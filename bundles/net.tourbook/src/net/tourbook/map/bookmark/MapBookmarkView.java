@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,6 +16,18 @@
 package net.tourbook.map.bookmark;
 
 import java.text.NumberFormat;
+
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
+import net.tourbook.common.util.ColumnDefinition;
+import net.tourbook.common.util.ColumnManager;
+import net.tourbook.common.util.IContextMenuProvider;
+import net.tourbook.common.util.ITourViewer;
+import net.tourbook.common.util.TableColumnDefinition;
+import net.tourbook.tour.ITourEventListener;
+import net.tourbook.tour.TourManager;
+import net.tourbook.ui.action.ActionModifyColumns;
 
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
@@ -54,736 +66,773 @@ import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 import org.oscim.core.MapPosition;
 
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.UI;
-import net.tourbook.common.util.ColumnDefinition;
-import net.tourbook.common.util.ColumnManager;
-import net.tourbook.common.util.ITourViewer;
-import net.tourbook.common.util.TableColumnDefinition;
-import net.tourbook.tour.ITourEventListener;
-import net.tourbook.tour.TourManager;
-import net.tourbook.ui.action.ActionModifyColumns;
-
 public class MapBookmarkView extends ViewPart implements ITourViewer {
 
-	public static final String		ID				= "net.tourbook.map.bookmark.MapBookmarkView";	//$NON-NLS-1$
+   public static final String    ID                              = "net.tourbook.map.bookmark.MapBookmarkView"; //$NON-NLS-1$
 
-	private final IDialogSettings	_state		= TourbookPlugin.getState(ID);
+   private final IDialogSettings _state                          = TourbookPlugin.getState(ID);
 
-	private ITourEventListener		_tourEventListener;
-	private IPartListener2			_partListener;
+   private ITourEventListener    _tourEventListener;
+   private IPartListener2        _partListener;
 
-	private ActionDeleteBookmark	_actionDeleteBookmark;
-	private ActionModifyColumns	_actionModifyColumns;
-	private ActionRenameBookmark	_actionRenameBookmark;
+   private PixelConverter        _pc;
 
-	private PixelConverter			_pc;
+   private TableViewer           _bookmarkViewer;
+   private ColumnManager         _columnManager;
 
-	private TableViewer				_bookmarkViewer;
-	private ColumnManager			_columnManager;
+   private MenuManager           _viewerMenuManager;
+   private IContextMenuProvider  _tableViewerContextMenuProvider = new TableContextMenuProvider();
 
-	private final NumberFormat		_nf0			= NumberFormat.getNumberInstance();
-	private final NumberFormat		_nfLatLon	= NumberFormat.getNumberInstance();
-	{
-		_nf0.setMinimumFractionDigits(0);
-		_nf0.setMaximumFractionDigits(0);
-		_nfLatLon.setMinimumFractionDigits(4);
-		_nfLatLon.setMaximumFractionDigits(4);
-	}
+   private ActionDeleteBookmark  _actionDeleteBookmark;
+   private ActionModifyColumns   _actionModifyColumns;
+   private ActionRenameBookmark  _actionRenameBookmark;
 
-	/*
-	 * UI controls
-	 */
-	private Composite	_parent;
+   private final NumberFormat    _nf0                            = NumberFormat.getNumberInstance();
+   private final NumberFormat    _nfLatLon                       = NumberFormat.getNumberInstance();
+   {
+      _nf0.setMinimumFractionDigits(0);
+      _nf0.setMaximumFractionDigits(0);
+      _nfLatLon.setMinimumFractionDigits(4);
+      _nfLatLon.setMaximumFractionDigits(4);
+   }
 
-	private Composite	_viewerContainer;
+   /*
+    * UI controls
+    */
+   private Composite _parent;
+   private Composite _viewerContainer;
 
-	/**
-	 * Delete bookmark
-	 */
-	private class ActionDeleteBookmark extends Action {
+   private Menu      _tableContextMenu;
 
-		public ActionDeleteBookmark() {
-			super(Messages.Map_Bookmark_Action_Bookmark_Delete, AS_PUSH_BUTTON);
-		}
+   /**
+    * Delete bookmark
+    */
+   private class ActionDeleteBookmark extends Action {
 
-		@Override
-		public void run() {
-			onBookmark_Delete();
-		}
-	}
+      public ActionDeleteBookmark() {
+         super(Messages.Map_Bookmark_Action_Bookmark_Delete, AS_PUSH_BUTTON);
+      }
 
-	/**
-	 * Rename bookmark
-	 */
-	private class ActionRenameBookmark extends Action {
+      @Override
+      public void run() {
+         onBookmark_Delete();
+      }
+   }
 
-		public ActionRenameBookmark() {
-			super(Messages.Map_Bookmark_Action_Bookmark_Rename, AS_PUSH_BUTTON);
-		}
+   /**
+    * Rename bookmark
+    */
+   private class ActionRenameBookmark extends Action {
 
-		@Override
-		public void run() {
-			onBookmark_Rename(true);
-		}
-	}
+      public ActionRenameBookmark() {
+         super(Messages.Map_Bookmark_Action_Bookmark_Rename, AS_PUSH_BUTTON);
+      }
 
-	private class BookmarkComparator extends ViewerComparator {
+      @Override
+      public void run() {
+         onBookmark_Rename(true);
+      }
+   }
 
-		@Override
-		public int compare(final Viewer viewer, final Object e1, final Object e2) {
+   private class BookmarkComparator extends ViewerComparator {
 
-			if (e1 == null || e2 == null) {
-				return 0;
-			}
+      @Override
+      public int compare(final Viewer viewer, final Object e1, final Object e2) {
 
-			final MapBookmark bookmark1 = (MapBookmark) e1;
-			final MapBookmark bookmark2 = (MapBookmark) e2;
+         if (e1 == null || e2 == null) {
+            return 0;
+         }
 
-			return bookmark1.name.compareTo(bookmark2.name);
-		}
+         final MapBookmark bookmark1 = (MapBookmark) e1;
+         final MapBookmark bookmark2 = (MapBookmark) e2;
 
-		@Override
-		public boolean isSorterProperty(final Object element, final String property) {
+         return bookmark1.name.compareTo(bookmark2.name);
+      }
 
-			// force resorting when a name is renamed
-			return true;
-		}
-	}
+      @Override
+      public boolean isSorterProperty(final Object element, final String property) {
 
-	private class BookmarkProvider implements IStructuredContentProvider {
+         // force resorting when a name is renamed
+         return true;
+      }
+   }
 
-		@Override
-		public void dispose() {}
+   private class BookmarkProvider implements IStructuredContentProvider {
 
-		@Override
-		public Object[] getElements(final Object inputElement) {
-			return MapBookmarkManager.getAllBookmarks().toArray();
-		}
+      @Override
+      public void dispose() {}
 
-		@Override
-		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
-	}
+      @Override
+      public Object[] getElements(final Object inputElement) {
+         return MapBookmarkManager.getAllBookmarks().toArray();
+      }
 
-	public MapBookmarkView() {
-		super();
-	}
+      @Override
+      public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
+   }
 
-	private void addPartListener() {
+   public class TableContextMenuProvider implements IContextMenuProvider {
 
-		_partListener = new IPartListener2() {
+      @Override
+      public void disposeContextMenu() {
 
-			@Override
-			public void partActivated(final IWorkbenchPartReference partRef) {}
+         if (_tableContextMenu != null) {
+            _tableContextMenu.dispose();
+         }
+      }
 
-			@Override
-			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
+      @Override
+      public Menu getContextMenu() {
+         return _tableContextMenu;
+      }
 
-			@Override
-			public void partClosed(final IWorkbenchPartReference partRef) {
+      @Override
+      public Menu recreateContextMenu() {
 
-				if (partRef.getPart(false) == MapBookmarkView.this) {
-					MapBookmarkManager.setMapBookmarkView(null);
-				}
-			}
+         disposeContextMenu();
 
-			@Override
-			public void partDeactivated(final IWorkbenchPartReference partRef) {}
+         _tableContextMenu = createUI_22_CreateViewerContextMenu();
 
-			@Override
-			public void partHidden(final IWorkbenchPartReference partRef) {}
+         return _tableContextMenu;
+      }
 
-			@Override
-			public void partInputChanged(final IWorkbenchPartReference partRef) {}
+   }
 
-			@Override
-			public void partOpened(final IWorkbenchPartReference partRef) {
+   public MapBookmarkView() {
+      super();
+   }
 
-				if (partRef.getPart(false) == MapBookmarkView.this) {
-					MapBookmarkManager.setMapBookmarkView(MapBookmarkView.this);
-				}
-			}
+   private void addPartListener() {
 
-			@Override
-			public void partVisible(final IWorkbenchPartReference partRef) {}
-		};
+      _partListener = new IPartListener2() {
 
-		getViewSite().getPage().addPartListener(_partListener);
-	}
+         @Override
+         public void partActivated(final IWorkbenchPartReference partRef) {}
 
-	private void createActions() {
+         @Override
+         public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
-		_actionModifyColumns = new ActionModifyColumns(this);
-		_actionDeleteBookmark = new ActionDeleteBookmark();
-		_actionRenameBookmark = new ActionRenameBookmark();
-	}
+         @Override
+         public void partClosed(final IWorkbenchPartReference partRef) {
 
-	@Override
-	public void createPartControl(final Composite parent) {
+            if (partRef.getPart(false) == MapBookmarkView.this) {
+               MapBookmarkManager.setMapBookmarkView(null);
+            }
+         }
 
-		initUI(parent);
+         @Override
+         public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
-		// define all columns for the viewer
-		_columnManager = new ColumnManager(this, _state);
-		defineAllColumns();
+         @Override
+         public void partHidden(final IWorkbenchPartReference partRef) {}
 
-		createUI(parent);
+         @Override
+         public void partInputChanged(final IWorkbenchPartReference partRef) {}
 
-		addPartListener();
+         @Override
+         public void partOpened(final IWorkbenchPartReference partRef) {
 
-		createActions();
-		fillToolbar();
+            if (partRef.getPart(false) == MapBookmarkView.this) {
+               MapBookmarkManager.setMapBookmarkView(MapBookmarkView.this);
+            }
+         }
 
-		updateUI_Viewer();
-	}
+         @Override
+         public void partVisible(final IWorkbenchPartReference partRef) {}
+      };
 
-	private void createUI(final Composite parent) {
+      getViewSite().getPage().addPartListener(_partListener);
+   }
 
-		_viewerContainer = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
-		{
-			createUI_10_TableViewer(_viewerContainer);
-		}
-	}
+   private void createActions() {
 
-	private void createUI_10_TableViewer(final Composite parent) {
+      _actionModifyColumns = new ActionModifyColumns(this);
+      _actionDeleteBookmark = new ActionDeleteBookmark();
+      _actionRenameBookmark = new ActionRenameBookmark();
+   }
 
-		/*
-		 * create table
-		 */
-		final Table table = new Table(parent, SWT.FULL_SELECTION /* | SWT.MULTI /* | SWT.BORDER */);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
+   private void createMenuManager() {
 
-		table.setHeaderVisible(true);
-//		table.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
-		table.setLinesVisible(false);
+      _viewerMenuManager = new MenuManager("#PopupMenu"); //$NON-NLS-1$
+      _viewerMenuManager.setRemoveAllWhenShown(true);
+      _viewerMenuManager.addMenuListener(new IMenuListener() {
+         @Override
+         public void menuAboutToShow(final IMenuManager manager) {
+            fillContextMenu(manager);
+         }
+      });
+   }
 
-		/*
-		 * create table viewer
-		 */
-		_bookmarkViewer = new TableViewer(table);
+   @Override
+   public void createPartControl(final Composite parent) {
 
-//		// set editing support after the viewer is created but before the columns are created
-//		net.tourbook.common.UI.setCellEditSupport(_markerViewer);
+      initUI(parent);
+      createMenuManager();
+
+      // define all columns for the viewer
+      _columnManager = new ColumnManager(this, _state);
+      defineAllColumns();
+
+      createUI(parent);
+
+      addPartListener();
+
+      createActions();
+      fillToolbar();
+
+      updateUI_Viewer();
+   }
+
+   private void createUI(final Composite parent) {
+
+      _viewerContainer = new Composite(parent, SWT.NONE);
+      GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
+      {
+         createUI_10_TableViewer(_viewerContainer);
+      }
+   }
+
+   private void createUI_10_TableViewer(final Composite parent) {
+
+      /*
+       * create table
+       */
+      final Table table = new Table(parent, SWT.FULL_SELECTION /* | SWT.MULTI /* | SWT.BORDER */);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
+
+      table.setHeaderVisible(true);
+//      table.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+      table.setLinesVisible(false);
+
+      /*
+       * create table viewer
+       */
+      _bookmarkViewer = new TableViewer(table);
+
+//      // set editing support after the viewer is created but before the columns are created
+//      net.tourbook.common.UI.setCellEditSupport(_markerViewer);
 //
-//		_colDefName.setEditingSupport(new MarkerEditingSupportLabel(_markerViewer));
-//		_colDefVisibility.setEditingSupport(new MarkerEditingSupportVisibility(_markerViewer));
+//      _colDefName.setEditingSupport(new MarkerEditingSupportLabel(_markerViewer));
+//      _colDefVisibility.setEditingSupport(new MarkerEditingSupportVisibility(_markerViewer));
 
-		_columnManager.createColumns(_bookmarkViewer);
+      _columnManager.createColumns(_bookmarkViewer);
 
-		_bookmarkViewer.setUseHashlookup(true);
-		_bookmarkViewer.setContentProvider(new BookmarkProvider());
-		_bookmarkViewer.setComparator(new BookmarkComparator());
+      _bookmarkViewer.setUseHashlookup(true);
+      _bookmarkViewer.setContentProvider(new BookmarkProvider());
+      _bookmarkViewer.setComparator(new BookmarkComparator());
 
-		_bookmarkViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+      _bookmarkViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 
-			@Override
-			public void selectionChanged(final SelectionChangedEvent event) {
-				onBookmark_Select();
-			}
-		});
+         @Override
+         public void selectionChanged(final SelectionChangedEvent event) {
+            onBookmark_Select();
+         }
+      });
 
-		_bookmarkViewer.addDoubleClickListener(new IDoubleClickListener() {
+      _bookmarkViewer.addDoubleClickListener(new IDoubleClickListener() {
 
-			@Override
-			public void doubleClick(final DoubleClickEvent event) {
-				onBookmark_Rename(true);
-			}
-		});
+         @Override
+         public void doubleClick(final DoubleClickEvent event) {
+            onBookmark_Rename(true);
+         }
+      });
 
-		_bookmarkViewer.getTable().addKeyListener(new KeyListener() {
+      _bookmarkViewer.getTable().addKeyListener(new KeyListener() {
 
-			@Override
-			public void keyPressed(final KeyEvent e) {
+         @Override
+         public void keyPressed(final KeyEvent e) {
 
-				switch (e.keyCode) {
+            switch (e.keyCode) {
 
-				case SWT.DEL:
-					onBookmark_Delete();
-					break;
+            case SWT.DEL:
+               onBookmark_Delete();
+               break;
 
-				case SWT.F2:
-					onBookmark_Rename(false);
-					break;
+            case SWT.F2:
+               onBookmark_Rename(false);
+               break;
 
-				default:
-					break;
-				}
-			}
+            default:
+               break;
+            }
+         }
 
-			@Override
-			public void keyReleased(final KeyEvent e) {}
-		});
+         @Override
+         public void keyReleased(final KeyEvent e) {}
+      });
 
-		createUI_20_ContextMenu();
-	}
+      createUI_20_ContextMenu();
+   }
 
-	/**
-	 * create the views context menu
-	 */
-	private void createUI_20_ContextMenu() {
+   /**
+    * create the views context menu
+    */
+   private void createUI_20_ContextMenu() {
 
-		final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
-		menuMgr.setRemoveAllWhenShown(true);
-		menuMgr.addMenuListener(new IMenuListener() {
-			@Override
-			public void menuAboutToShow(final IMenuManager manager) {
-				fillContextMenu(manager);
-			}
-		});
+      _tableContextMenu = createUI_22_CreateViewerContextMenu();
 
-		final Table table = (Table) _bookmarkViewer.getControl();
-		final Menu tableContextMenu = menuMgr.createContextMenu(table);
+      final Table table = (Table) _bookmarkViewer.getControl();
 
-		_columnManager.createHeaderContextMenu(table, tableContextMenu);
-	}
+      _columnManager.createHeaderContextMenu(table, _tableViewerContextMenuProvider);
+   }
 
-	private void defineAllColumns() {
+   /**
+    * create the views context menu
+    *
+    * @return
+    */
+   private Menu createUI_22_CreateViewerContextMenu() {
 
-		defineColumn_10_Name();
-		defineColumn_20_Zoomlevel();
-		defineColumn_30_Scale();
-		defineColumn_40_Bearing();
-		defineColumn_50_Tilt();
-		defineColumn_60_Latitude();
-		defineColumn_70_Longitude();
-	}
+      final Table table = (Table) _bookmarkViewer.getControl();
+      final Menu tableContextMenu = _viewerMenuManager.createContextMenu(table);
 
-	/**
-	 * Column: Name
-	 */
-	private void defineColumn_10_Name() {
+      return tableContextMenu;
+   }
 
-		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "name", SWT.LEAD); //$NON-NLS-1$
+   private void defineAllColumns() {
 
-		colDef.setColumnLabel(Messages.Map_Bookmark_Column_Name);
-		colDef.setColumnHeaderText(Messages.Map_Bookmark_Column_Name);
+      defineColumn_10_Name();
+      defineColumn_20_Zoomlevel();
+      defineColumn_30_Scale();
+      defineColumn_40_Bearing();
+      defineColumn_50_Tilt();
+      defineColumn_60_Latitude();
+      defineColumn_70_Longitude();
+   }
 
-		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(30));
-//		colDef.setColumnWeightData(new ColumnWeightData(30));
+   /**
+    * Column: Name
+    */
+   private void defineColumn_10_Name() {
 
-		colDef.setIsDefaultColumn();
-		colDef.setCanModifyVisibility(false);
+      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "name", SWT.LEAD); //$NON-NLS-1$
 
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				final MapBookmark bookmark = (MapBookmark) cell.getElement();
+      colDef.setColumnLabel(Messages.Map_Bookmark_Column_Name);
+      colDef.setColumnHeaderText(Messages.Map_Bookmark_Column_Name);
 
-				cell.setText(bookmark.name);
-			}
-		});
-	}
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(30));
+//      colDef.setColumnWeightData(new ColumnWeightData(30));
 
-	/**
-	 * Column: Zoomlevel
-	 */
-	private void defineColumn_20_Zoomlevel() {
+      colDef.setIsDefaultColumn();
+      colDef.setCanModifyVisibility(false);
 
-		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "zoomLevel", SWT.TRAIL); //$NON-NLS-1$
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+            final MapBookmark bookmark = (MapBookmark) cell.getElement();
 
-		colDef.setColumnLabel(Messages.Map_Bookmark_Column_ZoomLevel_Tooltip);
-		colDef.setColumnHeaderText(Messages.Map_Bookmark_Column_ZoomLevel);
-		colDef.setColumnHeaderToolTipText(Messages.Map_Bookmark_Column_ZoomLevel_Tooltip);
+            cell.setText(bookmark.name);
+         }
+      });
+   }
 
-		colDef.setIsDefaultColumn();
-		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(5));
-//		colDef.setColumnWeightData(new ColumnWeightData(5));
+   /**
+    * Column: Zoomlevel
+    */
+   private void defineColumn_20_Zoomlevel() {
 
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
+      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "zoomLevel", SWT.TRAIL); //$NON-NLS-1$
 
-				final MapBookmark bookmark = (MapBookmark) cell.getElement();
-				final MapPosition mapPos = bookmark.getMapPosition();
+      colDef.setColumnLabel(Messages.Map_Bookmark_Column_ZoomLevel_Tooltip);
+      colDef.setColumnHeaderText(Messages.Map_Bookmark_Column_ZoomLevel);
+      colDef.setColumnHeaderToolTipText(Messages.Map_Bookmark_Column_ZoomLevel_Tooltip);
 
-				cell.setText(Integer.toString(mapPos.zoomLevel));
-			}
-		});
-	}
+      colDef.setIsDefaultColumn();
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(5));
+//      colDef.setColumnWeightData(new ColumnWeightData(5));
 
-	/**
-	 * Column: Scale
-	 */
-	private void defineColumn_30_Scale() {
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
 
-		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "scale", SWT.TRAIL); //$NON-NLS-1$
+            final MapBookmark bookmark = (MapBookmark) cell.getElement();
+            final MapPosition mapPos = bookmark.getMapPosition();
 
-		colDef.setColumnLabel(Messages.Map_Bookmark_Column_Scale);
-		colDef.setColumnHeaderText(Messages.Map_Bookmark_Column_Scale);
-
-		colDef.setIsDefaultColumn();
-		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(9));
-//		colDef.setColumnWeightData(new ColumnWeightData(9));
+            cell.setText(Integer.toString(mapPos.zoomLevel));
+         }
+      });
+   }
 
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
+   /**
+    * Column: Scale
+    */
+   private void defineColumn_30_Scale() {
 
-				final MapBookmark bookmark = (MapBookmark) cell.getElement();
+      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "scale", SWT.TRAIL); //$NON-NLS-1$
 
-				final double value = bookmark.getMapPosition().scale;
+      colDef.setColumnLabel(Messages.Map_Bookmark_Column_Scale);
+      colDef.setColumnHeaderText(Messages.Map_Bookmark_Column_Scale);
 
-				String valueText;
-				if (value == 0) {
-					valueText = UI.EMPTY_STRING;
-				} else {
-					valueText = _nf0.format(value);
-				}
+      colDef.setIsDefaultColumn();
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(9));
+//      colDef.setColumnWeightData(new ColumnWeightData(9));
 
-				cell.setText(valueText);
-			}
-		});
-	}
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
 
-	/**
-	 * Column: Bearing
-	 */
-	private void defineColumn_40_Bearing() {
+            final MapBookmark bookmark = (MapBookmark) cell.getElement();
 
-		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "bearing", SWT.TRAIL); //$NON-NLS-1$
+            final double value = bookmark.getMapPosition().scale;
 
-		colDef.setColumnLabel(Messages.Map_Bookmark_Column_Bearing);
-		colDef.setColumnHeaderText(Messages.Map_Bookmark_Column_Bearing);
-		colDef.setColumnHeaderToolTipText(Messages.Map_Bookmark_Column_Bearing_Tooltip);
-		colDef.setColumnUnit(UI.SYMBOL_DEGREE);
+            String valueText;
+            if (value == 0) {
+               valueText = UI.EMPTY_STRING;
+            } else {
+               valueText = _nf0.format(value);
+            }
 
-		colDef.setIsDefaultColumn();
-		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(9));
-//		colDef.setColumnWeightData(new ColumnWeightData(9));
+            cell.setText(valueText);
+         }
+      });
+   }
 
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
+   /**
+    * Column: Bearing
+    */
+   private void defineColumn_40_Bearing() {
 
-				final MapBookmark bookmark = (MapBookmark) cell.getElement();
+      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "bearing", SWT.TRAIL); //$NON-NLS-1$
 
-				final float value = bookmark.getMapPosition().bearing;
-				String valueText;
+      colDef.setColumnLabel(Messages.Map_Bookmark_Column_Bearing);
+      colDef.setColumnHeaderText(Messages.Map_Bookmark_Column_Bearing);
+      colDef.setColumnHeaderToolTipText(Messages.Map_Bookmark_Column_Bearing_Tooltip);
+      colDef.setColumnUnit(UI.SYMBOL_DEGREE);
 
-				if (value == 0) {
-					valueText = UI.EMPTY_STRING;
-				} else {
-					valueText = _nf0.format(value);
-				}
+      colDef.setIsDefaultColumn();
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(9));
+//      colDef.setColumnWeightData(new ColumnWeightData(9));
 
-				cell.setText(valueText);
-			}
-		});
-	}
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
 
-	/**
-	 * Column: Tilt
-	 */
-	private void defineColumn_50_Tilt() {
+            final MapBookmark bookmark = (MapBookmark) cell.getElement();
 
-		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "tilt", SWT.TRAIL); //$NON-NLS-1$
+            final float value = bookmark.getMapPosition().bearing;
+            String valueText;
 
-		colDef.setColumnLabel(Messages.Map_Bookmark_Column_Tilt);
-		colDef.setColumnHeaderText(Messages.Map_Bookmark_Column_Tilt);
-		colDef.setColumnHeaderToolTipText(Messages.Map_Bookmark_Column_Tilt_Tooltip);
-		colDef.setColumnUnit(UI.SYMBOL_DEGREE);
+            if (value == 0) {
+               valueText = UI.EMPTY_STRING;
+            } else {
+               valueText = _nf0.format(value);
+            }
 
-		colDef.setIsDefaultColumn();
-		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(9));
-//		colDef.setColumnWeightData(new ColumnWeightData(9));
+            cell.setText(valueText);
+         }
+      });
+   }
 
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
+   /**
+    * Column: Tilt
+    */
+   private void defineColumn_50_Tilt() {
 
-				final MapBookmark bookmark = (MapBookmark) cell.getElement();
+      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "tilt", SWT.TRAIL); //$NON-NLS-1$
 
-				final float value = bookmark.getMapPosition().tilt;
-				String valueText;
+      colDef.setColumnLabel(Messages.Map_Bookmark_Column_Tilt);
+      colDef.setColumnHeaderText(Messages.Map_Bookmark_Column_Tilt);
+      colDef.setColumnHeaderToolTipText(Messages.Map_Bookmark_Column_Tilt_Tooltip);
+      colDef.setColumnUnit(UI.SYMBOL_DEGREE);
 
-				if (value == 0) {
-					valueText = UI.EMPTY_STRING;
-				} else {
-					valueText = _nf0.format(value);
-				}
+      colDef.setIsDefaultColumn();
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(9));
+//      colDef.setColumnWeightData(new ColumnWeightData(9));
 
-				cell.setText(valueText);
-			}
-		});
-	}
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
 
-	/**
-	 * Column: Latitude
-	 */
-	private void defineColumn_60_Latitude() {
+            final MapBookmark bookmark = (MapBookmark) cell.getElement();
 
-		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "latitude", SWT.TRAIL); //$NON-NLS-1$
+            final float value = bookmark.getMapPosition().tilt;
+            String valueText;
 
-		colDef.setColumnLabel(Messages.Map_Bookmark_Column_Latitude_Tooltip);
-		colDef.setColumnHeaderText(Messages.Map_Bookmark_Column_Latitude);
-		colDef.setColumnHeaderToolTipText(Messages.Map_Bookmark_Column_Latitude_Tooltip);
+            if (value == 0) {
+               valueText = UI.EMPTY_STRING;
+            } else {
+               valueText = _nf0.format(value);
+            }
 
-		colDef.setIsDefaultColumn();
-		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(9));
-//		colDef.setColumnWeightData(new ColumnWeightData(9));
+            cell.setText(valueText);
+         }
+      });
+   }
 
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
+   /**
+    * Column: Latitude
+    */
+   private void defineColumn_60_Latitude() {
 
-				final MapBookmark bookmark = (MapBookmark) cell.getElement();
-				final String valueText = _nfLatLon.format(bookmark.getLatitude());
+      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "latitude", SWT.TRAIL); //$NON-NLS-1$
 
-				cell.setText(valueText);
-			}
-		});
-	}
+      colDef.setColumnLabel(Messages.Map_Bookmark_Column_Latitude_Tooltip);
+      colDef.setColumnHeaderText(Messages.Map_Bookmark_Column_Latitude);
+      colDef.setColumnHeaderToolTipText(Messages.Map_Bookmark_Column_Latitude_Tooltip);
 
-	/**
-	 * Column: Longitude
-	 */
-	private void defineColumn_70_Longitude() {
+      colDef.setIsDefaultColumn();
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(9));
+//      colDef.setColumnWeightData(new ColumnWeightData(9));
 
-		final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "longitude", SWT.TRAIL); //$NON-NLS-1$
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
 
-		colDef.setColumnLabel(Messages.Map_Bookmark_Column_Longitude_Tooltip);
-		colDef.setColumnHeaderText(Messages.Map_Bookmark_Column_Longitude);
-		colDef.setColumnHeaderToolTipText(Messages.Map_Bookmark_Column_Longitude_Tooltip);
+            final MapBookmark bookmark = (MapBookmark) cell.getElement();
+            final String valueText = _nfLatLon.format(bookmark.getLatitude());
 
-		colDef.setIsDefaultColumn();
-		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(9));
-//		colDef.setColumnWeightData(new ColumnWeightData(9));
+            cell.setText(valueText);
+         }
+      });
+   }
 
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
+   /**
+    * Column: Longitude
+    */
+   private void defineColumn_70_Longitude() {
 
-				final MapBookmark bookmark = (MapBookmark) cell.getElement();
-				final String valueText = _nfLatLon.format(bookmark.getLongitude());
+      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "longitude", SWT.TRAIL); //$NON-NLS-1$
 
-				cell.setText(valueText);
-			}
-		});
-	}
+      colDef.setColumnLabel(Messages.Map_Bookmark_Column_Longitude_Tooltip);
+      colDef.setColumnHeaderText(Messages.Map_Bookmark_Column_Longitude);
+      colDef.setColumnHeaderToolTipText(Messages.Map_Bookmark_Column_Longitude_Tooltip);
 
-	@Override
-	public void dispose() {
+      colDef.setIsDefaultColumn();
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(9));
+//      colDef.setColumnWeightData(new ColumnWeightData(9));
 
-		TourManager.getInstance().removeTourEventListener(_tourEventListener);
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
 
-		getViewSite().getPage().removePartListener(_partListener);
+            final MapBookmark bookmark = (MapBookmark) cell.getElement();
+            final String valueText = _nfLatLon.format(bookmark.getLongitude());
 
-		super.dispose();
-	}
+            cell.setText(valueText);
+         }
+      });
+   }
 
-	/**
-	 * enable actions
-	 */
-	private void enableActions() {
+   @Override
+   public void dispose() {
 
-		final MapBookmark selectedBookmark = getSelectedBookmark();
-		final boolean isSelected = selectedBookmark != null;
+      TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
-		_actionDeleteBookmark.setEnabled(isSelected);
-		_actionRenameBookmark.setEnabled(isSelected);
-	}
+      getViewSite().getPage().removePartListener(_partListener);
 
-	private void fillContextMenu(final IMenuManager menuMgr) {
+      super.dispose();
+   }
 
-		menuMgr.add(_actionRenameBookmark);
-		menuMgr.add(_actionDeleteBookmark);
+   /**
+    * enable actions
+    */
+   private void enableActions() {
 
-		enableActions();
-	}
+      final MapBookmark selectedBookmark = getSelectedBookmark();
+      final boolean isSelected = selectedBookmark != null;
 
-	private void fillToolbar() {
+      _actionDeleteBookmark.setEnabled(isSelected);
+      _actionRenameBookmark.setEnabled(isSelected);
+   }
 
-		final IActionBars actionBars = getViewSite().getActionBars();
+   private void fillContextMenu(final IMenuManager menuMgr) {
 
-		/*
-		 * Fill view menu
-		 */
-		final IMenuManager menuMgr = actionBars.getMenuManager();
+      menuMgr.add(_actionRenameBookmark);
+      menuMgr.add(_actionDeleteBookmark);
 
-		menuMgr.add(new Separator());
-		menuMgr.add(_actionModifyColumns);
+      enableActions();
+   }
 
-		/*
-		 * Fill view toolbar
-		 */
-//		final IToolBarManager tbm = actionBars.getToolBarManager();
+   private void fillToolbar() {
+
+      final IActionBars actionBars = getViewSite().getActionBars();
+
+      /*
+       * Fill view menu
+       */
+      final IMenuManager menuMgr = actionBars.getMenuManager();
+
+      menuMgr.add(new Separator());
+      menuMgr.add(_actionModifyColumns);
+
+      /*
+       * Fill view toolbar
+       */
+//      final IToolBarManager tbm = actionBars.getToolBarManager();
 //
-//		tbm.add();
-	}
+//      tbm.add();
+   }
 
-	@Override
-	public ColumnManager getColumnManager() {
-		return _columnManager;
-	}
+   @Override
+   public ColumnManager getColumnManager() {
+      return _columnManager;
+   }
 
-	public Object getMarkerViewer() {
-		return _bookmarkViewer;
-	}
+   public Object getMarkerViewer() {
+      return _bookmarkViewer;
+   }
 
-	/**
-	 * @return Returns the selected bookmark or <code>null</code> if not selected
-	 */
-	private MapBookmark getSelectedBookmark() {
+   /**
+    * @return Returns the selected bookmark or <code>null</code> if not selected
+    */
+   private MapBookmark getSelectedBookmark() {
 
-		final IStructuredSelection selection = (IStructuredSelection) _bookmarkViewer.getSelection();
-		final MapBookmark selectedBookmark = (MapBookmark) selection.getFirstElement();
+      final IStructuredSelection selection = (IStructuredSelection) _bookmarkViewer.getSelection();
+      final MapBookmark selectedBookmark = (MapBookmark) selection.getFirstElement();
 
-		return selectedBookmark;
-	}
+      return selectedBookmark;
+   }
 
-	@Override
-	public ColumnViewer getViewer() {
-		return _bookmarkViewer;
-	}
+   @Override
+   public ColumnViewer getViewer() {
+      return _bookmarkViewer;
+   }
 
-	private void initUI(final Composite parent) {
+   private void initUI(final Composite parent) {
 
-		_parent = parent;
+      _parent = parent;
 
-		_pc = new PixelConverter(parent);
-	}
+      _pc = new PixelConverter(parent);
+   }
 
-	private void onBookmark_Delete() {
-		final MapBookmark selectedBookmark = getSelectedBookmark();
+   private void onBookmark_Delete() {
+      final MapBookmark selectedBookmark = getSelectedBookmark();
 
-		if (selectedBookmark == null) {
-			// this happened when deleting a bookmark
-			return;
-		}
+      if (selectedBookmark == null) {
+         // this happened when deleting a bookmark
+         return;
+      }
 
-		// update model
-		MapBookmarkManager.getAllBookmarks().remove(selectedBookmark);
-		MapBookmarkManager.getAllRecentBookmarks().remove(selectedBookmark);
+      // update model
+      MapBookmarkManager.getAllBookmarks().remove(selectedBookmark);
+      MapBookmarkManager.getAllRecentBookmarks().remove(selectedBookmark);
 
-		// update UI
-		_bookmarkViewer.refresh();
-		
-		// update maps
-		MapBookmarkManager.fireBookmarkEvent(selectedBookmark, net.tourbook.map.bookmark.IMapBookmarks.MapBookmarkEventType.MODIFIED);
+      // update UI
+      _bookmarkViewer.refresh();
 
-		enableActions();
-	}
+      // update maps
+      MapBookmarkManager.fireBookmarkEvent(selectedBookmark, net.tourbook.map.bookmark.IMapBookmarks.MapBookmarkEventType.MODIFIED);
 
-	/**
-	 * @param isOpenedWithMouse
-	 *           Is <code>true</code> when the action is opened with the mouse, otherwise with the
-	 *           keyboard
-	 */
-	private void onBookmark_Rename(final boolean isOpenedWithMouse) {
-      
-		final MapBookmark selectedBookmark = getSelectedBookmark();
-		
-		final BookmarkRenameDialog renameDialog = new BookmarkRenameDialog(
+      enableActions();
+   }
 
-				_parent.getShell(),
-				Messages.Map_Bookmark_Dialog_RenameBookmark_Title,
-				Messages.Map_Bookmark_Dialog_RenameBookmark_Message,
-				selectedBookmark.name,
-				isOpenedWithMouse,
-				new IInputValidator() {
+   /**
+    * @param isOpenedWithMouse
+    *           Is <code>true</code> when the action is opened with the mouse, otherwise with the
+    *           keyboard
+    */
+   private void onBookmark_Rename(final boolean isOpenedWithMouse) {
 
-					@Override
-					public String isValid(final String newText) {
+      final MapBookmark selectedBookmark = getSelectedBookmark();
 
-						if (newText.trim().length() == 0) {
-							return Messages.Map_Bookmark_Dialog_ValidationRename;
-						}
+      final BookmarkRenameDialog renameDialog = new BookmarkRenameDialog(
 
-						return null;
-					}
-				});
+            _parent.getShell(),
+            Messages.Map_Bookmark_Dialog_RenameBookmark_Title,
+            Messages.Map_Bookmark_Dialog_RenameBookmark_Message,
+            selectedBookmark.name,
+            isOpenedWithMouse,
+            new IInputValidator() {
 
-		renameDialog.open();
+               @Override
+               public String isValid(final String newText) {
 
-		if (renameDialog.getReturnCode() != Window.OK) {
-			return;
-		}
+                  if (newText.trim().length() == 0) {
+                     return Messages.Map_Bookmark_Dialog_ValidationRename;
+                  }
 
-		// update model
-		selectedBookmark.name = renameDialog.getValue();
+                  return null;
+               }
+            });
 
-		// update ui
-		_bookmarkViewer.refresh();
+      renameDialog.open();
 
-		// reselect bookmark
-		_bookmarkViewer.setSelection(new StructuredSelection(selectedBookmark), true);
-		
-		//update maps
-		MapBookmarkManager.fireBookmarkEvent(null, net.tourbook.map.bookmark.IMapBookmarks.MapBookmarkEventType.MODIFIED);
-	}
+      if (renameDialog.getReturnCode() != Window.OK) {
+         return;
+      }
 
-	private void onBookmark_Select() {
+      // update model
+      selectedBookmark.name = renameDialog.getValue();
 
-		final MapBookmark selectedBookmark = getSelectedBookmark();
+      // update ui
+      _bookmarkViewer.refresh();
 
-		if (selectedBookmark == null) {
-			// this happened when deleting a bookmark
-			return;
-		}
-		
-		MapBookmarkManager.fireBookmarkEvent(selectedBookmark, net.tourbook.map.bookmark.IMapBookmarks.MapBookmarkEventType.MOVETO);
+      // reselect bookmark
+      _bookmarkViewer.setSelection(new StructuredSelection(selectedBookmark), true);
 
-		enableActions();
-	}
+      //update maps
+      MapBookmarkManager.fireBookmarkEvent(null, net.tourbook.map.bookmark.IMapBookmarks.MapBookmarkEventType.MODIFIED);
+   }
 
-	void onDeleteBookmark(final MapBookmark deletedBookmark) {
+   private void onBookmark_Select() {
 
-		_bookmarkViewer.refresh();
-	}
+      final MapBookmark selectedBookmark = getSelectedBookmark();
 
-	void onUpdateBookmark(final MapBookmark updatedBookmark) {
+      if (selectedBookmark == null) {
+         // this happened when deleting a bookmark
+         return;
+      }
 
-	   _bookmarkViewer.refresh(true, true);
- 
-	   MapBookmarkManager.fireBookmarkEvent(null, net.tourbook.map.bookmark.IMapBookmarks.MapBookmarkEventType.MODIFIED);
+      MapBookmarkManager.fireBookmarkEvent(selectedBookmark, net.tourbook.map.bookmark.IMapBookmarks.MapBookmarkEventType.MOVETO);
 
-	}
+      enableActions();
+   }
 
-	@Override
-	public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
+   void onDeleteBookmark(final MapBookmark deletedBookmark) {
 
-		_viewerContainer.setRedraw(false);
-		{
-			_bookmarkViewer.getTable().dispose();
-			createUI_10_TableViewer(_viewerContainer);
-			_viewerContainer.layout();
+      _bookmarkViewer.refresh();
+   }
 
-			// update the viewer
-			reloadViewer();
-		}
-		_viewerContainer.setRedraw(true);
+   void onUpdateBookmark(final MapBookmark updatedBookmark) {
 
-		return _bookmarkViewer;
-	}
+      _bookmarkViewer.refresh(true, true);
 
-	@Override
-	public void reloadViewer() {
+      MapBookmarkManager.fireBookmarkEvent(null, net.tourbook.map.bookmark.IMapBookmarks.MapBookmarkEventType.MODIFIED);
 
-		updateUI_Viewer();
-	}
+   }
 
-	@PersistState
-	private void saveState() {
+   @Override
+   public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
 
-		_columnManager.saveState(_state);
-	}
+      _viewerContainer.setRedraw(false);
+      {
+         _bookmarkViewer.getTable().dispose();
+         createUI_10_TableViewer(_viewerContainer);
+         _viewerContainer.layout();
 
-	@Override
-	public void setFocus() {
+         // update the viewer
+         reloadViewer();
+      }
+      _viewerContainer.setRedraw(true);
 
-		_bookmarkViewer.getTable().setFocus();
-	}
+      return _bookmarkViewer;
+   }
 
-	@Override
-	public void updateColumnHeader(final ColumnDefinition colDef) {}
+   @Override
+   public void reloadViewer() {
 
-	private void updateUI_Viewer() {
+      updateUI_Viewer();
+   }
 
-		_bookmarkViewer.setInput(new Object[0]);
+   @PersistState
+   private void saveState() {
 
-		enableActions();
-	}
+      _columnManager.saveState(_state);
+   }
+
+   @Override
+   public void setFocus() {
+
+      _bookmarkViewer.getTable().setFocus();
+   }
+
+   @Override
+   public void updateColumnHeader(final ColumnDefinition colDef) {}
+
+   private void updateUI_Viewer() {
+
+      _bookmarkViewer.setInput(new Object[0]);
+
+      enableActions();
+   }
 }
-

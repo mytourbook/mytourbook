@@ -25,7 +25,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 
 import de.byteholder.geoclipse.preferences.IMappingPreferences;
-import de.byteholder.geoclipse.preferences.PrefPageMapProviders;
+import de.byteholder.geoclipse.preferences.PrefPage_Map2_Providers;
 
 public class ActionManageMapProviders extends Action {
 
@@ -52,7 +52,7 @@ public class ActionManageMapProviders extends Action {
 
 		PreferencesUtil.createPreferenceDialogOn(
 				Display.getCurrent().getActiveShell(),
-				PrefPageMapProviders.PREF_PAGE_MAP_PROVIDER_ID,
+				PrefPage_Map2_Providers.ID,
 				null,
 				null).open();
 	}

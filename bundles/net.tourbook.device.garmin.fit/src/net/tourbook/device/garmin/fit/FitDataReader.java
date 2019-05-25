@@ -63,6 +63,10 @@ public class FitDataReader extends TourbookDevice {
 
    private void addDebugLogListener(final MesgBroadcaster broadcaster) {
 
+//      ArrayList<MesgListener> mesgListeners = new ArrayList<MesgListener>();
+//      ArrayList<MesgDefinitionListener> mesgDefListeners = new ArrayList<MesgDefinitionListener>();
+//      ArrayList<DeveloperFieldDescriptionListener> devFieldDescListeners = new ArrayList<DeveloperFieldDescriptionListener>();
+
       broadcaster.addListener(new MesgListener() {
          @Override
          public void onMesg(final Mesg mesg) {

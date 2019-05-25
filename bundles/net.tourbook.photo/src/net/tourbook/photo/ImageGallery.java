@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -33,6 +33,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
+import net.tourbook.common.util.IContextMenuProvider;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.LRUMap;
 import net.tourbook.common.util.StatusUtil;
@@ -108,7 +109,7 @@ import org.eclipse.ui.progress.UIJob;
 
 /**
  * This class is a compilation from different source codes:
- * 
+ *
  * <pre>
  * org.eclipse.swt.examples.fileviewer
  * org.sharemedia.gui.libraryviews.GalleryLibraryView
@@ -117,3265 +118,3298 @@ import org.eclipse.ui.progress.UIJob;
  * </pre>
  */
 public abstract class ImageGallery implements IItemListener, IGalleryContextMenuProvider, IPhotoProvider, ITourViewer,
-		IPhotoEvictionListener {
-
-	/**
-	 * Number of gallery positions which are cached
-	 */
-	private static final int		MAX_GALLERY_POSITIONS			= 100;
-
-	private static final String		MENU_ID_PHOTO_GALLERY			= "menu.net.tourbook.photo.PhotoGallery";		//$NON-NLS-1$
-
-	private static final int		DELAY_JOB_SUBSEQUENT_FILTER		= 500;											// ms
-	private static final long		DELAY_JOB_UI_FILTER				= 200;											// ms
-	private static final long		DELAY_JOB_UI_LOADING			= 200;											// ms
-
-	public static final int			MIN_GALLERY_ITEM_WIDTH			= 10;											// pixel
-	public static final int			MAX_GALLERY_ITEM_WIDTH			= 2000;										// pixel
-
-	public static final String		STATE_THUMB_IMAGE_SIZE			= "STATE_THUMB_IMAGE_SIZE";					//$NON-NLS-1$
-	private static final String		STATE_GALLERY_POSITION_KEY		= "STATE_GALLERY_POSITION_KEY";				//$NON-NLS-1$
-	private static final String		STATE_GALLERY_POSITION_VALUE	= "STATE_GALLERY_POSITION_VALUE";				//$NON-NLS-1$
-	private static final String		STATE_IMAGE_SORTING				= "STATE_IMAGE_SORTING";						//$NON-NLS-1$
-	private static final String		STATE_SELECTED_ITEMS			= "STATE_SELECTED_ITEMS";						//$NON-NLS-1$
-
-	private static final String		DEFAULT_GALLERY_FONT			= "arial,sans-serif";							//$NON-NLS-1$
-
-	private IDialogSettings			_state;
-	private final IPreferenceStore	_prefStore						= Activator.getDefault().getPreferenceStore();
-
-	/*
-	 * worker thread management
-	 */
-	/**
-	 * Worker start time
-	 */
-	private long					_workerStart;
-
-	/**
-	 * Lock for all worker control data and state
-	 */
-	private final Object			_workerLock						= new Object();
-
-	/**
-	 * The worker's thread
-	 */
-	private volatile Thread			_workerThread					= null;
-
-	/**
-	 * True if the worker must exit on completion of the current cycle
-	 */
-	private volatile boolean		_workerStopped					= false;
-
-	/**
-	 * True if the worker must cancel its operations prematurely perhaps due to a state update
-	 */
-	private volatile boolean		_workerCancelled				= false;
-
-	/**
-	 * Worker state information -- this is what gets synchronized by an update
-	 */
-	private volatile File			_workerStateDir					= null;
-
-	/**
-	 * State information to use for the next cycle
-	 */
-	private volatile File			_workerNextFolder				= null;
-
-	/**
-	 * Manages the worker's thread
-	 */
-	private final Runnable			_workerRunnable;
-
-	/*
-	 * image loading/filtering
-	 */
-	private PhotoFilterGPS			_imageFilterGPS;
-	private PhotoFilterTour			_imageFilterTour;
-
-	private boolean					_filterJob1stRun;
-	private boolean					_filterJobIsCanceled;
-
-	private ReentrantLock			JOB_LOCK						= new ReentrantLock();
-	private Job						_jobFilter;
-
-	private AtomicBoolean			_jobFilterIsSubsequentScheduled	= new AtomicBoolean();
-	private int						_jobFilterDirtyCounter;
-
-	private UIJob					_jobUIFilter;
-	private AtomicBoolean			_jobUIFilterJobIsScheduled		= new AtomicBoolean();
-	private int						_jobUIFilterDirtyCounter;
-	private Photo[]					_jobUIFilterPhoto;
-
-	private Job						_jobUILoading;
-	private AtomicBoolean			_jobUILoadingIsScheduled		= new AtomicBoolean();
-	private int						_jobUILoadingDirtyCounter;
-
-	private int						_currentExifRunId;
-
-	/**
-	 *
-	 */
-	public Comparator<Photo>		SORT_BY_IMAGE_DATE;
-	public Comparator<Photo>		SORT_BY_FILE_NAME;
-	/**
-	 * Contains current gallery sorting id: {@link PicDirView#GALLERY_SORTING_BY_DATE} or
-	 * {@link PicDirView#GALLERY_SORTING_BY_NAME}
-	 */
-	private Comparator<Photo>		_currentComparator;
-	private GallerySorting			_currentSorting;
+      IPhotoEvictionListener {
+
+   /**
+    * Number of gallery positions which are cached
+    */
+   private static final int       MAX_GALLERY_POSITIONS        = 100;
+
+   private static final String    MENU_ID_PHOTO_GALLERY        = "menu.net.tourbook.photo.PhotoGallery";     //$NON-NLS-1$
+
+   private static final int       DELAY_JOB_SUBSEQUENT_FILTER  = 500;                                        // ms
+   private static final long      DELAY_JOB_UI_FILTER          = 200;                                        // ms
+   private static final long      DELAY_JOB_UI_LOADING         = 200;                                        // ms
+
+   public static final int        MIN_GALLERY_ITEM_WIDTH       = 10;                                         // pixel
+   public static final int        MAX_GALLERY_ITEM_WIDTH       = 2000;                                       // pixel
+
+   public static final String     STATE_THUMB_IMAGE_SIZE       = "STATE_THUMB_IMAGE_SIZE";                   //$NON-NLS-1$
+   private static final String    STATE_GALLERY_POSITION_KEY   = "STATE_GALLERY_POSITION_KEY";               //$NON-NLS-1$
+   private static final String    STATE_GALLERY_POSITION_VALUE = "STATE_GALLERY_POSITION_VALUE";             //$NON-NLS-1$
+   private static final String    STATE_IMAGE_SORTING          = "STATE_IMAGE_SORTING";                      //$NON-NLS-1$
+   private static final String    STATE_SELECTED_ITEMS         = "STATE_SELECTED_ITEMS";                     //$NON-NLS-1$
+
+   private static final String    DEFAULT_GALLERY_FONT         = "arial,sans-serif";                         //$NON-NLS-1$
+
+   private IDialogSettings        _state;
+   private final IPreferenceStore _prefStore                   = Activator.getDefault().getPreferenceStore();
+
+   /*
+    * worker thread management
+    */
+   /**
+    * Worker start time
+    */
+   private long             _workerStart;
+
+   /**
+    * Lock for all worker control data and state
+    */
+   private final Object     _workerLock       = new Object();
+
+   /**
+    * The worker's thread
+    */
+   private volatile Thread  _workerThread     = null;
+
+   /**
+    * True if the worker must exit on completion of the current cycle
+    */
+   private volatile boolean _workerStopped    = false;
+
+   /**
+    * True if the worker must cancel its operations prematurely perhaps due to a state update
+    */
+   private volatile boolean _workerCancelled  = false;
+
+   /**
+    * Worker state information -- this is what gets synchronized by an update
+    */
+   private volatile File    _workerStateDir   = null;
+
+   /**
+    * State information to use for the next cycle
+    */
+   private volatile File    _workerNextFolder = null;
+
+   /**
+    * Manages the worker's thread
+    */
+   private final Runnable   _workerRunnable;
+
+   /*
+    * image loading/filtering
+    */
+   private PhotoFilterGPS          _imageFilterGPS;
+   private PhotoFilterTour         _imageFilterTour;
+
+   private boolean                 _filterJob1stRun;
+   private boolean                 _filterJobIsCanceled;
+
+   private ReentrantLock           JOB_LOCK                        = new ReentrantLock();
+   private Job                     _jobFilter;
+
+   private AtomicBoolean           _jobFilterIsSubsequentScheduled = new AtomicBoolean();
+   private int                     _jobFilterDirtyCounter;
 
-	private PhotoRenderer			_photoRenderer;
-	private FullScreenImageViewer	_fullScreenImageViewer;
+   private UIJob                   _jobUIFilter;
+   private AtomicBoolean           _jobUIFilterJobIsScheduled      = new AtomicBoolean();
+   private int                     _jobUIFilterDirtyCounter;
+   private Photo[]                 _jobUIFilterPhoto;
+
+   private Job                     _jobUILoading;
+   private AtomicBoolean           _jobUILoadingIsScheduled        = new AtomicBoolean();
+   private int                     _jobUILoadingDirtyCounter;
+
+   private int                     _currentExifRunId;
+
+   /**
+    *
+    */
+   public Comparator<Photo>        SORT_BY_IMAGE_DATE;
+   public Comparator<Photo>        SORT_BY_FILE_NAME;
+   /**
+    * Contains current gallery sorting id: {@link PicDirView#GALLERY_SORTING_BY_DATE} or
+    * {@link PicDirView#GALLERY_SORTING_BY_NAME}
+    */
+   private Comparator<Photo>       _currentComparator;
+   private GallerySorting          _currentSorting;
 
-	private PhotoGalleryToolTip		_photoGalleryTooltip;
+   private PhotoRenderer           _photoRenderer;
+   private FullScreenImageViewer   _fullScreenImageViewer;
 
-	/**
-	 * Folder which images are currently be displayed
-	 */
-	private File					_photoFolder;
+   private PhotoGalleryToolTip     _photoGalleryTooltip;
 
-	/**
-	 * Folder which images should be displayed in the gallery
-	 */
-	private File					_photoFolderWhichShouldBeDisplayed;
+   /**
+    * Folder which images are currently be displayed
+    */
+   private File                    _photoFolder;
 
-	protected IPhotoGalleryProvider	_photoGalleryProvider;
+   /**
+    * Folder which images should be displayed in the gallery
+    */
+   private File                    _photoFolderWhichShouldBeDisplayed;
 
-	private int						_galleryStyle;
+   protected IPhotoGalleryProvider _photoGalleryProvider;
 
-	private boolean					_isShowCustomActionBar;
-	private boolean					_isShowThumbsize;
-	private boolean					_isHandleRatingStars;
-	private boolean					_isAttributesPainted;
+   private int                     _galleryStyle;
 
-	/**
-	 * Contains photos for <b>ALL</b> gallery items including <b>HIDDEN</b> items
-	 */
-	private Photo[]					_allPhotos;
+   private boolean                 _isShowCustomActionBar;
+   private boolean                 _isShowThumbsize;
+   private boolean                 _isHandleRatingStars;
+   private boolean                 _isAttributesPainted;
 
-	/**
-	 * Contains filtered gallery items.
-	 * <p>
-	 * Only these items are displayed in the gallery, {@link #_allPhotos} items contains also hidden
-	 * gallery items.
-	 */
-	private Photo[]					_sortedAndFilteredPhotos;
+   /**
+    * Contains photos for <b>ALL</b> gallery items including <b>HIDDEN</b> items
+    */
+   private Photo[]                 _allPhotos;
 
-	FileFilter						_fileFilter;
+   /**
+    * Contains filtered gallery items.
+    * <p>
+    * Only these items are displayed in the gallery, {@link #_allPhotos} items contains also hidden
+    * gallery items.
+    */
+   private Photo[]                 _sortedAndFilteredPhotos;
 
-	/**
-	 * Photo image size without border
-	 */
-	private int						_photoImageSize;
+   FileFilter                      _fileFilter;
 
-	private int						_photoBorderSize;
+   /**
+    * Photo image size without border
+    */
+   private int                     _photoImageSize;
 
-	private boolean					_isShowTooltip;
-	private boolean					_isShowAnnotations;
+   private int                     _photoBorderSize;
 
-	/**
-	 * keep gallery position for each used folder
-	 */
-	private LRUMap<String, Double>	_galleryPositions;
+   private boolean                 _isShowTooltip;
+   private boolean                 _isShowAnnotations;
 
-	private String					_newGalleryPositionKey;
+   /**
+    * keep gallery position for each used folder
+    */
+   private LRUMap<String, Double>  _galleryPositions;
 
-	private String					_currentGalleryPositionKey;
-	private String					_defaultStatusMessage			= UI.EMPTY_STRING;
-	private int[]					_restoredSelection;
+   private String                  _newGalleryPositionKey;
 
-	private GalleryType				_galleryType;
+   private String                  _currentGalleryPositionKey;
+   private String                  _defaultStatusMessage           = UI.EMPTY_STRING;
+   private int[]                   _restoredSelection;
 
-	private TableViewer				_photoViewer;
-	private ColumnManager			_columnManager;
-	private PixelConverter			_pc;
+   private GalleryType             _galleryType;
 
-	private GalleryMT20Item			_hoveredItem;
+   private TableViewer             _photoViewer;
+   private ColumnManager           _columnManager;
 
-	private int[]					_delayCounter					= { 0 };
+   private MenuManager             _viewerMenuManager;
+   private IContextMenuProvider    _tableViewerContextMenuProvider = new TableContextMenuProvider();
 
-	private Double					_contentGalleryPosition;
-	private boolean					_isLinkPhotoDisplayed;
+   private PixelConverter          _pc;
 
-	private final NumberFormat		_nf1							= NumberFormat.getNumberInstance();
-	{
-		_nf1.setMinimumFractionDigits(1);
-		_nf1.setMaximumFractionDigits(1);
-	}
+   private GalleryMT20Item         _hoveredItem;
+   private GalleryMT20Item[]       _sortedGalleryItems;
 
-	/*
-	 * UI resources
-	 */
-	private Font					_galleryFont;
-	/*
-	 * UI controls
-	 */
-	private Display					_display;
+   private int[]                   _delayCounter                   = { 0 };
 
-	private Composite				_uiContainer;
+   private Double                  _contentGalleryPosition;
+   private boolean                 _isLinkPhotoDisplayed;
 
-	private GalleryMT20				_galleryMT20;
+   private final NumberFormat      _nf1                            = NumberFormat.getNumberInstance();
+   {
+      _nf1.setMinimumFractionDigits(1);
+      _nf1.setMaximumFractionDigits(1);
+   }
 
-	private GalleryActionBar		_galleryActionBar;
-	private PageBook				_pageBook;
+   /*
+    * UI resources
+    */
+   private Font _galleryFont;
 
-	private Composite				_pageDefault;
-	private Composite				_pageGalleryInfo;
-	private Composite				_pageDetails;
-	private Label					_lblDefaultPage;
+   /*
+    * UI controls
+    */
+   private Display          _display;
 
-	private Label					_lblGalleryInfo;
-	private GalleryMT20Item[]		_sortedGalleryItems;
+   private Composite        _uiContainer;
 
-	{
-		_galleryPositions = new LRUMap<String, Double>(MAX_GALLERY_POSITIONS);
+   private GalleryMT20      _galleryMT20;
 
-		_workerRunnable = new Runnable() {
-			@Override
-			public void run() {
+   private GalleryActionBar _galleryActionBar;
+   private PageBook         _pageBook;
 
-				while (!_workerStopped) {
+   private Composite        _pageDefault;
+   private Composite        _pageGalleryInfo;
+   private Composite        _pageDetails;
+   private Label            _lblDefaultPage;
 
-					synchronized (_workerLock) {
-						_workerCancelled = false;
-						_workerStateDir = _workerNextFolder;
-					}
+   private Label            _lblGalleryInfo;
 
-					workerExecute();
+   private Menu             _tableContextMenu;
 
-					synchronized (_workerLock) {
-						try {
-							if ((!_workerCancelled) && (_workerStateDir == _workerNextFolder)) {
+   {
+      _galleryPositions = new LRUMap<>(MAX_GALLERY_POSITIONS);
 
-								/*
-								 * wait until the next images should be displayed
-								 */
+      _workerRunnable = new Runnable() {
+         @Override
+         public void run() {
 
-								_workerLock.wait();
-							}
-						} catch (final InterruptedException e) {}
-					}
-				}
+            while (!_workerStopped) {
 
-				_workerThread = null;
+               synchronized (_workerLock) {
+                  _workerCancelled = false;
+                  _workerStateDir = _workerNextFolder;
+               }
 
-				/*
-				 * wake up UI thread in case it is in a modal loop awaiting thread termination (see
-				 * workerStop())
-				 */
-				_display.wake();
-			}
-		};
+               workerExecute();
 
-		SORT_BY_IMAGE_DATE = new Comparator<Photo>() {
-			@Override
-			public int compare(final Photo photo1, final Photo photo2) {
+               synchronized (_workerLock) {
+                  try {
+                     if ((!_workerCancelled) && (_workerStateDir == _workerNextFolder)) {
 
-				if (_workerCancelled) {
-					// couldn't find another way how to stop sorting
-					return 0;
-				}
+                        /*
+                         * wait until the next images should be displayed
+                         */
 
-				final long diff = photo1.imageExifTime - photo2.imageExifTime;
+                        _workerLock.wait();
+                     }
+                  } catch (final InterruptedException e) {}
+               }
+            }
 
-				return diff < 0 ? -1 : diff > 0 ? 1 : 0;
-			}
-		};
+            _workerThread = null;
 
-		SORT_BY_FILE_NAME = new Comparator<Photo>() {
-			@Override
-			public int compare(final Photo photo1, final Photo photo2) {
+            /*
+             * wake up UI thread in case it is in a modal loop awaiting thread termination (see
+             * workerStop())
+             */
+            _display.wake();
+         }
+      };
 
-				if (_workerCancelled) {
-					// couldn't find another way how to stop sorting
-					return 0;
-				}
+      SORT_BY_IMAGE_DATE = new Comparator<Photo>() {
+         @Override
+         public int compare(final Photo photo1, final Photo photo2) {
 
-				return photo1.imageFilePathName.compareToIgnoreCase(photo2.imageFilePathName);
-			}
-		};
-	}
+            if (_workerCancelled) {
+               // couldn't find another way how to stop sorting
+               return 0;
+            }
 
-	private class ContentProvider implements IStructuredContentProvider {
+            final long diff = photo1.imageExifTime - photo2.imageExifTime;
 
-		@Override
-		public void dispose() {}
+            return diff < 0 ? -1 : diff > 0 ? 1 : 0;
+         }
+      };
 
-		@Override
-		public Object[] getElements(final Object inputElement) {
+      SORT_BY_FILE_NAME = new Comparator<Photo>() {
+         @Override
+         public int compare(final Photo photo1, final Photo photo2) {
 
-//			return _sortedGalleryItems
+            if (_workerCancelled) {
+               // couldn't find another way how to stop sorting
+               return 0;
+            }
 
-			if (_sortedAndFilteredPhotos == null) {
-				return new Photo[0];
-			}
+            return photo1.imageFilePathName.compareToIgnoreCase(photo2.imageFilePathName);
+         }
+      };
+   }
 
-			return _sortedAndFilteredPhotos;
-		}
+   private class ContentProvider implements IStructuredContentProvider {
 
-		@Override
-		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
-	}
+      @Override
+      public void dispose() {}
 
-	private class GalleryImplementation extends GalleryMT20 {
+      @Override
+      public Object[] getElements(final Object inputElement) {
 
-		public GalleryImplementation(final Composite parent, final int style, final IDialogSettings state) {
-			super(parent, style, state);
-		}
+//         return _sortedGalleryItems
 
-		@Override
-		public Photo getPhoto(final int filterIndex) {
+         if (_sortedAndFilteredPhotos == null) {
+            return new Photo[0];
+         }
 
-			if (filterIndex >= _sortedAndFilteredPhotos.length) {
-				return null;
-			}
+         return _sortedAndFilteredPhotos;
+      }
 
-			final Photo photo = _sortedAndFilteredPhotos[filterIndex];
+      @Override
+      public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
+   }
 
-			return photo;
-		}
+   private class GalleryImplementation extends GalleryMT20 {
 
-		@Override
-		protected void onBeforeModifySelection() {
-			onBeforeModifyGallerySelection();
-		}
-	}
+      public GalleryImplementation(final Composite parent, final int style, final IDialogSettings state) {
+         super(parent, style, state);
+      }
 
-	private class LoadCallbackExif implements ILoadCallBack {
+      @Override
+      public Photo getPhoto(final int filterIndex) {
 
-		private int		__runId;
-		private Photo	__photo;
+         if (filterIndex >= _sortedAndFilteredPhotos.length) {
+            return null;
+         }
 
-		public LoadCallbackExif(final Photo photo, final int runId) {
+         final Photo photo = _sortedAndFilteredPhotos[filterIndex];
 
-			__photo = photo;
-			__runId = runId;
-		}
+         return photo;
+      }
 
-		@Override
-		public void callBackImageIsLoaded(final boolean isUpdateUI) {
+      @Override
+      protected void onBeforeModifySelection() {
+         onBeforeModifyGallerySelection();
+      }
+   }
 
-			// keep exif metadata
-			final PhotoImageMetadata metadata = __photo.getImageMetaDataRaw();
+   private class LoadCallbackExif implements ILoadCallBack {
 
-			if (metadata != null) {
-				ExifCache.put(__photo.imageFilePathName, metadata);
-			}
+      private int   __runId;
+      private Photo __photo;
 
-			updateSqlState();
+      public LoadCallbackExif(final Photo photo, final int runId) {
 
-			if (__runId != _currentExifRunId) {
+         __photo = photo;
+         __runId = runId;
+      }
 
-				// this callback is from an older run ID, ignore it
+      @Override
+      public void callBackImageIsLoaded(final boolean isUpdateUI) {
 
-				return;
-			}
+         // keep exif metadata
+         final PhotoImageMetadata metadata = __photo.getImageMetaDataRaw();
 
-			jobFilter_22_ScheduleSubsequent(DELAY_JOB_SUBSEQUENT_FILTER);
-			jobUILoading_20_Schedule();
-		}
+         if (metadata != null) {
+            ExifCache.put(__photo.imageFilePathName, metadata);
+         }
 
-		private void updateSqlState() {
+         updateSqlState();
 
-			final AtomicReference<PhotoSqlLoadingState> sqlLoadingState = __photo.getSqlLoadingState();
+         if (__runId != _currentExifRunId) {
 
-			final boolean isInLoadingQueue = sqlLoadingState.get() == PhotoSqlLoadingState.IS_IN_LOADING_QUEUE;
+            // this callback is from an older run ID, ignore it
 
-			final boolean isSqlLoaded = sqlLoadingState.compareAndSet(
-					PhotoSqlLoadingState.IS_LOADED,
-					PhotoSqlLoadingState.IS_IN_LOADING_QUEUE);
+            return;
+         }
 
-			if (isInLoadingQueue == false && isSqlLoaded == false) {
+         jobFilter_22_ScheduleSubsequent(DELAY_JOB_SUBSEQUENT_FILTER);
+         jobUILoading_20_Schedule();
+      }
 
-				final IPhotoServiceProvider photoServiceProvider = Photo.getPhotoServiceProvider();
+      private void updateSqlState() {
 
-				PhotoLoadManager.putPhotoInLoadingQueueSql(__photo, this, photoServiceProvider, false);
-			}
-		}
-	}
+         final AtomicReference<PhotoSqlLoadingState> sqlLoadingState = __photo.getSqlLoadingState();
 
-	public ImageGallery(final IDialogSettings state) {
+         final boolean isInLoadingQueue = sqlLoadingState.get() == PhotoSqlLoadingState.IS_IN_LOADING_QUEUE;
 
-		_state = state;
-	}
+         final boolean isSqlLoaded = sqlLoadingState.compareAndSet(
+               PhotoSqlLoadingState.IS_LOADED,
+               PhotoSqlLoadingState.IS_IN_LOADING_QUEUE);
 
-	public void closePhotoTooltip() {
-		_photoGalleryTooltip.close();
-	}
+         if (isInLoadingQueue == false && isSqlLoaded == false) {
 
-	/**
-	 * create the views context menu
-	 * 
-	 * @param isRecreate
-	 */
-	private void createContextMenu() {
+            final IPhotoServiceProvider photoServiceProvider = Photo.getPhotoServiceProvider();
 
-		final MenuManager menuMgr = new MenuManager();
+            PhotoLoadManager.putPhotoInLoadingQueueSql(__photo, this, photoServiceProvider, false);
+         }
+      }
+   }
 
-		menuMgr.setRemoveAllWhenShown(true);
+   public class TableContextMenuProvider implements IContextMenuProvider {
 
-		menuMgr.addMenuListener(new IMenuListener() {
-			@Override
-			public void menuAboutToShow(final IMenuManager menuMgr2) {
-				fillContextMenu(menuMgr2);
-			}
-		});
+      @Override
+      public void disposeContextMenu() {
 
-		final Table table = _photoViewer.getTable();
+         if (_tableContextMenu != null) {
+            _tableContextMenu.dispose();
+         }
+      }
 
-//		if (isRecreate) {
+      @Override
+      public Menu getContextMenu() {
+         return _tableContextMenu;
+      }
+
+      @Override
+      public Menu recreateContextMenu() {
+
+         disposeContextMenu();
+
+         _tableContextMenu = createUI_36_CreateViewerContextMenu();
+
+         return _tableContextMenu;
+      }
+
+   }
+
+   public ImageGallery(final IDialogSettings state) {
+
+      _state = state;
+   }
+
+   public void closePhotoTooltip() {
+      _photoGalleryTooltip.close();
+   }
+
+   private void createGalleryFont() {
+
+      if (_galleryFont != null) {
+         _galleryFont.dispose();
+      }
+
+      final String prefGalleryFont = _prefStore.getString(IPhotoPreferences.PHOTO_VIEWER_FONT);
+      if (prefGalleryFont.length() > 0) {
+         try {
+
+//            System.out.println(UI.timeStamp() + "setting gallery font: " + prefGalleryFont); //$NON-NLS-1$
+
+            _galleryFont = new Font(_display, new FontData(prefGalleryFont));
+
+         } catch (final Exception e) {
+            // ignore
+         }
+      }
+
+      if (_galleryFont == null) {
+         StatusUtil.log("This font cannot be created: \"" + prefGalleryFont + "\"");//$NON-NLS-1$ //$NON-NLS-2$
+         _galleryFont = new Font(_display, DEFAULT_GALLERY_FONT, 7, SWT.NORMAL);
+      }
+   }
+
+   /**
+    * @param parent
+    * @param style
+    * @param photoGalleryProvider
+    * @param state
+    */
+   public void createImageGallery(final Composite parent,
+                                  final int style,
+                                  final IPhotoGalleryProvider photoGalleryProvider) {
+
+      PhotoUI.init();
+      createMenuManager();
+
+      _galleryStyle = style;
+      _photoGalleryProvider = photoGalleryProvider;
+
+      _pc = new PixelConverter(parent);
+
+      _columnManager = new ColumnManager(this, _state);
+      defineAllColumns();
+
+      jobFilter_10_Create();
+      jobUIFilter_10_Create();
+      jobUILoading_10_Create();
+
+      PhotoCache.addEvictionListener(this);
+
+      createUI(parent);
+
+      parent.addDisposeListener(new DisposeListener() {
+         @Override
+         public void widgetDisposed(final DisposeEvent e) {
+            onDispose();
+         }
+      });
+   }
+
+   private void createMenuManager() {
+
+      _viewerMenuManager = new MenuManager();
+      _viewerMenuManager.setRemoveAllWhenShown(true);
+      _viewerMenuManager.addMenuListener(new IMenuListener() {
+         @Override
+         public void menuAboutToShow(final IMenuManager menuManager) {
+
+            fillContextMenu(menuManager);
+         }
+      });
+   }
+
+   /**
+    * @return Returns a selection with all selected photos.
+    */
+   private PhotoSelection createPhotoSelection() {
+
+      final Collection<GalleryMT20Item> allItems = _galleryMT20.getSelection();
+      final ArrayList<Photo> photos = new ArrayList<>();
+
+      for (final GalleryMT20Item item : allItems) {
+
+         final Photo photo = item.photo;
+         if (photo != null) {
+            photos.add(photo);
+         }
+      }
+
+      return new PhotoSelection(photos, allItems, _galleryMT20.getSelectionIndex(), _isLinkPhotoDisplayed);
+   }
+
+   /**
+    * @param isAllImages
+    * @return
+    */
+   private PhotosWithExifSelection createPhotoSelectionWithExif(final boolean isAllImages) {
+
+      final ArrayList<Photo> loadedExifData = getLoadedExifImageData(_photoFolderWhichShouldBeDisplayed, isAllImages);
+
+      if (loadedExifData == null) {
+
+         MessageDialog.openInformation(
+               _display.getActiveShell(),
+               Messages.Pic_Dir_Dialog_Photos_Title,
+               Messages.Pic_Dir_Dialog_Photos_DialogInterrupted_Message);
+
+         return null;
+      }
+
+      /*
+       * check if a photo is selected
+       */
+      if (loadedExifData.size() == 0) {
+
+         if (isAllImages) {
+
+            MessageDialog.openInformation(
+                  _display.getActiveShell(),
+                  Messages.Pic_Dir_Dialog_Photos_Title,
+                  NLS.bind(Messages.Pic_Dir_Dialog_Photos_NoSelectedImagesInFolder_Message, //
+                        _photoFolderWhichShouldBeDisplayed.getAbsolutePath()));
+
+         } else {
+
+            MessageDialog.openInformation(
+                  _display.getActiveShell(),
+                  Messages.Pic_Dir_Dialog_Photos_Title,
+                  Messages.Pic_Dir_Dialog_Photos_NoSelectedImage_Message);
+         }
+
+         return null;
+      }
+
+      return new PhotosWithExifSelection(loadedExifData);
+   }
+
+   private void createUI(final Composite parent) {
+
+      _uiContainer = parent;
+      _display = parent.getDisplay();
+
+      _fileFilter = ImageUtils.createImageFileFilter();
+
+      createUI_05(parent);
+   }
+
+   private void createUI_05(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(1).spacing(0, 0).applyTo(container);
+//      container.setBackground(_display.getSystemColor(SWT.COLOR_DARK_RED));
+      {
+         if (_isShowThumbsize || _isShowCustomActionBar) {
+            _galleryActionBar = new GalleryActionBar(container, this, _isShowThumbsize, _isShowCustomActionBar);
+         }
+
+         _pageBook = new PageBook(container, SWT.NONE);
+         GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageBook);
+         {
+            createUI_20_PageGallery(_pageBook);
+            createUI_30_PageDetails(_pageBook);
+            createUI_99_PageDefault(_pageBook);
+            createUI_40_PageGalleryInfo(_pageBook);
+         }
+      }
+
+      _photoGalleryTooltip = new PhotoGalleryToolTip(_galleryMT20);
+      _photoGalleryTooltip.setReceiveMouseMoveEvent(true);
+
+      _galleryMT20.addItemListener(this);
+   }
+
+   /**
+    * Create gallery
+    */
+   private void createUI_20_PageGallery(final Composite parent) {
+
+      _galleryMT20 = new GalleryImplementation(parent, _galleryStyle, _state);
+
+      _galleryMT20.setHigherQualityDelay(200);
+//      _gallery.setAntialias(SWT.OFF);
+//      _gallery.setInterpolation(SWT.LOW);
+      _galleryMT20.setAntialias(SWT.ON);
+      _galleryMT20.setInterpolation(SWT.HIGH);
+      _galleryMT20.setItemMinMaxSize(MIN_GALLERY_ITEM_WIDTH, MAX_GALLERY_ITEM_WIDTH);
+
+      _galleryMT20.addListener(SWT.Modify, new Listener() {
+
+         // a modify event is fired when gallery is zoomed in/out
+
+         @Override
+         public void handleEvent(final Event event) {
+
+            PhotoLoadManager.stopImageLoading(false);
+
+            updateUI_AfterZoomInOut(event.width);
+         }
+      });
+
+      _galleryMT20.addListener(SWT.Selection, new Listener() {
+
+         // a gallery item is selected/deselected
+
+         @Override
+         public void handleEvent(final Event event) {
+            onSelectPhoto();
+         }
+      });
+
+      _galleryMT20.setContextMenuProvider(this);
+
+      _photoGalleryProvider.registerContextMenu(MENU_ID_PHOTO_GALLERY, _galleryMT20.getContextMenuManager());
+
+      _fullScreenImageViewer = _galleryMT20.getFullScreenImageViewer();
+
+      // allow the gallery to get access to the photo
+      _galleryMT20.setPhotoProvider(this);
+
+      // set photo renderer which paints the image but also starts the image loading
+      _photoRenderer = new PhotoRenderer(_galleryMT20, this);
+
+      _galleryMT20.setItemRenderer(_photoRenderer);
+   }
+
+   private void createUI_30_PageDetails(final PageBook parent) {
+
+      _pageDetails = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageDetails);
+      GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(_pageDetails);
+      {
+         createUI_32_PhotoViewer(_pageDetails);
+      }
+   }
+
+   private void createUI_32_PhotoViewer(final Composite parent) {
+
+      final Table table = new Table(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.MULTI);
+
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
+      table.setHeaderVisible(true);
+//      table.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+
+      /*
+       * create table viewer
+       */
+      _photoViewer = new TableViewer(table);
+      _columnManager.createColumns(_photoViewer);
+
+      _photoViewer.setUseHashlookup(true);
+      _photoViewer.setContentProvider(new ContentProvider());
+//      _photoViewer.setComparator(new ContentComparator());
+
+      _photoViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+         @Override
+         public void selectionChanged(final SelectionChangedEvent event) {
+            final ISelection eventSelection = event.getSelection();
+            if (eventSelection instanceof StructuredSelection) {
+//               onSelectTour(((StructuredSelection) eventSelection).toArray());
+            }
+         }
+      });
+
+      createUI_34_ContextMenu();
+   }
+
+   /**
+    * create the views context menu
+    *
+    * @param isRecreate
+    */
+   private void createUI_34_ContextMenu() {
+
+      _tableContextMenu = createUI_36_CreateViewerContextMenu();
+
+      final Table table = _photoViewer.getTable();
+
+      _columnManager.createHeaderContextMenu(table, _tableViewerContextMenuProvider);
+   }
+
+   private Menu createUI_36_CreateViewerContextMenu() {
+
+      final Table table = _photoViewer.getTable();
+
+      final Menu tableContextMenu = _viewerMenuManager.createContextMenu(table);
+
+      table.setMenu(tableContextMenu);
+
+      return tableContextMenu;
+   }
+
+   private void createUI_40_PageGalleryInfo(final PageBook parent) {
+
+      _pageGalleryInfo = new Composite(parent, SWT.NONE);
+//      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults()//
+            .numColumns(1)
+            .margins(5, 5)
+            .applyTo(_pageGalleryInfo);
+      {
+         _lblGalleryInfo = new Label(_pageGalleryInfo, SWT.WRAP);
+         GridDataFactory.fillDefaults()//
+               .grab(true, false)
+               .applyTo(_lblGalleryInfo);
+      }
+   }
+
+   private void createUI_99_PageDefault(final PageBook parent) {
+
+      _pageDefault = new Composite(parent, SWT.NONE);
+      GridLayoutFactory.fillDefaults()//
+            .numColumns(1)
+            .margins(5, 5)
+            .applyTo(_pageDefault);
+      {
+         _lblDefaultPage = new Label(_pageDefault, SWT.WRAP);
+         GridDataFactory.fillDefaults()//
+               .grab(true, true)
+               .align(SWT.FILL, SWT.FILL)
+               .applyTo(_lblDefaultPage);
+      }
+   }
+
+   private void defineAllColumns() {
+
+      defineColumn_ImageFileName();
+      defineColumn_AdjustedDate();
+      defineColumn_AdjustedTime();
+      defineColumn_ExifTime();
+      defineColumn_Dimension();
+      defineColumn_Orientation();
+      defineColumn_ImageDirectionText();
+      defineColumn_ImageDirectionDegree();
+//      defineColumnAltitude();
+//      defineColumnLatitude();
+//      defineColumnLongitude();
+      defineColumn_Location();
+   }
+
+   /**
+    * column: date
+    */
+   private void defineColumn_AdjustedDate() {
+
+      final ColumnDefinition colDef = TableColumnFactory.PHOTO_FILE_DATE.createColumn(_columnManager, _pc);
+      colDef.setIsDefaultColumn();
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+//            final Photo photo = (Photo) cell.getElement();
 //
-//			/*
-//			 * when a tooltip is reparented, the context menu must be recreated otherwise an
-//			 * exception is thown that the menu shell has the wrong parent
-//			 */
+//            cell.setText(_dateFormatter.print(photo.adjustedTime));
+         }
+      });
+   }
+
+   /**
+    * column: time
+    */
+   private void defineColumn_AdjustedTime() {
+
+      final ColumnDefinition colDef = TableColumnFactory.PHOTO_FILE_TIME.createColumn(_columnManager, _pc);
+
+      colDef.setIsDefaultColumn();
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+//            final Photo photo = (Photo) cell.getElement();
 //
-//			menuMgr.dispose();
-//		}
-
-		final Menu tableContextMenu = menuMgr.createContextMenu(table);
-
-		table.setMenu(tableContextMenu);
-
-		_columnManager.createHeaderContextMenu(table, tableContextMenu);
-	}
-
-	private void createGalleryFont() {
-
-		if (_galleryFont != null) {
-			_galleryFont.dispose();
-		}
-
-		final String prefGalleryFont = _prefStore.getString(IPhotoPreferences.PHOTO_VIEWER_FONT);
-		if (prefGalleryFont.length() > 0) {
-			try {
-
-//				System.out.println(UI.timeStamp() + "setting gallery font: " + prefGalleryFont); //$NON-NLS-1$
-
-				_galleryFont = new Font(_display, new FontData(prefGalleryFont));
-
-			} catch (final Exception e) {
-				// ignore
-			}
-		}
-
-		if (_galleryFont == null) {
-			StatusUtil.log("This font cannot be created: \"" + prefGalleryFont + "\"");//$NON-NLS-1$ //$NON-NLS-2$
-			_galleryFont = new Font(_display, DEFAULT_GALLERY_FONT, 7, SWT.NORMAL);
-		}
-	}
-
-	/**
-	 * @param parent
-	 * @param style
-	 * @param photoGalleryProvider
-	 * @param state
-	 */
-	public void createImageGallery(	final Composite parent,
-									final int style,
-									final IPhotoGalleryProvider photoGalleryProvider) {
-
-		PhotoUI.init();
-
-		_galleryStyle = style;
-		_photoGalleryProvider = photoGalleryProvider;
-
-		_pc = new PixelConverter(parent);
-
-		_columnManager = new ColumnManager(this, _state);
-		defineAllColumns();
-
-		jobFilter_10_Create();
-		jobUIFilter_10_Create();
-		jobUILoading_10_Create();
-
-		PhotoCache.addEvictionListener(this);
-
-		createUI(parent);
-
-		parent.addDisposeListener(new DisposeListener() {
-			@Override
-			public void widgetDisposed(final DisposeEvent e) {
-				onDispose();
-			}
-		});
-	}
-
-	/**
-	 * @return Returns a selection with all selected photos.
-	 */
-	private PhotoSelection createPhotoSelection() {
-
-		final Collection<GalleryMT20Item> allItems = _galleryMT20.getSelection();
-		final ArrayList<Photo> photos = new ArrayList<Photo>();
-
-		for (final GalleryMT20Item item : allItems) {
-
-			final Photo photo = item.photo;
-			if (photo != null) {
-				photos.add(photo);
-			}
-		}
-
-		return new PhotoSelection(photos, allItems, _galleryMT20.getSelectionIndex(), _isLinkPhotoDisplayed);
-	}
-
-	/**
-	 * @param isAllImages
-	 * @return
-	 */
-	private PhotosWithExifSelection createPhotoSelectionWithExif(final boolean isAllImages) {
-
-		final ArrayList<Photo> loadedExifData = getLoadedExifImageData(_photoFolderWhichShouldBeDisplayed, isAllImages);
-
-		if (loadedExifData == null) {
-
-			MessageDialog.openInformation(
-					_display.getActiveShell(),
-					Messages.Pic_Dir_Dialog_Photos_Title,
-					Messages.Pic_Dir_Dialog_Photos_DialogInterrupted_Message);
-
-			return null;
-		}
-
-		/*
-		 * check if a photo is selected
-		 */
-		if (loadedExifData.size() == 0) {
-
-			if (isAllImages) {
-
-				MessageDialog.openInformation(
-						_display.getActiveShell(),
-						Messages.Pic_Dir_Dialog_Photos_Title,
-						NLS.bind(Messages.Pic_Dir_Dialog_Photos_NoSelectedImagesInFolder_Message,//
-								_photoFolderWhichShouldBeDisplayed.getAbsolutePath()));
-
-			} else {
-
-				MessageDialog.openInformation(
-						_display.getActiveShell(),
-						Messages.Pic_Dir_Dialog_Photos_Title,
-						Messages.Pic_Dir_Dialog_Photos_NoSelectedImage_Message);
-			}
-
-			return null;
-		}
-
-		return new PhotosWithExifSelection(loadedExifData);
-	}
-
-	private void createUI(final Composite parent) {
-
-		_uiContainer = parent;
-		_display = parent.getDisplay();
-
-		_fileFilter = ImageUtils.createImageFileFilter();
-
-		createUI_05(parent);
-	}
-
-	private void createUI_05(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(1).spacing(0, 0).applyTo(container);
-//		container.setBackground(_display.getSystemColor(SWT.COLOR_DARK_RED));
-		{
-			if (_isShowThumbsize || _isShowCustomActionBar) {
-				_galleryActionBar = new GalleryActionBar(container, this, _isShowThumbsize, _isShowCustomActionBar);
-			}
-
-			_pageBook = new PageBook(container, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageBook);
-			{
-				createUI_20_PageGallery(_pageBook);
-				createUI_30_PageDetails(_pageBook);
-				createUI_99_PageDefault(_pageBook);
-				createUI_40_PageGalleryInfo(_pageBook);
-			}
-		}
-
-		_photoGalleryTooltip = new PhotoGalleryToolTip(_galleryMT20);
-		_photoGalleryTooltip.setReceiveMouseMoveEvent(true);
-
-		_galleryMT20.addItemListener(this);
-	}
-
-	/**
-	 * Create gallery
-	 */
-	private void createUI_20_PageGallery(final Composite parent) {
-
-		_galleryMT20 = new GalleryImplementation(parent, _galleryStyle, _state);
-
-		_galleryMT20.setHigherQualityDelay(200);
-//		_gallery.setAntialias(SWT.OFF);
-//		_gallery.setInterpolation(SWT.LOW);
-		_galleryMT20.setAntialias(SWT.ON);
-		_galleryMT20.setInterpolation(SWT.HIGH);
-		_galleryMT20.setItemMinMaxSize(MIN_GALLERY_ITEM_WIDTH, MAX_GALLERY_ITEM_WIDTH);
-
-		_galleryMT20.addListener(SWT.Modify, new Listener() {
-
-			// a modify event is fired when gallery is zoomed in/out
-
-			@Override
-			public void handleEvent(final Event event) {
-
-				PhotoLoadManager.stopImageLoading(false);
-
-				updateUI_AfterZoomInOut(event.width);
-			}
-		});
-
-		_galleryMT20.addListener(SWT.Selection, new Listener() {
-
-			// a gallery item is selected/deselected
-
-			@Override
-			public void handleEvent(final Event event) {
-				onSelectPhoto();
-			}
-		});
-
-		_galleryMT20.setContextMenuProvider(this);
-
-		_photoGalleryProvider.registerContextMenu(MENU_ID_PHOTO_GALLERY, _galleryMT20.getContextMenuManager());
-
-		_fullScreenImageViewer = _galleryMT20.getFullScreenImageViewer();
-
-		// allow the gallery to get access to the photo
-		_galleryMT20.setPhotoProvider(this);
-
-		// set photo renderer which paints the image but also starts the image loading
-		_photoRenderer = new PhotoRenderer(_galleryMT20, this);
-
-		_galleryMT20.setItemRenderer(_photoRenderer);
-	}
-
-	private void createUI_30_PageDetails(final PageBook parent) {
-
-		_pageDetails = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageDetails);
-		GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(_pageDetails);
-		{
-			createUI_32_PhotoViewer(_pageDetails);
-		}
-	}
-
-	private void createUI_32_PhotoViewer(final Composite parent) {
-
-		final Table table = new Table(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.MULTI);
-
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
-		table.setHeaderVisible(true);
-//		table.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
-
-		/*
-		 * create table viewer
-		 */
-		_photoViewer = new TableViewer(table);
-		_columnManager.createColumns(_photoViewer);
-
-		_photoViewer.setUseHashlookup(true);
-		_photoViewer.setContentProvider(new ContentProvider());
-//		_photoViewer.setComparator(new ContentComparator());
-
-		_photoViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-			@Override
-			public void selectionChanged(final SelectionChangedEvent event) {
-				final ISelection eventSelection = event.getSelection();
-				if (eventSelection instanceof StructuredSelection) {
-//					onSelectTour(((StructuredSelection) eventSelection).toArray());
-				}
-			}
-		});
-
-		createContextMenu();
-	}
-
-	private void createUI_40_PageGalleryInfo(final PageBook parent) {
-
-		_pageGalleryInfo = new Composite(parent, SWT.NONE);
-//		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults()//
-				.numColumns(1)
-				.margins(5, 5)
-				.applyTo(_pageGalleryInfo);
-		{
-			_lblGalleryInfo = new Label(_pageGalleryInfo, SWT.WRAP);
-			GridDataFactory.fillDefaults()//
-					.grab(true, false)
-					.applyTo(_lblGalleryInfo);
-		}
-	}
-
-	private void createUI_99_PageDefault(final PageBook parent) {
-
-		_pageDefault = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.fillDefaults()//
-				.numColumns(1)
-				.margins(5, 5)
-				.applyTo(_pageDefault);
-		{
-			_lblDefaultPage = new Label(_pageDefault, SWT.WRAP);
-			GridDataFactory.fillDefaults()//
-					.grab(true, true)
-					.align(SWT.FILL, SWT.FILL)
-					.applyTo(_lblDefaultPage);
-		}
-	}
-
-	private void defineAllColumns() {
-
-		defineColumn_ImageFileName();
-		defineColumn_AdjustedDate();
-		defineColumn_AdjustedTime();
-		defineColumn_ExifTime();
-		defineColumn_Dimension();
-		defineColumn_Orientation();
-		defineColumn_ImageDirectionText();
-		defineColumn_ImageDirectionDegree();
-//		defineColumnAltitude();
-//		defineColumnLatitude();
-//		defineColumnLongitude();
-		defineColumn_Location();
-	}
-
-	/**
-	 * column: date
-	 */
-	private void defineColumn_AdjustedDate() {
-
-		final ColumnDefinition colDef = TableColumnFactory.PHOTO_FILE_DATE.createColumn(_columnManager, _pc);
-		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-//				final Photo photo = (Photo) cell.getElement();
+//            cell.setText(_timeFormatter.print(photo.adjustedTime));
+         }
+      });
+   }
+
+   /**
+    * column: width x height
+    */
+   private void defineColumn_Dimension() {
+
+      final ColumnDefinition colDef = TableColumnFactory.PHOTO_FILE_DIMENSION.createColumn(_columnManager, _pc);
+
+      colDef.setIsDefaultColumn();
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Photo photo = (Photo) cell.getElement();
+
+            cell.setText(photo.getDimensionText());
+         }
+      });
+   }
+
+   /**
+    * column: tour start time
+    */
+   private void defineColumn_ExifTime() {
+
+      final ColumnDefinition colDef = TableColumnFactory.PHOTO_FILE_TIME.createColumn(_columnManager, _pc);
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Photo photo = (Photo) cell.getElement();
+
+            cell.setText(TimeTools.getZonedDateTime(photo.imageExifTime).format(TimeTools.Formatter_Time_M));
+         }
+      });
+   }
+
+   /**
+    * column: image direction degree
+    */
+   private void defineColumn_ImageDirectionDegree() {
+
+      final ColumnDefinition colDef = TableColumnFactory.PHOTO_FILE_IMAGE_DIRECTION_DEGREE//
+            .createColumn(_columnManager, _pc);
+
+      colDef.setIsDefaultColumn();
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Photo photo = (Photo) cell.getElement();
+            final double imageDirection = photo.getImageDirection();
+
+            if (imageDirection == Double.MIN_VALUE) {
+               cell.setText(UI.EMPTY_STRING);
+            } else {
+               cell.setText(Integer.toString((int) imageDirection));
+            }
+         }
+      });
+   }
+
+//   /**
+//    * column: altitude
+//    */
+//   private void defineColumnAltitude() {
 //
-//				cell.setText(_dateFormatter.print(photo.adjustedTime));
-			}
-		});
-	}
-
-	/**
-	 * column: time
-	 */
-	private void defineColumn_AdjustedTime() {
-
-		final ColumnDefinition colDef = TableColumnFactory.PHOTO_FILE_TIME.createColumn(_columnManager, _pc);
-
-		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-//				final Photo photo = (Photo) cell.getElement();
+//      final ColumnDefinition colDef = TableColumnFactory.PHOTO_FILE_ALTITUDE.createColumn(_columnManager, _pc);
+//      colDef.setIsDefaultColumn();
+//      colDef.setLabelProvider(new CellLabelProvider() {
+//         @Override
+//         public void update(final ViewerCell cell) {
 //
-//				cell.setText(_timeFormatter.print(photo.adjustedTime));
-			}
-		});
-	}
-
-	/**
-	 * column: width x height
-	 */
-	private void defineColumn_Dimension() {
-
-		final ColumnDefinition colDef = TableColumnFactory.PHOTO_FILE_DIMENSION.createColumn(_columnManager, _pc);
-
-		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final Photo photo = (Photo) cell.getElement();
-
-				cell.setText(photo.getDimensionText());
-			}
-		});
-	}
-
-	/**
-	 * column: tour start time
-	 */
-	private void defineColumn_ExifTime() {
-
-		final ColumnDefinition colDef = TableColumnFactory.PHOTO_FILE_TIME.createColumn(_columnManager, _pc);
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final Photo photo = (Photo) cell.getElement();
-
-				cell.setText(TimeTools.getZonedDateTime(photo.imageExifTime).format(TimeTools.Formatter_Time_M));
-			}
-		});
-	}
-
-	/**
-	 * column: image direction degree
-	 */
-	private void defineColumn_ImageDirectionDegree() {
-
-		final ColumnDefinition colDef = TableColumnFactory.PHOTO_FILE_IMAGE_DIRECTION_DEGREE//
-				.createColumn(_columnManager, _pc);
-
-		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final Photo photo = (Photo) cell.getElement();
-				final double imageDirection = photo.getImageDirection();
-
-				if (imageDirection == Double.MIN_VALUE) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-					cell.setText(Integer.toString((int) imageDirection));
-				}
-			}
-		});
-	}
-
-//	/**
-//	 * column: altitude
-//	 */
-//	private void defineColumnAltitude() {
+//            final Photo photo = (Photo) cell.getElement();
+//            final double altitude = photo.getAltitude();
 //
-//		final ColumnDefinition colDef = TableColumnFactory.PHOTO_FILE_ALTITUDE.createColumn(_columnManager, _pc);
-//		colDef.setIsDefaultColumn();
-//		colDef.setLabelProvider(new CellLabelProvider() {
-//			@Override
-//			public void update(final ViewerCell cell) {
+//            if (altitude == Double.MIN_VALUE) {
+//               cell.setText(UI.EMPTY_STRING);
+//            } else {
+//               cell.setText(Integer.toString((int) (altitude / UI.UNIT_VALUE_ALTITUDE)));
+//            }
+//         }
+//      });
+//   }
+
+   /**
+    * column: image direction degree
+    */
+   private void defineColumn_ImageDirectionText() {
+
+      final ColumnDefinition colDef = TableColumnFactory.PHOTO_FILE_IMAGE_DIRECTION_TEXT//
+            .createColumn(_columnManager, _pc);
+
+      colDef.setIsDefaultColumn();
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Photo photo = (Photo) cell.getElement();
+            final double imageDirection = photo.getImageDirection();
+
+            if (imageDirection == Double.MIN_VALUE) {
+               cell.setText(UI.EMPTY_STRING);
+            } else {
+               final int imageDirectionInt = (int) imageDirection;
+               cell.setText(getDirectionText(imageDirectionInt));
+            }
+         }
+      });
+   }
+
+   /**
+    * column: name
+    */
+   private void defineColumn_ImageFileName() {
+
+      final ColumnDefinition colDef = TableColumnFactory.PHOTO_FILE_NAME.createColumn(_columnManager, _pc);
+
+      colDef.setIsDefaultColumn();
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Photo photo = (Photo) cell.getElement();
+
+            cell.setText(photo.imageFileName);
+         }
+      });
+   }
+
+//   /**
+//    * column: latitude
+//    */
+//   private void defineColumnLatitude() {
 //
-//				final Photo photo = (Photo) cell.getElement();
-//				final double altitude = photo.getAltitude();
+//      final ColumnDefinition colDef = TableColumnFactory.LATITUDE.createColumn(_columnManager, _pc);
 //
-//				if (altitude == Double.MIN_VALUE) {
-//					cell.setText(UI.EMPTY_STRING);
-//				} else {
-//					cell.setText(Integer.toString((int) (altitude / UI.UNIT_VALUE_ALTITUDE)));
-//				}
-//			}
-//		});
-//	}
-
-	/**
-	 * column: image direction degree
-	 */
-	private void defineColumn_ImageDirectionText() {
-
-		final ColumnDefinition colDef = TableColumnFactory.PHOTO_FILE_IMAGE_DIRECTION_TEXT//
-				.createColumn(_columnManager, _pc);
-
-		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final Photo photo = (Photo) cell.getElement();
-				final double imageDirection = photo.getImageDirection();
-
-				if (imageDirection == Double.MIN_VALUE) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-					final int imageDirectionInt = (int) imageDirection;
-					cell.setText(getDirectionText(imageDirectionInt));
-				}
-			}
-		});
-	}
-
-	/**
-	 * column: name
-	 */
-	private void defineColumn_ImageFileName() {
-
-		final ColumnDefinition colDef = TableColumnFactory.PHOTO_FILE_NAME.createColumn(_columnManager, _pc);
-
-		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final Photo photo = (Photo) cell.getElement();
-
-				cell.setText(photo.imageFileName);
-			}
-		});
-	}
-
-//	/**
-//	 * column: latitude
-//	 */
-//	private void defineColumnLatitude() {
+//      colDef.setIsDefaultColumn();
+//      colDef.setLabelProvider(new CellLabelProvider() {
+//         @Override
+//         public void update(final ViewerCell cell) {
 //
-//		final ColumnDefinition colDef = TableColumnFactory.LATITUDE.createColumn(_columnManager, _pc);
+//            final double latitude = ((Photo) cell.getElement()).getLatitude();
 //
-//		colDef.setIsDefaultColumn();
-//		colDef.setLabelProvider(new CellLabelProvider() {
-//			@Override
-//			public void update(final ViewerCell cell) {
+//            if (latitude == Double.MIN_VALUE) {
+//               cell.setText(UI.EMPTY_STRING);
+//            } else {
+//               cell.setText(_nf8.format(latitude));
+//            }
+//         }
+//      });
+//   }
+
+   /**
+    * column: location
+    */
+   private void defineColumn_Location() {
+
+      final ColumnDefinition colDef = TableColumnFactory.PHOTO_FILE_LOCATION.createColumn(_columnManager, _pc);
+
+      colDef.setIsDefaultColumn();
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Photo photo = (Photo) cell.getElement();
+
+            cell.setText(photo.getGpsAreaInfo());
+         }
+      });
+   }
+
+//   /**
+//    * column: longitude
+//    */
+//   private void defineColumnLongitude() {
 //
-//				final double latitude = ((Photo) cell.getElement()).getLatitude();
+//      final ColumnDefinition colDef = net.tourbook.ui.TableColumnFactory.LONGITUDE.createColumn(_columnManager, _pc);
 //
-//				if (latitude == Double.MIN_VALUE) {
-//					cell.setText(UI.EMPTY_STRING);
-//				} else {
-//					cell.setText(_nf8.format(latitude));
-//				}
-//			}
-//		});
-//	}
-
-	/**
-	 * column: location
-	 */
-	private void defineColumn_Location() {
-
-		final ColumnDefinition colDef = TableColumnFactory.PHOTO_FILE_LOCATION.createColumn(_columnManager, _pc);
-
-		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final Photo photo = (Photo) cell.getElement();
-
-				cell.setText(photo.getGpsAreaInfo());
-			}
-		});
-	}
-
-//	/**
-//	 * column: longitude
-//	 */
-//	private void defineColumnLongitude() {
+//      colDef.setIsDefaultColumn();
+//      colDef.setLabelProvider(new CellLabelProvider() {
+//         @Override
+//         public void update(final ViewerCell cell) {
 //
-//		final ColumnDefinition colDef = net.tourbook.ui.TableColumnFactory.LONGITUDE.createColumn(_columnManager, _pc);
+//            final double longitude = ((Photo) cell.getElement()).getLongitude();
 //
-//		colDef.setIsDefaultColumn();
-//		colDef.setLabelProvider(new CellLabelProvider() {
-//			@Override
-//			public void update(final ViewerCell cell) {
+//            if (longitude == Double.MIN_VALUE) {
+//               cell.setText(UI.EMPTY_STRING);
+//            } else {
+//               cell.setText(_nf8.format(longitude));
+//            }
+//         }
+//      });
+//   }
+
+   /**
+    * column: orientation
+    */
+   private void defineColumn_Orientation() {
+
+      final ColumnDefinition colDef = TableColumnFactory.PHOTO_FILE_ORIENTATION.createColumn(_columnManager, _pc);
+
+      colDef.setIsDefaultColumn();
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Photo photo = (Photo) cell.getElement();
+
+            cell.setText(Integer.toString(photo.getOrientation()));
+         }
+      });
+   }
+
+   private void deselectAll() {
+
+      _galleryMT20.deselectAll();
+
+      // update UI
+      onSelectPhoto();
+   }
+
+   /**
+    * Disposes and deletes all thumb images.
+    */
+   private void disposeAndDeleteAllImages() {
+
+      PhotoLoadManager.stopImageLoading(true);
+      ThumbnailStore.cleanupStoreFiles(true, true);
+
+      PhotoImageCache.disposeAll();
+
+      ExifCache.clear();
+   }
+
+   protected abstract void enableActions(final boolean isItemAvailable);
+
+   protected abstract void enableAttributeActions(boolean isAttributesPainted);
+
+   @Override
+   public void evictedPhoto(final Photo evictedPhoto) {
+
+      final String evictedImageFilePathName = evictedPhoto.imageFilePathName;
+
+      // check if it is still evicted
+      if (PhotoCache.getPhoto(evictedImageFilePathName) != null) {
+
+         // photo is already recreated
+         return;
+      }
+
+      for (final Photo photo : _allPhotos) {
+         if (photo.imageFilePathName.equals(evictedImageFilePathName)) {
+
+            // evicted photo is still displayed, cache is again
+            PhotoCache.setPhoto(photo);
+
+            break;
+         }
+      }
+   }
+
+   @Override
+   public void fillContextMenu(final IMenuManager menuMgr) {
+
+      menuMgr.add(new Separator(UI.MENU_SEPARATOR_ADDITIONS));
+   }
+
+   /**
+    * This is called when a filter button is pressed.
+    *
+    * @param photoFilterGPS
+    * @param photoFilterTour
+    * @param isUpdateGallery
+    */
+   public void filterGallery(final PhotoFilterGPS photoFilterGPS, final PhotoFilterTour photoFilterTour) {
+
+      _imageFilterGPS = photoFilterGPS;
+      _imageFilterTour = photoFilterTour;
+
+      /*
+       * deselect all, this could be better implemented to keep selection, but is not yet done
+       */
+      deselectAll();
+
+      jobFilter_22_ScheduleSubsequent(0);
+   }
+
+   /**
+    * Preserves gallery positions for different gallery contents.
+    *
+    * @return
+    */
+   private double getCachedGalleryPosition() {
+
+      double galleryPosition = 0;
+
+      // keep current gallery position
+      if (_currentGalleryPositionKey != null) {
+         _galleryPositions.put(_currentGalleryPositionKey, _galleryMT20.getGalleryPosition());
+      }
+
+      // get old position
+      if (_newGalleryPositionKey != null) {
+
+         _currentGalleryPositionKey = _newGalleryPositionKey;
+
+         // get old gallery position
+         final Double oldPosition = _galleryPositions.get(_newGalleryPositionKey);
+
+         galleryPosition = oldPosition == null ? 0 : oldPosition;
+
+//         System.out.println(UI.timeStampNano() + " get old position " + oldPosition);
+//         // TODO remove SYSTEM.OUT.PRINTLN
+      }
+
+//      System.out.println(UI.timeStampNano() + " getCachedGalleryPosition() " + galleryPosition);
+//      // TODO remove SYSTEM.OUT.PRINTLN
+
+      return galleryPosition;
+   }
+
+   @Override
+   public ColumnManager getColumnManager() {
+      return _columnManager;
+   }
+
+   private Comparator<Photo> getCurrentComparator() {
+      return _currentSorting == GallerySorting.FILE_NAME ? SORT_BY_FILE_NAME : SORT_BY_IMAGE_DATE;
+   }
+
+   /**
+    * @return Returns gallery action bar container. {@link #setShowActionBar(boolean)} must be
+    *         called with the parameter <code>true</code> that the action bar is created.
+    */
+   public Composite getCustomActionBarContainer() {
+      return _galleryActionBar.getCustomContainer();
+   }
+
+   private String getDirectionText(final int degreeDirection) {
+
+      final float degree = (degreeDirection + 22.5f) / 45.0f;
+
+      final int directionIndex = ((int) degree) % 8;
+
+      return IWeather.windDirectionText[directionIndex];
+   }
+
+   public FullScreenImageViewer getFullScreenImageViewer() {
+      return _fullScreenImageViewer;
+   }
+
+   public Control getGallery() {
+      return _galleryMT20;
+   }
+
+   public Control getGalleryContainer() {
+      return _pageBook;
+   }
+
+   public Collection<GalleryMT20Item> getGallerySelection() {
+      return _galleryMT20.getSelection();
+   }
+
+   /**
+    * @param selectedFolder
+    * @param isGetAllImages
+    * @return Returns photo data for the images in the requested folder, sorted by date/time or
+    *         <code>null</code> when loading was canceled by the user.
+    */
+   private ArrayList<Photo> getLoadedExifImageData(final File selectedFolder, final boolean isGetAllImages) {
+
+      final boolean isFolderFilesLoaded = _photoFolder.getAbsolutePath().equals(_photoFolderWhichShouldBeDisplayed.getAbsolutePath());
+
+      if (PhotoLoadManager.getExifQueueSize() > 0 || isFolderFilesLoaded == false) {
+
+         /*
+          * wait until all image exif data are loaded
+          */
+         if (isEXIFDataLoaded() == false) {
+            return null;
+         }
+      }
+
+      Photo[] sortedPhotosArray;
+
+      if (isGetAllImages) {
+
+         // get all filtered photos
+
+         sortedPhotosArray = _sortedAndFilteredPhotos.clone();
+
+      } else {
+
+         // get all selected photos
+
+         final Collection<GalleryMT20Item> galleryItems = _galleryMT20.getSelection();
+
+         sortedPhotosArray = new Photo[galleryItems.size()];
+
+         int itemIndex = 0;
+
+         for (final GalleryMT20Item item : galleryItems) {
+
+            final Photo photo = item.photo;
+            if (photo != null) {
+               sortedPhotosArray[itemIndex++] = photo;
+            }
+         }
+
+      }
+
+      // sort photos by date/time
+      Arrays.sort(sortedPhotosArray, SORT_BY_IMAGE_DATE);
+
+      final ArrayList<Photo> sortedPhotos = new ArrayList<>(sortedPhotosArray.length);
+
+      for (final Photo photo : sortedPhotosArray) {
+         sortedPhotos.add(photo);
+      }
+
+      return sortedPhotos;
+   }
+
+   /**
+    * @return Returns folder which is currently displayed.
+    */
+   public File getPhotoFolder() {
+      return _photoFolder;
+   }
+
+   /**
+    * Creates a {@link PhotosWithExifSelection}
+    *
+    * @param isAllImages
+    * @return Returns a {@link ISelection} for selected or all images or <code>null</code> null
+    *         when loading EXIF data was canceled by the user.
+    */
+   public PhotosWithExifSelection getSelectedPhotosWithExif(final boolean isAllImages) {
+      return createPhotoSelectionWithExif(isAllImages);
+   }
+
+   @Override
+   public Photo[] getSortedAndFilteredPhotos() {
+      return _sortedAndFilteredPhotos;
+   }
+
+   /**
+    * This message is displayed when no other message is displayed.
+    *
+    * @return
+    */
+   private String getStatusDefaultMessage() {
+
+      final Collection<GalleryMT20Item> allSelectedPhoto = _galleryMT20.getSelection();
+      final int allPhotoSize = allSelectedPhoto.size();
+
+      return allPhotoSize == 0 //
+            // hide status message when nothing is selected
+            ? UI.EMPTY_STRING
+            : NLS.bind(Messages.Pic_Dir_StatusLabel_SelectedImages, allPhotoSize);
+   }
+
+   @Override
+   public ColumnViewer getViewer() {
+      return _photoViewer;
+   }
+
+   public void handlePrefStoreModifications(final PropertyChangeEvent event) {
+
+      final String property = event.getProperty();
+
+      if (property.equals(IPhotoPreferences.PHOTO_VIEWER_PREF_EVENT_IMAGE_QUALITY_IS_MODIFIED)) {
+
+         _display.asyncExec(new Runnable() {
+            @Override
+            public void run() {
+
+               final MessageDialog messageDialog = new MessageDialog(
+                     _display.getActiveShell(),
+                     Messages.Pic_Dir_Dialog_CleanupStoreImages_Title,
+                     null,
+                     Messages.Pic_Dir_Dialog_CleanupStoreImages_Message,
+                     MessageDialog.QUESTION,
+                     new String[] {
+                           Messages.Pic_Dir_Dialog_CleanupStoreImages_KeepImages,
+                           Messages.Pic_Dir_Dialog_CleanupStoreImages_DiscardImages },
+                     0);
+
+               if (messageDialog.open() == 1) {
+                  // discard all imaged
+                  disposeAndDeleteAllImages();
+               }
+
+               _galleryMT20.updateGallery(false, _galleryMT20.getGalleryPosition());
+
+               if (_galleryActionBar != null) {
+                  _galleryActionBar.updateUI_ImageIndicatorTooltip();
+               }
+            }
+         });
+
+      } else if (property.equals(IPhotoPreferences.PHOTO_VIEWER_PREF_EVENT_IMAGE_VIEWER_UI_IS_MODIFIED)
+            || property.equals(IPhotoPreferences.PHOTO_VIEWER_PREF_EVENT_FULLSIZE_VIEWER_IS_MODIFIED)) {
+
+         updateUI_FromPrefStore(true);
+
+         updateUI_AfterZoomInOut(_galleryMT20.getItemWidth());
+
+      } else if (property.equals(IPhotoPreferences.PHOTO_VIEWER_FONT)) {
+
+         onModifyFont();
+      }
+   }
+
+   public boolean isDisposed() {
+      return _galleryMT20.isDisposed();
+   }
+
+   /**
+    * @return Returns <code>true</code> when EXIF data for all (not filtered) photos are loaded.
+    */
+   private boolean isEXIFDataLoaded() {
+
+      final boolean isLoaded[] = new boolean[] { true };
+
+      try {
+
+         final IRunnableWithProgress runnable = new IRunnableWithProgress() {
+
+            @Override
+            public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+
+               final boolean isFolderFilesLoadedInitialValue = _photoFolder.getAbsolutePath()
+                     .equals(_photoFolderWhichShouldBeDisplayed.getAbsolutePath());
+
+               /*
+                * ensure files for the requested folder are read from the filesystem
+                */
+               if (isFolderFilesLoadedInitialValue == false) {
+
+                  monitor.beginTask(NLS.bind(
+                        Messages.Pic_Dir_Dialog_LoadingFolderFiles,
+                        _photoFolderWhichShouldBeDisplayed), IProgressMonitor.UNKNOWN);
+
+                  boolean isFolderFilesLoaded = isFolderFilesLoadedInitialValue;
+
+                  while (isFolderFilesLoaded == false) {
+
+                     /*
+                      * wait until files are loaded from the file system
+                      */
+                     Thread.sleep(10);
+
+                     isFolderFilesLoaded = _photoFolder.getAbsolutePath().equals(_photoFolderWhichShouldBeDisplayed.getAbsolutePath());
+                  }
+
+                  /*
+                   * wait until the loading job has started otherwise it is possible that the
+                   * exif queue is empty and is checked before it is filled (this happened)
+                   */
+                  Thread.sleep(100);
+               }
+
+               /*
+                * ensure all image EXIF data are loaded
+                */
+               final int allPhotoSize = _allPhotos.length;
+               monitor.beginTask(Messages.Pic_Dir_Dialog_LoadingEXIFData, IProgressMonitor.UNKNOWN);
+
+               int exifLoadingQueueSize = PhotoLoadManager.getExifQueueSize();
+
+               while (exifLoadingQueueSize > 0) {
+
+                  Thread.sleep(100);
+
+                  if (monitor.isCanceled()) {
+                     isLoaded[0] = false;
+                     return;
+                  }
+
+                  // show loading progress
+
+                  final int newExifLoadingQueueSize = PhotoLoadManager.getExifQueueSize();
+                  final double _percent = (double) (allPhotoSize - exifLoadingQueueSize) / allPhotoSize * 100.0;
+
+                  monitor.subTask(NLS.bind(Messages.Pic_Dir_Dialog_LoadingEXIFData_Subtask,
+                        new Object[] {
+                              exifLoadingQueueSize,
+                              allPhotoSize,
+                              _nf1.format(_percent) }));
+
+                  exifLoadingQueueSize = newExifLoadingQueueSize;
+               }
+            }
+         };
+
+         new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, true, runnable);
+
+      } catch (final InvocationTargetException e) {
+         StatusUtil.log(e);
+      } catch (final InterruptedException e) {
+         StatusUtil.log(e);
+      }
+
+      return isLoaded[0];
+   }
+
+   public boolean isLinkPhotoDisplayed() {
+      return _isLinkPhotoDisplayed;
+   }
+
+   private void jobFilter_10_Create() {
+
+      _jobFilter = new Job("PicDirImages: Filtering images") {//$NON-NLS-1$
+
+         @Override
+         protected IStatus run(final IProgressMonitor monitor) {
+
+            _filterJobIsCanceled = false;
+            _jobFilterIsSubsequentScheduled.set(false);
+
+            try {
+
+               if (_filterJob1stRun) {
+
+                  _filterJob1stRun = false;
+
+                  jobFilter_30_Run1st();
+
+               } else {
+                  jobFilter_32_RunSubsequent();
+               }
+
+            } catch (final Exception e) {
+               StatusUtil.log(e);
+            }
+
+            return Status.OK_STATUS;
+         }
+      };
+
+      _jobFilter.setSystem(true);
+   }
+
+   private void jobFilter_12_Stop() {
+
+      _filterJobIsCanceled = true;
+      _jobUIFilterPhoto = null;
+
+      // wait until the filter job has ended
+      try {
+
+         _jobFilter.cancel();
+         _jobFilter.join();
+
+      } catch (final InterruptedException e) {
+         StatusUtil.log(e);
+      }
+   }
+
+   private void jobFilter_20_Schedule1st() {
+
+      // filter must be stopped before new photos are set
+      jobFilter_12_Stop();
+
+      JOB_LOCK.lock();
+      {
+         try {
+
+            // this is the initial run of the filter job
+            _filterJob1stRun = true;
+
+            _sortedAndFilteredPhotos = new Photo[0];
+
+            _currentExifRunId++;
+
+            _jobFilter.schedule();
+
+         } finally {
+            JOB_LOCK.unlock();
+         }
+      }
+
+      /*
+       * hide status message for the first delay, because when nothing is filtered, the UI is
+       * flickering with an initial message
+       */
+      updateUI_StatusMessageInUIThread(UI.EMPTY_STRING);
+   }
+
+   private void jobFilter_22_ScheduleSubsequent(final long delay) {
+
+      JOB_LOCK.lock();
+      {
+         try {
+
+            _jobFilterDirtyCounter++;
+
+            if ((_jobFilter.getState() == Job.RUNNING) == false) {
+
+               // filter job is NOT running, schedule it
+
+               final boolean isScheduled = _jobFilterIsSubsequentScheduled.getAndSet(true);
+
+               if (isScheduled == false) {
+                  _jobFilter.schedule(delay);
+               }
+            }
+
+         } finally {
+            JOB_LOCK.unlock();
+         }
+      }
+   }
+
+   private void jobFilter_23_ScheduleSubsequentWithoutRunCheck() {
+
+      _jobFilterDirtyCounter++;
+
+      // filter job is NOT running, schedule it
+
+      final boolean isScheduled = _jobFilterIsSubsequentScheduled.getAndSet(true);
+
+      if (isScheduled == false) {
+         _jobFilter.schedule(DELAY_JOB_SUBSEQUENT_FILTER);
+      }
+   }
+
+   /**
+    * Filter and sort photos and load EXIF data (which is required for sorting).
+    */
+   private void jobFilter_30_Run1st() {
+
+//      final long start = System.nanoTime();
+
+      if (_allPhotos.length == 0) {
+
+         // there are no images in the current folder,
+
+         /*
+          * gallery MUST be updated even when no images are displayed because images from the
+          * previous folder are still displayed
+          */
+
+         updateUI_GalleryInfo();
+
+         return;
+      }
+
+      final boolean isGPSFilter = _imageFilterGPS == PhotoFilterGPS.WITH_GPS;
+      final boolean isNoGPSFilter = _imageFilterGPS == PhotoFilterGPS.NO_GPS;
+      final boolean isTourFilter = _imageFilterTour == PhotoFilterTour.WITH_TOURS;
+      final boolean isNoTourFilter = _imageFilterTour == PhotoFilterTour.NO_TOURS;
+
+      final boolean isFilterSet = isGPSFilter || isNoGPSFilter || isTourFilter || isNoTourFilter;
+
+      // get current dirty counter
+      final int currentDirtyCounter = _jobFilterDirtyCounter;
+
+      Photo[] newFilteredPhotos = null;
+
+      if (isFilterSet) {
+
+         final int numberOfPhotos = _allPhotos.length;
+         final Photo[] tempFilteredPhotos = new Photo[numberOfPhotos];
+
+         // filterindex is incremented when the filter contains a gallery item
+         int filterIndex = 0;
+         int photoIndex = 0;
+
+         // loop: all photos
+         for (final Photo photo : _allPhotos) {
+
+            if (_filterJobIsCanceled) {
+               return;
+            }
+
+            boolean isPhotoInFilter = false;
+
+            if (photo.isExifLoaded == false) {
+
+               // image is not yet loaded, it must be loaded to get the gps state
+
+               putInExifLoadingQueue(photo);
+            }
+
+            // check again, the gps state could have been cached and set
+            if (photo.isExifLoaded) {
+
+               final boolean isPhotoWithGps = _isLinkPhotoDisplayed
+                     ? photo.isLinkPhotoWithGps
+                     : photo.isTourPhotoWithGps;
+
+               if (isGPSFilter) {
+                  if (isPhotoWithGps) {
+                     isPhotoInFilter = true;
+                  }
+
+               } else if (isNoGPSFilter) {
+
+                  if (!isPhotoWithGps) {
+                     isPhotoInFilter = true;
+                  }
+               }
+            }
+
+            final boolean isSavedInTour = photo.isSavedInTour;
+
+            if (isTourFilter) {
+               if (isSavedInTour) {
+                  isPhotoInFilter = true;
+               }
+
+            } else if (isNoTourFilter) {
+
+               if (!isSavedInTour) {
+                  isPhotoInFilter = true;
+               }
+            }
+
+            if (isPhotoInFilter) {
+
+               tempFilteredPhotos[filterIndex] = _allPhotos[photoIndex];
+
+               filterIndex++;
+            }
+
+            photoIndex++;
+         }
+
+         // remove trailing array items which are not set
+         newFilteredPhotos = Arrays.copyOf(tempFilteredPhotos, filterIndex);
+
+      } else {
+
+         // a filter is not set, display all images but load exif data which is necessary when sorting by date
+
+         newFilteredPhotos = Arrays.copyOf(_allPhotos, _allPhotos.length);
+
+         // loop: all photos
+         for (final Photo photo : _allPhotos) {
+
+            if (_filterJobIsCanceled) {
+               return;
+            }
+
+            if (photo.isExifLoaded == false) {
+
+               // image is not yet loaded, it must be loaded to get the gps state
+               putInExifLoadingQueue(photo);
+            }
+         }
+      }
+
+      // check sorting
+//      if (_initialSorting != _currentSorting) {
 //
-//				final double longitude = ((Photo) cell.getElement()).getLongitude();
+//         /*
+//          * photo must be sorted because sorting is different than the initial sorting, this
+//          * will sort only the filtered photo
+//          */
 //
-//				if (longitude == Double.MIN_VALUE) {
-//					cell.setText(UI.EMPTY_STRING);
-//				} else {
-//					cell.setText(_nf8.format(longitude));
-//				}
-//			}
-//		});
-//	}
+      Arrays.sort(newFilteredPhotos, getCurrentComparator());
+//      }
 
-	/**
-	 * column: orientation
-	 */
-	private void defineColumn_Orientation() {
+      /**
+       * Update UI
+       * <p>
+       * gallery MUST be updated even when no images are displayed because images from the
+       * previous folder are still displayed
+       */
+      updateUI_GalleryItems(newFilteredPhotos, null);
 
-		final ColumnDefinition colDef = TableColumnFactory.PHOTO_FILE_ORIENTATION.createColumn(_columnManager, _pc);
+      if (_jobFilterDirtyCounter > currentDirtyCounter) {
 
-		colDef.setIsDefaultColumn();
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
+         // filter is dirty again
 
-				final Photo photo = (Photo) cell.getElement();
+         jobFilter_23_ScheduleSubsequentWithoutRunCheck();
 
-				cell.setText(Integer.toString(photo.getOrientation()));
-			}
-		});
-	}
+      } else {
 
-	private void deselectAll() {
+         // clear progress bar
 
-		_galleryMT20.deselectAll();
+         jobUILoading_20_Schedule();
+      }
 
-		// update UI
-		onSelectPhoto();
-	}
+//      final float timeDiff = (float) (System.nanoTime() - start) / 1000000;
+////      if (timeDiff > 10) {}
+//      System.out.println("filterJob_20_RunInitial:\t" + timeDiff + " ms\t"); //$NON-NLS-1$ //$NON-NLS-2$
+//      // TODO remove SYSTEM.OUT.PRINTLN
+   }
 
-	/**
-	 * Disposes and deletes all thumb images.
-	 */
-	private void disposeAndDeleteAllImages() {
+   /**
+    * Run filter and sorting again with newly loaded EXIF data until all EXIF data are loaded.
+    */
+   private void jobFilter_32_RunSubsequent() {
 
-		PhotoLoadManager.stopImageLoading(true);
-		ThumbnailStore.cleanupStoreFiles(true, true);
+//      final long start = System.nanoTime();
 
-		PhotoImageCache.disposeAll();
+      final boolean isGPSFilter = _imageFilterGPS == PhotoFilterGPS.WITH_GPS;
+      final boolean isNoGPSFilter = _imageFilterGPS == PhotoFilterGPS.NO_GPS;
+      final boolean isTourFilter = _imageFilterTour == PhotoFilterTour.WITH_TOURS;
+      final boolean isNoTourFilter = _imageFilterTour == PhotoFilterTour.NO_TOURS;
 
-		ExifCache.clear();
-	}
+      final boolean isFilterSet = isGPSFilter || isNoGPSFilter || isTourFilter || isNoTourFilter;
 
-	protected abstract void enableActions(final boolean isItemAvailable);
+      // get current dirty counter
+      final int currentDirtyCounter = _jobFilterDirtyCounter;
 
-	protected abstract void enableAttributeActions(boolean isAttributesPainted);
+      Photo[] newFilteredPhotos = null;
 
-	@Override
-	public void evictedPhoto(final Photo evictedPhoto) {
+      if (isFilterSet) {
 
-		final String evictedImageFilePathName = evictedPhoto.imageFilePathName;
+         final int numberOfPhotos = _allPhotos.length;
+         final Photo[] tempFilteredPhotos = new Photo[numberOfPhotos];
 
-		// check if it is still evicted
-		if (PhotoCache.getPhoto(evictedImageFilePathName) != null) {
+         // filterindex is incremented when the filter contains a gallery item
+         int filterIndex = 0;
+         int photoIndex = 0;
 
-			// photo is already recreated
-			return;
-		}
+         // loop: all photos
+         for (final Photo photo : _allPhotos) {
 
-		for (final Photo photo : _allPhotos) {
-			if (photo.imageFilePathName.equals(evictedImageFilePathName)) {
+            if (_filterJobIsCanceled) {
+               return;
+            }
 
-				// evicted photo is still displayed, cache is again
-				PhotoCache.setPhoto(photo);
+            boolean isPhotoInFilterGps = false;
+            boolean isPhotoInFilterTour = false;
 
-				break;
-			}
-		}
-	}
+            if (photo.isExifLoaded) {
 
-	@Override
-	public void fillContextMenu(final IMenuManager menuMgr) {
+               final boolean isPhotoWithGps = _isLinkPhotoDisplayed
+                     ? photo.isLinkPhotoWithGps
+                     : photo.isTourPhotoWithGps;
 
-		menuMgr.add(new Separator(UI.MENU_SEPARATOR_ADDITIONS));
+               if (isGPSFilter) {
+                  if (isPhotoWithGps) {
+                     isPhotoInFilterGps = true;
+                  }
 
-//		menuMgr.add(_actionMergePhotosWithTours);
+               } else if (isNoGPSFilter) {
 
-	}
+                  if (!isPhotoWithGps) {
+                     isPhotoInFilterGps = true;
+                  }
 
-	/**
-	 * This is called when a filter button is pressed.
-	 * 
-	 * @param photoFilterGPS
-	 * @param photoFilterTour
-	 * @param isUpdateGallery
-	 */
-	public void filterGallery(final PhotoFilterGPS photoFilterGPS, final PhotoFilterTour photoFilterTour) {
+               } else {
 
-		_imageFilterGPS = photoFilterGPS;
-		_imageFilterTour = photoFilterTour;
+                  // no gps filter
 
-		/*
-		 * deselect all, this could be better implemented to keep selection, but is not yet done
-		 */
-		deselectAll();
+                  isPhotoInFilterGps = true;
+               }
+            } else {
 
-		jobFilter_22_ScheduleSubsequent(0);
-	}
+               // no gps filter
 
-	/**
-	 * Preserves gallery positions for different gallery contents.
-	 * 
-	 * @return
-	 */
-	private double getCachedGalleryPosition() {
+               isPhotoInFilterGps = true;
+            }
 
-		double galleryPosition = 0;
+            final boolean isSavedInTour = photo.isSavedInTour;
 
-		// keep current gallery position
-		if (_currentGalleryPositionKey != null) {
-			_galleryPositions.put(_currentGalleryPositionKey, _galleryMT20.getGalleryPosition());
-		}
+            if (isTourFilter) {
+               if (isSavedInTour) {
+                  isPhotoInFilterTour = true;
+               }
 
-		// get old position
-		if (_newGalleryPositionKey != null) {
+            } else if (isNoTourFilter) {
 
-			_currentGalleryPositionKey = _newGalleryPositionKey;
+               if (!isSavedInTour) {
+                  isPhotoInFilterTour = true;
+               }
+            } else {
 
-			// get old gallery position
-			final Double oldPosition = _galleryPositions.get(_newGalleryPositionKey);
+               // no tour filter
+               isPhotoInFilterTour = true;
+            }
 
-			galleryPosition = oldPosition == null ? 0 : oldPosition;
+            if (isPhotoInFilterGps && isPhotoInFilterTour) {
 
-//			System.out.println(UI.timeStampNano() + " get old position " + oldPosition);
-//			// TODO remove SYSTEM.OUT.PRINTLN
-		}
+               tempFilteredPhotos[filterIndex] = _allPhotos[photoIndex];
 
-//		System.out.println(UI.timeStampNano() + " getCachedGalleryPosition() " + galleryPosition);
-//		// TODO remove SYSTEM.OUT.PRINTLN
+               filterIndex++;
+            }
 
-		return galleryPosition;
-	}
+            photoIndex++;
+         }
 
-	@Override
-	public ColumnManager getColumnManager() {
-		return _columnManager;
-	}
+         // remove trailing array items which are not set
+         newFilteredPhotos = Arrays.copyOf(tempFilteredPhotos, filterIndex);
 
-	private Comparator<Photo> getCurrentComparator() {
-		return _currentSorting == GallerySorting.FILE_NAME ? SORT_BY_FILE_NAME : SORT_BY_IMAGE_DATE;
-	}
+      } else {
 
-	/**
-	 * @return Returns gallery action bar container. {@link #setShowActionBar(boolean)} must be
-	 *         called with the parameter <code>true</code> that the action bar is created.
-	 */
-	public Composite getCustomActionBarContainer() {
-		return _galleryActionBar.getCustomContainer();
-	}
+         // a filter is not set, display all images but load exif data which is necessary when filtering by date
 
-	private String getDirectionText(final int degreeDirection) {
+         newFilteredPhotos = Arrays.copyOf(_allPhotos, _allPhotos.length);
+      }
 
-		final float degree = (degreeDirection + 22.5f) / 45.0f;
-
-		final int directionIndex = ((int) degree) % 8;
-
-		return IWeather.windDirectionText[directionIndex];
-	}
-
-	public FullScreenImageViewer getFullScreenImageViewer() {
-		return _fullScreenImageViewer;
-	}
-
-	public Control getGallery() {
-		return _galleryMT20;
-	}
-
-	public Control getGalleryContainer() {
-		return _pageBook;
-	}
-
-	public Collection<GalleryMT20Item> getGallerySelection() {
-		return _galleryMT20.getSelection();
-	}
-
-	/**
-	 * @param selectedFolder
-	 * @param isGetAllImages
-	 * @return Returns photo data for the images in the requested folder, sorted by date/time or
-	 *         <code>null</code> when loading was canceled by the user.
-	 */
-	private ArrayList<Photo> getLoadedExifImageData(final File selectedFolder, final boolean isGetAllImages) {
-
-		final boolean isFolderFilesLoaded = _photoFolder.getAbsolutePath().equals(
-				_photoFolderWhichShouldBeDisplayed.getAbsolutePath());
-
-		if (PhotoLoadManager.getExifQueueSize() > 0 || isFolderFilesLoaded == false) {
-
-			/*
-			 * wait until all image exif data are loaded
-			 */
-			if (isEXIFDataLoaded() == false) {
-				return null;
-			}
-		}
-
-		Photo[] sortedPhotosArray;
-
-		if (isGetAllImages) {
-
-			// get all filtered photos
-
-			sortedPhotosArray = _sortedAndFilteredPhotos.clone();
-
-		} else {
-
-			// get all selected photos
-
-			final Collection<GalleryMT20Item> galleryItems = _galleryMT20.getSelection();
-
-			sortedPhotosArray = new Photo[galleryItems.size()];
-
-			int itemIndex = 0;
-
-			for (final GalleryMT20Item item : galleryItems) {
-
-				final Photo photo = item.photo;
-				if (photo != null) {
-					sortedPhotosArray[itemIndex++] = photo;
-				}
-			}
-
-		}
-
-		// sort photos by date/time
-		Arrays.sort(sortedPhotosArray, SORT_BY_IMAGE_DATE);
-
-		final ArrayList<Photo> sortedPhotos = new ArrayList<Photo>(sortedPhotosArray.length);
-
-		for (final Photo photo : sortedPhotosArray) {
-			sortedPhotos.add(photo);
-		}
-
-		return sortedPhotos;
-	}
-
-	/**
-	 * @return Returns folder which is currently displayed.
-	 */
-	public File getPhotoFolder() {
-		return _photoFolder;
-	}
-
-	/**
-	 * Creates a {@link PhotosWithExifSelection}
-	 * 
-	 * @param isAllImages
-	 * @return Returns a {@link ISelection} for selected or all images or <code>null</code> null
-	 *         when loading EXIF data was canceled by the user.
-	 */
-	public PhotosWithExifSelection getSelectedPhotosWithExif(final boolean isAllImages) {
-		return createPhotoSelectionWithExif(isAllImages);
-	}
-
-	@Override
-	public Photo[] getSortedAndFilteredPhotos() {
-		return _sortedAndFilteredPhotos;
-	}
-
-	/**
-	 * This message is displayed when no other message is displayed.
-	 * 
-	 * @return
-	 */
-	private String getStatusDefaultMessage() {
-
-		final Collection<GalleryMT20Item> allSelectedPhoto = _galleryMT20.getSelection();
-		final int allPhotoSize = allSelectedPhoto.size();
-
-		return allPhotoSize == 0 //
-				// hide status message when nothing is selected
-				? UI.EMPTY_STRING
-				: NLS.bind(Messages.Pic_Dir_StatusLabel_SelectedImages, allPhotoSize);
-	}
-
-	@Override
-	public ColumnViewer getViewer() {
-		return _photoViewer;
-	}
-
-	public void handlePrefStoreModifications(final PropertyChangeEvent event) {
-
-		final String property = event.getProperty();
-
-		if (property.equals(IPhotoPreferences.PHOTO_VIEWER_PREF_EVENT_IMAGE_QUALITY_IS_MODIFIED)) {
-
-			_display.asyncExec(new Runnable() {
-				@Override
-				public void run() {
-
-					final MessageDialog messageDialog = new MessageDialog(
-							_display.getActiveShell(),
-							Messages.Pic_Dir_Dialog_CleanupStoreImages_Title,
-							null,
-							Messages.Pic_Dir_Dialog_CleanupStoreImages_Message,
-							MessageDialog.QUESTION,
-							new String[] {
-									Messages.Pic_Dir_Dialog_CleanupStoreImages_KeepImages,
-									Messages.Pic_Dir_Dialog_CleanupStoreImages_DiscardImages },
-							0);
-
-					if (messageDialog.open() == 1) {
-						// discard all imaged
-						disposeAndDeleteAllImages();
-					}
-
-					_galleryMT20.updateGallery(false, _galleryMT20.getGalleryPosition());
-
-					if (_galleryActionBar != null) {
-						_galleryActionBar.updateUI_ImageIndicatorTooltip();
-					}
-				}
-			});
-
-		} else if (property.equals(IPhotoPreferences.PHOTO_VIEWER_PREF_EVENT_IMAGE_VIEWER_UI_IS_MODIFIED)
-				|| property.equals(IPhotoPreferences.PHOTO_VIEWER_PREF_EVENT_FULLSIZE_VIEWER_IS_MODIFIED)) {
-
-			updateUI_FromPrefStore(true);
-
-			updateUI_AfterZoomInOut(_galleryMT20.getItemWidth());
-
-		} else if (property.equals(IPhotoPreferences.PHOTO_VIEWER_FONT)) {
-
-			onModifyFont();
-		}
-	}
-
-	public boolean isDisposed() {
-		return _galleryMT20.isDisposed();
-	}
-
-	/**
-	 * @return Returns <code>true</code> when EXIF data for all (not filtered) photos are loaded.
-	 */
-	private boolean isEXIFDataLoaded() {
-
-		final boolean isLoaded[] = new boolean[] { true };
-
-		try {
-
-			final IRunnableWithProgress runnable = new IRunnableWithProgress() {
-
-				@Override
-				public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-
-					final boolean isFolderFilesLoadedInitialValue = _photoFolder.getAbsolutePath().equals(
-							_photoFolderWhichShouldBeDisplayed.getAbsolutePath());
-
-					/*
-					 * ensure files for the requested folder are read from the filesystem
-					 */
-					if (isFolderFilesLoadedInitialValue == false) {
-
-						monitor.beginTask(NLS.bind(
-								Messages.Pic_Dir_Dialog_LoadingFolderFiles,
-								_photoFolderWhichShouldBeDisplayed), IProgressMonitor.UNKNOWN);
-
-						boolean isFolderFilesLoaded = isFolderFilesLoadedInitialValue;
-
-						while (isFolderFilesLoaded == false) {
-
-							/*
-							 * wait until files are loaded from the file system
-							 */
-							Thread.sleep(10);
-
-							isFolderFilesLoaded = _photoFolder.getAbsolutePath().equals(
-									_photoFolderWhichShouldBeDisplayed.getAbsolutePath());
-						}
-
-						/*
-						 * wait until the loading job has started otherwise it is possible that the
-						 * exif queue is empty and is checked before it is filled (this happened)
-						 */
-						Thread.sleep(100);
-					}
-
-					/*
-					 * ensure all image EXIF data are loaded
-					 */
-					final int allPhotoSize = _allPhotos.length;
-					monitor.beginTask(Messages.Pic_Dir_Dialog_LoadingEXIFData, IProgressMonitor.UNKNOWN);
-
-					int exifLoadingQueueSize = PhotoLoadManager.getExifQueueSize();
-
-					while (exifLoadingQueueSize > 0) {
-
-						Thread.sleep(100);
-
-						if (monitor.isCanceled()) {
-							isLoaded[0] = false;
-							return;
-						}
-
-						// show loading progress
-
-						final int newExifLoadingQueueSize = PhotoLoadManager.getExifQueueSize();
-						final double _percent = (double) (allPhotoSize - exifLoadingQueueSize) / allPhotoSize * 100.0;
-
-						monitor.subTask(NLS.bind(Messages.Pic_Dir_Dialog_LoadingEXIFData_Subtask, new Object[] {
-								exifLoadingQueueSize,
-								allPhotoSize,
-								_nf1.format(_percent) }));
-
-						exifLoadingQueueSize = newExifLoadingQueueSize;
-					}
-				}
-			};
-
-			new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, true, runnable);
-
-		} catch (final InvocationTargetException e) {
-			StatusUtil.log(e);
-		} catch (final InterruptedException e) {
-			StatusUtil.log(e);
-		}
-
-		return isLoaded[0];
-	}
-
-	public boolean isLinkPhotoDisplayed() {
-		return _isLinkPhotoDisplayed;
-	}
-
-	private void jobFilter_10_Create() {
-
-		_jobFilter = new Job("PicDirImages: Filtering images") {//$NON-NLS-1$
-
-			@Override
-			protected IStatus run(final IProgressMonitor monitor) {
-
-				_filterJobIsCanceled = false;
-				_jobFilterIsSubsequentScheduled.set(false);
-
-				try {
-
-					if (_filterJob1stRun) {
-
-						_filterJob1stRun = false;
-
-						jobFilter_30_Run1st();
-
-					} else {
-						jobFilter_32_RunSubsequent();
-					}
-
-				} catch (final Exception e) {
-					StatusUtil.log(e);
-				}
-
-				return Status.OK_STATUS;
-			}
-		};
-
-		_jobFilter.setSystem(true);
-	}
-
-	private void jobFilter_12_Stop() {
-
-		_filterJobIsCanceled = true;
-		_jobUIFilterPhoto = null;
-
-		// wait until the filter job has ended
-		try {
-
-			_jobFilter.cancel();
-			_jobFilter.join();
-
-		} catch (final InterruptedException e) {
-			StatusUtil.log(e);
-		}
-	}
-
-	private void jobFilter_20_Schedule1st() {
-
-		// filter must be stopped before new photos are set
-		jobFilter_12_Stop();
-
-		JOB_LOCK.lock();
-		{
-			try {
-
-				// this is the initial run of the filter job
-				_filterJob1stRun = true;
-
-				_sortedAndFilteredPhotos = new Photo[0];
-
-				_currentExifRunId++;
-
-				_jobFilter.schedule();
-
-			} finally {
-				JOB_LOCK.unlock();
-			}
-		}
-
-		/*
-		 * hide status message for the first delay, because when nothing is filtered, the UI is
-		 * flickering with an initial message
-		 */
-		updateUI_StatusMessageInUIThread(UI.EMPTY_STRING);
-	}
-
-	private void jobFilter_22_ScheduleSubsequent(final long delay) {
-
-		JOB_LOCK.lock();
-		{
-			try {
-
-				_jobFilterDirtyCounter++;
-
-				if ((_jobFilter.getState() == Job.RUNNING) == false) {
-
-					// filter job is NOT running, schedule it
-
-					final boolean isScheduled = _jobFilterIsSubsequentScheduled.getAndSet(true);
-
-					if (isScheduled == false) {
-						_jobFilter.schedule(delay);
-					}
-				}
-
-			} finally {
-				JOB_LOCK.unlock();
-			}
-		}
-	}
-
-	private void jobFilter_23_ScheduleSubsequentWithoutRunCheck() {
-
-		_jobFilterDirtyCounter++;
-
-		// filter job is NOT running, schedule it
-
-		final boolean isScheduled = _jobFilterIsSubsequentScheduled.getAndSet(true);
-
-		if (isScheduled == false) {
-			_jobFilter.schedule(DELAY_JOB_SUBSEQUENT_FILTER);
-		}
-	}
-
-	/**
-	 * Filter and sort photos and load EXIF data (which is required for sorting).
-	 */
-	private void jobFilter_30_Run1st() {
-
-//		final long start = System.nanoTime();
-
-		if (_allPhotos.length == 0) {
-
-			// there are no images in the current folder,
-
-			/*
-			 * gallery MUST be updated even when no images are displayed because images from the
-			 * previous folder are still displayed
-			 */
-
-			updateUI_GalleryInfo();
-
-			return;
-		}
-
-		final boolean isGPSFilter = _imageFilterGPS == PhotoFilterGPS.WITH_GPS;
-		final boolean isNoGPSFilter = _imageFilterGPS == PhotoFilterGPS.NO_GPS;
-		final boolean isTourFilter = _imageFilterTour == PhotoFilterTour.WITH_TOURS;
-		final boolean isNoTourFilter = _imageFilterTour == PhotoFilterTour.NO_TOURS;
-
-		final boolean isFilterSet = isGPSFilter || isNoGPSFilter || isTourFilter || isNoTourFilter;
-
-		// get current dirty counter
-		final int currentDirtyCounter = _jobFilterDirtyCounter;
-
-		Photo[] newFilteredPhotos = null;
-
-		if (isFilterSet) {
-
-			final int numberOfPhotos = _allPhotos.length;
-			final Photo[] tempFilteredPhotos = new Photo[numberOfPhotos];
-
-			// filterindex is incremented when the filter contains a gallery item
-			int filterIndex = 0;
-			int photoIndex = 0;
-
-			// loop: all photos
-			for (final Photo photo : _allPhotos) {
-
-				if (_filterJobIsCanceled) {
-					return;
-				}
-
-				boolean isPhotoInFilter = false;
-
-				if (photo.isExifLoaded == false) {
-
-					// image is not yet loaded, it must be loaded to get the gps state
-
-					putInExifLoadingQueue(photo);
-				}
-
-				// check again, the gps state could have been cached and set
-				if (photo.isExifLoaded) {
-
-					final boolean isPhotoWithGps = _isLinkPhotoDisplayed
-							? photo.isLinkPhotoWithGps
-							: photo.isTourPhotoWithGps;
-
-					if (isGPSFilter) {
-						if (isPhotoWithGps) {
-							isPhotoInFilter = true;
-						}
-
-					} else if (isNoGPSFilter) {
-
-						if (!isPhotoWithGps) {
-							isPhotoInFilter = true;
-						}
-					}
-				}
-
-				final boolean isSavedInTour = photo.isSavedInTour;
-
-				if (isTourFilter) {
-					if (isSavedInTour) {
-						isPhotoInFilter = true;
-					}
-
-				} else if (isNoTourFilter) {
-
-					if (!isSavedInTour) {
-						isPhotoInFilter = true;
-					}
-				}
-
-				if (isPhotoInFilter) {
-
-					tempFilteredPhotos[filterIndex] = _allPhotos[photoIndex];
-
-					filterIndex++;
-				}
-
-				photoIndex++;
-			}
-
-			// remove trailing array items which are not set
-			newFilteredPhotos = Arrays.copyOf(tempFilteredPhotos, filterIndex);
-
-		} else {
-
-			// a filter is not set, display all images but load exif data which is necessary when sorting by date
-
-			newFilteredPhotos = Arrays.copyOf(_allPhotos, _allPhotos.length);
-
-			// loop: all photos
-			for (final Photo photo : _allPhotos) {
-
-				if (_filterJobIsCanceled) {
-					return;
-				}
-
-				if (photo.isExifLoaded == false) {
-
-					// image is not yet loaded, it must be loaded to get the gps state
-					putInExifLoadingQueue(photo);
-				}
-			}
-		}
-
-		// check sorting
-//		if (_initialSorting != _currentSorting) {
+      // check sorting
+//      if (_initialSorting != _currentSorting) {
 //
-//			/*
-//			 * photo must be sorted because sorting is different than the initial sorting, this
-//			 * will sort only the filtered photo
-//			 */
+//         /*
+//          * photo must be sorted because sorting is different than the initial sorting, this
+//          * will sort only the filtered photo
+//          */
 //
-		Arrays.sort(newFilteredPhotos, getCurrentComparator());
-//		}
+      Arrays.sort(newFilteredPhotos, getCurrentComparator());
+//      }
 
-		/**
-		 * Update UI
-		 * <p>
-		 * gallery MUST be updated even when no images are displayed because images from the
-		 * previous folder are still displayed
-		 */
-		updateUI_GalleryItems(newFilteredPhotos, null);
+      /**
+       * UI update must be run in a UI job because the update can be very long when many
+       * (thousands) small images are displayed
+       */
+      _jobUIFilterPhoto = newFilteredPhotos;
 
-		if (_jobFilterDirtyCounter > currentDirtyCounter) {
+      jobUIFilter_20_Schedule(0);
 
-			// filter is dirty again
+      if (_jobFilterDirtyCounter > currentDirtyCounter) {
 
-			jobFilter_23_ScheduleSubsequentWithoutRunCheck();
+         // filter is dirty again
 
-		} else {
+         jobFilter_23_ScheduleSubsequentWithoutRunCheck();
 
-			// clear progress bar
+      } else {
 
-			jobUILoading_20_Schedule();
-		}
+         // clear progress bar
 
-//		final float timeDiff = (float) (System.nanoTime() - start) / 1000000;
-////		if (timeDiff > 10) {}
-//		System.out.println("filterJob_20_RunInitial:\t" + timeDiff + " ms\t"); //$NON-NLS-1$ //$NON-NLS-2$
-//		// TODO remove SYSTEM.OUT.PRINTLN
-	}
+         jobUILoading_20_Schedule();
+      }
 
-	/**
-	 * Run filter and sorting again with newly loaded EXIF data until all EXIF data are loaded.
-	 */
-	private void jobFilter_32_RunSubsequent() {
+//      final float timeDiff = (float) (System.nanoTime() - start) / 1000000;
+//      System.out.println("filterJob_30_RunSubsequent:\t" + timeDiff + " ms\t"); //$NON-NLS-1$ //$NON-NLS-2$
+//      // TODO remove SYSTEM.OUT.PRINTLN
+   }
 
-//		final long start = System.nanoTime();
+   private void jobUIFilter_10_Create() {
 
-		final boolean isGPSFilter = _imageFilterGPS == PhotoFilterGPS.WITH_GPS;
-		final boolean isNoGPSFilter = _imageFilterGPS == PhotoFilterGPS.NO_GPS;
-		final boolean isTourFilter = _imageFilterTour == PhotoFilterTour.WITH_TOURS;
-		final boolean isNoTourFilter = _imageFilterTour == PhotoFilterTour.NO_TOURS;
+      _jobUIFilter = new UIJob("PicDirImages: Update UI with filtered gallery images") { //$NON-NLS-1$
 
-		final boolean isFilterSet = isGPSFilter || isNoGPSFilter || isTourFilter || isNoTourFilter;
+         @Override
+         public IStatus runInUIThread(final IProgressMonitor monitor) {
 
-		// get current dirty counter
-		final int currentDirtyCounter = _jobFilterDirtyCounter;
+            _jobUIFilterJobIsScheduled.set(false);
 
-		Photo[] newFilteredPhotos = null;
+            try {
+               jobUIFilter_30_Run();
+            } catch (final Exception e) {
+               StatusUtil.log(e);
+            }
 
-		if (isFilterSet) {
+            return Status.OK_STATUS;
+         }
+      };
 
-			final int numberOfPhotos = _allPhotos.length;
-			final Photo[] tempFilteredPhotos = new Photo[numberOfPhotos];
+      _jobUIFilter.setSystem(true);
+   }
 
-			// filterindex is incremented when the filter contains a gallery item
-			int filterIndex = 0;
-			int photoIndex = 0;
+   private void jobUIFilter_20_Schedule(final long delay) {
 
-			// loop: all photos
-			for (final Photo photo : _allPhotos) {
+      JOB_LOCK.lock();
+      {
+         try {
 
-				if (_filterJobIsCanceled) {
-					return;
-				}
+            _jobUIFilterDirtyCounter++;
 
-				boolean isPhotoInFilterGps = false;
-				boolean isPhotoInFilterTour = false;
+            if ((_jobUIFilter.getState() == Job.RUNNING) == false) {
 
-				if (photo.isExifLoaded) {
+               // filter job is NOT running, schedule it
 
-					final boolean isPhotoWithGps = _isLinkPhotoDisplayed
-							? photo.isLinkPhotoWithGps
-							: photo.isTourPhotoWithGps;
+               final boolean isScheduled = _jobUIFilterJobIsScheduled.getAndSet(true);
 
-					if (isGPSFilter) {
-						if (isPhotoWithGps) {
-							isPhotoInFilterGps = true;
-						}
+               if (isScheduled == false) {
+                  _jobUIFilter.schedule(delay);
+               }
+            }
 
-					} else if (isNoGPSFilter) {
+         } finally {
+            JOB_LOCK.unlock();
+         }
+      }
+   }
 
-						if (!isPhotoWithGps) {
-							isPhotoInFilterGps = true;
-						}
+   private void jobUIFilter_30_Run() {
 
-					} else {
+      final Photo[] uiUpdatePhoto = _jobUIFilterPhoto;
+      _jobUIFilterPhoto = null;
 
-						// no gps filter
+      if (uiUpdatePhoto == null) {
+         return;
+      }
 
-						isPhotoInFilterGps = true;
-					}
-				} else {
+      final int currentDirtyCounter = _jobUIFilterDirtyCounter;
 
-					// no gps filter
+      updateUI_GalleryItems(uiUpdatePhoto, null);
 
-					isPhotoInFilterGps = true;
-				}
+      if (_jobUIFilterDirtyCounter > currentDirtyCounter) {
+         // UI is dirty again
+         jobUIFilter_20_Schedule(DELAY_JOB_UI_FILTER);
+      }
+   }
 
-				final boolean isSavedInTour = photo.isSavedInTour;
+   private void jobUILoading_10_Create() {
 
-				if (isTourFilter) {
-					if (isSavedInTour) {
-						isPhotoInFilterTour = true;
-					}
+      _jobUILoading = new UIJob("PicDirImages: Update UI when loading images") {//$NON-NLS-1$
 
-				} else if (isNoTourFilter) {
+         @Override
+         public IStatus runInUIThread(final IProgressMonitor monitor) {
 
-					if (!isSavedInTour) {
-						isPhotoInFilterTour = true;
-					}
-				} else {
+            _jobUILoadingIsScheduled.set(false);
 
-					// no tour filter
-					isPhotoInFilterTour = true;
-				}
+            try {
+               jobUILoading_30_Run();
+            } catch (final Exception e) {
+               StatusUtil.log(e);
+            }
 
-				if (isPhotoInFilterGps && isPhotoInFilterTour) {
+            return Status.OK_STATUS;
+         }
 
-					tempFilteredPhotos[filterIndex] = _allPhotos[photoIndex];
+      };
 
-					filterIndex++;
-				}
+      _jobUILoading.setSystem(true);
+   }
 
-				photoIndex++;
-			}
+   public void jobUILoading_20_Schedule() {
 
-			// remove trailing array items which are not set
-			newFilteredPhotos = Arrays.copyOf(tempFilteredPhotos, filterIndex);
+      JOB_LOCK.lock();
+      {
+         try {
 
-		} else {
+            _jobUILoadingDirtyCounter++;
 
-			// a filter is not set, display all images but load exif data which is necessary when filtering by date
+            if ((_jobUILoading.getState() == Job.RUNNING) == false) {
 
-			newFilteredPhotos = Arrays.copyOf(_allPhotos, _allPhotos.length);
-		}
+               // UI job is NOT running, schedule it
 
-		// check sorting
-//		if (_initialSorting != _currentSorting) {
+               final boolean isScheduled = _jobUILoadingIsScheduled.getAndSet(true);
+
+               if (isScheduled == false) {
+                  _jobUILoading.schedule(DELAY_JOB_UI_LOADING);
+               }
+            }
+
+         } finally {
+            JOB_LOCK.unlock();
+         }
+      }
+   }
+
+   private void jobUILoading_21_ScheduleWithoutRunCheck() {
+
+      _jobUILoadingDirtyCounter++;
+
+      final boolean isScheduled = _jobUILoadingIsScheduled.getAndSet(true);
+
+      if (isScheduled == false) {
+         _jobUILoading.schedule(DELAY_JOB_UI_LOADING);
+      }
+   }
+
+   private void jobUILoading_30_Run() {
+
+      final int currentDirtyCounter = _jobUILoadingDirtyCounter;
+
+      final int exifQueueSize = PhotoLoadManager.getExifQueueSize();
+      final int imageQueueSize = PhotoLoadManager.getImageQueueSize();
+      final int imageHQQueueSize = PhotoLoadManager.getImageHQQueueSize();
+
+      if (exifQueueSize > 0) {
+
+         updateUI_StatusMessageInUIThread(NLS.bind(Messages.Pic_Dir_StatusLabel_LoadingImagesFilter,
+               new Object[] {
+                     imageQueueSize,
+                     imageHQQueueSize,
+                     exifQueueSize }));
+
+      } else if (imageQueueSize > 0 || imageHQQueueSize > 0) {
+
+         updateUI_StatusMessageInUIThread(NLS.bind(//
+               Messages.Pic_Dir_StatusLabel_LoadingImages,
+               new Object[] { imageQueueSize, imageHQQueueSize, exifQueueSize }));
+
+      } else {
+
+         // hide last message
+
+         updateUI_StatusMessageInUIThread(UI.EMPTY_STRING);
+      }
+
+      if (_jobUILoadingDirtyCounter > currentDirtyCounter) {
+
+         // UI is dirty again, schedule it again
+
+         jobUILoading_21_ScheduleWithoutRunCheck();
+      }
+   }
+
+   private void onBeforeModifyGallerySelection() {
+
+      if (_hoveredItem == null) {
+         return;
+      }
+
+      _hoveredItem.isHovered = false;
+      _hoveredItem.isNeedExitUIUpdate = false;
+      _hoveredItem.hoveredStars = 0;
+      _hoveredItem.isHovered_AnnotationTour = false;
+      _hoveredItem.isHovered_InvalidImage = false;
+
+      if (_hoveredItem.allSelectedGalleryItems != null) {
+
+         for (final GalleryMT20Item selectedItems : _hoveredItem.allSelectedGalleryItems) {
+
+            selectedItems.isInHoveredGroup = false;
+
+            _galleryMT20.redrawItem(selectedItems);
+         }
+
+         /**
+          * This collection cannot be cleared because it's the original list with selected items
+          * in the gallery, so only the reference is set to <code>null</code>.
+          */
+         _hoveredItem.allSelectedGalleryItems = null;
+
+      } else {
+
+         _galleryMT20.redrawItem(_hoveredItem);
+      }
+
+      _hoveredItem = null;
+   }
+
+   private void onDispose() {
+
+      PhotoCache.removeEvictionListener(this);
+
+      if (_galleryFont != null) {
+         _galleryFont.dispose();
+      }
+
+      stopLoadingImages();
+   }
+
+   @Override
+   public boolean onItemMouseDown(final GalleryMT20Item mouseDownItem, final int itemMouseX, final int itemMouseY) {
+
+      if (mouseDownItem == null) {
+         return false;
+      }
+
+      if (_isHandleRatingStars || _isShowAnnotations || mouseDownItem.photo.isLoadingError()) {
+
+         if (_photoRenderer.isMouseDownHandled(mouseDownItem, itemMouseX, itemMouseY)) {
+
+            _galleryMT20.redrawItem(mouseDownItem);
+
+            return true;
+         }
+      }
+
+      return false;
+   }
+
+   @Override
+   public void onItemMouseExit(final GalleryMT20Item exitHoveredItem, final int itemMouseX, final int itemMouseY) {
+
+      if (_isHandleRatingStars == false
+            && _isShowAnnotations == false
+            && exitHoveredItem.photo.isLoadingError() == false) {
+         return;
+      }
+
+      /*
+       * reset hovering
+       */
+
+      final boolean isUpdateUI = exitHoveredItem.isNeedExitUIUpdate;
+
+      exitHoveredItem.isHovered = false;
+      exitHoveredItem.isNeedExitUIUpdate = false;
+
+      exitHoveredItem.hoveredStars = 0;
+      exitHoveredItem.isHovered_AnnotationTour = false;
+      exitHoveredItem.isHovered_InvalidImage = false;
+
+      if (exitHoveredItem.allSelectedGalleryItems != null) {
+
+         for (final GalleryMT20Item selectedItems : exitHoveredItem.allSelectedGalleryItems) {
+
+            selectedItems.isInHoveredGroup = false;
+
+            if (isUpdateUI) {
+               _galleryMT20.redrawItem(selectedItems);
+            }
+         }
+
+         /**
+          * This collection cannot be cleared because it's the original list with selected items
+          * in the gallery, so only the reference is set to <code>null</code>.
+          */
+         exitHoveredItem.allSelectedGalleryItems = null;
+
+         _hoveredItem = null;
+
+      } else {
+
+         if (isUpdateUI) {
+            _galleryMT20.redrawItem(exitHoveredItem);
+         }
+      }
+
+   }
+
+   @Override
+   public void onItemMouseHovered(final GalleryMT20Item hoveredItem, final int itemMouseX, final int itemMouseY) {
+
+      if (_isShowTooltip) {
+         _photoGalleryTooltip.show(hoveredItem);
+      }
+
+      if (hoveredItem == null) {
+         return;
+      }
+
+      final boolean isRatingStarsHandledAndPainted = _isHandleRatingStars && _isAttributesPainted;
+
+      if (isRatingStarsHandledAndPainted || _isShowAnnotations || hoveredItem.photo.isLoadingError()) {
+
+         _hoveredItem = hoveredItem;
+
+         hoveredItem.isHovered = true;
+
+         // this will set allSelectedGalleryItems in the hovered item
+         final boolean isModified = _photoRenderer.isItemHovered(hoveredItem, itemMouseX, itemMouseY);
+
+         // don't reset here, this is done in the item exit event
+         hoveredItem.isNeedExitUIUpdate |= isModified;
+
+         if (isModified) {
+
+            if (hoveredItem.allSelectedGalleryItems != null) {
+
+               for (final GalleryMT20Item selectedItems : hoveredItem.allSelectedGalleryItems) {
+
+                  selectedItems.isInHoveredGroup = true;
+
+                  _galleryMT20.redrawItem(selectedItems);
+               }
+
+            } else {
+
+               _galleryMT20.redrawItem(hoveredItem);
+            }
+         }
+      }
+   }
+
+   private void onModifyFont() {
+
+      createGalleryFont();
+
+      _photoRenderer.setFont(_galleryFont);
+   }
+
+   public void onReparentShell(final Shell reparentedShell) {
+
+      _photoGalleryTooltip.onReparentShell(reparentedShell);
+
+      /*
+       * when a tooltip is reparented, the context menu must be recreated otherwise an exception
+       * is thown that the menu shell has the wrong parent
+       */
+      createUI_34_ContextMenu();
+   }
+
+   private void onSelectPhoto() {
+
+      // show default message
+      updateUI_StatusMessage(UI.EMPTY_STRING);
+
+      // fire selection
+      _photoGalleryProvider.setSelection(createPhotoSelection());
+   }
+
+   /**
+    * Get gps state and exif data
+    *
+    * @return Returns <code>true</code> when exif data is already available from the cache and must
+    *         not be loaded.
+    */
+   private boolean putInExifLoadingQueue(final Photo photo) {
+
+      final PhotoImageMetadata photoImageMetadata = ExifCache.get(photo.imageFilePathName);
+
+      if (photoImageMetadata != null) {
+
+         photo.updateImageMetadata(photoImageMetadata);
+
+         return true;
+      }
+
+      PhotoLoadManager.putImageInLoadingQueueExif(photo, new LoadCallbackExif(photo, _currentExifRunId));
+
+      return false;
+   }
+
+   @Override
+   public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
+
+      _pageDetails.setRedraw(false);
+      {
+         _photoViewer.getTable().dispose();
+
+         createUI_32_PhotoViewer(_pageDetails);
+         _pageDetails.layout();
+
+         // update the viewer
+         reloadViewer();
+      }
+      _pageDetails.setRedraw(true);
+
+      return _photoViewer;
+   }
+
+   public void redrawItem(final GalleryMT20Item galleryItem) {
+      _galleryMT20.redrawItem(galleryItem);
+   }
+
+   public void refreshUI() {
+      _galleryMT20.redraw();
+   }
+
+   @Override
+   public void reloadViewer() {
+      _photoViewer.setInput(new Object[0]);
+   }
+
+   void restoreState() {
+
+      _galleryMT20.restoreState();
+
+      // set font
+      onModifyFont();
+
+      /*
+       * gallery sorting
+       */
+      final GallerySorting defaultSorting = GallerySorting.FILE_NAME;
+      final String stateValue = Util.getStateString(_state, STATE_IMAGE_SORTING, defaultSorting.name());
+      try {
+         _currentSorting = GallerySorting.valueOf(stateValue);
+      } catch (final Exception e) {
+         _currentSorting = defaultSorting;
+      }
+
+      // pref store settings
+      updateUI_FromPrefStore(false);
+
+      /**
+       * !!! very important !!!
+       * <p>
+       * show gallery to initialize client area, otherwise the width is 0 until the page is
+       * displayed in a later step
+       */
+      showPageBookPage(_galleryMT20, false);
+
+      // show default page
+      _lblDefaultPage.setText(_defaultStatusMessage);
+      showPageBookPage(_pageDefault, false);
+
+      /*
+       * set thumbnail size after gallery client area is set
+       */
+      final int stateThumbSize = Util.getStateInt(
+            _state,
+            STATE_THUMB_IMAGE_SIZE,
+            PhotoLoadManager.IMAGE_SIZE_THUMBNAIL);
+
+      // restore gallery action bar
+      if (_galleryActionBar != null) {
+         _galleryActionBar.restoreState(_state, stateThumbSize);
+         _galleryActionBar.setThumbnailSizeVisibility(_galleryMT20.isVertical());
+      }
+
+      // restore thumbnail image size
+      setThumbnailSizeRestore(stateThumbSize);
+
+      /*
+       * gallery folder/tour image positions
+       */
+      final String[] positionKeys = _state.getArray(STATE_GALLERY_POSITION_KEY);
+      final String[] positionValues = _state.getArray(STATE_GALLERY_POSITION_VALUE);
+      if (positionKeys != null && positionValues != null) {
+
+         // ensure same size
+         if (positionKeys.length == positionValues.length) {
+
+            for (int positionIndex = 0; positionIndex < positionKeys.length; positionIndex++) {
+
+               final String positionValueString = positionValues[positionIndex];
+
+               try {
+                  final Double positionValue = Double.parseDouble(positionValueString);
+
+                  _galleryPositions.put(positionKeys[positionIndex], positionValue);
+
+               } catch (final Exception e) {
+                  // ignore
+               }
+            }
+         }
+      }
+
+      _restoredSelection = Util.getStateIntArray(_state, STATE_SELECTED_ITEMS, null);
+   }
+
+   public void saveState() {
+
+      if (_galleryMT20.isVertical()) {
+
+         /*
+          * image size is only used in a vertical gallery, horizontal gallery is using the
+          * clientarea height to get the image size
+          */
+
+         _state.put(STATE_THUMB_IMAGE_SIZE, _photoImageSize);
+      }
+
+      _state.put(STATE_IMAGE_SORTING, _currentSorting.name());
+
+      /*
+       * keep gallery positions
+       */
+
+      // preserve current gallery position
+      final double galleryPosition = _galleryMT20.getGalleryPosition();
+
+      if (_currentGalleryPositionKey != null) {
+         _galleryPositions.put(_currentGalleryPositionKey, galleryPosition);
+      } else if (_newGalleryPositionKey != null) {
+         _galleryPositions.put(_newGalleryPositionKey, galleryPosition);
+      }
+
+      final Set<String> positionKeys = _galleryPositions.keySet();
+      final int positionSize = positionKeys.size();
+
+      if (positionSize > 0) {
+
+         final String[] positionKeyArray = positionKeys.toArray(new String[positionSize]);
+         final String[] positionValues = new String[positionSize];
+
+         for (int positionIndex = 0; positionIndex < positionKeyArray.length; positionIndex++) {
+
+            final String positionKey = positionKeyArray[positionIndex];
+            positionValues[positionIndex] = _galleryPositions.get(positionKey).toString();
+         }
+
+         _state.put(STATE_GALLERY_POSITION_KEY, positionKeyArray);
+         _state.put(STATE_GALLERY_POSITION_VALUE, positionValues);
+      }
+
+      Util.setState(_state, STATE_SELECTED_ITEMS, _galleryMT20.getSelectionIndex());
+
+      _columnManager.saveState(_state);
+
+      _galleryMT20.saveState();
+   }
+
+   void selectGalleryType(final GalleryType galleryType) {
+
+      _galleryType = galleryType;
+
+      showPageGalleryContent();
+   }
+
+   public void selectItem(final int itemIndex, final String galleryPositionKey) {
+
+      _galleryMT20.selectItem(itemIndex);
+
+//      // ensure to keep position, this has not worked in the full screen gallery when image was resized
+////      _currentGalleryPositionKey = galleryPositionKey;
+////      _newGalleryPositionKey = galleryPositionKey;
 //
-//			/*
-//			 * photo must be sorted because sorting is different than the initial sorting, this
-//			 * will sort only the filtered photo
-//			 */
+//      final double currentGalleryPosition = _galleryMT20.getGalleryPosition();
+////      _galleryPositions.put(galleryPositionKey, currentGalleryPosition);
 //
-		Arrays.sort(newFilteredPhotos, getCurrentComparator());
-//		}
+//      System.out.println(UI.timeStampNano() + " selectItem()\t" + galleryPositionKey + "\t" + currentGalleryPosition);
+//      // TODO remove SYSTEM.OUT.PRINTLN
+   }
+
+   public void setDefaultStatusMessage(final String message) {
+      _defaultStatusMessage = message;
+   }
+
+   public void setExternalMouseListener(final IExternalGalleryListener externalGalleryMouseListener) {
+      _galleryMT20.setExternalMouseListener(externalGalleryMouseListener);
+   }
+
+   /**
+    * @param photoFilterGPS
+    * @param photoFilterTour
+    */
+   public void setFilter(final PhotoFilterGPS photoFilterGPS, final PhotoFilterTour photoFilterTour) {
+      _imageFilterGPS = photoFilterGPS;
+      _imageFilterTour = photoFilterTour;
+   }
+
+   public void setFocus() {
+      _galleryMT20.setFocus();
+   }
+
+   public void setFullScreenImageViewer(final FullScreenImageViewer fullScreenImageViewer) {
+
+      _fullScreenImageViewer = fullScreenImageViewer;
+      _galleryMT20.setFullScreenImageViewer(fullScreenImageViewer);
+   }
+
+   private void setIsLinkPhotoDisplayed(final boolean isLinkPhotoDisplayed) {
+
+      _isLinkPhotoDisplayed = isLinkPhotoDisplayed;
+      _photoRenderer.setIsLinkPhotoDisplayed(isLinkPhotoDisplayed);
+   }
+
+   public void setPhotoInfo(final boolean isShowPhotoName,
+                            final PhotoDateInfo photoDateInfo,
+                            final boolean isShowAnnotations,
+                            final boolean isShowTooltip) {
+
+      _isShowTooltip = isShowTooltip;
+      _isShowAnnotations = isShowAnnotations;
 
-		/**
-		 * UI update must be run in a UI job because the update can be very long when many
-		 * (thousands) small images are displayed
-		 */
-		_jobUIFilterPhoto = newFilteredPhotos;
+      _photoRenderer.setPhotoInfo(isShowPhotoName, photoDateInfo, isShowAnnotations);
+   }
 
-		jobUIFilter_20_Schedule(0);
+   /**
+    * A custom actionbar can be displayed, by default it is hidden. The actionbar can be retrieved
+    * with {@link #getCustomActionBarContainer()}.
+    * <p>
+    * This method <b>must</b> be called before
+    * {@link #createImageGallery(Composite, int, IPhotoGalleryProvider)} is called.
+    */
+   public void setShowCustomActionBar() {
+      _isShowCustomActionBar = true;
+   }
 
-		if (_jobFilterDirtyCounter > currentDirtyCounter) {
+   /**
+    * Prevent to open pref dialog, when it's opened it would close this tooltip and the pref dialog
+    * is hidden -->> APP IS FREEZING !!!
+    */
+   public void setShowOtherShellActions(final boolean isShowOtherShellActions) {
+      _galleryMT20.setIsShowOtherShellActions(isShowOtherShellActions);
+   }
 
-			// filter is dirty again
+   void setShowPhotoRatingStars(final RatingStarBehaviour ratingStarBehaviour) {
 
-			jobFilter_23_ScheduleSubsequentWithoutRunCheck();
+      _isHandleRatingStars = ratingStarBehaviour == RatingStarBehaviour.HOVERED_STARS;
 
-		} else {
+      _photoRenderer.setShowRatingStars(ratingStarBehaviour);
 
-			// clear progress bar
+      // redraw gallery with new settings
+      _galleryMT20.redraw();
+   }
 
-			jobUILoading_20_Schedule();
-		}
+   /**
+    * Thumbnail size combobox can be displayed, by default it is hidden, This method <b>must</b> be
+    * called before {@link #createImageGallery(Composite, int, IPhotoGalleryProvider)} is called.
+    */
+   public void setShowThumbnailSize() {
+      _isShowThumbsize = true;
+   }
 
-//		final float timeDiff = (float) (System.nanoTime() - start) / 1000000;
-//		System.out.println("filterJob_30_RunSubsequent:\t" + timeDiff + " ms\t"); //$NON-NLS-1$ //$NON-NLS-2$
-//		// TODO remove SYSTEM.OUT.PRINTLN
-	}
+   public void setSorting(final GallerySorting gallerySorting) {
 
-	private void jobUIFilter_10_Create() {
+      // set new sorting algorithm
+      _currentSorting = gallerySorting;
+   }
 
-		_jobUIFilter = new UIJob("PicDirImages: Update UI with filtered gallery images") { //$NON-NLS-1$
+   private void setStatusMessage(final String message) {
 
-			@Override
-			public IStatus runInUIThread(final IProgressMonitor monitor) {
+      final IStatusLineManager statusLineManager = _photoGalleryProvider.getStatusLineManager();
 
-				_jobUIFilterJobIsScheduled.set(false);
+      if (statusLineManager != null) {
+         statusLineManager.setMessage(message);
+      }
+   }
 
-				try {
-					jobUIFilter_30_Run();
-				} catch (final Exception e) {
-					StatusUtil.log(e);
-				}
+   /**
+    * Setting thumbnail size is done in the gallery action bar, this can be done only for a
+    * vertical gallery.
+    *
+    * @param newImageSize
+    */
+   public void setThumbnailSize(final int newImageSize) {
 
-				return Status.OK_STATUS;
-			}
-		};
+      int newGalleryItemSize = newImageSize + _photoBorderSize;
 
-		_jobUIFilter.setSystem(true);
-	}
+      if (newGalleryItemSize == _galleryMT20.getItemWidth()) {
+         // nothing has changed
+         return;
+      }
 
-	private void jobUIFilter_20_Schedule(final long delay) {
+      final int prevGalleryItemSize = _galleryMT20.getItemWidth();
 
-		JOB_LOCK.lock();
-		{
-			try {
+      // update gallery
+      final int adjustedItemSize = _galleryMT20.zoomGallery(newGalleryItemSize, false);
 
-				_jobUIFilterDirtyCounter++;
+      if (adjustedItemSize == -1 || adjustedItemSize == prevGalleryItemSize) {
+         // nothing has changed
+         return;
+      }
 
-				if ((_jobUIFilter.getState() == Job.RUNNING) == false) {
+      PhotoLoadManager.stopImageLoading(false);
 
-					// filter job is NOT running, schedule it
+      if (adjustedItemSize != newGalleryItemSize) {
 
-					final boolean isScheduled = _jobUIFilterJobIsScheduled.getAndSet(true);
+         /*
+          * size has been modified, this case can occure when the gallery is switching the
+          * scrollbars on/off depending on the content
+          */
 
-					if (isScheduled == false) {
-						_jobUIFilter.schedule(delay);
-					}
-				}
+         newGalleryItemSize = adjustedItemSize;
+      }
 
-			} finally {
-				JOB_LOCK.unlock();
-			}
-		}
-	}
+      updateUI_AfterZoomInOut(newGalleryItemSize);
+   }
 
-	private void jobUIFilter_30_Run() {
+   private void setThumbnailSizeRestore(final int thumbSize) {
 
-		final Photo[] uiUpdatePhoto = _jobUIFilterPhoto;
-		_jobUIFilterPhoto = null;
+      PhotoLoadManager.stopImageLoading(false);
 
-		if (uiUpdatePhoto == null) {
-			return;
-		}
+      int requestedItemSize = thumbSize + _photoBorderSize;
 
-		final int currentDirtyCounter = _jobUIFilterDirtyCounter;
+      // update gallery
+      final int adjustedItemSize = _galleryMT20.zoomGallery(requestedItemSize, true);
 
-		updateUI_GalleryItems(uiUpdatePhoto, null);
+      // check if size has been modified when zoomed in/out
+      if (adjustedItemSize != requestedItemSize) {
 
-		if (_jobUIFilterDirtyCounter > currentDirtyCounter) {
-			// UI is dirty again
-			jobUIFilter_20_Schedule(DELAY_JOB_UI_FILTER);
-		}
-	}
+         /*
+          * size has been modified, this case can occure when the gallery is switching the
+          * scrollbars on/off depending on the content
+          */
 
-	private void jobUILoading_10_Create() {
+         requestedItemSize = adjustedItemSize;
+      }
 
-		_jobUILoading = new UIJob("PicDirImages: Update UI when loading images") {//$NON-NLS-1$
+      updateUI_AfterZoomInOut(requestedItemSize);
+   }
 
-			@Override
-			public IStatus runInUIThread(final IProgressMonitor monitor) {
+   public void setVertical(final boolean isVerticalGallery) {
 
-				_jobUILoadingIsScheduled.set(false);
+      if (isVerticalGallery) {
 
-				try {
-					jobUILoading_30_Run();
-				} catch (final Exception e) {
-					StatusUtil.log(e);
-				}
+         final int verticalWidth = _galleryMT20.getVerticalItemWidth();
 
-				return Status.OK_STATUS;
-			}
+         updateUI_AfterZoomInOut(verticalWidth);
+      }
 
-		};
+      _galleryActionBar.setThumbnailSizeVisibility(isVerticalGallery);
 
-		_jobUILoading.setSystem(true);
-	}
+      _galleryMT20.setVertical(isVerticalGallery);
+   }
 
-	public void jobUILoading_20_Schedule() {
+   public void showImages(final ArrayList<Photo> allPhotos,
+                          final String galleryPositionKey,
+                          final boolean isLinkPhotoDisplayed,
+                          final boolean isFilteredAndSorted) {
 
-		JOB_LOCK.lock();
-		{
-			try {
+      final Photo[] photos = allPhotos.toArray(new Photo[allPhotos.size()]);
 
-				_jobUILoadingDirtyCounter++;
+      if (isFilteredAndSorted == false) {
 
-				if ((_jobUILoading.getState() == Job.RUNNING) == false) {
+         // sort photos with current sorting algorithm
+         Arrays.sort(photos, getCurrentComparator());
+      }
 
-					// UI job is NOT running, schedule it
+      showImages(photos, galleryPositionKey, isLinkPhotoDisplayed);
+   }
 
-					final boolean isScheduled = _jobUILoadingIsScheduled.getAndSet(true);
+   /**
+    * Display images for a selected folder.
+    *
+    * @param imageFolder
+    * @param isReloadFolder
+    * @param isLinkPhotoDisplayed
+    */
+   public void showImages(final File imageFolder, final boolean isReloadFolder, final boolean isLinkPhotoDisplayed) {
 
-					if (isScheduled == false) {
-						_jobUILoading.schedule(DELAY_JOB_UI_LOADING);
-					}
-				}
+      jobFilter_12_Stop();
 
-			} finally {
-				JOB_LOCK.unlock();
-			}
-		}
-	}
+      PhotoLoadManager.stopImageLoading(true);
 
-	private void jobUILoading_21_ScheduleWithoutRunCheck() {
+      //////////////////////////////////////////
+      //
+      // MUST BE REMOVED, IS ONLY FOR TESTING
+      //
+//      disposeAndDeleteAllImages();
+//      PhotoLoadManager.removeInvalidImageFiles();
+      //
+      // MUST BE REMOVED, IS ONLY FOR TESTING
+      //
+      //////////////////////////////////////////
 
-		_jobUILoadingDirtyCounter++;
+      setIsLinkPhotoDisplayed(isLinkPhotoDisplayed);
 
-		final boolean isScheduled = _jobUILoadingIsScheduled.getAndSet(true);
+      if (imageFolder == null) {
+         _lblDefaultPage.setText(Messages.Pic_Dir_Label_ReadingFolders);
+      } else {
 
-		if (isScheduled == false) {
-			_jobUILoading.schedule(DELAY_JOB_UI_LOADING);
-		}
-	}
+         _lblDefaultPage.setText(NLS.bind(Messages.Pic_Dir_Label_Loading, imageFolder.getAbsolutePath()));
+      }
+      showPageBookPage(_pageDefault, true);
 
-	private void jobUILoading_30_Run() {
+      _photoFolderWhichShouldBeDisplayed = imageFolder;
 
-		final int currentDirtyCounter = _jobUILoadingDirtyCounter;
+      workerUpdate(imageFolder, isReloadFolder);
+   }
 
-		final int exifQueueSize = PhotoLoadManager.getExifQueueSize();
-		final int imageQueueSize = PhotoLoadManager.getImageQueueSize();
-		final int imageHQQueueSize = PhotoLoadManager.getImageHQQueueSize();
+   public void showImages(final Photo[] allFilteredAnsSortedPhotos,
+                          final String galleryPositionKey,
+                          final boolean isLinkPhotoDisplayed) {
 
-		if (exifQueueSize > 0) {
+//      System.out.println(UI.timeStampNano() + " showImages() " + galleryPositionKey);
+//      // TODO remove SYSTEM.OUT.PRINTLN
 
-			updateUI_StatusMessageInUIThread(NLS.bind(Messages.Pic_Dir_StatusLabel_LoadingImagesFilter, new Object[] {
-					imageQueueSize,
-					imageHQQueueSize,
-					exifQueueSize }));
+      jobFilter_12_Stop();
+      PhotoLoadManager.stopImageLoading(true);
 
-		} else if (imageQueueSize > 0 || imageHQQueueSize > 0) {
+      //////////////////////////////////////////
+      //
+      // MUST BE REMOVED, IS ONLY FOR TESTING
+      //
+//      disposeAndDeleteAllImages();
+//      PhotoLoadManager.removeInvalidImageFiles();
+      //
+      // MUST BE REMOVED, IS ONLY FOR TESTING
+      //
+      //////////////////////////////////////////
 
-			updateUI_StatusMessageInUIThread(NLS.bind(//
-					Messages.Pic_Dir_StatusLabel_LoadingImages,
-					new Object[] { imageQueueSize, imageHQQueueSize, exifQueueSize }));
+      setIsLinkPhotoDisplayed(isLinkPhotoDisplayed);
 
-		} else {
+      // images are not loaded from a folder, photos are already available
+      _photoFolder = null;
 
-			// hide last message
+      _newGalleryPositionKey = galleryPositionKey;
 
-			updateUI_StatusMessageInUIThread(UI.EMPTY_STRING);
-		}
+      // initialize tooltip for new images
+      _photoGalleryTooltip.reset(true);
 
-		if (_jobUILoadingDirtyCounter > currentDirtyCounter) {
+      _galleryMT20.deselectAll();
 
-			// UI is dirty again, schedule it again
+      _allPhotos = allFilteredAnsSortedPhotos;
 
-			jobUILoading_21_ScheduleWithoutRunCheck();
-		}
-	}
+      final double galleryPosition = getCachedGalleryPosition();
 
-	private void onBeforeModifyGallerySelection() {
+      updateUI_GalleryItems(_allPhotos, galleryPosition);
+   }
 
-		if (_hoveredItem == null) {
-			return;
-		}
+   /**
+    * @param isShowPhotoName
+    * @param photoDateInfo
+    * @param isShowAnnotations
+    * @param isShowTooltip
+    */
+   void showInfo(final boolean isShowPhotoName,
+                 final PhotoDateInfo photoDateInfo,
+                 final boolean isShowAnnotations,
+                 final boolean isShowTooltip) {
 
-		_hoveredItem.isHovered = false;
-		_hoveredItem.isNeedExitUIUpdate = false;
-		_hoveredItem.hoveredStars = 0;
-		_hoveredItem.isHovered_AnnotationTour = false;
-		_hoveredItem.isHovered_InvalidImage = false;
+      setPhotoInfo(isShowPhotoName, photoDateInfo, isShowAnnotations, isShowTooltip);
 
-		if (_hoveredItem.allSelectedGalleryItems != null) {
+      // reset tooltip, otherwise it could be displayed if it should not
+      _photoGalleryTooltip.reset(true);
 
-			for (final GalleryMT20Item selectedItems : _hoveredItem.allSelectedGalleryItems) {
+      _galleryMT20.redraw();
+   }
 
-				selectedItems.isInHoveredGroup = false;
+   public void showItem(final int itemIndex) {
+      _galleryMT20.showItem(itemIndex);
+   }
 
-				_galleryMT20.redrawItem(selectedItems);
-			}
+   private void showPageBookPage(final Composite page, final boolean isDelay) {
 
-			/**
-			 * This collection cannot be cleared because it's the original list with selected items
-			 * in the gallery, so only the reference is set to <code>null</code>.
-			 */
-			_hoveredItem.allSelectedGalleryItems = null;
+      if (isDelay) {
 
-		} else {
+         /*
+          * delay showing the default page because it is flickering when an image is displayed
+          * again within a few milliseconds
+          */
 
-			_galleryMT20.redrawItem(_hoveredItem);
-		}
+         _delayCounter[0]++;
 
-		_hoveredItem = null;
-	}
+         if (page == _pageDefault || page == _pageGalleryInfo) {
 
-	private void onDispose() {
+            _pageBook.getDisplay().timerExec(100, new Runnable() {
 
-		PhotoCache.removeEvictionListener(this);
+               private int       __delayCounter = _delayCounter[0];
+               private Composite __page         = page;
 
-		if (_galleryFont != null) {
-			_galleryFont.dispose();
-		}
+               @Override
+               public void run() {
 
-		stopLoadingImages();
-	}
+                  // check if this still the same page which should be displayed
+                  if (__delayCounter == _delayCounter[0]) {
+                     _pageBook.showPage(__page);
+                  }
+               }
+            });
 
-	@Override
-	public boolean onItemMouseDown(final GalleryMT20Item mouseDownItem, final int itemMouseX, final int itemMouseY) {
+         } else {
 
-		if (mouseDownItem == null) {
-			return false;
-		}
+            _pageBook.showPage(page);
+         }
 
-		if (_isHandleRatingStars || _isShowAnnotations || mouseDownItem.photo.isLoadingError()) {
+      } else {
 
-			if (_photoRenderer.isMouseDownHandled(mouseDownItem, itemMouseX, itemMouseY)) {
+         _pageBook.showPage(page);
+      }
 
-				_galleryMT20.redrawItem(mouseDownItem);
+   }
 
-				return true;
-			}
-		}
+   private void showPageGalleryContent() {
 
-		return false;
-	}
+      Composite galleryContent;
 
-	@Override
-	public void onItemMouseExit(final GalleryMT20Item exitHoveredItem, final int itemMouseX, final int itemMouseY) {
+      if (_galleryType == GalleryType.DETAILS) {
 
-		if (_isHandleRatingStars == false
-				&& _isShowAnnotations == false
-				&& exitHoveredItem.photo.isLoadingError() == false) {
-			return;
-		}
+         galleryContent = _pageDetails;
 
-		/*
-		 * reset hovering
-		 */
+         _photoViewer.setInput(new Object());
 
-		final boolean isUpdateUI = exitHoveredItem.isNeedExitUIUpdate;
+      } else {
 
-		exitHoveredItem.isHovered = false;
-		exitHoveredItem.isNeedExitUIUpdate = false;
+         // default is thumnail gallery
+         galleryContent = _galleryMT20;
 
-		exitHoveredItem.hoveredStars = 0;
-		exitHoveredItem.isHovered_AnnotationTour = false;
-		exitHoveredItem.isHovered_InvalidImage = false;
+         // update gallery
+         _galleryMT20.setVirtualItems(_sortedGalleryItems, _contentGalleryPosition);
+      }
 
-		if (exitHoveredItem.allSelectedGalleryItems != null) {
+      showPageBookPage(galleryContent, true);
+   }
 
-			for (final GalleryMT20Item selectedItems : exitHoveredItem.allSelectedGalleryItems) {
+   public void showRestoreFolder(final String restoreFolderName) {
 
-				selectedItems.isInHoveredGroup = false;
+      if (restoreFolderName == null) {
+         _lblDefaultPage.setText(Messages.Pic_Dir_StatusLabel_NoFolder);
+      } else {
+         _lblDefaultPage.setText(NLS.bind(Messages.Pic_Dir_StatusLabel_RestoringFolder, restoreFolderName));
+      }
 
-				if (isUpdateUI) {
-					_galleryMT20.redrawItem(selectedItems);
-				}
-			}
+      showPageBookPage(_pageDefault, true);
+   }
 
-			/**
-			 * This collection cannot be cleared because it's the original list with selected items
-			 * in the gallery, so only the reference is set to <code>null</code>.
-			 */
-			exitHoveredItem.allSelectedGalleryItems = null;
+   public void sortGallery(final GallerySorting gallerySorting) {
 
-			_hoveredItem = null;
+      // check if resorting is needed
+      if (_currentSorting == gallerySorting) {
+         return;
+      }
 
-		} else {
+      /*
+       * deselect all, this could be better implemented to keep selection, but is not yet done
+       */
+      deselectAll();
 
-			if (isUpdateUI) {
-				_galleryMT20.redrawItem(exitHoveredItem);
-			}
-		}
+      // set new sorting algorithm
+      _currentSorting = gallerySorting;
 
-	}
+      BusyIndicator.showWhile(_display, new Runnable() {
+         @Override
+         public void run() {
+            sortGallery_10_Runnable();
+         }
+      });
+   }
 
-	@Override
-	public void onItemMouseHovered(final GalleryMT20Item hoveredItem, final int itemMouseX, final int itemMouseY) {
+   /**
+    * This will sort all already created gallery items
+    */
+   private void sortGallery_10_Runnable() {
 
-		if (_isShowTooltip) {
-			_photoGalleryTooltip.show(hoveredItem);
-		}
+      if (_allPhotos == null || _allPhotos.length == 0) {
+         // there are no files
+         return;
+      }
 
-		if (hoveredItem == null) {
-			return;
-		}
+      final GalleryMT20Item[] virtualGalleryItems = _galleryMT20.getAllVirtualItems();
+      final int virtualSize = virtualGalleryItems.length;
 
-		final boolean isRatingStarsHandledAndPainted = _isHandleRatingStars && _isAttributesPainted;
+      if (virtualSize == 0) {
+         // there are no items
+         return;
+      }
 
-		if (isRatingStarsHandledAndPainted || _isShowAnnotations || hoveredItem.photo.isLoadingError()) {
+      // sort photos with new sorting algorithm
+      Arrays.sort(_sortedAndFilteredPhotos, getCurrentComparator());
 
-			_hoveredItem = hoveredItem;
+      updateUI_GalleryItems(_sortedAndFilteredPhotos, null);
+   }
 
-			hoveredItem.isHovered = true;
+   public void stopLoadingImages() {
 
-			// this will set allSelectedGalleryItems in the hovered item
-			final boolean isModified = _photoRenderer.isItemHovered(hoveredItem, itemMouseX, itemMouseY);
+      // stop jobs
+      jobFilter_12_Stop();
 
-			// don't reset here, this is done in the item exit event
-			hoveredItem.isNeedExitUIUpdate |= isModified;
+      PhotoLoadManager.stopImageLoading(true);
 
-			if (isModified) {
+      workerStop();
+   }
 
-				if (hoveredItem.allSelectedGalleryItems != null) {
+   /**
+    * @param fgColor
+    * @param bgColor
+    * @param selectionFgColor
+    * @param noFocusSelectionFgColor
+    * @param initUI
+    *           Is <code>true</code> after a restore to update the UI that not a default UI color
+    *           is displayed.
+    */
+   public void updateColors(final Color fgColor,
+                            final Color bgColor,
+                            final Color selectionFgColor,
+                            final Color noFocusSelectionFgColor,
+                            final boolean initUI) {
 
-					for (final GalleryMT20Item selectedItems : hoveredItem.allSelectedGalleryItems) {
-
-						selectedItems.isInHoveredGroup = true;
-
-						_galleryMT20.redrawItem(selectedItems);
-					}
-
-				} else {
-
-					_galleryMT20.redrawItem(hoveredItem);
-				}
-			}
-		}
-	}
-
-	private void onModifyFont() {
-
-		createGalleryFont();
-
-		_photoRenderer.setFont(_galleryFont);
-	}
-
-	public void onReparentShell(final Shell reparentedShell) {
-
-		_photoGalleryTooltip.onReparentShell(reparentedShell);
-
-		/*
-		 * when a tooltip is reparented, the context menu must be recreated otherwise an exception
-		 * is thown that the menu shell has the wrong parent
-		 */
-		createContextMenu();
-	}
-
-	private void onSelectPhoto() {
-
-		// show default message
-		updateUI_StatusMessage(UI.EMPTY_STRING);
-
-		// fire selection
-		_photoGalleryProvider.setSelection(createPhotoSelection());
-	}
-
-	/**
-	 * Get gps state and exif data
-	 * 
-	 * @return Returns <code>true</code> when exif data is already available from the cache and must
-	 *         not be loaded.
-	 */
-	private boolean putInExifLoadingQueue(final Photo photo) {
-
-		final PhotoImageMetadata photoImageMetadata = ExifCache.get(photo.imageFilePathName);
-
-		if (photoImageMetadata != null) {
-
-			photo.updateImageMetadata(photoImageMetadata);
-
-			return true;
-		}
-
-		PhotoLoadManager.putImageInLoadingQueueExif(photo, new LoadCallbackExif(photo, _currentExifRunId));
-
-		return false;
-	}
-
-	@Override
-	public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
-
-		_pageDetails.setRedraw(false);
-		{
-			_photoViewer.getTable().dispose();
-
-			createUI_32_PhotoViewer(_pageDetails);
-			_pageDetails.layout();
-
-			// update the viewer
-			reloadViewer();
-		}
-		_pageDetails.setRedraw(true);
-
-		return _photoViewer;
-	}
-
-	public void redrawItem(final GalleryMT20Item galleryItem) {
-		_galleryMT20.redrawItem(galleryItem);
-	}
-
-	public void refreshUI() {
-		_galleryMT20.redraw();
-	}
-
-	@Override
-	public void reloadViewer() {
-		_photoViewer.setInput(new Object[0]);
-	}
-
-	void restoreState() {
-
-		_galleryMT20.restoreState();
-
-		// set font
-		onModifyFont();
-
-		/*
-		 * gallery sorting
-		 */
-		final GallerySorting defaultSorting = GallerySorting.FILE_NAME;
-		final String stateValue = Util.getStateString(_state, STATE_IMAGE_SORTING, defaultSorting.name());
-		try {
-			_currentSorting = GallerySorting.valueOf(stateValue);
-		} catch (final Exception e) {
-			_currentSorting = defaultSorting;
-		}
-
-		// pref store settings
-		updateUI_FromPrefStore(false);
-
-		/**
-		 * !!! very important !!!
-		 * <p>
-		 * show gallery to initialize client area, otherwise the width is 0 until the page is
-		 * displayed in a later step
-		 */
-		showPageBookPage(_galleryMT20, false);
-
-		// show default page
-		_lblDefaultPage.setText(_defaultStatusMessage);
-		showPageBookPage(_pageDefault, false);
-
-		/*
-		 * set thumbnail size after gallery client area is set
-		 */
-		final int stateThumbSize = Util.getStateInt(
-				_state,
-				STATE_THUMB_IMAGE_SIZE,
-				PhotoLoadManager.IMAGE_SIZE_THUMBNAIL);
-
-		// restore gallery action bar
-		if (_galleryActionBar != null) {
-			_galleryActionBar.restoreState(_state, stateThumbSize);
-			_galleryActionBar.setThumbnailSizeVisibility(_galleryMT20.isVertical());
-		}
-
-		// restore thumbnail image size
-		setThumbnailSizeRestore(stateThumbSize);
-
-		/*
-		 * gallery folder/tour image positions
-		 */
-		final String[] positionKeys = _state.getArray(STATE_GALLERY_POSITION_KEY);
-		final String[] positionValues = _state.getArray(STATE_GALLERY_POSITION_VALUE);
-		if (positionKeys != null && positionValues != null) {
-
-			// ensure same size
-			if (positionKeys.length == positionValues.length) {
-
-				for (int positionIndex = 0; positionIndex < positionKeys.length; positionIndex++) {
-
-					final String positionValueString = positionValues[positionIndex];
-
-					try {
-						final Double positionValue = Double.parseDouble(positionValueString);
-
-						_galleryPositions.put(positionKeys[positionIndex], positionValue);
-
-					} catch (final Exception e) {
-						// ignore
-					}
-				}
-			}
-		}
-
-		_restoredSelection = Util.getStateIntArray(_state, STATE_SELECTED_ITEMS, null);
-	}
-
-	public void saveState() {
-
-		if (_galleryMT20.isVertical()) {
-
-			/*
-			 * image size is only used in a vertical gallery, horizontal gallery is using the
-			 * clientarea height to get the image size
-			 */
-
-			_state.put(STATE_THUMB_IMAGE_SIZE, _photoImageSize);
-		}
-
-		_state.put(STATE_IMAGE_SORTING, _currentSorting.name());
-
-		/*
-		 * keep gallery positions
-		 */
-
-		// preserve current gallery position
-		final double galleryPosition = _galleryMT20.getGalleryPosition();
-
-		if (_currentGalleryPositionKey != null) {
-			_galleryPositions.put(_currentGalleryPositionKey, galleryPosition);
-		} else if (_newGalleryPositionKey != null) {
-			_galleryPositions.put(_newGalleryPositionKey, galleryPosition);
-		}
-
-		final Set<String> positionKeys = _galleryPositions.keySet();
-		final int positionSize = positionKeys.size();
-
-		if (positionSize > 0) {
-
-			final String[] positionKeyArray = positionKeys.toArray(new String[positionSize]);
-			final String[] positionValues = new String[positionSize];
-
-			for (int positionIndex = 0; positionIndex < positionKeyArray.length; positionIndex++) {
-
-				final String positionKey = positionKeyArray[positionIndex];
-				positionValues[positionIndex] = _galleryPositions.get(positionKey).toString();
-			}
-
-			_state.put(STATE_GALLERY_POSITION_KEY, positionKeyArray);
-			_state.put(STATE_GALLERY_POSITION_VALUE, positionValues);
-		}
-
-		Util.setState(_state, STATE_SELECTED_ITEMS, _galleryMT20.getSelectionIndex());
-
-		_columnManager.saveState(_state);
-
-		_galleryMT20.saveState();
-	}
-
-	void selectGalleryType(final GalleryType galleryType) {
-
-		_galleryType = galleryType;
-
-		showPageGalleryContent();
-	}
-
-	public void selectItem(final int itemIndex, final String galleryPositionKey) {
-
-		_galleryMT20.selectItem(itemIndex);
-
-//		// ensure to keep position, this has not worked in the full screen gallery when image was resized
-////		_currentGalleryPositionKey = galleryPositionKey;
-////		_newGalleryPositionKey = galleryPositionKey;
-//
-//		final double currentGalleryPosition = _galleryMT20.getGalleryPosition();
-////		_galleryPositions.put(galleryPositionKey, currentGalleryPosition);
-//
-//		System.out.println(UI.timeStampNano() + " selectItem()\t" + galleryPositionKey + "\t" + currentGalleryPosition);
-//		// TODO remove SYSTEM.OUT.PRINTLN
-	}
-
-	public void setDefaultStatusMessage(final String message) {
-		_defaultStatusMessage = message;
-	}
-
-	public void setExternalMouseListener(final IExternalGalleryListener externalGalleryMouseListener) {
-		_galleryMT20.setExternalMouseListener(externalGalleryMouseListener);
-	}
-
-	/**
-	 * @param photoFilterGPS
-	 * @param photoFilterTour
-	 */
-	public void setFilter(final PhotoFilterGPS photoFilterGPS, final PhotoFilterTour photoFilterTour) {
-		_imageFilterGPS = photoFilterGPS;
-		_imageFilterTour = photoFilterTour;
-	}
-
-	public void setFocus() {
-		_galleryMT20.setFocus();
-	}
-
-	public void setFullScreenImageViewer(final FullScreenImageViewer fullScreenImageViewer) {
-
-		_fullScreenImageViewer = fullScreenImageViewer;
-		_galleryMT20.setFullScreenImageViewer(fullScreenImageViewer);
-	}
-
-	private void setIsLinkPhotoDisplayed(final boolean isLinkPhotoDisplayed) {
-
-		_isLinkPhotoDisplayed = isLinkPhotoDisplayed;
-		_photoRenderer.setIsLinkPhotoDisplayed(isLinkPhotoDisplayed);
-	}
-
-	public void setPhotoInfo(	final boolean isShowPhotoName,
-								final PhotoDateInfo photoDateInfo,
-								final boolean isShowAnnotations,
-								final boolean isShowTooltip) {
-
-		_isShowTooltip = isShowTooltip;
-		_isShowAnnotations = isShowAnnotations;
-
-		_photoRenderer.setPhotoInfo(isShowPhotoName, photoDateInfo, isShowAnnotations);
-	}
-
-	/**
-	 * A custom actionbar can be displayed, by default it is hidden. The actionbar can be retrieved
-	 * with {@link #getCustomActionBarContainer()}.
-	 * <p>
-	 * This method <b>must</b> be called before
-	 * {@link #createImageGallery(Composite, int, IPhotoGalleryProvider)} is called.
-	 */
-	public void setShowCustomActionBar() {
-		_isShowCustomActionBar = true;
-	}
-
-	/**
-	 * Prevent to open pref dialog, when it's opened it would close this tooltip and the pref dialog
-	 * is hidden -->> APP IS FREEZING !!!
-	 */
-	public void setShowOtherShellActions(final boolean isShowOtherShellActions) {
-		_galleryMT20.setIsShowOtherShellActions(isShowOtherShellActions);
-	}
-
-	void setShowPhotoRatingStars(final RatingStarBehaviour ratingStarBehaviour) {
-
-		_isHandleRatingStars = ratingStarBehaviour == RatingStarBehaviour.HOVERED_STARS;
-
-		_photoRenderer.setShowRatingStars(ratingStarBehaviour);
-
-		// redraw gallery with new settings
-		_galleryMT20.redraw();
-	}
-
-	/**
-	 * Thumbnail size combobox can be displayed, by default it is hidden, This method <b>must</b> be
-	 * called before {@link #createImageGallery(Composite, int, IPhotoGalleryProvider)} is called.
-	 */
-	public void setShowThumbnailSize() {
-		_isShowThumbsize = true;
-	}
-
-	public void setSorting(final GallerySorting gallerySorting) {
-
-		// set new sorting algorithm
-		_currentSorting = gallerySorting;
-	}
-
-	private void setStatusMessage(final String message) {
-
-		final IStatusLineManager statusLineManager = _photoGalleryProvider.getStatusLineManager();
-
-		if (statusLineManager != null) {
-			statusLineManager.setMessage(message);
-		}
-	}
-
-	/**
-	 * Setting thumbnail size is done in the gallery action bar, this can be done only for a
-	 * vertical gallery.
-	 * 
-	 * @param newImageSize
-	 */
-	public void setThumbnailSize(final int newImageSize) {
-
-		int newGalleryItemSize = newImageSize + _photoBorderSize;
-
-		if (newGalleryItemSize == _galleryMT20.getItemWidth()) {
-			// nothing has changed
-			return;
-		}
-
-		final int prevGalleryItemSize = _galleryMT20.getItemWidth();
-
-		// update gallery
-		final int adjustedItemSize = _galleryMT20.zoomGallery(newGalleryItemSize, false);
-
-		if (adjustedItemSize == -1 || adjustedItemSize == prevGalleryItemSize) {
-			// nothing has changed
-			return;
-		}
-
-		PhotoLoadManager.stopImageLoading(false);
-
-		if (adjustedItemSize != newGalleryItemSize) {
-
-			/*
-			 * size has been modified, this case can occure when the gallery is switching the
-			 * scrollbars on/off depending on the content
-			 */
-
-			newGalleryItemSize = adjustedItemSize;
-		}
-
-		updateUI_AfterZoomInOut(newGalleryItemSize);
-	}
-
-	private void setThumbnailSizeRestore(final int thumbSize) {
-
-		PhotoLoadManager.stopImageLoading(false);
-
-		int requestedItemSize = thumbSize + _photoBorderSize;
-
-		// update gallery
-		final int adjustedItemSize = _galleryMT20.zoomGallery(requestedItemSize, true);
-
-		// check if size has been modified when zoomed in/out
-		if (adjustedItemSize != requestedItemSize) {
-
-			/*
-			 * size has been modified, this case can occure when the gallery is switching the
-			 * scrollbars on/off depending on the content
-			 */
-
-			requestedItemSize = adjustedItemSize;
-		}
-
-		updateUI_AfterZoomInOut(requestedItemSize);
-	}
-
-	public void setVertical(final boolean isVerticalGallery) {
-
-		if (isVerticalGallery) {
-
-			final int verticalWidth = _galleryMT20.getVerticalItemWidth();
-
-			updateUI_AfterZoomInOut(verticalWidth);
-		}
-
-		_galleryActionBar.setThumbnailSizeVisibility(isVerticalGallery);
-
-		_galleryMT20.setVertical(isVerticalGallery);
-	}
-
-	public void showImages(	final ArrayList<Photo> allPhotos,
-							final String galleryPositionKey,
-							final boolean isLinkPhotoDisplayed,
-							final boolean isFilteredAndSorted) {
-
-		final Photo[] photos = allPhotos.toArray(new Photo[allPhotos.size()]);
-
-		if (isFilteredAndSorted == false) {
-
-			// sort photos with current sorting algorithm
-			Arrays.sort(photos, getCurrentComparator());
-		}
-
-		showImages(photos, galleryPositionKey, isLinkPhotoDisplayed);
-	}
-
-	/**
-	 * Display images for a selected folder.
-	 * 
-	 * @param imageFolder
-	 * @param isReloadFolder
-	 * @param isLinkPhotoDisplayed
-	 */
-	public void showImages(final File imageFolder, final boolean isReloadFolder, final boolean isLinkPhotoDisplayed) {
-
-		jobFilter_12_Stop();
-
-		PhotoLoadManager.stopImageLoading(true);
-
-		//////////////////////////////////////////
-		//
-		// MUST BE REMOVED, IS ONLY FOR TESTING
-		//
-//		disposeAndDeleteAllImages();
-//		PhotoLoadManager.removeInvalidImageFiles();
-		//
-		// MUST BE REMOVED, IS ONLY FOR TESTING
-		//
-		//////////////////////////////////////////
-
-		setIsLinkPhotoDisplayed(isLinkPhotoDisplayed);
-
-		if (imageFolder == null) {
-			_lblDefaultPage.setText(Messages.Pic_Dir_Label_ReadingFolders);
-		} else {
-
-			_lblDefaultPage.setText(NLS.bind(Messages.Pic_Dir_Label_Loading, imageFolder.getAbsolutePath()));
-		}
-		showPageBookPage(_pageDefault, true);
-
-		_photoFolderWhichShouldBeDisplayed = imageFolder;
-
-		workerUpdate(imageFolder, isReloadFolder);
-	}
-
-	public void showImages(	final Photo[] allFilteredAnsSortedPhotos,
-							final String galleryPositionKey,
-							final boolean isLinkPhotoDisplayed) {
-
-//		System.out.println(UI.timeStampNano() + " showImages() " + galleryPositionKey);
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
-		jobFilter_12_Stop();
-		PhotoLoadManager.stopImageLoading(true);
-
-		//////////////////////////////////////////
-		//
-		// MUST BE REMOVED, IS ONLY FOR TESTING
-		//
-//		disposeAndDeleteAllImages();
-//		PhotoLoadManager.removeInvalidImageFiles();
-		//
-		// MUST BE REMOVED, IS ONLY FOR TESTING
-		//
-		//////////////////////////////////////////
-
-		setIsLinkPhotoDisplayed(isLinkPhotoDisplayed);
-
-		// images are not loaded from a folder, photos are already available
-		_photoFolder = null;
-
-		_newGalleryPositionKey = galleryPositionKey;
-
-		// initialize tooltip for new images
-		_photoGalleryTooltip.reset(true);
-
-		_galleryMT20.deselectAll();
-
-		_allPhotos = allFilteredAnsSortedPhotos;
-
-		final double galleryPosition = getCachedGalleryPosition();
-
-		updateUI_GalleryItems(_allPhotos, galleryPosition);
-	}
-
-	/**
-	 * @param isShowPhotoName
-	 * @param photoDateInfo
-	 * @param isShowAnnotations
-	 * @param isShowTooltip
-	 */
-	void showInfo(	final boolean isShowPhotoName,
-					final PhotoDateInfo photoDateInfo,
-					final boolean isShowAnnotations,
-					final boolean isShowTooltip) {
-
-		setPhotoInfo(isShowPhotoName, photoDateInfo, isShowAnnotations, isShowTooltip);
-
-		// reset tooltip, otherwise it could be displayed if it should not
-		_photoGalleryTooltip.reset(true);
-
-		_galleryMT20.redraw();
-	}
-
-	public void showItem(final int itemIndex) {
-		_galleryMT20.showItem(itemIndex);
-	}
-
-	private void showPageBookPage(final Composite page, final boolean isDelay) {
-
-		if (isDelay) {
-
-			/*
-			 * delay showing the default page because it is flickering when an image is displayed
-			 * again within a few milliseconds
-			 */
-
-			_delayCounter[0]++;
-
-			if (page == _pageDefault || page == _pageGalleryInfo) {
-
-				_pageBook.getDisplay().timerExec(100, new Runnable() {
-
-					private int			__delayCounter	= _delayCounter[0];
-					private Composite	__page			= page;
-
-					@Override
-					public void run() {
-
-						// check if this still the same page which should be displayed
-						if (__delayCounter == _delayCounter[0]) {
-							_pageBook.showPage(__page);
-						}
-					}
-				});
-
-			} else {
-
-				_pageBook.showPage(page);
-			}
-
-		} else {
-
-			_pageBook.showPage(page);
-		}
-
-	}
-
-	private void showPageGalleryContent() {
-
-		Composite galleryContent;
-
-		if (_galleryType == GalleryType.DETAILS) {
-
-			galleryContent = _pageDetails;
-
-			_photoViewer.setInput(new Object());
-
-		} else {
-
-			// default is thumnail gallery
-			galleryContent = _galleryMT20;
-
-			// update gallery
-			_galleryMT20.setVirtualItems(_sortedGalleryItems, _contentGalleryPosition);
-		}
-
-		showPageBookPage(galleryContent, true);
-	}
-
-	public void showRestoreFolder(final String restoreFolderName) {
-
-		if (restoreFolderName == null) {
-			_lblDefaultPage.setText(Messages.Pic_Dir_StatusLabel_NoFolder);
-		} else {
-			_lblDefaultPage.setText(NLS.bind(Messages.Pic_Dir_StatusLabel_RestoringFolder, restoreFolderName));
-		}
-
-		showPageBookPage(_pageDefault, true);
-	}
-
-	public void sortGallery(final GallerySorting gallerySorting) {
-
-		// check if resorting is needed
-		if (_currentSorting == gallerySorting) {
-			return;
-		}
-
-		/*
-		 * deselect all, this could be better implemented to keep selection, but is not yet done
-		 */
-		deselectAll();
-
-		// set new sorting algorithm
-		_currentSorting = gallerySorting;
-
-		BusyIndicator.showWhile(_display, new Runnable() {
-			@Override
-			public void run() {
-				sortGallery_10_Runnable();
-			}
-		});
-	}
-
-	/**
-	 * This will sort all already created gallery items
-	 */
-	private void sortGallery_10_Runnable() {
-
-		if (_allPhotos == null || _allPhotos.length == 0) {
-			// there are no files
-			return;
-		}
-
-		final GalleryMT20Item[] virtualGalleryItems = _galleryMT20.getAllVirtualItems();
-		final int virtualSize = virtualGalleryItems.length;
-
-		if (virtualSize == 0) {
-			// there are no items
-			return;
-		}
-
-		// sort photos with new sorting algorithm
-		Arrays.sort(_sortedAndFilteredPhotos, getCurrentComparator());
-
-		updateUI_GalleryItems(_sortedAndFilteredPhotos, null);
-	}
-
-	public void stopLoadingImages() {
-
-		// stop jobs
-		jobFilter_12_Stop();
-
-		PhotoLoadManager.stopImageLoading(true);
-
-		workerStop();
-	}
-
-	/**
-	 * @param fgColor
-	 * @param bgColor
-	 * @param selectionFgColor
-	 * @param noFocusSelectionFgColor
-	 * @param initUI
-	 *            Is <code>true</code> after a restore to update the UI that not a default UI color
-	 *            is displayed.
-	 */
-	public void updateColors(	final Color fgColor,
-								final Color bgColor,
-								final Color selectionFgColor,
-								final Color noFocusSelectionFgColor,
-								final boolean initUI) {
-
-		/*
-		 * set color in action bar only for Linux & Windows, setting color in OSX looks not very
-		 * good
-		 */
-		if (UI.IS_OSX == false && _galleryActionBar != null) {
+      /*
+       * set color in action bar only for Linux & Windows, setting color in OSX looks not very
+       * good
+       */
+      if (UI.IS_OSX == false && _galleryActionBar != null) {
 // looks ugli with a custom toolbar manager
-//			_galleryActionBar.updateColors(fgColor, bgColor);
-		}
+//         _galleryActionBar.updateColors(fgColor, bgColor);
+      }
 
-		/*
-		 * gallery
-		 */
-		_galleryMT20.setColors(fgColor, bgColor);
+      /*
+       * gallery
+       */
+      _galleryMT20.setColors(fgColor, bgColor);
 
-		_photoRenderer.setColors(fgColor, bgColor, selectionFgColor, noFocusSelectionFgColor);
+      _photoRenderer.setColors(fgColor, bgColor, selectionFgColor, noFocusSelectionFgColor);
 
-		_pageDefault.setBackground(bgColor);
+      _pageDefault.setBackground(bgColor);
 
-		/*
-		 * loading page
-		 */
-		_lblDefaultPage.setForeground(fgColor);
-		_lblDefaultPage.setBackground(bgColor);
+      /*
+       * loading page
+       */
+      _lblDefaultPage.setForeground(fgColor);
+      _lblDefaultPage.setBackground(bgColor);
 
-		/*
-		 * page: folder info
-		 */
-		_pageGalleryInfo.setForeground(fgColor);
-		_pageGalleryInfo.setBackground(bgColor);
-		_lblGalleryInfo.setForeground(fgColor);
-		_lblGalleryInfo.setBackground(bgColor);
-	}
+      /*
+       * page: folder info
+       */
+      _pageGalleryInfo.setForeground(fgColor);
+      _pageGalleryInfo.setBackground(bgColor);
+      _lblGalleryInfo.setForeground(fgColor);
+      _lblGalleryInfo.setBackground(bgColor);
+   }
 
-	/**
-	 * The UI of the photos are updated.
-	 * 
-	 * @param arrayList
-	 *            Contains photos which are modified. Items in this list should be of type
-	 *            {@link Photo}.
-	 */
-	public void updatePhotos(final ArrayList<?> arrayList) {
+   /**
+    * The UI of the photos are updated.
+    *
+    * @param arrayList
+    *           Contains photos which are modified. Items in this list should be of type
+    *           {@link Photo}.
+    */
+   public void updatePhotos(final ArrayList<?> arrayList) {
 
-		if (_allPhotos == null) {
-			return;
-		}
+      if (_allPhotos == null) {
+         return;
+      }
 
-		for (int photoIndex = 0; photoIndex < _allPhotos.length; photoIndex++) {
+      for (int photoIndex = 0; photoIndex < _allPhotos.length; photoIndex++) {
 
-			final Photo galleryPhoto = _allPhotos[photoIndex];
-			final String galleryImageFilePathName = galleryPhoto.imageFilePathName;
+         final Photo galleryPhoto = _allPhotos[photoIndex];
+         final String galleryImageFilePathName = galleryPhoto.imageFilePathName;
 
-			for (final Object object : arrayList) {
+         for (final Object object : arrayList) {
 
-				if (object instanceof Photo) {
+            if (object instanceof Photo) {
 
-					final Photo updatedPhoto = (Photo) object;
+               final Photo updatedPhoto = (Photo) object;
 
-					if (galleryImageFilePathName.equals(updatedPhoto.imageFilePathName)) {
+               if (galleryImageFilePathName.equals(updatedPhoto.imageFilePathName)) {
 
-						_allPhotos[photoIndex] = updatedPhoto;
+                  _allPhotos[photoIndex] = updatedPhoto;
 
-						break;
-					}
-				}
-			}
-		}
+                  break;
+               }
+            }
+         }
+      }
 
-		/*
-		 * this is the easy way to update the UI for all visible photos
-		 */
-		_galleryMT20.redraw();
-	}
+      /*
+       * this is the easy way to update the UI for all visible photos
+       */
+      _galleryMT20.redraw();
+   }
 
-	/**
-	 * @param galleryItemSizeWithBorder
-	 *            Image size with border
-	 */
-	private void updateUI_AfterZoomInOut(final int galleryItemSizeWithBorder) {
+   /**
+    * @param galleryItemSizeWithBorder
+    *           Image size with border
+    */
+   private void updateUI_AfterZoomInOut(final int galleryItemSizeWithBorder) {
 
-		final int imageSizeWithoutBorder = galleryItemSizeWithBorder - _photoBorderSize;
+      final int imageSizeWithoutBorder = galleryItemSizeWithBorder - _photoBorderSize;
 
-		if (imageSizeWithoutBorder != _photoImageSize) {
+      if (imageSizeWithoutBorder != _photoImageSize) {
 
-			// image size has changed
+         // image size has changed
 
-			_photoImageSize = imageSizeWithoutBorder;
+         _photoImageSize = imageSizeWithoutBorder;
 
-			if (_galleryActionBar != null) {
-				_galleryActionBar.updateUI_AfterZoomInOut(imageSizeWithoutBorder);
-			}
+         if (_galleryActionBar != null) {
+            _galleryActionBar.updateUI_AfterZoomInOut(imageSizeWithoutBorder);
+         }
 
-			_photoGalleryTooltip.setGalleryImageSize(_photoImageSize);
-			_photoGalleryTooltip.reset(true);
+         _photoGalleryTooltip.setGalleryImageSize(_photoImageSize);
+         _photoGalleryTooltip.reset(true);
 
-			_isAttributesPainted = _photoRenderer.isAttributesPainted(galleryItemSizeWithBorder);
+         _isAttributesPainted = _photoRenderer.isAttributesPainted(galleryItemSizeWithBorder);
 
-			enableAttributeActions(_isAttributesPainted);
-		}
-	}
+         enableAttributeActions(_isAttributesPainted);
+      }
+   }
 
-	private void updateUI_FromPrefStore(final boolean isUpdateUI) {
+   private void updateUI_FromPrefStore(final boolean isUpdateUI) {
 
-		/*
-		 * image quality
-		 */
-		final boolean isShowHighQuality = _prefStore.getBoolean(//
-				IPhotoPreferences.PHOTO_VIEWER_IS_SHOW_IMAGE_WITH_HIGH_QUALITY);
+      /*
+       * image quality
+       */
+      final boolean isShowHighQuality = _prefStore.getBoolean(//
+            IPhotoPreferences.PHOTO_VIEWER_IS_SHOW_IMAGE_WITH_HIGH_QUALITY);
 
-		final int hqMinSize = _prefStore.getInt(//
-				IPhotoPreferences.PHOTO_VIEWER_HIGH_QUALITY_IMAGE_MIN_SIZE);
+      final int hqMinSize = _prefStore.getInt(//
+            IPhotoPreferences.PHOTO_VIEWER_HIGH_QUALITY_IMAGE_MIN_SIZE);
 
-		_galleryMT20.setImageQuality(isShowHighQuality, hqMinSize);
+      _galleryMT20.setImageQuality(isShowHighQuality, hqMinSize);
 
-		/*
-		 * text minimum thumb size
-		 */
-		final int minThumbSize = _prefStore.getInt(IPhotoPreferences.PHOTO_VIEWER_TEXT_MIN_THUMB_SIZE);
-		final int borderSize = _prefStore.getInt(IPhotoPreferences.PHOTO_VIEWER_IMAGE_BORDER_SIZE);
+      /*
+       * text minimum thumb size
+       */
+      final int minThumbSize = _prefStore.getInt(IPhotoPreferences.PHOTO_VIEWER_TEXT_MIN_THUMB_SIZE);
+      final int borderSize = _prefStore.getInt(IPhotoPreferences.PHOTO_VIEWER_IMAGE_BORDER_SIZE);
 
-		_photoRenderer.setSizeImageBorder(borderSize);
-		_photoRenderer.setSizeTextMinThumb(minThumbSize);
+      _photoRenderer.setSizeImageBorder(borderSize);
+      _photoRenderer.setSizeTextMinThumb(minThumbSize);
 
-		// get update border size
-		_photoBorderSize = _photoRenderer.getBorderSize();
+      // get update border size
+      _photoBorderSize = _photoRenderer.getBorderSize();
 
-		_fullScreenImageViewer.setPrefSettings(isUpdateUI);
-	}
+      _fullScreenImageViewer.setPrefSettings(isUpdateUI);
+   }
 
-	private void updateUI_GalleryInfo() {
+   private void updateUI_GalleryInfo() {
 
-		_display.syncExec(new Runnable() {
-			@Override
-			public void run() {
+      _display.syncExec(new Runnable() {
+         @Override
+         public void run() {
 
-				if (_galleryMT20.isDisposed()) {
-					return;
-				}
+            if (_galleryMT20.isDisposed()) {
+               return;
+            }
 
-				showPageBookPage(_pageGalleryInfo, true);
+            showPageBookPage(_pageGalleryInfo, true);
 
-				final int imageCount = _allPhotos.length;
+            final int imageCount = _allPhotos.length;
 
-				if (imageCount == 0) {
+            if (imageCount == 0) {
 
-					if (_defaultStatusMessage.length() > 0) {
-						_lblGalleryInfo.setText(_defaultStatusMessage);
-					} else {
-						_lblGalleryInfo.setText(Messages.Pic_Dir_StatusLabel_NoImages);
-					}
+               if (_defaultStatusMessage.length() > 0) {
+                  _lblGalleryInfo.setText(_defaultStatusMessage);
+               } else {
+                  _lblGalleryInfo.setText(Messages.Pic_Dir_StatusLabel_NoImages);
+               }
 
-				} else {
+            } else {
 
-					final int exifLoadingQueueSize = PhotoLoadManager.getExifQueueSize();
+               final int exifLoadingQueueSize = PhotoLoadManager.getExifQueueSize();
 
-					if (exifLoadingQueueSize > 0) {
+               if (exifLoadingQueueSize > 0) {
 
-						// show filter message only when image files are being loaded
+                  // show filter message only when image files are being loaded
 
-						_lblGalleryInfo.setText(NLS.bind(
-								Messages.Pic_Dir_StatusLabel_FilteringImages,
-								exifLoadingQueueSize));
+                  _lblGalleryInfo.setText(NLS.bind(
+                        Messages.Pic_Dir_StatusLabel_FilteringImages,
+                        exifLoadingQueueSize));
 
-					} else {
+               } else {
 
-						if (_sortedAndFilteredPhotos.length == 0) {
+                  if (_sortedAndFilteredPhotos.length == 0) {
 
-							if (imageCount == 1) {
-								_lblGalleryInfo.setText(Messages.Pic_Dir_StatusLabel_1ImageIsHiddenByFilter);
-							} else {
-								_lblGalleryInfo.setText(NLS.bind(
-										Messages.Pic_Dir_StatusLabel_nImagesAreHiddenByFilter,
-										imageCount));
-							}
+                     if (imageCount == 1) {
+                        _lblGalleryInfo.setText(Messages.Pic_Dir_StatusLabel_1ImageIsHiddenByFilter);
+                     } else {
+                        _lblGalleryInfo.setText(NLS.bind(
+                              Messages.Pic_Dir_StatusLabel_nImagesAreHiddenByFilter,
+                              imageCount));
+                     }
 
-						} else {
-							// this case should not happen, the gallery is displayed
-						}
-					}
-				}
+                  } else {
+                     // this case should not happen, the gallery is displayed
+                  }
+               }
+            }
 
-				if (imageCount == 0) {
-					_isAttributesPainted = false;
-				}
+            if (imageCount == 0) {
+               _isAttributesPainted = false;
+            }
 
-				enableActions(imageCount > 0);
-				enableAttributeActions(_isAttributesPainted);
-			}
-		});
-	}
+            enableActions(imageCount > 0);
+            enableAttributeActions(_isAttributesPainted);
+         }
+      });
+   }
 
-	/**
-	 * Set gallery items into a list according to the new sorting/filtering
-	 * 
-	 * @param filteredAndSortedPhotos
-	 * @param galleryPosition
-	 *            When <code>null</code> the old position is preserved, otherwise images at a new
-	 *            position are displayed.
-	 */
-	private void updateUI_GalleryItems(final Photo[] filteredAndSortedPhotos, final Double galleryPosition) {
+   /**
+    * Set gallery items into a list according to the new sorting/filtering
+    *
+    * @param filteredAndSortedPhotos
+    * @param galleryPosition
+    *           When <code>null</code> the old position is preserved, otherwise images at a new
+    *           position are displayed.
+    */
+   private void updateUI_GalleryItems(final Photo[] filteredAndSortedPhotos, final Double galleryPosition) {
 
-		final HashMap<String, GalleryMT20Item> existingGalleryItems = _galleryMT20.getCreatedGalleryItems();
+      final HashMap<String, GalleryMT20Item> existingGalleryItems = _galleryMT20.getCreatedGalleryItems();
 
-		final int photoSize = filteredAndSortedPhotos.length;
-		final GalleryMT20Item[] sortedGalleryItems = new GalleryMT20Item[photoSize];
+      final int photoSize = filteredAndSortedPhotos.length;
+      final GalleryMT20Item[] sortedGalleryItems = new GalleryMT20Item[photoSize];
 
-		// convert sorted photos into sorted gallery items
-		for (int itemIndex = 0; itemIndex < photoSize; itemIndex++) {
+      // convert sorted photos into sorted gallery items
+      for (int itemIndex = 0; itemIndex < photoSize; itemIndex++) {
 
-			final Photo sortedPhotos = filteredAndSortedPhotos[itemIndex];
+         final Photo sortedPhotos = filteredAndSortedPhotos[itemIndex];
 
-			// get gallery item for the current photo
-			final GalleryMT20Item galleryItem = existingGalleryItems.get(sortedPhotos.imageFilePathName);
+         // get gallery item for the current photo
+         final GalleryMT20Item galleryItem = existingGalleryItems.get(sortedPhotos.imageFilePathName);
 
-			if (galleryItem != null) {
-				sortedGalleryItems[itemIndex] = galleryItem;
-			}
-		}
+         if (galleryItem != null) {
+            sortedGalleryItems[itemIndex] = galleryItem;
+         }
+      }
 
-		_sortedAndFilteredPhotos = filteredAndSortedPhotos;
+      _sortedAndFilteredPhotos = filteredAndSortedPhotos;
 
-		_display.syncExec(new Runnable() {
-			@Override
-			public void run() {
+      _display.syncExec(new Runnable() {
+         @Override
+         public void run() {
 
-				if (_galleryMT20.isDisposed()) {
-					return;
-				}
+            if (_galleryMT20.isDisposed()) {
+               return;
+            }
 
-				final boolean isItemAvailable = sortedGalleryItems.length > 0;
+            final boolean isItemAvailable = sortedGalleryItems.length > 0;
 
-				enableActions(isItemAvailable);
+            enableActions(isItemAvailable);
 
-				if (isItemAvailable) {
+            if (isItemAvailable) {
 
-					// gallery items are available
+               // gallery items are available
 
-					_sortedGalleryItems = sortedGalleryItems;
-					_contentGalleryPosition = galleryPosition;
+               _sortedGalleryItems = sortedGalleryItems;
+               _contentGalleryPosition = galleryPosition;
 
-					showPageGalleryContent();
+               showPageGalleryContent();
 
-				} else {
+            } else {
 
-					// there is no gallery item
+               // there is no gallery item
 
-					updateUI_GalleryInfo();
-				}
-			}
-		});
-	}
+               updateUI_GalleryInfo();
+            }
+         }
+      });
+   }
 
-	public void updateUI_StatusMessage(final String message) {
+   public void updateUI_StatusMessage(final String message) {
 
-		if (message.length() == 0) {
-			setStatusMessage(getStatusDefaultMessage());
-		} else {
-			setStatusMessage(message);
-		}
-	}
+      if (message.length() == 0) {
+         setStatusMessage(getStatusDefaultMessage());
+      } else {
+         setStatusMessage(message);
+      }
+   }
 
-	public void updateUI_StatusMessageInUIThread(final String message) {
+   public void updateUI_StatusMessageInUIThread(final String message) {
 
-		_display.asyncExec(new Runnable() {
-			@Override
-			public void run() {
+      _display.asyncExec(new Runnable() {
+         @Override
+         public void run() {
 
-				if (_galleryMT20.isDisposed()) {
-					return;
-				}
+            if (_galleryMT20.isDisposed()) {
+               return;
+            }
 
-				if (message.length() == 0) {
-					setStatusMessage(getStatusDefaultMessage());
-				} else {
-					setStatusMessage(message);
-				}
-			}
-		});
-	}
+            if (message.length() == 0) {
+               setStatusMessage(getStatusDefaultMessage());
+            } else {
+               setStatusMessage(message);
+            }
+         }
+      });
+   }
 
-	/**
-	 * Get image files from current directory
-	 */
-	private void workerExecute() {
+   /**
+    * Get image files from current directory
+    */
+   private void workerExecute() {
 
-		_workerStart = System.currentTimeMillis();
+      _workerStart = System.currentTimeMillis();
 
-		Photo[] newPhotos = null;
+      Photo[] newPhotos = null;
 
-		if (_workerStateDir != null) {
+      if (_workerStateDir != null) {
 
-			_display.syncExec(new Runnable() {
-				@Override
-				public void run() {
+         _display.syncExec(new Runnable() {
+            @Override
+            public void run() {
 
-					// guard against the ui being closed before this runs
-					if (_uiContainer.isDisposed()) {
-						return;
-					}
+               // guard against the ui being closed before this runs
+               if (_uiContainer.isDisposed()) {
+                  return;
+               }
 
-					setStatusMessage(UI.EMPTY_STRING);
-				}
-			});
+               setStatusMessage(UI.EMPTY_STRING);
+            }
+         });
 
-			// get all image files, sorting is not yet done
-			final File[] files = _workerStateDir.listFiles(_fileFilter);
+         // get all image files, sorting is not yet done
+         final File[] files = _workerStateDir.listFiles(_fileFilter);
 
-			// check if interruption occred
-			if (_workerCancelled) {
-				return;
-			}
+         // check if interruption occred
+         if (_workerCancelled) {
+            return;
+         }
 
-			int numberOfImages = 0;
+         int numberOfImages = 0;
 
-			if (files == null) {
+         if (files == null) {
 
-				// prevent NPE
+            // prevent NPE
 
-				newPhotos = new Photo[0];
+            newPhotos = new Photo[0];
 
-			} else {
+         } else {
 
-				// image files are available
+            // image files are available
 
-				numberOfImages = files.length;
+            numberOfImages = files.length;
 
-				newPhotos = new Photo[numberOfImages];
+            newPhotos = new Photo[numberOfImages];
 
-				// create a photo for each image file
-				for (int fileIndex = 0; fileIndex < numberOfImages; fileIndex++) {
+            // create a photo for each image file
+            for (int fileIndex = 0; fileIndex < numberOfImages; fileIndex++) {
 
-					final File photoFile = files[fileIndex];
+               final File photoFile = files[fileIndex];
 
-					Photo galleryPhoto = PhotoCache.getPhoto(photoFile.getAbsolutePath());
+               Photo galleryPhoto = PhotoCache.getPhoto(photoFile.getAbsolutePath());
 
-					if (galleryPhoto == null) {
+               if (galleryPhoto == null) {
 
-						/*
-						 * photo is not found in the photo cache, create a new photo
-						 */
+                  /*
+                   * photo is not found in the photo cache, create a new photo
+                   */
 
-						galleryPhoto = new Photo(photoFile);
+                  galleryPhoto = new Photo(photoFile);
 
-						PhotoCache.setPhoto(galleryPhoto);
-					}
+                  PhotoCache.setPhoto(galleryPhoto);
+               }
 
-					newPhotos[fileIndex] = galleryPhoto;
-				}
+               newPhotos[fileIndex] = galleryPhoto;
+            }
 
-				/*
-				 * sort photos with currently selected comparator
-				 */
-				_currentComparator = getCurrentComparator();
-				Arrays.sort(newPhotos, _currentComparator);
-			}
+            /*
+             * sort photos with currently selected comparator
+             */
+            _currentComparator = getCurrentComparator();
+            Arrays.sort(newPhotos, _currentComparator);
+         }
 
-			// check if the previous files retrival has been interrupted
-			if (_workerCancelled) {
-				return;
-			}
+         // check if the previous files retrival has been interrupted
+         if (_workerCancelled) {
+            return;
+         }
 
-			_photoFolder = _workerStateDir;
+         _photoFolder = _workerStateDir;
 
-			if (_photoFolder != null) {
-				_newGalleryPositionKey = _photoFolder.getAbsolutePath();
-			}
+         if (_photoFolder != null) {
+            _newGalleryPositionKey = _photoFolder.getAbsolutePath();
+         }
 
-			workerExecute_DisplayImages(newPhotos);
-		}
-	}
+         workerExecute_DisplayImages(newPhotos);
+      }
+   }
 
-	private void workerExecute_DisplayImages(final Photo[] photos) {
+   private void workerExecute_DisplayImages(final Photo[] photos) {
 
-		_allPhotos = photos;
+      _allPhotos = photos;
 
-		_display.syncExec(new Runnable() {
-			@Override
-			public void run() {
+      _display.syncExec(new Runnable() {
+         @Override
+         public void run() {
 
-				// guard against the ui being closed before this runs
-				if (_uiContainer.isDisposed()) {
-					return;
-				}
+            // guard against the ui being closed before this runs
+            if (_uiContainer.isDisposed()) {
+               return;
+            }
 
-				// initialize tooltip for a new folder
-				_photoGalleryTooltip.reset(true);
+            // initialize tooltip for a new folder
+            _photoGalleryTooltip.reset(true);
 
-				final double galleryPosition = getCachedGalleryPosition();
+            final double galleryPosition = getCachedGalleryPosition();
 
-				_galleryMT20.setupItems(0, galleryPosition, _restoredSelection);
+            _galleryMT20.setupItems(0, galleryPosition, _restoredSelection);
 
-				_restoredSelection = null;
+            _restoredSelection = null;
 
-				/*
-				 * update status info
-				 */
-				final long timeDiff = System.currentTimeMillis() - _workerStart;
-				final String timeDiffText = NLS.bind(
-						Messages.Pic_Dir_Status_Loaded,
-						new Object[] { Long.toString(timeDiff), Integer.toString(_allPhotos.length) });
+            /*
+             * update status info
+             */
+            final long timeDiff = System.currentTimeMillis() - _workerStart;
+            final String timeDiffText = NLS.bind(
+                  Messages.Pic_Dir_Status_Loaded,
+                  new Object[] { Long.toString(timeDiff), Integer.toString(_allPhotos.length) });
 
-				setStatusMessage(timeDiffText);
-			}
-		});
+            setStatusMessage(timeDiffText);
+         }
+      });
 
-		/*
-		 * start filter always, even when no filter is set because it is loading exif data which is
-		 * used to sort images correctly by exif date (when available) and not by file date
-		 */
-		jobFilter_20_Schedule1st();
-	}
+      /*
+       * start filter always, even when no filter is set because it is loading exif data which is
+       * used to sort images correctly by exif date (when available) and not by file date
+       */
+      jobFilter_20_Schedule1st();
+   }
 
-	/**
-	 * Stops the worker and waits for it to terminate.
-	 */
-	private void workerStop() {
+   /**
+    * Stops the worker and waits for it to terminate.
+    */
+   private void workerStop() {
 
-		if (_workerThread == null) {
-			return;
-		}
+      if (_workerThread == null) {
+         return;
+      }
 
-		synchronized (_workerLock) {
+      synchronized (_workerLock) {
 
-			_workerCancelled = true;
-			_workerStopped = true;
+         _workerCancelled = true;
+         _workerStopped = true;
 
-			_workerLock.notifyAll();
-		}
+         _workerLock.notifyAll();
+      }
 
-		while (_workerThread != null) {
-			if (!_display.readAndDispatch()) {
-				_display.sleep();
-			}
-		}
-	}
+      while (_workerThread != null) {
+         if (!_display.readAndDispatch()) {
+            _display.sleep();
+         }
+      }
+   }
 
-	/**
-	 * Notifies the worker that it should update itself with new data. Cancels any previous
-	 * operation and begins a new one.
-	 * 
-	 * @param newFolder
-	 *            the new base directory for the table, null is ignored
-	 * @param isReloadFolder
-	 */
-	private void workerUpdate(final File newFolder, final boolean isReloadFolder) {
+   /**
+    * Notifies the worker that it should update itself with new data. Cancels any previous
+    * operation and begins a new one.
+    *
+    * @param newFolder
+    *           the new base directory for the table, null is ignored
+    * @param isReloadFolder
+    */
+   private void workerUpdate(final File newFolder, final boolean isReloadFolder) {
 
-		if (newFolder == null) {
-			return;
-		}
+      if (newFolder == null) {
+         return;
+      }
 
-		if (isReloadFolder == false && _workerNextFolder != null && _workerNextFolder.equals(newFolder)) {
-			return;
-		}
+      if (isReloadFolder == false && _workerNextFolder != null && _workerNextFolder.equals(newFolder)) {
+         return;
+      }
 
-		synchronized (_workerLock) {
+      synchronized (_workerLock) {
 
-			_workerNextFolder = newFolder;
+         _workerNextFolder = newFolder;
 
-			_workerStopped = false;
-			_workerCancelled = true;
+         _workerStopped = false;
+         _workerCancelled = true;
 
-			_workerLock.notifyAll();
-		}
+         _workerLock.notifyAll();
+      }
 
-		if (_workerThread == null) {
-			_workerThread = new Thread(_workerRunnable, "PicDirImages: Retrieving folder image files");//$NON-NLS-1$
-			_workerThread.start();
-		}
-	}
+      if (_workerThread == null) {
+         _workerThread = new Thread(_workerRunnable, "PicDirImages: Retrieving folder image files");//$NON-NLS-1$
+         _workerThread.start();
+      }
+   }
 }
