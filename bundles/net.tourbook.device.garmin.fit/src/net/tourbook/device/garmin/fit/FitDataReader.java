@@ -47,6 +47,7 @@ import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.tour.TourLogManager;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 
 /**
@@ -60,8 +61,11 @@ public class FitDataReader extends TourbookDevice {
 
    private boolean        _isVersionLogged;
 
-
    private void addDebugLogListener(final MesgBroadcaster broadcaster) {
+
+//      ArrayList<MesgListener> mesgListeners = new ArrayList<MesgListener>();
+//      ArrayList<MesgDefinitionListener> mesgDefListeners = new ArrayList<MesgDefinitionListener>();
+//      ArrayList<DeveloperFieldDescriptionListener> devFieldDescListeners = new ArrayList<DeveloperFieldDescriptionListener>();
 
       broadcaster.addListener(new MesgListener() {
          @Override
@@ -359,7 +363,6 @@ public class FitDataReader extends TourbookDevice {
                                     final HashMap<Long, TourData> alreadyImportedTours,
                                     final HashMap<Long, TourData> newlyImportedTours) {
 
-
       boolean returnValue = false;
 
       try (FileInputStream fileInputStream = new FileInputStream(importFilePath)) {
@@ -434,6 +437,10 @@ public class FitDataReader extends TourbookDevice {
       FileInputStream fis = null;
 
       try {
+
+         if (!FilenameUtils.getExtension(fileName).equalsIgnoreCase("fit")) {
+            return false;
+         }
 
          fis = new FileInputStream(fileName);
          returnValue = new Decode().checkFileIntegrity(fis);

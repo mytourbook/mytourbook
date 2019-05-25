@@ -15,11 +15,15 @@
 	<tourAltUp>0</tourAltUp>
 	<tourAltDown>0</tourAltDown>
 	<restPulse>0</restPulse>
+	<isPowerSensorPresent>0</isPowerSensorPresent>
 	<avgPulse>129.33058</avgPulse>
 	<maxPulse>183.62662</maxPulse>
+	<isPulseSensorPresent>1</isPulseSensorPresent>
 	<maxAltitude>0.0</maxAltitude>
 	<maxSpeed>4.500155</maxSpeed>
 	<avgCadence>0.0</avgCadence>
+	<tourImportFilePath>\net\tourbook\device\suunto\testFiles</tourImportFilePath>
+	<tourImportFileName>1547628896209_184710003036_post_timeline-1.json.gz</tourImportFileName>
 	<TourMarkers>
 		<TourMarker serieIndex="91">
 			<time>97</time>
@@ -2500,6 +2504,5 @@
 		<SwimStrokeStyle>2</SwimStrokeStyle>
 		<SwimStrokeStyle>-32768</SwimStrokeStyle>
 	</SwimStrokeStyles>
-	<test>jokl</test>
 </TourData>
 

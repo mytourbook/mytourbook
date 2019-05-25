@@ -21,9 +21,9 @@ import org.eclipse.jface.action.Action;
 
 public class ActionRefreshOfflineInfoSelected extends Action {
 
-	private PrefPageMapProviders	_prefPageMapFactories;
+	private PrefPage_Map2_Providers	_prefPageMapFactories;
 
-	public ActionRefreshOfflineInfoSelected(final PrefPageMapProviders prefPageMapFactories) {
+	public ActionRefreshOfflineInfoSelected(final PrefPage_Map2_Providers prefPageMapFactories) {
 
 		setToolTipText(Messages.Pref_Map_Button_RefreshTileInfoSelected_Tooltip);
 
