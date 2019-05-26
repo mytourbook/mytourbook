@@ -34,10 +34,12 @@ import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.IToolTipHideListener;
+import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.statistic.DurationTime;
 import net.tourbook.statistic.StatisticContext;
 import net.tourbook.statistic.StatisticView;
 import net.tourbook.statistic.TourbookStatistic;
@@ -88,6 +90,8 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
 
    private final MinMaxKeeper_YData    _minMaxKeeper                      = new MinMaxKeeper_YData();
    private TourData_Day                _tourDayData;
+
+   private ChartDataYSerie             _yData_Duration;
    private ChartDataYSerie             _yData_TrainingPerformance;
 
    private boolean                     _isSynchScaleEnabled;
@@ -527,23 +531,23 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
     */
    void createYData_Duration(final ChartDataModel chartModel, final ChartType chartType) {
 
-      final ChartDataYSerie yData = new ChartDataYSerie(
+      _yData_Duration = new ChartDataYSerie(
             chartType,
             _tourDayData.getDurationLowFloat(),
             _tourDayData.getDurationHighFloat());
 
-      yData.setYTitle(Messages.LABEL_GRAPH_TIME);
-      yData.setUnitLabel(Messages.LABEL_GRAPH_TIME_UNIT);
-      yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);
-      yData.setAllValueColors(0);
-      yData.setShowYSlider(true);
-      yData.setVisibleMinValue(0);
-      yData.setColorIndex(new int[][] { _tourDayData.typeColorIndex });
+      _yData_Duration.setYTitle(Messages.LABEL_GRAPH_TIME);
+      _yData_Duration.setUnitLabel(Messages.LABEL_GRAPH_TIME_UNIT);
+      _yData_Duration.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);
+      _yData_Duration.setAllValueColors(0);
+      _yData_Duration.setShowYSlider(true);
+      _yData_Duration.setVisibleMinValue(0);
+      _yData_Duration.setColorIndex(new int[][] { _tourDayData.typeColorIndex });
 
-      StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_TIME);
-      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_TIME, _activeTourTypeFilter);
+      StatisticServices.setDefaultColors(_yData_Duration, GraphColorManager.PREF_GRAPH_TIME);
+      StatisticServices.setTourTypeColors(_yData_Duration, GraphColorManager.PREF_GRAPH_TIME, _activeTourTypeFilter);
 
-      chartModel.addYData(yData);
+      chartModel.addYData(_yData_Duration);
    }
 
    /**
@@ -798,11 +802,17 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
 
       boolean isAvgValue = false;
 
+      DurationTime durationTime = DurationTime.MOVING;
+
       // set state if average values should be displayed or not, set it BEFORE retrieving data
       if (this instanceof StatisticTraining_Bar) {
 
          // ensure the data are comuted with the correct graph context, otherwise it do not work depending what was previously selected
          _isForceReloadData = true;
+
+         durationTime = (DurationTime) Util.getEnumValue(
+               _prefStore.getString(ITourbookPreferences.STAT_TRAINING_BAR_DURATION_TIME),
+               DurationTime.MOVING);
 
          isAvgValue = _prefStore.getBoolean(ITourbookPreferences.STAT_TRAINING_BAR_IS_SHOW_TRAINING_PERFORMANCE_AVG_VALUE);
 
@@ -812,6 +822,10 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
 
          // ensure the data are comuted with the correct graph context, otherwise it do not work depending what was previously selected
          _isForceReloadData = true;
+
+         durationTime = (DurationTime) Util.getEnumValue(
+               _prefStore.getString(ITourbookPreferences.STAT_TRAINING_LINE_DURATION_TIME),
+               DurationTime.MOVING);
 
          isAvgValue = _prefStore.getBoolean(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_PERFORMANCE_AVG_VALUE);
 
@@ -823,7 +837,10 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
             statContext.appTourTypeFilter,
             statContext.statFirstYear,
             statContext.statNumberOfYears,
-            isDataDirtyWithReset() || statContext.isRefreshData || _isForceReloadData);
+            isDataDirtyWithReset() || statContext.isRefreshData || _isForceReloadData || _isDuration_ReloadData,
+            durationTime);
+
+      _isDuration_ReloadData = false;
 
       // reset min/max values
       if (_isSynchScaleEnabled == false && (statContext.isRefreshData || _isForceReloadData)) {
@@ -847,10 +864,16 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
          _minMaxKeeper.setMinMaxValues(chartModel);
       }
 
+      // title MUST be set after the data model is created
       if (isAvgValue && _yData_TrainingPerformance != null) {
 
          // show avg sign in the title
          _yData_TrainingPerformance.setYTitle(Messages.LABEL_GRAPH_TRAINING_PERFORMANCE + UI.SPACE + UI.SYMBOL_AVERAGE);
+      }
+
+      // show selected time duration
+      if (_yData_Duration != null) {
+         setGraphLabel_Duration(_yData_Duration, durationTime);
       }
 
       StatisticServices.updateChartProperties(_chart, getGridPrefPrefix());

@@ -35,6 +35,7 @@ import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.statistic.ChartOptions_TourFrequency;
+import net.tourbook.statistic.DurationTime;
 import net.tourbook.statistic.SlideoutStatisticOptions;
 import net.tourbook.statistic.StatisticContext;
 import net.tourbook.statistic.TourbookStatistic;
@@ -802,7 +803,10 @@ public class StatisticTour_Frequency extends TourbookStatistic {
                   statContext.appTourTypeFilter,
                   statContext.statFirstYear,
                   statContext.statNumberOfYears,
-                  isDataDirtyWithReset() || statContext.isRefreshData);
+                  isDataDirtyWithReset() || statContext.isRefreshData,
+
+                  // this may need to be customized as in the other statistics
+                  DurationTime.MOVING);
 
       // reset min/max values
       if (_isSynchScaleEnabled == false && statContext.isRefreshData) {

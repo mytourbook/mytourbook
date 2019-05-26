@@ -25,7 +25,7 @@ import java.util.Arrays;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.statistic.TourbookStatistic;
+import net.tourbook.statistic.DurationTime;
 import net.tourbook.statistics.StatisticServices;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TourTypeFilter;
@@ -53,7 +53,7 @@ public class DataProvider_Tour_Month extends DataProvider {
                                final int lastYear,
                                final int numYears,
                                final boolean refreshData,
-                               final String durationTime) {
+                               final DurationTime durationTime) {
 
       /*
        * check if the required data are already loaded
@@ -129,17 +129,17 @@ public class DataProvider_Tour_Month extends DataProvider {
       String sqlDurationTime = null;
 
       switch (durationTime) {
-      case TourbookStatistic.STATE_DURATION_TIME_BREAK:
+      case BREAK:
 
          sqlDurationTime = " SUM(TourRecordingTime - TourDrivingTime),";
          break;
 
-      case TourbookStatistic.STATE_DURATION_TIME_RECORDING:
+      case RECORDING:
 
          sqlDurationTime = " SUM(TourRecordingTime),";
          break;
 
-      case TourbookStatistic.STATE_DURATION_TIME_MOVING:
+      case MOVING:
       default:
          // this is also the old implementation for the duration values
          sqlDurationTime = " SUM(CASE WHEN TourDrivingTime > 0 THEN TourDrivingTime ELSE TourRecordingTime END),";

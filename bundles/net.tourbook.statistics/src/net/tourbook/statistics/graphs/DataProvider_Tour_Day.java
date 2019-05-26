@@ -34,6 +34,7 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.statistic.DurationTime;
 import net.tourbook.statistics.StatisticServices;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TourTypeFilter;
@@ -191,7 +192,7 @@ public class DataProvider_Tour_Day extends DataProvider {
                            final int lastYear,
                            final int numberOfYears,
                            final boolean refreshData,
-                           final String durationTime) {
+                           final DurationTime durationTime) {
 
       // don't reload data which are already available
       if (person == _activePerson
@@ -214,6 +215,24 @@ public class DataProvider_Tour_Day extends DataProvider {
       int colorOffset = 0;
       if (tourTypeFilter.showUndefinedTourTypes()) {
          colorOffset = StatisticServices.TOUR_TYPE_COLOR_INDEX_OFFSET;
+      }
+
+      boolean isDurationTime_Break = false;
+      boolean isDurationTime_Recording = false;
+
+      switch (durationTime) {
+      case BREAK:
+         isDurationTime_Break = true;
+         break;
+
+      case RECORDING:
+         isDurationTime_Recording = true;
+         break;
+
+      case MOVING:
+      default:
+         // this is also the old implementation for the duration value
+         break;
       }
 
       // get the tour types
@@ -358,6 +377,17 @@ public class DataProvider_Tour_Day extends DataProvider {
                      + (zonedStartDateTime.getMinute() * 60)
                      + zonedStartDateTime.getSecond();
 
+               int durationTimeValue = 0;
+
+               if (isDurationTime_Break) {
+                  durationTimeValue = dbRecordingTime - dbDrivingTime;
+               } else if (isDurationTime_Recording) {
+                  durationTimeValue = dbRecordingTime;
+               } else {
+                  // moving time, this is also the old implementation for the duration value
+                  durationTimeValue = dbDrivingTime == 0 ? dbRecordingTime : dbDrivingTime;
+               }
+
                dbAllTourIds.add(dbTourId);
 
                dbAllYears.add(dbTourYear);
@@ -371,7 +401,7 @@ public class DataProvider_Tour_Day extends DataProvider {
                dbAllTourRecordingTime.add(dbRecordingTime);
                dbAllTourDrivingTime.add(dbDrivingTime);
 
-               dbAllTourDuration.add(dbDrivingTime == 0 ? dbRecordingTime : dbDrivingTime);
+               dbAllTourDuration.add(durationTimeValue);
 
                // round distance
                final float distance = dbDistance / UI.UNIT_VALUE_DISTANCE;

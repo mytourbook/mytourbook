@@ -61,10 +61,8 @@ public class StatisticMonth_Summary extends StatisticMonth {
                   || property.equals(ITourbookPreferences.STAT_MONTH_IS_SHOW_NUMBER_OF_TOURS)
                   || property.equals(ITourbookPreferences.STAT_MONTH_IS_SHOW_YEAR_SEPARATOR)) {
 
-               if (property.equals(ITourbookPreferences.STAT_MONTH_DURATION_TIME)
-               ) {
-
-                  _isReloadData = true;
+               if (property.equals(ITourbookPreferences.STAT_MONTH_DURATION_TIME)) {
+                  _isDuration_ReloadData = true;
                }
 
                // get the changed preferences

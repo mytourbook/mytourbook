@@ -66,7 +66,13 @@ public class StatisticTraining_Line extends StatisticTraining {
                   || property.equals(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_DISTANCE)
                   || property.equals(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_DURATION)
 
+                  || property.equals(ITourbookPreferences.STAT_TRAINING_LINE_DURATION_TIME)
+
             ) {
+
+               if (property.equals(ITourbookPreferences.STAT_TRAINING_LINE_DURATION_TIME)) {
+                  _isDuration_ReloadData = true;
+               }
 
                // get the changed preferences
                getPreferences();

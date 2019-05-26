@@ -17,6 +17,7 @@ package net.tourbook.statistic;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.util.Util;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -269,10 +270,10 @@ public class ChartOptions_Training implements IStatisticOptions {
       _chkShowDistance.setSelection(_prefStore.getDefaultBoolean(_prefKeys.isShow_Distance));
       _chkShowDuration.setSelection(_prefStore.getDefaultBoolean(_prefKeys.isShow_Duration));
 
-      final String durationTime = _prefStore.getDefaultString(_prefKeys.durationTime);
-      _rdoDuration_BreakTime.setSelection(durationTime.equals(TourbookStatistic.STATE_DURATION_TIME_BREAK));
-      _rdoDuration_MovingTime.setSelection(durationTime.equals(TourbookStatistic.STATE_DURATION_TIME_MOVING));
-      _rdoDuration_RecordingTime.setSelection(durationTime.equals(TourbookStatistic.STATE_DURATION_TIME_RECORDING));
+      final Enum<DurationTime> durationTime = Util.getEnumValue(_prefStore.getDefaultString(_prefKeys.durationTime), DurationTime.MOVING);
+      _rdoDuration_BreakTime.setSelection(durationTime.equals(DurationTime.BREAK));
+      _rdoDuration_MovingTime.setSelection(durationTime.equals(DurationTime.MOVING));
+      _rdoDuration_RecordingTime.setSelection(durationTime.equals(DurationTime.RECORDING));
 
       _chkShow_TrainingEffect.setSelection(_prefStore.getDefaultBoolean(_prefKeys.isShow_TrainingEffect));
       _chkShow_TrainingEffect_Anaerobic.setSelection(_prefStore.getDefaultBoolean(_prefKeys.isShow_TrainingEffect_Anaerobic));
@@ -291,10 +292,10 @@ public class ChartOptions_Training implements IStatisticOptions {
       _chkShowDistance.setSelection(_prefStore.getBoolean(_prefKeys.isShow_Distance));
       _chkShowDuration.setSelection(_prefStore.getBoolean(_prefKeys.isShow_Duration));
 
-      final String durationTime = _prefStore.getString(_prefKeys.durationTime);
-      _rdoDuration_BreakTime.setSelection(durationTime.equals(TourbookStatistic.STATE_DURATION_TIME_BREAK));
-      _rdoDuration_MovingTime.setSelection(durationTime.equals(TourbookStatistic.STATE_DURATION_TIME_MOVING));
-      _rdoDuration_RecordingTime.setSelection(durationTime.equals(TourbookStatistic.STATE_DURATION_TIME_RECORDING));
+      final Enum<DurationTime> durationTime = Util.getEnumValue(_prefStore.getString(_prefKeys.durationTime), DurationTime.MOVING);
+      _rdoDuration_BreakTime.setSelection(durationTime.equals(DurationTime.BREAK));
+      _rdoDuration_MovingTime.setSelection(durationTime.equals(DurationTime.MOVING));
+      _rdoDuration_RecordingTime.setSelection(durationTime.equals(DurationTime.RECORDING));
 
       _chkShow_TrainingEffect.setSelection(_prefStore.getBoolean(_prefKeys.isShow_TrainingEffect));
       _chkShow_TrainingEffect_Anaerobic.setSelection(_prefStore.getBoolean(_prefKeys.isShow_TrainingEffect_Anaerobic));
@@ -317,12 +318,12 @@ public class ChartOptions_Training implements IStatisticOptions {
       _prefStore.setValue(_prefKeys.durationTime,
 
             _rdoDuration_BreakTime.getSelection()
-                  ? TourbookStatistic.STATE_DURATION_TIME_BREAK
+                  ? DurationTime.BREAK.name()
 
                   : _rdoDuration_MovingTime.getSelection()
-                        ? TourbookStatistic.STATE_DURATION_TIME_MOVING
+                        ? DurationTime.MOVING.name()
 
-                        : TourbookStatistic.STATE_DURATION_TIME_RECORDING);
+                        : DurationTime.RECORDING.name());
 
       _prefStore.setValue(_prefKeys.isShow_TrainingEffect, _chkShow_TrainingEffect.getSelection());
       _prefStore.setValue(_prefKeys.isShow_TrainingEffect_Anaerobic, _chkShow_TrainingEffect_Anaerobic.getSelection());

@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.statistic;
 
+import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataYSerie;
@@ -46,10 +47,6 @@ public abstract class TourbookStatistic {
    protected static final String STATE_BAR_ORDERING_YEAR_TIME               = "STATE_BAR_ORDERING_YEAR_TIME";               //$NON-NLS-1$
 
    protected static final String STATE_BAR_ORDERING_HR_ZONE_START_FOR_MONTH = "STATE_BAR_ORDERING_HR_ZONE_START_FOR_MONTH"; ////$NON-NLS-1$
-
-   public static final String    STATE_DURATION_TIME_BREAK                  = "STATE_DURATION_TIME_BREAK";                  //$NON-NLS-1$
-   public static final String    STATE_DURATION_TIME_MOVING                 = "STATE_DURATION_TIME_MOVING";                 //$NON-NLS-1$
-   public static final String    STATE_DURATION_TIME_RECORDING              = "STATE_DURATION_TIME_RECORDING";              //$NON-NLS-1$
 
    /*
     * Grid prefixes
@@ -103,7 +100,7 @@ public abstract class TourbookStatistic {
 
    private boolean                  _isInPrefUpdate;
 
-   protected boolean                _isReloadData;
+   protected boolean                _isDuration_ReloadData;
 
    /*
     * UI controls
@@ -332,6 +329,24 @@ public abstract class TourbookStatistic {
     */
    public void setDataDirty() {
       _isDataDirty = true;
+   }
+
+   protected void setGraphLabel_Duration(final ChartDataYSerie yData_Duration, final DurationTime durationTime) {
+
+      if (durationTime == DurationTime.BREAK) {
+
+         yData_Duration.setYTitle(Messages.Graph_Label_Time_Paused);
+
+      } else if (durationTime == DurationTime.RECORDING) {
+
+         yData_Duration.setYTitle(Messages.Graph_Label_Time_Recording);
+
+      } else {
+
+         // durationTime == DurationTime.MOVING, this is the default
+
+         yData_Duration.setYTitle(Messages.Graph_Label_Time_Moving);
+      }
    }
 
    /**

@@ -18,6 +18,7 @@ package net.tourbook.statistic;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.ChartDataSerie;
+import net.tourbook.common.util.Util;
 import net.tourbook.preferences.ITourbookPreferences;
 
 import org.eclipse.jface.layout.GridDataFactory;
@@ -229,10 +230,12 @@ public class ChartOptions_WeekSummary implements IStatisticOptions {
       _rdoChartType_BarAdjacent.setSelection(chartType.equals(ChartDataSerie.CHART_TYPE_BAR_ADJACENT));
       _rdoChartType_BarStacked.setSelection(chartType.equals(ChartDataSerie.CHART_TYPE_BAR_STACKED));
 
-      final String durationTime = _prefStore.getDefaultString(ITourbookPreferences.STAT_WEEK_DURATION_TIME);
-      _rdoDuration_BreakTime.setSelection(durationTime.equals(TourbookStatistic.STATE_DURATION_TIME_BREAK));
-      _rdoDuration_MovingTime.setSelection(durationTime.equals(TourbookStatistic.STATE_DURATION_TIME_MOVING));
-      _rdoDuration_RecordingTime.setSelection(durationTime.equals(TourbookStatistic.STATE_DURATION_TIME_RECORDING));
+      final Enum<DurationTime> durationTime = Util.getEnumValue(
+            _prefStore.getDefaultString(ITourbookPreferences.STAT_WEEK_DURATION_TIME),
+            DurationTime.MOVING);
+      _rdoDuration_BreakTime.setSelection(durationTime.equals(DurationTime.BREAK));
+      _rdoDuration_MovingTime.setSelection(durationTime.equals(DurationTime.MOVING));
+      _rdoDuration_RecordingTime.setSelection(durationTime.equals(DurationTime.RECORDING));
 
       enableControls();
    }
@@ -250,10 +253,12 @@ public class ChartOptions_WeekSummary implements IStatisticOptions {
       _rdoChartType_BarAdjacent.setSelection(chartType.equals(ChartDataSerie.CHART_TYPE_BAR_ADJACENT));
       _rdoChartType_BarStacked.setSelection(chartType.equals(ChartDataSerie.CHART_TYPE_BAR_STACKED));
 
-      final String durationTime = _prefStore.getString(ITourbookPreferences.STAT_WEEK_DURATION_TIME);
-      _rdoDuration_BreakTime.setSelection(durationTime.equals(TourbookStatistic.STATE_DURATION_TIME_BREAK));
-      _rdoDuration_MovingTime.setSelection(durationTime.equals(TourbookStatistic.STATE_DURATION_TIME_MOVING));
-      _rdoDuration_RecordingTime.setSelection(durationTime.equals(TourbookStatistic.STATE_DURATION_TIME_RECORDING));
+      final Enum<DurationTime> durationTime = Util.getEnumValue(
+            _prefStore.getString(ITourbookPreferences.STAT_WEEK_DURATION_TIME),
+            DurationTime.MOVING);
+      _rdoDuration_BreakTime.setSelection(durationTime.equals(DurationTime.BREAK));
+      _rdoDuration_MovingTime.setSelection(durationTime.equals(DurationTime.MOVING));
+      _rdoDuration_RecordingTime.setSelection(durationTime.equals(DurationTime.RECORDING));
 
       enableControls();
    }
@@ -278,11 +283,11 @@ public class ChartOptions_WeekSummary implements IStatisticOptions {
       _prefStore.setValue(ITourbookPreferences.STAT_WEEK_DURATION_TIME,
 
             _rdoDuration_BreakTime.getSelection()
-                  ? TourbookStatistic.STATE_DURATION_TIME_BREAK
+                  ? DurationTime.BREAK.name()
 
                   : _rdoDuration_MovingTime.getSelection()
-                        ? TourbookStatistic.STATE_DURATION_TIME_MOVING
+                        ? DurationTime.MOVING.name()
 
-                        : TourbookStatistic.STATE_DURATION_TIME_RECORDING);
+                        : DurationTime.RECORDING.name());
    }
 }

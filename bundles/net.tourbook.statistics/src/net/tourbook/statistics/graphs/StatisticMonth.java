@@ -40,6 +40,7 @@ import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.statistic.DurationTime;
 import net.tourbook.statistic.StatisticContext;
 import net.tourbook.statistic.TourbookStatistic;
 import net.tourbook.statistics.Messages;
@@ -69,8 +70,10 @@ public abstract class StatisticMonth extends TourbookStatistic {
 
    private boolean                  _isSynchScaleEnabled;
 
-   private TourData_Month           _tourMonthData;
    private StatisticContext         _statContext;
+
+   private TourData_Month           _tourMonthData;
+   private ChartDataYSerie          _yData_Duration;
 
    private int                      _barOrderStart;
 
@@ -291,22 +294,22 @@ public abstract class StatisticMonth extends TourbookStatistic {
 
       // duration
 
-      final ChartDataYSerie yData = new ChartDataYSerie(
+      _yData_Duration = new ChartDataYSerie(
             ChartType.BAR,
             getChartType(_chartType),
             _resortedTimeLow,
             _resortedTimeHigh);
 
-      yData.setYTitle(Messages.LABEL_GRAPH_TIME);
-      yData.setUnitLabel(Messages.LABEL_GRAPH_TIME_UNIT);
-      yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);
-      yData.setShowYSlider(true);
+      _yData_Duration.setYTitle(Messages.LABEL_GRAPH_TIME);
+      _yData_Duration.setUnitLabel(Messages.LABEL_GRAPH_TIME_UNIT);
+      _yData_Duration.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);
+      _yData_Duration.setShowYSlider(true);
 
-      StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_TIME);
-      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_TIME, _appTourTypeFilter);
-      StatisticServices.setTourTypeColorIndex(yData, _resortedTypeIds, _appTourTypeFilter);
+      StatisticServices.setDefaultColors(_yData_Duration, GraphColorManager.PREF_GRAPH_TIME);
+      StatisticServices.setTourTypeColors(_yData_Duration, GraphColorManager.PREF_GRAPH_TIME, _appTourTypeFilter);
+      StatisticServices.setTourTypeColorIndex(_yData_Duration, _resortedTypeIds, _appTourTypeFilter);
 
-      chartDataModel.addYData(yData);
+      chartDataModel.addYData(_yData_Duration);
    }
 
    /**
@@ -543,7 +546,10 @@ public abstract class StatisticMonth extends TourbookStatistic {
    public void updateStatistic(final StatisticContext statContext) {
 
       _chartType = _prefStore.getString(ITourbookPreferences.STAT_MONTH_CHART_TYPE);
-      final String durationTime = _prefStore.getString(ITourbookPreferences.STAT_MONTH_DURATION_TIME);
+
+      final DurationTime durationTime = (DurationTime) Util.getEnumValue(
+            _prefStore.getString(ITourbookPreferences.STAT_MONTH_DURATION_TIME),
+            DurationTime.MOVING);
 
       _statContext = statContext;
 
@@ -561,10 +567,10 @@ public abstract class StatisticMonth extends TourbookStatistic {
                   _appTourTypeFilter,
                   _statFirstYear,
                   _statNumberOfYears,
-                  isDataDirtyWithReset() || statContext.isRefreshData || _isReloadData,
+                  isDataDirtyWithReset() || statContext.isRefreshData || _isDuration_ReloadData,
                   durationTime);
 
-      _isReloadData = false;
+      _isDuration_ReloadData = false;
 
       StatisticServices.setBarNames(statContext, _tourMonthData.usedTourTypeIds, _barOrderStart);
       reorderStatData();
@@ -580,6 +586,11 @@ public abstract class StatisticMonth extends TourbookStatistic {
 
       if (_isSynchScaleEnabled) {
          _minMaxKeeper.setMinMaxValues(chartDataModel);
+      }
+
+      // show selected time duration
+      if (_yData_Duration != null) {
+         setGraphLabel_Duration(_yData_Duration, durationTime);
       }
 
       StatisticServices.updateChartProperties(_chart, getGridPrefPrefix());

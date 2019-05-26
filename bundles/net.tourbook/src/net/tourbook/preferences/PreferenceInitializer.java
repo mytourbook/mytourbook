@@ -23,7 +23,7 @@ import net.tourbook.common.util.StringToArrayConverter;
 import net.tourbook.data.TourMarker;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.importdata.EasyConfig;
-import net.tourbook.statistic.TourbookStatistic;
+import net.tourbook.statistic.DurationTime;
 import net.tourbook.tour.BreakTimeTool;
 import net.tourbook.tour.DialogSetTimeZone;
 import net.tourbook.tour.TourManager;
@@ -90,7 +90,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ITourbookPreferences.STAT_DURATION_INTERVAL, 60);
       store.setDefault(ITourbookPreferences.STAT_DURATION_NUMBERS, 12);
 
-      store.setDefault(ITourbookPreferences.STAT_DAY_DURATION_TIME, TourbookStatistic.STATE_DURATION_TIME_MOVING);
+      store.setDefault(ITourbookPreferences.STAT_DAY_DURATION_TIME, DurationTime.MOVING.name());
       store.setDefault(ITourbookPreferences.STAT_DAY_IS_SHOW_ALTITUDE, true);
       store.setDefault(ITourbookPreferences.STAT_DAY_IS_SHOW_AVG_PACE, true);
       store.setDefault(ITourbookPreferences.STAT_DAY_IS_SHOW_AVG_SPEED, true);
@@ -99,7 +99,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ITourbookPreferences.STAT_DAY_IS_SHOW_YEAR_SEPARATOR, true);
 
       store.setDefault(ITourbookPreferences.STAT_WEEK_CHART_TYPE, ChartDataSerie.CHART_TYPE_BAR_STACKED);
-      store.setDefault(ITourbookPreferences.STAT_WEEK_DURATION_TIME, TourbookStatistic.STATE_DURATION_TIME_MOVING);
+      store.setDefault(ITourbookPreferences.STAT_WEEK_DURATION_TIME, DurationTime.MOVING.name());
       store.setDefault(ITourbookPreferences.STAT_WEEK_IS_SHOW_ALTITUDE, true);
       store.setDefault(ITourbookPreferences.STAT_WEEK_IS_SHOW_DISTANCE, true);
       store.setDefault(ITourbookPreferences.STAT_WEEK_IS_SHOW_DURATION, true);
@@ -107,7 +107,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ITourbookPreferences.STAT_WEEK_IS_SHOW_YEAR_SEPARATOR, true);
 
       store.setDefault(ITourbookPreferences.STAT_MONTH_CHART_TYPE, ChartDataSerie.CHART_TYPE_BAR_STACKED);
-      store.setDefault(ITourbookPreferences.STAT_MONTH_DURATION_TIME, TourbookStatistic.STATE_DURATION_TIME_MOVING);
+      store.setDefault(ITourbookPreferences.STAT_MONTH_DURATION_TIME, DurationTime.MOVING.name());
       store.setDefault(ITourbookPreferences.STAT_MONTH_IS_SHOW_ALTITUDE, true);
       store.setDefault(ITourbookPreferences.STAT_MONTH_IS_SHOW_DISTANCE, true);
       store.setDefault(ITourbookPreferences.STAT_MONTH_IS_SHOW_DURATION, true);
@@ -115,19 +115,19 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ITourbookPreferences.STAT_MONTH_IS_SHOW_YEAR_SEPARATOR, true);
 
       store.setDefault(ITourbookPreferences.STAT_YEAR_CHART_TYPE, ChartDataSerie.CHART_TYPE_BAR_STACKED);
-      store.setDefault(ITourbookPreferences.STAT_YEAR_DURATION_TIME, TourbookStatistic.STATE_DURATION_TIME_MOVING);
+      store.setDefault(ITourbookPreferences.STAT_YEAR_DURATION_TIME, DurationTime.MOVING.name());
       store.setDefault(ITourbookPreferences.STAT_YEAR_IS_SHOW_ALTITUDE, true);
       store.setDefault(ITourbookPreferences.STAT_YEAR_IS_SHOW_DISTANCE, true);
       store.setDefault(ITourbookPreferences.STAT_YEAR_IS_SHOW_DURATION, true);
       store.setDefault(ITourbookPreferences.STAT_YEAR_IS_SHOW_NUMBER_OF_TOURS, true);
       store.setDefault(ITourbookPreferences.STAT_YEAR_IS_SHOW_YEAR_SEPARATOR, true);
 
-      store.setDefault(ITourbookPreferences.STAT_TRAINING_BAR_DURATION_TIME, TourbookStatistic.STATE_DURATION_TIME_MOVING);
+      store.setDefault(ITourbookPreferences.STAT_TRAINING_BAR_DURATION_TIME, DurationTime.MOVING.name());
       store.setDefault(ITourbookPreferences.STAT_TRAINING_BAR_IS_SHOW_TRAINING_EFFECT, true);
       store.setDefault(ITourbookPreferences.STAT_TRAINING_BAR_IS_SHOW_TRAINING_EFFECT_ANAEROBIC, true);
       store.setDefault(ITourbookPreferences.STAT_TRAINING_BAR_IS_SHOW_TRAINING_PERFORMANCE, true);
 
-      store.setDefault(ITourbookPreferences.STAT_TRAINING_LINE_DURATION_TIME, TourbookStatistic.STATE_DURATION_TIME_MOVING);
+      store.setDefault(ITourbookPreferences.STAT_TRAINING_LINE_DURATION_TIME, DurationTime.MOVING.name());
       store.setDefault(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_EFFECT, true);
       store.setDefault(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_EFFECT_ANAEROBIC, true);
       store.setDefault(ITourbookPreferences.STAT_TRAINING_LINE_IS_SHOW_TRAINING_PERFORMANCE, true);

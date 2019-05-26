@@ -781,6 +781,12 @@ public class Messages extends NLS {
    public static String        GeoCompare_View_State_ComparingIsCanceled;
    public static String        GeoCompare_View_State_StartComparing;
 
+   public static String Graph_Label_Time_Moving;
+
+   public static String Graph_Label_Time_Paused;
+
+   public static String Graph_Label_Time_Recording;
+
    public static String        HR_Zone_01_060_Moderate;
    public static String        HR_Zone_01_060_Moderate_Shortcut;
    public static String        HR_Zone_01_070_FatBurning;
@@ -1644,11 +1650,8 @@ public class Messages extends NLS {
 
    public static String Pref_Statistic_Radio_BarAdjacent;
    public static String Pref_Statistic_Radio_BarStacked;
-
    public static String Pref_Statistic_Radio_Duration_MovingTime;
-
    public static String Pref_Statistic_Radio_Duration_PausedTime;
-
    public static String Pref_Statistic_Radio_Duration_RecordingTime;
 
    public static String Pref_Swimming_Label_Info;

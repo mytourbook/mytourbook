@@ -34,10 +34,12 @@ import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.IToolTipHideListener;
+import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.statistic.DurationTime;
 import net.tourbook.statistic.StatisticContext;
 import net.tourbook.statistic.StatisticView;
 import net.tourbook.statistic.TourbookStatistic;
@@ -69,16 +71,12 @@ import org.eclipse.ui.IWorkbenchPart;
 
 public abstract class StatisticDay extends TourbookStatistic implements IBarSelectionProvider, ITourProvider {
 
-// SET_FORMATTING_OFF
-
-   private static final String         TOUR_TOOLTIP_FORMAT_DATE_WEEK_TIME   = net.tourbook.ui.Messages.Tour_Tooltip_Format_DateWeekTime;
-
-// SET_FORMATTING_ON
+   private static final String         TOUR_TOOLTIP_FORMAT_DATE_WEEK_TIME = net.tourbook.ui.Messages.Tour_Tooltip_Format_DateWeekTime;
 
    private TourTypeFilter              _activeTourTypeFilter;
    private TourPerson                  _activePerson;
 
-   private long                        _selectedTourId          = -1;
+   private long                        _selectedTourId                    = -1;
 
    private int                         _currentYear;
    private int                         _numberOfYears;
@@ -86,15 +84,16 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
    private Chart                       _chart;
    private StatisticContext            _statContext;
 
-   private final MinMaxKeeper_YData    _minMaxKeeper            = new MinMaxKeeper_YData();
+   private final MinMaxKeeper_YData    _minMaxKeeper                      = new MinMaxKeeper_YData();
    private TourData_Day                _tourDayData;
+   private ChartDataYSerie             _yData_Duration;
 
    private boolean                     _isSynchScaleEnabled;
 
    private ITourEventListener          _tourPropertyListener;
-   private StatisticTourToolTip        _tourToolTip;
 
-   private TourInfoIconToolTipProvider _tourInfoToolTipProvider = new TourInfoIconToolTipProvider();
+   private StatisticTourToolTip        _tourToolTip;
+   private TourInfoIconToolTipProvider _tourInfoToolTipProvider           = new TourInfoIconToolTipProvider();
 
    private void addTourPropertyListener() {
 
@@ -517,23 +516,23 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
     */
    void createYDataDuration(final ChartDataModel chartModel) {
 
-      final ChartDataYSerie yData = new ChartDataYSerie(
+      _yData_Duration = new ChartDataYSerie(
             ChartType.BAR,
             _tourDayData.getDurationLowFloat(),
             _tourDayData.getDurationHighFloat());
 
-      yData.setYTitle(Messages.LABEL_GRAPH_TIME);
-      yData.setUnitLabel(Messages.LABEL_GRAPH_TIME_UNIT);
-      yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);
-      yData.setAllValueColors(0);
-      yData.setShowYSlider(true);
-      yData.setVisibleMinValue(0);
-      yData.setColorIndex(new int[][] { _tourDayData.typeColorIndex });
+      _yData_Duration.setYTitle(Messages.LABEL_GRAPH_TIME);
+      _yData_Duration.setUnitLabel(Messages.LABEL_GRAPH_TIME_UNIT);
+      _yData_Duration.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);
+      _yData_Duration.setAllValueColors(0);
+      _yData_Duration.setShowYSlider(true);
+      _yData_Duration.setVisibleMinValue(0);
+      _yData_Duration.setColorIndex(new int[][] { _tourDayData.typeColorIndex });
 
-      StatisticServices.setDefaultColors(yData, GraphColorManager.PREF_GRAPH_TIME);
-      StatisticServices.setTourTypeColors(yData, GraphColorManager.PREF_GRAPH_TIME, _activeTourTypeFilter);
+      StatisticServices.setDefaultColors(_yData_Duration, GraphColorManager.PREF_GRAPH_TIME);
+      StatisticServices.setTourTypeColors(_yData_Duration, GraphColorManager.PREF_GRAPH_TIME, _activeTourTypeFilter);
 
-      chartModel.addYData(yData);
+      chartModel.addYData(_yData_Duration);
    }
 
    @Override
@@ -680,7 +679,9 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
    @Override
    public void updateStatistic(final StatisticContext statContext) {
 
-      final String durationTime = _prefStore.getString(ITourbookPreferences.STAT_DAY_DURATION_TIME);
+      final DurationTime durationTime = (DurationTime) Util.getEnumValue(
+            _prefStore.getString(ITourbookPreferences.STAT_DAY_DURATION_TIME),
+            DurationTime.MOVING);
 
       _statContext = statContext;
 
@@ -719,10 +720,10 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
                   statContext.appTourTypeFilter,
                   statContext.statFirstYear,
                   statContext.statNumberOfYears,
-                  isDataDirtyWithReset() || statContext.isRefreshData || _isReloadData,
+                  isDataDirtyWithReset() || statContext.isRefreshData || _isDuration_ReloadData,
                   durationTime);
 
-      _isReloadData = false;
+      _isDuration_ReloadData = false;
 
       // reset min/max values
       if (_isSynchScaleEnabled == false && statContext.isRefreshData) {
@@ -741,6 +742,11 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 
       if (_isSynchScaleEnabled) {
          _minMaxKeeper.setMinMaxValues(chartModel);
+      }
+
+      // show selected time duration
+      if (_yData_Duration != null) {
+         setGraphLabel_Duration(_yData_Duration, durationTime);
       }
 
       StatisticServices.updateChartProperties(_chart, getGridPrefPrefix());
