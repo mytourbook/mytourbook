@@ -78,6 +78,6 @@ public class ActionRetrieveWeatherData extends Action {
          tour.setWeatherClouds("");
       }
 
-      //TODO refocus on the current tour to refresh the new values otherwise they are not visible
+      TourManager.saveModifiedTours(selectedTours);
    }
 }
