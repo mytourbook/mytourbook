@@ -69,6 +69,9 @@ public class ActionRetrieveWeatherData extends Action {
       // WInd speed
       // Wind dir
       // text like OMB plugin
+      //weather station distance ?
+
+      // For the request, get the half-point of the route just like in CG
       for (final TourData tour : selectedTours)
       {
          tour.setAvgTemperature(0);
