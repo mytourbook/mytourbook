@@ -95,6 +95,7 @@ Bugfix
 * .fitlog File 
 
   - Fixed avg power issue when value was a floating point
+  - Other values will now also be parsed as floating point when integer parsing fails
 
 
 * Fixed IllegalArgumentException: Widget has the wrong parent
