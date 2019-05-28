@@ -1020,6 +1020,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       defineColumn_Training_PowerToWeightRatio();
       defineColumn_Training_IntensityFactor();
       defineColumn_Training_StressScore();
+      defineColumn_Training_TrainingEffect();
+      defineColumn_Training_TrainingEffect_Anaerobic();
+      defineColumn_Training_TrainingPerformance();
 
       // Running dynamics
       defineColumn_RunDyn_StanceTime_Min();
@@ -2874,7 +2877,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    }
 
    /**
-    * column: PowerTrainingStressScore
+    * Column: PowerTrainingStressScore
     */
    private void defineColumn_Training_StressScore() {
 
@@ -2886,6 +2889,69 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
             final Object element = cell.getElement();
             final double value = ((TVITourBookItem) element).colPower_TrainingStressScore;
+
+            colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
+
+            setCellColor(cell, element);
+         }
+      });
+   }
+
+   /**
+    * Column: Training: Training Effect
+    */
+   private void defineColumn_Training_TrainingEffect() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.TRAINING_TRAINING_EFFECT_AEROB.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            final double value = ((TVITourBookItem) element).colTraining_TrainingEffect;
+
+            colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
+
+            setCellColor(cell, element);
+         }
+      });
+   }
+
+   /**
+    * Column: Training: Training effect anaerobic
+    */
+   private void defineColumn_Training_TrainingEffect_Anaerobic() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.TRAINING_TRAINING_EFFECT_ANAEROB.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            final double value = ((TVITourBookItem) element).colTraining_TrainingEffect_Anaerobic;
+
+            colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
+
+            setCellColor(cell, element);
+         }
+      });
+   }
+
+   /**
+    * Column: Training - Training Performance
+    */
+   private void defineColumn_Training_TrainingPerformance() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.TRAINING_TRAINING_PERFORMANCE.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            final double value = ((TVITourBookItem) element).colTraining_TrainingPerformance;
 
             colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 

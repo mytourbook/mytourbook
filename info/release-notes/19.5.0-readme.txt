@@ -11,27 +11,80 @@ Update Docu - END
 New   
 ===
 
-*
+* Tour Tag + Category
+
+  - New text field for tour tag/category which can contain text notes
+   
+  - Tagged Tours view
+    - Show tag/category notes in the new tooltip for tags/categories 
   
+  - Tagging preferences
+    - New column to show tag/category notes
+
+
+* Tour Book 
+
+  - Training Effects + Training Performance columns
+  - Reimport training values
+    - Currently used for Suunto 3 files
+
+  
+* Statistics
+
+  - Training effects + training performance graphs in training statistics
+
  
 Improvements   
 ============
 
 * Adjust Altitude
-  - Whole tour is selected for SRTM adjustments
 
- 
-Changes  
-=======
+  - Whole tour is selected for SRTM adjustments when dialog is opened (previously only half of the tour was selected)
+  
+  
+* Import
 
-* 
+  - .fit File
+  
+    import .fit developer fields
+   
+      Supported fields:
+      
+      - Cadence
+      - Ground Time (Stance time)
+      - Power
+      - Elevation
+      - Vertical Oscillation
+      
+      
+      Not yet supported fields:
+      
+      - Leg Spring Stiffness
+      - Form Power
+     
+     
+* Statistics
+
+  - Show recording/moving/break time separately in the day/week/month/year/training statistics
+  
 
  
 Bugfix   
 ======
+
+* .fitlog File 
+
+  - Fixed avg power issue when value was a floating point
+  - Other values will now also be parsed as floating point when integer parsing fails
+
 
 * Fixed IllegalArgumentException: Widget has the wrong parent
   This occured when app is started and a view is minimized, then the context menu is already created but has the wrong parent when the view is displayed later on.
   It needed a while until the cause of this issue was discovered. This has propably occured after switching to Eclipse 4.
   Nobody compained until now maybe it was not used to minimize a view.
   
+
+System
+======
+
+* FITSDK 20.90

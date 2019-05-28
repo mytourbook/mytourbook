@@ -315,6 +315,12 @@ public class Messages extends NLS {
    public static String        Action_Tag_Add_RecentTags;
    public static String        Action_Tag_AutoOpenCancel;
    public static String        Action_Tag_AutoOpenOK;
+   public static String        Action_Tag_Edit;
+   public static String        Action_Tag_Edit_Tooltip;
+
+   public static String        Action_TagCategory_Edit;
+   public static String        Action_TagCategory_Edit_Tooltip;
+   public static String        Action_TagCategory_EditCategory;
 
    public static String        Action_TourType_ModifyTourTypeFilter;
 
@@ -625,6 +631,9 @@ public class Messages extends NLS {
    public static String        Db_Field_TourData_Weather;
    public static String        Db_Field_TourMarker_UrlAddress;
    public static String        Db_Field_TourMarker_UrlText;
+   public static String        Db_Field_TourTag_Name;
+   public static String        Db_Field_TourTag_Notes;
+   public static String        Db_Field_TourTagCategory_Notes;
 
    public static String        DeviceManager_Selection_device_is_not_selected;
 
@@ -690,6 +699,16 @@ public class Messages extends NLS {
    public static String        Dialog_SplitTour_Label_TourStartDateTime;
    public static String        Dialog_SplitTour_Label_TourTitle;
    public static String        Dialog_SplitTour_Label_TourTitle_Tooltip;
+
+   public static String        Dialog_TourTag_EditTag_Title;
+   public static String        Dialog_TourTag_EditTagCategory_Title;
+   public static String        Dialog_TourTag_Label_Notes;
+   public static String        Dialog_TourTag_Label_TagName;
+   public static String        Dialog_TourTag_Message_RenameTag;
+
+   public static String        Dialog_TourTagCategory_Label_CategoryName;
+   public static String        Dialog_TourTagCategory_Message_RenameCategory;
+   public static String        Dialog_TourTagCategory_Title;
 
    public static String        Dlg_AdjustAltitude_Group_options;
    public static String        Dlg_AdjustAltitude_Label_end_altitude;
@@ -761,6 +780,12 @@ public class Messages extends NLS {
    public static String        GeoCompare_View_State_CompareResult;
    public static String        GeoCompare_View_State_ComparingIsCanceled;
    public static String        GeoCompare_View_State_StartComparing;
+
+   public static String Graph_Label_Time_Moving;
+
+   public static String Graph_Label_Time_Paused;
+
+   public static String Graph_Label_Time_Recording;
 
    public static String        HR_Zone_01_060_Moderate;
    public static String        HR_Zone_01_060_Moderate_Shortcut;
@@ -1045,6 +1070,7 @@ public class Messages extends NLS {
    public static String        Import_Data_Action_Reimport_OnlyTemperatureValues;
    public static String        Import_Data_Action_Reimport_OnlyTimeSlices;
    public static String        Import_Data_Action_Reimport_OnlyTourMarker;
+   public static String        Import_Data_Action_Reimport_OnlyTrainingValues;
    public static String        Import_Data_Action_Reimport_Tour;
    public static String        Import_Data_Action_RemoveTour;
    public static String        Import_Data_Action_RemoveToursWhenClosed;
@@ -1063,6 +1089,7 @@ public class Messages extends NLS {
    public static String        Import_Data_Dialog_ConfirmReimportTemperatureValues_Message;
    public static String        Import_Data_Dialog_ConfirmReimportTimeSlices_Message;
    public static String        Import_Data_Dialog_ConfirmReimportTourMarker_Message;
+   public static String        Import_Data_Dialog_ConfirmReimportTraining_Message;
    public static String        Import_Data_Dialog_DeleteTourFiles_LastChance_Message;
    public static String        Import_Data_Dialog_DeleteTourFiles_Message;
    public static String        Import_Data_Dialog_DeleteTourFiles_Title;
@@ -1183,6 +1210,7 @@ public class Messages extends NLS {
    public static String        Log_Reimport_Only_Swimming;
    public static String        Log_Reimport_Only_Temperature;
    public static String        Log_Reimport_Only_TourMarker;
+   public static String        Log_Reimport_Only_Training;
    public static String        Log_Reimport_PreviousFiles;
    public static String        Log_Reimport_PreviousFiles_End;
    public static String        Log_Reimport_Tour;
@@ -1585,9 +1613,9 @@ public class Messages extends NLS {
    public static String        pref_view_layout_label_sub_sub;
    public static String        pref_view_layout_label_title;
 
-//	public static String		Pref_SignImages_Dialog_ConfirmDelete_Message;
-//	public static String		Pref_SignImages_Dialog_Delete_Title;
-//	public static String		Pref_SignImages_Dialog_NoSelectedSignImage_Message;
+// public static String    Pref_SignImages_Dialog_ConfirmDelete_Message;
+// public static String    Pref_SignImages_Dialog_Delete_Title;
+// public static String    Pref_SignImages_Dialog_NoSelectedSignImage_Message;
 
    public static String Pref_Statistic_Action_SortByData;
    public static String Pref_Statistic_Action_SortByTime;
@@ -1598,12 +1626,18 @@ public class Messages extends NLS {
    public static String Pref_Statistic_Checkbox_Distance;
    public static String Pref_Statistic_Checkbox_Duration;
    public static String Pref_Statistic_Checkbox_NumberOfTours;
+   public static String Pref_Statistic_Checkbox_TrainingEffect_Aerob;
+   public static String Pref_Statistic_Checkbox_TrainingEffect_Anaerob;
+   public static String Pref_Statistic_Checkbox_TrainingPerformance;
+   public static String Pref_Statistic_Checkbox_TrainingPerformance_AvgValue;
+   public static String Pref_Statistic_Checkbox_TrainingPerformance_AvgValue_Tooltip;
    public static String Pref_Statistic_Checkbox_YearSeparator;
 
    public static String Pref_Statistic_Group_ChartType;
    public static String Pref_Statistic_Group_DaySummary;
    public static String Pref_Statistic_Group_MonthSummary;
    public static String Pref_Statistic_Group_TourFrequency;
+   public static String Pref_Statistic_Group_Training;
    public static String Pref_Statistic_Group_WeekSummary;
    public static String Pref_Statistic_Group_YearSummary;
 
@@ -1616,6 +1650,9 @@ public class Messages extends NLS {
 
    public static String Pref_Statistic_Radio_BarAdjacent;
    public static String Pref_Statistic_Radio_BarStacked;
+   public static String Pref_Statistic_Radio_Duration_MovingTime;
+   public static String Pref_Statistic_Radio_Duration_PausedTime;
+   public static String Pref_Statistic_Radio_Duration_RecordingTime;
 
    public static String Pref_Swimming_Label_Info;
 
@@ -1705,19 +1742,23 @@ public class Messages extends NLS {
    public static String PrefPage_ViewTooltip_Label_TourBook;
    public static String PrefPage_ViewTooltip_Label_WeekDay;
 
+   public static String PrefPageTags_1;
+
+   public static String PrefPageTags_2;
+
    public static String PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_down;
    public static String PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_up;
 
-//	public static String		SignImage_View_Action_CreateSignCategory;
-//	public static String		SignImage_View_Action_ImportSignImage;
-//	public static String		SignImage_Viewer_Column_Dimension_Label;
-//	public static String		SignImage_Viewer_Column_Dimension_Tooltip;
-//	public static String		SignImage_Viewer_Column_FilePathName_Label;
-//	public static String		SignImage_Viewer_Column_FilePathName_Tooltip;
-//	public static String		SignImage_Viewer_Column_Image_Header;
-//	public static String		SignImage_Viewer_Column_Image_Label;
-//	public static String		SignImage_Viewer_Column_Image_Tooltip;
-//	public static String		SignImage_Viewer_Column_Name_Label;
+// public static String    SignImage_View_Action_CreateSignCategory;
+// public static String    SignImage_View_Action_ImportSignImage;
+// public static String    SignImage_Viewer_Column_Dimension_Label;
+// public static String    SignImage_Viewer_Column_Dimension_Tooltip;
+// public static String    SignImage_Viewer_Column_FilePathName_Label;
+// public static String    SignImage_Viewer_Column_FilePathName_Tooltip;
+// public static String    SignImage_Viewer_Column_Image_Header;
+// public static String    SignImage_Viewer_Column_Image_Label;
+// public static String    SignImage_Viewer_Column_Image_Tooltip;
+// public static String    SignImage_Viewer_Column_Name_Label;
 
    public static String Search_Manager_CreateFTIndex;
    public static String Search_Manager_Log_DeletingLuceneRootFolder;

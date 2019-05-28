@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,10 @@
  *******************************************************************************/
 package net.tourbook.ui.views.rawData;
 
+import net.tourbook.Messages;
+import net.tourbook.common.util.ITourViewer3;
+import net.tourbook.importdata.RawDataManager;
+
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
@@ -24,241 +28,255 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
-import net.tourbook.Messages;
-import net.tourbook.common.util.ITourViewer3;
-import net.tourbook.importdata.RawDataManager;
-
 /**
  */
 public class ActionReimportSubMenu extends Action implements IMenuCreator {
 
-	private Menu													_menu;
+   private Menu                                     _menu;
 
-	private ActionReimport_EntireTour						_actionReimport_EntireTour;
-	private ActionReimport_OnlyAltitudeValues				_actionReimport_OnlyAltitudeValues;
-	private ActionReimport_OnlyCadenceValues				_actionReimport_OnlyCadenceValues;
-	private ActionReimport_OnlyGearValues					_actionReimport_OnlyGearValues;
-	private ActionReimport_OnlyPowerPulseValues			_actionReimport_OnlyPowerPulseValues;
-	private ActionReimport_OnlyPowerSpeedValues			_actionReimport_OnlyPowerSpeedValues;
-	private ActionReimport_OnlyRunningDynamicsValues	_actionReimport_OnlyRunningDynamicsValues;
-	private ActionReimport_OnlySwimmingValues				_actionReimport_OnlySwimmingValues;
-	private ActionReimport_OnlyTemperatureValues			_actionReimport_OnlyTemperatureValues;
-	private ActionReimport_OnlyTimeSlices					_actionReimport_OnlyTimeSlices;
-	private ActionReimport_OnlyTourMarker					_actionReimport_OnlyTourMarker;
+   private ActionReimport_EntireTour                _actionReimport_EntireTour;
+   private ActionReimport_OnlyTimeSlices            _actionReimport_OnlyTimeSlices;
+   private ActionReimport_OnlyTourMarker            _actionReimport_OnlyTourMarker;
 
-	private ITourViewer3											_tourViewer;
+   private ActionReimport_OnlyAltitudeValues        _actionReimport_OnlyAltitudeValues;
+   private ActionReimport_OnlyCadenceValues         _actionReimport_OnlyCadenceValues;
+   private ActionReimport_OnlyGearValues            _actionReimport_OnlyGearValues;
+   private ActionReimport_OnlyPowerPulseValues      _actionReimport_OnlyPowerPulseValues;
+   private ActionReimport_OnlyPowerSpeedValues      _actionReimport_OnlyPowerSpeedValues;
+   private ActionReimport_OnlyRunningDynamicsValues _actionReimport_OnlyRunningDynamicsValues;
+   private ActionReimport_OnlySwimmingValues        _actionReimport_OnlySwimmingValues;
+   private ActionReimport_OnlyTemperatureValues     _actionReimport_OnlyTemperatureValues;
+   private ActionReimport_OnlyTrainingValues        _actionReimport_OnlyTrainingValues;
 
-	private class ActionReimport_EntireTour extends Action {
+   private ITourViewer3                             _tourViewer;
 
-		public ActionReimport_EntireTour() {
-			setText(Messages.Import_Data_Action_Reimport_EntireTour);
-		}
+   private class ActionReimport_EntireTour extends Action {
 
-		@Override
-		public void run() {
-			RawDataManager.getInstance().actionReimportTour(RawDataManager.ReImport.Tour, _tourViewer);
-		}
+      public ActionReimport_EntireTour() {
+         setText(Messages.Import_Data_Action_Reimport_EntireTour);
+      }
 
-	}
+      @Override
+      public void run() {
+         RawDataManager.getInstance().actionReimportTour(RawDataManager.ReImport.Tour, _tourViewer);
+      }
 
-	private class ActionReimport_OnlyAltitudeValues extends Action {
+   }
 
-		public ActionReimport_OnlyAltitudeValues() {
-			setText(Messages.Import_Data_Action_Reimport_OnlyAltitudeValues);
-		}
+   private class ActionReimport_OnlyAltitudeValues extends Action {
 
-		@Override
-		public void run() {
-			RawDataManager.getInstance().actionReimportTour(RawDataManager.ReImport.OnlyAltitudeValues, _tourViewer);
-		}
-	}
+      public ActionReimport_OnlyAltitudeValues() {
+         setText(Messages.Import_Data_Action_Reimport_OnlyAltitudeValues);
+      }
 
-	private class ActionReimport_OnlyCadenceValues extends Action {
+      @Override
+      public void run() {
+         RawDataManager.getInstance().actionReimportTour(RawDataManager.ReImport.OnlyAltitudeValues, _tourViewer);
+      }
+   }
 
-		public ActionReimport_OnlyCadenceValues() {
-			setText(Messages.Import_Data_Action_Reimport_OnlyCadenceValues);
-		}
+   private class ActionReimport_OnlyCadenceValues extends Action {
 
-		@Override
-		public void run() {
-			RawDataManager.getInstance().actionReimportTour(RawDataManager.ReImport.OnlyCadenceValues, _tourViewer);
-		}
-	}
+      public ActionReimport_OnlyCadenceValues() {
+         setText(Messages.Import_Data_Action_Reimport_OnlyCadenceValues);
+      }
 
-	private class ActionReimport_OnlyGearValues extends Action {
+      @Override
+      public void run() {
+         RawDataManager.getInstance().actionReimportTour(RawDataManager.ReImport.OnlyCadenceValues, _tourViewer);
+      }
+   }
 
-		public ActionReimport_OnlyGearValues() {
-			setText(Messages.Import_Data_Action_Reimport_OnlyGearValues);
-		}
+   private class ActionReimport_OnlyGearValues extends Action {
 
-		@Override
-		public void run() {
-			RawDataManager.getInstance().actionReimportTour(RawDataManager.ReImport.OnlyGearValues, _tourViewer);
-		}
-	}
+      public ActionReimport_OnlyGearValues() {
+         setText(Messages.Import_Data_Action_Reimport_OnlyGearValues);
+      }
 
-	private class ActionReimport_OnlyPowerPulseValues extends Action {
+      @Override
+      public void run() {
+         RawDataManager.getInstance().actionReimportTour(RawDataManager.ReImport.OnlyGearValues, _tourViewer);
+      }
+   }
 
-		public ActionReimport_OnlyPowerPulseValues() {
-			setText(Messages.Import_Data_Action_Reimport_OnlyPowerAndPulseValues);
-		}
+   private class ActionReimport_OnlyPowerPulseValues extends Action {
 
-		@Override
-		public void run() {
-			RawDataManager.getInstance()
-					.actionReimportTour(
-							RawDataManager.ReImport.OnlyPowerAndPulseValues,
-							_tourViewer);
-		}
-	}
+      public ActionReimport_OnlyPowerPulseValues() {
+         setText(Messages.Import_Data_Action_Reimport_OnlyPowerAndPulseValues);
+      }
 
-	private class ActionReimport_OnlyPowerSpeedValues extends Action {
+      @Override
+      public void run() {
+         RawDataManager.getInstance()
+               .actionReimportTour(
+                     RawDataManager.ReImport.OnlyPowerAndPulseValues,
+                     _tourViewer);
+      }
+   }
 
-		public ActionReimport_OnlyPowerSpeedValues() {
-			setText(Messages.Import_Data_Action_Reimport_OnlyPowerAndSpeedValues);
-		}
+   private class ActionReimport_OnlyPowerSpeedValues extends Action {
 
-		@Override
-		public void run() {
-			RawDataManager.getInstance()
-					.actionReimportTour(
-							RawDataManager.ReImport.OnlyPowerAndSpeedValues,
-							_tourViewer);
-		}
-	}
+      public ActionReimport_OnlyPowerSpeedValues() {
+         setText(Messages.Import_Data_Action_Reimport_OnlyPowerAndSpeedValues);
+      }
 
-	private class ActionReimport_OnlyRunningDynamicsValues extends Action {
+      @Override
+      public void run() {
+         RawDataManager.getInstance()
+               .actionReimportTour(
+                     RawDataManager.ReImport.OnlyPowerAndSpeedValues,
+                     _tourViewer);
+      }
+   }
 
-		public ActionReimport_OnlyRunningDynamicsValues() {
-			setText(Messages.Import_Data_Action_Reimport_OnlyRunningDynamicsValues);
-		}
+   private class ActionReimport_OnlyRunningDynamicsValues extends Action {
 
-		@Override
-		public void run() {
-			RawDataManager.getInstance().actionReimportTour(RawDataManager.ReImport.OnlyRunningDynamics, _tourViewer);
-		}
-	}
+      public ActionReimport_OnlyRunningDynamicsValues() {
+         setText(Messages.Import_Data_Action_Reimport_OnlyRunningDynamicsValues);
+      }
 
-	private class ActionReimport_OnlySwimmingValues extends Action {
+      @Override
+      public void run() {
+         RawDataManager.getInstance().actionReimportTour(RawDataManager.ReImport.OnlyRunningDynamics, _tourViewer);
+      }
+   }
 
-		public ActionReimport_OnlySwimmingValues() {
-			setText(Messages.Import_Data_Action_Reimport_OnlySwimmingValues);
-		}
+   private class ActionReimport_OnlySwimmingValues extends Action {
 
-		@Override
-		public void run() {
-			RawDataManager.getInstance().actionReimportTour(RawDataManager.ReImport.OnlySwimming, _tourViewer);
-		}
-	}
+      public ActionReimport_OnlySwimmingValues() {
+         setText(Messages.Import_Data_Action_Reimport_OnlySwimmingValues);
+      }
 
-	private class ActionReimport_OnlyTemperatureValues extends Action {
+      @Override
+      public void run() {
+         RawDataManager.getInstance().actionReimportTour(RawDataManager.ReImport.OnlySwimming, _tourViewer);
+      }
+   }
 
-		public ActionReimport_OnlyTemperatureValues() {
-			setText(Messages.Import_Data_Action_Reimport_OnlyTemperatureValues);
-		}
+   private class ActionReimport_OnlyTemperatureValues extends Action {
 
-		@Override
-		public void run() {
-			RawDataManager.getInstance().actionReimportTour(RawDataManager.ReImport.OnlyTemperatureValues, _tourViewer);
-		}
-	}
+      public ActionReimport_OnlyTemperatureValues() {
+         setText(Messages.Import_Data_Action_Reimport_OnlyTemperatureValues);
+      }
 
-	private class ActionReimport_OnlyTimeSlices extends Action {
+      @Override
+      public void run() {
+         RawDataManager.getInstance().actionReimportTour(RawDataManager.ReImport.OnlyTemperatureValues, _tourViewer);
+      }
+   }
 
-		public ActionReimport_OnlyTimeSlices() {
-			setText(Messages.Import_Data_Action_Reimport_OnlyTimeSlices);
-		}
+   private class ActionReimport_OnlyTimeSlices extends Action {
 
-		@Override
-		public void run() {
-			RawDataManager.getInstance().actionReimportTour(RawDataManager.ReImport.AllTimeSlices, _tourViewer);
-		}
-	}
+      public ActionReimport_OnlyTimeSlices() {
+         setText(Messages.Import_Data_Action_Reimport_OnlyTimeSlices);
+      }
 
-	private class ActionReimport_OnlyTourMarker extends Action {
+      @Override
+      public void run() {
+         RawDataManager.getInstance().actionReimportTour(RawDataManager.ReImport.AllTimeSlices, _tourViewer);
+      }
+   }
 
-		public ActionReimport_OnlyTourMarker() {
-			setText(Messages.Import_Data_Action_Reimport_OnlyTourMarker);
-		}
+   private class ActionReimport_OnlyTourMarker extends Action {
 
-		@Override
-		public void run() {
-			RawDataManager.getInstance().actionReimportTour(RawDataManager.ReImport.OnlyTourMarker, _tourViewer);
-		}
-	}
+      public ActionReimport_OnlyTourMarker() {
+         setText(Messages.Import_Data_Action_Reimport_OnlyTourMarker);
+      }
 
-	public ActionReimportSubMenu(final ITourViewer3 tourViewer) {
+      @Override
+      public void run() {
+         RawDataManager.getInstance().actionReimportTour(RawDataManager.ReImport.OnlyTourMarker, _tourViewer);
+      }
+   }
 
-		super(Messages.Import_Data_Action_Reimport_Tour, AS_DROP_DOWN_MENU);
+   private class ActionReimport_OnlyTrainingValues extends Action {
 
-		setMenuCreator(this);
+      public ActionReimport_OnlyTrainingValues() {
+         setText(Messages.Import_Data_Action_Reimport_OnlyTrainingValues);
+      }
 
-		_tourViewer = tourViewer;
+      @Override
+      public void run() {
+         RawDataManager.getInstance().actionReimportTour(RawDataManager.ReImport.OnlyTrainingValues, _tourViewer);
+      }
+   }
 
-		_actionReimport_EntireTour = new ActionReimport_EntireTour();
-		_actionReimport_OnlyAltitudeValues = new ActionReimport_OnlyAltitudeValues();
-		_actionReimport_OnlyCadenceValues = new ActionReimport_OnlyCadenceValues();
-		_actionReimport_OnlyGearValues = new ActionReimport_OnlyGearValues();
-		_actionReimport_OnlyPowerPulseValues = new ActionReimport_OnlyPowerPulseValues();
-		_actionReimport_OnlyPowerSpeedValues = new ActionReimport_OnlyPowerSpeedValues();
-		_actionReimport_OnlyRunningDynamicsValues = new ActionReimport_OnlyRunningDynamicsValues();
-		_actionReimport_OnlySwimmingValues = new ActionReimport_OnlySwimmingValues();
-		_actionReimport_OnlyTemperatureValues = new ActionReimport_OnlyTemperatureValues();
-		_actionReimport_OnlyTimeSlices = new ActionReimport_OnlyTimeSlices();
-		_actionReimport_OnlyTourMarker = new ActionReimport_OnlyTourMarker();
-	}
+   public ActionReimportSubMenu(final ITourViewer3 tourViewer) {
 
-	@Override
-	public void dispose() {
+      super(Messages.Import_Data_Action_Reimport_Tour, AS_DROP_DOWN_MENU);
 
-		if (_menu != null) {
-			_menu.dispose();
-			_menu = null;
-		}
-	}
+      setMenuCreator(this);
 
-	private void fillMenu(final Menu menu) {
+      _tourViewer = tourViewer;
 
-		new ActionContributionItem(_actionReimport_OnlyAltitudeValues).fill(menu, -1);
-		new ActionContributionItem(_actionReimport_OnlyTemperatureValues).fill(menu, -1);
-		new ActionContributionItem(_actionReimport_OnlyCadenceValues).fill(menu, -1);
-		new ActionContributionItem(_actionReimport_OnlyGearValues).fill(menu, -1);
-		new ActionContributionItem(_actionReimport_OnlyPowerSpeedValues).fill(menu, -1);
-		new ActionContributionItem(_actionReimport_OnlyPowerPulseValues).fill(menu, -1);
-		new ActionContributionItem(_actionReimport_OnlyRunningDynamicsValues).fill(menu, -1);
-		new ActionContributionItem(_actionReimport_OnlySwimmingValues).fill(menu, -1);
-		new ActionContributionItem(_actionReimport_OnlyTourMarker).fill(menu, -1);
-		new ActionContributionItem(_actionReimport_OnlyTimeSlices).fill(menu, -1);
-		new ActionContributionItem(_actionReimport_EntireTour).fill(menu, -1);
-	}
+      _actionReimport_EntireTour = new ActionReimport_EntireTour();
+      _actionReimport_OnlyTimeSlices = new ActionReimport_OnlyTimeSlices();
+      _actionReimport_OnlyTourMarker = new ActionReimport_OnlyTourMarker();
 
-	@Override
-	public Menu getMenu(final Control parent) {
-		return null;
-	}
+      _actionReimport_OnlyAltitudeValues = new ActionReimport_OnlyAltitudeValues();
+      _actionReimport_OnlyCadenceValues = new ActionReimport_OnlyCadenceValues();
+      _actionReimport_OnlyGearValues = new ActionReimport_OnlyGearValues();
+      _actionReimport_OnlyPowerPulseValues = new ActionReimport_OnlyPowerPulseValues();
+      _actionReimport_OnlyPowerSpeedValues = new ActionReimport_OnlyPowerSpeedValues();
+      _actionReimport_OnlyRunningDynamicsValues = new ActionReimport_OnlyRunningDynamicsValues();
+      _actionReimport_OnlySwimmingValues = new ActionReimport_OnlySwimmingValues();
+      _actionReimport_OnlyTemperatureValues = new ActionReimport_OnlyTemperatureValues();
+      _actionReimport_OnlyTrainingValues = new ActionReimport_OnlyTrainingValues();
+   }
 
-	@Override
-	public Menu getMenu(final Menu parent) {
+   @Override
+   public void dispose() {
 
-		dispose();
+      if (_menu != null) {
+         _menu.dispose();
+         _menu = null;
+      }
+   }
 
-		_menu = new Menu(parent);
+   private void fillMenu(final Menu menu) {
 
-		// Add listener to repopulate the menu each time
-		_menu.addMenuListener(new MenuAdapter() {
-			@Override
-			public void menuShown(final MenuEvent e) {
+      new ActionContributionItem(_actionReimport_OnlyAltitudeValues).fill(menu, -1);
+      new ActionContributionItem(_actionReimport_OnlyTemperatureValues).fill(menu, -1);
+      new ActionContributionItem(_actionReimport_OnlyCadenceValues).fill(menu, -1);
+      new ActionContributionItem(_actionReimport_OnlyGearValues).fill(menu, -1);
+      new ActionContributionItem(_actionReimport_OnlyPowerSpeedValues).fill(menu, -1);
+      new ActionContributionItem(_actionReimport_OnlyPowerPulseValues).fill(menu, -1);
+      new ActionContributionItem(_actionReimport_OnlyRunningDynamicsValues).fill(menu, -1);
+      new ActionContributionItem(_actionReimport_OnlySwimmingValues).fill(menu, -1);
+      new ActionContributionItem(_actionReimport_OnlyTrainingValues).fill(menu, -1);
 
-				// dispose old menu items
-				for (final MenuItem menuItem : ((Menu) e.widget).getItems()) {
-					menuItem.dispose();
-				}
+      new ActionContributionItem(_actionReimport_OnlyTourMarker).fill(menu, -1);
+      new ActionContributionItem(_actionReimport_OnlyTimeSlices).fill(menu, -1);
+      new ActionContributionItem(_actionReimport_EntireTour).fill(menu, -1);
+   }
 
-				fillMenu(_menu);
-			}
-		});
+   @Override
+   public Menu getMenu(final Control parent) {
+      return null;
+   }
 
-		return _menu;
-	}
+   @Override
+   public Menu getMenu(final Menu parent) {
+
+      dispose();
+
+      _menu = new Menu(parent);
+
+      // Add listener to repopulate the menu each time
+      _menu.addMenuListener(new MenuAdapter() {
+         @Override
+         public void menuShown(final MenuEvent e) {
+
+            // dispose old menu items
+            for (final MenuItem menuItem : ((Menu) e.widget).getItems()) {
+               menuItem.dispose();
+            }
+
+            fillMenu(_menu);
+         }
+      });
+
+      return _menu;
+   }
 
 }
