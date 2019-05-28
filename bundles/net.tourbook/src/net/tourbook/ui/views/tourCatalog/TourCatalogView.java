@@ -26,6 +26,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
+import net.tourbook.common.util.IContextMenuProvider;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.ITreeViewer;
 import net.tourbook.common.util.PostSelectionProvider;
@@ -145,7 +146,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
    /**
     * flag if actions are added to the toolbar
     */
-   private boolean                   _isToolbarCreated     = false;
+   private boolean                   _isToolbarCreated          = false;
 
    private ColumnManager             _columnManager;
 
@@ -153,17 +154,12 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
    private boolean                   _isToolTipInTitle;
    private boolean                   _isToolTipInTags;
 
-   private TagMenuManager            _tagMenuMgr;
    private TreeViewerTourInfoToolTip _tourInfoToolTip;
-   private TourDoubleClickState      _tourDoubleClickState = new TourDoubleClickState();
+   private TourDoubleClickState      _tourDoubleClickState      = new TourDoubleClickState();
 
-   private PixelConverter            _pc;
-
-   /*
-    * UI controls
-    */
-   private Composite                 _viewerContainer;
-   private TreeViewer                _tourViewer;
+   private TagMenuManager            _tagMenuManager;
+   private MenuManager               _viewerMenuManager;
+   private IContextMenuProvider      _viewerContextMenuProvider = new TreeContextMenuProvider();
 
    private ActionRemoveComparedTours _actionRemoveComparedTours;
    private ActionRenameRefTour       _actionRenameRefTour;
@@ -179,6 +175,16 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
    private ActionTourCompareWizard   _actionTourCompareWizard;
    private ActionOpenTour            _actionOpenTour;
+
+   private PixelConverter            _pc;
+
+   /*
+    * UI controls
+    */
+   private Composite  _viewerContainer;
+   private TreeViewer _tourViewer;
+
+   private Menu       _treeContextMenu;
 
    class TourContentProvider implements ITreeContentProvider {
 
@@ -207,6 +213,33 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
       @Override
       public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
+   }
+
+   public class TreeContextMenuProvider implements IContextMenuProvider {
+
+      @Override
+      public void disposeContextMenu() {
+
+         if (_treeContextMenu != null) {
+            _treeContextMenu.dispose();
+         }
+      }
+
+      @Override
+      public Menu getContextMenu() {
+         return _treeContextMenu;
+      }
+
+      @Override
+      public Menu recreateContextMenu() {
+
+         disposeContextMenu();
+
+         _treeContextMenu = createUI_22_CreateViewerContextMenu();
+
+         return _treeContextMenu;
+      }
+
    }
 
    public TourCatalogView() {}
@@ -487,13 +520,28 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
       _actionOpenTour = new ActionOpenTour(this);
 
       _actionSetTourType = new ActionSetTourTypeMenu(this);
-      _tagMenuMgr = new TagMenuManager(this, true);
+   }
+
+   private void createMenuManager() {
+
+      _tagMenuManager = new TagMenuManager(this, true);
+
+      _viewerMenuManager = new MenuManager("#PopupMenu"); //$NON-NLS-1$
+      _viewerMenuManager.setRemoveAllWhenShown(true);
+      _viewerMenuManager.addMenuListener(new IMenuListener() {
+         @Override
+         public void menuAboutToShow(final IMenuManager manager) {
+
+            fillContextMenu(manager);
+         }
+      });
    }
 
    @Override
    public void createPartControl(final Composite parent) {
 
       _pc = new PixelConverter(parent);
+      createMenuManager();
 
       // define all columns for the viewer
       _columnManager = new ColumnManager(this, _state);
@@ -609,31 +657,32 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
     */
    private void createUI_20_ContextMenu() {
 
-      final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
-      menuMgr.setRemoveAllWhenShown(true);
-      menuMgr.addMenuListener(new IMenuListener() {
-         @Override
-         public void menuAboutToShow(final IMenuManager manager) {
-            fillContextMenu(manager);
-         }
-      });
+      _treeContextMenu = createUI_22_CreateViewerContextMenu();
 
       final Tree tree = (Tree) _tourViewer.getControl();
-      final Menu treeContextMenu = menuMgr.createContextMenu(tree);
+
+      _columnManager.createHeaderContextMenu(tree, _viewerContextMenuProvider);
+   }
+
+   private Menu createUI_22_CreateViewerContextMenu() {
+
+      final Tree tree = (Tree) _tourViewer.getControl();
+
+      final Menu treeContextMenu = _viewerMenuManager.createContextMenu(tree);
 
       treeContextMenu.addMenuListener(new MenuAdapter() {
          @Override
          public void menuHidden(final MenuEvent e) {
-            _tagMenuMgr.onHideMenu();
+            _tagMenuManager.onHideMenu();
          }
 
          @Override
          public void menuShown(final MenuEvent menuEvent) {
-            _tagMenuMgr.onShowMenu(menuEvent, tree, Display.getCurrent().getCursorLocation(), _tourInfoToolTip);
+            _tagMenuManager.onShowMenu(menuEvent, tree, Display.getCurrent().getCursorLocation(), _tourInfoToolTip);
          }
       });
 
-      _columnManager.createHeaderContextMenu(tree, treeContextMenu);
+      return treeContextMenu;
    }
 
    private void defineAllColumns(final Composite parent) {
@@ -957,7 +1006,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
       _actionCollapseOthers.setEnabled(selectedItems == 1 && firstElementHasChildren);
 
-      _tagMenuMgr.enableTagActions(isTourSelected, isOneTour, firstTourItem == null ? null : firstTourItem.tagIds);
+      _tagMenuManager.enableTagActions(isTourSelected, isOneTour, firstTourItem == null ? null : firstTourItem.tagIds);
 
       TourTypeMenuManager.enableRecentTourTypeActions(
             isTourSelected,
@@ -982,7 +1031,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
       menuMgr.add(_actionOpenTour);
 
       // tour tag actions
-      _tagMenuMgr.fillTagMenu(menuMgr);
+      _tagMenuManager.fillTagMenu(menuMgr);
 
       // tour type actions
       menuMgr.add(new Separator());

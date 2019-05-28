@@ -1,5 +1,12 @@
 Version 19.5.0                                            ?. May 2019
 
+Update Docu - START
+
+* Drag&Drop 2D map provider do NOT work when app is running as administrator !!!
+* Invalid 2D map provider files
+
+
+Update Docu - END
 
 New   
 ===
@@ -23,4 +30,8 @@ Changes
 Bugfix   
 ======
 
-* 
+* Fixed IllegalArgumentException: Widget has the wrong parent
+  This occured when app is started and a view is minimized, then the context menu is already created but has the wrong parent when the view is displayed later on.
+  It needed a while until the cause of this issue was discovered. This has propably occured after switching to Eclipse 4.
+  Nobody compained until now maybe it was not used to minimize a view.
+  

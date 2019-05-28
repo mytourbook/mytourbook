@@ -21,9 +21,9 @@ import org.eclipse.jface.action.Action;
 
 public class ActionCancelRefreshOfflineInfo extends Action {
 
-	private PrefPageMapProviders	fPrefPageMapFactories;
+	private PrefPage_Map2_Providers	fPrefPageMapFactories;
 
-	public ActionCancelRefreshOfflineInfo(final PrefPageMapProviders prefPageMapFactories) {
+	public ActionCancelRefreshOfflineInfo(final PrefPage_Map2_Providers prefPageMapFactories) {
 
 		setToolTipText(Messages.Pref_Map_Button_CancelTileInfo_Tooltip);
 
