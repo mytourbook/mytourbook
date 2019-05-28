@@ -15,12 +15,17 @@ New
     - New column to show tag/category notes
 
 
-* Tour Book
+* Tour Book 
 
   - Training Effects + Training Performance columns
   - Reimport training values
     - Currently used for Suunto 3 files
+
   
+* Statistics
+
+  - Training effects + training performance graphs in training statistics
+
  
 Improvements   
 ============
@@ -50,12 +55,11 @@ Improvements
       - Leg Spring Stiffness
       - Form Power
      
+     
+* Statistics
 
- 
-Changes  
-=======
-
-* 
+  - Show recording/moving/break time separately in the day/week/month/year/training statistics
+  
 
  
 Bugfix   
