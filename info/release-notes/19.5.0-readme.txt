@@ -33,6 +33,19 @@ New
 
   - Training effects + training performance graphs in training statistics
 
+* 2D Map (Frederic)
+
+  - Added the ability to create a marker from a location by right clicking on
+    a tour's position on the map
+
+* Easy Import (Frederic)
+
+  - When encountering invalid device files, those files are marked to be ignored so
+    that they are not considered as files to be imported in the future. An
+    option was added for the user to enable/disable this feature in the
+    preferences menu.
+
+
  
 Improvements   
 ============
@@ -61,6 +74,13 @@ Improvements
       
       - Leg Spring Stiffness
       - Form Power
+
+   - Suunto 9 Import Improvements (Frederic)
+
+      - We set the device name as "Suunto Spartan/9"
+      - Improvement for cases where a Suunto 9 file is invalid and we don't want it to be read as a fit file
+      - We save the tour import file path and file name for each imported Suunto 9 files
+      - We detect and save if a heart rate sensor or a power sensor are present
      
      
 * Statistics
@@ -81,9 +101,17 @@ Bugfix
   This occured when app is started and a view is minimized, then the context menu is already created but has the wrong parent when the view is displayed later on.
   It needed a while until the cause of this issue was discovered. This has propably occured after switching to Eclipse 4.
   Nobody compained until now maybe it was not used to minimize a view.
+
+* File Re-Import (Frederic)
+  - Fixed a bug (when using Linux) where the reimport filedialog doesn't show
   
 
 System
 ======
 
 * FITSDK 20.90
+
+
+Languages (Frederic)
+========
+* Completed, improved and fixed french translation
