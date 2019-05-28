@@ -7700,12 +7700,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return serie;
    }
 
-   @XmlElement
-   public String getTest() {
-      return "jokl"; //$NON-NLS-1$
-
-   }
-
    /**
     * @return Returns time data serie in floating points which is used for drawing charts.
     */

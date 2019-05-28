@@ -119,6 +119,8 @@ public class RawDataManager {
    //
    private static boolean           _importState_IsAutoOpenImportLog = RawDataView.STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW_DEFAULT;
    //
+   private static boolean           _importState_IsIgnoreInvalidFile = RawDataView.STATE_IS_IGNORE_INVALID_FILE_DEFAULT;
+   //
    static {
 
       ALL_IMPORT_TOUR_TYPE_CONFIG = new ComboEnumEntry<?>[] {
@@ -222,8 +224,7 @@ public class RawDataManager {
       OnlyTourMarker, //
    }
 
-   private RawDataManager() {
-   }
+   private RawDataManager() {}
 
    public static boolean doesInvalidFileExist(final String fileName) {
       final ArrayList<String> invalidFilesList = readInvalidFilesToIgnoreFile();
@@ -264,6 +265,10 @@ public class RawDataManager {
 
    public static boolean isAutoOpenImportLog() {
       return _importState_IsAutoOpenImportLog;
+   }
+
+   public static boolean isIgnoreInvalidFile() {
+      return _importState_IsIgnoreInvalidFile;
    }
 
    private static ArrayList<String> readInvalidFilesToIgnoreFile() {
@@ -2019,6 +2024,10 @@ public class RawDataManager {
 
    public void setState_CreateTourIdWithTime(final boolean isActionChecked) {
       _importState_IsCreateTourIdWithTime = isActionChecked;
+   }
+
+   public void setState_IsIgnoreInvalidFile(final boolean isIgnoreInvalidFile) {
+      _importState_IsIgnoreInvalidFile = isIgnoreInvalidFile;
    }
 
    public void setState_IsOpenImportLogView(final boolean isOpenImportLog) {

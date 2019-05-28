@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,6 +24,35 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
+import net.tourbook.common.util.ColumnDefinition;
+import net.tourbook.common.util.ColumnManager;
+import net.tourbook.common.util.IContextMenuProvider;
+import net.tourbook.common.util.ITourViewer;
+import net.tourbook.common.util.PostSelectionProvider;
+import net.tourbook.common.util.SQL;
+import net.tourbook.common.util.TableColumnDefinition;
+import net.tourbook.common.util.Util;
+import net.tourbook.data.TourData;
+import net.tourbook.data.TourMarker;
+import net.tourbook.database.TourDatabase;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.ActionOpenMarkerDialog;
+import net.tourbook.tour.ITourEventListener;
+import net.tourbook.tour.SelectionTourIds;
+import net.tourbook.tour.SelectionTourMarker;
+import net.tourbook.tour.TourEvent;
+import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
+import net.tourbook.ui.ITourProvider;
+import net.tourbook.ui.Messages;
+import net.tourbook.ui.TableColumnFactory;
+import net.tourbook.ui.action.ActionEditQuick;
+import net.tourbook.ui.action.ActionEditTour;
+import net.tourbook.ui.action.ActionModifyColumns;
+import net.tourbook.ui.action.ActionOpenTour;
 
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
@@ -71,1799 +100,1817 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.UI;
-import net.tourbook.common.util.ColumnDefinition;
-import net.tourbook.common.util.ColumnManager;
-import net.tourbook.common.util.ITourViewer;
-import net.tourbook.common.util.PostSelectionProvider;
-import net.tourbook.common.util.SQL;
-import net.tourbook.common.util.TableColumnDefinition;
-import net.tourbook.common.util.Util;
-import net.tourbook.data.TourData;
-import net.tourbook.data.TourMarker;
-import net.tourbook.database.TourDatabase;
-import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tour.ActionOpenMarkerDialog;
-import net.tourbook.tour.ITourEventListener;
-import net.tourbook.tour.SelectionTourIds;
-import net.tourbook.tour.SelectionTourMarker;
-import net.tourbook.tour.TourEvent;
-import net.tourbook.tour.TourEventId;
-import net.tourbook.tour.TourManager;
-import net.tourbook.ui.ITourProvider;
-import net.tourbook.ui.Messages;
-import net.tourbook.ui.TableColumnFactory;
-import net.tourbook.ui.action.ActionEditQuick;
-import net.tourbook.ui.action.ActionEditTour;
-import net.tourbook.ui.action.ActionModifyColumns;
-import net.tourbook.ui.action.ActionOpenTour;
-
 /**
  * This view displays all available {@link TourMarker}.
  */
 public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourViewer {
 
-	public static final String				ID												= "net.tourbook.ui.views.TourMarkerAllView";		//$NON-NLS-1$
-	//
-	private static final String			COLUMN_ALTITUDE							= "Altitude";												//$NON-NLS-1$
-	private static final String			COLUMN_DATE									= "Date";													//$NON-NLS-1$
-	private static final String			COLUMN_DESCRIPTION						= "Description";											//$NON-NLS-1$
-	private static final String			COLUMN_LATITUDE							= "Latitude";												//$NON-NLS-1$
-	private static final String			COLUMN_LONGITUDE							= "Longitude";												//$NON-NLS-1$
-	private static final String			COLUMN_MARKER_ID							= "MarkerId";												//$NON-NLS-1$
-	private static final String			COLUMN_NAME									= "Name";													//$NON-NLS-1$
-	private static final String			COLUMN_TOUR_ID								= "TourId";													//$NON-NLS-1$
-	private static final String			COLUMN_TIME									= "Time";													//$NON-NLS-1$
-	private static final String			COLUMN_URL_ADDRESS						= "UrlAddress";											//$NON-NLS-1$
-	private static final String			COLUMN_URL_LABEL							= "UrlLabel";												//$NON-NLS-1$
-	//
-	static final String						STATE_GEO_FILTER_AREA					= "STATE_GEO_FILTER_AREA";								//$NON-NLS-1$
-	private static final String			STATE_GPS_FILTER							= "STATE_GPS_FILTER";									//$NON-NLS-1$
-	static final String						STATE_IS_LAT_LON_DIGITS_ENABLED		= "STATE_IS_LAT_LON_DIGITS_ENABLED";				//$NON-NLS-1$
-	static final String						STATE_LAT_LON_DIGITS						= "STATE_LAT_LON_DIGITS";								//$NON-NLS-1$
-	private static final String			STATE_SELECTED_MARKER_ITEM				= "STATE_SELECTED_MARKER_ITEM";						//$NON-NLS-1$
-	private static final String			STATE_SORT_COLUMN_DIRECTION			= "STATE_SORT_COLUMN_DIRECTION";						//$NON-NLS-1$
-	private static final String			STATE_SORT_COLUMN_ID						= "STATE_SORT_COLUMN_ID";								//$NON-NLS-1$
-
-	static final double						DEFAULT_GEO_FILTER_AREA					= 0.05;
-	static final boolean						DEFAULT_IS_LAT_LON_DIGITS_ENABLED	= true;
-	static final int							DEFAULT_LAT_LON_DIGITS					= 5;
-	//
-	private static int						GPS_MARKER_FILTER_IS_DISABLED			= 0;
-	private static int						GPS_MARKER_FILTER_WITH_GPS				= 1;
-	private static int						GPS_MARKER_FILTER_WITHOUT_GPS			= 2;
-	//
-	private final IPreferenceStore		_prefStore									= TourbookPlugin.getPrefStore();
-	private final IDialogSettings			_state										= TourbookPlugin.getState(ID);
-	//
-	private PostSelectionProvider			_postSelectionProvider;
-	//
-	private IPartListener2					_partListener;
-	private IPropertyChangeListener		_prefChangeListener;
-	private ITourEventListener				_tourEventListener;
-	//
-	private ActionEditTour					_actionEditTour;
-	private ActionModifyColumns			_actionModifyColumns;
-	private ActionOpenMarkerDialog		_actionOpenMarkerDialog;
-	private ActionOpenTour					_actionOpenTour;
-	private ActionEditQuick					_actionQuickEdit;
-	private ActionTourMarkerFilter		_actionTourMarkerFilter;
-	private ActionMarkerFilterWithGPS	_actionTourFilterWithGPS;
-	private ActionMarkerFilterWithNoGPS	_actionTourFilterWithoutGPS;
-	//
-	private CheckboxTableViewer			_markerViewer;
-	private MarkerComparator				_markerComparator							= new MarkerComparator();
-	private ColumnManager					_columnManager;
-	private SelectionAdapter				_columnSortListener;
-
-	private ArrayList<TourMarkerItem>	_allMarkerItems							= new ArrayList<>();
-
-	private int									_gpsMarkerFilter							= GPS_MARKER_FILTER_IS_DISABLED;
-
-	/**
-	 * Number of digits for the lat/lon columns.
-	 */
-	private int									_latLonDigits;
-	private boolean							_isLatLonDigitsEnabled;
-
-	/**
-	 * Is <code>true</code> when markers are filtered with the geo filter.
-	 */
-	private boolean							_isGeoFilterActive;
-	private double								_geoFilterLat;
-	private double								_geoFilterLon;
-	private double								_geoFilterMaxDiff;
-
-	private boolean							_isInUpdate;
-
-	private final DateFormat				_dateFormatter								= DateFormat.getDateInstance(DateFormat.SHORT);
-	private final DateFormat				_timeFormatter								= DateFormat.getTimeInstance(DateFormat.SHORT);
-	//
-	private final NumberFormat				_nf1											= NumberFormat.getNumberInstance();
-	private final NumberFormat				_nf3											= NumberFormat.getNumberInstance();
-	private final NumberFormat				_nfLatLon									= NumberFormat.getNumberInstance();
-	{
-		_nf1.setMinimumFractionDigits(1);
-		_nf1.setMaximumFractionDigits(1);
-		_nf3.setMinimumFractionDigits(3);
-		_nf3.setMaximumFractionDigits(3);
-	}
-
-	/*
-	 * UI controls
-	 */
-	private PixelConverter	_pc;
-	private Composite			_uiParent;
-	private Composite			_viewerContainer;
-	private TourMarkerItem	_markerFilter;
-
-	private class MarkerComparator extends ViewerComparator {
-
-		private static final int	ASCENDING			= 0;
-		private static final int	DESCENDING			= 1;
-
-		private String					__sortColumnId		= COLUMN_TOUR_ID;
-		private int						__sortDirection	= ASCENDING;
-
-		@Override
-		public int compare(final Viewer viewer, final Object e1, final Object e2) {
-
-			final TourMarkerItem m1 = (TourMarkerItem) e1;
-			final TourMarkerItem m2 = (TourMarkerItem) e2;
-
-			boolean _isSortByTime = false;
-			double rc = 0;
-
-			// Determine which column and do the appropriate sort
-			switch (__sortColumnId) {
-			case COLUMN_ALTITUDE:
-				rc = m1.altitude - m2.altitude;
-				break;
+   public static final String          ID                                = "net.tourbook.ui.views.TourMarkerAllView";   //$NON-NLS-1$
+   //
+   private static final String         COLUMN_ALTITUDE                   = "Altitude";                                  //$NON-NLS-1$
+   private static final String         COLUMN_DATE                       = "Date";                                      //$NON-NLS-1$
+   private static final String         COLUMN_DESCRIPTION                = "Description";                               //$NON-NLS-1$
+   private static final String         COLUMN_LATITUDE                   = "Latitude";                                  //$NON-NLS-1$
+   private static final String         COLUMN_LONGITUDE                  = "Longitude";                                 //$NON-NLS-1$
+   private static final String         COLUMN_MARKER_ID                  = "MarkerId";                                  //$NON-NLS-1$
+   private static final String         COLUMN_NAME                       = "Name";                                      //$NON-NLS-1$
+   private static final String         COLUMN_TOUR_ID                    = "TourId";                                    //$NON-NLS-1$
+   private static final String         COLUMN_TIME                       = "Time";                                      //$NON-NLS-1$
+   private static final String         COLUMN_URL_ADDRESS                = "UrlAddress";                                //$NON-NLS-1$
+   private static final String         COLUMN_URL_LABEL                  = "UrlLabel";                                  //$NON-NLS-1$
+   //
+   static final String                 STATE_GEO_FILTER_AREA             = "STATE_GEO_FILTER_AREA";                     //$NON-NLS-1$
+   private static final String         STATE_GPS_FILTER                  = "STATE_GPS_FILTER";                          //$NON-NLS-1$
+   static final String                 STATE_IS_LAT_LON_DIGITS_ENABLED   = "STATE_IS_LAT_LON_DIGITS_ENABLED";           //$NON-NLS-1$
+   static final String                 STATE_LAT_LON_DIGITS              = "STATE_LAT_LON_DIGITS";                      //$NON-NLS-1$
+   private static final String         STATE_SELECTED_MARKER_ITEM        = "STATE_SELECTED_MARKER_ITEM";                //$NON-NLS-1$
+   private static final String         STATE_SORT_COLUMN_DIRECTION       = "STATE_SORT_COLUMN_DIRECTION";               //$NON-NLS-1$
+   private static final String         STATE_SORT_COLUMN_ID              = "STATE_SORT_COLUMN_ID";                      //$NON-NLS-1$
+
+   static final double                 DEFAULT_GEO_FILTER_AREA           = 0.05;
+   static final boolean                DEFAULT_IS_LAT_LON_DIGITS_ENABLED = true;
+   static final int                    DEFAULT_LAT_LON_DIGITS            = 5;
+   //
+   private static int                  GPS_MARKER_FILTER_IS_DISABLED     = 0;
+   private static int                  GPS_MARKER_FILTER_WITH_GPS        = 1;
+   private static int                  GPS_MARKER_FILTER_WITHOUT_GPS     = 2;
+   //
+   private final IPreferenceStore      _prefStore                        = TourbookPlugin.getPrefStore();
+   private final IDialogSettings       _state                            = TourbookPlugin.getState(ID);
+   //
+   private PostSelectionProvider       _postSelectionProvider;
+   //
+   private IPartListener2              _partListener;
+   private IPropertyChangeListener     _prefChangeListener;
+   private ITourEventListener          _tourEventListener;
+   //
+   private MenuManager                 _viewerMenuManager;
+   private IContextMenuProvider        _tableViewerContextMenuProvider   = new TableContextMenuProvider();
+   //
+   private ActionEditTour              _actionEditTour;
+   private ActionModifyColumns         _actionModifyColumns;
+   private ActionOpenMarkerDialog      _actionOpenMarkerDialog;
+   private ActionOpenTour              _actionOpenTour;
+   private ActionEditQuick             _actionQuickEdit;
+   private ActionTourMarkerFilter      _actionTourMarkerFilter;
+   private ActionMarkerFilterWithGPS   _actionTourFilterWithGPS;
+   private ActionMarkerFilterWithNoGPS _actionTourFilterWithoutGPS;
+   //
+   private CheckboxTableViewer         _markerViewer;
+   private MarkerComparator            _markerComparator                 = new MarkerComparator();
+   private ColumnManager               _columnManager;
+   private SelectionAdapter            _columnSortListener;
+
+   private ArrayList<TourMarkerItem>   _allMarkerItems                   = new ArrayList<>();
+
+   private int                         _gpsMarkerFilter                  = GPS_MARKER_FILTER_IS_DISABLED;
+
+   /**
+    * Number of digits for the lat/lon columns.
+    */
+   private int                         _latLonDigits;
+   private boolean                     _isLatLonDigitsEnabled;
+
+   /**
+    * Is <code>true</code> when markers are filtered with the geo filter.
+    */
+   private boolean                     _isGeoFilterActive;
+   private double                      _geoFilterLat;
+   private double                      _geoFilterLon;
+   private double                      _geoFilterMaxDiff;
+
+   private boolean                     _isInUpdate;
+
+   private final DateFormat            _dateFormatter                    = DateFormat.getDateInstance(DateFormat.SHORT);
+   private final DateFormat            _timeFormatter                    = DateFormat.getTimeInstance(DateFormat.SHORT);
+   //
+   private final NumberFormat          _nf1                              = NumberFormat.getNumberInstance();
+   private final NumberFormat          _nf3                              = NumberFormat.getNumberInstance();
+   private final NumberFormat          _nfLatLon                         = NumberFormat.getNumberInstance();
+   {
+      _nf1.setMinimumFractionDigits(1);
+      _nf1.setMaximumFractionDigits(1);
+      _nf3.setMinimumFractionDigits(3);
+      _nf3.setMaximumFractionDigits(3);
+   }
+
+   /*
+    * UI controls
+    */
+   private PixelConverter _pc;
+   private Composite      _uiParent;
+   private Composite      _viewerContainer;
+   private TourMarkerItem _markerFilter;
+
+   private Menu           _tableContextMenu;
+
+   private class MarkerComparator extends ViewerComparator {
+
+      private static final int ASCENDING       = 0;
+      private static final int DESCENDING      = 1;
 
-			case COLUMN_DESCRIPTION:
-				rc = m1.description.compareTo(m2.description);
-				break;
+      private String           __sortColumnId  = COLUMN_TOUR_ID;
+      private int              __sortDirection = ASCENDING;
+
+      @Override
+      public int compare(final Viewer viewer, final Object e1, final Object e2) {
+
+         final TourMarkerItem m1 = (TourMarkerItem) e1;
+         final TourMarkerItem m2 = (TourMarkerItem) e2;
 
-			case COLUMN_LATITUDE:
-				rc = m1.latitude - m2.latitude;
-				if (rc == 0) {
-					rc = m1.longitude - m2.longitude;
-				}
-				_isSortByTime = true;
-				break;
+         boolean _isSortByTime = false;
+         double rc = 0;
 
-			case COLUMN_LONGITUDE:
-				rc = m1.longitude - m2.longitude;
-				if (rc == 0) {
-					rc = m1.latitude - m2.latitude;
-				}
-				_isSortByTime = true;
-				break;
+         // Determine which column and do the appropriate sort
+         switch (__sortColumnId) {
+         case COLUMN_ALTITUDE:
+            rc = m1.altitude - m2.altitude;
+            break;
 
-			case COLUMN_MARKER_ID:
-				rc = m1.markerId - m2.markerId;
-				break;
+         case COLUMN_DESCRIPTION:
+            rc = m1.description.compareTo(m2.description);
+            break;
 
-			case COLUMN_TOUR_ID:
-				rc = m1.tourId - m2.tourId;
-				break;
+         case COLUMN_LATITUDE:
+            rc = m1.latitude - m2.latitude;
+            if (rc == 0) {
+               rc = m1.longitude - m2.longitude;
+            }
+            _isSortByTime = true;
+            break;
 
-			case COLUMN_DATE:
-			case COLUMN_TIME:
-				rc = m1.time - m2.time;
-				break;
+         case COLUMN_LONGITUDE:
+            rc = m1.longitude - m2.longitude;
+            if (rc == 0) {
+               rc = m1.latitude - m2.latitude;
+            }
+            _isSortByTime = true;
+            break;
 
-			case COLUMN_URL_ADDRESS:
-				rc = m1.urlAddress.compareTo(m2.urlAddress);
-				break;
+         case COLUMN_MARKER_ID:
+            rc = m1.markerId - m2.markerId;
+            break;
 
-			case COLUMN_URL_LABEL:
-				rc = m1.urlLabel.compareTo(m2.urlLabel);
-				break;
+         case COLUMN_TOUR_ID:
+            rc = m1.tourId - m2.tourId;
+            break;
 
-			case COLUMN_NAME:
-			default:
-				rc = m1.label.compareTo(m2.label);
-				_isSortByTime = true;
-			}
+         case COLUMN_DATE:
+         case COLUMN_TIME:
+            rc = m1.time - m2.time;
+            break;
 
-			if (rc == 0 && _isSortByTime) {
-				rc = m1.time - m2.time;
-			}
+         case COLUMN_URL_ADDRESS:
+            rc = m1.urlAddress.compareTo(m2.urlAddress);
+            break;
 
-			// If descending order, flip the direction
-			if (__sortDirection == DESCENDING) {
-				rc = -rc;
-			}
+         case COLUMN_URL_LABEL:
+            rc = m1.urlLabel.compareTo(m2.urlLabel);
+            break;
 
-			/*
-			 * MUST return 1 or -1 otherwise long values are not sorted correctly.
-			 */
-			return rc > 0 //
-					? 1
-					: rc < 0 //
-							? -1
-							: 0;
-		}
+         case COLUMN_NAME:
+         default:
+            rc = m1.label.compareTo(m2.label);
+            _isSortByTime = true;
+         }
 
-		public void setSortColumn(final Widget widget) {
+         if (rc == 0 && _isSortByTime) {
+            rc = m1.time - m2.time;
+         }
 
-			final ColumnDefinition columnDefinition = (ColumnDefinition) widget.getData();
-			final String columnId = columnDefinition.getColumnId();
+         // If descending order, flip the direction
+         if (__sortDirection == DESCENDING) {
+            rc = -rc;
+         }
 
-			if (columnId.equals(__sortColumnId)) {
+         /*
+          * MUST return 1 or -1 otherwise long values are not sorted correctly.
+          */
+         return rc > 0 //
+               ? 1
+               : rc < 0 //
+                     ? -1
+                     : 0;
+      }
 
-				// Same column as last sort; toggle the direction
+      public void setSortColumn(final Widget widget) {
 
-				__sortDirection = 1 - __sortDirection;
+         final ColumnDefinition columnDefinition = (ColumnDefinition) widget.getData();
+         final String columnId = columnDefinition.getColumnId();
 
-			} else {
+         if (columnId.equals(__sortColumnId)) {
 
-				// New column; do an ascent sorting
+            // Same column as last sort; toggle the direction
 
-				__sortColumnId = columnId;
-				__sortDirection = ASCENDING;
-			}
+            __sortDirection = 1 - __sortDirection;
 
-			updateUI_SetSortDirection(__sortColumnId, __sortDirection);
-		}
-	}
+         } else {
 
-	private class MarkerContentProvider implements IStructuredContentProvider {
+            // New column; do an ascent sorting
 
-		@Override
-		public void dispose() {}
+            __sortColumnId = columnId;
+            __sortDirection = ASCENDING;
+         }
 
-		@Override
-		public Object[] getElements(final Object inputElement) {
-			return _allMarkerItems.toArray();
-		}
-
-		@Override
-		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
-	}
-
-	public class MarkerItemFilter extends ViewerFilter {
-
-		@Override
-		public boolean select(final Viewer viewer, final Object parentElement, final Object element) {
-
-			final TourMarkerItem markerItem = (TourMarkerItem) element;
-
-			final boolean isTourWithGPS = markerItem.latitude != TourDatabase.DEFAULT_DOUBLE;
-			final boolean isTourWithoutGPS = markerItem.latitude == TourDatabase.DEFAULT_DOUBLE;
-
-			boolean isVisible;
-
-			/*
-			 * Check GPS filter
-			 */
-			if (_gpsMarkerFilter == GPS_MARKER_FILTER_IS_DISABLED) {
-
-				isVisible = true;
-
-			} else {
-
-				isVisible = _gpsMarkerFilter == GPS_MARKER_FILTER_WITH_GPS ? isTourWithGPS : isTourWithoutGPS;
-			}
-
-			if (isVisible == false) {
-				return false;
-			}
-
-			/*
-			 * Check geo filter
-			 */
-			if (_isGeoFilterActive == false) {
-				return true;
-			}
-
-			if (isTourWithoutGPS) {
-				return false;
-			}
-
-			// Lat filter
-			final double lat = markerItem.latitude;
-			final double latDiff = _geoFilterLat - lat;
-			if (latDiff > 0) {
-
-				if (latDiff > _geoFilterMaxDiff) {
-					return false;
-				}
-
-			} else {
-
-				if (-latDiff > _geoFilterMaxDiff) {
-					return false;
-				}
-			}
-
-			// Lon filter
-			final double lon = markerItem.longitude;
-			final double lonDiff = _geoFilterLon - lon;
-			if (lonDiff > 0) {
+         updateUI_SetSortDirection(__sortColumnId, __sortDirection);
+      }
+   }
 
-				if (lonDiff > _geoFilterMaxDiff) {
-					return false;
-				}
-			} else {
+   private class MarkerContentProvider implements IStructuredContentProvider {
 
-				if (-lonDiff > _geoFilterMaxDiff) {
-					return false;
-				}
-			}
+      @Override
+      public void dispose() {}
 
-			return true;
-		}
-	}
+      @Override
+      public Object[] getElements(final Object inputElement) {
+         return _allMarkerItems.toArray();
+      }
 
-	class TourMarkerItem {
+      @Override
+      public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
+   }
 
-		public long		markerId;
+   public class MarkerItemFilter extends ViewerFilter {
 
-		public long		tourId;
-		public String	label;
-		public String	description;
-		public String	urlLabel;
-		public String	urlAddress;
-		public double	latitude;
-		public double	longitude;
-		public float	altitude;
-		public long		time;
+      @Override
+      public boolean select(final Viewer viewer, final Object parentElement, final Object element) {
 
-		@Override
-		public boolean equals(final Object obj) {
-			if (this == obj) {
-				return true;
-			}
-			if (obj == null) {
-				return false;
-			}
-			if (!(obj instanceof TourMarkerItem)) {
-				return false;
-			}
-			final TourMarkerItem other = (TourMarkerItem) obj;
-			if (!getOuterType().equals(other.getOuterType())) {
-				return false;
-			}
-			if (markerId != other.markerId) {
-				return false;
-			}
-			return true;
-		}
+         final TourMarkerItem markerItem = (TourMarkerItem) element;
 
-		private TourMarkerAllView getOuterType() {
-			return TourMarkerAllView.this;
-		}
+         final boolean isTourWithGPS = markerItem.latitude != TourDatabase.DEFAULT_DOUBLE;
+         final boolean isTourWithoutGPS = markerItem.latitude == TourDatabase.DEFAULT_DOUBLE;
 
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + getOuterType().hashCode();
-			result = prime * result + (int) (markerId ^ (markerId >>> 32));
-			return result;
-		}
+         boolean isVisible;
 
-		@Override
-		public String toString() {
-			return "TourMarkerItem [_label=" + label + "]"; //$NON-NLS-1$ //$NON-NLS-2$
-		}
-	}
+         /*
+          * Check GPS filter
+          */
+         if (_gpsMarkerFilter == GPS_MARKER_FILTER_IS_DISABLED) {
 
-	public TourMarkerAllView() {
-		super();
-	}
+            isVisible = true;
 
-	void actionMarkerFilterGPS(final Action actionTourFilter) {
+         } else {
 
-		// toggle with/without GPS actions
+            isVisible = _gpsMarkerFilter == GPS_MARKER_FILTER_WITH_GPS ? isTourWithGPS : isTourWithoutGPS;
+         }
 
-		if (actionTourFilter == _actionTourFilterWithGPS) {
+         if (isVisible == false) {
+            return false;
+         }
 
-			// action with GPS is hit
+         /*
+          * Check geo filter
+          */
+         if (_isGeoFilterActive == false) {
+            return true;
+         }
+
+         if (isTourWithoutGPS) {
+            return false;
+         }
+
+         // Lat filter
+         final double lat = markerItem.latitude;
+         final double latDiff = _geoFilterLat - lat;
+         if (latDiff > 0) {
+
+            if (latDiff > _geoFilterMaxDiff) {
+               return false;
+            }
+
+         } else {
+
+            if (-latDiff > _geoFilterMaxDiff) {
+               return false;
+            }
+         }
+
+         // Lon filter
+         final double lon = markerItem.longitude;
+         final double lonDiff = _geoFilterLon - lon;
+         if (lonDiff > 0) {
+
+            if (lonDiff > _geoFilterMaxDiff) {
+               return false;
+            }
+         } else {
+
+            if (-lonDiff > _geoFilterMaxDiff) {
+               return false;
+            }
+         }
 
-			if (_gpsMarkerFilter != GPS_MARKER_FILTER_WITH_GPS) {
+         return true;
+      }
+   }
 
-				_gpsMarkerFilter = GPS_MARKER_FILTER_WITH_GPS;
+   public class TableContextMenuProvider implements IContextMenuProvider {
 
-			} else {
+      @Override
+      public void disposeContextMenu() {
 
-				_gpsMarkerFilter = GPS_MARKER_FILTER_IS_DISABLED;
-			}
+         if (_tableContextMenu != null) {
+            _tableContextMenu.dispose();
+         }
+      }
 
-			_actionTourFilterWithoutGPS.setChecked(false);
+      @Override
+      public Menu getContextMenu() {
+         return _tableContextMenu;
+      }
 
-		} else {
+      @Override
+      public Menu recreateContextMenu() {
 
-			// action without GPS is hit
+         disposeContextMenu();
 
-			if (_gpsMarkerFilter != GPS_MARKER_FILTER_WITHOUT_GPS) {
+         _tableContextMenu = createUI_22_CreateViewerContextMenu();
 
-				_gpsMarkerFilter = GPS_MARKER_FILTER_WITHOUT_GPS;
+         return _tableContextMenu;
+      }
 
-			} else {
+   }
 
-				_gpsMarkerFilter = GPS_MARKER_FILTER_IS_DISABLED;
-			}
+   class TourMarkerItem {
 
-			_actionTourFilterWithGPS.setChecked(false);
-		}
+      public long   markerId;
 
-		refilterViewer();
+      public long   tourId;
+      public String label;
+      public String description;
+      public String urlLabel;
+      public String urlAddress;
+      public double latitude;
+      public double longitude;
+      public float  altitude;
+      public long   time;
 
-		_markerViewer.getTable().setFocus();
-	}
+      @Override
+      public boolean equals(final Object obj) {
+         if (this == obj) {
+            return true;
+         }
+         if (obj == null) {
+            return false;
+         }
+         if (!(obj instanceof TourMarkerItem)) {
+            return false;
+         }
+         final TourMarkerItem other = (TourMarkerItem) obj;
+         if (!getOuterType().equals(other.getOuterType())) {
+            return false;
+         }
+         if (markerId != other.markerId) {
+            return false;
+         }
+         return true;
+      }
 
-	private void addPartListener() {
+      private TourMarkerAllView getOuterType() {
+         return TourMarkerAllView.this;
+      }
 
-		_partListener = new IPartListener2() {
+      @Override
+      public int hashCode() {
+         final int prime = 31;
+         int result = 1;
+         result = prime * result + getOuterType().hashCode();
+         result = prime * result + (int) (markerId ^ (markerId >>> 32));
+         return result;
+      }
 
-			@Override
-			public void partActivated(final IWorkbenchPartReference partRef) {}
+      @Override
+      public String toString() {
+         return "TourMarkerItem [_label=" + label + "]"; //$NON-NLS-1$ //$NON-NLS-2$
+      }
+   }
 
-			@Override
-			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
+   public TourMarkerAllView() {
+      super();
+   }
 
-			@Override
-			public void partClosed(final IWorkbenchPartReference partRef) {}
+   void actionMarkerFilterGPS(final Action actionTourFilter) {
 
-			@Override
-			public void partDeactivated(final IWorkbenchPartReference partRef) {}
+      // toggle with/without GPS actions
 
-			@Override
-			public void partHidden(final IWorkbenchPartReference partRef) {}
+      if (actionTourFilter == _actionTourFilterWithGPS) {
 
-			@Override
-			public void partInputChanged(final IWorkbenchPartReference partRef) {}
+         // action with GPS is hit
 
-			@Override
-			public void partOpened(final IWorkbenchPartReference partRef) {}
+         if (_gpsMarkerFilter != GPS_MARKER_FILTER_WITH_GPS) {
 
-			@Override
-			public void partVisible(final IWorkbenchPartReference partRef) {}
-		};
+            _gpsMarkerFilter = GPS_MARKER_FILTER_WITH_GPS;
 
-		getViewSite().getPage().addPartListener(_partListener);
-	}
+         } else {
 
-	private void addPrefListener() {
+            _gpsMarkerFilter = GPS_MARKER_FILTER_IS_DISABLED;
+         }
 
-		_prefChangeListener = new IPropertyChangeListener() {
-			@Override
-			public void propertyChange(final PropertyChangeEvent event) {
+         _actionTourFilterWithoutGPS.setChecked(false);
 
-				final String property = event.getProperty();
+      } else {
 
-				if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
+         // action without GPS is hit
 
-					// measurement system has changed
+         if (_gpsMarkerFilter != GPS_MARKER_FILTER_WITHOUT_GPS) {
 
-					_columnManager.saveState(_state);
-					_columnManager.clearColumns();
+            _gpsMarkerFilter = GPS_MARKER_FILTER_WITHOUT_GPS;
 
-					defineAllColumns();
+         } else {
 
-					_markerViewer = (CheckboxTableViewer) recreateViewer(_markerViewer);
+            _gpsMarkerFilter = GPS_MARKER_FILTER_IS_DISABLED;
+         }
 
-				} else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
+         _actionTourFilterWithGPS.setChecked(false);
+      }
 
-					_markerViewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+      refilterViewer();
 
-					_markerViewer.refresh();
+      _markerViewer.getTable().setFocus();
+   }
 
-					/*
-					 * the tree must be redrawn because the styled text does not show with the new color
-					 */
-					_markerViewer.getTable().redraw();
+   private void addPartListener() {
 
-				}
-			}
-		};
-		_prefStore.addPropertyChangeListener(_prefChangeListener);
-	}
+      _partListener = new IPartListener2() {
 
-	private void addTourEventListener() {
+         @Override
+         public void partActivated(final IWorkbenchPartReference partRef) {}
 
-		_tourEventListener = new ITourEventListener() {
-			@Override
-			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
+         @Override
+         public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
-				if (part == TourMarkerAllView.this) {
-					return;
-				}
+         @Override
+         public void partClosed(final IWorkbenchPartReference partRef) {}
 
-				if (_isInUpdate) {
-					return;
-				}
+         @Override
+         public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
-				if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
+         @Override
+         public void partHidden(final IWorkbenchPartReference partRef) {}
 
-					final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
-					if (modifiedTours != null) {
+         @Override
+         public void partInputChanged(final IWorkbenchPartReference partRef) {}
 
-						// update modified tour
+         @Override
+         public void partOpened(final IWorkbenchPartReference partRef) {}
 
-						reloadViewer();
-					}
+         @Override
+         public void partVisible(final IWorkbenchPartReference partRef) {}
+      };
 
-				} else if (eventId == TourEventId.MARKER_SELECTION) {
+      getViewSite().getPage().addPartListener(_partListener);
+   }
 
-					onTourEvent_TourMarker(eventData);
+   private void addPrefListener() {
 
-				} else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
+      _prefChangeListener = new IPropertyChangeListener() {
+         @Override
+         public void propertyChange(final PropertyChangeEvent event) {
 
-					reloadViewer();
-				}
-			}
-		};
+            final String property = event.getProperty();
 
-		TourManager.getInstance().addTourEventListener(_tourEventListener);
-	}
+            if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
 
-	private void createActions() {
+               // measurement system has changed
 
-		_actionEditTour = new ActionEditTour(this);
-		_actionModifyColumns = new ActionModifyColumns(this);
-		_actionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
-		_actionOpenTour = new ActionOpenTour(this);
-		_actionQuickEdit = new ActionEditQuick(this);
-		_actionTourFilterWithGPS = new ActionMarkerFilterWithGPS(this);
-		_actionTourFilterWithoutGPS = new ActionMarkerFilterWithNoGPS(this);
-		_actionTourMarkerFilter = new ActionTourMarkerFilter(this, _uiParent);
-	}
+               _columnManager.saveState(_state);
+               _columnManager.clearColumns();
 
-	@Override
-	public void createPartControl(final Composite parent) {
+               defineAllColumns();
 
-		_uiParent = parent;
+               _markerViewer = (CheckboxTableViewer) recreateViewer(_markerViewer);
 
-		initUI(parent);
+            } else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
-		restoreState_BeforeUI();
+               _markerViewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
-		// define all columns for the viewer
-		_columnManager = new ColumnManager(this, _state);
-		defineAllColumns();
+               _markerViewer.refresh();
 
-		createUI(parent);
+               /*
+                * the tree must be redrawn because the styled text does not show with the new color
+                */
+               _markerViewer.getTable().redraw();
 
-		addTourEventListener();
-		addPrefListener();
-		addPartListener();
+            }
+         }
+      };
+      _prefStore.addPropertyChangeListener(_prefChangeListener);
+   }
 
-		// set selection provider
-		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
+   private void addTourEventListener() {
 
-		createActions();
-		fillToolbar();
+      _tourEventListener = new ITourEventListener() {
+         @Override
+         public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
-		// load marker and display them
-//		parent.getDisplay().asyncExec(new Runnable() {
-//			public void run() {
+            if (part == TourMarkerAllView.this) {
+               return;
+            }
+
+            if (_isInUpdate) {
+               return;
+            }
+
+            if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
+
+               final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+               if (modifiedTours != null) {
+
+                  // update modified tour
+
+                  reloadViewer();
+               }
+
+            } else if (eventId == TourEventId.MARKER_SELECTION) {
+
+               onTourEvent_TourMarker(eventData);
+
+            } else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
+
+               reloadViewer();
+            }
+         }
+      };
+
+      TourManager.getInstance().addTourEventListener(_tourEventListener);
+   }
+
+   private void createActions() {
+
+      _actionEditTour = new ActionEditTour(this);
+      _actionModifyColumns = new ActionModifyColumns(this);
+      _actionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
+      _actionOpenTour = new ActionOpenTour(this);
+      _actionQuickEdit = new ActionEditQuick(this);
+      _actionTourFilterWithGPS = new ActionMarkerFilterWithGPS(this);
+      _actionTourFilterWithoutGPS = new ActionMarkerFilterWithNoGPS(this);
+      _actionTourMarkerFilter = new ActionTourMarkerFilter(this, _uiParent);
+   }
+
+   private void createMenuManager() {
+
+      _viewerMenuManager = new MenuManager("#PopupMenu"); //$NON-NLS-1$
+      _viewerMenuManager.setRemoveAllWhenShown(true);
+      _viewerMenuManager.addMenuListener(new IMenuListener() {
+         @Override
+         public void menuAboutToShow(final IMenuManager manager) {
+
+            fillContextMenu(manager);
+         }
+      });
+   }
+
+   @Override
+   public void createPartControl(final Composite parent) {
+
+      _uiParent = parent;
+
+      initUI(parent);
+      createMenuManager();
+
+      restoreState_BeforeUI();
+
+      // define all columns for the viewer
+      _columnManager = new ColumnManager(this, _state);
+      defineAllColumns();
+
+      createUI(parent);
+
+      addTourEventListener();
+      addPrefListener();
+      addPartListener();
+
+      // set selection provider
+      getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
+
+      createActions();
+      fillToolbar();
+
+      // load marker and display them
+//      parent.getDisplay().asyncExec(new Runnable() {
+//         public void run() {
 //
-//			}
-//		});
-		BusyIndicator.showWhile(parent.getDisplay(), new Runnable() {
-			@Override
-			public void run() {
-
-				loadAllMarker();
-
-				updateUI_SetViewerInput();
-
-				restoreState_WithUI();
-			}
-		});
-	}
-
-	private void createUI(final Composite parent) {
-
-		_viewerContainer = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
-		{
-			createUI_10_MarkerViewer(_viewerContainer);
-		}
-	}
-
-	private void createUI_10_MarkerViewer(final Composite parent) {
-
-		/*
-		 * create table
-		 */
-		final Table table = new Table(parent, SWT.FULL_SELECTION | SWT.MULTI | SWT.CHECK);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
-
-		table.setHeaderVisible(true);
-		table.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
-
-		/*
-		 * It took a while that the correct listener is set and also the checked item is fired and not
-		 * the wrong selection.
-		 */
-		table.addListener(SWT.Selection, new Listener() {
-
-			@Override
-			public void handleEvent(final Event event) {
-				onSelect_TourMarker(event);
-			}
-		});
-
-		/*
-		 * create table viewer
-		 */
-		_markerViewer = new CheckboxTableViewer(table);
-
-		_columnManager.createColumns(_markerViewer);
-
-		_markerViewer.setUseHashlookup(true);
-		_markerViewer.setContentProvider(new MarkerContentProvider());
-		_markerViewer.addFilter(new MarkerItemFilter());
-		_markerViewer.setComparator(_markerComparator);
-
-		_markerViewer.addDoubleClickListener(new IDoubleClickListener() {
-			@Override
-			public void doubleClick(final DoubleClickEvent event) {
-				onTourMarker_DoubleClick();
-			}
-		});
-
-		_markerViewer.addCheckStateListener(new ICheckStateListener() {
-			@Override
-			public void checkStateChanged(final CheckStateChangedEvent event) {
-				onTourMarker_StateChanged(event);
-			}
-		});
-
-		updateUI_SetSortDirection(//
-				_markerComparator.__sortColumnId,
-				_markerComparator.__sortDirection);
-
-		createUI_20_ContextMenu();
-	}
-
-	/**
-	 * create the views context menu
-	 */
-	private void createUI_20_ContextMenu() {
+//         }
+//      });
+      BusyIndicator.showWhile(parent.getDisplay(), new Runnable() {
+         @Override
+         public void run() {
 
-		final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
-		menuMgr.setRemoveAllWhenShown(true);
-		menuMgr.addMenuListener(new IMenuListener() {
-			@Override
-			public void menuAboutToShow(final IMenuManager manager) {
-				fillContextMenu(manager);
-			}
-		});
-
-		final Table table = (Table) _markerViewer.getControl();
-		final Menu tableContextMenu = menuMgr.createContextMenu(table);
+            loadAllMarker();
 
-		_columnManager.createHeaderContextMenu(table, tableContextMenu);
-	}
-
-	private void defineAllColumns() {
+            updateUI_SetViewerInput();
 
-		defineColumn_Name();
+            restoreState_WithUI();
+         }
+      });
+   }
 
-		defineColumn_Date();
-		defineColumn_Time();
+   private void createUI(final Composite parent) {
 
-		defineColumn_Altitude();
-		defineColumn_Latitude();
-		defineColumn_Longitude();
+      _viewerContainer = new Composite(parent, SWT.NONE);
+      GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
+      {
+         createUI_10_MarkerViewer(_viewerContainer);
+      }
+   }
 
-		defineColumn_Description();
-		defineColumn_UrlLabel();
-		defineColumn_UrlAddress();
+   private void createUI_10_MarkerViewer(final Composite parent) {
 
-		defineColumn_MarkerId();
-		defineColumn_TourId();
-	}
+      /*
+       * create table
+       */
+      final Table table = new Table(parent, SWT.FULL_SELECTION | SWT.MULTI | SWT.CHECK);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
 
-	/**
-	 * Column: Altitude
-	 */
-	private void defineColumn_Altitude() {
+      table.setHeaderVisible(true);
+      table.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
-		final ColumnDefinition colDef = TableColumnFactory.ALTITUDE_ALTITUDE.createColumn(_columnManager, _pc);
+      /*
+       * It took a while that the correct listener is set and also the checked item is fired and not
+       * the wrong selection.
+       */
+      table.addListener(SWT.Selection, new Listener() {
 
-		// overwrite column id to identify the column when table is sorted
-		colDef.setColumnId(COLUMN_ALTITUDE);
-		colDef.setColumnSelectionListener(_columnSortListener);
+         @Override
+         public void handleEvent(final Event event) {
+            onSelect_TourMarker(event);
+         }
+      });
 
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
+      /*
+       * create table viewer
+       */
+      _markerViewer = new CheckboxTableViewer(table);
 
-				String valueText;
-				final float altitude = ((TourMarkerItem) cell.getElement()).altitude;
+      _columnManager.createColumns(_markerViewer);
 
-				if (altitude == TourDatabase.DEFAULT_FLOAT) {
-					valueText = UI.EMPTY_STRING;
-				} else {
-					valueText = _nf1.format(altitude / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE);
-				}
+      _markerViewer.setUseHashlookup(true);
+      _markerViewer.setContentProvider(new MarkerContentProvider());
+      _markerViewer.addFilter(new MarkerItemFilter());
+      _markerViewer.setComparator(_markerComparator);
 
-				cell.setText(valueText);
-			}
-		});
-	}
+      _markerViewer.addDoubleClickListener(new IDoubleClickListener() {
+         @Override
+         public void doubleClick(final DoubleClickEvent event) {
+            onTourMarker_DoubleClick();
+         }
+      });
 
-	/**
-	 * Column: Date
-	 */
-	private void defineColumn_Date() {
+      _markerViewer.addCheckStateListener(new ICheckStateListener() {
+         @Override
+         public void checkStateChanged(final CheckStateChangedEvent event) {
+            onTourMarker_StateChanged(event);
+         }
+      });
 
-		final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_DATE, SWT.TRAIL);
+      updateUI_SetSortDirection(//
+            _markerComparator.__sortColumnId,
+            _markerComparator.__sortDirection);
 
-		colDef.setColumnName(Messages.ColumnFactory_Waypoint_Date);
+      createUI_20_ContextMenu();
+   }
 
-		colDef.setIsDefaultColumn();
-		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(12));
-		colDef.setColumnSelectionListener(_columnSortListener);
+   /**
+    * create the views context menu
+    */
+   private void createUI_20_ContextMenu() {
 
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
+      _tableContextMenu = createUI_22_CreateViewerContextMenu();
 
-				final TourMarkerItem tourMarkerItem = (TourMarkerItem) cell.getElement();
+      final Table table = (Table) _markerViewer.getControl();
 
-				cell.setText(_dateFormatter.format(tourMarkerItem.time));
-			}
-		});
+      _columnManager.createHeaderContextMenu(table, _tableViewerContextMenuProvider);
+   }
 
-	}
+   private Menu createUI_22_CreateViewerContextMenu() {
 
-	/**
-	 * Column: Description
-	 */
-	private void defineColumn_Description() {
+      final Table table = (Table) _markerViewer.getControl();
+      final Menu tableContextMenu = _viewerMenuManager.createContextMenu(table);
 
-		final ColumnDefinition colDef = TableColumnFactory.WAYPOINT_DESCRIPTION.createColumn(_columnManager, _pc);
+      return tableContextMenu;
+   }
 
-		colDef.setIsDefaultColumn();
+   private void defineAllColumns() {
 
-		// overwrite column id to identify the column when table is sorted
-		colDef.setColumnId(COLUMN_DESCRIPTION);
-		colDef.setColumnSelectionListener(_columnSortListener);
+      defineColumn_Name();
 
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
+      defineColumn_Date();
+      defineColumn_Time();
 
-				final TourMarkerItem marker = (TourMarkerItem) cell.getElement();
-				cell.setText(marker.description);
-			}
-		});
-	}
+      defineColumn_Altitude();
+      defineColumn_Latitude();
+      defineColumn_Longitude();
 
-	/**
-	 * Column: Latitude
-	 */
-	private void defineColumn_Latitude() {
+      defineColumn_Description();
+      defineColumn_UrlLabel();
+      defineColumn_UrlAddress();
 
-		final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_LATITUDE, SWT.TRAIL);
+      defineColumn_MarkerId();
+      defineColumn_TourId();
+   }
 
-		colDef.setColumnName(Messages.ColumnFactory_latitude);
-		colDef.setIsDefaultColumn();
+   /**
+    * Column: Altitude
+    */
+   private void defineColumn_Altitude() {
 
-		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(11));
-		colDef.setColumnSelectionListener(_columnSortListener);
+      final ColumnDefinition colDef = TableColumnFactory.ALTITUDE_ALTITUDE.createColumn(_columnManager, _pc);
 
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
+      // overwrite column id to identify the column when table is sorted
+      colDef.setColumnId(COLUMN_ALTITUDE);
+      colDef.setColumnSelectionListener(_columnSortListener);
 
-				String valueText;
-				final double latitude = ((TourMarkerItem) cell.getElement()).latitude;
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
 
-				if (latitude == TourDatabase.DEFAULT_DOUBLE) {
-					valueText = UI.EMPTY_STRING;
-				} else {
-					if (_isLatLonDigitsEnabled) {
-						valueText = _nfLatLon.format(latitude);
-					} else {
-						valueText = Double.toString(latitude);
-					}
-				}
+            String valueText;
+            final float altitude = ((TourMarkerItem) cell.getElement()).altitude;
 
-				cell.setText(valueText);
-			}
-		});
-	}
+            if (altitude == TourDatabase.DEFAULT_FLOAT) {
+               valueText = UI.EMPTY_STRING;
+            } else {
+               valueText = _nf1.format(altitude / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE);
+            }
 
-	/**
-	 * Column: Longitude
-	 */
-	private void defineColumn_Longitude() {
+            cell.setText(valueText);
+         }
+      });
+   }
 
-		final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_LONGITUDE, SWT.TRAIL);
+   /**
+    * Column: Date
+    */
+   private void defineColumn_Date() {
 
-		colDef.setColumnName(Messages.ColumnFactory_longitude);
-		colDef.setIsDefaultColumn();
+      final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_DATE, SWT.TRAIL);
 
-		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(11));
-		colDef.setColumnSelectionListener(_columnSortListener);
+      colDef.setColumnName(Messages.ColumnFactory_Waypoint_Date);
 
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
+      colDef.setIsDefaultColumn();
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(12));
+      colDef.setColumnSelectionListener(_columnSortListener);
 
-				String valueText;
-				final double longitude = ((TourMarkerItem) cell.getElement()).longitude;
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
 
-				if (longitude == TourDatabase.DEFAULT_DOUBLE) {
-					valueText = UI.EMPTY_STRING;
-				} else {
-					if (_isLatLonDigitsEnabled) {
-						valueText = _nfLatLon.format(longitude);
-					} else {
-						valueText = Double.toString(longitude);
-					}
-				}
+            final TourMarkerItem tourMarkerItem = (TourMarkerItem) cell.getElement();
 
-				cell.setText(valueText);
-			}
-		});
-	}
+            cell.setText(_dateFormatter.format(tourMarkerItem.time));
+         }
+      });
 
-	/**
-	 * Column: Marker ID
-	 */
-	private void defineColumn_MarkerId() {
+   }
 
-		final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_MARKER_ID, SWT.LEAD);
+   /**
+    * Column: Description
+    */
+   private void defineColumn_Description() {
 
-		colDef.setColumnName(Messages.ColumnFactory_TourMarkerId);
+      final ColumnDefinition colDef = TableColumnFactory.WAYPOINT_DESCRIPTION.createColumn(_columnManager, _pc);
 
-		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(12));
-		colDef.setColumnSelectionListener(_columnSortListener);
+      colDef.setIsDefaultColumn();
 
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				cell.setText(Long.toString(((TourMarkerItem) cell.getElement()).markerId));
-			}
-		});
-	}
+      // overwrite column id to identify the column when table is sorted
+      colDef.setColumnId(COLUMN_DESCRIPTION);
+      colDef.setColumnSelectionListener(_columnSortListener);
 
-	/**
-	 * Column: Name
-	 */
-	private void defineColumn_Name() {
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
 
-		final ColumnDefinition colDef = TableColumnFactory.WAYPOINT_NAME.createColumn(_columnManager, _pc);
+            final TourMarkerItem marker = (TourMarkerItem) cell.getElement();
+            cell.setText(marker.description);
+         }
+      });
+   }
 
-		colDef.setIsDefaultColumn();
+   /**
+    * Column: Latitude
+    */
+   private void defineColumn_Latitude() {
 
-		// overwrite column id to identify the column when table is sorted
-		colDef.setColumnId(COLUMN_NAME);
-		colDef.setColumnSelectionListener(_columnSortListener);
+      final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_LATITUDE, SWT.TRAIL);
 
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
+      colDef.setColumnName(Messages.ColumnFactory_latitude);
+      colDef.setIsDefaultColumn();
 
-				final TourMarkerItem marker = (TourMarkerItem) cell.getElement();
-				cell.setText(marker.label);
-			}
-		});
-	}
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(11));
+      colDef.setColumnSelectionListener(_columnSortListener);
 
-	/**
-	 * Column: Time
-	 */
-	private void defineColumn_Time() {
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
 
-		final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_TIME, SWT.TRAIL);
+            String valueText;
+            final double latitude = ((TourMarkerItem) cell.getElement()).latitude;
 
-		colDef.setColumnName(Messages.ColumnFactory_tour_time_label_hhmmss);
+            if (latitude == TourDatabase.DEFAULT_DOUBLE) {
+               valueText = UI.EMPTY_STRING;
+            } else {
+               if (_isLatLonDigitsEnabled) {
+                  valueText = _nfLatLon.format(latitude);
+               } else {
+                  valueText = Double.toString(latitude);
+               }
+            }
 
-		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(12));
+            cell.setText(valueText);
+         }
+      });
+   }
 
-		/*
-		 * a marker cannot be sorted by time only by date
-		 */
-//		colDef.setColumnSelectionListener(_columnSortListener);
+   /**
+    * Column: Longitude
+    */
+   private void defineColumn_Longitude() {
 
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
+      final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_LONGITUDE, SWT.TRAIL);
 
-				final TourMarkerItem tourMarkerItem = (TourMarkerItem) cell.getElement();
+      colDef.setColumnName(Messages.ColumnFactory_longitude);
+      colDef.setIsDefaultColumn();
 
-				cell.setText(_timeFormatter.format(tourMarkerItem.time));
-			}
-		});
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(11));
+      colDef.setColumnSelectionListener(_columnSortListener);
 
-	}
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
 
-	/**
-	 * Column: TourID
-	 */
-	private void defineColumn_TourId() {
+            String valueText;
+            final double longitude = ((TourMarkerItem) cell.getElement()).longitude;
 
-		final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_TOUR_ID, SWT.LEAD);
+            if (longitude == TourDatabase.DEFAULT_DOUBLE) {
+               valueText = UI.EMPTY_STRING;
+            } else {
+               if (_isLatLonDigitsEnabled) {
+                  valueText = _nfLatLon.format(longitude);
+               } else {
+                  valueText = Double.toString(longitude);
+               }
+            }
 
-		colDef.setColumnName(Messages.ColumnFactory_TourId);
+            cell.setText(valueText);
+         }
+      });
+   }
 
-		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(22));
-		colDef.setColumnSelectionListener(_columnSortListener);
+   /**
+    * Column: Marker ID
+    */
+   private void defineColumn_MarkerId() {
 
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				cell.setText(Long.toString(((TourMarkerItem) cell.getElement()).tourId));
-			}
-		});
+      final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_MARKER_ID, SWT.LEAD);
 
-	}
+      colDef.setColumnName(Messages.ColumnFactory_TourMarkerId);
 
-	/**
-	 * Column: Url address
-	 */
-	private void defineColumn_UrlAddress() {
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(12));
+      colDef.setColumnSelectionListener(_columnSortListener);
 
-		final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_URL_ADDRESS, SWT.LEAD);
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+            cell.setText(Long.toString(((TourMarkerItem) cell.getElement()).markerId));
+         }
+      });
+   }
 
-		colDef.setColumnName(Messages.ColumnFactory_InetAddress_Url);
+   /**
+    * Column: Name
+    */
+   private void defineColumn_Name() {
 
-		colDef.setIsDefaultColumn();
-		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(20));
-		colDef.setColumnSelectionListener(_columnSortListener);
+      final ColumnDefinition colDef = TableColumnFactory.WAYPOINT_NAME.createColumn(_columnManager, _pc);
 
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				final TourMarkerItem markerItem = (TourMarkerItem) cell.getElement();
-				cell.setText(markerItem.urlAddress);
-			}
-		});
-	}
+      colDef.setIsDefaultColumn();
 
-	/**
-	 * Column: Url label
-	 */
-	private void defineColumn_UrlLabel() {
+      // overwrite column id to identify the column when table is sorted
+      colDef.setColumnId(COLUMN_NAME);
+      colDef.setColumnSelectionListener(_columnSortListener);
 
-		final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_URL_LABEL, SWT.LEAD);
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
 
-		colDef.setColumnName(Messages.ColumnFactory_InetAddress_Label);
+            final TourMarkerItem marker = (TourMarkerItem) cell.getElement();
+            cell.setText(marker.label);
+         }
+      });
+   }
 
-		colDef.setIsDefaultColumn();
-		colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(20));
-		colDef.setColumnSelectionListener(_columnSortListener);
+   /**
+    * Column: Time
+    */
+   private void defineColumn_Time() {
 
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				final TourMarkerItem markerItem = (TourMarkerItem) cell.getElement();
-				cell.setText(markerItem.urlLabel);
-			}
-		});
-	}
+      final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_TIME, SWT.TRAIL);
 
-	@Override
-	public void dispose() {
+      colDef.setColumnName(Messages.ColumnFactory_tour_time_label_hhmmss);
 
-		TourManager.getInstance().removeTourEventListener(_tourEventListener);
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(12));
 
-		getViewSite().getPage().removePartListener(_partListener);
+      /*
+       * a marker cannot be sorted by time only by date
+       */
+//      colDef.setColumnSelectionListener(_columnSortListener);
 
-		_prefStore.removePropertyChangeListener(_prefChangeListener);
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
 
-		super.dispose();
-	}
+            final TourMarkerItem tourMarkerItem = (TourMarkerItem) cell.getElement();
 
-	private void enableActions() {
+            cell.setText(_timeFormatter.format(tourMarkerItem.time));
+         }
+      });
 
-		final TourMarker tourMarker = getSelectedTourMarker();
-		final boolean isMarkerSelected = tourMarker != null;
-		final boolean isGeoFilterDeactivated = _isGeoFilterActive == false;
+   }
 
-		_actionEditTour.setEnabled(isMarkerSelected);
-		_actionOpenMarkerDialog.setEnabled(isMarkerSelected);
-		_actionOpenTour.setEnabled(isMarkerSelected);
-		_actionQuickEdit.setEnabled(isMarkerSelected);
+   /**
+    * Column: TourID
+    */
+   private void defineColumn_TourId() {
 
-		_actionTourFilterWithGPS.setEnabled(isGeoFilterDeactivated);
-		_actionTourFilterWithoutGPS.setEnabled(isGeoFilterDeactivated);
-	}
+      final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_TOUR_ID, SWT.LEAD);
 
-	private void fillContextMenu(final IMenuManager menuMgr) {
+      colDef.setColumnName(Messages.ColumnFactory_TourId);
 
-		final TourMarker tourMarker = getSelectedTourMarker();
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(22));
+      colDef.setColumnSelectionListener(_columnSortListener);
 
-		/*
-		 * update actions
-		 */
-		_actionOpenMarkerDialog.setTourMarker(tourMarker);
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+            cell.setText(Long.toString(((TourMarkerItem) cell.getElement()).tourId));
+         }
+      });
 
-		/*
-		 * fill menu
-		 */
-		menuMgr.add(_actionOpenMarkerDialog);
+   }
 
-		menuMgr.add(new Separator());
-		menuMgr.add(_actionQuickEdit);
-		menuMgr.add(_actionEditTour);
-		menuMgr.add(_actionOpenTour);
+   /**
+    * Column: Url address
+    */
+   private void defineColumn_UrlAddress() {
 
-		enableActions();
-	}
+      final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_URL_ADDRESS, SWT.LEAD);
 
-	private void fillToolbar() {
+      colDef.setColumnName(Messages.ColumnFactory_InetAddress_Url);
 
-		final IActionBars actionBars = getViewSite().getActionBars();
+      colDef.setIsDefaultColumn();
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(20));
+      colDef.setColumnSelectionListener(_columnSortListener);
 
-		/*
-		 * Fill view menu
-		 */
-		final IMenuManager menuMgr = actionBars.getMenuManager();
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+            final TourMarkerItem markerItem = (TourMarkerItem) cell.getElement();
+            cell.setText(markerItem.urlAddress);
+         }
+      });
+   }
 
-		menuMgr.add(_actionModifyColumns);
+   /**
+    * Column: Url label
+    */
+   private void defineColumn_UrlLabel() {
 
-		/*
-		 * Fill view toolbar
-		 */
-		final IToolBarManager tbm = actionBars.getToolBarManager();
+      final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_URL_LABEL, SWT.LEAD);
 
-		tbm.add(_actionTourFilterWithGPS);
-		tbm.add(_actionTourFilterWithoutGPS);
-		tbm.add(_actionTourMarkerFilter);
-	}
+      colDef.setColumnName(Messages.ColumnFactory_InetAddress_Label);
 
-	private void fireSelection(final StructuredSelection selection) {
+      colDef.setIsDefaultColumn();
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(20));
+      colDef.setColumnSelectionListener(_columnSortListener);
 
-		// get unique tour id's
-		final HashSet<Long> tourIds = new HashSet<>();
-		for (final Iterator<?> selectedItem = selection.iterator(); selectedItem.hasNext();) {
-			tourIds.add(((TourMarkerItem) selectedItem.next()).tourId);
-		}
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+            final TourMarkerItem markerItem = (TourMarkerItem) cell.getElement();
+            cell.setText(markerItem.urlLabel);
+         }
+      });
+   }
 
-		final SelectionTourIds selectionTourIds = new SelectionTourIds(new ArrayList<>(tourIds));
+   @Override
+   public void dispose() {
 
-		final int uniqueTourIds = tourIds.size();
+      TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
-		if (uniqueTourIds == 1) {
+      getViewSite().getPage().removePartListener(_partListener);
 
-			// only one unique tour is selected, fire a marker selection
+      _prefStore.removePropertyChangeListener(_prefChangeListener);
 
-			final TourMarkerItem firstMarkerItem = (TourMarkerItem) selection.getFirstElement();
+      super.dispose();
+   }
 
-			// get tour by id
-			final TourData tourData = TourManager.getInstance().getTourData(firstMarkerItem.tourId);
-			if (tourData == null) {
-				return;
-			}
+   private void enableActions() {
 
-			final ArrayList<TourMarker> selectedTourMarkers = new ArrayList<>();
+      final TourMarker tourMarker = getSelectedTourMarker();
+      final boolean isMarkerSelected = tourMarker != null;
+      final boolean isGeoFilterDeactivated = _isGeoFilterActive == false;
 
-			for (final Iterator<?> iterator = selection.iterator(); iterator.hasNext();) {
+      _actionEditTour.setEnabled(isMarkerSelected);
+      _actionOpenMarkerDialog.setEnabled(isMarkerSelected);
+      _actionOpenTour.setEnabled(isMarkerSelected);
+      _actionQuickEdit.setEnabled(isMarkerSelected);
 
-				final long selectedMarkerId = ((TourMarkerItem) iterator.next()).markerId;
+      _actionTourFilterWithGPS.setEnabled(isGeoFilterDeactivated);
+      _actionTourFilterWithoutGPS.setEnabled(isGeoFilterDeactivated);
+   }
 
-				// get marker by id
-				for (final TourMarker tourMarker : tourData.getTourMarkers()) {
-					if (tourMarker.getMarkerId() == selectedMarkerId) {
-						selectedTourMarkers.add(tourMarker);
-						break;
-					}
-				}
-			}
+   private void fillContextMenu(final IMenuManager menuMgr) {
 
-			_isInUpdate = true;
-			{
-				/*
-				 * Set selection in the selection provider that the part selection provider is in sync
-				 * with the marker selection, otherwise a selection listener, e.g. tour editor can
-				 * display the wrong tour. This happened !!!
-				 */
-				_postSelectionProvider.setSelectionNoFireEvent(selectionTourIds);
+      final TourMarker tourMarker = getSelectedTourMarker();
 
-				TourManager.fireEventWithCustomData(//
-						TourEventId.MARKER_SELECTION,
-						new SelectionTourMarker(tourData, selectedTourMarkers),
-						getSite().getPart());
-			}
-			_isInUpdate = false;
+      /*
+       * update actions
+       */
+      _actionOpenMarkerDialog.setTourMarker(tourMarker);
 
-		} else if (uniqueTourIds > 1) {
+      /*
+       * fill menu
+       */
+      menuMgr.add(_actionOpenMarkerDialog);
 
-			// multiple tours are selected, fire a part selection
+      menuMgr.add(new Separator());
+      menuMgr.add(_actionQuickEdit);
+      menuMgr.add(_actionEditTour);
+      menuMgr.add(_actionOpenTour);
 
-			_isInUpdate = true;
-			{
-				_postSelectionProvider.setSelection(selectionTourIds);
-			}
-			_isInUpdate = false;
-		}
-	}
+      enableActions();
+   }
 
-	@Override
-	public ColumnManager getColumnManager() {
-		return _columnManager;
-	}
+   private void fillToolbar() {
 
-	/**
-	 * @return Returns the tour marker when the marker filter is active otherwise it returns
-	 *         <code>null</code>.
-	 */
-	TourMarkerItem getFilterMarker() {
-		return _markerFilter;
-	}
+      final IActionBars actionBars = getViewSite().getActionBars();
 
-	public Object getMarkerViewer() {
-		return _markerViewer;
-	}
+      /*
+       * Fill view menu
+       */
+      final IMenuManager menuMgr = actionBars.getMenuManager();
 
-	private TourMarker getSelectedTourMarker() {
+      menuMgr.add(_actionModifyColumns);
 
-		final TourMarkerItem tourMarkerItem = getSelectedTourMarkerItem();
-		if (tourMarkerItem == null) {
-			return null;
-		}
+      /*
+       * Fill view toolbar
+       */
+      final IToolBarManager tbm = actionBars.getToolBarManager();
 
-		// get tour by id
-		final TourData tourData = TourManager.getInstance().getTourData(tourMarkerItem.tourId);
-		if (tourData == null) {
-			return null;
-		}
+      tbm.add(_actionTourFilterWithGPS);
+      tbm.add(_actionTourFilterWithoutGPS);
+      tbm.add(_actionTourMarkerFilter);
+   }
 
-		final long markerId = tourMarkerItem.markerId;
+   private void fireSelection(final StructuredSelection selection) {
 
-		// get marker by id
-		for (final TourMarker tourMarker : tourData.getTourMarkers()) {
-			if (tourMarker.getMarkerId() == markerId) {
-				return tourMarker;
-			}
-		}
+      // get unique tour id's
+      final HashSet<Long> tourIds = new HashSet<>();
+      for (final Iterator<?> selectedItem = selection.iterator(); selectedItem.hasNext();) {
+         tourIds.add(((TourMarkerItem) selectedItem.next()).tourId);
+      }
 
-		return null;
-	}
+      final SelectionTourIds selectionTourIds = new SelectionTourIds(new ArrayList<>(tourIds));
 
-	private TourMarkerItem getSelectedTourMarkerItem() {
+      final int uniqueTourIds = tourIds.size();
 
-		final StructuredSelection selection = getViewerSelection();
+      if (uniqueTourIds == 1) {
 
-		if (selection.getFirstElement() instanceof TourMarkerItem) {
-			return (TourMarkerItem) selection.getFirstElement();
-		}
+         // only one unique tour is selected, fire a marker selection
 
-		return null;
-	}
+         final TourMarkerItem firstMarkerItem = (TourMarkerItem) selection.getFirstElement();
 
-	@Override
-	public ArrayList<TourData> getSelectedTours() {
+         // get tour by id
+         final TourData tourData = TourManager.getInstance().getTourData(firstMarkerItem.tourId);
+         if (tourData == null) {
+            return;
+         }
 
-		final ArrayList<TourData> selectedTours = new ArrayList<>();
+         final ArrayList<TourMarker> selectedTourMarkers = new ArrayList<>();
 
-		final StructuredSelection selection = getViewerSelection();
+         for (final Iterator<?> iterator = selection.iterator(); iterator.hasNext();) {
 
-		for (final Iterator<?> iterator = selection.iterator(); iterator.hasNext();) {
+            final long selectedMarkerId = ((TourMarkerItem) iterator.next()).markerId;
 
-			final Object element = iterator.next();
+            // get marker by id
+            for (final TourMarker tourMarker : tourData.getTourMarkers()) {
+               if (tourMarker.getMarkerId() == selectedMarkerId) {
+                  selectedTourMarkers.add(tourMarker);
+                  break;
+               }
+            }
+         }
 
-			if (element instanceof TourMarkerItem) {
+         _isInUpdate = true;
+         {
+            /*
+             * Set selection in the selection provider that the part selection provider is in sync
+             * with the marker selection, otherwise a selection listener, e.g. tour editor can
+             * display the wrong tour. This happened !!!
+             */
+            _postSelectionProvider.setSelectionNoFireEvent(selectionTourIds);
 
-				// get TourData from the tour marker item
+            TourManager.fireEventWithCustomData(//
+                  TourEventId.MARKER_SELECTION,
+                  new SelectionTourMarker(tourData, selectedTourMarkers),
+                  getSite().getPart());
+         }
+         _isInUpdate = false;
 
-				final TourMarkerItem tourMarkerItem = (TourMarkerItem) element;
+      } else if (uniqueTourIds > 1) {
 
-				// get tour by id
-				final TourData tourData = TourManager.getInstance().getTourData(tourMarkerItem.tourId);
+         // multiple tours are selected, fire a part selection
 
-				if (tourData != null) {
-					selectedTours.add(tourData);
-				}
-			}
-		}
+         _isInUpdate = true;
+         {
+            _postSelectionProvider.setSelection(selectionTourIds);
+         }
+         _isInUpdate = false;
+      }
+   }
 
-		return selectedTours;
-	}
+   @Override
+   public ColumnManager getColumnManager() {
+      return _columnManager;
+   }
 
-	/**
-	 * @param sortColumnId
-	 * @return Returns the column widget by it's column id, when column id is not found then the
-	 *         first column is returned.
-	 */
-	private TableColumn getSortColumn(final String sortColumnId) {
+   /**
+    * @return Returns the tour marker when the marker filter is active otherwise it returns
+    *         <code>null</code>.
+    */
+   TourMarkerItem getFilterMarker() {
+      return _markerFilter;
+   }
 
-		final TableColumn[] allColumns = _markerViewer.getTable().getColumns();
+   public Object getMarkerViewer() {
+      return _markerViewer;
+   }
 
-		for (final TableColumn column : allColumns) {
+   private TourMarker getSelectedTourMarker() {
 
-			final String columnId = ((ColumnDefinition) column.getData()).getColumnId();
+      final TourMarkerItem tourMarkerItem = getSelectedTourMarkerItem();
+      if (tourMarkerItem == null) {
+         return null;
+      }
 
-			if (columnId.equals(sortColumnId)) {
-				return column;
-			}
-		}
+      // get tour by id
+      final TourData tourData = TourManager.getInstance().getTourData(tourMarkerItem.tourId);
+      if (tourData == null) {
+         return null;
+      }
 
-		return allColumns[0];
-	}
+      final long markerId = tourMarkerItem.markerId;
 
-	@Override
-	public ColumnViewer getViewer() {
-		return _markerViewer;
-	}
+      // get marker by id
+      for (final TourMarker tourMarker : tourData.getTourMarkers()) {
+         if (tourMarker.getMarkerId() == markerId) {
+            return tourMarker;
+         }
+      }
 
-	private StructuredSelection getViewerSelection() {
+      return null;
+   }
 
-		return (StructuredSelection) _markerViewer.getSelection();
-	}
+   private TourMarkerItem getSelectedTourMarkerItem() {
 
-	private void initUI(final Composite parent) {
+      final StructuredSelection selection = getViewerSelection();
 
-		_pc = new PixelConverter(parent);
+      if (selection.getFirstElement() instanceof TourMarkerItem) {
+         return (TourMarkerItem) selection.getFirstElement();
+      }
 
-		_columnSortListener = new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onSelect_SortColumn(e);
-			}
-		};
-	}
+      return null;
+   }
 
-	boolean isGeoFilterActive() {
-		return _isGeoFilterActive;
-	}
+   @Override
+   public ArrayList<TourData> getSelectedTours() {
 
-	boolean isLatLonDigits() {
-		return _isLatLonDigitsEnabled;
-	}
+      final ArrayList<TourData> selectedTours = new ArrayList<>();
 
-	private void loadAllMarker() {
+      final StructuredSelection selection = getViewerSelection();
 
-//		final long start = System.nanoTime();
+      for (final Iterator<?> iterator = selection.iterator(); iterator.hasNext();) {
 
-		_allMarkerItems.clear();
+         final Object element = iterator.next();
 
-//		final double latLonFactor = Math.pow(10, _latLonDigits);
+         if (element instanceof TourMarkerItem) {
 
-		Connection conn = null;
-		PreparedStatement statement = null;
-		ResultSet result = null;
+            // get TourData from the tour marker item
 
-		try {
+            final TourMarkerItem tourMarkerItem = (TourMarkerItem) element;
 
-			conn = TourDatabase.getInstance().getConnection();
+            // get tour by id
+            final TourData tourData = TourManager.getInstance().getTourData(tourMarkerItem.tourId);
 
-			final String tblTourMarker = TourDatabase.TABLE_TOUR_MARKER;
-			final String tourKey = TourDatabase.KEY_TOUR;
+            if (tourData != null) {
+               selectedTours.add(tourData);
+            }
+         }
+      }
 
-			final String sql = "SELECT " // //$NON-NLS-1$
-					+ "MarkerID, " //						// 1 //$NON-NLS-1$
-					+ (tourKey + ", ") //					// 2 //$NON-NLS-1$
-					+ "Label, " //							// 3 //$NON-NLS-1$
-					+ "description, " //					// 4 //$NON-NLS-1$
-					+ "urlText, " //						// 5 //$NON-NLS-1$
-					+ "urlAddress, " //						// 6 //$NON-NLS-1$
-					+ "latitude, " //						// 7 //$NON-NLS-1$
-					+ "longitude, " //						// 8 //$NON-NLS-1$
-					+ "altitude, " //						// 9 //$NON-NLS-1$
-					+ "tourTime " //						// 10 //$NON-NLS-1$
-					//
-					+ UI.NEW_LINE
-					//
-					+ (" FROM " + tblTourMarker + UI.NEW_LINE) //$NON-NLS-1$
-			//
-			;
+      return selectedTours;
+   }
 
-			statement = conn.prepareStatement(sql);
-			result = statement.executeQuery();
+   /**
+    * @param sortColumnId
+    * @return Returns the column widget by it's column id, when column id is not found then the
+    *         first column is returned.
+    */
+   private TableColumn getSortColumn(final String sortColumnId) {
 
-			while (result.next()) {
+      final TableColumn[] allColumns = _markerViewer.getTable().getColumns();
 
-				final TourMarkerItem markerItem = new TourMarkerItem();
-				_allMarkerItems.add(markerItem);
+      for (final TableColumn column : allColumns) {
 
-				final String dbLabel = result.getString(3);
-				final String dbDescription = result.getString(4);
-				final String dbUrlLabel = result.getString(5);
-				final String dbUrlAddress = result.getString(6);
+         final String columnId = ((ColumnDefinition) column.getData()).getColumnId();
 
-				/*
-				 * Reduce accuracy that markers sorted by lat/lon are near together
-				 */
-				final double dbLatitude = result.getDouble(7);
-				final double dbLongitude = result.getDouble(8);
-				if (dbLatitude == TourDatabase.DEFAULT_DOUBLE) {
+         if (columnId.equals(sortColumnId)) {
+            return column;
+         }
+      }
 
-					markerItem.latitude = dbLatitude;
-					markerItem.longitude = dbLongitude;
+      return allColumns[0];
+   }
 
-				} else {
+   @Override
+   public ColumnViewer getViewer() {
+      return _markerViewer;
+   }
 
-//					if (_isLatLonDigitsEnabled) {
+   private StructuredSelection getViewerSelection() {
+
+      return (StructuredSelection) _markerViewer.getSelection();
+   }
+
+   private void initUI(final Composite parent) {
+
+      _pc = new PixelConverter(parent);
+
+      _columnSortListener = new SelectionAdapter() {
+         @Override
+         public void widgetSelected(final SelectionEvent e) {
+            onSelect_SortColumn(e);
+         }
+      };
+   }
+
+   boolean isGeoFilterActive() {
+      return _isGeoFilterActive;
+   }
+
+   boolean isLatLonDigits() {
+      return _isLatLonDigitsEnabled;
+   }
+
+   private void loadAllMarker() {
+
+//      final long start = System.nanoTime();
+
+      _allMarkerItems.clear();
+
+//      final double latLonFactor = Math.pow(10, _latLonDigits);
+
+      Connection conn = null;
+      PreparedStatement statement = null;
+      ResultSet result = null;
+
+      try {
+
+         conn = TourDatabase.getInstance().getConnection();
+
+         final String tblTourMarker = TourDatabase.TABLE_TOUR_MARKER;
+         final String tourKey = TourDatabase.KEY_TOUR;
+
+         final String sql = "SELECT " // //$NON-NLS-1$
+               + "MarkerID, " //                  // 1 //$NON-NLS-1$
+               + (tourKey + ", ") //               // 2 //$NON-NLS-1$
+               + "Label, " //                     // 3 //$NON-NLS-1$
+               + "description, " //               // 4 //$NON-NLS-1$
+               + "urlText, " //                  // 5 //$NON-NLS-1$
+               + "urlAddress, " //                  // 6 //$NON-NLS-1$
+               + "latitude, " //                  // 7 //$NON-NLS-1$
+               + "longitude, " //                  // 8 //$NON-NLS-1$
+               + "altitude, " //                  // 9 //$NON-NLS-1$
+               + "tourTime " //                  // 10 //$NON-NLS-1$
+               //
+               + UI.NEW_LINE
+               //
+               + (" FROM " + tblTourMarker + UI.NEW_LINE) //$NON-NLS-1$
+         //
+         ;
+
+         statement = conn.prepareStatement(sql);
+         result = statement.executeQuery();
+
+         while (result.next()) {
+
+            final TourMarkerItem markerItem = new TourMarkerItem();
+            _allMarkerItems.add(markerItem);
+
+            final String dbLabel = result.getString(3);
+            final String dbDescription = result.getString(4);
+            final String dbUrlLabel = result.getString(5);
+            final String dbUrlAddress = result.getString(6);
+
+            /*
+             * Reduce accuracy that markers sorted by lat/lon are near together
+             */
+            final double dbLatitude = result.getDouble(7);
+            final double dbLongitude = result.getDouble(8);
+            if (dbLatitude == TourDatabase.DEFAULT_DOUBLE) {
+
+               markerItem.latitude = dbLatitude;
+               markerItem.longitude = dbLongitude;
+
+            } else {
+
+//               if (_isLatLonDigitsEnabled) {
 //
-//						// set lat/lon accuracy
+//                  // set lat/lon accuracy
 //
-//						final long longLat = (long) (dbLatitude * latLonFactor);
-//						final long longLon = (long) (dbLongitude * latLonFactor);
+//                  final long longLat = (long) (dbLatitude * latLonFactor);
+//                  final long longLon = (long) (dbLongitude * latLonFactor);
 //
-//						markerItem.latitude = longLat / latLonFactor;
-//						markerItem.longitude = longLon / latLonFactor;
+//                  markerItem.latitude = longLat / latLonFactor;
+//                  markerItem.longitude = longLon / latLonFactor;
 //
-//					} else {
+//               } else {
 //
-					markerItem.latitude = dbLatitude;
-					markerItem.longitude = dbLongitude;
+               markerItem.latitude = dbLatitude;
+               markerItem.longitude = dbLongitude;
 //
-//					}
-				}
+//               }
+            }
 
-				markerItem.markerId = result.getLong(1);
-				markerItem.tourId = result.getLong(2);
-				markerItem.label = dbLabel == null ? UI.EMPTY_STRING : dbLabel;
-				markerItem.description = dbDescription == null ? UI.EMPTY_STRING : dbDescription;
-				markerItem.urlLabel = dbUrlLabel == null ? UI.EMPTY_STRING : dbUrlLabel;
-				markerItem.urlAddress = dbUrlAddress == null ? UI.EMPTY_STRING : dbUrlAddress;
-				markerItem.altitude = result.getFloat(9);
-				markerItem.time = result.getLong(10);
-			}
+            markerItem.markerId = result.getLong(1);
+            markerItem.tourId = result.getLong(2);
+            markerItem.label = dbLabel == null ? UI.EMPTY_STRING : dbLabel;
+            markerItem.description = dbDescription == null ? UI.EMPTY_STRING : dbDescription;
+            markerItem.urlLabel = dbUrlLabel == null ? UI.EMPTY_STRING : dbUrlLabel;
+            markerItem.urlAddress = dbUrlAddress == null ? UI.EMPTY_STRING : dbUrlAddress;
+            markerItem.altitude = result.getFloat(9);
+            markerItem.time = result.getLong(10);
+         }
 
-		} catch (final SQLException e) {
-			SQL.showException(e);
-		} finally {
-			Util.closeSql(conn);
-			Util.closeSql(statement);
-			Util.closeSql(result);
-		}
+      } catch (final SQLException e) {
+         SQL.showException(e);
+      } finally {
+         Util.closeSql(conn);
+         Util.closeSql(statement);
+         Util.closeSql(result);
+      }
 
-//		System.out.println((UI.timeStampNano() + " " + this.getClass().getName() + " \t")
-//				+ (((float) (System.nanoTime() - start) / 1000000) + " ms"));
-//		// TODO remove SYSTEM.OUT.PRINTLN
-	}
+//      System.out.println((UI.timeStampNano() + " " + this.getClass().getName() + " \t")
+//            + (((float) (System.nanoTime() - start) / 1000000) + " ms"));
+//      // TODO remove SYSTEM.OUT.PRINTLN
+   }
 
-	private void onSelect_SortColumn(final SelectionEvent e) {
+   private void onSelect_SortColumn(final SelectionEvent e) {
 
-		_viewerContainer.setRedraw(false);
-		{
-			// keep selection
-			final ISelection selectionBackup = getViewerSelection();
-			{
-				// update viewer with new sorting
-				_markerComparator.setSortColumn(e.widget);
-				_markerViewer.refresh();
-			}
-			updateUI_SelectTourMarker(selectionBackup, null);
-		}
-		_viewerContainer.setRedraw(true);
-	}
+      _viewerContainer.setRedraw(false);
+      {
+         // keep selection
+         final ISelection selectionBackup = getViewerSelection();
+         {
+            // update viewer with new sorting
+            _markerComparator.setSortColumn(e.widget);
+            _markerViewer.refresh();
+         }
+         updateUI_SelectTourMarker(selectionBackup, null);
+      }
+      _viewerContainer.setRedraw(true);
+   }
 
-	private void onSelect_TourMarker(final Event event) {
+   private void onSelect_TourMarker(final Event event) {
 
-		if (_isInUpdate) {
-			return;
-		}
+      if (_isInUpdate) {
+         return;
+      }
 
-		StructuredSelection selection;
+      StructuredSelection selection;
 
-		if (event.detail == SWT.CHECK) {
+      if (event.detail == SWT.CHECK) {
 
-			// checkbox is hit
+         // checkbox is hit
 
-			/**
-			 * !!! VERY important !!!
-			 * <p>
-			 * Table.getSelection() returns the wrong selection when the user clicked in a checkbox.
-			 */
+         /**
+          * !!! VERY important !!!
+          * <p>
+          * Table.getSelection() returns the wrong selection when the user clicked in a checkbox.
+          */
 
-			final TableItem item = (TableItem) event.item;
-			final Object selectedMarker = item.getData();
+         final TableItem item = (TableItem) event.item;
+         final Object selectedMarker = item.getData();
 
-			selection = new StructuredSelection(selectedMarker);
+         selection = new StructuredSelection(selectedMarker);
 
-		} else {
+      } else {
 
-			// checkbox is not hit
+         // checkbox is not hit
 
-			selection = (StructuredSelection) _markerViewer.getSelection();
-		}
+         selection = (StructuredSelection) _markerViewer.getSelection();
+      }
 
-		fireSelection(selection);
-	}
+      fireSelection(selection);
+   }
 
-	private void onTourEvent_TourMarker(final Object eventData) {
+   private void onTourEvent_TourMarker(final Object eventData) {
 
-		if (eventData instanceof SelectionTourMarker) {
+      if (eventData instanceof SelectionTourMarker) {
 
-			// select the tour marker item in the view
+         // select the tour marker item in the view
 
-			final SelectionTourMarker selection = (SelectionTourMarker) eventData;
-			final ArrayList<TourMarker> allTourMarker = selection.getSelectedTourMarker();
+         final SelectionTourMarker selection = (SelectionTourMarker) eventData;
+         final ArrayList<TourMarker> allTourMarker = selection.getSelectedTourMarker();
 
-			final long selectedTourMarkerId = allTourMarker.get(0).getMarkerId();
+         final long selectedTourMarkerId = allTourMarker.get(0).getMarkerId();
 
-			// find tour marker in marker items
-			TourMarkerItem selectedMarkerItem = null;
-			for (final TourMarkerItem tourMarker : _allMarkerItems) {
-				if (tourMarker.markerId == selectedTourMarkerId) {
-					selectedMarkerItem = tourMarker;
-					break;
-				}
-			}
+         // find tour marker in marker items
+         TourMarkerItem selectedMarkerItem = null;
+         for (final TourMarkerItem tourMarker : _allMarkerItems) {
+            if (tourMarker.markerId == selectedTourMarkerId) {
+               selectedMarkerItem = tourMarker;
+               break;
+            }
+         }
 
-			if (selectedMarkerItem != null) {
+         if (selectedMarkerItem != null) {
 
-				final StructuredSelection markerViewerSelection = new StructuredSelection(selectedMarkerItem);
+            final StructuredSelection markerViewerSelection = new StructuredSelection(selectedMarkerItem);
 
-				updateUI_SelectTourMarker(markerViewerSelection, null);
-			}
-		}
-	}
+            updateUI_SelectTourMarker(markerViewerSelection, null);
+         }
+      }
+   }
 
-	private void onTourMarker_DoubleClick() {
+   private void onTourMarker_DoubleClick() {
 
-		final TourMarker tourMarker = getSelectedTourMarker();
+      final TourMarker tourMarker = getSelectedTourMarker();
 
-		if (tourMarker == null) {
-			return;
-		}
+      if (tourMarker == null) {
+         return;
+      }
 
-		_actionOpenMarkerDialog.setTourMarker(tourMarker);
-		_actionOpenMarkerDialog.run();
-	}
+      _actionOpenMarkerDialog.setTourMarker(tourMarker);
+      _actionOpenMarkerDialog.run();
+   }
 
-	private void onTourMarker_StateChanged(final CheckStateChangedEvent event) {
+   private void onTourMarker_StateChanged(final CheckStateChangedEvent event) {
 
-		final boolean isChecked = event.getChecked();
-		final Object checkedElement = event.getElement();
-		final Object[] checkedElements = _markerViewer.getCheckedElements();
+      final boolean isChecked = event.getChecked();
+      final Object checkedElement = event.getElement();
+      final Object[] checkedElements = _markerViewer.getCheckedElements();
 
-		final TourMarkerItem markerItem = (TourMarkerItem) checkedElement;
-		final boolean isMarkerWithGPS = markerItem.latitude != TourDatabase.DEFAULT_DOUBLE;
+      final TourMarkerItem markerItem = (TourMarkerItem) checkedElement;
+      final boolean isMarkerWithGPS = markerItem.latitude != TourDatabase.DEFAULT_DOUBLE;
 
-		Object checkedMarker = null;
+      Object checkedMarker = null;
 
-		_isGeoFilterActive = false;
-		_markerFilter = null;
+      _isGeoFilterActive = false;
+      _markerFilter = null;
 
-		if (isMarkerWithGPS) {
+      if (isMarkerWithGPS) {
 
-			if (isChecked) {
+         if (isChecked) {
 
-				_isGeoFilterActive = true;
-				_markerFilter = markerItem;
+            _isGeoFilterActive = true;
+            _markerFilter = markerItem;
 
-				/*
-				 * Ensure that the checked marker is also selected. It is possible that a selected and
-				 * checked marker gets unchecked and another marker is checked that it is not selected.
-				 */
+            /*
+             * Ensure that the checked marker is also selected. It is possible that a selected and
+             * checked marker gets unchecked and another marker is checked that it is not selected.
+             */
 
-				boolean isCheckAndSelected = false;
+            boolean isCheckAndSelected = false;
 
-				final TableItem[] seletedItems = _markerViewer.getTable().getSelection();
-				for (final TableItem tableItem : seletedItems) {
-					if (tableItem.getData() == checkedElement) {
-						isCheckAndSelected = true;
-						break;
-					}
-				}
+            final TableItem[] seletedItems = _markerViewer.getTable().getSelection();
+            for (final TableItem tableItem : seletedItems) {
+               if (tableItem.getData() == checkedElement) {
+                  isCheckAndSelected = true;
+                  break;
+               }
+            }
 
-				if (isCheckAndSelected == false) {
+            if (isCheckAndSelected == false) {
 
-					updateUI_SelectTourMarker(new StructuredSelection(checkedElement), null);
-				}
-			}
+               updateUI_SelectTourMarker(new StructuredSelection(checkedElement), null);
+            }
+         }
 
-		} else {
+      } else {
 
-			// prevent to check tour marker without GPS
+         // prevent to check tour marker without GPS
 
-			_markerViewer.setGrayed(checkedElement, true);
+         _markerViewer.setGrayed(checkedElement, true);
 
-			checkedMarker = checkedElement;
-		}
+         checkedMarker = checkedElement;
+      }
 
-		if (isChecked && checkedElements.length > 1) {
+      if (isChecked && checkedElements.length > 1) {
 
-			// only 1 marker can be checked
+         // only 1 marker can be checked
 
-			checkedMarker = checkedElement;
-		}
+         checkedMarker = checkedElement;
+      }
 
-		if (checkedMarker != null) {
+      if (checkedMarker != null) {
 
-			for (final Object element : checkedElements) {
-				if (element != checkedMarker) {
-					_markerViewer.setChecked(element, false);
-				}
-			}
+         for (final Object element : checkedElements) {
+            if (element != checkedMarker) {
+               _markerViewer.setChecked(element, false);
+            }
+         }
 
-			updateUI_SelectTourMarker(new StructuredSelection(checkedMarker), null);
+         updateUI_SelectTourMarker(new StructuredSelection(checkedMarker), null);
 
-		}
+      }
 
-		if (isMarkerWithGPS) {
-			updateUI_GeoFilter(markerItem);
-		}
+      if (isMarkerWithGPS) {
+         updateUI_GeoFilter(markerItem);
+      }
 
-		enableActions();
-	}
+      enableActions();
+   }
 
-	@Override
-	public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
+   @Override
+   public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
 
-		_viewerContainer.setRedraw(false);
-		{
-			// keep selection
-			final ISelection selectionBackup = getViewerSelection();
-			final Object[] checkedElements = _markerViewer.getCheckedElements();
-			{
-				_markerViewer.getTable().dispose();
+      _viewerContainer.setRedraw(false);
+      {
+         // keep selection
+         final ISelection selectionBackup = getViewerSelection();
+         final Object[] checkedElements = _markerViewer.getCheckedElements();
+         {
+            _markerViewer.getTable().dispose();
 
-				createUI_10_MarkerViewer(_viewerContainer);
+            createUI_10_MarkerViewer(_viewerContainer);
 
-				// update UI
-				_viewerContainer.layout();
+            // update UI
+            _viewerContainer.layout();
 
-				// update the viewer
-				updateUI_SetViewerInput();
-			}
-			updateUI_SelectTourMarker(selectionBackup, checkedElements);
-		}
-		_viewerContainer.setRedraw(true);
+            // update the viewer
+            updateUI_SetViewerInput();
+         }
+         updateUI_SelectTourMarker(selectionBackup, checkedElements);
+      }
+      _viewerContainer.setRedraw(true);
 
-		_markerViewer.getTable().setFocus();
+      _markerViewer.getTable().setFocus();
 
-		return _markerViewer;
-	}
+      return _markerViewer;
+   }
 
-	private void refilterViewer() {
+   private void refilterViewer() {
 
-		BusyIndicator.showWhile(_viewerContainer.getDisplay(), new Runnable() {
-			@Override
-			public void run() {
+      BusyIndicator.showWhile(_viewerContainer.getDisplay(), new Runnable() {
+         @Override
+         public void run() {
 
-				_viewerContainer.setRedraw(false);
-				{
-					// keep selection
-					final ISelection selectionBackup = getViewerSelection();
-					final Object[] checkedElements = _markerViewer.getCheckedElements();
-					{
-						_markerViewer.refresh(false);
-					}
-					updateUI_SelectTourMarker(selectionBackup, checkedElements);
-				}
-				_viewerContainer.setRedraw(true);
-			}
-		});
-	}
+            _viewerContainer.setRedraw(false);
+            {
+               // keep selection
+               final ISelection selectionBackup = getViewerSelection();
+               final Object[] checkedElements = _markerViewer.getCheckedElements();
+               {
+                  _markerViewer.refresh(false);
+               }
+               updateUI_SelectTourMarker(selectionBackup, checkedElements);
+            }
+            _viewerContainer.setRedraw(true);
+         }
+      });
+   }
 
-	@Override
-	public void reloadViewer() {
+   @Override
+   public void reloadViewer() {
 
-		loadAllMarker();
+      loadAllMarker();
 
-		_viewerContainer.setRedraw(false);
-		{
-			// keep selection
-			final ISelection selectionBackup = getViewerSelection();
-			final Object[] checkedElements = _markerViewer.getCheckedElements();
-			{
-				updateUI_SetViewerInput();
-			}
-			updateUI_SelectTourMarker(selectionBackup, checkedElements);
-		}
-		_viewerContainer.setRedraw(true);
-	}
+      _viewerContainer.setRedraw(false);
+      {
+         // keep selection
+         final ISelection selectionBackup = getViewerSelection();
+         final Object[] checkedElements = _markerViewer.getCheckedElements();
+         {
+            updateUI_SetViewerInput();
+         }
+         updateUI_SelectTourMarker(selectionBackup, checkedElements);
+      }
+      _viewerContainer.setRedraw(true);
+   }
 
-	private void restoreState_BeforeUI() {
+   private void restoreState_BeforeUI() {
 
-		// GPS tour filter
-		_gpsMarkerFilter = Util.getStateInt(_state, STATE_GPS_FILTER, GPS_MARKER_FILTER_IS_DISABLED);
+      // GPS tour filter
+      _gpsMarkerFilter = Util.getStateInt(_state, STATE_GPS_FILTER, GPS_MARKER_FILTER_IS_DISABLED);
 
-		// lat/lon digits
-		_isLatLonDigitsEnabled = Util.getStateBoolean(
-				_state,
-				TourMarkerAllView.STATE_IS_LAT_LON_DIGITS_ENABLED,
-				TourMarkerAllView.DEFAULT_IS_LAT_LON_DIGITS_ENABLED);
+      // lat/lon digits
+      _isLatLonDigitsEnabled = Util.getStateBoolean(
+            _state,
+            TourMarkerAllView.STATE_IS_LAT_LON_DIGITS_ENABLED,
+            TourMarkerAllView.DEFAULT_IS_LAT_LON_DIGITS_ENABLED);
 
-		_latLonDigits = Util.getStateInt(
-				_state,
-				TourMarkerAllView.STATE_LAT_LON_DIGITS,
-				TourMarkerAllView.DEFAULT_LAT_LON_DIGITS);
-		setup_LatLonDigits();
+      _latLonDigits = Util.getStateInt(
+            _state,
+            TourMarkerAllView.STATE_LAT_LON_DIGITS,
+            TourMarkerAllView.DEFAULT_LAT_LON_DIGITS);
+      setup_LatLonDigits();
 
-		// geo filter accuracy
-		_geoFilterMaxDiff = Util.getStateDouble(_state, STATE_GEO_FILTER_AREA, DEFAULT_GEO_FILTER_AREA);
+      // geo filter accuracy
+      _geoFilterMaxDiff = Util.getStateDouble(_state, STATE_GEO_FILTER_AREA, DEFAULT_GEO_FILTER_AREA);
 
-		// sorting
-		final String sortColumnId = Util.getStateString(_state, STATE_SORT_COLUMN_ID, COLUMN_NAME);
-		final int sortDirection = Util.getStateInt(_state, STATE_SORT_COLUMN_DIRECTION, MarkerComparator.ASCENDING);
+      // sorting
+      final String sortColumnId = Util.getStateString(_state, STATE_SORT_COLUMN_ID, COLUMN_NAME);
+      final int sortDirection = Util.getStateInt(_state, STATE_SORT_COLUMN_DIRECTION, MarkerComparator.ASCENDING);
 
-		// update comparator
-		_markerComparator.__sortColumnId = sortColumnId;
-		_markerComparator.__sortDirection = sortDirection;
-	}
+      // update comparator
+      _markerComparator.__sortColumnId = sortColumnId;
+      _markerComparator.__sortDirection = sortDirection;
+   }
 
-	private void restoreState_WithUI() {
+   private void restoreState_WithUI() {
 
-		// GPS tour filter
-		_actionTourFilterWithGPS.setChecked(_gpsMarkerFilter == GPS_MARKER_FILTER_WITH_GPS);
-		_actionTourFilterWithoutGPS.setChecked(_gpsMarkerFilter == GPS_MARKER_FILTER_WITHOUT_GPS);
+      // GPS tour filter
+      _actionTourFilterWithGPS.setChecked(_gpsMarkerFilter == GPS_MARKER_FILTER_WITH_GPS);
+      _actionTourFilterWithoutGPS.setChecked(_gpsMarkerFilter == GPS_MARKER_FILTER_WITHOUT_GPS);
 
-		/*
-		 * select marker item
-		 */
-		final long stateMarkerId = Util.getStateLong(_state, //
-				STATE_SELECTED_MARKER_ITEM,
-				TourDatabase.ENTITY_IS_NOT_SAVED);
+      /*
+       * select marker item
+       */
+      final long stateMarkerId = Util.getStateLong(_state, //
+            STATE_SELECTED_MARKER_ITEM,
+            TourDatabase.ENTITY_IS_NOT_SAVED);
 
-		if (stateMarkerId != TourDatabase.ENTITY_IS_NOT_SAVED) {
+      if (stateMarkerId != TourDatabase.ENTITY_IS_NOT_SAVED) {
 
-			// select marker item by it's ID
-			for (final TourMarkerItem markerItem : _allMarkerItems) {
-				if (markerItem.markerId == stateMarkerId) {
+         // select marker item by it's ID
+         for (final TourMarkerItem markerItem : _allMarkerItems) {
+            if (markerItem.markerId == stateMarkerId) {
 
-					updateUI_SelectTourMarker(new StructuredSelection(markerItem), null);
+               updateUI_SelectTourMarker(new StructuredSelection(markerItem), null);
 
-					return;
-				}
-			}
-		}
+               return;
+            }
+         }
+      }
 
-		enableActions();
-	}
+      enableActions();
+   }
 
-	@PersistState
-	private void saveState() {
+   @PersistState
+   private void saveState() {
 
-		_columnManager.saveState(_state);
+      _columnManager.saveState(_state);
 
-		_state.put(STATE_SORT_COLUMN_ID, _markerComparator.__sortColumnId);
-		_state.put(STATE_SORT_COLUMN_DIRECTION, _markerComparator.__sortDirection);
+      _state.put(STATE_SORT_COLUMN_ID, _markerComparator.__sortColumnId);
+      _state.put(STATE_SORT_COLUMN_DIRECTION, _markerComparator.__sortDirection);
 
-		_state.put(STATE_GPS_FILTER, _gpsMarkerFilter);
+      _state.put(STATE_GPS_FILTER, _gpsMarkerFilter);
 
-		/*
-		 * selected marker item
-		 */
-		long markerId = TourDatabase.ENTITY_IS_NOT_SAVED;
-		final StructuredSelection selection = getViewerSelection();
-		final Object firstItem = selection.getFirstElement();
+      /*
+       * selected marker item
+       */
+      long markerId = TourDatabase.ENTITY_IS_NOT_SAVED;
+      final StructuredSelection selection = getViewerSelection();
+      final Object firstItem = selection.getFirstElement();
 
-		if (firstItem instanceof TourMarkerItem) {
-			final TourMarkerItem markerItem = (TourMarkerItem) firstItem;
-			markerId = markerItem.markerId;
-		}
-		_state.put(STATE_SELECTED_MARKER_ITEM, markerId);
-	}
+      if (firstItem instanceof TourMarkerItem) {
+         final TourMarkerItem markerItem = (TourMarkerItem) firstItem;
+         markerId = markerItem.markerId;
+      }
+      _state.put(STATE_SELECTED_MARKER_ITEM, markerId);
+   }
 
-	@Override
-	public void setFocus() {
-		_markerViewer.getTable().setFocus();
-	}
+   @Override
+   public void setFocus() {
+      _markerViewer.getTable().setFocus();
+   }
 
-	/**
-	 * Validates geo position accuracy and setup's the position formatter.
-	 */
-	private void setup_LatLonDigits() {
+   /**
+    * Validates geo position accuracy and setup's the position formatter.
+    */
+   private void setup_LatLonDigits() {
 
-		_nfLatLon.setMinimumFractionDigits(_latLonDigits);
-		_nfLatLon.setMaximumFractionDigits(_latLonDigits);
-	}
+      _nfLatLon.setMinimumFractionDigits(_latLonDigits);
+      _nfLatLon.setMaximumFractionDigits(_latLonDigits);
+   }
 
-	@Override
-	public void updateColumnHeader(final ColumnDefinition colDef) {
-		// TODO Auto-generated method stub
+   @Override
+   public void updateColumnHeader(final ColumnDefinition colDef) {
+      // TODO Auto-generated method stub
 
-	}
+   }
 
-	void updateUI_GeoFilter() {
+   void updateUI_GeoFilter() {
 
-		// geo filter accuracy
-		_geoFilterMaxDiff = Util.getStateDouble(_state, STATE_GEO_FILTER_AREA, DEFAULT_GEO_FILTER_AREA);
+      // geo filter accuracy
+      _geoFilterMaxDiff = Util.getStateDouble(_state, STATE_GEO_FILTER_AREA, DEFAULT_GEO_FILTER_AREA);
 
-		refilterViewer();
-	}
+      refilterViewer();
+   }
 
-	private void updateUI_GeoFilter(final TourMarkerItem markerItem) {
+   private void updateUI_GeoFilter(final TourMarkerItem markerItem) {
 
-		_geoFilterLat = markerItem.latitude;
-		_geoFilterLon = markerItem.longitude;
+      _geoFilterLat = markerItem.latitude;
+      _geoFilterLon = markerItem.longitude;
 
-		_viewerContainer.setRedraw(false);
-		{
-			_markerViewer.refresh(false);
+      _viewerContainer.setRedraw(false);
+      {
+         _markerViewer.refresh(false);
 
-			/*
-			 * Select and reveal marker item
-			 */
-			final Table table = _markerViewer.getTable();
-			final TableItem[] tableItems = table.getItems();
+         /*
+          * Select and reveal marker item
+          */
+         final Table table = _markerViewer.getTable();
+         final TableItem[] tableItems = table.getItems();
 
-			int checkedIndex = 0;
+         int checkedIndex = 0;
 
-			for (; checkedIndex < tableItems.length; checkedIndex++) {
-				if (tableItems[checkedIndex].getData() == markerItem) {
-					break;
-				}
-			}
+         for (; checkedIndex < tableItems.length; checkedIndex++) {
+            if (tableItems[checkedIndex].getData() == markerItem) {
+               break;
+            }
+         }
 
-			if (checkedIndex < tableItems.length) {
-				table.setSelection(checkedIndex);
-			}
+         if (checkedIndex < tableItems.length) {
+            table.setSelection(checkedIndex);
+         }
 
-		}
-		_viewerContainer.setRedraw(true);
+      }
+      _viewerContainer.setRedraw(true);
 
-	}
+   }
 
-	void updateUI_LatLonDigits(final boolean isEnabled, final int selectedDigits) {
+   void updateUI_LatLonDigits(final boolean isEnabled, final int selectedDigits) {
 
-		if (isEnabled == _isLatLonDigitsEnabled && selectedDigits == _latLonDigits) {
-			// nothing has changed
-			return;
-		}
+      if (isEnabled == _isLatLonDigitsEnabled && selectedDigits == _latLonDigits) {
+         // nothing has changed
+         return;
+      }
 
-		_isLatLonDigitsEnabled = isEnabled;
-		_latLonDigits = selectedDigits;
+      _isLatLonDigitsEnabled = isEnabled;
+      _latLonDigits = selectedDigits;
 
-		setup_LatLonDigits();
+      setup_LatLonDigits();
 
-		_viewerContainer.setRedraw(false);
-		{
-			// keep selection
-			final ISelection selectionBackup = getViewerSelection();
-			final Object[] checkedElements = _markerViewer.getCheckedElements();
-			{
-				_markerViewer.refresh();
-			}
-			updateUI_SelectTourMarker(selectionBackup, checkedElements);
-		}
-		_viewerContainer.setRedraw(true);
+      _viewerContainer.setRedraw(false);
+      {
+         // keep selection
+         final ISelection selectionBackup = getViewerSelection();
+         final Object[] checkedElements = _markerViewer.getCheckedElements();
+         {
+            _markerViewer.refresh();
+         }
+         updateUI_SelectTourMarker(selectionBackup, checkedElements);
+      }
+      _viewerContainer.setRedraw(true);
 
-	}
+   }
 
-	/**
-	 * Select and reveal tour marker item.
-	 *
-	 * @param selection
-	 * @param checkedElements
-	 */
-	private void updateUI_SelectTourMarker(final ISelection selection, final Object[] checkedElements) {
+   /**
+    * Select and reveal tour marker item.
+    *
+    * @param selection
+    * @param checkedElements
+    */
+   private void updateUI_SelectTourMarker(final ISelection selection, final Object[] checkedElements) {
 
-		_isInUpdate = true;
-		{
-			_markerViewer.setSelection(selection, true);
+      _isInUpdate = true;
+      {
+         _markerViewer.setSelection(selection, true);
 
-			if (checkedElements != null && checkedElements.length > 0) {
-				_markerViewer.setCheckedElements(checkedElements);
-			}
+         if (checkedElements != null && checkedElements.length > 0) {
+            _markerViewer.setCheckedElements(checkedElements);
+         }
 
-			final Table table = _markerViewer.getTable();
-			table.showSelection();
-		}
-		_isInUpdate = false;
-	}
+         final Table table = _markerViewer.getTable();
+         table.showSelection();
+      }
+      _isInUpdate = false;
+   }
 
-	/**
-	 * Set the sort column direction indicator for a column.
-	 *
-	 * @param sortColumnId
-	 * @param isAscendingSort
-	 */
-	private void updateUI_SetSortDirection(final String sortColumnId, final int sortDirection) {
+   /**
+    * Set the sort column direction indicator for a column.
+    *
+    * @param sortColumnId
+    * @param isAscendingSort
+    */
+   private void updateUI_SetSortDirection(final String sortColumnId, final int sortDirection) {
 
-		final Table table = _markerViewer.getTable();
-		final TableColumn tc = getSortColumn(sortColumnId);
+      final Table table = _markerViewer.getTable();
+      final TableColumn tc = getSortColumn(sortColumnId);
 
-		table.setSortColumn(tc);
-		table.setSortDirection(sortDirection == MarkerComparator.ASCENDING ? SWT.UP : SWT.DOWN);
-	}
+      table.setSortColumn(tc);
+      table.setSortDirection(sortDirection == MarkerComparator.ASCENDING ? SWT.UP : SWT.DOWN);
+   }
 
-	private void updateUI_SetViewerInput() {
+   private void updateUI_SetViewerInput() {
 
-		_isInUpdate = true;
-		{
-			_markerViewer.setInput(new Object[0]);
-		}
-		_isInUpdate = false;
-	}
+      _isInUpdate = true;
+      {
+         _markerViewer.setInput(new Object[0]);
+      }
+      _isInUpdate = false;
+   }
 
 }

@@ -29,6 +29,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
+import net.tourbook.common.util.IContextMenuProvider;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.ITreeViewer;
 import net.tourbook.common.util.PostSelectionProvider;
@@ -161,19 +162,18 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       _nf1.setMaximumFractionDigits(1);
    }
 
-   private final IPreferenceStore        _prefStore            = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore        _prefStore                 = TourbookPlugin.getPrefStore();
 
-   private final IDialogSettings         _state                = TourbookPlugin.getState(ID);
+   private final IDialogSettings         _state                     = TourbookPlugin.getState(ID);
 
-   private int                           _tagViewLayout        = TAG_VIEW_LAYOUT_HIERARCHICAL;
+   private int                           _tagViewLayout             = TAG_VIEW_LAYOUT_HIERARCHICAL;
    private TreeViewerTourInfoToolTip     _tourInfoToolTip;
 
    private boolean                       _isToolTipInTag;
    private boolean                       _isToolTipInTitle;
    private boolean                       _isToolTipInTags;
-   private TagMenuManager                _tagMenuMgr;
 
-   private TourDoubleClickState          _tourDoubleClickState = new TourDoubleClickState();
+   private TourDoubleClickState          _tourDoubleClickState      = new TourDoubleClickState();
 
    private int                           _numIteratedTours;
 
@@ -186,7 +186,11 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    private PostSelectionProvider         _postSelectionProvider;
    private IPropertyChangeListener       _prefChangeListener;
    private ITourEventListener            _tourEventListener;
-   //
+
+   private TagMenuManager                _tagMenuManager;
+   private MenuManager                   _viewerMenuManager;
+   private IContextMenuProvider          _viewerContextMenuProvider = new TreeContextMenuProvider();
+
    private ActionCollapseAll             _actionCollapseAll;
    private ActionCollapseOthers          _actionCollapseOthers;
    private ActionEditQuick               _actionEditQuick;
@@ -204,8 +208,10 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    private ActionSetLayoutFlat           _actionSetLayoutFlat;
    private ActionSetTourTypeMenu         _actionSetTourType;
 
+   private PixelConverter                _pc;
+
    /*
-    * resources
+    * UI resources
     */
    private final Image _imgTagCategory = TourbookPlugin.getImage(Messages.Image__tag_category);
    private final Image _imgTag         = TourbookPlugin.getImage(Messages.Image__tag);
@@ -214,8 +220,9 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    /*
     * UI controls
     */
-   private Composite      _viewerContainer;
-   private PixelConverter _pc;
+   private Composite _viewerContainer;
+
+   private Menu      _treeContextMenu;
 
    private class StateSegment {
 
@@ -357,6 +364,33 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
          setTagViewTitle(newInput);
       }
+   }
+
+   public class TreeContextMenuProvider implements IContextMenuProvider {
+
+      @Override
+      public void disposeContextMenu() {
+
+         if (_treeContextMenu != null) {
+            _treeContextMenu.dispose();
+         }
+      }
+
+      @Override
+      public Menu getContextMenu() {
+         return _treeContextMenu;
+      }
+
+      @Override
+      public Menu recreateContextMenu() {
+
+         disposeContextMenu();
+
+         _treeContextMenu = createUI_22_CreateViewerContextMenu();
+
+         return _treeContextMenu;
+      }
+
    }
 
    private void addPartListener() {
@@ -525,13 +559,27 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       _actionSetLayoutFlat = new ActionSetLayoutFlat(this);
       _actionSetLayoutHierarchical = new ActionSetLayoutHierarchical(this);
 
-      _tagMenuMgr = new TagMenuManager(this, true);
+   }
+
+   private void createMenuManager() {
+
+      _tagMenuManager = new TagMenuManager(this, true);
+
+      _viewerMenuManager = new MenuManager("#PopupMenu"); //$NON-NLS-1$
+      _viewerMenuManager.setRemoveAllWhenShown(true);
+      _viewerMenuManager.addMenuListener(new IMenuListener() {
+         @Override
+         public void menuAboutToShow(final IMenuManager manager) {
+            fillContextMenu(manager);
+         }
+      });
    }
 
    @Override
    public void createPartControl(final Composite parent) {
 
       _pc = new PixelConverter(parent);
+      createMenuManager();
 
       // define all columns
       _columnManager = new ColumnManager(this, _state);
@@ -619,8 +667,8 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
             case SWT.F2:
                onTagViewer_RenameTag();
                break;
+               }
             }
-         }
 
          @Override
          public void keyReleased(final KeyEvent e) {}
@@ -641,37 +689,42 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    }
 
    /**
-    * create the views context menu
+    * Setup the viewer context menu
     */
    private void createUI_20_ContextMenu() {
 
+      _treeContextMenu = createUI_22_CreateViewerContextMenu();
+
       final Tree tree = (Tree) _tagViewer.getControl();
 
-      final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
-      menuMgr.setRemoveAllWhenShown(true);
-      menuMgr.addMenuListener(new IMenuListener() {
-         @Override
-         public void menuAboutToShow(final IMenuManager manager) {
-            fillContextMenu(manager);
-         }
-      });
+      _columnManager.createHeaderContextMenu(tree, _viewerContextMenuProvider);
+   }
+
+   /**
+    * Create the viewer context menu
+    *
+    * @return
+    */
+   private Menu createUI_22_CreateViewerContextMenu() {
+
+      final Tree tree = (Tree) _tagViewer.getControl();
 
       // add the context menu to the tree viewer
 
-      final Menu treeContextMenu = menuMgr.createContextMenu(tree);
+      final Menu treeContextMenu = _viewerMenuManager.createContextMenu(tree);
       treeContextMenu.addMenuListener(new MenuAdapter() {
          @Override
          public void menuHidden(final MenuEvent e) {
-            _tagMenuMgr.onHideMenu();
+            _tagMenuManager.onHideMenu();
          }
 
          @Override
          public void menuShown(final MenuEvent menuEvent) {
-            _tagMenuMgr.onShowMenu(menuEvent, tree, Display.getCurrent().getCursorLocation(), _tourInfoToolTip);
+            _tagMenuManager.onShowMenu(menuEvent, tree, Display.getCurrent().getCursorLocation(), _tourInfoToolTip);
          }
       });
 
-      _columnManager.createHeaderContextMenu(tree, treeContextMenu);
+      return treeContextMenu;
    }
 
    /**
@@ -1340,7 +1393,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       _actionCollapseOthers.setEnabled(selectedItems == 1 && firstElementHasChildren);
       _actionCollapseAll.setEnabled(isItemsAvailable);
 
-      _tagMenuMgr.enableTagActions(isTourSelected, isOneTour, firstTour == null ? null : firstTour.tagIds);
+      _tagMenuManager.enableTagActions(isTourSelected, isOneTour, firstTour == null ? null : firstTour.tagIds);
 
       TourTypeMenuManager.enableRecentTourTypeActions(isTourSelected,
             isOneTour
@@ -1365,7 +1418,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       menuMgr.add(_actionEditTour);
       menuMgr.add(_actionOpenTour);
 
-      _tagMenuMgr.fillTagMenu(menuMgr);
+      _tagMenuManager.fillTagMenu(menuMgr);
 
       // tour type actions
       menuMgr.add(new Separator());

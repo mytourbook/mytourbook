@@ -606,10 +606,10 @@ public class ColumnManager {
     * Create header context menu which has the action to modify columns
     *
     * @param composite
-    * @param defaultContextMenu
+    * @param defaultContextMenuProvider
     * @return
     */
-   private Menu createHCM_0_Menu(final Composite composite, final Shell shell, final Menu defaultContextMenu) {
+   private Menu createHCM_0_Menu(final Composite composite, final Shell shell, final IContextMenuProvider defaultContextMenuProvider) {
 
       final Menu headerContextMenu = new Menu(shell, SWT.POP_UP);
 
@@ -623,8 +623,8 @@ public class ColumnManager {
 
             headerContextMenu.dispose();
 
-            if (defaultContextMenu != null) {
-               defaultContextMenu.dispose();
+            if (defaultContextMenuProvider != null) {
+               defaultContextMenuProvider.disposeContextMenu();
             }
          }
       });
@@ -875,31 +875,33 @@ public class ColumnManager {
     * set context menu depending on the position of the mouse
     *
     * @param table
+    *           Table control
     * @param defaultContextMenu
-    *           can be <code>null</code>
+    *           Can be <code>null</code> when a default context menu is not available
     */
-   public void createHeaderContextMenu(final Table table, final Menu defaultContextMenu) {
-      this.createHeaderContextMenu(table, defaultContextMenu, table.getShell());
+   public void createHeaderContextMenu(final Table table, final IContextMenuProvider defaultContextMenuProvider) {
+      this.createHeaderContextMenu(table, defaultContextMenuProvider, table.getShell());
    }
 
    /**
     * Set context menu depending on the position of the mouse
     *
     * @param table
-    * @param defaultContextMenu
-    *           can be <code>null</code>
+    *           Table control
+    * @param defaultContextMenuProvider
+    *           Can be <code>null</code> when a default context menu is not available
     * @param contextMenuShell
     *           Shell for the context menu. For reparented dialogs, the correct shell must be
     *           provided.
     */
-   public void createHeaderContextMenu(final Table table, final Menu defaultContextMenu, final Shell contextMenuShell) {
+   public void createHeaderContextMenu(final Table table, final IContextMenuProvider defaultContextMenuProvider, final Shell contextMenuShell) {
 
       // remove old listener
       if (_tableMenuDetectListener != null) {
          table.removeListener(SWT.MenuDetect, _tableMenuDetectListener);
       }
 
-      final Menu headerContextMenu[] = { createHCM_0_Menu(table, contextMenuShell, defaultContextMenu) };
+      final Menu headerContextMenu[] = { createHCM_0_Menu(table, contextMenuShell, defaultContextMenuProvider) };
 
       // add the context menu to the table
       _tableMenuDetectListener = new Listener() {
@@ -919,24 +921,35 @@ public class ColumnManager {
 
             _headerColumn = getHeaderColumn(table, mousePosition, isTableHeaderHit);
 
-            Menu contextMenu = getContextMenu(isTableHeaderHit, headerContextMenu[0], defaultContextMenu);
+            Menu contextMenu = getContextMenu(isTableHeaderHit, headerContextMenu[0], defaultContextMenuProvider);
 
-            if (contextMenu == headerContextMenu[0] && contextMenu.getShell() != table.getShell()) {
+            if (contextMenu != null) {
 
-               /**
-                * java.lang.IllegalArgumentException: Widget has the wrong parent
-                * <p>
-                * When a view is minimized, then the context menu is already created
-                * but has the wrong parent when the view is displayed lateron.
-                */
+               // can be null when context menu is not set
 
-               headerContextMenu[0].dispose();
+               if (contextMenu == headerContextMenu[0] && contextMenu.getShell() != table.getShell()) {
 
-               headerContextMenu[0] = createHCM_0_Menu(table, table.getShell(), defaultContextMenu);
+                  /**
+                   * java.lang.IllegalArgumentException: Widget has the wrong parent
+                   * <p>
+                   * When a view is minimized, then the context menu is already created
+                   * but has the wrong parent when the view is displayed lateron.
+                   */
 
-               contextMenu = getContextMenu(isTableHeaderHit, headerContextMenu[0], defaultContextMenu);
+                  headerContextMenu[0].dispose();
 
-               StatusUtil.log("Context menu has had the wrong parent, header context menu has been recreated.");
+                  headerContextMenu[0] = createHCM_0_Menu(table, table.getShell(), defaultContextMenuProvider);
+
+                  contextMenu = getContextMenu(isTableHeaderHit, headerContextMenu[0], defaultContextMenuProvider);
+
+                  StatusUtil.log("Table header context menu has had the wrong parent and is recreated.");
+
+               } else if (contextMenu == defaultContextMenuProvider.getContextMenu() && contextMenu.getShell() != table.getShell()) {
+
+                  contextMenu = defaultContextMenuProvider.recreateContextMenu();
+
+                  StatusUtil.log("Table context menu has had the wrong parent and is recreated.");
+               }
             }
 
             try {
@@ -944,16 +957,6 @@ public class ColumnManager {
                table.setMenu(contextMenu);
 
             } catch (final IllegalArgumentException e) {
-
-               // This occured: Widget has the wrong parent
-
-               // after some debugging, could not find the reason, this view is very similar to the tourbook view
-
-               /*
-                * The problem can occure when tours are compared with 2 different perspectives (ref
-                * tour and compare result), the system measurement is changed and the context menu
-                * for the ref tours will be opened
-                */
 
                StatusUtil.showStatus(e);
             }
@@ -995,32 +998,34 @@ public class ColumnManager {
     * Set context menu depending on the position of the mouse
     *
     * @param tree
+    *           Tree control
     * @param defaultContextMenu
-    *           can be <code>null</code>
+    *           Can be <code>null</code> when a default context menu is not available
     */
-   public void createHeaderContextMenu(final Tree tree, final Menu defaultContextMenu) {
+   public void createHeaderContextMenu(final Tree tree, final IContextMenuProvider defaultContextMenuProvider) {
 
-      this.createHeaderContextMenu(tree, tree.getShell(), defaultContextMenu);
+      this.createHeaderContextMenu(tree, defaultContextMenuProvider, tree.getShell());
    }
 
    /**
     * Set context menu depending on the position of the mouse
     *
     * @param tree
+    *           Tree control
+    * @param defaultContextMenu
+    *           Can be <code>null</code> when a default context menu is not available
     * @param contextMenuShell
     *           Shell for the context menu. For reparented dialogs, the correct shell must be
     *           provided.
-    * @param defaultContextMenu
-    *           can be <code>null</code>
     */
-   private void createHeaderContextMenu(final Tree tree, final Shell contextMenuShell, final Menu defaultContextMenu) {
+   private void createHeaderContextMenu(final Tree tree, final IContextMenuProvider defaultContextMenuProvider, final Shell contextMenuShell) {
 
       // remove old listener
       if (_treeMenuDetectListener != null) {
          tree.removeListener(SWT.MenuDetect, _treeMenuDetectListener);
       }
 
-      final Menu headerContextMenu[] = { createHCM_0_Menu(tree, contextMenuShell, defaultContextMenu) };
+      final Menu headerContextMenu[] = { createHCM_0_Menu(tree, contextMenuShell, defaultContextMenuProvider) };
 
       // add the context menu to the tree viewer
       _treeMenuDetectListener = new Listener() {
@@ -1041,24 +1046,35 @@ public class ColumnManager {
 
             _headerColumn = getHeaderColumn(tree, mousePosition, isTreeHeaderHit);
 
-            Menu contextMenu = getContextMenu(isTreeHeaderHit, headerContextMenu[0], defaultContextMenu);
+            Menu contextMenu = getContextMenu(isTreeHeaderHit, headerContextMenu[0], defaultContextMenuProvider);
 
-            if (contextMenu == headerContextMenu[0] && contextMenu.getShell() != tree.getShell()) {
+            if (contextMenu != null) {
 
-               /**
-                * java.lang.IllegalArgumentException: Widget has the wrong parent
-                * <p>
-                * When a view is minimized, then the context menu is already created
-                * but has the wrong parent when the view is displayed lateron.
-                */
+               // can be null when context menu is not set
 
-               headerContextMenu[0].dispose();
+               if (contextMenu == headerContextMenu[0] && contextMenu.getShell() != tree.getShell()) {
 
-               headerContextMenu[0] = createHCM_0_Menu(tree, tree.getShell(), defaultContextMenu);
+                  /**
+                   * java.lang.IllegalArgumentException: Widget has the wrong parent
+                   * <p>
+                   * When a view is minimized, then the context menu is already created
+                   * but has the wrong parent when the view is displayed lateron.
+                   */
 
-               contextMenu = getContextMenu(isTreeHeaderHit, headerContextMenu[0], defaultContextMenu);
+                  headerContextMenu[0].dispose();
 
-               StatusUtil.log("Context menu has had the wrong parent, header context menu has been recreated.");
+                  headerContextMenu[0] = createHCM_0_Menu(tree, tree.getShell(), defaultContextMenuProvider);
+
+                  contextMenu = getContextMenu(isTreeHeaderHit, headerContextMenu[0], defaultContextMenuProvider);
+
+                  StatusUtil.log("Tree header context menu has had the wrong parent and is recreated.");
+
+               } else if (contextMenu == defaultContextMenuProvider.getContextMenu() && contextMenu.getShell() != tree.getShell()) {
+
+                  contextMenu = defaultContextMenuProvider.recreateContextMenu();
+
+                  StatusUtil.log("Tree context menu has had the wrong parent and is recreated.");
+               }
             }
 
             try {
@@ -1306,10 +1322,10 @@ public class ColumnManager {
    /**
     * @param isHeaderHit
     * @param headerContextMenu
-    * @param defaultContextMenu
+    * @param defaultContextMenuProvider
     * @return
     */
-   private Menu getContextMenu(final boolean isHeaderHit, final Menu headerContextMenu, final Menu defaultContextMenu) {
+   private Menu getContextMenu(final boolean isHeaderHit, final Menu headerContextMenu, final IContextMenuProvider defaultContextMenuProvider) {
 
       Menu contextMenu;
 
@@ -1326,7 +1342,7 @@ public class ColumnManager {
 
       } else {
 
-         contextMenu = defaultContextMenu;
+         contextMenu = defaultContextMenuProvider.getContextMenu();
       }
 
       return contextMenu;

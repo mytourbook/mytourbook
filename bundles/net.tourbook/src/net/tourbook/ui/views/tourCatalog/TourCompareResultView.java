@@ -29,6 +29,7 @@ import net.tourbook.common.formatter.ValueFormat;
 import net.tourbook.common.formatter.ValueFormatSet;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
+import net.tourbook.common.util.IContextMenuProvider;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.ITreeViewer;
 import net.tourbook.common.util.PostSelectionProvider;
@@ -115,10 +116,10 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
 // SET_FORMATTING_ON
 
-   public static final String                 ID                  = "net.tourbook.views.tourCatalog.CompareResultView"; //$NON-NLS-1$
+   public static final String                 ID                         = "net.tourbook.views.tourCatalog.CompareResultView"; //$NON-NLS-1$
 
-   private final IPreferenceStore             _prefStore          = TourbookPlugin.getPrefStore();
-   private final IDialogSettings              _state              = TourbookPlugin.getState(ID);
+   private final IPreferenceStore             _prefStore                 = TourbookPlugin.getPrefStore();
+   private final IDialogSettings              _state                     = TourbookPlugin.getState(ID);
 
    private TVICompareResultRootItem           _rootItem;
 
@@ -133,9 +134,12 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
    private boolean                            _isToolbarCreated;
 
    private ColumnManager                      _columnManager;
-   private TagMenuManager                     _tagMenuMgr;
 
-   private SelectionRemovedComparedTours      _oldRemoveSelection = null;
+   private SelectionRemovedComparedTours      _oldRemoveSelection        = null;
+
+   private TagMenuManager                     _tagMenuManager;
+   private MenuManager                        _viewerMenuManager;
+   private IContextMenuProvider               _viewerContextMenuProvider = new TreeContextMenuProvider();
 
    private ActionSaveComparedTours            _actionSaveComparedTours;
    private ActionRemoveComparedTourSaveStatus _actionRemoveComparedTourSaveStatus;
@@ -149,19 +153,21 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
    private ActionSetTourTypeMenu              _actionSetTourType;
    private ActionOpenTour                     _actionOpenTour;
 
-   /*
-    * resources
-    */
-   private Image                     _dbImage = TourbookPlugin.getImageDescriptor(Messages.Image__database).createImage(true);
+   private TreeViewerTourInfoToolTip          _tourInfoToolTip;
+   private PixelConverter                     _pc;
 
-   private TreeViewerTourInfoToolTip _tourInfoToolTip;
-   private PixelConverter            _pc;
+   /*
+    * UI resources
+    */
+   private Image _dbImage = TourbookPlugin.getImageDescriptor(Messages.Image__database).createImage(true);
 
    /*
     * UI controls
     */
    private Composite          _viewerContainer;
    private CheckboxTreeViewer _tourViewer;
+
+   private Menu               _treeContextMenu;
 
    class ResultContentProvider implements ITreeContentProvider {
 
@@ -190,6 +196,33 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
       @Override
       public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
+   }
+
+   public class TreeContextMenuProvider implements IContextMenuProvider {
+
+      @Override
+      public void disposeContextMenu() {
+
+         if (_treeContextMenu != null) {
+            _treeContextMenu.dispose();
+         }
+      }
+
+      @Override
+      public Menu getContextMenu() {
+         return _treeContextMenu;
+      }
+
+      @Override
+      public Menu recreateContextMenu() {
+
+         disposeContextMenu();
+
+         _treeContextMenu = createUI_22_CreateViewerContextMenu();
+
+         return _treeContextMenu;
+      }
+
    }
 
    public TourCompareResultView() {}
@@ -406,8 +439,6 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
       _actionSetTourType = new ActionSetTourTypeMenu(this);
 
-      _tagMenuMgr = new TagMenuManager(this, true);
-
       _actionEditQuick = new ActionEditQuick(this);
       _actionEditTour = new ActionEditTour(this);
       _actionOpenTour = new ActionOpenTour(this);
@@ -416,10 +447,25 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
       _actionCollapseAll = new ActionCollapseAll(this);
    }
 
+   private void createMenuManager() {
+
+      _tagMenuManager = new TagMenuManager(this, true);
+
+      _viewerMenuManager = new MenuManager("#PopupMenu"); //$NON-NLS-1$
+      _viewerMenuManager.setRemoveAllWhenShown(true);
+      _viewerMenuManager.addMenuListener(new IMenuListener() {
+         @Override
+         public void menuAboutToShow(final IMenuManager manager) {
+            fillContextMenu(manager);
+         }
+      });
+   }
+
    @Override
    public void createPartControl(final Composite parent) {
 
       _pc = new PixelConverter(parent);
+      createMenuManager();
 
       // define all columns for the viewer
       _columnManager = new ColumnManager(this, _state);
@@ -538,34 +584,39 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
    }
 
    /**
-    * create the views context menu
+    * Setup context menu for the viewer
     */
    private void createUI_20_ContextMenu() {
 
-      final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
-      menuMgr.setRemoveAllWhenShown(true);
-      menuMgr.addMenuListener(new IMenuListener() {
-         @Override
-         public void menuAboutToShow(final IMenuManager manager) {
-            fillContextMenu(manager);
-         }
-      });
+      _treeContextMenu = createUI_22_CreateViewerContextMenu();
 
       final Tree tree = (Tree) _tourViewer.getControl();
-      final Menu treeContextMenu = menuMgr.createContextMenu(tree);
+
+      _columnManager.createHeaderContextMenu(tree, _viewerContextMenuProvider);
+   }
+
+   /**
+    * Creates context menu for the viewer
+    *
+    * @return
+    */
+   private Menu createUI_22_CreateViewerContextMenu() {
+
+      final Tree tree = (Tree) _tourViewer.getControl();
+      final Menu treeContextMenu = _viewerMenuManager.createContextMenu(tree);
       treeContextMenu.addMenuListener(new MenuAdapter() {
          @Override
          public void menuHidden(final MenuEvent e) {
-            _tagMenuMgr.onHideMenu();
+            _tagMenuManager.onHideMenu();
          }
 
          @Override
          public void menuShown(final MenuEvent menuEvent) {
-            _tagMenuMgr.onShowMenu(menuEvent, tree, Display.getCurrent().getCursorLocation(), _tourInfoToolTip);
+            _tagMenuManager.onShowMenu(menuEvent, tree, Display.getCurrent().getCursorLocation(), _tourInfoToolTip);
          }
       });
 
-      _columnManager.createHeaderContextMenu(tree, treeContextMenu);
+      return treeContextMenu;
    }
 
    private void defineAllColumns(final Composite parent) {
@@ -1094,7 +1145,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
          final TourType tourType = firstTourItem.comparedTourData.getTourType();
          existingTourTypeId = tourType == null ? TourDatabase.ENTITY_IS_NOT_SAVED : tourType.getTypeId();
       }
-      _tagMenuMgr.enableTagActions(isTourSelected, isOneTour, allExistingTags);
+      _tagMenuManager.enableTagActions(isTourSelected, isOneTour, allExistingTags);
 
       TourTypeMenuManager.enableRecentTourTypeActions(isTourSelected, existingTourTypeId);
    }
@@ -1112,7 +1163,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
       menuMgr.add(_actionOpenTour);
 
       // tour tag actions
-      _tagMenuMgr.fillTagMenu(menuMgr);
+      _tagMenuManager.fillTagMenu(menuMgr);
 
       // tour type actions
       menuMgr.add(new Separator());
