@@ -33,8 +33,6 @@ public class Messages extends NLS {
    public static String        Image_Action_Map_SyncPhotoWithMap_Disabled;
    public static String        Image_Action_POI;
    public static String        Image_Action_POI_Disabled;
-
-   public static String        Image_Action_CreateTourMarkerFromMap;
    public static String        Image_Action_ShowAllPhotosInMap;
    public static String        Image_Action_ShowAllPhotosInMap_Disabled;
    public static String        Image_Action_ShowPhotosInMap;

@@ -1665,6 +1665,8 @@ public class Messages extends NLS {
    public static String Pref_TourDb_Radio_DbSystem_Server;
    public static String Pref_TourDb_Radio_DbSystem_Server_Tooltip;
 
+   public static String Pref_TourTag_Column_Notes;
+   public static String Pref_TourTag_Column_TagsAndCategories;
    public static String Pref_TourTag_Link_AppearanceOptions;
 
    public static String Pref_TourTypeFilter_button_new;
@@ -1730,10 +1732,6 @@ public class Messages extends NLS {
    public static String PrefPage_ViewTooltip_Label_Title;
    public static String PrefPage_ViewTooltip_Label_TourBook;
    public static String PrefPage_ViewTooltip_Label_WeekDay;
-
-   public static String PrefPageTags_1;
-
-   public static String PrefPageTags_2;
 
    public static String PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_down;
    public static String PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_up;
