@@ -104,9 +104,9 @@ public class RawDataManager {
    private static final String LOG_REIMPORT_ONLY_POWER_SPEED      = Messages.Log_Reimport_Only_PowerSpeed;
    private static final String LOG_REIMPORT_ONLY_POWER_PULSE      = Messages.Log_Reimport_Only_PowerPulse;
    private static final String LOG_REIMPORT_ONLY_RUNNING_DYNAMICS = Messages.Log_Reimport_Only_RunningDynamics;
-   private static final String      LOG_REIMPORT_ONLY_TRAINING         = Messages.Log_Reimport_Only_Training;
    private static final String LOG_REIMPORT_ONLY_SWIMMING         = Messages.Log_Reimport_Only_Swimming;
    private static final String LOG_REIMPORT_ONLY_TEMPERATURE      = Messages.Log_Reimport_Only_Temperature;
+   private static final String LOG_REIMPORT_ONLY_TRAINING         = Messages.Log_Reimport_Only_Training;
    private static final String LOG_REIMPORT_TOUR                  = Messages.Log_Reimport_Tour;
 
    //
