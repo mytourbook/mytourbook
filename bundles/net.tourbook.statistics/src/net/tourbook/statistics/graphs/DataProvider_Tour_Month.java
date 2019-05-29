@@ -131,18 +131,18 @@ public class DataProvider_Tour_Month extends DataProvider {
       switch (durationTime) {
       case BREAK:
 
-         sqlDurationTime = " SUM(TourRecordingTime - TourDrivingTime),";
+         sqlDurationTime = " SUM(TourRecordingTime - TourDrivingTime),"; //$NON-NLS-1$
          break;
 
       case RECORDING:
 
-         sqlDurationTime = " SUM(TourRecordingTime),";
+         sqlDurationTime = " SUM(TourRecordingTime),"; //$NON-NLS-1$
          break;
 
       case MOVING:
       default:
          // this is also the old implementation for the duration values
-         sqlDurationTime = " SUM(CASE WHEN TourDrivingTime > 0 THEN TourDrivingTime ELSE TourRecordingTime END),";
+         sqlDurationTime = " SUM(CASE WHEN TourDrivingTime > 0 THEN TourDrivingTime ELSE TourRecordingTime END),"; //$NON-NLS-1$
          break;
       }
 

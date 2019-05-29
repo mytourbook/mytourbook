@@ -320,7 +320,7 @@ public class Suunto3_STAXHandler {
    private void parseXML(final String importFilePath) throws FactoryConfigurationError, XMLStreamException {
 
       final XMLInputFactory inputFactory = XMLInputFactory.newInstance();
-      final XMLEventReader eventReader = inputFactory.createXMLEventReader(new StreamSource("file:" + importFilePath));
+      final XMLEventReader eventReader = inputFactory.createXMLEventReader(new StreamSource("file:" + importFilePath)); //$NON-NLS-1$
 
       while (eventReader.hasNext()) {
 
