@@ -104,6 +104,7 @@ public class RawDataManager {
    private static final String LOG_REIMPORT_ONLY_POWER_SPEED      = Messages.Log_Reimport_Only_PowerSpeed;
    private static final String LOG_REIMPORT_ONLY_POWER_PULSE      = Messages.Log_Reimport_Only_PowerPulse;
    private static final String LOG_REIMPORT_ONLY_RUNNING_DYNAMICS = Messages.Log_Reimport_Only_RunningDynamics;
+   private static final String      LOG_REIMPORT_ONLY_TRAINING         = Messages.Log_Reimport_Only_Training;
    private static final String LOG_REIMPORT_ONLY_SWIMMING         = Messages.Log_Reimport_Only_Swimming;
    private static final String LOG_REIMPORT_ONLY_TEMPERATURE      = Messages.Log_Reimport_Only_Temperature;
    private static final String LOG_REIMPORT_TOUR                  = Messages.Log_Reimport_Tour;
@@ -218,6 +219,8 @@ public class RawDataManager {
       OnlyRunningDynamics, //
       OnlySwimming, //
       OnlyTemperatureValues, //
+      OnlyTrainingValues, //
+
       OnlyTourMarker, //
    }
 
@@ -714,6 +717,21 @@ public class RawDataManager {
          }
          break;
 
+      case OnlyTrainingValues:
+
+         if (actionReimportTour_12_ConfirmDialog(
+               ITourbookPreferences.TOGGLE_STATE_REIMPORT_TRAINING_VALUES,
+               Messages.Import_Data_Dialog_ConfirmReimportTraining_Message)) {
+
+            TourLogManager.addLog(
+                  TourLogState.DEFAULT, //
+                  LOG_REIMPORT_ONLY_TRAINING,
+                  TourLogView.CSS_LOG_TITLE);
+
+            return true;
+         }
+         break;
+
       case Tour:
 
          if (actionReimportTour_12_ConfirmDialog(
@@ -962,6 +980,8 @@ public class RawDataManager {
                                           final File reimportedFile,
                                           final TourData oldTourData) {
 
+      TourLogManager.showLogView();
+
       final String oldTourDateTimeShort = TourManager.getTourDateTimeShort(oldTourData);
       String message = null;
 
@@ -1043,7 +1063,10 @@ public class RawDataManager {
                || reimportId == ReImport.OnlyPowerAndSpeedValues
                || reimportId == ReImport.OnlyRunningDynamics
                || reimportId == ReImport.OnlySwimming
-               || reimportId == ReImport.OnlyTemperatureValues) {
+               || reimportId == ReImport.OnlyTemperatureValues
+               || reimportId == ReImport.OnlyTrainingValues
+
+         ) {
 
             // replace part of the tour
 
@@ -1089,8 +1112,6 @@ public class RawDataManager {
       } else {
          TourLogManager.logSubError(message);
       }
-
-      TourLogManager.showLogView();
 
       return null;
    }
@@ -1214,6 +1235,16 @@ public class RawDataManager {
          // reimport temperature only
 
          oldTourData.temperatureSerie = reimportedTourData.temperatureSerie;
+      }
+
+      // TRAINING
+      if (reimportId == ReImport.AllTimeSlices || reimportId == ReImport.OnlyTrainingValues) {
+
+         // reimport training only
+
+         oldTourData.setTraining_TrainingEffect_Aerob(reimportedTourData.getTraining_TrainingEffect_Aerob());
+         oldTourData.setTraining_TrainingEffect_Anaerob(reimportedTourData.getTraining_TrainingEffect_Anaerob());
+         oldTourData.setTraining_TrainingPerformance(reimportedTourData.getTraining_TrainingPerformance());
       }
 
       // ALL

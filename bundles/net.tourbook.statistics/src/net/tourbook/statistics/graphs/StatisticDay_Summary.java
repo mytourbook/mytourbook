@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -32,109 +32,118 @@ import org.eclipse.ui.IViewSite;
 
 public class StatisticDay_Summary extends StatisticDay {
 
-	private final IPreferenceStore	_prefStore	= TourbookPlugin.getPrefStore();
-	private IPropertyChangeListener	_statDay_PrefChangeListener;
+   private final IPreferenceStore  _prefStore = TourbookPlugin.getPrefStore();
+   private IPropertyChangeListener _statDay_PrefChangeListener;
 
-	private boolean					_isShowDistance;
-	private boolean					_isShowAltitude;
-	private boolean					_isShowDuration;
-	private boolean					_isShowAvgPace;
-	private boolean					_isShowAvgSpeed;
+   private boolean                 _isShowDistance;
+   private boolean                 _isShowAltitude;
+   private boolean                 _isShowDuration;
+   private boolean                 _isShowAvgPace;
+   private boolean                 _isShowAvgSpeed;
 
-	private void addPrefListener(final Composite container) {
+   private void addPrefListener(final Composite container) {
 
-		// create pref listener
-		_statDay_PrefChangeListener = new IPropertyChangeListener() {
-			@Override
-			public void propertyChange(final PropertyChangeEvent event) {
+      // create pref listener
+      _statDay_PrefChangeListener = new IPropertyChangeListener() {
+         @Override
+         public void propertyChange(final PropertyChangeEvent event) {
 
-				final String property = event.getProperty();
+            final String property = event.getProperty();
 
-				// observe which data are displayed
-				if (property.equals(ITourbookPreferences.STAT_DAY_IS_SHOW_ALTITUDE)
-						|| property.equals(ITourbookPreferences.STAT_DAY_IS_SHOW_DISTANCE)
-						|| property.equals(ITourbookPreferences.STAT_DAY_IS_SHOW_DURATION)
-						|| property.equals(ITourbookPreferences.STAT_DAY_IS_SHOW_AVG_PACE)
-						|| property.equals(ITourbookPreferences.STAT_DAY_IS_SHOW_AVG_SPEED)) {
+            // observe which data are displayed
+            if (property.equals(ITourbookPreferences.STAT_DAY_IS_SHOW_ALTITUDE)
+                  || property.equals(ITourbookPreferences.STAT_DAY_IS_SHOW_DISTANCE)
+                  || property.equals(ITourbookPreferences.STAT_DAY_IS_SHOW_DURATION)
+                  || property.equals(ITourbookPreferences.STAT_DAY_IS_SHOW_AVG_PACE)
+                  || property.equals(ITourbookPreferences.STAT_DAY_IS_SHOW_AVG_SPEED)
 
-					// get the changed preferences
-					getPreferences();
+                  || property.equals(ITourbookPreferences.STAT_DAY_DURATION_TIME)
 
-					// update chart
-					preferencesHasChanged();
-				}
-			}
-		};
+            ) {
 
-		// add pref listener
-		_prefStore.addPropertyChangeListener(_statDay_PrefChangeListener);
+               if (property.equals(ITourbookPreferences.STAT_DAY_DURATION_TIME)) {
 
-		// remove pref listener
-		container.addDisposeListener(new DisposeListener() {
-			@Override
-			public void widgetDisposed(final DisposeEvent e) {
-				_prefStore.removePropertyChangeListener(_statDay_PrefChangeListener);
-			}
-		});
-	}
+                  _isDuration_ReloadData = true;
+               }
 
-	@Override
-	public void createStatisticUI(final Composite parent, final IViewSite viewSite) {
+               // get the changed preferences
+               getPreferences();
 
-		super.createStatisticUI(parent, viewSite);
+               // update chart
+               preferencesHasChanged();
+            }
+         }
+      };
 
-		addPrefListener(parent);
-		getPreferences();
-	}
+      // add pref listener
+      _prefStore.addPropertyChangeListener(_statDay_PrefChangeListener);
 
-	@Override
-	ChartDataModel getChartDataModel() {
+      // remove pref listener
+      container.addDisposeListener(new DisposeListener() {
+         @Override
+         public void widgetDisposed(final DisposeEvent e) {
+            _prefStore.removePropertyChangeListener(_statDay_PrefChangeListener);
+         }
+      });
+   }
 
-		final ChartDataModel chartDataModel = new ChartDataModel(ChartType.BAR);
+   @Override
+   public void createStatisticUI(final Composite parent, final IViewSite viewSite) {
 
-		createXDataDay(chartDataModel);
+      super.createStatisticUI(parent, viewSite);
 
-		if (_isShowDistance) {
-			createYDataDistance(chartDataModel);
-		}
+      addPrefListener(parent);
+      getPreferences();
+   }
 
-		if (_isShowAltitude) {
-			createYDataAltitude(chartDataModel);
-		}
+   @Override
+   ChartDataModel getChartDataModel() {
 
-		if (_isShowDuration) {
-			createYDataDuration(chartDataModel);
-		}
+      final ChartDataModel chartDataModel = new ChartDataModel(ChartType.BAR);
 
-		if (_isShowAvgPace) {
-			createYDataAvgPace(chartDataModel);
-		}
+      createXDataDay(chartDataModel);
 
-		if (_isShowAvgSpeed) {
-			createYDataAvgSpeed(chartDataModel);
-		}
+      if (_isShowDistance) {
+         createYDataDistance(chartDataModel);
+      }
 
-		return chartDataModel;
-	}
+      if (_isShowAltitude) {
+         createYDataAltitude(chartDataModel);
+      }
 
-	@Override
-	protected String getGridPrefPrefix() {
-		return GRID_DAY_SUMMARY;
-	}
+      if (_isShowDuration) {
+         createYDataDuration(chartDataModel);
+      }
 
-	private void getPreferences() {
+      if (_isShowAvgPace) {
+         createYDataAvgPace(chartDataModel);
+      }
 
-		_isShowAltitude = _prefStore.getBoolean(ITourbookPreferences.STAT_DAY_IS_SHOW_ALTITUDE);
-		_isShowAvgPace = _prefStore.getBoolean(ITourbookPreferences.STAT_DAY_IS_SHOW_AVG_PACE);
-		_isShowAvgSpeed = _prefStore.getBoolean(ITourbookPreferences.STAT_DAY_IS_SHOW_AVG_SPEED);
-		_isShowDistance = _prefStore.getBoolean(ITourbookPreferences.STAT_DAY_IS_SHOW_DISTANCE);
-		_isShowDuration = _prefStore.getBoolean(ITourbookPreferences.STAT_DAY_IS_SHOW_DURATION);
-	}
+      if (_isShowAvgSpeed) {
+         createYDataAvgSpeed(chartDataModel);
+      }
 
-	@Override
-	protected void setupStatisticSlideout(final SlideoutStatisticOptions slideout) {
+      return chartDataModel;
+   }
 
-		slideout.setStatisticOptions(new ChartOptions_DaySummary());
-	}
+   @Override
+   protected String getGridPrefPrefix() {
+      return GRID_DAY_SUMMARY;
+   }
+
+   private void getPreferences() {
+
+      _isShowAltitude = _prefStore.getBoolean(ITourbookPreferences.STAT_DAY_IS_SHOW_ALTITUDE);
+      _isShowAvgPace = _prefStore.getBoolean(ITourbookPreferences.STAT_DAY_IS_SHOW_AVG_PACE);
+      _isShowAvgSpeed = _prefStore.getBoolean(ITourbookPreferences.STAT_DAY_IS_SHOW_AVG_SPEED);
+      _isShowDistance = _prefStore.getBoolean(ITourbookPreferences.STAT_DAY_IS_SHOW_DISTANCE);
+      _isShowDuration = _prefStore.getBoolean(ITourbookPreferences.STAT_DAY_IS_SHOW_DURATION);
+   }
+
+   @Override
+   protected void setupStatisticSlideout(final SlideoutStatisticOptions slideout) {
+
+      slideout.setStatisticOptions(new ChartOptions_DaySummary());
+   }
 
 }

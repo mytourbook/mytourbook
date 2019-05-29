@@ -512,19 +512,42 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private float                 power_AvgLeftPedalSmoothness;
    private float                 power_AvgRightPedalSmoothness;
 
+   // ############################################# TRAINING #############################################
+
+   /**
+    * Naming variants from Jesús Pérez
+    * <ul>
+    * <li>Impact of training</li>
+    * <li>Impact of effort</li>
+    * <li>Hardness of effort</li>
+    * <li>Training requirement</li>
+    * </ul>
+    * <p>
+    * Manufacturer names
+    * <ul>
+    * <li>Garmin: TotalTrainingEffect</li>
+    * <li>Suunto: PeakTrainingEffect</li>
+    * </ul>
+    *
+    * @param trainingEffect
+    */
+   private float                 training_TrainingEffect_Aerob;                        // db-version 38
+   private float                 training_TrainingEffect_Anaerob;                      // db-version 38
+   private float                 training_TrainingPerformance;                         // db-version 38
+
    // ############################################# OTHER TOUR/DEVICE DATA #############################################
 
    @XmlElement
-   private String                tourTitle;                                             // db-version 4
+   private String                tourTitle;                                            // db-version 4
 
    @XmlElement
-   private String                tourDescription;                                       // db-version 4
+   private String                tourDescription;                                      // db-version 4
 
    @XmlElement
    private String                tourStartPlace;                                       // db-version 4
 
    @XmlElement
-   private String                tourEndPlace;                                          // db-version 4
+   private String                tourEndPlace;                                         // db-version 4
 
    /**
     * Date/Time when tour data was created. This value is set to the tour start date before db
@@ -532,33 +555,33 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * <p>
     * Data format: YYYYMMDDhhmmss
     */
-   private long                  dateTimeCreated;                                       // db-version 11
+   private long                  dateTimeCreated;                                      // db-version 11
 
    /**
     * Date/Time when tour data was modified, default value is 0
     * <p>
     * Data format: YYYYMMDDhhmmss
     */
-   private long                  dateTimeModified;                                       // db-version 11
+   private long                  dateTimeModified;                                     // db-version 11
 
    /** Folder path from the import file. */
    @XmlElement
-   private String                tourImportFilePath;                                    // db-version 6
+   private String                tourImportFilePath;                                   // db-version 6
 
    /** File name from the import file. */
    @XmlElement
-   private String                tourImportFileName;                                    // db-version 29
+   private String                tourImportFileName;                                   // db-version 29
 
    /**
     * Tolerance for the Douglas Peucker algorithm.
     */
-   private short                 dpTolerance                     = 50;                     // 5.0 since version 14.7
+   private short                 dpTolerance                     = 50;                 // 5.0 since version 14.7
 
    /**
     * Time difference in seconds between 2 time slices or <code>-1</code> for GPS devices when the
     * time slices has variable time duration
     */
-   private short                 deviceTimeInterval               = -1;                  // db-version 3
+   private short                 deviceTimeInterval               = -1;                // db-version 3
 
    /**
     * Scaling factor for the temperature data serie, e.g. when set to 10 the temperature data serie
@@ -568,12 +591,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * disabled when float was introduces in 11.after8, preserved in database that older ejb objects
     * can be loaded
     */
-   private int                   temperatureScale               = 1;                     // db-version 13
+   private int                   temperatureScale               = 1;                   // db-version 13
 
    /**
     * Firmware version of the device
     */
-   private String                deviceFirmwareVersion;                                 // db-version 12
+   private String                deviceFirmwareVersion;                                // db-version 12
 
    /**
     * This value is multiplied with the cadence data serie when displayed, cadence data serie is
@@ -630,7 +653,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * <p>
     * a better name would be <i>pluginName</i>
     */
-   private String                devicePluginName;                                       // db-version 4
+   private String                devicePluginName;                                     // db-version 4
 
    /**
     * Deflection point in the conconi test, this value is the index for the data serie on the
@@ -1567,10 +1590,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    @Transient
    public boolean[]     visiblePoints_ForSurfing;
 
+
 // SET_FORMATTING_ON
 
-   public TourData() {
-   }
+   public TourData() {}
 
    /**
     * Removed data series when the sum of all values is 0.
@@ -5281,7 +5304,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       final boolean isGPS                          = setupStartingValues_LatLon(timeDataSerie);
       final boolean isPower                        = setupStartingValues_Power(timeDataSerie);
       final boolean isPulse                        = setupStartingValues_Pulse(timeDataSerie);
-      final boolean isSpeed 					   = setupStartingValues_Speed(timeDataSerie);
+      final boolean isSpeed                  = setupStartingValues_Speed(timeDataSerie);
       final boolean isTemperature                  = setupStartingValues_Temperature(timeDataSerie);
 
       final boolean isRunDyn_StanceTime            = setupStartingValues_RunDyn_StanceTime(timeDataSerie);
@@ -7995,6 +8018,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return tourWayPoints;
    }
 
+   public float getTraining_TrainingEffect_Aerob() {
+      return training_TrainingEffect_Aerob;
+   }
+
+   public float getTraining_TrainingEffect_Anaerob() {
+      return training_TrainingEffect_Anaerob;
+   }
+
+   public float getTraining_TrainingPerformance() {
+      return training_TrainingPerformance;
+   }
+
    /**
     * @return Returns weather text or an empty string when weather text is not set.
     */
@@ -9275,6 +9310,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    public void setTourType(final TourType tourType) {
       this.tourType = tourType;
+   }
+
+   public void setTraining_TrainingEffect_Aerob(final float trainingEffect) {
+      this.training_TrainingEffect_Aerob = trainingEffect;
+   }
+
+   public void setTraining_TrainingEffect_Anaerob(final float trainingEffect_Anaerobic) {
+      this.training_TrainingEffect_Anaerob = trainingEffect_Anaerobic;
+   }
+
+   public void setTraining_TrainingPerformance(final float trainingPerformance) {
+      this.training_TrainingPerformance = trainingPerformance;
    }
 
    public void setupHistoryTour() {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -84,8 +84,8 @@ public class StatisticView extends ViewPart implements ITourProvider {
 
    private static final char            NL                       = net.tourbook.common.UI.NEW_LINE;
 
-   private static final boolean         _isOSX                   = net.tourbook.common.UI.IS_OSX;
-   private static final boolean         _isLinux                 = net.tourbook.common.UI.IS_LINUX;
+   private static final boolean         IS_OSX                   = net.tourbook.common.UI.IS_OSX;
+   private static final boolean         IS_LINUX                 = net.tourbook.common.UI.IS_LINUX;
 
    private static boolean               _isInUpdateUI;
 
@@ -100,12 +100,10 @@ public class StatisticView extends ViewPart implements ITourProvider {
    private ISelectionListener           _postSelectionListener;
 
    private TourPerson                   _activePerson;
-
    private TourTypeFilter               _activeTourTypeFilter;
+   private TourbookStatistic            _activeStatistic;
 
    private int                          _selectedYear            = -1;
-
-   private TourbookStatistic            _activeStatistic;
 
    /**
     * Contains all years which have tours for the selected tour type and person.
@@ -179,11 +177,11 @@ public class StatisticView extends ViewPart implements ITourProvider {
          @Override
          public void partActivated(final IWorkbenchPartReference partRef) {
 
-//				if (partRef.getPart(false) == TourStatisticsView.this) {
+//          if (partRef.getPart(false) == TourStatisticsView.this) {
 //
-//					int a = 0;
-//					a++;
-//				}
+//             int a = 0;
+//             a++;
+//          }
          }
 
          @Override
@@ -429,7 +427,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
             GridDataFactory
                   .fillDefaults()//
                   .indent(widgetSpacing, 0)
-                  .hint(_pc.convertWidthInCharsToPixels(_isOSX ? 12 : _isLinux ? 12 : 5), SWT.DEFAULT)
+                  .hint(_pc.convertWidthInCharsToPixels(IS_OSX ? 12 : IS_LINUX ? 12 : 5), SWT.DEFAULT)
                   .applyTo(_comboYear);
 
             _comboYear.addSelectionListener(new SelectionAdapter() {
@@ -452,7 +450,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
             GridDataFactory
                   .fillDefaults()//
                   .indent(2, 0)
-                  .hint(_pc.convertWidthInCharsToPixels(_isOSX ? 8 : _isLinux ? 8 : 4), SWT.DEFAULT)
+                  .hint(_pc.convertWidthInCharsToPixels(IS_OSX ? 8 : IS_LINUX ? 8 : 4), SWT.DEFAULT)
                   .applyTo(_comboNumberOfYears);
 
             _comboNumberOfYears.addSelectionListener(new SelectionAdapter() {
@@ -476,7 +474,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
             GridDataFactory
                   .fillDefaults()//
                   .indent(widgetSpacing, 0)
-                  //						.hint(defaultTextSize.x, SWT.DEFAULT)
+                  //                .hint(defaultTextSize.x, SWT.DEFAULT)
                   .applyTo(_comboBarVerticalOrder);
 
             _comboBarVerticalOrder.addSelectionListener(new SelectionAdapter() {
@@ -688,22 +686,22 @@ public class StatisticView extends ViewPart implements ITourProvider {
 
          fromTourData = NL
 
-               + "FROM (			" + NL //$NON-NLS-1$
+               + "FROM (         " + NL //$NON-NLS-1$
 
-               + " SELECT			" + NL //$NON-NLS-1$
+               + " SELECT        " + NL //$NON-NLS-1$
 
-               + "  StartYear		" + NL //$NON-NLS-1$
+               + "  StartYear    " + NL //$NON-NLS-1$
 
                + ("  FROM " + TourDatabase.TABLE_TOUR_DATA) + NL//$NON-NLS-1$
 
                // get tag id's
                + "  LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" + NL //$NON-NLS-1$ //$NON-NLS-2$
-               + "  ON tourID = jTdataTtag.TourData_tourId	" + NL //$NON-NLS-1$
+               + "  ON tourID = jTdataTtag.TourData_tourId  " + NL //$NON-NLS-1$
 
-               + "  WHERE 1=1		" + NL //$NON-NLS-1$
+               + "  WHERE 1=1    " + NL //$NON-NLS-1$
                + sqlFilter.getWhereClause()
 
-               + ") td				" + NL//$NON-NLS-1$
+               + ") td           " + NL//$NON-NLS-1$
          ;
 
       } else {
@@ -714,20 +712,20 @@ public class StatisticView extends ViewPart implements ITourProvider {
 
                + " FROM " + TourDatabase.TABLE_TOUR_DATA + NL //$NON-NLS-1$
 
-               + " WHERE 1=1			" + NL //$NON-NLS-1$
+               + " WHERE 1=1        " + NL //$NON-NLS-1$
                + sqlFilter.getWhereClause() + NL;
       }
 
       final String sqlString = NL +
 
-            "SELECT						" + NL //$NON-NLS-1$
+            "SELECT                 " + NL //$NON-NLS-1$
 
-            + " StartYear				" + NL //$NON-NLS-1$
+            + " StartYear           " + NL //$NON-NLS-1$
 
             + fromTourData
 
-            + " GROUP BY STARTYEAR		" + NL //$NON-NLS-1$
-            + " ORDER BY STARTYEAR		" + NL//			//$NON-NLS-1$
+            + " GROUP BY STARTYEAR     " + NL //$NON-NLS-1$
+            + " ORDER BY STARTYEAR     " + NL//       //$NON-NLS-1$
       ;
       _availableYears = new TIntArrayList();
 

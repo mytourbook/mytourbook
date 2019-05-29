@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -42,6 +42,7 @@ import net.tourbook.common.tooltip.OpenDialogManager;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
+import net.tourbook.common.util.IContextMenuProvider;
 import net.tourbook.common.util.ITourViewer3;
 import net.tourbook.common.util.ITreeViewer;
 import net.tourbook.common.util.PostSelectionProvider;
@@ -153,14 +154,15 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
 // SET_FORMATTING_OFF
 
-	private static final String				COLUMN_FACTORY_TIME_ZONE_DIFF_TOOLTIP				= net.tourbook.ui.Messages.ColumnFactory_TimeZoneDifference_Tooltip;
-	private static final String				GRAPH_LABEL_HEARTBEAT_UNIT								= net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
+   private static final String           COLUMN_FACTORY_TIME_ZONE_DIFF_TOOLTIP           = net.tourbook.ui.Messages.ColumnFactory_TimeZoneDifference_Tooltip;
+   private static final String           GRAPH_LABEL_HEARTBEAT_UNIT                      = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
 
 // SET_FORMATTING_ON
 
    static public final String            ID                                              = "net.tourbook.views.tourListView";         //$NON-NLS-1$
 
    private final static IPreferenceStore _prefStore                                      = TourbookPlugin.getPrefStore();
+
    private final static IPreferenceStore _prefStoreCommon                                = CommonActivator.getPrefStore();
    private static final IDialogSettings  _state                                          = TourbookPlugin.getState(ID);
    //
@@ -259,26 +261,29 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _nf1_NoGroup.setMaximumFractionDigits(1);
       _nf1_NoGroup.setGroupingUsed(false);
    }
+   private int                                        _selectedYear              = -1;
 
-   private int                                        _selectedYear         = -1;
-   private int                                        _selectedYearSub      = -1;
-   private final ArrayList<Long>                      _selectedTourIds      = new ArrayList<>();
-
+   private int                                        _selectedYearSub           = -1;
+   private final ArrayList<Long>                      _selectedTourIds           = new ArrayList<>();
    private boolean                                    _isCollapseOthers;
+
    private boolean                                    _isInFireSelection;
    private boolean                                    _isInReload;
    private boolean                                    _isInStartup;
    private boolean                                    _isShowSummaryRow;
-
    private boolean                                    _isToolTipInDate;
+
    private boolean                                    _isToolTipInTags;
    private boolean                                    _isToolTipInTime;
    private boolean                                    _isToolTipInTitle;
    private boolean                                    _isToolTipInWeekDay;
+   private final TourDoubleClickState                 _tourDoubleClickState      = new TourDoubleClickState();
 
-   private final TourDoubleClickState                 _tourDoubleClickState = new TourDoubleClickState();
-   private TagMenuManager                             _tagMenuMgr;
    private TreeViewerTourInfoToolTip                  _tourInfoToolTip;
+
+   private TagMenuManager                             _tagMenuManager;
+   private MenuManager                                _viewerMenuManager;
+   private IContextMenuProvider                       _viewerContextMenuProvider = new TreeContextMenuProvider();
 
    private ActionAdjustTemperature                    _actionAdjustTemperature;
    private ActionSetTimeZone                          _actionSetTimeZone;
@@ -322,6 +327,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private Composite _parent;
    private Composite _viewerContainer;
+
+   private Menu      _treeContextMenu;
 
    private class ActionLinkWithOtherViews extends ActionToolbarSlideout {
 
@@ -434,6 +441,33 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
    }
 
+   public class TreeContextMenuProvider implements IContextMenuProvider {
+
+      @Override
+      public void disposeContextMenu() {
+
+         if (_treeContextMenu != null) {
+            _treeContextMenu.dispose();
+         }
+      }
+
+      @Override
+      public Menu getContextMenu() {
+         return _treeContextMenu;
+      }
+
+      @Override
+      public Menu recreateContextMenu() {
+
+         disposeContextMenu();
+
+         _treeContextMenu = createUI_22_CreateViewerContextMenu();
+
+         return _treeContextMenu;
+      }
+
+   }
+
    void actionExportViewCSV() {
 
       // get selected items
@@ -479,10 +513,10 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       exportCSV(selection, selectedFilePath);
 
-//		// DEBUGGING: USING DEFAULT PATH
-//		final IPath path = new Path(defaultExportFilePath).removeLastSegments(1).append(defaultExportFileName);
+//      // DEBUGGING: USING DEFAULT PATH
+//      final IPath path = new Path(defaultExportFilePath).removeLastSegments(1).append(defaultExportFileName);
 //
-//		exportCSV(selection, path.toOSString());
+//      exportCSV(selection, path.toOSString());
    }
 
    void actionSelectYearMonthTours() {
@@ -714,10 +748,26 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _actionToggleMonthWeek = new ActionToggleMonthWeek(this);
       _actionTourBookOptions = new ActionTourBookOptions();
 
-      _tagMenuMgr = new TagMenuManager(this, true);
       _actionLinkWithOtherViews = new ActionLinkWithOtherViews();
 
       fillActionBars();
+   }
+
+   private void createMenuManager() {
+
+      _tagMenuManager = new TagMenuManager(this, true);
+
+      _viewerMenuManager = new MenuManager("#PopupMenu"); //$NON-NLS-1$
+      _viewerMenuManager.setRemoveAllWhenShown(true);
+      _viewerMenuManager.addMenuListener(new IMenuListener() {
+         @Override
+         public void menuAboutToShow(final IMenuManager manager) {
+
+            _tourInfoToolTip.hideToolTip();
+
+            fillContextMenu(manager);
+         }
+      });
    }
 
    @Override
@@ -726,6 +776,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _parent = parent;
 
       initUI(parent);
+      createMenuManager();
 
       // define all columns for the viewer
       _columnManager = new ColumnManager(this, _state);
@@ -841,37 +892,41 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    }
 
    /**
-    * create the views context menu
+    * Setup context menu for the viewer
     */
    private void createUI_20_ContextMenu() {
 
-      final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
-      menuMgr.setRemoveAllWhenShown(true);
-      menuMgr.addMenuListener(new IMenuListener() {
-         @Override
-         public void menuAboutToShow(final IMenuManager manager) {
-
-            _tourInfoToolTip.hideToolTip();
-
-            fillContextMenu(manager);
-         }
-      });
+      _treeContextMenu = createUI_22_CreateViewerContextMenu();
 
       final Tree tree = (Tree) _tourViewer.getControl();
-      final Menu treeContextMenu = menuMgr.createContextMenu(tree);
+
+      _columnManager.createHeaderContextMenu(tree, _viewerContextMenuProvider);
+   }
+
+   /**
+    * Creates context menu for the viewer
+    *
+    * @return Returns the {@link Menu} widget
+    */
+   private Menu createUI_22_CreateViewerContextMenu() {
+
+      final Tree tree = (Tree) _tourViewer.getControl();
+
+      final Menu treeContextMenu = _viewerMenuManager.createContextMenu(tree);
+
       treeContextMenu.addMenuListener(new MenuAdapter() {
          @Override
          public void menuHidden(final MenuEvent e) {
-            _tagMenuMgr.onHideMenu();
+            _tagMenuManager.onHideMenu();
          }
 
          @Override
          public void menuShown(final MenuEvent menuEvent) {
-            _tagMenuMgr.onShowMenu(menuEvent, tree, Display.getCurrent().getCursorLocation(), _tourInfoToolTip);
+            _tagMenuManager.onShowMenu(menuEvent, tree, Display.getCurrent().getCursorLocation(), _tourInfoToolTip);
          }
       });
 
-      _columnManager.createHeaderContextMenu(tree, treeContextMenu);
+      return treeContextMenu;
    }
 
    private void csvField(final StringBuilder sb, final int fieldValue) {
@@ -962,6 +1017,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       defineColumn_Training_PowerToWeightRatio();
       defineColumn_Training_IntensityFactor();
       defineColumn_Training_StressScore();
+      defineColumn_Training_TrainingEffect();
+      defineColumn_Training_TrainingEffect_Anaerobic();
+      defineColumn_Training_TrainingPerformance();
 
       // Running dynamics
       defineColumn_RunDyn_StanceTime_Min();
@@ -2816,7 +2874,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    }
 
    /**
-    * column: PowerTrainingStressScore
+    * Column: PowerTrainingStressScore
     */
    private void defineColumn_Training_StressScore() {
 
@@ -2828,6 +2886,69 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
             final Object element = cell.getElement();
             final double value = ((TVITourBookItem) element).colPower_TrainingStressScore;
+
+            colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
+
+            setCellColor(cell, element);
+         }
+      });
+   }
+
+   /**
+    * Column: Training: Training Effect
+    */
+   private void defineColumn_Training_TrainingEffect() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.TRAINING_TRAINING_EFFECT_AEROB.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            final double value = ((TVITourBookItem) element).colTraining_TrainingEffect;
+
+            colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
+
+            setCellColor(cell, element);
+         }
+      });
+   }
+
+   /**
+    * Column: Training: Training effect anaerobic
+    */
+   private void defineColumn_Training_TrainingEffect_Anaerobic() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.TRAINING_TRAINING_EFFECT_ANAEROB.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            final double value = ((TVITourBookItem) element).colTraining_TrainingEffect_Anaerobic;
+
+            colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
+
+            setCellColor(cell, element);
+         }
+      });
+   }
+
+   /**
+    * Column: Training - Training Performance
+    */
+   private void defineColumn_Training_TrainingPerformance() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.TRAINING_TRAINING_PERFORMANCE.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            final double value = ((TVITourBookItem) element).colTraining_TrainingPerformance;
 
             colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
@@ -3042,7 +3163,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _actionSelectAllTours.setEnabled(true);
       _actionToggleMonthWeek.setEnabled(true);
 
-      _tagMenuMgr.enableTagActions(isTourSelected, isOneTour, firstTour == null ? null : firstTour.getTagIds());
+      _tagMenuManager.enableTagActions(isTourSelected, isOneTour, firstTour == null ? null : firstTour.getTagIds());
 
       TourTypeMenuManager.enableRecentTourTypeActions(
             isTourSelected,
@@ -3675,7 +3796,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       menuMgr.add(_actionMergeTour);
       menuMgr.add(_actionJoinTours);
 
-      _tagMenuMgr.fillTagMenu(menuMgr);
+      _tagMenuManager.fillTagMenu(menuMgr);
 
       // tour type actions
       menuMgr.add(new Separator());
@@ -4344,29 +4465,29 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
                      /**
                       * <code>
 
-                     	Caused by: java.lang.NullPointerException
-                     	at org.eclipse.jface.viewers.AbstractTreeViewer.getSelection(AbstractTreeViewer.java:2956)
-                     	at org.eclipse.jface.viewers.StructuredViewer.handleSelect(StructuredViewer.java:1211)
-                     	at org.eclipse.jface.viewers.StructuredViewer$4.widgetSelected(StructuredViewer.java:1241)
-                     	at org.eclipse.jface.util.OpenStrategy.fireSelectionEvent(OpenStrategy.java:239)
-                     	at org.eclipse.jface.util.OpenStrategy.access$4(OpenStrategy.java:233)
-                     	at org.eclipse.jface.util.OpenStrategy$1.handleEvent(OpenStrategy.java:403)
-                     	at org.eclipse.swt.widgets.EventTable.sendEvent(EventTable.java:84)
-                     	at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1053)
-                     	at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1077)
-                     	at org.eclipse.swt.widgets.Widget.sendSelectionEvent(Widget.java:1094)
-                     	at org.eclipse.swt.widgets.TreeItem.setExpanded(TreeItem.java:1385)
-                     	at org.eclipse.jface.viewers.TreeViewer.setExpanded(TreeViewer.java:332)
-                     	at org.eclipse.jface.viewers.AbstractTreeViewer.internalCollapseToLevel(AbstractTreeViewer.java:1571)
-                     	at org.eclipse.jface.viewers.AbstractTreeViewer.internalCollapseToLevel(AbstractTreeViewer.java:1586)
-                     	at org.eclipse.jface.viewers.AbstractTreeViewer.collapseToLevel(AbstractTreeViewer.java:751)
-                     	at org.eclipse.jface.viewers.AbstractTreeViewer.collapseAll(AbstractTreeViewer.java:733)
+                        Caused by: java.lang.NullPointerException
+                        at org.eclipse.jface.viewers.AbstractTreeViewer.getSelection(AbstractTreeViewer.java:2956)
+                        at org.eclipse.jface.viewers.StructuredViewer.handleSelect(StructuredViewer.java:1211)
+                        at org.eclipse.jface.viewers.StructuredViewer$4.widgetSelected(StructuredViewer.java:1241)
+                        at org.eclipse.jface.util.OpenStrategy.fireSelectionEvent(OpenStrategy.java:239)
+                        at org.eclipse.jface.util.OpenStrategy.access$4(OpenStrategy.java:233)
+                        at org.eclipse.jface.util.OpenStrategy$1.handleEvent(OpenStrategy.java:403)
+                        at org.eclipse.swt.widgets.EventTable.sendEvent(EventTable.java:84)
+                        at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1053)
+                        at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1077)
+                        at org.eclipse.swt.widgets.Widget.sendSelectionEvent(Widget.java:1094)
+                        at org.eclipse.swt.widgets.TreeItem.setExpanded(TreeItem.java:1385)
+                        at org.eclipse.jface.viewers.TreeViewer.setExpanded(TreeViewer.java:332)
+                        at org.eclipse.jface.viewers.AbstractTreeViewer.internalCollapseToLevel(AbstractTreeViewer.java:1571)
+                        at org.eclipse.jface.viewers.AbstractTreeViewer.internalCollapseToLevel(AbstractTreeViewer.java:1586)
+                        at org.eclipse.jface.viewers.AbstractTreeViewer.collapseToLevel(AbstractTreeViewer.java:751)
+                        at org.eclipse.jface.viewers.AbstractTreeViewer.collapseAll(AbstractTreeViewer.java:733)
 
-                     	at net.tourbook.ui.views.tourBook.TourBookView$70.run(TourBookView.java:3406)
+                        at net.tourbook.ui.views.tourBook.TourBookView$70.run(TourBookView.java:3406)
 
-                     	at org.eclipse.swt.widgets.RunnableLock.run(RunnableLock.java:35)
-                     	at org.eclipse.swt.widgets.Synchronizer.runAsyncMessages(Synchronizer.java:135)
-                     	... 22 more
+                        at org.eclipse.swt.widgets.RunnableLock.run(RunnableLock.java:35)
+                        at org.eclipse.swt.widgets.Synchronizer.runAsyncMessages(Synchronizer.java:135)
+                        ... 22 more
 
                       * </code>
                       */
@@ -4405,8 +4526,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             cell.setForeground(JFaceResources.getColorRegistry().get(net.tourbook.ui.UI.VIEW_COLOR_SUB));
          } else if (element instanceof TVITourBookYearSub) {
             cell.setForeground(JFaceResources.getColorRegistry().get(net.tourbook.ui.UI.VIEW_COLOR_SUB_SUB));
-//			} else if (element instanceof TVITourBookTour) {
-//				cell.setForeground(JFaceResources.getColorRegistry().get(UI.VIEW_COLOR_TOUR));
+//         } else if (element instanceof TVITourBookTour) {
+//            cell.setForeground(JFaceResources.getColorRegistry().get(UI.VIEW_COLOR_TOUR));
          }
       }
    }

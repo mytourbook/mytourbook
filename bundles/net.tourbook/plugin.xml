@@ -2,13 +2,13 @@
 <?eclipse version="3.2"?>
 <plugin>
 
-   <extension-point id="deviceDataReader"          name="Device Data Reader"  schema="schema/deviceDataReader.exsd"/>
-   <extension-point id="exportTour"                name="Export Tours"        schema="schema/exportTour.exsd"/>
-   <extension-point id="externalDeviceDataReader"  name="External Device Data Reader" schema="schema/externalDeviceDataReader.exsd"/>
-   <extension-point id="mapOverlay"                name="MapOverlay"          schema="schema/mapOverlay.exsd"/>
-   <extension-point id="printTour"                 name="Print Tours"         schema="schema/printTour.exsd"/>
-   <extension-point id="statisticYear"             name="Year Statistic"      schema="schema/statisticYear.exsd"/>
-   <extension-point id="tilefactory"               name="TileFactory"         schema="schema/tilefactory.exsd"/>
+   <extension-point id="deviceDataReader"             name="Device Data Reader"           schema="schema/deviceDataReader.exsd"/>
+   <extension-point id="exportTour"                   name="Export Tours"                 schema="schema/exportTour.exsd"/>
+   <extension-point id="externalDeviceDataReader"     name="External Device Data Reader"  schema="schema/externalDeviceDataReader.exsd"/>
+   <extension-point id="mapOverlay"                   name="MapOverlay"                   schema="schema/mapOverlay.exsd"/>
+   <extension-point id="printTour"                    name="Print Tours"                  schema="schema/printTour.exsd"/>
+   <extension-point id="net.tourbook.statisticYear"   name="Year Statistic"               schema="schema/net.tourbook.statisticYear.exsd"/>
+   <extension-point id="tilefactory"                  name="TileFactory"                  schema="schema/tilefactory.exsd"/>
 
    <extension
          id="application"
@@ -187,7 +187,7 @@
       <page
          name="%pref_page_map"
          id="de.byteholder.geoclipse.preferences.map"
-         class="de.byteholder.geoclipse.preferences.PrefPageMap"
+         class="de.byteholder.geoclipse.preferences.PrefPage_Map2"
       />
          <page
             name="%Pref_Page_Map2_Appearance"
@@ -197,8 +197,8 @@
          />
          <page
             name="%pref_page_provider"
-            id="de.byteholder.geoclipse.preferences.PrefPageMapProvider"
-            class="de.byteholder.geoclipse.preferences.PrefPageMapProviders"
+            id="de.byteholder.geoclipse.preferences.PrefPage_Map2_Providers"
+            class="de.byteholder.geoclipse.preferences.PrefPage_Map2_Providers"
             category="de.byteholder.geoclipse.preferences.map"
          />
          <page

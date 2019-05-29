@@ -2750,7 +2750,7 @@ public class ChartComponentGraph extends Canvas {
       int prevValueIndex = startIndex;
 
       /*
-       * set the hovered index only ONCE because when autoscrolling is done to the right side this
+       * Set the hovered index only ONCE because when autoscrolling is done to the right side this
        * can cause that the last value is used for the hovered index instead of the previous before
        * the last
        */
@@ -2786,7 +2786,8 @@ public class ChartComponentGraph extends Canvas {
             devY2 = (float) (graphY2 * scaleY);
          }
 
-         devXPositions[valueIndex] = (long) devX;
+         final long devX_long = (long) devX;
+         devXPositions[valueIndex] = devX_long;
 
          // check if position is horizontal visible
          if (devX < 0) {
@@ -2867,9 +2868,17 @@ public class ChartComponentGraph extends Canvas {
          }
 
          /*
-          * draw line to current point
+          * Draw line to current point
           */
-         if ((long) devX != (long) devXPrev || graphY1 == 0 || (isPath2 && graphY2 == 0)) {
+         final long devXPrev_long = (long) devXPrev;
+
+         if (devX_long != devXPrev_long
+
+               // draw line when is has the same x position but y is larger/smaller than previous value
+               || (devX_long == devXPrev_long && (devY1 >= 0 ? devY1 > devY1Prev : devY1 < devY1Prev))
+
+               || graphY1 == 0
+               || (isPath2 && graphY2 == 0)) {
 
             // optimization: draw only ONE line for the current x-position
             // but draw to the 0 line otherwise it's possible that a triangle is painted
@@ -2986,7 +2995,7 @@ public class ChartComponentGraph extends Canvas {
                   0,
                   (long) (devXDiffWidth + 1),
                   devChartHeight);
-            final PointLong currentPoint = new PointLong((long) devX, (long) (devYTop + devY));
+            final PointLong currentPoint = new PointLong(devX_long, (long) (devYTop + devY));
 
             lineDevPositions[valueIndex] = currentPoint;
             lineFocusRectangles[valueIndex] = currentRect;
@@ -3060,7 +3069,7 @@ public class ChartComponentGraph extends Canvas {
             }
 
             final RectangleLong lastRect = new RectangleLong(devXRect, 0, devXDiffWidth + 1, devChartHeight);
-            final PointLong lastPoint = new PointLong((long) devX, devYTop + (long) devY);
+            final PointLong lastPoint = new PointLong(devX_long, devYTop + (long) devY);
 
             lineDevPositions[valueIndex] = lastPoint;
             lineFocusRectangles[valueIndex] = lastRect;
@@ -3074,6 +3083,7 @@ public class ChartComponentGraph extends Canvas {
 
          devXPrev = devX;
          devY1Prev = devY1;
+
          prevValueIndex = valueIndex;
       }
 

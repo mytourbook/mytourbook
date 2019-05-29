@@ -23,7 +23,7 @@ import de.byteholder.geoclipse.map.event.IPositionListener;
 import de.byteholder.geoclipse.map.event.ITileListener;
 import de.byteholder.geoclipse.map.event.MapPositionEvent;
 import de.byteholder.geoclipse.map.event.TileEventId;
-import de.byteholder.geoclipse.preferences.PrefPageMapProviders;
+import de.byteholder.geoclipse.preferences.PrefPage_Map2_Providers;
 import de.byteholder.geoclipse.ui.ViewerDetailForm;
 
 import java.awt.Point;
@@ -147,7 +147,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 	 */
 	private final IDialogSettings					_dialogSettings;
 
-	private final PrefPageMapProviders				_prefPageMapFactory;
+	private final PrefPage_Map2_Providers				_prefPageMapFactory;
 
 	/**
 	 * all visible {@link MtLayer}'s
@@ -185,7 +185,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
 	private PixelConverter							_pc;
 
-	public DialogMPWms(final Shell parentShell, final PrefPageMapProviders mapFactory, final MPWms wmsMapProvider) {
+	public DialogMPWms(final Shell parentShell, final PrefPage_Map2_Providers mapFactory, final MPWms wmsMapProvider) {
 
 		super(parentShell, wmsMapProvider);
 

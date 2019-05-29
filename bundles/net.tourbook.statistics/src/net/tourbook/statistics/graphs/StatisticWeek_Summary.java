@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -32,105 +32,112 @@ import org.eclipse.ui.IViewSite;
 
 public class StatisticWeek_Summary extends StatisticWeek {
 
-	private final IPreferenceStore	_prefStore	= TourbookPlugin.getPrefStore();
+   private final IPreferenceStore  _prefStore = TourbookPlugin.getPrefStore();
 
-	private IPropertyChangeListener	_statWeek_PrefChangeListener;
+   private IPropertyChangeListener _statWeek_PrefChangeListener;
 
-	private boolean					_isShowAltitude;
-	private boolean					_isShowDistance;
-	private boolean					_isShowDuration;
-	private boolean					_isShowNumTours;
+   private boolean                 _isShowAltitude;
+   private boolean                 _isShowDistance;
+   private boolean                 _isShowDuration;
+   private boolean                 _isShowNumTours;
 
-	private void addPrefListener(final Composite container) {
+   private void addPrefListener(final Composite container) {
 
-		// create pref listener
-		_statWeek_PrefChangeListener = new IPropertyChangeListener() {
-			@Override
-			public void propertyChange(final PropertyChangeEvent event) {
+      // create pref listener
+      _statWeek_PrefChangeListener = new IPropertyChangeListener() {
+         @Override
+         public void propertyChange(final PropertyChangeEvent event) {
 
-				final String property = event.getProperty();
+            final String property = event.getProperty();
 
-				// observe which data are displayed
-				if (property.equals(ITourbookPreferences.STAT_WEEK_CHART_TYPE)
-						|| property.equals(ITourbookPreferences.STAT_WEEK_IS_SHOW_ALTITUDE)
-						|| property.equals(ITourbookPreferences.STAT_WEEK_IS_SHOW_DISTANCE)
-						|| property.equals(ITourbookPreferences.STAT_WEEK_IS_SHOW_DURATION)
-						|| property.equals(ITourbookPreferences.STAT_WEEK_IS_SHOW_NUMBER_OF_TOURS)
-				//
-				) {
+            // observe which data are displayed
+            if (property.equals(ITourbookPreferences.STAT_WEEK_CHART_TYPE)
 
-					// get the changed preferences
-					getPreferences();
+                  || property.equals(ITourbookPreferences.STAT_WEEK_DURATION_TIME)
 
-					// update chart
-					preferencesHasChanged();
-				}
-			}
-		};
+                  || property.equals(ITourbookPreferences.STAT_WEEK_IS_SHOW_ALTITUDE)
+                  || property.equals(ITourbookPreferences.STAT_WEEK_IS_SHOW_DISTANCE)
+                  || property.equals(ITourbookPreferences.STAT_WEEK_IS_SHOW_DURATION)
+                  || property.equals(ITourbookPreferences.STAT_WEEK_IS_SHOW_NUMBER_OF_TOURS)
+            //
+            ) {
 
-		// add pref listener
-		_prefStore.addPropertyChangeListener(_statWeek_PrefChangeListener);
+               if (property.equals(ITourbookPreferences.STAT_WEEK_DURATION_TIME)) {
+                  _isDuration_ReloadData = true;
+               }
 
-		// remove pref listener
-		container.addDisposeListener(new DisposeListener() {
-			@Override
-			public void widgetDisposed(final DisposeEvent e) {
-				_prefStore.removePropertyChangeListener(_statWeek_PrefChangeListener);
-			}
-		});
-	}
+               // get the changed preferences
+               getPreferences();
 
-	@Override
-	public void createStatisticUI(final Composite parent, final IViewSite viewSite) {
+               // update chart
+               preferencesHasChanged();
+            }
+         }
+      };
 
-		super.createStatisticUI(parent, viewSite);
+      // add pref listener
+      _prefStore.addPropertyChangeListener(_statWeek_PrefChangeListener);
 
-		addPrefListener(parent);
-		getPreferences();
-	}
+      // remove pref listener
+      container.addDisposeListener(new DisposeListener() {
+         @Override
+         public void widgetDisposed(final DisposeEvent e) {
+            _prefStore.removePropertyChangeListener(_statWeek_PrefChangeListener);
+         }
+      });
+   }
 
-	@Override
-	ChartDataModel getChartDataModel() {
+   @Override
+   public void createStatisticUI(final Composite parent, final IViewSite viewSite) {
 
-		final ChartDataModel chartDataModel = new ChartDataModel(ChartType.BAR);
+      super.createStatisticUI(parent, viewSite);
 
-		createXData_Week(chartDataModel);
+      addPrefListener(parent);
+      getPreferences();
+   }
 
-		if (_isShowDistance) {
-			createYData_Distance(chartDataModel);
-		}
+   @Override
+   ChartDataModel getChartDataModel() {
 
-		if (_isShowAltitude) {
-			createYData_Altitude(chartDataModel);
-		}
+      final ChartDataModel chartDataModel = new ChartDataModel(ChartType.BAR);
 
-		if (_isShowDuration) {
-			createYData_Duration(chartDataModel);
-		}
+      createXData_Week(chartDataModel);
 
-		if (_isShowNumTours) {
-			createYData_NumTours(chartDataModel);
-		}
+      if (_isShowDistance) {
+         createYData_Distance(chartDataModel);
+      }
 
-		return chartDataModel;
-	}
+      if (_isShowAltitude) {
+         createYData_Altitude(chartDataModel);
+      }
 
-	@Override
-	protected String getGridPrefPrefix() {
-		return GRID_WEEK_SUMMARY;
-	}
+      if (_isShowDuration) {
+         createYData_Duration(chartDataModel);
+      }
 
-	private void getPreferences() {
+      if (_isShowNumTours) {
+         createYData_NumTours(chartDataModel);
+      }
 
-		_isShowAltitude = _prefStore.getBoolean(ITourbookPreferences.STAT_WEEK_IS_SHOW_ALTITUDE);
-		_isShowDistance = _prefStore.getBoolean(ITourbookPreferences.STAT_WEEK_IS_SHOW_DISTANCE);
-		_isShowDuration = _prefStore.getBoolean(ITourbookPreferences.STAT_WEEK_IS_SHOW_DURATION);
-		_isShowNumTours = _prefStore.getBoolean(ITourbookPreferences.STAT_WEEK_IS_SHOW_NUMBER_OF_TOURS);
-	}
+      return chartDataModel;
+   }
 
-	@Override
-	protected void setupStatisticSlideout(final SlideoutStatisticOptions slideout) {
+   @Override
+   protected String getGridPrefPrefix() {
+      return GRID_WEEK_SUMMARY;
+   }
 
-		slideout.setStatisticOptions(new ChartOptions_WeekSummary());
-	}
+   private void getPreferences() {
+
+      _isShowAltitude = _prefStore.getBoolean(ITourbookPreferences.STAT_WEEK_IS_SHOW_ALTITUDE);
+      _isShowDistance = _prefStore.getBoolean(ITourbookPreferences.STAT_WEEK_IS_SHOW_DISTANCE);
+      _isShowDuration = _prefStore.getBoolean(ITourbookPreferences.STAT_WEEK_IS_SHOW_DURATION);
+      _isShowNumTours = _prefStore.getBoolean(ITourbookPreferences.STAT_WEEK_IS_SHOW_NUMBER_OF_TOURS);
+   }
+
+   @Override
+   protected void setupStatisticSlideout(final SlideoutStatisticOptions slideout) {
+
+      slideout.setStatisticOptions(new ChartOptions_WeekSummary());
+   }
 }

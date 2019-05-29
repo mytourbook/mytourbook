@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,10 +17,6 @@ package net.tourbook.statistics;
 
 import java.util.ArrayList;
 
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.preference.PreferenceConverter;
-import org.eclipse.swt.graphics.RGB;
-
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
@@ -35,343 +31,347 @@ import net.tourbook.statistic.StatisticContext;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.PreferenceConverter;
+import org.eclipse.swt.graphics.RGB;
+
 public class StatisticServices {
 
-	/**
-	 * offset for tour types in the color index
-	 */
-	public static int TOUR_TYPE_COLOR_INDEX_OFFSET = 1;
-
-	/**
-	 * @param serieIndex
-	 * @param valueIndex
-	 * @param resortedTypeIds
-	 * @param activeTourTypeFilter
-	 * @return Returns the tour type name for a data serie
-	 */
-	public static String getTourTypeName(	final int serieIndex,
-														final int valueIndex,
-														final long[][] resortedTypeIds,
-														final TourTypeFilter activeTourTypeFilter) {
+   /**
+    * offset for tour types in the color index
+    */
+   public static int TOUR_TYPE_COLOR_INDEX_OFFSET = 1;
+
+   /**
+    * @param serieIndex
+    * @param valueIndex
+    * @param resortedTypeIds
+    * @param activeTourTypeFilter
+    * @return Returns the tour type name for a data serie
+    */
+   public static String getTourTypeName(final int serieIndex,
+                                        final int valueIndex,
+                                        final long[][] resortedTypeIds,
+                                        final TourTypeFilter activeTourTypeFilter) {
 
-		int colorOffset = 0;
-		if (activeTourTypeFilter.showUndefinedTourTypes()) {
-			colorOffset = TOUR_TYPE_COLOR_INDEX_OFFSET;
-		}
+      int colorOffset = 0;
+      if (activeTourTypeFilter.showUndefinedTourTypes()) {
+         colorOffset = TOUR_TYPE_COLOR_INDEX_OFFSET;
+      }
 
-		if (serieIndex - colorOffset < 0) {
-			return Messages.ui_tour_not_defined;
-		}
+      if (serieIndex - colorOffset < 0) {
+         return Messages.ui_tour_not_defined;
+      }
 
-		final long typeId = resortedTypeIds[serieIndex][valueIndex];
+      final long typeId = resortedTypeIds[serieIndex][valueIndex];
 
-		final String tourTypeName = TourDatabase.getTourTypeName(typeId);
+      final String tourTypeName = TourDatabase.getTourTypeName(typeId);
 
-		return tourTypeName;
-	}
+      return tourTypeName;
+   }
 
-	/**
-	 * @param serieIndex
-	 * @param activeTourTypeFilter
-	 * @return Returns the tour type name for a data serie
-	 */
-	public static String getTourTypeName(final int serieIndex, final TourTypeFilter activeTourTypeFilter) {
+   /**
+    * @param serieIndex
+    * @param activeTourTypeFilter
+    * @return Returns the tour type name for a data serie
+    */
+   public static String getTourTypeName(final int serieIndex, final TourTypeFilter activeTourTypeFilter) {
 
-		int colorOffset = 0;
-		if (activeTourTypeFilter.showUndefinedTourTypes()) {
-			colorOffset = TOUR_TYPE_COLOR_INDEX_OFFSET;
-		}
+      int colorOffset = 0;
+      if (activeTourTypeFilter.showUndefinedTourTypes()) {
+         colorOffset = TOUR_TYPE_COLOR_INDEX_OFFSET;
+      }
 
-		if (serieIndex - colorOffset < 0) {
-			return Messages.ui_tour_not_defined;
-		}
+      if (serieIndex - colorOffset < 0) {
+         return Messages.ui_tour_not_defined;
+      }
 
-		final ArrayList<TourType> tourTypeList = TourDatabase.getActiveTourTypes();
-		final long typeId = tourTypeList.get(serieIndex - colorOffset).getTypeId();
+      final ArrayList<TourType> tourTypeList = TourDatabase.getActiveTourTypes();
+      final long typeId = tourTypeList.get(serieIndex - colorOffset).getTypeId();
 
-		final String tourTypeName = TourDatabase.getTourTypeName(typeId);
+      final String tourTypeName = TourDatabase.getTourTypeName(typeId);
 
-		return tourTypeName;
-	}
+      return tourTypeName;
+   }
 
-	/**
-	 * Set bar names into the statistic context. The names will be displayed in a combobox in the
-	 * statistics toolbar.
-	 *
-	 * @param statContext
-	 * @param allUsedTourTypeIds
-	 */
-	@SuppressWarnings("unchecked")
-	public static void setBarNames(	final StatisticContext statContext,
-												final long[] allUsedTourTypeIds,
-												final int barOrderStart) {
+   /**
+    * Set bar names into the statistic context. The names will be displayed in a combobox in the
+    * statistics toolbar.
+    *
+    * @param statContext
+    * @param allUsedTourTypeIds
+    */
+   @SuppressWarnings("unchecked")
+   public static void setBarNames(final StatisticContext statContext,
+                                  final long[] allUsedTourTypeIds,
+                                  final int barOrderStart) {
 
-		int numUsedTypes = 0;
-
-		// get number of used tour types, a used tour type is not NO_TOUR_TYPE
-		for (final long tourTypeId : allUsedTourTypeIds) {
-			if (tourTypeId != TourType.TOUR_TYPE_IS_NOT_USED) {
-				numUsedTypes++;
-			}
-		}
+      int numUsedTypes = 0;
+
+      // get number of used tour types, a used tour type is not NO_TOUR_TYPE
+      for (final long tourTypeId : allUsedTourTypeIds) {
+         if (tourTypeId != TourType.TOUR_TYPE_IS_NOT_USED) {
+            numUsedTypes++;
+         }
+      }
 
-		ArrayList<TourType> allTourTypes = TourDatabase.getActiveTourTypes();
+      ArrayList<TourType> allTourTypes = TourDatabase.getActiveTourTypes();
 
-		final boolean isShowNoTourTypes = TourbookPlugin.getActiveTourTypeFilter().showUndefinedTourTypes();
-		if (isShowNoTourTypes) {
+      final boolean isShowNoTourTypes = TourbookPlugin.getActiveTourTypeFilter().showUndefinedTourTypes();
+      if (isShowNoTourTypes) {
 
-			ArrayList<TourType> clonedTourTypes = new ArrayList<>();
+         ArrayList<TourType> clonedTourTypes = new ArrayList<>();
 
-			if (allTourTypes != null) {
-				clonedTourTypes = (ArrayList<TourType>) allTourTypes.clone();
-			}
-
-			// add dummy tour type
-			final TourType dummyTourType = new TourType(Messages.ui_tour_not_defined);
-			dummyTourType.setTourId_NotDefinedInTourData();
-			clonedTourTypes.add(0, dummyTourType);
-
-			allTourTypes = clonedTourTypes;
-
-		} else {
-
-			if (allTourTypes == null || allTourTypes.size() == 0 || numUsedTypes == 0) {
-
-				statContext.outIsUpdateBarNames = true;
-				statContext.outBarNames = null;
+         if (allTourTypes != null) {
+            clonedTourTypes = (ArrayList<TourType>) allTourTypes.clone();
+         }
+
+         // add dummy tour type
+         final TourType dummyTourType = new TourType(Messages.ui_tour_not_defined);
+         dummyTourType.setTourId_NotDefinedInTourData();
+         clonedTourTypes.add(0, dummyTourType);
+
+         allTourTypes = clonedTourTypes;
+
+      } else {
+
+         if (allTourTypes == null || allTourTypes.size() == 0 || numUsedTypes == 0) {
+
+            statContext.outIsUpdateBarNames = true;
+            statContext.outBarNames = null;
 
-				return;
-			}
-		}
+            return;
+         }
+      }
 
-		int barIndex = 0;
+      int barIndex = 0;
 
-		// create bar names 2 times
-		final String[] barNames = new String[numUsedTypes * 2];
+      // create bar names 2 times
+      final String[] barNames = new String[numUsedTypes * 2];
 
-		for (int inverseIndex = 0; inverseIndex < 2; inverseIndex++) {
+      for (int inverseIndex = 0; inverseIndex < 2; inverseIndex++) {
 
-			for (int typeIndex = 0; typeIndex < allTourTypes.size(); typeIndex++) {
+         for (int typeIndex = 0; typeIndex < allTourTypes.size(); typeIndex++) {
 
-				final TourType tourType = allTourTypes.get(typeIndex);
+            final TourType tourType = allTourTypes.get(typeIndex);
 
-				final long tourTypeId = tourType.getTypeId();
+            final long tourTypeId = tourType.getTypeId();
 
-				/*
-				 * Check if this type is used
-				 */
-				boolean isTourTypeUsed = false;
-				long usedTourTypeId = 0;
+            /*
+             * Check if this type is used
+             */
+            boolean isTourTypeUsed = false;
+            long usedTourTypeId = 0;
 
-				for (final long usedTourTypeIdValue : allUsedTourTypeIds) {
+            for (final long usedTourTypeIdValue : allUsedTourTypeIds) {
 
-					usedTourTypeId = usedTourTypeIdValue;
+               usedTourTypeId = usedTourTypeIdValue;
 
-					if (usedTourTypeId == tourTypeId) {
-						isTourTypeUsed = true;
-						break;
-					}
-				}
+               if (usedTourTypeId == tourTypeId) {
+                  isTourTypeUsed = true;
+                  break;
+               }
+            }
 
-				if (isTourTypeUsed) {
+            if (isTourTypeUsed) {
 
-					String barName;
+               String barName;
 
-					final String tourTypeName = usedTourTypeId == TourType.TOUR_TYPE_IS_NOT_DEFINED_IN_TOUR_DATA
-							? Messages.ui_tour_not_defined
-							: tourType.getName();
+               final String tourTypeName = usedTourTypeId == TourType.TOUR_TYPE_IS_NOT_DEFINED_IN_TOUR_DATA
+                     ? Messages.ui_tour_not_defined
+                     : tourType.getName();
 
-					if (inverseIndex == 0) {
-						barName = tourTypeName;
-					} else {
-						barName = tourTypeName
-								+ UI.SPACE
-								+ net.tourbook.statistics.Messages.Statistic_Label_Invers;
-					}
+               if (inverseIndex == 0) {
+                  barName = tourTypeName;
+               } else {
+                  barName = tourTypeName
+                        + UI.SPACE
+                        + net.tourbook.statistics.Messages.Statistic_Label_Invers;
+               }
 
-					barNames[barIndex++] = barName;
-				}
-			}
-		}
+               barNames[barIndex++] = barName;
+            }
+         }
+      }
 
-		// set state what the statistic container should do
-		statContext.outIsUpdateBarNames = true;
-		statContext.outBarNames = barNames;
-		statContext.outVerticalBarIndex = barOrderStart;
-	}
+      // set state what the statistic container should do
+      statContext.outIsUpdateBarNames = true;
+      statContext.outBarNames = barNames;
+      statContext.outVerticalBarIndex = barOrderStart;
+   }
 
-	/**
-	 * Set default colors for the y-axis, the color is defined in
-	 * {@link GraphColorManager#PREF_COLOR_LINE}
-	 *
-	 * @param yData
-	 * @param graphName
-	 */
-	public static void setDefaultColors(final ChartDataYSerie yData, final String graphName) {
-
-		final IPreferenceStore commonPrefStore = CommonActivator.getPrefStore();
-
-		final String defaultColorName = ICommonPreferences.GRAPH_COLORS + graphName + "."; //$NON-NLS-1$
-
-		// put the color into the chart data
-		yData.setDefaultRGB(PreferenceConverter.getColor(//
-				commonPrefStore,
-				defaultColorName + GraphColorManager.PREF_COLOR_LINE));
-	}
-
-	/**
-	 * create the color index for every tour type, <code>typeIds</code> contain all tour types
-	 *
-	 * @param tourTypeFilter
-	 */
-	public static void setTourTypeColorIndex(	final ChartDataYSerie yData,
-															final long[][] resortedTypeIds,
-															final TourTypeFilter tourTypeFilter) {
-
-		final ArrayList<TourType> tourTypes = TourDatabase.getActiveTourTypes();
-
-		int colorOffset = 0;
-		if (tourTypeFilter.showUndefinedTourTypes()) {
-			colorOffset = TOUR_TYPE_COLOR_INDEX_OFFSET;
-		}
-
-		final int[][] colorIndex = new int[resortedTypeIds.length][resortedTypeIds[0].length];
-
-		int serieIndex = 0;
-		for (final long[] typeIdSerie : resortedTypeIds) {
-
-			final int[] colorIndexSerie = new int[typeIdSerie.length];
-			for (int tourTypeIdIndex = 0; tourTypeIdIndex < typeIdSerie.length; tourTypeIdIndex++) {
-
-				int tourTypeColorIndex = 0;
-
-				final long typeId = typeIdSerie[tourTypeIdIndex];
-
-				if (typeId != -1) {
-					for (int typeIndex = 0; typeIndex < tourTypes.size(); typeIndex++) {
-						if ((tourTypes.get(typeIndex)).getTypeId() == typeId) {
-							tourTypeColorIndex = colorOffset + typeIndex;
-							break;
-						}
-					}
-				}
-				colorIndexSerie[tourTypeIdIndex] = tourTypeColorIndex;
-			}
-
-			colorIndex[serieIndex] = colorIndexSerie;
-
-			serieIndex++;
-		}
-
-		yData.setColorIndex(colorIndex);
-	}
-
-	public static void setTourTypeColors(	final ChartDataYSerie yData,
-														final String graphName,
-														final TourTypeFilter tourTypeFilter) {
-
-		final ArrayList<RGB> rgbBright = new ArrayList<>();
-		final ArrayList<RGB> rgbDark = new ArrayList<>();
-		final ArrayList<RGB> rgbLine = new ArrayList<>();
-		final ArrayList<RGB> rgbText = new ArrayList<>();
-
-		/*
-		 * set default color when tours are displayed where the tour type is not set, these tour will
-		 * be painted in the default color
-		 */
-		if (tourTypeFilter.showUndefinedTourTypes()) {
-
-			/*
-			 * color index 0: default color
-			 */
-			final IPreferenceStore commonPrefStore = CommonActivator.getPrefStore();
-			final String defaultColorName = ICommonPreferences.GRAPH_COLORS + graphName + "."; //$NON-NLS-1$
-
-			rgbBright.add(PreferenceConverter.getColor(//
-					commonPrefStore,
-					defaultColorName + GraphColorManager.PREF_COLOR_BRIGHT));
-
-			rgbDark.add(PreferenceConverter.getColor(//
-					commonPrefStore,
-					defaultColorName + GraphColorManager.PREF_COLOR_DARK));
-
-			rgbLine.add(PreferenceConverter.getColor(//
-					commonPrefStore,
-					defaultColorName + GraphColorManager.PREF_COLOR_LINE));
-
-			rgbText.add(PreferenceConverter.getColor(//
-					commonPrefStore,
-					defaultColorName + GraphColorManager.PREF_COLOR_TEXT));
-		}
-
-		/*
-		 * color index 1...n+1: tour type colors
-		 */
-		final ArrayList<TourType> tourTypes = TourDatabase.getActiveTourTypes();
-		for (final TourType tourType : tourTypes) {
-			rgbBright.add(tourType.getRGBBright());
-			rgbDark.add(tourType.getRGBDark());
-			rgbLine.add(tourType.getRGBLine());
-			rgbText.add(tourType.getRGBText());
-		}
-
-		// put the colors into the chart data
-		yData.setRgbBright(rgbBright.toArray(new RGB[rgbBright.size()]));
-		yData.setRgbDark(rgbDark.toArray(new RGB[rgbDark.size()]));
-		yData.setRgbLine(rgbLine.toArray(new RGB[rgbLine.size()]));
-		yData.setRgbText(rgbText.toArray(new RGB[rgbText.size()]));
-
-//		/*
-//		 * dump tour type colors
-//		 */
-//		System.out.println(UI.EMPTY_STRING);
-//		System.out.println("setTourTypeColors()"); //$NON-NLS-1$
+   /**
+    * Set default colors for the y-axis, the color is defined in
+    * {@link GraphColorManager#PREF_COLOR_LINE}
+    *
+    * @param yData
+    * @param graphName
+    */
+   public static void setDefaultColors(final ChartDataYSerie yData, final String graphName) {
+
+      final IPreferenceStore commonPrefStore = CommonActivator.getPrefStore();
+
+      final String defaultColorName = ICommonPreferences.GRAPH_COLORS + graphName + "."; //$NON-NLS-1$
+
+      // put the color into the chart data
+      yData.setDefaultRGB(PreferenceConverter.getColor(//
+            commonPrefStore,
+            defaultColorName + GraphColorManager.PREF_COLOR_LINE));
+   }
+
+   /**
+    * create the color index for every tour type, <code>typeIds</code> contain all tour types
+    *
+    * @param tourTypeFilter
+    */
+   public static void setTourTypeColorIndex(final ChartDataYSerie yData,
+                                            final long[][] resortedTypeIds,
+                                            final TourTypeFilter tourTypeFilter) {
+
+      final ArrayList<TourType> tourTypes = TourDatabase.getActiveTourTypes();
+
+      int colorOffset = 0;
+      if (tourTypeFilter.showUndefinedTourTypes()) {
+         colorOffset = TOUR_TYPE_COLOR_INDEX_OFFSET;
+      }
+
+      final int[][] colorIndex = new int[resortedTypeIds.length][resortedTypeIds[0].length];
+
+      int serieIndex = 0;
+      for (final long[] typeIdSerie : resortedTypeIds) {
+
+         final int[] colorIndexSerie = new int[typeIdSerie.length];
+         for (int tourTypeIdIndex = 0; tourTypeIdIndex < typeIdSerie.length; tourTypeIdIndex++) {
+
+            int tourTypeColorIndex = 0;
+
+            final long typeId = typeIdSerie[tourTypeIdIndex];
+
+            if (typeId != -1) {
+               for (int typeIndex = 0; typeIndex < tourTypes.size(); typeIndex++) {
+                  if ((tourTypes.get(typeIndex)).getTypeId() == typeId) {
+                     tourTypeColorIndex = colorOffset + typeIndex;
+                     break;
+                  }
+               }
+            }
+            colorIndexSerie[tourTypeIdIndex] = tourTypeColorIndex;
+         }
+
+         colorIndex[serieIndex] = colorIndexSerie;
+
+         serieIndex++;
+      }
+
+      yData.setColorIndex(colorIndex);
+   }
+
+   public static void setTourTypeColors(final ChartDataYSerie yData,
+                                        final String graphName,
+                                        final TourTypeFilter tourTypeFilter) {
+
+      final ArrayList<RGB> rgbBright = new ArrayList<>();
+      final ArrayList<RGB> rgbDark = new ArrayList<>();
+      final ArrayList<RGB> rgbLine = new ArrayList<>();
+      final ArrayList<RGB> rgbText = new ArrayList<>();
+
+      /*
+       * Set default color when tours are displayed where the tour type is not set, these tour will
+       * be painted in the default color
+       */
+      if (tourTypeFilter.showUndefinedTourTypes()) {
+
+         /*
+          * color index 0: default color
+          */
+         final IPreferenceStore commonPrefStore = CommonActivator.getPrefStore();
+         final String defaultColorName = ICommonPreferences.GRAPH_COLORS + graphName + "."; //$NON-NLS-1$
+
+         rgbBright.add(PreferenceConverter.getColor(
+               commonPrefStore,
+               defaultColorName + GraphColorManager.PREF_COLOR_BRIGHT));
+
+         rgbDark.add(PreferenceConverter.getColor(
+               commonPrefStore,
+               defaultColorName + GraphColorManager.PREF_COLOR_DARK));
+
+         rgbLine.add(PreferenceConverter.getColor(
+               commonPrefStore,
+               defaultColorName + GraphColorManager.PREF_COLOR_LINE));
+
+         rgbText.add(PreferenceConverter.getColor(
+               commonPrefStore,
+               defaultColorName + GraphColorManager.PREF_COLOR_TEXT));
+      }
+
+      /*
+       * Color index 1...n+1: tour type colors
+       */
+      final ArrayList<TourType> tourTypes = TourDatabase.getActiveTourTypes();
+      for (final TourType tourType : tourTypes) {
+         rgbBright.add(tourType.getRGBBright());
+         rgbDark.add(tourType.getRGBDark());
+         rgbLine.add(tourType.getRGBLine());
+         rgbText.add(tourType.getRGBText());
+      }
+
+      // put the colors into the chart data
+      yData.setRgbBright(rgbBright.toArray(new RGB[rgbBright.size()]));
+      yData.setRgbDark(rgbDark.toArray(new RGB[rgbDark.size()]));
+      yData.setRgbLine(rgbLine.toArray(new RGB[rgbLine.size()]));
+      yData.setRgbText(rgbText.toArray(new RGB[rgbText.size()]));
+
+//      /*
+//       * Dump tour type colors
+//       */
+//      System.out.println(UI.EMPTY_STRING);
+//      System.out.println("setTourTypeColors()"); //$NON-NLS-1$
 //
-//		for (final TourType tourType : tourTypes) {
+//      for (final TourType tourType : tourTypes) {
 //
-//			System.out.println(UI.EMPTY_STRING);
-//			System.out.println(tourType.getName());
-//			System.out.println(UI.EMPTY_STRING);
+//         System.out.println(UI.EMPTY_STRING);
+//         System.out.println(tourType.getName());
+//         System.out.println(UI.EMPTY_STRING);
 //
-//			final StringBuilder sb = new StringBuilder();
+//         final StringBuilder sb = new StringBuilder();
 //
-//			RGB rgb = tourType.getRGBBright();
-//			sb.append("new RGB(" + rgb.red + ", " + rgb.green + ", " + rgb.blue + "),\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+//         RGB rgb = tourType.getRGBBright();
+//         sb.append("new RGB(" + rgb.red + ", " + rgb.green + ", " + rgb.blue + "),\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 //
-//			rgb = tourType.getRGBDark();
-//			sb.append("new RGB(" + rgb.red + ", " + rgb.green + ", " + rgb.blue + "),\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+//         rgb = tourType.getRGBDark();
+//         sb.append("new RGB(" + rgb.red + ", " + rgb.green + ", " + rgb.blue + "),\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 //
-//			rgb = tourType.getRGBLine();
-//			sb.append("new RGB(" + rgb.red + ", " + rgb.green + ", " + rgb.blue + "),\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+//         rgb = tourType.getRGBLine();
+//         sb.append("new RGB(" + rgb.red + ", " + rgb.green + ", " + rgb.blue + "),\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 //
-//			rgb = tourType.getRGBText();
-//			sb.append("new RGB(" + rgb.red + ", " + rgb.green + ", " + rgb.blue + "),\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+//         rgb = tourType.getRGBText();
+//         sb.append("new RGB(" + rgb.red + ", " + rgb.green + ", " + rgb.blue + "),\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 //
-//			System.out.println(sb.toString());
-//		}
-	}
+//         System.out.println(sb.toString());
+//      }
+   }
 
-	/**
-	 * Set chart properties from the pref store.
-	 *
-	 * @param chart
-	 * @param prefGridPrefix
-	 *           Prefix for grid preferences.
-	 */
-	public static void updateChartProperties(final Chart chart, final String prefGridPrefix) {
+   /**
+    * Set chart properties from the pref store.
+    *
+    * @param chart
+    * @param prefGridPrefix
+    *           Prefix for grid preferences.
+    */
+   public static void updateChartProperties(final Chart chart, final String prefGridPrefix) {
 
-		UI.updateChartProperties(chart, prefGridPrefix);
+      UI.updateChartProperties(chart, prefGridPrefix);
 
-		/*
-		 * These settings are currently static, a UI to modify it is not yet implemented.
-		 */
-		final ChartTitleSegmentConfig ctsConfig = chart.getChartTitleSegmentConfig();
+      /*
+       * These settings are currently static, a UI to modify it is not yet implemented.
+       */
+      final ChartTitleSegmentConfig ctsConfig = chart.getChartTitleSegmentConfig();
 
-		ctsConfig.isMultipleSegments = true;
+      ctsConfig.isMultipleSegments = true;
 
-		ctsConfig.isShowSegmentBackground = false;
-		ctsConfig.isShowSegmentSeparator = true;
-		ctsConfig.isShowSegmentTitle = true;
-	}
+      ctsConfig.isShowSegmentBackground = false;
+      ctsConfig.isShowSegmentSeparator = true;
+      ctsConfig.isShowSegmentTitle = true;
+   }
 
 }

@@ -209,6 +209,12 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
    float colPower_PowerToWeight;
 
+   // ----------- TRAINING ---------
+
+   float colTraining_TrainingEffect;
+   float colTraining_TrainingEffect_Anaerobic;
+   float colTraining_TrainingPerformance;
+
    // ----------- SURFING ---------
 
    int     col_Surfing_NumberOfEvents;
