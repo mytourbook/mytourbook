@@ -333,19 +333,13 @@ public class Messages extends NLS {
    public static String        action_export_tour;
    public static String        action_print_tour;
    public static String        action_tag_add;
-   public static String        action_tag_dlg_rename_message;
-   public static String        action_tag_dlg_rename_title;
    public static String        action_tag_open_tagging_structure;
    public static String        action_tag_remove;
    public static String        action_tag_remove_all;
-   public static String        action_tag_rename_tag;
-   public static String        action_tag_rename_tag_category;
    public static String        action_tag_set_all_confirm_message;
    public static String        action_tag_set_all_confirm_title;
    public static String        action_tag_set_all_tag_structures;
    public static String        action_tag_set_tag_expand_type;
-   public static String        action_tagcategory_dlg_rename_message;
-   public static String        action_tagcategory_dlg_rename_title;
    public static String        action_tagView_flat_hierarchical;
    public static String        action_tagView_flat_layout;
    public static String        action_tour_editor_delete_time_slices_keep_time;
@@ -633,7 +627,6 @@ public class Messages extends NLS {
    public static String        Db_Field_TourMarker_UrlText;
    public static String        Db_Field_TourTag_Name;
    public static String        Db_Field_TourTag_Notes;
-   public static String        Db_Field_TourTagCategory_Notes;
 
    public static String        DeviceManager_Selection_device_is_not_selected;
 
@@ -701,7 +694,6 @@ public class Messages extends NLS {
    public static String        Dialog_SplitTour_Label_TourTitle_Tooltip;
 
    public static String        Dialog_TourTag_EditTag_Title;
-   public static String        Dialog_TourTag_EditTagCategory_Title;
    public static String        Dialog_TourTag_Label_Notes;
    public static String        Dialog_TourTag_Label_TagName;
    public static String        Dialog_TourTag_Message_RenameTag;
@@ -1588,16 +1580,11 @@ public class Messages extends NLS {
 
    public static String        pref_tourtag_btn_new_tag;
    public static String        pref_tourtag_btn_new_tag_category;
-   public static String        pref_tourtag_btn_rename;
    public static String        pref_tourtag_btn_reset;
    public static String        pref_tourtag_dlg_new_tag_category_message;
    public static String        pref_tourtag_dlg_new_tag_category_title;
    public static String        pref_tourtag_dlg_new_tag_message;
    public static String        pref_tourtag_dlg_new_tag_title;
-   public static String        pref_tourtag_dlg_rename_message;
-   public static String        pref_tourtag_dlg_rename_message_category;
-   public static String        pref_tourtag_dlg_rename_title;
-   public static String        pref_tourtag_dlg_rename_title_category;
    public static String        pref_tourtag_dlg_reset_message;
    public static String        pref_tourtag_dlg_reset_title;
    public static String        pref_tourtag_hint;
