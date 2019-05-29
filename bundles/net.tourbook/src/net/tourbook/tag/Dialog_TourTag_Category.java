@@ -80,7 +80,7 @@ public class Dialog_TourTag_Category extends TitleAreaDialog {
 
       super.create();
 
-      setTitle(Messages.Dialog_TourTagCategory_Title);
+      setTitle(Messages.Dialog_TourTagCategory_EditCategory_Title);
       setMessage(_dlgMessage);
    }
 

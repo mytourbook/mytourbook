@@ -32,6 +32,7 @@ import net.tourbook.ui.UI;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.window.Window;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 
@@ -66,9 +67,8 @@ public class ActionEditTag extends Action {
          final HashMap<Long, TourTag> allTourTags = TourDatabase.getAllTourTags();
 
          final TourTag tourTag = finalTourTag[0] = allTourTags.get(tourTagItem.getTagId());
-         final String tagName = tourTag.getTagName();
 
-         dlgMessage = tagName == null ? UI.EMPTY_STRING : tagName;
+         dlgMessage = NLS.bind(Messages.Dialog_TourTag_EditTag_Message, tourTag.getTagName());
 
          if (new Dialog_TourTag(
                Display.getCurrent().getActiveShell(),
@@ -85,9 +85,7 @@ public class ActionEditTag extends Action {
          final HashMap<Long, TourTagCategory> allTourTagCategories = TourDatabase.getAllTourTagCategories();
          final TourTagCategory tagCategory = finalTagCategory[0] = allTourTagCategories.get(tagCategoryItem.getCategoryId());
 
-         final String tagCategoryName = tagCategory.getCategoryName();
-
-         dlgMessage = tagCategoryName == null ? UI.EMPTY_STRING : tagCategoryName;
+         dlgMessage = NLS.bind(Messages.Dialog_TourTagCategory_EditCategory_Message, tagCategory.getCategoryName());
 
          if (new Dialog_TourTag_Category(
                Display.getCurrent().getActiveShell(),

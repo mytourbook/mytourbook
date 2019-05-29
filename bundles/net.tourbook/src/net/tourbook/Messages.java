@@ -693,13 +693,15 @@ public class Messages extends NLS {
    public static String        Dialog_SplitTour_Label_TourTitle;
    public static String        Dialog_SplitTour_Label_TourTitle_Tooltip;
 
+   public static String        Dialog_TourTag_EditTag_Message;
    public static String        Dialog_TourTag_EditTag_Title;
    public static String        Dialog_TourTag_Label_Notes;
    public static String        Dialog_TourTag_Label_TagName;
-   public static String        Dialog_TourTag_Message_RenameTag;
+   public static String        Dialog_TourTag_Title;
 
+   public static String        Dialog_TourTagCategory_EditCategory_Message;
+   public static String        Dialog_TourTagCategory_EditCategory_Title;
    public static String        Dialog_TourTagCategory_Label_CategoryName;
-   public static String        Dialog_TourTagCategory_Message_RenameCategory;
    public static String        Dialog_TourTagCategory_Title;
 
    public static String        Dlg_AdjustAltitude_Group_options;
@@ -773,11 +775,11 @@ public class Messages extends NLS {
    public static String        GeoCompare_View_State_ComparingIsCanceled;
    public static String        GeoCompare_View_State_StartComparing;
 
-   public static String Graph_Label_Time_Moving;
+   public static String        Graph_Label_Time_Moving;
 
-   public static String Graph_Label_Time_Paused;
+   public static String        Graph_Label_Time_Paused;
 
-   public static String Graph_Label_Time_Recording;
+   public static String        Graph_Label_Time_Recording;
 
    public static String        HR_Zone_01_060_Moderate;
    public static String        HR_Zone_01_060_Moderate_Shortcut;
