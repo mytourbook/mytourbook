@@ -17,6 +17,7 @@ New
    
   - Tagged Tours view
     - Show tag/category notes in the new tooltip for tags/categories 
+    - New column to show tag/category notes
   
   - Tagging preferences
     - New column to show tag/category notes
