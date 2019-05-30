@@ -23,6 +23,8 @@ public class Messages extends NLS {
 
    public static String        App_Action_Apply;
 
+   public static String        App_Label_NewTourMarker;
+
    public static String        graph_label_gradient_unit;
    public static String        graph_label_heartbeat_unit;
 
@@ -161,13 +163,10 @@ public class Messages extends NLS {
    public static String        Tour_Action_RunDyn_StepLength_Tooltip;
    public static String        Tour_Action_ShowHrZones_Tooltip;
 
-   public static String        TourData_Label_new_tour_marker;
-
    static {
       // initialize resource bundle
       NLS.initializeMessages(BUNDLE_NAME, Messages.class);
    }
 
-   private Messages() {
-   }
+   private Messages() {}
 }

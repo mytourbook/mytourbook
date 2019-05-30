@@ -88,7 +88,7 @@ public class ActionCreateTourMarkerFromMap extends Action {
       final TourMarker tourMarker = new TourMarker(tourData, ChartLabel.MARKER_TYPE_CUSTOM);
       tourMarker.setSerieIndex(closestLatLongIndex);
       tourMarker.setTime(relativeTourTime, tourData.getTourStartTimeMS() + (relativeTourTime * 1000));
-      tourMarker.setLabel(Messages.TourData_Label_new_tour_marker);
+      tourMarker.setLabel(Messages.App_Label_NewTourMarker);
 
       if (altitudeSerie != null) {
          tourMarker.setAltitude(altitudeSerie[closestLatLongIndex]);
