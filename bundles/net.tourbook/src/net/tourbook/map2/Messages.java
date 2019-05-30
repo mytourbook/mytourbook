@@ -23,7 +23,7 @@ public class Messages extends NLS {
 
    public static String        App_Action_Apply;
 
-   public static String        App_Label_NewTourMarker;
+   public static String        Default_Label_NewTourMarker;
 
    public static String        graph_label_gradient_unit;
    public static String        graph_label_heartbeat_unit;
