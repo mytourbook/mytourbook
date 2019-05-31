@@ -23,6 +23,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -311,13 +312,19 @@ public class RawDataManager {
          writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file, true), "UTF-8")); //$NON-NLS-1$
          final ImportConfig importConfig = getEasyConfig().getActiveImportConfig();
 
+
          for (final String invalidFile : _invalidFilesList) {
+
+            Path invalidFilePath = Paths.get(invalidFile);
+
             //If the invalid files are backed up and deleted from the device folder,
             //then we save their backup path and not their device path.
             if (importConfig.isCreateBackup && importConfig.isDeleteDeviceFiles) {
-               final Path invalidFileBackupPath = Paths.get(importConfig.getBackupFolder(), Paths.get(invalidFile).getFileName().toString());
-               writer.write(invalidFileBackupPath.toString());
-            } else {
+               invalidFilePath = Paths.get(importConfig.getBackupFolder(), Paths.get(invalidFile).getFileName().toString());
+            }
+
+            // We check if the file still exists (it could have been deleted recently)
+            if (Files.exists(invalidFilePath)) {
                writer.write(invalidFile);
             }
 
