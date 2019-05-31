@@ -41,7 +41,7 @@ New
 
 * Easy Import (Frederic)
 
-  - When encountering invalid device files, those files are marked to be ignored so
+  - When encountering invalid device files, those files are marked to be ignored (in the file invalidfiles_to_ignore.txt) so
     that they are not considered as files to be imported in the future. An
     option was added for the user to enable/disable this feature in the
     preferences menu.

@@ -1491,7 +1491,7 @@ public class TourInfoUI {
       _lblMaxPulse.setText(FormatManager.formatPulse(_tourData.getMaxPulse()));
       _lblMaxPulseUnit.setText(Messages.Value_Unit_Pulse);
 
-      _lblMaxSpeed.setText(FormatManager.formatSpeed(_tourData.getMaxSpeed()));
+      _lblMaxSpeed.setText(FormatManager.formatSpeed(_tourData.getMaxSpeed() / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
       _lblMaxSpeedUnit.setText(UI.UNIT_LABEL_SPEED);
 
       // gears
