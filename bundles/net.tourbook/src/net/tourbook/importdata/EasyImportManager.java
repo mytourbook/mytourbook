@@ -41,6 +41,17 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IMemento;
+import org.eclipse.ui.WorkbenchException;
+import org.eclipse.ui.XMLMemento;
+
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.NIO;
@@ -53,17 +64,6 @@ import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourLogState;
-
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.dialogs.ProgressMonitorDialog;
-import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IMemento;
-import org.eclipse.ui.WorkbenchException;
-import org.eclipse.ui.XMLMemento;
 
 public class EasyImportManager {
 
@@ -394,11 +394,14 @@ public class EasyImportManager {
       final HashSet<String> dbFileNames = getDbFileNames(availableFiles);
 
       for (final OSFile deviceFile : availableFiles) {
-
-         if (dbFileNames.contains(deviceFile.getFileName()) == false &&
-               (RawDataManager.isIgnoreInvalidFile() &&
-                     !RawDataManager.doesInvalidFileExist(deviceFile.getFileName()))) {
-            notImportedFiles.add(deviceFile);
+         if (dbFileNames.contains(deviceFile.getFileName()) == false) {
+            if (!RawDataManager.isIgnoreInvalidFile()) {
+               notImportedFiles.add(deviceFile);
+            } else {// RawDataManager.isIgnoreInvalidFile() == true
+               if (!RawDataManager.doesInvalidFileExist(deviceFile.getFileName())) {
+                  notImportedFiles.add(deviceFile);
+               }
+            }
          }
       }
 
