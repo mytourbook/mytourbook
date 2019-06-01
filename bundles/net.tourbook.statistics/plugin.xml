@@ -74,11 +74,11 @@
          category-time  ="Month"
       />
             
-            
+
       <!-- TRAINING -->
 
       <statistic
-         name           ="%Training_Line"
+         name           ="%Statistic_Training_Line"
          id             ="net.tourbook.statistics.graphs.StatisticTraining_Line"
          class          ="net.tourbook.statistics.graphs.StatisticTraining_Line"
          category-data  ="Training"
@@ -86,7 +86,7 @@
       />
 
       <statistic
-         name           ="%Training_Bar"
+         name           ="%Statistic_Training_Bar"
          id             ="net.tourbook.statistics.graphs.StatisticTraining_Bar"
          class          ="net.tourbook.statistics.graphs.StatisticTraining_Bar"
          category-data  ="Training"

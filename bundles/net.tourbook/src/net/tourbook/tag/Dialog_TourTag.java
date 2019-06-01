@@ -70,7 +70,7 @@ public class Dialog_TourTag extends TitleAreaDialog {
       super.configureShell(shell);
 
       // set window title
-      shell.setText(Messages.Dialog_TourTag_EditTag_Title);
+      shell.setText(Messages.Dialog_TourTag_Title);
    }
 
    @Override

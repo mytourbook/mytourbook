@@ -667,8 +667,8 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
             case SWT.F2:
                onTagViewer_RenameTag();
                break;
-               }
             }
+         }
 
          @Override
          public void keyReleased(final KeyEvent e) {}
@@ -740,6 +740,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
       defineColumn_Tour_Title();
       defineColumn_Tour_Tags();
+      defineColumn_Tour_TagAndCategoryNotes();
 
       defineColumn_Motion_Distance();
       defineColumn_Motion_MaxSpeed();
@@ -1160,6 +1161,40 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
             colDef.printLongValue(cell, value, element instanceof TVITagView_Tour);
 
             setCellColor(cell, element);
+         }
+      });
+   }
+
+   /**
+    * Column: tag notes
+    */
+   private void defineColumn_Tour_TagAndCategoryNotes() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TAG_AND_CATEGORY_NOTES.createColumn(_columnManager, _pc);
+      colDef.setIsDefaultColumn();
+      colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            final TVITagViewItem viewItem = (TVITagViewItem) element;
+
+            if (viewItem instanceof TVITagView_Tag) {
+
+               final TVITagView_Tag tagItem = (TVITagView_Tag) viewItem;
+
+               cell.setText(TourDatabase.getTagNotes((tagItem).tagId));
+
+            } else if (viewItem instanceof TVITagView_TagCategory) {
+
+               final TVITagView_TagCategory categoryItem = (TVITagView_TagCategory) viewItem;
+               cell.setText(TourDatabase.getTagCategoryNotes((categoryItem).tagCategoryId));
+
+            } else {
+
+               cell.setText(UI.EMPTY_STRING);
+            }
          }
       });
    }

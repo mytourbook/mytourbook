@@ -110,6 +110,7 @@ public abstract class TreeColumnFactory {
    public static final TreeColumnFactory TOUR_COUNTER;
    public static final TreeColumnFactory TOUR_NUM_MARKERS;
    public static final TreeColumnFactory TOUR_NUM_PHOTOS;
+   public static final TreeColumnFactory TOUR_TAG_AND_CATEGORY_NOTES;
    public static final TreeColumnFactory TOUR_TAG_AND_TAGS;
    public static final TreeColumnFactory TOUR_TAGS;
    public static final TreeColumnFactory TOUR_TITLE;
@@ -1912,14 +1913,30 @@ public abstract class TreeColumnFactory {
          }
       };
 
+      TOUR_TAG_AND_CATEGORY_NOTES = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TOUR_TAG_AND_CATEGORY_NOTES", SWT.LEAD); //$NON-NLS-1$
+
+            colDef.setColumnCategory(Messages.ColumnFactory_Category_Tour);
+            colDef.setColumnLabel(Messages.ColumnFactory_TagNotes_Label);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_TagNotes_Header);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_TagNotes_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
+
+            return colDef;
+         }
+      };
+
       TOUR_TAG_AND_TAGS = new TreeColumnFactory() {
          @Override
          public TreeColumnDefinition createColumn(final ColumnManager columnManager,
                                                   final PixelConverter pixelConverter) {
 
-            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager,
-                  "TOUR_TAG_AND_TAGS", //$NON-NLS-1$
-                  SWT.LEAD);
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TOUR_TAG_AND_TAGS", SWT.LEAD); //$NON-NLS-1$
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Tour);
             colDef.setColumnLabel(Messages.ColumnFactory_tag_label);

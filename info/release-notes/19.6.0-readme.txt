@@ -1,12 +1,12 @@
-Version 19.5.0                                            ?. May 2019
+Version 19.6.0                                            ?. June 2019
 
 Update Docu - START
 
 * Drag&Drop 2D map provider do NOT work when app is running as administrator !!!
 * Invalid 2D map provider files
 
-
 Update Docu - END
+
 
 New   
 ===
@@ -17,6 +17,7 @@ New
    
   - Tagged Tours view
     - Show tag/category notes in the new tooltip for tags/categories 
+    - New column to show tag/category notes
   
   - Tagging preferences
     - New column to show tag/category notes
@@ -40,7 +41,7 @@ New
 
 * Easy Import (Frederic)
 
-  - When encountering invalid device files, those files are marked to be ignored so
+  - When encountering invalid device files, those files are marked to be ignored (in the file invalidfiles_to_ignore.txt) so
     that they are not considered as files to be imported in the future. An
     option was added for the user to enable/disable this feature in the
     preferences menu.
@@ -101,7 +102,7 @@ Bugfix
 * Fixed IllegalArgumentException: Widget has the wrong parent
   This occured when app is started and a view is minimized, then the context menu is already created but has the wrong parent when the view is displayed later on.
   It needed a while until the cause of this issue was discovered. This has propably occured after switching to Eclipse 4.
-  Nobody compained until now maybe it was not used to minimize a view.
+  Nobody complained until now, maybe this feature was not used to minimize a view.
 
 * File Re-Import (Frederic)
   - Fixed a bug (when using Linux) where the reimport filedialog doesn't show

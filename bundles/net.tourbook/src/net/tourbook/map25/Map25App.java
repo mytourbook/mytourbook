@@ -737,7 +737,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	public void setMapProvider(final Map25Provider mapProvider) {
 
 	   debugPrint("############# setMapProvider entering setMapProvider"); //$NON-NLS-1$
-		debugPrint("############# setMapProvider layers before: " + mMap.layers().toString() + " size: " + mMap.layers().size()); //$NON-NLS-1$
+		debugPrint("############# setMapProvider layers before: " + mMap.layers().toString() + " size: " + mMap.layers().size()); //$NON-NLS-1$ //$NON-NLS-2$
 		/*boolean label_layer_was_enabled = getLayer_Label().isEnabled();
 		boolean building_layer_was_enabled = getLayer_Building().isEnabled();
 		mMap.layers().remove(_layer_Label);
@@ -1206,7 +1206,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 			tileSourceOfflinePrimary.setPreferredLanguage(_mf_prefered_language);
 			mMFileTileSource.add(tileSourceOfflinePrimary);   // adding primary map first
 			_tileSourceOfflineMapCount += 1;
-			debugPrint("#### getMapFile: Adding primary map: " + file + " size: " +  file.length() + " bytes)"); //$NON-NLS-1$
+			debugPrint("#### getMapFile: Adding primary map: " + file + " size: " +  file.length() + " bytes)"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		} else {
 		   ;
 			debugPrint("#### getMapFile: primary file missing: " + file.getAbsolutePath()); //$NON-NLS-1$
@@ -1225,7 +1225,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 					_tileSourceOfflineMapCount += 1;
 					//long size = FileUtils.sizeOf(f);
 					//debugPrint("Adding: " + f + " size: " +  	FileUtils.byteCountToDisplaySize(size) + "(" + size + " bytes)");
-					debugPrint("#### getMapFile: Adding secondary map: " + f + " size: " +  f.length() + " bytes), Total Maps: " + _tileSourceOfflineMapCount); //$NON-NLS-1$
+					debugPrint("#### getMapFile: Adding secondary map: " + f + " size: " +  f.length() + " bytes), Total Maps: " + _tileSourceOfflineMapCount); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				}
 			}
       }	
@@ -1253,7 +1253,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 		result = mOpenResult.isSuccess();
 		if (!mOpenResult.isSuccess()) {
 		   ;
-		 debugPrint("### checkMapFile: not adding: " + file2check.getAbsolutePath() + " " + mOpenResult.getErrorMessage()); //$NON-NLS-1$
+		 debugPrint("### checkMapFile: not adding: " + file2check.getAbsolutePath() + " " + mOpenResult.getErrorMessage()); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		return result;
 	}
