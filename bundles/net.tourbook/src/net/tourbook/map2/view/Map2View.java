@@ -416,22 +416,23 @@ public class Map2View extends ViewPart implements
    private long                           _lastFiredSyncEventTime;
 
    private HashMap<MapGraphId, Action>    _allTourColorActions = new HashMap<>();
-   private ActionTourColor                _actionTourColorAltitude;
-   private ActionTourColor                _actionTourColorGradient;
-   private ActionTourColor                _actionTourColorPulse;
-   private ActionTourColor                _actionTourColorSpeed;
-   private ActionTourColor                _actionTourColorPace;
-   private ActionTourColor                _actionTourColorHrZone;
+   private ActionTourColor                _actionTourColor_Altitude;
+   private ActionTourColor                _actionTourColor_Gradient;
+   private ActionTourColor                _actionTourColor_Pulse;
+   private ActionTourColor                _actionTourColor_Speed;
+   private ActionTourColor                _actionTourColor_Pace;
+   private ActionTourColor                _actionTourColor_HrZone;
    private ActionTourColor                _actionTourColor_RunDyn_StepLength;
 
+   private ActionCreateTourMarkerFromMap  _actionCreateTourMarkerFromMap;
    private ActionDimMap                   _actionDimMap;
    private ActionOpenPrefDialog           _actionEditMap2Preferences;
-   private ActionMap2_Options             _actionMap2_Options;
+   private ActionManageMapProviders       _actionManageProvider;
    private ActionMapBookmarks             _actionMap2_Bookmarks;
    private ActionMap2Color                _actionMap2_Color;
-   private ActionCreateTourMarkerFromMap  _actionCreateTourMarkerFromMap;
+   private ActionMap2_MapProvider         _actionMap2_MapProvider;
+   private ActionMap2_Options             _actionMap2_Options;
    private ActionMap2_Graphs              _actionMap2_TourColors;
-   private ActionManageMapProviders       _actionManageProvider;
    private ActionPhotoProperties          _actionPhotoFilter;
    private ActionReloadFailedMapImages    _actionReloadFailedMapImages;
    private ActionSaveDefaultPosition      _actionSaveDefaultPosition;
@@ -488,6 +489,26 @@ public class Map2View extends ViewPart implements
       protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
 
          return new Slideout_Map2_TourColors(_parent, toolbar, Map2View.this, _state);
+      }
+
+      @Override
+      protected void onBeforeOpenSlideout() {
+         closeOpenedDialogs(this);
+      }
+   }
+
+   private class ActionMap2_MapProvider extends ActionToolbarSlideout {
+
+      public ActionMap2_MapProvider() {
+
+         super(TourbookPlugin.getImageDescriptor(Messages.image_action_change_tile_factory),
+               TourbookPlugin.getImageDescriptor(Messages.image_action_change_tile_factory));
+      }
+
+      @Override
+      protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+
+         return new Slideout_Map2_MapProvider(_parent, toolbar, Map2View.this, _state);
       }
 
       @Override
@@ -563,8 +584,7 @@ public class Map2View extends ViewPart implements
       }
    }
 
-   public Map2View() {
-   }
+   public Map2View() {}
 
    public void action_SyncWith_ChartSlider() {
 
@@ -1093,8 +1113,7 @@ public class Map2View extends ViewPart implements
          }
 
          @Override
-         public void partDeactivated(final IWorkbenchPartReference partRef) {
-         }
+         public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
          @Override
          public void partHidden(final IWorkbenchPartReference partRef) {
@@ -1104,8 +1123,7 @@ public class Map2View extends ViewPart implements
          }
 
          @Override
-         public void partInputChanged(final IWorkbenchPartReference partRef) {
-         }
+         public void partInputChanged(final IWorkbenchPartReference partRef) {}
 
          @Override
          public void partOpened(final IWorkbenchPartReference partRef) {
@@ -1393,35 +1411,35 @@ public class Map2View extends ViewPart implements
             TourbookPlugin.getImageDescriptor(IMAGE_GRAPH),
             TourbookPlugin.getImageDescriptor(IMAGE_GRAPH_DISABLED));
 
-      _actionTourColorAltitude = new ActionTourColor(
+      _actionTourColor_Altitude = new ActionTourColor(
             this,
             MapGraphId.Altitude,
             Messages.map_action_tour_color_altitude_tooltip,
             IMAGE_GRAPH_ALTITUDE,
             IMAGE_GRAPH_ALTITUDE_DISABLED);
 
-      _actionTourColorGradient = new ActionTourColor(
+      _actionTourColor_Gradient = new ActionTourColor(
             this,
             MapGraphId.Gradient,
             Messages.map_action_tour_color_gradient_tooltip,
             IMAGE_GRAPH_GRADIENT,
             IMAGE_GRAPH_GRADIENT_DISABLED);
 
-      _actionTourColorPulse = new ActionTourColor(
+      _actionTourColor_Pulse = new ActionTourColor(
             this,
             MapGraphId.Pulse,
             Messages.map_action_tour_color_pulse_tooltip,
             IMAGE_GRAPH_PULSE,
             IMAGE_GRAPH_PULSE_DISABLED);
 
-      _actionTourColorSpeed = new ActionTourColor(
+      _actionTourColor_Speed = new ActionTourColor(
             this,
             MapGraphId.Speed,
             Messages.map_action_tour_color_speed_tooltip,
             IMAGE_GRAPH_SPEED,
             IMAGE_GRAPH_SPEED_DISABLED);
 
-      _actionTourColorPace = new ActionTourColor(
+      _actionTourColor_Pace = new ActionTourColor(
             this,
             MapGraphId.Pace,
             Messages.map_action_tour_color_pase_tooltip,
@@ -1435,19 +1453,19 @@ public class Map2View extends ViewPart implements
             IMAGE_GRAPH_RUN_DYN_STEP_LENGTH,
             IMAGE_GRAPH_RUN_DYN_STEP_LENGTH_DISABLED);
 
-      _actionTourColorHrZone = new ActionTourColor(
+      _actionTourColor_HrZone = new ActionTourColor(
             this,
             MapGraphId.HrZone,
             Messages.Tour_Action_ShowHrZones_Tooltip,
             Messages.Image__PulseZones,
             Messages.Image__PulseZones_Disabled);
 
-      _allTourColorActions.put(MapGraphId.Altitude, _actionTourColorAltitude);
-      _allTourColorActions.put(MapGraphId.Gradient, _actionTourColorGradient);
-      _allTourColorActions.put(MapGraphId.Pulse, _actionTourColorPulse);
-      _allTourColorActions.put(MapGraphId.Speed, _actionTourColorSpeed);
-      _allTourColorActions.put(MapGraphId.Pace, _actionTourColorPace);
-      _allTourColorActions.put(MapGraphId.HrZone, _actionTourColorHrZone);
+      _allTourColorActions.put(MapGraphId.Altitude, _actionTourColor_Altitude);
+      _allTourColorActions.put(MapGraphId.Gradient, _actionTourColor_Gradient);
+      _allTourColorActions.put(MapGraphId.Pulse, _actionTourColor_Pulse);
+      _allTourColorActions.put(MapGraphId.Speed, _actionTourColor_Speed);
+      _allTourColorActions.put(MapGraphId.Pace, _actionTourColor_Pace);
+      _allTourColorActions.put(MapGraphId.HrZone, _actionTourColor_HrZone);
       _allTourColorActions.put(MapGraphId.RunDyn_StepLength, _actionTourColor_RunDyn_StepLength);
 
       _actionZoom_In = new ActionZoomIn(this);
@@ -1464,8 +1482,10 @@ public class Map2View extends ViewPart implements
 
       _actionEditMap2Preferences = new ActionOpenPrefDialog(Messages.Map_Action_Edit2DMapPreferences, PrefPageMap2Appearance.ID);
 
-      _actionMap2_Color = new ActionMap2Color();
       _actionCreateTourMarkerFromMap = new ActionCreateTourMarkerFromMap(this);
+      _actionMap2_Bookmarks = new ActionMapBookmarks(this._parent, this);
+      _actionMap2_Color = new ActionMap2Color();
+      _actionMap2_MapProvider = new ActionMap2_MapProvider();
       _actionMap2_Options = new ActionMap2_Options();
       _actionSearchTourByLocation = new ActionSearchTourByLocation();
       _actionSelectMapProvider = new ActionSelectMapProvider(this);
@@ -1491,7 +1511,6 @@ public class Map2View extends ViewPart implements
       _actionDimMap = new ActionDimMap(this);
       _actionManageProvider = new ActionManageMapProviders(this);
 
-      _actionMap2_Bookmarks = new ActionMapBookmarks(this._parent, this);
    }
 
    /**
@@ -1827,22 +1846,22 @@ public class Map2View extends ViewPart implements
 
       if (numberOfTours == 0) {
 
-         _actionTourColorAltitude.setEnabled(false);
-         _actionTourColorGradient.setEnabled(false);
-         _actionTourColorPulse.setEnabled(false);
-         _actionTourColorSpeed.setEnabled(false);
-         _actionTourColorPace.setEnabled(false);
-         _actionTourColorHrZone.setEnabled(false);
+         _actionTourColor_Altitude.setEnabled(false);
+         _actionTourColor_Gradient.setEnabled(false);
+         _actionTourColor_Pulse.setEnabled(false);
+         _actionTourColor_Speed.setEnabled(false);
+         _actionTourColor_Pace.setEnabled(false);
+         _actionTourColor_HrZone.setEnabled(false);
          _actionTourColor_RunDyn_StepLength.setEnabled(false);
 
       } else if (isForceTourColor) {
 
-         _actionTourColorAltitude.setEnabled(true);
-         _actionTourColorGradient.setEnabled(true);
-         _actionTourColorPulse.setEnabled(true);
-         _actionTourColorSpeed.setEnabled(true);
-         _actionTourColorPace.setEnabled(true);
-         _actionTourColorHrZone.setEnabled(true);
+         _actionTourColor_Altitude.setEnabled(true);
+         _actionTourColor_Gradient.setEnabled(true);
+         _actionTourColor_Pulse.setEnabled(true);
+         _actionTourColor_Speed.setEnabled(true);
+         _actionTourColor_Pace.setEnabled(true);
+         _actionTourColor_HrZone.setEnabled(true);
          _actionTourColor_RunDyn_StepLength.setEnabled(true);
 
       } else if (isOneTour) {
@@ -1851,22 +1870,22 @@ public class Map2View extends ViewPart implements
          final boolean isPulse = oneTourData.pulseSerie != null;
          final boolean canShowHrZones = oneTourData.getNumberOfHrZones() > 0 && isPulse;
 
-         _actionTourColorAltitude.setEnabled(true);
-         _actionTourColorGradient.setEnabled(oneTourData.getGradientSerie() != null);
-         _actionTourColorPulse.setEnabled(isPulse);
-         _actionTourColorSpeed.setEnabled(oneTourData.getSpeedSerie() != null);
-         _actionTourColorPace.setEnabled(oneTourData.getPaceSerie() != null);
-         _actionTourColorHrZone.setEnabled(canShowHrZones);
+         _actionTourColor_Altitude.setEnabled(true);
+         _actionTourColor_Gradient.setEnabled(oneTourData.getGradientSerie() != null);
+         _actionTourColor_Pulse.setEnabled(isPulse);
+         _actionTourColor_Speed.setEnabled(oneTourData.getSpeedSerie() != null);
+         _actionTourColor_Pace.setEnabled(oneTourData.getPaceSerie() != null);
+         _actionTourColor_HrZone.setEnabled(canShowHrZones);
          _actionTourColor_RunDyn_StepLength.setEnabled(oneTourData.runDyn_StepLength != null);
 
       } else {
 
-         _actionTourColorAltitude.setEnabled(false);
-         _actionTourColorGradient.setEnabled(false);
-         _actionTourColorPulse.setEnabled(false);
-         _actionTourColorSpeed.setEnabled(false);
-         _actionTourColorPace.setEnabled(false);
-         _actionTourColorHrZone.setEnabled(false);
+         _actionTourColor_Altitude.setEnabled(false);
+         _actionTourColor_Gradient.setEnabled(false);
+         _actionTourColor_Pulse.setEnabled(false);
+         _actionTourColor_Speed.setEnabled(false);
+         _actionTourColor_Pace.setEnabled(false);
+         _actionTourColor_HrZone.setEnabled(false);
          _actionTourColor_RunDyn_StepLength.setEnabled(false);
       }
    }
@@ -1911,8 +1930,9 @@ public class Map2View extends ViewPart implements
 
       tbm.add(new Separator());
 
-      tbm.add(_actionSelectMapProvider);
+      tbm.add(_actionMap2_MapProvider);
       tbm.add(_actionMap2_Options);
+      tbm.add(_actionSelectMapProvider);
 
       /*
        * fill view menu
@@ -3471,27 +3491,27 @@ public class Map2View extends ViewPart implements
 
          switch (colorId) {
          case Altitude:
-            _actionTourColorAltitude.setChecked(true);
+            _actionTourColor_Altitude.setChecked(true);
             break;
 
          case Gradient:
-            _actionTourColorGradient.setChecked(true);
+            _actionTourColor_Gradient.setChecked(true);
             break;
 
          case Pace:
-            _actionTourColorPace.setChecked(true);
+            _actionTourColor_Pace.setChecked(true);
             break;
 
          case Pulse:
-            _actionTourColorPulse.setChecked(true);
+            _actionTourColor_Pulse.setChecked(true);
             break;
 
          case Speed:
-            _actionTourColorSpeed.setChecked(true);
+            _actionTourColor_Speed.setChecked(true);
             break;
 
          case HrZone:
-            _actionTourColorHrZone.setChecked(true);
+            _actionTourColor_HrZone.setChecked(true);
             break;
 
          case RunDyn_StepLength:
@@ -3499,14 +3519,14 @@ public class Map2View extends ViewPart implements
             break;
 
          default:
-            _actionTourColorAltitude.setChecked(true);
+            _actionTourColor_Altitude.setChecked(true);
             break;
          }
 
          setTourPainterColorProvider(colorId);
 
       } catch (final NumberFormatException e) {
-         _actionTourColorAltitude.setChecked(true);
+         _actionTourColor_Altitude.setChecked(true);
       }
 
       // draw tour with default color
@@ -3700,19 +3720,19 @@ public class Map2View extends ViewPart implements
       // tour color
       MapGraphId colorId;
 
-      if (_actionTourColorGradient.isChecked()) {
+      if (_actionTourColor_Gradient.isChecked()) {
          colorId = MapGraphId.Gradient;
 
-      } else if (_actionTourColorPulse.isChecked()) {
+      } else if (_actionTourColor_Pulse.isChecked()) {
          colorId = MapGraphId.Pulse;
 
-      } else if (_actionTourColorSpeed.isChecked()) {
+      } else if (_actionTourColor_Speed.isChecked()) {
          colorId = MapGraphId.Speed;
 
-      } else if (_actionTourColorPace.isChecked()) {
+      } else if (_actionTourColor_Pace.isChecked()) {
          colorId = MapGraphId.Pace;
 
-      } else if (_actionTourColorHrZone.isChecked()) {
+      } else if (_actionTourColor_HrZone.isChecked()) {
          colorId = MapGraphId.HrZone;
 
       } else if (_actionTourColor_RunDyn_StepLength.isChecked()) {
