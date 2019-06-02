@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -73,7 +73,25 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
    public static final int  OFFLINE_INFO_NOT_READ = -1;
 
    // loading tiles pool
-   private static final int                                THREAD_POOL_SIZE             = 20;
+   /**
+    * OpenStreetMap do not allow bulk downloading and do not accept more than 2 concurrent download
+    * threads.
+    * <p>
+    * <code>
+    *
+    * https://operations.osmfoundation.org/policies/tiles/
+    *
+    * Technical Usage Requirements
+    *
+    * - Valid HTTP User-Agent identifying application. Faking another app’s User-Agent WILL get you blocked.
+    * - If known, a valid HTTP Referer.
+    * - DO NOT send no-cache headers. (“Cache-Control: no-cache”, “Pragma: no-cache” etc.)
+    * - Cache Tile downloads locally according to HTTP Expiry Header, alternatively a minimum of 7 days.
+    * - Maximum of 2 download threads. (Unmodified web browsers’ download thread limits are acceptable.)
+    *
+    * </code>
+    */
+   private static final int                                THREAD_POOL_SIZE             = 2;
    private static ExecutorService                          _executorService;
 
    private static final ReentrantLock                      EXECUTOR_LOCK                = new ReentrantLock();
@@ -230,7 +248,7 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
    private boolean _isProfileBrightnessForNextMp    = false;
    private int     _profileBrightnessValueForNextMp = 77;
 
-//	private MapViewPortData							_mapViewPort;
+//   private MapViewPortData                     _mapViewPort;
 
    /**
     */
@@ -289,34 +307,34 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
       return _canBeToggled;
    }
 
-//	/**
-//	 * Checks if a tile is displayed in the map viewport.
-//	 *
-//	 * @param tile
-//	 *            Tile which is checked
-//	 * @return Returns <code>true</code> when the tile is displayed in the current map viewport.
-//	 */
-//	public boolean checkViewPort(final Tile tile) {
+//   /**
+//    * Checks if a tile is displayed in the map viewport.
+//    *
+//    * @param tile
+//    *            Tile which is checked
+//    * @return Returns <code>true</code> when the tile is displayed in the current map viewport.
+//    */
+//   public boolean checkViewPort(final Tile tile) {
 //
-//		// check zoom level
-//		if (tile.getZoom() != _mapViewPort.mapZoomLevel) {
-//			return false;
-//		}
+//      // check zoom level
+//      if (tile.getZoom() != _mapViewPort.mapZoomLevel) {
+//         return false;
+//      }
 //
-//		// check position
-//		final int tileX = tile.getX();
-//		final int tileY = tile.getY();
+//      // check position
+//      final int tileX = tile.getX();
+//      final int tileY = tile.getY();
 //
-//		if (tileX >= _mapViewPort.tilePosMinX
-//				&& tileX <= _mapViewPort.tilePosMaxX
-//				&& tileY >= _mapViewPort.tilePosMinY
-//				&& tileY <= _mapViewPort.tilePosMaxY) {
+//      if (tileX >= _mapViewPort.tilePosMinX
+//            && tileX <= _mapViewPort.tilePosMaxX
+//            && tileY >= _mapViewPort.tilePosMinY
+//            && tileY <= _mapViewPort.tilePosMaxY) {
 //
-//			return true;
-//		}
+//         return true;
+//      }
 //
-//		return false;
-//	}
+//      return false;
+//   }
 
    @Override
    public Object clone() throws CloneNotSupportedException {
@@ -1053,11 +1071,11 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
       initializeMapWithZoomAndSize(_maxZoomLevel, _tileSize);
    }
 
-//	/**
-//	 * @param offlineImagePath
-//	 * @return Path where tile files will are cached relative to the offline image path
-//	 */
-//	public abstract IPath getTileOSPathFolder(final String offlineImagePath);
+//   /**
+//    * @param offlineImagePath
+//    * @return Path where tile files will are cached relative to the offline image path
+//    */
+//   public abstract IPath getTileOSPathFolder(final String offlineImagePath);
 
    boolean isProfileBrightnessForNextMp() {
       return _isProfileBrightnessForNextMp;
@@ -1306,7 +1324,7 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
        * factory info unique, otherwise factorId is null and all created custom tile factory infos
        * cannot be distinguished with the equals/hashcode methods
        */
-      //		super.setFactoryId(factoryId);
+      //      super.setFactoryId(factoryId);
    }
 
    public void setImageFormat(final String imageFormat) {
@@ -1333,9 +1351,9 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
       _lastUsedZoom = zoom;
    }
 
-//	public void setMapViewPort(final MapViewPortData mapViewPort) {
-//		_mapViewPort = mapViewPort;
-//	}
+//   public void setMapViewPort(final MapViewPortData mapViewPort) {
+//      _mapViewPort = mapViewPort;
+//   }
 
    public void setName(final String mapProviderName) {
       _mapProviderName = mapProviderName;
