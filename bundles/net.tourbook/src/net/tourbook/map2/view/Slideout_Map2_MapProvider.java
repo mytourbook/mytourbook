@@ -15,8 +15,18 @@
  *******************************************************************************/
 package net.tourbook.map2.view;
 
+import de.byteholder.geoclipse.map.Map;
+import de.byteholder.geoclipse.map.UI;
+import de.byteholder.geoclipse.mapprovider.MP;
+import de.byteholder.geoclipse.mapprovider.MPCustom;
+import de.byteholder.geoclipse.mapprovider.MPPlugin;
+import de.byteholder.geoclipse.mapprovider.MPProfile;
+import de.byteholder.geoclipse.mapprovider.MPWms;
+import de.byteholder.geoclipse.mapprovider.MapProviderManager;
 import de.byteholder.geoclipse.preferences.IMappingPreferences;
 import de.byteholder.geoclipse.preferences.PrefPage_Map2_Providers;
+
+import java.util.ArrayList;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -24,18 +34,40 @@ import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.color.IColorSelectorListener;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
+import net.tourbook.preferences.ITourbookPreferences;
 
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
+import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.PreferenceConverter;
+import org.eclipse.jface.viewers.CellLabelProvider;
+import org.eclipse.jface.viewers.ColumnPixelData;
+import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.TableLayout;
+import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TableViewerColumn;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.ToolBar;
 
 /**
@@ -43,22 +75,55 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public class Slideout_Map2_MapProvider extends ToolbarSlideout implements IColorSelectorListener {
 
-   private static final String   MAP_ACTION_MANAGE_MAP_PROVIDERS = net.tourbook.map2.Messages.Map_Action_ManageMapProviders;
+// SET_FORMATTING_OFF
 
-   final static IPreferenceStore _prefStore                      = TourbookPlugin.getPrefStore();
-   final private IDialogSettings _state;
+   private static final String PREF_MAP_VIEWER_COLUMN_LBL_MAP_PROVIDER                 = de.byteholder.geoclipse.preferences.Messages.Pref_Map_Viewer_Column_Lbl_MapProvider;
+   private static final String PREF_MAP_VIEWER_COLUMN_CONTENT_SERVER_TYPE_PLUGIN       = de.byteholder.geoclipse.preferences.Messages.Pref_Map_Viewer_Column_ContentServerTypePlugin;
+   private static final String PREF_MAP_VIEWER_COLUMN_CONTENT_SERVER_TYPE_MAP_PROFILE  = de.byteholder.geoclipse.preferences.Messages.Pref_Map_Viewer_Column_ContentServerTypeMapProfile;
+   private static final String PREF_MAP_VIEWER_COLUMN_CONTENT_SERVER_TYPE_CUSTOM       = de.byteholder.geoclipse.preferences.Messages.Pref_Map_Viewer_Column_ContentServerTypeCustom;
+   private static final String PREF_MAP_VIEWER_COLUMN_CONTENT_SERVER_TYPE_WMS          = de.byteholder.geoclipse.preferences.Messages.Pref_Map_Viewer_Column_ContentServerTypeWms;
+   private static final String PREF_MAP_VIEWER_COLUMN_LBL_SERVER_TYPE_TOOLTIP          = de.byteholder.geoclipse.preferences.Messages.Pref_Map_Viewer_Column_Lbl_ServerType_Tooltip;
 
-   private SelectionAdapter      _defaultState_SelectionListener;
+   private static final String MAP_ACTION_MANAGE_MAP_PROVIDERS                         = net.tourbook.map2.Messages.Map_Action_ManageMapProviders;
 
-   private ActionOpenPrefDialog  _actionManageMapProviders;
-//   private Action                _actionRestoreDefaults;
+// SET_FORMATTING_ON
 
-   private Map2View              _map2View;
+   final static IPreferenceStore    _prefStore = TourbookPlugin.getPrefStore();
+   final private IDialogSettings    _state;
+
+   private SelectionAdapter         _defaultState_SelectionListener;
+
+   private ActionOpenPrefDialog     _action_ManageMapProviders;
+   private Action                   _action_MapProvider_Next;
+   private Action                   _action_MapProvider_Previous;
+
+   private Map2View                 _map2View;
+   private TableViewer              _mpViewer;
+
+   private final MapProviderManager _mpMgr     = MapProviderManager.getInstance();
+   private MP                       _selectedMP;
+   private ArrayList<MP>            _visibleMp;
+
+   private PixelConverter           _pc;
 
    /*
     * UI controls
     */
    private Composite _parent;
+
+   private class MapContentProvider implements IStructuredContentProvider {
+
+      @Override
+      public void dispose() {}
+
+      @Override
+      public Object[] getElements(final Object inputElement) {
+         return _visibleMp.toArray();
+      }
+
+      @Override
+      public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
+   }
 
    /**
     * @param ownerControl
@@ -85,28 +150,50 @@ public class Slideout_Map2_MapProvider extends ToolbarSlideout implements IColor
    private void createActions() {
 
       {
-         _actionManageMapProviders = new ActionOpenPrefDialog(
+         /*
+          * Action: Manage map providers
+          */
+         _action_ManageMapProviders = new ActionOpenPrefDialog(
                MAP_ACTION_MANAGE_MAP_PROVIDERS,
                PrefPage_Map2_Providers.ID);
 
-         _actionManageMapProviders.closeThisTooltip(this);
-         _actionManageMapProviders.setShell(_map2View.getMap().getShell());
+         _action_ManageMapProviders.closeThisTooltip(this);
+         _action_ManageMapProviders.setShell(_map2View.getMap().getShell());
 
          // set the currently displayed map provider so that this mp will be selected in the pref page
          _prefStore.setValue(IMappingPreferences.MAP_FACTORY_LAST_SELECTED_MAP_PROVIDER, _map2View.getMap().getMapProvider().getId());
       }
 
-//      {
-//         _actionRestoreDefaults = new Action() {
-//            @Override
-//            public void run() {
-//               resetToDefaults();
-//            }
-//         };
-//
-//         _actionRestoreDefaults.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_RestoreDefault));
-//         _actionRestoreDefaults.setToolTipText(Messages.App_Action_RestoreDefault_Tooltip);
-//      }
+      {
+         /*
+          * Action: Next map provider
+          */
+         _action_MapProvider_Next = new Action() {
+            @Override
+            public void run() {
+               onSelect_MapProvider_Next();
+            }
+         };
+
+         _action_MapProvider_Next.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ArrowDown));
+         _action_MapProvider_Next.setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ArrowDown_Disabled));
+         _action_MapProvider_Next.setToolTipText(Messages.Slideout_Map2Provider_MapProvider_Next_Tooltip);
+      }
+      {
+         /*
+          * Action: Previous map provider
+          */
+         _action_MapProvider_Previous = new Action() {
+            @Override
+            public void run() {
+               onSelect_MapProvider_Previous();
+            }
+         };
+
+         _action_MapProvider_Previous.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ArrowUp));
+         _action_MapProvider_Previous.setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ArrowUp_Disabled));
+         _action_MapProvider_Previous.setToolTipText(Messages.Slideout_Map2Provider_MapProvider_Previous_Tooltip);
+      }
    }
 
    @Override
@@ -117,6 +204,10 @@ public class Slideout_Map2_MapProvider extends ToolbarSlideout implements IColor
       createActions();
 
       final Composite ui = createUI(parent);
+
+      // load viewer
+      _visibleMp = _mpMgr.getAllMapProviders(true);
+      _mpViewer.setInput(new Object());
 
       restoreState();
       enableControls();
@@ -130,7 +221,8 @@ public class Slideout_Map2_MapProvider extends ToolbarSlideout implements IColor
       GridLayoutFactory.swtDefaults().applyTo(shellContainer);
       {
          createUI_10_Header(shellContainer);
-         createUI_20_MapOptions(shellContainer);
+//         createUI_20_MapOptions(shellContainer);
+         createUI_20_MapViewer_Viewer(shellContainer);
       }
 
       return shellContainer;
@@ -160,22 +252,153 @@ public class Slideout_Map2_MapProvider extends ToolbarSlideout implements IColor
              * Actionbar
              */
             final ToolBar toolbar = new ToolBar(container, SWT.FLAT);
-            GridDataFactory.fillDefaults()//
+            GridDataFactory.fillDefaults()
                   .grab(true, false)
                   .align(SWT.END, SWT.BEGINNING)
                   .applyTo(toolbar);
 
             final ToolBarManager tbm = new ToolBarManager(toolbar);
 
-//            tbm.add(_actionRestoreDefaults);
-            tbm.add(_actionManageMapProviders);
+            tbm.add(_action_MapProvider_Next);
+            tbm.add(_action_MapProvider_Previous);
+            tbm.add(_action_ManageMapProviders);
 
             tbm.update(true);
          }
       }
    }
 
-   private void createUI_20_MapOptions(final Composite parent) {
+   private void createUI_20_MapViewer_Viewer(final Composite parent) {
+
+      final Composite layoutContainer = new Composite(parent, SWT.NONE);
+      GridDataFactory
+            .fillDefaults()
+            .hint(
+                  _pc.convertWidthInCharsToPixels(50),
+                  _pc.convertHeightInCharsToPixels((int) (20 * 1.4)))
+            .applyTo(layoutContainer);
+
+      final TableColumnLayout tableLayout = new TableColumnLayout();
+      layoutContainer.setLayout(tableLayout);
+
+      /*
+       * create table
+       */
+      final Table table = new Table(layoutContainer, SWT.FULL_SELECTION);
+
+      table.setLayout(new TableLayout());
+      table.setHeaderVisible(true);
+      table.setLinesVisible(false);
+
+      _mpViewer = new TableViewer(table);
+      _mpViewer.setUseHashlookup(true);
+
+      /*
+       * create columns
+       */
+      TableViewerColumn tvc;
+      TableColumn tc;
+
+      // column: server type
+      tvc = new TableViewerColumn(_mpViewer, SWT.LEAD);
+      tc = tvc.getColumn();
+      tc.setToolTipText(PREF_MAP_VIEWER_COLUMN_LBL_SERVER_TYPE_TOOLTIP);
+      tvc.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final MP mapProvider = (MP) cell.getElement();
+
+            if (mapProvider instanceof MPWms) {
+               cell.setText(PREF_MAP_VIEWER_COLUMN_CONTENT_SERVER_TYPE_WMS);
+            } else if (mapProvider instanceof MPCustom) {
+               cell.setText(PREF_MAP_VIEWER_COLUMN_CONTENT_SERVER_TYPE_CUSTOM);
+            } else if (mapProvider instanceof MPProfile) {
+               cell.setText(PREF_MAP_VIEWER_COLUMN_CONTENT_SERVER_TYPE_MAP_PROFILE);
+            } else if (mapProvider instanceof MPPlugin) {
+               cell.setText(PREF_MAP_VIEWER_COLUMN_CONTENT_SERVER_TYPE_PLUGIN);
+            } else {
+               cell.setText(UI.EMPTY_STRING);
+            }
+         }
+      });
+      tableLayout.setColumnData(tvc.getColumn(), new ColumnPixelData(_pc.convertWidthInCharsToPixels(4)));
+
+      // column: map provider
+      tvc = new TableViewerColumn(_mpViewer, SWT.LEAD);
+      tc = tvc.getColumn();
+      tc.setText(PREF_MAP_VIEWER_COLUMN_LBL_MAP_PROVIDER);
+      tvc.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final MP mapProvider = (MP) cell.getElement();
+
+            cell.setText(mapProvider.getName());
+         }
+      });
+      tableLayout.setColumnData(tvc.getColumn(), new ColumnWeightData(20));
+
+      /*
+       * create table viewer
+       */
+      _mpViewer.setContentProvider(new MapContentProvider());
+      _mpViewer.setComparator(new ViewerComparator() {
+         @Override
+         public int compare(final Viewer viewer, final Object e1, final Object e2) {
+
+            final MP mp1 = (MP) e1;
+            final MP mp2 = (MP) e2;
+
+            final boolean thisIsPlugin = e1 instanceof MPPlugin;
+            final boolean otherIsPlugin = e2 instanceof MPPlugin;
+
+            if (thisIsPlugin && otherIsPlugin) {
+               return mp1.getName().compareTo(mp2.getName());
+            } else if (thisIsPlugin) {
+               return 1;
+            } else if (otherIsPlugin) {
+               return -1;
+            } else {
+               return mp1.getName().compareTo(mp2.getName());
+            }
+         }
+      });
+
+      _mpViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+         @Override
+         public void selectionChanged(final SelectionChangedEvent event) {
+            onSelect_MapProvider(event);
+         }
+      });
+
+      _mpViewer.addDoubleClickListener(new IDoubleClickListener() {
+         @Override
+         public void doubleClick(final DoubleClickEvent event) {
+
+//            if (_selectedMapProvider instanceof MPWms) {
+//
+//               openConfigDialog_Wms();
+//
+//            } else if (_selectedMapProvider instanceof MPCustom) {
+//
+//               openConfigDialog_Custom();
+//
+//            } else if (_selectedMapProvider instanceof MPProfile) {
+//
+//               openConfigDialog_MapProfile();
+//
+//            } else {
+//
+//               // select name
+//               _txtMapProviderName.setFocus();
+//               _txtMapProviderName.selectAll();
+//            }
+         }
+      });
+   }
+
+   private void createUI_30_MapOptions(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -190,6 +413,8 @@ public class Slideout_Map2_MapProvider extends ToolbarSlideout implements IColor
    private void initUI(final Composite parent) {
 
       _parent = parent;
+
+      _pc = new PixelConverter(parent);
 
       _defaultState_SelectionListener = new SelectionAdapter() {
          @Override
@@ -206,6 +431,22 @@ public class Slideout_Map2_MapProvider extends ToolbarSlideout implements IColor
       enableControls();
 
 //      _map2View.restoreState_Map2_Options();
+   }
+
+   private void onSelect_MapProvider(final SelectionChangedEvent event) {
+      // TODO Auto-generated method stub
+
+      final MP selectedMapProvider = (MP) event.getStructuredSelection().getFirstElement();
+   }
+
+   private void onSelect_MapProvider_Next() {
+      // TODO Auto-generated method stub
+
+   }
+
+   private void onSelect_MapProvider_Previous() {
+      // TODO Auto-generated method stub
+
    }
 
    private void resetToDefaults() {
@@ -238,6 +479,28 @@ public class Slideout_Map2_MapProvider extends ToolbarSlideout implements IColor
 //      _state.put(Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION,   _chkIsZoomWithMousePosition.getSelection());
 
 // SET_FORMATTING_ON
+   }
+
+   private void selectMapProviderInTheMap(final MP mp) {
+
+      // check if a new map provider is selected
+      if (_selectedMP != null && _selectedMP == mp) {
+         return;
+      }
+
+      _selectedMP = mp;
+
+      final Map map = _map2View.getMap();
+
+      map.setMapProvider(mp);
+
+      // reset overlays must be done after the new map provider is set
+//    map.resetOverlays();
+
+      // set map dim level
+      final IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
+      final RGB dimColor = PreferenceConverter.getColor(store, ITourbookPreferences.MAP_LAYOUT_MAP_DIMM_COLOR);
+      map.setDimLevel(_map2View.getMapDimLevel(), dimColor);
    }
 
 }

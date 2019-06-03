@@ -1931,8 +1931,8 @@ public class Map2View extends ViewPart implements
       tbm.add(new Separator());
 
       tbm.add(_actionMap2_MapProvider);
-      tbm.add(_actionMap2_Options);
       tbm.add(_actionSelectMapProvider);
+      tbm.add(_actionMap2_Options);
 
       /*
        * fill view menu

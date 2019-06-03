@@ -842,8 +842,10 @@ public class Messages extends NLS {
    public static String        Image__App_Turn_Off;
    public static String        Image__App_Turn_On;
    public static String        Image__ArrowDown;
+   public static String        Image__ArrowDown_Disabled;
    public static String        Image__ArrowDown_Themed;
    public static String        Image__ArrowUp;
+   public static String        Image__ArrowUp_Disabled;
    public static String        Image__ArrowUp_Themed;
    public static String        Image__assignMergedTour;
    public static String        Image__assignMergedTour_disabled;
@@ -1954,6 +1956,9 @@ public class Messages extends NLS {
    public static String Slideout_Map2MapOptions_Action_SetTourPaintingModeBasic;
    public static String Slideout_Map2MapOptions_Dialog_EnhancePaintingWarning_Message;
    public static String Slideout_Map2MapOptions_Dialog_EnhancePaintingWarning_Title;
+
+   public static String Slideout_Map2Provider_MapProvider_Next_Tooltip;
+   public static String Slideout_Map2Provider_MapProvider_Previous_Tooltip;
 
    public static String Slideout_Map_Bookmark_Label_NumBookmarkListItems;
    public static String Slideout_Map_Bookmark_Label_NumBookmarkListItems_Tooltip;
