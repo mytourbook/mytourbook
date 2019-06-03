@@ -1,51 +1,52 @@
-Version 19.6.0                                            ?. June 2019
+19.6.0                                                      2. June 2019
+ 
 
-Update Docu - START
+2D Map
+======
+There are currently issues with the default map from OpenStreetMap and 
+some drag & drop map providers, this will be fixed in the next version.
 
-* Drag&Drop 2D map provider do NOT work when app is running as administrator !!!
-* Invalid 2D map provider files
-
-Update Docu - END
 
 
 New   
 ===
 
-* Tour Tag + Category
+* Tour Tag + Tag Category
 
-  - New text field for tour tag/category which can contain text notes
-   
+  - New text field for tour tag/category which can contain text notes 
+    (up to 32k)
   - Tagged Tours view
-    - Show tag/category notes in the new tooltip for tags/categories 
+    - Show tag/category notes in a new tooltip when tags/categories are 
+      hovered
     - New column to show tag/category notes
-  
   - Tagging preferences
     - New column to show tag/category notes
 
 
-* Tour Book 
+* Tour Book
 
   - Training Effects + Training Performance columns
-  - Reimport training values
-    - Currently used for Suunto 3 files
+  - Reimport training values (from .fit + .sml files)
 
-  
+ 
 * Statistics
 
-  - Training effects + training performance graphs in training statistics
+  - Training Effects + Training Performance graphs in the new training 
+    statistics
+
 
 * 2D Map (Frederic)
 
-  - Added the ability to create a marker from a location by right clicking on
-    a tour's position on the map
+  - Create a tour marker from a location by right clicking on a tour's 
+    position on the map
+ 
 
 * Easy Import (Frederic)
 
-  - When encountering invalid device files, those files are marked to be ignored (in the file invalidfiles_to_ignore.txt) so
-    that they are not considered as files to be imported in the future. An
-    option was added for the user to enable/disable this feature in the
-    preferences menu.
-
+  - When encountering invalid device files, those files are marked to be
+    ignored (in the file invalidfiles_to_ignore.txt) so that they are 
+    not considered as files to be imported in the future. 
+    This feature can be enable/disable in the preferences.
 
  
 Improvements   
@@ -53,67 +54,80 @@ Improvements
 
 * Adjust Altitude
 
-  - Whole tour is selected for SRTM adjustments when dialog is opened (previously only half of the tour was selected)
-  
-  
+  - Whole tour is selected for SRTM adjustments when dialog is opened 
+    (previously only half of the tour was selected)
+
+
 * Import
 
-  - .fit File
-  
-    import .fit developer fields
-   
-      Supported fields:
-      
-      - Cadence
-      - Ground Time (Stance time)
-      - Power
-      - Elevation
-      - Vertical Oscillation
-      
-      
-      Not yet supported fields:
-      
-      - Leg Spring Stiffness
-      - Form Power
-
-   - Suunto 9 Import Improvements (Frederic)
-
-      - We set the device name as "Suunto Spartan/9"
-      - Improvement for cases where a Suunto 9 file is invalid and we don't want it to be read as a fit file
-      - We save the tour import file path and file name for each imported Suunto 9 files
-      - We detect and save if a heart rate sensor or a power sensor are present
-     
-     
-* Statistics
-
-  - Show recording/moving/break time separately in the day/week/month/year/training statistics
-  
+  - .fit file
+    Supported developer fields:
+    - Cadence
+    - Ground Time (Stance time)
+    - Power
+    - Elevation
+    - Vertical Oscillation
+    
+  - Suunto 9 (Frederic)
+    - Device name is set as Suunto Spartan/9
+    - Improvement for cases where a Suunto 9 file is invalid and it 
+      should not be read as a fit file
+    - Save the tour import file path and file name for each imported 
+      Suunto 9 files
+    - Detect and save if a heart rate sensor or a power sensor are 
+      present
 
  
+* Statistics
+
+  - Show recording/moving/break time separately in the 
+    day/week/month/year/training statistics
+
+
+
 Bugfix   
 ======
 
-* .fitlog File 
+* .fitlog File
 
-  - Fixed avg power issue when value was a floating point
-  - Other values will now also be parsed as floating point when integer parsing fails
+  - Fixed average power issue when value was a floating point
+  - Other values will now also be parsed as floating point when integer 
+    parsing fails
 
+ 
+* IllegalArgumentException: Widget has the wrong parent
 
-* Fixed IllegalArgumentException: Widget has the wrong parent
-  This occured when app is started and a view is minimized, then the context menu is already created but has the wrong parent when the view is displayed later on.
-  It needed a while until the cause of this issue was discovered. This has propably occured after switching to Eclipse 4.
-  Nobody complained until now, maybe this feature was not used to minimize a view.
+  - This occured when the app is started and a view was minimized, then 
+    the context menu is early created and it has the wrong parent when 
+    the view is displayed later on.
+    It needed a while until the cause of this issue was discovered, it 
+    propably occured after switching to Eclipse 4.
+    Nobody complained until now, maybe this feature was not used to 
+    minimize a view (this is an Eclipse built-in feature).
 
+ 
 * File Re-Import (Frederic)
-  - Fixed a bug (when using Linux) where the reimport filedialog doesn't show
-  
 
-System
+  - Fixed a bug (when using Linux) where the reimport filedialog doesn't
+    show
+
+ 
+* Tour Info Tooltip
+
+  - Fixed max speed for imperial measurement
+
+ 
+ 
+Translation    
+===========
+
+ - French: completed, improved and fixed translation (Frederic)
+ - German
+ - Italian (Doriano)
+
+ 
+ 
+System   
 ======
+  - FITSDK 20.90
 
-* FITSDK 20.90
-
-
-Languages (Frederic)
-========
-* Completed, improved and fixed french translation
