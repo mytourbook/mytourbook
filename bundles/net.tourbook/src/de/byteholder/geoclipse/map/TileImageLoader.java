@@ -41,7 +41,9 @@ import org.eclipse.swt.graphics.PaletteData;
  */
 public class TileImageLoader implements Runnable {
 
-   private static int _stackTraceCounter;
+   private static final String HTTP_HEADER_USER_AGENT = "User-Agent"; //$NON-NLS-1$
+
+   private static int          _stackTraceCounter;
 
    /**
     * Loads a tile image from a map provider which is contained in the tile. Tiles are retrieved
@@ -159,7 +161,11 @@ public class TileImageLoader implements Runnable {
 
                         final URLConnection connection = url.openConnection();
 
-                        connection.setRequestProperty("User-Agent", "mtb");
+                        final String userAgent = mp.getUserAgent();
+
+                        if (userAgent != null) {
+                           connection.setRequestProperty(HTTP_HEADER_USER_AGENT, userAgent);
+                        }
 
                         inputStream = connection.getInputStream();
 
