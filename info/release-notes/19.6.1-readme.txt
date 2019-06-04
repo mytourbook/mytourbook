@@ -1,0 +1,8 @@
+19.6.1                                                      ?. June 2019
+ 
+
+2D Map
+======
+Fixed issue that OpenStreetMap tiles are loaded again by conforming to their tile usage policy.
+
+
