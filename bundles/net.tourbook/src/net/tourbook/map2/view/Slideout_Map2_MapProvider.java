@@ -34,6 +34,7 @@ import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.color.IColorSelectorListener;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
+import net.tourbook.common.util.StringToArrayConverter;
 import net.tourbook.preferences.ITourbookPreferences;
 
 import org.eclipse.jface.action.Action;
@@ -48,17 +49,15 @@ import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnWeightData;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
-import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -88,23 +87,23 @@ public class Slideout_Map2_MapProvider extends ToolbarSlideout implements IColor
 
 // SET_FORMATTING_ON
 
-   final static IPreferenceStore    _prefStore = TourbookPlugin.getPrefStore();
-   final private IDialogSettings    _state;
+   final static IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
+   final private IDialogSettings _state;
 
-   private SelectionAdapter         _defaultState_SelectionListener;
+   private SelectionAdapter      _defaultState_SelectionListener;
 
-   private ActionOpenPrefDialog     _action_ManageMapProviders;
-   private Action                   _action_MapProvider_Next;
-   private Action                   _action_MapProvider_Previous;
+   private ActionOpenPrefDialog  _action_ManageMapProviders;
+   private Action                _action_MapProvider_Next;
+   private Action                _action_MapProvider_Previous;
 
-   private Map2View                 _map2View;
-   private TableViewer              _mpViewer;
+   private Map2View              _map2View;
+   private TableViewer           _mpViewer;
 
-   private final MapProviderManager _mpMgr     = MapProviderManager.getInstance();
-   private MP                       _selectedMP;
-   private ArrayList<MP>            _visibleMp;
+//   private final MapProviderManager _mpMgr     = MapProviderManager.getInstance();
+   private MP             _selectedMP;
+   private ArrayList<MP>  _allSortedMP;
 
-   private PixelConverter           _pc;
+   private PixelConverter _pc;
 
    /*
     * UI controls
@@ -118,7 +117,7 @@ public class Slideout_Map2_MapProvider extends ToolbarSlideout implements IColor
 
       @Override
       public Object[] getElements(final Object inputElement) {
-         return _visibleMp.toArray();
+         return _allSortedMP.toArray();
       }
 
       @Override
@@ -196,6 +195,37 @@ public class Slideout_Map2_MapProvider extends ToolbarSlideout implements IColor
       }
    }
 
+   /**
+    * Create a list with all available map providers, sorted by preference settings
+    */
+   private void createSortedMapProviders() {
+
+      final ArrayList<MP> allMapProvider = MapProviderManager.getInstance().getAllMapProviders(true);
+
+      final String[] storedMpIds = StringToArrayConverter.convertStringToArray(_prefStore.getString(IMappingPreferences.MAP_PROVIDER_SORT_ORDER));
+
+      _allSortedMP = new ArrayList<>();
+
+      // put all map providers into the viewer which are defined in the pref store
+      for (final String storeMpId : storedMpIds) {
+
+         // find the stored map provider in the available map providers
+         for (final MP mp : allMapProvider) {
+            if (mp.getId().equals(storeMpId)) {
+               _allSortedMP.add(mp);
+               break;
+            }
+         }
+      }
+
+      // make sure that all available map providers are in the viewer
+      for (final MP mp : allMapProvider) {
+         if (!_allSortedMP.contains(mp)) {
+            _allSortedMP.add(mp);
+         }
+      }
+   }
+
    @Override
    protected Composite createToolTipContentArea(final Composite parent) {
 
@@ -206,11 +236,14 @@ public class Slideout_Map2_MapProvider extends ToolbarSlideout implements IColor
       final Composite ui = createUI(parent);
 
       // load viewer
-      _visibleMp = _mpMgr.getAllMapProviders(true);
+      createSortedMapProviders();
       _mpViewer.setInput(new Object());
 
       restoreState();
       enableControls();
+
+      // set focus to map viewer
+      _mpViewer.getTable().setFocus();
 
       return ui;
    }
@@ -222,7 +255,7 @@ public class Slideout_Map2_MapProvider extends ToolbarSlideout implements IColor
       {
          createUI_10_Header(shellContainer);
 //         createUI_20_MapOptions(shellContainer);
-         createUI_20_MapViewer_Viewer(shellContainer);
+         createUI_20_MapViewer(shellContainer);
       }
 
       return shellContainer;
@@ -268,7 +301,7 @@ public class Slideout_Map2_MapProvider extends ToolbarSlideout implements IColor
       }
    }
 
-   private void createUI_20_MapViewer_Viewer(final Composite parent) {
+   private void createUI_20_MapViewer(final Composite parent) {
 
       final Composite layoutContainer = new Composite(parent, SWT.NONE);
       GridDataFactory
@@ -299,7 +332,9 @@ public class Slideout_Map2_MapProvider extends ToolbarSlideout implements IColor
       TableViewerColumn tvc;
       TableColumn tc;
 
-      // column: server type
+      /*
+       * Column: Server type
+       */
       tvc = new TableViewerColumn(_mpViewer, SWT.LEAD);
       tc = tvc.getColumn();
       tc.setToolTipText(PREF_MAP_VIEWER_COLUMN_LBL_SERVER_TYPE_TOOLTIP);
@@ -324,7 +359,9 @@ public class Slideout_Map2_MapProvider extends ToolbarSlideout implements IColor
       });
       tableLayout.setColumnData(tvc.getColumn(), new ColumnPixelData(_pc.convertWidthInCharsToPixels(4)));
 
-      // column: map provider
+      /*
+       * Column: Map provider
+       */
       tvc = new TableViewerColumn(_mpViewer, SWT.LEAD);
       tc = tvc.getColumn();
       tc.setText(PREF_MAP_VIEWER_COLUMN_LBL_MAP_PROVIDER);
@@ -342,26 +379,11 @@ public class Slideout_Map2_MapProvider extends ToolbarSlideout implements IColor
       /*
        * create table viewer
        */
-      _mpViewer.setContentProvider(new MapContentProvider());
-      _mpViewer.setComparator(new ViewerComparator() {
+      _mpViewer.setContentProvider(new IStructuredContentProvider() {
+
          @Override
-         public int compare(final Viewer viewer, final Object e1, final Object e2) {
-
-            final MP mp1 = (MP) e1;
-            final MP mp2 = (MP) e2;
-
-            final boolean thisIsPlugin = e1 instanceof MPPlugin;
-            final boolean otherIsPlugin = e2 instanceof MPPlugin;
-
-            if (thisIsPlugin && otherIsPlugin) {
-               return mp1.getName().compareTo(mp2.getName());
-            } else if (thisIsPlugin) {
-               return 1;
-            } else if (otherIsPlugin) {
-               return -1;
-            } else {
-               return mp1.getName().compareTo(mp2.getName());
-            }
+         public Object[] getElements(final Object inputElement) {
+            return _allSortedMP.toArray();
          }
       });
 
@@ -372,30 +394,6 @@ public class Slideout_Map2_MapProvider extends ToolbarSlideout implements IColor
          }
       });
 
-      _mpViewer.addDoubleClickListener(new IDoubleClickListener() {
-         @Override
-         public void doubleClick(final DoubleClickEvent event) {
-
-//            if (_selectedMapProvider instanceof MPWms) {
-//
-//               openConfigDialog_Wms();
-//
-//            } else if (_selectedMapProvider instanceof MPCustom) {
-//
-//               openConfigDialog_Custom();
-//
-//            } else if (_selectedMapProvider instanceof MPProfile) {
-//
-//               openConfigDialog_MapProfile();
-//
-//            } else {
-//
-//               // select name
-//               _txtMapProviderName.setFocus();
-//               _txtMapProviderName.selectAll();
-//            }
-         }
-      });
    }
 
    private void createUI_30_MapOptions(final Composite parent) {
@@ -434,18 +432,17 @@ public class Slideout_Map2_MapProvider extends ToolbarSlideout implements IColor
    }
 
    private void onSelect_MapProvider(final SelectionChangedEvent event) {
-      // TODO Auto-generated method stub
 
       final MP selectedMapProvider = (MP) event.getStructuredSelection().getFirstElement();
+
+      selectMapProviderInTheMap(selectedMapProvider);
    }
 
    private void onSelect_MapProvider_Next() {
-      // TODO Auto-generated method stub
 
    }
 
    private void onSelect_MapProvider_Previous() {
-      // TODO Auto-generated method stub
 
    }
 
@@ -469,6 +466,11 @@ public class Slideout_Map2_MapProvider extends ToolbarSlideout implements IColor
 //      _chkIsZoomWithMousePosition.setSelection( Util.getStateBoolean(_state,    Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION,   Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION_DEFAULT));
 
 // SET_FORMATTING_ON
+
+      // select map provider
+      final MP currentMP = _map2View.getMap().getMapProvider();
+
+      _mpViewer.setSelection(new StructuredSelection(currentMP), true);
    }
 
    private void saveState() {
@@ -493,9 +495,6 @@ public class Slideout_Map2_MapProvider extends ToolbarSlideout implements IColor
       final Map map = _map2View.getMap();
 
       map.setMapProvider(mp);
-
-      // reset overlays must be done after the new map provider is set
-//    map.resetOverlays();
 
       // set map dim level
       final IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
