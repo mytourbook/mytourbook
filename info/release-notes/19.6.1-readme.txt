@@ -1,0 +1,14 @@
+19.6.1                                                      4. June 2019
+ 
+
+2D Map
+======
+
+Since a few days, OpenStreetMap do not allow any more the download of 
+map tile images as it was done in the last 11 years.
+
+All older version of MyTourbook can not display map tile images from 
+OpenStreetMap.
+
+This fix do apply the tile image policy of OpenStreetMap which 
+allows again to download map tile images.

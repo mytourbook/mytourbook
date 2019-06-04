@@ -1018,6 +1018,16 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
       return url;
    }
 
+   /**
+    * @return Returns the map provider user agent or <code>null</code> when not available. This user
+    *         agent is set in the http header when a tile image is downloaded.
+    *         <p>
+    *         This was nessesary to conform to OpenStreetMap policy.
+    */
+   public String getUserAgent() {
+      return null;
+   }
+
    @Override
    public int hashCode() {
       final int prime = 31;
@@ -1070,12 +1080,6 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
 
       initializeMapWithZoomAndSize(_maxZoomLevel, _tileSize);
    }
-
-//   /**
-//    * @param offlineImagePath
-//    * @return Path where tile files will are cached relative to the offline image path
-//    */
-//   public abstract IPath getTileOSPathFolder(final String offlineImagePath);
 
    boolean isProfileBrightnessForNextMp() {
       return _isProfileBrightnessForNextMp;
@@ -1350,10 +1354,6 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
    public void setLastUsedZoom(final int zoom) {
       _lastUsedZoom = zoom;
    }
-
-//   public void setMapViewPort(final MapViewPortData mapViewPort) {
-//      _mapViewPort = mapViewPort;
-//   }
 
    public void setName(final String mapProviderName) {
       _mapProviderName = mapProviderName;
