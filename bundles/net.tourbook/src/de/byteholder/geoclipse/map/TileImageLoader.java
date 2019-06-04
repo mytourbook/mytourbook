@@ -1,24 +1,29 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package de.byteholder.geoclipse.map;
 
+import de.byteholder.geoclipse.Messages;
+import de.byteholder.geoclipse.map.event.TileEventId;
+import de.byteholder.geoclipse.mapprovider.MP;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.net.URLConnection;
 import java.net.UnknownHostException;
 import java.util.concurrent.LinkedBlockingDeque;
 
@@ -31,463 +36,469 @@ import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.ImageLoader;
 import org.eclipse.swt.graphics.PaletteData;
 
-import de.byteholder.geoclipse.Messages;
-import de.byteholder.geoclipse.map.event.TileEventId;
-import de.byteholder.geoclipse.mapprovider.MP;
-
 /**
  * This class loads the tile images. The run method is called from the executer in the thread queue.
  */
 public class TileImageLoader implements Runnable {
 
-	private static int	_stackTraceCounter;
+   private static final String HTTP_HEADER_USER_AGENT = "User-Agent"; //$NON-NLS-1$
 
-	/**
-	 * Loads a tile image from a map provider which is contained in the tile. Tiles are retrieved
-	 * from the tile waiting queue {@link MP#getTileWaitingQueue()}
-	 */
-	public TileImageLoader() {}
+   private static int          _stackTraceCounter;
 
-	private void finalizeTile(final Tile tile, final boolean isNotifyObserver) {
+   /**
+    * Loads a tile image from a map provider which is contained in the tile. Tiles are retrieved
+    * from the tile waiting queue {@link MP#getTileWaitingQueue()}
+    */
+   public TileImageLoader() {}
 
-		final String tileKey = tile.getTileKey();
+   private void finalizeTile(final Tile tile, final boolean isNotifyObserver) {
 
-		if (tile.isLoadingError()) {
+      final String tileKey = tile.getTileKey();
 
-			// move tile from tile cache into the cache which contails tiles with errors
+      if (tile.isLoadingError()) {
 
-			MP.getErrorTiles().add(tileKey, tile);
+         // move tile from tile cache into the cache which contails tiles with errors
 
-			MP.getTileCache().remove(tileKey);
-		}
+         MP.getErrorTiles().add(tileKey, tile);
 
-		// set tile state, notify observer (Map is an observer)
-		tile.setLoading(false);
+         MP.getTileCache().remove(tileKey);
+      }
 
-		if (isNotifyObserver) {
-			tile.notifyImageObservers();
-		}
+      // set tile state, notify observer (Map is an observer)
+      tile.setLoading(false);
 
-		MP.fireTileEvent(TileEventId.TILE_END_LOADING, tile);
-	}
+      if (isNotifyObserver) {
+         tile.notifyImageObservers();
+      }
 
-	/**
-	 * Get tile tile image from offline file, url or tile painter
-	 */
-	private void getTileImage(final Tile tile) {
+      MP.fireTileEvent(TileEventId.TILE_END_LOADING, tile);
+   }
 
-		String loadingError = null;
-		boolean isNotifyObserver = true;
-		boolean isParentFinal = false;
+   /**
+    * Get tile tile image from offline file, url or tile painter
+    */
+   private void getTileImage(final Tile tile) {
 
-		Tile parentTile = null;
+      String loadingError = null;
+      boolean isNotifyObserver = true;
+      boolean isParentFinal = false;
 
-		try {
+      Tile parentTile = null;
 
-			boolean isSaveImage = false;
+      try {
 
-			final MP mp = tile.getMP();
-			final TileImageCache tileImageCache = mp.getTileImageCache();
+         boolean isSaveImage = false;
 
-			final boolean useOfflineImage = mp.isUseOfflineImage();
+         final MP mp = tile.getMP();
+         final TileImageCache tileImageCache = mp.getTileImageCache();
 
-			ImageData tileImageData = null;
-			Image tileOfflineImage = null;
+         final boolean useOfflineImage = mp.isUseOfflineImage();
 
-			// load image from offline cache
-			if (useOfflineImage) {
-				tileOfflineImage = tileImageCache.getOfflineImage(tile);
-			}
+         ImageData tileImageData = null;
+         Image tileOfflineImage = null;
 
-			if (tileOfflineImage == null) {
+         // load image from offline cache
+         if (useOfflineImage) {
+            tileOfflineImage = tileImageCache.getOfflineImage(tile);
+         }
 
-				// offline image is not available
+         if (tileOfflineImage == null) {
 
-				isSaveImage = true;
+            // offline image is not available
 
-				final ITilePainter tilePainter = mp.getTilePainter();
+            isSaveImage = true;
 
-				if (tilePainter instanceof ITilePainter) {
+            final ITilePainter tilePainter = mp.getTilePainter();
 
-					// paint tile image
+            if (tilePainter instanceof ITilePainter) {
 
-					tileImageData = paintTileImage(tile, tilePainter);
+               // paint tile image
 
-				} else {
+               tileImageData = paintTileImage(tile, tilePainter);
 
-					// load tile image from a url
+            } else {
 
-					InputStream inputStream = null;
+               // load tile image from a url
 
-					try {
+               InputStream inputStream = null;
 
-						if (mp instanceof ITileLoader) {
+               try {
 
-							/*
-							 * get image from a tile loader (this feature is used to load images
-							 * from a wms server)
-							 */
+                  if (mp instanceof ITileLoader) {
 
-							try {
-								inputStream = ((ITileLoader) mp).getTileImageStream(tile);
-							} catch (final Exception e) {
-								loadingError = e.getMessage();
-								StatusUtil.log(loadingError, e);
-								throw e;
-							}
+                     /*
+                      * get image from a tile loader (this feature is used to load images
+                      * from a wms server)
+                      */
 
-						} else {
+                     try {
+                        inputStream = ((ITileLoader) mp).getTileImageStream(tile);
+                     } catch (final Exception e) {
+                        loadingError = e.getMessage();
+                        StatusUtil.log(loadingError, e);
+                        throw e;
+                     }
 
-							/*
-							 * get image from a url (this was the behaviour before wms was
-							 * supported)
-							 */
+                  } else {
 
-							final URL url;
+                     /*
+                      * get image from a url (this was the behaviour before wms was
+                      * supported)
+                      */
 
-							try {
+                     final URL url;
 
-								url = mp.getTileURLEncoded(tile);
+                     try {
 
-							} catch (final Exception e) {
-								loadingError = e.getMessage();
-								throw e;
-							}
+                        url = mp.getTileURLEncoded(tile);
 
-							try {
+                     } catch (final Exception e) {
+                        loadingError = e.getMessage();
+                        throw e;
+                     }
 
-								inputStream = url.openStream();
+                     try {
 
-							} catch (final FileNotFoundException e) {
+                        final URLConnection connection = url.openConnection();
 
-								loadingError = NLS.bind(
-										Messages.DBG052_Loading_Error_FileNotFoundException,
-										tile.getUrl(),
-										e.getMessage());
+                        final String userAgent = mp.getUserAgent();
 
-								// this is hidden because it can happen very often
-								// StatusUtil.log(IMAGE_HAS_LOADING_ERROR, e);
-								throw e;
+                        if (userAgent != null) {
+                           connection.setRequestProperty(HTTP_HEADER_USER_AGENT, userAgent);
+                        }
 
-							} catch (final UnknownHostException e) {
+                        inputStream = connection.getInputStream();
 
-								loadingError = NLS.bind(
-										Messages.DBG053_Loading_Error_UnknownHostException,
-										tile.getUrl(),
-										e.getMessage());
+                     } catch (final FileNotFoundException e) {
 
-								// this is hidden because it can happen very often
-								// StatusUtil.log(IMAGE_HAS_LOADING_ERROR, e);
-								throw e;
+                        loadingError = NLS.bind(
+                              Messages.DBG052_Loading_Error_FileNotFoundException,
+                              tile.getUrl(),
+                              e.getMessage());
 
-							} catch (final Exception e) {
+                        // this is hidden because it can happen very often
+                        // StatusUtil.log(IMAGE_HAS_LOADING_ERROR, e);
+                        throw e;
 
-								loadingError = NLS.bind(//
-										Messages.DBG054_Loading_Error_FromUrl,
-										tile.getUrl(),
-										e.getMessage());
+                     } catch (final UnknownHostException e) {
 
-								// this is hidden because it can happen very often
-								// StatusUtil.log(IMAGE_HAS_LOADING_ERROR, e);
-								throw e;
-							}
-						}
+                        loadingError = NLS.bind(
+                              Messages.DBG053_Loading_Error_UnknownHostException,
+                              tile.getUrl(),
+                              e.getMessage());
 
-						final ImageData[] loadedImageData = new ImageLoader().load(inputStream);
+                        // this is hidden because it can happen very often
+                        // StatusUtil.log(IMAGE_HAS_LOADING_ERROR, e);
+                        throw e;
 
-						if (loadedImageData != null && loadedImageData.length > 0) {
-							tileImageData = loadedImageData[0];
-						}
+                     } catch (final Exception e) {
 
-					} catch (final Exception e) {
+                        loadingError = NLS.bind(//
+                              Messages.DBG054_Loading_Error_FromUrl,
+                              tile.getUrl(),
+                              e.getMessage());
 
-						/*
-						 * exception occures when loading the image, don't remove them from the
-						 * loading list, so that the tiles don't get reloaded
-						 */
+                        // this is hidden because it can happen very often
+                        // StatusUtil.log(IMAGE_HAS_LOADING_ERROR, e);
+                        throw e;
+                     }
+                  }
 
-						try {
-							if (inputStream != null) {
+                  final ImageData[] loadedImageData = new ImageLoader().load(inputStream);
 
-								/*
-								 * Print stack track otherwise many popups can occure
-								 */
+                  if (loadedImageData != null && loadedImageData.length > 0) {
+                     tileImageData = loadedImageData[0];
+                  }
 
-								if (_stackTraceCounter++ > 1) {
+               } catch (final Exception e) {
 
-									e.printStackTrace();
+                  /*
+                   * exception occures when loading the image, don't remove them from the
+                   * loading list, so that the tiles don't get reloaded
+                   */
 
-								} else {
+                  try {
+                     if (inputStream != null) {
 
-									// the stream can contain an error message from the wms server
-									StatusUtil.showStatus(Util.readContentFromStream(inputStream), e);
-								}
+                        /*
+                         * Print stack track otherwise many popups can occure
+                         */
 
-								inputStream.close();
+                        if (_stackTraceCounter++ > 1) {
 
-								isSaveImage = false;
-							}
-						} catch (final IOException e1) {
+                           e.printStackTrace();
 
-							if (_stackTraceCounter++ > 1) {
+                        } else {
 
-								e.printStackTrace();
+                           // the stream can contain an error message from the wms server
+                           StatusUtil.showStatus(Util.readContentFromStream(inputStream), e);
+                        }
 
-							} else {
+                        inputStream.close();
 
-								StatusUtil.log(e.getMessage(), e);
-							}
-						}
+                        isSaveImage = false;
+                     }
+                  } catch (final IOException e1) {
 
-						MP.fireTileEvent(TileEventId.TILE_ERROR_LOADING, tile);
-					}
-				}
-			}
+                     if (_stackTraceCounter++ > 1) {
 
-			/**
-			 * tile image is loaded from a url or from an offline file, is painted or is not
-			 * available
-			 */
+                        e.printStackTrace();
 
-			boolean isSetupImage = true;
-			boolean isChildError = false;
+                     } else {
 
-			// set tile where the tile image is stored
-			Tile imageTile = tile;
-			String imageTileKey = tile.getTileKey();
+                        StatusUtil.log(e.getMessage(), e);
+                     }
+                  }
 
-			if (tileOfflineImage == null && tileImageData == null) {
+                  MP.fireTileEvent(TileEventId.TILE_ERROR_LOADING, tile);
+               }
+            }
+         }
 
-				// image data is empty, set error
+         /**
+          * tile image is loaded from a url or from an offline file, is painted or is not
+          * available
+          */
 
-				tile
-						.setLoadingError(loadingError == null
-								? Messages.DBG051_Loading_Error_EmptyImageData
-								: loadingError);
+         boolean isSetupImage = true;
+         boolean isChildError = false;
 
-				isSetupImage = false;
-			}
+         // set tile where the tile image is stored
+         Tile imageTile = tile;
+         String imageTileKey = tile.getTileKey();
 
-			parentTile = tile.getParentTile();
-			if (parentTile != null) {
+         if (tileOfflineImage == null && tileImageData == null) {
 
-				/*
-				 * the current tile is a child of a parent tile, create the parent image with this
-				 * child image data
-				 */
+            // image data is empty, set error
 
-				isNotifyObserver = false;
+            tile
+                  .setLoadingError(loadingError == null
+                        ? Messages.DBG051_Loading_Error_EmptyImageData
+                        : loadingError);
 
-				if (tileOfflineImage != null) {
+            isSetupImage = false;
+         }
 
-					tileImageData = tileOfflineImage.getImageData();
+         parentTile = tile.getParentTile();
+         if (parentTile != null) {
 
-					// when image data is used, the image is not needed any more
-					tileOfflineImage.dispose();
-					tileOfflineImage = null;
-				}
+            /*
+             * the current tile is a child of a parent tile, create the parent image with this
+             * child image data
+             */
 
-				// save child image
-				if (tileImageData != null && isSaveImage) {
-					tileImageCache.saveOfflineImage(tile, tileImageData, false);
-				}
+            isNotifyObserver = false;
 
-				// set image into child
-				final ParentImageStatus parentImageStatus = tile.createParentImage(tileImageData);
+            if (tileOfflineImage != null) {
 
-				if (parentImageStatus == null) {
+               tileImageData = tileOfflineImage.getImageData();
 
-					// set error into parent tile
-					parentTile.setLoadingError(Messages.DBG050_Loading_Error_CannotCreateParent);
+               // when image data is used, the image is not needed any more
+               tileOfflineImage.dispose();
+               tileOfflineImage = null;
+            }
 
-				} else {
+            // save child image
+            if (tileImageData != null && isSaveImage) {
+               tileImageCache.saveOfflineImage(tile, tileImageData, false);
+            }
 
-					// check if the parent image is created
-					if (parentImageStatus.isImageFinal) {
+            // set image into child
+            final ParentImageStatus parentImageStatus = tile.createParentImage(tileImageData);
 
-						// create image only when the parent is final
+            if (parentImageStatus == null) {
 
-						// set image data from parent
-						tileImageData = parentImageStatus.tileImageData;
+               // set error into parent tile
+               parentTile.setLoadingError(Messages.DBG050_Loading_Error_CannotCreateParent);
 
-						// use parent tile to store the image
-						imageTile = parentTile;
-						imageTileKey = parentTile.getTileKey();
+            } else {
 
-						// parent is final
-						isParentFinal = true;
-						isSetupImage = true;
-						isSaveImage = parentImageStatus.isSaveImage;
-						isChildError = parentImageStatus.isChildError;
+               // check if the parent image is created
+               if (parentImageStatus.isImageFinal) {
 
-					} else {
+                  // create image only when the parent is final
 
-						/*
-						 * disable image creation, the image is created only when the parent is
-						 * final
-						 */
+                  // set image data from parent
+                  tileImageData = parentImageStatus.tileImageData;
 
-						isSetupImage = false;
-					}
-				}
-			}
+                  // use parent tile to store the image
+                  imageTile = parentTile;
+                  imageTileKey = parentTile.getTileKey();
 
-			/*
-			 * create tile image
-			 */
-			if (isSetupImage) {
+                  // parent is final
+                  isParentFinal = true;
+                  isSetupImage = true;
+                  isSaveImage = parentImageStatus.isSaveImage;
+                  isChildError = parentImageStatus.isChildError;
 
-				// create/save image
-				final Image tileImage = tileImageCache.setupImage(
-						tileImageData,
-						tileOfflineImage,
-						imageTile,
-						imageTileKey,
-						isSaveImage,
-						isChildError);
+               } else {
 
-				if (imageTile.setMapImage(tileImage) == false) {
+                  /*
+                   * disable image creation, the image is created only when the parent is
+                   * final
+                   */
 
-					// set an error to prevent it loading a second time
-					tile.setLoadingError(Messages.DBG049_Loading_Error_ImageIsInvalid);
-				}
-			}
+                  isSetupImage = false;
+               }
+            }
+         }
 
-		} catch (final Exception e) {
+         /*
+          * create tile image
+          */
+         if (isSetupImage) {
 
-			// this should not happen
-			StatusUtil.log(NLS.bind(Messages.DBG048_Loading_Error_DefaultException, tile.getTileKey()), e);
+            // create/save image
+            final Image tileImage = tileImageCache.setupImage(
+                  tileImageData,
+                  tileOfflineImage,
+                  imageTile,
+                  imageTileKey,
+                  isSaveImage,
+                  isChildError);
 
-		} finally {
+            if (imageTile.setMapImage(tileImage) == false) {
 
-			finalizeTile(tile, isNotifyObserver);
+               // set an error to prevent it loading a second time
+               tile.setLoadingError(Messages.DBG049_Loading_Error_ImageIsInvalid);
+            }
+         }
 
-			if (isParentFinal) {
-				finalizeTile(parentTile, true);
-			}
-		}
-	}
+      } catch (final Exception e) {
 
-	/**
-	 * paint tile based on SRTM data
-	 */
-	private ImageData paintTileImage(final Tile tile, final ITilePainter tilePainter) {
+         // this should not happen
+         StatusUtil.log(NLS.bind(Messages.DBG048_Loading_Error_DefaultException, tile.getTileKey()), e);
 
-		MP.fireTileEvent(TileEventId.SRTM_PAINTING_START, tile);
+      } finally {
 
-		ImageData tileImageData = null;
+         finalizeTile(tile, isNotifyObserver);
 
-		try {
+         if (isParentFinal) {
+            finalizeTile(parentTile, true);
+         }
+      }
+   }
 
-			/*
-			 * create tile image data from RGB data
-			 */
+   /**
+    * paint tile based on SRTM data
+    */
+   private ImageData paintTileImage(final Tile tile, final ITilePainter tilePainter) {
 
-			// create RGB data for the tile
-			final int[][] rgbData = tilePainter.drawTile(tile);
+      MP.fireTileEvent(TileEventId.SRTM_PAINTING_START, tile);
 
-			final int tileSize = rgbData[0].length;
+      ImageData tileImageData = null;
 
-			tileImageData = new ImageData(//
-					tileSize,
-					tileSize,
-					24,
-					new PaletteData(0xFF, 0xFF00, 0xFF0000));
+      try {
 
-			final byte[] pixelData = tileImageData.data;
-			final int bytesPerLine = tileImageData.bytesPerLine;
+         /*
+          * create tile image data from RGB data
+          */
 
-			for (int drawX = 0; drawX < rgbData.length; drawX++) {
+         // create RGB data for the tile
+         final int[][] rgbData = tilePainter.drawTile(tile);
 
-				final int xBytesPerLine = drawX * bytesPerLine;
-				final int[] rgbX = rgbData[drawX];
+         final int tileSize = rgbData[0].length;
 
-				for (int drawY = 0; drawY < rgbX.length; drawY++) {
+         tileImageData = new ImageData(//
+               tileSize,
+               tileSize,
+               24,
+               new PaletteData(0xFF, 0xFF00, 0xFF0000));
 
-					final int dataIndex = xBytesPerLine + (drawY * 3);
+         final byte[] pixelData = tileImageData.data;
+         final int bytesPerLine = tileImageData.bytesPerLine;
 
-					final int rgb = rgbX[drawY];
+         for (int drawX = 0; drawX < rgbData.length; drawX++) {
 
-					final int blue = (byte) ((rgb & 0xFF0000) >> 16);
-					final int green = (byte) ((rgb & 0xFF00) >> 8);
-					final int red = (byte) ((rgb & 0xFF) >> 0);
+            final int xBytesPerLine = drawX * bytesPerLine;
+            final int[] rgbX = rgbData[drawX];
 
-					pixelData[dataIndex] = (byte) (blue & 0xff);
-					pixelData[dataIndex + 1] = (byte) (green & 0xff);
-					pixelData[dataIndex + 2] = (byte) (red & 0xff);
-				}
-			}
+            for (int drawY = 0; drawY < rgbX.length; drawY++) {
 
-			MP.fireTileEvent(TileEventId.SRTM_PAINTING_END, tile);
+               final int dataIndex = xBytesPerLine + (drawY * 3);
 
-		} catch (final Exception e) {
+               final int rgb = rgbX[drawY];
 
-			tile.setLoadingError(Messages.DBG045_Loading_Error_PaintingError + e.getMessage());
+               final int blue = (byte) ((rgb & 0xFF0000) >> 16);
+               final int green = (byte) ((rgb & 0xFF00) >> 8);
+               final int red = (byte) ((rgb & 0xFF) >> 0);
 
-			MP.fireTileEvent(TileEventId.SRTM_PAINTING_ERROR, tile);
+               pixelData[dataIndex] = (byte) (blue & 0xff);
+               pixelData[dataIndex + 1] = (byte) (green & 0xff);
+               pixelData[dataIndex + 2] = (byte) (red & 0xff);
+            }
+         }
 
-			StatusUtil.log(e.getMessage(), e);
-		}
+         MP.fireTileEvent(TileEventId.SRTM_PAINTING_END, tile);
 
-		return tileImageData;
-	}
+      } catch (final Exception e) {
 
-	@Override
-	public void run() {
+         tile.setLoadingError(Messages.DBG045_Loading_Error_PaintingError + e.getMessage());
 
-		/*
-		 * load/create tile image
-		 */
-		// get tile from queue
-		final LinkedBlockingDeque<Tile> tileWaitingQueue = MP.getTileWaitingQueue();
+         MP.fireTileEvent(TileEventId.SRTM_PAINTING_ERROR, tile);
 
-		final Tile tile = tileWaitingQueue.pollFirst();
+         StatusUtil.log(e.getMessage(), e);
+      }
 
-		if (tile == null) {
-			// it's possible that the waiting queue was reset
-			return;
-		}
+      return tileImageData;
+   }
 
-		final MP mp = tile.getMP();
-		final boolean isParentTile = mp instanceof ITileChildrenCreator;
-		{
-			// current tile is in the viewport of the map
+   @Override
+   public void run() {
 
-			MP.fireTileEvent(TileEventId.TILE_START_LOADING, tile);
+      /*
+       * load/create tile image
+       */
+      // get tile from queue
+      final LinkedBlockingDeque<Tile> tileWaitingQueue = MP.getTileWaitingQueue();
 
-			if (isParentTile) {
+      final Tile tile = tileWaitingQueue.pollFirst();
 
-				// current tile is a parent tile
+      if (tile == null) {
+         // it's possible that the waiting queue was reset
+         return;
+      }
 
-				if (tile.isLoadingError()) {
+      final MP mp = tile.getMP();
+      final boolean isParentTile = mp instanceof ITileChildrenCreator;
+      {
+         // current tile is in the viewport of the map
 
-					/*
-					 * parent tile has a loading error, this can happen when it contains no child
-					 * because it does not support the zooming level
-					 */
+         MP.fireTileEvent(TileEventId.TILE_START_LOADING, tile);
 
-					finalizeTile(tile, true);
+         if (isParentTile) {
 
-				} else if (tile.isOfflimeImageAvailable()) {
+            // current tile is a parent tile
 
-					// parent tile has no chilren which needs to be loaded, behave as a normal tile
+            if (tile.isLoadingError()) {
 
-					getTileImage(tile);
+               /*
+                * parent tile has a loading error, this can happen when it contains no child
+                * because it does not support the zooming level
+                */
 
-				} else {
+               finalizeTile(tile, true);
 
-					// a parent gets finalized when the last child is loaded
-				}
+            } else if (tile.isOfflimeImageAvailable()) {
 
-			} else {
+               // parent tile has no chilren which needs to be loaded, behave as a normal tile
 
-				// tile is 'normal' or a children
+               getTileImage(tile);
 
-				getTileImage(tile);
-			}
-		}
+            } else {
 
-		// loading has finished
-		tile.setFuture(null);
-	}
+               // a parent gets finalized when the last child is loaded
+            }
+
+         } else {
+
+            // tile is 'normal' or a children
+
+            getTileImage(tile);
+         }
+      }
+
+      // loading has finished
+      tile.setFuture(null);
+   }
 }
