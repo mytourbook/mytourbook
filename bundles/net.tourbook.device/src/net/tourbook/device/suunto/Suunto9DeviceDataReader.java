@@ -148,16 +148,13 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
     */
    private String GetJsonContentFromGZipFile(final String gzipFilePath, final boolean isValidatingFile) {
       String jsonFileContent = null;
+      GZIPInputStream gzip = null;
+      BufferedReader br = null;
       try {
-         final GZIPInputStream gzip = new GZIPInputStream(new FileInputStream(gzipFilePath));
-         final BufferedReader br = new BufferedReader(new InputStreamReader(gzip));
+         gzip = new GZIPInputStream(new FileInputStream(gzipFilePath));
+         br = new BufferedReader(new InputStreamReader(gzip));
 
          jsonFileContent = br.readLine();
-
-         // close resources
-         br.close();
-         gzip.close();
-
       } catch (final IOException e) {
 
          /*
@@ -169,6 +166,20 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
          }
 
          return ""; //$NON-NLS-1$
+      } finally {
+         try {
+            // close resources
+            if (br != null) {
+               br.close();
+               gzip.close();
+            }
+            if (gzip != null) {
+               gzip.close();
+            }
+         } catch (final IOException e) {
+            e.printStackTrace();
+         }
+
       }
 
       return jsonFileContent;
