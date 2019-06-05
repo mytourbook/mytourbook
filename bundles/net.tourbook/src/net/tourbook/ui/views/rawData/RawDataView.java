@@ -297,11 +297,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    }
 
    //
-   private final IPreferenceStore         _prefStore                 = TourbookPlugin.getPrefStore();
-   private final IPreferenceStore         _prefStoreCommon           = CommonActivator.getPrefStore();
-   private final IDialogSettings          _state                     = TourbookPlugin.getState(ID);
+   private final IPreferenceStore         _prefStore                      = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore         _prefStoreCommon                = CommonActivator.getPrefStore();
+   private final IDialogSettings          _state                          = TourbookPlugin.getState(ID);
    //
-   private RawDataManager                 _rawDataMgr                = RawDataManager.getInstance();
+   private RawDataManager                 _rawDataMgr                     = RawDataManager.getInstance();
    private TableViewer                    _tourViewer;
    private TableViewerTourInfoToolTip     _tourInfoToolTip;
    private ColumnManager                  _columnManager;
@@ -351,8 +351,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    protected TourPerson                   _activePerson;
    protected TourPerson                   _newActivePerson;
    //
-   protected boolean                      _isPartVisible             = false;
-   protected boolean                      _isViewerPersonDataDirty   = false;
+   protected boolean                      _isPartVisible                  = false;
+   protected boolean                      _isViewerPersonDataDirty        = false;
    //
    private final NumberFormat             _nf1;
    private final NumberFormat             _nf3;
@@ -4753,6 +4753,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
             selectFirstTour();
          }
+      }
+
+      if (RawDataManager.isIgnoreInvalidFile()) {
+         _rawDataMgr.clearInvalidFilesList();
       }
    }
 
