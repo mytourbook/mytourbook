@@ -499,16 +499,12 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
    private void createUI_40_Bottom(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory
-            .fillDefaults()//
+      GridDataFactory.fillDefaults()
             .grab(true, false)
             .span(2, 1)
-            //            .indent(0, _pc.convertVerticalDLUsToPixels(4))
             .applyTo(container);
-      GridLayoutFactory
-            .fillDefaults()//
+      GridLayoutFactory.fillDefaults()
             .numColumns(1)
-            //            .extendedMargins(0, 0, top, bottom)
             .applyTo(container);
 //      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
       {
@@ -538,7 +534,8 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
          tvc = new TreeViewerColumn(_tagViewer, SWT.LEAD);
          tvcColumn = tvc.getColumn();
-         tvcColumn.setText(Messages.PrefPageTags_1);
+         tvcColumn.setText(Messages.Pref_TourTag_Column_TagsAndCategories);
+
          tvc.setLabelProvider(new StyledCellLabelProvider() {
             @Override
             public void update(final ViewerCell cell) {
@@ -593,7 +590,8 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
          tvc = new TreeViewerColumn(_tagViewer, SWT.LEAD);
          tvcColumn = tvc.getColumn();
-         tvcColumn.setText(Messages.PrefPageTags_2);
+         tvcColumn.setText(Messages.Pref_TourTag_Column_Notes);
+         
          tvc.setLabelProvider(new CellLabelProvider() {
             @Override
             public void update(final ViewerCell cell) {
@@ -740,7 +738,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
    }
 
    /**
-    * Rename selected tag/category
+    * Edit selected tag/category
     */
    private void onAction_EditTag() {
 
@@ -753,7 +751,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
          final TVIPrefTag tourTagItem = ((TVIPrefTag) firstElement);
          final TourTag tourTag = tourTagItem.getTourTag();
 
-         dlgMessage = NLS.bind(Messages.Dialog_TourTag_Message_RenameTag, tourTag.getTagName());
+         dlgMessage = NLS.bind(Messages.Dialog_TourTag_EditTag_Message, tourTag.getTagName());
 
          if (new Dialog_TourTag(getShell(), dlgMessage, tourTag).open() != Window.OK) {
 
@@ -773,7 +771,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
          final TVIPrefTagCategory tagCategoryItem = (TVIPrefTagCategory) firstElement;
          final TourTagCategory tourTagCategory = tagCategoryItem.getTourTagCategory();
 
-         dlgMessage = NLS.bind(Messages.Dialog_TourTagCategory_Message_RenameCategory, tourTagCategory.getCategoryName());
+         dlgMessage = NLS.bind(Messages.Dialog_TourTagCategory_EditCategory_Message, tourTagCategory.getCategoryName());
 
          if (new Dialog_TourTag_Category(getShell(), dlgMessage, tourTagCategory).open() != Window.OK) {
 

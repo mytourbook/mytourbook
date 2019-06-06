@@ -189,7 +189,7 @@ public class MarkerToolkit {
      
       for (final MapBookmark mapBookmark : net.tourbook.map.bookmark.MapBookmarkManager.getAllBookmarks()) {
          //System.out.println("*** Markertoolkit:  mapbookmark name: " + mapBookmark.name); //$NON-NLS-1$
-         MarkerItem item = new MarkerItem(mapBookmark.id, mapBookmark.name, "",
+         MarkerItem item = new MarkerItem(mapBookmark.id, mapBookmark.name, "", //$NON-NLS-1$
                new GeoPoint(mapBookmark.getLatitude(), mapBookmark.getLongitude())
                );
          item.setMarker(createAdvanceSymbol(item, _bitmapPoi));
@@ -209,7 +209,7 @@ public class MarkerToolkit {
       for (int x = -COUNT; x < COUNT; x++) {
          for (int y = -COUNT; y < COUNT; y++) {
             double random = STEP * Math.random() * 2;
-            MarkerItem item = new MarkerItem(y + ", " + x, "Title " + demo_lat + "/" + demo_lon,"Description "  + x + "/" + y,
+            MarkerItem item = new MarkerItem(y + ", " + x, "Title " + demo_lat + "/" + demo_lon,"Description "  + x + "/" + y, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
                   new GeoPoint(demo_lat + y * STEP + random, demo_lon + x * STEP + random)
                   );
             item.setMarker(createAdvanceSymbol(item, _bitmapPoi));
@@ -251,12 +251,12 @@ public class MarkerToolkit {
       
       int subtitleWidth = 0;
       int subtitleHeight = 0;
-      String subtitle ="";
+      String subtitle =""; //$NON-NLS-1$
       boolean hasSubtitle = false;
       if (mItem.description.length()>1) {
-         if (mItem.description.startsWith("#")){
+         if (mItem.description.startsWith("#")){ //$NON-NLS-1$
             subtitle = mItem.description.substring(1); // not the first # char
-            subtitle = subtitle.split("\\R", 2)[0]; // only first line
+            subtitle = subtitle.split("\\R", 2)[0]; // only first line //$NON-NLS-1$
             subtitleWidth  = ((int) textPainter.getTextWidth(subtitle)) + 2 * margin;
             subtitleHeight = ((int) textPainter.getTextHeight(subtitle)) + 2 * margin;
             hasSubtitle = true;

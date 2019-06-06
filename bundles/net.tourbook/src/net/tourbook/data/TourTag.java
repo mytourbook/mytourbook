@@ -179,7 +179,7 @@ public class TourTag implements Cloneable, Comparable<Object> {
    }
 
    /**
-    * @return Returns notes or an empty string when not available
+    * @return Returns the tag notes or an empty string when not available
     */
    public String getNotes() {
 
@@ -194,7 +194,14 @@ public class TourTag implements Cloneable, Comparable<Object> {
       return tagId;
    }
 
+   /**
+    * @return Returns the tag name or an empty string when not available
+    */
    public String getTagName() {
+
+      if (name == null) {
+         return UI.EMPTY_STRING;
+      }
       return name;
    }
 

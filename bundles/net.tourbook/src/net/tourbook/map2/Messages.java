@@ -23,6 +23,8 @@ public class Messages extends NLS {
 
    public static String        App_Action_Apply;
 
+   public static String        Default_Label_NewTourMarker;
+
    public static String        graph_label_gradient_unit;
    public static String        graph_label_heartbeat_unit;
 
@@ -33,8 +35,6 @@ public class Messages extends NLS {
    public static String        Image_Action_Map_SyncPhotoWithMap_Disabled;
    public static String        Image_Action_POI;
    public static String        Image_Action_POI_Disabled;
-
-   public static String        Image_Action_CreateTourMarkerFromMap;
    public static String        Image_Action_ShowAllPhotosInMap;
    public static String        Image_Action_ShowAllPhotosInMap_Disabled;
    public static String        Image_Action_ShowPhotosInMap;
@@ -163,13 +163,10 @@ public class Messages extends NLS {
    public static String        Tour_Action_RunDyn_StepLength_Tooltip;
    public static String        Tour_Action_ShowHrZones_Tooltip;
 
-   public static String        TourData_Label_new_tour_marker;
-
    static {
       // initialize resource bundle
       NLS.initializeMessages(BUNDLE_NAME, Messages.class);
    }
 
-   private Messages() {
-   }
+   private Messages() {}
 }

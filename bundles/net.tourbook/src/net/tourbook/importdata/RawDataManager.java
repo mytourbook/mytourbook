@@ -23,6 +23,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -104,9 +105,9 @@ public class RawDataManager {
    private static final String LOG_REIMPORT_ONLY_POWER_SPEED      = Messages.Log_Reimport_Only_PowerSpeed;
    private static final String LOG_REIMPORT_ONLY_POWER_PULSE      = Messages.Log_Reimport_Only_PowerPulse;
    private static final String LOG_REIMPORT_ONLY_RUNNING_DYNAMICS = Messages.Log_Reimport_Only_RunningDynamics;
-   private static final String      LOG_REIMPORT_ONLY_TRAINING         = Messages.Log_Reimport_Only_Training;
    private static final String LOG_REIMPORT_ONLY_SWIMMING         = Messages.Log_Reimport_Only_Swimming;
    private static final String LOG_REIMPORT_ONLY_TEMPERATURE      = Messages.Log_Reimport_Only_Temperature;
+   private static final String LOG_REIMPORT_ONLY_TRAINING         = Messages.Log_Reimport_Only_Training;
    private static final String LOG_REIMPORT_TOUR                  = Messages.Log_Reimport_Tour;
 
    //
@@ -312,16 +313,21 @@ public class RawDataManager {
          final ImportConfig importConfig = getEasyConfig().getActiveImportConfig();
 
          for (final String invalidFile : _invalidFilesList) {
+
+            Path invalidFilePath = Paths.get(invalidFile);
+
             //If the invalid files are backed up and deleted from the device folder,
             //then we save their backup path and not their device path.
             if (importConfig.isCreateBackup && importConfig.isDeleteDeviceFiles) {
-               final Path invalidFileBackupPath = Paths.get(importConfig.getBackupFolder(), Paths.get(invalidFile).getFileName().toString());
-               writer.write(invalidFileBackupPath.toString());
-            } else {
-               writer.write(invalidFile);
+               invalidFilePath = Paths.get(importConfig.getBackupFolder(), Paths.get(invalidFile).getFileName().toString());
             }
 
-            writer.newLine();
+            // We check if the file still exists (it could have been deleted recently)
+            // and that it's not already in the text file
+            if (Files.exists(invalidFilePath) && !doesInvalidFileExist(invalidFilePath.getFileName().toString())) {
+               writer.write(invalidFilePath.toString());
+               writer.newLine();
+            }
          }
 
       } catch (final IOException e) {
@@ -1266,6 +1272,10 @@ public class RawDataManager {
       }
    }
 
+   public void clearInvalidFilesList() {
+      _invalidFilesList.clear();
+   }
+
    public DeviceData getDeviceData() {
       return _deviceData;
    }
@@ -1756,7 +1766,6 @@ public class RawDataManager {
 
       _tempTourTags.clear();
       _tempTourTypes.clear();
-      _invalidFilesList.clear();
    }
 
    public void removeTours(final TourData[] removedTours) {

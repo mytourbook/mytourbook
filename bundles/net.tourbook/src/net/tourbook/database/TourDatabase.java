@@ -1576,6 +1576,33 @@ public class TourDatabase {
    }
 
    /**
+    * @param tagId
+    * @return Returns the tag category notes
+    *         <code>null</code>
+    */
+   public static String getTagCategoryNotes(final Long tagId) {
+
+      if (tagId == null) {
+         return UI.EMPTY_STRING;
+      }
+
+      final HashMap<Long, TourTagCategory> hashAllTagCategories = getAllTourTagCategories();
+      final TourTagCategory tagCategory = hashAllTagCategories.get(tagId);
+
+      if (tagCategory != null) {
+         return tagCategory.getNotes();
+      } else {
+         try {
+            throw new MyTourbookException("tag category id '" + tagId + "' is not available"); //$NON-NLS-1$ //$NON-NLS-2$
+         } catch (final MyTourbookException e) {
+            e.printStackTrace();
+         }
+      }
+
+      return UI.EMPTY_STRING;
+   }
+
+   /**
     * @param categoryId
     * @return Returns a {@link TagCollection} with all tags and categories for the category Id
     */
@@ -1708,6 +1735,33 @@ public class TourDatabase {
       }
 
       return sb.toString();
+   }
+
+   /**
+    * @param tagId
+    * @return Returns the tag notes
+    *         <code>null</code>
+    */
+   public static String getTagNotes(final Long tagId) {
+
+      if (tagId == null) {
+         return UI.EMPTY_STRING;
+      }
+
+      final HashMap<Long, TourTag> hashAllTags = getAllTourTags();
+      final TourTag tag = hashAllTags.get(tagId);
+
+      if (tag != null) {
+         return tag.getNotes();
+      } else {
+         try {
+            throw new MyTourbookException("tag id '" + tagId + "' is not available"); //$NON-NLS-1$ //$NON-NLS-2$
+         } catch (final MyTourbookException e) {
+            e.printStackTrace();
+         }
+      }
+
+      return UI.EMPTY_STRING;
    }
 
    /**

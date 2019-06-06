@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -33,8 +33,10 @@ import org.eclipse.swt.widgets.Display;
 
 public class ActionCreateTourMarkerFromMap extends Action {
 
-   private Map2View _mapView;
-   private long     _currentHoverTourId;
+   private static final String IMAGE_EDIT_TOUR_MARKER_NEW = net.tourbook.Messages.Image__edit_tour_marker_new;
+
+   private Map2View            _mapView;
+   private long                _currentHoverTourId;
 
    public ActionCreateTourMarkerFromMap(final Map2View mapView) {
 
@@ -42,7 +44,7 @@ public class ActionCreateTourMarkerFromMap extends Action {
 
       _mapView = mapView;
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_Action_CreateTourMarkerFromMap));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(IMAGE_EDIT_TOUR_MARKER_NEW));
    }
 
    @Override
@@ -86,7 +88,7 @@ public class ActionCreateTourMarkerFromMap extends Action {
       final TourMarker tourMarker = new TourMarker(tourData, ChartLabel.MARKER_TYPE_CUSTOM);
       tourMarker.setSerieIndex(closestLatLongIndex);
       tourMarker.setTime(relativeTourTime, tourData.getTourStartTimeMS() + (relativeTourTime * 1000));
-      tourMarker.setLabel(Messages.TourData_Label_new_tour_marker);
+      tourMarker.setLabel(Messages.Default_Label_NewTourMarker);
 
       if (altitudeSerie != null) {
          tourMarker.setAltitude(altitudeSerie[closestLatLongIndex]);
