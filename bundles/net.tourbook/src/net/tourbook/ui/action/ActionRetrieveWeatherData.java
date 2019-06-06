@@ -15,12 +15,17 @@
  *******************************************************************************/
 package net.tourbook.ui.action;
 
+import com.javadocmd.simplelatlng.LatLng;
+
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider2;
+import net.tourbook.weather.HistoricalWeatherRetriever;
+import net.tourbook.weather.WeatherData;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -36,8 +41,7 @@ public class ActionRetrieveWeatherData extends Action {
 
       _tourProvider = tourProvider;
 
-      //TODO
-      setText("TOTO");//Messages.Tour_Action_AdjustTemperature);
+      setText(Messages.Tour_Action_RetrieveWeatherData);
    }
 
    @Override
@@ -63,6 +67,16 @@ public class ActionRetrieveWeatherData extends Action {
          return;
       }
 
+      final LatLng startPoint = new LatLng(selectedTours.get(0).latitudeSerie[0], selectedTours.get(0).longitudeSerie[0]);
+
+      final HistoricalWeatherRetriever historicalWeatherRetriever = HistoricalWeatherRetriever
+            .where(startPoint)
+            .when(DateTimeFormatter.ofPattern("yyyy-MM-dd").format(selectedTours.get(0).getTourStartTime()),
+                  selectedTours.get(0).getStartTimeOfDay() / 3600)
+            .forUser("76fe454d0cc3475886c231449192305")//Settings.getToken())
+            .retrieve();
+
+      final WeatherData historicalWeatherData = historicalWeatherRetriever.getHistoricalWeatherData();
       //TODO
       // for all the tours, retrieve and set the weather data :
       // Temperature
@@ -74,7 +88,7 @@ public class ActionRetrieveWeatherData extends Action {
       // For the request, get the half-point of the route just like in CG
       for (final TourData tour : selectedTours)
       {
-         tour.setAvgTemperature(0);
+         tour.setAvgTemperature(historicalWeatherData.getTemperatureAverage());
          tour.setWeatherWindSpeed(0);
          tour.setWeatherWindDir(0);
          tour.setWeather("toto");
