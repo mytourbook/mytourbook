@@ -312,7 +312,6 @@ public class RawDataManager {
          writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file, true), "UTF-8")); //$NON-NLS-1$
          final ImportConfig importConfig = getEasyConfig().getActiveImportConfig();
 
-
          for (final String invalidFile : _invalidFilesList) {
 
             Path invalidFilePath = Paths.get(invalidFile);
@@ -324,11 +323,11 @@ public class RawDataManager {
             }
 
             // We check if the file still exists (it could have been deleted recently)
-            if (Files.exists(invalidFilePath)) {
-               writer.write(invalidFile);
+            // and that it's not already in the text file
+            if (Files.exists(invalidFilePath) && !doesInvalidFileExist(invalidFilePath.getFileName().toString())) {
+               writer.write(invalidFilePath.toString());
+               writer.newLine();
             }
-
-            writer.newLine();
          }
 
       } catch (final IOException e) {
@@ -1273,6 +1272,10 @@ public class RawDataManager {
       }
    }
 
+   public void clearInvalidFilesList() {
+      _invalidFilesList.clear();
+   }
+
    public DeviceData getDeviceData() {
       return _deviceData;
    }
@@ -1763,7 +1766,6 @@ public class RawDataManager {
 
       _tempTourTags.clear();
       _tempTourTypes.clear();
-      _invalidFilesList.clear();
    }
 
    public void removeTours(final TourData[] removedTours) {

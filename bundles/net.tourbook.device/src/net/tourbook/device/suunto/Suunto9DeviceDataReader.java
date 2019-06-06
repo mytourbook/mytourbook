@@ -96,6 +96,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 
    /**
     * Retrieves the content from a resource.
+    * NOTE : This method is only used by the unit tests.
     *
     * @param gzipFilePath
     *           The absolute file path of the Suunto file.
@@ -105,12 +106,13 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
     */
    private String GetContentFromResource(final String resourceFilePath, final boolean isZipFile) {
       String fileContent = null;
+      BufferedReader br = null;
+      GZIPInputStream gzip = null;
+
       try {
          final InputStream inputStream =
                Suunto9DeviceDataReader.class.getResourceAsStream(resourceFilePath);
 
-         BufferedReader br = null;
-         GZIPInputStream gzip = null;
          if (isZipFile) {
             gzip = new GZIPInputStream(inputStream);
             br = new BufferedReader(new InputStreamReader(gzip));
@@ -119,15 +121,21 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
          }
 
          fileContent = br.lines().collect(Collectors.joining());
-
-         // close resources
-         br.close();
-         if (isZipFile) {
-            gzip.close();
-         }
       } catch (final IOException e) {
          StatusUtil.log(e);
          return ""; //$NON-NLS-1$
+      } finally {
+         try {
+            // close resources
+            if (br != null) {
+               gzip.close();
+            }
+            if (gzip != null) {
+               gzip.close();
+            }
+         } catch (final IOException e) {
+            e.printStackTrace();
+         }
       }
 
       return fileContent;
@@ -148,16 +156,15 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
     */
    private String GetJsonContentFromGZipFile(final String gzipFilePath, final boolean isValidatingFile) {
       String jsonFileContent = null;
+      FileInputStream fis = null;
+      GZIPInputStream gzip = null;
+      BufferedReader br = null;
       try {
-         final GZIPInputStream gzip = new GZIPInputStream(new FileInputStream(gzipFilePath));
-         final BufferedReader br = new BufferedReader(new InputStreamReader(gzip));
+         fis = new FileInputStream(gzipFilePath);
+         gzip = new GZIPInputStream(fis);
+         br = new BufferedReader(new InputStreamReader(gzip));
 
          jsonFileContent = br.readLine();
-
-         // close resources
-         br.close();
-         gzip.close();
-
       } catch (final IOException e) {
 
          /*
@@ -169,6 +176,21 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
          }
 
          return ""; //$NON-NLS-1$
+      } finally {
+         try {
+            // close resources
+            if (br != null) {
+               br.close();
+            }
+            if (gzip != null) {
+               gzip.close();
+            }
+            if (fis != null) {
+               fis.close();
+            }
+         } catch (final IOException e) {
+            e.printStackTrace();
+         }
       }
 
       return jsonFileContent;
@@ -462,6 +484,10 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 
    @Override
    public boolean validateRawData(final String fileName) {
+      if (!fileName.endsWith(".json.gz")) { //$NON-NLS-1$
+         return false;
+      }
+
       final String jsonFileContent = GetJsonContentFromGZipFile(fileName, true);
       return isValidActivity(jsonFileContent);
    }
