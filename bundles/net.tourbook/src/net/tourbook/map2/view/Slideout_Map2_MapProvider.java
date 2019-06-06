@@ -16,7 +16,6 @@
 package net.tourbook.map2.view;
 
 import de.byteholder.geoclipse.map.Map;
-import de.byteholder.geoclipse.map.UI;
 import de.byteholder.geoclipse.mapprovider.MP;
 import de.byteholder.geoclipse.mapprovider.MPCustom;
 import de.byteholder.geoclipse.mapprovider.MPPlugin;
@@ -30,11 +29,17 @@ import java.util.ArrayList;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.color.IColorSelectorListener;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
+import net.tourbook.common.util.ColumnDefinition;
+import net.tourbook.common.util.ColumnManager;
+import net.tourbook.common.util.EmptyContextMenuProvider;
+import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.StringToArrayConverter;
+import net.tourbook.common.util.TableColumnDefinition;
 import net.tourbook.preferences.ITourbookPreferences;
 
 import org.eclipse.jface.action.Action;
@@ -47,15 +52,15 @@ import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.viewers.CellLabelProvider;
-import org.eclipse.jface.viewers.ColumnPixelData;
+import org.eclipse.jface.viewers.CheckboxTableViewer;
+import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableLayout;
-import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
@@ -66,13 +71,12 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.ToolBar;
 
 /**
  * 2D Map provider slideout
  */
-public class Slideout_Map2_MapProvider extends ToolbarSlideout implements IColorSelectorListener {
+public class Slideout_Map2_MapProvider extends ToolbarSlideout implements IColorSelectorListener, ITourViewer {
 
 // SET_FORMATTING_OFF
 
@@ -97,7 +101,8 @@ public class Slideout_Map2_MapProvider extends ToolbarSlideout implements IColor
    private Action                _action_MapProvider_Previous;
 
    private Map2View              _map2View;
-   private TableViewer           _mpViewer;
+   private CheckboxTableViewer   _mpViewer;
+   private ColumnManager         _columnManager;
 
 //   private final MapProviderManager _mpMgr     = MapProviderManager.getInstance();
    private MP             _selectedMP;
@@ -105,10 +110,13 @@ public class Slideout_Map2_MapProvider extends ToolbarSlideout implements IColor
 
    private PixelConverter _pc;
 
+   private boolean        _isInUpdate;
+
    /*
     * UI controls
     */
    private Composite _parent;
+   private Composite _viewerContainer;
 
    private class MapContentProvider implements IStructuredContentProvider {
 
@@ -233,6 +241,10 @@ public class Slideout_Map2_MapProvider extends ToolbarSlideout implements IColor
 
       createActions();
 
+      // define all columns for the viewer
+      _columnManager = new ColumnManager(this, _state);
+      defineAllColumns();
+
       final Composite ui = createUI(parent);
 
       // load viewer
@@ -253,15 +265,20 @@ public class Slideout_Map2_MapProvider extends ToolbarSlideout implements IColor
       final Composite shellContainer = new Composite(parent, SWT.NONE);
       GridLayoutFactory.swtDefaults().applyTo(shellContainer);
       {
-         createUI_10_Header(shellContainer);
+         createUI_10_SlideoutHeader(shellContainer);
 //         createUI_20_MapOptions(shellContainer);
-         createUI_20_MapViewer(shellContainer);
+
+         _viewerContainer = new Composite(shellContainer, SWT.NONE);
+         GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
+         {
+            createUI_20_MapViewer(shellContainer);
+         }
       }
 
       return shellContainer;
    }
 
-   private void createUI_10_Header(final Composite parent) {
+   private void createUI_10_SlideoutHeader(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -317,64 +334,16 @@ public class Slideout_Map2_MapProvider extends ToolbarSlideout implements IColor
       /*
        * create table
        */
-      final Table table = new Table(layoutContainer, SWT.FULL_SELECTION);
+      final Table table = new Table(layoutContainer, SWT.CHECK | SWT.FULL_SELECTION);
 
       table.setLayout(new TableLayout());
       table.setHeaderVisible(true);
       table.setLinesVisible(false);
 
-      _mpViewer = new TableViewer(table);
+      _mpViewer = new CheckboxTableViewer(table);
       _mpViewer.setUseHashlookup(true);
 
-      /*
-       * create columns
-       */
-      TableViewerColumn tvc;
-      TableColumn tc;
-
-      /*
-       * Column: Server type
-       */
-      tvc = new TableViewerColumn(_mpViewer, SWT.LEAD);
-      tc = tvc.getColumn();
-      tc.setToolTipText(PREF_MAP_VIEWER_COLUMN_LBL_SERVER_TYPE_TOOLTIP);
-      tvc.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final MP mapProvider = (MP) cell.getElement();
-
-            if (mapProvider instanceof MPWms) {
-               cell.setText(PREF_MAP_VIEWER_COLUMN_CONTENT_SERVER_TYPE_WMS);
-            } else if (mapProvider instanceof MPCustom) {
-               cell.setText(PREF_MAP_VIEWER_COLUMN_CONTENT_SERVER_TYPE_CUSTOM);
-            } else if (mapProvider instanceof MPProfile) {
-               cell.setText(PREF_MAP_VIEWER_COLUMN_CONTENT_SERVER_TYPE_MAP_PROFILE);
-            } else if (mapProvider instanceof MPPlugin) {
-               cell.setText(PREF_MAP_VIEWER_COLUMN_CONTENT_SERVER_TYPE_PLUGIN);
-            } else {
-               cell.setText(UI.EMPTY_STRING);
-            }
-         }
-      });
-      tableLayout.setColumnData(tvc.getColumn(), new ColumnPixelData(_pc.convertWidthInCharsToPixels(4)));
-
-      /*
-       * Column: Map provider
-       */
-      tvc = new TableViewerColumn(_mpViewer, SWT.LEAD);
-      tc = tvc.getColumn();
-      tc.setText(PREF_MAP_VIEWER_COLUMN_LBL_MAP_PROVIDER);
-      tvc.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final MP mapProvider = (MP) cell.getElement();
-
-            cell.setText(mapProvider.getName());
-         }
-      });
-      tableLayout.setColumnData(tvc.getColumn(), new ColumnWeightData(20));
+      _columnManager.createColumns(_mpViewer);
 
       /*
        * create table viewer
@@ -394,6 +363,17 @@ public class Slideout_Map2_MapProvider extends ToolbarSlideout implements IColor
          }
       });
 
+      createUI_22_ContextMenu();
+   }
+
+   /**
+    * Ceate the view context menus
+    */
+   private void createUI_22_ContextMenu() {
+
+      final Table table = _mpViewer.getTable();
+
+      _columnManager.createHeaderContextMenu(table, new EmptyContextMenuProvider());
    }
 
    private void createUI_30_MapOptions(final Composite parent) {
@@ -404,8 +384,82 @@ public class Slideout_Map2_MapProvider extends ToolbarSlideout implements IColor
       {}
    }
 
+   private void defineAllColumns() {
+
+      defineColumn_10_MapProvider();
+      defineColumn_20_ServerType();
+   }
+
+   /**
+    * Column: Map Provider, this is the first column with a checkbox
+    */
+   private void defineColumn_10_MapProvider() {
+
+      final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, "MapProvider", SWT.TRAIL);
+
+      colDef.setColumnName(PREF_MAP_VIEWER_COLUMN_LBL_MAP_PROVIDER);
+
+      colDef.setIsColumnMoveable(false);
+      colDef.setIsDefaultColumn();
+      colDef.setColumnWeightData(new ColumnWeightData(20));
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final MP mapProvider = (MP) cell.getElement();
+
+            cell.setText(mapProvider.getName());
+         }
+      });
+   }
+
+   /**
+    * Column: Server type
+    */
+   private void defineColumn_20_ServerType() {
+
+      final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, "ServerType", SWT.TRAIL);
+
+      colDef.setColumnName(PREF_MAP_VIEWER_COLUMN_LBL_SERVER_TYPE_TOOLTIP);
+
+      colDef.setIsDefaultColumn();
+      colDef.setColumnWeightData(new ColumnWeightData(5));
+//      colDef.setColumnWidth(_pc.convertWidthInCharsToPixels(4));
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final MP mapProvider = (MP) cell.getElement();
+
+            if (mapProvider instanceof MPWms) {
+               cell.setText(PREF_MAP_VIEWER_COLUMN_CONTENT_SERVER_TYPE_WMS);
+            } else if (mapProvider instanceof MPCustom) {
+               cell.setText(PREF_MAP_VIEWER_COLUMN_CONTENT_SERVER_TYPE_CUSTOM);
+            } else if (mapProvider instanceof MPProfile) {
+               cell.setText(PREF_MAP_VIEWER_COLUMN_CONTENT_SERVER_TYPE_MAP_PROFILE);
+            } else if (mapProvider instanceof MPPlugin) {
+               cell.setText(PREF_MAP_VIEWER_COLUMN_CONTENT_SERVER_TYPE_PLUGIN);
+            } else {
+               cell.setText(UI.EMPTY_STRING);
+            }
+         }
+      });
+   }
+
    private void enableControls() {
 
+   }
+
+   @Override
+   public ColumnManager getColumnManager() {
+      return _columnManager;
+   }
+
+   @Override
+   public ColumnViewer getViewer() {
+      return _mpViewer;
    }
 
    private void initUI(final Composite parent) {
@@ -433,6 +487,10 @@ public class Slideout_Map2_MapProvider extends ToolbarSlideout implements IColor
 
    private void onSelect_MapProvider(final SelectionChangedEvent event) {
 
+      if (_isInUpdate) {
+         return;
+      }
+
       final MP selectedMapProvider = (MP) event.getStructuredSelection().getFirstElement();
 
       selectMapProviderInTheMap(selectedMapProvider);
@@ -444,6 +502,52 @@ public class Slideout_Map2_MapProvider extends ToolbarSlideout implements IColor
 
    private void onSelect_MapProvider_Previous() {
 
+   }
+
+   @Override
+   public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
+
+      _viewerContainer.setRedraw(false);
+      {
+         // keep selection
+         final ISelection selectionBackup = _mpViewer.getSelection();
+         final Object[] checkedElements = _mpViewer.getCheckedElements();
+         {
+            _mpViewer.getTable().dispose();
+
+            createUI_20_MapViewer(_viewerContainer);
+
+            // update UI
+            _viewerContainer.layout();
+
+            // update the viewer
+            updateUI_SetViewerInput();
+         }
+         updateUI_ReselectItems(selectionBackup, checkedElements);
+      }
+      _viewerContainer.setRedraw(true);
+
+      _mpViewer.getTable().setFocus();
+
+      return _mpViewer;
+   }
+
+   @Override
+   public void reloadViewer() {
+
+//      loadAllMarker();
+//
+//      _viewerContainer.setRedraw(false);
+//      {
+//         // keep selection
+//         final ISelection selectionBackup = _mpViewer.getSelection();
+//         final Object[] checkedElements = _mpViewer.getCheckedElements();
+//         {
+//            updateUI_SetViewerInput();
+//         }
+//         updateUI_SelectTourMarker(selectionBackup, checkedElements);
+//      }
+//      _viewerContainer.setRedraw(true);
    }
 
    private void resetToDefaults() {
@@ -502,4 +606,37 @@ public class Slideout_Map2_MapProvider extends ToolbarSlideout implements IColor
       map.setDimLevel(_map2View.getMapDimLevel(), dimColor);
    }
 
+   @Override
+   public void updateColumnHeader(final ColumnDefinition colDef) {}
+
+   /**
+    * Select and reveal the previous items.
+    *
+    * @param selection
+    * @param checkedElements
+    */
+   private void updateUI_ReselectItems(final ISelection selection, final Object[] checkedElements) {
+
+      _isInUpdate = true;
+      {
+         _mpViewer.setSelection(selection, true);
+
+         if (checkedElements != null && checkedElements.length > 0) {
+            _mpViewer.setCheckedElements(checkedElements);
+         }
+
+         final Table table = _mpViewer.getTable();
+         table.showSelection();
+      }
+      _isInUpdate = false;
+   }
+
+   private void updateUI_SetViewerInput() {
+
+      _isInUpdate = true;
+      {
+         _mpViewer.setInput(new Object[0]);
+      }
+      _isInUpdate = false;
+   }
 }
