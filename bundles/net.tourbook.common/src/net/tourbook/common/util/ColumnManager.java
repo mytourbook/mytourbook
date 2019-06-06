@@ -944,7 +944,9 @@ public class ColumnManager {
 
                   StatusUtil.log("Table header context menu has had the wrong parent and is recreated."); //$NON-NLS-1$
 
-               } else if (contextMenu == defaultContextMenuProvider.getContextMenu() && contextMenu.getShell() != table.getShell()) {
+               } else if (defaultContextMenuProvider != null
+                     && contextMenu == defaultContextMenuProvider.getContextMenu()
+                     && contextMenu.getShell() != table.getShell()) {
 
                   contextMenu = defaultContextMenuProvider.recreateContextMenu();
 
@@ -1069,7 +1071,9 @@ public class ColumnManager {
 
                   StatusUtil.log("Tree header context menu has had the wrong parent and is recreated."); //$NON-NLS-1$
 
-               } else if (contextMenu == defaultContextMenuProvider.getContextMenu() && contextMenu.getShell() != tree.getShell()) {
+               } else if (defaultContextMenuProvider != null
+                     && contextMenu == defaultContextMenuProvider.getContextMenu()
+                     && contextMenu.getShell() != tree.getShell()) {
 
                   contextMenu = defaultContextMenuProvider.recreateContextMenu();
 
@@ -1342,7 +1346,9 @@ public class ColumnManager {
 
       } else {
 
-         contextMenu = defaultContextMenuProvider.getContextMenu();
+         contextMenu = defaultContextMenuProvider != null
+               ? defaultContextMenuProvider.getContextMenu()
+               : null;
       }
 
       return contextMenu;
