@@ -16,11 +16,11 @@
 package net.tourbook.application;
 
 import net.tourbook.Messages;
+import net.tourbook.common.tooltip.ActionToolbarSlideoutAdv;
 import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.tooltip.SlideoutLocation;
 import net.tourbook.tag.tour.filter.SlideoutTourTagFilter;
 import net.tourbook.tag.tour.filter.TourTagFilterManager;
-import net.tourbook.tour.filter.ActionToolbarSlideoutAdv;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.resource.ImageDescriptor;

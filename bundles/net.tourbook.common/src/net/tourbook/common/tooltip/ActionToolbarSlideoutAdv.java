@@ -13,13 +13,11 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.tour.filter;
+package net.tourbook.common.tooltip;
 
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.Messages;
 import net.tourbook.common.UI;
-import net.tourbook.common.tooltip.AdvancedSlideout;
-import net.tourbook.common.tooltip.IOpeningDialog;
 
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.resource.ImageDescriptor;
