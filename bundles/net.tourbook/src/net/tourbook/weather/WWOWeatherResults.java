@@ -2,11 +2,13 @@ package net.tourbook.weather;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.util.List;
+
 /**
  * A Java representation of a World Weather Online query result "weather" element.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class WWOResults {
+public class WWOWeatherResults {
 
    private String maxtempC;
 
@@ -14,15 +16,15 @@ public class WWOResults {
 
    private String avgtempC;
 
-   private String hourly;
+   private List<WWOHourlyResults> hourly;
 
    public String getavgtempC() {
       return avgtempC;
    }
 
-   // public String gethourly() {
-   //     return hourly;
-   //  }
+   public List<WWOHourlyResults> gethourly() {
+      return hourly;
+   }
 
    public String getmaxtempC() {
       return maxtempC;

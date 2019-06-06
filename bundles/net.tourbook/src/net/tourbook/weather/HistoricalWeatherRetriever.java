@@ -88,7 +88,7 @@ public class HistoricalWeatherRetriever {
          final ObjectMapper mapper = new ObjectMapper();
          final String weatherResults = mapper.readValue(weatherDataResponse, JsonNode.class).get("data").get("weather").get(0).toString(); //$NON-NLS-1$
 
-         final WWOResults rawWeatherData = mapper.readValue(weatherResults, WWOResults.class);
+         final WWOWeatherResults rawWeatherData = mapper.readValue(weatherResults, WWOWeatherResults.class);
 
          // Within the hourly data, find the time that corresponds to the tour start time
          // and extract the weather data.
