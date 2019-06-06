@@ -80,6 +80,7 @@ import net.tourbook.map2.action.ActionCreateTourMarkerFromMap;
 import net.tourbook.map2.action.ActionDimMap;
 import net.tourbook.map2.action.ActionManageMapProviders;
 import net.tourbook.map2.action.ActionMap2Color;
+import net.tourbook.map2.action.ActionMap2_MapProvider;
 import net.tourbook.map2.action.ActionPhotoProperties;
 import net.tourbook.map2.action.ActionReloadFailedMapImages;
 import net.tourbook.map2.action.ActionSaveDefaultPosition;
@@ -489,26 +490,6 @@ public class Map2View extends ViewPart implements
       protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
 
          return new Slideout_Map2_TourColors(_parent, toolbar, Map2View.this, _state);
-      }
-
-      @Override
-      protected void onBeforeOpenSlideout() {
-         closeOpenedDialogs(this);
-      }
-   }
-
-   private class ActionMap2_MapProvider extends ActionToolbarSlideout {
-
-      public ActionMap2_MapProvider() {
-
-         super(TourbookPlugin.getImageDescriptor(Messages.image_action_change_tile_factory),
-               TourbookPlugin.getImageDescriptor(Messages.image_action_change_tile_factory));
-      }
-
-      @Override
-      protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
-
-         return new Slideout_Map2_MapProvider(_parent, toolbar, Map2View.this, _state);
       }
 
       @Override
@@ -1485,7 +1466,7 @@ public class Map2View extends ViewPart implements
       _actionCreateTourMarkerFromMap = new ActionCreateTourMarkerFromMap(this);
       _actionMap2_Bookmarks = new ActionMapBookmarks(this._parent, this);
       _actionMap2_Color = new ActionMap2Color();
-      _actionMap2_MapProvider = new ActionMap2_MapProvider();
+      _actionMap2_MapProvider = new ActionMap2_MapProvider(this, _state);
       _actionMap2_Options = new ActionMap2_Options();
       _actionSearchTourByLocation = new ActionSearchTourByLocation();
       _actionSelectMapProvider = new ActionSelectMapProvider(this);
