@@ -77,22 +77,15 @@ public class ActionRetrieveWeatherData extends Action {
             .retrieve();
 
       final WeatherData historicalWeatherData = historicalWeatherRetriever.getHistoricalWeatherData();
-      //TODO
-      // for all the tours, retrieve and set the weather data :
-      // Temperature
-      // WInd speed
-      // Wind dir
-      // text like OMB plugin
-      //weather station distance ?
 
       // For the request, get the half-point of the route just like in CG
-      for (final TourData tour : selectedTours)
-      {
+      for (final TourData tour : selectedTours) {
+         // TODO WHich avg temperature ? the one of the day ? the one of the hour ?
          tour.setAvgTemperature(historicalWeatherData.getTemperatureAverage());
-         tour.setWeatherWindSpeed(0);
-         tour.setWeatherWindDir(0);
-         tour.setWeather("toto");
-         tour.setWeatherClouds("");
+         tour.setWeatherWindSpeed(historicalWeatherData.getWindSpeed());
+         tour.setWeatherWindDir(historicalWeatherData.getWindDirection());
+         tour.setWeather(historicalWeatherData.getWeatherDescription());
+         tour.setWeatherClouds(historicalWeatherData.getWeatherType());
       }
 
       TourManager.saveModifiedTours(selectedTours);

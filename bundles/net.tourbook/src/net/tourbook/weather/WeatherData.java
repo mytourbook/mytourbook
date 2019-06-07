@@ -15,15 +15,21 @@
  *******************************************************************************/
 package net.tourbook.weather;
 
+import net.tourbook.common.weather.IWeather;
+
 /**
  * Class to store data from the WorldWeatherOnline API.
  * Documentation : https://www.worldweatheronline.com/developer/api/docs/historical-weather-api.aspx
  */
 public class WeatherData {
 
-   private float maxTemperature;
-   private float minTemperature;
-   private float AverageTemperature;
+   private float  maxTemperature;
+   private float  minTemperature;
+   private float  AverageTemperature;
+   private int    WindDirection;
+   private int    WindSpeed;
+   private String WeatherDescription;
+   private String WeatherType;
 
    public WeatherData() {
       maxTemperature = Float.MIN_VALUE;
@@ -43,6 +49,22 @@ public class WeatherData {
       return minTemperature;
    }
 
+   public String getWeatherDescription() {
+      return WeatherDescription;
+   }
+
+   public String getWeatherType() {
+      return WeatherType;
+   }
+
+   public int getWindDirection() {
+      return WindDirection;
+   }
+
+   public int getWindSpeed() {
+      return WindSpeed;
+   }
+
    public void setTemperatureAverage(final String temperatureAverage) {
       if (!temperatureAverage.equals("")) {
          AverageTemperature = Float.parseFloat(temperatureAverage);
@@ -59,5 +81,53 @@ public class WeatherData {
       if (!temperatureMin.equals("")) {
          minTemperature = Float.parseFloat(temperatureMin);
       }
+   }
+
+   public void setWeatherDescription(final String weatherDescription) {
+      WeatherDescription = weatherDescription;
+   }
+
+   public void setWeatherType(final String weatherCode) {
+      // Codes : http://www.worldweatheronline.com/feed/wwoConditionCodes.xml
+      switch (weatherCode) {
+      case "122":
+         WeatherType = IWeather.WEATHER_ID_OVERCAST;
+         break;
+      case "113":
+         WeatherType = IWeather.WEATHER_ID_CLEAR;
+         break;
+      case "116":
+         WeatherType = IWeather.WEATHER_ID_PART_CLOUDS;
+         break;
+      //case "200":
+      //    WeatherType = IWeather.WEATHER_ID_LIGHTNING;
+      //   break;
+      case "356":
+      case "359":
+         WeatherType = IWeather.WEATHER_ID_RAIN;
+         break;
+      case "332":
+      case "335":
+      case "329":
+      case "326":
+      case "323":
+      case "320":
+         WeatherType = IWeather.WEATHER_ID_SNOW;
+         break;
+      case "200":
+         WeatherType = IWeather.WEATHER_ID_SEVERE_WEATHER_ALERT;
+         break;
+      case "353":
+         WeatherType = IWeather.WEATHER_ID_SCATTERED_SHOWERS;
+         break;
+      }
+   }
+
+   public void setWindDirection(final int windDirection) {
+      WindDirection = windDirection;
+   }
+
+   public void setWindSpeed(final int windSpeed) {
+      WindSpeed = windSpeed;
    }
 }

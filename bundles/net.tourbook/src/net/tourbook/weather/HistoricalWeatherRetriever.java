@@ -36,14 +36,14 @@ import org.apache.http.impl.client.HttpClientBuilder;
 public class HistoricalWeatherRetriever {
 
    private String       startDate;
-   private int          startTimeOfDay;
+   private String       startTimeOfDay;
    private String       apiKey;
 
    private LatLng       searchAreaCenter;
 
    private WeatherData  historicalWeatherData;
 
-   private final String apiUrl              = "https://api.worldweatheronline.com/premium/v1/past-weather.ashx?key="; //$NON-NLS-1$
+   private final String apiUrl = "https://api.worldweatheronline.com/premium/v1/past-weather.ashx?key="; //$NON-NLS-1$
 
    private HistoricalWeatherRetriever(final LatLng searchAreaCenter) {
       this.searchAreaCenter = searchAreaCenter;
@@ -70,7 +70,7 @@ public class HistoricalWeatherRetriever {
       return this;
    }
 
-   public WeatherData  getHistoricalWeatherData() {
+   public WeatherData getHistoricalWeatherData() {
       return historicalWeatherData;
    }
 
@@ -92,6 +92,16 @@ public class HistoricalWeatherRetriever {
 
          // Within the hourly data, find the time that corresponds to the tour start time
          // and extract the weather data.
+         for (final WWOHourlyResults hourlyData : rawWeatherData.gethourly()) {
+            if (hourlyData.gettime().equals(startTimeOfDay)) {
+               weatherData.setWindDirection(Integer.parseInt(hourlyData.getWinddirDegree()));
+               weatherData.setWindSpeed(Integer.parseInt(hourlyData.getWindspeedKmph()));
+               weatherData.setWeatherDescription(hourlyData.getWeatherDescription());
+               weatherData.setWeatherType(hourlyData.getWeatherCode());
+               break;
+            }
+         }
+
          weatherData.setTemperatureMax(rawWeatherData.getmaxtempC());
          weatherData.setTemperatureMin(rawWeatherData.getmintempC());
          weatherData.setTemperatureAverage(rawWeatherData.getavgtempC());
@@ -169,7 +179,7 @@ public class HistoricalWeatherRetriever {
     */
    public HistoricalWeatherRetriever when(final String dateTime, final int startTimeOfDay) {
       this.startDate = dateTime;
-      this.startTimeOfDay = startTimeOfDay;
+      this.startTimeOfDay = startTimeOfDay + "00";
       return this;
    }
 }
