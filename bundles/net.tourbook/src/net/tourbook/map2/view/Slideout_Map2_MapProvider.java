@@ -43,6 +43,7 @@ import net.tourbook.common.util.TableColumnDefinition;
 import net.tourbook.preferences.ITourbookPreferences;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -87,32 +88,41 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
 // SET_FORMATTING_ON
 
    final static IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
-   final private IDialogSettings _state;
 
+   final private IDialogSettings _state;
    private SelectionAdapter      _defaultState_SelectionListener;
 
    private ActionOpenPrefDialog  _action_ManageMapProviders;
+
    private Action                _action_MapProvider_Next;
    private Action                _action_MapProvider_Previous;
-
    private Map2View              _map2View;
+
    private CheckboxTableViewer   _mpViewer;
    private ColumnManager         _columnManager;
+   //   private final MapProviderManager _mpMgr     = MapProviderManager.getInstance();
+   private MP                    _selectedMP;
 
-//   private final MapProviderManager _mpMgr     = MapProviderManager.getInstance();
-   private MP             _selectedMP;
-   private ArrayList<MP>  _allSortedMP;
+   private ArrayList<MP>         _allSortedMP;
+   private PixelConverter        _pc;
 
-   private PixelConverter _pc;
-
-   private boolean        _isInUpdate;
+   /** Ignore selection event */
+   private boolean               _isInUpdate;
 
    /*
     * UI controls
     */
    private Composite _parent;
+
    private Composite _viewerContainer;
    private ToolItem  _toolItem;
+
+   public class ActionOpenMapProviderPreferences extends ActionOpenPrefDialog {
+
+      public ActionOpenMapProviderPreferences(final String text, final String prefPageId) {
+         super(text, prefPageId);
+      }
+   }
 
    private class MapContentProvider implements IStructuredContentProvider {
 
@@ -168,15 +178,22 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
          /*
           * Action: Manage map providers
           */
-         _action_ManageMapProviders = new ActionOpenPrefDialog(
-               MAP_ACTION_MANAGE_MAP_PROVIDERS,
-               PrefPage_Map2_Providers.ID);
+         _action_ManageMapProviders = new ActionOpenMapProviderPreferences(MAP_ACTION_MANAGE_MAP_PROVIDERS, PrefPage_Map2_Providers.ID) {
 
-//         _action_ManageMapProviders.closeThisTooltip(this);
+            @Override
+            public void run() {
+
+               // set the currently displayed map provider so that this mp will be selected in the pref page
+               _prefStore.setValue(
+                     IMappingPreferences.MAP_FACTORY_LAST_SELECTED_MAP_PROVIDER,
+                     _map2View.getMap().getMapProvider().getId());
+
+               super.run();
+            }
+         };
+
+         _action_ManageMapProviders.closeThisTooltip(this);
          _action_ManageMapProviders.setShell(_map2View.getMap().getShell());
-
-         // set the currently displayed map provider so that this mp will be selected in the pref page
-         _prefStore.setValue(IMappingPreferences.MAP_FACTORY_LAST_SELECTED_MAP_PROVIDER, _map2View.getMap().getMapProvider().getId());
       }
 
       {
@@ -450,6 +467,16 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
    }
 
    @Override
+   protected void fillHeaderToolbar(final ToolBarManager toolbarManager) {
+
+      toolbarManager.add(_action_MapProvider_Next);
+      toolbarManager.add(_action_MapProvider_Previous);
+      toolbarManager.add(_action_ManageMapProviders);
+
+      toolbarManager.add(new Separator());
+   }
+
+   @Override
    public ColumnManager getColumnManager() {
       return _columnManager;
    }
@@ -496,8 +523,8 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
 
    @Override
    protected void onFocus() {
-      // TODO Auto-generated method stub
 
+      _mpViewer.getTable().setFocus();
    }
 
    private void onSelect_MapProvider(final SelectionChangedEvent event) {
