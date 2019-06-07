@@ -279,14 +279,14 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private boolean                                    _isToolTipInTitle;
    private boolean                                    _isToolTipInWeekDay;
    private final TourDoubleClickState                 _tourDoubleClickState      = new TourDoubleClickState();
-
    private TreeViewerTourInfoToolTip                  _tourInfoToolTip;
 
    private TagMenuManager                             _tagMenuManager;
+
    private MenuManager                                _viewerMenuManager;
    private IContextMenuProvider                       _viewerContextMenuProvider = new TreeContextMenuProvider();
-
    private ActionAdjustTemperature                    _actionAdjustTemperature;
+
    private ActionSetTimeZone                          _actionSetTimeZone;
    private ActionCollapseAll                          _actionCollapseAll;
    private ActionCollapseOthers                       _actionCollapseOthers;
@@ -318,18 +318,17 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private ActionSetPerson                            _actionSetOtherPerson;
    private ActionToggleMonthWeek                      _actionToggleMonthWeek;
    private ActionTourBookOptions                      _actionTourBookOptions;
-
    private TreeViewer                                 _tourViewer;
-   private TreeColumnDefinition                       _timeZoneOffsetColDef;
 
+   private TreeColumnDefinition                       _timeZoneOffsetColDef;
    private PixelConverter                             _pc;
 
    /*
     * UI controls
     */
    private Composite _parent;
-   private Composite _viewerContainer;
 
+   private Composite _viewerContainer;
    private Menu      _treeContextMenu;
 
    private class ActionLinkWithOtherViews extends ActionToolbarSlideout {
@@ -3126,6 +3125,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          canMergeTours = isOneTour && isDeviceTour && firstSavedTour.getMergeSourceTourId() != null;
       }
 
+      final boolean useWeatherRetrieval = _prefStore.getBoolean(ITourbookPreferences.STATE_USE_WEATHER_RETRIEVAL) &&
+            !_prefStore.getString(ITourbookPreferences.API_KEY).equals("");
+
       /*
        * enable actions
        */
@@ -3137,7 +3139,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       _actionComputeDistanceValuesFromGeoposition.setEnabled(isTourSelected);
       _actionComputeElevationGain.setEnabled(true);
-      _actionRetrieveWeatherData.setEnabled(true); //TODO We should only enable it when the API keyh is filled
+      _actionRetrieveWeatherData.setEnabled(useWeatherRetrieval);
       _actionDeleteTour.setEnabled(isTourSelected);
       _actionDuplicateTour.setEnabled(isOneTour && !isDeviceTour);
       _actionEditQuick.setEnabled(isOneTour);

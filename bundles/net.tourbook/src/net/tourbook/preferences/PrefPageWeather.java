@@ -18,15 +18,12 @@ package net.tourbook.preferences;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
-import net.tourbook.common.util.Util;
-import net.tourbook.ui.views.rawData.RawDataView;
 
-import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.layout.PixelConverter;
-import org.eclipse.jface.preference.IntegerFieldEditor;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
+import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -38,24 +35,20 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageWeather extends PreferencePage implements IWorkbenchPreferencePage {
 
-   public static final String    ID           = "net.tourbook.device.PrefPageGPX";          //$NON-NLS-1$
+   public static final String ID = "net.tourbook.preferences.PrefPageWeather"; //$NON-NLS-1$
 
-   //  private IPreferenceStore      _prefStore   = Activator.getDefault().getPreferenceStore();
-   private final IDialogSettings _importState = TourbookPlugin.getState(RawDataView.ID);
+   private final IPreferenceStore _prefStore                          = TourbookPlugin.getPrefStore();
 
-   private PixelConverter        _pc;
    /*
     * UI controls
     */
-   private Button _chkConvertWayPoints;
-   private Button _chkOneTour;
-   IntegerFieldEditor            fieldEditor;
+   private Button                _chkWeatherRetrieval;
+   private StringFieldEditor apiKeyFieldEditor;
+
+   private Composite         container;
 
    @Override
    protected Control createContents(final Composite parent) {
-
-      initUI(parent);
-
       final Composite ui = createUI(parent);
 
       restoreState();
@@ -65,49 +58,43 @@ public class PrefPageWeather extends PreferencePage implements IWorkbenchPrefere
 
    private Composite createUI(final Composite parent) {
 
-      final Composite container = new Composite(parent, SWT.NONE);
+      container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
       {
-         // checkbox: convert waypoints
+         // checkbox: use the weather retrieval feature
          {
-            _chkConvertWayPoints = new Button(container, SWT.CHECK);
-            GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkConvertWayPoints);
-            _chkConvertWayPoints.setText("Utiliser fonction meteo");//Messages.PrefPage_GPX_Checkbox_ConvertWayPoints);
-            _chkConvertWayPoints.setToolTipText("TITI");//Messages.PrefPage_GPX_Checkbox_ConvertWayPoints_Tooltip);
-
-            _chkConvertWayPoints.addSelectionListener(new SelectionAdapter() {
+            _chkWeatherRetrieval = new Button(container, SWT.CHECK);
+            GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkWeatherRetrieval);
+            _chkWeatherRetrieval.setText("Utiliser fonction meteo");//Messages.PrefPage_GPX_Checkbox_ConvertWayPoints);
+            _chkWeatherRetrieval.setToolTipText("TITI");//Messages.PrefPage_GPX_Checkbox_ConvertWayPoints_Tooltip);
+            _chkWeatherRetrieval.setSelection(_prefStore.getBoolean(ITourbookPreferences.STATE_USE_WEATHER_RETRIEVAL));
+            _chkWeatherRetrieval.addSelectionListener(new SelectionAdapter() {
                @Override
                public void widgetSelected(final SelectionEvent e) {
-                  onSelectExternalWebBrowser(container);
+                  onSelectCheckWeatherRetrieval();
                }
             });
 
 
                // text: description height
-            fieldEditor = new IntegerFieldEditor(ITourbookPreferences.TOUR_EDITOR_DESCRIPTION_HEIGHT,
+            apiKeyFieldEditor = new StringFieldEditor(ITourbookPreferences.TOUR_EDITOR_DESCRIPTION_HEIGHT,
                   "Cle API", //Messages.pref_tour_editor_description_height,
-                     container);
-               fieldEditor.setValidRange(2, 100);
-               fieldEditor.getLabelControl(container).setToolTipText(Messages.pref_tour_editor_description_height_tooltip);
-               UI.setFieldWidth(container, fieldEditor, UI.DEFAULT_FIELD_WIDTH);
+                  container);
+            apiKeyFieldEditor.setEnabled(_prefStore.getBoolean(ITourbookPreferences.STATE_USE_WEATHER_RETRIEVAL), container);
+            apiKeyFieldEditor.getLabelControl(container).setToolTipText(Messages.pref_tour_editor_description_height_tooltip);
+            apiKeyFieldEditor.setStringValue(_prefStore.getString(ITourbookPreferences.API_KEY));
+            UI.setFieldWidth(container, apiKeyFieldEditor, 320);
 //TODO add link to "Get API KEY"
-         }
-
-         // checkbox: merge all tracks into one tour
-         {
-            _chkOneTour = new Button(container, SWT.CHECK);
-            GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkOneTour);
-            _chkOneTour.setText("TATA");//Messages.PrefPage_GPX_Checkbox_OneTour);
          }
       }
 
       return container;
    }
 
-   private void enableControls(final Composite container) {
-      final boolean useExternalWebBrowser = _chkConvertWayPoints.getSelection();
-      fieldEditor.setEnabled(useExternalWebBrowser, container);
+   private void enableControls() {
+      final boolean useWeatherRetrieval = _chkWeatherRetrieval.getSelection();
+      apiKeyFieldEditor.setEnabled(useWeatherRetrieval, container);
    }
 
    @Override
@@ -115,49 +102,50 @@ public class PrefPageWeather extends PreferencePage implements IWorkbenchPrefere
       setPreferenceStore(TourbookPlugin.getDefault().getPreferenceStore());
    }
 
-   private void initUI(final Composite parent) {
-
-      _pc = new PixelConverter(parent);
-   }
-
    @Override
    public boolean okToLeave() {
       return super.okToLeave();
    }
 
-   private void onSelectExternalWebBrowser(final Composite container) {
-
-      enableControls(container);
+   private void onSelectCheckWeatherRetrieval() {
+      enableControls();
    }
 
    @Override
-   public boolean performCancel() {
-      return super.performCancel();
+   protected void performDefaults() {
+      _chkWeatherRetrieval.setSelection(ITourbookPreferences.STATE_USE_WEATHER_RETRIEVAL_DEFAULT);
+      apiKeyFieldEditor.setEnabled(ITourbookPreferences.STATE_USE_WEATHER_RETRIEVAL_DEFAULT, container);
+      apiKeyFieldEditor.setStringValue(_prefStore.getString(ITourbookPreferences.API_KEY_DEFAULT));
+
+      super.performDefaults();
    }
-
-
 
    @Override
    public boolean performOk() {
 
-      return super.performOk();
+      final boolean isOK = super.performOk();
+
+      if (isOK) {
+         saveState();
+      }
+
+      return isOK;
    }
 
    private void restoreState() {
 
-      // merge all tracks into one tour
-      final boolean isMergeIntoOneTour = Util.getStateBoolean(
-            _importState,
-            RawDataView.STATE_IS_MERGE_TRACKS,
-            RawDataView.STATE_IS_MERGE_TRACKS_DEFAULT);
-      _chkOneTour.setSelection(isMergeIntoOneTour);
+      final boolean useWeatherRetrieval = _prefStore.getBoolean(
+            ITourbookPreferences.STATE_USE_WEATHER_RETRIEVAL);
+      _chkWeatherRetrieval.setSelection(useWeatherRetrieval);
+      apiKeyFieldEditor.setStringValue(_prefStore.getString(ITourbookPreferences.API_KEY));
+   }
 
-      // convert waypoints
-      final boolean isConvertWayPoints = Util.getStateBoolean(
-            _importState,
-            RawDataView.STATE_IS_CONVERT_WAYPOINTS,
-            RawDataView.STATE_IS_CONVERT_WAYPOINTS_DEFAULT);
-      //_chkConvertWayPoints.setSelection(isConvertWayPoints);
+   private void saveState() {
+
+      final boolean useWeatherRetrieval = _chkWeatherRetrieval.getSelection();
+
+      _prefStore.setValue(ITourbookPreferences.STATE_USE_WEATHER_RETRIEVAL, useWeatherRetrieval);
+      _prefStore.setValue(ITourbookPreferences.API_KEY, apiKeyFieldEditor.getStringValue());
    }
 
 }
