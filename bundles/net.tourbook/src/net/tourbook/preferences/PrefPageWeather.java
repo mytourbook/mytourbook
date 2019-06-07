@@ -35,14 +35,14 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageWeather extends PreferencePage implements IWorkbenchPreferencePage {
 
-   public static final String ID = "net.tourbook.preferences.PrefPageWeather"; //$NON-NLS-1$
+   public static final String     ID         = "net.tourbook.preferences.PrefPageWeather"; //$NON-NLS-1$
 
-   private final IPreferenceStore _prefStore                          = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
 
    /*
     * UI controls
     */
-   private Button                _chkWeatherRetrieval;
+   private Button            _chkWeatherRetrieval;
    private StringFieldEditor apiKeyFieldEditor;
 
    private Composite         container;
@@ -66,9 +66,8 @@ public class PrefPageWeather extends PreferencePage implements IWorkbenchPrefere
          {
             _chkWeatherRetrieval = new Button(container, SWT.CHECK);
             GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkWeatherRetrieval);
-            _chkWeatherRetrieval.setText("Utiliser fonction meteo");//Messages.PrefPage_GPX_Checkbox_ConvertWayPoints);
-            _chkWeatherRetrieval.setToolTipText("TITI");//Messages.PrefPage_GPX_Checkbox_ConvertWayPoints_Tooltip);
-            _chkWeatherRetrieval.setSelection(_prefStore.getBoolean(ITourbookPreferences.STATE_USE_WEATHER_RETRIEVAL));
+            _chkWeatherRetrieval.setText(Messages.PrefPage_Weather_Checkbox_UseRetrieval);
+            _chkWeatherRetrieval.setToolTipText(Messages.PrefPage_Weather_Checkbox_UseRetrieval_Tooltip);
             _chkWeatherRetrieval.addSelectionListener(new SelectionAdapter() {
                @Override
                public void widgetSelected(final SelectionEvent e) {
@@ -76,14 +75,12 @@ public class PrefPageWeather extends PreferencePage implements IWorkbenchPrefere
                }
             });
 
-
-               // text: description height
+            // text: API Key
             apiKeyFieldEditor = new StringFieldEditor(ITourbookPreferences.TOUR_EDITOR_DESCRIPTION_HEIGHT,
-                  "Cle API", //Messages.pref_tour_editor_description_height,
+                  Messages.pref_weather_apiKey_FieldEditor,
                   container);
             apiKeyFieldEditor.setEnabled(_prefStore.getBoolean(ITourbookPreferences.STATE_USE_WEATHER_RETRIEVAL), container);
-            apiKeyFieldEditor.getLabelControl(container).setToolTipText(Messages.pref_tour_editor_description_height_tooltip);
-            apiKeyFieldEditor.setStringValue(_prefStore.getString(ITourbookPreferences.API_KEY));
+            apiKeyFieldEditor.getLabelControl(container).setToolTipText(Messages.pref_weather_apiKey_FieldEditor_tooltip);
             UI.setFieldWidth(container, apiKeyFieldEditor, 320);
 //TODO add link to "Get API KEY"
          }

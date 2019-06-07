@@ -36,7 +36,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 public class ActionRetrieveWeatherData extends Action {
-   private final ITourProvider2 _tourProvider;
+   private final ITourProvider2   _tourProvider;
    private final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
 
    public ActionRetrieveWeatherData(final ITourProvider2 tourProvider) {
@@ -65,7 +65,7 @@ public class ActionRetrieveWeatherData extends Action {
 
          MessageDialog.openInformation(
                shell,
-               Messages.Dialog_AdjustTemperature_Dialog_Title,
+               Messages.Dialog_RetrieveWeather_Dialog_Title,
                Messages.UI_Label_TourIsNotSelected);
 
          return;
@@ -77,10 +77,18 @@ public class ActionRetrieveWeatherData extends Action {
             .where(startPoint)
             .when(DateTimeFormatter.ofPattern("yyyy-MM-dd").format(selectedTours.get(0).getTourStartTime()),
                   selectedTours.get(0).getStartTimeOfDay() / 3600)
-            .forUser(_prefStore.getString(ITourbookPreferences.API_KEY))//"76fe454d0cc3475886c231449192305")//Settings.getToken())
+            .forUser(_prefStore.getString(ITourbookPreferences.API_KEY))
             .retrieve();
 
       final WeatherData historicalWeatherData = historicalWeatherRetriever.getHistoricalWeatherData();
+      if (historicalWeatherData == null) {
+         MessageDialog.openInformation(
+               shell,
+               Messages.Dialog_RetrieveWeather_Dialog_Title,
+               Messages.UI_Label_TourIsNotSelected);
+
+         return;
+      }
 
       // For the request, get the half-point of the route just like in CG
       for (final TourData tour : selectedTours) {
