@@ -25,16 +25,27 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WWOWeatherResults {
 
-   private String maxtempC;
+   private String                 maxtempC;
 
-   private String mintempC;
+   private String                 mintempC;
 
-   private String avgtempC;
+   private String                 avgtempC;
+
+   private String                 maxtempF;
+
+   private String                 mintempF;
+
+   private String                 avgtempF;
+
 
    private List<WWOHourlyResults> hourly;
 
    public String getavgtempC() {
       return avgtempC;
+   }
+
+   public String getAvgtempF() {
+      return avgtempF;
    }
 
    public List<WWOHourlyResults> gethourly() {
@@ -45,8 +56,16 @@ public class WWOWeatherResults {
       return maxtempC;
    }
 
+   public String getMaxtempF() {
+      return maxtempF;
+   }
+
    public String getmintempC() {
       return mintempC;
+   }
+
+   public String getMintempF() {
+      return mintempF;
    }
 
 /*

@@ -41,6 +41,12 @@ public class WWOHourlyResults {
    private String                 FeelsLikeF;
 
    private String                 tempC;
+   private String                 pressure;
+   private String                 humidity;
+   private String                 pressureInches;
+
+   private String                 precipMM;
+   private String                 precipInches;
 
    public String getFeelsLikeC() {
       return FeelsLikeC;
@@ -48,6 +54,26 @@ public class WWOHourlyResults {
 
    public String getFeelsLikeF() {
       return FeelsLikeF;
+   }
+
+   public String getHumidity() {
+      return humidity;
+   }
+
+   public String getPrecipInches() {
+      return precipInches;
+   }
+
+   public String getPrecipMM() {
+      return precipMM;
+   }
+
+   public String getPressure() {
+      return pressure;
+   }
+
+   public String getPressureInches() {
+      return pressureInches;
    }
 
    public String getTempC() {
@@ -66,7 +92,7 @@ public class WWOHourlyResults {
       return weatherDesc;
    }
 
-   public String getWeatherDescription() {
+   public String getWeatherDescription(final WWOWeatherResults weatherResults) {
       final StringBuilder weatherDescription = new StringBuilder(weatherDesc.get(0).getValue());
 
       weatherDescription.append(", Wind Chill: ");
@@ -78,6 +104,59 @@ public class WWOHourlyResults {
          weatherDescription.append(FeelsLikeF != null ? FeelsLikeF : "--");
          weatherDescription.append(" °F");
       }
+
+      //Max temp
+      weatherDescription.append(", Max: ");
+      if (UI.UNIT_VALUE_TEMPERATURE == 1) { // Metric
+         weatherDescription.append(weatherResults.getmaxtempC() != null ? weatherResults.getmaxtempC() : "--");
+         weatherDescription.append(" °C");
+      } else // Imperial
+      {
+         weatherDescription.append(weatherResults.getMaxtempF() != null ? weatherResults.getMaxtempF() : "--");
+         weatherDescription.append(" °F");
+      }
+
+      //Min temp
+      weatherDescription.append(", Min: ");
+      if (UI.UNIT_VALUE_TEMPERATURE == 1) { // Metric
+         weatherDescription.append(weatherResults.getmintempC() != null ? weatherResults.getmintempC() : "--");
+         weatherDescription.append(" °C");
+      } else // Imperial
+      {
+         weatherDescription.append(weatherResults.getMintempF() != null ? weatherResults.getMintempF() : "--");
+         weatherDescription.append(" °F");
+      }
+
+      //Precipitation
+      weatherDescription.append(", Precip: ");
+
+      //TODO write a functio that does all that
+      // externalize
+
+      if (UI.UNIT_VALUE_TEMPERATURE == 1) { // Metric
+         weatherDescription.append(precipMM != null ? precipMM : "--");
+         weatherDescription.append(" mm");
+      } else // Imperial
+      {
+         weatherDescription.append(precipInches != null ? precipInches : "--");
+         weatherDescription.append(" in");
+      }
+
+      //Pressure
+      weatherDescription.append(", Pressure: ");
+      if (UI.UNIT_VALUE_TEMPERATURE == 1) { // Metric
+         weatherDescription.append(pressure != null ? pressure : "--");
+         weatherDescription.append(" mbar");
+      } else // Imperial
+      {
+         weatherDescription.append(pressureInches != null ? pressureInches : "--");
+         weatherDescription.append(" in");
+      }
+
+      //Humidity
+      weatherDescription.append(", Humidity: ");
+      weatherDescription.append(humidity != null ? humidity : "--");
+      weatherDescription.append("%");
 
       return weatherDescription.toString();
    }

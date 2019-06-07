@@ -86,7 +86,7 @@ public class HistoricalWeatherRetriever {
       final WeatherData weatherData = new WeatherData();
       try {
          final ObjectMapper mapper = new ObjectMapper();
-         final String weatherResults = mapper.readValue(weatherDataResponse, JsonNode.class).get("data").get("weather").get(0).toString(); //$NON-NLS-1$
+         final String weatherResults = mapper.readValue(weatherDataResponse, JsonNode.class).get("data").get("weather").get(0).toString(); //$NON-NLS-1$ //$NON-NLS-2$
 
          final WWOWeatherResults rawWeatherData = mapper.readValue(weatherResults, WWOWeatherResults.class);
 
@@ -96,7 +96,7 @@ public class HistoricalWeatherRetriever {
             if (hourlyData.gettime().equals(startTimeOfDay)) {
                weatherData.setWindDirection(Integer.parseInt(hourlyData.getWinddirDegree()));
                weatherData.setWindSpeed(Integer.parseInt(hourlyData.getWindspeedKmph()));
-               weatherData.setWeatherDescription(hourlyData.getWeatherDescription());
+               weatherData.setWeatherDescription(hourlyData.getWeatherDescription(rawWeatherData));
                weatherData.setWeatherType(hourlyData.getWeatherCode());
                break;
             }
@@ -123,15 +123,16 @@ public class HistoricalWeatherRetriever {
    private String processRequest() {
       final StringBuffer weatherHistory = new StringBuffer();
       final String weatherRequestParameters = apiUrl + apiKey + "&q=" + searchAreaCenter.getLatitude() + "," + searchAreaCenter.getLongitude() //$NON-NLS-1$//$NON-NLS-2$
-            + "&date=" + startDate + "&tp=1&format=json"; //$NON-NLS-1$
+            + "&date=" + startDate + "&tp=1&format=json"; //$NON-NLS-1$ //$NON-NLS-2$
       //tp=1 : Specifies the weather forecast time interval in hours. Here, every 1 hour
 
+      BufferedReader rd = null;
       try {
          final HttpClient client = HttpClientBuilder.create().build();
          final HttpGet request = new HttpGet(weatherRequestParameters);
          final HttpResponse response = client.execute(request);
 
-         final BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+         rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
 
          String line = ""; //$NON-NLS-1$
          while ((line = rd.readLine()) != null) {
@@ -141,7 +142,20 @@ public class HistoricalWeatherRetriever {
          StatusUtil.log(
                "WeatherHistoryRetriever.processRequest : Error while executing the historical weather request with the parameters " //$NON-NLS-1$
                      + weatherRequestParameters + "\n" + ex.getMessage()); //$NON-NLS-1$
+         return ""; //$NON-NLS-1$
+      } finally {
+         try {
+            // close resources
+            if (rd != null) {
+               rd.close();
+            }
+
+         } catch (final IOException e) {
+            e.printStackTrace();
+         }
       }
+
+
       return weatherHistory.toString();
    }
 
@@ -166,7 +180,7 @@ public class HistoricalWeatherRetriever {
    private WeatherData retrieveHistoricalWeatherData() {
 
       final String rawWeatherData = processRequest();
-      if (!rawWeatherData.contains("weather")) {
+      if (!rawWeatherData.contains("weather")) { //$NON-NLS-1$
          return null;
       }
       final WeatherData historicalWeatherData = parseWeatherData(rawWeatherData);
@@ -179,7 +193,7 @@ public class HistoricalWeatherRetriever {
     */
    public HistoricalWeatherRetriever when(final String dateTime, final int startTimeOfDay) {
       this.startDate = dateTime;
-      this.startTimeOfDay = startTimeOfDay + "00";
+      this.startTimeOfDay = startTimeOfDay + "00"; //$NON-NLS-1$
       return this;
    }
 }
