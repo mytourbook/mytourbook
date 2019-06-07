@@ -37,7 +37,6 @@ public class WWOWeatherResults {
 
    private String                 avgtempF;
 
-
    private List<WWOHourlyResults> hourly;
 
    public String getavgtempC() {

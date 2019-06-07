@@ -155,7 +155,6 @@ public class HistoricalWeatherRetriever {
          }
       }
 
-
       return weatherHistory.toString();
    }
 
