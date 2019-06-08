@@ -84,7 +84,6 @@ import net.tourbook.map2.action.ActionMap2_MapProvider;
 import net.tourbook.map2.action.ActionPhotoProperties;
 import net.tourbook.map2.action.ActionReloadFailedMapImages;
 import net.tourbook.map2.action.ActionSaveDefaultPosition;
-import net.tourbook.map2.action.ActionSelectMapProvider;
 import net.tourbook.map2.action.ActionSetDefaultPosition;
 import net.tourbook.map2.action.ActionShowAllFilteredPhotos;
 import net.tourbook.map2.action.ActionShowLegendInMap;
@@ -160,7 +159,6 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
@@ -438,7 +436,6 @@ public class Map2View extends ViewPart implements
    private ActionReloadFailedMapImages    _actionReloadFailedMapImages;
    private ActionSaveDefaultPosition      _actionSaveDefaultPosition;
    private ActionSearchTourByLocation     _actionSearchTourByLocation;
-   private ActionSelectMapProvider        _actionSelectMapProvider;
    private ActionSetDefaultPosition       _actionSetDefaultPosition;
    private ActionShowAllFilteredPhotos    _actionShowAllFilteredPhotos;
    private ActionShowLegendInMap          _actionShowLegendInMap;
@@ -709,15 +706,6 @@ public class Map2View extends ViewPart implements
          _mapDimColor = dimColor;
 
          _map.dimMap(_mapDimLevel, dimColor);
-      }
-   }
-
-   public void actionOpenMapProviderDialog() {
-
-      final DialogModifyMapProvider dialog = new DialogModifyMapProvider(Display.getCurrent().getActiveShell());
-
-      if (dialog.open() == Window.OK) {
-         _actionSelectMapProvider.updateMapProviders();
       }
    }
 
@@ -1469,7 +1457,6 @@ public class Map2View extends ViewPart implements
       _actionMap2_MapProvider = new ActionMap2_MapProvider(this, _state);
       _actionMap2_Options = new ActionMap2_Options();
       _actionSearchTourByLocation = new ActionSearchTourByLocation();
-      _actionSelectMapProvider = new ActionSelectMapProvider(this);
       _actionSetDefaultPosition = new ActionSetDefaultPosition(this);
       _actionSaveDefaultPosition = new ActionSaveDefaultPosition(this);
 
@@ -1912,7 +1899,6 @@ public class Map2View extends ViewPart implements
       tbm.add(new Separator());
 
       tbm.add(_actionMap2_MapProvider);
-      tbm.add(_actionSelectMapProvider);
       tbm.add(_actionMap2_Options);
 
       /*
@@ -3447,7 +3433,7 @@ public class Map2View extends ViewPart implements
       _actionShowSliderInLegend.setChecked(_state.getBoolean(MEMENTO_SHOW_SLIDER_IN_LEGEND));
 
       // restore map provider by selecting the last used map factory
-      _actionSelectMapProvider.selectMapProvider(_state.get(MEMENTO_SELECTED_MAP_PROVIDER_ID));
+      _actionMap2_MapProvider.selectMapProvider(_state.get(MEMENTO_SELECTED_MAP_PROVIDER_ID));
 
       _actionPhotoFilter.restoreState();
 
@@ -3680,7 +3666,7 @@ public class Map2View extends ViewPart implements
       _state.put(MEMENTO_SHOW_TOUR_INFO_IN_MAP, _actionShowTourInfoInMap.isChecked());
       _state.put(MEMENTO_SHOW_WAY_POINTS, _actionShowWayPoints.isChecked());
 
-      _state.put(MEMENTO_SELECTED_MAP_PROVIDER_ID, _actionSelectMapProvider.getSelectedMapProvider().getId());
+      _state.put(MEMENTO_SELECTED_MAP_PROVIDER_ID, _actionMap2_MapProvider.getSelectedMapProvider().getId());
 
       if (_defaultPosition == null) {
 

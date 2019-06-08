@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.map2.action;
 
+import de.byteholder.geoclipse.mapprovider.MP;
+
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.tooltip.ActionToolbarSlideoutAdv;
 import net.tourbook.common.tooltip.AdvancedSlideout;
@@ -37,7 +39,6 @@ public class ActionMap2_MapProvider extends ActionToolbarSlideoutAdv {
 
    private Map2View                     _map2View;
 
-
    public ActionMap2_MapProvider(final Map2View map2View, final IDialogSettings state) {
 
       super(_actionImageDescriptor, _actionImageDescriptor);
@@ -54,6 +55,16 @@ public class ActionMap2_MapProvider extends ActionToolbarSlideoutAdv {
       _slideoutMap2MapProvider.setSlideoutLocation(SlideoutLocation.BELOW_RIGHT);
 
       return _slideoutMap2MapProvider;
+   }
+
+   public MP getSelectedMapProvider() {
+
+      return _slideoutMap2MapProvider.getSelectedMapProvider();
+   }
+
+   public void selectMapProvider(final String mapProviderID) {
+
+      _slideoutMap2MapProvider.selectMapProvider(mapProviderID);
    }
 
 }
