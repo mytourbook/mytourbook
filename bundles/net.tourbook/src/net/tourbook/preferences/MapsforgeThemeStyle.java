@@ -42,19 +42,25 @@ public class MapsforgeThemeStyle {
     * getting a local name of the mapstyle
     *
     * @param language
-    *           string like "en"
+    *           string like "en" or "en_EN"
     * @return a String with the local name like "hiking"
     */
    public String getName(final String language) {
-
       if ("default".equals(language)) { //$NON-NLS-1$
          return name.get(defaultlanguage);
+      } else if(language.length() > 2) { //eg, when using "en_EN, then using only first 2 chars"
+         if (name.containsKey(language.substring(0, 2))) {        
+            return name.get(language.substring(0, 2));
+         } else { //is already short like "en"
+            return name.get(language);
+         }
       } else if (name.containsKey(language)) {
          return name.get(language);
       } else {
          return name.get(defaultlanguage);
       }
    }
+   
 
    /**
     * get the style name like

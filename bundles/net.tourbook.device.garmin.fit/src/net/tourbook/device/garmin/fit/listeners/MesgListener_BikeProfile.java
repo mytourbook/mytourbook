@@ -18,6 +18,8 @@ package net.tourbook.device.garmin.fit.listeners;
 import com.garmin.fit.BikeProfileMesg;
 import com.garmin.fit.BikeProfileMesgListener;
 
+import net.tourbook.device.garmin.fit.FitData;
+
 public class MesgListener_BikeProfile extends AbstractMesgListener implements BikeProfileMesgListener {
 
 //   private static final String NL = "\n";//$NON-NLS-1$

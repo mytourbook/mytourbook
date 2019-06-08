@@ -1738,6 +1738,26 @@ public class Util {
     *
     * @param attributes
     * @param attributeName
+    * @return Returns a float value or 0 when attribute is not available or cannot be parsed.
+    */
+   public static float parseFloat0(final Attributes attributes, final String attributeName) {
+
+      try {
+         final String valueString = attributes.getValue(attributeName);
+         if (valueString != null) {
+            return Float.parseFloat(valueString);
+         }
+      } catch (final NumberFormatException e) {
+         // do nothing
+      }
+      return 0;
+   }
+
+   /**
+    * Parses SAX attribute
+    *
+    * @param attributes
+    * @param attributeName
     * @return Returns integer value or {@link Integer#MIN_VALUE} when attribute is not available or
     *         cannot be parsed.
     */
@@ -1769,27 +1789,10 @@ public class Util {
             return Integer.parseInt(valueString);
          }
       } catch (final NumberFormatException e) {
-         // do nothing
-      }
-      return 0;
-   }
-
-   /**
-    * Parses SAX attribute
-    *
-    * @param attributes
-    * @param attributeName
-    * @return Returns a float value or 0 when attribute is not available or cannot be parsed.
-    */
-   public static float parseFloat0(final Attributes attributes, final String attributeName) {
-
-      try {
-         final String valueString = attributes.getValue(attributeName);
-         if (valueString != null) {
-            return Float.parseFloat(valueString);
-         }
-      } catch (final NumberFormatException e) {
-         // do nothing
+         
+         // try to parse as float value
+         
+         return (int) parseFloat0(attributes, attributeName);
       }
       return 0;
    }

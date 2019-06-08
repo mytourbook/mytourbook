@@ -24,6 +24,7 @@ import java.time.ZonedDateTime;
 
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.data.TourData;
+import net.tourbook.device.garmin.fit.FitData;
 import net.tourbook.device.garmin.fit.FitDataReaderException;
 
 public class MesgListener_Session extends AbstractMesgListener implements SessionMesgListener {
@@ -48,7 +49,7 @@ public class MesgListener_Session extends AbstractMesgListener implements Sessio
 //
 // !!!!
 //      This problem is corrected in FIT SDK 14.10 but it took me several days to investigate it
-//		and then came the idea to check for a new FIT SDK which solved this problem.
+//    and then came the idea to check for a new FIT SDK which solved this problem.
 // !!!!
 
       final ZonedDateTime tourStartTime = TimeTools.getZonedDateTime(startTime.getDate().getTime());
@@ -162,6 +163,18 @@ public class MesgListener_Session extends AbstractMesgListener implements Sessio
       final Integer ftp = mesg.getThresholdPower();
       if (ftp != null) {
          tourData.setPower_FTP(ftp);
+      }
+
+      // -----------------------TRAINING -----------------------
+
+      final Float totalTrainingEffect = mesg.getTotalTrainingEffect();
+      if (totalTrainingEffect != null) {
+         tourData.setTraining_TrainingEffect_Aerob(totalTrainingEffect);
+      }
+
+      final Float totalAnaerobicTrainingEffect = mesg.getTotalAnaerobicTrainingEffect();
+      if (totalAnaerobicTrainingEffect != null) {
+         tourData.setTraining_TrainingEffect_Anaerob(totalAnaerobicTrainingEffect);
       }
 
       fitData.onSetup_Session_20_Finalize();

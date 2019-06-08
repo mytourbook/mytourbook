@@ -142,6 +142,7 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
             _chkIgnoreInvalidFile.setText(Messages.PrefPage_Import_Checkbox_IgnoreInvalidFiles);
             _chkIgnoreInvalidFile.addSelectionListener(_defaultSelectionListener);
             GridDataFactory.fillDefaults()
+                  .indent(0, 10)
                   .applyTo(_chkIgnoreInvalidFile);
          }
          {

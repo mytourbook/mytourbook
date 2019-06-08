@@ -942,13 +942,15 @@ public class ColumnManager {
 
                   contextMenu = getContextMenu(isTableHeaderHit, headerContextMenu[0], defaultContextMenuProvider);
 
-                  StatusUtil.log("Table header context menu has had the wrong parent and is recreated.");
+                  StatusUtil.log("Table header context menu has had the wrong parent and is recreated."); //$NON-NLS-1$
 
-               } else if (contextMenu == defaultContextMenuProvider.getContextMenu() && contextMenu.getShell() != table.getShell()) {
+               } else if (defaultContextMenuProvider != null
+                     && contextMenu == defaultContextMenuProvider.getContextMenu()
+                     && contextMenu.getShell() != table.getShell()) {
 
                   contextMenu = defaultContextMenuProvider.recreateContextMenu();
 
-                  StatusUtil.log("Table context menu has had the wrong parent and is recreated.");
+                  StatusUtil.log("Table context menu has had the wrong parent and is recreated."); //$NON-NLS-1$
                }
             }
 
@@ -1067,13 +1069,15 @@ public class ColumnManager {
 
                   contextMenu = getContextMenu(isTreeHeaderHit, headerContextMenu[0], defaultContextMenuProvider);
 
-                  StatusUtil.log("Tree header context menu has had the wrong parent and is recreated.");
+                  StatusUtil.log("Tree header context menu has had the wrong parent and is recreated."); //$NON-NLS-1$
 
-               } else if (contextMenu == defaultContextMenuProvider.getContextMenu() && contextMenu.getShell() != tree.getShell()) {
+               } else if (defaultContextMenuProvider != null
+                     && contextMenu == defaultContextMenuProvider.getContextMenu()
+                     && contextMenu.getShell() != tree.getShell()) {
 
                   contextMenu = defaultContextMenuProvider.recreateContextMenu();
 
-                  StatusUtil.log("Tree context menu has had the wrong parent and is recreated.");
+                  StatusUtil.log("Tree context menu has had the wrong parent and is recreated."); //$NON-NLS-1$
                }
             }
 
@@ -1342,7 +1346,9 @@ public class ColumnManager {
 
       } else {
 
-         contextMenu = defaultContextMenuProvider.getContextMenu();
+         contextMenu = defaultContextMenuProvider != null
+               ? defaultContextMenuProvider.getContextMenu()
+               : null;
       }
 
       return contextMenu;

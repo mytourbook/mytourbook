@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,24 +15,28 @@
  *******************************************************************************/
 package de.byteholder.geoclipse.mapprovider;
 
+import de.byteholder.geoclipse.map.Tile;
+
+import net.tourbook.application.ApplicationVersion;
+
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
-import de.byteholder.geoclipse.map.Tile;
-
 class OSMMapProvider extends MPPlugin {
 
-   static final String         FACTORY_ID     = "osm";                                //$NON-NLS-1$
-   private static final String OFFLINE_FOLDER = "osm";                                //$NON-NLS-1$
-   private static final String FACTORY_NAME   = "OpenStreetMap";                      //$NON-NLS-1$
+   static final String         FACTORY_ID     = "osm";                                                 //$NON-NLS-1$
+   private static final String OFFLINE_FOLDER = "osm";                                                 //$NON-NLS-1$
+   private static final String FACTORY_NAME   = "OpenStreetMap";                                       //$NON-NLS-1$
 
-   private static final String SEPARATOR      = "/";                                  //$NON-NLS-1$
+   private static final String SEPARATOR      = "/";                                                   //$NON-NLS-1$
 
    private static final int    MIN_ZOOM       = 0;
    private static final int    MAX_ZOOM       = 19;
 
-   private static final String BASE_URL       = "http://tile.openstreetmap.org";      //$NON-NLS-1$
+   private static final String BASE_URL       = "http://tile.openstreetmap.org";                       //$NON-NLS-1$
    private static final String FILE_EXT       = MapProviderManager.FILE_EXTENSION_PNG;
+
+   private String              _userAgent     = "MyTourbook/" + ApplicationVersion.getVersionSimple(); //$NON-NLS-1$
 
    public OSMMapProvider() {
 
@@ -87,5 +91,10 @@ class OSMMapProvider extends MPPlugin {
             .append('.')
             .append(FILE_EXT)
             .toString();
+   }
+
+   @Override
+   public String getUserAgent() {
+      return _userAgent;
    }
 }

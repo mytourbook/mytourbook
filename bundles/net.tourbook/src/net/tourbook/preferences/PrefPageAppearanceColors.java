@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,6 +18,24 @@ package net.tourbook.preferences;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.color.ColorDefinition;
+import net.tourbook.common.color.ColorProviderConfig;
+import net.tourbook.common.color.ColorValue;
+import net.tourbook.common.color.GraphColorItem;
+import net.tourbook.common.color.GraphColorManager;
+import net.tourbook.common.color.IGradientColorProvider;
+import net.tourbook.common.color.Map2ColorProfile;
+import net.tourbook.common.color.Map2GradientColorProvider;
+import net.tourbook.common.color.MapGraphId;
+import net.tourbook.common.color.MapUnits;
+import net.tourbook.map.MapColorProvider;
+import net.tourbook.map2.view.DialogMap2ColorEditor;
+import net.tourbook.map2.view.IMap2ColorUpdater;
+import net.tourbook.ui.UI;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -56,720 +74,704 @@ import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.CommonActivator;
-import net.tourbook.common.color.ColorDefinition;
-import net.tourbook.common.color.ColorProviderConfig;
-import net.tourbook.common.color.ColorValue;
-import net.tourbook.common.color.GraphColorItem;
-import net.tourbook.common.color.GraphColorManager;
-import net.tourbook.common.color.IGradientColorProvider;
-import net.tourbook.common.color.Map2ColorProfile;
-import net.tourbook.common.color.Map2GradientColorProvider;
-import net.tourbook.common.color.MapGraphId;
-import net.tourbook.common.color.MapUnits;
-import net.tourbook.map.MapColorProvider;
-import net.tourbook.map2.view.DialogMap2ColorEditor;
-import net.tourbook.map2.view.IMap2ColorUpdater;
-import net.tourbook.ui.UI;
-
-public class PrefPageAppearanceColors extends PreferencePage implements IWorkbenchPreferencePage, IColorTreeViewer,
-		IMap2ColorUpdater {
-
-	public static final String ID = "net.tourbook.preferences.PrefPageChartColors"; //$NON-NLS-1$
-
-	/*
-	 * Legend is created with dummy values 0...200.
-	 */
-	private static final int				LEGEND_MIN_VALUE			= 0;
-	private static final int				LEGEND_MAX_VALUE			= 200;
-
-	private static ColorValue[]			_legendImageColors		= new ColorValue[] {
-			new ColorValue(10, 255, 0, 0),
-			new ColorValue(50, 100, 100, 0),
-			new ColorValue(100, 0, 255, 0),
-			new ColorValue(150, 0, 100, 100),
-			new ColorValue(190, 0, 0, 255) };
-
-	private static final List<Float>		_legendImageUnitValues	= Arrays.asList(
-			10f,
-			50f,
-			100f,
-			150f,
-			190f);
-
-	private static final List<String>	_legendImageUnitLabels	= Arrays.asList(
-			Messages.Pref_ChartColors_unit_min,
-			Messages.Pref_ChartColors_unit_low,
-			Messages.Pref_ChartColors_unit_mid,
-			Messages.Pref_ChartColors_unit_high,
-			Messages.Pref_ChartColors_unit_max);
-
-	private final IPreferenceStore		_prefStore					= TourbookPlugin.getDefault().getPreferenceStore();
-	private final IPreferenceStore		_commonPrefStore			= CommonActivator.getPrefStore();
-
-	TreeViewer									_colorViewer;
-
-	private GraphColorItem					_selectedColor;
-	private boolean							_isColorChanged;
-
-	private ColorDefinition					_expandedItem;
-
-	private IGradientColorProvider		_legendImageColorProvider;
-	private DialogMap2ColorEditor			_dialogMappingColor;
-	private GraphColorPainter				_graphColorPainter;
-
-	/*
-	 * UI controls
-	 */
-	private Button				_btnLegend;
-	private Button				_chkLiveUpdate;
-
-	private ColorSelector	_colorSelector;
-
-	/**
-	 * the color content provider has the following structure<br>
-	 *
-	 * <pre>
-	 * {@link ColorDefinition}
-	 *    {@link GraphColorItem}
-	 *    {@link GraphColorItem}
-	 *    ...
-	 *    {@link GraphColorItem}
-	 *
-	 *    ...
-	 *
-	 * {@link ColorDefinition}
-	 *    {@link GraphColorItem}
-	 *    {@link GraphColorItem}
-	 *    ...
-	 *    {@link GraphColorItem}
-	 * </pre>
-	 */
-	private static class ColorContentProvider implements ITreeContentProvider {
-
-		@Override
-		public void dispose() {}
-
-		@Override
-		public Object[] getChildren(final Object parentElement) {
-			if (parentElement instanceof ColorDefinition) {
-				final ColorDefinition graphDefinition = (ColorDefinition) parentElement;
-				return graphDefinition.getGraphColorItems();
-			}
-			return null;
-		}
+public class PrefPageAppearanceColors extends PreferencePage implements
+      IWorkbenchPreferencePage,
+      IColorTreeViewer,
+      IMap2ColorUpdater {
+
+   public static final String ID = "net.tourbook.preferences.PrefPageChartColors"; //$NON-NLS-1$
+
+   /*
+    * Legend is created with dummy values 0...200.
+    */
+   private static final int          LEGEND_MIN_VALUE       = 0;
+   private static final int          LEGEND_MAX_VALUE       = 200;
+
+   private static ColorValue[]       _legendImageColors     = new ColorValue[] {
+         new ColorValue(10, 255, 0, 0),
+         new ColorValue(50, 100, 100, 0),
+         new ColorValue(100, 0, 255, 0),
+         new ColorValue(150, 0, 100, 100),
+         new ColorValue(190, 0, 0, 255) };
+
+   private static final List<Float>  _legendImageUnitValues = Arrays.asList(
+         10f,
+         50f,
+         100f,
+         150f,
+         190f);
+
+   private static final List<String> _legendImageUnitLabels = Arrays.asList(
+         Messages.Pref_ChartColors_unit_min,
+         Messages.Pref_ChartColors_unit_low,
+         Messages.Pref_ChartColors_unit_mid,
+         Messages.Pref_ChartColors_unit_high,
+         Messages.Pref_ChartColors_unit_max);
+
+   private final IPreferenceStore    _prefStore             = TourbookPlugin.getDefault().getPreferenceStore();
+   private final IPreferenceStore    _commonPrefStore       = CommonActivator.getPrefStore();
+
+   TreeViewer                        _colorViewer;
+
+   private GraphColorItem            _selectedColor;
+   private boolean                   _isColorChanged;
+
+   private ColorDefinition           _expandedItem;
+
+   private IGradientColorProvider    _legendImageColorProvider;
+   private DialogMap2ColorEditor     _dialogMappingColor;
+   private GraphColorPainter         _graphColorPainter;
+
+   /*
+    * UI controls
+    */
+   private Button        _btnLegend;
+   private Button        _chkLiveUpdate;
+
+   private ColorSelector _colorSelector;
+
+   /**
+    * the color content provider has the following structure<br>
+    *
+    * <pre>
+    * {@link ColorDefinition}
+    *    {@link GraphColorItem}
+    *    {@link GraphColorItem}
+    *    ...
+    *    {@link GraphColorItem}
+    *
+    *    ...
+    *
+    * {@link ColorDefinition}
+    *    {@link GraphColorItem}
+    *    {@link GraphColorItem}
+    *    ...
+    *    {@link GraphColorItem}
+    * </pre>
+    */
+   private static class ColorContentProvider implements ITreeContentProvider {
+
+      @Override
+      public void dispose() {}
+
+      @Override
+      public Object[] getChildren(final Object parentElement) {
+         if (parentElement instanceof ColorDefinition) {
+            final ColorDefinition graphDefinition = (ColorDefinition) parentElement;
+            return graphDefinition.getGraphColorItems();
+         }
+         return null;
+      }
+
+      @Override
+      public Object[] getElements(final Object inputElement) {
+         if (inputElement instanceof PrefPageAppearanceColors) {
+            return GraphColorManager.getInstance().getGraphColorDefinitions();
+         }
+         return null;
+      }
+
+      @Override
+      public Object getParent(final Object element) {
+         return null;
+      }
 
-		@Override
-		public Object[] getElements(final Object inputElement) {
-			if (inputElement instanceof PrefPageAppearanceColors) {
-				return GraphColorManager.getInstance().getGraphColorDefinitions();
-			}
-			return null;
-		}
+      @Override
+      public boolean hasChildren(final Object element) {
+         if (element instanceof ColorDefinition) {
+            return true;
+         }
+         return false;
+      }
 
-		@Override
-		public Object getParent(final Object element) {
-			return null;
-		}
+      @Override
+      public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
 
-		@Override
-		public boolean hasChildren(final Object element) {
-			if (element instanceof ColorDefinition) {
-				return true;
-			}
-			return false;
-		}
+   }
 
-		@Override
-		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
+   public static Map2GradientColorProvider createMap2ColorProvider() {
 
-	}
+      final Map2GradientColorProvider colorProvider = new Map2GradientColorProvider(MapGraphId.Altitude);
 
-	public static Map2GradientColorProvider createMap2ColorProvider() {
+      final Map2ColorProfile colorProfile = colorProvider.getColorProfile();
+      colorProfile.setColorValues(_legendImageColors);
 
-		final Map2GradientColorProvider colorProvider = new Map2GradientColorProvider(MapGraphId.Altitude);
+      // update legend configuations
+      final MapUnits mapUnits = colorProvider.getMapUnits(ColorProviderConfig.MAP3_PROFILE);
 
-		final Map2ColorProfile colorProfile = colorProvider.getColorProfile();
-		colorProfile.setColorValues(_legendImageColors);
+      mapUnits.units = _legendImageUnitValues;
+      mapUnits.unitLabels = _legendImageUnitLabels;
+      mapUnits.unitText = UI.EMPTY_STRING;
 
-		// update legend configuations
-		final MapUnits mapUnits = colorProvider.getMapUnits(ColorProviderConfig.MAP3_PROFILE);
+      mapUnits.legendMinValue = LEGEND_MIN_VALUE;
+      mapUnits.legendMaxValue = LEGEND_MAX_VALUE;
 
-		mapUnits.units = _legendImageUnitValues;
-		mapUnits.unitLabels = _legendImageUnitLabels;
-		mapUnits.unitText = UI.EMPTY_STRING;
+      return colorProvider;
+   }
 
-		mapUnits.legendMinValue = LEGEND_MIN_VALUE;
-		mapUnits.legendMaxValue = LEGEND_MAX_VALUE;
+   @Override
+   public void applyMapColors(final Map2ColorProfile newMapColor) {
 
-		return colorProvider;
-	}
+      updateColorsFromDialog(_selectedColor.getColorDefinition(), newMapColor);
 
-	@Override
-	public void applyMapColors(final Map2ColorProfile newMapColor) {
+      updateAndSaveColors();
+   }
 
-		updateColorsFromDialog(_selectedColor.getColorDefinition(), newMapColor);
+   /**
+    * create color objects for every graph definition
+    */
+   private void createColorDefinitions() {
 
-		updateAndSaveColors();
-	}
+      final String[][] colorNames = GraphColorManager.colorNames;
+      final ColorDefinition[] graphColorDefinitions = GraphColorManager.getInstance().getGraphColorDefinitions();
 
-	/**
-	 * create color objects for every graph definition
-	 */
-	private void createColorDefinitions() {
+      for (final ColorDefinition colorDefinition : graphColorDefinitions) {
 
-		final String[][] colorNames = GraphColorManager.colorNames;
-		final ColorDefinition[] graphColorDefinitions = GraphColorManager.getInstance().getGraphColorDefinitions();
+         final ArrayList<GraphColorItem> graphColors = new ArrayList<>();
 
-		for (final ColorDefinition colorDefinition : graphColorDefinitions) {
+         final boolean isMapColorAvailable = colorDefinition.getMap2Color_Active() != null;
 
-			final ArrayList<GraphColorItem> graphColors = new ArrayList<>();
+         for (final String[] colorName : colorNames) {
 
-			final boolean isMapColorAvailable = colorDefinition.getMap2Color_Active() != null;
+            if (colorName[0] == GraphColorManager.PREF_COLOR_MAPPING) {
+               if (isMapColorAvailable) {
+                  // create map color
+                  graphColors.add(new GraphColorItem(colorDefinition, colorName[0], colorName[1], true));
+               }
+            } else {
+               graphColors.add(new GraphColorItem(colorDefinition, colorName[0], colorName[1], false));
+            }
+         }
 
-			for (final String[] colorName : colorNames) {
+         colorDefinition.setColorNames(graphColors.toArray(new GraphColorItem[graphColors.size()]));
+      }
+   }
 
-				if (colorName[0] == GraphColorManager.PREF_COLOR_MAPPING) {
-					if (isMapColorAvailable) {
-						// create map color
-						graphColors.add(new GraphColorItem(colorDefinition, colorName[0], colorName[1], true));
-					}
-				} else {
-					graphColors.add(new GraphColorItem(colorDefinition, colorName[0], colorName[1], false));
-				}
-			}
+   @Override
+   protected Control createContents(final Composite parent) {
 
-			colorDefinition.setColorNames(graphColors.toArray(new GraphColorItem[graphColors.size()]));
-		}
-	}
+      createColorDefinitions();
 
-	@Override
-	protected Control createContents(final Composite parent) {
+      final Composite ui = createUI(parent);
 
-		createColorDefinitions();
+      initializeLegend();
 
-		final Composite ui = createUI(parent);
+      restoreState();
 
-		initializeLegend();
+      _colorViewer.setInput(this);
 
-		restoreState();
+      return ui;
+   }
 
-		_colorViewer.setInput(this);
+   private Composite createUI(final Composite parent) {
 
-		return ui;
-	}
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      {
+         createUI_10_ColorViewer(container);
+         createUI_20_ColorControl(container);
+         createUI_99_LiveUpdate(container);
+      }
 
-	private Composite createUI(final Composite parent) {
+      return container;
+   }
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-		{
-			createUI_10_ColorViewer(container);
-			createUI_20_ColorControl(container);
-			createUI_99_LiveUpdate(container);
-		}
+   private void createUI_10_ColorViewer(final Composite parent) {
 
-		return container;
-	}
+      /*
+       * create tree layout
+       */
+      final Composite layoutContainer = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults()//
+            .grab(true, true)
+            .hint(400, 100)
+            .applyTo(layoutContainer);
 
-	private void createUI_10_ColorViewer(final Composite parent) {
+      final TreeColumnLayout treeLayout = new TreeColumnLayout();
+      layoutContainer.setLayout(treeLayout);
 
-		/*
-		 * create tree layout
-		 */
-		final Composite layoutContainer = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
-				.grab(true, true)
-				.hint(400, 100)
-				.applyTo(layoutContainer);
+      /*
+       * create viewer
+       */
+      final Tree tree = new Tree(layoutContainer,
+            SWT.H_SCROLL
+                  | SWT.V_SCROLL
+                  | SWT.BORDER
+                  | SWT.MULTI
+                  | SWT.FULL_SELECTION);
 
-		final TreeColumnLayout treeLayout = new TreeColumnLayout();
-		layoutContainer.setLayout(treeLayout);
+      tree.setHeaderVisible(false);
+      tree.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
-		/*
-		 * create viewer
-		 */
-		final Tree tree = new Tree(layoutContainer,
-				SWT.H_SCROLL
-						| SWT.V_SCROLL
-						| SWT.BORDER
-						| SWT.MULTI
-						| SWT.FULL_SELECTION);
+      _colorViewer = new TreeViewer(tree);
+      defineAllColumns(treeLayout, tree);
 
-		tree.setHeaderVisible(false);
-		tree.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+      _colorViewer.setContentProvider(new ColorContentProvider());
 
-		_colorViewer = new TreeViewer(tree);
-		defineAllColumns(treeLayout, tree);
+      _graphColorPainter = new GraphColorPainter(this);
 
-		_colorViewer.setContentProvider(new ColorContentProvider());
+      _colorViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+         @Override
+         public void selectionChanged(final SelectionChangedEvent event) {
+            onSelectColorInColorViewer();
+         }
+      });
 
-		_graphColorPainter = new GraphColorPainter(this);
+      _colorViewer.addDoubleClickListener(new IDoubleClickListener() {
+         @Override
+         public void doubleClick(final DoubleClickEvent event) {
 
-		_colorViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-			@Override
-			public void selectionChanged(final SelectionChangedEvent event) {
-				onSelectColorInColorViewer();
-			}
-		});
-
-		_colorViewer.addDoubleClickListener(new IDoubleClickListener() {
-			@Override
-			public void doubleClick(final DoubleClickEvent event) {
-
-				final Object selection = ((IStructuredSelection) _colorViewer.getSelection()).getFirstElement();
-
-				if (selection instanceof ColorDefinition) {
-
-					// expand/collapse current item
-					final ColorDefinition treeItem = (ColorDefinition) selection;
-
-					if (_colorViewer.getExpandedState(treeItem)) {
-						_colorViewer.collapseToLevel(treeItem, 1);
-					} else {
-						if (_expandedItem != null) {
-							_colorViewer.collapseToLevel(_expandedItem, 1);
-						}
-						_colorViewer.expandToLevel(treeItem, 1);
-						_expandedItem = treeItem;
-
-						// expanding the treeangle, the layout is correctly done but not with double click
-						layoutContainer.layout(true, true);
-					}
-				} else if (selection instanceof GraphColorItem) {
-
-					final GraphColorItem graphColor = (GraphColorItem) selection;
-
-					if (graphColor.isMapColor()) {
-
-						// legend color is selected
-
-						onSelectMappingColor();
-
-					} else {
-						// open color selection dialog
-						_colorSelector.open();
-					}
-				}
-			}
-		});
-
-		_colorViewer.addTreeListener(new ITreeViewerListener() {
-
-			@Override
-			public void treeCollapsed(final TreeExpansionEvent event) {
-
-				if (event.getElement() instanceof ColorDefinition) {
-					_expandedItem = null;
-				}
-			}
-
-			@Override
-			public void treeExpanded(final TreeExpansionEvent event) {
-
-				final Object element = event.getElement();
-
-				if (element instanceof ColorDefinition) {
-					final ColorDefinition treeItem = (ColorDefinition) element;
-
-					if (_expandedItem != null) {
-						_colorViewer.collapseToLevel(_expandedItem, 1);
-					}
-
-					Display.getCurrent().asyncExec(new Runnable() {
-						@Override
-						public void run() {
-							_colorViewer.expandToLevel(treeItem, 1);
-							_expandedItem = treeItem;
-						}
-					});
-				}
-			}
-		});
-	}
-
-	/**
-	 * Create the color selection control.
-	 *
-	 * @param parent
-	 */
-	private void createUI_20_ColorControl(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(false, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-		// container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
-		{
-			/*
-			 * button: color selector:
-			 */
-			_colorSelector = new ColorSelector(container);
-			_colorSelector.getButton().setLayoutData(new GridData());
-			_colorSelector.setEnabled(false);
-			setButtonLayoutData(_colorSelector.getButton());
-			_colorSelector.addListener(new IPropertyChangeListener() {
-				@Override
-				public void propertyChange(final PropertyChangeEvent event) {
-					onSelectColorInColorSelector(event);
-					doLiveUpdate();
-				}
-			});
-
-			/*
-			 * button: mapping color
-			 */
-			_btnLegend = new Button(container, SWT.NONE);
-			_btnLegend.setText(Messages.Pref_ChartColors_btn_legend);
-			setButtonLayoutData(_btnLegend);
-
-			_btnLegend.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onSelectMappingColor();
-					doLiveUpdate();
-				}
-			});
-			_btnLegend.setEnabled(false);
-		}
-	}
-
-	private void createUI_99_LiveUpdate(final Composite parent) {
-
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().span(2, 1).grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-		{
-			/*
-			 * Checkbox: live update
-			 */
-			_chkLiveUpdate = new Button(container, SWT.CHECK);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(_chkLiveUpdate);
-			_chkLiveUpdate.setText(Messages.Pref_LiveUpdate_Checkbox);
-			_chkLiveUpdate.setToolTipText(Messages.Pref_LiveUpdate_Checkbox_Tooltip);
-			_chkLiveUpdate.addSelectionListener(new SelectionAdapter() {
-
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					doLiveUpdate();
-				}
-			});
-		}
-	}
-
-	/**
-	 * create columns
-	 */
-	private void defineAllColumns(final TreeColumnLayout treeLayout, final Tree tree) {
-
-		final int numberOfHorizontalImages = 5;
-		final int trailingOffset = 10;
-
-		final int itemHeight = tree.getItemHeight();
-		final int colorWidth = (itemHeight + GraphColorPainter.GRAPH_COLOR_SPACING)
-				* numberOfHorizontalImages
-				+ trailingOffset;
-
-		TreeColumn tc;
-		TreeViewerColumn tvc;
-
-		// 1. column: color item/color definition
-		tvc = new TreeViewerColumn(_colorViewer, SWT.LEAD);
-		tc = tvc.getColumn();
-		tvc.setLabelProvider(new StyledCellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final Object element = cell.getElement();
-
-				if (element instanceof ColorDefinition) {
-					cell.setText(((ColorDefinition) (element)).getVisibleName());
-				} else if (element instanceof GraphColorItem) {
-					cell.setText(((GraphColorItem) (element)).getName());
-				} else {
-					cell.setText(UI.EMPTY_STRING);
-				}
-			}
-		});
-		treeLayout.setColumnData(tc, new ColumnWeightData(1, true));
-
-		// 2. column: color for definition/item
-		tvc = new TreeViewerColumn(_colorViewer, SWT.TRAIL);
-		tc = tvc.getColumn();
-		tvc.setLabelProvider(new StyledCellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-
-				final Object element = cell.getElement();
-
-				if (element instanceof ColorDefinition) {
-
-					cell.setImage(_graphColorPainter.drawColorDefinitionImage(
-							(ColorDefinition) element,
-							numberOfHorizontalImages,
-							false));
-
-				} else if (element instanceof GraphColorItem) {
-
-					cell.setImage(_graphColorPainter.drawGraphColorImage(//
-							(GraphColorItem) element,
-							numberOfHorizontalImages,
-							false));
-
-				} else {
-
-					cell.setImage(null);
-				}
-			}
-		});
-		treeLayout.setColumnData(tc, new ColumnPixelData(colorWidth, true));
-	}
-
-	private void doLiveUpdate() {
-
-		if (_chkLiveUpdate.getSelection()) {
-			performApply();
-		}
-	}
-
-	@Override
-	public IGradientColorProvider getMapLegendColorProvider() {
-		return _legendImageColorProvider;
-	}
-
-	@Override
-	public TreeViewer getTreeViewer() {
-		return _colorViewer;
-	}
-
-	@Override
-	public void init(final IWorkbench workbench) {
-		setPreferenceStore(_commonPrefStore);
-	}
-
-	/**
-	 * Setup legend and create a dummy color provider.
-	 */
-	private void initializeLegend() {
-
-		_legendImageColorProvider = createMap2ColorProvider();
-
-		_dialogMappingColor = new DialogMap2ColorEditor(
-				Display.getCurrent().getActiveShell(),
-				_legendImageColorProvider,
-				this);
-	}
-
-	/**
-	 * is called when the color in the color selector has changed
-	 *
-	 * @param event
-	 */
-	private void onSelectColorInColorSelector(final PropertyChangeEvent event) {
-
-		final RGB oldValue = (RGB) event.getOldValue();
-		final RGB newValue = (RGB) event.getNewValue();
-
-		if (!oldValue.equals(newValue) && _selectedColor != null) {
-
-			// color has changed
-
-			// update the data model
-			_selectedColor.setRGB(newValue);
-
-			final ColorDefinition colorDefinition = _selectedColor.getColorDefinition();
-
-			/*
-			 * dispose the old color/image from the graph
-			 */
-			_graphColorPainter.invalidateResources(//
-					_selectedColor.getColorId(),
-					colorDefinition.getColorDefinitionId());
-
-			/*
-			 * update the tree viewer, the color images will then be recreated
-			 */
-			_colorViewer.update(_selectedColor, null);
-			_colorViewer.update(colorDefinition, null);
-
-			_isColorChanged = true;
-
-			// log changes that it is easier to adjust the defaults, this case will propaly happen not very often
-			System.out.println((net.tourbook.common.UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ()") //$NON-NLS-1$ //$NON-NLS-2$
-					+ ("\t: " + colorDefinition)); //$NON-NLS-1$
-		}
-	}
-
-	/**
-	 * is called when the color in the color viewer was selected
-	 */
-	private void onSelectColorInColorViewer() {
-
-		final IStructuredSelection selection = (IStructuredSelection) _colorViewer.getSelection();
-
-		_btnLegend.setEnabled(false);
-		_colorSelector.setEnabled(false);
-
-		if (selection.getFirstElement() instanceof GraphColorItem) {
-
-			// graph color is selected
-
-			final GraphColorItem graphColor = (GraphColorItem) selection.getFirstElement();
-
-			// keep selected color
-			_selectedColor = graphColor;
+            final Object selection = ((IStructuredSelection) _colorViewer.getSelection()).getFirstElement();
+
+            if (selection instanceof ColorDefinition) {
+
+               // expand/collapse current item
+               final ColorDefinition treeItem = (ColorDefinition) selection;
+
+               if (_colorViewer.getExpandedState(treeItem)) {
+                  _colorViewer.collapseToLevel(treeItem, 1);
+               } else {
+                  if (_expandedItem != null) {
+                     _colorViewer.collapseToLevel(_expandedItem, 1);
+                  }
+                  _colorViewer.expandToLevel(treeItem, 1);
+                  _expandedItem = treeItem;
+
+                  // expanding the treeangle, the layout is correctly done but not with double click
+                  layoutContainer.layout(true, true);
+               }
+            } else if (selection instanceof GraphColorItem) {
+
+               final GraphColorItem graphColor = (GraphColorItem) selection;
+
+               if (graphColor.isMapColor()) {
+
+                  // legend color is selected
+
+                  onSelectMappingColor();
+
+               } else {
+                  // open color selection dialog
+                  _colorSelector.open();
+               }
+            }
+         }
+      });
+
+      _colorViewer.addTreeListener(new ITreeViewerListener() {
+
+         @Override
+         public void treeCollapsed(final TreeExpansionEvent event) {
+
+            if (event.getElement() instanceof ColorDefinition) {
+               _expandedItem = null;
+            }
+         }
+
+         @Override
+         public void treeExpanded(final TreeExpansionEvent event) {
+
+            final Object element = event.getElement();
+
+            if (element instanceof ColorDefinition) {
+               final ColorDefinition treeItem = (ColorDefinition) element;
+
+               if (_expandedItem != null) {
+                  _colorViewer.collapseToLevel(_expandedItem, 1);
+               }
+
+               Display.getCurrent().asyncExec(new Runnable() {
+                  @Override
+                  public void run() {
+                     _colorViewer.expandToLevel(treeItem, 1);
+                     _expandedItem = treeItem;
+                  }
+               });
+            }
+         }
+      });
+   }
+
+   /**
+    * Create the color selection control.
+    *
+    * @param parent
+    */
+   private void createUI_20_ColorControl(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(false, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+      // container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+      {
+         /*
+          * button: color selector:
+          */
+         _colorSelector = new ColorSelector(container);
+         _colorSelector.getButton().setLayoutData(new GridData());
+         _colorSelector.setEnabled(false);
+         setButtonLayoutData(_colorSelector.getButton());
+         _colorSelector.addListener(new IPropertyChangeListener() {
+            @Override
+            public void propertyChange(final PropertyChangeEvent event) {
+               onSelectColorInColorSelector(event);
+               doLiveUpdate();
+            }
+         });
+
+         /*
+          * button: mapping color
+          */
+         _btnLegend = new Button(container, SWT.NONE);
+         _btnLegend.setText(Messages.Pref_ChartColors_btn_legend);
+         setButtonLayoutData(_btnLegend);
+
+         _btnLegend.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+               onSelectMappingColor();
+               doLiveUpdate();
+            }
+         });
+         _btnLegend.setEnabled(false);
+      }
+   }
+
+   private void createUI_99_LiveUpdate(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().span(2, 1).grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+      {
+         /*
+          * Checkbox: live update
+          */
+         _chkLiveUpdate = new Button(container, SWT.CHECK);
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(_chkLiveUpdate);
+         _chkLiveUpdate.setText(Messages.Pref_LiveUpdate_Checkbox);
+         _chkLiveUpdate.setToolTipText(Messages.Pref_LiveUpdate_Checkbox_Tooltip);
+         _chkLiveUpdate.addSelectionListener(new SelectionAdapter() {
+
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+               doLiveUpdate();
+            }
+         });
+      }
+   }
+
+   /**
+    * create columns
+    */
+   private void defineAllColumns(final TreeColumnLayout treeLayout, final Tree tree) {
+
+      final int numberOfHorizontalImages = 5;
+      final int trailingOffset = 10;
+
+      final int itemHeight = tree.getItemHeight();
+      final int colorWidth = (itemHeight + GraphColorPainter.GRAPH_COLOR_SPACING)
+            * numberOfHorizontalImages
+            + trailingOffset;
+
+      TreeColumn tc;
+      TreeViewerColumn tvc;
+
+      // 1. column: color item/color definition
+      tvc = new TreeViewerColumn(_colorViewer, SWT.LEAD);
+      tc = tvc.getColumn();
+      tvc.setLabelProvider(new StyledCellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            if (element instanceof ColorDefinition) {
+               cell.setText(((ColorDefinition) (element)).getVisibleName());
+            } else if (element instanceof GraphColorItem) {
+               cell.setText(((GraphColorItem) (element)).getName());
+            } else {
+               cell.setText(UI.EMPTY_STRING);
+            }
+         }
+      });
+      treeLayout.setColumnData(tc, new ColumnWeightData(1, true));
+
+      // 2. column: color for definition/item
+      tvc = new TreeViewerColumn(_colorViewer, SWT.TRAIL);
+      tc = tvc.getColumn();
+      tvc.setLabelProvider(new StyledCellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            if (element instanceof ColorDefinition) {
+
+               cell.setImage(_graphColorPainter.drawColorDefinitionImage(
+                     (ColorDefinition) element,
+                     numberOfHorizontalImages,
+                     false));
+
+            } else if (element instanceof GraphColorItem) {
+
+               cell.setImage(_graphColorPainter.drawGraphColorImage(//
+                     (GraphColorItem) element,
+                     numberOfHorizontalImages,
+                     false));
+
+            } else {
+
+               cell.setImage(null);
+            }
+         }
+      });
+      treeLayout.setColumnData(tc, new ColumnPixelData(colorWidth, true));
+   }
+
+   private void doLiveUpdate() {
+
+      if (_chkLiveUpdate.getSelection()) {
+         performApply();
+      }
+   }
+
+   @Override
+   public IGradientColorProvider getMapLegendColorProvider() {
+      return _legendImageColorProvider;
+   }
+
+   @Override
+   public TreeViewer getTreeViewer() {
+      return _colorViewer;
+   }
+
+   @Override
+   public void init(final IWorkbench workbench) {
+      setPreferenceStore(_commonPrefStore);
+   }
+
+   /**
+    * Setup legend and create a dummy color provider.
+    */
+   private void initializeLegend() {
+
+      _legendImageColorProvider = createMap2ColorProvider();
+
+      _dialogMappingColor = new DialogMap2ColorEditor(
+            Display.getCurrent().getActiveShell(),
+            _legendImageColorProvider,
+            this);
+   }
+
+   /**
+    * is called when the color in the color selector has changed
+    *
+    * @param event
+    */
+   private void onSelectColorInColorSelector(final PropertyChangeEvent event) {
+
+      final RGB oldValue = (RGB) event.getOldValue();
+      final RGB newValue = (RGB) event.getNewValue();
+
+      if (!oldValue.equals(newValue) && _selectedColor != null) {
+
+         // color has changed
+
+         // update the data model
+         _selectedColor.setRGB(newValue);
+
+         final ColorDefinition colorDefinition = _selectedColor.getColorDefinition();
 
-			if (graphColor.isMapColor()) {
+         /*
+          * dispose the old color/image from the graph
+          */
+         _graphColorPainter.invalidateResources(//
+               _selectedColor.getColorId(),
+               colorDefinition.getColorDefinitionId());
 
-				// legend color is selected
+         /*
+          * update the tree viewer, the color images will then be recreated
+          */
+         _colorViewer.update(_selectedColor, null);
+         _colorViewer.update(colorDefinition, null);
+
+         _isColorChanged = true;
+
+         // log changes that it is easier to adjust the defaults, this case will propaly happen not very often
+         System.out.println((net.tourbook.common.UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ()") //$NON-NLS-1$ //$NON-NLS-2$
+               + ("\t: " + colorDefinition)); //$NON-NLS-1$
+      }
+   }
 
-				_btnLegend.setEnabled(true);
+   /**
+    * is called when the color in the color viewer was selected
+    */
+   private void onSelectColorInColorViewer() {
 
-			} else {
+      final IStructuredSelection selection = (IStructuredSelection) _colorViewer.getSelection();
 
-				// 'normal' color is selected
+      _btnLegend.setEnabled(false);
+      _colorSelector.setEnabled(false);
 
-				// prepare color selector
-				_colorSelector.setColorValue(graphColor.getRGB());
-				_colorSelector.setEnabled(true);
-			}
+      if (selection.getFirstElement() instanceof GraphColorItem) {
 
-		} else {
+         // graph color is selected
 
-			// color definition is selected
+         final GraphColorItem graphColor = (GraphColorItem) selection.getFirstElement();
 
-		}
-	}
+         // keep selected color
+         _selectedColor = graphColor;
 
-	/**
-	 * modify the colors of the legend
-	 */
-	private void onSelectMappingColor() {
+         if (graphColor.isMapColor()) {
 
-		final ColorDefinition selectedColorDefinition = _selectedColor.getColorDefinition();
+            // legend color is selected
 
-		// set the color which should be modified in the dialog
-		_dialogMappingColor.setLegendColor(selectedColorDefinition);
+            _btnLegend.setEnabled(true);
 
-		// new colors will be set with applyMapColors
-		_dialogMappingColor.open();
-	}
+         } else {
 
-	@Override
-	protected void performApply() {
+            // 'normal' color is selected
 
-		if (_isColorChanged) {
-			updateAndSaveColors();
-		}
-	}
+            // prepare color selector
+            _colorSelector.setColorValue(graphColor.getRGB());
+            _colorSelector.setEnabled(true);
+         }
 
-	@Override
-	public boolean performCancel() {
+      } else {
 
-		resetColors();
-		_graphColorPainter.disposeAllResources();
+         // color definition is selected
 
-		return super.performCancel();
-	}
+      }
+   }
 
-	@Override
-	protected void performDefaults() {
+   /**
+    * modify the colors of the legend
+    */
+   private void onSelectMappingColor() {
 
-		final ColorDefinition[] graphColorDefinitions = GraphColorManager.getInstance().getGraphColorDefinitions();
+      final ColorDefinition selectedColorDefinition = _selectedColor.getColorDefinition();
 
-		// update current colors
-		for (final ColorDefinition graphDefinition : graphColorDefinitions) {
+      // set the color which should be modified in the dialog
+      _dialogMappingColor.setLegendColor(selectedColorDefinition);
 
-			graphDefinition.setGradientBright_New(graphDefinition.getGradientBright_Default());
-			graphDefinition.setGradientDark_New(graphDefinition.getGradientDark_Default());
-			graphDefinition.setLineColor_New(graphDefinition.getLineColor_Default());
-			graphDefinition.setTextColor_New(graphDefinition.getTextColor_Default());
+      // new colors will be set with applyMapColors
+      _dialogMappingColor.open();
+   }
 
-			final Map2ColorProfile defaultLegendColor = graphDefinition.getMap2Color_Default();
-			if (defaultLegendColor != null) {
-				graphDefinition.setMap2Color_New(defaultLegendColor.clone());
-			}
-		}
+   @Override
+   protected void performApply() {
 
-		_graphColorPainter.disposeAllResources();
-		_colorViewer.refresh();
+      if (_isColorChanged) {
+         updateAndSaveColors();
+      }
+   }
 
-		_isColorChanged = true;
+   @Override
+   public boolean performCancel() {
 
-		// live update
-		_chkLiveUpdate.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_PREF_PAGE_IS_COLOR_LIVE_UPDATE));
+      resetColors();
+      _graphColorPainter.disposeAllResources();
 
-		super.performDefaults();
-	}
+      return super.performCancel();
+   }
 
-	@Override
-	public boolean performOk() {
+   @Override
+   protected void performDefaults() {
 
-		if (_isColorChanged) {
-			updateAndSaveColors();
-		}
+      final ColorDefinition[] graphColorDefinitions = GraphColorManager.getInstance().getGraphColorDefinitions();
 
-		_graphColorPainter.disposeAllResources();
+      // update current colors
+      for (final ColorDefinition graphDefinition : graphColorDefinitions) {
 
-		// live update
-		_prefStore.setValue(ITourbookPreferences.GRAPH_PREF_PAGE_IS_COLOR_LIVE_UPDATE, _chkLiveUpdate.getSelection());
+         graphDefinition.setGradientBright_New(graphDefinition.getGradientBright_Default());
+         graphDefinition.setGradientDark_New(graphDefinition.getGradientDark_Default());
+         graphDefinition.setLineColor_New(graphDefinition.getLineColor_Default());
+         graphDefinition.setTextColor_New(graphDefinition.getTextColor_Default());
 
-		return super.performOk();
-	}
+         final Map2ColorProfile defaultLegendColor = graphDefinition.getMap2Color_Default();
+         if (defaultLegendColor != null) {
+            graphDefinition.setMap2Color_New(defaultLegendColor.clone());
+         }
+      }
 
-	private void resetColors() {
+      _graphColorPainter.disposeAllResources();
+      _colorViewer.refresh();
 
-		for (final ColorDefinition graphDefinition : GraphColorManager.getInstance().getGraphColorDefinitions()) {
+      _isColorChanged = true;
 
-			graphDefinition.setGradientBright_New(graphDefinition.getGradientBright_Active());
-			graphDefinition.setGradientDark_New(graphDefinition.getGradientDark_Active());
-			graphDefinition.setLineColor_New(graphDefinition.getLineColor_Active());
-			graphDefinition.setTextColor_New(graphDefinition.getTextColor_Active());
+      // live update
+      _chkLiveUpdate.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_PREF_PAGE_IS_COLOR_LIVE_UPDATE));
 
-			graphDefinition.setMap2Color_New(graphDefinition.getMap2Color_Active());
-		}
-	}
+      super.performDefaults();
+   }
 
-	private void restoreState() {
+   @Override
+   public boolean performOk() {
 
-		// live update
-		_chkLiveUpdate.setSelection(_prefStore.getBoolean(ITourbookPreferences.GRAPH_PREF_PAGE_IS_COLOR_LIVE_UPDATE));
-	}
+      if (_isColorChanged) {
+         updateAndSaveColors();
+      }
 
-	private void updateAndSaveColors() {
+      _graphColorPainter.disposeAllResources();
 
-		GraphColorManager.saveColors();
+      // live update
+      _prefStore.setValue(ITourbookPreferences.GRAPH_PREF_PAGE_IS_COLOR_LIVE_UPDATE, _chkLiveUpdate.getSelection());
 
-		MapColorProvider.updateMap2Colors();
+      return super.performOk();
+   }
 
-		// force to change the status
-		TourbookPlugin.getDefault()
-				.getPreferenceStore()//
-				.setValue(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED, Math.random());
-	}
+   private void resetColors() {
 
-	private void updateColorsFromDialog(final ColorDefinition selectedColorDefinition,
-													final Map2ColorProfile newMapColor) {
+      for (final ColorDefinition graphDefinition : GraphColorManager.getInstance().getGraphColorDefinitions()) {
 
-		// set new legend color
-		selectedColorDefinition.setMap2Color_New(newMapColor);
+         graphDefinition.setGradientBright_New(graphDefinition.getGradientBright_Active());
+         graphDefinition.setGradientDark_New(graphDefinition.getGradientDark_Active());
+         graphDefinition.setLineColor_New(graphDefinition.getLineColor_Active());
+         graphDefinition.setTextColor_New(graphDefinition.getTextColor_Active());
 
-		/*
-		 * dispose old color and image for the graph
-		 */
-		_graphColorPainter.invalidateResources(//
-				_selectedColor.getColorId(),
-				selectedColorDefinition.getColorDefinitionId());
+         graphDefinition.setMap2Color_New(graphDefinition.getMap2Color_Active());
+      }
+   }
 
-		/*
-		 * update the tree viewer, the color images will be recreated
-		 */
-		_colorViewer.update(_selectedColor, null);
-		_colorViewer.update(selectedColorDefinition, null);
+   private void restoreState() {
 
-		_isColorChanged = true;
-	}
+      // live update
+      _chkLiveUpdate.setSelection(_prefStore.getBoolean(ITourbookPreferences.GRAPH_PREF_PAGE_IS_COLOR_LIVE_UPDATE));
+   }
+
+   private void updateAndSaveColors() {
+
+      GraphColorManager.saveColors();
+
+      MapColorProvider.updateMap2Colors();
+
+      // force to change the status
+      TourbookPlugin.getDefault()
+            .getPreferenceStore()//
+            .setValue(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED, Math.random());
+   }
+
+   private void updateColorsFromDialog(final ColorDefinition selectedColorDefinition,
+                                       final Map2ColorProfile newMapColor) {
+
+      // set new legend color
+      selectedColorDefinition.setMap2Color_New(newMapColor);
+
+      /*
+       * dispose old color and image for the graph
+       */
+      _graphColorPainter.invalidateResources(//
+            _selectedColor.getColorId(),
+            selectedColorDefinition.getColorDefinitionId());
+
+      /*
+       * update the tree viewer, the color images will be recreated
+       */
+      _colorViewer.update(_selectedColor, null);
+      _colorViewer.update(selectedColorDefinition, null);
+
+      _isColorChanged = true;
+   }
 
 }

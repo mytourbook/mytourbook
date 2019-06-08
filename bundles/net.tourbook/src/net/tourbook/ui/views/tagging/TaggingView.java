@@ -45,7 +45,6 @@ import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageTags;
 import net.tourbook.tag.ActionMenuSetAllTagStructures;
 import net.tourbook.tag.ActionMenuSetTagStructure;
-import net.tourbook.tag.ActionRenameTag;
 import net.tourbook.tag.ChangedTags;
 import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.ITourEventListener;
@@ -107,12 +106,15 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IPartListener2;
@@ -192,6 +194,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    private ActionCollapseAll             _actionCollapseAll;
    private ActionCollapseOthers          _actionCollapseOthers;
    private ActionEditQuick               _actionEditQuick;
+   private ActionEditTag                 _actionEditTag;
    private ActionEditTour                _actionEditTour;
    private ActionExpandSelection         _actionExpandSelection;
    private ActionExport                  _actionExportTour;
@@ -201,7 +204,6 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    private ActionOpenTour                _actionOpenTour;
    private ActionOpenPrefDialog          _actionOpenTagPrefs;
    private ActionRefreshView             _actionRefreshView;
-   private ActionRenameTag               _actionRenameTag;
    private ActionSetLayoutHierarchical   _actionSetLayoutHierarchical;
    private ActionSetLayoutFlat           _actionSetLayoutFlat;
    private ActionSetTourTypeMenu         _actionSetTourType;
@@ -550,7 +552,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       _actionOpenTagPrefs = new ActionOpenPrefDialog(Messages.action_tag_open_tagging_structure, PrefPageTags.ID);
       _actionOpenTour = new ActionOpenTour(this);
       _actionRefreshView = new ActionRefreshView(this);
-      _actionRenameTag = new ActionRenameTag(this);
+      _actionEditTag = new ActionEditTag(this);
       _actionSetAllTagStructures = new ActionMenuSetAllTagStructures(this);
       _actionSetTagStructure = new ActionMenuSetTagStructure(this);
       _actionSetTourType = new ActionSetTourTypeMenu(this);
@@ -642,34 +644,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       _tagViewer.addSelectionChangedListener(new ISelectionChangedListener() {
          @Override
          public void selectionChanged(final SelectionChangedEvent event) {
-
-            final IStructuredSelection selectedTours = (IStructuredSelection) (event.getSelection());
-            final Object selectedItem = ((IStructuredSelection) (event.getSelection())).getFirstElement();
-
-            if (selectedItem instanceof TVITagView_Tour && selectedTours.size() == 1) {
-
-               // one tour is selected
-
-               final TVITagView_Tour tourItem = (TVITagView_Tour) selectedItem;
-               _postSelectionProvider.setSelection(new SelectionTourId(tourItem.getTourId()));
-
-            } else {
-
-               // multiple tours are selected
-
-               final ArrayList<Long> tourIds = new ArrayList<>();
-
-               for (final Iterator<?> tourIterator = selectedTours.iterator(); tourIterator.hasNext();) {
-                  final Object viewItem = tourIterator.next();
-                  if (viewItem instanceof TVITagView_Tour) {
-                     tourIds.add(((TVITagView_Tour) viewItem).getTourId());
-                  }
-               }
-
-               _postSelectionProvider.setSelection(new SelectionTourIds(tourIds));
-            }
-
-            enableActions(false);
+            onTagViewer_Selection(event);
          }
       });
 
@@ -677,26 +652,26 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
          @Override
          public void doubleClick(final DoubleClickEvent event) {
+            onTagViewer_DoubleClick();
+         }
+      });
 
-            final Object selection = ((IStructuredSelection) _tagViewer.getSelection()).getFirstElement();
+      tree.addListener(SWT.MouseDoubleClick, event -> onTagTree_DoubleClick(event));
 
-            if (selection instanceof TVITagView_Tour) {
+      tree.addKeyListener(new KeyListener() {
 
-               TourManager.getInstance().tourDoubleClickAction(TaggingView.this, _tourDoubleClickState);
+         @Override
+         public void keyPressed(final KeyEvent e) {
 
-            } else if (selection != null) {
-
-               // expand/collapse current item
-
-               final TreeViewerItem tourItem = (TreeViewerItem) selection;
-
-               if (_tagViewer.getExpandedState(tourItem)) {
-                  _tagViewer.collapseToLevel(tourItem, 1);
-               } else {
-                  _tagViewer.expandToLevel(tourItem, 1);
-               }
+            switch (e.keyCode) {
+            case SWT.F2:
+               onTagViewer_RenameTag();
+               break;
             }
          }
+
+         @Override
+         public void keyReleased(final KeyEvent e) {}
       });
 
       /*
@@ -710,6 +685,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
       // set tour info tooltip provider
       _tourInfoToolTip = new TreeViewerTourInfoToolTip(_tagViewer);
+      _tourInfoToolTip.setTooltipUIProvider(new TaggingView_TooltipUIProvider(this));
    }
 
    /**
@@ -764,6 +740,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
       defineColumn_Tour_Title();
       defineColumn_Tour_Tags();
+      defineColumn_Tour_TagAndCategoryNotes();
 
       defineColumn_Motion_Distance();
       defineColumn_Motion_MaxSpeed();
@@ -791,6 +768,25 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       colDef.setIsDefaultColumn();
       colDef.setCanModifyVisibility(false);
       colDef.setLabelProvider(new TourInfoToolTipStyledCellLabelProvider() {
+
+         @Override
+         public Object getData(final ViewerCell cell) {
+
+            if (_isToolTipInTag == false) {
+               return null;
+            }
+
+            final TVITagViewItem viewItem = (TVITagViewItem) cell.getElement();
+
+            if (viewItem instanceof TVITagView_Tag || viewItem instanceof TVITagView_TagCategory) {
+
+               // return tag/category to show it's notes fields in the tooltip
+
+               return viewItem;
+            }
+
+            return null;
+         }
 
          @Override
          public Long getTourId(final ViewerCell cell) {
@@ -1170,6 +1166,40 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    }
 
    /**
+    * Column: tag notes
+    */
+   private void defineColumn_Tour_TagAndCategoryNotes() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TAG_AND_CATEGORY_NOTES.createColumn(_columnManager, _pc);
+      colDef.setIsDefaultColumn();
+      colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            final TVITagViewItem viewItem = (TVITagViewItem) element;
+
+            if (viewItem instanceof TVITagView_Tag) {
+
+               final TVITagView_Tag tagItem = (TVITagView_Tag) viewItem;
+
+               cell.setText(TourDatabase.getTagNotes((tagItem).tagId));
+
+            } else if (viewItem instanceof TVITagView_TagCategory) {
+
+               final TVITagView_TagCategory categoryItem = (TVITagView_TagCategory) viewItem;
+               cell.setText(TourDatabase.getTagCategoryNotes((categoryItem).tagCategoryId));
+
+            } else {
+
+               cell.setText(UI.EMPTY_STRING);
+            }
+         }
+      });
+   }
+
+   /**
     * column: tags
     */
    private void defineColumn_Tour_Tags() {
@@ -1288,6 +1318,11 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       super.dispose();
    }
 
+   void editTag(final Object viewerCellData) {
+
+      _actionEditTag.editTag(viewerCellData);
+   }
+
    private void enableActions(final boolean isIterateTours) {
 
       final StructuredSelection selection = (StructuredSelection) _tagViewer.getSelection();
@@ -1356,18 +1391,23 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
       // enable rename action
       if (selectedItems == 1) {
+
          if (isTagSelected) {
-            _actionRenameTag.setText(Messages.action_tag_rename_tag);
-            _actionRenameTag.setEnabled(true);
+
+            _actionEditTag.setText(Messages.Action_Tag_Edit);
+            _actionEditTag.setEnabled(true);
+
          } else if (isCategorySelected) {
-            _actionRenameTag.setText(Messages.action_tag_rename_tag_category);
-            _actionRenameTag.setEnabled(true);
+
+            _actionEditTag.setText(Messages.Action_TagCategory_Edit);
+            _actionEditTag.setEnabled(true);
 
          } else {
-            _actionRenameTag.setEnabled(false);
+            _actionEditTag.setEnabled(false);
          }
+
       } else {
-         _actionRenameTag.setEnabled(false);
+         _actionEditTag.setEnabled(false);
       }
 
       /*
@@ -1403,7 +1443,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       menuMgr.add(_actionCollapseAll);
 
       menuMgr.add(new Separator());
-      menuMgr.add(_actionRenameTag);
+      menuMgr.add(_actionEditTag);
       menuMgr.add(_actionSetTagStructure);
       menuMgr.add(_actionSetAllTagStructures);
       menuMgr.add(_actionOpenTagPrefs);
@@ -1562,6 +1602,93 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    @Override
    public ColumnViewer getViewer() {
       return _tagViewer;
+   }
+
+   /**
+    * Ctrl state is not available in the tree viewer selection event -> use tree event
+    *
+    * @param event
+    */
+   private void onTagTree_DoubleClick(final Event event) {
+
+      final boolean isCtrl = (event.stateMask & SWT.CTRL) != 0;
+
+      if (isCtrl) {
+
+         final Object selection = ((IStructuredSelection) _tagViewer.getSelection()).getFirstElement();
+
+         if (selection instanceof TVITagView_Tag || selection instanceof TVITagView_TagCategory) {
+
+            // edit tag/category
+
+            _actionEditTag.run();
+         }
+      }
+   }
+
+   private void onTagViewer_DoubleClick() {
+
+      final Object selection = ((IStructuredSelection) _tagViewer.getSelection()).getFirstElement();
+
+      if (selection instanceof TVITagView_Tour) {
+
+         TourManager.getInstance().tourDoubleClickAction(TaggingView.this, _tourDoubleClickState);
+
+      } else if (selection != null) {
+
+         // expand/collapse current item
+
+         final TreeViewerItem tourItem = (TreeViewerItem) selection;
+
+         if (_tagViewer.getExpandedState(tourItem)) {
+            _tagViewer.collapseToLevel(tourItem, 1);
+         } else {
+            _tagViewer.expandToLevel(tourItem, 1);
+         }
+      }
+   }
+
+   private void onTagViewer_RenameTag() {
+
+      final Object selection = ((IStructuredSelection) _tagViewer.getSelection()).getFirstElement();
+
+      if (selection instanceof TVITagView_Tag || selection instanceof TVITagView_TagCategory) {
+
+         // edit tag/category
+
+         _actionEditTag.run();
+      }
+   }
+
+   private void onTagViewer_Selection(final SelectionChangedEvent event) {
+
+      final IStructuredSelection selectedTours = (IStructuredSelection) (event.getSelection());
+      final Object selectedItem = ((IStructuredSelection) (event.getSelection())).getFirstElement();
+
+      if (selectedItem instanceof TVITagView_Tour && selectedTours.size() == 1) {
+
+         // one tour is selected
+
+         final TVITagView_Tour tourItem = (TVITagView_Tour) selectedItem;
+         _postSelectionProvider.setSelection(new SelectionTourId(tourItem.getTourId()));
+
+      } else {
+
+         // multiple tours are selected
+
+         final ArrayList<Long> tourIds = new ArrayList<>();
+
+         for (final Iterator<?> tourIterator = selectedTours.iterator(); tourIterator.hasNext();) {
+            final Object viewItem = tourIterator.next();
+            if (viewItem instanceof TVITagView_Tour) {
+               tourIds.add(((TVITagView_Tour) viewItem).getTourId());
+            }
+         }
+
+         _postSelectionProvider.setSelection(new SelectionTourIds(tourIds));
+      }
+
+      enableActions(false);
    }
 
    @Override
@@ -1901,8 +2028,8 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
          cell.setForeground(JFaceResources.getColorRegistry().get(UI.VIEW_COLOR_SUB));
       } else if (element instanceof TVITagView_Month) {
          cell.setForeground(JFaceResources.getColorRegistry().get(UI.VIEW_COLOR_SUB_SUB));
-//		} else if (element instanceof TVITagView_Tour) {
-//			cell.setForeground(JFaceResources.getColorRegistry().get(UI.VIEW_COLOR_TOUR));
+//      } else if (element instanceof TVITagView_Tour) {
+//         cell.setForeground(JFaceResources.getColorRegistry().get(UI.VIEW_COLOR_TOUR));
       }
    }
 
@@ -1917,8 +2044,11 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       String description = UI.EMPTY_STRING;
 
       if (newInput instanceof TVITagView_Tag) {
+
          description = Messages.tag_view_title_tag + ((TVITagView_Tag) newInput).getName();
+
       } else if (newInput instanceof TVITagView_TagCategory) {
+
          description = Messages.tag_view_title_tag_category + ((TVITagView_TagCategory) newInput).name;
       }
 
@@ -1931,10 +2061,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    }
 
    @Override
-   public void updateColumnHeader(final ColumnDefinition colDef) {
-      // TODO Auto-generated method stub
-
-   }
+   public void updateColumnHeader(final ColumnDefinition colDef) {}
 
    private void updateToolTipState() {
 

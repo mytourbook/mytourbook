@@ -259,7 +259,7 @@
 
 		<!-- Suunto 3 -->
 		<device
-			class="net.tourbook.device.suunto.Suunto3DeviceDataReader"
+			class="net.tourbook.device.suunto.Suunto3_DeviceDataReader"
 			fileextension="sml"
 			id="net.tourbook.device.Suunto3"
 			name="Suunto 3">

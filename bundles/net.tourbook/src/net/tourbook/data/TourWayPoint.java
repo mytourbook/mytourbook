@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -25,9 +25,6 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 
-import org.eclipse.jface.resource.ImageRegistry;
-import org.eclipse.swt.graphics.Image;
-
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.map.GeoPosition;
@@ -36,6 +33,9 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.database.FIELD_VALIDATION;
 import net.tourbook.database.TourDatabase;
 
+import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.swt.graphics.Image;
+
 /**
  * A waypoint is associated with a tour but the way point position is independently from a tour, it
  * has it's own lat/lon position.
@@ -43,8 +43,7 @@ import net.tourbook.database.TourDatabase;
 @Entity
 public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea {
 
-   private static final String        IMAGE_MAP_WAY_POINT_HOVERED =
-         net.tourbook.map2.Messages.Image_Map_WayPoint_Hovered;
+   private static final String        IMAGE_MAP_WAY_POINT_HOVERED = net.tourbook.map2.Messages.Image_Map_WayPoint_Hovered;
 
    public static final int            DB_LENGTH_NAME              = 1024;
    public static final int            DB_LENGTH_DESCRIPTION       = 4096;
