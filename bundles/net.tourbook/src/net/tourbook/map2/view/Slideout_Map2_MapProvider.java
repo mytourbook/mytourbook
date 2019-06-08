@@ -295,26 +295,18 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
 
    private void createUI_20_MapViewer(final Composite parent) {
 
-//      final Composite layoutContainer = new Composite(parent, SWT.NONE);
-//      GridDataFactory.fillDefaults().grab(true, true).applyTo(layoutContainer);
-//
-//      final TableColumnLayout tableLayout = new TableColumnLayout();
-//      layoutContainer.setLayout(tableLayout);
-
       /*
-       * create table
+       * Create table
        */
       final Table table = new Table(parent, SWT.CHECK | SWT.FULL_SELECTION);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
 
-//      table.setLayout(new TableLayout());
       table.setHeaderVisible(true);
       table.setLinesVisible(false);
 
       _mpViewer = new CheckboxTableViewer(table);
       _mpViewer.setUseHashlookup(true);
 
-//      _columnManager.setColumnLayout(tableLayout);
       _columnManager.createColumns(_mpViewer);
       _columnManager.setSlideoutShell(this);
 
