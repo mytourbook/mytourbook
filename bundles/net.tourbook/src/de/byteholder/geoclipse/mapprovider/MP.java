@@ -224,9 +224,9 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
    private long                                            _offlineFileSize             = -1;
 
    /**
-    * State if the map provider can be toggled in the map
+    * State if the map provider can be selected in the map provider slideout or not.
     */
-   private boolean                                         _canBeToggled;
+   private boolean                                         _isVisibleInUI;
 
    //
    // Profile map provider values
@@ -248,7 +248,10 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
    private boolean _isProfileBrightnessForNextMp    = false;
    private int     _profileBrightnessValueForNextMp = 77;
 
-//   private MapViewPortData                     _mapViewPort;
+   /**
+    * The sort index is used to sort the map provider in the map provider list
+    */
+   private int     _sortIndex;
 
    /**
     */
@@ -303,8 +306,32 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
       }
    }
 
-   public boolean canBeToggled() {
-      return _canBeToggled;
+   @Override
+   public Object clone() throws CloneNotSupportedException {
+
+      final MP mapProvider = (MP) super.clone();
+
+      if (this instanceof MPProfile) {
+
+         /*
+          * a map profile contains all map providers which are not a map profile, clone all of them
+          * in the clone constructor
+          */
+
+      } else {
+
+         mapProvider._imageFormat = new String(_imageFormat);
+
+         mapProvider._favoritePosition = new GeoPosition(_favoritePosition == null
+               ? new GeoPosition(0.0, 0.0)
+               : _favoritePosition);
+
+         mapProvider._lastUsedPosition = new GeoPosition(_lastUsedPosition == null
+               ? new GeoPosition(0.0, 0.0)
+               : _lastUsedPosition);
+      }
+
+      return mapProvider;
    }
 
 //   /**
@@ -335,34 +362,6 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
 //
 //      return false;
 //   }
-
-   @Override
-   public Object clone() throws CloneNotSupportedException {
-
-      final MP mapProvider = (MP) super.clone();
-
-      if (this instanceof MPProfile) {
-
-         /*
-          * a map profile contains all map providers which are not a map profile, clone all of them
-          * in the clone constructor
-          */
-
-      } else {
-
-         mapProvider._imageFormat = new String(_imageFormat);
-
-         mapProvider._favoritePosition = new GeoPosition(_favoritePosition == null
-               ? new GeoPosition(0.0, 0.0)
-               : _favoritePosition);
-
-         mapProvider._lastUsedPosition = new GeoPosition(_lastUsedPosition == null
-               ? new GeoPosition(0.0, 0.0)
-               : _lastUsedPosition);
-      }
-
-      return mapProvider;
-   }
 
    @Override
    public int compareTo(final Object otherObject) {
@@ -772,6 +771,10 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
       return _projection;
    }
 
+   public int getSortIndex() {
+      return _sortIndex;
+   }
+
    /**
     * Returns the tile that is located at the given tilePoint for this zoom. For example, if
     * getMapSize() returns 10x20 for this zoom, and the tilePoint is (3,5), then the appropriate
@@ -1127,6 +1130,10 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
       return _isOfflineImageUsed;
    }
 
+   public boolean isVisibleInUI() {
+      return _isVisibleInUI;
+   }
+
    /**
     * Convert a pixel in the world bitmap at the specified zoom level into a GeoPosition
     *
@@ -1283,10 +1290,6 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
       _tileCache.resetTileImageAvailability();
    }
 
-   public void setCanBeToggled(final boolean canBeToggled) {
-      _canBeToggled = canBeToggled;
-   }
-
    public void setDefaultZoomLevel(final int defaultZoomLevel) {
       _defaultZoomLevel = defaultZoomLevel;
    }
@@ -1347,6 +1350,10 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
       _isProfileTransparentColors = isTransColors;
    }
 
+   public void setIsVisibleInUI(final boolean isVisibleInUI) {
+      _isVisibleInUI = isVisibleInUI;
+   }
+
    public void setLastUsedPosition(final GeoPosition position) {
       _lastUsedPosition = position;
    }
@@ -1389,6 +1396,10 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
       _profileTransparentColor = transColors;
    }
 
+   public void setSortIndex(final int sortIndex) {
+      _sortIndex = sortIndex;
+   }
+
    public void setStateToReloadOfflineCounter() {
 
       if (_offlineFileCounter != OFFLINE_INFO_NOT_READ) {
@@ -1427,5 +1438,9 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
    @Override
    public String toString() {
       return _mapProviderName + "(" + _mapProviderId + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+   }
+
+   public void xxxset_sortIndex(final int _sortIndex) {
+      this._sortIndex = _sortIndex;
    }
 }

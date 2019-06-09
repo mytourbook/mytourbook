@@ -1957,6 +1957,12 @@ public class Messages extends NLS {
    public static String Slideout_Map2MapOptions_Dialog_EnhancePaintingWarning_Message;
    public static String Slideout_Map2MapOptions_Dialog_EnhancePaintingWarning_Title;
 
+   public static String Slideout_Map2Provider_Button_HideMP;
+   public static String Slideout_Map2Provider_Button_HideMP_Tooltip;
+   public static String Slideout_Map2Provider_Button_UnhideMP;
+   public static String Slideout_Map2Provider_Button_UnhideMP_Tooltip;
+   public static String Slideout_Map2Provider_Column_IsVisible;
+   public static String Slideout_Map2Provider_Column_IsVisible_Tooltip;
    public static String Slideout_Map2Provider_Column_MPType;
    public static String Slideout_Map2Provider_Column_MPType_Custom;
    public static String Slideout_Map2Provider_Column_MPType_Internal;
