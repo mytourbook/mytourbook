@@ -108,7 +108,7 @@ public class HistoricalWeatherRetriever {
 
          final WWOWeatherResults rawWeatherData = mapper.readValue(weatherResults, WWOWeatherResults.class);
          final double roundedStartTimeOfDay = Math.ceil(tour.getStartTimeOfDay() / 3600.0);
-         final String startTimeOfDay = (int)roundedStartTimeOfDay + "00"; //$NON-NLS-1$
+         final String startTimeOfDay = (int) roundedStartTimeOfDay + "00"; //$NON-NLS-1$
 
          // Within the hourly data, find the time that corresponds to the tour start time
          // and extract the weather data.
@@ -122,6 +122,8 @@ public class HistoricalWeatherRetriever {
             }
          }
 
+         //TODO
+         // Request data for the beginning AND the end of the tour in order to generate the below data
          weatherData.setTemperatureMax(rawWeatherData.getmaxtempC());
          weatherData.setTemperatureMin(rawWeatherData.getmintempC());
          weatherData.setTemperatureAverage(rawWeatherData.getavgtempC());
@@ -142,7 +144,7 @@ public class HistoricalWeatherRetriever {
     */
    private String processRequest() {
       final LatLng searchAreaCenter = determineWeatherSearchArea();
-      final String startDate = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(tour.getTourStartTime());
+      final String startDate = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(tour.getTourStartTime()); //$NON-NLS-1$
 
       final String weatherRequestParameters = apiUrl + _prefStore.getString(ITourbookPreferences.API_KEY) + "&q=" + searchAreaCenter.getLatitude() //$NON-NLS-1$
             + "," + searchAreaCenter.getLongitude() //$NON-NLS-1$

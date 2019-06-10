@@ -231,7 +231,7 @@ public class UI {
    public static boolean       UNIT_IS_METRIC;
 
    /*
-    * Contains the unit label in the currenty measurement system for the distance values
+    * Contains the unit label in the current measurement system for the distance values
     */
    public static String       UNIT_LABEL_DISTANCE;
    public static String       UNIT_LABEL_DISTANCE_M_OR_YD;
@@ -264,6 +264,7 @@ public class UI {
    public static final String          UNIT_DISTANCE_INCH         = "inch";                     //$NON-NLS-1$
    public static final String          UNIT_PACE_MIN_P_KM         = "min/km";                   //$NON-NLS-1$
    public static final String          UNIT_PACE_MIN_P_MILE       = "min/mi";                   //$NON-NLS-1$
+   public static final String          UNIT_PRESSURE_MB           = "mb";                       //$NON-NLS-1$
    public static final String          UNIT_SPEED_KM_H            = "km/h";                     //$NON-NLS-1$
    public static final String          UNIT_SPEED_MPH             = "mph";                      //$NON-NLS-1$
    public static final String          UNIT_TEMPERATURE_C         = "\u00B0C";                  //$NON-NLS-1$

@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
-import net.tourbook.ui.UI;
+import net.tourbook.common.UI;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WWOHourlyResults {
@@ -98,65 +98,62 @@ public class WWOHourlyResults {
       weatherDescription.append(", Wind Chill: ");
       if (UI.UNIT_VALUE_TEMPERATURE == 1) { // Metric
          weatherDescription.append(FeelsLikeC != null ? FeelsLikeC : "--");
-         weatherDescription.append(" °C");
+         weatherDescription.append(" " + UI.UNIT_TEMPERATURE_C);
       } else // Imperial
       {
          weatherDescription.append(FeelsLikeF != null ? FeelsLikeF : "--");
-         weatherDescription.append(" °F");
+         weatherDescription.append(" " + UI.UNIT_TEMPERATURE_F);
       }
 
       //Max temp
       weatherDescription.append(", Max: ");
       if (UI.UNIT_VALUE_TEMPERATURE == 1) { // Metric
          weatherDescription.append(weatherResults.getmaxtempC() != null ? weatherResults.getmaxtempC() : "--");
-         weatherDescription.append(" °C");
+         weatherDescription.append(" " + UI.UNIT_TEMPERATURE_C);
       } else // Imperial
       {
          weatherDescription.append(weatherResults.getMaxtempF() != null ? weatherResults.getMaxtempF() : "--");
-         weatherDescription.append(" °F");
+         weatherDescription.append(" " + UI.UNIT_TEMPERATURE_F);
       }
 
       //Min temp
       weatherDescription.append(", Min: ");
       if (UI.UNIT_VALUE_TEMPERATURE == 1) { // Metric
          weatherDescription.append(weatherResults.getmintempC() != null ? weatherResults.getmintempC() : "--");
-         weatherDescription.append(" °C");
+         weatherDescription.append(" " + UI.UNIT_TEMPERATURE_C);
       } else // Imperial
       {
          weatherDescription.append(weatherResults.getMintempF() != null ? weatherResults.getMintempF() : "--");
-         weatherDescription.append(" °F");
+         weatherDescription.append(" " + UI.UNIT_TEMPERATURE_F);
       }
 
       //Precipitation
       weatherDescription.append(", Precip: ");
 
-      //TODO write a functio that does all that
-      // externalize
-
       if (UI.UNIT_VALUE_TEMPERATURE == 1) { // Metric
          weatherDescription.append(precipMM != null ? precipMM : "--");
-         weatherDescription.append(" mm");
+         weatherDescription.append(" " + UI.UNIT_MM);
       } else // Imperial
       {
          weatherDescription.append(precipInches != null ? precipInches : "--");
-         weatherDescription.append(" in");
+         weatherDescription.append(" " + UI.UNIT_DISTANCE_INCH);
       }
 
       //Pressure
       weatherDescription.append(", Pressure: ");
       if (UI.UNIT_VALUE_TEMPERATURE == 1) { // Metric
          weatherDescription.append(pressure != null ? pressure : "--");
-         weatherDescription.append(" mbar");
+         weatherDescription.append(" " + UI.UNIT_PRESSURE_MB);
       } else // Imperial
       {
          weatherDescription.append(pressureInches != null ? pressureInches : "--");
-         weatherDescription.append(" in");
+         weatherDescription.append(" " + UI.UNIT_DISTANCE_INCH);
       }
 
       //Humidity
       weatherDescription.append(", Humidity: ");
       weatherDescription.append(humidity != null ? humidity : "--");
-      weatherDescription.append("%");
+      weatherDescription.append("" + UI.SYMBOL_PERCENTAGE);
 
       return weatherDescription.toString();
    }
