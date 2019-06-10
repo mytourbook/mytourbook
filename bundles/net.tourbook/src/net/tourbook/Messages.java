@@ -1606,8 +1606,10 @@ public class Messages extends NLS {
 
    public static String        pref_weather_apiKey_FieldEditor;
    public static String        pref_weather_apiKey_FieldEditor_tooltip;
+   public static String        pref_weather_ApiSignupLink;
    public static String        PrefPage_Weather_Checkbox_UseRetrieval;
    public static String        PrefPage_Weather_Checkbox_UseRetrieval_Tooltip;
+   public static String        External_Link_WeatherApi;
 
 // public static String    Pref_SignImages_Dialog_ConfirmDelete_Message;
 // public static String    Pref_SignImages_Dialog_Delete_Title;

@@ -23,27 +23,30 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.preferences.ITourbookPreferences;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.eclipse.jface.preference.IPreferenceStore;
 
 /**
  * A class that retrieves, for a given track, the historical weather data.
  */
 public class HistoricalWeatherRetriever {
 
-   private String       startDate;
-   private String       startTimeOfDay;
-   private String       apiKey;
+   private String                 startDate;
+   private String                 startTimeOfDay;
+   private LatLng                 searchAreaCenter;
 
-   private LatLng       searchAreaCenter;
+   private WeatherData            historicalWeatherData;
 
-   private WeatherData  historicalWeatherData;
+   private final String           apiUrl     = "https://api.worldweatheronline.com/premium/v1/past-weather.ashx?key="; //$NON-NLS-1$
 
-   private final String apiUrl = "https://api.worldweatheronline.com/premium/v1/past-weather.ashx?key="; //$NON-NLS-1$
+   private final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
 
    private HistoricalWeatherRetriever(final LatLng searchAreaCenter) {
       this.searchAreaCenter = searchAreaCenter;
@@ -58,18 +61,6 @@ public class HistoricalWeatherRetriever {
       return new HistoricalWeatherRetriever(searchAreaCenter);
    }
 
-   /**
-    * Assigns an API key to the current object.
-    *
-    * @param apiKey
-    *           The API key to be used for the queries.
-    * @return The current object.
-    */
-   public HistoricalWeatherRetriever forUser(final String apiKey) {
-      this.apiKey = apiKey;
-      return this;
-   }
-
    public WeatherData getHistoricalWeatherData() {
       return historicalWeatherData;
    }
@@ -77,7 +68,7 @@ public class HistoricalWeatherRetriever {
    /**
     * Parses a JSON weather data object into a WeatherData object.
     *
-    * @param dailyNormalsData
+    * @param weatherDataResponse
     *           A string containing a historical weather data JSON object.
     * @return The parsed weather data.
     */
@@ -122,7 +113,8 @@ public class HistoricalWeatherRetriever {
     */
    private String processRequest() {
       final StringBuffer weatherHistory = new StringBuffer();
-      final String weatherRequestParameters = apiUrl + apiKey + "&q=" + searchAreaCenter.getLatitude() + "," + searchAreaCenter.getLongitude() //$NON-NLS-1$//$NON-NLS-2$
+      final String weatherRequestParameters = apiUrl + _prefStore.getString(ITourbookPreferences.API_KEY) + "&q=" + searchAreaCenter.getLatitude() //$NON-NLS-1$
+            + "," + searchAreaCenter.getLongitude() //$NON-NLS-1$
             + "&date=" + startDate + "&tp=1&format=json"; //$NON-NLS-1$ //$NON-NLS-2$
       //tp=1 : Specifies the weather forecast time interval in hours. Here, every 1 hour
 

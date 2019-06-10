@@ -21,9 +21,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourData;
-import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider2;
 import net.tourbook.weather.HistoricalWeatherRetriever;
@@ -31,13 +29,11 @@ import net.tourbook.weather.WeatherData;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 public class ActionRetrieveWeatherData extends Action {
    private final ITourProvider2   _tourProvider;
-   private final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
 
    public ActionRetrieveWeatherData(final ITourProvider2 tourProvider) {
 
@@ -77,7 +73,6 @@ public class ActionRetrieveWeatherData extends Action {
             .where(startPoint)
             .when(DateTimeFormatter.ofPattern("yyyy-MM-dd").format(selectedTours.get(0).getTourStartTime()),
                   selectedTours.get(0).getStartTimeOfDay() / 3600)
-            .forUser(_prefStore.getString(ITourbookPreferences.API_KEY))
             .retrieve();
 
       final WeatherData historicalWeatherData = historicalWeatherRetriever.getHistoricalWeatherData();
