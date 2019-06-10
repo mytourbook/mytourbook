@@ -16,6 +16,7 @@
 package net.tourbook.map2.view;
 
 import de.byteholder.geoclipse.map.Map;
+import de.byteholder.geoclipse.map.Tile;
 import de.byteholder.geoclipse.mapprovider.MP;
 import de.byteholder.geoclipse.mapprovider.MPCustom;
 import de.byteholder.geoclipse.mapprovider.MPPlugin;
@@ -58,7 +59,9 @@ import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.CheckboxCellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
+import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.EditingSupport;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -112,36 +115,35 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
 
 // SET_FORMATTING_ON
 
-   final static IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
-   final private IDialogSettings _state;
+   final static IPreferenceStore            _prefStore                         = TourbookPlugin.getPrefStore();
+   final private IDialogSettings            _state;
 
-   private ActionOpenPrefDialog  _action_ManageMapProviders;
-   private Action                _action_MapProvider_Next;
-   private Action                _action_MapProvider_Previous;
+   private ActionOpenMapProviderPreferences _action_ManageMapProviders;
+   private Action                           _action_MapProvider_Next;
+   private Action                           _action_MapProvider_Previous;
 
-   private Map2View              _map2View;
-   private TableViewer           _mpViewer;
-   private ColumnManager         _columnManager;
-   private TableColumnDefinition _colDef_IsMPVisible;
+   private Map2View                         _map2View;
+   private TableViewer                      _mpViewer;
+   private ColumnManager                    _columnManager;
+   private TableColumnDefinition            _colDef_IsMPVisible;
 
    /**
     * Index of the column with the image, index can be changed when the columns are reordered with
     * the mouse or the column manager
     */
-   private int                   _columnIndex_ForColumn_IsMPVisible;
+   private int                              _columnIndex_ForColumn_IsMPVisible = -1;
+   private int                              _columnWidth_ForColumn_IsVisible;
 
-   private long                  _dndDragStartViewerLeft;
+   private long                             _dndDragStartViewerLeft;
 
-   private MP                    _selectedMP;
-   private ArrayList<MP>         _allAvailableAndSortedMP;
+   private MP                               _selectedMP;
+   private ArrayList<MP>                    _allAvailableAndSortedMP;
 
    /** Ignore selection event */
-   private boolean               _isInUpdate;
-   private boolean               _isShowHiddenMapProvider;
+   private boolean                          _isInUpdate;
+   private boolean                          _isShowHiddenMapProvider;
 
-   private Button                _btnHideUnhideMP;
-
-   private PixelConverter        _pc;
+   private PixelConverter                   _pc;
 
    /*
     * UI controls
@@ -151,7 +153,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
 
    private Image     _imageYes;
    private Image     _imageNo;
-   private int       _columnWidth_IsVisible;
+   private Button    _btnHideUnhideMP;
 
    private class ActionOpenMapProviderPreferences extends ActionOpenPrefDialog {
 
@@ -506,6 +508,17 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
          }
       });
 
+      _mpViewer.addDoubleClickListener(new IDoubleClickListener() {
+
+         @Override
+         public void doubleClick(final DoubleClickEvent event) {
+
+            // the map provider is set in the run method
+
+            _action_ManageMapProviders.run();
+         }
+      });
+
       _mpViewer.setFilters(new ViewerFilter() {
 
          @Override
@@ -789,9 +802,28 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
 
    private void defineAllColumns() {
 
+      defineColumn_00_IsVisible();
       defineColumn_10_MapProvider();
       defineColumn_20_MPType();
-      defineColumn_30_IsVisible();
+      defineColumn_30_Url();
+   }
+
+   /**
+    * Column: Is visible
+    */
+   private void defineColumn_00_IsVisible() {
+
+      _colDef_IsMPVisible = new TableColumnDefinition(_columnManager, "IsVisible", SWT.CENTER); //$NON-NLS-1$
+
+      _colDef_IsMPVisible.setColumnName(Messages.Slideout_Map2Provider_Column_IsVisible);
+      _colDef_IsMPVisible.setColumnHeaderToolTipText(Messages.Slideout_Map2Provider_Column_IsVisible_Tooltip);
+      _colDef_IsMPVisible.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(12));
+      _colDef_IsMPVisible.setLabelProvider(new CellLabelProvider() {
+
+         // !!! set dummy label provider, otherwise an error occures !!!
+         @Override
+         public void update(final ViewerCell cell) {}
+      });
    }
 
    /**
@@ -856,20 +888,25 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
    }
 
    /**
-    * Column: Is visible
+    * Column: Url
     */
-   private void defineColumn_30_IsVisible() {
+   private void defineColumn_30_Url() {
 
-      _colDef_IsMPVisible = new TableColumnDefinition(_columnManager, "IsVisible", SWT.CENTER); //$NON-NLS-1$
+      final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, "TileUrl", SWT.LEAD); //$NON-NLS-1$
 
-      _colDef_IsMPVisible.setColumnName(Messages.Slideout_Map2Provider_Column_IsVisible);
-      _colDef_IsMPVisible.setColumnHeaderToolTipText(Messages.Slideout_Map2Provider_Column_IsVisible_Tooltip);
-      _colDef_IsMPVisible.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(12));
-      _colDef_IsMPVisible.setLabelProvider(new CellLabelProvider() {
+      colDef.setColumnName(Messages.Slideout_Map2Provider_Column_TileUrl);
+//      colDef.setColumnHeaderToolTipText(Messages.Slideout_Map2Provider_Column_MPType_Tooltip);
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
 
-         // !!! set dummy label provider, otherwise an error occures !!!
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
-         public void update(final ViewerCell cell) {}
+         public void update(final ViewerCell cell) {
+
+            final MP mapProvider = (MP) cell.getElement();
+
+            final Tile dummyTile = new Tile(mapProvider, 7, 77, 77, null);
+            cell.setText(mapProvider.getTileUrl(dummyTile));
+         }
       });
    }
 
@@ -992,29 +1029,19 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
 
             final MP mp = (MP) itemData;
 
-//            if (_colDef_IsVisible != null) {
-//
-//               final TableColumn tableColumn = _colDef_IsVisible.getTableColumn();
-//               if (tableColumn != null && tableColumn.isDisposed() == false) {
-//
-//               }
-//            }
-
             final Image image = mp.isVisibleInUI() ? _imageYes : _imageNo;
 
             if (image != null) {
 
                final Rectangle imageRect = image.getBounds();
 
-               final int x = event.x + event.width;
-
                // center horizontal
-               final int xOffset = Math.max(0, (_columnWidth_IsVisible - imageRect.width) / 2);
+               final int xOffset = Math.max(0, (_columnWidth_ForColumn_IsVisible - imageRect.width) / 2);
 
                // center vertical
                final int yOffset = Math.max(0, (event.height - imageRect.height) / 2);
 
-               final int devX = x + xOffset;
+               final int devX = event.x + xOffset;
                final int devY = event.y + yOffset;
 
                event.gc.drawImage(image, devX, devY);
@@ -1326,7 +1353,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
          final TableColumn tableColumn = _colDef_IsMPVisible.getTableColumn();
 
          if (tableColumn != null && tableColumn.isDisposed() == false) {
-            _columnWidth_IsVisible = tableColumn.getWidth();
+            _columnWidth_ForColumn_IsVisible = tableColumn.getWidth();
          }
       }
    }

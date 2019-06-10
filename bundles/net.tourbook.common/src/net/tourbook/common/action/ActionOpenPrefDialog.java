@@ -87,7 +87,7 @@ public class ActionOpenPrefDialog extends Action {
          _openedTooltip.hideNow();
       }
       if (_openedAdvancedSlideout != null) {
-         _openedAdvancedSlideout.hideNow();
+         _openedAdvancedSlideout.close();
       }
 
       PreferencesUtil.createPreferenceDialogOn(//

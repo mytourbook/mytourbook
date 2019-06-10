@@ -1895,6 +1895,9 @@ public class ColumnManager {
 
          // show column
 
+         // even more complicated -> update model otherwise column is not painted
+         columnDefinition.setIsColumnDisplayed(true);
+
          setVisibleColumnIds_Column_Show(columnDefinition, true);
 
       } else {
@@ -2157,18 +2160,24 @@ public class ColumnManager {
       for (final String columnId : visibleIds) {
 
          if (columnId.equals(headerHitColId)) {
-            // skip it to hide it
-            continue;
+
+            // set state that column is hidden
+
+            headerHitColDef.setIsColumnDisplayed(false);
+
+         } else {
+
+            // column is still displayed
+
+            final ColumnDefinition colDef = getColDef_ByColumnId(columnId);
+
+            // set visible columns
+            visibleColumnIds.add(colDef.getColumnId());
+
+            // set column id and width
+            visibleIdsAndWidth.add(colDef.getColumnId());
+            visibleIdsAndWidth.add(Integer.toString(colDef.getColumnWidth()));
          }
-
-         final ColumnDefinition colDef = getColDef_ByColumnId(columnId);
-
-         // set visible columns
-         visibleColumnIds.add(colDef.getColumnId());
-
-         // set column id and width
-         visibleIdsAndWidth.add(colDef.getColumnId());
-         visibleIdsAndWidth.add(Integer.toString(colDef.getColumnWidth()));
       }
 
       _activeProfile.visibleColumnIds = visibleColumnIds.toArray(new String[visibleColumnIds.size()]);
@@ -2199,6 +2208,12 @@ public class ColumnManager {
       for (final String columnId : _activeProfile.visibleColumnIds) {
 
          final ColumnDefinition colDef = getColDef_ByColumnId(columnId);
+
+         if (newColDef.getColumnId() == colDef.getColumnId() && isNewColumnAdded) {
+
+            // column is already added
+            continue;
+         }
 
          // set visible columns
          visibleColumnIds.add(columnId);
