@@ -87,12 +87,13 @@ public class ActionRetrieveWeatherData extends Action {
 
       // For the request, get the half-point of the route just like in CG
       for (final TourData tour : selectedTours) {
-         // TODO WHich avg temperature ? the one of the day ? the one of the hour ?
+         //TODO Take the temp at the start of the tour, take the temp at the end and make the average of it
          tour.setAvgTemperature(historicalWeatherData.getTemperatureAverage());
          tour.setWeatherWindSpeed(historicalWeatherData.getWindSpeed());
          tour.setWeatherWindDir(historicalWeatherData.getWindDirection());
          tour.setWeather(historicalWeatherData.getWeatherDescription());
          tour.setWeatherClouds(historicalWeatherData.getWeatherType());
+         tour.setWeatherDataFromApi(true);
       }
 
       TourManager.saveModifiedTours(selectedTours);
