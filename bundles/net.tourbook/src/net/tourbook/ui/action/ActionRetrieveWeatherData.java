@@ -15,9 +15,6 @@
  *******************************************************************************/
 package net.tourbook.ui.action;
 
-import com.javadocmd.simplelatlng.LatLng;
-
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
@@ -33,7 +30,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 public class ActionRetrieveWeatherData extends Action {
-   private final ITourProvider2   _tourProvider;
+   private final ITourProvider2 _tourProvider;
 
    public ActionRetrieveWeatherData(final ITourProvider2 tourProvider) {
 
@@ -58,7 +55,6 @@ public class ActionRetrieveWeatherData extends Action {
       if (selectedTours == null || selectedTours.size() < 1) {
 
          // a tour is not selected
-
          MessageDialog.openInformation(
                shell,
                Messages.Dialog_RetrieveWeather_Dialog_Title,
@@ -67,26 +63,19 @@ public class ActionRetrieveWeatherData extends Action {
          return;
       }
 
-      final LatLng startPoint = new LatLng(selectedTours.get(0).latitudeSerie[0], selectedTours.get(0).longitudeSerie[0]);
-
-      final HistoricalWeatherRetriever historicalWeatherRetriever = HistoricalWeatherRetriever
-            .where(startPoint)
-            .when(DateTimeFormatter.ofPattern("yyyy-MM-dd").format(selectedTours.get(0).getTourStartTime()),
-                  selectedTours.get(0).getStartTimeOfDay() / 3600)
-            .retrieve();
-
-      final WeatherData historicalWeatherData = historicalWeatherRetriever.getHistoricalWeatherData();
-      if (historicalWeatherData == null) {
-         MessageDialog.openInformation(
-               shell,
-               Messages.Dialog_RetrieveWeather_Dialog_Title,
-               Messages.UI_Label_TourIsNotSelected);
-
-         return;
-      }
-
-      // For the request, get the half-point of the route just like in CG
       for (final TourData tour : selectedTours) {
+         final HistoricalWeatherRetriever historicalWeatherRetriever = new HistoricalWeatherRetriever(tour);
+
+         final WeatherData historicalWeatherData = historicalWeatherRetriever.retrieve().getHistoricalWeatherData();
+         if (historicalWeatherData == null) {
+            MessageDialog.openInformation(
+                  shell,
+                  Messages.Dialog_RetrieveWeather_Dialog_Title,
+                  Messages.UI_Label_TourIsNotSelected);
+
+            return;
+         }
+
          //TODO Take the temp at the start of the tour, take the temp at the end and make the average of it
          tour.setAvgTemperature(historicalWeatherData.getTemperatureAverage());
          tour.setWeatherWindSpeed(historicalWeatherData.getWindSpeed());

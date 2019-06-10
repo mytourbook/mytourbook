@@ -18,13 +18,17 @@ package net.tourbook.weather;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.javadocmd.simplelatlng.LatLng;
+import com.javadocmd.simplelatlng.LatLngTool;
+import com.javadocmd.simplelatlng.util.LengthUnit;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.time.format.DateTimeFormatter;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
 
 import org.apache.http.HttpResponse;
@@ -38,9 +42,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
  */
 public class HistoricalWeatherRetriever {
 
-   private String                 startDate;
-   private String                 startTimeOfDay;
-   private LatLng                 searchAreaCenter;
+   private TourData               tour;
 
    private WeatherData            historicalWeatherData;
 
@@ -48,17 +50,42 @@ public class HistoricalWeatherRetriever {
 
    private final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
 
-   private HistoricalWeatherRetriever(final LatLng searchAreaCenter) {
-      this.searchAreaCenter = searchAreaCenter;
+   /*
+    * @param tour
+    * The tour for which we need to retrieve the weather data.
+    */
+   public HistoricalWeatherRetriever(final TourData tour) {
+      this.tour = tour;
    }
 
    /**
-    * Assigns the weather search area center to a new object.
-    *
-    * @return A new object.
+    * Determines the geographic area covered by a GPS track. The goal is to
+    * encompass most of the track to search a weather station as close as possible
+    * to the overall course and not just to a specific point.
     */
-   public static HistoricalWeatherRetriever where(final LatLng searchAreaCenter) {
-      return new HistoricalWeatherRetriever(searchAreaCenter);
+   private LatLng determineWeatherSearchArea() {
+      // Looking for the farthest point of the track
+      double maxDistance = Double.MIN_VALUE;
+      LatLng furthestPoint = null;
+      final LatLng startPoint = new LatLng(tour.latitudeSerie[0], tour.longitudeSerie[0]);
+      for (int index = 1; index < tour.latitudeSerie.length && index < tour.longitudeSerie.length; ++index) {
+         final LatLng currentPoint = new LatLng(tour.latitudeSerie[index], tour.longitudeSerie[index]);
+
+         final double distanceFromStart = LatLngTool.distance(startPoint, currentPoint, LengthUnit.METER);
+
+         if (distanceFromStart > maxDistance) {
+            maxDistance = distanceFromStart;
+            furthestPoint = currentPoint;
+         }
+      }
+
+      final double distanceFromStart = LatLngTool.distance(startPoint, furthestPoint, LengthUnit.METER);
+      final double bearingBetweenPoint = LatLngTool.initialBearing(startPoint, furthestPoint);
+
+      // We find the center of the circle formed by the starting point and the farthest point
+      final LatLng searchAreaCenter = LatLngTool.travel(startPoint, bearingBetweenPoint, distanceFromStart / 2, LengthUnit.METER);
+
+      return searchAreaCenter;
    }
 
    public WeatherData getHistoricalWeatherData() {
@@ -80,6 +107,8 @@ public class HistoricalWeatherRetriever {
          final String weatherResults = mapper.readValue(weatherDataResponse, JsonNode.class).get("data").get("weather").get(0).toString(); //$NON-NLS-1$ //$NON-NLS-2$
 
          final WWOWeatherResults rawWeatherData = mapper.readValue(weatherResults, WWOWeatherResults.class);
+         final double roundedStartTimeOfDay = Math.ceil(tour.getStartTimeOfDay() / 3600.0);
+         final String startTimeOfDay = (int)roundedStartTimeOfDay + "00"; //$NON-NLS-1$
 
          // Within the hourly data, find the time that corresponds to the tour start time
          // and extract the weather data.
@@ -112,13 +141,16 @@ public class HistoricalWeatherRetriever {
     * @return The result of the weather API query.
     */
    private String processRequest() {
-      final StringBuffer weatherHistory = new StringBuffer();
+      final LatLng searchAreaCenter = determineWeatherSearchArea();
+      final String startDate = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(tour.getTourStartTime());
+
       final String weatherRequestParameters = apiUrl + _prefStore.getString(ITourbookPreferences.API_KEY) + "&q=" + searchAreaCenter.getLatitude() //$NON-NLS-1$
             + "," + searchAreaCenter.getLongitude() //$NON-NLS-1$
             + "&date=" + startDate + "&tp=1&format=json"; //$NON-NLS-1$ //$NON-NLS-2$
       //tp=1 : Specifies the weather forecast time interval in hours. Here, every 1 hour
 
       BufferedReader rd = null;
+      final StringBuffer weatherHistory = new StringBuffer();
       try {
          final HttpClient client = HttpClientBuilder.create().build();
          final HttpGet request = new HttpGet(weatherRequestParameters);
@@ -151,13 +183,9 @@ public class HistoricalWeatherRetriever {
    }
 
    /**
-    * This method builds a HistoricalWeatherRetriever object and retrieves, if
-    * found, the weather data.
-    *
-    * @return the collected weather data.
+    * This method retrieves, if found, the weather data.
     */
    public HistoricalWeatherRetriever retrieve() {
-
       historicalWeatherData = retrieveHistoricalWeatherData();
 
       return this;
@@ -176,15 +204,5 @@ public class HistoricalWeatherRetriever {
       }
       final WeatherData historicalWeatherData = parseWeatherData(rawWeatherData);
       return historicalWeatherData;
-   }
-
-   /**
-    * @param dateTime
-    * @return
-    */
-   public HistoricalWeatherRetriever when(final String dateTime, final int startTimeOfDay) {
-      this.startDate = dateTime;
-      this.startTimeOfDay = startTimeOfDay + "00"; //$NON-NLS-1$
-      return this;
    }
 }
