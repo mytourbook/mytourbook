@@ -34,6 +34,7 @@ import net.tourbook.preferences.ITourbookPreferences;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.eclipse.jface.preference.IPreferenceStore;
 
@@ -154,7 +155,15 @@ public class HistoricalWeatherRetriever {
       BufferedReader rd = null;
       final StringBuffer weatherHistory = new StringBuffer();
       try {
-         final HttpClient client = HttpClientBuilder.create().build();
+         final HttpClientBuilder clientBuilder = HttpClientBuilder.create();
+         // I don't understand exactly the parameters 'requestSentRetryEnabled' is used.
+         // From the official documentation :
+         // (https://jar-download.com/artifacts/org.apache.httpcomponents/httpclient/4.5.2/source-code/org/apache/http/impl/client/DefaultHttpRequestRetryHandler.java)
+         // @param requestSentRetryEnabled true if it's OK to retry requests that have
+         // been sent
+         clientBuilder.setRetryHandler(new DefaultHttpRequestRetryHandler(3, false));
+         final HttpClient client = clientBuilder.build();
+
          final HttpGet request = new HttpGet(weatherRequestParameters);
          final HttpResponse response = client.execute(request);
 
