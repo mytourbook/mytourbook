@@ -439,7 +439,10 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
       return false;
    }
 
-   private void onDispose() {
+   /**
+    * Dispose UI resources, super.onDispose() must be called.
+    */
+   protected void onDispose() {
 
       _cursorResize.dispose();
       _cursorHand.dispose();

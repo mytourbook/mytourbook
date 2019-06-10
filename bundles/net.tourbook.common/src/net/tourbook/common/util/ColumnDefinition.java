@@ -74,7 +74,7 @@ public class ColumnDefinition implements Cloneable {
    protected int             _style;
 
    private CellLabelProvider _cellLabelProvider;
-   private ControlListener   _columnControlListener;
+
    private String            _columnCategory;
    private String            _columnHeaderText;
    private String            _columnToolTipText;
@@ -85,6 +85,7 @@ public class ColumnDefinition implements Cloneable {
    private boolean           _isColumnResizable   = true;
    private boolean           _isColumnMoveable    = true;
 
+   private ControlListener   _columnControlListener;
    private SelectionAdapter  _columnSelectionListener;
 
    private int               _createIndex;

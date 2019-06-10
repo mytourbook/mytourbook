@@ -164,10 +164,10 @@ public class ColumnManager {
    /**
     * Context menu listener
     */
-   private Listener                          _tableMenuDetectListener;
-   private Listener                          _treeMenuDetectListener;
+   private Listener                          _table_MenuDetect_Listener;
+   private Listener                          _tree_MenuDetect_Listener;
 
-   private final Listener                    _colItemListener;
+   private final Listener                    _colMenuItem_Listener;
 
    private IValueFormatter                   _valueFormatter_Number_1_0    = new ValueFormatter_Number_1_0();
    private IValueFormatter                   _valueFormatter_Number_1_1    = new ValueFormatter_Number_1_1();
@@ -179,7 +179,7 @@ public class ColumnManager {
    private IValueFormatter                   _valueFormatter_Time_SSS      = new ValueFormatter_Time_SSS();
 
    {
-      _colItemListener = new Listener() {
+      _colMenuItem_Listener = new Listener() {
          @Override
          public void handleEvent(final Event event) {
             onSelectColumnItem(event);
@@ -226,7 +226,7 @@ public class ColumnManager {
 
    void action_AddColumn(final ColumnDefinition colDef) {
 
-      setVisibleColumnIds_AddColumn(colDef);
+      setVisibleColumnIds_Column_Show(colDef, false);
    }
 
    private void action_FitAllColumnSize() {
@@ -415,7 +415,7 @@ public class ColumnManager {
          colMenuItem.setSelection(colDef.isColumnDisplayed());
 
          colMenuItem.setData(colDef);
-         colMenuItem.addListener(SWT.Selection, _colItemListener);
+         colMenuItem.addListener(SWT.Selection, _colMenuItem_Listener);
       }
    }
 
@@ -692,7 +692,7 @@ public class ColumnManager {
          menuItem.addListener(SWT.Selection, new Listener() {
             @Override
             public void handleEvent(final Event event) {
-               setVisibleColumnIds_HideCurrentColumn(colDef);
+               setVisibleColumnIds_Column_Hide(colDef);
             }
          });
 
@@ -807,7 +807,7 @@ public class ColumnManager {
          menuItem.setSelection(isChecked);
 
          menuItem.setData(columnProfile);
-         menuItem.addListener(SWT.Selection, _colItemListener);
+         menuItem.addListener(SWT.Selection, _colMenuItem_Listener);
       }
 
       createMenuSeparator(contextMenu);
@@ -897,14 +897,14 @@ public class ColumnManager {
    public void createHeaderContextMenu(final Table table, final IContextMenuProvider defaultContextMenuProvider, final Shell contextMenuShell) {
 
       // remove old listener
-      if (_tableMenuDetectListener != null) {
-         table.removeListener(SWT.MenuDetect, _tableMenuDetectListener);
+      if (_table_MenuDetect_Listener != null) {
+         table.removeListener(SWT.MenuDetect, _table_MenuDetect_Listener);
       }
 
       final Menu headerContextMenu[] = { createHCM_0_Menu(table, contextMenuShell, defaultContextMenuProvider) };
 
       // add the context menu to the table
-      _tableMenuDetectListener = new Listener() {
+      _table_MenuDetect_Listener = new Listener() {
          @Override
          public void handleEvent(final Event event) {
 
@@ -993,7 +993,7 @@ public class ColumnManager {
          }
       };
 
-      table.addListener(SWT.MenuDetect, _tableMenuDetectListener);
+      table.addListener(SWT.MenuDetect, _table_MenuDetect_Listener);
    }
 
    /**
@@ -1023,14 +1023,14 @@ public class ColumnManager {
    private void createHeaderContextMenu(final Tree tree, final IContextMenuProvider defaultContextMenuProvider, final Shell contextMenuShell) {
 
       // remove old listener
-      if (_treeMenuDetectListener != null) {
-         tree.removeListener(SWT.MenuDetect, _treeMenuDetectListener);
+      if (_tree_MenuDetect_Listener != null) {
+         tree.removeListener(SWT.MenuDetect, _tree_MenuDetect_Listener);
       }
 
       final Menu headerContextMenu[] = { createHCM_0_Menu(tree, contextMenuShell, defaultContextMenuProvider) };
 
       // add the context menu to the tree viewer
-      _treeMenuDetectListener = new Listener() {
+      _tree_MenuDetect_Listener = new Listener() {
          @Override
          public void handleEvent(final Event event) {
 
@@ -1130,7 +1130,7 @@ public class ColumnManager {
          }
       };
 
-      tree.addListener(SWT.MenuDetect, _treeMenuDetectListener);
+      tree.addListener(SWT.MenuDetect, _tree_MenuDetect_Listener);
    }
 
    private void createMenuSeparator(final Menu contextMenu) {
@@ -1419,6 +1419,8 @@ public class ColumnManager {
    /**
     * Read the order/width for the columns, this is necessary because the user can have rearranged
     * the columns and/or resized the columns with the mouse.
+    * <p>
+    * This will also update the model with the current column width.
     *
     * @return Returns ALL columns, first the visible then the hidden columns.
     */
@@ -1875,6 +1877,34 @@ public class ColumnManager {
       _columnLayout = columnLayout;
    }
 
+   /**
+    * Show or hide a column in the viewer.
+    *
+    * @param columnDefinition
+    * @param isVisible
+    */
+   public void setColumnVisible(final TableColumnDefinition columnDefinition, final boolean isVisible) {
+
+      // save current column widths into the model
+      setVisibleColumnIds_FromViewer();
+
+      // update model from the model -> highly complicated but is seems to work
+      getRearrangedColumns();
+
+      if (isVisible) {
+
+         // show column
+
+         setVisibleColumnIds_Column_Show(columnDefinition, true);
+
+      } else {
+
+         // hide column
+
+         setVisibleColumnIds_Column_Hide(columnDefinition);
+      }
+   }
+
    public void setIsCategoryAvailable(final boolean isCategoryAvailable) {
       _isCategoryAvailable = isCategoryAvailable;
    }
@@ -2097,46 +2127,6 @@ public class ColumnManager {
       }
    }
 
-   private void setVisibleColumnIds_AddColumn(final ColumnDefinition newColDef) {
-
-      final ArrayList<String> visibleColumnIds = new ArrayList<>();
-      final ArrayList<String> visibleIdsAndWidth = new ArrayList<>();
-
-      for (final String columnId : _activeProfile.visibleColumnIds) {
-
-         final ColumnDefinition colDef = getColDef_ByColumnId(columnId);
-
-         // set visible columns
-         visibleColumnIds.add(columnId);
-
-         // set column id and width
-         visibleIdsAndWidth.add(columnId);
-         visibleIdsAndWidth.add(Integer.toString(colDef.getColumnWidth()));
-      }
-
-      /*
-       * Append new column
-       */
-
-      // set visible columns
-      visibleColumnIds.add(newColDef.getColumnId());
-
-      // set column id and width
-      visibleIdsAndWidth.add(newColDef.getColumnId());
-      visibleIdsAndWidth.add(Integer.toString(newColDef.getColumnWidth()));
-
-      /*
-       * Update model
-       */
-      _activeProfile.visibleColumnIds = visibleColumnIds.toArray(new String[visibleColumnIds.size()]);
-      _activeProfile.visibleColumnIdsAndWidth = visibleIdsAndWidth.toArray(new String[visibleIdsAndWidth.size()]);
-
-      /*
-       * Update UI
-       */
-      _columnViewer = _tourViewer.recreateViewer(_columnViewer);
-   }
-
    private void setVisibleColumnIds_All() {
 
       final ArrayList<String> visibleColumnIds = new ArrayList<>();
@@ -2154,6 +2144,97 @@ public class ColumnManager {
 
       _activeProfile.visibleColumnIds = visibleColumnIds.toArray(new String[visibleColumnIds.size()]);
       _activeProfile.visibleColumnIdsAndWidth = visibleIdsAndWidth.toArray(new String[visibleIdsAndWidth.size()]);
+   }
+
+   private void setVisibleColumnIds_Column_Hide(final ColumnDefinition headerHitColDef) {
+
+      final String headerHitColId = headerHitColDef.getColumnId();
+      final String[] visibleIds = _activeProfile.visibleColumnIds;
+
+      final ArrayList<String> visibleColumnIds = new ArrayList<>();
+      final ArrayList<String> visibleIdsAndWidth = new ArrayList<>();
+
+      for (final String columnId : visibleIds) {
+
+         if (columnId.equals(headerHitColId)) {
+            // skip it to hide it
+            continue;
+         }
+
+         final ColumnDefinition colDef = getColDef_ByColumnId(columnId);
+
+         // set visible columns
+         visibleColumnIds.add(colDef.getColumnId());
+
+         // set column id and width
+         visibleIdsAndWidth.add(colDef.getColumnId());
+         visibleIdsAndWidth.add(Integer.toString(colDef.getColumnWidth()));
+      }
+
+      _activeProfile.visibleColumnIds = visibleColumnIds.toArray(new String[visibleColumnIds.size()]);
+      _activeProfile.visibleColumnIdsAndWidth = visibleIdsAndWidth.toArray(new String[visibleIdsAndWidth.size()]);
+
+      _columnViewer = _tourViewer.recreateViewer(_columnViewer);
+   }
+
+   private void setVisibleColumnIds_Column_Show(final ColumnDefinition newColDef, final boolean isFirstColumn) {
+
+      final ArrayList<String> visibleColumnIds = new ArrayList<>();
+      final ArrayList<String> visibleIdsAndWidth = new ArrayList<>();
+
+      boolean isNewColumnAdded = false;
+
+      if (isFirstColumn) {
+
+         // set visible columns
+         visibleColumnIds.add(newColDef.getColumnId());
+
+         // set column id and width
+         visibleIdsAndWidth.add(newColDef.getColumnId());
+         visibleIdsAndWidth.add(Integer.toString(newColDef.getColumnWidth()));
+
+         isNewColumnAdded = true;
+      }
+
+      for (final String columnId : _activeProfile.visibleColumnIds) {
+
+         final ColumnDefinition colDef = getColDef_ByColumnId(columnId);
+
+         // set visible columns
+         visibleColumnIds.add(columnId);
+
+         // set column id and width
+         visibleIdsAndWidth.add(columnId);
+         visibleIdsAndWidth.add(Integer.toString(colDef.getColumnWidth()));
+
+         if (newColDef.getColumnId() == colDef.getColumnId()) {
+            isNewColumnAdded = true;
+         }
+      }
+
+      /*
+       * Append new column
+       */
+      if (isNewColumnAdded == false) {
+
+         // set visible columns
+         visibleColumnIds.add(newColDef.getColumnId());
+
+         // set column id and width
+         visibleIdsAndWidth.add(newColDef.getColumnId());
+         visibleIdsAndWidth.add(Integer.toString(newColDef.getColumnWidth()));
+      }
+
+      /*
+       * Update model
+       */
+      _activeProfile.visibleColumnIds = visibleColumnIds.toArray(new String[visibleColumnIds.size()]);
+      _activeProfile.visibleColumnIdsAndWidth = visibleIdsAndWidth.toArray(new String[visibleIdsAndWidth.size()]);
+
+      /*
+       * Update UI
+       */
+      _columnViewer = _tourViewer.recreateViewer(_columnViewer);
    }
 
    private void setVisibleColumnIds_Default() {
@@ -2251,38 +2332,6 @@ public class ColumnManager {
       // get the sorting order and column width from the viewer
       _activeProfile.visibleColumnIds = getColumns_FromViewer_Ids();
       _activeProfile.visibleColumnIdsAndWidth = getColumns_FromViewer_IdAndWidth();
-
-   }
-
-   private void setVisibleColumnIds_HideCurrentColumn(final ColumnDefinition headerHitColDef) {
-
-      final String headerHitColId = headerHitColDef.getColumnId();
-      final String[] visibleIds = _activeProfile.visibleColumnIds;
-
-      final ArrayList<String> visibleColumnIds = new ArrayList<>();
-      final ArrayList<String> visibleIdsAndWidth = new ArrayList<>();
-
-      for (final String columnId : visibleIds) {
-
-         if (columnId.equals(headerHitColId)) {
-            // skip it to hide it
-            continue;
-         }
-
-         final ColumnDefinition colDef = getColDef_ByColumnId(columnId);
-
-         // set visible columns
-         visibleColumnIds.add(colDef.getColumnId());
-
-         // set column id and width
-         visibleIdsAndWidth.add(colDef.getColumnId());
-         visibleIdsAndWidth.add(Integer.toString(colDef.getColumnWidth()));
-      }
-
-      _activeProfile.visibleColumnIds = visibleColumnIds.toArray(new String[visibleColumnIds.size()]);
-      _activeProfile.visibleColumnIdsAndWidth = visibleIdsAndWidth.toArray(new String[visibleIdsAndWidth.size()]);
-
-      _columnViewer = _tourViewer.recreateViewer(_columnViewer);
    }
 
    private void updateColumns(final ColumnProfile profile) {
