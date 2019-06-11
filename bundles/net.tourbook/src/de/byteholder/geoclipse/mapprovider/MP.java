@@ -1440,7 +1440,4 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
       return _mapProviderName + "(" + _mapProviderId + ")"; //$NON-NLS-1$ //$NON-NLS-2$
    }
 
-   public void xxxset_sortIndex(final int _sortIndex) {
-      this._sortIndex = _sortIndex;
-   }
 }
