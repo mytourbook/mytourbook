@@ -23,7 +23,10 @@ import com.javadocmd.simplelatlng.util.LengthUnit;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.time.format.DateTimeFormatter;
 
 import net.tourbook.application.TourbookPlugin;
@@ -31,11 +34,6 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 /**
@@ -147,27 +145,45 @@ public class HistoricalWeatherRetriever {
       final LatLng searchAreaCenter = determineWeatherSearchArea();
       final String startDate = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(tour.getTourStartTime()); //$NON-NLS-1$
 
-      final String weatherRequestParameters = apiUrl + _prefStore.getString(ITourbookPreferences.API_KEY) + "&q=" + searchAreaCenter.getLatitude() //$NON-NLS-1$
+      final String weatherRequestWithParameters = apiUrl + _prefStore.getString(ITourbookPreferences.API_KEY) + "&q=" + searchAreaCenter.getLatitude() //$NON-NLS-1$
             + "," + searchAreaCenter.getLongitude() //$NON-NLS-1$
             + "&date=" + startDate + "&tp=1&format=json"; //$NON-NLS-1$ //$NON-NLS-2$
       //tp=1 : Specifies the weather forecast time interval in hours. Here, every 1 hour
 
       BufferedReader rd = null;
+      InputStream stream = null;
+      InputStreamReader isr = null;
       final StringBuffer weatherHistory = new StringBuffer();
       try {
-         final HttpClientBuilder clientBuilder = HttpClientBuilder.create();
-         // I don't understand exactly the parameters 'requestSentRetryEnabled' is used.
-         // From the official documentation :
-         // (https://jar-download.com/artifacts/org.apache.httpcomponents/httpclient/4.5.2/source-code/org/apache/http/impl/client/DefaultHttpRequestRetryHandler.java)
-         // @param requestSentRetryEnabled true if it's OK to retry requests that have
-         // been sent
-         clientBuilder.setRetryHandler(new DefaultHttpRequestRetryHandler(3, false));
-         final HttpClient client = clientBuilder.build();
+         final URL url = new URL(weatherRequestWithParameters);
+         final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+         connection.setRequestMethod("GET");
+         connection.connect();
 
-         final HttpGet request = new HttpGet(weatherRequestParameters);
-         final HttpResponse response = client.execute(request);
+         stream = connection.getInputStream();
+         isr = new InputStreamReader(stream);
+         rd = new BufferedReader(isr);
 
-         rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+         // read the contents using an InputStreamReader
+
+         // NOTE :
+         // Initially, I have used the below code but I kept getting RANDOM error as below:
+         // java.lang.NoClassDefFoundError: Could not initialize class sun.security.ssl.SSLContextImpl$CustomizedTLSContext
+         /*
+          * final HttpClientBuilder clientBuilder = HttpClientBuilder.create();
+          * // I don't understand exactly the parameters 'requestSentRetryEnabled' is used.
+          * // From the official documentation :
+          * //
+          * (https://jar-download.com/artifacts/org.apache.httpcomponents/httpclient/4.5.2/source-
+          * code/org/apache/http/impl/client/DefaultHttpRequestRetryHandler.java)
+          * // @param requestSentRetryEnabled true if it's OK to retry requests that have
+          * // been sent
+          * clientBuilder.setRetryHandler(new DefaultHttpRequestRetryHandler(3, false));
+          * final HttpClient client = clientBuilder.build();
+          * final HttpGet request = new HttpGet(weatherRequestParameters);
+          * final HttpResponse response = client.execute(request);
+          * rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+          */
 
          String line = ""; //$NON-NLS-1$
          while ((line = rd.readLine()) != null) {
@@ -176,13 +192,19 @@ public class HistoricalWeatherRetriever {
       } catch (final Exception ex) {
          StatusUtil.log(
                "WeatherHistoryRetriever.processRequest : Error while executing the historical weather request with the parameters " //$NON-NLS-1$
-                     + weatherRequestParameters + "\n" + ex.getMessage()); //$NON-NLS-1$
+                     + weatherRequestWithParameters + "\n" + ex.getMessage()); //$NON-NLS-1$
          return ""; //$NON-NLS-1$
       } finally {
          try {
             // close resources
             if (rd != null) {
                rd.close();
+            }
+            if (isr != null) {
+               isr.close();
+            }
+            if (stream != null) {
+               stream.close();
             }
 
          } catch (final IOException e) {

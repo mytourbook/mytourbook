@@ -71,7 +71,7 @@ public class ActionRetrieveWeatherData extends Action {
             MessageDialog.openInformation(
                   shell,
                   Messages.Dialog_RetrieveWeather_Dialog_Title,
-                  Messages.UI_Label_TourIsNotSelected);
+                  Messages.UI_Label_WeatherDataNotFound);
 
             return;
          }

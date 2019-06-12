@@ -7495,7 +7495,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
          _tourData.setCadenceMultiplier(_rdoCadence_Rpm.getSelection() ? 1.0f : 2.0f);
 
          _tourData.setWeather(_txtWeather.getText().trim());
-         _tourData.setWeatherWindDir(_spinWindDirectionValue.getSelection());
+         _tourData.setWeatherWindDir((int) (_spinWindDirectionValue.getSelection() / 10.0f));
          if (_isWindSpeedManuallyModified) {
             /*
              * update the speed only when it was modified because when the measurement is changed
@@ -7903,7 +7903,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
       _txtWeather.setText(_tourData.getWeather());
 
       // wind direction
-      final int weatherWindDirDegree = _tourData.getWeatherWindDir();
+      final int weatherWindDirDegree = (int) (_tourData.getWeatherWindDir() * 10.0f);
       _spinWindDirectionValue.setSelection(weatherWindDirDegree);
       _comboWindDirectionText.select(getWindDirectionTextIndex(weatherWindDirDegree));
 
