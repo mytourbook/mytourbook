@@ -82,7 +82,7 @@ public class ActionRetrieveWeatherData extends Action {
          tour.setWeatherWindDir(historicalWeatherData.getWindDirection());
          tour.setWeather(historicalWeatherData.getWeatherDescription());
          tour.setWeatherClouds(historicalWeatherData.getWeatherType());
-         tour.setWeatherDataFromApi(true);
+         tour.setIsWeatherDataFromApi(true);
       }
 
       TourManager.saveModifiedTours(selectedTours);

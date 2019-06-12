@@ -5663,7 +5663,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
       _comboLocation_End.setEnabled(canEdit);
 
       _txtWeather.setEnabled(canEdit);
-      _spinTemperature.setEnabled(canEdit && (_tourData != null && _tourData.temperatureSerie == null));
+      _spinTemperature.setEnabled(canEdit && (_tourData != null && (_tourData.temperatureSerie == null || _tourData.isWeatherDataFromApi())));
       _comboClouds.setEnabled(canEdit);
       _spinWindDirectionValue.setEnabled(canEdit);
 
