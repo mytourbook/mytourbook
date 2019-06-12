@@ -1504,7 +1504,7 @@ public abstract class AdvancedSlideoutShell {
    protected void restoreState_SlideoutIsPinned(final boolean isSlideoutPinned) {}
 
    /**
-    *
+    * State is saved AFTER the slideout is disposed.
     */
    protected void saveState() {
 
@@ -1520,6 +1520,13 @@ public abstract class AdvancedSlideoutShell {
       _state.put(STATE_VERT_SLIDEOUT_PIN_LOCATION_Y, _vertPinLocationY);
 
       _state.put(STATE_IS_KEEP_SLIDEOUT_OPEN, _isKeepSlideoutOpen);
+   }
+
+   /**
+    * This is called before the tooltip will be disposed.
+    */
+   protected void saveState_BeforeDisposed() {
+
    }
 
    /**
@@ -1759,6 +1766,8 @@ public abstract class AdvancedSlideoutShell {
          return;
       }
 
+      saveState_BeforeDisposed();
+
       // hide tooltip definitively
 
       ownerShellRemoveListener();
@@ -1779,6 +1788,8 @@ public abstract class AdvancedSlideoutShell {
       if (_visibleShell == null || _visibleShell.isDisposed()) {
          return;
       }
+
+      saveState_BeforeDisposed();
 
       closeInternalShells();
 

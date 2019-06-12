@@ -1,0 +1,48 @@
+19.7.0                                                      ?. July 2019
+ 
+
+
+New   
+===
+
+* 2D Map 
+
+  - Map provider slideout
+    
+    - 3 state column sorting: ascending/descending/manual with drag & drop
+
+
+
+ 
+Improvements   
+============
+
+* 
+
+  - 
+
+
+
+Bugfix   
+======
+
+* 
+
+  - 
+
+ 
+ 
+Translation    
+===========
+
+ - French (Frederic)
+ - German
+ - Italian (Doriano)
+
+ 
+ 
+System   
+======
+
+  - 
+

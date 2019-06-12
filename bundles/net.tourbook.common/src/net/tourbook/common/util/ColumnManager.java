@@ -56,7 +56,7 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.ControlListener;
-import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
@@ -527,7 +527,7 @@ public class ColumnManager {
       colDef.setTableColumn(tc);
 
       // add selection listener
-      final SelectionAdapter columnSelectionListener = colDef.getColumnSelectionListener();
+      final SelectionListener columnSelectionListener = colDef.getColumnSelectionListener();
       if (columnSelectionListener != null) {
          tc.addSelectionListener(columnSelectionListener);
       }
@@ -590,7 +590,7 @@ public class ColumnManager {
       colDef.setTreeColumn(tc);
 
       // add selection listener
-      final SelectionAdapter columnSelectionListener = colDef.getColumnSelectionListener();
+      final SelectionListener columnSelectionListener = colDef.getColumnSelectionListener();
       if (columnSelectionListener != null) {
          tc.addSelectionListener(columnSelectionListener);
       }
@@ -1904,6 +1904,8 @@ public class ColumnManager {
 
          // hide column
 
+         columnDefinition.setIsColumnDisplayed(false);
+
          setVisibleColumnIds_Column_Hide(columnDefinition);
       }
    }
@@ -2143,15 +2145,17 @@ public class ColumnManager {
          // set column id and width
          visibleIdsAndWidth.add(colDef.getColumnId());
          visibleIdsAndWidth.add(Integer.toString(colDef.getColumnWidth()));
+
+         colDef.setIsColumnDisplayed(true);
       }
 
       _activeProfile.visibleColumnIds = visibleColumnIds.toArray(new String[visibleColumnIds.size()]);
       _activeProfile.visibleColumnIdsAndWidth = visibleIdsAndWidth.toArray(new String[visibleIdsAndWidth.size()]);
    }
 
-   private void setVisibleColumnIds_Column_Hide(final ColumnDefinition headerHitColDef) {
+   private void setVisibleColumnIds_Column_Hide(final ColumnDefinition colDef_HeaderHit) {
 
-      final String headerHitColId = headerHitColDef.getColumnId();
+      final String headerHitColId = colDef_HeaderHit.getColumnId();
       final String[] visibleIds = _activeProfile.visibleColumnIds;
 
       final ArrayList<String> visibleColumnIds = new ArrayList<>();
@@ -2163,7 +2167,7 @@ public class ColumnManager {
 
             // set state that column is hidden
 
-            headerHitColDef.setIsColumnDisplayed(false);
+            colDef_HeaderHit.setIsColumnDisplayed(false);
 
          } else {
 
@@ -2186,7 +2190,7 @@ public class ColumnManager {
       _columnViewer = _tourViewer.recreateViewer(_columnViewer);
    }
 
-   private void setVisibleColumnIds_Column_Show(final ColumnDefinition newColDef, final boolean isFirstColumn) {
+   private void setVisibleColumnIds_Column_Show(final ColumnDefinition colDef_New, final boolean isFirstColumn) {
 
       final ArrayList<String> visibleColumnIds = new ArrayList<>();
       final ArrayList<String> visibleIdsAndWidth = new ArrayList<>();
@@ -2196,11 +2200,11 @@ public class ColumnManager {
       if (isFirstColumn) {
 
          // set visible columns
-         visibleColumnIds.add(newColDef.getColumnId());
+         visibleColumnIds.add(colDef_New.getColumnId());
 
          // set column id and width
-         visibleIdsAndWidth.add(newColDef.getColumnId());
-         visibleIdsAndWidth.add(Integer.toString(newColDef.getColumnWidth()));
+         visibleIdsAndWidth.add(colDef_New.getColumnId());
+         visibleIdsAndWidth.add(Integer.toString(colDef_New.getColumnWidth()));
 
          isNewColumnAdded = true;
       }
@@ -2209,7 +2213,7 @@ public class ColumnManager {
 
          final ColumnDefinition colDef = getColDef_ByColumnId(columnId);
 
-         if (newColDef.getColumnId() == colDef.getColumnId() && isNewColumnAdded) {
+         if (colDef_New.getColumnId() == colDef.getColumnId() && isNewColumnAdded) {
 
             // column is already added
             continue;
@@ -2222,7 +2226,7 @@ public class ColumnManager {
          visibleIdsAndWidth.add(columnId);
          visibleIdsAndWidth.add(Integer.toString(colDef.getColumnWidth()));
 
-         if (newColDef.getColumnId() == colDef.getColumnId()) {
+         if (colDef_New.getColumnId() == colDef.getColumnId()) {
             isNewColumnAdded = true;
          }
       }
@@ -2233,11 +2237,11 @@ public class ColumnManager {
       if (isNewColumnAdded == false) {
 
          // set visible columns
-         visibleColumnIds.add(newColDef.getColumnId());
+         visibleColumnIds.add(colDef_New.getColumnId());
 
          // set column id and width
-         visibleIdsAndWidth.add(newColDef.getColumnId());
-         visibleIdsAndWidth.add(Integer.toString(newColDef.getColumnWidth()));
+         visibleIdsAndWidth.add(colDef_New.getColumnId());
+         visibleIdsAndWidth.add(Integer.toString(colDef_New.getColumnWidth()));
       }
 
       /*
@@ -2267,6 +2271,12 @@ public class ColumnManager {
             // set column id and width
             visibleIdsAndWidth.add(colDef.getColumnId());
             visibleIdsAndWidth.add(Integer.toString(colDef.getColumnWidth()));
+
+            colDef.setIsColumnDisplayed(true);
+
+         } else {
+
+            colDef.setIsColumnDisplayed(false);
          }
       }
 
@@ -2288,10 +2298,10 @@ public class ColumnManager {
 
             final boolean isChecked = menuItem.getSelection();
 
-            if (isChecked) {
+            // data in the table item contains the input items for the viewer
+            final ColumnDefinition colDef = (ColumnDefinition) itemData;
 
-               // data in the table item contains the input items for the viewer
-               final ColumnDefinition colDef = (ColumnDefinition) itemData;
+            if (isChecked) {
 
                // set the visible columns
                visibleColumnIds.add(colDef.getColumnId());
@@ -2299,6 +2309,12 @@ public class ColumnManager {
                // set column id and width
                columnIdsAndWidth.add(colDef.getColumnId());
                columnIdsAndWidth.add(Integer.toString(colDef.getColumnWidth()));
+
+               colDef.setIsColumnDisplayed(true);
+
+            } else {
+
+               colDef.setIsColumnDisplayed(false);
             }
          }
       }

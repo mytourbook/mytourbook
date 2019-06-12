@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.map2.view;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.mapprovider.MP;
 import de.byteholder.geoclipse.mapprovider.MPCustom;
@@ -82,10 +84,12 @@ import org.eclipse.swt.dnd.TransferData;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
-import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -114,13 +118,14 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
 
 // SET_FORMATTING_ON
 
-   private static final String              COLUMN_IS_VISIBLE                  = "IsVisible";                  //$NON-NLS-1$
-   private static final String              COLUMN_MAP_PROVIDER                = "MapProvider";                //$NON-NLS-1$
-   private static final String              COLUMN_MP_TYPE                     = "MPType";                     //$NON-NLS-1$
-   private static final String              COLUMN_TILE_URL                    = "TileUrl";                    //$NON-NLS-1$
+   private static final String              COLUMN_IS_VISIBLE                  = "IsVisible";                        //$NON-NLS-1$
+   private static final String              COLUMN_MAP_PROVIDER                = "MapProvider";                      //$NON-NLS-1$
+   private static final String              COLUMN_MP_TYPE                     = "MPType";                           //$NON-NLS-1$
+   private static final String              COLUMN_TILE_URL                    = "TileUrl";                          //$NON-NLS-1$
 
-   private static final String              STATE_SORT_COLUMN_DIRECTION        = "STATE_SORT_COLUMN_DIRECTION";//$NON-NLS-1$
-   private static final String              STATE_SORT_COLUMN_ID               = "STATE_SORT_COLUMN_ID";       //$NON-NLS-1$
+   private static final String              STATE_IS_SHOW_HIDDEN_MAP_PROVIDER  = "STATE_IS_SHOW_HIDDEN_MAP_PROVIDER";//$NON-NLS-1$
+   private static final String              STATE_SORT_COLUMN_DIRECTION        = "STATE_SORT_COLUMN_DIRECTION";      //$NON-NLS-1$
+   private static final String              STATE_SORT_COLUMN_ID               = "STATE_SORT_COLUMN_ID";             //$NON-NLS-1$
 
    private static final IPreferenceStore    _prefStore                         = TourbookPlugin.getPrefStore();
    private static IDialogSettings           _state;
@@ -145,9 +150,9 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
    private long                             _dndDragStartViewerLeft;
 
    private MP                               _selectedMP;
-   private ArrayList<MP>                    _allAvailableAndSortedMP;
+   private ArrayList<MP>                    _allMapProvider;
 
-   private SelectionAdapter                 _columnSortListener;
+   private SelectionListener                _columnSortListener;
 
    /** Ignore selection event */
    private boolean                          _isInUpdate;
@@ -187,48 +192,60 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
          final MP mp1 = (MP) e1;
          final MP mp2 = (MP) e2;
 
-         double rc = 0;
+         if (__sortDirection == MANUAL_SORTING) {
 
-         // Determine which column and do the appropriate sort
-         switch (__sortColumnId) {
+            return mp1.getSortIndex() - mp2.getSortIndex();
 
-         case COLUMN_MP_TYPE:
-            rc = getMapProviderType(mp1).compareTo(getMapProviderType(mp2));
-            break;
+         } else {
 
-         case COLUMN_IS_VISIBLE:
-            rc = Boolean.compare(mp1.isVisibleInUI(), mp2.isVisibleInUI());
-            break;
+            double rc = 0;
 
-         case COLUMN_TILE_URL:
-            rc = getTileUrl(mp1).compareTo(getTileUrl(mp2));
-            break;
+            // Determine which column and do the appropriate sort
+            switch (__sortColumnId) {
 
-         case COLUMN_MAP_PROVIDER:
-         default:
-            rc = mp1.getName().compareTo(mp2.getName());
+            case COLUMN_IS_VISIBLE:
+
+               /*
+                * Comparison is mp2->mp1 that the map providers are ascending sorted when visible is
+                * ascending sorted
+                */
+               rc = Boolean.compare(mp2.isVisibleInUI(), mp1.isVisibleInUI());
+               break;
+
+            case COLUMN_MP_TYPE:
+               rc = getMapProviderType(mp1).compareTo(getMapProviderType(mp2));
+               break;
+
+            case COLUMN_TILE_URL:
+               rc = getTileUrl(mp1).compareTo(getTileUrl(mp2));
+               break;
+
+            case COLUMN_MAP_PROVIDER:
+            default:
+               rc = mp1.getName().compareTo(mp2.getName());
+            }
+
+            if (rc == 0) {
+
+               // subsort by map provider
+
+               rc = mp1.getName().compareTo(mp2.getName());
+            }
+
+            // if descending order, flip the direction
+            if (__sortDirection == DESCENDING) {
+               rc = -rc;
+            }
+
+            /*
+             * MUST return 1 or -1 otherwise long values are not sorted correctly.
+             */
+            return rc > 0 //
+                  ? 1
+                  : rc < 0 //
+                        ? -1
+                        : 0;
          }
-
-         if (rc == 0) {
-
-            // subsort by map provider
-
-            rc = mp1.getName().compareTo(mp2.getName());
-         }
-
-         // if descending order, flip the direction
-         if (__sortDirection == DESCENDING) {
-            rc = -rc;
-         }
-
-         /*
-          * MUST return 1 or -1 otherwise long values are not sorted correctly.
-          */
-         return rc > 0 //
-               ? 1
-               : rc < 0 //
-                     ? -1
-                     : 0;
       }
 
       @Override
@@ -245,9 +262,22 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
 
          if (columnId.equals(__sortColumnId)) {
 
-            // Same column as last sort; toggle the direction
+            // Same column as last sort -> select next sorting
 
-            __sortDirection = 1 - __sortDirection;
+            switch (__sortDirection) {
+            case ASCENDING:
+               __sortDirection = DESCENDING;
+               break;
+
+            case DESCENDING:
+               __sortDirection = MANUAL_SORTING;
+               break;
+
+            case MANUAL_SORTING:
+            default:
+               __sortDirection = ASCENDING;
+               break;
+            }
 
          } else {
 
@@ -331,6 +361,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
 
    private void action_HideUnhideMapProvider() {
 
+      // toggle visibility
       _isShowHiddenMapProvider = !_isShowHiddenMapProvider;
 
       updateUI_HideUnhideMapProviders();
@@ -444,35 +475,39 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
 
       final ArrayList<String> storedMpIds = Util.convertStringToList(_prefStore.getString(IMappingPreferences.MAP_PROVIDER_SORT_ORDER));
 
-      _allAvailableAndSortedMP = new ArrayList<>();
+      _allMapProvider = new ArrayList<>();
 
       int mpSortIndex = 0;
 
-      // put all map providers into the viewer which are defined in the pref store
+      /*
+       * Set sortindex for manual sorted map provider
+       */
       for (final String storeMpId : storedMpIds) {
 
          // find the stored map provider in the available map providers
+
          for (final MP mp : allMapProvider) {
             if (mp.getId().equals(storeMpId)) {
 
                mp.setSortIndex(mpSortIndex++);
 
-               _allAvailableAndSortedMP.add(mp);
+               _allMapProvider.add(mp);
+
                break;
             }
          }
       }
 
-      // make sure that all available map providers are in the viewer
+      // make sure that all available map providers are in the list
       for (final MP mp : allMapProvider) {
-         if (!_allAvailableAndSortedMP.contains(mp)) {
-            _allAvailableAndSortedMP.add(mp);
+         if (!_allMapProvider.contains(mp)) {
+            _allMapProvider.add(mp);
          }
       }
 
       // ensure that one mp is available
-      if (_allAvailableAndSortedMP.size() == 0) {
-         _allAvailableAndSortedMP.add(MapProviderManager.getDefaultMapProvider());
+      if (_allMapProvider.size() == 0) {
+         _allMapProvider.add(MapProviderManager.getDefaultMapProvider());
       }
    }
 
@@ -490,7 +525,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
             createUI_20_MapViewer(_viewerContainer);
          }
 
-         createUI_30_Hint(shellContainer);
+         createUI_30_Tips(shellContainer);
          createUI_90_Actions(shellContainer);
       }
 
@@ -520,6 +555,9 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
       table.setLinesVisible(false);
       table.setHeaderBackground(bgColor);
       table.setHeaderForeground(fgColor);
+
+      // set colors for all cells
+      UI.setChildColors(table, fgColor, bgColor);
 
       /*
        * NOTE: MeasureItem, PaintItem and EraseItem are called repeatedly. Therefore, it is critical
@@ -571,6 +609,16 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
          }
       });
 
+      table.addKeyListener(new KeyAdapter() {
+         @Override
+         public void keyPressed(final KeyEvent e) {
+
+            if (e.character == ' ') {
+               toggleMPVisibility();
+            }
+         }
+      });
+
       /*
        * Create table viewer
        */
@@ -597,7 +645,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
 
          @Override
          public Object[] getElements(final Object inputElement) {
-            return _allAvailableAndSortedMP.toArray();
+            return _allMapProvider.toArray();
          }
       });
 
@@ -635,33 +683,12 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
          }
       });
 
-      /**
-       * When a viewer filter is used, then a comparator MUST be set,
-       * otherwise it is wrongly sorted !!!
-       */
-//      _mpViewer.setComparator(new ViewerComparator() {
-//
-//         @Override
-//         public int compare(final Viewer viewer, final Object e1, final Object e2) {
-//
-//            final MP mp1 = (MP) e1;
-//            final MP mp2 = (MP) e2;
-//
-//            return mp1.getSortIndex() - mp2.getSortIndex();
-//         }
-//      });
-
       _mpViewer.setComparator(_mpComparator);
 
-      updateUI_SetSortDirection(//
-            _mpComparator.__sortColumnId,
-            _mpComparator.__sortDirection);
+      updateUI_SetSortDirection(_mpComparator.__sortColumnId, _mpComparator.__sortDirection);
 
       createUI_21_DragAndDrop();
       createUI_22_ContextMenu();
-
-      // set colors for all controls
-      UI.setChildColors(table, fgColor, bgColor);
    }
 
    private void createUI_21_DragAndDrop() {
@@ -695,13 +722,24 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
                @Override
                public void dragStart(final DragSourceEvent event) {
 
-                  final LocalSelectionTransfer transfer = LocalSelectionTransfer.getTransfer();
-                  final ISelection selection = _mpViewer.getSelection();
+                  if (_mpComparator.__sortDirection == MapProviderComparator.MANUAL_SORTING) {
 
-                  transfer.setSelection(selection);
-                  transfer.setSelectionSetTime(_dndDragStartViewerLeft = event.time & 0xFFFFFFFFL);
+                     // drag & drop can only be done with manual sorting
 
-                  event.doit = !selection.isEmpty();
+                     final LocalSelectionTransfer transfer = LocalSelectionTransfer.getTransfer();
+                     final ISelection selection = _mpViewer.getSelection();
+
+                     transfer.setSelection(selection);
+                     transfer.setSelectionSetTime(_dndDragStartViewerLeft = event.time & 0xFFFFFFFFL);
+
+                     event.doit = !selection.isEmpty();
+
+                  } else {
+
+                     // column is sorted ascending/descending -> no d&d
+
+                     event.doit = false;
+                  }
                }
             });
 
@@ -819,9 +857,8 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
                      mpTable.setSelection(mpIndex);
                      mpTable.setFocus();
 
-                     // save state
-                     saveState_MapProviders();
-
+                     // save sort order
+                     saveState_MapProviders_SortOrder();
                   }
                   _isInUpdate = false;
 
@@ -876,11 +913,12 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
       _columnManager.createHeaderContextMenu(table, new EmptyContextMenuProvider());
    }
 
-   private void createUI_30_Hint(final Composite parent) {
+   private void createUI_30_Tips(final Composite parent) {
 
       // label: Hint
       final Label label = new Label(parent, SWT.NONE);
       label.setText(Messages.Slideout_Map2Provider_Label_Tip);
+      label.setToolTipText(Messages.Slideout_Map2Provider_Label_Tip_Tooltip);
    }
 
    private void createUI_90_Actions(final Composite parent) {
@@ -899,12 +937,9 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
             _btnHideUnhideMP = new Button(container, SWT.NONE);
             _btnHideUnhideMP.setText(Messages.Slideout_Map2Provider_Button_UnhideMP);
             _btnHideUnhideMP.setToolTipText(Messages.Slideout_Map2Provider_Button_UnhideMP_Tooltip);
-            _btnHideUnhideMP.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  action_HideUnhideMapProvider();
-               }
-            });
+
+            _btnHideUnhideMP.addSelectionListener(widgetSelectedAdapter(event -> action_HideUnhideMapProvider()));
+
             UI.setButtonLayoutData(_btnHideUnhideMP);
          }
       }
@@ -940,7 +975,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
    }
 
    /**
-    * Column: Map Provider, this is the first column with a checkbox
+    * Column: Map provider
     */
    private void defineColumn_10_MapProvider() {
 
@@ -976,6 +1011,8 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
       colDef.setColumnName(Messages.Slideout_Map2Provider_Column_MPType);
       colDef.setColumnHeaderToolTipText(Messages.Slideout_Map2Provider_Column_MPType_Tooltip);
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
+
+      colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -1032,21 +1069,10 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
 
       final ArrayList<MP> allMPInMPViewer = new ArrayList<>();
 
-      if (_isShowHiddenMapProvider) {
+      final TableItem[] items = _mpViewer.getTable().getItems();
 
-         // show all, nothing is hidden
-
-         allMPInMPViewer.addAll(_allAvailableAndSortedMP);
-
-      } else {
-
-         // show only visible map provider
-
-         for (final MP mp : _allAvailableAndSortedMP) {
-            if (mp.isVisibleInUI()) {
-               allMPInMPViewer.add(mp);
-            }
-         }
+      for (final TableItem item : items) {
+         allMPInMPViewer.add((MP) item.getData());
       }
 
       return allMPInMPViewer;
@@ -1114,7 +1140,6 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
    }
 
    private String getTileUrl(final MP mapProvider) {
-      String tileUrl = UI.EMPTY_STRING;
 
       if (mapProvider instanceof MPWms) {
 
@@ -1122,7 +1147,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
 
          final MPWms wmsMapProvider = (MPWms) mapProvider;
 
-         tileUrl = wmsMapProvider.getCapabilitiesUrl();
+         return wmsMapProvider.getCapabilitiesUrl();
 
       } else if (mapProvider instanceof MPCustom) {
 
@@ -1130,13 +1155,13 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
 
          final MPCustom customMapProvider = (MPCustom) mapProvider;
 
-         tileUrl = customMapProvider.getCustomUrl();
+         return customMapProvider.getCustomUrl();
 
       } else if (mapProvider instanceof MPProfile) {
 
          // map profile
 
-         tileUrl = UI.EMPTY_STRING;
+         return UI.EMPTY_STRING;
 
       } else if (mapProvider instanceof MPPlugin) {
 
@@ -1145,9 +1170,10 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
          final MPPlugin pluginMapProvider = (MPPlugin) mapProvider;
          final String baseURL = pluginMapProvider.getBaseURL();
 
-         tileUrl = baseURL == null ? UI.EMPTY_STRING : baseURL;
+         return baseURL == null ? UI.EMPTY_STRING : baseURL;
       }
-      return tileUrl;
+
+      return UI.EMPTY_STRING;
    }
 
    @Override
@@ -1167,12 +1193,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
       _imageYes = TourbookPlugin.getImageDescriptor(Messages.Image__State_OK).createImage();
       _imageNo = TourbookPlugin.getImageDescriptor(Messages.Image__State_Error).createImage();
 
-      _columnSortListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            onSelect_SortColumn(e);
-         }
-      };
+      _columnSortListener = widgetSelectedAdapter(e -> onSelect_SortColumn(e));
    }
 
    @Override
@@ -1215,27 +1236,24 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
          final TableItem item = (TableItem) event.item;
          final Object itemData = item.getData();
 
-         if (itemData instanceof MP) {
+         final MP mp = (MP) itemData;
 
-            final MP mp = (MP) itemData;
+         final Image image = mp.isVisibleInUI() ? _imageYes : _imageNo;
 
-            final Image image = mp.isVisibleInUI() ? _imageYes : _imageNo;
+         if (image != null) {
 
-            if (image != null) {
+            final Rectangle imageRect = image.getBounds();
 
-               final Rectangle imageRect = image.getBounds();
+            // center horizontal
+            final int xOffset = Math.max(0, (_columnWidth_ForColumn_IsVisible - imageRect.width) / 2);
 
-               // center horizontal
-               final int xOffset = Math.max(0, (_columnWidth_ForColumn_IsVisible - imageRect.width) / 2);
+            // center vertical
+            final int yOffset = Math.max(0, (event.height - imageRect.height) / 2);
 
-               // center vertical
-               final int yOffset = Math.max(0, (event.height - imageRect.height) / 2);
+            final int devX = event.x + xOffset;
+            final int devY = event.y + yOffset;
 
-               final int devX = event.x + xOffset;
-               final int devY = event.y + yOffset;
-
-               event.gc.drawImage(image, devX, devY);
-            }
+            event.gc.drawImage(image, devX, devY);
          }
 
          break;
@@ -1254,7 +1272,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
 
          // this can occure when the last selected mp is not available or filtered out
 
-         selectedMapProvider = _allAvailableAndSortedMP.get(0);
+         selectedMapProvider = _allMapProvider.get(0);
       }
 
       selectMapProviderInTheMap(selectedMapProvider);
@@ -1324,12 +1342,14 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
       {
          // keep selection
          final ISelection selectionBackup = getViewerSelection();
-         {
-            // update viewer with new sorting
-            _mpComparator.setSortColumn(e.widget);
-            _mpViewer.refresh();
-         }
-         updateUI_SelectGeoFilterItem(selectionBackup);
+
+         // toggle sorting
+         _mpComparator.setSortColumn(e.widget);
+         _mpViewer.refresh();
+
+         // reselect selection
+         _mpViewer.setSelection(selectionBackup, true);
+         _mpViewer.getTable().showSelection();
       }
       _viewerContainer.setRedraw(true);
    }
@@ -1344,11 +1364,13 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
          {
             _mpViewer.getTable().dispose();
 
-            createUI_20_MapViewer(_viewerContainer);
+            final boolean isColumnDisplayed = _colDef_IsMPVisible.isColumnDisplayed();
 
-            _columnIndex_ForColumn_IsMPVisible = _colDef_IsMPVisible.isColumnDisplayed()
+            _columnIndex_ForColumn_IsMPVisible = isColumnDisplayed
                   ? _colDef_IsMPVisible.getCreateIndex()
                   : -1;
+
+            createUI_20_MapViewer(_viewerContainer);
 
             // update UI
             _viewerContainer.layout();
@@ -1373,12 +1395,14 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
 
    private void restoreState() {
 
+      _isShowHiddenMapProvider = Util.getStateBoolean(_state, STATE_IS_SHOW_HIDDEN_MAP_PROVIDER, true);
+
       /*
        * Check all map providers which are defined in the pref store
        */
       final ArrayList<String> storeProviderIds = Util.convertStringToList(_prefStore.getString(IMappingPreferences.MAP_PROVIDER_VISIBLE_IN_UI));
 
-      for (final MP mapProvider : _allAvailableAndSortedMP) {
+      for (final MP mapProvider : _allMapProvider) {
 
          final String mpId = mapProvider.getId();
 
@@ -1411,11 +1435,9 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
 
    private void restoreState_BeforeUI() {
 
-      // sorting
+      // update sorting comparator
       final String sortColumnId = Util.getStateString(_state, STATE_SORT_COLUMN_ID, COLUMN_MAP_PROVIDER);
       final int sortDirection = Util.getStateInt(_state, STATE_SORT_COLUMN_DIRECTION, MapProviderComparator.DESCENDING);
-
-      // update comparator
       _mpComparator.__sortColumnId = sortColumnId;
       _mpComparator.__sortDirection = sortDirection;
    }
@@ -1423,7 +1445,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
    @Override
    protected void saveState() {
 
-      // save UI
+      _state.put(STATE_IS_SHOW_HIDDEN_MAP_PROVIDER, _isShowHiddenMapProvider);
 
       _state.put(STATE_SORT_COLUMN_ID, _mpComparator.__sortColumnId);
       _state.put(STATE_SORT_COLUMN_DIRECTION, _mpComparator.__sortDirection);
@@ -1433,24 +1455,16 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
       super.saveState();
    }
 
+   @Override
+   protected void saveState_BeforeDisposed() {
+
+      saveState_MapProviders_VisibleInUI();
+   }
+
    /**
     * Save the ckeck state and order of the map providers
     */
-   private void saveState_MapProviders() {
-
-      /*
-       * Save all checked map providers
-       */
-
-      final ArrayList<String> allVisibleMP = new ArrayList<>();
-
-      for (final MP mp : _allAvailableAndSortedMP) {
-         if (mp.isVisibleInUI()) {
-            allVisibleMP.add(mp.getId());
-         }
-      }
-
-      _prefStore.setValue(IMappingPreferences.MAP_PROVIDER_VISIBLE_IN_UI, Util.convertListToString(allVisibleMP));
+   private void saveState_MapProviders_SortOrder() {
 
       /*
        * Save order of all map providers
@@ -1470,6 +1484,26 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
    }
 
    /**
+    * Save the ckeck state and order of the map providers
+    */
+   private void saveState_MapProviders_VisibleInUI() {
+
+      /*
+       * Save all checked map providers
+       */
+
+      final ArrayList<String> allVisibleMP = new ArrayList<>();
+
+      for (final MP mp : _allMapProvider) {
+         if (mp.isVisibleInUI()) {
+            allVisibleMP.add(mp.getId());
+         }
+      }
+
+      _prefStore.setValue(IMappingPreferences.MAP_PROVIDER_VISIBLE_IN_UI, Util.convertListToString(allVisibleMP));
+   }
+
+   /**
     * Select a map provider by it's map provider ID
     *
     * @param selectedMpId
@@ -1482,7 +1516,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
        */
       if (selectedMpId != null) {
 
-         for (final MP mp : _allAvailableAndSortedMP) {
+         for (final MP mp : _allMapProvider) {
 
             // check mp ID
             if (mp.getId().equals(selectedMpId)) {
@@ -1498,7 +1532,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
       /*
        * If map provider is not set, get default map provider
        */
-      for (final MP mp : _allAvailableAndSortedMP) {
+      for (final MP mp : _allMapProvider) {
 
          if (mp.getId().equals(MapProviderManager.DEFAULT_MAP_PROVIDER_ID)) {
 
@@ -1512,7 +1546,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
       /*
        * if map provider is not set, get first one
        */
-      final MP mp = _allAvailableAndSortedMP.get(0);
+      final MP mp = _allMapProvider.get(0);
       if (mp != null) {
 
          // map provider is available
@@ -1578,6 +1612,32 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
       }
    }
 
+   private void toggleMPVisibility() {
+
+      final MP mp = (MP) _mpViewer.getStructuredSelection().getFirstElement();
+
+      if (mp == null) {
+
+         // this occured
+
+         return;
+      }
+
+      if (_colDef_IsMPVisible.isColumnDisplayed()) {
+
+         // toggle only when visible column is displayed
+
+         // update model - toggle visibility
+         mp.setIsVisibleInUI(!mp.isVisibleInUI());
+
+         // update UI
+         _mpViewer.update(mp, null);
+
+         // redraw to show changed image
+         _mpViewer.getTable().redraw();
+      }
+   }
+
    @Override
    public void updateColumnHeader(final ColumnDefinition colDef) {}
 
@@ -1601,9 +1661,6 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
          _btnHideUnhideMP.setText(Messages.Slideout_Map2Provider_Button_UnhideMP);
          _btnHideUnhideMP.setToolTipText(Messages.Slideout_Map2Provider_Button_UnhideMP_Tooltip);
       }
-
-      // show/hide visible column
-      recreateViewer(_mpViewer);
    }
 
    /**
@@ -1624,49 +1681,23 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
    }
 
    /**
-    * Select and reveal a compare item item.
-    *
-    * @param selection
-    */
-   private void updateUI_SelectGeoFilterItem(final ISelection selection) {
-
-//      _isInUpdate = true;
-      {
-         _mpViewer.setSelection(selection, true);
-         _mpViewer.getTable().showSelection();
-
-//       // focus can have changed when resorted, set focus to the selected item
-//       int selectedIndex = 0;
-//       final Table table = _geoFilterViewer.getTable();
-//       final TableItem[] items = table.getItems();
-//       for (int itemIndex = 0; itemIndex < items.length; itemIndex++) {
-//
-//          final TableItem tableItem = items[itemIndex];
-//
-//          if (tableItem.getData() == selectedProfile) {
-//             selectedIndex = itemIndex;
-//          }
-//       }
-//       table.setSelection(selectedIndex);
-//       table.showSelection();
-
-      }
-//      _isInUpdate = false;
-   }
-
-   /**
-    * Set the sort column direction indicator for a column.
+    * Set the sort column direction indicator for a column
     *
     * @param sortColumnId
     * @param isAscendingSort
     */
    private void updateUI_SetSortDirection(final String sortColumnId, final int sortDirection) {
 
+      final int direction =
+            sortDirection == MapProviderComparator.ASCENDING ? SWT.UP
+                  : sortDirection == MapProviderComparator.DESCENDING ? SWT.DOWN
+                        : SWT.NONE;
+
       final Table table = _mpViewer.getTable();
       final TableColumn tc = getSortColumn(sortColumnId);
 
       table.setSortColumn(tc);
-      table.setSortDirection(sortDirection == MapProviderComparator.ASCENDING ? SWT.UP : SWT.DOWN);
+      table.setSortDirection(direction);
    }
 
    private void updateUI_SetViewerInput() {

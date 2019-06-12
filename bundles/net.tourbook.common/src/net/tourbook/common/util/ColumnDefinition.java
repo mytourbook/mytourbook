@@ -28,7 +28,7 @@ import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.events.ControlListener;
-import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionListener;
 
 public class ColumnDefinition implements Cloneable {
 
@@ -60,8 +60,9 @@ public class ColumnDefinition implements Cloneable {
     * every column in a table must have a unique id
     */
    private String            _columnId;
+
    /**
-    * visibility status used in the modify dialog, this is used if the dialog is canceled to not
+    * Visibility status used in the modify dialog, this is used if the dialog is canceled to not
     * touch the visible status
     */
    private boolean           _isColumnDisplayed;
@@ -86,7 +87,7 @@ public class ColumnDefinition implements Cloneable {
    private boolean           _isColumnMoveable    = true;
 
    private ControlListener   _columnControlListener;
-   private SelectionAdapter  _columnSelectionListener;
+   private SelectionListener _columnSelectionListener;
 
    private int               _createIndex;
 
@@ -276,7 +277,7 @@ public class ColumnDefinition implements Cloneable {
       return _label;
    }
 
-   public SelectionAdapter getColumnSelectionListener() {
+   public SelectionListener getColumnSelectionListener() {
       return _columnSelectionListener;
    }
 
@@ -553,10 +554,10 @@ public class ColumnDefinition implements Cloneable {
     * Add listener which is called when the column header is selected, this is mainly used to sort
     * columns.
     *
-    * @param selectionAdapter
+    * @param selectionListener
     */
-   public void setColumnSelectionListener(final SelectionAdapter selectionAdapter) {
-      _columnSelectionListener = selectionAdapter;
+   public void setColumnSelectionListener(final SelectionListener selectionListener) {
+      _columnSelectionListener = selectionListener;
    }
 
    /**

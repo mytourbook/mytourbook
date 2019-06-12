@@ -1971,6 +1971,7 @@ public class Messages extends NLS {
    public static String Slideout_Map2Provider_Column_MPType_WMS;
    public static String Slideout_Map2Provider_Column_TileUrl;
    public static String Slideout_Map2Provider_Label_Tip;
+   public static String Slideout_Map2Provider_Label_Tip_Tooltip;
    public static String Slideout_Map2Provider_MapProvider_Next_Tooltip;
    public static String Slideout_Map2Provider_MapProvider_Previous_Tooltip;
 
