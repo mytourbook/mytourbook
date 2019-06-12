@@ -230,14 +230,22 @@ public class Messages extends NLS {
    public static String        Weather_Clounds_Snow;
    public static String        Weather_Clounds_Sunny;
 
-   public static String        Weather_WindDirection_E;
    public static String        Weather_WindDirection_N;
+   public static String        Weather_WindDirection_NNE;
    public static String        Weather_WindDirection_NE;
-   public static String        Weather_WindDirection_NW;
-   public static String        Weather_WindDirection_S;
+   public static String        Weather_WindDirection_ENE;
+   public static String        Weather_WindDirection_E;
+   public static String        Weather_WindDirection_ESE;
    public static String        Weather_WindDirection_SE;
+   public static String        Weather_WindDirection_SSE;
+   public static String        Weather_WindDirection_S;
+   public static String        Weather_WindDirection_SSW;
    public static String        Weather_WindDirection_SW;
+   public static String        Weather_WindDirection_WSW;
    public static String        Weather_WindDirection_W;
+   public static String        Weather_WindDirection_WNW;
+   public static String        Weather_WindDirection_NW;
+   public static String        Weather_WindDirection_NNW;
 
    public static String        Weather_WindSpeed_Bft00;
    public static String        Weather_WindSpeed_Bft00_Short;

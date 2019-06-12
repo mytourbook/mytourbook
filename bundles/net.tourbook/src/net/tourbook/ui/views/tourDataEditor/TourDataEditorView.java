@@ -3838,7 +3838,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
                .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
                .applyTo(_comboWindDirectionText);
          _comboWindDirectionText.setToolTipText(Messages.tour_editor_label_WindDirectionNESW_Tooltip);
-         _comboWindDirectionText.setVisibleItemCount(10);
+         _comboWindDirectionText.setVisibleItemCount(16);
          _comboWindDirectionText.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(final SelectionEvent e) {
@@ -3862,8 +3862,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
                .indent(10, 0)
                .align(SWT.BEGINNING, SWT.CENTER)
                .applyTo(_spinWindDirectionValue);
-         _spinWindDirectionValue.setMinimum(-1);
-         _spinWindDirectionValue.setMaximum(360);
+         _spinWindDirectionValue.setMinimum(0);
+         _spinWindDirectionValue.setMaximum(3600);
+         _spinWindDirectionValue.setDigits(1);
          _spinWindDirectionValue.setToolTipText(Messages.tour_editor_label_wind_direction_Tooltip);
 
          _spinWindDirectionValue.addModifyListener(new ModifyListener() {
@@ -3940,7 +3941,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
                .applyTo(_spinTemperature);
          _spinTemperature.setToolTipText(Messages.tour_editor_label_temperature_Tooltip);
 
-         // the min/max temperature has a large range because fahrenheit has bigger values than celcius
+         // the min/max temperature has a large range because fahrenheit has bigger values than celsius
          _spinTemperature.setMinimum(-600);
          _spinTemperature.setMaximum(1500);
 
@@ -3984,7 +3985,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
             }
          });
 
-         // label: celcius, fahrenheit
+         // label: celsius, fahrenheit
          _lblTemperatureUnit = _tk.createLabel(container, UI.UNIT_LABEL_TEMPERATURE);
 
          /*
@@ -6220,9 +6221,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
    private int getWindDirectionTextIndex(final int degreeDirection) {
 
-      final float degree = (degreeDirection + 22.5f) / 45.0f;
+      final float degree = (degreeDirection / 10.0f + 11.25f) / 22.5f;
 
-      final int directionIndex = ((int) degree) % 8;
+      final int directionIndex = ((int) degree) % 16;
 
       return directionIndex;
    }
@@ -6867,12 +6868,16 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
    private void onSelectWindDirectionText() {
 
-      // N=0=0  NE=1=45  E=2=90  SE=3=135  S=4=180  SW=5=225  W=6=270  NW=7=315
+      // N=348.75=11.25   NNE=11.25=33.75    NE=33.75=56.25    ENE=56.25=78.75
+      // E=78.75=101.25   ESE=101.25=123.75  SE=123.75=146.25  SSE=146.25=168.75
+      // S=168.75=191.25  SSW=191.25=213.75  SW=213.75=236.25  WSW=236.25=258.75
+      // W=258.75=281.25  WNW=281.25=303.75  NW=303.75=326.25  NNW=326.25=348.75
+
       final int selectedIndex = _comboWindDirectionText.getSelectionIndex();
 
       // get degree from selected direction
 
-      final int degree = selectedIndex * 45;
+      final int degree = (int) (selectedIndex * 22.5f * 10f);
 
       _spinWindDirectionValue.setSelection(degree);
    }
@@ -6881,11 +6886,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
       int degree = _spinWindDirectionValue.getSelection();
 
-      if (degree == -1) {
-         degree = 359;
-         _spinWindDirectionValue.setSelection(degree);
-      }
-      if (degree == 360) {
+      if (degree == 3600) {
          degree = 0;
          _spinWindDirectionValue.setSelection(degree);
       }
