@@ -498,7 +498,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    private int                   weatherHumidity;                                      // db-version 39
 
-   private float                 weatherPrecipitation;                                        // db-version 39
+   private float                 weatherPrecipitation;                                 // db-version 39
+
+   private int                   weatherPressure;                                      // db-version 39
 
    /** Unit is Watt */
    private float                 power_Avg;
@@ -8087,6 +8089,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return weatherPrecipitation;
    }
 
+   public int getWeatherPressure() {
+      return weatherPressure;
+   }
+
    public int getWeatherWindDir() {
       return weatherWindDir;
    }
@@ -9968,6 +9974,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    public void setWeatherPrecipitation(final float weatherPrecipitation) {
       this.weatherPrecipitation = weatherPrecipitation;
+   }
+
+   public void setWeatherPressure(final int weatherPressure) {
+      this.weatherPressure = weatherPressure;
    }
 
    public void setWeatherWindDir(final int weatherWindDir) {

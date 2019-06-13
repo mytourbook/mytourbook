@@ -580,6 +580,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
    private Label             _lblDistanceUnit;
    private Label             _lblHumidityUnit;
    private Label             _lblPrecipitationUnit;
+   private Label             _lblPressureUnit;
    private Label             _lblSpeedUnit;
    private Label             _lblStartTime;
    private Label             _lblTags;
@@ -597,6 +598,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
    private Spinner           _spinFTP;
    private Spinner           _spinHumidity;
    private Spinner           _spinPrecipitationValue;
+   private Spinner           _spinPressureValue;
    private Spinner           _spinRestPuls;
    private Spinner           _spinTemperature;
    private Spinner           _spinWindDirectionValue;
@@ -4033,6 +4035,26 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
          // label: mm, inches
          _lblPrecipitationUnit = _tk.createLabel(container, UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
+
+         /*
+          * Pressure
+          */
+         // label
+         label = _tk.createLabel(container, Messages.tour_editor_label_pressure);
+         label.setToolTipText(Messages.tour_editor_label_pressure_Tooltip);
+         _firstColumnControls.add(label);
+
+         // spinner: pressure value
+         _spinPressureValue = new Spinner(container, SWT.BORDER);
+         GridDataFactory
+               .fillDefaults()
+               .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+               .align(SWT.BEGINNING, SWT.CENTER)
+               .applyTo(_spinPressureValue);
+         _spinPressureValue.setMaximum(400000);
+
+         // label: mb, inHg
+         _lblPressureUnit = _tk.createLabel(container, UI.UNIT_LABEL_PRESSURE_MB_OR_INHG);
 
          /*
           * clouds
@@ -7990,6 +8012,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
       _spinPrecipitationValue.setData(FIX_LINUX_ASYNC_EVENT_1, true);
       _spinPrecipitationValue.setSelection((int) (precipitation * 100f));
 
+      /*
+       * Pressure
+       */
+      final double pressure = UI.convertPressureFromMetric(_tourData.getWeatherPressure());
+
+      _spinPressureValue.setData(FIX_LINUX_ASYNC_EVENT_1, true);
+      _spinPressureValue.setDigits(2);
+      _spinPressureValue.setSelection((int) (pressure * 100f));
+
       // set start date/time without time zone
       final ZonedDateTime tourStartTime = _tourData.getTourStartTime();
       _dtTourDate.setData(FIX_LINUX_ASYNC_EVENT_1, true);
@@ -8064,6 +8095,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
       _lblAltitudeUpUnit.setText(UI.UNIT_LABEL_ALTITUDE);
       _lblAltitudeDownUnit.setText(UI.UNIT_LABEL_ALTITUDE);
       _lblPrecipitationUnit.setText(UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
+      _lblPressureUnit.setText(UI.UNIT_LABEL_PRESSURE_MB_OR_INHG);
       _lblTemperatureUnit.setText(UI.UNIT_LABEL_TEMPERATURE);
       _lblSpeedUnit.setText(UI.UNIT_LABEL_SPEED);
 

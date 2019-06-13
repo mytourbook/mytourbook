@@ -238,6 +238,7 @@ public class UI {
    public static String       UNIT_LABEL_DISTANCE_MM_OR_INCH;
    public static String       UNIT_LABEL_ALTITUDE;
    public static String       UNIT_LABEL_ALTIMETER;
+   public static String       UNIT_LABEL_PRESSURE_MB_OR_INHG;
    public static String       UNIT_LABEL_TEMPERATURE;
    public static String       UNIT_LABEL_SPEED;
    public static String       UNIT_LABEL_PACE;
@@ -267,6 +268,7 @@ public class UI {
    public static final String          UNIT_PACE_MIN_P_KM         = "min/km";                   //$NON-NLS-1$
    public static final String          UNIT_PACE_MIN_P_MILE       = "min/mi";                   //$NON-NLS-1$
    public static final String          UNIT_PRESSURE_MB           = "mb";                       //$NON-NLS-1$
+   public static final String          UNIT_PRESSURE_INHG         = "inHg";                     //$NON-NLS-1$
    public static final String          UNIT_SPEED_KM_H            = "km/h";                     //$NON-NLS-1$
    public static final String          UNIT_SPEED_MPH             = "mph";                      //$NON-NLS-1$
    public static final String          UNIT_TEMPERATURE_C         = "\u00B0C";                  //$NON-NLS-1$
@@ -662,6 +664,18 @@ public class UI {
       }
 
       return precipitation * UNIT_M_TO_INCHES / 100f;
+   }
+
+   /**
+    * @param weatherPressure
+    * @return Returns the atmospheric pressure value in the current measurement system.
+    */
+   public static double convertPressureFromMetric(final int weatherPressure) {
+      if (UNIT_VALUE_TEMPERATURE == 1) {
+         return weatherPressure;
+      }
+final double toto = weatherPressure * 0.02953f;
+      return weatherPressure * 0.02953f;
    }
 
    /**

@@ -32,11 +32,20 @@ public class WeatherData {
    private String WeatherDescription;
    private String WeatherType;
    private int    averageHumidity;
+   private int    averagePressure;
 
    public WeatherData() {
       maxTemperature = Float.MIN_VALUE;
       minTemperature = Float.MIN_VALUE;
       AverageTemperature = Float.MIN_VALUE;
+   }
+
+   public int getAverageHumidity() {
+      return averageHumidity;
+   }
+
+   public int getAveragePressure() {
+      return averagePressure;
    }
 
    public float getPrecipitation() {
@@ -69,6 +78,14 @@ public class WeatherData {
 
    public int getWindSpeed() {
       return WindSpeed;
+   }
+
+   public void setAverageHumidity(final int averageHumidity) {
+      this.averageHumidity = averageHumidity;
+   }
+
+   public void setAveragePressure(final int averagePressure) {
+      this.averagePressure = averagePressure;
    }
 
    public void setPrecipitation(final float precipitation) {
@@ -145,13 +162,5 @@ public class WeatherData {
 
    public void setWindSpeed(final int windSpeed) {
       WindSpeed = windSpeed;
-   }
-
-   public int getAverageHumidity() {
-      return averageHumidity;
-   }
-
-   public void setAverageHumidity(int averageHumidity) {
-      this.averageHumidity = averageHumidity;
    }
 }

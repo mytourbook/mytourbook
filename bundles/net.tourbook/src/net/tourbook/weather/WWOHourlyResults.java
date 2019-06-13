@@ -43,7 +43,6 @@ public class WWOHourlyResults {
    private String                 tempC;
    private String                 pressure;
    private int                    humidity;
-   private String                 pressureInches;
 
    private String                 precipMM;
 
@@ -63,12 +62,8 @@ public class WWOHourlyResults {
       return Float.parseFloat(precipMM);
    }
 
-   public String getPressure() {
-      return pressure;
-   }
-
-   public String getPressureInches() {
-      return pressureInches;
+   public int getPressure() {
+      return Integer.parseInt(pressure);
    }
 
    public String getTempC() {
@@ -120,17 +115,6 @@ public class WWOHourlyResults {
       {
          weatherDescription.append(weatherResults.getMintempF() != null ? weatherResults.getMintempF() : "--");
          weatherDescription.append(" " + UI.UNIT_TEMPERATURE_F);
-      }
-
-      //Pressure
-      weatherDescription.append(", Pressure: ");
-      if (UI.UNIT_VALUE_TEMPERATURE == 1) { // Metric
-         weatherDescription.append(pressure != null ? pressure : "--");
-         weatherDescription.append(" " + UI.UNIT_PRESSURE_MB);
-      } else // Imperial
-      {
-         weatherDescription.append(pressureInches != null ? pressureInches : "--");
-         weatherDescription.append(" " + UI.UNIT_DISTANCE_INCH);
       }
 
       return weatherDescription.toString();
