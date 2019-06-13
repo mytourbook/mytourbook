@@ -2943,8 +2943,8 @@ public class TourDatabase {
             // version 39 start  -  19.7
             //
             + " isWeatherDataFromApi                  BOOLEAN  DEFAULT FALSE,             \n" //$NON-NLS-1$
-            + " precipitation                         FLOAT    DEFAULT 0,                 \n" //$NON-NLS-1$
-            + " averageHumidity                       SMALLINT DEFAULT 0,                 \n" //$NON-NLS-1$
+            + " weatherPrecipitation                  FLOAT    DEFAULT 0,                 \n" //$NON-NLS-1$
+            + " weatherHumidity                       SMALLINT DEFAULT 0,                 \n" //$NON-NLS-1$
             //
             // version 39 end
 
@@ -7091,8 +7091,8 @@ public class TourDatabase {
 
             // Add new columns
             SQL.AddCol_Boolean(stmt, TABLE_TOUR_DATA,             "isWeatherDataFromApi",       DEFAULT_FALSE); //$NON-NLS-1$
-            SQL.AddCol_Float  (stmt, TABLE_TOUR_DATA,             "precipitation",              DEFAULT_0); //$NON-NLS-1$
-            SQL.AddCol_Int    (stmt, TABLE_TOUR_DATA,             "averageHumidity",            DEFAULT_0); //$NON-NLS-1$
+            SQL.AddCol_Float  (stmt, TABLE_TOUR_DATA,             "weatherPrecipitation",              DEFAULT_0); //$NON-NLS-1$
+            SQL.AddCol_Int    (stmt, TABLE_TOUR_DATA,             "weatherHumidity",            DEFAULT_0); //$NON-NLS-1$
 
 // SET_FORMATTING_ON
          }

@@ -494,11 +494,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    private String                weatherClouds;                                        // db-version 8
 
-   private String                weather;                                                // db-version 13
+   private String                weather;                                              // db-version 13
 
-   private int averageHumidity; // db-version 39
+   private int                   weatherHumidity;                                      // db-version 39
 
-   private float precipitation; // db-version 39
+   private float                 weatherPrecipitation;                                        // db-version 39
 
    /** Unit is Watt */
    private float                 power_Avg;
@@ -6362,11 +6362,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
    }
 
-   public int getAverageHumidity() {
-      // TODO Auto-generated method stub
-      return averageHumidity;
-   }
-
    /**
     * @return the avgCadence
     */
@@ -7203,10 +7198,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
 
       return powerSerie;
-   }
-
-   public float getPrecipitation() {
-      return precipitation;
    }
 
    public float[] getPulseSmoothedSerie() {
@@ -8067,6 +8058,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return weatherClouds;
    }
 
+   public int getWeatherHumidity() {
+      return weatherHumidity;
+   }
+
    /**
     * @return Returns the index for the cloud values in {@link IWeather#cloudIcon} and
     *         {@link IWeather#cloudText} or 0 when the clouds are not defined
@@ -8086,6 +8081,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
 
       return weatherCloudsIndex < 0 ? 0 : weatherCloudsIndex;
+   }
+
+   public float getWeatherPrecipitation() {
+      return weatherPrecipitation;
    }
 
    public int getWeatherWindDir() {
@@ -8610,10 +8609,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
    }
 
-   public void setAverageHumidity(final int averageHumidity) {
-      this.averageHumidity = averageHumidity;
-   }
-
    /**
     * @param avgCadence
     *           the avgCadence to set
@@ -9015,10 +9010,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    public void setPowerSerie(final float[] powerSerie) {
       this.powerSerie = powerSerie;
       this.isPowerSerieFromDevice = true;
-   }
-
-   public void setPrecipitation(final float precipitation) {
-      this.precipitation = precipitation;
    }
 
    public void setRearShiftCount(final int rearShiftCount) {
@@ -9969,6 +9960,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    public void setWeatherClouds(final String weatherClouds) {
       this.weatherClouds = weatherClouds;
+   }
+
+   public void setWeatherHumidity(final int weatherHumidity) {
+      this.weatherHumidity = weatherHumidity;
+   }
+
+   public void setWeatherPrecipitation(final float weatherPrecipitation) {
+      this.weatherPrecipitation = weatherPrecipitation;
    }
 
    public void setWeatherWindDir(final int weatherWindDir) {

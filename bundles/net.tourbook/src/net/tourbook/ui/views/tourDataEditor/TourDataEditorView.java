@@ -7977,7 +7977,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
       /*
        * Humidity
        */
-      final int humidity = _tourData.getAverageHumidity();
+      final int humidity = _tourData.getWeatherHumidity();
 
       _spinHumidity.setData(FIX_LINUX_ASYNC_EVENT_1, true);
       _spinHumidity.setSelection(humidity);
@@ -7985,7 +7985,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
       /*
        * Precipitation
        */
-      final float precipitation = UI.convertPrecipitationFromMetric(_tourData.getPrecipitation());
+      final float precipitation = UI.convertPrecipitationFromMetric(_tourData.getWeatherPrecipitation());
 
       _spinPrecipitationValue.setData(FIX_LINUX_ASYNC_EVENT_1, true);
       _spinPrecipitationValue.setSelection((int) (precipitation * 100f));
