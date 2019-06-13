@@ -111,6 +111,12 @@ public class WeatherData {
       //case "200":
       //    WeatherType = IWeather.WEATHER_ID_LIGHTNING;
       //   break;
+      case "293":
+      case "296":
+      case "299":
+      case "302":
+      case "305":
+      case "308":
       case "356":
       case "359":
          WeatherType = IWeather.WEATHER_ID_RAIN;
