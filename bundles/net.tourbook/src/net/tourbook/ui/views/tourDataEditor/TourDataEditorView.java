@@ -578,6 +578,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
    private Label             _lblAltitudeUpUnit;
    private Label             _lblAltitudeDownUnit;
    private Label             _lblDistanceUnit;
+   private Label             _lblHumidityUnit;
    private Label             _lblPrecipitationUnit;
    private Label             _lblSpeedUnit;
    private Label             _lblStartTime;
@@ -594,6 +595,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
    private Spinner           _spinBodyWeight;
    private Spinner           _spinCalories;
    private Spinner           _spinFTP;
+   private Spinner           _spinHumidity;
    private Spinner           _spinPrecipitationValue;
    private Spinner           _spinRestPuls;
    private Spinner           _spinTemperature;
@@ -3989,6 +3991,27 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
          // label: celsius, fahrenheit
          _lblTemperatureUnit = _tk.createLabel(container, UI.UNIT_LABEL_TEMPERATURE);
+
+         /*
+          * Humidity
+          */
+         // label
+         label = _tk.createLabel(container, Messages.tour_editor_label_humidity);
+         label.setToolTipText(Messages.tour_editor_label_humidity_Tooltip);
+         _firstColumnControls.add(label);
+
+         // spinner: humidity value
+         _spinHumidity = new Spinner(container, SWT.BORDER);
+         GridDataFactory
+               .fillDefaults()
+               .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+               .align(SWT.BEGINNING, SWT.CENTER)
+               .applyTo(_spinHumidity);
+         _spinHumidity.setMinimum(0);
+         _spinHumidity.setMaximum(100);
+
+         // label: mm, inches
+         _lblHumidityUnit = _tk.createLabel(container, UI.UNIT_PERCENT);
 
          /*
           * Precipitation
@@ -7950,6 +7973,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
       _spinTemperature.setData(FIX_LINUX_ASYNC_EVENT_1, true);
       _spinTemperature.setDigits(1);
       _spinTemperature.setSelection((int) ((avgTemperature * 10) + 0.5));
+
+      /*
+       * Humidity
+       */
+      final int humidity = _tourData.getAverageHumidity();
+
+      _spinHumidity.setData(FIX_LINUX_ASYNC_EVENT_1, true);
+      _spinHumidity.setSelection(humidity);
 
       /*
        * Precipitation

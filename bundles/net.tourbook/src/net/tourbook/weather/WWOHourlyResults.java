@@ -42,7 +42,7 @@ public class WWOHourlyResults {
 
    private String                 tempC;
    private String                 pressure;
-   private String                 humidity;
+   private int                    humidity;
    private String                 pressureInches;
 
    private String                 precipMM;
@@ -55,7 +55,7 @@ public class WWOHourlyResults {
       return FeelsLikeF;
    }
 
-   public String getHumidity() {
+   public int getHumidity() {
       return humidity;
    }
 
@@ -132,11 +132,6 @@ public class WWOHourlyResults {
          weatherDescription.append(pressureInches != null ? pressureInches : "--");
          weatherDescription.append(" " + UI.UNIT_DISTANCE_INCH);
       }
-
-      //Humidity
-      weatherDescription.append(", Humidity: ");
-      weatherDescription.append(humidity != null ? humidity : "--");
-      weatherDescription.append("" + UI.SYMBOL_PERCENTAGE);
 
       return weatherDescription.toString();
    }

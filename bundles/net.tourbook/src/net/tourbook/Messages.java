@@ -2523,6 +2523,8 @@ public class Messages extends NLS {
    public static String tour_editor_label_clouds;
    public static String tour_editor_label_clouds_Tooltip;
    public static String tour_editor_label_temperature;
+   public static String tour_editor_label_humidity;
+   public static String tour_editor_label_humidity_Tooltip;
    public static String tour_editor_label_precipitation;
    public static String tour_editor_label_precipitation_Tooltip;
    public static String tour_editor_label_temperature_Tooltip;

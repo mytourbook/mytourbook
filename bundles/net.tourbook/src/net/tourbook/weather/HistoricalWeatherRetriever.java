@@ -131,6 +131,8 @@ public class HistoricalWeatherRetriever {
          float totalPrecipitation = 0f;
          boolean isTourStartData = false;
          boolean isTourEndData = false;
+         int numHourlyDatasets = 0;
+         int totalHumidity = 0;
          for (final WWOHourlyResults hourlyData : rawWeatherData.gethourly()) {
             if (hourlyData.gettime().equals(startTime)) {
                isTourStartData = true;
@@ -143,9 +145,11 @@ public class HistoricalWeatherRetriever {
                weatherData.setWindDirection(Integer.parseInt(hourlyData.getWinddirDegree()));
                weatherData.setWindSpeed(Integer.parseInt(hourlyData.getWindspeedKmph()));
                weatherData.setWeatherDescription(hourlyData.getWeatherDescription(rawWeatherData));
+               totalHumidity += hourlyData.getHumidity();
                totalPrecipitation += hourlyData.getPrecipMM();
                weatherData.setWeatherType(hourlyData.getWeatherCode());
 
+               ++numHourlyDatasets;
                if (isTourEndData) {
                   break;
                }
@@ -157,6 +161,7 @@ public class HistoricalWeatherRetriever {
          weatherData.setTemperatureMax(rawWeatherData.getmaxtempC());
          weatherData.setTemperatureMin(rawWeatherData.getmintempC());
          weatherData.setTemperatureAverage(rawWeatherData.getavgtempC());
+         weatherData.setAverageHumidity((int) Math.ceil((double) totalHumidity / (double) numHourlyDatasets));
          weatherData.setPrecipitation(totalPrecipitation);
 
       } catch (final IOException e) {

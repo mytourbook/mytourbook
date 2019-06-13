@@ -76,10 +76,10 @@ public class ActionRetrieveWeatherData extends Action {
             return;
          }
 
-         //TODO Take the temp at the start of the tour, take the temp at the end and make the average of it
          tour.setAvgTemperature(historicalWeatherData.getTemperatureAverage());
          tour.setWeatherWindSpeed(historicalWeatherData.getWindSpeed());
          tour.setWeatherWindDir(historicalWeatherData.getWindDirection());
+         tour.setAverageHumidity(historicalWeatherData.getAverageHumidity());
          tour.setPrecipitation(historicalWeatherData.getPrecipitation());
          tour.setWeather(historicalWeatherData.getWeatherDescription());
          tour.setWeatherClouds(historicalWeatherData.getWeatherType());

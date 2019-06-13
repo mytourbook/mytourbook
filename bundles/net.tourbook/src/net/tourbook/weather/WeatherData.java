@@ -31,6 +31,7 @@ public class WeatherData {
    private float  precipitation;
    private String WeatherDescription;
    private String WeatherType;
+   private int    averageHumidity;
 
    public WeatherData() {
       maxTemperature = Float.MIN_VALUE;
@@ -144,5 +145,13 @@ public class WeatherData {
 
    public void setWindSpeed(final int windSpeed) {
       WindSpeed = windSpeed;
+   }
+
+   public int getAverageHumidity() {
+      return averageHumidity;
+   }
+
+   public void setAverageHumidity(int averageHumidity) {
+      this.averageHumidity = averageHumidity;
    }
 }
