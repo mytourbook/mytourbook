@@ -578,6 +578,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
    private Label             _lblAltitudeUpUnit;
    private Label             _lblAltitudeDownUnit;
    private Label             _lblDistanceUnit;
+   private Label             _lblPrecipitationUnit;
    private Label             _lblSpeedUnit;
    private Label             _lblStartTime;
    private Label             _lblTags;
@@ -593,6 +594,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
    private Spinner           _spinBodyWeight;
    private Spinner           _spinCalories;
    private Spinner           _spinFTP;
+   private Spinner           _spinPrecipitationValue;
    private Spinner           _spinRestPuls;
    private Spinner           _spinTemperature;
    private Spinner           _spinWindDirectionValue;
@@ -3987,6 +3989,27 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
          // label: celsius, fahrenheit
          _lblTemperatureUnit = _tk.createLabel(container, UI.UNIT_LABEL_TEMPERATURE);
+
+         /*
+          * Precipitation
+          */
+         // label
+         label = _tk.createLabel(container, Messages.tour_editor_label_precipitation);
+         label.setToolTipText(Messages.tour_editor_label_precipitation_Tooltip);
+         _firstColumnControls.add(label);
+
+         // spinner: precipitation value
+         _spinPrecipitationValue = new Spinner(container, SWT.BORDER);
+         GridDataFactory
+               .fillDefaults()
+               .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+               .align(SWT.BEGINNING, SWT.CENTER)
+               .applyTo(_spinPrecipitationValue);
+         _spinPrecipitationValue.setDigits(2);
+         _spinPrecipitationValue.setMaximum(10000);
+
+         // label: mm, inches
+         _lblPrecipitationUnit = _tk.createLabel(container, UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
 
          /*
           * clouds
@@ -7928,6 +7951,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
       _spinTemperature.setDigits(1);
       _spinTemperature.setSelection((int) ((avgTemperature * 10) + 0.5));
 
+      /*
+       * Precipitation
+       */
+      final float precipitation = UI.convertPrecipitationFromMetric(_tourData.getPrecipitation());
+
+      _spinPrecipitationValue.setData(FIX_LINUX_ASYNC_EVENT_1, true);
+      _spinPrecipitationValue.setSelection((int) (precipitation * 100f));
+
       // set start date/time without time zone
       final ZonedDateTime tourStartTime = _tourData.getTourStartTime();
       _dtTourDate.setData(FIX_LINUX_ASYNC_EVENT_1, true);
@@ -8001,6 +8032,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
       _lblDistanceUnit.setText(UI.UNIT_LABEL_DISTANCE);
       _lblAltitudeUpUnit.setText(UI.UNIT_LABEL_ALTITUDE);
       _lblAltitudeDownUnit.setText(UI.UNIT_LABEL_ALTITUDE);
+      _lblPrecipitationUnit.setText(UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
       _lblTemperatureUnit.setText(UI.UNIT_LABEL_TEMPERATURE);
       _lblSpeedUnit.setText(UI.UNIT_LABEL_SPEED);
 

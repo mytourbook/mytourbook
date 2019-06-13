@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 
 import net.tourbook.application.TourbookPlugin;
@@ -42,6 +43,10 @@ import org.eclipse.jface.preference.IPreferenceStore;
 public class HistoricalWeatherRetriever {
 
    private TourData               tour;
+   private LatLng                 searchAreaCenter;
+   private String                 startDate;
+   private String                 startTime;
+   private String                 endTime;
 
    private WeatherData            historicalWeatherData;
 
@@ -55,6 +60,20 @@ public class HistoricalWeatherRetriever {
     */
    public HistoricalWeatherRetriever(final TourData tour) {
       this.tour = tour;
+
+      searchAreaCenter = determineWeatherSearchArea();
+      startDate = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(tour.getTourStartTime()); //$NON-NLS-1$
+
+      final double roundedStartTime = tour.getTourStartTime().getHour();
+      startTime = (int) roundedStartTime + "00"; //$NON-NLS-1$
+
+
+      int roundedEndHour = Instant.ofEpochMilli(tour.getTourEndTimeMS()).atZone(tour.getTimeZoneIdWithDefault()).getHour();
+      final int roundedEndMinutes = Instant.ofEpochMilli(tour.getTourEndTimeMS()).atZone(tour.getTimeZoneIdWithDefault()).getMinute();
+      if (roundedEndMinutes >= 30) {
+         ++roundedEndHour;
+      }
+      endTime = roundedEndHour + "00"; //$NON-NLS-1$
    }
 
    /**
@@ -106,18 +125,30 @@ public class HistoricalWeatherRetriever {
          final String weatherResults = mapper.readValue(weatherDataResponse, JsonNode.class).get("data").get("weather").get(0).toString(); //$NON-NLS-1$ //$NON-NLS-2$
 
          final WWOWeatherResults rawWeatherData = mapper.readValue(weatherResults, WWOWeatherResults.class);
-         final double roundedStartTimeOfDay = Math.ceil(tour.getStartTimeOfDay() / 3600.0);
-         final String startTimeOfDay = (int) roundedStartTimeOfDay + "00"; //$NON-NLS-1$
 
          // Within the hourly data, find the time that corresponds to the tour start time
          // and extract the weather data.
+         float totalPrecipitation = 0f;
+         boolean isTourStartData = false;
+         boolean isTourEndData = false;
          for (final WWOHourlyResults hourlyData : rawWeatherData.gethourly()) {
-            if (hourlyData.gettime().equals(startTimeOfDay)) {
+            if (hourlyData.gettime().equals(startTime)) {
+               isTourStartData = true;
+            }
+            if (hourlyData.gettime().equals(endTime)) {
+               isTourEndData = true;
+            }
+
+            if (isTourStartData || isTourEndData) {
                weatherData.setWindDirection(Integer.parseInt(hourlyData.getWinddirDegree()));
                weatherData.setWindSpeed(Integer.parseInt(hourlyData.getWindspeedKmph()));
                weatherData.setWeatherDescription(hourlyData.getWeatherDescription(rawWeatherData));
+               totalPrecipitation += hourlyData.getPrecipMM();
                weatherData.setWeatherType(hourlyData.getWeatherCode());
-               break;
+
+               if (isTourEndData) {
+                  break;
+               }
             }
          }
 
@@ -126,6 +157,7 @@ public class HistoricalWeatherRetriever {
          weatherData.setTemperatureMax(rawWeatherData.getmaxtempC());
          weatherData.setTemperatureMin(rawWeatherData.getmintempC());
          weatherData.setTemperatureAverage(rawWeatherData.getavgtempC());
+         weatherData.setPrecipitation(totalPrecipitation);
 
       } catch (final IOException e) {
          StatusUtil.log(
@@ -137,14 +169,35 @@ public class HistoricalWeatherRetriever {
    }
 
    /**
+    * This method retrieves, if found, the weather data.
+    */
+   public HistoricalWeatherRetriever retrieve() {
+      historicalWeatherData = retrieveHistoricalWeatherData();
+
+      return this;
+   }
+
+   /**
+    * Retrieves the historical weather data
+    *
+    * @return The weather data, if found.
+    */
+   private WeatherData retrieveHistoricalWeatherData() {
+
+      final String rawWeatherData = sendWeatherApiRequest();
+      if (!rawWeatherData.contains("weather")) { //$NON-NLS-1$
+         return null;
+      }
+      final WeatherData historicalWeatherData = parseWeatherData(rawWeatherData);
+      return historicalWeatherData;
+   }
+
+   /**
     * Processes a query against the weather API.
     *
     * @return The result of the weather API query.
     */
-   private String processRequest() {
-      final LatLng searchAreaCenter = determineWeatherSearchArea();
-      final String startDate = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(tour.getTourStartTime()); //$NON-NLS-1$
-
+   private String sendWeatherApiRequest() {
       final String weatherRequestWithParameters = apiUrl + _prefStore.getString(ITourbookPreferences.API_KEY) + "&q=" + searchAreaCenter.getLatitude() //$NON-NLS-1$
             + "," + searchAreaCenter.getLongitude() //$NON-NLS-1$
             + "&date=" + startDate + "&tp=1&format=json"; //$NON-NLS-1$ //$NON-NLS-2$
@@ -213,29 +266,5 @@ public class HistoricalWeatherRetriever {
       }
 
       return weatherHistory.toString();
-   }
-
-   /**
-    * This method retrieves, if found, the weather data.
-    */
-   public HistoricalWeatherRetriever retrieve() {
-      historicalWeatherData = retrieveHistoricalWeatherData();
-
-      return this;
-   }
-
-   /**
-    * Retrieves the historical weather data
-    *
-    * @return The weather data, if found.
-    */
-   private WeatherData retrieveHistoricalWeatherData() {
-
-      final String rawWeatherData = processRequest();
-      if (!rawWeatherData.contains("weather")) { //$NON-NLS-1$
-         return null;
-      }
-      final WeatherData historicalWeatherData = parseWeatherData(rawWeatherData);
-      return historicalWeatherData;
    }
 }

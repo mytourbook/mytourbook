@@ -491,8 +491,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private int                   weatherWindDir;                                       // db-version 8
 
    private int                   weatherWindSpd;                                       // db-version 8
-   private String                weatherClouds;                                          // db-version 8
+   private String                weatherClouds;                                        // db-version 8
    private String                weather;                                                // db-version 13
+
+   private float precipitation; // db-version 39
+
    /** Unit is Watt */
    private float                 power_Avg;
 
@@ -7193,6 +7196,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return powerSerie;
    }
 
+   public float getPrecipitation() {
+      return precipitation;
+   }
+
    public float[] getPulseSmoothedSerie() {
 
       if (pulseSerie == null) {
@@ -8995,6 +9002,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    public void setPowerSerie(final float[] powerSerie) {
       this.powerSerie = powerSerie;
       this.isPowerSerieFromDevice = true;
+   }
+
+   public void setPrecipitation(final float precipitation) {
+      this.precipitation = precipitation;
    }
 
    public void setRearShiftCount(final int rearShiftCount) {

@@ -28,6 +28,7 @@ public class WeatherData {
    private float  AverageTemperature;
    private int    WindDirection;
    private int    WindSpeed;
+   private float  precipitation;
    private String WeatherDescription;
    private String WeatherType;
 
@@ -35,6 +36,10 @@ public class WeatherData {
       maxTemperature = Float.MIN_VALUE;
       minTemperature = Float.MIN_VALUE;
       AverageTemperature = Float.MIN_VALUE;
+   }
+
+   public float getPrecipitation() {
+      return precipitation;
    }
 
    public float getTemperatureAverage() {
@@ -63,6 +68,10 @@ public class WeatherData {
 
    public int getWindSpeed() {
       return WindSpeed;
+   }
+
+   public void setPrecipitation(final float precipitation) {
+      this.precipitation = precipitation;
    }
 
    public void setTemperatureAverage(final String temperatureAverage) {

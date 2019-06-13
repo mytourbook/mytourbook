@@ -80,6 +80,7 @@ public class ActionRetrieveWeatherData extends Action {
          tour.setAvgTemperature(historicalWeatherData.getTemperatureAverage());
          tour.setWeatherWindSpeed(historicalWeatherData.getWindSpeed());
          tour.setWeatherWindDir(historicalWeatherData.getWindDirection());
+         tour.setPrecipitation(historicalWeatherData.getPrecipitation());
          tour.setWeather(historicalWeatherData.getWeatherDescription());
          tour.setWeatherClouds(historicalWeatherData.getWeatherType());
          tour.setIsWeatherDataFromApi(true);
