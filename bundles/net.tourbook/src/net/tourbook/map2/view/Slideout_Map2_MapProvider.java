@@ -1305,6 +1305,9 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
             return;
          }
       }
+
+      // this case can occure when switched from show all to only visible map providers
+      selectMapProvider_Internal(allMPInViewer.get(0));
    }
 
    private void onSelect_MapProvider_Previous() {
@@ -1334,6 +1337,9 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
             return;
          }
       }
+
+      // this case can occure when switched from show all to only visible map providers
+      selectMapProvider_Internal(allMPInViewer.get(0));
    }
 
    private void onSelect_SortColumn(final SelectionEvent e) {
