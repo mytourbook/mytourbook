@@ -2946,6 +2946,9 @@ public class TourDatabase {
             + " weatherPrecipitation                  FLOAT    DEFAULT 0,                 \n" //$NON-NLS-1$
             + " weatherHumidity                       SMALLINT DEFAULT 0,                 \n" //$NON-NLS-1$
             + " weatherPressure                       SMALLINT DEFAULT 0,                 \n" //$NON-NLS-1$
+            + " weatherWindChill                      FLOAT    DEFAULT 0,                 \n" //$NON-NLS-1$
+            + " weatherMaxTemperature                 SMALLINT DEFAULT 0,                 \n" //$NON-NLS-1$
+            + " weatherMinTemperature                 SMALLINT DEFAULT 0,                 \n" //$NON-NLS-1$
             //
             // version 39 end
 
@@ -7095,6 +7098,9 @@ public class TourDatabase {
             SQL.AddCol_Float  (stmt, TABLE_TOUR_DATA,             "weatherPrecipitation",       DEFAULT_0); //$NON-NLS-1$
             SQL.AddCol_Int    (stmt, TABLE_TOUR_DATA,             "weatherHumidity",            DEFAULT_0); //$NON-NLS-1$
             SQL.AddCol_Int    (stmt, TABLE_TOUR_DATA,             "weatherPressure",            DEFAULT_0); //$NON-NLS-1$
+            SQL.AddCol_Float  (stmt, TABLE_TOUR_DATA,             "weatherWindChill",           DEFAULT_0); //$NON-NLS-1$
+            SQL.AddCol_Int    (stmt, TABLE_TOUR_DATA,             "weatherMaxTemperature",      DEFAULT_0); //$NON-NLS-1$
+            SQL.AddCol_Int    (stmt, TABLE_TOUR_DATA,             "weatherMinTemperature",      DEFAULT_0); //$NON-NLS-1$
 
 // SET_FORMATTING_ON
          }

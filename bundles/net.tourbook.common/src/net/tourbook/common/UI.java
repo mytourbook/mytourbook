@@ -674,7 +674,7 @@ public class UI {
       if (UNIT_VALUE_TEMPERATURE == 1) {
          return weatherPressure;
       }
-final double toto = weatherPressure * 0.02953f;
+
       return weatherPressure * 0.02953f;
    }
 

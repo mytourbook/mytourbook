@@ -20,8 +20,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
-import net.tourbook.common.UI;
-
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WWOHourlyResults {
    private String                 time;
@@ -46,8 +44,8 @@ public class WWOHourlyResults {
 
    private String                 precipMM;
 
-   public String getFeelsLikeC() {
-      return FeelsLikeC;
+   public int getFeelsLikeC() {
+      return Integer.parseInt(FeelsLikeC);
    }
 
    public String getFeelsLikeF() {
@@ -66,8 +64,8 @@ public class WWOHourlyResults {
       return Integer.parseInt(pressure);
    }
 
-   public String getTempC() {
-      return tempC;
+   public int getTempC() {
+      return Integer.parseInt(tempC);
    }
 
    public String gettime() {
@@ -83,41 +81,7 @@ public class WWOHourlyResults {
    }
 
    public String getWeatherDescription(final WWOWeatherResults weatherResults) {
-      final StringBuilder weatherDescription = new StringBuilder(weatherDesc.get(0).getValue());
-
-      weatherDescription.append(", Wind Chill: ");
-      if (UI.UNIT_VALUE_TEMPERATURE == 1) { // Metric
-         weatherDescription.append(FeelsLikeC != null ? FeelsLikeC : "--");
-         weatherDescription.append(" " + UI.UNIT_TEMPERATURE_C);
-      } else // Imperial
-      {
-         weatherDescription.append(FeelsLikeF != null ? FeelsLikeF : "--");
-         weatherDescription.append(" " + UI.UNIT_TEMPERATURE_F);
-      }
-
-      //Max temp
-      weatherDescription.append(", Max: ");
-      if (UI.UNIT_VALUE_TEMPERATURE == 1) { // Metric
-         weatherDescription.append(weatherResults.getmaxtempC() != null ? weatherResults.getmaxtempC() : "--");
-         weatherDescription.append(" " + UI.UNIT_TEMPERATURE_C);
-      } else // Imperial
-      {
-         weatherDescription.append(weatherResults.getMaxtempF() != null ? weatherResults.getMaxtempF() : "--");
-         weatherDescription.append(" " + UI.UNIT_TEMPERATURE_F);
-      }
-
-      //Min temp
-      weatherDescription.append(", Min: ");
-      if (UI.UNIT_VALUE_TEMPERATURE == 1) { // Metric
-         weatherDescription.append(weatherResults.getmintempC() != null ? weatherResults.getmintempC() : "--");
-         weatherDescription.append(" " + UI.UNIT_TEMPERATURE_C);
-      } else // Imperial
-      {
-         weatherDescription.append(weatherResults.getMintempF() != null ? weatherResults.getMintempF() : "--");
-         weatherDescription.append(" " + UI.UNIT_TEMPERATURE_F);
-      }
-
-      return weatherDescription.toString();
+      return weatherDesc.get(0).getValue();
    }
 
    public String getWinddirDegree() {

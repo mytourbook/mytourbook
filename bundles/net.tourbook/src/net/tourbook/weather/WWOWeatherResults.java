@@ -31,20 +31,10 @@ public class WWOWeatherResults {
 
    private String                 avgtempC;
 
-   private String                 maxtempF;
-
-   private String                 mintempF;
-
-   private String                 avgtempF;
-
    private List<WWOHourlyResults> hourly;
 
    public String getavgtempC() {
       return avgtempC;
-   }
-
-   public String getAvgtempF() {
-      return avgtempF;
    }
 
    public List<WWOHourlyResults> gethourly() {
@@ -55,34 +45,7 @@ public class WWOWeatherResults {
       return maxtempC;
    }
 
-   public String getMaxtempF() {
-      return maxtempF;
-   }
-
    public String getmintempC() {
       return mintempC;
    }
-
-   public String getMintempF() {
-      return mintempF;
-   }
-
-/*
- * public void setAttributes(final String attributes) {
- * this.attributes = attributes;
- * }
- * public void setDatatype(final String datatype) {
- * this.datatype = datatype;
- * }
- * public void setDate(final String date) {
- * this.date = date;
- * }
- * public void setStation(final String station) {
- * this.station = station;
- * }
- * public void setValue(final String value) {
- * this.value = value;
- * }
- */
-
 }

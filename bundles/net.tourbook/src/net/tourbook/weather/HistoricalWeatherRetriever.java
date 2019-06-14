@@ -134,6 +134,10 @@ public class HistoricalWeatherRetriever {
          int numHourlyDatasets = 0;
          int sumHumidity = 0;
          int sumPressure = 0;
+         int sumWindChill = 0;
+         int maxTemperature = Integer.MIN_VALUE;
+         int minTemperature = Integer.MAX_VALUE;
+
          for (final WWOHourlyResults hourlyData : rawWeatherData.gethourly()) {
             if (hourlyData.gettime().equals(startTime)) {
                isTourStartData = true;
@@ -149,7 +153,16 @@ public class HistoricalWeatherRetriever {
                sumHumidity += hourlyData.getHumidity();
                totalPrecipitation += hourlyData.getPrecipMM();
                sumPressure += hourlyData.getPressure();
+               sumWindChill += hourlyData.getFeelsLikeC();
                weatherData.setWeatherType(hourlyData.getWeatherCode());
+
+               if (hourlyData.getTempC() < minTemperature) {
+                  minTemperature  = hourlyData.getTempC();
+               }
+
+               if (hourlyData.getTempC() > maxTemperature) {
+                  maxTemperature = hourlyData.getTempC();
+               }
 
                ++numHourlyDatasets;
                if (isTourEndData) {
@@ -160,9 +173,10 @@ public class HistoricalWeatherRetriever {
 
          //TODO
          // Request data for the beginning AND the end of the tour in order to generate the below data
-         weatherData.setTemperatureMax(rawWeatherData.getmaxtempC());
-         weatherData.setTemperatureMin(rawWeatherData.getmintempC());
+         weatherData.setTemperatureMax(maxTemperature);
+         weatherData.setTemperatureMin(minTemperature);
          weatherData.setTemperatureAverage(rawWeatherData.getavgtempC());
+         weatherData.setWindChill((int) Math.ceil((double) sumWindChill / (double) numHourlyDatasets));
          weatherData.setAverageHumidity((int) Math.ceil((double) sumHumidity / (double) numHourlyDatasets));
          weatherData.setAveragePressure((int) Math.ceil((double) sumPressure / (double) numHourlyDatasets));
          weatherData.setPrecipitation(totalPrecipitation);

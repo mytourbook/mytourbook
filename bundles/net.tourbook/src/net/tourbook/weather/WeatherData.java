@@ -23,8 +23,8 @@ import net.tourbook.common.weather.IWeather;
  */
 public class WeatherData {
 
-   private float  maxTemperature;
-   private float  minTemperature;
+   private int    maxTemperature;
+   private int    minTemperature;
    private float  AverageTemperature;
    private int    WindDirection;
    private int    WindSpeed;
@@ -32,13 +32,10 @@ public class WeatherData {
    private String WeatherDescription;
    private String WeatherType;
    private int    averageHumidity;
+   //TODO TourWeatherData class name
+   // or average{Property} name ?
    private int    averagePressure;
-
-   public WeatherData() {
-      maxTemperature = Float.MIN_VALUE;
-      minTemperature = Float.MIN_VALUE;
-      AverageTemperature = Float.MIN_VALUE;
-   }
+   private int windChill;
 
    public int getAverageHumidity() {
       return averageHumidity;
@@ -56,11 +53,11 @@ public class WeatherData {
       return AverageTemperature;
    }
 
-   public float getTemperatureMax() {
+   public int getTemperatureMax() {
       return maxTemperature;
    }
 
-   public float getTemperatureMin() {
+   public int getTemperatureMin() {
       return minTemperature;
    }
 
@@ -70,6 +67,10 @@ public class WeatherData {
 
    public String getWeatherType() {
       return WeatherType;
+   }
+
+   public int getWindChill() {
+      return windChill;
    }
 
    public int getWindDirection() {
@@ -98,16 +99,12 @@ public class WeatherData {
       }
    }
 
-   public void setTemperatureMax(final String temperatureMax) {
-      if (!temperatureMax.equals("")) {
-         maxTemperature = Float.parseFloat(temperatureMax);
-      }
+   public void setTemperatureMax(final int temperatureMax) {
+         maxTemperature = temperatureMax;
    }
 
-   public void setTemperatureMin(final String temperatureMin) {
-      if (!temperatureMin.equals("")) {
-         minTemperature = Float.parseFloat(temperatureMin);
-      }
+   public void setTemperatureMin(final int temperatureMin) {
+         minTemperature = temperatureMin;
    }
 
    public void setWeatherDescription(final String weatherDescription) {
@@ -154,6 +151,10 @@ public class WeatherData {
          WeatherType = IWeather.WEATHER_ID_SCATTERED_SHOWERS;
          break;
       }
+   }
+
+   public void setWindChill(final int windChill) {
+      this.windChill = windChill;
    }
 
    public void setWindDirection(final int windDirection) {
