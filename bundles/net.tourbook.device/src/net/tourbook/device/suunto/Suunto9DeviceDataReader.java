@@ -128,7 +128,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
          try {
             // close resources
             if (br != null) {
-               gzip.close();
+               br.close();
             }
             if (gzip != null) {
                gzip.close();
@@ -484,7 +484,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 
    @Override
    public boolean validateRawData(final String fileName) {
-      if (!fileName.endsWith(".json.gz")) { //$NON-NLS-1$
+      if (!fileName.toLowerCase().endsWith(".json.gz")) { //$NON-NLS-1$
          return false;
       }
 
