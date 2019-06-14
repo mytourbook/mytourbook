@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,6 +18,13 @@ package net.tourbook.common.util;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.Messages;
+import net.tourbook.common.UI;
+import net.tourbook.common.formatter.FormatManager;
+import net.tourbook.common.formatter.IValueFormatter;
+import net.tourbook.common.formatter.ValueFormat;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
@@ -76,13 +83,6 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.Widget;
-
-import net.tourbook.common.CommonActivator;
-import net.tourbook.common.Messages;
-import net.tourbook.common.UI;
-import net.tourbook.common.formatter.FormatManager;
-import net.tourbook.common.formatter.IValueFormatter;
-import net.tourbook.common.formatter.ValueFormat;
 
 public class DialogModifyColumns extends TrayDialog {
 
@@ -1221,7 +1221,7 @@ public class DialogModifyColumns extends TrayDialog {
    }
 
    /**
-    * check if the up/down button are enabled
+    * Check if the up/down button are enabled
     */
    private void enableUpDownActions() {
 

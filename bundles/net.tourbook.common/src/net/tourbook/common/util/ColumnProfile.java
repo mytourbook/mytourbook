@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,96 +21,112 @@ import net.tourbook.common.UI;
 
 public class ColumnProfile implements Cloneable {
 
-	String								name						= UI.EMPTY_STRING;
+   private static long                _idCreator;
 
-	/**
-	 * Contains column definitions which are visible in the table/tree in the sort order of the
-	 * table/tree.
-	 */
-	ArrayList<ColumnDefinition>			visibleColumnDefinitions	= new ArrayList<ColumnDefinition>();
+   String                             name                     = UI.EMPTY_STRING;
 
-	/**
-	 * Contains the column ids which are visible in the viewer.
-	 */
-	String[]							visibleColumnIds;
+   /**
+    * Contains column definitions which are visible in the table/tree in the sort order of the
+    * table/tree.
+    */
+   ArrayList<ColumnDefinition>        visibleColumnDefinitions = new ArrayList<>();
 
-	/**
-	 * Contains a pair with column id/column width for visible columns.
-	 */
-	String[]							visibleColumnIdsAndWidth;
+   /**
+    * Contains the column ids which are visible in the viewer.
+    */
+   String[]                           visibleColumnIds;
 
-	/**
-	 * Contains a pair with column id/column format for all columns.
-	 * 
-	 * @since 16.5
-	 */
-	public ArrayList<ColumnProperties>	columnProperties			= new ArrayList<>();
+   /**
+    * Contains a pair with column id/column width for visible columns.
+    */
+   String[]                           visibleColumnIdsAndWidth;
 
-	private long						_id;
+   /**
+    * Contains a pair with column id/column format for all columns.
+    *
+    * @since 16.5
+    */
+   public ArrayList<ColumnProperties> columnProperties         = new ArrayList<>();
 
-	private static long					_idCreator;
+   private long                       _id;
 
-	public ColumnProfile() {
-		_id = ++_idCreator;
-	}
+   public ColumnProfile() {
+      _id = ++_idCreator;
+   }
 
-	@Override
-	protected ColumnProfile clone() {
+   @Override
+   protected ColumnProfile clone() {
 
-		ColumnProfile clonedObject = null;
+      ColumnProfile clonedObject = null;
 
-		try {
+      try {
 
-			clonedObject = (ColumnProfile) super.clone();
+         clonedObject = (ColumnProfile) super.clone();
 
-			clonedObject._id = ++_idCreator;
+         clonedObject._id = ++_idCreator;
 
-		} catch (final CloneNotSupportedException e) {
-			StatusUtil.log(e);
-		}
+      } catch (final CloneNotSupportedException e) {
+         StatusUtil.log(e);
+      }
 
-		return clonedObject;
-	}
+      return clonedObject;
+   }
 
-	@Override
-	public boolean equals(final Object obj) {
+   @Override
+   public boolean equals(final Object obj) {
 
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		final ColumnProfile other = (ColumnProfile) obj;
-		if (_id != other._id) {
-			return false;
-		}
-		return true;
-	}
+      if (this == obj) {
+         return true;
+      }
+      if (obj == null) {
+         return false;
+      }
+      if (getClass() != obj.getClass()) {
+         return false;
+      }
+      final ColumnProfile other = (ColumnProfile) obj;
+      if (_id != other._id) {
+         return false;
+      }
+      return true;
+   }
 
-	public long getID() {
-		return _id;
-	}
+   /**
+    * @param columnId
+    * @return Returns the visual index of the column or -1 when column is not visible.
+    */
+   public int getColumnIndex(final String columnId) {
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + (int) (_id ^ (_id >>> 32));
-		return result;
-	}
+      for (int columnIndex = 0; columnIndex < visibleColumnIds.length; columnIndex++) {
+         final String visibleColumnId = visibleColumnIds[columnIndex];
+         if (visibleColumnId.equals(columnId)) {
+            return columnIndex;
+         }
+      }
 
-	@Override
-	public String toString() {
-		return "ColumnProfile [" // //$NON-NLS-1$
+      return -1;
+   }
 
-				+ ("name=" + name + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("_id=" + _id + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+   public long getID() {
+      return _id;
+   }
 
-				+ "]"; //$NON-NLS-1$
-	}
+   @Override
+   public int hashCode() {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + (int) (_id ^ (_id >>> 32));
+      return result;
+   }
+
+   @Override
+   public String toString() {
+      return "ColumnProfile [" // //$NON-NLS-1$
+
+            + ("name=" + name + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+            + ("_id=" + _id + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+
+            + "]"; //$NON-NLS-1$
+   }
 
 }

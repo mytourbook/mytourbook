@@ -18,11 +18,11 @@ package net.tourbook.application;
 import de.byteholder.geoclipse.map.Map;
 
 import net.tourbook.Messages;
+import net.tourbook.common.tooltip.ActionToolbarSlideoutAdv;
 import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.tooltip.SlideoutLocation;
 import net.tourbook.common.util.Util;
 import net.tourbook.map2.view.Map2View;
-import net.tourbook.tour.filter.ActionToolbarSlideoutAdv;
 import net.tourbook.tour.filter.geo.Slideout_TourGeoFilter;
 import net.tourbook.tour.filter.geo.TourGeoFilter;
 import net.tourbook.tour.filter.geo.TourGeoFilter_Manager;

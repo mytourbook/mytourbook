@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 20018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,20 +17,19 @@ package de.byteholder.geoclipse.preferences;
 
 public interface IMappingPreferences {
 
-   final String               OFFLINE_CACHE_USE_OFFLINE              = "OffLineCache_IsUsed";                //$NON-NLS-1$
-   final String               OFFLINE_CACHE_USE_DEFAULT_LOCATION     = "OffLineCache_UseSelectedLocation";   //$NON-NLS-1$
-   final String               OFFLINE_CACHE_PATH                     = "OffLineCache_Path";                  //$NON-NLS-1$
-   final String               OFFLINE_CACHE_PERIOD_OF_VALIDITY       = "OffLineCache_PeriodOfValidity";      //$NON-NLS-1$
-   final String               OFFLINE_CACHE_MAX_SIZE                 = "OffLineCache_MaxCacheSize";          //$NON-NLS-1$
+   static final String        OFFLINE_CACHE_USE_OFFLINE              = "OffLineCache_IsUsed";                //$NON-NLS-1$
+   static final String        OFFLINE_CACHE_USE_DEFAULT_LOCATION     = "OffLineCache_UseSelectedLocation";   //$NON-NLS-1$
+   static final String        OFFLINE_CACHE_PATH                     = "OffLineCache_Path";                  //$NON-NLS-1$
+   static final String        OFFLINE_CACHE_PERIOD_OF_VALIDITY       = "OffLineCache_PeriodOfValidity";      //$NON-NLS-1$
+   static final String        OFFLINE_CACHE_MAX_SIZE                 = "OffLineCache_MaxCacheSize";          //$NON-NLS-1$
 
-   final String               SHOW_MAP_TILE_INFO                     = "MapTileInfo_IsShowInfo";             //$NON-NLS-1$
+   static final String        SHOW_MAP_TILE_INFO                     = "MapTileInfo_IsShowInfo";             //$NON-NLS-1$
 
-   final String               MAP_FACTORY_IS_READ_TILE_SIZE          = "MapFactory_IsReadTileSize";          //$NON-NLS-1$
-   final String               MAP_FACTORY_LAST_SELECTED_MAP_PROVIDER = "MapFactory_LastSelectedMapProvider"; //$NON-NLS-1$
+   static final String        MAP_FACTORY_IS_READ_TILE_SIZE          = "MapFactory_IsReadTileSize";          //$NON-NLS-1$
+   static final String        MAP_FACTORY_LAST_SELECTED_MAP_PROVIDER = "MapFactory_LastSelectedMapProvider"; //$NON-NLS-1$
 
-   final String               THEME_FONT_LOGGING                     = "Theme_Font_Logging";                 //$NON-NLS-1$
+   static final String        THEME_FONT_LOGGING                     = "Theme_Font_Logging";                 //$NON-NLS-1$
 
    public static final String MAP_PROVIDER_SORT_ORDER                = "MapProvider_SortOrder";              //$NON-NLS-1$
-   public static final String MAP_PROVIDER_TOGGLE_LIST               = "MapProvider_ToggleList";             //$NON-NLS-1$
-
+   public static final String MAP_PROVIDER_VISIBLE_IN_UI             = "MAP_PROVIDER_VISIBLE_IN_UI";         //$NON-NLS-1$
 }
