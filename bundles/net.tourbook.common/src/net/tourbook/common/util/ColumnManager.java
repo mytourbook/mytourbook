@@ -603,7 +603,7 @@ public class ColumnManager {
    }
 
    /**
-    * Create header context menu which has the action to modify columns
+    * Create (H)eader (C)ontext (M)enu which has the actions to modify columns
     *
     * @param composite
     * @param defaultContextMenuProvider
@@ -669,7 +669,7 @@ public class ColumnManager {
 
       {
          /*
-          * Menu title
+          * Menu title: > Column: ... <
           */
 
          // create menu item text
@@ -818,7 +818,10 @@ public class ColumnManager {
     */
    private void createHCM_40_Columns(final Menu contextMenu) {
 
-      {
+      /*
+       * Header: > Columns <
+       */
+       {
          final MenuItem menuItem = new MenuItem(contextMenu, SWT.PUSH);
          menuItem.setText(Messages.Action_ColumnManager_Column_Info);
          menuItem.setEnabled(false);

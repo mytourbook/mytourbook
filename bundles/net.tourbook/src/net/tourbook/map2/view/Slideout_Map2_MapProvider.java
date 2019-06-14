@@ -37,6 +37,7 @@ import net.tourbook.common.color.IColorSelectorListener;
 import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
+import net.tourbook.common.util.ColumnProfile;
 import net.tourbook.common.util.EmptyContextMenuProvider;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.TableColumnDefinition;
@@ -462,8 +463,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
       restoreState();
       enableControls();
 
-      // set focus to map viewer
-      _mpViewer.getTable().setFocus();
+      setFocusToMPViewer();
    }
 
    /**
@@ -1208,7 +1208,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
    @Override
    protected void onFocus() {
 
-      _mpViewer.getTable().setFocus();
+      setFocusToMPViewer();
    }
 
    private void onPaint_Viewer(final Event event) {
@@ -1370,11 +1370,9 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
          {
             _mpViewer.getTable().dispose();
 
-            final boolean isColumnDisplayed = _colDef_IsMPVisible.isColumnDisplayed();
-
-            _columnIndex_ForColumn_IsMPVisible = isColumnDisplayed
-                  ? _colDef_IsMPVisible.getCreateIndex()
-                  : -1;
+            // update column index which is needed for repainting
+            final ColumnProfile activeProfile = _columnManager.getActiveProfile();
+            _columnIndex_ForColumn_IsMPVisible = activeProfile.getColumnIndex(_colDef_IsMPVisible.getColumnId());
 
             createUI_20_MapViewer(_viewerContainer);
 
@@ -1388,7 +1386,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
       }
       _viewerContainer.setRedraw(true);
 
-      _mpViewer.getTable().setFocus();
+      setFocusToMPViewer();
 
       return _mpViewer;
    }
@@ -1604,6 +1602,11 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
       final IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
       final RGB dimColor = PreferenceConverter.getColor(store, ITourbookPreferences.MAP_LAYOUT_MAP_DIMM_COLOR);
       map.setDimLevel(_map2View.getMapDimLevel(), dimColor);
+   }
+
+   private void setFocusToMPViewer() { 
+
+      _mpViewer.getTable().setFocus();
    }
 
    private void setWidth_ForColum_IsVisible() {
