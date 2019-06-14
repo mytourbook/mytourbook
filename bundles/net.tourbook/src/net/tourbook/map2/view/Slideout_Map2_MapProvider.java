@@ -919,6 +919,11 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
       final Label label = new Label(parent, SWT.NONE);
       label.setText(Messages.Slideout_Map2Provider_Label_Tip);
       label.setToolTipText(Messages.Slideout_Map2Provider_Label_Tip_Tooltip);
+      GridDataFactory.fillDefaults()
+
+            // this width forces the min width of the slideout to be smaller than the default !!!
+            .hint(_pc.convertWidthInCharsToPixels(30), SWT.DEFAULT)
+            .applyTo(label);
    }
 
    private void createUI_90_Actions(final Composite parent) {
@@ -1604,7 +1609,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
       map.setDimLevel(_map2View.getMapDimLevel(), dimColor);
    }
 
-   private void setFocusToMPViewer() { 
+   private void setFocusToMPViewer() {
 
       _mpViewer.getTable().setFocus();
    }
