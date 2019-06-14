@@ -48,7 +48,8 @@ import org.xmlunit.diff.Diff;
 public class Suunto9DeviceDataReader extends TourbookDevice {
 
    // For Unit testing
-   private static final boolean                   UNITTESTS             = false;
+   // NOTE: Don't forget to set the smoothing parameters to default.
+   private static final boolean                   UNITTESTS             = true;
    // Make sure that the smoothing value is 10 (speed and gradient)
    public static final String                     IMPORT_FILE_PATH      = "/net/tourbook/device/suunto/testFiles/"; //$NON-NLS-1$
    private static Map<String, String>             testFiles             = new HashMap<>();                          // Java 7

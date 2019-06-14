@@ -195,7 +195,7 @@ public class SuuntoJsonProcessor {
       }
 
       // We detect the available sensors
-      if(jsonFileContent.contains(TAG_HR) ||
+      if (jsonFileContent.contains(TAG_HR) ||
             jsonFileContent.contains(TAG_RR)) {
          tourData.setIsPulseSensorPresent(true);
       }
@@ -745,8 +745,7 @@ public class SuuntoJsonProcessor {
       String result = null;
       try {
          result = new JSONObject(token).get(elementName).toString();
-      } catch (final Exception e) {
-      }
+      } catch (final Exception e) {}
       if (result == "null") { //$NON-NLS-1$
          return null;
       }
