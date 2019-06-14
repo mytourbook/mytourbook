@@ -2495,6 +2495,12 @@ public class Messages extends NLS {
    public static String tour_editor_label_driving_time;
    public static String tour_editor_label_end_location;
    public static String tour_editor_label_import_file_path;
+   public static String tour_editor_label_avgtemperature;
+   public static String tour_editor_label_avgtemperature_Tooltip;
+   public static String tour_editor_label_maxtemperature;
+   public static String tour_editor_label_maxtemperature_Tooltip;
+   public static String tour_editor_label_mintemperature;
+   public static String tour_editor_label_mintemperature_Tooltip;
    public static String tour_editor_label_merge_from_tour_id;
    public static String tour_editor_label_merge_from_tour_id_tooltip;
    public static String tour_editor_label_merge_into_tour_id;
@@ -2532,6 +2538,8 @@ public class Messages extends NLS {
    public static String tour_editor_label_temperature_Tooltip;
    public static String tour_editor_label_rest_pulse;
    public static String tour_editor_label_rest_pulse_Tooltip;
+   public static String tour_editor_label_windchill;
+   public static String tour_editor_label_windchill_Tooltip;
    public static String tour_editor_label_WindDirectionNESW_Tooltip;
    public static String tour_editor_message_person_is_required;
    public static String tour_editor_message_show_another_tour;

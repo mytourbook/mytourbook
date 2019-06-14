@@ -20,6 +20,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
+/**
+ * A Java representation of a World Weather Online query result "hourly" element.
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WWOHourlyResults {
    private String                 time;
@@ -80,7 +83,7 @@ public class WWOHourlyResults {
       return weatherDesc;
    }
 
-   public String getWeatherDescription(final WWOWeatherResults weatherResults) {
+   public String getWeatherDescription() {
       return weatherDesc.get(0).getValue();
    }
 

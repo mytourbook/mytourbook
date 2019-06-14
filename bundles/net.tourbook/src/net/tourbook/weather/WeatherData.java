@@ -25,7 +25,7 @@ public class WeatherData {
 
    private int    maxTemperature;
    private int    minTemperature;
-   private float  AverageTemperature;
+   private int    averageTemperature;
    private int    WindDirection;
    private int    WindSpeed;
    private float  precipitation;
@@ -49,8 +49,8 @@ public class WeatherData {
       return precipitation;
    }
 
-   public float getTemperatureAverage() {
-      return AverageTemperature;
+   public int getTemperatureAverage() {
+      return averageTemperature;
    }
 
    public int getTemperatureMax() {
@@ -93,10 +93,8 @@ public class WeatherData {
       this.precipitation = precipitation;
    }
 
-   public void setTemperatureAverage(final String temperatureAverage) {
-      if (!temperatureAverage.equals("")) {
-         AverageTemperature = Float.parseFloat(temperatureAverage);
-      }
+   public void setTemperatureAverage(final int temperatureAverage) {
+      averageTemperature = temperatureAverage;
    }
 
    public void setTemperatureMax(final int temperatureMax) {

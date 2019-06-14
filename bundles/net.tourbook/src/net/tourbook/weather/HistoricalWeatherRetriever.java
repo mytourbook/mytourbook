@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.weather;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.javadocmd.simplelatlng.LatLng;
@@ -23,18 +24,20 @@ import com.javadocmd.simplelatlng.util.LengthUnit;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 /**
@@ -122,12 +125,15 @@ public class HistoricalWeatherRetriever {
       final WeatherData weatherData = new WeatherData();
       try {
          final ObjectMapper mapper = new ObjectMapper();
-         final String weatherResults = mapper.readValue(weatherDataResponse, JsonNode.class).get("data").get("weather").get(0).toString(); //$NON-NLS-1$ //$NON-NLS-2$
+         final String weatherResults = mapper.readValue(weatherDataResponse, JsonNode.class)
+               .get("data") //$NON-NLS-1$
+               .get("weather") //$NON-NLS-1$
+               .get(0)
+               .get("hourly") //$NON-NLS-1$
+               .toString();
 
-         final WWOWeatherResults rawWeatherData = mapper.readValue(weatherResults, WWOWeatherResults.class);
+         final List<WWOHourlyResults> rawWeatherData = mapper.readValue(weatherResults, new TypeReference<List<WWOHourlyResults>>() {});
 
-         // Within the hourly data, find the time that corresponds to the tour start time
-         // and extract the weather data.
          float totalPrecipitation = 0f;
          boolean isTourStartData = false;
          boolean isTourEndData = false;
@@ -135,12 +141,16 @@ public class HistoricalWeatherRetriever {
          int sumHumidity = 0;
          int sumPressure = 0;
          int sumWindChill = 0;
+         int sumTemperature = 0;
          int maxTemperature = Integer.MIN_VALUE;
          int minTemperature = Integer.MAX_VALUE;
 
-         for (final WWOHourlyResults hourlyData : rawWeatherData.gethourly()) {
+         for (final WWOHourlyResults hourlyData : rawWeatherData) {
+            // Within the hourly data, find the times that corresponds to the tour time
+            // and extract all the weather data.
             if (hourlyData.gettime().equals(startTime)) {
                isTourStartData = true;
+               weatherData.setWeatherDescription(hourlyData.getWeatherDescription());
             }
             if (hourlyData.gettime().equals(endTime)) {
                isTourEndData = true;
@@ -149,12 +159,12 @@ public class HistoricalWeatherRetriever {
             if (isTourStartData || isTourEndData) {
                weatherData.setWindDirection(Integer.parseInt(hourlyData.getWinddirDegree()));
                weatherData.setWindSpeed(Integer.parseInt(hourlyData.getWindspeedKmph()));
-               weatherData.setWeatherDescription(hourlyData.getWeatherDescription(rawWeatherData));
                sumHumidity += hourlyData.getHumidity();
                totalPrecipitation += hourlyData.getPrecipMM();
                sumPressure += hourlyData.getPressure();
                sumWindChill += hourlyData.getFeelsLikeC();
                weatherData.setWeatherType(hourlyData.getWeatherCode());
+               sumTemperature += hourlyData.getTempC();
 
                if (hourlyData.getTempC() < minTemperature) {
                   minTemperature  = hourlyData.getTempC();
@@ -171,11 +181,9 @@ public class HistoricalWeatherRetriever {
             }
          }
 
-         //TODO
-         // Request data for the beginning AND the end of the tour in order to generate the below data
          weatherData.setTemperatureMax(maxTemperature);
          weatherData.setTemperatureMin(minTemperature);
-         weatherData.setTemperatureAverage(rawWeatherData.getavgtempC());
+         weatherData.setTemperatureAverage((int) Math.ceil((double) sumTemperature / (double) numHourlyDatasets));
          weatherData.setWindChill((int) Math.ceil((double) sumWindChill / (double) numHourlyDatasets));
          weatherData.setAverageHumidity((int) Math.ceil((double) sumHumidity / (double) numHourlyDatasets));
          weatherData.setAveragePressure((int) Math.ceil((double) sumPressure / (double) numHourlyDatasets));
@@ -226,39 +234,19 @@ public class HistoricalWeatherRetriever {
       //tp=1 : Specifies the weather forecast time interval in hours. Here, every 1 hour
 
       BufferedReader rd = null;
-      InputStream stream = null;
       InputStreamReader isr = null;
       final StringBuffer weatherHistory = new StringBuffer();
       try {
-         final URL url = new URL(weatherRequestWithParameters);
-         final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-         connection.setRequestMethod("GET");
-         connection.connect();
-
-         stream = connection.getInputStream();
-         isr = new InputStreamReader(stream);
-         rd = new BufferedReader(isr);
-
-         // read the contents using an InputStreamReader
-
          // NOTE :
-         // Initially, I have used the below code but I kept getting RANDOM error as below:
+         // This error below keeps popping up RANDOMLY and as of today, I haven't found a solution:
          // java.lang.NoClassDefFoundError: Could not initialize class sun.security.ssl.SSLContextImpl$CustomizedTLSContext
-         /*
-          * final HttpClientBuilder clientBuilder = HttpClientBuilder.create();
-          * // I don't understand exactly the parameters 'requestSentRetryEnabled' is used.
-          * // From the official documentation :
-          * //
-          * (https://jar-download.com/artifacts/org.apache.httpcomponents/httpclient/4.5.2/source-
-          * code/org/apache/http/impl/client/DefaultHttpRequestRetryHandler.java)
-          * // @param requestSentRetryEnabled true if it's OK to retry requests that have
-          * // been sent
-          * clientBuilder.setRetryHandler(new DefaultHttpRequestRetryHandler(3, false));
-          * final HttpClient client = clientBuilder.build();
-          * final HttpGet request = new HttpGet(weatherRequestParameters);
-          * final HttpResponse response = client.execute(request);
-          * rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-          */
+
+         final HttpClientBuilder clientBuilder = HttpClientBuilder.create();
+         final HttpClient client = clientBuilder.build();
+         final HttpGet request = new HttpGet(weatherRequestWithParameters);
+         final HttpResponse response = client.execute(request);
+         isr = new InputStreamReader(response.getEntity().getContent());
+         rd = new BufferedReader(isr);
 
          String line = ""; //$NON-NLS-1$
          while ((line = rd.readLine()) != null) {
@@ -278,10 +266,6 @@ public class HistoricalWeatherRetriever {
             if (isr != null) {
                isr.close();
             }
-            if (stream != null) {
-               stream.close();
-            }
-
          } catch (final IOException e) {
             e.printStackTrace();
          }
