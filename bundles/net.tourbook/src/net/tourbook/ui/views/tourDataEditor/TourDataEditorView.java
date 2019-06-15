@@ -578,16 +578,16 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
    private Label             _lblAltitudeUpUnit;
    private Label             _lblAltitudeDownUnit;
    private Label             _lblDistanceUnit;
-   private Label             _lblMaxTemperatureUnit;
-   private Label             _lblMinTemperatureUnit;
    private Label             _lblPrecipitationUnit;
    private Label             _lblPressureUnit;
    private Label             _lblSpeedUnit;
    private Label             _lblStartTime;
    private Label             _lblTags;
-   private Label             _lblTemperatureUnit;
+   private Label             _lblTemperatureUnit_Avg;
+   private Label             _lblTemperatureUnit_Max;
+   private Label             _lblTemperatureUnit_Min;
+   private Label             _lblTemperatureUnit_WindChill;
    private Label             _lblTimeZone;
-   private Label             _lblWindChillUnit;
    //
    private Link              _linkDefaultTimeZone;
    private Link              _linkGeoTimeZone;
@@ -3656,33 +3656,31 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
       final Composite container = (Composite) _sectionWeather.getClient();
       GridLayoutFactory
             .fillDefaults()//
-            .numColumns(2)
-            .spacing(COLUMN_SPACING, 5)
+            .numColumns(5)
+//            .spacing(COLUMN_SPACING, 5)
             .applyTo(container);
+//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
       {
-         createUI_Section_141_Weather(container);
-         createUI_Section_142_Weather(container);
-         createUI_Section_144_WeatherCol1(container);
+         createUI_Section_141_Weather_Description(container);
+         createUI_Section_142_Weather_Wind(container);
+         createUI_Section_144_Weather_Temperature(container);
          // TODO I am not sure what 14X means so I am just incremening from the previous 144
-         createUI_Section_145_Weather(container);
+         createUI_Section_146_Weather_Other(container);
       }
    }
 
-   private void createUI_Section_141_Weather(final Composite parent) {
+   private void createUI_Section_141_Weather_Description(final Composite parent) {
 
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
       {
          /*
           * weather description
           */
-         final Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_Weather);
+         final Label label = _tk.createLabel(parent, Messages.Tour_Editor_Label_Weather);
          GridDataFactory.swtDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
          _firstColumnControls.add(label);
 
          _txtWeather = _tk.createText(
-               container, //
+               parent, //
                UI.EMPTY_STRING,
                SWT.BORDER | SWT.WRAP | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL//
          );
@@ -3691,6 +3689,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
          GridDataFactory
                .fillDefaults()//
                .grab(true, true)
+               .span(4, 1)
                //
                // SWT.DEFAULT causes lots of problems with the layout therefore the hint is set
                //
@@ -3699,24 +3698,20 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
       }
    }
 
-   private void createUI_Section_142_Weather(final Composite section) {
+   private void createUI_Section_142_Weather_Wind(final Composite parent) {
 
-      final Composite container = _tk.createComposite(section);
-      GridDataFactory.fillDefaults().span(2, 1).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(5).applyTo(container);
       {
-
          /*
           * wind speed
           */
 
          // label
-         Label label = _tk.createLabel(container, Messages.tour_editor_label_wind_speed);
+         final Label label = _tk.createLabel(parent, Messages.tour_editor_label_wind_speed);
          label.setToolTipText(Messages.tour_editor_label_wind_speed_Tooltip);
          _firstColumnControls.add(label);
 
          // spinner
-         _spinWindSpeedValue = new Spinner(container, SWT.BORDER);
+         _spinWindSpeedValue = new Spinner(parent, SWT.BORDER);
          GridDataFactory
                .fillDefaults()//
                .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
@@ -3759,14 +3754,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
          });
 
          // label: km/h, mi/h
-         _lblSpeedUnit = _tk.createLabel(container, UI.UNIT_LABEL_SPEED);
+         _lblSpeedUnit = _tk.createLabel(parent, UI.UNIT_LABEL_SPEED);
 
          // combo: wind speed with text
-         _comboWindSpeedText = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
+         _comboWindSpeedText = new Combo(parent, SWT.READ_ONLY | SWT.BORDER);
          GridDataFactory
                .fillDefaults()//
                .align(SWT.BEGINNING, SWT.FILL)
-               .indent(20, 0)
+//               .indent(20, 0)
                .span(2, 1)
                .applyTo(_comboWindSpeedText);
          _tk.adapt(_comboWindSpeedText, true, false);
@@ -3785,7 +3780,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
          });
 
          /**
-          * this is not working correctly, the combo item is modified but an selection change event
+          * this is not working correctly, the combo item is modified but an selection change
+          * event
           * is not fired -> no updates are done :-((
           */
 //			_comboWindSpeedText.addMouseWheelListener(new MouseWheelListener() {
@@ -3832,18 +3828,21 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
          for (final String speedText : IWeather.windSpeedText) {
             _comboWindSpeedText.add(speedText);
          }
+      }
+
+      {
 
          /*
           * wind direction
           */
 
          // label
-         label = _tk.createLabel(container, Messages.tour_editor_label_wind_direction);
+         final Label label = _tk.createLabel(parent, Messages.tour_editor_label_wind_direction);
          label.setToolTipText(Messages.tour_editor_label_wind_direction_Tooltip);
          _firstColumnControls.add(label);
 
          // combo: wind direction text
-         _comboWindDirectionText = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
+         _comboWindDirectionText = new Combo(parent, SWT.READ_ONLY | SWT.BORDER);
          _tk.adapt(_comboWindDirectionText, true, false);
          GridDataFactory
                .fillDefaults()//
@@ -3865,14 +3864,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
          });
 
          // spacer
-         new Label(container, SWT.NONE);
+         new Label(parent, SWT.NONE);
 
          // spinner: wind direction value
-         _spinWindDirectionValue = new Spinner(container, SWT.BORDER);
+         _spinWindDirectionValue = new Spinner(parent, SWT.BORDER);
          GridDataFactory
                .fillDefaults()//
                .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
-               .indent(20, 0)
+//               .indent(20, 0)
                .align(SWT.BEGINNING, SWT.CENTER)
                .applyTo(_spinWindDirectionValue);
          _spinWindDirectionValue.setMinimum(0);
@@ -3913,195 +3912,189 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
          });
 
          // label: direction unit = degree
-         _tk.createLabel(container, Messages.Tour_Editor_Label_WindDirection_Unit);
+         _tk.createLabel(parent, Messages.Tour_Editor_Label_WindDirection_Unit);
 
          // fill combobox
          for (final String windDirText : IWeather.windDirectionText) {
             _comboWindDirectionText.add(windDirText);
          }
-
       }
    }
 
    /**
-    * weather: 1. column
+    * weather
     */
-   private void createUI_Section_144_WeatherCol1(final Composite section) {
+   private void createUI_Section_144_Weather_Temperature(final Composite parent) {
 
-      final Composite container = _tk.createComposite(section);
-      GridDataFactory.fillDefaults().span(2, 1).applyTo(container);
-      GridLayoutFactory.fillDefaults()//
-            .numColumns(8)
-            .applyTo(container);
+      Label label;
+
       {
          /*
-          * temperatures
+          * Temperatures
           */
-
-
          // label
-         Label label = _tk.createLabel(container, Messages.tour_editor_label_temperature);
+         label = _tk.createLabel(parent, Messages.tour_editor_label_temperature);
          label.setToolTipText(Messages.tour_editor_label_temperature_Tooltip);
          _firstColumnControls.add(label);
 
-         // Average
-         // label: Average Temperature
-         label = _tk.createLabel(container, Messages.tour_editor_label_avgtemperature);
-         label.setToolTipText(Messages.tour_editor_label_avgtemperature_Tooltip);
+         {
+            /*
+             * Average Temperature
+             */
 
-         // spinner
-         _spinAverageTemperature = new Spinner(container, SWT.BORDER);
-         GridDataFactory
-               .fillDefaults()//
-               .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
-               .align(SWT.BEGINNING, SWT.CENTER)
-               .applyTo(_spinAverageTemperature);
-         _spinAverageTemperature.setToolTipText(Messages.tour_editor_label_avgtemperature_Tooltip);
+//            // label: Average Temperature
+//            label = _tk.createLabel(container, Messages.tour_editor_label_avgtemperature);
+//            label.setToolTipText(Messages.tour_editor_label_avgtemperature_Tooltip);
 
-         // the min/max temperature has a large range because fahrenheit has bigger values than celsius
-         _spinAverageTemperature.setMinimum(-600);
-         _spinAverageTemperature.setMaximum(1500);
+            // spinner
+            _spinAverageTemperature = new Spinner(parent, SWT.BORDER);
+            GridDataFactory
+                  .fillDefaults()//
+                  .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+                  .align(SWT.BEGINNING, SWT.CENTER)
+                  .applyTo(_spinAverageTemperature);
+            _spinAverageTemperature.setToolTipText(Messages.tour_editor_label_avgtemperature_Tooltip);
 
-         _spinAverageTemperature.addModifyListener(new ModifyListener() {
-            @Override
-            public void modifyText(final ModifyEvent e) {
-               if (_isSetField || _isSavingInProgress) {
-                  return;
+            // the min/max temperature has a large range because fahrenheit has bigger values than celsius
+            _spinAverageTemperature.setMinimum(-600);
+            _spinAverageTemperature.setMaximum(1500);
+
+            _spinAverageTemperature.addModifyListener(new ModifyListener() {
+               @Override
+               public void modifyText(final ModifyEvent e) {
+                  if (_isSetField || _isSavingInProgress) {
+                     return;
+                  }
+                  _isTemperatureManuallyModified = true;
+                  setTourDirty();
                }
-               _isTemperatureManuallyModified = true;
-               setTourDirty();
-            }
-         });
+            });
 
-         _spinAverageTemperature.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
+            _spinAverageTemperature.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
 
-               if (_isLinux && e.widget.getData(FIX_LINUX_ASYNC_EVENT_1) != null) {
-                  e.widget.setData(FIX_LINUX_ASYNC_EVENT_1, null);
-                  return;
+                  if (_isLinux && e.widget.getData(FIX_LINUX_ASYNC_EVENT_1) != null) {
+                     e.widget.setData(FIX_LINUX_ASYNC_EVENT_1, null);
+                     return;
+                  }
+
+                  if (_isSetField || _isSavingInProgress) {
+                     return;
+                  }
+                  _isTemperatureManuallyModified = true;
+                  setTourDirty();
                }
+            });
 
-               if (_isSetField || _isSavingInProgress) {
-                  return;
+            _spinAverageTemperature.addMouseWheelListener(new MouseWheelListener() {
+               @Override
+               public void mouseScrolled(final MouseEvent event) {
+                  Util.adjustSpinnerValueOnMouseScroll(event);
+                  if (_isSetField || _isSavingInProgress) {
+                     return;
+                  }
+                  _isTemperatureManuallyModified = true;
+                  setTourDirty();
                }
-               _isTemperatureManuallyModified = true;
-               setTourDirty();
-            }
-         });
+            });
 
-         _spinAverageTemperature.addMouseWheelListener(new MouseWheelListener() {
-            @Override
-            public void mouseScrolled(final MouseEvent event) {
-               Util.adjustSpinnerValueOnMouseScroll(event);
-               if (_isSetField || _isSavingInProgress) {
-                  return;
-               }
-               _isTemperatureManuallyModified = true;
-               setTourDirty();
-            }
-         });
+            // label: celsius, fahrenheit
+            _lblTemperatureUnit_Avg = _tk.createLabel(parent, UI.SYMBOL_AVERAGE + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
+         }
 
-         // label: celsius, fahrenheit
-         _lblTemperatureUnit = _tk.createLabel(container, UI.UNIT_LABEL_TEMPERATURE);
+         {
+            /*
+             * Maximum Temperature
+             */
 
+//            // label: Maximum Temperature
+//            label = _tk.createLabel(container, Messages.tour_editor_label_maxtemperature);
+//            label.setToolTipText(Messages.tour_editor_label_maxtemperature_Tooltip);
+
+            // spinner
+            _spinMaxTemperature = new Spinner(parent, SWT.BORDER);
+            GridDataFactory
+                  .fillDefaults()//
+                  .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+                  .align(SWT.BEGINNING, SWT.CENTER)
+                  .applyTo(_spinMaxTemperature);
+            _spinMaxTemperature.setToolTipText(Messages.tour_editor_label_maxtemperature_Tooltip);
+
+            // the min/max temperature has a large range because fahrenheit has bigger values than celsius
+            _spinMaxTemperature.setMinimum(-600);
+            _spinMaxTemperature.setMaximum(1500);
+
+            _lblTemperatureUnit_Max = _tk.createLabel(parent, UI.SYMBOL_MAX + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
+         }
 
          // spacer
-         new Label(container, SWT.NONE);
+         new Label(parent, SWT.NONE);
 
+         {
+            /*
+             * Wind chill
+             */
 
-         // Wind chill
+//            // label
+//            label = _tk.createLabel(container, Messages.tour_editor_label_windchill);
+//            label.setToolTipText(Messages.tour_editor_label_windchill_Tooltip);
 
-         // label
-         label = _tk.createLabel(container, Messages.tour_editor_label_windchill);
-         label.setToolTipText(Messages.tour_editor_label_windchill_Tooltip);
+            // spinner
+            _spinWindChill = new Spinner(parent, SWT.BORDER);
+            GridDataFactory
+                  .fillDefaults()
+                  .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+                  .align(SWT.BEGINNING, SWT.CENTER)
+                  .applyTo(_spinWindChill);
+            _spinWindChill.setToolTipText(Messages.tour_editor_label_windchill_Tooltip);
+            // the min/max temperature has a large range because fahrenheit has bigger values than celsius
+            _spinWindChill.setMinimum(-600);
+            _spinWindChill.setMaximum(1500);
 
-         // spinner
-         _spinWindChill = new Spinner(container, SWT.BORDER);
-         GridDataFactory
-               .fillDefaults()
-               .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
-               .align(SWT.BEGINNING, SWT.CENTER)
-               .applyTo(_spinWindChill);
-         _spinWindChill.setToolTipText(Messages.tour_editor_label_windchill_Tooltip);
-         // the min/max temperature has a large range because fahrenheit has bigger values than celsius
-         _spinWindChill.setMinimum(-600);
-         _spinWindChill.setMaximum(1500);
+            _lblTemperatureUnit_WindChill = _tk.createLabel(parent, UI.SYMBOL_TILDE + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
+         }
 
-         _lblWindChillUnit = _tk.createLabel(container, UI.UNIT_LABEL_TEMPERATURE);
+         {
+            /*
+             * Minimum Temperature
+             */
 
+//            // label: Minimum Temperature
+//            label = _tk.createLabel(container, Messages.tour_editor_label_mintemperature);
+//            label.setToolTipText(Messages.tour_editor_label_mintemperature_Tooltip);
 
-         // spacer
-         new Label(container, SWT.NONE);
+            // spinner
+            _spinMinTemperature = new Spinner(parent, SWT.BORDER);
+            GridDataFactory
+                  .fillDefaults()//
+                  .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+                  .align(SWT.BEGINNING, SWT.CENTER)
+                  .applyTo(_spinMinTemperature);
+            _spinMinTemperature.setToolTipText(Messages.tour_editor_label_mintemperature_Tooltip);
 
+            // the min/max temperature has a large range because fahrenheit has bigger values than celsius
+            _spinMinTemperature.setMinimum(-600);
+            _spinMinTemperature.setMaximum(1500);
 
-         // Maximum Temperature
-
-         // label: Maximum Temperature
-         label = _tk.createLabel(container, Messages.tour_editor_label_maxtemperature);
-         label.setToolTipText(Messages.tour_editor_label_maxtemperature_Tooltip);
-
-         // spinner
-         _spinMaxTemperature = new Spinner(container, SWT.BORDER);
-         GridDataFactory
-               .fillDefaults()//
-               .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
-               .align(SWT.BEGINNING, SWT.CENTER)
-               .applyTo(_spinMaxTemperature);
-         _spinMaxTemperature.setToolTipText(Messages.tour_editor_label_maxtemperature_Tooltip);
-
-         // the min/max temperature has a large range because fahrenheit has bigger values than celsius
-         _spinMaxTemperature.setMinimum(-600);
-         _spinMaxTemperature.setMaximum(1500);
-
-         _lblMaxTemperatureUnit = _tk.createLabel(container, UI.UNIT_LABEL_TEMPERATURE);
-
-         // spacer
-         new Label(container, SWT.NONE);
-
-         // Minimum Temperature
-
-         // label: Minimum Temperature
-         label = _tk.createLabel(container, Messages.tour_editor_label_mintemperature);
-         label.setToolTipText(Messages.tour_editor_label_mintemperature_Tooltip);
-
-         // spinner
-         _spinMinTemperature = new Spinner(container, SWT.BORDER);
-         GridDataFactory
-               .fillDefaults()//
-               .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
-               .align(SWT.BEGINNING, SWT.CENTER)
-               .applyTo(_spinMinTemperature);
-         _spinMinTemperature.setToolTipText(Messages.tour_editor_label_mintemperature_Tooltip);
-
-         // the min/max temperature has a large range because fahrenheit has bigger values than celsius
-         _spinMinTemperature.setMinimum(-600);
-         _spinMinTemperature.setMaximum(1500);
-
-         _lblMinTemperatureUnit = _tk.createLabel(container, UI.UNIT_LABEL_TEMPERATURE);
+            _lblTemperatureUnit_Min = _tk.createLabel(parent, UI.SYMBOL_MIN + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
+         }
       }
    }
 
-   private void createUI_Section_145_Weather(final Composite section) {
+   private void createUI_Section_146_Weather_Other(final Composite parent) {
 
-      final Composite container = _tk.createComposite(section);
-      GridDataFactory.fillDefaults().span(2, 1).applyTo(container);
-      GridLayoutFactory.fillDefaults()//
-            // .spacing(2, 1)
-            .numColumns(3)
-            .applyTo(container);
-//    _firstColumnContainerControls.add(container);
       {
          /*
           * Humidity
           */
          // label
-         Label label = _tk.createLabel(container, Messages.tour_editor_label_humidity);
+         Label label = _tk.createLabel(parent, Messages.tour_editor_label_humidity);
          label.setToolTipText(Messages.tour_editor_label_humidity_Tooltip);
          _firstColumnControls.add(label);
 
          // spinner: humidity value
-         _spinHumidity = new Spinner(container, SWT.BORDER);
+         _spinHumidity = new Spinner(parent, SWT.BORDER);
          GridDataFactory
                .fillDefaults()
                .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
@@ -4111,18 +4104,21 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
          _spinHumidity.setMaximum(100);
 
          // label: mm, inches
-         label = _tk.createLabel(container, UI.UNIT_PERCENT);
+         label = _tk.createLabel(parent, UI.UNIT_PERCENT);
+         GridDataFactory.fillDefaults().span(3, 1).applyTo(label);
+      }
 
+      {
          /*
           * Precipitation
           */
          // label
-         label = _tk.createLabel(container, Messages.tour_editor_label_precipitation);
+         Label label = _tk.createLabel(parent, Messages.tour_editor_label_precipitation);
          label.setToolTipText(Messages.tour_editor_label_precipitation_Tooltip);
          _firstColumnControls.add(label);
 
          // spinner: precipitation value
-         _spinPrecipitationValue = new Spinner(container, SWT.BORDER);
+         _spinPrecipitationValue = new Spinner(parent, SWT.BORDER);
          GridDataFactory
                .fillDefaults()
                .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
@@ -4132,18 +4128,24 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
          _spinPrecipitationValue.setMaximum(10000);
 
          // label: mm, inches
-         _lblPrecipitationUnit = _tk.createLabel(container, UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
+         _lblPrecipitationUnit = _tk.createLabel(parent, UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
 
+         // spacer
+         label = new Label(parent, SWT.NONE);
+         GridDataFactory.fillDefaults().span(2, 1).applyTo(label);
+      }
+
+      {
          /*
           * Pressure
           */
          // label
-         label = _tk.createLabel(container, Messages.tour_editor_label_pressure);
+         Label label = _tk.createLabel(parent, Messages.tour_editor_label_pressure);
          label.setToolTipText(Messages.tour_editor_label_pressure_Tooltip);
          _firstColumnControls.add(label);
 
          // spinner: pressure value
-         _spinPressureValue = new Spinner(container, SWT.BORDER);
+         _spinPressureValue = new Spinner(parent, SWT.BORDER);
          GridDataFactory
                .fillDefaults()
                .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
@@ -4152,17 +4154,23 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
          _spinPressureValue.setMaximum(400000);
 
          // label: mb, inHg
-         _lblPressureUnit = _tk.createLabel(container, UI.UNIT_LABEL_PRESSURE_MB_OR_INHG);
+         _lblPressureUnit = _tk.createLabel(parent, UI.UNIT_LABEL_PRESSURE_MB_OR_INHG);
 
+         // spacer
+         label = new Label(parent, SWT.NONE);
+         GridDataFactory.fillDefaults().span(2, 1).applyTo(label);
+      }
+
+      {
          /*
-          * clouds
+          * Clouds
           */
-         final Composite cloudContainer = new Composite(container, SWT.NONE);
+         final Composite cloudContainer = new Composite(parent, SWT.NONE);
          GridDataFactory.fillDefaults().applyTo(cloudContainer);
          GridLayoutFactory.fillDefaults().numColumns(3).applyTo(cloudContainer);
          {
             // label: clouds
-            label = _tk.createLabel(cloudContainer, Messages.tour_editor_label_clouds);
+            final Label label = _tk.createLabel(cloudContainer, Messages.tour_editor_label_clouds);
             label.setToolTipText(Messages.tour_editor_label_clouds_Tooltip);
 
             // icon: clouds
@@ -4176,7 +4184,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
          _firstColumnControls.add(cloudContainer);
 
          // combo: clouds
-         _comboClouds = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
+         _comboClouds = new Combo(parent, SWT.READ_ONLY | SWT.BORDER);
          GridDataFactory.fillDefaults().span(2, 1).applyTo(_comboClouds);
          _tk.adapt(_comboClouds, true, false);
          _comboClouds.setToolTipText(Messages.tour_editor_label_clouds_Tooltip);
@@ -4201,6 +4209,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
             displayCloudIcon();
          }
          _isSetField = false;
+
+         // spacer
+         final Label label = new Label(parent, SWT.NONE);
+         GridDataFactory.fillDefaults().span(3, 1).applyTo(label);
       }
    }
 
@@ -8221,11 +8233,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
       _lblAltitudeDownUnit.setText(UI.UNIT_LABEL_ALTITUDE);
       _lblPrecipitationUnit.setText(UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
       _lblPressureUnit.setText(UI.UNIT_LABEL_PRESSURE_MB_OR_INHG);
-      _lblTemperatureUnit.setText(UI.UNIT_LABEL_TEMPERATURE);
       _lblSpeedUnit.setText(UI.UNIT_LABEL_SPEED);
-      _lblMaxTemperatureUnit.setText(UI.UNIT_LABEL_TEMPERATURE);
-      _lblMinTemperatureUnit.setText(UI.UNIT_LABEL_TEMPERATURE);
-      _lblWindChillUnit.setText(UI.UNIT_LABEL_TEMPERATURE);
+      _lblTemperatureUnit_Avg.setText(UI.SYMBOL_AVERAGE + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
+      _lblTemperatureUnit_Max.setText(UI.SYMBOL_MAX + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
+      _lblTemperatureUnit_Min.setText(UI.SYMBOL_MIN + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
+      _lblTemperatureUnit_WindChill.setText(UI.SYMBOL_TILDE + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
 
       // cadence rpm/spm
       final float cadence = _tourData.getCadenceMultiplier();
