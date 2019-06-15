@@ -42,6 +42,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
@@ -390,6 +391,59 @@ public class Util {
       }
 
       return floatValues;
+   }
+
+   /**
+    * Converts a list of strings into a comma-separated string.
+    *
+    * @param allTexts
+    * @return
+    */
+   public static String convertListToString(final ArrayList<String> allTexts) {
+
+      if (allTexts == null) {
+         return UI.EMPTY_STRING;
+      }
+
+      if (allTexts.size() == 0) {
+         return UI.EMPTY_STRING;
+      }
+
+      boolean isFirst = false;
+      final StringBuilder sb = new StringBuilder();
+
+      for (final String text : allTexts) {
+
+         if (isFirst) {
+            isFirst = false;
+            sb.append(text);
+         } else {
+
+            sb.append(',').append(text);
+         }
+      }
+
+      return sb.toString();
+   }
+
+   /**
+    * Converts a comma-seaparated string into a list of strings.
+    *
+    * @param text
+    * @return
+    */
+   public static ArrayList<String> convertStringToList(final String text) {
+
+      final ArrayList<String> allTexts = new ArrayList<>();
+
+      final StringTokenizer tok = new StringTokenizer(text, UI.COMMA_SPACE);
+      final int nTokens = tok.countTokens();
+
+      for (int i = 0; i < nTokens; i++) {
+         allTexts.add(tok.nextToken());
+      }
+
+      return allTexts;
    }
 
    /**
@@ -1789,9 +1843,9 @@ public class Util {
             return Integer.parseInt(valueString);
          }
       } catch (final NumberFormatException e) {
-         
+
          // try to parse as float value
-         
+
          return (int) parseFloat0(attributes, attributeName);
       }
       return 0;

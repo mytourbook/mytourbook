@@ -314,7 +314,7 @@
       
       <!-- 
       
-         Bycicle
+         Bicycle
       
          pref page for bikes is disabled since version 11.07 because bikes 
          are currently not used and is confusing the user
@@ -426,6 +426,15 @@
             class="net.tourbook.preferences.PrefPageViewColors"
             category="net.tourbook.preferences.PrefPageViews"
          />
+
+  	<!--
+         Weather
+      -->
+      <page
+         name="%Pref_Page_Weather"
+         id="net.tourbook.preferences.PrefPageWeather"
+         class="net.tourbook.preferences.PrefPageWeather"
+      />
 
    </extension>
 

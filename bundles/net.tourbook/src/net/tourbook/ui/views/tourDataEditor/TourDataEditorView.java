@@ -578,11 +578,16 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
    private Label             _lblAltitudeUpUnit;
    private Label             _lblAltitudeDownUnit;
    private Label             _lblDistanceUnit;
+   private Label             _lblMaxTemperatureUnit;
+   private Label             _lblMinTemperatureUnit;
+   private Label             _lblPrecipitationUnit;
+   private Label             _lblPressureUnit;
    private Label             _lblSpeedUnit;
    private Label             _lblStartTime;
    private Label             _lblTags;
    private Label             _lblTemperatureUnit;
    private Label             _lblTimeZone;
+   private Label             _lblWindChillUnit;
    //
    private Link              _linkDefaultTimeZone;
    private Link              _linkGeoTimeZone;
@@ -593,8 +598,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
    private Spinner           _spinBodyWeight;
    private Spinner           _spinCalories;
    private Spinner           _spinFTP;
+   private Spinner           _spinHumidity;
+   private Spinner           _spinPrecipitationValue;
+   private Spinner           _spinPressureValue;
    private Spinner           _spinRestPuls;
-   private Spinner           _spinTemperature;
+   private Spinner           _spinAverageTemperature;
+   private Spinner           _spinMaxTemperature;
+   private Spinner           _spinMinTemperature;
+   private Spinner           _spinWindChill;
    private Spinner           _spinWindDirectionValue;
    private Spinner           _spinWindSpeedValue;
    //
@@ -3652,6 +3663,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
          createUI_Section_141_Weather(container);
          createUI_Section_142_Weather(container);
          createUI_Section_144_WeatherCol1(container);
+         // TODO I am not sure what 14X means so I am just incremening from the previous 144
+         createUI_Section_145_Weather(container);
       }
    }
 
@@ -3679,7 +3692,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
                .fillDefaults()//
                .grab(true, true)
                //
-               // SWT.DEFAULT causes lot's of problems with the layout therefore the hint is set
+               // SWT.DEFAULT causes lots of problems with the layout therefore the hint is set
                //
                .hint(_hintTextColumnWidth, _pc.convertHeightInCharsToPixels(2))
                .applyTo(_txtWeather);
@@ -3753,7 +3766,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
          GridDataFactory
                .fillDefaults()//
                .align(SWT.BEGINNING, SWT.FILL)
-               .indent(10, 0)
+               .indent(20, 0)
                .span(2, 1)
                .applyTo(_comboWindSpeedText);
          _tk.adapt(_comboWindSpeedText, true, false);
@@ -3838,7 +3851,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
                .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
                .applyTo(_comboWindDirectionText);
          _comboWindDirectionText.setToolTipText(Messages.tour_editor_label_WindDirectionNESW_Tooltip);
-         _comboWindDirectionText.setVisibleItemCount(10);
+         _comboWindDirectionText.setVisibleItemCount(16);
          _comboWindDirectionText.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(final SelectionEvent e) {
@@ -3859,11 +3872,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
          GridDataFactory
                .fillDefaults()//
                .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
-               .indent(10, 0)
+               .indent(20, 0)
                .align(SWT.BEGINNING, SWT.CENTER)
                .applyTo(_spinWindDirectionValue);
-         _spinWindDirectionValue.setMinimum(-1);
-         _spinWindDirectionValue.setMaximum(360);
+         _spinWindDirectionValue.setMinimum(0);
+         _spinWindDirectionValue.setMaximum(3600);
+         _spinWindDirectionValue.setDigits(1);
          _spinWindDirectionValue.setToolTipText(Messages.tour_editor_label_wind_direction_Tooltip);
 
          _spinWindDirectionValue.addModifyListener(new ModifyListener() {
@@ -3915,36 +3929,40 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
    private void createUI_Section_144_WeatherCol1(final Composite section) {
 
       final Composite container = _tk.createComposite(section);
-      GridDataFactory.fillDefaults().applyTo(container);
+      GridDataFactory.fillDefaults().span(2, 1).applyTo(container);
       GridLayoutFactory.fillDefaults()//
-//				.spacing(2, 1)
-            .numColumns(3)
+            .numColumns(8)
             .applyTo(container);
-//		_firstColumnContainerControls.add(container);
       {
          /*
-          * temperature
+          * temperatures
           */
+
 
          // label
          Label label = _tk.createLabel(container, Messages.tour_editor_label_temperature);
          label.setToolTipText(Messages.tour_editor_label_temperature_Tooltip);
          _firstColumnControls.add(label);
 
+         // Average
+         // label: Average Temperature
+         label = _tk.createLabel(container, Messages.tour_editor_label_avgtemperature);
+         label.setToolTipText(Messages.tour_editor_label_avgtemperature_Tooltip);
+
          // spinner
-         _spinTemperature = new Spinner(container, SWT.BORDER);
+         _spinAverageTemperature = new Spinner(container, SWT.BORDER);
          GridDataFactory
                .fillDefaults()//
-               .align(SWT.BEGINNING, SWT.CENTER)
                .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
-               .applyTo(_spinTemperature);
-         _spinTemperature.setToolTipText(Messages.tour_editor_label_temperature_Tooltip);
+               .align(SWT.BEGINNING, SWT.CENTER)
+               .applyTo(_spinAverageTemperature);
+         _spinAverageTemperature.setToolTipText(Messages.tour_editor_label_avgtemperature_Tooltip);
 
-         // the min/max temperature has a large range because fahrenheit has bigger values than celcius
-         _spinTemperature.setMinimum(-600);
-         _spinTemperature.setMaximum(1500);
+         // the min/max temperature has a large range because fahrenheit has bigger values than celsius
+         _spinAverageTemperature.setMinimum(-600);
+         _spinAverageTemperature.setMaximum(1500);
 
-         _spinTemperature.addModifyListener(new ModifyListener() {
+         _spinAverageTemperature.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(final ModifyEvent e) {
                if (_isSetField || _isSavingInProgress) {
@@ -3955,7 +3973,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
             }
          });
 
-         _spinTemperature.addSelectionListener(new SelectionAdapter() {
+         _spinAverageTemperature.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(final SelectionEvent e) {
 
@@ -3972,7 +3990,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
             }
          });
 
-         _spinTemperature.addMouseWheelListener(new MouseWheelListener() {
+         _spinAverageTemperature.addMouseWheelListener(new MouseWheelListener() {
             @Override
             public void mouseScrolled(final MouseEvent event) {
                Util.adjustSpinnerValueOnMouseScroll(event);
@@ -3984,8 +4002,157 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
             }
          });
 
-         // label: celcius, fahrenheit
+         // label: celsius, fahrenheit
          _lblTemperatureUnit = _tk.createLabel(container, UI.UNIT_LABEL_TEMPERATURE);
+
+
+         // spacer
+         new Label(container, SWT.NONE);
+
+
+         // Wind chill
+
+         // label
+         label = _tk.createLabel(container, Messages.tour_editor_label_windchill);
+         label.setToolTipText(Messages.tour_editor_label_windchill_Tooltip);
+
+         // spinner
+         _spinWindChill = new Spinner(container, SWT.BORDER);
+         GridDataFactory
+               .fillDefaults()
+               .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+               .align(SWT.BEGINNING, SWT.CENTER)
+               .applyTo(_spinWindChill);
+         _spinWindChill.setToolTipText(Messages.tour_editor_label_windchill_Tooltip);
+         // the min/max temperature has a large range because fahrenheit has bigger values than celsius
+         _spinWindChill.setMinimum(-600);
+         _spinWindChill.setMaximum(1500);
+
+         _lblWindChillUnit = _tk.createLabel(container, UI.UNIT_LABEL_TEMPERATURE);
+
+
+         // spacer
+         new Label(container, SWT.NONE);
+
+
+         // Maximum Temperature
+
+         // label: Maximum Temperature
+         label = _tk.createLabel(container, Messages.tour_editor_label_maxtemperature);
+         label.setToolTipText(Messages.tour_editor_label_maxtemperature_Tooltip);
+
+         // spinner
+         _spinMaxTemperature = new Spinner(container, SWT.BORDER);
+         GridDataFactory
+               .fillDefaults()//
+               .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+               .align(SWT.BEGINNING, SWT.CENTER)
+               .applyTo(_spinMaxTemperature);
+         _spinMaxTemperature.setToolTipText(Messages.tour_editor_label_maxtemperature_Tooltip);
+
+         // the min/max temperature has a large range because fahrenheit has bigger values than celsius
+         _spinMaxTemperature.setMinimum(-600);
+         _spinMaxTemperature.setMaximum(1500);
+
+         _lblMaxTemperatureUnit = _tk.createLabel(container, UI.UNIT_LABEL_TEMPERATURE);
+
+         // spacer
+         new Label(container, SWT.NONE);
+
+         // Minimum Temperature
+
+         // label: Minimum Temperature
+         label = _tk.createLabel(container, Messages.tour_editor_label_mintemperature);
+         label.setToolTipText(Messages.tour_editor_label_mintemperature_Tooltip);
+
+         // spinner
+         _spinMinTemperature = new Spinner(container, SWT.BORDER);
+         GridDataFactory
+               .fillDefaults()//
+               .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+               .align(SWT.BEGINNING, SWT.CENTER)
+               .applyTo(_spinMinTemperature);
+         _spinMinTemperature.setToolTipText(Messages.tour_editor_label_mintemperature_Tooltip);
+
+         // the min/max temperature has a large range because fahrenheit has bigger values than celsius
+         _spinMinTemperature.setMinimum(-600);
+         _spinMinTemperature.setMaximum(1500);
+
+         _lblMinTemperatureUnit = _tk.createLabel(container, UI.UNIT_LABEL_TEMPERATURE);
+      }
+   }
+
+   private void createUI_Section_145_Weather(final Composite section) {
+
+      final Composite container = _tk.createComposite(section);
+      GridDataFactory.fillDefaults().span(2, 1).applyTo(container);
+      GridLayoutFactory.fillDefaults()//
+            // .spacing(2, 1)
+            .numColumns(3)
+            .applyTo(container);
+//    _firstColumnContainerControls.add(container);
+      {
+         /*
+          * Humidity
+          */
+         // label
+         Label label = _tk.createLabel(container, Messages.tour_editor_label_humidity);
+         label.setToolTipText(Messages.tour_editor_label_humidity_Tooltip);
+         _firstColumnControls.add(label);
+
+         // spinner: humidity value
+         _spinHumidity = new Spinner(container, SWT.BORDER);
+         GridDataFactory
+               .fillDefaults()
+               .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+               .align(SWT.BEGINNING, SWT.CENTER)
+               .applyTo(_spinHumidity);
+         _spinHumidity.setMinimum(0);
+         _spinHumidity.setMaximum(100);
+
+         // label: mm, inches
+         label = _tk.createLabel(container, UI.UNIT_PERCENT);
+
+         /*
+          * Precipitation
+          */
+         // label
+         label = _tk.createLabel(container, Messages.tour_editor_label_precipitation);
+         label.setToolTipText(Messages.tour_editor_label_precipitation_Tooltip);
+         _firstColumnControls.add(label);
+
+         // spinner: precipitation value
+         _spinPrecipitationValue = new Spinner(container, SWT.BORDER);
+         GridDataFactory
+               .fillDefaults()
+               .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+               .align(SWT.BEGINNING, SWT.CENTER)
+               .applyTo(_spinPrecipitationValue);
+         _spinPrecipitationValue.setDigits(2);
+         _spinPrecipitationValue.setMaximum(10000);
+
+         // label: mm, inches
+         _lblPrecipitationUnit = _tk.createLabel(container, UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
+
+         /*
+          * Pressure
+          */
+         // label
+         label = _tk.createLabel(container, Messages.tour_editor_label_pressure);
+         label.setToolTipText(Messages.tour_editor_label_pressure_Tooltip);
+         _firstColumnControls.add(label);
+
+         // spinner: pressure value
+         _spinPressureValue = new Spinner(container, SWT.BORDER);
+         GridDataFactory
+               .fillDefaults()
+               .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+               .align(SWT.BEGINNING, SWT.CENTER)
+               .applyTo(_spinPressureValue);
+         _spinPressureValue.setMaximum(400000);
+
+         // label: mb, inHg
+         _lblPressureUnit = _tk.createLabel(container, UI.UNIT_LABEL_PRESSURE_MB_OR_INHG);
 
          /*
           * clouds
@@ -5663,7 +5830,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
       _comboLocation_End.setEnabled(canEdit);
 
       _txtWeather.setEnabled(canEdit);
-      _spinTemperature.setEnabled(canEdit && (_tourData != null && _tourData.temperatureSerie == null));
+      _spinAverageTemperature.setEnabled(canEdit && (_tourData != null && (_tourData.temperatureSerie == null || _tourData.isWeatherDataFromApi())));
       _comboClouds.setEnabled(canEdit);
       _spinWindDirectionValue.setEnabled(canEdit);
 
@@ -6220,9 +6387,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
    private int getWindDirectionTextIndex(final int degreeDirection) {
 
-      final float degree = (degreeDirection + 22.5f) / 45.0f;
+      final float degree = (degreeDirection / 10.0f + 11.25f) / 22.5f;
 
-      final int directionIndex = ((int) degree) % 8;
+      final int directionIndex = ((int) degree) % 16;
 
       return directionIndex;
    }
@@ -6867,12 +7034,16 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
    private void onSelectWindDirectionText() {
 
-      // N=0=0  NE=1=45  E=2=90  SE=3=135  S=4=180  SW=5=225  W=6=270  NW=7=315
+      // N=348.75=11.25   NNE=11.25=33.75    NE=33.75=56.25    ENE=56.25=78.75
+      // E=78.75=101.25   ESE=101.25=123.75  SE=123.75=146.25  SSE=146.25=168.75
+      // S=168.75=191.25  SSW=191.25=213.75  SW=213.75=236.25  WSW=236.25=258.75
+      // W=258.75=281.25  WNW=281.25=303.75  NW=303.75=326.25  NNW=326.25=348.75
+
       final int selectedIndex = _comboWindDirectionText.getSelectionIndex();
 
       // get degree from selected direction
 
-      final int degree = selectedIndex * 45;
+      final int degree = (int) (selectedIndex * 22.5f * 10f);
 
       _spinWindDirectionValue.setSelection(degree);
    }
@@ -6881,11 +7052,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
       int degree = _spinWindDirectionValue.getSelection();
 
-      if (degree == -1) {
-         degree = 359;
-         _spinWindDirectionValue.setSelection(degree);
-      }
-      if (degree == 360) {
+      if (degree == 3600) {
          degree = 0;
          _spinWindDirectionValue.setSelection(degree);
       }
@@ -7494,7 +7661,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
          _tourData.setCadenceMultiplier(_rdoCadence_Rpm.getSelection() ? 1.0f : 2.0f);
 
          _tourData.setWeather(_txtWeather.getText().trim());
-         _tourData.setWeatherWindDir(_spinWindDirectionValue.getSelection());
+         _tourData.setWeatherWindDir((int) (_spinWindDirectionValue.getSelection() / 10.0f));
          if (_isWindSpeedManuallyModified) {
             /*
              * update the speed only when it was modified because when the measurement is changed
@@ -7514,7 +7681,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
          if (_isTemperatureManuallyModified) {
 
-            final float temperature = (float) _spinTemperature.getSelection() / 10;
+            final float temperature = (float) _spinAverageTemperature.getSelection() / 10;
 
             _tourData.setAvgTemperature(UI.convertTemperatureToMetric(temperature));
          }
@@ -7902,7 +8069,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
       _txtWeather.setText(_tourData.getWeather());
 
       // wind direction
-      final int weatherWindDirDegree = _tourData.getWeatherWindDir();
+      final int weatherWindDirDegree = (int) (_tourData.getWeatherWindDir() * 10.0f);
       _spinWindDirectionValue.setSelection(weatherWindDirDegree);
       _comboWindDirectionText.select(getWindDirectionTextIndex(weatherWindDirDegree));
 
@@ -7923,9 +8090,61 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
        */
       final float avgTemperature = UI.convertTemperatureFromMetric(_tourData.getAvgTemperature());
 
-      _spinTemperature.setData(FIX_LINUX_ASYNC_EVENT_1, true);
-      _spinTemperature.setDigits(1);
-      _spinTemperature.setSelection((int) ((avgTemperature * 10) + 0.5));
+      _spinAverageTemperature.setData(FIX_LINUX_ASYNC_EVENT_1, true);
+      _spinAverageTemperature.setDigits(1);
+      _spinAverageTemperature.setSelection((int) ((avgTemperature * 10) + 0.5));
+
+      /*
+       * Wind Chill
+       */
+      final float avgWindChill = UI.convertTemperatureFromMetric(_tourData.getWeatherWindChill());
+
+      _spinWindChill.setData(FIX_LINUX_ASYNC_EVENT_1, true);
+      _spinWindChill.setDigits(1);
+      _spinWindChill.setSelection((int) ((avgWindChill * 10) + 0.5));
+
+      /*
+       * Max temperature
+       */
+      final float maxTemperature = UI.convertTemperatureFromMetric(_tourData.getMaxTemperature());
+
+      _spinMaxTemperature.setData(FIX_LINUX_ASYNC_EVENT_1, true);
+      _spinMaxTemperature.setDigits(1);
+      _spinMaxTemperature.setSelection((int) ((maxTemperature * 10) + 0.5));
+
+      /*
+       * Max temperature
+       */
+      final float minTemperature = UI.convertTemperatureFromMetric(_tourData.getMinTemperature());
+
+      _spinMinTemperature.setData(FIX_LINUX_ASYNC_EVENT_1, true);
+      _spinMinTemperature.setDigits(1);
+      _spinMinTemperature.setSelection((int) ((minTemperature * 10) + 0.5));
+
+      /*
+       * Humidity
+       */
+      final int humidity = _tourData.getWeatherHumidity();
+
+      _spinHumidity.setData(FIX_LINUX_ASYNC_EVENT_1, true);
+      _spinHumidity.setSelection(humidity);
+
+      /*
+       * Precipitation
+       */
+      final float precipitation = UI.convertPrecipitationFromMetric(_tourData.getWeatherPrecipitation());
+
+      _spinPrecipitationValue.setData(FIX_LINUX_ASYNC_EVENT_1, true);
+      _spinPrecipitationValue.setSelection((int) (precipitation * 100f));
+
+      /*
+       * Pressure
+       */
+      final double pressure = UI.convertPressureFromMetric(_tourData.getWeatherPressure());
+
+      _spinPressureValue.setData(FIX_LINUX_ASYNC_EVENT_1, true);
+      _spinPressureValue.setDigits(2);
+      _spinPressureValue.setSelection((int) (pressure * 100f));
 
       // set start date/time without time zone
       final ZonedDateTime tourStartTime = _tourData.getTourStartTime();
@@ -8000,8 +8219,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
       _lblDistanceUnit.setText(UI.UNIT_LABEL_DISTANCE);
       _lblAltitudeUpUnit.setText(UI.UNIT_LABEL_ALTITUDE);
       _lblAltitudeDownUnit.setText(UI.UNIT_LABEL_ALTITUDE);
+      _lblPrecipitationUnit.setText(UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
+      _lblPressureUnit.setText(UI.UNIT_LABEL_PRESSURE_MB_OR_INHG);
       _lblTemperatureUnit.setText(UI.UNIT_LABEL_TEMPERATURE);
       _lblSpeedUnit.setText(UI.UNIT_LABEL_SPEED);
+      _lblMaxTemperatureUnit.setText(UI.UNIT_LABEL_TEMPERATURE);
+      _lblMinTemperatureUnit.setText(UI.UNIT_LABEL_TEMPERATURE);
+      _lblWindChillUnit.setText(UI.UNIT_LABEL_TEMPERATURE);
 
       // cadence rpm/spm
       final float cadence = _tourData.getCadenceMultiplier();

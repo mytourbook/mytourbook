@@ -87,6 +87,7 @@ import net.tourbook.ui.action.ActionModifyColumns;
 import net.tourbook.ui.action.ActionMultiplyCaloriesBy1000;
 import net.tourbook.ui.action.ActionOpenTour;
 import net.tourbook.ui.action.ActionRefreshView;
+import net.tourbook.ui.action.ActionRetrieveWeatherData;
 import net.tourbook.ui.action.ActionSetAltitudeValuesFromSRTM;
 import net.tourbook.ui.action.ActionSetPerson;
 import net.tourbook.ui.action.ActionSetTimeZone;
@@ -278,19 +279,20 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private boolean                                    _isToolTipInTitle;
    private boolean                                    _isToolTipInWeekDay;
    private final TourDoubleClickState                 _tourDoubleClickState      = new TourDoubleClickState();
-
    private TreeViewerTourInfoToolTip                  _tourInfoToolTip;
 
    private TagMenuManager                             _tagMenuManager;
+
    private MenuManager                                _viewerMenuManager;
    private IContextMenuProvider                       _viewerContextMenuProvider = new TreeContextMenuProvider();
-
    private ActionAdjustTemperature                    _actionAdjustTemperature;
+
    private ActionSetTimeZone                          _actionSetTimeZone;
    private ActionCollapseAll                          _actionCollapseAll;
    private ActionCollapseOthers                       _actionCollapseOthers;
    private ActionComputeDistanceValuesFromGeoposition _actionComputeDistanceValuesFromGeoposition;
    private ActionComputeElevationGain                 _actionComputeElevationGain;
+   private ActionRetrieveWeatherData                  _actionRetrieveWeatherData;
    private ActionDuplicateTour                        _actionDuplicateTour;
    private ActionEditQuick                            _actionEditQuick;
    private ActionExpandSelection                      _actionExpandSelection;
@@ -316,18 +318,17 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private ActionSetPerson                            _actionSetOtherPerson;
    private ActionToggleMonthWeek                      _actionToggleMonthWeek;
    private ActionTourBookOptions                      _actionTourBookOptions;
-
    private TreeViewer                                 _tourViewer;
-   private TreeColumnDefinition                       _timeZoneOffsetColDef;
 
+   private TreeColumnDefinition                       _timeZoneOffsetColDef;
    private PixelConverter                             _pc;
 
    /*
     * UI controls
     */
    private Composite _parent;
-   private Composite _viewerContainer;
 
+   private Composite _viewerContainer;
    private Menu      _treeContextMenu;
 
    private class ActionLinkWithOtherViews extends ActionToolbarSlideout {
@@ -717,6 +718,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
    private void createActions() {
 
+      _actionRetrieveWeatherData = new ActionRetrieveWeatherData(this);
       _actionAdjustTemperature = new ActionAdjustTemperature(this);
       _actionCollapseAll = new ActionCollapseAll(this);
       _actionCollapseOthers = new ActionCollapseOthers(this);
@@ -3123,6 +3125,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          canMergeTours = isOneTour && isDeviceTour && firstSavedTour.getMergeSourceTourId() != null;
       }
 
+      final boolean useWeatherRetrieval = _prefStore.getBoolean(ITourbookPreferences.STATE_USE_WEATHER_RETRIEVAL) &&
+            !_prefStore.getString(ITourbookPreferences.API_KEY).equals("");
+
       /*
        * enable actions
        */
@@ -3134,6 +3139,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       _actionComputeDistanceValuesFromGeoposition.setEnabled(isTourSelected);
       _actionComputeElevationGain.setEnabled(true);
+      _actionRetrieveWeatherData.setEnabled(useWeatherRetrieval);
       _actionDeleteTour.setEnabled(isTourSelected);
       _actionDuplicateTour.setEnabled(isOneTour && !isDeviceTour);
       _actionEditQuick.setEnabled(isOneTour);
@@ -3814,6 +3820,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       menuMgr.add(_actionPrintTour);
 
       menuMgr.add(new Separator());
+      menuMgr.add(_actionRetrieveWeatherData);
       menuMgr.add(_actionAdjustTemperature);
       menuMgr.add(_actionComputeElevationGain);
       menuMgr.add(_actionComputeDistanceValuesFromGeoposition);

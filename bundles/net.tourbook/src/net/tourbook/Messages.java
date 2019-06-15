@@ -303,6 +303,8 @@ public class Messages extends NLS {
    public static String        Dialog_PersonManager_PersonIsNotAvailable_Message;
    public static String        Dialog_PersonManager_PersonIsNotAvailable_Title;
 
+   public static String        Dialog_RetrieveWeather_Dialog_Title;
+
    public static String        dialog_is_tour_editor_modified_message;
    public static String        dialog_is_tour_editor_modified_title;
 
@@ -842,8 +844,10 @@ public class Messages extends NLS {
    public static String        Image__App_Turn_Off;
    public static String        Image__App_Turn_On;
    public static String        Image__ArrowDown;
+   public static String        Image__ArrowDown_Disabled;
    public static String        Image__ArrowDown_Themed;
    public static String        Image__ArrowUp;
+   public static String        Image__ArrowUp_Disabled;
    public static String        Image__ArrowUp_Themed;
    public static String        Image__assignMergedTour;
    public static String        Image__assignMergedTour_disabled;
@@ -1602,6 +1606,13 @@ public class Messages extends NLS {
    public static String        pref_view_layout_label_sub_sub;
    public static String        pref_view_layout_label_title;
 
+   public static String        pref_weather_apiKey_FieldEditor;
+   public static String        pref_weather_apiKey_FieldEditor_tooltip;
+   public static String        pref_weather_ApiSignupLink;
+   public static String        PrefPage_Weather_Checkbox_UseRetrieval;
+   public static String        PrefPage_Weather_Checkbox_UseRetrieval_Tooltip;
+   public static String        External_Link_WeatherApi;
+
 // public static String    Pref_SignImages_Dialog_ConfirmDelete_Message;
 // public static String    Pref_SignImages_Dialog_Delete_Title;
 // public static String    Pref_SignImages_Dialog_NoSelectedSignImage_Message;
@@ -1955,6 +1966,24 @@ public class Messages extends NLS {
    public static String Slideout_Map2MapOptions_Dialog_EnhancePaintingWarning_Message;
    public static String Slideout_Map2MapOptions_Dialog_EnhancePaintingWarning_Title;
 
+   public static String Slideout_Map2Provider_Button_HideMP;
+   public static String Slideout_Map2Provider_Button_HideMP_Tooltip;
+   public static String Slideout_Map2Provider_Button_UnhideMP;
+   public static String Slideout_Map2Provider_Button_UnhideMP_Tooltip;
+   public static String Slideout_Map2Provider_Column_IsVisible;
+   public static String Slideout_Map2Provider_Column_IsVisible_Tooltip;
+   public static String Slideout_Map2Provider_Column_MPType;
+   public static String Slideout_Map2Provider_Column_MPType_Custom;
+   public static String Slideout_Map2Provider_Column_MPType_Internal;
+   public static String Slideout_Map2Provider_Column_MPType_Profile;
+   public static String Slideout_Map2Provider_Column_MPType_Tooltip;
+   public static String Slideout_Map2Provider_Column_MPType_WMS;
+   public static String Slideout_Map2Provider_Column_TileUrl;
+   public static String Slideout_Map2Provider_Label_Tip;
+   public static String Slideout_Map2Provider_Label_Tip_Tooltip;
+   public static String Slideout_Map2Provider_MapProvider_Next_Tooltip;
+   public static String Slideout_Map2Provider_MapProvider_Previous_Tooltip;
+
    public static String Slideout_Map_Bookmark_Label_NumBookmarkListItems;
    public static String Slideout_Map_Bookmark_Label_NumBookmarkListItems_Tooltip;
    public static String Slideout_Map_Bookmark_Label_NumContextMenuItems;
@@ -1978,6 +2007,8 @@ public class Messages extends NLS {
    public static String Slideout_Map_Options_Label_SliderPath_Color;
    public static String Slideout_Map_Options_Label_SliderPath_Width;
    public static String Slideout_Map_Options_Label_Title;
+
+   public static String Slideout_Map_Provider_Label_Title;
 
    public static String Slideout_Map_TourColors_Checkbox_ShowInChartToolbar_Tooltip;
    public static String Slideout_Map_TourColors_Label_Title;
@@ -2166,6 +2197,7 @@ public class Messages extends NLS {
    public static String Tooltip_ValuePoint_Label_SlicesMax_Tooltip;
 
    public static String Tour_Action_AdjustTemperature;
+   public static String Tour_Action_RetrieveWeatherData;
    public static String Tour_Action_auto_move_sliders_when_zoomed;
    public static String Tour_Action_auto_zoom_to_slider_position;
    public static String Tour_Action_DuplicateTour;
@@ -2485,6 +2517,12 @@ public class Messages extends NLS {
    public static String tour_editor_label_driving_time;
    public static String tour_editor_label_end_location;
    public static String tour_editor_label_import_file_path;
+   public static String tour_editor_label_avgtemperature;
+   public static String tour_editor_label_avgtemperature_Tooltip;
+   public static String tour_editor_label_maxtemperature;
+   public static String tour_editor_label_maxtemperature_Tooltip;
+   public static String tour_editor_label_mintemperature;
+   public static String tour_editor_label_mintemperature_Tooltip;
    public static String tour_editor_label_merge_from_tour_id;
    public static String tour_editor_label_merge_from_tour_id_tooltip;
    public static String tour_editor_label_merge_into_tour_id;
@@ -2513,9 +2551,17 @@ public class Messages extends NLS {
    public static String tour_editor_label_clouds;
    public static String tour_editor_label_clouds_Tooltip;
    public static String tour_editor_label_temperature;
+   public static String tour_editor_label_humidity;
+   public static String tour_editor_label_humidity_Tooltip;
+   public static String tour_editor_label_precipitation;
+   public static String tour_editor_label_precipitation_Tooltip;
+   public static String tour_editor_label_pressure;
+   public static String tour_editor_label_pressure_Tooltip;
    public static String tour_editor_label_temperature_Tooltip;
    public static String tour_editor_label_rest_pulse;
    public static String tour_editor_label_rest_pulse_Tooltip;
+   public static String tour_editor_label_windchill;
+   public static String tour_editor_label_windchill_Tooltip;
    public static String tour_editor_label_WindDirectionNESW_Tooltip;
    public static String tour_editor_message_person_is_required;
    public static String tour_editor_message_show_another_tour;
@@ -2717,6 +2763,7 @@ public class Messages extends NLS {
    public static String UI_Label_no_chart_is_selected;
    public static String UI_Label_PersonIsRequired;
    public static String UI_Label_TourIsNotSelected;
+   public static String UI_Label_WeatherDataNotFound;
 
    public static String ui_tour_not_defined;
 

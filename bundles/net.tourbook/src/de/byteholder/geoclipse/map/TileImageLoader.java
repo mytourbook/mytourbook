@@ -161,6 +161,8 @@ public class TileImageLoader implements Runnable {
 
                         final URLConnection connection = url.openConnection();
 
+                        connection.setReadTimeout(5000);
+
                         final String userAgent = mp.getUserAgent();
 
                         if (userAgent != null) {

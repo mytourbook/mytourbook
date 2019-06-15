@@ -16,9 +16,9 @@
 package net.tourbook.application;
 
 import net.tourbook.Messages;
+import net.tourbook.common.tooltip.ActionToolbarSlideoutAdv;
 import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.tooltip.SlideoutLocation;
-import net.tourbook.tour.filter.ActionToolbarSlideoutAdv;
 import net.tourbook.tour.filter.SlideoutTourFilter;
 import net.tourbook.tour.filter.TourFilterManager;
 

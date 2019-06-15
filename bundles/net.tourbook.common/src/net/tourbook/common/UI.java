@@ -231,13 +231,14 @@ public class UI {
    public static boolean       UNIT_IS_METRIC;
 
    /*
-    * Contains the unit label in the currenty measurement system for the distance values
+    * Contains the unit label in the current measurement system for the distance values
     */
    public static String       UNIT_LABEL_DISTANCE;
    public static String       UNIT_LABEL_DISTANCE_M_OR_YD;
    public static String       UNIT_LABEL_DISTANCE_MM_OR_INCH;
    public static String       UNIT_LABEL_ALTITUDE;
    public static String       UNIT_LABEL_ALTIMETER;
+   public static String       UNIT_LABEL_PRESSURE_MB_OR_INHG;
    public static String       UNIT_LABEL_TEMPERATURE;
    public static String       UNIT_LABEL_SPEED;
    public static String       UNIT_LABEL_PACE;
@@ -250,6 +251,8 @@ public class UI {
    // (Celcius * 9/5) + 32 = Fahrenheit
    public static final float UNIT_FAHRENHEIT_MULTI = 1.8f;
    public static final float UNIT_FAHRENHEIT_ADD   = 32;
+
+   public static final float UNIT_M_TO_INCHES      = 39.37007874f;
 
    /*
     * Labels for the different measurement systems
@@ -264,6 +267,8 @@ public class UI {
    public static final String          UNIT_DISTANCE_INCH         = "inch";                     //$NON-NLS-1$
    public static final String          UNIT_PACE_MIN_P_KM         = "min/km";                   //$NON-NLS-1$
    public static final String          UNIT_PACE_MIN_P_MILE       = "min/mi";                   //$NON-NLS-1$
+   public static final String          UNIT_PRESSURE_MB           = "mb";                       //$NON-NLS-1$
+   public static final String          UNIT_PRESSURE_INHG         = "inHg";                     //$NON-NLS-1$
    public static final String          UNIT_SPEED_KM_H            = "km/h";                     //$NON-NLS-1$
    public static final String          UNIT_SPEED_MPH             = "mph";                      //$NON-NLS-1$
    public static final String          UNIT_TEMPERATURE_C         = "\u00B0C";                  //$NON-NLS-1$
@@ -649,8 +654,33 @@ public class UI {
    }
 
    /**
+    * @param precipitation
+    * @return Returns the precipitation amount in the current measurement system.
+    */
+   public static float convertPrecipitationFromMetric(final float precipitation) {
+
+      if (UNIT_VALUE_TEMPERATURE == 1) {
+         return precipitation;
+      }
+
+      return precipitation * UNIT_M_TO_INCHES / 100f;
+   }
+
+   /**
+    * @param weatherPressure
+    * @return Returns the atmospheric pressure value in the current measurement system.
+    */
+   public static double convertPressureFromMetric(final int weatherPressure) {
+      if (UNIT_VALUE_TEMPERATURE == 1) {
+         return weatherPressure;
+      }
+
+      return weatherPressure * 0.02953f;
+   }
+
+   /**
     * @param temperature
-    * @return Returns the temperatur in the current measurement system.
+    * @return Returns the temperature in the current measurement system.
     */
    public static float convertTemperatureFromMetric(final float temperature) {
 
