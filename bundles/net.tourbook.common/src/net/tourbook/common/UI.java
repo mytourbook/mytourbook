@@ -121,6 +121,7 @@ public class UI {
    private static final String      JS_BACKSLASH_REPLACEMENT      = "\\\\";     //$NON-NLS-1$
    private static final String      HTML_NEW_LINE                 = "\\n";      //$NON-NLS-1$
 
+   public static final String       SYMBOL_ALMOST_EQUAL_TO        = "\u2248";   //$NON-NLS-1$
    public static final String       SYMBOL_ARROW_UP               = "\u2191";   //$NON-NLS-1$
    public static final String       SYMBOL_ARROW_DOWN             = "\u2193";   //$NON-NLS-1$
    public static final String       SYMBOL_ARROW_LEFT_RIGHT       = "\u2194";   //$NON-NLS-1$

@@ -4052,7 +4052,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
             _spinWindChill.setMinimum(-600);
             _spinWindChill.setMaximum(1500);
 
-            _lblTemperatureUnit_WindChill = _tk.createLabel(parent, UI.SYMBOL_TILDE + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
+            _lblTemperatureUnit_WindChill = _tk.createLabel(parent, UI.SYMBOL_ALMOST_EQUAL_TO + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
          }
 
          {
@@ -8237,7 +8237,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
       _lblTemperatureUnit_Avg.setText(UI.SYMBOL_AVERAGE + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
       _lblTemperatureUnit_Max.setText(UI.SYMBOL_MAX + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
       _lblTemperatureUnit_Min.setText(UI.SYMBOL_MIN + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
-      _lblTemperatureUnit_WindChill.setText(UI.SYMBOL_TILDE + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
+      _lblTemperatureUnit_WindChill.setText(UI.SYMBOL_ALMOST_EQUAL_TO + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
 
       // cadence rpm/spm
       final float cadence = _tourData.getCadenceMultiplier();
