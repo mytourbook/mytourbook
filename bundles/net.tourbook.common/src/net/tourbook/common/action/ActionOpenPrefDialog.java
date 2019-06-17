@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,96 +15,111 @@
  *******************************************************************************/
 package net.tourbook.common.action;
 
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.Messages;
+import net.tourbook.common.tooltip.AdvancedSlideout;
+import net.tourbook.common.tooltip.AnimatedToolTipShell;
+
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 
-import net.tourbook.common.CommonActivator;
-import net.tourbook.common.Messages;
-import net.tourbook.common.tooltip.AnimatedToolTipShell;
-
 public class ActionOpenPrefDialog extends Action {
 
-	private String						_prefPageId;
-	private Object						_prefDialogData;
+   private String               _prefPageId;
+   private Object               _prefDialogData;
 
-	private Shell						_shell	= Display.getCurrent().getActiveShell();
+   private Shell                _shell = Display.getCurrent().getActiveShell();
 
-	private AnimatedToolTipShell	_openedTooltip;
+   private AdvancedSlideout     _openedAdvancedSlideout;
+   private AnimatedToolTipShell _openedTooltip;
 
-	/**
-	 * @param text
-	 * @param prefPageId
-	 */
-	public ActionOpenPrefDialog(final String text, final String prefPageId) {
+   /**
+    * @param text
+    * @param prefPageId
+    */
+   public ActionOpenPrefDialog(final String text, final String prefPageId) {
 
-		setText(text);
-		setImageDescriptor(CommonActivator.getImageDescriptor(Messages.Image__options));
+      setText(text);
+      setImageDescriptor(CommonActivator.getImageDescriptor(Messages.Image__options));
 
-		_prefPageId = prefPageId;
-	}
+      _prefPageId = prefPageId;
+   }
 
-	/**
-	 * @param text
-	 * @param prefPageId
-	 * @param data
-	 */
-	public ActionOpenPrefDialog(final String text, final String prefPageId, final Object data) {
+   /**
+    * @param text
+    * @param prefPageId
+    * @param data
+    */
+   public ActionOpenPrefDialog(final String text, final String prefPageId, final Object data) {
 
-		this(text, prefPageId);
+      this(text, prefPageId);
 
-		_prefDialogData = data;
-	}
+      _prefDialogData = data;
+   }
 
-	/**
-	 * This tooltip will be closed when the pref dialog is opened.
-	 *
-	 * @param openedTooltip
-	 */
-	public void closeThisTooltip(final AnimatedToolTipShell openedTooltip) {
+   /**
+    * This tooltip will be closed when the pref dialog is opened.
+    *
+    * @param openedAdvancedSlideout
+    */
+   public void closeThisTooltip(final AdvancedSlideout openedAdvancedSlideout) {
 
-		_openedTooltip = openedTooltip;
-	}
+      _openedAdvancedSlideout = openedAdvancedSlideout;
+   }
 
-	@Override
-	public void run() {
+   /**
+    * This tooltip will be closed when the pref dialog is opened.
+    *
+    * @param openedTooltip
+    */
+   public void closeThisTooltip(final AnimatedToolTipShell openedTooltip) {
 
-		// hide other opened dialog
-		if (_openedTooltip != null) {
-			_openedTooltip.hideNow();
-		}
+      _openedTooltip = openedTooltip;
+   }
 
-		PreferencesUtil.createPreferenceDialogOn(//
-				_shell,
-				_prefPageId,
-				null,
-				_prefDialogData).open();
-	}
+   @Override
+   public void run() {
 
-	public void setPrefData(final Object data) {
+      // hide other opened dialog
+      if (_openedTooltip != null) {
+         _openedTooltip.hideNow();
+      }
+      if (_openedAdvancedSlideout != null) {
+         _openedAdvancedSlideout.close();
+      }
 
-		_prefDialogData = data;
-	}
+      PreferencesUtil.createPreferenceDialogOn(//
+            _shell,
+            _prefPageId,
+            null,
+            _prefDialogData).open();
+   }
 
-	/**
-	 * Set pref page and pref data
-	 *
-	 * @param pageId
-	 * @param data
-	 */
-	public void setPrefData(final String pageId, final Object data) {
+   public void setPrefData(final Object data) {
 
-		_prefPageId = pageId;
-		_prefDialogData = data;
-	}
+      _prefDialogData = data;
+   }
 
-	/**
-	 * Set shell to the parent otherwise the pref dialog is closed when the slideout is closed. Is a
-	 * bit tricky :-)
-	 */
-	public void setShell(final Shell shell) {
+   /**
+    * Set pref page and pref data
+    *
+    * @param pageId
+    * @param data
+    */
+   public void setPrefData(final String pageId, final Object data) {
 
-		_shell = shell;
-	}
+      _prefPageId = pageId;
+      _prefDialogData = data;
+   }
+
+   /**
+    * Set shell to the parent otherwise the pref dialog is closed when the slideout is closed. Is a
+    * bit tricky :-)
+    */
+   public void setShell(final Shell shell) {
+
+      _shell = shell;
+   }
 }

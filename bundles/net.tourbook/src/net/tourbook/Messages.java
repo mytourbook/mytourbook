@@ -842,8 +842,10 @@ public class Messages extends NLS {
    public static String        Image__App_Turn_Off;
    public static String        Image__App_Turn_On;
    public static String        Image__ArrowDown;
+   public static String        Image__ArrowDown_Disabled;
    public static String        Image__ArrowDown_Themed;
    public static String        Image__ArrowUp;
+   public static String        Image__ArrowUp_Disabled;
    public static String        Image__ArrowUp_Themed;
    public static String        Image__assignMergedTour;
    public static String        Image__assignMergedTour_disabled;
@@ -1955,6 +1957,24 @@ public class Messages extends NLS {
    public static String Slideout_Map2MapOptions_Dialog_EnhancePaintingWarning_Message;
    public static String Slideout_Map2MapOptions_Dialog_EnhancePaintingWarning_Title;
 
+   public static String Slideout_Map2Provider_Button_HideMP;
+   public static String Slideout_Map2Provider_Button_HideMP_Tooltip;
+   public static String Slideout_Map2Provider_Button_UnhideMP;
+   public static String Slideout_Map2Provider_Button_UnhideMP_Tooltip;
+   public static String Slideout_Map2Provider_Column_IsVisible;
+   public static String Slideout_Map2Provider_Column_IsVisible_Tooltip;
+   public static String Slideout_Map2Provider_Column_MPType;
+   public static String Slideout_Map2Provider_Column_MPType_Custom;
+   public static String Slideout_Map2Provider_Column_MPType_Internal;
+   public static String Slideout_Map2Provider_Column_MPType_Profile;
+   public static String Slideout_Map2Provider_Column_MPType_Tooltip;
+   public static String Slideout_Map2Provider_Column_MPType_WMS;
+   public static String Slideout_Map2Provider_Column_TileUrl;
+   public static String Slideout_Map2Provider_Label_Tip;
+   public static String Slideout_Map2Provider_Label_Tip_Tooltip;
+   public static String Slideout_Map2Provider_MapProvider_Next_Tooltip;
+   public static String Slideout_Map2Provider_MapProvider_Previous_Tooltip;
+
    public static String Slideout_Map_Bookmark_Label_NumBookmarkListItems;
    public static String Slideout_Map_Bookmark_Label_NumBookmarkListItems_Tooltip;
    public static String Slideout_Map_Bookmark_Label_NumContextMenuItems;
@@ -1978,6 +1998,8 @@ public class Messages extends NLS {
    public static String Slideout_Map_Options_Label_SliderPath_Color;
    public static String Slideout_Map_Options_Label_SliderPath_Width;
    public static String Slideout_Map_Options_Label_Title;
+
+   public static String Slideout_Map_Provider_Label_Title;
 
    public static String Slideout_Map_TourColors_Checkbox_ShowInChartToolbar_Tooltip;
    public static String Slideout_Map_TourColors_Label_Title;
