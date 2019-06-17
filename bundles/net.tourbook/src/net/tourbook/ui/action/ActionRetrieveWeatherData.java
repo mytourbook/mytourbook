@@ -72,7 +72,7 @@ public class ActionRetrieveWeatherData extends Action {
          final WeatherData historicalWeatherData = historicalWeatherRetriever.retrieve().getHistoricalWeatherData();
          if (historicalWeatherData == null) {
             final String message = NLS.bind(
-                  Messages.UI_Label_WeatherDataNotFound,
+                  Messages.Dialog_RetrieveWeather_WeatherDataNotFound,
                   new Object[] {
                         TourManager.getTourDateTimeShort(tour) });
 

@@ -587,9 +587,7 @@ public interface ITourbookPreferences {
    /*
     * Weather
     */
-   public static final String  STATE_USE_WEATHER_RETRIEVAL         = "useWeatherRetrieval"; //$NON-NLS-1$
-   public static final boolean STATE_USE_WEATHER_RETRIEVAL_DEFAULT = false;
-   public static final String  API_KEY                             = "apiKey";              //$NON-NLS-1$
-   public static final String  API_KEY_DEFAULT                     = "";                    //$NON-NLS-1$
+   public static final String WEATHER_USE_WEATHER_RETRIEVAL = "WEATHER_STATE_USE_WEATHER_RETRIEVAL"; //$NON-NLS-1$
+   public static final String WEATHER_API_KEY               = "WEATHER_API_KEY";                     //$NON-NLS-1$
 
 }

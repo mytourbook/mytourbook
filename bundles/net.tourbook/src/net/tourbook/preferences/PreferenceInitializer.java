@@ -505,6 +505,12 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ITourbookPreferences.DIALOG_SET_TIME_ZONE_ACTION, DialogSetTimeZone.TIME_ZONE_ACTION_SET_FROM_LIST);
       store.setDefault(ITourbookPreferences.DIALOG_SET_TIME_ZONE_SELECTED_ZONE_ID, TimeTools.getDefaultTimeZoneId());
 
+      /*
+       * Weather
+       */
+      store.setDefault(ITourbookPreferences.WEATHER_USE_WEATHER_RETRIEVAL,false);
+      store.setDefault(ITourbookPreferences.WEATHER_API_KEY,"");
+
 // SET_FORMATTING_ON
    }
 

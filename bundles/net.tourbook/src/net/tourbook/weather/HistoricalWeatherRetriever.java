@@ -228,7 +228,8 @@ public class HistoricalWeatherRetriever {
     * @return The result of the weather API query.
     */
    private String sendWeatherApiRequest() {
-      final String weatherRequestWithParameters = apiUrl + _prefStore.getString(ITourbookPreferences.API_KEY) + "&q=" + searchAreaCenter.getLatitude() //$NON-NLS-1$
+      final String weatherRequestWithParameters = apiUrl + _prefStore.getString(ITourbookPreferences.WEATHER_API_KEY) + "&q=" + searchAreaCenter //$NON-NLS-1$
+            .getLatitude()
             + "," + searchAreaCenter.getLongitude() //$NON-NLS-1$
             + "&date=" + startDate + "&tp=1&format=json"; //$NON-NLS-1$ //$NON-NLS-2$
       //tp=1 : Specifies the weather forecast time interval in hours. Here, every 1 hour
