@@ -148,6 +148,7 @@ public class UI {
    public static final String       SYMBOL_SUM_WITH_SPACE         = "\u2211 ";  //$NON-NLS-1$
    public static final String       SYMBOL_SUN                    = "\u263C";   //$NON-NLS-1$
    public static final String       SYMBOL_TAU                    = "\u03c4";   //$NON-NLS-1$
+   public static final String       SYMBOL_TILDE                  = "\u007e";   //$NON-NLS-1$
 
    public static final CharSequence SYMBOL_BACKSLASH              = "\\";       //$NON-NLS-1$
    public static final String       SYMBOL_COLON                  = ":";        //$NON-NLS-1$
