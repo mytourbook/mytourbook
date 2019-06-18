@@ -304,6 +304,7 @@ public class Messages extends NLS {
    public static String        Dialog_PersonManager_PersonIsNotAvailable_Title;
 
    public static String        Dialog_RetrieveWeather_Dialog_Title;
+   public static String        Dialog_RetrieveWeather_WeatherDataNotFound;
 
    public static String        dialog_is_tour_editor_modified_message;
    public static String        dialog_is_tour_editor_modified_title;
@@ -1606,12 +1607,12 @@ public class Messages extends NLS {
    public static String        pref_view_layout_label_sub_sub;
    public static String        pref_view_layout_label_title;
 
-   public static String        pref_weather_apiKey_FieldEditor;
-   public static String        pref_weather_apiKey_FieldEditor_tooltip;
-   public static String        pref_weather_ApiSignupLink;
-   public static String        PrefPage_Weather_Checkbox_UseRetrieval;
-   public static String        PrefPage_Weather_Checkbox_UseRetrieval_Tooltip;
-   public static String        External_Link_WeatherApi;
+   public static String        Pref_Weather_ApiKey_FieldEditor;
+   public static String        Pref_Weather_ApiKey_FieldEditor_Tooltip;
+   public static String        Pref_Weather_ApiSignupLink;
+   public static String        Pref_Weather_Checkbox_UseRetrieval;
+   public static String        Pref_Weather_Checkbox_UseRetrieval_Tooltip;
+   public static String        Pref_Weather_External_Link_WeatherApi;
 
 // public static String    Pref_SignImages_Dialog_ConfirmDelete_Message;
 // public static String    Pref_SignImages_Dialog_Delete_Title;
@@ -2763,7 +2764,6 @@ public class Messages extends NLS {
    public static String UI_Label_no_chart_is_selected;
    public static String UI_Label_PersonIsRequired;
    public static String UI_Label_TourIsNotSelected;
-   public static String UI_Label_WeatherDataNotFound;
 
    public static String ui_tour_not_defined;
 

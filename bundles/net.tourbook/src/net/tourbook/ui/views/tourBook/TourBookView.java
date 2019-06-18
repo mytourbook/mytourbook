@@ -3125,8 +3125,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          canMergeTours = isOneTour && isDeviceTour && firstSavedTour.getMergeSourceTourId() != null;
       }
 
-      final boolean useWeatherRetrieval = _prefStore.getBoolean(ITourbookPreferences.STATE_USE_WEATHER_RETRIEVAL) &&
-            !_prefStore.getString(ITourbookPreferences.API_KEY).equals("");
+      final boolean useWeatherRetrieval = _prefStore.getBoolean(ITourbookPreferences.WEATHER_USE_WEATHER_RETRIEVAL) &&
+            !_prefStore.getString(ITourbookPreferences.WEATHER_API_KEY).equals("");
 
       /*
        * enable actions
