@@ -6952,10 +6952,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return maxSpeed;
    }
 
-   public float getMaxTemperature() {
-     return weatherMaxTemperature;
-   }
-
    public int getMergedAltitudeOffset() {
       return mergedAltitudeOffset;
    }
@@ -6989,10 +6985,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    public float[] getMetricDistanceSerie() {
       return distanceSerie;
-   }
-
-   public float getMinTemperature() {
-      return weatherMinTemperature;
    }
 
    /**
@@ -8097,6 +8089,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
 
       return weatherCloudsIndex < 0 ? 0 : weatherCloudsIndex;
+   }
+
+   public float getWeatherMaxTemperature() {
+     return weatherMaxTemperature;
+   }
+
+   public float getWeatherMinTemperature() {
+      return weatherMinTemperature;
    }
 
    public float getWeatherPrecipitation() {

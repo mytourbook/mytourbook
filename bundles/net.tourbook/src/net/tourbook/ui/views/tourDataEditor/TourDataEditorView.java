@@ -8105,7 +8105,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
       /*
        * Max temperature
        */
-      final float maxTemperature = UI.convertTemperatureFromMetric(_tourData.getMaxTemperature());
+      final float maxTemperature = UI.convertTemperatureFromMetric(_tourData.getWeatherMaxTemperature());
 
       _spinMaxTemperature.setData(FIX_LINUX_ASYNC_EVENT_1, true);
       _spinMaxTemperature.setDigits(1);
@@ -8114,7 +8114,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
       /*
        * Max temperature
        */
-      final float minTemperature = UI.convertTemperatureFromMetric(_tourData.getMinTemperature());
+      final float minTemperature = UI.convertTemperatureFromMetric(_tourData.getWeatherMinTemperature());
 
       _spinMinTemperature.setData(FIX_LINUX_ASYNC_EVENT_1, true);
       _spinMinTemperature.setDigits(1);
