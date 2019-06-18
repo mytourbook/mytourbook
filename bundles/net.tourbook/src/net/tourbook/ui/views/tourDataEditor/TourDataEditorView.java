@@ -3942,10 +3942,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
              * Average Temperature
              */
 
-//            // label: Average Temperature
-//            label = _tk.createLabel(container, Messages.tour_editor_label_avgtemperature);
-//            label.setToolTipText(Messages.tour_editor_label_avgtemperature_Tooltip);
-
             // spinner
             _spinAverageTemperature = new Spinner(parent, SWT.BORDER);
             GridDataFactory
@@ -4008,10 +4004,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
              * Maximum Temperature
              */
 
-//            // label: Maximum Temperature
-//            label = _tk.createLabel(container, Messages.tour_editor_label_maxtemperature);
-//            label.setToolTipText(Messages.tour_editor_label_maxtemperature_Tooltip);
-
             // spinner
             _spinMaxTemperature = new Spinner(parent, SWT.BORDER);
             GridDataFactory
@@ -4036,10 +4028,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
              * Wind chill
              */
 
-//            // label
-//            label = _tk.createLabel(container, Messages.tour_editor_label_windchill);
-//            label.setToolTipText(Messages.tour_editor_label_windchill_Tooltip);
-
             // spinner
             _spinWindChill = new Spinner(parent, SWT.BORDER);
             GridDataFactory
@@ -4059,10 +4047,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
             /*
              * Minimum Temperature
              */
-
-//            // label: Minimum Temperature
-//            label = _tk.createLabel(container, Messages.tour_editor_label_mintemperature);
-//            label.setToolTipText(Messages.tour_editor_label_mintemperature_Tooltip);
 
             // spinner
             _spinMinTemperature = new Spinner(parent, SWT.BORDER);
@@ -4100,6 +4084,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
                .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
                .align(SWT.BEGINNING, SWT.CENTER)
                .applyTo(_spinHumidity);
+         _spinHumidity.setToolTipText(Messages.tour_editor_label_humidity_Tooltip);
          _spinHumidity.setMinimum(0);
          _spinHumidity.setMaximum(100);
 
@@ -4124,6 +4109,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
                .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
                .align(SWT.BEGINNING, SWT.CENTER)
                .applyTo(_spinPrecipitationValue);
+         _spinPrecipitationValue.setToolTipText(Messages.tour_editor_label_precipitation_Tooltip);
          _spinPrecipitationValue.setDigits(2);
          _spinPrecipitationValue.setMaximum(10000);
 
@@ -4151,6 +4137,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
                .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
                .align(SWT.BEGINNING, SWT.CENTER)
                .applyTo(_spinPressureValue);
+         _spinPressureValue.setToolTipText(Messages.tour_editor_label_pressure_Tooltip);
          _spinPressureValue.setMaximum(400000);
 
          // label: mb, inHg
