@@ -67,6 +67,10 @@ public class ActionRetrieveWeatherData extends Action {
       final ArrayList<TourData> modifiedTours = new ArrayList<>();
 
       for (final TourData tour : selectedTours) {
+         if (tour.latitudeSerie == null || tour.longitudeSerie == null) {
+            continue;
+         }
+
          final HistoricalWeatherRetriever historicalWeatherRetriever = new HistoricalWeatherRetriever(tour);
 
          final WeatherData historicalWeatherData = historicalWeatherRetriever.retrieve().getHistoricalWeatherData();
@@ -99,6 +103,8 @@ public class ActionRetrieveWeatherData extends Action {
          modifiedTours.add(tour);
       }
 
-      TourManager.saveModifiedTours(modifiedTours);
+      if (modifiedTours.size() > 0) {
+         TourManager.saveModifiedTours(modifiedTours);
+      }
    }
 }
