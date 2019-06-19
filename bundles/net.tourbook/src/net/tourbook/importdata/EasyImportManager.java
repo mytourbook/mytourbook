@@ -41,17 +41,6 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.dialogs.ProgressMonitorDialog;
-import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IMemento;
-import org.eclipse.ui.WorkbenchException;
-import org.eclipse.ui.XMLMemento;
-
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.NIO;
@@ -64,6 +53,17 @@ import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourLogState;
+
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IMemento;
+import org.eclipse.ui.WorkbenchException;
+import org.eclipse.ui.XMLMemento;
 
 public class EasyImportManager {
 
@@ -100,6 +100,7 @@ public class EasyImportManager {
    //
    private static final String      ATTR_IL_DESCRIPTION                      = "description";                                      //$NON-NLS-1$
    private static final String      ATTR_IL_IS_ADJUST_TEMPERATURE            = "isAdjustTemperature";                              //$NON-NLS-1$
+   private static final String      ATTR_IL_IS_RETRIEVE_WEATHER_DATA          = "isRetrieveWeatherData";                            //$NON-NLS-1$
    private static final String      ATTR_IL_IS_SAVE_TOUR                     = "isSaveTour";                                       //$NON-NLS-1$
    private static final String      ATTR_IL_IS_SHOW_IN_DASHBOARD             = "isShowInDashBoard";                                //$NON-NLS-1$
    private static final String      ATTR_IL_IS_SET_LAST_MARKER               = "isSetLastMarker";                                  //$NON-NLS-1$
@@ -117,6 +118,7 @@ public class EasyImportManager {
    public static final String       LOG_EASY_IMPORT_003_TOUR_TYPE_ITEM       = Messages.Log_EasyImport_003_TourType_Item;
    public static final String       LOG_EASY_IMPORT_004_SET_LAST_MARKER      = Messages.Log_EasyImport_004_SetLastMarker;
    public static final String       LOG_EASY_IMPORT_005_ADJUST_TEMPERATURE   = Messages.Log_EasyImport_005_AdjustTemperatureValues;
+   public static final String       LOG_EASY_IMPORT_006_RETRIEVE_WEATHER_DATA = Messages.Log_EasyImport_006_RetrieveWeatherData;
    public static final String       LOG_EASY_IMPORT_099_SAVE_TOUR            = Messages.Log_EasyImport_099_SaveTour;
    public static final String       LOG_EASY_IMPORT_100_DELETE_TOUR_FILES    = Messages.Log_EasyImport_100_DeleteTourFiles;
    public static final String       LOG_EASY_IMPORT_101_TURN_WATCHING_OFF    = Messages.Log_EasyImport_101_TurnWatchingOff;
@@ -720,6 +722,9 @@ public class EasyImportManager {
             EasyConfig.TEMPERATURE_AVG_TEMPERATURE_MIN,
             EasyConfig.TEMPERATURE_AVG_TEMPERATURE_MAX);
 
+      // retrieve weather data
+      importLauncher.isRetrieveWeatherData = Util.getXmlBoolean(xmlConfig, ATTR_IL_IS_RETRIEVE_WEATHER_DATA, false);
+
       final Enum<TourTypeConfig> ttConfig = Util.getXmlEnum(
             xmlConfig,
             ATTR_TOUR_TYPE_CONFIG,
@@ -1075,6 +1080,9 @@ public class EasyImportManager {
          xmlConfig.putBoolean(ATTR_IL_IS_ADJUST_TEMPERATURE, importLauncher.isAdjustTemperature);
          xmlConfig.putInteger(ATTR_IL_TEMPERATURE_ADJUSTMENT_DURATION, importLauncher.temperatureAdjustmentDuration);
          xmlConfig.putFloat(ATTR_IL_TEMPERATURE_TOUR_AVG_TEMPERATURE, importLauncher.tourAvgTemperature);
+
+         // Retrieve weather data
+         xmlConfig.putBoolean(ATTR_IL_IS_RETRIEVE_WEATHER_DATA, importLauncher.isRetrieveWeatherData);
 
          final Enum<TourTypeConfig> ttConfig = importLauncher.tourTypeConfig;
          Util.setXmlEnum(xmlConfig, ATTR_TOUR_TYPE_CONFIG, ttConfig);

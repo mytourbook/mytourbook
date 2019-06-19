@@ -21,12 +21,9 @@ import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider2;
-import net.tourbook.weather.HistoricalWeatherRetriever;
-import net.tourbook.weather.WeatherData;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
@@ -67,40 +64,12 @@ public class ActionRetrieveWeatherData extends Action {
       final ArrayList<TourData> modifiedTours = new ArrayList<>();
 
       for (final TourData tour : selectedTours) {
-         if (tour.latitudeSerie == null || tour.longitudeSerie == null) {
-            continue;
+
+         final boolean isDataRetrieved = TourManager.retrieveWeatherData(tour);
+
+         if (isDataRetrieved) {
+            modifiedTours.add(tour);
          }
-
-         final HistoricalWeatherRetriever historicalWeatherRetriever = new HistoricalWeatherRetriever(tour);
-
-         final WeatherData historicalWeatherData = historicalWeatherRetriever.retrieve().getHistoricalWeatherData();
-         if (historicalWeatherData == null) {
-            final String message = NLS.bind(
-                  Messages.Dialog_RetrieveWeather_WeatherDataNotFound,
-                  new Object[] {
-                        TourManager.getTourDateTimeShort(tour) });
-
-            MessageDialog.openInformation(
-                  shell,
-                  Messages.Dialog_RetrieveWeather_Dialog_Title,
-                  message);
-            continue;
-         }
-
-         tour.setAvgTemperature(historicalWeatherData.getTemperatureAverage());
-         tour.setWeatherWindChill(historicalWeatherData.getWindChill());
-         tour.setWeatherMaxTemperature(historicalWeatherData.getTemperatureMax());
-         tour.setWeatherMinTemperature(historicalWeatherData.getTemperatureMin());
-         tour.setWeatherWindSpeed(historicalWeatherData.getWindSpeed());
-         tour.setWeatherWindDir(historicalWeatherData.getWindDirection());
-         tour.setWeatherHumidity(historicalWeatherData.getAverageHumidity());
-         tour.setWeatherPrecipitation(historicalWeatherData.getPrecipitation());
-         tour.setWeatherPressure(historicalWeatherData.getAveragePressure());
-         tour.setWeather(historicalWeatherData.getWeatherDescription());
-         tour.setWeatherClouds(historicalWeatherData.getWeatherType());
-         tour.setIsWeatherDataFromApi(true);
-
-         modifiedTours.add(tour);
       }
 
       if (modifiedTours.size() > 0) {

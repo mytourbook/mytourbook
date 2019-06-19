@@ -169,6 +169,8 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Checkbox_LastMarker_Tooltip;
    public static String        Dialog_ImportConfig_Checkbox_LiveUpdate;
    public static String        Dialog_ImportConfig_Checkbox_LiveUpdate_Tooltip;
+   public static String        Dialog_ImportConfig_Checkbox_RetrieveWeatherData;
+   public static String        Dialog_ImportConfig_Checkbox_RetrieveWeatherData_Tooltip;
    public static String        Dialog_ImportConfig_Checkbox_SaveTour;
    public static String        Dialog_ImportConfig_Checkbox_SaveTour_Tooltip;
    public static String        Dialog_ImportConfig_Checkbox_ShowInDashboard;
@@ -190,6 +192,8 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Column_LastMarker_Label;
    public static String        Dialog_ImportConfig_Column_LastMarker_Tooltip;
    public static String        Dialog_ImportConfig_Column_Name;
+   public static String        Dialog_ImportConfig_Column_RetrieveWeatherData_Label;
+   public static String        Dialog_ImportConfig_Column_RetrieveWeatherData_Header;
    public static String        Dialog_ImportConfig_Column_Save_Header;
    public static String        Dialog_ImportConfig_Column_Save_Label;
    public static String        Dialog_ImportConfig_Column_ShowInDash_Header;
@@ -995,6 +999,7 @@ public class Messages extends NLS {
    public static String        Image__State_MovedTour_View;
    public static String        Image__State_NotSavedInTour;
    public static String        Image__State_OK;
+   public static String        Image__State_RetrieveWeatherData;
    public static String        Image__State_Save;
    public static String        Image__State_SavedInTour;
    public static String        Image__State_SaveTour;
@@ -1131,6 +1136,8 @@ public class Messages extends NLS {
    public static String        Import_Data_HTML_ReceiveFromSerialPort_ConfiguredLink;
    public static String        Import_Data_HTML_ReceiveFromSerialPort_DirectlyAction;
    public static String        Import_Data_HTML_ReceiveFromSerialPort_DirectlyLink;
+   public static String        Import_Data_HTML_RetrieveWeatherData_Yes;
+   public static String        Import_Data_HTML_RetrieveWeatherData_No;
    public static String        Import_Data_HTML_SaveTour_No;
    public static String        Import_Data_HTML_SaveTour_Yes;
    public static String        Import_Data_HTML_Title_Backup;
@@ -1188,6 +1195,7 @@ public class Messages extends NLS {
    public static String        Log_EasyImport_003_TourType_Item;
    public static String        Log_EasyImport_004_SetLastMarker;
    public static String        Log_EasyImport_005_AdjustTemperatureValues;
+   public static String        Log_EasyImport_006_RetrieveWeatherData;
    public static String        Log_EasyImport_099_SaveTour;
    public static String        Log_EasyImport_100_DeleteTourFiles;
    public static String        Log_EasyImport_101_TurnWatchingOff;
@@ -1213,6 +1221,11 @@ public class Messages extends NLS {
    public static String        Log_Reimport_PreviousFiles;
    public static String        Log_Reimport_PreviousFiles_End;
    public static String        Log_Reimport_Tour;
+
+   public static String        Log_RetrieveWeatherData_001_Start;
+   public static String        Log_RetrieveWeatherData_002_End;
+   public static String        Log_RetrieveWeatherData_003_TourChanges;
+   public static String        Log_RetrieveWeatherData_010_NoGpsDataSeries;
 
    public static String        Log_SetTimeZone_001_Start_FromGeo;
    public static String        Log_SetTimeZone_001_Start_FromList;
