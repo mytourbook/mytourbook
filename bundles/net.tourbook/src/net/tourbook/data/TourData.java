@@ -6952,10 +6952,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return maxSpeed;
    }
 
-   public float getMaxTemperature() {
-     return weatherMaxTemperature;
-   }
-
    public int getMergedAltitudeOffset() {
       return mergedAltitudeOffset;
    }
@@ -6989,10 +6985,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    public float[] getMetricDistanceSerie() {
       return distanceSerie;
-   }
-
-   public float getMinTemperature() {
-      return weatherMinTemperature;
    }
 
    /**
@@ -8099,6 +8091,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return weatherCloudsIndex < 0 ? 0 : weatherCloudsIndex;
    }
 
+   public float getWeatherMaxTemperature() {
+     return weatherMaxTemperature;
+   }
+
+   public float getWeatherMinTemperature() {
+      return weatherMinTemperature;
+   }
+
    public float getWeatherPrecipitation() {
       return weatherPrecipitation;
    }
@@ -8122,7 +8122,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * @param zoomLevel
     * @param projectionId
-    * @return Returns the world position for the suplied zoom level and projection id
+    * @return Returns the world position for the supplied zoom level and projection id
     */
    public Point[] getWorldPositionForTour(final String projectionId, final int zoomLevel) {
       return _tourWorldPosition.get(projectionId.hashCode() + zoomLevel);
@@ -8179,7 +8179,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
-    * @return Returns <code>true</code> when {@link TourData} contains refreence tours, otherwise
+    * @return Returns <code>true</code> when {@link TourData} contains reference tours, otherwise
     *         <code>false</code>
     */
    public boolean isContainReferenceTour() {

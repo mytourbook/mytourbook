@@ -50,6 +50,11 @@ public class PrefPageWeather extends PreferencePage implements IWorkbenchPrefere
    private Text      apiKeyFieldEditor;
    private Link      apiSignupLink;
 
+   /*
+    * Labels
+    */
+   private Label labelApiKey;
+
    @Override
    protected Control createContents(final Composite parent) {
       final Composite ui = createUI(parent);
@@ -81,9 +86,10 @@ public class PrefPageWeather extends PreferencePage implements IWorkbenchPrefere
             });
 
             //Label: API Key
-            final Label label = new Label(container, SWT.WRAP);
-            label.setText(Messages.Pref_Weather_ApiKey_FieldEditor);
-            GridDataFactory.swtDefaults().indent(defaultHIndent, 0).applyTo(label);
+            labelApiKey = new Label(container, SWT.WRAP);
+            labelApiKey.setText(Messages.Pref_Weather_ApiKey_FieldEditor);
+            GridDataFactory.swtDefaults().indent(defaultHIndent, 0).applyTo(labelApiKey);
+            labelApiKey.setEnabled(_prefStore.getBoolean(ITourbookPreferences.WEATHER_USE_WEATHER_RETRIEVAL));
 
             // text: API Key
             apiKeyFieldEditor = new Text(container, SWT.BORDER);
@@ -91,7 +97,7 @@ public class PrefPageWeather extends PreferencePage implements IWorkbenchPrefere
             apiKeyFieldEditor.setToolTipText(Messages.Pref_Weather_ApiKey_FieldEditor_Tooltip);
             GridDataFactory.swtDefaults()
                   .indent(defaultHIndent, 0)
-                  .hint(200, 15)
+                  .align(SWT.FILL, SWT.FILL)
                   .applyTo(apiKeyFieldEditor);
 
             //Link to the WWO Api Sign-up page
@@ -116,6 +122,7 @@ public class PrefPageWeather extends PreferencePage implements IWorkbenchPrefere
 
    private void enableControls() {
       final boolean useWeatherRetrieval = _chkWeatherRetrieval.getSelection();
+      labelApiKey.setEnabled(useWeatherRetrieval);
       apiKeyFieldEditor.setEnabled(useWeatherRetrieval);
       apiSignupLink.setEnabled(useWeatherRetrieval);
    }
