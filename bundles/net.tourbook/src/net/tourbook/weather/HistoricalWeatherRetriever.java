@@ -134,13 +134,15 @@ public class HistoricalWeatherRetriever {
 
          final List<WWOHourlyResults> rawWeatherData = mapper.readValue(weatherResults, new TypeReference<List<WWOHourlyResults>>() {});
 
-         float totalPrecipitation = 0f;
          boolean isTourStartData = false;
          boolean isTourEndData = false;
          int numHourlyDatasets = 0;
          int sumHumidity = 0;
          int sumPressure = 0;
+         float sumPrecipitation = 0f;
          int sumWindChill = 0;
+         int sumWindDirection = 0;
+         int sumWindSpeed = 0;
          int sumTemperature = 0;
          int maxTemperature = Integer.MIN_VALUE;
          int minTemperature = Integer.MAX_VALUE;
@@ -151,19 +153,19 @@ public class HistoricalWeatherRetriever {
             if (hourlyData.gettime().equals(startTime)) {
                isTourStartData = true;
                weatherData.setWeatherDescription(hourlyData.getWeatherDescription());
+               weatherData.setWeatherType(hourlyData.getWeatherCode());
             }
             if (hourlyData.gettime().equals(endTime)) {
                isTourEndData = true;
             }
 
             if (isTourStartData || isTourEndData) {
-               weatherData.setWindDirection(Integer.parseInt(hourlyData.getWinddirDegree()));
-               weatherData.setWindSpeed(Integer.parseInt(hourlyData.getWindspeedKmph()));
+               sumWindDirection += hourlyData.getWinddirDegree();
+               sumWindSpeed += hourlyData.getWindspeedKmph();
                sumHumidity += hourlyData.getHumidity();
-               totalPrecipitation += hourlyData.getPrecipMM();
+               sumPrecipitation += hourlyData.getPrecipMM();
                sumPressure += hourlyData.getPressure();
                sumWindChill += hourlyData.getFeelsLikeC();
-               weatherData.setWeatherType(hourlyData.getWeatherCode());
                sumTemperature += hourlyData.getTempC();
 
                if (hourlyData.getTempC() < minTemperature) {
@@ -181,13 +183,15 @@ public class HistoricalWeatherRetriever {
             }
          }
 
+         weatherData.setWindDirection((int) Math.ceil((double) sumWindDirection / (double) numHourlyDatasets));
+         weatherData.setWindSpeed((int) Math.ceil((double) sumWindSpeed / (double) numHourlyDatasets));
          weatherData.setTemperatureMax(maxTemperature);
          weatherData.setTemperatureMin(minTemperature);
          weatherData.setTemperatureAverage((int) Math.ceil((double) sumTemperature / (double) numHourlyDatasets));
          weatherData.setWindChill((int) Math.ceil((double) sumWindChill / (double) numHourlyDatasets));
          weatherData.setAverageHumidity((int) Math.ceil((double) sumHumidity / (double) numHourlyDatasets));
          weatherData.setAveragePressure((int) Math.ceil((double) sumPressure / (double) numHourlyDatasets));
-         weatherData.setPrecipitation(totalPrecipitation);
+         weatherData.setPrecipitation(sumPrecipitation);
 
       } catch (final IOException e) {
          StatusUtil.log(
