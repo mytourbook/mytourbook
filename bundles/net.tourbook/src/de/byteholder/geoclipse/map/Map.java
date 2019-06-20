@@ -5685,6 +5685,15 @@ public class Map extends Canvas {
     */
    public synchronized void setMapCenter(final GeoPosition geoPosition) {
 
+      if (_mp == null) {
+
+         // this occured when restore state had a wrong map provider
+
+         setMapProvider(MapProviderManager.getDefaultMapProvider());
+
+         return;
+      }
+
       final java.awt.Point newMapCenter = _mp.geoToPixel(geoPosition, _mapZoomLevel);
 
       if (Thread.currentThread() == _displayThread) {
