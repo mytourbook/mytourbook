@@ -45,7 +45,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
  */
 public class HistoricalWeatherRetriever {
 
-   private final static String    baseApiUrl   = "https://api.worldweatheronline.com/premium/v1/past-weather.ashx"; //$NON-NLS-1$
+   private final static String    baseApiUrl   = "http://api.worldweatheronline.com/premium/v1/past-weather.ashx"; //$NON-NLS-1$
    private final static String    keyParameter = "?key=";                                                           //$NON-NLS-1$
    private TourData               tour;
    private LatLng                 searchAreaCenter;
@@ -255,6 +255,7 @@ public class HistoricalWeatherRetriever {
          // NOTE :
          // This error below keeps popping up RANDOMLY and as of today, I haven't found a solution:
          // java.lang.NoClassDefFoundError: Could not initialize class sun.security.ssl.SSLContextImpl$CustomizedTLSContext
+         // 2019/06/20 : To avoid this issue, we are using the HTTP address of WWO and not the HTTPS.
 
          final HttpClientBuilder clientBuilder = HttpClientBuilder.create();
          final HttpClient client = clientBuilder.build();
