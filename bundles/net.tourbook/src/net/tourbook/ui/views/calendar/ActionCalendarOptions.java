@@ -16,8 +16,8 @@
 package net.tourbook.ui.views.calendar;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.tooltip.ActionToolbarSlideoutAdv;
 import net.tourbook.common.tooltip.AdvancedSlideout;
-import net.tourbook.tour.filter.ActionToolbarSlideoutAdv;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.widgets.ToolItem;

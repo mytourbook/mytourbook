@@ -42,7 +42,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(IMappingPreferences.THEME_FONT_LOGGING, "1|Lucida Console|9.0|0|"); //$NON-NLS-1$
 
 		// map providers which can be toggled, osm is the default map provider
-		store.setDefault(IMappingPreferences.MAP_PROVIDER_TOGGLE_LIST, "osm"); //$NON-NLS-1$
+		store.setDefault(IMappingPreferences.MAP_PROVIDER_VISIBLE_IN_UI, "osm"); //$NON-NLS-1$
 
 	}
 }
