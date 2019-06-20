@@ -65,10 +65,14 @@ public class ActionMap2_MapProvider extends ActionToolbarSlideoutAdv {
    @Override
    protected void onBeforeOpenSlideout() {
 
-      _map2View.closeOpenedDialogs(this); 
+      _map2View.closeOpenedDialogs(this);
    }
 
    public void selectMapProvider(final String mapProviderID) {
+
+      if (_slideoutMap2MapProvider == null) {
+         return;
+      }
 
       _slideoutMap2MapProvider.selectMapProvider(mapProviderID);
    }

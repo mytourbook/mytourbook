@@ -849,11 +849,13 @@ public class Messages extends NLS {
    public static String        Image__App_Turn_Off;
    public static String        Image__App_Turn_On;
    public static String        Image__ArrowDown;
+   public static String        Image__ArrowDown_Dark;
+   public static String        Image__ArrowDown_Dark_Disabled;
    public static String        Image__ArrowDown_Disabled;
-   public static String        Image__ArrowDown_Themed;
    public static String        Image__ArrowUp;
+   public static String        Image__ArrowUp_Dark;
+   public static String        Image__ArrowUp_Dark_Disabled;
    public static String        Image__ArrowUp_Disabled;
-   public static String        Image__ArrowUp_Themed;
    public static String        Image__assignMergedTour;
    public static String        Image__assignMergedTour_disabled;
    public static String        Image__chart_analyzer;
@@ -927,6 +929,8 @@ public class Messages extends NLS {
    public static String        Image__MapBookmark_Location;
    public static String        Image__MapBookmark_New;
    public static String        Image__MapOptions;
+   public static String        Image__MapOptions_Dark;
+
    public static String        Image__MapOptions_Disabled;
    public static String        Image__MarkerFilter_WithGPS;
    public static String        Image__MarkerFilter_WithGPS_Disabled;

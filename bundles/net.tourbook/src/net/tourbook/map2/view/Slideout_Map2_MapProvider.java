@@ -18,6 +18,7 @@ package net.tourbook.map2.view;
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import de.byteholder.geoclipse.map.Map;
+import de.byteholder.geoclipse.mapprovider.IMapProviderListener;
 import de.byteholder.geoclipse.mapprovider.MP;
 import de.byteholder.geoclipse.mapprovider.MPCustom;
 import de.byteholder.geoclipse.mapprovider.MPPlugin;
@@ -110,7 +111,7 @@ import org.eclipse.swt.widgets.Widget;
 /**
  * 2D Map provider slideout
  */
-public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColorSelectorListener, ITourViewer {
+public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColorSelectorListener, ITourViewer, IMapProviderListener {
 
 // SET_FORMATTING_OFF
 
@@ -174,7 +175,10 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
    private class ActionOpenMapProviderPreferences extends ActionOpenPrefDialog {
 
       public ActionOpenMapProviderPreferences(final String text, final String prefPageId) {
+
          super(text, prefPageId);
+
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__MapOptions_Dark));
       }
    }
 
@@ -353,6 +357,8 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
 
       setTitleText(Messages.Slideout_Map_Provider_Label_Title);
 
+      MapProviderManager.getInstance().addMapProviderListener(this);
+
       /*
        * Create map provider list very early as this list will be used to get the selected or
        * default map provider for the map.
@@ -422,8 +428,8 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
             }
          };
 
-         _action_MapProvider_Next.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ArrowDown));
-         _action_MapProvider_Next.setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ArrowDown_Disabled));
+         _action_MapProvider_Next.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ArrowDown_Dark));
+         _action_MapProvider_Next.setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ArrowDown_Dark_Disabled));
          _action_MapProvider_Next.setToolTipText(Messages.Slideout_Map2Provider_MapProvider_Next_Tooltip);
       }
       {
@@ -437,8 +443,8 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
             }
          };
 
-         _action_MapProvider_Previous.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ArrowUp));
-         _action_MapProvider_Previous.setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ArrowUp_Disabled));
+         _action_MapProvider_Previous.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ArrowUp_Dark));
+         _action_MapProvider_Previous.setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ArrowUp_Dark_Disabled));
          _action_MapProvider_Previous.setToolTipText(Messages.Slideout_Map2Provider_MapProvider_Previous_Tooltip);
       }
    }
@@ -1055,6 +1061,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
 
    private void enableControls() {
 
+//      arrow-up-blue.png
    }
 
    @Override
@@ -1199,6 +1206,23 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
       _imageNo = TourbookPlugin.getImageDescriptor(Messages.Image__State_Error).createImage();
 
       _columnSortListener = widgetSelectedAdapter(e -> onSelect_SortColumn(e));
+   }
+
+   @Override
+   public void mapProviderListChanged() {
+
+      if (_selectedMP != null) {
+
+         // map profile tile offline images are deleted, reset state
+         _selectedMP.resetTileImageAvailability();
+      }
+
+      // update model
+      createSortedMapProviders();
+
+      // update UI
+      _mpViewer.refresh();
+      selectMapProvider(_selectedMP == null ? null : _selectedMP.getId());
    }
 
    @Override
