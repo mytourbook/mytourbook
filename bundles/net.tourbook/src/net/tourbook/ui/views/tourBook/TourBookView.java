@@ -318,17 +318,18 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private ActionSetPerson                            _actionSetOtherPerson;
    private ActionToggleMonthWeek                      _actionToggleMonthWeek;
    private ActionTourBookOptions                      _actionTourBookOptions;
-   private TreeViewer                                 _tourViewer;
 
+   private TreeViewer                                 _tourViewer;
    private TreeColumnDefinition                       _timeZoneOffsetColDef;
+
    private PixelConverter                             _pc;
 
    /*
     * UI controls
     */
    private Composite _parent;
-
    private Composite _viewerContainer;
+
    private Menu      _treeContextMenu;
 
    private class ActionLinkWithOtherViews extends ActionToolbarSlideout {

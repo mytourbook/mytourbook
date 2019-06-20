@@ -61,6 +61,8 @@ public class PrefPageWeather extends PreferencePage implements IWorkbenchPrefere
 
       restoreState();
 
+      enableControls();
+
       return ui;
    }
 
@@ -89,11 +91,9 @@ public class PrefPageWeather extends PreferencePage implements IWorkbenchPrefere
             labelApiKey = new Label(container, SWT.WRAP);
             labelApiKey.setText(Messages.Pref_Weather_ApiKey_FieldEditor);
             GridDataFactory.swtDefaults().indent(defaultHIndent, 0).applyTo(labelApiKey);
-            labelApiKey.setEnabled(_prefStore.getBoolean(ITourbookPreferences.WEATHER_USE_WEATHER_RETRIEVAL));
 
             // text: API Key
             apiKeyFieldEditor = new Text(container, SWT.BORDER);
-            apiKeyFieldEditor.setEnabled(_prefStore.getBoolean(ITourbookPreferences.WEATHER_USE_WEATHER_RETRIEVAL));
             apiKeyFieldEditor.setToolTipText(Messages.Pref_Weather_ApiKey_FieldEditor_Tooltip);
             GridDataFactory.swtDefaults()
                   .indent(defaultHIndent, 0)
@@ -143,8 +143,8 @@ public class PrefPageWeather extends PreferencePage implements IWorkbenchPrefere
 
    @Override
    protected void performDefaults() {
-      _chkWeatherRetrieval.setSelection(_prefStore.getBoolean(ITourbookPreferences.WEATHER_USE_WEATHER_RETRIEVAL));
-      apiKeyFieldEditor.setText(_prefStore.getString(ITourbookPreferences.WEATHER_API_KEY));
+      _chkWeatherRetrieval.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.WEATHER_USE_WEATHER_RETRIEVAL));
+      apiKeyFieldEditor.setText(_prefStore.getDefaultString(ITourbookPreferences.WEATHER_API_KEY));
 
       enableControls();
 

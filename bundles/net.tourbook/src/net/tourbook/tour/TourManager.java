@@ -65,6 +65,8 @@ import net.tourbook.ui.tourChart.TourChartView;
 import net.tourbook.ui.tourChart.X_AXIS_START_TIME;
 import net.tourbook.ui.views.TourChartAnalyzerInfo;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
+import net.tourbook.weather.HistoricalWeatherRetriever;
+import net.tourbook.weather.WeatherData;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
@@ -125,6 +127,12 @@ public class TourManager {
    public static final String  LOG_TEMP_ADJUST_006_IS_ABOVE_TEMPERATURE      = Messages.Log_TemperatureAdjustment_006_IsAboveTemperature;
    public static final String  LOG_TEMP_ADJUST_010_NO_TEMPERATURE_DATA_SERIE = Messages.Log_TemperatureAdjustment_010_NoTemperatureDataSeries;
    public static final String  LOG_TEMP_ADJUST_011_NO_TIME_DATA_SERIE        = Messages.Log_TemperatureAdjustment_011_NoTimeDataSeries;
+   //
+   public static final String  LOG_RETRIEVE_WEATHER_DATA_001_START                     = Messages.Log_RetrieveWeatherData_001_Start;
+   public static final String  LOG_RETRIEVE_WEATHER_DATA_002_END                       = Messages.Log_RetrieveWeatherData_002_End;
+   public static final String  LOG_RETRIEVE_WEATHER_DATA_003_TOUR_CHANGES              = Messages.Log_RetrieveWeatherData_003_TourChanges;
+   public static final String  LOG_RETRIEVE_WEATHER_DATA_010_NO_GPS_DATA_SERIE  =
+         Messages.Log_RetrieveWeatherData_010_NoGpsDataSeries;
    //
    public static final String  CUSTOM_DATA_TOUR_DATA                         = "tourData";                                                         //$NON-NLS-1$
    public static final String  CUSTOM_DATA_TOUR_CHART_CONFIGURATION          = "tourChartConfig";                                                  //$NON-NLS-1$
@@ -489,6 +497,7 @@ public class TourManager {
 
       return true;
    }
+
 
    public static void clearMultipleTourData() {
 
@@ -2173,10 +2182,59 @@ public class TourManager {
    }
 
    /**
+    * @param tourData
+    * @return Returns <code>true</code> when the tour is modified, otherwise <code>false</code>.
+    */
+   public static boolean retrieveWeatherData(final TourData tourData) {
+
+      // ensure data is available
+      if (tourData.latitudeSerie == null || tourData.longitudeSerie == null) {
+
+         TourLogManager.logSubError(
+               String.format(
+                     LOG_RETRIEVE_WEATHER_DATA_010_NO_GPS_DATA_SERIE,
+                     getTourDateTimeShort(tourData)));
+
+         return false;
+      }
+
+      final HistoricalWeatherRetriever historicalWeatherRetriever = new HistoricalWeatherRetriever(tourData);
+
+      final WeatherData historicalWeatherData = historicalWeatherRetriever.retrieve().getHistoricalWeatherData();
+      if (historicalWeatherData == null) {
+         TourLogManager.logSubError(
+               NLS.bind(
+                     Messages.Dialog_RetrieveWeather_WeatherDataNotFound,
+                     new Object[] {
+                           TourManager.getTourDateTimeShort(tourData) }));
+         return false;
+      }
+
+      tourData.setAvgTemperature(historicalWeatherData.getTemperatureAverage());
+      tourData.setWeatherWindChill(historicalWeatherData.getWindChill());
+      tourData.setWeatherMaxTemperature(historicalWeatherData.getTemperatureMax());
+      tourData.setWeatherMinTemperature(historicalWeatherData.getTemperatureMin());
+      tourData.setWeatherWindSpeed(historicalWeatherData.getWindSpeed());
+      tourData.setWeatherWindDir(historicalWeatherData.getWindDirection());
+      tourData.setWeatherHumidity(historicalWeatherData.getAverageHumidity());
+      tourData.setWeatherPrecipitation(historicalWeatherData.getPrecipitation());
+      tourData.setWeatherPressure(historicalWeatherData.getAveragePressure());
+      tourData.setWeather(historicalWeatherData.getWeatherDescription());
+      tourData.setWeatherClouds(historicalWeatherData.getWeatherType());
+      tourData.setIsWeatherDataFromApi(true);
+
+      TourLogManager.addSubLog(
+            TourLogState.IMPORT_OK,
+            getTourDateTimeShort(tourData));
+
+      return true;
+   }
+
+   /**
     * Saves tours which have been modified and updates the tour data editor, a notification is fired
     * when the data are saved.
     * <p>
-    * If a tour is openend in the {@link TourDataEditorView}, the tour will be saved only when the
+    * If a tour is opened in the {@link TourDataEditorView}, the tour will be saved only when the
     * tour is not dirty, if the tour is dirty, saving is not done.
     * <p>
     * The event {@link TourEventId#TOUR_CHANGED} is fired always.

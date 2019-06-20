@@ -87,11 +87,11 @@ public class WWOHourlyResults {
       return weatherDesc.get(0).getValue();
    }
 
-   public String getWinddirDegree() {
-      return winddirDegree;
+   public int getWinddirDegree() {
+      return Integer.parseInt(winddirDegree);
    }
 
-   public String getWindspeedKmph() {
-      return windspeedKmph;
+   public int getWindspeedKmph() {
+      return Integer.parseInt(windspeedKmph);
    }
 }
