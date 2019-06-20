@@ -25,6 +25,8 @@ import com.javadocmd.simplelatlng.util.LengthUnit;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -34,10 +36,6 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 /**
@@ -257,11 +255,12 @@ public class HistoricalWeatherRetriever {
          // java.lang.NoClassDefFoundError: Could not initialize class sun.security.ssl.SSLContextImpl$CustomizedTLSContext
          // 2019/06/20 : To avoid this issue, we are using the HTTP address of WWO and not the HTTPS.
 
-         final HttpClientBuilder clientBuilder = HttpClientBuilder.create();
-         final HttpClient client = clientBuilder.build();
-         final HttpGet request = new HttpGet(weatherRequestWithParameters);
-         final HttpResponse response = client.execute(request);
-         isr = new InputStreamReader(response.getEntity().getContent());
+         final URL url = new URL(weatherRequestWithParameters);
+         final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+         connection.setRequestMethod("GET"); //$NON-NLS-1$
+         connection.connect();
+
+         isr = new InputStreamReader(connection.getInputStream());
          rd = new BufferedReader(isr);
 
          String line = ""; //$NON-NLS-1$
