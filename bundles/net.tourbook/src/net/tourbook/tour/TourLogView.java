@@ -133,6 +133,11 @@ public class TourLogView extends ViewPart {
          @Override
          public void run() {
 
+            if (_browser.isDisposed()) {
+               // this can occure when view is being closed
+               return;
+            }
+
             String jsText = UI.replaceJS_BackSlash(tourLog.message);
             jsText = UI.replaceJS_Apostrophe(jsText);
             final String message = jsText;
