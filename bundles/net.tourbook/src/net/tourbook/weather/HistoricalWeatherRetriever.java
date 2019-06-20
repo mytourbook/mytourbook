@@ -45,17 +45,20 @@ import org.eclipse.jface.preference.IPreferenceStore;
  */
 public class HistoricalWeatherRetriever {
 
+   private final static String    baseApiUrl   = "https://api.worldweatheronline.com/premium/v1/past-weather.ashx"; //$NON-NLS-1$
+   private final static String    keyParameter = "?key=";                                                           //$NON-NLS-1$
    private TourData               tour;
    private LatLng                 searchAreaCenter;
    private String                 startDate;
    private String                 startTime;
+
    private String                 endTime;
 
    private WeatherData            historicalWeatherData;
 
-   private final String           apiUrl     = "https://api.worldweatheronline.com/premium/v1/past-weather.ashx?key="; //$NON-NLS-1$
+   private final IPreferenceStore _prefStore   = TourbookPlugin.getPrefStore();
 
-   private final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
+   public HistoricalWeatherRetriever() {}
 
    /*
     * @param tour
@@ -70,13 +73,20 @@ public class HistoricalWeatherRetriever {
       final double roundedStartTime = tour.getTourStartTime().getHour();
       startTime = (int) roundedStartTime + "00"; //$NON-NLS-1$
 
-
       int roundedEndHour = Instant.ofEpochMilli(tour.getTourEndTimeMS()).atZone(tour.getTimeZoneIdWithDefault()).getHour();
       final int roundedEndMinutes = Instant.ofEpochMilli(tour.getTourEndTimeMS()).atZone(tour.getTimeZoneIdWithDefault()).getMinute();
       if (roundedEndMinutes >= 30) {
          ++roundedEndHour;
       }
       endTime = roundedEndHour + "00"; //$NON-NLS-1$
+   }
+
+   public static String getApiUrl() {
+      return baseApiUrl + keyParameter;
+   }
+
+   public static String getBaseApiUrl() {
+      return baseApiUrl;
    }
 
    /**
@@ -169,7 +179,7 @@ public class HistoricalWeatherRetriever {
                sumTemperature += hourlyData.getTempC();
 
                if (hourlyData.getTempC() < minTemperature) {
-                  minTemperature  = hourlyData.getTempC();
+                  minTemperature = hourlyData.getTempC();
                }
 
                if (hourlyData.getTempC() > maxTemperature) {
@@ -232,7 +242,7 @@ public class HistoricalWeatherRetriever {
     * @return The result of the weather API query.
     */
    private String sendWeatherApiRequest() {
-      final String weatherRequestWithParameters = apiUrl + _prefStore.getString(ITourbookPreferences.WEATHER_API_KEY) + "&q=" + searchAreaCenter //$NON-NLS-1$
+      final String weatherRequestWithParameters = getApiUrl() + _prefStore.getString(ITourbookPreferences.WEATHER_API_KEY) + "&q=" + searchAreaCenter //$NON-NLS-1$
             .getLatitude()
             + "," + searchAreaCenter.getLongitude() //$NON-NLS-1$
             + "&date=" + startDate + "&tp=1&format=json"; //$NON-NLS-1$ //$NON-NLS-2$
@@ -278,4 +288,5 @@ public class HistoricalWeatherRetriever {
 
       return weatherHistory.toString();
    }
+
 }
