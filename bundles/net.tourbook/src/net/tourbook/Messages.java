@@ -1228,7 +1228,6 @@ public class Messages extends NLS {
 
    public static String        Log_RetrieveWeatherData_001_Start;
    public static String        Log_RetrieveWeatherData_002_End;
-   public static String        Log_RetrieveWeatherData_003_TourChanges;
    public static String        Log_RetrieveWeatherData_010_NoGpsDataSeries;
 
    public static String        Log_SetTimeZone_001_Start_FromGeo;
@@ -1627,9 +1626,14 @@ public class Messages extends NLS {
    public static String        Pref_Weather_ApiKey_FieldEditor;
    public static String        Pref_Weather_ApiKey_FieldEditor_Tooltip;
    public static String        Pref_Weather_ApiSignupLink;
+   public static String        Pref_Weather_Button_TestHTTPConnection;
    public static String        Pref_Weather_Checkbox_UseRetrieval;
    public static String        Pref_Weather_Checkbox_UseRetrieval_Tooltip;
    public static String        Pref_Weather_External_Link_WeatherApi;
+   public static String        Pref_Weather_CheckHTTPConnection_Title;
+   public static String        Pref_Weather_CheckHTTPConnection_Message;
+   public static String        Pref_Weather_CheckHTTPConnection_OK_Message;
+   public static String        Pref_Weather_CheckHTTPConnection_FAILED_Message;
 
 // public static String    Pref_SignImages_Dialog_ConfirmDelete_Message;
 // public static String    Pref_SignImages_Dialog_Delete_Title;
@@ -2535,11 +2539,8 @@ public class Messages extends NLS {
    public static String tour_editor_label_driving_time;
    public static String tour_editor_label_end_location;
    public static String tour_editor_label_import_file_path;
-   public static String tour_editor_label_avgtemperature;
    public static String tour_editor_label_avgtemperature_Tooltip;
-   public static String tour_editor_label_maxtemperature;
    public static String tour_editor_label_maxtemperature_Tooltip;
-   public static String tour_editor_label_mintemperature;
    public static String tour_editor_label_mintemperature_Tooltip;
    public static String tour_editor_label_merge_from_tour_id;
    public static String tour_editor_label_merge_from_tour_id_tooltip;
@@ -2578,7 +2579,6 @@ public class Messages extends NLS {
    public static String tour_editor_label_temperature_Tooltip;
    public static String tour_editor_label_rest_pulse;
    public static String tour_editor_label_rest_pulse_Tooltip;
-   public static String tour_editor_label_windchill;
    public static String tour_editor_label_windchill_Tooltip;
    public static String tour_editor_label_WindDirectionNESW_Tooltip;
    public static String tour_editor_message_person_is_required;

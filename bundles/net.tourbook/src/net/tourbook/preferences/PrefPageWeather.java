@@ -15,20 +15,31 @@
  *******************************************************************************/
 package net.tourbook.preferences;
 
+import de.byteholder.geoclipse.map.UI;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.weather.HistoricalWeatherRetriever;
 import net.tourbook.web.WEB;
 
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
@@ -46,9 +57,10 @@ public class PrefPageWeather extends PreferencePage implements IWorkbenchPrefere
    /*
     * UI controls
     */
-   private Button    _chkWeatherRetrieval;
-   private Text      apiKeyFieldEditor;
-   private Link      apiSignupLink;
+   private Button _chkWeatherRetrieval;
+   private Text   apiKeyFieldEditor;
+   private Link   apiSignupLink;
+   private Button btnTestConnection;
 
    /*
     * Labels
@@ -101,17 +113,29 @@ public class PrefPageWeather extends PreferencePage implements IWorkbenchPrefere
                   .applyTo(apiKeyFieldEditor);
 
             //Link to the WWO Api Sign-up page
-            //See https://www.worldweatheronline.com/developer/signup.aspx
+            //See http(s)://www.worldweatheronline.com/developer/signup.aspx
             apiSignupLink = new Link(container, SWT.PUSH);
             apiSignupLink.setText(Messages.Pref_Weather_ApiSignupLink);
             GridDataFactory.fillDefaults()
                   .span(2, 1)
                   .indent(defaultHIndent, 0)
                   .applyTo(apiSignupLink);
+            apiSignupLink.setEnabled(true);
             apiSignupLink.addListener(SWT.Selection, new Listener() {
                @Override
                public void handleEvent(final Event event) {
                   WEB.openUrl(Messages.Pref_Weather_External_Link_WeatherApi);
+               }
+            });
+
+            // button: test connection
+            btnTestConnection = new Button(container, SWT.NONE);
+            GridDataFactory.swtDefaults().indent(defaultHIndent, 0).applyTo(btnTestConnection);
+            btnTestConnection.setText(Messages.Pref_Weather_Button_TestHTTPConnection);
+            btnTestConnection.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  onCheckConnection();
                }
             });
          }
@@ -124,7 +148,7 @@ public class PrefPageWeather extends PreferencePage implements IWorkbenchPrefere
       final boolean useWeatherRetrieval = _chkWeatherRetrieval.getSelection();
       labelApiKey.setEnabled(useWeatherRetrieval);
       apiKeyFieldEditor.setEnabled(useWeatherRetrieval);
-      apiSignupLink.setEnabled(useWeatherRetrieval);
+      btnTestConnection.setEnabled(useWeatherRetrieval);
    }
 
    @Override
@@ -135,6 +159,44 @@ public class PrefPageWeather extends PreferencePage implements IWorkbenchPrefere
    @Override
    public boolean okToLeave() {
       return super.okToLeave();
+   }
+
+   /**
+    * This method ensures the connection to the API can be made successfully.
+    */
+   private void onCheckConnection() {
+
+      BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+         @Override
+         public void run() {
+
+            try {
+               final URL url = new URL(HistoricalWeatherRetriever.getApiUrl() + _prefStore.getString(ITourbookPreferences.WEATHER_API_KEY));
+               final HttpURLConnection urlConn = (HttpURLConnection) url.openConnection();
+               urlConn.connect();
+
+               final int response = urlConn.getResponseCode();
+               final String responseMessage = urlConn.getResponseMessage();
+
+               final String message = response == HttpURLConnection.HTTP_OK
+                     ? NLS.bind(Messages.Pref_Weather_CheckHTTPConnection_OK_Message, HistoricalWeatherRetriever.getBaseApiUrl())
+                     : NLS.bind(
+                           Messages.Pref_Weather_CheckHTTPConnection_FAILED_Message,
+                           new Object[] {
+                                 HistoricalWeatherRetriever.getBaseApiUrl(),
+                                 Integer.toString(response),
+                                 responseMessage == null ? UI.EMPTY_STRING : responseMessage });
+
+               MessageDialog.openInformation(
+                     Display.getCurrent().getActiveShell(),
+                     Messages.Pref_Weather_CheckHTTPConnection_Message,
+                     message);
+
+            } catch (final IOException e) {
+               e.printStackTrace();
+            }
+         };
+      });
    }
 
    private void onSelectCheckWeatherRetrieval() {

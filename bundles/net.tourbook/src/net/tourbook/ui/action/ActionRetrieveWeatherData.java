@@ -24,6 +24,7 @@ import net.tourbook.ui.ITourProvider2;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
@@ -61,19 +62,24 @@ public class ActionRetrieveWeatherData extends Action {
          return;
       }
 
-      final ArrayList<TourData> modifiedTours = new ArrayList<>();
+      BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+         @Override
+         public void run() {
+            final ArrayList<TourData> modifiedTours = new ArrayList<>();
 
-      for (final TourData tour : selectedTours) {
+            for (final TourData tour : selectedTours) {
 
-         final boolean isDataRetrieved = TourManager.retrieveWeatherData(tour);
+               final boolean isDataRetrieved = TourManager.retrieveWeatherData(tour);
 
-         if (isDataRetrieved) {
-            modifiedTours.add(tour);
-         }
-      }
+               if (isDataRetrieved) {
+                  modifiedTours.add(tour);
+               }
+            }
 
-      if (modifiedTours.size() > 0) {
-         TourManager.saveModifiedTours(modifiedTours);
-      }
+            if (modifiedTours.size() > 0) {
+               TourManager.saveModifiedTours(modifiedTours);
+            }
+         };
+      });
    }
 }
