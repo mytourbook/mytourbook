@@ -25,6 +25,8 @@ import com.javadocmd.simplelatlng.util.LengthUnit;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -34,10 +36,6 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 /**
@@ -45,17 +43,20 @@ import org.eclipse.jface.preference.IPreferenceStore;
  */
 public class HistoricalWeatherRetriever {
 
+   private final static String    baseApiUrl   = "http://api.worldweatheronline.com/premium/v1/past-weather.ashx"; //$NON-NLS-1$
+   private final static String    keyParameter = "?key=";                                                           //$NON-NLS-1$
    private TourData               tour;
    private LatLng                 searchAreaCenter;
    private String                 startDate;
    private String                 startTime;
+
    private String                 endTime;
 
    private WeatherData            historicalWeatherData;
 
-   private final String           apiUrl     = "https://api.worldweatheronline.com/premium/v1/past-weather.ashx?key="; //$NON-NLS-1$
+   private final IPreferenceStore _prefStore   = TourbookPlugin.getPrefStore();
 
-   private final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
+   public HistoricalWeatherRetriever() {}
 
    /*
     * @param tour
@@ -70,13 +71,20 @@ public class HistoricalWeatherRetriever {
       final double roundedStartTime = tour.getTourStartTime().getHour();
       startTime = (int) roundedStartTime + "00"; //$NON-NLS-1$
 
-
       int roundedEndHour = Instant.ofEpochMilli(tour.getTourEndTimeMS()).atZone(tour.getTimeZoneIdWithDefault()).getHour();
       final int roundedEndMinutes = Instant.ofEpochMilli(tour.getTourEndTimeMS()).atZone(tour.getTimeZoneIdWithDefault()).getMinute();
       if (roundedEndMinutes >= 30) {
          ++roundedEndHour;
       }
       endTime = roundedEndHour + "00"; //$NON-NLS-1$
+   }
+
+   public static String getApiUrl() {
+      return baseApiUrl + keyParameter;
+   }
+
+   public static String getBaseApiUrl() {
+      return baseApiUrl;
    }
 
    /**
@@ -169,7 +177,7 @@ public class HistoricalWeatherRetriever {
                sumTemperature += hourlyData.getTempC();
 
                if (hourlyData.getTempC() < minTemperature) {
-                  minTemperature  = hourlyData.getTempC();
+                  minTemperature = hourlyData.getTempC();
                }
 
                if (hourlyData.getTempC() > maxTemperature) {
@@ -232,7 +240,7 @@ public class HistoricalWeatherRetriever {
     * @return The result of the weather API query.
     */
    private String sendWeatherApiRequest() {
-      final String weatherRequestWithParameters = apiUrl + _prefStore.getString(ITourbookPreferences.WEATHER_API_KEY) + "&q=" + searchAreaCenter //$NON-NLS-1$
+      final String weatherRequestWithParameters = getApiUrl() + _prefStore.getString(ITourbookPreferences.WEATHER_API_KEY) + "&q=" + searchAreaCenter //$NON-NLS-1$
             .getLatitude()
             + "," + searchAreaCenter.getLongitude() //$NON-NLS-1$
             + "&date=" + startDate + "&tp=1&format=json"; //$NON-NLS-1$ //$NON-NLS-2$
@@ -245,12 +253,14 @@ public class HistoricalWeatherRetriever {
          // NOTE :
          // This error below keeps popping up RANDOMLY and as of today, I haven't found a solution:
          // java.lang.NoClassDefFoundError: Could not initialize class sun.security.ssl.SSLContextImpl$CustomizedTLSContext
+         // 2019/06/20 : To avoid this issue, we are using the HTTP address of WWO and not the HTTPS.
 
-         final HttpClientBuilder clientBuilder = HttpClientBuilder.create();
-         final HttpClient client = clientBuilder.build();
-         final HttpGet request = new HttpGet(weatherRequestWithParameters);
-         final HttpResponse response = client.execute(request);
-         isr = new InputStreamReader(response.getEntity().getContent());
+         final URL url = new URL(weatherRequestWithParameters);
+         final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+         connection.setRequestMethod("GET"); //$NON-NLS-1$
+         connection.connect();
+
+         isr = new InputStreamReader(connection.getInputStream());
          rd = new BufferedReader(isr);
 
          String line = ""; //$NON-NLS-1$
@@ -278,4 +288,5 @@ public class HistoricalWeatherRetriever {
 
       return weatherHistory.toString();
    }
+
 }
