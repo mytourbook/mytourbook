@@ -254,6 +254,17 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
    private int     _sortIndex;
 
    /**
+    * When <code>true</code> then the map provider is a layer for a specific topic with transparent
+    * background which should be displyed over a map.
+    */
+   private boolean _isTransparentLayer;
+
+   /**
+    * When <code>true</code> then the map provider shows a topographic within the map.
+    */
+   private boolean _isIncludesHillshading;
+
+   /**
     */
    public MP() {
 
@@ -1084,6 +1095,14 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
       initializeMapWithZoomAndSize(_maxZoomLevel, _tileSize);
    }
 
+   /**
+    * @see #_isIncludesHillshading
+    * @return
+    */
+   public boolean isIncludesHillshading() {
+      return _isIncludesHillshading;
+   }
+
    boolean isProfileBrightnessForNextMp() {
       return _isProfileBrightnessForNextMp;
    }
@@ -1124,6 +1143,14 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
       }
 
       return true;
+   }
+
+   /**
+    * @see #_isTransparentLayer
+    * @return
+    */
+   public boolean isTransparentLayer() {
+      return _isTransparentLayer;
    }
 
    public boolean isUseOfflineImage() {
@@ -1338,6 +1365,10 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
       _imageFormat = imageFormat;
    }
 
+   public void setIsIncludesHillshading(final boolean isIncludesHillshading) {
+      _isIncludesHillshading = isIncludesHillshading;
+   }
+
    void setIsProfileBrightnessForNextMp(final boolean isBrightness) {
       _isProfileBrightnessForNextMp = isBrightness;
    }
@@ -1348,6 +1379,10 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
 
    void setIsProfileTransparentColors(final boolean isTransColors) {
       _isProfileTransparentColors = isTransColors;
+   }
+
+   public void setIsTransparentLayer(final boolean isTransparentLayer) {
+      _isTransparentLayer = isTransparentLayer;
    }
 
    public void setIsVisibleInUI(final boolean isVisibleInUI) {

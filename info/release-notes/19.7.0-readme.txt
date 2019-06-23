@@ -20,6 +20,7 @@ Improvements
 * 2D Map Preferences
 
   - Selected map provider is also displayed in 2D map view
+  - New map provider fields (is layer / contains hillshading) to better identify it
 
 
 
