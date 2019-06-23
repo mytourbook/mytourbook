@@ -49,6 +49,7 @@ import java.util.ArrayList;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.map2.view.Map2View;
 import net.tourbook.web.WEB;
 
 import org.eclipse.core.runtime.Assert;
@@ -128,25 +129,25 @@ import org.geotools.data.ows.WMSRequest;
 
 public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenchPreferencePage {
 
-   private static final String      CHARACTER_0                   = "0";                                                           //$NON-NLS-1$
+   private static final String      CHARACTER_0             = "0";                                                           //$NON-NLS-1$
 
-   public static final String       ID                            = "de.byteholder.geoclipse.preferences.PrefPage_Map2_Providers"; //$NON-NLS-1$
+   public static final String       ID                      = "de.byteholder.geoclipse.preferences.PrefPage_Map2_Providers"; //$NON-NLS-1$
 
-   private static final String      XML_EXTENSION                 = ".xml";                                                        //$NON-NLS-1$
+   private static final String      XML_EXTENSION           = ".xml";                                                        //$NON-NLS-1$
 
    /**
     * max lenghth for map provider id and offline folder
     */
-   private static final int         MAX_ID_LENGTH                 = 24;
+   private static final int         MAX_ID_LENGTH           = 24;
 
-   private static final String      IMPORT_FILE_PATH              = "MapProvider_ImportFilePath";                                  //$NON-NLS-1$
-   private static final String      EXPORT_FILE_PATH              = "MapProvider_ExportFilePath";                                  //$NON-NLS-1$
+   private static final String      IMPORT_FILE_PATH        = "MapProvider_ImportFilePath";                                  //$NON-NLS-1$
+   private static final String      EXPORT_FILE_PATH        = "MapProvider_ExportFilePath";                                  //$NON-NLS-1$
 
-   final static NumberFormat        _nf                           = NumberFormat.getNumberInstance();
+   final static NumberFormat        _nf                     = NumberFormat.getNumberInstance();
 
-   private final IPreferenceStore   _prefStore                    = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore   _prefStore              = TourbookPlugin.getPrefStore();
 
-   private final MapProviderManager _mpMgr                        = MapProviderManager.getInstance();
+   private final MapProviderManager _mpMgr                  = MapProviderManager.getInstance();
 
    /**
     * contains all visible map providers
@@ -156,7 +157,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
    /**
     * map provider's which are used when getting offline info
     */
-   private final ArrayList<MP>      _offlineJobMapProviders       = new ArrayList<>();
+   private final ArrayList<MP>      _offlineJobMapProviders = new ArrayList<>();
    private IOfflineInfoListener     _offlineJobInfoListener;
    private Job                      _offlineJobGetInfo;
    private MP                       _offlineJobMp;
@@ -167,8 +168,8 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
    /**
     * is <code>true</code> when the job is canceled
     */
-   private boolean                  _isOfflineJobCanceled         = true;
-   private boolean                  _isOfflineJobRunning          = false;
+   private boolean                  _isOfflineJobCanceled   = true;
+   private boolean                  _isOfflineJobRunning;
 
    /**
     * map provider which is currently selected in the list
@@ -176,13 +177,12 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
    private MP                       _selectedMapProvider;
    private MP                       _newMapProvider;
 
-   private boolean                  _isNewMapProvider             = false;
-   private boolean                  _isModifiedMapProvider        = false;
-   private boolean                  _isModifiedMapProviderList    = false;
-   private boolean                  _isForceUpdateMapProviderList = false;
+   private boolean                  _isNewMapProvider;
+   private boolean                  _isModifiedMapProvider;
+   private boolean                  _isModifiedMapProviderList;
 
-   private boolean                  _isDisableModifyListener      = false;
-   private boolean                  _isValid                      = true;
+   private boolean                  _isInUIUpdate;
+   private boolean                  _isValid                = true;
 
    private final ModifyListener     _modifyListener;
    private boolean                  _isModifiedOfflineFolder;
@@ -228,6 +228,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
    private ActionRefreshOfflineInfoNotAssessed _actionRefreshNotAssessed;
 
    private PixelConverter                      _pc;
+
    {
       _nf.setMinimumFractionDigits(2);
       _nf.setMaximumFractionDigits(2);
@@ -255,7 +256,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       _modifyListener = new ModifyListener() {
          @Override
          public void modifyText(final ModifyEvent e) {
-            if (_isDisableModifyListener == false) {
+            if (_isInUIUpdate == false) {
                setMapProviderModified();
             }
          }
@@ -473,7 +474,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       final String name = _txtMapProviderName.getText().trim().toLowerCase();
       final String validText = UI.createIdFromName(name, MAX_ID_LENGTH);
 
-      _isDisableModifyListener = true;
+      _isInUIUpdate = true;
       {
          if (_isModifiedMapProviderId == false) {
             _txtMapProviderId.setText(validText);
@@ -483,7 +484,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
             _txtOfflineFolder.setText(validText);
          }
       }
-      _isDisableModifyListener = false;
+      _isInUIUpdate = false;
    }
 
    @Override
@@ -1012,7 +1013,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
          _txtMapProviderName.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(final ModifyEvent e) {
-               if (_isDisableModifyListener) {
+               if (_isInUIUpdate) {
                   return;
                }
                createAutoText();
@@ -1059,7 +1060,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
                @Override
                public void modifyText(final ModifyEvent e) {
 
-                  if (_isDisableModifyListener) {
+                  if (_isInUIUpdate) {
                      return;
                   }
 
@@ -1095,7 +1096,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
          _txtMapProviderId.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(final ModifyEvent e) {
-               if (_isDisableModifyListener) {
+               if (_isInUIUpdate) {
                   return;
                }
 
@@ -1271,7 +1272,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
          _isModifiedMapProviderId = false;
          _isModifiedOfflineFolder = false;
 
-         _isDisableModifyListener = true;
+         _isInUIUpdate = true;
          {
             /*
              * set map provider fields
@@ -1286,7 +1287,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
             _lblOfflineFolderInfo.setText(UI.EMPTY_STRING);
             _offlineContainer.layout(true);
          }
-         _isDisableModifyListener = false;
+         _isInUIUpdate = false;
 
          enableControls();
 
@@ -1408,8 +1409,6 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       // select imported map provider
       if (importedMPs != null) {
 
-         _isForceUpdateMapProviderList = true;
-
          // update model
          _visibleMp.addAll(importedMPs);
 
@@ -1418,6 +1417,8 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
          // select map provider in the viewer
          _mpViewer.setSelection(new StructuredSelection(importedMPs.get(0)), true);
+
+         MapProviderManager.getInstance().writeMapProviderXml();
       }
 
       _mpViewer.getTable().setFocus();
@@ -1818,7 +1819,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       }
 
       // custom map provider list must be updated
-      _isForceUpdateMapProviderList = true;
+      MapProviderManager.getInstance().writeMapProviderXml();
    }
 
    private void onAction_MapProvider_Export() {
@@ -1914,7 +1915,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
          _selectedMapProvider = mapProvider;
 
-         _isDisableModifyListener = true;
+         _isInUIUpdate = true;
          {
 
             // update UI
@@ -1968,7 +1969,13 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
             updateUIOfflineInfoDetail(mapProvider);
          }
-         _isDisableModifyListener = false;
+         _isInUIUpdate = false;
+
+         // show selected map provider also in the map
+         final Map2View map2View = MapProviderManager.getMap2View();
+         if (map2View != null) {
+            map2View.showMapProvider(_selectedMapProvider);
+         }
 
          enableControls();
       }
@@ -2133,33 +2140,27 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
    @Override
    public boolean performCancel() {
 
-      if (_isForceUpdateMapProviderList == false) {
+      /*
+       * check if the map provider list is modified and ask the user to save it
+       */
+      if (_isModifiedMapProviderList || _isModifiedMapProvider) {
 
-         /*
-          * check if the map provider list is modified and ask the user to save it
-          */
-         if (_isModifiedMapProviderList || _isModifiedMapProvider) {
-            if (MessageDialogNoClose.openConfirm(
-                  Display.getCurrent().getActiveShell(),
-                  Messages.pref_map_dlg_cancelModifiedMapProvider_title,
-                  Messages.pref_map_dlg_cancelModifiedMapProvider_message)) {
+         if (MessageDialogNoClose.openConfirm(
+               Display.getCurrent().getActiveShell(),
+               Messages.pref_map_dlg_cancelModifiedMapProvider_title,
+               Messages.pref_map_dlg_cancelModifiedMapProvider_message)) {
 
-               if (_isModifiedMapProvider) {
+            if (_isModifiedMapProvider) {
 
-                  // current map provider is modified
+               // current map provider is modified
 
-                  if (updateModelFromUI() == false) {
-                     return false;
-                  }
+               if (updateModelFromUI() == false) {
+                  return false;
                }
-
-               _isForceUpdateMapProviderList = true;
             }
-         }
-      }
 
-      if (_isForceUpdateMapProviderList) {
-         saveMapProviders(true);
+            saveMapProviders(true);
+         }
       }
 
       saveState();
@@ -2294,8 +2295,11 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       boolean isSaveNeeded = false;
 
       if (isForceSave) {
+
          // check if save is needed
+
          isSaveNeeded = _isModifiedMapProvider || _isModifiedMapProviderList;
+
       } else {
 
          if (_isModifiedMapProvider) {
@@ -2320,12 +2324,11 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
          }
       }
 
-      if (_isForceUpdateMapProviderList || isSaveNeeded || isSaveMapProvider || isSaveOtherMapProviders) {
+      if (isSaveNeeded || isSaveMapProvider || isSaveOtherMapProviders) {
 
          MapProviderManager.getInstance().writeMapProviderXml();
 
          _isModifiedMapProviderList = false;
-         _isForceUpdateMapProviderList = false;
 
          return true;
       }
@@ -2351,7 +2354,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       _isNewMapProvider = true;
       _newMapProvider = mapProvider;
 
-      _isDisableModifyListener = true;
+      _isInUIUpdate = true;
       {
          /*
           * set map provider fields empty
@@ -2374,7 +2377,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
          _lblOfflineFolderInfo.setText(UI.EMPTY_STRING);
          _offlineContainer.layout(true);
       }
-      _isDisableModifyListener = false;
+      _isInUIUpdate = false;
 
       enableControls();
 

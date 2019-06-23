@@ -1653,9 +1653,12 @@ public class Map2View extends ViewPart implements
       addSelectionListener();
       addTourEventListener();
       addMapListener();
+
       MapBookmarkManager.addBookmarkListener(this);
       PhotoManager.addPhotoEventListener(this);
       MapManager.addMapSyncListener(this);
+
+      MapProviderManager.setMap2View(this);
 
       // register overlays which draw the tour
       GeoclipseExtensions.registerOverlays(_map);
@@ -1739,6 +1742,8 @@ public class Map2View extends ViewPart implements
 
       getViewSite().getPage().removePostSelectionListener(_postSelectionListener);
       getViewSite().getPage().removePartListener(_partListener);
+
+      MapProviderManager.setMap2View(null);
 
       MapBookmarkManager.removeBookmarkListener(this);
       MapManager.removeMapSyncListener(this);
@@ -3712,6 +3717,11 @@ public class Map2View extends ViewPart implements
       _state.put(MEMENTO_TOUR_COLOR_ID, colorId.name());
 
       _actionPhotoFilter.saveState();
+   }
+
+   public void showMapProvider(final MP mapProvider) {
+
+      _map.setMapProvider(mapProvider);
    }
 
    private void selectTourSegments(final SelectedTourSegmenterSegments selectedSegmenterConfig) {

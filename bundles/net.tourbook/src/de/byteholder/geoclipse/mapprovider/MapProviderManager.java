@@ -48,6 +48,7 @@ import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
+import net.tourbook.map2.view.Map2View;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -262,6 +263,8 @@ public class MapProviderManager {
 
    //
    private static final ListenerList<IMapProviderListener> _mapProviderListeners = new ListenerList<>(ListenerList.IDENTITY);
+
+   private static Map2View                                 _map2View;
 
    private MapProviderManager() {}
 
@@ -665,6 +668,10 @@ public class MapProviderManager {
       return _instance;
    }
 
+   public static Map2View getMap2View() {
+      return _map2View;
+   }
+
    private static String getMapProviderType(final MP mapProvider) {
 
       if (mapProvider instanceof MPCustom) {
@@ -980,6 +987,10 @@ public class MapProviderManager {
             }
          }
       }
+   }
+
+   public static void setMap2View(final Map2View map2View) {
+      _map2View = map2View;
    }
 
    public void addMapProvider(final MP mp) {
@@ -2255,6 +2266,10 @@ public class MapProviderManager {
       return newMPs;
    }
 
+   /**
+    * Writes internal map provider list into a xml file and fires an {@link IMapProviderListener}
+    * event.
+    */
    public void writeMapProviderXml() {
 
       BufferedWriter writer = null;

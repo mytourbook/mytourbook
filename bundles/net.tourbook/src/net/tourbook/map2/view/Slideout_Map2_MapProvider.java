@@ -349,7 +349,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
     */
    public Slideout_Map2_MapProvider(final ToolItem toolItem, final Map2View map2View, final IDialogSettings state) {
 
-      super(toolItem.getParent(), state, new int[] { 100, 500, 100, 500 });
+      super(toolItem.getParent(), state, new int[] { 325, 400, 325, 400 });
 
       _toolItem = toolItem;
       _map2View = map2View;
@@ -666,9 +666,6 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
 
          @Override
          public void doubleClick(final DoubleClickEvent event) {
-
-            // the map provider is set in the run method
-
             _action_ManageMapProviders.run();
          }
       });
@@ -1221,8 +1218,9 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
       createSortedMapProviders();
 
       // update UI
-      _mpViewer.refresh();
-      selectMapProvider(_selectedMP == null ? null : _selectedMP.getId());
+      // -> UI is disposed as when the pref page opens to modify map provider's then this slideout is closed
+      // _mpViewer.refresh();
+//      selectMapProvider(_selectedMP == null ? null : _selectedMP.getId());
    }
 
    @Override
@@ -1230,6 +1228,8 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
 
       UI.disposeResource(_imageYes);
       UI.disposeResource(_imageNo);
+
+      MapProviderManager.getInstance().removeMapProviderListener(this);
 
       super.onDispose();
    }
@@ -1307,7 +1307,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
       selectMapProviderInTheMap(selectedMapProvider);
    }
 
-   private void onSelect_MapProvider_Next() {
+   public void onSelect_MapProvider_Next() {
 
       final ArrayList<MP> allMPInViewer = getAllMapProviderInMPViewer();
       final int numMP = allMPInViewer.size();
@@ -1470,7 +1470,8 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
 
       // update sorting comparator
       final String sortColumnId = Util.getStateString(_state, STATE_SORT_COLUMN_ID, COLUMN_MAP_PROVIDER);
-      final int sortDirection = Util.getStateInt(_state, STATE_SORT_COLUMN_DIRECTION, MapProviderComparator.DESCENDING);
+      final int sortDirection = Util.getStateInt(_state, STATE_SORT_COLUMN_DIRECTION, MapProviderComparator.ASCENDING);
+
       _mpComparator.__sortColumnId = sortColumnId;
       _mpComparator.__sortDirection = sortDirection;
    }

@@ -140,12 +140,13 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
     *           <p>
     *
     *           <pre>
-    *           horizContentDefaultWidth = 300;
+    * <code>
+    *           horizContentDefaultWidth  = 300;
     *           horizContentDefaultHeight = 150;
     *
-    *           vertContentDefaultWidth = 400;
-    *           vertContentDefaultHeight = 250;
-    *
+    *           vertContentDefaultWidth   = 400;
+    *           vertContentDefaultHeight  = 250;
+    * </code>
     *           </pre>
     */
    public AdvancedSlideout(final Control ownerControl, //

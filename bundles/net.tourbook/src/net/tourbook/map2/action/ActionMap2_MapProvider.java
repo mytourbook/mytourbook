@@ -45,7 +45,6 @@ public class ActionMap2_MapProvider extends ActionToolbarSlideoutAdv {
 
       _map2View = map2View;
       _state = state;
-
    }
 
    @Override
@@ -66,6 +65,15 @@ public class ActionMap2_MapProvider extends ActionToolbarSlideoutAdv {
    protected void onBeforeOpenSlideout() {
 
       _map2View.closeOpenedDialogs(this);
+   }
+
+   @Override
+   protected void onSelect() {
+
+      super.onSelect();
+
+      // select next map provider
+      _slideoutMap2MapProvider.onSelect_MapProvider_Next();
    }
 
    public void selectMapProvider(final String mapProviderID) {

@@ -5841,10 +5841,10 @@ public class Map extends Canvas {
    /**
     * Sets the map provider for the map and redraws the map
     *
-    * @param mp
+    * @param mapProvider
     *           new map provider
     */
-   public void setMapProvider(final MP mp) {
+   public void setMapProvider(final MP mapProvider) {
 
       GeoPosition center = null;
       int zoom = 0;
@@ -5860,7 +5860,7 @@ public class Map extends Canvas {
          refresh = true;
       }
 
-      _mp = mp;
+      _mp = mapProvider;
 
 //      // check if the map is initialized
 //      if (_worldPixelViewport == null) {
@@ -5874,7 +5874,7 @@ public class Map extends Canvas {
          setZoom(zoom);
          setMapCenter(center);
       } else {
-         setZoom(mp.getDefaultZoomLevel());
+         setZoom(mapProvider.getDefaultZoomLevel());
       }
 
       paint();
