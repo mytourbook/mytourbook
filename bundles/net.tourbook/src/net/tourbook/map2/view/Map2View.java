@@ -218,6 +218,8 @@ public class Map2View extends ViewPart implements
    private static final String   IMAGE_MAP_OPTIONS                                     = net.tourbook.Messages.Image__MapOptions;
    private static final String   IMAGE_MAP_OPTIONS_DISABLED                            = net.tourbook.Messages.Image__MapOptions_Disabled;
 
+   static final String           STATE_IS_TOGGLE_KEYBOARD_PANNING                      = "STATE_IS_TOGGLE_KEYBOARD_PANNING";                  //$NON-NLS-1$
+   static final boolean          STATE_IS_TOGGLE_KEYBOARD_PANNING_DEFAULT              = true;
    private static final String   STATE_IS_SHOW_TOUR_IN_MAP                             = "STATE_IS_SHOW_TOUR_IN_MAP";                          //$NON-NLS-1$
    private static final String   STATE_IS_SHOW_PHOTO_IN_MAP                            = "STATE_IS_SHOW_PHOTO_IN_MAP";                         //$NON-NLS-1$
    private static final String   STATE_IS_SHOW_LEGEND_IN_MAP                           = "STATE_IS_SHOW_LEGEND_IN_MAP";                        //$NON-NLS-1$
@@ -298,6 +300,7 @@ public class Map2View extends ViewPart implements
 
          MapGraphId.HrZone,
    };
+
 
 
    private final IPreferenceStore   _prefStore                             = TourbookPlugin.getPrefStore();
@@ -3540,6 +3543,10 @@ public class Map2View extends ViewPart implements
 
    void restoreState_Map2_Options() {
 
+      _map.setIsInInverseKeyboardPanning(Util.getStateBoolean(_state,
+            Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING,
+            Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING_DEFAULT));
+
       _map.setIsZoomWithMousePosition(Util.getStateBoolean(_state,
             Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION,
             Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION_DEFAULT));
@@ -3719,11 +3726,6 @@ public class Map2View extends ViewPart implements
       _actionPhotoFilter.saveState();
    }
 
-   public void showMapProvider(final MP mapProvider) {
-
-      _map.setMapProvider(mapProvider);
-   }
-
    private void selectTourSegments(final SelectedTourSegmenterSegments selectedSegmenterConfig) {
 
       if (_allTourData.size() < 1) {
@@ -3832,6 +3834,11 @@ public class Map2View extends ViewPart implements
             }
          });
       }
+   }
+
+   public void showMapProvider(final MP mapProvider) {
+
+      _map.setMapProvider(mapProvider);
    }
 
    private void showToursFromTourProvider() {
