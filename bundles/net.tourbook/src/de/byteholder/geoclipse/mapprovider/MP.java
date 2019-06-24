@@ -130,103 +130,101 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
    private static final ListenerList<IOfflineInfoListener> _offlineReloadEventListeners = new ListenerList<>(ListenerList.IDENTITY);
 
    private int                                             _dimmingAlphaValue           = 0xFF;
-
    private RGB                                             _dimmingColor;
 
    private final Projection                                _projection;
+
    /**
     * image size in pixel for a square image
     */
-   private int                                             _tileSize                    = Integer
-         .parseInt(MapProviderManager.DEFAULT_IMAGE_SIZE);
+   private int                                             _tileSize                    = Integer.parseInt(MapProviderManager.DEFAULT_IMAGE_SIZE);
+
    // map min/max zoom level
-   private int                                             _minZoomLevel                = 0;
+   private int         _minZoomLevel       = 0;
+   private int         _maxZoomLevel       = Map.UI_MAX_ZOOM_LEVEL - Map.UI_MIN_ZOOM_LEVEL;
 
-   private int                                             _maxZoomLevel                = Map.UI_MAX_ZOOM_LEVEL
-         - Map.UI_MIN_ZOOM_LEVEL;
-
-   private int                                             _defaultZoomLevel            = 0;
+   private int         _defaultZoomLevel   = 0;
 
    /**
     * The number of tiles wide at each zoom level
     */
-   private int[]                                           _mapWidthInTilesAtZoom;
+   private int[]       _mapWidthInTilesAtZoom;
 
    /**
     * An array of coordinates in <em>pixels</em> that indicates the center in the world map for the
     * given zoom level.
     */
-   private Point2D[]                                       _mapCenterInPixelsAtZoom;
+   private Point2D[]   _mapCenterInPixelsAtZoom;
 
    /**
     * An array of doubles that contain the number of pixels per degree of longitude at a give zoom
     * level.
     */
-   private double[]                                        _longitudeDegreeWidthInPixels;
+   private double[]    _longitudeDegreeWidthInPixels;
 
    /**
     * An array of doubles that contain the number of radians per degree of longitude at a given zoom
     * level (where longitudeRadianWidthInPixels[0] is the most zoomed out)
     */
-   private double[]                                        _longitudeRadianWidthInPixels;
+   private double[]    _longitudeRadianWidthInPixels;
 
-   private boolean                                         _isOfflineImageUsed          = true;
+   private boolean     _isOfflineImageUsed = true;
 
    /**
     * This is the image shown as long as the real tile image is not yet fully loaded.
     */
-   private Image                                           _loadingImage;
+   private Image       _loadingImage;
 
    /**
     * This is the image displayed when the real tile image could not be loaded.
     */
-   private Image                                           _errorImage;
+   private Image       _errorImage;
 
    /**
     * unique id to identify a map provider
     */
-   private String                                          _mapProviderId;
+   private String      _mapProviderId;
 
    /**
     * mime image format which is currently used
     */
-   private String                                          _imageFormat                 = MapProviderManager.DEFAULT_IMAGE_FORMAT;
+   private String      _imageFormat        = MapProviderManager.DEFAULT_IMAGE_FORMAT;
 
-   private int                                             _favoriteZoom                = 0;
-   private GeoPosition                                     _favoritePosition            = new GeoPosition(0.0, 0.0);
+   private int         _favoriteZoom       = 0;
+   private GeoPosition _favoritePosition   = new GeoPosition(0.0, 0.0);
 
-   private int                                             _lastUsedZoom                = 0;
-   private GeoPosition                                     _lastUsedPosition            = new GeoPosition(0.0, 0.0);
+   private int         _lastUsedZoom       = 0;
+   private GeoPosition _lastUsedPosition   = new GeoPosition(0.0, 0.0);
 
    /**
     * name of the map provider which is displayed in the UI
     */
-   private String                                          _mapProviderName;
+   private String      _mapProviderName;
 
    /**
     * map provider description
     */
-   private String                                          _description                 = UI.EMPTY_STRING;
+   private String      _description        = UI.EMPTY_STRING;
 
    /**
     * OS folder to save offline images
     */
-   private String                                          _offlineFolder;
+   private String      _offlineFolder;
 
    /**
     * number of files in the offline cache
     */
-   private int                                             _offlineFileCounter          = -1;
+   private int         _offlineFileCounter = -1;
 
    /**
     * size in Bytes for the offline images
     */
-   private long                                            _offlineFileSize             = -1;
+   private long        _offlineFileSize    = -1;
 
    /**
     * State if the map provider can be selected in the map provider slideout or not.
     */
-   private boolean                                         _isVisibleInUI;
+   private boolean     _isVisibleInUI;
 
    //
    // Profile map provider values

@@ -76,6 +76,7 @@ public class Messages extends NLS {
    public static String        Pref_Map_JobName_ReadMapFactoryOfflineInfo;
    public static String        Pref_Map_Label_AvaiablelMapProvider;
    public static String        Pref_Map_Label_Description;
+   public static String        Pref_Map_Label_Layers;
    public static String        Pref_Map_Label_MapProviderDropTarget;
    public static String        Pref_Map_Label_MapProviderDropTarget_Tooltip;
    public static String        Pref_Map_Label_OfflineInfo_NotDone;

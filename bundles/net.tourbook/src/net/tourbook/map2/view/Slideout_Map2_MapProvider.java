@@ -1177,9 +1177,8 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
          // plugin map provider
 
          final MPPlugin pluginMapProvider = (MPPlugin) mapProvider;
-         final String baseURL = pluginMapProvider.getBaseURL();
 
-         return baseURL == null ? UI.EMPTY_STRING : baseURL;
+         return pluginMapProvider.getBaseURL();
       }
 
       return UI.EMPTY_STRING;
