@@ -130,7 +130,7 @@ public class PrefPageWeather extends PreferencePage implements IWorkbenchPrefere
 
             // button: test connection
             btnTestConnection = new Button(container, SWT.NONE);
-            GridDataFactory.swtDefaults().indent(defaultHIndent, 0).applyTo(btnTestConnection);
+            GridDataFactory.swtDefaults().indent(defaultHIndent, 0).span(2, 1).applyTo(btnTestConnection);
             btnTestConnection.setText(Messages.Pref_Weather_Button_TestHTTPConnection);
             btnTestConnection.addSelectionListener(new SelectionAdapter() {
                @Override
