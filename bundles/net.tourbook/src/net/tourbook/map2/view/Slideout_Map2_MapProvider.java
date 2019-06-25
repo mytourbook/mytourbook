@@ -356,6 +356,9 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
       _state = state;
 
       setTitleText(Messages.Slideout_Map_Provider_Label_Title);
+      
+      // prevent that the opened slideout is partly hidden
+      setIsForceBoundsToBeInsideOfViewport(true);
 
       MapProviderManager.getInstance().addMapProviderListener(this);
 

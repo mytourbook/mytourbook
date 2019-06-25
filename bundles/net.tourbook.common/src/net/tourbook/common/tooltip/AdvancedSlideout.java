@@ -470,7 +470,12 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
          final int diffX = _devXMousedown - e.x;
          final int diffY = _devYMousedown - e.y;
 
-         setShellLocation(diffX, diffY);
+         // allow the shell to be moved partly outside of the viewport
+         isShellMoved = true;
+         {
+            setShellLocation(diffX, diffY);
+         }
+         isShellMoved = false;
       }
    }
 
