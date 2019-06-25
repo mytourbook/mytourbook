@@ -8091,7 +8091,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
       _spinAverageTemperature.setData(FIX_LINUX_ASYNC_EVENT_1, true);
       _spinAverageTemperature.setDigits(1);
-      _spinAverageTemperature.setSelection((int) ((avgTemperature * 10) + 0.5));
+      _spinAverageTemperature.setSelection(Math.round(avgTemperature * 10));
 
       /*
        * Wind Chill
@@ -8100,7 +8100,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
       _spinWindChill.setData(FIX_LINUX_ASYNC_EVENT_1, true);
       _spinWindChill.setDigits(1);
-      _spinWindChill.setSelection((int) ((avgWindChill * 10) + 0.5));
+      _spinWindChill.setSelection(Math.round(avgWindChill * 10));
 
       /*
        * Max temperature
@@ -8109,16 +8109,16 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
       _spinMaxTemperature.setData(FIX_LINUX_ASYNC_EVENT_1, true);
       _spinMaxTemperature.setDigits(1);
-      _spinMaxTemperature.setSelection((int) ((maxTemperature * 10) + 0.5));
+      _spinMaxTemperature.setSelection(Math.round(maxTemperature * 10));
 
       /*
-       * Max temperature
+       * Min temperature
        */
       final float minTemperature = UI.convertTemperatureFromMetric(_tourData.getWeatherMinTemperature());
 
       _spinMinTemperature.setData(FIX_LINUX_ASYNC_EVENT_1, true);
       _spinMinTemperature.setDigits(1);
-      _spinMinTemperature.setSelection((int) ((minTemperature * 10) + 0.5));
+      _spinMinTemperature.setSelection(Math.round(minTemperature * 10));
 
       /*
        * Humidity
@@ -8134,7 +8134,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
       final float precipitation = UI.convertPrecipitationFromMetric(_tourData.getWeatherPrecipitation());
 
       _spinPrecipitationValue.setData(FIX_LINUX_ASYNC_EVENT_1, true);
-      _spinPrecipitationValue.setSelection((int) (precipitation * 100f));
+      _spinPrecipitationValue.setSelection(Math.round(precipitation * 100));
 
       /*
        * Pressure
@@ -8143,7 +8143,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
       _spinPressureValue.setData(FIX_LINUX_ASYNC_EVENT_1, true);
       _spinPressureValue.setDigits(2);
-      _spinPressureValue.setSelection((int) (pressure * 100f));
+      _spinPressureValue.setSelection((int) Math.round(pressure * 100));
 
       // set start date/time without time zone
       final ZonedDateTime tourStartTime = _tourData.getTourStartTime();
