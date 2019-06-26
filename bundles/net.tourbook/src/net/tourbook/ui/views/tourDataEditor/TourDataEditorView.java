@@ -176,9 +176,11 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DateTime;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
@@ -212,7 +214,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
    public static final String     ID                            = "net.tourbook.views.TourDataEditorView";                //$NON-NLS-1$
 
    /**
-    * On Linux an asynch selection event is fired since e4
+    * On Linux an async selection event is fired since e4
     */
    private static final String    FIX_LINUX_ASYNC_EVENT_1       = "FIX_LINUX_ASYNC_EVENT_1";                              //$NON-NLS-1$
    private static final String    FIX_LINUX_ASYNC_EVENT_2       = "FIX_LINUX_ASYNC_EVENT_2";                              //$NON-NLS-1$
@@ -1630,6 +1632,21 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
       }
    }
 
+   private static boolean isChild(final Control parent, final Control child)
+   {
+       if (child.equals(parent)) {
+         return true;
+      }
+
+       final Composite p = child.getParent();
+
+       if (p != null) {
+         return isChild(parent, p);
+      } else {
+         return false;
+      }
+   }
+
    /**
     * Compute distance values from the geo positions
     * <p>
@@ -2887,6 +2904,23 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
       createFieldListener();
 
       createUI(parent);
+      final Display display = parent.getDisplay();
+      display.addFilter(SWT.KeyDown, new Listener() {
+         @Override
+         public void handleEvent(final Event e) {
+            if (e.widget instanceof Control && isChild(parent, (Control) e.widget))
+            {
+               // TODO If ctrl is down and 115 was just pressed
+               // ==> then we save the tour
+               if (e.keyCode == 115) { //115 = the key "S"
+                  if (isDirty()) {
+                     saveTourIntoDB();
+                  }
+               }
+            }
+         }
+      });
+
       createMenus();
       createActions();
 
