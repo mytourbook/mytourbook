@@ -1632,21 +1632,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
       }
    }
 
-   private static boolean isChild(final Control parent, final Control child)
-   {
-       if (child.equals(parent)) {
-         return true;
-      }
-
-       final Composite p = child.getParent();
-
-       if (p != null) {
-         return isChild(parent, p);
-      } else {
-         return false;
-      }
-   }
-
    /**
     * Compute distance values from the geo positions
     * <p>
@@ -2904,18 +2889,18 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
       createFieldListener();
 
       createUI(parent);
-      final Display display = parent.getDisplay();
+      final Display display = Display.getCurrent();
       display.addFilter(SWT.KeyDown, new Listener() {
          @Override
          public void handleEvent(final Event e) {
-            if (e.widget instanceof Control && isChild(parent, (Control) e.widget))
-            {
-               // TODO If ctrl is down and 115 was just pressed
-               // ==> then we save the tour
-               if (e.keyCode == 115) { //115 = the key "S"
-                  if (isDirty()) {
-                     saveTourIntoDB();
-                  }
+            if (((e.stateMask & SWT.CTRL) == SWT.CTRL) && (e.keyCode == 's')) {
+               if (isDirty()) {
+                  BusyIndicator.showWhile(display, new Runnable() {
+                     @Override
+                     public void run() {
+                        saveTourIntoDB();
+                     };
+                  });
                }
             }
          }
