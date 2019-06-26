@@ -15,6 +15,8 @@
  *******************************************************************************/
 package de.byteholder.geoclipse.preferences;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import de.byteholder.geoclipse.map.UI;
 import de.byteholder.geoclipse.mapprovider.DialogMP;
 import de.byteholder.geoclipse.mapprovider.DialogMPCustom;
@@ -49,6 +51,7 @@ import java.util.ArrayList;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.Util;
 import net.tourbook.map2.view.Map2View;
 import net.tourbook.web.WEB;
 
@@ -75,6 +78,7 @@ import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -120,6 +124,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.progress.UIJob;
@@ -130,23 +135,33 @@ import org.geotools.data.ows.WMSRequest;
 
 public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenchPreferencePage {
 
-   private static final String APP_TRUE         = net.tourbook.Messages.App__True;
+   private static final String APP_TRUE                       = net.tourbook.Messages.App__True;
 
-   public static final String  ID               = "de.byteholder.geoclipse.preferences.PrefPage_Map2_Providers"; //$NON-NLS-1$
+   public static final String  ID                             = "de.byteholder.geoclipse.preferences.PrefPage_Map2_Providers"; //$NON-NLS-1$
 
-   private static final String CHARACTER_0      = "0";                                                           //$NON-NLS-1$
+   private static final String CHARACTER_0                    = "0";                                                           //$NON-NLS-1$
 
-   private static final String XML_EXTENSION    = ".xml";                                                        //$NON-NLS-1$
+   private static final String XML_EXTENSION                  = ".xml";                                                        //$NON-NLS-1$
 
    /**
     * max lenghth for map provider id and offline folder
     */
-   private static final int    MAX_ID_LENGTH    = 24;
+   private static final int    MAX_ID_LENGTH                  = 24;
 
-   private static final String IMPORT_FILE_PATH = "MapProvider_ImportFilePath";                                  //$NON-NLS-1$
-   private static final String EXPORT_FILE_PATH = "MapProvider_ExportFilePath";                                  //$NON-NLS-1$
+   private static final String IMPORT_FILE_PATH               = "MapProvider_ImportFilePath";                                  //$NON-NLS-1$
+   private static final String EXPORT_FILE_PATH               = "MapProvider_ExportFilePath";                                  //$NON-NLS-1$
 
-   final static NumberFormat   _nf              = NumberFormat.getNumberInstance();
+   final static NumberFormat   _nf                            = NumberFormat.getNumberInstance();
+
+   private static final String COLUMN_KEY_FOR_COLUMN_ID       = "ColumnId";
+
+   private static final String COLUMN_IS_CONTAINS_HILLSHADING = "ContainsHillshading";                                         //$NON-NLS-1$
+   private static final String COLUMN_IS_TRANSPARENT_LAYER    = "IsTransparentLayer";                                          //$NON-NLS-1$
+   private static final String COLUMN_OFFLINE_FOLDER_NAME     = "OfflineFolderName";                                           //$NON-NLS-1$
+   private static final String COLUMN_MAP_PROVIDER_NAME       = "MapProviderName";                                             //$NON-NLS-1$
+   private static final String COLUMN_MP_TYPE                 = "MPType";                                                      //$NON-NLS-1$
+   private static final String COLUMN_TILE_URL                = "TileUrl";                                                     //$NON-NLS-1$
+
    {
       _nf.setMinimumFractionDigits(2);
       _nf.setMaximumFractionDigits(2);
@@ -193,7 +208,9 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
    private boolean                             _isInUIUpdate;
    private boolean                             _isValid                = true;
 
-   private final ModifyListener                _modifyListener;
+   private ModifyListener                      _modifyListener;
+   private SelectionListener                   _columnSortListener;
+
    private boolean                             _isModifiedOfflineFolder;
    private boolean                             _isModifiedMapProviderId;
 
@@ -208,39 +225,41 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
     * UI controls
     */
 
-   private DropTarget _wmsDropTarget;
+   private DropTarget            _wmsDropTarget;
 
-   private Group      _groupDetails;
+   private Group                 _groupDetails;
 
-   private DropTarget _mpDropTarget;
+   private DropTarget            _mpDropTarget;
 
-   private Button     _btnAddMapProviderCustom;
-   private Button     _btnAddMapProviderWms;
-   private Button     _btnAddMapProviderMapProfile;
-   private Button     _btnCancel;
-   private Button     _btnDeleteMapProvider;
-   private Button     _btnDeleteOfflineMap;
-   private Button     _btnEdit;
-   private Button     _btnExport;
-   private Button     _btnImport;
-   private Button     _btnUpdate;
+   private Button                _btnAddMapProviderCustom;
+   private Button                _btnAddMapProviderWms;
+   private Button                _btnAddMapProviderMapProfile;
+   private Button                _btnCancel;
+   private Button                _btnDeleteMapProvider;
+   private Button                _btnDeleteOfflineMap;
+   private Button                _btnEdit;
+   private Button                _btnExport;
+   private Button                _btnImport;
+   private Button                _btnUpdate;
 
-   private Button     _chkIsIncludesHillshading;
-   private Button     _chkIsTransparentLayer;
+   private Button                _chkIsIncludesHillshading;
+   private Button                _chkIsTransparentLayer;
 
-   private Label      _lblDescription;
-   private Label      _lblDropTarget;
-   private Label      _lblMpDropTarget;
-   private Label      _lblOfflineFolderInfo;
-   private Label      _lblLayers;
+   private Label                 _lblDescription;
+   private Label                 _lblDropTarget;
+   private Label                 _lblMpDropTarget;
+   private Label                 _lblOfflineFolderInfo;
+   private Label                 _lblLayers;
 
-   private Text       _txtDescription;
-   private Text       _txtMapProviderName;
-   private Text       _txtMapProviderId;
-   private Text       _txtMapProviderType;
-   private Text       _txtOfflineFolder;
-   private Text       _txtOfflineInfoTotal;
-   private Text       _txtLayers;
+   private Text                  _txtDescription;
+   private Text                  _txtMapProviderName;
+   private Text                  _txtMapProviderId;
+   private Text                  _txtMapProviderType;
+   private Text                  _txtOfflineFolder;
+   private Text                  _txtOfflineInfoTotal;
+   private Text                  _txtLayers;
+
+   private MapProviderComparator _mpComparator = new MapProviderComparator();
 
    private class MapContentProvider implements IStructuredContentProvider {
 
@@ -254,6 +273,171 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
       @Override
       public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
+   }
+
+   private class MapProviderComparator extends ViewerComparator {
+
+      private static final int ASCENDING       = 0;
+      private static final int DESCENDING      = 1;
+
+      private String           __sortColumnId  = COLUMN_MAP_PROVIDER_NAME;
+      private int              __sortDirection = ASCENDING;
+
+      @Override
+      public int compare(final Viewer viewer, final Object e1, final Object e2) {
+
+         final MP mp1 = (MP) e1;
+         final MP mp2 = (MP) e2;
+
+         double rc = 0;
+
+         // Determine which column and do the appropriate sort
+         switch (__sortColumnId) {
+
+         case COLUMN_IS_CONTAINS_HILLSHADING:
+
+            rc = Boolean.compare(mp2.isIncludesHillshading(), mp1.isIncludesHillshading());
+            break;
+
+         case COLUMN_IS_TRANSPARENT_LAYER:
+
+            rc = Boolean.compare(mp2.isTransparentLayer(), mp1.isTransparentLayer());
+            break;
+
+         case COLUMN_MP_TYPE:
+            rc = getMapProviderType(mp1).compareTo(getMapProviderType(mp2));
+            break;
+
+         case COLUMN_TILE_URL:
+            rc = getTileUrl(mp1).compareTo(getTileUrl(mp2));
+            break;
+
+         case COLUMN_OFFLINE_FOLDER_NAME:
+            rc = mp1.getOfflineFolder().compareTo(mp2.getOfflineFolder());
+            break;
+
+         case COLUMN_MAP_PROVIDER_NAME:
+         default:
+            rc = mp1.getName().compareTo(mp2.getName());
+         }
+
+         if (rc == 0) {
+
+            // subsort by map provider
+
+            rc = mp1.getName().compareTo(mp2.getName());
+         }
+
+         // if descending order, flip the direction
+         if (__sortDirection == DESCENDING) {
+            rc = -rc;
+         }
+
+         /*
+          * MUST return 1 or -1 otherwise long values are not sorted correctly.
+          */
+         return rc > 0 //
+               ? 1
+               : rc < 0 //
+                     ? -1
+                     : 0;
+      }
+
+      private String getMapProviderType(final MP mapProvider) {
+
+         if (mapProvider instanceof MPWms) {
+            return net.tourbook.Messages.Slideout_Map2Provider_Column_MPType_WMS;
+
+         } else if (mapProvider instanceof MPCustom) {
+            return net.tourbook.Messages.Slideout_Map2Provider_Column_MPType_Custom;
+
+         } else if (mapProvider instanceof MPProfile) {
+            return net.tourbook.Messages.Slideout_Map2Provider_Column_MPType_Profile;
+
+         } else if (mapProvider instanceof MPPlugin) {
+            return net.tourbook.Messages.Slideout_Map2Provider_Column_MPType_Internal;
+
+         } else {
+            return UI.EMPTY_STRING;
+         }
+      }
+
+      private String getTileUrl(final MP mapProvider) {
+
+         if (mapProvider instanceof MPWms) {
+
+            // wms map provider
+
+            final MPWms wmsMapProvider = (MPWms) mapProvider;
+
+            return wmsMapProvider.getCapabilitiesUrl();
+
+         } else if (mapProvider instanceof MPCustom) {
+
+            // custom map provider
+
+            final MPCustom customMapProvider = (MPCustom) mapProvider;
+
+            return customMapProvider.getCustomUrl();
+
+         } else if (mapProvider instanceof MPProfile) {
+
+            // map profile
+
+            return UI.EMPTY_STRING;
+
+         } else if (mapProvider instanceof MPPlugin) {
+
+            // plugin map provider
+
+            final MPPlugin pluginMapProvider = (MPPlugin) mapProvider;
+
+            return pluginMapProvider.getBaseURL();
+         }
+
+         return UI.EMPTY_STRING;
+      }
+
+      @Override
+      public boolean isSorterProperty(final Object element, final String property) {
+
+         // force resorting when a name is renamed
+         return true;
+      }
+
+      public void setSortColumn(final Widget widget) {
+
+         final String columnId = (String) widget.getData(COLUMN_KEY_FOR_COLUMN_ID);
+
+         if (columnId == null) {
+            return;
+         }
+
+         if (columnId.equals(__sortColumnId)) {
+
+            // Same column as last sort -> select next sorting
+
+            switch (__sortDirection) {
+            case ASCENDING:
+               __sortDirection = DESCENDING;
+               break;
+
+            case DESCENDING:
+            default:
+               __sortDirection = ASCENDING;
+               break;
+            }
+
+         } else {
+
+            // New column; do an ascent sorting
+
+            __sortColumnId = columnId;
+            __sortDirection = ASCENDING;
+         }
+
+         updateUI_SetSortDirection(__sortColumnId, __sortDirection);
+      }
    }
 
    public PrefPage_Map2_Providers() {
@@ -308,6 +492,8 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
    private void addListener() {
 
+      _columnSortListener = widgetSelectedAdapter(e -> onSelect_SortColumn(e));
+
       _offlineJobInfoListener = new IOfflineInfoListener() {
 
          @Override
@@ -331,22 +517,6 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
       MP.addOfflineInfoListener(_offlineJobInfoListener);
    }
-
-//   private String checkBaseUrl(final String baseUrl) {
-//
-//      if (baseUrl == null || baseUrl.length() == 0) {
-//         return Messages.pref_map_validationError_baseUrlIsRequired;
-//      } else {
-//
-//         try {
-//            new URL(baseUrl);
-//         } catch (final MalformedURLException e) {
-//            return Messages.pref_map_validationError_invalidUrl;
-//         }
-//      }
-//
-//      return null;
-//   }
 
    private String checkMapProviderId(final String factoryId) {
 
@@ -494,6 +664,22 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       _isInUIUpdate = false;
    }
 
+//   private String checkBaseUrl(final String baseUrl) {
+//
+//      if (baseUrl == null || baseUrl.length() == 0) {
+//         return Messages.pref_map_validationError_baseUrlIsRequired;
+//      } else {
+//
+//         try {
+//            new URL(baseUrl);
+//         } catch (final MalformedURLException e) {
+//            return Messages.pref_map_validationError_invalidUrl;
+//         }
+//      }
+//
+//      return null;
+//   }
+
    @Override
    protected Control createContents(final Composite parent) {
 
@@ -502,6 +688,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       addListener();
 
       initializeDialogUnits(parent);
+
       final Composite container = createUI(parent);
 
       // load viewer
@@ -615,7 +802,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       _mpViewer = new TableViewer(table);
       _mpViewer.setUseHashlookup(true);
 
-      createUI_Columns(tableLayout);
+      defineAllColumns(tableLayout);
 
       /*
        * create table viewer
@@ -674,6 +861,10 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
             }
          }
       });
+
+      _mpViewer.setComparator(_mpComparator);
+
+      updateUI_SetSortDirection(_mpComparator.__sortColumnId, _mpComparator.__sortDirection);
    }
 
    private void createUI_30_Buttons(final Composite container) {
@@ -1100,207 +1291,6 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       }
    }
 
-   /*
-    * create columns
-    */
-   private void createUI_Columns(final TableColumnLayout tableLayout) {
-
-      TableViewerColumn tvc;
-      TableColumn tc;
-
-      {
-         /*
-          * Column: server type
-          */
-         tvc = new TableViewerColumn(_mpViewer, SWT.LEAD);
-         tc = tvc.getColumn();
-         tc.setToolTipText(Messages.Pref_Map_Viewer_Column_Lbl_ServerType_Tooltip);
-         tvc.setLabelProvider(new CellLabelProvider() {
-            @Override
-            public void update(final ViewerCell cell) {
-
-               final MP mapProvider = (MP) cell.getElement();
-
-               if (mapProvider instanceof MPWms) {
-                  cell.setText(Messages.Pref_Map_Viewer_Column_ContentServerTypeWms);
-               } else if (mapProvider instanceof MPCustom) {
-                  cell.setText(Messages.Pref_Map_Viewer_Column_ContentServerTypeCustom);
-               } else if (mapProvider instanceof MPProfile) {
-                  cell.setText(Messages.Pref_Map_Viewer_Column_ContentServerTypeMapProfile);
-               } else if (mapProvider instanceof MPPlugin) {
-                  cell.setText(Messages.Pref_Map_Viewer_Column_ContentServerTypePlugin);
-               } else {
-                  cell.setText(UI.EMPTY_STRING);
-               }
-            }
-         });
-
-         tableLayout.setColumnData(tvc.getColumn(), new ColumnPixelData(_pc.convertWidthInCharsToPixels(4)));
-      }
-      {
-         /*
-          * Column: map provider
-          */
-
-         tvc = new TableViewerColumn(_mpViewer, SWT.LEAD);
-         tc = tvc.getColumn();
-         tc.setText(Messages.Pref_Map_Viewer_Column_Lbl_MapProvider);
-         tvc.setLabelProvider(new CellLabelProvider() {
-            @Override
-            public void update(final ViewerCell cell) {
-
-               final MP mapProvider = (MP) cell.getElement();
-
-               cell.setText(mapProvider.getName());
-            }
-         });
-
-         tableLayout.setColumnData(tvc.getColumn(), new ColumnWeightData(20));
-      }
-      {
-         /*
-          * Column: offline path
-          */
-
-         tvc = new TableViewerColumn(_mpViewer, SWT.LEAD);
-         tc = tvc.getColumn();
-         tc.setText(Messages.Pref_Map_Viewer_Column_Lbl_OfflinePath);
-         tvc.setLabelProvider(new CellLabelProvider() {
-            @Override
-            public void update(final ViewerCell cell) {
-
-               final MP mapProvider = (MP) cell.getElement();
-
-               cell.setText(mapProvider.getOfflineFolder());
-            }
-         });
-
-         tableLayout.setColumnData(tvc.getColumn(), new ColumnWeightData(10));
-      }
-      {
-         /*
-          * Column: Includes hillshading
-          */
-
-         tvc = new TableViewerColumn(_mpViewer, SWT.TRAIL);
-         tc = tvc.getColumn();
-         tc.setText(Messages.Pref_Map_Viewer_Column_IsHillshading);
-         tc.setToolTipText(Messages.Pref_Map_Viewer_Column_IsHillshading_Tooltip);
-         tvc.setLabelProvider(new CellLabelProvider() {
-            @Override
-            public void update(final ViewerCell cell) {
-
-               final MP mapProvider = (MP) cell.getElement();
-
-               cell.setText(mapProvider.isIncludesHillshading() ? APP_TRUE : UI.EMPTY_STRING);
-            }
-         });
-
-         tableLayout.setColumnData(tvc.getColumn(), new ColumnPixelData(_pc.convertWidthInCharsToPixels(8)));
-      }
-      {
-         /*
-          * Column: Is transparent layer
-          */
-
-         tvc = new TableViewerColumn(_mpViewer, SWT.TRAIL);
-         tc = tvc.getColumn();
-         tc.setText(Messages.Pref_Map_Viewer_Column_IsTransparent);
-         tc.setToolTipText(Messages.Pref_Map_Viewer_Column_IsTransparent_Tooltip);
-         tvc.setLabelProvider(new CellLabelProvider() {
-            @Override
-            public void update(final ViewerCell cell) {
-
-               final MP mapProvider = (MP) cell.getElement();
-
-               cell.setText(mapProvider.isTransparentLayer() ? APP_TRUE : UI.EMPTY_STRING);
-            }
-         });
-
-         tableLayout.setColumnData(tvc.getColumn(), new ColumnPixelData(_pc.convertWidthInCharsToPixels(8)));
-      }
-      {
-         /*
-          * Column: layer
-          */
-
-         tvc = new TableViewerColumn(_mpViewer, SWT.TRAIL);
-         tc = tvc.getColumn();
-         tc.setText(Messages.Pref_Map_Viewer_Column_Lbl_Layer);
-         tvc.setLabelProvider(new CellLabelProvider() {
-            @Override
-            public void update(final ViewerCell cell) {
-
-               String layer = UI.EMPTY_STRING;
-
-               final MP mapProvider = (MP) cell.getElement();
-               if (mapProvider instanceof MPWms) {
-
-                  final MPWms wmsMapProvider = (MPWms) mapProvider;
-
-                  final StringBuilder sb = new StringBuilder();
-                  sb.append(wmsMapProvider.getAvailableLayers());
-
-                  layer = sb.toString();
-               }
-               cell.setText(layer);
-            }
-         });
-
-         tableLayout.setColumnData(tvc.getColumn(), new ColumnPixelData(_pc.convertWidthInCharsToPixels(10)));
-      }
-      {
-         /*
-          * Column: offline file counter
-          */
-
-         tvc = new TableViewerColumn(_mpViewer, SWT.TRAIL);
-         tc = tvc.getColumn();
-         tc.setText(Messages.Pref_Map_Viewer_Column_Lbl_OfflineFileCounter);
-         tvc.setLabelProvider(new CellLabelProvider() {
-            @Override
-            public void update(final ViewerCell cell) {
-
-               final int offlineTileCounter = ((MP) cell.getElement()).getOfflineFileCounter();
-               if (offlineTileCounter == MP.OFFLINE_INFO_NOT_READ) {
-                  cell.setText(Messages.pref_map_lable_NA);
-               } else if (offlineTileCounter > 0) {
-                  cell.setText(Integer.toString(offlineTileCounter));
-               } else {
-                  cell.setText(UI.DASH_WITH_SPACE);
-               }
-            }
-         });
-
-         tableLayout.setColumnData(tvc.getColumn(), new ColumnPixelData(_pc.convertWidthInCharsToPixels(10)));
-      }
-      {
-         /*
-          * Column: offline file size
-          */
-
-         tvc = new TableViewerColumn(_mpViewer, SWT.TRAIL);
-         tc = tvc.getColumn();
-         tc.setText(Messages.Pref_Map_Viewer_Column_Lbl_OfflineFileSize);
-         tvc.setLabelProvider(new CellLabelProvider() {
-            @Override
-            public void update(final ViewerCell cell) {
-
-               final long offlineTileSize = ((MP) cell.getElement()).getOfflineFileSize();
-               if (offlineTileSize == MP.OFFLINE_INFO_NOT_READ) {
-                  cell.setText(Messages.pref_map_lable_NA);
-               } else if (offlineTileSize > 0) {
-                  cell.setText(_nf.format((float) offlineTileSize / 1024 / 1024));
-               } else {
-                  cell.setText(UI.DASH_WITH_SPACE);
-               }
-            }
-         });
-
-         tableLayout.setColumnData(tvc.getColumn(), new ColumnPixelData(_pc.convertWidthInCharsToPixels(12)));
-      }
-   }
-
    /**
     * Creates a {@link MPWms} from the capabilities url
     *
@@ -1442,54 +1432,249 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       }
    }
 
-//   /**
-//    * !!!!!!!!!!!!!! RECURSIVE !!!!!!!!!!!!!!!!!<br>
-//    * <br>
-//    * Deletes all files and subdirectories. If a deletion fails, the method stops attempting to
-//    * delete and returns false. <br>
-//    * <br>
-//    * !!!!!!!!!!!!!! RECURSIVE !!!!!!!!!!!!!!!!!
-//    *
-//    * @param file
-//    * @param monitor
-//    * @return Returns <code>true</code> if all deletions were successful
-//    */
-//   private void deleteDir(final File file, final IProgressMonitor monitor) {
-//
-//      if (monitor.isCanceled()) {
-//         return;
-//      }
-//
-//      if (file.isDirectory()) {
-//
-//         final String[] children = file.list();
-//
-//         for (final String element : children) {
-//            deleteDir(new File(file, element), monitor);
-//         }
-//
-//         // update monitor every 200ms
-//         final long time = System.currentTimeMillis();
-//         if (time > _deleteUIUpdateTime + 200) {
-//            _deleteUIUpdateTime = time;
-//            monitor.subTask(NLS.bind(Messages.Pref_Map_MonitorMessage_DeletedOfflineImages, file.toString()));
-//         }
-//
-//      }
-//
-//      // The directory is now empty so delete it
-//      final boolean isDeleted = file.delete();
-//
-//      // canceled must be checked before isDeleted because this returns false when the monitor is canceled
-//      if (monitor.isCanceled()) {
-//         return;
-//      }
-//
-//      if (isDeleted == false) {
-//         _isDeleteError = true;
-//         monitor.setCanceled(true);
-//      }
-//   }
+   /**
+    * Create all columns
+    */
+   private void defineAllColumns(final TableColumnLayout tableLayout) {
+
+      defineColumn_10_ServerType(tableLayout);
+      defineColumn_20_MapProviderName(tableLayout);
+      defineColumn_30_OfflinePath(tableLayout);
+      defineColumn_40_Hillshading(tableLayout);
+      defineColumn_50_TransparentLayer(tableLayout);
+      defineColumn_60_WMSLayers(tableLayout);
+      defineColumn_70_OfflineFileCounter(tableLayout);
+      defineColumn_72_OfflineFileSize(tableLayout);
+   }
+
+   /**
+    * Column: Server type
+    */
+   private void defineColumn_10_ServerType(final TableColumnLayout tableLayout) {
+
+      final TableViewerColumn tvc = new TableViewerColumn(_mpViewer, SWT.LEAD);
+
+      final TableColumn tc = tvc.getColumn();
+      tc.setToolTipText(Messages.Pref_Map_Viewer_Column_Lbl_ServerType_Tooltip);
+      tc.setData(COLUMN_KEY_FOR_COLUMN_ID, COLUMN_MP_TYPE);
+      tc.addSelectionListener(_columnSortListener);
+
+      tvc.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final MP mapProvider = (MP) cell.getElement();
+
+            if (mapProvider instanceof MPWms) {
+               cell.setText(Messages.Pref_Map_Viewer_Column_ContentServerTypeWms);
+            } else if (mapProvider instanceof MPCustom) {
+               cell.setText(Messages.Pref_Map_Viewer_Column_ContentServerTypeCustom);
+            } else if (mapProvider instanceof MPProfile) {
+               cell.setText(Messages.Pref_Map_Viewer_Column_ContentServerTypeMapProfile);
+            } else if (mapProvider instanceof MPPlugin) {
+               cell.setText(Messages.Pref_Map_Viewer_Column_ContentServerTypePlugin);
+            } else {
+               cell.setText(UI.EMPTY_STRING);
+            }
+         }
+      });
+
+      tableLayout.setColumnData(tvc.getColumn(), new ColumnPixelData(_pc.convertWidthInCharsToPixels(4)));
+   }
+
+   /**
+    * Column: Map provider name
+    */
+   private void defineColumn_20_MapProviderName(final TableColumnLayout tableLayout) {
+
+      final TableViewerColumn tvc = new TableViewerColumn(_mpViewer, SWT.LEAD);
+
+      final TableColumn tc = tvc.getColumn();
+      tc.setText(Messages.Pref_Map_Viewer_Column_Lbl_MapProvider);
+      tc.addSelectionListener(_columnSortListener);
+      tc.setData(COLUMN_KEY_FOR_COLUMN_ID, COLUMN_MAP_PROVIDER_NAME);
+
+      tvc.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final MP mapProvider = (MP) cell.getElement();
+
+            cell.setText(mapProvider.getName());
+         }
+      });
+
+      tableLayout.setColumnData(tvc.getColumn(), new ColumnWeightData(20));
+   }
+
+   /**
+    * Column: offline path
+    */
+   private void defineColumn_30_OfflinePath(final TableColumnLayout tableLayout) {
+
+      final TableViewerColumn tvc = new TableViewerColumn(_mpViewer, SWT.LEAD);
+
+      final TableColumn tc = tvc.getColumn();
+      tc.setText(Messages.Pref_Map_Viewer_Column_Lbl_OfflinePath);
+      tc.setData(COLUMN_KEY_FOR_COLUMN_ID, COLUMN_OFFLINE_FOLDER_NAME);
+      tc.addSelectionListener(_columnSortListener);
+
+      tvc.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final MP mapProvider = (MP) cell.getElement();
+
+            cell.setText(mapProvider.getOfflineFolder());
+         }
+      });
+
+      tableLayout.setColumnData(tvc.getColumn(), new ColumnWeightData(10));
+   }
+
+   /**
+    * Column: Includes hillshading
+    */
+   private void defineColumn_40_Hillshading(final TableColumnLayout tableLayout) {
+
+      final TableViewerColumn tvc = new TableViewerColumn(_mpViewer, SWT.TRAIL);
+
+      final TableColumn tc = tvc.getColumn();
+      tc.setText(Messages.Pref_Map_Viewer_Column_IsHillshading);
+      tc.setToolTipText(Messages.Pref_Map_Viewer_Column_IsHillshading_Tooltip);
+      tc.addSelectionListener(_columnSortListener);
+      tc.setData(COLUMN_KEY_FOR_COLUMN_ID, COLUMN_IS_CONTAINS_HILLSHADING);
+
+      tvc.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final MP mapProvider = (MP) cell.getElement();
+
+            cell.setText(mapProvider.isIncludesHillshading() ? APP_TRUE : UI.EMPTY_STRING);
+         }
+      });
+
+      tableLayout.setColumnData(tvc.getColumn(), new ColumnPixelData(_pc.convertWidthInCharsToPixels(8)));
+   }
+
+   /**
+    * Column: Is transparent layer
+    */
+   private void defineColumn_50_TransparentLayer(final TableColumnLayout tableLayout) {
+
+      final TableViewerColumn tvc = new TableViewerColumn(_mpViewer, SWT.TRAIL);
+
+      final TableColumn tc = tvc.getColumn();
+      tc.setText(Messages.Pref_Map_Viewer_Column_IsTransparent);
+      tc.setToolTipText(Messages.Pref_Map_Viewer_Column_IsTransparent_Tooltip);
+      tc.addSelectionListener(_columnSortListener);
+      tc.setData(COLUMN_KEY_FOR_COLUMN_ID, COLUMN_IS_TRANSPARENT_LAYER);
+
+      tvc.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final MP mapProvider = (MP) cell.getElement();
+
+            cell.setText(mapProvider.isTransparentLayer() ? APP_TRUE : UI.EMPTY_STRING);
+         }
+      });
+
+      tableLayout.setColumnData(tvc.getColumn(), new ColumnPixelData(_pc.convertWidthInCharsToPixels(8)));
+   }
+
+   /**
+    * Column: WMS layers
+    */
+   private void defineColumn_60_WMSLayers(final TableColumnLayout tableLayout) {
+
+      final TableViewerColumn tvc = new TableViewerColumn(_mpViewer, SWT.TRAIL);
+
+      final TableColumn tc = tvc.getColumn();
+      tc.setText(Messages.Pref_Map_Viewer_Column_Lbl_Layer);
+      tc.addSelectionListener(_columnSortListener);
+
+      tvc.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            String layer = UI.EMPTY_STRING;
+
+            final MP mapProvider = (MP) cell.getElement();
+            if (mapProvider instanceof MPWms) {
+
+               final MPWms wmsMapProvider = (MPWms) mapProvider;
+
+               final StringBuilder sb = new StringBuilder();
+               sb.append(wmsMapProvider.getAvailableLayers());
+
+               layer = sb.toString();
+            }
+            cell.setText(layer);
+         }
+      });
+
+      tableLayout.setColumnData(tvc.getColumn(), new ColumnPixelData(_pc.convertWidthInCharsToPixels(10)));
+   }
+
+   /**
+    * Column: Offline file counter
+    */
+   private void defineColumn_70_OfflineFileCounter(final TableColumnLayout tableLayout) {
+
+      final TableViewerColumn tvc = new TableViewerColumn(_mpViewer, SWT.TRAIL);
+
+      final TableColumn tc = tvc.getColumn();
+      tc.setText(Messages.Pref_Map_Viewer_Column_Lbl_OfflineFileCounter);
+      tc.addSelectionListener(_columnSortListener);
+
+      tvc.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final int offlineTileCounter = ((MP) cell.getElement()).getOfflineFileCounter();
+            if (offlineTileCounter == MP.OFFLINE_INFO_NOT_READ) {
+               cell.setText(Messages.pref_map_lable_NA);
+            } else if (offlineTileCounter > 0) {
+               cell.setText(Integer.toString(offlineTileCounter));
+            } else {
+               cell.setText(UI.DASH_WITH_SPACE);
+            }
+         }
+      });
+
+      tableLayout.setColumnData(tvc.getColumn(), new ColumnPixelData(_pc.convertWidthInCharsToPixels(10)));
+   }
+
+   /**
+    * Column: Offline file size
+    */
+   private void defineColumn_72_OfflineFileSize(final TableColumnLayout tableLayout) {
+
+      final TableViewerColumn tvc = new TableViewerColumn(_mpViewer, SWT.TRAIL);
+
+      final TableColumn tc = tvc.getColumn();
+      tc.setText(Messages.Pref_Map_Viewer_Column_Lbl_OfflineFileSize);
+      tc.addSelectionListener(_columnSortListener);
+
+      tvc.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final long offlineTileSize = ((MP) cell.getElement()).getOfflineFileSize();
+            if (offlineTileSize == MP.OFFLINE_INFO_NOT_READ) {
+               cell.setText(Messages.pref_map_lable_NA);
+            } else if (offlineTileSize > 0) {
+               cell.setText(_nf.format((float) offlineTileSize / 1024 / 1024));
+            } else {
+               cell.setText(UI.DASH_WITH_SPACE);
+            }
+         }
+      });
+
+      tableLayout.setColumnData(tvc.getColumn(), new ColumnPixelData(_pc.convertWidthInCharsToPixels(12)));
+   }
 
    private void deleteFile(final String filePath) {
 
@@ -1544,6 +1729,55 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
       super.dispose();
    }
+
+//   /**
+//    * !!!!!!!!!!!!!! RECURSIVE !!!!!!!!!!!!!!!!!<br>
+//    * <br>
+//    * Deletes all files and subdirectories. If a deletion fails, the method stops attempting to
+//    * delete and returns false. <br>
+//    * <br>
+//    * !!!!!!!!!!!!!! RECURSIVE !!!!!!!!!!!!!!!!!
+//    *
+//    * @param file
+//    * @param monitor
+//    * @return Returns <code>true</code> if all deletions were successful
+//    */
+//   private void deleteDir(final File file, final IProgressMonitor monitor) {
+//
+//      if (monitor.isCanceled()) {
+//         return;
+//      }
+//
+//      if (file.isDirectory()) {
+//
+//         final String[] children = file.list();
+//
+//         for (final String element : children) {
+//            deleteDir(new File(file, element), monitor);
+//         }
+//
+//         // update monitor every 200ms
+//         final long time = System.currentTimeMillis();
+//         if (time > _deleteUIUpdateTime + 200) {
+//            _deleteUIUpdateTime = time;
+//            monitor.subTask(NLS.bind(Messages.Pref_Map_MonitorMessage_DeletedOfflineImages, file.toString()));
+//         }
+//
+//      }
+//
+//      // The directory is now empty so delete it
+//      final boolean isDeleted = file.delete();
+//
+//      // canceled must be checked before isDeleted because this returns false when the monitor is canceled
+//      if (monitor.isCanceled()) {
+//         return;
+//      }
+//
+//      if (isDeleted == false) {
+//         _isDeleteError = true;
+//         monitor.setCanceled(true);
+//      }
+//   }
 
    private void doImportMP(final String importFilePath) {
 
@@ -1794,6 +2028,27 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       table.setSelection(table.getSelectionIndex());
 
       return new MapProviderNavigator(prevMapProvider, isNextNext == 1);
+   }
+
+   /**
+    * @param sortColumnId
+    * @return Returns the column widget by it's column id, when column id is not found then the
+    *         first column is returned.
+    */
+   private TableColumn getSortColumn(final String sortColumnId) {
+
+      final TableColumn[] allColumns = _mpViewer.getTable().getColumns();
+
+      for (final TableColumn column : allColumns) {
+
+         final String columnId = (String) column.getData(COLUMN_KEY_FOR_COLUMN_ID);
+
+         if (columnId != null && columnId.equals(sortColumnId)) {
+            return column;
+         }
+      }
+
+      return allColumns[0];
    }
 
    private String getTileLayerInfo(final MP mapProvider) {
@@ -2162,6 +2417,24 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       }
    }
 
+   private void onSelect_SortColumn(final SelectionEvent e) {
+
+//      _viewerContainer.setRedraw(false);
+//      {
+      // keep selection
+      final ISelection selectionBackup = _mpViewer.getSelection();
+
+      // toggle sorting
+      _mpComparator.setSortColumn(e.widget);
+      _mpViewer.refresh();
+
+      // reselect selection
+      _mpViewer.setSelection(selectionBackup, true);
+      _mpViewer.getTable().showSelection();
+//      }
+//      _viewerContainer.setRedraw(true);
+   }
+
    private void openConfigDialog() {
 
       if (_isModifiedMapProvider) {
@@ -2415,6 +2688,16 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       // set focus to selected map provider
       final Table table = _mpViewer.getTable();
       table.setSelection(table.getSelectionIndex());
+   }
+
+   private void restoreState_BeforeUI() {
+
+      // update sorting comparator
+      final String sortColumnId = Util.getStateString(_state, STATE_SORT_COLUMN_ID, COLUMN_MAP_PROVIDER);
+      final int sortDirection = Util.getStateInt(_state, STATE_SORT_COLUMN_DIRECTION, MapProviderComparator.ASCENDING);
+
+      _mpComparator.__sortColumnId = sortColumnId;
+      _mpComparator.__sortDirection = sortDirection;
    }
 
    private void runnableDropMapProvider(final DropTargetEvent event) {
@@ -3030,6 +3313,26 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       }
 
       _txtOfflineInfoTotal.setText(sbTotal.toString());
+   }
+
+   /**
+    * Set the sort column direction indicator for a column
+    *
+    * @param sortColumnId
+    * @param isAscendingSort
+    */
+   private void updateUI_SetSortDirection(final String sortColumnId, final int sortDirection) {
+
+      final int direction =
+            sortDirection == MapProviderComparator.ASCENDING ? SWT.UP
+                  : sortDirection == MapProviderComparator.DESCENDING ? SWT.DOWN
+                        : SWT.NONE;
+
+      final Table table = _mpViewer.getTable();
+      final TableColumn tc = getSortColumn(sortColumnId);
+
+      table.setSortColumn(tc);
+      table.setSortDirection(direction);
    }
 
    /**

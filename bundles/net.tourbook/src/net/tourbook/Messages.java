@@ -2001,8 +2001,10 @@ public class Messages extends NLS {
    public static String Slideout_Map2Provider_Column_MPType_Tooltip;
    public static String Slideout_Map2Provider_Column_MPType_WMS;
    public static String Slideout_Map2Provider_Column_TileUrl;
+   public static String Slideout_Map2Provider_Label_SelectedMapProvider;
    public static String Slideout_Map2Provider_Label_Tip;
    public static String Slideout_Map2Provider_Label_Tip_Tooltip;
+   public static String Slideout_Map2Provider_Label_Title;
    public static String Slideout_Map2Provider_MapProvider_Next_Tooltip;
    public static String Slideout_Map2Provider_MapProvider_Previous_Tooltip;
 
@@ -2031,8 +2033,6 @@ public class Messages extends NLS {
    public static String Slideout_Map_Options_Label_SliderPath_Color;
    public static String Slideout_Map_Options_Label_SliderPath_Width;
    public static String Slideout_Map_Options_Label_Title;
-
-   public static String Slideout_Map_Provider_Label_Title;
 
    public static String Slideout_Map_TourColors_Checkbox_ShowInChartToolbar_Tooltip;
    public static String Slideout_Map_TourColors_Label_Title;
