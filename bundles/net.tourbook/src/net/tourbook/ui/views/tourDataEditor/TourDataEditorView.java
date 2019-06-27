@@ -212,7 +212,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
    public static final String     ID                            = "net.tourbook.views.TourDataEditorView";                //$NON-NLS-1$
 
    /**
-    * On Linux an async selection event is fired since e4
+    * On Linux an asynch selection event is fired since e4
     */
    private static final String    FIX_LINUX_ASYNC_EVENT_1       = "FIX_LINUX_ASYNC_EVENT_1";                              //$NON-NLS-1$
    private static final String    FIX_LINUX_ASYNC_EVENT_2       = "FIX_LINUX_ASYNC_EVENT_2";                              //$NON-NLS-1$
