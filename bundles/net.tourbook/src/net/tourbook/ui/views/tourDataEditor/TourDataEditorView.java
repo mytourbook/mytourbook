@@ -176,11 +176,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DateTime;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
@@ -2889,22 +2887,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
       createFieldListener();
 
       createUI(parent);
-      final Display display = Display.getCurrent();
-      display.addFilter(SWT.KeyDown, new Listener() {
-         @Override
-         public void handleEvent(final Event e) {
-            if (((e.stateMask & SWT.CTRL) == SWT.CTRL) && (e.keyCode == 's')) {
-               if (isDirty()) {
-                  BusyIndicator.showWhile(display, new Runnable() {
-                     @Override
-                     public void run() {
-                        saveTourIntoDB();
-                     };
-                  });
-               }
-            }
-         }
-      });
 
       createMenus();
       createActions();
