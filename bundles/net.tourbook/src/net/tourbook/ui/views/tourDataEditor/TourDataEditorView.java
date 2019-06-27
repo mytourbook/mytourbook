@@ -2887,7 +2887,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
       createFieldListener();
 
       createUI(parent);
-
       createMenus();
       createActions();
 
