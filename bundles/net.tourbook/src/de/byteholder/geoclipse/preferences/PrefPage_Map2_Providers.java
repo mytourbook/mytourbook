@@ -64,6 +64,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -135,40 +136,45 @@ import org.geotools.data.ows.WMSRequest;
 
 public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenchPreferencePage {
 
-   private static final String APP_TRUE                       = net.tourbook.Messages.App__True;
+   private static final String           APP_TRUE   = net.tourbook.Messages.App__True;
 
-   public static final String  ID                             = "de.byteholder.geoclipse.preferences.PrefPage_Map2_Providers"; //$NON-NLS-1$
+   public static final String            ID         = "de.byteholder.geoclipse.preferences.PrefPage_Map2_Providers";                          //$NON-NLS-1$
 
-   private static final String CHARACTER_0                    = "0";                                                           //$NON-NLS-1$
+   private static final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
+   private static final IDialogSettings  _state     = TourbookPlugin.getState("de.byteholder.geoclipse.preferences.PrefPage_Map2_Providers"); //$NON-NLS-1$
 
-   private static final String XML_EXTENSION                  = ".xml";                                                        //$NON-NLS-1$
+   //
+
+   private static final String       STATE_SORT_COLUMN_DIRECTION    = "STATE_SORT_COLUMN_DIRECTION";   //$NON-NLS-1$
+   private static final String       STATE_SORT_COLUMN_ID           = "STATE_SORT_COLUMN_ID";          //$NON-NLS-1$
+
+   private static final String       CHARACTER_0                    = "0";                             //$NON-NLS-1$
+
+   private static final String       XML_EXTENSION                  = ".xml";                          //$NON-NLS-1$
 
    /**
     * max lenghth for map provider id and offline folder
     */
-   private static final int    MAX_ID_LENGTH                  = 24;
+   private static final int          MAX_ID_LENGTH                  = 24;
 
-   private static final String IMPORT_FILE_PATH               = "MapProvider_ImportFilePath";                                  //$NON-NLS-1$
-   private static final String EXPORT_FILE_PATH               = "MapProvider_ExportFilePath";                                  //$NON-NLS-1$
+   private static final String       IMPORT_FILE_PATH               = "MapProvider_ImportFilePath";    //$NON-NLS-1$
+   private static final String       EXPORT_FILE_PATH               = "MapProvider_ExportFilePath";    //$NON-NLS-1$
 
-   final static NumberFormat   _nf                            = NumberFormat.getNumberInstance();
+   private static final String       COLUMN_KEY_FOR_COLUMN_ID       = "ColumnId";
 
-   private static final String COLUMN_KEY_FOR_COLUMN_ID       = "ColumnId";
+   private static final String       COLUMN_IS_CONTAINS_HILLSHADING = "ContainsHillshading";           //$NON-NLS-1$
+   private static final String       COLUMN_IS_TRANSPARENT_LAYER    = "IsTransparentLayer";            //$NON-NLS-1$
+   private static final String       COLUMN_OFFLINE_FOLDER_NAME     = "OfflineFolderName";             //$NON-NLS-1$
+   private static final String       COLUMN_MAP_PROVIDER_NAME       = "MapProviderName";               //$NON-NLS-1$
+   private static final String       COLUMN_MP_TYPE                 = "MPType";                        //$NON-NLS-1$
+   private static final String       COLUMN_TILE_URL                = "TileUrl";                       //$NON-NLS-1$
 
-   private static final String COLUMN_IS_CONTAINS_HILLSHADING = "ContainsHillshading";                                         //$NON-NLS-1$
-   private static final String COLUMN_IS_TRANSPARENT_LAYER    = "IsTransparentLayer";                                          //$NON-NLS-1$
-   private static final String COLUMN_OFFLINE_FOLDER_NAME     = "OfflineFolderName";                                           //$NON-NLS-1$
-   private static final String COLUMN_MAP_PROVIDER_NAME       = "MapProviderName";                                             //$NON-NLS-1$
-   private static final String COLUMN_MP_TYPE                 = "MPType";                                                      //$NON-NLS-1$
-   private static final String COLUMN_TILE_URL                = "TileUrl";                                                     //$NON-NLS-1$
-
-   {
+   private final static NumberFormat _nf                            = NumberFormat.getNumberInstance();
+   static {
       _nf.setMinimumFractionDigits(2);
       _nf.setMaximumFractionDigits(2);
       _nf.setMinimumIntegerDigits(1);
    }
-
-   private final IPreferenceStore              _prefStore              = TourbookPlugin.getPrefStore();
 
    private TableViewer                         _mpViewer;
    private final MapProviderManager            _mpManager              = MapProviderManager.getInstance();
@@ -688,6 +694,8 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       addListener();
 
       initializeDialogUnits(parent);
+
+      restoreState_BeforeUI();
 
       final Composite container = createUI(parent);
 
@@ -2693,7 +2701,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
    private void restoreState_BeforeUI() {
 
       // update sorting comparator
-      final String sortColumnId = Util.getStateString(_state, STATE_SORT_COLUMN_ID, COLUMN_MAP_PROVIDER);
+      final String sortColumnId = Util.getStateString(_state, STATE_SORT_COLUMN_ID, COLUMN_MAP_PROVIDER_NAME);
       final int sortDirection = Util.getStateInt(_state, STATE_SORT_COLUMN_DIRECTION, MapProviderComparator.ASCENDING);
 
       _mpComparator.__sortColumnId = sortColumnId;
@@ -2802,14 +2810,12 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
    private void saveState() {
 
-      // offline info
-//      fPrefStore.setValue(IMappingPreferences.MAP_FACTORY_IS_READ_TILE_SIZE, fChkReadTileSize.getSelection());
+      _state.put(STATE_SORT_COLUMN_ID, _mpComparator.__sortColumnId);
+      _state.put(STATE_SORT_COLUMN_DIRECTION, _mpComparator.__sortDirection);
 
       // selected map provider
       if (_selectedMapProvider != null) {
-         _prefStore.setValue(//
-               IMappingPreferences.MAP_FACTORY_LAST_SELECTED_MAP_PROVIDER,
-               _selectedMapProvider.getId());
+         _prefStore.setValue(IMappingPreferences.MAP_FACTORY_LAST_SELECTED_MAP_PROVIDER, _selectedMapProvider.getId());
       }
    }
 
