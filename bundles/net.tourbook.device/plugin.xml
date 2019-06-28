@@ -89,6 +89,18 @@
             name="SportTracks (.fitlog)">
       </device>
    </extension>
+   
+   
+   <!-- FitLogEx -->
+   <extension	point="net.tourbook.deviceDataReader">
+
+      <device
+            class="net.tourbook.device.sporttracks.FitLogDeviceDataReader"
+            fileextension="fitlogex"
+            id="net.tourbook.device.SportTracks"
+            name="SportTracks (.fitlogex)">
+      </device>
+   </extension>
 
 
    <!-- GPX -->
