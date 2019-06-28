@@ -77,7 +77,6 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.StatusUtil;
-import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.database.FIELD_VALIDATION;
 import net.tourbook.database.TourDatabase;
@@ -6587,7 +6586,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          return _dateTimeCreated;
       }
 
-      _dateTimeCreated = Util.createDateTimeFromYMDhms(dateTimeCreated);
+      _dateTimeCreated = TimeTools.createDateTimeFromYMDhms(dateTimeCreated);
 
       return _dateTimeCreated;
    }
@@ -6602,7 +6601,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          return _dateTimeModified;
       }
 
-      _dateTimeModified = Util.createDateTimeFromYMDhms(dateTimeModified);
+      _dateTimeModified = TimeTools.createDateTimeFromYMDhms(dateTimeModified);
 
       return _dateTimeModified;
    }

@@ -139,6 +139,7 @@ public class MapProviderManager {
 
    private static final String ATTR_MP_NAME                        = "Name";                  //$NON-NLS-1$
    private static final String ATTR_MP_ID                          = "Id";                    //$NON-NLS-1$
+   private static final String ATTR_MP_DATE_TIME_MODIFIED          = "Modified";              //$NON-NLS-1$
    private static final String ATTR_MP_DESCRIPTION                 = "Description";           //$NON-NLS-1$
    private static final String ATTR_MP_IS_INCLUDES_HILLSHADING     = "isIncludesHillShading"; //$NON-NLS-1$
    private static final String ATTR_MP_IS_TRANSPARENT_LAYER        = "isTransparentLayer";    //$NON-NLS-1$
@@ -1481,6 +1482,8 @@ public class MapProviderManager {
          final Boolean xmlHasTopo = tagMapProvider.getBoolean(ATTR_MP_IS_INCLUDES_HILLSHADING);
          final Boolean xmlIsLayer = tagMapProvider.getBoolean(ATTR_MP_IS_TRANSPARENT_LAYER);
 
+         final Long xmlModified = Util.getXmlLong(tagMapProvider, ATTR_MP_DATE_TIME_MODIFIED, 0L);
+
          // zoom level
          final Integer xmlZoomMin = tagMapProvider.getInteger(ATTR_MP_ZOOM_LEVEL_MIN);
          final Integer xmlZoomMax = tagMapProvider.getInteger(ATTR_MP_ZOOM_LEVEL_MAX);
@@ -1587,6 +1590,7 @@ public class MapProviderManager {
             mapProvider.setOfflineFolder(xmlOfflineFolder);
             mapProvider.setIsTransparentLayer(xmlIsLayer == null ? false : xmlIsLayer);
             mapProvider.setIsIncludesHillshading(xmlHasTopo == null ? false : xmlHasTopo);
+            mapProvider.setDateTimeModified(xmlModified);
 
             // image
             mapProvider.setTileSize(xmlImageSize == null ? Integer.parseInt(DEFAULT_IMAGE_SIZE) : xmlImageSize);
@@ -2332,6 +2336,7 @@ public class MapProviderManager {
       tagMapProvider.putString(ATTR_MP_OFFLINE_FOLDER, mp.getOfflineFolder());
       tagMapProvider.putBoolean(ATTR_MP_IS_INCLUDES_HILLSHADING, mp.isIncludesHillshading());
       tagMapProvider.putBoolean(ATTR_MP_IS_TRANSPARENT_LAYER, mp.isTransparentLayer());
+      Util.setXmlLong(tagMapProvider, ATTR_MP_DATE_TIME_MODIFIED, mp.getDateTimeModified());
 
       // image
       tagMapProvider.putInteger(ATTR_MP_IMAGE_SIZE, mp.getTileSize());

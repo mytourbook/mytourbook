@@ -110,6 +110,7 @@ public class Messages extends NLS {
    public static String        Pref_Map_Viewer_Column_IsTransparent_Tooltip;
    public static String        Pref_Map_Viewer_Column_Lbl_Layer;
    public static String        Pref_Map_Viewer_Column_Lbl_MapProvider;
+   public static String        Pref_Map_Viewer_Column_Lbl_Modified;
    public static String        Pref_Map_Viewer_Column_Lbl_OfflineFileCounter;
    public static String        Pref_Map_Viewer_Column_Lbl_OfflineFileSize;
    public static String        Pref_Map_Viewer_Column_Lbl_OfflinePath;

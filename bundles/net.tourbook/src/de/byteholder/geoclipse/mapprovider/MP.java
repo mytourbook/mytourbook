@@ -36,6 +36,7 @@ import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -46,6 +47,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import net.tourbook.common.map.CommonMapProvider;
 import net.tourbook.common.map.GeoPosition;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 
 import org.eclipse.core.runtime.IPath;
@@ -233,34 +235,37 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
    /**
     * alpha values for the map provider, 100 is opaque, 0 is transparent
     */
-   private int     _profileAlpha                    = 100;
+   private int           _profileAlpha                    = 100;
 
-   private boolean _isProfileTransparentColors      = false;
-   private int[]   _profileTransparentColor         = null;
+   private boolean       _isProfileTransparentColors      = false;
+   private int[]         _profileTransparentColor         = null;
 
    /**
     * when <code>true</code> the color black is transparent
     */
-   private boolean _isProfileBlackTransparent;
+   private boolean       _isProfileBlackTransparent;
 
-   private boolean _isProfileBrightnessForNextMp    = false;
-   private int     _profileBrightnessValueForNextMp = 77;
+   private boolean       _isProfileBrightnessForNextMp    = false;
+   private int           _profileBrightnessValueForNextMp = 77;
 
    /**
     * The sort index is used to sort the map provider in the map provider list
     */
-   private int     _sortIndex;
+   private int           _sortIndex;
 
    /**
     * When <code>true</code> then the map provider is a layer for a specific topic with transparent
     * background which should be displyed over a map.
     */
-   private boolean _isTransparentLayer;
+   private boolean       _isTransparentLayer;
 
    /**
     * When <code>true</code> then the map provider shows a topographic within the map.
     */
-   private boolean _isIncludesHillshading;
+   private boolean       _isIncludesHillshading;
+
+   private long          _dateTimeModified_Long;
+   private ZonedDateTime _dateTimeModified_Zoned;
 
    /**
     */
@@ -545,6 +550,25 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
     */
    String getCustomTileKey() {
       return null;
+   }
+
+   public long getDateTimeModified() {
+      return _dateTimeModified_Long;
+   }
+
+   /**
+    * @return Returns {@link ZonedDateTime} when the tour was modified or <code>null</code> when
+    *         date/time is not available
+    */
+   public ZonedDateTime getDateTimeModified_Zoned() {
+
+      if (_dateTimeModified_Zoned != null || _dateTimeModified_Long == 0) {
+         return _dateTimeModified_Zoned;
+      }
+
+      _dateTimeModified_Zoned = TimeTools.createDateTimeFromYMDhms(_dateTimeModified_Long);
+
+      return _dateTimeModified_Zoned;
    }
 
    public int getDefaultZoomLevel() {
@@ -1313,6 +1337,10 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
 
    public void resetTileImageAvailability() {
       _tileCache.resetTileImageAvailability();
+   }
+
+   public void setDateTimeModified(final long dateTimeModified) {
+      _dateTimeModified_Long = dateTimeModified;
    }
 
    public void setDefaultZoomLevel(final int defaultZoomLevel) {

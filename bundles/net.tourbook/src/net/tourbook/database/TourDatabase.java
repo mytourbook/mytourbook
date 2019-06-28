@@ -2091,15 +2091,7 @@ public class TourDatabase {
        */
       tourData.getNumberOfHrZones();
 
-      final ZonedDateTime zdtNow = ZonedDateTime.now();
-
-      final long dtSaved = (zdtNow.getYear() * 10000000000L)
-            + (zdtNow.getMonthValue() * 100000000L)
-            + (zdtNow.getDayOfMonth() * 1000000L)
-            //
-            + (zdtNow.getHour() * 10000L)
-            + (zdtNow.getMinute() * 100L)
-            + zdtNow.getSecond();
+      final long dtSaved = TimeTools.createdNowAsYMDhms();
 
       checkUnsavedTransientInstances(tourData);
 

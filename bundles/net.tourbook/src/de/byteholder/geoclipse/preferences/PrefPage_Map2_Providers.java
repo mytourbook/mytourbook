@@ -136,7 +136,16 @@ import org.geotools.data.ows.WMSRequest;
 
 public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenchPreferencePage {
 
-   private static final String           APP_TRUE   = net.tourbook.Messages.App__True;
+// SET_FORMATTING_OFF
+
+   private static final String SLIDEOUT_MAP2_PROVIDER_COLUMN_MP_TYPE_CUSTOM   = net.tourbook.Messages.Slideout_Map2Provider_Column_MPType_Custom;
+   private static final String SLIDEOUT_MAP2_PROVIDER_COLUMN_MP_TYPE_INTERNAL = net.tourbook.Messages.Slideout_Map2Provider_Column_MPType_Internal;
+   private static final String SLIDEOUT_MAP2_PROVIDER_COLUMN_MP_TYPE_PROFILE  = net.tourbook.Messages.Slideout_Map2Provider_Column_MPType_Profile;
+   private static final String SLIDEOUT_MAP2_PROVIDER_COLUMN_MP_TYPE_WMS      = net.tourbook.Messages.Slideout_Map2Provider_Column_MPType_WMS;
+
+   private static final String APP_TRUE   = net.tourbook.Messages.App__True;
+
+// SET_FORMATTING_ON
 
    public static final String            ID         = "de.byteholder.geoclipse.preferences.PrefPage_Map2_Providers";                          //$NON-NLS-1$
 
@@ -160,13 +169,14 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
    private static final String       IMPORT_FILE_PATH               = "MapProvider_ImportFilePath";    //$NON-NLS-1$
    private static final String       EXPORT_FILE_PATH               = "MapProvider_ExportFilePath";    //$NON-NLS-1$
 
-   private static final String       COLUMN_KEY_FOR_COLUMN_ID       = "ColumnId";
+   private static final String       COLUMN_KEY_FOR_COLUMN_ID       = "ColumnId";                      //$NON-NLS-1$
 
    private static final String       COLUMN_IS_CONTAINS_HILLSHADING = "ContainsHillshading";           //$NON-NLS-1$
    private static final String       COLUMN_IS_TRANSPARENT_LAYER    = "IsTransparentLayer";            //$NON-NLS-1$
-   private static final String       COLUMN_OFFLINE_FOLDER_NAME     = "OfflineFolderName";             //$NON-NLS-1$
    private static final String       COLUMN_MAP_PROVIDER_NAME       = "MapProviderName";               //$NON-NLS-1$
+   private static final String       COLUMN_MODIFIED                = "Modified";                      //$NON-NLS-1$
    private static final String       COLUMN_MP_TYPE                 = "MPType";                        //$NON-NLS-1$
+   private static final String       COLUMN_OFFLINE_FOLDER_NAME     = "OfflineFolderName";             //$NON-NLS-1$
    private static final String       COLUMN_TILE_URL                = "TileUrl";                       //$NON-NLS-1$
 
    private final static NumberFormat _nf                            = NumberFormat.getNumberInstance();
@@ -310,6 +320,10 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
             rc = Boolean.compare(mp2.isTransparentLayer(), mp1.isTransparentLayer());
             break;
 
+         case COLUMN_MODIFIED:
+            rc = mp2.getDateTimeModified() - mp1.getDateTimeModified();
+            break;
+
          case COLUMN_MP_TYPE:
             rc = getMapProviderType(mp1).compareTo(getMapProviderType(mp2));
             break;
@@ -352,16 +366,16 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       private String getMapProviderType(final MP mapProvider) {
 
          if (mapProvider instanceof MPWms) {
-            return net.tourbook.Messages.Slideout_Map2Provider_Column_MPType_WMS;
+            return SLIDEOUT_MAP2_PROVIDER_COLUMN_MP_TYPE_WMS;
 
          } else if (mapProvider instanceof MPCustom) {
-            return net.tourbook.Messages.Slideout_Map2Provider_Column_MPType_Custom;
+            return SLIDEOUT_MAP2_PROVIDER_COLUMN_MP_TYPE_CUSTOM;
 
          } else if (mapProvider instanceof MPProfile) {
-            return net.tourbook.Messages.Slideout_Map2Provider_Column_MPType_Profile;
+            return SLIDEOUT_MAP2_PROVIDER_COLUMN_MP_TYPE_PROFILE;
 
          } else if (mapProvider instanceof MPPlugin) {
-            return net.tourbook.Messages.Slideout_Map2Provider_Column_MPType_Internal;
+            return SLIDEOUT_MAP2_PROVIDER_COLUMN_MP_TYPE_INTERNAL;
 
          } else {
             return UI.EMPTY_STRING;
@@ -1453,6 +1467,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       defineColumn_60_WMSLayers(tableLayout);
       defineColumn_70_OfflineFileCounter(tableLayout);
       defineColumn_72_OfflineFileSize(tableLayout);
+      defineColumn_80_Modified(tableLayout);
    }
 
    /**
@@ -1682,6 +1697,37 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       });
 
       tableLayout.setColumnData(tvc.getColumn(), new ColumnPixelData(_pc.convertWidthInCharsToPixels(12)));
+   }
+
+   /**
+    * Column: Modified
+    */
+   private void defineColumn_80_Modified(final TableColumnLayout tableLayout) {
+
+      final TableViewerColumn tvc = new TableViewerColumn(_mpViewer, SWT.TRAIL);
+
+      final TableColumn tc = tvc.getColumn();
+      tc.setText(Messages.Pref_Map_Viewer_Column_Lbl_Modified);
+      tc.setData(COLUMN_KEY_FOR_COLUMN_ID, COLUMN_MODIFIED);
+      tc.addSelectionListener(_columnSortListener);
+
+      tvc.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final long dtModified = ((MP) cell.getElement()).getDateTimeModified();
+
+            if (dtModified == 0) {
+               cell.setText(UI.SPACE);
+            } else {
+
+               final ZonedDateTime dtModifiedZoned = TimeTools.createDateTimeFromYMDhms(dtModified);
+               cell.setText(dtModifiedZoned.format(TimeTools.Formatter_DateTime_S));
+            }
+         }
+      });
+
+      tableLayout.setColumnData(tvc.getColumn(), new ColumnPixelData(_pc.convertWidthInCharsToPixels(18)));
    }
 
    private void deleteFile(final String filePath) {
@@ -3120,6 +3166,8 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
          }
       }
 
+      final long dtModified = TimeTools.createdNowAsYMDhms();
+
       // update fields
       mapProvider.setId(mpId);
       mapProvider.setName(mpName);
@@ -3127,6 +3175,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       mapProvider.setOfflineFolder(offlineFolder);
       mapProvider.setIsIncludesHillshading(_chkIsIncludesHillshading.getSelection());
       mapProvider.setIsTransparentLayer(_chkIsTransparentLayer.getSelection());
+      mapProvider.setDateTimeModified(dtModified);
 
       if (_isNewMapProvider) {
 
