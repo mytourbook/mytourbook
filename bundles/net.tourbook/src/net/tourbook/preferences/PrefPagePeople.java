@@ -113,7 +113,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
    public static final String     ID                        = "net.tourbook.preferences.PrefPagePeopleId"; //$NON-NLS-1$
 
    /**
-    * On Linux an asynch selection event is fired since e4
+    * On Linux an async selection event is fired since e4
     */
    private static final String    FIX_LINUX_ASYNC_EVENT_1   = "FIX_LINUX_ASYNC_EVENT_1";                   //$NON-NLS-1$
    private static final String    FIX_LINUX_ASYNC_EVENT_2   = "FIX_LINUX_ASYNC_EVENT_2";                   //$NON-NLS-1$
@@ -368,7 +368,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
             }
 
             /*
-             * algorithmus for avg pulse is changed in version 11.7 (break time is now ignored)
+             * algorithm for avg pulse is changed in version 11.7 (break time is now ignored)
              */
             originalTourData.computeAvg_Pulse();
 
@@ -1872,7 +1872,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
    private void onEditHrZones() {
 
       /*
-       * valication must be checked because the dialog can save the person and therefor the person
+       * validation must be checked because the dialog can save the person and therefore the person
        * must be valid
        */
       if (isPersonValid() == false) {
@@ -1941,7 +1941,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          updateUIFromPerson(_selectedPerson);
 
       } else {
-         // irgnore, this can happen when a refresh() of the table viewer is done
+         // ignore, this can happen when a refresh() of the table viewer is done
       }
 
       enableActions();
