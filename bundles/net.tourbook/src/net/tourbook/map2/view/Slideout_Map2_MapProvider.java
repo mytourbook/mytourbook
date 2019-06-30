@@ -37,7 +37,6 @@ import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.color.IColorSelectorListener;
-import net.tourbook.common.map.MapUI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.util.ColumnDefinition;
@@ -1082,7 +1081,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
 
             final MP mapProvider = (MP) cell.getElement();
 
-            cell.setImage(getMapProvider_TypeImage(mapProvider));
+            cell.setImage(MapProviderManager.getMapProvider_TypeImage(mapProvider));
             cell.setText(mapProvider.getName());
          }
       });
@@ -1240,46 +1239,6 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
       } else {
          return UI.EMPTY_STRING;
       }
-   }
-
-   private Image getMapProvider_TypeImage(final MP mapProvider) {
-
-      if (mapProvider.isTransparentLayer()) {
-
-         if (mapProvider.isIncludesHillshading()) {
-
-            return UI.IMAGE_REGISTRY.get(MapUI.MAP_PROVIDER_TRANSPARENT_HILL);
-
-         } else {
-
-            return UI.IMAGE_REGISTRY.get(MapUI.MAP_PROVIDER_TRANSPARENT);
-         }
-      }
-
-      if (mapProvider instanceof MPWms) {
-
-      } else if (mapProvider instanceof MPCustom) {
-
-         if (mapProvider.isIncludesHillshading()) {
-
-            return UI.IMAGE_REGISTRY.get(MapUI.MAP_PROVIDER_CUSTOM_HILL);
-
-         } else {
-
-            return UI.IMAGE_REGISTRY.get(MapUI.MAP_PROVIDER_CUSTOM);
-         }
-
-      } else if (mapProvider instanceof MPProfile) {
-
-         return UI.IMAGE_REGISTRY.get(MapUI.MAP_PROVIDER_PROFILE);
-
-
-      } else if (mapProvider instanceof MPPlugin) {
-
-         return UI.IMAGE_REGISTRY.get(MapUI.MAP_PROVIDER_INTERNAL);
-      }
-
-      return null;
    }
 
    @Override

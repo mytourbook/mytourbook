@@ -45,6 +45,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.map.GeoPosition;
+import net.tourbook.common.map.MapUI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
@@ -59,8 +60,10 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.WorkbenchException;
@@ -672,6 +675,47 @@ public class MapProviderManager {
 
    public static Map2View getMap2View() {
       return _map2View;
+   }
+
+   public static Image getMapProvider_TypeImage(final MP mapProvider) {
+
+      final ImageRegistry imageRegistry = net.tourbook.common.UI.IMAGE_REGISTRY;
+
+      if (mapProvider.isTransparentLayer()) {
+
+         if (mapProvider.isIncludesHillshading()) {
+
+            return imageRegistry.get(MapUI.MAP_PROVIDER_TRANSPARENT_HILL);
+
+         } else {
+
+            return imageRegistry.get(MapUI.MAP_PROVIDER_TRANSPARENT);
+         }
+      }
+
+      if (mapProvider instanceof MPWms) {
+
+      } else if (mapProvider instanceof MPCustom) {
+
+         if (mapProvider.isIncludesHillshading()) {
+
+            return imageRegistry.get(MapUI.MAP_PROVIDER_CUSTOM_HILL);
+
+         } else {
+
+            return imageRegistry.get(MapUI.MAP_PROVIDER_CUSTOM);
+         }
+
+      } else if (mapProvider instanceof MPProfile) {
+
+         return imageRegistry.get(MapUI.MAP_PROVIDER_PROFILE);
+
+      } else if (mapProvider instanceof MPPlugin) {
+
+         return imageRegistry.get(MapUI.MAP_PROVIDER_INTERNAL);
+      }
+
+      return null;
    }
 
    private static String getMapProviderType(final MP mapProvider) {
