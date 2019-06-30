@@ -71,11 +71,11 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
       SQL_SUM_COLUMNS = NL
 
-            + "SUM(CAST(TourDistance AS BIGINT)),        " + NL // 0   //$NON-NLS-1$
-            + "SUM(CAST(TourRecordingTime AS BIGINT)),   " + NL // 1   //$NON-NLS-1$
-            + "SUM(CAST(TourDrivingTime AS BIGINT)),     " + NL // 2   //$NON-NLS-1$
-            + "SUM(CAST(TourAltUp AS BIGINT)),           " + NL // 3   //$NON-NLS-1$
-            + "SUM(CAST(TourAltDown AS BIGINT)),         " + NL // 4   //$NON-NLS-1$
+            + "SUM( CAST(TourDistance AS BIGINT)),       " + NL // 0   //$NON-NLS-1$
+            + "SUM( CAST(TourRecordingTime AS BIGINT)),  " + NL // 1   //$NON-NLS-1$
+            + "SUM( CAST(TourDrivingTime AS BIGINT)),    " + NL // 2   //$NON-NLS-1$
+            + "SUM( CAST(TourAltUp AS BIGINT)),          " + NL // 3   //$NON-NLS-1$
+            + "SUM( CAST(TourAltDown AS BIGINT)),        " + NL // 4   //$NON-NLS-1$
             + "SUM(1),                                   " + NL // 5   //$NON-NLS-1$
             //
             + "MAX(MaxSpeed),                            " + NL // 6   //$NON-NLS-1$
@@ -89,16 +89,16 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             + "AVG( CASE WHEN WeatherWindSpd = 0   THEN NULL ELSE WeatherWindSpd END ),   " + NL //                              13   //$NON-NLS-1$
             + "AVG( CASE WHEN RestPulse = 0        THEN NULL ELSE RestPulse END ),        " + NL //                              14   //$NON-NLS-1$
             //
-            + "SUM(CAST(Calories AS BIGINT)),               " + NL // 15   //$NON-NLS-1$
-            + "SUM(CAST(Power_TotalWork AS BIGINT)),        " + NL // 16   //$NON-NLS-1$
+            + "SUM( CAST(Calories AS BIGINT)),              " + NL // 15   //$NON-NLS-1$
+            + "SUM( CAST(Power_TotalWork AS BIGINT)),       " + NL // 16   //$NON-NLS-1$
 
-            + "SUM(CAST(NumberOfTimeSlices AS BIGINT)),     " + NL // 17   //$NON-NLS-1$
-            + "SUM(CAST(NumberOfPhotos AS BIGINT)),         " + NL // 18   //$NON-NLS-1$
+            + "SUM( CAST(NumberOfTimeSlices AS BIGINT)),    " + NL // 17   //$NON-NLS-1$
+            + "SUM( CAST(NumberOfPhotos AS BIGINT)),        " + NL // 18   //$NON-NLS-1$
             //
-            + "SUM(CAST(FrontShiftCount AS BIGINT)),        " + NL // 19   //$NON-NLS-1$
-            + "SUM(CAST(RearShiftCount AS BIGINT)),         " + NL // 20   //$NON-NLS-1$
+            + "SUM( CAST(FrontShiftCount AS BIGINT)),       " + NL // 19   //$NON-NLS-1$
+            + "SUM( CAST(RearShiftCount AS BIGINT)),        " + NL // 20   //$NON-NLS-1$
 
-            + "SUM(CAST(surfing_NumberOfEvents AS BIGINT))  " + NL // 21   //$NON-NLS-1$
+            + "SUM( CAST(Surfing_NumberOfEvents AS BIGINT)) " + NL // 21   //$NON-NLS-1$
       ;
 
    }
@@ -128,11 +128,11 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
    long         colCounter;
    long         colCalories;
-   long         colDistance;
+   long         colTourDistance;
    float        colBodyWeight;
 
-   long         colRecordingTime;
-   long         colDrivingTime;
+   long         colTourRecordingTime;
+   long         colTourDrivingTime;
    long         colPausedTime;
 
    long         colAltitudeUp;
@@ -157,13 +157,13 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
    String       colWeekDay;
    int          colWeekYear;
 
-   int          colNumberOfTimeSlices;
-   int          colNumberOfPhotos;
+   long         colNumberOfTimeSlices;
+   long         colNumberOfPhotos;
 
    int          colDPTolerance;
 
-   int          colFrontShiftCount;
-   int          colRearShiftCount;
+   long         colFrontShiftCount;
+   long         colRearShiftCount;
 
    float        colCadenceMultiplier;
 
@@ -216,7 +216,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
    // ----------- SURFING ---------
 
-   int     col_Surfing_NumberOfEvents;
+   long    col_Surfing_NumberOfEvents;
    short   col_Surfing_MinSpeed_StartStop;
    short   col_Surfing_MinSpeed_Surfing;
    short   col_Surfing_MinTimeDuration;
@@ -239,21 +239,21 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
 // SET_FORMATTING_OFF
 
-      colDistance       = result.getLong(startIndex + 0);
+      colTourDistance      = result.getLong(startIndex + 0);
 
-      colRecordingTime  = result.getLong(startIndex + 1);
-      colDrivingTime    = result.getLong(startIndex + 2);
+      colTourRecordingTime = result.getLong(startIndex + 1);
+      colTourDrivingTime   = result.getLong(startIndex + 2);
 
-      colAltitudeUp     = result.getLong(startIndex + 3);
-      colAltitudeDown   = result.getLong(startIndex + 4);
+      colAltitudeUp        = result.getLong(startIndex + 3);
+      colAltitudeDown      = result.getLong(startIndex + 4);
 
       colCounter        = result.getLong(startIndex + 5);
 
       colMaxSpeed       = result.getFloat(startIndex + 6);
 
       // compute average speed/pace, prevent divide by 0
-      colAvgSpeed       = colDrivingTime == 0 ? 0 : 3.6f * colDistance / colDrivingTime;
-      colAvgPace        = colDistance == 0 ? 0 : colDrivingTime * 1000f / colDistance;
+      colAvgSpeed       = colTourDrivingTime == 0 ? 0 : 3.6f * colTourDistance / colTourDrivingTime;
+      colAvgPace        = colTourDistance == 0 ? 0 : colTourDrivingTime * 1000f / colTourDistance;
 
       colMaxAltitude    = result.getLong(startIndex + 7);
       colMaxPulse       = result.getLong(startIndex + 8);
@@ -269,17 +269,17 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       colCalories                = result.getLong(startIndex + 15);
       colPower_TotalWork         = result.getLong(startIndex + 16);
 
-      colNumberOfTimeSlices      = result.getInt(startIndex + 17);
-      colNumberOfPhotos          = result.getInt(startIndex + 18);
+      colNumberOfTimeSlices      = result.getLong(startIndex + 17);
+      colNumberOfPhotos          = result.getLong(startIndex + 18);
 
-      colFrontShiftCount         = result.getInt(startIndex + 19);
-      colRearShiftCount          = result.getInt(startIndex + 20);
+      colFrontShiftCount         = result.getLong(startIndex + 19);
+      colRearShiftCount          = result.getLong(startIndex + 20);
 
-      col_Surfing_NumberOfEvents = result.getInt(startIndex + 21);
+      col_Surfing_NumberOfEvents = result.getLong(startIndex + 21);
 
 // SET_FORMATTING_ON
 
-      colPausedTime = colRecordingTime - colDrivingTime;
+      colPausedTime = colTourRecordingTime - colTourDrivingTime;
    }
 
    @Override

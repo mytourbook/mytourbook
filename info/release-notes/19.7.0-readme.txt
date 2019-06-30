@@ -26,9 +26,10 @@ Improvements
 Bugfix   
 ======
 
-* 
+* Tourbook view
 
-  - 
+  - Fixed sqlstate 22003: The resulting value is outside the range for the data type INTEGER
+  
 
  
  
