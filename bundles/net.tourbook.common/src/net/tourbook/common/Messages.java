@@ -165,6 +165,10 @@ public class Messages extends NLS {
    public static String        Image__BookOpen_Themed;
    public static String        Image__ColumnCategory;
    public static String        Image__CustomizeProfilesColumns;
+   public static String        Image__MapProvider_Custom;
+   public static String        Image__MapProvider_Internal;
+   public static String        Image__MapProvider_Profile;
+   public static String        Image__MapProvider_Transparent;
    public static String        Image__options;
    public static String        Image__Pin_Themed;
    public static String        Image__TourOptions;

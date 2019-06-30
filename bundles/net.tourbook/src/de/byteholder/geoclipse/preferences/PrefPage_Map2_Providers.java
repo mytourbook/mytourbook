@@ -49,6 +49,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.map.MapUI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
@@ -111,6 +112,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.events.VerifyListener;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -1524,6 +1526,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
             final MP mapProvider = (MP) cell.getElement();
 
             cell.setText(mapProvider.getName());
+            cell.setImage(getMapProvider_TypeImage(mapProvider));
          }
       });
 
@@ -1979,6 +1982,30 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
             }
          }
       }
+   }
+
+   private Image getMapProvider_TypeImage(final MP mapProvider) {
+
+      if (mapProvider.isTransparentLayer()) {
+         return net.tourbook.common.UI.IMAGE_REGISTRY.get(MapUI.MAP_PROVIDER_TRANSPARENT);
+      }
+
+      if (mapProvider instanceof MPWms) {
+
+      } else if (mapProvider instanceof MPCustom) {
+
+         return net.tourbook.common.UI.IMAGE_REGISTRY.get(MapUI.MAP_PROVIDER_CUSTOM);
+
+      } else if (mapProvider instanceof MPProfile) {
+
+         return net.tourbook.common.UI.IMAGE_REGISTRY.get(MapUI.MAP_PROVIDER_PROFILE);
+
+      } else if (mapProvider instanceof MPPlugin) {
+
+         return net.tourbook.common.UI.IMAGE_REGISTRY.get(MapUI.MAP_PROVIDER_INTERNAL);
+      }
+
+      return null;
    }
 
    /**

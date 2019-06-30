@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -34,213 +34,203 @@ import org.eclipse.swt.graphics.Rectangle;
 
 public class PhotoUI {
 
-	public static Styler		PHOTO_FOLDER_STYLER;
-	public static Styler		PHOTO_FILE_STYLER;
+   public static Styler       PHOTO_FOLDER_STYLER;
+   public static Styler       PHOTO_FILE_STYLER;
 
-	public static final String	INVALID_PHOTO_IMAGE						= "INVALID_PHOTO_IMAGE";					//$NON-NLS-1$
-	public static final String	INVALID_PHOTO_IMAGE_HOVERED				= "INVALID_PHOTO_IMAGE_HOVERED";			//$NON-NLS-1$
+   public static final String INVALID_PHOTO_IMAGE                    = "INVALID_PHOTO_IMAGE";                    //$NON-NLS-1$
+   public static final String INVALID_PHOTO_IMAGE_HOVERED            = "INVALID_PHOTO_IMAGE_HOVERED";            //$NON-NLS-1$
 
-	public static final String	PHOTO_ANNOTATION_GPS_EXIF				= "PHOTO_ANNOTATION_GPS_EXIF";				//$NON-NLS-1$
-	public static final String	PHOTO_ANNOTATION_GPS_TOUR				= "PHOTO_ANNOTATION_GPS_TOUR";				//$NON-NLS-1$
-	public static final String	PHOTO_ANNOTATION_SAVED_IN_TOUR			= "PHOTO_ANNOTATION_SAVED_IN_TOUR";		//$NON-NLS-1$
-	public static final String	PHOTO_ANNOTATION_SAVED_IN_TOUR_HOVERED	= "PHOTO_ANNOTATION_SAVED_IN_TOUR_HOVERED"; //$NON-NLS-1$
+   public static final String PHOTO_ANNOTATION_GPS_EXIF              = "PHOTO_ANNOTATION_GPS_EXIF";              //$NON-NLS-1$
+   public static final String PHOTO_ANNOTATION_GPS_TOUR              = "PHOTO_ANNOTATION_GPS_TOUR";              //$NON-NLS-1$
+   public static final String PHOTO_ANNOTATION_SAVED_IN_TOUR         = "PHOTO_ANNOTATION_SAVED_IN_TOUR";         //$NON-NLS-1$
+   public static final String PHOTO_ANNOTATION_SAVED_IN_TOUR_HOVERED = "PHOTO_ANNOTATION_SAVED_IN_TOUR_HOVERED"; //$NON-NLS-1$
 
-	public static final String	PHOTO_RATING_STAR						= "PHOTO_RATING_STAR";						//$NON-NLS-1$
-	public static final String	PHOTO_RATING_STAR_AND_HOVERED			= "PHOTO_RATING_STAR_AND_HOVERED";			//$NON-NLS-1$
-	public static final String	PHOTO_RATING_STAR_DELETE				= "PHOTO_RATING_STAR_DELETE";				//$NON-NLS-1$
-	public static final String	PHOTO_RATING_STAR_DISABLED				= "PHOTO_RATING_STAR_DISABLED";			//$NON-NLS-1$
-	public static final String	PHOTO_RATING_STAR_HOVERED				= "PHOTO_RATING_STAR_HOVERED";				//$NON-NLS-1$
-	public static final String	PHOTO_RATING_STAR_NOT_HOVERED			= "PHOTO_RATING_STAR_NOT_HOVERED";			//$NON-NLS-1$
-	public static final String	PHOTO_RATING_STAR_NOT_HOVERED_BUT_SET	= "PHOTO_RATING_STAR_NOT_HOVERED_BUT_SET";	//$NON-NLS-1$
+   public static final String PHOTO_RATING_STAR                      = "PHOTO_RATING_STAR";                      //$NON-NLS-1$
+   public static final String PHOTO_RATING_STAR_AND_HOVERED          = "PHOTO_RATING_STAR_AND_HOVERED";          //$NON-NLS-1$
+   public static final String PHOTO_RATING_STAR_DELETE               = "PHOTO_RATING_STAR_DELETE";               //$NON-NLS-1$
+   public static final String PHOTO_RATING_STAR_DISABLED             = "PHOTO_RATING_STAR_DISABLED";             //$NON-NLS-1$
+   public static final String PHOTO_RATING_STAR_HOVERED              = "PHOTO_RATING_STAR_HOVERED";              //$NON-NLS-1$
+   public static final String PHOTO_RATING_STAR_NOT_HOVERED          = "PHOTO_RATING_STAR_NOT_HOVERED";          //$NON-NLS-1$
+   public static final String PHOTO_RATING_STAR_NOT_HOVERED_BUT_SET  = "PHOTO_RATING_STAR_NOT_HOVERED_BUT_SET";  //$NON-NLS-1$
 
-	static {
+   static {
 
-		setPhotoColorsFromPrefStore();
+      setPhotoColorsFromPrefStore();
 
-		/*
-		 * set photo styler
-		 */
-		PHOTO_FOLDER_STYLER = StyledString.createColorRegistryStyler(IPhotoPreferences.PHOTO_VIEWER_COLOR_FOLDER, null);
-		PHOTO_FILE_STYLER = StyledString.createColorRegistryStyler(IPhotoPreferences.PHOTO_VIEWER_COLOR_FILE, null);
+      /*
+       * set photo styler
+       */
+      PHOTO_FOLDER_STYLER = StyledString.createColorRegistryStyler(IPhotoPreferences.PHOTO_VIEWER_COLOR_FOLDER, null);
+      PHOTO_FILE_STYLER = StyledString.createColorRegistryStyler(IPhotoPreferences.PHOTO_VIEWER_COLOR_FILE, null);
 
-		final ImageRegistry imageRegistry = UI.IMAGE_REGISTRY;
+      final ImageRegistry imageRegistry = UI.IMAGE_REGISTRY;
 
-		imageRegistry.put(INVALID_PHOTO_IMAGE, //
-				Activator.getImageDescriptor(Messages.Image__PhotoInvalidPhotoImage));
-		imageRegistry.put(INVALID_PHOTO_IMAGE_HOVERED,//
-				Activator.getImageDescriptor(Messages.Image__PhotoInvalidPhotoImageHovered));
+// SET_FORMATTING_OFF
 
-		imageRegistry.put(PHOTO_ANNOTATION_GPS_EXIF, //
-				Activator.getImageDescriptor(Messages.Image__PhotoAnnotationExifGPS));
-		imageRegistry.put(PHOTO_ANNOTATION_GPS_TOUR,//
-				Activator.getImageDescriptor(Messages.Image__PhotoAnnotationTourGPS));
+      imageRegistry.put(INVALID_PHOTO_IMAGE,                      Activator.getImageDescriptor(Messages.Image__PhotoInvalidPhotoImage));
+      imageRegistry.put(INVALID_PHOTO_IMAGE_HOVERED,              Activator.getImageDescriptor(Messages.Image__PhotoInvalidPhotoImageHovered));
 
-		imageRegistry.put(PHOTO_ANNOTATION_SAVED_IN_TOUR,//
-				Activator.getImageDescriptor(Messages.Image__PhotoAnnotationSavedInTour));
-		imageRegistry.put(PHOTO_ANNOTATION_SAVED_IN_TOUR_HOVERED,//
-				Activator.getImageDescriptor(Messages.Image__PhotoAnnotationSavedInTourHovered));
+      imageRegistry.put(PHOTO_ANNOTATION_GPS_EXIF,                Activator.getImageDescriptor(Messages.Image__PhotoAnnotationExifGPS));
+      imageRegistry.put(PHOTO_ANNOTATION_GPS_TOUR,                Activator.getImageDescriptor(Messages.Image__PhotoAnnotationTourGPS));
 
-		imageRegistry.put(PHOTO_RATING_STAR,//
-				Activator.getImageDescriptor(Messages.Image__PhotoRatingStar));
-		imageRegistry.put(PHOTO_RATING_STAR_AND_HOVERED,//
-				Activator.getImageDescriptor(Messages.Image__PhotoRatingStarAndHovered));
-		imageRegistry.put(PHOTO_RATING_STAR_DISABLED,//
-				Activator.getImageDescriptor(Messages.Image__PhotoRatingStarDisabled));
-		imageRegistry.put(PHOTO_RATING_STAR_DELETE,//
-				Activator.getImageDescriptor(Messages.Image__PhotoRatingStarDelete));
-		imageRegistry.put(PHOTO_RATING_STAR_HOVERED,//
-				Activator.getImageDescriptor(Messages.Image__PhotoRatingStarHovered));
-		imageRegistry.put(PHOTO_RATING_STAR_NOT_HOVERED,//
-				Activator.getImageDescriptor(Messages.Image__PhotoRatingStarNotHovered));
-		imageRegistry.put(PHOTO_RATING_STAR_NOT_HOVERED_BUT_SET,//
-				Activator.getImageDescriptor(Messages.Image__PhotoRatingStarNotHoveredButSet));
+      imageRegistry.put(PHOTO_ANNOTATION_SAVED_IN_TOUR,           Activator.getImageDescriptor(Messages.Image__PhotoAnnotationSavedInTour));
+      imageRegistry.put(PHOTO_ANNOTATION_SAVED_IN_TOUR_HOVERED,   Activator.getImageDescriptor(Messages.Image__PhotoAnnotationSavedInTourHovered));
 
-	}
+      imageRegistry.put(PHOTO_RATING_STAR,                        Activator.getImageDescriptor(Messages.Image__PhotoRatingStar));
+      imageRegistry.put(PHOTO_RATING_STAR_AND_HOVERED,            Activator.getImageDescriptor(Messages.Image__PhotoRatingStarAndHovered));
+      imageRegistry.put(PHOTO_RATING_STAR_DISABLED,               Activator.getImageDescriptor(Messages.Image__PhotoRatingStarDisabled));
+      imageRegistry.put(PHOTO_RATING_STAR_DELETE,                 Activator.getImageDescriptor(Messages.Image__PhotoRatingStarDelete));
+      imageRegistry.put(PHOTO_RATING_STAR_HOVERED,                Activator.getImageDescriptor(Messages.Image__PhotoRatingStarHovered));
+      imageRegistry.put(PHOTO_RATING_STAR_NOT_HOVERED,            Activator.getImageDescriptor(Messages.Image__PhotoRatingStarNotHovered));
+      imageRegistry.put(PHOTO_RATING_STAR_NOT_HOVERED_BUT_SET,    Activator.getImageDescriptor(Messages.Image__PhotoRatingStarNotHoveredButSet));
 
-	/**
-	 * When this method is called, this class is loaded and initialized in the static initializer,
-	 * which is setting the colors in the color registry
-	 */
-	public static void init() {}
+// SET_FORMATTING_ON
+   }
 
-	/**
-	 * Paint photo image .
-	 * 
-	 * @param gc
-	 * @param photo
-	 * @param signImage
-	 * @param photoPosX
-	 * @param photoPosY
-	 * @param imageCanvasWidth
-	 * @param imageCanvasHeight
-	 * @param style
-	 *            Style how the image is painted in the image canvas:
-	 *            <p>
-	 *            {@link SWT#CENTER}, {@link SWT#TOP}<br>
-	 * @return Returns the rectangle where the image is painted.
-	 */
-	public static Rectangle paintPhotoImage(final GC gc,
-											final Photo photo,
-											final Image signImage,
-											final int photoPosX,
-											final int photoPosY,
-											final int imageCanvasWidth,
-											final int imageCanvasHeight,
-											final int style,
-											final Rectangle noHideArea) {
+   /**
+    * When this method is called, this class is loaded and initialized in the static initializer,
+    * which is setting the colors in the color registry
+    */
+   public static void init() {}
 
-		final Rectangle imageRect = signImage.getBounds();
-		final int _paintedImageWidth = imageRect.width;
-		final int _paintedImageHeight = imageRect.height;
+   /**
+    * Paint photo image .
+    *
+    * @param gc
+    * @param photo
+    * @param signImage
+    * @param photoPosX
+    * @param photoPosY
+    * @param imageCanvasWidth
+    * @param imageCanvasHeight
+    * @param style
+    *           Style how the image is painted in the image canvas:
+    *           <p>
+    *           {@link SWT#CENTER}, {@link SWT#TOP}<br>
+    * @return Returns the rectangle where the image is painted.
+    */
+   public static Rectangle paintPhotoImage(final GC gc,
+                                           final Photo photo,
+                                           final Image signImage,
+                                           final int photoPosX,
+                                           final int photoPosY,
+                                           final int imageCanvasWidth,
+                                           final int imageCanvasHeight,
+                                           final int style,
+                                           final Rectangle noHideArea) {
 
-		final Point bestSize = RendererHelper.getBestSize(
-				photo,
-				_paintedImageWidth,
-				_paintedImageHeight,
-				imageCanvasWidth,
-				imageCanvasHeight);
+      final Rectangle imageRect = signImage.getBounds();
+      final int _paintedImageWidth = imageRect.width;
+      final int _paintedImageHeight = imageRect.height;
 
-		final int paintedDest_Width = bestSize.x;
-		final int paintedDest_Height = bestSize.y;
+      final Point bestSize = RendererHelper.getBestSize(
+            photo,
+            _paintedImageWidth,
+            _paintedImageHeight,
+            imageCanvasWidth,
+            imageCanvasHeight);
 
-		// get center offset
-		final int centerOffsetX = (imageCanvasWidth - paintedDest_Width) / 2;
-		final int centerOffsetY = (imageCanvasHeight - paintedDest_Height) / 2;
+      final int paintedDest_Width = bestSize.x;
+      final int paintedDest_Height = bestSize.y;
 
-		int paintedDest_DevX = photoPosX;
-		int paintedDest_DevY = photoPosY;
+      // get center offset
+      final int centerOffsetX = (imageCanvasWidth - paintedDest_Width) / 2;
+      final int centerOffsetY = (imageCanvasHeight - paintedDest_Height) / 2;
 
-		if (style == SWT.TOP) {
+      int paintedDest_DevX = photoPosX;
+      int paintedDest_DevY = photoPosY;
 
-			paintedDest_DevX += centerOffsetX;
+      if (style == SWT.TOP) {
 
-		} else {
+         paintedDest_DevX += centerOffsetX;
 
-			// default is vertical/horizontal centerd
+      } else {
 
-			paintedDest_DevX += centerOffsetX;
-			paintedDest_DevY += centerOffsetY;
-		}
+         // default is vertical/horizontal centerd
 
-		final Rectangle rectPainted = new Rectangle(
-				paintedDest_DevX,
-				paintedDest_DevY,
-				paintedDest_Width,
-				paintedDest_Height);
+         paintedDest_DevX += centerOffsetX;
+         paintedDest_DevY += centerOffsetY;
+      }
 
-		if (noHideArea != null) {
+      final Rectangle rectPainted = new Rectangle(
+            paintedDest_DevX,
+            paintedDest_DevY,
+            paintedDest_Width,
+            paintedDest_Height);
 
-			if (rectPainted.intersects(noHideArea)) {
+      if (noHideArea != null) {
 
-				// prevent that the image is painted over the no hide area (this can be a marker label)
+         if (rectPainted.intersects(noHideArea)) {
 
-				rectPainted.y = noHideArea.y + noHideArea.height;
-			}
-		}
+            // prevent that the image is painted over the no hide area (this can be a marker label)
 
-		try {
+            rectPainted.y = noHideArea.y + noHideArea.height;
+         }
+      }
 
-			try {
+      try {
 
-				gc.setAntialias(SWT.ON);
-				gc.setInterpolation(SWT.HIGH);
+         try {
 
-//				gc.setBackground(gc.getDevice().getSystemColor(SWT.COLOR_WIDGET_LIGHT_SHADOW));
-//				gc.fillRectangle(photoPosX, photoPosY, imageCanvasWidth, imageCanvasHeight);
+            gc.setAntialias(SWT.ON);
+            gc.setInterpolation(SWT.HIGH);
 
-				gc.drawImage(signImage, //
-						0,
-						0,
-						_paintedImageWidth,
-						_paintedImageHeight,
-						//
-						rectPainted.x,
-						rectPainted.y,
-						rectPainted.width,
-						rectPainted.height);
+//            gc.setBackground(gc.getDevice().getSystemColor(SWT.COLOR_WIDGET_LIGHT_SHADOW));
+//            gc.fillRectangle(photoPosX, photoPosY, imageCanvasWidth, imageCanvasHeight);
 
-			} catch (final Exception e) {
+            gc.drawImage(signImage, //
+                  0,
+                  0,
+                  _paintedImageWidth,
+                  _paintedImageHeight,
+                  //
+                  rectPainted.x,
+                  rectPainted.y,
+                  rectPainted.width,
+                  rectPainted.height);
 
-				System.out.println("SWT exception occured when painting valid image " //$NON-NLS-1$
-						+ photo.imageFilePathName
-						+ " it's potentially this bug: https://bugs.eclipse.org/bugs/show_bug.cgi?id=375845"); //$NON-NLS-1$
+         } catch (final Exception e) {
 
-				// ensure image is valid after reloading
-				PhotoImageCache.disposeAll();
-			}
+            System.out.println("SWT exception occured when painting valid image " //$NON-NLS-1$
+                  + photo.imageFilePathName
+                  + " it's potentially this bug: https://bugs.eclipse.org/bugs/show_bug.cgi?id=375845"); //$NON-NLS-1$
 
-		} catch (final Exception e) {
+            // ensure image is valid after reloading
+            PhotoImageCache.disposeAll();
+         }
 
-			gc.drawString(e.getMessage(), photoPosX, photoPosY);
-		}
+      } catch (final Exception e) {
 
-		return rectPainted;
-	}
+         gc.drawString(e.getMessage(), photoPosX, photoPosY);
+      }
 
-	/**
-	 * Set photo colors in the JFace color registry from the pref store
-	 */
-	public static void setPhotoColorsFromPrefStore() {
+      return rectPainted;
+   }
 
-		// pref store var cannot be set from a static field because it can be null !!!
-		final IPreferenceStore prefStore = Activator.getDefault().getPreferenceStore();
+   /**
+    * Set photo colors in the JFace color registry from the pref store
+    */
+   public static void setPhotoColorsFromPrefStore() {
 
-		final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
+      // pref store var cannot be set from a static field because it can be null !!!
+      final IPreferenceStore prefStore = Activator.getDefault().getPreferenceStore();
 
-		colorRegistry.put(IPhotoPreferences.PHOTO_VIEWER_COLOR_FOREGROUND, //
-				PreferenceConverter.getColor(prefStore, IPhotoPreferences.PHOTO_VIEWER_COLOR_FOREGROUND));
+      final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
 
-		colorRegistry.put(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND, //
-				PreferenceConverter.getColor(prefStore, IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND));
+      colorRegistry.put(IPhotoPreferences.PHOTO_VIEWER_COLOR_FOREGROUND, //
+            PreferenceConverter.getColor(prefStore, IPhotoPreferences.PHOTO_VIEWER_COLOR_FOREGROUND));
 
-		colorRegistry.put(IPhotoPreferences.PHOTO_VIEWER_COLOR_SELECTION_FOREGROUND, //
-				PreferenceConverter.getColor(prefStore, IPhotoPreferences.PHOTO_VIEWER_COLOR_SELECTION_FOREGROUND));
+      colorRegistry.put(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND, //
+            PreferenceConverter.getColor(prefStore, IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND));
 
-		colorRegistry.put(IPhotoPreferences.PHOTO_VIEWER_COLOR_FOLDER, //
-				PreferenceConverter.getColor(prefStore, IPhotoPreferences.PHOTO_VIEWER_COLOR_FOLDER));
+      colorRegistry.put(IPhotoPreferences.PHOTO_VIEWER_COLOR_SELECTION_FOREGROUND, //
+            PreferenceConverter.getColor(prefStore, IPhotoPreferences.PHOTO_VIEWER_COLOR_SELECTION_FOREGROUND));
 
-		colorRegistry.put(IPhotoPreferences.PHOTO_VIEWER_COLOR_FILE, //
-				PreferenceConverter.getColor(prefStore, IPhotoPreferences.PHOTO_VIEWER_COLOR_FILE));
-	}
+      colorRegistry.put(IPhotoPreferences.PHOTO_VIEWER_COLOR_FOLDER, //
+            PreferenceConverter.getColor(prefStore, IPhotoPreferences.PHOTO_VIEWER_COLOR_FOLDER));
+
+      colorRegistry.put(IPhotoPreferences.PHOTO_VIEWER_COLOR_FILE, //
+            PreferenceConverter.getColor(prefStore, IPhotoPreferences.PHOTO_VIEWER_COLOR_FILE));
+   }
 
 }

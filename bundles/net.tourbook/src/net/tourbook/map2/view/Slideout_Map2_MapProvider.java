@@ -28,6 +28,7 @@ import de.byteholder.geoclipse.mapprovider.MapProviderManager;
 import de.byteholder.geoclipse.preferences.IMappingPreferences;
 import de.byteholder.geoclipse.preferences.PrefPage_Map2_Providers;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
@@ -35,6 +36,8 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.color.IColorSelectorListener;
+import net.tourbook.common.map.MapUI;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
@@ -125,6 +128,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
    private static final String PREF_MAP_VIEWER_COLUMN_IS_TRANSPARENT_TOOLTIP  = de.byteholder.geoclipse.preferences.Messages.Pref_Map_Viewer_Column_IsTransparent_Tooltip;
    private static final String PREF_MAP_VIEWER_COLUMN_IS_HILLSHADING          = de.byteholder.geoclipse.preferences.Messages.Pref_Map_Viewer_Column_IsHillshading;
    private static final String PREF_MAP_VIEWER_COLUMN_IS_HILLSHADING_TOOLTIP  = de.byteholder.geoclipse.preferences.Messages.Pref_Map_Viewer_Column_IsHillshading_Tooltip;
+   private static final String PREF_MAP_VIEWER_COLUMN_LBL_MODIFIED            = de.byteholder.geoclipse.preferences.Messages.Pref_Map_Viewer_Column_Lbl_Modified;
    private static final String PREF_MAP_VIEWER_COLUMN_LBL_MAP_PROVIDER        = de.byteholder.geoclipse.preferences.Messages.Pref_Map_Viewer_Column_Lbl_MapProvider;
 
 // SET_FORMATTING_ON
@@ -132,6 +136,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
    private static final String              COLUMN_IS_CONTAINS_HILLSHADING     = "ContainsHillshading";              //$NON-NLS-1$
    private static final String              COLUMN_IS_TRANSPARENT_LAYER        = "IsTransparentLayer";               //$NON-NLS-1$
    private static final String              COLUMN_IS_VISIBLE                  = "IsVisible";                        //$NON-NLS-1$
+   private static final String              COLUMN_MAP_MODIFIED                = "Modified";                         //$NON-NLS-1$
    private static final String              COLUMN_MAP_PROVIDER                = "MapProvider";                      //$NON-NLS-1$
    private static final String              COLUMN_MP_TYPE                     = "MPType";                           //$NON-NLS-1$
    private static final String              COLUMN_TILE_URL                    = "TileUrl";                          //$NON-NLS-1$
@@ -242,8 +247,12 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
                rc = Boolean.compare(mp2.isVisibleInUI(), mp1.isVisibleInUI());
                break;
 
+            case COLUMN_MAP_MODIFIED:
+               rc = mp1.getDateTimeModified() - mp2.getDateTimeModified();
+               break;
+
             case COLUMN_MP_TYPE:
-               rc = getMapProviderType(mp1).compareTo(getMapProviderType(mp2));
+               rc = getMapProvider_Type(mp1).compareTo(getMapProvider_Type(mp2));
                break;
 
             case COLUMN_TILE_URL:
@@ -999,6 +1008,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
       defineColumn_30_Hillshading();
       defineColumn_40_TransparentLayer();
       defineColumn_50_Url();
+      defineColumn_80_Modified();
    }
 
    /**
@@ -1041,7 +1051,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
 
             final MP mapProvider = (MP) cell.getElement();
 
-            cell.setText(getMapProviderType(mapProvider));
+            cell.setText(getMapProvider_Type(mapProvider));
          }
       });
    }
@@ -1068,6 +1078,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
 
             final MP mapProvider = (MP) cell.getElement();
 
+            cell.setImage(getMapProvider_TypeImage(mapProvider));
             cell.setText(mapProvider.getName());
          }
       });
@@ -1144,6 +1155,35 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
       });
    }
 
+   /**
+    * Column: Modified
+    */
+   private void defineColumn_80_Modified() {
+
+      final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_MAP_MODIFIED, SWT.LEAD);
+
+      colDef.setColumnName(PREF_MAP_VIEWER_COLUMN_LBL_MODIFIED);
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(18));
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final long dtModified = ((MP) cell.getElement()).getDateTimeModified();
+
+            if (dtModified == 0) {
+               cell.setText(UI.SPACE1);
+            } else {
+
+               final ZonedDateTime dtModifiedZoned = TimeTools.createDateTimeFromYMDhms(dtModified);
+               cell.setText(dtModifiedZoned.format(TimeTools.Formatter_DateTime_S));
+            }
+         }
+      });
+   }
+
    private void enableControls() {
 
    }
@@ -1179,7 +1219,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
       return _columnManager;
    }
 
-   private String getMapProviderType(final MP mapProvider) {
+   private String getMapProvider_Type(final MP mapProvider) {
 
       if (mapProvider instanceof MPWms) {
          return Messages.Slideout_Map2Provider_Column_MPType_WMS;
@@ -1196,6 +1236,30 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
       } else {
          return UI.EMPTY_STRING;
       }
+   }
+
+   private Image getMapProvider_TypeImage(final MP mapProvider) {
+
+      if (mapProvider.isTransparentLayer()) {
+         return UI.IMAGE_REGISTRY.get(MapUI.MAP_PROVIDER_TRANSPARENT);
+      }
+
+      if (mapProvider instanceof MPWms) {
+
+      } else if (mapProvider instanceof MPCustom) {
+
+         return UI.IMAGE_REGISTRY.get(MapUI.MAP_PROVIDER_CUSTOM);
+
+      } else if (mapProvider instanceof MPProfile) {
+
+         return UI.IMAGE_REGISTRY.get(MapUI.MAP_PROVIDER_PROFILE);
+
+      } else if (mapProvider instanceof MPPlugin) {
+
+         return UI.IMAGE_REGISTRY.get(MapUI.MAP_PROVIDER_INTERNAL);
+      }
+
+      return null;
    }
 
    @Override
