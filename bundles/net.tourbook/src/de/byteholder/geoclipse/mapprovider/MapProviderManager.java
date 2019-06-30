@@ -774,6 +774,94 @@ public class MapProviderManager {
       return null;
    }
 
+   public static String getTileLayerInfo(final MP mapProvider) {
+
+      final String layerInfo = UI.EMPTY_STRING;
+
+      if (mapProvider instanceof MPWms) {
+
+         // wms map provider
+
+         return ((MPWms) mapProvider).getCapabilitiesUrl();
+
+      } else if (mapProvider instanceof MPCustom) {
+
+         // custom map provider
+
+         return ((MPCustom) mapProvider).getCustomUrl();
+
+      } else if (mapProvider instanceof MPProfile) {
+
+         // map profile
+
+         return getTileLayerInfo_MPProfile((MPProfile) mapProvider);
+
+      } else if (mapProvider instanceof MPPlugin) {
+
+         // plugin map provider
+
+         return ((MPPlugin) mapProvider).getBaseURL();
+      }
+
+      return layerInfo;
+   }
+
+   private static String getTileLayerInfo_MPProfile(final MPProfile mpProfile) {
+
+      final StringBuilder sb = new StringBuilder();
+
+      for (final MPWrapper mpWrapper : mpProfile.getAllWrappers()) {
+
+         final MP mpWrapperMP = mpWrapper.getMP();
+
+         if (mpWrapper.isDisplayedInMap()) {
+
+            if (mpWrapperMP instanceof MPWms) {
+
+               // wms map provider
+
+               final MPWms wmsMapProvider = (MPWms) mpWrapperMP;
+
+               if (sb.length() > 0) {
+                  sb.append(UI.NEW_LINE);
+               }
+
+               sb.append(wmsMapProvider.getCapabilitiesUrl());
+
+            } else if (mpWrapperMP instanceof MPCustom) {
+
+               // custom map provider
+
+               final MPCustom customMapProvider = (MPCustom) mpWrapperMP;
+
+               if (sb.length() > 0) {
+                  sb.append(UI.NEW_LINE);
+               }
+
+               sb.append(customMapProvider.getCustomUrl());
+
+            } else if (mpWrapperMP instanceof MPProfile) {
+
+               // map profile
+
+            } else if (mpWrapperMP instanceof MPPlugin) {
+
+               // plugin map provider
+
+               final MPPlugin pluginMapProvider = (MPPlugin) mpWrapperMP;
+
+               if (sb.length() > 0) {
+                  sb.append(UI.NEW_LINE);
+               }
+
+               sb.append(pluginMapProvider.getBaseURL());
+            }
+         }
+      }
+
+      return sb.toString();
+   }
+
    /**
     * Load WMS capabilities, update the map provider by setting the UI state for the layers<br>
     * <br>

@@ -2106,93 +2106,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       return allColumns[0];
    }
 
-   private String getTileLayerInfo(final MP mapProvider) {
 
-      final String layerInfo = UI.EMPTY_STRING;
-
-      if (mapProvider instanceof MPWms) {
-
-         // wms map provider
-
-         return ((MPWms) mapProvider).getCapabilitiesUrl();
-
-      } else if (mapProvider instanceof MPCustom) {
-
-         // custom map provider
-
-         return ((MPCustom) mapProvider).getCustomUrl();
-
-      } else if (mapProvider instanceof MPProfile) {
-
-         // map profile
-
-         return getTileLayerInfo_MPProfile((MPProfile) mapProvider);
-
-      } else if (mapProvider instanceof MPPlugin) {
-
-         // plugin map provider
-
-         return ((MPPlugin) mapProvider).getBaseURL();
-      }
-
-      return layerInfo;
-   }
-
-   private String getTileLayerInfo_MPProfile(final MPProfile mpProfile) {
-
-      final StringBuilder sb = new StringBuilder();
-
-      for (final MPWrapper mpWrapper : mpProfile.getAllWrappers()) {
-
-         final MP mpWrapperMP = mpWrapper.getMP();
-
-         if (mpWrapper.isDisplayedInMap()) {
-
-            if (mpWrapperMP instanceof MPWms) {
-
-               // wms map provider
-
-               final MPWms wmsMapProvider = (MPWms) mpWrapperMP;
-
-               if (sb.length() > 0) {
-                  sb.append(UI.NEW_LINE);
-               }
-
-               sb.append(wmsMapProvider.getCapabilitiesUrl());
-
-            } else if (mpWrapperMP instanceof MPCustom) {
-
-               // custom map provider
-
-               final MPCustom customMapProvider = (MPCustom) mpWrapperMP;
-
-               if (sb.length() > 0) {
-                  sb.append(UI.NEW_LINE);
-               }
-
-               sb.append(customMapProvider.getCustomUrl());
-
-            } else if (mpWrapperMP instanceof MPProfile) {
-
-               // map profile
-
-            } else if (mpWrapperMP instanceof MPPlugin) {
-
-               // plugin map provider
-
-               final MPPlugin pluginMapProvider = (MPPlugin) mpWrapperMP;
-
-               if (sb.length() > 0) {
-                  sb.append(UI.NEW_LINE);
-               }
-
-               sb.append(pluginMapProvider.getBaseURL());
-            }
-         }
-      }
-
-      return sb.toString();
-   }
 
    @Override
    public void init(final IWorkbench workbench) {}
@@ -3222,7 +3136,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
          _txtDescription.setText(mapProvider.getDescription());
          _txtMapProviderId.setText(mapProvider.getId());
          _txtMapProviderName.setText(mapProvider.getName());
-         _txtLayers.setText(getTileLayerInfo(mapProvider));
+         _txtLayers.setText(MapProviderManager.getTileLayerInfo(mapProvider));
 
          // offline folder
          final String tileOSFolder = mapProvider.getOfflineFolder();

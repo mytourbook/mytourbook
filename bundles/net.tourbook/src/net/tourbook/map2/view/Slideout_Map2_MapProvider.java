@@ -46,6 +46,7 @@ import net.tourbook.common.util.EmptyContextMenuProvider;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.TableColumnDefinition;
 import net.tourbook.common.util.Util;
+import net.tourbook.map.MapProvider_InfoToolTip;
 import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.preferences.ITourbookPreferences;
 
@@ -160,6 +161,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
    private ColumnManager                    _columnManager;
    private TableColumnDefinition            _colDef_IsMPVisible;
    private MapProviderComparator            _mpComparator                      = new MapProviderComparator();
+   private MapProvider_InfoToolTip          _mpInfoToolTip;
 
    /**
     * Index of the column with the image, index can be changed when the columns are reordered with
@@ -736,6 +738,9 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
       });
 
       _mpViewer.setComparator(_mpComparator);
+
+      // set info tooltip provider
+      _mpInfoToolTip = new MapProvider_InfoToolTip(_mpViewer);
 
       updateUI_SetSortDirection(_mpComparator.__sortColumnId, _mpComparator.__sortDirection);
 
