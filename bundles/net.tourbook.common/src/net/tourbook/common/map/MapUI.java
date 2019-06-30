@@ -26,10 +26,12 @@ import org.eclipse.jface.resource.ImageRegistry;
  */
 public class MapUI {
 
-   public static final String MAP_PROVIDER_CUSTOM      = "map-provider-custom";      //$NON-NLS-1$
-   public static final String MAP_PROVIDER_INTERNAL    = "map-provider-internal";    //$NON-NLS-1$
-   public static final String MAP_PROVIDER_PROFILE     = "map-provider-profile";     //$NON-NLS-1$
-   public static final String MAP_PROVIDER_TRANSPARENT = "map-provider-transparent"; //$NON-NLS-1$
+   public static final String MAP_PROVIDER_CUSTOM           = "map-provider-custom";           //$NON-NLS-1$
+   public static final String MAP_PROVIDER_CUSTOM_HILL      = "map-provider-custom-hill";      //$NON-NLS-1$
+   public static final String MAP_PROVIDER_INTERNAL         = "map-provider-internal";         //$NON-NLS-1$
+   public static final String MAP_PROVIDER_PROFILE          = "map-provider-profile";          //$NON-NLS-1$
+   public static final String MAP_PROVIDER_TRANSPARENT      = "map-provider-transparent";      //$NON-NLS-1$
+   public static final String MAP_PROVIDER_TRANSPARENT_HILL = "map-provider-transparent-hill"; //$NON-NLS-1$
 
    static {
 
@@ -37,10 +39,12 @@ public class MapUI {
 
 // SET_FORMATTING_OFF
 
-      imageRegistry.put(MAP_PROVIDER_CUSTOM,       CommonActivator.getImageDescriptor(Messages.Image__MapProvider_Custom));
-      imageRegistry.put(MAP_PROVIDER_INTERNAL,     CommonActivator.getImageDescriptor(Messages.Image__MapProvider_Internal));
-      imageRegistry.put(MAP_PROVIDER_PROFILE,      CommonActivator.getImageDescriptor(Messages.Image__MapProvider_Profile));
-      imageRegistry.put(MAP_PROVIDER_TRANSPARENT,  CommonActivator.getImageDescriptor(Messages.Image__MapProvider_Transparent));
+      imageRegistry.put(MAP_PROVIDER_CUSTOM,             CommonActivator.getImageDescriptor(Messages.Image__MapProvider_Custom));
+      imageRegistry.put(MAP_PROVIDER_CUSTOM_HILL,        CommonActivator.getImageDescriptor(Messages.Image__MapProvider_Custom_Hill));
+      imageRegistry.put(MAP_PROVIDER_INTERNAL,           CommonActivator.getImageDescriptor(Messages.Image__MapProvider_Internal));
+      imageRegistry.put(MAP_PROVIDER_PROFILE,            CommonActivator.getImageDescriptor(Messages.Image__MapProvider_Profile));
+      imageRegistry.put(MAP_PROVIDER_TRANSPARENT,        CommonActivator.getImageDescriptor(Messages.Image__MapProvider_Transparent));
+      imageRegistry.put(MAP_PROVIDER_TRANSPARENT_HILL,   CommonActivator.getImageDescriptor(Messages.Image__MapProvider_Transparent_Hill));
 
 // SET_FORMATTING_ON
 

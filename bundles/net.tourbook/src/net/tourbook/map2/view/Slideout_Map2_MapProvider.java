@@ -33,6 +33,7 @@ import java.util.ArrayList;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.color.IColorSelectorListener;
@@ -121,6 +122,8 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
 // SET_FORMATTING_OFF
 
    private static final String APP_TRUE                                       = net.tourbook.Messages.App__True;
+   private static final String IMAGE_APP_NO                                   = net.tourbook.common.Messages.Image__App_No;
+   private static final String IMAGE_APP_YES                                  = net.tourbook.common.Messages.Image__App_Yes;
 
    private static final String MAP_ACTION_MANAGE_MAP_PROVIDERS                = net.tourbook.map2.Messages.Map_Action_ManageMapProviders;
 
@@ -1026,7 +1029,8 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
 
       _colDef_IsMPVisible.setLabelProvider(new CellLabelProvider() {
 
-         // !!! set dummy label provider, otherwise an error occures !!!
+         // !!! When using cell.setImage() then it is not centered !!!
+         // !!! Set dummy label provider, otherwise an error occures !!!
          @Override
          public void update(final ViewerCell cell) {}
       });
@@ -1241,18 +1245,34 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
    private Image getMapProvider_TypeImage(final MP mapProvider) {
 
       if (mapProvider.isTransparentLayer()) {
-         return UI.IMAGE_REGISTRY.get(MapUI.MAP_PROVIDER_TRANSPARENT);
+
+         if (mapProvider.isIncludesHillshading()) {
+
+            return UI.IMAGE_REGISTRY.get(MapUI.MAP_PROVIDER_TRANSPARENT_HILL);
+
+         } else {
+
+            return UI.IMAGE_REGISTRY.get(MapUI.MAP_PROVIDER_TRANSPARENT);
+         }
       }
 
       if (mapProvider instanceof MPWms) {
 
       } else if (mapProvider instanceof MPCustom) {
 
-         return UI.IMAGE_REGISTRY.get(MapUI.MAP_PROVIDER_CUSTOM);
+         if (mapProvider.isIncludesHillshading()) {
+
+            return UI.IMAGE_REGISTRY.get(MapUI.MAP_PROVIDER_CUSTOM_HILL);
+
+         } else {
+
+            return UI.IMAGE_REGISTRY.get(MapUI.MAP_PROVIDER_CUSTOM);
+         }
 
       } else if (mapProvider instanceof MPProfile) {
 
          return UI.IMAGE_REGISTRY.get(MapUI.MAP_PROVIDER_PROFILE);
+
 
       } else if (mapProvider instanceof MPPlugin) {
 
@@ -1349,8 +1369,8 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
 
       _pc = new PixelConverter(parent);
 
-      _imageYes = TourbookPlugin.getImageDescriptor(Messages.Image__State_OK).createImage();
-      _imageNo = TourbookPlugin.getImageDescriptor(Messages.Image__State_Error).createImage();
+      _imageYes = CommonActivator.getImageDescriptor(IMAGE_APP_YES).createImage();
+      _imageNo = CommonActivator.getImageDescriptor(IMAGE_APP_NO).createImage();
 
       _columnSortListener = widgetSelectedAdapter(e -> onSelect_SortColumn(e));
    }
