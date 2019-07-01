@@ -182,7 +182,6 @@ public class FitLogSAXHandler extends DefaultHandler {
    private class Lap {
 
       private long  lapEndTime;
-      private float durationSeconds;
    }
 
    public FitLogSAXHandler(final FitLogDeviceDataReader device,
@@ -720,9 +719,9 @@ public class FitLogSAXHandler extends DefaultHandler {
 
             final Lap lap = new Lap();
 
-            lap.durationSeconds = Float.parseFloat(durationSeconds);
+            final long lapDurationSeconds = (long) Float.parseFloat(durationSeconds);
 
-            final ZonedDateTime lapEndTime = ZonedDateTime.parse(startTime).plusSeconds((long) lap.durationSeconds);
+            final ZonedDateTime lapEndTime = ZonedDateTime.parse(startTime).plusSeconds(lapDurationSeconds);
             lap.lapEndTime = lapEndTime.toInstant().toEpochMilli();
 
             _currentActivity.laps.add(lap);
