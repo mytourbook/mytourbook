@@ -28,6 +28,8 @@ New
 
   - Moved from 8 cardinals to 16 cardinals wind direction
 
+  - The user can choose to activate the weather retrieval in the easy import config
+
 
  
 Improvements   
@@ -46,11 +48,20 @@ Bugfix
 
   - Fixed sqlstate 22003: The resulting value is outside the range for the data type INTEGER
   
-* Preferences
+* Preferences (Frederic)
 
   - Fixed Linux async problem: modify flag is set when opening the users page 
+
+* Easy Import Config (Frederic)
+
+  - Fix for when a user unchecks the option "Set Tour type" in the Easy Import Config
+
+* Marker deletion (Frederic)
+  
+  - Fixed NPE when deleting a marker in a specific case
  
  
+
 Translation    
 ===========
 
