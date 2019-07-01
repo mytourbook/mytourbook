@@ -1,6 +1,10 @@
 19.7.0                                                      ?. July 2019
  
-
+Update Docu
+===========
+   * Tour data editor
+     I can confirm that the documentation for Ctrl-Enter or Ctrl-Shilt-Enter do not work, however Ctrl-Tab and Ctrl-Shift-Tab is doing the same.
+   
 
 New   
 ===
