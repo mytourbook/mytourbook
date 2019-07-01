@@ -11,6 +11,22 @@ New
     
     - 3 state column sorting: ascending/descending/manual with drag & drop
 
+* Weather (need to purchase an API Key) (Frederic)
+  - Added the ability to retrieve the weather data that occured during a given
+    tour (using the WorldWeatherOnline API). The following data will be set in
+    the tour :
+    - Label containing the weather description
+    - Wind speed
+    - Wind direction
+    - Average Temperature
+    - Wind Chill 
+    - Max Temperature
+    - Min Temperature
+    - Humidity
+    - Precipitation
+    - Clouds
+
+  - Moved from 8 cardinals to 16 cardinals wind direction
 
 
  
@@ -30,7 +46,9 @@ Bugfix
 
   - Fixed sqlstate 22003: The resulting value is outside the range for the data type INTEGER
   
+* Preferences
 
+  - Fixed Linux async problem: modify flag is set when opening the users page 
  
  
 Translation    
