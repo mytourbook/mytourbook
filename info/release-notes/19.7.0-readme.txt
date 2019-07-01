@@ -63,7 +63,7 @@ Bugfix
 * Import
 
   - .fitlog file (Frederic)
-    Fix for importing laps
+    Fix for importing laps as markers
 
  
 
