@@ -56,10 +56,11 @@ Bugfix
 
   - Fix for when a user unchecks the option "Set Tour type" in the Easy Import Config
 
-* Marker deletion (Frederic)
-  
-  - Fixed NPE when deleting a marker in a specific case
- 
+* Import
+
+  - .fitlog file (Frederic)
+    Fix for importing laps
+
  
 
 Translation    
