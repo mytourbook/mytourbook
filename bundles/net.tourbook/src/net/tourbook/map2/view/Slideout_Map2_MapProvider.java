@@ -110,7 +110,6 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Widget;
 
@@ -194,7 +193,6 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
 
    private Button    _btnHideUnhideMP;
 
-   private Text      _txtSelectedMapProvider;
 
    private class ActionOpenMapProviderPreferences extends ActionOpenPrefDialog {
 
@@ -565,16 +563,6 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
       GridLayoutFactory.fillDefaults().applyTo(shellContainer);
       shellContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
       {
-         {
-            /*
-             * Selected map provider
-             */
-
-            // text: map provider
-            _txtSelectedMapProvider = new Text(shellContainer, SWT.READ_ONLY);
-            GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtSelectedMapProvider);
-         }
-
          _viewerContainer = new Composite(shellContainer, SWT.NONE);
          GridDataFactory.fillDefaults().grab(true, true).applyTo(_viewerContainer);
          GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
@@ -1435,7 +1423,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
       }
 
       // show map provider name
-      _txtSelectedMapProvider.setText(selectedMapProvider.getName());
+      updateTitleText(selectedMapProvider.getName());
 
       if (_isInUpdate) {
          return;

@@ -560,4 +560,9 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
       _titleText = titleText;
    }
 
+   protected void updateTitleText(final String titleText) {
+
+      _labelDragSlideout.setText(titleText);
+   }
+
 }

@@ -24,17 +24,16 @@ import de.byteholder.geoclipse.mapprovider.MapProviderManager;
 import de.byteholder.geoclipse.preferences.Messages;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.font.MTFont;
 import net.tourbook.common.util.ToolTip;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Button;
@@ -52,31 +51,40 @@ import org.eclipse.swt.widgets.Text;
  */
 public class MapProvider_InfoToolTip extends ToolTip {
 
-   private MP             _mp;
+   private static final int SHELL_MARGIN = 5;
 
-   private Control        _ttControl;
+   private MP               _mp;
 
-   private ColumnViewer   _tableViewer;
-   private ViewerCell     _viewerCell;
+   private Control          _ttControl;
 
-   private PixelConverter _pc;
+   private ColumnViewer     _tableViewer;
+   private ViewerCell       _viewerCell;
+
+   private boolean          _hasDescription;
+   private boolean          _hasTileLayerInfo;
+   private String           _tileLayerInfo;
+
+   /*
+    * UI resources
+    */
+   private Color _bgColor;
+   private Color _fgColor;
 
    /*
     * UI controls
     */
-   private Button _chkIsIncludesHillshading;
-   private Button _chkIsTransparentLayer;
+   private Composite _ttContainer;
 
-   private Label  _lblDescription;
-   private Label  _lblOfflineFolderInfo;
-   private Label  _lblLayers;
+   private Button    _chkIsIncludesHillshading;
+   private Button    _chkIsTransparentLayer;
 
-   private Text   _txtDescription;
-   private Text   _txtMapProviderName;
-   private Text   _txtMapProviderId;
-   private Text   _txtMapProviderType;
-   private Text   _txtOfflineFolder;
-   private Text   _txtLayers;
+   private Label     _lblMapProviderName;
+   private Label     _lblMapProviderId;
+   private Label     _lblMapProviderType;
+   private Label     _lblOfflineFolder;
+
+   private Text      _txtDescription;
+   private Text      _txtLayers;
 
    public MapProvider_InfoToolTip(final TableViewer tableViewer) {
 
@@ -99,31 +107,38 @@ public class MapProvider_InfoToolTip extends ToolTip {
    @Override
    public Composite createToolTipContentArea(final Event event, final Composite parent) {
 
-      _pc = new PixelConverter(parent);
+      setupContent();
+
+      initUI(parent);
 
       final Composite container = createUI(parent);
 
-      parent.addDisposeListener(new DisposeListener() {
-         @Override
-         public void widgetDisposed(final DisposeEvent e) {
-            container.dispose();
-         }
-      });
-
-      updateUI_MapProviderInfo(_mp);
+      updateUI(_mp);
+      updateUI_Layout();
 
       return container;
    }
 
    private Composite createUI(final Composite parent) {
 
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+      final Composite shellContainer = new Composite(parent, SWT.NONE);
+      shellContainer.setForeground(_fgColor);
+      shellContainer.setBackground(_bgColor);
+      GridLayoutFactory.fillDefaults().applyTo(shellContainer);
       {
-         createUI_10_MPInfo(container);
+         _ttContainer = new Composite(shellContainer, SWT.NONE);
+         _ttContainer.setForeground(_fgColor);
+         _ttContainer.setBackground(_bgColor);
+         GridLayoutFactory
+               .fillDefaults() //
+               .margins(SHELL_MARGIN, SHELL_MARGIN)
+               .applyTo(_ttContainer);
+         {
+            createUI_10_MPInfo(_ttContainer);
+         }
       }
 
-      return container;
+      return shellContainer;
    }
 
    private void createUI_10_MPInfo(final Composite parent) {
@@ -131,57 +146,69 @@ public class MapProvider_InfoToolTip extends ToolTip {
       final int secondColumnIndent = 20;
 
       final Composite container = new Composite(parent, SWT.NONE);
+      container.setForeground(_fgColor);
+      container.setBackground(_bgColor);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(4).spacing(5, 0).applyTo(container);
       {
          {
             /*
              * Map provider name
              */
 
-            final Label label = new Label(container, SWT.NONE);
-            label.setText(Messages.Pref_Map_Lable_MapProvider);
+            _lblMapProviderName = createUI_LabelValue(container, SWT.LEAD);
+            GridDataFactory.fillDefaults().span(4, 1).applyTo(_lblMapProviderName);
+            MTFont.setBannerFont(_lblMapProviderName);
 
-            // text: map provider
-            _txtMapProviderName = new Text(container, SWT.None);
-            GridDataFactory.fillDefaults().span(3, 1).applyTo(_txtMapProviderName);
+            // spacer
+            final Label spacer = createUI_Label(container, UI.EMPTY_STRING);
+            GridDataFactory.fillDefaults().span(4, 1).grab(true, false).hint(1, 10).applyTo(spacer);
          }
 
-         {
-            /*
-             * Description
-             */
+         /*
+          * Description
+          */
+         if (_hasDescription) {
 
             // label: description
-            _lblDescription = new Label(container, SWT.NONE);
-            _lblDescription.setText(Messages.Pref_Map_Label_Description);
-            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.TOP).applyTo(_lblDescription);
+            final Label label = createUI_Label(container, Messages.Map2Provider_Tooltip_Label_Description);
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.TOP).applyTo(label);
 
             // text: description
             _txtDescription = new Text(container, SWT.READ_ONLY | SWT.WRAP);
+            _txtDescription.setForeground(_fgColor);
+            _txtDescription.setBackground(_bgColor);
             GridDataFactory.fillDefaults()
                   .span(3, 1)
-                  .hint(_pc.convertWidthInCharsToPixels(50), _pc.convertHeightInCharsToPixels(5))
                   .grab(true, false)
                   .applyTo(_txtDescription);
+
+            // spacer
+            final Label spacer = createUI_Label(container, UI.EMPTY_STRING);
+            GridDataFactory.fillDefaults().span(4, 1).grab(true, false).hint(1, 5).applyTo(spacer);
          }
-         {
-            /*
-             * Layers
-             */
+
+         /*
+          * Layers
+          */
+         if (_hasTileLayerInfo) {
 
             // label
-            _lblLayers = new Label(container, SWT.NONE);
-            _lblLayers.setText(Messages.Pref_Map_Label_Layers);
-            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.TOP).applyTo(_lblLayers);
+            final Label label = createUI_Label(container, Messages.Map2Provider_Tooltip_Label_Layers);
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.TOP).applyTo(label);
 
             // text
             _txtLayers = new Text(container, SWT.READ_ONLY | SWT.WRAP);
+            _txtLayers.setForeground(_fgColor);
+            _txtLayers.setBackground(_bgColor);
             GridDataFactory.fillDefaults()
                   .span(3, 1)
-                  .hint(_pc.convertWidthInCharsToPixels(50), _pc.convertHeightInCharsToPixels(5))
                   .grab(true, false)
                   .applyTo(_txtLayers);
+
+            // spacer
+            final Label spacer = createUI_Label(container, UI.EMPTY_STRING);
+            GridDataFactory.fillDefaults().span(4, 1).grab(true, false).hint(1, 5).applyTo(spacer);
          }
 
          {
@@ -190,65 +217,37 @@ public class MapProvider_InfoToolTip extends ToolTip {
              */
 
             // label: offline folder
-            final Label label = new Label(container, SWT.NONE);
-            label.setText(Messages.Pref_Map_Lable_OfflineFolder);
+            createUI_Label(container, Messages.Map2Provider_Tooltip_Lable_OfflineFolder);
 
             // text: offline folder
-            _txtOfflineFolder = new Text(container, SWT.NONE);
-            GridDataFactory.fillDefaults()
-                  .hint(_pc.convertWidthInCharsToPixels(30), SWT.DEFAULT)
-                  .applyTo(_txtOfflineFolder);
-
-            // label: offline info
-            _lblOfflineFolderInfo = new Label(container, SWT.TRAIL);
-            GridDataFactory.fillDefaults()
-                  .span(2, 1)
-                  .grab(true, false)
-                  .align(SWT.END, SWT.CENTER)
-                  .applyTo(_lblOfflineFolderInfo);
+            _lblOfflineFolder = createUI_LabelValue(container, SWT.LEAD);
+            GridDataFactory.fillDefaults().applyTo(_lblOfflineFolder);
          }
-
-         {
-            /*
-             * Unique id
-             */
-
-            final Label label = new Label(container, SWT.NONE);
-            label.setText(Messages.Pref_Map_Lable_MapProviderId);
-
-            // text: map provider id
-            _txtMapProviderId = new Text(container, SWT.NONE);
-            GridDataFactory.fillDefaults().applyTo(_txtMapProviderId);
-
-         }
-
          {
             /*
              * Checkbox: Includes topo
              */
 
             _chkIsIncludesHillshading = new Button(container, SWT.CHECK);
-            _chkIsIncludesHillshading.setText(Messages.Pref_Map_Checkbox_IncludeHillshading);
-            _chkIsIncludesHillshading.setToolTipText(Messages.Pref_Map_Checkbox_IncludeHillshading_Tooltip);
+            _chkIsIncludesHillshading.setText(Messages.Map2Provider_Tooltip_Checkbox_IncludeHillshading);
+            _chkIsIncludesHillshading.setForeground(_fgColor);
+            _chkIsIncludesHillshading.setBackground(_bgColor);
             GridDataFactory.fillDefaults()
                   .grab(true, false)
                   .span(2, 1)
                   .indent(secondColumnIndent, 0)
                   .applyTo(_chkIsIncludesHillshading);
          }
-
          {
             /*
-             * Map provider type
+             * Unique id
              */
 
-            final Label label = new Label(container, SWT.NONE);
-            label.setText(Messages.Pref_Map_Lable_MapProviderType);
+            createUI_Label(container, Messages.Map2Provider_Tooltip_Lable_MapProviderId);
 
-            // text: map provider type
-            _txtMapProviderType = new Text(container, SWT.READ_ONLY);
-            _txtMapProviderType.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
-            GridDataFactory.fillDefaults().applyTo(_txtMapProviderType);
+            _lblMapProviderId = createUI_LabelValue(container, SWT.LEAD);
+            GridDataFactory.fillDefaults().applyTo(_lblMapProviderId);
+
          }
          {
             /*
@@ -256,15 +255,53 @@ public class MapProvider_InfoToolTip extends ToolTip {
              */
 
             _chkIsTransparentLayer = new Button(container, SWT.CHECK);
-            _chkIsTransparentLayer.setText(Messages.Pref_Map_Checkbox_IsTransparentLayer);
-            _chkIsTransparentLayer.setToolTipText(Messages.Pref_Map_Checkbox_IsTransparentLayer_Tooltip);
+            _chkIsTransparentLayer.setText(Messages.Map2Provider_Tooltip_Checkbox_IsTransparentLayer);
+            _chkIsTransparentLayer.setForeground(_fgColor);
+            _chkIsTransparentLayer.setBackground(_bgColor);
+
             GridDataFactory.fillDefaults()
                   .grab(true, false)
                   .span(2, 1)
                   .indent(secondColumnIndent, 0)
                   .applyTo(_chkIsTransparentLayer);
          }
+         {
+            /*
+             * Map provider type
+             */
+
+            createUI_Label(container, Messages.Map2Provider_Tooltip_Lable_MapProviderType);
+
+            _lblMapProviderType = createUI_LabelValue(container, SWT.LEAD);
+            GridDataFactory.fillDefaults()
+                  .grab(true, false)
+                  .span(3, 1)
+                  .applyTo(_lblMapProviderType);
+         }
       }
+   }
+
+   private Label createUI_Label(final Composite parent, final String labelText) {
+
+      final Label label = new Label(parent, SWT.NONE);
+      label.setForeground(_fgColor);
+      label.setBackground(_bgColor);
+
+      if (labelText != null) {
+         label.setText(labelText);
+      }
+
+      return label;
+   }
+
+   private Label createUI_LabelValue(final Composite parent, final int style) {
+
+      final Label label = new Label(parent, style);
+      GridDataFactory.fillDefaults().applyTo(label);
+      label.setForeground(_fgColor);
+      label.setBackground(_bgColor);
+
+      return label;
    }
 
    @Override
@@ -350,6 +387,22 @@ public class MapProvider_InfoToolTip extends ToolTip {
       return _viewerCell;
    }
 
+   private void initUI(final Composite parent) {
+
+      final Display display = parent.getDisplay();
+
+      _bgColor = display.getSystemColor(SWT.COLOR_INFO_BACKGROUND);
+      _fgColor = display.getSystemColor(SWT.COLOR_INFO_FOREGROUND);
+   }
+
+   private void setupContent() {
+
+      _tileLayerInfo = MapProviderManager.getTileLayerInfo(_mp);
+
+      _hasDescription = _mp.getDescription().trim().length() > 0;
+      _hasTileLayerInfo = _tileLayerInfo.length() > 0;
+   }
+
    @Override
    protected boolean shouldCreateToolTip(final Event event) {
 
@@ -379,47 +432,59 @@ public class MapProvider_InfoToolTip extends ToolTip {
       return isShowTooltip;
    }
 
-   private void updateUI_MapProviderInfo(final MP mapProvider) {
+   private void updateUI(final MP mapProvider) {
 
       // common fields
       _chkIsIncludesHillshading.setSelection(mapProvider.isIncludesHillshading());
       _chkIsTransparentLayer.setSelection(mapProvider.isTransparentLayer());
-      _txtDescription.setText(mapProvider.getDescription());
-      _txtMapProviderId.setText(mapProvider.getId());
-      _txtMapProviderName.setText(mapProvider.getName());
-      _txtLayers.setText(MapProviderManager.getTileLayerInfo(mapProvider));
+      _lblMapProviderId.setText(mapProvider.getId());
+      _lblMapProviderName.setText(mapProvider.getName());
+
+      if (_hasDescription) {
+         _txtDescription.setText(mapProvider.getDescription());
+      }
+      if (_hasTileLayerInfo) {
+         _txtLayers.setText(MapProviderManager.getTileLayerInfo(mapProvider));
+      }
 
       // offline folder
       final String tileOSFolder = mapProvider.getOfflineFolder();
       if (tileOSFolder == null) {
-         _txtOfflineFolder.setText(UI.EMPTY_STRING);
+         _lblOfflineFolder.setText(UI.EMPTY_STRING);
       } else {
-         _txtOfflineFolder.setText(tileOSFolder);
+         _lblOfflineFolder.setText(tileOSFolder);
       }
 
       if (mapProvider instanceof MPWms) {
 
          // wms map provider
 
-         _txtMapProviderType.setText(Messages.Pref_Map_ProviderType_Wms);
+         _lblMapProviderType.setText(Messages.Pref_Map_ProviderType_Wms);
 
       } else if (mapProvider instanceof MPCustom) {
 
          // custom map provider
 
-         _txtMapProviderType.setText(Messages.Pref_Map_ProviderType_Custom);
+         _lblMapProviderType.setText(Messages.Pref_Map_ProviderType_Custom);
 
       } else if (mapProvider instanceof MPProfile) {
 
          // map profile
 
-         _txtMapProviderType.setText(Messages.Pref_Map_ProviderType_MapProfile);
+         _lblMapProviderType.setText(Messages.Pref_Map_ProviderType_MapProfile);
 
       } else if (mapProvider instanceof MPPlugin) {
 
          // plugin map provider
 
-         _txtMapProviderType.setText(Messages.Pref_Map_ProviderType_Plugin);
+         _lblMapProviderType.setText(Messages.Pref_Map_ProviderType_Plugin);
       }
+   }
+
+   private void updateUI_Layout() {
+
+      // compute width for all controls and equalize column width for the different sections
+
+      _ttContainer.layout(true, true);
    }
 }

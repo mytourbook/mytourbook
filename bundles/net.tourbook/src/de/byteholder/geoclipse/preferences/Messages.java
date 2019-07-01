@@ -33,6 +33,15 @@ public class Messages extends NLS {
 
    public static String        External_Link_MapProviders;
 
+   public static String        Map2Provider_Tooltip_Checkbox_IncludeHillshading;
+   public static String        Map2Provider_Tooltip_Checkbox_IsTransparentLayer;
+   public static String        Map2Provider_Tooltip_Label_Description;
+   public static String        Map2Provider_Tooltip_Label_Layers;
+   public static String        Map2Provider_Tooltip_Lable_MapProvider;
+   public static String        Map2Provider_Tooltip_Lable_MapProviderId;
+   public static String        Map2Provider_Tooltip_Lable_MapProviderType;
+   public static String        Map2Provider_Tooltip_Lable_OfflineFolder;
+
    public static String        pref_cache_clear_cache;
    public static String        pref_cache_location;
    public static String        pref_cache_message_box_text;
