@@ -160,7 +160,6 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
    private ColumnManager                    _columnManager;
    private TableColumnDefinition            _colDef_IsMPVisible;
    private MapProviderComparator            _mpComparator                      = new MapProviderComparator();
-   private MapProvider_InfoToolTip          _mpInfoToolTip;
 
    /**
     * Index of the column with the image, index can be changed when the columns are reordered with
@@ -192,7 +191,6 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
    private Image     _imageNo;
 
    private Button    _btnHideUnhideMP;
-
 
    private class ActionOpenMapProviderPreferences extends ActionOpenPrefDialog {
 
@@ -375,6 +373,13 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
          // redraw to show changed image
          _mpViewer.getTable().redraw();
       }
+   }
+
+   /**
+    * This class is used to show a tooltip only when this cell is hovered
+    */
+   public abstract class TooltipLabelProvider extends CellLabelProvider {
+
    }
 
    /**
@@ -728,7 +733,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
       _mpViewer.setComparator(_mpComparator);
 
       // set info tooltip provider
-      _mpInfoToolTip = new MapProvider_InfoToolTip(_mpViewer);
+      new MapProvider_InfoToolTip(_mpViewer);
 
       updateUI_SetSortDirection(_mpComparator.__sortColumnId, _mpComparator.__sortDirection);
 
@@ -1068,7 +1073,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
 
       colDef.setColumnSelectionListener(_columnSortListener);
 
-      colDef.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new TooltipLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 

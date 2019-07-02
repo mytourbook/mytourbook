@@ -267,6 +267,8 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
    private long          _dateTimeModified_Long;
    private ZonedDateTime _dateTimeModified_Zoned;
 
+   private String        _onlineMapUrl;
+
    /**
     */
    public MP() {
@@ -786,6 +788,18 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
     */
    public String getOfflineFolder() {
       return _offlineFolder;
+   }
+
+   /**
+    * @return Returns the online map url, when not available an empty string is returned.
+    */
+   public String getOnlineMapUrl() {
+
+      if (_onlineMapUrl == null) {
+         return UI.EMPTY_STRING;
+      }
+
+      return _onlineMapUrl;
    }
 
    int getProfileAlpha() {
@@ -1443,6 +1457,10 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
     */
    public void setOfflineFolder(final String offlineFolder) {
       _offlineFolder = offlineFolder;
+   }
+
+   public void setOnlineMapUrl(final String onlineMapUrl) {
+      _onlineMapUrl = onlineMapUrl;
    }
 
    void setProfileAlpha(final int alpha) {

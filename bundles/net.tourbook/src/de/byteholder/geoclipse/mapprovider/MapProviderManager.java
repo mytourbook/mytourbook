@@ -147,6 +147,7 @@ public class MapProviderManager {
    private static final String ATTR_MP_IS_INCLUDES_HILLSHADING     = "isIncludesHillShading"; //$NON-NLS-1$
    private static final String ATTR_MP_IS_TRANSPARENT_LAYER        = "isTransparentLayer";    //$NON-NLS-1$
    private static final String ATTR_MP_OFFLINE_FOLDER              = "OfflineFolder";         //$NON-NLS-1$
+   private static final String ATTR_MP_ONLINE_MAP_URL              = "OnlineMapUrl";          //$NON-NLS-1$
    private static final String ATTR_MP_TYPE                        = "Type";                  //$NON-NLS-1$
    private static final String ATTR_MP_IMAGE_SIZE                  = "ImageSize";             //$NON-NLS-1$
    private static final String ATTR_MP_IMAGE_FORMAT                = "ImageFormat";           //$NON-NLS-1$
@@ -1605,8 +1606,9 @@ public class MapProviderManager {
          final String xmlMapProviderName = tagMapProvider.getString(ATTR_MP_NAME);
          final String xmlMapProviderType = tagMapProvider.getString(ATTR_MP_TYPE);
 
-         final String xmlOfflineFolder = tagMapProvider.getString(ATTR_MP_OFFLINE_FOLDER);
          final String xmlDescription = tagMapProvider.getString(ATTR_MP_DESCRIPTION);
+         final String xmlOfflineFolder = tagMapProvider.getString(ATTR_MP_OFFLINE_FOLDER);
+         final String xmlOnlineMapUrl = tagMapProvider.getString(ATTR_MP_ONLINE_MAP_URL);
 
          final Integer xmlImageSize = tagMapProvider.getInteger(ATTR_MP_IMAGE_SIZE);
          final String xmlImageFormat = tagMapProvider.getString(ATTR_MP_IMAGE_FORMAT);
@@ -1715,14 +1717,15 @@ public class MapProviderManager {
           */
          if (mapProvider != null) {
 
-            // id
-            mapProvider.setId(xmlMapProviderId);
-            mapProvider.setName(xmlMapProviderName);
+            // common
+            mapProvider.setDateTimeModified(xmlModified);
             mapProvider.setDescription(xmlDescription == null ? UI.EMPTY_STRING : xmlDescription);
-            mapProvider.setOfflineFolder(xmlOfflineFolder);
+            mapProvider.setId(xmlMapProviderId);
             mapProvider.setIsTransparentLayer(xmlIsLayer == null ? false : xmlIsLayer);
             mapProvider.setIsIncludesHillshading(xmlHasTopo == null ? false : xmlHasTopo);
-            mapProvider.setDateTimeModified(xmlModified);
+            mapProvider.setName(xmlMapProviderName);
+            mapProvider.setOfflineFolder(xmlOfflineFolder);
+            mapProvider.setOnlineMapUrl(xmlOnlineMapUrl);
 
             // image
             mapProvider.setTileSize(xmlImageSize == null ? Integer.parseInt(DEFAULT_IMAGE_SIZE) : xmlImageSize);
@@ -2462,10 +2465,11 @@ public class MapProviderManager {
       /*
        * set common fields
        */
+      tagMapProvider.putString(ATTR_MP_DESCRIPTION, mp.getDescription());
       tagMapProvider.putString(ATTR_MP_ID, mp.getId());
       tagMapProvider.putString(ATTR_MP_NAME, mp.getName());
-      tagMapProvider.putString(ATTR_MP_DESCRIPTION, mp.getDescription());
       tagMapProvider.putString(ATTR_MP_OFFLINE_FOLDER, mp.getOfflineFolder());
+      tagMapProvider.putString(ATTR_MP_ONLINE_MAP_URL, mp.getOnlineMapUrl());
       tagMapProvider.putBoolean(ATTR_MP_IS_INCLUDES_HILLSHADING, mp.isIncludesHillshading());
       tagMapProvider.putBoolean(ATTR_MP_IS_TRANSPARENT_LAYER, mp.isTransparentLayer());
       Util.setXmlLong(tagMapProvider, ATTR_MP_DATE_TIME_MODIFIED, mp.getDateTimeModified());

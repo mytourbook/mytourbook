@@ -26,9 +26,11 @@ import de.byteholder.geoclipse.preferences.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.util.ToolTip;
+import net.tourbook.map2.view.Slideout_Map2_MapProvider;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerCell;
@@ -278,6 +280,19 @@ public class MapProvider_InfoToolTip extends ToolTip {
                   .span(3, 1)
                   .applyTo(_lblMapProviderType);
          }
+//         {
+//            /*
+//             * Online map
+//             */
+//
+//            createUI_Label(container, Messages.Map2Provider_Tooltip_Lable_OnlineMap);
+//
+//            _linkOnlineMap = new Link(container, SWT.LEAD);
+//            GridDataFactory.fillDefaults()
+//                  .grab(true, false)
+//                  .span(3, 1)
+//                  .applyTo(_linkOnlineMap);
+//         }
       }
    }
 
@@ -307,20 +322,24 @@ public class MapProvider_InfoToolTip extends ToolTip {
    @Override
    public Point getLocation(final Point tipSize, final Event event) {
 
+      final int mouseX = event.x;
+
+      final Point mousePosition = new Point(mouseX, event.y);
+
       // try to position the tooltip at the bottom of the cell
-      final ViewerCell cell = _tableViewer.getCell(new Point(event.x, event.y));
+      final ViewerCell cell = _tableViewer.getCell(mousePosition);
 
       if (cell != null) {
 
          final Rectangle cellBounds = cell.getBounds();
-         final int cellWidth2 = cellBounds.width / 2;
+         final int cellWidth2 = (int) (cellBounds.width * 0.5);
          final int cellHeight = cellBounds.height;
 
          final int devXDefault = cellBounds.x + cellWidth2;// + cellBounds.width; //event.x;
          final int devY = cellBounds.y + cellHeight;
 
          /*
-          * check if the tooltip is outside of the tree, this can happen when the column is very
+          * Ceck if the tooltip is outside of the tree, this can happen when the column is very
           * wide and partly hidden
           */
          final Rectangle treeBounds = _ttControl.getBounds();
@@ -347,10 +366,24 @@ public class MapProvider_InfoToolTip extends ToolTip {
 
             if (isDevXAdjusted) {
 
-               ttDisplayLocation = _ttControl.toDisplay(devXDefault - cellWidth2 + 20 - tipSizeWidth, devY);
+               final int devXAdjusted = devXDefault - cellWidth2 + 20 - tipSizeWidth;
+
+               ttDisplayLocation = _ttControl.toDisplay(devXAdjusted, devY);
 
             } else {
-               ttDisplayLocation.x = ttDisplayLocation.x - tipSizeWidth;
+
+               int devXAdjusted = ttDisplayLocation.x - tipSizeWidth;
+
+               if (devXAdjusted + tipSizeWidth + 10 > mouseX) {
+
+                  // prevent that the tooltip of the adjusted x position is below the mouse
+
+                  final Point mouseDisplay = _ttControl.toDisplay(mouseX, devY);
+
+                  devXAdjusted = mouseDisplay.x - tipSizeWidth - 10;
+               }
+
+               ttDisplayLocation.x = devXAdjusted;
             }
          }
 
@@ -377,10 +410,23 @@ public class MapProvider_InfoToolTip extends ToolTip {
 
       if (_viewerCell != null) {
 
-         final Object cellElement = _viewerCell.getElement();
+         final CellLabelProvider labelProvider = _tableViewer.getLabelProvider(_viewerCell.getColumnIndex());
 
-         if (cellElement instanceof MP) {
-            _mp = (MP) cellElement;
+         if (labelProvider instanceof Slideout_Map2_MapProvider.TooltipLabelProvider) {
+
+            // show tooltip for this cell
+
+            final Object cellElement = _viewerCell.getElement();
+
+            if (cellElement instanceof MP) {
+               _mp = (MP) cellElement;
+            }
+
+         } else {
+
+            // tooltip is not dispalyed for this cell
+
+            _viewerCell = null;
          }
       }
 
@@ -411,6 +457,10 @@ public class MapProvider_InfoToolTip extends ToolTip {
       }
 
       if (_viewerCell == null) {
+
+         // show default tooltip
+         _ttControl.setToolTipText(null);
+
          return false;
       }
 

@@ -101,6 +101,7 @@ public class Messages extends NLS {
    public static String        Pref_Map_Lable_NotAvailable;
    public static String        Pref_Map_Lable_NotRetrieved;
    public static String        Pref_Map_Lable_OfflineFolder;
+   public static String        Pref_Map_Lable_OnlineMap;
    public static String        Pref_Map_Link_MapProvider;
    public static String        Pref_Map_Link_MapProvider_Tooltip;
    public static String        Pref_Map_ProviderType_Custom;
@@ -123,6 +124,7 @@ public class Messages extends NLS {
    public static String        Pref_Map_Viewer_Column_Lbl_OfflineFileCounter;
    public static String        Pref_Map_Viewer_Column_Lbl_OfflineFileSize;
    public static String        Pref_Map_Viewer_Column_Lbl_OfflinePath;
+   public static String        Pref_Map_Viewer_Column_Lbl_OnlineMapUrl;
    public static String        Pref_Map_Viewer_Column_Lbl_ServerType_Tooltip;
 
    public static String        PrefPageMapProviders_Pref_Map_FileDialog_AllFiles;

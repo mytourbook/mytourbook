@@ -74,6 +74,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Sash;
@@ -1167,6 +1168,15 @@ public class UI {
       // No attempt is made to constrain the bounds. The default
       // constraining behavior in Window will be used.
       return result;
+   }
+
+   /**
+    * @param url
+    * @return Returns the url with surrounding < a > tags which can be used for the {@link Link}
+    *         control.
+    */
+   public static String getLinkText(final String url) {
+      return LINK_TAG_START + url + LINK_TAG_END;
    }
 
    public static boolean isCtrlKey(final Event event) {
