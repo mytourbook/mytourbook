@@ -15,6 +15,24 @@ New
     
     - 3 state column sorting: ascending/descending/manual with drag & drop
 
+* Weather (need to purchase an API Key) (Frederic)
+  - Added the ability to retrieve the weather data that occured during a given
+    tour (using the WorldWeatherOnline API). The following data will be set in
+    the tour :
+    - Label containing the weather description
+    - Wind speed
+    - Wind direction
+    - Average Temperature
+    - Wind Chill 
+    - Max Temperature
+    - Min Temperature
+    - Humidity
+    - Precipitation
+    - Clouds
+
+  - Moved from 8 cardinals to 16 cardinals wind direction
+
+  - The user can choose to activate the weather retrieval in the easy import config
 
 
  
@@ -39,9 +57,25 @@ Bugfix
 
   - Fixed sqlstate 22003: The resulting value is outside the range for the data type INTEGER
   
+* Preferences (Frederic)
+
+  - Fixed Linux async problem: modify flag is set when opening the users page 
+
+* Easy Import Config (Frederic)
+
+  - Fix for when a user unchecks the option "Set Tour type" in the Easy Import Config
+
+* Marker deletion (Frederic)
+
+  - Fixed NPE when deleting a marker in a specific case
+
+* Import
+
+  - .fitlog file (Frederic)
+    Fix for importing laps as markers
 
  
- 
+
 Translation    
 ===========
 
