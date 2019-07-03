@@ -79,43 +79,48 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * this will manage all map providers
+ * This will manage all 2D map providers
  */
 public class MapProviderManager {
+
+   private static final String PREF_MAP_PROVIDER_TYPE_CUSTOM      = de.byteholder.geoclipse.preferences.Messages.Pref_Map_ProviderType_Custom;
+   private static final String PREF_MAP_PROVIDER_TYPE_MAP_PROFILE = de.byteholder.geoclipse.preferences.Messages.Pref_Map_ProviderType_MapProfile;
+   private static final String PREF_MAP_PROVIDER_TYPE_PLUGIN      = de.byteholder.geoclipse.preferences.Messages.Pref_Map_ProviderType_Plugin;
+   private static final String PREF_MAP_PROVIDER_TYPE_WMS         = de.byteholder.geoclipse.preferences.Messages.Pref_Map_ProviderType_Wms;
 
    /**
     * This prefix is used to sort the map providers at the end when the map provider is not a map
     * profile
     */
-   private static final String SINGLE_MAP_PROVIDER_NAME_PREFIX = "_";          //$NON-NLS-1$
+   private static final String SINGLE_MAP_PROVIDER_NAME_PREFIX    = "_";                                                                          //$NON-NLS-1$
 
-   private static final int    OSM_BACKGROUND_COLOR            = 0xE8EEF1;
-   private static final int    DEFAULT_ALPHA                   = 100;
+   private static final int    OSM_BACKGROUND_COLOR               = 0xE8EEF1;
+   private static final int    DEFAULT_ALPHA                      = 100;
 
-   private static final String URL_PREFIX_HTTP                 = "http";       //$NON-NLS-1$
-   private static final String URL_PREFIX_HTTP_PROTOCOL        = "http://";    //$NON-NLS-1$
+   private static final String URL_PREFIX_HTTP                    = "http";                                                                       //$NON-NLS-1$
+   private static final String URL_PREFIX_HTTP_PROTOCOL           = "http://";                                                                    //$NON-NLS-1$
 
-   private static final String MAP_PROVIDER_TYPE_WMS           = "wms";        //$NON-NLS-1$
-   private static final String MAP_PROVIDER_TYPE_CUSTOM        = "custom";     //$NON-NLS-1$
-   private static final String MAP_PROVIDER_TYPE_MAP_PROFILE   = "profile";    //$NON-NLS-1$
-   private static final String MAP_PROVIDER_TYPE_PLUGIN        = "plugin";     //$NON-NLS-1$
+   private static final String MAP_PROVIDER_TYPE_WMS              = "wms";                                                                        //$NON-NLS-1$
+   private static final String MAP_PROVIDER_TYPE_CUSTOM           = "custom";                                                                     //$NON-NLS-1$
+   private static final String MAP_PROVIDER_TYPE_MAP_PROFILE      = "profile";                                                                    //$NON-NLS-1$
+   private static final String MAP_PROVIDER_TYPE_PLUGIN           = "plugin";                                                                     //$NON-NLS-1$
 
-   public static final String  MIME_PNG                        = "image/png";  //$NON-NLS-1$
-   public static final String  MIME_GIF                        = "image/gif";  //$NON-NLS-1$
-   public static final String  MIME_JPG                        = "image/jpg";  //$NON-NLS-1$
-   public static final String  MIME_JPEG                       = "image/jpeg"; //$NON-NLS-1$
+   public static final String  MIME_PNG                           = "image/png";                                                                  //$NON-NLS-1$
+   public static final String  MIME_GIF                           = "image/gif";                                                                  //$NON-NLS-1$
+   public static final String  MIME_JPG                           = "image/jpg";                                                                  //$NON-NLS-1$
+   public static final String  MIME_JPEG                          = "image/jpeg";                                                                 //$NON-NLS-1$
 
-   public static final String  DEFAULT_IMAGE_FORMAT            = MIME_PNG;
+   public static final String  DEFAULT_IMAGE_FORMAT               = MIME_PNG;
 
-   public static final String  FILE_EXTENSION_PNG              = "png";        //$NON-NLS-1$
-   public static final String  FILE_EXTENSION_GIF              = "gif";        //$NON-NLS-1$
-   public static final String  FILE_EXTENSION_JPG              = "jpg";        //$NON-NLS-1$
+   public static final String  FILE_EXTENSION_PNG                 = "png";                                                                        //$NON-NLS-1$
+   public static final String  FILE_EXTENSION_GIF                 = "gif";                                                                        //$NON-NLS-1$
+   public static final String  FILE_EXTENSION_JPG                 = "jpg";                                                                        //$NON-NLS-1$
 
    /**
     * This file name part is attached to saved tile images for profile map providers were only a
     * part of the child images are available.
     */
-   public static final String  PART_IMAGE_FILE_NAME_SUFFIX     = "-part";      //$NON-NLS-1$
+   public static final String  PART_IMAGE_FILE_NAME_SUFFIX        = "-part";                                                                      //$NON-NLS-1$
 
    /*
     * map provider file and root tag
@@ -678,6 +683,19 @@ public class MapProviderManager {
       return _map2View;
    }
 
+   private static String getMapProvider_InternalType(final MP mapProvider) {
+
+      if (mapProvider instanceof MPCustom) {
+         return MAP_PROVIDER_TYPE_CUSTOM;
+      } else if (mapProvider instanceof MPWms) {
+         return MAP_PROVIDER_TYPE_WMS;
+      } else if (mapProvider instanceof MPPlugin) {
+         return MAP_PROVIDER_TYPE_PLUGIN;
+      }
+
+      return null;
+   }
+
    public static Image getMapProvider_TypeImage(final MP mapProvider) {
 
       final ImageRegistry imageRegistry = net.tourbook.common.UI.IMAGE_REGISTRY;
@@ -719,17 +737,34 @@ public class MapProviderManager {
       return null;
    }
 
-   private static String getMapProviderType(final MP mapProvider) {
+   public static String getMapProvider_TypeLabel(final MP mapProvider) {
 
-      if (mapProvider instanceof MPCustom) {
-         return MAP_PROVIDER_TYPE_CUSTOM;
-      } else if (mapProvider instanceof MPWms) {
-         return MAP_PROVIDER_TYPE_WMS;
+      if (mapProvider instanceof MPWms) {
+
+         // wms map provider
+
+         return PREF_MAP_PROVIDER_TYPE_WMS;
+
+      } else if (mapProvider instanceof MPCustom) {
+
+         // custom map provider
+
+         return PREF_MAP_PROVIDER_TYPE_CUSTOM;
+
+      } else if (mapProvider instanceof MPProfile) {
+
+         // map profile
+
+         return PREF_MAP_PROVIDER_TYPE_MAP_PROFILE;
+
       } else if (mapProvider instanceof MPPlugin) {
-         return MAP_PROVIDER_TYPE_PLUGIN;
+
+         // plugin map provider
+
+         return PREF_MAP_PROVIDER_TYPE_PLUGIN;
       }
 
-      return null;
+      return UI.EMPTY_STRING;
    }
 
    /**
@@ -2583,7 +2618,7 @@ public class MapProviderManager {
 
          final MP mp = mpWrapper.getMP();
 
-         final String mpType = getMapProviderType(mp);
+         final String mpType = getMapProvider_InternalType(mp);
          if (mpType == null) {
             continue;
          }

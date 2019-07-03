@@ -1175,7 +1175,7 @@ public class UI {
     * @return Returns the url with surrounding < a > tags which can be used for the {@link Link}
     *         control.
     */
-   public static String getLinkText(final String url) {
+   public static String getLinkFromText(final String url) {
       return LINK_TAG_START + url + LINK_TAG_END;
    }
 

@@ -27,6 +27,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.util.ToolTip;
 import net.tourbook.map2.view.Slideout_Map2_MapProvider;
+import net.tourbook.web.WEB;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -35,6 +36,8 @@ import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -44,6 +47,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Text;
 
 /**
@@ -63,6 +67,7 @@ public class MapProvider_InfoToolTip extends ToolTip {
    private ViewerCell       _viewerCell;
 
    private boolean          _hasDescription;
+   private boolean          _hasOnlineMap;
    private boolean          _hasTileLayerInfo;
    private String           _tileLayerInfo;
 
@@ -88,6 +93,8 @@ public class MapProvider_InfoToolTip extends ToolTip {
    private Text      _txtDescription;
    private Text      _txtLayers;
 
+   private Link      _linkOnlineMap;
+
    public MapProvider_InfoToolTip(final TableViewer tableViewer) {
 
       super(tableViewer.getTable(), NO_RECREATE, false);
@@ -96,6 +103,36 @@ public class MapProvider_InfoToolTip extends ToolTip {
       _tableViewer = tableViewer;
 
       setHideOnMouseDown(false);
+   }
+
+   public static String getMapProviderType(final MP mapProvider) {
+
+      if (mapProvider instanceof MPWms) {
+
+         // wms map provider
+
+         return Messages.Pref_Map_ProviderType_Wms;
+
+      } else if (mapProvider instanceof MPCustom) {
+
+         // custom map provider
+
+         return Messages.Pref_Map_ProviderType_Custom;
+
+      } else if (mapProvider instanceof MPProfile) {
+
+         // map profile
+
+         return Messages.Pref_Map_ProviderType_MapProfile;
+
+      } else if (mapProvider instanceof MPPlugin) {
+
+         // plugin map provider
+
+         return Messages.Pref_Map_ProviderType_Plugin;
+      }
+
+      return UI.EMPTY_STRING;
    }
 
    @Override
@@ -166,28 +203,54 @@ public class MapProvider_InfoToolTip extends ToolTip {
             final Label spacer = createUI_Label(container, UI.EMPTY_STRING);
             GridDataFactory.fillDefaults().span(4, 1).grab(true, false).hint(1, 10).applyTo(spacer);
          }
+         {
+            /*
+             * Online map
+             */
+            if (_hasOnlineMap) {
 
-         /*
-          * Description
-          */
-         if (_hasDescription) {
+               // label
+               createUI_Label(container, Messages.Map2Provider_Tooltip_Label_OnlineMap);
 
-            // label: description
-            final Label label = createUI_Label(container, Messages.Map2Provider_Tooltip_Label_Description);
-            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.TOP).applyTo(label);
+               // link
+               _linkOnlineMap = new Link(container, SWT.NONE);
+               _linkOnlineMap.setForeground(_fgColor);
+               _linkOnlineMap.setBackground(_bgColor);
+               _linkOnlineMap.addSelectionListener(new SelectionAdapter() {
+                  @Override
+                  public void widgetSelected(final SelectionEvent e) {
+                     WEB.openUrl(_mp.getOnlineMapUrl());
+                  }
+               });
+               GridDataFactory.fillDefaults()
+                     .span(3, 1)
+                     .grab(true, false)
+                     .applyTo(_linkOnlineMap);
+            }
+         }
+         {
+            /*
+             * Description
+             */
+            if (_hasDescription) {
 
-            // text: description
-            _txtDescription = new Text(container, SWT.READ_ONLY | SWT.WRAP);
-            _txtDescription.setForeground(_fgColor);
-            _txtDescription.setBackground(_bgColor);
-            GridDataFactory.fillDefaults()
-                  .span(3, 1)
-                  .grab(true, false)
-                  .applyTo(_txtDescription);
+               // label: description
+               final Label label = createUI_Label(container, Messages.Map2Provider_Tooltip_Label_Description);
+               GridDataFactory.fillDefaults().align(SWT.FILL, SWT.TOP).applyTo(label);
 
-            // spacer
-            final Label spacer = createUI_Label(container, UI.EMPTY_STRING);
-            GridDataFactory.fillDefaults().span(4, 1).grab(true, false).hint(1, 5).applyTo(spacer);
+               // text: description
+               _txtDescription = new Text(container, SWT.READ_ONLY | SWT.WRAP);
+               _txtDescription.setForeground(_fgColor);
+               _txtDescription.setBackground(_bgColor);
+               GridDataFactory.fillDefaults()
+                     .span(3, 1)
+                     .grab(true, false)
+                     .applyTo(_txtDescription);
+
+               // spacer
+               final Label spacer = createUI_Label(container, UI.EMPTY_STRING);
+               GridDataFactory.fillDefaults().span(4, 1).grab(true, false).hint(1, 5).applyTo(spacer);
+            }
          }
 
          /*
@@ -446,6 +509,7 @@ public class MapProvider_InfoToolTip extends ToolTip {
       _tileLayerInfo = MapProviderManager.getTileLayerInfo(_mp);
 
       _hasDescription = _mp.getDescription().trim().length() > 0;
+      _hasOnlineMap = _mp.getOnlineMapUrl().trim().length() > 0;
       _hasTileLayerInfo = _tileLayerInfo.length() > 0;
    }
 
@@ -493,6 +557,9 @@ public class MapProvider_InfoToolTip extends ToolTip {
       if (_hasDescription) {
          _txtDescription.setText(mapProvider.getDescription());
       }
+      if (_hasOnlineMap) {
+         _linkOnlineMap.setText(net.tourbook.common.UI.getLinkFromText(mapProvider.getOnlineMapUrl()));
+      }
       if (_hasTileLayerInfo) {
          _txtLayers.setText(MapProviderManager.getTileLayerInfo(mapProvider));
       }
@@ -505,30 +572,7 @@ public class MapProvider_InfoToolTip extends ToolTip {
          _lblOfflineFolder.setText(tileOSFolder);
       }
 
-      if (mapProvider instanceof MPWms) {
-
-         // wms map provider
-
-         _lblMapProviderType.setText(Messages.Pref_Map_ProviderType_Wms);
-
-      } else if (mapProvider instanceof MPCustom) {
-
-         // custom map provider
-
-         _lblMapProviderType.setText(Messages.Pref_Map_ProviderType_Custom);
-
-      } else if (mapProvider instanceof MPProfile) {
-
-         // map profile
-
-         _lblMapProviderType.setText(Messages.Pref_Map_ProviderType_MapProfile);
-
-      } else if (mapProvider instanceof MPPlugin) {
-
-         // plugin map provider
-
-         _lblMapProviderType.setText(Messages.Pref_Map_ProviderType_Plugin);
-      }
+      _lblMapProviderType.setText(MapProviderManager.getMapProvider_TypeLabel(mapProvider));
    }
 
    private void updateUI_Layout() {

@@ -252,7 +252,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
                break;
 
             case COLUMN_MP_TYPE:
-               rc = getMapProvider_Type(mp1).compareTo(getMapProvider_Type(mp2));
+               rc = MapProviderManager.getMapProvider_TypeLabel(mp1).compareTo(MapProviderManager.getMapProvider_TypeLabel(mp2));
                break;
 
             case COLUMN_TILE_URL:
@@ -1052,7 +1052,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
 
             final MP mapProvider = (MP) cell.getElement();
 
-            cell.setText(getMapProvider_Type(mapProvider));
+            cell.setText(MapProviderManager.getMapProvider_TypeLabel(mapProvider));
          }
       });
    }
@@ -1218,25 +1218,6 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
    @Override
    public ColumnManager getColumnManager() {
       return _columnManager;
-   }
-
-   private String getMapProvider_Type(final MP mapProvider) {
-
-      if (mapProvider instanceof MPWms) {
-         return Messages.Slideout_Map2Provider_Column_MPType_WMS;
-
-      } else if (mapProvider instanceof MPCustom) {
-         return Messages.Slideout_Map2Provider_Column_MPType_Custom;
-
-      } else if (mapProvider instanceof MPProfile) {
-         return Messages.Slideout_Map2Provider_Column_MPType_Profile;
-
-      } else if (mapProvider instanceof MPPlugin) {
-         return Messages.Slideout_Map2Provider_Column_MPType_Internal;
-
-      } else {
-         return UI.EMPTY_STRING;
-      }
    }
 
    @Override
