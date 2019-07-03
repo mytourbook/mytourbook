@@ -148,6 +148,7 @@ public class MapProviderManager {
    private static final String ATTR_MP_NAME                        = "Name";                  //$NON-NLS-1$
    private static final String ATTR_MP_ID                          = "Id";                    //$NON-NLS-1$
    private static final String ATTR_MP_DATE_TIME_MODIFIED          = "Modified";              //$NON-NLS-1$
+   private static final String ATTR_MP_CATEGORY                    = "Category";              //$NON-NLS-1$
    private static final String ATTR_MP_DESCRIPTION                 = "Description";           //$NON-NLS-1$
    private static final String ATTR_MP_IS_INCLUDES_HILLSHADING     = "isIncludesHillShading"; //$NON-NLS-1$
    private static final String ATTR_MP_IS_TRANSPARENT_LAYER        = "isTransparentLayer";    //$NON-NLS-1$
@@ -727,7 +728,14 @@ public class MapProviderManager {
 
       } else if (mapProvider instanceof MPProfile) {
 
-         return imageRegistry.get(MapUI.MAP_PROVIDER_PROFILE);
+         if (mapProvider.isIncludesHillshading()) {
+
+            return imageRegistry.get(MapUI.MAP_PROVIDER_PROFILE_HILL);
+
+         } else {
+
+            return imageRegistry.get(MapUI.MAP_PROVIDER_PROFILE);
+         }
 
       } else if (mapProvider instanceof MPPlugin) {
 
@@ -1641,6 +1649,7 @@ public class MapProviderManager {
          final String xmlMapProviderName = tagMapProvider.getString(ATTR_MP_NAME);
          final String xmlMapProviderType = tagMapProvider.getString(ATTR_MP_TYPE);
 
+         final String xmlCategory = tagMapProvider.getString(ATTR_MP_CATEGORY);
          final String xmlDescription = tagMapProvider.getString(ATTR_MP_DESCRIPTION);
          final String xmlOfflineFolder = tagMapProvider.getString(ATTR_MP_OFFLINE_FOLDER);
          final String xmlOnlineMapUrl = tagMapProvider.getString(ATTR_MP_ONLINE_MAP_URL);
@@ -1753,6 +1762,7 @@ public class MapProviderManager {
          if (mapProvider != null) {
 
             // common
+            mapProvider.setCategory(xmlCategory == null ? UI.EMPTY_STRING : xmlCategory);
             mapProvider.setDateTimeModified(xmlModified);
             mapProvider.setDescription(xmlDescription == null ? UI.EMPTY_STRING : xmlDescription);
             mapProvider.setId(xmlMapProviderId);
@@ -2500,6 +2510,7 @@ public class MapProviderManager {
       /*
        * set common fields
        */
+      tagMapProvider.putString(ATTR_MP_CATEGORY, mp.getCategory());
       tagMapProvider.putString(ATTR_MP_DESCRIPTION, mp.getDescription());
       tagMapProvider.putString(ATTR_MP_ID, mp.getId());
       tagMapProvider.putString(ATTR_MP_NAME, mp.getName());

@@ -53,6 +53,7 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.map2.view.Map2View;
+import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.web.WEB;
 
 import org.eclipse.core.runtime.Assert;
@@ -74,6 +75,8 @@ import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
+import org.eclipse.jface.resource.ColorRegistry;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnWeightData;
@@ -111,6 +114,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.events.VerifyListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -173,6 +177,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
    private static final String       COLUMN_KEY_FOR_COLUMN_ID       = "ColumnId";                      //$NON-NLS-1$
 
+   private static final String       COLUMN_CATEGORY                = "Category";                      //$NON-NLS-1$
    private static final String       COLUMN_DESCRIPTION             = "Description";                   //$NON-NLS-1$
    private static final String       COLUMN_IS_CONTAINS_HILLSHADING = "ContainsHillshading";           //$NON-NLS-1$
    private static final String       COLUMN_IS_TRANSPARENT_LAYER    = "IsTransparentLayer";            //$NON-NLS-1$
@@ -274,6 +279,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
    private Link       _linkOnlineMap;
 
+   private Text       _txtCategory;
    private Text       _txtDescription;
    private Text       _txtMapProviderName;
    private Text       _txtMapProviderId;
@@ -315,6 +321,10 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
          // Determine which column and do the appropriate sort
          switch (__sortColumnId) {
+
+         case COLUMN_CATEGORY:
+            rc = mp1.getCategory().compareTo(mp2.getCategory());
+            break;
 
          case COLUMN_DESCRIPTION:
             rc = mp1.getDescription().compareTo(mp2.getDescription());
@@ -803,12 +813,17 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
    private void createUI_20_MapViewer_Viewer(final Composite parent) {
 
+      // set colors for the viewer
+      final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
+      final Color fgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_FOREGROUND);
+      final Color bgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND);
+
       final TableColumnLayout tableLayout = new TableColumnLayout();
 
       final Composite layoutContainer = new Composite(parent, SWT.NONE);
       layoutContainer.setLayout(tableLayout);
       GridDataFactory.fillDefaults()//
-            .hint(600, _pc.convertHeightInCharsToPixels(10))
+            .hint(800, _pc.convertHeightInCharsToPixels(10))
             .grab(true, true)
             .applyTo(layoutContainer);
 
@@ -820,6 +835,8 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       table.setLayout(new TableLayout());
       table.setHeaderVisible(true);
       table.setLinesVisible(false);
+      table.setHeaderBackground(bgColor);
+      table.setHeaderForeground(fgColor);
 
       table.addKeyListener(new KeyListener() {
 
@@ -844,27 +861,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
        * create table viewer
        */
       _mpViewer.setContentProvider(new MapContentProvider());
-      _mpViewer.setComparator(new ViewerComparator() {
-         @Override
-         public int compare(final Viewer viewer, final Object e1, final Object e2) {
-
-            final MP mp1 = (MP) e1;
-            final MP mp2 = (MP) e2;
-
-            final boolean thisIsPlugin = e1 instanceof MPPlugin;
-            final boolean otherIsPlugin = e2 instanceof MPPlugin;
-
-            if (thisIsPlugin && otherIsPlugin) {
-               return mp1.getName().compareTo(mp2.getName());
-            } else if (thisIsPlugin) {
-               return 1;
-            } else if (otherIsPlugin) {
-               return -1;
-            } else {
-               return mp1.getName().compareTo(mp2.getName());
-            }
-         }
-      });
+      _mpViewer.setComparator(_mpComparator);
 
       _mpViewer.addSelectionChangedListener(new ISelectionChangedListener() {
          @Override
@@ -898,9 +895,9 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
          }
       });
 
-      _mpViewer.setComparator(_mpComparator);
-
       updateUI_SetSortDirection(_mpComparator.__sortColumnId, _mpComparator.__sortDirection);
+
+      net.tourbook.common.UI.setChildColors(table, fgColor, bgColor);
    }
 
    private void createUI_30_Buttons(final Composite container) {
@@ -909,170 +906,198 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       GridDataFactory.fillDefaults().applyTo(btnContainer);
       GridLayoutFactory.fillDefaults().applyTo(btnContainer);
       {
-         // button: edit
-         _btnEdit = new Button(btnContainer, SWT.NONE);
-         _btnEdit.setText(Messages.Pref_Map_Button_Edit);
-         _btnEdit.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               openConfigDialog();
-            }
-         });
-         GridDataFactory.fillDefaults()//
-               .grab(true, false)
-               .align(SWT.END, SWT.FILL)
-               .applyTo(_btnEdit);
-         setButtonLayoutData(_btnEdit);
-
-         // button: add custom map provider
-         _btnAddMapProviderCustom = new Button(btnContainer, SWT.NONE);
-         _btnAddMapProviderCustom.setText(Messages.Pref_Map_Button_AddMapProviderCustom);
-         _btnAddMapProviderCustom.setToolTipText(Messages.Pref_Map_Button_AddMapProviderCustom_Tooltip);
-         _btnAddMapProviderCustom.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               setEmptyMapProviderUI(new MPCustom());
-            }
-         });
-         setButtonLayoutData(_btnAddMapProviderCustom);
-
-         // button: add wms map provider
-         _btnAddMapProviderWms = new Button(btnContainer, SWT.NONE);
-         _btnAddMapProviderWms.setText(Messages.Pref_Map_Button_AddMapProviderWms);
-         _btnAddMapProviderWms.setToolTipText(Messages.Pref_Map_Button_AddMapProviderWms_Tooltip);
-         _btnAddMapProviderWms.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onAction_MapProvider_AddWms();
-            }
-         });
-         setButtonLayoutData(_btnAddMapProviderWms);
-
-         // button: add profile map provider
-         _btnAddMapProviderMapProfile = new Button(btnContainer, SWT.NONE);
-         _btnAddMapProviderMapProfile.setText(Messages.Pref_Map_Button_AddMapProfile);
-         _btnAddMapProviderMapProfile.setToolTipText(Messages.Pref_Map_Button_AddMapProfile_Tooltip);
-         _btnAddMapProviderMapProfile.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-
-               final MPProfile mapProfile = new MPProfile();
-               mapProfile.synchronizeMPWrapper();
-
-               setEmptyMapProviderUI(mapProfile);
-            }
-         });
-         setButtonLayoutData(_btnAddMapProviderMapProfile);
-
-         // wms drag&drop target
-         _lblDropTarget = new Label(btnContainer, SWT.BORDER | SWT.WRAP | SWT.CENTER);
-         _lblDropTarget.setText(Messages.Pref_Map_Label_WmsDropTarget);
-         _lblDropTarget.setToolTipText(Messages.Pref_Map_Label_WmsDropTarget_Tooltip);
-         GridDataFactory.fillDefaults().applyTo(_lblDropTarget);
-         setWmsDropTarget(_lblDropTarget);
-
-         // button: delete offline map
-         _btnDeleteOfflineMap = new Button(btnContainer, SWT.NONE);
-         _btnDeleteOfflineMap.setText(Messages.Pref_Map_Button_DeleteOfflineMap);
-         _btnDeleteOfflineMap.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               deleteOfflineMap(_selectedMapProvider);
-            }
-         });
-         setButtonLayoutData(_btnDeleteOfflineMap);
-
-         // button: import
-         _btnImport = new Button(btnContainer, SWT.NONE);
-         _btnImport.setText(Messages.Pref_Map_Button_ImportMP);
-         _btnImport.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onAction_MapProvider_Import();
-            }
-         });
-         setButtonLayoutData(_btnImport);
-         GridData gd = setButtonLayoutData(_btnImport);
-         gd.verticalIndent = 20;
-
-         // button: export
-         _btnExport = new Button(btnContainer, SWT.NONE);
-         _btnExport.setText(Messages.Pref_Map_Button_ExportMP);
-         _btnExport.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onAction_MapProvider_Export();
-            }
-         });
-         setButtonLayoutData(_btnExport);
-
-         /*
-          * drop target: map provider
-          */
-         _lblMpDropTarget = new Label(btnContainer, SWT.BORDER | SWT.WRAP | SWT.CENTER);
-         _lblMpDropTarget.setText(Messages.Pref_Map_Label_MapProviderDropTarget);
-         _lblMpDropTarget.setToolTipText(Messages.Pref_Map_Label_MapProviderDropTarget_Tooltip);
-         GridDataFactory.fillDefaults().applyTo(_lblMpDropTarget);
-
-         _mpDropTarget = new DropTarget(_lblMpDropTarget, DND.DROP_MOVE | DND.DROP_COPY | DND.DROP_LINK);
-
-         _mpDropTarget.setTransfer(new Transfer[] { URLTransfer.getInstance(), FileTransfer.getInstance() });
-
-         _mpDropTarget.addDropListener(new DropTargetAdapter() {
-
-            @Override
-            public void drop(final DropTargetEvent event) {
-
-               if (event.data == null) {
-                  event.detail = DND.DROP_NONE;
-                  return;
+         {
+            /*
+             * Bbutton: edit
+             */
+            _btnEdit = new Button(btnContainer, SWT.NONE);
+            _btnEdit.setText(Messages.Pref_Map_Button_Edit);
+            _btnEdit.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  openConfigDialog();
                }
+            });
+            GridDataFactory.fillDefaults()//
+                  .grab(true, false)
+                  .align(SWT.END, SWT.FILL)
+                  .applyTo(_btnEdit);
+            setButtonLayoutData(_btnEdit);
+         }
+         {
+            /*
+             * Button: add custom map provider
+             */
+            _btnAddMapProviderCustom = new Button(btnContainer, SWT.NONE);
+            _btnAddMapProviderCustom.setText(Messages.Pref_Map_Button_AddMapProviderCustom);
+            _btnAddMapProviderCustom.setToolTipText(Messages.Pref_Map_Button_AddMapProviderCustom_Tooltip);
+            _btnAddMapProviderCustom.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  setEmptyMapProviderUI(new MPCustom());
+               }
+            });
+            setButtonLayoutData(_btnAddMapProviderCustom);
+         }
+         {
+            /*
+             * Button: add wms map provider
+             */
+            _btnAddMapProviderWms = new Button(btnContainer, SWT.NONE);
+            _btnAddMapProviderWms.setText(Messages.Pref_Map_Button_AddMapProviderWms);
+            _btnAddMapProviderWms.setToolTipText(Messages.Pref_Map_Button_AddMapProviderWms_Tooltip);
+            _btnAddMapProviderWms.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  onAction_MapProvider_AddWms();
+               }
+            });
+            setButtonLayoutData(_btnAddMapProviderWms);
+         }
+         {
+            /*
+             * Button: add profile map provider
+             */
+            _btnAddMapProviderMapProfile = new Button(btnContainer, SWT.NONE);
+            _btnAddMapProviderMapProfile.setText(Messages.Pref_Map_Button_AddMapProfile);
+            _btnAddMapProviderMapProfile.setToolTipText(Messages.Pref_Map_Button_AddMapProfile_Tooltip);
+            _btnAddMapProviderMapProfile.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
 
-               /*
-                * run async to free the mouse cursor from the drop operation
-                */
-               Display.getDefault().asyncExec(new Runnable() {
-                  @Override
-                  public void run() {
-                     runnableDropMapProvider(event);
+                  final MPProfile mapProfile = new MPProfile();
+                  mapProfile.synchronizeMPWrapper();
+
+                  setEmptyMapProviderUI(mapProfile);
+               }
+            });
+            setButtonLayoutData(_btnAddMapProviderMapProfile);
+         }
+         {
+            /*
+             * WMS drag&drop target
+             */
+            _lblDropTarget = new Label(btnContainer, SWT.BORDER | SWT.WRAP | SWT.CENTER);
+            _lblDropTarget.setText(Messages.Pref_Map_Label_WmsDropTarget);
+            _lblDropTarget.setToolTipText(Messages.Pref_Map_Label_WmsDropTarget_Tooltip);
+            GridDataFactory.fillDefaults().applyTo(_lblDropTarget);
+            setWmsDropTarget(_lblDropTarget);
+         }
+         {
+            /*
+             * Button: delete offline map
+             */
+            _btnDeleteOfflineMap = new Button(btnContainer, SWT.NONE);
+            _btnDeleteOfflineMap.setText(Messages.Pref_Map_Button_DeleteOfflineMap);
+            _btnDeleteOfflineMap.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  deleteOfflineMap(_selectedMapProvider);
+               }
+            });
+            setButtonLayoutData(_btnDeleteOfflineMap);
+         }
+         {
+            /*
+             * Button: import
+             */
+            _btnImport = new Button(btnContainer, SWT.NONE);
+            _btnImport.setText(Messages.Pref_Map_Button_ImportMP);
+            _btnImport.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  onAction_MapProvider_Import();
+               }
+            });
+            setButtonLayoutData(_btnImport);
+            final GridData gd = setButtonLayoutData(_btnImport);
+            gd.verticalIndent = 20;
+         }
+         {
+            /*
+             * Bbutton: export
+             */
+            _btnExport = new Button(btnContainer, SWT.NONE);
+            _btnExport.setText(Messages.Pref_Map_Button_ExportMP);
+            _btnExport.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  onAction_MapProvider_Export();
+               }
+            });
+            setButtonLayoutData(_btnExport);
+         }
+         {
+            /*
+             * drop target: map provider
+             */
+            _lblMpDropTarget = new Label(btnContainer, SWT.BORDER | SWT.WRAP | SWT.CENTER);
+            _lblMpDropTarget.setText(Messages.Pref_Map_Label_MapProviderDropTarget);
+            _lblMpDropTarget.setToolTipText(Messages.Pref_Map_Label_MapProviderDropTarget_Tooltip);
+            GridDataFactory.fillDefaults().applyTo(_lblMpDropTarget);
+
+            _mpDropTarget = new DropTarget(_lblMpDropTarget, DND.DROP_MOVE | DND.DROP_COPY | DND.DROP_LINK);
+
+            _mpDropTarget.setTransfer(new Transfer[] { URLTransfer.getInstance(), FileTransfer.getInstance() });
+
+            _mpDropTarget.addDropListener(new DropTargetAdapter() {
+
+               @Override
+               public void drop(final DropTargetEvent event) {
+
+                  if (event.data == null) {
+                     event.detail = DND.DROP_NONE;
+                     return;
                   }
-               });
-            }
-         });
 
-         /*
-          * link: map provider support
-          */
-         final Link link = new Link(btnContainer, SWT.NONE);
-         link.setText(Messages.Pref_Map_Link_MapProvider);
-         link.setToolTipText(Messages.Pref_Map_Link_MapProvider_Tooltip);
-         link.setEnabled(true);
-         link.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               WEB.openUrl(Messages.External_Link_MapProviders);
-            }
-         });
-         GridDataFactory.fillDefaults()//
-               .align(SWT.END, SWT.FILL)
-               .grab(true, false)
-               .applyTo(link);
-
-         /*
-          * button: delete map provider
-          */
-         _btnDeleteMapProvider = new Button(btnContainer, SWT.NONE);
-         _btnDeleteMapProvider.setText(Messages.Pref_Map_Button_DeleteMapProvider);
-         _btnDeleteMapProvider.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onAction_MapProvider_Delete();
-            }
-         });
-         gd = setButtonLayoutData(_btnDeleteMapProvider);
-         gd.grabExcessVerticalSpace = true;
-         gd.verticalAlignment = SWT.END;
-         gd.verticalIndent = 20;
+                  /*
+                   * run async to free the mouse cursor from the drop operation
+                   */
+                  Display.getDefault().asyncExec(new Runnable() {
+                     @Override
+                     public void run() {
+                        runnableDropMapProvider(event);
+                     }
+                  });
+               }
+            });
+         }
+         {
+            /*
+             * link: map provider support
+             */
+            final Link link = new Link(btnContainer, SWT.NONE);
+            link.setText(Messages.Pref_Map_Link_MapProvider);
+            link.setToolTipText(Messages.Pref_Map_Link_MapProvider_Tooltip);
+            link.setEnabled(true);
+            link.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  WEB.openUrl(Messages.External_Link_MapProviders);
+               }
+            });
+            GridDataFactory.fillDefaults()//
+                  .align(SWT.END, SWT.FILL)
+                  .grab(true, false)
+                  .applyTo(link);
+         }
+         {
+            /*
+             * button: delete map provider
+             */
+            _btnDeleteMapProvider = new Button(btnContainer, SWT.NONE);
+            _btnDeleteMapProvider.setText(Messages.Pref_Map_Button_DeleteMapProvider);
+            _btnDeleteMapProvider.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  onAction_MapProvider_Delete();
+               }
+            });
+            final GridData gd = setButtonLayoutData(_btnDeleteMapProvider);
+            gd.grabExcessVerticalSpace = true;
+            gd.verticalAlignment = SWT.END;
+            gd.verticalIndent = 20;
+         }
 
       }
    }
@@ -1142,6 +1167,19 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
                }
             });
             GridDataFactory.fillDefaults().span(3, 1).applyTo(_txtMapProviderName);
+         }
+         {
+            /*
+             * Common category
+             */
+
+            final Label label = new Label(container, SWT.NONE);
+            label.setText(Messages.Pref_Map_Lable_Category);
+
+            // text: map provider
+            _txtCategory = new Text(container, SWT.BORDER);
+            _txtCategory.addModifyListener(_modifyListener);
+            GridDataFactory.fillDefaults().span(3, 1).applyTo(_txtCategory);
          }
          {
             /*
@@ -1518,13 +1556,14 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
    private void defineAllColumns(final TableColumnLayout tableLayout) {
 
       defineColumn_10_MapProviderName(tableLayout);
-      defineColumn_20_MPType(tableLayout);
-      defineColumn_22_OnlineMapUrl(tableLayout);
-      defineColumn_24_Description(tableLayout);
-      defineColumn_30_OfflinePath(tableLayout);
-      defineColumn_40_Hillshading(tableLayout);
-      defineColumn_50_TransparentLayer(tableLayout);
+      defineColumn_12_Category(tableLayout);
+      defineColumn_22_Hillshading(tableLayout);
+      defineColumn_24_TransparentLayer(tableLayout);
+      defineColumn_30_MPType(tableLayout);
+      defineColumn_40_OnlineMapUrl(tableLayout);
+      defineColumn_50_Description(tableLayout);
       defineColumn_60_WMSLayers(tableLayout);
+      defineColumn_62_OfflinePath(tableLayout);
       defineColumn_70_OfflineFileCounter(tableLayout);
       defineColumn_72_OfflineFileSize(tableLayout);
       defineColumn_80_Modified(tableLayout);
@@ -1554,13 +1593,85 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
          }
       });
 
-      tableLayout.setColumnData(tvc.getColumn(), new ColumnPixelData(_pc.convertWidthInCharsToPixels(20)));
+      tableLayout.setColumnData(tvc.getColumn(), new ColumnPixelData(_pc.convertWidthInCharsToPixels(30)));
+   }
+
+   /**
+    * Column: Category
+    */
+   private void defineColumn_12_Category(final TableColumnLayout tableLayout) {
+
+      final TableViewerColumn tvc = new TableViewerColumn(_mpViewer, SWT.LEAD);
+
+      final TableColumn tc = tvc.getColumn();
+      tc.setText(Messages.Pref_Map_Viewer_Column_Lbl_Category);
+      tc.setToolTipText(Messages.Pref_Map_Viewer_Column_Lbl_Category);
+      tc.addSelectionListener(_columnSortListener);
+      tc.setData(COLUMN_KEY_FOR_COLUMN_ID, COLUMN_CATEGORY);
+
+      tvc.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            cell.setText(((MP) cell.getElement()).getCategory());
+         }
+      });
+
+      tableLayout.setColumnData(tvc.getColumn(), new ColumnPixelData(_pc.convertWidthInCharsToPixels(12)));
+   }
+
+   /**
+    * Column: Includes hillshading
+    */
+   private void defineColumn_22_Hillshading(final TableColumnLayout tableLayout) {
+
+      final TableViewerColumn tvc = new TableViewerColumn(_mpViewer, SWT.LEAD);
+
+      final TableColumn tc = tvc.getColumn();
+      tc.setText(Messages.Pref_Map_Viewer_Column_IsHillshading);
+      tc.setToolTipText(Messages.Pref_Map_Viewer_Column_IsHillshading_Tooltip);
+      tc.addSelectionListener(_columnSortListener);
+      tc.setData(COLUMN_KEY_FOR_COLUMN_ID, COLUMN_IS_CONTAINS_HILLSHADING);
+
+      tvc.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            cell.setText(((MP) cell.getElement()).isIncludesHillshading() ? APP_TRUE : UI.EMPTY_STRING);
+         }
+      });
+
+      tableLayout.setColumnData(tvc.getColumn(), new ColumnPixelData(_pc.convertWidthInCharsToPixels(6)));
+   }
+
+   /**
+    * Column: Is transparent layer
+    */
+   private void defineColumn_24_TransparentLayer(final TableColumnLayout tableLayout) {
+
+      final TableViewerColumn tvc = new TableViewerColumn(_mpViewer, SWT.LEAD);
+
+      final TableColumn tc = tvc.getColumn();
+      tc.setText(Messages.Pref_Map_Viewer_Column_IsTransparent);
+      tc.setToolTipText(Messages.Pref_Map_Viewer_Column_IsTransparent_Tooltip);
+      tc.addSelectionListener(_columnSortListener);
+      tc.setData(COLUMN_KEY_FOR_COLUMN_ID, COLUMN_IS_TRANSPARENT_LAYER);
+
+      tvc.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            cell.setText(((MP) cell.getElement()).isTransparentLayer() ? APP_TRUE : UI.EMPTY_STRING);
+         }
+      });
+
+      tableLayout.setColumnData(tvc.getColumn(), new ColumnPixelData(_pc.convertWidthInCharsToPixels(6)));
    }
 
    /**
     * Column: Server type
     */
-   private void defineColumn_20_MPType(final TableColumnLayout tableLayout) {
+   private void defineColumn_30_MPType(final TableColumnLayout tableLayout) {
 
       final TableViewerColumn tvc = new TableViewerColumn(_mpViewer, SWT.LEAD);
 
@@ -1587,7 +1698,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
    /**
     * Column: Online map url
     */
-   private void defineColumn_22_OnlineMapUrl(final TableColumnLayout tableLayout) {
+   private void defineColumn_40_OnlineMapUrl(final TableColumnLayout tableLayout) {
 
       final TableViewerColumn tvc = new TableViewerColumn(_mpViewer, SWT.LEAD);
 
@@ -1605,13 +1716,13 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
          }
       });
 
-      tableLayout.setColumnData(tvc.getColumn(), new ColumnWeightData(10));
+      tableLayout.setColumnData(tvc.getColumn(), new ColumnWeightData(14));
    }
 
    /**
     * Column: Description
     */
-   private void defineColumn_24_Description(final TableColumnLayout tableLayout) {
+   private void defineColumn_50_Description(final TableColumnLayout tableLayout) {
 
       final TableViewerColumn tvc = new TableViewerColumn(_mpViewer, SWT.LEAD);
 
@@ -1629,79 +1740,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
          }
       });
 
-      tableLayout.setColumnData(tvc.getColumn(), new ColumnWeightData(10));
-   }
-
-   /**
-    * Column: offline path
-    */
-   private void defineColumn_30_OfflinePath(final TableColumnLayout tableLayout) {
-
-      final TableViewerColumn tvc = new TableViewerColumn(_mpViewer, SWT.LEAD);
-
-      final TableColumn tc = tvc.getColumn();
-      tc.setText(Messages.Pref_Map_Viewer_Column_Lbl_OfflinePath);
-      tc.setToolTipText(Messages.Pref_Map_Viewer_Column_Lbl_OfflinePath);
-      tc.setData(COLUMN_KEY_FOR_COLUMN_ID, COLUMN_OFFLINE_FOLDER_NAME);
-      tc.addSelectionListener(_columnSortListener);
-
-      tvc.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            cell.setText(((MP) cell.getElement()).getOfflineFolder());
-         }
-      });
-
-      tableLayout.setColumnData(tvc.getColumn(), new ColumnWeightData(10));
-   }
-
-   /**
-    * Column: Includes hillshading
-    */
-   private void defineColumn_40_Hillshading(final TableColumnLayout tableLayout) {
-
-      final TableViewerColumn tvc = new TableViewerColumn(_mpViewer, SWT.TRAIL);
-
-      final TableColumn tc = tvc.getColumn();
-      tc.setText(Messages.Pref_Map_Viewer_Column_IsHillshading);
-      tc.setToolTipText(Messages.Pref_Map_Viewer_Column_IsHillshading_Tooltip);
-      tc.addSelectionListener(_columnSortListener);
-      tc.setData(COLUMN_KEY_FOR_COLUMN_ID, COLUMN_IS_CONTAINS_HILLSHADING);
-
-      tvc.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            cell.setText(((MP) cell.getElement()).isIncludesHillshading() ? APP_TRUE : UI.EMPTY_STRING);
-         }
-      });
-
-      tableLayout.setColumnData(tvc.getColumn(), new ColumnPixelData(_pc.convertWidthInCharsToPixels(6)));
-   }
-
-   /**
-    * Column: Is transparent layer
-    */
-   private void defineColumn_50_TransparentLayer(final TableColumnLayout tableLayout) {
-
-      final TableViewerColumn tvc = new TableViewerColumn(_mpViewer, SWT.TRAIL);
-
-      final TableColumn tc = tvc.getColumn();
-      tc.setText(Messages.Pref_Map_Viewer_Column_IsTransparent);
-      tc.setToolTipText(Messages.Pref_Map_Viewer_Column_IsTransparent_Tooltip);
-      tc.addSelectionListener(_columnSortListener);
-      tc.setData(COLUMN_KEY_FOR_COLUMN_ID, COLUMN_IS_TRANSPARENT_LAYER);
-
-      tvc.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            cell.setText(((MP) cell.getElement()).isTransparentLayer() ? APP_TRUE : UI.EMPTY_STRING);
-         }
-      });
-
-      tableLayout.setColumnData(tvc.getColumn(), new ColumnPixelData(_pc.convertWidthInCharsToPixels(6)));
+      tableLayout.setColumnData(tvc.getColumn(), new ColumnWeightData(14));
    }
 
    /**
@@ -1737,6 +1776,30 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       });
 
       tableLayout.setColumnData(tvc.getColumn(), new ColumnPixelData(_pc.convertWidthInCharsToPixels(6)));
+   }
+
+   /**
+    * Column: offline path
+    */
+   private void defineColumn_62_OfflinePath(final TableColumnLayout tableLayout) {
+
+      final TableViewerColumn tvc = new TableViewerColumn(_mpViewer, SWT.LEAD);
+
+      final TableColumn tc = tvc.getColumn();
+      tc.setText(Messages.Pref_Map_Viewer_Column_Lbl_OfflinePath);
+      tc.setToolTipText(Messages.Pref_Map_Viewer_Column_Lbl_OfflinePath);
+      tc.setData(COLUMN_KEY_FOR_COLUMN_ID, COLUMN_OFFLINE_FOLDER_NAME);
+      tc.addSelectionListener(_columnSortListener);
+
+      tvc.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            cell.setText(((MP) cell.getElement()).getOfflineFolder());
+         }
+      });
+
+      tableLayout.setColumnData(tvc.getColumn(), new ColumnWeightData(10));
    }
 
    /**
@@ -2000,13 +2063,14 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
       _mpViewer.getTable().setEnabled(isExistingMapProvider);
 
+      _chkIsIncludesHillshading.setEnabled(canEditFields);
+      _chkIsTransparentLayer.setEnabled(canEditFields && isNoProfileMapProvider);
+      _txtCategory.setEnabled(canEditFields);
       _txtDescription.setEnabled(canEditFields);
       _txtMapProviderId.setEnabled(canEditFields);
       _txtMapProviderName.setEnabled(canEditFields);
       _txtOfflineFolder.setEnabled(canEditFields);
       _txtOnlineMapUrl.setEnabled(canEditFields);
-      _chkIsIncludesHillshading.setEnabled(canEditFields && isNoProfileMapProvider);
-      _chkIsTransparentLayer.setEnabled(canEditFields && isNoProfileMapProvider);
 
       // map provider list actions
       _btnAddMapProviderCustom.setEnabled(isExistingMapProvider);
@@ -2889,14 +2953,18 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
          /*
           * set map provider fields empty
           */
-         _txtMapProviderName.setText(UI.EMPTY_STRING);
-         _txtMapProviderId.setText(UI.EMPTY_STRING);
-         _txtOfflineFolder.setText(UI.EMPTY_STRING);
-         _txtDescription.setText(UI.EMPTY_STRING);
-         _txtLayers.setText(UI.EMPTY_STRING);
-
          _chkIsIncludesHillshading.setSelection(false);
          _chkIsTransparentLayer.setSelection(false);
+
+         _linkOnlineMap.setText(UI.EMPTY_STRING);
+
+         _txtCategory.setText(UI.EMPTY_STRING);
+         _txtDescription.setText(UI.EMPTY_STRING);
+         _txtMapProviderId.setText(UI.EMPTY_STRING);
+         _txtMapProviderName.setText(UI.EMPTY_STRING);
+         _txtOfflineFolder.setText(UI.EMPTY_STRING);
+         _txtOnlineMapUrl.setText(UI.EMPTY_STRING);
+         _txtLayers.setText(UI.EMPTY_STRING);
 
          // map provider type
          if (mapProvider instanceof MPCustom) {
@@ -3183,6 +3251,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       final long dtModified = TimeTools.createdNowAsYMDhms();
 
       // update fields
+      mapProvider.setCategory(_txtCategory.getText());
       mapProvider.setDateTimeModified(dtModified);
       mapProvider.setDescription(_txtDescription.getText().trim());
       mapProvider.setId(mpId);
@@ -3237,6 +3306,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
          _chkIsTransparentLayer.setSelection(mapProvider.isTransparentLayer());
          _linkOnlineMap.setText(net.tourbook.common.UI.getLinkFromText(onlineMapUrl));
          _linkOnlineMap.setToolTipText(mapProvider.getName());
+         _txtCategory.setText(mapProvider.getCategory());
          _txtDescription.setText(mapProvider.getDescription());
          _txtLayers.setText(MapProviderManager.getTileLayerInfo(mapProvider));
          _txtMapProviderId.setText(mapProvider.getId());

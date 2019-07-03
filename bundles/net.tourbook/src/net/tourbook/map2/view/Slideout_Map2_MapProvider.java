@@ -36,7 +36,6 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
-import net.tourbook.common.color.IColorSelectorListener;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.util.ColumnDefinition;
@@ -116,7 +115,7 @@ import org.eclipse.swt.widgets.Widget;
 /**
  * 2D Map provider slideout
  */
-public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColorSelectorListener, ITourViewer, IMapProviderListener {
+public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITourViewer, IMapProviderListener {
 
 // SET_FORMATTING_OFF
 
@@ -130,11 +129,13 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
    private static final String PREF_MAP_VIEWER_COLUMN_IS_TRANSPARENT_TOOLTIP  = de.byteholder.geoclipse.preferences.Messages.Pref_Map_Viewer_Column_IsTransparent_Tooltip;
    private static final String PREF_MAP_VIEWER_COLUMN_IS_HILLSHADING          = de.byteholder.geoclipse.preferences.Messages.Pref_Map_Viewer_Column_IsHillshading;
    private static final String PREF_MAP_VIEWER_COLUMN_IS_HILLSHADING_TOOLTIP  = de.byteholder.geoclipse.preferences.Messages.Pref_Map_Viewer_Column_IsHillshading_Tooltip;
+   private static final String PREF_MAP_VIEWER_COLUMN_LBL_CATEGORY            = de.byteholder.geoclipse.preferences.Messages.Pref_Map_Viewer_Column_Lbl_Category;
    private static final String PREF_MAP_VIEWER_COLUMN_LBL_MODIFIED            = de.byteholder.geoclipse.preferences.Messages.Pref_Map_Viewer_Column_Lbl_Modified;
    private static final String PREF_MAP_VIEWER_COLUMN_LBL_MAP_PROVIDER        = de.byteholder.geoclipse.preferences.Messages.Pref_Map_Viewer_Column_Lbl_MapProvider;
 
 // SET_FORMATTING_ON
 
+   private static final String              COLUMN_CATEGORY                    = "Category";                         //$NON-NLS-1$
    private static final String              COLUMN_IS_CONTAINS_HILLSHADING     = "ContainsHillshading";              //$NON-NLS-1$
    private static final String              COLUMN_IS_TRANSPARENT_LAYER        = "IsTransparentLayer";               //$NON-NLS-1$
    private static final String              COLUMN_IS_VISIBLE                  = "IsVisible";                        //$NON-NLS-1$
@@ -172,6 +173,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
 
    private MP                               _selectedMP;
    private ArrayList<MP>                    _allMapProvider;
+   private MapProvider_InfoToolTip          _mpTooltip;
 
    private SelectionListener                _columnSortListener;
 
@@ -187,10 +189,10 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
    private Composite _viewerContainer;
    private ToolItem  _toolItem;
 
+   private Button    _btnHideUnhideMP;
+
    private Image     _imageYes;
    private Image     _imageNo;
-
-   private Button    _btnHideUnhideMP;
 
    private class ActionOpenMapProviderPreferences extends ActionOpenPrefDialog {
 
@@ -227,6 +229,10 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
 
             // Determine which column and do the appropriate sort
             switch (__sortColumnId) {
+
+            case COLUMN_CATEGORY:
+               rc = mp1.getCategory().compareTo(mp2.getCategory());
+               break;
 
             case COLUMN_IS_CONTAINS_HILLSHADING:
 
@@ -430,11 +436,6 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
       if (isVisible) {
          _columnManager.createHeaderContextMenu(_mpViewer.getTable(), null, getRRShellWithResize());
       }
-   }
-
-   @Override
-   public void colorDialogOpened(final boolean isAnotherDialogOpened) {
-      setIsAnotherDialogOpened(isAnotherDialogOpened);
    }
 
    private void createActions() {
@@ -733,7 +734,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
       _mpViewer.setComparator(_mpComparator);
 
       // set info tooltip provider
-      new MapProvider_InfoToolTip(_mpViewer);
+      _mpTooltip = new MapProvider_InfoToolTip(this, _mpViewer);
 
       updateUI_SetSortDirection(_mpComparator.__sortColumnId, _mpComparator.__sortDirection);
 
@@ -1003,8 +1004,9 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
    private void defineAllColumns() {
 
       defineColumn_00_IsVisible();
-      defineColumn_10_MPType();
-      defineColumn_20_MapProvider();
+      defineColumn_10_MapProvider();
+      defineColumn_20_Category();
+      defineColumn_22_MPType();
       defineColumn_30_Hillshading();
       defineColumn_40_TransparentLayer();
       defineColumn_50_Url();
@@ -1034,33 +1036,9 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
    }
 
    /**
-    * Column: MP type
-    */
-   private void defineColumn_10_MPType() {
-
-      final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_MP_TYPE, SWT.LEAD);
-
-      colDef.setColumnName(Messages.Slideout_Map2Provider_Column_MPType);
-      colDef.setColumnHeaderToolTipText(Messages.Slideout_Map2Provider_Column_MPType_Tooltip);
-      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
-
-      colDef.setColumnSelectionListener(_columnSortListener);
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final MP mapProvider = (MP) cell.getElement();
-
-            cell.setText(MapProviderManager.getMapProvider_TypeLabel(mapProvider));
-         }
-      });
-   }
-
-   /**
     * Column: Map provider
     */
-   private void defineColumn_20_MapProvider() {
+   private void defineColumn_10_MapProvider() {
 
       final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_MAP_PROVIDER, SWT.LEAD);
 
@@ -1081,6 +1059,55 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
 
             cell.setImage(MapProviderManager.getMapProvider_TypeImage(mapProvider));
             cell.setText(mapProvider.getName());
+         }
+      });
+   }
+
+   /**
+    * Column: Category
+    */
+   private void defineColumn_20_Category() {
+
+      final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_CATEGORY, SWT.LEAD);
+
+      colDef.setColumnName(PREF_MAP_VIEWER_COLUMN_LBL_CATEGORY);
+      colDef.setColumnHeaderToolTipText(PREF_MAP_VIEWER_COLUMN_LBL_CATEGORY);
+      colDef.setIsDefaultColumn();
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final MP mapProvider = (MP) cell.getElement();
+
+            cell.setText(mapProvider.getCategory());
+         }
+      });
+   }
+
+   /**
+    * Column: MP type
+    */
+   private void defineColumn_22_MPType() {
+
+      final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_MP_TYPE, SWT.LEAD);
+
+      colDef.setColumnName(Messages.Slideout_Map2Provider_Column_MPType);
+      colDef.setColumnHeaderToolTipText(Messages.Slideout_Map2Provider_Column_MPType_Tooltip);
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final MP mapProvider = (MP) cell.getElement();
+
+            cell.setText(MapProviderManager.getMapProvider_TypeLabel(mapProvider));
          }
       });
    }
@@ -1399,6 +1426,9 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
 
    private void onSelect_MapProvider(final SelectionChangedEvent event) {
 
+      // hide tooltip which can display content from the previous map provider
+      _mpTooltip.hide();
+
       MP selectedMapProvider = (MP) event.getStructuredSelection().getFirstElement();
 
       if (selectedMapProvider == null) {
@@ -1408,8 +1438,13 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
          selectedMapProvider = _allMapProvider.get(0);
       }
 
-      // show map provider name
-      updateTitleText(selectedMapProvider.getName());
+      /*
+       * Show map provider name in the slideout title
+       */
+      String titleText = selectedMapProvider.getName();
+      // replace & with && otherwise it is displayed
+      titleText = titleText.replace("&", "&&"); //$NON-NLS-1$ //$NON-NLS-2$
+      updateTitleText(titleText);
 
       if (_isInUpdate) {
          return;
@@ -1450,7 +1485,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements IColo
       selectMapProvider_Internal(allMPInViewer.get(0));
    }
 
-   private void onSelect_MapProvider_Previous() {
+   public void onSelect_MapProvider_Previous() {
 
       final ArrayList<MP> allMPInViewer = getAllMapProviderInMPViewer();
       final int numMP = allMPInViewer.size();

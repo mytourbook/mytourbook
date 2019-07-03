@@ -267,7 +267,15 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
    private long          _dateTimeModified_Long;
    private ZonedDateTime _dateTimeModified_Zoned;
 
+   /**
+    * Url for an online map
+    */
    private String        _onlineMapUrl;
+
+   /**
+    * Common category field which allows to sort the map provider accordingly
+    */
+   private String        _category                        = UI.EMPTY_STRING;
 
    /**
     */
@@ -545,6 +553,10 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
 
    public Point2D.Double geoToPixelDouble(final GeoPosition geoPosition, final int zoomLevel) {
       return _projection.geoToPixelDouble(geoPosition, zoomLevel, this);
+   }
+
+   public String getCategory() {
+      return _category;
    }
 
    /**
@@ -1351,6 +1363,10 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
 
    public void resetTileImageAvailability() {
       _tileCache.resetTileImageAvailability();
+   }
+
+   public void setCategory(final String category) {
+      _category = category;
    }
 
    public void setDateTimeModified(final long dateTimeModified) {

@@ -80,25 +80,28 @@ public class MapProvider_InfoToolTip extends ToolTip {
    /*
     * UI controls
     */
-   private Composite _ttContainer;
+   private Composite                 _ttContainer;
 
-   private Button    _chkIsIncludesHillshading;
-   private Button    _chkIsTransparentLayer;
+   private Button                    _chkIsIncludesHillshading;
+   private Button                    _chkIsTransparentLayer;
 
-   private Label     _lblMapProviderName;
-   private Label     _lblMapProviderId;
-   private Label     _lblMapProviderType;
-   private Label     _lblOfflineFolder;
+   private Label                     _lblMapProviderName;
+   private Label                     _lblMapProviderId;
+   private Label                     _lblMapProviderType;
+   private Label                     _lblOfflineFolder;
 
-   private Text      _txtDescription;
-   private Text      _txtLayers;
+   private Text                      _txtDescription;
+   private Text                      _txtLayers;
 
-   private Link      _linkOnlineMap;
+   private Link                      _linkOnlineMap;
 
-   public MapProvider_InfoToolTip(final TableViewer tableViewer) {
+   private Slideout_Map2_MapProvider _slideout_Map2_MapProvider;
+
+   public MapProvider_InfoToolTip(final Slideout_Map2_MapProvider slideout_Map2_MapProvider, final TableViewer tableViewer) {
 
       super(tableViewer.getTable(), NO_RECREATE, false);
 
+      _slideout_Map2_MapProvider = slideout_Map2_MapProvider;
       _ttControl = tableViewer.getTable();
       _tableViewer = tableViewer;
 
@@ -140,6 +143,8 @@ public class MapProvider_InfoToolTip extends ToolTip {
 
       super.afterHideToolTip(event);
 
+      _slideout_Map2_MapProvider.setIsAnotherDialogOpened(false);
+
       _viewerCell = null;
    }
 
@@ -154,6 +159,13 @@ public class MapProvider_InfoToolTip extends ToolTip {
 
       updateUI(_mp);
       updateUI_Layout();
+
+      /*
+       * Prevent that this tooltip is NOT closed when the mouse is hovering the tooltip and this
+       * tooltip is not covered by the underlaying slideout, very complicated !!! (but is seams to
+       * work :-)
+       */
+      _slideout_Map2_MapProvider.setIsAnotherDialogOpened(true);
 
       return container;
    }
@@ -227,6 +239,10 @@ public class MapProvider_InfoToolTip extends ToolTip {
                      .grab(true, false)
                      .applyTo(_linkOnlineMap);
             }
+
+            // spacer
+            final Label spacer = createUI_Label(container, UI.EMPTY_STRING);
+            GridDataFactory.fillDefaults().span(4, 1).grab(true, false).hint(1, 5).applyTo(spacer);
          }
          {
             /*
@@ -297,6 +313,7 @@ public class MapProvider_InfoToolTip extends ToolTip {
             _chkIsIncludesHillshading.setText(Messages.Map2Provider_Tooltip_Checkbox_IncludeHillshading);
             _chkIsIncludesHillshading.setForeground(_fgColor);
             _chkIsIncludesHillshading.setBackground(_bgColor);
+            _chkIsIncludesHillshading.setEnabled(false);
             GridDataFactory.fillDefaults()
                   .grab(true, false)
                   .span(2, 1)
@@ -323,6 +340,7 @@ public class MapProvider_InfoToolTip extends ToolTip {
             _chkIsTransparentLayer.setText(Messages.Map2Provider_Tooltip_Checkbox_IsTransparentLayer);
             _chkIsTransparentLayer.setForeground(_fgColor);
             _chkIsTransparentLayer.setBackground(_bgColor);
+            _chkIsTransparentLayer.setEnabled(false);
 
             GridDataFactory.fillDefaults()
                   .grab(true, false)

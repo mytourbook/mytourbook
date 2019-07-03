@@ -171,6 +171,7 @@ public class Messages extends NLS {
    public static String        Image__MapProvider_Custom_Hill;
    public static String        Image__MapProvider_Internal;
    public static String        Image__MapProvider_Profile;
+   public static String        Image__MapProvider_Profile_Hill;
    public static String        Image__MapProvider_Transparent;
    public static String        Image__MapProvider_Transparent_Hill;
    public static String        Image__options;

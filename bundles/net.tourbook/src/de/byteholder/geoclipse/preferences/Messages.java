@@ -95,6 +95,7 @@ public class Messages extends NLS {
    public static String        Pref_Map_Label_Url;
    public static String        Pref_Map_Label_WmsDropTarget;
    public static String        Pref_Map_Label_WmsDropTarget_Tooltip;
+   public static String        Pref_Map_Lable_Category;
    public static String        Pref_Map_Lable_Files;
    public static String        Pref_Map_Lable_MapProvider;
    public static String        Pref_Map_Lable_MapProviderId;
@@ -119,6 +120,7 @@ public class Messages extends NLS {
    public static String        Pref_Map_Viewer_Column_IsHillshading_Tooltip;
    public static String        Pref_Map_Viewer_Column_IsTransparent;
    public static String        Pref_Map_Viewer_Column_IsTransparent_Tooltip;
+   public static String        Pref_Map_Viewer_Column_Lbl_Category;
    public static String        Pref_Map_Viewer_Column_Lbl_Description;
    public static String        Pref_Map_Viewer_Column_Lbl_Layer;
    public static String        Pref_Map_Viewer_Column_Lbl_MapProvider;

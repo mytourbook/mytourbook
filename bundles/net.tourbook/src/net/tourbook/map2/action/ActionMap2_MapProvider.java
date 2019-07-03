@@ -21,12 +21,14 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.tooltip.ActionToolbarSlideoutAdv;
 import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.tooltip.SlideoutLocation;
+import net.tourbook.common.util.Util;
 import net.tourbook.map2.Messages;
 import net.tourbook.map2.view.Map2View;
 import net.tourbook.map2.view.Slideout_Map2_MapProvider;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.ToolItem;
 
 public class ActionMap2_MapProvider extends ActionToolbarSlideoutAdv {
@@ -68,12 +70,20 @@ public class ActionMap2_MapProvider extends ActionToolbarSlideoutAdv {
    }
 
    @Override
-   protected void onSelect() {
+   protected void onSelect(final SelectionEvent selectionEvent) {
 
-      super.onSelect();
+      super.onSelect(selectionEvent);
 
-      // select next map provider
-      _slideoutMap2MapProvider.onSelect_MapProvider_Next();
+      if (Util.isCtrlKeyPressed(selectionEvent)) {
+
+         // select previous map provider
+         _slideoutMap2MapProvider.onSelect_MapProvider_Previous();
+
+      } else {
+
+         // select next map provider
+         _slideoutMap2MapProvider.onSelect_MapProvider_Next();
+      }
    }
 
    public void selectMapProvider(final String mapProviderID) {
