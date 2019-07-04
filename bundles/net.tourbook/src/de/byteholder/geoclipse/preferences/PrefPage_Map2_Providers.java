@@ -367,9 +367,13 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
          if (rc == 0) {
 
-            // subsort by map provider
+            // subsort 1 by category
+            rc = mp1.getCategory().compareTo(mp2.getCategory());
 
-            rc = mp1.getName().compareTo(mp2.getName());
+            // subsort 2 by map provider
+            if (rc == 0) {
+               rc = mp1.getName().compareTo(mp2.getName());
+            }
          }
 
          // if descending order, flip the direction
@@ -428,7 +432,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
             // map profile
 
-            return UI.EMPTY_STRING;
+            return MapProviderManager.getTileLayerInfo(mapProvider);
 
          } else if (mapProvider instanceof MPPlugin) {
 
@@ -1560,6 +1564,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       defineColumn_22_Hillshading(tableLayout);
       defineColumn_24_TransparentLayer(tableLayout);
       defineColumn_30_MPType(tableLayout);
+      defineColumn_38_TileUrl(tableLayout);
       defineColumn_40_OnlineMapUrl(tableLayout);
       defineColumn_50_Description(tableLayout);
       defineColumn_60_WMSLayers(tableLayout);
@@ -1693,6 +1698,32 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       });
 
       tableLayout.setColumnData(tvc.getColumn(), new ColumnPixelData(_pc.convertWidthInCharsToPixels(8)));
+   }
+
+   /**
+    * Column: Tile url
+    */
+   private void defineColumn_38_TileUrl(final TableColumnLayout tableLayout) {
+
+      final TableViewerColumn tvc = new TableViewerColumn(_mpViewer, SWT.LEAD);
+
+      final TableColumn tc = tvc.getColumn();
+      tc.setText(Messages.Pref_Map_Viewer_Column_Lbl_TileUrl);
+      tc.setToolTipText(Messages.Pref_Map_Viewer_Column_Lbl_TileUrl);
+      tc.addSelectionListener(_columnSortListener);
+      tc.setData(COLUMN_KEY_FOR_COLUMN_ID, COLUMN_TILE_URL);
+
+      tvc.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final MP mapProvider = (MP) cell.getElement();
+
+            cell.setText(MapProviderManager.getTileLayerInfo(mapProvider));
+         }
+      });
+
+      tableLayout.setColumnData(tvc.getColumn(), new ColumnWeightData(14));
    }
 
    /**

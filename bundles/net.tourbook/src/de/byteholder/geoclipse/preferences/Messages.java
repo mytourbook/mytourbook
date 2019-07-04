@@ -130,6 +130,7 @@ public class Messages extends NLS {
    public static String        Pref_Map_Viewer_Column_Lbl_OfflinePath;
    public static String        Pref_Map_Viewer_Column_Lbl_OnlineMapUrl;
    public static String        Pref_Map_Viewer_Column_Lbl_ServerType_Tooltip;
+   public static String        Pref_Map_Viewer_Column_Lbl_TileUrl;
    public static String        Pref_Map_Viewer_Column_Lbl_WMSLayer;
 
    public static String        PrefPageMapProviders_Pref_Map_FileDialog_AllFiles;
