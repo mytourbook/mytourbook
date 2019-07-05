@@ -20,14 +20,10 @@ import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.mapprovider.IMapProviderListener;
 import de.byteholder.geoclipse.mapprovider.MP;
-import de.byteholder.geoclipse.mapprovider.MPCustom;
-import de.byteholder.geoclipse.mapprovider.MPPlugin;
-import de.byteholder.geoclipse.mapprovider.MPProfile;
-import de.byteholder.geoclipse.mapprovider.MPWms;
 import de.byteholder.geoclipse.mapprovider.MapProviderManager;
 import de.byteholder.geoclipse.preferences.IMappingPreferences;
 import de.byteholder.geoclipse.preferences.PrefPage_Map2_Providers;
-
+ 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 
@@ -140,7 +136,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
    private static final String              COLUMN_IS_TRANSPARENT_LAYER        = "IsTransparentLayer";               //$NON-NLS-1$
    private static final String              COLUMN_IS_VISIBLE                  = "IsVisible";                        //$NON-NLS-1$
    private static final String              COLUMN_MAP_MODIFIED                = "Modified";                         //$NON-NLS-1$
-   private static final String              COLUMN_MAP_PROVIDER                = "MapProvider";                      //$NON-NLS-1$
+   private static final String              COLUMN_MAP_PROVIDER_NAME           = "MapProviderName";                  //$NON-NLS-1$
    private static final String              COLUMN_MP_TYPE                     = "MPType";                           //$NON-NLS-1$
    private static final String              COLUMN_TILE_URL                    = "TileUrl";                          //$NON-NLS-1$
 
@@ -210,7 +206,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
       private static final int DESCENDING      = 1;
       private static final int MANUAL_SORTING  = 2;
 
-      private String           __sortColumnId  = COLUMN_MAP_PROVIDER;
+      private String           __sortColumnId  = COLUMN_MAP_PROVIDER_NAME;
       private int              __sortDirection = ASCENDING;
 
       @Override
@@ -262,10 +258,10 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
                break;
 
             case COLUMN_TILE_URL:
-               rc = getTileUrl(mp1).compareTo(getTileUrl(mp2));
+               rc = MapProviderManager.getTileLayerInfo(mp1).compareTo(MapProviderManager.getTileLayerInfo(mp2));
                break;
 
-            case COLUMN_MAP_PROVIDER:
+            case COLUMN_MAP_PROVIDER_NAME:
             default:
                rc = mp1.getName().compareTo(mp2.getName());
             }
@@ -514,7 +510,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
       restoreState();
       enableControls();
 
-      setFocusToMPViewer();
+      _mpViewer.getTable().setFocus();
    }
 
    /**
@@ -633,7 +629,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
 
          @Override
          public void controlResized(final ControlEvent e) {
-            setWidth_ForColum_IsVisible();
+            setWidth_ForColumn_IsVisible();
          }
       });
 
@@ -681,12 +677,12 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
       _columnManager.setSlideoutShell(this);
 
       // set initial width
-      setWidth_ForColum_IsVisible();
+      setWidth_ForColumn_IsVisible();
 
       _colDef_IsMPVisible.setControlListener(new ControlAdapter() {
          @Override
          public void controlResized(final ControlEvent e) {
-            setWidth_ForColum_IsVisible();
+            setWidth_ForColumn_IsVisible();
          }
       });
 
@@ -1009,7 +1005,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
       defineColumn_22_MPType();
       defineColumn_30_Hillshading();
       defineColumn_40_TransparentLayer();
-      defineColumn_50_Url();
+      defineColumn_50_TileUrl();
       defineColumn_80_Modified();
    }
 
@@ -1040,7 +1036,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
     */
    private void defineColumn_10_MapProvider() {
 
-      final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_MAP_PROVIDER, SWT.LEAD);
+      final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_MAP_PROVIDER_NAME, SWT.LEAD);
 
       colDef.setColumnName(PREF_MAP_VIEWER_COLUMN_LBL_MAP_PROVIDER);
 
@@ -1161,9 +1157,9 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
    }
 
    /**
-    * Column: Url
+    * Column: Tile url
     */
-   private void defineColumn_50_Url() {
+   private void defineColumn_50_TileUrl() {
 
       final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_TILE_URL, SWT.LEAD);
 
@@ -1178,7 +1174,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
 
             final MP mapProvider = (MP) cell.getElement();
 
-            cell.setText(getTileUrl(mapProvider));
+            cell.setText(MapProviderManager.getTileLayerInfo(mapProvider));
          }
       });
    }
@@ -1284,41 +1280,6 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
       return allColumns[0];
    }
 
-   private String getTileUrl(final MP mapProvider) {
-
-      if (mapProvider instanceof MPWms) {
-
-         // wms map provider
-
-         final MPWms wmsMapProvider = (MPWms) mapProvider;
-
-         return wmsMapProvider.getCapabilitiesUrl();
-
-      } else if (mapProvider instanceof MPCustom) {
-
-         // custom map provider
-
-         final MPCustom customMapProvider = (MPCustom) mapProvider;
-
-         return customMapProvider.getCustomUrl();
-
-      } else if (mapProvider instanceof MPProfile) {
-
-         // map profile
-
-         return UI.EMPTY_STRING;
-
-      } else if (mapProvider instanceof MPPlugin) {
-
-         // plugin map provider
-
-         final MPPlugin pluginMapProvider = (MPPlugin) mapProvider;
-
-         return pluginMapProvider.getBaseURL();
-      }
-
-      return UI.EMPTY_STRING;
-   }
 
    @Override
    public ColumnViewer getViewer() {
@@ -1372,7 +1333,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
    @Override
    protected void onFocus() {
 
-      setFocusToMPViewer();
+      _mpViewer.getTable().setFocus();
    }
 
    private void onPaint_Viewer(final Event event) {
@@ -1561,7 +1522,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
       }
       _viewerContainer.setRedraw(true);
 
-      setFocusToMPViewer();
+      _mpViewer.getTable().setFocus();
 
       return _mpViewer;
    }
@@ -1615,7 +1576,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
    private void restoreState_BeforeUI() {
 
       // update sorting comparator
-      final String sortColumnId = Util.getStateString(_state, STATE_SORT_COLUMN_ID, COLUMN_MAP_PROVIDER);
+      final String sortColumnId = Util.getStateString(_state, STATE_SORT_COLUMN_ID, COLUMN_MAP_PROVIDER_NAME);
       final int sortDirection = Util.getStateInt(_state, STATE_SORT_COLUMN_DIRECTION, MapProviderComparator.ASCENDING);
 
       _mpComparator.__sortColumnId = sortColumnId;
@@ -1769,12 +1730,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
       map.setDimLevel(_map2View.getMapDimLevel(), dimColor);
    }
 
-   private void setFocusToMPViewer() {
-
-      _mpViewer.getTable().setFocus();
-   }
-
-   private void setWidth_ForColum_IsVisible() {
+   private void setWidth_ForColumn_IsVisible() {
 
       if (_colDef_IsMPVisible != null) {
 

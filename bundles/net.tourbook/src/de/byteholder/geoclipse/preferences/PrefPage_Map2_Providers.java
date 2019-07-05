@@ -50,12 +50,17 @@ import java.util.ArrayList;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.util.ColumnDefinition;
+import net.tourbook.common.util.ColumnManager;
+import net.tourbook.common.util.EmptyContextMenuProvider;
+import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.TableColumnDefinition;
 import net.tourbook.common.util.Util;
 import net.tourbook.map2.view.Map2View;
 import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.web.WEB;
-
+  
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -72,14 +77,12 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
-import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.CellLabelProvider;
-import org.eclipse.jface.viewers.ColumnPixelData;
-import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
@@ -89,7 +92,6 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
@@ -138,12 +140,10 @@ import org.geotools.data.ows.Service;
 import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.ows.WMSRequest;
 
-public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenchPreferencePage {
+public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenchPreferencePage, ITourViewer {
 
 // SET_FORMATTING_OFF
 
-   private static final String SLIDEOUT_MAP2_PROVIDER_COLUMN_MP_TYPE          = net.tourbook.Messages.Slideout_Map2Provider_Column_MPType;
-   private static final String SLIDEOUT_MAP2_PROVIDER_COLUMN_MP_TYPE_TOOLTIP  = net.tourbook.Messages.Slideout_Map2Provider_Column_MPType_Tooltip;
    private static final String SLIDEOUT_MAP2_PROVIDER_COLUMN_MP_TYPE_CUSTOM   = net.tourbook.Messages.Slideout_Map2Provider_Column_MPType_Custom;
    private static final String SLIDEOUT_MAP2_PROVIDER_COLUMN_MP_TYPE_INTERNAL = net.tourbook.Messages.Slideout_Map2Provider_Column_MPType_Internal;
    private static final String SLIDEOUT_MAP2_PROVIDER_COLUMN_MP_TYPE_PROFILE  = net.tourbook.Messages.Slideout_Map2Provider_Column_MPType_Profile;
@@ -197,6 +197,8 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
    private TableViewer                         _mpViewer;
    private MapProviderComparator               _mpComparator           = new MapProviderComparator();
+   private ColumnManager                       _columnManager;
+
    private final MapProviderManager            _mpManager              = MapProviderManager.getInstance();
 
    /**
@@ -250,7 +252,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
    /*
     * UI controls
     */
-
+   private Composite  _viewerContainer;
    private DropTarget _wmsDropTarget;
 
    private Group      _groupDetails;
@@ -357,7 +359,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
             break;
 
          case COLUMN_TILE_URL:
-            rc = getTileUrl(mp1).compareTo(getTileUrl(mp2));
+            rc = MapProviderManager.getTileLayerInfo(mp1).compareTo(MapProviderManager.getTileLayerInfo(mp2));
             break;
 
          case COLUMN_MAP_PROVIDER_NAME:
@@ -408,42 +410,6 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
          } else {
             return UI.EMPTY_STRING;
          }
-      }
-
-      private String getTileUrl(final MP mapProvider) {
-
-         if (mapProvider instanceof MPWms) {
-
-            // wms map provider
-
-            final MPWms wmsMapProvider = (MPWms) mapProvider;
-
-            return wmsMapProvider.getCapabilitiesUrl();
-
-         } else if (mapProvider instanceof MPCustom) {
-
-            // custom map provider
-
-            final MPCustom customMapProvider = (MPCustom) mapProvider;
-
-            return customMapProvider.getCustomUrl();
-
-         } else if (mapProvider instanceof MPProfile) {
-
-            // map profile
-
-            return MapProviderManager.getTileLayerInfo(mapProvider);
-
-         } else if (mapProvider instanceof MPPlugin) {
-
-            // plugin map provider
-
-            final MPPlugin pluginMapProvider = (MPPlugin) mapProvider;
-
-            return pluginMapProvider.getBaseURL();
-         }
-
-         return UI.EMPTY_STRING;
       }
 
       @Override
@@ -539,8 +505,6 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
    }
 
    private void addListener() {
-
-      _columnSortListener = widgetSelectedAdapter(e -> onSelect_SortColumn(e));
 
       _offlineJobInfoListener = new IOfflineInfoListener() {
 
@@ -712,6 +676,36 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       _isInUIUpdate = false;
    }
 
+   @Override
+   protected Control createContents(final Composite parent) {
+
+      _visibleMp = _mpManager.getAllMapProviders(true);
+
+      addListener();
+
+      initUI(parent);
+      initializeDialogUnits(parent);
+
+      restoreState_BeforeUI();
+
+      // define all columns for the viewer
+      _columnManager = new ColumnManager(this, _state);
+      defineAllColumns();
+
+      final Composite container = createUI(parent);
+
+      // load viewer
+      _mpViewer.setInput(new Object());
+
+      restoreState();
+
+      updateUI_OfflineInfo_Total();
+
+      _mpViewer.getTable().setFocus();
+
+      return container;
+   }
+
 //   private String checkBaseUrl(final String baseUrl) {
 //
 //      if (baseUrl == null || baseUrl.length() == 0) {
@@ -728,44 +722,23 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 //      return null;
 //   }
 
-   @Override
-   protected Control createContents(final Composite parent) {
-
-      _visibleMp = _mpManager.getAllMapProviders(true);
-
-      addListener();
-
-      initializeDialogUnits(parent);
-
-      restoreState_BeforeUI();
-
-      final Composite container = createUI(parent);
-
-      // load viewer
-      _mpViewer.setInput(new Object());
-
-      restoreState();
-
-      updateUI_OfflineInfo_Total();
-
-      _mpViewer.getTable().setFocus();
-
-      return container;
-   }
-
    private Composite createUI(final Composite parent) {
-
-      _pc = new PixelConverter(parent);
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).spacing(5, 0).applyTo(container);
 //      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
       {
-         createUI_10_MapViewer_Header(container);
+         createUI_10_Header(container);
          new Label(container, SWT.NONE);
 
-         createUI_20_MapViewer_Viewer(container);
+         _viewerContainer = new Composite(container, SWT.NONE);
+         GridDataFactory.fillDefaults().grab(true, true).applyTo(_viewerContainer);
+         GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
+         {
+            createUI_20_MapViewer_Viewer(_viewerContainer);
+         }
+
          createUI_30_Buttons(container);
 
          createUI_40_ReadTileSize(container);
@@ -781,7 +754,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       return container;
    }
 
-   private void createUI_10_MapViewer_Header(final Composite parent) {
+   private void createUI_10_Header(final Composite parent) {
 
       final Composite headerContainer = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(headerContainer);
@@ -822,19 +795,14 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       final Color fgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_FOREGROUND);
       final Color bgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND);
 
-      final TableColumnLayout tableLayout = new TableColumnLayout();
-
-      final Composite layoutContainer = new Composite(parent, SWT.NONE);
-      layoutContainer.setLayout(tableLayout);
-      GridDataFactory.fillDefaults()//
-            .hint(800, _pc.convertHeightInCharsToPixels(10))
-            .grab(true, true)
-            .applyTo(layoutContainer);
-
       /*
-       * create table
+       * Create table
        */
-      final Table table = new Table(layoutContainer, SWT.FULL_SELECTION | SWT.BORDER);
+      final Table table = new Table(parent, SWT.FULL_SELECTION);
+      GridDataFactory.fillDefaults()//
+            .hint(600, _pc.convertHeightInCharsToPixels(10))
+            .grab(true, true)
+            .applyTo(table);
 
       table.setLayout(new TableLayout());
       table.setHeaderVisible(true);
@@ -856,16 +824,17 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
          public void keyReleased(final KeyEvent e) {}
       });
 
+      /*
+       * Create table viewer
+       */
       _mpViewer = new TableViewer(table);
       _mpViewer.setUseHashlookup(true);
 
-      defineAllColumns(tableLayout);
-
-      /*
-       * create table viewer
-       */
       _mpViewer.setContentProvider(new MapContentProvider());
       _mpViewer.setComparator(_mpComparator);
+
+      _columnManager.createColumns(_mpViewer);
+      _columnManager.createHeaderContextMenu(table, new EmptyContextMenuProvider());
 
       _mpViewer.addSelectionChangedListener(new ISelectionChangedListener() {
          @Override
@@ -901,6 +870,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
       updateUI_SetSortDirection(_mpComparator.__sortColumnId, _mpComparator.__sortDirection);
 
+      // draw dark theme for the table
       net.tourbook.common.UI.setChildColors(table, fgColor, bgColor);
    }
 
@@ -1557,163 +1527,162 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
    /**
     * Create all columns
     */
-   private void defineAllColumns(final TableColumnLayout tableLayout) {
+   private void defineAllColumns() {
 
-      defineColumn_10_MapProviderName(tableLayout);
-      defineColumn_12_Category(tableLayout);
-      defineColumn_22_Hillshading(tableLayout);
-      defineColumn_24_TransparentLayer(tableLayout);
-      defineColumn_30_MPType(tableLayout);
-      defineColumn_38_TileUrl(tableLayout);
-      defineColumn_40_OnlineMapUrl(tableLayout);
-      defineColumn_50_Description(tableLayout);
-      defineColumn_60_WMSLayers(tableLayout);
-      defineColumn_62_OfflinePath(tableLayout);
-      defineColumn_70_OfflineFileCounter(tableLayout);
-      defineColumn_72_OfflineFileSize(tableLayout);
-      defineColumn_80_Modified(tableLayout);
+      defineColumn_10_MapProviderName();
+      defineColumn_12_Category();
+      defineColumn_22_Hillshading();
+      defineColumn_24_TransparentLayer();
+      defineColumn_30_MPType();
+      defineColumn_38_TileUrl();
+//      defineColumn_40_OnlineMapUrl();
+//      defineColumn_50_Description();
+//      defineColumn_60_WMSLayers();
+//      defineColumn_62_OfflinePath();
+//      defineColumn_70_OfflineFileCounter();
+//      defineColumn_72_OfflineFileSize();
+      defineColumn_80_Modified();
    }
 
    /**
-    * Column: Map provider name
+    * Column: Map provider
     */
-   private void defineColumn_10_MapProviderName(final TableColumnLayout tableLayout) {
+   private void defineColumn_10_MapProviderName() {
 
-      final TableViewerColumn tvc = new TableViewerColumn(_mpViewer, SWT.LEAD);
+      final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_MAP_PROVIDER_NAME, SWT.LEAD);
 
-      final TableColumn tc = tvc.getColumn();
-      tc.setText(Messages.Pref_Map_Viewer_Column_Lbl_MapProvider);
-      tc.setToolTipText(Messages.Pref_Map_Viewer_Column_Lbl_MapProvider);
-      tc.addSelectionListener(_columnSortListener);
-      tc.setData(COLUMN_KEY_FOR_COLUMN_ID, COLUMN_MAP_PROVIDER_NAME);
+      colDef.setColumnName(Messages.Pref_Map_Viewer_Column_Lbl_MapProvider);
+      colDef.setColumnHeaderToolTipText(Messages.Pref_Map_Viewer_Column_Lbl_MapProvider);
 
-      tvc.setLabelProvider(new CellLabelProvider() {
+      colDef.setCanModifyVisibility(false);
+      colDef.setIsColumnMoveable(false);
+      colDef.setIsDefaultColumn();
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(40));
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
             final MP mapProvider = (MP) cell.getElement();
 
-            cell.setText(mapProvider.getName());
             cell.setImage(MapProviderManager.getMapProvider_TypeImage(mapProvider));
+            cell.setText(mapProvider.getName());
          }
       });
-
-      tableLayout.setColumnData(tvc.getColumn(), new ColumnPixelData(_pc.convertWidthInCharsToPixels(30)));
    }
 
    /**
     * Column: Category
     */
-   private void defineColumn_12_Category(final TableColumnLayout tableLayout) {
+   private void defineColumn_12_Category() {
 
-      final TableViewerColumn tvc = new TableViewerColumn(_mpViewer, SWT.LEAD);
+      final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_CATEGORY, SWT.LEAD);
 
-      final TableColumn tc = tvc.getColumn();
-      tc.setText(Messages.Pref_Map_Viewer_Column_Lbl_Category);
-      tc.setToolTipText(Messages.Pref_Map_Viewer_Column_Lbl_Category);
-      tc.addSelectionListener(_columnSortListener);
-      tc.setData(COLUMN_KEY_FOR_COLUMN_ID, COLUMN_CATEGORY);
+      colDef.setColumnName(Messages.Pref_Map_Viewer_Column_Lbl_Category);
+      colDef.setColumnHeaderToolTipText(Messages.Pref_Map_Viewer_Column_Lbl_Category);
+      colDef.setIsDefaultColumn();
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
 
-      tvc.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
+      colDef.setColumnSelectionListener(_columnSortListener);
 
-            cell.setText(((MP) cell.getElement()).getCategory());
-         }
-      });
-
-      tableLayout.setColumnData(tvc.getColumn(), new ColumnPixelData(_pc.convertWidthInCharsToPixels(12)));
-   }
-
-   /**
-    * Column: Includes hillshading
-    */
-   private void defineColumn_22_Hillshading(final TableColumnLayout tableLayout) {
-
-      final TableViewerColumn tvc = new TableViewerColumn(_mpViewer, SWT.LEAD);
-
-      final TableColumn tc = tvc.getColumn();
-      tc.setText(Messages.Pref_Map_Viewer_Column_IsHillshading);
-      tc.setToolTipText(Messages.Pref_Map_Viewer_Column_IsHillshading_Tooltip);
-      tc.addSelectionListener(_columnSortListener);
-      tc.setData(COLUMN_KEY_FOR_COLUMN_ID, COLUMN_IS_CONTAINS_HILLSHADING);
-
-      tvc.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            cell.setText(((MP) cell.getElement()).isIncludesHillshading() ? APP_TRUE : UI.EMPTY_STRING);
-         }
-      });
-
-      tableLayout.setColumnData(tvc.getColumn(), new ColumnPixelData(_pc.convertWidthInCharsToPixels(6)));
-   }
-
-   /**
-    * Column: Is transparent layer
-    */
-   private void defineColumn_24_TransparentLayer(final TableColumnLayout tableLayout) {
-
-      final TableViewerColumn tvc = new TableViewerColumn(_mpViewer, SWT.LEAD);
-
-      final TableColumn tc = tvc.getColumn();
-      tc.setText(Messages.Pref_Map_Viewer_Column_IsTransparent);
-      tc.setToolTipText(Messages.Pref_Map_Viewer_Column_IsTransparent_Tooltip);
-      tc.addSelectionListener(_columnSortListener);
-      tc.setData(COLUMN_KEY_FOR_COLUMN_ID, COLUMN_IS_TRANSPARENT_LAYER);
-
-      tvc.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            cell.setText(((MP) cell.getElement()).isTransparentLayer() ? APP_TRUE : UI.EMPTY_STRING);
-         }
-      });
-
-      tableLayout.setColumnData(tvc.getColumn(), new ColumnPixelData(_pc.convertWidthInCharsToPixels(6)));
-   }
-
-   /**
-    * Column: Server type
-    */
-   private void defineColumn_30_MPType(final TableColumnLayout tableLayout) {
-
-      final TableViewerColumn tvc = new TableViewerColumn(_mpViewer, SWT.LEAD);
-
-      final TableColumn tc = tvc.getColumn();
-      tc.setText(SLIDEOUT_MAP2_PROVIDER_COLUMN_MP_TYPE);
-      tc.setToolTipText(SLIDEOUT_MAP2_PROVIDER_COLUMN_MP_TYPE_TOOLTIP);
-      tc.setData(COLUMN_KEY_FOR_COLUMN_ID, COLUMN_MP_TYPE);
-      tc.addSelectionListener(_columnSortListener);
-
-      tvc.setLabelProvider(new CellLabelProvider() {
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
             final MP mapProvider = (MP) cell.getElement();
 
-            cell.setImage(null);
+            cell.setText(mapProvider.getCategory());
+         }
+      });
+   }
+
+   /**
+    * Column: Includes hillshading
+    */
+   private void defineColumn_22_Hillshading() {
+
+      final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_IS_CONTAINS_HILLSHADING, SWT.LEAD);
+
+      colDef.setColumnName(Messages.Pref_Map_Viewer_Column_IsHillshading);
+      colDef.setColumnHeaderToolTipText(Messages.Pref_Map_Viewer_Column_IsHillshading_Tooltip);
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(8));
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final MP mapProvider = (MP) cell.getElement();
+
+            cell.setText(mapProvider.isIncludesHillshading() ? APP_TRUE : UI.EMPTY_STRING);
+         }
+      });
+   }
+
+   /**
+    * Column: Is transparent layer
+    */
+   private void defineColumn_24_TransparentLayer() {
+
+      final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_IS_TRANSPARENT_LAYER, SWT.LEAD);
+
+      colDef.setColumnName(Messages.Pref_Map_Viewer_Column_IsTransparent);
+      colDef.setColumnHeaderToolTipText(Messages.Pref_Map_Viewer_Column_IsTransparent_Tooltip);
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(8));
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final MP mapProvider = (MP) cell.getElement();
+
+            cell.setText(mapProvider.isTransparentLayer() ? APP_TRUE : UI.EMPTY_STRING);
+         }
+      });
+   }
+
+   /**
+    * Column: MP type
+    */
+   private void defineColumn_30_MPType() {
+
+      final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_MP_TYPE, SWT.LEAD);
+
+      colDef.setColumnName(net.tourbook.Messages.Slideout_Map2Provider_Column_MPType);
+      colDef.setColumnHeaderToolTipText(net.tourbook.Messages.Slideout_Map2Provider_Column_MPType_Tooltip);
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final MP mapProvider = (MP) cell.getElement();
+
             cell.setText(MapProviderManager.getMapProvider_TypeLabel(mapProvider));
          }
       });
-
-      tableLayout.setColumnData(tvc.getColumn(), new ColumnPixelData(_pc.convertWidthInCharsToPixels(8)));
    }
 
    /**
     * Column: Tile url
     */
-   private void defineColumn_38_TileUrl(final TableColumnLayout tableLayout) {
+   private void defineColumn_38_TileUrl() {
 
-      final TableViewerColumn tvc = new TableViewerColumn(_mpViewer, SWT.LEAD);
+      final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_TILE_URL, SWT.LEAD);
 
-      final TableColumn tc = tvc.getColumn();
-      tc.setText(Messages.Pref_Map_Viewer_Column_Lbl_TileUrl);
-      tc.setToolTipText(Messages.Pref_Map_Viewer_Column_Lbl_TileUrl);
-      tc.addSelectionListener(_columnSortListener);
-      tc.setData(COLUMN_KEY_FOR_COLUMN_ID, COLUMN_TILE_URL);
+      colDef.setColumnName(net.tourbook.Messages.Slideout_Map2Provider_Column_TileUrl);
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(40));
 
-      tvc.setLabelProvider(new CellLabelProvider() {
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1722,191 +1691,21 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
             cell.setText(MapProviderManager.getTileLayerInfo(mapProvider));
          }
       });
-
-      tableLayout.setColumnData(tvc.getColumn(), new ColumnWeightData(14));
-   }
-
-   /**
-    * Column: Online map url
-    */
-   private void defineColumn_40_OnlineMapUrl(final TableColumnLayout tableLayout) {
-
-      final TableViewerColumn tvc = new TableViewerColumn(_mpViewer, SWT.LEAD);
-
-      final TableColumn tc = tvc.getColumn();
-      tc.setText(Messages.Pref_Map_Viewer_Column_Lbl_OnlineMapUrl);
-      tc.setToolTipText(Messages.Pref_Map_Viewer_Column_Lbl_OnlineMapUrl);
-      tc.addSelectionListener(_columnSortListener);
-      tc.setData(COLUMN_KEY_FOR_COLUMN_ID, COLUMN_ONLINE_MAP_URL);
-
-      tvc.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            cell.setText(((MP) cell.getElement()).getOnlineMapUrl());
-         }
-      });
-
-      tableLayout.setColumnData(tvc.getColumn(), new ColumnWeightData(14));
-   }
-
-   /**
-    * Column: Description
-    */
-   private void defineColumn_50_Description(final TableColumnLayout tableLayout) {
-
-      final TableViewerColumn tvc = new TableViewerColumn(_mpViewer, SWT.LEAD);
-
-      final TableColumn tc = tvc.getColumn();
-      tc.setText(Messages.Pref_Map_Viewer_Column_Lbl_Description);
-      tc.setToolTipText(Messages.Pref_Map_Viewer_Column_Lbl_Description);
-      tc.addSelectionListener(_columnSortListener);
-      tc.setData(COLUMN_KEY_FOR_COLUMN_ID, COLUMN_DESCRIPTION);
-
-      tvc.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            cell.setText(((MP) cell.getElement()).getDescription());
-         }
-      });
-
-      tableLayout.setColumnData(tvc.getColumn(), new ColumnWeightData(14));
-   }
-
-   /**
-    * Column: WMS layers
-    */
-   private void defineColumn_60_WMSLayers(final TableColumnLayout tableLayout) {
-
-      final TableViewerColumn tvc = new TableViewerColumn(_mpViewer, SWT.TRAIL);
-
-      final TableColumn tc = tvc.getColumn();
-      tc.setText(Messages.Pref_Map_Viewer_Column_Lbl_WMSLayer);
-      tc.setToolTipText(Messages.Pref_Map_Viewer_Column_Lbl_WMSLayer);
-      tc.addSelectionListener(_columnSortListener);
-
-      tvc.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            String layer = UI.EMPTY_STRING;
-
-            final MP mapProvider = (MP) cell.getElement();
-            if (mapProvider instanceof MPWms) {
-
-               final MPWms wmsMapProvider = (MPWms) mapProvider;
-
-               final StringBuilder sb = new StringBuilder();
-               sb.append(wmsMapProvider.getAvailableLayers());
-
-               layer = sb.toString();
-            }
-            cell.setText(layer);
-         }
-      });
-
-      tableLayout.setColumnData(tvc.getColumn(), new ColumnPixelData(_pc.convertWidthInCharsToPixels(6)));
-   }
-
-   /**
-    * Column: offline path
-    */
-   private void defineColumn_62_OfflinePath(final TableColumnLayout tableLayout) {
-
-      final TableViewerColumn tvc = new TableViewerColumn(_mpViewer, SWT.LEAD);
-
-      final TableColumn tc = tvc.getColumn();
-      tc.setText(Messages.Pref_Map_Viewer_Column_Lbl_OfflinePath);
-      tc.setToolTipText(Messages.Pref_Map_Viewer_Column_Lbl_OfflinePath);
-      tc.setData(COLUMN_KEY_FOR_COLUMN_ID, COLUMN_OFFLINE_FOLDER_NAME);
-      tc.addSelectionListener(_columnSortListener);
-
-      tvc.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            cell.setText(((MP) cell.getElement()).getOfflineFolder());
-         }
-      });
-
-      tableLayout.setColumnData(tvc.getColumn(), new ColumnWeightData(10));
-   }
-
-   /**
-    * Column: Offline file counter
-    */
-   private void defineColumn_70_OfflineFileCounter(final TableColumnLayout tableLayout) {
-
-      final TableViewerColumn tvc = new TableViewerColumn(_mpViewer, SWT.TRAIL);
-
-      final TableColumn tc = tvc.getColumn();
-      tc.setText(Messages.Pref_Map_Viewer_Column_Lbl_OfflineFileCounter);
-      tc.setToolTipText(Messages.Pref_Map_Viewer_Column_Lbl_OfflineFileCounter);
-      tc.addSelectionListener(_columnSortListener);
-
-      tvc.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final int offlineTileCounter = ((MP) cell.getElement()).getOfflineFileCounter();
-            if (offlineTileCounter == MP.OFFLINE_INFO_NOT_READ) {
-               cell.setText(Messages.pref_map_lable_NA);
-            } else if (offlineTileCounter > 0) {
-               cell.setText(Integer.toString(offlineTileCounter));
-            } else {
-               cell.setText(UI.DASH_WITH_SPACE);
-            }
-         }
-      });
-
-      tableLayout.setColumnData(tvc.getColumn(), new ColumnPixelData(_pc.convertWidthInCharsToPixels(6)));
-   }
-
-   /**
-    * Column: Offline file size
-    */
-   private void defineColumn_72_OfflineFileSize(final TableColumnLayout tableLayout) {
-
-      final TableViewerColumn tvc = new TableViewerColumn(_mpViewer, SWT.TRAIL);
-
-      final TableColumn tc = tvc.getColumn();
-      tc.setText(Messages.Pref_Map_Viewer_Column_Lbl_OfflineFileSize);
-      tc.setToolTipText(Messages.Pref_Map_Viewer_Column_Lbl_OfflineFileSize);
-      tc.addSelectionListener(_columnSortListener);
-
-      tvc.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final long offlineTileSize = ((MP) cell.getElement()).getOfflineFileSize();
-            if (offlineTileSize == MP.OFFLINE_INFO_NOT_READ) {
-               cell.setText(Messages.pref_map_lable_NA);
-            } else if (offlineTileSize > 0) {
-               cell.setText(_nf.format((float) offlineTileSize / 1024 / 1024));
-            } else {
-               cell.setText(UI.DASH_WITH_SPACE);
-            }
-         }
-      });
-
-      tableLayout.setColumnData(tvc.getColumn(), new ColumnPixelData(_pc.convertWidthInCharsToPixels(6)));
    }
 
    /**
     * Column: Modified
     */
-   private void defineColumn_80_Modified(final TableColumnLayout tableLayout) {
+   private void defineColumn_80_Modified() {
 
-      final TableViewerColumn tvc = new TableViewerColumn(_mpViewer, SWT.LEAD);
+      final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_MODIFIED, SWT.LEAD);
 
-      final TableColumn tc = tvc.getColumn();
-      tc.setText(Messages.Pref_Map_Viewer_Column_Lbl_Modified);
-      tc.setToolTipText(Messages.Pref_Map_Viewer_Column_Lbl_Modified);
-      tc.setData(COLUMN_KEY_FOR_COLUMN_ID, COLUMN_MODIFIED);
-      tc.addSelectionListener(_columnSortListener);
+      colDef.setColumnName(Messages.Pref_Map_Viewer_Column_Lbl_OfflineFileSize);
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(18));
 
-      tvc.setLabelProvider(new CellLabelProvider() {
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
@@ -1921,8 +1720,6 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
             }
          }
       });
-
-      tableLayout.setColumnData(tvc.getColumn(), new ColumnPixelData(_pc.convertWidthInCharsToPixels(18)));
    }
 
    private void deleteFile(final String filePath) {
@@ -1933,6 +1730,173 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
          file.delete();
       }
    }
+
+//   /**
+//    * Column: Online map url
+//    */
+//   private void defineColumn_40_OnlineMapUrl() {
+//
+//      final TableViewerColumn tvc = new TableViewerColumn(_mpViewer, SWT.LEAD);
+//
+//      final TableColumn tc = tvc.getColumn();
+//      tc.setText(Messages.Pref_Map_Viewer_Column_Lbl_OnlineMapUrl);
+//      tc.setToolTipText(Messages.Pref_Map_Viewer_Column_Lbl_OnlineMapUrl);
+//      tc.addSelectionListener(_columnSortListener);
+//      tc.setData(COLUMN_KEY_FOR_COLUMN_ID, COLUMN_ONLINE_MAP_URL);
+//
+//      tvc.setLabelProvider(new CellLabelProvider() {
+//         @Override
+//         public void update(final ViewerCell cell) {
+//
+//            cell.setText(((MP) cell.getElement()).getOnlineMapUrl());
+//         }
+//      });
+//
+//      tableLayout.setColumnData(tvc.getColumn(), new ColumnWeightData(14));
+//   }
+//
+//   /**
+//    * Column: Description
+//    */
+//   private void defineColumn_50_Description() {
+//
+//      final TableViewerColumn tvc = new TableViewerColumn(_mpViewer, SWT.LEAD);
+//
+//      final TableColumn tc = tvc.getColumn();
+//      tc.setText(Messages.Pref_Map_Viewer_Column_Lbl_Description);
+//      tc.setToolTipText(Messages.Pref_Map_Viewer_Column_Lbl_Description);
+//      tc.addSelectionListener(_columnSortListener);
+//      tc.setData(COLUMN_KEY_FOR_COLUMN_ID, COLUMN_DESCRIPTION);
+//
+//      tvc.setLabelProvider(new CellLabelProvider() {
+//         @Override
+//         public void update(final ViewerCell cell) {
+//
+//            cell.setText(((MP) cell.getElement()).getDescription());
+//         }
+//      });
+//
+//      tableLayout.setColumnData(tvc.getColumn(), new ColumnWeightData(14));
+//   }
+//
+//   /**
+//    * Column: WMS layers
+//    */
+//   private void defineColumn_60_WMSLayers() {
+//
+//      final TableViewerColumn tvc = new TableViewerColumn(_mpViewer, SWT.TRAIL);
+//
+//      final TableColumn tc = tvc.getColumn();
+//      tc.setText(Messages.Pref_Map_Viewer_Column_Lbl_WMSLayer);
+//      tc.setToolTipText(Messages.Pref_Map_Viewer_Column_Lbl_WMSLayer);
+//      tc.addSelectionListener(_columnSortListener);
+//
+//      tvc.setLabelProvider(new CellLabelProvider() {
+//         @Override
+//         public void update(final ViewerCell cell) {
+//
+//            String layer = UI.EMPTY_STRING;
+//
+//            final MP mapProvider = (MP) cell.getElement();
+//            if (mapProvider instanceof MPWms) {
+//
+//               final MPWms wmsMapProvider = (MPWms) mapProvider;
+//
+//               final StringBuilder sb = new StringBuilder();
+//               sb.append(wmsMapProvider.getAvailableLayers());
+//
+//               layer = sb.toString();
+//            }
+//            cell.setText(layer);
+//         }
+//      });
+//
+//      tableLayout.setColumnData(tvc.getColumn(), new ColumnPixelData(_pc.convertWidthInCharsToPixels(6)));
+//   }
+//
+//   /**
+//    * Column: offline path
+//    */
+//   private void defineColumn_62_OfflinePath() {
+//
+//      final TableViewerColumn tvc = new TableViewerColumn(_mpViewer, SWT.LEAD);
+//
+//      final TableColumn tc = tvc.getColumn();
+//      tc.setText(Messages.Pref_Map_Viewer_Column_Lbl_OfflinePath);
+//      tc.setToolTipText(Messages.Pref_Map_Viewer_Column_Lbl_OfflinePath);
+//      tc.setData(COLUMN_KEY_FOR_COLUMN_ID, COLUMN_OFFLINE_FOLDER_NAME);
+//      tc.addSelectionListener(_columnSortListener);
+//
+//      tvc.setLabelProvider(new CellLabelProvider() {
+//         @Override
+//         public void update(final ViewerCell cell) {
+//
+//            cell.setText(((MP) cell.getElement()).getOfflineFolder());
+//         }
+//      });
+//
+//      tableLayout.setColumnData(tvc.getColumn(), new ColumnWeightData(10));
+//   }
+//
+//   /**
+//    * Column: Offline file counter
+//    */
+//   private void defineColumn_70_OfflineFileCounter() {
+//
+//      final TableViewerColumn tvc = new TableViewerColumn(_mpViewer, SWT.TRAIL);
+//
+//      final TableColumn tc = tvc.getColumn();
+//      tc.setText(Messages.Pref_Map_Viewer_Column_Lbl_OfflineFileCounter);
+//      tc.setToolTipText(Messages.Pref_Map_Viewer_Column_Lbl_OfflineFileCounter);
+//      tc.addSelectionListener(_columnSortListener);
+//
+//      tvc.setLabelProvider(new CellLabelProvider() {
+//         @Override
+//         public void update(final ViewerCell cell) {
+//
+//            final int offlineTileCounter = ((MP) cell.getElement()).getOfflineFileCounter();
+//            if (offlineTileCounter == MP.OFFLINE_INFO_NOT_READ) {
+//               cell.setText(Messages.pref_map_lable_NA);
+//            } else if (offlineTileCounter > 0) {
+//               cell.setText(Integer.toString(offlineTileCounter));
+//            } else {
+//               cell.setText(UI.DASH_WITH_SPACE);
+//            }
+//         }
+//      });
+//
+//      tableLayout.setColumnData(tvc.getColumn(), new ColumnPixelData(_pc.convertWidthInCharsToPixels(6)));
+//   }
+//
+//   /**
+//    * Column: Offline file size
+//    */
+//   private void defineColumn_72_OfflineFileSize() {
+//
+//      final TableViewerColumn tvc = new TableViewerColumn(_mpViewer, SWT.TRAIL);
+//
+//      final TableColumn tc = tvc.getColumn();
+//      tc.setText(Messages.Pref_Map_Viewer_Column_Lbl_OfflineFileSize);
+//      tc.setToolTipText(Messages.Pref_Map_Viewer_Column_Lbl_OfflineFileSize);
+//      tc.addSelectionListener(_columnSortListener);
+//
+//      tvc.setLabelProvider(new CellLabelProvider() {
+//         @Override
+//         public void update(final ViewerCell cell) {
+//
+//            final long offlineTileSize = ((MP) cell.getElement()).getOfflineFileSize();
+//            if (offlineTileSize == MP.OFFLINE_INFO_NOT_READ) {
+//               cell.setText(Messages.pref_map_lable_NA);
+//            } else if (offlineTileSize > 0) {
+//               cell.setText(_nf.format((float) offlineTileSize / 1024 / 1024));
+//            } else {
+//               cell.setText(UI.DASH_WITH_SPACE);
+//            }
+//         }
+//      });
+//
+//      tableLayout.setColumnData(tvc.getColumn(), new ColumnPixelData(_pc.convertWidthInCharsToPixels(6)));
+//   }
 
    public void deleteOfflineMap(final MP mapProvider) {
 
@@ -1978,55 +1942,6 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
       super.dispose();
    }
-
-//   /**
-//    * !!!!!!!!!!!!!! RECURSIVE !!!!!!!!!!!!!!!!!<br>
-//    * <br>
-//    * Deletes all files and subdirectories. If a deletion fails, the method stops attempting to
-//    * delete and returns false. <br>
-//    * <br>
-//    * !!!!!!!!!!!!!! RECURSIVE !!!!!!!!!!!!!!!!!
-//    *
-//    * @param file
-//    * @param monitor
-//    * @return Returns <code>true</code> if all deletions were successful
-//    */
-//   private void deleteDir(final File file, final IProgressMonitor monitor) {
-//
-//      if (monitor.isCanceled()) {
-//         return;
-//      }
-//
-//      if (file.isDirectory()) {
-//
-//         final String[] children = file.list();
-//
-//         for (final String element : children) {
-//            deleteDir(new File(file, element), monitor);
-//         }
-//
-//         // update monitor every 200ms
-//         final long time = System.currentTimeMillis();
-//         if (time > _deleteUIUpdateTime + 200) {
-//            _deleteUIUpdateTime = time;
-//            monitor.subTask(NLS.bind(Messages.Pref_Map_MonitorMessage_DeletedOfflineImages, file.toString()));
-//         }
-//
-//      }
-//
-//      // The directory is now empty so delete it
-//      final boolean isDeleted = file.delete();
-//
-//      // canceled must be checked before isDeleted because this returns false when the monitor is canceled
-//      if (monitor.isCanceled()) {
-//         return;
-//      }
-//
-//      if (isDeleted == false) {
-//         _isDeleteError = true;
-//         monitor.setCanceled(true);
-//      }
-//   }
 
    private void doImportMP(final String importFilePath) {
 
@@ -2138,6 +2053,60 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       if (focusControl != null) {
          focusControl.setFocus();
       }
+   }
+
+//   /**
+//    * !!!!!!!!!!!!!! RECURSIVE !!!!!!!!!!!!!!!!!<br>
+//    * <br>
+//    * Deletes all files and subdirectories. If a deletion fails, the method stops attempting to
+//    * delete and returns false. <br>
+//    * <br>
+//    * !!!!!!!!!!!!!! RECURSIVE !!!!!!!!!!!!!!!!!
+//    *
+//    * @param file
+//    * @param monitor
+//    * @return Returns <code>true</code> if all deletions were successful
+//    */
+//   private void deleteDir(final File file, final IProgressMonitor monitor) {
+//
+//      if (monitor.isCanceled()) {
+//         return;
+//      }
+//
+//      if (file.isDirectory()) {
+//
+//         final String[] children = file.list();
+//
+//         for (final String element : children) {
+//            deleteDir(new File(file, element), monitor);
+//         }
+//
+//         // update monitor every 200ms
+//         final long time = System.currentTimeMillis();
+//         if (time > _deleteUIUpdateTime + 200) {
+//            _deleteUIUpdateTime = time;
+//            monitor.subTask(NLS.bind(Messages.Pref_Map_MonitorMessage_DeletedOfflineImages, file.toString()));
+//         }
+//
+//      }
+//
+//      // The directory is now empty so delete it
+//      final boolean isDeleted = file.delete();
+//
+//      // canceled must be checked before isDeleted because this returns false when the monitor is canceled
+//      if (monitor.isCanceled()) {
+//         return;
+//      }
+//
+//      if (isDeleted == false) {
+//         _isDeleteError = true;
+//         monitor.setCanceled(true);
+//      }
+//   }
+
+   @Override
+   public ColumnManager getColumnManager() {
+      return _columnManager;
    }
 
    /**
@@ -2303,7 +2272,19 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
    }
 
    @Override
+   public ColumnViewer getViewer() {
+      return _mpViewer;
+   }
+
+   @Override
    public void init(final IWorkbench workbench) {}
+
+   private void initUI(final Composite parent) {
+
+      _pc = new PixelConverter(parent);
+
+      _columnSortListener = widgetSelectedAdapter(e -> onSelect_SortColumn(e));
+   }
 
    @Override
    public boolean isValid() {
@@ -2582,20 +2563,20 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
    private void onSelect_SortColumn(final SelectionEvent e) {
 
-//      _viewerContainer.setRedraw(false);
-//      {
-      // keep selection
-      final ISelection selectionBackup = _mpViewer.getSelection();
+      _viewerContainer.setRedraw(false);
+      {
+         // keep selection
+         final ISelection selectionBackup = _mpViewer.getSelection();
 
-      // toggle sorting
-      _mpComparator.setSortColumn(e.widget);
-      _mpViewer.refresh();
+         // toggle sorting
+         _mpComparator.setSortColumn(e.widget);
+         _mpViewer.refresh();
 
-      // reselect selection
-      _mpViewer.setSelection(selectionBackup, true);
-      _mpViewer.getTable().showSelection();
-//      }
-//      _viewerContainer.setRedraw(true);
+         // reselect selection
+         _mpViewer.setSelection(selectionBackup, true);
+         _mpViewer.getTable().showSelection();
+      }
+      _viewerContainer.setRedraw(true);
    }
 
    private void openConfigDialog() {
@@ -2818,6 +2799,39 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       return isOK;
    }
 
+   @Override
+   public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
+
+      _viewerContainer.setRedraw(false);
+      {
+         // keep selection
+         final ISelection selectionBackup = _mpViewer.getSelection();
+         {
+            _mpViewer.getTable().dispose();
+
+            createUI_20_MapViewer_Viewer(_viewerContainer);
+
+            // update UI
+            _viewerContainer.layout();
+
+            // update the viewer
+            reloadViewer();
+         }
+         updateUI_ReselectItems(selectionBackup);
+      }
+      _viewerContainer.setRedraw(true);
+
+//      setFocusToMPViewer();
+
+      return _mpViewer;
+   }
+
+   @Override
+   public void reloadViewer() {
+
+      updateUI_SetViewerInput();
+   }
+
    private void restoreState() {
 
       /*
@@ -2972,6 +2986,8 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       if (_selectedMapProvider != null) {
          _prefStore.setValue(IMappingPreferences.MAP_FACTORY_LAST_SELECTED_MAP_PROVIDER, _selectedMapProvider.getId());
       }
+
+      _columnManager.saveState(_state);
    }
 
    private void setEmptyMapProviderUI(final MP mapProvider) {
@@ -3209,6 +3225,9 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
          e.printStackTrace();
       }
    }
+
+   @Override
+   public void updateColumnHeader(final ColumnDefinition colDef) {}
 
    /**
     * Update map provider model from the UI
@@ -3492,6 +3511,23 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
    }
 
    /**
+    * Select and reveal the previous items.
+    *
+    * @param selection
+    */
+   private void updateUI_ReselectItems(final ISelection selection) {
+
+      _isInUIUpdate = true;
+      {
+         _mpViewer.setSelection(selection, true);
+
+         final Table table = _mpViewer.getTable();
+         table.showSelection();
+      }
+      _isInUIUpdate = false;
+   }
+
+   /**
     * Set the sort column direction indicator for a column
     *
     * @param sortColumnId
@@ -3509,6 +3545,15 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
       table.setSortColumn(tc);
       table.setSortDirection(direction);
+   }
+
+   private void updateUI_SetViewerInput() {
+
+      _isInUIUpdate = true;
+      {
+         _mpViewer.setInput(new Object[0]);
+      }
+      _isInUIUpdate = false;
    }
 
    /**
@@ -3555,5 +3600,4 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
       return errorControl;
    }
-
 }
