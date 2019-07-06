@@ -48,6 +48,8 @@ import java.text.NumberFormat;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 
+import javax.inject.Inject;
+
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.ColumnDefinition;
@@ -69,6 +71,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.e4.ui.services.IStylingEngine;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.IInputValidator;
@@ -246,6 +249,10 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
    private ActionRefreshOfflineInfoNotAssessed _actionRefreshNotAssessed;
 
    private PixelConverter                      _pc;
+
+// IStylingEngine is injected
+   @Inject
+   IStylingEngine engine;
 
    /*
     * UI controls
@@ -1687,7 +1694,12 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
             final MP mapProvider = (MP) cell.getElement();
 
-            cell.setText(MapProviderManager.getTileLayerInfo(mapProvider));
+            final String tileLayerInfo = MapProviderManager.getTileLayerInfo(mapProvider)
+
+                  // show profile url more readable
+                  .replace(UI.NEW_LINE, UI.DASH_WITH_SPACE);
+
+            cell.setText(tileLayerInfo);
          }
       });
    }
@@ -1699,7 +1711,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
       final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_MODIFIED, SWT.LEAD);
 
-      colDef.setColumnName(Messages.Pref_Map_Viewer_Column_Lbl_OfflineFileSize);
+      colDef.setColumnName(Messages.Pref_Map_Viewer_Column_Lbl_Modified);
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(18));
 
       colDef.setColumnSelectionListener(_columnSortListener);
