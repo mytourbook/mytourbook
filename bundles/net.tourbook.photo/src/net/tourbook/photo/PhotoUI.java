@@ -226,6 +226,9 @@ public class PhotoUI {
       colorRegistry.put(IPhotoPreferences.PHOTO_VIEWER_COLOR_SELECTION_FOREGROUND, //
             PreferenceConverter.getColor(prefStore, IPhotoPreferences.PHOTO_VIEWER_COLOR_SELECTION_FOREGROUND));
 
+      colorRegistry.put(IPhotoPreferences.PHOTO_VIEWER_COLOR_SELECTION_BACKGROUND, //
+            PreferenceConverter.getColor(prefStore, IPhotoPreferences.PHOTO_VIEWER_COLOR_SELECTION_BACKGROUND));
+
       colorRegistry.put(IPhotoPreferences.PHOTO_VIEWER_COLOR_FOLDER, //
             PreferenceConverter.getColor(prefStore, IPhotoPreferences.PHOTO_VIEWER_COLOR_FOLDER));
 

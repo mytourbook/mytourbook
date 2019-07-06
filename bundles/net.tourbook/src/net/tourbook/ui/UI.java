@@ -1034,8 +1034,7 @@ public class UI {
 
       final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
 
-      // TODO this color needs to be changed to a defined background color
-      final Color bgSelectedColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_SELECTION_FOREGROUND);
+      final Color bgSelectedColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_SELECTION_BACKGROUND);
 
       /*
        * NOTE: EraseItem is called repeatedly. Therefore it is critical
