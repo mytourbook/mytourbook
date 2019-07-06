@@ -60,7 +60,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.map2.view.Map2View;
 import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.web.WEB;
-  
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -174,8 +174,6 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
    private static final String       IMPORT_FILE_PATH               = "MapProvider_ImportFilePath";    //$NON-NLS-1$
    private static final String       EXPORT_FILE_PATH               = "MapProvider_ExportFilePath";    //$NON-NLS-1$
-
-   private static final String       COLUMN_KEY_FOR_COLUMN_ID       = "ColumnId";                      //$NON-NLS-1$
 
    private static final String       COLUMN_CATEGORY                = "Category";                      //$NON-NLS-1$
    private static final String       COLUMN_DESCRIPTION             = "Description";                   //$NON-NLS-1$
@@ -421,7 +419,8 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
       public void setSortColumn(final Widget widget) {
 
-         final String columnId = (String) widget.getData(COLUMN_KEY_FOR_COLUMN_ID);
+         final ColumnDefinition columnDefinition = (ColumnDefinition) widget.getData();
+         final String columnId = columnDefinition.getColumnId();
 
          if (columnId == null) {
             return;
@@ -2261,7 +2260,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
       for (final TableColumn column : allColumns) {
 
-         final String columnId = (String) column.getData(COLUMN_KEY_FOR_COLUMN_ID);
+         final String columnId = ((ColumnDefinition) column.getData()).getColumnId();
 
          if (columnId != null && columnId.equals(sortColumnId)) {
             return column;
