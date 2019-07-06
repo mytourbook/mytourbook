@@ -742,7 +742,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
          GridDataFactory.fillDefaults().grab(true, true).applyTo(_viewerContainer);
          GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
          {
-            createUI_20_MapViewer_Viewer(_viewerContainer);
+            createUI_20_Viewer(_viewerContainer);
          }
 
          createUI_30_Buttons(container);
@@ -794,7 +794,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       }
    }
 
-   private void createUI_20_MapViewer_Viewer(final Composite parent) {
+   private void createUI_20_Viewer(final Composite parent) {
 
       // set colors for the viewer
       final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
@@ -829,6 +829,8 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
          @Override
          public void keyReleased(final KeyEvent e) {}
       });
+
+      net.tourbook.ui.UI.setTableSelectionColor(table);
 
       /*
        * Create table viewer
@@ -1742,6 +1744,18 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       }
    }
 
+   public void deleteOfflineMap(final MP mapProvider) {
+
+      deleteOfflineMapFiles(mapProvider);
+
+      // disable delete offline button
+      enableControls();
+
+      // reselect map provider, set focus to map provider
+      _mpViewer.setSelection(_mpViewer.getSelection());
+      _mpViewer.getTable().setFocus();
+   }
+
 //   /**
 //    * Column: Online map url
 //    */
@@ -1909,18 +1923,6 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 //      tableLayout.setColumnData(tvc.getColumn(), new ColumnPixelData(_pc.convertWidthInCharsToPixels(6)));
 //   }
 
-   public void deleteOfflineMap(final MP mapProvider) {
-
-      deleteOfflineMapFiles(mapProvider);
-
-      // disable delete offline button
-      enableControls();
-
-      // reselect map provider, set focus to map provider
-      _mpViewer.setSelection(_mpViewer.getSelection());
-      _mpViewer.getTable().setFocus();
-   }
-
    private void deleteOfflineMapFiles(final MP mp) {
 
       if (MapProviderManager.deleteOfflineMap(mp, false)) {
@@ -2066,6 +2068,11 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       }
    }
 
+   @Override
+   public ColumnManager getColumnManager() {
+      return _columnManager;
+   }
+
 //   /**
 //    * !!!!!!!!!!!!!! RECURSIVE !!!!!!!!!!!!!!!!!<br>
 //    * <br>
@@ -2114,11 +2121,6 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 //         monitor.setCanceled(true);
 //      }
 //   }
-
-   @Override
-   public ColumnManager getColumnManager() {
-      return _columnManager;
-   }
 
    /**
     * !!!!! Recursive funktion to count files/size !!!!!
@@ -2820,7 +2822,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
          {
             _mpViewer.getTable().dispose();
 
-            createUI_20_MapViewer_Viewer(_viewerContainer);
+            createUI_20_Viewer(_viewerContainer);
 
             // update UI
             _viewerContainer.layout();

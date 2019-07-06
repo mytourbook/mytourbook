@@ -23,7 +23,7 @@ import de.byteholder.geoclipse.mapprovider.MP;
 import de.byteholder.geoclipse.mapprovider.MapProviderManager;
 import de.byteholder.geoclipse.preferences.IMappingPreferences;
 import de.byteholder.geoclipse.preferences.PrefPage_Map2_Providers;
- 
+
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 
@@ -569,7 +569,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
          GridDataFactory.fillDefaults().grab(true, true).applyTo(_viewerContainer);
          GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
          {
-            createUI_20_MapViewer(_viewerContainer);
+            createUI_20_Viewer(_viewerContainer);
          }
 
          createUI_30_Tips(shellContainer);
@@ -586,7 +586,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
       return shellContainer;
    }
 
-   private void createUI_20_MapViewer(final Composite parent) {
+   private void createUI_20_Viewer(final Composite parent) {
 
       final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
       final Color fgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_FOREGROUND);
@@ -602,6 +602,8 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
       table.setLinesVisible(false);
       table.setHeaderBackground(bgColor);
       table.setHeaderForeground(fgColor);
+
+      net.tourbook.ui.UI.setTableSelectionColor(table);
 
       // set colors for all cells
       UI.setChildColors(table, fgColor, bgColor);
@@ -1510,7 +1512,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
             final ColumnProfile activeProfile = _columnManager.getActiveProfile();
             _columnIndex_ForColumn_IsMPVisible = activeProfile.getColumnIndex(_colDef_IsMPVisible.getColumnId());
 
-            createUI_20_MapViewer(_viewerContainer);
+            createUI_20_Viewer(_viewerContainer);
 
             // update UI
             _viewerContainer.layout();
