@@ -250,9 +250,8 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
    private PixelConverter                      _pc;
 
-// IStylingEngine is injected
    @Inject
-   IStylingEngine engine;
+   IStylingEngine                              _cssEngine;
 
    /*
     * UI controls
@@ -813,8 +812,12 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       table.setLayout(new TableLayout());
       table.setHeaderVisible(true);
       table.setLinesVisible(false);
-      table.setHeaderBackground(bgColor);
-      table.setHeaderForeground(fgColor);
+
+//      table.setHeaderBackground(bgColor);
+//      table.setHeaderForeground(fgColor);
+
+      // set the class, can be used several times
+      table.setData("org.eclipse.e4.ui.css.CssClassName", "mtTable");
 
       table.addKeyListener(new KeyListener() {
 
@@ -877,7 +880,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       updateUI_SetSortDirection(_mpComparator.__sortColumnId, _mpComparator.__sortDirection);
 
       // draw dark theme for the table
-      net.tourbook.common.UI.setChildColors(table, fgColor, bgColor);
+//      net.tourbook.common.UI.setChildColors(table, fgColor, bgColor);
    }
 
    private void createUI_30_Buttons(final Composite container) {

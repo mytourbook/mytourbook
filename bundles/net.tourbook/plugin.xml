@@ -31,14 +31,14 @@
          <property   name="aboutText"                 value="%Product_about"/>
          <property   name="aboutImage"                value="icons/application/tourbook-about.png"/>
          <property   name="appName"                   value="MyTourbook"/>
-         
+         <property   name="applicationCSS"            value="platform:/plugin/net.tourbook/css/default.css"/>
+
          <property   name="preferenceCustomization"   value="plugin_customization.ini"/>
          <property   name="lifeCycleURI"              value="bundleclass://net.tourbook/net.tourbook.application.LifeCycleManager"/>
          
       </product>
 
    </extension>
-
 
    <extension        point="org.eclipse.core.runtime.preferences">
    

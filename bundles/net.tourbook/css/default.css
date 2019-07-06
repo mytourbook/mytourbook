@@ -1,0 +1,13 @@
+
+
+.mtTable
+{
+   background-color: #055;
+   color:            white;
+}
+
+.mtTable:selected
+{
+   background-color: #ddd;
+   color:            #333;
+}
