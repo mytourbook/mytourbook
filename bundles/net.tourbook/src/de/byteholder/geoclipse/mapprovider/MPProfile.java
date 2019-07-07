@@ -316,6 +316,23 @@ public class MPProfile extends MP implements ITileChildrenCreator {
    }
 
    /**
+    * @return Returns number of layers which are used in the map provider.
+    */
+   public int getLayers() {
+
+      int numUsedMP = 0;
+
+      for (final MPWrapper mpWrapper : _mpWrappers) {
+
+         if (mpWrapper.isDisplayedInMap()) {
+            numUsedMP++;
+         }
+      }
+
+      return numUsedMP;
+   }
+
+   /**
     * this method is synchronized because when live View is checked in the map profile dialog
     * and the brightness is changed, many ConcurrentModificationException occured
     *

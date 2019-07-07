@@ -147,6 +147,10 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
 // SET_FORMATTING_OFF
 
+   private static final String SLIDEOUT_MAP2_PROVIDER_COLUMN_MP_TYPE          = net.tourbook.Messages.Slideout_Map2Provider_Column_MPType;
+   private static final String SLIDEOUT_MAP2_PROVIDER_COLUMN_MP_TYPE_TOOLTIP  = net.tourbook.Messages.Slideout_Map2Provider_Column_MPType_Tooltip;
+   private static final String SLIDEOUT_MAP2_PROVIDER_COLUMN_TILE_URL         = net.tourbook.Messages.Slideout_Map2Provider_Column_TileUrl;
+
    private static final String SLIDEOUT_MAP2_PROVIDER_COLUMN_MP_TYPE_CUSTOM   = net.tourbook.Messages.Slideout_Map2Provider_Column_MPType_Custom;
    private static final String SLIDEOUT_MAP2_PROVIDER_COLUMN_MP_TYPE_INTERNAL = net.tourbook.Messages.Slideout_Map2Provider_Column_MPType_Internal;
    private static final String SLIDEOUT_MAP2_PROVIDER_COLUMN_MP_TYPE_PROFILE  = net.tourbook.Messages.Slideout_Map2Provider_Column_MPType_Profile;
@@ -185,12 +189,12 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
    private static final String       COLUMN_MAP_PROVIDER_NAME       = "MapProviderName";               //$NON-NLS-1$
    private static final String       COLUMN_MODIFIED                = "Modified";                      //$NON-NLS-1$
    private static final String       COLUMN_MP_TYPE                 = "MPType";                        //$NON-NLS-1$
+   private static final String       COLUMN_NUM_Layers              = "NumLayers";                     //$NON-NLS-1$
    private static final String       COLUMN_OFFLINE_FILE_COUNTER    = "OfflineFileCounter";            //$NON-NLS-1$
    private static final String       COLUMN_OFFLINE_FILE_SIZE       = "OfflineFileSize";               //$NON-NLS-1$
    private static final String       COLUMN_OFFLINE_FOLDER_NAME     = "OfflineFolderName";             //$NON-NLS-1$
    private static final String       COLUMN_ONLINE_MAP_URL          = "OnlineMapUrl";                  //$NON-NLS-1$
    private static final String       COLUMN_TILE_URL                = "TileUrl";                       //$NON-NLS-1$
-   private static final String       COLUMN_WMSLayer                = "WMSLayer";                      //$NON-NLS-1$
 
    private final static NumberFormat _nf                            = NumberFormat.getNumberInstance();
    static {
@@ -324,10 +328,12 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       @Override
       public int compare(final Viewer viewer, final Object e1, final Object e2) {
 
+         final boolean isDescending = __sortDirection == DESCENDING;
+
          final MP mp1 = (MP) e1;
          final MP mp2 = (MP) e2;
 
-         double rc = 0;
+         long rc = 0;
 
          // Determine which column and do the appropriate sort
          switch (__sortColumnId) {
@@ -378,14 +384,47 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
             rc = MapProviderManager.getTileLayerInfo(mp1).compareTo(MapProviderManager.getTileLayerInfo(mp2));
             break;
 
-         case COLUMN_WMSLayer:
+         case COLUMN_NUM_Layers:
 
             if (mp1 instanceof MPWms && mp2 instanceof MPWms) {
 
                final MPWms wmsMP1 = (MPWms) mp1;
-               final MPWms wmsMP = (MPWms) mp2;
+               final MPWms wmsMP2 = (MPWms) mp2;
 
-               rc = wmsMP1.getAvailableLayers() - wmsMP.getAvailableLayers();
+               rc = wmsMP1.getAvailableLayers() - wmsMP2.getAvailableLayers();
+
+            } else
+
+            /**
+             * This sorting is highly complicated:
+             * <p>
+             * - show map profiles at the top
+             * - sort according to the number of layers
+             * - do not show 1 layer for simple map providers
+             * - second/third sorting should be category/mp name
+             */
+            if (mp1 instanceof MPProfile && mp2 instanceof MPProfile) {
+
+               final MPProfile profileMP1 = (MPProfile) mp1;
+               final MPProfile profileMP2 = (MPProfile) mp2;
+
+               rc = profileMP1.getLayers() - profileMP2.getLayers();
+
+            } else if (mp1 instanceof MPProfile) {
+
+               if (isDescending) {
+                  rc = +1;
+               } else {
+                  rc = -1;
+               }
+
+            } else if (mp2 instanceof MPProfile) {
+
+               if (isDescending) {
+                  rc = -1;
+               } else {
+                  rc = +1;
+               }
             }
 
             break;
@@ -407,7 +446,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
          }
 
          // if descending order, flip the direction
-         if (__sortDirection == DESCENDING) {
+         if (isDescending) {
             rc = -rc;
          }
 
@@ -1568,7 +1607,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       defineColumn_38_TileUrl();
       defineColumn_40_OnlineMapUrl();
       defineColumn_50_Description();
-      defineColumn_60_WMSLayers();
+      defineColumn_60_Layers();
       defineColumn_62_OfflinePath();
       defineColumn_70_OfflineFileCounter();
       defineColumn_72_OfflineFileSize();
@@ -1686,8 +1725,8 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
       final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_MP_TYPE, SWT.LEAD);
 
-      colDef.setColumnName(net.tourbook.Messages.Slideout_Map2Provider_Column_MPType);
-      colDef.setColumnHeaderToolTipText(net.tourbook.Messages.Slideout_Map2Provider_Column_MPType_Tooltip);
+      colDef.setColumnName(SLIDEOUT_MAP2_PROVIDER_COLUMN_MP_TYPE);
+      colDef.setColumnHeaderToolTipText(SLIDEOUT_MAP2_PROVIDER_COLUMN_MP_TYPE_TOOLTIP);
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
 
       colDef.setColumnSelectionListener(_columnSortListener);
@@ -1710,7 +1749,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
       final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_TILE_URL, SWT.LEAD);
 
-      colDef.setColumnName(net.tourbook.Messages.Slideout_Map2Provider_Column_TileUrl);
+      colDef.setColumnName(SLIDEOUT_MAP2_PROVIDER_COLUMN_TILE_URL);
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(16));
       colDef.setIsDefaultColumn();
 
@@ -1775,14 +1814,14 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
    }
 
    /**
-    * Column: WMS layers
+    * Column: Number of layers
     */
-   private void defineColumn_60_WMSLayers() {
+   private void defineColumn_60_Layers() {
 
-      final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_WMSLayer, SWT.TRAIL);
+      final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_NUM_Layers, SWT.TRAIL);
 
-      colDef.setColumnName(Messages.Pref_Map_Viewer_Column_Lbl_WMSLayer);
-      colDef.setColumnHeaderToolTipText(Messages.Pref_Map_Viewer_Column_Lbl_WMSLayer);
+      colDef.setColumnName(Messages.Pref_Map_Viewer_Column_Lbl_Layers);
+      colDef.setColumnHeaderToolTipText(Messages.Pref_Map_Viewer_Column_Lbl_Layers);
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(6));
       colDef.setIsDefaultColumn();
 
@@ -1792,19 +1831,23 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
          @Override
          public void update(final ViewerCell cell) {
 
-            String layer = UI.EMPTY_STRING;
+            String numLayers = UI.EMPTY_STRING;
 
             final MP mapProvider = (MP) cell.getElement();
             if (mapProvider instanceof MPWms) {
 
-               final MPWms wmsMapProvider = (MPWms) mapProvider;
+               final MPWms wmsMP = (MPWms) mapProvider;
 
-               final StringBuilder sb = new StringBuilder();
-               sb.append(wmsMapProvider.getAvailableLayers());
+               numLayers = Integer.toString(wmsMP.getAvailableLayers());
 
-               layer = sb.toString();
+            } else if (mapProvider instanceof MPProfile) {
+
+               final MPProfile profileMP = (MPProfile) mapProvider;
+
+               numLayers = Integer.toString(profileMP.getLayers());
+
             }
-            cell.setText(layer);
+            cell.setText(numLayers);
          }
       });
    }

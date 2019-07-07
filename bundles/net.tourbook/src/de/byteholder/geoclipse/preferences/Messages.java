@@ -116,14 +116,14 @@ public class Messages extends NLS {
    public static String        Pref_Map_Viewer_Column_IsTransparent_Tooltip;
    public static String        Pref_Map_Viewer_Column_Lbl_Category;
    public static String        Pref_Map_Viewer_Column_Lbl_Description;
+   public static String        Pref_Map_Viewer_Column_Lbl_Layers;
    public static String        Pref_Map_Viewer_Column_Lbl_MapProvider;
    public static String        Pref_Map_Viewer_Column_Lbl_Modified;
    public static String        Pref_Map_Viewer_Column_Lbl_OfflineFileCounter;
    public static String        Pref_Map_Viewer_Column_Lbl_OfflineFileSize;
    public static String        Pref_Map_Viewer_Column_Lbl_OfflinePath;
    public static String        Pref_Map_Viewer_Column_Lbl_OnlineMapUrl;
-   public static String        Pref_Map_Viewer_Column_Lbl_WMSLayer;
-
+   
    public static String        PrefPageMapProviders_Pref_Map_FileDialog_AllFiles;
    public static String        PrefPageMapProviders_Pref_Map_FileDialog_XmlFiles;
 
