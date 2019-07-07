@@ -1991,13 +1991,10 @@ public class Messages extends NLS {
    public static String Slideout_Map2Provider_Button_UnhideMP_Tooltip;
    public static String Slideout_Map2Provider_Column_IsVisible;
    public static String Slideout_Map2Provider_Column_IsVisible_Tooltip;
-   public static String Slideout_Map2Provider_Column_MPType;
    public static String Slideout_Map2Provider_Column_MPType_Custom;
    public static String Slideout_Map2Provider_Column_MPType_Internal;
    public static String Slideout_Map2Provider_Column_MPType_Profile;
-   public static String Slideout_Map2Provider_Column_MPType_Tooltip;
    public static String Slideout_Map2Provider_Column_MPType_WMS;
-   public static String Slideout_Map2Provider_Column_TileUrl;
    public static String Slideout_Map2Provider_Label_Tip;
    public static String Slideout_Map2Provider_Label_Tip_Tooltip;
    public static String Slideout_Map2Provider_Label_Title;

@@ -147,15 +147,6 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
 // SET_FORMATTING_OFF
 
-   private static final String SLIDEOUT_MAP2_PROVIDER_COLUMN_MP_TYPE          = net.tourbook.Messages.Slideout_Map2Provider_Column_MPType;
-   private static final String SLIDEOUT_MAP2_PROVIDER_COLUMN_MP_TYPE_TOOLTIP  = net.tourbook.Messages.Slideout_Map2Provider_Column_MPType_Tooltip;
-   private static final String SLIDEOUT_MAP2_PROVIDER_COLUMN_TILE_URL         = net.tourbook.Messages.Slideout_Map2Provider_Column_TileUrl;
-
-   private static final String SLIDEOUT_MAP2_PROVIDER_COLUMN_MP_TYPE_CUSTOM   = net.tourbook.Messages.Slideout_Map2Provider_Column_MPType_Custom;
-   private static final String SLIDEOUT_MAP2_PROVIDER_COLUMN_MP_TYPE_INTERNAL = net.tourbook.Messages.Slideout_Map2Provider_Column_MPType_Internal;
-   private static final String SLIDEOUT_MAP2_PROVIDER_COLUMN_MP_TYPE_PROFILE  = net.tourbook.Messages.Slideout_Map2Provider_Column_MPType_Profile;
-   private static final String SLIDEOUT_MAP2_PROVIDER_COLUMN_MP_TYPE_WMS      = net.tourbook.Messages.Slideout_Map2Provider_Column_MPType_WMS;
-
    private static final String APP_TRUE   = net.tourbook.Messages.App__True;
 
 // SET_FORMATTING_ON
@@ -463,16 +454,16 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       private String getMapProviderType(final MP mapProvider) {
 
          if (mapProvider instanceof MPWms) {
-            return SLIDEOUT_MAP2_PROVIDER_COLUMN_MP_TYPE_WMS;
+            return Messages.Pref_Map_Viewer_Column_MPType_WMS;
 
          } else if (mapProvider instanceof MPCustom) {
-            return SLIDEOUT_MAP2_PROVIDER_COLUMN_MP_TYPE_CUSTOM;
+            return Messages.Pref_Map_Viewer_Column_MPType_Custom;
 
          } else if (mapProvider instanceof MPProfile) {
-            return SLIDEOUT_MAP2_PROVIDER_COLUMN_MP_TYPE_PROFILE;
+            return Messages.Pref_Map_Viewer_Column_MPType_Profile;
 
          } else if (mapProvider instanceof MPPlugin) {
-            return SLIDEOUT_MAP2_PROVIDER_COLUMN_MP_TYPE_INTERNAL;
+            return Messages.Pref_Map_Viewer_Column_MPType_Internal;
 
          } else {
             return UI.EMPTY_STRING;
@@ -1725,8 +1716,8 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
       final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_MP_TYPE, SWT.LEAD);
 
-      colDef.setColumnName(SLIDEOUT_MAP2_PROVIDER_COLUMN_MP_TYPE);
-      colDef.setColumnHeaderToolTipText(SLIDEOUT_MAP2_PROVIDER_COLUMN_MP_TYPE_TOOLTIP);
+      colDef.setColumnName(Messages.Pref_Map_Viewer_Column_MPType);
+      colDef.setColumnHeaderToolTipText(Messages.Pref_Map_Viewer_Column_MPType_Tooltip);
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
 
       colDef.setColumnSelectionListener(_columnSortListener);
@@ -1749,7 +1740,8 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
       final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_TILE_URL, SWT.LEAD);
 
-      colDef.setColumnName(SLIDEOUT_MAP2_PROVIDER_COLUMN_TILE_URL);
+      colDef.setColumnName(Messages.Pref_Map_Viewer_Column_TileUrl);
+      colDef.setColumnHeaderToolTipText(Messages.Pref_Map_Viewer_Column_TileUrl);
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(16));
       colDef.setIsDefaultColumn();
 
@@ -1779,6 +1771,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_ONLINE_MAP_URL, SWT.LEAD);
 
       colDef.setColumnName(Messages.Pref_Map_Viewer_Column_Lbl_OnlineMapUrl);
+      colDef.setColumnHeaderToolTipText(Messages.Pref_Map_Viewer_Column_Lbl_OnlineMapUrl);
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
 
       colDef.setColumnSelectionListener(_columnSortListener);
@@ -1800,6 +1793,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_DESCRIPTION, SWT.LEAD);
 
       colDef.setColumnName(Messages.Pref_Map_Viewer_Column_Lbl_Description);
+      colDef.setColumnHeaderToolTipText(Messages.Pref_Map_Viewer_Column_Lbl_Description);
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
 
       colDef.setColumnSelectionListener(_columnSortListener);
@@ -1944,6 +1938,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_MODIFIED, SWT.LEAD);
 
       colDef.setColumnName(Messages.Pref_Map_Viewer_Column_Lbl_Modified);
+      colDef.setColumnHeaderToolTipText(Messages.Pref_Map_Viewer_Column_Lbl_Modified);
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(20));
 
       colDef.setColumnSelectionListener(_columnSortListener);
