@@ -851,11 +851,9 @@ public class Messages extends NLS {
    public static String        Image__ArrowDown;
    public static String        Image__ArrowDown_Dark;
    public static String        Image__ArrowDown_Dark_Disabled;
-   public static String        Image__ArrowDown_Disabled;
    public static String        Image__ArrowUp;
    public static String        Image__ArrowUp_Dark;
    public static String        Image__ArrowUp_Dark_Disabled;
-   public static String        Image__ArrowUp_Disabled;
    public static String        Image__assignMergedTour;
    public static String        Image__assignMergedTour_disabled;
    public static String        Image__chart_analyzer;
@@ -1630,7 +1628,6 @@ public class Messages extends NLS {
    public static String        Pref_Weather_Checkbox_UseRetrieval;
    public static String        Pref_Weather_Checkbox_UseRetrieval_Tooltip;
    public static String        Pref_Weather_External_Link_WeatherApi;
-   public static String        Pref_Weather_CheckHTTPConnection_Title;
    public static String        Pref_Weather_CheckHTTPConnection_Message;
    public static String        Pref_Weather_CheckHTTPConnection_OK_Message;
    public static String        Pref_Weather_CheckHTTPConnection_FAILED_Message;
@@ -2001,7 +1998,6 @@ public class Messages extends NLS {
    public static String Slideout_Map2Provider_Column_MPType_Tooltip;
    public static String Slideout_Map2Provider_Column_MPType_WMS;
    public static String Slideout_Map2Provider_Column_TileUrl;
-   public static String Slideout_Map2Provider_Label_SelectedMapProvider;
    public static String Slideout_Map2Provider_Label_Tip;
    public static String Slideout_Map2Provider_Label_Tip_Tooltip;
    public static String Slideout_Map2Provider_Label_Title;

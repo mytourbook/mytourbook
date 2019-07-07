@@ -38,7 +38,6 @@ public class Messages extends NLS {
    public static String        Map2Provider_Tooltip_Label_Description;
    public static String        Map2Provider_Tooltip_Label_Layers;
    public static String        Map2Provider_Tooltip_Label_OnlineMap;
-   public static String        Map2Provider_Tooltip_Lable_MapProvider;
    public static String        Map2Provider_Tooltip_Lable_MapProviderId;
    public static String        Map2Provider_Tooltip_Lable_MapProviderType;
    public static String        Map2Provider_Tooltip_Lable_OfflineFolder;
@@ -92,7 +91,6 @@ public class Messages extends NLS {
    public static String        Pref_Map_Label_OfflineInfo_NotDone;
    public static String        Pref_Map_Label_OfflineInfo_Partly;
    public static String        Pref_Map_Label_OfflineInfo_Total;
-   public static String        Pref_Map_Label_Url;
    public static String        Pref_Map_Label_WmsDropTarget;
    public static String        Pref_Map_Label_WmsDropTarget_Tooltip;
    public static String        Pref_Map_Lable_Category;
@@ -112,25 +110,18 @@ public class Messages extends NLS {
    public static String        Pref_Map_ProviderType_Wms;
    public static String        Pref_Map_ValidationError_NameIsRequired;
    public static String        Pref_Map_ValidationError_OfflineFolderIsUsedInMapProfile;
-   public static String        Pref_Map_Viewer_Column_ContentServerTypeCustom;
-   public static String        Pref_Map_Viewer_Column_ContentServerTypeMapProfile;
-   public static String        Pref_Map_Viewer_Column_ContentServerTypePlugin;
-   public static String        Pref_Map_Viewer_Column_ContentServerTypeWms;
    public static String        Pref_Map_Viewer_Column_IsHillshading;
    public static String        Pref_Map_Viewer_Column_IsHillshading_Tooltip;
    public static String        Pref_Map_Viewer_Column_IsTransparent;
    public static String        Pref_Map_Viewer_Column_IsTransparent_Tooltip;
    public static String        Pref_Map_Viewer_Column_Lbl_Category;
    public static String        Pref_Map_Viewer_Column_Lbl_Description;
-   public static String        Pref_Map_Viewer_Column_Lbl_Layer;
    public static String        Pref_Map_Viewer_Column_Lbl_MapProvider;
    public static String        Pref_Map_Viewer_Column_Lbl_Modified;
    public static String        Pref_Map_Viewer_Column_Lbl_OfflineFileCounter;
    public static String        Pref_Map_Viewer_Column_Lbl_OfflineFileSize;
    public static String        Pref_Map_Viewer_Column_Lbl_OfflinePath;
    public static String        Pref_Map_Viewer_Column_Lbl_OnlineMapUrl;
-   public static String        Pref_Map_Viewer_Column_Lbl_ServerType_Tooltip;
-   public static String        Pref_Map_Viewer_Column_Lbl_TileUrl;
    public static String        Pref_Map_Viewer_Column_Lbl_WMSLayer;
 
    public static String        PrefPageMapProviders_Pref_Map_FileDialog_AllFiles;
