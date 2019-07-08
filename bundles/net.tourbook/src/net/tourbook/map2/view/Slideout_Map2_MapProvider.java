@@ -121,17 +121,16 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
 
    private static final String MAP_ACTION_MANAGE_MAP_PROVIDERS                = net.tourbook.map2.Messages.Map_Action_ManageMapProviders;
 
-   private static final String PREF_MAP_VIEWER_COLUMN_IS_TRANSPARENT          = de.byteholder.geoclipse.preferences.Messages.Pref_Map_Viewer_Column_IsTransparent;
-   private static final String PREF_MAP_VIEWER_COLUMN_IS_TRANSPARENT_TOOLTIP  = de.byteholder.geoclipse.preferences.Messages.Pref_Map_Viewer_Column_IsTransparent_Tooltip;
-   private static final String PREF_MAP_VIEWER_COLUMN_IS_HILLSHADING          = de.byteholder.geoclipse.preferences.Messages.Pref_Map_Viewer_Column_IsHillshading;
-   private static final String PREF_MAP_VIEWER_COLUMN_IS_HILLSHADING_TOOLTIP  = de.byteholder.geoclipse.preferences.Messages.Pref_Map_Viewer_Column_IsHillshading_Tooltip;
-   private static final String PREF_MAP_VIEWER_COLUMN_MP_TYPE                 = de.byteholder.geoclipse.preferences.Messages.Pref_Map_Viewer_Column_MPType;
-   private static final String PREF_MAP_VIEWER_COLUMN_MP_TYPE_TOOLTIP         = de.byteholder.geoclipse.preferences.Messages.Pref_Map_Viewer_Column_MPType_Tooltip;
-   private static final String PREF_MAP_VIEWER_COLUMN_TILE_URL                = de.byteholder.geoclipse.preferences.Messages.Pref_Map_Viewer_Column_TileUrl;
-
-   private static final String PREF_MAP_VIEWER_COLUMN_LBL_CATEGORY            = de.byteholder.geoclipse.preferences.Messages.Pref_Map_Viewer_Column_Lbl_Category;
-   private static final String PREF_MAP_VIEWER_COLUMN_LBL_MODIFIED            = de.byteholder.geoclipse.preferences.Messages.Pref_Map_Viewer_Column_Lbl_Modified;
-   private static final String PREF_MAP_VIEWER_COLUMN_LBL_MAP_PROVIDER        = de.byteholder.geoclipse.preferences.Messages.Pref_Map_Viewer_Column_Lbl_MapProvider;
+   private static final String PREF_MAP2_VIEWER_COLUMN_CATEGORY               = de.byteholder.geoclipse.preferences.Messages.Pref_Map2_Viewer_Column_Category;
+   private static final String PREF_MAP2_VIEWER_COLUMN_IS_TRANSPARENT         = de.byteholder.geoclipse.preferences.Messages.Pref_Map2_Viewer_Column_IsTransparent;
+   private static final String PREF_MAP2_VIEWER_COLUMN_IS_TRANSPARENT_TOOLTIP = de.byteholder.geoclipse.preferences.Messages.Pref_Map2_Viewer_Column_IsTransparent_Tooltip;
+   private static final String PREF_MAP2_VIEWER_COLUMN_IS_HILLSHADING         = de.byteholder.geoclipse.preferences.Messages.Pref_Map2_Viewer_Column_IsHillshading;
+   private static final String PREF_MAP2_VIEWER_COLUMN_IS_HILLSHADING_TOOLTIP = de.byteholder.geoclipse.preferences.Messages.Pref_Map2_Viewer_Column_IsHillshading_Tooltip;
+   private static final String PREF_MAP2_VIEWER_COLUMN_MAP_PROVIDER           = de.byteholder.geoclipse.preferences.Messages.Pref_Map2_Viewer_Column_MapProvider;
+   private static final String PREF_MAP2_VIEWER_COLUMN_MODIFIED               = de.byteholder.geoclipse.preferences.Messages.Pref_Map2_Viewer_Column_Modified;
+   private static final String PREF_MAP2_VIEWER_COLUMN_MP_TYPE                = de.byteholder.geoclipse.preferences.Messages.Pref_Map2_Viewer_Column_MPType;
+   private static final String PREF_MAP2_VIEWER_COLUMN_MP_TYPE_TOOLTIP        = de.byteholder.geoclipse.preferences.Messages.Pref_Map2_Viewer_Column_MPType_Tooltip;
+   private static final String PREF_MAP2_VIEWER_COLUMN_TILE_URL               = de.byteholder.geoclipse.preferences.Messages.Pref_Map2_Viewer_Column_TileUrl;
 
 // SET_FORMATTING_ON
 
@@ -1044,7 +1043,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
 
       final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_MAP_PROVIDER_NAME, SWT.LEAD);
 
-      colDef.setColumnName(PREF_MAP_VIEWER_COLUMN_LBL_MAP_PROVIDER);
+      colDef.setColumnName(PREF_MAP2_VIEWER_COLUMN_MAP_PROVIDER);
 
       colDef.setCanModifyVisibility(false);
       colDef.setIsColumnMoveable(false);
@@ -1072,8 +1071,8 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
 
       final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_CATEGORY, SWT.LEAD);
 
-      colDef.setColumnName(PREF_MAP_VIEWER_COLUMN_LBL_CATEGORY);
-      colDef.setColumnHeaderToolTipText(PREF_MAP_VIEWER_COLUMN_LBL_CATEGORY);
+      colDef.setColumnName(PREF_MAP2_VIEWER_COLUMN_CATEGORY);
+      colDef.setColumnHeaderToolTipText(PREF_MAP2_VIEWER_COLUMN_CATEGORY);
       colDef.setIsDefaultColumn();
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
 
@@ -1097,8 +1096,8 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
 
       final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_MP_TYPE, SWT.LEAD);
 
-      colDef.setColumnName(PREF_MAP_VIEWER_COLUMN_MP_TYPE);
-      colDef.setColumnHeaderToolTipText(PREF_MAP_VIEWER_COLUMN_MP_TYPE_TOOLTIP);
+      colDef.setColumnName(PREF_MAP2_VIEWER_COLUMN_MP_TYPE);
+      colDef.setColumnHeaderToolTipText(PREF_MAP2_VIEWER_COLUMN_MP_TYPE_TOOLTIP);
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
 
       colDef.setColumnSelectionListener(_columnSortListener);
@@ -1121,8 +1120,8 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
 
       final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_IS_CONTAINS_HILLSHADING, SWT.LEAD);
 
-      colDef.setColumnName(PREF_MAP_VIEWER_COLUMN_IS_HILLSHADING);
-      colDef.setColumnHeaderToolTipText(PREF_MAP_VIEWER_COLUMN_IS_HILLSHADING_TOOLTIP);
+      colDef.setColumnName(PREF_MAP2_VIEWER_COLUMN_IS_HILLSHADING);
+      colDef.setColumnHeaderToolTipText(PREF_MAP2_VIEWER_COLUMN_IS_HILLSHADING_TOOLTIP);
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(8));
 
       colDef.setColumnSelectionListener(_columnSortListener);
@@ -1145,8 +1144,8 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
 
       final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_IS_TRANSPARENT_LAYER, SWT.LEAD);
 
-      colDef.setColumnName(PREF_MAP_VIEWER_COLUMN_IS_TRANSPARENT);
-      colDef.setColumnHeaderToolTipText(PREF_MAP_VIEWER_COLUMN_IS_TRANSPARENT_TOOLTIP);
+      colDef.setColumnName(PREF_MAP2_VIEWER_COLUMN_IS_TRANSPARENT);
+      colDef.setColumnHeaderToolTipText(PREF_MAP2_VIEWER_COLUMN_IS_TRANSPARENT_TOOLTIP);
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(8));
 
       colDef.setColumnSelectionListener(_columnSortListener);
@@ -1169,7 +1168,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
 
       final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_TILE_URL, SWT.LEAD);
 
-      colDef.setColumnName(PREF_MAP_VIEWER_COLUMN_TILE_URL);
+      colDef.setColumnName(PREF_MAP2_VIEWER_COLUMN_TILE_URL);
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(40));
 
       colDef.setColumnSelectionListener(_columnSortListener);
@@ -1192,7 +1191,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
 
       final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_MAP_MODIFIED, SWT.LEAD);
 
-      colDef.setColumnName(PREF_MAP_VIEWER_COLUMN_LBL_MODIFIED);
+      colDef.setColumnName(PREF_MAP2_VIEWER_COLUMN_MODIFIED);
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(18));
 
       colDef.setColumnSelectionListener(_columnSortListener);
