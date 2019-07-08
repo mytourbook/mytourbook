@@ -1,4 +1,6 @@
 19.7.0                                                      ?. July 2019
+
+Update to Eclipse 4.12 to fix an issue
  
 Update Docu
 ===========
