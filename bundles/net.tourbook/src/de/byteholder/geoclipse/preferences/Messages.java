@@ -123,12 +123,8 @@ public class Messages extends NLS {
    public static String        Pref_Map2_Viewer_Column_OfflineFileSize;
    public static String        Pref_Map2_Viewer_Column_OfflinePath;
    public static String        Pref_Map2_Viewer_Column_OnlineMapUrl;
-   public static String        Pref_Map2_Viewer_Column_MPType_Custom;
-   public static String        Pref_Map2_Viewer_Column_MPType_Internal;
-   public static String        Pref_Map2_Viewer_Column_MPType_Profile;
    public static String        Pref_Map2_Viewer_Column_MPType;
    public static String        Pref_Map2_Viewer_Column_MPType_Tooltip;
-   public static String        Pref_Map2_Viewer_Column_MPType_WMS;
    public static String        Pref_Map2_Viewer_Column_TileUrl;
 
    public static String        PrefPageMapProviders_Pref_Map_FileDialog_AllFiles;

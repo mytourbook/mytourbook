@@ -352,7 +352,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
             break;
 
          case COLUMN_MP_TYPE:
-            rc = getMapProviderType(mp1).compareTo(getMapProviderType(mp2));
+            rc = MapProviderManager.getMapProvider_TypeLabel(mp1).compareTo(MapProviderManager.getMapProvider_TypeLabel(mp2));
             break;
 
          case COLUMN_OFFLINE_FILE_COUNTER:
@@ -449,25 +449,6 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
                : rc < 0 //
                      ? -1
                      : 0;
-      }
-
-      private String getMapProviderType(final MP mapProvider) {
-
-         if (mapProvider instanceof MPWms) {
-            return Messages.Pref_Map2_Viewer_Column_MPType_WMS;
-
-         } else if (mapProvider instanceof MPCustom) {
-            return Messages.Pref_Map2_Viewer_Column_MPType_Custom;
-
-         } else if (mapProvider instanceof MPProfile) {
-            return Messages.Pref_Map2_Viewer_Column_MPType_Profile;
-
-         } else if (mapProvider instanceof MPPlugin) {
-            return Messages.Pref_Map2_Viewer_Column_MPType_Internal;
-
-         } else {
-            return UI.EMPTY_STRING;
-         }
       }
 
       @Override
