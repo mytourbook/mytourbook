@@ -756,6 +756,7 @@ public class Messages extends NLS {
 
    public static String        External_Link_MyTourbook;
    public static String        External_Link_MyTourbook_TourChartSmoothing;
+   public static String        External_Link_Weather_ApiSignup;
 
    public static String        Format_hhmm;
    public static String        Format_rawdata_file_yyyy_mm_dd;
@@ -1621,13 +1622,12 @@ public class Messages extends NLS {
    public static String        pref_view_layout_label_sub_sub;
    public static String        pref_view_layout_label_title;
 
-   public static String        Pref_Weather_ApiKey_FieldEditor;
-   public static String        Pref_Weather_ApiKey_FieldEditor_Tooltip;
-   public static String        Pref_Weather_ApiSignupLink;
+   public static String        Pref_Weather_Label_ApiKey;
+   public static String        Pref_Weather_Label_ApiKey_Tooltip;
+   public static String        Pref_Weather_Link_ApiSignup;
    public static String        Pref_Weather_Button_TestHTTPConnection;
    public static String        Pref_Weather_Checkbox_UseRetrieval;
    public static String        Pref_Weather_Checkbox_UseRetrieval_Tooltip;
-   public static String        Pref_Weather_External_Link_WeatherApi;
    public static String        Pref_Weather_CheckHTTPConnection_Message;
    public static String        Pref_Weather_CheckHTTPConnection_OK_Message;
    public static String        Pref_Weather_CheckHTTPConnection_FAILED_Message;

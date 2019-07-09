@@ -62,9 +62,9 @@ public class PrefPageWeather extends PreferencePage implements IWorkbenchPrefere
 
    private Label  _labelApiKey;
 
-   private Link   _apiSignupLink;
+   private Link   _linkApiSignup;
 
-   private Text   _apiKeyFieldEditor;
+   private Text   _textApiKey;
 
    @Override
    protected Control createContents(final Composite parent) {
@@ -109,18 +109,18 @@ public class PrefPageWeather extends PreferencePage implements IWorkbenchPrefere
 
             // label
             _labelApiKey = new Label(container, SWT.WRAP);
-            _labelApiKey.setText(Messages.Pref_Weather_ApiKey_FieldEditor);
+            _labelApiKey.setText(Messages.Pref_Weather_Label_ApiKey);
             GridDataFactory.fillDefaults()
                   .indent(defaultHIndent, 0)
                   .align(SWT.FILL, SWT.CENTER)
                   .applyTo(_labelApiKey);
 
             // text
-            _apiKeyFieldEditor = new Text(container, SWT.BORDER);
-            _apiKeyFieldEditor.setToolTipText(Messages.Pref_Weather_ApiKey_FieldEditor_Tooltip);
+            _textApiKey = new Text(container, SWT.BORDER);
+            _textApiKey.setToolTipText(Messages.Pref_Weather_Label_ApiKey_Tooltip);
             GridDataFactory.fillDefaults()
                   .grab(true, false)
-                  .applyTo(_apiKeyFieldEditor);
+                  .applyTo(_textApiKey);
          }
          {
             /*
@@ -128,19 +128,19 @@ public class PrefPageWeather extends PreferencePage implements IWorkbenchPrefere
              */
 
             // Link - see http(s)://www.worldweatheronline.com/developer/signup.aspx
-            _apiSignupLink = new Link(container, SWT.PUSH);
-            _apiSignupLink.setText(Messages.Pref_Weather_ApiSignupLink);
-            _apiSignupLink.setEnabled(true);
-            _apiSignupLink.addListener(SWT.Selection, new Listener() {
+            _linkApiSignup = new Link(container, SWT.PUSH);
+            _linkApiSignup.setText(Messages.Pref_Weather_Link_ApiSignup);
+            _linkApiSignup.setEnabled(true);
+            _linkApiSignup.addListener(SWT.Selection, new Listener() {
                @Override
                public void handleEvent(final Event event) {
-                  WEB.openUrl(Messages.Pref_Weather_External_Link_WeatherApi);
+                  WEB.openUrl(Messages.External_Link_Weather_ApiSignup);
                }
             });
             GridDataFactory.fillDefaults()
                   .span(2, 1)
                   .indent(defaultHIndent, 0)
-                  .applyTo(_apiSignupLink);
+                  .applyTo(_linkApiSignup);
          }
          {
             /*
@@ -170,7 +170,7 @@ public class PrefPageWeather extends PreferencePage implements IWorkbenchPrefere
       final boolean useWeatherRetrieval = _chkWeatherRetrieval.getSelection();
 
       _labelApiKey.setEnabled(useWeatherRetrieval);
-      _apiKeyFieldEditor.setEnabled(useWeatherRetrieval);
+      _textApiKey.setEnabled(useWeatherRetrieval);
       _btnTestConnection.setEnabled(useWeatherRetrieval);
    }
 
@@ -231,7 +231,7 @@ public class PrefPageWeather extends PreferencePage implements IWorkbenchPrefere
    protected void performDefaults() {
 
       _chkWeatherRetrieval.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.WEATHER_USE_WEATHER_RETRIEVAL));
-      _apiKeyFieldEditor.setText(_prefStore.getDefaultString(ITourbookPreferences.WEATHER_API_KEY));
+      _textApiKey.setText(_prefStore.getDefaultString(ITourbookPreferences.WEATHER_API_KEY));
 
       enableControls();
 
@@ -253,7 +253,7 @@ public class PrefPageWeather extends PreferencePage implements IWorkbenchPrefere
    private void restoreState() {
 
       _chkWeatherRetrieval.setSelection(_prefStore.getBoolean(ITourbookPreferences.WEATHER_USE_WEATHER_RETRIEVAL));
-      _apiKeyFieldEditor.setText(_prefStore.getString(ITourbookPreferences.WEATHER_API_KEY));
+      _textApiKey.setText(_prefStore.getString(ITourbookPreferences.WEATHER_API_KEY));
    }
 
    private void saveState() {
@@ -261,7 +261,7 @@ public class PrefPageWeather extends PreferencePage implements IWorkbenchPrefere
       final boolean useWeatherRetrieval = _chkWeatherRetrieval.getSelection();
 
       _prefStore.setValue(ITourbookPreferences.WEATHER_USE_WEATHER_RETRIEVAL, useWeatherRetrieval);
-      _prefStore.setValue(ITourbookPreferences.WEATHER_API_KEY, _apiKeyFieldEditor.getText());
+      _prefStore.setValue(ITourbookPreferences.WEATHER_API_KEY, _textApiKey.getText());
    }
 
 }
