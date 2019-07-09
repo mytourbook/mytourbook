@@ -69,7 +69,6 @@ public class Messages extends NLS {
    public static String        Pref_Map_Button_RefreshTileInfoSelected_Tooltip;
    public static String        Pref_Map_Button_UpdateMapProvider;
    public static String        Pref_Map_Checkbox_IncludeHillshading;
-   public static String        Pref_Map_Checkbox_IncludeHillshading_Tooltip;
    public static String        Pref_Map_Checkbox_IsTransparentLayer;
    public static String        Pref_Map_Checkbox_IsTransparentLayer_Tooltip;
    public static String        Pref_Map_Dialog_Export_Title;

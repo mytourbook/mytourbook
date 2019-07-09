@@ -105,16 +105,16 @@ public class PrefPagePhotoDirectory extends FieldEditorPreferencePage implements
 
    private void createUI_10_Colors(final Composite parent) {
 
-      final Group colorGroup = new Group(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(colorGroup);
+      final Group group = new Group(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
       GridLayoutFactory.fillDefaults()//
             .margins(5, 5)
             .spacing(30, LayoutConstants.getSpacing().y)
             .numColumns(2)
-            .applyTo(colorGroup);
-      colorGroup.setText(Messages.PrefPage_Photo_Viewer_Group_Colors);
+            .applyTo(group);
+      group.setText(Messages.PrefPage_Photo_Viewer_Group_Colors);
       {
-         final Composite containerLeft = new Composite(colorGroup, SWT.NONE);
+         final Composite containerLeft = new Composite(group, SWT.NONE);
          GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(containerLeft);
          {
             // color: foreground
@@ -142,24 +142,27 @@ public class PrefPagePhotoDirectory extends FieldEditorPreferencePage implements
                   containerLeft));
          }
 
-         final Composite containerFileFolder = new Composite(colorGroup, SWT.NONE);
+         final Composite containerRight = new Composite(group, SWT.NONE);
+         GridDataFactory.fillDefaults()
+               .grab(true, false)
+               .align(SWT.FILL, SWT.BEGINNING)
+               .applyTo(containerRight);
          {
-            /*
-             * checkbox: show file/folder number
-             */
-            final BooleanFieldEditor2 chkEditorIsShowFileFolder = new BooleanFieldEditor2(
-                  IPhotoPreferences.PHOTO_VIEWER_IS_SHOW_FILE_FOLDER,
-                  Messages.PrefPage_Photo_Viewer_Checkbox_ShowNumbersInFolderView,
-                  containerFileFolder);
-            addField(chkEditorIsShowFileFolder);
+            {
+               /*
+                * checkbox: show file/folder number
+                */
+               final BooleanFieldEditor2 chkEditorIsShowFileFolder = new BooleanFieldEditor2(
+                     IPhotoPreferences.PHOTO_VIEWER_IS_SHOW_FILE_FOLDER,
+                     Messages.PrefPage_Photo_Viewer_Checkbox_ShowNumbersInFolderView,
+                     containerRight);
+               addField(chkEditorIsShowFileFolder);
 
-            _chkIsShowFileFolder = chkEditorIsShowFileFolder.getChangeControl(containerFileFolder);
-            GridDataFactory.fillDefaults()//
-                  .span(2, 1)
-                  .applyTo(_chkIsShowFileFolder);
-            _chkIsShowFileFolder.setToolTipText(//
-                  Messages.PrefPage_Photo_Viewer_Checkbox_ShowNumbersInFolderView_Tooltip);
-            _chkIsShowFileFolder.addSelectionListener(_viewerUISelectionListener);
+               _chkIsShowFileFolder = chkEditorIsShowFileFolder.getChangeControl(containerRight);
+               _chkIsShowFileFolder.setToolTipText(Messages.PrefPage_Photo_Viewer_Checkbox_ShowNumbersInFolderView_Tooltip);
+               _chkIsShowFileFolder.addSelectionListener(_viewerUISelectionListener);
+               GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsShowFileFolder);
+            }
             {
                /*
                 * color: folder
@@ -167,26 +170,27 @@ public class PrefPagePhotoDirectory extends FieldEditorPreferencePage implements
                _colorEditorFolder = new ColorFieldEditor(
                      IPhotoPreferences.PHOTO_VIEWER_COLOR_FOLDER,
                      Messages.PrefPage_Photo_Viewer_Label_FolderColor,
-                     containerFileFolder);
+                     containerRight);
                addField(_colorEditorFolder);
 
                // indent label
-               _lblFolderColor = _colorEditorFolder.getLabelControl(containerFileFolder);
-               GridData gd = (GridData) _lblFolderColor.getLayoutData();
+               _lblFolderColor = _colorEditorFolder.getLabelControl(containerRight);
+               final GridData gd = (GridData) _lblFolderColor.getLayoutData();
                gd.horizontalIndent = 16;
-
+            }
+            {
                /*
                 * color: file
                 */
                _colorEditorFile = new ColorFieldEditor(
                      IPhotoPreferences.PHOTO_VIEWER_COLOR_FILE,
                      Messages.PrefPage_Photo_Viewer_Label_FileColor,
-                     containerFileFolder);
+                     containerRight);
                addField(_colorEditorFile);
 
                // indent label
-               _lblFileColor = _colorEditorFile.getLabelControl(containerFileFolder);
-               gd = (GridData) _lblFileColor.getLayoutData();
+               _lblFileColor = _colorEditorFile.getLabelControl(containerRight);
+               final GridData gd = (GridData) _lblFileColor.getLayoutData();
                gd.horizontalIndent = 16;
             }
          }

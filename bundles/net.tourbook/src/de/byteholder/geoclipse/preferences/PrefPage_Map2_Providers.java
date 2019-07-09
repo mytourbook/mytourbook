@@ -1356,7 +1356,6 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
             _chkIsIncludesHillshading = new Button(container, SWT.CHECK);
             _chkIsIncludesHillshading.setText(Messages.Pref_Map_Checkbox_IncludeHillshading);
-            _chkIsIncludesHillshading.setToolTipText(Messages.Pref_Map_Checkbox_IncludeHillshading_Tooltip);
             _chkIsIncludesHillshading.addSelectionListener(selectionListener);
             GridDataFactory.fillDefaults()
                   .grab(true, false)

@@ -1044,6 +1044,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
       final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_MAP_PROVIDER_NAME, SWT.LEAD);
 
       colDef.setColumnName(PREF_MAP2_VIEWER_COLUMN_MAP_PROVIDER);
+      colDef.setColumnHeaderToolTipText(PREF_MAP2_VIEWER_COLUMN_MAP_PROVIDER);
 
       colDef.setCanModifyVisibility(false);
       colDef.setIsColumnMoveable(false);
@@ -1169,6 +1170,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
       final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_TILE_URL, SWT.LEAD);
 
       colDef.setColumnName(PREF_MAP2_VIEWER_COLUMN_TILE_URL);
+      colDef.setColumnHeaderToolTipText(PREF_MAP2_VIEWER_COLUMN_TILE_URL);
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(40));
 
       colDef.setColumnSelectionListener(_columnSortListener);
@@ -1192,6 +1194,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
       final ColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_MAP_MODIFIED, SWT.LEAD);
 
       colDef.setColumnName(PREF_MAP2_VIEWER_COLUMN_MODIFIED);
+      colDef.setColumnHeaderToolTipText(PREF_MAP2_VIEWER_COLUMN_MODIFIED);
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(18));
 
       colDef.setColumnSelectionListener(_columnSortListener);
