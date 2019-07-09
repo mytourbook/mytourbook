@@ -110,14 +110,16 @@ public class PrefPageWeather extends PreferencePage implements IWorkbenchPrefere
             // label
             _labelApiKey = new Label(container, SWT.WRAP);
             _labelApiKey.setText(Messages.Pref_Weather_ApiKey_FieldEditor);
-            GridDataFactory.fillDefaults().indent(defaultHIndent, 0).applyTo(_labelApiKey);
+            GridDataFactory.fillDefaults()
+                  .indent(defaultHIndent, 0)
+                  .align(SWT.FILL, SWT.CENTER)
+                  .applyTo(_labelApiKey);
 
             // text
             _apiKeyFieldEditor = new Text(container, SWT.BORDER);
             _apiKeyFieldEditor.setToolTipText(Messages.Pref_Weather_ApiKey_FieldEditor_Tooltip);
             GridDataFactory.fillDefaults()
                   .grab(true, false)
-                  .indent(defaultHIndent, 0)
                   .applyTo(_apiKeyFieldEditor);
          }
          {
@@ -154,6 +156,8 @@ public class PrefPageWeather extends PreferencePage implements IWorkbenchPrefere
             });
             GridDataFactory.fillDefaults()
                   .indent(defaultHIndent, 0)
+                  .align(SWT.BEGINNING, SWT.FILL)
+                  .span(2, 1)
                   .applyTo(_btnTestConnection);
          }
       }
