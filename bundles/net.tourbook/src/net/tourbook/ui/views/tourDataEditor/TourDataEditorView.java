@@ -3664,7 +3664,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
          createUI_Section_141_Weather_Description(container);
          createUI_Section_142_Weather_Wind(container);
          createUI_Section_144_Weather_Temperature(container);
-         // TODO I am not sure what 14X means so I am just incremening from the previous 144
          createUI_Section_146_Weather_Other(container);
       }
    }
@@ -3933,8 +3932,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
           * Temperatures
           */
          // label
-         label = _tk.createLabel(parent, Messages.tour_editor_label_temperature);
-         label.setToolTipText(Messages.tour_editor_label_temperature_Tooltip);
+         label = _tk.createLabel(parent, Messages.Tour_Editor_Label_Temperature);
+         label.setToolTipText(Messages.Tour_Editor_Label_Temperature_Tooltip);
          _firstColumnControls.add(label);
 
          {
@@ -3949,7 +3948,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
                   .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
                   .align(SWT.BEGINNING, SWT.CENTER)
                   .applyTo(_spinAverageTemperature);
-            _spinAverageTemperature.setToolTipText(Messages.tour_editor_label_avgtemperature_Tooltip);
+            _spinAverageTemperature.setToolTipText(Messages.Tour_Editor_Label_Temperature_Avg_Tooltip);
 
             // the min/max temperature has a large range because fahrenheit has bigger values than celsius
             _spinAverageTemperature.setMinimum(-600);
@@ -4011,7 +4010,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
                   .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
                   .align(SWT.BEGINNING, SWT.CENTER)
                   .applyTo(_spinMaxTemperature);
-            _spinMaxTemperature.setToolTipText(Messages.tour_editor_label_maxtemperature_Tooltip);
+            _spinMaxTemperature.setToolTipText(Messages.Tour_Editor_Label_Temperature_Max_Tooltip);
 
             // the min/max temperature has a large range because fahrenheit has bigger values than celsius
             _spinMaxTemperature.setMinimum(-600);
@@ -4035,7 +4034,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
                   .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
                   .align(SWT.BEGINNING, SWT.CENTER)
                   .applyTo(_spinWindChill);
-            _spinWindChill.setToolTipText(Messages.tour_editor_label_windchill_Tooltip);
+            _spinWindChill.setToolTipText(Messages.Tour_Editor_Label_Temperature_WindCill_Tooltip);
             // the min/max temperature has a large range because fahrenheit has bigger values than celsius
             _spinWindChill.setMinimum(-600);
             _spinWindChill.setMaximum(1500);
@@ -4055,7 +4054,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
                   .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
                   .align(SWT.BEGINNING, SWT.CENTER)
                   .applyTo(_spinMinTemperature);
-            _spinMinTemperature.setToolTipText(Messages.tour_editor_label_mintemperature_Tooltip);
+            _spinMinTemperature.setToolTipText(Messages.Tour_Editor_Label_Temperature_Min_Tooltip);
 
             // the min/max temperature has a large range because fahrenheit has bigger values than celsius
             _spinMinTemperature.setMinimum(-600);
@@ -4073,8 +4072,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
           * Humidity
           */
          // label
-         Label label = _tk.createLabel(parent, Messages.tour_editor_label_humidity);
-         label.setToolTipText(Messages.tour_editor_label_humidity_Tooltip);
+         Label label = _tk.createLabel(parent, Messages.Tour_Editor_Label_Humidity);
+         label.setToolTipText(Messages.Tour_Editor_Label_Humidity_Tooltip);
          _firstColumnControls.add(label);
 
          // spinner: humidity value
@@ -4084,7 +4083,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
                .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
                .align(SWT.BEGINNING, SWT.CENTER)
                .applyTo(_spinHumidity);
-         _spinHumidity.setToolTipText(Messages.tour_editor_label_humidity_Tooltip);
+         _spinHumidity.setToolTipText(Messages.Tour_Editor_Label_Humidity_Tooltip);
          _spinHumidity.setMinimum(0);
          _spinHumidity.setMaximum(100);
 
@@ -4098,8 +4097,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
           * Precipitation
           */
          // label
-         Label label = _tk.createLabel(parent, Messages.tour_editor_label_precipitation);
-         label.setToolTipText(Messages.tour_editor_label_precipitation_Tooltip);
+         Label label = _tk.createLabel(parent, Messages.Tour_Editor_Label_Precipitation);
+         label.setToolTipText(Messages.Tour_Editor_Label_Precipitation_Tooltip);
          _firstColumnControls.add(label);
 
          // spinner: precipitation value
@@ -4109,7 +4108,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
                .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
                .align(SWT.BEGINNING, SWT.CENTER)
                .applyTo(_spinPrecipitationValue);
-         _spinPrecipitationValue.setToolTipText(Messages.tour_editor_label_precipitation_Tooltip);
+         _spinPrecipitationValue.setToolTipText(Messages.Tour_Editor_Label_Precipitation_Tooltip);
          _spinPrecipitationValue.setDigits(2);
          _spinPrecipitationValue.setMaximum(10000);
 
@@ -4126,8 +4125,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
           * Pressure
           */
          // label
-         Label label = _tk.createLabel(parent, Messages.tour_editor_label_pressure);
-         label.setToolTipText(Messages.tour_editor_label_pressure_Tooltip);
+         Label label = _tk.createLabel(parent, Messages.Tour_Editor_Label_AirPressure);
+         label.setToolTipText(Messages.Tour_Editor_Label_AirPressure_Tooltip);
          _firstColumnControls.add(label);
 
          // spinner: pressure value
@@ -4137,7 +4136,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
                .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
                .align(SWT.BEGINNING, SWT.CENTER)
                .applyTo(_spinPressureValue);
-         _spinPressureValue.setToolTipText(Messages.tour_editor_label_pressure_Tooltip);
+         _spinPressureValue.setToolTipText(Messages.Tour_Editor_Label_AirPressure_Tooltip);
          _spinPressureValue.setMaximum(400000);
 
          // label: mb, inHg
@@ -4197,9 +4196,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
          }
          _isSetField = false;
 
-         // spacer
-         final Label label = new Label(parent, SWT.NONE);
-         GridDataFactory.fillDefaults().span(3, 1).applyTo(label);
+//         // spacer
+//         final Label label = new Label(parent, SWT.NONE);
+//         GridDataFactory.fillDefaults().span(3, 1).applyTo(label);
       }
    }
 
