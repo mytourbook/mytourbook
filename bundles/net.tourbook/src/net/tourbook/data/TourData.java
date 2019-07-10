@@ -3059,23 +3059,52 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    public void computeAvg_Temperature() {
 
-      if (temperatureSerie == null) {
+      if (temperatureSerie == null || temperatureSerie.length == 0) {
          return;
       }
 
+      float temperatureMin = Float.MIN_VALUE;
+      float temperatureMax = Float.MIN_VALUE;
       float temperatureSum = 0;
+
       int tempLength = temperatureSerie.length;
 
       for (final float temperature : temperatureSerie) {
+
          if (temperature == Float.MIN_VALUE) {
+
             // ignore invalid values
             tempLength--;
+
          } else {
+
+            if (temperatureMin == Float.MIN_VALUE) {
+
+               // set initial value
+               temperatureMin = temperature;
+               temperatureMax = temperature;
+
+            } else {
+
+               if (temperature < temperatureMin) {
+
+                  temperatureMin = temperature;
+
+               } else if (temperature > temperatureMax) {
+
+                  temperatureMax = temperature;
+               }
+            }
+
             temperatureSum += temperature;
          }
       }
 
       if (tempLength > 0) {
+
+//         weatherMinTemperature=temperatureMin;
+//         weatherMaxTemperature=temperatureMax;
+
          avgTemperature = temperatureSum / tempLength;
       }
    }
@@ -8091,7 +8120,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    public float getWeatherMaxTemperature() {
-     return weatherMaxTemperature;
+      return weatherMaxTemperature;
    }
 
    public float getWeatherMinTemperature() {
