@@ -1270,7 +1270,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
             _txtDescription.addModifyListener(_modifyListener);
             GridDataFactory.fillDefaults()
                   .span(3, 1)
-                  .hint(_pc.convertWidthInCharsToPixels(50), _pc.convertHeightInCharsToPixels(3))
+                  .hint(_pc.convertWidthInCharsToPixels(50), _pc.convertHeightInCharsToPixels(5))
                   .grab(true, false)
                   .applyTo(_txtDescription);
          }

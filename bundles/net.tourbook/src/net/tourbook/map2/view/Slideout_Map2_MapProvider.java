@@ -1022,8 +1022,6 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
 
       _colDef_IsMPVisible = new TableColumnDefinition(_columnManager, COLUMN_IS_VISIBLE, SWT.CENTER);
 
-//      _colDef_IsMPVisible.setColumnName(Messages.Slideout_Map2Provider_Column_IsVisible);
-//      _colDef_IsMPVisible.setColumnHeaderToolTipText(Messages.Slideout_Map2Provider_Column_IsVisible_Tooltip);
       _colDef_IsMPVisible.setColumnName(PREF_MAP2_VIEWER_COLUMN_IS_VISIBLE);
       _colDef_IsMPVisible.setColumnHeaderToolTipText(PREF_MAP2_VIEWER_COLUMN_IS_VISIBLE_TOOLTIP);
       _colDef_IsMPVisible.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(12));

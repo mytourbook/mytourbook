@@ -1673,11 +1673,13 @@ public class MapProviderManager {
             xmlModified = TimeTools.now();
 
             // add import info
-            final String importInfo = NLS.bind("Imported from: {0}", filename);
+            final String importInfo = NLS.bind(Messages.MP_Manager_Label_ImportFrom, filename);
 
-            if (xmlDescription != null) {
-               xmlDescription += UI.NEW_LINE;
-               xmlDescription += UI.NEW_LINE;
+            if (xmlDescription != null && xmlDescription.trim().length() > 0) {
+
+               // without \r the text is not on a new line
+               xmlDescription += net.tourbook.common.UI.NEW_LINE_TEXT_WIDGET;
+               xmlDescription += net.tourbook.common.UI.NEW_LINE_TEXT_WIDGET;
             }
 
             xmlDescription += importInfo;

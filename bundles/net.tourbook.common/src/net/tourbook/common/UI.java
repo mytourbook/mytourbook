@@ -105,6 +105,7 @@ public class UI {
    public static final String       DASH_WITH_DOUBLE_SPACE        = "   -   ";  //$NON-NLS-1$
    public static final String       DIMENSION                     = " x ";      //$NON-NLS-1$
    public static final String       EMPTY_STRING                  = "";         //$NON-NLS-1$
+   public static final String       NEW_LINE_TEXT_WIDGET          = "\r\n";     //$NON-NLS-1$
    public static final String       NEW_LINE1                     = "\n";       //$NON-NLS-1$
    public static final String       NEW_LINE2                     = "\n\n";     //$NON-NLS-1$
    public static final String       NEW_LINE3                     = "\n\n\n";   //$NON-NLS-1$
