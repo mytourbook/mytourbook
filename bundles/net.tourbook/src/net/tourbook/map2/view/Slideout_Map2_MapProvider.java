@@ -115,7 +115,6 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
 
 // SET_FORMATTING_OFF
 
-   private static final String APP_TRUE                                       = net.tourbook.Messages.App__True;
    private static final String IMAGE_APP_NO                                   = net.tourbook.common.Messages.Image__App_No;
    private static final String IMAGE_APP_YES                                  = net.tourbook.common.Messages.Image__App_Yes;
 
@@ -126,6 +125,8 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
    private static final String PREF_MAP2_VIEWER_COLUMN_IS_TRANSPARENT_TOOLTIP = de.byteholder.geoclipse.preferences.Messages.Pref_Map2_Viewer_Column_IsTransparent_Tooltip;
    private static final String PREF_MAP2_VIEWER_COLUMN_IS_HILLSHADING         = de.byteholder.geoclipse.preferences.Messages.Pref_Map2_Viewer_Column_IsHillshading;
    private static final String PREF_MAP2_VIEWER_COLUMN_IS_HILLSHADING_TOOLTIP = de.byteholder.geoclipse.preferences.Messages.Pref_Map2_Viewer_Column_IsHillshading_Tooltip;
+   private static final String PREF_MAP2_VIEWER_COLUMN_IS_VISIBLE             = de.byteholder.geoclipse.preferences.Messages.Pref_Map2_Viewer_Column_IsVisible;
+   private static final String PREF_MAP2_VIEWER_COLUMN_IS_VISIBLE_TOOLTIP     = de.byteholder.geoclipse.preferences.Messages.Pref_Map2_Viewer_Column_IsVisible_Tooltip;
    private static final String PREF_MAP2_VIEWER_COLUMN_MAP_PROVIDER           = de.byteholder.geoclipse.preferences.Messages.Pref_Map2_Viewer_Column_MapProvider;
    private static final String PREF_MAP2_VIEWER_COLUMN_MODIFIED               = de.byteholder.geoclipse.preferences.Messages.Pref_Map2_Viewer_Column_Modified;
    private static final String PREF_MAP2_VIEWER_COLUMN_MP_TYPE                = de.byteholder.geoclipse.preferences.Messages.Pref_Map2_Viewer_Column_MPType;
@@ -253,7 +254,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
                break;
 
             case COLUMN_MAP_MODIFIED:
-               rc = mp1.getDateTimeModified() - mp2.getDateTimeModified();
+               rc = mp1.getDateTimeModified_Long() - mp2.getDateTimeModified_Long();
                break;
 
             case COLUMN_MP_TYPE:
@@ -1021,8 +1022,10 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
 
       _colDef_IsMPVisible = new TableColumnDefinition(_columnManager, COLUMN_IS_VISIBLE, SWT.CENTER);
 
-      _colDef_IsMPVisible.setColumnName(Messages.Slideout_Map2Provider_Column_IsVisible);
-      _colDef_IsMPVisible.setColumnHeaderToolTipText(Messages.Slideout_Map2Provider_Column_IsVisible_Tooltip);
+//      _colDef_IsMPVisible.setColumnName(Messages.Slideout_Map2Provider_Column_IsVisible);
+//      _colDef_IsMPVisible.setColumnHeaderToolTipText(Messages.Slideout_Map2Provider_Column_IsVisible_Tooltip);
+      _colDef_IsMPVisible.setColumnName(PREF_MAP2_VIEWER_COLUMN_IS_VISIBLE);
+      _colDef_IsMPVisible.setColumnHeaderToolTipText(PREF_MAP2_VIEWER_COLUMN_IS_VISIBLE_TOOLTIP);
       _colDef_IsMPVisible.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(12));
 
       _colDef_IsMPVisible.setColumnSelectionListener(_columnSortListener);
@@ -1133,7 +1136,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
 
             final MP mapProvider = (MP) cell.getElement();
 
-            cell.setText(mapProvider.isIncludesHillshading() ? APP_TRUE : UI.EMPTY_STRING);
+            cell.setText(mapProvider.isIncludesHillshading() ? Messages.App__True : UI.EMPTY_STRING);
          }
       });
    }
@@ -1157,7 +1160,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
 
             final MP mapProvider = (MP) cell.getElement();
 
-            cell.setText(mapProvider.isTransparentLayer() ? APP_TRUE : UI.EMPTY_STRING);
+            cell.setText(mapProvider.isTransparentLayer() ? Messages.App__True : UI.EMPTY_STRING);
          }
       });
    }
@@ -1203,14 +1206,12 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
          @Override
          public void update(final ViewerCell cell) {
 
-            final long dtModified = ((MP) cell.getElement()).getDateTimeModified();
+            final ZonedDateTime dtModified = ((MP) cell.getElement()).getDateTimeModified();
 
-            if (dtModified == 0) {
+            if (dtModified == null) {
                cell.setText(UI.SPACE1);
             } else {
-
-               final ZonedDateTime dtModifiedZoned = TimeTools.createDateTimeFromYMDhms(dtModified);
-               cell.setText(dtModifiedZoned.format(TimeTools.Formatter_DateTime_S));
+               cell.setText(dtModified.format(TimeTools.Formatter_DateTime_S));
             }
          }
       });

@@ -1989,8 +1989,6 @@ public class Messages extends NLS {
    public static String Slideout_Map2Provider_Button_HideMP_Tooltip;
    public static String Slideout_Map2Provider_Button_UnhideMP;
    public static String Slideout_Map2Provider_Button_UnhideMP_Tooltip;
-   public static String Slideout_Map2Provider_Column_IsVisible;
-   public static String Slideout_Map2Provider_Column_IsVisible_Tooltip;
    public static String Slideout_Map2Provider_Label_Tip;
    public static String Slideout_Map2Provider_Label_Tip_Tooltip;
    public static String Slideout_Map2Provider_Label_Title;

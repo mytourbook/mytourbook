@@ -34,6 +34,7 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -1280,7 +1281,7 @@ public class MapProviderManager {
          }
       }
 
-      final ArrayList<MP> importedMapProviders = readXml1(absolutePath, false, false);
+      final ArrayList<MP> importedMapProviders = readXml_MP_1(absolutePath, false, false);
       for (final MP mp : importedMapProviders) {
 
          /*
@@ -1539,7 +1540,7 @@ public class MapProviderManager {
     */
    public ArrayList<MP> importMapProvider(final String importFilePath) {
 
-      final ArrayList<MP> importedMPList = readXml1(importFilePath, true, true);
+      final ArrayList<MP> importedMPList = readXml_MP_1(importFilePath, true, true);
       if (importedMPList.size() > 0) {
 
          // validate map provider
@@ -1550,6 +1551,7 @@ public class MapProviderManager {
    }
 
    private void logError(final String errorText, final Exception exception) {
+
       StatusUtil.log(errorText, exception);
       _errorLog.add(errorText);
    }
@@ -1564,7 +1566,7 @@ public class MapProviderManager {
     * @return Returns a list with all map providers from a xml file including wrapped plugin map
     *         provider
     */
-   private ArrayList<MP> readXml1(final String filename, final boolean isShowExistError, final boolean isMpImport) {
+   private ArrayList<MP> readXml_MP_1(final String filename, final boolean isShowExistError, final boolean isMpImport) {
 
       final ArrayList<MP> validMapProviders = new ArrayList<>();
       InputStreamReader reader = null;
@@ -1596,10 +1598,10 @@ public class MapProviderManager {
             }
          }
 
-         readXml2(validMapProviders, mementoRoot, ROOT_CHILD_TAG_MAP_PROVIDER);
+         readXml_MP_2(validMapProviders, mementoRoot, ROOT_CHILD_TAG_MAP_PROVIDER, isMpImport, filename);
 
          if (isMpImport) {
-            readXml2(validMapProviders, mementoRoot, ROOT_CHILD_TAG_WRAPPED_MAP_PROVIDER);
+            readXml_MP_2(validMapProviders, mementoRoot, ROOT_CHILD_TAG_WRAPPED_MAP_PROVIDER, isMpImport, filename);
          }
 
       } catch (final UnsupportedEncodingException e) {
@@ -1632,10 +1634,14 @@ public class MapProviderManager {
     * @param validMapProviders
     * @param mementoRoot
     * @param tagNameRootChildren
+    * @param isMpImport
+    * @param filename
     */
-   private void readXml2(final ArrayList<MP> validMapProviders,
-                         final XMLMemento mementoRoot,
-                         final String tagNameRootChildren) {
+   private void readXml_MP_2(final ArrayList<MP> validMapProviders,
+                             final XMLMemento mementoRoot,
+                             final String tagNameRootChildren,
+                             final boolean isMpImport,
+                             final String filename) {
 
       final ArrayList<MP> allMapProviders = getAllMapProviders();
       final IMemento[] tagMapProviderList = mementoRoot.getChildren(tagNameRootChildren);
@@ -1650,7 +1656,7 @@ public class MapProviderManager {
          final String xmlMapProviderType = tagMapProvider.getString(ATTR_MP_TYPE);
 
          final String xmlCategory = tagMapProvider.getString(ATTR_MP_CATEGORY);
-         final String xmlDescription = tagMapProvider.getString(ATTR_MP_DESCRIPTION);
+         String xmlDescription = tagMapProvider.getString(ATTR_MP_DESCRIPTION);
          final String xmlOfflineFolder = tagMapProvider.getString(ATTR_MP_OFFLINE_FOLDER);
          final String xmlOnlineMapUrl = tagMapProvider.getString(ATTR_MP_ONLINE_MAP_URL);
 
@@ -1660,7 +1666,26 @@ public class MapProviderManager {
          final Boolean xmlHasTopo = tagMapProvider.getBoolean(ATTR_MP_IS_INCLUDES_HILLSHADING);
          final Boolean xmlIsLayer = tagMapProvider.getBoolean(ATTR_MP_IS_TRANSPARENT_LAYER);
 
-         final Long xmlModified = Util.getXmlLong(tagMapProvider, ATTR_MP_DATE_TIME_MODIFIED, 0L);
+         ZonedDateTime xmlModified;
+         if (isMpImport) {
+
+            // set import date/time
+            xmlModified = TimeTools.now();
+
+            // add import info
+            final String importInfo = NLS.bind("Imported from: {0}", filename);
+
+            if (xmlDescription != null) {
+               xmlDescription += UI.NEW_LINE;
+               xmlDescription += UI.NEW_LINE;
+            }
+
+            xmlDescription += importInfo;
+
+         } else {
+
+            xmlModified = Util.getXmlDateTime(tagMapProvider, ATTR_MP_DATE_TIME_MODIFIED, null);
+         }
 
          // zoom level
          final Integer xmlZoomMin = tagMapProvider.getInteger(ATTR_MP_ZOOM_LEVEL_MIN);
@@ -1743,17 +1768,17 @@ public class MapProviderManager {
          if (xmlMapProviderType.equals(MAP_PROVIDER_TYPE_CUSTOM)) {
 
             // custom map provider
-            mapProvider = readXmlCustom(tagMapProvider, xmlMapProviderId);
+            mapProvider = readXml_MP_Custom(tagMapProvider, xmlMapProviderId);
 
          } else if (xmlMapProviderType.equals(MAP_PROVIDER_TYPE_WMS)) {
 
             // wms map provider
-            mapProvider = readXmlWms(tagMapProvider, xmlMapProviderId, tagNameRootChildren);
+            mapProvider = readXml_MP_Wms(tagMapProvider, xmlMapProviderId, tagNameRootChildren);
 
          } else if (xmlMapProviderType.equals(MAP_PROVIDER_TYPE_MAP_PROFILE)) {
 
             // map profile
-            mapProvider = readXmlProfile(tagMapProvider, xmlMapProviderId);
+            mapProvider = readXml_MP_Profile(tagMapProvider, xmlMapProviderId);
          }
 
          /*
@@ -1803,7 +1828,7 @@ public class MapProviderManager {
     * @param mapProviderId
     * @return
     */
-   private MPCustom readXmlCustom(final IMemento mementoMapProvider, final String mapProviderId) {
+   private MPCustom readXml_MP_Custom(final IMemento mementoMapProvider, final String mapProviderId) {
 
       final MPCustom mapProvider = new MPCustom();
 
@@ -1904,7 +1929,7 @@ public class MapProviderManager {
     * @param mapProviderId
     * @return
     */
-   private MPProfile readXmlProfile(final IMemento tagMapProvider, final String mapProviderId) {
+   private MPProfile readXml_MP_Profile(final IMemento tagMapProvider, final String mapProviderId) {
 
       final ArrayList<MPWrapper> mpWrapperList = new ArrayList<>();
       final MPProfile mapProfile = new MPProfile(mpWrapperList);
@@ -2071,9 +2096,9 @@ public class MapProviderManager {
     * @param tagNameRootChildren
     * @return
     */
-   private MPWms readXmlWms(final IMemento mementoMapProvider,
-                            final String mapProviderId,
-                            final String tagNameRootChildren) {
+   private MPWms readXml_MP_Wms(final IMemento mementoMapProvider,
+                                final String mapProviderId,
+                                final String tagNameRootChildren) {
 
       final MPWms mapProvider = new MPWms();
 
@@ -2216,7 +2241,7 @@ public class MapProviderManager {
    private ArrayList<MP> validateImportedMP(final ArrayList<MP> importedMPList) {
 
       final ArrayList<MP> newMPs = new ArrayList<>();
-      final ArrayList<MP> existingMPs = MapProviderManager.getInstance().getAllMapProviders(true);
+      final ArrayList<MP> existingMPs = getAllMapProviders(true);
 
       /*
        * first map provider is the main map provider, the others are wrapped map providers
@@ -2296,7 +2321,7 @@ public class MapProviderManager {
        */
       final ArrayList<MP> importedMpWrapperList = new ArrayList<>(importedMPList);
 
-      final ArrayList<MP> existingMPs = MapProviderManager.getInstance().getAllMapProviders(true);
+      final ArrayList<MP> existingMPs = getAllMapProviders(true);
       final MPProfile importedMpProfile = importedMP;
       final ArrayList<MPWrapper> importedProfileWrappers = importedMpProfile.getAllWrappers();
 
@@ -2506,6 +2531,7 @@ public class MapProviderManager {
 
       final GeoPosition lastUsedPosition = mp.getLastUsedPosition();
       final GeoPosition favoritePosition = mp.getFavoritePosition();
+      final ZonedDateTime dateTimeModified = mp.getDateTimeModified();
 
       /*
        * set common fields
@@ -2518,7 +2544,7 @@ public class MapProviderManager {
       tagMapProvider.putString(ATTR_MP_ONLINE_MAP_URL, mp.getOnlineMapUrl());
       tagMapProvider.putBoolean(ATTR_MP_IS_INCLUDES_HILLSHADING, mp.isIncludesHillshading());
       tagMapProvider.putBoolean(ATTR_MP_IS_TRANSPARENT_LAYER, mp.isTransparentLayer());
-      Util.setXmlLong(tagMapProvider, ATTR_MP_DATE_TIME_MODIFIED, mp.getDateTimeModified());
+      tagMapProvider.putString(ATTR_MP_DATE_TIME_MODIFIED, dateTimeModified == null ? null : dateTimeModified.toString());
 
       // image
       tagMapProvider.putInteger(ATTR_MP_IMAGE_SIZE, mp.getTileSize());
@@ -2530,25 +2556,13 @@ public class MapProviderManager {
 
       // favorite position
       tagMapProvider.putInteger(ATTR_MP_FAVORITE_ZOOM_LEVEL, mp.getFavoriteZoom());
-      tagMapProvider.putFloat(ATTR_MP_FAVORITE_LATITUDE,
-            favoritePosition == null
-                  ? 0.0f
-                  : (float) favoritePosition.latitude);
-      tagMapProvider.putFloat(ATTR_MP_FAVORITE_LONGITUDE,
-            favoritePosition == null
-                  ? 0.0f
-                  : (float) favoritePosition.longitude);
+      tagMapProvider.putFloat(ATTR_MP_FAVORITE_LATITUDE, favoritePosition == null ? 0.0f : (float) favoritePosition.latitude);
+      tagMapProvider.putFloat(ATTR_MP_FAVORITE_LONGITUDE, favoritePosition == null ? 0.0f : (float) favoritePosition.longitude);
 
       // last used position
       tagMapProvider.putInteger(ATTR_MP_LAST_USED_ZOOM_LEVEL, mp.getLastUsedZoom());
-      tagMapProvider.putFloat(ATTR_MP_LAST_USED_LATITUDE,
-            lastUsedPosition == null
-                  ? 0.0f
-                  : (float) lastUsedPosition.latitude);
-      tagMapProvider.putFloat(ATTR_MP_LAST_USED_LONGITUDE,
-            lastUsedPosition == null
-                  ? 0.0f
-                  : (float) lastUsedPosition.longitude);
+      tagMapProvider.putFloat(ATTR_MP_LAST_USED_LATITUDE, lastUsedPosition == null ? 0.0f : (float) lastUsedPosition.latitude);
+      tagMapProvider.putFloat(ATTR_MP_LAST_USED_LONGITUDE, lastUsedPosition == null ? 0.0f : (float) lastUsedPosition.longitude);
 
       /*
        * add special fields for each map provider

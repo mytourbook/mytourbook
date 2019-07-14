@@ -113,6 +113,8 @@ public class Messages extends NLS {
    public static String        Pref_Map2_Viewer_Column_IsHillshading_Tooltip;
    public static String        Pref_Map2_Viewer_Column_IsTransparent;
    public static String        Pref_Map2_Viewer_Column_IsTransparent_Tooltip;
+   public static String        Pref_Map2_Viewer_Column_IsVisible;
+   public static String        Pref_Map2_Viewer_Column_IsVisible_Tooltip;
    public static String        Pref_Map2_Viewer_Column_Category;
    public static String        Pref_Map2_Viewer_Column_Description;
    public static String        Pref_Map2_Viewer_Column_Layers;

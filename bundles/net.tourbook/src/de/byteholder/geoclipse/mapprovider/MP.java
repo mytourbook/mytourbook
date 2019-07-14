@@ -264,8 +264,12 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
     */
    private boolean       _isIncludesHillshading;
 
-   private long          _dateTimeModified_Long;
-   private ZonedDateTime _dateTimeModified_Zoned;
+   private ZonedDateTime _dateTimeModified;
+
+   /**
+    * Is used for sorting
+    */
+   private long          _dateTimeModified_Long           = Long.MIN_VALUE;
 
    /**
     * Url for an online map
@@ -566,23 +570,25 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
       return null;
    }
 
-   public long getDateTimeModified() {
-      return _dateTimeModified_Long;
-   }
-
    /**
     * @return Returns {@link ZonedDateTime} when the tour was modified or <code>null</code> when
     *         date/time is not available
     */
-   public ZonedDateTime getDateTimeModified_Zoned() {
+   public ZonedDateTime getDateTimeModified() {
+      return _dateTimeModified;
+   }
 
-      if (_dateTimeModified_Zoned != null || _dateTimeModified_Long == 0) {
-         return _dateTimeModified_Zoned;
+   public long getDateTimeModified_Long() {
+
+      if (_dateTimeModified == null) {
+         return Long.MIN_VALUE;
       }
 
-      _dateTimeModified_Zoned = TimeTools.createDateTimeFromYMDhms(_dateTimeModified_Long);
+      if (_dateTimeModified_Long == Long.MIN_VALUE) {
+         _dateTimeModified_Long = TimeTools.toEpochMilli(_dateTimeModified);
+      }
 
-      return _dateTimeModified_Zoned;
+      return _dateTimeModified_Long;
    }
 
    public int getDefaultZoomLevel() {
@@ -1369,8 +1375,8 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
       _category = category;
    }
 
-   public void setDateTimeModified(final long dateTimeModified) {
-      _dateTimeModified_Long = dateTimeModified;
+   public void setDateTimeModified(final ZonedDateTime dateTimeModified) {
+      _dateTimeModified = dateTimeModified;
    }
 
    public void setDefaultZoomLevel(final int defaultZoomLevel) {

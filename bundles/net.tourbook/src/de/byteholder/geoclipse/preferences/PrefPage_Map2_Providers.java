@@ -177,6 +177,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
    private static final String       COLUMN_DESCRIPTION             = "Description";                   //$NON-NLS-1$
    private static final String       COLUMN_IS_CONTAINS_HILLSHADING = "ContainsHillshading";           //$NON-NLS-1$
    private static final String       COLUMN_IS_TRANSPARENT_LAYER    = "IsTransparentLayer";            //$NON-NLS-1$
+   private static final String       COLUMN_IS_VISIBLE              = "IsVisible";                     //$NON-NLS-1$
    private static final String       COLUMN_MAP_PROVIDER_NAME       = "MapProviderName";               //$NON-NLS-1$
    private static final String       COLUMN_MODIFIED                = "Modified";                      //$NON-NLS-1$
    private static final String       COLUMN_MP_TYPE                 = "MPType";                        //$NON-NLS-1$
@@ -347,8 +348,17 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
             rc = Boolean.compare(mp2.isTransparentLayer(), mp1.isTransparentLayer());
             break;
 
+         case COLUMN_IS_VISIBLE:
+
+            /*
+             * Comparison is mp2->mp1 that the map providers are ascending sorted when visible is
+             * ascending sorted
+             */
+            rc = Boolean.compare(mp2.isVisibleInUI(), mp1.isVisibleInUI());
+            break;
+
          case COLUMN_MODIFIED:
-            rc = mp1.getDateTimeModified() - mp2.getDateTimeModified();
+            rc = mp1.getDateTimeModified_Long() - mp2.getDateTimeModified_Long();
             break;
 
          case COLUMN_MP_TYPE:
@@ -1045,7 +1055,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
          }
          {
             /*
-             * drop target: map provider
+             * Drop target: Map provider
              */
             _lblMpDropTarget = new Label(btnContainer, SWT.BORDER | SWT.WRAP | SWT.CENTER);
             _lblMpDropTarget.setText(Messages.Pref_Map_Label_MapProviderDropTarget);
@@ -1570,6 +1580,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
     */
    private void defineAllColumns() {
 
+      defineColumn_00_IsVisible();
       defineColumn_10_MapProviderName();
       defineColumn_12_Category();
       defineColumn_22_Hillshading();
@@ -1583,6 +1594,30 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       defineColumn_70_OfflineFileCounter();
       defineColumn_72_OfflineFileSize();
       defineColumn_80_Modified();
+   }
+
+   /**
+    * Column: Is visible
+    */
+   private void defineColumn_00_IsVisible() {
+
+      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_IS_VISIBLE, SWT.CENTER);
+
+      colDef.setColumnName(Messages.Pref_Map2_Viewer_Column_IsVisible);
+      colDef.setColumnHeaderToolTipText(Messages.Pref_Map2_Viewer_Column_IsVisible_Tooltip);
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(12));
+
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final MP mapProvider = (MP) cell.getElement();
+
+            cell.setText(mapProvider.isVisibleInUI() ? APP_TRUE : UI.EMPTY_STRING);
+         }
+      });
    }
 
    /**
@@ -1927,14 +1962,12 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
          @Override
          public void update(final ViewerCell cell) {
 
-            final long dtModified = ((MP) cell.getElement()).getDateTimeModified();
+            final ZonedDateTime dtModified = ((MP) cell.getElement()).getDateTimeModified();
 
-            if (dtModified == 0) {
+            if (dtModified == null) {
                cell.setText(UI.SPACE);
             } else {
-
-               final ZonedDateTime dtModifiedZoned = TimeTools.createDateTimeFromYMDhms(dtModified);
-               cell.setText(dtModifiedZoned.format(TimeTools.Formatter_DateTime_S));
+               cell.setText(dtModified.format(TimeTools.Formatter_DateTime_S));
             }
          }
       });
@@ -3349,11 +3382,9 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
          }
       }
 
-      final long dtModified = TimeTools.createdNowAsYMDhms();
-
       // update fields
       mapProvider.setCategory(_txtCategory.getText());
-      mapProvider.setDateTimeModified(dtModified);
+      mapProvider.setDateTimeModified(TimeTools.now());
       mapProvider.setDescription(_txtDescription.getText().trim());
       mapProvider.setId(mpId);
       mapProvider.setIsIncludesHillshading(_chkIsIncludesHillshading.getSelection());
