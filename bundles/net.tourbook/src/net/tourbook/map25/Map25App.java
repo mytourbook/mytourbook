@@ -144,8 +144,9 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	 * if i could replace "_l" against "_layer_BaseMap", everything would be easier...
 	 * _l = mMap.setBaseMap(tileSource);  returns VectorTileLayer
 	 */
-	private OsmTileLayerMT			_layer_BaseMap;   //extends extends VectorTileLayer
-	private VectorTileLayer 		_l;	
+   private OsmTileLayerMT        _layer_BaseMap;   //extends extends VectorTileLayer
+   //private VectorTileLayer      _layer_BaseMap;
+   //private VectorTileLayer     _l;   	
 
 	private BuildingLayer			_layer_Building;
 	private S3DBLayer					_layer_S3DB_Building;
@@ -353,8 +354,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 			if (!checkMapFile(new File(_mf_mapFilePath))) {
 				throw new IllegalArgumentException("cannot read mapfile: " + _mf_mapFilePath); //$NON-NLS-1$
 			}
-
-			
 			
 			final MultiMapFileTileSource tileSource = getMapFile(_mf_mapFilePath);
 			if (_tileSourceOfflineMapCount == 0) {
@@ -746,7 +745,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 			debugPrint("############# setMapProvider: setMap   to      " + mapProvider.mf_MapFilepath); //$NON-NLS-1$
 			//debugPrint("############# setMapProvider: setTheme to      " + mapProvider.mf_ThemeFilepath); //$NON-NLS-1$
 			//debugPrint("############# setMapProvider: setStyle to      " + mapProvider.mf_ThemeStyle); //$NON-NLS-1$
-			debugPrint("############# setMapProvider: isOfflineMap     " + mapProvider.is_mf_Map); //$NON-NLS-1$
+			debugPrint("############# setMapProvider: is_mf_Map     " + mapProvider.is_mf_Map); //$NON-NLS-1$
 			debugPrint("############# setMapProvider: isThemeFromFile  " + mapProvider.mf_IsThemeFromFile); //$NON-NLS-1$
 			//debugPrint("############# setMapProvider: name             " + mapProvider.name); //$NON-NLS-1$
 
@@ -795,6 +794,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
             setupMap_Layers();
             //restoreState();
             
+            updateUI_MapBookmarkLayer();
+            
             /**
              * Map Viewport
              */
@@ -816,7 +817,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
             }
          });
          
-         restoreState();
+         //restoreState();
 
 			
 			_mf_IsThemeFromFile = _selectedMapProvider.mf_IsThemeFromFile;
@@ -839,7 +840,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 					   debugPrint("############# setMapProvider: Theme loader started"); //$NON-NLS-1$
 						this._mf_IRenderTheme = ThemeLoader.load(_mf_themeFilePath);
 						debugPrint("############# setMapProvider: Theme loader done, now activating..."); //$NON-NLS-1$
-						_l.setRenderTheme(_mf_IRenderTheme);
+						_layer_BaseMap.setRenderTheme(_mf_IRenderTheme);
 						////mMap.setTheme(_mf_IRenderTheme);
 						loadTheme(mapProvider.mf_ThemeStyle);  //whene starting with onlinemaps and switching to mf, osmarender is used ??? when uncommented it ok
 						debugPrint("############# setMapProvider: ...activaded"); //$NON-NLS-1$
@@ -900,7 +901,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       CanvasAdapter.textScale = _vtm_TextScale;
       CanvasAdapter.userScale = _vtm_UserScale;
 		
-      _l = mMap.setBaseMap(tileSource);
+      //_l = mMap.setBaseMap(tileSource);
       
 		_layer_BaseMap = new OsmTileLayerMT(mMap);
 
@@ -953,11 +954,11 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
 		_tileManager = _layer_BaseMap.getManager();
 
-		_l = mMap.setBaseMap(tileSource);
+		//_l = mMap.setBaseMap(tileSource);
 		
 		_layer_BaseMap.setTileSource(tileSource);
 		
-		_l.setRenderTheme(ThemeLoader.load(VtmThemes.DEFAULT));  //to avoid errors
+		_layer_BaseMap.setRenderTheme(ThemeLoader.load(VtmThemes.DEFAULT));  //to avoid errors
 
 		// THIS IS NOT YET WORKING
 //		mapLayer.setNumLoaders(10);		
@@ -990,7 +991,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 			;
 			//_l.setRenderTheme(ThemeLoader.load(VtmThemes.DEFAULT));  //to avoid errors
 			this._mf_IRenderTheme = ThemeLoader.load(_mf_themeFilePath);  // because of changes in loadtheme
-			_l.setRenderTheme(_mf_IRenderTheme);
+			_layer_BaseMap.setRenderTheme(_mf_IRenderTheme);
 			mMap.setTheme(ThemeLoader.load(_mf_themeFilePath)); //neccercary?seem so
 			////loadTheme(mapProvider.mf_ThemeStyle); //neccercary?
 		}
@@ -1033,8 +1034,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
        * 
        */
 //    // Buildings or S3DB  Block I
-      //_layer_S3DB_Building = new S3DBLayer(mMap,_layer_BaseMap, true);  //this is working with subtheme  switching, but no online buildings anymore
-      _layer_S3DB_Building = new S3DBLayer(mMap,_l, true);  //is working online and offline, but S3DB only until subtheme switching
+      _layer_S3DB_Building = new S3DBLayer(mMap,_layer_BaseMap, true);  //this is working with subtheme  switching, but no online buildings anymore
+      //_layer_S3DB_Building = new S3DBLayer(mMap,_l, true);  //is working online and offline, but S3DB only until subtheme switching
       _layer_Building = new BuildingLayer(mMap, _layer_BaseMap, false, true);
       
 		if(_isOfflineMap) {
