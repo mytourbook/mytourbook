@@ -121,10 +121,10 @@ public class Map25ProviderManager {
 
       mapProvider.isEnabled = false;
       mapProvider.name = "0_OpenandromapV4Map_OpenandromapTheme_Switzerland"; //$NON-NLS-1$
-      mapProvider.offline_MapFilepath = "C:\\OfflineMaps\\mapfiles\\www.openandromaps.org\\Switzerland_ML.map"; //$NON-NLS-1$
-      mapProvider.offline_ThemeFilepath = "C:\\OfflineMaps\\mapstyles\\www.openandromaps.org\\Elements.xml"; //$NON-NLS-1$
+      mapProvider.mf_MapFilepath = "C:\\OfflineMaps\\mapfiles\\www.openandromaps.org\\Switzerland_ML.map"; //$NON-NLS-1$
+      mapProvider.mf_ThemeFilepath = "C:\\OfflineMaps\\mapstyles\\www.openandromaps.org\\Elements.xml"; //$NON-NLS-1$
       mapProvider.tileEncoding = TileEncoding.MF;
-      mapProvider.offline_ThemeStyle = "elv-mtb"; //$NON-NLS-1$
+      mapProvider.mf_ThemeStyle = "elv-mtb"; //$NON-NLS-1$
       mapProvider.description = Messages.Map25_Provider_OpenAndoMap_Description;
 
       return mapProvider;
@@ -303,14 +303,14 @@ public class Map25ProviderManager {
                   mapProvider.name           = Util.getXmlString(xml, ATTR_NAME, UI.EMPTY_STRING);
                   mapProvider.description    = Util.getXmlString(xml, ATTR_DESCRIPTION, UI.EMPTY_STRING);
 
-                  mapProvider.isOfflineMap   = Util.getXmlBoolean(xml, ATTR_IS_OFFLINE_MAP, false);
+                  mapProvider.is_mf_Map   = Util.getXmlBoolean(xml, ATTR_IS_OFFLINE_MAP, false);
 
-                  if (mapProvider.isOfflineMap) {
+                  if (mapProvider.is_mf_Map) {
 
-                     mapProvider.offline_IsThemeFromFile    = Util.getXmlBoolean(xml, ATTR_OFFLINE_IS_THEME_FROM_FILE, true);
-                     mapProvider.offline_MapFilepath        = Util.getXmlString(xml, ATTR_OFFLINE_MAP_FILEPATH, UI.EMPTY_STRING);
-                     mapProvider.offline_ThemeFilepath      = Util.getXmlString(xml, ATTR_OFFLINE_THEME_FILEPATH, UI.EMPTY_STRING);
-                     mapProvider.offline_ThemeStyle         = Util.getXmlString(xml, ATTR_OFFLINE_THEME_STYLE, UI.EMPTY_STRING);
+                     mapProvider.mf_IsThemeFromFile    = Util.getXmlBoolean(xml, ATTR_OFFLINE_IS_THEME_FROM_FILE, true);
+                     mapProvider.mf_MapFilepath        = Util.getXmlString(xml, ATTR_OFFLINE_MAP_FILEPATH, UI.EMPTY_STRING);
+                     mapProvider.mf_ThemeFilepath      = Util.getXmlString(xml, ATTR_OFFLINE_THEME_FILEPATH, UI.EMPTY_STRING);
+                     mapProvider.mf_ThemeStyle         = Util.getXmlString(xml, ATTR_OFFLINE_THEME_STYLE, UI.EMPTY_STRING);
 
                   } else {
 
@@ -322,7 +322,7 @@ public class Map25ProviderManager {
                   }
 // SET_FORMATTING_ON
 
-                  final boolean isOfflineThemeFromFile = mapProvider.isOfflineMap && mapProvider.offline_IsThemeFromFile;
+                  final boolean isOfflineThemeFromFile = mapProvider.is_mf_Map && mapProvider.mf_IsThemeFromFile;
                   final TileEncoding tileEncoding = (TileEncoding) Util.getXmlEnum(xml, ATTR_TILE_ENCODING, TileEncoding.VTM);
 
                   mapProvider.tileEncoding = tileEncoding;
@@ -448,7 +448,7 @@ public class Map25ProviderManager {
 
             final IMemento xml = xmlRoot.createChild(TAG_MAP_PROVIDER);
 
-            final boolean isOfflineMap = mapProvider.isOfflineMap;
+            final boolean isOfflineMap = mapProvider.is_mf_Map;
 
             xml.putString(ATTR_UUID, mapProvider.getId().toString());
 
@@ -462,10 +462,10 @@ public class Map25ProviderManager {
 
             if (isOfflineMap) {
 
-               xml.putBoolean(ATTR_OFFLINE_IS_THEME_FROM_FILE, mapProvider.offline_IsThemeFromFile);
-               xml.putString(ATTR_OFFLINE_MAP_FILEPATH, mapProvider.offline_MapFilepath);
-               xml.putString(ATTR_OFFLINE_THEME_FILEPATH, mapProvider.offline_ThemeFilepath);
-               xml.putString(ATTR_OFFLINE_THEME_STYLE, mapProvider.offline_ThemeStyle);
+               xml.putBoolean(ATTR_OFFLINE_IS_THEME_FROM_FILE, mapProvider.mf_IsThemeFromFile);
+               xml.putString(ATTR_OFFLINE_MAP_FILEPATH, mapProvider.mf_MapFilepath);
+               xml.putString(ATTR_OFFLINE_THEME_FILEPATH, mapProvider.mf_ThemeFilepath);
+               xml.putString(ATTR_OFFLINE_THEME_STYLE, mapProvider.mf_ThemeStyle);
 
             } else {
 
