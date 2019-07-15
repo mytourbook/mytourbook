@@ -15,6 +15,11 @@
  *******************************************************************************/
 package net.tourbook.common.tooltip;
 
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.Messages;
+import net.tourbook.common.UI;
+import net.tourbook.common.font.MTFont;
+
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -37,11 +42,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
-
-import net.tourbook.common.CommonActivator;
-import net.tourbook.common.Messages;
-import net.tourbook.common.UI;
-import net.tourbook.common.font.MTFont;
 
 /*
  * Resize control: org.eclipse.jface.text.AbstractInformationControl
@@ -140,12 +140,13 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
     *           <p>
     *
     *           <pre>
-    *           horizContentDefaultWidth = 300;
+    * <code>
+    *           horizContentDefaultWidth  = 300;
     *           horizContentDefaultHeight = 150;
     *
-    *           vertContentDefaultWidth = 400;
-    *           vertContentDefaultHeight = 250;
-    *
+    *           vertContentDefaultWidth   = 400;
+    *           vertContentDefaultHeight  = 250;
+    * </code>
     *           </pre>
     */
    public AdvancedSlideout(final Control ownerControl, //
@@ -314,7 +315,7 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
       _toolbarSlideoutActions = new ToolBar(container, SWT.FLAT);
       GridDataFactory
             .fillDefaults()//
-            .indent(20, 0)
+            .indent(10, 0)
             .applyTo(_toolbarSlideoutActions);
    }
 
@@ -323,14 +324,24 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
       /*
        * fill exit toolbar
        */
-      final ToolBarManager exitToolbarManager = new ToolBarManager(_toolbarSlideoutActions);
+      final ToolBarManager toolbarManager = new ToolBarManager(_toolbarSlideoutActions);
 
-      exitToolbarManager.add(_actionPinSlideout);
-      exitToolbarManager.add(_actionKeepSlideoutOpen);
-      exitToolbarManager.add(_actionCloseSlideout);
+      fillHeaderToolbar(toolbarManager);
 
-      exitToolbarManager.update(true);
+      toolbarManager.add(_actionPinSlideout);
+      toolbarManager.add(_actionKeepSlideoutOpen);
+      toolbarManager.add(_actionCloseSlideout);
+
+      toolbarManager.update(true);
    }
+
+   /**
+    * Actions can be added to the header toolbar.
+    *
+    * @param toolbarManager
+    *           Toolbar manager for the header toolbar.
+    */
+   protected void fillHeaderToolbar(final ToolBarManager toolbarManager) {}
 
    protected abstract Rectangle getParentBounds();
 
@@ -429,7 +440,10 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
       return false;
    }
 
-   private void onDispose() {
+   /**
+    * Dispose UI resources, super.onDispose() must be called.
+    */
+   protected void onDispose() {
 
       _cursorResize.dispose();
       _cursorHand.dispose();
@@ -456,7 +470,12 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
          final int diffX = _devXMousedown - e.x;
          final int diffY = _devYMousedown - e.y;
 
-         setShellLocation(diffX, diffY);
+         // allow the shell to be moved partly outside of the viewport
+         isShellMoved = true;
+         {
+            setShellLocation(diffX, diffY);
+         }
+         isShellMoved = false;
       }
    }
 
@@ -539,6 +558,11 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 
    protected void setTitleText(final String titleText) {
       _titleText = titleText;
+   }
+
+   protected void updateTitleText(final String titleText) {
+
+      _labelDragSlideout.setText(titleText);
    }
 
 }

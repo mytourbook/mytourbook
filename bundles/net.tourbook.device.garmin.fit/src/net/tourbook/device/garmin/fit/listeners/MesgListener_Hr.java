@@ -22,6 +22,7 @@ import com.garmin.fit.HrMesgListener;
 import java.util.List;
 
 import net.tourbook.data.TimeData;
+import net.tourbook.device.garmin.fit.FitData;
 import net.tourbook.tour.TourLogManager;
 
 /**
@@ -30,7 +31,7 @@ import net.tourbook.tour.TourLogManager;
 public class MesgListener_Hr extends AbstractMesgListener implements HrMesgListener {
 
    public MesgListener_Hr(final FitData fitData) {
-      super(fitData);
+      super(fitData); 
    }
 
    @Override

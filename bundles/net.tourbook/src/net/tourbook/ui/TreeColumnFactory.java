@@ -110,16 +110,20 @@ public abstract class TreeColumnFactory {
    public static final TreeColumnFactory TOUR_COUNTER;
    public static final TreeColumnFactory TOUR_NUM_MARKERS;
    public static final TreeColumnFactory TOUR_NUM_PHOTOS;
+   public static final TreeColumnFactory TOUR_TAG_AND_CATEGORY_NOTES;
    public static final TreeColumnFactory TOUR_TAG_AND_TAGS;
    public static final TreeColumnFactory TOUR_TAGS;
    public static final TreeColumnFactory TOUR_TITLE;
    public static final TreeColumnFactory TOUR_TYPE;
    public static final TreeColumnFactory TOUR_TYPE_TEXT;
 
-   public static final TreeColumnFactory TRAINING_INTENSITY_FACTOR;
    public static final TreeColumnFactory TRAINING_FTP;
+   public static final TreeColumnFactory TRAINING_INTENSITY_FACTOR;
    public static final TreeColumnFactory TRAINING_POWER_TO_WEIGHT;
    public static final TreeColumnFactory TRAINING_STRESS_SCORE;
+   public static final TreeColumnFactory TRAINING_TRAINING_EFFECT_AEROB;
+   public static final TreeColumnFactory TRAINING_TRAINING_EFFECT_ANAEROB;
+   public static final TreeColumnFactory TRAINING_TRAINING_PERFORMANCE;
 
    public static final TreeColumnFactory WEATHER_AVG_TEMPERATURE;
    public static final TreeColumnFactory WEATHER_CLOUDS;
@@ -1724,7 +1728,7 @@ public abstract class TreeColumnFactory {
             colDef.setColumnHeaderText(Messages.ColumnFactory_TimeZoneDifference_Header);
 
 // !!! THIS MUST BE SET IN THE VIEW TO SET THE CORRECT DEFAULT TIME ZONE !!!
-//				colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_TimeZone_Tooltip);
+//          colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_TimeZone_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
@@ -1909,14 +1913,30 @@ public abstract class TreeColumnFactory {
          }
       };
 
+      TOUR_TAG_AND_CATEGORY_NOTES = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TOUR_TAG_AND_CATEGORY_NOTES", SWT.LEAD); //$NON-NLS-1$
+
+            colDef.setColumnCategory(Messages.ColumnFactory_Category_Tour);
+            colDef.setColumnLabel(Messages.ColumnFactory_TagNotes_Label);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_TagNotes_Header);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_TagNotes_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
+
+            return colDef;
+         }
+      };
+
       TOUR_TAG_AND_TAGS = new TreeColumnFactory() {
          @Override
          public TreeColumnDefinition createColumn(final ColumnManager columnManager,
                                                   final PixelConverter pixelConverter) {
 
-            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager,
-                  "TOUR_TAG_AND_TAGS", //$NON-NLS-1$
-                  SWT.LEAD);
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TOUR_TAG_AND_TAGS", SWT.LEAD); //$NON-NLS-1$
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Tour);
             colDef.setColumnLabel(Messages.ColumnFactory_tag_label);
@@ -2039,6 +2059,84 @@ public abstract class TreeColumnFactory {
             colDef.setColumnLabel(Messages.ColumnFactory_Power_IntensityFactor_Label);
             colDef.setColumnHeaderText(Messages.ColumnFactory_Power_IntensityFactor_Header);
             colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Power_IntensityFactor_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
+            colDef.setValueFormats(
+                  ValueFormatSet.Number,
+                  ValueFormat.NUMBER_1_2,
+                  ValueFormat.NUMBER_1_2,
+                  columnManager);
+
+            return colDef;
+         }
+      };
+
+      TRAINING_TRAINING_EFFECT_AEROB = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(//
+                  columnManager,
+                  "TRAINING_TRAINING_EFFECT", //$NON-NLS-1$
+                  SWT.TRAIL);
+
+            colDef.setColumnCategory(Messages.ColumnFactory_Category_Training);
+            colDef.setColumnLabel(Messages.ColumnFactory_Training_TrainingEffect_Aerob_Label);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_Training_TrainingEffect_Aerob_Header);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Training_TrainingEffect_Aerob_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
+            colDef.setValueFormats(
+                  ValueFormatSet.Number,
+                  ValueFormat.NUMBER_1_1,
+                  ValueFormat.NUMBER_1_1,
+                  columnManager);
+
+            return colDef;
+         }
+      };
+
+      TRAINING_TRAINING_EFFECT_ANAEROB = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(//
+                  columnManager,
+                  "TRAINING_TRAINING_EFFECT_ANAEROBIC", //$NON-NLS-1$
+                  SWT.TRAIL);
+
+            colDef.setColumnCategory(Messages.ColumnFactory_Category_Training);
+            colDef.setColumnLabel(Messages.ColumnFactory_Training_TrainingEffect_Anaerob_Label);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_Training_TrainingEffect_Anaerob_Header);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Training_TrainingEffect_Anaerob_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
+            colDef.setValueFormats(
+                  ValueFormatSet.Number,
+                  ValueFormat.NUMBER_1_1,
+                  ValueFormat.NUMBER_1_1,
+                  columnManager);
+
+            return colDef;
+         }
+      };
+
+      TRAINING_TRAINING_PERFORMANCE = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(//
+                  columnManager,
+                  "TRAINING_PERFORMANCE_LEVEL", //$NON-NLS-1$
+                  SWT.TRAIL);
+
+            colDef.setColumnCategory(Messages.ColumnFactory_Category_Training);
+            colDef.setColumnLabel(Messages.ColumnFactory_Training_TrainingPerformance_Label);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_Training_TrainingPerformance_Header);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Training_TrainingPerformance_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
             colDef.setValueFormats(

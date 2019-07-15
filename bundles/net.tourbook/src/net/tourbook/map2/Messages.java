@@ -23,6 +23,8 @@ public class Messages extends NLS {
 
    public static String        App_Action_Apply;
 
+   public static String        Default_Label_NewTourMarker;
+
    public static String        graph_label_gradient_unit;
    public static String        graph_label_heartbeat_unit;
 
@@ -33,8 +35,6 @@ public class Messages extends NLS {
    public static String        Image_Action_Map_SyncPhotoWithMap_Disabled;
    public static String        Image_Action_POI;
    public static String        Image_Action_POI_Disabled;
-
-   public static String        Image_Action_CreateTourMarkerFromMap;
    public static String        Image_Action_ShowAllPhotosInMap;
    public static String        Image_Action_ShowAllPhotosInMap_Disabled;
    public static String        Image_Action_ShowPhotosInMap;
@@ -90,7 +90,6 @@ public class Messages extends NLS {
    public static String        legendcolor_dialog_txt_max_value;
    public static String        legendcolor_dialog_txt_min_value;
 
-   public static String        map_action_change_tile_factory_tooltip;
    public static String        map_action_dim_map;
    public static String        map_action_dim_map_disabled;
    public static String        map_action_reload_map;
@@ -105,20 +104,16 @@ public class Messages extends NLS {
    public static String        Map_Action_POI;
    public static String        Map_Action_POI_Tooltip;
    public static String        Map_Action_SearchTourByLocation;
-   public static String        Map_Action_SetDefaultMapProviders;
    public static String        Map_Action_ShowAllFilteredPhotos_Tooltip;
    public static String        Map_Action_ShowPhotos_Tooltip;
    public static String        Map_Action_ShowTourInfoInMap;
    public static String        Map_Action_ShowWayPoints;
    public static String        Map_Action_SynchWithSlider_Centered;
    public static String        Map_Action_SyncPhotoWithMap_Tooltip;
-   public static String        Map_Action_ToggleMarker;
 
    public static String        Map_Properties_ShowGeoGrid;
    public static String        Map_Properties_ShowTileBorder;
    public static String        Map_Properties_ShowTileInfo;
-
-   public static String        Modify_MapProvider_Label_Hints;
 
    public static String        map_action_show_legend_in_map;
    public static String        map_action_show_scale_in_map;
@@ -149,12 +144,6 @@ public class Messages extends NLS {
 
    public static String        map_properties_map_dim_level;
 
-   public static String        modify_mapprovider_btn_down;
-   public static String        modify_mapprovider_btn_up;
-   public static String        modify_mapprovider_dialog_area_message;
-   public static String        modify_mapprovider_dialog_area_title;
-   public static String        modify_mapprovider_dialog_title;
-
    public static String        statusLine_mapInfo_data;
    public static String        statusLine_mapInfo_defaultText;
    public static String        statusLine_mapInfo_pattern;
@@ -163,13 +152,10 @@ public class Messages extends NLS {
    public static String        Tour_Action_RunDyn_StepLength_Tooltip;
    public static String        Tour_Action_ShowHrZones_Tooltip;
 
-   public static String        TourData_Label_new_tour_marker;
-
    static {
       // initialize resource bundle
       NLS.initializeMessages(BUNDLE_NAME, Messages.class);
    }
 
-   private Messages() {
-   }
+   private Messages() {}
 }

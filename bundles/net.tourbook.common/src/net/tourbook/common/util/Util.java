@@ -42,6 +42,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
@@ -393,6 +394,59 @@ public class Util {
    }
 
    /**
+    * Converts a list of strings into a comma-separated string.
+    *
+    * @param allTexts
+    * @return
+    */
+   public static String convertListToString(final ArrayList<String> allTexts) {
+
+      if (allTexts == null) {
+         return UI.EMPTY_STRING;
+      }
+
+      if (allTexts.size() == 0) {
+         return UI.EMPTY_STRING;
+      }
+
+      boolean isFirst = false;
+      final StringBuilder sb = new StringBuilder();
+
+      for (final String text : allTexts) {
+
+         if (isFirst) {
+            isFirst = false;
+            sb.append(text);
+         } else {
+
+            sb.append(',').append(text);
+         }
+      }
+
+      return sb.toString();
+   }
+
+   /**
+    * Converts a comma-seaparated string into a list of strings.
+    *
+    * @param text
+    * @return
+    */
+   public static ArrayList<String> convertStringToList(final String text) {
+
+      final ArrayList<String> allTexts = new ArrayList<>();
+
+      final StringTokenizer tok = new StringTokenizer(text, UI.COMMA_SPACE);
+      final int nTokens = tok.countTokens();
+
+      for (int i = 0; i < nTokens; i++) {
+         allTexts.add(tok.nextToken());
+      }
+
+      return allTexts;
+   }
+
+   /**
     * @param sourceString
     * @param lookFor
     * @return Returns the number of characters which are found in the string or -1 when the string
@@ -414,24 +468,6 @@ public class Util {
       }
 
       return count;
-   }
-
-   /**
-    * Creates a {@link ZonedDateTime} from the number: YYYYMMDDhhmmss
-    *
-    * @param yyyymmddhhmmss
-    * @return
-    */
-   public static ZonedDateTime createDateTimeFromYMDhms(final long yyyymmddhhmmss) {
-
-      final int year = (int) (yyyymmddhhmmss / 10000000000L) % 10000;
-      final int month = (int) (yyyymmddhhmmss / 100000000) % 100;
-      final int day = (int) (yyyymmddhhmmss / 1000000) % 100;
-      final int hour = (int) (yyyymmddhhmmss / 10000) % 100;
-      final int minute = (int) (yyyymmddhhmmss / 100 % 100);
-      final int second = (int) (yyyymmddhhmmss % 100);
-
-      return ZonedDateTime.of(year, month, day, hour, minute, second, 0, TimeTools.getDefaultTimeZone());
    }
 
    /**
@@ -1738,6 +1774,26 @@ public class Util {
     *
     * @param attributes
     * @param attributeName
+    * @return Returns a float value or 0 when attribute is not available or cannot be parsed.
+    */
+   public static float parseFloat0(final Attributes attributes, final String attributeName) {
+
+      try {
+         final String valueString = attributes.getValue(attributeName);
+         if (valueString != null) {
+            return Float.parseFloat(valueString);
+         }
+      } catch (final NumberFormatException e) {
+         // do nothing
+      }
+      return 0;
+   }
+
+   /**
+    * Parses SAX attribute
+    *
+    * @param attributes
+    * @param attributeName
     * @return Returns integer value or {@link Integer#MIN_VALUE} when attribute is not available or
     *         cannot be parsed.
     */
@@ -1769,27 +1825,10 @@ public class Util {
             return Integer.parseInt(valueString);
          }
       } catch (final NumberFormatException e) {
-         // do nothing
-      }
-      return 0;
-   }
 
-   /**
-    * Parses SAX attribute
-    *
-    * @param attributes
-    * @param attributeName
-    * @return Returns a float value or 0 when attribute is not available or cannot be parsed.
-    */
-   public static float parseFloat0(final Attributes attributes, final String attributeName) {
+         // try to parse as float value
 
-      try {
-         final String valueString = attributes.getValue(attributeName);
-         if (valueString != null) {
-            return Float.parseFloat(valueString);
-         }
-      } catch (final NumberFormatException e) {
-         // do nothing
+         return (int) parseFloat0(attributes, attributeName);
       }
       return 0;
    }

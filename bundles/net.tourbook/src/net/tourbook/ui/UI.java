@@ -38,6 +38,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
@@ -70,8 +71,10 @@ import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.layout.GridData;
@@ -79,8 +82,11 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
@@ -1017,6 +1023,51 @@ public class UI {
       label.setLayoutData(gd);
    }
 
+   /**
+    * Set selection color which is displayed when table item is selected.
+    * <p>
+    * The code is from here
+    * https://www.eclipse.org/articles/article.php?file=Article-CustomDrawingTableAndTreeItems/index.html
+    * <p>
+    */
+   public static void setTableSelectionColor(final Table table) {
+
+      final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
+
+      final Color bgSelectedColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_SELECTION_BACKGROUND);
+
+      /*
+       * NOTE: EraseItem is called repeatedly. Therefore it is critical
+       * for performance that this method be as efficient as possible.
+       */
+      table.addListener(SWT.EraseItem, new Listener() {
+         @Override
+         public void handleEvent(final Event event) {
+
+            event.detail &= ~SWT.HOT;
+
+            if ((event.detail & SWT.SELECTED) == 0) {
+               // item is not selected
+               return;
+            }
+
+            final int clientWidth = table.getClientArea().width;
+            final GC gc = event.gc;
+
+            final Color oldForeground = gc.getForeground();
+            final Color oldBackground = gc.getBackground();
+            {
+               gc.setBackground(bgSelectedColor);
+               gc.fillRectangle(0, event.y, clientWidth, event.height);
+            }
+            gc.setForeground(oldForeground);
+            gc.setBackground(oldBackground);
+
+            event.detail &= ~SWT.SELECTED;
+         }
+      });
+   }
+
    private static void setupFonts() {
 
       final Display display = Display.getCurrent();
@@ -1277,6 +1328,8 @@ public class UI {
          net.tourbook.common.UI.UNIT_LABEL_DISTANCE_M_OR_YD = net.tourbook.common.UI.UNIT_DISTANCE_YARD;
          net.tourbook.common.UI.UNIT_LABEL_DISTANCE_MM_OR_INCH = net.tourbook.common.UI.UNIT_DISTANCE_INCH;
 
+         net.tourbook.common.UI.UNIT_LABEL_PRESSURE_MB_OR_INHG = net.tourbook.common.UI.UNIT_PRESSURE_INHG;
+
          net.tourbook.common.UI.UNIT_LABEL_SPEED = net.tourbook.common.UI.UNIT_SPEED_MPH;
          net.tourbook.common.UI.UNIT_LABEL_PACE = net.tourbook.common.UI.UNIT_PACE_MIN_P_MILE;
 
@@ -1293,6 +1346,8 @@ public class UI {
          net.tourbook.common.UI.UNIT_LABEL_DISTANCE = net.tourbook.common.UI.UNIT_DISTANCE_KM;
          net.tourbook.common.UI.UNIT_LABEL_DISTANCE_M_OR_YD = net.tourbook.common.UI.UNIT_METER;
          net.tourbook.common.UI.UNIT_LABEL_DISTANCE_MM_OR_INCH = net.tourbook.common.UI.UNIT_MM;
+
+         net.tourbook.common.UI.UNIT_LABEL_PRESSURE_MB_OR_INHG = net.tourbook.common.UI.UNIT_PRESSURE_MB;
 
          net.tourbook.common.UI.UNIT_LABEL_SPEED = net.tourbook.common.UI.UNIT_SPEED_KM_H;
          net.tourbook.common.UI.UNIT_LABEL_PACE = net.tourbook.common.UI.UNIT_PACE_MIN_P_KM;

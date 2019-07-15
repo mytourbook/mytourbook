@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -23,7 +23,9 @@ import net.tourbook.data.TourType;
 
 public class ImportLauncher implements Cloneable {
 
+	private static long				_idCreator;
 	public String					description						= UI.EMPTY_STRING;
+
 	public String					name							= UI.EMPTY_STRING;
 
 	/**
@@ -45,6 +47,11 @@ public class ImportLauncher implements Cloneable {
 	 */
 	public boolean					isShowInDashboard				= true;
 
+   /**
+    * When <code>true</code>, assigns a type to the tour.
+    */
+   public boolean             isSetTourType                 = false;
+
 	/**
 	 * When <code>true</code> save the tour for the active person.
 	 */
@@ -54,17 +61,22 @@ public class ImportLauncher implements Cloneable {
 	 * When <code>true</code> then the text of the last marker is set.
 	 */
 	public boolean					isSetLastMarker					= false;
-
 	/**
 	 * Last marker distance in meters.
 	 */
 	public int						lastMarkerDistance				= 0;
+
 	public String					lastMarkerText					= UI.EMPTY_STRING;
 
 	/**
 	 * When <code>true</code> then the tour start temperature is adjusted.
 	 */
 	public boolean					isAdjustTemperature				= false;
+
+   /**
+    * When <code>true</code>, the weather data is saved in the tour.
+    */
+   public boolean                  isRetrieveWeatherData         = false;
 
 	/**
 	 * Duration in seconds during which the temperature is adjusted.
@@ -78,8 +90,6 @@ public class ImportLauncher implements Cloneable {
 	public float					tourAvgTemperature				= EasyConfig.TEMPERATURE_AVG_TEMPERATURE_DEFAULT;
 
 	private long					_id;
-
-	private static long				_idCreator;
 
 	public ImportLauncher() {
 

@@ -77,7 +77,6 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.StatusUtil;
-import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.database.FIELD_VALIDATION;
 import net.tourbook.database.TourDatabase;
@@ -376,6 +375,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * <br>
     * 0 == false, 1 == true
     */
+   @XmlElement
    private int                   isPowerSensorPresent            = 0;                     // db-version 12
 
    // ############################################# PULSE #############################################
@@ -424,6 +424,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * <br>
     * 0 == false, 1 == true
     */
+   @XmlElement
    private int                   isPulseSensorPresent            = 0;                     // db-version 12
 
    // ############################################# DEVICE TOUR TYPE #############################################
@@ -480,10 +481,31 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    // ############################################# WEATHER #############################################
 
+   /**
+    * Is <code>true</code> when the weather data below is from the weather API and not
+    * manually entered or from the device.
+    */
+   private boolean isWeatherDataFromApi = false;
+
    private int                   weatherWindDir;                                       // db-version 8
+
    private int                   weatherWindSpd;                                       // db-version 8
-   private String                weatherClouds;                                          // db-version 8
-   private String                weather;                                                // db-version 13
+
+   private String                weatherClouds;                                        // db-version 8
+
+   private String                weather;                                              // db-version 13
+
+   private int                   weatherHumidity;                                      // db-version 39
+
+   private float                 weatherPrecipitation;                                 // db-version 39
+
+   private int                   weatherPressure;                                      // db-version 39
+
+   private int                   weatherWindChill;                                     // db-version 39
+
+   private int                   weatherMaxTemperature;                                // db-version 39
+
+   private int                   weatherMinTemperature;                                // db-version 39
 
    // ############################################# POWER #############################################
 
@@ -510,19 +532,42 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private float                 power_AvgLeftPedalSmoothness;
    private float                 power_AvgRightPedalSmoothness;
 
+   // ############################################# TRAINING #############################################
+
+   /**
+    * Naming variants from Jesús Pérez
+    * <ul>
+    * <li>Impact of training</li>
+    * <li>Impact of effort</li>
+    * <li>Hardness of effort</li>
+    * <li>Training requirement</li>
+    * </ul>
+    * <p>
+    * Manufacturer names
+    * <ul>
+    * <li>Garmin: TotalTrainingEffect</li>
+    * <li>Suunto: PeakTrainingEffect</li>
+    * </ul>
+    *
+    * @param trainingEffect
+    */
+   private float                 training_TrainingEffect_Aerob;                        // db-version 38
+   private float                 training_TrainingEffect_Anaerob;                      // db-version 38
+   private float                 training_TrainingPerformance;                         // db-version 38
+
    // ############################################# OTHER TOUR/DEVICE DATA #############################################
 
    @XmlElement
-   private String                tourTitle;                                             // db-version 4
+   private String                tourTitle;                                            // db-version 4
 
    @XmlElement
-   private String                tourDescription;                                       // db-version 4
+   private String                tourDescription;                                      // db-version 4
 
    @XmlElement
    private String                tourStartPlace;                                       // db-version 4
 
    @XmlElement
-   private String                tourEndPlace;                                          // db-version 4
+   private String                tourEndPlace;                                         // db-version 4
 
    /**
     * Date/Time when tour data was created. This value is set to the tour start date before db
@@ -530,31 +575,33 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * <p>
     * Data format: YYYYMMDDhhmmss
     */
-   private long                  dateTimeCreated;                                       // db-version 11
+   private long                  dateTimeCreated;                                      // db-version 11
 
    /**
     * Date/Time when tour data was modified, default value is 0
     * <p>
     * Data format: YYYYMMDDhhmmss
     */
-   private long                  dateTimeModified;                                       // db-version 11
+   private long                  dateTimeModified;                                     // db-version 11
 
    /** Folder path from the import file. */
-   private String                tourImportFilePath;                                    // db-version 6
+   @XmlElement
+   private String                tourImportFilePath;                                   // db-version 6
 
    /** File name from the import file. */
-   private String                tourImportFileName;                                    // db-version 29
+   @XmlElement
+   private String                tourImportFileName;                                   // db-version 29
 
    /**
     * Tolerance for the Douglas Peucker algorithm.
     */
-   private short                 dpTolerance                     = 50;                     // 5.0 since version 14.7
+   private short                 dpTolerance                     = 50;                 // 5.0 since version 14.7
 
    /**
     * Time difference in seconds between 2 time slices or <code>-1</code> for GPS devices when the
     * time slices has variable time duration
     */
-   private short                 deviceTimeInterval               = -1;                  // db-version 3
+   private short                 deviceTimeInterval               = -1;                // db-version 3
 
    /**
     * Scaling factor for the temperature data serie, e.g. when set to 10 the temperature data serie
@@ -564,12 +611,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * disabled when float was introduces in 11.after8, preserved in database that older ejb objects
     * can be loaded
     */
-   private int                   temperatureScale               = 1;                     // db-version 13
+   private int                   temperatureScale               = 1;                   // db-version 13
 
    /**
     * Firmware version of the device
     */
-   private String                deviceFirmwareVersion;                                 // db-version 12
+   private String                deviceFirmwareVersion;                                // db-version 12
 
    /**
     * This value is multiplied with the cadence data serie when displayed, cadence data serie is
@@ -626,7 +673,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * <p>
     * a better name would be <i>pluginName</i>
     */
-   private String                devicePluginName;                                       // db-version 4
+   private String                devicePluginName;                                     // db-version 4
 
    /**
     * Deflection point in the conconi test, this value is the index for the data serie on the
@@ -1563,10 +1610,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    @Transient
    public boolean[]     visiblePoints_ForSurfing;
 
+
 // SET_FORMATTING_ON
 
-   public TourData() {
-   }
+   public TourData() {}
 
    /**
     * Removed data series when the sum of all values is 0.
@@ -3012,23 +3059,52 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    public void computeAvg_Temperature() {
 
-      if (temperatureSerie == null) {
+      if (temperatureSerie == null || temperatureSerie.length == 0) {
          return;
       }
 
+      float temperatureMin = Float.MIN_VALUE;
+      float temperatureMax = Float.MIN_VALUE;
       float temperatureSum = 0;
+
       int tempLength = temperatureSerie.length;
 
       for (final float temperature : temperatureSerie) {
+
          if (temperature == Float.MIN_VALUE) {
+
             // ignore invalid values
             tempLength--;
+
          } else {
+
+            if (temperatureMin == Float.MIN_VALUE) {
+
+               // set initial value
+               temperatureMin = temperature;
+               temperatureMax = temperature;
+
+            } else {
+
+               if (temperature < temperatureMin) {
+
+                  temperatureMin = temperature;
+
+               } else if (temperature > temperatureMax) {
+
+                  temperatureMax = temperature;
+               }
+            }
+
             temperatureSum += temperature;
          }
       }
 
       if (tempLength > 0) {
+
+//         weatherMinTemperature=temperatureMin;
+//         weatherMaxTemperature=temperatureMax;
+
          avgTemperature = temperatureSum / tempLength;
       }
    }
@@ -5277,7 +5353,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       final boolean isGPS                          = setupStartingValues_LatLon(timeDataSerie);
       final boolean isPower                        = setupStartingValues_Power(timeDataSerie);
       final boolean isPulse                        = setupStartingValues_Pulse(timeDataSerie);
-      final boolean isSpeed 					   = setupStartingValues_Speed(timeDataSerie);
+      final boolean isSpeed                  = setupStartingValues_Speed(timeDataSerie);
       final boolean isTemperature                  = setupStartingValues_Temperature(timeDataSerie);
 
       final boolean isRunDyn_StanceTime            = setupStartingValues_RunDyn_StanceTime(timeDataSerie);
@@ -6539,7 +6615,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          return _dateTimeCreated;
       }
 
-      _dateTimeCreated = Util.createDateTimeFromYMDhms(dateTimeCreated);
+      _dateTimeCreated = TimeTools.createDateTimeFromYMDhms(dateTimeCreated);
 
       return _dateTimeCreated;
    }
@@ -6554,7 +6630,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          return _dateTimeModified;
       }
 
-      _dateTimeModified = Util.createDateTimeFromYMDhms(dateTimeModified);
+      _dateTimeModified = TimeTools.createDateTimeFromYMDhms(dateTimeModified);
 
       return _dateTimeModified;
    }
@@ -7673,11 +7749,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return serie;
    }
 
-   @XmlElement
-   public String getTest() {
-      return "jokl"; //$NON-NLS-1$
-   }
-
    /**
     * @return Returns time data serie in floating points which is used for drawing charts.
     */
@@ -7996,6 +8067,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return tourWayPoints;
    }
 
+   public float getTraining_TrainingEffect_Aerob() {
+      return training_TrainingEffect_Aerob;
+   }
+
+   public float getTraining_TrainingEffect_Anaerob() {
+      return training_TrainingEffect_Anaerob;
+   }
+
+   public float getTraining_TrainingPerformance() {
+      return training_TrainingPerformance;
+   }
+
    /**
     * @return Returns weather text or an empty string when weather text is not set.
     */
@@ -8009,6 +8092,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    public String getWeatherClouds() {
       return weatherClouds;
+   }
+
+   public int getWeatherHumidity() {
+      return weatherHumidity;
    }
 
    /**
@@ -8032,6 +8119,26 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return weatherCloudsIndex < 0 ? 0 : weatherCloudsIndex;
    }
 
+   public float getWeatherMaxTemperature() {
+      return weatherMaxTemperature;
+   }
+
+   public float getWeatherMinTemperature() {
+      return weatherMinTemperature;
+   }
+
+   public float getWeatherPrecipitation() {
+      return weatherPrecipitation;
+   }
+
+   public int getWeatherPressure() {
+      return weatherPressure;
+   }
+
+   public int getWeatherWindChill() {
+      return weatherWindChill;
+   }
+
    public int getWeatherWindDir() {
       return weatherWindDir;
    }
@@ -8043,7 +8150,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * @param zoomLevel
     * @param projectionId
-    * @return Returns the world position for the suplied zoom level and projection id
+    * @return Returns the world position for the supplied zoom level and projection id
     */
    public Point[] getWorldPositionForTour(final String projectionId, final int zoomLevel) {
       return _tourWorldPosition.get(projectionId.hashCode() + zoomLevel);
@@ -8100,7 +8207,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
-    * @return Returns <code>true</code> when {@link TourData} contains refreence tours, otherwise
+    * @return Returns <code>true</code> when {@link TourData} contains reference tours, otherwise
     *         <code>false</code>
     */
    public boolean isContainReferenceTour() {
@@ -8372,6 +8479,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       // serieData can be null for multiple tours
 
       return serieData != null && serieData.visiblePoints_Surfing != null;
+   }
+
+   public boolean isWeatherDataFromApi() {
+      return isWeatherDataFromApi;
    }
 
    /**
@@ -8862,6 +8973,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
    }
 
+   public void setIsWeatherDataFromApi(final boolean isWeatherDataFromApi) {
+      this.isWeatherDataFromApi = isWeatherDataFromApi;
+   }
+
    public void setMaxPulse(final float maxPulse) {
       this.maxPulse = maxPulse;
    }
@@ -9276,6 +9391,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    public void setTourType(final TourType tourType) {
       this.tourType = tourType;
+   }
+
+   public void setTraining_TrainingEffect_Aerob(final float trainingEffect) {
+      this.training_TrainingEffect_Aerob = trainingEffect;
+   }
+
+   public void setTraining_TrainingEffect_Anaerob(final float trainingEffect_Anaerobic) {
+      this.training_TrainingEffect_Anaerob = trainingEffect_Anaerobic;
+   }
+
+   public void setTraining_TrainingPerformance(final float trainingPerformance) {
+      this.training_TrainingPerformance = trainingPerformance;
    }
 
    public void setupHistoryTour() {
@@ -9885,6 +10012,30 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    public void setWeatherClouds(final String weatherClouds) {
       this.weatherClouds = weatherClouds;
+   }
+
+   public void setWeatherHumidity(final int weatherHumidity) {
+      this.weatherHumidity = weatherHumidity;
+   }
+
+   public void setWeatherMaxTemperature(final int weatherMaxTemperature) {
+      this.weatherMaxTemperature = weatherMaxTemperature;
+   }
+
+   public void setWeatherMinTemperature(final int weatherMinTemperature) {
+      this.weatherMinTemperature = weatherMinTemperature;
+   }
+
+   public void setWeatherPrecipitation(final float weatherPrecipitation) {
+      this.weatherPrecipitation = weatherPrecipitation;
+   }
+
+   public void setWeatherPressure(final int weatherPressure) {
+      this.weatherPressure = weatherPressure;
+   }
+
+   public void setWeatherWindChill(final int weatherWindChill) {
+      this.weatherWindChill = weatherWindChill;
    }
 
    public void setWeatherWindDir(final int weatherWindDir) {

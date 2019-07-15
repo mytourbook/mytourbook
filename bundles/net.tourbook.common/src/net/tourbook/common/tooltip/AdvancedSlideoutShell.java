@@ -158,6 +158,14 @@ public abstract class AdvancedSlideoutShell {
    private boolean                    _isInShellResize;
    private boolean                    _isDoNotStopAnimation;
 
+   /**
+    * When <code>true</code>, then the tooltip is ALWAYS displayed within the viewport, otherwise
+    * (default) the tooltip bounds can be partly outside of the viewport.
+    */
+   private boolean                    _isForceBoundsToBeInsideOfViewport;
+
+   protected boolean                  isShellMoved;
+
    private AbstractRRShell            _visibleRRShell;
    private AbstractRRShell            _rrShellWithResize;
    private AbstractRRShell            _rrShellNoResize;
@@ -734,33 +742,62 @@ public abstract class AdvancedSlideoutShell {
       final Rectangle displayBounds = getDisplayBounds(location);
       final Point tipRightBottom = new Point(location.x + tipSize.x, location.y + tipSize.y);
 
-      if (!(displayBounds.contains(location) && displayBounds.contains(tipRightBottom))) {
+      if (_isForceBoundsToBeInsideOfViewport && isShellMoved == false) {
 
-         final int minVisibleSize = 50;
+         // do not allow that the tooltip is outside of the viewport
 
-         final int displayX = displayBounds.x;
-         final int displayY = displayBounds.y;
+         if (!(displayBounds.contains(location) && displayBounds.contains(tipRightBottom))) {
 
-         final int displayWidth = displayBounds.width;
-         final int displayHeight = displayBounds.height;
+            if (tipRightBottom.x > displayBounds.x + displayBounds.width) {
+               location.x -= tipRightBottom.x - (displayBounds.x + displayBounds.width);
+            }
 
-         final int displayRight = displayX + displayWidth;
-         final int displayBottom = displayY + displayHeight;
+            if (tipRightBottom.y > displayBounds.y + displayBounds.height) {
+               location.y -= tipRightBottom.y - (displayBounds.y + displayBounds.height);
+            }
 
-         if (location.x > displayRight - minVisibleSize) {
-            location.x = displayRight - minVisibleSize;
+            if (location.x < displayBounds.x) {
+               location.x = displayBounds.x;
+            }
+
+            if (location.y < displayBounds.y) {
+               location.y = displayBounds.y;
+            }
          }
 
-         if (location.y > displayBottom - minVisibleSize) {
-            location.y = displayBottom - minVisibleSize;
-         }
+      } else {
 
-         if (location.x < displayX) {
-            location.x = displayX;
-         }
+         // this is the (historically) default
 
-         if (location.y < displayY) {
-            location.y = displayY;
+         if (!(displayBounds.contains(location) && displayBounds.contains(tipRightBottom))) {
+
+            // this is the size how much of the tooltip cannot be hidden
+            final int minVisibleSize = 50;
+
+            final int displayX = displayBounds.x;
+            final int displayY = displayBounds.y;
+
+            final int displayWidth = displayBounds.width;
+            final int displayHeight = displayBounds.height;
+
+            final int displayRight = displayX + displayWidth;
+            final int displayBottom = displayY + displayHeight;
+
+            if (location.x > displayRight - minVisibleSize) {
+               location.x = displayRight - minVisibleSize;
+            }
+
+            if (location.y > displayBottom - minVisibleSize) {
+               location.y = displayBottom - minVisibleSize;
+            }
+
+            if (location.x < displayX) {
+               location.x = displayX;
+            }
+
+            if (location.y < displayY) {
+               location.y = displayY;
+            }
          }
       }
 
@@ -875,6 +912,14 @@ public abstract class AdvancedSlideoutShell {
     */
    public void hideNow() {
       ttHide_WithoutAnimation();
+   }
+
+   /**
+    * @see #_isForceBoundsToBeInsideOfViewport
+    * @return
+    */
+   public boolean isForceBoundsToBeInsideOfViewport() {
+      return _isForceBoundsToBeInsideOfViewport;
    }
 
    private boolean isHidden() {
@@ -1504,7 +1549,7 @@ public abstract class AdvancedSlideoutShell {
    protected void restoreState_SlideoutIsPinned(final boolean isSlideoutPinned) {}
 
    /**
-    *
+    * State is saved AFTER the slideout is disposed.
     */
    protected void saveState() {
 
@@ -1520,6 +1565,13 @@ public abstract class AdvancedSlideoutShell {
       _state.put(STATE_VERT_SLIDEOUT_PIN_LOCATION_Y, _vertPinLocationY);
 
       _state.put(STATE_IS_KEEP_SLIDEOUT_OPEN, _isKeepSlideoutOpen);
+   }
+
+   /**
+    * This is called before the tooltip will be disposed.
+    */
+   protected void saveState_BeforeDisposed() {
+
    }
 
    /**
@@ -1540,6 +1592,14 @@ public abstract class AdvancedSlideoutShell {
     */
    public void setIsAnotherDialogOpened(final boolean isDialogOpened) {
       _isAnotherDialogOpened = isDialogOpened;
+   }
+
+   /**
+    * @param isForceBoundsToBeInsideOfViewport
+    * @see #_isForceBoundsToBeInsideOfViewport
+    */
+   public void setIsForceBoundsToBeInsideOfViewport(final boolean isForceBoundsToBeInsideOfViewport) {
+      _isForceBoundsToBeInsideOfViewport = isForceBoundsToBeInsideOfViewport;
    }
 
    /**
@@ -1759,6 +1819,8 @@ public abstract class AdvancedSlideoutShell {
          return;
       }
 
+      saveState_BeforeDisposed();
+
       // hide tooltip definitively
 
       ownerShellRemoveListener();
@@ -1779,6 +1841,8 @@ public abstract class AdvancedSlideoutShell {
       if (_visibleShell == null || _visibleShell.isDisposed()) {
          return;
       }
+
+      saveState_BeforeDisposed();
 
       closeInternalShells();
 

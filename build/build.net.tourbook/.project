@@ -11,6 +11,11 @@
 	</natures>
 	<linkedResources>
 		<link>
+			<name>gradle.properties</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PARENT_LOC/gradle.properties</locationURI>
+		</link>
+		<link>
 			<name>pom-LANGUAGE-FRAGMENTS.xml</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/LANGUAGE-FRAGMENTS/pom.xml</locationURI>

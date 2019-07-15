@@ -698,8 +698,8 @@ public class DialogQuickEdit extends TitleAreaDialog {
           */
 
          // label
-         Label label = _tk.createLabel(container, Messages.tour_editor_label_temperature);
-         label.setToolTipText(Messages.tour_editor_label_temperature_Tooltip);
+         Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_Temperature);
+         label.setToolTipText(Messages.Tour_Editor_Label_Temperature_Tooltip);
          _firstColumnControls.add(label);
 
          // spinner
@@ -709,7 +709,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
                .align(SWT.BEGINNING, SWT.CENTER)
                .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
                .applyTo(_spinTemperature);
-         _spinTemperature.setToolTipText(Messages.tour_editor_label_temperature_Tooltip);
+         _spinTemperature.setToolTipText(Messages.Tour_Editor_Label_Temperature_Tooltip);
 
          // the min/max temperature has a large range because fahrenheit has bigger values than celcius
          _spinTemperature.setMinimum(-600);
