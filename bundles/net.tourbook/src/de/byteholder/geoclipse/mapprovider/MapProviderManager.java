@@ -262,11 +262,10 @@ public class MapProviderManager {
    private static IPreferenceStore    _prefStore                   = TourbookPlugin.getPrefStore();
 
    private static boolean             _isDeleteError;
-
    private static long                _deleteUIUpdateTime;
+
    private static int                 _deleteUIDeletedFiles;
    private static int                 _deleteUICheckedFiles;
-
    /**
     * Default map provider
     */
@@ -278,6 +277,8 @@ public class MapProviderManager {
    private static final ListenerList<IMapProviderListener> _mapProviderListeners = new ListenerList<>(ListenerList.IDENTITY);
 
    private static Map2View                                 _map2View;
+
+   private boolean                    _isLogImportInfo             = false;
 
    private MapProviderManager() {}
 
@@ -1168,6 +1169,22 @@ public class MapProviderManager {
       }
    }
 
+   /**
+    * Save the visible state of the map providers
+    */
+   public static void saveState_MapProviders_VisibleInUI() {
+
+      final ArrayList<String> allVisibleMP = new ArrayList<>();
+
+      for (final MP mp : _allMapProviders) {
+         if (mp.isVisibleInUI()) {
+            allVisibleMP.add(mp.getId());
+         }
+      }
+
+      _prefStore.setValue(IMappingPreferences.MAP_PROVIDER_VISIBLE_IN_UI, Util.convertListToString(allVisibleMP));
+   }
+
    public static void setMap2View(final Map2View map2View) {
       _map2View = map2View;
    }
@@ -1544,7 +1561,13 @@ public class MapProviderManager {
       if (importedMPList.size() > 0) {
 
          // validate map provider
-         return validateImportedMP(importedMPList);
+         final ArrayList<MP> isMPValid = validateImportedMP(importedMPList);
+
+         if (isMPValid != null) {
+            saveState_MapProviders_VisibleInUI();
+         }
+
+         return isMPValid;
       }
 
       return null;
@@ -1666,23 +1689,31 @@ public class MapProviderManager {
          final Boolean xmlHasTopo = tagMapProvider.getBoolean(ATTR_MP_IS_INCLUDES_HILLSHADING);
          final Boolean xmlIsLayer = tagMapProvider.getBoolean(ATTR_MP_IS_TRANSPARENT_LAYER);
 
+         Boolean xmlIsVisible = null;
          ZonedDateTime xmlModified;
+
          if (isMpImport) {
+
+            // imported mp's should be visible
+            xmlIsVisible = true;
 
             // set import date/time
             xmlModified = TimeTools.now();
 
             // add import info
-            final String importInfo = NLS.bind(Messages.MP_Manager_Label_ImportFrom, filename);
+            if (_isLogImportInfo) {
 
-            if (xmlDescription != null && xmlDescription.trim().length() > 0) {
+               final String importInfo = NLS.bind(Messages.MP_Manager_Label_ImportFrom, filename);
 
-               // without \r the text is not on a new line
-               xmlDescription += net.tourbook.common.UI.NEW_LINE_TEXT_WIDGET;
-               xmlDescription += net.tourbook.common.UI.NEW_LINE_TEXT_WIDGET;
+               if (xmlDescription != null && xmlDescription.trim().length() > 0) {
+
+                  // without \r the text is not on a new line
+                  xmlDescription += net.tourbook.common.UI.NEW_LINE_TEXT_WIDGET;
+                  xmlDescription += net.tourbook.common.UI.NEW_LINE_TEXT_WIDGET;
+               }
+
+               xmlDescription += importInfo;
             }
-
-            xmlDescription += importInfo;
 
          } else {
 
@@ -1798,6 +1829,10 @@ public class MapProviderManager {
             mapProvider.setName(xmlMapProviderName);
             mapProvider.setOfflineFolder(xmlOfflineFolder);
             mapProvider.setOnlineMapUrl(xmlOnlineMapUrl);
+
+            if (xmlIsVisible != null) {
+               mapProvider.setIsVisibleInUI(xmlIsVisible);
+            }
 
             // image
             mapProvider.setTileSize(xmlImageSize == null ? Integer.parseInt(DEFAULT_IMAGE_SIZE) : xmlImageSize);
@@ -2539,6 +2574,7 @@ public class MapProviderManager {
        * set common fields
        */
       tagMapProvider.putString(ATTR_MP_CATEGORY, mp.getCategory());
+      tagMapProvider.putString(ATTR_MP_DATE_TIME_MODIFIED, dateTimeModified == null ? null : dateTimeModified.toString());
       tagMapProvider.putString(ATTR_MP_DESCRIPTION, mp.getDescription());
       tagMapProvider.putString(ATTR_MP_ID, mp.getId());
       tagMapProvider.putString(ATTR_MP_NAME, mp.getName());
@@ -2546,7 +2582,6 @@ public class MapProviderManager {
       tagMapProvider.putString(ATTR_MP_ONLINE_MAP_URL, mp.getOnlineMapUrl());
       tagMapProvider.putBoolean(ATTR_MP_IS_INCLUDES_HILLSHADING, mp.isIncludesHillshading());
       tagMapProvider.putBoolean(ATTR_MP_IS_TRANSPARENT_LAYER, mp.isTransparentLayer());
-      tagMapProvider.putString(ATTR_MP_DATE_TIME_MODIFIED, dateTimeModified == null ? null : dateTimeModified.toString());
 
       // image
       tagMapProvider.putInteger(ATTR_MP_IMAGE_SIZE, mp.getTileSize());
