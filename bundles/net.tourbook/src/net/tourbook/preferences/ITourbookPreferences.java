@@ -584,4 +584,10 @@ public interface ITourbookPreferences {
     */
    public static final String FONT_LOGGING_IS_MODIFIED = "FONT_LOGGING_IS_MODIFIED"; //$NON-NLS-1$
 
+   /*
+    * Weather
+    */
+   public static final String WEATHER_USE_WEATHER_RETRIEVAL = "WEATHER_STATE_USE_WEATHER_RETRIEVAL"; //$NON-NLS-1$
+   public static final String WEATHER_API_KEY               = "WEATHER_API_KEY";                     //$NON-NLS-1$
+
 }

@@ -73,6 +73,11 @@ public class ImportLauncher implements Cloneable {
 	 */
 	public boolean					isAdjustTemperature				= false;
 
+   /**
+    * When <code>true</code>, the weather data is saved in the tour.
+    */
+   public boolean                  isRetrieveWeatherData         = false;
+
 	/**
 	 * Duration in seconds during which the temperature is adjusted.
 	 */

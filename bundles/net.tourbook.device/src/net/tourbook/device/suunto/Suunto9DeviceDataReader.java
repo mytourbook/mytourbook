@@ -48,6 +48,7 @@ import org.xmlunit.diff.Diff;
 public class Suunto9DeviceDataReader extends TourbookDevice {
 
    // For Unit testing
+   // NOTE: Don't forget to set the smoothing parameters to default.
    private static final boolean                   UNITTESTS             = false;
    // Make sure that the smoothing value is 10 (speed and gradient)
    public static final String                     IMPORT_FILE_PATH      = "/net/tourbook/device/suunto/testFiles/"; //$NON-NLS-1$
@@ -128,7 +129,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
          try {
             // close resources
             if (br != null) {
-               gzip.close();
+               br.close();
             }
             if (gzip != null) {
                gzip.close();
@@ -484,7 +485,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 
    @Override
    public boolean validateRawData(final String fileName) {
-      if (!fileName.endsWith(".json.gz")) { //$NON-NLS-1$
+      if (!fileName.toLowerCase().endsWith(".json.gz")) { //$NON-NLS-1$
          return false;
       }
 

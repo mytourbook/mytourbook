@@ -162,9 +162,18 @@ public class Messages extends NLS {
 
    public static String        Image__App_Close;
    public static String        Image__App_Close_Themed;
+   public static String        Image__App_No;
+   public static String        Image__App_Yes;
    public static String        Image__BookOpen_Themed;
    public static String        Image__ColumnCategory;
    public static String        Image__CustomizeProfilesColumns;
+   public static String        Image__MapProvider_Custom;
+   public static String        Image__MapProvider_Custom_Hill;
+   public static String        Image__MapProvider_Internal;
+   public static String        Image__MapProvider_Profile;
+   public static String        Image__MapProvider_Profile_Hill;
+   public static String        Image__MapProvider_Transparent;
+   public static String        Image__MapProvider_Transparent_Hill;
    public static String        Image__options;
    public static String        Image__Pin_Themed;
    public static String        Image__TourOptions;
@@ -230,14 +239,22 @@ public class Messages extends NLS {
    public static String        Weather_Clounds_Snow;
    public static String        Weather_Clounds_Sunny;
 
-   public static String        Weather_WindDirection_E;
    public static String        Weather_WindDirection_N;
+   public static String        Weather_WindDirection_NNE;
    public static String        Weather_WindDirection_NE;
-   public static String        Weather_WindDirection_NW;
-   public static String        Weather_WindDirection_S;
+   public static String        Weather_WindDirection_ENE;
+   public static String        Weather_WindDirection_E;
+   public static String        Weather_WindDirection_ESE;
    public static String        Weather_WindDirection_SE;
+   public static String        Weather_WindDirection_SSE;
+   public static String        Weather_WindDirection_S;
+   public static String        Weather_WindDirection_SSW;
    public static String        Weather_WindDirection_SW;
+   public static String        Weather_WindDirection_WSW;
    public static String        Weather_WindDirection_W;
+   public static String        Weather_WindDirection_WNW;
+   public static String        Weather_WindDirection_NW;
+   public static String        Weather_WindDirection_NNW;
 
    public static String        Weather_WindSpeed_Bft00;
    public static String        Weather_WindSpeed_Bft00_Short;

@@ -4274,16 +4274,16 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="8"
-     inkscape:cx="308.15681"
-     inkscape:cy="545.70248"
+     inkscape:cx="160.58664"
+     inkscape:cy="564.05926"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
-     inkscape:window-width="1754"
-     inkscape:window-height="1376"
-     inkscape:window-x="447"
-     inkscape:window-y="0"
-     inkscape:window-maximized="0"
+     inkscape:window-width="1476"
+     inkscape:window-height="900"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
      inkscape:snap-grids="true"
      inkscape:snap-page="false"
      inkscape:snap-to-guides="false"
@@ -5648,8 +5648,8 @@
        id="rect4471-8-4-0-4-2-7"
        width="15.999978"
        height="16"
-       x="159.99994"
-       y="506.36218"
+       x="164.00002"
+       y="507.36218"
        inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icons\state-moved-tour.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
@@ -9670,5 +9670,86 @@
        inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\tour-location-filter.png"
        inkscape:export-xdpi="96"
        inkscape:export-ydpi="96" />
+    <g
+       id="g2331"
+       transform="matrix(1.0547454,0,0,1.0547454,-9.9898238,-27.775723)"
+       inkscape:export-filename="C:\Users\frederic\git\MT\mytourbook\bundles\net.tourbook\icons\state-weather.png"
+       inkscape:export-xdpi="101.78"
+       inkscape:export-ydpi="101.78">
+      <g
+         transform="matrix(1.0518359,0,0,0.93850266,-10.173538,31.342358)"
+         id="g2320">
+        <path
+           style="fill:#000000;fill-opacity:0;stroke:#a3a3a3;stroke-width:0.73196393;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:5.75;stroke-dasharray:none;stroke-opacity:1"
+           d="m 187.49919,522.25008 c 2.3436,-7.06249 2.3436,-7.06249 2.3436,-7.06249"
+           id="path1409"
+           inkscape:connector-curvature="0"
+           inkscape:export-filename="C:\Users\frederic\git\MT\mytourbook\bundles\net.tourbook\icons\state-weather.png"
+           inkscape:export-xdpi="114.03442"
+           inkscape:export-ydpi="114.03442" />
+        <path
+           style="fill:#000000;fill-opacity:0;stroke:#a3a3a3;stroke-width:0.73196393;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:5.75;stroke-dasharray:none;stroke-opacity:1"
+           d="m 192.18639,522.25008 c -2.3436,-7.06249 -2.3436,-7.06249 -2.3436,-7.06249"
+           id="path1409-0"
+           inkscape:connector-curvature="0"
+           inkscape:export-filename="C:\Users\frederic\git\MT\mytourbook\bundles\net.tourbook\icons\state-weather.png"
+           inkscape:export-xdpi="114.03442"
+           inkscape:export-ydpi="114.03442" />
+        <path
+           style="fill:#000000;fill-opacity:0;stroke:#a3a3a3;stroke-width:0.58386707;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:5.75;stroke-dasharray:none;stroke-opacity:1"
+           d="m 189.84278,515.18759 c 0.008,-4.82132 0.008,-4.82132 0.008,-4.82132"
+           id="path1409-9"
+           inkscape:connector-curvature="0"
+           inkscape:export-filename="C:\Users\frederic\git\MT\mytourbook\bundles\net.tourbook\icons\state-weather.png"
+           inkscape:export-xdpi="114.03442"
+           inkscape:export-ydpi="114.03442" />
+        <ellipse
+           style="fill:#000000;fill-opacity:0;stroke:#a3a3a3;stroke-width:0.92400002;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:5.75;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+           id="path1449"
+           cx="185.27248"
+           cy="514.31042"
+           rx="1.6530513"
+           ry="1.7329688"
+           inkscape:export-filename="C:\Users\frederic\git\MT\mytourbook\bundles\net.tourbook\icons\state-weather.png"
+           inkscape:export-xdpi="114.03442"
+           inkscape:export-ydpi="114.03442" />
+        <ellipse
+           style="fill:#000000;fill-opacity:0;stroke:#a3a3a3;stroke-width:0.92400002;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:5.75;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+           id="path1449-5"
+           cx="186.39568"
+           cy="509.40698"
+           rx="1.6530513"
+           ry="1.7329688"
+           inkscape:export-filename="C:\Users\frederic\git\MT\mytourbook\bundles\net.tourbook\icons\state-weather.png"
+           inkscape:export-xdpi="114.03442"
+           inkscape:export-ydpi="114.03442" />
+        <ellipse
+           style="fill:#000000;fill-opacity:0;stroke:#a3a3a3;stroke-width:0.92400002;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:5.75;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+           id="path1449-8"
+           cx="194.64471"
+           cy="510.23929"
+           rx="1.6530513"
+           ry="1.7329688"
+           inkscape:export-filename="C:\Users\frederic\git\MT\mytourbook\bundles\net.tourbook\icons\state-weather.png"
+           inkscape:export-xdpi="114.03442"
+           inkscape:export-ydpi="114.03442" />
+        <path
+           style="fill:#000000;fill-opacity:0;stroke:#a3a3a3;stroke-width:0.5938648;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:5.75;stroke-dasharray:none;stroke-opacity:1"
+           d="m 193.01042,510.38801 c -5.27504,-0.007 -5.27504,-0.007 -5.27504,-0.007"
+           id="path1409-9-6"
+           inkscape:connector-curvature="0"
+           inkscape:export-filename="C:\Users\frederic\git\MT\mytourbook\bundles\net.tourbook\icons\state-weather.png"
+           inkscape:export-xdpi="114.03442"
+           inkscape:export-ydpi="114.03442" />
+      </g>
+      <path
+         inkscape:export-ydpi="114.03442"
+         inkscape:export-xdpi="114.03442"
+         inkscape:export-filename="C:\Users\frederic\git\MT\mytourbook\bundles\net.tourbook\icons\state-weather.png"
+         inkscape:connector-curvature="0"
+         id="path1409-9-6-0"
+         d="m 189.86393,510.35336 c -3.17267,3.28755 -3.17267,3.28755 -3.17267,3.28755"
+         style="fill:#000000;fill-opacity:0;stroke:#a3a3a3;stroke-width:0.65685046;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:5.75;stroke-dasharray:none;stroke-opacity:1" />
+    </g>
   </g>
 </svg>

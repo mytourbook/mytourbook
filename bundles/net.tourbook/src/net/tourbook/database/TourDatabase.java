@@ -103,7 +103,8 @@ public class TourDatabase {
    /**
     * Version for the database which is required that the tourbook application works successfully
     */
-   private static final int TOURBOOK_DB_VERSION = 38;
+   private static final int TOURBOOK_DB_VERSION = 39;
+//   private static final int TOURBOOK_DB_VERSION = 39; // 19.7 ?
 //   private static final int TOURBOOK_DB_VERSION = 38; // 19.5 ?
 //   private static final int TOURBOOK_DB_VERSION = 37; // 19.2
 //   private static final int TOURBOOK_DB_VERSION = 36; // 18.12
@@ -515,7 +516,7 @@ public class TourDatabase {
                // Caused by: ERROR 42Y55: 'DROP TABLE' cannot be performed on 'TOURCATEGORY' because it does not exist.
 
                /*
-                * This case occured because table TOURCATEGORY was created until version 1.6 but do
+                * This case occurred because table TOURCATEGORY was created until version 1.6 but do
                 * not exist in later versions.
                 */
                StatusUtil.log(e);
@@ -724,7 +725,7 @@ public class TourDatabase {
    }
 
    /**
-    * This error can occure when transient instances are not saved.
+    * This error can occur when transient instances are not saved.
     *
     * <pre>
     *
@@ -1014,7 +1015,7 @@ public class TourDatabase {
          e.printStackTrace();
 
          /*
-          * an error could have been occured when loading the tour with em.find, remove the tour
+          * an error could have been occurred when loading the tour with em.find, remove the tour
           * with sql commands
           */
          deleteTour_WithSQL(tourId);
@@ -1970,7 +1971,7 @@ public class TourDatabase {
          MessageDialog.openError(
                Display.getCurrent().getActiveShell(), //
                "Error", //$NON-NLS-1$
-               "Error occured when saving an entity"); //$NON-NLS-1$
+               "Error occurred when saving an entity"); //$NON-NLS-1$
       }
 
       return savedEntity;
@@ -2028,7 +2029,7 @@ public class TourDatabase {
          MessageDialog.openError(
                Display.getCurrent().getActiveShell(), //
                "Error", //$NON-NLS-1$
-               "Error occured when saving an entity"); //$NON-NLS-1$
+               "Error occurred when saving an entity"); //$NON-NLS-1$
       }
 
       return savedEntity;
@@ -2090,15 +2091,7 @@ public class TourDatabase {
        */
       tourData.getNumberOfHrZones();
 
-      final ZonedDateTime zdtNow = ZonedDateTime.now();
-
-      final long dtSaved = (zdtNow.getYear() * 10000000000L)
-            + (zdtNow.getMonthValue() * 100000000L)
-            + (zdtNow.getDayOfMonth() * 1000000L)
-            //
-            + (zdtNow.getHour() * 10000L)
-            + (zdtNow.getMinute() * 100L)
-            + zdtNow.getSecond();
+      final long dtSaved = TimeTools.createdNowAsYMDhms();
 
       checkUnsavedTransientInstances(tourData);
 
@@ -2939,6 +2932,18 @@ public class TourDatabase {
             //
             // version 38 end
 
+            // version 39 start  -  19.7
+            //
+            + " isWeatherDataFromApi                  BOOLEAN  DEFAULT FALSE,             \n" //$NON-NLS-1$
+            + " weatherPrecipitation                  FLOAT    DEFAULT 0,                 \n" //$NON-NLS-1$
+            + " weatherHumidity                       SMALLINT DEFAULT 0,                 \n" //$NON-NLS-1$
+            + " weatherPressure                       SMALLINT DEFAULT 0,                 \n" //$NON-NLS-1$
+            + " weatherWindChill                      FLOAT    DEFAULT 0,                 \n" //$NON-NLS-1$
+            + " weatherMaxTemperature                 SMALLINT DEFAULT 0,                 \n" //$NON-NLS-1$
+            + " weatherMinTemperature                 SMALLINT DEFAULT 0,                 \n" //$NON-NLS-1$
+            //
+            // version 39 end
+
             //            // version 35 start  -  18.?
             //            //
             //            + " LatitudeMinE6         INTEGER DEFAULT 0,                        \n" //$NON-NLS-1$
@@ -2950,7 +2955,7 @@ public class TourDatabase {
 
             // version 5 start
             /**
-             * Disabled because when two blob object's are deserialized then the error occures:
+             * Disabled because when two blob object's are deserialized then the error occurs:
              * <p>
              * java.io.StreamCorruptedException: invalid stream header: 00ACED00
              * <p>
@@ -3043,7 +3048,7 @@ public class TourDatabase {
             //
             + "   tourTime             BIGINT DEFAULT " + Long.MIN_VALUE + ",             \n" //$NON-NLS-1$ //$NON-NLS-2$
             //
-            // When DEFAULT value is NOT set, this exception occures:
+            // When DEFAULT value is NOT set, this exception occurs:
             //
             //java.lang.IllegalArgumentException: Can not set float field net.tourbook.data.TourMarker.altitude to null value
             //   at sun.reflect.UnsafeFieldAccessorImpl.throwSetIllegalArgumentException(UnsafeFieldAccessorImpl.java:176)
@@ -4672,6 +4677,11 @@ public class TourDatabase {
             currentDbVersion = newVersion = updateDbDesign_037_to_038(conn, splashManager);
          }
 
+         // 38 -> 39
+         if (currentDbVersion == 38) {
+            currentDbVersion = newVersion = updateDbDesign_038_to_039(conn, splashManager);
+         }
+
          /*
           * Update version number
           */
@@ -6191,7 +6201,7 @@ public class TourDatabase {
                } catch (final Exception e) {
 
                   /*
-                   * This ArrayIndexOutOfBoundsException occured during the update after this
+                   * This ArrayIndexOutOfBoundsException occurred during the update after this
                    * version was released. Therefore it's captured and detailed logged, other
                    * markers are not affected.
                    */
@@ -7050,6 +7060,39 @@ public class TourDatabase {
             SQL.AddCol_Float  (stmt, TABLE_TOUR_DATA,             "training_TrainingEffect_Aerob",       DEFAULT_0); //$NON-NLS-1$
             SQL.AddCol_Float  (stmt, TABLE_TOUR_DATA,             "training_TrainingEffect_Anaerob",     DEFAULT_0); //$NON-NLS-1$
             SQL.AddCol_Float  (stmt, TABLE_TOUR_DATA,             "training_TrainingPerformance",        DEFAULT_0); //$NON-NLS-1$
+
+// SET_FORMATTING_ON
+         }
+      }
+      stmt.close();
+
+      logDb_UpdateEnd(newDbVersion);
+
+      return newDbVersion;
+   }
+
+   private int updateDbDesign_038_to_039(final Connection conn, final SplashManager splashManager) throws SQLException {
+
+      final int newDbVersion = 39;
+
+      logDb_UpdateStart(newDbVersion);
+      updateMonitor(splashManager, newDbVersion);
+
+      final Statement stmt = conn.createStatement();
+      {
+         // check if db is updated to version 39
+         if (isColumnAvailable(conn, TABLE_TOUR_TAG, "isWeatherDataFromApi") == false) { //$NON-NLS-1$
+
+// SET_FORMATTING_OFF
+
+            // Add new columns
+            SQL.AddCol_Boolean(stmt, TABLE_TOUR_DATA,             "isWeatherDataFromApi",       DEFAULT_FALSE); //$NON-NLS-1$
+            SQL.AddCol_Float  (stmt, TABLE_TOUR_DATA,             "weatherPrecipitation",       DEFAULT_0); //$NON-NLS-1$
+            SQL.AddCol_Int    (stmt, TABLE_TOUR_DATA,             "weatherHumidity",            DEFAULT_0); //$NON-NLS-1$
+            SQL.AddCol_Int    (stmt, TABLE_TOUR_DATA,             "weatherPressure",            DEFAULT_0); //$NON-NLS-1$
+            SQL.AddCol_Float  (stmt, TABLE_TOUR_DATA,             "weatherWindChill",           DEFAULT_0); //$NON-NLS-1$
+            SQL.AddCol_Int    (stmt, TABLE_TOUR_DATA,             "weatherMaxTemperature",      DEFAULT_0); //$NON-NLS-1$
+            SQL.AddCol_Int    (stmt, TABLE_TOUR_DATA,             "weatherMinTemperature",      DEFAULT_0); //$NON-NLS-1$
 
 // SET_FORMATTING_ON
          }

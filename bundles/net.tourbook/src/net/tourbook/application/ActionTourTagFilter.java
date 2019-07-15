@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,45 +24,42 @@ import net.tourbook.tag.tour.filter.TourTagFilterManager;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.ToolItem;
 
 public class ActionTourTagFilter extends ActionToolbarSlideoutAdv {
 
-// SET_FORMATTING_OFF
+   private static final ImageDescriptor _actionImageDescriptor         = TourbookPlugin.getImageDescriptor(Messages.Image__TourTagFilter);
+   private static final ImageDescriptor _actionImageDisabledDescriptor = TourbookPlugin.getImageDescriptor(Messages.Image__TourTagFilter_Disabled);
 
-	private static final ImageDescriptor	_actionImageDescriptor			= TourbookPlugin.getImageDescriptor(Messages.Image__TourTagFilter);
-	private static final ImageDescriptor	_actionImageDisabledDescriptor	= TourbookPlugin.getImageDescriptor(Messages.Image__TourTagFilter_Disabled);
+   private static final IDialogSettings _state                         = TourbookPlugin.getState("TourTagFilterSlideout");                         //$NON-NLS-1$
 
-	private static final IDialogSettings	_state	= TourbookPlugin.getState("TourTagFilterSlideout");//$NON-NLS-1$
-	
-// SET_FORMATTING_ON
+   private AdvancedSlideout             _slideoutTourTagFilter;
 
-	private AdvancedSlideout				_slideoutTourTagFilter;
+   public ActionTourTagFilter() {
 
-	public ActionTourTagFilter() {
+      super(_actionImageDescriptor, _actionImageDisabledDescriptor);
 
-		super(_actionImageDescriptor, _actionImageDisabledDescriptor);
+      isToggleAction = true;
+      notSelectedTooltip = Messages.Tour_Tag_Filter_Action_Tooltip;
+   }
 
-		isToggleAction = true;
-		notSelectedTooltip = Messages.Tour_Tag_Filter_Action_Tooltip;
-	}
+   @Override
+   protected AdvancedSlideout createSlideout(final ToolItem toolItem) {
 
-	@Override
-	protected AdvancedSlideout createSlideout(final ToolItem toolItem) {
+      _slideoutTourTagFilter = new SlideoutTourTagFilter(toolItem, _state);
+      _slideoutTourTagFilter.setSlideoutLocation(SlideoutLocation.ABOVE_CENTER);
 
-		_slideoutTourTagFilter = new SlideoutTourTagFilter(toolItem, _state);
-		_slideoutTourTagFilter.setSlideoutLocation(SlideoutLocation.ABOVE_CENTER);
+      return _slideoutTourTagFilter;
+   }
 
-		return _slideoutTourTagFilter;
-	}
+   @Override
+   protected void onSelect(final SelectionEvent selectionEvent) {
 
-	@Override
-	protected void onSelect() {
+      super.onSelect(selectionEvent);
 
-		super.onSelect();
-
-		// update tour tag filter
-		TourTagFilterManager.setFilterEnabled(getSelection());
-	}
+      // update tour tag filter
+      TourTagFilterManager.setFilterEnabled(getSelection());
+   }
 
 }

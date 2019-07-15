@@ -261,9 +261,9 @@ public class TVITourBookYearSub extends TVITourBookItem {
                tourItem.tourDay                 = dbDay;
                tourItem.tourWeek                = dbWeek;
 
-               final long dbDistance            = tourItem.colDistance = result.getLong(4);
-               tourItem.colRecordingTime        = result.getLong(5);
-               final long dbDrivingTime         = tourItem.colDrivingTime = result.getLong(6);
+               final long dbDistance            = tourItem.colTourDistance = result.getLong(4);
+               tourItem.colTourRecordingTime    = result.getLong(5);
+               final long dbDrivingTime         = tourItem.colTourDrivingTime = result.getLong(6);
                tourItem.colAltitudeUp           = result.getLong(7);
                tourItem.colAltitudeDown         = result.getLong(8);
 
@@ -290,15 +290,15 @@ public class TVITourBookYearSub extends TVITourBookItem {
                tourItem.colClouds               = result.getString(28);
                tourItem.colRestPulse            = result.getInt(29);
 
-               tourItem.colCalories             = result.getInt(30);
+               tourItem.colCalories             = result.getLong(30);
                tourItem.colPersonId             = result.getLong(31);
 
-               tourItem.colNumberOfTimeSlices   = result.getInt(32);
-               tourItem.colNumberOfPhotos       = result.getInt(33);
+               tourItem.colNumberOfTimeSlices   = result.getLong(32);
+               tourItem.colNumberOfPhotos       = result.getLong(33);
                tourItem.colDPTolerance          = result.getInt(34);
 
-               tourItem.colFrontShiftCount      = result.getInt(35);
-               tourItem.colRearShiftCount       = result.getInt(36);
+               tourItem.colFrontShiftCount      = result.getLong(35);
+               tourItem.colRearShiftCount       = result.getLong(36);
 
                // ----------------- POWER ------------------
 
@@ -357,7 +357,7 @@ public class TVITourBookYearSub extends TVITourBookItem {
 
                // ---------- SURFING -------------
 
-               tourItem.col_Surfing_NumberOfEvents             = result.getShort(70);
+               tourItem.col_Surfing_NumberOfEvents             = result.getLong(70);
                tourItem.col_Surfing_MinSpeed_StartStop         = result.getShort(71);
                tourItem.col_Surfing_MinSpeed_Surfing           = result.getShort(72);
                tourItem.col_Surfing_MinTimeDuration            = result.getShort(73);
@@ -412,7 +412,7 @@ public class TVITourBookYearSub extends TVITourBookItem {
                tourItem.colAvgSpeed = dbDrivingTime == 0 ? 0 : 3.6f * dbDistance / dbDrivingTime;
                tourItem.colAvgPace = dbDistance == 0 ? 0 : dbDrivingTime * 1000 / dbDistance;
 
-               tourItem.colPausedTime = tourItem.colRecordingTime - tourItem.colDrivingTime;
+               tourItem.colPausedTime = tourItem.colTourRecordingTime - tourItem.colTourDrivingTime;
 
                // get first tag id
                if (resultTagId instanceof Long) {

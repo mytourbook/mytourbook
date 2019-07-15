@@ -65,6 +65,8 @@ import net.tourbook.ui.tourChart.TourChartView;
 import net.tourbook.ui.tourChart.X_AXIS_START_TIME;
 import net.tourbook.ui.views.TourChartAnalyzerInfo;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
+import net.tourbook.weather.HistoricalWeatherRetriever;
+import net.tourbook.weather.WeatherData;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
@@ -91,100 +93,105 @@ import org.eclipse.ui.PlatformUI;
 
 public class TourManager {
 
-   private static final String GRAPH_LABEL_ALTIMETER                         = net.tourbook.common.Messages.Graph_Label_Altimeter;
-   private static final String GRAPH_LABEL_ALTITUDE                          = net.tourbook.common.Messages.Graph_Label_Altitude;
-   private static final String GRAPH_LABEL_CADENCE                           = net.tourbook.common.Messages.Graph_Label_Cadence;
-   private static final String GRAPH_LABEL_CADENCE_UNIT                      = net.tourbook.common.Messages.Graph_Label_Cadence_Unit;
-   private static final String GRAPH_LABEL_CADENCE_UNIT_SPM                  = net.tourbook.common.Messages.Graph_Label_Cadence_Unit_Spm;
-   private static final String GRAPH_LABEL_CADENCE_UNIT_RPM_SPM              = net.tourbook.common.Messages.Graph_Label_Cadence_Unit_RpmSpm;
-   private static final String GRAPH_LABEL_GEARS                             = net.tourbook.common.Messages.Graph_Label_Gears;
-   private static final String GRAPH_LABEL_GEO_COMPARE_UNIT                  = net.tourbook.common.Messages.Graph_Label_Geo_Compare_Unit;
-   private static final String GRAPH_LABEL_GRADIENT                          = net.tourbook.common.Messages.Graph_Label_Gradient;
-   private static final String GRAPH_LABEL_GRADIENT_UNIT                     = net.tourbook.common.Messages.Graph_Label_Gradient_Unit;
-   private static final String GRAPH_LABEL_HEARTBEAT                         = net.tourbook.common.Messages.Graph_Label_Heartbeat;
-   private static final String GRAPH_LABEL_HEARTBEAT_UNIT                    = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
-   private static final String GRAPH_LABEL_PACE                              = net.tourbook.common.Messages.Graph_Label_Pace;
-   private static final String GRAPH_LABEL_POWER                             = net.tourbook.common.Messages.Graph_Label_Power;
-   private static final String GRAPH_LABEL_POWER_UNIT                        = net.tourbook.common.Messages.Graph_Label_Power_Unit;
-   private static final String GRAPH_LABEL_SPEED                             = net.tourbook.common.Messages.Graph_Label_Speed;
-   private static final String GRAPH_LABEL_TEMPERATURE                       = net.tourbook.common.Messages.Graph_Label_Temperature;
-   private static final String GRAPH_LABEL_TOUR_COMPARE                      = net.tourbook.common.Messages.Graph_Label_Tour_Compare;
-   private static final String GRAPH_LABEL_TOUR_COMPARE_UNIT                 = net.tourbook.common.Messages.Graph_Label_Tour_Compare_Unit;
-   private static final String GRAPH_LABEL_RUN_DYN_STANCE_TIME               = net.tourbook.common.Messages.Graph_Label_RunDyn_StanceTime;
-   private static final String GRAPH_LABEL_RUN_DYN_STANCE_TIME_BALANCE       = net.tourbook.common.Messages.Graph_Label_RunDyn_StanceTimeBalance;
-   private static final String GRAPH_LABEL_RUN_DYN_STEP_LENGTH               = net.tourbook.common.Messages.Graph_Label_RunDyn_StepLength;
-   private static final String GRAPH_LABEL_RUN_DYN_VERTICAL_OSCILLATION      = net.tourbook.common.Messages.Graph_Label_RunDyn_VerticalOscillation;
-   private static final String GRAPH_LABEL_RUN_DYN_VERTICAL_RATIO            = net.tourbook.common.Messages.Graph_Label_RunDyn_VerticalRatio;
-   private static final String GRAPH_LABEL_SWIM_STROKES                      = net.tourbook.common.Messages.Graph_Label_Swim_Strokes;
-   private static final String GRAPH_LABEL_SWIM_SWOLF                        = net.tourbook.common.Messages.Graph_Label_Swim_Swolf;
+   private static final String GRAPH_LABEL_ALTIMETER                           = net.tourbook.common.Messages.Graph_Label_Altimeter;
+   private static final String GRAPH_LABEL_ALTITUDE                            = net.tourbook.common.Messages.Graph_Label_Altitude;
+   private static final String GRAPH_LABEL_CADENCE                             = net.tourbook.common.Messages.Graph_Label_Cadence;
+   private static final String GRAPH_LABEL_CADENCE_UNIT                        = net.tourbook.common.Messages.Graph_Label_Cadence_Unit;
+   private static final String GRAPH_LABEL_CADENCE_UNIT_SPM                    = net.tourbook.common.Messages.Graph_Label_Cadence_Unit_Spm;
+   private static final String GRAPH_LABEL_CADENCE_UNIT_RPM_SPM                = net.tourbook.common.Messages.Graph_Label_Cadence_Unit_RpmSpm;
+   private static final String GRAPH_LABEL_GEARS                               = net.tourbook.common.Messages.Graph_Label_Gears;
+   private static final String GRAPH_LABEL_GEO_COMPARE_UNIT                    = net.tourbook.common.Messages.Graph_Label_Geo_Compare_Unit;
+   private static final String GRAPH_LABEL_GRADIENT                            = net.tourbook.common.Messages.Graph_Label_Gradient;
+   private static final String GRAPH_LABEL_GRADIENT_UNIT                       = net.tourbook.common.Messages.Graph_Label_Gradient_Unit;
+   private static final String GRAPH_LABEL_HEARTBEAT                           = net.tourbook.common.Messages.Graph_Label_Heartbeat;
+   private static final String GRAPH_LABEL_HEARTBEAT_UNIT                      = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
+   private static final String GRAPH_LABEL_PACE                                = net.tourbook.common.Messages.Graph_Label_Pace;
+   private static final String GRAPH_LABEL_POWER                               = net.tourbook.common.Messages.Graph_Label_Power;
+   private static final String GRAPH_LABEL_POWER_UNIT                          = net.tourbook.common.Messages.Graph_Label_Power_Unit;
+   private static final String GRAPH_LABEL_SPEED                               = net.tourbook.common.Messages.Graph_Label_Speed;
+   private static final String GRAPH_LABEL_TEMPERATURE                         = net.tourbook.common.Messages.Graph_Label_Temperature;
+   private static final String GRAPH_LABEL_TOUR_COMPARE                        = net.tourbook.common.Messages.Graph_Label_Tour_Compare;
+   private static final String GRAPH_LABEL_TOUR_COMPARE_UNIT                   = net.tourbook.common.Messages.Graph_Label_Tour_Compare_Unit;
+   private static final String GRAPH_LABEL_RUN_DYN_STANCE_TIME                 = net.tourbook.common.Messages.Graph_Label_RunDyn_StanceTime;
+   private static final String GRAPH_LABEL_RUN_DYN_STANCE_TIME_BALANCE         = net.tourbook.common.Messages.Graph_Label_RunDyn_StanceTimeBalance;
+   private static final String GRAPH_LABEL_RUN_DYN_STEP_LENGTH                 = net.tourbook.common.Messages.Graph_Label_RunDyn_StepLength;
+   private static final String GRAPH_LABEL_RUN_DYN_VERTICAL_OSCILLATION        = net.tourbook.common.Messages.Graph_Label_RunDyn_VerticalOscillation;
+   private static final String GRAPH_LABEL_RUN_DYN_VERTICAL_RATIO              = net.tourbook.common.Messages.Graph_Label_RunDyn_VerticalRatio;
+   private static final String GRAPH_LABEL_SWIM_STROKES                        = net.tourbook.common.Messages.Graph_Label_Swim_Strokes;
+   private static final String GRAPH_LABEL_SWIM_SWOLF                          = net.tourbook.common.Messages.Graph_Label_Swim_Swolf;
    //
-   public static final String  LOG_TEMP_ADJUST_001_START                     = Messages.Log_TemperatureAdjustment_001_Start;
-   public static final String  LOG_TEMP_ADJUST_002_END                       = Messages.Log_TemperatureAdjustment_002_End;
-   public static final String  LOG_TEMP_ADJUST_003_TOUR_CHANGES              = Messages.Log_TemperatureAdjustment_003_TourChanges;
-   public static final String  LOG_TEMP_ADJUST_005_TOUR_IS_TOO_SHORT         = Messages.Log_TemperatureAdjustment_005_TourIsTooShort;
-   public static final String  LOG_TEMP_ADJUST_006_IS_ABOVE_TEMPERATURE      = Messages.Log_TemperatureAdjustment_006_IsAboveTemperature;
-   public static final String  LOG_TEMP_ADJUST_010_NO_TEMPERATURE_DATA_SERIE = Messages.Log_TemperatureAdjustment_010_NoTemperatureDataSeries;
-   public static final String  LOG_TEMP_ADJUST_011_NO_TIME_DATA_SERIE        = Messages.Log_TemperatureAdjustment_011_NoTimeDataSeries;
+   public static final String  LOG_TEMP_ADJUST_001_START                       = Messages.Log_TemperatureAdjustment_001_Start;
+   public static final String  LOG_TEMP_ADJUST_002_END                         = Messages.Log_TemperatureAdjustment_002_End;
+   public static final String  LOG_TEMP_ADJUST_003_TOUR_CHANGES                = Messages.Log_TemperatureAdjustment_003_TourChanges;
+   public static final String  LOG_TEMP_ADJUST_005_TOUR_IS_TOO_SHORT           = Messages.Log_TemperatureAdjustment_005_TourIsTooShort;
+   public static final String  LOG_TEMP_ADJUST_006_IS_ABOVE_TEMPERATURE        = Messages.Log_TemperatureAdjustment_006_IsAboveTemperature;
+   public static final String  LOG_TEMP_ADJUST_010_NO_TEMPERATURE_DATA_SERIE   = Messages.Log_TemperatureAdjustment_010_NoTemperatureDataSeries;
+   public static final String  LOG_TEMP_ADJUST_011_NO_TIME_DATA_SERIE          = Messages.Log_TemperatureAdjustment_011_NoTimeDataSeries;
    //
-   public static final String  CUSTOM_DATA_TOUR_DATA                         = "tourData";                                                         //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_TOUR_CHART_CONFIGURATION          = "tourChartConfig";                                                  //$NON-NLS-1$
+   public static final String  LOG_RETRIEVE_WEATHER_DATA_001_START             = Messages.Log_RetrieveWeatherData_001_Start;
+   public static final String  LOG_RETRIEVE_WEATHER_DATA_002_END               = Messages.Log_RetrieveWeatherData_002_End;
+   public static final String  LOG_RETRIEVE_WEATHER_DATA_010_NO_GPS_DATA_SERIE =
+         Messages.Log_RetrieveWeatherData_010_NoGpsDataSeries;
    //
-   public static final String  CUSTOM_DATA_ALTIMETER                         = "altimeter";                                                        //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_ALTITUDE                          = "altitude";                                                         //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_CADENCE                           = "cadence";                                                          //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_DISTANCE                          = "distance";                                                         //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_GEAR_RATIO                        = "gearRatio";                                                        //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_GRADIENT                          = "gradient";                                                         //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_HISTORY                           = "history";                                                          //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_PACE                              = "pace";                                                             //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_POWER                             = "power";                                                            //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_PULSE                             = "pulse";                                                            //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_SPEED                             = "speed";                                                            //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_TEMPERATURE                       = "temperature";                                                      //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_TIME                              = "time";                                                             //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_SEGMENT_VALUES                    = "segmentValues";                                                    //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_ANALYZER_INFO                     = "analyzerInfo";                                                     //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_CONCONI_TEST                      = "CUSTOM_DATA_CONCONI_TEST";                                         //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_RUN_DYN_STANCE_TIME               = "runDyn_RunDyn_StanceTime";                                         //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_RUN_DYN_STANCE_TIME_BALANCE       = "runDyn_RunDyn_StanceTimeBalance";                                  //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_RUN_DYN_STEP_LENGTH               = "runDyn_RunDyn_StepLength";                                         //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_RUN_DYN_VERTICAL_OSCILLATION      = "runDyn_RunDyn_VerticalOscillation";                                //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_RUN_DYN_VERTICAL_RATIO            = "runDyn_RunDyn_VerticalRatio";                                      //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_SWIM_STROKES                      = "swim_Strokes";                                                     //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_SWIM_SWOLF                        = "swim_Swolf";                                                       //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_TOUR_DATA                           = "tourData";                                                         //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_TOUR_CHART_CONFIGURATION            = "tourChartConfig";                                                  //$NON-NLS-1$
    //
-   public static final String  X_AXIS_TIME                                   = "time";                                                             //$NON-NLS-1$
-   public static final String  X_AXIS_DISTANCE                               = "distance";                                                         //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_ALTIMETER                           = "altimeter";                                                        //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_ALTITUDE                            = "altitude";                                                         //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_CADENCE                             = "cadence";                                                          //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_DISTANCE                            = "distance";                                                         //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_GEAR_RATIO                          = "gearRatio";                                                        //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_GRADIENT                            = "gradient";                                                         //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_HISTORY                             = "history";                                                          //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_PACE                                = "pace";                                                             //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_POWER                               = "power";                                                            //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_PULSE                               = "pulse";                                                            //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_SPEED                               = "speed";                                                            //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_TEMPERATURE                         = "temperature";                                                      //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_TIME                                = "time";                                                             //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_SEGMENT_VALUES                      = "segmentValues";                                                    //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_ANALYZER_INFO                       = "analyzerInfo";                                                     //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_CONCONI_TEST                        = "CUSTOM_DATA_CONCONI_TEST";                                         //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_RUN_DYN_STANCE_TIME                 = "runDyn_RunDyn_StanceTime";                                         //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_RUN_DYN_STANCE_TIME_BALANCE         = "runDyn_RunDyn_StanceTimeBalance";                                  //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_RUN_DYN_STEP_LENGTH                 = "runDyn_RunDyn_StepLength";                                         //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_RUN_DYN_VERTICAL_OSCILLATION        = "runDyn_RunDyn_VerticalOscillation";                                //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_RUN_DYN_VERTICAL_RATIO              = "runDyn_RunDyn_VerticalRatio";                                      //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_SWIM_STROKES                        = "swim_Strokes";                                                     //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_SWIM_SWOLF                          = "swim_Swolf";                                                       //$NON-NLS-1$
    //
-   private final static String FORMAT_MM_SS                                  = "%d:%02d";                                                          //$NON-NLS-1$
-   public static final String  GEAR_TEETH_FORMAT                             = "%2d:%2d";                                                          //$NON-NLS-1$
-   public static final String  GEAR_VALUE_FORMAT                             = GEAR_TEETH_FORMAT + " - %1.2f";                                     //$NON-NLS-1$
+   public static final String  X_AXIS_TIME                                     = "time";                                                             //$NON-NLS-1$
+   public static final String  X_AXIS_DISTANCE                                 = "distance";                                                         //$NON-NLS-1$
    //
-   public static final int     GRAPH_ALTITUDE                                = 1000;
-   public static final int     GRAPH_SPEED                                   = 1001;
-   public static final int     GRAPH_ALTIMETER                               = 1002;
-   public static final int     GRAPH_PULSE                                   = 1003;
-   public static final int     GRAPH_TEMPERATURE                             = 1004;
-   public static final int     GRAPH_CADENCE                                 = 1005;
-   public static final int     GRAPH_GRADIENT                                = 1006;
-   public static final int     GRAPH_POWER                                   = 1007;
-   public static final int     GRAPH_PACE                                    = 1008;
-   public static final int     GRAPH_GEARS                                   = 1009;
+   private final static String FORMAT_MM_SS                                    = "%d:%02d";                                                          //$NON-NLS-1$
+   public static final String  GEAR_TEETH_FORMAT                               = "%2d:%2d";                                                          //$NON-NLS-1$
+   public static final String  GEAR_VALUE_FORMAT                               = GEAR_TEETH_FORMAT + " - %1.2f";                                     //$NON-NLS-1$
+   //
+   public static final int     GRAPH_ALTITUDE                                  = 1000;
+   public static final int     GRAPH_SPEED                                     = 1001;
+   public static final int     GRAPH_ALTIMETER                                 = 1002;
+   public static final int     GRAPH_PULSE                                     = 1003;
+   public static final int     GRAPH_TEMPERATURE                               = 1004;
+   public static final int     GRAPH_CADENCE                                   = 1005;
+   public static final int     GRAPH_GRADIENT                                  = 1006;
+   public static final int     GRAPH_POWER                                     = 1007;
+   public static final int     GRAPH_PACE                                      = 1008;
+   public static final int     GRAPH_GEARS                                     = 1009;
 
-   public static final int     GRAPH_RUN_DYN_STANCE_TIME                     = 1100;
-   public static final int     GRAPH_RUN_DYN_STANCE_TIME_BALANCED            = 1101;
-   public static final int     GRAPH_RUN_DYN_STEP_LENGTH                     = 1102;
-   public static final int     GRAPH_RUN_DYN_VERTICAL_OSCILLATION            = 1103;
-   public static final int     GRAPH_RUN_DYN_VERTICAL_RATIO                  = 1104;
+   public static final int     GRAPH_RUN_DYN_STANCE_TIME                       = 1100;
+   public static final int     GRAPH_RUN_DYN_STANCE_TIME_BALANCED              = 1101;
+   public static final int     GRAPH_RUN_DYN_STEP_LENGTH                       = 1102;
+   public static final int     GRAPH_RUN_DYN_VERTICAL_OSCILLATION              = 1103;
+   public static final int     GRAPH_RUN_DYN_VERTICAL_RATIO                    = 1104;
 
-   public static final int     GRAPH_SWIM_STROKES                            = 1200;
-   public static final int     GRAPH_SWIM_SWOLF                              = 1201;
+   public static final int     GRAPH_SWIM_STROKES                              = 1200;
+   public static final int     GRAPH_SWIM_SWOLF                                = 1201;
 
-   public static final int     GRAPH_TRAINING_EFFECT_AEROB                   = 1300;
-   public static final int     GRAPH_TRAINING_EFFECT_ANAEROB                 = 1301;
-   public static final int     GRAPH_TRAINING_PERFORMANCE                    = 1302;
+   public static final int     GRAPH_TRAINING_EFFECT_AEROB                     = 1300;
+   public static final int     GRAPH_TRAINING_EFFECT_ANAEROB                   = 1301;
+   public static final int     GRAPH_TRAINING_PERFORMANCE                      = 1302;
 
-   public static final int     GRAPH_TOUR_COMPARE                            = 2000;
+   public static final int     GRAPH_TOUR_COMPARE                              = 2000;
    //
    //
    /**
@@ -2173,10 +2180,59 @@ public class TourManager {
    }
 
    /**
+    * @param tourData
+    * @return Returns <code>true</code> when the tour is modified, otherwise <code>false</code>.
+    */
+   public static boolean retrieveWeatherData(final TourData tourData) {
+
+      // ensure data is available
+      if (tourData.latitudeSerie == null || tourData.longitudeSerie == null) {
+
+         TourLogManager.logSubError(
+               String.format(
+                     LOG_RETRIEVE_WEATHER_DATA_010_NO_GPS_DATA_SERIE,
+                     getTourDateTimeShort(tourData)));
+
+         return false;
+      }
+
+      final HistoricalWeatherRetriever historicalWeatherRetriever = new HistoricalWeatherRetriever(tourData);
+
+      final WeatherData historicalWeatherData = historicalWeatherRetriever.retrieve().getHistoricalWeatherData();
+      if (historicalWeatherData == null) {
+         TourLogManager.logSubError(
+               NLS.bind(
+                     Messages.Dialog_RetrieveWeather_WeatherDataNotFound,
+                     new Object[] {
+                           TourManager.getTourDateTimeShort(tourData) }));
+         return false;
+      }
+
+      tourData.setAvgTemperature(historicalWeatherData.getTemperatureAverage());
+      tourData.setWeatherWindChill(historicalWeatherData.getWindChill());
+      tourData.setWeatherMaxTemperature(historicalWeatherData.getTemperatureMax());
+      tourData.setWeatherMinTemperature(historicalWeatherData.getTemperatureMin());
+      tourData.setWeatherWindSpeed(historicalWeatherData.getWindSpeed());
+      tourData.setWeatherWindDir(historicalWeatherData.getWindDirection());
+      tourData.setWeatherHumidity(historicalWeatherData.getAverageHumidity());
+      tourData.setWeatherPrecipitation(historicalWeatherData.getPrecipitation());
+      tourData.setWeatherPressure(historicalWeatherData.getAveragePressure());
+      tourData.setWeather(historicalWeatherData.getWeatherDescription());
+      tourData.setWeatherClouds(historicalWeatherData.getWeatherType());
+      tourData.setIsWeatherDataFromApi(true);
+
+      TourLogManager.addSubLog(
+            TourLogState.IMPORT_OK,
+            getTourDateTimeShort(tourData));
+
+      return true;
+   }
+
+   /**
     * Saves tours which have been modified and updates the tour data editor, a notification is fired
     * when the data are saved.
     * <p>
-    * If a tour is openend in the {@link TourDataEditorView}, the tour will be saved only when the
+    * If a tour is opened in the {@link TourDataEditorView}, the tour will be saved only when the
     * tour is not dirty, if the tour is dirty, saving is not done.
     * <p>
     * The event {@link TourEventId#TOUR_CHANGED} is fired always.
