@@ -44,6 +44,8 @@ import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.UnknownHostException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.NumberFormat;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -68,7 +70,6 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.e4.ui.services.IStylingEngine;
@@ -2055,6 +2056,44 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       }
    }
 
+   private void doImportMP_Multiple(final ArrayList<String> allFilesPaths) {
+
+      boolean isImported = false;
+      MP firstMP = null;
+
+      // loop: all import files
+      for (final String importFilePath : allFilesPaths) {
+
+         // create map provider from xml file
+         final ArrayList<MP> importedMPs = MapProviderManager.getInstance().importMapProvider(importFilePath);
+
+         if (importedMPs != null) {
+
+            if (firstMP == null) {
+               firstMP = importedMPs.get(0);
+            }
+
+            // update model
+            _visibleMp.addAll(importedMPs);
+
+            // update viewer
+            _mpViewer.add(importedMPs.toArray(new MP[importedMPs.size()]));
+
+            isImported = true;
+         }
+      }
+
+      if (isImported) {
+
+         MapProviderManager.getInstance().writeMapProviderXml();
+
+         // select map provider in the viewer
+         _mpViewer.setSelection(new StructuredSelection(firstMP), true);
+
+         _mpViewer.getTable().setFocus();
+      }
+   }
+
    private void enableControls() {
 
       // focus get's lost when a map provider is modified the first time
@@ -2143,55 +2182,6 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
    public ColumnManager getColumnManager() {
       return _columnManager;
    }
-
-//   /**
-//    * !!!!!!!!!!!!!! RECURSIVE !!!!!!!!!!!!!!!!!<br>
-//    * <br>
-//    * Deletes all files and subdirectories. If a deletion fails, the method stops attempting to
-//    * delete and returns false. <br>
-//    * <br>
-//    * !!!!!!!!!!!!!! RECURSIVE !!!!!!!!!!!!!!!!!
-//    *
-//    * @param file
-//    * @param monitor
-//    * @return Returns <code>true</code> if all deletions were successful
-//    */
-//   private void deleteDir(final File file, final IProgressMonitor monitor) {
-//
-//      if (monitor.isCanceled()) {
-//         return;
-//      }
-//
-//      if (file.isDirectory()) {
-//
-//         final String[] children = file.list();
-//
-//         for (final String element : children) {
-//            deleteDir(new File(file, element), monitor);
-//         }
-//
-//         // update monitor every 200ms
-//         final long time = System.currentTimeMillis();
-//         if (time > _deleteUIUpdateTime + 200) {
-//            _deleteUIUpdateTime = time;
-//            monitor.subTask(NLS.bind(Messages.Pref_Map_MonitorMessage_DeletedOfflineImages, file.toString()));
-//         }
-//
-//      }
-//
-//      // The directory is now empty so delete it
-//      final boolean isDeleted = file.delete();
-//
-//      // canceled must be checked before isDeleted because this returns false when the monitor is canceled
-//      if (monitor.isCanceled()) {
-//         return;
-//      }
-//
-//      if (isDeleted == false) {
-//         _isDeleteError = true;
-//         monitor.setCanceled(true);
-//      }
-//   }
 
    /**
     * !!!!! Recursive funktion to count files/size !!!!!
@@ -2593,29 +2583,47 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
    private void onAction_MapProvider_Import() {
 
-      final FileDialog dialog = new FileDialog(getShell(), SWT.OPEN);
+      final FileDialog fileDialog = new FileDialog(getShell(), SWT.OPEN | SWT.MULTI);
 
-      dialog.setText(Messages.Pref_Map_Dialog_Import_Title);
-      dialog.setFilterPath(_prefStore.getString(IMPORT_FILE_PATH));
+      fileDialog.setText(Messages.Pref_Map_Dialog_Import_Title);
+      fileDialog.setFilterPath(_prefStore.getString(IMPORT_FILE_PATH));
 
-      dialog.setFilterExtensions(new String[] { "*.*", "xml" });//$NON-NLS-1$ //$NON-NLS-2$
-      dialog.setFilterNames(new String[] {
+      fileDialog.setFilterExtensions(new String[] { "*.*", "xml" });//$NON-NLS-1$ //$NON-NLS-2$
+      fileDialog.setFilterNames(new String[] {
             Messages.PrefPageMapProviders_Pref_Map_FileDialog_AllFiles,
             Messages.PrefPageMapProviders_Pref_Map_FileDialog_XmlFiles });
 
-      dialog.setFileName(_selectedMapProvider.getId() + XML_EXTENSION);
+      fileDialog.setFileName(_selectedMapProvider.getId() + XML_EXTENSION);
 
-      final String selectedFilePath = dialog.open();
+      // open file dialog
+      final String firstFilePathName = fileDialog.open();
 
-      if (selectedFilePath == null) {
-         // dialog is canceled
+      // check if user canceled the dialog
+      if (firstFilePathName == null) {
          return;
       }
 
-      // keep path
-      _prefStore.setValue(IMPORT_FILE_PATH, selectedFilePath);
+      // get folder path from file path
+      final java.nio.file.Path firstFilePath = Paths.get(firstFilePathName);
+      final String filePathFolder = firstFilePath.getParent().toString();
 
-      doImportMP(selectedFilePath);
+      // keep last selected path
+      _prefStore.setValue(IMPORT_FILE_PATH, filePathFolder);
+
+      /*
+       * Convert file names into file paths
+       */
+      final String[] allSelectedFileNames = fileDialog.getFileNames();
+      final ArrayList<String> allFilesPaths = new ArrayList<>();
+
+      for (final String fileName : allSelectedFileNames) {
+
+         final java.nio.file.Path filePath = Paths.get(filePathFolder, fileName);
+
+         allFilesPaths.add(filePath.toString());
+      }
+
+      doImportMP_Multiple(allFilesPaths);
    }
 
    private void onAction_MapProvider_Update() {
@@ -2994,22 +3002,31 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
             return;
          }
 
-         // create temp file name
-         final IPath stateLocation = Platform.getStateLocation(TourbookPlugin.getDefault().getBundle());
-         final String tempFilePath = stateLocation
-               .append(Long.toString(System.nanoTime()) + XML_EXTENSION)
-               .toOSString();
+         String tempFilePath = null;
 
-         // load file from internet
-         if (loadFile(url, tempFilePath) == false) {
+         try {
+
+            // create temp file name
+            final java.nio.file.Path tempFile = Files.createTempFile("MapProvider_", XML_EXTENSION);
+
+            tempFilePath = tempFile.toString();
+
+            // load file from internet
+            if (loadFile(url, tempFilePath) == false) {
+               return;
+            }
+
+            doImportMP(tempFilePath);
+
+         } catch (final IOException e) {
+            StatusUtil.showStatus(e);
+         } finally {
+
+            // delete temp file
             deleteFile(tempFilePath);
-            return;
          }
 
-         doImportMP(tempFilePath);
 
-         // delete temp file
-         deleteFile(tempFilePath);
       }
    }
 

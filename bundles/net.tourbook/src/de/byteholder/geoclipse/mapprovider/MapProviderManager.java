@@ -221,64 +221,64 @@ public class MapProviderManager {
    private static final String ATTR_PMP_BRIGHTNESS_FOR_NEXT_MP    = "BrightnessForNextMP";   //$NON-NLS-1$
 
    // transparent pixel
-   private static final String        TAG_TRANSPARENT_COLOR        = "TransparentColor";              //$NON-NLS-1$
-   private static final String        ATTR_TRANSPARENT_COLOR_VALUE = "Value";                         //$NON-NLS-1$
+   private static final String                             TAG_TRANSPARENT_COLOR        = "TransparentColor";                       //$NON-NLS-1$
+   private static final String                             ATTR_TRANSPARENT_COLOR_VALUE = "Value";                                  //$NON-NLS-1$
 
    /**
     * Id for the default map provider
     */
-   public static String               DEFAULT_MAP_PROVIDER_ID      = OSMMapProvider.FACTORY_ID;
+   public static String                                    DEFAULT_MAP_PROVIDER_ID      = OSMMapProvider.FACTORY_ID;
 
    /**
     * Size for osm images
     */
-   public static final int            OSM_IMAGE_SIZE               = 256;
-   public static final String         DEFAULT_IMAGE_SIZE           = Integer.toString(OSM_IMAGE_SIZE);
-   public static final String[]       IMAGE_SIZE                   =
+   public static final int                                 OSM_IMAGE_SIZE               = 256;
+   public static final String                              DEFAULT_IMAGE_SIZE           = Integer.toString(OSM_IMAGE_SIZE);
+   public static final String[]                            IMAGE_SIZE                   =
          {
                DEFAULT_IMAGE_SIZE,
-               "300",                                                                                 //$NON-NLS-1$
-               "400",                                                                                 //$NON-NLS-1$
-               "500",                                                                                 //$NON-NLS-1$
-               "512",                                                                                 //$NON-NLS-1$
-               "600",                                                                                 //$NON-NLS-1$
-               "700",                                                                                 //$NON-NLS-1$S
-               "768",                                                                                 //$NON-NLS-1$
-               "800",                                                                                 //$NON-NLS-1$
-               "900",                                                                                 //$NON-NLS-1$
-               "1000",                                                                                //$NON-NLS-1$
-               "1024",                                                                                //$NON-NLS-1$
+               "300",                                                                                                               //$NON-NLS-1$
+               "400",                                                                                                               //$NON-NLS-1$
+               "500",                                                                                                               //$NON-NLS-1$
+               "512",                                                                                                               //$NON-NLS-1$
+               "600",                                                                                                               //$NON-NLS-1$
+               "700",                                                                                                               //$NON-NLS-1$S
+               "768",                                                                                                               //$NON-NLS-1$
+               "800",                                                                                                               //$NON-NLS-1$
+               "900",                                                                                                               //$NON-NLS-1$
+               "1000",                                                                                                              //$NON-NLS-1$
+               "1024",                                                                                                              //$NON-NLS-1$
          };
 
-   private static final ReentrantLock WMS_LOCK                     = new ReentrantLock();
+   private static final ReentrantLock                      WMS_LOCK                     = new ReentrantLock();
 
-   private static MapProviderManager  _instance;
+   private static MapProviderManager                       _instance;
 
    /**
     * contains all available map providers, including empty map provider and map profiles
     */
-   private static ArrayList<MP>       _allMapProviders;
+   private static ArrayList<MP>                            _allMapProviders;
 
-   private static IPreferenceStore    _prefStore                   = TourbookPlugin.getPrefStore();
+   private static IPreferenceStore                         _prefStore                   = TourbookPlugin.getPrefStore();
 
-   private static boolean             _isDeleteError;
-   private static long                _deleteUIUpdateTime;
+   private static boolean                                  _isDeleteError;
+   private static long                                     _deleteUIUpdateTime;
 
-   private static int                 _deleteUIDeletedFiles;
-   private static int                 _deleteUICheckedFiles;
+   private static int                                      _deleteUIDeletedFiles;
+   private static int                                      _deleteUICheckedFiles;
+
    /**
     * Default map provider
     */
-   private static MPPlugin            _mpDefault;
+   private static MPPlugin                                 _mpDefault;
 
-   private static ArrayList<String>   _errorLog                    = new ArrayList<>();
+   private static ArrayList<String>                        _errorLog                    = new ArrayList<>();
 
-   //
-   private static final ListenerList<IMapProviderListener> _mapProviderListeners = new ListenerList<>(ListenerList.IDENTITY);
+   private static final ListenerList<IMapProviderListener> _mapProviderListeners        = new ListenerList<>(ListenerList.IDENTITY);
 
    private static Map2View                                 _map2View;
 
-   private boolean                    _isLogImportInfo             = false;
+   private boolean                                         _isLogImportInfo             = false;
 
    private MapProviderManager() {}
 
@@ -1549,7 +1549,7 @@ public class MapProviderManager {
 
    /**
     * @param importFilePath
-    * @return Returns the imported map provider or <code>null</code> when an import error
+    * @return Returns the imported map providers or <code>null</code> when an import error
     *         occured<br>
     *         <br>
     *         Multiple map providers are returned when a map profile contains map providers which
@@ -1561,13 +1561,13 @@ public class MapProviderManager {
       if (importedMPList.size() > 0) {
 
          // validate map provider
-         final ArrayList<MP> isMPValid = validateImportedMP(importedMPList);
+         final ArrayList<MP> allValidMPs = validateImportedMP(importedMPList);
 
-         if (isMPValid != null) {
+         if (allValidMPs != null) {
             saveState_MapProviders_VisibleInUI();
          }
 
-         return isMPValid;
+         return allValidMPs;
       }
 
       return null;
