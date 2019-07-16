@@ -2914,13 +2914,7 @@ public class Map2View extends ViewPart implements
             final ArrayList<Photo> galleryPhotos = tourData.getGalleryPhotos();
 
             if (galleryPhotos != null) {
-               allPhotos.addAll(galleryPhotos);
-               
-               /*playing with photos next 3 lines*/
-               for (final  Photo foto : galleryPhotos) {
-                  System.out.println("photo: " + foto.imagePathName + " " + foto.imageFileName);
-               }             
-               
+               allPhotos.addAll(galleryPhotos);           
             }
          }
       }

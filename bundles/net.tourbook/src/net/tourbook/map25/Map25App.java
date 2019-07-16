@@ -288,7 +288,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 			public void onMapEvent(final Event e, final MapPosition mapPosition) {
 
 				_map25View.fireSyncMapEvent(mapPosition, 0);
-				//debugPrint("############### Orientation: " +  _map25View.getOrientation());  //$NON-NLS-1$
+				//debugPrint(" map25: " + "############### Orientation: " +  _map25View.getOrientation());  //$NON-NLS-1$
 			}
 		});
 	}
@@ -326,26 +326,26 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 		_mf_prefered_language = Locale.getDefault().toString();
 		_httpFactory = new OkHttpEngineMT.OkHttpFactoryMT();
 		
-      debugPrint("# create Layers: prefered language:           " + _mf_prefered_language);//$NON-NLS-1$
-      debugPrint("# create Layers: Map Name:                    " +_selectedMapProvider.name); //$NON-NLS-1$
-      debugPrint("# create Layers: Map ONLINE/OFFLINE:          " +_selectedMapProvider.is_mf_Map); //$NON-NLS-1$
-      debugPrint("# create Layers: Map mf_MapFilepath:          " +_selectedMapProvider.mf_MapFilepath); //$NON-NLS-1$
-      debugPrint("# create Layers: Map mf_ThemeFilepath:        " +_selectedMapProvider.mf_ThemeFilepath); //$NON-NLS-1$
-      debugPrint("# create Layers: Map encoding:                " +_selectedMapProvider.tileEncoding.toString()); //$NON-NLS-1$
-      debugPrint("# create Layers: prefered language:           " + _mf_prefered_language); //$NON-NLS-1$
+      debugPrint(" map25: " + "# create Layers: prefered language:           " + _mf_prefered_language);//$NON-NLS-1$
+      debugPrint(" map25: " + "# create Layers: Map Name:                    " +_selectedMapProvider.name); //$NON-NLS-1$
+      debugPrint(" map25: " + "# create Layers: Map ONLINE/OFFLINE:          " +_selectedMapProvider.is_mf_Map); //$NON-NLS-1$
+      debugPrint(" map25: " + "# create Layers: Map mf_MapFilepath:          " +_selectedMapProvider.mf_MapFilepath); //$NON-NLS-1$
+      debugPrint(" map25: " + "# create Layers: Map mf_ThemeFilepath:        " +_selectedMapProvider.mf_ThemeFilepath); //$NON-NLS-1$
+      debugPrint(" map25: " + "# create Layers: Map encoding:                " +_selectedMapProvider.tileEncoding.toString()); //$NON-NLS-1$
+      debugPrint(" map25: " + "# create Layers: prefered language:           " + _mf_prefered_language); //$NON-NLS-1$
 
 		if (_selectedMapProvider.tileEncoding  != TileEncoding.MF) { // NOT mapsforge
 			_isOfflineMap = false;
 			final UrlTileSource tileSource = createTileSource(_selectedMapProvider, _httpFactory);
-			debugPrint("# create Layers OSCI: step 1: " + mMap.layers().toString() + " size: " + mMap.layers().size());  // result 1
+			debugPrint(" map25: " + "# create Layers OSCI: step 1: " + mMap.layers().toString() + " size: " + mMap.layers().size());  // result 1
 			//tileSource.getDataSource().dispose();
 			//_l = mMap.setBaseMap(tileSource);
 
 			//loadTheme(null);
 			setupMap(_selectedMapProvider, tileSource);
-         debugPrint("# create Layers OSCI: step 2: " + mMap.layers().toString() + " size: " + mMap.layers().size());  // result 3
+         debugPrint(" map25: " + "# create Layers OSCI: step 2: " + mMap.layers().toString() + " size: " + mMap.layers().size());  // result 3
 
-			debugPrint("############# create Layers: is online map with theme: " + _selectedMapProvider.theme.name()); //$NON-NLS-1$
+			debugPrint(" map25: " + "############# create Layers: is online map with theme: " + _selectedMapProvider.theme.name()); //$NON-NLS-1$
 		} else {  //offline maps
 			_isOfflineMap = true;
 			//_httpFactory = null;
@@ -362,7 +362,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 			//_l = mMap.setBaseMap(tileSource);
 			
 			
-         debugPrint("# create Layers: mf step 1: " + mMap.layers().toString() + " size: " + mMap.layers().size());  // result 1
+         debugPrint(" map25: " + "# create Layers: mf step 1: " + mMap.layers().toString() + " size: " + mMap.layers().size());  // result 1
          // here we have only one layer, that we need for mapsource switching
 			
          // the next block was active for single mapsource
@@ -370,28 +370,28 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 			//tileSource.setMapFile(_mf_mapFilePath);
 			//tileSource.setPreferredLanguage(_mf_prefered_language);
          
-         debugPrint("# create Layers: mf step 2: " + mMap.layers().toString() + " size: " + mMap.layers().size());  // result 1
+         debugPrint(" map25: " + "# create Layers: mf step 2: " + mMap.layers().toString() + " size: " + mMap.layers().size());  // result 1
 			//_l = mMap.setBaseMap(tileSource);
 		
-         debugPrint("# create Layers: mf step 3: " + mMap.layers().toString() + " size: " + mMap.layers().size());  // result ?
+         debugPrint(" map25: " + "# create Layers: mf step 3: " + mMap.layers().toString() + " size: " + mMap.layers().size());  // result ?
 			
 			
 			_mf_IsThemeFromFile = _selectedMapProvider.mf_IsThemeFromFile;
 			_mf_themeFilePath = checkFile(_selectedMapProvider.mf_ThemeFilepath); //check theme path, null when not found
 			_mf_theme_styleID = _selectedMapProvider.mf_ThemeStyle;
 
-			debugPrint("# create Layers: is mapsforge map using : " + _mf_mapFilePath); //$NON-NLS-1$
-			debugPrint("# create Layers: is mapsforge theme : " + _mf_themeFilePath); //$NON-NLS-1$
-			debugPrint("# create Layers: is mapsforge style : " + _mf_theme_styleID); //$NON-NLS-1$
+			debugPrint(" map25: " + "# create Layers: is mapsforge map using : " + _mf_mapFilePath); //$NON-NLS-1$
+			debugPrint(" map25: " + "# create Layers: is mapsforge theme : " + _mf_themeFilePath); //$NON-NLS-1$
+			debugPrint(" map25: " + "# create Layers: is mapsforge style : " + _mf_theme_styleID); //$NON-NLS-1$
 					
 			//setupMap(_selectedMapProvider, tileSource); //single map file
 			setupMap(_selectedMapProvider, tileSource); //multi map file
 			
 			loadTheme(_mf_theme_styleID);
 			
-         debugPrint("# create Layers: mf step 4: " + mMap.layers().toString() + " size: " + mMap.layers().size());  // result ?
+         debugPrint(" map25: " + "# create Layers: mf step 4: " + mMap.layers().toString() + " size: " + mMap.layers().size());  // result ?
 			
-			debugPrint("# create Layers: leaving"); //$NON-NLS-1$
+			debugPrint(" map25: " + "# create Layers: leaving"); //$NON-NLS-1$
 		}  // end mf_ maps
 
 		setupMap_Layers();
@@ -426,17 +426,17 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	}  // end createLayers()
 
 	protected void loadTheme(final String styleId) {
-		debugPrint("####### loadtheme: entering styleID: " + styleId); //$NON-NLS-1$
+		debugPrint(" map25: " + "####### loadtheme: entering styleID: " + styleId); //$NON-NLS-1$
 		
 		if (!_isOfflineMap) { // NOT mapsforge
-			debugPrint("####### loadtheme: is online map setting textscale " +   _vtm_TextScale); //$NON-NLS-1$
+			debugPrint(" map25: " + "####### loadtheme: is online map setting textscale " +   _vtm_TextScale); //$NON-NLS-1$
 			//CanvasAdapter.textScale = _vtm_TextScale;
 			// if problems with switching themes via keyboard, maybe this block is the problem
 			/*if (_selectedMapProvider.theme != null && _selectedMapProvider.theme != VtmThemes.MAPZEN && _selectedMapProvider.theme != VtmThemes.OPENMAPTILES) {
-				debugPrint("############# setMapProvider: onlinemap using internal theme: " + _selectedMapProvider.theme); //$NON-NLS-1$
+				debugPrint(" map25: " + "############# setMapProvider: onlinemap using internal theme: " + _selectedMapProvider.theme); //$NON-NLS-1$
 				mMap.setTheme((ThemeFile) _selectedMapProvider.theme);			
 			} else { //when null or when not working MAPZEN or OPENMAPTILES is selected, using DEFAULT theme instead
-				debugPrint("############# setMapProvider: onlinemap using internal default theme: " + _selectedMapProvider.theme); //$NON-NLS-1$
+				debugPrint(" map25: " + "############# setMapProvider: onlinemap using internal default theme: " + _selectedMapProvider.theme); //$NON-NLS-1$
 				mMap.setTheme(VtmThemes.DEFAULT);
 			}*/
 			mMap.clearMap();
@@ -445,11 +445,11 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 		
 		else {  //is mapsforge map
 
-			//debugPrint("####### loadtheme: is offline map setting textscale " +   _mf_TextScale); //$NON-NLS-1$
-			//debugPrint("####### loadtheme: is offline map IsThemeFileFromFile " +  _mf_IsThemeFromFile); //$NON-NLS-1$
+			//debugPrint(" map25: " + "####### loadtheme: is offline map setting textscale " +   _mf_TextScale); //$NON-NLS-1$
+			//debugPrint(" map25: " + "####### loadtheme: is offline map IsThemeFileFromFile " +  _mf_IsThemeFromFile); //$NON-NLS-1$
 			
 			if (_mf_IsThemeFromFile) { //external theme
-			   debugPrint("####### loadtheme: using external theme"); //$NON-NLS-1$
+			   debugPrint(" map25: " + "####### loadtheme: using external theme"); //$NON-NLS-1$
 				mMap.setTheme(new ExternalRenderTheme(_mf_themeFilePath, new XmlRenderThemeMenuCallback() {
 					@Override
 					public Set<String> getCategories(XmlRenderThemeStyleMenu renderThemeStyleMenu) {
@@ -462,7 +462,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 							return null;
 						} else 
 						   ;
-							debugPrint("####### loadtheme:  selected Style: " + renderThemeStyleLayer.getTitle(_mf_prefered_language)); //$NON-NLS-1$
+							debugPrint(" map25: " + "####### loadtheme:  selected Style: " + renderThemeStyleLayer.getTitle(_mf_prefered_language)); //$NON-NLS-1$
 						Set<String> categories = renderThemeStyleLayer.getCategories();
 						int n = 0;
 						int overlaycount = renderThemeStyleLayer.getOverlays().size();
@@ -470,16 +470,16 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 							if (overlay.isEnabled())
 								categories.addAll(overlay.getCategories());
 						}
-						debugPrint("####### loadtheme: leaving"); //$NON-NLS-1$
+						debugPrint(" map25: " + "####### loadtheme: leaving"); //$NON-NLS-1$
 						return categories;
 					}
 				}));
 			} else { //internal theme
 				if (_selectedMapProvider.theme != null && _selectedMapProvider.theme != VtmThemes.MAPZEN && _selectedMapProvider.theme != VtmThemes.OPENMAPTILES) {
-					debugPrint("####### loadtheme: using internal theme: " + _selectedMapProvider.theme); //$NON-NLS-1$
+					debugPrint(" map25: " + "####### loadtheme: using internal theme: " + _selectedMapProvider.theme); //$NON-NLS-1$
 					mMap.setTheme((ThemeFile) _selectedMapProvider.theme);				
 				} else { //when null or when not working MAPZEN or OPENMAPTILES is selected, using DEFAULT theme instead
-					debugPrint("####### loadtheme: using internal default theme: " + _selectedMapProvider.theme); //$NON-NLS-1$
+					debugPrint(" map25: " + "####### loadtheme: using internal default theme: " + _selectedMapProvider.theme); //$NON-NLS-1$
 					mMap.setTheme(VtmThemes.DEFAULT);
 				}
 				_mf_IsThemeFromFile = false;
@@ -663,30 +663,30 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	   //saveState();  //doesnt help
 	   Boolean onlineOfflineStatusHasChanged = false;
       _mf_mapFilePath =  mapProvider.mf_MapFilepath;
-      debugPrint("############# setMapProvider entering setMapProvider: _mf_mapFilePath:" + _mf_mapFilePath + " _last_mf_mapFilePath: " + _last_mf_mapFilePath); //$NON-NLS-1$
-      debugPrint("############# setMapProvider layers before: " + mMap.layers().toString() + " size: " + mMap.layers().size()); //$NON-NLS-1$
-	   debugPrint("############# setMapProvider entering setMapProvider"); //$NON-NLS-1$
-		debugPrint("############# setMapProvider layers before: " + mMap.layers().toString() + " size: " + mMap.layers().size()); //$NON-NLS-1$ //$NON-NLS-2$
+      debugPrint(" map25: " + "############# setMapProvider entering setMapProvider: _mf_mapFilePath:" + _mf_mapFilePath + " _last_mf_mapFilePath: " + _last_mf_mapFilePath); //$NON-NLS-1$
+      debugPrint(" map25: " + "############# setMapProvider layers before: " + mMap.layers().toString() + " size: " + mMap.layers().size()); //$NON-NLS-1$
+	   debugPrint(" map25: " + "############# setMapProvider entering setMapProvider"); //$NON-NLS-1$
+		debugPrint(" map25: " + "############# setMapProvider layers before: " + mMap.layers().toString() + " size: " + mMap.layers().size()); //$NON-NLS-1$ //$NON-NLS-2$
 
 		//if NOT mapsforge map
       if (!_mf_mapFilePath.equals(_last_mf_mapFilePath) || mapProvider.is_mf_Map !=  _last_is_mf_Map  ) {  //only reloading layers when neccercary 
-         debugPrint("############# setMapProvider switchin offline/one to: " + mapProvider.is_mf_Map); //$NON-NLS-1$
+         debugPrint(" map25: " + "############# setMapProvider switchin offline/one to: " + mapProvider.is_mf_Map); //$NON-NLS-1$
          onlineOfflineStatusHasChanged = true;
          removeLayers();
       }
       
       //if NOT mapsforge map      
-		//debugPrint("############# setMapProvider MapProviderENCODING: " + mapProvider.tileEncoding); //$NON-NLS-1$
+		//debugPrint(" map25: " + "############# setMapProvider MapProviderENCODING: " + mapProvider.tileEncoding); //$NON-NLS-1$
 		if (mapProvider.tileEncoding  != TileEncoding.MF) { // NOT mapsforge
 			this._isOfflineMap = false;
 			CanvasAdapter.textScale = _vtm_TextScale;
 			CanvasAdapter.userScale = _vtm_UserScale;
-			debugPrint("############# setMapProvider: setMapProvider NOT mf Map"); //$NON-NLS-1$
-			//debugPrint("############# setMapProvider: using internal default theme: " + _selectedMapProvider.theme); //$NON-NLS-1$
+			debugPrint(" map25: " + "############# setMapProvider: setMapProvider NOT mf Map"); //$NON-NLS-1$
+			//debugPrint(" map25: " + "############# setMapProvider: using internal default theme: " + _selectedMapProvider.theme); //$NON-NLS-1$
 			final UrlTileSource tileSource = createTileSource(mapProvider, _httpFactory);
 			_layer_BaseMap.setTileSource(tileSource);
 			_layer_BaseMap.setRenderTheme(ThemeLoader.load(VtmThemes.DEFAULT));  //if active, key 1-5 nor working, if not active "ERROR VectorTileLoader - no theme is set"
-			//debugPrint("############# setMapProvider: set theme to-> " + mapProvider.name); //$NON-NLS-1$
+			//debugPrint(" map25: " + "############# setMapProvider: set theme to-> " + mapProvider.name); //$NON-NLS-1$
 
          if (onlineOfflineStatusHasChanged) {
             setupMap(mapProvider, tileSource);
@@ -712,10 +712,10 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
          
          if (mapProvider.theme != null && mapProvider.theme != VtmThemes.MAPZEN && mapProvider.theme != VtmThemes.OPENMAPTILES) {
 			//if (_selectedMapProvider.theme != null && _selectedMapProvider.theme != VtmThemes.MAPZEN && _selectedMapProvider.theme != VtmThemes.OPENMAPTILES) {
-				debugPrint("############# setMapProvider: onlinemap using internal theme: " + mapProvider.theme); //$NON-NLS-1$
+				debugPrint(" map25: " + "############# setMapProvider: onlinemap using internal theme: " + mapProvider.theme); //$NON-NLS-1$
 				mMap.setTheme((ThemeFile) mapProvider.theme);			
 			} else { //when null or when not working MAPZEN or OPENMAPTILES is selected, using DEFAULT theme instead
-				debugPrint("############# setMapProvider: onlinemap MAPZEN or OPENMAPTILES is selected, using internal default theme"); //$NON-NLS-1$
+				debugPrint(" map25: " + "############# setMapProvider: onlinemap MAPZEN or OPENMAPTILES is selected, using internal default theme"); //$NON-NLS-1$
 				mMap.setTheme(VtmThemes.DEFAULT);
 			}
 
@@ -727,14 +727,14 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 			this._isOfflineMap = true;
 			CanvasAdapter.textScale = _mf_TextScale;
 			CanvasAdapter.userScale = _mf_UserScale;
-			debugPrint("############# setMapProvider: setMapProvider its mf Map"); //$NON-NLS-1$
+			debugPrint(" map25: " + "############# setMapProvider: setMapProvider its mf Map"); //$NON-NLS-1$
 		
-			debugPrint("############# setMapProvider: setMap   to      " + mapProvider.mf_MapFilepath); //$NON-NLS-1$
-			//debugPrint("############# setMapProvider: setTheme to      " + mapProvider.mf_ThemeFilepath); //$NON-NLS-1$
-			//debugPrint("############# setMapProvider: setStyle to      " + mapProvider.mf_ThemeStyle); //$NON-NLS-1$
-			debugPrint("############# setMapProvider: is_mf_Map     " + mapProvider.is_mf_Map); //$NON-NLS-1$
-			debugPrint("############# setMapProvider: isThemeFromFile  " + mapProvider.mf_IsThemeFromFile); //$NON-NLS-1$
-			//debugPrint("############# setMapProvider: name             " + mapProvider.name); //$NON-NLS-1$
+			debugPrint(" map25: " + "############# setMapProvider: setMap   to      " + mapProvider.mf_MapFilepath); //$NON-NLS-1$
+			//debugPrint(" map25: " + "############# setMapProvider: setTheme to      " + mapProvider.mf_ThemeFilepath); //$NON-NLS-1$
+			//debugPrint(" map25: " + "############# setMapProvider: setStyle to      " + mapProvider.mf_ThemeStyle); //$NON-NLS-1$
+			debugPrint(" map25: " + "############# setMapProvider: is_mf_Map     " + mapProvider.is_mf_Map); //$NON-NLS-1$
+			debugPrint(" map25: " + "############# setMapProvider: isThemeFromFile  " + mapProvider.mf_IsThemeFromFile); //$NON-NLS-1$
+			//debugPrint(" map25: " + "############# setMapProvider: name             " + mapProvider.name); //$NON-NLS-1$
 
 			_mf_mapFilePath =  mapProvider.mf_MapFilepath;
 			
@@ -747,7 +747,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 				throw new IllegalArgumentException("############# setMapProvider: cannot read mapfile: " + _mf_mapFilePath); //$NON-NLS-1$
 			} else {
 			   ;
-				debugPrint("############# setMapProvider: Map Path: " + _mf_mapFilePath); //$NON-NLS-1$
+				debugPrint(" map25: " + "############# setMapProvider: Map Path: " + _mf_mapFilePath); //$NON-NLS-1$
 			}
 
 			/* When switching subthemes buildings disapear and
@@ -815,29 +815,29 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 				this._mf_IsThemeFromFile = true;
 		
 				if (_mf_themeFilePath == null) {
-					debugPrint("############# setMapProvider: Theme not found: " + _mf_mapFilePath + " using default DEFAULT"); //$NON-NLS-1$ //$NON-NLS-2$
+					debugPrint(" map25: " + "############# setMapProvider: Theme not found: " + _mf_mapFilePath + " using default DEFAULT"); //$NON-NLS-1$ //$NON-NLS-2$
 					mMap.setTheme(VtmThemes.DEFAULT);   // ThemeLoader.load(_mf_themeFilePath));
 				} else {
 					if (!_mf_themeFilePath.equals(_last_mf_themeFilePath) || !_mf_theme_styleID.equals(_last_mf_theme_styleID) || _mf_IsThemeFromFile != _last_mf_IsThemeFromFile ) {  //only parsing when different file	
-					   debugPrint("############# setMapProvider: Theme loader started"); //$NON-NLS-1$
+					   debugPrint(" map25: " + "############# setMapProvider: Theme loader started"); //$NON-NLS-1$
 						this._mf_IRenderTheme = ThemeLoader.load(_mf_themeFilePath);
-						debugPrint("############# setMapProvider: Theme loader done, now activating..."); //$NON-NLS-1$
+						debugPrint(" map25: " + "############# setMapProvider: Theme loader done, now activating..."); //$NON-NLS-1$
 						_layer_BaseMap.setRenderTheme(_mf_IRenderTheme);
 						////mMap.setTheme(_mf_IRenderTheme);
 						loadTheme(mapProvider.mf_ThemeStyle);  //whene starting with onlinemaps and switching to mf, osmarender is used ??? when uncommented it ok
-						debugPrint("############# setMapProvider: ...activaded"); //$NON-NLS-1$
+						debugPrint(" map25: " + "############# setMapProvider: ...activaded"); //$NON-NLS-1$
 						//_mf_IsThemeFromFile = true;
 					} else {
 					   ;
-						debugPrint("############# setMapProvider: mapprovider has the same theme file and style"); //$NON-NLS-1$
+						debugPrint(" map25: " + "############# setMapProvider: mapprovider has the same theme file and style"); //$NON-NLS-1$
 					}
 				}
 			} else { //internal theme
 				if (_selectedMapProvider.theme != null && _selectedMapProvider.theme != VtmThemes.MAPZEN && _selectedMapProvider.theme != VtmThemes.OPENMAPTILES) {
-					debugPrint("############# setMapProvider: using internal theme: " + _selectedMapProvider.theme); //$NON-NLS-1$
+					debugPrint(" map25: " + "############# setMapProvider: using internal theme: " + _selectedMapProvider.theme); //$NON-NLS-1$
 					mMap.setTheme((ThemeFile) _selectedMapProvider.theme);				
 				} else { //when null or when not working MAPZEN or OPENMAPTILES is selected, using DEFAULT theme instead
-					debugPrint("############# setMapProvider: using internal default theme: " + _selectedMapProvider.theme); //$NON-NLS-1$
+					debugPrint(" map25: " + "############# setMapProvider: using internal default theme: " + _selectedMapProvider.theme); //$NON-NLS-1$
 					mMap.setTheme(VtmThemes.DEFAULT);
 				}
 				_mf_IsThemeFromFile = false;
@@ -849,14 +849,14 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       mMap.clearMap();
       mMap.updateMap(true);	
 
-		//debugPrint("############# setMapProvider: set language : " + _mf_prefered_language); //$NON-NLS-1$
+		//debugPrint(" map25: " + "############# setMapProvider: set language : " + _mf_prefered_language); //$NON-NLS-1$
       this._last_mf_themeFilePath = _mf_themeFilePath;
 		this._last_mf_theme_styleID = _mf_theme_styleID;
 		this._last_mf_mapFilePath = _mf_mapFilePath;
 		this._last_mf_IsThemeFromFile = _mf_IsThemeFromFile;
 		this._last_is_mf_Map = _isOfflineMap;
 		_selectedMapProvider = mapProvider;
-		debugPrint("############# setMapProvider leaving: layers now: " + mMap.layers().toString() + " size: " + mMap.layers().size());
+		debugPrint(" map25: " + "############# setMapProvider leaving: layers now: " + mMap.layers().toString() + " size: " + mMap.layers().size());
 	}
 
 	  /**
@@ -864,13 +864,13 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
     * this is done here, after that all layers must be added again. but that is a different story.
     */
    private void removeLayers() {
-      debugPrint("### removeLayers: layers before: " + mMap.layers().toString() + " size: " + mMap.layers().size());
+      debugPrint(" map25: " + "### removeLayers: layers before: " + mMap.layers().toString() + " size: " + mMap.layers().size());
       //saveState();
       for( int n = mMap.layers().size() - 1; n > 0 ;n--) { 
-         debugPrint("### removeLayers: layer " + n + "/" + mMap.layers().size()+ " " + mMap.layers().get(n).toString());
+         debugPrint(" map25: " + "### removeLayers: layer " + n + "/" + mMap.layers().size()+ " " + mMap.layers().get(n).toString());
          mMap.layers().remove(n);
       }
-      debugPrint("### removeLayers: layers after: " + mMap.layers().toString() + " size: " + mMap.layers().size());
+      debugPrint(" map25: " + "### removeLayers: layers after: " + mMap.layers().toString() + " size: " + mMap.layers().size());
    }
 	
 	/**
@@ -879,7 +879,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	 * @param tileSource
 	 */
 	private void setupMap(final Map25Provider mapProvider, final UrlTileSource tileSource) {
-	   debugPrint("############# setupMap:  online entering"); //$NON-NLS-1$
+	   debugPrint(" map25: " + "############# setupMap:  online entering"); //$NON-NLS-1$
 		
       CanvasAdapter.textScale = _vtm_TextScale;
       CanvasAdapter.userScale = _vtm_UserScale;
@@ -899,12 +899,12 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
 		mMap.setBaseMap(_layer_BaseMap);
 
-		debugPrint("############# setupMap:  mMap.setTheme(getTheme(mapProvider)): " + getTheme(mapProvider)); //$NON-NLS-1$
-		//debugPrint("############# setupMap:  Map25ProviderManager.getDefaultTheme(TileEncoding.VTM)" + Map25ProviderManager.getDefaultTheme(TileEncoding.VTM));  //$NON-NLS-1$
+		debugPrint(" map25: " + "############# setupMap:  mMap.setTheme(getTheme(mapProvider)): " + getTheme(mapProvider)); //$NON-NLS-1$
+		//debugPrint(" map25: " + "############# setupMap:  Map25ProviderManager.getDefaultTheme(TileEncoding.VTM)" + Map25ProviderManager.getDefaultTheme(TileEncoding.VTM));  //$NON-NLS-1$
 		mMap.setTheme(getTheme(mapProvider));
 		//mMap.setTheme((ThemeFile) Map25ProviderManager.getDefaultTheme(TileEncoding.VTM));
 
-		debugPrint("############# setupMap:  leaving"); //$NON-NLS-1$
+		debugPrint(" map25: " + "############# setupMap:  leaving"); //$NON-NLS-1$
 	}
 
 
@@ -915,8 +915,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	 */
 	//private void setupMap(final Map25Provider mapProvider, final MapFileTileSource tileSource) {
 	private void setupMap(final Map25Provider mapProvider, final MultiMapFileTileSource tileSource) {	
-	   debugPrint("############# setupMap:  mapsforge entering"); //$NON-NLS-1$
-      debugPrint("############# setupMap: layers before: " + mMap.layers().toString() + " size: " + mMap.layers().size());		
+	   debugPrint(" map25: " + "############# setupMap:  mapsforge entering"); //$NON-NLS-1$
+      debugPrint(" map25: " + "############# setupMap: layers before: " + mMap.layers().toString() + " size: " + mMap.layers().size());		
       CanvasAdapter.textScale = _mf_TextScale;
       CanvasAdapter.userScale = _mf_UserScale;
 		
@@ -925,10 +925,10 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       _mf_theme_styleID = mapProvider.mf_ThemeStyle;    
       _mf_mapFilePath = mapProvider.mf_MapFilepath;
    
-      debugPrint("############# setupMap: is mapsforge map using : " + _mf_mapFilePath); //$NON-NLS-1$
-      debugPrint("############# setupMap: is mapsforge theme : " + _mf_themeFilePath); //$NON-NLS-1$
-      debugPrint("############# setupMap: is mapsforge style : " + _mf_theme_styleID); //$NON-NLS-1$
-      debugPrint("############# setupMap: is mapsforge mapfilepath : " + _mf_mapFilePath); //$NON-NLS-1$
+      debugPrint(" map25: " + "############# setupMap: is mapsforge map using : " + _mf_mapFilePath); //$NON-NLS-1$
+      debugPrint(" map25: " + "############# setupMap: is mapsforge theme : " + _mf_themeFilePath); //$NON-NLS-1$
+      debugPrint(" map25: " + "############# setupMap: is mapsforge style : " + _mf_theme_styleID); //$NON-NLS-1$
+      debugPrint(" map25: " + "############# setupMap: is mapsforge mapfilepath : " + _mf_mapFilePath); //$NON-NLS-1$
      
 		_layer_BaseMap = new OsmTileLayerMT(mMap);
 
@@ -952,20 +952,20 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 			throw new IllegalArgumentException("cannot read mapfile: " + _mf_mapFilePath); //$NON-NLS-1$
 		} else {
 		   ;
-			debugPrint("############# setupMap: Map Path: " + _mf_mapFilePath); //$NON-NLS-1$
+			debugPrint(" map25: " + "############# setupMap: Map Path: " + _mf_mapFilePath); //$NON-NLS-1$
 		}
 		
 		/*if (_tileSourceOfflineMapCount == 0) {
 			;
 			//throw new IllegalArgumentException("cannot read mapfile: " + _selectedMapProvider.mf_MapFilepath); //$NON-NLS-1$
 		} else {
-			//debugPrint("############# setupMap: Map Path: " + _mf_mapFilePath); //$NON-NLS-1$
+			//debugPrint(" map25: " + "############# setupMap: Map Path: " + _mf_mapFilePath); //$NON-NLS-1$
 		}*/
 
 		//_mf_themeFilePath = checkFile(_selectedMapProvider.mf_ThemeFilepath);
 
 		if (_mf_themeFilePath == null) {
-			debugPrint("############# setupMap:  Theme not found: " + _mf_themeFilePath + " using default OSMARENDER"); //$NON-NLS-1$ //$NON-NLS-2$
+			debugPrint(" map25: " + "############# setupMap:  Theme not found: " + _mf_themeFilePath + " using default OSMARENDER"); //$NON-NLS-1$ //$NON-NLS-2$
 			mMap.setTheme(VtmThemes.OSMARENDER);   // ThemeLoader.load(_mf_themeFilePath));
 		} else {
 			;
@@ -976,11 +976,11 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 			////loadTheme(mapProvider.mf_ThemeStyle); //neccercary?
 		}
 
-		debugPrint("############# setupMap:  leaving"); //$NON-NLS-1$
+		debugPrint(" map25: " + "############# setupMap:  leaving"); //$NON-NLS-1$
 	}
 
 	private void setupMap_Layers() {
-	   debugPrint("################ setupMap_Layers:  entering"); //$NON-NLS-1$
+	   debugPrint(" map25: " + "################ setupMap_Layers:  entering"); //$NON-NLS-1$
 	   final Layers layers = mMap.layers();
 	   final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 	   
@@ -1019,7 +1019,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 		   
 			_layer_S3DB_Building.setEnabled(true);
 			_layer_S3DB_Building.setColored(true);
-			debugPrint("################ setupMap_Layers: adding S3DBlayer "); //$NON-NLS-1$
+			debugPrint(" map25: " + "################ setupMap_Layers: adding S3DBlayer "); //$NON-NLS-1$
 			//_layer_BaseMap.setRenderTheme(_mf_IRenderTheme); //again??
 			//layers.remove(_layer_Building);
 			layers.add(_layer_S3DB_Building);
@@ -1027,7 +1027,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 			// building
 		   
 			_layer_Building.setEnabled(true);
-			debugPrint("################ setupMap_Layers:Building Layer "); //$NON-NLS-1$
+			debugPrint(" map25: " + "################ setupMap_Layers:Building Layer "); //$NON-NLS-1$
 			//layers.remove(_layer_S3DB_Building);
 			layers.add(_layer_Building);
 		}
@@ -1038,7 +1038,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	   layers.add(_layer_Label);
 
       // MapBookmarks
-      //debugPrint("################ setupMap_Layers: calling constructor"); //$NON-NLS-1$
+      //debugPrint(" map25: " + "################ setupMap_Layers: calling constructor"); //$NON-NLS-1$
       _markertoolkit = new MarkerToolkit(MarkerToolkit.MarkerShape.STAR);
       if (config.isMarkerClustered) {
          _layer_MapBookmark = new ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(), _markertoolkit._markerRendererFactory, this);
@@ -1072,8 +1072,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	   _layer_TileInfo.setEnabled(false);
 	   layers.add(_layer_TileInfo);
 
-      debugPrint("################ setupMap_Layers: " + mMap.layers().toString() + " size: " + mMap.layers().size());
-	   debugPrint("################ setupMap_Layers:  leaving"); //$NON-NLS-1$
+      debugPrint(" map25: " + "################ setupMap_Layers: " + mMap.layers().toString() + " size: " + mMap.layers().size());
+	   debugPrint(" map25: " + "################ setupMap_Layers:  leaving"); //$NON-NLS-1$
 
 	}
 
@@ -1106,9 +1106,9 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	   final Layers layers = mMap.layers();
 	   final int layer_index_MapBookmark = layers.indexOf(_layer_MapBookmark);
 	   final boolean isShowMapBookmark = config.isShowMapBookmark;
-	   debugPrint("# updateUI_MapBookmarkLayer(): entering"); //$NON-NLS-1$
+	   debugPrint(" map25: " + "# updateUI_MapBookmarkLayer(): entering"); //$NON-NLS-1$
 	   if (config.isMarkerClustered != _markertoolkit._isMarkerClusteredLast) { // only recreate MapBookmarkLayer when changed in UI
-	      //debugPrint("# updateUI_MapBookmarkLayer(): index was before: " + layer_index_MapBookmark); //$NON-NLS-1$
+	      //debugPrint(" map25: " + "# updateUI_MapBookmarkLayer(): index was before: " + layer_index_MapBookmark); //$NON-NLS-1$
 	      layers.remove(_layer_MapBookmark); 
 	      if (config.isMarkerClustered) {
 	         _layer_MapBookmark = new ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(), _markertoolkit._markerRendererFactory, this);
@@ -1116,7 +1116,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	         _layer_MapBookmark = new ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(), _markertoolkit._symbol, this);
 	      }
 	      layers.add(layer_index_MapBookmark, _layer_MapBookmark);
-	      //debugPrint("# updateUI_MapBookmarkLayer(): index is now: " + layer_index_MapBookmark); //$NON-NLS-1$
+	      //debugPrint(" map25: " + "# updateUI_MapBookmarkLayer(): index is now: " + layer_index_MapBookmark); //$NON-NLS-1$
 	   } else {
 	      _layer_MapBookmark.removeAllItems();
 	   }  
@@ -1147,7 +1147,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 		    }
 		});
 		
-		debugPrint("#### getMapFile: basepath: " + directory);	 //$NON-NLS-1$
+		debugPrint(" map25: " + "#### getMapFile: basepath: " + directory);	 //$NON-NLS-1$
 		
 		//Arrays.sort(files, SizeFileComparator.SIZE_COMPARATOR); // sort mapsfiles size
 		
@@ -1159,13 +1159,13 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 			tileSourceOfflinePrimary.setPreferredLanguage(_mf_prefered_language);
 			mMFileTileSource.add(tileSourceOfflinePrimary);   // adding primary map first
 			_tileSourceOfflineMapCount += 1;
-			debugPrint("#### getMapFile: Adding primary map: " + file + " size: " +  file.length() + " bytes)"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			debugPrint(" map25: " + "#### getMapFile: Adding primary map: " + file + " size: " +  file.length() + " bytes)"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		} else {
 		   ;
-			debugPrint("#### getMapFile: primary file missing: " + file.getAbsolutePath()); //$NON-NLS-1$
+			debugPrint(" map25: " + "#### getMapFile: primary file missing: " + file.getAbsolutePath()); //$NON-NLS-1$
 		}
 
-		//debugPrint("Adding: " + file + " size: " +  	FileUtils.byteCountToDisplaySize(file.length()) + "(" + file.length() + " bytes)");
+		//debugPrint(" map25: " + "Adding: " + file + " size: " +  	FileUtils.byteCountToDisplaySize(file.length()) + "(" + file.length() + " bytes)");
 		
 		for (File f : files)
       {
@@ -1177,8 +1177,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 					mMFileTileSource.add(tileSourceOffline);
 					_tileSourceOfflineMapCount += 1;
 					//long size = FileUtils.sizeOf(f);
-					//debugPrint("Adding: " + f + " size: " +  	FileUtils.byteCountToDisplaySize(size) + "(" + size + " bytes)");
-					debugPrint("#### getMapFile: Adding secondary map: " + f + " size: " +  f.length() + " bytes), Total Maps: " + _tileSourceOfflineMapCount); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					//debugPrint(" map25: " + "Adding: " + f + " size: " +  	FileUtils.byteCountToDisplaySize(size) + "(" + size + " bytes)");
+					debugPrint(" map25: " + "#### getMapFile: Adding secondary map: " + f + " size: " +  f.length() + " bytes), Total Maps: " + _tileSourceOfflineMapCount); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				}
 			}
       }	
@@ -1187,7 +1187,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	
 	public void debugPrint(String debugText) {
 	   if(debugMode == DebugMode.ON) {
-	      System.out.println(UI.timeStamp() + " map25: " + debugText);//$NON-NLS-1$
+	      System.out.println(UI.timeStamp() + debugText);//$NON-NLS-1$
+	      //System.out.println(UI.timeStamp() + " map25: " + debugText);//$NON-NLS-1$
 	   }
 	}
 	
@@ -1206,7 +1207,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 		result = mOpenResult.isSuccess();
 		if (!mOpenResult.isSuccess()) {
 		   ;
-		 debugPrint("### checkMapFile: not adding: " + file2check.getAbsolutePath() + " " + mOpenResult.getErrorMessage()); //$NON-NLS-1$ //$NON-NLS-2$
+		 debugPrint(" map25: " + "### checkMapFile: not adding: " + file2check.getAbsolutePath() + " " + mOpenResult.getErrorMessage()); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		return result;
 	}
@@ -1220,19 +1221,19 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
 		File file = new File(FilePath);
 		if (!file.exists()) {
-		  		   debugPrint("## checkFile: file not exist: " +  file.getAbsolutePath()); //$NON-NLS-1$
+		  		   debugPrint(" map25: " + "## checkFile: file not exist: " +  file.getAbsolutePath()); //$NON-NLS-1$
 			return null;
 			//throw new IllegalArgumentException("file does not exist: " + file);
 		} else if (!file.isFile()) {
-		   debugPrint("## checkFile: is not a file: " +  file.getAbsolutePath()); //$NON-NLS-1$
+		   debugPrint(" map25: " + "## checkFile: is not a file: " +  file.getAbsolutePath()); //$NON-NLS-1$
 			return null;
 			//throw new IllegalArgumentException("not a file: " + file);
 		} else if (!file.canRead()) {
-		   debugPrint("## checkFile: can not read file: " +  file.getAbsolutePath()); //$NON-NLS-1$
+		   debugPrint(" map25: " + "## checkFile: can not read file: " +  file.getAbsolutePath()); //$NON-NLS-1$
 			return null;
 			//throw new IllegalArgumentException("cannot read file: " + file);
 		}
-		//debugPrint("############ check file:  file_path: " +  file.getAbsolutePath()); //$NON-NLS-1$
+		//debugPrint(" map25: " + "############ check file:  file_path: " +  file.getAbsolutePath()); //$NON-NLS-1$
 		//return file;
 		return file.getAbsolutePath();
 	}
@@ -1300,7 +1301,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	@Override
 	public boolean onItemSingleTapUp(int index, MarkerItem item) {
 	   
-	   debugPrint(
+	   debugPrint(" map25: " +
 	         (UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //$NON-NLS-1$ //$NON-NLS-2$
 	         + ("\tonItemSingleTapUp") //$NON-NLS-1$
 	         + ("\tMapbookmark") //$NON-NLS-1$
@@ -1317,7 +1318,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	      ;
 	   // item.setMarker(null);
 
-	   //debugPrint("Marker tap, index:title " + item.getTitle()); //$NON-NLS-1$
+	   //debugPrint(" map25: " + "Marker tap, index:title " + item.getTitle()); //$NON-NLS-1$
 	   return true;
 	}
 
@@ -1330,7 +1331,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	      ;
 	   // item.setMarker(null);
 
-	   //debugPrint("Marker long press " + item.getTitle()); //$NON-NLS-1$
+	   //debugPrint(" map25: " + "Marker long press " + item.getTitle()); //$NON-NLS-1$
 	   return true;
 	}
 
@@ -1362,7 +1363,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	@Override
 	public boolean onItemSingleTapUp(final int index, final MapMarker item) {
 
- debugPrint(
+ debugPrint(" map25: " +
        (UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //$NON-NLS-1$ //$NON-NLS-2$
        + ("\tonItemSingleTapUp") //$NON-NLS-1$
        + ("\tTourmarker") //$NON-NLS-1$

@@ -68,6 +68,7 @@ import net.tourbook.map25.layer.tourtrack.TourLayer;
 import net.tourbook.map25.ui.SlideoutMap25_MapOptions;
 import net.tourbook.map25.ui.SlideoutMap25_MapProvider;
 import net.tourbook.map25.ui.SlideoutMap25_TrackOptions;
+import net.tourbook.photo.Photo;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourData;
@@ -76,6 +77,8 @@ import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tour.photo.TourPhotoLink;
+import net.tourbook.tour.photo.TourPhotoLinkSelection;
 import net.tourbook.ui.tourChart.TourChart;
 
 import org.eclipse.e4.ui.di.PersistState;
@@ -1038,8 +1041,62 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
    }
 
 
+   /**
+    * @param selection
+    * @return Returns a list which contains all photos.
+    * copied from Map2View 17.07.2019
+    */
+   private ArrayList<Photo> paintPhotoSelection(final ISelection selection) {
+
+      //_isLinkPhotoDisplayed = false;
+
+      final ArrayList<Photo> allPhotos = new ArrayList<>();
+
+      if (selection instanceof TourPhotoLinkSelection) {
+
+      //   _isLinkPhotoDisplayed = true;
+
+         final TourPhotoLinkSelection linkSelection = (TourPhotoLinkSelection) selection;
+
+         final ArrayList<TourPhotoLink> tourPhotoLinks = linkSelection.tourPhotoLinks;
+
+         for (final TourPhotoLink tourPhotoLink : tourPhotoLinks) {
+            allPhotos.addAll(tourPhotoLink.linkPhotos);
+         }
+
+      } else {
+
+         for (final TourData tourData : _allTourData) {
+
+            final ArrayList<Photo> galleryPhotos = tourData.getGalleryPhotos();
+
+            if (galleryPhotos != null) {
+               allPhotos.addAll(galleryPhotos);
+               
+               /*playing with photos next lines*/
+               _mapApp.debugPrint(" Map25View + ** paintPhotoSelection: Path: " + galleryPhotos.get(0).imagePathName);
+               for (final  Photo foto : galleryPhotos) {
+                  _mapApp.debugPrint(" Map25View + ** paintPhotoSelection: " + " " + foto.imageFileName +
+                        " link_lat: " + foto.getLinkLatitude() + 
+                        " tour_lat: " + +foto.getTourLatitude() + 
+                        " dimtext:" + foto.getDimensionText() +
+                        " keythumb:" + Photo.getImageKeyThumb(foto.imageFilePathName)
+                        );
+               }             
+               
+            }
+         }
+      }
+
+      //paintPhotos(allPhotos);
+      
+      return allPhotos;
+   }
+   
+   
+   
    private void onSelectionChanged(final ISelection selection) {
-      System.out.println("** Map25View onSelectionChanged: tour selection changed");
+      _mapApp.debugPrint(" Map25View + * onSelectionChanged: tour selection changed");
       
       final int selectionHash = selection.hashCode();
       if (_lastSelectionHash == selectionHash) {
@@ -1073,18 +1130,20 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
          final SelectionTourData selectionTourData = (SelectionTourData) selection;
          final TourData tourData = selectionTourData.getTourData();
          
-         System.out.println("** Map25View onSelectionChanged: SelectionTourData changed: " + tourData.getTourTitle());
+         _mapApp.debugPrint(" Map25View + * onSelectionChanged: SelectionTourData changed: " + tourData.getTourTitle());
 
          paintTour(tourData);
+         paintPhotoSelection(selection);
 
       } else if (selection instanceof SelectionTourId) {
 
          final SelectionTourId tourIdSelection = (SelectionTourId) selection;
          final TourData tourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
          
-         System.out.println("** Map25View onSelectionChanged: SelectionTourId changed: " + tourData.getTourTitle());
+         _mapApp.debugPrint(" Map25View + * onSelectionChanged: SelectionTourId changed: " + tourData.getTourTitle());
 
          paintTour(tourData);
+         paintPhotoSelection(selection);
 
       } else if (selection instanceof SelectionTourIds) {
 
@@ -1102,12 +1161,14 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
             final TourData tourData = TourManager.getInstance().getTourData(tourIds.get(0));
 
             paintTour(tourData);
+            paintPhotoSelection(selection);
 
          } else {
 
             // paint multiple tours
 
             paintTours(tourIds);
+            paintPhotoSelection(selection);
 
          }
 
@@ -1362,6 +1423,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
          }
       }
 
+      
       /*
        * Markers
        */
@@ -1375,7 +1437,8 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       /*
        * Photos
        */
-      System.out.println("** Map25View paintTours_AndUpdateMap: creating photolayer ");
+      _mapApp.debugPrint(" Map25View + ** paintTours_AndUpdateMap: creating photolayer ");
+
       _phototoolkit.loadConfig();
       
       /*
