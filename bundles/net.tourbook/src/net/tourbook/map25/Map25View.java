@@ -60,6 +60,7 @@ import net.tourbook.map25.action.ActionZoomIn;
 import net.tourbook.map25.action.ActionZoomOut;
 import net.tourbook.map25.layer.marker.MapMarker;
 import net.tourbook.map25.layer.marker.MarkerLayer;
+import net.tourbook.map25.layer.marker.PhotoToolkit;
 import net.tourbook.map25.layer.tourtrack.Map25TrackConfig;
 import net.tourbook.map25.layer.tourtrack.SliderLocation_Layer;
 import net.tourbook.map25.layer.tourtrack.SliderPath_Layer;
@@ -204,6 +205,9 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
    private boolean _isContextMenuVisible;
 //	private MouseAdapter							_wwMouseListener;
    private Menu    _swtContextMenu;
+   
+   private PhotoToolkit _phototoolkit = new PhotoToolkit();
+   
    //
    /*
     * UI controls
@@ -1035,7 +1039,8 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
 
    private void onSelectionChanged(final ISelection selection) {
-
+      System.out.println("** Map25View onSelectionChanged: tour selection changed");
+      
       final int selectionHash = selection.hashCode();
       if (_lastSelectionHash == selectionHash) {
 
@@ -1067,6 +1072,8 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
          final SelectionTourData selectionTourData = (SelectionTourData) selection;
          final TourData tourData = selectionTourData.getTourData();
+         
+         System.out.println("** Map25View onSelectionChanged: SelectionTourData changed: " + tourData.getTourTitle());
 
          paintTour(tourData);
 
@@ -1074,6 +1081,8 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
          final SelectionTourId tourIdSelection = (SelectionTourId) selection;
          final TourData tourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
+         
+         System.out.println("** Map25View onSelectionChanged: SelectionTourId changed: " + tourData.getTourTitle());
 
          paintTour(tourData);
 
@@ -1363,6 +1372,12 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
          markerLayer.replaceMarkers(allMarkers);
       }
 
+      /*
+       * Photos
+       */
+      System.out.println("** Map25View paintTours_AndUpdateMap: creating photolayer ");
+      _phototoolkit.loadConfig();
+      
       /*
        * Update map
        */

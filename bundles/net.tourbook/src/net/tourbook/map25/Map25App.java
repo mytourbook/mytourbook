@@ -1130,7 +1130,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
 	
 	/**
-	 * gget a sorted list with mapsforgemap files
+	 * get a sorted list with mapsforgemap files
 	 * @param <MultiMapDataStore>
 	 * @param filename
 	 * @return files[]
@@ -1291,8 +1291,25 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	   super.resize(w, h);
 	}
 
+	  /**
+    * clicking on a mapbookmark
+    * @param index
+    * @param MarkerItem
+    * @return true, when clicked
+    */
 	@Override
 	public boolean onItemSingleTapUp(int index, MarkerItem item) {
+	   
+	   debugPrint(
+	         (UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //$NON-NLS-1$ //$NON-NLS-2$
+	         + ("\tonItemSingleTapUp") //$NON-NLS-1$
+	         + ("\tMapbookmark") //$NON-NLS-1$
+	         + ("\tTitle:" + item.getTitle()) //$NON-NLS-1$
+	         + ("\tindex:" + index) //$NON-NLS-1$
+	         + ("\t_isMapItemHit:" + _isMapItemHit + " -> true") //$NON-NLS-1$ //$NON-NLS-2$
+	         //Pref_Map25_Encoding_Mapsforge
+	         );
+	   
 	   if (item.getMarker() == null)
 	      ;
 	   // item.setMarker(symbol);
@@ -1300,7 +1317,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	      ;
 	   // item.setMarker(null);
 
-	   //debugPrint("Marker tap " + item.getTitle()); //$NON-NLS-1$
+	   //debugPrint("Marker tap, index:title " + item.getTitle()); //$NON-NLS-1$
 	   return true;
 	}
 
@@ -1336,20 +1353,28 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	   return false;
 	}
 
+   /**
+   * clicking on a tourmarker
+   * @param index
+   * @param MapMarker
+   * @return true, when clicked
+   */
 	@Override
 	public boolean onItemSingleTapUp(final int index, final MapMarker item) {
 
-// System.out.println(
-//       (UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //
-//       + ("\tonItemSingleTapUp")//
-//       + ("\tindex:" + index)
-//       + ("\t_isMapItemHit:" + _isMapItemHit + " -> true")
-//       //Pref_Map25_Encoding_Mapsforge
-//       );
-// // TODO remove SYSTEM.OUT.PRINTLN
-//
-// _isMapItemHit = true;
-//
+ debugPrint(
+       (UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //$NON-NLS-1$ //$NON-NLS-2$
+       + ("\tonItemSingleTapUp") //$NON-NLS-1$
+       + ("\tTourmarker") //$NON-NLS-1$
+       + ("\tTitle:" + item.title) //$NON-NLS-1$
+       + ("\tindex:" + index) //$NON-NLS-1$
+       + ("\t_isMapItemHit:" + _isMapItemHit + " -> true") //$NON-NLS-1$ //$NON-NLS-2$
+       //Pref_Map25_Encoding_Mapsforge
+       );
+ // TODO remove SYSTEM.OUT.PRINTLN
+
+ _isMapItemHit = true;
+
 // return true;
 	   return false;
 	}
