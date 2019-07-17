@@ -60,7 +60,10 @@ import net.tourbook.map25.action.ActionZoomIn;
 import net.tourbook.map25.action.ActionZoomOut;
 import net.tourbook.map25.layer.marker.MapMarker;
 import net.tourbook.map25.layer.marker.MarkerLayer;
+import net.tourbook.map25.layer.marker.MarkerToolkit;
+import net.tourbook.map25.layer.marker.MarkerToolkit.MarkerMode;
 import net.tourbook.map25.layer.marker.PhotoToolkit;
+import net.tourbook.map25.layer.marker.PhotoToolkit.PhotoMode;
 import net.tourbook.map25.layer.tourtrack.Map25TrackConfig;
 import net.tourbook.map25.layer.tourtrack.SliderLocation_Layer;
 import net.tourbook.map25.layer.tourtrack.SliderPath_Layer;
@@ -209,7 +212,8 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 //	private MouseAdapter							_wwMouseListener;
    private Menu    _swtContextMenu;
    
-   private PhotoToolkit _phototoolkit = new PhotoToolkit();
+   private PhotoToolkit _phototoolkit;// = new PhotoToolkit();
+   //private PhotoMode _photoMode = PhotoToolkit.PhotoMode.NORMAL; // PhotoToolkit.modeDemo or PhotoToolkit.modeNormal
    
    //
    /*
@@ -1074,21 +1078,13 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
                allPhotos.addAll(galleryPhotos);
                
                /*playing with photos next lines*/
-               _mapApp.debugPrint(" Map25View + ** paintPhotoSelection: Path: " + galleryPhotos.get(0).imagePathName);
-               for (final  Photo foto : galleryPhotos) {
-                  _mapApp.debugPrint(" Map25View + ** paintPhotoSelection: " + " " + foto.imageFileName +
-                        " link_lat: " + foto.getLinkLatitude() + 
-                        " tour_lat: " + +foto.getTourLatitude() + 
-                        " dimtext:" + foto.getDimensionText() +
-                        " keythumb:" + Photo.getImageKeyThumb(foto.imageFilePathName)
-                        );
-               }             
-               
+               _mapApp._phototoolkit.createMarkerItemList(galleryPhotos, _mapApp._photoMode);
+            
             }
          }
       }
 
-      //paintPhotos(allPhotos);
+      _mapApp.updateUI_PhotoLayer();
       
       return allPhotos;
    }
@@ -1141,7 +1137,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
          final TourData tourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
          
          _mapApp.debugPrint(" Map25View + * onSelectionChanged: SelectionTourId changed: " + tourData.getTourTitle());
-
+         
          paintTour(tourData);
          paintPhotoSelection(selection);
 
@@ -1439,7 +1435,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
        */
       _mapApp.debugPrint(" Map25View + ** paintTours_AndUpdateMap: creating photolayer ");
 
-      _phototoolkit.loadConfig();
+
       
       /*
        * Update map

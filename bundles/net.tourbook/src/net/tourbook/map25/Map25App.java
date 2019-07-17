@@ -43,6 +43,8 @@ import net.tourbook.map25.layer.marker.MarkerLayer;
 import net.tourbook.map25.layer.marker.MarkerLayer.OnItemGestureListener;
 import net.tourbook.map25.layer.marker.MarkerRenderer;
 import net.tourbook.map25.layer.marker.MarkerToolkit;
+import net.tourbook.map25.layer.marker.PhotoToolkit;
+import net.tourbook.map25.layer.marker.PhotoToolkit.PhotoMode;
 import net.tourbook.map25.layer.marker.MarkerToolkit.MarkerMode;
 import net.tourbook.map25.layer.tourtrack.SliderLocation_Layer;
 import net.tourbook.map25.layer.tourtrack.SliderPath_Layer;
@@ -191,6 +193,11 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    ItemizedLayer<MarkerItem> _layer_MapBookmark;
    private MarkerToolkit _markertoolkit;
    private MarkerMode _markerMode = MarkerToolkit.MarkerMode.NORMAL; // MarkerToolkit.modeDemo or MarkerToolkit.modeNormal
+   
+   ItemizedLayer<MarkerItem> _layer_Photo;
+   public PhotoToolkit _phototoolkit = new PhotoToolkit();
+   public PhotoMode _photoMode = PhotoToolkit.PhotoMode.NORMAL; // PhotoToolkit.modeDemo or PhotoToolkit.modeNormal
+   //public List<MarkerItem> _photo_pts = new ArrayList<>();
 
 	/**
 	 * Is <code>true</code> when a tour marker is hit.
@@ -1050,6 +1057,12 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       _layer_MapBookmark.setEnabled(false);
       layers.add(_layer_MapBookmark);	   
 	   
+      //Photos
+      _layer_Photo = new  ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(), _phototoolkit._symbol, this);
+      _layer_Photo.addItems(_phototoolkit._photo_pts);  //must not be done at startup, no tour is loadet yet
+      _layer_Photo.setEnabled(true);  //later false, when GUI is done
+      layers.add(_layer_Photo);
+      
 	   // marker
 	   _layer_Marker = new MarkerLayer(mMap, this);
 	   _layer_Marker.setEnabled(false);
@@ -1106,7 +1119,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	   final Layers layers = mMap.layers();
 	   final int layer_index_MapBookmark = layers.indexOf(_layer_MapBookmark);
 	   final boolean isShowMapBookmark = config.isShowMapBookmark;
-	   debugPrint(" map25: " + "# updateUI_MapBookmarkLayer(): entering"); //$NON-NLS-1$
+	   debugPrint(" map25: # updateUI_MapBookmarkLayer(): entering"); //$NON-NLS-1$
 	   if (config.isMarkerClustered != _markertoolkit._isMarkerClusteredLast) { // only recreate MapBookmarkLayer when changed in UI
 	      //debugPrint(" map25: " + "# updateUI_MapBookmarkLayer(): index was before: " + layer_index_MapBookmark); //$NON-NLS-1$
 	      layers.remove(_layer_MapBookmark); 
@@ -1126,6 +1139,22 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	   _layer_MapBookmark.setEnabled(isShowMapBookmark);
 	   _markertoolkit._isMarkerClusteredLast = config.isMarkerClustered;
 	   //
+	}
+	
+	public void updateUI_PhotoLayer() {  //like paintPhotos() in Map2View
+	   final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
+	   final Layers layers = mMap.layers();
+	   final int layer_index_Photo = layers.indexOf(_layer_Photo);
+	   //final boolean isShowPhoto = config.isShowPhoto;
+	   debugPrint(" map25: # updateUI_PhotoLayer(): entering"); //$NON-NLS-1$
+	   layers.remove(_layer_Photo);
+	   //if cluster here
+	   _layer_Photo = new ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(), _phototoolkit._symbol, this);
+	   layers.add(layer_index_Photo, _layer_Photo);
+	   //List<MarkerItem> pts = _phototoolkit.createMarkerItemList(_photoMode);
+	   _layer_Photo.addItems(_phototoolkit._photo_pts);
+	   _layer_Photo.setEnabled(true);
+
 	}
 
 	
