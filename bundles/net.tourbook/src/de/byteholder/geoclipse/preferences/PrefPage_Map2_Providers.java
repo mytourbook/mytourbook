@@ -935,7 +935,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       {
          {
             /*
-             * Bbutton: edit
+             * Button: edit
              */
             _btnEdit = new Button(btnContainer, SWT.NONE);
             _btnEdit.setText(Messages.Pref_Map_Button_Edit);
