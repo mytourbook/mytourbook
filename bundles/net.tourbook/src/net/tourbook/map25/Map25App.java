@@ -190,11 +190,11 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private float                 _mf_UserScale = 2.50f;
    private float                 _vtm_UserScale = 2.0f;	
 	
-   ItemizedLayer<MarkerItem> _layer_MapBookmark;
+   private ItemizedLayer<MarkerItem> _layer_MapBookmark;
    private MarkerToolkit _markertoolkit;
    private MarkerMode _markerMode = MarkerToolkit.MarkerMode.NORMAL; // MarkerToolkit.modeDemo or MarkerToolkit.modeNormal
    
-   ItemizedLayer<MarkerItem> _layer_Photo;
+   private ItemizedLayer<MarkerItem> _layer_Photo;
    public PhotoToolkit _phototoolkit = new PhotoToolkit();
    public PhotoMode _photoMode = PhotoToolkit.PhotoMode.NORMAL; // PhotoToolkit.modeDemo or PhotoToolkit.modeNormal
    //public List<MarkerItem> _photo_pts = new ArrayList<>();
@@ -550,6 +550,10 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 		return _layer_ScaleBar;
 	}
 
+   public ItemizedLayer<MarkerItem> getLayer_Photo() {
+      return _layer_Photo;
+   }
+	
 	public SliderLocation_Layer getLayer_SliderLocation() {
 		return _layer_SliderLocation;
 	}
@@ -1059,8 +1063,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	   
       //Photos
       _layer_Photo = new  ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(), _phototoolkit._symbol, this);
-      _layer_Photo.addItems(_phototoolkit._photo_pts);  //must not be done at startup, no tour is loadet yet
-      _layer_Photo.setEnabled(true);  //later false, when GUI is done
+      //_layer_Photo.addItems(_phototoolkit._photo_pts);  //must not be done at startup, no tour is loadet yet
+      _layer_Photo.setEnabled(false);  //later false, when GUI is done
       layers.add(_layer_Photo);
       
 	   // marker
@@ -1152,7 +1156,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	   _layer_Photo = new ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(), _phototoolkit._symbol, this);
 	   layers.add(layer_index_Photo, _layer_Photo);
 	   //List<MarkerItem> pts = _phototoolkit.createMarkerItemList(_photoMode);
-	   _layer_Photo.addItems(_phototoolkit._photo_pts);
+	   //_layer_Photo.addItems(_phototoolkit._photo_pts);
 	   _layer_Photo.setEnabled(true);
 
 	}

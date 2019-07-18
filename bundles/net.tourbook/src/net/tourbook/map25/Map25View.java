@@ -25,6 +25,7 @@ import java.awt.event.ComponentEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -71,7 +72,9 @@ import net.tourbook.map25.layer.tourtrack.TourLayer;
 import net.tourbook.map25.ui.SlideoutMap25_MapOptions;
 import net.tourbook.map25.ui.SlideoutMap25_MapProvider;
 import net.tourbook.map25.ui.SlideoutMap25_TrackOptions;
+import net.tourbook.photo.IPhotoEventListener;
 import net.tourbook.photo.Photo;
+import net.tourbook.photo.PhotoEventId;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourData;
@@ -101,12 +104,17 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 import org.oscim.core.BoundingBox;
 import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
+import org.oscim.layers.marker.ItemizedLayer;
+import org.oscim.layers.marker.MarkerItem;
+import org.oscim.layers.marker.MarkerSymbol;
+import org.oscim.layers.marker.MarkerSymbol.HotspotPlace;
 import org.oscim.layers.tile.bitmap.BitmapTileLayer;
 import org.oscim.map.Animator;
 import org.oscim.map.Map;
@@ -213,6 +221,9 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
    private Menu    _swtContextMenu;
    
    private PhotoToolkit _phototoolkit;// = new PhotoToolkit();
+   private List<MarkerItem> _photo_pts = new ArrayList<>();
+
+   private ArrayList<Photo> _galleryPhotos;
    //private PhotoMode _photoMode = PhotoToolkit.PhotoMode.NORMAL; // PhotoToolkit.modeDemo or PhotoToolkit.modeNormal
    
    //
@@ -815,6 +826,30 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
       return allMarkerItems;
    }
+   
+   public List<MarkerItem> createPhotoItemList(ArrayList<Photo> galleryPhotos, PhotoMode PhotoMode){
+      List<MarkerItem> pts = new ArrayList<>();
+      if (galleryPhotos.size() == 0) {
+         return  pts;     
+      }
+      System.out.println(" Map25View + *** createPhotoItemList: Path: " + galleryPhotos.get(0).imagePathName + " size: " + galleryPhotos.size());
+      for (final  Photo photo : galleryPhotos) {
+         UUID photoKey = UUID.randomUUID();
+         String photoName = photo.imageFileName;
+         String photoDescription = photo.getDimensionText();
+         Double photoLat = photo.getTourLatitude();
+         Double photoLon = photo.getTourLongitude();
+         MarkerItem item = new MarkerItem(photoKey, photoName, photoDescription,
+               new GeoPoint(photoLat, photoLon)
+               );     
+         //item.setMarker(new MarkerSymbol(_phototoolkit.createPhotoBitmap(), HotspotPlace.CENTER));
+         System.out.println(" Map25View + *** createPhotoItemList: item lat: " + item.geoPoint.getLatitude() + " lon: " + item.geoPoint.getLongitude());
+         //pts.add(item);
+      }
+    _photo_pts = pts;
+    _galleryPhotos = galleryPhotos;
+      return pts;
+   }
 
    @Override
    public void createPartControl(final Composite parent) {
@@ -1053,7 +1088,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
    private ArrayList<Photo> paintPhotoSelection(final ISelection selection) {
 
       //_isLinkPhotoDisplayed = false;
-
+      selection.toString();
       final ArrayList<Photo> allPhotos = new ArrayList<>();
 
       if (selection instanceof TourPhotoLinkSelection) {
@@ -1078,7 +1113,8 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
                allPhotos.addAll(galleryPhotos);
                
                /*playing with photos next lines*/
-               _mapApp._phototoolkit.createMarkerItemList(galleryPhotos, _mapApp._photoMode);
+               
+               createPhotoItemList(galleryPhotos, _mapApp._photoMode);
             
             }
          }
@@ -1425,7 +1461,6 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
        */
       final MarkerLayer markerLayer = _mapApp.getLayer_TourMarker();
       if (markerLayer.isEnabled()) {
-
          final List<MapMarker> allMarkers = createMapMarkers(_allTourData);
          markerLayer.replaceMarkers(allMarkers);
       }
@@ -1433,8 +1468,11 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       /*
        * Photos
        */
+      final ItemizedLayer<MarkerItem> photoLayer = _mapApp.getLayer_Photo();
+      photoLayer.removeAllItems();
+      List<MarkerItem> photoItems =createPhotoItemList(_galleryPhotos, PhotoToolkit.PhotoMode.NORMAL);
+      photoLayer.addItems(photoItems);
       _mapApp.debugPrint(" Map25View + ** paintTours_AndUpdateMap: creating photolayer ");
-
 
       
       /*
@@ -1765,5 +1803,6 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       _actionSyncMap_WithChartSlider.setDisabledImageDescriptor(imageDescriptorDisabled);
       _actionSyncMap_WithChartSlider.setChecked(isSync || isCenter);
    }
+
 
 }

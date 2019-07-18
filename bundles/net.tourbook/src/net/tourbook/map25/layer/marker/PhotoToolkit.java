@@ -61,7 +61,13 @@ public class PhotoToolkit {
    
    //private Map25App                      _mapApp;
    public enum PhotoMode {DEMO, NORMAL};
-   public List<MarkerItem> _photo_pts = new ArrayList<>();
+  // public List<MarkerItem> _photo_pts = new ArrayList<>();
+
+  // private ArrayList<Photo> _galleryPhotos;
+   
+  // public ArrayList<Photo> get_galleryPhotos() {
+  //    return _galleryPhotos;
+  // }
 
    public PhotoToolkit() {
       System.out.println(" PhotoToolkit + *** Constructor");
@@ -107,7 +113,7 @@ public class PhotoToolkit {
    
    public Bitmap createPhotoBitmap() {
       //loadConfig();
-      System.out.println("createPhotoBitmap size: " + _symbolSizeInt);
+      //System.out.println("createPhotoBitmap size: " + _symbolSizeInt);
       _bitmapPhoto = CanvasAdapter.newBitmap(_symbolSizeInt, _symbolSizeInt, 0);
 
       org.oscim.backend.canvas.Canvas defaultPhotoCanvas = CanvasAdapter.newCanvas();  
@@ -137,57 +143,58 @@ public class PhotoToolkit {
    
    
    
-   public List<MarkerItem> createMarkerItemList(ArrayList<Photo> galleryPhotos, PhotoMode PhotoMode){
-      loadConfig();
-      
-      List<MarkerItem> pts = new ArrayList<>();
-      System.out.println(" PhotoToolkit + *** paintPhotoSelection: Path: " + galleryPhotos.get(0).imagePathName);
-      for (final  Photo photo : galleryPhotos) {
-         //UUID photoKey = UUID.fromString(Photo.getImageKeyThumb(photo.imageFilePathName));
-         UUID photoKey = UUID.randomUUID();
-         String photoName = photo.imageFileName;
-         String photoDescription = photo.getDimensionText();
-         Double photoLat = photo.getTourLatitude();
-         Double photoLon = photo.getTourLongitude();
-         
-         MarkerItem item = new MarkerItem(photoKey, photoName, photoDescription,
-               new GeoPoint(photoLat, photoLon)
-               );
-         item.setMarker(new MarkerSymbol(createPhotoBitmap(), HotspotPlace.CENTER));
-         System.out.println("item lat: " + item.geoPoint.getLatitude() + " lon: " + item.geoPoint.getLongitude());
-         //item.get
-         pts.add(item);
-
-        /* System.out.println(" PhotoToolkit + *** createMarkerItemList, adding: " + " " + photo.imageFileName +
-               " tour lat: " + photo.getTourLatitude() + " lon: " + photo.getTourLongitude() +
-               " dimtext:" + photo.getDimensionText() +
-               " keythumb:" + Photo.getImageKeyThumb(photo.imageFilePathName)
-               );*/
-      } 
-      
-
-      if (PhotoMode == PhotoMode.NORMAL) {
-         this._photo_pts = pts;
-         return pts;};
-
-      int COUNT = 5;
-      float STEP = 100f / 110000f; // roughly 100 meters
-
-      double demo_lat = 47.2266239;
-      double demo_lon = 8.8184374;
-
-      for (int x = -COUNT; x < COUNT; x++) {
-         for (int y = -COUNT; y < COUNT; y++) {
-            double random = STEP * Math.random() * 2;
-            MarkerItem item = new MarkerItem(y + ", " + x, "Title " + demo_lat + "/" + demo_lon,"Description "  + x + "/" + y, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-                  new GeoPoint(demo_lat + y * STEP + random, demo_lon + x * STEP + random)
-                  );
-      //      item.setMarker(createAdvanceSymbol(item, _bitmapPoi));
-            pts.add(item);
-         }
-      }
-      this._photo_pts = pts;
-      return pts;  
-   }
+//   public List<MarkerItem> createPhotoItemList(ArrayList<Photo> galleryPhotos, PhotoMode PhotoMode){
+//      loadConfig();
+//      
+//      List<MarkerItem> pts = new ArrayList<>();
+//      System.out.println(" PhotoToolkit + *** paintPhotoSelection: Path: " + galleryPhotos.get(0).imagePathName);
+//      for (final  Photo photo : galleryPhotos) {
+//         //UUID photoKey = UUID.fromString(Photo.getImageKeyThumb(photo.imageFilePathName));
+//         UUID photoKey = UUID.randomUUID();
+//         String photoName = photo.imageFileName;
+//         String photoDescription = photo.getDimensionText();
+//         Double photoLat = photo.getTourLatitude();
+//         Double photoLon = photo.getTourLongitude();
+//         
+//         MarkerItem item = new MarkerItem(photoKey, photoName, photoDescription,
+//               new GeoPoint(photoLat, photoLon)
+//               );
+//         item.setMarker(new MarkerSymbol(createPhotoBitmap(), HotspotPlace.CENTER));
+//         System.out.println("item lat: " + item.geoPoint.getLatitude() + " lon: " + item.geoPoint.getLongitude());
+//         //item.get
+//         pts.add(item);
+//
+//        /* System.out.println(" PhotoToolkit + *** createMarkerItemList, adding: " + " " + photo.imageFileName +
+//               " tour lat: " + photo.getTourLatitude() + " lon: " + photo.getTourLongitude() +
+//               " dimtext:" + photo.getDimensionText() +
+//               " keythumb:" + Photo.getImageKeyThumb(photo.imageFilePathName)
+//               );*/
+//      } 
+//      
+//
+//      if (PhotoMode == PhotoMode.NORMAL) {
+//         this._photo_pts = pts;
+//         return pts;};
+//
+//      int COUNT = 5;
+//      float STEP = 100f / 110000f; // roughly 100 meters
+//
+//      double demo_lat = 47.2266239;
+//      double demo_lon = 8.8184374;
+//
+//      for (int x = -COUNT; x < COUNT; x++) {
+//         for (int y = -COUNT; y < COUNT; y++) {
+//            double random = STEP * Math.random() * 2;
+//            MarkerItem item = new MarkerItem(y + ", " + x, "Title " + demo_lat + "/" + demo_lon,"Description "  + x + "/" + y, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+//                  new GeoPoint(demo_lat + y * STEP + random, demo_lon + x * STEP + random)
+//                  );
+//      //      item.setMarker(createAdvanceSymbol(item, _bitmapPoi));
+//            pts.add(item);
+//         }
+//      }
+//      this._photo_pts = pts;
+//      this._galleryPhotos = galleryPhotos;
+//      return pts;  
+//   }
    
 }
