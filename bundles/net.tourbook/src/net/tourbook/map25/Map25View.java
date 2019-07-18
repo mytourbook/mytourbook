@@ -829,10 +829,13 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
    
    public List<MarkerItem> createPhotoItemList(ArrayList<Photo> galleryPhotos, PhotoMode PhotoMode){
       List<MarkerItem> pts = new ArrayList<>();
+      
+      if (galleryPhotos == null) { return pts;}
+      
       if (galleryPhotos.size() == 0) {
          return  pts;     
       }
-      System.out.println(" Map25View + *** createPhotoItemList: Path: " + galleryPhotos.get(0).imagePathName + " size: " + galleryPhotos.size());
+      //System.out.println(" Map25View: *** createPhotoItemList: Path: " + galleryPhotos.get(0).imagePathName + " size: " + galleryPhotos.size());
       for (final  Photo photo : galleryPhotos) {
          UUID photoKey = UUID.randomUUID();
          String photoName = photo.imageFileName;
@@ -843,7 +846,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
                new GeoPoint(photoLat, photoLon)
                );     
          //item.setMarker(new MarkerSymbol(_phototoolkit.createPhotoBitmap(), HotspotPlace.CENTER));
-         System.out.println(" Map25View + *** createPhotoItemList: item lat: " + item.geoPoint.getLatitude() + " lon: " + item.geoPoint.getLongitude());
+         //System.out.println(" Map25View: *** createPhotoItemList: item lat: " + item.geoPoint.getLatitude() + " lon: " + item.geoPoint.getLongitude());
          //pts.add(item);
       }
     _photo_pts = pts;
@@ -1128,7 +1131,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
    
    
    private void onSelectionChanged(final ISelection selection) {
-      _mapApp.debugPrint(" Map25View + * onSelectionChanged: tour selection changed");
+      //_mapApp.debugPrint(" Map25View: * onSelectionChanged: tour selection changed");
       
       final int selectionHash = selection.hashCode();
       if (_lastSelectionHash == selectionHash) {
@@ -1162,7 +1165,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
          final SelectionTourData selectionTourData = (SelectionTourData) selection;
          final TourData tourData = selectionTourData.getTourData();
          
-         _mapApp.debugPrint(" Map25View + * onSelectionChanged: SelectionTourData changed: " + tourData.getTourTitle());
+         //_mapApp.debugPrint(" Map25View: * onSelectionChanged: SelectionTourData changed: " + tourData.getTourTitle());
 
          paintTour(tourData);
          paintPhotoSelection(selection);
@@ -1172,7 +1175,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
          final SelectionTourId tourIdSelection = (SelectionTourId) selection;
          final TourData tourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
          
-         _mapApp.debugPrint(" Map25View + * onSelectionChanged: SelectionTourId changed: " + tourData.getTourTitle());
+         //_mapApp.debugPrint(" Map25View: * onSelectionChanged: SelectionTourId changed: " + tourData.getTourTitle());
          
          paintTour(tourData);
          paintPhotoSelection(selection);
@@ -1472,7 +1475,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       photoLayer.removeAllItems();
       List<MarkerItem> photoItems =createPhotoItemList(_galleryPhotos, PhotoToolkit.PhotoMode.NORMAL);
       photoLayer.addItems(photoItems);
-      _mapApp.debugPrint(" Map25View + ** paintTours_AndUpdateMap: creating photolayer ");
+      //_mapApp.debugPrint(" Map25View: ** paintTours_AndUpdateMap: creating photolayer ");
 
       
       /*
