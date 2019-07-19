@@ -867,7 +867,15 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
          public void keyPressed(final KeyEvent e) {
 
             if (e.keyCode == SWT.DEL) {
-               onAction_MapProvider_Delete();
+
+               /*
+                * Delete map provider only when the delete button is enabled, otherwise internal map
+                * providers can be deleted which is not good
+                */
+               if (_btnDeleteMapProvider.isEnabled()) {
+
+                  onAction_MapProvider_Delete();
+               }
             }
          }
 
@@ -1042,7 +1050,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
          }
          {
             /*
-             * Bbutton: export
+             * Button: export
              */
             _btnExport = new Button(btnContainer, SWT.NONE);
             _btnExport.setText(Messages.Pref_Map_Button_ExportMP);
@@ -2050,10 +2058,11 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
       _mpViewer.getTable().setFocus();
 
-      if (importedMPs != null) {
-         // show the imported map provider in the config dialog
-         openConfigDialog();
-      }
+// this annoying
+//      if (importedMPs != null) {
+//         // show the imported map provider in the config dialog
+//         openConfigDialog();
+//      }
    }
 
    private void doImportMP_Multiple(final ArrayList<String> allFilesPaths) {
@@ -3025,7 +3034,6 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
             // delete temp file
             deleteFile(tempFilePath);
          }
-
 
       }
    }

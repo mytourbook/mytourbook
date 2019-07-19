@@ -2295,7 +2295,7 @@ public class MapProviderManager {
             MessageDialog.openError(
                   Display.getDefault().getActiveShell(),
                   Messages.Import_Error_Dialog_Title,
-                  NLS.bind(Messages.DBG021_Import_Error_DuplicateId, mp.getId()));
+                  NLS.bind(Messages.DBG021_Import_Error_DuplicateId, mp.getName() + UI.DASH_WITH_SPACE + mp.getId()));
 
             return null;
          }
