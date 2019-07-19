@@ -2906,7 +2906,6 @@ public class Map2View extends ViewPart implements
          for (final TourPhotoLink tourPhotoLink : tourPhotoLinks) {
             allPhotos.addAll(tourPhotoLink.linkPhotos);
          }
-         System.out.println("***** Map2View: paintphotoselection: TourPhotoLinkSelection size: " + allPhotos.size());
 
       } else {
 
@@ -2916,10 +2915,6 @@ public class Map2View extends ViewPart implements
 
             if (galleryPhotos != null) {
                allPhotos.addAll(galleryPhotos);  
-               
-               /*playing with photos next lines*/
-               System.out.println("***** Map2View: paintphotoselection else: size: " + allPhotos.size());
-               
             }
          }
       }

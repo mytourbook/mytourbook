@@ -1,5 +1,9 @@
 package net.tourbook.map25.layer.marker;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -105,7 +109,7 @@ public class PhotoToolkit {
    }
 
    public final void loadConfig () {
-      System.out.println(" PhotoToolkit + *** loadConfig");
+      //System.out.println(" PhotoToolkit + *** loadConfig");
       final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
       _fgColor = ColorUtil.getARGB(config.markerOutline_Color, (int) (config.markerOutline_Opacity / 100.0 * 0xff));
       _bgColor = ColorUtil.getARGB(config.markerFill_Color,    (int) (config.markerFill_Opacity    / 100.0 * 0xff));
@@ -141,6 +145,33 @@ public class PhotoToolkit {
       return paintedBitmap;
    }
    
+ 
+   public Bitmap createPhotoBitmapFromFile(String photofile) {
+      System.out.println(" PhotoToolkit + *** createPhotoBitmapFromFile for file: " + photofile);
+      Bitmap photoBitmap = CanvasAdapter.newBitmap(120, 90, 0);
+      final File photoFile = new File(photofile);
+      Bitmap bitmapFromPhotoFile = null;
+      FileInputStream fileStream;
+      try {
+         fileStream = new FileInputStream(photoFile);
+         bitmapFromPhotoFile = CanvasAdapter.decodeBitmap(fileStream, 120, 90, 100);
+      } catch (FileNotFoundException e1) {
+         e1.printStackTrace();
+         return _bitmapPhoto;
+      } catch (IOException e) {
+         // TODO Auto-generated catch block
+         e.printStackTrace();
+         return _bitmapPhoto;
+      }
+
+      org.oscim.backend.canvas.Canvas PhotoCanvas = CanvasAdapter.newCanvas();  
+      PhotoCanvas.setBitmap(photoBitmap);
+      PhotoCanvas.drawBitmap(bitmapFromPhotoFile, 0, 0);
+      //PhotoCanvas.drawBitmapScaled(bitmapFromPhotoFile);
+      float half = _symbolSizeInt/2;
+
+      return photoBitmap;
+   }
    
    
 //   public List<MarkerItem> createPhotoItemList(ArrayList<Photo> galleryPhotos, PhotoMode PhotoMode){

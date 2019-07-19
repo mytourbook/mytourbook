@@ -43,8 +43,6 @@ import net.tourbook.map25.layer.marker.MarkerLayer;
 import net.tourbook.map25.layer.marker.MarkerLayer.OnItemGestureListener;
 import net.tourbook.map25.layer.marker.MarkerRenderer;
 import net.tourbook.map25.layer.marker.MarkerToolkit;
-import net.tourbook.map25.layer.marker.PhotoToolkit;
-import net.tourbook.map25.layer.marker.PhotoToolkit.PhotoMode;
 import net.tourbook.map25.layer.marker.MarkerToolkit.MarkerMode;
 import net.tourbook.map25.layer.tourtrack.SliderLocation_Layer;
 import net.tourbook.map25.layer.tourtrack.SliderPath_Layer;
@@ -195,9 +193,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private MarkerMode _markerMode = MarkerToolkit.MarkerMode.NORMAL; // MarkerToolkit.modeDemo or MarkerToolkit.modeNormal
    
    private ItemizedLayer<MarkerItem> _layer_Photo;
-   public PhotoToolkit _phototoolkit = new PhotoToolkit();
-   public PhotoMode _photoMode = PhotoToolkit.PhotoMode.NORMAL; // PhotoToolkit.modeDemo or PhotoToolkit.modeNormal
-   //public List<MarkerItem> _photo_pts = new ArrayList<>();
+   //public PhotoToolkit _phototoolkit = new PhotoToolkit();
+   //public PhotoMode _photoMode = PhotoToolkit.PhotoMode.NORMAL; // PhotoToolkit.modeDemo or PhotoToolkit.modeNormal
 
 	/**
 	 * Is <code>true</code> when a tour marker is hit.
@@ -1062,7 +1059,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       layers.add(_layer_MapBookmark);	   
 	   
       //Photos
-      _layer_Photo = new  ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(), _phototoolkit._symbol, this);
+      _layer_Photo = new  ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(), _markertoolkit._symbol, this); //symbol must be replaced
       //_layer_Photo.addItems(_phototoolkit._photo_pts);  //must not be done at startup, no tour is loadet yet
       _layer_Photo.setEnabled(false);  //later false, when GUI is done
       layers.add(_layer_Photo);
@@ -1145,22 +1142,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	   //
 	}
 	
-	public void updateUI_PhotoLayer() {  //like paintPhotos() in Map2View
-	   final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
-	   final Layers layers = mMap.layers();
-	   final int layer_index_Photo = layers.indexOf(_layer_Photo);
-	   //final boolean isShowPhoto = config.isShowPhoto;
-	   debugPrint(" map25: # updateUI_PhotoLayer(): entering"); //$NON-NLS-1$
-	   layers.remove(_layer_Photo);
-	   //if cluster here
-	   _layer_Photo = new ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(), _phototoolkit._symbol, this);
-	   layers.add(layer_index_Photo, _layer_Photo);
-	   //List<MarkerItem> pts = _phototoolkit.createMarkerItemList(_photoMode);
-	   //_layer_Photo.addItems(_phototoolkit._photo_pts);
-	   _layer_Photo.setEnabled(true);
-
-	}
-
 	
 	/**
 	 * get a sorted list with mapsforgemap files
