@@ -488,24 +488,19 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private boolean isWeatherDataFromApi = false;
 
    private int                   weatherWindDir;                                       // db-version 8
-
    private int                   weatherWindSpd;                                       // db-version 8
-
    private String                weatherClouds;                                        // db-version 8
 
    private String                weather;                                              // db-version 13
 
    private int                   weatherHumidity;                                      // db-version 39
-
    private float                 weatherPrecipitation;                                 // db-version 39
-
    private int                   weatherPressure;                                      // db-version 39
-
    private int                   weatherWindChill;                                     // db-version 39
 
-   private int                   weatherMaxTemperature;                                // db-version 39
+   private float                 weatherMinTemperature;                                // db-version 39
+   private float                 weatherMaxTemperature;                                // db-version 39
 
-   private int                   weatherMinTemperature;                                // db-version 39
 
    // ############################################# POWER #############################################
 
@@ -3102,8 +3097,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       if (tempLength > 0) {
 
-//         weatherMinTemperature=temperatureMin;
-//         weatherMaxTemperature=temperatureMax;
+         weatherMinTemperature = temperatureMin;
+         weatherMaxTemperature = temperatureMax;
 
          avgTemperature = temperatureSum / tempLength;
       }
@@ -10018,11 +10013,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       this.weatherHumidity = weatherHumidity;
    }
 
-   public void setWeatherMaxTemperature(final int weatherMaxTemperature) {
+   public void setWeatherMaxTemperature(final float weatherMaxTemperature) {
       this.weatherMaxTemperature = weatherMaxTemperature;
    }
 
-   public void setWeatherMinTemperature(final int weatherMinTemperature) {
+   public void setWeatherMinTemperature(final float weatherMinTemperature) {
       this.weatherMinTemperature = weatherMinTemperature;
    }
 
