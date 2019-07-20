@@ -2989,10 +2989,11 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
          final String[] paths = (String[]) event.data;
          Assert.isTrue(paths.length > 0);
 
-         final String importFilePath = paths[0];
+         for (final String importFilePath : paths) {
 
-         if (isXmlFile(importFilePath)) {
-            doImportMP(importFilePath);
+            if (isXmlFile(importFilePath)) {
+               doImportMP(importFilePath);
+            }
          }
 
       } else if (URLTransfer.getInstance().isSupportedType(transferDataType)) {
