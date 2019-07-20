@@ -255,7 +255,7 @@ public class UI {
    public static final float UNIT_FAHRENHEIT_MULTI = 1.8f;
    public static final float UNIT_FAHRENHEIT_ADD   = 32;
 
-   public static final float UNIT_M_TO_INCHES      = 39.37007874f;
+   public static final float UNIT_METER_TO_INCHES  = 39.37007874f;
 
    /*
     * Labels for the different measurement systems
@@ -636,25 +636,52 @@ public class UI {
     * @param precipitation
     * @return Returns the precipitation amount in the current measurement system.
     */
-   public static float convertPrecipitationFromMetric(final float precipitation) {
+   public static float convertPrecipitation_FromMetric(final float precipitation) {
 
       if (UNIT_VALUE_TEMPERATURE == 1) {
          return precipitation;
       }
 
-      return precipitation * UNIT_M_TO_INCHES / 100f;
+      return precipitation * UNIT_METER_TO_INCHES;
+   }
+
+   /**
+    * @param precipitation
+    * @return Returns the precipitation amount in the current measurement system.
+    */
+   public static float convertPrecipitation_ToMetric(final float precipitation) {
+
+      if (UNIT_VALUE_TEMPERATURE == 1) {
+         return precipitation;
+      }
+
+      return precipitation / UNIT_METER_TO_INCHES;
    }
 
    /**
     * @param weatherPressure
     * @return Returns the atmospheric pressure value in the current measurement system.
     */
-   public static double convertPressureFromMetric(final int weatherPressure) {
+   public static float convertPressure_FromMetric(final float weatherPressure) {
+
       if (UNIT_VALUE_TEMPERATURE == 1) {
          return weatherPressure;
       }
 
       return weatherPressure * 0.02953f;
+   }
+
+   /**
+    * @param weatherPressure
+    * @return Returns the atmospheric pressure value in the current measurement system.
+    */
+   public static float convertPressure_ToMetric(final float weatherPressure) {
+
+      if (UNIT_VALUE_TEMPERATURE == 1) {
+         return weatherPressure;
+      }
+
+      return weatherPressure / 0.02953f / 100f;
    }
 
    /**
