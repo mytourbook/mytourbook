@@ -8,7 +8,7 @@ New
   - Map provider slideout
    - This replaces the (old and removed) menu dropdown for map provider 
      selection
-   - More info is dispalyed for a map provider which can be configured 
+   - More info is displayed for a map provider which can be configured 
      with the column manager
    - Tooltip for a hovered map provider
    - 3 state column sorting:
