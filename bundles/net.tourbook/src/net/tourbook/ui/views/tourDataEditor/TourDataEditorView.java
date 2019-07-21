@@ -3909,7 +3909,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
                   .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
                   .align(SWT.BEGINNING, SWT.CENTER)
                   .applyTo(_spinWeather_Wind_DirectionValue);
-            _spinWeather_Wind_DirectionValue.setMinimum(0);
+            _spinWeather_Wind_DirectionValue.setMinimum(-1);
             _spinWeather_Wind_DirectionValue.setMaximum(3600);
             _spinWeather_Wind_DirectionValue.setDigits(1);
             _spinWeather_Wind_DirectionValue.setToolTipText(Messages.tour_editor_label_wind_direction_Tooltip);
@@ -7084,6 +7084,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
       int degree = _spinWeather_Wind_DirectionValue.getSelection();
 
+      // this tricky code is used to scroll before 0 which will overscroll and starts from the beginning
+      if (degree == -1) {
+         degree = 3599;
+         _spinWeather_Wind_DirectionValue.setSelection(degree);
+      }
+
       if (degree == 3600) {
          degree = 0;
          _spinWeather_Wind_DirectionValue.setSelection(degree);
@@ -8124,7 +8130,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
       _txtWeather.setText(_tourData.getWeather());
 
       // wind direction
-      final int weatherWindDirDegree = (int) (_tourData.getWeatherWindDir() * 10.0f);
+      final int weatherWindDirDegree = _tourData.getWeatherWindDir() * 10;
       _spinWeather_Wind_DirectionValue.setSelection(weatherWindDirDegree);
       _comboWeather_WindDirectionText.select(getWindDirectionTextIndex(weatherWindDirDegree));
 

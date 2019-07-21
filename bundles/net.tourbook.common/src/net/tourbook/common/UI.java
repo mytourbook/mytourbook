@@ -1104,9 +1104,9 @@ public class UI {
     */
    public static int getCardinalDirectionTextIndex(final int degreeDirection) {
 
-      final float degree = (degreeDirection + 22.5f) / 45.0f;
+      final float degree = (degreeDirection / 10.0f + 11.25f) / 22.5f;
 
-      final int directionIndex = ((int) degree) % 8;
+      final int directionIndex = ((int) degree) % 16;
 
       return directionIndex;
    }
