@@ -101,7 +101,6 @@ Translation
 
 * French (Frederic)
 * German
-* Italian (Doriano)
 
  
 System   
