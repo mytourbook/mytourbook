@@ -1,0 +1,42 @@
+19.9.0                                                      ?. September 2019
+
+TODOs
+=====
+
+* Reduce tour book context menu with "Adjust Tour" submenu which contains computed tour actions
+* Show weather, location start/end as new columns
+* Compute min/max temperature for selected tours
+   
+
+New   
+===
+
+* 
+
+ 
+Improvements   
+============
+
+* 
+
+
+Bugfix   
+======
+
+* 
+ 
+
+Translation    
+===========
+
+ - French (Frederic)
+ - German
+ - Italian (Doriano)
+
+ 
+ 
+System   
+======
+
+  - 
+

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,46 +24,43 @@ import net.tourbook.tour.filter.TourFilterManager;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.ToolItem;
 
 public class ActionTourDataFilter extends ActionToolbarSlideoutAdv {
 
-// SET_FORMATTING_OFF
+   private static final ImageDescriptor _actionImageDescriptor         = TourbookPlugin.getImageDescriptor(Messages.Image__TourFilter);
+   private static final ImageDescriptor _actionImageDisabledDescriptor = TourbookPlugin.getImageDescriptor(Messages.Image__TourFilter_Disabled);
 
-	private static final ImageDescriptor	_actionImageDescriptor			= TourbookPlugin.getImageDescriptor(Messages.Image__TourFilter);
-	private static final ImageDescriptor	_actionImageDisabledDescriptor	= TourbookPlugin.getImageDescriptor(Messages.Image__TourFilter_Disabled);
+   private static final IDialogSettings _state                         = TourbookPlugin.getState("TourFilter");                                 //$NON-NLS-1$
 
-	private static final IDialogSettings	_state	= TourbookPlugin.getState("TourFilter");//$NON-NLS-1$
-	
-	private SlideoutTourFilter _slideoutTourFilter;
-	
-// SET_FORMATTING_ON
+   private SlideoutTourFilter           _slideoutTourFilter;
 
-	public ActionTourDataFilter() {
+   public ActionTourDataFilter() {
 
-		super(_actionImageDescriptor, _actionImageDisabledDescriptor);
+      super(_actionImageDescriptor, _actionImageDisabledDescriptor);
 
-		isToggleAction = true;
-		notSelectedTooltip = Messages.Tour_Filter_Action_Tooltip;
-	}
+      isToggleAction = true;
+      notSelectedTooltip = Messages.Tour_Filter_Action_Tooltip;
+   }
 
-	@Override
-	protected AdvancedSlideout createSlideout(final ToolItem toolItem) {
+   @Override
+   protected AdvancedSlideout createSlideout(final ToolItem toolItem) {
 
-		_slideoutTourFilter = new SlideoutTourFilter(toolItem, _state);
+      _slideoutTourFilter = new SlideoutTourFilter(toolItem, _state);
 
-		_slideoutTourFilter.setSlideoutLocation(SlideoutLocation.ABOVE_CENTER);
+      _slideoutTourFilter.setSlideoutLocation(SlideoutLocation.ABOVE_CENTER);
 
-		return _slideoutTourFilter;
-	}
+      return _slideoutTourFilter;
+   }
 
-	@Override
-	protected void onSelect() {
+   @Override
+   protected void onSelect(final SelectionEvent selectionEvent) {
 
-		super.onSelect();
+      super.onSelect(selectionEvent);
 
-		// update tour filter
-		TourFilterManager.setFilterEnabled(getSelection());
-	}
+      // update tour filter
+      TourFilterManager.setFilterEnabled(getSelection());
+   }
 
 }

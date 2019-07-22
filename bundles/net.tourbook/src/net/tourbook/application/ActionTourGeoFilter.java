@@ -28,6 +28,7 @@ import net.tourbook.tour.filter.geo.TourGeoFilter;
 import net.tourbook.tour.filter.geo.TourGeoFilter_Manager;
 
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.IViewPart;
@@ -56,9 +57,9 @@ public class ActionTourGeoFilter extends ActionToolbarSlideoutAdv {
    }
 
    @Override
-   protected void onSelect() {
+   protected void onSelect(final SelectionEvent selectionEvent) {
 
-      super.onSelect();
+      super.onSelect(selectionEvent);
 
       final boolean isSelected = getSelection();
 

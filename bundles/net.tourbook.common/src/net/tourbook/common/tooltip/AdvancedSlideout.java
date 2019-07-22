@@ -140,12 +140,13 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
     *           <p>
     *
     *           <pre>
-    *           horizContentDefaultWidth = 300;
+    * <code>
+    *           horizContentDefaultWidth  = 300;
     *           horizContentDefaultHeight = 150;
     *
-    *           vertContentDefaultWidth = 400;
-    *           vertContentDefaultHeight = 250;
-    *
+    *           vertContentDefaultWidth   = 400;
+    *           vertContentDefaultHeight  = 250;
+    * </code>
     *           </pre>
     */
    public AdvancedSlideout(final Control ownerControl, //
@@ -469,7 +470,12 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
          final int diffX = _devXMousedown - e.x;
          final int diffY = _devYMousedown - e.y;
 
-         setShellLocation(diffX, diffY);
+         // allow the shell to be moved partly outside of the viewport
+         isShellMoved = true;
+         {
+            setShellLocation(diffX, diffY);
+         }
+         isShellMoved = false;
       }
    }
 
@@ -552,6 +558,11 @@ public abstract class AdvancedSlideout extends AdvancedSlideoutShell {
 
    protected void setTitleText(final String titleText) {
       _titleText = titleText;
+   }
+
+   protected void updateTitleText(final String titleText) {
+
+      _labelDragSlideout.setText(titleText);
    }
 
 }

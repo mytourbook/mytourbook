@@ -163,7 +163,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    static public final String            ID                                              = "net.tourbook.views.tourListView";         //$NON-NLS-1$
 
    private final static IPreferenceStore _prefStore                                      = TourbookPlugin.getPrefStore();
-
    private final static IPreferenceStore _prefStoreCommon                                = CommonActivator.getPrefStore();
    private static final IDialogSettings  _state                                          = TourbookPlugin.getState(ID);
    //
@@ -262,31 +261,30 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _nf1_NoGroup.setMaximumFractionDigits(1);
       _nf1_NoGroup.setGroupingUsed(false);
    }
+   //
    private int                                        _selectedYear              = -1;
-
    private int                                        _selectedYearSub           = -1;
    private final ArrayList<Long>                      _selectedTourIds           = new ArrayList<>();
+   //
    private boolean                                    _isCollapseOthers;
-
    private boolean                                    _isInFireSelection;
    private boolean                                    _isInReload;
    private boolean                                    _isInStartup;
    private boolean                                    _isShowSummaryRow;
    private boolean                                    _isToolTipInDate;
-
    private boolean                                    _isToolTipInTags;
    private boolean                                    _isToolTipInTime;
    private boolean                                    _isToolTipInTitle;
    private boolean                                    _isToolTipInWeekDay;
+   //
    private final TourDoubleClickState                 _tourDoubleClickState      = new TourDoubleClickState();
    private TreeViewerTourInfoToolTip                  _tourInfoToolTip;
-
+   //
    private TagMenuManager                             _tagMenuManager;
-
    private MenuManager                                _viewerMenuManager;
    private IContextMenuProvider                       _viewerContextMenuProvider = new TreeContextMenuProvider();
+   //
    private ActionAdjustTemperature                    _actionAdjustTemperature;
-
    private ActionSetTimeZone                          _actionSetTimeZone;
    private ActionCollapseAll                          _actionCollapseAll;
    private ActionCollapseOthers                       _actionCollapseOthers;
@@ -318,10 +316,10 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private ActionSetPerson                            _actionSetOtherPerson;
    private ActionToggleMonthWeek                      _actionToggleMonthWeek;
    private ActionTourBookOptions                      _actionTourBookOptions;
-
+   //
    private TreeViewer                                 _tourViewer;
    private TreeColumnDefinition                       _timeZoneOffsetColDef;
-
+   //
    private PixelConverter                             _pc;
 
    /*
@@ -3127,7 +3125,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       }
 
       final boolean useWeatherRetrieval = _prefStore.getBoolean(ITourbookPreferences.WEATHER_USE_WEATHER_RETRIEVAL) &&
-            !_prefStore.getString(ITourbookPreferences.WEATHER_API_KEY).equals("");
+            !_prefStore.getString(ITourbookPreferences.WEATHER_API_KEY).equals(UI.EMPTY_STRING);
 
       /*
        * enable actions
@@ -4542,7 +4540,14 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
    @Override
    public void setFocus() {
-      _tourViewer.getTree().setFocus();
+
+      final Tree tree = _tourViewer.getTree();
+
+      if (tree.isDisposed()) {
+         return;
+      }
+
+      tree.setFocus();
    }
 
    void setLinkAndCollapse(final boolean isCollapseOthers) {

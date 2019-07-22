@@ -14,7 +14,7 @@
    <packaging>pom</packaging>
    
    <properties>
-      <tycho.version>0.24.0</tycho.version>
+      <tycho.version>0.25.0</tycho.version>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>  
    </properties>
 
@@ -60,20 +60,18 @@
    <repositories>
    
 
-      <!-- Eclipse E4 web repositories 
+      <!-- Eclipse E4 web repository -->
       
       <repository>
-         <id>eclipse-photon</id>
-         <layout>p2</layout>
-         <url>http://download.eclipse.org/releases/photon</url>
-      </repository>
-      
-      -->
-      
-      <!-- Eclipse 4.10 local repositories downloaded from 
-         https://download.eclipse.org/eclipse/downloads/drops4/R-4.10-201812060815/ 
-      -->
+         <id>eclipse.platform.4.12</id>                                  <layout>p2</layout>
+         <url>https://download.eclipse.org/releases/2019-06</url>
+      </repository>   
    
+      <!-- 
+      
+      Eclipse local repositories downloaded from https://download.eclipse.org/eclipse/downloads/
+      do not work anymore
+      
       <repository>
          <id>eclipse.platform.4.10</id>                                  <layout>p2</layout>
          <url>jar:file:repositories/org.eclipse.platform-4.10.zip!/</url>
@@ -93,7 +91,8 @@
          <id>eclipse.pde.4.10</id>                                       <layout>p2</layout>
          <url>jar:file:repositories/org.eclipse.pde-4.10.zip!/</url>
       </repository>
-
+      
+      -->
       
       <repository>
          <id>eclipse.3.8.2.nl</id>                                      <layout>p2</layout>
