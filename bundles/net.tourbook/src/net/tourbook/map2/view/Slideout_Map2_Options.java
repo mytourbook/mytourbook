@@ -62,6 +62,7 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
     */
    private Composite _parent;
 
+   private Button    _chkIsToggleKeyboardPanning;
    private Button    _chkIsShowHoveredTour;
    private Button    _chkIsZoomWithMousePosition;
 
@@ -202,6 +203,19 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
                GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsZoomWithMousePosition);
             }
          }
+         {
+            /*
+             * Inverse keyboard panning
+             */
+            {
+               // checkbox
+               _chkIsToggleKeyboardPanning = new Button(container, SWT.CHECK);
+               _chkIsToggleKeyboardPanning.setText(Messages.Slideout_Map_Options_Checkbox_ToggleKeyboardPanning);
+               _chkIsToggleKeyboardPanning.setToolTipText(Messages.Slideout_Map_Options_Checkbox_ToggleKeyboardPanning_Tooltip);
+               _chkIsToggleKeyboardPanning.addSelectionListener(_defaultState_SelectionListener);
+               GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsToggleKeyboardPanning);
+            }
+         }
       }
    }
 
@@ -284,6 +298,7 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
 
 // SET_FORMATTING_OFF
 
+      _chkIsToggleKeyboardPanning.setSelection(   Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING_DEFAULT);
       _chkIsShowHoveredTour.setSelection(          Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT);
       _chkIsZoomWithMousePosition.setSelection(    Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION_DEFAULT);
 
@@ -296,8 +311,9 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
 
 // SET_FORMATTING_OFF
 
-      _chkIsShowHoveredTour.setSelection(       Util.getStateBoolean(_state,    Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR, Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT));
-      _chkIsZoomWithMousePosition.setSelection( Util.getStateBoolean(_state,    Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION,   Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION_DEFAULT));
+      _chkIsToggleKeyboardPanning.setSelection(   Util.getStateBoolean(_state,  Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING,   Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING_DEFAULT));
+      _chkIsShowHoveredTour.setSelection(          Util.getStateBoolean(_state,  Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR, Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT));
+      _chkIsZoomWithMousePosition.setSelection(    Util.getStateBoolean(_state,  Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION,   Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION_DEFAULT));
 
 // SET_FORMATTING_ON
    }
@@ -306,6 +322,7 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
 
 // SET_FORMATTING_OFF
 
+      _state.put(Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING,   _chkIsToggleKeyboardPanning.getSelection());
       _state.put(Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR, _chkIsShowHoveredTour.getSelection());
       _state.put(Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION,   _chkIsZoomWithMousePosition.getSelection());
 

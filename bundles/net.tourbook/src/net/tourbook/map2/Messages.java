@@ -90,7 +90,6 @@ public class Messages extends NLS {
    public static String        legendcolor_dialog_txt_max_value;
    public static String        legendcolor_dialog_txt_min_value;
 
-   public static String        map_action_change_tile_factory_tooltip;
    public static String        map_action_dim_map;
    public static String        map_action_dim_map_disabled;
    public static String        map_action_reload_map;
@@ -105,20 +104,16 @@ public class Messages extends NLS {
    public static String        Map_Action_POI;
    public static String        Map_Action_POI_Tooltip;
    public static String        Map_Action_SearchTourByLocation;
-   public static String        Map_Action_SetDefaultMapProviders;
    public static String        Map_Action_ShowAllFilteredPhotos_Tooltip;
    public static String        Map_Action_ShowPhotos_Tooltip;
    public static String        Map_Action_ShowTourInfoInMap;
    public static String        Map_Action_ShowWayPoints;
    public static String        Map_Action_SynchWithSlider_Centered;
    public static String        Map_Action_SyncPhotoWithMap_Tooltip;
-   public static String        Map_Action_ToggleMarker;
 
    public static String        Map_Properties_ShowGeoGrid;
    public static String        Map_Properties_ShowTileBorder;
    public static String        Map_Properties_ShowTileInfo;
-
-   public static String        Modify_MapProvider_Label_Hints;
 
    public static String        map_action_show_legend_in_map;
    public static String        map_action_show_scale_in_map;
@@ -148,12 +143,6 @@ public class Messages extends NLS {
    public static String        map_dlg_dim_warning_toggle_message;
 
    public static String        map_properties_map_dim_level;
-
-   public static String        modify_mapprovider_btn_down;
-   public static String        modify_mapprovider_btn_up;
-   public static String        modify_mapprovider_dialog_area_message;
-   public static String        modify_mapprovider_dialog_area_title;
-   public static String        modify_mapprovider_dialog_title;
 
    public static String        statusLine_mapInfo_data;
    public static String        statusLine_mapInfo_defaultText;

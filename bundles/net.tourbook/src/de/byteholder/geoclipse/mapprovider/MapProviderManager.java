@@ -34,6 +34,7 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -45,9 +46,11 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.map.GeoPosition;
+import net.tourbook.common.map.MapUI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
+import net.tourbook.map2.view.Map2View;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -58,8 +61,10 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.WorkbenchException;
@@ -75,43 +80,48 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * this will manage all map providers
+ * This will manage all 2D map providers
  */
 public class MapProviderManager {
+
+   private static final String PREF_MAP_PROVIDER_TYPE_CUSTOM      = de.byteholder.geoclipse.preferences.Messages.Pref_Map_ProviderType_Custom;
+   private static final String PREF_MAP_PROVIDER_TYPE_MAP_PROFILE = de.byteholder.geoclipse.preferences.Messages.Pref_Map_ProviderType_MapProfile;
+   private static final String PREF_MAP_PROVIDER_TYPE_PLUGIN      = de.byteholder.geoclipse.preferences.Messages.Pref_Map_ProviderType_Plugin;
+   private static final String PREF_MAP_PROVIDER_TYPE_WMS         = de.byteholder.geoclipse.preferences.Messages.Pref_Map_ProviderType_Wms;
 
    /**
     * This prefix is used to sort the map providers at the end when the map provider is not a map
     * profile
     */
-   private static final String SINGLE_MAP_PROVIDER_NAME_PREFIX = "_";          //$NON-NLS-1$
+   private static final String SINGLE_MAP_PROVIDER_NAME_PREFIX    = "_";                                                                          //$NON-NLS-1$
 
-   private static final int    OSM_BACKGROUND_COLOR            = 0xE8EEF1;
-   private static final int    DEFAULT_ALPHA                   = 100;
+   private static final int    OSM_BACKGROUND_COLOR               = 0xE8EEF1;
+   private static final int    DEFAULT_ALPHA                      = 100;
 
-   private static final String URL_PREFIX_HTTP                 = "http";       //$NON-NLS-1$
-   private static final String URL_PREFIX_HTTP_PROTOCOL        = "http://";    //$NON-NLS-1$
+   private static final String URL_PREFIX_HTTP                    = "http";                                                                       //$NON-NLS-1$
+   private static final String URL_PREFIX_HTTP_PROTOCOL           = "http://";                                                                    //$NON-NLS-1$
 
-   private static final String MAP_PROVIDER_TYPE_WMS           = "wms";        //$NON-NLS-1$
-   private static final String MAP_PROVIDER_TYPE_CUSTOM        = "custom";     //$NON-NLS-1$
-   private static final String MAP_PROVIDER_TYPE_MAP_PROFILE   = "profile";    //$NON-NLS-1$
-   private static final String MAP_PROVIDER_TYPE_PLUGIN        = "plugin";     //$NON-NLS-1$
+   private static final String MAP_PROVIDER_TYPE_WMS              = "wms";                                                                        //$NON-NLS-1$
+   private static final String MAP_PROVIDER_TYPE_CUSTOM           = "custom";                                                                     //$NON-NLS-1$
+   private static final String MAP_PROVIDER_TYPE_MAP_PROFILE      = "profile";                                                                    //$NON-NLS-1$
+   private static final String MAP_PROVIDER_TYPE_PLUGIN           = "plugin";                                                                     //$NON-NLS-1$
 
-   public static final String  MIME_PNG                        = "image/png";  //$NON-NLS-1$
-   public static final String  MIME_GIF                        = "image/gif";  //$NON-NLS-1$
-   public static final String  MIME_JPG                        = "image/jpg";  //$NON-NLS-1$
-   public static final String  MIME_JPEG                       = "image/jpeg"; //$NON-NLS-1$
+   public static final String  MIME_PNG                           = "image/png";                                                                  //$NON-NLS-1$
+   public static final String  MIME_GIF                           = "image/gif";                                                                  //$NON-NLS-1$
+   public static final String  MIME_JPG                           = "image/jpg";                                                                  //$NON-NLS-1$
+   public static final String  MIME_JPEG                          = "image/jpeg";                                                                 //$NON-NLS-1$
 
-   public static final String  DEFAULT_IMAGE_FORMAT            = MIME_PNG;
+   public static final String  DEFAULT_IMAGE_FORMAT               = MIME_PNG;
 
-   public static final String  FILE_EXTENSION_PNG              = "png";        //$NON-NLS-1$
-   public static final String  FILE_EXTENSION_GIF              = "gif";        //$NON-NLS-1$
-   public static final String  FILE_EXTENSION_JPG              = "jpg";        //$NON-NLS-1$
+   public static final String  FILE_EXTENSION_PNG                 = "png";                                                                        //$NON-NLS-1$
+   public static final String  FILE_EXTENSION_GIF                 = "gif";                                                                        //$NON-NLS-1$
+   public static final String  FILE_EXTENSION_JPG                 = "jpg";                                                                        //$NON-NLS-1$
 
    /**
     * This file name part is attached to saved tile images for profile map providers were only a
     * part of the child images are available.
     */
-   public static final String  PART_IMAGE_FILE_NAME_SUFFIX     = "-part";      //$NON-NLS-1$
+   public static final String  PART_IMAGE_FILE_NAME_SUFFIX        = "-part";                                                                      //$NON-NLS-1$
 
    /*
     * map provider file and root tag
@@ -127,33 +137,38 @@ public class MapProviderManager {
    private static final String ATTR_ROOT_IS_MANUAL_EXPORT    = "IsExport";                //$NON-NLS-1$
 
    /*
-    * map provider common fields
+    * Map provider common fields
     */
-   private static final String ROOT_CHILD_TAG_MAP_PROVIDER         = "MapProvider";        //$NON-NLS-1$
+   private static final String ROOT_CHILD_TAG_MAP_PROVIDER         = "MapProvider";           //$NON-NLS-1$
 
    /**
-    * tag for map providers which are wrapped into a map profile
+    * Tag for map providers which are wrapped into a map profile
     */
-   private static final String ROOT_CHILD_TAG_WRAPPED_MAP_PROVIDER = "WrappedMapProvider"; //$NON-NLS-1$
+   private static final String ROOT_CHILD_TAG_WRAPPED_MAP_PROVIDER = "WrappedMapProvider";    //$NON-NLS-1$
 
-   private static final String ATTR_MP_NAME                        = "Name";               //$NON-NLS-1$
-   private static final String ATTR_MP_ID                          = "Id";                 //$NON-NLS-1$
-   private static final String ATTR_MP_DESCRIPTION                 = "Description";        //$NON-NLS-1$
-   private static final String ATTR_MP_OFFLINE_FOLDER              = "OfflineFolder";      //$NON-NLS-1$
-   private static final String ATTR_MP_TYPE                        = "Type";               //$NON-NLS-1$
-   private static final String ATTR_MP_IMAGE_SIZE                  = "ImageSize";          //$NON-NLS-1$
-   private static final String ATTR_MP_IMAGE_FORMAT                = "ImageFormat";        //$NON-NLS-1$
-   private static final String ATTR_MP_ZOOM_LEVEL_MIN              = "ZoomMin";            //$NON-NLS-1$
-   private static final String ATTR_MP_ZOOM_LEVEL_MAX              = "ZoomMax";            //$NON-NLS-1$
-   private static final String ATTR_MP_LAST_USED_ZOOM_LEVEL        = "LastUsedZoomLevel";  //$NON-NLS-1$
-   private static final String ATTR_MP_LAST_USED_LATITUDE          = "LastUsedLatitude";   //$NON-NLS-1$
-   private static final String ATTR_MP_LAST_USED_LONGITUDE         = "LastUsedLongitude";  //$NON-NLS-1$
-   private static final String ATTR_MP_FAVORITE_ZOOM_LEVEL         = "FavoriteZoomLevel";  //$NON-NLS-1$
-   private static final String ATTR_MP_FAVORITE_LATITUDE           = "FavoriteLatitude";   //$NON-NLS-1$
-   private static final String ATTR_MP_FAVORITE_LONGITUDE          = "FavoriteLongitude";  //$NON-NLS-1$
+   private static final String ATTR_MP_NAME                        = "Name";                  //$NON-NLS-1$
+   private static final String ATTR_MP_ID                          = "Id";                    //$NON-NLS-1$
+   private static final String ATTR_MP_DATE_TIME_MODIFIED          = "Modified";              //$NON-NLS-1$
+   private static final String ATTR_MP_CATEGORY                    = "Category";              //$NON-NLS-1$
+   private static final String ATTR_MP_DESCRIPTION                 = "Description";           //$NON-NLS-1$
+   private static final String ATTR_MP_IS_INCLUDES_HILLSHADING     = "isIncludesHillShading"; //$NON-NLS-1$
+   private static final String ATTR_MP_IS_TRANSPARENT_LAYER        = "isTransparentLayer";    //$NON-NLS-1$
+   private static final String ATTR_MP_OFFLINE_FOLDER              = "OfflineFolder";         //$NON-NLS-1$
+   private static final String ATTR_MP_ONLINE_MAP_URL              = "OnlineMapUrl";          //$NON-NLS-1$
+   private static final String ATTR_MP_TYPE                        = "Type";                  //$NON-NLS-1$
+   private static final String ATTR_MP_IMAGE_SIZE                  = "ImageSize";             //$NON-NLS-1$
+   private static final String ATTR_MP_IMAGE_FORMAT                = "ImageFormat";           //$NON-NLS-1$
+   private static final String ATTR_MP_ZOOM_LEVEL_MIN              = "ZoomMin";               //$NON-NLS-1$
+   private static final String ATTR_MP_ZOOM_LEVEL_MAX              = "ZoomMax";               //$NON-NLS-1$
+   private static final String ATTR_MP_LAST_USED_ZOOM_LEVEL        = "LastUsedZoomLevel";     //$NON-NLS-1$
+   private static final String ATTR_MP_LAST_USED_LATITUDE          = "LastUsedLatitude";      //$NON-NLS-1$
+   private static final String ATTR_MP_LAST_USED_LONGITUDE         = "LastUsedLongitude";     //$NON-NLS-1$
+   private static final String ATTR_MP_FAVORITE_ZOOM_LEVEL         = "FavoriteZoomLevel";     //$NON-NLS-1$
+   private static final String ATTR_MP_FAVORITE_LATITUDE           = "FavoriteLatitude";      //$NON-NLS-1$
+   private static final String ATTR_MP_FAVORITE_LONGITUDE          = "FavoriteLongitude";     //$NON-NLS-1$
 
    /*
-    * custom map provider
+    * Custom map provider
     */
    private static final String ATTR_CUSTOM_CUSTOM_URL                        = "CustomUrl";          //$NON-NLS-1$
 
@@ -172,13 +187,9 @@ public class MapProviderManager {
    private static final String PART_TYPE_X                                   = "X";                  //$NON-NLS-1$;
    private static final String PART_TYPE_Y                                   = "Y";                  //$NON-NLS-1$;
    private static final String PART_TYPE_ZOOM                                = "ZOOM";               //$NON-NLS-1$;
-//   private static final String            PART_TYPE_LAT_TOP                        = "LATITUDE_TOP";               //$NON-NLS-1$
-//   private static final String            PART_TYPE_LAT_BOTTOM                     = "LATITUDE_BOTTOM";            //$NON-NLS-1$;
-//   private static final String            PART_TYPE_LON_LEFT                        = "LONGITUDE_LEFT";            //$NON-NLS-1$;
-//   private static final String            PART_TYPE_LON_RIGHT                        = "LONGITUDE_RIGHT";            //$NON-NLS-1$;
 
    /*
-    * wms map provider
+    * WMS map provider
     */
    private static final String ATTR_WMS_CAPS_URL                = "CapsUrl";               //$NON-NLS-1$
    private static final String ATTR_WMS_MAP_URL                 = "GetMapUrl";             //$NON-NLS-1$
@@ -191,12 +202,14 @@ public class MapProviderManager {
    private static final String ATTR_LAYER_POSITION              = "Position";              //$NON-NLS-1$
 
    /*
-    * map profile
+    * Map profile
     */
    private static final String TAG_MAP_PROVIDER_WRAPPER  = "MapProviderWrapper"; //$NON-NLS-1$
    private static final String ATTR_PMP_BACKGROUND_COLOR = "BackgroundColor";    //$NON-NLS-1$
 
-   // profile map provider settings
+   /*
+    * Profile map provider settings
+    */
    private static final String ATTR_PMP_MAP_PROVIDER_ID           = "Id";                    //$NON-NLS-1$
    private static final String ATTR_PMP_MAP_PROVIDER_TYPE         = "Type";                  //$NON-NLS-1$
    private static final String ATTR_PMP_POSITION                  = "Position";              //$NON-NLS-1$
@@ -208,60 +221,64 @@ public class MapProviderManager {
    private static final String ATTR_PMP_BRIGHTNESS_FOR_NEXT_MP    = "BrightnessForNextMP";   //$NON-NLS-1$
 
    // transparent pixel
-   private static final String        TAG_TRANSPARENT_COLOR        = "TransparentColor";              //$NON-NLS-1$
-   private static final String        ATTR_TRANSPARENT_COLOR_VALUE = "Value";                         //$NON-NLS-1$
+   private static final String                             TAG_TRANSPARENT_COLOR        = "TransparentColor";                       //$NON-NLS-1$
+   private static final String                             ATTR_TRANSPARENT_COLOR_VALUE = "Value";                                  //$NON-NLS-1$
 
    /**
     * Id for the default map provider
     */
-   public static String               DEFAULT_MAP_PROVIDER_ID      = OSMMapProvider.FACTORY_ID;
+   public static String                                    DEFAULT_MAP_PROVIDER_ID      = OSMMapProvider.FACTORY_ID;
 
    /**
     * Size for osm images
     */
-   public static final int            OSM_IMAGE_SIZE               = 256;
-   public static final String         DEFAULT_IMAGE_SIZE           = Integer.toString(OSM_IMAGE_SIZE);
-   public static final String[]       IMAGE_SIZE                   = {
-         DEFAULT_IMAGE_SIZE,
-         "300",                                                                                       //$NON-NLS-1$
-         "400",                                                                                       //$NON-NLS-1$
-         "500",                                                                                       //$NON-NLS-1$
-         "512",                                                                                       //$NON-NLS-1$
-         "600",                                                                                       //$NON-NLS-1$
-         "700",                                                                                       //$NON-NLS-1$S
-         "768",                                                                                       //$NON-NLS-1$
-         "800",                                                                                       //$NON-NLS-1$
-         "900",                                                                                       //$NON-NLS-1$
-         "1000",                                                                                      //$NON-NLS-1$
-         "1024",                                                                                      //$NON-NLS-1$
-   };
+   public static final int                                 OSM_IMAGE_SIZE               = 256;
+   public static final String                              DEFAULT_IMAGE_SIZE           = Integer.toString(OSM_IMAGE_SIZE);
+   public static final String[]                            IMAGE_SIZE                   =
+         {
+               DEFAULT_IMAGE_SIZE,
+               "300",                                                                                                               //$NON-NLS-1$
+               "400",                                                                                                               //$NON-NLS-1$
+               "500",                                                                                                               //$NON-NLS-1$
+               "512",                                                                                                               //$NON-NLS-1$
+               "600",                                                                                                               //$NON-NLS-1$
+               "700",                                                                                                               //$NON-NLS-1$S
+               "768",                                                                                                               //$NON-NLS-1$
+               "800",                                                                                                               //$NON-NLS-1$
+               "900",                                                                                                               //$NON-NLS-1$
+               "1000",                                                                                                              //$NON-NLS-1$
+               "1024",                                                                                                              //$NON-NLS-1$
+         };
 
-   private static final ReentrantLock WMS_LOCK                     = new ReentrantLock();
+   private static final ReentrantLock                      WMS_LOCK                     = new ReentrantLock();
 
-   private static MapProviderManager  _instance;
+   private static MapProviderManager                       _instance;
 
    /**
     * contains all available map providers, including empty map provider and map profiles
     */
-   private static ArrayList<MP>       _allMapProviders;
+   private static ArrayList<MP>                            _allMapProviders;
 
-   private static IPreferenceStore    _prefStore                   = TourbookPlugin.getPrefStore();
+   private static IPreferenceStore                         _prefStore                   = TourbookPlugin.getPrefStore();
 
-   private static boolean             _isDeleteError;
+   private static boolean                                  _isDeleteError;
+   private static long                                     _deleteUIUpdateTime;
 
-   private static long                _deleteUIUpdateTime;
-   private static int                 _deleteUIDeletedFiles;
-   private static int                 _deleteUICheckedFiles;
+   private static int                                      _deleteUIDeletedFiles;
+   private static int                                      _deleteUICheckedFiles;
 
    /**
     * Default map provider
     */
-   private static MPPlugin            _mpDefault;
+   private static MPPlugin                                 _mpDefault;
 
-   private static ArrayList<String>   _errorLog                    = new ArrayList<>();
+   private static ArrayList<String>                        _errorLog                    = new ArrayList<>();
 
-   //
-   private static final ListenerList<IMapProviderListener> _mapProviderListeners = new ListenerList<>(ListenerList.IDENTITY);
+   private static final ListenerList<IMapProviderListener> _mapProviderListeners        = new ListenerList<>(ListenerList.IDENTITY);
+
+   private static Map2View                                 _map2View;
+
+   private boolean                                         _isLogImportInfo             = false;
 
    private MapProviderManager() {}
 
@@ -665,7 +682,11 @@ public class MapProviderManager {
       return _instance;
    }
 
-   private static String getMapProviderType(final MP mapProvider) {
+   public static Map2View getMap2View() {
+      return _map2View;
+   }
+
+   private static String getMapProvider_InternalType(final MP mapProvider) {
 
       if (mapProvider instanceof MPCustom) {
          return MAP_PROVIDER_TYPE_CUSTOM;
@@ -676,6 +697,84 @@ public class MapProviderManager {
       }
 
       return null;
+   }
+
+   public static Image getMapProvider_TypeImage(final MP mapProvider) {
+
+      final ImageRegistry imageRegistry = net.tourbook.common.UI.IMAGE_REGISTRY;
+
+      if (mapProvider.isTransparentLayer()) {
+
+         if (mapProvider.isIncludesHillshading()) {
+
+            return imageRegistry.get(MapUI.MAP_PROVIDER_TRANSPARENT_HILL);
+
+         } else {
+
+            return imageRegistry.get(MapUI.MAP_PROVIDER_TRANSPARENT);
+         }
+      }
+
+      if (mapProvider instanceof MPWms) {
+
+      } else if (mapProvider instanceof MPCustom) {
+
+         if (mapProvider.isIncludesHillshading()) {
+
+            return imageRegistry.get(MapUI.MAP_PROVIDER_CUSTOM_HILL);
+
+         } else {
+
+            return imageRegistry.get(MapUI.MAP_PROVIDER_CUSTOM);
+         }
+
+      } else if (mapProvider instanceof MPProfile) {
+
+         if (mapProvider.isIncludesHillshading()) {
+
+            return imageRegistry.get(MapUI.MAP_PROVIDER_PROFILE_HILL);
+
+         } else {
+
+            return imageRegistry.get(MapUI.MAP_PROVIDER_PROFILE);
+         }
+
+      } else if (mapProvider instanceof MPPlugin) {
+
+         return imageRegistry.get(MapUI.MAP_PROVIDER_INTERNAL);
+      }
+
+      return null;
+   }
+
+   public static String getMapProvider_TypeLabel(final MP mapProvider) {
+
+      if (mapProvider instanceof MPWms) {
+
+         // wms map provider
+
+         return PREF_MAP_PROVIDER_TYPE_WMS;
+
+      } else if (mapProvider instanceof MPCustom) {
+
+         // custom map provider
+
+         return PREF_MAP_PROVIDER_TYPE_CUSTOM;
+
+      } else if (mapProvider instanceof MPProfile) {
+
+         // map profile
+
+         return PREF_MAP_PROVIDER_TYPE_MAP_PROFILE;
+
+      } else if (mapProvider instanceof MPPlugin) {
+
+         // plugin map provider
+
+         return PREF_MAP_PROVIDER_TYPE_PLUGIN;
+      }
+
+      return UI.EMPTY_STRING;
    }
 
    /**
@@ -719,6 +818,94 @@ public class MapProviderManager {
       }
 
       return null;
+   }
+
+   public static String getTileLayerInfo(final MP mapProvider) {
+
+      final String layerInfo = UI.EMPTY_STRING;
+
+      if (mapProvider instanceof MPWms) {
+
+         // wms map provider
+
+         return ((MPWms) mapProvider).getCapabilitiesUrl();
+
+      } else if (mapProvider instanceof MPCustom) {
+
+         // custom map provider
+
+         return ((MPCustom) mapProvider).getCustomUrl();
+
+      } else if (mapProvider instanceof MPProfile) {
+
+         // map profile
+
+         return getTileLayerInfo_MPProfile((MPProfile) mapProvider);
+
+      } else if (mapProvider instanceof MPPlugin) {
+
+         // plugin map provider
+
+         return ((MPPlugin) mapProvider).getBaseURL();
+      }
+
+      return layerInfo;
+   }
+
+   private static String getTileLayerInfo_MPProfile(final MPProfile mpProfile) {
+
+      final StringBuilder sb = new StringBuilder();
+
+      for (final MPWrapper mpWrapper : mpProfile.getAllWrappers()) {
+
+         final MP mpWrapperMP = mpWrapper.getMP();
+
+         if (mpWrapper.isDisplayedInMap()) {
+
+            if (mpWrapperMP instanceof MPWms) {
+
+               // wms map provider
+
+               final MPWms wmsMapProvider = (MPWms) mpWrapperMP;
+
+               if (sb.length() > 0) {
+                  sb.append(UI.NEW_LINE);
+               }
+
+               sb.append(wmsMapProvider.getCapabilitiesUrl());
+
+            } else if (mpWrapperMP instanceof MPCustom) {
+
+               // custom map provider
+
+               final MPCustom customMapProvider = (MPCustom) mpWrapperMP;
+
+               if (sb.length() > 0) {
+                  sb.append(UI.NEW_LINE);
+               }
+
+               sb.append(customMapProvider.getCustomUrl());
+
+            } else if (mpWrapperMP instanceof MPProfile) {
+
+               // map profile
+
+            } else if (mpWrapperMP instanceof MPPlugin) {
+
+               // plugin map provider
+
+               final MPPlugin pluginMapProvider = (MPPlugin) mpWrapperMP;
+
+               if (sb.length() > 0) {
+                  sb.append(UI.NEW_LINE);
+               }
+
+               sb.append(pluginMapProvider.getBaseURL());
+            }
+         }
+      }
+
+      return sb.toString();
    }
 
    /**
@@ -982,6 +1169,26 @@ public class MapProviderManager {
       }
    }
 
+   /**
+    * Save the visible state of the map providers
+    */
+   public static void saveState_MapProviders_VisibleInUI() {
+
+      final ArrayList<String> allVisibleMP = new ArrayList<>();
+
+      for (final MP mp : _allMapProviders) {
+         if (mp.isVisibleInUI()) {
+            allVisibleMP.add(mp.getId());
+         }
+      }
+
+      _prefStore.setValue(IMappingPreferences.MAP_PROVIDER_VISIBLE_IN_UI, Util.convertListToString(allVisibleMP));
+   }
+
+   public static void setMap2View(final Map2View map2View) {
+      _map2View = map2View;
+   }
+
    public void addMapProvider(final MP mp) {
       _allMapProviders.add(mp);
       updateMpSorting(mp);
@@ -1091,7 +1298,7 @@ public class MapProviderManager {
          }
       }
 
-      final ArrayList<MP> importedMapProviders = readXml1(absolutePath, false, false);
+      final ArrayList<MP> importedMapProviders = readXml_MP_1(absolutePath, false, false);
       for (final MP mp : importedMapProviders) {
 
          /*
@@ -1342,7 +1549,7 @@ public class MapProviderManager {
 
    /**
     * @param importFilePath
-    * @return Returns the imported map provider or <code>null</code> when an import error
+    * @return Returns the imported map providers or <code>null</code> when an import error
     *         occured<br>
     *         <br>
     *         Multiple map providers are returned when a map profile contains map providers which
@@ -1350,17 +1557,24 @@ public class MapProviderManager {
     */
    public ArrayList<MP> importMapProvider(final String importFilePath) {
 
-      final ArrayList<MP> importedMPList = readXml1(importFilePath, true, true);
+      final ArrayList<MP> importedMPList = readXml_MP_1(importFilePath, true, true);
       if (importedMPList.size() > 0) {
 
          // validate map provider
-         return validateImportedMP(importedMPList);
+         final ArrayList<MP> allValidMPs = validateImportedMP(importedMPList);
+
+         if (allValidMPs != null) {
+            saveState_MapProviders_VisibleInUI();
+         }
+
+         return allValidMPs;
       }
 
       return null;
    }
 
    private void logError(final String errorText, final Exception exception) {
+
       StatusUtil.log(errorText, exception);
       _errorLog.add(errorText);
    }
@@ -1375,7 +1589,7 @@ public class MapProviderManager {
     * @return Returns a list with all map providers from a xml file including wrapped plugin map
     *         provider
     */
-   private ArrayList<MP> readXml1(final String filename, final boolean isShowExistError, final boolean isMpImport) {
+   private ArrayList<MP> readXml_MP_1(final String filename, final boolean isShowExistError, final boolean isMpImport) {
 
       final ArrayList<MP> validMapProviders = new ArrayList<>();
       InputStreamReader reader = null;
@@ -1407,10 +1621,10 @@ public class MapProviderManager {
             }
          }
 
-         readXml2(validMapProviders, mementoRoot, ROOT_CHILD_TAG_MAP_PROVIDER);
+         readXml_MP_2(validMapProviders, mementoRoot, ROOT_CHILD_TAG_MAP_PROVIDER, isMpImport, filename);
 
          if (isMpImport) {
-            readXml2(validMapProviders, mementoRoot, ROOT_CHILD_TAG_WRAPPED_MAP_PROVIDER);
+            readXml_MP_2(validMapProviders, mementoRoot, ROOT_CHILD_TAG_WRAPPED_MAP_PROVIDER, isMpImport, filename);
          }
 
       } catch (final UnsupportedEncodingException e) {
@@ -1443,10 +1657,14 @@ public class MapProviderManager {
     * @param validMapProviders
     * @param mementoRoot
     * @param tagNameRootChildren
+    * @param isMpImport
+    * @param filename
     */
-   private void readXml2(final ArrayList<MP> validMapProviders,
-                         final XMLMemento mementoRoot,
-                         final String tagNameRootChildren) {
+   private void readXml_MP_2(final ArrayList<MP> validMapProviders,
+                             final XMLMemento mementoRoot,
+                             final String tagNameRootChildren,
+                             final boolean isMpImport,
+                             final String filename) {
 
       final ArrayList<MP> allMapProviders = getAllMapProviders();
       final IMemento[] tagMapProviderList = mementoRoot.getChildren(tagNameRootChildren);
@@ -1456,36 +1674,72 @@ public class MapProviderManager {
          /*
           * get common fields
           */
-         final String mapProviderId = tagMapProvider.getString(ATTR_MP_ID);
-         final String mapProviderName = tagMapProvider.getString(ATTR_MP_NAME);
-         final String mapProviderType = tagMapProvider.getString(ATTR_MP_TYPE);
+         final String xmlMapProviderId = tagMapProvider.getString(ATTR_MP_ID);
+         final String xmlMapProviderName = tagMapProvider.getString(ATTR_MP_NAME);
+         final String xmlMapProviderType = tagMapProvider.getString(ATTR_MP_TYPE);
 
-         final String offlineFolder = tagMapProvider.getString(ATTR_MP_OFFLINE_FOLDER);
-         final String description = tagMapProvider.getString(ATTR_MP_DESCRIPTION);
+         final String xmlCategory = tagMapProvider.getString(ATTR_MP_CATEGORY);
+         String xmlDescription = tagMapProvider.getString(ATTR_MP_DESCRIPTION);
+         final String xmlOfflineFolder = tagMapProvider.getString(ATTR_MP_OFFLINE_FOLDER);
+         final String xmlOnlineMapUrl = tagMapProvider.getString(ATTR_MP_ONLINE_MAP_URL);
 
-         final Integer imageSize = tagMapProvider.getInteger(ATTR_MP_IMAGE_SIZE);
-         final String imageFormat = tagMapProvider.getString(ATTR_MP_IMAGE_FORMAT);
+         final Integer xmlImageSize = tagMapProvider.getInteger(ATTR_MP_IMAGE_SIZE);
+         final String xmlImageFormat = tagMapProvider.getString(ATTR_MP_IMAGE_FORMAT);
+
+         final Boolean xmlHasTopo = tagMapProvider.getBoolean(ATTR_MP_IS_INCLUDES_HILLSHADING);
+         final Boolean xmlIsLayer = tagMapProvider.getBoolean(ATTR_MP_IS_TRANSPARENT_LAYER);
+
+         Boolean xmlIsVisible = null;
+         ZonedDateTime xmlModified;
+
+         if (isMpImport) {
+
+            // imported mp's should be visible
+            xmlIsVisible = true;
+
+            // set import date/time
+            xmlModified = TimeTools.now();
+
+            // add import info
+            if (_isLogImportInfo) {
+
+               final String importInfo = NLS.bind(Messages.MP_Manager_Label_ImportFrom, filename);
+
+               if (xmlDescription != null && xmlDescription.trim().length() > 0) {
+
+                  // without \r the text is not on a new line
+                  xmlDescription += net.tourbook.common.UI.NEW_LINE_TEXT_WIDGET;
+                  xmlDescription += net.tourbook.common.UI.NEW_LINE_TEXT_WIDGET;
+               }
+
+               xmlDescription += importInfo;
+            }
+
+         } else {
+
+            xmlModified = Util.getXmlDateTime(tagMapProvider, ATTR_MP_DATE_TIME_MODIFIED, null);
+         }
 
          // zoom level
-         final Integer zoomMin = tagMapProvider.getInteger(ATTR_MP_ZOOM_LEVEL_MIN);
-         final Integer zoomMax = tagMapProvider.getInteger(ATTR_MP_ZOOM_LEVEL_MAX);
+         final Integer xmlZoomMin = tagMapProvider.getInteger(ATTR_MP_ZOOM_LEVEL_MIN);
+         final Integer xmlZoomMax = tagMapProvider.getInteger(ATTR_MP_ZOOM_LEVEL_MAX);
 
          // favorite position
-         final Integer favoriteZoom = tagMapProvider.getInteger(ATTR_MP_FAVORITE_ZOOM_LEVEL);
-         final Float favoriteLatitude = tagMapProvider.getFloat(ATTR_MP_FAVORITE_LATITUDE);
-         final Float favoriteLongitude = tagMapProvider.getFloat(ATTR_MP_FAVORITE_LONGITUDE);
+         final Integer xmlFavoriteZoom = tagMapProvider.getInteger(ATTR_MP_FAVORITE_ZOOM_LEVEL);
+         final Float xmlFavoriteLatitude = tagMapProvider.getFloat(ATTR_MP_FAVORITE_LATITUDE);
+         final Float xmlFavoriteLongitude = tagMapProvider.getFloat(ATTR_MP_FAVORITE_LONGITUDE);
 
          // last used position
-         final Integer lastUsedZoom = tagMapProvider.getInteger(ATTR_MP_LAST_USED_ZOOM_LEVEL);
-         final Float lastUsedLatitude = tagMapProvider.getFloat(ATTR_MP_LAST_USED_LATITUDE);
-         final Float lastUsedLongitude = tagMapProvider.getFloat(ATTR_MP_LAST_USED_LONGITUDE);
+         final Integer xmlLastUsedZoom = tagMapProvider.getInteger(ATTR_MP_LAST_USED_ZOOM_LEVEL);
+         final Float xmlLastUsedLatitude = tagMapProvider.getFloat(ATTR_MP_LAST_USED_LATITUDE);
+         final Float xmlLastUsedLongitude = tagMapProvider.getFloat(ATTR_MP_LAST_USED_LONGITUDE);
 
          // check common fields
-         if (mapProviderId == null || mapProviderName == null || offlineFolder == null || mapProviderType == null) {
+         if (xmlMapProviderId == null || xmlMapProviderName == null || xmlOfflineFolder == null || xmlMapProviderType == null) {
 
             logError(NLS.bind(//
                   Messages.DBG008_Error_TagIsInvalid,
-                  mapProviderId,
+                  xmlMapProviderId,
                   tagNameRootChildren), new Exception());
             continue;
          }
@@ -1493,10 +1747,10 @@ public class MapProviderManager {
          // check if the factory id is already used, ignore the duplicated factory
          boolean isValid = true;
          for (final MP checkMapProvider : validMapProviders) {
-            if (checkMapProvider.getId().equalsIgnoreCase(mapProviderId)) {
+            if (checkMapProvider.getId().equalsIgnoreCase(xmlMapProviderId)) {
                logError(NLS.bind(//
                      Messages.DBG009_Error_MapProfileDuplicate,
-                     mapProviderId), new Exception());
+                     xmlMapProviderId), new Exception());
 
                isValid = false;
                break;
@@ -1507,10 +1761,10 @@ public class MapProviderManager {
          }
 
          // check plugin map provider, they are also added to the list
-         if (mapProviderType.equals(MAP_PROVIDER_TYPE_PLUGIN)) {
+         if (xmlMapProviderType.equals(MAP_PROVIDER_TYPE_PLUGIN)) {
 
             for (final MP mp : allMapProviders) {
-               if (mp.getId().equalsIgnoreCase(mapProviderId) && mp instanceof MPPlugin) {
+               if (mp.getId().equalsIgnoreCase(xmlMapProviderId) && mp instanceof MPPlugin) {
 
                   validMapProviders.add(mp);
                   isValid = true;
@@ -1522,20 +1776,20 @@ public class MapProviderManager {
             if (isValid == false) {
                logError(NLS.bind(//
                      Messages.DBG027_ImportError_InvalidPlugin,
-                     mapProviderId), new Exception());
+                     xmlMapProviderId), new Exception());
             }
 
             continue;
          }
 
          // check map provider type
-         if (mapProviderType.equals(MAP_PROVIDER_TYPE_CUSTOM) == false
-               && mapProviderType.equals(MAP_PROVIDER_TYPE_WMS) == false
-               && mapProviderType.equals(MAP_PROVIDER_TYPE_MAP_PROFILE) == false) {
+         if (xmlMapProviderType.equals(MAP_PROVIDER_TYPE_CUSTOM) == false
+               && xmlMapProviderType.equals(MAP_PROVIDER_TYPE_WMS) == false
+               && xmlMapProviderType.equals(MAP_PROVIDER_TYPE_MAP_PROFILE) == false) {
             logError(NLS.bind(//
                   Messages.DBG010_Error_InvalidType,
-                  mapProviderId,
-                  mapProviderType), new Exception());
+                  xmlMapProviderId,
+                  xmlMapProviderType), new Exception());
             continue;
          }
 
@@ -1544,20 +1798,20 @@ public class MapProviderManager {
           */
          MP mapProvider = null;
 
-         if (mapProviderType.equals(MAP_PROVIDER_TYPE_CUSTOM)) {
+         if (xmlMapProviderType.equals(MAP_PROVIDER_TYPE_CUSTOM)) {
 
             // custom map provider
-            mapProvider = readXmlCustom(tagMapProvider, mapProviderId);
+            mapProvider = readXml_MP_Custom(tagMapProvider, xmlMapProviderId);
 
-         } else if (mapProviderType.equals(MAP_PROVIDER_TYPE_WMS)) {
+         } else if (xmlMapProviderType.equals(MAP_PROVIDER_TYPE_WMS)) {
 
             // wms map provider
-            mapProvider = readXmlWms(tagMapProvider, mapProviderId, tagNameRootChildren);
+            mapProvider = readXml_MP_Wms(tagMapProvider, xmlMapProviderId, tagNameRootChildren);
 
-         } else if (mapProviderType.equals(MAP_PROVIDER_TYPE_MAP_PROFILE)) {
+         } else if (xmlMapProviderType.equals(MAP_PROVIDER_TYPE_MAP_PROFILE)) {
 
             // map profile
-            mapProvider = readXmlProfile(tagMapProvider, mapProviderId);
+            mapProvider = readXml_MP_Profile(tagMapProvider, xmlMapProviderId);
          }
 
          /*
@@ -1565,32 +1819,41 @@ public class MapProviderManager {
           */
          if (mapProvider != null) {
 
-            // id
-            mapProvider.setId(mapProviderId);
-            mapProvider.setName(mapProviderName);
-            mapProvider.setDescription(description == null ? UI.EMPTY_STRING : description);
-            mapProvider.setOfflineFolder(offlineFolder);
+            // common
+            mapProvider.setCategory(xmlCategory == null ? UI.EMPTY_STRING : xmlCategory);
+            mapProvider.setDateTimeModified(xmlModified);
+            mapProvider.setDescription(xmlDescription == null ? UI.EMPTY_STRING : xmlDescription);
+            mapProvider.setId(xmlMapProviderId);
+            mapProvider.setIsTransparentLayer(xmlIsLayer == null ? false : xmlIsLayer);
+            mapProvider.setIsIncludesHillshading(xmlHasTopo == null ? false : xmlHasTopo);
+            mapProvider.setName(xmlMapProviderName);
+            mapProvider.setOfflineFolder(xmlOfflineFolder);
+            mapProvider.setOnlineMapUrl(xmlOnlineMapUrl);
+
+            if (xmlIsVisible != null) {
+               mapProvider.setIsVisibleInUI(xmlIsVisible);
+            }
 
             // image
-            mapProvider.setTileSize(imageSize == null ? Integer.parseInt(DEFAULT_IMAGE_SIZE) : imageSize);
-            mapProvider.setImageFormat(imageFormat == null ? DEFAULT_IMAGE_FORMAT : imageFormat);
+            mapProvider.setTileSize(xmlImageSize == null ? Integer.parseInt(DEFAULT_IMAGE_SIZE) : xmlImageSize);
+            mapProvider.setImageFormat(xmlImageFormat == null ? DEFAULT_IMAGE_FORMAT : xmlImageFormat);
 
             // zoom level
-            final int minZoom = zoomMin == null ? 0 : zoomMin;
-            final int maxZoom = zoomMax == null ? 17 : zoomMax;
+            final int minZoom = xmlZoomMin == null ? 0 : xmlZoomMin;
+            final int maxZoom = xmlZoomMax == null ? 17 : xmlZoomMax;
             mapProvider.setZoomLevel(minZoom, maxZoom);
 
             // favorite position
-            mapProvider.setFavoriteZoom(favoriteZoom == null ? 0 : favoriteZoom);
+            mapProvider.setFavoriteZoom(xmlFavoriteZoom == null ? 0 : xmlFavoriteZoom);
             mapProvider.setFavoritePosition(new GeoPosition(
-                  favoriteLatitude == null ? 0.0 : favoriteLatitude,
-                  favoriteLongitude == null ? 0.0 : favoriteLongitude));
+                  xmlFavoriteLatitude == null ? 0.0 : xmlFavoriteLatitude,
+                  xmlFavoriteLongitude == null ? 0.0 : xmlFavoriteLongitude));
 
             // last used position
-            mapProvider.setLastUsedZoom(lastUsedZoom == null ? 0 : lastUsedZoom);
+            mapProvider.setLastUsedZoom(xmlLastUsedZoom == null ? 0 : xmlLastUsedZoom);
             mapProvider.setLastUsedPosition(new GeoPosition(
-                  lastUsedLatitude == null ? 0.0 : lastUsedLatitude,
-                  lastUsedLongitude == null ? 0.0 : lastUsedLongitude));
+                  xmlLastUsedLatitude == null ? 0.0 : xmlLastUsedLatitude,
+                  xmlLastUsedLongitude == null ? 0.0 : xmlLastUsedLongitude));
 
             validMapProviders.add(mapProvider);
          }
@@ -1602,7 +1865,7 @@ public class MapProviderManager {
     * @param mapProviderId
     * @return
     */
-   private MPCustom readXmlCustom(final IMemento mementoMapProvider, final String mapProviderId) {
+   private MPCustom readXml_MP_Custom(final IMemento mementoMapProvider, final String mapProviderId) {
 
       final MPCustom mapProvider = new MPCustom();
 
@@ -1703,7 +1966,7 @@ public class MapProviderManager {
     * @param mapProviderId
     * @return
     */
-   private MPProfile readXmlProfile(final IMemento tagMapProvider, final String mapProviderId) {
+   private MPProfile readXml_MP_Profile(final IMemento tagMapProvider, final String mapProviderId) {
 
       final ArrayList<MPWrapper> mpWrapperList = new ArrayList<>();
       final MPProfile mapProfile = new MPProfile(mpWrapperList);
@@ -1870,9 +2133,9 @@ public class MapProviderManager {
     * @param tagNameRootChildren
     * @return
     */
-   private MPWms readXmlWms(final IMemento mementoMapProvider,
-                            final String mapProviderId,
-                            final String tagNameRootChildren) {
+   private MPWms readXml_MP_Wms(final IMemento mementoMapProvider,
+                                final String mapProviderId,
+                                final String tagNameRootChildren) {
 
       final MPWms mapProvider = new MPWms();
 
@@ -2015,7 +2278,7 @@ public class MapProviderManager {
    private ArrayList<MP> validateImportedMP(final ArrayList<MP> importedMPList) {
 
       final ArrayList<MP> newMPs = new ArrayList<>();
-      final ArrayList<MP> existingMPs = MapProviderManager.getInstance().getAllMapProviders(true);
+      final ArrayList<MP> existingMPs = getAllMapProviders(true);
 
       /*
        * first map provider is the main map provider, the others are wrapped map providers
@@ -2032,7 +2295,7 @@ public class MapProviderManager {
             MessageDialog.openError(
                   Display.getDefault().getActiveShell(),
                   Messages.Import_Error_Dialog_Title,
-                  NLS.bind(Messages.DBG021_Import_Error_DuplicateId, mp.getId()));
+                  NLS.bind(Messages.DBG021_Import_Error_DuplicateId, mp.getName() + UI.DASH_WITH_SPACE + mp.getId()));
 
             return null;
          }
@@ -2095,7 +2358,7 @@ public class MapProviderManager {
        */
       final ArrayList<MP> importedMpWrapperList = new ArrayList<>(importedMPList);
 
-      final ArrayList<MP> existingMPs = MapProviderManager.getInstance().getAllMapProviders(true);
+      final ArrayList<MP> existingMPs = getAllMapProviders(true);
       final MPProfile importedMpProfile = importedMP;
       final ArrayList<MPWrapper> importedProfileWrappers = importedMpProfile.getAllWrappers();
 
@@ -2255,6 +2518,10 @@ public class MapProviderManager {
       return newMPs;
    }
 
+   /**
+    * Writes internal map provider list into a xml file and fires an {@link IMapProviderListener}
+    * event.
+    */
    public void writeMapProviderXml() {
 
       BufferedWriter writer = null;
@@ -2301,14 +2568,20 @@ public class MapProviderManager {
 
       final GeoPosition lastUsedPosition = mp.getLastUsedPosition();
       final GeoPosition favoritePosition = mp.getFavoritePosition();
+      final ZonedDateTime dateTimeModified = mp.getDateTimeModified();
 
       /*
        * set common fields
        */
+      tagMapProvider.putString(ATTR_MP_CATEGORY, mp.getCategory());
+      tagMapProvider.putString(ATTR_MP_DATE_TIME_MODIFIED, dateTimeModified == null ? null : dateTimeModified.toString());
+      tagMapProvider.putString(ATTR_MP_DESCRIPTION, mp.getDescription());
       tagMapProvider.putString(ATTR_MP_ID, mp.getId());
       tagMapProvider.putString(ATTR_MP_NAME, mp.getName());
-      tagMapProvider.putString(ATTR_MP_DESCRIPTION, mp.getDescription());
       tagMapProvider.putString(ATTR_MP_OFFLINE_FOLDER, mp.getOfflineFolder());
+      tagMapProvider.putString(ATTR_MP_ONLINE_MAP_URL, mp.getOnlineMapUrl());
+      tagMapProvider.putBoolean(ATTR_MP_IS_INCLUDES_HILLSHADING, mp.isIncludesHillshading());
+      tagMapProvider.putBoolean(ATTR_MP_IS_TRANSPARENT_LAYER, mp.isTransparentLayer());
 
       // image
       tagMapProvider.putInteger(ATTR_MP_IMAGE_SIZE, mp.getTileSize());
@@ -2320,25 +2593,13 @@ public class MapProviderManager {
 
       // favorite position
       tagMapProvider.putInteger(ATTR_MP_FAVORITE_ZOOM_LEVEL, mp.getFavoriteZoom());
-      tagMapProvider.putFloat(ATTR_MP_FAVORITE_LATITUDE,
-            favoritePosition == null
-                  ? 0.0f
-                  : (float) favoritePosition.latitude);
-      tagMapProvider.putFloat(ATTR_MP_FAVORITE_LONGITUDE,
-            favoritePosition == null
-                  ? 0.0f
-                  : (float) favoritePosition.longitude);
+      tagMapProvider.putFloat(ATTR_MP_FAVORITE_LATITUDE, favoritePosition == null ? 0.0f : (float) favoritePosition.latitude);
+      tagMapProvider.putFloat(ATTR_MP_FAVORITE_LONGITUDE, favoritePosition == null ? 0.0f : (float) favoritePosition.longitude);
 
       // last used position
       tagMapProvider.putInteger(ATTR_MP_LAST_USED_ZOOM_LEVEL, mp.getLastUsedZoom());
-      tagMapProvider.putFloat(ATTR_MP_LAST_USED_LATITUDE,
-            lastUsedPosition == null
-                  ? 0.0f
-                  : (float) lastUsedPosition.latitude);
-      tagMapProvider.putFloat(ATTR_MP_LAST_USED_LONGITUDE,
-            lastUsedPosition == null
-                  ? 0.0f
-                  : (float) lastUsedPosition.longitude);
+      tagMapProvider.putFloat(ATTR_MP_LAST_USED_LATITUDE, lastUsedPosition == null ? 0.0f : (float) lastUsedPosition.latitude);
+      tagMapProvider.putFloat(ATTR_MP_LAST_USED_LONGITUDE, lastUsedPosition == null ? 0.0f : (float) lastUsedPosition.longitude);
 
       /*
        * add special fields for each map provider
@@ -2419,7 +2680,7 @@ public class MapProviderManager {
 
          final MP mp = mpWrapper.getMP();
 
-         final String mpType = getMapProviderType(mp);
+         final String mpType = getMapProvider_InternalType(mp);
          if (mpType == null) {
             continue;
          }

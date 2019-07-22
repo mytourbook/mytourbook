@@ -471,24 +471,6 @@ public class Util {
    }
 
    /**
-    * Creates a {@link ZonedDateTime} from the number: YYYYMMDDhhmmss
-    *
-    * @param yyyymmddhhmmss
-    * @return
-    */
-   public static ZonedDateTime createDateTimeFromYMDhms(final long yyyymmddhhmmss) {
-
-      final int year = (int) (yyyymmddhhmmss / 10000000000L) % 10000;
-      final int month = (int) (yyyymmddhhmmss / 100000000) % 100;
-      final int day = (int) (yyyymmddhhmmss / 1000000) % 100;
-      final int hour = (int) (yyyymmddhhmmss / 10000) % 100;
-      final int minute = (int) (yyyymmddhhmmss / 100 % 100);
-      final int second = (int) (yyyymmddhhmmss % 100);
-
-      return ZonedDateTime.of(year, month, day, hour, minute, second, 0, TimeTools.getDefaultTimeZone());
-   }
-
-   /**
     * creates a double array backup
     *
     * @param original

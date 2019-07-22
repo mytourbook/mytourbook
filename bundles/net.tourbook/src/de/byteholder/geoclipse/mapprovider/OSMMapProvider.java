@@ -24,16 +24,20 @@ import org.eclipse.core.runtime.Path;
 
 class OSMMapProvider extends MPPlugin {
 
-   static final String         FACTORY_ID     = "osm";                                                 //$NON-NLS-1$
-   private static final String OFFLINE_FOLDER = "osm";                                                 //$NON-NLS-1$
-   private static final String FACTORY_NAME   = "OpenStreetMap";                                       //$NON-NLS-1$
+   static final String         FACTORY_ID     = "osm";           //$NON-NLS-1$
+   private static final String OFFLINE_FOLDER = "osm";           //$NON-NLS-1$
+   private static final String FACTORY_NAME   = "OpenStreetMap"; //$NON-NLS-1$
+   private static final String OSM_CATEGORY   = "OSM";           //$NON-NLS-1$
 
-   private static final String SEPARATOR      = "/";                                                   //$NON-NLS-1$
+   private static final String SEPARATOR      = "/";             //$NON-NLS-1$
 
    private static final int    MIN_ZOOM       = 0;
    private static final int    MAX_ZOOM       = 19;
 
-   private static final String BASE_URL       = "http://tile.openstreetmap.org";                       //$NON-NLS-1$
+   // https is very slow
+   private static final String TILE_BASE_URL  = "http://tile.openstreetmap.org";                       //$NON-NLS-1$
+   private static final String MAP_ONLINE_URL = "https://www.openstreetmap.org";                       //$NON-NLS-1$
+
    private static final String FILE_EXT       = MapProviderManager.FILE_EXTENSION_PNG;
 
    private String              _userAgent     = "MyTourbook/" + ApplicationVersion.getVersionSimple(); //$NON-NLS-1$
@@ -48,7 +52,12 @@ class OSMMapProvider extends MPPlugin {
 
    @Override
    public String getBaseURL() {
-      return BASE_URL;
+      return TILE_BASE_URL;
+   }
+
+   @Override
+   public String getCategory() {
+      return OSM_CATEGORY;
    }
 
    @Override
@@ -67,6 +76,11 @@ class OSMMapProvider extends MPPlugin {
    }
 
    @Override
+   public String getOnlineMapUrl() {
+      return MAP_ONLINE_URL;
+   }
+
+   @Override
    public IPath getTileOSPath(final String fullPath, final Tile tile) {
 
       return new Path(fullPath)//
@@ -81,7 +95,7 @@ class OSMMapProvider extends MPPlugin {
    public String getTileUrl(final Tile tile) {
 
       return new StringBuilder()//
-            .append(BASE_URL)
+            .append(TILE_BASE_URL)
             .append(SEPARATOR)
             .append(tile.getZoom())
             .append(SEPARATOR)

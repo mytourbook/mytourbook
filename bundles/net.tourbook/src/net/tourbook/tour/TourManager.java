@@ -2208,22 +2208,22 @@ public class TourManager {
          return false;
       }
 
-      tourData.setAvgTemperature(historicalWeatherData.getTemperatureAverage());
-      tourData.setWeatherWindChill(historicalWeatherData.getWindChill());
-      tourData.setWeatherMaxTemperature(historicalWeatherData.getTemperatureMax());
-      tourData.setWeatherMinTemperature(historicalWeatherData.getTemperatureMin());
-      tourData.setWeatherWindSpeed(historicalWeatherData.getWindSpeed());
-      tourData.setWeatherWindDir(historicalWeatherData.getWindDirection());
-      tourData.setWeatherHumidity(historicalWeatherData.getAverageHumidity());
-      tourData.setWeatherPrecipitation(historicalWeatherData.getPrecipitation());
-      tourData.setWeatherPressure(historicalWeatherData.getAveragePressure());
-      tourData.setWeather(historicalWeatherData.getWeatherDescription());
-      tourData.setWeatherClouds(historicalWeatherData.getWeatherType());
       tourData.setIsWeatherDataFromApi(true);
 
-      TourLogManager.addSubLog(
-            TourLogState.IMPORT_OK,
-            getTourDateTimeShort(tourData));
+      tourData.setAvgTemperature(historicalWeatherData.getTemperatureAverage());
+      tourData.setWeatherWindSpeed(historicalWeatherData.getWindSpeed());
+      tourData.setWeatherWindDir(historicalWeatherData.getWindDirection());
+      tourData.setWeather(historicalWeatherData.getWeatherDescription());
+      tourData.setWeatherClouds(historicalWeatherData.getWeatherType());
+
+      tourData.setWeather_Humidity((short) historicalWeatherData.getAverageHumidity());
+      tourData.setWeather_Precipitation(historicalWeatherData.getPrecipitation());
+      tourData.setWeather_Pressure((short) historicalWeatherData.getAveragePressure());
+      tourData.setWeather_Temperature_Max(historicalWeatherData.getTemperatureMax());
+      tourData.setWeather_Temperature_Min(historicalWeatherData.getTemperatureMin());
+      tourData.setWeather_Temperature_WindChill(historicalWeatherData.getWindChill());
+
+      TourLogManager.addSubLog(TourLogState.IMPORT_OK, getTourDateTimeShort(tourData));
 
       return true;
    }

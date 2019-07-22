@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -26,23 +26,22 @@ import org.eclipse.jface.preference.IPreferenceStore;
  */
 public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
-	@Override
-	public void initializeDefaultPreferences() {
+   @Override
+   public void initializeDefaultPreferences() {
 
-		final IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
+      final IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
 
-		store.setDefault(IMappingPreferences.OFFLINE_CACHE_USE_OFFLINE, false);
-		store.setDefault(IMappingPreferences.OFFLINE_CACHE_USE_DEFAULT_LOCATION, true);
+      store.setDefault(IMappingPreferences.OFFLINE_CACHE_USE_OFFLINE, false);
+      store.setDefault(IMappingPreferences.OFFLINE_CACHE_USE_DEFAULT_LOCATION, true);
 
-		store.setDefault(IMappingPreferences.OFFLINE_CACHE_PERIOD_OF_VALIDITY, 7);
-		store.setDefault(IMappingPreferences.OFFLINE_CACHE_MAX_SIZE, 100);
+      store.setDefault(IMappingPreferences.OFFLINE_CACHE_PERIOD_OF_VALIDITY, 7);
+      store.setDefault(IMappingPreferences.OFFLINE_CACHE_MAX_SIZE, 100);
 
-		store.setDefault(IMappingPreferences.SHOW_MAP_TILE_INFO, true);
+      store.setDefault(IMappingPreferences.SHOW_MAP_TILE_INFO, true);
 
-		store.setDefault(IMappingPreferences.THEME_FONT_LOGGING, "1|Lucida Console|9.0|0|"); //$NON-NLS-1$
+      store.setDefault(IMappingPreferences.THEME_FONT_LOGGING, "1|Lucida Console|9.0|0|"); //$NON-NLS-1$
 
-		// map providers which can be toggled, osm is the default map provider
-		store.setDefault(IMappingPreferences.MAP_PROVIDER_VISIBLE_IN_UI, "osm"); //$NON-NLS-1$
-
-	}
+      // map providers which can be toggled, osm is the default map provider
+      store.setDefault(IMappingPreferences.MAP_PROVIDER_VISIBLE_IN_UI, "osm"); //$NON-NLS-1$
+   }
 }

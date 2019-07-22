@@ -28,13 +28,28 @@ public class WeatherData {
    private int    averageTemperature;
    private int    WindDirection;
    private int    WindSpeed;
+
+   /**
+    * Precipitation in millimeters
+    */
    private float  precipitation;
+
    private String WeatherDescription;
    private String WeatherType;
+
+   /**
+    * Humidity in percentage (%)
+    */
    private int    averageHumidity;
+
    //TODO TourWeatherData class name
    // or average{Property} name ?
-   private int    averagePressure;
+
+   /**
+    * Atmospheric pressure in millibars (mb)
+    */
+   private int averagePressure;
+
    private int windChill;
 
    public int getAverageHumidity() {
@@ -98,11 +113,11 @@ public class WeatherData {
    }
 
    public void setTemperatureMax(final int temperatureMax) {
-         maxTemperature = temperatureMax;
+      maxTemperature = temperatureMax;
    }
 
    public void setTemperatureMin(final int temperatureMin) {
-         minTemperature = temperatureMin;
+      minTemperature = temperatureMin;
    }
 
    public void setWeatherDescription(final String weatherDescription) {
@@ -110,42 +125,44 @@ public class WeatherData {
    }
 
    public void setWeatherType(final String weatherCode) {
+
       // Codes : http://www.worldweatheronline.com/feed/wwoConditionCodes.xml
+
       switch (weatherCode) {
-      case "122":
+      case "122": //$NON-NLS-1$
          WeatherType = IWeather.WEATHER_ID_OVERCAST;
          break;
-      case "113":
+      case "113": //$NON-NLS-1$
          WeatherType = IWeather.WEATHER_ID_CLEAR;
          break;
-      case "116":
+      case "116": //$NON-NLS-1$
          WeatherType = IWeather.WEATHER_ID_PART_CLOUDS;
          break;
       //case "200":
       //    WeatherType = IWeather.WEATHER_ID_LIGHTNING;
       //   break;
-      case "293":
-      case "296":
-      case "299":
-      case "302":
-      case "305":
-      case "308":
-      case "356":
-      case "359":
+      case "293": //$NON-NLS-1$
+      case "296": //$NON-NLS-1$
+      case "299": //$NON-NLS-1$
+      case "302": //$NON-NLS-1$
+      case "305": //$NON-NLS-1$
+      case "308": //$NON-NLS-1$
+      case "356": //$NON-NLS-1$
+      case "359": //$NON-NLS-1$
          WeatherType = IWeather.WEATHER_ID_RAIN;
          break;
-      case "332":
-      case "335":
-      case "329":
-      case "326":
-      case "323":
-      case "320":
+      case "332": //$NON-NLS-1$
+      case "335": //$NON-NLS-1$
+      case "329": //$NON-NLS-1$
+      case "326": //$NON-NLS-1$
+      case "323": //$NON-NLS-1$
+      case "320": //$NON-NLS-1$
          WeatherType = IWeather.WEATHER_ID_SNOW;
          break;
-      case "200":
+      case "200": //$NON-NLS-1$
          WeatherType = IWeather.WEATHER_ID_SEVERE_WEATHER_ALERT;
          break;
-      case "353":
+      case "353": //$NON-NLS-1$
          WeatherType = IWeather.WEATHER_ID_SCATTERED_SHOWERS;
          break;
       }

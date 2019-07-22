@@ -25,6 +25,7 @@ import java.util.List;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WWOHourlyResults {
+
    private String                 time;
 
    private String                 windspeedKmph;
@@ -35,24 +36,34 @@ public class WWOHourlyResults {
 
    private String                 weatherCode;
 
+   /**
+    * Feels like temperature in degrees Celsius (windchill)
+    */
    @JsonProperty("FeelsLikeC")
    private String                 FeelsLikeC;
 
-   @JsonProperty("FeelsLikeF")
-   private String                 FeelsLikeF;
-
+   /**
+    * Temperature in degrees Celsius
+    */
    private String                 tempC;
+
+   /**
+    * Atmospheric pressure in millibars (mb)
+    */
    private String                 pressure;
+
+   /**
+    * Humidity in percentage (%)
+    */
    private int                    humidity;
 
+   /**
+    * Precipitation in millimeters
+    */
    private String                 precipMM;
 
    public int getFeelsLikeC() {
       return Integer.parseInt(FeelsLikeC);
-   }
-
-   public String getFeelsLikeF() {
-      return FeelsLikeF;
    }
 
    public int getHumidity() {

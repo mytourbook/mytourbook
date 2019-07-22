@@ -36,6 +36,7 @@ import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -46,6 +47,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import net.tourbook.common.map.CommonMapProvider;
 import net.tourbook.common.map.GeoPosition;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 
 import org.eclipse.core.runtime.IPath;
@@ -130,103 +132,101 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
    private static final ListenerList<IOfflineInfoListener> _offlineReloadEventListeners = new ListenerList<>(ListenerList.IDENTITY);
 
    private int                                             _dimmingAlphaValue           = 0xFF;
-
    private RGB                                             _dimmingColor;
 
    private final Projection                                _projection;
+
    /**
     * image size in pixel for a square image
     */
-   private int                                             _tileSize                    = Integer
-         .parseInt(MapProviderManager.DEFAULT_IMAGE_SIZE);
+   private int                                             _tileSize                    = Integer.parseInt(MapProviderManager.DEFAULT_IMAGE_SIZE);
+
    // map min/max zoom level
-   private int                                             _minZoomLevel                = 0;
+   private int         _minZoomLevel       = 0;
+   private int         _maxZoomLevel       = Map.UI_MAX_ZOOM_LEVEL - Map.UI_MIN_ZOOM_LEVEL;
 
-   private int                                             _maxZoomLevel                = Map.UI_MAX_ZOOM_LEVEL
-         - Map.UI_MIN_ZOOM_LEVEL;
-
-   private int                                             _defaultZoomLevel            = 0;
+   private int         _defaultZoomLevel   = 0;
 
    /**
     * The number of tiles wide at each zoom level
     */
-   private int[]                                           _mapWidthInTilesAtZoom;
+   private int[]       _mapWidthInTilesAtZoom;
 
    /**
     * An array of coordinates in <em>pixels</em> that indicates the center in the world map for the
     * given zoom level.
     */
-   private Point2D[]                                       _mapCenterInPixelsAtZoom;
+   private Point2D[]   _mapCenterInPixelsAtZoom;
 
    /**
     * An array of doubles that contain the number of pixels per degree of longitude at a give zoom
     * level.
     */
-   private double[]                                        _longitudeDegreeWidthInPixels;
+   private double[]    _longitudeDegreeWidthInPixels;
 
    /**
     * An array of doubles that contain the number of radians per degree of longitude at a given zoom
     * level (where longitudeRadianWidthInPixels[0] is the most zoomed out)
     */
-   private double[]                                        _longitudeRadianWidthInPixels;
+   private double[]    _longitudeRadianWidthInPixels;
 
-   private boolean                                         _isOfflineImageUsed          = true;
+   private boolean     _isOfflineImageUsed = true;
 
    /**
     * This is the image shown as long as the real tile image is not yet fully loaded.
     */
-   private Image                                           _loadingImage;
+   private Image       _loadingImage;
 
    /**
     * This is the image displayed when the real tile image could not be loaded.
     */
-   private Image                                           _errorImage;
+   private Image       _errorImage;
 
    /**
     * unique id to identify a map provider
     */
-   private String                                          _mapProviderId;
+   private String      _mapProviderId;
 
    /**
     * mime image format which is currently used
     */
-   private String                                          _imageFormat                 = MapProviderManager.DEFAULT_IMAGE_FORMAT;
+   private String      _imageFormat        = MapProviderManager.DEFAULT_IMAGE_FORMAT;
 
-   private int                                             _favoriteZoom                = 0;
-   private GeoPosition                                     _favoritePosition            = new GeoPosition(0.0, 0.0);
+   private int         _favoriteZoom       = 0;
+   private GeoPosition _favoritePosition   = new GeoPosition(0.0, 0.0);
 
-   private int                                             _lastUsedZoom                = 0;
-   private GeoPosition                                     _lastUsedPosition            = new GeoPosition(0.0, 0.0);
+   private int         _lastUsedZoom       = 0;
+   private GeoPosition _lastUsedPosition   = new GeoPosition(0.0, 0.0);
 
    /**
     * name of the map provider which is displayed in the UI
     */
-   private String                                          _mapProviderName;
+   private String      _mapProviderName;
 
    /**
     * map provider description
     */
-   private String                                          _description                 = UI.EMPTY_STRING;
+   private String      _description        = UI.EMPTY_STRING;
 
    /**
     * OS folder to save offline images
     */
-   private String                                          _offlineFolder;
+   private String      _offlineFolder;
 
    /**
     * number of files in the offline cache
     */
-   private int                                             _offlineFileCounter          = -1;
+   private int         _offlineFileCounter = -1;
 
    /**
     * size in Bytes for the offline images
     */
-   private long                                            _offlineFileSize             = -1;
+   private long        _offlineFileSize    = -1;
 
    /**
     * State if the map provider can be selected in the map provider slideout or not.
     */
-   private boolean                                         _isVisibleInUI;
+   private boolean     _isVisibleInUI;
 
    //
    // Profile map provider values
@@ -235,23 +235,51 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
    /**
     * alpha values for the map provider, 100 is opaque, 0 is transparent
     */
-   private int     _profileAlpha                    = 100;
+   private int           _profileAlpha                    = 100;
 
-   private boolean _isProfileTransparentColors      = false;
-   private int[]   _profileTransparentColor         = null;
+   private boolean       _isProfileTransparentColors      = false;
+   private int[]         _profileTransparentColor         = null;
 
    /**
     * when <code>true</code> the color black is transparent
     */
-   private boolean _isProfileBlackTransparent;
+   private boolean       _isProfileBlackTransparent;
 
-   private boolean _isProfileBrightnessForNextMp    = false;
-   private int     _profileBrightnessValueForNextMp = 77;
+   private boolean       _isProfileBrightnessForNextMp    = false;
+   private int           _profileBrightnessValueForNextMp = 77;
 
    /**
     * The sort index is used to sort the map provider in the map provider list
     */
-   private int     _sortIndex;
+   private int           _sortIndex;
+
+   /**
+    * When <code>true</code> then the map provider is a layer for a specific topic with transparent
+    * background which should be displyed over a map.
+    */
+   private boolean       _isTransparentLayer;
+
+   /**
+    * When <code>true</code> then the map provider shows a topographic within the map.
+    */
+   private boolean       _isIncludesHillshading;
+
+   private ZonedDateTime _dateTimeModified;
+
+   /**
+    * Is used for sorting
+    */
+   private long          _dateTimeModified_Long           = Long.MIN_VALUE;
+
+   /**
+    * Url for an online map
+    */
+   private String        _onlineMapUrl;
+
+   /**
+    * Common category field which allows to sort the map provider accordingly
+    */
+   private String        _category                        = UI.EMPTY_STRING;
 
    /**
     */
@@ -531,11 +559,36 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
       return _projection.geoToPixelDouble(geoPosition, zoomLevel, this);
    }
 
+   public String getCategory() {
+      return _category;
+   }
+
    /**
     * @return Returns a custom tile key, default returns <code>null</code>
     */
    String getCustomTileKey() {
       return null;
+   }
+
+   /**
+    * @return Returns {@link ZonedDateTime} when the tour was modified or <code>null</code> when
+    *         date/time is not available
+    */
+   public ZonedDateTime getDateTimeModified() {
+      return _dateTimeModified;
+   }
+
+   public long getDateTimeModified_Long() {
+
+      if (_dateTimeModified == null) {
+         return Long.MIN_VALUE;
+      }
+
+      if (_dateTimeModified_Long == Long.MIN_VALUE) {
+         _dateTimeModified_Long = TimeTools.toEpochMilli(_dateTimeModified);
+      }
+
+      return _dateTimeModified_Long;
    }
 
    public int getDefaultZoomLevel() {
@@ -753,6 +806,18 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
     */
    public String getOfflineFolder() {
       return _offlineFolder;
+   }
+
+   /**
+    * @return Returns the online map url, when not available an empty string is returned.
+    */
+   public String getOnlineMapUrl() {
+
+      if (_onlineMapUrl == null) {
+         return UI.EMPTY_STRING;
+      }
+
+      return _onlineMapUrl;
    }
 
    int getProfileAlpha() {
@@ -1084,6 +1149,14 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
       initializeMapWithZoomAndSize(_maxZoomLevel, _tileSize);
    }
 
+   /**
+    * @see #_isIncludesHillshading
+    * @return
+    */
+   public boolean isIncludesHillshading() {
+      return _isIncludesHillshading;
+   }
+
    boolean isProfileBrightnessForNextMp() {
       return _isProfileBrightnessForNextMp;
    }
@@ -1124,6 +1197,14 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
       }
 
       return true;
+   }
+
+   /**
+    * @see #_isTransparentLayer
+    * @return
+    */
+   public boolean isTransparentLayer() {
+      return _isTransparentLayer;
    }
 
    public boolean isUseOfflineImage() {
@@ -1290,6 +1371,14 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
       _tileCache.resetTileImageAvailability();
    }
 
+   public void setCategory(final String category) {
+      _category = category;
+   }
+
+   public void setDateTimeModified(final ZonedDateTime dateTimeModified) {
+      _dateTimeModified = dateTimeModified;
+   }
+
    public void setDefaultZoomLevel(final int defaultZoomLevel) {
       _defaultZoomLevel = defaultZoomLevel;
    }
@@ -1338,6 +1427,10 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
       _imageFormat = imageFormat;
    }
 
+   public void setIsIncludesHillshading(final boolean isIncludesHillshading) {
+      _isIncludesHillshading = isIncludesHillshading;
+   }
+
    void setIsProfileBrightnessForNextMp(final boolean isBrightness) {
       _isProfileBrightnessForNextMp = isBrightness;
    }
@@ -1348,6 +1441,10 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
 
    void setIsProfileTransparentColors(final boolean isTransColors) {
       _isProfileTransparentColors = isTransColors;
+   }
+
+   public void setIsTransparentLayer(final boolean isTransparentLayer) {
+      _isTransparentLayer = isTransparentLayer;
    }
 
    public void setIsVisibleInUI(final boolean isVisibleInUI) {
@@ -1382,6 +1479,10 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
     */
    public void setOfflineFolder(final String offlineFolder) {
       _offlineFolder = offlineFolder;
+   }
+
+   public void setOnlineMapUrl(final String onlineMapUrl) {
+      _onlineMapUrl = onlineMapUrl;
    }
 
    void setProfileAlpha(final int alpha) {

@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -25,105 +25,105 @@ import org.oscim.core.MapPosition;
 
 public class MapManager {
 
-	private final static ListenerList _allMapSyncListener = new ListenerList(ListenerList.IDENTITY);
+   private final static ListenerList<IMapSyncListener> _allMapSyncListener = new ListenerList<>(ListenerList.IDENTITY);
 
-	public static void addMapSyncListener(final IMapSyncListener listener) {
-		_allMapSyncListener.add(listener);
-	}
+   public static void addMapSyncListener(final IMapSyncListener listener) {
+      _allMapSyncListener.add(listener);
+   }
 
-	public static void fireSyncMapEvent(final MapPosition mapPosition,
-										final ViewPart viewPart,
-										final int positionFlags) {
+   public static void fireSyncMapEvent(final MapPosition mapPosition,
+                                       final ViewPart viewPart,
+                                       final int positionFlags) {
 
-		final Object[] allListeners = _allMapSyncListener.getListeners();
+      final Object[] allListeners = _allMapSyncListener.getListeners();
 
-		for (final Object listener : allListeners) {
-			((IMapSyncListener) (listener)).syncMapWithOtherMap(mapPosition, viewPart, positionFlags);
-		}
-	}
+      for (final Object listener : allListeners) {
+         ((IMapSyncListener) (listener)).syncMapWithOtherMap(mapPosition, viewPart, positionFlags);
+      }
+   }
 
-	public static boolean isInOwnMapPosition(	final ConcurrentHashMap<MapPosition, Long> ownMapPositions,
-												final ConcurrentHashMap<MapPosition, Long> otherMapPositions) {
+   public static boolean isInOwnMapPosition(final ConcurrentHashMap<MapPosition, Long> ownMapPositions,
+                                            final ConcurrentHashMap<MapPosition, Long> otherMapPositions) {
 
-		if (otherMapPositions == null) {
-			return false;
-		}
+      if (otherMapPositions == null) {
+         return false;
+      }
 
-		final long currentTime = System.currentTimeMillis();
-		final int keepingTime = 5000;
+      final long currentTime = System.currentTimeMillis();
+      final int keepingTime = 5000;
 
-		final HashSet<MapPosition> removeOwnPositions = new HashSet<>();
-		final HashSet<MapPosition> removeOtherPositions = new HashSet<>();
-		final ConcurrentHashMap<MapPosition, Long> keepOtherPositions = new ConcurrentHashMap<>();
+      final HashSet<MapPosition> removeOwnPositions = new HashSet<>();
+      final HashSet<MapPosition> removeOtherPositions = new HashSet<>();
+      final ConcurrentHashMap<MapPosition, Long> keepOtherPositions = new ConcurrentHashMap<>();
 
-		boolean returnValue = false;
-		try {
+      boolean returnValue = false;
+      try {
 
-			for (final Entry<MapPosition, Long> otherEntry : otherMapPositions.entrySet()) {
+         for (final Entry<MapPosition, Long> otherEntry : otherMapPositions.entrySet()) {
 
-				final MapPosition otherPos = otherEntry.getKey();
-				final Long otherValue = otherEntry.getValue();
+            final MapPosition otherPos = otherEntry.getKey();
+            final Long otherValue = otherEntry.getValue();
 
-				final long timeDiff = currentTime - otherValue;
+            final long timeDiff = currentTime - otherValue;
 
-				if (timeDiff > keepingTime) {
+            if (timeDiff > keepingTime) {
 
-					removeOtherPositions.add(otherPos);
+               removeOtherPositions.add(otherPos);
 
-				} else {
+            } else {
 
-					keepOtherPositions.put(otherPos, otherValue);
-				}
-			}
+               keepOtherPositions.put(otherPos, otherValue);
+            }
+         }
 
-			outerLoop:
+         outerLoop:
 
-			for (final Entry<MapPosition, Long> ownEntry : ownMapPositions.entrySet()) {
+         for (final Entry<MapPosition, Long> ownEntry : ownMapPositions.entrySet()) {
 
-				final MapPosition ownKey = ownEntry.getKey();
+            final MapPosition ownKey = ownEntry.getKey();
 
-				final long timeDiff = currentTime - ownEntry.getValue();
+            final long timeDiff = currentTime - ownEntry.getValue();
 
-				if (timeDiff > keepingTime) {
+            if (timeDiff > keepingTime) {
 
-					removeOwnPositions.add(ownKey);
+               removeOwnPositions.add(ownKey);
 
-				} else {
+            } else {
 
-					for (final MapPosition otherKey : keepOtherPositions.keySet()) {
+               for (final MapPosition otherKey : keepOtherPositions.keySet()) {
 
-						if (ownKey.x == otherKey.x && ownKey.y == otherKey.y && ownKey.scale == otherKey.scale) {
+                  if (ownKey.x == otherKey.x && ownKey.y == otherKey.y && ownKey.scale == otherKey.scale) {
 
-							/*
-							 * This is a subsequent event which was fired from here but the other
-							 * map posted additional sync events because of an animation
-							 */
+                     /*
+                      * This is a subsequent event which was fired from here but the other
+                      * map posted additional sync events because of an animation
+                      */
 
-							returnValue = true;
+                     returnValue = true;
 
-							break outerLoop;
-						}
-					}
-				}
-			}
+                     break outerLoop;
+                  }
+               }
+            }
+         }
 
-		} finally {
+      } finally {
 
-			/*
-			 * remove old positions
-			 */
-			for (final MapPosition mapPosition : removeOwnPositions) {
-				ownMapPositions.remove(mapPosition);
-			}
-			for (final MapPosition mapPosition : removeOtherPositions) {
-				otherMapPositions.remove(mapPosition);
-			}
-		}
+         /*
+          * remove old positions
+          */
+         for (final MapPosition mapPosition : removeOwnPositions) {
+            ownMapPositions.remove(mapPosition);
+         }
+         for (final MapPosition mapPosition : removeOtherPositions) {
+            otherMapPositions.remove(mapPosition);
+         }
+      }
 
-		return returnValue;
-	}
+      return returnValue;
+   }
 
-	public static void removeMapSyncListener(final IMapSyncListener listener) {
-		_allMapSyncListener.remove(listener);
-	}
+   public static void removeMapSyncListener(final IMapSyncListener listener) {
+      _allMapSyncListener.remove(listener);
+   }
 }
