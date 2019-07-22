@@ -23,6 +23,7 @@ New
     - A selected map provider in the pref page is immediately displayed 
       in 2D map view
 
+
 * Weather (Frederic)
 
   - Added the ability to retrieve the weather data that occured during a
@@ -31,12 +32,18 @@ New
     --------------------------------------------------------------------
      You need to purchase an API Key to use this feature
   
-     This is the first time in the history of MyTourbook that a user needs
-     to pay for a new feature. The problem is, it seems that there is no 
-     website where you can get historical weather data for free.
+     This is the first time in the history of MyTourbook that a user 
+     needs to pay for a new feature. The problem is, it seems that there
+     is no website where you can get historical weather data for free.
   
      Without an API key, any new weather fields can be edited/saved as 
      all other tour fields, they are just not filled automatically.
+     
+     This API key can be tested 60 days for free.
+
+     It is recommended to test the retrieved weather data with your own 
+     device data as there can be big differences depending which weather
+     station was nearby.
     --------------------------------------------------------------------
   
   - The following data will be set in the tour
@@ -53,7 +60,8 @@ New
       
   - Moved from 8 cardinals to 16 cardinals wind direction
   
-  - The user can choose to activate the weather retrieval in the easy import config
+  - The user can choose to activate the weather retrieval in the easy 
+    import config
   
  
 Improvements   
@@ -69,20 +77,23 @@ Bugfix
 
 * Tour Book View
 
-  - Fixed sqlstate 22003: The resulting value is outside the range for the data type INTEGER.
+  - Fixed sqlstate 22003: The resulting value is outside the range for 
+    the data type INTEGER.
     This could occure when the summary columns had an integer overflow
 
  
 
 * Preferences (Frederic)
 
-  - Fixed Linux async problem: modify flag is set when opening the users page
+  - Fixed Linux async problem: modify flag is set when opening the users 
+    page
 
  
 
 * Easy Import Config (Frederic)
 
-  - Fix for when a user unchecks the option "Set Tour type" in the Easy Import Config
+  - Fix for when a user unchecks the option "Set Tour type" in the Easy 
+    Import Config
 
  
 * Marker deletion (Frederic)
@@ -108,6 +119,7 @@ System
 
 * Eclipse 2019-06 (4.12)
 
-  - This new version solved the issue "Dozens of NPEs in LogView.onMouseMover"
+  - This new version solved the issue 
+    "Dozens of NPEs in LogView.onMouseMover"
  
 
