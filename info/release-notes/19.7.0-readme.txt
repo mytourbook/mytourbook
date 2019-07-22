@@ -31,8 +31,8 @@ New
     --------------------------------------------------------------------
      You need to purchase an API Key to use this feature
   
-     This is the first time in the history of MyTourbook, that you need 
-     to pay for a new feature. The problem is, it seams that there is no 
+     This is the first time in the history of MyTourbook that a user needs
+     to pay for a new feature. The problem is, it seems that there is no 
      website where you can get historical weather data for free.
   
      Without an API key, any new weather fields can be edited/saved as 
