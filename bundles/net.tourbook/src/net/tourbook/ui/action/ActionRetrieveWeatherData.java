@@ -78,6 +78,11 @@ public class ActionRetrieveWeatherData extends Action {
 
             if (modifiedTours.size() > 0) {
                TourManager.saveModifiedTours(modifiedTours);
+            } else {
+               MessageDialog.openInformation(
+                     shell,
+                     Messages.Dialog_RetrieveWeather_Dialog_Title,
+                     Messages.UI_Label_WeatherDataNotRetrieved);
             }
          };
       });
