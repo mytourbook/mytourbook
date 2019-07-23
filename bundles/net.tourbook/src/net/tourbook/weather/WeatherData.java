@@ -42,9 +42,6 @@ public class WeatherData {
     */
    private int    averageHumidity;
 
-   //TODO TourWeatherData class name
-   // or average{Property} name ?
-
    /**
     * Atmospheric pressure in millibars (mb)
     */
