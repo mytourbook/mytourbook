@@ -6,6 +6,8 @@ TODOs
 * Reduce tour book context menu with "Adjust Tour" submenu which contains computed tour actions
 * Show weather, location start/end as new columns
 * Compute min/max temperature for selected tours
+* Update SWT to 4.13 (Eclipse 2019-09) to fix the issue when changing the tour start time
+  spinner (cf. https://bugs.eclipse.org/bugs/show_bug.cgi?id=547489) 
    
 
 New   
