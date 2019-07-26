@@ -340,7 +340,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private ActionOpenMarkerDialog         _actionOpenMarkerDialog;
    private ActionOpenAdjustAltitudeDialog _actionOpenAdjustAltitudeDialog;
    private ActionOpenPrefDialog           _actionEditImportPreferences;
-   private ActionReimportSubMenu          _actionReimportSubMenu;
+   private Action_Reimport_SubMenu        _actionReimportSubMenu;
    private ActionRemoveTour               _actionRemoveTour;
    private ActionRemoveToursWhenClosed    _actionRemoveToursWhenClosed;
    private ActionSaveTourInDatabase       _actionSaveTour;
@@ -1016,7 +1016,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       _actionOpenTourLogView = new ActionOpenTourLogView();
       _actionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
       _actionOpenTour = new ActionOpenTour(this);
-      _actionReimportSubMenu = new ActionReimportSubMenu(this);
+      _actionReimportSubMenu = new Action_Reimport_SubMenu(this);
       _actionRemoveTour = new ActionRemoveTour(this);
       _actionRemoveToursWhenClosed = new ActionRemoveToursWhenClosed();
       _actionSaveTour = new ActionSaveTourInDatabase(this, false);

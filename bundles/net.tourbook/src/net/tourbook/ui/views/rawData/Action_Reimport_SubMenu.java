@@ -30,7 +30,7 @@ import org.eclipse.swt.widgets.MenuItem;
 
 /**
  */
-public class ActionReimportSubMenu extends Action implements IMenuCreator {
+public class Action_Reimport_SubMenu extends Action implements IMenuCreator {
 
    private Menu                                     _menu;
 
@@ -201,7 +201,7 @@ public class ActionReimportSubMenu extends Action implements IMenuCreator {
       }
    }
 
-   public ActionReimportSubMenu(final ITourViewer3 tourViewer) {
+   public Action_Reimport_SubMenu(final ITourViewer3 tourViewer) {
 
       super(Messages.Import_Data_Action_Reimport_Tour, AS_DROP_DOWN_MENU);
 
@@ -236,16 +236,17 @@ public class ActionReimportSubMenu extends Action implements IMenuCreator {
    private void fillMenu(final Menu menu) {
 
       new ActionContributionItem(_actionReimport_OnlyAltitudeValues).fill(menu, -1);
-      new ActionContributionItem(_actionReimport_OnlyTemperatureValues).fill(menu, -1);
       new ActionContributionItem(_actionReimport_OnlyCadenceValues).fill(menu, -1);
       new ActionContributionItem(_actionReimport_OnlyGearValues).fill(menu, -1);
-      new ActionContributionItem(_actionReimport_OnlyPowerSpeedValues).fill(menu, -1);
       new ActionContributionItem(_actionReimport_OnlyPowerPulseValues).fill(menu, -1);
+      new ActionContributionItem(_actionReimport_OnlyPowerSpeedValues).fill(menu, -1);
       new ActionContributionItem(_actionReimport_OnlyRunningDynamicsValues).fill(menu, -1);
       new ActionContributionItem(_actionReimport_OnlySwimmingValues).fill(menu, -1);
+
+      new ActionContributionItem(_actionReimport_OnlyTemperatureValues).fill(menu, -1);
+      new ActionContributionItem(_actionReimport_OnlyTourMarker).fill(menu, -1);
       new ActionContributionItem(_actionReimport_OnlyTrainingValues).fill(menu, -1);
 
-      new ActionContributionItem(_actionReimport_OnlyTourMarker).fill(menu, -1);
       new ActionContributionItem(_actionReimport_OnlyTimeSlices).fill(menu, -1);
       new ActionContributionItem(_actionReimport_EntireTour).fill(menu, -1);
    }

@@ -22,6 +22,14 @@ Improvements
 * 
 
 
+Changes
+=======
+
+* Tour Book View
+
+  -  Moved tour actions into submenu "Adjust Tour Values"
+
+
 Bugfix   
 ======
 
