@@ -38,8 +38,8 @@ public class ActionShowPhotos extends Action {
 
 	@Override
 	public void run() {
-	   _map25View.actionZoomIn();
-		//_mapView.actionShowPhotos();
+	   //_map25View.actionZoomIn();
+		_map25View.actionShowPhotos();
 	}
 
 }
