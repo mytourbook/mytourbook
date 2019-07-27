@@ -59,6 +59,7 @@ import net.tourbook.map25.action.ActionSynchMapWithChartSlider;
 import net.tourbook.map25.action.ActionSynchMapWithTour;
 import net.tourbook.map25.action.ActionZoomIn;
 import net.tourbook.map25.action.ActionZoomOut;
+import net.tourbook.map25.action.ActionShowPhotos;
 import net.tourbook.map25.layer.marker.MapMarker;
 import net.tourbook.map25.layer.marker.MarkerConfig;
 import net.tourbook.map25.layer.marker.MarkerLayer;
@@ -203,7 +204,11 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
    private ActionZoomIn                  _actionZoom_In;
    private ActionZoomOut                 _actionZoom_Out;
    private double                        _zoomFactor = 1.5;
-   //
+
+   // Photo stuff
+   private ActionShowPhotos              _actionShowPhotos;
+   private boolean                       _isShowPhoto;
+
    /** Contains only geo tours */
    private ArrayList<TourData>           _allTourData    = new ArrayList<>();
    private TIntArrayList                 _allTourStarts  = new TIntArrayList();
@@ -455,6 +460,20 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       }
    }
 
+   public void actionShowPhotos() {
+
+      _isShowPhoto = _actionShowPhotos.isChecked();
+
+      enableActions();
+
+      //_tourPainterConfig.isPhotoVisible = _isShowPhoto;
+
+      //_mapApp.setOverlayKey(Integer.toString(_filteredPhotos.hashCode()));
+      //_mapApp.disposeOverlayImageCache();
+
+      //_mapApp.paint();
+   }
+   
    public void actionZoomIn() {
    	final Map map25 = _mapApp.getMap();
 
@@ -704,6 +723,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       _actionShowTour_WithOptions = new ActionShowTour_WithConfig();
       _actionZoom_In = new ActionZoomIn(this);
       _actionZoom_Out = new ActionZoomOut(this);
+      _actionShowPhotos = new ActionShowPhotos(this);
 
    }
 
@@ -1045,6 +1065,10 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
        */
       final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
+      tbm.add(new Separator());
+      tbm.add(_actionShowPhotos);
+
+      tbm.add(new Separator());
       tbm.add(_actionMapBookmarks);  //should be moved to position like in Map2View
 
       tbm.add(new Separator());
