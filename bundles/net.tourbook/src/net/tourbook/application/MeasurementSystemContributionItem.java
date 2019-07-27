@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -17,6 +17,7 @@ package net.tourbook.application;
 
 import net.tourbook.Messages;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.TourManager;
 import net.tourbook.ui.CustomControlContribution;
 import net.tourbook.ui.UI;
 
@@ -36,195 +37,210 @@ import org.eclipse.swt.widgets.Control;
 
 public class MeasurementSystemContributionItem extends CustomControlContribution {
 
-	private static final String				ID						= "net.tourbook.measurementSelector";				//$NON-NLS-1$
+   private static final String           ID                    = "net.tourbook.measurementSelector";              //$NON-NLS-1$
 
-	private final static IPreferenceStore	_prefStore				= TourbookPlugin.getDefault().getPreferenceStore();
+   private final static IPreferenceStore _prefStore            = TourbookPlugin.getDefault().getPreferenceStore();
 
-	private static int						_oldSystemIndex			= Integer.MIN_VALUE;
+   private static int                    _oldSystemIndex       = Integer.MIN_VALUE;
 
-	private IPropertyChangeListener			_prefChangeListener;
+   private IPropertyChangeListener       _prefChangeListener;
 
-	private boolean							_isFireSelectionEvent	= true;
+   private boolean                       _isFireSelectionEvent = true;
 
-	private Combo							_combo;
+   private Combo                         _combo;
 
-	public MeasurementSystemContributionItem() {
-		this(ID);
-	}
+   public MeasurementSystemContributionItem() {
+      this(ID);
+   }
 
-	protected MeasurementSystemContributionItem(final String id) {
-		super(id);
-	}
+   protected MeasurementSystemContributionItem(final String id) {
+      super(id);
+   }
 
-	public static void selectSystemFromPrefStore(final Combo combo) {
+   public static void selectSystemFromPrefStore(final Combo combo) {
 
-		final String system = _prefStore.getString(ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE);
+      final String system = _prefStore.getString(ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE);
 
-		if (system.equals(ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE_KM)) {
-			combo.select(0);
-		} else if (system.equals(ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE_MI)) {
-			combo.select(1);
-		} else {
-			combo.select(0);
-		}
-	}
+      if (system.equals(ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE_KM)) {
+         combo.select(0);
+      } else if (system.equals(ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE_MI)) {
+         combo.select(1);
+      } else {
+         combo.select(0);
+      }
 
-	/**
-	 * Sets measurement system in the pref store, updates {@link UI#UNIT_VALUE_ALTITUDE}... var's
-	 * and fires modify event {@link ITourbookPreferences#MEASUREMENT_SYSTEM}
-	 * 
-	 * @param systemIndex
-	 *            0...metric, 1...imperial
-	 */
-	public static void selectSystemInPrefStore(final int systemIndex) {
+      _oldSystemIndex = combo.getSelectionIndex();
+   }
 
-		if (systemIndex == _oldSystemIndex) {
-			// nothing has changed
-			return;
-		}
+   /**
+    * Sets measurement system in the pref store, updates {@link UI#UNIT_VALUE_ALTITUDE}... var's
+    * and fires modify event {@link ITourbookPreferences#MEASUREMENT_SYSTEM}
+    *
+    * @param systemIndex
+    *           0...metric, 1...imperial
+    */
+   public static void selectSystemInPrefStore(final int systemIndex) {
 
-		_oldSystemIndex = systemIndex;
+      if (systemIndex == _oldSystemIndex) {
+         // nothing has changed
+         return;
+      }
 
-		if (systemIndex == 0) {
+      _oldSystemIndex = systemIndex;
 
-			// set metric system
+      if (systemIndex == 0) {
 
-			_prefStore.putValue(
-					ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE,
-					ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE_KM);
+         // set metric system
 
-			_prefStore.putValue(
-					ITourbookPreferences.MEASUREMENT_SYSTEM_ALTITUDE,
-					ITourbookPreferences.MEASUREMENT_SYSTEM_ALTITUDE_M);
+         _prefStore.putValue(
+               ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE,
+               ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE_KM);
 
-			_prefStore.putValue(
-					ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPERATURE,
-					ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPERATURE_C);
+         _prefStore.putValue(
+               ITourbookPreferences.MEASUREMENT_SYSTEM_ALTITUDE,
+               ITourbookPreferences.MEASUREMENT_SYSTEM_ALTITUDE_M);
 
-		} else {
+         _prefStore.putValue(
+               ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPERATURE,
+               ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPERATURE_C);
 
-			// set imperial system
+      } else {
 
-			_prefStore.putValue(
-					ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE,
-					ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE_MI);
+         // set imperial system
 
-			_prefStore.putValue(
-					ITourbookPreferences.MEASUREMENT_SYSTEM_ALTITUDE,
-					ITourbookPreferences.MEASUREMENT_SYSTEM_ALTITUDE_FOOT);
+         _prefStore.putValue(
+               ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE,
+               ITourbookPreferences.MEASUREMENT_SYSTEM_DISTANCE_MI);
 
-			_prefStore.putValue(
-					ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPERATURE,
-					ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPTERATURE_F);
-		}
+         _prefStore.putValue(
+               ITourbookPreferences.MEASUREMENT_SYSTEM_ALTITUDE,
+               ITourbookPreferences.MEASUREMENT_SYSTEM_ALTITUDE_FOOT);
 
-		UI.updateUnits();
+         _prefStore.putValue(
+               ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPERATURE,
+               ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPTERATURE_F);
+      }
 
-		// fire modify event
-		_prefStore.setValue(ITourbookPreferences.MEASUREMENT_SYSTEM, Math.random());
-	}
+      UI.updateUnits();
 
-	/**
-	 * listen for changes in the person list
-	 */
-	private void addPrefListener() {
+      // fire modify event
+      _prefStore.setValue(ITourbookPreferences.MEASUREMENT_SYSTEM, Math.random());
+   }
 
-		_prefChangeListener = new IPropertyChangeListener() {
-			@Override
-			public void propertyChange(final PropertyChangeEvent event) {
+   /**
+    * listen for changes in the person list
+    */
+   private void addPrefListener() {
 
-				final String property = event.getProperty();
+      _prefChangeListener = new IPropertyChangeListener() {
+         @Override
+         public void propertyChange(final PropertyChangeEvent event) {
 
-				if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
+            final String property = event.getProperty();
 
-					_isFireSelectionEvent = false;
-					{
-						selectSystemFromPrefStore(_combo);
-					}
-					_isFireSelectionEvent = true;
-				}
-			}
+            if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
 
-		};
-		// register the listener
-		_prefStore.addPropertyChangeListener(_prefChangeListener);
-	}
+               _isFireSelectionEvent = false;
+               {
+                  selectSystemFromPrefStore(_combo);
+               }
+               _isFireSelectionEvent = true;
+            }
+         }
 
-	@Override
-	protected Control createControl(final Composite parent) {
+      };
+      // register the listener
+      _prefStore.addPropertyChangeListener(_prefChangeListener);
+   }
 
-		final Composite ui = createUI(parent);
+   @Override
+   protected Control createControl(final Composite parent) {
 
-		addPrefListener();
+      final Composite ui = createUI(parent);
 
-		return ui;
-	}
+      addPrefListener();
 
-	private Composite createUI(final Composite parent) {
+      return ui;
+   }
 
-		if (net.tourbook.common.UI.IS_OSX) {
+   private Composite createUI(final Composite parent) {
 
-			return createUI10ComboBox(parent);
+      if (net.tourbook.common.UI.IS_OSX) {
 
-		} else {
+         return createUI10ComboBox(parent);
 
-			/*
-			 * on win32 a few pixel above and below the combobox are drawn, wrapping it into a
-			 * composite removes the pixels
-			 */
-			final Composite container = new Composite(parent, SWT.NONE);
-			GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(container);
-			{
-				final Composite control = createUI10ComboBox(container);
-				control.setLayoutData(new GridData(SWT.NONE, SWT.CENTER, false, true));
-			}
+      } else {
 
-			return container;
-		}
-	}
+         /*
+          * on win32 a few pixel above and below the combobox are drawn, wrapping it into a
+          * composite removes the pixels
+          */
+         final Composite container = new Composite(parent, SWT.NONE);
+         GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(container);
+         {
+            final Composite control = createUI10ComboBox(container);
+            control.setLayoutData(new GridData(SWT.NONE, SWT.CENTER, false, true));
+         }
 
-	private Composite createUI10ComboBox(final Composite parent) {
+         return container;
+      }
+   }
 
-		_combo = new Combo(parent, SWT.DROP_DOWN | SWT.READ_ONLY);
-		_combo.setToolTipText(Messages.App_measurement_tooltip);
+   private Composite createUI10ComboBox(final Composite parent) {
 
-		_combo.addDisposeListener(new DisposeListener() {
-			@Override
-			public void widgetDisposed(final DisposeEvent e) {
-				_prefStore.removePropertyChangeListener(_prefChangeListener);
-			}
-		});
+      _combo = new Combo(parent, SWT.DROP_DOWN | SWT.READ_ONLY);
+      _combo.setToolTipText(Messages.App_measurement_tooltip);
 
-		_combo.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
+      _combo.addDisposeListener(new DisposeListener() {
+         @Override
+         public void widgetDisposed(final DisposeEvent e) {
+            _prefStore.removePropertyChangeListener(_prefChangeListener);
+         }
+      });
 
-				if (_isFireSelectionEvent == false) {
-					return;
-				}
+      _combo.addSelectionListener(new SelectionAdapter() {
+         @Override
+         public void widgetSelected(final SelectionEvent e) {
 
-				onSelectSystem();
-			}
-		});
+            if (_isFireSelectionEvent == false) {
+               return;
+            }
 
-		// fill combo box
-		_combo.add(Messages.App_measurement_metric); // metric system
-		_combo.add(Messages.App_measurement_imperial); // imperial system
+            if (TourManager.isTourEditorModified()) {
 
-		// select previous value
-		selectSystemFromPrefStore(_combo);
+               // prevent to change the measurement system when a tour is modified in the tour editor
+               // -> select old measurement system
 
-		return _combo;
-	}
+               _combo.getDisplay().asyncExec(() -> {
 
-	private void onSelectSystem() {
+                  _combo.select(_oldSystemIndex);
+               });
 
-		final int selectedIndex = _combo.getSelectionIndex();
+            } else {
 
-		if (selectedIndex == -1) {
-			return;
-		}
+               onSelectSystem();
+            }
+         }
+      });
 
-		selectSystemInPrefStore(selectedIndex);
-	}
+      // fill combo box
+      _combo.add(Messages.App_measurement_metric); // metric system
+      _combo.add(Messages.App_measurement_imperial); // imperial system
+
+      // select previous value
+      selectSystemFromPrefStore(_combo);
+
+      return _combo;
+   }
+
+   private void onSelectSystem() {
+
+      final int selectedIndex = _combo.getSelectionIndex();
+
+      if (selectedIndex == -1) {
+         return;
+      }
+
+      selectSystemInPrefStore(selectedIndex);
+   }
 }

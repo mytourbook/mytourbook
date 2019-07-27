@@ -476,12 +476,12 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
             .applyTo(container);
       GridLayoutFactory.fillDefaults().margins(10, 10).applyTo(container);
       {
-         createUI100Container(container);
-         createUI200Log(container);
+         createUI_100_Container(container);
+         createUI_200_Log(container);
       }
    }
 
-   private void createUI100Container(final Composite parent) {
+   private void createUI_100_Container(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
@@ -490,7 +490,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
          // left part (layer selection)
          _leftContainer = new Composite(container, SWT.NONE);
          GridLayoutFactory.fillDefaults().extendedMargins(0, 5, 0, 0).applyTo(_leftContainer);
-         createUI110LeftContainer(_leftContainer);
+         createUI_110_LeftContainer(_leftContainer);
 
          // sash
          final Sash sash = new Sash(container, SWT.VERTICAL);
@@ -499,13 +499,13 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
          // right part (map)
          final Composite mapContainer = new Composite(container, SWT.NONE);
          GridLayoutFactory.fillDefaults().extendedMargins(5, 0, 0, 0).spacing(0, 0).applyTo(mapContainer);
-         createUI180Map(mapContainer);
+         createUI_180_Map(mapContainer);
 
          _detailForm = new ViewerDetailForm(container, _leftContainer, sash, mapContainer, 30);
       }
    }
 
-   private void createUI110LeftContainer(final Composite parent) {
+   private void createUI_110_LeftContainer(final Composite parent) {
 
       _innerContainer = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(_innerContainer);
@@ -516,8 +516,8 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
          label.setText(Messages.Dialog_MapConfig_Label_MapProvider);
          label.setToolTipText(Messages.Dialog_MapConfig_Label_HintDragAndDrop);
 
-         createUI114Viewer(_innerContainer);
-         createUI140DialogProperties(_innerContainer);
+         createUI_114_Viewer(_innerContainer);
+         createUI_140_DialogProperties(_innerContainer);
 
          /*
           * section properties
@@ -551,14 +551,14 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
             _propInnerContainer.setBackground(parentBackground);
             {
-               createUI120MapProviderProperties(_propInnerContainer);
-               createUI130ProfileProperties(_propInnerContainer);
+               createUI_120_MapProviderProperties(_propInnerContainer);
+               createUI_130_ProfileProperties(_propInnerContainer);
             }
          }
       }
    }
 
-   private Control createUI114Viewer(final Composite parent) {
+   private Control createUI_114_Viewer(final Composite parent) {
 
       final TreeColumnLayout treeLayout = new TreeColumnLayout();
 
@@ -567,10 +567,9 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
       GridDataFactory.fillDefaults().grab(true, true).applyTo(layoutContainer);
       {
 
-         final Tree tree = new Tree(layoutContainer, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION);
+         final Tree tree = new Tree(layoutContainer, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION);
 
          tree.setHeaderVisible(true);
-         tree.setLinesVisible(true);
 
          /*
           * tree viewer
@@ -692,8 +691,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
                _treeViewer,
                new FocusCellOwnerDrawHighlighter(_treeViewer));
 
-         final ColumnViewerEditorActivationStrategy actSupport = new ColumnViewerEditorActivationStrategy(
-               _treeViewer) {
+         final ColumnViewerEditorActivationStrategy actSupport = new ColumnViewerEditorActivationStrategy(_treeViewer) {
 
             @Override
             protected boolean isEditorActivationEvent(final ColumnViewerEditorActivationEvent event) {
@@ -714,7 +712,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
       }
 
-      createUI116ViewerColumns(treeLayout);
+      createUI_116_ViewerColumns(treeLayout);
 
       return layoutContainer;
    }
@@ -724,247 +722,261 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
     *
     * @param pixelConverter
     */
-   private void createUI116ViewerColumns(final TreeColumnLayout treeLayout) {
+   private void createUI_116_ViewerColumns(final TreeColumnLayout treeLayout) {
 
       TreeViewerColumn tvc;
       TreeColumn tc;
 
-      /*
-       * column: map provider
-       */
-      tvc = new TreeViewerColumn(_treeViewer, SWT.LEAD);
-      tc = tvc.getColumn();
-      tc.setText(Messages.Dialog_MapProfile_Column_MapProvider);
-      tc.setToolTipText(Messages.Dialog_MapProfile_Column_MapProvider_Tooltip);
-      tvc.setLabelProvider(new StyledCellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
+      {
+         /*
+          * Column: Map provider
+          */
 
-            final StyledString styledString = new StyledString();
-            final Object element = cell.getElement();
+         tvc = new TreeViewerColumn(_treeViewer, SWT.LEAD);
+         tc = tvc.getColumn();
+         tc.setText(Messages.Dialog_MapProfile_Column_MapProvider);
+         tc.setToolTipText(Messages.Dialog_MapProfile_Column_MapProvider_Tooltip);
+         tvc.setLabelProvider(new StyledCellLabelProvider() {
+            @Override
+            public void update(final ViewerCell cell) {
 
-            if (element instanceof TVIMapProvider) {
+               final StyledString styledString = new StyledString();
+               final Object element = cell.getElement();
 
-               final MPWrapper mpWrapper = ((TVIMapProvider) element).getMapProviderWrapper();
-               final MP mapProvider = mpWrapper.getMP();
+               if (element instanceof TVIMapProvider) {
 
-               styledString.append(mapProvider.getName());
+                  final MPWrapper mpWrapper = ((TVIMapProvider) element).getMapProviderWrapper();
+                  final MP mapProvider = mpWrapper.getMP();
 
-               cell.setImage(mpWrapper.isDisplayedInMap() ? _imageMap : _imagePlaceholder);
+                  styledString.append(mapProvider.getName());
 
-            } else if (element instanceof TVIWmsLayer) {
+                  cell.setImage(mpWrapper.isDisplayedInMap() ? _imageMap : _imagePlaceholder);
 
-               final MtLayer mtLayer = ((TVIWmsLayer) element).getMtLayer();
+               } else if (element instanceof TVIWmsLayer) {
 
-               styledString.append(mtLayer.getGeoLayer().getTitle());
+                  final MtLayer mtLayer = ((TVIWmsLayer) element).getMtLayer();
 
-               styledString.append("  (", StyledString.QUALIFIER_STYLER);//$NON-NLS-1$
-               styledString.append(mtLayer.getGeoLayer().getName(), StyledString.QUALIFIER_STYLER);
-               styledString.append(")", StyledString.QUALIFIER_STYLER);//$NON-NLS-1$
+                  styledString.append(mtLayer.getGeoLayer().getTitle());
 
-               cell.setImage(mtLayer.isDisplayedInMap() ? _imageLayer : _imagePlaceholder);
+                  styledString.append("  (", StyledString.QUALIFIER_STYLER);//$NON-NLS-1$
+                  styledString.append(mtLayer.getGeoLayer().getName(), StyledString.QUALIFIER_STYLER);
+                  styledString.append(")", StyledString.QUALIFIER_STYLER);//$NON-NLS-1$
 
-            } else {
-               styledString.append(element.toString());
-            }
+                  cell.setImage(mtLayer.isDisplayedInMap() ? _imageLayer : _imagePlaceholder);
 
-            cell.setText(styledString.getString());
-            cell.setStyleRanges(styledString.getStyleRanges());
-         }
-      });
-      treeLayout.setColumnData(tc, new ColumnWeightData(100, true));
-
-      /*
-       * column: is visible
-       */
-      tvc = new TreeViewerColumn(_treeViewer, SWT.LEAD);
-      tc = tvc.getColumn();
-      tc.setText(Messages.Dialog_MapProfile_Column_IsVisible);
-      tc.setToolTipText(Messages.Dialog_MapProfile_Column_IsVisible_Tooltip);
-      tvc.setLabelProvider(new StyledCellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final Object element = cell.getElement();
-
-            if (element instanceof TVIMapProvider) {
-
-               final MPWrapper mpWrapper = ((TVIMapProvider) element).getMapProviderWrapper();
-
-               cell.setText(Boolean.toString(mpWrapper.isDisplayedInMap()));
-
-            } else if (element instanceof TVIWmsLayer) {
-
-               final MtLayer mtLayer = ((TVIWmsLayer) element).getMtLayer();
-
-               cell.setText(Boolean.toString(mtLayer.isDisplayedInMap()));
-
-            } else {
-               cell.setText(UI.EMPTY_STRING);
-            }
-         }
-      });
-
-      tvc.setEditingSupport(new EditingSupport(_treeViewer) {
-
-         private final CheckboxCellEditor fCellEditor = new CheckboxCellEditor(_treeViewer.getTree());
-
-         @Override
-         protected boolean canEdit(final Object element) {
-
-            if (element instanceof TVIMapProvider) {
-
-               final TVIMapProvider tvi = (TVIMapProvider) element;
-               final MP mapProvider = tvi.getMapProviderWrapper().getMP();
-
-               if (mapProvider instanceof MPWms) {
-
-                  // wms can be toggled when at least one layer is displayed
-
-                  return canWmsBeDisplayed((MPWms) mapProvider);
-               }
-            }
-
-            return true;
-         }
-
-         @Override
-         protected CellEditor getCellEditor(final Object element) {
-            return fCellEditor;
-         }
-
-         @Override
-         protected Object getValue(final Object element) {
-
-            if (element instanceof TVIMapProvider) {
-
-               final MPWrapper mpWrapper = ((TVIMapProvider) element).getMapProviderWrapper();
-
-               return mpWrapper.isDisplayedInMap();
-
-            } else if (element instanceof TVIWmsLayer) {
-
-               final MtLayer mtLayer = ((TVIWmsLayer) element).getMtLayer();
-
-               return mtLayer.isDisplayedInMap();
-            }
-
-            return null;
-         }
-
-         @Override
-         protected void setValue(final Object element, final Object value) {
-
-            final boolean isChecked = ((Boolean) value);
-
-            if (element instanceof TVIMapProvider) {
-
-               final MPWrapper mpWrapper = ((TVIMapProvider) element).getMapProviderWrapper();
-
-               mpWrapper.setIsDisplayedInMap(isChecked);
-
-               if (isChecked) {
-
-                  /*
-                   * remove parent tiles from loading cache because they can have loading
-                   * errors (from their children) which prevents them to be loaded again
-                   */
-                  _mpProfile.resetParentTiles();
+               } else {
+                  styledString.append(element.toString());
                }
 
-               enableProfileMapButton();
+               cell.setText(styledString.getString());
+               cell.setStyleRanges(styledString.getStyleRanges());
+            }
+         });
+         treeLayout.setColumnData(tc, new ColumnWeightData(100, true));
+      }
+      {
+         /*
+          * Column: Is visible
+          */
 
-            } else if (element instanceof TVIWmsLayer) {
+         tvc = new TreeViewerColumn(_treeViewer, SWT.CENTER);
+         tc = tvc.getColumn();
+         tc.setText(Messages.Dialog_MapProfile_Column_IsVisible);
+         tc.setToolTipText(Messages.Dialog_MapProfile_Column_IsVisible_Tooltip);
+         tvc.setLabelProvider(new StyledCellLabelProvider() {
+            @Override
+            public void update(final ViewerCell cell) {
 
-               final TVIWmsLayer tviLayer = (TVIWmsLayer) element;
-               final MtLayer mtLayer = tviLayer.getMtLayer();
+               final Object element = cell.getElement();
 
-               mtLayer.setIsDisplayedInMap(isChecked);
+               if (element instanceof TVIMapProvider) {
 
-               updateMVMapProvider(tviLayer);
+                  final MPWrapper mpWrapper = ((TVIMapProvider) element).getMapProviderWrapper();
+                  final boolean isVisible = mpWrapper.isDisplayedInMap();
+
+                  cell.setText(isVisible ? Boolean.toString(isVisible) : UI.EMPTY_STRING);
+
+               } else if (element instanceof TVIWmsLayer) {
+
+                  final MtLayer mtLayer = ((TVIWmsLayer) element).getMtLayer();
+                  final boolean isVisible = mtLayer.isDisplayedInMap();
+
+                  cell.setText(isVisible ? Boolean.toString(isVisible) : UI.EMPTY_STRING);
+
+               } else {
+                  cell.setText(UI.EMPTY_STRING);
+               }
+            }
+         });
+
+         tvc.setEditingSupport(new EditingSupport(_treeViewer) {
+
+            private final CheckboxCellEditor fCellEditor = new CheckboxCellEditor(_treeViewer.getTree());
+
+            @Override
+            protected boolean canEdit(final Object element) {
+
+               if (element instanceof TVIMapProvider) {
+
+                  final TVIMapProvider tvi = (TVIMapProvider) element;
+                  final MP mapProvider = tvi.getMapProviderWrapper().getMP();
+
+                  if (mapProvider instanceof MPWms) {
+
+                     // wms can be toggled when at least one layer is displayed
+
+                     return canWmsBeDisplayed((MPWms) mapProvider);
+                  }
+               }
+
+               return true;
             }
 
-            // update viewer
-            getViewer().update(element, null);
-
-            updateLiveView();
-         }
-      });
-      treeLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(10)));
-
-      /*
-       * column: alpha
-       */
-      tvc = new TreeViewerColumn(_treeViewer, SWT.LEAD);
-      tc = tvc.getColumn();
-      tc.setText(Messages.Dialog_MapProfile_Column_Alpha);
-      tc.setToolTipText(Messages.Dialog_MapProfile_Column_Alpha_Tooltip);
-      tvc.setLabelProvider(new StyledCellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final Object element = cell.getElement();
-
-            if (element instanceof TVIMapProvider) {
-
-               final MPWrapper mpWrapper = ((TVIMapProvider) element).getMapProviderWrapper();
-
-               cell.setText(Integer.toString(mpWrapper.getAlpha()));
-
-            } else {
-
-               cell.setText(UI.EMPTY_STRING);
+            @Override
+            protected CellEditor getCellEditor(final Object element) {
+               return fCellEditor;
             }
-         }
-      });
-      treeLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(10)));
 
-      /*
-       * column: brightness
-       */
-      tvc = new TreeViewerColumn(_treeViewer, SWT.LEAD);
-      tc = tvc.getColumn();
-      tc.setText(Messages.Dialog_MapProfile_Column_Brightness);
-      tc.setToolTipText(Messages.Dialog_MapProfile_Column_Brightness_Tooltip);
-      tvc.setLabelProvider(new StyledCellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
+            @Override
+            protected Object getValue(final Object element) {
 
-            final Object element = cell.getElement();
+               if (element instanceof TVIMapProvider) {
 
-            if (element instanceof TVIMapProvider) {
+                  final MPWrapper mpWrapper = ((TVIMapProvider) element).getMapProviderWrapper();
 
-               final MPWrapper mpWrapper = ((TVIMapProvider) element).getMapProviderWrapper();
+                  return mpWrapper.isDisplayedInMap();
 
-               cell.setText(mpWrapper.isBrightnessForNextMp() ? Integer.toString(mpWrapper
-                     .getBrightnessValueForNextMp()) : UI.EMPTY_STRING);
+               } else if (element instanceof TVIWmsLayer) {
 
-            } else {
+                  final MtLayer mtLayer = ((TVIWmsLayer) element).getMtLayer();
 
-               cell.setText(UI.EMPTY_STRING);
+                  return mtLayer.isDisplayedInMap();
+               }
+
+               return null;
             }
-         }
-      });
-      treeLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(10)));
 
-      /*
-       * column: empty to prevent scrolling to the right when the right column is selected
-       */
-      tvc = new TreeViewerColumn(_treeViewer, SWT.LEAD);
-      tvc.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-            /*
-             * !!! label provider is necessary to prevent a NPE !!!
-             */
-         }
-      });
-      tc = tvc.getColumn();
-      treeLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(4)));
+            @Override
+            protected void setValue(final Object element, final Object value) {
 
+               final boolean isChecked = ((Boolean) value);
+
+               if (element instanceof TVIMapProvider) {
+
+                  final MPWrapper mpWrapper = ((TVIMapProvider) element).getMapProviderWrapper();
+
+                  mpWrapper.setIsDisplayedInMap(isChecked);
+
+                  if (isChecked) {
+
+                     /*
+                      * remove parent tiles from loading cache because they can have loading
+                      * errors (from their children) which prevents them to be loaded again
+                      */
+                     _mpProfile.resetParentTiles();
+                  }
+
+                  enableProfileMapButton();
+
+               } else if (element instanceof TVIWmsLayer) {
+
+                  final TVIWmsLayer tviLayer = (TVIWmsLayer) element;
+                  final MtLayer mtLayer = tviLayer.getMtLayer();
+
+                  mtLayer.setIsDisplayedInMap(isChecked);
+
+                  updateMVMapProvider(tviLayer);
+               }
+
+               // update viewer
+               getViewer().update(element, null);
+
+               updateLiveView();
+            }
+         });
+         treeLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(8)));
+      }
+      {
+         /*
+          * Column: Alpha
+          */
+
+         tvc = new TreeViewerColumn(_treeViewer, SWT.TRAIL);
+         tc = tvc.getColumn();
+         tc.setText(Messages.Dialog_MapProfile_Column_Alpha);
+         tc.setToolTipText(Messages.Dialog_MapProfile_Column_Alpha_Tooltip);
+         tvc.setLabelProvider(new StyledCellLabelProvider() {
+            @Override
+            public void update(final ViewerCell cell) {
+
+               final Object element = cell.getElement();
+
+               if (element instanceof TVIMapProvider) {
+
+                  final MPWrapper mpWrapper = ((TVIMapProvider) element).getMapProviderWrapper();
+                  final boolean isVisible = mpWrapper.isDisplayedInMap();
+
+                  cell.setText(isVisible ? Integer.toString(mpWrapper.getAlpha()) : UI.EMPTY_STRING);
+
+               } else {
+
+                  cell.setText(UI.EMPTY_STRING);
+               }
+            }
+         });
+         treeLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(8)));
+      }
+      {
+         /*
+          * Column: Brightness
+          */
+
+         tvc = new TreeViewerColumn(_treeViewer, SWT.TRAIL);
+         tc = tvc.getColumn();
+         tc.setText(Messages.Dialog_MapProfile_Column_Brightness);
+         tc.setToolTipText(Messages.Dialog_MapProfile_Column_Brightness_Tooltip);
+         tvc.setLabelProvider(new StyledCellLabelProvider() {
+            @Override
+            public void update(final ViewerCell cell) {
+
+               final Object element = cell.getElement();
+
+               if (element instanceof TVIMapProvider) {
+
+                  final MPWrapper mpWrapper = ((TVIMapProvider) element).getMapProviderWrapper();
+
+                  cell.setText(mpWrapper.isBrightnessForNextMp()
+                        ? Integer.toString(mpWrapper.getBrightnessValueForNextMp())
+                        : UI.EMPTY_STRING);
+
+               } else {
+
+                  cell.setText(UI.EMPTY_STRING);
+               }
+            }
+         });
+         treeLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(8)));
+      }
+      {
+         /*
+          * column: Empty column to prevent scrolling to the right when the right column is selected
+          */
+
+         tvc = new TreeViewerColumn(_treeViewer, SWT.LEAD);
+         tvc.setLabelProvider(new CellLabelProvider() {
+            @Override
+            public void update(final ViewerCell cell) {
+               /*
+                * !!! label provider is necessary to prevent a NPE !!!
+                */
+            }
+         });
+         tc = tvc.getColumn();
+         treeLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(4)));
+      }
    }
 
-   private void createUI120MapProviderProperties(final Composite parent) {
+   private void createUI_120_MapProviderProperties(final Composite parent) {
 
       final Group group = new Group(parent, SWT.NONE);
       group.setText(Messages.Dialog_MapConfig_Group_MapProvider);
@@ -1133,7 +1145,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
          // ################################################
 
-         createUI122ColorSelector1(group);
+         createUI_122_ColorSelector1(group);
 
          // ################################################
 
@@ -1144,7 +1156,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
       }
    }
 
-   private void createUI122ColorSelector1(final Composite parent) {
+   private void createUI_122_ColorSelector1(final Composite parent) {
 
       // transparent color selectors
 
@@ -1181,13 +1193,13 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
          clientContainer.setBackground(parentBackground);
 
          {
-            createUI124ColorSelector2(clientContainer);
+            createUI_124_ColorSelector2(clientContainer);
          }
       }
 
    }
 
-   private void createUI124ColorSelector2(final Composite parent) {
+   private void createUI_124_ColorSelector2(final Composite parent) {
 
       final IPropertyChangeListener colorListener = new IPropertyChangeListener() {
          @Override
@@ -1205,44 +1217,44 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
          final Composite colorContainer0 = new Composite(colorContainerParent, SWT.NONE);
          GridLayoutFactory.fillDefaults().numColumns(7).spacing(0, 0).applyTo(colorContainer0);
          {
-            _colorSelectorTransparent0 = createUIColorSelector(colorContainer0, colorListener, gd);
-            _colorSelectorTransparent1 = createUIColorSelector(colorContainer0, colorListener, gd);
-            _colorSelectorTransparent2 = createUIColorSelector(colorContainer0, colorListener, gd);
-            _colorSelectorTransparent3 = createUIColorSelector(colorContainer0, colorListener, gd);
-            _colorSelectorTransparent4 = createUIColorSelector(colorContainer0, colorListener, gd);
-            _colorSelectorTransparent5 = createUIColorSelector(colorContainer0, colorListener, gd);
-            _colorSelectorTransparent6 = createUIColorSelector(colorContainer0, colorListener, gd);
+            _colorSelectorTransparent0 = createUI_ColorSelector(colorContainer0, colorListener, gd);
+            _colorSelectorTransparent1 = createUI_ColorSelector(colorContainer0, colorListener, gd);
+            _colorSelectorTransparent2 = createUI_ColorSelector(colorContainer0, colorListener, gd);
+            _colorSelectorTransparent3 = createUI_ColorSelector(colorContainer0, colorListener, gd);
+            _colorSelectorTransparent4 = createUI_ColorSelector(colorContainer0, colorListener, gd);
+            _colorSelectorTransparent5 = createUI_ColorSelector(colorContainer0, colorListener, gd);
+            _colorSelectorTransparent6 = createUI_ColorSelector(colorContainer0, colorListener, gd);
          }
 
          final Composite colorContainer1 = new Composite(colorContainerParent, SWT.NONE);
          GridDataFactory.fillDefaults().applyTo(colorContainer1);
          GridLayoutFactory.fillDefaults().numColumns(7).spacing(0, 0).applyTo(colorContainer1);
          {
-            _colorSelectorTransparent7 = createUIColorSelector(colorContainer1, colorListener, gd);
-            _colorSelectorTransparent8 = createUIColorSelector(colorContainer1, colorListener, gd);
-            _colorSelectorTransparent9 = createUIColorSelector(colorContainer1, colorListener, gd);
-            _colorSelectorTransparent10 = createUIColorSelector(colorContainer1, colorListener, gd);
-            _colorSelectorTransparent11 = createUIColorSelector(colorContainer1, colorListener, gd);
-            _colorSelectorTransparent12 = createUIColorSelector(colorContainer1, colorListener, gd);
-            _colorSelectorTransparent13 = createUIColorSelector(colorContainer1, colorListener, gd);
+            _colorSelectorTransparent7 = createUI_ColorSelector(colorContainer1, colorListener, gd);
+            _colorSelectorTransparent8 = createUI_ColorSelector(colorContainer1, colorListener, gd);
+            _colorSelectorTransparent9 = createUI_ColorSelector(colorContainer1, colorListener, gd);
+            _colorSelectorTransparent10 = createUI_ColorSelector(colorContainer1, colorListener, gd);
+            _colorSelectorTransparent11 = createUI_ColorSelector(colorContainer1, colorListener, gd);
+            _colorSelectorTransparent12 = createUI_ColorSelector(colorContainer1, colorListener, gd);
+            _colorSelectorTransparent13 = createUI_ColorSelector(colorContainer1, colorListener, gd);
          }
 
          final Composite colorContainer2 = new Composite(colorContainerParent, SWT.NONE);
          GridDataFactory.fillDefaults().applyTo(colorContainer2);
          GridLayoutFactory.fillDefaults().numColumns(7).spacing(0, 0).applyTo(colorContainer2);
          {
-            _colorSelectorTransparent14 = createUIColorSelector(colorContainer2, colorListener, gd);
-            _colorSelectorTransparent15 = createUIColorSelector(colorContainer2, colorListener, gd);
-            _colorSelectorTransparent16 = createUIColorSelector(colorContainer2, colorListener, gd);
-            _colorSelectorTransparent17 = createUIColorSelector(colorContainer2, colorListener, gd);
-            _colorSelectorTransparent18 = createUIColorSelector(colorContainer2, colorListener, gd);
-            _colorSelectorTransparent19 = createUIColorSelector(colorContainer2, colorListener, gd);
-            _colorSelectorTransparent20 = createUIColorSelector(colorContainer2, colorListener, gd);
+            _colorSelectorTransparent14 = createUI_ColorSelector(colorContainer2, colorListener, gd);
+            _colorSelectorTransparent15 = createUI_ColorSelector(colorContainer2, colorListener, gd);
+            _colorSelectorTransparent16 = createUI_ColorSelector(colorContainer2, colorListener, gd);
+            _colorSelectorTransparent17 = createUI_ColorSelector(colorContainer2, colorListener, gd);
+            _colorSelectorTransparent18 = createUI_ColorSelector(colorContainer2, colorListener, gd);
+            _colorSelectorTransparent19 = createUI_ColorSelector(colorContainer2, colorListener, gd);
+            _colorSelectorTransparent20 = createUI_ColorSelector(colorContainer2, colorListener, gd);
          }
       }
    }
 
-   private void createUI130ProfileProperties(final Composite parent) {
+   private void createUI_130_ProfileProperties(final Composite parent) {
 
       Label label;
       final MouseWheelListener mouseWheelListener = new MouseWheelListener() {
@@ -1361,7 +1373,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
       }
    }
 
-   private void createUI140DialogProperties(final Composite parent) {
+   private void createUI_140_DialogProperties(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().applyTo(container);
@@ -1418,7 +1430,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
       }
    }
 
-   private void createUI180Map(final Composite parent) {
+   private void createUI_180_Map(final Composite parent) {
 
       final Composite toolbarContainer = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(toolbarContainer);
@@ -1522,7 +1534,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
        */
    }
 
-   private void createUI200Log(final Composite parent) {
+   private void createUI_200_Log(final Composite parent) {
 
       final Font monoFont = getMonoFont();
       final Color parentBackground = parent.getBackground();
@@ -1589,9 +1601,9 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
       }
    }
 
-   private ColorSelector createUIColorSelector(final Composite parent,
-                                               final IPropertyChangeListener colorListener,
-                                               final GridDataFactory gd) {
+   private ColorSelector createUI_ColorSelector(final Composite parent,
+                                                final IPropertyChangeListener colorListener,
+                                                final GridDataFactory gd) {
 
       final ColorSelector colorSelector = new ColorSelector(parent);
 

@@ -2935,12 +2935,12 @@ public class TourDatabase {
             // version 39 start  -  19.7
             //
             + " isWeatherDataFromApi                  BOOLEAN  DEFAULT FALSE,             \n" //$NON-NLS-1$
-            + " weatherPrecipitation                  FLOAT    DEFAULT 0,                 \n" //$NON-NLS-1$
-            + " weatherHumidity                       SMALLINT DEFAULT 0,                 \n" //$NON-NLS-1$
-            + " weatherPressure                       SMALLINT DEFAULT 0,                 \n" //$NON-NLS-1$
-            + " weatherWindChill                      FLOAT    DEFAULT 0,                 \n" //$NON-NLS-1$
-            + " weatherMaxTemperature                 SMALLINT DEFAULT 0,                 \n" //$NON-NLS-1$
-            + " weatherMinTemperature                 SMALLINT DEFAULT 0,                 \n" //$NON-NLS-1$
+            + " weather_Humidity                      SMALLINT DEFAULT 0,                 \n" //$NON-NLS-1$
+            + " weather_Precipitation                 FLOAT    DEFAULT 0,                 \n" //$NON-NLS-1$
+            + " weather_Pressure                      FLOAT    DEFAULT 0,                 \n" //$NON-NLS-1$
+            + " weather_Temperature_Min               FLOAT    DEFAULT 0,                 \n" //$NON-NLS-1$
+            + " weather_Temperature_Max               FLOAT    DEFAULT 0,                 \n" //$NON-NLS-1$
+            + " weather_Temperature_WindChill         FLOAT    DEFAULT 0,                 \n" //$NON-NLS-1$
             //
             // version 39 end
 
@@ -7081,18 +7081,18 @@ public class TourDatabase {
       final Statement stmt = conn.createStatement();
       {
          // check if db is updated to version 39
-         if (isColumnAvailable(conn, TABLE_TOUR_TAG, "isWeatherDataFromApi") == false) { //$NON-NLS-1$
+         if (isColumnAvailable(conn, TABLE_TOUR_DATA, "isWeatherDataFromApi") == false) { //$NON-NLS-1$
 
 // SET_FORMATTING_OFF
 
             // Add new columns
-            SQL.AddCol_Boolean(stmt, TABLE_TOUR_DATA,             "isWeatherDataFromApi",       DEFAULT_FALSE); //$NON-NLS-1$
-            SQL.AddCol_Float  (stmt, TABLE_TOUR_DATA,             "weatherPrecipitation",       DEFAULT_0); //$NON-NLS-1$
-            SQL.AddCol_Int    (stmt, TABLE_TOUR_DATA,             "weatherHumidity",            DEFAULT_0); //$NON-NLS-1$
-            SQL.AddCol_Int    (stmt, TABLE_TOUR_DATA,             "weatherPressure",            DEFAULT_0); //$NON-NLS-1$
-            SQL.AddCol_Float  (stmt, TABLE_TOUR_DATA,             "weatherWindChill",           DEFAULT_0); //$NON-NLS-1$
-            SQL.AddCol_Int    (stmt, TABLE_TOUR_DATA,             "weatherMaxTemperature",      DEFAULT_0); //$NON-NLS-1$
-            SQL.AddCol_Int    (stmt, TABLE_TOUR_DATA,             "weatherMinTemperature",      DEFAULT_0); //$NON-NLS-1$
+            SQL.AddCol_Boolean   (stmt, TABLE_TOUR_DATA, "isWeatherDataFromApi",          DEFAULT_FALSE);   //$NON-NLS-1$
+            SQL.AddCol_SmallInt  (stmt, TABLE_TOUR_DATA, "weather_Humidity",              DEFAULT_0);       //$NON-NLS-1$
+            SQL.AddCol_Float     (stmt, TABLE_TOUR_DATA, "weather_Precipitation",         DEFAULT_0);       //$NON-NLS-1$
+            SQL.AddCol_Float     (stmt, TABLE_TOUR_DATA, "weather_Pressure",              DEFAULT_0);       //$NON-NLS-1$
+            SQL.AddCol_Float     (stmt, TABLE_TOUR_DATA, "weather_Temperature_Min",       DEFAULT_0);       //$NON-NLS-1$
+            SQL.AddCol_Float     (stmt, TABLE_TOUR_DATA, "weather_Temperature_Max",       DEFAULT_0);       //$NON-NLS-1$
+            SQL.AddCol_Float     (stmt, TABLE_TOUR_DATA, "weather_Temperature_WindChill", DEFAULT_0);       //$NON-NLS-1$
 
 // SET_FORMATTING_ON
          }
