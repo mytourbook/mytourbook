@@ -28,13 +28,25 @@ public class WeatherData {
    private int    averageTemperature;
    private int    WindDirection;
    private int    WindSpeed;
+
+   /**
+    * Precipitation in millimeters
+    */
    private float  precipitation;
+
    private String WeatherDescription;
    private String WeatherType;
+
+   /**
+    * Humidity in percentage (%)
+    */
    private int    averageHumidity;
-   //TODO TourWeatherData class name
-   // or average{Property} name ?
-   private int    averagePressure;
+
+   /**
+    * Atmospheric pressure in millibars (mb)
+    */
+   private int averagePressure;
+
    private int windChill;
 
    public int getAverageHumidity() {
@@ -98,11 +110,11 @@ public class WeatherData {
    }
 
    public void setTemperatureMax(final int temperatureMax) {
-         maxTemperature = temperatureMax;
+      maxTemperature = temperatureMax;
    }
 
    public void setTemperatureMin(final int temperatureMin) {
-         minTemperature = temperatureMin;
+      minTemperature = temperatureMin;
    }
 
    public void setWeatherDescription(final String weatherDescription) {
@@ -110,7 +122,9 @@ public class WeatherData {
    }
 
    public void setWeatherType(final String weatherCode) {
+
       // Codes : http://www.worldweatheronline.com/feed/wwoConditionCodes.xml
+
       switch (weatherCode) {
       case "122": //$NON-NLS-1$
          WeatherType = IWeather.WEATHER_ID_OVERCAST;

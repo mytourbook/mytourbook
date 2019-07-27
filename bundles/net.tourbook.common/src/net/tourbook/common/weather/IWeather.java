@@ -52,20 +52,20 @@ public interface IWeather {
     *
     * source: wikipedia
     *
-    * Bft	Description				km/h 		mph
-    * 0	Calm 					< 1 		< 1
-    * 1	Light air			 	1.1 - 5.5 	1 - 3
-    * 2	Light breeze 			5.6 - 11 	4 - 7
-    * 3	Gentle breeze 			12 - 19 	8 - 12
-    * 4	Moderate breeze 		20 - 28 	13 - 17
-    * 5	Fresh breeze 			29 - 38 	18 - 24
-    * 6	Strong breeze 			39 - 49 	25 - 30
-    * 7	High wind, ...		 	50 - 61 	31 - 38
-    * 8	Gale, Fresh gale 		62 - 74 	39 - 46
-    * 9	Strong gale 			75 - 88 	47 - 54
-    * 10	Storm[6], Whole gale 	89 - 102 	55 - 63
-    * 11	Violent storm 			103 - 117 	64 - 72
-    * 12	Hurricane-force 	 	>= 118 		>= 73
+    * Bft Description            km/h        mph
+    * 0   Calm                   < 1         < 1
+    * 1   Light air              1.1 - 5.5   1 - 3
+    * 2   Light breeze           5.6 - 11    4 - 7
+    * 3   Gentle breeze          12 - 19     8 - 12
+    * 4   Moderate breeze        20 - 28     13 - 17
+    * 5   Fresh breeze           29 - 38     18 - 24
+    * 6   Strong breeze          39 - 49     25 - 30
+    * 7   High wind, ...         50 - 61     31 - 38
+    * 8   Gale, Fresh gale       62 - 74     39 - 46
+    * 9   Strong gale            75 - 88     47 - 54
+    * 10  Storm[6], Whole gale   89 - 102    55 - 63
+    * 11  Violent storm          103 - 117   64 - 72
+    * 12  Hurricane-force        >= 118      >= 73
     * </pre>
     */
    public static final String[] windSpeedText                   = new String[] {
@@ -101,24 +101,30 @@ public interface IWeather {
    /**
     * Wind speed in km/h
     */
-   public static final int[]    windSpeedKmh                    = new int[] { 0,                        // 0 bft
-         5,                                                                                             //	1 bft
-         11,                                                                                            //	2
-         19,                                                                                            //	3
-         28,                                                                                            //	4
-         38,                                                                                            //	5
-         49,                                                                                            //  6
-         61,                                                                                            //  7
-         74,                                                                                            //  8
-         88,                                                                                            //  9
+   public static final int[]    windSpeedKmh                    = new int[]
+
+   {
+         0,                                                                                             // 0 bft
+         5,                                                                                             // 1 bft
+         11,                                                                                            // 2
+         19,                                                                                            // 3
+         28,                                                                                            // 4
+         38,                                                                                            // 5
+         49,                                                                                            // 6
+         61,                                                                                            // 7
+         74,                                                                                            // 8
+         88,                                                                                            // 9
          102,                                                                                           // 10
          117,                                                                                           // 11
          118,                                                                                           // 12
    };
 
-   public static final int[]    windSpeedMph                    = new int[] { 0,                        // 0 bft
-         3,                                                                                             //  1 bft
-         7,                                                                                             //  2
+   public static final int[]    windSpeedMph                    = new int[]
+
+   {
+         0,                                                                                             // 0 bft
+         3,                                                                                             // 1 bft
+         7,                                                                                             // 2
          12,                                                                                            // 3
          17,                                                                                            // 4
          24,                                                                                            // 5

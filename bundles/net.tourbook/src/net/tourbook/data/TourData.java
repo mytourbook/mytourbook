@@ -485,27 +485,33 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Is <code>true</code> when the weather data below is from the weather API and not
     * manually entered or from the device.
     */
-   private boolean isWeatherDataFromApi = false;
+   private boolean               isWeatherDataFromApi = false;
 
    private int                   weatherWindDir;                                       // db-version 8
-
    private int                   weatherWindSpd;                                       // db-version 8
-
    private String                weatherClouds;                                        // db-version 8
 
    private String                weather;                                              // db-version 13
 
-   private int                   weatherHumidity;                                      // db-version 39
+   /**
+    * Humidity in percentage (%)
+    */
+   private short                 weather_Humidity;                                     // db-version 39
 
-   private float                 weatherPrecipitation;                                 // db-version 39
+   /**
+    * Precipitation in millimeters
+    */
+   private float                 weather_Precipitation;                                // db-version 39
 
-   private int                   weatherPressure;                                      // db-version 39
+   /**
+    * Atmospheric pressure in millibars (mb)
+    */
+   private float                 weather_Pressure;                                     // db-version 39
 
-   private int                   weatherWindChill;                                     // db-version 39
+   private float                 weather_Temperature_Min;                              // db-version 39
+   private float                 weather_Temperature_Max;                              // db-version 39
+   private float                 weather_Temperature_WindChill;                        // db-version 39
 
-   private int                   weatherMaxTemperature;                                // db-version 39
-
-   private int                   weatherMinTemperature;                                // db-version 39
 
    // ############################################# POWER #############################################
 
@@ -3102,8 +3108,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       if (tempLength > 0) {
 
-//         weatherMinTemperature=temperatureMin;
-//         weatherMaxTemperature=temperatureMax;
+         weather_Temperature_Min = temperatureMin;
+         weather_Temperature_Max = temperatureMax;
 
          avgTemperature = temperatureSum / tempLength;
       }
@@ -8087,15 +8093,44 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
+    * @return {@link #weather_Humidity}
+    */
+   public int getWeather_Humidity() {
+      return weather_Humidity;
+   }
+
+   /**
+    * @return {@link #weather_Precipitation}
+    */
+   public float getWeather_Precipitation() {
+      return weather_Precipitation;
+   }
+
+   /**
+    * @return {@link #weather_Pressure}
+    */
+   public float getWeather_Pressure() {
+      return weather_Pressure;
+   }
+
+   public float getWeather_Temperature_Max() {
+      return weather_Temperature_Max;
+   }
+
+   public float getWeather_Temperature_Min() {
+      return weather_Temperature_Min;
+   }
+
+   public float getWeather_Temperature_WindChill() {
+      return weather_Temperature_WindChill;
+   }
+
+   /**
     * @return Returns the {@link IWeather#WEATHER_ID_}... or <code>null</code> when weather is not
     *         set.
     */
    public String getWeatherClouds() {
       return weatherClouds;
-   }
-
-   public int getWeatherHumidity() {
-      return weatherHumidity;
    }
 
    /**
@@ -8117,26 +8152,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
 
       return weatherCloudsIndex < 0 ? 0 : weatherCloudsIndex;
-   }
-
-   public float getWeatherMaxTemperature() {
-      return weatherMaxTemperature;
-   }
-
-   public float getWeatherMinTemperature() {
-      return weatherMinTemperature;
-   }
-
-   public float getWeatherPrecipitation() {
-      return weatherPrecipitation;
-   }
-
-   public int getWeatherPressure() {
-      return weatherPressure;
-   }
-
-   public int getWeatherWindChill() {
-      return weatherWindChill;
    }
 
    public int getWeatherWindDir() {
@@ -10005,6 +10020,45 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
+    * {@link #weather_Humidity}
+    *
+    * @param weatherHumidity
+    */
+   public void setWeather_Humidity(final short weatherHumidity) {
+      this.weather_Humidity = weatherHumidity;
+   }
+
+   /**
+    * {@link #weather_Precipitation}
+    *
+    * @param weatherPrecipitation
+    */
+   public void setWeather_Precipitation(final float weatherPrecipitation) {
+      this.weather_Precipitation = weatherPrecipitation;
+   }
+
+   /**
+    * {@link #weather_Pressure}
+    *
+    * @param weatherPressure
+    */
+   public void setWeather_Pressure(final float weatherPressure) {
+      this.weather_Pressure = weatherPressure;
+   }
+
+   public void setWeather_Temperature_Max(final float weatherMaxTemperature) {
+      this.weather_Temperature_Max = weatherMaxTemperature;
+   }
+
+   public void setWeather_Temperature_Min(final float weatherMinTemperature) {
+      this.weather_Temperature_Min = weatherMinTemperature;
+   }
+
+   public void setWeather_Temperature_WindChill(final float weatherWindChill) {
+      this.weather_Temperature_WindChill = weatherWindChill;
+   }
+
+   /**
     * Sets the weather id which is defined in {@link IWeather#WEATHER_ID_}... or <code>null</code>
     * when weather id is not defined
     *
@@ -10012,30 +10066,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    public void setWeatherClouds(final String weatherClouds) {
       this.weatherClouds = weatherClouds;
-   }
-
-   public void setWeatherHumidity(final int weatherHumidity) {
-      this.weatherHumidity = weatherHumidity;
-   }
-
-   public void setWeatherMaxTemperature(final int weatherMaxTemperature) {
-      this.weatherMaxTemperature = weatherMaxTemperature;
-   }
-
-   public void setWeatherMinTemperature(final int weatherMinTemperature) {
-      this.weatherMinTemperature = weatherMinTemperature;
-   }
-
-   public void setWeatherPrecipitation(final float weatherPrecipitation) {
-      this.weatherPrecipitation = weatherPrecipitation;
-   }
-
-   public void setWeatherPressure(final int weatherPressure) {
-      this.weatherPressure = weatherPressure;
-   }
-
-   public void setWeatherWindChill(final int weatherWindChill) {
-      this.weatherWindChill = weatherWindChill;
    }
 
    public void setWeatherWindDir(final int weatherWindDir) {

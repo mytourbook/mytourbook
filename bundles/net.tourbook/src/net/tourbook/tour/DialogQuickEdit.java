@@ -95,20 +95,20 @@ public class DialogQuickEdit extends TitleAreaDialog {
    private FormToolkit        _tk;
    private Form               _formContainer;
 
-   private CLabel             _lblCloudIcon;
+   private CLabel             _lblWeather_CloudIcon;
 
-   private Combo              _comboClouds;
    private Combo              _comboTitle;
-   private Combo              _comboWindDirectionText;
-   private Combo              _comboWindSpeedText;
+   private Combo              _comboWeather_Clouds;
+   private Combo              _comboWeather_Wind_DirectionText;
+   private Combo              _comboWeather_Wind_SpeedText;
 
    private Spinner            _spinBodyWeight;
    private Spinner            _spinFTP;
    private Spinner            _spinRestPuls;
-   private Spinner            _spinTemperature;
    private Spinner            _spinCalories;
-   private Spinner            _spinWindSpeedValue;
-   private Spinner            _spinWindDirectionValue;
+   private Spinner            _spinWeather_Temperature_Avg;
+   private Spinner            _spinWeather_Wind_SpeedValue;
+   private Spinner            _spinWeather_Wind_DirectionValue;
 
    private Text               _txtDescription;
    private Text               _txtWeather;
@@ -286,8 +286,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
          _tk.adapt(_comboTitle, true, false);
 
-         GridDataFactory
-               .fillDefaults()//
+         GridDataFactory.fillDefaults()
                .grab(true, false)
                .hint(defaultTextWidth, SWT.DEFAULT)
                .applyTo(_comboTitle);
@@ -318,8 +317,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
          int descLines = store.getInt(ITourbookPreferences.TOUR_EDITOR_DESCRIPTION_HEIGHT);
          descLines = descLines == 0 ? 5 : descLines;
 
-         GridDataFactory
-               .fillDefaults()//
+         GridDataFactory.fillDefaults()
                .grab(true, true)
                //
                // SWT.DEFAULT causes lot's of problems with the layout therefore the hint is set
@@ -332,8 +330,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
    private void createUI_130_Personal(final Composite parent) {
 
       final Composite section = createSection(parent, Messages.tour_editor_section_personal, false);
-      GridLayoutFactory
-            .fillDefaults()//
+      GridLayoutFactory.fillDefaults()
             .numColumns(2)
             .spacing(20, 5)
             .applyTo(section);
@@ -386,8 +383,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
             // spinner
             _spinRestPuls = new Spinner(container, SWT.BORDER);
-            GridDataFactory
-                  .fillDefaults()//
+            GridDataFactory.fillDefaults()
                   .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
                   .align(SWT.BEGINNING, SWT.CENTER)
                   .applyTo(_spinRestPuls);
@@ -424,8 +420,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
                // spinner: weight
                _spinBodyWeight = new Spinner(container, SWT.BORDER);
-               GridDataFactory
-                     .fillDefaults()//
+               GridDataFactory.fillDefaults()
                      .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
                      .align(SWT.BEGINNING, SWT.CENTER)
                      .applyTo(_spinBodyWeight);
@@ -450,8 +445,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
                // spinner: FTP
                _spinFTP = new Spinner(container, SWT.BORDER);
-               GridDataFactory
-                     .fillDefaults()//
+               GridDataFactory.fillDefaults()
                      .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
                      .align(SWT.BEGINNING, SWT.CENTER)
                      .applyTo(_spinFTP);
@@ -470,8 +464,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
    private void createUI_140_Weather(final Composite parent) {
 
       final Composite section = createSection(parent, Messages.tour_editor_section_weather, false);
-      GridLayoutFactory
-            .fillDefaults()//
+      GridLayoutFactory.fillDefaults()
             .numColumns(2)
             .spacing(20, 5)
             .applyTo(section);
@@ -501,8 +494,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
                SWT.BORDER | SWT.WRAP | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL//
          );
 
-         GridDataFactory
-               .fillDefaults()//
+         GridDataFactory.fillDefaults()
                .grab(true, true)
                //
                // SWT.DEFAULT causes lot's of problems with the layout therefore the hint is set
@@ -518,168 +510,166 @@ public class DialogQuickEdit extends TitleAreaDialog {
       GridDataFactory.fillDefaults().span(2, 1).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(5).applyTo(container);
       {
+         {
+            /*
+             * wind speed
+             */
 
-         /*
-          * wind speed
-          */
+            // label
+            Label label = _tk.createLabel(container, Messages.tour_editor_label_wind_speed);
+            label.setToolTipText(Messages.tour_editor_label_wind_speed_Tooltip);
+            _firstColumnControls.add(label);
 
-         // label
-         Label label = _tk.createLabel(container, Messages.tour_editor_label_wind_speed);
-         label.setToolTipText(Messages.tour_editor_label_wind_speed_Tooltip);
-         _firstColumnControls.add(label);
+            // spinner
+            _spinWeather_Wind_SpeedValue = new Spinner(container, SWT.BORDER);
+            GridDataFactory.fillDefaults()
+                  .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+                  .align(SWT.BEGINNING, SWT.CENTER)
+                  .applyTo(_spinWeather_Wind_SpeedValue);
+            _spinWeather_Wind_SpeedValue.setMinimum(0);
+            _spinWeather_Wind_SpeedValue.setMaximum(120);
+            _spinWeather_Wind_SpeedValue.setToolTipText(Messages.tour_editor_label_wind_speed_Tooltip);
 
-         // spinner
-         _spinWindSpeedValue = new Spinner(container, SWT.BORDER);
-         GridDataFactory
-               .fillDefaults()//
-               .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
-               .align(SWT.BEGINNING, SWT.CENTER)
-               .applyTo(_spinWindSpeedValue);
-         _spinWindSpeedValue.setMinimum(0);
-         _spinWindSpeedValue.setMaximum(120);
-         _spinWindSpeedValue.setToolTipText(Messages.tour_editor_label_wind_speed_Tooltip);
-
-         _spinWindSpeedValue.addModifyListener(new ModifyListener() {
-            @Override
-            public void modifyText(final ModifyEvent e) {
-               if (_isUpdateUI) {
-                  return;
+            _spinWeather_Wind_SpeedValue.addModifyListener(new ModifyListener() {
+               @Override
+               public void modifyText(final ModifyEvent e) {
+                  if (_isUpdateUI) {
+                     return;
+                  }
+                  onSelectWindSpeedValue();
                }
-               onSelectWindSpeedValue();
-            }
-         });
-         _spinWindSpeedValue.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               if (_isUpdateUI) {
-                  return;
+            });
+            _spinWeather_Wind_SpeedValue.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  if (_isUpdateUI) {
+                     return;
+                  }
+                  onSelectWindSpeedValue();
                }
-               onSelectWindSpeedValue();
-            }
-         });
-         _spinWindSpeedValue.addMouseWheelListener(new MouseWheelListener() {
-            @Override
-            public void mouseScrolled(final MouseEvent event) {
-               Util.adjustSpinnerValueOnMouseScroll(event);
-               if (_isUpdateUI) {
-                  return;
+            });
+            _spinWeather_Wind_SpeedValue.addMouseWheelListener(new MouseWheelListener() {
+               @Override
+               public void mouseScrolled(final MouseEvent event) {
+                  Util.adjustSpinnerValueOnMouseScroll(event);
+                  if (_isUpdateUI) {
+                     return;
+                  }
+                  onSelectWindSpeedValue();
                }
-               onSelectWindSpeedValue();
-            }
-         });
+            });
 
-         // label: km/h, mi/h
-         label = _tk.createLabel(container, UI.UNIT_LABEL_SPEED);
+            // label: km/h, mi/h
+            label = _tk.createLabel(container, UI.UNIT_LABEL_SPEED);
 
-         // combo: wind speed with text
-         _comboWindSpeedText = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
-         GridDataFactory
-               .fillDefaults()//
-               .align(SWT.BEGINNING, SWT.FILL)
-               .indent(10, 0)
-               .span(2, 1)
-               .applyTo(_comboWindSpeedText);
-         _tk.adapt(_comboWindSpeedText, true, false);
-         _comboWindSpeedText.setToolTipText(Messages.tour_editor_label_wind_speed_Tooltip);
-         _comboWindSpeedText.setVisibleItemCount(20);
-         _comboWindSpeedText.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
+            // combo: wind speed with text
+            _comboWeather_Wind_SpeedText = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
+            GridDataFactory.fillDefaults()
+                  .align(SWT.BEGINNING, SWT.FILL)
+                  .indent(10, 0)
+                  .span(2, 1)
+                  .applyTo(_comboWeather_Wind_SpeedText);
+            _tk.adapt(_comboWeather_Wind_SpeedText, true, false);
+            _comboWeather_Wind_SpeedText.setToolTipText(Messages.tour_editor_label_wind_speed_Tooltip);
+            _comboWeather_Wind_SpeedText.setVisibleItemCount(20);
+            _comboWeather_Wind_SpeedText.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
 
-               if (_isUpdateUI) {
-                  return;
+                  if (_isUpdateUI) {
+                     return;
+                  }
+                  onSelectWindSpeedText();
                }
-               onSelectWindSpeedText();
-            }
-         });
+            });
 
-         // fill combobox
-         for (final String speedText : IWeather.windSpeedText) {
-            _comboWindSpeedText.add(speedText);
+            // fill combobox
+            for (final String speedText : IWeather.windSpeedText) {
+               _comboWeather_Wind_SpeedText.add(speedText);
+            }
          }
+         {
+            /*
+             * wind direction
+             */
 
-         /*
-          * wind direction
-          */
+            // label
+            final Label label = _tk.createLabel(container, Messages.tour_editor_label_wind_direction);
+            label.setToolTipText(Messages.tour_editor_label_wind_direction_Tooltip);
+            _firstColumnControls.add(label);
 
-         // label
-         label = _tk.createLabel(container, Messages.tour_editor_label_wind_direction);
-         label.setToolTipText(Messages.tour_editor_label_wind_direction_Tooltip);
-         _firstColumnControls.add(label);
+            // combo: wind direction text
+            _comboWeather_Wind_DirectionText = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
+            _tk.adapt(_comboWeather_Wind_DirectionText, true, false);
+            _comboWeather_Wind_DirectionText.setToolTipText(Messages.tour_editor_label_WindDirectionNESW_Tooltip);
+            _comboWeather_Wind_DirectionText.setVisibleItemCount(16);
+            GridDataFactory.fillDefaults()
+                  .align(SWT.BEGINNING, SWT.FILL)
+                  .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+                  .applyTo(_comboWeather_Wind_DirectionText);
+            _comboWeather_Wind_DirectionText.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
 
-         // combo: wind direction text
-         _comboWindDirectionText = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
-         _tk.adapt(_comboWindDirectionText, true, false);
-         GridDataFactory
-               .fillDefaults()//
-               .align(SWT.BEGINNING, SWT.FILL)
-               .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
-               .applyTo(_comboWindDirectionText);
-         _comboWindDirectionText.setToolTipText(Messages.tour_editor_label_WindDirectionNESW_Tooltip);
-         _comboWindDirectionText.setVisibleItemCount(10);
-         _comboWindDirectionText.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-
-               if (_isUpdateUI) {
-                  return;
+                  if (_isUpdateUI) {
+                     return;
+                  }
+                  onSelectWindDirectionText();
                }
-               onSelectWindDirectionText();
-            }
-         });
+            });
 
-         // fill combobox
-         for (final String fComboCloudsUIValue : IWeather.windDirectionText) {
-            _comboWindDirectionText.add(fComboCloudsUIValue);
+            // fill combobox
+            for (final String fComboCloudsUIValue : IWeather.windDirectionText) {
+               _comboWeather_Wind_DirectionText.add(fComboCloudsUIValue);
+            }
+
+            // spacer
+            new Label(container, SWT.NONE);
+
+            // spinner: wind direction value
+            _spinWeather_Wind_DirectionValue = new Spinner(container, SWT.BORDER);
+            _spinWeather_Wind_DirectionValue.setMinimum(-1);
+            _spinWeather_Wind_DirectionValue.setMaximum(3600);
+            _spinWeather_Wind_DirectionValue.setDigits(1);
+            _spinWeather_Wind_DirectionValue.setToolTipText(Messages.tour_editor_label_wind_direction_Tooltip);
+            GridDataFactory.fillDefaults()
+                  .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+                  .indent(10, 0)
+                  .align(SWT.BEGINNING, SWT.CENTER)
+                  .applyTo(_spinWeather_Wind_DirectionValue);
+
+            _spinWeather_Wind_DirectionValue.addModifyListener(new ModifyListener() {
+               @Override
+               public void modifyText(final ModifyEvent e) {
+                  if (_isUpdateUI) {
+                     return;
+                  }
+                  onSelectWindDirectionValue();
+               }
+            });
+            _spinWeather_Wind_DirectionValue.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  if (_isUpdateUI) {
+                     return;
+                  }
+                  onSelectWindDirectionValue();
+               }
+            });
+            _spinWeather_Wind_DirectionValue.addMouseWheelListener(new MouseWheelListener() {
+               @Override
+               public void mouseScrolled(final MouseEvent event) {
+                  Util.adjustSpinnerValueOnMouseScroll(event);
+                  if (_isUpdateUI) {
+                     return;
+                  }
+                  onSelectWindDirectionValue();
+               }
+            });
+
+            // label: direction unit = degree
+            _tk.createLabel(container, Messages.Tour_Editor_Label_WindDirection_Unit);
          }
-
-         // spacer
-         new Label(container, SWT.NONE);
-
-         // spinner: wind direction value
-         _spinWindDirectionValue = new Spinner(container, SWT.BORDER);
-         GridDataFactory
-               .fillDefaults()//
-               .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
-               .indent(10, 0)
-               .align(SWT.BEGINNING, SWT.CENTER)
-               .applyTo(_spinWindDirectionValue);
-         _spinWindDirectionValue.setMinimum(-1);
-         _spinWindDirectionValue.setMaximum(360);
-         _spinWindDirectionValue.setToolTipText(Messages.tour_editor_label_wind_direction_Tooltip);
-
-         _spinWindDirectionValue.addModifyListener(new ModifyListener() {
-            @Override
-            public void modifyText(final ModifyEvent e) {
-               if (_isUpdateUI) {
-                  return;
-               }
-               onSelectWindDirectionValue();
-            }
-         });
-         _spinWindDirectionValue.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               if (_isUpdateUI) {
-                  return;
-               }
-               onSelectWindDirectionValue();
-            }
-         });
-         _spinWindDirectionValue.addMouseWheelListener(new MouseWheelListener() {
-            @Override
-            public void mouseScrolled(final MouseEvent event) {
-               Util.adjustSpinnerValueOnMouseScroll(event);
-               if (_isUpdateUI) {
-                  return;
-               }
-               onSelectWindDirectionValue();
-            }
-         });
-
-         // label: direction unit = degree
-         _tk.createLabel(container, Messages.Tour_Editor_Label_WindDirection_Unit);
-
       }
    }
 
@@ -703,19 +693,18 @@ public class DialogQuickEdit extends TitleAreaDialog {
          _firstColumnControls.add(label);
 
          // spinner
-         _spinTemperature = new Spinner(container, SWT.BORDER);
-         GridDataFactory
-               .fillDefaults()//
+         _spinWeather_Temperature_Avg = new Spinner(container, SWT.BORDER);
+         GridDataFactory.fillDefaults()
                .align(SWT.BEGINNING, SWT.CENTER)
                .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
-               .applyTo(_spinTemperature);
-         _spinTemperature.setToolTipText(Messages.Tour_Editor_Label_Temperature_Tooltip);
+               .applyTo(_spinWeather_Temperature_Avg);
+         _spinWeather_Temperature_Avg.setToolTipText(Messages.Tour_Editor_Label_Temperature_Tooltip);
 
          // the min/max temperature has a large range because fahrenheit has bigger values than celcius
-         _spinTemperature.setMinimum(-600);
-         _spinTemperature.setMaximum(1500);
+         _spinWeather_Temperature_Avg.setMinimum(-600);
+         _spinWeather_Temperature_Avg.setMaximum(1500);
 
-         _spinTemperature.addModifyListener(new ModifyListener() {
+         _spinWeather_Temperature_Avg.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(final ModifyEvent e) {
                if (_isUpdateUI) {
@@ -724,7 +713,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
                _isTemperatureManuallyModified = true;
             }
          });
-         _spinTemperature.addSelectionListener(new SelectionAdapter() {
+         _spinWeather_Temperature_Avg.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(final SelectionEvent e) {
                if (_isUpdateUI) {
@@ -733,7 +722,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
                _isTemperatureManuallyModified = true;
             }
          });
-         _spinTemperature.addMouseWheelListener(new MouseWheelListener() {
+         _spinWeather_Temperature_Avg.addMouseWheelListener(new MouseWheelListener() {
             @Override
             public void mouseScrolled(final MouseEvent event) {
                Util.adjustSpinnerValueOnMouseScroll(event);
@@ -759,22 +748,21 @@ public class DialogQuickEdit extends TitleAreaDialog {
             label.setToolTipText(Messages.tour_editor_label_clouds_Tooltip);
 
             // icon: clouds
-            _lblCloudIcon = new CLabel(cloudContainer, SWT.NONE);
-            GridDataFactory
-                  .fillDefaults()//
+            _lblWeather_CloudIcon = new CLabel(cloudContainer, SWT.NONE);
+            GridDataFactory.fillDefaults()
                   .align(SWT.END, SWT.FILL)
                   .grab(true, false)
-                  .applyTo(_lblCloudIcon);
+                  .applyTo(_lblWeather_CloudIcon);
          }
          _firstColumnControls.add(cloudContainer);
 
          // combo: clouds
-         _comboClouds = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
-         GridDataFactory.fillDefaults().span(2, 1).applyTo(_comboClouds);
-         _tk.adapt(_comboClouds, true, false);
-         _comboClouds.setToolTipText(Messages.tour_editor_label_clouds_Tooltip);
-         _comboClouds.setVisibleItemCount(10);
-         _comboClouds.addSelectionListener(new SelectionAdapter() {
+         _comboWeather_Clouds = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
+         GridDataFactory.fillDefaults().span(2, 1).applyTo(_comboWeather_Clouds);
+         _tk.adapt(_comboWeather_Clouds, true, false);
+         _comboWeather_Clouds.setToolTipText(Messages.tour_editor_label_clouds_Tooltip);
+         _comboWeather_Clouds.setVisibleItemCount(10);
+         _comboWeather_Clouds.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(final SelectionEvent e) {
                displayCloudIcon();
@@ -783,13 +771,13 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
          // fill combobox
          for (final String cloudText : IWeather.cloudText) {
-            _comboClouds.add(cloudText);
+            _comboWeather_Clouds.add(cloudText);
          }
 
          // force the icon to be displayed to ensure the width is correctly set when the size is computed
          _isUpdateUI = true;
          {
-            _comboClouds.select(0);
+            _comboWeather_Clouds.select(0);
             displayCloudIcon();
          }
          _isUpdateUI = false;
@@ -803,17 +791,17 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
    private void displayCloudIcon() {
 
-      final int selectionIndex = _comboClouds.getSelectionIndex();
+      final int selectionIndex = _comboWeather_Clouds.getSelectionIndex();
 
       final String cloudKey = IWeather.cloudIcon[selectionIndex];
       final Image cloundIcon = net.tourbook.common.UI.IMAGE_REGISTRY.get(cloudKey);
 
-      _lblCloudIcon.setImage(cloundIcon);
+      _lblWeather_CloudIcon.setImage(cloundIcon);
    }
 
    private void enableControls() {
 
-      _spinTemperature.setEnabled(_tourData.temperatureSerie == null);
+      _spinWeather_Temperature_Avg.setEnabled(_tourData.temperatureSerie == null);
    }
 
    @Override
@@ -869,42 +857,44 @@ public class DialogQuickEdit extends TitleAreaDialog {
    private void onSelectWindDirectionText() {
 
       // N=0=0  NE=1=45  E=2=90  SE=3=135  S=4=180  SW=5=225  W=6=270  NW=7=315
-      final int selectedIndex = _comboWindDirectionText.getSelectionIndex();
+      final int selectedIndex = _comboWeather_Wind_DirectionText.getSelectionIndex();
 
       // get degree from selected direction
 
-      final int degree = selectedIndex * 45;
+      final int degree = (int) (selectedIndex * 22.5f * 10f);
 
-      _spinWindDirectionValue.setSelection(degree);
+      _spinWeather_Wind_DirectionValue.setSelection(degree);
    }
 
    private void onSelectWindDirectionValue() {
 
-      int degree = _spinWindDirectionValue.getSelection();
+      int degree = _spinWeather_Wind_DirectionValue.getSelection();
 
+      // this tricky code is used to scroll before 0 which will overscroll and starts from the beginning
       if (degree == -1) {
-         degree = 359;
-         _spinWindDirectionValue.setSelection(degree);
-      }
-      if (degree == 360) {
-         degree = 0;
-         _spinWindDirectionValue.setSelection(degree);
+         degree = 3599;
+         _spinWeather_Wind_DirectionValue.setSelection(degree);
       }
 
-      _comboWindDirectionText.select(net.tourbook.common.UI.getCardinalDirectionTextIndex(degree));
+      if (degree == 3600) {
+         degree = 0;
+         _spinWeather_Wind_DirectionValue.setSelection(degree);
+      }
+
+      _comboWeather_Wind_DirectionText.select(net.tourbook.common.UI.getCardinalDirectionTextIndex(degree));
    }
 
    private void onSelectWindSpeedText() {
 
       _isWindSpeedManuallyModified = true;
 
-      final int selectedIndex = _comboWindSpeedText.getSelectionIndex();
+      final int selectedIndex = _comboWeather_Wind_SpeedText.getSelectionIndex();
       final int speed = _unitValueWindSpeed[selectedIndex];
 
       final boolean isBackup = _isUpdateUI;
       _isUpdateUI = true;
       {
-         _spinWindSpeedValue.setSelection(speed);
+         _spinWeather_Wind_SpeedValue.setSelection(speed);
       }
       _isUpdateUI = isBackup;
    }
@@ -913,12 +903,12 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
       _isWindSpeedManuallyModified = true;
 
-      final int windSpeed = _spinWindSpeedValue.getSelection();
+      final int windSpeed = _spinWeather_Wind_SpeedValue.getSelection();
 
       final boolean isBackup = _isUpdateUI;
       _isUpdateUI = true;
       {
-         _comboWindSpeedText.select(getWindSpeedTextIndex(windSpeed));
+         _comboWeather_Wind_SpeedText.select(getWindSpeedTextIndex(windSpeed));
       }
       _isUpdateUI = isBackup;
    }
@@ -936,17 +926,17 @@ public class DialogQuickEdit extends TitleAreaDialog {
       _tourData.setRestPulse(_spinRestPuls.getSelection());
       _tourData.setCalories(_spinCalories.getSelection());
 
-      _tourData.setWeatherWindDir(_spinWindDirectionValue.getSelection());
+      _tourData.setWeatherWindDir((int) (_spinWeather_Wind_DirectionValue.getSelection() / 10.0f));
       if (_isWindSpeedManuallyModified) {
          /*
           * update the speed only when it was modified because when the measurement is changed
           * when the tour is being modified then the computation of the speed value can cause
           * rounding errors
           */
-         _tourData.setWeatherWindSpeed((int) (_spinWindSpeedValue.getSelection() * _unitValueDistance));
+         _tourData.setWeatherWindSpeed((int) (_spinWeather_Wind_SpeedValue.getSelection() * _unitValueDistance));
       }
 
-      final int cloudIndex = _comboClouds.getSelectionIndex();
+      final int cloudIndex = _comboWeather_Clouds.getSelectionIndex();
       String cloudValue = IWeather.cloudIcon[cloudIndex];
       if (cloudValue.equals(net.tourbook.common.UI.IMAGE_EMPTY_16)) {
          // replace invalid cloud key
@@ -956,7 +946,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
       _tourData.setWeather(_txtWeather.getText().trim());
 
       if (_isTemperatureManuallyModified) {
-         float temperature = (float) _spinTemperature.getSelection() / 10;
+         float temperature = (float) _spinWeather_Temperature_Avg.getSelection() / 10;
          if (_unitValueTemperature != 1) {
 
             temperature = ((temperature - net.tourbook.ui.UI.UNIT_FAHRENHEIT_ADD)
@@ -992,18 +982,18 @@ public class DialogQuickEdit extends TitleAreaDialog {
          _txtWeather.setText(_tourData.getWeather());
 
          // wind direction
-         final int weatherWindDirDegree = _tourData.getWeatherWindDir();
-         _spinWindDirectionValue.setSelection(weatherWindDirDegree);
-         _comboWindDirectionText.select(net.tourbook.common.UI.getCardinalDirectionTextIndex(weatherWindDirDegree));
+         final int weatherWindDirDegree = _tourData.getWeatherWindDir() * 10;
+         _spinWeather_Wind_DirectionValue.setSelection(weatherWindDirDegree);
+         _comboWeather_Wind_DirectionText.select(net.tourbook.common.UI.getCardinalDirectionTextIndex(weatherWindDirDegree));
 
          // wind speed
          final int windSpeed = _tourData.getWeatherWindSpeed();
          final int speed = (int) (windSpeed / _unitValueDistance);
-         _spinWindSpeedValue.setSelection(speed);
-         _comboWindSpeedText.select(getWindSpeedTextIndex(speed));
+         _spinWeather_Wind_SpeedValue.setSelection(speed);
+         _comboWeather_Wind_SpeedText.select(getWindSpeedTextIndex(speed));
 
          // weather clouds
-         _comboClouds.select(_tourData.getWeatherIndex());
+         _comboWeather_Clouds.select(_tourData.getWeatherIndex());
 
          // icon must be displayed after the combobox entry is selected
          displayCloudIcon();
@@ -1020,8 +1010,8 @@ public class DialogQuickEdit extends TitleAreaDialog {
                   + net.tourbook.ui.UI.UNIT_FAHRENHEIT_ADD;
          }
 
-         _spinTemperature.setDigits(1);
-         _spinTemperature.setSelection(Math.round(avgTemperature * 10));
+         _spinWeather_Temperature_Avg.setDigits(1);
+         _spinWeather_Temperature_Avg.setSelection(Math.round(avgTemperature * 10));
       }
       _isUpdateUI = false;
    }
