@@ -28,13 +28,16 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.ui.Messages;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 
@@ -43,8 +46,10 @@ import org.eclipse.jface.preference.IPreferenceStore;
  */
 public class HistoricalWeatherRetriever {
 
-   private final static String    baseApiUrl   = "http://api.worldweatheronline.com/premium/v1/past-weather.ashx"; //$NON-NLS-1$
-   private final static String    keyParameter = "?key=";                                                           //$NON-NLS-1$
+   private static final boolean   _isLogWeatherData = System.getProperty("logWeatherData") != null;                     //$NON-NLS-1$
+
+   private final static String    baseApiUrl        = "http://api.worldweatheronline.com/premium/v1/past-weather.ashx"; //$NON-NLS-1$
+   private final static String    keyParameter      = "?key=";                                                          //$NON-NLS-1$
    private TourData               tour;
    private LatLng                 searchAreaCenter;
    private String                 startDate;
@@ -54,7 +59,7 @@ public class HistoricalWeatherRetriever {
 
    private WeatherData            historicalWeatherData;
 
-   private final IPreferenceStore _prefStore   = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore _prefStore        = TourbookPlugin.getPrefStore();
 
    public HistoricalWeatherRetriever() {}
 
@@ -129,6 +134,28 @@ public class HistoricalWeatherRetriever {
     * @return The parsed weather data.
     */
    private WeatherData parseWeatherData(final String weatherDataResponse) {
+
+      if (_isLogWeatherData) {
+
+         final long recordingTime = tour.getTourRecordingTime();
+         final ZonedDateTime zdtTourStart = tour.getTourStartTime();
+         final ZonedDateTime zdtTourEnd = zdtTourStart.plusSeconds(recordingTime);
+         final String tourTitle = tour.getTourTitle();
+
+         System.out.println();
+
+         if (tourTitle.length() > 0) {
+            System.out.println(tourTitle);
+         }
+         
+         System.out.println(String.format(Messages.Tour_Tooltip_Format_DateWeekTime,
+               zdtTourStart.format(TimeTools.Formatter_Date_F),
+               zdtTourStart.format(TimeTools.Formatter_Time_M),
+               zdtTourEnd.format(TimeTools.Formatter_Time_M),
+               zdtTourStart.get(TimeTools.calendarWeek.weekOfWeekBasedYear())));
+         
+         System.out.println(weatherDataResponse);
+      }
 
       final WeatherData weatherData = new WeatherData();
       try {
@@ -230,7 +257,9 @@ public class HistoricalWeatherRetriever {
       if (!rawWeatherData.contains("weather")) { //$NON-NLS-1$
          return null;
       }
+
       final WeatherData historicalWeatherData = parseWeatherData(rawWeatherData);
+
       return historicalWeatherData;
    }
 
@@ -240,10 +269,20 @@ public class HistoricalWeatherRetriever {
     * @return The result of the weather API query.
     */
    private String sendWeatherApiRequest() {
-      final String weatherRequestWithParameters = getApiUrl() + _prefStore.getString(ITourbookPreferences.WEATHER_API_KEY) + "&q=" + searchAreaCenter //$NON-NLS-1$
-            .getLatitude()
-            + "," + searchAreaCenter.getLongitude() //$NON-NLS-1$
-            + "&date=" + startDate + "&tp=1&format=json"; //$NON-NLS-1$ //$NON-NLS-2$
+
+      final String weatherRequestWithParameters =
+
+            getApiUrl() + _prefStore.getString(ITourbookPreferences.WEATHER_API_KEY)
+
+                  + "&q=" + searchAreaCenter.getLatitude() + "," + searchAreaCenter.getLongitude() //$NON-NLS-1$ //$NON-NLS-2$
+                  + "&date=" + startDate //$NON-NLS-1$
+                  + "&tp=1" //$NON-NLS-1$
+                  + "&format=json" //$NON-NLS-1$
+
+                  + "&includelocation=yes" //$NON-NLS-1$
+                  + "&extra=utcDateTime" //$NON-NLS-1$
+      ;
+
       //tp=1 : Specifies the weather forecast time interval in hours. Here, every 1 hour
 
       BufferedReader rd = null;

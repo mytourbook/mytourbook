@@ -4540,7 +4540,14 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
    @Override
    public void setFocus() {
-      _tourViewer.getTree().setFocus();
+
+      final Tree tree = _tourViewer.getTree();
+
+      if (tree.isDisposed()) {
+         return;
+      }
+
+      tree.setFocus();
    }
 
    void setLinkAndCollapse(final boolean isCollapseOthers) {

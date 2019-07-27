@@ -1422,6 +1422,13 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
 
    public void onSelect_MapProvider_Next() {
 
+      if (_mpViewer.getTable().isDisposed()) {
+
+         // this can occures when the action is pressed with the keyboard and the slideout is closed
+
+         return;
+      }
+
       final ArrayList<MP> allMPInViewer = getAllMapProviderInMPViewer();
       final int numMP = allMPInViewer.size();
 
@@ -1453,6 +1460,13 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
    }
 
    public void onSelect_MapProvider_Previous() {
+
+      if (_mpViewer.getTable().isDisposed()) {
+
+         // this can occures when the action is pressed with the keyboard and the slideout is closed
+
+         return;
+      }
 
       final ArrayList<MP> allMPInViewer = getAllMapProviderInMPViewer();
       final int numMP = allMPInViewer.size();
@@ -1605,7 +1619,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
    @Override
    protected void saveState_BeforeDisposed() {
 
-      saveState_MapProviders_VisibleInUI();
+      MapProviderManager.saveState_MapProviders_VisibleInUI();
    }
 
    /**
@@ -1628,26 +1642,6 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
 
       // update internal sorted map provider list with new sorting
       createSortedMapProviders();
-   }
-
-   /**
-    * Save the ckeck state and order of the map providers
-    */
-   private void saveState_MapProviders_VisibleInUI() {
-
-      /*
-       * Save all checked map providers
-       */
-
-      final ArrayList<String> allVisibleMP = new ArrayList<>();
-
-      for (final MP mp : _allMapProvider) {
-         if (mp.isVisibleInUI()) {
-            allVisibleMP.add(mp.getId());
-         }
-      }
-
-      _prefStore.setValue(IMappingPreferences.MAP_PROVIDER_VISIBLE_IN_UI, Util.convertListToString(allVisibleMP));
    }
 
    /**
