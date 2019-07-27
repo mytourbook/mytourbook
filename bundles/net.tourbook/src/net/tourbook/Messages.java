@@ -324,6 +324,7 @@ public class Messages extends NLS {
    public static String        Action_Tag_AutoOpenOK;
    public static String        Action_Tag_Edit;
    public static String        Action_Tag_Edit_Tooltip;
+   public static String        Action_Tag_SetTags;
 
    public static String        Action_TagCategory_Edit;
    public static String        Action_TagCategory_Edit_Tooltip;
@@ -669,6 +670,10 @@ public class Messages extends NLS {
    public static String        Dialog_JoinTours_Label_TourTime;
    public static String        Dialog_JoinTours_Label_TourType;
    public static String        Dialog_JoinTours_Link_TourType;
+
+   public static String        Dialog_SetTags_Message;
+   public static String        Dialog_SetTags_ShellTitle;
+   public static String        Dialog_SetTags_Title;
 
    public static String        Dialog_SetTimeZone_Button_AdjustTimeZone;
    public static String        Dialog_SetTimeZone_Dialog_Title;

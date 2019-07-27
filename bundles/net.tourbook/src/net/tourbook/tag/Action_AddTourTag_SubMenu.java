@@ -46,7 +46,7 @@ import org.eclipse.swt.widgets.MenuItem;
 /**
  * Add tag(s) from the selected tours
  */
-public class ActionAddTourTag extends Action implements IMenuCreator, IAdvancedMenuForActions {
+public class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, IAdvancedMenuForActions {
 
    private static final String    SPACE_PRE_TAG     = "   ";          //$NON-NLS-1$
 
@@ -54,7 +54,7 @@ public class ActionAddTourTag extends Action implements IMenuCreator, IAdvancedM
    private Menu                   _menu;
 
    /**
-    * contains all tags for all selected tours in the viewer
+    * Contains all tags for all selected tours in the viewer
     */
    private Set<TourTag>           _selectedTourTags = new HashSet<>();
    private ArrayList<TourData>    _selectedTours;
@@ -174,10 +174,10 @@ public class ActionAddTourTag extends Action implements IMenuCreator, IAdvancedM
 
       private Menu                   __categoryMenu;
 
-      private final ActionAddTourTag __actionAddTourTag;
+      private final Action_AddTourTag_SubMenu __actionAddTourTag;
       private final TourTagCategory  __tagCategory;
 
-      public ActionTourTagCategory(final ActionAddTourTag actionAddTourTag, final TourTagCategory tagCategory) {
+      public ActionTourTagCategory(final Action_AddTourTag_SubMenu actionAddTourTag, final TourTagCategory tagCategory) {
 
          super(tagCategory.getCategoryName(), AS_DROP_DOWN_MENU);
 
@@ -241,7 +241,7 @@ public class ActionAddTourTag extends Action implements IMenuCreator, IAdvancedM
     *           {@link TourManager#TOUR_CHANGED} event is fired, otherwise the {@link TourData}
     *           from the tour provider is only updated
     */
-   public ActionAddTourTag(final TagMenuManager tagMenuManager) {
+   public Action_AddTourTag_SubMenu(final TagMenuManager tagMenuManager) {
 
       super(Messages.action_tag_add, AS_DROP_DOWN_MENU);
 
@@ -258,7 +258,7 @@ public class ActionAddTourTag extends Action implements IMenuCreator, IAdvancedM
     *           This parameter is ignored but it indicates that the menu auto open behaviour is
     *           used.
     */
-   public ActionAddTourTag(final TagMenuManager tagMenuMgr, final Object isAutoOpen) {
+   public Action_AddTourTag_SubMenu(final TagMenuManager tagMenuMgr, final Object isAutoOpen) {
 
       super(Messages.Action_Tag_Add_AutoOpen, AS_PUSH_BUTTON);
 
@@ -325,8 +325,8 @@ public class ActionAddTourTag extends Action implements IMenuCreator, IAdvancedM
 
             if (isSelectedTags) {
 
-               for (final TourTag _selectedTourTag : _selectedTourTags) {
-                  if (_selectedTourTag.getTagId() == tagId) {
+               for (final TourTag selectedTourTag : _selectedTourTags) {
+                  if (selectedTourTag.getTagId() == tagId) {
                      isTagChecked = true;
                      break;
                   }
@@ -448,8 +448,8 @@ public class ActionAddTourTag extends Action implements IMenuCreator, IAdvancedM
          {
             addActionToMenu(menu, _actionOK);
             addActionToMenu(menu, new ActionCancel());
-
          }
+
          (new Separator()).fill(menu, -1);
          {
             addActionToMenu(menu, _actionOpenTagPrefs);

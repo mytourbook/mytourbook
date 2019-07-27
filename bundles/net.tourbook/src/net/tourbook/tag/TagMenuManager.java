@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -46,6 +46,7 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.graphics.Point;
@@ -55,737 +56,761 @@ import org.eclipse.swt.widgets.Menu;
 
 public class TagMenuManager {
 
-	private static final String				SETTINGS_SECTION_RECENT_TAGS	= "TagManager.RecentTags";							//$NON-NLS-1$
-	private static final String				STATE_RECENT_TAGS				= "tagId";											//$NON-NLS-1$
-	private static final String				STATE_PREVIOUS_TAGS				= "";												//$NON-NLS-1$
+   private static final String            SETTINGS_SECTION_RECENT_TAGS = "TagManager.RecentTags";                              //$NON-NLS-1$
+   private static final String            STATE_RECENT_TAGS            = "tagId";                                              //$NON-NLS-1$
+   private static final String            STATE_PREVIOUS_TAGS          = "";                                                   //$NON-NLS-1$
+
+   private static final IPreferenceStore  _prefStore                   = TourbookPlugin.getPrefStore();
+   private static final IDialogSettings   _state                       = TourbookPlugin.getState(SETTINGS_SECTION_RECENT_TAGS);
+
+   private static IPropertyChangeListener _prefChangeListener;
 
-	private static final IPreferenceStore	_prefStore						= TourbookPlugin.getPrefStore();
-	private static final IDialogSettings	_state							= TourbookPlugin
-																					.getState(SETTINGS_SECTION_RECENT_TAGS);
-	private static IPropertyChangeListener	_prefChangeListener;
+   private static TagMenuManager          _currentInstance;
+   private static boolean                 _isAdvMenu;
 
-	private static TagMenuManager			_currentInstance;
-	private static boolean					_isAdvMenu;
+   private static ActionRecentTag[]       _actionsRecentTags;
+   private static ActionAllPreviousTags   _actionAllPreviousTags;
 
-	private static ActionRecentTag[]		_actionsRecentTags;
-	private static ActionAllPreviousTags	_actionAllPreviousTags;
+   /**
+    * number of tags which are displayed in the context menu or saved in the dialog settings, it's
+    * max number is 9 to have a unique accelerator key
+    */
+   private static LinkedList<TourTag>     _recentTags                  = new LinkedList<>();
 
-	/**
-	 * number of tags which are displayed in the context menu or saved in the dialog settings, it's
-	 * max number is 9 to have a unique accelerator key
-	 */
-	private static LinkedList<TourTag>		_recentTags						= new LinkedList<TourTag>();
+   /**
+    * Contains all tags which are added by the last add action
+    */
+   private static HashMap<Long, TourTag>  _allPreviousTags             = new HashMap<>();
 
-	/**
-	 * Contains all tags which are added by the last add action
-	 */
-	private static HashMap<Long, TourTag>	_allPreviousTags				= new HashMap<Long, TourTag>();
-
-	private static int						_maxRecentActions				= -1;
-
-	/**
-	 * Contains tag id's for all selected tours
-	 */
-	private static HashSet<Long>			_allTourTagIds;
-	private static boolean					_isEnableRecentTagActions;
-
-	private static int						_taggingAutoOpenDelay;
-	private static boolean					_isTaggingAutoOpen;
-	private static boolean					_isTaggingAnimation;
-
-	private boolean							_isSaveTour;
-	private ITourProvider					_tourProvider;
-
-	private ActionContributionItem			_actionAddTagAdvanced;
-	private ActionAddTourTag				_actionAddTag;
-	private ActionRemoveTourTag				_actionRemoveTag;
-	private ActionRemoveAllTags				_actionRemoveAllTags;
-
-	private AdvancedMenuForActions			_advancedMenuToAddTags;
-
-	/**
-	 *
-	 */
-	private static class ActionAllPreviousTags extends Action {
-
-		public ActionAllPreviousTags() {
-			super(UI.IS_NOT_INITIALIZED, AS_CHECK_BOX);
-		}
-
-		@Override
-		public void run() {
-
-			if (_isAdvMenu) {
-
-				final ActionAddTourTag actionAddTagAdvanced = (ActionAddTourTag) _currentInstance._actionAddTagAdvanced
-						.getAction();
-
-				actionAddTagAdvanced.setTourTag(isChecked(), _allPreviousTags);
-			} else {
-
-				_currentInstance.saveTourTags(_allPreviousTags, isChecked());
-			}
-		}
-	}
-
-	/**
-	 *
-	 */
-	private static class ActionRecentTag extends Action {
-
-		private TourTag	_tag;
-
-		public ActionRecentTag() {
-			super(UI.IS_NOT_INITIALIZED, AS_CHECK_BOX);
-		}
-
-		@Override
-		public void run() {
-
-			final ActionAddTourTag actionAddTagAdvanced = (ActionAddTourTag) _currentInstance._actionAddTagAdvanced
-					.getAction();
-
-			if (_isAdvMenu) {
-				actionAddTagAdvanced.setTourTag(isChecked(), _tag);
-			} else {
-				_currentInstance.saveTourTags(_tag, isChecked());
-			}
-		}
-
-		private void setupTagAction(final TourTag tag, final String tagText) {
-			setText(tagText);
-			_tag = tag;
-		}
-
-		@Override
-		public String toString() {
-			return "ActionRecentTag [_tag=" + _tag + "]"; //$NON-NLS-1$ //$NON-NLS-2$
-		}
+   private static int                     _maxRecentActions            = -1;
 
-	}
+   /**
+    * Contains tag id's for all selected tours
+    */
+   private static HashSet<Long>           _allTourTagIds;
+   private static boolean                 _isEnableRecentTagActions;
 
-	/**
-	 * Removes all tags
-	 */
-	private class ActionRemoveAllTags extends Action {
-
-		public ActionRemoveAllTags() {
-			super(Messages.action_tag_remove_all, AS_PUSH_BUTTON);
-		}
+   private static int                     _taggingAutoOpenDelay;
+   private static boolean                 _isTaggingAutoOpen;
+   private static boolean                 _isTaggingAnimation;
 
-		@Override
-		public void run() {
-			BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-				@Override
-				public void run() {
-					runnableRemoveAllTags();
-				}
-			});
-		}
-	}
+   private boolean                        _isSaveTour;
+   private ITourProvider                  _tourProvider;
 
-	/**
-	 * @param tourProvider
-	 * @param isSaveTour
-	 */
-	public TagMenuManager(final ITourProvider tourProvider, final boolean isSaveTour) {
+   private ActionContributionItem         _actionAddTagAdvanced;
+   private Action_AddTourTag_SubMenu      _actionAddTag;
+   private Action_RemoveTourTag_SubMenu   _actionRemoveTag;
+   private Action_RemoveAllTags           _actionRemoveAllTags;
+   private Action_SetTags                 _actionSetTags;
+
+   private AdvancedMenuForActions         _advancedMenuToAddTags;
 
-		_tourProvider = tourProvider;
-		_isSaveTour = isSaveTour;
+   /**
+    * Removes all tags
+    */
+   private class Action_RemoveAllTags extends Action {
+
+      public Action_RemoveAllTags() {
+         super(Messages.action_tag_remove_all, AS_PUSH_BUTTON);
+      }
+
+      @Override
+      public void run() {
+         BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+            @Override
+            public void run() {
+               runnableRemoveAllTags();
+            }
+         });
+      }
+   }
 
-		if (_prefChangeListener == null) {
-			// static var's are not yet initialized
-			addPrefListener();
-			setupRecentActions();
-			restoreAutoOpen();
-		}
+   /**
+    * Removes all tags
+    */
+   private class Action_SetTags extends Action {
+
+      public Action_SetTags() {
+         super(Messages.Action_Tag_SetTags, AS_PUSH_BUTTON);
+      }
 
-		_actionAddTagAdvanced = new ActionContributionItem(new ActionAddTourTag(this, null));
-		_actionAddTagAdvanced.setId(ICommandIds.ACTION_ADD_TAG);
+      @Override
+      public void run() {
 
-		_actionAddTag = new ActionAddTourTag(this);
-		_actionRemoveTag = new ActionRemoveTourTag(this);
-		_actionRemoveAllTags = new ActionRemoveAllTags();
+         if (new Dialog_SetTags(Display.getCurrent().getActiveShell(), TagMenuManager.this).open() == Window.OK) {
 
-		_advancedMenuToAddTags = new AdvancedMenuForActions(_actionAddTagAdvanced);
+            // save all tours with the new tour type
+//            TourManager.saveModifiedTours(selectedTours);
+         }
+      }
+   }
 
-	}
+   /**
+    *
+    */
+   private static class ActionAllPreviousTags extends Action {
 
-	private static void addPrefListener() {
+      public ActionAllPreviousTags() {
+         super(UI.IS_NOT_INITIALIZED, AS_CHECK_BOX);
+      }
 
-		// create pref listener
-		_prefChangeListener = new IPropertyChangeListener() {
-			@Override
-			public void propertyChange(final PropertyChangeEvent event) {
-				final String property = event.getProperty();
+      @Override
+      public void run() {
 
-				// check if the number of recent tags has changed
-				if (property.equals(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TAGS)) {
+         if (_isAdvMenu) {
 
-					setupRecentActions();
+            final Action_AddTourTag_SubMenu actionAddTagAdvanced = (Action_AddTourTag_SubMenu) _currentInstance._actionAddTagAdvanced.getAction();
 
-				} else if (property.equals(ITourbookPreferences.APPEARANCE_IS_TAGGING_AUTO_OPEN)
-						|| property.equals(ITourbookPreferences.APPEARANCE_IS_TAGGING_ANIMATION)
-						|| property.equals(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY)) {
+            actionAddTagAdvanced.setTourTag(isChecked(), _allPreviousTags);
 
-					restoreAutoOpen();
-				}
-			}
-		};
+         } else {
 
-		// add pref listener
-		_prefStore.addPropertyChangeListener(_prefChangeListener);
-	}
+            _currentInstance.saveTourTags(_allPreviousTags, isChecked());
+         }
+      }
+   }
 
-	static void enableRecentTagActions(final boolean isAddTagEnabled, final Set<Long> existingTagIds) {
+   /**
+    *
+    */
+   private static class ActionRecentTag extends Action {
 
-		if (_actionsRecentTags == null) {
-			return;
-		}
-
-		final boolean isExistingTagIds = _allTourTagIds != null && _allTourTagIds.size() > 0;
-		for (final ActionRecentTag actionRecentTag : _actionsRecentTags) {
-
-			final TourTag actionTag = actionRecentTag._tag;
-			if (actionTag == null) {
-				actionRecentTag.setEnabled(false);
-				continue;
-			}
-
-			final long recentTagId = actionTag.getTagId();
-			boolean isTagEnabled;
-			boolean isTagChecked;
+      private TourTag _tag;
 
-			if (isExistingTagIds && _isEnableRecentTagActions) {
+      public ActionRecentTag() {
+         super(UI.IS_NOT_INITIALIZED, AS_CHECK_BOX);
+      }
 
-				// disable action when it's tag id is contained in allExistingTagIds
+      @Override
+      public void run() {
 
-				boolean isExistTagId = false;
+         final Action_AddTourTag_SubMenu actionAddTagAdvanced = (Action_AddTourTag_SubMenu) _currentInstance._actionAddTagAdvanced.getAction();
 
-				for (final long existingTagId : _allTourTagIds) {
-					if (recentTagId == existingTagId) {
-						isExistTagId = true;
-						break;
-					}
-				}
+         if (_isAdvMenu) {
+            actionAddTagAdvanced.setTourTag(isChecked(), _tag);
+         } else {
+            _currentInstance.saveTourTags(_tag, isChecked());
+         }
+      }
 
-				isTagEnabled = isExistTagId == false;
-				isTagChecked = isExistTagId;
+      private void setupTagAction(final TourTag tag, final String tagText) {
+         setText(tagText);
+         _tag = tag;
+      }
 
-			} else {
-				isTagEnabled = _isEnableRecentTagActions;
-				isTagChecked = false;
-			}
+      @Override
+      public String toString() {
+         return "ActionRecentTag [_tag=" + _tag + "]"; //$NON-NLS-1$ //$NON-NLS-2$
+      }
 
-			if (isTagEnabled && existingTagIds.contains(recentTagId)) {
-				isTagChecked = true;
-			}
+   }
 
-			actionRecentTag.setEnabled(isTagEnabled);
-			actionRecentTag.setChecked(isTagChecked);
-		}
+   /**
+    * @param tourProvider
+    * @param isSaveTour
+    */
+   public TagMenuManager(final ITourProvider tourProvider, final boolean isSaveTour) {
 
-		if (_allPreviousTags != null && isAddTagEnabled) {
+      _tourProvider = tourProvider;
+      _isSaveTour = isSaveTour;
 
-			boolean isTagChecked = true;
+      if (_prefChangeListener == null) {
 
-			for (final TourTag previousTag : _allPreviousTags.values()) {
-				if (_allTourTagIds.contains(previousTag.getTagId()) == false) {
-					isTagChecked = false;
-					break;
-				}
-			}
+         // static var's are not yet initialized
+         addPrefListener();
+         setupRecentActions();
+         restoreAutoOpen();
+      }
 
-			_actionAllPreviousTags.setChecked(isTagChecked);
-			_actionAllPreviousTags.setEnabled(isTagChecked == false);
+      _actionAddTagAdvanced = new ActionContributionItem(new Action_AddTourTag_SubMenu(this, null));
+      _actionAddTagAdvanced.setId(ICommandIds.ACTION_ADD_TAG);
 
-		} else {
+      _actionAddTag = new Action_AddTourTag_SubMenu(this);
+      _actionRemoveTag = new Action_RemoveTourTag_SubMenu(this);
+      _actionRemoveAllTags = new Action_RemoveAllTags();
+      _actionSetTags = new Action_SetTags();
 
-			_actionAllPreviousTags.setChecked(false);
-			_actionAllPreviousTags.setEnabled(false);
-		}
+      _advancedMenuToAddTags = new AdvancedMenuForActions(_actionAddTagAdvanced);
 
-	}
+   }
 
-	private static void restoreAutoOpen() {
-		_isTaggingAutoOpen = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_TAGGING_AUTO_OPEN);
-		_isTaggingAnimation = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_TAGGING_ANIMATION);
-		_taggingAutoOpenDelay = _prefStore.getInt(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY);
-	}
+   private static void addPrefListener() {
 
-	public static void restoreTagState() {
+      // create pref listener
+      _prefChangeListener = new IPropertyChangeListener() {
+         @Override
+         public void propertyChange(final PropertyChangeEvent event) {
+            final String property = event.getProperty();
 
-		final HashMap<Long, TourTag> allTags = TourDatabase.getAllTourTags();
+            // check if the number of recent tags has changed
+            if (property.equals(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TAGS)) {
 
-		final String[] recentTagIds = _state.getArray(STATE_RECENT_TAGS);
-		if (recentTagIds != null) {
+               setupRecentActions();
 
-			for (final String tagId : recentTagIds) {
-				try {
-					final TourTag tag = allTags.get(Long.valueOf(tagId));
-					if (tag != null) {
-						_recentTags.add(tag);
-					}
-				} catch (final NumberFormatException e) {
-					// ignore
-				}
-			}
-		}
+            } else if (property.equals(ITourbookPreferences.APPEARANCE_IS_TAGGING_AUTO_OPEN)
+                  || property.equals(ITourbookPreferences.APPEARANCE_IS_TAGGING_ANIMATION)
+                  || property.equals(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY)) {
 
-		final String[] previousTagIds = _state.getArray(STATE_PREVIOUS_TAGS);
-		if (previousTagIds != null) {
+               restoreAutoOpen();
+            }
+         }
+      };
 
-			for (final String tagId : previousTagIds) {
-				try {
-					final TourTag tag = allTags.get(Long.valueOf(tagId));
-					if (tag != null) {
-						_allPreviousTags.put(tag.getTagId(), tag);
-					}
-				} catch (final NumberFormatException e) {
-					// ignore
-				}
-			}
-		}
-	}
+      // add pref listener
+      _prefStore.addPropertyChangeListener(_prefChangeListener);
+   }
 
-	public static void saveTagState() {
+   static void enableRecentTagActions(final boolean isAddTagEnabled, final Set<Long> existingTagIds) {
 
-		if (_maxRecentActions > 0) {
+      if (_actionsRecentTags == null) {
+         return;
+      }
 
-			final String[] tagIds = new String[Math.min(_maxRecentActions, _recentTags.size())];
-			int tagIndex = 0;
+      final boolean isExistingTagIds = _allTourTagIds != null && _allTourTagIds.size() > 0;
+      for (final ActionRecentTag actionRecentTag : _actionsRecentTags) {
 
-			for (final TourTag tag : _recentTags) {
+         final TourTag actionTag = actionRecentTag._tag;
+         if (actionTag == null) {
+            actionRecentTag.setEnabled(false);
+            continue;
+         }
 
-				tagIds[tagIndex++] = Long.toString(tag.getTagId());
+         final long recentTagId = actionTag.getTagId();
+         boolean isTagEnabled;
+         boolean isTagChecked;
 
-				if (tagIndex == _maxRecentActions) {
-					break;
-				}
-			}
+         if (isExistingTagIds && _isEnableRecentTagActions) {
 
-			_state.put(STATE_RECENT_TAGS, tagIds);
-		}
-
-		if (_allPreviousTags.size() > 0) {
-
-			final String[] tagIds = new String[_allPreviousTags.size()];
-			int tagIndex = 0;
+            // disable action when it's tag id is contained in allExistingTagIds
 
-			for (final TourTag tag : _allPreviousTags.values()) {
-				tagIds[tagIndex++] = Long.toString(tag.getTagId());
-			}
+            boolean isExistTagId = false;
 
-			_state.put(STATE_PREVIOUS_TAGS, tagIds);
-		}
-	}
+            for (final long existingTagId : _allTourTagIds) {
+               if (recentTagId == existingTagId) {
+                  isExistTagId = true;
+                  break;
+               }
+            }
 
-	/**
-	 * create actions for recenct tags
-	 */
-	private static void setupRecentActions() {
+            isTagEnabled = isExistTagId == false;
+            isTagChecked = isExistTagId;
 
-		_maxRecentActions = TourbookPlugin
-				.getDefault()
-				.getPreferenceStore()
-				.getInt(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TAGS);
+         } else {
+            isTagEnabled = _isEnableRecentTagActions;
+            isTagChecked = false;
+         }
 
-		_actionsRecentTags = new ActionRecentTag[_maxRecentActions];
+         if (isTagEnabled && existingTagIds.contains(recentTagId)) {
+            isTagChecked = true;
+         }
 
-		for (int actionIndex = 0; actionIndex < _actionsRecentTags.length; actionIndex++) {
-			_actionsRecentTags[actionIndex] = new ActionRecentTag();
-		}
+         actionRecentTag.setEnabled(isTagEnabled);
+         actionRecentTag.setChecked(isTagChecked);
+      }
 
-		_actionAllPreviousTags = new ActionAllPreviousTags();
-	}
+      if (_allPreviousTags != null && isAddTagEnabled) {
 
-	static void updatePreviousTagState(final HashMap<Long, TourTag> modifiedTags) {
+         boolean isTagChecked = true;
 
-		// check if all previous tags are contained in the modified tags
-		for (final TourTag previousTag : _allPreviousTags.values()) {
-			if (modifiedTags.containsKey(previousTag.getTagId()) == false) {
-				_actionAllPreviousTags.setChecked(false);
-				return;
-			}
-		}
-	}
+         for (final TourTag previousTag : _allPreviousTags.values()) {
+            if (_allTourTagIds.contains(previousTag.getTagId()) == false) {
+               isTagChecked = false;
+               break;
+            }
+         }
 
-	/**
-	 * Update names of all recent tags
-	 */
-	public static void updateRecentTagNames() {
+         _actionAllPreviousTags.setChecked(isTagChecked);
+         _actionAllPreviousTags.setEnabled(isTagChecked == false);
 
-		final HashMap<Long, TourTag> allTourTags = TourDatabase.getAllTourTags();
+      } else {
 
-		for (final TourTag recentTag : _recentTags) {
+         _actionAllPreviousTags.setChecked(false);
+         _actionAllPreviousTags.setEnabled(false);
+      }
 
-			final TourTag tourTag = allTourTags.get(recentTag.getTagId());
-			if (tourTag != null) {
-				recentTag.setTagName(tourTag.getTagName());
-			}
-		}
+   }
 
-		for (final TourTag previousTag : _allPreviousTags.values()) {
+   private static void restoreAutoOpen() {
+      _isTaggingAutoOpen = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_TAGGING_AUTO_OPEN);
+      _isTaggingAnimation = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_TAGGING_ANIMATION);
+      _taggingAutoOpenDelay = _prefStore.getInt(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY);
+   }
 
-			final TourTag tourTag = allTourTags.get(previousTag.getTagId());
-			if (tourTag != null) {
-				previousTag.setTagName(tourTag.getTagName());
-			}
-		}
-	}
+   public static void restoreTagState() {
 
-	/**
-	 * @param isAddTagEnabled
-	 * @param isRemoveTagEnabled
-	 */
-	private void enableTagActions(final boolean isAddTagEnabled, final boolean isRemoveTagEnabled) {
+      final HashMap<Long, TourTag> allTags = TourDatabase.getAllTourTags();
 
-		_currentInstance = this;
+      final String[] recentTagIds = _state.getArray(STATE_RECENT_TAGS);
+      if (recentTagIds != null) {
 
-		final ActionAddTourTag actionAddTagAdvanced = (ActionAddTourTag) _actionAddTagAdvanced.getAction();
+         for (final String tagId : recentTagIds) {
+            try {
+               final TourTag tag = allTags.get(Long.valueOf(tagId));
+               if (tag != null) {
+                  _recentTags.add(tag);
+               }
+            } catch (final NumberFormatException e) {
+               // ignore
+            }
+         }
+      }
 
-		actionAddTagAdvanced.setEnabled(isAddTagEnabled);
-		_actionAddTag.setEnabled(isAddTagEnabled);
+      final String[] previousTagIds = _state.getArray(STATE_PREVIOUS_TAGS);
+      if (previousTagIds != null) {
 
-		_actionRemoveTag.setEnabled(isRemoveTagEnabled);
-		_actionRemoveAllTags.setEnabled(isRemoveTagEnabled);
+         for (final String tagId : previousTagIds) {
+            try {
+               final TourTag tag = allTags.get(Long.valueOf(tagId));
+               if (tag != null) {
+                  _allPreviousTags.put(tag.getTagId(), tag);
+               }
+            } catch (final NumberFormatException e) {
+               // ignore
+            }
+         }
+      }
+   }
 
-		enableRecentTagActions(isAddTagEnabled, _allTourTagIds);
-	}
+   public static void saveTagState() {
 
-	/**
-	 * Add/remove tags
-	 * 
-	 * @param isTourSelected
-	 *            Is <code>true</code> when at least one tour is selected
-	 * @param isOneTour
-	 *            Is <code>true</code> when one single tour is selected
-	 * @param oneTourTagIds
-	 *            Contains {@link TourTag} ids when one tour is selected
-	 */
-	public void enableTagActions(	final boolean isTourSelected,
-									final boolean isOneTour,
-									final ArrayList<Long> oneTourTagIds) {
+      if (_maxRecentActions > 0) {
 
-		final boolean isAddTagEnabled = isTourSelected;
-		final boolean isRemoveTagEnabled;
-		final HashSet<Long> allTourTagIds = new HashSet<Long>();
+         final String[] tagIds = new String[Math.min(_maxRecentActions, _recentTags.size())];
+         int tagIndex = 0;
 
-		if (isOneTour) {
+         for (final TourTag tag : _recentTags) {
 
-			// one tour is selected
+            tagIds[tagIndex++] = Long.toString(tag.getTagId());
 
-			if (oneTourTagIds != null && oneTourTagIds.size() > 0) {
+            if (tagIndex == _maxRecentActions) {
+               break;
+            }
+         }
 
-				// at least one tag is within the tour
+         _state.put(STATE_RECENT_TAGS, tagIds);
+      }
 
-				isRemoveTagEnabled = true;
+      if (_allPreviousTags.size() > 0) {
 
-				if (oneTourTagIds != null) {
-					for (final Long tagId : oneTourTagIds) {
-						allTourTagIds.add(tagId);
-					}
-				}
+         final String[] tagIds = new String[_allPreviousTags.size()];
+         int tagIndex = 0;
 
-			} else {
+         for (final TourTag tag : _allPreviousTags.values()) {
+            tagIds[tagIndex++] = Long.toString(tag.getTagId());
+         }
 
-				// tags are not available
+         _state.put(STATE_PREVIOUS_TAGS, tagIds);
+      }
+   }
 
-				isRemoveTagEnabled = false;
-			}
-		} else {
+   /**
+    * create actions for recenct tags
+    */
+   private static void setupRecentActions() {
 
-			// multiple tours are selected
+      _maxRecentActions = TourbookPlugin
+            .getDefault()
+            .getPreferenceStore()
+            .getInt(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TAGS);
 
-			isRemoveTagEnabled = isTourSelected;
-		}
+      _actionsRecentTags = new ActionRecentTag[_maxRecentActions];
 
-		_isEnableRecentTagActions = isAddTagEnabled;
-		_allTourTagIds = allTourTagIds;
+      for (int actionIndex = 0; actionIndex < _actionsRecentTags.length; actionIndex++) {
+         _actionsRecentTags[actionIndex] = new ActionRecentTag();
+      }
 
-		enableTagActions(isAddTagEnabled, isRemoveTagEnabled);
-	}
+      _actionAllPreviousTags = new ActionAllPreviousTags();
+   }
 
-	/**
-	 * @param isAddTagEnabled
-	 * @param isRemoveTagEnabled
-	 * @param tourTags
-	 */
-	public void enableTagActions(	final boolean isAddTagEnabled,
-									final boolean isRemoveTagEnabled,
-									final Set<TourTag> tourTags) {
+   static void updatePreviousTagState(final HashMap<Long, TourTag> modifiedTags) {
 
-		// get tag id's from all tags
-		final HashSet<Long> allExistingTagIds = new HashSet<Long>();
-		if (tourTags != null) {
-			for (final TourTag tourTag : tourTags) {
-				allExistingTagIds.add(tourTag.getTagId());
-			}
-		}
+      // check if all previous tags are contained in the modified tags
+      for (final TourTag previousTag : _allPreviousTags.values()) {
+         if (modifiedTags.containsKey(previousTag.getTagId()) == false) {
+            _actionAllPreviousTags.setChecked(false);
+            return;
+         }
+      }
+   }
 
-		_isEnableRecentTagActions = isAddTagEnabled;
-		_allTourTagIds = allExistingTagIds;
+   /**
+    * Update names of all recent tags
+    */
+   public static void updateRecentTagNames() {
 
-		enableTagActions(isAddTagEnabled, isRemoveTagEnabled);
-	}
+      final HashMap<Long, TourTag> allTourTags = TourDatabase.getAllTourTags();
 
-	void fillMenuWithRecentTags(final IMenuManager menuMgr, final Menu menu) {
+      for (final TourTag recentTag : _recentTags) {
 
-		if (_recentTags.size() == 0) {
-			return;
-		}
+         final TourTag tourTag = allTourTags.get(recentTag.getTagId());
+         if (tourTag != null) {
+            recentTag.setTagName(tourTag.getTagName());
+         }
+      }
 
-		if (_maxRecentActions < 1) {
-			return;
-		}
+      for (final TourTag previousTag : _allPreviousTags.values()) {
 
-		// add all previous tags
-		if (_allPreviousTags.size() > 0) {
+         final TourTag tourTag = allTourTags.get(previousTag.getTagId());
+         if (tourTag != null) {
+            previousTag.setTagName(tourTag.getTagName());
+         }
+      }
+   }
 
-			final Collection<TourTag> allPreviousTags = _allPreviousTags.values();
+   /**
+    * @param isAddTagEnabled
+    * @param isRemoveTagEnabled
+    */
+   private void enableTagActions(final boolean isAddTagEnabled, final boolean isRemoveTagEnabled) {
 
-			// check if the first previous tag is the same as the first recent tag
-			if (_allPreviousTags.size() > 1 || allPreviousTags.iterator().next().equals(_recentTags.get(0)) == false) {
+      _currentInstance = this;
 
-				final StringBuilder sb = new StringBuilder();
-				boolean isFirst = true;
+      final Action_AddTourTag_SubMenu actionAddTagAdvanced = (Action_AddTourTag_SubMenu) _actionAddTagAdvanced.getAction();
 
-				for (final TourTag recentTag : allPreviousTags) {
-					if (isFirst) {
-						isFirst = false;
-					} else {
-						sb.append(UI.COMMA_SPACE);
-					}
-					sb.append(recentTag.getTagName());
-				}
-
-				if (menu == null) {
-
-					_actionAllPreviousTags.setText(UI.SPACE4 + UI.MNEMONIC + 0 + UI.SPACE2 + sb.toString());
-					menuMgr.add(new ActionContributionItem(_actionAllPreviousTags));
+      actionAddTagAdvanced.setEnabled(isAddTagEnabled);
+      _actionAddTag.setEnabled(isAddTagEnabled);
 
-				} else {
-
-					_actionAllPreviousTags.setText(UI.MNEMONIC + 0 + UI.SPACE2 + sb.toString());
-					new ActionContributionItem(_actionAllPreviousTags).fill(menu, -1);
-				}
-			}
-		}
+      _actionRemoveTag.setEnabled(isRemoveTagEnabled);
+      _actionRemoveAllTags.setEnabled(isRemoveTagEnabled);
+      _actionSetTags.setEnabled(isAddTagEnabled || isRemoveTagEnabled);
 
-		// add all recent tags
-		int tagIndex = 0;
-		for (final ActionRecentTag actionRecentTag : _actionsRecentTags) {
-			try {
+      enableRecentTagActions(isAddTagEnabled, _allTourTagIds);
+   }
 
-				final TourTag tag = _recentTags.get(tagIndex);
+   /**
+    * Add/remove tags
+    *
+    * @param isTourSelected
+    *           Is <code>true</code> when at least one tour is selected
+    * @param isOneTour
+    *           Is <code>true</code> when one single tour is selected
+    * @param oneTourTagIds
+    *           Contains {@link TourTag} ids when one tour is selected
+    */
+   public void enableTagActions(final boolean isTourSelected,
+                                final boolean isOneTour,
+                                final ArrayList<Long> oneTourTagIds) {
 
-				if (menu == null) {
+      final boolean isAddTagEnabled = isTourSelected;
+      final boolean isRemoveTagEnabled;
+      final HashSet<Long> allTourTagIds = new HashSet<>();
 
-					actionRecentTag.setupTagAction(
-							tag,
-							(UI.SPACE4 + UI.MNEMONIC + (tagIndex + 1) + UI.SPACE2 + tag.getTagName()));
-					menuMgr.add(new ActionContributionItem(actionRecentTag));
+      if (isOneTour) {
 
-				} else {
+         // one tour is selected
 
-					actionRecentTag.setupTagAction(//
-							tag,
-							(UI.MNEMONIC + (tagIndex + 1) + UI.SPACE2 + tag.getTagName()));
-					new ActionContributionItem(actionRecentTag).fill(menu, -1);
-				}
+         if (oneTourTagIds != null && oneTourTagIds.size() > 0) {
 
-			} catch (final IndexOutOfBoundsException e) {
-				// there are no more recent tags
-				break;
-			}
+            // at least one tag is within the tour
 
-			tagIndex++;
-		}
-	}
+            isRemoveTagEnabled = true;
 
-	/**
-	 * @param menuMgr
-	 */
-	public void fillTagMenu(final IMenuManager menuMgr) {
+            if (oneTourTagIds != null) {
+               for (final Long tagId : oneTourTagIds) {
+                  allTourTagIds.add(tagId);
+               }
+            }
 
-		// all all tour tag actions
-		menuMgr.add(new Separator());
-		{
-			menuMgr.add(_actionAddTagAdvanced);
-			menuMgr.add(_actionAddTag);
+         } else {
 
-			fillMenuWithRecentTags(menuMgr, null);
+            // tags are not available
 
-			menuMgr.add(_actionRemoveTag);
-			menuMgr.add(_actionRemoveAllTags);
-		}
+            isRemoveTagEnabled = false;
+         }
+      } else {
 
-		_isAdvMenu = false;
-	}
+         // multiple tours are selected
 
-	ITourProvider getTourProvider() {
-		return _tourProvider;
-	}
+         isRemoveTagEnabled = isTourSelected;
+      }
 
-	/**
-	 * This is called when the menu is hidden which contains the tag actions.
-	 */
-	public void onHideMenu() {
-		_advancedMenuToAddTags.onHideParentMenu();
-	}
+      _isEnableRecentTagActions = isAddTagEnabled;
+      _allTourTagIds = allTourTagIds;
 
-	/**
-	 * This is called when the menu is displayed which contains the tag actions.
-	 * 
-	 * @param menuEvent
-	 * @param menuParentControl
-	 * @param menuPosition
-	 * @param toolTip
-	 */
-	public void onShowMenu(	final MenuEvent menuEvent,
-							final Control menuParentControl,
-							final Point menuPosition,
-							final ToolTip toolTip) {
+      enableTagActions(isAddTagEnabled, isRemoveTagEnabled);
+   }
 
-		_advancedMenuToAddTags.onShowParentMenu(//
-				menuEvent,
-				menuParentControl,
-				_isTaggingAutoOpen,
-				_isTaggingAnimation,
-				_taggingAutoOpenDelay,
-				menuPosition,
-				toolTip);
-	}
+   /**
+    * @param isAddTagEnabled
+    * @param isRemoveTagEnabled
+    * @param tourTags
+    */
+   public void enableTagActions(final boolean isAddTagEnabled,
+                                final boolean isRemoveTagEnabled,
+                                final Set<TourTag> tourTags) {
 
-	private void runnableRemoveAllTags() {
+      // get tag id's from all tags
+      final HashSet<Long> allExistingTagIds = new HashSet<>();
+      if (tourTags != null) {
+         for (final TourTag tourTag : tourTags) {
+            allExistingTagIds.add(tourTag.getTagId());
+         }
+      }
 
-		// get tours which tour type should be changed
-		final ArrayList<TourData> modifiedTours = _tourProvider.getSelectedTours();
+      _isEnableRecentTagActions = isAddTagEnabled;
+      _allTourTagIds = allExistingTagIds;
 
-		if (modifiedTours == null || modifiedTours.size() == 0) {
-			return;
-		}
+      enableTagActions(isAddTagEnabled, isRemoveTagEnabled);
+   }
 
-		final HashMap<Long, TourTag> modifiedTags = new HashMap<Long, TourTag>();
+   void fillMenuWithRecentTags(final IMenuManager menuMgr, final Menu menu) {
 
-		// remove tag in all tours (without tours from an editor)
-		for (final TourData tourData : modifiedTours) {
+      if (_recentTags.size() == 0) {
+         return;
+      }
 
-			// get all tag's which will be removed
-			final Set<TourTag> tourTags = tourData.getTourTags();
+      if (_maxRecentActions < 1) {
+         return;
+      }
 
-			for (final TourTag tourTag : tourTags) {
-				modifiedTags.put(tourTag.getTagId(), tourTag);
-			}
-
-			// remove all tour tags
-			tourTags.clear();
-		}
-
-		saveAndNotify(modifiedTags, modifiedTours);
-	}
-
-	/**
-	 * Save modified tours and notify tour provider
-	 * 
-	 * @param modifiedTags
-	 * @param modifiedTours
-	 */
-	private void saveAndNotify(final HashMap<Long, TourTag> modifiedTags, ArrayList<TourData> modifiedTours) {
-
-		if (_isSaveTour) {
-
-			// save all tours with the removed tags
-
-			modifiedTours = TourManager.saveModifiedTours(modifiedTours);
-
-		} else {
-
-			// tours are not saved but the tour provider must be notified that tours has changed
-
-			if (_tourProvider instanceof ITourProvider2) {
-				((ITourProvider2) _tourProvider).toursAreModified(modifiedTours);
-			} else {
-				TourManager.fireEvent(TourEventId.TOUR_CHANGED, new TourEvent(modifiedTours));
-			}
-		}
-
-		TourManager.fireEventWithCustomData(TourEventId.NOTIFY_TAG_VIEW, //
-				new ChangedTags(modifiedTags, modifiedTours, false),
-				null);
-	}
-
-	/**
-	 * Set/Save for multiple tour tags
-	 * 
-	 * @param modifiedTags
-	 * @param isAddMode
-	 */
-	void saveTourTags(final HashMap<Long, TourTag> modifiedTags, final boolean isAddMode) {
-
-		final Runnable runnable = new Runnable() {
-
-			@Override
-			public void run() {
-
-				final ArrayList<TourData> modifiedTours = _tourProvider.getSelectedTours();
-
-				// get tours which tag should be changed
-				if (modifiedTours == null || modifiedTours.size() == 0) {
-					return;
-				}
-
-				final Collection<TourTag> tagCollection = modifiedTags.values();
-
-				// add the tag into all selected tours
-				for (final TourData tourData : modifiedTours) {
-
-					// set tag into tour
-					final Set<TourTag> tourTags = tourData.getTourTags();
-
-					if (isAddMode) {
-						// add tag to the tour
-						tourTags.addAll(tagCollection);
-					} else {
-						// remove tag from tour
-						tourTags.removeAll(tagCollection);
-					}
-				}
-
-				// update recent tags
-				for (final TourTag tag : tagCollection) {
-					_recentTags.remove(tag);
-					_recentTags.addFirst(tag);
-				}
-
-				// it's possible that both hash maps are the same when previous tags has been added as last
-				if (_allPreviousTags != modifiedTags) {
-					_allPreviousTags.clear();
-					_allPreviousTags.putAll(modifiedTags);
-				}
-
-				saveAndNotify(modifiedTags, modifiedTours);
-			}
-		};
-
-		BusyIndicator.showWhile(Display.getCurrent(), runnable);
-	}
-
-	/**
-	 * Set/Save one tour tag
-	 * 
-	 * @param tag
-	 * @param isAddMode
-	 */
-	void saveTourTags(final TourTag tag, final boolean isAddMode) {
-
-		final HashMap<Long, TourTag> tags = new HashMap<Long, TourTag>();
-		tags.put(tag.getTagId(), tag);
-
-		saveTourTags(tags, isAddMode);
-	}
-
-	void setIsAdvanceMenu() {
-		_isAdvMenu = true;
-	}
+      // add all previous tags
+      if (_allPreviousTags.size() > 0) {
+
+         final Collection<TourTag> allPreviousTags = _allPreviousTags.values();
+
+         // check if the first previous tag is the same as the first recent tag
+         if (_allPreviousTags.size() > 1 || allPreviousTags.iterator().next().equals(_recentTags.get(0)) == false) {
+
+            final StringBuilder sb = new StringBuilder();
+            boolean isFirst = true;
+
+            for (final TourTag recentTag : allPreviousTags) {
+               if (isFirst) {
+                  isFirst = false;
+               } else {
+                  sb.append(UI.COMMA_SPACE);
+               }
+               sb.append(recentTag.getTagName());
+            }
+
+            if (menu == null) {
+
+               _actionAllPreviousTags.setText(UI.SPACE4 + UI.MNEMONIC + 0 + UI.SPACE2 + sb.toString());
+               menuMgr.add(new ActionContributionItem(_actionAllPreviousTags));
+
+            } else {
+
+               _actionAllPreviousTags.setText(UI.MNEMONIC + 0 + UI.SPACE2 + sb.toString());
+               new ActionContributionItem(_actionAllPreviousTags).fill(menu, -1);
+            }
+         }
+      }
+
+      // add all recent tags
+      int tagIndex = 0;
+      for (final ActionRecentTag actionRecentTag : _actionsRecentTags) {
+         try {
+
+            final TourTag tag = _recentTags.get(tagIndex);
+
+            if (menu == null) {
+
+               actionRecentTag.setupTagAction(
+                     tag,
+                     (UI.SPACE4 + UI.MNEMONIC + (tagIndex + 1) + UI.SPACE2 + tag.getTagName()));
+               menuMgr.add(new ActionContributionItem(actionRecentTag));
+
+            } else {
+
+               actionRecentTag.setupTagAction(//
+                     tag,
+                     (UI.MNEMONIC + (tagIndex + 1) + UI.SPACE2 + tag.getTagName()));
+               new ActionContributionItem(actionRecentTag).fill(menu, -1);
+            }
+
+         } catch (final IndexOutOfBoundsException e) {
+            // there are no more recent tags
+            break;
+         }
+
+         tagIndex++;
+      }
+   }
+
+   /**
+    * @param menuMgr
+    */
+   public void fillTagMenu(final IMenuManager menuMgr) {
+
+      // all all tour tag actions
+      menuMgr.add(new Separator());
+      {
+         menuMgr.add(_actionAddTagAdvanced);
+         menuMgr.add(_actionAddTag);
+
+         fillMenuWithRecentTags(menuMgr, null);
+
+         menuMgr.add(_actionRemoveTag);
+         menuMgr.add(_actionRemoveAllTags);
+         menuMgr.add(_actionSetTags);
+      }
+
+      _isAdvMenu = false;
+   }
+
+   ITourProvider getTourProvider() {
+      return _tourProvider;
+   }
+
+   /**
+    * This is called when the menu is hidden which contains the tag actions.
+    */
+   public void onHideMenu() {
+      _advancedMenuToAddTags.onHideParentMenu();
+   }
+
+   /**
+    * This is called when the menu is displayed which contains the tag actions.
+    *
+    * @param menuEvent
+    * @param menuParentControl
+    * @param menuPosition
+    * @param toolTip
+    */
+   public void onShowMenu(final MenuEvent menuEvent,
+                          final Control menuParentControl,
+                          final Point menuPosition,
+                          final ToolTip toolTip) {
+
+      _advancedMenuToAddTags.onShowParentMenu(//
+            menuEvent,
+            menuParentControl,
+            _isTaggingAutoOpen,
+            _isTaggingAnimation,
+            _taggingAutoOpenDelay,
+            menuPosition,
+            toolTip);
+   }
+
+   private void runnableRemoveAllTags() {
+
+      // get tours which tour type should be changed
+      final ArrayList<TourData> modifiedTours = _tourProvider.getSelectedTours();
+
+      if (modifiedTours == null || modifiedTours.size() == 0) {
+         return;
+      }
+
+      final HashMap<Long, TourTag> modifiedTags = new HashMap<>();
+
+      // remove tag in all tours (without tours from an editor)
+      for (final TourData tourData : modifiedTours) {
+
+         // get all tag's which will be removed
+         final Set<TourTag> tourTags = tourData.getTourTags();
+
+         for (final TourTag tourTag : tourTags) {
+            modifiedTags.put(tourTag.getTagId(), tourTag);
+         }
+
+         // remove all tour tags
+         tourTags.clear();
+      }
+
+      saveAndNotify(modifiedTags, modifiedTours);
+   }
+
+   /**
+    * Save modified tours and notify tour provider
+    *
+    * @param modifiedTags
+    * @param modifiedTours
+    */
+   private void saveAndNotify(final HashMap<Long, TourTag> modifiedTags, ArrayList<TourData> modifiedTours) {
+
+      if (_isSaveTour) {
+
+         // save all tours with the removed tags
+
+         modifiedTours = TourManager.saveModifiedTours(modifiedTours);
+
+      } else {
+
+         // tours are not saved but the tour provider must be notified that tours has changed
+
+         if (_tourProvider instanceof ITourProvider2) {
+            ((ITourProvider2) _tourProvider).toursAreModified(modifiedTours);
+         } else {
+            TourManager.fireEvent(TourEventId.TOUR_CHANGED, new TourEvent(modifiedTours));
+         }
+      }
+
+      TourManager.fireEventWithCustomData(TourEventId.NOTIFY_TAG_VIEW, //
+            new ChangedTags(modifiedTags, modifiedTours, false),
+            null);
+   }
+
+   /**
+    * Set/Save for multiple tour tags
+    *
+    * @param modifiedTags
+    * @param isAddMode
+    */
+   void saveTourTags(final HashMap<Long, TourTag> modifiedTags, final boolean isAddMode) {
+
+      final Runnable runnable = new Runnable() {
+
+         @Override
+         public void run() {
+
+            final ArrayList<TourData> modifiedTours = _tourProvider.getSelectedTours();
+
+            // get tours which tag should be changed
+            if (modifiedTours == null || modifiedTours.size() == 0) {
+               return;
+            }
+
+            final Collection<TourTag> tagCollection = modifiedTags.values();
+
+            // add the tag into all selected tours
+            for (final TourData tourData : modifiedTours) {
+
+               // set tag into tour
+               final Set<TourTag> tourTags = tourData.getTourTags();
+
+               if (isAddMode) {
+                  // add tag to the tour
+                  tourTags.addAll(tagCollection);
+               } else {
+                  // remove tag from tour
+                  tourTags.removeAll(tagCollection);
+               }
+            }
+
+            // update recent tags
+            for (final TourTag tag : tagCollection) {
+               _recentTags.remove(tag);
+               _recentTags.addFirst(tag);
+            }
+
+            // it's possible that both hash maps are the same when previous tags has been added as last
+            if (_allPreviousTags != modifiedTags) {
+               _allPreviousTags.clear();
+               _allPreviousTags.putAll(modifiedTags);
+            }
+
+            saveAndNotify(modifiedTags, modifiedTours);
+         }
+      };
+
+      BusyIndicator.showWhile(Display.getCurrent(), runnable);
+   }
+
+   /**
+    * Set/Save one tour tag
+    *
+    * @param tag
+    * @param isAddMode
+    */
+   void saveTourTags(final TourTag tag, final boolean isAddMode) {
+
+      final HashMap<Long, TourTag> tags = new HashMap<>();
+      tags.put(tag.getTagId(), tag);
+
+      saveTourTags(tags, isAddMode);
+   }
+
+   void setIsAdvanceMenu() {
+      _isAdvMenu = true;
+   }
 }
