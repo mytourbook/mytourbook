@@ -2123,9 +2123,6 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
 
    private void updateTags_TagViewer(final long[] tagIds) {
 
-      /*
-       * Update UI
-       */
       final ArrayList<TVIPrefTag> tagItems = new ArrayList<>(tagIds.length);
 
       if (tagIds.length > 0) {
@@ -2141,6 +2138,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
          }
       }
 
+      // update UI
       _tagViewer.setCheckedElements(tagItems.toArray());
    }
 

@@ -16,6 +16,7 @@
 package net.tourbook.tag;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -29,6 +30,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
+import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.PrefPageTags;
 import net.tourbook.ui.action.ActionCollapseAll;
 import net.tourbook.ui.action.ActionExpandAll;
@@ -37,7 +39,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.dialogs.TitleAreaDialog;
+import org.eclipse.jface.dialogs.TrayDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.TreeColumnLayout;
@@ -78,7 +80,7 @@ import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.dialogs.ContainerCheckedTreeViewer;
 
-public class Dialog_SetTags extends TitleAreaDialog implements ITreeViewer {
+public class Dialog_SetTags extends TrayDialog implements ITreeViewer {
 
    private static final String               STATE_IS_HIERARCHICAL_LAYOUT             = "STATE_IS_HIERARCHICAL_LAYOUT"; //$NON-NLS-1$
 
@@ -149,7 +151,7 @@ public class Dialog_SetTags extends TitleAreaDialog implements ITreeViewer {
 
       @Override
       public void run() {
-//         onTag_Layout(false);
+         onTag_Layout(false);
       }
    }
 
@@ -164,7 +166,7 @@ public class Dialog_SetTags extends TitleAreaDialog implements ITreeViewer {
 
       @Override
       public void run() {
-//         onTag_Layout(true);
+         onTag_Layout(true);
       }
    }
 
@@ -244,14 +246,25 @@ public class Dialog_SetTags extends TitleAreaDialog implements ITreeViewer {
 
       super(parentShell);
 
-      _tagMenuManager = tagMenuManager;
-
       // make dialog resizable
-      setShellStyle(getShellStyle() | SWT.RESIZE);
+//      setShellStyle(getShellStyle() | SWT.RESIZE);
 
       setDefaultImage(TourbookPlugin.getImageDescriptor(Messages.Image__tag_category).createImage());
 
       _state = TourbookPlugin.getDefault().getDialogSettingsSection(getClass().getName());
+
+      _tagMenuManager = tagMenuManager;
+
+      // a tour must be selected
+      _selectedTours = _tagMenuManager.getTourProvider().getSelectedTours();
+   }
+
+   @Override
+   public boolean close() {
+
+      saveState();
+
+      return super.close();
    }
 
    @Override
@@ -267,15 +280,6 @@ public class Dialog_SetTags extends TitleAreaDialog implements ITreeViewer {
             onDispose();
          }
       });
-   }
-
-   @Override
-   public void create() {
-
-      super.create();
-
-      setTitle(Messages.Dialog_SetTags_Title);
-      setMessage(Messages.Dialog_SetTags_Message);
    }
 
    private void createActions() {
@@ -298,59 +302,51 @@ public class Dialog_SetTags extends TitleAreaDialog implements ITreeViewer {
    @Override
    protected Control createDialogArea(final Composite parent) {
 
-      final Composite dlgAreaContainer = (Composite) super.createDialogArea(parent);
-
       initUI(parent);
       restoreStateBeforeUI();
 
-      createUI(dlgAreaContainer);
+      final Composite ui = createUI(parent);
 
       createActions();
       fillToolbar();
 
-      // set root item
-      _rootItem = new TVIPrefTagRoot(_tagViewer, true);
-
-      updateUIFromModel();
+      // load tag viewer
+      updateTagModel();
 
       restoreState();
       enableControls();
 
-      return dlgAreaContainer;
+      _tagViewer.getTree().setFocus();
+
+      return ui;
    }
 
-   private void createUI(final Composite parent) {
+   private Composite createUI(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
+      GridDataFactory.fillDefaults()
+            .grab(true, true)
+            .hint(400, 600)
+            .applyTo(container);
       GridLayoutFactory
             .fillDefaults()
-            .spacing(0, 2)
+            .spacing(0, 0)
             .applyTo(container);
 //      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
       {
-         createUI_342_AllTags_Header(container);
-         createUI_344_AllTags_Viewer(container);
+         createUI_10_AllTags_Header(container);
+         createUI_20_AllTags_Viewer(container);
       }
+
+      return container;
    }
 
-   private void createUI_342_AllTags_Header(final Composite parent) {
+   private void createUI_10_AllTags_Header(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
       {
-//         {
-//            // Label: All Tags
-//            _lblAllTags = new Label(container, SWT.NONE);
-//            _lblAllTags.setText(Messages.Slideout_TourTagFilter_Label_AllTags);
-//            GridDataFactory
-//                  .fillDefaults()//
-//                  .align(SWT.FILL, SWT.CENTER)
-//                  .grab(true, false)
-//                  .applyTo(_lblAllTags);
-//         }
          {
             // toolbar
             _toolBarAllTags = new ToolBar(container, SWT.FLAT);
@@ -359,17 +355,15 @@ public class Dialog_SetTags extends TitleAreaDialog implements ITreeViewer {
       }
    }
 
-   private void createUI_344_AllTags_Viewer(final Composite parent) {
+   private void createUI_20_AllTags_Viewer(final Composite parent) {
 
       /*
        * Create tree layout
        */
 
       final Composite layoutContainer = new Composite(parent, SWT.NONE);
-      GridDataFactory
-            .fillDefaults()//
+      GridDataFactory.fillDefaults()
             .grab(true, true)
-            .hint(200, 100)
             .applyTo(layoutContainer);
 
       final TreeColumnLayout treeLayout = new TreeColumnLayout();
@@ -441,6 +435,7 @@ public class Dialog_SetTags extends TitleAreaDialog implements ITreeViewer {
 
       defineAllColumns(treeLayout);
    }
+
    private void defineAllColumns(final TreeColumnLayout treeLayout) {
 
       TreeViewerColumn tvc;
@@ -540,6 +535,8 @@ public class Dialog_SetTags extends TitleAreaDialog implements ITreeViewer {
 
    private void enableControls() {
 
+      _actionCollapseAll.setEnabled(_isHierarchicalLayout);
+      _actionExpandAll.setEnabled(_isHierarchicalLayout);
    }
 
    private void expandCollapseFolder(final TVIPrefTagCategory treeItem) {
@@ -576,49 +573,51 @@ public class Dialog_SetTags extends TitleAreaDialog implements ITreeViewer {
 
       // keep window size and position
       return _state;
-   }
-
-   private TVIPrefTag getTagTreeItem(final TourTag tourTag) {
-
-      final long requestedTourTagId = tourTag.getTagId();
-
-      final ArrayList<TreeViewerItem> tviChildren = _rootItem.getFetchedChildren();
-
-      return getTagTreeItem_Children(requestedTourTagId, tviChildren);
+//      return null;
    }
 
    /**
-    * Recursive !!!
+    * Traverses all tag viewer items until a tag items is found Recursive !
     *
-    * @param requestedTourTagId
-    * @param tviChildren
-    * @return Returns tree item for the tour tag or <code>null</code> when not found
+    * @param parentItems
+    * @param tagItems
+    * @param tagId
+    * @return Returns <code>true</code> when the tag id is found
     */
-   private TVIPrefTag getTagTreeItem_Children(final long requestedTourTagId, final ArrayList<TreeViewerItem> tviChildren) {
+   private boolean getTagItems(final ArrayList<TreeViewerItem> parentItems,
+                               final ArrayList<TVIPrefTag> tagItems,
+                               final long tagId) {
 
-      for (final TreeViewerItem treeViewerItem : tviChildren) {
+      for (final TreeViewerItem tvItem : parentItems) {
 
-         if (treeViewerItem instanceof TVIPrefTag) {
+         if (tvItem instanceof TVIPrefTagCategory) {
 
-            final TVIPrefTag tviTag = (TVIPrefTag) treeViewerItem;
+            final TVIPrefTagCategory tagCategory = (TVIPrefTagCategory) tvItem;
+            final ArrayList<TreeViewerItem> tagCategoryChildren = tagCategory.getFetchedChildren();
 
-            if (tviTag.getTourTag().getTagId() == requestedTourTagId) {
-               return tviTag;
+            if (tagCategoryChildren.size() > 0) {
+
+               final boolean isTagFound = getTagItems(tagCategoryChildren, tagItems, tagId);
+
+               if (isTagFound) {
+                  return true;
+               }
             }
 
-         } else if (treeViewerItem instanceof TVIPrefTagCategory) {
+         } else if (tvItem instanceof TVIPrefTag) {
 
-            final TVIPrefTagCategory tviTagCategory = (TVIPrefTagCategory) treeViewerItem;
+            final TVIPrefTag tagItem = (TVIPrefTag) tvItem;
 
-            final TVIPrefTag tviTagFromChilren = getTagTreeItem_Children(requestedTourTagId, tviTagCategory.getFetchedChildren());
+            if (tagId == tagItem.getTourTag().getTagId()) {
 
-            if (tviTagFromChilren != null) {
-               return tviTagFromChilren;
+               tagItems.add(tagItem);
+
+               return true;
             }
          }
       }
 
-      return null;
+      return false;
    }
 
    @Override
@@ -628,6 +627,31 @@ public class Dialog_SetTags extends TitleAreaDialog implements ITreeViewer {
 
    private void initUI(final Composite parent) {
 
+   }
+
+   /**
+    * Load all tag items that the categories do show the number of items
+    */
+   private void loadAllTagItems() {
+
+      final HashMap<Long, TourTag> allTourTags = TourDatabase.getAllTourTags();
+
+      final Set<Long> tagIds = allTourTags.keySet();
+
+      final ArrayList<TVIPrefTag> tagItems = new ArrayList<>(tagIds.size());
+
+      if (tagIds.size() > 0) {
+
+         // get all tag viewer items which should be checked
+
+         final ArrayList<TreeViewerItem> rootItems = _rootItem.getFetchedChildren();
+
+         for (final long tagId : tagIds) {
+
+            // Is recursive !!!
+            getTagItems(rootItems, tagItems, tagId);
+         }
+      }
    }
 
    @Override
@@ -644,6 +668,23 @@ public class Dialog_SetTags extends TitleAreaDialog implements ITreeViewer {
       _imgTag.dispose();
       _imgTagRoot.dispose();
       _imgTagCategory.dispose();
+   }
+
+   /**
+    * @param isHierarchicalLayout
+    *           Is <code>true</code> when the layout is flat, otherwise it is hierarchical
+    */
+   private void onTag_Layout(final boolean isHierarchicalLayout) {
+
+      // ignore layout when it is already set
+      if (_isHierarchicalLayout == isHierarchicalLayout) {
+         return;
+      }
+
+      _isHierarchicalLayout = isHierarchicalLayout;
+
+      updateTagModel();
+      enableControls();
    }
 
    private void onTag_Select(final SelectionChangedEvent event) {
@@ -854,7 +895,6 @@ public class Dialog_SetTags extends TitleAreaDialog implements ITreeViewer {
 
    private void restoreStateBeforeUI() {
 
-      // layout
       _isHierarchicalLayout = Util.getStateBoolean(_state, STATE_IS_HIERARCHICAL_LAYOUT, true);
    }
 
@@ -862,6 +902,20 @@ public class Dialog_SetTags extends TitleAreaDialog implements ITreeViewer {
 
       _state.put(STATE_IS_HIERARCHICAL_LAYOUT, _isHierarchicalLayout);
    }
+
+   @Override
+   protected void setShellStyle(final int newShellStyle) {
+
+      super.setShellStyle(
+            SWT.CLOSE
+                  | SWT.MODELESS
+                  | SWT.BORDER
+                  | SWT.TITLE
+                  | SWT.RESIZE);
+
+      setBlockOnOpen(false);
+   }
+
    /**
     * update tourdata from the fields
     */
@@ -884,50 +938,36 @@ public class Dialog_SetTags extends TitleAreaDialog implements ITreeViewer {
       _tagViewer.setInput(this);
 
       loadAllTagItems();
-   }
 
-   private void updateUIFromModel() {
-
-      // show contents in the viewers
-      _tagViewer.setInput(this);
-
-      // a tour must be selected
-      _selectedTours = _tagMenuManager.getTourProvider().getSelectedTours();
-
-      // get all tags for all tours
-      final Set<TourTag> selectedTourTags = new HashSet<>();
+      // get all tags from all selectedtours
+      final Set<Long> allTagIds = new HashSet<>();
       for (final TourData tourData : _selectedTours) {
-         final Set<TourTag> tags = tourData.getTourTags();
-         if (tags != null) {
-            selectedTourTags.addAll(tags);
+         final Set<TourTag> allTourTags = tourData.getTourTags();
+
+         if (allTourTags != null) {
+
+            for (final TourTag tourTag : allTourTags) {
+               allTagIds.add(tourTag.getTagId());
+            }
          }
       }
 
-      // get tag tree items from the viewer, this will also load all tree children
-      final ArrayList<TVIPrefTag> allTagItems = new ArrayList<>();
-      for (final TourTag tourTag : selectedTourTags) {
+      final ArrayList<TVIPrefTag> tagItems = new ArrayList<>(allTagIds.size());
 
-         final TVIPrefTag tviTag = getTagTreeItem(tourTag);
+      if (allTagIds.size() > 0) {
 
-         if (tviTag != null) {
-            allTagItems.add(tviTag);
+         // get all tag viewer items which should be checked
+
+         final ArrayList<TreeViewerItem> rootItems = _rootItem.getFetchedChildren();
+
+         for (final long tagId : allTagIds) {
+
+            // Is recursive !!!
+            getTagItems(rootItems, tagItems, tagId);
          }
       }
 
-      final TVIPrefTag[] checkedItems = allTagItems.toArray(new TVIPrefTag[allTagItems.size()]);
-
-      // check tags
-      _tagViewer.setCheckedElements(checkedItems);
-
-      // set parent gray state
-//      _tagViewer.setGrayedElements(checkedItems);
-      _tagViewer.setExpandedElements(checkedItems);
-
-//      for (final TVIPrefTag tviPrefTag : checkedItems) {
-//
-//         final TreeViewerItem tviParent = tviPrefTag.getParentItem();
-////         final boolean isVisible = _tagViewer.setParentsGrayed(tviParent, true);
-//      }
-
+      // update UI
+      _tagViewer.setCheckedElements(tagItems.toArray());
    }
 }
