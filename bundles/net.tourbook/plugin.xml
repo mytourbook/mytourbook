@@ -525,13 +525,6 @@
                label="%view_name_Book"
                mnemonic="%view_name_Book_Mnemonic"/>
 
-            <!-- Reference Tours -->
-            <command 
-               commandId="command.net.tourbook.views.tourCatalog.TourCatalogView"
-               icon="icons/reference-tours.png"
-               label="%view_name_ReferenceTours"
-               mnemonic="%view_name_ReferenceTours_Mnemonic"/>
-
             <!-- Tagged Tours -->
             <command 
                commandId="command.net.tourbook.views.tagViewID"
@@ -539,6 +532,13 @@
                label="%command_tagging_name"
                mnemonic="%command_tagging_name_Mnemonic"
                tooltip="%command_tagging_name_tooltip"/>
+
+            <!-- Reference Tours -->
+            <command 
+               commandId="command.net.tourbook.views.tourCatalog.TourCatalogView"
+               icon="icons/reference-tours.png"
+               label="%view_name_ReferenceTours"
+               mnemonic="%view_name_ReferenceTours_Mnemonic"/>
 
             <!-- Collated Tours -->
             <command 
