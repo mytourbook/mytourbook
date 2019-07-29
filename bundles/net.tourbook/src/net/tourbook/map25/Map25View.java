@@ -149,6 +149,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
    private static final String            STATE_IS_LAYER_HILLSHADING_VISIBLE               = "STATE_IS_LAYER_HILLSHADING_VISIBLE";                     //$NON-NLS-1$
    private static final String            STATE_IS_LAYER_LABEL_VISIBLE                     = "STATE_IS_LAYER_LABEL_VISIBLE";                           //$NON-NLS-1$
    private static final String            STATE_IS_LAYER_MARKER_VISIBLE                    = "STATE_IS_LAYER_MARKER_VISIBLE";                          //$NON-NLS-1$
+   private static final String            STATE_IS_LAYER_PHOTO_VISIBLE                     = "STATE_IS_LAYER_PHOTO_VISIBLE";                           //$NON-NLS-1$  
    private static final String            STATE_IS_LAYER_SCALE_BAR_VISIBLE                 = "STATE_IS_LAYER_SCALE_BAR_VISIBLE";                       //$NON-NLS-1$
    private static final String            STATE_IS_LAYER_TILE_INFO_VISIBLE                 = "STATE_IS_LAYER_TILE_INFO_VISIBLE";                       //$NON-NLS-1$
    private static final String            STATE_IS_LAYER_TOUR_VISIBLE                      = "STATE_IS_LAYER_TOUR_VISIBLE";                            //$NON-NLS-1$
@@ -463,6 +464,12 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
    public void actionShowPhotos() {
 
       _isShowPhoto = _actionShowPhotos.isChecked();
+
+      _mapApp.getLayer_Photo().setEnabled(_isShowPhoto);
+      
+      paintTours_AndUpdateMap();
+      
+      _mapApp.getMap().render();
 
       enableActions();
 
@@ -880,6 +887,11 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       if (galleryPhotos.size() == 0) {
          System.out.println(" Map25View: *** createPhotoItemList: galleriePhotos.size() was 0");
          return  pts;     
+      }
+      
+      if (!_isShowPhoto) {
+         System.out.println(" Map25View: *** createPhotoItemList: photlayer is off");
+         return pts;
       }
       
 //      final int hashGalleryPhotos = galleryPhotos.hashCode();
@@ -1652,12 +1664,16 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       final boolean isMarkerVisible = Util.getStateBoolean(_state, STATE_IS_LAYER_MARKER_VISIBLE, true);
       _actionShowMarker_WithOptions.setSelected(isMarkerVisible);
       _mapApp.getLayer_TourMarker().setEnabled(isMarkerVisible);
+      
+      // photo_layer
+      _isShowPhoto = Util.getStateBoolean(_state, STATE_IS_LAYER_PHOTO_VISIBLE, true);
+      _actionShowPhotos.setChecked(_isShowPhoto);
+      _mapApp.getLayer_Photo().setEnabled(_isShowPhoto);
 
       // hillshading layer
       final BitmapTileLayer layer_HillShading = _mapApp.getLayer_HillShading();
       final int layerHillshadingOpacity = Util.getStateInt(_state, STATE_LAYER_HILLSHADING_OPACITY, 100);
       _mapApp.setLayer_HillShading_Opacity(layerHillshadingOpacity);
-
       layer_HillShading.setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_HILLSHADING_VISIBLE, true));
       layer_HillShading.setBitmapAlpha(layerHillshadingOpacity / 100f, true);
 
@@ -1666,9 +1682,6 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       _mapApp.getLayer_Building().setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_BUILDING_VISIBLE, true));
       
       _mapApp.getLayer_MapBookmark().setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_BOOKMARK_VISIBLE, true));
-
-      
-      //_mapApp.getLayer_S3DB().setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_S3DB_VISIBLE, true));
 
       _mapApp.getLayer_Label().setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_LABEL_VISIBLE, true));
       _mapApp.getLayer_ScaleBar().setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_SCALE_BAR_VISIBLE, true));
@@ -1692,12 +1705,14 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
       _state.put(STATE_IS_LAYER_BASE_MAP_VISIBLE, _mapApp.getLayer_BaseMap().isEnabled());
       _state.put(STATE_IS_LAYER_BUILDING_VISIBLE, _mapApp.getLayer_Building().isEnabled());
-      //_state.put(STATE_IS_LAYER_BOOKMARK_VISIBLE, _mapApp.getLayer_MapBookmark().isEnabled());
-      //_state.put(STATE_IS_LAYER_S3DB_VISIBLE, _mapApp.getLayer_S3DB().isEnabled());
       _state.put(STATE_IS_LAYER_LABEL_VISIBLE, _mapApp.getLayer_Label().isEnabled());
       _state.put(STATE_IS_LAYER_MARKER_VISIBLE, _mapApp.getLayer_TourMarker().isEnabled());
+      _state.put(STATE_IS_LAYER_PHOTO_VISIBLE, _mapApp.getLayer_Photo().isEnabled());
       _state.put(STATE_IS_LAYER_TILE_INFO_VISIBLE, _mapApp.getLayer_TileInfo().isEnabled());
+      
       _state.put(STATE_IS_LAYER_TOUR_VISIBLE, _mapApp.getLayer_Tour().isEnabled());
+      _state.put(STATE_IS_LAYER_TOUR_VISIBLE, false);  //default off @ next start
+      
       _state.put(STATE_IS_LAYER_SCALE_BAR_VISIBLE, _mapApp.getLayer_ScaleBar().isEnabled());
 
       _state.put(STATE_IS_LAYER_BOOKMARK_VISIBLE, _mapApp.getLayer_MapBookmark().isEnabled());
