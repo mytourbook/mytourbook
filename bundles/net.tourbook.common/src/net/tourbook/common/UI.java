@@ -497,6 +497,9 @@ public class UI {
     */
 //	private static final int	VERTICAL_DIALOG_UNITS_PER_CHAR	= 8;
 
+   /**
+    * @param sash
+    */
    public static void addSashColorHandler(final Sash sash) {
 
       sash.addMouseTrackListener(new MouseTrackListener() {
