@@ -62,6 +62,7 @@ public class FitLogSAXHandler extends DefaultHandler {
    private static final String                  TAG_ACTIVITY_POWER              = "Power";               //$NON-NLS-1$
    private static final String                  TAG_ACTIVITY_WEATHER            = "Weather";             //$NON-NLS-1$
 
+   private static final String                  ATTRIB_DURATION_SECONDS         = "DurationSeconds";     //$NON-NLS-1$
    private static final String                  ATTRIB_NAME                     = "Name";                //$NON-NLS-1$
    private static final String                  ATTRIB_START_TIME               = "StartTime";           //$NON-NLS-1$
    private static final String                  ATTRIB_TOTAL_SECONDS            = "TotalSeconds";        //$NON-NLS-1$
@@ -188,7 +189,8 @@ public class FitLogSAXHandler extends DefaultHandler {
 
    private class Lap {
 
-      private long lapStartTime;
+      private long  lapEndTime;
+      private float durationSeconds;
    }
 
    public FitLogSAXHandler(final FitLogDeviceDataReader device,
@@ -262,7 +264,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 //      final long trackStartTime = _currentActivity.trackTourStartTime;
 //      if (trackStartTime != Long.MIN_VALUE && trackStartTime < 0) {
 //
-//         // this case occured, e.g. year was 0002
+//         // this case occurred, e.g. year was 0002
 //         tourDateTime = _currentActivity.tourStartTime;
 //
 //      } else if (tourDateTime == null) {
@@ -540,7 +542,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 
       for (final Lap lap : _laps) {
 
-         final long startTimeDiff = lap.lapStartTime - tourStartTime;// - tour2sliceTimeDiff;
+         final long startTimeDiff = lap.lapEndTime - tourStartTime;// - tour2sliceTimeDiff;
          int lapRelativeTime = (int) (startTimeDiff / 1000);
          int serieIndex = 0;
 
@@ -553,7 +555,7 @@ public class FitLogSAXHandler extends DefaultHandler {
          }
 
          if (lapRelativeTime < 0) {
-            // this case occured
+            // this case occurred
             lapRelativeTime = 0;
          }
 
@@ -761,12 +763,16 @@ public class FitLogSAXHandler extends DefaultHandler {
       if (name.equals(TAG_LAP)) {
 
          final String startTime = attributes.getValue(ATTRIB_START_TIME);
+         final String durationSeconds = attributes.getValue(ATTRIB_DURATION_SECONDS);
 
          if (startTime != null) {
 
             final Lap lap = new Lap();
 
-            lap.lapStartTime = ZonedDateTime.parse(startTime).toInstant().toEpochMilli();
+            lap.durationSeconds = Float.parseFloat(durationSeconds);
+
+            final ZonedDateTime lapEndTime = ZonedDateTime.parse(startTime).plusSeconds((long) lap.durationSeconds);
+            lap.lapEndTime = lapEndTime.toInstant().toEpochMilli();
 
             _currentActivity.laps.add(lap);
          }
