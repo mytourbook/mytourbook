@@ -37,7 +37,8 @@ import org.eclipse.swt.widgets.Display;
 
 public class FitLogDeviceDataReader extends TourbookDevice {
 
-   private static final String           XML_FIT_LOG_TAG = "<FitnessWorkbook";                              //$NON-NLS-1$
+   private static final String           XML_FIT_LOG_TAG    = "<FitnessWorkbook ";                             //$NON-NLS-1$
+   private static final String           XML_FIT_LOG_EX_TAG = "<FitnessWorkbookEx ";                           //$NON-NLS-1$
 
    private static final IPreferenceStore _prefStore      = TourbookPlugin.getDefault().getPreferenceStore();
 
@@ -80,7 +81,8 @@ public class FitLogDeviceDataReader extends TourbookDevice {
                                     final HashMap<Long, TourData> alreadyImportedTours,
                                     final HashMap<Long, TourData> newlyImportedTours) {
 
-      if (isValidXMLFile(importFilePath, XML_FIT_LOG_TAG, true) == false) {
+      if (isValidXMLFile(importFilePath, XML_FIT_LOG_TAG, true) == false ||
+            isValidXMLFile(importFilePath, XML_FIT_LOG_EX_TAG, true) == false) {
          return false;
       }
 
@@ -140,6 +142,6 @@ public class FitLogDeviceDataReader extends TourbookDevice {
       /*
        * .fitlog files contain BOM's (Byte Order Mark)
        */
-      return isValidXMLFile(fileName, XML_FIT_LOG_TAG, true);
+      return isValidXMLFile(fileName, XML_FIT_LOG_TAG, true) || isValidXMLFile(fileName, XML_FIT_LOG_EX_TAG, true);
    }
 }
