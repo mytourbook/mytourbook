@@ -189,7 +189,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 
    private class Lap {
 
-      private long  lapEndTime;
+      private long lapEndTime;
    }
 
    public FitLogSAXHandler(final FitLogDeviceDataReader device,
