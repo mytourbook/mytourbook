@@ -13,17 +13,22 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.common.util;
+package net.tourbook.ui.views.tagging;
 
-import org.eclipse.jface.viewers.TreeViewer;
+import net.tourbook.common.util.Util;
 
-/**
- * Provides a {@link TreeViewer}
- */
-public interface ITreeViewer {
+import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
 
-	/**
-    * @return Returns the tree viewer which is used to collapse/expand tree items.
-    */
-	TreeViewer getTreeViewer();
+public class ActionHandler_OpenView_TourTags extends AbstractHandler {
+
+   @Override
+   public Object execute(final ExecutionEvent event) throws ExecutionException {
+
+      Util.showView(TourTags_View.ID, true);
+
+      return null;
+   }
+
 }

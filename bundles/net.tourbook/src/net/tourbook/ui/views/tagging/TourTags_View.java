@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.tag;
+package net.tourbook.ui.views.tagging;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,14 +32,15 @@ import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.PrefPageTags;
+import net.tourbook.tag.TVIPrefTag;
+import net.tourbook.tag.TVIPrefTagCategory;
+import net.tourbook.tag.TVIPrefTagRoot;
 import net.tourbook.ui.action.ActionCollapseAll;
 import net.tourbook.ui.action.ActionExpandAll;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.ToolBarManager;
-import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.dialogs.TrayDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.TreeColumnLayout;
@@ -62,31 +63,28 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swt.widgets.Widget;
+import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.dialogs.ContainerCheckedTreeViewer;
+import org.eclipse.ui.part.ViewPart;
 
-public class Dialog_SetTags extends TrayDialog implements ITreeViewer {
+public class TourTags_View extends ViewPart implements ITreeViewer {
 
-   private static final String               STATE_IS_HIERARCHICAL_LAYOUT             = "STATE_IS_HIERARCHICAL_LAYOUT"; //$NON-NLS-1$
+   static public final String                ID                                       = "net.tourbook.ui.views.tagging.TourTags_View"; //$NON-NLS-1$
 
-   private final IDialogSettings             _state;
+   private static final String               STATE_IS_HIERARCHICAL_LAYOUT             = "STATE_IS_HIERARCHICAL_LAYOUT";                //$NON-NLS-1$
 
-   private TagMenuManager                    _tagMenuManager;
+   private final IDialogSettings             _state                                   = TourbookPlugin.getState("TourTagsView");       //$NON-NLS-1$
 
    private ContainerCheckedTreeViewer        _tagViewer;
    private TVIPrefTagRoot                    _rootItem;
@@ -104,11 +102,11 @@ public class Dialog_SetTags extends TrayDialog implements ITreeViewer {
    private long                              _expandRunnableCounter;
 
    private ArrayList<TourData>               _selectedTours;
+
    private ActionCollapseAllWithoutSelection _actionCollapseAll;
    private ActionExpandAll                   _actionExpandAll;
    private ActionOpenPrefDialog              _actionOpenPrefTags;
-   private ActionTag_LayoutFlat              _actionTag_LayoutFlat;
-   private ActionTag_LayoutHierarchical      _actionTag_LayoutHierarchical;
+   private ActionTagLayout                   _actionTagLayout;
 
    /*
     * Image resources
@@ -120,7 +118,6 @@ public class Dialog_SetTags extends TrayDialog implements ITreeViewer {
    /*
     * UI controls
     */
-   private ToolBar _toolBarAllTags;
 
    private class ActionCollapseAllWithoutSelection extends ActionCollapseAll {
 
@@ -140,33 +137,18 @@ public class Dialog_SetTags extends TrayDialog implements ITreeViewer {
 
    }
 
-   private class ActionTag_LayoutFlat extends Action {
+   private class ActionTagLayout extends Action {
 
-      ActionTag_LayoutFlat() {
+      ActionTagLayout() {
 
-         super(Messages.action_tagView_flat_layout, AS_RADIO_BUTTON);
+         super(Messages.action_tagView_flat_layout, AS_PUSH_BUTTON);
 
          setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__layout_flat));
       }
 
       @Override
       public void run() {
-         onTag_Layout(false);
-      }
-   }
-
-   private class ActionTag_LayoutHierarchical extends Action {
-
-      ActionTag_LayoutHierarchical() {
-
-         super(Messages.action_tagView_flat_hierarchical, AS_RADIO_BUTTON);
-
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__layout_hierarchical));
-      }
-
-      @Override
-      public void run() {
-         onTag_Layout(true);
+         onTag_Layout();
       }
    }
 
@@ -242,70 +224,23 @@ public class Dialog_SetTags extends TrayDialog implements ITreeViewer {
       public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
    }
 
-   public Dialog_SetTags(final Shell parentShell, final TagMenuManager tagMenuManager) {
-
-      super(parentShell);
-
-      // make dialog resizable
-//      setShellStyle(getShellStyle() | SWT.RESIZE);
-
-      setDefaultImage(TourbookPlugin.getImageDescriptor(Messages.Image__tag_category).createImage());
-
-      _state = TourbookPlugin.getDefault().getDialogSettingsSection(getClass().getName());
-
-      _tagMenuManager = tagMenuManager;
-
-      // a tour must be selected
-      _selectedTours = _tagMenuManager.getTourProvider().getSelectedTours();
-   }
-
-   @Override
-   public boolean close() {
-
-      saveState();
-
-      return super.close();
-   }
-
-   @Override
-   protected void configureShell(final Shell shell) {
-
-      super.configureShell(shell);
-
-      shell.setText(Messages.Dialog_SetTags_ShellTitle);
-
-      shell.addDisposeListener(new DisposeListener() {
-         @Override
-         public void widgetDisposed(final DisposeEvent e) {
-            onDispose();
-         }
-      });
-   }
+   public TourTags_View() {}
 
    private void createActions() {
 
       _actionExpandAll = new ActionExpandAll(this);
       _actionCollapseAll = new ActionCollapseAllWithoutSelection(this);
       _actionOpenPrefTags = new ActionOpenPrefDialog(Messages.action_tag_open_tagging_structure, PrefPageTags.ID);
-      _actionTag_LayoutFlat = new ActionTag_LayoutFlat();
-      _actionTag_LayoutHierarchical = new ActionTag_LayoutHierarchical();
+      _actionTagLayout = new ActionTagLayout();
    }
 
    @Override
-   protected final void createButtonsForButtonBar(final Composite parent) {
-
-      super.createButtonsForButtonBar(parent);
-
-      getButton(IDialogConstants.OK_ID).setText(Messages.App_Action_Save);
-   }
-
-   @Override
-   protected Control createDialogArea(final Composite parent) {
+   public void createPartControl(final Composite parent) {
 
       initUI(parent);
       restoreStateBeforeUI();
 
-      final Composite ui = createUI(parent);
+      createUI(parent);
 
       createActions();
       fillToolbar();
@@ -315,19 +250,15 @@ public class Dialog_SetTags extends TrayDialog implements ITreeViewer {
 
       restoreState();
       enableControls();
-
-      _tagViewer.getTree().setFocus();
-
-      return ui;
    }
 
-   private Composite createUI(final Composite parent) {
+   private void createUI(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults()
-            .grab(true, true)
-            .hint(400, 600)
-            .applyTo(container);
+//      GridDataFactory.fillDefaults()
+//            .grab(true, true)
+//            .hint(400, 600)
+//            .applyTo(container);
       GridLayoutFactory
             .fillDefaults()
             .spacing(0, 0)
@@ -337,8 +268,6 @@ public class Dialog_SetTags extends TrayDialog implements ITreeViewer {
          createUI_10_AllTags_Header(container);
          createUI_20_AllTags_Viewer(container);
       }
-
-      return container;
    }
 
    private void createUI_10_AllTags_Header(final Composite parent) {
@@ -346,13 +275,7 @@ public class Dialog_SetTags extends TrayDialog implements ITreeViewer {
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-      {
-         {
-            // toolbar
-            _toolBarAllTags = new ToolBar(container, SWT.FLAT);
-            GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).applyTo(container);
-         }
-      }
+      {}
    }
 
    private void createUI_20_AllTags_Viewer(final Composite parent) {
@@ -533,6 +456,14 @@ public class Dialog_SetTags extends TrayDialog implements ITreeViewer {
       }
    }
 
+   @Override
+   public void dispose() {
+
+      _imgTag.dispose();
+      _imgTagRoot.dispose();
+      _imgTagCategory.dispose();
+   }
+
    private void enableControls() {
 
       _actionCollapseAll.setEnabled(_isHierarchicalLayout);
@@ -549,31 +480,19 @@ public class Dialog_SetTags extends TrayDialog implements ITreeViewer {
       }
    }
 
-   /**
-    * set the toolbar action after the {@link #_tagViewer} is created
-    */
    private void fillToolbar() {
 
+      final IActionBars actionBars = getViewSite().getActionBars();
+
       /*
-       * Toolbar: All tags
+       * Fill view toolbar
        */
-      final ToolBarManager tbmAllTags = new ToolBarManager(_toolBarAllTags);
+      final IToolBarManager tbm = actionBars.getToolBarManager();
 
-      tbmAllTags.add(_actionTag_LayoutFlat);
-      tbmAllTags.add(_actionTag_LayoutHierarchical);
-      tbmAllTags.add(_actionExpandAll);
-      tbmAllTags.add(_actionCollapseAll);
-      tbmAllTags.add(_actionOpenPrefTags);
-
-      tbmAllTags.update(true);
-   }
-
-   @Override
-   protected IDialogSettings getDialogBoundsSettings() {
-
-      // keep window size and position
-      return _state;
-//      return null;
+      tbm.add(_actionTagLayout);
+      tbm.add(_actionExpandAll);
+      tbm.add(_actionCollapseAll);
+      tbm.add(_actionOpenPrefTags);
    }
 
    /**
@@ -654,34 +573,12 @@ public class Dialog_SetTags extends TrayDialog implements ITreeViewer {
       }
    }
 
-   @Override
-   protected void okPressed() {
+   private void onTag_Layout() {
 
-      saveState();
-      updateModelFromUI();
+      // toggle layout
+      _isHierarchicalLayout = !_isHierarchicalLayout;
 
-      super.okPressed();
-   }
-
-   private void onDispose() {
-
-      _imgTag.dispose();
-      _imgTagRoot.dispose();
-      _imgTagCategory.dispose();
-   }
-
-   /**
-    * @param isHierarchicalLayout
-    *           Is <code>true</code> when the layout is flat, otherwise it is hierarchical
-    */
-   private void onTag_Layout(final boolean isHierarchicalLayout) {
-
-      // ignore layout when it is already set
-      if (_isHierarchicalLayout == isHierarchicalLayout) {
-         return;
-      }
-
-      _isHierarchicalLayout = isHierarchicalLayout;
+      updateUI_ActionLayout();
 
       updateTagModel();
       enableControls();
@@ -883,14 +780,7 @@ public class Dialog_SetTags extends TrayDialog implements ITreeViewer {
 
    private void restoreState() {
 
-      /*
-       * Set layout actions after the UI is created
-       */
-      if (_isHierarchicalLayout) {
-         _actionTag_LayoutHierarchical.setChecked(true);
-      } else {
-         _actionTag_LayoutFlat.setChecked(true);
-      }
+      updateUI_ActionLayout();
    }
 
    private void restoreStateBeforeUI() {
@@ -904,16 +794,9 @@ public class Dialog_SetTags extends TrayDialog implements ITreeViewer {
    }
 
    @Override
-   protected void setShellStyle(final int newShellStyle) {
+   public void setFocus() {
 
-      super.setShellStyle(
-            SWT.CLOSE
-                  | SWT.MODELESS
-                  | SWT.BORDER
-                  | SWT.TITLE
-                  | SWT.RESIZE);
-
-      setBlockOnOpen(false);
+      _tagViewer.getTree().setFocus();
    }
 
    /**
@@ -938,6 +821,10 @@ public class Dialog_SetTags extends TrayDialog implements ITreeViewer {
       _tagViewer.setInput(this);
 
       loadAllTagItems();
+
+      if (_selectedTours == null) {
+         return;
+      }
 
       // get all tags from all selectedtours
       final Set<Long> allTagIds = new HashSet<>();
@@ -969,5 +856,19 @@ public class Dialog_SetTags extends TrayDialog implements ITreeViewer {
 
       // update UI
       _tagViewer.setCheckedElements(tagItems.toArray());
+   }
+
+   private void updateUI_ActionLayout() {
+
+      if (_isHierarchicalLayout) {
+
+         _actionTagLayout.setToolTipText(Messages.Action_TourTags_Layout_Flat_Tooltip);
+         _actionTagLayout.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__layout_flat));
+
+      } else {
+
+         _actionTagLayout.setToolTipText(Messages.Action_TourTags_Layout_Hierarchical_Tooltip);
+         _actionTagLayout.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__layout_hierarchical));
+      }
    }
 }

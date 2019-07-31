@@ -27,6 +27,7 @@ import net.tourbook.application.ICommandIds;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.AdvancedMenuForActions;
 import net.tourbook.common.util.ToolTip;
+import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.database.TourDatabase;
@@ -37,6 +38,7 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourProvider2;
 import net.tourbook.ui.UI;
+import net.tourbook.ui.views.tagging.TourTags_View;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
@@ -46,7 +48,6 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.jface.window.Window;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.graphics.Point;
@@ -131,17 +132,18 @@ public class TagMenuManager {
    private class Action_SetTags extends Action {
 
       public Action_SetTags() {
+
          super(Messages.Action_Tag_SetTags, AS_PUSH_BUTTON);
+
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TourTags));
       }
 
       @Override
       public void run() {
 
-         if (new Dialog_SetTags(Display.getCurrent().getActiveShell(), TagMenuManager.this).open() == Window.OK) {
+         Util.showView(TourTags_View.ID, true);
 
-            // save all tours with the new tour type
-//            TourManager.saveModifiedTours(selectedTours);
-         }
+         // TODO maybe the tour must be selected
       }
    }
 
@@ -635,6 +637,7 @@ public class TagMenuManager {
       // all all tour tag actions
       menuMgr.add(new Separator());
       {
+         menuMgr.add(_actionSetTags);
          menuMgr.add(_actionAddTagAdvanced);
          menuMgr.add(_actionAddTag);
 
@@ -642,7 +645,6 @@ public class TagMenuManager {
 
          menuMgr.add(_actionRemoveTag);
          menuMgr.add(_actionRemoveAllTags);
-         menuMgr.add(_actionSetTags);
       }
 
       _isAdvMenu = false;
