@@ -237,7 +237,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    }
 
    /**
-    * comparatore is sorting the tree items
+    * Comparator is sorting the tree items
     */
    private final class TagComparator extends ViewerComparator {
       @Override
@@ -366,7 +366,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       }
    }
 
-   public class TreeContextMenuProvider implements IContextMenuProvider {
+   private class TreeContextMenuProvider implements IContextMenuProvider {
 
       @Override
       public void disposeContextMenu() {
@@ -1715,7 +1715,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    }
 
    /**
-    * reload the content of the tag viewer
+    * Reload the content of the tag viewer
     */
    @Override
    public void reloadViewer() {

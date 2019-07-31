@@ -930,8 +930,6 @@ public class Messages extends NLS {
    public static String        Image__graph_tour_compare;
    public static String        Image__graph_tour_compare_disabled;
    public static String        Image__icon_placeholder;
-   public static String        Image__layout_flat;
-   public static String        Image__layout_hierarchical;
    public static String        Image__link;
    public static String        Image__MapBookmark;
    public static String        Image__MapBookmark_Disabled;
@@ -939,7 +937,6 @@ public class Messages extends NLS {
    public static String        Image__MapBookmark_New;
    public static String        Image__MapOptions;
    public static String        Image__MapOptions_Dark;
-
    public static String        Image__MapOptions_Disabled;
    public static String        Image__MarkerFilter_WithGPS;
    public static String        Image__MarkerFilter_WithGPS_Disabled;
@@ -1023,6 +1020,8 @@ public class Messages extends NLS {
    public static String        Image__tag;
    public static String        Image__tag_category;
    public static String        Image__tag_root;
+   public static String        Image__TagLayout_Flat;
+   public static String        Image__TagLayout_Hierarchical;
    public static String        Image__tour_map_ref_tour_new;
    public static String        Image__tour_new;
    public static String        Image__tour_new_disabled;
@@ -1032,7 +1031,6 @@ public class Messages extends NLS {
    public static String        Image__Tour;
    public static String        Image__Tour_Duplicate;
    public static String        Image__Tour_Duplicate_disabled;
-
    public static String        Image__TourBook_Month;
    public static String        Image__TourBook_SelectAll;
    public static String        Image__TourBook_Week;
