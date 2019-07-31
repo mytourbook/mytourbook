@@ -62,9 +62,9 @@ public class FitLogSAXHandler extends DefaultHandler {
    private static final String                  TAG_ACTIVITY_POWER              = "Power";               //$NON-NLS-1$
    private static final String                  TAG_ACTIVITY_WEATHER            = "Weather";             //$NON-NLS-1$
 
+   private static final String                  ATTRIB_DURATION_SECONDS         = "DurationSeconds";     //$NON-NLS-1$
    private static final String                  ATTRIB_NAME                     = "Name";                //$NON-NLS-1$
    private static final String                  ATTRIB_START_TIME               = "StartTime";           //$NON-NLS-1$
-   private static final String                  ATTRIB_DURATION_SECONDS         = "DurationSeconds";     //$NON-NLS-1$
    private static final String                  ATTRIB_TOTAL_SECONDS            = "TotalSeconds";        //$NON-NLS-1$
    private static final String                  ATTRIB_TOTAL_METERS             = "TotalMeters";         //$NON-NLS-1$
    private static final String                  ATTRIB_TOTAL_CAL                = "TotalCal";            //$NON-NLS-1$
@@ -268,7 +268,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 //
 //      } else if (tourDateTime == null) {
 //
-//         // this case can occure when a tour do not have a track
+//         // this case can occur when a tour do not have a track
 //         tourDateTime = _currentActivity.tourStartTime;
 //      }
 

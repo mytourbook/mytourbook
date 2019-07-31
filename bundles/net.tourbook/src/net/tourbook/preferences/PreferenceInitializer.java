@@ -18,6 +18,7 @@ package net.tourbook.preferences;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataSerie;
+import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StringToArrayConverter;
 import net.tourbook.data.TourMarker;
@@ -509,7 +510,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
        * Weather
        */
       store.setDefault(ITourbookPreferences.WEATHER_USE_WEATHER_RETRIEVAL,false);
-      store.setDefault(ITourbookPreferences.WEATHER_API_KEY,"");
+      store.setDefault(ITourbookPreferences.WEATHER_API_KEY, UI.EMPTY_STRING);
 
 // SET_FORMATTING_ON
    }

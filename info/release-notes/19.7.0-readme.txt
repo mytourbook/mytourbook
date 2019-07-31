@@ -1,48 +1,122 @@
-19.7.0                                                      ?. July 2019
- 
-
+19.7.0                                                     27. July 2019
 
 New   
 ===
 
-* 2D Map 
+* 2D Map
 
+  - Added/updated/removed 2D Map Provider
+  
   - Map provider slideout
+   - This replaces the (old and removed) menu dropdown for map provider 
+     selection
+   - More info is displayed for a map provider which can be configured 
+     with the column manager
+   - Tooltip for a hovered map provider
+   - 3 state column sorting:
+     ascending/descending/manual with drag & drop
+ 
+  - Map provider preference page
     
-    - 3 state column sorting: ascending/descending/manual with drag & drop
+    - More info fields, e.g. online map, category, is layer, contains 
+      hillshading
+    - All available fields can be displayed in the map provider list and
+      can be managed with the column manager
+    - A selected map provider in the pref page is immediately displayed 
+      in 2D map view
 
 
+* Weather (Frederic)
 
+  - Added the ability to retrieve the weather data that occured during a
+    given tour (using the WorldWeatherOnline API).
+  
+    --------------------------------------------------------------------
+     You need to purchase an API Key to use this feature
+  
+     This is the first time in the history of MyTourbook that a user 
+     needs to pay for a new feature. The problem is, it seems that there
+     is no website where you can get historical weather data for free.
+  
+     Without an API key, any new weather fields can be edited/saved as 
+     all other tour fields, they are just not filled automatically.
+     
+     This API key can be tested 60 days for free, how to use it is 
+     documented here.
+    --------------------------------------------------------------------
+  
+  - The following data will be set in the tour
+    - Label containing the weather description
+    - Wind speed
+    - Wind direction
+    - Average Temperature
+    - Wind Chill
+    - Max Temperature
+    - Min Temperature
+    - Humidity
+    - Precipitation
+    - Clouds
+      
+  - Moved from 8 cardinals to 16 cardinals wind direction
+  
+  - The user can choose to activate the weather retrieval in the easy 
+    import config
+  
  
 Improvements   
 ============
 
-* 
+* 2D Map Options
 
-  - 
+  - Toggle direction for <cursor>-key panning
 
-
-
+ 
 Bugfix   
 ======
 
-* 
+* Tour Book View
 
-  - 
+  - Fixed sqlstate 22003: The resulting value is outside the range for 
+    the data type INTEGER.
+    This could occure when the summary columns had an integer overflow
+
+
+* Preferences (Frederic)
+
+  - Fixed Linux async problem: modify flag is set when opening the users 
+    page
+ 
+
+* Easy Import Config (Frederic)
+
+  - Fix for when a user unchecks the option "Set Tour type" in the Easy 
+    Import Config
 
  
+* Marker deletion (Frederic)
+
+  - Fixed NPE when deleting a marker in a specific case
+
+
+* Import (Frederic)
+
+  - .fitlog file
+    Fix for importing laps as markers
+
  
 Translation    
 ===========
 
- - French (Frederic)
- - German
- - Italian (Doriano)
+* French (Frederic)
+* German
 
- 
  
 System   
 ======
 
-  - 
+* Eclipse 2019-06 (4.12)
+
+  - This new version solved the issue 
+    "Dozens of NPEs in LogView.onMouseMover"
+ 
 

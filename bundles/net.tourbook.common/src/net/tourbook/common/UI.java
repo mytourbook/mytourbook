@@ -74,6 +74,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Sash;
@@ -104,6 +105,7 @@ public class UI {
    public static final String       DASH_WITH_DOUBLE_SPACE        = "   -   ";  //$NON-NLS-1$
    public static final String       DIMENSION                     = " x ";      //$NON-NLS-1$
    public static final String       EMPTY_STRING                  = "";         //$NON-NLS-1$
+   public static final String       NEW_LINE_TEXT_WIDGET          = "\r\n";     //$NON-NLS-1$
    public static final String       NEW_LINE1                     = "\n";       //$NON-NLS-1$
    public static final String       NEW_LINE2                     = "\n\n";     //$NON-NLS-1$
    public static final String       NEW_LINE3                     = "\n\n\n";   //$NON-NLS-1$
@@ -253,7 +255,7 @@ public class UI {
    public static final float UNIT_FAHRENHEIT_MULTI = 1.8f;
    public static final float UNIT_FAHRENHEIT_ADD   = 32;
 
-   public static final float UNIT_M_TO_INCHES      = 39.37007874f;
+   public static final float UNIT_METER_TO_INCHES  = 39.37007874f;
 
    /*
     * Labels for the different measurement systems
@@ -384,51 +386,27 @@ public class UI {
 
       IMAGE_REGISTRY = CommonActivator.getDefault().getImageRegistry();
 
-      IMAGE_REGISTRY.put(
-            IMAGE_ACTION_PHOTO_FILTER, //
-            CommonActivator.getImageDescriptor(Messages.Image_Action_PhotoFilter));
-      IMAGE_REGISTRY.put(
-            IMAGE_ACTION_PHOTO_FILTER_NO_PHOTOS, //
-            CommonActivator.getImageDescriptor(Messages.Image_Action_PhotoFilterNoPhotos));
-      IMAGE_REGISTRY.put(
-            IMAGE_ACTION_PHOTO_FILTER_WITH_PHOTOS, //
-            CommonActivator.getImageDescriptor(Messages.Image_Action_PhotoFilterWithPhotos));
-      IMAGE_REGISTRY.put(
-            IMAGE_ACTION_PHOTO_FILTER_DISABLED, //
-            CommonActivator.getImageDescriptor(Messages.Image_Action_PhotoFilter_Disabled));
+// SET_FORMATTING_OFF
 
-      IMAGE_REGISTRY.put(
-            IMAGE_CONFIGURE_COLUMNS, //
-            CommonActivator.getImageDescriptor(Messages.Image__CustomizeProfilesColumns));
-      IMAGE_REGISTRY.put(
-            IMAGE_EMPTY_16, //
-            CommonActivator.getImageDescriptor(Messages.Image___Empty16));
+      IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_FILTER,                  CommonActivator.getImageDescriptor(Messages.Image_Action_PhotoFilter));
+      IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_FILTER_NO_PHOTOS,        CommonActivator.getImageDescriptor(Messages.Image_Action_PhotoFilterNoPhotos));
+      IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_FILTER_WITH_PHOTOS,      CommonActivator.getImageDescriptor(Messages.Image_Action_PhotoFilterWithPhotos));
+      IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_FILTER_DISABLED,         CommonActivator.getImageDescriptor(Messages.Image_Action_PhotoFilter_Disabled));
+
+      IMAGE_REGISTRY.put(IMAGE_CONFIGURE_COLUMNS,                    CommonActivator.getImageDescriptor(Messages.Image__CustomizeProfilesColumns));
+      IMAGE_REGISTRY.put(IMAGE_EMPTY_16,                             CommonActivator.getImageDescriptor(Messages.Image___Empty16));
 
       // weather images
-      IMAGE_REGISTRY.put(
-            IWeather.WEATHER_ID_CLEAR, //
-            CommonActivator.getImageDescriptor(Messages.Image__weather_sunny));
-      IMAGE_REGISTRY.put(
-            IWeather.WEATHER_ID_PART_CLOUDS, //
-            CommonActivator.getImageDescriptor(Messages.Image__weather_cloudy));
-      IMAGE_REGISTRY.put(
-            IWeather.WEATHER_ID_OVERCAST, //
-            CommonActivator.getImageDescriptor(Messages.Image__weather_clouds));
-      IMAGE_REGISTRY.put(
-            IWeather.WEATHER_ID_LIGHTNING, //
-            CommonActivator.getImageDescriptor(Messages.Image__weather_lightning));
-      IMAGE_REGISTRY.put(
-            IWeather.WEATHER_ID_RAIN, //
-            CommonActivator.getImageDescriptor(Messages.Image__weather_rain));
-      IMAGE_REGISTRY.put(
-            IWeather.WEATHER_ID_SNOW, //
-            CommonActivator.getImageDescriptor(Messages.Image__weather_snow));
-      IMAGE_REGISTRY.put(
-            IWeather.WEATHER_ID_SCATTERED_SHOWERS, //
-            CommonActivator.getImageDescriptor(Messages.Image__Weather_ScatteredShowers));
-      IMAGE_REGISTRY.put(
-            IWeather.WEATHER_ID_SEVERE_WEATHER_ALERT, //
-            CommonActivator.getImageDescriptor(Messages.Image__Weather_Severe));
+      IMAGE_REGISTRY.put(IWeather.WEATHER_ID_CLEAR,                  CommonActivator.getImageDescriptor(Messages.Image__weather_sunny));
+      IMAGE_REGISTRY.put(IWeather.WEATHER_ID_PART_CLOUDS,            CommonActivator.getImageDescriptor(Messages.Image__weather_cloudy));
+      IMAGE_REGISTRY.put(IWeather.WEATHER_ID_OVERCAST,               CommonActivator.getImageDescriptor(Messages.Image__weather_clouds));
+      IMAGE_REGISTRY.put(IWeather.WEATHER_ID_LIGHTNING,              CommonActivator.getImageDescriptor(Messages.Image__weather_lightning));
+      IMAGE_REGISTRY.put(IWeather.WEATHER_ID_RAIN,                   CommonActivator.getImageDescriptor(Messages.Image__weather_rain));
+      IMAGE_REGISTRY.put(IWeather.WEATHER_ID_SNOW,                   CommonActivator.getImageDescriptor(Messages.Image__weather_snow));
+      IMAGE_REGISTRY.put(IWeather.WEATHER_ID_SCATTERED_SHOWERS,      CommonActivator.getImageDescriptor(Messages.Image__Weather_ScatteredShowers));
+      IMAGE_REGISTRY.put(IWeather.WEATHER_ID_SEVERE_WEATHER_ALERT,   CommonActivator.getImageDescriptor(Messages.Image__Weather_Severe));
+
+// SET_FORMATTING_ON
 
       final String commaSpace = Messages.Period_Format_CommaSpace;
       final String space2 = Messages.Period_Format_SpaceAndSpace;
@@ -658,25 +636,52 @@ public class UI {
     * @param precipitation
     * @return Returns the precipitation amount in the current measurement system.
     */
-   public static float convertPrecipitationFromMetric(final float precipitation) {
+   public static float convertPrecipitation_FromMetric(final float precipitation) {
 
       if (UNIT_VALUE_TEMPERATURE == 1) {
          return precipitation;
       }
 
-      return precipitation * UNIT_M_TO_INCHES / 100f;
+      return precipitation * UNIT_METER_TO_INCHES;
+   }
+
+   /**
+    * @param precipitation
+    * @return Returns the precipitation amount in the current measurement system.
+    */
+   public static float convertPrecipitation_ToMetric(final float precipitation) {
+
+      if (UNIT_VALUE_TEMPERATURE == 1) {
+         return precipitation;
+      }
+
+      return precipitation / UNIT_METER_TO_INCHES;
    }
 
    /**
     * @param weatherPressure
     * @return Returns the atmospheric pressure value in the current measurement system.
     */
-   public static double convertPressureFromMetric(final int weatherPressure) {
+   public static float convertPressure_FromMetric(final float weatherPressure) {
+
       if (UNIT_VALUE_TEMPERATURE == 1) {
          return weatherPressure;
       }
 
       return weatherPressure * 0.02953f;
+   }
+
+   /**
+    * @param weatherPressure
+    * @return Returns the atmospheric pressure value in the current measurement system.
+    */
+   public static float convertPressure_ToMetric(final float weatherPressure) {
+
+      if (UNIT_VALUE_TEMPERATURE == 1) {
+         return weatherPressure;
+      }
+
+      return weatherPressure / 0.02953f / 100f;
    }
 
    /**
@@ -1099,9 +1104,9 @@ public class UI {
     */
    public static int getCardinalDirectionTextIndex(final int degreeDirection) {
 
-      final float degree = (degreeDirection + 22.5f) / 45.0f;
+      final float degree = (degreeDirection / 10.0f + 11.25f) / 22.5f;
 
-      final int directionIndex = ((int) degree) % 8;
+      final int directionIndex = ((int) degree) % 16;
 
       return directionIndex;
    }
@@ -1191,6 +1196,15 @@ public class UI {
       // No attempt is made to constrain the bounds. The default
       // constraining behavior in Window will be used.
       return result;
+   }
+
+   /**
+    * @param url
+    * @return Returns the url with surrounding < a > tags which can be used for the {@link Link}
+    *         control.
+    */
+   public static String getLinkFromText(final String url) {
+      return LINK_TAG_START + url + LINK_TAG_END;
    }
 
    public static boolean isCtrlKey(final Event event) {

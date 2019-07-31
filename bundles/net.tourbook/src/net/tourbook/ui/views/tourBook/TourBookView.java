@@ -163,7 +163,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    static public final String            ID                                              = "net.tourbook.views.tourListView";         //$NON-NLS-1$
 
    private final static IPreferenceStore _prefStore                                      = TourbookPlugin.getPrefStore();
-
    private final static IPreferenceStore _prefStoreCommon                                = CommonActivator.getPrefStore();
    private static final IDialogSettings  _state                                          = TourbookPlugin.getState(ID);
    //
@@ -262,31 +261,30 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _nf1_NoGroup.setMaximumFractionDigits(1);
       _nf1_NoGroup.setGroupingUsed(false);
    }
+   //
    private int                                        _selectedYear              = -1;
-
    private int                                        _selectedYearSub           = -1;
    private final ArrayList<Long>                      _selectedTourIds           = new ArrayList<>();
+   //
    private boolean                                    _isCollapseOthers;
-
    private boolean                                    _isInFireSelection;
    private boolean                                    _isInReload;
    private boolean                                    _isInStartup;
    private boolean                                    _isShowSummaryRow;
    private boolean                                    _isToolTipInDate;
-
    private boolean                                    _isToolTipInTags;
    private boolean                                    _isToolTipInTime;
    private boolean                                    _isToolTipInTitle;
    private boolean                                    _isToolTipInWeekDay;
+   //
    private final TourDoubleClickState                 _tourDoubleClickState      = new TourDoubleClickState();
    private TreeViewerTourInfoToolTip                  _tourInfoToolTip;
-
+   //
    private TagMenuManager                             _tagMenuManager;
-
    private MenuManager                                _viewerMenuManager;
    private IContextMenuProvider                       _viewerContextMenuProvider = new TreeContextMenuProvider();
+   //
    private ActionAdjustTemperature                    _actionAdjustTemperature;
-
    private ActionSetTimeZone                          _actionSetTimeZone;
    private ActionCollapseAll                          _actionCollapseAll;
    private ActionCollapseOthers                       _actionCollapseOthers;
@@ -318,10 +316,10 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private ActionSetPerson                            _actionSetOtherPerson;
    private ActionToggleMonthWeek                      _actionToggleMonthWeek;
    private ActionTourBookOptions                      _actionTourBookOptions;
-
+   //
    private TreeViewer                                 _tourViewer;
    private TreeColumnDefinition                       _timeZoneOffsetColDef;
-
+   //
    private PixelConverter                             _pc;
 
    /*
@@ -1420,7 +1418,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            final int value = ((TVITourBookItem) element).colNumberOfTimeSlices;
+            final long value = ((TVITourBookItem) element).colNumberOfTimeSlices;
 
             colDef.printValue_0(cell, value);
 
@@ -1567,7 +1565,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            final double value = ((TVITourBookItem) element).colDistance
+            final double value = ((TVITourBookItem) element).colTourDistance
                   / 1000.0
                   / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 
@@ -1836,7 +1834,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            final int value = ((TVITourBookItem) element).colFrontShiftCount;
+            final long value = ((TVITourBookItem) element).colFrontShiftCount;
 
             colDef.printValue_0(cell, value);
 
@@ -1859,7 +1857,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            final int value = ((TVITourBookItem) element).colRearShiftCount;
+            final long value = ((TVITourBookItem) element).colRearShiftCount;
 
             colDef.printValue_0(cell, value);
 
@@ -2337,12 +2335,12 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            final int value = ((TVITourBookItem) element).col_Surfing_NumberOfEvents;
+            final long value = ((TVITourBookItem) element).col_Surfing_NumberOfEvents;
 
             if (value == 0 || value == TourData.SURFING_VALUE_IS_NOT_SET) {
                cell.setText(UI.EMPTY_STRING);
             } else {
-               cell.setText(Integer.toString(value));
+               cell.setText(Long.toString(value));
             }
 
             setCellColor(cell, element);
@@ -2364,7 +2362,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            final long value = ((TVITourBookItem) element).colDrivingTime;
+            final long value = ((TVITourBookItem) element).colTourDrivingTime;
 
             colDef.printLongValue(cell, value, element instanceof TVITourBookTour);
 
@@ -2417,7 +2415,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             final TVITourBookItem item = (TVITourBookItem) element;
 
             final long dbPausedTime = item.colPausedTime;
-            final long dbRecordingTime = item.colRecordingTime;
+            final long dbRecordingTime = item.colTourRecordingTime;
 
             final double relativePausedTime = dbRecordingTime == 0 ? 0 : (double) dbPausedTime
                   / dbRecordingTime
@@ -2442,7 +2440,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            final long value = ((TVITourBookItem) element).colRecordingTime;
+            final long value = ((TVITourBookItem) element).colTourRecordingTime;
 
             colDef.printLongValue(cell, value, element instanceof TVITourBookTour);
 
@@ -2675,7 +2673,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            final int value = ((TVITourBookItem) element).colNumberOfPhotos;
+            final long value = ((TVITourBookItem) element).colNumberOfPhotos;
 
             colDef.printValue_0(cell, value);
 
@@ -3127,7 +3125,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       }
 
       final boolean useWeatherRetrieval = _prefStore.getBoolean(ITourbookPreferences.WEATHER_USE_WEATHER_RETRIEVAL) &&
-            !_prefStore.getString(ITourbookPreferences.WEATHER_API_KEY).equals("");
+            !_prefStore.getString(ITourbookPreferences.WEATHER_API_KEY).equals(UI.EMPTY_STRING);
 
       /*
        * enable actions
@@ -3420,7 +3418,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       // CSV_HEADER_DISTANCE
       {
-         final float dbDistance = tviItem.colDistance;
+         final float dbDistance = tviItem.colTourDistance;
          if (dbDistance != 0) {
             sb.append(_nf1_NoGroup.format(dbDistance / 1000 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
          }
@@ -3447,7 +3445,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       // CSV_HEADER_RECORDING_TIME
       {
-         final long colRecordingTime = (tviItem).colRecordingTime;
+         final long colRecordingTime = (tviItem).colTourRecordingTime;
          if (colRecordingTime != 0) {
             sb.append(Long.toString(colRecordingTime));
          }
@@ -3456,7 +3454,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       // CSV_HEADER_MOVING_TIME
       {
-         final long colDrivingTime = tviItem.colDrivingTime;
+         final long colDrivingTime = tviItem.colTourDrivingTime;
          if (colDrivingTime != 0) {
             sb.append(Long.toString(colDrivingTime));
          }
@@ -3476,7 +3474,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       {
          final long colPausedTime = tviItem.colPausedTime;
          final long dbPausedTime = colPausedTime;
-         final long dbRecordingTime = tviItem.colRecordingTime;
+         final long dbRecordingTime = tviItem.colTourRecordingTime;
          final float relativePausedTime = dbRecordingTime == 0 //
                ? 0
                : (float) dbPausedTime / dbRecordingTime * 100;
@@ -3488,7 +3486,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       // CSV_HEADER_RECORDING_TIME hhh:mm:ss
       {
-         final long colRecordingTime = (tviItem).colRecordingTime;
+         final long colRecordingTime = (tviItem).colTourRecordingTime;
          if (colRecordingTime != 0) {
             sb.append(net.tourbook.common.UI.format_hh_mm_ss(colRecordingTime));
          }
@@ -3497,7 +3495,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       // CSV_HEADER_MOVING_TIME hhh:mm:ss
       {
-         final long colDrivingTime = tviItem.colDrivingTime;
+         final long colDrivingTime = tviItem.colTourDrivingTime;
          if (colDrivingTime != 0) {
             sb.append(net.tourbook.common.UI.format_hh_mm_ss(colDrivingTime));
          }
@@ -3526,9 +3524,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       // CSV_HEADER_NUMBER_OF_PHOTOS
       {
-         final int numberOfPhotos = tviItem.colNumberOfPhotos;
+         final long numberOfPhotos = tviItem.colNumberOfPhotos;
          if (numberOfPhotos != 0) {
-            sb.append(Integer.toString(numberOfPhotos));
+            sb.append(Long.toString(numberOfPhotos));
          }
 
          sb.append(UI.TAB);
@@ -3696,9 +3694,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       // CSV_HEADER_TIME_SLICES
       {
-         final int numberOfTimeSlices = tviItem.colNumberOfTimeSlices;
+         final long numberOfTimeSlices = tviItem.colNumberOfTimeSlices;
          if (numberOfTimeSlices != 0) {
-            sb.append(Integer.toString(numberOfTimeSlices));
+            sb.append(Long.toString(numberOfTimeSlices));
          }
          sb.append(UI.TAB);
       }
@@ -3747,16 +3745,16 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       // CSV_HEADER_GEAR_FRONT_SHIFT_COUNT
       {
-         final int shiftCount = tviItem.colFrontShiftCount;
-         sb.append(Integer.toString(shiftCount));
+         final long shiftCount = tviItem.colFrontShiftCount;
+         sb.append(Long.toString(shiftCount));
 
          sb.append(UI.TAB);
       }
 
       // CSV_HEADER_GEAR_REAR_SHIFT_COUNT
       {
-         final int shiftCount = tviItem.colRearShiftCount;
-         sb.append(Integer.toString(shiftCount));
+         final long shiftCount = tviItem.colRearShiftCount;
+         sb.append(Long.toString(shiftCount));
 
          sb.append(UI.TAB);
       }
@@ -4542,7 +4540,14 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
    @Override
    public void setFocus() {
-      _tourViewer.getTree().setFocus();
+
+      final Tree tree = _tourViewer.getTree();
+
+      if (tree.isDisposed()) {
+         return;
+      }
+
+      tree.setFocus();
    }
 
    void setLinkAndCollapse(final boolean isCollapseOthers) {
