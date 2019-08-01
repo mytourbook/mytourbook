@@ -23,7 +23,10 @@ import java.util.Set;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
-import net.tourbook.common.action.ActionOpenPrefDialog;
+import net.tourbook.common.tooltip.ActionToolbarSlideout;
+import net.tourbook.common.tooltip.IOpeningDialog;
+import net.tourbook.common.tooltip.OpenDialogManager;
+import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.IContextMenuProvider;
@@ -36,7 +39,6 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.preferences.PrefPageTags;
 import net.tourbook.tag.TVIPrefTag;
 import net.tourbook.tag.TVIPrefTagCategory;
 import net.tourbook.tag.TVIPrefTagRoot;
@@ -83,6 +85,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swt.widgets.Widget;
@@ -114,15 +117,17 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
    private boolean                           _isInCollapseAll;
    private boolean                           _isInUIUpdate;
 
+   private OpenDialogManager                 _openDlgMgr                              = new OpenDialogManager();
+
    private long                              _expandRunnableCounter;
 
    private ArrayList<TourData>               _selectedTours;
 
    private ActionCollapseAllWithoutSelection _actionCollapseAll;
    private ActionExpandAll                   _actionExpandAll;
-   private ActionOpenPrefDialog              _actionOpenPrefTags;
    private ActionSaveTour                    _actionSaveTour;
    private ActionTagLayout                   _actionTagLayout;
+   private Action_TourChart_Options          _actionTourTagOptions;
 
    private PixelConverter                    _pc;
 
@@ -136,10 +141,25 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
    /*
     * UI controls
     */
+   private Composite   _parent;
    private Composite   _viewerContainer;
 
    private Menu        _treeContextMenu;
    private MenuManager _viewerMenuManager;
+
+   private class Action_TourChart_Options extends ActionToolbarSlideout {
+
+      @Override
+      protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+
+         return new SlideoutTourTagOptions(_parent, toolbar);
+      }
+
+      @Override
+      protected void onBeforeOpenSlideout() {
+         closeOpenedDialogs(this);
+      }
+   }
 
    private class ActionCollapseAllWithoutSelection extends ActionCollapseAll {
 
@@ -190,7 +210,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
 
       @Override
       public void run() {
-         onTag_Layout();
+         onAction_Layout();
       }
    }
 
@@ -341,13 +361,22 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
 
    }
 
+   /**
+    * Close all opened dialogs except the opening dialog.
+    *
+    * @param openingDialog
+    */
+   private void closeOpenedDialogs(final IOpeningDialog openingDialog) {
+      _openDlgMgr.closeOpenedDialogs(openingDialog);
+   }
+
    private void createActions() {
 
       _actionSaveTour = new ActionSaveTour();
       _actionExpandAll = new ActionExpandAll(this);
       _actionCollapseAll = new ActionCollapseAllWithoutSelection(this);
-      _actionOpenPrefTags = new ActionOpenPrefDialog(Messages.action_tag_open_tagging_structure, PrefPageTags.ID);
       _actionTagLayout = new ActionTagLayout();
+      _actionTourTagOptions = new Action_TourChart_Options();
    }
 
    private void createMenuManager() {
@@ -379,7 +408,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
       fillToolbar();
 
       // load tag viewer
-      updateTagModel();
+      reloadViewer();
 
       restoreState();
       enableControls();
@@ -679,7 +708,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
       tbm.add(_actionTagLayout);
       tbm.add(_actionExpandAll);
       tbm.add(_actionCollapseAll);
-      tbm.add(_actionOpenPrefTags);
+      tbm.add(_actionTourTagOptions);
    }
 
    @Override
@@ -743,6 +772,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
 
    private void initUI(final Composite parent) {
 
+      _parent = parent;
       _pc = new PixelConverter(parent);
    }
 
@@ -771,14 +801,15 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
       }
    }
 
-   private void onTag_Layout() {
+   private void onAction_Layout() {
 
       // toggle layout
       _isHierarchicalLayout = !_isHierarchicalLayout;
 
       updateUI_ActionLayout();
 
-      updateTagModel();
+      recreateViewer(_tagViewer);
+
       enableControls();
    }
 
@@ -986,8 +1017,17 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
          final Object[] expandedElements = _tagViewer.getExpandedElements();
          final Object[] checkedElements = _tagViewer.getCheckedElements();
          final ISelection selection = _tagViewer.getSelection();
-         
-         exclude category tags !!!
+
+         /*
+          * Exclude categories as it whould check ALL children
+          */
+         final ArrayList<TVIPrefTag> allTags = new ArrayList<>();
+         for (final Object object : checkedElements) {
+
+            if (object instanceof TVIPrefTag) {
+               allTags.add((TVIPrefTag) object);
+            }
+         }
 
          _tagViewer.getTree().dispose();
 
@@ -997,7 +1037,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
          reloadViewer_SetContent();
 
          _tagViewer.setExpandedElements(expandedElements);
-         _tagViewer.setCheckedElements(checkedElements);
+         _tagViewer.setCheckedElements(allTags.toArray(new TVIPrefTag[allTags.size()]));
 
          _isInUIUpdate = true;
          {

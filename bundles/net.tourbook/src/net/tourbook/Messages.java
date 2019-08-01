@@ -2177,6 +2177,8 @@ public class Messages extends NLS {
    public static String Slideout_TourTagFilter_Label_SelectedTags;
    public static String Slideout_TourTagFilter_Label_Title;
 
+   public static String Slideout_TourTagOptions_Label_Title;
+
    public static String Slideout_TrainingOptions_Label_Title;
 
    public static String Tooltip_ValuePoint_Action_CloseContextMenu;
