@@ -53,6 +53,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
    private IWorkbenchAction                  _actionPreferences;
 
+   private IWorkbenchAction                  _saveAction;
    private IWorkbenchAction                  _actionAbout;
    private IWorkbenchAction                  _actionQuit;
 
@@ -133,6 +134,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
       final MenuManager tourMenu = new MenuManager(Messages.App_Action_Menu_Tour, "m_Tour"); //$NON-NLS-1$
 
       tourMenu.add(new Separator("defaultViews")); //$NON-NLS-1$
+
+      tourMenu.add(_saveAction);
 
       return tourMenu;
    }
@@ -324,6 +327,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
       register(_actionResetPerspective);
       register(_actionClosePerspective);
       register(_actionCloseAllPerspective);
+
+      _saveAction = ActionFactory.SAVE.create(window);
+      register(_saveAction);
 
       /*
        * If we're on OS X we shouldn't show this command in the File menu. It should be invisible to
