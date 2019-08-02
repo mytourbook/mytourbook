@@ -42,9 +42,17 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.tag.TVIPrefTag;
 import net.tourbook.tag.TVIPrefTagCategory;
 import net.tourbook.tag.TVIPrefTagRoot;
+import net.tourbook.tour.ITourEventListener;
+import net.tourbook.tour.SelectionDeletedTours;
+import net.tourbook.tour.SelectionTourData;
+import net.tourbook.tour.SelectionTourId;
+import net.tourbook.tour.SelectionTourIds;
+import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
 import net.tourbook.ui.action.ActionCollapseAll;
 import net.tourbook.ui.action.ActionExpandAll;
 
+import org.eclipse.e4.ui.di.Persist;
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
@@ -74,6 +82,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
@@ -84,12 +93,15 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.dialogs.ContainerCheckedTreeViewer;
 import org.eclipse.ui.part.ViewPart;
 
@@ -100,6 +112,9 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
    private static final String               STATE_IS_HIERARCHICAL_LAYOUT             = "STATE_IS_HIERARCHICAL_LAYOUT";                //$NON-NLS-1$
 
    private final IDialogSettings             _state                                   = TourbookPlugin.getState("TourTagsView");       //$NON-NLS-1$
+
+   private ISelectionListener                _postSelectionListener;
+   private ITourEventListener                _tourEventListener;
 
    private ContainerCheckedTreeViewer        _tagViewer;
    private ColumnManager                     _columnManager;
@@ -121,7 +136,9 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
 
    private long                              _expandRunnableCounter;
 
-   private ArrayList<TourData>               _selectedTours;
+   private int                               _lastSelectionHash;
+   private ArrayList<TourData>               _allTaggedTours                          = new ArrayList<>();
+   private int                               _hash_AllTourData;
 
    private ActionCollapseAllWithoutSelection _actionCollapseAll;
    private ActionExpandAll                   _actionExpandAll;
@@ -130,6 +147,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
    private Action_TourChart_Options          _actionTourTagOptions;
 
    private PixelConverter                    _pc;
+   private MenuManager                       _viewerMenuManager;
 
    /*
     * Image resources
@@ -141,11 +159,12 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
    /*
     * UI controls
     */
-   private Composite   _parent;
-   private Composite   _viewerContainer;
+   private Composite _parent;
+   private Composite _viewerContainer;
 
-   private Menu        _treeContextMenu;
-   private MenuManager _viewerMenuManager;
+   private Menu      _treeContextMenu;
+
+   private Label     _lblHeader;
 
    private class Action_TourChart_Options extends ActionToolbarSlideout {
 
@@ -362,6 +381,51 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
    }
 
    /**
+    * Listen for events when a tour is selected
+    */
+   private void addSelectionListener() {
+
+      _postSelectionListener = new ISelectionListener() {
+         @Override
+         public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
+
+            if (part == TourTags_View.this) {
+               return;
+            }
+
+            onSelectionChanged(selection);
+         }
+      };
+      getSite().getPage().addPostSelectionListener(_postSelectionListener);
+   }
+
+   private void addTourEventListener() {
+
+      _tourEventListener = new ITourEventListener() {
+         @Override
+         public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
+
+            if (part == TourTags_View.this) {
+               return;
+            }
+
+            if ((eventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
+
+               onSelectionChanged((ISelection) eventData);
+
+            }
+         }
+      };
+
+      TourManager.getInstance().addTourEventListener(_tourEventListener);
+   }
+
+   private void clearView() {
+
+      _tagViewer.setCheckedElements(new Object[] {});
+   }
+
+   /**
     * Close all opened dialogs except the opening dialog.
     *
     * @param openingDialog
@@ -407,27 +471,27 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
       createActions();
       fillToolbar();
 
+      addSelectionListener();
+      addTourEventListener();
+
       // load tag viewer
       reloadViewer();
 
       restoreState();
       enableControls();
+
+      restoreSelection();
    }
 
    private void createUI(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-//      GridDataFactory.fillDefaults()
-//            .grab(true, true)
-//            .hint(400, 600)
-//            .applyTo(container);
-      GridLayoutFactory
-            .fillDefaults()
+      GridLayoutFactory.fillDefaults()
             .spacing(0, 0)
             .applyTo(container);
 //      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
       {
-//         createUI_10_AllTags_Header(container);
+         createUI_10_Header(container);
 
          _viewerContainer = new Composite(container, SWT.NONE);
          GridDataFactory.fillDefaults().grab(true, true).applyTo(_viewerContainer);
@@ -438,13 +502,19 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
       }
    }
 
-   private void createUI_10_AllTags_Header(final Composite parent) {
+   private void createUI_10_Header(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+      GridLayoutFactory.swtDefaults().numColumns(1).applyTo(container);
+      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
       {
-
+         _lblHeader = new Label(container, SWT.NONE);
+         _lblHeader.setText(UI.SPACE4);
+         GridDataFactory.fillDefaults()
+               .align(SWT.BEGINNING, SWT.CENTER)
+               .grab(true, true)
+               .applyTo(_lblHeader);
       }
    }
 
@@ -570,7 +640,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
 
    private void defineColumn_10_Tags() {
 
-      final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "tags", SWT.LEAD);
+      final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "tags", SWT.LEAD); //$NON-NLS-1$
 
       colDef.setColumnLabel(Messages.Pref_TourTag_Column_TagsAndCategories);
       colDef.setColumnHeaderText(Messages.Pref_TourTag_Column_TagsAndCategories);
@@ -633,7 +703,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
 
    private void defineColumn_20_Notes() {
 
-      final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "notes", SWT.LEAD);
+      final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "notes", SWT.LEAD); //$NON-NLS-1$
 
       colDef.setColumnLabel(Messages.Pref_TourTag_Column_Notes);
       colDef.setColumnHeaderText(Messages.Pref_TourTag_Column_Notes);
@@ -674,9 +744,14 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
    @Override
    public void dispose() {
 
+      getSite().getPage().removePostSelectionListener(_postSelectionListener);
+      TourManager.getInstance().removeTourEventListener(_tourEventListener);
+
       _imgTag.dispose();
       _imgTagRoot.dispose();
       _imgTagCategory.dispose();
+
+      super.dispose();
    }
 
    private void enableControls() {
@@ -806,11 +881,60 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
       // toggle layout
       _isHierarchicalLayout = !_isHierarchicalLayout;
 
-      updateUI_ActionLayout();
+      updateUI_TagLayout();
 
       recreateViewer(_tagViewer);
 
       enableControls();
+   }
+
+   private void onSelectionChanged(final ISelection selection) {
+
+      if (selection == null) {
+         return;
+      }
+
+      final int selectionHash = selection.hashCode();
+      if (_lastSelectionHash == selectionHash) {
+
+         /*
+          * Last selection has not changed, this can occure when the app lost the focus and got the
+          * focus again.
+          */
+         return;
+      }
+
+      _lastSelectionHash = selectionHash;
+
+      if (selection instanceof SelectionTourData) {
+
+         final SelectionTourData tourDataSelection = (SelectionTourData) selection;
+
+         updateUI_Tags(tourDataSelection.getTourData());
+
+      } else if (selection instanceof SelectionTourId) {
+
+         final SelectionTourId selectionTourId = (SelectionTourId) selection;
+         final Long tourId = selectionTourId.getTourId();
+
+         updateUI_Tags(TourManager.getInstance().getTourData(tourId));
+
+      } else if (selection instanceof SelectionTourIds) {
+
+         final ArrayList<Long> allTourIds = ((SelectionTourIds) selection).getTourIds();
+         if (allTourIds != null) {
+
+            final ArrayList<TourData> allTourData = new ArrayList<>();
+
+            TourManager.loadTourData(allTourIds, allTourData, false);
+
+            updateUI_Tags(allTourData);
+         }
+
+      } else if (selection instanceof SelectionDeletedTours) {
+
+         clearView();
+      }
    }
 
    private void onTag_Select(final SelectionChangedEvent event) {
@@ -1076,9 +1200,42 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
       loadAllTagItems();
    }
 
+   private void restoreSelection() {
+
+      // try to use selection from selection service
+      onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
+
+      if (_allTaggedTours.size() == 0) {
+
+         // a tour is not displayed, find a tour provider which provides a tour
+         Display.getCurrent().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+
+               // validate widget
+               if (_parent.isDisposed()) {
+                  return;
+               }
+
+               /*
+                * check if tour was set from a selection provider
+                */
+               if (_allTaggedTours.size() > 0) {
+                  return;
+               }
+
+               final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
+               if (selectedTours != null && selectedTours.size() > 0) {
+                  updateUI_Tags(selectedTours);
+               }
+            }
+         });
+      }
+   }
+
    private void restoreState() {
 
-      updateUI_ActionLayout();
+      updateUI_TagLayout();
    }
 
    private void restoreStateBeforeUI() {
@@ -1092,6 +1249,17 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
       _columnManager.saveState(_state);
 
       _state.put(STATE_IS_HIERARCHICAL_LAYOUT, _isHierarchicalLayout);
+   }
+
+   @Persist
+   private void saveTags() {
+
+      System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] saveTags()")
+//            + ("\t: " + )
+//            + ("\t: " + )
+      );
+// TODO remove SYSTEM.OUT.PRINTLN
+
    }
 
    @Override
@@ -1119,17 +1287,40 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
       }
    }
 
-   private void updateTagModel() {
+   private void updateUI_TagLayout() {
 
-      reloadViewer_SetContent();
+      if (_isHierarchicalLayout) {
 
-      if (_selectedTours == null) {
+         _actionTagLayout.setToolTipText(Messages.Tour_Tags_Action_Layout_Flat_Tooltip);
+         _actionTagLayout.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TagLayout_Flat));
+
+      } else {
+
+         _actionTagLayout.setToolTipText(Messages.Tour_Tags_Action_Layout_Hierarchical_Tooltip);
+         _actionTagLayout.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TagLayout_Hierarchical));
+      }
+   }
+
+   private void updateUI_Tags(final ArrayList<TourData> allTourData) {
+
+      final int allTourData_Hash = allTourData.hashCode();
+
+      // check if tags are already checked with the previous tour data
+      if (allTourData_Hash == _hash_AllTourData) {
          return;
       }
 
-      // get all tags from all selectedtours
+      _hash_AllTourData = allTourData_Hash;
+
+      _allTaggedTours.clear();
+      _allTaggedTours.addAll(allTourData);
+
+      /*
+       * Get all tag id's
+       */
       final Set<Long> allTagIds = new HashSet<>();
-      for (final TourData tourData : _selectedTours) {
+
+      for (final TourData tourData : _allTaggedTours) {
          final Set<TourTag> allTourTags = tourData.getTourTags();
 
          if (allTourTags != null) {
@@ -1140,36 +1331,41 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
          }
       }
 
+      /*
+       * Get all tag tree items which should be checked
+       */
       final ArrayList<TVIPrefTag> tagItems = new ArrayList<>(allTagIds.size());
 
       if (allTagIds.size() > 0) {
-
-         // get all tag viewer items which should be checked
 
          final ArrayList<TreeViewerItem> rootItems = _rootItem.getFetchedChildren();
 
          for (final long tagId : allTagIds) {
 
-            // Is recursive !!!
+            // recursive !!!
             getTagItems(rootItems, tagItems, tagId);
          }
       }
+
+      // update title
+      final String headerText = allTourData.size() == 1
+
+            ? TourManager.getTourTitle(allTourData.get(0))
+            : NLS.bind(Messages.Tour_Tags_Title_MultipleTours, allTourData.size());
+
+      _lblHeader.setText(headerText);
+      _lblHeader.setToolTipText(headerText);
+      _lblHeader.getParent().layout();
 
       // update UI
       _tagViewer.setCheckedElements(tagItems.toArray());
    }
 
-   private void updateUI_ActionLayout() {
+   private void updateUI_Tags(final TourData tourData) {
 
-      if (_isHierarchicalLayout) {
+      final ArrayList<TourData> allTourData = new ArrayList<>();
+      allTourData.add(tourData);
 
-         _actionTagLayout.setToolTipText(Messages.Action_TourTags_Layout_Flat_Tooltip);
-         _actionTagLayout.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TagLayout_Flat));
-
-      } else {
-
-         _actionTagLayout.setToolTipText(Messages.Action_TourTags_Layout_Hierarchical_Tooltip);
-         _actionTagLayout.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TagLayout_Hierarchical));
-      }
+      updateUI_Tags(allTourData);
    }
 }

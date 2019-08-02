@@ -330,9 +330,6 @@ public class Messages extends NLS {
    public static String        Action_TagCategory_Edit_Tooltip;
    public static String        Action_TagCategory_EditCategory;
 
-   public static String        Action_TourTags_Layout_Flat_Tooltip;
-   public static String        Action_TourTags_Layout_Hierarchical_Tooltip;
-
    public static String        Action_TourType_ModifyTourTypeFilter;
 
    public static String        Adjust_Altitude_CreateDummyAltitudeData_Message;
@@ -2510,6 +2507,10 @@ public class Messages extends NLS {
    public static String Tour_Statistic_Combo_BarVOrder_Tooltip;
 
    public static String Tour_Tag_Filter_Action_Tooltip;
+
+   public static String Tour_Tags_Action_Layout_Flat_Tooltip;
+   public static String Tour_Tags_Action_Layout_Hierarchical_Tooltip;
+   public static String Tour_Tags_Title_MultipleTours;
 
    public static String tag_view_action_refresh_view_tooltip;
    public static String tag_view_title_tag;
