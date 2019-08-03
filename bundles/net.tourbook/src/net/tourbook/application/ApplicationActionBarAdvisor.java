@@ -207,6 +207,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
           */
          final IToolBarManager tbMgr_TourFilter = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
 
+         tbMgr_TourFilter.add(_saveAction);
+
          {
             /*
              * Tour data filter

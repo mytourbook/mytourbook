@@ -1412,10 +1412,10 @@ THIS IS NOT YET FULLY IMPLEMENTED
          name="%View_Name_SignImage"
          defaultHandler="net.tourbook.sign.ActionHandlerOpenSignImageView"
          />
-      -->            
-         
+      -->
+
    </extension>
-         
+
    <extension
          point="org.eclipse.ui.contexts">
       <context

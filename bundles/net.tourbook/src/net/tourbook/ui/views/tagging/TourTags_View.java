@@ -52,7 +52,7 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.ui.action.ActionCollapseAll;
 import net.tourbook.ui.action.ActionExpandAll;
 
-import org.eclipse.e4.ui.di.Persist;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
@@ -100,12 +100,13 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.dialogs.ContainerCheckedTreeViewer;
 import org.eclipse.ui.part.ViewPart;
 
-public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer {
+public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer, ISaveablePart {
 
    static public final String                ID                                       = "net.tourbook.ui.views.tagging.TourTags_View"; //$NON-NLS-1$
 
@@ -131,6 +132,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
    private boolean                           _isHierarchicalLayout;
    private boolean                           _isInCollapseAll;
    private boolean                           _isInUIUpdate;
+   private boolean                           _isTagDirty;
 
    private OpenDialogManager                 _openDlgMgr                              = new OpenDialogManager();
 
@@ -142,7 +144,6 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
 
    private ActionCollapseAllWithoutSelection _actionCollapseAll;
    private ActionExpandAll                   _actionExpandAll;
-   private ActionSaveTour                    _actionSaveTour;
    private ActionTagLayout                   _actionTagLayout;
    private Action_TourChart_Options          _actionTourTagOptions;
 
@@ -198,25 +199,6 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
 
    }
 
-   private class ActionSaveTour extends Action {
-
-      public ActionSaveTour() {
-
-         super(null, AS_PUSH_BUTTON);
-
-         setToolTipText(Messages.app_action_save_tour_tooltip);
-
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__save));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__save_disabled));
-
-         setEnabled(false);
-      }
-
-      @Override
-      public void run() {
-         action_SaveTour();
-      }
-   }
 
    private class ActionTagLayout extends Action {
 
@@ -375,11 +357,6 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
 
    public TourTags_View() {}
 
-   private void action_SaveTour() {
-      // TODO Auto-generated method stub
-
-   }
-
    /**
     * Listen for events when a tour is selected
     */
@@ -436,7 +413,6 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
 
    private void createActions() {
 
-      _actionSaveTour = new ActionSaveTour();
       _actionExpandAll = new ActionExpandAll(this);
       _actionCollapseAll = new ActionCollapseAllWithoutSelection(this);
       _actionTagLayout = new ActionTagLayout();
@@ -754,6 +730,20 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
       super.dispose();
    }
 
+   @Override
+   public void doSave(final IProgressMonitor monitor) {
+
+      _isTagDirty = false;
+
+      firePropertyChange(PROP_DIRTY);
+   }
+
+   @Override
+   public void doSaveAs() {
+      // TODO Auto-generated method stub
+
+   }
+
    private void enableControls() {
 
       _actionCollapseAll.setEnabled(_isHierarchicalLayout);
@@ -779,7 +769,6 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
        */
       final IToolBarManager tbm = actionBars.getToolBarManager();
 
-      tbm.add(_actionSaveTour);
       tbm.add(_actionTagLayout);
       tbm.add(_actionExpandAll);
       tbm.add(_actionCollapseAll);
@@ -849,6 +838,21 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
 
       _parent = parent;
       _pc = new PixelConverter(parent);
+   }
+
+   @Override
+   public boolean isDirty() {
+      return _isTagDirty;
+   }
+
+   @Override
+   public boolean isSaveAsAllowed() {
+      return false;
+   }
+
+   @Override
+   public boolean isSaveOnCloseNeeded() {
+      return true;
    }
 
    /**
@@ -958,6 +962,10 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
       if (_tagViewerItem_IsChecked) {
 
          // a checkbox is checked
+
+         _isTagDirty = true;
+
+         firePropertyChange(PROP_DIRTY);
 
          selection = _tagViewerItem_Data;
 
@@ -1251,8 +1259,15 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer 
       _state.put(STATE_IS_HIERARCHICAL_LAYOUT, _isHierarchicalLayout);
    }
 
-   @Persist
-   private void saveTags() {
+   void saveTags() {
+
+      _isTagDirty = false;
+
+      firePropertyChange(PROP_DIRTY);
+
+//      https: //www.vogella.com/tutorials/Eclipse4Services/article.html#implementing-editor-like-behavior
+//
+//      search 'eclipse e4 "@Persist"'
 
       System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] saveTags()")
 //            + ("\t: " + )
