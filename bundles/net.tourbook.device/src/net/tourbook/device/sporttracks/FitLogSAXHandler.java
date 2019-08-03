@@ -743,6 +743,7 @@ public class FitLogSAXHandler extends DefaultHandler {
       if (name.equals(TAG_ACTIVITY_CUSTOM_DATA_FIELD)) {
 
          // notes.append(fieldname : value);
+         //TODO Add a title such as "Custom Data Fields:"
 
          final String customFieldName = attributes.getValue(ATTRIB_CUSTOM_DATA_FIELD_NAME);
          final String customFieldValue = attributes.getValue(ATTRIB_CUSTOM_DATA_FIELD_VALUE);
@@ -844,7 +845,7 @@ public class FitLogSAXHandler extends DefaultHandler {
     *
     *           <pre>
     *              <Weather Conditions="Clear" Temp=
-   "15.5003">Min./Max.: 55.6 °F/63.9 °F; Pressure: 1004.5 mbar; Humidity: 74.9%; Dew point: 49.0 °F; Wind Speed: 1.9 mph; Precipitation: 0.0mm</Weather>
+   "15.5003">Min./Max.: 55.6 ï¿½F/63.9 ï¿½F; Pressure: 1004.5 mbar; Humidity: 74.9%; Dew point: 49.0 ï¿½F; Wind Speed: 1.9 mph; Precipitation: 0.0mm</Weather>
     *           </pre>
     *
     * @return
