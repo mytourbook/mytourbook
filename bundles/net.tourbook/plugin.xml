@@ -913,7 +913,7 @@ THIS IS NOT YET FULLY IMPLEMENTED
          Important tools are displayed in the app toolbar
       -->
       
-      <menuContribution locationURI="toolbar:org.eclipse.ui.main.toolbar?before=net.tourbook.separator.EditTour">
+      <menuContribution locationURI="toolbar:org.eclipse.ui.main.toolbar?before=sep_BeforeTourSave">
       
          <toolbar id="mc_tb_TourEditor" label="%Toolbar_Name_Tools">
 

@@ -485,7 +485,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
       container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
       {
          _lblHeader = new Label(container, SWT.NONE);
-         _lblHeader.setText(UI.SPACE4);
+         _lblHeader.setText("Selected tour(s)");
          GridDataFactory.fillDefaults()
                .align(SWT.BEGINNING, SWT.CENTER)
                .grab(true, true)

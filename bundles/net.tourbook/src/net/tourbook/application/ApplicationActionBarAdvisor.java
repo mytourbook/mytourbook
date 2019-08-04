@@ -254,10 +254,12 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
           */
          final IToolBarManager tbm_TourEditor = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
 
-         tbm_TourEditor.add(new Separator("net.tourbook.separator.EditTour"));
+         tbm_TourEditor.add(new Separator("sep_BeforeTourSave"));
          tbm_TourEditor.add(_action_Save);
 
-         final ToolBarContributionItem tbContribItem = new ToolBarContributionItem(tbm_TourEditor, "mc_tb_TourEditor"); //$NON-NLS-1$
+         final ToolBarContributionItem tbContribItem = new ToolBarContributionItem(
+               tbm_TourEditor,
+               "mc_tb_TourEditor"); //$NON-NLS-1$
          coolBar.add(tbContribItem);
       }
 
