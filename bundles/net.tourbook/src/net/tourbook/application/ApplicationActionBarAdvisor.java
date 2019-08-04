@@ -53,7 +53,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
    private IWorkbenchAction                  _actionPreferences;
 
-   private IWorkbenchAction                  _saveAction;
+   private IWorkbenchAction                  _action_Save;
    private IWorkbenchAction                  _actionAbout;
    private IWorkbenchAction                  _actionQuit;
 
@@ -135,7 +135,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
       tourMenu.add(new Separator("defaultViews")); //$NON-NLS-1$
 
-      tourMenu.add(_saveAction);
+      tourMenu.add(_action_Save);
 
       return tourMenu;
    }
@@ -207,8 +207,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
           */
          final IToolBarManager tbMgr_TourFilter = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
 
-         tbMgr_TourFilter.add(_saveAction);
-
          {
             /*
              * Tour data filter
@@ -248,6 +246,19 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
             TourTagFilterManager.setTourTagFilterAction(_actionTour_TagFilter);
          }
+      }
+
+      {
+         /*
+          * Toolbar: mc_tb_TourEditor | Save tour
+          */
+         final IToolBarManager tbm_TourEditor = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
+
+         tbm_TourEditor.add(new Separator("net.tourbook.separator.EditTour"));
+         tbm_TourEditor.add(_action_Save);
+
+         final ToolBarContributionItem tbContribItem = new ToolBarContributionItem(tbm_TourEditor, "mc_tb_TourEditor"); //$NON-NLS-1$
+         coolBar.add(tbContribItem);
       }
 
       {
@@ -330,8 +341,18 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
       register(_actionClosePerspective);
       register(_actionCloseAllPerspective);
 
-      _saveAction = ActionFactory.SAVE.create(window);
-      register(_saveAction);
+      /*
+       * Action: Save tour
+       */
+      _action_Save = ActionFactory.SAVE.create(window);
+
+      _action_Save.setText(Messages.App_Action_SaveTour);
+      _action_Save.setToolTipText(Messages.App_Action_SaveTour_Tooltip);
+
+      _action_Save.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__SaveTour));
+      _action_Save.setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__SaveTour_Disabled));
+
+      register(_action_Save);
 
       /*
        * If we're on OS X we shouldn't show this command in the File menu. It should be invisible to

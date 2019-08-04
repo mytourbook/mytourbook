@@ -199,7 +199,6 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
    }
 
-
    private class ActionTagLayout extends Action {
 
       ActionTagLayout() {
@@ -852,7 +851,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
    @Override
    public boolean isSaveOnCloseNeeded() {
-      return true;
+      return isDirty();
    }
 
    /**
@@ -914,7 +913,10 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
          final SelectionTourData tourDataSelection = (SelectionTourData) selection;
 
-         updateUI_Tags(tourDataSelection.getTourData());
+         final TourData tourData = tourDataSelection.getTourData();
+         if (tourData != null) {
+            updateUI_Tags(tourData);
+         }
 
       } else if (selection instanceof SelectionTourId) {
 
@@ -963,9 +965,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
          // a checkbox is checked
 
-         _isTagDirty = true;
-
-         firePropertyChange(PROP_DIRTY);
+         setTagsDirty();
 
          selection = _tagViewerItem_Data;
 
@@ -984,6 +984,8 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
          if (_tagViewerItem_IsChecked == false) {
 
             // tag is selected and NOT the checkbox !!!
+
+            setTagsDirty();
 
             final boolean isChecked = _tagViewer.getChecked(tviTag);
 
@@ -1281,6 +1283,12 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
    public void setFocus() {
 
       _tagViewer.getTree().setFocus();
+   }
+
+   private void setTagsDirty() {
+      _isTagDirty = true;
+
+      firePropertyChange(PROP_DIRTY);
    }
 
    @Override

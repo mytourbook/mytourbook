@@ -185,7 +185,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IPartListener2;
-import org.eclipse.ui.ISaveablePart2;
+import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
@@ -206,7 +206,7 @@ import org.eclipse.ui.progress.UIJob;
 /**
  * This editor can edit (when all is implemented) all data for a tour
  */
-public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITourProvider2 {
+public class TourDataEditorView extends ViewPart implements ISaveablePart, ITourProvider2 {
 
    public static final String     ID                            = "net.tourbook.views.TourDataEditorView";                //$NON-NLS-1$
 
@@ -478,7 +478,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
    private ActionModifyColumns              _actionModify_SwimSliceColumns;
    private ActionOpenAdjustAltitudeDialog   _actionOpenAdjustAltitudeDialog;
    private ActionOpenMarkerDialog           _actionOpenMarkerDialog;
-   private ActionSaveTour                   _actionSaveTour;
    private ActionSetStartDistanceTo0        _actionSetStartDistanceTo_0;
    private ActionSplitTour                  _actionSplitTour;
    private ActionToggleReadEditMode         _actionToggleReadEditMode;
@@ -2050,13 +2049,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
       }
    }
 
-   void actionSaveTour() {
-
-      // action is enabled when the tour is modified
-
-      saveTourIntoDB();
-   }
-
    void actionSetStartDistanceTo_0000() {
 
       // it is already checked if a valid data serie is available and first distance is > 0
@@ -2553,7 +2545,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
    private void createActions() {
 
-      _actionSaveTour = new ActionSaveTour(this);
       _actionCreateTour = new ActionCreateTour(this);
       _actionUndoChanges = new ActionUndoChanges(this);
       _actionDeleteDistanceValues = new ActionDeleteDistanceValues(this);
@@ -5647,11 +5638,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
       super.dispose();
    }
 
-   /**
-    * saving is done in the {@link #promptToSaveOnClose()} method
-    */
    @Override
-   public void doSave(final IProgressMonitor monitor) {}
+   public void doSave(final IProgressMonitor monitor) {
+      saveTourIntoDB();
+   }
 
    @Override
    public void doSaveAs() {}
@@ -5688,7 +5678,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
       /*
        * tour can only be saved when it's already saved in the database,except manual tours
        */
-      _actionSaveTour.setEnabled(isCellEditorInactive && _isTourDirty && isTourValid);
+//      _actionSaveTour.setEnabled(isCellEditorInactive && _isTourDirty && isTourValid);
 
       _actionCreateTour.setEnabled(isCellEditorInactive && !_isTourDirty);
       _actionUndoChanges.setEnabled(isCellEditorInactive && _isTourDirty);
@@ -5945,8 +5935,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
        * fill view toolbar
        */
       final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
-
-      tbm.add(_actionSaveTour);
 
       tbm.add(new Separator());
       tbm.add(_actionOpenMarkerDialog);
@@ -7130,32 +7118,32 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
       _isSetField = isBackup;
    }
 
-   /*
-    * this method is called when the application is shut down to save dirty tours or to cancel the
-    * shutdown
-    * @see org.eclipse.ui.ISaveablePart2#promptToSaveOnClose()
-    */
-   @Override
-   public int promptToSaveOnClose() {
-
-      int returnCode;
-
-      if (_isTourDirty == false) {
-         returnCode = ISaveablePart2.NO;
-      }
-
-      _isSavingInProgress = true;
-      {
-         if (saveTourWithValidation()) {
-            returnCode = ISaveablePart2.NO;
-         } else {
-            returnCode = ISaveablePart2.CANCEL;
-         }
-      }
-      _isSavingInProgress = false;
-
-      return returnCode;
-   }
+//   /*
+//    * this method is called when the application is shut down to save dirty tours or to cancel the
+//    * shutdown
+//    * @see org.eclipse.ui.ISaveablePart2#promptToSaveOnClose()
+//    */
+//   @Override
+//   public int promptToSaveOnClose() {
+//
+//      int returnCode;
+//
+//      if (_isTourDirty == false) {
+//         returnCode = ISaveablePart2.NO;
+//      }
+//
+//      _isSavingInProgress = true;
+//      {
+//         if (saveTourWithValidation()) {
+//            returnCode = ISaveablePart2.NO;
+//         } else {
+//            returnCode = ISaveablePart2.CANCEL;
+//         }
+//      }
+//      _isSavingInProgress = false;
+//
+//      return returnCode;
+//   }
 
    private void recreateViewer() {
 
@@ -7327,72 +7315,73 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
    private boolean saveTourIntoDB() {
 
       _isSavingInProgress = true;
+      {
+         updateModel_FromUI();
 
-      updateModel_FromUI();
+         _tourData.computeAltitudeUpDown();
+         _tourData.computeTourDrivingTime();
+         _tourData.computeComputedValues();
 
-      _tourData.computeAltitudeUpDown();
-      _tourData.computeTourDrivingTime();
-      _tourData.computeComputedValues();
+         /*
+          * saveTour will check the tour editor dirty state, but when the tour is saved the dirty
+          * flag
+          * can be set before to prevent an out of synch error
+          */
+         _isTourDirty = false;
 
-      /*
-       * saveTour will check the tour editor dirty state, but when the tour is saved the dirty flag
-       * can be set before to prevent an out of synch error
-       */
-      _isTourDirty = false;
+         _tourData = TourDatabase.saveTour(_tourData, true);
 
-      _tourData = TourDatabase.saveTour(_tourData, true);
+         updateMarkerMap();
 
-      updateMarkerMap();
+         // refresh combos
 
-      // refresh combos
+         if (_isTitleModified) {
 
-      if (_isTitleModified) {
+            _comboTitle.clearSelection();
+            _comboTitle.removeAll();
 
-         _comboTitle.clearSelection();
-         _comboTitle.removeAll();
-
-         // fill combobox
-         final TreeSet<String> arr = TourDatabase.getAllTourTitles();
-         for (final String string : arr) {
-            _comboTitle.add(string);
+            // fill combobox
+            final TreeSet<String> arr = TourDatabase.getAllTourTitles();
+            for (final String string : arr) {
+               _comboTitle.add(string);
+            }
+            _comboTitle.update();
+            _isTitleModified = false;
          }
-         _comboTitle.update();
-         _isTitleModified = false;
-      }
 
-      if (_isLocationStartModified) {
+         if (_isLocationStartModified) {
 
-         _comboLocation_Start.clearSelection();
-         _comboLocation_Start.removeAll();
+            _comboLocation_Start.clearSelection();
+            _comboLocation_Start.removeAll();
 
-         // fill combobox
-         final TreeSet<String> arr = TourDatabase.getAllTourPlaceStarts();
-         for (final String string : arr) {
-            _comboLocation_Start.add(string);
+            // fill combobox
+            final TreeSet<String> arr = TourDatabase.getAllTourPlaceStarts();
+            for (final String string : arr) {
+               _comboLocation_Start.add(string);
+            }
+            _comboLocation_Start.update();
+            _isLocationStartModified = false;
          }
-         _comboLocation_Start.update();
-         _isLocationStartModified = false;
-      }
 
-      if (_isLocationEndModified) {
+         if (_isLocationEndModified) {
 
-         _comboLocation_End.clearSelection();
-         _comboLocation_End.removeAll();
+            _comboLocation_End.clearSelection();
+            _comboLocation_End.removeAll();
 
-         // fill combobox
-         final TreeSet<String> arr = TourDatabase.getAllTourPlaceEnds();
-         for (final String string : arr) {
-            _comboLocation_End.add(string);
+            // fill combobox
+            final TreeSet<String> arr = TourDatabase.getAllTourPlaceEnds();
+            for (final String string : arr) {
+               _comboLocation_End.add(string);
+            }
+            _comboLocation_End.update();
+            _isLocationEndModified = false;
          }
-         _comboLocation_End.update();
-         _isLocationEndModified = false;
+
+         setTourClean();
+
+         // notify all views which display the tour type
+         TourManager.fireEvent(TourEventId.TOUR_CHANGED, new TourEvent(_tourData), TourDataEditorView.this);
       }
-
-      setTourClean();
-
-      // notify all views which display the tour type
-      TourManager.fireEvent(TourEventId.TOUR_CHANGED, new TourEvent(_tourData), TourDataEditorView.this);
-
       _isSavingInProgress = false;
 
       return true;

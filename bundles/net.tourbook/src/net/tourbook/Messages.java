@@ -453,6 +453,10 @@ public class Messages extends NLS {
    public static String        App_Action_RestoreDefault_Tooltip;
    public static String        App_Action_set_tour_type;
    public static String        App_Action_Save;
+
+   public static String App_Action_SaveTour;
+
+   public static String App_Action_SaveTour_Tooltip;
    public static String        App_Action_SetPerson;
    public static String        App_Action_SplitTour;
    public static String        App_Action_ToolTipLocation_AboveTourChart_Tooltip;
@@ -989,6 +993,10 @@ public class Messages extends NLS {
    public static String        Image__synch_graph_bySize_disabled;
    public static String        Image__synch_statistics;
    public static String        Image__synch_statistics_Disabled;
+   public static String Image__SaveTour;
+
+   public static String Image__SaveTour_Disabled;
+
    public static String        Image__SearchExternal;
    public static String        Image__SearchExternal_Disabled;
    public static String        Image__SearchToursByLocation;

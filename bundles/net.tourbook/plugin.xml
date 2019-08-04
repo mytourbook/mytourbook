@@ -898,8 +898,6 @@ THIS IS NOT YET FULLY IMPLEMENTED
                mnemonic="%command_view_selectedTour_mnemonic"
                tooltip="%command_view_selectedTour_tooltip"/>
                     
-            <!-- Tour Editor -->
-            
             <!-- 2D Map -->
             <command
                commandId="net.tourbook.mapping.command.tourMap"
@@ -915,28 +913,28 @@ THIS IS NOT YET FULLY IMPLEMENTED
          Important tools are displayed in the app toolbar
       -->
       
-      <menuContribution locationURI="toolbar:org.eclipse.ui.main.toolbar">
+      <menuContribution locationURI="toolbar:org.eclipse.ui.main.toolbar?before=net.tourbook.separator.EditTour">
       
-         <toolbar id="net.tourbook.toolbars.tourTools" label="%Toolbar_Name_Tools">
+         <toolbar id="mc_tb_TourEditor" label="%Toolbar_Name_Tools">
 
             <command
-               commandId="net.tourbook.command.tourDataEditor"
-               icon="icons/tour-editor.png"
-               label="%command_view_tourEditor"
-               mnemonic="%command_view_tourEditor_mnemonic"
-               tooltip="%command_view_tourEditor_tooltip">
-            </command>
-
-            <command
-               commandId="net.tourbook.command.createNewTour"
-               icon="icons/tour-new.png"
-               label="%command_createNewTour"
-               mnemonic="%command_createNewTour_mnemonic"
-               style="push"
+               commandId   ="net.tourbook.command.tourDataEditor"
+               icon        ="icons/tour-editor.png"
+               label       ="%command_view_tourEditor"
+               mnemonic    ="%command_view_tourEditor_mnemonic"
+               tooltip     ="%command_view_tourEditor_tooltip"
             />
 
+            <command
+               commandId   ="net.tourbook.command.createNewTour"
+               icon        ="icons/tour-new.png"
+               label       ="%command_createNewTour"
+               mnemonic    ="%command_createNewTour_mnemonic"
+            />
 
          </toolbar>
+         
+         
       </menuContribution>
       
       
