@@ -20,6 +20,8 @@ import com.garmin.fit.DeveloperField;
 import com.garmin.fit.RecordMesg;
 import com.garmin.fit.RecordMesgListener;
 
+import java.util.stream.StreamSupport;
+
 import net.tourbook.common.UI;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
@@ -264,13 +266,13 @@ public class MesgListener_Record extends AbstractMesgListener implements RecordM
 
       /**
        * Running dynamics data <code>
-
+      
       //	|| fieldName.equals("stance_time") //				     253.0  ms
       //	|| fieldName.equals("stance_time_balance") //		   51.31 percent
       //	|| fieldName.equals("step_length") //				    1526.0  mm
       // || fieldName.equals("vertical_oscillation") //       105.2  mm          //$NON-NLS-1$
       // || fieldName.equals("vertical_ratio") //               8.96 percent     //$NON-NLS-1$
-
+      
        * </code>
        */
       final Float stanceTime = mesg.getStanceTime();
@@ -349,6 +351,14 @@ public class MesgListener_Record extends AbstractMesgListener implements RecordM
 
          case DEV_FIELD_NAME__POWER:
          case DEV_FIELD_NAME__RP_POWER:
+
+            //If both Stryd ("Power") and Garmin RD Pod Power data "RP_Power"
+            //are present, we only keep the Stryd data
+            if (devField.getName().equals(DEV_FIELD_NAME__RP_POWER) &&
+                  StreamSupport.stream(mesg.getDeveloperFields().spliterator(), false)
+                        .anyMatch(developerField -> developerField.getName().equals(DEV_FIELD_NAME__POWER))) {
+               break;
+            }
 
             //  112 Watts
 
