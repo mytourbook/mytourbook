@@ -244,7 +244,6 @@ public class FitLogSAXHandler extends DefaultHandler {
       } else if (name.equals(TAG_ACTIVITY_CUSTOM_DATA_FIELDS)) {
 
          _isInCustomDataFields = false;
-         _hasCustomDataFields = true;
 
       } else if (name.equals(TAG_ACTIVITY_CUSTOM_DATA_FIELD_DEFINITIONS)) {
 
@@ -771,6 +770,10 @@ public class FitLogSAXHandler extends DefaultHandler {
             if (customFieldOptions != null && customFieldOptions.trim().length() != 0) {
 
                final String[] tokens = customFieldOptions.split("\\|"); //$NON-NLS-1$
+               if (tokens.length < 2) {
+                  return;
+               }
+
                final int numberOfDecimals = Integer.parseInt(tokens[1]);
 
                final String customFieldValue = _currentActivity.customDataFields.get(customFieldName);
@@ -954,6 +957,7 @@ public class FitLogSAXHandler extends DefaultHandler {
          initTour(attributes);
       } else if (name.equals(TAG_ACTIVITY_CUSTOM_DATA_FIELDS)) {
          _isInCustomDataFields = true;
+         _hasCustomDataFields = true;
 
       } else if (name.equals(TAG_ACTIVITY_CUSTOM_DATA_FIELD_DEFINITIONS)) {
          _isInCustomDataFieldDefinitions = true;
