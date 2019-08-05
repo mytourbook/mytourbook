@@ -466,7 +466,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ITour
    private Action_RemoveSwimStyle           _action_RemoveSwimStyle;
    private Action_SetSwimStyle_Header       _action_SetSwimStyle_Header;
    private ActionComputeDistanceValues      _actionComputeDistanceValues;
-   private ActionCreateTour                 _actionCreateTour;
    private ActionCreateTourMarker           _actionCreateTourMarker;
    private ActionCSVTimeSliceExport         _actionCsvTimeSliceExport;
    private ActionDeleteDistanceValues       _actionDeleteDistanceValues;
@@ -2545,7 +2544,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ITour
 
    private void createActions() {
 
-      _actionCreateTour = new ActionCreateTour(this);
       _actionUndoChanges = new ActionUndoChanges(this);
       _actionDeleteDistanceValues = new ActionDeleteDistanceValues(this);
       _actionComputeDistanceValues = new ActionComputeDistanceValues(this);
@@ -5678,9 +5676,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ITour
       /*
        * tour can only be saved when it's already saved in the database,except manual tours
        */
-//      _actionSaveTour.setEnabled(isCellEditorInactive && _isTourDirty && isTourValid);
+// TODO     _actionSaveTour.setEnabled(isCellEditorInactive && _isTourDirty && isTourValid);
 
-      _actionCreateTour.setEnabled(isCellEditorInactive && !_isTourDirty);
       _actionUndoChanges.setEnabled(isCellEditorInactive && _isTourDirty);
 
       _actionOpenAdjustAltitudeDialog.setEnabled(isCellEditorInactive && canUseTool);
@@ -5945,7 +5942,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ITour
       tbm.add(_actionToggleRowSelectMode);
 
       tbm.add(new Separator());
-      tbm.add(_actionCreateTour);
       tbm.add(_actionViewSettings);
 
       tbm.update(true);

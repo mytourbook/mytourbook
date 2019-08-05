@@ -32,6 +32,7 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.ToolBarContributionItem;
 import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -47,7 +48,9 @@ import org.eclipse.ui.application.IActionBarConfigurer;
  */
 public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
-   private static final String               MENU_CONTRIB_TOOLBAR_APP_FILTER = "mc_tb_AppFilter"; //$NON-NLS-1$
+   private static final String               MENU_CONTRIB_TOOLBAR_APP_FILTER = "mc_tb_AppFilter";            //$NON-NLS-1$
+
+   private static IPreferenceStore           _prefStore                      = TourbookPlugin.getPrefStore();
 
    private IWorkbenchWindow                  _window;
 
@@ -249,17 +252,21 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
       }
 
       {
-         /*
-          * Toolbar: mc_tb_TourEditor | Save tour
+         /**
+          * Toolbar: mc_tb_TourEditor
+          * <p>
+          * The save action is added with the plugin.xml menuContrigution -> complicated but this
+          * was the only way I've found, that the save action is at the end of the toolbar and
+          * not at the beginning
+          * <p>
+          * This toolbar is also used as a placeholder for the toolbar location
           */
          final IToolBarManager tbm_TourEditor = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
-
-         tbm_TourEditor.add(new Separator("sep_BeforeTourSave"));
-         tbm_TourEditor.add(_action_Save);
 
          final ToolBarContributionItem tbContribItem = new ToolBarContributionItem(
                tbm_TourEditor,
                "mc_tb_TourEditor"); //$NON-NLS-1$
+
          coolBar.add(tbContribItem);
       }
 
@@ -267,11 +274,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
          /*
           * Toolbar: Measurement
           */
-         final boolean isShowMeasurement = TourbookPlugin
-               .getDefault()
-               .getPreferenceStore()
-               .getBoolean(ITourbookPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI);
-
+         final boolean isShowMeasurement = _prefStore.getBoolean(ITourbookPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI);
          if (isShowMeasurement) {
 
             final IToolBarManager tbMgr_System = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
@@ -344,7 +347,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
       register(_actionCloseAllPerspective);
 
       /*
-       * Action: Save tour
+       * Action: Save tour with the command id "org.eclipse.ui.file.save"
        */
       _action_Save = ActionFactory.SAVE.create(window);
 

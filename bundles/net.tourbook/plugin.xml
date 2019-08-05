@@ -913,7 +913,7 @@ THIS IS NOT YET FULLY IMPLEMENTED
          Important tools are displayed in the app toolbar
       -->
       
-      <menuContribution locationURI="toolbar:org.eclipse.ui.main.toolbar?before=sep_BeforeTourSave">
+      <menuContribution locationURI="toolbar:org.eclipse.ui.main.toolbar">
       
          <toolbar id="mc_tb_TourEditor" label="%Toolbar_Name_Tools">
 
@@ -921,7 +921,6 @@ THIS IS NOT YET FULLY IMPLEMENTED
                commandId   ="net.tourbook.command.tourDataEditor"
                icon        ="icons/tour-editor.png"
                label       ="%command_view_tourEditor"
-               mnemonic    ="%command_view_tourEditor_mnemonic"
                tooltip     ="%command_view_tourEditor_tooltip"
             />
 
@@ -929,12 +928,18 @@ THIS IS NOT YET FULLY IMPLEMENTED
                commandId   ="net.tourbook.command.createNewTour"
                icon        ="icons/tour-new.png"
                label       ="%command_createNewTour"
-               mnemonic    ="%command_createNewTour_mnemonic"
+            />
+
+            <command
+               commandId      ="org.eclipse.ui.file.save"
+               icon           ="icons/save-tour.png"
+               disabledIcon   ="icons/save-tour-disabled.png"
+               tooltip        ="%Command_App_SaveTour_Tooltip"
             />
 
          </toolbar>
          
-         
+            
       </menuContribution>
       
       
