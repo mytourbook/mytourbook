@@ -15,11 +15,6 @@
  *******************************************************************************/
 package net.tourbook.device.garmin.fit.listeners;
 
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.osgi.util.NLS;
-import org.joda.time.Period;
-import org.joda.time.PeriodType;
-
 import com.garmin.fit.DateTime;
 import com.garmin.fit.DeveloperField;
 import com.garmin.fit.RecordMesg;
@@ -35,13 +30,18 @@ import net.tourbook.device.garmin.fit.FitData;
 import net.tourbook.device.garmin.fit.IPreferences;
 import net.tourbook.device.garmin.fit.Messages;
 
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.osgi.util.NLS;
+import org.joda.time.Period;
+import org.joda.time.PeriodType;
+
 public class MesgListener_Record extends AbstractMesgListener implements RecordMesgListener {
 
    private static final String DEV_FIELD_NAME__CADENCE              = "Cadence";                                  //$NON-NLS-1$
    private static final String DEV_FIELD_NAME__GROUND_TIME          = "Ground Time";                              //$NON-NLS-1$
    private static final String DEV_FIELD_NAME__LEG_SPRING_STIFFNESS = "Leg Spring Stiffness";                     //$NON-NLS-1$
    private static final String DEV_FIELD_NAME__POWER                = "Power";                                    //$NON-NLS-1$
-   //Power Data from Stryd sensor
+   //Power Data from Garmin Running Dynamics Pod
    private static final String DEV_FIELD_NAME__RP_POWER             = "RP_Power";                                 //$NON-NLS-1$
    private static final String DEV_FIELD_NAME__FORM_POWER           = "Form Power";                               //$NON-NLS-1$
    private static final String DEV_FIELD_NAME__ELEVATION            = "Elevation";                                //$NON-NLS-1$
@@ -264,13 +264,13 @@ public class MesgListener_Record extends AbstractMesgListener implements RecordM
 
       /**
        * Running dynamics data <code>
-      
+
       //	|| fieldName.equals("stance_time") //				     253.0  ms
       //	|| fieldName.equals("stance_time_balance") //		   51.31 percent
       //	|| fieldName.equals("step_length") //				    1526.0  mm
       // || fieldName.equals("vertical_oscillation") //       105.2  mm          //$NON-NLS-1$
       // || fieldName.equals("vertical_ratio") //               8.96 percent     //$NON-NLS-1$
-      
+
        * </code>
        */
       final Float stanceTime = mesg.getStanceTime();
