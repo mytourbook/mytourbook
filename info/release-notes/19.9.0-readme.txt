@@ -19,7 +19,9 @@ New
 Improvements   
 ============
 
-* 
+* Tour Editor
+  - Tour can be saved with <Ctrl>+S when "Tour Editor" view is the active view
+  - The save and new tour actions are removed from the view toolbar but are available at the main toolbar
 
 
 Changes

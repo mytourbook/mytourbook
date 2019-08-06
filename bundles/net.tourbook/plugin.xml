@@ -472,14 +472,14 @@
             visible="true"/>
       
          <command
-            commandId="net.tourbook.command.createNewTour"
-            icon="icons/tour-new.png"
-            label="%command_createNewTour"
-            mnemonic="%command_createNewTour_mnemonic"/>
+            commandId   ="net.tourbook.command.createNewTour"
+            icon        ="icons/tour-new.png"
+            label       ="%Command_App_CreateNewTour"
+            mnemonic    ="%Command_App_CreateNewTour_Mnemonic"/>
             
          <separator
-            name="net.tourbook.separator.additional"
-            visible="true"/>
+            name        ="net.tourbook.separator.additional"
+            visible     ="true"/>
 
       </menuContribution>
 
@@ -927,9 +927,16 @@ THIS IS NOT YET FULLY IMPLEMENTED
             <command
                commandId   ="net.tourbook.command.createNewTour"
                icon        ="icons/tour-new.png"
-               label       ="%command_createNewTour"
+               tooltip     ="%Command_App_CreateNewTour_Tooltip"
             />
 
+            <!-- 
+               This command handler for this global command is defined in 
+               
+               net.tourbook.application.ApplicationActionBarAdvisor._action_Save
+               
+               Parts have to implement ISaveablePart to activate this action when part is active.
+            -->
             <command
                commandId      ="org.eclipse.ui.file.save"
                icon           ="icons/save-tour.png"
@@ -1101,302 +1108,316 @@ THIS IS NOT YET FULLY IMPLEMENTED
    <extension point="org.eclipse.ui.commands">
 
       <command
-            id="command.net.tourbook.views.rawData.RawDataView"
-            name="%view_name_Data_Import"
-            defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewTourImport"
-            />
-      <command
-            id="command.net.tourbook.tour.TourLogView"
-            name="%View_Name_TourLog"
-            defaultHandler="net.tourbook.ui.views.ActionHandler_OpenView_TourLog"
-            />
-      <command
-            id="command.net.tourbook.views.tourListView"
-            name="%view_name_Book"
-            defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewTourBook"
-            />
-            
-      <command
-            id="command.net.tourbook.views.tagViewID"
-            name="%view_name_tagView"
-            defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewTagging"
-            />
-      <command
-            id="command.net.tourbook.views.calendar.CalendarView"
-            name="%view_name_Calendar"
-            defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewCalendar"
-            />
-      <command
-            id="command.net.tourbook.views.tourCatalog.TourCatalogView"
-            name="%view_name_ReferenceTours"
-            defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewTourCatalog"
-            />
-      <command
-            id="command.net.tourbook.statistic.StatisticView"
-            name="%view_name_Statistics"
-            defaultHandler="net.tourbook.statistic.ActionHandlerOpenViewStatistic"
-            />
-
-      <command
-         id="command.net.tourbook.search.SearchView"
-         name="%View_Name_SearchAll"
-         defaultHandler="net.tourbook.search.ActionHandler_OpenSearchView"
-         />
-
-      <command
-         id="command.de.byteholder.geoclipse.poi.ShowPOI"
-         name="%View_Name_SearchPOI"
-         defaultHandler="de.byteholder.geoclipse.poi.ActionHandlerOpenViewPOI"
-         />
-
-      <command
-         id="command.net.tourbook.views.collatedToursViewID"
-         name="%View_Name_CollatedTours"
-         defaultHandler="net.tourbook.ui.views.collateTours.ActionHandler_OpenView_CollatedTours"
-         />
-      <command
-         id="command.net.tourbook.ui.views.TourMarkerAllView"
-         name="%View_Name_TourMarkerAll"
-         defaultHandler="net.tourbook.ui.views.tourMarker.ActionHandlerOpenViewTourMarkerAll"
-         />
-      
-      <command
-         id                ="command.net.tourbook.views.TourMarkerView"
-         name              ="%view_name_Marker"
-         defaultHandler    ="net.tourbook.ui.views.tourMarker.ActionHandlerOpenViewTourMarker"/>
-      
-      <command
-         id                ="command.net.tourbook.ui.views.tagging.TourTags_View"
-         name              ="%View_Name_TourTags"
-         defaultHandler    ="net.tourbook.ui.views.tagging.ActionHandler_OpenView_TourTags"/>
-   
-      <command
-         id="command.net.tourbook.views.TourBlogView"
-         name="%View_Name_TourBlog"
-         defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewTourBlog"
-         />
-
-      <command
-         id="command.net.tourbook.views.TourInfoView"
-         name="%View_Name_TourBlog"
-         defaultHandler="net.tourbook.ui.views.ActionHandler_OpenView_TourInfo"
-         />
-
-      <command
-         id="command.net.tourbook.views.TourWaypointView"
-         name="%View_Name_Waypoint"
-         defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewTourWaypoint"
-      />
-      
-      <command
-         id="command.net.tourbook.views.HeartRateVariabilityChart"
-         name="%View_Name_HeartRateVariabilityChart"
-         defaultHandler="net.tourbook.ui.views.heartRateVariability.ActionHandler_OpenView_HeartRateVariability"
-      />
-      
-      <command
-         id="command.net.tourbook.views.ConconiChart"
-         name="%View_Name_ConconiChart"
-         defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewConconiChart"
-      />
-      
-      <command
-         id="command.net.tourbook.training.Training"
-         name="%View_Name_Training"
-         defaultHandler="net.tourbook.training.ActionHandlerOpenViewTraining"
-      />
-      
-      <command
-         id="command.net.tourbook.ui.views.TourChartSmoothingView"
-         name="%View_Name_TourChartSmoothing"
-         defaultHandler="net.tourbook.ui.views.ActionHandlerOpenViewChartSmoothing"
-      />
-  
-      <command
-            id="net.tourbook.command.tourChart.tool.adjustAltitude"
-            name="%command_tourChart_tool_adjustAltitude">
-      </command>
-      <command
-            id="net.tourbook.command.tourChart.showStartTime"
-            name="%command_tourChart_showStartTime">
-      </command>
-      <command
-            id="net.tourbook.command.tourChart.canScrollChart"
-            name="%command_tourChart_canScrollChart">
-      </command>
-
-      <command
-            id="net.tourbook.command.selectedTour"
-            defaultHandler="net.tourbook.ui.action.ActionHandlerViewSelectedTour"
-            name="%command_view_selectedTour">
-      </command>
-      <command
-            id="net.tourbook.command.device.importFromFile"
-            defaultHandler="net.tourbook.importdata.ActionHandlerImportFromFile"
-            name="%command_device_importFromFile">
-      </command>
-      
-      <command
-            id="net.tourbook.command.device.synchronize.direct"
-            defaultHandler="net.tourbook.importdata.ActionHandlerImportFromDeviceDirect"
-            name="%Command_Device_ReceiveFromSerialPort_Directly">
-      </command>
-      <command
-            id="net.tourbook.command.device.synchronize"
-            defaultHandler="net.tourbook.importdata.ActionHandlerImportFromDevice"
-            name="%Command_Device_ReceiveFromSerialPort_Configured">
-      </command>
-      <command
-            id="net.tourbook.command.tourChart.options"
-            name="%command_tourChart_options">
-      </command>
-
-      <command
-         id            ="net.tourbook.command.tourCompareWizard"
-         name         ="%command_tourCompare_wizard"
-         defaultHandler   ="net.tourbook.ui.views.tourCatalog.ActionHandlerTourCompareWizard"
-      />
-      
-      <command
-         id            ="net.tourbook.command.GeoParts"
-         name         ="%Command_GeoParts"
-         defaultHandler   ="net.tourbook.ui.views.geoCompare.ActionHandler_OpenView_GeoParts"
-      />
-      
-      <command
-            id="net.tourbook.command.tourChart.tool.graphAnalyzer"
-            name="%command_tourChart_tool_graphAnalyzer"
-            defaultHandler="net.tourbook.ui.action.ActionHandlerViewGraphAnalyzer"
-            />
-
-      <command
-            id="net.tourbook.command.tourChart.tool.tourSegmenter"
-            name="%command_tourChart_tool_tourSegmenter"
-            defaultHandler="net.tourbook.ui.views.tourSegmenter.ActionHandlerViewTourSegmenter"
-            />
-
-
-      <command
-            id="net.tourbook.command.tourDataEditor"
-            name="%command_view_tourEditor"
-            defaultHandler="net.tourbook.ui.action.ActionHandlerTourDataEditor"
-            />
-      <command
-            id="net.tourbook.mapping.command.tourMap"
-            name="%command_tour_map_name"
-            defaultHandler="net.tourbook.map2.action.ActionHandlerOpenTourMapView"
-            />
-
-      <command
-            id="net.tourbook.command.createNewTour"
-            name="%command_createNewTour"
-            defaultHandler="net.tourbook.ui.action.ActionHandlerCreateNewTour"
-            />
-
-      <command
-         id            ="net.tourbook.command.dbTool.consistencyCheck"
-         name         ="%command_dbtool_consistency_check"
-         defaultHandler   ="net.tourbook.ui.action.ActionHandlerDbConsistencyCheck"
+         id             ="command.net.tourbook.views.rawData.RawDataView"
+         name           ="%view_name_Data_Import"
+         defaultHandler ="net.tourbook.ui.views.ActionHandlerOpenViewTourImport"
       />
 
+      <command
+         id             ="command.net.tourbook.tour.TourLogView"
+         name           ="%View_Name_TourLog"
+         defaultHandler ="net.tourbook.ui.views.ActionHandler_OpenView_TourLog"
+      />
+
+      <command
+         id             ="command.net.tourbook.views.tourListView"
+         name           ="%view_name_Book"
+         defaultHandler ="net.tourbook.ui.views.ActionHandlerOpenViewTourBook"
+      />
+
+      <command
+         id             ="command.net.tourbook.views.tagViewID"
+         name           ="%view_name_tagView"
+         defaultHandler ="net.tourbook.ui.views.ActionHandlerOpenViewTagging"
+      />
+
+      <command
+         id             ="command.net.tourbook.views.calendar.CalendarView"
+         name           ="%view_name_Calendar"
+         defaultHandler ="net.tourbook.ui.views.ActionHandlerOpenViewCalendar"
+      />
+
+      <command
+         id             ="command.net.tourbook.views.tourCatalog.TourCatalogView"
+         name           ="%view_name_ReferenceTours"
+         defaultHandler ="net.tourbook.ui.views.ActionHandlerOpenViewTourCatalog"
+      />
+
+      <command
+         id             ="command.net.tourbook.statistic.StatisticView"
+         name           ="%view_name_Statistics"
+         defaultHandler ="net.tourbook.statistic.ActionHandlerOpenViewStatistic"
+      />
+
+      <command
+         id             ="command.net.tourbook.search.SearchView"
+         name           ="%View_Name_SearchAll"
+         defaultHandler ="net.tourbook.search.ActionHandler_OpenSearchView"
+      />
+
+      <command
+         id             ="command.de.byteholder.geoclipse.poi.ShowPOI"
+         name           ="%View_Name_SearchPOI"
+         defaultHandler ="de.byteholder.geoclipse.poi.ActionHandlerOpenViewPOI"
+      />
+
+      <command
+         id             ="command.net.tourbook.views.collatedToursViewID"
+         name           ="%View_Name_CollatedTours"
+         defaultHandler ="net.tourbook.ui.views.collateTours.ActionHandler_OpenView_CollatedTours"
+      />
+
+      <command
+         id             ="command.net.tourbook.ui.views.TourMarkerAllView"
+         name           ="%View_Name_TourMarkerAll"
+         defaultHandler ="net.tourbook.ui.views.tourMarker.ActionHandlerOpenViewTourMarkerAll"
+      />
+
+      <command
+         id             ="command.net.tourbook.views.TourMarkerView"
+         name           ="%view_name_Marker"
+         defaultHandler ="net.tourbook.ui.views.tourMarker.ActionHandlerOpenViewTourMarker"
+      />
+
+      <command
+         id             ="command.net.tourbook.ui.views.tagging.TourTags_View"
+         name           ="%View_Name_TourTags"
+         defaultHandler ="net.tourbook.ui.views.tagging.ActionHandler_OpenView_TourTags"
+      />
+
+      <command
+         id             ="command.net.tourbook.views.TourBlogView"
+         name           ="%View_Name_TourBlog"
+         defaultHandler ="net.tourbook.ui.views.ActionHandlerOpenViewTourBlog"
+      />
+
+      <command
+         id             ="command.net.tourbook.views.TourInfoView"
+         name           ="%View_Name_TourBlog"
+         defaultHandler ="net.tourbook.ui.views.ActionHandler_OpenView_TourInfo"
+      />
+
+      <command
+         id             ="command.net.tourbook.views.TourWaypointView"
+         name           ="%View_Name_Waypoint"
+         defaultHandler ="net.tourbook.ui.views.ActionHandlerOpenViewTourWaypoint"
+      />
+
+      <command
+         id             ="command.net.tourbook.views.HeartRateVariabilityChart"
+         name           ="%View_Name_HeartRateVariabilityChart"
+         defaultHandler ="net.tourbook.ui.views.heartRateVariability.ActionHandler_OpenView_HeartRateVariability"
+      />
+
+      <command
+         id             ="command.net.tourbook.views.ConconiChart"
+         name           ="%View_Name_ConconiChart"
+         defaultHandler ="net.tourbook.ui.views.ActionHandlerOpenViewConconiChart"
+      />
+
+      <command
+         id             ="command.net.tourbook.training.Training"
+         name           ="%View_Name_Training"
+         defaultHandler ="net.tourbook.training.ActionHandlerOpenViewTraining"
+      />
+
+      <command
+         id             ="command.net.tourbook.ui.views.TourChartSmoothingView"
+         name           ="%View_Name_TourChartSmoothing"
+         defaultHandler ="net.tourbook.ui.views.ActionHandlerOpenViewChartSmoothing"
+      />
+
+      <command
+         id             ="net.tourbook.command.tourChart.tool.adjustAltitude"
+         name           ="%command_tourChart_tool_adjustAltitude"
+      />
+
+      <command
+         id             ="net.tourbook.command.tourChart.showStartTime"
+         name           ="%command_tourChart_showStartTime"
+      />
+
+      <command
+         id             ="net.tourbook.command.tourChart.canScrollChart"
+         name           ="%command_tourChart_canScrollChart"
+      />
+
+      <command
+         id             ="net.tourbook.command.selectedTour"
+         defaultHandler ="net.tourbook.ui.action.ActionHandlerViewSelectedTour"
+         name           ="%command_view_selectedTour"
+      />
+
+      <command
+         id             ="net.tourbook.command.device.importFromFile"
+         name           ="%command_device_importFromFile"
+         defaultHandler ="net.tourbook.importdata.ActionHandlerImportFromFile"
+      />
+
+      <command
+         id             ="net.tourbook.command.device.synchronize.direct"
+         name           ="%Command_Device_ReceiveFromSerialPort_Directly"
+         defaultHandler ="net.tourbook.importdata.ActionHandlerImportFromDeviceDirect"
+      />
+
+      <command
+         id             ="net.tourbook.command.device.synchronize"
+         name           ="%Command_Device_ReceiveFromSerialPort_Configured"
+         defaultHandler ="net.tourbook.importdata.ActionHandlerImportFromDevice"
+      />
+
+      <command
+         id             ="net.tourbook.command.tourChart.options"
+         name           ="%command_tourChart_options"
+      />
+
+      <command
+         id             ="net.tourbook.command.tourCompareWizard"
+         name           ="%command_tourCompare_wizard"
+         defaultHandler ="net.tourbook.ui.views.tourCatalog.ActionHandlerTourCompareWizard"
+      />
+
+      <command
+         id             ="net.tourbook.command.GeoParts"
+         name           ="%Command_GeoParts"
+         defaultHandler ="net.tourbook.ui.views.geoCompare.ActionHandler_OpenView_GeoParts"
+      />
+
+      <command
+         id             ="net.tourbook.command.tourChart.tool.graphAnalyzer"
+         name           ="%command_tourChart_tool_graphAnalyzer"
+         defaultHandler ="net.tourbook.ui.action.ActionHandlerViewGraphAnalyzer"
+      />
+
+      <command
+         id             ="net.tourbook.command.tourChart.tool.tourSegmenter"
+         name           ="%command_tourChart_tool_tourSegmenter"
+         defaultHandler ="net.tourbook.ui.views.tourSegmenter.ActionHandlerViewTourSegmenter"
+      />
+
+      <command
+         id             ="net.tourbook.command.tourDataEditor"
+         name           ="%command_view_tourEditor"
+         defaultHandler ="net.tourbook.ui.action.ActionHandlerTourDataEditor"
+      />
+
+      <command
+         id             ="net.tourbook.mapping.command.tourMap"
+         name           ="%command_tour_map_name"
+         defaultHandler ="net.tourbook.map2.action.ActionHandlerOpenTourMapView"
+      />
+
+      <command
+         id             ="net.tourbook.command.createNewTour"
+         name           ="%Command_App_CreateNewTour"
+         defaultHandler ="net.tourbook.ui.action.ActionHandlerCreateNewTour"
+      />
+
+      <command
+         id             ="net.tourbook.command.dbTool.consistencyCheck"
+         name           ="%command_dbtool_consistency_check"
+         defaultHandler ="net.tourbook.ui.action.ActionHandlerDbConsistencyCheck"
+      />
 
       <!-- 
-      
-THIS IS NOT YET FULLY IMPLEMENTED
-      
+
+      THIS IS NOT YET FULLY IMPLEMENTED
+
       <command
          id            ="net.tourbook.command.dbTool.CompressDB"
          name         ="%Command_DbTool_Compress_Database"
          defaultHandler   ="net.tourbook.ui.action.ActionHandlerDb_CompressDB"
       />
-      
-      -->            
+
+      -->
 
       <command
-            id="net.tourbook.command.OpenHomePage"
-            name="%Command_App_OpenHomePage"
-            defaultHandler="net.tourbook.ui.action.ActionHandlerOpenHomePage"
-            />
+         id             ="net.tourbook.command.OpenHomePage"
+         name           ="%Command_App_OpenHomePage"
+         defaultHandler ="net.tourbook.ui.action.ActionHandlerOpenHomePage"
+      />
+
       <command
-            id="net.tourbook.command.OpenForum"
-            name="%Command_App_OpenForum"
-            defaultHandler="net.tourbook.ui.action.ActionHandlerOpenForum"
-            />
+         id             ="net.tourbook.command.OpenForum"
+         name           ="%Command_App_OpenForum"
+         defaultHandler ="net.tourbook.ui.action.ActionHandlerOpenForum"
+      />
 
       <!--
          Photo filter
       -->            
-               
+
       <command
-           id="command.net.tourbook.PhotoFilter"
-           name="%Action_TourPhotoFilter"
-           defaultHandler="net.tourbook.tour.photo.ActionHandlerPhotoFilter">
+        id              ="command.net.tourbook.PhotoFilter"
+        name            ="%Action_TourPhotoFilter"
+        defaultHandler  ="net.tourbook.tour.photo.ActionHandlerPhotoFilter">
 
          <state
-            class="org.eclipse.ui.handlers.RegistryToggleState:false"
-            id="org.eclipse.ui.commands.toggleState">
+            id       ="org.eclipse.ui.commands.toggleState">
+            class    ="org.eclipse.ui.handlers.RegistryToggleState:false"
          </state>
-         
+
       </command>
-               
+
       <!--
          Photo 
-      -->            
+      -->
+
+      <command
+         id             ="command.net.tourbook.photo.LinkPhotoWithTourInFolder"
+         name           ="%Action_PhotoDirectory_LinkPhotoWithTourInFolder"
+         defaultHandler ="net.tourbook.tour.photo.ActionHandlerLinkPhotoWithTourInFolder"
+      />
       
       <command
-         id="command.net.tourbook.photo.LinkPhotoWithTourInFolder"
-         name="%Action_PhotoDirectory_LinkPhotoWithTourInFolder"
-         defaultHandler="net.tourbook.tour.photo.ActionHandlerLinkPhotoWithTourInFolder"
-         />
+         id             ="command.net.tourbook.photo.LinkPhotoWithTourInGallerySelected"
+         name           ="%Action_PhotoDirectory_LinkPhotoWithTourInGallerySelected"
+         defaultHandler ="net.tourbook.tour.photo.ActionHandlerLinkPhotoWithTourInGallerySelected"
+      />
+      
+      <command 
+         id             ="command.net.tourbook.photo.LinkPhotoWithTourInGalleryAll"
+         name           ="%Action_PhotoDirectory_LinkPhotoWithTourInGalleryAll"
+         defaultHandler ="net.tourbook.tour.photo.ActionHandlerLinkPhotoWithTourInGalleryAll"
+      />
       
       <command
-         id="command.net.tourbook.photo.LinkPhotoWithTourInGallerySelected"
-         name="%Action_PhotoDirectory_LinkPhotoWithTourInGallerySelected"
-         defaultHandler="net.tourbook.tour.photo.ActionHandlerLinkPhotoWithTourInGallerySelected"
-         />
-      
-      <command id="command.net.tourbook.photo.LinkPhotoWithTourInGalleryAll"
-         name="%Action_PhotoDirectory_LinkPhotoWithTourInGalleryAll"
-         defaultHandler="net.tourbook.tour.photo.ActionHandlerLinkPhotoWithTourInGalleryAll"
-         />
-      
+         id             ="command.net.tourbook.photo.TourPhotosView"
+         name           ="%View_Name_PhotoTourPhotos"
+         defaultHandler ="net.tourbook.tour.photo.ActionHandlerOpenTourPhotosView"
+      />
+
       <command
-         id="command.net.tourbook.photo.TourPhotosView"
-         name="%View_Name_PhotoTourPhotos"
-         defaultHandler="net.tourbook.tour.photo.ActionHandlerOpenTourPhotosView"
-         />
-               
-      <command
-           id="command.net.tourbook.PicDir.SyncPhotoWithTour"
-           name="%Command_PicDir_SyncPhotoWithTour"
-           defaultHandler="net.tourbook.tour.photo.ActionHandlerSyncPhotoWithTour">
+         id             ="command.net.tourbook.PicDir.SyncPhotoWithTour"
+         name           ="%Command_PicDir_SyncPhotoWithTour"
+         defaultHandler ="net.tourbook.tour.photo.ActionHandlerSyncPhotoWithTour">   
 
          <state
-            class="org.eclipse.ui.handlers.RegistryToggleState"
-            id="org.eclipse.ui.commands.toggleState">
+            id       ="org.eclipse.ui.commands.toggleState">
+            class    ="org.eclipse.ui.handlers.RegistryToggleState"
          </state>
-         
+
       </command>
-            
+
 
       <!--
          Photo folder history
-      -->            
-               
+      -->
+
       <command
-         id="net.tourbook.command.PicDir.ShowNaviationHistory"
-         name="%Command_PicDir_ShowNaviationHistory"
-         />
-      
+         id             ="net.tourbook.command.PicDir.ShowNaviationHistory"
+         name           ="%Command_PicDir_ShowNaviationHistory"
+      />
+
       <command
-         id="net.tourbook.command.PicDir.NavigateHistoryBackward"
-         name="%Command_PicDir_History_Backward"
-         />
-           
+         id             ="net.tourbook.command.PicDir.NavigateHistoryBackward"
+         name           ="%Command_PicDir_History_Backward"
+      />
+  
       <command
-         id="net.tourbook.command.PicDir.NavigateHistoryForward"
-         name="%Command_PicDir_History_Forward"
-         />
+         id             ="net.tourbook.command.PicDir.NavigateHistoryForward"
+         name           ="%Command_PicDir_History_Forward"
+      />
 
       <!--
          Tour signs
@@ -1810,10 +1831,10 @@ THIS IS NOT YET FULLY IMPLEMENTED
       />
 
       <key
-         commandId="net.tourbook.command.createNewTour"
-         sequence="%Shortcut_Key_App_NewTour"
-         contextId="org.eclipse.ui.contexts.window"
-         schemeId="net.tourbook.scheme"
+         commandId   ="net.tourbook.command.createNewTour"
+         sequence    ="%Shortcut_Key_App_NewTour"
+         contextId   ="org.eclipse.ui.contexts.window"
+         schemeId    ="net.tourbook.scheme"
       />
 
 
