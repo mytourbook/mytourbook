@@ -311,6 +311,11 @@ public class MesgListener_Record extends AbstractMesgListener implements RecordM
     */
    private void setRecord_DeveloperData(final RecordMesg mesg, final TimeData timeData) {
 
+      final boolean containsMultiplePowerDataSources =
+            StreamSupport.stream(mesg.getDeveloperFields().spliterator(), false)
+                  .anyMatch(developerField -> developerField.getName().equals(DEV_FIELD_NAME__POWER) &&
+                        developerField.getName().equals(DEV_FIELD_NAME__POWER));
+
       for (final DeveloperField devField : mesg.getDeveloperFields()) {
 
          switch (devField.getName()) {
@@ -352,12 +357,22 @@ public class MesgListener_Record extends AbstractMesgListener implements RecordM
          case DEV_FIELD_NAME__POWER:
          case DEV_FIELD_NAME__RP_POWER:
 
-            //If both Stryd ("Power") and Garmin RD Pod Power data ("RP_Power")
-            //are present, we skip the Garmin data and only keep the Stryd data
-            if (devField.getName().equals(DEV_FIELD_NAME__RP_POWER) &&
-                  StreamSupport.stream(mesg.getDeveloperFields().spliterator(), false)
-                        .anyMatch(developerField -> developerField.getName().equals(DEV_FIELD_NAME__POWER))) {
-               break;
+            //If the current power data source is not the one
+            //specified by the user as the "preferred" data source,
+            //we do not import it.
+            if (containsMultiplePowerDataSources) {
+
+               //Stryd
+               if (devField.getName().equals(DEV_FIELD_NAME__POWER) &&
+                     _prefStore.getInt(IPreferences.FIT_PREFERRED_POWER_DATA_SOURCE) != 0) {
+                  break;
+               }
+
+               //Garmin RD Pod
+               if (devField.getName().equals(DEV_FIELD_NAME__RP_POWER) &&
+                     _prefStore.getInt(IPreferences.FIT_PREFERRED_POWER_DATA_SOURCE) != 1) {
+                  break;
+               }
             }
 
             //  112 Watts
