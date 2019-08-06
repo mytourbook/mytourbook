@@ -580,8 +580,12 @@ public class FitLogSAXHandler extends DefaultHandler {
       for (final Lap lap : _laps) {
 
          long startTimeDiff = lap.endTime - tourStartTime;// - tour2sliceTimeDiff;
+
          // If present, we add the total pause time
          for (final Pause pause : _currentActivity.pauses) {
+
+            //We need to make sure to only add the pauses that are
+            //within the current lap time interval.
             if (pause.startTime < lap.endTime &&
                   pause.endTime > lap.startTime) {
                startTimeDiff += pause.duration;
