@@ -632,12 +632,15 @@ public class TagMenuManager {
    /**
     * @param menuMgr
     */
-   public void fillTagMenu(final IMenuManager menuMgr) {
+   public void fillTagMenu(final IMenuManager menuMgr, final boolean isShow_SetTags) {
 
       // all all tour tag actions
       menuMgr.add(new Separator());
       {
-         menuMgr.add(_actionSetTags);
+         if (isShow_SetTags) {
+            menuMgr.add(_actionSetTags);
+         }
+
          menuMgr.add(_actionAddTagAdvanced);
          menuMgr.add(_actionAddTag);
 

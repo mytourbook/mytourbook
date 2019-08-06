@@ -146,7 +146,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 		menuMgr.add(_actionAdjustAltitude);
 
 		// tour tag actions
-		_tagMenuMgr.fillTagMenu(menuMgr);
+      _tagMenuMgr.fillTagMenu(menuMgr, false);
 
 		// tour type actions
 		menuMgr.add(new Separator());
@@ -204,7 +204,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
 	@Override
 	public ArrayList<TourData> getSelectedTours() {
 
-		final ArrayList<TourData> tourList = new ArrayList<TourData>();
+		final ArrayList<TourData> tourList = new ArrayList<>();
 		tourList.add(_tourEditor.getTourData());
 
 		return tourList;

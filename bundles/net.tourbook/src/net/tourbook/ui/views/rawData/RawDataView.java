@@ -3719,7 +3719,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       TourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, this, true);
 
       // tour tag actions
-      _tagMenuManager.fillTagMenu(menuMgr);
+      _tagMenuManager.fillTagMenu(menuMgr, true);
 
       // add standard group which allows other plug-ins to contribute here
       menuMgr.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));

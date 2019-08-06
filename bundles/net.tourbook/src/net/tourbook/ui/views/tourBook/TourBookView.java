@@ -3780,7 +3780,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       menuMgr.add(_actionMergeTour);
       menuMgr.add(_actionJoinTours);
 
-      _tagMenuManager.fillTagMenu(menuMgr);
+      _tagMenuManager.fillTagMenu(menuMgr, true);
 
       // tour type actions
       menuMgr.add(new Separator());

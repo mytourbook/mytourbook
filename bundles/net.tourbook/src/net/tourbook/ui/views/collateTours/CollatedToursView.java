@@ -1885,7 +1885,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
       menuMgr.add(_actionComputeDistanceValuesFromGeoposition);
       menuMgr.add(_actionSetAltitudeFromSRTM);
 
-      _tagMenuManager.fillTagMenu(menuMgr);
+      _tagMenuManager.fillTagMenu(menuMgr, true);
 
       // tour type actions
       menuMgr.add(new Separator());

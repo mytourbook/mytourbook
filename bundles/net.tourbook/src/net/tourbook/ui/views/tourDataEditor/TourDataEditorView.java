@@ -2874,7 +2874,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ITour
             final Set<TourTag> tourTags = _tourData.getTourTags();
             final boolean isTagInTour = tourTags.size() > 0;
 
-            _tagMenuMgr.fillTagMenu(menuMgr);
+            _tagMenuMgr.fillTagMenu(menuMgr, false);
             _tagMenuMgr.enableTagActions(true, isTagInTour, tourTags);
          }
       });
