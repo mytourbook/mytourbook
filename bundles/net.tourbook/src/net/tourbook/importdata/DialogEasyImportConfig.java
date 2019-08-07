@@ -3888,8 +3888,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       _selectedIL.isSaveTour = _chkIL_SaveTour.getSelection();
       _selectedIL.isShowInDashboard = _chkIL_ShowInDashboard.getSelection();
 
-      _selectedIL.isSetTourType = _chkIL_SetTourType.getSelection();
-
       // update UI
       _ilViewer.update(_selectedIL, null);
    }
@@ -4316,7 +4314,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       // tour type
       final Enum<TourTypeConfig> selectedTourTypeConfig = getSelectedTourTypeConfig();
       _selectedIL.tourTypeConfig = selectedTourTypeConfig;
-      _selectedIL.isSetTourType = _chkIL_SetTourType.getSelection();
 
       /*
        * Set tour type data
@@ -4491,7 +4488,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
          // Retrieve Weather Data
          _chkIL_RetrieveWeatherData.setSelection(_selectedIL.isRetrieveWeatherData);
 
-         _chkIL_SetTourType.setSelection(_selectedIL.isSetTourType);
+         _chkIL_SetTourType.setSelection(isSetTourType);
          if (isSetTourType) {
             _comboIL_TourType.select(getTourTypeConfigIndex(tourTypeConfig));
          }
