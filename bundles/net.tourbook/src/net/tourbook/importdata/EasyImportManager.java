@@ -103,8 +103,8 @@ public class EasyImportManager {
    private static final String      ATTR_IL_IS_RETRIEVE_WEATHER_DATA          = "isRetrieveWeatherData";                            //$NON-NLS-1$
    private static final String      ATTR_IL_IS_SAVE_TOUR                      = "isSaveTour";                                       //$NON-NLS-1$
    private static final String      ATTR_IL_IS_SHOW_IN_DASHBOARD              = "isShowInDashBoard";                                //$NON-NLS-1$
-   private static final String      ATTR_IL_IS_SET_LAST_MARKER                = "isSetLastMarker";
-   private static final String      ATTR_IL_IS_SET_TOUR_TYPE                  = "isSetTourType";
+   private static final String      ATTR_IL_IS_SET_LAST_MARKER                = "isSetLastMarker";                                  //$NON-NLS-1$
+   private static final String      ATTR_IL_IS_SET_TOUR_TYPE                  = "isSetTourType";                                    //$NON-NLS-1$
    private static final String      ATTR_IL_LAST_MARKER_TEXT                  = "lastMarkerText";                                   //$NON-NLS-1$
    private static final String      ATTR_IL_LAST_MARKER_DISTANCE              = "lastMarkerDistance";                               //$NON-NLS-1$
    private static final String      ATTR_IL_TEMPERATURE_ADJUSTMENT_DURATION   = "temperatureAdjustmentDuration";                    //$NON-NLS-1$
@@ -1088,7 +1088,9 @@ public class EasyImportManager {
          // Retrieve weather data
          xmlConfig.putBoolean(ATTR_IL_IS_RETRIEVE_WEATHER_DATA, importLauncher.isRetrieveWeatherData);
 
+         // Set tour type
          xmlConfig.putBoolean(ATTR_IL_IS_SET_TOUR_TYPE, importLauncher.isSetTourType);
+
          final Enum<TourTypeConfig> ttConfig = importLauncher.tourTypeConfig;
          Util.setXmlEnum(xmlConfig, ATTR_TOUR_TYPE_CONFIG, ttConfig);
 
