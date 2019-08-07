@@ -2404,17 +2404,17 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
    private void createUI_591_IL_RetrieveWeatherData(final Composite parent) {
 
-         /*
-          * Checkbox: Retrieve Weather Data
-          */
-         _chkIL_RetrieveWeatherData = new Button(parent, SWT.CHECK);
+      /*
+       * Checkbox: Retrieve Weather Data
+       */
+      _chkIL_RetrieveWeatherData = new Button(parent, SWT.CHECK);
       _chkIL_RetrieveWeatherData.setText(Messages.Dialog_ImportConfig_Checkbox_RetrieveWeatherData);
       _chkIL_RetrieveWeatherData.setToolTipText(Messages.Dialog_ImportConfig_Checkbox_RetrieveWeatherData_Tooltip);
-         _chkIL_RetrieveWeatherData.addSelectionListener(_defaultModify_Listener);
-         GridDataFactory
-               .fillDefaults()//
-               .span(2, 1)
-               .indent(0, 5)
+      _chkIL_RetrieveWeatherData.addSelectionListener(_defaultModify_Listener);
+      GridDataFactory
+            .fillDefaults()//
+            .span(2, 1)
+            .indent(0, 5)
             .applyTo(_chkIL_RetrieveWeatherData);
 
    }
@@ -3194,7 +3194,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       final boolean isRetrieveWeatherData = _prefStore.getBoolean(ITourbookPreferences.WEATHER_USE_WEATHER_RETRIEVAL) &&
             !_prefStore.getString(ITourbookPreferences.WEATHER_API_KEY).equals(""); //$NON-NLS-1$
 
-      boolean isSetTourType = false;
+      boolean isSetTourType = isILSelected && _chkIL_SetTourType.getSelection();
 
       if (isILSelected) {
 
