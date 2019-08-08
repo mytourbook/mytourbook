@@ -2404,17 +2404,17 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
    private void createUI_591_IL_RetrieveWeatherData(final Composite parent) {
 
-         /*
-          * Checkbox: Retrieve Weather Data
-          */
-         _chkIL_RetrieveWeatherData = new Button(parent, SWT.CHECK);
+      /*
+       * Checkbox: Retrieve Weather Data
+       */
+      _chkIL_RetrieveWeatherData = new Button(parent, SWT.CHECK);
       _chkIL_RetrieveWeatherData.setText(Messages.Dialog_ImportConfig_Checkbox_RetrieveWeatherData);
       _chkIL_RetrieveWeatherData.setToolTipText(Messages.Dialog_ImportConfig_Checkbox_RetrieveWeatherData_Tooltip);
-         _chkIL_RetrieveWeatherData.addSelectionListener(_defaultModify_Listener);
-         GridDataFactory
-               .fillDefaults()//
-               .span(2, 1)
-               .indent(0, 5)
+      _chkIL_RetrieveWeatherData.addSelectionListener(_defaultModify_Listener);
+      GridDataFactory
+            .fillDefaults()//
+            .span(2, 1)
+            .indent(0, 5)
             .applyTo(_chkIL_RetrieveWeatherData);
 
    }
@@ -3194,7 +3194,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       final boolean isRetrieveWeatherData = _prefStore.getBoolean(ITourbookPreferences.WEATHER_USE_WEATHER_RETRIEVAL) &&
             !_prefStore.getString(ITourbookPreferences.WEATHER_API_KEY).equals(""); //$NON-NLS-1$
 
-      boolean isSetTourType = false;
+      boolean isSetTourType = isILSelected && _chkIL_SetTourType.getSelection();
 
       if (isILSelected) {
 
@@ -3837,6 +3837,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       // create new tt item
       final ImportLauncher newTTItem = new ImportLauncher();
 
+      newTTItem.isSetTourType = true;
       newTTItem.tourTypeConfig = TourTypeConfig.TOUR_TYPE_CONFIG_ONE_FOR_ALL;
       newTTItem.oneTourType = tourType;
       newTTItem.name = tourType.getName();
@@ -3887,6 +3888,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
       _selectedIL.isSaveTour = _chkIL_SaveTour.getSelection();
       _selectedIL.isShowInDashboard = _chkIL_ShowInDashboard.getSelection();
+
+      _selectedIL.isSetTourType = _chkIL_SetTourType.getSelection();
 
       // update UI
       _ilViewer.update(_selectedIL, null);
@@ -4314,6 +4317,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       // tour type
       final Enum<TourTypeConfig> selectedTourTypeConfig = getSelectedTourTypeConfig();
       _selectedIL.tourTypeConfig = selectedTourTypeConfig;
+      _selectedIL.isSetTourType = _chkIL_SetTourType.getSelection();
 
       /*
        * Set tour type data
@@ -4488,7 +4492,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
          // Retrieve Weather Data
          _chkIL_RetrieveWeatherData.setSelection(_selectedIL.isRetrieveWeatherData);
 
-         _chkIL_SetTourType.setSelection(isSetTourType);
+         _chkIL_SetTourType.setSelection(_selectedIL.isSetTourType);
          if (isSetTourType) {
             _comboIL_TourType.select(getTourTypeConfigIndex(tourTypeConfig));
          }

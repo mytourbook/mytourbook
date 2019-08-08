@@ -48,6 +48,11 @@ public class ImportLauncher implements Cloneable {
    public boolean                  isShowInDashboard             = true;
 
    /**
+    * When <code>true</code>, assigns a type to the tour.
+    */
+   public boolean                  isSetTourType                 = false;
+
+   /**
     * When <code>true</code> save the tour for the active person.
     */
    public boolean                  isSaveTour                    = false;
