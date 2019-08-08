@@ -726,8 +726,8 @@ public class EasyImportManager {
       // retrieve weather data
       importLauncher.isRetrieveWeatherData = Util.getXmlBoolean(xmlConfig, ATTR_IL_IS_RETRIEVE_WEATHER_DATA, false);
 
-      // Set your type
-      importLauncher.isSetTourType = Util.getXmlBoolean(xmlConfig, ATTR_IL_IS_SET_TOUR_TYPE, false);
+      // set your type, default is true to preserve previous saved tour types before this field was introduced
+      importLauncher.isSetTourType = Util.getXmlBoolean(xmlConfig, ATTR_IL_IS_SET_TOUR_TYPE, true);
 
       final Enum<TourTypeConfig> ttConfig = Util.getXmlEnum(
             xmlConfig,
@@ -777,7 +777,6 @@ public class EasyImportManager {
       } else {
 
          // this is the default, tour type is not set
-
       }
 
       importLauncher.setupItemImage();
