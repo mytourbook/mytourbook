@@ -1,0 +1,16 @@
+19.7.1                                                   27. August 2019
+
+
+Bugfix   
+======
+
+* Easy Import Configuration
+
+  - Fixed tour types, they can get lost in 19.7.0 when easy import 
+    configuration dialog is saved even when nothing is modified
+  
+
+Translation    
+===========
+
+* Italian (Doriano)
