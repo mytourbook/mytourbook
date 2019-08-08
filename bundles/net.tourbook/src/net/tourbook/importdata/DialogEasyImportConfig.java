@@ -4464,9 +4464,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
       _isInUIUpdate = true;
       {
-         final Enum<TourTypeConfig> tourTypeConfig = _selectedIL.tourTypeConfig;
-         final boolean isSetTourType = tourTypeConfig != null;
-
          final double distance = getMarkerDistanceValue(_selectedIL);
          final double distance10 = distance * 10;
          final int distanceValue = (int) (distance10 + 0.5);
@@ -4492,7 +4489,11 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
          // Retrieve Weather Data
          _chkIL_RetrieveWeatherData.setSelection(_selectedIL.isRetrieveWeatherData);
 
-         _chkIL_SetTourType.setSelection(_selectedIL.isSetTourType);
+         final Enum<TourTypeConfig> tourTypeConfig = _selectedIL.tourTypeConfig;
+         final boolean isSetTourType = tourTypeConfig != null && _selectedIL.isSetTourType;
+
+         // Set tour type
+         _chkIL_SetTourType.setSelection(isSetTourType);
          if (isSetTourType) {
             _comboIL_TourType.select(getTourTypeConfigIndex(tourTypeConfig));
          }
