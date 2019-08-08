@@ -3837,6 +3837,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       // create new tt item
       final ImportLauncher newTTItem = new ImportLauncher();
 
+      newTTItem.isSetTourType = true;
       newTTItem.tourTypeConfig = TourTypeConfig.TOUR_TYPE_CONFIG_ONE_FOR_ALL;
       newTTItem.oneTourType = tourType;
       newTTItem.name = tourType.getName();
