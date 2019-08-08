@@ -81,12 +81,22 @@
 
    <!-- FitLog -->
    <extension	point="net.tourbook.deviceDataReader">
-
       <device
             class="net.tourbook.device.sporttracks.FitLogDeviceDataReader"
             fileextension="fitlog"
             id="net.tourbook.device.SportTracks"
             name="SportTracks (.fitlog)">
+      </device>
+   </extension>
+   
+   
+   <!-- FitLogEx -->
+   <extension	point="net.tourbook.deviceDataReader">
+      <device
+            class="net.tourbook.device.sporttracks.FitLogDeviceDataReader"
+            fileextension="fitlogex"
+            id="net.tourbook.device.SportTracks"
+            name="SportTracks (.fitlogex)">
       </device>
    </extension>
 
@@ -224,11 +234,12 @@
       </page>
    </extension>
    
+   <!-- Suunto 9/Spartan  -->
    <extension	point="org.eclipse.ui.preferencePages">
       <page
             category="net.tourbook.preferences.PrefPageImport"
             class="net.tourbook.device.suunto.Suunto9ImportPreferences"
-            id="net.tourbook.device.suunto.Suunto9PreferencesPage"
+            id="net.tourbook.device.suunto.suunto9ImportPreferences"
             name="Suunto Spartan/9">
       </page>
    </extension>
