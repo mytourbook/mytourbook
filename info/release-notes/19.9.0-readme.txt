@@ -13,7 +13,8 @@ TODOs
 New   
 ===
 
-* 
+* Import FitLogEx Files (Frederic)
+  - Custom Data Field Import
 
  
 Improvements   
