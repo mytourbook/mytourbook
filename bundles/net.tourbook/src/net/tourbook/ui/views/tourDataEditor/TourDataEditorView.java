@@ -5853,7 +5853,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
             && _tourData.latitudeSerie != null
             && _tourData.latitudeSerie.length > 0;
 
-      final boolean canEditTemperatureAvg = canEdit && _tourData != null && (_tourData.temperatureSerie == null || _tourData.isWeatherDataFromApi());
+      final boolean canEditTemperature = canEdit && _tourData != null && (_tourData.temperatureSerie == null || _tourData.isWeatherDataFromApi());
 
       _comboTitle.setEnabled(canEdit);
       _txtDescription.setEnabled(canEdit);
@@ -5865,7 +5865,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
       _comboWeather_Clouds.setEnabled(canEdit);
       _comboWeather_WindDirectionText.setEnabled(canEdit);
       _comboWeather_WindSpeedText.setEnabled(canEdit);
-      _spinWeather_Temperature_Average.setEnabled(canEditTemperatureAvg);
+      _spinWeather_Temperature_Average.setEnabled(canEditTemperature);
+      _spinWeather_Temperature_Min.setEnabled(canEditTemperature);
+      _spinWeather_Temperature_Max.setEnabled(canEditTemperature);
       _spinWeather_Wind_DirectionValue.setEnabled(canEdit);
       _spinWeather_Wind_SpeedValue.setEnabled(canEdit);
       _txtWeather.setEnabled(canEdit);

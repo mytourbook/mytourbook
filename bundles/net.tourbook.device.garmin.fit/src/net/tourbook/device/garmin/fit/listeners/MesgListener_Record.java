@@ -20,6 +20,8 @@ import com.garmin.fit.DeveloperField;
 import com.garmin.fit.RecordMesg;
 import com.garmin.fit.RecordMesgListener;
 
+import java.util.stream.StreamSupport;
+
 import net.tourbook.common.UI;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
@@ -41,6 +43,8 @@ public class MesgListener_Record extends AbstractMesgListener implements RecordM
    private static final String DEV_FIELD_NAME__GROUND_TIME          = "Ground Time";                              //$NON-NLS-1$
    private static final String DEV_FIELD_NAME__LEG_SPRING_STIFFNESS = "Leg Spring Stiffness";                     //$NON-NLS-1$
    private static final String DEV_FIELD_NAME__POWER                = "Power";                                    //$NON-NLS-1$
+   //Power Data from Garmin Running Dynamics Pod
+   private static final String DEV_FIELD_NAME__RP_POWER             = "RP_Power";                                 //$NON-NLS-1$
    private static final String DEV_FIELD_NAME__FORM_POWER           = "Form Power";                               //$NON-NLS-1$
    private static final String DEV_FIELD_NAME__ELEVATION            = "Elevation";                                //$NON-NLS-1$
    private static final String DEV_FIELD_NAME__VERTICAL_OSCILLATION = "Vertical Oscillation";                     //$NON-NLS-1$
@@ -307,6 +311,11 @@ public class MesgListener_Record extends AbstractMesgListener implements RecordM
     */
    private void setRecord_DeveloperData(final RecordMesg mesg, final TimeData timeData) {
 
+      final boolean containsMultiplePowerDataSources =
+            StreamSupport.stream(mesg.getDeveloperFields().spliterator(), false)
+                  .anyMatch(developerField -> developerField.getName().equals(DEV_FIELD_NAME__POWER) &&
+                        developerField.getName().equals(DEV_FIELD_NAME__POWER));
+
       for (final DeveloperField devField : mesg.getDeveloperFields()) {
 
          switch (devField.getName()) {
@@ -346,6 +355,25 @@ public class MesgListener_Record extends AbstractMesgListener implements RecordM
             break;
 
          case DEV_FIELD_NAME__POWER:
+         case DEV_FIELD_NAME__RP_POWER:
+
+            //If the current power data source is not the one
+            //specified by the user as the "preferred" data source,
+            //we do not import it.
+            if (containsMultiplePowerDataSources) {
+
+               //Stryd
+               if (devField.getName().equals(DEV_FIELD_NAME__POWER) &&
+                     _prefStore.getInt(IPreferences.FIT_PREFERRED_POWER_DATA_SOURCE) != 0) {
+                  break;
+               }
+
+               //Garmin RD Pod
+               if (devField.getName().equals(DEV_FIELD_NAME__RP_POWER) &&
+                     _prefStore.getInt(IPreferences.FIT_PREFERRED_POWER_DATA_SOURCE) != 1) {
+                  break;
+               }
+            }
 
             //  112 Watts
 

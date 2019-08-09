@@ -1,10 +1,12 @@
-19.7.0                                                      ?. July 2019
+19.7.0                                                     27. July 2019
 
 New   
 ===
 
 * 2D Map
 
+  - Added/updated/removed 2D Map Provider
+  
   - Map provider slideout
    - This replaces the (old and removed) menu dropdown for map provider 
      selection
@@ -39,11 +41,8 @@ New
      Without an API key, any new weather fields can be edited/saved as 
      all other tour fields, they are just not filled automatically.
      
-     This API key can be tested 60 days for free.
-
-     It is recommended to test the retrieved weather data with your own 
-     device data as there can be big differences depending which weather
-     station was nearby.
+     This API key can be tested 60 days for free, how to use it is 
+     documented here.
     --------------------------------------------------------------------
   
   - The following data will be set in the tour
@@ -81,13 +80,11 @@ Bugfix
     the data type INTEGER.
     This could occure when the summary columns had an integer overflow
 
- 
 
 * Preferences (Frederic)
 
   - Fixed Linux async problem: modify flag is set when opening the users 
     page
-
  
 
 * Easy Import Config (Frederic)
