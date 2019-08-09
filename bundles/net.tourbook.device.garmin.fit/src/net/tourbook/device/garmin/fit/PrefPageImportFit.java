@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.device.garmin.fit;
 
-import java.util.ArrayList;
-
 import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
 
@@ -45,38 +43,35 @@ import org.joda.time.PeriodType;
 
 public class PrefPageImportFit extends PreferencePage implements IWorkbenchPreferencePage {
 
-   public static final String             ID                            = "net.tourbook.device.PrefPageFit";                    //$NON-NLS-1$
+   public static final String    ID                            = "net.tourbook.device.PrefPageFit";          //$NON-NLS-1$
 
-   private static final String            STATE_FIT_IMPORT_SELECTED_TAB = "STATE_FIT_IMPORT_SELECTED_TAB";                      //$NON-NLS-1$
+   private static final String   STATE_FIT_IMPORT_SELECTED_TAB = "STATE_FIT_IMPORT_SELECTED_TAB";            //$NON-NLS-1$
 
-   private static final String            DEGREE_CELCIUS                = "\u0394 \u00b0C";                                     //$NON-NLS-1$
+   private static final String   DEGREE_CELCIUS                = "\u0394 \u00b0C";                           //$NON-NLS-1$
 
-   private static final float             TEMPERATURE_DIGITS            = 10.0f;
+   private static final float    TEMPERATURE_DIGITS            = 10.0f;
 
-   private static final int               TAB_FOLDER_SPEED              = 0;
-   private static final int               TAB_FOLDER_TEMPERATURE        = 1;
-   private static final int               TAB_FOLDER_MARKER_FILTER      = 2;
-   private static final int               TAB_FOLDER_TIME_SLIZE         = 3;
-   private static final int               TAB_FOLDER_POWER              = 4;
+   private static final int      TAB_FOLDER_SPEED              = 0;
+   private static final int      TAB_FOLDER_TEMPERATURE        = 1;
+   private static final int      TAB_FOLDER_MARKER_FILTER      = 2;
+   private static final int      TAB_FOLDER_TIME_SLIZE         = 3;
+   private static final int      TAB_FOLDER_POWER              = 4;
 
-   private static PeriodType              _tourPeriodTemplate           = PeriodType.yearMonthDayTime()
+   private static PeriodType     _tourPeriodTemplate           = PeriodType.yearMonthDayTime()
 
 //			// hide these components
          .withMillisRemoved();
 
-   @SuppressWarnings("serial")
-   private final static ArrayList<String> PowerDataSources              = new ArrayList<String>() {
-                                                                           {
-                                                                              add(Messages.PrefPage_Fit_Combo_Power_Data_Source_Stryd);
-                                                                              add(Messages.PrefPage_Fit_Combo_Power_Data_Source_Garmin_RD_Pod);
-                                                                           }
-                                                                        };
+   private final static String[] PowerDataSources              = new String[] {
+         Messages.PrefPage_Fit_Combo_Power_Data_Source_Stryd,
+         Messages.PrefPage_Fit_Combo_Power_Data_Source_Garmin_RD_Pod
+   };
 
-   private IPreferenceStore               _prefStore                    = Activator.getDefault().getPreferenceStore();
+   private IPreferenceStore      _prefStore                    = Activator.getDefault().getPreferenceStore();
 
-   private PixelConverter                 _pc;
+   private PixelConverter        _pc;
 
-   private SelectionAdapter               _defaultSelectionListener;
+   private SelectionAdapter      _defaultSelectionListener;
 
    /*
     * UI controls
@@ -389,10 +384,9 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
          /*
           * Fill-up the power data sources choices
           */
-         for (int index = 0; index < PowerDataSources.size(); ++index) {
-            _comboPowerDataSource.add(PowerDataSources.get(index));
+         for (final String powerDataSource : PowerDataSources) {
+            _comboPowerDataSource.add(powerDataSource);
          }
-         _comboPowerDataSource.select(_prefStore.getInt(IPreferences.FIT_PREFERRED_POWER_DATA_SOURCE));
       }
 
       return container;
@@ -537,6 +531,9 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
 
       // folder
       _tabFolder.setSelection(_prefStore.getInt(STATE_FIT_IMPORT_SELECTED_TAB));
+
+      // Preferred power data source
+      _comboPowerDataSource.select(_prefStore.getInt(IPreferences.FIT_PREFERRED_POWER_DATA_SOURCE));
 
       enableControls();
    }

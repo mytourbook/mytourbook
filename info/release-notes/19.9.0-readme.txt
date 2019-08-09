@@ -22,6 +22,17 @@ New
 Improvements   
 ============
 
+* Import FitLogEx Files (Frederic)
+  - Custom Data Field Import
+
+
+* .fit file (Frederic)
+  Added support for the developer field:
+    - Garmin Running Dynamics Pod
+  Added the ability to select the preferred power developer field to import
+  when multiple power data sources are present within a given FIT file:
+    - Stryd or Garmin Running Dynamics Pod
+
 * 
 
 
