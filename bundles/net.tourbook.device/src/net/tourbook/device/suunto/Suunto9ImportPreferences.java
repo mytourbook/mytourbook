@@ -130,8 +130,8 @@ public class Suunto9ImportPreferences extends FieldEditorPreferencePage implemen
       /*
        * Fill-up the distance data choices
        */
-      for (final String distanceChoiceType : DistanceData) {
-         _comboDistanceDataSource.add(distanceChoiceType);
+      for (final String distanceDataType : DistanceData) {
+         _comboDistanceDataSource.add(distanceDataType);
       }
       _comboDistanceDataSource.select(_prefStore.getInt(IPreferences.DISTANCE_DATA_SOURCE));
    }
