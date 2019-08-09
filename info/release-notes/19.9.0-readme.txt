@@ -36,7 +36,9 @@ Improvements
 Bugfix   
 ======
 
-* 
+* Weather (Frederic)
+ - When entering a pressure using the metric system (mb), the format now accepts 2
+   decimals
  
 
 Translation    

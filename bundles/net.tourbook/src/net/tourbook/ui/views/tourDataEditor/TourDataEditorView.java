@@ -4106,7 +4106,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
          // spinner: pressure value
          _spinWeather_PressureValue = new Spinner(container, SWT.BORDER);
          _spinWeather_PressureValue.setToolTipText(Messages.Tour_Editor_Label_AirPressure_Tooltip);
-         _spinWeather_PressureValue.setMaximum(400000);
+         //The highest barometric pressure ever recorded on Earth was 32.01 inches (1083.98), measured in Agata, U.S.S.R., on December 31, 1968.
+         _spinWeather_PressureValue.setMaximum(108398);
          _spinWeather_PressureValue.addMouseWheelListener(_mouseWheelListener);
          _spinWeather_PressureValue.addSelectionListener(_selectionListener);
 
@@ -7708,7 +7709,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
          _tourData.setWeather_Humidity((short) _spinWeather_Humidity.getSelection());
 
-         final int pressure = _spinWeather_PressureValue.getSelection();
+         final float pressure = _spinWeather_PressureValue.getSelection() / 100.0f;
          _tourData.setWeather_Pressure(UI.convertPressure_ToMetric(pressure));
 
          final int precipitation = _spinWeather_PrecipitationValue.getSelection();
@@ -8212,13 +8213,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
        */
       final float pressure = UI.convertPressure_FromMetric(_tourData.getWeather_Pressure());
 
-      if (UI.UNIT_IS_METRIC) {
-         _spinWeather_PressureValue.setDigits(0);
-         _spinWeather_PressureValue.setSelection(Math.round(pressure));
-      } else {
-         _spinWeather_PressureValue.setDigits(2);
-         _spinWeather_PressureValue.setSelection(Math.round(pressure * 100));
-      }
+      _spinWeather_PressureValue.setDigits(2);
+      _spinWeather_PressureValue.setSelection(Math.round(pressure * 100));
       _spinWeather_PressureValue.setData(FIX_LINUX_ASYNC_EVENT_1, true);
 
       /*
