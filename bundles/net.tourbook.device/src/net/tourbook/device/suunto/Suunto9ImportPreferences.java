@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.device.suunto;
 
-import java.util.ArrayList;
-
 import net.tourbook.application.TourbookPlugin;
 
 import org.eclipse.jface.layout.GridDataFactory;
@@ -33,22 +31,16 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class Suunto9ImportPreferences extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-   @SuppressWarnings("serial")
-   private final static ArrayList<String> AltitudeData = new ArrayList<String>() {
-                                                          {
-                                                             add(Messages.pref_altitude_gps);
-                                                             add(Messages.pref_altitude_barometer);
-                                                          }
-                                                       };
-   @SuppressWarnings("serial")
-   private final static ArrayList<String> DistanceData = new ArrayList<String>() {
-                                                          {
-                                                             add(Messages.pref_distance_gps);
-                                                             add(Messages.pref_distance_providedvalues);
-                                                          }
-                                                       };
+   private final static String[]  AltitudeData = new String[] {
+         Messages.pref_altitude_gps,
+         Messages.pref_altitude_barometer
+   };
+   private final static String[]  DistanceData = new String[] {
+         Messages.pref_distance_gps,
+         Messages.pref_distance_providedvalues
+   };
 
-   private final IPreferenceStore         _prefStore   = TourbookPlugin.getDefault().getPreferenceStore();
+   private final IPreferenceStore _prefStore   = TourbookPlugin.getDefault().getPreferenceStore();
 
    /*
     * UI controls
@@ -105,8 +97,7 @@ public class Suunto9ImportPreferences extends FieldEditorPreferencePage implemen
    }
 
    @Override
-   public void init(final IWorkbench workbench) {
-   }
+   public void init(final IWorkbench workbench) {}
 
    @Override
    protected void performDefaults() {
@@ -132,15 +123,15 @@ public class Suunto9ImportPreferences extends FieldEditorPreferencePage implemen
       /*
        * Fill-up the altitude data choices
        */
-      for (int index = 0; index < AltitudeData.size(); ++index) {
-         _comboAltitudeDataSource.add(AltitudeData.get(index));
+      for (final String altitudeDataType : AltitudeData) {
+         _comboAltitudeDataSource.add(altitudeDataType);
       }
       _comboAltitudeDataSource.select(_prefStore.getInt(IPreferences.ALTITUDE_DATA_SOURCE));
       /*
        * Fill-up the distance data choices
        */
-      for (final String distanceChoice : DistanceData) {
-         _comboDistanceDataSource.add(distanceChoice);
+      for (final String distanceChoiceType : DistanceData) {
+         _comboDistanceDataSource.add(distanceChoiceType);
       }
       _comboDistanceDataSource.select(_prefStore.getInt(IPreferences.DISTANCE_DATA_SOURCE));
    }
