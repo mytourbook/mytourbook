@@ -7375,7 +7375,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ITour
 
          setTourClean();
 
-         // notify all views which display the tour type
+         // notify all views
          TourManager.fireEvent(TourEventId.TOUR_CHANGED, new TourEvent(_tourData), TourDataEditorView.this);
       }
       _isSavingInProgress = false;

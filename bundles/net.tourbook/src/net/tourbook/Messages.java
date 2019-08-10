@@ -454,9 +454,9 @@ public class Messages extends NLS {
    public static String        App_Action_set_tour_type;
    public static String        App_Action_Save;
 
-   public static String App_Action_SaveTour;
+   public static String        App_Action_SaveTour;
 
-   public static String App_Action_SaveTour_Tooltip;
+   public static String        App_Action_SaveTour_Tooltip;
    public static String        App_Action_SetPerson;
    public static String        App_Action_SplitTour;
    public static String        App_Action_ToolTipLocation_AboveTourChart_Tooltip;
@@ -993,10 +993,8 @@ public class Messages extends NLS {
    public static String        Image__synch_graph_bySize_disabled;
    public static String        Image__synch_statistics;
    public static String        Image__synch_statistics_Disabled;
-   public static String Image__SaveTour;
-
-   public static String Image__SaveTour_Disabled;
-
+   public static String        Image__SaveTour;
+   public static String        Image__SaveTour_Disabled;
    public static String        Image__SearchExternal;
    public static String        Image__SearchExternal_Disabled;
    public static String        Image__SearchToursByLocation;
@@ -1026,7 +1024,11 @@ public class Messages extends NLS {
    public static String        Image__tag_category;
    public static String        Image__tag_root;
    public static String        Image__TagLayout_Flat;
+   public static String        Image__TagLayout_Flat_Disabled;
    public static String        Image__TagLayout_Hierarchical;
+   public static String        Image__TagLayout_Hierarchical_Disabled;
+   public static String        Image__TagsChecked;
+   public static String        Image__TagsChecked_Disabled;
    public static String        Image__tour_map_ref_tour_new;
    public static String        Image__tour_new;
    public static String        Image__tour_new_disabled;
@@ -2518,7 +2520,11 @@ public class Messages extends NLS {
 
    public static String Tour_Tags_Action_Layout_Flat_Tooltip;
    public static String Tour_Tags_Action_Layout_Hierarchical_Tooltip;
-   public static String Tour_Tags_Title_MultipleTours;
+   public static String Tour_Tags_Action_TagCheckFilter;
+   public static String Tour_Tags_Action_TagCheckFilter_AllTags_Tooltip;
+   public static String Tour_Tags_Action_TagCheckFilter_OnlyTaggedTours_Tooltip;
+   public static String Tour_Tags_Title_MultipleTours_MultipleTags;
+   public static String Tour_Tags_Title_MultipleTours_OneTag;
 
    public static String tag_view_action_refresh_view_tooltip;
    public static String tag_view_title_tag;
