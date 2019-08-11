@@ -30,7 +30,6 @@ import org.eclipse.swt.widgets.ToolItem;
 public class ActionTourDataFilter extends ActionToolbarSlideoutAdv {
 
    private static final ImageDescriptor _actionImageDescriptor          = TourbookPlugin.getImageDescriptor(Messages.Image__TourFilter);
-//   private static final ImageDescriptor _actionImageDescriptor_Selected = TourbookPlugin.getImageDescriptor(Messages.Image__TourFilter_Selected);
    private static final ImageDescriptor _actionImageDescriptor_Disabled = TourbookPlugin.getImageDescriptor(Messages.Image__TourFilter_Disabled);
 
    private static final IDialogSettings _state                          = TourbookPlugin.getState("TourFilter");                                 //$NON-NLS-1$

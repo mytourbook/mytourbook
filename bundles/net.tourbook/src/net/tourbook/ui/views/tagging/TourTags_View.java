@@ -142,7 +142,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
    private boolean                           _isHierarchicalLayout;
    private boolean                           _isInCollapseAll;
    private boolean                           _isInUIUpdate;
-   private boolean                           _isShowOnlyTagsWhichAreChecked;
+   private boolean                           _isShowOnlyCheckedTags;
    private boolean                           _isTagDirty;
 
    private OpenDialogManager                 _openDlgMgr                               = new OpenDialogManager();
@@ -224,7 +224,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
       @Override
       public void run() {
-         onAction_ShowOnlyTagsFromTaggedTours();
+         onAction_ShowOnlyCheckedTags();
       }
    }
 
@@ -464,6 +464,12 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
                clearView();
 
+            } else if (eventId == TourEventId.TAG_STRUCTURE_CHANGED) {
+
+               _hash_AllTourData = Integer.MIN_VALUE;
+               recreateViewer(_tagViewer);
+               updateUI_Tags(_allSelectedTours, true);
+
             } else if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
 
                final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
@@ -480,13 +486,17 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
       TourManager.getInstance().addTourEventListener(_tourEventListener);
    }
 
+   private void clearCheckedTagIds() {
+      _allCheckedTagIds.clear();
+   }
+
    private void clearView() {
 
       _tagViewer.setCheckedElements(new Object[] {});
 
       _allSelectedTours.clear();
       _allTaggedTours.clear();
-      _allCheckedTagIds.clear();
+      clearCheckedTagIds();
 
       updateUI_ViewHeader();
    }
@@ -840,16 +850,17 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
    private void enableControls() {
 
-      final boolean areTagsAvailable = _allSelectedTours.size() > 0;
+      final boolean isTourAvailable = _allSelectedTours.size() > 0;
 
-      _actionCollapseAll.setEnabled(areTagsAvailable && _isHierarchicalLayout);
-      _actionExpandAll.setEnabled(areTagsAvailable && _isHierarchicalLayout);
+      _actionCollapseAll.setEnabled(isTourAvailable && _isHierarchicalLayout);
+      _actionExpandAll.setEnabled(isTourAvailable && _isHierarchicalLayout);
 
-      _actionTagCheckFilter.setEnabled(areTagsAvailable);
-      _actionTagLayout.setEnabled(areTagsAvailable);
-      _actionUndoChanges.setEnabled(areTagsAvailable && _isTagDirty);
+      _actionTagCheckFilter.setEnabled(isTourAvailable);
+      _actionTagLayout.setEnabled(isTourAvailable && _isShowOnlyCheckedTags == false);
 
-      _tagViewer.getTree().setEnabled(areTagsAvailable);
+      _actionUndoChanges.setEnabled(isTourAvailable && _isTagDirty);
+
+      _tagViewer.getTree().setEnabled(isTourAvailable);
 
 //  TODO    _actionTourTagOptions.__slideoutTourTagOptions.setEnabled();
    }
@@ -997,20 +1008,34 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
       // toggle layout
       _isHierarchicalLayout = !_isHierarchicalLayout;
 
-      updateUI_TagLayout();
+      updateUI_TagLayoutAction();
 
       recreateViewer(_tagViewer);
+
+      // tags in the tree hierarchie must be rechecked otherwise they are not checked
+      updateUI_Tags(_allTaggedTours, true);
 
       enableControls();
    }
 
-   private void onAction_ShowOnlyTagsFromTaggedTours() {
+   private void onAction_ShowOnlyCheckedTags() {
 
       // toggle tag filter
-      _isShowOnlyTagsWhichAreChecked = !_isShowOnlyTagsWhichAreChecked;
+      _isShowOnlyCheckedTags = !_isShowOnlyCheckedTags;
 
-      updateUI_TagCheckFilter();
+      if (_isShowOnlyCheckedTags && _isHierarchicalLayout) {
 
+         // tag viewer must not display a tree
+
+         onAction_Layout();
+         updateUI_TagFilter();
+
+      } else {
+
+         updateUI_TagFilter();
+
+         enableControls();
+      }
    }
 
    private void onAction_UndoChanges() {
@@ -1287,7 +1312,6 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
           * Exclude categories as it whould check ALL children
           */
          final ArrayList<TVIPrefTag> allTags = new ArrayList<>();
-         final Set<Long> allTagIds = new HashSet<>();
          for (final Object object : checkedElements) {
 
             if (object instanceof TVIPrefTag) {
@@ -1304,9 +1328,6 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
          _tagViewer.setExpandedElements(expandedElements);
          _tagViewer.setCheckedElements(allTags.toArray(new TVIPrefTag[allTags.size()]));
-
-         _allCheckedTagIds.clear();
-         _allCheckedTagIds.addAll(allTagIds);
 
          _isInUIUpdate = true;
          {
@@ -1380,16 +1401,16 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
    private void restoreState() {
 
-      updateUI_TagLayout();
-      updateUI_TagCheckFilter();
+      _actionTagCheckFilter.setChecked(_isShowOnlyCheckedTags);
 
-      _actionTagCheckFilter.setChecked(_isShowOnlyTagsWhichAreChecked);
+      updateUI_TagLayoutAction();
+      updateUI_TagFilter();
    }
 
    private void restoreStateBeforeUI() {
 
       _isHierarchicalLayout = Util.getStateBoolean(_state, STATE_IS_HIERARCHICAL_LAYOUT, true);
-      _isShowOnlyTagsWhichAreChecked = Util.getStateBoolean(_state, STATE_IS_SHOW_ONLY_TAGS_WHICH_ARE_CHECKED, false);
+      _isShowOnlyCheckedTags = Util.getStateBoolean(_state, STATE_IS_SHOW_ONLY_TAGS_WHICH_ARE_CHECKED, false);
    }
 
    @PersistState
@@ -1398,7 +1419,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
       _columnManager.saveState(_state);
 
       _state.put(STATE_IS_HIERARCHICAL_LAYOUT, _isHierarchicalLayout);
-      _state.put(STATE_IS_SHOW_ONLY_TAGS_WHICH_ARE_CHECKED, _isShowOnlyTagsWhichAreChecked);
+      _state.put(STATE_IS_SHOW_ONLY_TAGS_WHICH_ARE_CHECKED, _isShowOnlyCheckedTags);
    }
 
    @Override
@@ -1435,9 +1456,12 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
       }
    }
 
-   private void updateUI_TagCheckFilter() {
+   /**
+    * Set tag viewer filter which will refilter it
+    */
+   private void updateUI_TagFilter() {
 
-      if (_isShowOnlyTagsWhichAreChecked) {
+      if (_isShowOnlyCheckedTags) {
 
          _actionTagCheckFilter.setToolTipText(Messages.Tour_Tags_Action_TagCheckFilter_AllTags_Tooltip);
 
@@ -1451,7 +1475,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
       }
    }
 
-   private void updateUI_TagLayout() {
+   private void updateUI_TagLayoutAction() {
 
       if (_isHierarchicalLayout) {
 
@@ -1468,6 +1492,8 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
    }
 
    /**
+    * First update internal lists of the selected tours and available tags and then update the UI.
+    *
     * @param allTourData
     * @param isForceUpdate
     *           Ignore previous displayed tags and force a UI update
@@ -1489,7 +1515,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
       /*
        * Get all tag id's
        */
-      _allCheckedTagIds.clear();
+      clearCheckedTagIds();
       _allTaggedTours.clear();
 
       for (final TourData tourData : _allSelectedTours) {
@@ -1540,12 +1566,16 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
       updateUI_Tags(allTourData, false);
    }
 
+   /**
+    * Update view header which shows the number of selected tour(s) and tags.
+    */
    private void updateUI_ViewHeader() {
 
-      // update title
       final String headerText;
 
       final int numSelectedTours = _allSelectedTours.size();
+      final int numTags = _allCheckedTagIds.size();
+
       if (numSelectedTours == 0) {
 
          // a tour is not selected
@@ -1556,7 +1586,9 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
          // 1 tour is selected
 
-         headerText = TourManager.getTourTitle(_allSelectedTours.get(0));
+         headerText = NLS.bind(Messages.Tour_Tags_Title_OneTour,
+               TourManager.getTourTitle(_allSelectedTours.get(0)),
+               numTags);
 
       } else {
 
@@ -1564,11 +1596,12 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
          final int numTaggedTours = _allTaggedTours.size();
 
-         if (numTaggedTours == 1) {
-            headerText = NLS.bind(Messages.Tour_Tags_Title_MultipleTours_OneTag, numSelectedTours, numTaggedTours);
-         } else {
-            headerText = NLS.bind(Messages.Tour_Tags_Title_MultipleTours_MultipleTags, numSelectedTours, numTaggedTours);
-         }
+         headerText = NLS.bind(Messages.Tour_Tags_Title_MultipleTours,
+               new Object[] {
+                     numSelectedTours,
+                     numTaggedTours,
+                     numTags
+               });
       }
 
       _lblHeader.setText(headerText);

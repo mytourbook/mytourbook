@@ -677,10 +677,6 @@ public class Messages extends NLS {
    public static String        Dialog_JoinTours_Label_TourType;
    public static String        Dialog_JoinTours_Link_TourType;
 
-   public static String        Dialog_SetTags_Message;
-   public static String        Dialog_SetTags_ShellTitle;
-   public static String        Dialog_SetTags_Title;
-
    public static String        Dialog_SetTimeZone_Button_AdjustTimeZone;
    public static String        Dialog_SetTimeZone_Dialog_Title;
    public static String        Dialog_SetTimeZone_Label_Info;
@@ -1043,7 +1039,6 @@ public class Messages extends NLS {
    public static String        Image__TourBook_Week;
    public static String        Image__TourFilter;
    public static String        Image__TourFilter_Disabled;
-   public static String        Image__TourFilter_Selected;
    public static String        Image__TourGeoFilter;
    public static String        Image__TourInfo;
    public static String        Image__TourInfo_Disabled;
@@ -2520,11 +2515,10 @@ public class Messages extends NLS {
 
    public static String Tour_Tags_Action_Layout_Flat_Tooltip;
    public static String Tour_Tags_Action_Layout_Hierarchical_Tooltip;
-   public static String Tour_Tags_Action_TagCheckFilter;
    public static String Tour_Tags_Action_TagCheckFilter_AllTags_Tooltip;
    public static String Tour_Tags_Action_TagCheckFilter_OnlyTaggedTours_Tooltip;
-   public static String Tour_Tags_Title_MultipleTours_MultipleTags;
-   public static String Tour_Tags_Title_MultipleTours_OneTag;
+   public static String Tour_Tags_Title_MultipleTours;
+   public static String Tour_Tags_Title_OneTour;
 
    public static String tag_view_action_refresh_view_tooltip;
    public static String tag_view_title_tag;
