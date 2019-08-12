@@ -24,9 +24,9 @@ import net.tourbook.preferences.PrefPageTags;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -40,14 +40,15 @@ import org.eclipse.swt.widgets.ToolBar;
 /**
  * Tour chart properties slideout.
  */
-public class SlideoutTourTagOptions extends ToolbarSlideout {
+public class Slideout_TourTag_Options extends ToolbarSlideout {
 
-   private final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
+   private IDialogSettings      _state;
+   private TourTags_View        _tourTags_View;
 
-   private SelectionAdapter       _defaultSelectionListener;
+   private SelectionAdapter     _defaultSelectionListener;
 
-   private ActionOpenPrefDialog   _action_PrefDialog;
-   private Action                 _action_RestoreDefaults;
+   private ActionOpenPrefDialog _action_PrefDialog;
+   private Action               _action_RestoreDefaults;
 
    /*
     * UI controls
@@ -59,15 +60,21 @@ public class SlideoutTourTagOptions extends ToolbarSlideout {
    /**
     * @param ownerControl
     * @param toolBar
+    * @param tourTags_View
+    * @param state
     * @param tourChart
     * @param gridPrefPrefix
     */
-   public SlideoutTourTagOptions(final Control ownerControl,
-                                 final ToolBar toolBar) {
+   public Slideout_TourTag_Options(final Control ownerControl,
+                                   final ToolBar toolBar,
+                                   final TourTags_View tourTags_View,
+                                   final IDialogSettings state) {
 
       super(ownerControl, toolBar);
 
       _ownerControl = ownerControl;
+      _tourTags_View = tourTags_View;
+      _state = state;
    }
 
    private void createActions() {

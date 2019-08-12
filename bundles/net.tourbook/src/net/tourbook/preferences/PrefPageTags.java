@@ -591,7 +591,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
          tvc = new TreeViewerColumn(_tagViewer, SWT.LEAD);
          tvcColumn = tvc.getColumn();
          tvcColumn.setText(Messages.Pref_TourTag_Column_Notes);
-         
+
          tvc.setLabelProvider(new CellLabelProvider() {
             @Override
             public void update(final ViewerCell cell) {

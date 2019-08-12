@@ -1709,6 +1709,7 @@ public class Messages extends NLS {
    public static String Pref_TourDb_Radio_DbSystem_Server;
    public static String Pref_TourDb_Radio_DbSystem_Server_Tooltip;
 
+   public static String Pref_TourTag_Column_ID;
    public static String Pref_TourTag_Column_Notes;
    public static String Pref_TourTag_Column_TagsAndCategories;
    public static String Pref_TourTag_Link_AppearanceOptions;
@@ -2515,6 +2516,8 @@ public class Messages extends NLS {
 
    public static String Tour_Tags_Action_Layout_Flat_Tooltip;
    public static String Tour_Tags_Action_Layout_Hierarchical_Tooltip;
+   public static String Tour_Tags_Action_MouseExpandCollapse;
+   public static String Tour_Tags_Action_SingleExpand_CollapseOthers;
    public static String Tour_Tags_Action_TagCheckFilter_AllTags_Tooltip;
    public static String Tour_Tags_Action_TagCheckFilter_OnlyTaggedTours_Tooltip;
    public static String Tour_Tags_Title_MultipleTours;
