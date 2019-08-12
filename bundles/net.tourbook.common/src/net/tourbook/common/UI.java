@@ -678,10 +678,10 @@ public class UI {
    public static float convertPressure_ToMetric(final float weatherPressure) {
 
       if (UNIT_VALUE_TEMPERATURE == 1) {
-         return weatherPressure / 10;
+         return weatherPressure;
       }
 
-      return weatherPressure / 0.02953f / 100;
+      return weatherPressure / 0.02953f;
    }
 
    /**

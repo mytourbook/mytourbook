@@ -7709,7 +7709,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
          _tourData.setWeather_Humidity((short) _spinWeather_Humidity.getSelection());
 
-         final float pressure = _spinWeather_PressureValue.getSelection();
+         float pressure = _spinWeather_PressureValue.getSelection();
+
+         if (UI.UNIT_IS_METRIC) {
+            pressure /= 10.0f;
+         } else {
+            pressure /= 100.0f;
+         }
+
          _tourData.setWeather_Pressure(UI.convertPressure_ToMetric(pressure));
 
          final int precipitation = _spinWeather_PrecipitationValue.getSelection();
