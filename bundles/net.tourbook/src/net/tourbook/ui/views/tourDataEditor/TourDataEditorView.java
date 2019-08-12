@@ -7709,7 +7709,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
          _tourData.setWeather_Humidity((short) _spinWeather_Humidity.getSelection());
 
-         final float pressure = _spinWeather_PressureValue.getSelection() / 100.0f;
+         final float pressure = _spinWeather_PressureValue.getSelection();
          _tourData.setWeather_Pressure(UI.convertPressure_ToMetric(pressure));
 
          final int precipitation = _spinWeather_PrecipitationValue.getSelection();
@@ -8213,8 +8213,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
        */
       final float pressure = UI.convertPressure_FromMetric(_tourData.getWeather_Pressure());
 
-      _spinWeather_PressureValue.setDigits(2);
-      _spinWeather_PressureValue.setSelection(Math.round(pressure * 100));
+      if (UI.UNIT_IS_METRIC) {
+         _spinWeather_PressureValue.setDigits(1);
+         _spinWeather_PressureValue.setSelection(Math.round(pressure * 10));
+      } else {
+         _spinWeather_PressureValue.setDigits(2);
+         _spinWeather_PressureValue.setSelection(Math.round(pressure * 100));
+      }
       _spinWeather_PressureValue.setData(FIX_LINUX_ASYNC_EVENT_1, true);
 
       /*
