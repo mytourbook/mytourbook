@@ -4273,16 +4273,16 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="22.627418"
-     inkscape:cx="326.43363"
-     inkscape:cy="436.11388"
+     inkscape:zoom="32"
+     inkscape:cx="248.06222"
+     inkscape:cy="881.68946"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
      inkscape:window-width="1507"
-     inkscape:window-height="1128"
+     inkscape:window-height="1066"
      inkscape:window-x="117"
-     inkscape:window-y="0"
+     inkscape:window-y="29"
      inkscape:window-maximized="0"
      inkscape:snap-grids="true"
      inkscape:snap-page="false"
@@ -4293,8 +4293,8 @@
      inkscape:snap-bbox="true"
      inkscape:bbox-paths="true"
      inkscape:bbox-nodes="true"
-     inkscape:snap-bbox-edge-midpoints="false"
-     inkscape:snap-bbox-midpoints="false"
+     inkscape:snap-bbox-edge-midpoints="true"
+     inkscape:snap-bbox-midpoints="true"
      inkscape:object-nodes="true"
      inkscape:snap-object-midpoints="true"
      inkscape:snap-others="false"
@@ -4304,7 +4304,8 @@
      inkscape:snap-tangential="true"
      inkscape:snap-text-baseline="true"
      inkscape:snap-smooth-nodes="true"
-     inkscape:snap-midpoints="false">
+     inkscape:snap-midpoints="true"
+     inkscape:snap-center="true">
     <inkscape:grid
        type="xygrid"
        id="grid2993"
@@ -4330,6 +4331,15 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1">
+    <path
+       style="fill:none;stroke:#d0ec86;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 246.0097,170.29504 c 3.09377,0 7.94175,-1.63693 7.9803,-7.98549"
+       id="path2118-1-2-1"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\undo-tour-modifications.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
     <rect
        style="fill:#fe7f00;fill-opacity:1;stroke:none;stroke-width:0.99999988;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
        id="rect5760-8-0-3-9"
@@ -10189,5 +10199,34 @@
        inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\tags-checked.png"
        inkscape:export-xdpi="95.999863"
        inkscape:export-ydpi="95.999863" />
+    <rect
+       style="opacity:0.98999999;fill:none;stroke:none"
+       id="rect6561-8-1-9-9-5-5-9-9-1-3-94-1-6-6-4-1-8"
+       width="16"
+       height="16.000015"
+       x="239.99998"
+       y="-177.36217"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\undo-tour-modifications.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       transform="scale(1,-1)" />
+    <path
+       style="fill:#d0ec86;fill-opacity:1;stroke:#435800;stroke-width:0.99999994;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:normal"
+       d="m 247.3447,175.99471 -6.60768,-6.13341 6.60768,-6.13341"
+       id="rect17705-1-1-8-5-9"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccc"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\undo-tour-modifications.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <path
+       style="fill:#435800;fill-opacity:1;stroke:#435800;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 247.5,170.85118 c 4.92428,0.13079 7.03125,-8.1265 7.03125,-8.33405 0,0 -2,7.34505 -7.03125,7.34505 z"
+       id="path2118-1-2"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cccc"
+       inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\undo-tour-modifications.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
   </g>
 </svg>
