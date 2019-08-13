@@ -1,14 +1,20 @@
 package net.tourbook.map25.layer.marker;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.ImageLoader;
 import org.oscim.backend.CanvasAdapter;
 import org.oscim.backend.canvas.Bitmap;
 import org.oscim.backend.canvas.Color;
@@ -21,6 +27,8 @@ import org.oscim.layers.marker.MarkerRendererFactory;
 import org.oscim.layers.marker.MarkerSymbol;
 import org.oscim.layers.marker.MarkerSymbol.HotspotPlace;
 
+import de.byteholder.geoclipse.map.Map;
+import de.byteholder.geoclipse.map.Tile;
 import net.tourbook.common.color.ColorUtil;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
@@ -28,7 +36,14 @@ import net.tourbook.map.bookmark.MapBookmark;
 import net.tourbook.map25.Map25App;
 import net.tourbook.map25.Map25ConfigManager;
 import net.tourbook.map25.layer.marker.MarkerToolkit.MarkerShape;
+import net.tourbook.photo.ILoadCallBack;
+import net.tourbook.photo.ImageQuality;
 import net.tourbook.photo.Photo;
+import net.tourbook.photo.PhotoImageCache;
+import net.tourbook.photo.PhotoLoadManager;
+import net.tourbook.photo.PhotoLoadingState;
+import net.tourbook.photo.ImageUtils;
+import net.tourbook.map2.view.TourMapPainter;
 
 public class PhotoToolkit {
 
@@ -51,6 +66,8 @@ public class PhotoToolkit {
    private Bitmap _bitmapPhoto;
    private Bitmap _bitmapStar;
    private Bitmap _BitmapClusterStar;
+   
+//   private static ImageUtils _imageUtils;
 
    final Paint _fillPainter = CanvasAdapter.newPaint();
 
@@ -144,10 +161,77 @@ public class PhotoToolkit {
       final Bitmap paintedBitmap = drawable.getBitmap(_BitmapClusterStar);
       return paintedBitmap;
    }
+
+   /**
+    * same as above, but for 2.5D maps
+    * @param photo
+    * @return the image
+    */
+   public  Bitmap getPhotoImage(final Photo photo) {
+      Image photoImage = null;
+      Bitmap photoBitmap = null;
+      
+      final ImageQuality requestedImageQuality = ImageQuality.THUMB;
+      
+      // check if image has an loading error
+      final PhotoLoadingState photoLoadingState = photo.getLoadingState(requestedImageQuality);
+
+      if (photoLoadingState != PhotoLoadingState.IMAGE_IS_INVALID) {
+         System.out.println("!!! entering getPhotoImage");
+         // image is not yet loaded
+
+         // check if image is in the cache
+         photoImage = PhotoImageCache.getImage(photo, requestedImageQuality);
+         
+         if ((photoImage == null || photoImage.isDisposed())
+               && photoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {
+
+            // the requested image is not available in the image cache -> image must be loaded
+
+            //final ILoadCallBack imageLoadCallback = new LoadCallbackImage(map, tile);
+
+            //PhotoLoadManager.putImageInLoadingQueueThumbMap(photo, requestedImageQuality, imageLoadCallback);
+         }
+         if (photoImage != null){
+            try {
+               photoBitmap = CanvasAdapter.decodeBitmap(new ByteArrayInputStream(ImageUtils.formatImage(photoImage, org.eclipse.swt.SWT.IMAGE_BMP)));
+               System.out.println("!!! getPhotoImage created photoBitmap heigth: " + photoBitmap.getHeight() + " width: " +  photoBitmap.getWidth());               
+            } catch (IOException e) {
+               // TODO Auto-generated catch block
+               e.printStackTrace();
+            }
+         }  
+      }
+      
+      return photoBitmap;
+   }
    
+   
+   public Bitmap createPhotoBitmapFromPhoto(Photo photo) {
+      Bitmap bitmap = null;
+      bitmap = getPhotoImage(photo);
+      
+      final org.eclipse.swt.graphics.Point photoSize = photo.getMapImageSize();
+      System.out.println(" ??????????? PhotoToolkit *** createPhotoBitmapfromPhoto: target size x / y: " + photoSize.x + " / " + photoSize.y);
+      
+      System.out.println(" ??????????? PhotoToolkit *** createPhotoBitmapfromPhoto: " + photo.imageFileName);
+      if(bitmap != null) {
+         System.out.println(" ??????????? PhotoToolkit *** createPhotoBitmapfromPhoto width: " + bitmap.getWidth());
+      } else {
+         System.out.println(" ??????????? PhotoToolkit *** createPhotoBitmapfromPhoto was null");
+      }
+      return bitmap;
+   }
  
+   
+   /**
+    * currently not used anymore, was to slow
+    * @param photofile
+    * @return
+    */
    public Bitmap createPhotoBitmapFromFile(String photofile) {
       System.out.println(" PhotoToolkit + *** createPhotoBitmapFromFile for file: " + photofile);
+
       Bitmap photoBitmap = CanvasAdapter.newBitmap(120, 90, 0);
       final File photoFile = new File(photofile);
       Bitmap bitmapFromPhotoFile = null;

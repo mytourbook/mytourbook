@@ -1320,8 +1320,10 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	         + ("\tonItemSingleTapUp") //$NON-NLS-1$
 	         + ("\tMapbookmark") //$NON-NLS-1$
 	         + ("\tTitle:" + item.getTitle()) //$NON-NLS-1$
+	         + ("\tDescription:" + item.description) //$NON-NLS-1$
 	         + ("\tindex:" + index) //$NON-NLS-1$
 	         + ("\t_isMapItemHit:" + _isMapItemHit + " -> true") //$NON-NLS-1$ //$NON-NLS-2$
+	         
 	         //Pref_Map25_Encoding_Mapsforge
 	         );
 	   

@@ -99,6 +99,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -894,39 +895,30 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
          return pts;
       }
       
-//      final int hashGalleryPhotos = galleryPhotos.hashCode();
-//      //allNewPhotoHash = 1;
-//      if (_hashGalleryPhotos == hashGalleryPhotos) {
-//         _mapApp.debugPrint("* Map25View: createPhotoItemList same hash, normaly skipping, not this time ");
-//         //return pts; //otherwise no photos. i dont not why
-//         ;
-//      }
-//      _hashGalleryPhotos = hashGalleryPhotos;
-
       PhotoToolkit phototoolkit = new PhotoToolkit();
-//      _bitmapPhoto = CanvasAdapter.newBitmap(_symbolSizeInt, _symbolSizeInt, 0);
-//      org.oscim.backend.canvas.Canvas defaultPhotoCanvas = CanvasAdapter.newCanvas();
-//      defaultPhotoCanvas.setBitmap(_bitmapPhoto);
-//      float half = _symbolSizeInt/2;
-//      _fillPainter.setColor(0x80FF0000);
-//      defaultPhotoCanvas.drawCircle(half, half, half, _fillPainter);     
-      
-      System.out.println(" Map25View: *** createPhotoItemList: Path: " + galleryPhotos.get(0).imagePathName + " size: " + galleryPhotos.size());
+  
+      //System.out.println(" Map25View: *** createPhotoItemList: Path: " + galleryPhotos.get(0).imagePathName + " size: " + galleryPhotos.size());
       
       for (final  Photo photo : galleryPhotos) {
          
          
          UUID photoKey = UUID.randomUUID();
          String photoName = photo.imageFileName;
-         String photoDescription = photo.getDimensionText();
+         String photoDescription = photo.imageFilePathName;
          Double photoLat = photo.getTourLatitude();
          Double photoLon = photo.getTourLongitude();
          MarkerItem item = new MarkerItem(photoKey, photoName, photoDescription,
                new GeoPoint(photoLat, photoLon)
                );
-         item.setMarker(new MarkerSymbol(phototoolkit.createPhotoBitmapFromFile(photo.imageFilePathName), HotspotPlace.BOTTOM_CENTER));
+         //item.setMarker(new MarkerSymbol(phototoolkit.createPhotoBitmapFromFile(photo.imageFilePathName), HotspotPlace.BOTTOM_CENTER));
+         Bitmap bm = phototoolkit.createPhotoBitmapFromPhoto(photo);
+         if (bm != null) {
+            item.setMarker(new MarkerSymbol(bm, HotspotPlace.BOTTOM_CENTER));
+         }        
+         
+         //System.out.println(" Map25View: *** createPhotoItemList: " + im.toString());
          //item.setMarker(new MarkerSymbol(phototoolkit.createPhotoBitmap(), HotspotPlace.CENTER));
-         System.out.println(" Map25View: *** createPhotoItemList: item lat: " + item.geoPoint.getLatitude() + " lon: " + item.geoPoint.getLongitude());
+         //System.out.println(" Map25View: *** createPhotoItemList: item lat: " + item.geoPoint.getLatitude() + " lon: " + item.geoPoint.getLongitude());
          pts.add(item);
       }
       _photo_pts = pts;
@@ -1598,19 +1590,11 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       photoLayer.removeAllItems();
       
       List<MarkerItem> photoItems = createPhotoItemList(_allPhotos);
-      
-//      int allNewPhotoHash = _allPhotos.hashCode();
-//      allNewPhotoHash = 2;
-//      if (allNewPhotoHash != _hashGalleryPhotos) {
-//         photoItems = createPhotoItemList(_allPhotos);
-//      }else {
-//         _mapApp.debugPrint("* Map25View: paintTours_AndUpdateMap: same hash, skipping ");
-//      }
-      
-      photoItems = createPhotoItemList(_allPhotos);
+          
+//      photoItems = createPhotoItemList(_allPhotos);
       _mapApp.debugPrint(" Map25View: ** paintTours_AndUpdateMap: creating photoItems with size: " + photoItems.size());
       photoLayer.addItems(photoItems);
-      photoLayer.setEnabled(true);
+      //photoLayer.setEnabled(true);
       _mapApp.debugPrint(" Map25View: ** paintTours_AndUpdateMap: creating photolayer with size: " + _allPhotos.size());
 
       
@@ -1711,7 +1695,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       _state.put(STATE_IS_LAYER_TILE_INFO_VISIBLE, _mapApp.getLayer_TileInfo().isEnabled());
       
       _state.put(STATE_IS_LAYER_TOUR_VISIBLE, _mapApp.getLayer_Tour().isEnabled());
-      _state.put(STATE_IS_LAYER_TOUR_VISIBLE, false);  //default off @ next start
+      _state.put(STATE_IS_LAYER_TOUR_VISIBLE, _mapApp.getLayer_Photo().isEnabled());
       
       _state.put(STATE_IS_LAYER_SCALE_BAR_VISIBLE, _mapApp.getLayer_ScaleBar().isEnabled());
 
