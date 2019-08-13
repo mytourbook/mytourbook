@@ -1,25 +1,25 @@
 package net.tourbook.map25.layer.marker;
 
+import java.awt.Point;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.graphics.ImageLoader;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Display;
+import org.imgscalr.Scalr.Rotation;
 import org.oscim.backend.CanvasAdapter;
 import org.oscim.backend.canvas.Bitmap;
 import org.oscim.backend.canvas.Color;
 import org.oscim.backend.canvas.Paint;
-import org.oscim.core.GeoPoint;
 import org.oscim.layers.marker.ClusterMarkerRenderer;
 //import org.oscim.layers.marker.ItemizedLayer;
 import org.oscim.layers.marker.MarkerItem;
@@ -27,8 +27,6 @@ import org.oscim.layers.marker.MarkerRendererFactory;
 import org.oscim.layers.marker.MarkerSymbol;
 import org.oscim.layers.marker.MarkerSymbol.HotspotPlace;
 
-import de.byteholder.geoclipse.map.Map;
-import de.byteholder.geoclipse.map.Tile;
 import net.tourbook.common.color.ColorUtil;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
@@ -43,7 +41,7 @@ import net.tourbook.photo.PhotoImageCache;
 import net.tourbook.photo.PhotoLoadManager;
 import net.tourbook.photo.PhotoLoadingState;
 import net.tourbook.photo.ImageUtils;
-import net.tourbook.map2.view.TourMapPainter;
+
 
 public class PhotoToolkit {
 
@@ -79,6 +77,7 @@ public class PhotoToolkit {
    
    public boolean _isMarkerClusteredLast;
    
+   Display                       _display;
    
    //private Map25App                      _mapApp;
    public enum PhotoMode {DEMO, NORMAL};
@@ -170,12 +169,14 @@ public class PhotoToolkit {
    public  Bitmap getPhotoImage(final Photo photo) {
       Image photoImage = null;
       Bitmap photoBitmap = null;
+      //final org.eclipse.swt.graphics.Point photoSize = photo.getMapImageSize();
       
       final ImageQuality requestedImageQuality = ImageQuality.THUMB;
       
       // check if image has an loading error
       final PhotoLoadingState photoLoadingState = photo.getLoadingState(requestedImageQuality);
 
+ 
       if (photoLoadingState != PhotoLoadingState.IMAGE_IS_INVALID) {
          System.out.println("!!! entering getPhotoImage");
          // image is not yet loaded
@@ -192,14 +193,45 @@ public class PhotoToolkit {
 
             //PhotoLoadManager.putImageInLoadingQueueThumbMap(photo, requestedImageQuality, imageLoadCallback);
          }
+                      
          if (photoImage != null){
+            
+            Rectangle imageBounds = photoImage.getBounds();
+            final int originalImageWidth = imageBounds.width;
+            final int originalImageHeight = imageBounds.height;  
+            
+            int imageWidth = originalImageWidth;
+            int imageHeight = originalImageHeight;
+            
+            final int thumbSize = PhotoLoadManager.IMAGE_SIZE_THUMBNAIL;
+            boolean isRotated = false;
+            
+            final Point bestSize = ImageUtils.getBestSize(imageWidth, imageHeight, thumbSize, thumbSize);
+            Rotation thumbRotation = null;  
+            if (isRotated == false) {
+               isRotated = true;
+               //thumbRotation = getRotation();
+            }
+            
+            final Image scaledThumbImage = ImageUtils.resize(
+                  _display,
+                  photoImage,
+                  bestSize.x,
+                  bestSize.y,
+                  SWT.ON,
+                  SWT.LOW,
+                  thumbRotation);          
+            
             try {
-               photoBitmap = CanvasAdapter.decodeBitmap(new ByteArrayInputStream(ImageUtils.formatImage(photoImage, org.eclipse.swt.SWT.IMAGE_BMP)));
+               
+               //photoBitmap = CanvasAdapter.decodeBitmap(new ByteArrayInputStream(ImageUtils.formatImage(photoImage, org.eclipse.swt.SWT.IMAGE_BMP)));
+               photoBitmap = CanvasAdapter.decodeBitmap(new ByteArrayInputStream(ImageUtils.formatImage(scaledThumbImage, org.eclipse.swt.SWT.IMAGE_BMP)));
                System.out.println("!!! getPhotoImage created photoBitmap heigth: " + photoBitmap.getHeight() + " width: " +  photoBitmap.getWidth());               
             } catch (IOException e) {
                // TODO Auto-generated catch block
                e.printStackTrace();
             }
+
          }  
       }
       
@@ -212,6 +244,8 @@ public class PhotoToolkit {
       bitmap = getPhotoImage(photo);
       
       final org.eclipse.swt.graphics.Point photoSize = photo.getMapImageSize();
+      
+      
       System.out.println(" ??????????? PhotoToolkit *** createPhotoBitmapfromPhoto: target size x / y: " + photoSize.x + " / " + photoSize.y);
       
       System.out.println(" ??????????? PhotoToolkit *** createPhotoBitmapfromPhoto: " + photo.imageFileName);
@@ -224,92 +258,5 @@ public class PhotoToolkit {
    }
  
    
-   /**
-    * currently not used anymore, was to slow
-    * @param photofile
-    * @return
-    */
-   public Bitmap createPhotoBitmapFromFile(String photofile) {
-      System.out.println(" PhotoToolkit + *** createPhotoBitmapFromFile for file: " + photofile);
-
-      Bitmap photoBitmap = CanvasAdapter.newBitmap(120, 90, 0);
-      final File photoFile = new File(photofile);
-      Bitmap bitmapFromPhotoFile = null;
-      FileInputStream fileStream;
-      try {
-         fileStream = new FileInputStream(photoFile);
-         bitmapFromPhotoFile = CanvasAdapter.decodeBitmap(fileStream, 120, 90, 100);
-      } catch (FileNotFoundException e1) {
-         e1.printStackTrace();
-         return _bitmapPhoto;
-      } catch (IOException e) {
-         // TODO Auto-generated catch block
-         e.printStackTrace();
-         return _bitmapPhoto;
-      }
-
-      org.oscim.backend.canvas.Canvas PhotoCanvas = CanvasAdapter.newCanvas();  
-      PhotoCanvas.setBitmap(photoBitmap);
-      PhotoCanvas.drawBitmap(bitmapFromPhotoFile, 0, 0);
-      //PhotoCanvas.drawBitmapScaled(bitmapFromPhotoFile);
-      float half = _symbolSizeInt/2;
-
-      return photoBitmap;
-   }
-   
-   
-//   public List<MarkerItem> createPhotoItemList(ArrayList<Photo> galleryPhotos, PhotoMode PhotoMode){
-//      loadConfig();
-//      
-//      List<MarkerItem> pts = new ArrayList<>();
-//      System.out.println(" PhotoToolkit + *** paintPhotoSelection: Path: " + galleryPhotos.get(0).imagePathName);
-//      for (final  Photo photo : galleryPhotos) {
-//         //UUID photoKey = UUID.fromString(Photo.getImageKeyThumb(photo.imageFilePathName));
-//         UUID photoKey = UUID.randomUUID();
-//         String photoName = photo.imageFileName;
-//         String photoDescription = photo.getDimensionText();
-//         Double photoLat = photo.getTourLatitude();
-//         Double photoLon = photo.getTourLongitude();
-//         
-//         MarkerItem item = new MarkerItem(photoKey, photoName, photoDescription,
-//               new GeoPoint(photoLat, photoLon)
-//               );
-//         item.setMarker(new MarkerSymbol(createPhotoBitmap(), HotspotPlace.CENTER));
-//         System.out.println("item lat: " + item.geoPoint.getLatitude() + " lon: " + item.geoPoint.getLongitude());
-//         //item.get
-//         pts.add(item);
-//
-//        /* System.out.println(" PhotoToolkit + *** createMarkerItemList, adding: " + " " + photo.imageFileName +
-//               " tour lat: " + photo.getTourLatitude() + " lon: " + photo.getTourLongitude() +
-//               " dimtext:" + photo.getDimensionText() +
-//               " keythumb:" + Photo.getImageKeyThumb(photo.imageFilePathName)
-//               );*/
-//      } 
-//      
-//
-//      if (PhotoMode == PhotoMode.NORMAL) {
-//         this._photo_pts = pts;
-//         return pts;};
-//
-//      int COUNT = 5;
-//      float STEP = 100f / 110000f; // roughly 100 meters
-//
-//      double demo_lat = 47.2266239;
-//      double demo_lon = 8.8184374;
-//
-//      for (int x = -COUNT; x < COUNT; x++) {
-//         for (int y = -COUNT; y < COUNT; y++) {
-//            double random = STEP * Math.random() * 2;
-//            MarkerItem item = new MarkerItem(y + ", " + x, "Title " + demo_lat + "/" + demo_lon,"Description "  + x + "/" + y, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-//                  new GeoPoint(demo_lat + y * STEP + random, demo_lon + x * STEP + random)
-//                  );
-//      //      item.setMarker(createAdvanceSymbol(item, _bitmapPoi));
-//            pts.add(item);
-//         }
-//      }
-//      this._photo_pts = pts;
-//      this._galleryPhotos = galleryPhotos;
-//      return pts;  
-//   }
    
 }
