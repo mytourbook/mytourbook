@@ -451,6 +451,8 @@ public class Messages extends NLS {
    public static String        App_Action_RestartApp;
    public static String        App_Action_RestoreDefault;
    public static String        App_Action_RestoreDefault_Tooltip;
+   public static String        App_Action_RestoreTour;
+   public static String        App_Action_RestoreTour_Disabled;
    public static String        App_Action_set_tour_type;
    public static String        App_Action_Save;
 
@@ -461,8 +463,6 @@ public class Messages extends NLS {
    public static String        App_Action_SplitTour;
    public static String        App_Action_ToolTipLocation_AboveTourChart_Tooltip;
    public static String        App_Action_ToolTipLocation_BelowTourChart_Tooltip;
-   public static String App_Action_UndoTourModifications;
-
    public static String        App_Action_UpdateNew;
 
    public static String        App_measurement_imperial;

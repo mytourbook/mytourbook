@@ -32,7 +32,7 @@ Changes
 
 * Tour Book View
 
-  -  Moved tour actions into submenu "Adjust Tour Values"
+  -  Moved all tour modify actions into submenu "Adjust Tour Values"
 
 
 Bugfix   

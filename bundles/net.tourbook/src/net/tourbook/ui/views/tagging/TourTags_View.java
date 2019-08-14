@@ -123,9 +123,9 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
    private static final String                STATE_SORT_COLUMN_DIRECTION               = "STATE_SORT_COLUMN_DIRECTION";                 //$NON-NLS-1$
    private static final String                STATE_SORT_COLUMN_ID                      = "STATE_SORT_COLUMN_ID";                        //$NON-NLS-1$
 
-   private static final String                COLUMN_ID                                 = "id"; //$NON-NLS-1$
-   private static final String                COLUMN_NOTES                              = "notes"; //$NON-NLS-1$
-   private static final String                COLUMN_TAGS                               = "tags"; //$NON-NLS-1$
+   private static final String                COLUMN_ID                                 = "id";                                          //$NON-NLS-1$
+   private static final String                COLUMN_NOTES                              = "notes";                                       //$NON-NLS-1$
+   private static final String                COLUMN_TAGS                               = "tags";                                        //$NON-NLS-1$
 
    private final IDialogSettings              _state                                    = TourbookPlugin.getState("TourTagsView");       //$NON-NLS-1$
 
@@ -280,8 +280,8 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
          setText(Messages.app_action_undo_modifications);
          setToolTipText(Messages.app_action_undo_modifications_tooltip);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.App_Action_UndoTourModifications));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__undo_edit_disabled));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.App_Action_RestoreTour));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.App_Action_RestoreTour_Disabled));
 
          setEnabled(false);
       }
@@ -1202,19 +1202,23 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
       // toggle tag filter
       _isShowOnlyCheckedTags = !_isShowOnlyCheckedTags;
 
-      if (_isShowOnlyCheckedTags && _isHierarchicalLayout) {
+      _parent.setRedraw(false);
+      {
+         if (_isShowOnlyCheckedTags && _isHierarchicalLayout) {
 
-         // tag viewer must not display a tree
+            // tag viewer must not display a tree
 
-         onAction_TagLayout();
-         updateUI_TagFilter();
+            onAction_TagLayout();
+            updateUI_TagFilter();
 
-      } else {
+         } else {
 
-         updateUI_TagFilter();
+            updateUI_TagFilter();
 
-         enableControls();
+            enableControls();
+         }
       }
+      _parent.setRedraw(true);
    }
 
    private void onAction_TagLayout() {
@@ -1222,24 +1226,28 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
       // toggle layout
       _isHierarchicalLayout = !_isHierarchicalLayout;
 
-      if (_isHierarchicalLayout && _isShowOnlyCheckedTags) {
+      _parent.setRedraw(false);
+      {
+         if (_isHierarchicalLayout && _isShowOnlyCheckedTags) {
 
-         // currently the tree cannot show only checked tags -> show all tags in the tree but with ckecked tags
+            // currently the tree cannot show only checked tags -> show all tags in the tree but with ckecked tags
 
-         _isShowOnlyCheckedTags = false;
-         _actionTagFilter.setChecked(false);
+            _isShowOnlyCheckedTags = false;
+            _actionTagFilter.setChecked(false);
 
-         updateUI_TagFilter();
+            updateUI_TagFilter();
+         }
+
+         updateUI_TagLayoutAction();
+
+         recreateViewer(_tagViewer);
+
+         // tags in the tree hierarchie must be rechecked otherwise they are not checked
+         updateUI_Tags(_allTaggedTours, true);
+
+         enableControls();
       }
-
-      updateUI_TagLayoutAction();
-
-      recreateViewer(_tagViewer);
-
-      // tags in the tree hierarchie must be rechecked otherwise they are not checked
-      updateUI_Tags(_allTaggedTours, true);
-
-      enableControls();
+      _parent.setRedraw(true);
    }
 
    private void onAction_UndoChanges() {
