@@ -1584,15 +1584,14 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
        * Photos
        */
       paintPhotos(_allPhotos);
-      _mapApp.debugPrint(" Map25View: ** paintTours_AndUpdateMap: creating photolayer OLD with size: " + _allPhotos.size());
+      //_mapApp.debugPrint(" Map25View: ** paintTours_AndUpdateMap: creating photolayer OLD with size: " + _allPhotos.size());
       
       final ItemizedLayer<MarkerItem> photoLayer = _mapApp.getLayer_Photo();
       photoLayer.removeAllItems();
-      
-      List<MarkerItem> photoItems = createPhotoItemList(_allPhotos);
-          
-//      photoItems = createPhotoItemList(_allPhotos);
-      _mapApp.debugPrint(" Map25View: ** paintTours_AndUpdateMap: creating photoItems with size: " + photoItems.size());
+
+      final List<MarkerItem> photoItems = createPhotoItemList(_allPhotos);
+
+      //_mapApp.debugPrint(" Map25View: ** paintTours_AndUpdateMap: creating photoItems with size: " + photoItems.size());
       photoLayer.addItems(photoItems);
       //photoLayer.setEnabled(true);
       _mapApp.debugPrint(" Map25View: ** paintTours_AndUpdateMap: creating photolayer with size: " + _allPhotos.size());

@@ -49,10 +49,10 @@ public class MarkerToolkit {
    
    private int  _clusterSymbolWeight;
    private float  _clusterOutlineSize;
-   private Bitmap _clusterBitmap;
+   private Bitmap _bitmapCluster;
    //private boolean _isBillboard;
    
-   public MarkerSymbol _symbol;
+   public MarkerSymbol _symbol;  //marker symbol circle or star
    private float _symbolSize = 10f;
    private int _symbolSizeInt = 10;
    private int _clusterSymbol_Size;
@@ -79,7 +79,7 @@ public class MarkerToolkit {
 
       _fillPainter.setStyle(Paint.Style.FILL);
       
-      _clusterBitmap = createClusterBitmap(1);
+      _bitmapCluster = createClusterBitmap(1);
       
       _bitmapPoi = createPoiBitmap(shape);
       
@@ -97,8 +97,8 @@ public class MarkerToolkit {
                protected Bitmap getClusterBitmap(int size) {
                   // Can customize cluster bitmap here
                   //System.out.println("*** Markertoolkit:  cluster size: " + size); //$NON-NLS-1$
-                  _clusterBitmap = createClusterBitmap(size);
-                  return _clusterBitmap;
+                  _bitmapCluster = createClusterBitmap(size);
+                  return _bitmapCluster;
                }
             };
          }
@@ -148,6 +148,7 @@ public class MarkerToolkit {
    }
    
    public Bitmap drawStar(int bitmapStarSize) {
+      //System.out.println("*** Markertoolkit:  drawstar: "); //$NON-NLS-1$
       _bitmapStar = CanvasAdapter.newBitmap(bitmapStarSize, bitmapStarSize, 0);
       org.oscim.backend.canvas.Canvas defaultMarkerCanvas = CanvasAdapter.newCanvas();
       defaultMarkerCanvas.setBitmap(_bitmapStar);
@@ -165,7 +166,11 @@ public class MarkerToolkit {
       return _bitmapStar;
    }
    
-   
+   /**
+    * this creates the bitmap for clustering a draw the size as text in the middle
+    * @param size 
+    * @return
+    */
    public Bitmap createClusterBitmap(int size) {
       
       final ScreenUtils.ClusterDrawable drawable = new ScreenUtils.ClusterDrawable(
