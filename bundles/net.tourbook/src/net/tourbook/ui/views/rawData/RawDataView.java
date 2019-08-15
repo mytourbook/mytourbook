@@ -296,6 +296,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       HREF_ACTION_SETUP_EASY_IMPORT = HREF_TOKEN + ACTION_SETUP_EASY_IMPORT + HREF_TOKEN;
    }
 
+   private static boolean                 _isStopWatchingStoresThread;
    //
    private final IPreferenceStore         _prefStore                      = TourbookPlugin.getPrefStore();
    private final IPreferenceStore         _prefStoreCommon                = CommonActivator.getPrefStore();
@@ -383,7 +384,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private Thread                 _watchingStoresThread;
    private Thread                 _watchingFolderThread;
    private WatchService           _folderWatcher;
-   private boolean                _isStopWatchingStoresThread;
    private AtomicBoolean          _isWatchingStores           = new AtomicBoolean();
    private AtomicBoolean          _isDeviceStateUpdateDelayed = new AtomicBoolean();
    private ReentrantLock          WATCH_LOCK                  = new ReentrantLock();
@@ -641,6 +641,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       @Override
       public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {}
+   }
+
+   public static boolean isStopWatchingStoresThread() {
+      return _isStopWatchingStoresThread;
    }
 
    private void action_Easy_SetDeviceWatching_OnOff() {
@@ -3908,7 +3912,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
              * set transparency
              */
             final ImageData imageData = tempImage.getImageData();
-            imageData.transparentPixel = imageData.getPixel(0, 0);
+            imageData.transparentPixel = imageData.palette.getPixel(TourType.TRANSPARENT_COLOR);
 
             image = new Image(display, imageData);
          }
@@ -3941,7 +3945,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                 * set transparency
                 */
                final ImageData imageData = tempImage.getImageData();
-               imageData.transparentPixel = imageData.getPixel(0, 0);
+               imageData.transparentPixel = imageData.palette.getPixel(TourType.TRANSPARENT_COLOR);
 
                image = new Image(display, imageData);
 
@@ -5493,7 +5497,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
                   monitor.beginTask(Messages.Import_Data_Task_CloseDeviceInfo, IProgressMonitor.UNKNOWN);
 
-                  final int waitingTime = 10000;
+                  final int waitingTime = 5000; // in ms
 
                   _watchingStoresThread.join(waitingTime);
 
@@ -5503,15 +5507,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
                      _watchingStoresThread.interrupt();
 
-                     Display.getDefault().asyncExec(new Runnable() {
-                        @Override
-                        public void run() {
-
-                           StatusUtil.showInfo(NLS.bind(//
-                                 Messages.Import_Data_Task_CloseDeviceInfo_CannotClose,
-                                 waitingTime / 1000));
-                        }
-                     });
+                     StatusUtil.logInfo(NLS.bind(
+                           Messages.Import_Data_Task_CloseDeviceInfo_CannotClose,
+                           waitingTime / 1000));
                   }
 
                } catch (final InterruptedException e) {
@@ -5559,8 +5557,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
                         final boolean isCheckFiles = _isDeviceStateValid == false;
 
-                        final DeviceImportState importState = EasyImportManager.getInstance()//
-                              .checkImportedFiles(isCheckFiles);
+                        final DeviceImportState importState = EasyImportManager.getInstance().checkImportedFiles(isCheckFiles);
 
                         if (importState.areTheSameStores == false || isCheckFiles) {
 
