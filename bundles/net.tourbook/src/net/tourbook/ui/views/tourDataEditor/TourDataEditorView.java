@@ -4107,7 +4107,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
          _spinWeather_PressureValue = new Spinner(container, SWT.BORDER);
          _spinWeather_PressureValue.setToolTipText(Messages.Tour_Editor_Label_AirPressure_Tooltip);
          //The highest barometric pressure ever recorded on Earth was 32.01 inches (1083.98), measured in Agata, U.S.S.R., on December 31, 1968.
-         _spinWeather_PressureValue.setMaximum(108398);
+         _spinWeather_PressureValue.setMaximum(110000);
          _spinWeather_PressureValue.addMouseWheelListener(_mouseWheelListener);
          _spinWeather_PressureValue.addSelectionListener(_selectionListener);
 
