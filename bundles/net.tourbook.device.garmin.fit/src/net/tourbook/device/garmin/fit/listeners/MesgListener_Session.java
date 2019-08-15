@@ -21,8 +21,10 @@ import com.garmin.fit.SessionMesgListener;
 import com.garmin.fit.Sport;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 
 import net.tourbook.common.time.TimeTools;
+import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.device.garmin.fit.FitData;
 import net.tourbook.device.garmin.fit.FitDataReaderException;
@@ -105,14 +107,34 @@ public class MesgListener_Session extends AbstractMesgListener implements Sessio
       }
 
       // -----------------------POWER -----------------------
-
-      final Integer avgPower = mesg.getAvgPower();
+      Integer avgPower = mesg.getAvgPower();
       if (avgPower != null) {
          tourData.setPower_Avg(avgPower);
       }
-      final Integer maxPower = mesg.getMaxPower();
+
+      Integer maxPower = mesg.getMaxPower();
       if (maxPower != null) {
          tourData.setPower_Max(maxPower);
+      }
+
+      // Looking if the power was retrieved from the developer fields
+      if (mesg.getMaxPower() == null && mesg.getAvgPower() == null) {
+         final ArrayList<Float> powerDataList = new ArrayList<>();
+         for (final TimeData timeData : fitData.getAllTimeData()) {
+            powerDataList.add(timeData.power);
+
+            if (tourData.getPower_DataSource() == null) {
+               tourData.setPower_DataSource(timeData.powerDataSource);
+            }
+         }
+
+         avgPower = (int) powerDataList.stream().mapToDouble(Float::doubleValue).average().getAsDouble();
+         tourData.setPower_Avg(avgPower);
+
+         maxPower = (int) powerDataList.stream().mapToDouble(Float::doubleValue).max().getAsDouble();
+         tourData.setPower_Max(maxPower);
+
+         tourData.setIsStrideSensorPresent(true);
       }
 
       final Integer normalizedPower = mesg.getNormalizedPower();
@@ -179,4 +201,5 @@ public class MesgListener_Session extends AbstractMesgListener implements Sessio
 
       fitData.onSetup_Session_20_Finalize();
    }
+
 }

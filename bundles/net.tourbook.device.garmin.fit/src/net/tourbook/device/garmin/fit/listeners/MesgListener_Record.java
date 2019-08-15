@@ -20,8 +20,6 @@ import com.garmin.fit.DeveloperField;
 import com.garmin.fit.RecordMesg;
 import com.garmin.fit.RecordMesgListener;
 
-import java.util.stream.StreamSupport;
-
 import net.tourbook.common.UI;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
@@ -42,9 +40,9 @@ public class MesgListener_Record extends AbstractMesgListener implements RecordM
    private static final String DEV_FIELD_NAME__CADENCE              = "Cadence";                                  //$NON-NLS-1$
    private static final String DEV_FIELD_NAME__GROUND_TIME          = "Ground Time";                              //$NON-NLS-1$
    private static final String DEV_FIELD_NAME__LEG_SPRING_STIFFNESS = "Leg Spring Stiffness";                     //$NON-NLS-1$
-   private static final String DEV_FIELD_NAME__POWER                = "Power";                                    //$NON-NLS-1$
+   public static final String  DEV_FIELD_NAME__POWER                = "Power";                                    //$NON-NLS-1$
    //Power Data from Garmin Running Dynamics Pod
-   private static final String DEV_FIELD_NAME__RP_POWER             = "RP_Power";                                 //$NON-NLS-1$
+   public static final String  DEV_FIELD_NAME__RP_POWER             = "RP_Power";                                 //$NON-NLS-1$
    private static final String DEV_FIELD_NAME__FORM_POWER           = "Form Power";                               //$NON-NLS-1$
    private static final String DEV_FIELD_NAME__ELEVATION            = "Elevation";                                //$NON-NLS-1$
    private static final String DEV_FIELD_NAME__VERTICAL_OSCILLATION = "Vertical Oscillation";                     //$NON-NLS-1$
@@ -266,13 +264,13 @@ public class MesgListener_Record extends AbstractMesgListener implements RecordM
 
       /**
        * Running dynamics data <code>
-
+      
       //	|| fieldName.equals("stance_time") //				     253.0  ms
       //	|| fieldName.equals("stance_time_balance") //		   51.31 percent
       //	|| fieldName.equals("step_length") //				    1526.0  mm
       // || fieldName.equals("vertical_oscillation") //       105.2  mm          //$NON-NLS-1$
       // || fieldName.equals("vertical_ratio") //               8.96 percent     //$NON-NLS-1$
-
+      
        * </code>
        */
       final Float stanceTime = mesg.getStanceTime();
@@ -311,10 +309,14 @@ public class MesgListener_Record extends AbstractMesgListener implements RecordM
     */
    private void setRecord_DeveloperData(final RecordMesg mesg, final TimeData timeData) {
 
-      final boolean containsMultiplePowerDataSources =
-            StreamSupport.stream(mesg.getDeveloperFields().spliterator(), false)
-                  .anyMatch(developerField -> developerField.getName().equals(DEV_FIELD_NAME__POWER) &&
-                        developerField.getName().equals(DEV_FIELD_NAME__POWER));
+      int powerDataSources = 0;
+
+      for (final DeveloperField developerField : mesg.getDeveloperFields()) {
+         if (developerField.getName().equals(DEV_FIELD_NAME__POWER) ||
+               developerField.getName().equals(DEV_FIELD_NAME__RP_POWER)) {
+            ++powerDataSources;
+         }
+      }
 
       for (final DeveloperField devField : mesg.getDeveloperFields()) {
 
@@ -360,7 +362,7 @@ public class MesgListener_Record extends AbstractMesgListener implements RecordM
             //If the current power data source is not the one
             //specified by the user as the "preferred" data source,
             //we do not import it.
-            if (containsMultiplePowerDataSources) {
+            if (powerDataSources > 1) {
 
                //Stryd
                if (devField.getName().equals(DEV_FIELD_NAME__POWER) &&
@@ -374,6 +376,9 @@ public class MesgListener_Record extends AbstractMesgListener implements RecordM
                   break;
                }
             }
+
+            timeData.powerDataSource = devField.getName().equals(DEV_FIELD_NAME__POWER) ? Messages.PrefPage_Fit_Combo_Power_Data_Source_Stryd
+                  : Messages.PrefPage_Fit_Combo_Power_Data_Source_Garmin_RD_Pod;
 
             //  112 Watts
 

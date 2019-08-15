@@ -103,7 +103,7 @@ public class TourDatabase {
    /**
     * Version for the database which is required that the tourbook application works successfully
     */
-   private static final int TOURBOOK_DB_VERSION = 39;
+   private static final int TOURBOOK_DB_VERSION = 40;
 //   private static final int TOURBOOK_DB_VERSION = 39; // 19.7 ?
 //   private static final int TOURBOOK_DB_VERSION = 38; // 19.5 ?
 //   private static final int TOURBOOK_DB_VERSION = 37; // 19.2
@@ -2944,6 +2944,12 @@ public class TourDatabase {
             //
             // version 39 end
 
+            // version 40 start  -  19.9
+            //
+            + " power_DataSource     VARCHAR(" + TourData.DB_LENGTH_POWER_DATA_SOURCE + "),      \n" //$NON-NLS-1$ //$NON-NLS-2$
+            //
+            // version 40 end
+
             //            // version 35 start  -  18.?
             //            //
             //            + " LatitudeMinE6         INTEGER DEFAULT 0,                        \n" //$NON-NLS-1$
@@ -4680,6 +4686,11 @@ public class TourDatabase {
          // 38 -> 39
          if (currentDbVersion == 38) {
             currentDbVersion = newVersion = updateDbDesign_038_to_039(conn, splashManager);
+         }
+
+         // 39 -> 40
+         if (currentDbVersion == 39) {
+            currentDbVersion = newVersion = updateDbDesign_039_to_040(conn, splashManager);
          }
 
          /*
@@ -7093,6 +7104,33 @@ public class TourDatabase {
             SQL.AddCol_Float     (stmt, TABLE_TOUR_DATA, "weather_Temperature_Min",       DEFAULT_0);       //$NON-NLS-1$
             SQL.AddCol_Float     (stmt, TABLE_TOUR_DATA, "weather_Temperature_Max",       DEFAULT_0);       //$NON-NLS-1$
             SQL.AddCol_Float     (stmt, TABLE_TOUR_DATA, "weather_Temperature_WindChill", DEFAULT_0);       //$NON-NLS-1$
+
+// SET_FORMATTING_ON
+         }
+      }
+      stmt.close();
+
+      logDb_UpdateEnd(newDbVersion);
+
+      return newDbVersion;
+   }
+
+   private int updateDbDesign_039_to_040(final Connection conn, final SplashManager splashManager) throws SQLException {
+
+      final int newDbVersion = 40;
+
+      logDb_UpdateStart(newDbVersion);
+      updateMonitor(splashManager, newDbVersion);
+
+      final Statement stmt = conn.createStatement();
+      {
+         // check if db is updated to version 40
+         if (isColumnAvailable(conn, TABLE_TOUR_DATA, "power_DataSource") == false) { //$NON-NLS-1$
+
+// SET_FORMATTING_OFF
+
+            // Add new columns
+            SQL.AddCol_VarCar   (stmt, TABLE_TOUR_DATA, "power_DataSource",  TourData.DB_LENGTH_POWER_DATA_SOURCE);   //$NON-NLS-1$
 
 // SET_FORMATTING_ON
          }
