@@ -625,7 +625,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
 		updateUI_MapBookmarkLayer();
 		
-		updateUI_PhotoLayer();
+		//updateUI_PhotoLayer();
 		
 		mMap.render();
 	}
@@ -792,7 +792,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
             
             updateUI_MapBookmarkLayer();
             
-            updateUI_PhotoLayer();
+            //updateUI_PhotoLayer();
             
             /**
              * Map Viewport
@@ -1065,23 +1065,23 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       _layer_MapBookmark.addItems(pts);
       _layer_MapBookmark.setEnabled(false);
       layers.add(_layer_MapBookmark);	   
-	   
+
+      // marker
+      _layer_Marker = new MarkerLayer(mMap, this);
+      _layer_Marker.setEnabled(false);
+      layers.add(_layer_Marker);      
+      
       //Photos
       _phototoolkit = new PhotoToolkit();
-      if (config.isMarkerClustered) { //sharing same setting as MapBookmarks, later photolayer should get its own configuration
-         _layer_Photo = new  ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(),  _phototoolkit._markerRendererFactory, this);
-      } else {
+      //if (config.isMarkerClustered) { //sharing same setting as MapBookmarks, later photolayer should get its own configuration
+         //_layer_Photo = new  ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(),  _phototoolkit._markerRendererFactory, this);
+      //} else {
          _layer_Photo = new  ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(),  _phototoolkit._symbol, this);
-      }
+      //}
       //_layer_Photo.addItems(_phototoolkit._photo_pts);  //must not be done at startup, no tour is loadet yet
       _layer_Photo.setEnabled(false);
       layers.add(_layer_Photo);
       
-	   // marker
-	   _layer_Marker = new MarkerLayer(mMap, this);
-	   _layer_Marker.setEnabled(false);
-	   layers.add(_layer_Marker);
-
 	   // slider location
 	   _layer_SliderLocation = new SliderLocation_Layer(mMap);
 	   _layer_SliderLocation.setEnabled(false);
@@ -1174,7 +1174,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       } else {
          _layer_Photo.removeAllItems();
       }  
-      //_layer_Photo.removeAllItems();
+
       //List<MarkerItem> pts = _markertoolkit.createMarkerItemList(_markerMode); //hopefully done in map25view "paintToursAndUpdate"
       //_layer_Photo.addItems(pts); //hopefully done in map25view "paintToursAndUpdate"
       _layer_Photo.setEnabled(isShowPhotoLayer);
