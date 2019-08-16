@@ -101,9 +101,11 @@ import org.eclipse.ui.PlatformUI;
 public class TourDatabase {
 
    /**
-    * version for the database which is required that the tourbook application works successfully
+    * Version for the database which is required that the tourbook application works successfully
     */
-   private static final int TOURBOOK_DB_VERSION = 37;
+   private static final int TOURBOOK_DB_VERSION = 39;
+//   private static final int TOURBOOK_DB_VERSION = 39; // 19.7 ?
+//   private static final int TOURBOOK_DB_VERSION = 38; // 19.5 ?
 //   private static final int TOURBOOK_DB_VERSION = 37; // 19.2
 //   private static final int TOURBOOK_DB_VERSION = 36; // 18.12
 //   private static final int TOURBOOK_DB_VERSION = 35; // 18.7
@@ -180,64 +182,69 @@ public class TourDatabase {
    private static final String JOINTABLE__TOURPERSON__TOURPERSON_HRZONE = TABLE_TOUR_PERSON + "_" + TABLE_TOUR_PERSON_HRZONE; //$NON-NLS-1$
 
    // never used tables, is needed to drop them
-   private final static String                    TABLE_TOUR_CATEGORY             = "TourCategory";                                         //$NON-NLS-1$
-   private final static String                    TABLE_TOURCATEGORY__TOURDATA    = TABLE_TOUR_CATEGORY + "_" + TABLE_TOUR_DATA;            //$NON-NLS-1$
+   private final static String                            TABLE_TOUR_CATEGORY             = "TourCategory";                                         //$NON-NLS-1$
+   private final static String                            TABLE_TOURCATEGORY__TOURDATA    = TABLE_TOUR_CATEGORY + "_" + TABLE_TOUR_DATA;            //$NON-NLS-1$
 
    /**
     * Is <code>-1</code>, this is the id for a not saved entity
     */
-   public static final int                        ENTITY_IS_NOT_SAVED             = -1;
+   public static final int                                ENTITY_IS_NOT_SAVED             = -1;
    //
-   private static final String                    ENTITY_ID_BIKE                  = "BikeID";                                               //$NON-NLS-1$
-   private static final String                    ENTITY_ID_COMPARED              = "ComparedID";                                           //$NON-NLS-1$
-   private static final String                    ENTITY_ID_HR_ZONE               = "HrZoneID";                                             //$NON-NLS-1$
-   private static final String                    ENTITY_ID_MARKER                = "MarkerID";                                             //$NON-NLS-1$
-   private static final String                    ENTITY_ID_PERSON                = "PersonID";                                             //$NON-NLS-1$
-   private static final String                    ENTITY_ID_PHOTO                 = "PhotoID";                                              //$NON-NLS-1$
-   private static final String                    ENTITY_ID_REF                   = "RefID";                                                //$NON-NLS-1$
-   private static final String                    ENTITY_ID_TAG                   = "TagID";                                                //$NON-NLS-1$
-   private static final String                    ENTITY_ID_TAG_CATEGORY          = "TagCategoryID";                                        //$NON-NLS-1$
-   public static final String                     ENTITY_ID_TOUR                  = "TourID";                                               //$NON-NLS-1$
-   private static final String                    ENTITY_ID_TYPE                  = "TypeID";                                               //$NON-NLS-1$
-   public static final String                     ENTITY_ID_WAY_POINT             = "WayPointID";                                           //$NON-NLS-1$
+   private static final String                            ENTITY_ID_BIKE                  = "BikeID";                                               //$NON-NLS-1$
+   private static final String                            ENTITY_ID_COMPARED              = "ComparedID";                                           //$NON-NLS-1$
+   private static final String                            ENTITY_ID_HR_ZONE               = "HrZoneID";                                             //$NON-NLS-1$
+   private static final String                            ENTITY_ID_MARKER                = "MarkerID";                                             //$NON-NLS-1$
+   private static final String                            ENTITY_ID_PERSON                = "PersonID";                                             //$NON-NLS-1$
+   private static final String                            ENTITY_ID_PHOTO                 = "PhotoID";                                              //$NON-NLS-1$
+   private static final String                            ENTITY_ID_REF                   = "RefID";                                                //$NON-NLS-1$
+   private static final String                            ENTITY_ID_TAG                   = "TagID";                                                //$NON-NLS-1$
+   private static final String                            ENTITY_ID_TAG_CATEGORY          = "TagCategoryID";                                        //$NON-NLS-1$
+   public static final String                             ENTITY_ID_TOUR                  = "TourID";                                               //$NON-NLS-1$
+   private static final String                            ENTITY_ID_TYPE                  = "TypeID";                                               //$NON-NLS-1$
+   public static final String                             ENTITY_ID_WAY_POINT             = "WayPointID";                                           //$NON-NLS-1$
    //
-   private static final String                    KEY_BIKE                        = TABLE_TOUR_BIKE + "_" + ENTITY_ID_BIKE;                 //$NON-NLS-1$
-   private static final String                    KEY_PERSON                      = TABLE_TOUR_PERSON + "_" + ENTITY_ID_PERSON;             //$NON-NLS-1$
-   private static final String                    KEY_TAG                         = TABLE_TOUR_TAG + "_" + ENTITY_ID_TAG;                   //$NON-NLS-1$
-   private static final String                    KEY_TAG_CATEGORY                = TABLE_TOUR_TAG_CATEGORY + "_" + ENTITY_ID_TAG_CATEGORY; //$NON-NLS-1$
-   public static final String                     KEY_TOUR                        = TABLE_TOUR_DATA + "_" + ENTITY_ID_TOUR;                 //$NON-NLS-1$
-   private static final String                    KEY_TYPE                        = TABLE_TOUR_TYPE + "_" + ENTITY_ID_TYPE;                 //$NON-NLS-1$
+   private static final String                            KEY_BIKE                        = TABLE_TOUR_BIKE + "_" + ENTITY_ID_BIKE;                 //$NON-NLS-1$
+   private static final String                            KEY_PERSON                      = TABLE_TOUR_PERSON + "_" + ENTITY_ID_PERSON;             //$NON-NLS-1$
+   private static final String                            KEY_TAG                         = TABLE_TOUR_TAG + "_" + ENTITY_ID_TAG;                   //$NON-NLS-1$
+   private static final String                            KEY_TAG_CATEGORY                = TABLE_TOUR_TAG_CATEGORY + "_" + ENTITY_ID_TAG_CATEGORY; //$NON-NLS-1$
+   public static final String                             KEY_TOUR                        = TABLE_TOUR_DATA + "_" + ENTITY_ID_TOUR;                 //$NON-NLS-1$
+   private static final String                            KEY_TYPE                        = TABLE_TOUR_TYPE + "_" + ENTITY_ID_TYPE;                 //$NON-NLS-1$
 
-   private static final String                    DEFAULT_0                       = "0";                                                    //$NON-NLS-1$
-   private static final String                    DEFAULT_1_0                     = "1.0";                                                  //$NON-NLS-1$
-   private static final String                    DEFAULT_FALSE                   = "false";                                                //$NON-NLS-1$
-   private static final String                    DEFAULT_IGNORED                 = "-1";                                                   //$NON-NLS-1$
+   private static final String                            DEFAULT_0                       = "0";                                                    //$NON-NLS-1$
+   private static final String                            DEFAULT_1_0                     = "1.0";                                                  //$NON-NLS-1$
+   private static final String                            DEFAULT_FALSE                   = "false";                                                //$NON-NLS-1$
+   private static final String                            DEFAULT_IGNORED                 = "-1";                                                   //$NON-NLS-1$
 
-   private static final String                    PERSISTENCE_UNIT_NAME           = "tourdatabase";                                         //$NON-NLS-1$
+   private static final String                            PERSISTENCE_UNIT_NAME           = "tourdatabase";                                         //$NON-NLS-1$
 
-   private static final String                    DERBY_DATABASE                  = "derby-database";                                       //$NON-NLS-1$
-   private static final String                    DERBY_DB_TOURBOOK               = "tourbook";                                             //$NON-NLS-1$
-   private static String                          DERBY_DRIVER_CLASS;
-   private static String                          DERBY_URL;
-   private static final String                    DERBY_URL_COMMAND_CREATE_TRUE   = ";create=true";                                         //$NON-NLS-1$
-   private static final String                    DERBY_URL_COMMAND_SHUTDOWN_TRUE = ";shutdown=true";                                       //$NON-NLS-1$
-   private static final String                    DERBY_URL_COMMAND_UPGRADE_TRUE  = ";upgrade=true";                                        //$NON-NLS-1$
+   private static final String                            DERBY_DATABASE                  = "derby-database";                                       //$NON-NLS-1$
+   private static final String                            DERBY_DB_TOURBOOK               = "tourbook";                                             //$NON-NLS-1$
+   private static String                                  DERBY_DRIVER_CLASS;
+   private static String                                  DERBY_URL;
+   private static final String                            DERBY_URL_COMMAND_CREATE_TRUE   = ";create=true";                                         //$NON-NLS-1$
+   private static final String                            DERBY_URL_COMMAND_SHUTDOWN_TRUE = ";shutdown=true";                                       //$NON-NLS-1$
+   private static final String                            DERBY_URL_COMMAND_UPGRADE_TRUE  = ";upgrade=true";                                        //$NON-NLS-1$
    //
-   private static volatile TourDatabase           _instance;
+   private static volatile TourDatabase                   _instance;
 
-   private static ArrayList<TourType>             _activeTourTypes;
+   private static ArrayList<TourType>                     _activeTourTypes;
 
-   private static volatile ArrayList<TourType>    _dbTourTypes;
+   private static volatile ArrayList<TourType>            _dbTourTypes;
 
    /**
     * Key is tag ID.
     */
-   private static volatile HashMap<Long, TourTag> _tourTags;
+   private static volatile HashMap<Long, TourTag>         _allTourTags;
+
+   /**
+    * Key is tag category ID.
+    */
+   private static volatile HashMap<Long, TourTagCategory> _allTourTagCategories;
 
    /**
     * Key is category ID or <code>-1</code> for the root.
     */
-   private static HashMap<Long, TagCollection>    _tagCollections                 = new HashMap<>();
+   private static HashMap<Long, TagCollection>            _tagCollections                 = new HashMap<>();
 
    /*
     * cached distinct fields
@@ -509,7 +516,7 @@ public class TourDatabase {
                // Caused by: ERROR 42Y55: 'DROP TABLE' cannot be performed on 'TOURCATEGORY' because it does not exist.
 
                /*
-                * This case occured because table TOURCATEGORY was created until version 1.6 but do
+                * This case occurred because table TOURCATEGORY was created until version 1.6 but do
                 * not exist in later versions.
                 */
                StatusUtil.log(e);
@@ -718,7 +725,7 @@ public class TourDatabase {
    }
 
    /**
-    * This error can occure when transient instances are not saved.
+    * This error can occur when transient instances are not saved.
     *
     * <pre>
     *
@@ -780,9 +787,14 @@ public class TourDatabase {
     */
    public static synchronized void clearTourTags() {
 
-      if (_tourTags != null) {
-         _tourTags.clear();
-         _tourTags = null;
+      if (_allTourTags != null) {
+         _allTourTags.clear();
+         _allTourTags = null;
+      }
+
+      if (_allTourTagCategories != null) {
+         _allTourTagCategories.clear();
+         _allTourTagCategories = null;
       }
 
       if (_tagCollections != null) {
@@ -1003,7 +1015,7 @@ public class TourDatabase {
          e.printStackTrace();
 
          /*
-          * an error could have been occured when loading the tour with em.find, remove the tour
+          * an error could have been occurred when loading the tour with em.find, remove the tour
           * with sql commands
           */
          deleteTour_WithSQL(tourId);
@@ -1271,21 +1283,65 @@ public class TourDatabase {
    }
 
    /**
+    * This method is synchronized to conform to FindBugs
+    *
+    * @return Returns all tour tags which are stored in the database, the hash key is the tag id
+    */
+   public static HashMap<Long, TourTagCategory> getAllTourTagCategories() {
+
+      if (_allTourTagCategories != null) {
+         return _allTourTagCategories;
+      }
+
+      synchronized (DB_LOCK) {
+
+         // check again, field must be volatile to work correctly
+         if (_allTourTagCategories != null) {
+            return _allTourTagCategories;
+         }
+
+         final EntityManager em = TourDatabase.getInstance().getEntityManager();
+         if (em != null) {
+
+            final Query emQuery = em.createQuery(
+                  "" //$NON-NLS-1$
+                        + "SELECT tourTagCategory" //$NON-NLS-1$
+                        + (" FROM " + TourTagCategory.class.getSimpleName() + " AS tourTagCategory")); //$NON-NLS-1$ //$NON-NLS-2$
+
+            _allTourTagCategories = new HashMap<>();
+
+            final List<?> resultList = emQuery.getResultList();
+            for (final Object result : resultList) {
+
+               if (result instanceof TourTagCategory) {
+                  final TourTagCategory tourTagCategory = (TourTagCategory) result;
+                  _allTourTagCategories.put(tourTagCategory.getCategoryId(), tourTagCategory);
+               }
+            }
+
+            em.close();
+         }
+      }
+
+      return _allTourTagCategories;
+   }
+
+   /**
     * this method is synchronized to conform to FindBugs
     *
     * @return Returns all tour tags which are stored in the database, the hash key is the tag id
     */
    public static HashMap<Long, TourTag> getAllTourTags() {
 
-      if (_tourTags != null) {
-         return _tourTags;
+      if (_allTourTags != null) {
+         return _allTourTags;
       }
 
       synchronized (DB_LOCK) {
 
          // check again, field must be volatile to work correctly
-         if (_tourTags != null) {
-            return _tourTags;
+         if (_allTourTags != null) {
+            return _allTourTags;
          }
 
          final EntityManager em = TourDatabase.getInstance().getEntityManager();
@@ -1296,14 +1352,14 @@ public class TourDatabase {
                         + "SELECT tourTag" //$NON-NLS-1$
                         + (" FROM " + TourTag.class.getSimpleName() + " AS tourTag")); //$NON-NLS-1$ //$NON-NLS-2$
 
-            _tourTags = new HashMap<>();
+            _allTourTags = new HashMap<>();
 
             final List<?> resultList = emQuery.getResultList();
             for (final Object result : resultList) {
 
                if (result instanceof TourTag) {
                   final TourTag tourTag = (TourTag) result;
-                  _tourTags.put(tourTag.getTagId(), tourTag);
+                  _allTourTags.put(tourTag.getTagId(), tourTag);
                }
             }
 
@@ -1311,7 +1367,7 @@ public class TourDatabase {
          }
       }
 
-      return _tourTags;
+      return _allTourTags;
    }
 
    /**
@@ -1521,6 +1577,33 @@ public class TourDatabase {
    }
 
    /**
+    * @param tagId
+    * @return Returns the tag category notes
+    *         <code>null</code>
+    */
+   public static String getTagCategoryNotes(final Long tagId) {
+
+      if (tagId == null) {
+         return UI.EMPTY_STRING;
+      }
+
+      final HashMap<Long, TourTagCategory> hashAllTagCategories = getAllTourTagCategories();
+      final TourTagCategory tagCategory = hashAllTagCategories.get(tagId);
+
+      if (tagCategory != null) {
+         return tagCategory.getNotes();
+      } else {
+         try {
+            throw new MyTourbookException("tag category id '" + tagId + "' is not available"); //$NON-NLS-1$ //$NON-NLS-2$
+         } catch (final MyTourbookException e) {
+            e.printStackTrace();
+         }
+      }
+
+      return UI.EMPTY_STRING;
+   }
+
+   /**
     * @param categoryId
     * @return Returns a {@link TagCollection} with all tags and categories for the category Id
     */
@@ -1653,6 +1736,33 @@ public class TourDatabase {
       }
 
       return sb.toString();
+   }
+
+   /**
+    * @param tagId
+    * @return Returns the tag notes
+    *         <code>null</code>
+    */
+   public static String getTagNotes(final Long tagId) {
+
+      if (tagId == null) {
+         return UI.EMPTY_STRING;
+      }
+
+      final HashMap<Long, TourTag> hashAllTags = getAllTourTags();
+      final TourTag tag = hashAllTags.get(tagId);
+
+      if (tag != null) {
+         return tag.getNotes();
+      } else {
+         try {
+            throw new MyTourbookException("tag id '" + tagId + "' is not available"); //$NON-NLS-1$ //$NON-NLS-2$
+         } catch (final MyTourbookException e) {
+            e.printStackTrace();
+         }
+      }
+
+      return UI.EMPTY_STRING;
    }
 
    /**
@@ -1861,7 +1971,7 @@ public class TourDatabase {
          MessageDialog.openError(
                Display.getCurrent().getActiveShell(), //
                "Error", //$NON-NLS-1$
-               "Error occured when saving an entity"); //$NON-NLS-1$
+               "Error occurred when saving an entity"); //$NON-NLS-1$
       }
 
       return savedEntity;
@@ -1919,7 +2029,7 @@ public class TourDatabase {
          MessageDialog.openError(
                Display.getCurrent().getActiveShell(), //
                "Error", //$NON-NLS-1$
-               "Error occured when saving an entity"); //$NON-NLS-1$
+               "Error occurred when saving an entity"); //$NON-NLS-1$
       }
 
       return savedEntity;
@@ -1981,15 +2091,7 @@ public class TourDatabase {
        */
       tourData.getNumberOfHrZones();
 
-      final ZonedDateTime zdtNow = ZonedDateTime.now();
-
-      final long dtSaved = (zdtNow.getYear() * 10000000000L)
-            + (zdtNow.getMonthValue() * 100000000L)
-            + (zdtNow.getDayOfMonth() * 1000000L)
-            //
-            + (zdtNow.getHour() * 10000L)
-            + (zdtNow.getMinute() * 100L)
-            + zdtNow.getSecond();
+      final long dtSaved = TimeTools.createdNowAsYMDhms();
 
       checkUnsavedTransientInstances(tourData);
 
@@ -2822,6 +2924,26 @@ public class TourDatabase {
             //
             // version 37 end ---------
 
+            // version 38 start  -  19.5
+            //
+            + " training_TrainingEffect_Aerob         FLOAT    DEFAULT 0,                 \n" //$NON-NLS-1$
+            + " training_TrainingEffect_Anaerob       FLOAT    DEFAULT 0,                 \n" //$NON-NLS-1$
+            + " training_TrainingPerformance          FLOAT    DEFAULT 0,                 \n" //$NON-NLS-1$
+            //
+            // version 38 end
+
+            // version 39 start  -  19.7
+            //
+            + " isWeatherDataFromApi                  BOOLEAN  DEFAULT FALSE,             \n" //$NON-NLS-1$
+            + " weather_Humidity                      SMALLINT DEFAULT 0,                 \n" //$NON-NLS-1$
+            + " weather_Precipitation                 FLOAT    DEFAULT 0,                 \n" //$NON-NLS-1$
+            + " weather_Pressure                      FLOAT    DEFAULT 0,                 \n" //$NON-NLS-1$
+            + " weather_Temperature_Min               FLOAT    DEFAULT 0,                 \n" //$NON-NLS-1$
+            + " weather_Temperature_Max               FLOAT    DEFAULT 0,                 \n" //$NON-NLS-1$
+            + " weather_Temperature_WindChill         FLOAT    DEFAULT 0,                 \n" //$NON-NLS-1$
+            //
+            // version 39 end
+
             //            // version 35 start  -  18.?
             //            //
             //            + " LatitudeMinE6         INTEGER DEFAULT 0,                        \n" //$NON-NLS-1$
@@ -2833,7 +2955,7 @@ public class TourDatabase {
 
             // version 5 start
             /**
-             * Disabled because when two blob object's are deserialized then the error occures:
+             * Disabled because when two blob object's are deserialized then the error occurs:
              * <p>
              * java.io.StreamCorruptedException: invalid stream header: 00ACED00
              * <p>
@@ -2926,7 +3048,7 @@ public class TourDatabase {
             //
             + "   tourTime             BIGINT DEFAULT " + Long.MIN_VALUE + ",             \n" //$NON-NLS-1$ //$NON-NLS-2$
             //
-            // When DEFAULT value is NOT set, this exception occures:
+            // When DEFAULT value is NOT set, this exception occurs:
             //
             //java.lang.IllegalArgumentException: Can not set float field net.tourbook.data.TourMarker.altitude to null value
             //   at sun.reflect.UnsafeFieldAccessorImpl.throwSetIllegalArgumentException(UnsafeFieldAccessorImpl.java:176)
@@ -3112,34 +3234,41 @@ public class TourDatabase {
       /*
        * Create table: TOURTAG
        */
-      exec(stmt, "CREATE TABLE " + TABLE_TOUR_TAG + "   (                                    \n" //$NON-NLS-1$ //$NON-NLS-2$
+      exec(stmt, "CREATE TABLE " + TABLE_TOUR_TAG + "   (                                 \n" //$NON-NLS-1$ //$NON-NLS-2$
       //
             + SQL.CreateField_EntityId(ENTITY_ID_TAG, true)
             //
-            + "   isRoot                   INTEGER,                                          \n" //$NON-NLS-1$
-            + "   expandType                INTEGER,                                          \n" //$NON-NLS-1$
-            + "   name                  VARCHAR(" + TourTag.DB_LENGTH_NAME + ")            \n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   isRoot               INTEGER,                                           \n" //$NON-NLS-1$
+            + "   expandType           INTEGER,                                           \n" //$NON-NLS-1$
+            + "   name                 VARCHAR(" + TourTag.DB_LENGTH_NAME + "),           \n" //$NON-NLS-1$ //$NON-NLS-2$
+
+            // version 38 start
+            //
+            + "   notes                VARCHAR(" + TourTag.DB_LENGTH_NOTES + ")           \n" //$NON-NLS-1$ //$NON-NLS-2$
+            //
+            // version 38 end ---------
+
             //
             + ")"); //$NON-NLS-1$
 
       /**
        * Create table: TOURDATA_TOURTAG
        */
-      exec(stmt, "CREATE TABLE " + JOINTABLE__TOURDATA__TOURTAG + "   (                     \n" //$NON-NLS-1$ //$NON-NLS-2$
+      exec(stmt, "CREATE TABLE " + JOINTABLE__TOURDATA__TOURTAG + "   (                   \n" //$NON-NLS-1$ //$NON-NLS-2$
       //
-            + "   " + KEY_TAG + "            BIGINT NOT NULL,                              \n"//$NON-NLS-1$ //$NON-NLS-2$
-            + "   " + KEY_TOUR + "         BIGINT NOT NULL                                 \n"//$NON-NLS-1$ //$NON-NLS-2$
+            + "   " + KEY_TAG + "      BIGINT NOT NULL,                                   \n"//$NON-NLS-1$ //$NON-NLS-2$
+            + "   " + KEY_TOUR + "     BIGINT NOT NULL                                    \n"//$NON-NLS-1$ //$NON-NLS-2$
             //
             + ")"); //$NON-NLS-1$
 
       // Add Constraint
-      final String fkName = "fk_" + JOINTABLE__TOURDATA__TOURTAG + "_" + KEY_TOUR; //                     //$NON-NLS-1$ //$NON-NLS-2$
+      final String fkName = "fk_" + JOINTABLE__TOURDATA__TOURTAG + "_" + KEY_TOUR; //        //$NON-NLS-1$ //$NON-NLS-2$
       exec(
             stmt,
-            "ALTER TABLE " + JOINTABLE__TOURDATA__TOURTAG + "                              \n" //$NON-NLS-1$ //$NON-NLS-2$
-                  + "   ADD CONSTRAINT " + fkName + "                                       \n" //$NON-NLS-1$ //$NON-NLS-2$
+            "ALTER TABLE " + JOINTABLE__TOURDATA__TOURTAG + "                             \n" //$NON-NLS-1$ //$NON-NLS-2$
+                  + "   ADD CONSTRAINT " + fkName + "                                     \n" //$NON-NLS-1$ //$NON-NLS-2$
                   + "   FOREIGN KEY (" + KEY_TOUR + ")                                    \n" //$NON-NLS-1$ //$NON-NLS-2$
-                  + "   REFERENCES " + TABLE_TOUR_DATA + " (" + ENTITY_ID_TOUR + ")         "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                  + "   REFERENCES " + TABLE_TOUR_DATA + " (" + ENTITY_ID_TOUR + ")       "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
    }
 
    /**
@@ -3150,17 +3279,24 @@ public class TourDatabase {
     * @throws SQLException
     * @since DB version 5
     */
-   private void createTable_TourTagCategory(final Statement stmt) throws SQLException {
+   private void createTable_TourTag_Category(final Statement stmt) throws SQLException {
 
       /*
        * Create table: TOURTAGCATEGORY
        */
-      exec(stmt, "CREATE TABLE " + TABLE_TOUR_TAG_CATEGORY + "   (                              \n" //$NON-NLS-1$ //$NON-NLS-2$
+      exec(stmt, "CREATE TABLE " + TABLE_TOUR_TAG_CATEGORY + "   (                        \n" //$NON-NLS-1$ //$NON-NLS-2$
       //
             + SQL.CreateField_EntityId(ENTITY_ID_TAG_CATEGORY, true)
             //
-            + "   isRoot          INTEGER,                                                \n" //$NON-NLS-1$
-            + "   name         VARCHAR(" + TourTagCategory.DB_LENGTH_NAME + ")                     \n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   isRoot               INTEGER,                                           \n" //$NON-NLS-1$
+            + "   name                 VARCHAR(" + TourTag.DB_LENGTH_NAME + "),           \n" //$NON-NLS-1$ //$NON-NLS-2$
+
+            // version 38 start
+            //
+            + "   notes                VARCHAR(" + TourTag.DB_LENGTH_NOTES + ")           \n" //$NON-NLS-1$ //$NON-NLS-2$
+            //
+            // version 38 end ---------
+
             //
             + ")" //$NON-NLS-1$
       );
@@ -3170,31 +3306,31 @@ public class TourDatabase {
        */
       final String jtabTag = JOINTABLE__TOURTAGCATEGORY_TOURTAG;
 
-      exec(stmt, "CREATE TABLE " + jtabTag + "   (                                          \n" //$NON-NLS-1$ //$NON-NLS-2$
+      exec(stmt, "CREATE TABLE " + jtabTag + "   (                                        \n" //$NON-NLS-1$ //$NON-NLS-2$
       //
-            + "   " + KEY_TAG + "               BIGINT NOT NULL,                              \n"//$NON-NLS-1$ //$NON-NLS-2$
-            + "   " + KEY_TAG_CATEGORY + "      BIGINT NOT NULL                                 \n"//$NON-NLS-1$ //$NON-NLS-2$
+            + "   " + KEY_TAG + "               BIGINT NOT NULL,                          \n"//$NON-NLS-1$ //$NON-NLS-2$
+            + "   " + KEY_TAG_CATEGORY + "      BIGINT NOT NULL                           \n"//$NON-NLS-1$ //$NON-NLS-2$
             //
             + ")"); //$NON-NLS-1$
 
       // add constraints
-      final String fkTag = "fk_" + jtabTag + "_" + KEY_TAG; //                                 //$NON-NLS-1$ //$NON-NLS-2$
-      final String fkCat = "fk_" + jtabTag + "_" + TABLE_TOUR_TAG_CATEGORY + "_" + KEY_TAG_CATEGORY; //   //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      final String fkTag = "fk_" + jtabTag + "_" + KEY_TAG; //                                              //$NON-NLS-1$ //$NON-NLS-2$
+      final String fkCat = "fk_" + jtabTag + "_" + TABLE_TOUR_TAG_CATEGORY + "_" + KEY_TAG_CATEGORY; //     //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
       exec(
             stmt,
-            "ALTER TABLE " + jtabTag + "                                                \n"//$NON-NLS-1$ //$NON-NLS-2$
-                  + "   ADD CONSTRAINT " + fkTag + "                                             \n"//$NON-NLS-1$ //$NON-NLS-2$
-                  + "   FOREIGN KEY (" + KEY_TAG + ")                                             \n"//$NON-NLS-1$ //$NON-NLS-2$
-                  + "   REFERENCES " + TABLE_TOUR_TAG + " (" + ENTITY_ID_TAG + ")                        \n"//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            "ALTER TABLE " + jtabTag + "                                                  \n"//$NON-NLS-1$ //$NON-NLS-2$
+                  + "   ADD CONSTRAINT " + fkTag + "                                      \n"//$NON-NLS-1$ //$NON-NLS-2$
+                  + "   FOREIGN KEY (" + KEY_TAG + ")                                     \n"//$NON-NLS-1$ //$NON-NLS-2$
+                  + "   REFERENCES " + TABLE_TOUR_TAG + " (" + ENTITY_ID_TAG + ")         \n"//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
       );
 
       exec(
             stmt,
-            "ALTER TABLE " + jtabTag + "                                                \n"//$NON-NLS-1$ //$NON-NLS-2$
-                  + "   ADD CONSTRAINT " + fkCat + "                                             \n"//$NON-NLS-1$ //$NON-NLS-2$
-                  + "   FOREIGN KEY (" + KEY_TAG_CATEGORY + ")                                       \n"//$NON-NLS-1$ //$NON-NLS-2$
-                  + "   REFERENCES " + TABLE_TOUR_TAG_CATEGORY + " (" + ENTITY_ID_TAG_CATEGORY + ")            \n"//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            "ALTER TABLE " + jtabTag + "                                                              \n"//$NON-NLS-1$ //$NON-NLS-2$
+                  + "   ADD CONSTRAINT " + fkCat + "                                                  \n"//$NON-NLS-1$ //$NON-NLS-2$
+                  + "   FOREIGN KEY (" + KEY_TAG_CATEGORY + ")                                        \n"//$NON-NLS-1$ //$NON-NLS-2$
+                  + "   REFERENCES " + TABLE_TOUR_TAG_CATEGORY + " (" + ENTITY_ID_TAG_CATEGORY + ")   \n"//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
       );
 
       /*
@@ -3202,31 +3338,31 @@ public class TourDatabase {
        */
       final String jtabCategory = JOINTABLE__TOURTAGCATEGORY_TOURTAGCATEGORY;
 
-      exec(stmt, "CREATE TABLE " + jtabCategory + "   (                                       \n"//$NON-NLS-1$ //$NON-NLS-2$
+      exec(stmt, "CREATE TABLE " + jtabCategory + "   (                                   \n"//$NON-NLS-1$ //$NON-NLS-2$
       //
-            + "   " + KEY_TAG_CATEGORY + "1   BIGINT NOT NULL,                                 \n"//$NON-NLS-1$ //$NON-NLS-2$
-            + "   " + KEY_TAG_CATEGORY + "2   BIGINT NOT NULL                                    \n"//$NON-NLS-1$ //$NON-NLS-2$
+            + "   " + KEY_TAG_CATEGORY + "1   BIGINT NOT NULL,                            \n"//$NON-NLS-1$ //$NON-NLS-2$
+            + "   " + KEY_TAG_CATEGORY + "2   BIGINT NOT NULL                             \n"//$NON-NLS-1$ //$NON-NLS-2$
             //
             + ")"); //$NON-NLS-1$
 
       // add constraints
-      final String fk1 = "fk_" + jtabCategory + "_" + KEY_TAG_CATEGORY + "1"; //                     //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-      final String fk2 = "fk_" + jtabCategory + "_" + KEY_TAG_CATEGORY + "2"; //                     //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      final String fk1 = "fk_" + jtabCategory + "_" + KEY_TAG_CATEGORY + "1"; //             //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      final String fk2 = "fk_" + jtabCategory + "_" + KEY_TAG_CATEGORY + "2"; //             //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
       exec(
             stmt,
-            "ALTER TABLE " + jtabCategory + "                                          \n"//$NON-NLS-1$ //$NON-NLS-2$
-                  + "   ADD CONSTRAINT " + fk1 + "                                                \n"//$NON-NLS-1$ //$NON-NLS-2$
+            "ALTER TABLE " + jtabCategory + "                                                         \n"//$NON-NLS-1$ //$NON-NLS-2$
+                  + "   ADD CONSTRAINT " + fk1 + "                                                    \n"//$NON-NLS-1$ //$NON-NLS-2$
                   + "   FOREIGN KEY (" + KEY_TAG_CATEGORY + "1)                                       \n"//$NON-NLS-1$ //$NON-NLS-2$
-                  + "   REFERENCES " + TABLE_TOUR_TAG_CATEGORY + " (" + ENTITY_ID_TAG_CATEGORY + ")            \n"//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                  + "   REFERENCES " + TABLE_TOUR_TAG_CATEGORY + " (" + ENTITY_ID_TAG_CATEGORY + ")   \n"//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
       );
 
       exec(
             stmt,
-            "ALTER TABLE " + jtabCategory + "                                          \n"//$NON-NLS-1$ //$NON-NLS-2$
-                  + "   ADD CONSTRAINT " + fk2 + "                                                \n"//$NON-NLS-1$ //$NON-NLS-2$
+            "ALTER TABLE " + jtabCategory + "                                                         \n"//$NON-NLS-1$ //$NON-NLS-2$
+                  + "   ADD CONSTRAINT " + fk2 + "                                                    \n"//$NON-NLS-1$ //$NON-NLS-2$
                   + "   FOREIGN KEY (" + KEY_TAG_CATEGORY + "2)                                       \n"//$NON-NLS-1$ //$NON-NLS-2$
-                  + "   REFERENCES " + TABLE_TOUR_TAG_CATEGORY + " (" + ENTITY_ID_TAG_CATEGORY + ")            \n"//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                  + "   REFERENCES " + TABLE_TOUR_TAG_CATEGORY + " (" + ENTITY_ID_TAG_CATEGORY + ")   \n"//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
       );
    }
 
@@ -3967,7 +4103,7 @@ public class TourDatabase {
             createTable_Version(stmt);
 
             createTable_TourTag(stmt);
-            createTable_TourTagCategory(stmt);
+            createTable_TourTag_Category(stmt);
 
             createTable_TourWayPoint(stmt);
 //            createTable_SharedMarker(stmt);
@@ -4536,6 +4672,16 @@ public class TourDatabase {
             isPostUpdate37 = true;
          }
 
+         // 37 -> 38
+         if (currentDbVersion == 37) {
+            currentDbVersion = newVersion = updateDbDesign_037_to_038(conn, splashManager);
+         }
+
+         // 38 -> 39
+         if (currentDbVersion == 38) {
+            currentDbVersion = newVersion = updateDbDesign_038_to_039(conn, splashManager);
+         }
+
          /*
           * Update version number
           */
@@ -4765,7 +4911,7 @@ public class TourDatabase {
       final Statement stmt = conn.createStatement();
       {
          createTable_TourTag(stmt);
-         createTable_TourTagCategory(stmt);
+         createTable_TourTag_Category(stmt);
          createIndex_TourData_005(stmt);
       }
       stmt.close();
@@ -6055,7 +6201,7 @@ public class TourDatabase {
                } catch (final Exception e) {
 
                   /*
-                   * This ArrayIndexOutOfBoundsException occured during the update after this
+                   * This ArrayIndexOutOfBoundsException occurred during the update after this
                    * version was released. Therefore it's captured and detailed logged, other
                    * markers are not affected.
                    */
@@ -6891,6 +7037,71 @@ public class TourDatabase {
       StatusUtil.logInfo(String.format(
             "Database postupdate 36 -> 37 in %s mm:ss", //$NON-NLS-1$
             net.tourbook.common.UI.formatHhMmSs(timeDiff / 1000)));
+   }
+
+   private int updateDbDesign_037_to_038(final Connection conn, final SplashManager splashManager) throws SQLException {
+
+      final int newDbVersion = 38;
+
+      logDb_UpdateStart(newDbVersion);
+      updateMonitor(splashManager, newDbVersion);
+
+      final Statement stmt = conn.createStatement();
+      {
+         // check if db is updated to version 38
+         if (isColumnAvailable(conn, TABLE_TOUR_TAG, "notes") == false) { //$NON-NLS-1$
+
+// SET_FORMATTING_OFF
+
+            // Add new columns
+            SQL.AddCol_VarCar (stmt, TABLE_TOUR_TAG,              "notes", TourTag.DB_LENGTH_NOTES);                 //$NON-NLS-1$
+            SQL.AddCol_VarCar (stmt, TABLE_TOUR_TAG_CATEGORY,     "notes", TourTag.DB_LENGTH_NOTES);                 //$NON-NLS-1$
+
+            SQL.AddCol_Float  (stmt, TABLE_TOUR_DATA,             "training_TrainingEffect_Aerob",       DEFAULT_0); //$NON-NLS-1$
+            SQL.AddCol_Float  (stmt, TABLE_TOUR_DATA,             "training_TrainingEffect_Anaerob",     DEFAULT_0); //$NON-NLS-1$
+            SQL.AddCol_Float  (stmt, TABLE_TOUR_DATA,             "training_TrainingPerformance",        DEFAULT_0); //$NON-NLS-1$
+
+// SET_FORMATTING_ON
+         }
+      }
+      stmt.close();
+
+      logDb_UpdateEnd(newDbVersion);
+
+      return newDbVersion;
+   }
+
+   private int updateDbDesign_038_to_039(final Connection conn, final SplashManager splashManager) throws SQLException {
+
+      final int newDbVersion = 39;
+
+      logDb_UpdateStart(newDbVersion);
+      updateMonitor(splashManager, newDbVersion);
+
+      final Statement stmt = conn.createStatement();
+      {
+         // check if db is updated to version 39
+         if (isColumnAvailable(conn, TABLE_TOUR_DATA, "isWeatherDataFromApi") == false) { //$NON-NLS-1$
+
+// SET_FORMATTING_OFF
+
+            // Add new columns
+            SQL.AddCol_Boolean   (stmt, TABLE_TOUR_DATA, "isWeatherDataFromApi",          DEFAULT_FALSE);   //$NON-NLS-1$
+            SQL.AddCol_SmallInt  (stmt, TABLE_TOUR_DATA, "weather_Humidity",              DEFAULT_0);       //$NON-NLS-1$
+            SQL.AddCol_Float     (stmt, TABLE_TOUR_DATA, "weather_Precipitation",         DEFAULT_0);       //$NON-NLS-1$
+            SQL.AddCol_Float     (stmt, TABLE_TOUR_DATA, "weather_Pressure",              DEFAULT_0);       //$NON-NLS-1$
+            SQL.AddCol_Float     (stmt, TABLE_TOUR_DATA, "weather_Temperature_Min",       DEFAULT_0);       //$NON-NLS-1$
+            SQL.AddCol_Float     (stmt, TABLE_TOUR_DATA, "weather_Temperature_Max",       DEFAULT_0);       //$NON-NLS-1$
+            SQL.AddCol_Float     (stmt, TABLE_TOUR_DATA, "weather_Temperature_WindChill", DEFAULT_0);       //$NON-NLS-1$
+
+// SET_FORMATTING_ON
+         }
+      }
+      stmt.close();
+
+      logDb_UpdateEnd(newDbVersion);
+
+      return newDbVersion;
    }
 
 //   private int updateDbDesign_034_to_035(final Connection conn, final IProgressMonitor monitor) throws SQLException {

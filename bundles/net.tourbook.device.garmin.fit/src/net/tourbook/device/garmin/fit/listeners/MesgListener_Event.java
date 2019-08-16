@@ -21,6 +21,7 @@ import com.garmin.fit.EventMesgListener;
 import java.util.List;
 
 import net.tourbook.data.GearData;
+import net.tourbook.device.garmin.fit.FitData;
 
 /**
  * Set gear data

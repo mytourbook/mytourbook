@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -174,7 +174,14 @@ public class TVITourBookYearSub extends TVITourBookItem {
             + "surfing_MinSpeed_Surfing, " //               72   //$NON-NLS-1$
             + "surfing_MinTimeDuration, " //                73   //$NON-NLS-1$
             + "surfing_IsMinDistance, " //                  74   //$NON-NLS-1$
-            + "surfing_MinDistance" //                      75   //$NON-NLS-1$
+            + "surfing_MinDistance," //                     75   //$NON-NLS-1$
+
+            //
+            // ---------- TRAINING -------------
+            //
+            + "training_TrainingEffect_Aerob, " //          76   //$NON-NLS-1$
+            + "training_TrainingEffect_Anaerob, " //        77   //$NON-NLS-1$
+            + "training_TrainingPerformance " //            78   //$NON-NLS-1$
 
             + UI.NEW_LINE
 
@@ -254,9 +261,9 @@ public class TVITourBookYearSub extends TVITourBookItem {
                tourItem.tourDay                 = dbDay;
                tourItem.tourWeek                = dbWeek;
 
-               final long dbDistance            = tourItem.colDistance = result.getLong(4);
-               tourItem.colRecordingTime        = result.getLong(5);
-               final long dbDrivingTime         = tourItem.colDrivingTime = result.getLong(6);
+               final long dbDistance            = tourItem.colTourDistance = result.getLong(4);
+               tourItem.colTourRecordingTime    = result.getLong(5);
+               final long dbDrivingTime         = tourItem.colTourDrivingTime = result.getLong(6);
                tourItem.colAltitudeUp           = result.getLong(7);
                tourItem.colAltitudeDown         = result.getLong(8);
 
@@ -283,15 +290,15 @@ public class TVITourBookYearSub extends TVITourBookItem {
                tourItem.colClouds               = result.getString(28);
                tourItem.colRestPulse            = result.getInt(29);
 
-               tourItem.colCalories             = result.getInt(30);
+               tourItem.colCalories             = result.getLong(30);
                tourItem.colPersonId             = result.getLong(31);
 
-               tourItem.colNumberOfTimeSlices   = result.getInt(32);
-               tourItem.colNumberOfPhotos       = result.getInt(33);
+               tourItem.colNumberOfTimeSlices   = result.getLong(32);
+               tourItem.colNumberOfPhotos       = result.getLong(33);
                tourItem.colDPTolerance          = result.getInt(34);
 
-               tourItem.colFrontShiftCount      = result.getInt(35);
-               tourItem.colRearShiftCount       = result.getInt(36);
+               tourItem.colFrontShiftCount      = result.getLong(35);
+               tourItem.colRearShiftCount       = result.getLong(36);
 
                // ----------------- POWER ------------------
 
@@ -316,11 +323,11 @@ public class TVITourBookYearSub extends TVITourBookItem {
 
                // --------------------- IMPORT ------------------
 
-               tourItem.col_ImportFileName                  = result.getString(50);
-               tourItem.col_ImportFilePath                  = result.getString(51);
+               tourItem.col_ImportFileName                     = result.getString(50);
+               tourItem.col_ImportFilePath                     = result.getString(51);
 
-               String dbDeviceName                          = result.getString(52);
-               String dbFirmwareVersion                     = result.getString(53);
+               String dbDeviceName                             = result.getString(52);
+               String dbFirmwareVersion                        = result.getString(53);
 
                // -----------------------------------------------
 
@@ -328,35 +335,41 @@ public class TVITourBookYearSub extends TVITourBookItem {
 
                // ---------- RUNNING DYNAMICS -------------
 
-               tourItem.colRunDyn_StanceTime_Min            = result.getInt(55);
-               tourItem.colRunDyn_StanceTime_Max            = result.getInt(56);
-               tourItem.colRunDyn_StanceTime_Avg            = result.getFloat(57);
+               tourItem.colRunDyn_StanceTime_Min               = result.getInt(55);
+               tourItem.colRunDyn_StanceTime_Max               = result.getInt(56);
+               tourItem.colRunDyn_StanceTime_Avg               = result.getFloat(57);
 
-               tourItem.colRunDyn_StanceTimeBalance_Min     = result.getInt(58)     / TourData.RUN_DYN_DATA_MULTIPLIER;
-               tourItem.colRunDyn_StanceTimeBalance_Max     = result.getInt(59)     / TourData.RUN_DYN_DATA_MULTIPLIER;
-               tourItem.colRunDyn_StanceTimeBalance_Avg     = result.getFloat(60)   / TourData.RUN_DYN_DATA_MULTIPLIER;
+               tourItem.colRunDyn_StanceTimeBalance_Min        = result.getInt(58)     / TourData.RUN_DYN_DATA_MULTIPLIER;
+               tourItem.colRunDyn_StanceTimeBalance_Max        = result.getInt(59)     / TourData.RUN_DYN_DATA_MULTIPLIER;
+               tourItem.colRunDyn_StanceTimeBalance_Avg        = result.getFloat(60)   / TourData.RUN_DYN_DATA_MULTIPLIER;
 
-               tourItem.colRunDyn_StepLength_Min            = result.getInt(61);
-               tourItem.colRunDyn_StepLength_Max            = result.getInt(62);
-               tourItem.colRunDyn_StepLength_Avg            = result.getFloat(63);
+               tourItem.colRunDyn_StepLength_Min               = result.getInt(61);
+               tourItem.colRunDyn_StepLength_Max               = result.getInt(62);
+               tourItem.colRunDyn_StepLength_Avg               = result.getFloat(63);
 
-               tourItem.colRunDyn_VerticalOscillation_Min   = result.getInt(64)     / TourData.RUN_DYN_DATA_MULTIPLIER;
-               tourItem.colRunDyn_VerticalOscillation_Max   = result.getInt(65)     / TourData.RUN_DYN_DATA_MULTIPLIER;
-               tourItem.colRunDyn_VerticalOscillation_Avg   = result.getFloat(66)   / TourData.RUN_DYN_DATA_MULTIPLIER;
+               tourItem.colRunDyn_VerticalOscillation_Min      = result.getInt(64)     / TourData.RUN_DYN_DATA_MULTIPLIER;
+               tourItem.colRunDyn_VerticalOscillation_Max      = result.getInt(65)     / TourData.RUN_DYN_DATA_MULTIPLIER;
+               tourItem.colRunDyn_VerticalOscillation_Avg      = result.getFloat(66)   / TourData.RUN_DYN_DATA_MULTIPLIER;
 
-               tourItem.colRunDyn_VerticalRatio_Min         = result.getInt(67)     / TourData.RUN_DYN_DATA_MULTIPLIER;
-               tourItem.colRunDyn_VerticalRatio_Max         = result.getInt(68)     / TourData.RUN_DYN_DATA_MULTIPLIER;
-               tourItem.colRunDyn_VerticalRatio_Avg         = result.getFloat(69)   / TourData.RUN_DYN_DATA_MULTIPLIER;
+               tourItem.colRunDyn_VerticalRatio_Min            = result.getInt(67)     / TourData.RUN_DYN_DATA_MULTIPLIER;
+               tourItem.colRunDyn_VerticalRatio_Max            = result.getInt(68)     / TourData.RUN_DYN_DATA_MULTIPLIER;
+               tourItem.colRunDyn_VerticalRatio_Avg            = result.getFloat(69)   / TourData.RUN_DYN_DATA_MULTIPLIER;
 
                // ---------- SURFING -------------
 
-               tourItem.col_Surfing_NumberOfEvents          = result.getShort(70);
-               tourItem.col_Surfing_MinSpeed_StartStop      = result.getShort(71);
-               tourItem.col_Surfing_MinSpeed_Surfing        = result.getShort(72);
-               tourItem.col_Surfing_MinTimeDuration         = result.getShort(73);
+               tourItem.col_Surfing_NumberOfEvents             = result.getLong(70);
+               tourItem.col_Surfing_MinSpeed_StartStop         = result.getShort(71);
+               tourItem.col_Surfing_MinSpeed_Surfing           = result.getShort(72);
+               tourItem.col_Surfing_MinTimeDuration            = result.getShort(73);
 
-               tourItem.col_Surfing_IsMinDistance           = result.getBoolean(74);
-               tourItem.col_Surfing_MinDistance             = result.getShort(75);
+               tourItem.col_Surfing_IsMinDistance              = result.getBoolean(74);
+               tourItem.col_Surfing_MinDistance                = result.getShort(75);
+
+               // ---------- TRAINING -------------
+
+               tourItem.colTraining_TrainingEffect             = result.getFloat(76);
+               tourItem.colTraining_TrainingEffect_Anaerobic   = result.getFloat(77);
+               tourItem.colTraining_TrainingPerformance        = result.getFloat(78);
 
 // SET_FORMATTING_ON
 
@@ -399,7 +412,7 @@ public class TVITourBookYearSub extends TVITourBookItem {
                tourItem.colAvgSpeed = dbDrivingTime == 0 ? 0 : 3.6f * dbDistance / dbDrivingTime;
                tourItem.colAvgPace = dbDistance == 0 ? 0 : dbDrivingTime * 1000 / dbDistance;
 
-               tourItem.colPausedTime = tourItem.colRecordingTime - tourItem.colDrivingTime;
+               tourItem.colPausedTime = tourItem.colTourRecordingTime - tourItem.colTourDrivingTime;
 
                // get first tag id
                if (resultTagId instanceof Long) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,8 @@
  *******************************************************************************/
 package de.byteholder.geoclipse.preferences;
 
+import net.tourbook.application.TourbookPlugin;
+
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.BooleanFieldEditor;
@@ -26,16 +28,14 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-import net.tourbook.application.TourbookPlugin;
-
 /**
- * Category page for the map
+ * Category page for 2D map
  */
-public class PrefPageMap extends PreferencePage implements IWorkbenchPreferencePage {
+public class PrefPage_Map2 extends PreferencePage implements IWorkbenchPreferencePage {
 
    private BooleanFieldEditor _chkShowTileInfo;
 
-   public PrefPageMap() {
+   public PrefPage_Map2() {
       noDefaultAndApplyButton();
    }
 

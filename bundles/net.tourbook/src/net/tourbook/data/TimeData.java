@@ -155,6 +155,9 @@ public class TimeData implements Serializable {
    /**
     * Running dynamics data: Vertical oscillation. Contains {@link Short#MIN_VALUE} when value is
     * not set.
+    * <p>
+    * This value is multiplied with {@link TourData#RUN_DYN_DATA_MULTIPLIER} and the unit is mm
+    * (Millimeter)
     */
    public short              runDyn_VerticalOscillation = Short.MIN_VALUE;
 

@@ -23,6 +23,7 @@ import com.garmin.fit.Mesg;
 import java.util.Date;
 
 import net.tourbook.data.TourMarker;
+import net.tourbook.device.garmin.fit.FitData;
 
 /**
  * A {@link TourMarker} is set for each lap.

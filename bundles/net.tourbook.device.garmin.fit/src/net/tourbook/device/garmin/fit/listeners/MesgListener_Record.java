@@ -16,6 +16,7 @@
 package net.tourbook.device.garmin.fit.listeners;
 
 import com.garmin.fit.DateTime;
+import com.garmin.fit.DeveloperField;
 import com.garmin.fit.RecordMesg;
 import com.garmin.fit.RecordMesgListener;
 
@@ -25,6 +26,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.device.garmin.fit.Activator;
 import net.tourbook.device.garmin.fit.DataConverters;
+import net.tourbook.device.garmin.fit.FitData;
 import net.tourbook.device.garmin.fit.IPreferences;
 import net.tourbook.device.garmin.fit.Messages;
 
@@ -35,16 +37,24 @@ import org.joda.time.PeriodType;
 
 public class MesgListener_Record extends AbstractMesgListener implements RecordMesgListener {
 
-   private IPreferenceStore _prefStore            = Activator.getDefault().getPreferenceStore();
+   private static final String DEV_FIELD_NAME__CADENCE              = "Cadence";                                  //$NON-NLS-1$
+   private static final String DEV_FIELD_NAME__GROUND_TIME          = "Ground Time";                              //$NON-NLS-1$
+   private static final String DEV_FIELD_NAME__LEG_SPRING_STIFFNESS = "Leg Spring Stiffness";                     //$NON-NLS-1$
+   private static final String DEV_FIELD_NAME__POWER                = "Power";                                    //$NON-NLS-1$
+   private static final String DEV_FIELD_NAME__FORM_POWER           = "Form Power";                               //$NON-NLS-1$
+   private static final String DEV_FIELD_NAME__ELEVATION            = "Elevation";                                //$NON-NLS-1$
+   private static final String DEV_FIELD_NAME__VERTICAL_OSCILLATION = "Vertical Oscillation";                     //$NON-NLS-1$
 
-   private float            _temperatureAdjustment;
+   private IPreferenceStore    _prefStore                           = Activator.getDefault().getPreferenceStore();
 
-   private boolean          _isIgnoreSpeedValues;
-   private boolean          _isReplaceExceededTimeSlice;
+   private float               _temperatureAdjustment;
 
-   private long             _exceededTimeSliceLimit;
-   private long             _exceededTimeSliceDuration;
-   private long             _previousAbsoluteTime = Long.MIN_VALUE;
+   private boolean             _isIgnoreSpeedValues;
+   private boolean             _isReplaceExceededTimeSlice;
+
+   private long                _exceededTimeSliceLimit;
+   private long                _exceededTimeSliceDuration;
+   private long                _previousAbsoluteTime                = Long.MIN_VALUE;
 
    public MesgListener_Record(final FitData fitData) {
 
@@ -252,12 +262,13 @@ public class MesgListener_Record extends AbstractMesgListener implements RecordM
 
       /**
        * Running dynamics data <code>
-       *
-      //	|| fieldName.equals("stance_time") //				  253.0  ms
+
+      //	|| fieldName.equals("stance_time") //				     253.0  ms
       //	|| fieldName.equals("stance_time_balance") //		   51.31 percent
-      //	|| fieldName.equals("step_length") //				 1526.0  mm
-      //	|| fieldName.equals("vertical_oscillation") //		    7.03 percent
-      //	|| fieldName.equals("vertical_ratio") //			  114.2  mm
+      //	|| fieldName.equals("step_length") //				    1526.0  mm
+      // || fieldName.equals("vertical_oscillation") //       105.2  mm          //$NON-NLS-1$
+      // || fieldName.equals("vertical_ratio") //               8.96 percent     //$NON-NLS-1$
+
        * </code>
        */
       final Float stanceTime = mesg.getStanceTime();
@@ -284,6 +295,125 @@ public class MesgListener_Record extends AbstractMesgListener implements RecordM
       if (verticalRatio != null) {
          timeData.runDyn_VerticalRatio = (short) (verticalRatio * TourData.RUN_DYN_DATA_MULTIPLIER);
       }
+
+      setRecord_DeveloperData(mesg, timeData);
+   }
+
+   /**
+    * Field values from developer fields are only set, when the values are not yet set.
+    *
+    * @param mesg
+    * @param timeData
+    */
+   private void setRecord_DeveloperData(final RecordMesg mesg, final TimeData timeData) {
+
+      for (final DeveloperField devField : mesg.getDeveloperFields()) {
+
+         switch (devField.getName()) {
+
+         case DEV_FIELD_NAME__CADENCE:
+
+            // 91 RPM
+
+            if (timeData.cadence == Float.MIN_VALUE) {
+
+               final Float fieldValue = devField.getFloatValue();
+               if (fieldValue != null) {
+                  timeData.cadence = fieldValue;
+               }
+            }
+
+            break;
+
+         case DEV_FIELD_NAME__ELEVATION:
+
+            // 315 Meters
+
+            if (timeData.altitude == Float.MIN_VALUE) {
+
+               final Float fieldValue = devField.getFloatValue();
+               if (fieldValue != null) {
+                  timeData.altitude = fieldValue;
+               }
+            }
+
+            break;
+
+         case DEV_FIELD_NAME__FORM_POWER:
+
+            // 32 Watts
+
+            break;
+
+         case DEV_FIELD_NAME__POWER:
+
+            //  112 Watts
+
+            if (timeData.power == Float.MIN_VALUE) {
+
+               final Float fieldValue = devField.getFloatValue();
+               if (fieldValue != null) {
+                  timeData.power = fieldValue;
+               }
+            }
+
+            break;
+
+         case DEV_FIELD_NAME__GROUND_TIME:
+
+            // 660 Milliseconds
+
+            if (timeData.runDyn_StanceTime == Short.MIN_VALUE) {
+
+               final Short fieldValue = devField.getShortValue();
+               if (fieldValue != null) {
+                  timeData.runDyn_StanceTime = fieldValue.shortValue();
+
+               }
+            }
+
+            break;
+
+         case DEV_FIELD_NAME__LEG_SPRING_STIFFNESS:
+
+            // 0.0 kN/m
+
+            break;
+
+         case DEV_FIELD_NAME__VERTICAL_OSCILLATION:
+
+            //  Vertical Oscillation     6.375 Centimeters
+            //  Vertical Oscillation     6.375 Centimeters
+            //  Vertical Oscillation     6.125 Centimeters
+            //  Vertical Oscillation       6.0 Centimeters
+            //  Vertical Oscillation     5.875 Centimeters
+            //  Vertical Oscillation     5.875 Centimeters
+            //  Vertical Oscillation      5.75 Centimeters
+            //  Vertical Oscillation       6.0 Centimeters
+            //  Vertical Oscillation       6.0 Centimeters
+
+            if (timeData.runDyn_VerticalOscillation == Short.MIN_VALUE) {
+
+               final Float fieldValue = devField.getFloatValue();
+               if (fieldValue != null) {
+
+                  timeData.runDyn_VerticalOscillation = (short) (fieldValue
+
+                        * TourData.RUN_DYN_DATA_MULTIPLIER
+
+                        // adjust to mm
+                        * 10);
+               }
+            }
+
+            break;
+
+         default:
+            break;
+         }
+
+      }
+
    }
 
 }

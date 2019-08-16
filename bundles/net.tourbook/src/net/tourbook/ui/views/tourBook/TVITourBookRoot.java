@@ -164,7 +164,7 @@ public class TVITourBookRoot extends TVITourBookItem {
                && summaryIndex != numChildren - 1) {
 
             // wrong summary row detected
-            
+
             // move summary to the end
             final TreeViewerItem summarytYearItem = children.remove(summaryIndex);
 

@@ -18,16 +18,17 @@ package net.tourbook.application;
 import de.byteholder.geoclipse.map.Map;
 
 import net.tourbook.Messages;
+import net.tourbook.common.tooltip.ActionToolbarSlideoutAdv;
 import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.tooltip.SlideoutLocation;
 import net.tourbook.common.util.Util;
 import net.tourbook.map2.view.Map2View;
-import net.tourbook.tour.filter.ActionToolbarSlideoutAdv;
 import net.tourbook.tour.filter.geo.Slideout_TourGeoFilter;
 import net.tourbook.tour.filter.geo.TourGeoFilter;
 import net.tourbook.tour.filter.geo.TourGeoFilter_Manager;
 
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.IViewPart;
@@ -56,9 +57,9 @@ public class ActionTourGeoFilter extends ActionToolbarSlideoutAdv {
    }
 
    @Override
-   protected void onSelect() {
+   protected void onSelect(final SelectionEvent selectionEvent) {
 
-      super.onSelect();
+      super.onSelect(selectionEvent);
 
       final boolean isSelected = getSelection();
 

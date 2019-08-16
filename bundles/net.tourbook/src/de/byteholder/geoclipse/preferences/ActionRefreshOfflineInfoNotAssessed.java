@@ -21,9 +21,9 @@ import org.eclipse.jface.action.Action;
 
 public class ActionRefreshOfflineInfoNotAssessed extends Action {
 
-	private PrefPageMapProviders	_prefPageMapFactories;
+	private PrefPage_Map2_Providers	_prefPageMapFactories;
 
-	public ActionRefreshOfflineInfoNotAssessed(final PrefPageMapProviders prefPageMapFactories) {
+	public ActionRefreshOfflineInfoNotAssessed(final PrefPage_Map2_Providers prefPageMapFactories) {
 
 		setToolTipText(Messages.Pref_Map_Button_RefreshTileInfoNotAssessed_Tooltip);
 

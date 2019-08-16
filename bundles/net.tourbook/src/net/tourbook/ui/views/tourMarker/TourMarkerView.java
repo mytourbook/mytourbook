@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,6 +18,37 @@ package net.tourbook.ui.views.tourMarker;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
+
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
+import net.tourbook.common.util.ColumnDefinition;
+import net.tourbook.common.util.ColumnManager;
+import net.tourbook.common.util.IContextMenuProvider;
+import net.tourbook.common.util.ITourViewer;
+import net.tourbook.common.util.PostSelectionProvider;
+import net.tourbook.data.TourData;
+import net.tourbook.data.TourMarker;
+import net.tourbook.database.TourDatabase;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.ActionOpenMarkerDialog;
+import net.tourbook.tour.ITourEventListener;
+import net.tourbook.tour.SelectionDeletedTours;
+import net.tourbook.tour.SelectionTourData;
+import net.tourbook.tour.SelectionTourId;
+import net.tourbook.tour.SelectionTourIds;
+import net.tourbook.tour.SelectionTourMarker;
+import net.tourbook.tour.TourEvent;
+import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
+import net.tourbook.ui.ITourProvider;
+import net.tourbook.ui.TableColumnFactory;
+import net.tourbook.ui.action.ActionModifyColumns;
+import net.tourbook.ui.tourChart.ChartLabel;
+import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
+import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
+import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
+import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.IMenuListener;
@@ -62,1009 +93,1025 @@ import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.UI;
-import net.tourbook.common.util.ColumnDefinition;
-import net.tourbook.common.util.ColumnManager;
-import net.tourbook.common.util.ITourViewer;
-import net.tourbook.common.util.PostSelectionProvider;
-import net.tourbook.data.TourData;
-import net.tourbook.data.TourMarker;
-import net.tourbook.database.TourDatabase;
-import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tour.ActionOpenMarkerDialog;
-import net.tourbook.tour.ITourEventListener;
-import net.tourbook.tour.SelectionDeletedTours;
-import net.tourbook.tour.SelectionTourData;
-import net.tourbook.tour.SelectionTourId;
-import net.tourbook.tour.SelectionTourIds;
-import net.tourbook.tour.SelectionTourMarker;
-import net.tourbook.tour.TourEvent;
-import net.tourbook.tour.TourEventId;
-import net.tourbook.tour.TourManager;
-import net.tourbook.ui.ITourProvider;
-import net.tourbook.ui.TableColumnFactory;
-import net.tourbook.ui.action.ActionModifyColumns;
-import net.tourbook.ui.tourChart.ChartLabel;
-import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
-import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
-import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
-import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
-
 public class TourMarkerView extends ViewPart implements ITourProvider, ITourViewer {
 
-	public static final String			ID				= "net.tourbook.views.TourMarkerView";			//$NON-NLS-1$
+   public static final String      ID                              = "net.tourbook.views.TourMarkerView";       //$NON-NLS-1$
 
-	private final IPreferenceStore	_prefStore	= TourbookPlugin.getPrefStore();
-	private final IDialogSettings		_state		= TourbookPlugin.getState("TourMarkerView");	//$NON-NLS-1$
+   private final IPreferenceStore  _prefStore                      = TourbookPlugin.getPrefStore();
+   private final IDialogSettings   _state                          = TourbookPlugin.getState("TourMarkerView"); //$NON-NLS-1$
 
-	private TourData						_tourData;
+   private TourData                _tourData;
 
-	private PostSelectionProvider		_postSelectionProvider;
-	private ISelectionListener			_postSelectionListener;
-	private IPropertyChangeListener	_prefChangeListener;
-	private ITourEventListener			_tourEventListener;
-	private IPartListener2				_partListener;
+   private PostSelectionProvider   _postSelectionProvider;
+   private ISelectionListener      _postSelectionListener;
+   private IPropertyChangeListener _prefChangeListener;
+   private ITourEventListener      _tourEventListener;
+   private IPartListener2          _partListener;
 
-	private ActionOpenMarkerDialog	_actionEditTourMarkers;
-	private ActionModifyColumns		_actionModifyColumns;
+   private MenuManager             _viewerMenuManager;
+   private IContextMenuProvider    _tableViewerContextMenuProvider = new TableContextMenuProvider();
 
-	private PixelConverter				_pc;
+   private ActionOpenMarkerDialog  _actionEditTourMarkers;
+   private ActionModifyColumns     _actionModifyColumns;
 
-	private TableViewer					_markerViewer;
-	private ColumnManager				_columnManager;
+   private PixelConverter          _pc;
 
-	private boolean						_isInUpdate;
-	private boolean						_isMultipleTours;
+   private TableViewer             _markerViewer;
+   private ColumnManager           _columnManager;
 
-	private ColumnDefinition			_colDefName;
-	private ColumnDefinition			_colDefVisibility;
+   private boolean                 _isInUpdate;
+   private boolean                 _isMultipleTours;
 
-	private final NumberFormat			_nf3			= NumberFormat.getNumberInstance();
-	{
-		_nf3.setMinimumFractionDigits(3);
-		_nf3.setMaximumFractionDigits(3);
-	}
+   private ColumnDefinition        _colDefName;
+   private ColumnDefinition        _colDefVisibility;
 
-	/*
-	 * UI controls
-	 */
-	private PageBook	_pageBook;
-	private Composite	_pageNoData;
-	private Composite	_viewerContainer;
+   private final NumberFormat      _nf3                            = NumberFormat.getNumberInstance();
+   {
+      _nf3.setMinimumFractionDigits(3);
+      _nf3.setMaximumFractionDigits(3);
+   }
 
-	private Font		_boldFont;
+   /*
+    * UI controls
+    */
+   private PageBook  _pageBook;
+   private Composite _pageNoData;
+   private Composite _viewerContainer;
 
-	class MarkerViewerContentProvicer implements IStructuredContentProvider {
+   private Font      _boldFont;
 
-		@Override
-		public void dispose() {}
+   private Menu      _tableContextMenu;
 
-		@Override
-		public Object[] getElements(final Object inputElement) {
+   class MarkerViewerContentProvicer implements IStructuredContentProvider {
 
-			if (_tourData == null) {
-				return new Object[0];
-			} else {
+      @Override
+      public void dispose() {}
 
-				Object[] tourMarkers;
+      @Override
+      public Object[] getElements(final Object inputElement) {
 
-				if (_tourData.isMultipleTours()) {
+         if (_tourData == null) {
+            return new Object[0];
+         } else {
 
-					tourMarkers = _tourData.multiTourMarkers.toArray();
+            Object[] tourMarkers;
 
-				} else {
+            if (_tourData.isMultipleTours()) {
 
-					tourMarkers = _tourData.getTourMarkers().toArray();
-				}
+               tourMarkers = _tourData.multiTourMarkers.toArray();
 
-//				System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//						+ ("\n\t_tourData: " + _tourData));
-//				// TODO remove SYSTEM.OUT.PRINTLN
+            } else {
 
-				return tourMarkers;
-			}
-		}
+               tourMarkers = _tourData.getTourMarkers().toArray();
+            }
 
-		@Override
-		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
-	}
+//            System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//                  + ("\n\t_tourData: " + _tourData));
+//            // TODO remove SYSTEM.OUT.PRINTLN
 
-	/**
-	 * Sort the markers by time
-	 */
-	private class MarkerViewerSorter extends ViewerSorter {
+            return tourMarkers;
+         }
+      }
 
-		@Override
-		public int compare(final Viewer viewer, final Object obj1, final Object obj2) {
+      @Override
+      public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
+   }
 
-//			return ((TourMarker) (obj1)).getTime() - ((TourMarker) (obj2)).getTime();
+   /**
+    * Sort the markers by time
+    */
+   private class MarkerViewerSorter extends ViewerSorter {
+
+      @Override
+      public int compare(final Viewer viewer, final Object obj1, final Object obj2) {
+
+//         return ((TourMarker) (obj1)).getTime() - ((TourMarker) (obj2)).getTime();
 // time is disabled because it's not always available in gpx files
 
-			if (_isMultipleTours) {
+         if (_isMultipleTours) {
 
-				return ((TourMarker) (obj1)).getMultiTourSerieIndex() - ((TourMarker) (obj2)).getMultiTourSerieIndex();
-			} else {
+            return ((TourMarker) (obj1)).getMultiTourSerieIndex() - ((TourMarker) (obj2)).getMultiTourSerieIndex();
+         } else {
 
-				return ((TourMarker) (obj1)).getSerieIndex() - ((TourMarker) (obj2)).getSerieIndex();
-			}
+            return ((TourMarker) (obj1)).getSerieIndex() - ((TourMarker) (obj2)).getSerieIndex();
+         }
 
-		}
-	}
+      }
+   }
 
-	public TourMarkerView() {
-		super();
-	}
+   public class TableContextMenuProvider implements IContextMenuProvider {
 
-	private void addPartListener() {
+      @Override
+      public void disposeContextMenu() {
 
-		_partListener = new IPartListener2() {
+         if (_tableContextMenu != null) {
+            _tableContextMenu.dispose();
+         }
+      }
 
-			@Override
-			public void partActivated(final IWorkbenchPartReference partRef) {}
+      @Override
+      public Menu getContextMenu() {
+         return _tableContextMenu;
+      }
 
-			@Override
-			public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
+      @Override
+      public Menu recreateContextMenu() {
 
-			@Override
-			public void partClosed(final IWorkbenchPartReference partRef) {}
+         disposeContextMenu();
 
-			@Override
-			public void partDeactivated(final IWorkbenchPartReference partRef) {}
+         _tableContextMenu = createUI_22_CreateViewerContextMenu();
 
-			@Override
-			public void partHidden(final IWorkbenchPartReference partRef) {}
+         return _tableContextMenu;
+      }
 
-			@Override
-			public void partInputChanged(final IWorkbenchPartReference partRef) {}
+   }
 
-			@Override
-			public void partOpened(final IWorkbenchPartReference partRef) {}
+   public TourMarkerView() {
+      super();
+   }
 
-			@Override
-			public void partVisible(final IWorkbenchPartReference partRef) {}
-		};
-		getViewSite().getPage().addPartListener(_partListener);
-	}
+   private void addPartListener() {
 
-	private void addPrefListener() {
+      _partListener = new IPartListener2() {
 
-		_prefChangeListener = new IPropertyChangeListener() {
-			@Override
-			public void propertyChange(final PropertyChangeEvent event) {
+         @Override
+         public void partActivated(final IWorkbenchPartReference partRef) {}
 
-				final String property = event.getProperty();
+         @Override
+         public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
 
-				if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
+         @Override
+         public void partClosed(final IWorkbenchPartReference partRef) {}
 
-					// measurement system has changed
+         @Override
+         public void partDeactivated(final IWorkbenchPartReference partRef) {}
 
-					_columnManager.saveState(_state);
-					_columnManager.clearColumns();
+         @Override
+         public void partHidden(final IWorkbenchPartReference partRef) {}
 
-					defineAllColumns();
+         @Override
+         public void partInputChanged(final IWorkbenchPartReference partRef) {}
 
-					_markerViewer = (TableViewer) recreateViewer(_markerViewer);
+         @Override
+         public void partOpened(final IWorkbenchPartReference partRef) {}
 
-				} else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
+         @Override
+         public void partVisible(final IWorkbenchPartReference partRef) {}
+      };
+      getViewSite().getPage().addPartListener(_partListener);
+   }
 
-					_markerViewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
-					_markerViewer.refresh();
+   private void addPrefListener() {
 
-					/*
-					 * the tree must be redrawn because the styled text does not show with the new color
-					 */
-					_markerViewer.getTable().redraw();
+      _prefChangeListener = new IPropertyChangeListener() {
+         @Override
+         public void propertyChange(final PropertyChangeEvent event) {
 
-				}
-			}
-		};
-		_prefStore.addPropertyChangeListener(_prefChangeListener);
-	}
+            final String property = event.getProperty();
 
-	/**
-	 * listen for events when a tour is selected
-	 */
-	private void addSelectionListener() {
+            if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
 
-		_postSelectionListener = new ISelectionListener() {
+               // measurement system has changed
 
-			@Override
-			public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
+               _columnManager.saveState(_state);
+               _columnManager.clearColumns();
 
-				if (part == TourMarkerView.this) {
-					return;
-				}
+               defineAllColumns();
 
-				onSelectionChanged(selection);
-			}
-		};
-		getSite().getPage().addPostSelectionListener(_postSelectionListener);
-	}
+               _markerViewer = (TableViewer) recreateViewer(_markerViewer);
 
-	private void addTourEventListener() {
+            } else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
-		_tourEventListener = new ITourEventListener() {
-			@Override
-			public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
+               _markerViewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+               _markerViewer.refresh();
 
-				if (_isInUpdate || part == TourMarkerView.this) {
-					return;
-				}
+               /*
+                * the tree must be redrawn because the styled text does not show with the new color
+                */
+               _markerViewer.getTable().redraw();
 
-				if (eventId == TourEventId.TOUR_SELECTION && eventData instanceof ISelection) {
+            }
+         }
+      };
+      _prefStore.addPropertyChangeListener(_prefChangeListener);
+   }
 
-					onSelectionChanged((ISelection) eventData);
+   /**
+    * listen for events when a tour is selected
+    */
+   private void addSelectionListener() {
 
-				} else {
+      _postSelectionListener = new ISelectionListener() {
 
-					if (_tourData == null) {
-						return;
-					}
+         @Override
+         public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
-					if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
+            if (part == TourMarkerView.this) {
+               return;
+            }
 
-						final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
-						if (modifiedTours != null) {
+            onSelectionChanged(selection);
+         }
+      };
+      getSite().getPage().addPostSelectionListener(_postSelectionListener);
+   }
 
-							// update modified tour
+   private void addTourEventListener() {
 
-							final long viewTourId = _tourData.getTourId();
+      _tourEventListener = new ITourEventListener() {
+         @Override
+         public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
-							for (final TourData tourData : modifiedTours) {
-								if (tourData.getTourId() == viewTourId) {
+            if (_isInUpdate || part == TourMarkerView.this) {
+               return;
+            }
 
-									// get modified tour
-									_tourData = tourData;
-									_isMultipleTours = tourData.isMultipleTours();
+            if (eventId == TourEventId.TOUR_SELECTION && eventData instanceof ISelection) {
 
-									updateUI_MarkerViewer();
+               onSelectionChanged((ISelection) eventData);
 
-									// removed old tour data from the selection provider
-									_postSelectionProvider.clearSelection();
+            } else {
 
-									// nothing more to do, the view contains only one tour
-									return;
-								}
-							}
-						}
+               if (_tourData == null) {
+                  return;
+               }
 
-					} else if (eventId == TourEventId.MARKER_SELECTION) {
+               if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
 
-						onTourEvent_TourMarker(eventData);
+                  final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+                  if (modifiedTours != null) {
 
-					} else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
+                     // update modified tour
 
-						clearView();
-					}
-				}
-			}
-		};
+                     final long viewTourId = _tourData.getTourId();
 
-		TourManager.getInstance().addTourEventListener(_tourEventListener);
-	}
+                     for (final TourData tourData : modifiedTours) {
+                        if (tourData.getTourId() == viewTourId) {
 
-	private void clearView() {
+                           // get modified tour
+                           _tourData = tourData;
+                           _isMultipleTours = tourData.isMultipleTours();
 
-		_tourData = null;
+                           updateUI_MarkerViewer();
 
-		updateUI_MarkerViewer();
+                           // removed old tour data from the selection provider
+                           _postSelectionProvider.clearSelection();
 
-		_postSelectionProvider.clearSelection();
-	}
+                           // nothing more to do, the view contains only one tour
+                           return;
+                        }
+                     }
+                  }
 
-	private void createActions() {
+               } else if (eventId == TourEventId.MARKER_SELECTION) {
 
-		_actionEditTourMarkers = new ActionOpenMarkerDialog(this, true);
-		_actionModifyColumns = new ActionModifyColumns(this);
-	}
+                  onTourEvent_TourMarker(eventData);
 
-	@Override
-	public void createPartControl(final Composite parent) {
+               } else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
 
-		_pc = new PixelConverter(parent);
-		_boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
+                  clearView();
+               }
+            }
+         }
+      };
 
-		// define all columns for the viewer
-		_columnManager = new ColumnManager(this, _state);
-		_columnManager.setIsCategoryAvailable(true);
-		defineAllColumns();
+      TourManager.getInstance().addTourEventListener(_tourEventListener);
+   }
 
-		createUI(parent);
+   private void clearView() {
 
-		addSelectionListener();
-		addTourEventListener();
-		addPrefListener();
-		addPartListener();
+      _tourData = null;
 
-		createActions();
-		fillToolbar();
+      updateUI_MarkerViewer();
 
-		// this part is a selection provider
-		getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
+      _postSelectionProvider.clearSelection();
+   }
 
-		// show default page
-		_pageBook.showPage(_pageNoData);
+   private void createActions() {
 
-		// show marker from last selection
-		onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
+      _actionEditTourMarkers = new ActionOpenMarkerDialog(this, true);
+      _actionModifyColumns = new ActionModifyColumns(this);
+   }
 
-		if (_tourData == null) {
-			showTourFromTourProvider();
-		}
-	}
+   private void createMenuManager() {
 
-	private void createUI(final Composite parent) {
+      _viewerMenuManager = new MenuManager("#PopupMenu"); //$NON-NLS-1$
+      _viewerMenuManager.setRemoveAllWhenShown(true);
+      _viewerMenuManager.addMenuListener(new IMenuListener() {
+         @Override
+         public void menuAboutToShow(final IMenuManager manager) {
+            fillContextMenu(manager);
+         }
+      });
+   }
 
-		_pageBook = new PageBook(parent, SWT.NONE);
+   @Override
+   public void createPartControl(final Composite parent) {
 
-		_pageNoData = net.tourbook.common.UI.createUI_PageNoData(_pageBook, Messages.UI_Label_no_chart_is_selected);
+      _pc = new PixelConverter(parent);
+      _boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 
-		_viewerContainer = new Composite(_pageBook, SWT.NONE);
-		GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
-		{
-			createUI_10_TableViewer(_viewerContainer);
-		}
-	}
+      createMenuManager();
 
-	private void createUI_10_TableViewer(final Composite parent) {
+      // define all columns for the viewer
+      _columnManager = new ColumnManager(this, _state);
+      _columnManager.setIsCategoryAvailable(true);
+      defineAllColumns();
 
-		/*
-		 * create table
-		 */
-		final Table table = new Table(parent, SWT.FULL_SELECTION | SWT.MULTI /* | SWT.BORDER */);
-		GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
+      createUI(parent);
 
-		table.setHeaderVisible(true);
-//		table.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
-		table.setLinesVisible(false);
+      addSelectionListener();
+      addTourEventListener();
+      addPrefListener();
+      addPartListener();
 
-		/*
-		 * create table viewer
-		 */
-		_markerViewer = new TableViewer(table);
+      createActions();
+      fillToolbar();
 
-//		// set editing support after the viewer is created but before the columns are created
-//		net.tourbook.common.UI.setCellEditSupport(_markerViewer);
+      // this part is a selection provider
+      getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
+
+      // show default page
+      _pageBook.showPage(_pageNoData);
+
+      // show marker from last selection
+      onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
+
+      if (_tourData == null) {
+         showTourFromTourProvider();
+      }
+   }
+
+   private void createUI(final Composite parent) {
+
+      _pageBook = new PageBook(parent, SWT.NONE);
+
+      _pageNoData = net.tourbook.common.UI.createUI_PageNoData(_pageBook, Messages.UI_Label_no_chart_is_selected);
+
+      _viewerContainer = new Composite(_pageBook, SWT.NONE);
+      GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
+      {
+         createUI_10_TableViewer(_viewerContainer);
+      }
+   }
+
+   private void createUI_10_TableViewer(final Composite parent) {
+
+      /*
+       * create table
+       */
+      final Table table = new Table(parent, SWT.FULL_SELECTION | SWT.MULTI /* | SWT.BORDER */);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
+
+      table.setHeaderVisible(true);
+//      table.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+      table.setLinesVisible(false);
+
+      /*
+       * create table viewer
+       */
+      _markerViewer = new TableViewer(table);
+
+//      // set editing support after the viewer is created but before the columns are created
+//      net.tourbook.common.UI.setCellEditSupport(_markerViewer);
 //
-//		_colDefName.setEditingSupport(new MarkerEditingSupportLabel(_markerViewer));
-//		_colDefVisibility.setEditingSupport(new MarkerEditingSupportVisibility(_markerViewer));
+//      _colDefName.setEditingSupport(new MarkerEditingSupportLabel(_markerViewer));
+//      _colDefVisibility.setEditingSupport(new MarkerEditingSupportVisibility(_markerViewer));
 
-		_columnManager.createColumns(_markerViewer);
+      _columnManager.createColumns(_markerViewer);
 
-		_markerViewer.setUseHashlookup(true);
-		_markerViewer.setContentProvider(new MarkerViewerContentProvicer());
-		_markerViewer.setSorter(new MarkerViewerSorter());
+      _markerViewer.setUseHashlookup(true);
+      _markerViewer.setContentProvider(new MarkerViewerContentProvicer());
+      _markerViewer.setSorter(new MarkerViewerSorter());
 
-		_markerViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-			@Override
-			public void selectionChanged(final SelectionChangedEvent event) {
-				onSelect_TourMarker((StructuredSelection) event.getSelection());
-			}
-		});
-
-		_markerViewer.addDoubleClickListener(new IDoubleClickListener() {
-			@Override
-			public void doubleClick(final DoubleClickEvent event) {
+      _markerViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+         @Override
+         public void selectionChanged(final SelectionChangedEvent event) {
+            onSelect_TourMarker((StructuredSelection) event.getSelection());
+         }
+      });
 
-				if (isTourSavedInDb() == false) {
-					return;
-				}
+      _markerViewer.addDoubleClickListener(new IDoubleClickListener() {
+         @Override
+         public void doubleClick(final DoubleClickEvent event) {
 
-				// edit selected marker
-				final IStructuredSelection selection = (IStructuredSelection) _markerViewer.getSelection();
-				if (selection.size() > 0) {
-					_actionEditTourMarkers.setTourMarker((TourMarker) selection.getFirstElement());
-					_actionEditTourMarkers.run();
-				}
-			}
-		});
+            if (isTourSavedInDb() == false) {
+               return;
+            }
 
-		createUI_20_ContextMenu();
-	}
+            // edit selected marker
+            final IStructuredSelection selection = (IStructuredSelection) _markerViewer.getSelection();
+            if (selection.size() > 0) {
+               _actionEditTourMarkers.setTourMarker((TourMarker) selection.getFirstElement());
+               _actionEditTourMarkers.run();
+            }
+         }
+      });
 
-	/**
-	 * create the views context menu
-	 */
-	private void createUI_20_ContextMenu() {
+      createUI_20_ContextMenu();
+   }
 
-		final MenuManager menuMgr = new MenuManager("#PopupMenu"); //$NON-NLS-1$
-		menuMgr.setRemoveAllWhenShown(true);
-		menuMgr.addMenuListener(new IMenuListener() {
-			@Override
-			public void menuAboutToShow(final IMenuManager manager) {
-				fillContextMenu(manager);
-			}
-		});
+   /**
+    * create the views context menu
+    */
+   private void createUI_20_ContextMenu() {
 
-		final Table table = (Table) _markerViewer.getControl();
-		final Menu tableContextMenu = menuMgr.createContextMenu(table);
+      _tableContextMenu = createUI_22_CreateViewerContextMenu();
 
-		_columnManager.createHeaderContextMenu(table, tableContextMenu);
-	}
+      final Table table = (Table) _markerViewer.getControl();
 
-	private void defineAllColumns() {
+      _columnManager.createHeaderContextMenu(table, _tableViewerContextMenuProvider);
+   }
 
-		defineColumn_Marker_IsVisible();
+   private Menu createUI_22_CreateViewerContextMenu() {
 
-		defineColumn_Time_Time();
-		defineColumn_Time_TimeDelta();
+      final Table table = (Table) _markerViewer.getControl();
+      final Menu tableContextMenu = _viewerMenuManager.createContextMenu(table);
 
-		defineColumn_Motion_Distance();
-		defineColumn_Motion_DistanceDelta();
+      return tableContextMenu;
+   }
 
-		defineColumn_Waypoint_Name();
-		defineColumn_Waypoint_Description();
-		defineColumn_Marker_Url();
+   private void defineAllColumns() {
 
-		defineColumn_Data_SerieIndex();
-	}
+      defineColumn_Marker_IsVisible();
 
-	/**
-	 * Column: Serie index
-	 */
-	private void defineColumn_Data_SerieIndex() {
+      defineColumn_Time_Time();
+      defineColumn_Time_TimeDelta();
 
-		_colDefName = TableColumnFactory.MARKER_SERIE_INDEX.createColumn(_columnManager, _pc);
+      defineColumn_Motion_Distance();
+      defineColumn_Motion_DistanceDelta();
 
-		_colDefName.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
+      defineColumn_Waypoint_Name();
+      defineColumn_Waypoint_Description();
+      defineColumn_Marker_Url();
 
-				final TourMarker marker = (TourMarker) cell.getElement();
+      defineColumn_Data_SerieIndex();
+   }
 
-				cell.setText(Integer.toString(marker.getSerieIndex()));
-			}
-		});
-	}
+   /**
+    * Column: Serie index
+    */
+   private void defineColumn_Data_SerieIndex() {
 
-	/**
-	 * Column: Is visible
-	 */
-	private void defineColumn_Marker_IsVisible() {
+      _colDefName = TableColumnFactory.MARKER_SERIE_INDEX.createColumn(_columnManager, _pc);
 
-		_colDefVisibility = TableColumnFactory.MARKER_MAP_VISIBLE.createColumn(_columnManager, _pc);
+      _colDefName.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
 
-		_colDefVisibility.setIsDefaultColumn();
+            final TourMarker marker = (TourMarker) cell.getElement();
 
-		_colDefVisibility.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
+            cell.setText(Integer.toString(marker.getSerieIndex()));
+         }
+      });
+   }
 
-				final TourMarker tourMarker = (TourMarker) cell.getElement();
-				cell.setText(tourMarker.isMarkerVisible()
-						? Messages.App_Label_BooleanYes
-						: Messages.App_Label_BooleanNo);
-			}
-		});
-	}
+   /**
+    * Column: Is visible
+    */
+   private void defineColumn_Marker_IsVisible() {
 
-	/**
-	 * Column: Url
-	 */
-	private void defineColumn_Marker_Url() {
+      _colDefVisibility = TableColumnFactory.MARKER_MAP_VISIBLE.createColumn(_columnManager, _pc);
 
-		final ColumnDefinition colDef = TableColumnFactory.MARKER_URL.createColumn(_columnManager, _pc);
+      _colDefVisibility.setIsDefaultColumn();
 
-		colDef.setIsDefaultColumn();
+      _colDefVisibility.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
 
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
+            final TourMarker tourMarker = (TourMarker) cell.getElement();
+            cell.setText(tourMarker.isMarkerVisible()
+                  ? Messages.App_Label_BooleanYes
+                  : Messages.App_Label_BooleanNo);
+         }
+      });
+   }
 
-				final TourMarker marker = (TourMarker) cell.getElement();
+   /**
+    * Column: Url
+    */
+   private void defineColumn_Marker_Url() {
 
-				String columnText = UI.EMPTY_STRING;
+      final ColumnDefinition colDef = TableColumnFactory.MARKER_URL.createColumn(_columnManager, _pc);
 
-				/*
-				 * Url
-				 */
-				final String urlText = marker.getUrlText();
-				final String urlAddress = marker.getUrlAddress();
-				final boolean isText = urlText.length() > 0;
-				final boolean isAddress = urlAddress.length() > 0;
+      colDef.setIsDefaultColumn();
 
-				if (isText || isAddress) {
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
 
-					if (isAddress == false) {
+            final TourMarker marker = (TourMarker) cell.getElement();
 
-						// only text is in the link -> this is not a internet address but create a link of it
+            String columnText = UI.EMPTY_STRING;
 
-						columnText = urlText;
+            /*
+             * Url
+             */
+            final String urlText = marker.getUrlText();
+            final String urlAddress = marker.getUrlAddress();
+            final boolean isText = urlText.length() > 0;
+            final boolean isAddress = urlAddress.length() > 0;
 
-					} else {
+            if (isText || isAddress) {
 
-						columnText = urlAddress;
-					}
-				}
+               if (isAddress == false) {
 
-				cell.setText(columnText);
-			}
-		});
-	}
+                  // only text is in the link -> this is not a internet address but create a link of it
 
-	/**
-	 * Column: Distance km/mi
-	 */
-	private void defineColumn_Motion_Distance() {
+                  columnText = urlText;
 
-		final ColumnDefinition colDef = TableColumnFactory.MOTION_DISTANCE.createColumn(_columnManager, _pc);
+               } else {
 
-		colDef.setIsDefaultColumn();
-		colDef.disableValueFormatter();
+                  columnText = urlAddress;
+               }
+            }
 
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
+            cell.setText(columnText);
+         }
+      });
+   }
 
-				final TourMarker tourMarker = (TourMarker) cell.getElement();
+   /**
+    * Column: Distance km/mi
+    */
+   private void defineColumn_Motion_Distance() {
 
-				final float markerDistance = tourMarker.getDistance();
-				if (markerDistance == -1) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-					cell.setText(_nf3.format(markerDistance / 1000 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
-				}
+      final ColumnDefinition colDef = TableColumnFactory.MOTION_DISTANCE.createColumn(_columnManager, _pc);
 
-				if (tourMarker.getType() == ChartLabel.MARKER_TYPE_DEVICE) {
-					cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-				}
-			}
-		});
-	}
+      colDef.setIsDefaultColumn();
+      colDef.disableValueFormatter();
 
-	/**
-	 * Column: Distance delta km/mi
-	 */
-	private void defineColumn_Motion_DistanceDelta() {
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
 
-		final ColumnDefinition colDef = TableColumnFactory.MOTION_DISTANCE_DELTA.createColumn(_columnManager, _pc);
+            final TourMarker tourMarker = (TourMarker) cell.getElement();
 
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
+            final float markerDistance = tourMarker.getDistance();
+            if (markerDistance == -1) {
+               cell.setText(UI.EMPTY_STRING);
+            } else {
+               cell.setText(_nf3.format(markerDistance / 1000 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
+            }
 
-				final TourMarker tourMarker = (TourMarker) cell.getElement();
+            if (tourMarker.getType() == ChartLabel.MARKER_TYPE_DEVICE) {
+               cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+            }
+         }
+      });
+   }
 
-				final float markerDistance = tourMarker.getDistance();
+   /**
+    * Column: Distance delta km/mi
+    */
+   private void defineColumn_Motion_DistanceDelta() {
 
-				if (markerDistance == -1) {
+      final ColumnDefinition colDef = TableColumnFactory.MOTION_DISTANCE_DELTA.createColumn(_columnManager, _pc);
 
-					cell.setText(UI.EMPTY_STRING);
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
 
-				} else {
+            final TourMarker tourMarker = (TourMarker) cell.getElement();
 
-					float prevDistance = 0;
-					final ViewerRow lastRow = cell.getViewerRow().getNeighbor(ViewerRow.ABOVE, false);
+            final float markerDistance = tourMarker.getDistance();
 
-					if (null != lastRow) {
-						final TourMarker element = (TourMarker) lastRow.getElement();
-						if (element instanceof TourMarker) {
-							prevDistance = element.getDistance();
-						}
-						prevDistance = prevDistance < 0 ? 0 : prevDistance;
-					}
+            if (markerDistance == -1) {
 
-					cell.setText(_nf3.format((markerDistance - prevDistance)
-							/ 1000
-							/ net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
-				}
-			}
-		});
-	}
+               cell.setText(UI.EMPTY_STRING);
 
-	/**
-	 * Column: Time
-	 */
-	private void defineColumn_Time_Time() {
+            } else {
 
-		final ColumnDefinition colDef = TableColumnFactory.TIME_TOUR_TIME_HH_MM_SS.createColumn(_columnManager, _pc);
+               float prevDistance = 0;
+               final ViewerRow lastRow = cell.getViewerRow().getNeighbor(ViewerRow.ABOVE, false);
 
-		colDef.setIsDefaultColumn();
+               if (null != lastRow) {
+                  final TourMarker element = (TourMarker) lastRow.getElement();
+                  if (element instanceof TourMarker) {
+                     prevDistance = element.getDistance();
+                  }
+                  prevDistance = prevDistance < 0 ? 0 : prevDistance;
+               }
 
-		// hide wrong tooltip
-		colDef.setColumnHeaderToolTipText(UI.EMPTY_STRING);
+               cell.setText(_nf3.format((markerDistance - prevDistance)
+                     / 1000
+                     / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
+            }
+         }
+      });
+   }
 
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
+   /**
+    * Column: Time
+    */
+   private void defineColumn_Time_Time() {
 
-				final TourMarker marker = (TourMarker) cell.getElement();
-				final long time = marker.getTime();
+      final ColumnDefinition colDef = TableColumnFactory.TIME_TOUR_TIME_HH_MM_SS.createColumn(_columnManager, _pc);
 
-				cell.setText(net.tourbook.common.UI.format_hh_mm_ss(time));
-			}
-		});
-	}
+      colDef.setIsDefaultColumn();
 
-	/**
-	 * Column: Time
-	 */
-	private void defineColumn_Time_TimeDelta() {
+      // hide wrong tooltip
+      colDef.setColumnHeaderToolTipText(UI.EMPTY_STRING);
 
-		final ColumnDefinition colDef = TableColumnFactory.MARKER_TIME_DELTA.createColumn(_columnManager, _pc);
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
 
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
+            final TourMarker marker = (TourMarker) cell.getElement();
+            final long time = marker.getTime();
 
-				final ViewerRow lastRow = cell.getViewerRow().getNeighbor(ViewerRow.ABOVE, false);
-				int lastTime = 0;
-				if (null != lastRow) {
-					final Object element = lastRow.getElement();
-					if (element instanceof TourMarker) {
-						lastTime = ((TourMarker) element).getTime();
-					}
-				}
+            cell.setText(net.tourbook.common.UI.format_hh_mm_ss(time));
+         }
+      });
+   }
 
-				cell.setText(net.tourbook.common.UI.format_hh_mm_ss(((TourMarker) cell.getElement()).getTime() - lastTime));
+   /**
+    * Column: Time
+    */
+   private void defineColumn_Time_TimeDelta() {
 
-				final String text = ((TourMarker) cell.getElement()).getLabel();
+      final ColumnDefinition colDef = TableColumnFactory.MARKER_TIME_DELTA.createColumn(_columnManager, _pc);
 
-				/*
-				 * Show text in red/bold when the text ends with a !, this hidden feature was introduced
-				 * by helmling
-				 */
-				if (text.endsWith(UI.SYMBOL_EXCLAMATION_POINT)) {
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
 
-					final Display display = Display.getCurrent();
+            final ViewerRow lastRow = cell.getViewerRow().getNeighbor(ViewerRow.ABOVE, false);
+            int lastTime = 0;
+            if (null != lastRow) {
+               final Object element = lastRow.getElement();
+               if (element instanceof TourMarker) {
+                  lastTime = ((TourMarker) element).getTime();
+               }
+            }
 
-					if (null != display) {
-						cell.setForeground(display.getSystemColor(SWT.COLOR_RED));
-					}
+            cell.setText(net.tourbook.common.UI.format_hh_mm_ss(((TourMarker) cell.getElement()).getTime() - lastTime));
 
-					cell.setFont(_boldFont);
-				}
-			}
-		});
-	}
+            final String text = ((TourMarker) cell.getElement()).getLabel();
 
-	/**
-	 * Column: Description
-	 */
-	private void defineColumn_Waypoint_Description() {
+            /*
+             * Show text in red/bold when the text ends with a !, this hidden feature was introduced
+             * by helmling
+             */
+            if (text.endsWith(UI.SYMBOL_EXCLAMATION_POINT)) {
 
-		final ColumnDefinition colDef = TableColumnFactory.WAYPOINT_DESCRIPTION.createColumn(_columnManager, _pc);
+               final Display display = Display.getCurrent();
 
-		colDef.setIsDefaultColumn();
+               if (null != display) {
+                  cell.setForeground(display.getSystemColor(SWT.COLOR_RED));
+               }
 
-		colDef.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
+               cell.setFont(_boldFont);
+            }
+         }
+      });
+   }
 
-				final TourMarker marker = (TourMarker) cell.getElement();
-				cell.setText(marker.getDescription());
-			}
-		});
-	}
+   /**
+    * Column: Description
+    */
+   private void defineColumn_Waypoint_Description() {
 
-	/**
-	 * Column: Name
-	 */
-	private void defineColumn_Waypoint_Name() {
+      final ColumnDefinition colDef = TableColumnFactory.WAYPOINT_DESCRIPTION.createColumn(_columnManager, _pc);
 
-		_colDefName = TableColumnFactory.WAYPOINT_NAME.createColumn(_columnManager, _pc);
+      colDef.setIsDefaultColumn();
 
-		_colDefName.setIsDefaultColumn();
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
 
-		_colDefName.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
+            final TourMarker marker = (TourMarker) cell.getElement();
+            cell.setText(marker.getDescription());
+         }
+      });
+   }
 
-				final TourMarker marker = (TourMarker) cell.getElement();
+   /**
+    * Column: Name
+    */
+   private void defineColumn_Waypoint_Name() {
 
-				cell.setText(marker.getLabel());
-			}
-		});
-	}
+      _colDefName = TableColumnFactory.WAYPOINT_NAME.createColumn(_columnManager, _pc);
 
-	@Override
-	public void dispose() {
+      _colDefName.setIsDefaultColumn();
 
-		TourManager.getInstance().removeTourEventListener(_tourEventListener);
+      _colDefName.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
 
-		getSite().getPage().removePostSelectionListener(_postSelectionListener);
-		getViewSite().getPage().removePartListener(_partListener);
+            final TourMarker marker = (TourMarker) cell.getElement();
 
-		_prefStore.removePropertyChangeListener(_prefChangeListener);
+            cell.setText(marker.getLabel());
+         }
+      });
+   }
 
-		super.dispose();
-	}
+   @Override
+   public void dispose() {
 
-	/**
-	 * enable actions
-	 */
-	private void enableActions() {
+      TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
-		final boolean isTourInDb = isTourSavedInDb();
-		final boolean isSingleTour = _tourData != null && _tourData.isMultipleTours() == false;
+      getSite().getPage().removePostSelectionListener(_postSelectionListener);
+      getViewSite().getPage().removePartListener(_partListener);
 
-		_actionEditTourMarkers.setEnabled(isTourInDb && isSingleTour);
-	}
+      _prefStore.removePropertyChangeListener(_prefChangeListener);
 
-	private void fillContextMenu(final IMenuManager menuMgr) {
+      super.dispose();
+   }
 
-		menuMgr.add(_actionEditTourMarkers);
+   /**
+    * enable actions
+    */
+   private void enableActions() {
 
-		// add standard group which allows other plug-ins to contribute here
-		menuMgr.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+      final boolean isTourInDb = isTourSavedInDb();
+      final boolean isSingleTour = _tourData != null && _tourData.isMultipleTours() == false;
 
-		// set the marker which should be selected in the marker dialog
-		final IStructuredSelection selection = (IStructuredSelection) _markerViewer.getSelection();
-		_actionEditTourMarkers.setTourMarker((TourMarker) selection.getFirstElement());
+      _actionEditTourMarkers.setEnabled(isTourInDb && isSingleTour);
+   }
 
-		enableActions();
-	}
+   private void fillContextMenu(final IMenuManager menuMgr) {
 
-	private void fillToolbar() {
+      menuMgr.add(_actionEditTourMarkers);
 
-		final IActionBars actionBars = getViewSite().getActionBars();
+      // add standard group which allows other plug-ins to contribute here
+      menuMgr.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
-		/*
-		 * Fill view menu
-		 */
-		final IMenuManager menuMgr = actionBars.getMenuManager();
+      // set the marker which should be selected in the marker dialog
+      final IStructuredSelection selection = (IStructuredSelection) _markerViewer.getSelection();
+      _actionEditTourMarkers.setTourMarker((TourMarker) selection.getFirstElement());
 
-		menuMgr.add(new Separator());
-		menuMgr.add(_actionModifyColumns);
+      enableActions();
+   }
 
-		/*
-		 * Fill view toolbar
-		 */
-//		final IToolBarManager tbm = actionBars.getToolBarManager();
+   private void fillToolbar() {
+
+      final IActionBars actionBars = getViewSite().getActionBars();
+
+      /*
+       * Fill view menu
+       */
+      final IMenuManager menuMgr = actionBars.getMenuManager();
+
+      menuMgr.add(new Separator());
+      menuMgr.add(_actionModifyColumns);
+
+      /*
+       * Fill view toolbar
+       */
+//      final IToolBarManager tbm = actionBars.getToolBarManager();
 //
-//		tbm.add();
-	}
+//      tbm.add();
+   }
 
-	@Override
-	public ColumnManager getColumnManager() {
-		return _columnManager;
-	}
+   @Override
+   public ColumnManager getColumnManager() {
+      return _columnManager;
+   }
 
-	public Object getMarkerViewer() {
-		return _markerViewer;
-	}
+   public Object getMarkerViewer() {
+      return _markerViewer;
+   }
 
-	@Override
-	public ArrayList<TourData> getSelectedTours() {
+   @Override
+   public ArrayList<TourData> getSelectedTours() {
 
-		final ArrayList<TourData> selectedTours = new ArrayList<>();
+      final ArrayList<TourData> selectedTours = new ArrayList<>();
 
-		if (_tourData != null) {
-			selectedTours.add(_tourData);
-		}
+      if (_tourData != null) {
+         selectedTours.add(_tourData);
+      }
 
-		return selectedTours;
-	}
+      return selectedTours;
+   }
 
-	@Override
-	public ColumnViewer getViewer() {
-		return _markerViewer;
-	}
+   @Override
+   public ColumnViewer getViewer() {
+      return _markerViewer;
+   }
 
-	/**
-	 * @return Returns <code>true</code> when the tour is saved in the database.
-	 */
-	private boolean isTourSavedInDb() {
+   /**
+    * @return Returns <code>true</code> when the tour is saved in the database.
+    */
+   private boolean isTourSavedInDb() {
 
-		if ((_tourData != null) && (_tourData.getTourPerson() != null)) {
-			return true;
-		}
+      if ((_tourData != null) && (_tourData.getTourPerson() != null)) {
+         return true;
+      }
 
-		return false;
-	}
+      return false;
+   }
 
-	private void onSelect_TourMarker(final StructuredSelection selection) {
+   private void onSelect_TourMarker(final StructuredSelection selection) {
 
-		if (_isInUpdate) {
-			return;
-		}
+      if (_isInUpdate) {
+         return;
+      }
 
-		final ArrayList<TourMarker> selectedTourMarker = new ArrayList<>();
+      final ArrayList<TourMarker> selectedTourMarker = new ArrayList<>();
 
-		for (final Iterator<?> iterator = selection.iterator(); iterator.hasNext();) {
-			selectedTourMarker.add((TourMarker) iterator.next());
-		}
+      for (final Iterator<?> iterator = selection.iterator(); iterator.hasNext();) {
+         selectedTourMarker.add((TourMarker) iterator.next());
+      }
 
-		TourManager.fireEventWithCustomData(//
-				TourEventId.MARKER_SELECTION,
-				new SelectionTourMarker(_tourData, selectedTourMarker),
-				getSite().getPart());
-	}
+      TourManager.fireEventWithCustomData(//
+            TourEventId.MARKER_SELECTION,
+            new SelectionTourMarker(_tourData, selectedTourMarker),
+            getSite().getPart());
+   }
 
-	private void onSelectionChanged(final ISelection selection) {
+   private void onSelectionChanged(final ISelection selection) {
 
-		if (_isInUpdate || selection == null) {
-			return;
-		}
+      if (_isInUpdate || selection == null) {
+         return;
+      }
 
-//		System.out.println((net.tourbook.common.UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//				+ ("\tonSelectionChanged: " + selection));
-//		// TODO remove SYSTEM.OUT.PRINTLN
+//      System.out.println((net.tourbook.common.UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+//            + ("\tonSelectionChanged: " + selection));
+//      // TODO remove SYSTEM.OUT.PRINTLN
 
-		long tourId = TourDatabase.ENTITY_IS_NOT_SAVED;
-		TourData tourData = null;
+      long tourId = TourDatabase.ENTITY_IS_NOT_SAVED;
+      TourData tourData = null;
 
-		if (selection instanceof SelectionTourData) {
+      if (selection instanceof SelectionTourData) {
 
-			// a tour was selected, get the chart and update the marker viewer
+         // a tour was selected, get the chart and update the marker viewer
 
-			final SelectionTourData tourDataSelection = (SelectionTourData) selection;
-			tourData = tourDataSelection.getTourData();
+         final SelectionTourData tourDataSelection = (SelectionTourData) selection;
+         tourData = tourDataSelection.getTourData();
 
-		} else if (selection instanceof SelectionTourId) {
+      } else if (selection instanceof SelectionTourId) {
 
-			tourId = ((SelectionTourId) selection).getTourId();
+         tourId = ((SelectionTourId) selection).getTourId();
 
-		} else if (selection instanceof SelectionTourIds) {
+      } else if (selection instanceof SelectionTourIds) {
 
-			final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
+         final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
 
-			if (tourIds != null && tourIds.size() > 0) {
+         if (tourIds != null && tourIds.size() > 0) {
 
-				if (tourIds.size() == 1) {
-					tourId = tourIds.get(0);
-				} else {
-					tourData = TourManager.createJoinedTourData(tourIds);
-				}
-			}
+            if (tourIds.size() == 1) {
+               tourId = tourIds.get(0);
+            } else {
+               tourData = TourManager.createJoinedTourData(tourIds);
+            }
+         }
 
-		} else if (selection instanceof SelectionTourCatalogView) {
+      } else if (selection instanceof SelectionTourCatalogView) {
 
-			final SelectionTourCatalogView tourCatalogSelection = (SelectionTourCatalogView) selection;
+         final SelectionTourCatalogView tourCatalogSelection = (SelectionTourCatalogView) selection;
 
-			final TVICatalogRefTourItem refItem = tourCatalogSelection.getRefItem();
-			if (refItem != null) {
-				tourId = refItem.getTourId();
-			}
+         final TVICatalogRefTourItem refItem = tourCatalogSelection.getRefItem();
+         if (refItem != null) {
+            tourId = refItem.getTourId();
+         }
 
-		} else if (selection instanceof StructuredSelection) {
+      } else if (selection instanceof StructuredSelection) {
 
-			final Object firstElement = ((StructuredSelection) selection).getFirstElement();
-			if (firstElement instanceof TVICatalogComparedTour) {
-				tourId = ((TVICatalogComparedTour) firstElement).getTourId();
-			} else if (firstElement instanceof TVICompareResultComparedTour) {
-				tourId = ((TVICompareResultComparedTour) firstElement).getComparedTourData().getTourId();
-			}
+         final Object firstElement = ((StructuredSelection) selection).getFirstElement();
+         if (firstElement instanceof TVICatalogComparedTour) {
+            tourId = ((TVICatalogComparedTour) firstElement).getTourId();
+         } else if (firstElement instanceof TVICompareResultComparedTour) {
+            tourId = ((TVICompareResultComparedTour) firstElement).getComparedTourData().getTourId();
+         }
 
-		} else if (selection instanceof SelectionDeletedTours) {
+      } else if (selection instanceof SelectionDeletedTours) {
 
-			clearView();
-		}
+         clearView();
+      }
 
-		if (tourData == null) {
+      if (tourData == null) {
 
-			if (tourId >= TourDatabase.ENTITY_IS_NOT_SAVED) {
+         if (tourId >= TourDatabase.ENTITY_IS_NOT_SAVED) {
 
-				tourData = TourManager.getInstance().getTourData(tourId);
-				if (tourData != null) {
-					_tourData = tourData;
-					_isMultipleTours = tourData.isMultipleTours();
-				}
-			}
-		} else {
+            tourData = TourManager.getInstance().getTourData(tourId);
+            if (tourData != null) {
+               _tourData = tourData;
+               _isMultipleTours = tourData.isMultipleTours();
+            }
+         }
+      } else {
 
-			_tourData = tourData;
-			_isMultipleTours = tourData.isMultipleTours();
-		}
+         _tourData = tourData;
+         _isMultipleTours = tourData.isMultipleTours();
+      }
 
-		updateUI_MarkerViewer();
-	}
+      updateUI_MarkerViewer();
+   }
 
-	private void onTourEvent_TourMarker(final Object eventData) {
+   private void onTourEvent_TourMarker(final Object eventData) {
 
-		if (eventData instanceof SelectionTourMarker) {
+      if (eventData instanceof SelectionTourMarker) {
 
-			/*
-			 * Select the tourmarker in the view
-			 */
-			final SelectionTourMarker selection = (SelectionTourMarker) eventData;
+         /*
+          * Select the tourmarker in the view
+          */
+         final SelectionTourMarker selection = (SelectionTourMarker) eventData;
 
-			final TourData tourData = selection.getTourData();
-			final ArrayList<TourMarker> tourMarker = selection.getSelectedTourMarker();
+         final TourData tourData = selection.getTourData();
+         final ArrayList<TourMarker> tourMarker = selection.getSelectedTourMarker();
 
-			if (tourData != _tourData) {
+         if (tourData != _tourData) {
 
-				_tourData = tourData;
-				_isMultipleTours = tourData.isMultipleTours();
+            _tourData = tourData;
+            _isMultipleTours = tourData.isMultipleTours();
 
-				updateUI_MarkerViewer();
-			}
+            updateUI_MarkerViewer();
+         }
 
-			_isInUpdate = true;
-			{
-				_markerViewer.setSelection(new StructuredSelection(tourMarker), true);
-			}
-			_isInUpdate = false;
-		}
-	}
+         _isInUpdate = true;
+         {
+            _markerViewer.setSelection(new StructuredSelection(tourMarker), true);
+         }
+         _isInUpdate = false;
+      }
+   }
 
-	@Override
-	public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
+   @Override
+   public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
 
-		_viewerContainer.setRedraw(false);
-		{
-			_markerViewer.getTable().dispose();
+      _viewerContainer.setRedraw(false);
+      {
+         _markerViewer.getTable().dispose();
 
-			createUI_10_TableViewer(_viewerContainer);
-			_viewerContainer.layout();
+         createUI_10_TableViewer(_viewerContainer);
+         _viewerContainer.layout();
 
-			// update the viewer
-			reloadViewer();
-		}
-		_viewerContainer.setRedraw(true);
+         // update the viewer
+         reloadViewer();
+      }
+      _viewerContainer.setRedraw(true);
 
-		return _markerViewer;
-	}
+      return _markerViewer;
+   }
 
-	@Override
-	public void reloadViewer() {
+   @Override
+   public void reloadViewer() {
 
-		updateUI_MarkerViewer();
-	}
+      updateUI_MarkerViewer();
+   }
 
-	@PersistState
-	private void saveState() {
+   @PersistState
+   private void saveState() {
 
-		_columnManager.saveState(_state);
-	}
+      _columnManager.saveState(_state);
+   }
 
-	@Override
-	public void setFocus() {
+   @Override
+   public void setFocus() {
 
-		_markerViewer.getTable().setFocus();
-	}
+      _markerViewer.getTable().setFocus();
+   }
 
-	private void showTourFromTourProvider() {
+   private void showTourFromTourProvider() {
 
-		_pageBook.showPage(_pageNoData);
+      _pageBook.showPage(_pageNoData);
 
-		// a tour is not displayed, find a tour provider which provides a tour
-		Display.getCurrent().asyncExec(new Runnable() {
-			@Override
-			public void run() {
+      // a tour is not displayed, find a tour provider which provides a tour
+      Display.getCurrent().asyncExec(new Runnable() {
+         @Override
+         public void run() {
 
-				// validate widget
-				if (_pageBook.isDisposed()) {
-					return;
-				}
+            // validate widget
+            if (_pageBook.isDisposed()) {
+               return;
+            }
 
-				/*
-				 * check if tour was set from a selection provider
-				 */
-				if (_tourData != null) {
-					return;
-				}
+            /*
+             * check if tour was set from a selection provider
+             */
+            if (_tourData != null) {
+               return;
+            }
 
-				onSelectionChanged(TourManager.getSelectedToursSelection());
-			}
-		});
-	}
+            onSelectionChanged(TourManager.getSelectedToursSelection());
+         }
+      });
+   }
 
-	@Override
-	public void updateColumnHeader(final ColumnDefinition colDef) {
-		// TODO Auto-generated method stub
+   @Override
+   public void updateColumnHeader(final ColumnDefinition colDef) {
+      // TODO Auto-generated method stub
 
-	}
+   }
 
-	private void updateUI_MarkerViewer() {
+   private void updateUI_MarkerViewer() {
 
-		if (_tourData == null) {
+      if (_tourData == null) {
 
-			_pageBook.showPage(_pageNoData);
+         _pageBook.showPage(_pageNoData);
 
-		} else {
+      } else {
 
-			_isInUpdate = true;
-			{
-				_markerViewer.setInput(new Object[0]);
-			}
-			_isInUpdate = false;
+         _isInUpdate = true;
+         {
+            _markerViewer.setInput(new Object[0]);
+         }
+         _isInUpdate = false;
 
-			_pageBook.showPage(_viewerContainer);
-		}
+         _pageBook.showPage(_viewerContainer);
+      }
 
-		enableActions();
-	}
+      enableActions();
+   }
 }

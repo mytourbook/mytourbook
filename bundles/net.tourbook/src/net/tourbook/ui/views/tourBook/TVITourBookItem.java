@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -71,37 +71,36 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
       SQL_SUM_COLUMNS = NL
 
-            + "SUM(TourDistance),         " + NL // 0   //$NON-NLS-1$
-            + "SUM(TourRecordingTime),    " + NL // 1   //$NON-NLS-1$
-            + "SUM(TourDrivingTime),      " + NL // 2   //$NON-NLS-1$
-            + "SUM(TourAltUp),            " + NL // 3   //$NON-NLS-1$
-            + "SUM(TourAltDown),          " + NL // 4   //$NON-NLS-1$
-            + "SUM(1),                    " + NL // 5   //$NON-NLS-1$
+            + "SUM( CAST(TourDistance AS BIGINT)),       " + NL // 0   //$NON-NLS-1$
+            + "SUM( CAST(TourRecordingTime AS BIGINT)),  " + NL // 1   //$NON-NLS-1$
+            + "SUM( CAST(TourDrivingTime AS BIGINT)),    " + NL // 2   //$NON-NLS-1$
+            + "SUM( CAST(TourAltUp AS BIGINT)),          " + NL // 3   //$NON-NLS-1$
+            + "SUM( CAST(TourAltDown AS BIGINT)),        " + NL // 4   //$NON-NLS-1$
+            + "SUM(1),                                   " + NL // 5   //$NON-NLS-1$
             //
-            + "MAX(MaxSpeed),             " + NL // 6   //$NON-NLS-1$
-            + "SUM(TourDistance),         " + NL // 7   //$NON-NLS-1$
-            + "SUM(TourDrivingTime),      " + NL // 8   //$NON-NLS-1$
-            + "MAX(MaxAltitude),          " + NL // 9   //$NON-NLS-1$
-            + "MAX(MaxPulse),             " + NL // 10 //$NON-NLS-1$
+            + "MAX(MaxSpeed),                            " + NL // 6   //$NON-NLS-1$
+            + "MAX(MaxAltitude),                         " + NL // 7   //$NON-NLS-1$
+            + "MAX(MaxPulse),                            " + NL // 8 //$NON-NLS-1$
             //
-            + "AVG( CASE WHEN AvgPulse = 0         THEN NULL ELSE AvgPulse END),          " + NL //                        11   //$NON-NLS-1$
-            + "AVG( CASE WHEN AvgCadence = 0       THEN NULL ELSE DOUBLE(AvgCadence) * CadenceMultiplier END ),      " + NL //   12   //$NON-NLS-1$
-            + "AVG( CASE WHEN AvgTemperature = 0   THEN NULL ELSE DOUBLE(AvgTemperature) / TemperatureScale END ),   " + NL //   13   //$NON-NLS-1$
-            + "AVG( CASE WHEN WeatherWindDir = 0   THEN NULL ELSE WeatherWindDir END ),   " + NL //                        14   //$NON-NLS-1$
-            + "AVG( CASE WHEN WeatherWindSpd = 0   THEN NULL ELSE WeatherWindSpd END ),   " + NL //                        15   //$NON-NLS-1$
-            + "AVG( CASE WHEN RestPulse = 0        THEN NULL ELSE RestPulse END ),        " + NL //                        16   //$NON-NLS-1$
+            + "AVG( CASE WHEN AvgPulse = 0         THEN NULL ELSE AvgPulse END),          " + NL //                              9   //$NON-NLS-1$
+            + "AVG( CASE WHEN AvgCadence = 0       THEN NULL ELSE DOUBLE(AvgCadence) * CadenceMultiplier END ),      " + NL //   10   //$NON-NLS-1$
+            + "AVG( CASE WHEN AvgTemperature = 0   THEN NULL ELSE DOUBLE(AvgTemperature) / TemperatureScale END ),   " + NL //   11   //$NON-NLS-1$
+            + "AVG( CASE WHEN WeatherWindDir = 0   THEN NULL ELSE WeatherWindDir END ),   " + NL //                              12   //$NON-NLS-1$
+            + "AVG( CASE WHEN WeatherWindSpd = 0   THEN NULL ELSE WeatherWindSpd END ),   " + NL //                              13   //$NON-NLS-1$
+            + "AVG( CASE WHEN RestPulse = 0        THEN NULL ELSE RestPulse END ),        " + NL //                              14   //$NON-NLS-1$
             //
-            + "SUM(Calories),                " + NL // 17   //$NON-NLS-1$
-            + "SUM(Power_TotalWork),         " + NL // 18   //$NON-NLS-1$
+            + "SUM( CAST(Calories AS BIGINT)),              " + NL // 15   //$NON-NLS-1$
+            + "SUM( CAST(Power_TotalWork AS BIGINT)),       " + NL // 16   //$NON-NLS-1$
 
-            + "SUM(NumberOfTimeSlices),      " + NL // 19   //$NON-NLS-1$
-            + "SUM(NumberOfPhotos),          " + NL // 20   //$NON-NLS-1$
+            + "SUM( CAST(NumberOfTimeSlices AS BIGINT)),    " + NL // 17   //$NON-NLS-1$
+            + "SUM( CAST(NumberOfPhotos AS BIGINT)),        " + NL // 18   //$NON-NLS-1$
             //
-            + "SUM(FrontShiftCount),         " + NL // 21   //$NON-NLS-1$
-            + "SUM(RearShiftCount),          " + NL // 22   //$NON-NLS-1$
+            + "SUM( CAST(FrontShiftCount AS BIGINT)),       " + NL // 19   //$NON-NLS-1$
+            + "SUM( CAST(RearShiftCount AS BIGINT)),        " + NL // 20   //$NON-NLS-1$
 
-            + "SUM(surfing_NumberOfEvents)   " + NL // 23   //$NON-NLS-1$
+            + "SUM( CAST(Surfing_NumberOfEvents AS BIGINT)) " + NL // 21   //$NON-NLS-1$
       ;
+
    }
 
    TourBookView tourBookView;
@@ -129,11 +128,11 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
    long         colCounter;
    long         colCalories;
-   long         colDistance;
+   long         colTourDistance;
    float        colBodyWeight;
 
-   long         colRecordingTime;
-   long         colDrivingTime;
+   long         colTourRecordingTime;
+   long         colTourDrivingTime;
    long         colPausedTime;
 
    long         colAltitudeUp;
@@ -158,13 +157,13 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
    String       colWeekDay;
    int          colWeekYear;
 
-   int          colNumberOfTimeSlices;
-   int          colNumberOfPhotos;
+   long         colNumberOfTimeSlices;
+   long         colNumberOfPhotos;
 
    int          colDPTolerance;
 
-   int          colFrontShiftCount;
-   int          colRearShiftCount;
+   long         colFrontShiftCount;
+   long         colRearShiftCount;
 
    float        colCadenceMultiplier;
 
@@ -209,9 +208,15 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
    float colPower_PowerToWeight;
 
+   // ----------- TRAINING ---------
+
+   float colTraining_TrainingEffect;
+   float colTraining_TrainingEffect_Anaerobic;
+   float colTraining_TrainingPerformance;
+
    // ----------- SURFING ---------
 
-   int     col_Surfing_NumberOfEvents;
+   long    col_Surfing_NumberOfEvents;
    short   col_Surfing_MinSpeed_StartStop;
    short   col_Surfing_MinSpeed_Surfing;
    short   col_Surfing_MinTimeDuration;
@@ -234,50 +239,47 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
 // SET_FORMATTING_OFF
 
-      colDistance       = result.getLong(startIndex + 0);
+      colTourDistance      = result.getLong(startIndex + 0);
 
-      colRecordingTime  = result.getLong(startIndex + 1);
-      colDrivingTime    = result.getLong(startIndex + 2);
+      colTourRecordingTime = result.getLong(startIndex + 1);
+      colTourDrivingTime   = result.getLong(startIndex + 2);
 
-      colAltitudeUp     = result.getLong(startIndex + 3);
-      colAltitudeDown   = result.getLong(startIndex + 4);
+      colAltitudeUp        = result.getLong(startIndex + 3);
+      colAltitudeDown      = result.getLong(startIndex + 4);
 
       colCounter        = result.getLong(startIndex + 5);
 
       colMaxSpeed       = result.getFloat(startIndex + 6);
 
       // compute average speed/pace, prevent divide by 0
-      final long dbDistance = result.getLong(startIndex + 7);
-      final long dbDrivingTime = result.getLong(startIndex + 8);
+      colAvgSpeed       = colTourDrivingTime == 0 ? 0 : 3.6f * colTourDistance / colTourDrivingTime;
+      colAvgPace        = colTourDistance == 0 ? 0 : colTourDrivingTime * 1000f / colTourDistance;
 
-      colAvgSpeed       = dbDrivingTime == 0 ? 0 : 3.6f * dbDistance / dbDrivingTime;
-      colAvgPace        = dbDistance == 0 ? 0 : dbDrivingTime * 1000f / dbDistance;
+      colMaxAltitude    = result.getLong(startIndex + 7);
+      colMaxPulse       = result.getLong(startIndex + 8);
 
-      colMaxAltitude    = result.getLong(startIndex + 9);
-      colMaxPulse       = result.getLong(startIndex + 10);
+      colAvgPulse       = result.getFloat(startIndex + 9);
+      colAvgCadence     = result.getFloat(startIndex + 10);
+      colAvgTemperature = result.getFloat(startIndex + 11);
 
-      colAvgPulse       = result.getFloat(startIndex + 11);
-      colAvgCadence     = result.getFloat(startIndex + 12);
-      colAvgTemperature = result.getFloat(startIndex + 13);
+      colWindDir        = result.getInt(startIndex + 12);
+      colWindSpd        = result.getInt(startIndex + 13);
+      colRestPulse      = result.getInt(startIndex + 14);
 
-      colWindDir        = result.getInt(startIndex + 14);
-      colWindSpd        = result.getInt(startIndex + 15);
-      colRestPulse      = result.getInt(startIndex + 16);
+      colCalories                = result.getLong(startIndex + 15);
+      colPower_TotalWork         = result.getLong(startIndex + 16);
 
-      colCalories                = result.getLong(startIndex + 17);
-      colPower_TotalWork         = result.getLong(startIndex + 18);
+      colNumberOfTimeSlices      = result.getLong(startIndex + 17);
+      colNumberOfPhotos          = result.getLong(startIndex + 18);
 
-      colNumberOfTimeSlices      = result.getInt(startIndex + 19);
-      colNumberOfPhotos          = result.getInt(startIndex + 20);
+      colFrontShiftCount         = result.getLong(startIndex + 19);
+      colRearShiftCount          = result.getLong(startIndex + 20);
 
-      colFrontShiftCount         = result.getInt(startIndex + 21);
-      colRearShiftCount          = result.getInt(startIndex + 22);
-
-      col_Surfing_NumberOfEvents = result.getInt(startIndex + 23);
+      col_Surfing_NumberOfEvents = result.getLong(startIndex + 21);
 
 // SET_FORMATTING_ON
 
-      colPausedTime = colRecordingTime - colDrivingTime;
+      colPausedTime = colTourRecordingTime - colTourDrivingTime;
    }
 
    @Override

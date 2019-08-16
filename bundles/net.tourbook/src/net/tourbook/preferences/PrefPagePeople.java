@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -110,1147 +110,1164 @@ import net.tourbook.training.TrainingManager;
 
 public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferencePage {
 
-	public static final String			ID									= "net.tourbook.preferences.PrefPagePeopleId";	//$NON-NLS-1$
-
-	private static final String		STATE_SELECTED_PERSON		= "selectedPersonId";									//$NON-NLS-1$
-	private static final String		STATE_SELECTED_TAB_FOLDER	= "selectedTabFolder";									//$NON-NLS-1$
-
-	public static final int				HEART_BEAT_MIN					= 10;
-	public static final int				HEART_BEAT_MAX					= 300;
-
-	/**
-	 * Id to indicate that the hr zones should be displayed for the active person when the pref
-	 * dialog is opened
-	 */
-	public static final String			PREF_DATA_SELECT_HR_ZONES	= "SelectHrZones";										//$NON-NLS-1$
-
-	private final IPreferenceStore	_prefStore						= TourbookPlugin.getPrefStore();
-	private final IDialogSettings		_state							= TourbookPlugin.getState(ID);
-
-	// REMOVED BIKES 30.4.2011
-
-	private ArrayList<TourPerson>			_people;
-
-	/**
-	 * this device list has all the devices which are visible in the device combobox
-	 */
-	private ArrayList<ExternalDevice>	_deviceList;
-
-	private final NumberFormat				_nf1	= NumberFormat.getNumberInstance();
-	private final NumberFormat				_nf2	= NumberFormat.getNumberInstance();
-	{
-		_nf1.setMinimumFractionDigits(1);
-		_nf1.setMaximumFractionDigits(1);
-		_nf2.setMinimumFractionDigits(2);
-		_nf2.setMaximumFractionDigits(2);
-	}
-
-	private final boolean					_isOSX							= net.tourbook.common.UI.IS_OSX;
-	private final boolean					_isLinux							= net.tourbook.common.UI.IS_LINUX;
-
-	private SelectionListener				_defaultSelectionListener;
-	private ModifyListener					_defaultModifyListener;
-	private MouseListener					_hrZoneMouseListener;
-	private IPropertyChangeListener		_prefChangeListener;
+   public static final String     ID                        = "net.tourbook.preferences.PrefPagePeopleId"; //$NON-NLS-1$
+
+   /**
+    * On Linux an async selection event is fired since e4
+    */
+   private static final String    FIX_LINUX_ASYNC_EVENT_1   = "FIX_LINUX_ASYNC_EVENT_1";                   //$NON-NLS-1$
+   private static final String    FIX_LINUX_ASYNC_EVENT_2   = "FIX_LINUX_ASYNC_EVENT_2";                   //$NON-NLS-1$
+   //
+   private static final String    STATE_SELECTED_PERSON     = "selectedPersonId";                          //$NON-NLS-1$
+   private static final String    STATE_SELECTED_TAB_FOLDER = "selectedTabFolder";                         //$NON-NLS-1$
+
+   public static final int        HEART_BEAT_MIN            = 10;
+   public static final int        HEART_BEAT_MAX            = 300;
+
+   /**
+    * Id to indicate that the hr zones should be displayed for the active person when the pref
+    * dialog is opened
+    */
+   public static final String     PREF_DATA_SELECT_HR_ZONES = "SelectHrZones";                             //$NON-NLS-1$
+
+   private final IPreferenceStore _prefStore                = TourbookPlugin.getPrefStore();
+   private final IDialogSettings  _state                    = TourbookPlugin.getState(ID);
+
+   // REMOVED BIKES 30.4.2011
+
+   private ArrayList<TourPerson>     _people;
+
+   /**
+    * this device list has all the devices which are visible in the device combobox
+    */
+   private ArrayList<ExternalDevice> _deviceList;
+
+   private final NumberFormat        _nf1 = NumberFormat.getNumberInstance();
+   private final NumberFormat        _nf2 = NumberFormat.getNumberInstance();
+   {
+      _nf1.setMinimumFractionDigits(1);
+      _nf1.setMaximumFractionDigits(1);
+      _nf2.setMinimumFractionDigits(2);
+      _nf2.setMaximumFractionDigits(2);
+   }
+
+   private final boolean             _isOSX                     = net.tourbook.common.UI.IS_OSX;
+   private final boolean             _isLinux                   = net.tourbook.common.UI.IS_LINUX;
+
+   private SelectionListener         _defaultSelectionListener;
+   private ModifyListener            _defaultModifyListener;
+   private MouseListener             _hrZoneMouseListener;
+   private IPropertyChangeListener   _prefChangeListener;
+
+   private boolean                   _isFireModifyEvent         = false;
+   private boolean                   _isPersonModified          = false;
+   private boolean                   _isUpdateUI                = false;
+
+   private HashMap<Long, TourPerson> _peopleWithModifiedHrZones = new HashMap<>();
+   private boolean                   _isHrZoneModified          = false;
+
+   private TourPerson                _selectedPerson;
+   private TourPerson                _newPerson;
+   private Set<TourPersonHRZone>     _backupSelectedPersonHrZones;
 
-	private boolean							_isFireModifyEvent			= false;
-	private boolean							_isPersonModified				= false;
-	private boolean							_isUpdateUI						= false;
+   private ZonedDateTime             _today                     = TimeTools.now();
 
-	private HashMap<Long, TourPerson>	_peopleWithModifiedHrZones	= new HashMap<>();
-	private boolean							_isHrZoneModified				= false;
+   private Font                      _fontItalic;
+   private Color[]                   _hrZoneColors;
 
-	private TourPerson						_selectedPerson;
-	private TourPerson						_newPerson;
-	private Set<TourPersonHRZone>			_backupSelectedPersonHrZones;
+   /**
+    * Is <code>true</code> when a tour in the tour editor is modified.
+    */
+   private boolean                   _isNoUI                    = false;
 
-	private ZonedDateTime					_today							= TimeTools.now();
+   /*
+    * UI controls
+    */
+   private Composite            _prefPageContainer;
+   private TableViewer          _peopleViewer;
 
-	private Font								_fontItalic;
-	private Color[]							_hrZoneColors;
+   private Button               _btnAddPerson;
+   private Button               _btnSavePerson;
+   private Button               _btnCancel;
 
-	/**
-	 * Is <code>true</code> when a tour in the tour editor is modified.
-	 */
-	private boolean							_isNoUI							= false;
+   private TabFolder            _tabFolderPerson;
+   private Text                 _txtFirstName;
+   private Text                 _txtLastName;
+   private Combo                _cboSportComputer;
+   private Spinner              _spinnerWeight;
+   private Spinner              _spinnerHeight;
+   private Spinner              _spinnerRestingHR;
+   private Spinner              _spinnerMaxHR;
+   private Button               _rdoGenderMale;
+   private Button               _rdoGenderFemale;
 
-	/*
-	 * UI controls
-	 */
-	private Composite					_prefPageContainer;
-	private TableViewer				_peopleViewer;
+   private ScrolledComposite    _hrZoneScrolledContainer;
+   private Button               _btnModifyHrZones;
+   private Button               _btnComputeHrZonesForAllTours;
+   private Combo                _cboTemplate;
+   private Combo                _cboHrMaxFormula;
+   private DateTime             _dtBirthday;
+   private Label                _lblAgePerson;
+   private Label                _lblAgeHr;
 
-	private Button						_btnAddPerson;
-	private Button						_btnSavePerson;
-	private Button						_btnCancel;
+   private Text                 _txtRawDataPath;
+   private DirectoryFieldEditor _rawDataPathEditor;
 
-	private TabFolder					_tabFolderPerson;
-	private Text						_txtFirstName;
-	private Text						_txtLastName;
-	private Combo						_cboSportComputer;
-	private Spinner					_spinnerWeight;
-	private Spinner					_spinnerHeight;
-	private Spinner					_spinnerRestingHR;
-	private Spinner					_spinnerMaxHR;
-	private Button						_rdoGenderMale;
-	private Button						_rdoGenderFemale;
+   private class ClientsContentProvider implements IStructuredContentProvider {
 
-	private ScrolledComposite		_hrZoneScrolledContainer;
-	private Button						_btnModifyHrZones;
-	private Button						_btnComputeHrZonesForAllTours;
-	private Combo						_cboTemplate;
-	private Combo						_cboHrMaxFormula;
-	private DateTime					_dtBirthday;
-	private Label						_lblAgePerson;
-	private Label						_lblAgeHr;
+      public ClientsContentProvider() {}
 
-	private Text						_txtRawDataPath;
-	private DirectoryFieldEditor	_rawDataPathEditor;
+      @Override
+      public void dispose() {}
 
-	private class ClientsContentProvider implements IStructuredContentProvider {
+      @Override
+      public Object[] getElements(final Object parent) {
+         return _people.toArray(new TourPerson[_people.size()]);
+      }
 
-		public ClientsContentProvider() {}
+      @Override
+      public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {
 
-		@Override
-		public void dispose() {}
+      }
+   }
 
-		@Override
-		public Object[] getElements(final Object parent) {
-			return _people.toArray(new TourPerson[_people.size()]);
-		}
+   private void addPrefListener() {
 
-		@Override
-		public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {
+      _prefChangeListener = new IPropertyChangeListener() {
+         @Override
+         public void propertyChange(final PropertyChangeEvent event) {
 
-		}
-	}
+            final String property = event.getProperty();
 
-	private void addPrefListener() {
+            /*
+             * set a new chart configuration when the preferences has changed
+             */
+            if (property.equals(ITourbookPreferences.HR_ZONES_ARE_MODIFIED)) {
 
-		_prefChangeListener = new IPropertyChangeListener() {
-			@Override
-			public void propertyChange(final PropertyChangeEvent event) {
+               onEditHrZonesIsOK(getCurrentPerson());
+               performOK10();
+            }
+         }
+      };
 
-				final String property = event.getProperty();
+      _prefStore.addPropertyChangeListener(_prefChangeListener);
+   }
 
-				/*
-				 * set a new chart configuration when the preferences has changed
-				 */
-				if (property.equals(ITourbookPreferences.HR_ZONES_ARE_MODIFIED)) {
+   @Override
+   public void applyData(final Object data) {
 
-					onEditHrZonesIsOK(getCurrentPerson());
-					performOK10();
-				}
-			}
-		};
+      // this is called after the UI is created
 
-		_prefStore.addPropertyChangeListener(_prefChangeListener);
-	}
+      if (_isNoUI) {
+         return;
+      }
 
-	@Override
-	public void applyData(final Object data) {
+      if (data instanceof Boolean) {
 
-		// this is called after the UI is created
+         final Boolean isCreatePerson = (Boolean) data;
+         if (isCreatePerson && _people.size() == 0) {
 
-		if (_isNoUI) {
-			return;
-		}
+            // this is a request, to create a new person
 
-		if (data instanceof Boolean) {
+            final TourPerson newPerson = createDefaultPerson();
 
-			final Boolean isCreatePerson = (Boolean) data;
-			if (isCreatePerson && _people.size() == 0) {
+            newPerson.persist();
 
-				// this is a request, to create a new person
+            // update model
+            _people.add(newPerson);
 
-				final TourPerson newPerson = createDefaultPerson();
+            // update state
+            _isFireModifyEvent = true;
+            _isPersonModified = false;
 
-				newPerson.persist();
+            // update ui viewer and person ui
+            _peopleViewer.add(newPerson);
+            _peopleViewer.setSelection(new StructuredSelection(newPerson));
 
-				// update model
-				_people.add(newPerson);
+            enableActions();
 
-				// update state
-				_isFireModifyEvent = true;
-				_isPersonModified = false;
+            // for the first person, disable Add.. button and people list that the user is not confused
+            _btnAddPerson.setEnabled(false);
+            _peopleViewer.getTable().setEnabled(false);
 
-				// update ui viewer and person ui
-				_peopleViewer.add(newPerson);
-				_peopleViewer.setSelection(new StructuredSelection(newPerson));
+            // select first name
+            _tabFolderPerson.setSelection(0);
+            _txtFirstName.selectAll();
+            _txtFirstName.setFocus();
+         }
 
-				enableActions();
+      } else if (data instanceof PrefPagePeopleData) {
 
-				// for the first person, disable Add.. button and people list that the user is not confused
-				_btnAddPerson.setEnabled(false);
-				_peopleViewer.getTable().setEnabled(false);
+         final PrefPagePeopleData prefPageData = (PrefPagePeopleData) data;
 
-				// select first name
-				_tabFolderPerson.setSelection(0);
-				_txtFirstName.selectAll();
-				_txtFirstName.setFocus();
-			}
+         if (prefPageData.prefDataSelectHrZones.equals(PREF_DATA_SELECT_HR_ZONES)) {
 
-		} else if (data instanceof PrefPagePeopleData) {
+            // select hr zones for the given person
 
-			final PrefPagePeopleData prefPageData = (PrefPagePeopleData) data;
+            if (prefPageData.person != null) {
 
-			if (prefPageData.prefDataSelectHrZones.equals(PREF_DATA_SELECT_HR_ZONES)) {
+               _peopleViewer.setSelection(new StructuredSelection(prefPageData.person));
 
-				// select hr zones for the given person
+               final Table table = _peopleViewer.getTable();
 
-				if (prefPageData.person != null) {
+               // set focus to selected person
+               table.setSelection(table.getSelectionIndex());
+            }
 
-					_peopleViewer.setSelection(new StructuredSelection(prefPageData.person));
+            if (_tabFolderPerson != null) {
+               _tabFolderPerson.setSelection(1);
+            } else {
+               Display.getDefault().asyncExec(new Runnable() {
+                  @Override
+                  public void run() {
+                     _tabFolderPerson.setSelection(1);
+                  }
+               });
+            }
+         }
+      }
+   }
 
-					final Table table = _peopleViewer.getTable();
+   private Set<TourPersonHRZone> cloneHrZones(final ArrayList<TourPersonHRZone> hrZones) {
 
-					// set focus to selected person
-					table.setSelection(table.getSelectionIndex());
-				}
+      final HashSet<TourPersonHRZone> hrZonesClone = new HashSet<>();
 
-				if (_tabFolderPerson != null) {
-					_tabFolderPerson.setSelection(1);
-				} else {
-					Display.getDefault().asyncExec(new Runnable() {
-						@Override
-						public void run() {
-							_tabFolderPerson.setSelection(1);
-						}
-					});
-				}
-			}
-		}
-	}
+      for (final TourPersonHRZone tourPersonHRZone : hrZones) {
+         hrZonesClone.add(tourPersonHRZone.clone());
+      }
 
-	private Set<TourPersonHRZone> cloneHrZones(final ArrayList<TourPersonHRZone> hrZones) {
+      return hrZonesClone;
+   }
 
-		final HashSet<TourPersonHRZone> hrZonesClone = new HashSet<>();
+   /**
+    * @param isCheckPeople
+    * @return Returns <code>true</code> when all tours has been updated and the update process was
+    *         not canceled.
+    */
+   private boolean computeHrZonesForAllTours(final boolean isCheckPeople) {
 
-		for (final TourPersonHRZone tourPersonHRZone : hrZones) {
-			hrZonesClone.add(tourPersonHRZone.clone());
-		}
+      setErrorMessage(null);
 
-		return hrZonesClone;
-	}
+      final int[] tourCounter = { 0 };
+      final int[] tourCounterWithHrZones = { 0 };
 
-	/**
-	 * @param isCheckPeople
-	 * @return Returns <code>true</code> when all tours has been updated and the update process was
-	 *         not canceled.
-	 */
-	private boolean computeHrZonesForAllTours(final boolean isCheckPeople) {
+      final IComputeTourValues computeTourValueConfig = new IComputeTourValues() {
 
-		setErrorMessage(null);
+         @Override
+         public boolean computeTourValues(final TourData originalTourData) {
 
-		final int[] tourCounter = { 0 };
-		final int[] tourCounterWithHrZones = { 0 };
+            tourCounter[0]++;
 
-		final IComputeTourValues computeTourValueConfig = new IComputeTourValues() {
+            if (isCheckPeople) {
 
-			@Override
-			public boolean computeTourValues(final TourData originalTourData) {
+               // check if hr zone was modified for the person which owns the tour
+               final long personId = originalTourData.getTourPerson().getPersonId();
+               if (_peopleWithModifiedHrZones.containsKey(personId) == false) {
+                  return false;
+               }
+            }
 
-				tourCounter[0]++;
+            /*
+             * algorithm for avg pulse is changed in version 11.7 (break time is now ignored)
+             */
+            originalTourData.computeAvg_Pulse();
 
-				if (isCheckPeople) {
+            final int[] allHrZones = originalTourData.getHrZones();
+            if (allHrZones == null) {
+               return false;
+            }
 
-					// check if hr zone was modified for the person which owns the tour
-					final long personId = originalTourData.getTourPerson().getPersonId();
-					if (_peopleWithModifiedHrZones.containsKey(personId) == false) {
-						return false;
-					}
-				}
+            // check if hr zones are computed
+            for (final int hrZone : allHrZones) {
+               if (hrZone != -1) {
+                  // hr zone is set
+                  tourCounterWithHrZones[0]++;
+                  return true;
+               }
+            }
 
-				/*
-				 * algorithmus for avg pulse is changed in version 11.7 (break time is now ignored)
-				 */
-				originalTourData.computeAvg_Pulse();
+            return false;
+         }
 
-				final int[] allHrZones = originalTourData.getHrZones();
-				if (allHrZones == null) {
-					return false;
-				}
+         @Override
+         public String getResultText() {
 
-				// check if hr zones are computed
-				for (final int hrZone : allHrZones) {
-					if (hrZone != -1) {
-						// hr zone is set
-						tourCounterWithHrZones[0]++;
-						return true;
-					}
-				}
+            return NLS.bind(Messages.Compute_HrZones_Job_ComputeAllTours_Result, //
+                  new Object[] { tourCounterWithHrZones[0] });
+         }
 
-				return false;
-			}
+         @Override
+         public String getSubTaskText(final TourData savedTourData) {
+            return NLS.bind(Messages.Compute_HrZones_Job_ComputeAllTours_SubTask, //
+                  new Object[] { tourCounterWithHrZones[0], tourCounter[0] });
+         }
+      };
 
-			@Override
-			public String getResultText() {
+      final boolean isCanceled = TourDatabase.computeValuesForAllTours(computeTourValueConfig, null);
 
-				return NLS.bind(Messages.Compute_HrZones_Job_ComputeAllTours_Result, //
-						new Object[] { tourCounterWithHrZones[0] });
-			}
+      boolean returnValue = true;
 
-			@Override
-			public String getSubTaskText(final TourData savedTourData) {
-				return NLS.bind(Messages.Compute_HrZones_Job_ComputeAllTours_SubTask, //
-						new Object[] { tourCounterWithHrZones[0], tourCounter[0] });
-			}
-		};
+      if (isCheckPeople && isCanceled) {
 
-		final boolean isCanceled = TourDatabase.computeValuesForAllTours(computeTourValueConfig, null);
+         setErrorMessage(Messages.Pref_People_Error_ComputeHrZonesForAllTours);
 
-		boolean returnValue = true;
+         MessageDialog.openInformation(
+               getShell(),
+               Messages.Compute_HrZones_Dialog_ComputeAllTours_Title,
+               Messages.Pref_People_Dialog_ComputeHrZonesForAllToursIsCanceled_Message);
 
-		if (isCheckPeople && isCanceled) {
+         returnValue = false;
+      }
 
-			setErrorMessage(Messages.Pref_People_Error_ComputeHrZonesForAllTours);
+      TourManager.getInstance().removeAllToursFromCache();
+      TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR);
 
-			MessageDialog.openInformation(
-					getShell(),
-					Messages.Compute_HrZones_Dialog_ComputeAllTours_Title,
-					Messages.Pref_People_Dialog_ComputeHrZonesForAllToursIsCanceled_Message);
+      // fire unique event for all changes
+      TourManager.fireEvent(TourEventId.ALL_TOURS_ARE_MODIFIED);
 
-			returnValue = false;
-		}
+      _isFireModifyEvent = true;
+      fireModifyEvent();
 
-		TourManager.getInstance().removeAllToursFromCache();
-		TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR);
+      _peopleWithModifiedHrZones.clear();
 
-		// fire unique event for all changes
-		TourManager.fireEvent(TourEventId.ALL_TOURS_ARE_MODIFIED);
+      return returnValue;
+   }
 
-		_isFireModifyEvent = true;
-		fireModifyEvent();
+   @Override
+   protected Control createContents(final Composite parent) {
 
-		_peopleWithModifiedHrZones.clear();
+      // check: if a tour is modified in the tour editor
+      if (TourManager.isTourEditorModified()) {
 
-		return returnValue;
-	}
+         _isNoUI = true;
 
-	@Override
-	protected Control createContents(final Composite parent) {
+         return createUI_01_NoUI(parent);
+      }
 
-		// check: if a tour is modified in the tour editor
-		if (TourManager.isTourEditorModified()) {
+      initUI(parent);
 
-			_isNoUI = true;
+      final Composite container = createUI(parent);
 
-			return createUI_01_NoUI(parent);
-		}
+      updateUIDeviceList();
 
-		initUI(parent);
+      // update people viewer
+      _people = PersonManager.getTourPeople();
+      _peopleViewer.setInput(new Object());
 
-		final Composite container = createUI(parent);
+      // reselect previous person and tabfolder
+      restoreState();
 
-		updateUIDeviceList();
+      enableActions();
+      addPrefListener();
 
-		// update people viewer
-		_people = PersonManager.getTourPeople();
-		_peopleViewer.setInput(new Object());
+      return container;
+   }
 
-		// reselect previous person and tabfolder
-		restoreState();
+   private TourPerson createDefaultPerson() {
 
-		enableActions();
-		addPrefListener();
+      final TourPerson newPerson = new TourPerson(Messages.App_Default_PersonFirstName, UI.EMPTY_STRING);
 
-		return container;
-	}
+      newPerson.setHeight(1.77f);
+      newPerson.setWeight(77.7f);
+      newPerson.setBirthDay(TourPerson.DEFAULT_BIRTHDAY.toInstant().toEpochMilli());
 
-	private TourPerson createDefaultPerson() {
+      newPerson.setGender(0);
+      newPerson.setRestPulse(TourPerson.DEFAULT_REST_PULSE);
 
-		final TourPerson newPerson = new TourPerson(Messages.App_Default_PersonFirstName, UI.EMPTY_STRING);
+      return newPerson;
+   }
 
-		newPerson.setHeight(1.77f);
-		newPerson.setWeight(77.7f);
-		newPerson.setBirthDay(TourPerson.DEFAULT_BIRTHDAY.toInstant().toEpochMilli());
+   private void createDeviceList() {
 
-		newPerson.setGender(0);
-		newPerson.setRestPulse(TourPerson.DEFAULT_REST_PULSE);
+      // create device list
+      _deviceList = new ArrayList<>();
 
-		return newPerson;
-	}
+      // add special device
+      _deviceList.add(null);
 
-	private void createDeviceList() {
+      // add all devices which can read from a device
+      final List<ExternalDevice> deviceList = DeviceManager.getExternalDeviceList();
+      for (final ExternalDevice device : deviceList) {
+         _deviceList.add(device);
+      }
+   }
 
-		// create device list
-		_deviceList = new ArrayList<>();
+   private Composite createUI(final Composite parent) {
 
-		// add special device
-		_deviceList.add(null);
-
-		// add all devices which can read from a device
-		final List<ExternalDevice> deviceList = DeviceManager.getExternalDeviceList();
-		for (final ExternalDevice device : deviceList) {
-			_deviceList.add(device);
-		}
-	}
-
-	private Composite createUI(final Composite parent) {
-
-		_prefPageContainer = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
+      _prefPageContainer = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults()//
 //				.grab(true, true)
-				.applyTo(_prefPageContainer);
-		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(_prefPageContainer);
-		{
+            .applyTo(_prefPageContainer);
+      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(_prefPageContainer);
+      {
 
-			final Label label = new Label(_prefPageContainer, SWT.WRAP);
-			label.setText(Messages.Pref_People_Title);
+         final Label label = new Label(_prefPageContainer, SWT.WRAP);
+         label.setText(Messages.Pref_People_Title);
 
-			final Composite innerContainer = new Composite(_prefPageContainer, SWT.NONE);
-			GridDataFactory.fillDefaults()//
-					.grab(true, true)
-					.applyTo(innerContainer);
-			GridLayoutFactory.fillDefaults().numColumns(2).applyTo(innerContainer);
-			{
-				createUI_10_People_Viewer(innerContainer);
-				createUI_20_People_Actions(innerContainer);
+         final Composite innerContainer = new Composite(_prefPageContainer, SWT.NONE);
+         GridDataFactory.fillDefaults()//
+               .grab(true, true)
+               .applyTo(innerContainer);
+         GridLayoutFactory.fillDefaults().numColumns(2).applyTo(innerContainer);
+         {
+            createUI_10_People_Viewer(innerContainer);
+            createUI_20_People_Actions(innerContainer);
 
-				createUI_30_Person_Folder(innerContainer);
-			}
+            createUI_30_Person_Folder(innerContainer);
+         }
 
-			// placeholder
-			new Label(_prefPageContainer, SWT.NONE);
-		}
+         // placeholder
+         new Label(_prefPageContainer, SWT.NONE);
+      }
 
-		return _prefPageContainer;
-	}
+      return _prefPageContainer;
+   }
 
-	private Control createUI_01_NoUI(final Composite parent) {
+   private Control createUI_01_NoUI(final Composite parent) {
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-		{
-			final Label label = new Label(container, SWT.WRAP);
-			GridDataFactory.fillDefaults().grab(true, false).hint(350, SWT.DEFAULT).applyTo(label);
-			label.setText(Messages.Pref_App_Label_TourEditorIsModified);
-		}
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+      {
+         final Label label = new Label(container, SWT.WRAP);
+         GridDataFactory.fillDefaults().grab(true, false).hint(350, SWT.DEFAULT).applyTo(label);
+         label.setText(Messages.Pref_App_Label_TourEditorIsModified);
+      }
 
-		return container;
-	}
+      return container;
+   }
 
-	private void createUI_10_People_Viewer(final Composite parent) {
+   private void createUI_10_People_Viewer(final Composite parent) {
 
-		final TableColumnLayout tableLayout = new TableColumnLayout();
+      final TableColumnLayout tableLayout = new TableColumnLayout();
 
-		final Composite layoutContainer = new Composite(parent, SWT.NONE);
-		layoutContainer.setLayout(tableLayout);
-		GridDataFactory.fillDefaults() //
-				.grab(true, true)
-				.hint(convertWidthInCharsToPixels(30), convertHeightInCharsToPixels(5))
-				.applyTo(layoutContainer);
+      final Composite layoutContainer = new Composite(parent, SWT.NONE);
+      layoutContainer.setLayout(tableLayout);
+      GridDataFactory.fillDefaults() //
+            .grab(true, true)
+            .hint(convertWidthInCharsToPixels(30), convertHeightInCharsToPixels(5))
+            .applyTo(layoutContainer);
 
-		/*
-		 * create table
-		 */
-		final Table table = new Table(
-				layoutContainer,
-				(SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI));
+      /*
+       * create table
+       */
+      final Table table = new Table(
+            layoutContainer,
+            (SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI));
 
-		table.setHeaderVisible(true);
-		table.setLinesVisible(true);
+      table.setHeaderVisible(true);
+      table.setLinesVisible(true);
 
-		_peopleViewer = new TableViewer(table);
-		defineAllColumns(tableLayout);
+      _peopleViewer = new TableViewer(table);
+      defineAllColumns(tableLayout);
 
-		_peopleViewer.setUseHashlookup(true);
-		_peopleViewer.setContentProvider(new ClientsContentProvider());
+      _peopleViewer.setUseHashlookup(true);
+      _peopleViewer.setContentProvider(new ClientsContentProvider());
 
-		_peopleViewer.setComparator(new ViewerComparator() {
-			@Override
-			public int compare(final Viewer viewer, final Object e1, final Object e2) {
+      _peopleViewer.setComparator(new ViewerComparator() {
+         @Override
+         public int compare(final Viewer viewer, final Object e1, final Object e2) {
 
-				// compare by last + first name
+            // compare by last + first name
 
-				final TourPerson p1 = (TourPerson) e1;
-				final TourPerson p2 = (TourPerson) e2;
+            final TourPerson p1 = (TourPerson) e1;
+            final TourPerson p2 = (TourPerson) e2;
 
-				final int compareLastName = p1.getLastName().compareTo(p2.getLastName());
+            final int compareLastName = p1.getLastName().compareTo(p2.getLastName());
 
-				if (compareLastName != 0) {
-					return compareLastName;
-				}
+            if (compareLastName != 0) {
+               return compareLastName;
+            }
 
-				return p1.getFirstName().compareTo(p2.getFirstName());
-			}
-		});
+            return p1.getFirstName().compareTo(p2.getFirstName());
+         }
+      });
 
-		_peopleViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-			@Override
-			public void selectionChanged(final SelectionChangedEvent event) {
-				onSelectPerson();
-			}
-		});
+      _peopleViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+         @Override
+         public void selectionChanged(final SelectionChangedEvent event) {
+            onSelectPerson();
+         }
+      });
 
-		_peopleViewer.addDoubleClickListener(new IDoubleClickListener() {
-			@Override
-			public void doubleClick(final DoubleClickEvent event) {
-				_tabFolderPerson.setSelection(0);
-				_txtFirstName.setFocus();
-				_txtFirstName.selectAll();
-			}
-		});
+      _peopleViewer.addDoubleClickListener(new IDoubleClickListener() {
+         @Override
+         public void doubleClick(final DoubleClickEvent event) {
+            _tabFolderPerson.setSelection(0);
+            _txtFirstName.setFocus();
+            _txtFirstName.selectAll();
+         }
+      });
 
-	}
+   }
 
-	private void createUI_20_People_Actions(final Composite parent) {
+   private void createUI_20_People_Actions(final Composite parent) {
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults()//
 //				.grab(false, true)
-				.applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+            .applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-		{
-			/*
-			 * button: add
-			 */
-			_btnAddPerson = new Button(container, SWT.NONE);
-			_btnAddPerson.setText(Messages.Pref_People_Action_add_person);
-			setButtonLayoutData(_btnAddPerson);
-			_btnAddPerson.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onAddPerson();
-				}
-			});
+      {
+         /*
+          * button: add
+          */
+         _btnAddPerson = new Button(container, SWT.NONE);
+         _btnAddPerson.setText(Messages.Pref_People_Action_add_person);
+         setButtonLayoutData(_btnAddPerson);
+         _btnAddPerson.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+               onAddPerson();
+            }
+         });
 
-			/*
-			 * button: update
-			 */
-			_btnSavePerson = new Button(container, SWT.NONE);
-			_btnSavePerson.setText(Messages.App_Action_Save);
-			_btnSavePerson.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onSavePerson();
-				}
-			});
-			setButtonLayoutData(_btnSavePerson);
-			final GridData gd = (GridData) _btnSavePerson.getLayoutData();
-			gd.verticalAlignment = SWT.BOTTOM;
-			gd.grabExcessVerticalSpace = true;
+         /*
+          * button: update
+          */
+         _btnSavePerson = new Button(container, SWT.NONE);
+         _btnSavePerson.setText(Messages.App_Action_Save);
+         _btnSavePerson.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+               onSavePerson();
+            }
+         });
+         setButtonLayoutData(_btnSavePerson);
+         final GridData gd = (GridData) _btnSavePerson.getLayoutData();
+         gd.verticalAlignment = SWT.BOTTOM;
+         gd.grabExcessVerticalSpace = true;
 
-			/*
-			 * button: cancel
-			 */
-			_btnCancel = new Button(container, SWT.NONE);
-			_btnCancel.setText(Messages.App_Action_Cancel);
-			_btnCancel.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onCancelPerson();
-				}
-			});
-			setButtonLayoutData(_btnCancel);
-		}
-	}
+         /*
+          * button: cancel
+          */
+         _btnCancel = new Button(container, SWT.NONE);
+         _btnCancel.setText(Messages.App_Action_Cancel);
+         _btnCancel.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+               onCancelPerson();
+            }
+         });
+         setButtonLayoutData(_btnCancel);
+      }
+   }
 
-	private void createUI_30_Person_Folder(final Composite parent) {
+   private void createUI_30_Person_Folder(final Composite parent) {
 
-		_tabFolderPerson = new TabFolder(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
-				.grab(true, false)
-				.span(2, 1)
-				.applyTo(_tabFolderPerson);
-		{
-			// tab: person
-			final TabItem tabItemDetails = new TabItem(_tabFolderPerson, SWT.NONE);
-			tabItemDetails.setText(Messages.Pref_People_Tab_Person);
-			tabItemDetails.setControl(createUI_50_Tab_Person(_tabFolderPerson));
+      _tabFolderPerson = new TabFolder(parent, SWT.NONE);
+      GridDataFactory.fillDefaults()//
+            .grab(true, false)
+            .span(2, 1)
+            .applyTo(_tabFolderPerson);
+      {
+         // tab: person
+         final TabItem tabItemDetails = new TabItem(_tabFolderPerson, SWT.NONE);
+         tabItemDetails.setText(Messages.Pref_People_Tab_Person);
+         tabItemDetails.setControl(createUI_50_Tab_Person(_tabFolderPerson));
 
-			// tab: hr zone
-			final TabItem tabItemHRZone = new TabItem(_tabFolderPerson, SWT.NONE);
-			tabItemHRZone.setText(Messages.Pref_People_Tab_HRZone);
-			tabItemHRZone.setControl(createUI_60_Tab_HRZone(_tabFolderPerson));
+         // tab: hr zone
+         final TabItem tabItemHRZone = new TabItem(_tabFolderPerson, SWT.NONE);
+         tabItemHRZone.setText(Messages.Pref_People_Tab_HRZone);
+         tabItemHRZone.setControl(createUI_60_Tab_HRZone(_tabFolderPerson));
 
-			// tab: data transfer
-			final TabItem tabItemDataTransfer = new TabItem(_tabFolderPerson, SWT.NONE);
-			tabItemDataTransfer.setText(Messages.Pref_People_Tab_DataTransfer);
-			tabItemDataTransfer.setControl(createUI_90_Tab_DataTransfer(_tabFolderPerson));
-		}
-	}
+         // tab: data transfer
+         final TabItem tabItemDataTransfer = new TabItem(_tabFolderPerson, SWT.NONE);
+         tabItemDataTransfer.setText(Messages.Pref_People_Tab_DataTransfer);
+         tabItemDataTransfer.setControl(createUI_90_Tab_DataTransfer(_tabFolderPerson));
+      }
+   }
 
-	private Control createUI_50_Tab_Person(final Composite parent) {
+   private Control createUI_50_Tab_Person(final Composite parent) {
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults()//
 //				.grab(true, false)
-				.applyTo(container);
-		GridLayoutFactory.swtDefaults().numColumns(3).extendedMargins(0, 0, 7, 0).applyTo(container);
-		{
-			createUI_51_Field_FirstName(container);
-			createUI_52_Field_LastName(container);
+            .applyTo(container);
+      GridLayoutFactory.swtDefaults().numColumns(3).extendedMargins(0, 0, 7, 0).applyTo(container);
+      {
+         createUI_51_Field_FirstName(container);
+         createUI_52_Field_LastName(container);
 
-			createUI_53_Field_Birthday(container);
-			createUI_54_Field_Gender(container);
-			createUI_55_Field_Weight(container);
-			createUI_56_Field_Height(container);
-		}
-		container.layout(true, true);
+         createUI_53_Field_Birthday(container);
+         createUI_54_Field_Gender(container);
+         createUI_55_Field_Weight(container);
+         createUI_56_Field_Height(container);
+      }
+      container.layout(true, true);
 
-		return container;
-	}
+      return container;
+   }
 
-	/**
-	 * field: first name
-	 */
-	private void createUI_51_Field_FirstName(final Composite parent) {
+   /**
+    * field: first name
+    */
+   private void createUI_51_Field_FirstName(final Composite parent) {
 
-		final Label label = new Label(parent, SWT.NONE);
-		label.setText(Messages.Pref_People_Label_first_name);
+      final Label label = new Label(parent, SWT.NONE);
+      label.setText(Messages.Pref_People_Label_first_name);
 
-		_txtFirstName = new Text(parent, SWT.BORDER);
-		GridDataFactory.fillDefaults()//
-				.grab(true, false)
-				.span(2, 1)
-				.applyTo(_txtFirstName);
-		_txtFirstName.addModifyListener(_defaultModifyListener);
-	}
+      _txtFirstName = new Text(parent, SWT.BORDER);
+      GridDataFactory.fillDefaults()//
+            .grab(true, false)
+            .span(2, 1)
+            .applyTo(_txtFirstName);
+      _txtFirstName.addModifyListener(_defaultModifyListener);
+   }
 
-	/**
-	 * field: last name
-	 */
-	private void createUI_52_Field_LastName(final Composite parent) {
+   /**
+    * field: last name
+    */
+   private void createUI_52_Field_LastName(final Composite parent) {
 
-		final Label label = new Label(parent, SWT.NONE);
-		label.setText(Messages.Pref_People_Label_last_name);
+      final Label label = new Label(parent, SWT.NONE);
+      label.setText(Messages.Pref_People_Label_last_name);
 
-		_txtLastName = new Text(parent, SWT.BORDER);
-		GridDataFactory.fillDefaults()//
-				.grab(true, false)
-				.span(2, 1)
-				.applyTo(_txtLastName);
-		_txtLastName.addModifyListener(_defaultModifyListener);
-	}
+      _txtLastName = new Text(parent, SWT.BORDER);
+      GridDataFactory.fillDefaults()//
+            .grab(true, false)
+            .span(2, 1)
+            .applyTo(_txtLastName);
+      _txtLastName.addModifyListener(_defaultModifyListener);
+   }
 
-	/**
-	 * field: birthday
-	 */
-	private void createUI_53_Field_Birthday(final Composite parent) {
+   /**
+    * field: birthday
+    */
+   private void createUI_53_Field_Birthday(final Composite parent) {
 
-		/*
-		 * date-time: birthday
-		 */
-		final Label label = new Label(parent, SWT.NONE);
-		label.setText(Messages.Pref_People_Label_Birthday);
+      /*
+       * date-time: birthday
+       */
+      final Label label = new Label(parent, SWT.NONE);
+      label.setText(Messages.Pref_People_Label_Birthday);
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
-				.span(2, 1)
-				.applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-		{
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults()//
+            .span(2, 1)
+            .applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      {
 
-			_dtBirthday = new DateTime(container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN | SWT.BORDER);
-			GridDataFactory.fillDefaults()//
-					.align(SWT.BEGINNING, SWT.FILL)
-					.applyTo(_dtBirthday);
-			_dtBirthday.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					updateUIOnModifiedHrZones();
-				}
-			});
-			_dtBirthday.addKeyListener(new KeyListener() {
+         _dtBirthday = new DateTime(container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN | SWT.BORDER);
+         GridDataFactory.fillDefaults()//
+               .align(SWT.BEGINNING, SWT.FILL)
+               .applyTo(_dtBirthday);
+         _dtBirthday.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
 
-				@Override
-				public void keyPressed(final KeyEvent e) {}
+               if (_isLinux && e.widget.getData(FIX_LINUX_ASYNC_EVENT_1) != null) {
+                  e.widget.setData(FIX_LINUX_ASYNC_EVENT_1, null);
+                  return;
+               }
 
-				@Override
-				public void keyReleased(final KeyEvent e) {
-					/*
-					 * key listener is necessary because the selection listener is not fired when the
-					 * values are modified with mouse wheel up/down
-					 */
+               if (_isLinux && e.widget.getData(FIX_LINUX_ASYNC_EVENT_2) != null) {
+                  e.widget.setData(FIX_LINUX_ASYNC_EVENT_2, null);
+                  return;
+               }
+
+               updateUIOnModifiedHrZones();
+            }
+         });
+         _dtBirthday.addKeyListener(new KeyListener() {
+
+            @Override
+            public void keyPressed(final KeyEvent e) {}
+
+            @Override
+            public void keyReleased(final KeyEvent e) {
+               /*
+                * key listener is necessary because the selection listener is not fired when the
+                * values are modified with mouse wheel up/down
+                */
 //					onModifyHrZones();
-				}
-			});
+            }
+         });
 
-			/*
-			 * label: age
-			 */
-			_lblAgePerson = new Label(container, SWT.NONE);
-			GridDataFactory.fillDefaults()//
-					.align(SWT.FILL, SWT.CENTER)
-					.applyTo(_lblAgePerson);
-		}
-	}
+         /*
+          * label: age
+          */
+         _lblAgePerson = new Label(container, SWT.NONE);
+         GridDataFactory.fillDefaults()//
+               .align(SWT.FILL, SWT.CENTER)
+               .applyTo(_lblAgePerson);
+      }
+   }
 
-	/**
-	 * field: gender
-	 */
-	private void createUI_54_Field_Gender(final Composite parent) {
+   /**
+    * field: gender
+    */
+   private void createUI_54_Field_Gender(final Composite parent) {
 
-		// label
-		final Label label = new Label(parent, SWT.NONE);
-		label.setText(Messages.Pref_People_Label_Gender);
+      // label
+      final Label label = new Label(parent, SWT.NONE);
+      label.setText(Messages.Pref_People_Label_Gender);
 
-		// radio
-		final Composite containerGender = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
-				.span(2, 1)
-				.applyTo(containerGender);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerGender);
-		{
-			_rdoGenderMale = new Button(containerGender, SWT.RADIO);
-			_rdoGenderMale.setText(Messages.Pref_People_Label_GenderMale);
-			_rdoGenderMale.addSelectionListener(_defaultSelectionListener);
+      // radio
+      final Composite containerGender = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults()//
+            .span(2, 1)
+            .applyTo(containerGender);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerGender);
+      {
+         _rdoGenderMale = new Button(containerGender, SWT.RADIO);
+         _rdoGenderMale.setText(Messages.Pref_People_Label_GenderMale);
+         _rdoGenderMale.addSelectionListener(_defaultSelectionListener);
 
-			_rdoGenderFemale = new Button(containerGender, SWT.RADIO);
-			_rdoGenderFemale.setText(Messages.Pref_People_Label_GenderFemale);
-			_rdoGenderFemale.addSelectionListener(_defaultSelectionListener);
-		}
-	}
+         _rdoGenderFemale = new Button(containerGender, SWT.RADIO);
+         _rdoGenderFemale.setText(Messages.Pref_People_Label_GenderFemale);
+         _rdoGenderFemale.addSelectionListener(_defaultSelectionListener);
+      }
+   }
 
-	/**
-	 * field: weight
-	 */
-	private void createUI_55_Field_Weight(final Composite parent) {
+   /**
+    * field: weight
+    */
+   private void createUI_55_Field_Weight(final Composite parent) {
 
-		Label label = new Label(parent, SWT.NONE);
-		label.setText(Messages.Pref_People_Label_weight);
+      Label label = new Label(parent, SWT.NONE);
+      label.setText(Messages.Pref_People_Label_weight);
 
-		final Composite containerWeight = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
-				.applyTo(containerWeight);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerWeight);
-		{
-			// spinner: weight
-			_spinnerWeight = new Spinner(containerWeight, SWT.BORDER);
-			GridDataFactory.fillDefaults() //
-					.align(SWT.BEGINNING, SWT.FILL)
+      final Composite containerWeight = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults()//
+            .applyTo(containerWeight);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerWeight);
+      {
+         // spinner: weight
+         _spinnerWeight = new Spinner(containerWeight, SWT.BORDER);
+         GridDataFactory.fillDefaults() //
+               .align(SWT.BEGINNING, SWT.FILL)
 //					.hint(_spinnerWidth, SWT.DEFAULT)
-					.applyTo(_spinnerWeight);
-			_spinnerWeight.setDigits(1);
-			_spinnerWeight.setMinimum(0);
-			_spinnerWeight.setMaximum(3000); // 300.0 kg
-			_spinnerWeight.addSelectionListener(_defaultSelectionListener);
-			_spinnerWeight.addMouseWheelListener(new MouseWheelListener() {
-				@Override
-				public void mouseScrolled(final MouseEvent event) {
-					UI.adjustSpinnerValueOnMouseScroll(event);
-					onModifyPerson();
-				}
-			});
+               .applyTo(_spinnerWeight);
+         _spinnerWeight.setDigits(1);
+         _spinnerWeight.setMinimum(0);
+         _spinnerWeight.setMaximum(3000); // 300.0 kg
+         _spinnerWeight.addSelectionListener(_defaultSelectionListener);
+         _spinnerWeight.addMouseWheelListener(new MouseWheelListener() {
+            @Override
+            public void mouseScrolled(final MouseEvent event) {
+               UI.adjustSpinnerValueOnMouseScroll(event);
+               onModifyPerson();
+            }
+         });
 
-			// label: unit
-			label = new Label(containerWeight, SWT.NONE);
-			label.setText(UI.UNIT_WEIGHT_KG);
-		}
+         // label: unit
+         label = new Label(containerWeight, SWT.NONE);
+         label.setText(UI.UNIT_WEIGHT_KG);
+      }
 
-		// 3rd column filler
-		new Label(parent, SWT.NONE);
-	}
+      // 3rd column filler
+      new Label(parent, SWT.NONE);
+   }
 
-	/**
-	 * field: height
-	 */
-	private void createUI_56_Field_Height(final Composite parent) {
+   /**
+    * field: height
+    */
+   private void createUI_56_Field_Height(final Composite parent) {
 
-		Label label = new Label(parent, SWT.NONE);
-		label.setText(Messages.Pref_People_Label_height);
+      Label label = new Label(parent, SWT.NONE);
+      label.setText(Messages.Pref_People_Label_height);
 
-		final Composite containerHeight = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
-				.applyTo(containerHeight);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerHeight);
-		{
-			// spinner: height
-			_spinnerHeight = new Spinner(containerHeight, SWT.BORDER);
-			GridDataFactory.fillDefaults()//
-					.align(SWT.BEGINNING, SWT.FILL)
+      final Composite containerHeight = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults()//
+            .applyTo(containerHeight);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerHeight);
+      {
+         // spinner: height
+         _spinnerHeight = new Spinner(containerHeight, SWT.BORDER);
+         GridDataFactory.fillDefaults()//
+               .align(SWT.BEGINNING, SWT.FILL)
 //					.hint(_spinnerWidth, SWT.DEFAULT)
-					.applyTo(_spinnerHeight);
-			_spinnerHeight.setDigits(2);
-			_spinnerHeight.setMinimum(0);
-			_spinnerHeight.setMaximum(300); // 3.00 m
-			_spinnerHeight.addSelectionListener(_defaultSelectionListener);
-			_spinnerHeight.addMouseWheelListener(new MouseWheelListener() {
-				@Override
-				public void mouseScrolled(final MouseEvent event) {
-					UI.adjustSpinnerValueOnMouseScroll(event);
-					onModifyPerson();
-				}
-			});
+               .applyTo(_spinnerHeight);
+         _spinnerHeight.setDigits(2);
+         _spinnerHeight.setMinimum(0);
+         _spinnerHeight.setMaximum(300); // 3.00 m
+         _spinnerHeight.addSelectionListener(_defaultSelectionListener);
+         _spinnerHeight.addMouseWheelListener(new MouseWheelListener() {
+            @Override
+            public void mouseScrolled(final MouseEvent event) {
+               UI.adjustSpinnerValueOnMouseScroll(event);
+               onModifyPerson();
+            }
+         });
 
-			// label: unit
-			label = new Label(containerHeight, SWT.NONE);
-			label.setText(UI.UNIT_METER);
-		}
+         // label: unit
+         label = new Label(containerHeight, SWT.NONE);
+         label.setText(UI.UNIT_METER);
+      }
 
-		// filler
-		new Label(parent, SWT.NONE);
-	}
+      // filler
+      new Label(parent, SWT.NONE);
+   }
 
-	private Control createUI_60_Tab_HRZone(final Composite parent) {
+   private Control createUI_60_Tab_HRZone(final Composite parent) {
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.swtDefaults()//
-				.numColumns(1)
-				.extendedMargins(0, 0, 7, 0)
-				.applyTo(container);
-		{
-			final Composite containerHr = new Composite(container, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, false).applyTo(containerHr);
-			GridLayoutFactory.fillDefaults().numColumns(3).applyTo(containerHr);
-			{
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridLayoutFactory.swtDefaults()//
+            .numColumns(1)
+            .extendedMargins(0, 0, 7, 0)
+            .applyTo(container);
+      {
+         final Composite containerHr = new Composite(container, SWT.NONE);
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(containerHr);
+         GridLayoutFactory.fillDefaults().numColumns(3).applyTo(containerHr);
+         {
 //				createUI53FieldBirthday(containerHr);
-				createUI_62_RestingHR(containerHr);
-				createUI_64_MaxHR(containerHr);
-			}
+            createUI_62_RestingHR(containerHr);
+            createUI_64_MaxHR(containerHr);
+         }
 
-			final Group group = new Group(container, SWT.NONE);
-			GridDataFactory.fillDefaults().grab(true, true).applyTo(group);
-			GridLayoutFactory.swtDefaults().extendedMargins(0, 0, -5, 0).applyTo(group);
+         final Group group = new Group(container, SWT.NONE);
+         GridDataFactory.fillDefaults().grab(true, true).applyTo(group);
+         GridLayoutFactory.swtDefaults().extendedMargins(0, 0, -5, 0).applyTo(group);
 //			group.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-			{
-				createUI_70_HrZone(group);
-				createUI_72_HrZone_Actions(group);
-			}
-		}
+         {
+            createUI_70_HrZone(group);
+            createUI_72_HrZone_Actions(group);
+         }
+      }
 
-		return container;
-	}
+      return container;
+   }
 
-	/**
-	 * field: resting hr
-	 */
-	private void createUI_62_RestingHR(final Composite parent) {
+   /**
+    * field: resting hr
+    */
+   private void createUI_62_RestingHR(final Composite parent) {
 
-		Label label = new Label(parent, SWT.NONE);
-		label.setText(Messages.Pref_People_Label_RestingHR);
+      Label label = new Label(parent, SWT.NONE);
+      label.setText(Messages.Pref_People_Label_RestingHR);
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults()//
 //				.span(2, 1)
-				.applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-		{
-			// spinner: weight
-			_spinnerRestingHR = new Spinner(container, SWT.BORDER);
-			GridDataFactory.fillDefaults() //
-					.align(SWT.BEGINNING, SWT.FILL)
+            .applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      {
+         // spinner: weight
+         _spinnerRestingHR = new Spinner(container, SWT.BORDER);
+         GridDataFactory.fillDefaults() //
+               .align(SWT.BEGINNING, SWT.FILL)
 //					.hint(_spinnerWidth, SWT.DEFAULT)
-					.applyTo(_spinnerRestingHR);
-			_spinnerRestingHR.setMinimum(10);
-			_spinnerRestingHR.setMaximum(200);
-			_spinnerRestingHR.addSelectionListener(_defaultSelectionListener);
-			_spinnerRestingHR.addMouseWheelListener(new MouseWheelListener() {
-				@Override
-				public void mouseScrolled(final MouseEvent event) {
-					UI.adjustSpinnerValueOnMouseScroll(event);
-					onModifyPerson();
-				}
-			});
+               .applyTo(_spinnerRestingHR);
+         _spinnerRestingHR.setMinimum(10);
+         _spinnerRestingHR.setMaximum(200);
+         _spinnerRestingHR.addSelectionListener(_defaultSelectionListener);
+         _spinnerRestingHR.addMouseWheelListener(new MouseWheelListener() {
+            @Override
+            public void mouseScrolled(final MouseEvent event) {
+               UI.adjustSpinnerValueOnMouseScroll(event);
+               onModifyPerson();
+            }
+         });
 
-			// label: unit
-			label = new Label(container, SWT.NONE);
-			label.setText(net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit);
-		}
+         // label: unit
+         label = new Label(container, SWT.NONE);
+         label.setText(net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit);
+      }
 
-		final Composite containerAge = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
-				.grab(true, false)
-				.align(SWT.END, SWT.FILL)
-				.applyTo(containerAge);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerAge);
+      final Composite containerAge = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults()//
+            .grab(true, false)
+            .align(SWT.END, SWT.FILL)
+            .applyTo(containerAge);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerAge);
 //		containerAge.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-		{
-			/*
-			 * label: age
-			 */
-			label = new Label(containerAge, SWT.NONE);
-			GridDataFactory.fillDefaults()//
-					.grab(true, true)
-					.align(SWT.END, SWT.CENTER)
-					.applyTo(label);
-			label.setText(Messages.Pref_People_Label_Age);
+      {
+         /*
+          * label: age
+          */
+         label = new Label(containerAge, SWT.NONE);
+         GridDataFactory.fillDefaults()//
+               .grab(true, true)
+               .align(SWT.END, SWT.CENTER)
+               .applyTo(label);
+         label.setText(Messages.Pref_People_Label_Age);
 
-			/*
-			 * label: age years
-			 */
-			_lblAgeHr = new Label(containerAge, SWT.NONE);
-			GridDataFactory.fillDefaults()//
+         /*
+          * label: age years
+          */
+         _lblAgeHr = new Label(containerAge, SWT.NONE);
+         GridDataFactory.fillDefaults()//
 //					.hint(convertHeightInCharsToPixels(4), SWT.DEFAULT)
-					.grab(true, true)
-					.align(SWT.END, SWT.CENTER)
-					.applyTo(_lblAgeHr);
-		}
-	}
+               .grab(true, true)
+               .align(SWT.END, SWT.CENTER)
+               .applyTo(_lblAgeHr);
+      }
+   }
 
-	/**
-	 * field: max hr
-	 */
-	private void createUI_64_MaxHR(final Composite parent) {
+   /**
+    * field: max hr
+    */
+   private void createUI_64_MaxHR(final Composite parent) {
 
-		Label label = new Label(parent, SWT.NONE);
-		label.setText(Messages.Pref_People_Label_MaxHR);
+      Label label = new Label(parent, SWT.NONE);
+      label.setText(Messages.Pref_People_Label_MaxHR);
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
-				.grab(true, false)
-				.span(2, 1)
-				.applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
-		{
-			/*
-			 * spinner: hr max
-			 */
-			_spinnerMaxHR = new Spinner(container, SWT.BORDER);
-			GridDataFactory.fillDefaults() //
-					.align(SWT.BEGINNING, SWT.FILL)
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults()//
+            .grab(true, false)
+            .span(2, 1)
+            .applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+      {
+         /*
+          * spinner: hr max
+          */
+         _spinnerMaxHR = new Spinner(container, SWT.BORDER);
+         GridDataFactory.fillDefaults() //
+               .align(SWT.BEGINNING, SWT.FILL)
 //					.hint(_spinnerWidth, SWT.DEFAULT)
-					.applyTo(_spinnerMaxHR);
-			_spinnerMaxHR.setMinimum(HEART_BEAT_MIN);
-			_spinnerMaxHR.setMaximum(HEART_BEAT_MAX);
-			_spinnerMaxHR.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					updateUIOnModifiedHrZones();
-				}
-			});
-			_spinnerMaxHR.addMouseWheelListener(new MouseWheelListener() {
-				@Override
-				public void mouseScrolled(final MouseEvent event) {
-					UI.adjustSpinnerValueOnMouseScroll(event);
-					updateUIOnModifiedHrZones();
-				}
-			});
+               .applyTo(_spinnerMaxHR);
+         _spinnerMaxHR.setMinimum(HEART_BEAT_MIN);
+         _spinnerMaxHR.setMaximum(HEART_BEAT_MAX);
+         _spinnerMaxHR.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+               updateUIOnModifiedHrZones();
+            }
+         });
+         _spinnerMaxHR.addMouseWheelListener(new MouseWheelListener() {
+            @Override
+            public void mouseScrolled(final MouseEvent event) {
+               UI.adjustSpinnerValueOnMouseScroll(event);
+               updateUIOnModifiedHrZones();
+            }
+         });
 
-			/*
-			 * label: unit
-			 */
-			label = new Label(container, SWT.NONE);
-			label.setText(net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit);
+         /*
+          * label: unit
+          */
+         label = new Label(container, SWT.NONE);
+         label.setText(net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit);
 
-			/*
-			 * combo: formula to compute hr max
-			 */
-			_cboHrMaxFormula = new Combo(container, SWT.READ_ONLY | SWT.DROP_DOWN);
-			GridDataFactory.fillDefaults() //
-					.grab(true, false)
-					.indent(5, 0)
-					.hint(50, SWT.DEFAULT)
-					.applyTo(_cboHrMaxFormula);
-			_cboHrMaxFormula.setVisibleItemCount(20);
-			_cboHrMaxFormula.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					updateUIOnModifiedHrZones();
-				}
-			});
+         /*
+          * combo: formula to compute hr max
+          */
+         _cboHrMaxFormula = new Combo(container, SWT.READ_ONLY | SWT.DROP_DOWN);
+         GridDataFactory.fillDefaults() //
+               .grab(true, false)
+               .indent(5, 0)
+               .hint(50, SWT.DEFAULT)
+               .applyTo(_cboHrMaxFormula);
+         _cboHrMaxFormula.setVisibleItemCount(20);
+         _cboHrMaxFormula.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+               updateUIOnModifiedHrZones();
+            }
+         });
 
-			// fill combobox
-			final String[] hrMaxFormulaNames = TrainingManager.HRMaxFormulaNames;
-			for (final String formulaName : hrMaxFormulaNames) {
-				_cboHrMaxFormula.add(formulaName);
-			}
-		}
-	}
+         // fill combobox
+         final String[] hrMaxFormulaNames = TrainingManager.HRMaxFormulaNames;
+         for (final String formulaName : hrMaxFormulaNames) {
+            _cboHrMaxFormula.add(formulaName);
+         }
+      }
+   }
 
-	private void createUI_70_HrZone(final Composite parent) {
+   private void createUI_70_HrZone(final Composite parent) {
 
-		final Composite hrZoneContainer = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
-				.grab(true, true)
-				.applyTo(hrZoneContainer);
-		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(hrZoneContainer);
+      final Composite hrZoneContainer = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults()//
+            .grab(true, true)
+            .applyTo(hrZoneContainer);
+      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(hrZoneContainer);
 //		hrZoneContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-		{
-			/*
-			 * container for hr zone fields
-			 */
+      {
+         /*
+          * container for hr zone fields
+          */
 
-			// scrolled container
-			_hrZoneScrolledContainer = new ScrolledComposite(hrZoneContainer, //
-					SWT.V_SCROLL //
-							| SWT.H_SCROLL
+         // scrolled container
+         _hrZoneScrolledContainer = new ScrolledComposite(hrZoneContainer, //
+               SWT.V_SCROLL //
+                     | SWT.H_SCROLL
 //					| SWT.BORDER
-			);
-			GridDataFactory.fillDefaults()//
-					.grab(true, true)
-					.hint(SWT.DEFAULT, convertHeightInCharsToPixels(10))
-					.applyTo(_hrZoneScrolledContainer);
+         );
+         GridDataFactory.fillDefaults()//
+               .grab(true, true)
+               .hint(SWT.DEFAULT, convertHeightInCharsToPixels(10))
+               .applyTo(_hrZoneScrolledContainer);
 //			_hrZoneScrolledContainer.setAlwaysShowScrollBars(true);
-			_hrZoneScrolledContainer.setExpandVertical(true);
-			_hrZoneScrolledContainer.setExpandHorizontal(true);
+         _hrZoneScrolledContainer.setExpandVertical(true);
+         _hrZoneScrolledContainer.setExpandHorizontal(true);
 
-			_hrZoneScrolledContainer.addControlListener(new ControlAdapter() {
-				@Override
-				public void controlResized(final ControlEvent e) {
-					final Control content = _hrZoneScrolledContainer.getContent();
-					if (content != null) {
+         _hrZoneScrolledContainer.addControlListener(new ControlAdapter() {
+            @Override
+            public void controlResized(final ControlEvent e) {
+               final Control content = _hrZoneScrolledContainer.getContent();
+               if (content != null) {
 //						_hrZoneScrolledContainer.setMinSize(content.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-					}
-				}
-			});
-		}
-	}
+               }
+            }
+         });
+      }
+   }
 
-	private void createUI_72_HrZone_Actions(final Composite parent) {
+   private void createUI_72_HrZone_Actions(final Composite parent) {
 
-		// compute size for the first combo item
-		final Label label = new Label(parent, SWT.NONE);
-		label.setText(Messages.HR_Zone_Template_Select);
-		final Point comboSize = label.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-		label.dispose();
+      // compute size for the first combo item
+      final Label label = new Label(parent, SWT.NONE);
+      label.setText(Messages.HR_Zone_Template_Select);
+      final Point comboSize = label.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+      label.dispose();
 
-		final int comboWidth = (int) (_isOSX || _isLinux ? comboSize.x * 1.3 : comboSize.x);
+      final int comboWidth = (int) (_isOSX || _isLinux ? comboSize.x * 1.3 : comboSize.x);
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
-				.indent(0, 20)
-				.grab(true, false)
-				.applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults()//
+            .indent(0, 20)
+            .grab(true, false)
+            .applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-		{
-			/*
-			 * button: compute speed values for all tours
-			 */
-			_btnComputeHrZonesForAllTours = new Button(container, SWT.NONE);
-			GridDataFactory.fillDefaults()//
-					.applyTo(_btnComputeHrZonesForAllTours);
-			_btnComputeHrZonesForAllTours.setText(Messages.Pref_People_Button_HrZones_ComputeAllTours);
-			_btnComputeHrZonesForAllTours.setToolTipText(Messages.Pref_People_Button_HrZones_ComputeAllTours_Tooltip);
-			_btnComputeHrZonesForAllTours.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
+      {
+         /*
+          * button: compute speed values for all tours
+          */
+         _btnComputeHrZonesForAllTours = new Button(container, SWT.NONE);
+         GridDataFactory.fillDefaults()//
+               .applyTo(_btnComputeHrZonesForAllTours);
+         _btnComputeHrZonesForAllTours.setText(Messages.Pref_People_Button_HrZones_ComputeAllTours);
+         _btnComputeHrZonesForAllTours.setToolTipText(Messages.Pref_People_Button_HrZones_ComputeAllTours_Tooltip);
+         _btnComputeHrZonesForAllTours.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
 
-					if (MessageDialog.openConfirm(
-							Display.getCurrent().getActiveShell(),
-							Messages.Compute_HrZones_Dialog_ComputeAllTours_Title,
-							Messages.Compute_HrZones_Dialog_ComputeAllTours_Title_Message)) {
+               if (MessageDialog.openConfirm(
+                     Display.getCurrent().getActiveShell(),
+                     Messages.Compute_HrZones_Dialog_ComputeAllTours_Title,
+                     Messages.Compute_HrZones_Dialog_ComputeAllTours_Title_Message)) {
 
-						computeHrZonesForAllTours(false);
-					}
-				}
-			});
+                  computeHrZonesForAllTours(false);
+               }
+            }
+         });
 
-			/*
-			 * button: edit hr zones
-			 */
-			_btnModifyHrZones = new Button(container, SWT.PUSH);
-			GridDataFactory.fillDefaults()//
-					.grab(true, false)
-					.align(SWT.END, SWT.FILL)
-					.applyTo(_btnModifyHrZones);
-			_btnModifyHrZones.setText(Messages.Dialog_HRZone_Button_EditHrZones);
-			_btnModifyHrZones.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onEditHrZones();
-				}
-			});
+         /*
+          * button: edit hr zones
+          */
+         _btnModifyHrZones = new Button(container, SWT.PUSH);
+         GridDataFactory.fillDefaults()//
+               .grab(true, false)
+               .align(SWT.END, SWT.FILL)
+               .applyTo(_btnModifyHrZones);
+         _btnModifyHrZones.setText(Messages.Dialog_HRZone_Button_EditHrZones);
+         _btnModifyHrZones.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+               onEditHrZones();
+            }
+         });
 
-			/*
-			 * combo: formula to compute hr max
-			 */
-			_cboTemplate = new Combo(container, SWT.READ_ONLY | SWT.DROP_DOWN);
-			GridDataFactory.fillDefaults() //
-					.hint(comboWidth, SWT.DEFAULT)
-					.applyTo(_cboTemplate);
-			_cboTemplate.setToolTipText(Messages.Pref_People_Label_HrZoneTemplate_Tooltip);
-			_cboTemplate.setVisibleItemCount(20);
-			_cboTemplate.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onCreateHrZonesFromTemplate();
-				}
-			});
+         /*
+          * combo: formula to compute hr max
+          */
+         _cboTemplate = new Combo(container, SWT.READ_ONLY | SWT.DROP_DOWN);
+         GridDataFactory.fillDefaults() //
+               .hint(comboWidth, SWT.DEFAULT)
+               .applyTo(_cboTemplate);
+         _cboTemplate.setToolTipText(Messages.Pref_People_Label_HrZoneTemplate_Tooltip);
+         _cboTemplate.setVisibleItemCount(20);
+         _cboTemplate.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+               onCreateHrZonesFromTemplate();
+            }
+         });
 
-			// fill combobox
-			for (final String hrZoneTemplate : TrainingManager.HR_ZONE_TEMPLATES) {
-				_cboTemplate.add(hrZoneTemplate);
-			}
-			_cboTemplate.select(TrainingManager.HR_ZONE_TEMPLATE_00);
-		}
-	}
+         // fill combobox
+         for (final String hrZoneTemplate : TrainingManager.HR_ZONE_TEMPLATES) {
+            _cboTemplate.add(hrZoneTemplate);
+         }
+         _cboTemplate.select(TrainingManager.HR_ZONE_TEMPLATE_00);
+      }
+   }
 
-	private void createUI_80_HrZone_InnerContainer(	final int hrMaxFormulaKey,
-																	final int hrMaxPulse,
-																	final ZonedDateTime birthDay) {
+   private void createUI_80_HrZone_InnerContainer(final int hrMaxFormulaKey,
+                                                  final int hrMaxPulse,
+                                                  final ZonedDateTime birthDay) {
 
-		// get current scroll position
-		final Point scrollBackup = _hrZoneScrolledContainer.getOrigin();
+      // get current scroll position
+      final Point scrollBackup = _hrZoneScrolledContainer.getOrigin();
 
-		// dispose previous ui
-		final Control content = _hrZoneScrolledContainer.getContent();
-		if (content != null) {
-			content.dispose();
-		}
+      // dispose previous ui
+      final Control content = _hrZoneScrolledContainer.getContent();
+      if (content != null) {
+         content.dispose();
+      }
 
-		// hr zone container
-		final Composite innerContainer = new Composite(_hrZoneScrolledContainer, SWT.NONE);
-		GridLayoutFactory.fillDefaults()//
-				.numColumns(10)
+      // hr zone container
+      final Composite innerContainer = new Composite(_hrZoneScrolledContainer, SWT.NONE);
+      GridLayoutFactory.fillDefaults()//
+            .numColumns(10)
 //				.extendedMargins(0, 5, 0, 0)
-				.spacing(2, 2)
-				.applyTo(innerContainer);
-		innerContainer.addMouseListener(_hrZoneMouseListener);
+            .spacing(2, 2)
+            .applyTo(innerContainer);
+      innerContainer.addMouseListener(_hrZoneMouseListener);
 //		innerContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-		{
-			final ArrayList<TourPersonHRZone> hrZones = getCurrentPerson().getHrZonesSorted();
+      {
+         final ArrayList<TourPersonHRZone> hrZones = getCurrentPerson().getHrZonesSorted();
 
-			if (hrZones.size() == 0) {
-				// hr zones are not available, show info
-				createUI_81_HrZone_Info(innerContainer);
-			} else {
-				createUI_82_HrZone_Header(innerContainer);
-				createUI_84_HrZone_Fields(innerContainer, hrMaxFormulaKey, hrMaxPulse, birthDay);
-			}
-		}
+         if (hrZones.size() == 0) {
+            // hr zones are not available, show info
+            createUI_81_HrZone_Info(innerContainer);
+         } else {
+            createUI_82_HrZone_Header(innerContainer);
+            createUI_84_HrZone_Fields(innerContainer, hrMaxFormulaKey, hrMaxPulse, birthDay);
+         }
+      }
 
-		_hrZoneScrolledContainer.setContent(innerContainer);
+      _hrZoneScrolledContainer.setContent(innerContainer);
 
-		// force the v-scrollbar to be displayed
-		_hrZoneScrolledContainer.setMinSize(innerContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+      // force the v-scrollbar to be displayed
+      _hrZoneScrolledContainer.setMinSize(innerContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 
-		// set scroll position to previous position
-		if (scrollBackup != null) {
-			_hrZoneScrolledContainer.setOrigin(scrollBackup);
-		}
-	}
+      // set scroll position to previous position
+      if (scrollBackup != null) {
+         _hrZoneScrolledContainer.setOrigin(scrollBackup);
+      }
+   }
 
-	private void createUI_81_HrZone_Info(final Composite parent) {
+   private void createUI_81_HrZone_Info(final Composite parent) {
 
-		final Label label = new Label(parent, SWT.WRAP);
-		GridDataFactory.fillDefaults().applyTo(label);
-		label.setText(Messages.Pref_People_Label_HrZoneInfo);
-	}
+      final Label label = new Label(parent, SWT.WRAP);
+      GridDataFactory.fillDefaults().applyTo(label);
+      label.setText(Messages.Pref_People_Label_HrZoneInfo);
+   }
 
-	private void createUI_82_HrZone_Header(final Composite parent) {
+   private void createUI_82_HrZone_Header(final Composite parent) {
 
-		/*
-		 * label: color
-		 */
-		Label label = new Label(parent, SWT.NONE);
-		label.addMouseListener(_hrZoneMouseListener);
+      /*
+       * label: color
+       */
+      Label label = new Label(parent, SWT.NONE);
+      label.addMouseListener(_hrZoneMouseListener);
 
-		/*
-		 * label: zone
-		 */
-		label = new Label(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().grab(true, false)
+      /*
+       * label: zone
+       */
+      label = new Label(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false)
 //				.hint(250, SWT.DEFAULT)
-				.align(SWT.FILL, SWT.BOTTOM)
-				.indent(5, 0)
-				.applyTo(label);
-		label.setFont(_fontItalic);
-		label.setText(Messages.Dialog_HRZone_Label_Header_Zone);
-		label.addMouseListener(_hrZoneMouseListener);
+            .align(SWT.FILL, SWT.BOTTOM)
+            .indent(5, 0)
+            .applyTo(label);
+      label.setFont(_fontItalic);
+      label.setText(Messages.Dialog_HRZone_Label_Header_Zone);
+      label.addMouseListener(_hrZoneMouseListener);
 
-		/*
-		 * label: min pulse
-		 */
-		label = new Label(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.BOTTOM).span(8, 1).applyTo(label);
-		label.setFont(_fontItalic);
-		label.setText(Messages.Dialog_HRZone_Label_Header_Pulse);
-		label.addMouseListener(_hrZoneMouseListener);
+      /*
+       * label: min pulse
+       */
+      label = new Label(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.BOTTOM).span(8, 1).applyTo(label);
+      label.setFont(_fontItalic);
+      label.setText(Messages.Dialog_HRZone_Label_Header_Pulse);
+      label.addMouseListener(_hrZoneMouseListener);
 //
 //		/*
 //		 * label: min pulse
@@ -1260,578 +1277,578 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 //		label.setFont(_fontItalic);
 //		label.setText(Messages.Dialog_HRZone_Label_Header_Pulse);
 //		label.addMouseListener(_hrZoneMouseListener);
-	}
+   }
 
-	private void createUI_84_HrZone_Fields(final Composite parent,
-														final int hrMaxFormulaKey,
-														final int hrMaxPulse,
-														final ZonedDateTime birthDay) {
+   private void createUI_84_HrZone_Fields(final Composite parent,
+                                          final int hrMaxFormulaKey,
+                                          final int hrMaxPulse,
+                                          final ZonedDateTime birthDay) {
 
-		final TourPerson currentPerson = getCurrentPerson();
-		if (currentPerson == null) {
-			return;
-		}
+      final TourPerson currentPerson = getCurrentPerson();
+      if (currentPerson == null) {
+         return;
+      }
 
-		// get sorted hr zones
-		final ArrayList<TourPersonHRZone> hrZones = new ArrayList<>(currentPerson.getHrZonesSorted());
-		final int hrZoneSize = hrZones.size();
-		Collections.sort(hrZones);
+      // get sorted hr zones
+      final ArrayList<TourPersonHRZone> hrZones = new ArrayList<>(currentPerson.getHrZonesSorted());
+      final int hrZoneSize = hrZones.size();
+      Collections.sort(hrZones);
 
-		final HrZoneContext hrZoneMinMaxBpm = currentPerson.getHrZoneContext(
-				hrMaxFormulaKey,
-				hrMaxPulse,
-				birthDay,
-				_today);
+      final HrZoneContext hrZoneMinMaxBpm = currentPerson.getHrZoneContext(
+            hrMaxFormulaKey,
+            hrMaxPulse,
+            birthDay,
+            _today);
 
-		// init hr zone colors
-		final Display display = parent.getDisplay();
-		disposeHrZoneColors();
-		_hrZoneColors = new Color[hrZoneSize];
+      // init hr zone colors
+      final Display display = parent.getDisplay();
+      disposeHrZoneColors();
+      _hrZoneColors = new Color[hrZoneSize];
 
-		for (int zoneIndex = 0; zoneIndex < hrZoneSize; zoneIndex++) {
+      for (int zoneIndex = 0; zoneIndex < hrZoneSize; zoneIndex++) {
 
-			final TourPersonHRZone hrZone = hrZones.get(zoneIndex);
+         final TourPersonHRZone hrZone = hrZones.get(zoneIndex);
 
-			final int zoneMinValue = hrZone.getZoneMinValue();
-			final int zoneMaxValue = hrZone.getZoneMaxValue();
+         final int zoneMinValue = hrZone.getZoneMinValue();
+         final int zoneMaxValue = hrZone.getZoneMaxValue();
 
-			final Color hrZoneColor = _hrZoneColors[zoneIndex] = new Color(display, hrZone.getColor());
+         final Color hrZoneColor = _hrZoneColors[zoneIndex] = new Color(display, hrZone.getColor());
 
-			/*
-			 * label: color
-			 */
-			Label label = new Label(parent, SWT.NONE);
-			GridDataFactory.fillDefaults().hint(16, 16).applyTo(label);
-			label.setText(UI.EMPTY_STRING);
-			label.setBackground(hrZoneColor);
-			label.addMouseListener(_hrZoneMouseListener);
+         /*
+          * label: color
+          */
+         Label label = new Label(parent, SWT.NONE);
+         GridDataFactory.fillDefaults().hint(16, 16).applyTo(label);
+         label.setText(UI.EMPTY_STRING);
+         label.setBackground(hrZoneColor);
+         label.addMouseListener(_hrZoneMouseListener);
 
-			/*
-			 * label: hr zone name
-			 */
-			label = new Label(parent, SWT.NONE);
-			GridDataFactory.fillDefaults()//
-					.indent(5, 0)
-					.applyTo(label);
-			label.setText(hrZone.getNameLong());
-			label.addMouseListener(_hrZoneMouseListener);
+         /*
+          * label: hr zone name
+          */
+         label = new Label(parent, SWT.NONE);
+         GridDataFactory.fillDefaults()//
+               .indent(5, 0)
+               .applyTo(label);
+         label.setText(hrZone.getNameLong());
+         label.addMouseListener(_hrZoneMouseListener);
 
-			/*
-			 * label: min pulse %
-			 */
-			label = new Label(parent, SWT.NONE);
-			GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).indent(10, 0).applyTo(label);
-			label.setText(zoneMinValue == Integer.MIN_VALUE ? UI.EMPTY_STRING : Integer.toString(zoneMinValue));
-			label.addMouseListener(_hrZoneMouseListener);
+         /*
+          * label: min pulse %
+          */
+         label = new Label(parent, SWT.NONE);
+         GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).indent(10, 0).applyTo(label);
+         label.setText(zoneMinValue == Integer.MIN_VALUE ? UI.EMPTY_STRING : Integer.toString(zoneMinValue));
+         label.addMouseListener(_hrZoneMouseListener);
 
-			/*
-			 * label: ...
-			 */
-			label = new Label(parent, SWT.NONE);
-			GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.FILL).applyTo(label);
+         /*
+          * label: ...
+          */
+         label = new Label(parent, SWT.NONE);
+         GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.FILL).applyTo(label);
 //			label.setText(zoneMaxValue == Integer.MAX_VALUE ? UI.EMPTY_STRING : UI.SYMBOL_DASH);
-			label.setText(UI.SYMBOL_DASH);
-			label.addMouseListener(_hrZoneMouseListener);
+         label.setText(UI.SYMBOL_DASH);
+         label.addMouseListener(_hrZoneMouseListener);
 
-			/*
-			 * label: max pulse %
-			 */
-			label = new Label(parent, SWT.NONE);
-			GridDataFactory.fillDefaults()//
-					.align(SWT.END, SWT.FILL)
+         /*
+          * label: max pulse %
+          */
+         label = new Label(parent, SWT.NONE);
+         GridDataFactory.fillDefaults()//
+               .align(SWT.END, SWT.FILL)
 //					.indent(10, 0)
-					.applyTo(label);
-			label.setText(zoneMaxValue == Integer.MAX_VALUE //
-					? Messages.App_Label_max
-					: Integer.toString(zoneMaxValue));
-			label.addMouseListener(_hrZoneMouseListener);
+               .applyTo(label);
+         label.setText(zoneMaxValue == Integer.MAX_VALUE //
+               ? Messages.App_Label_max
+               : Integer.toString(zoneMaxValue));
+         label.addMouseListener(_hrZoneMouseListener);
 
-			/*
-			 * label: %
-			 */
-			label = new Label(parent, SWT.NONE);
-			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
-			label.setText(UI.SYMBOL_PERCENTAGE);
-			label.addMouseListener(_hrZoneMouseListener);
+         /*
+          * label: %
+          */
+         label = new Label(parent, SWT.NONE);
+         GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+         label.setText(UI.SYMBOL_PERCENTAGE);
+         label.addMouseListener(_hrZoneMouseListener);
 
-			/*
-			 * label: min pulse bpm
-			 */
-			label = new Label(parent, SWT.NONE);
-			GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).indent(15, 0).applyTo(label);
-			label.setText(zoneMinValue == Integer.MIN_VALUE //
-					? UI.EMPTY_STRING
-					: Integer.toString((int) hrZoneMinMaxBpm.zoneMinBpm[zoneIndex]));
-			label.addMouseListener(_hrZoneMouseListener);
+         /*
+          * label: min pulse bpm
+          */
+         label = new Label(parent, SWT.NONE);
+         GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).indent(15, 0).applyTo(label);
+         label.setText(zoneMinValue == Integer.MIN_VALUE //
+               ? UI.EMPTY_STRING
+               : Integer.toString((int) hrZoneMinMaxBpm.zoneMinBpm[zoneIndex]));
+         label.addMouseListener(_hrZoneMouseListener);
 
-			/*
-			 * label: ...
-			 */
-			label = new Label(parent, SWT.NONE);
-			GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.FILL).applyTo(label);
-			label.setText(UI.SYMBOL_DASH);
-			label.addMouseListener(_hrZoneMouseListener);
+         /*
+          * label: ...
+          */
+         label = new Label(parent, SWT.NONE);
+         GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.FILL).applyTo(label);
+         label.setText(UI.SYMBOL_DASH);
+         label.addMouseListener(_hrZoneMouseListener);
 
-			/*
-			 * label: max pulse bpm
-			 */
-			label = new Label(parent, SWT.NONE);
-			GridDataFactory.fillDefaults()//
-					.align(SWT.END, SWT.FILL)
+         /*
+          * label: max pulse bpm
+          */
+         label = new Label(parent, SWT.NONE);
+         GridDataFactory.fillDefaults()//
+               .align(SWT.END, SWT.FILL)
 //					.indent(10, 0)
-					.applyTo(label);
-			label.setText(zoneMaxValue == Integer.MAX_VALUE //
-					? Messages.App_Label_max
-					: Integer.toString((int) hrZoneMinMaxBpm.zoneMaxBpm[zoneIndex]));
-			label.addMouseListener(_hrZoneMouseListener);
+               .applyTo(label);
+         label.setText(zoneMaxValue == Integer.MAX_VALUE //
+               ? Messages.App_Label_max
+               : Integer.toString((int) hrZoneMinMaxBpm.zoneMaxBpm[zoneIndex]));
+         label.addMouseListener(_hrZoneMouseListener);
 
-			/*
-			 * label: bpm
-			 */
-			label = new Label(parent, SWT.NONE);
-			GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
-			label.setText(net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit);
-			label.addMouseListener(_hrZoneMouseListener);
-		}
-	}
+         /*
+          * label: bpm
+          */
+         label = new Label(parent, SWT.NONE);
+         GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+         label.setText(net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit);
+         label.addMouseListener(_hrZoneMouseListener);
+      }
+   }
 
-	private Control createUI_90_Tab_DataTransfer(final Composite parent) {
+   private Control createUI_90_Tab_DataTransfer(final Composite parent) {
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults()//
 //				.grab(true, false)
-				.applyTo(container);
-		{
-			/*
-			 * label: info
-			 */
-			final Label label = new Label(container, SWT.WRAP);
-			GridDataFactory.fillDefaults()//
-					.span(3, 1)
+            .applyTo(container);
+      {
+         /*
+          * label: info
+          */
+         final Label label = new Label(container, SWT.WRAP);
+         GridDataFactory.fillDefaults()//
+               .span(3, 1)
 //					.indent(0, 15)
-					.hint(net.tourbook.common.UI.DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
-					.applyTo(label);
-			label.setText(Messages.Pref_People_Label_DataTransfer);
+               .hint(net.tourbook.common.UI.DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
+               .applyTo(label);
+         label.setText(Messages.Pref_People_Label_DataTransfer);
 
-			createUI_92_Field_SportComputer(container);
-			createUI_94_Field_RawDataPath(container);
-		}
+         createUI_92_Field_SportComputer(container);
+         createUI_94_Field_RawDataPath(container);
+      }
 
-		// set layout after the fields are created
-		GridLayoutFactory.swtDefaults().numColumns(3).extendedMargins(0, 0, 7, 0).applyTo(container);
+      // set layout after the fields are created
+      GridLayoutFactory.swtDefaults().numColumns(3).extendedMargins(0, 0, 7, 0).applyTo(container);
 
-		/*
-		 * set width for the text control that the pref dialog is not as wide as the full path
-		 */
-		final Text rawPathControl = _rawDataPathEditor.getTextControl(container);
-		final GridData gd = (GridData) rawPathControl.getLayoutData();
-		gd.widthHint = 200;
+      /*
+       * set width for the text control that the pref dialog is not as wide as the full path
+       */
+      final Text rawPathControl = _rawDataPathEditor.getTextControl(container);
+      final GridData gd = (GridData) rawPathControl.getLayoutData();
+      gd.widthHint = 200;
 
-		return container;
-	}
+      return container;
+   }
 
-	/**
-	 * field: sport computer
-	 */
-	private void createUI_92_Field_SportComputer(final Composite parent) {
+   /**
+    * field: sport computer
+    */
+   private void createUI_92_Field_SportComputer(final Composite parent) {
 
-		// label
-		final Label label = new Label(parent, SWT.NONE);
-		GridDataFactory.fillDefaults().indent(0, 15).align(SWT.FILL, SWT.CENTER).applyTo(label);
-		label.setText(Messages.Pref_People_Label_device);
+      // label
+      final Label label = new Label(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().indent(0, 15).align(SWT.FILL, SWT.CENTER).applyTo(label);
+      label.setText(Messages.Pref_People_Label_device);
 
-		// combo
-		_cboSportComputer = new Combo(parent, SWT.READ_ONLY | SWT.DROP_DOWN);
-		GridDataFactory.swtDefaults().indent(0, 15).applyTo(_cboSportComputer);
-		_cboSportComputer.setVisibleItemCount(20);
-		_cboSportComputer.addSelectionListener(_defaultSelectionListener);
+      // combo
+      _cboSportComputer = new Combo(parent, SWT.READ_ONLY | SWT.DROP_DOWN);
+      GridDataFactory.swtDefaults().indent(0, 15).applyTo(_cboSportComputer);
+      _cboSportComputer.setVisibleItemCount(20);
+      _cboSportComputer.addSelectionListener(_defaultSelectionListener);
 
-		// spacer
-		new Label(parent, SWT.NONE);
-	}
+      // spacer
+      new Label(parent, SWT.NONE);
+   }
 
-	/**
-	 * field: path to save raw tour data
-	 */
-	private void createUI_94_Field_RawDataPath(final Composite parent) {
+   /**
+    * field: path to save raw tour data
+    */
+   private void createUI_94_Field_RawDataPath(final Composite parent) {
 
-		/*
-		 * editor: raw data path
-		 */
-		_rawDataPathEditor = new DirectoryFieldEditor(
-				ITourbookPreferences.DUMMY_FIELD,
-				Messages.Pref_People_Label_DefaultDataTransferFilePath,
-				parent);
-		_rawDataPathEditor.setEmptyStringAllowed(true);
-		_rawDataPathEditor.setValidateStrategy(StringFieldEditor.VALIDATE_ON_KEY_STROKE);
+      /*
+       * editor: raw data path
+       */
+      _rawDataPathEditor = new DirectoryFieldEditor(
+            ITourbookPreferences.DUMMY_FIELD,
+            Messages.Pref_People_Label_DefaultDataTransferFilePath,
+            parent);
+      _rawDataPathEditor.setEmptyStringAllowed(true);
+      _rawDataPathEditor.setValidateStrategy(StringFieldEditor.VALIDATE_ON_KEY_STROKE);
 
-		final Label lblPath = _rawDataPathEditor.getLabelControl(parent);
-		lblPath.setToolTipText(Messages.Pref_People_Label_DefaultDataTransferFilePath_Tooltip);
+      final Label lblPath = _rawDataPathEditor.getLabelControl(parent);
+      lblPath.setToolTipText(Messages.Pref_People_Label_DefaultDataTransferFilePath_Tooltip);
 
-		_txtRawDataPath = _rawDataPathEditor.getTextControl(parent);
-		_txtRawDataPath.addModifyListener(_defaultModifyListener);
-	}
+      _txtRawDataPath = _rawDataPathEditor.getTextControl(parent);
+      _txtRawDataPath.addModifyListener(_defaultModifyListener);
+   }
 
-	private void defineAllColumns(final TableColumnLayout tableLayout) {
+   private void defineAllColumns(final TableColumnLayout tableLayout) {
 
-		TableViewerColumn tvc;
-		TableColumn tc;
+      TableViewerColumn tvc;
+      TableColumn tc;
 
-		/*
-		 * column: first name
-		 */
-		tvc = new TableViewerColumn(_peopleViewer, SWT.LEAD);
-		tc = tvc.getColumn();
-		tc.setText(Messages.Pref_People_Column_first_name);
-		tvc.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				cell.setText(((TourPerson) cell.getElement()).getFirstName());
-			}
-		});
-		tableLayout.setColumnData(tc, new ColumnWeightData(5, convertWidthInCharsToPixels(5)));
+      /*
+       * column: first name
+       */
+      tvc = new TableViewerColumn(_peopleViewer, SWT.LEAD);
+      tc = tvc.getColumn();
+      tc.setText(Messages.Pref_People_Column_first_name);
+      tvc.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+            cell.setText(((TourPerson) cell.getElement()).getFirstName());
+         }
+      });
+      tableLayout.setColumnData(tc, new ColumnWeightData(5, convertWidthInCharsToPixels(5)));
 
-		/*
-		 * column: last name
-		 */
-		tvc = new TableViewerColumn(_peopleViewer, SWT.LEAD);
-		tc = tvc.getColumn();
-		tc.setText(Messages.Pref_People_Column_last_name);
-		tvc.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				cell.setText(((TourPerson) cell.getElement()).getLastName());
-			}
-		});
-		tableLayout.setColumnData(tc, new ColumnWeightData(5, convertWidthInCharsToPixels(5)));
+      /*
+       * column: last name
+       */
+      tvc = new TableViewerColumn(_peopleViewer, SWT.LEAD);
+      tc = tvc.getColumn();
+      tc.setText(Messages.Pref_People_Column_last_name);
+      tvc.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+            cell.setText(((TourPerson) cell.getElement()).getLastName());
+         }
+      });
+      tableLayout.setColumnData(tc, new ColumnWeightData(5, convertWidthInCharsToPixels(5)));
 
-		/*
-		 * column: birth day
-		 */
-		tvc = new TableViewerColumn(_peopleViewer, SWT.TRAIL);
-		tc = tvc.getColumn();
-		tc.setText(Messages.Pref_People_Column_Birthday);
-		tvc.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
+      /*
+       * column: birth day
+       */
+      tvc = new TableViewerColumn(_peopleViewer, SWT.TRAIL);
+      tc = tvc.getColumn();
+      tc.setText(Messages.Pref_People_Column_Birthday);
+      tvc.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
 
-				final long birthDayValue = ((TourPerson) cell.getElement()).getBirthDay();
+            final long birthDayValue = ((TourPerson) cell.getElement()).getBirthDay();
 
-				if (birthDayValue == 0) {
-					cell.setText(UI.EMPTY_STRING);
-				} else {
-					cell.setText(TimeTools.getZonedDateTime(birthDayValue).format(TimeTools.Formatter_Date_S));
-				}
-			}
-		});
-		tableLayout.setColumnData(tc, new ColumnWeightData(5, convertWidthInCharsToPixels(5)));
+            if (birthDayValue == 0) {
+               cell.setText(UI.EMPTY_STRING);
+            } else {
+               cell.setText(TimeTools.getZonedDateTime(birthDayValue).format(TimeTools.Formatter_Date_S));
+            }
+         }
+      });
+      tableLayout.setColumnData(tc, new ColumnWeightData(5, convertWidthInCharsToPixels(5)));
 
-		/*
-		 * column: device
-		 */
-		tvc = new TableViewerColumn(_peopleViewer, SWT.LEAD);
-		tc = tvc.getColumn();
-		tc.setText(Messages.Pref_People_Column_device);
-		tvc.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
+      /*
+       * column: device
+       */
+      tvc = new TableViewerColumn(_peopleViewer, SWT.LEAD);
+      tc = tvc.getColumn();
+      tc.setText(Messages.Pref_People_Column_device);
+      tvc.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
 
-				final TourPerson tourPerson = (TourPerson) cell.getElement();
-				final String deviceId = tourPerson.getDeviceReaderId();
+            final TourPerson tourPerson = (TourPerson) cell.getElement();
+            final String deviceId = tourPerson.getDeviceReaderId();
 
-				if (deviceId != null) {
-					for (final ExternalDevice device : _deviceList) {
-						if (device != null && deviceId.equals(device.deviceId)) {
-							cell.setText(device.visibleName);
-							return;
-						}
-					}
-				}
+            if (deviceId != null) {
+               for (final ExternalDevice device : _deviceList) {
+                  if (device != null && deviceId.equals(device.deviceId)) {
+                     cell.setText(device.visibleName);
+                     return;
+                  }
+               }
+            }
 
-				cell.setText(UI.EMPTY_STRING);
-			}
-		});
-		tableLayout.setColumnData(tc, new ColumnWeightData(4, convertWidthInCharsToPixels(4)));
+            cell.setText(UI.EMPTY_STRING);
+         }
+      });
+      tableLayout.setColumnData(tc, new ColumnWeightData(4, convertWidthInCharsToPixels(4)));
 
-		/*
-		 * column: height
-		 */
-		tvc = new TableViewerColumn(_peopleViewer, SWT.TRAIL);
-		tc = tvc.getColumn();
-		tc.setText(Messages.Pref_People_Column_height);
-		tvc.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				final float height = ((TourPerson) cell.getElement()).getHeight();
-				cell.setText(_nf2.format(height));
-			}
-		});
-		tableLayout.setColumnData(tc, new ColumnPixelData(convertHorizontalDLUsToPixels(6 * 4), true));
+      /*
+       * column: height
+       */
+      tvc = new TableViewerColumn(_peopleViewer, SWT.TRAIL);
+      tc = tvc.getColumn();
+      tc.setText(Messages.Pref_People_Column_height);
+      tvc.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+            final float height = ((TourPerson) cell.getElement()).getHeight();
+            cell.setText(_nf2.format(height));
+         }
+      });
+      tableLayout.setColumnData(tc, new ColumnPixelData(convertHorizontalDLUsToPixels(6 * 4), true));
 
-		/*
-		 * column: weight
-		 */
-		tvc = new TableViewerColumn(_peopleViewer, SWT.TRAIL);
-		tc = tvc.getColumn();
-		tc.setText(Messages.Pref_People_Column_weight);
-		tvc.setLabelProvider(new CellLabelProvider() {
-			@Override
-			public void update(final ViewerCell cell) {
-				final float weight = ((TourPerson) cell.getElement()).getWeight();
-				cell.setText(_nf1.format(weight));
-			}
-		});
-		tableLayout.setColumnData(tc, new ColumnPixelData(convertHorizontalDLUsToPixels(7 * 4), true));
-	}
+      /*
+       * column: weight
+       */
+      tvc = new TableViewerColumn(_peopleViewer, SWT.TRAIL);
+      tc = tvc.getColumn();
+      tc.setText(Messages.Pref_People_Column_weight);
+      tvc.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+            final float weight = ((TourPerson) cell.getElement()).getWeight();
+            cell.setText(_nf1.format(weight));
+         }
+      });
+      tableLayout.setColumnData(tc, new ColumnPixelData(convertHorizontalDLUsToPixels(7 * 4), true));
+   }
 
-	@Override
-	public void dispose() {
+   @Override
+   public void dispose() {
 
-		disposeHrZoneColors();
+      disposeHrZoneColors();
 
-		if (_prefChangeListener != null) {
-			_prefStore.removePropertyChangeListener(_prefChangeListener);
-		}
+      if (_prefChangeListener != null) {
+         _prefStore.removePropertyChangeListener(_prefChangeListener);
+      }
 
-		if (_isNoUI) {
-			super.dispose();
-			return;
-		}
+      if (_isNoUI) {
+         super.dispose();
+         return;
+      }
 
-		super.dispose();
-	}
+      super.dispose();
+   }
 
-	private void disposeHrZoneColors() {
+   private void disposeHrZoneColors() {
 
-		if (_hrZoneColors == null) {
-			return;
-		}
+      if (_hrZoneColors == null) {
+         return;
+      }
 
-		for (final Color hrZoneColor : _hrZoneColors) {
-			hrZoneColor.dispose();
-		}
-	}
+      for (final Color hrZoneColor : _hrZoneColors) {
+         hrZoneColor.dispose();
+      }
+   }
 
-	private void enableActions() {
+   private void enableActions() {
 
-		final boolean isValid = isPersonValid();
+      final boolean isValid = isPersonValid();
 
-		boolean isHrZoneAvailable = false;
-		final TourPerson currentPerson = getCurrentPerson();
+      boolean isHrZoneAvailable = false;
+      final TourPerson currentPerson = getCurrentPerson();
 
-		if (currentPerson != null) {
-			isHrZoneAvailable = currentPerson.getHrZonesSorted().size() > 0;
-		}
+      if (currentPerson != null) {
+         isHrZoneAvailable = currentPerson.getHrZonesSorted().size() > 0;
+      }
 
-		_btnAddPerson.setEnabled(!_isPersonModified && isValid);
-		_peopleViewer.getTable().setEnabled(!_isPersonModified && isValid);
+      _btnAddPerson.setEnabled(!_isPersonModified && isValid);
+      _peopleViewer.getTable().setEnabled(!_isPersonModified && isValid);
 
-		_btnSavePerson.setEnabled(_isPersonModified && isValid);
-		_btnCancel.setEnabled(_isPersonModified);
+      _btnSavePerson.setEnabled(_isPersonModified && isValid);
+      _btnCancel.setEnabled(_isPersonModified);
 
-		_spinnerMaxHR.setEnabled(getSelectedHrMaxFormulaKey() == TrainingManager.HR_MAX_NOT_COMPUTED);
+      _spinnerMaxHR.setEnabled(getSelectedHrMaxFormulaKey() == TrainingManager.HR_MAX_NOT_COMPUTED);
 
-		_btnModifyHrZones.setEnabled(isHrZoneAvailable);
+      _btnModifyHrZones.setEnabled(isHrZoneAvailable);
 //		_btnComputeHrZonesForAllTours.setEnabled(_isPersonModified && isValid);
-		_btnComputeHrZonesForAllTours.setEnabled(_isPersonModified == false);
-	}
+      _btnComputeHrZonesForAllTours.setEnabled(_isPersonModified == false);
+   }
 
-	private void fireModifyEvent() {
+   private void fireModifyEvent() {
 
-		if (_isFireModifyEvent) {
+      if (_isFireModifyEvent) {
 
-			TourManager.getInstance().clearTourDataCache();
+         TourManager.getInstance().clearTourDataCache();
 
-			// fire event that person is modified
-			getPreferenceStore().setValue(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED, Math.random());
+         // fire event that person is modified
+         getPreferenceStore().setValue(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED, Math.random());
 
-			_isFireModifyEvent = false;
-		}
-	}
+         _isFireModifyEvent = false;
+      }
+   }
 
-	private ZonedDateTime getBirthdayFromUI() {
+   private ZonedDateTime getBirthdayFromUI() {
 
-		return ZonedDateTime.of(
-				_dtBirthday.getYear(),
-				_dtBirthday.getMonth() + 1,
-				_dtBirthday.getDay(),
-				0,
-				0,
-				0,
-				0,
-				TimeTools.getDefaultTimeZone());
-	}
+      return ZonedDateTime.of(
+            _dtBirthday.getYear(),
+            _dtBirthday.getMonth() + 1,
+            _dtBirthday.getDay(),
+            0,
+            0,
+            0,
+            0,
+            TimeTools.getDefaultTimeZone());
+   }
 
-	/**
-	 * @return Returns person which is currently displayed, one person is at least available therefor
-	 *         this should never return <code>null</code> but it can be <code>null</code> when the
-	 *         application is started the first time and people are not yet created.
-	 */
-	private TourPerson getCurrentPerson() {
+   /**
+    * @return Returns person which is currently displayed, one person is at least available therefor
+    *         this should never return <code>null</code> but it can be <code>null</code> when the
+    *         application is started the first time and people are not yet created.
+    */
+   private TourPerson getCurrentPerson() {
 
-		final boolean isNewPerson = _newPerson != null;
-		return isNewPerson ? _newPerson : _selectedPerson;
-	}
+      final boolean isNewPerson = _newPerson != null;
+      return isNewPerson ? _newPerson : _selectedPerson;
+   }
 
-	/**
-	 * @return Returns the key for the selected HR max formula in the combo box.
-	 */
-	private int getSelectedHrMaxFormulaKey() {
+   /**
+    * @return Returns the key for the selected HR max formula in the combo box.
+    */
+   private int getSelectedHrMaxFormulaKey() {
 
-		int selectedIndex = _cboHrMaxFormula.getSelectionIndex();
+      int selectedIndex = _cboHrMaxFormula.getSelectionIndex();
 
-		if (selectedIndex == -1) {
-			selectedIndex = 0;
-			_cboHrMaxFormula.select(0);
-		}
+      if (selectedIndex == -1) {
+         selectedIndex = 0;
+         _cboHrMaxFormula.select(0);
+      }
 
-		return TrainingManager.HRMaxFormulaKeys[selectedIndex];
-	}
+      return TrainingManager.HRMaxFormulaKeys[selectedIndex];
+   }
 
-	@Override
-	public void init(final IWorkbench workbench) {
-		setPreferenceStore(_prefStore);
-		noDefaultAndApplyButton();
-	}
+   @Override
+   public void init(final IWorkbench workbench) {
+      setPreferenceStore(_prefStore);
+      noDefaultAndApplyButton();
+   }
 
-	private void initUI(final Composite parent) {
+   private void initUI(final Composite parent) {
 
-		initializeDialogUnits(parent);
+      initializeDialogUnits(parent);
 
-		_fontItalic = JFaceResources.getFontRegistry().getItalic(JFaceResources.DIALOG_FONT);
+      _fontItalic = JFaceResources.getFontRegistry().getItalic(JFaceResources.DIALOG_FONT);
 
-		_defaultSelectionListener = new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onModifyPerson();
-			}
-		};
+      _defaultSelectionListener = new SelectionAdapter() {
+         @Override
+         public void widgetSelected(final SelectionEvent e) {
+            onModifyPerson();
+         }
+      };
 
-		_defaultModifyListener = new ModifyListener() {
-			@Override
-			public void modifyText(final ModifyEvent e) {
-				onModifyPerson();
-			}
-		};
+      _defaultModifyListener = new ModifyListener() {
+         @Override
+         public void modifyText(final ModifyEvent e) {
+            onModifyPerson();
+         }
+      };
 
-		_hrZoneMouseListener = new MouseListener() {
+      _hrZoneMouseListener = new MouseListener() {
 
-			@Override
-			public void mouseDoubleClick(final MouseEvent e) {
-				onEditHrZones();
-			}
+         @Override
+         public void mouseDoubleClick(final MouseEvent e) {
+            onEditHrZones();
+         }
 
-			@Override
-			public void mouseDown(final MouseEvent e) {}
+         @Override
+         public void mouseDown(final MouseEvent e) {}
 
-			@Override
-			public void mouseUp(final MouseEvent e) {}
-		};
+         @Override
+         public void mouseUp(final MouseEvent e) {}
+      };
 
-		createDeviceList();
-	}
+      createDeviceList();
+   }
 
-	/**
-	 * @return Returns <code>true</code> when person is valid, otherwise <code>false</code>.
-	 */
-	private boolean isPersonValid() {
+   /**
+    * @return Returns <code>true</code> when person is valid, otherwise <code>false</code>.
+    */
+   private boolean isPersonValid() {
 
-		if (_txtFirstName.getText().trim().equals(UI.EMPTY_STRING)) {
+      if (_txtFirstName.getText().trim().equals(UI.EMPTY_STRING)) {
 
-			setErrorMessage(Messages.Pref_People_Error_first_name_is_required);
+         setErrorMessage(Messages.Pref_People_Error_first_name_is_required);
 
-			// don't set focus because another field could be edited
+         // don't set focus because another field could be edited
 //			_txtFirstName.setFocus();
 
-			return false;
+         return false;
 
-		} else {
+      } else {
 
-			final String transferPath = _rawDataPathEditor.getStringValue().trim();
+         final String transferPath = _rawDataPathEditor.getStringValue().trim();
 
-			if (!transferPath.equals(UI.EMPTY_STRING) && Util.isDirectory(transferPath) == false) {
+         if (!transferPath.equals(UI.EMPTY_STRING) && Util.isDirectory(transferPath) == false) {
 
-				setErrorMessage(Messages.Pref_People_Error_path_is_invalid);
+            setErrorMessage(Messages.Pref_People_Error_path_is_invalid);
 
-				return false;
-			}
-		}
+            return false;
+         }
+      }
 
-		setErrorMessage(null);
+      setErrorMessage(null);
 
-		return true;
-	}
+      return true;
+   }
 
-	@Override
-	public boolean okToLeave() {
+   @Override
+   public boolean okToLeave() {
 
-		if (_isNoUI) {
-			super.okToLeave();
-			return true;
-		}
+      if (_isNoUI) {
+         super.okToLeave();
+         return true;
+      }
 
-		if (isPersonValid() == false) {
-			return false;
-		}
+      if (isPersonValid() == false) {
+         return false;
+      }
 
-		saveState();
-		savePerson(true, true);
+      saveState();
+      savePerson(true, true);
 
-		// enable action because the user can go back to this pref page
-		enableActions();
+      // enable action because the user can go back to this pref page
+      enableActions();
 
-		if (updateToursWithModifiedHrZones() == false) {
-			return false;
-		}
+      if (updateToursWithModifiedHrZones() == false) {
+         return false;
+      }
 
-		return super.okToLeave();
-	}
+      return super.okToLeave();
+   }
 
-	private void onAddPerson() {
+   private void onAddPerson() {
 
-		_newPerson = createDefaultPerson();
-		_isPersonModified = true;
+      _newPerson = createDefaultPerson();
+      _isPersonModified = true;
 
-		updateUIFromPerson(_newPerson);
-		enableActions();
+      updateUIFromPerson(_newPerson);
+      enableActions();
 
-		// edit first name
-		_tabFolderPerson.setSelection(0);
-		_txtFirstName.selectAll();
-		_txtFirstName.setFocus();
-	}
+      // edit first name
+      _tabFolderPerson.setSelection(0);
+      _txtFirstName.selectAll();
+      _txtFirstName.setFocus();
+   }
 
-	private void onCancelPerson() {
+   private void onCancelPerson() {
 
-		_newPerson = null;
-		_isPersonModified = false;
+      _newPerson = null;
+      _isPersonModified = false;
 
-		if (_backupSelectedPersonHrZones != null) {
-			_selectedPerson.setHrZones(_backupSelectedPersonHrZones);
-		}
+      if (_backupSelectedPersonHrZones != null) {
+         _selectedPerson.setHrZones(_backupSelectedPersonHrZones);
+      }
 
-		updateUIFromPerson(_selectedPerson);
-		enableActions();
+      updateUIFromPerson(_selectedPerson);
+      enableActions();
 
-		_peopleViewer.getTable().setFocus();
-	}
+      _peopleViewer.getTable().setFocus();
+   }
 
-	private void onCreateHrZonesFromTemplate() {
+   private void onCreateHrZonesFromTemplate() {
 
-		final int selectedTemplate = _cboTemplate.getSelectionIndex();
+      final int selectedTemplate = _cboTemplate.getSelectionIndex();
 
-		// reselect first item
-		_cboTemplate.select(TrainingManager.HR_ZONE_TEMPLATE_00);
+      // reselect first item
+      _cboTemplate.select(TrainingManager.HR_ZONE_TEMPLATE_00);
 
-		if (selectedTemplate == TrainingManager.HR_ZONE_TEMPLATE_00) {
-			// just ignore it
-			return;
-		}
+      if (selectedTemplate == TrainingManager.HR_ZONE_TEMPLATE_00) {
+         // just ignore it
+         return;
+      }
 
-		final TourPerson person = getCurrentPerson();
-		final ArrayList<TourPersonHRZone> hrZones = person.getHrZonesSorted();
+      final TourPerson person = getCurrentPerson();
+      final ArrayList<TourPersonHRZone> hrZones = person.getHrZonesSorted();
 
-		// check if hr zones are already available
+      // check if hr zones are already available
 //		if (hrZones != null && hrZones.size() > 0) {
 //
 //			// hr zones are availabe
@@ -1843,478 +1860,480 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 //			}
 //		}
 
-		if (_backupSelectedPersonHrZones == null) {
-			_backupSelectedPersonHrZones = cloneHrZones(hrZones);
-		}
+      if (_backupSelectedPersonHrZones == null) {
+         _backupSelectedPersonHrZones = cloneHrZones(hrZones);
+      }
 
-		person.setHrZones(TrainingManager.createHrZones(person, selectedTemplate));
+      person.setHrZones(TrainingManager.createHrZones(person, selectedTemplate));
 
-		onEditHrZonesIsOK(person);
-	}
+      onEditHrZonesIsOK(person);
+   }
 
-	private void onEditHrZones() {
+   private void onEditHrZones() {
 
-		/*
-		 * valication must be checked because the dialog can save the person and therefor the person
-		 * must be valid
-		 */
-		if (isPersonValid() == false) {
-			return;
-		}
+      /*
+       * validation must be checked because the dialog can save the person and therefore the person
+       * must be valid
+       */
+      if (isPersonValid() == false) {
+         return;
+      }
 
-		final TourPerson person = getCurrentPerson();
+      final TourPerson person = getCurrentPerson();
 
-		if (_backupSelectedPersonHrZones == null) {
-			_backupSelectedPersonHrZones = cloneHrZones(person.getHrZonesSorted());
-		}
+      if (_backupSelectedPersonHrZones == null) {
+         _backupSelectedPersonHrZones = cloneHrZones(person.getHrZonesSorted());
+      }
 
-		if (new DialogHRZones(getShell(), person).open() == Window.OK) {
-			onEditHrZonesIsOK(person);
-		}
-	}
+      if (new DialogHRZones(getShell(), person).open() == Window.OK) {
+         onEditHrZonesIsOK(person);
+      }
+   }
 
-	private void onEditHrZonesIsOK(final TourPerson person) {
+   private void onEditHrZonesIsOK(final TourPerson person) {
 
-		_isHrZoneModified = true;
+      _isHrZoneModified = true;
 
-		final int hrMaxFormulaKey = person.getHrMaxFormula();
-		final int maxPulse = person.getMaxPulse();
+      final int hrMaxFormulaKey = person.getHrMaxFormula();
+      final int maxPulse = person.getMaxPulse();
 
-		createUI_80_HrZone_InnerContainer(hrMaxFormulaKey, maxPulse, getBirthdayFromUI());
-		onModifyPerson();
-	}
+      createUI_80_HrZone_InnerContainer(hrMaxFormulaKey, maxPulse, getBirthdayFromUI());
+      onModifyPerson();
+   }
 
-	/**
-	 * set person modified and enable actions accordingly
-	 */
-	private void onModifyPerson() {
+   /**
+    * set person modified and enable actions accordingly
+    */
+   private void onModifyPerson() {
 
-		if (_isUpdateUI) {
-			return;
-		}
+      if (_isUpdateUI) {
+         return;
+      }
 
-		_isPersonModified = true;
+      _isPersonModified = true;
 
-		enableActions();
-	}
+      enableActions();
+   }
 
-	private void onSavePerson() {
+   private void onSavePerson() {
 
-		if (isPersonValid() == false) {
-			return;
-		}
+      if (isPersonValid() == false) {
+         return;
+      }
 
-		savePerson(false, false);
-		enableActions();
+      savePerson(false, false);
+      enableActions();
 
-		_peopleViewer.getTable().setFocus();
-	}
+      _peopleViewer.getTable().setFocus();
+   }
 
-	private void onSelectPerson() {
+   private void onSelectPerson() {
 
-		final IStructuredSelection selection = (IStructuredSelection) _peopleViewer.getSelection();
-		final TourPerson person = (TourPerson) selection.getFirstElement();
+      final IStructuredSelection selection = (IStructuredSelection) _peopleViewer.getSelection();
+      final TourPerson person = (TourPerson) selection.getFirstElement();
 
-		if (person != null) {
+      if (person != null) {
 
-			_selectedPerson = person;
+         _selectedPerson = person;
 
-			_backupSelectedPersonHrZones = null;
+         _backupSelectedPersonHrZones = null;
 
-			updateUIFromPerson(_selectedPerson);
+         updateUIFromPerson(_selectedPerson);
 
-		} else {
-			// irgnore, this can happen when a refresh() of the table viewer is done
-		}
+      } else {
+         // ignore, this can happen when a refresh() of the table viewer is done
+      }
 
-		enableActions();
-	}
+      enableActions();
+   }
 
-	@Override
-	public boolean performCancel() {
+   @Override
+   public boolean performCancel() {
 
-		if (_isNoUI) {
-			super.performCancel();
-			return true;
-		}
+      if (_isNoUI) {
+         super.performCancel();
+         return true;
+      }
 
-		if (_isPersonModified && _newPerson == null) {
+      if (_isPersonModified && _newPerson == null) {
 
-			// existing person is modified, reset hr zones
+         // existing person is modified, reset hr zones
 
-			if (_backupSelectedPersonHrZones != null) {
-				_selectedPerson.setHrZones(_backupSelectedPersonHrZones);
-			}
-		}
+         if (_backupSelectedPersonHrZones != null) {
+            _selectedPerson.setHrZones(_backupSelectedPersonHrZones);
+         }
+      }
 
-		saveState();
-		fireModifyEvent();
-
-		if (updateToursWithModifiedHrZones() == false) {
-			return false;
-		}
+      saveState();
+      fireModifyEvent();
+
+      if (updateToursWithModifiedHrZones() == false) {
+         return false;
+      }
 
-		return super.performCancel();
-	}
+      return super.performCancel();
+   }
 
-	@Override
-	public boolean performOk() {
+   @Override
+   public boolean performOk() {
 
-		if (_isNoUI) {
-			super.performOk();
-			return true;
-		}
+      if (_isNoUI) {
+         super.performOk();
+         return true;
+      }
 
-		if (performOK10() == false) {
-			return false;
-		}
+      if (performOK10() == false) {
+         return false;
+      }
 
-		return super.performOk();
-	}
+      return super.performOk();
+   }
 
-	private boolean performOK10() {
+   private boolean performOK10() {
 
-		if (isPersonValid() == false) {
-			return false;
-		}
+      if (isPersonValid() == false) {
+         return false;
+      }
 
-		savePerson(false, false);
+      savePerson(false, false);
 
-		/*
-		 * update UI because it's possible that other dialog boxes are displayed before the pref
-		 * dialog is closed
-		 */
-		enableActions();
+      /*
+       * update UI because it's possible that other dialog boxes are displayed before the pref
+       * dialog is closed
+       */
+      enableActions();
 
-		saveState();
-		fireModifyEvent();
+      saveState();
+      fireModifyEvent();
 
-		if (updateToursWithModifiedHrZones() == false) {
-			return false;
-		}
+      if (updateToursWithModifiedHrZones() == false) {
+         return false;
+      }
 
-		return true;
-	}
+      return true;
+   }
 
-	private void restoreState() {
+   private void restoreState() {
 
-		/*
-		 * selected person
-		 */
-		final long personId = Util.getStateLong(_state, STATE_SELECTED_PERSON, -1);
-		StructuredSelection personSelection = null;
-		if (personId != -1) {
+      /*
+       * selected person
+       */
+      final long personId = Util.getStateLong(_state, STATE_SELECTED_PERSON, -1);
+      StructuredSelection personSelection = null;
+      if (personId != -1) {
 
-			for (final TourPerson person : _people) {
-				if (person.getPersonId() == personId) {
-					personSelection = new StructuredSelection(person);
-					break;
-				}
-			}
-		}
-		if (personSelection == null && _people.size() > 0) {
+         for (final TourPerson person : _people) {
+            if (person.getPersonId() == personId) {
+               personSelection = new StructuredSelection(person);
+               break;
+            }
+         }
+      }
+      if (personSelection == null && _people.size() > 0) {
 
-			/*
-			 * previous person could not be reselected, select first person, a person MUST always be
-			 * available since version 11.7
-			 */
+         /*
+          * previous person could not be reselected, select first person, a person MUST always be
+          * available since version 11.7
+          */
 
-			personSelection = new StructuredSelection(_peopleViewer.getTable().getItem(0).getData());
-		}
+         personSelection = new StructuredSelection(_peopleViewer.getTable().getItem(0).getData());
+      }
 
-		if (personSelection != null) {
-			_peopleViewer.setSelection(personSelection);
-		}
+      if (personSelection != null) {
+         _peopleViewer.setSelection(personSelection);
+      }
 
-		// reselected tab folder
-		_tabFolderPerson.setSelection(Util.getStateInt(_state, STATE_SELECTED_TAB_FOLDER, 0));
-	}
+      // reselected tab folder
+      _tabFolderPerson.setSelection(Util.getStateInt(_state, STATE_SELECTED_TAB_FOLDER, 0));
+   }
 
-	/**
-	 * @param isAskToSave
-	 * @param isRevert
-	 * @return Returns <code>false</code> when person is not saved, modifications will be reverted.
-	 */
-	private boolean savePerson(final boolean isAskToSave, final boolean isRevert) {
+   /**
+    * @param isAskToSave
+    * @param isRevert
+    * @return Returns <code>false</code> when person is not saved, modifications will be reverted.
+    */
+   private boolean savePerson(final boolean isAskToSave, final boolean isRevert) {
 
-		final boolean isNewPerson = _newPerson != null;
-		final TourPerson person = getCurrentPerson();
-		_newPerson = null;
+      final boolean isNewPerson = _newPerson != null;
+      final TourPerson person = getCurrentPerson();
+      _newPerson = null;
 
-		if (_isPersonModified) {
+      if (_isPersonModified) {
 
-			if (isAskToSave) {
+         if (isAskToSave) {
 
-				if (MessageDialog.openQuestion(
-						Display.getCurrent().getActiveShell(),
-						Messages.Pref_People_Dialog_SaveModifiedPerson_Title,
-						NLS.bind(Messages.Pref_People_Dialog_SaveModifiedPerson_Message,
+            if (MessageDialog.openQuestion(
+                  Display.getCurrent().getActiveShell(),
+                  Messages.Pref_People_Dialog_SaveModifiedPerson_Title,
+                  NLS.bind(Messages.Pref_People_Dialog_SaveModifiedPerson_Message,
 
-								// use name from the ui because it could be modified
-								_txtFirstName.getText())) == false) {
+                        // use name from the ui because it could be modified
+                        _txtFirstName.getText())) == false) {
 
-					// revert person
+               // revert person
 
-					if (isRevert) {
+               if (isRevert) {
 
-						// update state
-						_isPersonModified = false;
+                  // update state
+                  _isPersonModified = false;
 
-						// update ui from the previous selected person
-						if (_backupSelectedPersonHrZones != null) {
-							_selectedPerson.setHrZones(_backupSelectedPersonHrZones);
-						}
-						updateUIFromPerson(_selectedPerson);
-					}
+                  // update ui from the previous selected person
+                  if (_backupSelectedPersonHrZones != null) {
+                     _selectedPerson.setHrZones(_backupSelectedPersonHrZones);
+                  }
+                  updateUIFromPerson(_selectedPerson);
+               }
 
-					return false;
-				}
-			}
+               return false;
+            }
+         }
 
-			updatePersonFromUI(person);
-			person.persist();
+         updatePersonFromUI(person);
+         person.persist();
 
-			// .persist() updates the people list, the model, retrieve updated people list
-			_people = PersonManager.getTourPeople();
+         // .persist() updates the people list, the model, retrieve updated people list
+         _people = PersonManager.getTourPeople();
 
-			// update state
-			_isFireModifyEvent = true;
-			_isPersonModified = false;
+         // update state
+         _isFireModifyEvent = true;
+         _isPersonModified = false;
 
-			// update ui
-			if (isNewPerson) {
+         // update ui
+         if (isNewPerson) {
 //				_people.add(person);
-				_peopleViewer.add(person);
+            _peopleViewer.add(person);
 
-			} else {
-				// !!! refreshing a person do not resort the table when sorting has changed !!!
-				_peopleViewer.refresh();
-			}
+         } else {
+            // !!! refreshing a person do not resort the table when sorting has changed !!!
+            _peopleViewer.refresh();
+         }
 
-			if (_isHrZoneModified) {
-				// keep person which hr zone was modified
-				_peopleWithModifiedHrZones.put(person.getPersonId(), person);
-			}
+         if (_isHrZoneModified) {
+            // keep person which hr zone was modified
+            _peopleWithModifiedHrZones.put(person.getPersonId(), person);
+         }
 
-			_isHrZoneModified = false;
+         _isHrZoneModified = false;
 
-			// select updated/new person
-			_peopleViewer.setSelection(new StructuredSelection(person), true);
-		}
+         // select updated/new person
+         _peopleViewer.setSelection(new StructuredSelection(person), true);
+      }
 
-		return true;
-	}
+      return true;
+   }
 
-	private void saveState() {
+   private void saveState() {
 
-		// selected person
-		final Object firstElement = ((IStructuredSelection) _peopleViewer.getSelection()).getFirstElement();
-		if (firstElement instanceof TourPerson) {
-			_state.put(STATE_SELECTED_PERSON, ((TourPerson) firstElement).getPersonId());
-		}
+      // selected person
+      final Object firstElement = ((IStructuredSelection) _peopleViewer.getSelection()).getFirstElement();
+      if (firstElement instanceof TourPerson) {
+         _state.put(STATE_SELECTED_PERSON, ((TourPerson) firstElement).getPersonId());
+      }
 
-		// selected tab folder
-		final int selectedTab = _tabFolderPerson.getSelectionIndex();
-		_state.put(STATE_SELECTED_TAB_FOLDER, selectedTab < 0 ? 0 : selectedTab);
-	}
+      // selected tab folder
+      final int selectedTab = _tabFolderPerson.getSelectionIndex();
+      _state.put(STATE_SELECTED_TAB_FOLDER, selectedTab < 0 ? 0 : selectedTab);
+   }
 
-	private void updatePersonFromUI(final TourPerson person) {
+   private void updatePersonFromUI(final TourPerson person) {
 
-		String deviceId = null;
-		final int selectedIndex = _cboSportComputer.getSelectionIndex();
-		if (selectedIndex > 0) {
-			deviceId = _deviceList.get(selectedIndex).deviceId;
-		}
+      String deviceId = null;
+      final int selectedIndex = _cboSportComputer.getSelectionIndex();
+      if (selectedIndex > 0) {
+         deviceId = _deviceList.get(selectedIndex).deviceId;
+      }
 
-		/*
-		 * update person
-		 */
-		person.setFirstName(_txtFirstName.getText());
-		person.setLastName(_txtLastName.getText());
+      /*
+       * update person
+       */
+      person.setFirstName(_txtFirstName.getText());
+      person.setLastName(_txtLastName.getText());
 
-		person.setBirthDay(getBirthdayFromUI().toInstant().toEpochMilli());
-		person.setWeight(_spinnerWeight.getSelection() / 10.0f);
-		person.setHeight(_spinnerHeight.getSelection() / 100.0f);
+      person.setBirthDay(getBirthdayFromUI().toInstant().toEpochMilli());
+      person.setWeight(_spinnerWeight.getSelection() / 10.0f);
+      person.setHeight(_spinnerHeight.getSelection() / 100.0f);
 
-		person.setGender(_rdoGenderMale.getSelection() ? 0 : 1);
-		person.setRestPulse(_spinnerRestingHR.getSelection());
+      person.setGender(_rdoGenderMale.getSelection() ? 0 : 1);
+      person.setRestPulse(_spinnerRestingHR.getSelection());
 
-		person.setRawDataPath(_rawDataPathEditor.getStringValue());
-		person.setDeviceReaderId(deviceId);
+      person.setRawDataPath(_rawDataPathEditor.getStringValue());
+      person.setDeviceReaderId(deviceId);
 
-		// hr max formula
-		final int hrMaxSelectionIndex = _cboHrMaxFormula.getSelectionIndex();
-		person.setHrMaxFormula(TrainingManager.HRMaxFormulaKeys[hrMaxSelectionIndex]);
-		person.setMaxPulse(_spinnerMaxHR.getSelection());
-	}
+      // hr max formula
+      final int hrMaxSelectionIndex = _cboHrMaxFormula.getSelectionIndex();
+      person.setHrMaxFormula(TrainingManager.HRMaxFormulaKeys[hrMaxSelectionIndex]);
+      person.setMaxPulse(_spinnerMaxHR.getSelection());
+   }
 
-	/**
-	 * @return Return <code>true</code> when HR zones are not modified or when HR zones has been
-	 *         updated. Returns <code>false</code> when tour data update has been canceled.
-	 */
-	private boolean updateToursWithModifiedHrZones() {
+   /**
+    * @return Return <code>true</code> when HR zones are not modified or when HR zones has been
+    *         updated. Returns <code>false</code> when tour data update has been canceled.
+    */
+   private boolean updateToursWithModifiedHrZones() {
 
-		setErrorMessage(null);
+      setErrorMessage(null);
 
-		if (_peopleWithModifiedHrZones.size() == 0) {
-			return true;
-		}
+      if (_peopleWithModifiedHrZones.size() == 0) {
+         return true;
+      }
 
-		if (MessageDialog.openQuestion(
-				getShell(),
-				Messages.Compute_HrZones_Dialog_ComputeAllTours_Title,
-				Messages.Pref_People_Dialog_ComputeHrZonesForAllTours_Message)) {
+      if (MessageDialog.openQuestion(
+            getShell(),
+            Messages.Compute_HrZones_Dialog_ComputeAllTours_Title,
+            Messages.Pref_People_Dialog_ComputeHrZonesForAllTours_Message)) {
 
-			return computeHrZonesForAllTours(true);
-		}
+         return computeHrZonesForAllTours(true);
+      }
 
-		// user has canceled and the user is informed that hr zones can be inconsistent
-		return true;
-	}
+      // user has canceled and the user is informed that hr zones can be inconsistent
+      return true;
+   }
 
-	/**
-	 * @return Returns age from the birthday in the UI
-	 */
-	private int updateUIAge() {
+   /**
+    * @return Returns age from the birthday in the UI
+    */
+   private int updateUIAge() {
 
-		final Period age = Period.between(getBirthdayFromUI().toLocalDate(), _today.toLocalDate());
+      final Period age = Period.between(getBirthdayFromUI().toLocalDate(), _today.toLocalDate());
 
-		final int ageYears = age.getYears();
-		final String ageText = UI.SPACE + Integer.toString(ageYears) + UI.SPACE2 + Messages.Pref_People_Label_Years;
+      final int ageYears = age.getYears();
+      final String ageText = UI.SPACE + Integer.toString(ageYears) + UI.SPACE2 + Messages.Pref_People_Label_Years;
 
-		_lblAgePerson.setText(ageText);
-		_lblAgeHr.setText(ageText);
+      _lblAgePerson.setText(ageText);
+      _lblAgeHr.setText(ageText);
 
-		return ageYears;
-	}
+      return ageYears;
+   }
 
-	private void updateUIDeviceList() {
+   private void updateUIDeviceList() {
 
-		// add all devices to the combobox
-		for (final ExternalDevice device : _deviceList) {
-			if (device == null) {
-				_cboSportComputer.add(DeviceManager.DEVICE_IS_NOT_SELECTED);
-			} else {
-				_cboSportComputer.add(device.visibleName);
-			}
-		}
-	}
+      // add all devices to the combobox
+      for (final ExternalDevice device : _deviceList) {
+         if (device == null) {
+            _cboSportComputer.add(DeviceManager.DEVICE_IS_NOT_SELECTED);
+         } else {
+            _cboSportComputer.add(device.visibleName);
+         }
+      }
+   }
 
-	private void updateUIFromPerson(final TourPerson person) {
+   private void updateUIFromPerson(final TourPerson person) {
 
-		_isUpdateUI = true;
-		{
-			final ZonedDateTime dtBirthday = person.getBirthDayWithDefault();
-			final int gender = person.getGender();
-			final int restPulse = person.getRestPulse();
+      _isUpdateUI = true;
+      {
+         final ZonedDateTime dtBirthday = person.getBirthDayWithDefault();
+         final int gender = person.getGender();
+         final int restPulse = person.getRestPulse();
 
-			_txtFirstName.setText(person.getFirstName());
-			_txtLastName.setText(person.getLastName());
-			_dtBirthday.setDate(dtBirthday.getYear(), dtBirthday.getMonthValue() - 1, dtBirthday.getDayOfMonth());
-			_spinnerWeight.setSelection((int) (person.getWeight() * 10));
-			_spinnerHeight.setSelection((int) (person.getHeight() * 100));
-			_rawDataPathEditor.setStringValue(person.getRawDataPath());
-			_rdoGenderMale.setSelection(gender == 0);
-			_rdoGenderFemale.setSelection(gender != 0);
-			_spinnerRestingHR.setSelection(restPulse == 0 ? TourPerson.DEFAULT_REST_PULSE : restPulse);
+         _txtFirstName.setText(person.getFirstName());
+         _txtLastName.setText(person.getLastName());
+         _dtBirthday.setData(FIX_LINUX_ASYNC_EVENT_1, true);
+         _dtBirthday.setData(FIX_LINUX_ASYNC_EVENT_2, true);
+         _dtBirthday.setDate(dtBirthday.getYear(), dtBirthday.getMonthValue() - 1, dtBirthday.getDayOfMonth());
+         _spinnerWeight.setSelection((int) (person.getWeight() * 10));
+         _spinnerHeight.setSelection((int) (person.getHeight() * 100));
+         _rawDataPathEditor.setStringValue(person.getRawDataPath());
+         _rdoGenderMale.setSelection(gender == 0);
+         _rdoGenderFemale.setSelection(gender != 0);
+         _spinnerRestingHR.setSelection(restPulse == 0 ? TourPerson.DEFAULT_REST_PULSE : restPulse);
 
-			final int hrMaxFormulaKey = person.getHrMaxFormula();
-			final int maxPulse = person.getMaxPulse();
+         final int hrMaxFormulaKey = person.getHrMaxFormula();
+         final int maxPulse = person.getMaxPulse();
 
-			updateUIHrMax(hrMaxFormulaKey, maxPulse);
-			updateUISportComputer(person);
+         updateUIHrMax(hrMaxFormulaKey, maxPulse);
+         updateUISportComputer(person);
 
-			createUI_80_HrZone_InnerContainer(hrMaxFormulaKey, maxPulse, dtBirthday);
-		}
-		_isUpdateUI = false;
-	}
+         createUI_80_HrZone_InnerContainer(hrMaxFormulaKey, maxPulse, dtBirthday);
+      }
+      _isUpdateUI = false;
+   }
 
-	/**
-	 * hr max formula
-	 *
-	 * @param hrMaxFormulaKey
-	 * @param maxPulse
-	 */
-	private void updateUIHrMax(final int hrMaxFormulaKey, final int maxPulse) {
+   /**
+    * hr max formula
+    *
+    * @param hrMaxFormulaKey
+    * @param maxPulse
+    */
+   private void updateUIHrMax(final int hrMaxFormulaKey, final int maxPulse) {
 
-		final int age = updateUIAge();
-		final int hrMax = TourPerson.getHrMax(hrMaxFormulaKey, maxPulse, age);
+      final int age = updateUIAge();
+      final int hrMax = TourPerson.getHrMax(hrMaxFormulaKey, maxPulse, age);
 
-		if (hrMaxFormulaKey == TrainingManager.HR_MAX_NOT_COMPUTED) {
+      if (hrMaxFormulaKey == TrainingManager.HR_MAX_NOT_COMPUTED) {
 
-			// hr max is not computed
+         // hr max is not computed
 
-			_cboHrMaxFormula.select(TrainingManager.HRMaxFormulaKeys.length - 1);
-			_spinnerMaxHR.setSelection(maxPulse);
+         _cboHrMaxFormula.select(TrainingManager.HRMaxFormulaKeys.length - 1);
+         _spinnerMaxHR.setSelection(maxPulse);
 
-		} else {
+      } else {
 
-			int comboIndex = -1;
-			for (final int formulaKey : TrainingManager.HRMaxFormulaKeys) {
-				if (formulaKey == hrMaxFormulaKey) {
-					comboIndex = hrMaxFormulaKey;
-					break;
-				}
-			}
+         int comboIndex = -1;
+         for (final int formulaKey : TrainingManager.HRMaxFormulaKeys) {
+            if (formulaKey == hrMaxFormulaKey) {
+               comboIndex = hrMaxFormulaKey;
+               break;
+            }
+         }
 
-			if (comboIndex == -1) {
-				// set default value
-				comboIndex = 0;
-			}
+         if (comboIndex == -1) {
+            // set default value
+            comboIndex = 0;
+         }
 
-			_cboHrMaxFormula.select(comboIndex);
-			_spinnerMaxHR.setSelection(hrMax);
-		}
-	}
+         _cboHrMaxFormula.select(comboIndex);
+         _spinnerMaxHR.setSelection(hrMax);
+      }
+   }
 
-	/**
-	 * This method is called when variables are modified which influence the HR zones
-	 */
-	private void updateUIOnModifiedHrZones() {
+   /**
+    * This method is called when variables are modified which influence the HR zones
+    */
+   private void updateUIOnModifiedHrZones() {
 
-		final int selectedHrMaxFormulaKey = getSelectedHrMaxFormulaKey();
-		final int maxPulse = _spinnerMaxHR.getSelection();
+      final int selectedHrMaxFormulaKey = getSelectedHrMaxFormulaKey();
+      final int maxPulse = _spinnerMaxHR.getSelection();
 
-		updateUIHrMax(selectedHrMaxFormulaKey, maxPulse);
+      updateUIHrMax(selectedHrMaxFormulaKey, maxPulse);
 
-		getCurrentPerson().resetHrZones();
-		_isHrZoneModified = true;
+      getCurrentPerson().resetHrZones();
+      _isHrZoneModified = true;
 
-		// update modified bpm in hr zones
-		createUI_80_HrZone_InnerContainer(selectedHrMaxFormulaKey, maxPulse, getBirthdayFromUI());
+      // update modified bpm in hr zones
+      createUI_80_HrZone_InnerContainer(selectedHrMaxFormulaKey, maxPulse, getBirthdayFromUI());
 
-		onModifyPerson();
-	}
+      onModifyPerson();
+   }
 
-	/**
-	 * select device in the combo box
-	 */
-	private void updateUISportComputer(final TourPerson person) {
+   /**
+    * select device in the combo box
+    */
+   private void updateUISportComputer(final TourPerson person) {
 
-		final String deviceId = person.getDeviceReaderId();
+      final String deviceId = person.getDeviceReaderId();
 
-		if (deviceId == null) {
-			_cboSportComputer.select(0);
-		} else {
+      if (deviceId == null) {
+         _cboSportComputer.select(0);
+      } else {
 
-			int deviceIndex = 0;
+         int deviceIndex = 0;
 
-			for (final ExternalDevice device : _deviceList) {
+         for (final ExternalDevice device : _deviceList) {
 
-				if (device != null) {
-					if (deviceId.equals(device.deviceId)) {
-						_cboSportComputer.select(deviceIndex);
-						break;
-					}
-				}
+            if (device != null) {
+               if (deviceId.equals(device.deviceId)) {
+                  _cboSportComputer.select(deviceIndex);
+                  break;
+               }
+            }
 
-				deviceIndex++;
-			}
+            deviceIndex++;
+         }
 
-			// when the device id was not found, select "<no selection>" entry
-			if (deviceIndex == 0) {
-				_cboSportComputer.select(0);
-			}
-		}
-	}
+         // when the device id was not found, select "<no selection>" entry
+         if (deviceIndex == 0) {
+            _cboSportComputer.select(0);
+         }
+      }
+   }
 }

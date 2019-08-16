@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License along with 
+ *
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package de.byteholder.geoclipse.mapprovider;
 
@@ -25,352 +25,352 @@ import org.eclipse.osgi.util.NLS;
  * This is a wrapper for a map provider ({@link MP}) within a map profile ({@link MPProfile})
  */
 public class MPWrapper implements Cloneable {
- 
-	/**
-	 * unique id which identifies the map provider, this is a copy from the map provider
-	 */
-	private String						_mapProviderId;
-
-	private MP							_mp;
-
-	/**
-	 * position index is the sorting position within the map profile viewer
-	 */
-	private int							_positionIndex				= -1;
-
-	/**
-	 * is <code>true</code> when this map provider is displayed in a map profile
-	 */
-	private boolean						_isDisplayedInMap;
-
-	private ArrayList<LayerOfflineData>	_wmsOfflineLayerList;
-
-	/**
-	 * Contains the type of the map provider which is defined in
-	 * {@link MapProviderManager#MAP_PROVIDER_TYPE_xxx}
-	 */
-	private String						_type;
 
-	private boolean						_isEnabled					= true;
+   /**
+    * unique id which identifies the map provider, this is a copy from the map provider
+    */
+   private String                      _mapProviderId;
+
+   private MP                          _mp;
+
+   /**
+    * position index is the sorting position within the map profile viewer
+    */
+   private int                         _positionIndex            = -1;
+
+   /**
+    * is <code>true</code> when this map provider is displayed in a map profile
+    */
+   private boolean                     _isDisplayedInMap;
 
-	/**
-	 * alpha values for the map provider, 100 is opaque, 0 is transparent
-	 */
-	private int							_alpha						= 100;
+   private ArrayList<LayerOfflineData> _wmsOfflineLayerList;
 
-	private boolean						_isTransparentColors		= false;
-	private int[]						_transparentColor			= null;
+   /**
+    * Contains the type of the map provider which is defined in
+    * {@link MapProviderManager#MAP_PROVIDER_TYPE_xxx}
+    */
+   private String                      _type;
 
-	/**
-	 * when <code>true</code> the color black is transparent
-	 */
-	private boolean						_isBlackTransparent;
+   private boolean                     _isEnabled                = true;
 
-	private boolean						_isBrightnessForNextMp		= false;
-	private int							_brightnessValueForNextMp	= 82;
+   /**
+    * alpha values for the map provider, 100 is opaque, 0 is transparent
+    */
+   private int                         _alpha                    = 100;
 
-//	@SuppressWarnings("unused")
-//	private MPWrapper() {}
-
-	MPWrapper(final MP mapProvider) {
+   private boolean                     _isTransparentColors      = false;
+   private int[]                       _transparentColor         = null;
 
-		_mapProviderId = mapProvider.getId();
-
-		setMP(mapProvider);
-	}
-
-	MPWrapper(final String mapProviderId) {
-		_mapProviderId = mapProviderId;
-	}
-
-	@Override
-	protected Object clone() throws CloneNotSupportedException {
-
-		// clone wrapper
-		final MPWrapper clonedMpWrapper = (MPWrapper) super.clone();
-
-		// clone map provider
-		final MP clonedMP = (MP) _mp.clone();
-
-		clonedMpWrapper._mp = clonedMP;
-
-		return clonedMpWrapper;
-	}
-
-	@Override
-	public boolean equals(final Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (!(obj instanceof MPWrapper)) {
-			return false;
-		}
-		final MPWrapper other = (MPWrapper) obj;
-		if (_mapProviderId == null) {
-			if (other._mapProviderId != null) {
-				return false;
-			}
-		} else if (!_mapProviderId.equals(other._mapProviderId)) {
-			return false;
-		}
-		return true;
-	}
-
-	int getAlpha() {
-		return _alpha;
-	}
-
-	int getBrightnessValueForNextMp() {
-		return _brightnessValueForNextMp;
-	}
-
-	public String getMapProviderId() {
-		return _mapProviderId;
-	}
-
-	/**
-	 * @return Returns the map provider for the wrapper or <code>null</code> when it's not yet set
-	 */
-	public MP getMP() {
-
-		if (_mp == null) {
+   /**
+    * when <code>true</code> the color black is transparent
+    */
+   private boolean                     _isBlackTransparent;
 
-			// create map provider
-
-			final ArrayList<MP> allMp = MapProviderManager.getInstance().getAllMapProviders(false);
+   private boolean                     _isBrightnessForNextMp    = false;
+   private int                         _brightnessValueForNextMp = 82;
 
-			for (final MP mp : allMp) {
-				if (mp.getId().equalsIgnoreCase(_mapProviderId)) {
-					try {
+//   @SuppressWarnings("unused")
+//   private MPWrapper() {}
 
-						_mp = (MP) mp.clone();
-
-						MPProfile.updateMpFromWrapper(_mp, this);
-
-						break;
-
-					} catch (final CloneNotSupportedException e) {
-						StatusUtil.showStatus(e);
-					}
-				}
-			}
-
-			// check map provider
-			if (_mp == null) {
-				StatusUtil.showStatus(NLS.bind("A map provider cannot be created in the wrapper \"{0}\"",//$NON-NLS-1$
-						_mapProviderId), new Exception());
-			}
-		}
-
-		return _mp;
-	}
-
-	int getPositionIndex() {
-		return _positionIndex;
-	}
-
-	int[] getTransparentColors() {
-		return _transparentColor;
-	}
-
-	String getType() {
-		return _type;
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((_mapProviderId == null) ? 0 : _mapProviderId.hashCode());
-		return result;
-	}
-
-	boolean isBrightnessForNextMp() {
-		return _isBrightnessForNextMp;
-	}
-
-	public boolean isDisplayedInMap() {
-		return _isDisplayedInMap;
-	}
- 
-	/**
-	 * @return Returns <code>true</code> when this map provider can be used, <code>false</code> when
-	 *         a wms server is not available
-	 */
-	boolean isEnabled() {
-		return _isEnabled;
-	}
+   MPWrapper(final MP mapProvider) {
 
-	boolean isTransparentBlack() {
-		return _isBlackTransparent;
-	}
+      _mapProviderId = mapProvider.getId();
 
-	boolean isTransparentColors() {
-		return _isTransparentColors;
-	}
+      setMP(mapProvider);
+   }
 
-	void setAlpha(final int alpha) {
-		_alpha = alpha;
-	}
+   MPWrapper(final String mapProviderId) {
+      _mapProviderId = mapProviderId;
+   }
 
-	void setBrightnessForNextMp(final int brightnessValue) {
-		_brightnessValueForNextMp = brightnessValue;
-	}
+   @Override
+   protected Object clone() throws CloneNotSupportedException {
 
-	void setEnabled(final boolean isEnabled) {
-		_isEnabled = isEnabled;
-	}
+      // clone wrapper
+      final MPWrapper clonedMpWrapper = (MPWrapper) super.clone();
 
-	void setIsBrightnessForNextMp(final boolean isBrightness) {
+      // clone map provider
+      final MP clonedMP = (MP) _mp.clone();
+
+      clonedMpWrapper._mp = clonedMP;
 
-//		System.out.println("MPWrapper:setIsBrightnessForNextMp\t" + _mapProviderId + "\t" + isBrightness);
-//		// TODO remove SYSTEM.OUT.PRINTLN
+      return clonedMpWrapper;
+   }
 
-		_isBrightnessForNextMp = isBrightness;
-	}
+   @Override
+   public boolean equals(final Object obj) {
+      if (this == obj) {
+         return true;
+      }
+      if (obj == null) {
+         return false;
+      }
+      if (!(obj instanceof MPWrapper)) {
+         return false;
+      }
+      final MPWrapper other = (MPWrapper) obj;
+      if (_mapProviderId == null) {
+         if (other._mapProviderId != null) {
+            return false;
+         }
+      } else if (!_mapProviderId.equals(other._mapProviderId)) {
+         return false;
+      }
+      return true;
+   }
+
+   int getAlpha() {
+      return _alpha;
+   }
+
+   int getBrightnessValueForNextMp() {
+      return _brightnessValueForNextMp;
+   }
 
-	void setIsDisplayedInMap(final boolean isDisplayed) {
-		_isDisplayedInMap = isDisplayed;
-	}
+   public String getMapProviderId() {
+      return _mapProviderId;
+   }
 
-	void setIsTransparentBlack(final boolean isBlackTransparent) {
-		_isBlackTransparent = isBlackTransparent;
-	}
+   /**
+    * @return Returns the map provider for the wrapper or <code>null</code> when it's not yet set
+    */
+   public MP getMP() {
 
-	void setIsTransparentColors(final boolean isTransColors) {
-		_isTransparentColors = isTransColors;
-	}
+      if (_mp == null) {
 
-	/**
-	 * Sets a new factory id, this happens when it is modified in the UI
-	 * 
-	 * @param newFactoryId
-	 */
-	public void setMapProviderId(final String newFactoryId) {
-		_mapProviderId = newFactoryId;
-		_mp.setId(newFactoryId);
-	}
+         // create map provider
 
-	/**
-	 * Sets a map provider into the wrapper
-	 * 
-	 * @param newMP
-	 */
-	void setMP(final MP newMP) {
+         final ArrayList<MP> allMp = MapProviderManager.getInstance().getAllMapProviders(false);
 
-		final MP oldMapProvider = _mp;
-		_mp = newMP;
+         for (final MP mp : allMp) {
+            if (mp.getId().equalsIgnoreCase(_mapProviderId)) {
+               try {
 
-		if (newMP instanceof MPWms) {
+                  _mp = (MP) mp.clone();
 
-			final MPWms newWmsMapProvider = (MPWms) newMP;
-			final ArrayList<MtLayer> newMtLayers = newWmsMapProvider.getMtLayers();
+                  MPProfile.updateMpFromWrapper(_mp, this);
 
-			if (newMtLayers == null) {
-				// wms is not loaded
-				return;
-			}
+                  break;
+
+               } catch (final CloneNotSupportedException e) {
+                  StatusUtil.showStatus(e);
+               }
+            }
+         }
+
+         // check map provider
+         if (_mp == null) {
+            StatusUtil.showStatus(NLS.bind("A map provider cannot be created in the wrapper \"{0}\"", //$NON-NLS-1$
+                  _mapProviderId), new Exception());
+         }
+      }
+
+      return _mp;
+   }
+
+   int getPositionIndex() {
+      return _positionIndex;
+   }
+
+   int[] getTransparentColors() {
+      return _transparentColor;
+   }
+
+   String getType() {
+      return _type;
+   }
+
+   @Override
+   public int hashCode() {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + ((_mapProviderId == null) ? 0 : _mapProviderId.hashCode());
+      return result;
+   }
 
-			if (oldMapProvider instanceof MPWms) {
+   boolean isBrightnessForNextMp() {
+      return _isBrightnessForNextMp;
+   }
 
-				/*
-				 * copy layer state from old to new wms map provider
-				 */
+   public boolean isDisplayedInMap() {
+      return _isDisplayedInMap;
+   }
 
-				final MPWms oldWmsMapProvider = (MPWms) oldMapProvider;
-				final ArrayList<MtLayer> oldMtLayers = oldWmsMapProvider.getMtLayers();
+   /**
+    * @return Returns <code>true</code> when this map provider can be used, <code>false</code> when
+    *         a wms server is not available
+    */
+   boolean isEnabled() {
+      return _isEnabled;
+   }
 
-				if (oldMtLayers != null && newMtLayers != null) {
+   boolean isTransparentBlack() {
+      return _isBlackTransparent;
+   }
 
-					// update all new layers
-					for (final MtLayer newMtLayer : newMtLayers) {
+   boolean isTransparentColors() {
+      return _isTransparentColors;
+   }
 
-						// set default
-						newMtLayer.setIsDisplayedInMap(false);
-						newMtLayer.setPositionIndex(-1);
+   void setAlpha(final int alpha) {
+      _alpha = alpha;
+   }
 
-						final String newId = newMtLayer.getGeoLayer().getName();
+   void setBrightnessForNextMp(final int brightnessValue) {
+      _brightnessValueForNextMp = brightnessValue;
+   }
 
-						// search new layer within the old layers
-						for (final MtLayer oldMtLayer : oldMtLayers) {
+   void setEnabled(final boolean isEnabled) {
+      _isEnabled = isEnabled;
+   }
 
-							final String oldId = oldMtLayer.getGeoLayer().getName();
-							if (newId.equals(oldId)) {
+   void setIsBrightnessForNextMp(final boolean isBrightness) {
 
-								// set state from old layer into new layer
-								newMtLayer.setIsDisplayedInMap(oldMtLayer.isDisplayedInMap());
-								newMtLayer.setPositionIndex(oldMtLayer.getPositionIndex());
+//      System.out.println("MPWrapper:setIsBrightnessForNextMp\t" + _mapProviderId + "\t" + isBrightness);
+//      // TODO remove SYSTEM.OUT.PRINTLN
 
-								break;
-							}
-						}
-					}
-				}
+      _isBrightnessForNextMp = isBrightness;
+   }
 
-			} else if (_wmsOfflineLayerList != null) {
+   void setIsDisplayedInMap(final boolean isDisplayed) {
+      _isDisplayedInMap = isDisplayed;
+   }
 
-				/*
-				 * set layer state from offline data
-				 */
+   void setIsTransparentBlack(final boolean isBlackTransparent) {
+      _isBlackTransparent = isBlackTransparent;
+   }
 
-				for (final MtLayer newMtLayer : newMtLayers) {
+   void setIsTransparentColors(final boolean isTransColors) {
+      _isTransparentColors = isTransColors;
+   }
 
-					final String newName = newMtLayer.getGeoLayer().getName();
+   /**
+    * Sets a new factory id, this happens when it is modified in the UI
+    *
+    * @param newFactoryId
+    */
+   public void setMapProviderId(final String newFactoryId) {
+      _mapProviderId = newFactoryId;
+      _mp.setId(newFactoryId);
+   }
 
-					// search new layer within the offline layers
-					for (final LayerOfflineData offlineLayer : _wmsOfflineLayerList) {
+   /**
+    * Sets a map provider into the wrapper
+    *
+    * @param newMP
+    */
+   void setMP(final MP newMP) {
 
-						final String offlineName = offlineLayer.name;
-						if (offlineName.equalsIgnoreCase(newName)) {
+      final MP oldMapProvider = _mp;
+      _mp = newMP;
 
-							// update state
+      if (newMP instanceof MPWms) {
 
-							newMtLayer.setIsDisplayedInMap(offlineLayer.isDisplayedInMap);
-							newMtLayer.setPositionIndex(offlineLayer.position);
+         final MPWms newWmsMapProvider = (MPWms) newMP;
+         final ArrayList<MtLayer> newMtLayers = newWmsMapProvider.getMtLayers();
 
-							break;
-						}
-					}
-				}
+         if (newMtLayers == null) {
+            // wms is not loaded
+            return;
+         }
 
-			} else {
+         if (oldMapProvider instanceof MPWms) {
 
-				/*
-				 * set all layers to be not displayed
-				 */
+            /*
+             * copy layer state from old to new wms map provider
+             */
 
-//				for (final MtLayer newMtLayer : newMtLayers) {
-//					newMtLayer.setIsDisplayedInMap(false);
-//					newMtLayer.setPositionIndex(-1);
-//				}
-			}
-		}
+            final MPWms oldWmsMapProvider = (MPWms) oldMapProvider;
+            final ArrayList<MtLayer> oldMtLayers = oldWmsMapProvider.getMtLayers();
 
-		MPProfile.updateWrapperFromMp(this, _mp);
-	}
+            if (oldMtLayers != null && newMtLayers != null) {
 
-	void setPositionIndex(final int positionIndex) {
-		_positionIndex = positionIndex;
-	}
+               // update all new layers
+               for (final MtLayer newMtLayer : newMtLayers) {
 
-	void setTransparentColors(final int[] transColors) {
-		_transparentColor = transColors;
-	}
+                  // set default
+                  newMtLayer.setIsDisplayedInMap(false);
+                  newMtLayer.setPositionIndex(-1);
 
-	void setType(final String type) {
-		_type = type;
-	}
+                  final String newId = newMtLayer.getGeoLayer().getName();
 
-	void setWmsOfflineLayerList(final ArrayList<LayerOfflineData> wmsOfflineLayerList) {
-		_wmsOfflineLayerList = wmsOfflineLayerList;
-	}
+                  // search new layer within the old layers
+                  for (final MtLayer oldMtLayer : oldMtLayers) {
 
-	@Override
-	public String toString() {
-		return _mapProviderId + " pos:" + _positionIndex; //$NON-NLS-1$
-	}
+                     final String oldId = oldMtLayer.getGeoLayer().getName();
+                     if (newId.equals(oldId)) {
+
+                        // set state from old layer into new layer
+                        newMtLayer.setIsDisplayedInMap(oldMtLayer.isDisplayedInMap());
+                        newMtLayer.setPositionIndex(oldMtLayer.getPositionIndex());
+
+                        break;
+                     }
+                  }
+               }
+            }
+
+         } else if (_wmsOfflineLayerList != null) {
+
+            /*
+             * set layer state from offline data
+             */
+
+            for (final MtLayer newMtLayer : newMtLayers) {
+
+               final String newName = newMtLayer.getGeoLayer().getName();
+
+               // search new layer within the offline layers
+               for (final LayerOfflineData offlineLayer : _wmsOfflineLayerList) {
+
+                  final String offlineName = offlineLayer.name;
+                  if (offlineName.equalsIgnoreCase(newName)) {
+
+                     // update state
+
+                     newMtLayer.setIsDisplayedInMap(offlineLayer.isDisplayedInMap);
+                     newMtLayer.setPositionIndex(offlineLayer.position);
+
+                     break;
+                  }
+               }
+            }
+
+         } else {
+
+            /*
+             * set all layers to be not displayed
+             */
+
+//            for (final MtLayer newMtLayer : newMtLayers) {
+//               newMtLayer.setIsDisplayedInMap(false);
+//               newMtLayer.setPositionIndex(-1);
+//            }
+         }
+      }
+
+      MPProfile.updateWrapperFromMp(this, _mp);
+   }
+
+   void setPositionIndex(final int positionIndex) {
+      _positionIndex = positionIndex;
+   }
+
+   void setTransparentColors(final int[] transColors) {
+      _transparentColor = transColors;
+   }
+
+   void setType(final String type) {
+      _type = type;
+   }
+
+   void setWmsOfflineLayerList(final ArrayList<LayerOfflineData> wmsOfflineLayerList) {
+      _wmsOfflineLayerList = wmsOfflineLayerList;
+   }
+
+   @Override
+   public String toString() {
+      return _mapProviderId + " pos:" + _positionIndex; //$NON-NLS-1$
+   }
 
 }

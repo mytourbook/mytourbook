@@ -144,15 +144,15 @@ public class MapsforgeStyleParser {
 	 */
 	public static void main(String args[]) {
 		MapsforgeStyleParser mapStyleParser = new MapsforgeStyleParser();
-		List<MapsforgeThemeStyle> styles = mapStyleParser.readXML("C:\\Users\\top\\BTSync\\oruxmaps\\mapstyles\\TMS\\Tiramisu_3_0_beta1.xml"); //$NON-NLS-1$
-		//List<MapsforgeThemeStyle> styles = mapStyleParser.readXML("C:\\Users\\top\\BTSync\\oruxmaps\\mapstyles\\ELV4\\Elevate.xml");
+		//List<MapsforgeThemeStyle> styles = mapStyleParser.readXML("C:\\Users\\top\\BTSync\\oruxmaps\\mapstyles\\TMS\\Tiramisu_3_0_beta1.xml"); //$NON-NLS-1$
+		List<MapsforgeThemeStyle> styles = mapStyleParser.readXML("C:\\Users\\top\\BTSync\\oruxmaps\\mapstyles\\ELV4\\Elevate.xml"); //$NON-NLS-1$
 		System.out.println("Stylecount: " + styles.size()); //$NON-NLS-1$
 		System.out.println("Defaultlanguage: " + mapStyleParser.getDefaultLanguage()); //$NON-NLS-1$
 		System.out.println("Defaultstyle:    " + mapStyleParser.getDefaultStyle()); //$NON-NLS-1$
 		//System.out.println("Defaultstylename de:" + styles.);
 		for (MapsforgeThemeStyle style : styles) {
 			System.out.println(style);
-			System.out.println("local Name: " + style.getName("")); //$NON-NLS-1$ //$NON-NLS-2$
+			System.out.println("local Name: " + style.getName("de")); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 	}
 }

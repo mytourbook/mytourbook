@@ -23,6 +23,7 @@ import com.garmin.fit.SwimStroke;
 import java.util.List;
 
 import net.tourbook.data.SwimData;
+import net.tourbook.device.garmin.fit.FitData;
 
 /**
  * Set swim data

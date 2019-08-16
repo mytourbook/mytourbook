@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -23,168 +23,178 @@ import net.tourbook.data.TourType;
 
 public class ImportLauncher implements Cloneable {
 
-	public String					description						= UI.EMPTY_STRING;
-	public String					name							= UI.EMPTY_STRING;
+   private static long             _idCreator;
 
-	/**
-	 * When <code>null</code> then the tour type is not set.
-	 */
-	public Enum<TourTypeConfig>		tourTypeConfig;
+   public String                   description                   = UI.EMPTY_STRING;
+   public String                   name                          = UI.EMPTY_STRING;
 
-	public TourType					oneTourType;
+   /**
+    * When <code>null</code> then the tour type is not set.
+    */
+   public Enum<TourTypeConfig>     tourTypeConfig;
 
-	public ArrayList<SpeedTourType>	speedTourTypes					= new ArrayList<>();
+   public TourType                 oneTourType;
 
-	/** Contains the image hash or 0 when an image is not displayed. */
-	public int						imageHash;
+   public ArrayList<SpeedTourType> speedTourTypes                = new ArrayList<>();
 
-	public int						imageWidth;
+   /** Contains the image hash or 0 when an image is not displayed. */
+   public int                      imageHash;
 
-	/**
-	 * Show/hide this launcher in the dashboard.
-	 */
-	public boolean					isShowInDashboard				= true;
+   public int                      imageWidth;
 
-	/**
-	 * When <code>true</code> save the tour for the active person.
-	 */
-	public boolean					isSaveTour						= false;
+   /**
+    * Show/hide this launcher in the dashboard.
+    */
+   public boolean                  isShowInDashboard             = true;
 
-	/**
-	 * When <code>true</code> then the text of the last marker is set.
-	 */
-	public boolean					isSetLastMarker					= false;
+   /**
+    * When <code>true</code>, assigns a type to the tour.
+    */
+   public boolean                  isSetTourType                 = false;
 
-	/**
-	 * Last marker distance in meters.
-	 */
-	public int						lastMarkerDistance				= 0;
-	public String					lastMarkerText					= UI.EMPTY_STRING;
+   /**
+    * When <code>true</code> save the tour for the active person.
+    */
+   public boolean                  isSaveTour                    = false;
 
-	/**
-	 * When <code>true</code> then the tour start temperature is adjusted.
-	 */
-	public boolean					isAdjustTemperature				= false;
+   /**
+    * When <code>true</code> then the text of the last marker is set.
+    */
+   public boolean                  isSetLastMarker               = false;
+   /**
+    * Last marker distance in meters.
+    */
+   public int                      lastMarkerDistance            = 0;
 
-	/**
-	 * Duration in seconds during which the temperature is adjusted.
-	 */
-	public int						temperatureAdjustmentDuration	= EasyConfig.TEMPERATURE_ADJUSTMENT_DURATION_DEFAULT;
+   public String                   lastMarkerText                = UI.EMPTY_STRING;
 
-	/**
-	 * Temperature adjustment will be performed when the tour average temperature is below this
-	 * value.
-	 */
-	public float					tourAvgTemperature				= EasyConfig.TEMPERATURE_AVG_TEMPERATURE_DEFAULT;
+   /**
+    * When <code>true</code> then the tour start temperature is adjusted.
+    */
+   public boolean                  isAdjustTemperature           = false;
 
-	private long					_id;
+   /**
+    * When <code>true</code>, the weather data is saved in the tour.
+    */
+   public boolean                  isRetrieveWeatherData         = false;
 
-	private static long				_idCreator;
+   /**
+    * Duration in seconds during which the temperature is adjusted.
+    */
+   public int                      temperatureAdjustmentDuration = EasyConfig.TEMPERATURE_ADJUSTMENT_DURATION_DEFAULT;
 
-	public ImportLauncher() {
+   /**
+    * Temperature adjustment will be performed when the tour average temperature is below this
+    * value.
+    */
+   public float                    tourAvgTemperature            = EasyConfig.TEMPERATURE_AVG_TEMPERATURE_DEFAULT;
 
-		_id = ++_idCreator;
-	}
+   private long                    _id;
 
-	@Override
-	protected ImportLauncher clone() {
+   public ImportLauncher() {
 
-		ImportLauncher clonedObject = null;
+      _id = ++_idCreator;
+   }
 
-		try {
+   @Override
+   protected ImportLauncher clone() {
 
-			clonedObject = (ImportLauncher) super.clone();
+      ImportLauncher clonedObject = null;
 
-			clonedObject._id = ++_idCreator;
-			clonedObject.speedTourTypes = new ArrayList<>();
+      try {
 
-			for (final SpeedTourType speedVertex : speedTourTypes) {
-				clonedObject.speedTourTypes.add(speedVertex.clone());
-			}
+         clonedObject = (ImportLauncher) super.clone();
 
-		} catch (final CloneNotSupportedException e) {
-			StatusUtil.log(e);
-		}
+         clonedObject._id = ++_idCreator;
+         clonedObject.speedTourTypes = new ArrayList<>();
 
-		return clonedObject;
-	}
+         for (final SpeedTourType speedVertex : speedTourTypes) {
+            clonedObject.speedTourTypes.add(speedVertex.clone());
+         }
 
-	@Override
-	public boolean equals(final Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		final ImportLauncher other = (ImportLauncher) obj;
-		if (_id != other._id) {
-			return false;
-		}
-		return true;
-	}
+      } catch (final CloneNotSupportedException e) {
+         StatusUtil.log(e);
+      }
 
-	/**
-	 * @return Returns a unique id for this import tile.
-	 */
-	public long getId() {
-		return _id;
-	}
+      return clonedObject;
+   }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + (int) (_id ^ (_id >>> 32));
-		return result;
-	}
+   @Override
+   public boolean equals(final Object obj) {
+      if (this == obj) {
+         return true;
+      }
+      if (obj == null) {
+         return false;
+      }
+      if (getClass() != obj.getClass()) {
+         return false;
+      }
+      final ImportLauncher other = (ImportLauncher) obj;
+      if (_id != other._id) {
+         return false;
+      }
+      return true;
+   }
 
-	/**
-	 * Setup data for the tour type config image.
-	 */
-	void setupItemImage() {
+   /**
+    * @return Returns a unique id for this import tile.
+    */
+   public long getId() {
+      return _id;
+   }
 
-		if (TourTypeConfig.TOUR_TYPE_CONFIG_BY_SPEED.equals(tourTypeConfig)) {
+   @Override
+   public int hashCode() {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + (int) (_id ^ (_id >>> 32));
+      return result;
+   }
 
-			final int numVertices = speedTourTypes.size();
+   /**
+    * Setup data for the tour type config image.
+    */
+   void setupItemImage() {
 
-			imageHash = speedTourTypes.hashCode();
-			imageWidth = numVertices * TourType.TOUR_TYPE_IMAGE_SIZE;
+      if (TourTypeConfig.TOUR_TYPE_CONFIG_BY_SPEED.equals(tourTypeConfig)) {
 
-		} else if (TourTypeConfig.TOUR_TYPE_CONFIG_ONE_FOR_ALL.equals(tourTypeConfig)) {
+         final int numVertices = speedTourTypes.size();
 
-			if (oneTourType == null) {
+         imageHash = speedTourTypes.hashCode();
+         imageWidth = numVertices * TourType.TOUR_TYPE_IMAGE_SIZE;
 
-				imageHash = 0;
-				imageWidth = 0;
+      } else if (TourTypeConfig.TOUR_TYPE_CONFIG_ONE_FOR_ALL.equals(tourTypeConfig)) {
 
-			} else {
+         if (oneTourType == null) {
 
-				imageHash = oneTourType.hashCode();
-				imageWidth = TourType.TOUR_TYPE_IMAGE_SIZE;
-			}
+            imageHash = 0;
+            imageWidth = 0;
 
-		} else {
+         } else {
 
-			// this is the default, no image
+            imageHash = oneTourType.hashCode();
+            imageWidth = TourType.TOUR_TYPE_IMAGE_SIZE;
+         }
 
-			imageHash = 0;
-			imageWidth = 0;
-		}
-	}
+      } else {
 
-	@Override
-	public String toString() {
-		return "DeviceImportLauncher [" //$NON-NLS-1$
-				//
-				+ ("name=" + name + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-//				+ ("speedTourTypes=" + speedTourTypes + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-//				+ ("tourTypeConfig=" + tourTypeConfig + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("lastMarkerDistance=" + lastMarkerDistance + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+         // this is the default, no image
 
-				+ "]"; //$NON-NLS-1$
-	}
+         imageHash = 0;
+         imageWidth = 0;
+      }
+   }
+
+   @Override
+   public String toString() {
+      return "DeviceImportLauncher [" //$NON-NLS-1$
+            //
+            + ("name=" + name + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+//            + ("speedTourTypes=" + speedTourTypes + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+//            + ("tourTypeConfig=" + tourTypeConfig + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+            + ("lastMarkerDistance=" + lastMarkerDistance + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+
+            + "]"; //$NON-NLS-1$
+   }
 }

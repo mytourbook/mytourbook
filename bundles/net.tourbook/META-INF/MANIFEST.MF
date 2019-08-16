@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Application_Name
 Bundle-SymbolicName: net.tourbook;singleton:=true
-Bundle-Version: 19.5.0.qualifier
+Bundle-Version: 19.7.1.qualifier
 Bundle-Activator: net.tourbook.application.TourbookPlugin
 Bundle-Vendor: %Bundle-Vendor
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
@@ -55,6 +55,8 @@ Export-Package: de.byteholder.geoclipse.map,
  net.tourbook.ui.tourChart,
  net.tourbook.ui.views.rawData
 Import-Package: cop.swt.widgets.viewers.table.celleditors,
+ com.fasterxml.jackson.core.type,
+ com.fasterxml.jackson.databind,
  com.javadocmd.simplelatlng,
  net.tourbook.chart,
  net.tourbook.common,

@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -27,179 +27,180 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
 /**
- * Add tag(s) from the selected tours
+ * Context menu which contains actions to add each column to a viewer.
  */
 public class ColumnContextMenu extends Action implements IMenuCreator {
 
-	private Menu						_menu;
-	private ColumnManager				_columnManager;
+   private Menu                        _menu;
+   private ColumnManager               _columnManager;
 
-	private ArrayList<String>			_categories;
-	private ArrayList<ColumnDefinition>	_categorizedColumns;
+   private ArrayList<String>           _categories;
+   private ArrayList<ColumnDefinition> _categorizedColumns;
 
-	private class ActionColumn extends Action {
+   private class ActionColumn extends Action {
 
-		private ColumnDefinition	__colDef;
+      private ColumnDefinition __colDef;
 
-		public ActionColumn(final ColumnDefinition colDef, final String menuText) {
+      public ActionColumn(final ColumnDefinition colDef, final String menuText) {
 
-			super(menuText, AS_CHECK_BOX);
+         super(menuText, AS_CHECK_BOX);
 
-			__colDef = colDef;
-		}
+         __colDef = colDef;
+      }
 
-		@Override
-		public void run() {
-			_columnManager.action_AddColumn(__colDef);
-		}
-	}
+      @Override
+      public void run() {
+         _columnManager.action_AddColumn(__colDef);
+      }
+   }
 
-	/**
-	 * 
-	 */
-	private class ActionColumnCategory extends Action implements IMenuCreator {
+   /**
+    *
+    */
+   private class ActionColumnCategory extends Action implements IMenuCreator {
 
-		private Menu	__categoryMenu;
-		private String	__category;
+      private Menu   __categoryMenu;
+      private String __category;
 
-		public ActionColumnCategory(final String category) {
+      public ActionColumnCategory(final String category) {
 
-			super(category, AS_DROP_DOWN_MENU);
+         super(category, AS_DROP_DOWN_MENU);
 
-			__category = category;
+         __category = category;
 
-			setMenuCreator(this);
-		}
+         setMenuCreator(this);
+      }
 
-		@Override
-		public void dispose() {
-			if (__categoryMenu != null) {
-				__categoryMenu.dispose();
-				__categoryMenu = null;
-			}
-		}
+      @Override
+      public void dispose() {
 
-		@Override
-		public Menu getMenu(final Control parent) {
-			return null;
-		}
+         if (__categoryMenu != null) {
+            __categoryMenu.dispose();
+            __categoryMenu = null;
+         }
+      }
 
-		@Override
-		public Menu getMenu(final Menu parent) {
+      @Override
+      public Menu getMenu(final Control parent) {
+         return null;
+      }
 
-			dispose();
-			__categoryMenu = new Menu(parent);
+      @Override
+      public Menu getMenu(final Menu parent) {
 
-			// Add listener to repopulate the menu each time
-			__categoryMenu.addMenuListener(new MenuAdapter() {
-				@Override
-				public void menuShown(final MenuEvent e) {
+         dispose();
+         __categoryMenu = new Menu(parent);
 
-					final Menu menu = (Menu) e.widget;
+         // Add listener to repopulate the menu each time
+         __categoryMenu.addMenuListener(new MenuAdapter() {
+            @Override
+            public void menuShown(final MenuEvent e) {
 
-					// dispose old items
-					final MenuItem[] items = menu.getItems();
-					for (final MenuItem item : items) {
-						item.dispose();
-					}
+               final Menu menu = (Menu) e.widget;
 
-					// add actions
-					createColumnActions(__categoryMenu, __category);
-				}
-			});
+               // dispose old items
+               final MenuItem[] items = menu.getItems();
+               for (final MenuItem item : items) {
+                  item.dispose();
+               }
 
-			return __categoryMenu;
-		}
-	}
+               // add actions
+               createColumnActions(__categoryMenu, __category);
+            }
+         });
 
-	public ColumnContextMenu(	final Menu contextMenu,
-								final ArrayList<String> categories,
-								final ArrayList<ColumnDefinition> categorizedColumns,
-								final ColumnManager columnManager) {
+         return __categoryMenu;
+      }
+   }
 
-		_menu = contextMenu;
-		_columnManager = columnManager;
+   public ColumnContextMenu(final Menu contextMenu,
+                            final ArrayList<String> categories,
+                            final ArrayList<ColumnDefinition> categorizedColumns,
+                            final ColumnManager columnManager) {
 
-		_categories = categories;
-		_categorizedColumns = categorizedColumns;
+      _menu = contextMenu;
+      _columnManager = columnManager;
 
-		for (final String category : _categories) {
-			addActionToMenu(_menu, new ActionColumnCategory(category));
-		}
-	}
+      _categories = categories;
+      _categorizedColumns = categorizedColumns;
 
-	private void addActionToMenu(final Menu menu, final Action action) {
+      for (final String category : _categories) {
+         addActionToMenu(_menu, new ActionColumnCategory(category));
+      }
+   }
 
-		final ActionContributionItem item = new ActionContributionItem(action);
-		item.fill(menu, -1);
-	}
+   private void addActionToMenu(final Menu menu, final Action action) {
 
-	private void createColumnActions(final Menu menu, final String category) {
+      final ActionContributionItem item = new ActionContributionItem(action);
+      item.fill(menu, -1);
+   }
 
-		final ArrayList<ColumnDefinition> categoryColDefs = new ArrayList<>();
+   private void createColumnActions(final Menu menu, final String category) {
 
-		for (final ColumnDefinition colDef : _categorizedColumns) {
+      final ArrayList<ColumnDefinition> categoryColDefs = new ArrayList<>();
 
-			if (category.equals(colDef.getColumnCategory())) {
-				categoryColDefs.add(colDef);
-			}
-		}
+      for (final ColumnDefinition colDef : _categorizedColumns) {
 
-		if (categoryColDefs.size() == 0) {
-			return;
-		}
+         if (category.equals(colDef.getColumnCategory())) {
+            categoryColDefs.add(colDef);
+         }
+      }
 
-		/*
-		 * Create menu item for each column
-		 */
-		for (final ColumnDefinition colDef : categoryColDefs) {
+      if (categoryColDefs.size() == 0) {
+         return;
+      }
 
-			/*
-			 * Create column text
-			 */
-			final String label = colDef.getColumnLabel();
-			final String unit = colDef.getColumnUnit();
+      /*
+       * Create menu item for each column
+       */
+      for (final ColumnDefinition colDef : categoryColDefs) {
 
-			final StringBuilder sb = new StringBuilder();
+         /*
+          * Create column text
+          */
+         final String label = colDef.getColumnLabel();
+         final String unit = colDef.getColumnUnit();
 
-			// add label
-			if (label != null) {
-				sb.append(label);
-			}
+         final StringBuilder sb = new StringBuilder();
 
-			// add unit
-			if (unit != null) {
+         // add label
+         if (label != null) {
+            sb.append(label);
+         }
 
-				if (sb.length() > 0) {
-					sb.append(ColumnManager.COLUMN_TEXT_SEPARATOR);
-				}
+         // add unit
+         if (unit != null) {
 
-				sb.append(unit);
-			}
+            if (sb.length() > 0) {
+               sb.append(ColumnManager.COLUMN_TEXT_SEPARATOR);
+            }
 
-			final ActionColumn columnAction = new ActionColumn(colDef, sb.toString());
+            sb.append(unit);
+         }
 
-			addActionToMenu(menu, columnAction);
-		}
-	}
+         final ActionColumn columnAction = new ActionColumn(colDef, sb.toString());
 
-	@Override
-	public void dispose() {
+         addActionToMenu(menu, columnAction);
+      }
+   }
 
-		if (_menu != null) {
-			_menu.dispose();
-			_menu = null;
-		}
-	}
+   @Override
+   public void dispose() {
 
-	@Override
-	public Menu getMenu(final Control parent) {
-		return null;
-	}
+      if (_menu != null) {
+         _menu.dispose();
+         _menu = null;
+      }
+   }
 
-	@Override
-	public Menu getMenu(final Menu parent) {
-		return null;
-	}
+   @Override
+   public Menu getMenu(final Control parent) {
+      return null;
+   }
+
+   @Override
+   public Menu getMenu(final Menu parent) {
+      return null;
+   }
 
 }

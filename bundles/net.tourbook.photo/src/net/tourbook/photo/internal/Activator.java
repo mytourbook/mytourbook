@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -29,75 +29,75 @@ import org.osgi.framework.BundleContext;
  */
 public class Activator extends AbstractUIPlugin {
 
-	// The plug-in ID
-	public static final String	PLUGIN_ID	= "net.tourbook.photo"; //$NON-NLS-1$
+   // The plug-in ID
+   public static final String PLUGIN_ID = "net.tourbook.photo"; //$NON-NLS-1$
 
-	// The shared instance
-	private static Activator	plugin;
+   // The shared instance
+   private static Activator plugin;
 
-	/**
-	 * The constructor
-	 */
-	public Activator() {}
+   /**
+    * The constructor
+    */
+   public Activator() {}
 
-	/**
-	 * Returns the shared instance
-	 * 
-	 * @return the shared instance
-	 */
-	public static Activator getDefault() {
-		return plugin;
-	}
+   /**
+    * Returns the shared instance
+    *
+    * @return the shared instance
+    */
+   public static Activator getDefault() {
+      return plugin;
+   }
 
-	/**
-	 * Returns an image descriptor for images in the plug-in path.
-	 * 
-	 * @param path
-	 *            the path
-	 * @return the axisImage descriptor
-	 */
-	public static ImageDescriptor getImageDescriptor(final String path) {
-		return imageDescriptorFromPlugin(PLUGIN_ID, "icons/" + path); //$NON-NLS-1$
-	}
+   /**
+    * Returns an image descriptor for images in the plug-in path.
+    *
+    * @param path
+    *           the path
+    * @return the axisImage descriptor
+    */
+   public static ImageDescriptor getImageDescriptor(final String path) {
+      return imageDescriptorFromPlugin(PLUGIN_ID, "icons/" + path); //$NON-NLS-1$
+   }
 
-	/**
-	 * @param sectionName
-	 * @return Returns the dialog setting section for the sectionName, a section is always returned
-	 *         even when it's empty
-	 */
-	public IDialogSettings getDialogSettingsSection(final String sectionName) {
+   /**
+    * @param sectionName
+    * @return Returns the dialog setting section for the sectionName, a section is always returned
+    *         even when it's empty
+    */
+   public IDialogSettings getDialogSettingsSection(final String sectionName) {
 
-		final IDialogSettings dialogSettings = getDialogSettings();
-		IDialogSettings section = dialogSettings.getSection(sectionName);
+      final IDialogSettings dialogSettings = getDialogSettings();
+      IDialogSettings section = dialogSettings.getSection(sectionName);
 
-		if (section == null) {
-			section = dialogSettings.addNewSection(sectionName);
-		}
+      if (section == null) {
+         section = dialogSettings.addNewSection(sectionName);
+      }
 
-		return section;
-	}
+      return section;
+   }
 
-	@Override
-	public void start(final BundleContext context) throws Exception {
+   @Override
+   public void start(final BundleContext context) throws Exception {
 
-		super.start(context);
+      super.start(context);
 
-		plugin = this;
+      plugin = this;
 
-		PhotoUI.init();
-	}
+      PhotoUI.init();
+   }
 
-	@Override
-	public void stop(final BundleContext context) throws Exception {
+   @Override
+   public void stop(final BundleContext context) throws Exception {
 
-		PhotoLoadManager.stopImageLoading(true);
-		PhotoLoadManager.removeInvalidImageFiles();
+      PhotoLoadManager.stopImageLoading(true);
+      PhotoLoadManager.removeInvalidImageFiles();
 
-		PhotoImageCache.disposeAll();
+      PhotoImageCache.disposeAll();
 
-		plugin = null;
+      plugin = null;
 
-		super.stop(context);
-	}
+      super.stop(context);
+   }
 
 }

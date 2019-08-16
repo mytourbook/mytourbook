@@ -35,6 +35,7 @@ import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.statistic.ChartOptions_TourFrequency;
+import net.tourbook.statistic.DurationTime;
 import net.tourbook.statistic.SlideoutStatisticOptions;
 import net.tourbook.statistic.StatisticContext;
 import net.tourbook.statistic.TourbookStatistic;
@@ -212,13 +213,13 @@ public class StatisticTour_Frequency extends TourbookStatistic {
       _statTimeSumColorIndex = new int[colorLength][timeLength];
 
       // loop: all tours
-      for (int tourIndex = 0; tourIndex < tourDayData.distanceHigh.length; tourIndex++) {
+      for (int tourIndex = 0; tourIndex < tourDayData.distance_High.length; tourIndex++) {
 
          int unitIndex;
          final int typeColorIndex = tourDayData.typeColorIndex[tourIndex];
 
-         final int diffDistance = (int) ((tourDayData.distanceHigh[tourIndex] - tourDayData.distanceLow[tourIndex] + 500) / 1000);
-         final int diffAltitude = (int) (tourDayData.altitudeHigh[tourIndex] - tourDayData.altitudeLow[tourIndex]);
+         final int diffDistance = (int) ((tourDayData.distance_High[tourIndex] - tourDayData.distance_Low[tourIndex] + 500) / 1000);
+         final int diffAltitude = (int) (tourDayData.altitude_High[tourIndex] - tourDayData.altitude_Low[tourIndex]);
          final int diffTime = (int) (tourDayData.getDurationHighFloat()[tourIndex] - tourDayData
                .getDurationLowFloat()[tourIndex]);
 
@@ -802,7 +803,10 @@ public class StatisticTour_Frequency extends TourbookStatistic {
                   statContext.appTourTypeFilter,
                   statContext.statFirstYear,
                   statContext.statNumberOfYears,
-                  isDataDirtyWithReset() || statContext.isRefreshData);
+                  isDataDirtyWithReset() || statContext.isRefreshData,
+
+                  // this may need to be customized as in the other statistics
+                  DurationTime.MOVING);
 
       // reset min/max values
       if (_isSynchScaleEnabled == false && statContext.isRefreshData) {

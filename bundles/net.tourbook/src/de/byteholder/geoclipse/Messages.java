@@ -158,6 +158,7 @@ public class Messages extends NLS {
    public static String        MP_Manager_DeletedOfflineImagesParts_TaskName;
    public static String        MP_Manager_DeletedOfflineImagesParts_TaskNameParts;
    public static String        MP_Manager_DeleteOfflineImages_CannotDeleteFolder;
+   public static String        MP_Manager_Label_ImportFrom;
    public static String        MP_Manager_Task_GetWms;
 
    public static String        DBG001_Error_Wms_LatLonBboxIsNotDefined;
