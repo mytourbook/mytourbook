@@ -93,9 +93,10 @@ public class PhotoToolkit extends MarkerToolkit{
       
       _bitmapCluster = createClusterBitmap(1);
       
-      _bitmapPhoto = createPhotoBitmap();
+      //_bitmapPhoto = createPhotoBitmap();
+      _bitmapPhoto = createPoiBitmap(MarkerShape.CIRCLE);
       
-      _BitmapClusterPhoto = createPhotoBitmap(); //must be replaced later, like MarkerToolkit
+      _BitmapClusterPhoto = createPoiBitmap(MarkerShape.CIRCLE); //must be replaced later, like MarkerToolkit
       
       _symbol = new MarkerSymbol(_bitmapPhoto, MarkerSymbol.HotspotPlace.BOTTOM_CENTER, false);
       
@@ -116,31 +117,6 @@ public class PhotoToolkit extends MarkerToolkit{
             };
          }
       };
-   }
-
-   
-   public Bitmap createPhotoBitmap() {
-      loadConfig();
-      debugPrint("????? createPhotoBitmap size: " + _symbolSizeInt); //$NON-NLS-1$
-      _bitmapPhoto = CanvasAdapter.newBitmap(_symbolSizeInt, _symbolSizeInt, 0);
-
-      _bitmapPhoto = drawDefaultPhotoSymbol(_symbolSizeInt);
-
-      return _bitmapPhoto;
-
-   }
-
-   
-   public Bitmap drawDefaultPhotoSymbol(int bitmapPhotoSymbolSize) {
-      _bitmapDefaultPhotoSymbol =  CanvasAdapter.newBitmap(bitmapPhotoSymbolSize, bitmapPhotoSymbolSize, 0);
-      org.oscim.backend.canvas.Canvas defaultPhotoCanvas = CanvasAdapter.newCanvas();
-      defaultPhotoCanvas.setBitmap(_bitmapDefaultPhotoSymbol);
-      float half = bitmapPhotoSymbolSize/2;
-      _linePainter.setStyle(Paint.Style.STROKE);
-      _linePainter.setColor(0xA0000000); // 80percent gray
-      _linePainter.setStrokeWidth(4);
-      defaultPhotoCanvas.drawCircle(half, half, half * 0.8f, _linePainter);
-      return _bitmapDefaultPhotoSymbol;
    }
 
 

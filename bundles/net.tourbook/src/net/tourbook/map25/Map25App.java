@@ -1238,7 +1238,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 		return mMFileTileSource;
 	}	
 	
-	public void debugPrint(String debugText) {
+	public static void debugPrint(String debugText) {
 	   if(debugMode == DebugMode.ON) {
 	      System.out.println(UI.timeStamp() + debugText);//$NON-NLS-1$
 	      //System.out.println(UI.timeStamp() + " map25: " + debugText);//$NON-NLS-1$

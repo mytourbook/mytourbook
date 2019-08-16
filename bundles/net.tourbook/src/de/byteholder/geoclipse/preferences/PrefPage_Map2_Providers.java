@@ -50,7 +50,7 @@ import java.text.NumberFormat;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 
-import javax.inject.Inject;
+//import javax.inject.Inject;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.time.TimeTools;
@@ -251,8 +251,8 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
    private PixelConverter                      _pc;
 
 // IStylingEngine is injected
-   @Inject
-   IStylingEngine engine;
+//   @Inject
+//   IStylingEngine engine;
 
    /*
     * UI controls

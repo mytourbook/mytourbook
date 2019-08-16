@@ -75,9 +75,6 @@ public class MarkerToolkit {
    
    public boolean _isMarkerClusteredLast;
    
-   //public enum DebugMode {OFF, ON};
-   //public DebugMode debugMode = DebugMode.ON;   // before releasing, set this to OFF
-   
    public MarkerToolkit(MarkerShape shape) {
       final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 
@@ -146,7 +143,7 @@ public class MarkerToolkit {
       
       if(shape == shape.CIRCLE) {
          _fillPainter.setColor(0x80FF69B4); // 50percent pink
-         defaultMarkerCanvas.drawCircle(half, half, half, _fillPainter);
+         defaultMarkerCanvas.drawCircle(half, half, half * 0.8f, _fillPainter);
       } else {
          _bitmapPoi = drawStar(_symbolSizeInt);
       }
@@ -329,9 +326,10 @@ public class MarkerToolkit {
    }
    
    public void debugPrint(String debugText) {
-      if(net.tourbook.map25.Map25App.debugMode == net.tourbook.map25.Map25App.DebugMode.ON) {
-         System.out.println(UI.timeStamp() + debugText);//$NON-NLS-1$
-      }
+      net.tourbook.map25.Map25App.debugPrint(debugText);
+//      if(net.tourbook.map25.Map25App.debugMode == net.tourbook.map25.Map25App.DebugMode.ON) {
+//         System.out.println(UI.timeStamp() + debugText);//$NON-NLS-1$
+//      }
    }
    
 }
