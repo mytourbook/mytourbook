@@ -157,8 +157,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	
 	private int							_tileSourceOfflineMapCount = 0;
 	
-	public enum DebugMode {OFF, ON};
-	public DebugMode debugMode = DebugMode.ON;   // before releasing, set this to OFF
+	public static enum DebugMode {OFF, ON};
+	public static DebugMode debugMode = DebugMode.ON;   // before releasing, set this to OFF
 	
 	/**
 	 * The opacity can be set in the layer but not read. This will keep the state of the hillshading opacity.
@@ -1391,7 +1391,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	}
 
 	@Override
-	public boolean onItemLongPress(final int index, final MapMarker item) {
+	public boolean onItemLongPress(int index, MapMarker item) {
 
 // System.out.println(
 //       (UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //
@@ -1416,7 +1416,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    * @return true, when clicked
    */
 	@Override
-	public boolean onItemSingleTapUp(final int index, final MapMarker item) {
+	public boolean onItemSingleTapUp(int index, MapMarker item) {
 
  debugPrint(" map25: " +
        (UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //$NON-NLS-1$ //$NON-NLS-2$
@@ -1427,7 +1427,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
        + ("\t_isMapItemHit:" + _isMapItemHit + " -> true") //$NON-NLS-1$ //$NON-NLS-2$
        //Pref_Map25_Encoding_Mapsforge
        );
- // TODO remove SYSTEM.OUT.PRINTLN
 
  _isMapItemHit = true;
 

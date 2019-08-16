@@ -66,7 +66,7 @@ import net.tourbook.map25.layer.marker.MarkerLayer;
 import net.tourbook.map25.layer.marker.MarkerToolkit;
 import net.tourbook.map25.layer.marker.MarkerToolkit.MarkerMode;
 import net.tourbook.map25.layer.marker.PhotoToolkit;
-import net.tourbook.map25.layer.marker.PhotoToolkit.PhotoMode;
+//import net.tourbook.map25.layer.marker.PhotoToolkit.PhotoMode;
 import net.tourbook.map25.layer.tourtrack.Map25TrackConfig;
 import net.tourbook.map25.layer.tourtrack.SliderLocation_Layer;
 import net.tourbook.map25.layer.tourtrack.SliderPath_Layer;
@@ -815,7 +815,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       display.asyncExec(new Runnable() {
          @Override
          public void run() {
-//				System.out.println("SWT calling menu"); //$NON-NLS-1$
+//				_mapApp.debugPrint("SWT calling menu"); //$NON-NLS-1$
             swt_awt_ContextMenu.swtIndirectShowMenu(xScreenPos, yScreenPos);
          }
       });
@@ -877,27 +877,27 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
    }
    
    public List<MarkerItem> createPhotoItemList(ArrayList<Photo> galleryPhotos){
-      System.out.println(" Map25View: *** createPhotoItemList: entering ");
+      _mapApp.debugPrint(" Map25View: _mapApp.debugPrint( entering ");
       List<MarkerItem> pts = new ArrayList<>();
  
       if (galleryPhotos == null) {
-         System.out.println(" Map25View: *** createPhotoItemList: galleriePhotos was null");
+         _mapApp.debugPrint(" Map25View: *** createPhotoItemList: galleriePhotos was null");
          return pts;
          }
 
       if (galleryPhotos.size() == 0) {
-         System.out.println(" Map25View: *** createPhotoItemList: galleriePhotos.size() was 0");
+         _mapApp.debugPrint(" Map25View: *** createPhotoItemList: galleriePhotos.size() was 0");
          return  pts;     
       }
       
       if (!_isShowPhoto) {
-         System.out.println(" Map25View: *** createPhotoItemList: photlayer is off");
+         _mapApp.debugPrint(" Map25View: *** createPhotoItemList: photlayer is off");
          return pts;
       }
       
       PhotoToolkit phototoolkit = new PhotoToolkit();
   
-      //System.out.println(" Map25View: *** createPhotoItemList: Path: " + galleryPhotos.get(0).imagePathName + " size: " + galleryPhotos.size());
+      //_mapApp.debugPrint(" Map25View: *** createPhotoItemList: Path: " + galleryPhotos.get(0).imagePathName + " size: " + galleryPhotos.size());
       
       for (final  Photo photo : galleryPhotos) {
          
@@ -916,9 +916,9 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
             item.setMarker(new MarkerSymbol(bm, HotspotPlace.BOTTOM_CENTER));
          }        
          
-         //System.out.println(" Map25View: *** createPhotoItemList: " + im.toString());
+         //_mapApp.debugPrint(" Map25View: *** createPhotoItemList: " + im.toString());
          //item.setMarker(new MarkerSymbol(phototoolkit.createPhotoBitmap(), HotspotPlace.CENTER));
-         //System.out.println(" Map25View: *** createPhotoItemList: item lat: " + item.geoPoint.getLatitude() + " lon: " + item.geoPoint.getLongitude());
+         //_mapApp.debugPrint(" Map25View: *** createPhotoItemList: item lat: " + item.geoPoint.getLatitude() + " lon: " + item.geoPoint.getLongitude());
          pts.add(item);
       }
       _photo_pts = pts;
@@ -1150,10 +1150,10 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
    public void onMapBookmarkActionPerformed(final MapBookmark mapBookmark, final MapBookmarkEventType  mapBookmarkEventType) {
       
       if (mapBookmarkEventType == MapBookmarkEventType.MOVETO) { 
-         //System.out.println("*** Map25View_onMapBookmarkActionPerformed moveto: " + mapBookmark.name);
+         //_mapApp.debugPrint("*** Map25View_onMapBookmarkActionPerformed moveto: " + mapBookmark.name);
          moveToMapLocation(mapBookmark);
       } else if (mapBookmarkEventType == MapBookmarkEventType.MODIFIED) {
-         //System.out.println("*** Map25View_onMapBookmarkActionPerformed modify: " + mapBookmark.name);
+         //_mapApp.debugPrint("*** Map25View_onMapBookmarkActionPerformed modify: " + mapBookmark.name);
          _mapApp.updateUI_MapBookmarkLayer();
       }
    }

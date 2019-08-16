@@ -34,18 +34,21 @@ import org.oscim.layers.marker.MarkerRendererFactory;
 import org.oscim.layers.marker.MarkerSymbol;
 import org.oscim.layers.marker.MarkerSymbol.HotspotPlace;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorUtil;
 import net.tourbook.map.bookmark.MapBookmark;
+import net.tourbook.map25.Map25App;
 import net.tourbook.map25.Map25ConfigManager;
+import net.tourbook.map25.Map25App.DebugMode;
 
 
 public class MarkerToolkit {
    //ItemizedLayer<MarkerItem> mMarkerLayer;
-   private int _fgColor = 0xFF000000; // 100 percent black. AARRGGBB
-   private int _bgColor = 0x80FF69B4; // 50 percent pink. AARRGGBB
-   private int _clusterSymbolSizeDP = net.tourbook.map25.layer.marker.MarkerRenderer.MAP_MARKER_CLUSTER_SIZE_DP;
-   private int _clusterForegroundColor = net.tourbook.map25.layer.marker.MarkerRenderer.CLUSTER_COLOR_TEXT;
-   private int _clusterBackgroundColor = net.tourbook.map25.layer.marker.MarkerRenderer.CLUSTER_COLOR_BACK;
+   protected int _fgColor = 0xFF000000; // 100 percent black. AARRGGBB
+   protected int _bgColor = 0x80FF69B4; // 50 percent pink. AARRGGBB
+   protected int _clusterSymbolSizeDP = net.tourbook.map25.layer.marker.MarkerRenderer.MAP_MARKER_CLUSTER_SIZE_DP;
+   protected int _clusterForegroundColor = net.tourbook.map25.layer.marker.MarkerRenderer.CLUSTER_COLOR_TEXT;
+   protected int _clusterBackgroundColor = net.tourbook.map25.layer.marker.MarkerRenderer.CLUSTER_COLOR_BACK;
    
    private int  _clusterSymbolWeight;
    private float  _clusterOutlineSize;
@@ -53,15 +56,16 @@ public class MarkerToolkit {
    //private boolean _isBillboard;
    
    public MarkerSymbol _symbol;  //marker symbol circle or star
-   private float _symbolSize = 10f;
-   private int _symbolSizeInt = 10;
-   private int _clusterSymbol_Size;
+   protected float _symbolSize = 10f;
+   protected int _symbolSizeInt = 10;
+   protected int _clusterSymbol_Size;
 
    private Bitmap _bitmapPoi;
    private Bitmap _bitmapStar;
    private Bitmap _BitmapClusterStar;
 
-   final Paint _fillPainter = CanvasAdapter.newPaint();
+   protected Paint _fillPainter = CanvasAdapter.newPaint();
+   protected Paint _linePainter = CanvasAdapter.newPaint();
 
    public MarkerRendererFactory _markerRendererFactory;
    
@@ -71,11 +75,14 @@ public class MarkerToolkit {
    
    public boolean _isMarkerClusteredLast;
    
+   //public enum DebugMode {OFF, ON};
+   //public DebugMode debugMode = DebugMode.ON;   // before releasing, set this to OFF
+   
    public MarkerToolkit(MarkerShape shape) {
       final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 
       loadConfig();
-      //System.out.println("*** Markertoolkit:  entering constructor"); //$NON-NLS-1$
+      //_mapApp.debugPrint("*** Markertoolkit:  entering constructor"); //$NON-NLS-1$
 
       _fillPainter.setStyle(Paint.Style.FILL);
       
@@ -96,7 +103,7 @@ public class MarkerToolkit {
                @Override
                protected Bitmap getClusterBitmap(int size) {
                   // Can customize cluster bitmap here
-                  //System.out.println("*** Markertoolkit:  cluster size: " + size); //$NON-NLS-1$
+                  //_mapApp.debugPrint("*** Markertoolkit:  cluster size: " + size); //$NON-NLS-1$
                   _bitmapCluster = createClusterBitmap(size);
                   return _bitmapCluster;
                }
@@ -123,8 +130,8 @@ public class MarkerToolkit {
       
       _clusterSymbol_Size = config.clusterSymbol_Size;
       
-      //System.out.println("*** Markertoolkit:  fillradius for star: " + config.clusterSymbol_Size + " " + config.clusterSymbol_Weight); //$NON-NLS-1$
-      //System.out.println("*** Markertoolkit:  _clusterOutlineSize for star: " + _clusterOutlineSize + " , _clusterSymbol_Size: " + _clusterSymbol_Size); //$NON-NLS-1$
+      //_mapApp.debugPrint("*** Markertoolkit:  fillradius for star: " + config.clusterSymbol_Size + " " + config.clusterSymbol_Weight); //$NON-NLS-1$
+      //_mapApp.debugPrint("*** Markertoolkit:  _clusterOutlineSize for star: " + _clusterOutlineSize + " , _clusterSymbol_Size: " + _clusterSymbol_Size); //$NON-NLS-1$
 
    }
 
@@ -148,7 +155,7 @@ public class MarkerToolkit {
    }
    
    public Bitmap drawStar(int bitmapStarSize) {
-      //System.out.println("*** Markertoolkit:  drawstar: "); //$NON-NLS-1$
+      //_mapApp.debugPrint("*** Markertoolkit:  drawstar: "); //$NON-NLS-1$
       _bitmapStar = CanvasAdapter.newBitmap(bitmapStarSize, bitmapStarSize, 0);
       org.oscim.backend.canvas.Canvas defaultMarkerCanvas = CanvasAdapter.newCanvas();
       defaultMarkerCanvas.setBitmap(_bitmapStar);
@@ -193,7 +200,7 @@ public class MarkerToolkit {
       List<MarkerItem> pts = new ArrayList<>();
      
       for (final MapBookmark mapBookmark : net.tourbook.map.bookmark.MapBookmarkManager.getAllBookmarks()) {
-         //System.out.println("*** Markertoolkit:  mapbookmark name: " + mapBookmark.name); //$NON-NLS-1$
+         //_mapApp.debugPrint("*** Markertoolkit:  mapbookmark name: " + mapBookmark.name); //$NON-NLS-1$
          MarkerItem item = new MarkerItem(mapBookmark.id, mapBookmark.name, "", //$NON-NLS-1$
                new GeoPoint(mapBookmark.getLatitude(), mapBookmark.getLongitude())
                );
@@ -321,6 +328,10 @@ public class MarkerToolkit {
 
    }
    
-   
+   public void debugPrint(String debugText) {
+      if(net.tourbook.map25.Map25App.debugMode == net.tourbook.map25.Map25App.DebugMode.ON) {
+         System.out.println(UI.timeStamp() + debugText);//$NON-NLS-1$
+      }
+   }
    
 }

@@ -39,50 +39,23 @@ import net.tourbook.photo.PhotoLoadingState;
 import net.tourbook.photo.ImageUtils;
 
 
-public class PhotoToolkit {
+public class PhotoToolkit extends MarkerToolkit{
 
-   private int _fgColor = 0xFF000000; // 100 percent black. AARRGGBB
-   private int _bgColor = 0x80FF69B4; // 50 percent pink. AARRGGBB
-   private int _clusterSymbolSizeDP = net.tourbook.map25.layer.marker.MarkerRenderer.MAP_MARKER_CLUSTER_SIZE_DP;
-   private int _clusterForegroundColor = net.tourbook.map25.layer.marker.MarkerRenderer.CLUSTER_COLOR_TEXT;
-   private int _clusterBackgroundColor = net.tourbook.map25.layer.marker.MarkerRenderer.CLUSTER_COLOR_BACK;
-   
-   private int  _clusterSymbolWeight;
-   private float  _clusterOutlineSize;
+
    private Bitmap _bitmapCluster;
    //private boolean _isBillboard;
    
    public MarkerSymbol _symbol;  //marker symbol, circle or star
-   private float _symbolSize = 20f;
-   private int _symbolSizeInt = 20;
-   private int _clusterSymbol_Size;
 
    private Bitmap _bitmapPhoto;  //normaly the photo as Bitmap
    private Bitmap _bitmapDefaultPhotoSymbol;  // default bitmap circle or star. used when no photo loaded
    private Bitmap _BitmapClusterPhoto;  // The Bitmap when markers are clustered
 
-   final Paint _fillPainter = CanvasAdapter.newPaint();
-   final Paint _linePainter = CanvasAdapter.newPaint();
-
    public MarkerRendererFactory _markerRendererFactory;
-   
-   public enum MarkerShape {STAR, CIRCLE};
-   
-   public enum MarkerMode {DEMO, NORMAL};
    
    public boolean _isMarkerClusteredLast;
    
    Display                       _display;
-   
-   //private Map25App                      _mapApp;
-   public enum PhotoMode {DEMO, NORMAL};
-  // public List<MarkerItem> _photo_pts = new ArrayList<>();
-
-  // private ArrayList<Photo> _galleryPhotos;
-   
-  // public ArrayList<Photo> get_galleryPhotos() {
-  //    return _galleryPhotos;
-  // }
 
    private class LoadCallbackImage implements ILoadCallBack {
 
@@ -97,20 +70,21 @@ public class PhotoToolkit {
       @Override
       public void callBackImageIsLoaded(final boolean isUpdateUI) {
 
-         System.out.println("???? PhotoToolkit: LoadCallbackImage");
+         debugPrint("???? PhotoToolkit: LoadCallbackImage"); //$NON-NLS-1$
          
          if (isUpdateUI == false) {
             return;
          }
 
-         __map.queueOverlayPainting(__tile);
+         //__map.queueOverlayPainting(__tile);
 //       __map.paint();
       }
    }   
    
    
    public PhotoToolkit() {
-      System.out.println(" PhotoToolkit + *** Constructor");
+      super(MarkerShape.CIRCLE);
+      debugPrint(" ?? PhotoToolkit + *** Constructor"); //$NON-NLS-1$
       final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 
       loadConfig();
@@ -135,7 +109,7 @@ public class PhotoToolkit {
                @Override
                protected Bitmap getClusterBitmap(int size) {
                   // Can customize cluster bitmap here
-                  //System.out.println("*** Markertoolkit:  cluster size: " + size); //$NON-NLS-1$
+                  //debugPrint("??? Markertoolkit:  cluster size: " + size); //$NON-NLS-1$
                   _bitmapCluster = createClusterBitmap(size);
                   return _bitmapCluster;
                }
@@ -144,30 +118,10 @@ public class PhotoToolkit {
       };
    }
 
-   public final void loadConfig () {
-      //System.out.println(" PhotoToolkit + *** loadConfig");
-      final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
-      _fgColor = ColorUtil.getARGB(config.markerOutline_Color, (int) (config.markerOutline_Opacity / 100.0 * 0xff));
-      _bgColor = ColorUtil.getARGB(config.markerFill_Color,    (int) (config.markerFill_Opacity    / 100.0 * 0xff));
-      _clusterSymbolSizeDP = config.clusterSymbol_Size;
-      _clusterForegroundColor = ColorUtil.getARGB(
-            config.clusterOutline_Color,
-            (int) (config.clusterOutline_Opacity / 100.0 * 0xff));
-      _clusterBackgroundColor = ColorUtil.getARGB(
-            config.clusterFill_Color,
-            (int) (config.clusterFill_Opacity / 100.0 * 0xff));
-      _clusterSymbolWeight = config.clusterSymbol_Weight;
-      _clusterOutlineSize = config.clusterOutline_Size;
-      _symbolSize = ScreenUtils.getPixels(config.markerSymbol_Size);
-      _symbolSizeInt = (int) Math.ceil(_symbolSize);
-      
-      _clusterSymbol_Size = config.clusterSymbol_Size;
-          
-   }
    
    public Bitmap createPhotoBitmap() {
       loadConfig();
-      System.out.println("!!!!! createPhotoBitmap size: " + _symbolSizeInt);
+      debugPrint("????? createPhotoBitmap size: " + _symbolSizeInt); //$NON-NLS-1$
       _bitmapPhoto = CanvasAdapter.newBitmap(_symbolSizeInt, _symbolSizeInt, 0);
 
       _bitmapPhoto = drawDefaultPhotoSymbol(_symbolSizeInt);
@@ -185,28 +139,10 @@ public class PhotoToolkit {
       _linePainter.setStyle(Paint.Style.STROKE);
       _linePainter.setColor(0xA0000000); // 80percent gray
       _linePainter.setStrokeWidth(4);
-      defaultPhotoCanvas.drawCircle(half, half, half, _linePainter);
+      defaultPhotoCanvas.drawCircle(half, half, half * 0.8f, _linePainter);
       return _bitmapDefaultPhotoSymbol;
    }
 
-   /**
-    * this creates the bitmap for clustering a draw the size as text in the middle
-    * @param size 
-    * @return
-    */   
-   public Bitmap createClusterBitmap(int size) {
-      
-      final ScreenUtils.ClusterDrawable drawable = new ScreenUtils.ClusterDrawable(
-            _clusterSymbolSizeDP,
-            _clusterForegroundColor,
-            _clusterBackgroundColor,
-            Integer.toString(size),
-            _clusterSymbolWeight,
-            _clusterOutlineSize);
-
-      final Bitmap paintedBitmap = drawable.getBitmap(_BitmapClusterPhoto);
-      return paintedBitmap;
-   }
 
    /**
     * same as in TourMapPainter, but for 2.5D maps
@@ -223,7 +159,7 @@ public class PhotoToolkit {
       final PhotoLoadingState photoLoadingState = photo.getLoadingState(requestedImageQuality);
 
       if (photoLoadingState != PhotoLoadingState.IMAGE_IS_INVALID) {
-         //System.out.println("!!! entering getPhotoImage");
+         //debugPrint("??? entering getPhotoImage"); //$NON-NLS-1$
          // image is not yet loaded
 
          // check if image is in the cache
@@ -271,7 +207,7 @@ public class PhotoToolkit {
                
                //photoBitmap = CanvasAdapter.decodeBitmap(new ByteArrayInputStream(ImageUtils.formatImage(photoImage, org.eclipse.swt.SWT.IMAGE_BMP)));
                photoBitmap = CanvasAdapter.decodeBitmap(new ByteArrayInputStream(ImageUtils.formatImage(scaledThumbImage, org.eclipse.swt.SWT.IMAGE_BMP)));
-               //System.out.println("!!! getPhotoImage created photoBitmap heigth: " + photoBitmap.getHeight() + " width: " +  photoBitmap.getWidth());               
+               //debugPrint("??? getPhotoImage created photoBitmap heigth: " + photoBitmap.getHeight() + " width: " +  photoBitmap.getWidth());               
             } catch (IOException e) {
                // TODO Auto-generated catch block
                e.printStackTrace();
@@ -290,13 +226,13 @@ public class PhotoToolkit {
       /*
       final org.eclipse.swt.graphics.Point photoSize = photo.getMapImageSize();
         
-      System.out.println(" ??????????? PhotoToolkit *** createPhotoBitmapfromPhoto: target size x / y: " + photoSize.x + " / " + photoSize.y);
+      debugPrint(" ??????????? PhotoToolkit *** createPhotoBitmapfromPhoto: target size x / y: " + photoSize.x + " / " + photoSize.y); //$NON-NLS-1$
       
-      System.out.println(" ??????????? PhotoToolkit *** createPhotoBitmapfromPhoto: " + photo.imageFileName);
+      debugPrint(" ??????????? PhotoToolkit *** createPhotoBitmapfromPhoto: " + photo.imageFileName); //$NON-NLS-1$
       if(bitmap != null) {
-         System.out.println(" ??????????? PhotoToolkit *** createPhotoBitmapfromPhoto width: " + bitmap.getWidth());
+         debugPrint(" ??????????? PhotoToolkit *** createPhotoBitmapfromPhoto width: " + bitmap.getWidth()); //$NON-NLS-1$
       } else {
-         System.out.println(" ??????????? PhotoToolkit *** createPhotoBitmapfromPhoto was null");
+         debugPrint(" ??????????? PhotoToolkit *** createPhotoBitmapfromPhoto was null"); //$NON-NLS-1$
       }
       */
       return bitmap;

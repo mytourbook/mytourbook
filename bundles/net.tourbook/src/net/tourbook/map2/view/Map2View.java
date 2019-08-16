@@ -2890,7 +2890,6 @@ public class Map2View extends ViewPart implements
     * @return Returns a list which contains all photos.
     */
    private ArrayList<Photo> paintPhotoSelection(final ISelection selection) {
-      System.out.println("***** Map2View: paintphotoselection entering");
       _isLinkPhotoDisplayed = false;
 
       final ArrayList<Photo> allPhotos = new ArrayList<>();
