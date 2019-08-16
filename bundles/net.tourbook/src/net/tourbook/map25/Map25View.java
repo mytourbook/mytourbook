@@ -877,7 +877,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
    }
    
    public List<MarkerItem> createPhotoItemList(ArrayList<Photo> galleryPhotos){
-      _mapApp.debugPrint(" Map25View: _mapApp.debugPrint( entering ");
+      _mapApp.debugPrint(" Map25View: entering ");
       List<MarkerItem> pts = new ArrayList<>();
  
       if (galleryPhotos == null) {
