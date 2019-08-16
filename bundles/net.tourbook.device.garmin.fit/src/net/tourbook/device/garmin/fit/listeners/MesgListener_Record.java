@@ -378,8 +378,7 @@ public class MesgListener_Record extends AbstractMesgListener implements RecordM
                }
             }
 
-            timeData.powerDataSource = devField.getName().equals(DEV_FIELD_NAME__POWER) ? Messages.PrefPage_Fit_Combo_Power_Data_Source_Stryd
-                  : Messages.PrefPage_Fit_Combo_Power_Data_Source_Garmin_RD_Pod;
+            timeData.powerDataSource = devField.getName().equals(DEV_FIELD_NAME__POWER) ? "Stryd" : "Garmin Running Dynamics Pod"; //$NON-NLS-1$ //$NON-NLS-2$
 
             //  112 Watts
 
