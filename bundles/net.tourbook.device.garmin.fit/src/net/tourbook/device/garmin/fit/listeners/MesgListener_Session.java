@@ -107,7 +107,7 @@ public class MesgListener_Session extends AbstractMesgListener implements Sessio
       }
 
       // -----------------------POWER -----------------------
-      Integer avgPower = mesg.getAvgPower();
+      final Integer avgPower = mesg.getAvgPower();
       if (avgPower != null) {
          tourData.setPower_Avg(avgPower);
       }
@@ -128,8 +128,7 @@ public class MesgListener_Session extends AbstractMesgListener implements Sessio
             }
          }
 
-         avgPower = (int) powerDataList.stream().mapToDouble(Float::doubleValue).average().getAsDouble();
-         tourData.setPower_Avg(avgPower);
+         fitData._computeAveragePower = true;
 
          maxPower = (int) powerDataList.stream().mapToDouble(Float::doubleValue).max().getAsDouble();
          tourData.setPower_Max(maxPower);
