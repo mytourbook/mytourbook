@@ -9393,12 +9393,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
-    * Set only tour start time components which are used in views, e.g. tourbook view and are
+    * Set tour start yeay/month/day which are used in views, e.g. tourbook view, they are
     * accessed with sql statements.
     *
     * @param tourStartTime
     */
-   public void setTourStartTimeComponents(final ZonedDateTime tourStartTime) {
+   public void setTourStartTime_YYMMDD(final ZonedDateTime tourStartTime) {
 
       startYear = (short) tourStartTime.getYear();
       startMonth = (short) tourStartTime.getMonthValue();

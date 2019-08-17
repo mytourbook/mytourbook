@@ -316,7 +316,7 @@ public class FitLogSAXHandler extends DefaultHandler {
          if (tourStartTime_FromImport.equals(tourStartTime_FromLatLon) == false) {
 
             // time zone is different -> fix tour start components with adjusted time zone
-            tourData.setTourStartTimeComponents(tourStartTime_FromLatLon);
+            tourData.setTourStartTime_YYMMDD(tourStartTime_FromLatLon);
          }
       }
 
