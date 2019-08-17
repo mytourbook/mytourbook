@@ -62,7 +62,9 @@ public class MarkerToolkit {
 
    private Bitmap _bitmapPoi;
    private Bitmap _bitmapStar;
-   private Bitmap _BitmapClusterStar;
+   private Bitmap _bitmapCircle;
+   private Bitmap _BitmapClusterSymbol;
+   
 
    protected Paint _fillPainter = CanvasAdapter.newPaint();
    protected Paint _linePainter = CanvasAdapter.newPaint();
@@ -84,12 +86,17 @@ public class MarkerToolkit {
       _fillPainter.setStyle(Paint.Style.FILL);
       
       _linePainter.setStyle(Paint.Style.STROKE);
+      _linePainter.setStrokeWidth(4);
       
       _bitmapCluster = createClusterBitmap(1);
       
       _bitmapPoi = createPoiBitmap(shape);
       
-      _BitmapClusterStar = drawStar(_clusterSymbol_Size);
+      if(shape == MarkerShape.CIRCLE) {
+         _BitmapClusterSymbol = drawCircle(_clusterSymbol_Size);
+      } else {
+         _BitmapClusterSymbol = drawStar(_clusterSymbol_Size);
+      }
       
       _symbol = new MarkerSymbol(_bitmapPoi, MarkerSymbol.HotspotPlace.CENTER, false);
       
@@ -139,19 +146,24 @@ public class MarkerToolkit {
 
       _bitmapPoi = CanvasAdapter.newBitmap(_symbolSizeInt, _symbolSizeInt, 0);
 
-      org.oscim.backend.canvas.Canvas defaultMarkerCanvas = CanvasAdapter.newCanvas();  
-      defaultMarkerCanvas.setBitmap(_bitmapPoi);
-      float half = _symbolSizeInt/2;
-      
-      if(shape == shape.CIRCLE) {
-         _linePainter.setColor(0xA0000000); //gray like the PhotoSymbol in the UI
-         //_fillPainter.setColor(0x80FF69B4); // 50percent pink
-         defaultMarkerCanvas.drawCircle(half, half, half * 0.8f, _linePainter);
+      if(shape == MarkerShape.CIRCLE) {
+         _bitmapPoi = drawCircle(_symbolSizeInt);
       } else {
          _bitmapPoi = drawStar(_symbolSizeInt);
       }
      return _bitmapPoi;
       
+   }
+   
+   public Bitmap drawCircle(int bitmapCircleSize) {
+      _bitmapCircle = CanvasAdapter.newBitmap(bitmapCircleSize, bitmapCircleSize, 0);
+      org.oscim.backend.canvas.Canvas defaultMarkerCanvas = CanvasAdapter.newCanvas();
+      defaultMarkerCanvas.setBitmap(_bitmapCircle);
+      float half = bitmapCircleSize/2;
+      _linePainter.setColor(0xA0000000); //gray like the PhotoSymbol in the UI
+      _linePainter.setStrokeWidth(2);
+      defaultMarkerCanvas.drawCircle(half, half, half * 0.8f, _linePainter);
+      return _bitmapCircle;
    }
    
    public Bitmap drawStar(int bitmapStarSize) {
@@ -188,7 +200,7 @@ public class MarkerToolkit {
             _clusterSymbolWeight,
             _clusterOutlineSize);
 
-      final Bitmap paintedBitmap = drawable.getBitmap(_BitmapClusterStar);
+      final Bitmap paintedBitmap = drawable.getBitmap(_BitmapClusterSymbol);
       return paintedBitmap;
    }
    
@@ -196,7 +208,7 @@ public class MarkerToolkit {
    public List<MarkerItem> createMarkerItemList(MarkerMode MarkerMode){
       loadConfig();
       createPoiBitmap(MarkerShape.STAR);
-      _BitmapClusterStar = drawStar(_clusterSymbol_Size);
+      _BitmapClusterSymbol = drawStar(_clusterSymbol_Size);
       List<MarkerItem> pts = new ArrayList<>();
      
       for (final MapBookmark mapBookmark : net.tourbook.map.bookmark.MapBookmarkManager.getAllBookmarks()) {
@@ -208,7 +220,7 @@ public class MarkerToolkit {
          pts.add(item);
       }
 
-      if (MarkerMode == MarkerMode.NORMAL) {return pts;};
+      if (MarkerMode == net.tourbook.map25.layer.marker.MarkerToolkit.MarkerMode.NORMAL) {return pts;};
 
       int COUNT = 5;
       float STEP = 100f / 110000f; // roughly 100 meters
