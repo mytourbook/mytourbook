@@ -181,7 +181,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 
    private class Lap {
 
-      private long  lapEndTime;
+      private long lapEndTime;
    }
 
    public FitLogSAXHandler(final FitLogDeviceDataReader device,
@@ -260,7 +260,9 @@ public class FitLogSAXHandler extends DefaultHandler {
 //         tourDateTime = _currentActivity.tourStartTime;
 //      }
 
-      tourData.setTourStartTime(_currentActivity.tourStartTime);
+      final ZonedDateTime tourStartTime_FromImport = _currentActivity.tourStartTime;
+
+      tourData.setTourStartTime(tourStartTime_FromImport);
 
       tourData.setTourTitle(_currentActivity.name);
       tourData.setTourDescription(_currentActivity.notes);
@@ -305,6 +307,17 @@ public class FitLogSAXHandler extends DefaultHandler {
          // create 'normal' tour
 
          tourData.createTimeSeries(_currentActivity.timeSlices, false);
+
+         /*
+          * The tour start time timezone is set from lat/lon in createTimeSeries()
+          */
+         final ZonedDateTime tourStartTime_FromLatLon = tourData.getTourStartTime();
+
+         if (tourStartTime_FromImport.equals(tourStartTime_FromLatLon) == false) {
+
+            // time zone is different -> fix tour start components with adjusted time zone
+            tourData.setTourStartTimeComponents(tourStartTime_FromLatLon);
+         }
       }
 
       if (_currentActivity.avgPower != 0) {

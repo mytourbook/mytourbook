@@ -233,16 +233,16 @@ public class TimeTools {
     *
     * @param yyyymmddhhmmss
     * @return
-    */ 
+    */
    public static ZonedDateTime createDateTimeFromYMDhms(final long yyyymmddhhmmss) {
-   
+
       final int year = (int) (yyyymmddhhmmss / 10000000000L) % 10000;
       final int month = (int) (yyyymmddhhmmss / 100000000) % 100;
       final int day = (int) (yyyymmddhhmmss / 1000000) % 100;
       final int hour = (int) (yyyymmddhhmmss / 10000) % 100;
       final int minute = (int) (yyyymmddhhmmss / 100 % 100);
       final int second = (int) (yyyymmddhhmmss % 100);
-   
+
       return ZonedDateTime.of(year, month, day, hour, minute, second, 0, getDefaultTimeZone());
    }
 
@@ -281,7 +281,7 @@ public class TimeTools {
       final boolean isDefaultZone = dbTimeZoneId == null;
       final boolean isTourTimeZone = dbTimeZoneId != null;
 
-      final ZoneId zoneId = isDefaultZone //
+      final ZoneId zoneId = isDefaultZone
             ? _defaultTimeZoneId
             : ZoneId.of(dbTimeZoneId);
 
@@ -294,8 +294,7 @@ public class TimeTools {
 
          tourZonedDateTime = ZonedDateTime.ofInstant(tourStartInstant, zoneId);
 
-         final ZonedDateTime tourDateTimeWithDefaultZoneId = tourZonedDateTime
-               .withZoneSameInstant(_defaultTimeZoneId);
+         final ZonedDateTime tourDateTimeWithDefaultZoneId = tourZonedDateTime.withZoneSameInstant(_defaultTimeZoneId);
 
          final int tourOffset = tourZonedDateTime.getOffset().getTotalSeconds();
          final int defaultOffset = tourDateTimeWithDefaultZoneId.getOffset().getTotalSeconds();
