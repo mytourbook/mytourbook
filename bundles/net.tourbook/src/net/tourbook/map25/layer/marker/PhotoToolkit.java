@@ -29,6 +29,7 @@ import net.tourbook.data.TourMarker;
 import net.tourbook.map.bookmark.MapBookmark;
 import net.tourbook.map25.Map25App;
 import net.tourbook.map25.Map25ConfigManager;
+import net.tourbook.map25.Map25View;
 import net.tourbook.map25.layer.marker.MarkerToolkit.MarkerShape;
 import net.tourbook.photo.ILoadCallBack;
 import net.tourbook.photo.ImageQuality;
@@ -48,36 +49,36 @@ public class PhotoToolkit extends MarkerToolkit{
    public MarkerSymbol _symbol;  //marker symbol, circle or star
 
    private Bitmap _bitmapPhoto;  //normaly the photo as Bitmap
-   private Bitmap _bitmapDefaultPhotoSymbol;  // default bitmap circle or star. used when no photo loaded
    private Bitmap _BitmapClusterPhoto;  // The Bitmap when markers are clustered
 
    public MarkerRendererFactory _markerRendererFactory;
    
    public boolean _isMarkerClusteredLast;
    
-   Display                       _display;
+   Display  _display;
+   
+   private Map25App _mapApp;
 
    private class LoadCallbackImage implements ILoadCallBack {
 
-      private Map  __map;
-      private Tile __tile;
+      private Map25App         _mapApp;
+      //private Map25View = _map25App.
 
       public LoadCallbackImage() {
-         __map = null;
-         __tile = null;
+         //_map25View = null;
+         //_mapApp = null;
       }
 
       @Override
       public void callBackImageIsLoaded(final boolean isUpdateUI) {
 
          debugPrint("???? PhotoToolkit: LoadCallbackImage"); //$NON-NLS-1$
-         
-         if (isUpdateUI == false) {
-            return;
-         }
+         updatePhotos();
+         _mapApp.updateUI_PhotoLayer();
+//         if (isUpdateUI == false) {
+//            return;
+//         }
 
-         //__map.queueOverlayPainting(__tile);
-//       __map.paint();
       }
    }   
    
@@ -196,9 +197,17 @@ public class PhotoToolkit extends MarkerToolkit{
    }
    
    
-   public Bitmap createPhotoBitmapFromPhoto(Photo photo) {
-      Bitmap bitmap = null;
-      bitmap = getPhotoImage(photo);
+   public MarkerSymbol createPhotoBitmapFromPhoto(Photo photo, MarkerItem item) {
+      Bitmap bitmapImage = getPhotoImage(photo);
+      MarkerSymbol bitmapPhoto = null;
+      
+      if (bitmapImage == null) {
+         bitmapImage = _bitmapPhoto;
+      }
+      bitmapPhoto = createAdvanceSymbol(item, bitmapImage, true);
+
+      //debugPrint(" ??????????? PhotoToolkit *** createPhotoBitmapfromPhoto Dims H + W: " + bitmapImage.getHeight() + " " + bitmapImage.getWidth()); //$NON-NLS-1$
+      
       /*
       final org.eclipse.swt.graphics.Point photoSize = photo.getMapImageSize();
         
@@ -211,9 +220,14 @@ public class PhotoToolkit extends MarkerToolkit{
          debugPrint(" ??????????? PhotoToolkit *** createPhotoBitmapfromPhoto was null"); //$NON-NLS-1$
       }
       */
-      return bitmap;
+      return bitmapPhoto;
    }
  
-   
+   public void updatePhotos() {
+      //net.tourbook.map25.Map25App.debugPrint("Update Photos");
+      System.out.println("update: ");// + _mapApp.getMap().getMapPosition());
+      net.tourbook.map25.Map25App.debugPrint("Update Photos 2");
+      _mapApp.updateUI_PhotoLayer();
+   }
    
 }

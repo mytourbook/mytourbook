@@ -83,6 +83,8 @@ public class MarkerToolkit {
 
       _fillPainter.setStyle(Paint.Style.FILL);
       
+      _linePainter.setStyle(Paint.Style.STROKE);
+      
       _bitmapCluster = createClusterBitmap(1);
       
       _bitmapPoi = createPoiBitmap(shape);
@@ -142,8 +144,9 @@ public class MarkerToolkit {
       float half = _symbolSizeInt/2;
       
       if(shape == shape.CIRCLE) {
-         _fillPainter.setColor(0x80FF69B4); // 50percent pink
-         defaultMarkerCanvas.drawCircle(half, half, half * 0.8f, _fillPainter);
+         _linePainter.setColor(0xA0000000); //gray like the PhotoSymbol in the UI
+         //_fillPainter.setColor(0x80FF69B4); // 50percent pink
+         defaultMarkerCanvas.drawCircle(half, half, half * 0.8f, _linePainter);
       } else {
          _bitmapPoi = drawStar(_symbolSizeInt);
       }
@@ -201,7 +204,7 @@ public class MarkerToolkit {
          MarkerItem item = new MarkerItem(mapBookmark.id, mapBookmark.name, "", //$NON-NLS-1$
                new GeoPoint(mapBookmark.getLatitude(), mapBookmark.getLongitude())
                );
-         item.setMarker(createAdvanceSymbol(item, _bitmapPoi));
+         item.setMarker(createAdvanceSymbol(item, _bitmapPoi, false));
          pts.add(item);
       }
 
@@ -221,7 +224,7 @@ public class MarkerToolkit {
             MarkerItem item = new MarkerItem(y + ", " + x, "Title " + demo_lat + "/" + demo_lon,"Description "  + x + "/" + y, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
                   new GeoPoint(demo_lat + y * STEP + random, demo_lon + x * STEP + random)
                   );
-            item.setMarker(createAdvanceSymbol(item, _bitmapPoi));
+            item.setMarker(createAdvanceSymbol(item, _bitmapPoi, false));
             pts.add(item);
          }
       }
@@ -237,7 +240,7 @@ public class MarkerToolkit {
     * @return MarkerSymbol with title, description and symbol
     * 
     */
-   public MarkerSymbol createAdvanceSymbol(MarkerItem mItem, Bitmap poiBitmap) {
+   public MarkerSymbol createAdvanceSymbol(MarkerItem mItem, Bitmap poiBitmap, Boolean isPhoto) {
       loadConfig();
       final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
       final boolean isBillboard = config.markerOrientation == Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD;
@@ -317,6 +320,10 @@ public class MarkerToolkit {
       markerCanvas.drawBitmap(titleBitmap, xSize/2-(titleWidth/2), 0);
       markerCanvas.drawBitmap(poiBitmap, xSize/2-(symbolWidth/2), ySize/2-(symbolWidth/2));
       
+      if (isPhoto) {
+         return (new MarkerSymbol(markerBitmap, HotspotPlace.BOTTOM_CENTER));
+      }
+      
       if (isBillboard) {
          return (new MarkerSymbol(markerBitmap, HotspotPlace.CENTER));
       } else {
@@ -327,9 +334,6 @@ public class MarkerToolkit {
    
    public void debugPrint(String debugText) {
       net.tourbook.map25.Map25App.debugPrint(debugText);
-//      if(net.tourbook.map25.Map25App.debugMode == net.tourbook.map25.Map25App.DebugMode.ON) {
-//         System.out.println(UI.timeStamp() + debugText);//$NON-NLS-1$
-//      }
    }
    
 }

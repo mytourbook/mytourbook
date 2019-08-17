@@ -825,7 +825,7 @@ public class MarkerRenderer extends BucketRenderer {
 
             //create dummy MarkerItem with dummy coordinates. only need it for create the label
 			   MarkerItem item = new MarkerItem(title, subtitle, new GeoPoint(5.0, 5.0));
-			   item.setMarker(_markertoolkit.createAdvanceSymbol(item, markerSymbol.getBitmap()));
+			   item.setMarker(_markertoolkit.createAdvanceSymbol(item, markerSymbol.getBitmap(), false));
 			   
 			   mapSymbol.set(projItem.mapX, projItem.mapY, item.getMarker().getBitmap(), markerSymbol.mBillboard); 
 			   mapSymbol.offset = markerSymbol.getHotspot();
