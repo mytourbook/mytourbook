@@ -308,7 +308,9 @@ public class FitLogSAXHandler extends DefaultHandler {
 //         tourDateTime = _currentActivity.tourStartTime;
 //      }
 
-      tourData.setTourStartTime(_currentActivity.tourStartTime);
+      final ZonedDateTime tourStartTime_FromImport = _currentActivity.tourStartTime;
+
+      tourData.setTourStartTime(tourStartTime_FromImport);
 
       tourData.setTourTitle(_currentActivity.name);
       tourData.setTourDescription(_currentActivity.notes);
@@ -373,6 +375,17 @@ public class FitLogSAXHandler extends DefaultHandler {
          // create 'normal' tour
 
          tourData.createTimeSeries(_currentActivity.timeSlices, false);
+         
+         /*
+          * The tour start time timezone is set from lat/lon in createTimeSeries()
+          */
+         final ZonedDateTime tourStartTime_FromLatLon = tourData.getTourStartTime();
+
+         if (tourStartTime_FromImport.equals(tourStartTime_FromLatLon) == false) {
+
+            // time zone is different -> fix tour start components with adjusted time zone
+            tourData.setTourStartTime_YYMMDD(tourStartTime_FromLatLon);
+         }
       }
 
       if (_currentActivity.avgPower != 0) {
@@ -947,7 +960,7 @@ public class FitLogSAXHandler extends DefaultHandler {
     *
     *           <pre>
     *              <Weather Conditions="Clear" Temp=
-   "15.5003">Min./Max.: 55.6 °F/63.9 °F; Pressure: 1004.5 mbar; Humidity: 74.9%; Dew point: 49.0 °F; Wind Speed: 1.9 mph; Precipitation: 0.0mm</Weather>
+   "15.5003">Min./Max.: 55.6 ï¿½F/63.9 ï¿½F; Pressure: 1004.5 mbar; Humidity: 74.9%; Dew point: 49.0 ï¿½F; Wind Speed: 1.9 mph; Precipitation: 0.0mm</Weather>
     *           </pre>
     *
     * @return
