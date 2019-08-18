@@ -37,7 +37,6 @@ Improvements
 Bugfix   
 ======
 
-<<<<<<< HEAD
 * Weather (Frederic)
  - When entering a pressure using the metric system (mb), the format now accepts 1
    decimal
@@ -46,18 +45,9 @@ Bugfix
 
   - Fitlog Import
     - Fixed tour start time year/month/day by using it's time zone
-
-  - Tour Book View
-    - Extended "Set Time Zone" wizard to set tour start time year/month/day with time zone
-=======
-* Tour start time in tour book view was wrong needed these fixes
-
-  - Fitlog Import
-    - Fixed tour start time year/month/day by using it's time zone
   
   - Tour Book View
     - Extended "Set Time Zone" wizard to set tour start time year/month/day with time zone   
->>>>>>> refs/remotes/wolfgang/master
  
 
 Translation    

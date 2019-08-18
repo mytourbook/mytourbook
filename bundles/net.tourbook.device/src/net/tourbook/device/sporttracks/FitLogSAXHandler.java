@@ -960,7 +960,7 @@ public class FitLogSAXHandler extends DefaultHandler {
     *
     *           <pre>
     *              <Weather Conditions="Clear" Temp=
-   "15.5003">Min./Max.: 55.6 �F/63.9 �F; Pressure: 1004.5 mbar; Humidity: 74.9%; Dew point: 49.0 �F; Wind Speed: 1.9 mph; Precipitation: 0.0mm</Weather>
+   "15.5003">Min./Max.: 55.6 °F/63.9 °F; Pressure: 1004.5 mbar; Humidity: 74.9%; Dew point: 49.0 °F; Wind Speed: 1.9 mph; Precipitation: 0.0mm</Weather>
     *           </pre>
     *
     * @return
