@@ -24,6 +24,11 @@ import java.util.LinkedHashMap;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
+import org.eclipse.osgi.util.NLS;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
+
 import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
@@ -38,11 +43,6 @@ import net.tourbook.device.Messages;
 import net.tourbook.preferences.TourTypeColorDefinition;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.ChartLabel;
-
-import org.eclipse.osgi.util.NLS;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
 
 public class FitLogSAXHandler extends DefaultHandler {
 
@@ -375,7 +375,7 @@ public class FitLogSAXHandler extends DefaultHandler {
          // create 'normal' tour
 
          tourData.createTimeSeries(_currentActivity.timeSlices, false);
-         
+
          /*
           * The tour start time timezone is set from lat/lon in createTimeSeries()
           */

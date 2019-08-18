@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -38,167 +38,198 @@ import org.eclipse.swt.widgets.Link;
 
 class DialogSetTimeZone_WizardPage extends WizardPage {
 
-	private final IPreferenceStore	_prefStore	= TourbookPlugin.getPrefStore();
+   private final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
 
-	private PixelConverter			_pc;
+   private PixelConverter         _pc;
 
-	/*
-	 * UI controls
-	 */
-	private Combo					_comboTimeZone;
+   /*
+    * UI controls
+    */
+   private Combo  _comboTimeZone;
 
-	private Link					_linkDefaultTimeZone;
+   private Link   _linkDefaultTimeZone;
 
-	private Button					_rdoSetTimeZone_Remove;
-	private Button					_rdoSetTimeZone_FromList;
-	private Button					_rdoSetTimeZone_FromGeo;
+   private Button _rdoSetTimeZone_Remove;
+   private Button _rdoSetTimeZone_FromList;
+   private Button _rdoSetTimeZone_FromGeo;
+   private Button _rdoSetTourStart_YYMMDD;
 
-	protected DialogSetTimeZone_WizardPage(final String pageName) {
+   protected DialogSetTimeZone_WizardPage(final String pageName) {
 
-		super(pageName);
+      super(pageName);
 
-		setTitle(Messages.Dialog_SetTimeZone_Dialog_Title);
-	}
+      setTitle(Messages.Dialog_SetTimeZone_Dialog_Title);
+   }
 
-	@Override
-	public void createControl(final Composite parent) {
+   @Override
+   public void createControl(final Composite parent) {
 
-		_pc = new PixelConverter(parent);
+      _pc = new PixelConverter(parent);
 
-		final Composite page = createUI(parent);
+      final Composite page = createUI(parent);
 
-		// set wizard page control
-		setControl(page);
+      // set wizard page control
+      setControl(page);
 
-		restoreState();
-	}
+      restoreState();
+   }
 
-	private Composite createUI(final Composite parent) {
+   private Composite createUI(final Composite parent) {
 
-		final Composite container = new Composite(parent, SWT.NONE);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
-		GridDataFactory.fillDefaults()//
-				.grab(true, false)
-				.applyTo(container);
-		GridLayoutFactory.swtDefaults().applyTo(container);
-		{
-			createUI_10_Controls(container);
-		}
+      final Composite container = new Composite(parent, SWT.NONE);
+//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+      GridDataFactory.fillDefaults()
+            .grab(true, false)
+            .applyTo(container);
+      GridLayoutFactory.swtDefaults().applyTo(container);
+      {
+         createUI_10_Controls(container);
+      }
 
-		return container;
-	}
+      return container;
+   }
 
-	private void createUI_10_Controls(final Composite parent) {
+   private void createUI_10_Controls(final Composite parent) {
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.fillDefaults().applyTo(container);
-		{
-			{
-				// label: Info
-				final Label label = new Label(container, SWT.NONE);
-				GridDataFactory.fillDefaults().applyTo(label);
-				label.setText(Messages.Dialog_SetTimeZone_Label_Info);
-			}
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridLayoutFactory.fillDefaults().applyTo(container);
+      {
+         {
+            /*
+             * Info
+             */
 
-			{
-				// radio: Set time zone from geo position
-				_rdoSetTimeZone_FromGeo = new Button(container, SWT.RADIO);
-				_rdoSetTimeZone_FromGeo.setText(Messages.Dialog_SetTimeZone_Radio_SetTimeZone_FromGeo);
-				GridDataFactory.fillDefaults()//
-						.indent(0, 10)
-						.applyTo(_rdoSetTimeZone_FromGeo);
-			}
+            // label
+            final Label label = new Label(container, SWT.NONE);
+            GridDataFactory.fillDefaults().applyTo(label);
+            label.setText(Messages.Dialog_SetTimeZone_Label_Info);
+         }
+         {
+            /*
+             * Set time zone from geo position
+             */
 
-			{
-				/*
-				 * Set time zone from list
-				 */
+            // radio
+            _rdoSetTimeZone_FromGeo = new Button(container, SWT.RADIO);
+            _rdoSetTimeZone_FromGeo.setText(Messages.Dialog_SetTimeZone_Radio_SetTimeZone_FromGeo);
+            GridDataFactory.fillDefaults()//
+                  .indent(0, 10)
+                  .applyTo(_rdoSetTimeZone_FromGeo);
+         }
+         {
+            /*
+             * Set time zone from list
+             */
 
-				// radio
-				_rdoSetTimeZone_FromList = new Button(container, SWT.RADIO);
-				_rdoSetTimeZone_FromList.setText(Messages.Dialog_SetTimeZone_Radio_SetTimeZone_FromCombo);
+            // radio
+            _rdoSetTimeZone_FromList = new Button(container, SWT.RADIO);
+            _rdoSetTimeZone_FromList.setText(Messages.Dialog_SetTimeZone_Radio_SetTimeZone_FromCombo);
 
-				// content
-				final Composite setContainer = new Composite(container, SWT.NONE);
-				GridDataFactory.fillDefaults().grab(true, false).applyTo(setContainer);
-				GridLayoutFactory.fillDefaults().numColumns(2).applyTo(setContainer);
-				{
-					{
-						// combo
-						_comboTimeZone = new Combo(setContainer, SWT.READ_ONLY | SWT.BORDER);
-						_comboTimeZone.setVisibleItemCount(50);
-						GridDataFactory.fillDefaults()//
-								.indent(_pc.convertWidthInCharsToPixels(2), 0)
-								.align(SWT.BEGINNING, SWT.FILL)
-								.applyTo(_comboTimeZone);
+            // content
+            final Composite setContainer = new Composite(container, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(setContainer);
+            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(setContainer);
+            {
+               {
+                  // combo
+                  _comboTimeZone = new Combo(setContainer, SWT.READ_ONLY | SWT.BORDER);
+                  _comboTimeZone.setVisibleItemCount(50);
+                  GridDataFactory.fillDefaults()//
+                        .indent(_pc.convertWidthInCharsToPixels(2), 0)
+                        .align(SWT.BEGINNING, SWT.FILL)
+                        .applyTo(_comboTimeZone);
 
-						// fill combobox
-						for (final TimeZoneData timeZone : TimeTools.getAllTimeZones()) {
-							_comboTimeZone.add(timeZone.label);
-						}
-					}
+                  // fill combobox
+                  for (final TimeZoneData timeZone : TimeTools.getAllTimeZones()) {
+                     _comboTimeZone.add(timeZone.label);
+                  }
+               }
 
-					{
-						// link: set default
+               {
+                  // link: set default
 
-						_linkDefaultTimeZone = new Link(setContainer, SWT.NONE);
-						_linkDefaultTimeZone.setText(Messages.Tour_Editor_Link_SetDefautTimeZone);
-						_linkDefaultTimeZone.setToolTipText(NLS.bind(
-								Messages.Tour_Editor_Link_SetDefautTimeZone_Tooltip,
-								TimeTools.getDefaultTimeZoneId()));
-						_linkDefaultTimeZone.addSelectionListener(new SelectionAdapter() {
-							@Override
-							public void widgetSelected(final SelectionEvent e) {
+                  _linkDefaultTimeZone = new Link(setContainer, SWT.NONE);
+                  _linkDefaultTimeZone.setText(Messages.Tour_Editor_Link_SetDefautTimeZone);
+                  _linkDefaultTimeZone.setToolTipText(NLS.bind(
+                        Messages.Tour_Editor_Link_SetDefautTimeZone_Tooltip,
+                        TimeTools.getDefaultTimeZoneId()));
+                  _linkDefaultTimeZone.addSelectionListener(new SelectionAdapter() {
+                     @Override
+                     public void widgetSelected(final SelectionEvent e) {
 
-								// select default time zone
-								_comboTimeZone.select(TimeTools.getTimeZoneIndex_Default());
-							}
-						});
-					}
-				}
+                        // select default time zone
+                        _comboTimeZone.select(TimeTools.getTimeZoneIndex_Default());
+                     }
+                  });
+               }
+            }
+            {
+               /*
+                * Remove Time zone
+                */
 
-				{
-					// radio: Remove Time zone
-					_rdoSetTimeZone_Remove = new Button(container, SWT.RADIO);
-					_rdoSetTimeZone_Remove.setText(Messages.Dialog_SetTimeZone_Radio_RemoveTimeZone);
-					GridDataFactory.fillDefaults()//
-//						.indent(0, 20)
-							.applyTo(_rdoSetTimeZone_Remove);
-				}
+               // radio
+               _rdoSetTimeZone_Remove = new Button(container, SWT.RADIO);
+               _rdoSetTimeZone_Remove.setText(Messages.Dialog_SetTimeZone_Radio_RemoveTimeZone);
+            }
+            {
+               /**
+                * Adjust tour start YYMMDD with time zone
+                * <p>
+                * Year/month/day of the tour start is kept separately to be used e.g. in the Tour
+                * Book view. This will set just these components which could be wrong when the tour
+                * import had a bug.
+                */
 
-			}
-		}
-	}
+               // radio
+               _rdoSetTourStart_YYMMDD = new Button(container, SWT.RADIO);
+               _rdoSetTourStart_YYMMDD.setText(Messages.Dialog_SetTimeZone_Radio_AdjustTourStart_YYMMDD);
+               _rdoSetTourStart_YYMMDD.setToolTipText(Messages.Dialog_SetTimeZone_Radio_AdjustTourStartYYMMDD_Tooltip);
+            }
 
-	private void restoreState() {
+         }
+      }
+   }
 
-		final int timeZoneAction = _prefStore.getInt(ITourbookPreferences.DIALOG_SET_TIME_ZONE_ACTION);
-		final String timeZoneId = _prefStore.getString(ITourbookPreferences.DIALOG_SET_TIME_ZONE_SELECTED_ZONE_ID);
-		final int timeZoneIndex = TimeTools.getTimeZoneIndex_WithDefault(timeZoneId);
+   private void restoreState() {
 
-		_rdoSetTimeZone_FromList.setSelection(timeZoneAction == DialogSetTimeZone.TIME_ZONE_ACTION_SET_FROM_LIST);
-		_rdoSetTimeZone_FromGeo
-				.setSelection(timeZoneAction == DialogSetTimeZone.TIME_ZONE_ACTION_SET_FROM_GEO_POSITION);
-		_rdoSetTimeZone_Remove.setSelection(timeZoneAction == DialogSetTimeZone.TIME_ZONE_ACTION_REMOVE_TIME_ZONE);
+      final int timeZoneAction = _prefStore.getInt(ITourbookPreferences.DIALOG_SET_TIME_ZONE_ACTION);
+      final String timeZoneId = _prefStore.getString(ITourbookPreferences.DIALOG_SET_TIME_ZONE_SELECTED_ZONE_ID);
+      final int timeZoneIndex = TimeTools.getTimeZoneIndex_WithDefault(timeZoneId);
 
-		_comboTimeZone.select(timeZoneIndex);
-	}
+      _rdoSetTimeZone_FromList.setSelection(timeZoneAction == DialogSetTimeZone.TIME_ZONE_ACTION_SET_FROM_LIST);
+      _rdoSetTimeZone_FromGeo.setSelection(timeZoneAction == DialogSetTimeZone.TIME_ZONE_ACTION_SET_FROM_GEO_POSITION);
+      _rdoSetTimeZone_Remove.setSelection(timeZoneAction == DialogSetTimeZone.TIME_ZONE_ACTION_REMOVE_TIME_ZONE);
+      _rdoSetTourStart_YYMMDD.setSelection(timeZoneAction == DialogSetTimeZone.TIME_ZONE_ACTION_ADJUST_TOUR_START_YYMMDD);
 
-	void saveState() {
+      _comboTimeZone.select(timeZoneIndex);
+   }
 
-		final int selectedTimeZoneIndex = _comboTimeZone.getSelectionIndex();
-		final TimeZoneData timeZoneData = TimeTools.getTimeZone_ByIndex(selectedTimeZoneIndex);
+   void saveState() {
 
-		final String timeZoneId = timeZoneData.zoneId;
+      final int selectedTimeZoneIndex = _comboTimeZone.getSelectionIndex();
+      final TimeZoneData timeZoneData = TimeTools.getTimeZone_ByIndex(selectedTimeZoneIndex);
 
-		final int timeZoneAction = _rdoSetTimeZone_FromGeo.getSelection()
-				? DialogSetTimeZone.TIME_ZONE_ACTION_SET_FROM_GEO_POSITION
-				: _rdoSetTimeZone_Remove.getSelection()
-						? DialogSetTimeZone.TIME_ZONE_ACTION_REMOVE_TIME_ZONE
-						: DialogSetTimeZone.TIME_ZONE_ACTION_SET_FROM_LIST;
+      final String timeZoneId = timeZoneData.zoneId;
 
-		_prefStore.setValue(ITourbookPreferences.DIALOG_SET_TIME_ZONE_ACTION, timeZoneAction);
-		_prefStore.setValue(ITourbookPreferences.DIALOG_SET_TIME_ZONE_SELECTED_ZONE_ID, timeZoneId);
-	}
+      int timeZoneAction = -1;
+
+      if (_rdoSetTimeZone_FromList.getSelection()) {
+         timeZoneAction = DialogSetTimeZone.TIME_ZONE_ACTION_SET_FROM_LIST;
+
+      } else if (_rdoSetTimeZone_FromGeo.getSelection()) {
+         timeZoneAction = DialogSetTimeZone.TIME_ZONE_ACTION_SET_FROM_GEO_POSITION;
+
+      } else if (_rdoSetTimeZone_Remove.getSelection()) {
+         timeZoneAction = DialogSetTimeZone.TIME_ZONE_ACTION_REMOVE_TIME_ZONE;
+
+      } else if (_rdoSetTourStart_YYMMDD.getSelection()) {
+         timeZoneAction = DialogSetTimeZone.TIME_ZONE_ACTION_ADJUST_TOUR_START_YYMMDD;
+
+      }
+
+      _prefStore.setValue(ITourbookPreferences.DIALOG_SET_TIME_ZONE_ACTION, timeZoneAction);
+      _prefStore.setValue(ITourbookPreferences.DIALOG_SET_TIME_ZONE_SELECTED_ZONE_ID, timeZoneId);
+   }
 
 }
