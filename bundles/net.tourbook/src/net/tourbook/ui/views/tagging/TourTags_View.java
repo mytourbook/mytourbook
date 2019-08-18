@@ -25,10 +25,7 @@ import java.util.Set;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
-import net.tourbook.common.tooltip.ActionToolbarSlideout;
-import net.tourbook.common.tooltip.IOpeningDialog;
-import net.tourbook.common.tooltip.OpenDialogManager;
-import net.tourbook.common.tooltip.ToolbarSlideout;
+import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.IContextMenuProvider;
@@ -41,6 +38,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.preferences.PrefPageTags;
 import net.tourbook.tag.TVIPrefTag;
 import net.tourbook.tag.TVIPrefTagCategory;
 import net.tourbook.tag.TVIPrefTagRoot;
@@ -101,7 +99,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
@@ -160,16 +157,17 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
    private boolean                            _isShowOnlyCheckedTags;
    private boolean                            _isTagDirty;
 
-   private OpenDialogManager                  _openDlgMgr                               = new OpenDialogManager();
+//   private OpenDialogManager                  _openDlgMgr                               = new OpenDialogManager();
 
    private long                               _expandRunnableCounter;
 
    private ActionCollapseAllWithoutSelection  _actionCollapseAll;
    private ActionExpandAll                    _actionExpandAll;
    private Action_SingleExpand_CollapseOthers _actionSingleExpandCollapseOthers;
+   private ActionOpenPrefDialog               _action_PrefDialog;
    private ActionTagLayout                    _actionTagLayout;
    private ActionTagFilter                    _actionTagFilter;
-   private Action_TourTag_Options             _actionTourTagOptions;
+//   private Action_TourTag_Options             _actionTourTagOptions;
    private ActionUndoChanges                  _actionUndoChanges;
 
    private PixelConverter                     _pc;
@@ -204,23 +202,23 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
       }
    }
 
-   private class Action_TourTag_Options extends ActionToolbarSlideout {
-
-      private Slideout_TourTag_Options __slideoutTourTagOptions;
-
-      @Override
-      protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
-
-         __slideoutTourTagOptions = new Slideout_TourTag_Options(_parent, toolbar, TourTags_View.this, _state);
-
-         return __slideoutTourTagOptions;
-      }
-
-      @Override
-      protected void onBeforeOpenSlideout() {
-         closeOpenedDialogs(this);
-      }
-   }
+//   private class Action_TourTag_Options extends ActionToolbarSlideout {
+//
+//      private Slideout_TourTag_Options __slideoutTourTagOptions;
+//
+//      @Override
+//      protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+//
+//         __slideoutTourTagOptions = new Slideout_TourTag_Options(_parent, toolbar, TourTags_View.this, _state);
+//
+//         return __slideoutTourTagOptions;
+//      }
+//
+//      @Override
+//      protected void onBeforeOpenSlideout() {
+//         closeOpenedDialogs(this);
+//      }
+//   }
 
    private class ActionCollapseAllWithoutSelection extends ActionCollapseAll {
 
@@ -612,21 +610,20 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
     *
     * @param openingDialog
     */
-   private void closeOpenedDialogs(final IOpeningDialog openingDialog) {
-      _openDlgMgr.closeOpenedDialogs(openingDialog);
-   }
+//   private void closeOpenedDialogs(final IOpeningDialog openingDialog) {
+//      _openDlgMgr.closeOpenedDialogs(openingDialog);
+//   }
 
    private void createActions() {
 
       _actionExpandAll = new ActionExpandAll(this);
       _actionCollapseAll = new ActionCollapseAllWithoutSelection(this);
+      _action_PrefDialog = new ActionOpenPrefDialog(Messages.action_tag_open_tagging_structure, PrefPageTags.ID);
       _actionTagLayout = new ActionTagLayout();
       _actionTagFilter = new ActionTagFilter();
-      _actionTourTagOptions = new Action_TourTag_Options();
+//      _actionTourTagOptions = new Action_TourTag_Options();
       _actionSingleExpandCollapseOthers = new Action_SingleExpand_CollapseOthers();
-
       _actionUndoChanges = new ActionUndoChanges();
-
    }
 
    private void createMenuManager() {
@@ -1057,7 +1054,8 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
       tbm.add(_actionExpandAll);
       tbm.add(_actionCollapseAll);
       tbm.add(_actionUndoChanges);
-      tbm.add(_actionTourTagOptions);
+      tbm.add(_action_PrefDialog);
+//      tbm.add(_actionTourTagOptions);
 
       /*
        * fill toolbar view menu

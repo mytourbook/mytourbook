@@ -1714,9 +1714,14 @@ public class Messages extends NLS {
    public static String Pref_TourDb_Radio_DbSystem_Server;
    public static String Pref_TourDb_Radio_DbSystem_Server_Tooltip;
 
+   public static String Pref_TourTag_Action_DeleteCategory;
+   public static String Pref_TourTag_Action_DeleteTag;
+   public static String Pref_TourTag_Action_DeleteTag_WithConfirm;
    public static String Pref_TourTag_Column_ID;
    public static String Pref_TourTag_Column_Notes;
    public static String Pref_TourTag_Column_TagsAndCategories;
+   public static String Pref_TourTag_Dialog_DeleteTag_Message;
+   public static String Pref_TourTag_Dialog_DeleteTag_Title;
    public static String Pref_TourTag_Link_AppearanceOptions;
 
    public static String Pref_TourTypeFilter_button_new;

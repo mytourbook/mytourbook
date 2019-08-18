@@ -104,8 +104,8 @@ public class TourDatabase {
     * Version for the database which is required that the tourbook application works successfully
     */
    private static final int TOURBOOK_DB_VERSION = 39;
-//   private static final int TOURBOOK_DB_VERSION = 39; // 19.7 ?
-//   private static final int TOURBOOK_DB_VERSION = 38; // 19.5 ?
+//   private static final int TOURBOOK_DB_VERSION = 39; // 19.7
+//   private static final int TOURBOOK_DB_VERSION = 38; // 19.6
 //   private static final int TOURBOOK_DB_VERSION = 37; // 19.2
 //   private static final int TOURBOOK_DB_VERSION = 36; // 18.12
 //   private static final int TOURBOOK_DB_VERSION = 35; // 18.7
@@ -3210,15 +3210,15 @@ public class TourDatabase {
       /*
        * CREATE TABLE TourReference
        */
-      exec(stmt, "CREATE TABLE " + TABLE_TOUR_REFERENCE + "   (                              \n" //$NON-NLS-1$ //$NON-NLS-2$
+      exec(stmt, "CREATE TABLE " + TABLE_TOUR_REFERENCE + "   (                           \n" //$NON-NLS-1$ //$NON-NLS-2$
       //
             + SQL.CreateField_EntityId(ENTITY_ID_REF, true)
             //
-            + "   " + KEY_TOUR + "   BIGINT,                                                \n"//$NON-NLS-1$ //$NON-NLS-2$
+            + "   " + KEY_TOUR + "     BIGINT,                                            \n"//$NON-NLS-1$ //$NON-NLS-2$
             //
-            + "   startIndex         INTEGER NOT NULL,                                       \n" //$NON-NLS-1$
-            + "   endIndex          INTEGER NOT NULL,                                       \n" //$NON-NLS-1$
-            + "   label            VARCHAR(" + TourReference.DB_LENGTH_LABEL + ")            \n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   startIndex           INTEGER NOT NULL,                                  \n" //$NON-NLS-1$
+            + "   endIndex             INTEGER NOT NULL,                                  \n" //$NON-NLS-1$
+            + "   label                VARCHAR(" + TourReference.DB_LENGTH_LABEL + ")     \n" //$NON-NLS-1$ //$NON-NLS-2$
             + ")"); //$NON-NLS-1$
    }
 
@@ -3284,16 +3284,16 @@ public class TourDatabase {
       /*
        * Create table: TOURTAGCATEGORY
        */
-      exec(stmt, "CREATE TABLE " + TABLE_TOUR_TAG_CATEGORY + "   (                        \n" //$NON-NLS-1$ //$NON-NLS-2$
+      exec(stmt, "CREATE TABLE " + TABLE_TOUR_TAG_CATEGORY + "   (                                    \n" //$NON-NLS-1$ //$NON-NLS-2$
       //
             + SQL.CreateField_EntityId(ENTITY_ID_TAG_CATEGORY, true)
             //
-            + "   isRoot               INTEGER,                                           \n" //$NON-NLS-1$
-            + "   name                 VARCHAR(" + TourTag.DB_LENGTH_NAME + "),           \n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   isRoot               INTEGER,                                                       \n" //$NON-NLS-1$
+            + "   name                 VARCHAR(" + TourTag.DB_LENGTH_NAME + "),                       \n" //$NON-NLS-1$ //$NON-NLS-2$
 
             // version 38 start
             //
-            + "   notes                VARCHAR(" + TourTag.DB_LENGTH_NOTES + ")           \n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   notes                VARCHAR(" + TourTag.DB_LENGTH_NOTES + ")                       \n" //$NON-NLS-1$ //$NON-NLS-2$
             //
             // version 38 end ---------
 
@@ -3306,23 +3306,23 @@ public class TourDatabase {
        */
       final String jtabTag = JOINTABLE__TOURTAGCATEGORY_TOURTAG;
 
-      exec(stmt, "CREATE TABLE " + jtabTag + "   (                                        \n" //$NON-NLS-1$ //$NON-NLS-2$
+      exec(stmt, "CREATE TABLE " + jtabTag + "   (                                                    \n" //$NON-NLS-1$ //$NON-NLS-2$
       //
-            + "   " + KEY_TAG + "               BIGINT NOT NULL,                          \n"//$NON-NLS-1$ //$NON-NLS-2$
-            + "   " + KEY_TAG_CATEGORY + "      BIGINT NOT NULL                           \n"//$NON-NLS-1$ //$NON-NLS-2$
+            + "   " + KEY_TAG + "               BIGINT NOT NULL,                                      \n"//$NON-NLS-1$ //$NON-NLS-2$
+            + "   " + KEY_TAG_CATEGORY + "      BIGINT NOT NULL                                       \n"//$NON-NLS-1$ //$NON-NLS-2$
             //
             + ")"); //$NON-NLS-1$
 
       // add constraints
-      final String fkTag = "fk_" + jtabTag + "_" + KEY_TAG; //                                              //$NON-NLS-1$ //$NON-NLS-2$
-      final String fkCat = "fk_" + jtabTag + "_" + TABLE_TOUR_TAG_CATEGORY + "_" + KEY_TAG_CATEGORY; //     //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      final String fkTag = "fk_" + jtabTag + "_" + KEY_TAG; //                                           //$NON-NLS-1$ //$NON-NLS-2$
+      final String fkCat = "fk_" + jtabTag + "_" + TABLE_TOUR_TAG_CATEGORY + "_" + KEY_TAG_CATEGORY; //  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
       exec(
             stmt,
-            "ALTER TABLE " + jtabTag + "                                                  \n"//$NON-NLS-1$ //$NON-NLS-2$
-                  + "   ADD CONSTRAINT " + fkTag + "                                      \n"//$NON-NLS-1$ //$NON-NLS-2$
-                  + "   FOREIGN KEY (" + KEY_TAG + ")                                     \n"//$NON-NLS-1$ //$NON-NLS-2$
-                  + "   REFERENCES " + TABLE_TOUR_TAG + " (" + ENTITY_ID_TAG + ")         \n"//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            "ALTER TABLE " + jtabTag + "                                                              \n"//$NON-NLS-1$ //$NON-NLS-2$
+                  + "   ADD CONSTRAINT " + fkTag + "                                                  \n"//$NON-NLS-1$ //$NON-NLS-2$
+                  + "   FOREIGN KEY (" + KEY_TAG + ")                                                 \n"//$NON-NLS-1$ //$NON-NLS-2$
+                  + "   REFERENCES " + TABLE_TOUR_TAG + " (" + ENTITY_ID_TAG + ")                     \n"//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
       );
 
       exec(
@@ -3338,16 +3338,16 @@ public class TourDatabase {
        */
       final String jtabCategory = JOINTABLE__TOURTAGCATEGORY_TOURTAGCATEGORY;
 
-      exec(stmt, "CREATE TABLE " + jtabCategory + "   (                                   \n"//$NON-NLS-1$ //$NON-NLS-2$
+      exec(stmt, "CREATE TABLE " + jtabCategory + "   (                                               \n"//$NON-NLS-1$ //$NON-NLS-2$
       //
-            + "   " + KEY_TAG_CATEGORY + "1   BIGINT NOT NULL,                            \n"//$NON-NLS-1$ //$NON-NLS-2$
-            + "   " + KEY_TAG_CATEGORY + "2   BIGINT NOT NULL                             \n"//$NON-NLS-1$ //$NON-NLS-2$
+            + "   " + KEY_TAG_CATEGORY + "1   BIGINT NOT NULL,                                        \n"//$NON-NLS-1$ //$NON-NLS-2$
+            + "   " + KEY_TAG_CATEGORY + "2   BIGINT NOT NULL                                         \n"//$NON-NLS-1$ //$NON-NLS-2$
             //
             + ")"); //$NON-NLS-1$
 
       // add constraints
-      final String fk1 = "fk_" + jtabCategory + "_" + KEY_TAG_CATEGORY + "1"; //             //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-      final String fk2 = "fk_" + jtabCategory + "_" + KEY_TAG_CATEGORY + "2"; //             //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      final String fk1 = "fk_" + jtabCategory + "_" + KEY_TAG_CATEGORY + "1"; //                         //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      final String fk2 = "fk_" + jtabCategory + "_" + KEY_TAG_CATEGORY + "2"; //                         //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
       exec(
             stmt,

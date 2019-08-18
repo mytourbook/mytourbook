@@ -17,7 +17,9 @@ TODOs
 New   
 ===
 
-* 
+* Tour Tag
+
+  - Delete tour tag and tag category
 
  
 Improvements   
