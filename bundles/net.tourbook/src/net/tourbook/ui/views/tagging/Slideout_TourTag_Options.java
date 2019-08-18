@@ -31,7 +31,6 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -53,7 +52,7 @@ public class Slideout_TourTag_Options extends ToolbarSlideout {
    /*
     * UI controls
     */
-   private Button  _chkShowBreaktimeValues;
+//   private Button  _chkShowBreaktimeValues;
 
    private Control _ownerControl;
 
@@ -169,19 +168,19 @@ public class Slideout_TourTag_Options extends ToolbarSlideout {
             .applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
       {
-         {
-            /*
-             * Show break time values
-             */
-            _chkShowBreaktimeValues = new Button(container, SWT.CHECK);
-            _chkShowBreaktimeValues.setText(Messages.Tour_Action_ShowBreaktimeValues);
-
-            GridDataFactory.fillDefaults()//
-                  .span(2, 1)
-                  .applyTo(_chkShowBreaktimeValues);
-
-            _chkShowBreaktimeValues.addSelectionListener(_defaultSelectionListener);
-         }
+//         {
+//            /*
+//             * Show break time values
+//             */
+//            _chkShowBreaktimeValues = new Button(container, SWT.CHECK);
+//            _chkShowBreaktimeValues.setText(Messages.Tour_Action_ShowBreaktimeValues);
+//
+//            GridDataFactory.fillDefaults()//
+//                  .span(2, 1)
+//                  .applyTo(_chkShowBreaktimeValues);
+//
+//            _chkShowBreaktimeValues.addSelectionListener(_defaultSelectionListener);
+//         }
       }
    }
 
