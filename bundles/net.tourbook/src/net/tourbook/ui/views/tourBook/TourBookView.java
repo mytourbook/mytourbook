@@ -951,6 +951,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       defineColumn_Tour_Marker();
       defineColumn_Tour_Photos();
       defineColumn_Tour_Tags();
+//      defineColumn_Tour_TagIds();
 
       // Motion / Bewegung
       defineColumn_Motion_Distance();
@@ -2663,8 +2664,46 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       });
    }
 
+//   /**
+//    * Column for debugging: Tag ids
+//    */
+//   private void defineColumn_Tour_TagIds() {
+//
+//      final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "TOUR_TAG_IDS", SWT.TRAIL); //$NON-NLS-1$
+//
+//      colDef.setColumnCategory(net.tourbook.ui.Messages.ColumnFactory_Category_Tour);
+//      colDef.setColumnLabel("Tag ID");
+//      colDef.setColumnHeaderText("Tag ID");
+//
+//      colDef.setDefaultColumnWidth(30);
+//
+//      colDef.setLabelProvider(new CellLabelProvider() {
+//
+//         @Override
+//         public void update(final ViewerCell cell) {
+//            final Object element = cell.getElement();
+//            if (element instanceof TVITourBookTour) {
+//
+//               final ArrayList<Long> tagIds = ((TVITourBookTour) element).getTagIds();
+//               if (tagIds == null) {
+//                  cell.setText(UI.EMPTY_STRING);
+//               } else {
+//
+//                  cell.setText(tagIds.stream()
+////                      .map(Object::toString)
+////                      .sorted()
+//                        .map(n -> Long.toString(n))
+//                        .collect(Collectors.joining(",")));
+//
+//                  setCellColor(cell, element);
+//               }
+//            }
+//         }
+//      });
+//   }
+
    /**
-    * column: tags
+    * Column: Tags
     */
    private void defineColumn_Tour_Tags() {
 
