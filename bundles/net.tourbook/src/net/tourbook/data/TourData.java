@@ -4753,7 +4753,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       // time is in seconds relative to the tour start
       long recordingTime = 0;
 
-      long tourStartTime = 0;
+      long historyTourStartTime = 0;
 
       // convert data from the tour format into long[] array
       for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
@@ -4767,13 +4767,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
             // 1st trackpoint
 
             timeSerieHistory[serieIndex] = 0;
-            tourStartTime = absoluteTime;
+            historyTourStartTime = absoluteTime;
 
          } else {
 
             // 1..Nth trackpoint
 
-            recordingTime = (absoluteTime - tourStartTime) / 1000;
+            recordingTime = (absoluteTime - historyTourStartTime) / 1000;
             timeSerieHistory[serieIndex] = (recordingTime);
 
          }
@@ -5359,7 +5359,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       final boolean isGPS                          = setupStartingValues_LatLon(timeDataSerie);
       final boolean isPower                        = setupStartingValues_Power(timeDataSerie);
       final boolean isPulse                        = setupStartingValues_Pulse(timeDataSerie);
-      final boolean isSpeed                  = setupStartingValues_Speed(timeDataSerie);
+      final boolean isSpeed                        = setupStartingValues_Speed(timeDataSerie);
       final boolean isTemperature                  = setupStartingValues_Temperature(timeDataSerie);
 
       final boolean isRunDyn_StanceTime            = setupStartingValues_RunDyn_StanceTime(timeDataSerie);
@@ -9390,6 +9390,22 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       // cache zoned date time
       _zonedStartTime = zonedStartTime;
+   }
+
+   /**
+    * Set tour start yeay/month/day which are used in views, e.g. tourbook view, they are
+    * accessed with sql statements.
+    *
+    * @param tourStartTime
+    */
+   public void setTourStartTime_YYMMDD(final ZonedDateTime tourStartTime) {
+
+      startYear = (short) tourStartTime.getYear();
+      startMonth = (short) tourStartTime.getMonthValue();
+      startDay = (short) tourStartTime.getDayOfMonth();
+      startHour = (short) tourStartTime.getHour();
+      startMinute = (short) tourStartTime.getMinute();
+      startSecond = tourStartTime.getSecond();
    }
 
    public void setTourTags(final Set<TourTag> tourTags) {

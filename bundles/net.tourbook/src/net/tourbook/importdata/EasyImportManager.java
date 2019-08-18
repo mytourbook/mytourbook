@@ -53,6 +53,7 @@ import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourLogState;
+import net.tourbook.ui.views.rawData.RawDataView;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -192,6 +193,16 @@ public class EasyImportManager {
              * Filestore has changed, a device was added/removed.
              */
             _fileStoresHash = fileStoresHash;
+
+            if (RawDataView.isStopWatchingStoresThread()) {
+
+               /*
+                * When the watching store is stopped, then getImportFiles() could cause a SQL
+                * exceptöion when it checks the files in the db
+                */
+
+               return returnState;
+            }
 
             getImportFiles();
 
