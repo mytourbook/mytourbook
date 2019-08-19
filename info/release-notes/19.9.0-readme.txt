@@ -46,7 +46,7 @@ Bugfix
 
   - Fitlog Import
     - Fixed tour start time year/month/day by using it's time zone
-    - Taking into account the pauses when importing laps
+    - Now Taking into account the pauses when importing laps
   
   - Tour Book View
     - Extended "Set Time Zone" wizard to set tour start time year/month/day with time zone   
