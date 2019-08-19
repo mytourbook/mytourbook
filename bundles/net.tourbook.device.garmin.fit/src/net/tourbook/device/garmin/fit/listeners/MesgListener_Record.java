@@ -310,6 +310,16 @@ public class MesgListener_Record extends AbstractMesgListener implements RecordM
     */
    private void setRecord_DeveloperData(final RecordMesg mesg, final TimeData timeData) {
 
+      int developerFieldCount = 0;
+      for (@SuppressWarnings("unused")
+      final DeveloperField developerField : mesg.getDeveloperFields()) {
+         developerFieldCount++;
+      }
+
+      if (developerFieldCount == 0) {
+         return;
+      }
+
       int powerDataSources = 0;
 
       for (final DeveloperField developerField : mesg.getDeveloperFields()) {
