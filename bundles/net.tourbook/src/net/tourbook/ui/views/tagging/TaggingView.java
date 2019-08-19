@@ -75,6 +75,7 @@ import net.tourbook.ui.views.TourInfoToolTipStyledCellLabelProvider;
 import net.tourbook.ui.views.TreeViewerTourInfoToolTip;
 
 import org.eclipse.e4.ui.di.PersistState;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -204,11 +205,12 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    private ActionOpenTour                _actionOpenTour;
    private ActionOpenPrefDialog          _actionOpenTagPrefs;
    private ActionRefreshView             _actionRefreshView;
-   private ActionSetLayoutHierarchical   _actionSetLayoutHierarchical;
-   private ActionSetLayoutFlat           _actionSetLayoutFlat;
-   private ActionSetTourTypeMenu         _actionSetTourType;
+   private ActionTagLayout               _action_ToggleTagLayout;
+//   private ActionSetLayoutHierarchical   _actionSetLayoutHierarchical;
+//   private ActionSetLayoutFlat           _actionSetLayoutFlat;
+   private ActionSetTourTypeMenu _actionSetTourType;
 
-   private PixelConverter                _pc;
+   private PixelConverter        _pc;
 
    /*
     * UI resources
@@ -223,6 +225,21 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    private Composite _viewerContainer;
 
    private Menu      _treeContextMenu;
+
+   private class ActionTagLayout extends Action {
+
+      ActionTagLayout() {
+
+         super(Messages.action_tagView_flat_layout, AS_PUSH_BUTTON);
+
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TagLayout_Flat));
+      }
+
+      @Override
+      public void run() {
+         onAction_ToggleTagLayout();
+      }
+   }
 
    private class StateSegment {
 
@@ -556,8 +573,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       _actionSetAllTagStructures = new ActionMenuSetAllTagStructures(this);
       _actionSetTagStructure = new ActionMenuSetTagStructure(this);
       _actionSetTourType = new ActionSetTourTypeMenu(this);
-      _actionSetLayoutFlat = new ActionSetLayoutFlat(this);
-      _actionSetLayoutHierarchical = new ActionSetLayoutHierarchical(this);
+      _action_ToggleTagLayout = new ActionTagLayout();
 
    }
 
@@ -570,6 +586,9 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       _viewerMenuManager.addMenuListener(new IMenuListener() {
          @Override
          public void menuAboutToShow(final IMenuManager manager) {
+
+            _tourInfoToolTip.hideToolTip();
+
             fillContextMenu(manager);
          }
       });
@@ -1480,9 +1499,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
       tbm.add(_actionExpandSelection);
       tbm.add(_actionCollapseAll);
-
-      tbm.add(_actionSetLayoutFlat);
-      tbm.add(_actionSetLayoutHierarchical);
+      tbm.add(_action_ToggleTagLayout);
 
       tbm.add(_actionRefreshView);
 
@@ -1604,6 +1621,26 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       return _tagViewer;
    }
 
+   private void onAction_ToggleTagLayout() {
+
+      switch (_tagViewLayout) {
+
+      case TAG_VIEW_LAYOUT_FLAT:
+
+         _tagViewLayout = TAG_VIEW_LAYOUT_HIERARCHICAL;
+         break;
+
+      case TAG_VIEW_LAYOUT_HIERARCHICAL:
+
+         _tagViewLayout = TAG_VIEW_LAYOUT_FLAT;
+         break;
+      }
+
+      updateUI_TagLayoutAction();
+
+      reloadViewer();
+   }
+
    /**
     * Ctrl state is not available in the tree viewer selection event -> use tree event
     *
@@ -1638,12 +1675,12 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
          // expand/collapse current item
 
-         final TreeViewerItem tourItem = (TreeViewerItem) selection;
+         final TreeViewerItem treeItem = (TreeViewerItem) selection;
 
-         if (_tagViewer.getExpandedState(tourItem)) {
-            _tagViewer.collapseToLevel(tourItem, 1);
+         if (_tagViewer.getExpandedState(treeItem)) {
+            _tagViewer.collapseToLevel(treeItem, 1);
          } else {
-            _tagViewer.expandToLevel(tourItem, 1);
+            _tagViewer.expandToLevel(treeItem, 1);
          }
       }
    }
@@ -1672,6 +1709,16 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
          final TVITagView_Tour tourItem = (TVITagView_Tour) selectedItem;
          _postSelectionProvider.setSelection(new SelectionTourId(tourItem.getTourId()));
 
+      } else if (selectedItem instanceof TVITagView_TagCategory) {
+
+         // expand/collapse category
+
+         if (_tagViewer.getExpandedState(selectedItem)) {
+            _tagViewer.collapseToLevel(selectedItem, 1);
+         } else {
+            _tagViewer.expandToLevel(selectedItem, 1);
+         }
+
       } else {
 
          // multiple tours are selected
@@ -1685,7 +1732,9 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
             }
          }
 
-         _postSelectionProvider.setSelection(new SelectionTourIds(tourIds));
+         if (tourIds.size() > 0) {
+            _postSelectionProvider.setSelection(new SelectionTourIds(tourIds));
+         }
       }
 
       enableActions(false);
@@ -1704,7 +1753,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
          createUI_10_TagViewer(_viewerContainer);
          _viewerContainer.layout();
 
-         _tagViewer.setInput(_rootItem = new TVITagView_Root(this, _tagViewLayout));
+         _tagViewer.setInput(_rootItem = new TVITagView_Root(_tagViewLayout));
 
          _tagViewer.setExpandedElements(expandedElements);
          _tagViewer.setSelection(selection);
@@ -1725,7 +1774,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       {
          final Object[] expandedElements = _tagViewer.getExpandedElements();
 
-         _tagViewer.setInput(_rootItem = new TVITagView_Root(this, _tagViewLayout));
+         _tagViewer.setInput(_rootItem = new TVITagView_Root(_tagViewLayout));
          _tagViewer.setExpandedElements(expandedElements);
       }
       tree.setRedraw(true);
@@ -1744,13 +1793,11 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
          case TAG_VIEW_LAYOUT_FLAT:
 
             _tagViewLayout = viewLayout;
-            _actionSetLayoutFlat.setChecked(true);
             break;
 
          case TAG_VIEW_LAYOUT_HIERARCHICAL:
 
             _tagViewLayout = viewLayout;
-            _actionSetLayoutHierarchical.setChecked(true);
             break;
 
          default:
@@ -1761,9 +1808,9 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
          // set default tag view layout
          _tagViewLayout = TAG_VIEW_LAYOUT_HIERARCHICAL;
-         _actionSetLayoutHierarchical.setChecked(true);
       }
 
+      updateUI_TagLayoutAction();
       updateToolTipState();
    }
 
@@ -2055,11 +2102,6 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       setContentDescription(description);
    }
 
-   public void setViewLayout(final int tagViewStructure) {
-      _tagViewLayout = tagViewStructure;
-      reloadViewer();
-   }
-
    @Override
    public void updateColumnHeader(final ColumnDefinition colDef) {}
 
@@ -2068,6 +2110,26 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       _isToolTipInTag = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TAGGING_TAG);
       _isToolTipInTitle = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TAGGING_TITLE);
       _isToolTipInTags = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TAGGING_TAGS);
+   }
+
+   private void updateUI_TagLayoutAction() {
+
+      if (_tagViewLayout == TAG_VIEW_LAYOUT_HIERARCHICAL) {
+
+         // hierarchy is displayed -> show icon/tooltip for flat view
+
+         _action_ToggleTagLayout.setToolTipText(Messages.Tour_Tags_Action_Layout_Flat_Tooltip);
+         _action_ToggleTagLayout.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TagLayout_Flat));
+         _action_ToggleTagLayout.setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TagLayout_Flat_Disabled));
+
+      } else {
+
+         // flat view is displayed -> show icon/tooltip for hierarchy view
+
+         _action_ToggleTagLayout.setToolTipText(Messages.Tour_Tags_Action_Layout_Hierarchical_Tooltip);
+         _action_ToggleTagLayout.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TagLayout_Hierarchical));
+         _action_ToggleTagLayout.setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TagLayout_Hierarchical_Disabled));
+      }
    }
 
    /**

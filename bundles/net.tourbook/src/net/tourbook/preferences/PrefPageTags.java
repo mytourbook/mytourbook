@@ -16,16 +16,10 @@
 package net.tourbook.preferences;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Query;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -34,18 +28,16 @@ import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.ITreeViewer;
-import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.TreeViewerItem;
-import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
-import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tag.Dialog_TourTag;
 import net.tourbook.tag.Dialog_TourTag_Category;
 import net.tourbook.tag.TVIPrefTag;
 import net.tourbook.tag.TVIPrefTagCategory;
 import net.tourbook.tag.TVIPrefTagRoot;
+import net.tourbook.tag.TagManager;
 import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
@@ -121,7 +113,11 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
    private TVIPrefTagRoot          _rootItem;
 
+   private ActionCollapseAll       _action_CollapseAll;
+   private ActionExpandSelection   _action_ExpandSelection;
+
    private boolean                 _isModified   = false;
+   private boolean                 _canTagsBeModified;
 
    private long                    _dragStartTime;
 
@@ -143,10 +139,6 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
    private Button     _btnNewTag;
    private Button     _btnNewTagCategory;
    private Button     _btnReset;
-
-   /*
-    * None UI controls
-    */
 
    /**
     * Sort the tags and categories
@@ -262,11 +254,18 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
       _prefStore.addPropertyChangeListener(_prefChangeListener);
    }
 
+   private void createActions() {
+
+      _action_ExpandSelection = new ActionExpandSelection(this, true);
+      _action_CollapseAll = new ActionCollapseAll(this);
+   }
+
    @Override
    protected Control createContents(final Composite parent) {
 
       final Composite ui = createUI(parent);
 
+      createActions();
       fillToolbar();
 
       // set root item
@@ -335,7 +334,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
       GridDataFactory
             .fillDefaults()//
             .grab(true, true)
-            .hint(200, 100)
+            .hint(400, 500)
             .applyTo(layoutContainer);
 
       final TreeColumnLayout treeLayout = new TreeColumnLayout();
@@ -359,7 +358,20 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
          @Override
          public void keyPressed(final KeyEvent e) {
 
+            if (_canTagsBeModified == false) {
+               return;
+            }
+
             switch (e.keyCode) {
+
+            case SWT.DEL:
+               // delete tag only when the delete button is enabled
+               if (_btnDeleteTagOrCategory.isEnabled()) {
+                  onAction_Delete_TagOrCategory();
+               }
+
+               break;
+
             case SWT.F2:
                onAction_Edit_TagOrCategory();
                break;
@@ -386,7 +398,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
       _tagViewer.addSelectionChangedListener(new ISelectionChangedListener() {
          @Override
          public void selectionChanged(final SelectionChangedEvent event) {
-            enableControls();
+            onTagViewer_Selection(event);
          }
       });
 
@@ -635,101 +647,8 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
                cell.setText(shortedNotes);
             }
          });
-         treeLayout.setColumnData(tvcColumn, new ColumnWeightData(100, true));
+         treeLayout.setColumnData(tvcColumn, new ColumnWeightData(80, true));
       }
-   }
-
-   private void deleteTourTag(final TourTag tourTag) {
-
-//      if (deleteTourTag_10_FromTourData(tourTag)) {
-//         deleteTourTag_20_FromDb(tourTag);
-//      }
-   }
-
-   private boolean deleteTourTag_10_FromTourData(final TourTag tourTag) {
-
-      boolean returnResult = false;
-
-      final EntityManager em = TourDatabase.getInstance().getEntityManager();
-
-      if (em != null) {
-
-         final Query query = em.createQuery(
-
-               "SELECT tourData" //$NON-NLS-1$
-                     + (" FROM TourData AS tourData") //$NON-NLS-1$
-                     + (" WHERE tourData.tourType.typeId=" + tourTag.getTypeId())); //$NON-NLS-1$
-
-         final List<?> tourDataList = query.getResultList();
-         if (tourDataList.size() > 0) {
-
-            final EntityTransaction ts = em.getTransaction();
-
-            try {
-
-               ts.begin();
-
-               // remove tour type from all tour data
-               for (final Object listItem : tourDataList) {
-
-                  if (listItem instanceof TourData) {
-
-                     final TourData tourData = (TourData) listItem;
-
-                     tourData.setTourType(null);
-                     em.merge(tourData);
-                  }
-               }
-
-               ts.commit();
-
-            } catch (final Exception e) {
-               StatusUtil.showStatus(e);
-            } finally {
-               if (ts.isActive()) {
-                  ts.rollback();
-               }
-            }
-         }
-
-         returnResult = true;
-         em.close();
-      }
-
-      return returnResult;
-   }
-
-   private boolean deleteTourTag_20_FromDb(final TourTag tourTag) {
-
-      boolean returnResult = false;
-
-      final EntityManager em = TourDatabase.getInstance().getEntityManager();
-      final EntityTransaction ts = em.getTransaction();
-
-      try {
-         final TourType tourTypeEntity = em.find(TourType.class, tourTag.getTypeId());
-
-         if (tourTypeEntity != null) {
-
-            ts.begin();
-
-            em.remove(tourTypeEntity);
-
-            ts.commit();
-         }
-
-      } catch (final Exception e) {
-         StatusUtil.showStatus(e);
-      } finally {
-         if (ts.isActive()) {
-            ts.rollback();
-         } else {
-            returnResult = true;
-         }
-         em.close();
-      }
-
-      return returnResult;
    }
 
    @Override
@@ -759,26 +678,26 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
          isCategorySelected = true;
       }
 
-      _btnNewTag.setEnabled(isSelection == false || isCategorySelected == true && isTagSelected == false);
-      _btnNewTagCategory.setEnabled(isSelection == false || isCategorySelected == true && isTagSelected == false);
+      _btnNewTag.setEnabled(_canTagsBeModified && (isSelection == false || isCategorySelected == true && isTagSelected == false));
+      _btnNewTagCategory.setEnabled(_canTagsBeModified && (isSelection == false || isCategorySelected == true && isTagSelected == false));
 
       if (selectedItems.size() == 1) {
 
          if (isTagSelected) {
 
             _btnDeleteTagOrCategory.setText(Messages.Pref_TourTag_Action_DeleteTag_WithConfirm);
-            _btnDeleteTagOrCategory.setEnabled(true);
+            _btnDeleteTagOrCategory.setEnabled(_canTagsBeModified);
 
             _btnEditTagOrCategory.setText(Messages.Action_Tag_Edit);
-            _btnEditTagOrCategory.setEnabled(true);
+            _btnEditTagOrCategory.setEnabled(_canTagsBeModified);
 
          } else if (isCategorySelected) {
 
             _btnDeleteTagOrCategory.setText(Messages.Pref_TourTag_Action_DeleteCategory);
-            _btnDeleteTagOrCategory.setEnabled(true);
+            _btnDeleteTagOrCategory.setEnabled(_canTagsBeModified);
 
             _btnEditTagOrCategory.setText(Messages.Action_TagCategory_EditCategory);
-            _btnEditTagOrCategory.setEnabled(true);
+            _btnEditTagOrCategory.setEnabled(_canTagsBeModified);
          }
 
       } else {
@@ -786,6 +705,12 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
          _btnDeleteTagOrCategory.setEnabled(false);
          _btnEditTagOrCategory.setEnabled(false);
       }
+
+      _btnReset.setEnabled(_canTagsBeModified);
+      _tagViewer.getTree().setEnabled(_canTagsBeModified);
+
+      _action_CollapseAll.setEnabled(_canTagsBeModified);
+      _action_ExpandSelection.setEnabled(_canTagsBeModified);
    }
 
    /**
@@ -795,8 +720,8 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
       final ToolBarManager tbm = new ToolBarManager(_toolBar);
 
-      tbm.add(new ActionExpandSelection(this, true));
-      tbm.add(new ActionCollapseAll(this));
+      tbm.add(_action_ExpandSelection);
+      tbm.add(_action_CollapseAll);
 
       tbm.update(true);
    }
@@ -844,13 +769,24 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
    @Override
    public void init(final IWorkbench workbench) {
-      setPreferenceStore(TourbookPlugin.getDefault().getPreferenceStore());
+
+      setPreferenceStore(_prefStore);
+
+      // ensure that a tour is NOT modified
+      if (TourManager.isTourEditorModified(false)) {
+
+         _canTagsBeModified = false;
+
+         noDefaultAndApplyButton();
+
+      } else {
+
+         _canTagsBeModified = true;
+      }
    }
 
    @Override
    public boolean isValid() {
-
-//      saveFilterList();
 
       return true;
    }
@@ -865,21 +801,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
          final TourTag tourTag = ((TVIPrefTag) selection).getTourTag();
 
-         // confirm deletion
-         final MessageDialog dialog = new MessageDialog(
-               this.getShell(),
-               Messages.Pref_TourTag_Dialog_DeleteTag_Title,
-               null,
-               NLS.bind(Messages.Pref_TourTag_Dialog_DeleteTag_Message, tourTag.getTagName()),
-               MessageDialog.QUESTION,
-               new String[] {
-                     Messages.Pref_TourTag_Action_DeleteTag,
-                     IDialogConstants.CANCEL_LABEL },
-               1);
-
-         if (dialog.open() == Window.OK) {
-
-            deleteTourTag(tourTag);
+         if (TagManager.deleteTourTag(tourTag)) {
 
             _isModified = true;
          }
@@ -1345,6 +1267,28 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
       }
    }
 
+   private void onTagViewer_Selection(final SelectionChangedEvent event) {
+
+      final Object selectedItem = ((IStructuredSelection) (event.getSelection())).getFirstElement();
+
+      if (selectedItem instanceof TVIPrefTag) {
+
+         // a tag is selected
+
+      } else if (selectedItem instanceof TVIPrefTagCategory) {
+
+         // expand/collapse category
+
+         if (_tagViewer.getExpandedState(selectedItem)) {
+            _tagViewer.collapseToLevel(selectedItem, 1);
+         } else {
+            _tagViewer.expandToLevel(selectedItem, 1);
+         }
+      }
+
+      enableControls();
+   }
+
    @Override
    public boolean performCancel() {
 
@@ -1359,50 +1303,6 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
       fireModifyEvent();
 
       return true;
-   }
-
-   /**
-    * get all tours for the tag Id of this tree item
-    */
-   private ArrayList<Long> readTagChildren_Tours(final TourTag tourTag) {
-
-      final ArrayList<Long> allTourIds = new ArrayList<>();
-
-      try {
-
-         final String sql = ""
-
-               + "SELECT" //                                                              //$NON-NLS-1$
-
-               + " TourData.tourId," //                                                1  //$NON-NLS-1$
-
-               + " FROM " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" //  //$NON-NLS-1$ //$NON-NLS-2$
-
-               // get all tours for current tag
-               + " LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " TourData" //      //$NON-NLS-1$ //$NON-NLS-2$
-               + " ON jTdataTtag.TourData_tourId = TourData.tourId " //                   //$NON-NLS-1$
-
-               + " WHERE jTdataTtag.TourTag_TagId = ?" //                                 //$NON-NLS-1$
-
-               + " ORDER BY tourId"; //                                                   //$NON-NLS-1$
-
-         final Connection conn = TourDatabase.getInstance().getConnection();
-
-         final PreparedStatement statement = conn.prepareStatement(sql);
-         statement.setLong(1, tourTag.getTagId());
-
-         final ResultSet result = statement.executeQuery();
-         while (result.next()) {
-            allTourIds.add(result.getLong(1));
-         }
-
-         conn.close();
-
-      } catch (final SQLException e) {
-         net.tourbook.ui.UI.showSQLException(e);
-      }
-
-      return allTourIds;
    }
 
    @Override
