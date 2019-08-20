@@ -50,6 +50,8 @@ public class FitData {
    private boolean                 _isSetLastMarker;
    private int                     _lastMarkerTimeSlices;
 
+   public boolean                  _isComputeAveragePower;
+
    private FitDataReader           _fitDataReader;
    private String                  _importFilePathName;
 
@@ -78,8 +80,6 @@ public class FitData {
    private TourMarker              _current_TourMarker;
 
    private long                    _timeDiffMS;
-
-   public boolean                  _computeAveragePower;
 
    public FitData(final FitDataReader fitDataReader,
                   final String importFilePath,
@@ -181,7 +181,7 @@ public class FitData {
          // In the case where the power was retrieved from a developer field,
          // the fit file didn't contain the average power and we need
          // to compute it ourselves.
-         if(_computeAveragePower) {
+         if(_isComputeAveragePower) {
             _tourData.setPower_Avg(_tourData.computeAvg_FromValues(_tourData.getPowerSerie(), 0, _tourData.getPowerSerie().length - 1));
          }
 

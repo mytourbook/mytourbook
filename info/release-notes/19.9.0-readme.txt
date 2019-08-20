@@ -18,7 +18,8 @@ New
 ===
 
 * Import FitLogEx Files (Frederic)
-  - Custom Data Field Import
+  - Custom Data Field Import. The data field names and values are imported in
+    the tour notes.
 
 * .fit file (Frederic)
   Added support for the developer field:
@@ -40,6 +41,15 @@ Bugfix
 * Weather (Frederic)
  - When entering a pressure using the metric system (mb), the format now accepts 1
    decimal
+
+* Tour start time in tour book view was wrong needed these fixes
+
+  - Fitlog Import
+    - Fixed tour start time year/month/day by using it's time zone
+    - Now Taking into account the pauses when importing laps
+  
+  - Tour Book View
+    - Extended "Set Time Zone" wizard to set tour start time year/month/day with time zone   
  
 
 Translation    
