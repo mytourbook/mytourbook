@@ -663,6 +663,12 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
       super.dispose();
    }
 
+   private void doLiveUpdate() {
+
+      _isModified = true;
+      fireModifyEvent();
+   }
+
    private void enableControls() {
 
       final IStructuredSelection selectedItems = _tagViewer.getStructuredSelection();
@@ -802,8 +808,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
          final TourTag tourTag = ((TVIPrefTag) selection).getTourTag();
 
          if (TagManager.deleteTourTag(tourTag)) {
-
-            _isModified = true;
+            doLiveUpdate();
          }
 
       } else if (selection instanceof TVIPrefTagCategory) {
@@ -1170,54 +1175,30 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
          System.out.println("RESET TAG STRUCTURE"); //$NON-NLS-1$
 
-         final StringBuilder sb = new StringBuilder();
          final Connection conn = TourDatabase.getInstance().getConnection();
+         {
+            String sql;
+            
+            // remove join table tag->category
+            sql = "DELETE FROM " + TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAG;
+            int result = conn.createStatement().executeUpdate(sql);
+            System.out.println("Deleted " + result + " entries from " + TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAG);
 
-         /*
-          * remove join table tag->category
-          */
-         sb.append("DELETE FROM "); //$NON-NLS-1$
-         sb.append(TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAG);
-         int result = conn.createStatement().executeUpdate(sb.toString());
-         System.out.println(
-               "Deleted " //$NON-NLS-1$
-                     + result
-                     + " entries from " //$NON-NLS-1$
-                     + TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAG);
+            // remove jointable category<->category
+            sql = "DELETE FROM " + TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAGCATEGORY;
+            result = conn.createStatement().executeUpdate(sql);
+            System.out.println("Deleted " + result + " entries from " + TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAGCATEGORY);
 
-         /*
-          * remove jointable category<->category
-          */
-         sb.setLength(0);
-         sb.append("DELETE FROM "); //$NON-NLS-1$
-         sb.append(TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAGCATEGORY);
-         result = conn.createStatement().executeUpdate(sb.toString());
-         System.out.println(
-               "Deleted " //$NON-NLS-1$
-                     + result
-                     + " entries from " //$NON-NLS-1$
-                     + TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAGCATEGORY);
+            // set tags to root
+            sql = "UPDATE " + TourDatabase.TABLE_TOUR_TAG + " SET isRoot=1"; //$NON-NLS-1$
+            result = conn.createStatement().executeUpdate(sql);
+            System.out.println("Set " + result + " tour tags to root"); //$NON-NLS-1$ //$NON-NLS-2$
 
-         /*
-          * set tags to root
-          */
-         sb.setLength(0);
-         sb.append("UPDATE "); //$NON-NLS-1$
-         sb.append(TourDatabase.TABLE_TOUR_TAG);
-         sb.append(" SET isRoot=1"); //$NON-NLS-1$
-         result = conn.createStatement().executeUpdate(sb.toString());
-         System.out.println("Set " + result + " tour tags to root"); //$NON-NLS-1$ //$NON-NLS-2$
-
-         /*
-          * set categories to root
-          */
-         sb.setLength(0);
-         sb.append("UPDATE "); //$NON-NLS-1$
-         sb.append(TourDatabase.TABLE_TOUR_TAG_CATEGORY);
-         sb.append(" SET isRoot=1"); //$NON-NLS-1$
-         result = conn.createStatement().executeUpdate(sb.toString());
-         System.out.println("Set " + result + " tour categories to root"); //$NON-NLS-1$ //$NON-NLS-2$
-
+            // set categories to root
+            sql = "UPDATE " + TourDatabase.TABLE_TOUR_TAG_CATEGORY + " SET isRoot=1"; //$NON-NLS-1$
+            result = conn.createStatement().executeUpdate(sql);
+            System.out.println("Set " + result + " tour categories to root"); //$NON-NLS-1$ //$NON-NLS-2$
+         }
          conn.close();
 
          // update the tag viewer
@@ -1231,6 +1212,8 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
       }
 
       setFocusToViewer();
+
+      doLiveUpdate();
    }
 
    private void onTagTree_DoubleClick(final Event event) {

@@ -205,7 +205,7 @@ public class TourDatabase {
    //
    private static final String                            KEY_BIKE                        = TABLE_TOUR_BIKE + "_" + ENTITY_ID_BIKE;                 //$NON-NLS-1$
    private static final String                            KEY_PERSON                      = TABLE_TOUR_PERSON + "_" + ENTITY_ID_PERSON;             //$NON-NLS-1$
-   private static final String                            KEY_TAG                         = TABLE_TOUR_TAG + "_" + ENTITY_ID_TAG;                   //$NON-NLS-1$
+   public static final String                             KEY_TAG                         = TABLE_TOUR_TAG + "_" + ENTITY_ID_TAG;                   //$NON-NLS-1$
    private static final String                            KEY_TAG_CATEGORY                = TABLE_TOUR_TAG_CATEGORY + "_" + ENTITY_ID_TAG_CATEGORY; //$NON-NLS-1$
    public static final String                             KEY_TOUR                        = TABLE_TOUR_DATA + "_" + ENTITY_ID_TOUR;                 //$NON-NLS-1$
    private static final String                            KEY_TYPE                        = TABLE_TOUR_TYPE + "_" + ENTITY_ID_TYPE;                 //$NON-NLS-1$
@@ -1058,21 +1058,21 @@ public class TourDatabase {
 
          conn = TourDatabase.getInstance().getConnection();
 
-         final String sqlWhere_TourId = " WHERE tourId=?"; //$NON-NLS-1$
-         final String sqlWhere_TourData_TourId = " WHERE " + TABLE_TOUR_DATA + "_tourId=?"; //$NON-NLS-1$ //$NON-NLS-2$
-
 // SET_FORMATTING_OFF
+
+         final String sqlWhere_TourId           = " WHERE tourId=?";                         //$NON-NLS-1$
+         final String sqlWhere_TourData_TourId  = " WHERE " + TABLE_TOUR_DATA + "_tourId=?"; //$NON-NLS-1$ //$NON-NLS-2$
+
          final String allSql[] = {
-               //
-               "DELETE FROM " + TABLE_TOUR_DATA             + sqlWhere_TourId, //$NON-NLS-1$
-               "DELETE FROM " + TABLE_TOUR_MARKER             + sqlWhere_TourData_TourId, //$NON-NLS-1$
-               "DELETE FROM " + TABLE_TOUR_PHOTO             + sqlWhere_TourData_TourId, //$NON-NLS-1$
-               "DELETE FROM " + TABLE_TOUR_WAYPOINT          + sqlWhere_TourData_TourId, //$NON-NLS-1$
-               "DELETE FROM " + TABLE_TOUR_REFERENCE          + sqlWhere_TourData_TourId, //$NON-NLS-1$
-               "DELETE FROM " + JOINTABLE__TOURDATA__TOURTAG    + sqlWhere_TourData_TourId, //$NON-NLS-1$
-               "DELETE FROM " + TABLE_TOUR_COMPARED          + sqlWhere_TourId, //$NON-NLS-1$
-               "DELETE FROM " + TABLE_TOUR_GEO_PARTS         + sqlWhere_TourId, //$NON-NLS-1$
-               //
+
+            "DELETE FROM " + TABLE_TOUR_DATA                + sqlWhere_TourId,            //$NON-NLS-1$
+            "DELETE FROM " + TABLE_TOUR_MARKER              + sqlWhere_TourData_TourId,   //$NON-NLS-1$
+            "DELETE FROM " + TABLE_TOUR_PHOTO               + sqlWhere_TourData_TourId,   //$NON-NLS-1$
+            "DELETE FROM " + TABLE_TOUR_WAYPOINT            + sqlWhere_TourData_TourId,   //$NON-NLS-1$
+            "DELETE FROM " + TABLE_TOUR_REFERENCE           + sqlWhere_TourData_TourId,   //$NON-NLS-1$
+            "DELETE FROM " + JOINTABLE__TOURDATA__TOURTAG   + sqlWhere_TourData_TourId,   //$NON-NLS-1$
+            "DELETE FROM " + TABLE_TOUR_COMPARED            + sqlWhere_TourId,            //$NON-NLS-1$
+            "DELETE FROM " + TABLE_TOUR_GEO_PARTS           + sqlWhere_TourId,            //$NON-NLS-1$
          };
 // SET_FORMATTING_ON
 
@@ -3260,21 +3260,27 @@ public class TourDatabase {
       /**
        * Create table: TOURDATA_TOURTAG
        */
-      exec(stmt, "CREATE TABLE " + JOINTABLE__TOURDATA__TOURTAG + "   (                   \n" //$NON-NLS-1$ //$NON-NLS-2$
-      //
-            + "   " + KEY_TAG + "      BIGINT NOT NULL,                                   \n"//$NON-NLS-1$ //$NON-NLS-2$
-            + "   " + KEY_TOUR + "     BIGINT NOT NULL                                    \n"//$NON-NLS-1$ //$NON-NLS-2$
-            //
-            + ")"); //$NON-NLS-1$
+      exec(stmt,
+
+            "CREATE TABLE " + JOINTABLE__TOURDATA__TOURTAG + "   (                        \n" //$NON-NLS-1$ //$NON-NLS-2$
+
+                  + "   " + KEY_TAG + "      BIGINT NOT NULL,                             \n"//$NON-NLS-1$ //$NON-NLS-2$
+                  + "   " + KEY_TOUR + "     BIGINT NOT NULL                              \n"//$NON-NLS-1$ //$NON-NLS-2$
+
+                  + ")"); //$NON-NLS-1$
 
       // Add Constraint
-      final String fkName = "fk_" + JOINTABLE__TOURDATA__TOURTAG + "_" + KEY_TOUR; //        //$NON-NLS-1$ //$NON-NLS-2$
-      exec(
-            stmt,
+      final String fkName = "fk_" + JOINTABLE__TOURDATA__TOURTAG + "_" + KEY_TOUR; //         //$NON-NLS-1$ //$NON-NLS-2$
+
+      exec(stmt,
+
             "ALTER TABLE " + JOINTABLE__TOURDATA__TOURTAG + "                             \n" //$NON-NLS-1$ //$NON-NLS-2$
                   + "   ADD CONSTRAINT " + fkName + "                                     \n" //$NON-NLS-1$ //$NON-NLS-2$
                   + "   FOREIGN KEY (" + KEY_TOUR + ")                                    \n" //$NON-NLS-1$ //$NON-NLS-2$
                   + "   REFERENCES " + TABLE_TOUR_DATA + " (" + ENTITY_ID_TOUR + ")       "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
+      // Create index TOURTAG_TAGID
+      SQL.CreateIndex(stmt, JOINTABLE__TOURDATA__TOURTAG, KEY_TAG);
    }
 
    /**
@@ -7130,7 +7136,10 @@ public class TourDatabase {
 // SET_FORMATTING_OFF
 
             // Add new columns
-            SQL.AddCol_VarCar   (stmt, TABLE_TOUR_DATA, "power_DataSource",  TourData.DB_LENGTH_POWER_DATA_SOURCE);   //$NON-NLS-1$
+            SQL.AddCol_VarCar(stmt, TABLE_TOUR_DATA, "power_DataSource",  TourData.DB_LENGTH_POWER_DATA_SOURCE);   //$NON-NLS-1$
+
+            // Create index in table: TOURDATA_TOURTAG - Index: TOURTAG_TAGID
+            SQL.CreateIndex(  stmt, JOINTABLE__TOURDATA__TOURTAG, KEY_TAG);
 
 // SET_FORMATTING_ON
          }
@@ -7269,4 +7278,3 @@ public class TourDatabase {
    }
 
 }
-

@@ -20,20 +20,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
-import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Query;
 
 import net.tourbook.Messages;
-import net.tourbook.common.util.StatusUtil;
-import net.tourbook.data.TourData;
+import net.tourbook.common.util.Util;
 import net.tourbook.data.TourTag;
-import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.UI;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -55,99 +48,49 @@ public class TagManager {
          TourTag.EXPAND_TYPE_YEAR_DAY,
          TourTag.EXPAND_TYPE_YEAR_MONTH_DAY };
 
-   private static void deleteTag(final TourTag tourTag) {
-
-      if (deleteTag_10_FromTourData(tourTag)) {
-         deleteTag_20_FromDb(tourTag);
-      }
-   }
-
    private static boolean deleteTag_10_FromTourData(final TourTag tourTag) {
 
       boolean returnResult = false;
 
-      final EntityManager em = TourDatabase.getInstance().getEntityManager();
+      final String sql = ""
 
-      if (em != null) {
+            + "DELETE"
+            + " FROM " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG
+            + " WHERE " + TourDatabase.KEY_TAG + "=?";
 
-         final Query query = em.createQuery("" //$NON-NLS-1$
+      Connection conn = null;
+      PreparedStatement prepStmt = null;
 
-               + "SELECT         \n" //$NON-NLS-1$
-               + " TourData      \n" //                                          //$NON-NLS-1$
-               + " FROM TourData \n" //                                          //$NON-NLS-1$
-               + " WHERE tourData.tourType.typeId=" + tourTag.getTagId()); //    //$NON-NLS-1$
+      try {
 
-         final List<?> allTourData = query.getResultList();
-         if (allTourData.size() > 0) {
+         conn = TourDatabase.getInstance().getConnection();
 
-            final EntityTransaction ts = em.getTransaction();
-
-            try {
-
-               ts.begin();
-
-               // remove tour tag from all tour data
-               for (final Object listItem : allTourData) {
-
-                  if (listItem instanceof TourData) {
-
-                     final TourData tourData = (TourData) listItem;
-
-                     final Set<TourTag> allTourTags = tourData.getTourTags();
-                     allTourTags.remove(tourTag);
-                     tourData.setTourTags(allTourTags);
-
-                     em.merge(tourData);
-                  }
-               }
-
-               ts.commit();
-
-            } catch (final Exception e) {
-               StatusUtil.showStatus(e);
-            } finally {
-               if (ts.isActive()) {
-                  ts.rollback();
-               }
-            }
-         }
+         prepStmt = conn.prepareStatement(sql);
+         prepStmt.setLong(1, tourTag.getTagId());
+         prepStmt.execute();
+         prepStmt.close();
 
          returnResult = true;
-         em.close();
+
+      } catch (final SQLException e) {
+
+         System.out.println(sql);
+         UI.showSQLException(e);
+
+      } finally {
+         Util.closeSql(conn);
+         Util.closeSql(prepStmt);
       }
 
       return returnResult;
    }
 
-   private static boolean deleteTag_20_FromDb(final TourTag tourTag) {
 
-      boolean returnResult = false;
+   private static boolean deleteTag_20_FromTagDb(final TourTag tourTag) {
 
-      final EntityManager em = TourDatabase.getInstance().getEntityManager();
-      final EntityTransaction ts = em.getTransaction();
+      final boolean returnResult = true;
 
-      try {
-         final TourType tourTypeEntity = em.find(TourType.class, tourTag.getTagId());
 
-         if (tourTypeEntity != null) {
-
-            ts.begin();
-
-            em.remove(tourTypeEntity);
-
-            ts.commit();
-         }
-
-      } catch (final Exception e) {
-         StatusUtil.showStatus(e);
-      } finally {
-         if (ts.isActive()) {
-            ts.rollback();
-         } else {
-            returnResult = true;
-         }
-         em.close();
-      }
 
       return returnResult;
    }
@@ -174,8 +117,9 @@ public class TagManager {
 
       if (dialog.open() == Window.OK) {
 
-         deleteTag(tourTag);
-
+         if (deleteTag_10_FromTourData(tourTag)) {
+            return deleteTag_20_FromTagDb(tourTag);
+         }
       }
 
       return false;
