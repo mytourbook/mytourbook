@@ -40,7 +40,10 @@ public class MesgListener_Record extends AbstractMesgListener implements RecordM
    private static final String DEV_FIELD_NAME__CADENCE              = "Cadence";                                  //$NON-NLS-1$
    private static final String DEV_FIELD_NAME__GROUND_TIME          = "Ground Time";                              //$NON-NLS-1$
    private static final String DEV_FIELD_NAME__LEG_SPRING_STIFFNESS = "Leg Spring Stiffness";                     //$NON-NLS-1$
+   //Power Data from  Stryd
    private static final String DEV_FIELD_NAME__POWER                = "Power";                                    //$NON-NLS-1$
+   //Power Data from Garmin Running Dynamics Pod
+   private static final String DEV_FIELD_NAME__RP_POWER             = "RP_Power";                                 //$NON-NLS-1$
    private static final String DEV_FIELD_NAME__FORM_POWER           = "Form Power";                               //$NON-NLS-1$
    private static final String DEV_FIELD_NAME__ELEVATION            = "Elevation";                                //$NON-NLS-1$
    private static final String DEV_FIELD_NAME__VERTICAL_OSCILLATION = "Vertical Oscillation";                     //$NON-NLS-1$
@@ -307,6 +310,25 @@ public class MesgListener_Record extends AbstractMesgListener implements RecordM
     */
    private void setRecord_DeveloperData(final RecordMesg mesg, final TimeData timeData) {
 
+      int developerFieldCount = 0;
+      for (@SuppressWarnings("unused")
+      final DeveloperField developerField : mesg.getDeveloperFields()) {
+         developerFieldCount++;
+      }
+
+      if (developerFieldCount == 0) {
+         return;
+      }
+
+      int powerDataSources = 0;
+
+      for (final DeveloperField developerField : mesg.getDeveloperFields()) {
+         if (developerField.getName().equals(DEV_FIELD_NAME__POWER) ||
+               developerField.getName().equals(DEV_FIELD_NAME__RP_POWER)) {
+            ++powerDataSources;
+         }
+      }
+
       for (final DeveloperField devField : mesg.getDeveloperFields()) {
 
          switch (devField.getName()) {
@@ -346,6 +368,27 @@ public class MesgListener_Record extends AbstractMesgListener implements RecordM
             break;
 
          case DEV_FIELD_NAME__POWER:
+         case DEV_FIELD_NAME__RP_POWER:
+
+            //If the current power data source is not the one
+            //specified by the user as the "preferred" data source,
+            //we do not import it.
+            if (powerDataSources > 1) {
+
+               //Stryd
+               if (devField.getName().equals(DEV_FIELD_NAME__POWER) &&
+                     _prefStore.getInt(IPreferences.FIT_PREFERRED_POWER_DATA_SOURCE) != 0) {
+                  break;
+               }
+
+               //Garmin RD Pod
+               if (devField.getName().equals(DEV_FIELD_NAME__RP_POWER) &&
+                     _prefStore.getInt(IPreferences.FIT_PREFERRED_POWER_DATA_SOURCE) != 1) {
+                  break;
+               }
+            }
+
+            timeData.powerDataSource = devField.getName().equals(DEV_FIELD_NAME__POWER) ? "Stryd" : "Garmin Running Dynamics Pod"; //$NON-NLS-1$ //$NON-NLS-2$
 
             //  112 Watts
 

@@ -684,7 +684,7 @@ public class UI {
          return weatherPressure;
       }
 
-      return weatherPressure / 0.02953f / 100f;
+      return weatherPressure / 0.02953f;
    }
 
    /**

@@ -50,6 +50,8 @@ public class FitData {
    private boolean                 _isSetLastMarker;
    private int                     _lastMarkerTimeSlices;
 
+   public boolean                  _isComputeAveragePower;
+
    private FitDataReader           _fitDataReader;
    private String                  _importFilePathName;
 
@@ -102,7 +104,7 @@ public class FitData {
          _allTimeData.get(0).speed = Float.MIN_VALUE;
       }
 
-// disabled, this is annoing
+// disabled, this is annoying
 //    tourData.setTourTitle(getTourTitle());
 //    tourData.setTourDescription(getTourDescription());
 
@@ -174,6 +176,14 @@ public class FitData {
          // create additional data
          _tourData.computeComputedValues();
          _tourData.computeAltimeterGradientSerie();
+
+
+         // In the case where the power was retrieved from a developer field,
+         // the fit file didn't contain the average power and we need
+         // to compute it ourselves.
+         if(_isComputeAveragePower) {
+            _tourData.setPower_Avg(_tourData.computeAvg_FromValues(_tourData.getPowerSerie(), 0, _tourData.getPowerSerie().length - 1));
+         }
 
          // must be called after time series are created
          finalizeTour_Gears(_tourData, _allGearData);
@@ -450,7 +460,7 @@ public class FitData {
    public void onSetup_Record_20_Finalize() {
 
       if (_current_TimeData == null) {
-         // this occured
+         // this occurred
          return;
       }
 
@@ -464,7 +474,8 @@ public class FitData {
          if (prevTime == currentTime) {
 
             /*
-             * Ignore and merge duplicated records. The device Bryton 210 creates duplicated enries,
+             * Ignore and merge duplicated records. The device Bryton 210 creates duplicated
+             * entries,
              * to have valid data for this device, they must be merged.
              */
 
