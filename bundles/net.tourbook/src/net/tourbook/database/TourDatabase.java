@@ -197,7 +197,7 @@ public class TourDatabase {
    private static final String                            ENTITY_ID_PERSON                = "PersonID";                                             //$NON-NLS-1$
    private static final String                            ENTITY_ID_PHOTO                 = "PhotoID";                                              //$NON-NLS-1$
    private static final String                            ENTITY_ID_REF                   = "RefID";                                                //$NON-NLS-1$
-   private static final String                            ENTITY_ID_TAG                   = "TagID";                                                //$NON-NLS-1$
+   public static final String                             ENTITY_ID_TAG                   = "TagID";                                                //$NON-NLS-1$
    private static final String                            ENTITY_ID_TAG_CATEGORY          = "TagCategoryID";                                        //$NON-NLS-1$
    public static final String                             ENTITY_ID_TOUR                  = "TourID";                                               //$NON-NLS-1$
    private static final String                            ENTITY_ID_TYPE                  = "TypeID";                                               //$NON-NLS-1$
@@ -1327,7 +1327,7 @@ public class TourDatabase {
    }
 
    /**
-    * this method is synchronized to conform to FindBugs
+    * This method is synchronized to conform to FindBugs
     *
     * @return Returns all tour tags which are stored in the database, the hash key is the tag id
     */

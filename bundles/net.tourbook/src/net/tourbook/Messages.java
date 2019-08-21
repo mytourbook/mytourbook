@@ -322,6 +322,7 @@ public class Messages extends NLS {
    public static String        Action_Tag_Add_RecentTags;
    public static String        Action_Tag_AutoOpenCancel;
    public static String        Action_Tag_AutoOpenOK;
+   public static String        Action_Tag_Delete;
    public static String        Action_Tag_Edit;
    public static String        Action_Tag_Edit_Tooltip;
    public static String        Action_Tag_SetTags;
@@ -1715,13 +1716,10 @@ public class Messages extends NLS {
    public static String Pref_TourDb_Radio_DbSystem_Server_Tooltip;
 
    public static String Pref_TourTag_Action_DeleteCategory;
-   public static String Pref_TourTag_Action_DeleteTag;
    public static String Pref_TourTag_Action_DeleteTag_WithConfirm;
    public static String Pref_TourTag_Column_ID;
    public static String Pref_TourTag_Column_Notes;
    public static String Pref_TourTag_Column_TagsAndCategories;
-   public static String Pref_TourTag_Dialog_DeleteTag_Message;
-   public static String Pref_TourTag_Dialog_DeleteTag_Title;
    public static String Pref_TourTag_Link_AppearanceOptions;
 
    public static String Pref_TourTypeFilter_button_new;
@@ -2193,6 +2191,10 @@ public class Messages extends NLS {
    public static String Slideout_TourTagOptions_Label_Title;
 
    public static String Slideout_TrainingOptions_Label_Title;
+
+   public static String Tag_Manager_Action_DeleteTag;
+   public static String Tag_Manager_Dialog_DeleteTag_Message;
+   public static String Tag_Manager_Dialog_DeleteTag_Title;
 
    public static String Tooltip_ValuePoint_Action_CloseContextMenu;
    public static String Tooltip_ValuePoint_Action_OpenToolTipMenu_ToolTip;

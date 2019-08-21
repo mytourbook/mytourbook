@@ -46,6 +46,7 @@ import net.tourbook.preferences.PrefPageTags;
 import net.tourbook.tag.ActionMenuSetAllTagStructures;
 import net.tourbook.tag.ActionMenuSetTagStructure;
 import net.tourbook.tag.ChangedTags;
+import net.tourbook.tag.TagManager;
 import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.ITourItem;
@@ -194,6 +195,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
    private ActionCollapseAll             _actionCollapseAll;
    private ActionCollapseOthers          _actionCollapseOthers;
+   private ActionDeleteTag               _actionDeleteTag;
    private ActionEditQuick               _actionEditQuick;
    private ActionEditTag                 _actionEditTag;
    private ActionEditTour                _actionEditTour;
@@ -206,11 +208,9 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    private ActionOpenPrefDialog          _actionOpenTagPrefs;
    private ActionRefreshView             _actionRefreshView;
    private ActionTagLayout               _action_ToggleTagLayout;
-//   private ActionSetLayoutHierarchical   _actionSetLayoutHierarchical;
-//   private ActionSetLayoutFlat           _actionSetLayoutFlat;
-   private ActionSetTourTypeMenu _actionSetTourType;
+   private ActionSetTourTypeMenu         _actionSetTourType;
 
-   private PixelConverter        _pc;
+   private PixelConverter                _pc;
 
    /*
     * UI resources
@@ -225,6 +225,21 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    private Composite _viewerContainer;
 
    private Menu      _treeContextMenu;
+
+   private class ActionDeleteTag extends Action {
+
+      ActionDeleteTag() {
+
+         super(Messages.Action_Tag_Delete, AS_PUSH_BUTTON);
+
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete));
+      }
+
+      @Override
+      public void run() {
+         onAction_DeleteTag();
+      }
+   }
 
    private class ActionTagLayout extends Action {
 
@@ -407,7 +422,6 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
          return _treeContextMenu;
       }
-
    }
 
    private void addPartListener() {
@@ -570,6 +584,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       _actionOpenTour = new ActionOpenTour(this);
       _actionRefreshView = new ActionRefreshView(this);
       _actionEditTag = new ActionEditTag(this);
+      _actionDeleteTag = new ActionDeleteTag();
       _actionSetAllTagStructures = new ActionMenuSetAllTagStructures(this);
       _actionSetTagStructure = new ActionMenuSetTagStructure(this);
       _actionSetTourType = new ActionSetTourTypeMenu(this);
@@ -1435,6 +1450,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
        */
       _actionSetTagStructure.setEnabled(isTagSelected || (numItems == 1 && numCategorys == 0));
       _actionSetAllTagStructures.setEnabled(isItemsAvailable);
+      _actionDeleteTag.setEnabled(isTagSelected);
 
       _actionExpandSelection.setEnabled(firstElement == null
             ? false
@@ -1466,6 +1482,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       menuMgr.add(_actionSetTagStructure);
       menuMgr.add(_actionSetAllTagStructures);
       menuMgr.add(_actionOpenTagPrefs);
+      menuMgr.add(_actionDeleteTag);
 
       menuMgr.add(new Separator());
       menuMgr.add(_actionEditQuick);
@@ -1619,6 +1636,21 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    @Override
    public ColumnViewer getViewer() {
       return _tagViewer;
+   }
+
+   private void onAction_DeleteTag() {
+
+      final Object selection = _tagViewer.getStructuredSelection().getFirstElement();
+
+      if (selection instanceof TVITagView_Tag) {
+
+         // delete tag
+
+         final HashMap<Long, TourTag> allTourTags = TourDatabase.getAllTourTags();
+         final long tagId = ((TVITagView_Tag) selection).tagId;
+
+         TagManager.deleteTourTag(allTourTags.get(tagId));
+      }
    }
 
    private void onAction_ToggleTagLayout() {

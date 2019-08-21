@@ -17,6 +17,7 @@ package net.tourbook.preferences;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Set;
 
 import javax.persistence.EntityManager;
@@ -117,7 +118,6 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
    private ActionExpandSelection   _action_ExpandSelection;
 
    private boolean                 _isModified   = false;
-   private boolean                 _canTagsBeModified;
 
    private long                    _dragStartTime;
 
@@ -203,17 +203,10 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
          return ((TreeViewerItem) element).getParentItem();
       }
 
-//      public TreeViewerItem getRootItem() {
-//         return _rootItem;
-//      }
-
       @Override
       public boolean hasChildren(final Object element) {
          return ((TreeViewerItem) element).hasChildren();
       }
-
-      @Override
-      public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
    }
 
    public PrefPageTags() {}
@@ -267,9 +260,6 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
       createActions();
       fillToolbar();
-
-      // set root item
-      _rootItem = new TVIPrefTagRoot(_tagViewer, true);
 
       updateTagViewer();
       enableControls();
@@ -357,10 +347,6 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
          @Override
          public void keyPressed(final KeyEvent e) {
-
-            if (_canTagsBeModified == false) {
-               return;
-            }
 
             switch (e.keyCode) {
 
@@ -666,6 +652,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
    private void doLiveUpdate() {
 
       _isModified = true;
+
       fireModifyEvent();
    }
 
@@ -684,26 +671,26 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
          isCategorySelected = true;
       }
 
-      _btnNewTag.setEnabled(_canTagsBeModified && (isSelection == false || isCategorySelected == true && isTagSelected == false));
-      _btnNewTagCategory.setEnabled(_canTagsBeModified && (isSelection == false || isCategorySelected == true && isTagSelected == false));
+      _btnNewTag.setEnabled((isSelection == false || isCategorySelected == true && isTagSelected == false));
+      _btnNewTagCategory.setEnabled((isSelection == false || isCategorySelected == true && isTagSelected == false));
 
       if (selectedItems.size() == 1) {
 
          if (isTagSelected) {
 
             _btnDeleteTagOrCategory.setText(Messages.Pref_TourTag_Action_DeleteTag_WithConfirm);
-            _btnDeleteTagOrCategory.setEnabled(_canTagsBeModified);
+            _btnDeleteTagOrCategory.setEnabled(true);
 
             _btnEditTagOrCategory.setText(Messages.Action_Tag_Edit);
-            _btnEditTagOrCategory.setEnabled(_canTagsBeModified);
+            _btnEditTagOrCategory.setEnabled(true);
 
          } else if (isCategorySelected) {
 
             _btnDeleteTagOrCategory.setText(Messages.Pref_TourTag_Action_DeleteCategory);
-            _btnDeleteTagOrCategory.setEnabled(_canTagsBeModified);
+            _btnDeleteTagOrCategory.setEnabled(true);
 
             _btnEditTagOrCategory.setText(Messages.Action_TagCategory_EditCategory);
-            _btnEditTagOrCategory.setEnabled(_canTagsBeModified);
+            _btnEditTagOrCategory.setEnabled(true);
          }
 
       } else {
@@ -712,11 +699,11 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
          _btnEditTagOrCategory.setEnabled(false);
       }
 
-      _btnReset.setEnabled(_canTagsBeModified);
-      _tagViewer.getTree().setEnabled(_canTagsBeModified);
+      _btnReset.setEnabled(true);
+      _tagViewer.getTree().setEnabled(true);
 
-      _action_CollapseAll.setEnabled(_canTagsBeModified);
-      _action_ExpandSelection.setEnabled(_canTagsBeModified);
+      _action_CollapseAll.setEnabled(true);
+      _action_ExpandSelection.setEnabled(true);
    }
 
    /**
@@ -777,18 +764,6 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
    public void init(final IWorkbench workbench) {
 
       setPreferenceStore(_prefStore);
-
-      // ensure that a tour is NOT modified
-      if (TourManager.isTourEditorModified(false)) {
-
-         _canTagsBeModified = false;
-
-         noDefaultAndApplyButton();
-
-      } else {
-
-         _canTagsBeModified = true;
-      }
    }
 
    @Override
@@ -808,12 +783,14 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
          final TourTag tourTag = ((TVIPrefTag) selection).getTourTag();
 
          if (TagManager.deleteTourTag(tourTag)) {
-            doLiveUpdate();
+
+            // update tag viewer with new loaded structure
+            updateTagViewer();
          }
 
       } else if (selection instanceof TVIPrefTagCategory) {
 
-         // delete category
+         // TODO delete category
 
       }
 
@@ -1178,42 +1155,56 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
          final Connection conn = TourDatabase.getInstance().getConnection();
          {
             String sql;
-            
+            int result;
+
             // remove join table tag->category
-            sql = "DELETE FROM " + TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAG;
-            int result = conn.createStatement().executeUpdate(sql);
-            System.out.println("Deleted " + result + " entries from " + TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAG);
+            final Statement stmt1 = conn.createStatement();
+            {
+               sql = "DELETE FROM " + TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAG;
+               result = stmt1.executeUpdate(sql);
+               System.out.println("Deleted " + result + " entries from " + TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAG);
+            }
+            stmt1.close();
 
             // remove jointable category<->category
-            sql = "DELETE FROM " + TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAGCATEGORY;
-            result = conn.createStatement().executeUpdate(sql);
-            System.out.println("Deleted " + result + " entries from " + TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAGCATEGORY);
+            final Statement stmt2 = conn.createStatement();
+            {
+               sql = "DELETE FROM " + TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAGCATEGORY;
+               result = stmt2.executeUpdate(sql);
+               System.out.println("Deleted " + result + " entries from " + TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAGCATEGORY);
+            }
+            stmt2.close();
 
             // set tags to root
-            sql = "UPDATE " + TourDatabase.TABLE_TOUR_TAG + " SET isRoot=1"; //$NON-NLS-1$
-            result = conn.createStatement().executeUpdate(sql);
-            System.out.println("Set " + result + " tour tags to root"); //$NON-NLS-1$ //$NON-NLS-2$
+            final Statement stmt3 = conn.createStatement();
+            {
+               sql = "UPDATE " + TourDatabase.TABLE_TOUR_TAG + " SET isRoot=1"; //$NON-NLS-1$
+               result = stmt3.executeUpdate(sql);
+               System.out.println("Set " + result + " tour tags to root"); //$NON-NLS-1$ //$NON-NLS-2$
+            }
+            stmt3.close();
 
             // set categories to root
-            sql = "UPDATE " + TourDatabase.TABLE_TOUR_TAG_CATEGORY + " SET isRoot=1"; //$NON-NLS-1$
-            result = conn.createStatement().executeUpdate(sql);
-            System.out.println("Set " + result + " tour categories to root"); //$NON-NLS-1$ //$NON-NLS-2$
+            final Statement stmt4 = conn.createStatement();
+            {
+               sql = "UPDATE " + TourDatabase.TABLE_TOUR_TAG_CATEGORY + " SET isRoot=1"; //$NON-NLS-1$
+               result = stmt4.executeUpdate(sql);
+               System.out.println("Set " + result + " tour categories to root"); //$NON-NLS-1$ //$NON-NLS-2$
+            }
+            stmt4.close();
          }
          conn.close();
 
-         // update the tag viewer
-         _rootItem = new TVIPrefTagRoot(_tagViewer, true);
+         // update tag viewer with new loaded structure
          updateTagViewer();
 
-         _isModified = true;
+         doLiveUpdate();
 
       } catch (final SQLException e) {
          net.tourbook.ui.UI.showSQLException(e);
       }
 
       setFocusToViewer();
-
-      doLiveUpdate();
    }
 
    private void onTagTree_DoubleClick(final Event event) {
@@ -1307,12 +1298,14 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
    }
 
    @Override
-   public void updateColumnHeader(final ColumnDefinition colDef) {
-      // TODO Auto-generated method stub
+   public void updateColumnHeader(final ColumnDefinition colDef) {}
 
-   }
-
+   /**
+    * Update tag viewer with new loaded structure
+    */
    private void updateTagViewer() {
+
+      _rootItem = new TVIPrefTagRoot(_tagViewer, true);
 
       // show contents in the viewers
       _tagViewer.setInput(this);
