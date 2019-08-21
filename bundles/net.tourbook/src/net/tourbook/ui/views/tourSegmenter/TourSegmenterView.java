@@ -26,6 +26,41 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 
+import net.tourbook.Messages;
+import net.tourbook.algorithm.DPPoint;
+import net.tourbook.algorithm.DouglasPeuckerSimplifier;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.chart.ColorCache;
+import net.tourbook.chart.SelectionChartXSliderPosition;
+import net.tourbook.common.UI;
+import net.tourbook.common.util.ColumnDefinition;
+import net.tourbook.common.util.ColumnManager;
+import net.tourbook.common.util.ITourViewer;
+import net.tourbook.common.util.PostSelectionProvider;
+import net.tourbook.common.util.Util;
+import net.tourbook.data.AltitudeUpDownSegment;
+import net.tourbook.data.TourData;
+import net.tourbook.data.TourMarker;
+import net.tourbook.data.TourSegment;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.PrefPageComputedValues;
+import net.tourbook.tour.BreakTimeMethod;
+import net.tourbook.tour.BreakTimeResult;
+import net.tourbook.tour.BreakTimeTool;
+import net.tourbook.tour.ITourEventListener;
+import net.tourbook.tour.SelectionDeletedTours;
+import net.tourbook.tour.SelectionTourData;
+import net.tourbook.tour.SelectionTourId;
+import net.tourbook.tour.SelectionTourIds;
+import net.tourbook.tour.TourEvent;
+import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
+import net.tourbook.ui.ImageComboLabel;
+import net.tourbook.ui.TableColumnFactory;
+import net.tourbook.ui.action.ActionModifyColumns;
+import net.tourbook.ui.tourChart.TourChart;
+import net.tourbook.web.WEB;
+
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -80,41 +115,6 @@ import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
-
-import net.tourbook.Messages;
-import net.tourbook.algorithm.DPPoint;
-import net.tourbook.algorithm.DouglasPeuckerSimplifier;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.chart.ColorCache;
-import net.tourbook.chart.SelectionChartXSliderPosition;
-import net.tourbook.common.UI;
-import net.tourbook.common.util.ColumnDefinition;
-import net.tourbook.common.util.ColumnManager;
-import net.tourbook.common.util.ITourViewer;
-import net.tourbook.common.util.PostSelectionProvider;
-import net.tourbook.common.util.Util;
-import net.tourbook.data.AltitudeUpDownSegment;
-import net.tourbook.data.TourData;
-import net.tourbook.data.TourMarker;
-import net.tourbook.data.TourSegment;
-import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.preferences.PrefPageComputedValues;
-import net.tourbook.tour.BreakTimeMethod;
-import net.tourbook.tour.BreakTimeResult;
-import net.tourbook.tour.BreakTimeTool;
-import net.tourbook.tour.ITourEventListener;
-import net.tourbook.tour.SelectionDeletedTours;
-import net.tourbook.tour.SelectionTourData;
-import net.tourbook.tour.SelectionTourId;
-import net.tourbook.tour.SelectionTourIds;
-import net.tourbook.tour.TourEvent;
-import net.tourbook.tour.TourEventId;
-import net.tourbook.tour.TourManager;
-import net.tourbook.ui.ImageComboLabel;
-import net.tourbook.ui.TableColumnFactory;
-import net.tourbook.ui.action.ActionModifyColumns;
-import net.tourbook.ui.tourChart.TourChart;
-import net.tourbook.web.WEB;
 
 /**
  *
@@ -2131,11 +2131,12 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             }
          });
 
-         // text: distance value
+         // text: distance value + unit
          _lblDistanceValue = new Label(container, SWT.NONE);
          _lblDistanceValue.setText(Messages.tour_segmenter_segType_byDistance_defaultDistance);
          GridDataFactory.fillDefaults()
                .align(SWT.FILL, SWT.CENTER)
+               .grab(true, false)
                .applyTo(_lblDistanceValue);
       }
 

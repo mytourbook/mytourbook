@@ -675,6 +675,8 @@ public class Messages extends NLS {
    public static String        Dialog_SetTimeZone_Label_Info;
    public static String        Dialog_SetTimeZone_Label_Progress_SubTask;
    public static String        Dialog_SetTimeZone_Label_Progress_Task;
+   public static String        Dialog_SetTimeZone_Radio_AdjustTourStart_YYMMDD;
+   public static String        Dialog_SetTimeZone_Radio_AdjustTourStartYYMMDD_Tooltip;
    public static String        Dialog_SetTimeZone_Radio_RemoveTimeZone;
    public static String        Dialog_SetTimeZone_Radio_SetTimeZone_FromCombo;
    public static String        Dialog_SetTimeZone_Radio_SetTimeZone_FromGeo;
@@ -1237,6 +1239,7 @@ public class Messages extends NLS {
    public static String        Log_SetTimeZone_011_SetFromGeo;
    public static String        Log_SetTimeZone_012_NoGeo;
    public static String        Log_SetTimeZone_013_Removed;
+   public static String        Log_SetTimeZone_014_TourStartYYMMDDAdjusted;
 
    public static String        Log_TemperatureAdjustment_001_Start;
    public static String        Log_TemperatureAdjustment_002_End;
