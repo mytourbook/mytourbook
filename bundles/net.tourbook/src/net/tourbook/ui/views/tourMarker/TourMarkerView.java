@@ -31,6 +31,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.ActionDeleteMarkerDialog;
 import net.tourbook.tour.ActionOpenMarkerDialog;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionDeletedTours;
@@ -112,6 +113,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
    private IContextMenuProvider    _tableViewerContextMenuProvider = new TableContextMenuProvider();
 
    private ActionOpenMarkerDialog  _actionEditTourMarkers;
+   private ActionDeleteMarkerDialog _actionDeleteTourMarkers;
    private ActionModifyColumns     _actionModifyColumns;
 
    private PixelConverter          _pc;
@@ -390,6 +392,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
    private void createActions() {
 
       _actionEditTourMarkers = new ActionOpenMarkerDialog(this, true);
+      _actionDeleteTourMarkers = new ActionDeleteMarkerDialog(this, true);
       _actionModifyColumns = new ActionModifyColumns(this);
    }
 
@@ -828,11 +831,14 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
       final boolean isSingleTour = _tourData != null && _tourData.isMultipleTours() == false;
 
       _actionEditTourMarkers.setEnabled(isTourInDb && isSingleTour);
+      //TODO
+      _actionDeleteTourMarkers.setEnabled(true);
    }
 
    private void fillContextMenu(final IMenuManager menuMgr) {
 
       menuMgr.add(_actionEditTourMarkers);
+      menuMgr.add(_actionDeleteTourMarkers);
 
       // add standard group which allows other plug-ins to contribute here
       menuMgr.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
@@ -840,6 +846,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
       // set the marker which should be selected in the marker dialog
       final IStructuredSelection selection = (IStructuredSelection) _markerViewer.getSelection();
       _actionEditTourMarkers.setTourMarker((TourMarker) selection.getFirstElement());
+      _actionDeleteTourMarkers.setTourMarker((TourMarker) selection.getFirstElement());
 
       enableActions();
    }

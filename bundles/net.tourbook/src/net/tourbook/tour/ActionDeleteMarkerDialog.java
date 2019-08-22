@@ -16,17 +16,17 @@
 package net.tourbook.tour;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.ui.ITourProvider;
-import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.window.Window;
-import org.eclipse.swt.widgets.Display;
 
 public class ActionDeleteMarkerDialog extends Action {
 
@@ -44,7 +44,7 @@ public class ActionDeleteMarkerDialog extends Action {
 		_tourProvider = tourProvider;
 		_isSaveTour = isSaveTour;
 
-		setText(Messages.app_action_edit_tour_marker);
+      setText("");//Messages.app_action_edit_tour_marker);
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour_marker));
 		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour_marker_disabled));
 
@@ -69,49 +69,29 @@ public class ActionDeleteMarkerDialog extends Action {
 			return;
 		}
 
-		final DialogMarker markerDialog = new DialogMarker(
-				Display.getCurrent().getActiveShell(),
-				tourData,
-				selectedTourMarker);
+      final Set<TourMarker> _originalTourMarkers = tourData.getTourMarkers();
+      final Iterator<TourMarker> it = _originalTourMarkers.iterator();
 
-		if (markerDialog.open() == Window.OK) {
+      while (it.hasNext()) {
+         if (it.next().getMarkerId() == selectedTourMarker.getMarkerId()) { // remove even elements
+            it.remove();
+         }
+      }
+
+      final Set<TourMarker> _newTourMarkers = new HashSet<>();
+
+      for (final TourMarker tourMarker : _originalTourMarkers) {
+         _newTourMarkers.add(tourMarker.clone());
+      }
+
+      tourData.setTourMarkers(_newTourMarkers);
 
 			if (isSaveTour) {
 
 				TourManager.saveModifiedTours(selectedTours);
 
-			} else {
+      }
 
-				/*
-				 * don't save the tour, just update the tour data editor
-				 */
-				final TourDataEditorView tourDataEditor = TourManager.getTourDataEditor();
-				if (tourDataEditor != null) {
-					tourDataEditor.updateUI(tourData, true);
-					fireTourChangeEvent(tourData);
-				}
-
-//				fireTourChangeEvent(tourData);
-			}
-
-		} else {
-
-//			fireTourChangeEvent(tourData);
-		}
-	}
-
-	/**
-	 * This event must be event when the dialog is canceled because the original tour marker are
-	 * replaced with the backedup markers.
-	 * <p>
-	 * Views which contain the original {@link TourMarker}'s need to know that the list has changed
-	 * otherwise marker actions do fail, e.g. Set Marker Hidden in tour chart view.
-	 * 
-	 * @param tourData
-	 */
-	private static void fireTourChangeEvent(final TourData tourData) {
-
-		TourManager.fireEvent(TourEventId.TOUR_CHANGED, new TourEvent(tourData));
 	}
 
 	@Override
