@@ -37,17 +37,13 @@ public class ActionDeleteMarkerDialog extends Action {
 
    private ITourProvider         _tourProvider;
    private ArrayList<TourMarker> _tourMarkers;
-   private boolean               _isSaveTour;
 
    /**
     * @param tourProvider
-    * @param isSaveTour
-    *           when <code>true</code> the tour will be saved when the marker dialog is closed
     */
-   public ActionDeleteMarkerDialog(final ITourProvider tourProvider, final boolean isSaveTour) {
+   public ActionDeleteMarkerDialog(final ITourProvider tourProvider) {
 
       _tourProvider = tourProvider;
-      _isSaveTour = isSaveTour;
 
       setText(Messages.app_action_delete_tour_marker);
       setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete_tour_marker));
@@ -56,7 +52,6 @@ public class ActionDeleteMarkerDialog extends Action {
    }
 
    private static void doAction(final ITourProvider tourProvider,
-                                final boolean isSaveTour,
                                 final ArrayList<TourMarker> selectedTourMarkers) {
 
       final ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
@@ -111,10 +106,7 @@ public class ActionDeleteMarkerDialog extends Action {
 
       tourData.setTourMarkers(_newTourMarkers);
 
-      if (isSaveTour) {
-
-         TourManager.saveModifiedTours(selectedTours);
-      }
+      TourManager.saveModifiedTours(selectedTours);
 
    }
 
@@ -123,7 +115,7 @@ public class ActionDeleteMarkerDialog extends Action {
       BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
          @Override
          public void run() {
-            doAction(_tourProvider, _isSaveTour, _tourMarkers);
+            doAction(_tourProvider, _tourMarkers);
          };
       });
 

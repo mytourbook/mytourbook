@@ -234,20 +234,6 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
       super();
    }
 
-   private void addDeleteKeyListener() {
-      /*
-       * this.addKeyListener(new KeyAdapter() {
-       * @Override
-       * public void keyReleased(final KeyEvent e) {
-       * if (e.keyCode == SWT.DEL) {
-       * setSelection(null);
-       * }
-       * autoCompleteKeyUp(e);
-       * }
-       * });
-       */
-   }
-
    private void addPartListener() {
 
       _partListener = new IPartListener2() {
@@ -408,7 +394,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
    private void createActions() {
 
       _actionEditTourMarkers = new ActionOpenMarkerDialog(this, true);
-      _actionDeleteTourMarkers = new ActionDeleteMarkerDialog(this, true);
+      _actionDeleteTourMarkers = new ActionDeleteMarkerDialog(this);
       _actionModifyColumns = new ActionModifyColumns(this);
    }
 
@@ -443,7 +429,6 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
       addTourEventListener();
       addPrefListener();
       addPartListener();
-      addDeleteKeyListener();
 
       createActions();
       fillToolbar();
@@ -498,7 +483,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
                   return;
                }
 
-               // set the marker which should be selected in the marker dialog
+               // Retrieves the markers that were selected in the marker dialog
                final IStructuredSelection selection = (IStructuredSelection) _markerViewer.getSelection();
                _actionDeleteTourMarkers.setTourMarkers(selection.toArray());
                _actionDeleteTourMarkers.run();
