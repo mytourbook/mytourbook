@@ -80,6 +80,8 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerRow;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -96,38 +98,38 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourMarkerView extends ViewPart implements ITourProvider, ITourViewer {
 
-   public static final String      ID                              = "net.tourbook.views.TourMarkerView";       //$NON-NLS-1$
+   public static final String       ID                              = "net.tourbook.views.TourMarkerView";       //$NON-NLS-1$
 
-   private final IPreferenceStore  _prefStore                      = TourbookPlugin.getPrefStore();
-   private final IDialogSettings   _state                          = TourbookPlugin.getState("TourMarkerView"); //$NON-NLS-1$
+   private final IPreferenceStore   _prefStore                      = TourbookPlugin.getPrefStore();
+   private final IDialogSettings    _state                          = TourbookPlugin.getState("TourMarkerView"); //$NON-NLS-1$
 
-   private TourData                _tourData;
+   private TourData                 _tourData;
 
-   private PostSelectionProvider   _postSelectionProvider;
-   private ISelectionListener      _postSelectionListener;
-   private IPropertyChangeListener _prefChangeListener;
-   private ITourEventListener      _tourEventListener;
-   private IPartListener2          _partListener;
+   private PostSelectionProvider    _postSelectionProvider;
+   private ISelectionListener       _postSelectionListener;
+   private IPropertyChangeListener  _prefChangeListener;
+   private ITourEventListener       _tourEventListener;
+   private IPartListener2           _partListener;
 
-   private MenuManager             _viewerMenuManager;
-   private IContextMenuProvider    _tableViewerContextMenuProvider = new TableContextMenuProvider();
+   private MenuManager              _viewerMenuManager;
+   private IContextMenuProvider     _tableViewerContextMenuProvider = new TableContextMenuProvider();
 
-   private ActionOpenMarkerDialog  _actionEditTourMarkers;
+   private ActionOpenMarkerDialog   _actionEditTourMarkers;
    private ActionDeleteMarkerDialog _actionDeleteTourMarkers;
-   private ActionModifyColumns     _actionModifyColumns;
+   private ActionModifyColumns      _actionModifyColumns;
 
-   private PixelConverter          _pc;
+   private PixelConverter           _pc;
 
-   private TableViewer             _markerViewer;
-   private ColumnManager           _columnManager;
+   private TableViewer              _markerViewer;
+   private ColumnManager            _columnManager;
 
-   private boolean                 _isInUpdate;
-   private boolean                 _isMultipleTours;
+   private boolean                  _isInUpdate;
+   private boolean                  _isMultipleTours;
 
-   private ColumnDefinition        _colDefName;
-   private ColumnDefinition        _colDefVisibility;
+   private ColumnDefinition         _colDefName;
+   private ColumnDefinition         _colDefVisibility;
 
-   private final NumberFormat      _nf3                            = NumberFormat.getNumberInstance();
+   private final NumberFormat       _nf3                            = NumberFormat.getNumberInstance();
    {
       _nf3.setMinimumFractionDigits(3);
       _nf3.setMaximumFractionDigits(3);
@@ -230,6 +232,20 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
    public TourMarkerView() {
       super();
+   }
+
+   private void addDeleteKeyListener() {
+      /*
+       * this.addKeyListener(new KeyAdapter() {
+       * @Override
+       * public void keyReleased(final KeyEvent e) {
+       * if (e.keyCode == SWT.DEL) {
+       * setSelection(null);
+       * }
+       * autoCompleteKeyUp(e);
+       * }
+       * });
+       */
    }
 
    private void addPartListener() {
@@ -427,6 +443,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
       addTourEventListener();
       addPrefListener();
       addPartListener();
+      addDeleteKeyListener();
 
       createActions();
       fillToolbar();
@@ -469,6 +486,29 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
       table.setHeaderVisible(true);
 //      table.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
       table.setLinesVisible(false);
+
+      table.addKeyListener(new KeyListener() {
+
+         @Override
+         public void keyPressed(final KeyEvent e) {
+
+            if (e.keyCode == SWT.DEL) {
+
+               if (_actionDeleteTourMarkers == null) {
+                  return;
+               }
+
+               // set the marker which should be selected in the marker dialog
+               final IStructuredSelection selection = (IStructuredSelection) _markerViewer.getSelection();
+               _actionDeleteTourMarkers.setTourMarkers(selection.toArray());
+               _actionDeleteTourMarkers.run();
+
+            }
+         }
+
+         @Override
+         public void keyReleased(final KeyEvent e) {}
+      });
 
       /*
        * create table viewer
@@ -846,7 +886,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
       // set the marker which should be selected in the marker dialog
       final IStructuredSelection selection = (IStructuredSelection) _markerViewer.getSelection();
       _actionEditTourMarkers.setTourMarker((TourMarker) selection.getFirstElement());
-      _actionDeleteTourMarkers.setTourMarker((TourMarker) selection.getFirstElement());
+      _actionDeleteTourMarkers.setTourMarkers(selection.toArray());
 
       enableActions();
    }

@@ -17,8 +17,9 @@ package net.tourbook.tour;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -27,12 +28,16 @@ import net.tourbook.data.TourMarker;
 import net.tourbook.ui.ITourProvider;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.widgets.Display;
 
 public class ActionDeleteMarkerDialog extends Action {
 
-   private ITourProvider _tourProvider;
-   private TourMarker    _tourMarker;
-   private boolean       _isSaveTour;
+   private ITourProvider         _tourProvider;
+   private ArrayList<TourMarker> _tourMarkers;
+   private boolean               _isSaveTour;
 
    /**
     * @param tourProvider
@@ -44,28 +49,23 @@ public class ActionDeleteMarkerDialog extends Action {
       _tourProvider = tourProvider;
       _isSaveTour = isSaveTour;
 
-      setText("Delete marker(s)...");//Messages.app_action_edit_tour_marker);
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour_marker));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour_marker_disabled));
+      setText(Messages.app_action_delete_tour_marker);
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete_tour_marker));
 
       setEnabled(false);
    }
 
-   public static void doAction(final ITourProvider tourProvider,
-                               final boolean isSaveTour,
-                               final TourMarker selectedTourMarker) {
+   private static void doAction(final ITourProvider tourProvider,
+                                final boolean isSaveTour,
+                                final ArrayList<TourMarker> selectedTourMarkers) {
 
       final ArrayList<TourData> selectedTours = tourProvider.getSelectedTours();
 
       // check if one tour is selected
-      if (selectedTours == null || selectedTours.size() != 1 || selectedTours.get(0) == null) {
+      if (selectedTours == null || selectedTours.size() != 1 || selectedTours.get(0) == null ||
+            selectedTourMarkers == null || selectedTourMarkers.size() == 0 || selectedTourMarkers.get(0) == null) {
          return;
       }
-
-      //TODO SEVERAL MARKERS CAN BE SELECTED. TAKE CARE OF THAT CASE.
-
-      // Put an (s) inthe text. Supprimer le(s) marqueur(s)
-      // or can the translation be changed depending if several markers ????
 
       final TourData tourData = selectedTours.get(0);
 
@@ -74,13 +74,33 @@ public class ActionDeleteMarkerDialog extends Action {
          return;
       }
 
-      final Set<TourMarker> _originalTourMarkers = tourData.getTourMarkers();
-      final Iterator<TourMarker> it = _originalTourMarkers.iterator();
+      String dialogTitle = Messages.Dlg_TourMarker_MsgBox_delete_marker_title;
+      String dialogMessage = NLS.bind(Messages.Dlg_TourMarker_MsgBox_delete_marker_message, (selectedTourMarkers.get(0)).getLabel());
 
-      while (it.hasNext()) {
-         if (it.next().getMarkerId() == selectedTourMarker.getMarkerId()) { // remove even elements
-            it.remove();
+      if (selectedTourMarkers.size() > 1) {
+         dialogTitle = Messages.Dlg_TourMarker_MsgBox_delete_markers_title;
+
+         final StringBuilder markersNames = new StringBuilder();
+         for (final TourMarker tourMarker : selectedTourMarkers) {
+            if (markersNames.toString().isEmpty() == false) {
+               markersNames.append(", "); //$NON-NLS-1$
+            }
+            markersNames.append("\"" + tourMarker.getLabel() + "\""); //$NON-NLS-1$ //$NON-NLS-2$
          }
+         dialogMessage = NLS.bind(Messages.Dlg_TourMarker_MsgBox_delete_markers_message, markersNames.toString());
+      }
+
+      if (MessageDialog.openQuestion(
+            Display.getDefault().getActiveShell(),
+            dialogTitle,
+            dialogMessage) == false) {
+         return;
+      }
+
+      final List<TourMarker> _originalTourMarkers = tourData.getTourMarkers().stream().collect(Collectors.toList());
+
+      for (final TourMarker selectedTourMarker : selectedTourMarkers) {
+         _originalTourMarkers.removeIf(m -> m.getMarkerId() == selectedTourMarker.getMarkerId());
       }
 
       final Set<TourMarker> _newTourMarkers = new HashSet<>();
@@ -100,11 +120,21 @@ public class ActionDeleteMarkerDialog extends Action {
 
    @Override
    public void run() {
-      doAction(_tourProvider, _isSaveTour, _tourMarker);
+      BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+         @Override
+         public void run() {
+            doAction(_tourProvider, _isSaveTour, _tourMarkers);
+         };
+      });
+
    }
 
-   public void setTourMarker(final TourMarker tourMarker) {
-      _tourMarker = tourMarker;
+   public void setTourMarkers(final Object[] tourMarkers) {
+      _tourMarkers = new ArrayList<>();
+
+      for (final Object tourMarker : tourMarkers) {
+         _tourMarkers.add((TourMarker) tourMarker);
+      }
    }
 
 }
