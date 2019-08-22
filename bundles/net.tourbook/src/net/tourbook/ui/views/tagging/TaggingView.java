@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import net.tourbook.Messages;
@@ -98,6 +99,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.StyledString;
@@ -1640,16 +1642,31 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
    private void onAction_DeleteTag() {
 
-      final Object selection = _tagViewer.getStructuredSelection().getFirstElement();
+      final ITreeSelection structuredSelection = _tagViewer.getStructuredSelection();
+      final List<?> allSelection = structuredSelection.toList();
+
+      final HashMap<Long, TourTag> allTourTags = TourDatabase.getAllTourTags();
+
+      final ArrayList<TourTag> allSelectedTags = new ArrayList<>();
+      for (final Object object : allSelection) {
+
+         if (object instanceof TVITagView_Tag) {
+
+            final TVITagView_Tag tviTag = (TVITagView_Tag) object;
+
+            allSelectedTags.add(allTourTags.get(tviTag.getTagId()));
+         }
+      }
+
+      final Object selection = structuredSelection.getFirstElement();
 
       if (selection instanceof TVITagView_Tag) {
 
          // delete tag
 
-         final HashMap<Long, TourTag> allTourTags = TourDatabase.getAllTourTags();
          final long tagId = ((TVITagView_Tag) selection).tagId;
 
-         TagManager.deleteTourTag(allTourTags.get(tagId));
+         TagManager.deleteTourTag(allSelectedTags);
       }
    }
 

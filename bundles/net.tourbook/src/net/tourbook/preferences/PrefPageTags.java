@@ -18,6 +18,7 @@ package net.tourbook.preferences;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Set;
 
 import javax.persistence.EntityManager;
@@ -782,7 +783,10 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
          final TourTag tourTag = ((TVIPrefTag) selection).getTourTag();
 
-         if (TagManager.deleteTourTag(tourTag)) {
+         final ArrayList<TourTag> allTags = new ArrayList<>();
+         allTags.add(tourTag);
+
+         if (TagManager.deleteTourTag(allTags)) {
 
             // update tag viewer with new loaded structure
             updateTagViewer();
