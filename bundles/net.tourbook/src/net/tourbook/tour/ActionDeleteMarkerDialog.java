@@ -46,7 +46,8 @@ public class ActionDeleteMarkerDialog extends Action {
       _tourProvider = tourProvider;
 
       setText(Messages.app_action_delete_tour_marker);
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete_tour_marker));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete_disabled));
 
       setEnabled(false);
    }

@@ -856,8 +856,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
       final boolean isSingleTour = _tourData != null && _tourData.isMultipleTours() == false;
 
       _actionEditTourMarkers.setEnabled(isTourInDb && isSingleTour);
-      //TODO
-      _actionDeleteTourMarkers.setEnabled(true);
+      _actionDeleteTourMarkers.setEnabled(isTourInDb && isSingleTour);
    }
 
    private void fillContextMenu(final IMenuManager menuMgr) {
