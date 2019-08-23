@@ -82,7 +82,7 @@ public class TagManager {
 
          // remove multiple tags
 
-         dialogMessage = NLS.bind("Permamently delete {0} tags and remove them from {1} tours ?", allTags.size(), allTourIds.size());
+         dialogMessage = NLS.bind(Messages.Tag_Manager_Dialog_DeleteTag_Multiple_Message, allTags.size(), allTourIds.size());
       }
 
       final Display display = Display.getDefault();
@@ -185,9 +185,11 @@ public class TagManager {
          conn.commit();
 
          // log result
+         TourLogManager.showLogView();
+
          for (int tagIndex = 0; tagIndex < allTags.size(); tagIndex++) {
 
-            TourLogManager.logInfo(String.format("Deleted tags from - Tours: %d - Tag categories: %d - Tags: %d - Tag: \"%s\"",
+            TourLogManager.logInfo(String.format(Messages.Tag_Manager_LogInfo_DeletedTags,
                   returnValue_TourData[tagIndex],
                   returnValue_TagCategory[tagIndex],
                   returnValue_TourTag[tagIndex],

@@ -3293,7 +3293,7 @@ public class TourDatabase {
     */
    private void createTable_TourTag_Category(final Statement stmt) throws SQLException {
 
-      /*
+      /**
        * Create table: TOURTAGCATEGORY
        */
       exec(stmt, "CREATE TABLE " + TABLE_TOUR_TAG_CATEGORY + "   (                                    \n" //$NON-NLS-1$ //$NON-NLS-2$
@@ -3313,7 +3313,7 @@ public class TourDatabase {
             + ")" //$NON-NLS-1$
       );
 
-      /*
+      /**
        * Create table: TOURTAGCATEGORY_TOURTAG
        */
       final String jtabTag = JOINTABLE__TOURTAGCATEGORY_TOURTAG;
@@ -3345,7 +3345,7 @@ public class TourDatabase {
                   + "   REFERENCES " + TABLE_TOUR_TAG_CATEGORY + " (" + ENTITY_ID_TAG_CATEGORY + ")   \n"//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
       );
 
-      /*
+      /**
        * Create table: TOURTAGCATEGORY_TOURTAGCATEGORY
        */
       final String jtabCategory = JOINTABLE__TOURTAGCATEGORY_TOURTAGCATEGORY;

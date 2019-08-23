@@ -104,6 +104,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TreePath;
+import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
@@ -121,6 +122,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
@@ -129,9 +131,9 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TaggingView extends ViewPart implements ITourProvider, ITourViewer, ITreeViewer {
 
-   static public final String        ID                           = "net.tourbook.views.tagViewID";  //$NON-NLS-1$
+   static public final String        ID                                     = "net.tourbook.views.tagViewID";           //$NON-NLS-1$
 
-   private static final String       MEMENTO_TAG_VIEW_LAYOUT      = "tagview.layout";                //$NON-NLS-1$
+   private static final String       MEMENTO_TAG_VIEW_LAYOUT                = "tagview.layout";                         //$NON-NLS-1$
 
    /**
     * The expanded tag items have these structure:
@@ -143,20 +145,21 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
     * 4. id/year/month<br>
     * ...
     */
-   private static final String       STATE_EXPANDED_ITEMS         = "STATE_EXPANDED_ITEMS";          //$NON-NLS-1$
+   private static final String       STATE_EXPANDED_ITEMS                   = "STATE_EXPANDED_ITEMS";                   //$NON-NLS-1$
+   private static final String       STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS = "STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS"; //$NON-NLS-1$
 
-   private static final int          STATE_ITEM_TYPE_SEPARATOR    = -1;
+   private static final int          STATE_ITEM_TYPE_SEPARATOR              = -1;
 
-   private static final int          STATE_ITEM_TYPE_CATEGORY     = 1;
-   private static final int          STATE_ITEM_TYPE_TAG          = 2;
-   private static final int          STATE_ITEM_TYPE_YEAR         = 3;
-   private static final int          STATE_ITEM_TYPE_MONTH        = 4;
+   private static final int          STATE_ITEM_TYPE_CATEGORY               = 1;
+   private static final int          STATE_ITEM_TYPE_TAG                    = 2;
+   private static final int          STATE_ITEM_TYPE_YEAR                   = 3;
+   private static final int          STATE_ITEM_TYPE_MONTH                  = 4;
 
-   static final int                  TAG_VIEW_LAYOUT_FLAT         = 0;
-   static final int                  TAG_VIEW_LAYOUT_HIERARCHICAL = 10;
+   static final int                  TAG_VIEW_LAYOUT_FLAT                   = 0;
+   static final int                  TAG_VIEW_LAYOUT_HIERARCHICAL           = 10;
    //
-   private static final NumberFormat _nf0                         = NumberFormat.getNumberInstance();
-   private static final NumberFormat _nf1                         = NumberFormat.getNumberInstance();
+   private static final NumberFormat _nf0                                   = NumberFormat.getNumberInstance();
+   private static final NumberFormat _nf1                                   = NumberFormat.getNumberInstance();
 
    {
       _nf0.setMinimumFractionDigits(0);
@@ -166,53 +169,62 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       _nf1.setMaximumFractionDigits(1);
    }
 
-   private final IPreferenceStore        _prefStore                 = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore              _prefStore                               = TourbookPlugin.getPrefStore();
 
-   private final IDialogSettings         _state                     = TourbookPlugin.getState(ID);
+   private final IDialogSettings               _state                                   = TourbookPlugin.getState(ID);
 
-   private int                           _tagViewLayout             = TAG_VIEW_LAYOUT_HIERARCHICAL;
-   private TreeViewerTourInfoToolTip     _tourInfoToolTip;
+   private int                                 _tagViewLayout                           = TAG_VIEW_LAYOUT_HIERARCHICAL;
+   private TreeViewerTourInfoToolTip           _tourInfoToolTip;
 
-   private boolean                       _isToolTipInTag;
-   private boolean                       _isToolTipInTitle;
-   private boolean                       _isToolTipInTags;
+   private boolean                             _isToolTipInTag;
+   private boolean                             _isToolTipInTitle;
+   private boolean                             _isToolTipInTags;
 
-   private TourDoubleClickState          _tourDoubleClickState      = new TourDoubleClickState();
+   private boolean                             _isMouseContextMenu;
+   private boolean                             _isSelectedWithKeyboard;
 
-   private int                           _numIteratedTours;
+   private boolean                             _isBehaviourSingleExpandedOthersCollapse = true;
+   private boolean                             _isBehaviourAutoExpandCollapse           = true;
+   private boolean                             _isInCollapseAll;
+   private int                                 _expandRunnableCounter;
 
-   private TreeViewer                    _tagViewer;
-   private TVITagView_Root               _rootItem;
-   private ColumnManager                 _columnManager;
+   private TourDoubleClickState                _tourDoubleClickState                    = new TourDoubleClickState();
 
-   private IPartListener2                _partListener;
-   private ISelectionListener            _postSelectionListener;
-   private PostSelectionProvider         _postSelectionProvider;
-   private IPropertyChangeListener       _prefChangeListener;
-   private ITourEventListener            _tourEventListener;
+   private int                                 _numIteratedTours;
 
-   private TagMenuManager                _tagMenuManager;
-   private MenuManager                   _viewerMenuManager;
-   private IContextMenuProvider          _viewerContextMenuProvider = new TreeContextMenuProvider();
+   private TreeViewer                          _tagViewer;
+   private TVITagView_Root                     _rootItem;
+   private ColumnManager                       _columnManager;
 
-   private ActionCollapseAll             _actionCollapseAll;
-   private ActionCollapseOthers          _actionCollapseOthers;
-   private ActionDeleteTag               _actionDeleteTag;
-   private ActionEditQuick               _actionEditQuick;
-   private ActionEditTag                 _actionEditTag;
-   private ActionEditTour                _actionEditTour;
-   private ActionExpandSelection         _actionExpandSelection;
-   private ActionExport                  _actionExportTour;
-   private ActionMenuSetAllTagStructures _actionSetAllTagStructures;
-   private ActionMenuSetTagStructure     _actionSetTagStructure;
-   private ActionModifyColumns           _actionModifyColumns;
-   private ActionOpenTour                _actionOpenTour;
-   private ActionOpenPrefDialog          _actionOpenTagPrefs;
-   private ActionRefreshView             _actionRefreshView;
-   private ActionTagLayout               _action_ToggleTagLayout;
-   private ActionSetTourTypeMenu         _actionSetTourType;
+   private IPartListener2                      _partListener;
+   private ISelectionListener                  _postSelectionListener;
+   private PostSelectionProvider               _postSelectionProvider;
+   private IPropertyChangeListener             _prefChangeListener;
+   private ITourEventListener                  _tourEventListener;
 
-   private PixelConverter                _pc;
+   private TagMenuManager                      _tagMenuManager;
+   private MenuManager                         _viewerMenuManager;
+   private IContextMenuProvider                _viewerContextMenuProvider               = new TreeContextMenuProvider();
+
+   private Action_CollapseAll_WithoutSelection _action_CollapseAll_WithoutSelection;
+   private ActionCollapseOthers                _actionCollapseOthers;
+   private ActionDeleteTag                     _actionDeleteTag;
+   private ActionEditQuick                     _actionEditQuick;
+   private ActionEditTag                       _actionEditTag;
+   private ActionEditTour                      _actionEditTour;
+   private ActionExpandSelection               _actionExpandSelection;
+   private ActionExport                        _actionExportTour;
+   private ActionMenuSetAllTagStructures       _actionSetAllTagStructures;
+   private ActionMenuSetTagStructure           _actionSetTagStructure;
+   private ActionModifyColumns                 _actionModifyColumns;
+   private ActionOpenTour                      _actionOpenTour;
+   private ActionOpenPrefDialog                _actionOpenTagPrefs;
+   private ActionRefreshView                   _actionRefreshView;
+   private ActionTagLayout                     _action_ToggleTagLayout;
+   private ActionSetTourTypeMenu               _actionSetTourType;
+   private Action_SingleExpand_CollapseOthers  _action_SingleExpand_CollapseOthers;
+
+   private PixelConverter                      _pc;
 
    /*
     * UI resources
@@ -228,6 +240,37 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
    private Menu      _treeContextMenu;
 
+   private boolean   _isInExpandingSelection;
+
+   private class Action_CollapseAll_WithoutSelection extends ActionCollapseAll {
+
+      public Action_CollapseAll_WithoutSelection(final ITreeViewer treeViewerProvider) {
+         super(treeViewerProvider);
+      }
+
+      @Override
+      public void run() {
+
+         _isInCollapseAll = true;
+         {
+            super.run();
+         }
+         _isInCollapseAll = false;
+      }
+   }
+
+   private class Action_SingleExpand_CollapseOthers extends Action {
+
+      public Action_SingleExpand_CollapseOthers() {
+         super(Messages.Tour_Tags_Action_SingleExpand_CollapseOthers, AS_CHECK_BOX);
+      }
+
+      @Override
+      public void run() {
+         onAction_SingleExpandCollapseOthers();
+      }
+   }
+
    private class ActionDeleteTag extends Action {
 
       ActionDeleteTag() {
@@ -235,6 +278,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
          super(Messages.Action_Tag_Delete, AS_PUSH_BUTTON);
 
          setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete_disabled));
       }
 
       @Override
@@ -575,7 +619,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
    private void createActions() {
 
-      _actionCollapseAll = new ActionCollapseAll(this);
+      _action_CollapseAll_WithoutSelection = new Action_CollapseAll_WithoutSelection(this);
       _actionCollapseOthers = new ActionCollapseOthers(this);
       _actionEditQuick = new ActionEditQuick(this);
       _actionEditTour = new ActionEditTour(this);
@@ -590,8 +634,8 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       _actionSetAllTagStructures = new ActionMenuSetAllTagStructures(this);
       _actionSetTagStructure = new ActionMenuSetTagStructure(this);
       _actionSetTourType = new ActionSetTourTypeMenu(this);
+      _action_SingleExpand_CollapseOthers = new Action_SingleExpand_CollapseOthers();
       _action_ToggleTagLayout = new ActionTagLayout();
-
    }
 
    private void createMenuManager() {
@@ -693,13 +737,26 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       });
 
       tree.addListener(SWT.MouseDoubleClick, event -> onTagTree_DoubleClick(event));
+      tree.addListener(SWT.MouseDown, event -> onTagTree_MouseDown(event));
 
       tree.addKeyListener(new KeyListener() {
 
          @Override
          public void keyPressed(final KeyEvent e) {
 
+            _isSelectedWithKeyboard = true;
+
             switch (e.keyCode) {
+
+            case SWT.DEL:
+
+               // delete tag only when the delete button is enabled
+               if (_actionDeleteTag.isEnabled()) {
+                  onAction_DeleteTag();
+               }
+
+               break;
+
             case SWT.F2:
                onTagViewer_RenameTag();
                break;
@@ -1463,7 +1520,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       _actionExportTour.setEnabled(isIteratedTours);
 
       _actionCollapseOthers.setEnabled(selectedItems == 1 && firstElementHasChildren);
-      _actionCollapseAll.setEnabled(isItemsAvailable);
+      _action_CollapseAll_WithoutSelection.setEnabled(isItemsAvailable);
 
       _tagMenuManager.enableTagActions(isTourSelected, isOneTour, firstTour == null ? null : firstTour.tagIds);
 
@@ -1473,11 +1530,21 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
                   : TourDatabase.ENTITY_IS_NOT_SAVED);
    }
 
+   private void expandCollapseItem(final TreeViewerItem treeItem) {
+
+      if (_tagViewer.getExpandedState(treeItem)) {
+         _tagViewer.collapseToLevel(treeItem, 1);
+      } else {
+         _tagViewer.expandToLevel(treeItem, 1);
+      }
+   }
+
    private void fillContextMenu(final IMenuManager menuMgr) {
 
       menuMgr.add(_actionCollapseOthers);
       menuMgr.add(_actionExpandSelection);
-      menuMgr.add(_actionCollapseAll);
+      menuMgr.add(_action_CollapseAll_WithoutSelection);
+      menuMgr.add(_action_SingleExpand_CollapseOthers);
 
       menuMgr.add(new Separator());
       menuMgr.add(_actionEditTag);
@@ -1517,7 +1584,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       tbm.removeAll();
 
       tbm.add(_actionExpandSelection);
-      tbm.add(_actionCollapseAll);
+      tbm.add(_action_CollapseAll_WithoutSelection);
       tbm.add(_action_ToggleTagLayout);
 
       tbm.add(_actionRefreshView);
@@ -1658,16 +1725,17 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
          }
       }
 
-      final Object selection = structuredSelection.getFirstElement();
+      if (allSelectedTags.size() > 0) {
 
-      if (selection instanceof TVITagView_Tag) {
-
-         // delete tag
-
-         final long tagId = ((TVITagView_Tag) selection).tagId;
+         // delete tags
 
          TagManager.deleteTourTag(allSelectedTags);
       }
+   }
+
+   private void onAction_SingleExpandCollapseOthers() {
+
+      _isBehaviourSingleExpandedOthersCollapse = _action_SingleExpand_CollapseOthers.isChecked();
    }
 
    private void onAction_ToggleTagLayout() {
@@ -1688,6 +1756,134 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       updateUI_TagLayoutAction();
 
       reloadViewer();
+   }
+
+   private void onSelect_CategoryItem(final TreeSelection treeSelection) {
+
+      if (_isInExpandingSelection) {
+
+         // prevent endless loops
+         return;
+      }
+
+      final TreePath[] selectedTreePaths = treeSelection.getPaths();
+      if (selectedTreePaths.length == 0) {
+         return;
+      }
+      final TreePath selectedTreePath = selectedTreePaths[0];
+      if (selectedTreePath == null) {
+         return;
+      }
+
+      onSelect_CategoryItem_10_AutoExpandCollapse(treeSelection, selectedTreePath);
+   }
+
+   /**
+    * This is not yet working thoroughly because the expanded position moves up or down and all
+    * expanded childrens are not visible (but they could) like when the triangle (+/-) icon in the
+    * tree is clicked.
+    *
+    * @param treeSelection
+    * @param selectedTreePath
+    */
+   private void onSelect_CategoryItem_10_AutoExpandCollapse(final ITreeSelection treeSelection,
+                                                            final TreePath selectedTreePath) {
+
+      if (_isInCollapseAll) {
+
+         // prevent auto expand
+         return;
+      }
+
+      if (_isBehaviourSingleExpandedOthersCollapse) {
+
+         /*
+          * run async because this is doing a reselection which cannot be done within the current
+          * selection event
+          */
+         Display.getCurrent().asyncExec(new Runnable() {
+
+            private long           __expandRunnableCounter = ++_expandRunnableCounter;
+
+            private ITreeSelection __treeSelection         = treeSelection;
+            private TreePath       __selectedTreePath      = selectedTreePath;
+
+            @Override
+            public void run() {
+
+               // check if a newer expand event occured
+               if (__expandRunnableCounter != _expandRunnableCounter) {
+                  return;
+               }
+
+               onSelect_CategoryItem_20_AutoExpandCollapse_Runnable(
+                     __treeSelection,
+                     __selectedTreePath);
+            }
+         });
+
+      } else {
+
+         if (_isBehaviourAutoExpandCollapse) {
+
+            // expand folder with one mouse click but not with the keyboard
+            expandCollapseItem((TreeViewerItem) selectedTreePath.getLastSegment());
+         }
+      }
+   }
+
+   /**
+    * This behavior is complex and still have possible problems.
+    *
+    * @param treeSelection
+    * @param selectedTreePath
+    */
+   private void onSelect_CategoryItem_20_AutoExpandCollapse_Runnable(final ITreeSelection treeSelection,
+                                                                     final TreePath selectedTreePath) {
+      _isInExpandingSelection = true;
+      {
+         final Tree tree = _tagViewer.getTree();
+
+         tree.setRedraw(false);
+         {
+            final TreeItem topItem = tree.getTopItem();
+
+            final boolean isExpanded = _tagViewer.getExpandedState(selectedTreePath);
+
+            /*
+             * collapse all tree paths
+             */
+            final TreePath[] allExpandedTreePaths = _tagViewer.getExpandedTreePaths();
+            for (final TreePath treePath : allExpandedTreePaths) {
+               _tagViewer.setExpandedState(treePath, false);
+            }
+
+            /*
+             * expand and select selected folder
+             */
+            _tagViewer.setExpandedTreePaths(new TreePath[] { selectedTreePath });
+            _tagViewer.setSelection(treeSelection, true);
+
+            if (_isBehaviourAutoExpandCollapse && isExpanded) {
+
+               // auto collapse expanded folder
+               _tagViewer.setExpandedState(selectedTreePath, false);
+            }
+
+            /**
+             * set top item to the previous top item, otherwise the expanded/collapse item is
+             * positioned at the bottom and the UI is jumping all the time
+             * <p>
+             * win behaviour: when an item is set to top which was collapsed bevore, it will be
+             * expanded
+             */
+            if (topItem.isDisposed() == false) {
+               tree.setTopItem(topItem);
+            }
+         }
+         tree.setRedraw(true);
+      }
+      _isInExpandingSelection = false;
    }
 
    /**
@@ -1712,6 +1908,11 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       }
    }
 
+   private void onTagTree_MouseDown(final Event event) {
+
+      _isMouseContextMenu = event.button == 3;
+   }
+
    private void onTagViewer_DoubleClick() {
 
       final Object selection = ((IStructuredSelection) _tagViewer.getSelection()).getFirstElement();
@@ -1726,11 +1927,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
          final TreeViewerItem treeItem = (TreeViewerItem) selection;
 
-         if (_tagViewer.getExpandedState(treeItem)) {
-            _tagViewer.collapseToLevel(treeItem, 1);
-         } else {
-            _tagViewer.expandToLevel(treeItem, 1);
-         }
+         expandCollapseItem(treeItem);
       }
    }
 
@@ -1748,6 +1945,10 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
    private void onTagViewer_Selection(final SelectionChangedEvent event) {
 
+      if (_isMouseContextMenu) {
+         return;
+      }
+
       final IStructuredSelection selectedTours = (IStructuredSelection) (event.getSelection());
       final Object selectedItem = ((IStructuredSelection) (event.getSelection())).getFirstElement();
 
@@ -1758,14 +1959,20 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
          final TVITagView_Tour tourItem = (TVITagView_Tour) selectedItem;
          _postSelectionProvider.setSelection(new SelectionTourId(tourItem.getTourId()));
 
-      } else if (selectedItem instanceof TVITagView_TagCategory) {
+      } else if (selectedItem instanceof TVITagView_Tag
+            || selectedItem instanceof TVITagView_TagCategory
+            || selectedItem instanceof TVITagView_Year
+            || selectedItem instanceof TVITagView_Month
 
-         // expand/collapse category
+      ) {
 
-         if (_tagViewer.getExpandedState(selectedItem)) {
-            _tagViewer.collapseToLevel(selectedItem, 1);
-         } else {
-            _tagViewer.expandToLevel(selectedItem, 1);
+         // expand/collapse tree category items
+
+         if (_isSelectedWithKeyboard == false) {
+
+            // do not expand/collapse when keyboard is used -> unusable
+
+            onSelect_CategoryItem((TreeSelection) event.getSelection());
          }
 
       } else {
@@ -1785,6 +1992,9 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
             _postSelectionProvider.setSelection(new SelectionTourIds(tourIds));
          }
       }
+
+      // reset state
+      _isSelectedWithKeyboard = false;
 
       enableActions(false);
    }
@@ -1858,6 +2068,13 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
          // set default tag view layout
          _tagViewLayout = TAG_VIEW_LAYOUT_HIERARCHICAL;
       }
+
+      // single expand
+      _isBehaviourSingleExpandedOthersCollapse = Util.getStateBoolean(
+            _state,
+            STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS,
+            false);
+      _action_SingleExpand_CollapseOthers.setChecked(_isBehaviourSingleExpandedOthersCollapse);
 
       updateUI_TagLayoutAction();
       updateToolTipState();
@@ -2057,6 +2274,8 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
       // save view layout
       _state.put(MEMENTO_TAG_VIEW_LAYOUT, _tagViewLayout);
+
+      _state.put(STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS, _action_SingleExpand_CollapseOthers.isChecked());
 
       saveState_ExpandedItems();
    }

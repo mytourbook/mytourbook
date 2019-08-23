@@ -161,7 +161,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
    private long                               _expandRunnableCounter;
 
-   private ActionCollapseAllWithoutSelection  _actionCollapseAll;
+   private Action_CollapseAll_WithoutSelection _actionCollapseAll;
    private ActionExpandAll                    _actionExpandAll;
    private Action_SingleExpand_CollapseOthers _actionSingleExpandCollapseOthers;
    private ActionOpenPrefDialog               _action_PrefDialog;
@@ -190,16 +190,22 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
    private Label     _lblHeader;
 
-   private class Action_SingleExpand_CollapseOthers extends Action {
+   private class Action_CollapseAll_WithoutSelection extends ActionCollapseAll {
 
-      public Action_SingleExpand_CollapseOthers() {
-         super(Messages.Tour_Tags_Action_SingleExpand_CollapseOthers, AS_CHECK_BOX);
+      public Action_CollapseAll_WithoutSelection(final ITreeViewer treeViewerProvider) {
+         super(treeViewerProvider);
       }
 
       @Override
       public void run() {
-         onAction_SingleExpandCollapseOthers();
+
+         _isInCollapseAll = true;
+         {
+            super.run();
+         }
+         _isInCollapseAll = false;
       }
+
    }
 
 //   private class Action_TourTag_Options extends ActionToolbarSlideout {
@@ -220,22 +226,16 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 //      }
 //   }
 
-   private class ActionCollapseAllWithoutSelection extends ActionCollapseAll {
+   private class Action_SingleExpand_CollapseOthers extends Action {
 
-      public ActionCollapseAllWithoutSelection(final ITreeViewer treeViewerProvider) {
-         super(treeViewerProvider);
+      public Action_SingleExpand_CollapseOthers() {
+         super(Messages.Tour_Tags_Action_SingleExpand_CollapseOthers, AS_CHECK_BOX);
       }
 
       @Override
       public void run() {
-
-         _isInCollapseAll = true;
-         {
-            super.run();
-         }
-         _isInCollapseAll = false;
+         onAction_SingleExpandCollapseOthers();
       }
-
    }
 
    public class ActionTagFilter extends Action {
@@ -617,7 +617,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
    private void createActions() {
 
       _actionExpandAll = new ActionExpandAll(this);
-      _actionCollapseAll = new ActionCollapseAllWithoutSelection(this);
+      _actionCollapseAll = new Action_CollapseAll_WithoutSelection(this);
       _action_PrefDialog = new ActionOpenPrefDialog(Messages.action_tag_open_tagging_structure, PrefPageTags.ID);
       _actionTagLayout = new ActionTagLayout();
       _actionTagFilter = new ActionTagFilter();

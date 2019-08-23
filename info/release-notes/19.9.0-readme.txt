@@ -18,7 +18,8 @@ New
 ===
 
 * Tour Tag
-  - Delete tour tag and tag category
+  - Delete tour tag, tag is removed from tours and tag definition is deleted
+    To delete a tour tag category is not yet implemented
 
 * Import FitLogEx Files (Frederic)
   - Custom Data Field Import. The data field names and values are imported in
@@ -39,6 +40,8 @@ Improvements
   - Tour can be saved with <Ctrl>+S when "Tour Editor" view is the active view
   - The save and new tour actions are removed from the view toolbar but are available at the main toolbar
 
+* Tagged Tours
+  - Expand/collapse tag/category/year/month when label is selected
 
 Changes
 =======
