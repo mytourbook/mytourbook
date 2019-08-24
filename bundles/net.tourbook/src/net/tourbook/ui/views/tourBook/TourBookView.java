@@ -321,9 +321,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       public ActionLinkWithOtherViews() {
 
-         super(
-               TourbookPlugin.getImageDescriptor(Messages.Image__SyncViews),
-               null);
+         super(TourbookPlugin.getImageDescriptor(Messages.Image__SyncViews), null);
 
          isToggleAction = true;
          notSelectedTooltip = Messages.Calendar_View_Action_LinkWithOtherViews;
@@ -341,7 +339,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       @Override
       protected void onSelect() {
-
          super.onSelect();
       }
    }
@@ -797,6 +794,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             _tourViewer.setInput(this);
 
             reselectTourViewer();
+
+            restoreState_AfterUI();
          }
       });
    }
@@ -4364,9 +4363,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       }
 
       _actionSelectAllTours.setChecked(_state.getBoolean(STATE_IS_SELECT_YEAR_MONTH_TOURS));
-      _actionLinkWithOtherViews.setSelection(_state.getBoolean(STATE_IS_LINK_WITH_OTHER_VIEWS));
-      _isCollapseOthers = Util.getStateBoolean(
-            _state,
+      _isCollapseOthers = Util.getStateBoolean(_state,
             STATE_LINK_AND_COLLAPSE_ALL_OTHER_ITEMS,
             STATE_LINK_AND_COLLAPSE_ALL_OTHER_ITEMS_DEFAULT);
       /*
@@ -4389,6 +4386,15 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _isShowSummaryRow = isShowSummaryRow();
 
       updateToolTipState();
+   }
+
+   private void restoreState_AfterUI() {
+
+      /*
+       * This must be selected lately otherwise the selection state is set but is not visible
+       * (button is not pressed). Could not figure out why this occures after debugging this issue
+       */
+      _actionLinkWithOtherViews.setSelection(_state.getBoolean(STATE_IS_LINK_WITH_OTHER_VIEWS));
    }
 
    @PersistState
