@@ -69,20 +69,24 @@ public class TagManager {
          return false;
       }
 
-      final ArrayList<Long> allTourIds = getTaggedTours(allTags);
       String dialogMessage;
+      String actionDeleteTags;
+
+      final ArrayList<Long> allTourIds = getTaggedTours(allTags);
 
       if (allTags.size() == 1) {
 
          // remove one tag
 
          dialogMessage = NLS.bind(Messages.Tag_Manager_Dialog_DeleteTag_Message, allTags.get(0).getTagName(), allTourIds.size());
+         actionDeleteTags = Messages.Tag_Manager_Action_DeleteTag;
 
       } else {
 
          // remove multiple tags
 
          dialogMessage = NLS.bind(Messages.Tag_Manager_Dialog_DeleteTag_Multiple_Message, allTags.size(), allTourIds.size());
+         actionDeleteTags = Messages.Tag_Manager_Action_DeleteTags;
       }
 
       final Display display = Display.getDefault();
@@ -95,7 +99,7 @@ public class TagManager {
             dialogMessage,
             MessageDialog.QUESTION,
             new String[] {
-                  Messages.Tag_Manager_Action_DeleteTag,
+                  actionDeleteTags,
                   IDialogConstants.CANCEL_LABEL },
             1);
 

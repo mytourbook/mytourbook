@@ -146,6 +146,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
     * ...
     */
    private static final String       STATE_EXPANDED_ITEMS                   = "STATE_EXPANDED_ITEMS";                   //$NON-NLS-1$
+   private static final String       STATE_IS_ON_SELECT_EXPAND_COLLAPSE     = "STATE_IS_ON_SELECT_EXPAND_COLLAPSE";     //$NON-NLS-1$
    private static final String       STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS = "STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS"; //$NON-NLS-1$
 
    private static final int          STATE_ITEM_TYPE_SEPARATOR              = -1;
@@ -183,8 +184,8 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    private boolean                             _isMouseContextMenu;
    private boolean                             _isSelectedWithKeyboard;
 
-   private boolean                             _isBehaviourSingleExpandedOthersCollapse = true;
-   private boolean                             _isBehaviourAutoExpandCollapse           = true;
+   private boolean                             _isBehaviour_SingleExpand_CollapseOthers = true;
+   private boolean                             _isBehaviour_OnSelect_ExpandCollapse     = true;
    private boolean                             _isInCollapseAll;
    private int                                 _expandRunnableCounter;
 
@@ -207,8 +208,11 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    private IContextMenuProvider                _viewerContextMenuProvider               = new TreeContextMenuProvider();
 
    private Action_CollapseAll_WithoutSelection _action_CollapseAll_WithoutSelection;
+   private Action_DeleteTag                    _action_DeleteTag;
+   private Action_OnMouseSelect_ExpandCollapse _action_OnMouseSelect_ExpandCollapse;
+   private Action_SingleExpand_CollapseOthers  _action_SingleExpand_CollapseOthers;
+   private Action_TagLayout                    _action_ToggleTagLayout;
    private ActionCollapseOthers                _actionCollapseOthers;
-   private ActionDeleteTag                     _actionDeleteTag;
    private ActionEditQuick                     _actionEditQuick;
    private ActionEditTag                       _actionEditTag;
    private ActionEditTour                      _actionEditTour;
@@ -220,9 +224,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    private ActionOpenTour                      _actionOpenTour;
    private ActionOpenPrefDialog                _actionOpenTagPrefs;
    private ActionRefreshView                   _actionRefreshView;
-   private ActionTagLayout                     _action_ToggleTagLayout;
    private ActionSetTourTypeMenu               _actionSetTourType;
-   private Action_SingleExpand_CollapseOthers  _action_SingleExpand_CollapseOthers;
 
    private PixelConverter                      _pc;
 
@@ -244,8 +246,8 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
    private class Action_CollapseAll_WithoutSelection extends ActionCollapseAll {
 
-      public Action_CollapseAll_WithoutSelection(final ITreeViewer treeViewerProvider) {
-         super(treeViewerProvider);
+      public Action_CollapseAll_WithoutSelection() {
+         super(TaggingView.this);
       }
 
       @Override
@@ -256,6 +258,34 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
             super.run();
          }
          _isInCollapseAll = false;
+      }
+   }
+
+   private class Action_DeleteTag extends Action {
+
+      Action_DeleteTag() {
+
+         super(Messages.Action_Tag_Delete, AS_PUSH_BUTTON);
+
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete_disabled));
+      }
+
+      @Override
+      public void run() {
+         onAction_DeleteTag();
+      }
+   }
+
+   private class Action_OnMouseSelect_ExpandCollapse extends Action {
+
+      public Action_OnMouseSelect_ExpandCollapse() {
+         super(Messages.Tour_Tags_Action_OnMouseSelect_ExpandCollapse, AS_CHECK_BOX);
+      }
+
+      @Override
+      public void run() {
+         onAction_OnMouseSelect_ExpandCollapse();
       }
    }
 
@@ -271,25 +301,9 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       }
    }
 
-   private class ActionDeleteTag extends Action {
+   private class Action_TagLayout extends Action {
 
-      ActionDeleteTag() {
-
-         super(Messages.Action_Tag_Delete, AS_PUSH_BUTTON);
-
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete_disabled));
-      }
-
-      @Override
-      public void run() {
-         onAction_DeleteTag();
-      }
-   }
-
-   private class ActionTagLayout extends Action {
-
-      ActionTagLayout() {
+      Action_TagLayout() {
 
          super(Messages.action_tagView_flat_layout, AS_PUSH_BUTTON);
 
@@ -619,7 +633,12 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
    private void createActions() {
 
-      _action_CollapseAll_WithoutSelection = new Action_CollapseAll_WithoutSelection(this);
+      _action_CollapseAll_WithoutSelection = new Action_CollapseAll_WithoutSelection();
+      _action_DeleteTag = new Action_DeleteTag();
+      _action_OnMouseSelect_ExpandCollapse = new Action_OnMouseSelect_ExpandCollapse();
+      _action_SingleExpand_CollapseOthers = new Action_SingleExpand_CollapseOthers();
+      _action_ToggleTagLayout = new Action_TagLayout();
+
       _actionCollapseOthers = new ActionCollapseOthers(this);
       _actionEditQuick = new ActionEditQuick(this);
       _actionEditTour = new ActionEditTour(this);
@@ -630,12 +649,10 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       _actionOpenTour = new ActionOpenTour(this);
       _actionRefreshView = new ActionRefreshView(this);
       _actionEditTag = new ActionEditTag(this);
-      _actionDeleteTag = new ActionDeleteTag();
       _actionSetAllTagStructures = new ActionMenuSetAllTagStructures(this);
       _actionSetTagStructure = new ActionMenuSetTagStructure(this);
       _actionSetTourType = new ActionSetTourTypeMenu(this);
-      _action_SingleExpand_CollapseOthers = new Action_SingleExpand_CollapseOthers();
-      _action_ToggleTagLayout = new ActionTagLayout();
+
    }
 
    private void createMenuManager() {
@@ -751,7 +768,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
             case SWT.DEL:
 
                // delete tag only when the delete button is enabled
-               if (_actionDeleteTag.isEnabled()) {
+               if (_action_DeleteTag.isEnabled()) {
                   onAction_DeleteTag();
                }
 
@@ -1509,7 +1526,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
        */
       _actionSetTagStructure.setEnabled(isTagSelected || (numItems == 1 && numCategorys == 0));
       _actionSetAllTagStructures.setEnabled(isItemsAvailable);
-      _actionDeleteTag.setEnabled(isTagSelected);
+      _action_DeleteTag.setEnabled(isTagSelected);
 
       _actionExpandSelection.setEnabled(firstElement == null
             ? false
@@ -1544,6 +1561,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       menuMgr.add(_actionCollapseOthers);
       menuMgr.add(_actionExpandSelection);
       menuMgr.add(_action_CollapseAll_WithoutSelection);
+      menuMgr.add(_action_OnMouseSelect_ExpandCollapse);
       menuMgr.add(_action_SingleExpand_CollapseOthers);
 
       menuMgr.add(new Separator());
@@ -1551,7 +1569,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       menuMgr.add(_actionSetTagStructure);
       menuMgr.add(_actionSetAllTagStructures);
       menuMgr.add(_actionOpenTagPrefs);
-      menuMgr.add(_actionDeleteTag);
+      menuMgr.add(_action_DeleteTag);
 
       menuMgr.add(new Separator());
       menuMgr.add(_actionEditQuick);
@@ -1733,9 +1751,14 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       }
    }
 
+   private void onAction_OnMouseSelect_ExpandCollapse() {
+
+      _isBehaviour_OnSelect_ExpandCollapse = _action_OnMouseSelect_ExpandCollapse.isChecked();
+   }
+
    private void onAction_SingleExpandCollapseOthers() {
 
-      _isBehaviourSingleExpandedOthersCollapse = _action_SingleExpand_CollapseOthers.isChecked();
+      _isBehaviour_SingleExpand_CollapseOthers = _action_SingleExpand_CollapseOthers.isChecked();
    }
 
    private void onAction_ToggleTagLayout() {
@@ -1795,7 +1818,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
          return;
       }
 
-      if (_isBehaviourSingleExpandedOthersCollapse) {
+      if (_isBehaviour_SingleExpand_CollapseOthers) {
 
          /*
           * run async because this is doing a reselection which cannot be done within the current
@@ -1824,7 +1847,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
       } else {
 
-         if (_isBehaviourAutoExpandCollapse) {
+         if (_isBehaviour_OnSelect_ExpandCollapse) {
 
             // expand folder with one mouse click but not with the keyboard
             expandCollapseItem((TreeViewerItem) selectedTreePath.getLastSegment());
@@ -1864,7 +1887,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
             _tagViewer.setExpandedTreePaths(new TreePath[] { selectedTreePath });
             _tagViewer.setSelection(treeSelection, true);
 
-            if (_isBehaviourAutoExpandCollapse && isExpanded) {
+            if (_isBehaviour_OnSelect_ExpandCollapse && isExpanded) {
 
                // auto collapse expanded folder
                _tagViewer.setExpandedState(selectedTreePath, false);
@@ -2069,12 +2092,13 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
          _tagViewLayout = TAG_VIEW_LAYOUT_HIERARCHICAL;
       }
 
-      // single expand
-      _isBehaviourSingleExpandedOthersCollapse = Util.getStateBoolean(
-            _state,
-            STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS,
-            false);
-      _action_SingleExpand_CollapseOthers.setChecked(_isBehaviourSingleExpandedOthersCollapse);
+      // on mouse select -> expand/collapse
+      _isBehaviour_OnSelect_ExpandCollapse = Util.getStateBoolean(_state, STATE_IS_ON_SELECT_EXPAND_COLLAPSE, true);
+      _action_OnMouseSelect_ExpandCollapse.setChecked(_isBehaviour_OnSelect_ExpandCollapse);
+
+      // single expand -> collapse others
+      _isBehaviour_SingleExpand_CollapseOthers = Util.getStateBoolean(_state, STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS, true);
+      _action_SingleExpand_CollapseOthers.setChecked(_isBehaviour_SingleExpand_CollapseOthers);
 
       updateUI_TagLayoutAction();
       updateToolTipState();
@@ -2276,6 +2300,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       _state.put(MEMENTO_TAG_VIEW_LAYOUT, _tagViewLayout);
 
       _state.put(STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS, _action_SingleExpand_CollapseOthers.isChecked());
+      _state.put(STATE_IS_ON_SELECT_EXPAND_COLLAPSE, _action_OnMouseSelect_ExpandCollapse.isChecked());
 
       saveState_ExpandedItems();
    }

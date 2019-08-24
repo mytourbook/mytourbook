@@ -2193,6 +2193,7 @@ public class Messages extends NLS {
    public static String Slideout_TrainingOptions_Label_Title;
 
    public static String Tag_Manager_Action_DeleteTag;
+   public static String Tag_Manager_Action_DeleteTags;
    public static String Tag_Manager_Dialog_DeleteTag_Message;
    public static String Tag_Manager_Dialog_DeleteTag_Multiple_Message;
    public static String Tag_Manager_Dialog_DeleteTag_Title;
@@ -2531,6 +2532,7 @@ public class Messages extends NLS {
    public static String Tour_Tags_Action_Layout_Flat_Tooltip;
    public static String Tour_Tags_Action_Layout_Hierarchical_Tooltip;
    public static String Tour_Tags_Action_MouseExpandCollapse;
+   public static String Tour_Tags_Action_OnMouseSelect_ExpandCollapse;
    public static String Tour_Tags_Action_SingleExpand_CollapseOthers;
    public static String Tour_Tags_Action_TagCheckFilter_AllTags_Tooltip;
    public static String Tour_Tags_Action_TagCheckFilter_OnlyTaggedTours_Tooltip;

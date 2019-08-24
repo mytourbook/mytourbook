@@ -42,6 +42,7 @@ import net.tourbook.tag.TVIPrefTagRoot;
 import net.tourbook.tag.TagManager;
 import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.action.ActionCollapseAll;
 import net.tourbook.ui.action.ActionExpandSelection;
@@ -119,6 +120,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
    private ActionExpandSelection   _action_ExpandSelection;
 
    private boolean                 _isModified   = false;
+   private boolean                 _isSelectedWithKeyboard;
 
    private long                    _dragStartTime;
 
@@ -135,7 +137,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
    private TreeViewer _tagViewer;
    private ToolBar    _toolBar;
 
-   private Button     _btnDeleteTagOrCategory;
+   private Button     _btnDeleteTag;
    private Button     _btnEditTagOrCategory;
    private Button     _btnNewTag;
    private Button     _btnNewTagCategory;
@@ -349,12 +351,14 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
          @Override
          public void keyPressed(final KeyEvent e) {
 
+            _isSelectedWithKeyboard = true;
+
             switch (e.keyCode) {
 
             case SWT.DEL:
                // delete tag only when the delete button is enabled
-               if (_btnDeleteTagOrCategory.isEnabled()) {
-                  onAction_Delete_TagOrCategory();
+               if (_btnDeleteTag.isEnabled()) {
+                  onAction_DeleteTag();
                }
 
                break;
@@ -483,18 +487,17 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
          }
          {
             /*
-             * Delete tag or category
+             * Button: Delete tag
              */
-
-            _btnDeleteTagOrCategory = new Button(container, SWT.NONE);
-            _btnDeleteTagOrCategory.setText(Messages.Pref_TourTag_Action_DeleteTag_WithConfirm);
-            _btnDeleteTagOrCategory.addSelectionListener(new SelectionAdapter() {
+            _btnDeleteTag = new Button(container, SWT.NONE);
+            _btnDeleteTag.setText(Messages.Pref_TourTag_Action_DeleteTag_WithConfirm);
+            _btnDeleteTag.addSelectionListener(new SelectionAdapter() {
                @Override
                public void widgetSelected(final SelectionEvent e) {
-                  onAction_Delete_TagOrCategory();
+                  onAction_DeleteTag();
                }
             });
-            GridDataFactory.fillDefaults().grab(true, false).applyTo(_btnDeleteTagOrCategory);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(_btnDeleteTag);
          }
 
          {
@@ -679,16 +682,14 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
          if (isTagSelected) {
 
-            _btnDeleteTagOrCategory.setText(Messages.Pref_TourTag_Action_DeleteTag_WithConfirm);
-            _btnDeleteTagOrCategory.setEnabled(true);
+            _btnDeleteTag.setEnabled(true);
 
             _btnEditTagOrCategory.setText(Messages.Action_Tag_Edit);
             _btnEditTagOrCategory.setEnabled(true);
 
          } else if (isCategorySelected) {
 
-            _btnDeleteTagOrCategory.setText(Messages.Pref_TourTag_Action_DeleteCategory);
-            _btnDeleteTagOrCategory.setEnabled(true);
+            _btnDeleteTag.setEnabled(false);
 
             _btnEditTagOrCategory.setText(Messages.Action_TagCategory_EditCategory);
             _btnEditTagOrCategory.setEnabled(true);
@@ -696,7 +697,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
       } else {
 
-         _btnDeleteTagOrCategory.setEnabled(false);
+         _btnDeleteTag.setEnabled(false);
          _btnEditTagOrCategory.setEnabled(false);
       }
 
@@ -773,7 +774,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
       return true;
    }
 
-   private void onAction_Delete_TagOrCategory() {
+   private void onAction_DeleteTag() {
 
       final Object selection = _tagViewer.getStructuredSelection().getFirstElement();
 
@@ -1154,7 +1155,8 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
       try {
 
-         System.out.println("RESET TAG STRUCTURE"); //$NON-NLS-1$
+         TourLogManager.showLogView();
+         TourLogManager.logTitle("RESET TAG STRUCTURE"); //$NON-NLS-1$
 
          final Connection conn = TourDatabase.getInstance().getConnection();
          {
@@ -1166,7 +1168,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
             {
                sql = "DELETE FROM " + TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAG;
                result = stmt1.executeUpdate(sql);
-               System.out.println("Deleted " + result + " entries from " + TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAG);
+               TourLogManager.logInfo("Deleted " + result + " entries from " + TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAG);
             }
             stmt1.close();
 
@@ -1175,7 +1177,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
             {
                sql = "DELETE FROM " + TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAGCATEGORY;
                result = stmt2.executeUpdate(sql);
-               System.out.println("Deleted " + result + " entries from " + TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAGCATEGORY);
+               TourLogManager.logInfo("Deleted " + result + " entries from " + TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAGCATEGORY);
             }
             stmt2.close();
 
@@ -1184,7 +1186,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
             {
                sql = "UPDATE " + TourDatabase.TABLE_TOUR_TAG + " SET isRoot=1"; //$NON-NLS-1$
                result = stmt3.executeUpdate(sql);
-               System.out.println("Set " + result + " tour tags to root"); //$NON-NLS-1$ //$NON-NLS-2$
+               TourLogManager.logInfo("Set " + result + " tour tags to root"); //$NON-NLS-1$ //$NON-NLS-2$
             }
             stmt3.close();
 
@@ -1193,7 +1195,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
             {
                sql = "UPDATE " + TourDatabase.TABLE_TOUR_TAG_CATEGORY + " SET isRoot=1"; //$NON-NLS-1$
                result = stmt4.executeUpdate(sql);
-               System.out.println("Set " + result + " tour categories to root"); //$NON-NLS-1$ //$NON-NLS-2$
+               TourLogManager.logInfo("Set " + result + " tour categories to root"); //$NON-NLS-1$ //$NON-NLS-2$
             }
             stmt4.close();
          }
@@ -1257,12 +1259,18 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
          // expand/collapse category
 
-         if (_tagViewer.getExpandedState(selectedItem)) {
-            _tagViewer.collapseToLevel(selectedItem, 1);
-         } else {
-            _tagViewer.expandToLevel(selectedItem, 1);
+         if (_isSelectedWithKeyboard == false) {
+
+            if (_tagViewer.getExpandedState(selectedItem)) {
+               _tagViewer.collapseToLevel(selectedItem, 1);
+            } else {
+               _tagViewer.expandToLevel(selectedItem, 1);
+            }
          }
       }
+
+      // reset state
+      _isSelectedWithKeyboard = false;
 
       enableControls();
    }
