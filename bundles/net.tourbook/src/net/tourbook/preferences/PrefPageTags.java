@@ -1166,25 +1166,25 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
             // remove join table tag->category
             final Statement stmt1 = conn.createStatement();
             {
-               sql = "DELETE FROM " + TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAG;
+               sql = "DELETE FROM " + TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAG; //$NON-NLS-1$
                result = stmt1.executeUpdate(sql);
-               TourLogManager.logInfo("Deleted " + result + " entries from " + TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAG);
+               TourLogManager.logInfo("Deleted " + result + " entries from " + TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAG); //$NON-NLS-1$ //$NON-NLS-2$
             }
             stmt1.close();
 
             // remove jointable category<->category
             final Statement stmt2 = conn.createStatement();
             {
-               sql = "DELETE FROM " + TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAGCATEGORY;
+               sql = "DELETE FROM " + TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAGCATEGORY; //$NON-NLS-1$
                result = stmt2.executeUpdate(sql);
-               TourLogManager.logInfo("Deleted " + result + " entries from " + TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAGCATEGORY);
+               TourLogManager.logInfo("Deleted " + result + " entries from " + TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAGCATEGORY); //$NON-NLS-1$ //$NON-NLS-2$
             }
             stmt2.close();
 
             // set tags to root
             final Statement stmt3 = conn.createStatement();
             {
-               sql = "UPDATE " + TourDatabase.TABLE_TOUR_TAG + " SET isRoot=1"; //$NON-NLS-1$
+               sql = "UPDATE " + TourDatabase.TABLE_TOUR_TAG + " SET isRoot=1"; //$NON-NLS-1$ //$NON-NLS-2$
                result = stmt3.executeUpdate(sql);
                TourLogManager.logInfo("Set " + result + " tour tags to root"); //$NON-NLS-1$ //$NON-NLS-2$
             }
@@ -1193,7 +1193,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
             // set categories to root
             final Statement stmt4 = conn.createStatement();
             {
-               sql = "UPDATE " + TourDatabase.TABLE_TOUR_TAG_CATEGORY + " SET isRoot=1"; //$NON-NLS-1$
+               sql = "UPDATE " + TourDatabase.TABLE_TOUR_TAG_CATEGORY + " SET isRoot=1"; //$NON-NLS-1$ //$NON-NLS-2$
                result = stmt4.executeUpdate(sql);
                TourLogManager.logInfo("Set " + result + " tour categories to root"); //$NON-NLS-1$ //$NON-NLS-2$
             }
