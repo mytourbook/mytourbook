@@ -1263,8 +1263,11 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
          recreateViewer(_tagViewer);
 
-         // tags in the tree hierarchie must be rechecked otherwise they are not checked
-         updateUI_Tags_FromTourData(_allTaggedTours, true);
+         _parent.getDisplay().asyncExec(() -> {
+
+            // tags in the tree hierarchie must be rechecked otherwise they are not checked
+            updateUI_Tags_FromTourData(_allTaggedTours, true);
+         });
 
          enableControls();
       }

@@ -550,9 +550,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
             } else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
-               _tagViewer.getTree()
-                     .setLinesVisible(
-                           _prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+               _tagViewer.getTree().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
                _tagViewer.refresh();
 

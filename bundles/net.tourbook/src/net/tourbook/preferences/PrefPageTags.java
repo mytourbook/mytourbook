@@ -232,9 +232,8 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
             if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
-               _tagViewer.getTree()
-                     .setLinesVisible(
-                           getPreferenceStore().getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+               _tagViewer.getTree().setLinesVisible(
+                     getPreferenceStore().getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
                _tagViewer.refresh();
 
@@ -276,8 +275,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
       // container
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
-      GridLayoutFactory
-            .fillDefaults()//
+      GridLayoutFactory.fillDefaults()
             .margins(0, 0)
             //            .spacing(SWT.DEFAULT, 0)
             .numColumns(2)
@@ -324,8 +322,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
        */
 
       final Composite layoutContainer = new Composite(parent, SWT.NONE);
-      GridDataFactory
-            .fillDefaults()//
+      GridDataFactory.fillDefaults()
             .grab(true, true)
             .hint(400, 500)
             .applyTo(layoutContainer);
