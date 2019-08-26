@@ -68,6 +68,7 @@ import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.ICheckStateProvider;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IElementComparer;
 import org.eclipse.jface.viewers.ISelection;
@@ -112,66 +113,66 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer, ISaveablePart {
 
-   static public final String                 ID                                        = "net.tourbook.ui.views.tagging.TourTags_View"; //$NON-NLS-1$
+   static public final String         ID                                        = "net.tourbook.ui.views.tagging.TourTags_View"; //$NON-NLS-1$
 
-   private static final String                STATE_IS_HIERARCHICAL_LAYOUT              = "STATE_IS_HIERARCHICAL_LAYOUT";                //$NON-NLS-1$
-   private static final String                STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS    = "STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS";      //$NON-NLS-1$
-   private static final String                STATE_IS_SHOW_ONLY_TAGS_WHICH_ARE_CHECKED = "STATE_IS_SHOW_ONLY_TAGS_WHICH_ARE_CHECKED";   //$NON-NLS-1$
-   private static final String                STATE_SORT_COLUMN_DIRECTION               = "STATE_SORT_COLUMN_DIRECTION";                 //$NON-NLS-1$
-   private static final String                STATE_SORT_COLUMN_ID                      = "STATE_SORT_COLUMN_ID";                        //$NON-NLS-1$
+   private static final String        STATE_IS_HIERARCHICAL_LAYOUT              = "STATE_IS_HIERARCHICAL_LAYOUT";                //$NON-NLS-1$
+   private static final String        STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS    = "STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS";      //$NON-NLS-1$
+   private static final String        STATE_IS_SHOW_ONLY_TAGS_WHICH_ARE_CHECKED = "STATE_IS_SHOW_ONLY_TAGS_WHICH_ARE_CHECKED";   //$NON-NLS-1$
+   private static final String        STATE_SORT_COLUMN_DIRECTION               = "STATE_SORT_COLUMN_DIRECTION";                 //$NON-NLS-1$
+   private static final String        STATE_SORT_COLUMN_ID                      = "STATE_SORT_COLUMN_ID";                        //$NON-NLS-1$
 
-   private static final String                COLUMN_ID                                 = "id";                                          //$NON-NLS-1$
-   private static final String                COLUMN_NOTES                              = "notes";                                       //$NON-NLS-1$
-   private static final String                COLUMN_TAGS                               = "tags";                                        //$NON-NLS-1$
+   private static final String        COLUMN_ID                                 = "id";                                          //$NON-NLS-1$
+   private static final String        COLUMN_NOTES                              = "notes";                                       //$NON-NLS-1$
+   private static final String        COLUMN_TAGS                               = "tags";                                        //$NON-NLS-1$
 
-   private final IDialogSettings              _state                                    = TourbookPlugin.getState("TourTagsView");       //$NON-NLS-1$
+   private final IDialogSettings      _state                                    = TourbookPlugin.getState("TourTagsView");       //$NON-NLS-1$
 
-   private ISelectionListener                 _postSelectionListener;
-   private ITourEventListener                 _tourEventListener;
+   private ISelectionListener         _postSelectionListener;
+   private ITourEventListener         _tourEventListener;
 
-   private ContainerCheckedTreeViewer         _tagViewer;
-   private IContextMenuProvider               _tagViewerContextMenuProvider             = new TreeContextMenuProvider();
-   private TagViewerComparator                _tagViewerComparator                      = new TagViewerComparator();
-   private TagFilter                          _tagFilter                                = new TagFilter();
-   private ColumnManager                      _columnManager;
-   private TVIPrefTagRoot                     _rootItem;
+   private ContainerCheckedTreeViewer _tagViewer;
+   private IContextMenuProvider       _tagViewerContextMenuProvider             = new TreeContextMenuProvider();
+   private TagViewerComparator        _tagViewerComparator                      = new TagViewerComparator();
+   private TagFilter                  _tagFilter                                = new TagFilter();
+   private ColumnManager              _columnManager;
+   private TVIPrefTagRoot             _rootItem;
 
-   private int                                _lastSelectionHash;
-   private int                                _hash_AllTourData;
-   private HashSet<Long>                      _allCheckedTagIds                         = new HashSet<>();
-   private ArrayList<TourData>                _allSelectedTours                         = new ArrayList<>();
-   private ArrayList<TourData>                _allTaggedTours                           = new ArrayList<>();
+   private int                        _lastSelectionHash;
+   private int                        _hash_AllTourData;
+   private HashSet<Long>              _allCheckedTagIds                         = new HashSet<>();
+   private ArrayList<TourData>        _allSelectedTours                         = new ArrayList<>();
+   private ArrayList<TourData>        _allTaggedTours                           = new ArrayList<>();
 
-   private boolean                            _tagViewerItem_IsChecked;
-   private boolean                            _tagViewerItem_IsKeyPressed;
-   private Object                             _tagViewerItem_Data;
+   private boolean                    _tagViewerItem_IsChecked;
+   private boolean                    _tagViewerItem_IsKeyPressed;
+   private Object                     _tagViewerItem_Data;
 
-   private SelectionListener                  _columnSortListener;
+   private SelectionListener          _columnSortListener;
 
-   private boolean                            _isBehaviourSingleExpandedOthersCollapse  = true;
-   private boolean                            _isBehaviourAutoExpandCollapse            = true;
-   private boolean                            _isExpandingSelection;
-   private boolean                            _isHierarchicalLayout;
-   private boolean                            _isInCollapseAll;
-   private boolean                            _isInUIUpdate;
-   private boolean                            _isShowOnlyCheckedTags;
-   private boolean                            _isTagDirty;
+   private boolean                    _isBehaviourSingleExpandedOthersCollapse  = true;
+   private boolean                    _isBehaviourAutoExpandCollapse            = true;
+   private boolean                    _isExpandingSelection;
+   private boolean                    _isHierarchicalLayout;
+   private boolean                    _isInCollapseAll;
+   private boolean                    _isInUIUpdate;
+   private boolean                    _isShowOnlyCheckedTags;
+   private boolean                    _isTagDirty;
 
 //   private OpenDialogManager                  _openDlgMgr                               = new OpenDialogManager();
 
-   private long                               _expandRunnableCounter;
+   private long                                _expandRunnableCounter;
 
    private Action_CollapseAll_WithoutSelection _actionCollapseAll;
-   private ActionExpandAll                    _actionExpandAll;
-   private Action_SingleExpand_CollapseOthers _actionSingleExpandCollapseOthers;
-   private ActionOpenPrefDialog               _action_PrefDialog;
-   private ActionTagLayout                    _actionTagLayout;
-   private ActionTagFilter                    _actionTagFilter;
+   private ActionExpandAll                     _actionExpandAll;
+   private Action_SingleExpand_CollapseOthers  _actionSingleExpandCollapseOthers;
+   private ActionOpenPrefDialog                _action_PrefDialog;
+   private ActionTagLayout                     _actionTagLayout;
+   private ActionTagFilter                     _actionTagFilter;
 //   private Action_TourTag_Options             _actionTourTagOptions;
-   private ActionUndoChanges                  _actionUndoChanges;
+   private ActionUndoChanges                   _actionUndoChanges;
 
-   private PixelConverter                     _pc;
-   private MenuManager                        _viewerMenuManager;
+   private PixelConverter                      _pc;
+   private MenuManager                         _viewerMenuManager;
 
    /*
     * Image resources
@@ -476,7 +477,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
       }
    }
 
-   private final class TagViewerContentProvicer implements ITreeContentProvider {
+   private final class TagViewerContentProvider implements ITreeContentProvider {
 
       @Override
       public void dispose() {}
@@ -756,7 +757,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
       _tagViewer = new ContainerCheckedTreeViewer(tree);
       _columnManager.createColumns(_tagViewer);
 
-      _tagViewer.setContentProvider(new TagViewerContentProvicer());
+      _tagViewer.setContentProvider(new TagViewerContentProvider());
       _tagViewer.setComparer(new TagComparer());
       _tagViewer.setComparator(_tagViewerComparator);
       _tagViewer.setUseHashlookup(true);
@@ -768,14 +769,30 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
          }
       });
 
-//      _tagViewer.addCheckStateListener(new ICheckStateListener() {
-//
-//         @Override
-//         public void checkStateChanged(CheckStateChangedEvent event) {
-//            // TODO Auto-generated method stub
-//
-//         }
-//      });
+      /**
+       * This check state provider is necessary to fix
+       * <p>
+       * https://bugs.eclipse.org/bugs/show_bug.cgi?id=170521
+       * <p>
+       * Refreshing ContainerCheckedTreeViewer does not restore checked/grayed states correctly.
+       */
+      _tagViewer.setCheckStateProvider(new ICheckStateProvider() {
+
+         @Override
+         public boolean isChecked(final Object element) {
+
+            if (isGrayed(element)) {
+               return true;
+            }
+
+            return false;
+         }
+
+         @Override
+         public boolean isGrayed(final Object element) {
+            return false;
+         }
+      });
 
       _tagViewer.addSelectionChangedListener(new ISelectionChangedListener() {
          @Override
