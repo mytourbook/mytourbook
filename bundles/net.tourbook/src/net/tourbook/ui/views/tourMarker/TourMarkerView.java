@@ -479,7 +479,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
             if (e.keyCode == SWT.DEL) {
 
-               if (_actionDeleteTourMarkers == null) {
+               if (_actionDeleteTourMarkers.isEnabled() == false) {
                   return;
                }
 
