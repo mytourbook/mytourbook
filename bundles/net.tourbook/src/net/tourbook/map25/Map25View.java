@@ -23,6 +23,8 @@ import java.awt.Frame;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -906,20 +908,26 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
          String starText = "";
          switch (stars) {
          case 1:
-            starText = "*";
+            starText = " *";
          case 2:
-            starText = "**";
+            starText = " **";
          case 3:
-            starText = "***";
+            starText = " ***";
          case 4:
-            starText = "****";
+            starText = " ****";
          case 5:
-            starText = "*****";
+            starText = " *****";
          }            
          UUID photoKey = UUID.randomUUID();
          //String photoName = photo.imageFileName;
-         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");  // can be nicely localyzed
-         String photoName = sdf.format(new Date(photo.imageExifTime)) + " " + starText;
+
+         LocalDateTime dateTime = LocalDateTime.ofEpochSecond(photo.imageExifTime, 0, ZoneOffset.UTC);
+         String photoName = dateTime.format(net.tourbook.common.time.TimeTools.Formatter_Time_S);
+         
+         //SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");  // can be nicely localyzed
+         //net.tourbook.common.time.TimeTools.         //DateTime
+         
+         //String photoName = sdf.format(new Date(photo.imageExifTime)) + starText;
          //String photoDescription = photo.imageFilePathName;
          String photoDescription = "Ratingstars: " + Integer.toString(photo.ratingStars);
          Double photoLat = photo.getTourLatitude();

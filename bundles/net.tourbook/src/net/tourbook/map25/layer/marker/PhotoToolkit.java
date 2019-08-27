@@ -184,7 +184,9 @@ public class PhotoToolkit extends MarkerToolkit{
                
                //photoBitmap = CanvasAdapter.decodeBitmap(new ByteArrayInputStream(ImageUtils.formatImage(photoImage, org.eclipse.swt.SWT.IMAGE_BMP)));
                photoBitmap = CanvasAdapter.decodeBitmap(new ByteArrayInputStream(ImageUtils.formatImage(scaledThumbImage, org.eclipse.swt.SWT.IMAGE_BMP)));
-               //debugPrint("??? getPhotoImage created photoBitmap heigth: " + photoBitmap.getHeight() + " width: " +  photoBitmap.getWidth());               
+               //debugPrint("??? getPhotoImage created photoBitmap width: " + photoBitmap.getWidth() + " Height: " +  photoBitmap.getHeight()); 
+               //debugPrint("??? getPhotoImage created bestsize width: " + bestSize.x + " width: " +  bestSize.y);
+               //debugPrint("??? getPhotoImage created thumbnail size: " + thumbSize); 
             } catch (IOException e) {
                // TODO Auto-generated catch block
                e.printStackTrace();
@@ -205,21 +207,9 @@ public class PhotoToolkit extends MarkerToolkit{
          bitmapImage = _bitmapPhoto;
       }
       bitmapPhoto = createAdvanceSymbol(item, bitmapImage, true);
-
-      //debugPrint(" ??????????? PhotoToolkit *** createPhotoBitmapfromPhoto Dims H + W: " + bitmapImage.getHeight() + " " + bitmapImage.getWidth()); //$NON-NLS-1$
+      //debugPrint(" ??????????? PhotoToolkit *** createPhotoBitmapfromPhoto: target size x / y: " + bitmapPhoto.getBitmap().getWidth() + " / " + bitmapPhoto.getBitmap().getHeight()); //$NON-NLS-1$
+      //debugPrint(" ??????????? PhotoToolkit *** createPhotoBitmapfromPhoto Dims H + W: " + bitmapImage.getWidth() + " " + bitmapImage.getHeight()); //$NON-NLS-1$
       
-      /*
-      final org.eclipse.swt.graphics.Point photoSize = photo.getMapImageSize();
-        
-      debugPrint(" ??????????? PhotoToolkit *** createPhotoBitmapfromPhoto: target size x / y: " + photoSize.x + " / " + photoSize.y); //$NON-NLS-1$
-      
-      debugPrint(" ??????????? PhotoToolkit *** createPhotoBitmapfromPhoto: " + photo.imageFileName); //$NON-NLS-1$
-      if(bitmap != null) {
-         debugPrint(" ??????????? PhotoToolkit *** createPhotoBitmapfromPhoto width: " + bitmap.getWidth()); //$NON-NLS-1$
-      } else {
-         debugPrint(" ??????????? PhotoToolkit *** createPhotoBitmapfromPhoto was null"); //$NON-NLS-1$
-      }
-      */
       return bitmapPhoto;
    }
  

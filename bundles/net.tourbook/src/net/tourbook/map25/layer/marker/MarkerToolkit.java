@@ -19,6 +19,7 @@
 
 package net.tourbook.map25.layer.marker;
 
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -268,37 +269,42 @@ public class MarkerToolkit {
       int margin = 3;
       int dist2symbol = 30;
       
-      int titleWidth  = ((int) textPainter.getTextWidth(mItem.title) + 2 * margin);
-      int titleHeight = ((int) textPainter.getTextHeight(mItem.title) + 2 * margin);
-
-      int symbolWidth = poiBitmap.getWidth();
+      //int titleWidth  = ((int) textPainter.getTextWidth(mItem.title) + 2 * margin);
+      //int titleHeight = ((int) textPainter.getTextHeight(mItem.title) + 2 * margin);
       
-      int subtitleWidth = 0;
-      int subtitleHeight = 0;
+      
+      Point titleSize = new Point((int) textPainter.getTextWidth(mItem.title) + 2 * margin, (int) textPainter.getTextHeight(mItem.title) + 2 * margin);
+      Point symbolSize = new Point(poiBitmap.getWidth(),poiBitmap.getHeight());
+      Point subtitleSize = new Point();
+      Point size = new Point();  //total  size of all elements
+      //int symbolWidth = poiBitmap.getWidth();
+      
+      //int subtitleWidth = 0;
+      //int subtitleHeight = 0;
       String subtitle =""; //$NON-NLS-1$
       boolean hasSubtitle = false;
       if (mItem.description.length()>1) {
          if (mItem.description.startsWith("#")){ //$NON-NLS-1$
             subtitle = mItem.description.substring(1); // not the first # char
             subtitle = subtitle.split("\\R", 2)[0]; // only first line //$NON-NLS-1$
-            subtitleWidth  = ((int) textPainter.getTextWidth(subtitle)) + 2 * margin;
-            subtitleHeight = ((int) textPainter.getTextHeight(subtitle)) + 2 * margin;
+            subtitleSize.x  = ((int) textPainter.getTextWidth(subtitle)) + 2 * margin;
+            subtitleSize.y = ((int) textPainter.getTextHeight(subtitle)) + 2 * margin;
             hasSubtitle = true;
          }
       }
       
-      int xSize = java.lang.Math.max(titleWidth, subtitleWidth);
-      xSize = java.lang.Math.max(xSize, symbolWidth);   
+      size.x = java.lang.Math.max(titleSize.x, subtitleSize.x);
+      size.x = java.lang.Math.max(size.x, symbolSize.x);   
       
-      int ySize = titleHeight + symbolWidth + dist2symbol;
+      size.y = titleSize.y + symbolSize.y + dist2symbol;
       
       // markerCanvas, the drawing area for all: title, description and symbol
-      Bitmap markerBitmap = CanvasAdapter.newBitmap(xSize, ySize, 0);
+      Bitmap markerBitmap = CanvasAdapter.newBitmap(size.x, size.y, 0);
       org.oscim.backend.canvas.Canvas markerCanvas = CanvasAdapter.newCanvas();  
       markerCanvas.setBitmap(markerBitmap);
       
       //titleCanvas for the title text
-      Bitmap titleBitmap = CanvasAdapter.newBitmap( titleWidth + margin, titleHeight + margin, 0);
+      Bitmap titleBitmap = CanvasAdapter.newBitmap( titleSize.x + margin, titleSize.y + margin, 0);
       org.oscim.backend.canvas.Canvas titleCanvas = CanvasAdapter.newCanvas();
       titleCanvas.setBitmap(titleBitmap);
       
@@ -308,29 +314,35 @@ public class MarkerToolkit {
        * only for testing purposes, normally uncommented
        */
       //fillPainter.setColor(0x60ffffff);
-      //markerCanvas.drawCircle(0, 0, xSize*2, fillPainter);
+      //markerCanvas.drawCircle(0, 0, size.x*2, fillPainter);
       //fillPainter.setColor(_bgColor);
       }
       
       // draw an oversized transparent circle, so the canvas is completely filled with a transparent color
       // titleCanvas.fillRectangle() does not support transparency
-      titleCanvas.drawCircle(0, 0, xSize*2, fillPainter);
+      titleCanvas.drawCircle(0, 0, size.x*2, fillPainter);
       
-      titleCanvas.drawText(mItem.title, margin, titleHeight - margin , textPainter);
+      titleCanvas.drawText(mItem.title, margin, titleSize.y - margin , textPainter);
       
       if (hasSubtitle) {
-         Bitmap subtitleBitmap = CanvasAdapter.newBitmap( subtitleWidth + margin, subtitleHeight + margin, 0);
+         Bitmap subtitleBitmap = CanvasAdapter.newBitmap( subtitleSize.x + margin, subtitleSize.y + margin, 0);
          org.oscim.backend.canvas.Canvas subtitleCanvas = CanvasAdapter.newCanvas();
          subtitleCanvas.setBitmap(subtitleBitmap); 
-         subtitleCanvas.drawCircle(0, 0, xSize*2, fillPainter);
-         subtitleCanvas.drawText(subtitle, margin, titleHeight - margin, textPainter);
-         markerCanvas.drawBitmap(subtitleBitmap, xSize/2-(subtitleWidth/2), ySize - (subtitleHeight + margin));
-      } else {
-         ;
+         subtitleCanvas.drawCircle(0, 0, size.x*2, fillPainter);
+         subtitleCanvas.drawText(subtitle, margin, titleSize.y - margin, textPainter);
+         markerCanvas.drawBitmap(subtitleBitmap, size.x/2-(subtitleSize.x/2), size.y - (subtitleSize.y + margin));
+      } else if (isPhoto){
+         int lineLength = 20;
+         textPainter.setStrokeWidth(2);
+         Bitmap subtitleBitmap = CanvasAdapter.newBitmap( lineLength, lineLength, 0); //heigth as title
+         org.oscim.backend.canvas.Canvas subtitleCanvas = CanvasAdapter.newCanvas();
+         subtitleCanvas.setBitmap(subtitleBitmap);
+         subtitleCanvas.drawLine(lineLength/2, 0, lineLength/2, lineLength, textPainter);
+         markerCanvas.drawBitmap(subtitleBitmap, size.x/2-(lineLength / 2), size.y - lineLength);
       }    
       
-      markerCanvas.drawBitmap(titleBitmap, xSize/2-(titleWidth/2), 0);
-      markerCanvas.drawBitmap(poiBitmap, xSize/2-(symbolWidth/2), ySize/2-(symbolWidth/2));
+      markerCanvas.drawBitmap(titleBitmap, size.x/2-(titleSize.x/2), 0);
+      markerCanvas.drawBitmap(poiBitmap, size.x/2-(symbolSize.x/2), size.y/2-(symbolSize.y/2));
       
       if (isPhoto) {
          return (new MarkerSymbol(markerBitmap, HotspotPlace.BOTTOM_CENTER));
