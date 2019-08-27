@@ -1011,7 +1011,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       defineColumn_Powertrain_AvgLeftTorqueEffectiveness();
       defineColumn_Powertrain_AvgRightPedalSmoothness();
       defineColumn_Powertrain_AvgRightTorqueEffectiveness();
-      defineColumn_Powertrain_PedalLeftRightBalance();
+      defineColumn_Powertrain_HikingPercentage();
+      defineColumn_Powertrain_RunningPercentage();
 
       // Training - Trainingsanalyse
       defineColumn_Training_FTP();
@@ -1867,6 +1868,29 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    }
 
    /**
+    * Column: Gear teeth
+    */
+   private void defineColumn_Powertrain_HikingPercentage() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.POWERTRAIN_HIKING_ZONE_PERCENTAGE.createColumn(
+            _columnManager,
+            _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            final long value = ((TVITourBookItem) element).colRearShiftCount;
+
+            colDef.printValue_0(cell, value);
+
+            setCellColor(cell, element);
+         }
+      });
+   }
+
+   /**
     * Column: Pedal left/right balance
     */
    private void defineColumn_Powertrain_PedalLeftRightBalance() {
@@ -1881,6 +1905,29 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
             final Object element = cell.getElement();
             final int value = ((TVITourBookItem) element).colPower_PedalLeftRightBalance;
+
+            colDef.printValue_0(cell, value);
+
+            setCellColor(cell, element);
+         }
+      });
+   }
+
+   /**
+    * Column: Gear teeth
+    */
+   private void defineColumn_Powertrain_RunningPercentage() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.POWERTRAIN_RUNNING_ZONE_PERCENTAGE.createColumn(
+            _columnManager,
+            _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            final long value = ((TVITourBookItem) element).colRearShiftCount;
 
             colDef.printValue_0(cell, value);
 
