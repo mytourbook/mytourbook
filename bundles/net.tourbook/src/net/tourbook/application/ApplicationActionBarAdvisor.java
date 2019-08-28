@@ -140,6 +140,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
       tourMenu.add(_action_Save);
 
+      tourMenu.add(new GroupMarker("group_AfterSaveTour")); //$NON-NLS-1$
+
       return tourMenu;
    }
 

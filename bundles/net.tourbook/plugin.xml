@@ -650,16 +650,32 @@
             commandId   ="command.net.tourbook.views.TourWaypointView"
             icon        ="icons/tour-waypoint.png"
             label       ="%View_Name_Waypoint"
-            mnemonic    ="%View_Name_Waypoint_Mnemonic"/>
+            mnemonic    ="%View_Name_Waypoint_Mnemonic"
+         />
 
       </menuContribution>
-      
-      
+
+
+      <menuContribution locationURI="menu:m_Tour?after=group_AfterSaveTour">
+
+         <!-- Restore Tour -->
+         <command
+            commandId      ="command.net.tourbook.tour.RestoreTour"
+            icon           ="icons/restore-tour.png"
+            disabledIcon   ="icons/restore-tour-disabled.png"
+            label          ="%Command_App_RestoreTour"
+            mnemonic       ="%Command_App_RestoreTour_Mnemonic"
+            tooltip        ="%Command_App_RestoreTour_Tooltip"
+         />
+
+      </menuContribution>
+
+
       <!-- 
          Map
       -->
       <menuContribution locationURI="menu:m_Map?before=defaultViews">
-      
+
          <separator
             name="sep_Map"
             visible="true"/>
@@ -943,6 +959,23 @@ THIS IS NOT YET FULLY IMPLEMENTED
                disabledIcon   ="icons/save-tour-disabled.png"
                tooltip        ="%Command_App_SaveTour_Tooltip"
             />
+            
+            <command
+               commandId      ="command.net.tourbook.tour.RestoreTour"
+               icon           ="icons/restore-tour.png"
+               disabledIcon   ="icons/restore-tour-disabled.png"
+               label          ="%Command_App_RestoreTour"
+               mnemonic       ="%Command_App_RestoreTour_Mnemonic"
+               tooltip        ="%Command_App_RestoreTour_Tooltip">
+               <visibleWhen>
+                  <with variable="activePartId">
+                     <or>
+                        <equals value="net.tourbook.views.TourDataEditorView"/>
+                        <equals value="net.tourbook.ui.views.tagging.TourTags_View"/>
+                     </or>
+                  </with>
+               </visibleWhen>
+            </command>
 
          </toolbar>
          
@@ -1437,11 +1470,29 @@ THIS IS NOT YET FULLY IMPLEMENTED
          defaultHandler="net.tourbook.sign.ActionHandlerOpenSignImageView"
          />
       -->
+      
+      <!--
+         Tour
+      -->
+      <command
+         id             ="command.net.tourbook.tour.RestoreTour"
+         name           ="%Command_Tour_RestoreTour"
+         xdefaultHandler ="net.tourbook.tour.photo.ActionHandlerOpenTourPhotosView"
+      />
 
    </extension>
+   
+   <extension  point="org.eclipse.ui.handlers">
+   
+      <handler
+         commandId   ="command.net.tourbook.tour.RestoreTour"
+         class       ="net.tourbook.handler.RestoreTour_Handler"
+      />
+      
+   </extension>
+   
 
-   <extension
-         point="org.eclipse.ui.contexts">
+   <extension  point="org.eclipse.ui.contexts">
       <context
             id="net.tourbook.chart.context.isTourChart"
             name="net.tourbook.chart.context.isTourChart">
@@ -1449,28 +1500,26 @@ THIS IS NOT YET FULLY IMPLEMENTED
    </extension>
 
 
-   <extension
-         point="net.tourbook.mapOverlay">
+   <extension  point="net.tourbook.mapOverlay">
       <painter class="net.tourbook.map2.view.TourMapPainter"/>
    </extension>
 
 
-   <extension
-         point="net.tourbook.tilefactory">
+   <extension  point="net.tourbook.tilefactory">
       <tilefactory
             class="net.tourbook.srtm.tilefactory.SRTMMapProvider"
             name="SRTM Map Provider"/>
    </extension>
 
 
-     <extension point="org.eclipse.core.expressions.propertyTesters">
+   <extension point="org.eclipse.core.expressions.propertyTesters">
       <propertyTester
-         id="de.byteholder.geoclipse.tester.propertyTester"
-         namespace="de.byteholder.geoclipse.tester"
-         properties="someProperty"
-         type="java.lang.Object"
-         class="de.byteholder.geoclipse.tileinfo.TrimPropertyTester">
-        </propertyTester>
+         id          ="de.byteholder.geoclipse.tester.propertyTester"
+         namespace   ="de.byteholder.geoclipse.tester"
+         properties  ="someProperty"
+         type        ="java.lang.Object"
+         class       ="de.byteholder.geoclipse.tileinfo.TrimPropertyTester"
+      />
    </extension>
    
    
@@ -1832,7 +1881,7 @@ THIS IS NOT YET FULLY IMPLEMENTED
          schemeId="net.tourbook.scheme"/>
 
 
-      <!-- New -->
+      <!-- Tour import/new/undo -->
    
       <key
          commandId="net.tourbook.command.device.importFromFile"
@@ -1844,6 +1893,13 @@ THIS IS NOT YET FULLY IMPLEMENTED
       <key
          commandId   ="net.tourbook.command.createNewTour"
          sequence    ="%Shortcut_Key_App_NewTour"
+         contextId   ="org.eclipse.ui.contexts.window"
+         schemeId    ="net.tourbook.scheme"
+      />
+
+      <key
+         commandId   ="command.net.tourbook.tour.RestoreTour"
+         sequence    ="%Shortcut_Key_App_RestoreTour"
          contextId   ="org.eclipse.ui.contexts.window"
          schemeId    ="net.tourbook.scheme"
       />

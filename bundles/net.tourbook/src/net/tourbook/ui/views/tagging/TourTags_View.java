@@ -169,10 +169,9 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
    private ActionTagLayout                     _actionTagLayout;
    private ActionTagFilter                     _actionTagFilter;
 //   private Action_TourTag_Options             _actionTourTagOptions;
-   private ActionUndoChanges                   _actionUndoChanges;
 
-   private PixelConverter                      _pc;
-   private MenuManager                         _viewerMenuManager;
+   private PixelConverter _pc;
+   private MenuManager    _viewerMenuManager;
 
    /*
     * Image resources
@@ -267,27 +266,6 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
       @Override
       public void run() {
          onAction_TagLayout();
-      }
-   }
-
-   private class ActionUndoChanges extends Action {
-
-      public ActionUndoChanges() {
-
-         super(null, AS_PUSH_BUTTON);
-
-         setText(Messages.app_action_undo_modifications);
-         setToolTipText(Messages.app_action_undo_modifications_tooltip);
-
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.App_Action_RestoreTour));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.App_Action_RestoreTour_Disabled));
-
-         setEnabled(false);
-      }
-
-      @Override
-      public void run() {
-         onAction_UndoChanges();
       }
    }
 
@@ -624,7 +602,6 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
       _actionTagFilter = new ActionTagFilter();
 //      _actionTourTagOptions = new Action_TourTag_Options();
       _actionSingleExpandCollapseOthers = new Action_SingleExpand_CollapseOthers();
-      _actionUndoChanges = new ActionUndoChanges();
    }
 
    private void createMenuManager() {
@@ -641,6 +618,9 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
    @Override
    public void createPartControl(final Composite parent) {
+
+      //Listener registration. This is very important for enabling and disabling the tool bar level buttons
+//      addListenerObject(this);
 
       initUI(parent);
       createMenuManager();
@@ -1028,11 +1008,9 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
       _actionTagFilter.setEnabled(isTourAvailable);
       _actionTagLayout.setEnabled(isTourAvailable);
 
-      _actionUndoChanges.setEnabled(isTourAvailable && _isTagDirty);
+//      _actionUndoChanges.setEnabled(isTourAvailable && _isTagDirty);
 
       _tagViewer.getTree().setEnabled(isTourAvailable);
-
-//  TODO    _actionTourTagOptions.__slideoutTourTagOptions.setEnabled();
    }
 
    private void expandCollapseFolder(final TVIPrefTagCategory treeItem) {
@@ -1070,7 +1048,6 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
       tbm.add(_actionTagLayout);
       tbm.add(_actionExpandAll);
       tbm.add(_actionCollapseAll);
-      tbm.add(_actionUndoChanges);
       tbm.add(_action_PrefDialog);
 //      tbm.add(_actionTourTagOptions);
 
@@ -1725,22 +1702,6 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
    public void updateColumnHeader(final ColumnDefinition colDef) {}
 
    /**
-    * update tourdata from the fields
-    */
-//   private void updateModelFromUI() {
-//
-//      final Object[] checkeckElements = _tagViewer.getCheckedElements();
-//
-//      for (final Object treeItem : checkeckElements) {
-//
-//         System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ()") //$NON-NLS-1$ //$NON-NLS-2$
-//               + ("\t: " + treeItem)); //$NON-NLS-1$
-//// TODO remove SYSTEM.OUT.PRINTLN
-//
-//      }
-//   }
-
-   /**
     * Update view header which shows the number of selected tour(s) and tags.
     */
    private void updateUI_NumberOfTours() {
@@ -1903,11 +1864,6 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
       updateUI_NumberOfTours();
 
       _tagViewer.refresh();
-
-//      System.out.println(""
-//            + Arrays.toString(tagItems.toArray())
-//            + ("\n"));
-//// TODO remove SYSTEM.OUT.PRINTLN
 
       // update UI
       _tagViewer.setCheckedElements(tagItems.toArray());
