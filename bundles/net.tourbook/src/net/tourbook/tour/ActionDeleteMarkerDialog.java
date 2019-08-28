@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.ui.ITourProvider;
@@ -76,10 +77,10 @@ public class ActionDeleteMarkerDialog extends Action {
       if (selectedTourMarkers.size() > 1) {
          dialogTitle = Messages.Dlg_TourMarker_MsgBox_delete_markers_title;
 
-         final StringBuilder markersNames = new StringBuilder(System.getProperty("line.separator")); //$NON-NLS-1$
+         final StringBuilder markersNames = new StringBuilder(UI.NEW_LINE);
          for (final TourMarker tourMarker : selectedTourMarkers) {
             if (markersNames.toString().isEmpty() == false) {
-               markersNames.append(System.getProperty("line.separator")); //$NON-NLS-1$
+               markersNames.append(UI.NEW_LINE);
             }
             markersNames.append("\"" + tourMarker.getLabel() + "\""); //$NON-NLS-1$ //$NON-NLS-2$
          }
