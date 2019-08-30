@@ -32,6 +32,10 @@ New
   - when multiple power data sources are present within a given FIT file:
     - Stryd or Garmin Running Dynamics Pod
 
+* Tour Marker's view
+ - Possibility to delete marker(s) from the contextual menu and when pressing
+   the DELETE key
+
  
 Improvements   
 ============

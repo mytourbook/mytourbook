@@ -386,6 +386,7 @@ public class Messages extends NLS {
    public static String        app_action_edit_adjust_altitude;
    public static String        app_action_edit_rows_tooltip;
    public static String        app_action_edit_tour_marker;
+   public static String        app_action_delete_tour_marker;
    public static String        app_action_expand_selection_tooltip;
    public static String        app_action_expand_type_flat;
    public static String        app_action_expand_type_year_day;
@@ -762,7 +763,9 @@ public class Messages extends NLS {
    public static String        Dlg_TourMarker_Label_position;
    public static String        Dlg_TourMarker_Label_Position_Tooltip;
    public static String        Dlg_TourMarker_MsgBox_delete_marker_message;
+   public static String        Dlg_TourMarker_MsgBox_delete_markers_message;
    public static String        Dlg_TourMarker_MsgBox_delete_marker_title;
+   public static String        Dlg_TourMarker_MsgBox_delete_markers_title;
    public static String        Dlg_TourMarker_MsgBox_WrongFormat_Message;
    public static String        Dlg_TourMarker_MsgBox_WrongFormat_Title;
 
