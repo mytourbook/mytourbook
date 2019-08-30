@@ -1,5 +1,6 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2019 Thomas Theussing
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -39,7 +40,8 @@ public class ActionShowPhotos extends Action {
 	@Override
 	public void run() {
 	   //_map25View.actionZoomIn();
-		_map25View.actionShowPhotos();
+		//_map25View.actionShowPhotos();
+	   ;
 	}
 
 }

@@ -59,7 +59,7 @@ import net.tourbook.map25.action.ActionSynchMapWithChartSlider;
 import net.tourbook.map25.action.ActionSynchMapWithTour;
 import net.tourbook.map25.action.ActionZoomIn;
 import net.tourbook.map25.action.ActionZoomOut;
-import net.tourbook.map25.action.ActionShowPhotos;
+//import net.tourbook.map25.action.ActionShowPhotos;
 import net.tourbook.map25.layer.marker.MapMarker;
 import net.tourbook.map25.layer.marker.MarkerLayer;
 import net.tourbook.map25.layer.marker.PhotoToolkit;
@@ -71,6 +71,7 @@ import net.tourbook.map25.layer.tourtrack.TourLayer;
 import net.tourbook.map25.ui.SlideoutMap25_MapOptions;
 import net.tourbook.map25.ui.SlideoutMap25_MapProvider;
 import net.tourbook.map25.ui.SlideoutMap25_TrackOptions;
+import net.tourbook.map25.ui.SlideoutMap25_PhotoOptions;
 import net.tourbook.photo.Photo;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionDeletedTours;
@@ -123,12 +124,16 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
    //
    private static final String            IMAGE_ACTION_SHOW_TOUR_IN_MAP                    = net.tourbook.map2.Messages.Image__Tour;
    private static final String            IMAGE_ACTION_SHOW_TOUR_IN_MAP_DISABLED           = net.tourbook.map2.Messages.Image__Tour_Disabled;
+   private static final String            IMAGE_ACTION_SHOW_PHOTO_IN_MAP                   = net.tourbook.map2.Messages.Image_Action_ShowPhotosInMap;
+   private static final String            IMAGE_ACTION_SHOW_PHOTO_IN_MAP_DISABLED          = net.tourbook.map2.Messages.Image_Action_ShowAllPhotosInMap_Disabled;
    private static final String            IMAGE_ACTION_SYNCH_WITH_SLIDER_CENTERED_DISABLED = net.tourbook.map2.Messages.Image_Action_SynchWithSlider_Centered_Disabled;
    private static final String            IMAGE_ACTION_SYNCH_WITH_SLIDER_CENTERED          = net.tourbook.map2.Messages.Image_Action_SynchWithSlider_Centered;
    private static final String            IMAGE_ACTION_CHANGE_TILE_FACTORY                 = net.tourbook.map2.Messages.image_action_change_tile_factory;
    private static final String            IMAGE_ACTION_SYNCH_WITH_SLIDER_DISABLED          = net.tourbook.map2.Messages.image_action_synch_with_slider_disabled;
    private static final String            IMAGE_ACTION_SYNCH_WITH_SLIDER                   = net.tourbook.map2.Messages.image_action_synch_with_slider;
    private static final String            MAP_ACTION_SHOW_TOUR_IN_MAP                      = net.tourbook.map2.Messages.map_action_show_tour_in_map;
+   private static final String            MAP_ACTION_SHOW_PHOTO_IN_MAP                     = "show photos in map"; //must be externalyzed
+   
    private static final String            MAP_ACTION_SYNCH_WITH_SLIDER                     = net.tourbook.map2.Messages.map_action_synch_with_slider;
    private static final String            MAP_ACTION_SYNCH_WITH_SLIDER_CENTERED            = net.tourbook.map2.Messages.Map_Action_SynchWithSlider_Centered;
    //
@@ -192,12 +197,13 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
    private ActionSynchMapWithTour        _actionSyncMap_WithTour;
    private ActionShowEntireTour          _actionShowEntireTour;
    private ActionShowTour_WithConfig     _actionShowTour_WithOptions;
+   private ActionShowPhoto_WithConfig    _actionShowPhoto_WithOptions;   
    private ActionZoomIn                  _actionZoom_In;
    private ActionZoomOut                 _actionZoom_Out;
    private double                        _zoomFactor = 1.5;
 
    // Photo stuff
-   private ActionShowPhotos              _actionShowPhotos;
+   //private ActionShowPhotos              _actionShowPhotos;
    private boolean                       _isShowPhoto;
 
    /** Contains only geo tours */
@@ -296,6 +302,37 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       }
    }
 
+   private class ActionShowPhoto_WithConfig extends ActionToolbarSlideout {
+
+      public ActionShowPhoto_WithConfig() {
+
+         super(
+               TourbookPlugin.getImageDescriptor(Map25View.IMAGE_ACTION_SHOW_PHOTO_IN_MAP),
+               TourbookPlugin.getImageDescriptor(Map25View.IMAGE_ACTION_SHOW_PHOTO_IN_MAP_DISABLED));
+
+         isToggleAction = true;
+         notSelectedTooltip = MAP_ACTION_SHOW_PHOTO_IN_MAP;
+      }
+
+      @Override
+      protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+         return new SlideoutMap25_PhotoOptions(_parent, toolbar, Map25View.this);
+      }
+
+      @Override
+      protected void onBeforeOpenSlideout() {
+         closeOpenedDialogs(this);
+      }
+
+      @Override
+      protected void onSelect() {
+
+         super.onSelect();
+
+         //actionShowTour(getSelection());  //hmmm
+      }
+   }
+   
    private class ActionShowTour_WithConfig extends ActionToolbarSlideout {
 
       public ActionShowTour_WithConfig() {
@@ -451,7 +488,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       }
    }
 
-   public void actionShowPhotos() {
+ /*  public void actionShowPhotos() {
 
       _isShowPhoto = _actionShowPhotos.isChecked();
 
@@ -463,13 +500,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
       enableActions();
 
-      //_tourPainterConfig.isPhotoVisible = _isShowPhoto;
-
-      //_mapApp.setOverlayKey(Integer.toString(_filteredPhotos.hashCode()));
-      //_mapApp.disposeOverlayImageCache();
-
-      //_mapApp.paint();
-   }
+   } */
    
    public void actionZoomIn() {
    	final Map map25 = _mapApp.getMap();
@@ -711,6 +742,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       _actionShowMarker_WithOptions = new ActionMap25_ShowMarker(this, _parent);
       _actionMapBookmarks = new ActionMapBookmarks(this._parent, this);
 
+      _actionShowPhoto_WithOptions = new ActionShowPhoto_WithConfig();
       _actionMapProvider = new ActionMap25_MapProvider();
       _actionMapOptions = new ActionMap25_Options();
       _actionShowEntireTour = new ActionShowEntireTour(this);
@@ -720,7 +752,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       _actionShowTour_WithOptions = new ActionShowTour_WithConfig();
       _actionZoom_In = new ActionZoomIn(this);
       _actionZoom_Out = new ActionZoomOut(this);
-      _actionShowPhotos = new ActionShowPhotos(this);
+      //_actionShowPhoto = new ActionShowPhoto(this);
 
    }
 
@@ -990,12 +1022,13 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
       final boolean canShowTour = isTourAvailable && isTourLayerVisible;
 
+      _actionShowPhoto_WithOptions.setEnabled(isTourAvailable);      
       _actionShowTour_WithOptions.setEnabled(isTourAvailable);
       _actionShowMarker_WithOptions.setEnabled(isTourAvailable);
       _actionShowEntireTour.setEnabled(canShowTour);
       _actionSyncMap_WithTour.setEnabled(canShowTour);
       _actionSyncMap_WithChartSlider.setEnabled(canShowTour);
-
+      //_actionShowPhotos.setEnabled(isTourAvailable);
       _actionMapBookmarks.setEnabled(true);
       _actionMapProvider.setEnabled(true);
       _actionMapOptions.setEnabled(true);
@@ -1013,7 +1046,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
       tbm.add(new Separator());
-      tbm.add(_actionShowPhotos);
+      tbm.add(_actionShowPhoto_WithOptions);
 
       tbm.add(new Separator());
       tbm.add(_actionMapBookmarks);  //should be moved to position like in Map2View
@@ -1604,7 +1637,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       
       // photo_layer
       _isShowPhoto = Util.getStateBoolean(_state, STATE_IS_LAYER_PHOTO_VISIBLE, true);
-      _actionShowPhotos.setChecked(_isShowPhoto);
+      _actionShowPhoto_WithOptions.setSelection(_isShowPhoto);
       _mapApp.getLayer_Photo().setEnabled(_isShowPhoto);
 
       // hillshading layer
