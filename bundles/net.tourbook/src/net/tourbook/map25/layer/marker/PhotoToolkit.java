@@ -3,7 +3,9 @@ package net.tourbook.map25.layer.marker;
 import java.awt.Point;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
@@ -14,6 +16,7 @@ import org.oscim.backend.CanvasAdapter;
 import org.oscim.backend.canvas.Bitmap;
 import org.oscim.backend.canvas.Color;
 import org.oscim.backend.canvas.Paint;
+import org.oscim.core.GeoPoint;
 import org.oscim.layers.marker.ClusterMarkerRenderer;
 //import org.oscim.layers.marker.ItemizedLayer;
 import org.oscim.layers.marker.MarkerItem;
@@ -24,6 +27,7 @@ import org.oscim.layers.marker.MarkerSymbol.HotspotPlace;
 import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.map.Tile;
 import net.tourbook.common.color.ColorUtil;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.map.bookmark.MapBookmark;
@@ -120,7 +124,69 @@ public class PhotoToolkit extends MarkerToolkit{
       };
    }
 
+   public List<MarkerItem> createPhotoItemList(ArrayList<Photo> galleryPhotos){
+      Map25App.debugPrint(" Phototoolkit createPhotoItemList: entering ");
+      List<MarkerItem> pts = new ArrayList<>();
+      
+      if (galleryPhotos == null) {
+         Map25App.debugPrint(" Map25View: *** createPhotoItemList: galleriePhotos was null");
+         return pts;
+         }
 
+      if (galleryPhotos.size() == 0) {
+         Map25App.debugPrint(" Map25View: *** createPhotoItemList: galleriePhotos.size() was 0");
+         return  pts;     
+      }
+      
+      /*if (!_isShowPhoto) {
+         Map25App.debugPrint(" Map25View: *** createPhotoItemList: photlayer is off");
+         return pts;
+      }*/
+      
+      for (final  Photo photo : galleryPhotos) {
+         int stars = 0;
+         String starText = "";
+         String photoName = "";
+         UUID photoKey = UUID.randomUUID();
+
+         stars = photo.ratingStars;
+         //starText = "";
+         switch (stars) {
+         case 1:
+            starText = " *";
+         case 2:
+            starText = " **";
+         case 3:
+            starText = " ***";
+         case 4:
+            starText = " ****";
+         case 5:
+            starText = " *****";
+         }
+         photoName = TimeTools.getZonedDateTime(photo.imageExifTime).format(TimeTools.Formatter_Time_S) + starText;       
+
+         String photoDescription = "Ratingstars: " + Integer.toString(photo.ratingStars);
+         
+         Double photoLat = photo.getTourLatitude();
+         Double photoLon = photo.getTourLongitude();
+         MarkerItem item = new MarkerItem(photoKey, photoName, photoDescription,
+               new GeoPoint(photoLat, photoLon)
+               );
+         MarkerSymbol markerSymbol = createPhotoBitmapFromPhoto(photo, item);
+        
+         if (markerSymbol != null) {
+            item.setMarker(markerSymbol);
+         }        
+         
+         pts.add(item);
+      }
+      //_photo_pts = pts;
+      //_allPhotos = galleryPhotos; 
+      
+      return pts;   
+   }
+   
+   
    /**
     * same as in TourMapPainter, but for 2.5D maps
     * @param photo

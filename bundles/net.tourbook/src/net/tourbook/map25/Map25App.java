@@ -1184,7 +1184,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
          _layer_Photo.removeAllItems();
     //  }  
       
-      //List<MarkerItem> pts = _markertoolkit.createMarkerItemList(_markerMode); //hopefully done in map25view "paintToursAndUpdate"
+      _selectedPhotosPts = _phototoolkit.createPhotoItemList(_map25View.get_allPhotos()); //hopefully done in map25view "paintToursAndUpdate"
+      debugPrint(" map25: " + "# updateUI_PhotoLayer(): #photos: " + _selectedPhotosPts.size()); //$NON-NLS-1$
       _layer_Photo.addItems(_selectedPhotosPts); //hopefully done in map25view "paintToursAndUpdate"
       _layer_Photo.setEnabled(isShowPhotoLayer);
       _markertoolkit._isMarkerClusteredLast = config.isMarkerClustered;// using settings from MapBookmarks must be changed later with own config

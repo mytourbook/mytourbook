@@ -321,7 +321,7 @@ public class MarkerToolkit {
       // draw an oversized transparent circle, so the canvas is completely filled with a transparent color
       // titleCanvas.fillRectangle() does not support transparency
       titleCanvas.drawCircle(0, 0, size.x*2, fillPainter);
-      
+
       titleCanvas.drawText(mItem.title, margin, titleSize.y - margin , textPainter);
       
       if (hasSubtitle) {
@@ -341,7 +341,10 @@ public class MarkerToolkit {
          markerCanvas.drawBitmap(subtitleBitmap, size.x/2-(lineLength / 2), size.y - lineLength);
       }    
       
-      markerCanvas.drawBitmap(titleBitmap, size.x/2-(titleSize.x/2), 0);
+      if (config.isShowTourMarker) {
+         markerCanvas.drawBitmap(titleBitmap, size.x/2-(titleSize.x/2), 0);
+      }
+      
       markerCanvas.drawBitmap(poiBitmap, size.x/2-(symbolSize.x/2), size.y/2-(symbolSize.y/2));
       
       if (isPhoto) {
