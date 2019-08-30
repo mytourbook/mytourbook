@@ -24,11 +24,7 @@ import java.util.LinkedHashMap;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-import org.eclipse.osgi.util.NLS;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
-
+import net.tourbook.common.UI;
 import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
@@ -41,8 +37,12 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.device.InvalidDeviceSAXException;
 import net.tourbook.device.Messages;
 import net.tourbook.preferences.TourTypeColorDefinition;
-import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.ChartLabel;
+
+import org.eclipse.osgi.util.NLS;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 
 public class FitLogSAXHandler extends DefaultHandler {
 
@@ -337,15 +337,14 @@ public class FitLogSAXHandler extends DefaultHandler {
          final StringBuilder tourNotes = new StringBuilder(tourData.getTourDescription());
 
          if (!tourNotes.toString().trim().isEmpty()) {
-            tourNotes.append(System.getProperty("line.separator")); //$NON-NLS-1$
-            tourNotes.append(System.getProperty("line.separator")); //$NON-NLS-1$
+            tourNotes.append(UI.NEW_LINE2);
          }
 
          tourNotes.append(Messages.FitLog_CustomDataFields_Label);
          _currentActivity.customDataFields.forEach((key, value) -> {
             if (!tourNotes.toString().trim().isEmpty()) {
                //If there is already content in the notes fields, then we insert a new line
-               tourNotes.append(System.getProperty("line.separator")); //$NON-NLS-1$
+               tourNotes.append(UI.NEW_LINE);
             }
             tourNotes.append("\"" + key + "\" : \"" + value + "\""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
          });
@@ -979,7 +978,7 @@ public class FitLogSAXHandler extends DefaultHandler {
       float windSpeedValue = Float.parseFloat(windSpeed);
 
       // Converting to the current unit
-      windSpeedValue *= UI.UNIT_VALUE_DISTANCE;
+      windSpeedValue *= net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 
       return Math.round(windSpeedValue);
    }
