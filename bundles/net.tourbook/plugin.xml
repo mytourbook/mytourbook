@@ -2204,6 +2204,19 @@ THIS IS NOT YET FULLY IMPLEMENTED
    
    <!-- COMMAND FRAMEWORK TO ENABLE/DISABLE MENU ITEMS -->
    
+   <extension point="org.eclipse.ui.services">
+   
+      <!-- 
+      <sourceProvider   provider="net.tourbook.commands.TourEditor_SourceProvider">
+         <variable
+            name           ="net.tourbook.currentTourEditor"
+            priorityLevel  ="activeWorkbenchWindow"
+         />
+      </sourceProvider>
+      -->
+   </extension>
+
+
    <extension point="org.eclipse.core.expressions.propertyTesters">
    
       <propertyTester
