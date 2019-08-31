@@ -195,7 +195,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private MarkerMode _markerMode = MarkerToolkit.MarkerMode.NORMAL; // MarkerToolkit.modeDemo or MarkerToolkit.modeNormal
    
    private ItemizedLayer<MarkerItem> _layer_Photo;
-   private PhotoToolkit _phototoolkit;
+   public PhotoToolkit _phototoolkit;
    //public PhotoMode _photoMode = PhotoToolkit.PhotoMode.NORMAL; // PhotoToolkit.modeDemo or PhotoToolkit.modeNormal
 
    public List<MarkerItem> _selectedPhotosPts;

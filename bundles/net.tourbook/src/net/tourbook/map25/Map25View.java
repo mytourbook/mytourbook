@@ -1188,9 +1188,9 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       //}else {
       //_mapApp.debugPrint("* Map25View: paintphotoselection same hash, skipping ");
       //}
-      PhotoToolkit phototoolkit = new PhotoToolkit();
-      _photo_pts = phototoolkit.createPhotoItemList(allPhotos);
-      //createPhotoItemList(allPhotos);
+      _photo_pts = _mapApp._phototoolkit.createPhotoItemList(_allPhotos);
+      //PhotoToolkit phototoolkit = new PhotoToolkit();
+      //_photo_pts = phototoolkit.createPhotoItemList(allPhotos);
 
       _allPhotos = allPhotos;
       
@@ -1571,9 +1571,9 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       //final ItemizedLayer<MarkerItem> photoLayer = _mapApp.getLayer_Photo();
       //photoLayer.removeAllItems();
 
-      PhotoToolkit phototoolkit = new PhotoToolkit();
-      
-      final List<MarkerItem> photoItems = phototoolkit.createPhotoItemList(_allPhotos);
+      final List<MarkerItem> photoItems = _mapApp._phototoolkit.createPhotoItemList(_allPhotos);
+      //PhotoToolkit phototoolkit = new PhotoToolkit();
+      //final List<MarkerItem> photoItems = phototoolkit.createPhotoItemList(_allPhotos);
       
       //final List<MarkerItem> photoItems = createPhotoItemList(_allPhotos);
       _mapApp.setPhotoSelection(photoItems);
