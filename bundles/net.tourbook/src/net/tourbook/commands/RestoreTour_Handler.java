@@ -13,21 +13,48 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.handler;
+package net.tourbook.commands;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.ui.ISaveablePart;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.handlers.HandlerUtil;
 
 public class RestoreTour_Handler extends AbstractHandler {
 
    @Override
    public Object execute(final ExecutionEvent event) throws ExecutionException {
 
-      int a = 0;
-      a++;
+      final IWorkbenchPart part = HandlerUtil.getActivePart(event);
+
+      if (part instanceof IRestorablePart) {
+
+         ((IRestorablePart) part).doRestore();
+      }
 
       return null;
    }
+
+   @Override
+   public boolean isEnabled() {
+
+      final IWorkbenchWindow wbWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+      if (wbWindow == null) {
+         return false;
+      }
+
+      final IWorkbenchPart activePart = wbWindow.getActivePage().getActivePart();
+
+      if (activePart instanceof ISaveablePart) {
+         return ((ISaveablePart) activePart).isDirty();
+      }
+
+      return false;
+   }
+
 
 }

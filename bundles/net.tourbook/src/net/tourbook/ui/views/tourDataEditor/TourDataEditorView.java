@@ -44,6 +44,7 @@ import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
+import net.tourbook.commands.IRestorablePart;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.font.MTFont;
@@ -191,6 +192,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.events.ExpansionAdapter;
 import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.widgets.Form;
@@ -206,7 +208,7 @@ import org.eclipse.ui.progress.UIJob;
 /**
  * This editor can edit (when all is implemented) all data for a tour
  */
-public class TourDataEditorView extends ViewPart implements ISaveablePart, ITourProvider2 {
+public class TourDataEditorView extends ViewPart implements ISaveablePart, IRestorablePart, ITourProvider2 {
 
    public static final String     ID                            = "net.tourbook.views.TourDataEditorView";                //$NON-NLS-1$
 
@@ -481,7 +483,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ITour
    private ActionSplitTour                  _actionSplitTour;
    private ActionToggleReadEditMode         _actionToggleReadEditMode;
    private ActionToggleRowSelectMode        _actionToggleRowSelectMode;
-   private ActionUndoChanges                _actionUndoChanges;
    private ActionViewSettings               _actionViewSettings;
    //
    private ArrayList<Action_SetSwimStyle>   _allSwimStyleActions;
@@ -2138,13 +2139,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ITour
       recreateViewer();
    }
 
-   void actionUndoChanges() {
-
-      if (confirmUndoChanges()) {
-         discardModifications();
-      }
-   }
-
    private void addPartListener() {
 
       // set the part listener
@@ -2544,7 +2538,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ITour
 
    private void createActions() {
 
-      _actionUndoChanges = new ActionUndoChanges(this);
       _actionDeleteDistanceValues = new ActionDeleteDistanceValues(this);
       _actionComputeDistanceValues = new ActionComputeDistanceValues(this);
       _actionToggleRowSelectMode = new ActionToggleRowSelectMode(this);
@@ -5638,6 +5631,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ITour
    }
 
    @Override
+   public void doRestore() {
+
+      if (confirmUndoChanges()) {
+         discardModifications();
+      }
+   }
+
+   @Override
    public void doSave(final IProgressMonitor monitor) {
       saveTourIntoDB();
    }
@@ -5679,7 +5680,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ITour
        */
 // TODO     _actionSaveTour.setEnabled(isCellEditorInactive && _isTourDirty && isTourValid);
 
-      _actionUndoChanges.setEnabled(isCellEditorInactive && _isTourDirty);
+// TODO     _actionUndoChanges.setEnabled(isCellEditorInactive && _isTourDirty);
 
       _actionOpenAdjustAltitudeDialog.setEnabled(isCellEditorInactive && canUseTool);
       _actionOpenMarkerDialog.setEnabled(isCellEditorInactive && canUseTool);
@@ -5951,9 +5952,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ITour
        * fill toolbar view menu
        */
       final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
-
-      menuMgr.add(_actionUndoChanges);
-      menuMgr.add(new Separator());
 
       menuMgr.add(_actionModify_TimeSliceColumns);
       menuMgr.add(_actionModify_SwimSliceColumns);
@@ -6283,30 +6281,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ITour
       return tourDataList;
    }
 
-   /**
-    * Get time serie index from swim time
-    */
-   private int getSerieIndexFromSwimTime(final int swimSerieIndex) {
-
-      // check bounds
-      if (swimSerieIndex < 0 || swimSerieIndex >= _swimSerie_Time.length) {
-         return 0;
-      }
-
-      final int swimTime = _swimSerie_Time[swimSerieIndex];
-
-      for (int serieIndex = 0; serieIndex < _serieTime.length; serieIndex++) {
-
-         final int serieTime = _serieTime[serieIndex];
-
-         if (serieTime >= swimTime) {
-            return serieIndex;
-         }
-      }
-
-      return 0;
-   }
-
 // /**
 //  * Converts a string into a int value
 //  *
@@ -6331,6 +6305,30 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ITour
 //
 //    return 0;
 // }
+
+   /**
+    * Get time serie index from swim time
+    */
+   private int getSerieIndexFromSwimTime(final int swimSerieIndex) {
+
+      // check bounds
+      if (swimSerieIndex < 0 || swimSerieIndex >= _swimSerie_Time.length) {
+         return 0;
+      }
+
+      final int swimTime = _swimSerie_Time[swimSerieIndex];
+
+      for (int serieIndex = 0; serieIndex < _serieTime.length; serieIndex++) {
+
+         final int serieTime = _serieTime[serieIndex];
+
+         if (serieTime >= swimTime) {
+            return serieIndex;
+         }
+      }
+
+      return 0;
+   }
 
    TableViewer getSliceViewer() {
       return _timeSlice_Viewer;
@@ -7101,20 +7099,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ITour
       _isSetField = isBackup;
    }
 
-   private void onSelectWindSpeedValue() {
-
-      _isWindSpeedManuallyModified = true;
-
-      final int windSpeed = _spinWeather_Wind_SpeedValue.getSelection();
-
-      final boolean isBackup = _isSetField;
-      _isSetField = true;
-      {
-         _comboWeather_WindSpeedText.select(getWindSpeedTextIndex(windSpeed));
-      }
-      _isSetField = isBackup;
-   }
-
 //   /*
 //    * this method is called when the application is shut down to save dirty tours or to cancel the
 //    * shutdown
@@ -7141,6 +7125,20 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ITour
 //
 //      return returnCode;
 //   }
+
+   private void onSelectWindSpeedValue() {
+
+      _isWindSpeedManuallyModified = true;
+
+      final int windSpeed = _spinWeather_Wind_SpeedValue.getSelection();
+
+      final boolean isBackup = _isSetField;
+      _isSetField = true;
+      {
+         _comboWeather_WindSpeedText.select(getWindSpeedTextIndex(windSpeed));
+      }
+      _isSetField = isBackup;
+   }
 
    private void recreateViewer() {
 
@@ -7587,6 +7585,16 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ITour
     */
    private void setTourDirty() {
 
+      /*
+       * Ensure that this view is the active part. It is possible to set tour dirty with the mouse
+       * wheel but the save/undo actions are not enabled.
+       */
+
+      final IWorkbenchPart activePart = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActivePart();
+      if (this != activePart) {
+         Util.showView(ID, true);
+      }
+
       if (_isTourDirty) {
          return;
       }
@@ -7595,11 +7603,27 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ITour
 
       enableActions();
 
-      /*
-       * this is not an eclipse editor part but the property change must be fired to show the start
+      /**
+       * This is not an eclipse editor part but the property change must be fired to show the start
        * "*" marker in the part name
        */
       firePropertyChange(PROP_DIRTY);
+
+      /**
+       * Enable restore action is also done with firePropertyChange, however it only works with
+       * <enabledWhen> but do not work with <activeWhen>
+       * <p>
+       * IEvaluationService.requestEvaluation(..) could be another option to enable commands/handler
+       * with property tester.
+       */
+//      final IWorkbench workbench = PlatformUI.getWorkbench();
+//      final IEvaluationService evalService = workbench.getService(IEvaluationService.class);
+
+//      evalService.requestEvaluation(ISources.ACTIVE_PART_NAME);
+
+//      evalService.requestEvaluation("net.tourbook.propertyTester.TourEditor_Tester");
+//      evalService.requestEvaluation("command.net.tourbook.tour.RestoreTour");
+//      evalService.requestEvaluation("net.tourbook.expression.TourEditor.isDirty");
    }
 
    /**

@@ -658,15 +658,31 @@
 
       <menuContribution locationURI="menu:m_Tour?after=group_AfterSaveTour">
 
+         <!-- Save Tour -->
+         <command
+            commandId      ="org.eclipse.ui.file.save"
+            mnemonic       ="%Command_App_RestoreTour_Mnemonic"
+            tooltip        ="%Command_App_RestoreTour_Tooltip"
+         >
+            <!-- 
+            <visibleWhen   checkEnabled="false">
+               <reference  definitionId="net.tourbook.isTourEditorActive"/>
+            </visibleWhen>
+            -->
+         </command>
+
          <!-- Restore Tour -->
          <command
             commandId      ="command.net.tourbook.tour.RestoreTour"
-            icon           ="icons/restore-tour.png"
-            disabledIcon   ="icons/restore-tour-disabled.png"
-            label          ="%Command_App_RestoreTour"
             mnemonic       ="%Command_App_RestoreTour_Mnemonic"
             tooltip        ="%Command_App_RestoreTour_Tooltip"
-         />
+         >
+            <!-- 
+            <visibleWhen   checkEnabled="false">
+               <reference  definitionId="net.tourbook.isTourEditorActive"/>
+            </visibleWhen>
+            -->
+         </command>
 
       </menuContribution>
 
@@ -947,10 +963,10 @@ THIS IS NOT YET FULLY IMPLEMENTED
             />
 
             <!-- 
+               Save Tour
+               
                This command handler for this global command is defined in 
-               
                net.tourbook.application.ApplicationActionBarAdvisor._action_Save
-               
                Parts have to implement ISaveablePart to activate this action when part is active.
             -->
             <command
@@ -958,23 +974,25 @@ THIS IS NOT YET FULLY IMPLEMENTED
                icon           ="icons/save-tour.png"
                disabledIcon   ="icons/save-tour-disabled.png"
                tooltip        ="%Command_App_SaveTour_Tooltip"
-            />
+            >
+               <!-- 
+               <visibleWhen   checkEnabled="false">
+                  <reference  definitionId="net.tourbook.isTourEditorActive"/>
+               </visibleWhen>
+               -->
+            </command>
             
+            <!-- Restore Tour -->
             <command
                commandId      ="command.net.tourbook.tour.RestoreTour"
-               icon           ="icons/restore-tour.png"
-               disabledIcon   ="icons/restore-tour-disabled.png"
-               label          ="%Command_App_RestoreTour"
                mnemonic       ="%Command_App_RestoreTour_Mnemonic"
-               tooltip        ="%Command_App_RestoreTour_Tooltip">
-               <visibleWhen>
-                  <with variable="activePartId">
-                     <or>
-                        <equals value="net.tourbook.views.TourDataEditorView"/>
-                        <equals value="net.tourbook.ui.views.tagging.TourTags_View"/>
-                     </or>
-                  </with>
+               tooltip        ="%Command_App_RestoreTour_Tooltip"
+            >
+               <!-- 
+               <visibleWhen   checkEnabled="false">
+                  <reference  definitionId="net.tourbook.isTourEditorActive"/>
                </visibleWhen>
+               -->
             </command>
 
          </toolbar>
@@ -1477,21 +1495,19 @@ THIS IS NOT YET FULLY IMPLEMENTED
       <command
          id             ="command.net.tourbook.tour.RestoreTour"
          name           ="%Command_Tour_RestoreTour"
-         xdefaultHandler ="net.tourbook.tour.photo.ActionHandlerOpenTourPhotosView"
       />
 
    </extension>
+
+   <extension point="org.eclipse.ui.commandImages">
    
-   <extension  point="org.eclipse.ui.handlers">
-   
-      <handler
-         commandId   ="command.net.tourbook.tour.RestoreTour"
-         class       ="net.tourbook.handler.RestoreTour_Handler"
+      <image   
+         commandId      ="command.net.tourbook.tour.RestoreTour"
+         icon           ="icons/restore-tour.png"
+         disabledIcon   ="icons/restore-tour-disabled.png"
       />
-      
    </extension>
    
-
    <extension  point="org.eclipse.ui.contexts">
       <context
             id="net.tourbook.chart.context.isTourChart"
@@ -2183,6 +2199,52 @@ THIS IS NOT YET FULLY IMPLEMENTED
       <fragment
          uri="fragment.e4xmi">
       </fragment>
+   </extension>
+   
+   
+   <!-- COMMAND FRAMEWORK TO ENABLE/DISABLE MENU ITEMS -->
+   
+   <extension point="org.eclipse.core.expressions.propertyTesters">
+   
+      <propertyTester
+         id          ="net.tourbook.propertyTester.TourEditor_Tester"
+         class       ="net.tourbook.commands.TourEditor_Tester"
+         namespace   ="net.tourbook.expression.TourEditor"
+         properties  ="isDirty"
+         type        ="java.lang.Object"
+      />
+   </extension>
+
+   
+   <extension point="org.eclipse.ui.handlers">
+   
+      <handler
+         commandId   ="command.net.tourbook.tour.RestoreTour"
+         class       ="net.tourbook.commands.RestoreTour_Handler"
+      >
+         <enabledWhen>
+            <with variable="activePart">
+               <test property="net.tourbook.expression.TourEditor.isDirty"/>
+            </with>
+         </enabledWhen>
+         
+     </handler>
+      
+   </extension>
+   
+   <extension point="org.eclipse.core.expressions.definitions">
+
+      <!-- 
+      <definition id="net.tourbook.isTourEditorActive">
+         <with variable="activePartId">
+            <or>
+               <equals value="net.tourbook.views.TourDataEditorView"/>
+               <equals value="net.tourbook.ui.views.tagging.TourTags_View"/>
+            </or>
+         </with>
+      </definition>
+      -->
+      
    </extension>
 
 

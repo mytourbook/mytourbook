@@ -138,8 +138,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
       tourMenu.add(new Separator("defaultViews")); //$NON-NLS-1$
 
-      tourMenu.add(_action_Save);
-
       tourMenu.add(new GroupMarker("group_AfterSaveTour")); //$NON-NLS-1$
 
       return tourMenu;
