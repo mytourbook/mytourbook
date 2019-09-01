@@ -660,7 +660,7 @@
 
          <!-- Save Tour -->
          <command
-            commandId      ="org.eclipse.ui.file.save"
+            commandId      ="command.net.tourbook.tour.SaveTour"
             mnemonic       ="%Command_App_RestoreTour_Mnemonic"
             tooltip        ="%Command_App_RestoreTour_Tooltip"
          >
@@ -970,7 +970,7 @@ THIS IS NOT YET FULLY IMPLEMENTED
                Parts have to implement ISaveablePart to activate this action when part is active.
             -->
             <command
-               commandId      ="org.eclipse.ui.file.save"
+               commandId      ="command.net.tourbook.tour.SaveTour"
                icon           ="icons/save-tour.png"
                disabledIcon   ="icons/save-tour-disabled.png"
                tooltip        ="%Command_App_SaveTour_Tooltip"
@@ -1496,6 +1496,10 @@ THIS IS NOT YET FULLY IMPLEMENTED
          id             ="command.net.tourbook.tour.RestoreTour"
          name           ="%Command_Tour_RestoreTour"
       />
+      <command
+         id             ="command.net.tourbook.tour.SaveTour"
+         name           ="%Command_Tour_SaveTour"
+      />
 
    </extension>
 
@@ -1506,6 +1510,12 @@ THIS IS NOT YET FULLY IMPLEMENTED
          icon           ="icons/restore-tour.png"
          disabledIcon   ="icons/restore-tour-disabled.png"
       />
+      <image   
+         commandId      ="command.net.tourbook.tour.SaveTour"
+         icon           ="icons/save-tour.png"
+         disabledIcon   ="icons/save-tour-disabled.png"
+      />
+
    </extension>
    
    <extension  point="org.eclipse.ui.contexts">
@@ -1919,6 +1929,12 @@ THIS IS NOT YET FULLY IMPLEMENTED
          contextId   ="org.eclipse.ui.contexts.window"
          schemeId    ="net.tourbook.scheme"
       />
+      <key
+         commandId   ="command.net.tourbook.tour.SaveTour"
+         sequence    ="%Shortcut_Key_App_SaveTour"
+         contextId   ="org.eclipse.ui.contexts.window"
+         schemeId    ="net.tourbook.scheme"
+      />
 
 
       <!-- Picture directory -->            
@@ -2234,6 +2250,18 @@ THIS IS NOT YET FULLY IMPLEMENTED
       <handler
          commandId   ="command.net.tourbook.tour.RestoreTour"
          class       ="net.tourbook.commands.RestoreTour_Handler"
+      >
+         <enabledWhen>
+            <with variable="activePart">
+               <test property="net.tourbook.expression.TourEditor.isDirty"/>
+            </with>
+         </enabledWhen>
+         
+     </handler>
+
+      <handler
+         commandId   ="command.net.tourbook.tour.SaveTour"
+         class       ="net.tourbook.commands.SaveTour_Handler"
       >
          <enabledWhen>
             <with variable="activePart">

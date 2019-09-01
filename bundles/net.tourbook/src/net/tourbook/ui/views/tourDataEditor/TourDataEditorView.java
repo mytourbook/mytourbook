@@ -193,6 +193,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.forms.events.ExpansionAdapter;
 import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.widgets.Form;
@@ -2145,9 +2146,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, IRest
       _partListener = new IPartListener2() {
          @Override
          public void partActivated(final IWorkbenchPartReference partRef) {
+
             if (partRef.getPart(false) == TourDataEditorView.this) {
                _postSelectionProvider.setSelection(new SelectionTourData(null, _tourData));
             }
+
+            // update save icon
+            final ICommandService cs = PlatformUI.getWorkbench().getService(ICommandService.class);
+            cs.refreshElements("command.net.tourbook.tour.SaveTour", null);
          }
 
          @Override

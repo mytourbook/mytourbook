@@ -56,7 +56,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
    private IWorkbenchAction                  _actionPreferences;
 
-   private IWorkbenchAction                  _action_Save;
+//   private IWorkbenchAction                  _action_Save;
    private IWorkbenchAction                  _actionAbout;
    private IWorkbenchAction                  _actionQuit;
 
@@ -349,15 +349,15 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
       /*
        * Action: Save tour with the command id "org.eclipse.ui.file.save"
        */
-      _action_Save = ActionFactory.SAVE.create(window);
-
-      _action_Save.setText(Messages.App_Action_SaveTour);
-      _action_Save.setToolTipText(Messages.App_Action_SaveTour_Tooltip);
-
-      _action_Save.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__SaveTour));
-      _action_Save.setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__SaveTour_Disabled));
-
-      register(_action_Save);
+//      _action_Save = ActionFactory.SAVE.create(window);
+//
+//      _action_Save.setText(Messages.App_Action_SaveTour);
+//      _action_Save.setToolTipText(Messages.App_Action_SaveTour_Tooltip);
+//
+//      _action_Save.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__SaveTour));
+//      _action_Save.setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__SaveTour_Disabled));
+//
+//      register(_action_Save);
 
       /*
        * If we're on OS X we shouldn't show this command in the File menu. It should be invisible to

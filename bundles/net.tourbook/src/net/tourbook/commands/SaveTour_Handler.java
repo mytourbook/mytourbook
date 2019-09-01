@@ -27,17 +27,18 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.IElementUpdater;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.menus.UIElement;
+import org.eclipse.ui.services.IServiceLocator;
 
-public class RestoreTour_Handler extends AbstractHandler implements IElementUpdater {
+public class SaveTour_Handler extends AbstractHandler implements IElementUpdater {
 
    @Override
    public Object execute(final ExecutionEvent event) throws ExecutionException {
 
       final IWorkbenchPart part = HandlerUtil.getActivePart(event);
 
-      if (part instanceof IRestorablePart) {
+      if (part instanceof ISaveablePart) {
 
-         ((IRestorablePart) part).doRestore();
+         ((ISaveablePart) part).doSave(null);
       }
 
       return null;
@@ -61,7 +62,7 @@ public class RestoreTour_Handler extends AbstractHandler implements IElementUpda
    }
 
    @Override
-   public void updateElement(final UIElement element, final Map parameters) {
+   public void updateElement(final UIElement uiElement, final Map parameters) {
       // TODO Auto-generated method stub
 
 //      for parameters see
@@ -69,6 +70,13 @@ public class RestoreTour_Handler extends AbstractHandler implements IElementUpda
 
 //      icon           ="icons/save-tour.png"
 //      disabledIcon   ="icons/save-tour-disabled.png"
+
+      final Class<? extends UIElement> clazz = uiElement.getClass();
+
+      final IServiceLocator serviceLocator = uiElement.getServiceLocator();
+
+      int a = 0;
+      a++;
 
    }
 
