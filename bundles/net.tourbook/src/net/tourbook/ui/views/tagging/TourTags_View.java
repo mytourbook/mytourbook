@@ -24,6 +24,8 @@ import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.commands.AppCommands;
+import net.tourbook.commands.IRestorablePart;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.util.ColumnDefinition;
@@ -105,13 +107,18 @@ import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchPartReference;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.dialogs.ContainerCheckedTreeViewer;
 import org.eclipse.ui.part.ViewPart;
 
-public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer, ISaveablePart {
+public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer, ISaveablePart, IRestorablePart {
 
    static public final String         ID                                        = "net.tourbook.ui.views.tagging.TourTags_View"; //$NON-NLS-1$
 
@@ -127,6 +134,8 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
    private final IDialogSettings      _state                                    = TourbookPlugin.getState("TourTagsView");       //$NON-NLS-1$
 
+   private SelectionListener          _columnSortListener;
+   private IPartListener2             _partListener;
    private ISelectionListener         _postSelectionListener;
    private ITourEventListener         _tourEventListener;
 
@@ -146,8 +155,6 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
    private boolean                    _tagViewerItem_IsChecked;
    private boolean                    _tagViewerItem_IsKeyPressed;
    private Object                     _tagViewerItem_Data;
-
-   private SelectionListener          _columnSortListener;
 
    private boolean                    _isBehaviourSingleExpandedOthersCollapse  = true;
    private boolean                    _isBehaviourAutoExpandCollapse            = true;
@@ -513,6 +520,48 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
    public TourTags_View() {}
 
+   private void addPartListener() {
+
+      // set the part listener
+      _partListener = new IPartListener2() {
+         @Override
+         public void partActivated(final IWorkbenchPartReference partRef) {
+
+            if (partRef.getPart(false) == TourTags_View.this) {
+
+               // update save/restore icon
+               final ICommandService commandService = PlatformUI.getWorkbench().getService(ICommandService.class);
+               commandService.refreshElements(AppCommands.COMMAND_NET_TOURBOOK_TOUR_RESTORE_TOUR, null);
+               commandService.refreshElements(AppCommands.COMMAND_NET_TOURBOOK_TOUR_SAVE_TOUR, null);
+            }
+         }
+
+         @Override
+         public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
+
+         @Override
+         public void partClosed(final IWorkbenchPartReference partRef) {}
+
+         @Override
+         public void partDeactivated(final IWorkbenchPartReference partRef) {}
+
+         @Override
+         public void partHidden(final IWorkbenchPartReference partRef) {}
+
+         @Override
+         public void partInputChanged(final IWorkbenchPartReference partRef) {}
+
+         @Override
+         public void partOpened(final IWorkbenchPartReference partRef) {}
+
+         @Override
+         public void partVisible(final IWorkbenchPartReference partRef) {}
+      };
+
+      // register the listener in the page
+      getSite().getPage().addPartListener(_partListener);
+   }
+
    /**
     * Listen for events when a tour is selected
     */
@@ -635,6 +684,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
       createActions();
       fillToolbar();
 
+      addPartListener();
       addSelectionListener();
       addTourEventListener();
 
@@ -975,7 +1025,11 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
    @Override
    public void dispose() {
 
-      getSite().getPage().removePostSelectionListener(_postSelectionListener);
+      final IWorkbenchPage page = getSite().getPage();
+
+      page.removePartListener(_partListener);
+      page.removePostSelectionListener(_postSelectionListener);
+
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
       _imgTag.dispose();
@@ -983,6 +1037,16 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
       _imgTagCategory.dispose();
 
       super.dispose();
+   }
+
+   @Override
+   public void doRestore() {
+
+      _isTagDirty = false;
+
+      enableControls();
+
+      firePropertyChange(PROP_DIRTY);
    }
 
    @Override

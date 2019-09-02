@@ -17,19 +17,30 @@ package net.tourbook.commands;
 
 import java.util.Map;
 
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.ui.views.tagging.TourTags_View;
+import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
+
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.ISaveablePart;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.IElementUpdater;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.menus.UIElement;
-import org.eclipse.ui.services.IServiceLocator;
 
 public class SaveTour_Handler extends AbstractHandler implements IElementUpdater {
+
+   private static final ImageDescriptor _iconSaveTour          = TourbookPlugin.getImageDescriptor(Messages.Image__SaveTour);
+   private static final ImageDescriptor _iconSaveTour_Disabled = TourbookPlugin.getImageDescriptor(Messages.Image__SaveTour_Disabled);
+   private static final ImageDescriptor _iconSaveTags          = TourbookPlugin.getImageDescriptor(Messages.Image__SaveTags);
+   private static final ImageDescriptor _iconSaveTags_Disabled = TourbookPlugin.getImageDescriptor(Messages.Image__SaveTags_Disabled);
 
    @Override
    public Object execute(final ExecutionEvent event) throws ExecutionException {
@@ -63,21 +74,44 @@ public class SaveTour_Handler extends AbstractHandler implements IElementUpdater
 
    @Override
    public void updateElement(final UIElement uiElement, final Map parameters) {
-      // TODO Auto-generated method stub
 
-//      for parameters see
-//      https://www.eclipse.org/forums/index.php/t/161643/
+      /**
+       * Show command icon depending on the active part.
+       * <p>
+       * This method will be called from partActivated() with
+       * org.eclipse.ui.commands.ICommandService.refreshElements(..)
+       * <p>
+       * -> Higly complicated
+       */
 
-//      icon           ="icons/save-tour.png"
-//      disabledIcon   ="icons/save-tour-disabled.png"
+      final IWorkbenchWindow window = uiElement.getServiceLocator().getService(IWorkbenchWindow.class);
+      if (window == null) {
+         return;
+      }
+      final IWorkbenchPage page = window.getActivePage();
+      if (page == null) {
+         return;
+      }
+      final IWorkbenchPart part = page.getActivePart();
+      if (part == null) {
+         return;
+      }
 
-      final Class<? extends UIElement> clazz = uiElement.getClass();
+      /**
+       * !!! VERY IMPORTANT !!!
+       * <p>
+       * The disabled icon must be set first, otherwise the wrong icon is displayed !!!
+       */
+      if (part instanceof TourDataEditorView) {
 
-      final IServiceLocator serviceLocator = uiElement.getServiceLocator();
+         uiElement.setDisabledIcon(_iconSaveTour_Disabled);
+         uiElement.setIcon(_iconSaveTour);
 
-      int a = 0;
-      a++;
+      } else if (part instanceof TourTags_View) {
 
+         uiElement.setDisabledIcon(_iconSaveTags_Disabled);
+         uiElement.setIcon(_iconSaveTags);
+      }
    }
 
 }

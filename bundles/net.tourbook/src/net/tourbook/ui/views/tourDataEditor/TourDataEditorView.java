@@ -44,6 +44,7 @@ import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
+import net.tourbook.commands.AppCommands;
 import net.tourbook.commands.IRestorablePart;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
@@ -2148,12 +2149,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, IRest
          public void partActivated(final IWorkbenchPartReference partRef) {
 
             if (partRef.getPart(false) == TourDataEditorView.this) {
-               _postSelectionProvider.setSelection(new SelectionTourData(null, _tourData));
-            }
 
-            // update save icon
-            final ICommandService cs = PlatformUI.getWorkbench().getService(ICommandService.class);
-            cs.refreshElements("command.net.tourbook.tour.SaveTour", null);
+               _postSelectionProvider.setSelection(new SelectionTourData(null, _tourData));
+
+               // update save icon
+               final ICommandService cs = PlatformUI.getWorkbench().getService(ICommandService.class);
+               cs.refreshElements(AppCommands.COMMAND_NET_TOURBOOK_TOUR_SAVE_TOUR, null);
+            }
          }
 
          @Override

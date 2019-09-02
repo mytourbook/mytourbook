@@ -997,6 +997,8 @@ public class Messages extends NLS {
    public static String        Image__synch_graph_bySize_disabled;
    public static String        Image__synch_statistics;
    public static String        Image__synch_statistics_Disabled;
+   public static String        Image__SaveTags;
+   public static String        Image__SaveTags_Disabled;
    public static String        Image__SaveTour;
    public static String        Image__SaveTour_Disabled;
    public static String        Image__SearchExternal;

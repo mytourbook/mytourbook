@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.commands;
 
-import java.util.Map;
-
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -24,11 +22,9 @@ import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.commands.IElementUpdater;
 import org.eclipse.ui.handlers.HandlerUtil;
-import org.eclipse.ui.menus.UIElement;
 
-public class RestoreTour_Handler extends AbstractHandler implements IElementUpdater {
+public class RestoreTour_Handler extends AbstractHandler {
 
    @Override
    public Object execute(final ExecutionEvent event) throws ExecutionException {
@@ -58,18 +54,6 @@ public class RestoreTour_Handler extends AbstractHandler implements IElementUpda
       }
 
       return false;
-   }
-
-   @Override
-   public void updateElement(final UIElement element, final Map parameters) {
-      // TODO Auto-generated method stub
-
-//      for parameters see
-//      https://www.eclipse.org/forums/index.php/t/161643/
-
-//      icon           ="icons/save-tour.png"
-//      disabledIcon   ="icons/save-tour-disabled.png"
-
    }
 
 }
