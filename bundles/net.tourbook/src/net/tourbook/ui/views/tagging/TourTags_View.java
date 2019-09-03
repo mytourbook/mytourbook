@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors 
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1215,8 +1215,6 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
    public boolean isDirty() {
 
       return _isTagDirty;
-
-//      return false;
    }
 
    @Override
@@ -1315,14 +1313,6 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
       _parent.setRedraw(true);
    }
 
-   private void onAction_UndoChanges() {
-
-      _isTagDirty = false;
-
-      enableControls();
-
-      firePropertyChange(PROP_DIRTY);
-   }
 
    private void onSelect_SortColumn(final SelectionEvent e) {
 

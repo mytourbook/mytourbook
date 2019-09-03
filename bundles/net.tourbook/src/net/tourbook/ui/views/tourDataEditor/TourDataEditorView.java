@@ -213,15 +213,15 @@ import org.eclipse.ui.progress.UIJob;
 public class TourDataEditorView extends ViewPart implements ISaveablePart, IRestorablePart, ITourProvider2 {
 
    public static final String     ID                            = "net.tourbook.views.TourDataEditorView";                //$NON-NLS-1$
-
-   /**
-    * On Linux an asynch selection event is fired since e4
-    */
-   private static final String    FIX_LINUX_ASYNC_EVENT_1       = "FIX_LINUX_ASYNC_EVENT_1";                              //$NON-NLS-1$
-   private static final String    FIX_LINUX_ASYNC_EVENT_2       = "FIX_LINUX_ASYNC_EVENT_2";                              //$NON-NLS-1$
    //
    private static final String    GRAPH_LABEL_HEARTBEAT_UNIT    = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
    private static final String    VALUE_UNIT_K_CALORIES         = net.tourbook.ui.Messages.Value_Unit_KCalories;
+   //
+   /**
+    * On Linux an asynch selection event is fired since e4 
+    */
+   private static final String    FIX_LINUX_ASYNC_EVENT_1       = "FIX_LINUX_ASYNC_EVENT_1";                              //$NON-NLS-1$
+   private static final String    FIX_LINUX_ASYNC_EVENT_2       = "FIX_LINUX_ASYNC_EVENT_2";                              //$NON-NLS-1$
    //
    private static final int       COLUMN_SPACING                = 20;
    //
@@ -396,7 +396,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, IRest
     */
    private int[][]                            _refTourRange;
 
-   private boolean                            _isPartVisible          = false;
+   private boolean                            _isPartVisible;
 
    /**
     * when <code>true</code> additional info is displayed in the title area
@@ -404,9 +404,19 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, IRest
    private boolean                            _isInfoInTitle;
 
    /**
-    * is <code>true</code> when a cell editor is activ, otherwise <code>false</code>
+    * Is <code>true</code> when a cell editor is activ, otherwise <code>false</code>
     */
-   private boolean                            _isCellEditorActive     = false;
+   private boolean                            _isCellEditorActive;
+
+   /**
+    * Current combobox cell editor or <code>null</code> when a cell editor is not active.
+    */
+   private CellEditor_ComboBox_Customized     _currentComboBox_CellEditor;
+
+   /**
+    * Current text cell editor or <code>null</code> when a cell editor is not active.
+    */
+   private CellEditor_Text_Customized         _currentTextEditor_CellEditor;
 
    /**
     * every requested UI update increased this counter
@@ -673,6 +683,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, IRest
          super.activate();
 
          _isCellEditorActive = true;
+         _currentComboBox_CellEditor = this;
+
          enableActionsDelayed();
       }
 
@@ -682,7 +694,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, IRest
          super.deactivate();
 
          _isCellEditorActive = false;
+         _currentComboBox_CellEditor = null;
+
          enableActionsDelayed();
+      }
+
+      @Override
+      protected void focusLost() {
+         super.focusLost();
       }
    }
 
@@ -702,6 +721,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, IRest
          super.activate();
 
          _isCellEditorActive = true;
+         _currentTextEditor_CellEditor = this;
+
          enableActionsDelayed();
       }
 
@@ -711,7 +732,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, IRest
          super.deactivate();
 
          _isCellEditorActive = false;
+         _currentTextEditor_CellEditor = null;
+
          enableActionsDelayed();
+      }
+
+      @Override
+      protected void focusLost() {
+         super.focusLost();
       }
    }
 
@@ -4359,24 +4387,21 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, IRest
       }
 
       // with e4 the layouts are not yet set -> NPE's -> run async which worked
-      parent.getShell().getDisplay().asyncExec(new Runnable() {
-         @Override
-         public void run() {
+      parent.getShell().getDisplay().asyncExec(() -> {
 
-            // compute width for all controls and equalize column width for the different sections
-            _tab1Container.layout(true, true);
-            UI.setEqualizeColumWidths(_firstColumnControls);
-            UI.setEqualizeColumWidths(_secondColumnControls);
+         // compute width for all controls and equalize column width for the different sections
+         _tab1Container.layout(true, true);
+         UI.setEqualizeColumWidths(_firstColumnControls);
+         UI.setEqualizeColumWidths(_secondColumnControls);
 
-            _tab1Container.layout(true, true);
-            UI.setEqualizeColumWidths(_firstColumnContainerControls);
+         _tab1Container.layout(true, true);
+         UI.setEqualizeColumWidths(_firstColumnContainerControls);
 
-            /*
-             * Reduce width that the decorator is not truncated
-             */
-            final GridData gd = (GridData) _lblTimeZone.getLayoutData();
-            gd.widthHint -= UI.DECORATOR_HORIZONTAL_INDENT;
-         }
+         /*
+          * Reduce width that the decorator is not truncated
+          */
+         final GridData gd = (GridData) _lblTimeZone.getLayoutData();
+         gd.widthHint -= UI.DECORATOR_HORIZONTAL_INDENT;
       });
 
       return _tab1Container;
@@ -5641,6 +5666,21 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, IRest
    @Override
    public void doRestore() {
 
+      if (_isCellEditorActive) {
+
+         /**
+          * Ensure that the active cell editor is not in edit mode, because the command shortcut can
+          * activate this restore action.
+          */
+
+         if (_currentComboBox_CellEditor != null) {
+            _currentComboBox_CellEditor.focusLost();
+         }
+         if (_currentTextEditor_CellEditor != null) {
+            _currentTextEditor_CellEditor.focusLost();
+         }
+      }
+
       if (confirmUndoChanges()) {
          discardModifications();
       }
@@ -5648,6 +5688,22 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, IRest
 
    @Override
    public void doSave(final IProgressMonitor monitor) {
+
+      if (_isCellEditorActive) {
+
+         /**
+          * Ensure that the content of the active cell editor is updated in the model and also
+          * saved because the command shortcut can activate this save action.
+          */
+
+         if (_currentComboBox_CellEditor != null) {
+            _currentComboBox_CellEditor.focusLost();
+         }
+         if (_currentTextEditor_CellEditor != null) {
+            _currentTextEditor_CellEditor.focusLost();
+         }
+      }
+
       saveTourIntoDB();
    }
 
@@ -5683,12 +5739,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, IRest
       final boolean isDistanceLargerThan0 = isTourData //
             && isDistanceAvailable
             && _tourData.distanceSerie[0] > 0;
-      /*
-       * tour can only be saved when it's already saved in the database,except manual tours
-       */
-// TODO     _actionSaveTour.setEnabled(isCellEditorInactive && _isTourDirty && isTourValid);
-
-// TODO     _actionUndoChanges.setEnabled(isCellEditorInactive && _isTourDirty);
 
       _actionOpenAdjustAltitudeDialog.setEnabled(isCellEditorInactive && canUseTool);
       _actionOpenMarkerDialog.setEnabled(isCellEditorInactive && canUseTool);
@@ -6288,31 +6338,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, IRest
 
       return tourDataList;
    }
-
-// /**
-//  * Converts a string into a int value
-//  *
-//  * @param valueText
-//  * @return Returns the float value for the parameter valueText, return <code>0</code>
-//  * @throws IllegalArgumentException
-//  */
-// private int getIntValue(String valueText) throws IllegalArgumentException {
-//
-//    valueText = valueText.trim();
-//    if (valueText.length() == 0) {
-//
-//       return 0;
-//
-//    } else {
-//
-//       final Object convertedValue = StringToNumberConverter.toInteger(true).convert(valueText);
-//       if (convertedValue instanceof Integer) {
-//          return ((Integer) convertedValue).intValue();
-//       }
-//    }
-//
-//    return 0;
-// }
 
    /**
     * Get time serie index from swim time

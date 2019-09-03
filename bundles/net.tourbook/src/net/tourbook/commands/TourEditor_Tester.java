@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors 
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,15 +20,12 @@ import org.eclipse.ui.ISaveablePart;
 
 public class TourEditor_Tester extends PropertyTester {
 
-   private static final String PROPERTY_IS_DIRTY = "isDirty";
+   private static final String PROPERTY_IS_DIRTY           = "isDirty";
 
    @Override
    public boolean test(final Object receiver, final String property, final Object[] args, final Object expectedValue) {
 
-      /*
-       * Return dirty state from the tour editor or tag view editor which are an instance of
-       * ISavablePart
-       */
+      // return dirty state from the tour editor or tag view editor
       if (PROPERTY_IS_DIRTY.equals(property) && receiver instanceof ISaveablePart) {
 
          final boolean isDirty = ((ISaveablePart) receiver).isDirty();
