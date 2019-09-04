@@ -71,7 +71,11 @@ Bugfix
     - Fixed tour start time year/month/day by using it's time zone
   
   - Tour Book View
-    - Extended "Set Time Zone" wizard to set tour start time year/month/day with time zone   
+    - Extended "Set Time Zone" wizard to set tour start time year/month/day with time zone  
+    
+* Tour Chart
+  - Imperial altitude/altimeter values could be wrong depending on the selected measurement system and when the tour was displayed the first time
+       
 
 Translation    
 ===========

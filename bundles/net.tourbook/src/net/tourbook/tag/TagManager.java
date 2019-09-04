@@ -42,6 +42,8 @@ import org.eclipse.swt.widgets.Display;
  */
 public class TagManager {
 
+   private static final String  NL                  = UI.NEW_LINE;
+
    public static final String[] EXPAND_TYPE_NAMES   = {
          Messages.app_action_expand_type_flat,
          Messages.app_action_expand_type_year_day,
@@ -52,8 +54,51 @@ public class TagManager {
          TourTag.EXPAND_TYPE_YEAR_DAY,
          TourTag.EXPAND_TYPE_YEAR_MONTH_DAY };
 
-   private static final String  PARAMETER_FIRST     = "?";   //$NON-NLS-1$
-   private static final String  PARAMETER_FOLLOWING = ", ?"; //$NON-NLS-1$
+   private static final String  PARAMETER_FIRST     = "?";          //$NON-NLS-1$
+   private static final String  PARAMETER_FOLLOWING = ", ?";        //$NON-NLS-1$
+
+   private static boolean canDeleteTourTagCategory(final long categoryId) {
+
+      final String sql_Category_Category = "" //$NON-NLS-1$
+
+            + "SELECT" + NL //                                                               //$NON-NLS-1$
+            + " COUNT(TOURTAGCATEGORY_TAGCATEGORYID)" + NL //                                //$NON-NLS-1$
+            + " FROM " + TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAGCATEGORY + NL //     //$NON-NLS-1$
+            + " WHERE TOURTAGCATEGORY_TAGCATEGORYID1 = " + categoryId + NL //                 //$NON-NLS-1$
+      ;
+
+      Connection conn = null;
+      PreparedStatement stmt_Category_Category = null;
+
+      long numCategory_Category = 0;
+
+      try {
+
+         conn = TourDatabase.getInstance().getConnection();
+         {
+            stmt_Category_Category = conn.prepareStatement(sql_Category_Category);
+
+            final ResultSet result = stmt_Category_Category.executeQuery();
+            while (result.next()) {
+               numCategory_Category = result.getLong(1);
+               break;
+            }
+         }
+
+      } catch (final SQLException e) {
+         StatusUtil.log(sql_Category_Category);
+         UI.showSQLException(e);
+      } finally {
+         Util.closeSql(conn);
+         Util.closeSql(stmt_Category_Category);
+      }
+
+      if (numCategory_Category > 0) {
+
+      }
+
+      return false;
+   }
 
    /**
     * Deletes a tour tag from all contained tours and in the tag structure. This event
@@ -218,6 +263,20 @@ public class TagManager {
       }
 
       return returnResult;
+   }
+
+   public static boolean deleteTourTagCategory(final long categoryId) {
+
+      // ensure that a tour is NOT modified in the tour editor
+      if (TourManager.isTourEditorModified(false)) {
+         return false;
+      }
+
+      if (canDeleteTourTagCategory(categoryId) == false) {
+         return false;
+      }
+
+      return false;
    }
 
    /**

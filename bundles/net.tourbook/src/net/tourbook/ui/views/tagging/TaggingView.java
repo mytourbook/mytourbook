@@ -196,7 +196,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    private TreeViewer                          _tagViewer;
    private TVITagView_Root                     _rootItem;
    private ColumnManager                       _columnManager;
-
+ 
    private IPartListener2                      _partListener;
    private ISelectionListener                  _postSelectionListener;
    private PostSelectionProvider               _postSelectionProvider;
@@ -209,6 +209,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
    private Action_CollapseAll_WithoutSelection _action_CollapseAll_WithoutSelection;
    private Action_DeleteTag                    _action_DeleteTag;
+   private Action_DeleteTagCategory            _action_DeleteTagCategory;
    private Action_OnMouseSelect_ExpandCollapse _action_OnMouseSelect_ExpandCollapse;
    private Action_SingleExpand_CollapseOthers  _action_SingleExpand_CollapseOthers;
    private Action_TagLayout                    _action_ToggleTagLayout;
@@ -274,6 +275,22 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       @Override
       public void run() {
          onAction_DeleteTag();
+      }
+   }
+
+   private class Action_DeleteTagCategory extends Action {
+
+      Action_DeleteTagCategory() {
+
+         super(Messages.Action_Tag_DeleteCategory, AS_PUSH_BUTTON);
+
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete_disabled));
+      }
+
+      @Override
+      public void run() {
+         onAction_DeleteTagCategory();
       }
    }
 
@@ -633,6 +650,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
       _action_CollapseAll_WithoutSelection = new Action_CollapseAll_WithoutSelection();
       _action_DeleteTag = new Action_DeleteTag();
+      _action_DeleteTagCategory = new Action_DeleteTagCategory();
       _action_OnMouseSelect_ExpandCollapse = new Action_OnMouseSelect_ExpandCollapse();
       _action_SingleExpand_CollapseOthers = new Action_SingleExpand_CollapseOthers();
       _action_ToggleTagLayout = new Action_TagLayout();
@@ -767,7 +785,12 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
                // delete tag only when the delete button is enabled
                if (_action_DeleteTag.isEnabled()) {
+
                   onAction_DeleteTag();
+
+               } else if (_action_DeleteTagCategory.isEnabled()) {
+
+                  onAction_DeleteTagCategory();
                }
 
                break;
@@ -1475,7 +1498,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
       final boolean isTourSelected = numTours > 0;
       final boolean isTagSelected = numTags > 0 && numTours == 0 && numCategorys == 0 && numOtherItems == 0;
-      final boolean isCategorySelected = numCategorys > 0 && numTours == 0 && numTags == 0 && numOtherItems == 0;
+      final boolean isCategorySelected = numCategorys == 1 && numTours == 0 && numTags == 0 && numOtherItems == 0;
       final boolean isOneTour = numTours == 1;
       final boolean isItemsAvailable = treeItems > 0;
 
@@ -1525,6 +1548,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       _actionSetTagStructure.setEnabled(isTagSelected || (numItems == 1 && numCategorys == 0));
       _actionSetAllTagStructures.setEnabled(isItemsAvailable);
       _action_DeleteTag.setEnabled(isTagSelected);
+      _action_DeleteTagCategory.setEnabled(isCategorySelected);
 
       _actionExpandSelection.setEnabled(firstElement == null
             ? false
@@ -1568,6 +1592,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       menuMgr.add(_actionSetAllTagStructures);
       menuMgr.add(_actionOpenTagPrefs);
       menuMgr.add(_action_DeleteTag);
+      menuMgr.add(_action_DeleteTagCategory);
 
       menuMgr.add(new Separator());
       menuMgr.add(_actionEditQuick);
@@ -1746,6 +1771,26 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
          // delete tags
 
          TagManager.deleteTourTag(allSelectedTags);
+      }
+   }
+
+   private void onAction_DeleteTagCategory() {
+
+      final ITreeSelection structuredSelection = _tagViewer.getStructuredSelection();
+      final List<?> allSelection = structuredSelection.toList();
+
+      for (final Object object : allSelection) {
+
+         if (object instanceof TVITagView_TagCategory) {
+
+            final TVITagView_TagCategory tviTagCategory = (TVITagView_TagCategory) object;
+
+            TagManager.deleteTourTagCategory(tviTagCategory.getCategoryId());
+
+            // currently only one empty tag category can be deleted -> other cases need more time
+
+            return;
+         }
       }
    }
 

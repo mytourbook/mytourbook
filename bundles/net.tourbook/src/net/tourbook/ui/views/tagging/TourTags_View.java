@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors 
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -529,9 +529,8 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
             if (partRef.getPart(false) == TourTags_View.this) {
 
-               // update save/restore icon
+               // update save icon
                final ICommandService commandService = PlatformUI.getWorkbench().getService(ICommandService.class);
-               commandService.refreshElements(AppCommands.COMMAND_NET_TOURBOOK_TOUR_RESTORE_TOUR, null);
                commandService.refreshElements(AppCommands.COMMAND_NET_TOURBOOK_TOUR_SAVE_TOUR, null);
             }
          }

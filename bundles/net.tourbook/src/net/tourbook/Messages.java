@@ -323,6 +323,7 @@ public class Messages extends NLS {
    public static String        Action_Tag_AutoOpenCancel;
    public static String        Action_Tag_AutoOpenOK;
    public static String        Action_Tag_Delete;
+   public static String        Action_Tag_DeleteCategory;
    public static String        Action_Tag_Edit;
    public static String        Action_Tag_Edit_Tooltip;
    public static String        Action_Tag_SetTags;
