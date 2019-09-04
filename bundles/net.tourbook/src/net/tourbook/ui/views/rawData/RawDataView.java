@@ -248,6 +248,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    public static final boolean STATE_IS_MERGE_TRACKS_DEFAULT              = false;
    public static final String  STATE_IS_IGNORE_INVALID_FILE               = "isIgnoreInvalidFile";                                            //$NON-NLS-1$
    public static final boolean STATE_IS_IGNORE_INVALID_FILE_DEFAULT       = true;
+   public static final String  STATE_IS_SET_BODY_WEIGHT                   = "isSetBodyWeight";                                                //$NON-NLS-1$
+   public static final boolean STATE_IS_SET_BODY_WEIGHT_DEFAULT           = true;
    //
    private static final String HREF_TOKEN                                 = "#";                                                              //$NON-NLS-1$
    private static final String PAGE_ABOUT_BLANK                           = "about:blank";                                                    //$NON-NLS-1$
@@ -3473,7 +3475,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       tourData.setTourPerson(person);
 
       // set weight from person
-      tourData.setBodyWeight(person.getWeight());
+      if (_rawDataMgr.isSetBodyWeight()) {
+         tourData.setBodyWeight(person.getWeight());
+      }
 
       tourData.setTourBike(person.getTourBike());
 
@@ -4585,6 +4589,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       final boolean isIgnoreInvalidFile = _state.getBoolean(STATE_IS_IGNORE_INVALID_FILE);
       _rawDataMgr.setState_IsIgnoreInvalidFile(isIgnoreInvalidFile);
 
+      // restore: set body weight status before the tours are imported
+      final boolean isSetBodyWeight = _state.getBoolean(STATE_IS_SET_BODY_WEIGHT);
+      _rawDataMgr.setState_IsSetBodyWeight(isSetBodyWeight);
+
       // auto open import log view
       final boolean isAutoOpenLogView = Util.getStateBoolean(_state, //
             STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW,
@@ -5170,7 +5178,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          final Table table = _tourViewer.getTable();
 
          if (table.isDisposed()) {
-            
+
             // this occured when testing
             return;
          }
