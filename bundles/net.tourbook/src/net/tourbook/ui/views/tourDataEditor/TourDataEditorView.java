@@ -5912,9 +5912,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, IRest
       _comboWeather_Clouds.setEnabled(canEdit);
       _comboWeather_WindDirectionText.setEnabled(canEdit);
       _comboWeather_WindSpeedText.setEnabled(canEdit);
+      _spinWeather_Humidity.setEnabled(canEdit);
+      _spinWeather_PrecipitationValue.setEnabled(canEdit);
+      _spinWeather_PressureValue.setEnabled(canEdit);
       _spinWeather_Temperature_Average.setEnabled(canEditTemperature);
       _spinWeather_Temperature_Min.setEnabled(canEditTemperature);
       _spinWeather_Temperature_Max.setEnabled(canEditTemperature);
+      _spinWeather_Temperature_WindChill.setEnabled(canEdit);
       _spinWeather_Wind_DirectionValue.setEnabled(canEdit);
       _spinWeather_Wind_SpeedValue.setEnabled(canEdit);
       _txtWeather.setEnabled(canEdit);

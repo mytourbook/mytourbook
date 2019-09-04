@@ -5167,7 +5167,15 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       final int numImportedTours = _rawDataMgr.getImportedTours().size();
       if (numImportedTours > 0) {
 
-         _tourViewer.getControl().setFocus();
+         final Table table = _tourViewer.getTable();
+
+         if (table.isDisposed()) {
+            
+            // this occured when testing
+            return;
+         }
+
+         table.setFocus();
 
       } else {
 
