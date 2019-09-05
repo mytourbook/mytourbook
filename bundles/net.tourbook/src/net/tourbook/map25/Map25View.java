@@ -54,6 +54,7 @@ import net.tourbook.map.bookmark.MapBookmarkManager;
 import net.tourbook.map.bookmark.MapLocation;
 import net.tourbook.map25.action.ActionMap25_ShowMarker;
 import net.tourbook.map25.action.ActionShowEntireTour;
+import net.tourbook.map25.action.ActionShowPhotos;
 import net.tourbook.map25.action.ActionSyncMap2WithOtherMap;
 import net.tourbook.map25.action.ActionSynchMapWithChartSlider;
 import net.tourbook.map25.action.ActionSynchMapWithTour;
@@ -435,19 +436,19 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       enableActions();
    }
    
-   /*  public void actionShowPhotos() {
+   public void actionShowPhotos(final boolean isPhotoVisible) {
 
-   _isShowPhoto = _actionShowPhotos.isChecked();
+      _isShowPhoto = _actionShowPhoto_WithOptions.isEnabled();
 
-   _mapApp.getLayer_Photo().setEnabled(_isShowPhoto);
-   
-   paintTours_AndUpdateMap();
-   
-   _mapApp.getMap().render();
+      _mapApp.getLayer_Photo().setEnabled(_isShowPhoto);
 
-   enableActions();
+      paintTours_AndUpdateMap();
 
-} */
+      _mapApp.getMap().render();
+
+      enableActions();
+
+   }
 
    public void actionSync_WithChartSlider() {
 

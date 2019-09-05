@@ -64,7 +64,7 @@ public class SlideoutMap25_PhotoOptions extends ToolbarSlideout {
     */
    private Composite _parent;
 
-   private Button    _chkIsShowPhoto;
+   //private Button    _chkIsShowPhoto;
    private Button    _chkIsShowPhotoTitle;
    private Button    _chkIsPhotoClustered;
 
@@ -144,7 +144,6 @@ public class SlideoutMap25_PhotoOptions extends ToolbarSlideout {
    private void createUI_50_Layer(final Composite parent) {
 
       final Group group = new Group(parent, SWT.NONE);
-      //group.setText(Messages.Slideout_Map25MapOptions_Group_MapLayer);
       group.setText("Slideout_Map25PhotoOptions_Group_PhotoLayer");
       GridDataFactory
             .fillDefaults()//
@@ -153,17 +152,15 @@ public class SlideoutMap25_PhotoOptions extends ToolbarSlideout {
       GridLayoutFactory.swtDefaults().numColumns(1).applyTo(group);
       {
          
-         {
-            /*
-             * Photo
-             */
-            _chkIsShowPhoto = new Button(group, SWT.CHECK);
-            //_chkShowLayer_Photo.setText(Messages.Slideout_Map25MapOptions_Checkbox_Layer_Cartography);
-            _chkIsShowPhoto.setText("Slideout_Map25PhotoOptions_Checkbox_Layer_Photo");
-            //_chkShowLayer_Photo.setToolTipText(Messages.Slideout_Map25MapOptions_Checkbox_Layer_Cartography_Tooltip);
-            _chkIsShowPhoto.setToolTipText("Slideout_Map25PhotoOptions_Checkbox_Layer_Photo_Tooltip");
-            _chkIsShowPhoto.addSelectionListener(_layerSelectionListener);
-         }       
+//         {
+//            /*
+//             * Photo
+//             */
+//            _chkIsShowPhoto = new Button(group, SWT.CHECK);
+//            _chkIsShowPhoto.setText("Slideout_Map25PhotoOptions_Checkbox_Layer_Photo");
+//            _chkIsShowPhoto.setToolTipText("Slideout_Map25PhotoOptions_Checkbox_Layer_Photo_Tooltip");
+//            _chkIsShowPhoto.addSelectionListener(_layerSelectionListener);
+//         }       
          {
             /*
              * Photo Clustering
@@ -284,7 +281,7 @@ public class SlideoutMap25_PhotoOptions extends ToolbarSlideout {
       Map25App.debugPrint("slideout: onModify_Layer"); 
       final Map25App mapApp = _map25View.getMapApp();
 
-      mapApp.getLayer_Photo().setEnabled(_chkIsShowPhoto.getSelection());
+     // mapApp.getLayer_Photo().setEnabled(_chkIsShowPhoto.getSelection());
 
       mapApp.setIsPhotoClustered(_chkIsPhotoClustered.getSelection());
       
@@ -300,7 +297,7 @@ public class SlideoutMap25_PhotoOptions extends ToolbarSlideout {
 
       final Map25App mapApp = _map25View.getMapApp();
 
-      _chkIsShowPhoto.setSelection(mapApp.getLayer_Photo().isEnabled());
+     //_chkIsShowPhoto.setSelection(mapApp.getLayer_Photo().isEnabled());
 
       _chkIsPhotoClustered.setSelection(mapApp.getIsPhotoClustered());
 
@@ -310,7 +307,7 @@ public class SlideoutMap25_PhotoOptions extends ToolbarSlideout {
 
    private void saveState() {
       final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
-      config.isShowPhoto = _chkIsShowPhoto.getSelection();
+    //  config.isShowPhoto = _chkIsShowPhoto.getSelection();
       config.isShowPhotoTitle = _chkIsShowPhotoTitle.getSelection();
       config.isPhotoClustered = _chkIsPhotoClustered.getSelection();
       //Map25ConfigManager.useDraggedKeyboardNavigation = _chkUseDraggedKeyboardNavigation.getSelection();
