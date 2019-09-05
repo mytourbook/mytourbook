@@ -591,12 +591,12 @@ public class UI {
    }
 
    /**
-    * @param temperature
-    * @return Returns the temperature in the current measurement system.
+    * @param bodyWeight
+    * @return Returns the weight in the current measurement system.
     */
    public static float convertBodyWeightFromMetric(final float bodyWeight) {
 
-      if (UNIT_VALUE_TEMPERATURE == 1) {
+      if (UNIT_VALUE_WEIGHT == 1) {
          return bodyWeight;
       }
 
