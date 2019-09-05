@@ -280,9 +280,7 @@ public class PhotoToolkit extends MarkerToolkit{
    }
  
    public void updatePhotos() {
-      //net.tourbook.map25.Map25App.debugPrint("Update Photos");
-      System.out.println("update: ");// + _mapApp.getMap().getMapPosition());
-      net.tourbook.map25.Map25App.debugPrint("Update Photos 2");
+      net.tourbook.map25.Map25App.debugPrint("Update Photos");
       _mapApp.updateUI_PhotoLayer();
    }
    
