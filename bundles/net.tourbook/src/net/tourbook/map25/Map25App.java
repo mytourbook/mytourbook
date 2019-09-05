@@ -1100,11 +1100,11 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       
       //Photos
       _phototoolkit = new PhotoToolkit();
-      //if (config.isMarkerClustered) { //sharing same setting as MapBookmarks, later photolayer should get its own configuration
-         //_layer_Photo = new  ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(),  _phototoolkit._markerRendererFactory, this);
-      //} else {
+      if (config.isMarkerClustered) { //sharing same setting as MapBookmarks, later photolayer should get its own configuration
+         _layer_Photo = new  ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(),  _phototoolkit._markerRendererFactory, this);
+      } else {
          _layer_Photo = new  ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(),  _phototoolkit._symbol, this);
-      //}
+      }
       //_layer_Photo.addItems(_phototoolkit._photo_pts);  //must not be done at startup, no tour is loadet yet
       _layer_Photo.setEnabled(false);
       layers.add(_layer_Photo);
@@ -1155,6 +1155,11 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 		}
 	}
 
+	/**
+	 * updates the mapbookmarklayer, switching between clustered and not clustered
+    * settings are from MarkerConfig
+    * replacing the mapbookmarkitems
+	 */
 	public void updateUI_MapBookmarkLayer() {
 	   final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 	   final Layers layers = mMap.layers();
@@ -1183,6 +1188,13 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	   //
 	}
 	
+	
+	/**
+	 * updates the photo layer, switchung between clustered to not clustered
+	 * settings are from MarkerConfig
+	 * replacing the photo Items
+	 * currently no GUI for selecting clustering
+	 */
 	public void updateUI_PhotoLayer() {
 	   debugPrint(" map25: " + "# updateUI_PhotoLayer():  entering");
 	   final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
@@ -1205,7 +1217,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       }  
       
       _selectedPhotosPts = _phototoolkit.createPhotoItemList(_map25View.get_allPhotos()); //hopefully done in map25view "paintToursAndUpdate"
-      //debugPrint(" map25: " + "# updateUI_PhotoLayer(): #photos: " + _selectedPhotosPts.size() + " enabled: " + "isShowPhotoLayer"); //$NON-NLS-1$
+      debugPrint(" map25: " + "# updateUI_PhotoLayer(): #photos: " + _selectedPhotosPts.size() + " enabled: " + "isShowPhotoLayer"); //$NON-NLS-1$
       _layer_Photo.addItems(_selectedPhotosPts); //hopefully done in map25view "paintToursAndUpdate"
       _layer_Photo.setEnabled(isShowPhotoLayer);
       _phototoolkit._isMarkerClusteredLast = config.isMarkerClustered;// using settings from MapBookmarks must be changed later with own config

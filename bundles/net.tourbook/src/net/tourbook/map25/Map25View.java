@@ -62,6 +62,7 @@ import net.tourbook.map25.action.ActionZoomIn;
 import net.tourbook.map25.action.ActionZoomOut;
 //import net.tourbook.map25.action.ActionShowPhotos;
 import net.tourbook.map25.layer.marker.MapMarker;
+import net.tourbook.map25.layer.marker.MarkerConfig;
 import net.tourbook.map25.layer.marker.MarkerLayer;
 import net.tourbook.map25.layer.marker.PhotoToolkit;
 //import net.tourbook.map25.layer.marker.PhotoToolkit.PhotoMode;
@@ -199,13 +200,13 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
    private ActionSynchMapWithTour        _actionSyncMap_WithTour;
    private ActionShowEntireTour          _actionShowEntireTour;
    private ActionShowTour_WithConfig     _actionShowTour_WithOptions;
-   private ActionShowPhoto_WithConfig    _actionShowPhoto_WithOptions;   
+   //private ActionShowPhoto_WithConfig    _actionShowPhoto_WithOptions;   
    private ActionZoomIn                  _actionZoom_In;
    private ActionZoomOut                 _actionZoom_Out;
    private double                        _zoomFactor = 1.5;
 
    // Photo stuff
-   //private ActionShowPhotos              _actionShowPhotos;
+   private ActionShowPhotos              _actionShowPhotos;
    private boolean                       _isShowPhoto;
 
 
@@ -436,13 +437,20 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       enableActions();
    }
    
-   public void actionShowPhotos(final boolean isPhotoVisible) {
+   //public void actionShowPhotos(final boolean isPhotoVisible) {
+   public void actionShowPhotos() {   
+      final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 
-      _isShowPhoto = _actionShowPhoto_WithOptions.isEnabled();
+      _isShowPhoto = _actionShowPhotos.isChecked();
+      config.isShowPhoto = _isShowPhoto;
+      
+      //_isShowPhoto = _actionShowPhoto_WithOptions.isEnabled();
+      
+      Map25App.debugPrint("show photo: " + _isShowPhoto); //$NON-NLS-1$
 
       _mapApp.getLayer_Photo().setEnabled(_isShowPhoto);
 
-      paintTours_AndUpdateMap();
+      //paintTours_AndUpdateMap();
 
       _mapApp.getMap().render();
 
@@ -745,8 +753,8 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
       _actionShowMarker_WithOptions = new ActionMap25_ShowMarker(this, _parent);
       _actionMapBookmarks = new ActionMapBookmarks(this._parent, this);
-
-      _actionShowPhoto_WithOptions = new ActionShowPhoto_WithConfig();
+      _actionShowPhotos = new ActionShowPhotos(this);
+      //_actionShowPhoto_WithOptions = new ActionShowPhoto_WithConfig();
       _actionMapProvider = new ActionMap25_MapProvider();
       _actionMapOptions = new ActionMap25_Options();
       _actionShowEntireTour = new ActionShowEntireTour(this);
@@ -1026,7 +1034,8 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
       final boolean canShowTour = isTourAvailable && isTourLayerVisible;
 
-      _actionShowPhoto_WithOptions.setEnabled(isTourAvailable);      
+      _actionShowPhotos.setEnabled(isTourAvailable);
+      //_actionShowPhoto_WithOptions.setEnabled(isTourAvailable);      
       _actionShowTour_WithOptions.setEnabled(isTourAvailable);
       _actionShowMarker_WithOptions.setEnabled(isTourAvailable);
       _actionShowEntireTour.setEnabled(canShowTour);
@@ -1050,7 +1059,8 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
       tbm.add(new Separator());
-      tbm.add(_actionShowPhoto_WithOptions);
+      //tbm.add(_actionShowPhoto_WithOptions);
+      tbm.add(_actionShowPhotos);
 
       tbm.add(new Separator());
       tbm.add(_actionMapBookmarks);  //should be moved to position like in Map2View
@@ -1571,22 +1581,14 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
        */
       paintPhotos(_allPhotos);
       //_mapApp.debugPrint(" Map25View: ** paintTours_AndUpdateMap: creating photolayer OLD with size: " + _allPhotos.size());
-      
-      //final ItemizedLayer<MarkerItem> photoLayer = _mapApp.getLayer_Photo();
-      //photoLayer.removeAllItems();
 
       final List<MarkerItem> photoItems = _mapApp._phototoolkit.createPhotoItemList(_allPhotos);
-      //PhotoToolkit phototoolkit = new PhotoToolkit();
-      //final List<MarkerItem> photoItems = phototoolkit.createPhotoItemList(_allPhotos);
-      
-      //final List<MarkerItem> photoItems = createPhotoItemList(_allPhotos);
+
       _mapApp.setPhotoSelection(photoItems);
       //_mapApp.debugPrint(" Map25View: ** paintTours_AndUpdateMap: creating photoItems with size: " + photoItems.size());
-      //photoLayer.addItems(photoItems);
       _mapApp.updateUI_PhotoLayer();
       //photoLayer.setEnabled(true);
       Map25App.debugPrint(" Map25View: ** paintTours_AndUpdateMap: creating photolayer with size: " + _allPhotos.size());
-
       
       /*
        * Update map
@@ -1641,7 +1643,8 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       
       // photo_layer
       _isShowPhoto = Util.getStateBoolean(_state, STATE_IS_LAYER_PHOTO_VISIBLE, true);
-      _actionShowPhoto_WithOptions.setSelection(_isShowPhoto);
+      _actionShowPhotos.setEnabled(_isShowPhoto);
+      //_actionShowPhoto_WithOptions.setSelection(_isShowPhoto);
       _mapApp.getLayer_Photo().setEnabled(_isShowPhoto);
 
       // hillshading layer

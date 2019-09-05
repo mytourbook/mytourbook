@@ -44,6 +44,7 @@ public class ActionShowPhotos extends Action {
 	   //_map25View.actionZoomIn();
 	   //final boolean isPhotoVisible = _actionToolItem.getSelection();
 		//_map25View.actionShowPhotos(isPhotoVisible);
+	   _map25View.actionShowPhotos();
 	   ;
 	}
 
