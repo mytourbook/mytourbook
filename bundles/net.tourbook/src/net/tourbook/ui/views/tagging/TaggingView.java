@@ -196,7 +196,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    private TreeViewer                          _tagViewer;
    private TVITagView_Root                     _rootItem;
    private ColumnManager                       _columnManager;
- 
+
    private IPartListener2                      _partListener;
    private ISelectionListener                  _postSelectionListener;
    private PostSelectionProvider               _postSelectionProvider;
@@ -872,6 +872,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       defineColumn_Tour_Title();
       defineColumn_Tour_Tags();
       defineColumn_Tour_TagAndCategoryNotes();
+      defineColumn_Tour_TagID();
 
       defineColumn_Motion_Distance();
       defineColumn_Motion_MaxSpeed();
@@ -1321,6 +1322,39 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
                final TVITagView_TagCategory categoryItem = (TVITagView_TagCategory) viewItem;
                cell.setText(TourDatabase.getTagCategoryNotes((categoryItem).tagCategoryId));
+
+            } else {
+
+               cell.setText(UI.EMPTY_STRING);
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Tag ID
+    */
+   private void defineColumn_Tour_TagID() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TAG_ID.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            if (element instanceof TVITagView_Tag) {
+
+               final long tagId = ((TVITagView_Tag) element).getTagId();
+
+               cell.setText(Long.toString(tagId));
+
+            } else if (element instanceof TVITagView_TagCategory) {
+
+               final long categoryId = ((TVITagView_TagCategory) element).getCategoryId();
+
+               cell.setText(Long.toString(categoryId));
 
             } else {
 
@@ -1785,7 +1819,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
             final TVITagView_TagCategory tviTagCategory = (TVITagView_TagCategory) object;
 
-            TagManager.deleteTourTagCategory(tviTagCategory.getCategoryId());
+            TagManager.deleteTourTagCategory(tviTagCategory.getCategoryId(), tviTagCategory.getName());
 
             // currently only one empty tag category can be deleted -> other cases need more time
 

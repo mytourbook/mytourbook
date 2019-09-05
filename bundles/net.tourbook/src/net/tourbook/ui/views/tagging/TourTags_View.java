@@ -52,6 +52,7 @@ import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.TreeColumnFactory;
 import net.tourbook.ui.action.ActionCollapseAll;
 import net.tourbook.ui.action.ActionExpandAll;
 
@@ -986,14 +987,11 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
    private void defineColumn_99_ID() {
 
-      final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, COLUMN_ID, SWT.TRAIL);
-
-      colDef.setColumnLabel(Messages.Pref_TourTag_Column_ID);
-      colDef.setColumnHeaderText(Messages.Pref_TourTag_Column_ID);
-      colDef.setColumnHeaderToolTipText(Messages.Pref_TourTag_Column_ID);
+      final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TAG_ID.createColumn(_columnManager, _pc);
 
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(8));
 
+      colDef.setColumnId(COLUMN_ID);
       colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {
@@ -1063,7 +1061,8 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
    private void enableControls() {
 
-      final boolean isTourAvailable = _allSelectedTours.size() > 0;
+      boolean isTourAvailable = _allSelectedTours.size() > 0;
+      isTourAvailable = true;
 
       _actionCollapseAll.setEnabled(isTourAvailable && _isHierarchicalLayout);
       _actionExpandAll.setEnabled(isTourAvailable && _isHierarchicalLayout);
@@ -1311,7 +1310,6 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
       }
       _parent.setRedraw(true);
    }
-
 
    private void onSelect_SortColumn(final SelectionEvent e) {
 

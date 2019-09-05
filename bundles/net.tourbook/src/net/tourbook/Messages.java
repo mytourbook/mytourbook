@@ -2200,6 +2200,9 @@ public class Messages extends NLS {
 
    public static String Tag_Manager_Action_DeleteTag;
    public static String Tag_Manager_Action_DeleteTags;
+   public static String Tag_Manager_Dialog_DeleteCategory_Categories_Message;
+   public static String Tag_Manager_Dialog_DeleteCategory_Tags_Message;
+   public static String Tag_Manager_Dialog_DeleteCategory_Title;
    public static String Tag_Manager_Dialog_DeleteTag_Message;
    public static String Tag_Manager_Dialog_DeleteTag_Multiple_Message;
    public static String Tag_Manager_Dialog_DeleteTag_Title;
