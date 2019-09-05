@@ -4590,7 +4590,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       _rawDataMgr.setState_IsIgnoreInvalidFile(isIgnoreInvalidFile);
 
       // restore: set body weight status before the tours are imported
-      final boolean isSetBodyWeight = _state.getBoolean(STATE_IS_SET_BODY_WEIGHT);
+      final boolean isSetBodyWeight = Util.getStateBoolean(_state, STATE_IS_SET_BODY_WEIGHT, STATE_IS_SET_BODY_WEIGHT_DEFAULT);
       _rawDataMgr.setState_IsSetBodyWeight(isSetBodyWeight);
 
       // auto open import log view
