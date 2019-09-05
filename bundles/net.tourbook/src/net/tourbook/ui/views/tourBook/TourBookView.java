@@ -1326,7 +1326,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            final double weight = ((TVITourBookItem) element).colBodyWeight;
+            final double weight = UI.convertBodyWeightFromMetric(((TVITourBookItem) element).colBodyWeight);
 
             if (weight == 0) {
                cell.setText(UI.EMPTY_STRING);

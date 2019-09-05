@@ -631,7 +631,7 @@ public class TourInfoUI {
 
          _lblBodyWeight = createUI_LabelValue(container, SWT.TRAIL);
 
-         createUI_Label(container, UI.UNIT_WEIGHT_KG);
+         createUI_Label(container, UI.UNIT_LABEL_WEIGHT);
       }
    }
 
