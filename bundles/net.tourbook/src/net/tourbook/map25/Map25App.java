@@ -195,6 +195,9 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private MarkerMode _markerMode = MarkerToolkit.MarkerMode.NORMAL; // MarkerToolkit.modeDemo or MarkerToolkit.modeNormal
    
    private ItemizedLayer<MarkerItem> _layer_Photo;
+   private boolean                   _isPhotoClustered = true;
+   private boolean                   _isPhotoShowTitle = true;
+
    public PhotoToolkit _phototoolkit;
    //public PhotoMode _photoMode = PhotoToolkit.PhotoMode.NORMAL; // PhotoToolkit.modeDemo or PhotoToolkit.modeNormal
 
@@ -577,6 +580,22 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
 	public Map25Provider getSelectedMapProvider() {
 		return _selectedMapProvider;
+	}
+	
+	public boolean getIsPhotoClustered() {
+	   return _isPhotoClustered;
+	}
+	
+	public void setIsPhotoClustered(boolean state) {
+	   this._isPhotoClustered = state;
+	}
+	
+	public boolean getIsPhotoShowTitle() {
+	   return _isPhotoShowTitle;  
+	}
+	
+	public void setIsPhotoShowTitle(boolean state) {
+	   this._isPhotoShowTitle = state;  
 	}
 
 
@@ -1169,27 +1188,27 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	   final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
       final Layers layers = mMap.layers();
       final int layer_index_PhotoLayer = layers.indexOf(_layer_Photo);
-      //final boolean isShowPhotoLayer = config.isShowMapBookmark; // using settings from MapBookmarks must be changed later with own config
+      final boolean isShowPhotoLayer = config.isShowPhoto; // using settings from MapBookmarks must be changed later with own config
       //"STATE_IS_LAYER_PHOTO_VISIBLE"
-      debugPrint(" map25: " + "# updateUI_PhotoLayer(): #photos: " + _selectedPhotosPts.size()); //$NON-NLS-1$
-      //if (config.isMarkerClustered != _markertoolkit._isMarkerClusteredLast) { // only recreate PhotoLayer when changed in UI. 
+      //debugPrint(" map25: " + "# updateUI_PhotoLayer(): #photos: " + _selectedPhotosPts.size()); //$NON-NLS-1$
+      if (config.isPhotoClustered != _phototoolkit._isMarkerClusteredLast) { // only recreate PhotoLayer when changed in UI. 
          //debugPrint(" map25: " + "# updateUI_PhotoLayer(): index was before: " + layer_index_PhotoLayer); //$NON-NLS-1$
          layers.remove(_layer_Photo); 
-         if (config.isMarkerClustered) {
+         if (config.isPhotoClustered) {
             _layer_Photo = new ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(), _phototoolkit._markerRendererFactory, this);
          } else {
             _layer_Photo = new ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(), _phototoolkit._symbol, this);
          }
          layers.add(layer_index_PhotoLayer, _layer_Photo);
-      //} else {
+      } else {
          _layer_Photo.removeAllItems();
-      //}  
+      }  
       
       _selectedPhotosPts = _phototoolkit.createPhotoItemList(_map25View.get_allPhotos()); //hopefully done in map25view "paintToursAndUpdate"
-      debugPrint(" map25: " + "# updateUI_PhotoLayer(): #photos: " + _selectedPhotosPts.size() + " enabled: " + "isShowPhotoLayer"); //$NON-NLS-1$
+      //debugPrint(" map25: " + "# updateUI_PhotoLayer(): #photos: " + _selectedPhotosPts.size() + " enabled: " + "isShowPhotoLayer"); //$NON-NLS-1$
       _layer_Photo.addItems(_selectedPhotosPts); //hopefully done in map25view "paintToursAndUpdate"
-      //_layer_Photo.setEnabled(isShowPhotoLayer);
-      _markertoolkit._isMarkerClusteredLast = config.isMarkerClustered;// using settings from MapBookmarks must be changed later with own config
+      _layer_Photo.setEnabled(isShowPhotoLayer);
+      _phototoolkit._isMarkerClusteredLast = config.isMarkerClustered;// using settings from MapBookmarks must be changed later with own config
 	}
 	
 	

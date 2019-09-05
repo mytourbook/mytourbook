@@ -41,7 +41,9 @@ import net.tourbook.common.UI;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.map25.Map25App;
+import net.tourbook.map25.Map25ConfigManager;
 import net.tourbook.map25.Map25View;
+import net.tourbook.map25.layer.marker.MarkerConfig;
 
 /**
  * Map 2.5D photo properties slideout.
@@ -62,9 +64,9 @@ public class SlideoutMap25_PhotoOptions extends ToolbarSlideout {
     */
    private Composite _parent;
 
-   private Button    _chkShowLayer_Photo;
+   private Button    _chkIsShowPhoto;
    private Button    _chkIsShowPhotoTitle;
-   private Button    _chkIsPhotoClustering;
+   private Button    _chkIsPhotoClustered;
 
    private Button    _chkUseDraggedKeyboardNavigation;
 
@@ -155,21 +157,21 @@ public class SlideoutMap25_PhotoOptions extends ToolbarSlideout {
             /*
              * Photo
              */
-            _chkShowLayer_Photo = new Button(group, SWT.CHECK);
+            _chkIsShowPhoto = new Button(group, SWT.CHECK);
             //_chkShowLayer_Photo.setText(Messages.Slideout_Map25MapOptions_Checkbox_Layer_Cartography);
-            _chkShowLayer_Photo.setText("Slideout_Map25PhotoOptions_Checkbox_Layer_Photo");
+            _chkIsShowPhoto.setText("Slideout_Map25PhotoOptions_Checkbox_Layer_Photo");
             //_chkShowLayer_Photo.setToolTipText(Messages.Slideout_Map25MapOptions_Checkbox_Layer_Cartography_Tooltip);
-            _chkShowLayer_Photo.setToolTipText("Slideout_Map25PhotoOptions_Checkbox_Layer_Photo_Tooltip");
-            _chkShowLayer_Photo.addSelectionListener(_layerSelectionListener);
+            _chkIsShowPhoto.setToolTipText("Slideout_Map25PhotoOptions_Checkbox_Layer_Photo_Tooltip");
+            _chkIsShowPhoto.addSelectionListener(_layerSelectionListener);
          }       
          {
             /*
              * Photo Clustering
              */
-            _chkIsPhotoClustering = new Button(group, SWT.CHECK);
+            _chkIsPhotoClustered = new Button(group, SWT.CHECK);
             //_chkIsPhotoClustering.setText(Messages.Slideout_Map25MapOptions_Checkbox_Layer_LabelSymbol);
-            _chkIsPhotoClustering.setText("Slideout_Map25PhotoOptions_Checkbox_Layer_Clustering");
-            _chkIsPhotoClustering.addSelectionListener(_layerSelectionListener);
+            _chkIsPhotoClustered.setText("Slideout_Map25PhotoOptions_Checkbox_Layer_Clustering");
+            _chkIsPhotoClustered.addSelectionListener(_layerSelectionListener);
          }
          {
             /*
@@ -215,7 +217,7 @@ public class SlideoutMap25_PhotoOptions extends ToolbarSlideout {
    }
 
    private void enableActions() {
-
+      Map25App.debugPrint("slideout: enableActions");
      // final boolean isHillShading = _chkShowLayer_Hillshading.getSelection();
 
      // _spinnerHillshadingOpacity.setEnabled(isHillShading);
@@ -225,7 +227,7 @@ public class SlideoutMap25_PhotoOptions extends ToolbarSlideout {
    }
 
    private void initUI(final Composite parent) {
-
+      Map25App.debugPrint("slideout: initUI"); 
       _parent = parent;
 
       _pc = new PixelConverter(parent);
@@ -261,6 +263,8 @@ public class SlideoutMap25_PhotoOptions extends ToolbarSlideout {
          @Override
          public void widgetSelected(final SelectionEvent e) {
             onModify_Layer();
+           _map25View.getMapApp();
+         Map25App.debugPrint("slideout: widget selected"); 
          }
       };
 
@@ -268,7 +272,7 @@ public class SlideoutMap25_PhotoOptions extends ToolbarSlideout {
    }
 
    private void onChangeUI() {
-
+      Map25App.debugPrint("slideout: onChangeUI"); 
       saveState();
 
       enableActions();
@@ -277,36 +281,38 @@ public class SlideoutMap25_PhotoOptions extends ToolbarSlideout {
 
 
    private void onModify_Layer() {
-
+      Map25App.debugPrint("slideout: onModify_Layer"); 
       final Map25App mapApp = _map25View.getMapApp();
 
-      mapApp.getLayer_Photo().setEnabled(_chkShowLayer_Photo.getSelection());
+      mapApp.getLayer_Photo().setEnabled(_chkIsShowPhoto.getSelection());
 
-      mapApp.getLayer_Label().setEnabled(_chkIsPhotoClustering.getSelection());
-
-      // switching off both building layers
-      mapApp.getLayer_Building().setEnabled(_chkIsShowPhotoTitle.getSelection());
-      mapApp.getLayer_S3DB().setEnabled(_chkIsShowPhotoTitle.getSelection());    
+      mapApp.setIsPhotoClustered(_chkIsPhotoClustered.getSelection());
       
+      mapApp.setIsPhotoShowTitle(_chkIsShowPhotoTitle.getSelection());
+
       enableActions();
 
       mapApp.getMap().updateMap(true);
+      mapApp.updateUI_PhotoLayer();
    }
 
    private void restoreState() {
 
       final Map25App mapApp = _map25View.getMapApp();
 
-      _chkShowLayer_Photo.setSelection(mapApp.getLayer_BaseMap().isEnabled());
+      _chkIsShowPhoto.setSelection(mapApp.getLayer_Photo().isEnabled());
 
-      _chkIsPhotoClustering.setSelection(mapApp.getLayer_Label().isEnabled());
+      _chkIsPhotoClustered.setSelection(mapApp.getIsPhotoClustered());
 
-      _chkIsShowPhotoTitle.setSelection(mapApp.getLayer_Building().isEnabled());   
+      _chkIsShowPhotoTitle.setSelection(mapApp.getIsPhotoShowTitle());   
       
    }
 
    private void saveState() {
-      ;
+      final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
+      config.isShowPhoto = _chkIsShowPhoto.getSelection();
+      config.isShowPhotoTitle = _chkIsShowPhotoTitle.getSelection();
+      config.isPhotoClustered = _chkIsPhotoClustered.getSelection();
       //Map25ConfigManager.useDraggedKeyboardNavigation = _chkUseDraggedKeyboardNavigation.getSelection();
    }
 

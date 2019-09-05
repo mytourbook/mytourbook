@@ -144,7 +144,8 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
    private static final String            STATE_IS_LAYER_HILLSHADING_VISIBLE               = "STATE_IS_LAYER_HILLSHADING_VISIBLE";                     //$NON-NLS-1$
    private static final String            STATE_IS_LAYER_LABEL_VISIBLE                     = "STATE_IS_LAYER_LABEL_VISIBLE";                           //$NON-NLS-1$
    private static final String            STATE_IS_LAYER_MARKER_VISIBLE                    = "STATE_IS_LAYER_MARKER_VISIBLE";                          //$NON-NLS-1$
-   private static final String            STATE_IS_LAYER_PHOTO_VISIBLE                     = "STATE_IS_LAYER_PHOTO_VISIBLE";                           //$NON-NLS-1$  
+   private static final String            STATE_IS_LAYER_PHOTO_VISIBLE                     = "STATE_IS_LAYER_PHOTO_VISIBLE";                           //$NON-NLS-1$
+ //  private static final String            STATE_IS_LAYER_PHOTO_TITLE_VISIBLE                 
    private static final String            STATE_IS_LAYER_SCALE_BAR_VISIBLE                 = "STATE_IS_LAYER_SCALE_BAR_VISIBLE";                       //$NON-NLS-1$
    private static final String            STATE_IS_LAYER_TILE_INFO_VISIBLE                 = "STATE_IS_LAYER_TILE_INFO_VISIBLE";                       //$NON-NLS-1$
    private static final String            STATE_IS_LAYER_TOUR_VISIBLE                      = "STATE_IS_LAYER_TOUR_VISIBLE";                            //$NON-NLS-1$
@@ -205,6 +206,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
    // Photo stuff
    //private ActionShowPhotos              _actionShowPhotos;
    private boolean                       _isShowPhoto;
+
 
    /** Contains only geo tours */
    private ArrayList<TourData>           _allTourData    = new ArrayList<>();
@@ -432,6 +434,20 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
       enableActions();
    }
+   
+   /*  public void actionShowPhotos() {
+
+   _isShowPhoto = _actionShowPhotos.isChecked();
+
+   _mapApp.getLayer_Photo().setEnabled(_isShowPhoto);
+   
+   paintTours_AndUpdateMap();
+   
+   _mapApp.getMap().render();
+
+   enableActions();
+
+} */
 
    public void actionSync_WithChartSlider() {
 
@@ -488,20 +504,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       }
    }
 
- /*  public void actionShowPhotos() {
-
-      _isShowPhoto = _actionShowPhotos.isChecked();
-
-      _mapApp.getLayer_Photo().setEnabled(_isShowPhoto);
-      
-      paintTours_AndUpdateMap();
-      
-      _mapApp.getMap().render();
-
-      enableActions();
-
-   } */
-   
+ 
    public void actionZoomIn() {
    	final Map map25 = _mapApp.getMap();
 
@@ -1160,7 +1163,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
             allPhotos.addAll(tourPhotoLink.linkPhotos);
          }
 
-         Map25App.debugPrint("* Map25View: paintphotoselection: TourPhotoLinkSelection size: " + allPhotos.size());
+         //Map25App.debugPrint("* Map25View: paintphotoselection: TourPhotoLinkSelection size: " + allPhotos.size());
 
       } else {
 
@@ -1171,12 +1174,12 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
             if (galleryPhotos != null) {
                allPhotos.addAll(galleryPhotos);
                /*playing with photos next lines*/
-               Map25App.debugPrint("* Map25View: paintphotoselection else: size: " + allPhotos.size());
+               //Map25App.debugPrint("* Map25View: paintphotoselection else: size: " + allPhotos.size());
             }
          }
       }
    
-      Map25App.debugPrint("* Map25View: paintphotoselection returning size: " + allPhotos.size());
+      //Map25App.debugPrint("* Map25View: paintphotoselection returning size: " + allPhotos.size());
       
 
       paintPhotos(allPhotos);
@@ -1690,6 +1693,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       // hillshading layer
       _state.put(STATE_IS_LAYER_HILLSHADING_VISIBLE, _mapApp.getLayer_HillShading().isEnabled());
       _state.put(STATE_LAYER_HILLSHADING_OPACITY, _mapApp.getLayer_HillShading_Opacity());
+
 
       Map25ConfigManager.saveState();
    }
