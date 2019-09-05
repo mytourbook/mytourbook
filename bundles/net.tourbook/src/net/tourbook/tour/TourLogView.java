@@ -133,7 +133,7 @@ public class TourLogView extends ViewPart {
          @Override
          public void run() {
 
-            if (_browser.isDisposed()) {
+            if (_browser == null || _browser.isDisposed()) {
                // this can occure when view is being closed
                return;
             }

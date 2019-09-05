@@ -147,7 +147,10 @@ public abstract class TourbookDevice implements IRawDataReader {
          System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] createUniqueId()") //$NON-NLS-1$ //$NON-NLS-2$
                + (" - System property \"createRandomTourId\" is recognized -> Every imported tour has a unique tour id")); //$NON-NLS-1$
 
-         return Double.valueOf(Math.random()).toString();
+         final Double randomNumber = Double.valueOf(Math.random());
+
+         //We remove the "0." as it creates issues when, later, parsing back into a long
+         return randomNumber.toString().substring(2);
       }
 
       String uniqueKey;

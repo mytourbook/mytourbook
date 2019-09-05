@@ -384,6 +384,7 @@ public class Messages extends NLS {
    public static String        app_action_edit_adjust_altitude;
    public static String        app_action_edit_rows_tooltip;
    public static String        app_action_edit_tour_marker;
+   public static String        app_action_delete_tour_marker;
    public static String        app_action_expand_selection_tooltip;
    public static String        app_action_expand_type_flat;
    public static String        app_action_expand_type_year_day;
@@ -675,6 +676,8 @@ public class Messages extends NLS {
    public static String        Dialog_SetTimeZone_Label_Info;
    public static String        Dialog_SetTimeZone_Label_Progress_SubTask;
    public static String        Dialog_SetTimeZone_Label_Progress_Task;
+   public static String        Dialog_SetTimeZone_Radio_AdjustTourStart_YYMMDD;
+   public static String        Dialog_SetTimeZone_Radio_AdjustTourStartYYMMDD_Tooltip;
    public static String        Dialog_SetTimeZone_Radio_RemoveTimeZone;
    public static String        Dialog_SetTimeZone_Radio_SetTimeZone_FromCombo;
    public static String        Dialog_SetTimeZone_Radio_SetTimeZone_FromGeo;
@@ -750,7 +753,9 @@ public class Messages extends NLS {
    public static String        Dlg_TourMarker_Label_position;
    public static String        Dlg_TourMarker_Label_Position_Tooltip;
    public static String        Dlg_TourMarker_MsgBox_delete_marker_message;
+   public static String        Dlg_TourMarker_MsgBox_delete_markers_message;
    public static String        Dlg_TourMarker_MsgBox_delete_marker_title;
+   public static String        Dlg_TourMarker_MsgBox_delete_markers_title;
    public static String        Dlg_TourMarker_MsgBox_WrongFormat_Message;
    public static String        Dlg_TourMarker_MsgBox_WrongFormat_Title;
 
@@ -1237,6 +1242,7 @@ public class Messages extends NLS {
    public static String        Log_SetTimeZone_011_SetFromGeo;
    public static String        Log_SetTimeZone_012_NoGeo;
    public static String        Log_SetTimeZone_013_Removed;
+   public static String        Log_SetTimeZone_014_TourStartYYMMDDAdjusted;
 
    public static String        Log_TemperatureAdjustment_001_Start;
    public static String        Log_TemperatureAdjustment_002_End;
