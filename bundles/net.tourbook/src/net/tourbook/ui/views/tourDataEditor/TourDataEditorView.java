@@ -4106,7 +4106,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
          // spinner: pressure value
          _spinWeather_PressureValue = new Spinner(container, SWT.BORDER);
          _spinWeather_PressureValue.setToolTipText(Messages.Tour_Editor_Label_AirPressure_Tooltip);
-         _spinWeather_PressureValue.setMaximum(400000);
+         //The highest barometric pressure ever recorded on Earth was 32.01 inches (1083.98), measured in Agata, U.S.S.R., on December 31, 1968.
+         _spinWeather_PressureValue.setMaximum(110000);
          _spinWeather_PressureValue.addMouseWheelListener(_mouseWheelListener);
          _spinWeather_PressureValue.addSelectionListener(_selectionListener);
 
@@ -5865,9 +5866,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
       _comboWeather_Clouds.setEnabled(canEdit);
       _comboWeather_WindDirectionText.setEnabled(canEdit);
       _comboWeather_WindSpeedText.setEnabled(canEdit);
+      _spinWeather_Humidity.setEnabled(canEdit);
+      _spinWeather_PrecipitationValue.setEnabled(canEdit);
+      _spinWeather_PressureValue.setEnabled(canEdit);
       _spinWeather_Temperature_Average.setEnabled(canEditTemperature);
       _spinWeather_Temperature_Min.setEnabled(canEditTemperature);
       _spinWeather_Temperature_Max.setEnabled(canEditTemperature);
+      _spinWeather_Temperature_WindChill.setEnabled(canEdit);
       _spinWeather_Wind_DirectionValue.setEnabled(canEdit);
       _spinWeather_Wind_SpeedValue.setEnabled(canEdit);
       _txtWeather.setEnabled(canEdit);
@@ -7708,7 +7713,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
          _tourData.setWeather_Humidity((short) _spinWeather_Humidity.getSelection());
 
-         final int pressure = _spinWeather_PressureValue.getSelection();
+         float pressure = _spinWeather_PressureValue.getSelection();
+
+         if (UI.UNIT_IS_METRIC) {
+            pressure /= 10.0f;
+         } else {
+            pressure /= 100.0f;
+         }
+
          _tourData.setWeather_Pressure(UI.convertPressure_ToMetric(pressure));
 
          final int precipitation = _spinWeather_PrecipitationValue.getSelection();
@@ -8213,8 +8225,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
       final float pressure = UI.convertPressure_FromMetric(_tourData.getWeather_Pressure());
 
       if (UI.UNIT_IS_METRIC) {
-         _spinWeather_PressureValue.setDigits(0);
-         _spinWeather_PressureValue.setSelection(Math.round(pressure));
+         _spinWeather_PressureValue.setDigits(1);
+         _spinWeather_PressureValue.setSelection(Math.round(pressure * 10));
       } else {
          _spinWeather_PressureValue.setDigits(2);
          _spinWeather_PressureValue.setSelection(Math.round(pressure * 100));

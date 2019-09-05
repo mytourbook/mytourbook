@@ -782,7 +782,7 @@ public class CalendarProfileManager {
    }
 
    /**
-    * Altitude
+    * Elevation Gain
     *
     * @return
     */
