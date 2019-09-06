@@ -48,6 +48,7 @@ import net.tourbook.map25.layer.marker.PhotoToolkit;
 import net.tourbook.map25.layer.tourtrack.SliderLocation_Layer;
 import net.tourbook.map25.layer.tourtrack.SliderPath_Layer;
 import net.tourbook.map25.layer.tourtrack.TourLayer;
+import net.tourbook.photo.Photo;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.widgets.Display;
@@ -157,8 +158,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	
 	private int							_tileSourceOfflineMapCount = 0;
 	
-	public enum DebugMode {OFF, ON};
-	public DebugMode debugMode = DebugMode.ON;   // before releasing, set this to OFF
+	public static enum DebugMode {OFF, ON};
+	public static DebugMode debugMode = DebugMode.OFF;   // before releasing, set this to OFF
 	
 	/**
 	 * The opacity can be set in the layer but not read. This will keep the state of the hillshading opacity.
@@ -194,9 +195,14 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private MarkerMode _markerMode = MarkerToolkit.MarkerMode.NORMAL; // MarkerToolkit.modeDemo or MarkerToolkit.modeNormal
    
    private ItemizedLayer<MarkerItem> _layer_Photo;
-   private PhotoToolkit _phototoolkit;
+   private boolean                   _isPhotoClustered = true;
+   private boolean                   _isPhotoShowTitle = true;
+
+   public PhotoToolkit _phototoolkit;
    //public PhotoMode _photoMode = PhotoToolkit.PhotoMode.NORMAL; // PhotoToolkit.modeDemo or PhotoToolkit.modeNormal
 
+   public List<MarkerItem> _selectedPhotosPts;
+   
 	/**
 	 * Is <code>true</code> when a tour marker is hit.
 	 */
@@ -575,6 +581,22 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	public Map25Provider getSelectedMapProvider() {
 		return _selectedMapProvider;
 	}
+	
+	public boolean getIsPhotoClustered() {
+	   return _isPhotoClustered;
+	}
+	
+	public void setIsPhotoClustered(boolean state) {
+	   this._isPhotoClustered = state;
+	}
+	
+	public boolean getIsPhotoShowTitle() {
+	   return _isPhotoShowTitle;  
+	}
+	
+	public void setIsPhotoShowTitle(boolean state) {
+	   this._isPhotoShowTitle = state;  
+	}
 
 
 	/**
@@ -612,7 +634,10 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 		}
 	}
 
-
+	public void setPhotoSelection(List<MarkerItem> _photoItems) {
+	   debugPrint("MapApp25: setPhotoSelection size input: " +_photoItems.size());
+	   this._selectedPhotosPts = _photoItems;
+	}
 
 
 /**
@@ -621,11 +646,13 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
  */
 	public void onModifyMarkerConfig() {
 
+	   debugPrint("MapApp25: onModifyMarkerConfig size current: " + _selectedPhotosPts.size());
+	   
 		updateUI_MarkerLayer();
 
 		updateUI_MapBookmarkLayer();
 		
-		//updateUI_PhotoLayer();
+		updateUI_PhotoLayer();
 		
 		mMap.render();
 	}
@@ -792,7 +819,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
             
             updateUI_MapBookmarkLayer();
             
-            //updateUI_PhotoLayer();
+            updateUI_PhotoLayer();
             
             /**
              * Map Viewport
@@ -1073,11 +1100,11 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       
       //Photos
       _phototoolkit = new PhotoToolkit();
-      //if (config.isMarkerClustered) { //sharing same setting as MapBookmarks, later photolayer should get its own configuration
-         //_layer_Photo = new  ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(),  _phototoolkit._markerRendererFactory, this);
-      //} else {
+      if (config.isMarkerClustered) { //sharing same setting as MapBookmarks, later photolayer should get its own configuration
+         _layer_Photo = new  ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(),  _phototoolkit._markerRendererFactory, this);
+      } else {
          _layer_Photo = new  ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(),  _phototoolkit._symbol, this);
-      //}
+      }
       //_layer_Photo.addItems(_phototoolkit._photo_pts);  //must not be done at startup, no tour is loadet yet
       _layer_Photo.setEnabled(false);
       layers.add(_layer_Photo);
@@ -1128,6 +1155,11 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 		}
 	}
 
+	/**
+	 * updates the mapbookmarklayer, switching between clustered and not clustered
+    * settings are from MarkerConfig
+    * replacing the mapbookmarkitems
+	 */
 	public void updateUI_MapBookmarkLayer() {
 	   final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 	   final Layers layers = mMap.layers();
@@ -1135,7 +1167,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	   final boolean isShowMapBookmarkLayer = config.isShowMapBookmark;
 	   //debugPrint(" map25: # updateUI_MapBookmarkLayer(): entering"); //$NON-NLS-1$
 	   if (config.isMarkerClustered != _markertoolkit._isMarkerClusteredLast) { // only recreate MapBookmarkLayer when changed in UI
-	      //debugPrint(" map25: " + "# updateUI_MapBookmarkLayer(): index was before: " + layer_index_MapBookmark); //$NON-NLS-1$
+
 	      layers.remove(_layer_MapBookmark); 
 	      if (config.isMarkerClustered) {
 	         _layer_MapBookmark = new ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(), _markertoolkit._markerRendererFactory, this);
@@ -1149,36 +1181,49 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	   }  
 	   //_layer_Bookmark.removeAllItems();
 	   List<MarkerItem> pts = _markertoolkit.createMarkerItemList(_markerMode);
+      //debugPrint(" map25: " + "# updateUI_MapBookmarkLayer(): #MapBookmartks: " + pts.size()); //$NON-NLS-1$
 	   _layer_MapBookmark.addItems(pts);
 	   _layer_MapBookmark.setEnabled(isShowMapBookmarkLayer);
 	   _markertoolkit._isMarkerClusteredLast = config.isMarkerClustered;
 	   //
 	}
 	
+	
+	/**
+	 * updates the photo layer, switchung between clustered to not clustered
+	 * settings are from MarkerConfig
+	 * replacing the photo Items
+	 * currently no GUI for selecting clustering
+	 */
 	public void updateUI_PhotoLayer() {
+	   debugPrint(" map25: " + "# updateUI_PhotoLayer():  entering");
 	   final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
       final Layers layers = mMap.layers();
       final int layer_index_PhotoLayer = layers.indexOf(_layer_Photo);
-      final boolean isShowPhotoLayer = config.isShowMapBookmark; // using settings from MapBookmarks must be changed later with own config
-      
-      if (config.isMarkerClustered != _markertoolkit._isMarkerClusteredLast) { // only recreate PhotoLayer when changed in UI. 
-         debugPrint(" map25: " + "# updateUI_PhotoLayer(): index was before: " + layer_index_PhotoLayer); //$NON-NLS-1$
+      final boolean isShowPhotoLayer = config.isShowPhoto; // using settings from MapBookmarks must be changed later with own config
+      //"STATE_IS_LAYER_PHOTO_VISIBLE"
+      //debugPrint(" map25: " + "# updateUI_PhotoLayer(): #photos: " + _selectedPhotosPts.size()); //$NON-NLS-1$
+      //if (config.isPhotoClustered != _phototoolkit._isMarkerClusteredLast) { // only recreate PhotoLayer when changed in UI. 
+      if (config.isMarkerClustered != _phototoolkit._isMarkerClusteredLast) { // only recreate PhotoLayer when changed in UI.    
+         //debugPrint(" map25: " + "# updateUI_PhotoLayer(): index was before: " + layer_index_PhotoLayer); //$NON-NLS-1$
          layers.remove(_layer_Photo); 
-         if (config.isMarkerClustered) {
+         //if (config.isPhotoClustered) {
+         if (config.isMarkerClustered) {   
             _layer_Photo = new ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(), _phototoolkit._markerRendererFactory, this);
          } else {
             _layer_Photo = new ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(), _phototoolkit._symbol, this);
          }
          layers.add(layer_index_PhotoLayer, _layer_Photo);
-         //debugPrint(" map25: " + "# updateUI_PhotoLayer(): index is now: " + layer_index_PhotoLayer); //$NON-NLS-1$
       } else {
          _layer_Photo.removeAllItems();
       }  
-
-      //List<MarkerItem> pts = _markertoolkit.createMarkerItemList(_markerMode); //hopefully done in map25view "paintToursAndUpdate"
-      //_layer_Photo.addItems(pts); //hopefully done in map25view "paintToursAndUpdate"
+      
+      _selectedPhotosPts = _phototoolkit.createPhotoItemList(_map25View.get_allPhotos()); //hopefully done in map25view "paintToursAndUpdate"
+      debugPrint(" map25: " + "# updateUI_PhotoLayer(): #photos: " + _selectedPhotosPts.size() + " enabled: " + "isShowPhotoLayer"); //$NON-NLS-1$
+      _layer_Photo.addItems(_selectedPhotosPts); //hopefully done in map25view "paintToursAndUpdate"
       _layer_Photo.setEnabled(isShowPhotoLayer);
-      _markertoolkit._isMarkerClusteredLast = config.isMarkerClustered;// using settings from MapBookmarks must be changed later with own config
+      //_phototoolkit._isMarkerClusteredLast = config.isPhotoClustered;
+      _phototoolkit._isMarkerClusteredLast = config.isMarkerClustered;// using settings from MapBookmarks must be changed later with own config
 	}
 	
 	
@@ -1238,7 +1283,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 		return mMFileTileSource;
 	}	
 	
-	public void debugPrint(String debugText) {
+	public static void debugPrint(String debugText) {
 	   if(debugMode == DebugMode.ON) {
 	      System.out.println(UI.timeStamp() + debugText);//$NON-NLS-1$
 	      //System.out.println(UI.timeStamp() + " map25: " + debugText);//$NON-NLS-1$
@@ -1391,7 +1436,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	}
 
 	@Override
-	public boolean onItemLongPress(final int index, final MapMarker item) {
+	public boolean onItemLongPress(int index, MapMarker item) {
 
 // System.out.println(
 //       (UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //
@@ -1416,7 +1461,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    * @return true, when clicked
    */
 	@Override
-	public boolean onItemSingleTapUp(final int index, final MapMarker item) {
+	public boolean onItemSingleTapUp(int index, MapMarker item) {
 
  debugPrint(" map25: " +
        (UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //$NON-NLS-1$ //$NON-NLS-2$
@@ -1427,7 +1472,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
        + ("\t_isMapItemHit:" + _isMapItemHit + " -> true") //$NON-NLS-1$ //$NON-NLS-2$
        //Pref_Map25_Encoding_Mapsforge
        );
- // TODO remove SYSTEM.OUT.PRINTLN
 
  _isMapItemHit = true;
 

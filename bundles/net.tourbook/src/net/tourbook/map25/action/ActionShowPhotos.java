@@ -1,5 +1,6 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2019 Thomas Theussing
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,10 +22,12 @@ import net.tourbook.map25.Map25View;
 //import net.tourbook.map2.view.Map2View;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.swt.widgets.ToolItem;
 
 public class ActionShowPhotos extends Action {
 
    private Map25View   _map25View;
+   private ToolItem    _actionToolItem;  //i dont understand this. to complicate. giving up gui programming
 
 	public ActionShowPhotos(final Map25View map25View) {
 
@@ -39,7 +42,10 @@ public class ActionShowPhotos extends Action {
 	@Override
 	public void run() {
 	   //_map25View.actionZoomIn();
-		_map25View.actionShowPhotos();
+	   //final boolean isPhotoVisible = _actionToolItem.getSelection();
+		//_map25View.actionShowPhotos(isPhotoVisible);
+	   _map25View.actionShowPhotos();
+	   ;
 	}
 
 }

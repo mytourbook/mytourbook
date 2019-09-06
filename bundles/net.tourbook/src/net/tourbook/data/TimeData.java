@@ -109,6 +109,11 @@ public class TimeData implements Serializable {
    public float              power                      = Float.MIN_VALUE;
 
    /**
+    * Name of the power data source or sensor
+    */
+   public String             powerDataSource;
+
+   /**
     * Speed in km/h, speed is typically provided by an ergo trainer not from a bike computer, Polar
     * provides speed but is ignored. Contains {@link Float#MIN_VALUE} when value is not set.
     */
