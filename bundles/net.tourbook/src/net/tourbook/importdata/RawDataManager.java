@@ -122,6 +122,8 @@ public class RawDataManager {
    //
    private static boolean           _importState_IsIgnoreInvalidFile = RawDataView.STATE_IS_IGNORE_INVALID_FILE_DEFAULT;
    //
+   private static boolean           _importState_IsSetBodyWeight     = RawDataView.STATE_IS_SET_BODY_WEIGHT_DEFAULT;
+   //
    static {
 
       ALL_IMPORT_TOUR_TYPE_CONFIG = new ComboEnumEntry<?>[] {
@@ -1757,6 +1759,10 @@ public class RawDataManager {
       return newFile.getAbsolutePath();
    }
 
+   public boolean isSetBodyWeight() {
+      return _importState_IsSetBodyWeight;
+   }
+
    public void removeAllTours() {
 
       _toursInImportView.clear();
@@ -2041,6 +2047,10 @@ public class RawDataManager {
 
    public void setState_IsOpenImportLogView(final boolean isOpenImportLog) {
       _importState_IsAutoOpenImportLog = isOpenImportLog;
+   }
+
+   public void setState_IsSetBodyWeight(final boolean isSetBodyWeight) {
+      _importState_IsSetBodyWeight = isSetBodyWeight;
    }
 
    private RawDataView showRawDataView() {

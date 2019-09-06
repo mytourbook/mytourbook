@@ -32,6 +32,10 @@ New
  - Possibility to delete marker(s) from the contextual menu and when pressing
    the DELETE key
 
+* Import Preferences (Frederic)
+  - Added the ability to choose whether to set the person's body weight when
+    importing and saving a tour.
+
  
 Improvements   
 ============
