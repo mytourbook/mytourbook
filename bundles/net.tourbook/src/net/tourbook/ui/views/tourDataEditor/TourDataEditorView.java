@@ -579,6 +579,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
    private Label             _lblAltitudeUpUnit;
    private Label             _lblAltitudeDownUnit;
    private Label             _lblDistanceUnit;
+   private Label             _lblPerson_BodyWeightUnit;
    private Label             _lblSpeedUnit;
    private Label             _lblStartTime;
    private Label             _lblTags;
@@ -3664,13 +3665,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
                   .applyTo(_spinPerson_BodyWeight);
             _spinPerson_BodyWeight.setDigits(1);
             _spinPerson_BodyWeight.setMinimum(0);
-            _spinPerson_BodyWeight.setMaximum(3000); // 300.0 kg
+            _spinPerson_BodyWeight.setMaximum(6614); // 300.0 kg, 661.4 lbs
 
             _spinPerson_BodyWeight.addMouseWheelListener(_mouseWheelListener);
             _spinPerson_BodyWeight.addSelectionListener(_selectionListener);
 
             // label: unit
-            _tk.createLabel(container, UI.UNIT_WEIGHT_KG);
+            _lblPerson_BodyWeightUnit = _tk.createLabel(container, UI.UNIT_LABEL_WEIGHT);
          }
          {
             /*
@@ -8133,7 +8134,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
       /*
        * personal details
        */
-      _spinPerson_BodyWeight.setSelection(Math.round(_tourData.getBodyWeight() * 10));
+      final float bodyWeight = UI.convertBodyWeightFromMetric(_tourData.getBodyWeight());
+      _spinPerson_BodyWeight.setSelection(Math.round(bodyWeight * 10));
+
       _spinPerson_FTP.setSelection(_tourData.getPower_FTP());
       _spinPerson_RestPuls.setSelection(_tourData.getRestPulse());
       _spinPerson_Calories.setSelection(_tourData.getCalories());
@@ -8309,6 +8312,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
       _lblDistanceUnit.setText(UI.UNIT_LABEL_DISTANCE);
       _lblAltitudeUpUnit.setText(UI.UNIT_LABEL_ALTITUDE);
       _lblAltitudeDownUnit.setText(UI.UNIT_LABEL_ALTITUDE);
+      _lblPerson_BodyWeightUnit.setText(UI.UNIT_LABEL_WEIGHT);
       _lblWeather_PrecipitationUnit.setText(UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
       _lblWeather_PressureUnit.setText(UI.UNIT_LABEL_PRESSURE_MB_OR_INHG);
       _lblSpeedUnit.setText(UI.UNIT_LABEL_SPEED);

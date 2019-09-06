@@ -104,6 +104,10 @@ public class MeasurementSystemContributionItem extends CustomControlContribution
                ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPERATURE,
                ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPERATURE_C);
 
+         _prefStore.putValue(
+               ITourbookPreferences.MEASUREMENT_SYSTEM_WEIGHT,
+               ITourbookPreferences.MEASUREMENT_SYSTEM_WEIGHT_KG);
+
       } else {
 
          // set imperial system
@@ -119,6 +123,10 @@ public class MeasurementSystemContributionItem extends CustomControlContribution
          _prefStore.putValue(
                ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPERATURE,
                ITourbookPreferences.MEASUREMENT_SYSTEM_TEMPTERATURE_F);
+
+         _prefStore.putValue(
+               ITourbookPreferences.MEASUREMENT_SYSTEM_WEIGHT,
+               ITourbookPreferences.MEASUREMENT_SYSTEM_WEIGHT_LBS);
       }
 
       UI.updateUnits();

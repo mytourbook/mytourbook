@@ -58,6 +58,9 @@ Bugfix
   
   - Tour Book View
     - Extended "Set Time Zone" wizard to set tour start time year/month/day with time zone   
+
+* Body Weight unit (Frederic)
+ - When changing the measurement unit, the body weight unit is updated in the UI
  
 
 Translation    

@@ -426,12 +426,12 @@ public class DialogQuickEdit extends TitleAreaDialog {
                      .applyTo(_spinBodyWeight);
                _spinBodyWeight.setDigits(1);
                _spinBodyWeight.setMinimum(0);
-               _spinBodyWeight.setMaximum(3000); // 300.0 kg
+               _spinBodyWeight.setMaximum(6614); // 300.0 kg, 661.4 lbs
 
                _spinBodyWeight.addMouseWheelListener(_mouseWheelListener);
 
                // label: unit
-               _tk.createLabel(container, UI.UNIT_WEIGHT_KG);
+               _tk.createLabel(container, UI.UNIT_LABEL_WEIGHT);
             }
 
             {
