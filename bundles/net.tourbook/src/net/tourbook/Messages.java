@@ -1575,6 +1575,7 @@ public class Messages extends NLS {
    public static String        Pref_People_Label_RestingHR;
    public static String        Pref_People_Label_weight;
    public static String        Pref_People_Label_Years;
+   public static String        Pref_People_Link;
    public static String        Pref_People_Tab_DataTransfer;
    public static String        Pref_People_Tab_HRZone;
    public static String        Pref_People_Tab_Person;

@@ -110,28 +110,35 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferencePage {
 
-   public static final String     ID                        = "net.tourbook.preferences.PrefPagePeopleId"; //$NON-NLS-1$
+   public static final String     ID                                  = "net.tourbook.preferences.PrefPagePeopleId"; //$NON-NLS-1$
 
    /**
     * On Linux an async selection event is fired since e4
     */
-   private static final String    FIX_LINUX_ASYNC_EVENT_1   = "FIX_LINUX_ASYNC_EVENT_1";                   //$NON-NLS-1$
-   private static final String    FIX_LINUX_ASYNC_EVENT_2   = "FIX_LINUX_ASYNC_EVENT_2";                   //$NON-NLS-1$
+   private static final String    FIX_LINUX_ASYNC_EVENT_1             = "FIX_LINUX_ASYNC_EVENT_1";                   //$NON-NLS-1$
+   private static final String    FIX_LINUX_ASYNC_EVENT_2             = "FIX_LINUX_ASYNC_EVENT_2";                   //$NON-NLS-1$
    //
-   private static final String    STATE_SELECTED_PERSON     = "selectedPersonId";                          //$NON-NLS-1$
-   private static final String    STATE_SELECTED_TAB_FOLDER = "selectedTabFolder";                         //$NON-NLS-1$
+   private static final String    STATE_SELECTED_PERSON               = "selectedPersonId";                          //$NON-NLS-1$
+   private static final String    STATE_SELECTED_TAB_FOLDER           = "selectedTabFolder";                         //$NON-NLS-1$
 
-   public static final int        HEART_BEAT_MIN            = 10;
-   public static final int        HEART_BEAT_MAX            = 300;
+   public static final int        HEART_BEAT_MIN                      = 10;
+   public static final int        HEART_BEAT_MAX                      = 300;
 
    /**
     * Id to indicate that the hr zones should be displayed for the active person when the pref
     * dialog is opened
     */
-   public static final String     PREF_DATA_SELECT_HR_ZONES = "SelectHrZones";                             //$NON-NLS-1$
+   public static final String     PREF_DATA_SELECT_HR_ZONES           = "SelectHrZones";                             //$NON-NLS-1$
 
-   private final IPreferenceStore _prefStore                = TourbookPlugin.getPrefStore();
-   private final IDialogSettings  _state                    = TourbookPlugin.getState(ID);
+   /**
+    * Id to indicate that the person's information should be displayed for the active person when
+    * the pref
+    * dialog is opened
+    */
+   public static final String     PREF_DATA_SELECT_PERSON_INFORMATION = "SelectPersonInformation";
+
+   private final IPreferenceStore _prefStore                          = TourbookPlugin.getPrefStore();
+   private final IDialogSettings  _state                              = TourbookPlugin.getState(ID);
 
    // REMOVED BIKES 30.4.2011
 
@@ -253,6 +260,9 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       _prefStore.addPropertyChangeListener(_prefChangeListener);
    }
 
+   /**
+    *
+    */
    @Override
    public void applyData(final Object data) {
 
@@ -300,30 +310,35 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
          final PrefPagePeopleData prefPageData = (PrefPagePeopleData) data;
 
-         if (prefPageData.prefDataSelectHrZones.equals(PREF_DATA_SELECT_HR_ZONES)) {
+         if (prefPageData.person != null && _peopleViewer != null) {
 
-            // select hr zones for the given person
+            _peopleViewer.setSelection(new StructuredSelection(prefPageData.person));
 
-            if (prefPageData.person != null) {
+            final Table table = _peopleViewer.getTable();
 
-               _peopleViewer.setSelection(new StructuredSelection(prefPageData.person));
+            // set focus to selected person
+            table.setSelection(table.getSelectionIndex());
+         }
 
-               final Table table = _peopleViewer.getTable();
-
-               // set focus to selected person
-               table.setSelection(table.getSelectionIndex());
-            }
-
-            if (_tabFolderPerson != null) {
+         if (_tabFolderPerson != null) {
+            if (prefPageData.prefDataSelectHrZones != null && prefPageData.prefDataSelectHrZones.equals(PREF_DATA_SELECT_HR_ZONES)) {
+               // select hr zones for the given person
                _tabFolderPerson.setSelection(1);
             } else {
-               Display.getDefault().asyncExec(new Runnable() {
-                  @Override
-                  public void run() {
-                     _tabFolderPerson.setSelection(1);
-                  }
-               });
+               _tabFolderPerson.setSelection(0);
             }
+         } else {
+            Display.getDefault().asyncExec(new Runnable() {
+               @Override
+               public void run() {
+                  if (prefPageData.prefDataSelectHrZones != null && prefPageData.prefDataSelectHrZones.equals(PREF_DATA_SELECT_HR_ZONES)) {
+                     // select hr zones for the given person
+                     _tabFolderPerson.setSelection(1);
+                  } else {
+                     _tabFolderPerson.setSelection(0);
+                  }
+               }
+            });
          }
       }
    }
