@@ -59,7 +59,7 @@ public class TagManager {
 
    private static boolean canDeleteTourTagCategory(final long categoryId, final String categoryName) {
 
-      // TOURTAGCATEGORY_TOURTAG
+      // Category -> Tag
       final String sql_Category_Tags = "" //$NON-NLS-1$
 
             + "SELECT" + NL //                                                               //$NON-NLS-1$
@@ -68,7 +68,7 @@ public class TagManager {
             + " WHERE TOURTAGCATEGORY_TAGCATEGORYID = " + categoryId + NL //                 //$NON-NLS-1$
       ;
 
-      // TOURTAGCATEGORY_TOURTAGCATEGORY
+      // Category -> Category
       final String sql_Category_Categories = "" //$NON-NLS-1$
 
             + "SELECT" + NL //                                                               //$NON-NLS-1$

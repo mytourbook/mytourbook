@@ -328,6 +328,8 @@ public class Messages extends NLS {
    public static String        Action_Tag_Edit_Tooltip;
    public static String        Action_Tag_SetTags;
 
+   public static String        Action_TagCategory_DeleteCategory;
+   public static String        Action_TagCategory_DeleteTag;
    public static String        Action_TagCategory_Edit;
    public static String        Action_TagCategory_Edit_Tooltip;
    public static String        Action_TagCategory_EditCategory;

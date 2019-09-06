@@ -137,7 +137,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
    private TreeViewer _tagViewer;
    private ToolBar    _toolBar;
 
-   private Button     _btnDeleteTag;
+   private Button     _btnDeleteTagOrCategory;
    private Button     _btnEditTagOrCategory;
    private Button     _btnNewTag;
    private Button     _btnNewTagCategory;
@@ -354,8 +354,8 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
             case SWT.DEL:
                // delete tag only when the delete button is enabled
-               if (_btnDeleteTag.isEnabled()) {
-                  onAction_DeleteTag();
+               if (_btnDeleteTagOrCategory.isEnabled()) {
+                  onAction_DeleteTagOrCategory();
                }
 
                break;
@@ -486,15 +486,15 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
             /*
              * Button: Delete tag
              */
-            _btnDeleteTag = new Button(container, SWT.NONE);
-            _btnDeleteTag.setText(Messages.Pref_TourTag_Action_DeleteTag_WithConfirm);
-            _btnDeleteTag.addSelectionListener(new SelectionAdapter() {
+            _btnDeleteTagOrCategory = new Button(container, SWT.NONE);
+            _btnDeleteTagOrCategory.setText(Messages.Action_TagCategory_DeleteTag);
+            _btnDeleteTagOrCategory.addSelectionListener(new SelectionAdapter() {
                @Override
                public void widgetSelected(final SelectionEvent e) {
-                  onAction_DeleteTag();
+                  onAction_DeleteTagOrCategory();
                }
             });
-            GridDataFactory.fillDefaults().grab(true, false).applyTo(_btnDeleteTag);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(_btnDeleteTagOrCategory);
          }
 
          {
@@ -679,14 +679,16 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
          if (isTagSelected) {
 
-            _btnDeleteTag.setEnabled(true);
+            _btnDeleteTagOrCategory.setText(Messages.Action_TagCategory_DeleteTag);
+            _btnDeleteTagOrCategory.setEnabled(true);
 
             _btnEditTagOrCategory.setText(Messages.Action_Tag_Edit);
             _btnEditTagOrCategory.setEnabled(true);
 
          } else if (isCategorySelected) {
 
-            _btnDeleteTag.setEnabled(false);
+            _btnDeleteTagOrCategory.setText(Messages.Action_TagCategory_DeleteCategory);
+            _btnDeleteTagOrCategory.setEnabled(true);
 
             _btnEditTagOrCategory.setText(Messages.Action_TagCategory_EditCategory);
             _btnEditTagOrCategory.setEnabled(true);
@@ -694,7 +696,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
       } else {
 
-         _btnDeleteTag.setEnabled(false);
+         _btnDeleteTagOrCategory.setEnabled(false);
          _btnEditTagOrCategory.setEnabled(false);
       }
 
@@ -771,7 +773,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
       return true;
    }
 
-   private void onAction_DeleteTag() {
+   private void onAction_DeleteTagOrCategory() {
 
       final Object selection = _tagViewer.getStructuredSelection().getFirstElement();
 
@@ -792,7 +794,14 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
       } else if (selection instanceof TVIPrefTagCategory) {
 
-         // TODO delete category
+         // delete category
+
+         final TourTagCategory tourTagCategory = ((TVIPrefTagCategory) selection).getTourTagCategory();
+
+         if (TagManager.deleteTourTagCategory(tourTagCategory.getCategoryId(), tourTagCategory.getCategoryName())) {
+
+            updateTagViewer();
+         }
 
       }
 

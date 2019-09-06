@@ -1958,8 +1958,8 @@ public abstract class TreeColumnFactory {
             final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TOUR_TAG_ID", SWT.TRAIL); //$NON-NLS-1$
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Tour);
-            colDef.setColumnLabel(Messages.ColumnFactory_ID);
-            colDef.setColumnHeaderText(Messages.ColumnFactory_ID);
+            colDef.setColumnLabel(Messages.ColumnFactory_TagID_Label);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_TagID_Header);
             colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_TagID_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
