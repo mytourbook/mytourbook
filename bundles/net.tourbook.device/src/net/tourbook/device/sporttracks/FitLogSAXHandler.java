@@ -369,6 +369,9 @@ public class FitLogSAXHandler extends DefaultHandler {
          tourData.setTourAltUp(_currentActivity.elevationUp);
          tourData.setTourAltDown(_currentActivity.elevationDown);
 
+         // We set the tour as manual since it was a manual tour created in SportTracks in the first place.
+         tourData.setDeviceId(TourData.DEVICE_ID_FOR_MANUAL_TOUR);
+
       } else {
 
          // create 'normal' tour
@@ -385,6 +388,8 @@ public class FitLogSAXHandler extends DefaultHandler {
             // time zone is different -> fix tour start components with adjusted time zone
             tourData.setTourStartTime_YYMMDD(tourStartTime_FromLatLon);
          }
+
+         tourData.setDeviceId(_device.deviceId);
       }
 
       if (_currentActivity.avgPower != 0) {
@@ -403,7 +408,6 @@ public class FitLogSAXHandler extends DefaultHandler {
          tourData.setAvgCadence(_currentActivity.avgCadence);
       }
 
-      tourData.setDeviceId(_device.deviceId);
       tourData.setDeviceName(_device.visibleName);
 
       // after all data are added, the tour id can be created because it depends on the tour distance
