@@ -261,7 +261,6 @@ public class UI {
    public static float       UNIT_VALUE_WEIGHT;
 
    public static final float UNIT_KILOGRAM_TO_POUND = 2.204623f;
-   public static final float UNIT_POUND_TO_KILOGRAM = 0.4535924f;
 
    /*
     * Labels for the different measurement systems
@@ -614,7 +613,7 @@ public class UI {
          return weight;
       }
 
-      return weight / UNIT_POUND_TO_KILOGRAM;
+      return weight / UNIT_KILOGRAM_TO_POUND;
    }
 
    /**

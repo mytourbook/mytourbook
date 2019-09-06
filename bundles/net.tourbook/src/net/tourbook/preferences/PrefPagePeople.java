@@ -2166,7 +2166,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
       person.setBirthDay(getBirthdayFromUI().toInstant().toEpochMilli());
 
-      final float bodyWeight = UI.convertBodyWeightFromMetric(_spinnerWeight.getSelection());
+      final float bodyWeight = UI.convertBodyWeightToMetric(_spinnerWeight.getSelection());
       person.setWeight(bodyWeight / 10.0f);
 
       person.setHeight(_spinnerHeight.getSelection() / 100.0f);
