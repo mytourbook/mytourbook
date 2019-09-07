@@ -190,17 +190,17 @@ public class TourDatabase {
     */
    public static final int                                ENTITY_IS_NOT_SAVED             = -1;
    //
-   private static final String                            ENTITY_ID_BIKE                  = "BikeID";                                               //$NON-NLS-1$
-   private static final String                            ENTITY_ID_COMPARED              = "ComparedID";                                           //$NON-NLS-1$
-   private static final String                            ENTITY_ID_HR_ZONE               = "HrZoneID";                                             //$NON-NLS-1$
-   private static final String                            ENTITY_ID_MARKER                = "MarkerID";                                             //$NON-NLS-1$
-   private static final String                            ENTITY_ID_PERSON                = "PersonID";                                             //$NON-NLS-1$
-   private static final String                            ENTITY_ID_PHOTO                 = "PhotoID";                                              //$NON-NLS-1$
-   private static final String                            ENTITY_ID_REF                   = "RefID";                                                //$NON-NLS-1$
+   public static final String                             ENTITY_ID_BIKE                  = "BikeID";                                               //$NON-NLS-1$
+   public static final String                             ENTITY_ID_COMPARED              = "ComparedID";                                           //$NON-NLS-1$
+   public static final String                             ENTITY_ID_HR_ZONE               = "HrZoneID";                                             //$NON-NLS-1$
+   public static final String                             ENTITY_ID_MARKER                = "MarkerID";                                             //$NON-NLS-1$
+   public static final String                             ENTITY_ID_PERSON                = "PersonID";                                             //$NON-NLS-1$
+   public static final String                             ENTITY_ID_PHOTO                 = "PhotoID";                                              //$NON-NLS-1$
+   public static final String                             ENTITY_ID_REF                   = "RefID";                                                //$NON-NLS-1$
    public static final String                             ENTITY_ID_TAG                   = "TagID";                                                //$NON-NLS-1$
-   private static final String                            ENTITY_ID_TAG_CATEGORY          = "TagCategoryID";                                        //$NON-NLS-1$
+   public static final String                             ENTITY_ID_TAG_CATEGORY          = "TagCategoryID";                                        //$NON-NLS-1$
    public static final String                             ENTITY_ID_TOUR                  = "TourID";                                               //$NON-NLS-1$
-   private static final String                            ENTITY_ID_TYPE                  = "TypeID";                                               //$NON-NLS-1$
+   public static final String                             ENTITY_ID_TYPE                  = "TypeID";                                               //$NON-NLS-1$
    public static final String                             ENTITY_ID_WAY_POINT             = "WayPointID";                                           //$NON-NLS-1$
    //
    private static final String                            KEY_BIKE                        = TABLE_TOUR_BIKE + "_" + ENTITY_ID_BIKE;                 //$NON-NLS-1$

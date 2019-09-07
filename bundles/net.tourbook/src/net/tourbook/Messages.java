@@ -2200,14 +2200,17 @@ public class Messages extends NLS {
 
    public static String Slideout_TrainingOptions_Label_Title;
 
+   public static String Tag_Manager_Action_DeleteCategory;
    public static String Tag_Manager_Action_DeleteTag;
    public static String Tag_Manager_Action_DeleteTags;
    public static String Tag_Manager_Dialog_DeleteCategory_Categories_Message;
+   public static String Tag_Manager_Dialog_DeleteCategory_Message;
    public static String Tag_Manager_Dialog_DeleteCategory_Tags_Message;
    public static String Tag_Manager_Dialog_DeleteCategory_Title;
    public static String Tag_Manager_Dialog_DeleteTag_Message;
    public static String Tag_Manager_Dialog_DeleteTag_Multiple_Message;
    public static String Tag_Manager_Dialog_DeleteTag_Title;
+   public static String Tag_Manager_LogInfo_DeletedTagCategory;
    public static String Tag_Manager_LogInfo_DeletedTags;
 
    public static String Tooltip_ValuePoint_Action_CloseContextMenu;

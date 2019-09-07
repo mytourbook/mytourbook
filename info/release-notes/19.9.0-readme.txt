@@ -19,7 +19,7 @@ New
 
 * Tour Tag
   - Delete tour tag, tag is removed from tours and tag definition is deleted
-    To delete a tour tag category is not yet implemented
+  - Delete tour tag category
 
 * Import FitLogEx Files (Frederic)
   - Custom Data Field Import. The data field names and values are imported in

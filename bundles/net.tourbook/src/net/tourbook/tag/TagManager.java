@@ -172,15 +172,7 @@ public class TagManager {
 
             if (deleteTourTag_10(allTags)) {
 
-               // remove old tags from cached tours
-               TourDatabase.clearTourTags();
-
-               TagMenuManager.updateRecentTagNames();
-
-               TourManager.getInstance().clearTourDataCache();
-
-               // fire modify event
-               TourManager.fireEvent(TourEventId.TAG_STRUCTURE_CHANGED);
+               fireChangeEvent();
 
                returnValue[0] = true;
             }
@@ -261,9 +253,6 @@ public class TagManager {
                   allTags.get(tagIndex).getTagName()));
          }
 
-         if (returnResult == false) {
-            conn.rollback();
-         }
          returnResult = true;
 
       } catch (final SQLException e) {
@@ -281,6 +270,11 @@ public class TagManager {
       return returnResult;
    }
 
+   /**
+    * @param categoryId
+    * @param categoryName
+    * @return Returns <code>true</code> when tag category is deleted.
+    */
    public static boolean deleteTourTagCategory(final long categoryId, final String categoryName) {
 
       // ensure that a tour is NOT modified in the tour editor
@@ -292,7 +286,114 @@ public class TagManager {
          return false;
       }
 
-      return false;
+      final Display display = Display.getDefault();
+
+      // confirm deletion, show tag name and number of tours which contain a tag
+      final MessageDialog dialog = new MessageDialog(
+            display.getActiveShell(),
+            Messages.Tag_Manager_Dialog_DeleteCategory_Title,
+            null,
+            NLS.bind(Messages.Tag_Manager_Dialog_DeleteCategory_Message, categoryName),
+            MessageDialog.QUESTION,
+            new String[] {
+                  Messages.Tag_Manager_Action_DeleteCategory,
+                  IDialogConstants.CANCEL_LABEL },
+            1);
+
+      final boolean returnValue[] = { false };
+
+      if (dialog.open() == Window.OK) {
+
+         BusyIndicator.showWhile(display, () -> {
+
+            if (deleteTourTagCategory_10(categoryId, categoryName)) {
+
+               fireChangeEvent();
+
+               returnValue[0] = true;
+            }
+         });
+      }
+
+      return returnValue[0];
+   }
+
+   private static boolean deleteTourTagCategory_10(final long categoryId, final String categoryName) {
+
+      boolean returnResult = false;
+
+      String sql;
+      Connection conn = null;
+
+      PreparedStatement prepStmt_CategoryCategory = null;
+      PreparedStatement prepStmt_TagCategory = null;
+
+      try {
+
+         conn = TourDatabase.getInstance().getConnection();
+
+         // remove category from: TOURTAGCATEGORY_TOURTAGCATEGORY
+         sql = "DELETE" + NL //                                                                 //$NON-NLS-1$
+               + " FROM " + TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAGCATEGORY + NL //     //$NON-NLS-1$
+               + " WHERE TOURTAGCATEGORY_TAGCATEGORYID2 =?"; //                                 //$NON-NLS-1$
+         prepStmt_CategoryCategory = conn.prepareStatement(sql);
+
+         // remove category from TOURTAGCATEGORY
+         sql = "DELETE" //                                                                      //$NON-NLS-1$
+               + " FROM " + TourDatabase.TABLE_TOUR_TAG_CATEGORY //                       //$NON-NLS-1$
+               + " WHERE " + TourDatabase.ENTITY_ID_TAG_CATEGORY + "=?"; //               //$NON-NLS-1$ //$NON-NLS-2$
+         prepStmt_TagCategory = conn.prepareStatement(sql);
+
+         int[] returnValue_CategoryCategory;
+         int[] returnValue_TagCategory;
+
+         conn.setAutoCommit(false);
+         {
+            prepStmt_CategoryCategory.setLong(1, categoryId);
+            prepStmt_CategoryCategory.addBatch();
+
+            prepStmt_TagCategory.setLong(1, categoryId);
+            prepStmt_TagCategory.addBatch();
+
+            returnValue_CategoryCategory = prepStmt_CategoryCategory.executeBatch();
+            returnValue_TagCategory = prepStmt_TagCategory.executeBatch();
+         }
+         conn.commit();
+
+         // log result
+         TourLogManager.showLogView();
+         TourLogManager.logInfo(String.format(Messages.Tag_Manager_LogInfo_DeletedTagCategory,
+               returnValue_CategoryCategory[0],
+               returnValue_TagCategory[0],
+               categoryName));
+
+         returnResult = true;
+
+      } catch (final SQLException e) {
+
+         UI.showSQLException(e);
+
+      } finally {
+
+         Util.closeSql(conn);
+         Util.closeSql(prepStmt_CategoryCategory);
+         Util.closeSql(prepStmt_TagCategory);
+      }
+
+      return returnResult;
+   }
+
+   private static void fireChangeEvent() {
+
+      // remove old tags from cached tours
+      TourDatabase.clearTourTags();
+
+      TagMenuManager.updateRecentTagNames();
+
+      TourManager.getInstance().clearTourDataCache();
+
+      // fire modify event
+      TourManager.fireEvent(TourEventId.TAG_STRUCTURE_CHANGED);
    }
 
    private static long getNumberOfItems(final Connection conn, final String sql) {

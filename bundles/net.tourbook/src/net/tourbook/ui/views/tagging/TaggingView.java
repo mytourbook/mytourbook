@@ -779,6 +779,8 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
             _isSelectedWithKeyboard = true;
 
+            enableActions(true);
+
             switch (e.keyCode) {
 
             case SWT.DEL:
@@ -1503,7 +1505,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       }
 
       /*
-       * count number of selected tours/tags/categories
+       * Count number of selected tours/tags/categories
        */
       int numTours = 0;
       int numTags = 0;
