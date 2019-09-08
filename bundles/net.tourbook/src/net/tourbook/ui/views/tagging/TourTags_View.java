@@ -64,7 +64,10 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
@@ -89,8 +92,10 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
+import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MenuAdapter;
@@ -99,10 +104,13 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
@@ -194,9 +202,13 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
    private Composite _parent;
    private Composite _viewerContainer;
 
+   private Button    _btnUncheckAllTags;
+
    private Menu      _treeContextMenu;
 
    private Label     _lblHeader;
+
+   private ToolBar   _toolbarSaveUndo;
 
    private class Action_CollapseAll_WithoutSelection extends ActionCollapseAll {
 
@@ -512,7 +524,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
          disposeContextMenu();
 
-         _treeContextMenu = createUI_24_CreateViewerContextMenu();
+         _treeContextMenu = createUI_84_CreateViewerContextMenu();
 
          return _treeContextMenu;
       }
@@ -683,6 +695,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
       createActions();
       fillToolbar();
+      fillActionBar();
 
       addPartListener();
       addSelectionListener();
@@ -713,7 +726,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
          GridDataFactory.fillDefaults().grab(true, true).applyTo(_viewerContainer);
          GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
          {
-            createUI_20_TagViewer(_viewerContainer);
+            createUI_80_TagViewer(_viewerContainer);
          }
       }
    }
@@ -722,8 +735,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.swtDefaults().numColumns(1).applyTo(container);
-//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
+      GridLayoutFactory.swtDefaults().applyTo(container);
       {
          _lblHeader = new Label(container, SWT.NONE);
          _lblHeader.setText(UI.SPACE1);
@@ -731,10 +743,48 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
                .align(SWT.BEGINNING, SWT.CENTER)
                .grab(true, true)
                .applyTo(_lblHeader);
+
+         createUI_30_Buttons(container);
       }
    }
 
-   private void createUI_20_TagViewer(final Composite parent) {
+   private void createUI_30_Buttons(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults()
+            .grab(true, false)
+            .applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+      {
+         {
+            /*
+             * Button: Uncheck all
+             */
+            _btnUncheckAllTags = new Button(container, SWT.NONE);
+            _btnUncheckAllTags.setText(Messages.App_Action_UncheckAll);
+            _btnUncheckAllTags.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  onAction_UncheckAllTags();
+               }
+            });
+            UI.setButtonLayoutData(_btnUncheckAllTags);
+            final GridData gd = (GridData) _btnUncheckAllTags.getLayoutData();
+            gd.horizontalAlignment = SWT.END;
+            gd.grabExcessHorizontalSpace = true;
+         }
+//         {
+//            /*
+//             * Toolbar: Save/Undo
+//             */
+//            _toolbarSaveUndo = new ToolBar(container, SWT.FLAT);
+//            GridDataFactory.fillDefaults().indent(10, 0).applyTo(_toolbarSaveUndo);
+//         }
+      }
+   }
+
+   private void createUI_80_TagViewer(final Composite parent) {
 
       /*
        * Create tree
@@ -831,15 +881,15 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
          }
       });
 
-      createUI_22_ContextMenu();
+      createUI_82_ContextMenu();
    }
 
    /**
     * Setup the viewer context menu
     */
-   private void createUI_22_ContextMenu() {
+   private void createUI_82_ContextMenu() {
 
-      _treeContextMenu = createUI_24_CreateViewerContextMenu();
+      _treeContextMenu = createUI_84_CreateViewerContextMenu();
 
       final Tree tree = (Tree) _tagViewer.getControl();
 
@@ -851,7 +901,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
     *
     * @return
     */
-   private Menu createUI_24_CreateViewerContextMenu() {
+   private Menu createUI_84_CreateViewerContextMenu() {
 
       final Tree tree = _tagViewer.getTree();
 
@@ -1049,6 +1099,35 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
    @Override
    public void doSave(final IProgressMonitor monitor) {
 
+      final int numTagIds = _allCheckedTagIds.size();
+      final int numTaggedTours = _allTaggedTours.size();
+      final int numSelectedTours = _allSelectedTours.size();
+
+
+      final String tagNames = TourDatabase.getTagNamesText(_allCheckedTagIds, true);
+
+      final String dialogMessage = NLS.bind(Messages.Tour_Tags_Dialog_SetTags_Message, tagNames, numSelectedTours);
+
+      // confirm deletion, show tag name and number of tours which contain a tag
+      final Display display = Display.getDefault();
+      final MessageDialog dialog = new MessageDialog(
+            display.getActiveShell(),
+            Messages.Tour_Tags_Dialog_SetTags_Title,
+            null,
+            dialogMessage,
+            MessageDialog.QUESTION,
+            new String[] {
+                  Messages.Tour_Tags_Action_SaveTags,
+                  IDialogConstants.CANCEL_LABEL },
+            1);
+
+      if (dialog.open() == Window.OK) {
+
+         BusyIndicator.showWhile(display, () -> {
+
+         });
+      }
+
       _isTagDirty = false;
 
       enableControls();
@@ -1089,6 +1168,20 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
          _tagViewer.expandToLevel(treeItem, 1);
       }
+   }
+
+   private void fillActionBar() {
+
+      /*
+       * fill exit toolbar
+       */
+      final ToolBarManager toolbarManager = new ToolBarManager(_toolbarSaveUndo);
+
+//      toolbarManager.add(_actionPinSlideout);
+//      toolbarManager.add(_actionKeepSlideoutOpen);
+//      toolbarManager.add(_actionCloseSlideout);
+
+      toolbarManager.update(true);
    }
 
    private void fillContextMenu(final IMenuManager menuMgr) {
@@ -1309,6 +1402,14 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
          enableControls();
       }
       _parent.setRedraw(true);
+   }
+
+   private void onAction_UncheckAllTags() {
+
+      _allCheckedTagIds.clear();
+      _allTaggedTours.clear();
+
+      _tagViewer.refresh();
    }
 
    private void onSelect_SortColumn(final SelectionEvent e) {
@@ -1615,7 +1716,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
          _tagViewer.getTree().dispose();
 
-         createUI_20_TagViewer(_viewerContainer);
+         createUI_80_TagViewer(_viewerContainer);
          _viewerContainer.layout();
 
          reloadViewer_SetContent();

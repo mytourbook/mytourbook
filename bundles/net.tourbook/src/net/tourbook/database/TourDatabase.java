@@ -230,6 +230,7 @@ public class TourDatabase {
    private static ArrayList<TourType>                     _activeTourTypes;
 
    private static volatile ArrayList<TourType>            _dbTourTypes;
+   private static HashMap<Long, TourType>                 _dbTourTypeIds;
 
    /**
     * Key is tag ID.
@@ -809,8 +810,12 @@ public class TourDatabase {
    public static synchronized void clearTourTypes() {
 
       if (_dbTourTypes != null) {
+
          _dbTourTypes.clear();
+         _dbTourTypeIds.clear();
+
          _dbTourTypes = null;
+         _dbTourTypeIds = null;
       }
 
       TourTypeImage.setTourTypeImagesDirty();
@@ -1404,6 +1409,7 @@ public class TourDatabase {
 
          // create empty list
          _dbTourTypes = new ArrayList<>();
+         _dbTourTypeIds = new HashMap<>();
 
          final EntityManager em = TourDatabase.getInstance().getEntityManager();
          if (em != null) {
@@ -1415,6 +1421,10 @@ public class TourDatabase {
                         + (" ORDER  BY tourType.name")); //$NON-NLS-1$
 
             _dbTourTypes = (ArrayList<TourType>) emQuery.getResultList();
+
+            for (final TourType tourType : _dbTourTypes) {
+               _dbTourTypeIds.put(tourType.getTypeId(), tourType);
+            }
 
             em.close();
          }
@@ -1715,7 +1725,7 @@ public class TourDatabase {
       return getTagNamesText(tagNames, isVertical);
    }
 
-   private static String getTagNamesText(final ArrayList<String> tagNames, final boolean isVertical) {
+   public static String getTagNamesText(final ArrayList<String> tagNames, final boolean isVertical) {
 
       // sort tags by name
       Collections.sort(tagNames);
@@ -1736,6 +1746,21 @@ public class TourDatabase {
       }
 
       return sb.toString();
+   }
+
+   public static String getTagNamesText(final Set<Long> alltagIds, final boolean isVertical) {
+
+      // ensure tour types are loaded
+      getAllTourTypes();
+
+      final ArrayList<String> tagNames = new ArrayList<>();
+
+      for (final Long tagId : alltagIds) {
+         TourType tourType = _dbTourTypeIds.get(tagId);
+         tagNames.add(tourType.getName());
+      }
+
+      return getTagNamesText(tagNames, isVertical);
    }
 
    /**

@@ -460,14 +460,13 @@ public class Messages extends NLS {
    public static String        App_Action_RestoreTour_Disabled;
    public static String        App_Action_set_tour_type;
    public static String        App_Action_Save;
-
    public static String        App_Action_SaveTour;
-
    public static String        App_Action_SaveTour_Tooltip;
    public static String        App_Action_SetPerson;
    public static String        App_Action_SplitTour;
    public static String        App_Action_ToolTipLocation_AboveTourChart_Tooltip;
    public static String        App_Action_ToolTipLocation_BelowTourChart_Tooltip;
+   public static String        App_Action_UncheckAll;
    public static String        App_Action_UpdateNew;
 
    public static String        App_measurement_imperial;
@@ -2547,9 +2546,15 @@ public class Messages extends NLS {
    public static String Tour_Tags_Action_Layout_Hierarchical_Tooltip;
    public static String Tour_Tags_Action_MouseExpandCollapse;
    public static String Tour_Tags_Action_OnMouseSelect_ExpandCollapse;
+   public static String Tour_Tags_Action_SaveTags;
+
    public static String Tour_Tags_Action_SingleExpand_CollapseOthers;
    public static String Tour_Tags_Action_TagCheckFilter_AllTags_Tooltip;
    public static String Tour_Tags_Action_TagCheckFilter_OnlyTaggedTours_Tooltip;
+   public static String Tour_Tags_Dialog_SetTags_Message;
+
+   public static String Tour_Tags_Dialog_SetTags_Title;
+
    public static String Tour_Tags_Title_MultipleTours;
    public static String Tour_Tags_Title_OneTour;
 

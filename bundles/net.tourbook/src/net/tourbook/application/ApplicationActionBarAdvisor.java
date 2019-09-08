@@ -48,13 +48,13 @@ import org.eclipse.ui.application.IActionBarConfigurer;
  */
 public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
-   private static final String               MENU_CONTRIB_TOOLBAR_APP_FILTER = "mc_tb_AppFilter";            //$NON-NLS-1$
+   private static final String     MENU_CONTRIB_TOOLBAR_APP_FILTER = "mc_tb_AppFilter";            //$NON-NLS-1$
 
-   private static IPreferenceStore           _prefStore                      = TourbookPlugin.getPrefStore();
+   private static IPreferenceStore _prefStore                      = TourbookPlugin.getPrefStore();
 
-   private IWorkbenchWindow                  _window;
+   private IWorkbenchWindow        _window;
 
-   private IWorkbenchAction                  _actionPreferences;
+   private IWorkbenchAction        _actionPreferences;
 
 //   private IWorkbenchAction                  _action_Save;
    private IWorkbenchAction                  _actionAbout;
@@ -334,30 +334,15 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
       _actionOtherViews = new ActionOtherViews(window);
 
-//      _actionEditActionSets = ActionFactory.EDIT_ACTION_SETS.create(window);
       _actionSavePerspective = ActionFactory.SAVE_PERSPECTIVE.create(window);
       _actionResetPerspective = ActionFactory.RESET_PERSPECTIVE.create(window);
       _actionClosePerspective = ActionFactory.CLOSE_PERSPECTIVE.create(window);
       _actionCloseAllPerspective = ActionFactory.CLOSE_ALL_PERSPECTIVES.create(window);
 
-//      register(_actionEditActionSets);
       register(_actionSavePerspective);
       register(_actionResetPerspective);
       register(_actionClosePerspective);
       register(_actionCloseAllPerspective);
-
-      /*
-       * Action: Save tour with the command id "org.eclipse.ui.file.save"
-       */
-//      _action_Save = ActionFactory.SAVE.create(window);
-//
-//      _action_Save.setText(Messages.App_Action_SaveTour);
-//      _action_Save.setToolTipText(Messages.App_Action_SaveTour_Tooltip);
-//
-//      _action_Save.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__SaveTour));
-//      _action_Save.setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__SaveTour_Disabled));
-//
-//      register(_action_Save);
 
       /*
        * If we're on OS X we shouldn't show this command in the File menu. It should be invisible to
