@@ -592,6 +592,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
          public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
             if (selection instanceof SelectionDeletedTours) {
+
                final SelectionDeletedTours deletedTourSelection = (SelectionDeletedTours) selection;
 
                updateViewerAfterTourIsDeleted(_rootItem, deletedTourSelection.removedTours);
@@ -2136,6 +2137,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
          final Object[] expandedElements = _tagViewer.getExpandedElements();
 
          _tagViewer.setInput(_rootItem = new TVITagView_Root(_tagViewLayout));
+
          _tagViewer.setExpandedElements(expandedElements);
       }
       tree.setRedraw(true);
@@ -2613,6 +2615,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
                }
 
             } else {
+
                // update children
                updateViewerAfterTourIsDeleted(childItem, deletedTourIds);
             }

@@ -853,10 +853,6 @@ THIS IS NOT YET FULLY IMPLEMENTED
 
       </menuContribution>
 
-   </extension>
-
-   <extension point="org.eclipse.ui.menus">
-
 
       <!--
          Photo filter
@@ -1017,11 +1013,7 @@ THIS IS NOT YET FULLY IMPLEMENTED
 
          </toolbar>
       </menuContribution>
-      
-   </extension>
-
-   <extension point="org.eclipse.ui.menus">
-      
+           
       <menuContribution locationURI="toolbar:org.eclipse.ui.trim.status">
 
          <toolbar id="net.tourbook.mapping.statusline.mapinfo">
@@ -1051,6 +1043,11 @@ THIS IS NOT YET FULLY IMPLEMENTED
          </toolbar>
       </menuContribution>
       
+      <!--
+      
+         Tour import (RawDataView)
+      
+      -->
       <menuContribution locationURI="toolbar:net.tourbook.views.rawData.RawDataView?after=import">
       
          <command
@@ -1076,6 +1073,39 @@ THIS IS NOT YET FULLY IMPLEMENTED
             style="push"
             tooltip="%Command_Device_ReceiveFromSerialPort_Directly_Tooltip"
          />
+         
+      </menuContribution>
+
+      <!--
+      
+         Tagged Tours
+      
+      -->
+      <menuContribution locationURI="toolbar:net.tourbook.ui.views.tagging.TourTags_View?after=group_AfterSaveTour">
+
+         <!-- Save Tour -->
+         <command
+            commandId      ="command.net.tourbook.tour.SaveTour"
+            mnemonic       ="%Command_App_SaveTour_Mnemonic"
+            tooltip        ="%Command_App_SaveTour_Tooltip"
+         >
+            <parameter 
+               name="net.tourbook.parameter.isInTourTagsToolbar"
+               value="true"
+            />
+         </command>
+
+         <!-- Restore Tour -->
+         <command
+            commandId      ="command.net.tourbook.tour.RestoreTour"
+            mnemonic       ="%Command_App_RestoreTour_Mnemonic"
+            tooltip        ="%Command_App_RestoreTour_Tooltip"
+         >
+            <parameter 
+               name="net.tourbook.parameter.isInTourTagsToolbar"
+               value="true"
+            />
+         </command>
          
       </menuContribution>
 
@@ -2219,7 +2249,7 @@ THIS IS NOT YET FULLY IMPLEMENTED
 
    
    <extension point="org.eclipse.ui.handlers">
-   
+
       <handler
          commandId   ="command.net.tourbook.tour.RestoreTour"
          class       ="net.tourbook.commands.RestoreTour_Handler"
@@ -2231,7 +2261,7 @@ THIS IS NOT YET FULLY IMPLEMENTED
          </enabledWhen>
          
      </handler>
-
+   
       <handler
          commandId   ="command.net.tourbook.tour.SaveTour"
          class       ="net.tourbook.commands.SaveTour_Handler"
