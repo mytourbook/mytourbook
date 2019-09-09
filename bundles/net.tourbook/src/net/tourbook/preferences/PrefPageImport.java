@@ -35,6 +35,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.eclipse.ui.dialogs.PreferenceLinkArea;
+import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 
 public class PrefPageImport extends PreferencePage implements IWorkbenchPreferencePage {
 
@@ -169,7 +171,21 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
                   .indent(0, 10)
                   .applyTo(_chkSetBodyWeight);
          }
+         {
+            final PreferenceLinkArea prefLink = new PreferenceLinkArea(
+                  container,
+                  SWT.NONE,
+                  PrefPagePeople.ID,
+                  Messages.Pref_People_Link,
+                  (IWorkbenchPreferenceContainer) getContainer(),
+                  new PrefPagePeopleData(null, TourbookPlugin.getActivePerson()));
 
+            GridDataFactory.fillDefaults()//
+                  .grab(true, false)
+                  .indent(_checkboxIndent, 0)
+                  .hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
+                  .applyTo(prefLink.getControl());
+         }
       }
    }
 
