@@ -50,8 +50,6 @@ import java.text.NumberFormat;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 
-import javax.inject.Inject;
-
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.ColumnDefinition;
@@ -72,7 +70,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.e4.ui.services.IStylingEngine;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.IInputValidator;
@@ -249,10 +246,6 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
    private ActionRefreshOfflineInfoNotAssessed _actionRefreshNotAssessed;
 
    private PixelConverter                      _pc;
-
-// IStylingEngine is injected
-   @Inject
-   IStylingEngine engine;
 
    /*
     * UI controls

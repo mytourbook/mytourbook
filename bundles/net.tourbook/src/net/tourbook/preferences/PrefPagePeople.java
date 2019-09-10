@@ -25,6 +25,25 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.util.Util;
+import net.tourbook.data.HrZoneContext;
+import net.tourbook.data.TourData;
+import net.tourbook.data.TourPerson;
+import net.tourbook.data.TourPersonHRZone;
+import net.tourbook.database.IComputeTourValues;
+import net.tourbook.database.PersonManager;
+import net.tourbook.database.TourDatabase;
+import net.tourbook.importdata.DeviceManager;
+import net.tourbook.importdata.ExternalDevice;
+import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
+import net.tourbook.training.DialogHRZones;
+import net.tourbook.training.TrainingManager;
+
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -89,49 +108,37 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.UI;
-import net.tourbook.common.time.TimeTools;
-import net.tourbook.common.util.Util;
-import net.tourbook.data.HrZoneContext;
-import net.tourbook.data.TourData;
-import net.tourbook.data.TourPerson;
-import net.tourbook.data.TourPersonHRZone;
-import net.tourbook.database.IComputeTourValues;
-import net.tourbook.database.PersonManager;
-import net.tourbook.database.TourDatabase;
-import net.tourbook.importdata.DeviceManager;
-import net.tourbook.importdata.ExternalDevice;
-import net.tourbook.tour.TourEventId;
-import net.tourbook.tour.TourManager;
-import net.tourbook.training.DialogHRZones;
-import net.tourbook.training.TrainingManager;
-
 public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferencePage {
 
-   public static final String     ID                        = "net.tourbook.preferences.PrefPagePeopleId"; //$NON-NLS-1$
+   public static final String     ID                                  = "net.tourbook.preferences.PrefPagePeopleId"; //$NON-NLS-1$
 
    /**
     * On Linux an async selection event is fired since e4
     */
-   private static final String    FIX_LINUX_ASYNC_EVENT_1   = "FIX_LINUX_ASYNC_EVENT_1";                   //$NON-NLS-1$
-   private static final String    FIX_LINUX_ASYNC_EVENT_2   = "FIX_LINUX_ASYNC_EVENT_2";                   //$NON-NLS-1$
+   private static final String    FIX_LINUX_ASYNC_EVENT_1             = "FIX_LINUX_ASYNC_EVENT_1";                   //$NON-NLS-1$
+   private static final String    FIX_LINUX_ASYNC_EVENT_2             = "FIX_LINUX_ASYNC_EVENT_2";                   //$NON-NLS-1$
    //
-   private static final String    STATE_SELECTED_PERSON     = "selectedPersonId";                          //$NON-NLS-1$
-   private static final String    STATE_SELECTED_TAB_FOLDER = "selectedTabFolder";                         //$NON-NLS-1$
+   private static final String    STATE_SELECTED_PERSON               = "selectedPersonId";                          //$NON-NLS-1$
+   private static final String    STATE_SELECTED_TAB_FOLDER           = "selectedTabFolder";                         //$NON-NLS-1$
 
-   public static final int        HEART_BEAT_MIN            = 10;
-   public static final int        HEART_BEAT_MAX            = 300;
+   public static final int        HEART_BEAT_MIN                      = 10;
+   public static final int        HEART_BEAT_MAX                      = 300;
 
    /**
     * Id to indicate that the hr zones should be displayed for the active person when the pref
     * dialog is opened
     */
-   public static final String     PREF_DATA_SELECT_HR_ZONES = "SelectHrZones";                             //$NON-NLS-1$
+   public static final String     PREF_DATA_SELECT_HR_ZONES           = "SelectHrZones";                             //$NON-NLS-1$
 
-   private final IPreferenceStore _prefStore                = TourbookPlugin.getPrefStore();
-   private final IDialogSettings  _state                    = TourbookPlugin.getState(ID);
+   /**
+    * Id to indicate that the person's information should be displayed for the active person when
+    * the pref
+    * dialog is opened
+    */
+   public static final String     PREF_DATA_SELECT_PERSON_INFORMATION = "SelectPersonInformation";
+
+   private final IPreferenceStore _prefStore                          = TourbookPlugin.getPrefStore();
+   private final IDialogSettings  _state                              = TourbookPlugin.getState(ID);
 
    // REMOVED BIKES 30.4.2011
 
@@ -253,6 +260,9 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       _prefStore.addPropertyChangeListener(_prefChangeListener);
    }
 
+   /**
+    *
+    */
    @Override
    public void applyData(final Object data) {
 
@@ -300,30 +310,35 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
          final PrefPagePeopleData prefPageData = (PrefPagePeopleData) data;
 
-         if (prefPageData.prefDataSelectHrZones.equals(PREF_DATA_SELECT_HR_ZONES)) {
+         if (prefPageData.person != null && _peopleViewer != null) {
 
-            // select hr zones for the given person
+            _peopleViewer.setSelection(new StructuredSelection(prefPageData.person));
 
-            if (prefPageData.person != null) {
+            final Table table = _peopleViewer.getTable();
 
-               _peopleViewer.setSelection(new StructuredSelection(prefPageData.person));
+            // set focus to selected person
+            table.setSelection(table.getSelectionIndex());
+         }
 
-               final Table table = _peopleViewer.getTable();
-
-               // set focus to selected person
-               table.setSelection(table.getSelectionIndex());
-            }
-
-            if (_tabFolderPerson != null) {
+         if (_tabFolderPerson != null) {
+            if (prefPageData.prefDataSelectHrZones != null && prefPageData.prefDataSelectHrZones.equals(PREF_DATA_SELECT_HR_ZONES)) {
+               // select hr zones for the given person
                _tabFolderPerson.setSelection(1);
             } else {
-               Display.getDefault().asyncExec(new Runnable() {
-                  @Override
-                  public void run() {
-                     _tabFolderPerson.setSelection(1);
-                  }
-               });
+               _tabFolderPerson.setSelection(0);
             }
+         } else {
+            Display.getDefault().asyncExec(new Runnable() {
+               @Override
+               public void run() {
+                  if (prefPageData.prefDataSelectHrZones != null && prefPageData.prefDataSelectHrZones.equals(PREF_DATA_SELECT_HR_ZONES)) {
+                     // select hr zones for the given person
+                     _tabFolderPerson.setSelection(1);
+                  } else {
+                     _tabFolderPerson.setSelection(0);
+                  }
+               }
+            });
          }
       }
    }
@@ -843,7 +858,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
                .applyTo(_spinnerWeight);
          _spinnerWeight.setDigits(1);
          _spinnerWeight.setMinimum(0);
-         _spinnerWeight.setMaximum(3000); // 300.0 kg
+         _spinnerWeight.setMaximum(6614); // 300.0 kg, 661.4 lbs
          _spinnerWeight.addSelectionListener(_defaultSelectionListener);
          _spinnerWeight.addMouseWheelListener(new MouseWheelListener() {
             @Override
@@ -855,7 +870,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
          // label: unit
          label = new Label(containerWeight, SWT.NONE);
-         label.setText(UI.UNIT_WEIGHT_KG);
+         label.setText(UI.UNIT_LABEL_WEIGHT);
       }
 
       // 3rd column filler
@@ -1590,11 +1605,11 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
        */
       tvc = new TableViewerColumn(_peopleViewer, SWT.TRAIL);
       tc = tvc.getColumn();
-      tc.setText(Messages.Pref_People_Column_weight);
+      tc.setText(UI.UNIT_LABEL_WEIGHT);
       tvc.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
-            final float weight = ((TourPerson) cell.getElement()).getWeight();
+            final float weight = UI.convertBodyWeightFromMetric(((TourPerson) cell.getElement()).getWeight());
             cell.setText(_nf1.format(weight));
          }
       });
@@ -2150,7 +2165,10 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       person.setLastName(_txtLastName.getText());
 
       person.setBirthDay(getBirthdayFromUI().toInstant().toEpochMilli());
-      person.setWeight(_spinnerWeight.getSelection() / 10.0f);
+
+      final float bodyWeight = UI.convertBodyWeightToMetric(_spinnerWeight.getSelection());
+      person.setWeight(bodyWeight / 10.0f);
+
       person.setHeight(_spinnerHeight.getSelection() / 100.0f);
 
       person.setGender(_rdoGenderMale.getSelection() ? 0 : 1);
@@ -2230,7 +2248,10 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          _dtBirthday.setData(FIX_LINUX_ASYNC_EVENT_1, true);
          _dtBirthday.setData(FIX_LINUX_ASYNC_EVENT_2, true);
          _dtBirthday.setDate(dtBirthday.getYear(), dtBirthday.getMonthValue() - 1, dtBirthday.getDayOfMonth());
-         _spinnerWeight.setSelection((int) (person.getWeight() * 10));
+
+         final float bodyWeight = UI.convertBodyWeightFromMetric(person.getWeight());
+         _spinnerWeight.setSelection((int) (bodyWeight * 10));
+
          _spinnerHeight.setSelection((int) (person.getHeight() * 100));
          _rawDataPathEditor.setStringValue(person.getRawDataPath());
          _rdoGenderMale.setSelection(gender == 0);

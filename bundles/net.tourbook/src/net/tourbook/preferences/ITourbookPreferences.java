@@ -366,6 +366,10 @@ public interface ITourbookPreferences {
    public static final String MEASUREMENT_SYSTEM_ENERGY_JOULE   = "energy.joule";                      //$NON-NLS-1$
    public static final String MEASUREMENT_SYSTEM_ENERGY_CALORIE = "energy.calorie";                    //$NON-NLS-1$
 
+   public static final String MEASUREMENT_SYSTEM_WEIGHT         = "system.of.weight";                  //$NON-NLS-1$
+   public static final String MEASUREMENT_SYSTEM_WEIGHT_KG      = "weight.kilogram";                   //$NON-NLS-1$
+   public static final String MEASUREMENT_SYSTEM_WEIGHT_LBS     = "weight.pound";                      //$NON-NLS-1$
+
    /*
     * map settings
     */

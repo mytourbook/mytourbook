@@ -3967,8 +3967,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
             for (int serieIndex = 0; serieIndex < size; serieIndex++) {
                altitudeSerieSmoothed[serieIndex] = (float) altitude_sc[serieIndex];
-               altitudeSerieImperialSmoothed[serieIndex] = (float) (altitude_sc[serieIndex]
-                     / UI.UNIT_VALUE_ALTITUDE);
+               altitudeSerieImperialSmoothed[serieIndex] = (float) (altitude_sc[serieIndex] / UI.UNIT_FOOT);
             }
          } else {
 
@@ -3976,7 +3975,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
             for (int serieIndex = 0; serieIndex < size; serieIndex++) {
                altitudeSerieSmoothed[serieIndex] = altitudeSerie[serieIndex];
-               altitudeSerieImperialSmoothed[serieIndex] = (altitudeSerie[serieIndex] / UI.UNIT_VALUE_ALTITUDE);
+               altitudeSerieImperialSmoothed[serieIndex] = (altitudeSerie[serieIndex] / UI.UNIT_FOOT);
             }
          }
       }
@@ -4125,7 +4124,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
             final double vSpeedSmoothed = Vv_sc[serieIndex] * 3600.0;
             altimeterSerie[serieIndex] = (float) (vSpeedSmoothed);
-            altimeterSerieImperial[serieIndex] = (float) (vSpeedSmoothed / UI.UNIT_VALUE_ALTITUDE);
+            altimeterSerieImperial[serieIndex] = (float) (vSpeedSmoothed / UI.UNIT_FOOT);
          }
       }
 
@@ -6342,7 +6341,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
             altitudeSerieImperial = new float[altitudeSerie.length];
 
             for (int valueIndex = 0; valueIndex < altitudeSerie.length; valueIndex++) {
-               altitudeSerieImperial[valueIndex] = altitudeSerie[valueIndex] / UI.UNIT_VALUE_ALTITUDE;
+               altitudeSerieImperial[valueIndex] = altitudeSerie[valueIndex] / UI.UNIT_FOOT;
             }
          }
          return altitudeSerieImperial;

@@ -426,12 +426,12 @@ public class DialogQuickEdit extends TitleAreaDialog {
                      .applyTo(_spinBodyWeight);
                _spinBodyWeight.setDigits(1);
                _spinBodyWeight.setMinimum(0);
-               _spinBodyWeight.setMaximum(3000); // 300.0 kg
+               _spinBodyWeight.setMaximum(6614); // 300.0 kg, 661.4 lbs
 
                _spinBodyWeight.addMouseWheelListener(_mouseWheelListener);
 
                // label: unit
-               _tk.createLabel(container, UI.UNIT_WEIGHT_KG);
+               _tk.createLabel(container, UI.UNIT_LABEL_WEIGHT);
             }
 
             {
@@ -921,7 +921,8 @@ public class DialogQuickEdit extends TitleAreaDialog {
       _tourData.setTourTitle(_comboTitle.getText().trim());
       _tourData.setTourDescription(_txtDescription.getText().trim());
 
-      _tourData.setBodyWeight((float) (_spinBodyWeight.getSelection() / 10.0));
+      final float bodyWeight = UI.convertBodyWeightToMetric(_spinBodyWeight.getSelection());
+      _tourData.setBodyWeight(bodyWeight / 10.0f);
       _tourData.setPower_FTP(_spinFTP.getSelection());
       _tourData.setRestPulse(_spinRestPuls.getSelection());
       _tourData.setCalories(_spinCalories.getSelection());
@@ -971,7 +972,8 @@ public class DialogQuickEdit extends TitleAreaDialog {
          /*
           * personal details
           */
-         _spinBodyWeight.setSelection(Math.round(_tourData.getBodyWeight() * 10));
+         final float bodyWeight = UI.convertBodyWeightFromMetric(_tourData.getBodyWeight());
+         _spinBodyWeight.setSelection(Math.round(bodyWeight * 10));
          _spinFTP.setSelection(_tourData.getPower_FTP());
          _spinRestPuls.setSelection(_tourData.getRestPulse());
          _spinCalories.setSelection(_tourData.getCalories());

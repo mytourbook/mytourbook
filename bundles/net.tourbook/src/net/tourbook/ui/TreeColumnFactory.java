@@ -317,9 +317,9 @@ public abstract class TreeColumnFactory {
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Body);
             colDef.setColumnLabel(Messages.ColumnFactory_BodyWeight_Label);
-            colDef.setColumnHeaderText(UI.UNIT_WEIGHT_KG);
+            colDef.setColumnHeaderText(UI.UNIT_LABEL_WEIGHT);
             colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_BodyWeight_Tooltip);
-            colDef.setColumnUnit(UI.UNIT_WEIGHT_KG);
+            colDef.setColumnUnit(UI.UNIT_LABEL_WEIGHT);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(7));
 
