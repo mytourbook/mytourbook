@@ -36,6 +36,10 @@ New
  - Possibility to delete marker(s) from the contextual menu and when pressing
    the DELETE key
 
+* Import Preferences (Frederic)
+  - Added the ability to choose whether to set the person's body weight when
+    importing and saving a tour.
+
  
 Improvements   
 ============
@@ -69,9 +73,13 @@ Bugfix
 
   - Fitlog Import
     - Fixed tour start time year/month/day by using it's time zone
+    - Distinguishing between manual activities and activities with tracks
   
   - Tour Book View
     - Extended "Set Time Zone" wizard to set tour start time year/month/day with time zone  
+
+* Body Weight unit (Frederic)
+ - When changing the measurement unit, the body weight unit is updated in the UI
     
 * Tour Chart
   - Imperial altitude/altimeter values could be wrong depending on the selected measurement system and when the tour was displayed the first time

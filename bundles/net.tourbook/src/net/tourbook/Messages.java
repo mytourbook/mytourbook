@@ -1571,7 +1571,6 @@ public class Messages extends NLS {
    public static String        Pref_People_Column_first_name;
    public static String        Pref_People_Column_height;
    public static String        Pref_People_Column_last_name;
-   public static String        Pref_People_Column_weight;
    public static String        Pref_People_Dialog_ComputeHrZonesForAllTours_Message;
    public static String        Pref_People_Dialog_ComputeHrZonesForAllToursIsCanceled_Message;
    public static String        Pref_People_Dialog_SaveModifiedPerson_Message;
@@ -1597,6 +1596,7 @@ public class Messages extends NLS {
    public static String        Pref_People_Label_RestingHR;
    public static String        Pref_People_Label_weight;
    public static String        Pref_People_Label_Years;
+   public static String        Pref_People_Link;
    public static String        Pref_People_Tab_DataTransfer;
    public static String        Pref_People_Tab_HRZone;
    public static String        Pref_People_Tab_Person;
@@ -1762,6 +1762,8 @@ public class Messages extends NLS {
    public static String PrefPage_Import_Label_Info;
    public static String PrefPage_Import_Checkbox_IgnoreInvalidFiles;
    public static String PrefPage_Import_Checkbox_IgnoreInvalidFiles_Tooltip;
+   public static String PrefPage_Import_Checkbox_SetBodyWeight;
+   public static String PrefPage_Import_Checkbox_SetBodyWeight_Tooltip;
 
    public static String PrefPage_ViewActions_Group;
    public static String PrefPage_ViewActions_Label_DoubleClick;
