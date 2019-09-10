@@ -63,9 +63,8 @@ public abstract class TreeColumnFactory {
    public static final TreeColumnFactory POWERTRAIN_GEAR_FRONT_SHIFT_COUNT;
    public static final TreeColumnFactory POWERTRAIN_GEAR_REAR_SHIFT_COUNT;
    public static final TreeColumnFactory POWERTRAIN_PEDAL_LEFT_RIGHT_BALANCE;
-   public static final TreeColumnFactory POWERTRAIN_HIKING_ZONE_PERCENTAGE;
+   public static final TreeColumnFactory POWERTRAIN_HIKING_VS_RUNNING_PERCENTAGE;
    //public static final TreeColumnFactory POWERTRAIN_HIKE_ZONE_TIME;
-   public static final TreeColumnFactory POWERTRAIN_RUNNING_ZONE_PERCENTAGE;
    //public static final TreeColumnFactory POWERTRAIN_RUNNING_ZONE_TIME;
 
    public static final TreeColumnFactory RUN_DYN_STANCE_TIME_MIN;
@@ -931,11 +930,11 @@ public abstract class TreeColumnFactory {
          }
       };
 
-      POWERTRAIN_HIKING_ZONE_PERCENTAGE = new TreeColumnFactory() {
+      POWERTRAIN_HIKING_VS_RUNNING_PERCENTAGE = new TreeColumnFactory() {
 
          @Override
          public TreeColumnDefinition createColumn(final ColumnManager columnManager,
-                                                   final PixelConverter pixelConverter) {
+                                                  final PixelConverter pixelConverter) {
 
             final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager,
                   "POWERTRAIN_HIKE_ZONE_PERCENTAGE", //$NON-NLS-1$
@@ -943,28 +942,7 @@ public abstract class TreeColumnFactory {
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Powertrain);
             colDef.setColumnLabel("HIKE ZONE");//Messages.ColumnFactory_GearTeeth_Label);
-            colDef.setColumnHeaderText("HIKE");//Messages.ColumnFactory_GearTeeth_Header);
-            //colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_GearTeeth_Tooltip);
-
-            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
-
-            return colDef;
-         }
-      };
-
-      POWERTRAIN_RUNNING_ZONE_PERCENTAGE = new TreeColumnFactory() {
-
-         @Override
-         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
-                                                   final PixelConverter pixelConverter) {
-
-            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager,
-                  "POWERTRAIN_RUNNING_ZONE_PERCENTAGE", //$NON-NLS-1$
-                  SWT.TRAIL);
-
-            colDef.setColumnCategory(Messages.ColumnFactory_Category_Powertrain);
-            colDef.setColumnLabel("RUNNING ZONE");//Messages.ColumnFactory_GearTeeth_Label);
-            colDef.setColumnHeaderText("RUNNING");//Messages.ColumnFactory_GearTeeth_Header);
+            colDef.setColumnHeaderText("Hiking vs Running");//Messages.ColumnFactory_GearTeeth_Header);
             //colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_GearTeeth_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
