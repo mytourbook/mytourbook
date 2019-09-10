@@ -1480,7 +1480,8 @@ public class TourInfoUI {
 
       // body
       _lblRestPulse.setText(Integer.toString(_tourData.getRestPulse()));
-      _lblBodyWeight.setText(_nf1.format(_tourData.getBodyWeight()));
+      final float bodyWeight = UI.convertBodyWeightFromMetric(_tourData.getBodyWeight());
+      _lblBodyWeight.setText(_nf1.format(bodyWeight));
 
       /*
        * Max values

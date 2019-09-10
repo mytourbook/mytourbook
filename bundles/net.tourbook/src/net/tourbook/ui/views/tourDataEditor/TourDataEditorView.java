@@ -7699,7 +7699,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
          _tourData.setTourStartPlace(_comboLocation_Start.getText());
          _tourData.setTourEndPlace(_comboLocation_End.getText());
 
-         _tourData.setBodyWeight((float) (_spinPerson_BodyWeight.getSelection() / 10.0));
+         final float bodyWeight = UI.convertBodyWeightToMetric(_spinPerson_BodyWeight.getSelection());
+         _tourData.setBodyWeight(bodyWeight / 10.0f);
          _tourData.setPower_FTP(_spinPerson_FTP.getSelection());
          _tourData.setCalories(_spinPerson_Calories.getSelection());
          _tourData.setRestPulse(_spinPerson_RestPuls.getSelection());
