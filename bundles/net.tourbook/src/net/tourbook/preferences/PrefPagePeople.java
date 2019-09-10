@@ -1109,7 +1109,21 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
                .grab(true, false)
                .hint(80, SWT.DEFAULT)
                .applyTo(prefLink.getControl());
+
+
       }
+
+      // button: compute computed values
+      final Button btnComputValues = new Button(container, SWT.NONE);
+      GridDataFactory.fillDefaults().indent(0, 10/* DEFAULT_V_DISTANCE_PARAGRAPH */).applyTo(btnComputValues);
+      btnComputValues.setText(Messages.Compute_BreakTime_Button_ComputeAllTours);
+      btnComputValues.setToolTipText(Messages.Compute_BreakTime_Button_ComputeAllTours_Tooltip);
+      btnComputValues.addSelectionListener(new SelectionAdapter() {
+         @Override
+         public void widgetSelected(final SelectionEvent e) {
+            //onComputeBreakTimeValues();
+         }
+      });
 
       return container;
    }

@@ -167,6 +167,8 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
    float        colCadenceMultiplier;
 
+   String       colHikingVsRunning;
+
    // ----------- Running Dynamics ---------
 
    int   colRunDyn_StanceTime_Min;

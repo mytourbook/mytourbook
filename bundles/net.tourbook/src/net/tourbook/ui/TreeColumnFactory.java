@@ -943,7 +943,7 @@ public abstract class TreeColumnFactory {
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Powertrain);
             colDef.setColumnLabel("Hiking vs Running");//Messages.ColumnFactory_GearTeeth_Label);
             colDef.setColumnHeaderText("% - %");//Messages.ColumnFactory_GearTeeth_Header);
-            //colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_GearTeeth_Tooltip);
+            colDef.setColumnHeaderToolTipText("Hiking vs Running");//Messages.ColumnFactory_GearTeeth_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 

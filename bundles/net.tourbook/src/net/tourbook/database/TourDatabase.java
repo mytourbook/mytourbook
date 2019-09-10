@@ -103,7 +103,7 @@ public class TourDatabase {
    /**
     * Version for the database which is required that the tourbook application works successfully
     */
-   private static final int TOURBOOK_DB_VERSION = 40;
+   private static final int TOURBOOK_DB_VERSION = 41;
 //   private static final int TOURBOOK_DB_VERSION = 39; // 19.7 ?
 //   private static final int TOURBOOK_DB_VERSION = 38; // 19.5 ?
 //   private static final int TOURBOOK_DB_VERSION = 37; // 19.2
@@ -2950,6 +2950,13 @@ public class TourDatabase {
             //
             // version 40 end
 
+            // version 41 start  -  19.X
+            //
+            + " cadenceZoneHiking                     INTEGER DEFAULT -1,                 \n" //$NON-NLS-1$
+            + " cadenceZoneRunning                    INTEGER DEFAULT -1,                 \n" //$NON-NLS-1$
+            //
+            // version 41 end
+
             //            // version 35 start  -  18.?
             //            //
             //            + " LatitudeMinE6         INTEGER DEFAULT 0,                        \n" //$NON-NLS-1$
@@ -4691,6 +4698,11 @@ public class TourDatabase {
          // 39 -> 40
          if (currentDbVersion == 39) {
             currentDbVersion = newVersion = updateDbDesign_039_to_040(conn, splashManager);
+         }
+
+         // 40 -> 41
+         if (currentDbVersion == 40) {
+            currentDbVersion = newVersion = updateDbDesign_040_to_041(conn, splashManager);
          }
 
          /*
@@ -7131,6 +7143,34 @@ public class TourDatabase {
 
             // Add new columns
             SQL.AddCol_VarCar   (stmt, TABLE_TOUR_DATA, "power_DataSource",  TourData.DB_LENGTH_POWER_DATA_SOURCE);   //$NON-NLS-1$
+
+// SET_FORMATTING_ON
+         }
+      }
+      stmt.close();
+
+      logDb_UpdateEnd(newDbVersion);
+
+      return newDbVersion;
+   }
+
+   private int updateDbDesign_040_to_041(final Connection conn, final SplashManager splashManager) throws SQLException {
+
+      final int newDbVersion = 41;
+
+      logDb_UpdateStart(newDbVersion);
+      updateMonitor(splashManager, newDbVersion);
+
+      final Statement stmt = conn.createStatement();
+      {
+         // check if db is updated to version 41
+         if (isColumnAvailable(conn, TABLE_TOUR_DATA, "cadenceZoneHiking") == false) { //$NON-NLS-1$
+
+// SET_FORMATTING_OFF
+
+            // Add new columns
+            SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "cadenceZoneHiking", DEFAULT_0);//$NON-NLS-1$
+            SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "cadenceZoneRunning", DEFAULT_0); //$NON-NLS-1$
 
 // SET_FORMATTING_ON
          }

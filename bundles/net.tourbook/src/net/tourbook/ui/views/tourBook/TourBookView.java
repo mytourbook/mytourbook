@@ -1880,9 +1880,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            final long value = ((TVITourBookItem) element).colRearShiftCount;
+            final String value = ((TVITourBookItem) element).colHikingVsRunning;
 
-            cell.setText("30 - 70");
+            cell.setText(value);//"30 - 70");
 
             setCellColor(cell, element);
          }

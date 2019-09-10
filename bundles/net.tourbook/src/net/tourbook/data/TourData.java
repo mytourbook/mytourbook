@@ -420,6 +420,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private int                   hrZone9                        = -1;                     // db-version 16
 
    /**
+    * Time spent in the "Hiking" cadence zone.
+    */
+   private int                   cadenceZoneHiking                        = -1;                     // db-version 41
+   /**
+    * Time spent in the "Running" cadence zone.
+    */
+   private int                   cadenceZoneRunning                        = -1;                     // db-version 41
+
+   /**
     * A flag indicating that the pulse is from a sensor. This is the state of the device which is
     * not related to the availability of pulse data. Pulse data should be available but is not
     * checked.<br>
