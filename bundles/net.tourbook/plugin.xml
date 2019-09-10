@@ -1076,39 +1076,6 @@ THIS IS NOT YET FULLY IMPLEMENTED
          
       </menuContribution>
 
-      <!--
-      
-         Tagged Tours
-      
-      -->
-      <menuContribution locationURI="toolbar:net.tourbook.ui.views.tagging.TourTags_View?after=group_AfterSaveTour">
-
-         <!-- Save Tour -->
-         <command
-            commandId      ="command.net.tourbook.tour.SaveTour"
-            mnemonic       ="%Command_App_SaveTour_Mnemonic"
-            tooltip        ="%Command_App_SaveTour_Tooltip"
-         >
-            <parameter 
-               name="net.tourbook.parameter.isInTourTagsToolbar"
-               value="true"
-            />
-         </command>
-
-         <!-- Restore Tour -->
-         <command
-            commandId      ="command.net.tourbook.tour.RestoreTour"
-            mnemonic       ="%Command_App_RestoreTour_Mnemonic"
-            tooltip        ="%Command_App_RestoreTour_Tooltip"
-         >
-            <parameter 
-               name="net.tourbook.parameter.isInTourTagsToolbar"
-               value="true"
-            />
-         </command>
-         
-      </menuContribution>
-
 
       <!--
          Photo folder (PicDirView)

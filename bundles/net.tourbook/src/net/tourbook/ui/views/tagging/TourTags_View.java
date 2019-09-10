@@ -59,13 +59,11 @@ import net.tourbook.ui.action.ActionExpandAll;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -105,13 +103,11 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
@@ -127,10 +123,13 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.dialogs.ContainerCheckedTreeViewer;
 import org.eclipse.ui.part.ViewPart;
+import org.eclipse.ui.services.IEvaluationService;
 
 public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer, ISaveablePart, IRestorablePart {
 
    static public final String         ID                                        = "net.tourbook.ui.views.tagging.TourTags_View"; //$NON-NLS-1$
+
+   private static final String        COMMAND_EXPRESSION_TOUR_EDITOR_IS_DIRTY   = "net.tourbook.expression.TourEditor.isDirty";  //$NON-NLS-1$
 
    private static final String        STATE_IS_HIERARCHICAL_LAYOUT              = "STATE_IS_HIERARCHICAL_LAYOUT";                //$NON-NLS-1$
    private static final String        STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS    = "STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS";      //$NON-NLS-1$
@@ -177,16 +176,17 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
    private long                                _expandRunnableCounter;
 
-   private Action_CollapseAll_WithoutSelection _actionCollapseAll;
-   private ActionExpandAll                     _actionExpandAll;
-   private Action_SingleExpand_CollapseOthers  _actionSingleExpandCollapseOthers;
+   private Action_CollapseAll_WithoutSelection _action_CollapseAll;
+   private ActionExpandAll                     _action_ExpandAll;
+   private Action_SingleExpand_CollapseOthers  _action_SingleExpandCollapseOthers;
    private ActionOpenPrefDialog                _action_PrefDialog;
-   private ActionTagLayout                     _actionTagLayout;
-   private ActionTagFilter                     _actionTagFilter;
-//   private Action_TourTag_Options             _actionTourTagOptions;
+   private Action_RestoreTags                  _action_RestoreTags;
+   private Action_SaveTags                     _action_SaveTags;
+   private ActionTagLayout                     _action_TagLayout;
+   private ActionTagFilter                     _action_TagFilter;
 
-   private PixelConverter _pc;
-   private MenuManager    _viewerMenuManager;
+   private PixelConverter                      _pc;
+   private MenuManager                         _viewerMenuManager;
 
    /*
     * Image resources
@@ -206,8 +206,6 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
    private Menu      _treeContextMenu;
 
    private Label     _lblHeader;
-
-   private ToolBar   _toolbarSaveUndo;
 
    private class Action_CollapseAll_WithoutSelection extends ActionCollapseAll {
 
@@ -245,6 +243,46 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 //      }
 //   }
 
+   private class Action_RestoreTags extends Action {
+
+      public Action_RestoreTags() {
+
+         super(UI.EMPTY_STRING, AS_PUSH_BUTTON);
+
+         setToolTipText(Messages.Action_Tag_Restore_Tooltip);
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__RestoreTags));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__RestoreTags_Disabled));
+      }
+
+      @Override
+      public void run() {
+
+         doRestore();
+
+         updateCommandHandler();
+      }
+   }
+
+   private class Action_SaveTags extends Action {
+
+      public Action_SaveTags() {
+
+         super(UI.EMPTY_STRING, AS_PUSH_BUTTON);
+
+         setToolTipText(Messages.Action_Tag_Save_Tooltip);
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__SaveTags));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__SaveTags_Disabled));
+      }
+
+      @Override
+      public void run() {
+
+         doSave(null);
+
+         updateCommandHandler();
+      }
+   }
+
    private class Action_SingleExpand_CollapseOthers extends Action {
 
       public Action_SingleExpand_CollapseOthers() {
@@ -257,12 +295,13 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
       }
    }
 
-   public class ActionTagFilter extends Action {
+   private class ActionTagFilter extends Action {
 
       public ActionTagFilter() {
 
          super(UI.EMPTY_STRING, AS_CHECK_BOX);
 
+         setToolTipText(Messages.Action_Tag_Filter_Tooltip);
          setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TagsChecked));
          setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TagsChecked_Disabled));
       }
@@ -295,7 +334,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
     * <br>
     * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
     */
-   class TagComparer implements IElementComparer {
+   private class TagComparer implements IElementComparer {
 
       @Override
       public boolean equals(final Object a, final Object b) {
@@ -328,7 +367,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
       }
    }
 
-   public class TagFilter extends ViewerFilter {
+   private class TagFilter extends ViewerFilter {
 
       @Override
       public boolean select(final Viewer viewer, final Object parentElement, final Object element) {
@@ -642,24 +681,16 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
       updateUI_NumberOfTours();
    }
 
-   /**
-    * Close all opened dialogs except the opening dialog.
-    *
-    * @param openingDialog
-    */
-//   private void closeOpenedDialogs(final IOpeningDialog openingDialog) {
-//      _openDlgMgr.closeOpenedDialogs(openingDialog);
-//   }
-
    private void createActions() {
 
-      _actionExpandAll = new ActionExpandAll(this);
-      _actionCollapseAll = new Action_CollapseAll_WithoutSelection(this);
+      _action_ExpandAll = new ActionExpandAll(this);
+      _action_CollapseAll = new Action_CollapseAll_WithoutSelection(this);
       _action_PrefDialog = new ActionOpenPrefDialog(Messages.action_tag_open_tagging_structure, PrefPageTags.ID);
-      _actionTagLayout = new ActionTagLayout();
-      _actionTagFilter = new ActionTagFilter();
-//      _actionTourTagOptions = new Action_TourTag_Options();
-      _actionSingleExpandCollapseOthers = new Action_SingleExpand_CollapseOthers();
+      _action_RestoreTags = new Action_RestoreTags();
+      _action_SaveTags = new Action_SaveTags();
+      _action_SingleExpandCollapseOthers = new Action_SingleExpand_CollapseOthers();
+      _action_TagLayout = new ActionTagLayout();
+      _action_TagFilter = new ActionTagFilter();
    }
 
    private void createMenuManager() {
@@ -692,7 +723,6 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
       createActions();
       fillToolbar();
-      fillActionBar();
 
       addPartListener();
       addSelectionListener();
@@ -774,17 +804,10 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
                }
             });
             UI.setButtonLayoutData(_btnUncheckAllTags);
-            final GridData gd = (GridData) _btnUncheckAllTags.getLayoutData();
+//            final GridData gd = (GridData) _btnUncheckAllTags.getLayoutData();
 //            gd.horizontalAlignment = SWT.END;
 //            gd.grabExcessHorizontalSpace = true;
          }
-//         {
-//            /*
-//             * Toolbar: Save/Undo
-//             */
-//            _toolbarSaveUndo = new ToolBar(container, SWT.FLAT);
-//            GridDataFactory.fillDefaults().indent(10, 0).applyTo(_toolbarSaveUndo);
-//         }
       }
    }
 
@@ -1090,8 +1113,12 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
       super.dispose();
    }
 
+   @SuppressWarnings("unchecked")
    @Override
    public void doRestore() {
+
+      final ArrayList<TourData> allLastSelectedTours = (ArrayList<TourData>) _allSelectedTours.clone();
+      updateUI_Tags_FromTourData(allLastSelectedTours);
 
       _isTagDirty = false;
 
@@ -1146,13 +1173,14 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
       boolean isTourAvailable = _allSelectedTours.size() > 0;
       isTourAvailable = true;
 
-      _actionCollapseAll.setEnabled(isTourAvailable && _isHierarchicalLayout);
-      _actionExpandAll.setEnabled(isTourAvailable && _isHierarchicalLayout);
+      _action_CollapseAll.setEnabled(isTourAvailable && _isHierarchicalLayout);
+      _action_ExpandAll.setEnabled(isTourAvailable && _isHierarchicalLayout);
 
-      _actionTagFilter.setEnabled(isTourAvailable);
-      _actionTagLayout.setEnabled(isTourAvailable);
+      _action_TagFilter.setEnabled(isTourAvailable);
+      _action_TagLayout.setEnabled(isTourAvailable);
 
-//      _actionUndoChanges.setEnabled(isTourAvailable && _isTagDirty);
+      _action_SaveTags.setEnabled(isTourAvailable && _isTagDirty);
+      _action_RestoreTags.setEnabled(isTourAvailable && _isTagDirty);
 
       _tagViewer.getTree().setEnabled(isTourAvailable);
    }
@@ -1173,24 +1201,10 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
       }
    }
 
-   private void fillActionBar() {
-
-      /*
-       * fill exit toolbar
-       */
-      final ToolBarManager toolbarManager = new ToolBarManager(_toolbarSaveUndo);
-
-//      toolbarManager.add(_actionPinSlideout);
-//      toolbarManager.add(_actionKeepSlideoutOpen);
-//      toolbarManager.add(_actionCloseSlideout);
-
-      toolbarManager.update(true);
-   }
-
    private void fillContextMenu(final IMenuManager menuMgr) {
 
       menuMgr.add(new Separator());
-      menuMgr.add(_actionSingleExpandCollapseOthers);
+      menuMgr.add(_action_SingleExpandCollapseOthers);
    }
 
    private void fillToolbar() {
@@ -1202,21 +1216,18 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
        */
       final IToolBarManager tbm = actionBars.getToolBarManager();
 
-      tbm.add(_actionTagFilter);
-      tbm.add(_actionTagLayout);
-      tbm.add(_actionExpandAll);
-      tbm.add(_actionCollapseAll);
+      tbm.add(_action_SaveTags);
+      tbm.add(_action_RestoreTags);
+
+      tbm.add(new Separator());
+
+      tbm.add(_action_TagFilter);
+      tbm.add(_action_TagLayout);
+
+      tbm.add(_action_ExpandAll);
+      tbm.add(_action_CollapseAll);
+
       tbm.add(_action_PrefDialog);
-//      tbm.add(_actionTourTagOptions);
-
-      tbm.add(new GroupMarker("group_AfterSaveTour")); //$NON-NLS-1$
-
-      /*
-       * fill toolbar view menu
-       */
-//      final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
-//
-//      menuMgr.add(_actionUndoChanges);
    }
 
    @Override
@@ -1350,7 +1361,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
    private void onAction_SingleExpandCollapseOthers() {
 
-      _isBehaviourSingleExpandedOthersCollapse = _actionSingleExpandCollapseOthers.isChecked();
+      _isBehaviourSingleExpandedOthersCollapse = _action_SingleExpandCollapseOthers.isChecked();
    }
 
    private void onAction_TagFilter() {
@@ -1394,7 +1405,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
             // the tree cannot show only checked tags -> show all tags in the tree but with ckecked tags
 
             _isShowOnlyCheckedTags = false;
-            _actionTagFilter.setChecked(false);
+            _action_TagFilter.setChecked(false);
 
             updateUI_TagFilter();
          }
@@ -1416,10 +1427,16 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
    private void onAction_UncheckAllTags() {
 
+      _isTagDirty = true;
+
       _allCheckedTagIds.clear();
       _allTaggedTours.clear();
 
       _tagViewer.refresh();
+
+      enableControls();
+
+      updateCommandHandler();
    }
 
    private void onSelect_SortColumn(final SelectionEvent e) {
@@ -1794,13 +1811,13 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
    private void restoreState() {
 
-      _actionTagFilter.setChecked(_isShowOnlyCheckedTags);
+      _action_TagFilter.setChecked(_isShowOnlyCheckedTags);
 
       _isBehaviourSingleExpandedOthersCollapse = Util.getStateBoolean(
             _state,
             STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS,
             false);
-      _actionSingleExpandCollapseOthers.setChecked(_isBehaviourSingleExpandedOthersCollapse);
+      _action_SingleExpandCollapseOthers.setChecked(_isBehaviourSingleExpandedOthersCollapse);
 
       updateUI_TagLayoutAction();
       updateUI_TagFilter();
@@ -1830,7 +1847,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
       _state.put(STATE_SORT_COLUMN_ID, _tagViewerComparator.__sortColumnId);
       _state.put(STATE_SORT_COLUMN_DIRECTION, _tagViewerComparator.__sortDirection);
 
-      _state.put(STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS, _actionSingleExpandCollapseOthers.isChecked());
+      _state.put(STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS, _action_SingleExpandCollapseOthers.isChecked());
    }
 
    @Override
@@ -1850,6 +1867,16 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
    @Override
    public void updateColumnHeader(final ColumnDefinition colDef) {}
+
+   /**
+    * Enable/disable save/restore actions in the app toolbar
+    */
+   private void updateCommandHandler() {
+
+      final IEvaluationService evalService = PlatformUI.getWorkbench().getService(IEvaluationService.class);
+
+      evalService.requestEvaluation(COMMAND_EXPRESSION_TOUR_EDITOR_IS_DIRTY);
+   }
 
    /**
     * Update view header which shows the number of selected tour(s) and tags.
@@ -1922,13 +1949,13 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
       if (_isShowOnlyCheckedTags) {
 
-         _actionTagFilter.setToolTipText(Messages.Tour_Tags_Action_TagCheckFilter_AllTags_Tooltip);
+         _action_TagFilter.setToolTipText(Messages.Tour_Tags_Action_TagCheckFilter_AllTags_Tooltip);
 
          _tagViewer.addFilter(_tagFilter);
 
       } else {
 
-         _actionTagFilter.setToolTipText(Messages.Tour_Tags_Action_TagCheckFilter_OnlyTaggedTours_Tooltip);
+         _action_TagFilter.setToolTipText(Messages.Tour_Tags_Action_TagCheckFilter_OnlyTaggedTours_Tooltip);
 
          _tagViewer.removeFilter(_tagFilter);
       }
@@ -1940,17 +1967,17 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
          // hierarchy is displayed -> show icon/tooltip for flat view
 
-         _actionTagLayout.setToolTipText(Messages.Tour_Tags_Action_Layout_Flat_Tooltip);
-         _actionTagLayout.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TagLayout_Flat));
-         _actionTagLayout.setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TagLayout_Flat_Disabled));
+         _action_TagLayout.setToolTipText(Messages.Tour_Tags_Action_Layout_Flat_Tooltip);
+         _action_TagLayout.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TagLayout_Flat));
+         _action_TagLayout.setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TagLayout_Flat_Disabled));
 
       } else {
 
          // flat view is displayed -> show icon/tooltip for hierarchy view
 
-         _actionTagLayout.setToolTipText(Messages.Tour_Tags_Action_Layout_Hierarchical_Tooltip);
-         _actionTagLayout.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TagLayout_Hierarchical));
-         _actionTagLayout.setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TagLayout_Hierarchical_Disabled));
+         _action_TagLayout.setToolTipText(Messages.Tour_Tags_Action_Layout_Hierarchical_Tooltip);
+         _action_TagLayout.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TagLayout_Hierarchical));
+         _action_TagLayout.setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TagLayout_Hierarchical_Disabled));
       }
    }
 

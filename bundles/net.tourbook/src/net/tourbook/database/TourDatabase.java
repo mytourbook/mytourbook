@@ -1751,13 +1751,13 @@ public class TourDatabase {
    public static String getTagNamesText(final Set<Long> alltagIds, final boolean isVertical) {
 
       // ensure tour types are loaded
-      getAllTourTypes();
+      getAllTourTags();
 
       final ArrayList<String> tagNames = new ArrayList<>();
 
       for (final Long tagId : alltagIds) {
-         TourType tourType = _dbTourTypeIds.get(tagId);
-         tagNames.add(tourType.getName());
+         final TourTag tourTag = _allTourTags.get(tagId);
+         tagNames.add(tourTag.getTagName());
       }
 
       return getTagNamesText(tagNames, isVertical);

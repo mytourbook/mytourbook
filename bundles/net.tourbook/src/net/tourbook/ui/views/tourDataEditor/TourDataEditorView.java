@@ -7646,22 +7646,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, IRest
        * "*" marker in the part name
        */
       firePropertyChange(PROP_DIRTY);
-
-      /**
-       * Enable restore action is also done with firePropertyChange, however it only works with
-       * <enabledWhen> but do not work with <activeWhen>
-       * <p>
-       * IEvaluationService.requestEvaluation(..) could be another option to enable commands/handler
-       * with property tester.
-       */
-//      final IWorkbench workbench = PlatformUI.getWorkbench();
-//      final IEvaluationService evalService = workbench.getService(IEvaluationService.class);
-
-//      evalService.requestEvaluation(ISources.ACTIVE_PART_NAME);
-
-//      evalService.requestEvaluation("net.tourbook.propertyTester.TourEditor_Tester");
-//      evalService.requestEvaluation("command.net.tourbook.tour.RestoreTour");
-//      evalService.requestEvaluation("net.tourbook.expression.TourEditor.isDirty");
    }
 
    /**

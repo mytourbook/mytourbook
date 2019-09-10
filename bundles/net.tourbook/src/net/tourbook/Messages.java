@@ -326,6 +326,9 @@ public class Messages extends NLS {
    public static String        Action_Tag_DeleteCategory;
    public static String        Action_Tag_Edit;
    public static String        Action_Tag_Edit_Tooltip;
+   public static String        Action_Tag_Filter_Tooltip;
+   public static String        Action_Tag_Restore_Tooltip;
+   public static String        Action_Tag_Save_Tooltip;
    public static String        Action_Tag_SetTags;
 
    public static String        Action_TagCategory_DeleteCategory;
@@ -982,6 +985,8 @@ public class Messages extends NLS {
    public static String        Image__RawData_TransferDirect;
    public static String        Image__Remove;
    public static String        Image__Remove_Disabled;
+   public static String        Image__RestoreTags;
+   public static String        Image__RestoreTags_Disabled;
    public static String        Image__refresh;
    public static String        Image__remove_all;
    public static String        Image__remove_all_disabled;
