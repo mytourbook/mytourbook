@@ -107,6 +107,8 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.eclipse.ui.dialogs.PreferenceLinkArea;
+import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 
 public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferencePage {
 
@@ -687,6 +689,11 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          tabItemHRZone.setText(Messages.Pref_People_Tab_HRZone);
          tabItemHRZone.setControl(createUI_60_Tab_HRZone(_tabFolderPerson));
 
+         // tab: cadence zones
+         final TabItem tabItemCadenceZones = new TabItem(_tabFolderPerson, SWT.NONE);
+         tabItemCadenceZones.setText("Zones de cadence");//Messages.Pref_People_Tab_HRZone);
+         tabItemCadenceZones.setControl(createUI_70_CadenceZones(_tabFolderPerson));
+
          // tab: data transfer
          final TabItem tabItemDataTransfer = new TabItem(_tabFolderPerson, SWT.NONE);
          tabItemDataTransfer.setText(Messages.Pref_People_Tab_DataTransfer);
@@ -1081,6 +1088,30 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
             _cboHrMaxFormula.add(formulaName);
          }
       }
+   }
+
+   private Control createUI_70_CadenceZones(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.swtDefaults().extendedMargins(5, 5, 10, 5).numColumns(1).applyTo(container);
+      {
+         final PreferenceLinkArea prefLink = new PreferenceLinkArea(
+               container,
+               SWT.NONE,
+               PrefPagePeople.ID,
+               Messages.Compute_HrZone_Link,
+               (IWorkbenchPreferenceContainer) getContainer(),
+               new PrefPagePeopleData(PrefPagePeople.PREF_DATA_SELECT_HR_ZONES, null));
+
+         GridDataFactory
+               .fillDefaults()//
+               .grab(true, false)
+               .hint(80, SWT.DEFAULT)
+               .applyTo(prefLink.getControl());
+      }
+
+      return container;
    }
 
    private void createUI_70_HrZone(final Composite parent) {

@@ -941,8 +941,8 @@ public abstract class TreeColumnFactory {
                   SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Powertrain);
-            colDef.setColumnLabel("HIKE ZONE");//Messages.ColumnFactory_GearTeeth_Label);
-            colDef.setColumnHeaderText("Hiking vs Running");//Messages.ColumnFactory_GearTeeth_Header);
+            colDef.setColumnLabel("Hiking vs Running");//Messages.ColumnFactory_GearTeeth_Label);
+            colDef.setColumnHeaderText("% - %");//Messages.ColumnFactory_GearTeeth_Header);
             //colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_GearTeeth_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
