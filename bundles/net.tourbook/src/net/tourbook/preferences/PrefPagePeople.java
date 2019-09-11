@@ -1961,8 +1961,8 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
       if (MessageDialog.openConfirm(
             Display.getCurrent().getActiveShell(),
-            Messages.Compute_BreakTime_Dialog_ComputeForAllTours_Title,
-            Messages.Compute_BreakTime_Dialog_ComputeForAllTours_Message) == false) {
+            "Youre sure to compute cadence times ?", //Messages.Compute_BreakTime_Dialog_ComputeForAllTours_Title,
+            "Youre sure to compute cadence times ?") == false) {// Messages.Compute_BreakTime_Dialog_ComputeForAllTours_Message) {// == false) {
          return;
       }
 
@@ -1983,11 +1983,28 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
             oldBreakTime[0] += tourRecordingTime - tourDrivingTime;
 
             // force the break time to be recomputed with the current values which are already store in the pref store
-            oldTourData.setBreakTimeSerie(null);
+           // oldTourData.setBreakTimeSerie(null);
 
             // recompute break time
-            oldTourData.computeTourDrivingTime();
+           // oldTourData.computeTourDrivingTime();
+            int cadenceZoneRunningTIme = 0;
+            int cadenceZoneHikingTIme = 0;
 
+            if (oldTourData.getCadenceSerie() == null) {
+               return false;
+            }
+
+            for (final float toto : oldTourData.getCadenceSerie()) {
+               if (toto >= 70) {
+                  ++cadenceZoneRunningTIme;
+               } else {
+                  ++cadenceZoneHikingTIme;
+               }
+
+            }
+
+            oldTourData.setCadenceZoneHikingTime(cadenceZoneHikingTIme);
+            oldTourData.setCadenceZoneRunningTime(cadenceZoneRunningTIme);
             return true;
          }
 
