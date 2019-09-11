@@ -1263,6 +1263,7 @@ public class Messages extends NLS {
    public static String        Log_SetTimeZone_001_Start_FromGeo;
    public static String        Log_SetTimeZone_001_Start_FromList;
    public static String        Log_SetTimeZone_001_Start_Remove;
+   public static String        Log_SetTimeZone_001_Start_YYMMDD;
    public static String        Log_SetTimeZone_002_End;
    public static String        Log_SetTimeZone_010_SetSelected;
    public static String        Log_SetTimeZone_011_SetFromGeo;
