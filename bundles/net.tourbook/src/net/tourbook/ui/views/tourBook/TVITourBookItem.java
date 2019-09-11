@@ -66,7 +66,9 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             + "FrontShiftCount,           " + NL //$NON-NLS-1$
             + "RearShiftCount,            " + NL //$NON-NLS-1$
 
-            + "surfing_NumberOfEvents     " + NL //$NON-NLS-1$
+            + "surfing_NumberOfEvents,    " + NL //$NON-NLS-1$
+
+            + "cadenceZoneHiking          " + NL //$NON-NLS-1$
       ;
 
       SQL_SUM_COLUMNS = NL
@@ -98,7 +100,9 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             + "SUM( CAST(FrontShiftCount AS BIGINT)),       " + NL // 19   //$NON-NLS-1$
             + "SUM( CAST(RearShiftCount AS BIGINT)),        " + NL // 20   //$NON-NLS-1$
 
-            + "SUM( CAST(Surfing_NumberOfEvents AS BIGINT)) " + NL // 21   //$NON-NLS-1$
+            + "SUM( CAST(Surfing_NumberOfEvents AS BIGINT)), " + NL // 21   //$NON-NLS-1$
+
+            + "AVG( CASE WHEN cadenceZoneHiking = 0         THEN NULL ELSE cadenceZoneHiking END),          " + NL //                              9   //$NON-NLS-1$
       ;
 
    }
@@ -281,7 +285,15 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
 // SET_FORMATTING_ON
 
+
       colPausedTime = colTourRecordingTime - colTourDrivingTime;
+
+      //     //TOTO Here is the result for week?, month, year
+      // so we need the average
+      final int cadenceZoneHikingTime = result.getInt(startIndex + 22) == -1 ? 0 : result.getInt(startIndex + 22);
+      //final String cadenceZoneRunningTime = result.getInt(80) == -1 ? "0" : String.valueOf(result.getInt(80));
+      // percentage = cadenceZoneTime * 100 / colTourRecordingTime;
+      colHikingVsRunning = cadenceZoneHikingTime + " - " + "-2";
    }
 
    @Override

@@ -107,8 +107,6 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
-import org.eclipse.ui.dialogs.PreferenceLinkArea;
-import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 
 public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferencePage {
 
@@ -1096,19 +1094,20 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.swtDefaults().extendedMargins(5, 5, 10, 5).numColumns(1).applyTo(container);
       {
-         final PreferenceLinkArea prefLink = new PreferenceLinkArea(
-               container,
-               SWT.NONE,
-               PrefPagePeople.ID,
-               Messages.Compute_HrZone_Link,
-               (IWorkbenchPreferenceContainer) getContainer(),
-               new PrefPagePeopleData(PrefPagePeople.PREF_DATA_SELECT_HR_ZONES, null));
 
-         GridDataFactory
-               .fillDefaults()//
-               .grab(true, false)
-               .hint(80, SWT.DEFAULT)
-               .applyTo(prefLink.getControl());
+         /*
+          * label: unit
+          */
+         final Label label = new Label(container, SWT.NONE);
+         label.setText("toto");//net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit);
+
+         final Composite containerHr = new Composite(container, SWT.NONE);
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(containerHr);
+         GridLayoutFactory.fillDefaults().numColumns(3).applyTo(containerHr);
+         {
+            createUI_71_CadenceDifferentiator(containerHr);
+            //createUI_72_MaxHR(containerHr);
+         }
 
 
       }
@@ -1116,12 +1115,12 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       // button: compute computed values
       final Button btnComputValues = new Button(container, SWT.NONE);
       GridDataFactory.fillDefaults().indent(0, 10/* DEFAULT_V_DISTANCE_PARAGRAPH */).applyTo(btnComputValues);
-      btnComputValues.setText(Messages.Compute_BreakTime_Button_ComputeAllTours);
+      btnComputValues.setText("Calculer les temps pour chaque zone de cadence");//Messages.Compute_BreakTime_Button_ComputeAllTours);
       btnComputValues.setToolTipText(Messages.Compute_BreakTime_Button_ComputeAllTours_Tooltip);
       btnComputValues.addSelectionListener(new SelectionAdapter() {
          @Override
          public void widgetSelected(final SelectionEvent e) {
-            //onComputeBreakTimeValues();
+            onComputeCadenceZonesTimeValues();
          }
       });
 
@@ -1164,6 +1163,62 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
                }
             }
          });
+      }
+   }
+
+   /**
+    * field: Selection of the cadence differentiating hiking from running.
+    */
+   private void createUI_71_CadenceDifferentiator(final Composite parent) {
+
+      Label label = new Label(parent, SWT.NONE);
+      label.setText("0 rpm");//Messages.Pref_People_Label_RestingHR);
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults()//
+//          .span(2, 1)
+            .applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      {
+         // spinner: weight
+         _spinnerRestingHR = new Spinner(container, SWT.BORDER);
+         GridDataFactory.fillDefaults() //
+               .align(SWT.BEGINNING, SWT.FILL)
+//             .hint(_spinnerWidth, SWT.DEFAULT)
+               .applyTo(_spinnerRestingHR);
+         _spinnerRestingHR.setMinimum(10);
+         _spinnerRestingHR.setMaximum(200);
+         _spinnerRestingHR.addSelectionListener(_defaultSelectionListener);
+         _spinnerRestingHR.addMouseWheelListener(new MouseWheelListener() {
+            @Override
+            public void mouseScrolled(final MouseEvent event) {
+               UI.adjustSpinnerValueOnMouseScroll(event);
+               onModifyPerson();
+            }
+         });
+
+         // label: unit
+         label = new Label(container, SWT.NONE);
+         label.setText(net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit);
+      }
+
+      final Composite containerAge = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults()//
+            .grab(true, false)
+            .align(SWT.END, SWT.FILL)
+            .applyTo(containerAge);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerAge);
+//    containerAge.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+      {
+         /*
+          * label: age
+          */
+         label = new Label(containerAge, SWT.NONE);
+         GridDataFactory.fillDefaults()//
+               .grab(true, true)
+               .align(SWT.END, SWT.CENTER)
+               .applyTo(label);
+         label.setText("140 rpm");//Messages.Pref_People_Label_Age);
       }
    }
 
@@ -1726,6 +1781,15 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       }
    }
 
+   private void fireTourModifyEvent() {
+
+      TourManager.getInstance().removeAllToursFromCache();
+      TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR);
+
+      // fire unique event for all changes
+      TourManager.fireEvent(TourEventId.ALL_TOURS_ARE_MODIFIED);
+   }
+
    private ZonedDateTime getBirthdayFromUI() {
 
       return ZonedDateTime.of(
@@ -1891,6 +1955,80 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       enableActions();
 
       _peopleViewer.getTable().setFocus();
+   }
+
+   private void onComputeCadenceZonesTimeValues() {
+
+      if (MessageDialog.openConfirm(
+            Display.getCurrent().getActiveShell(),
+            Messages.Compute_BreakTime_Dialog_ComputeForAllTours_Title,
+            Messages.Compute_BreakTime_Dialog_ComputeForAllTours_Message) == false) {
+         return;
+      }
+
+      saveState();
+
+      final int[] oldBreakTime = { 0 };
+      final int[] newBreakTime = { 0 };
+
+      final IComputeTourValues computeTourValueConfig = new IComputeTourValues() {
+
+         @Override
+         public boolean computeTourValues(final TourData oldTourData) {
+
+            final int tourRecordingTime = (int) oldTourData.getTourRecordingTime();
+
+            // get old break time
+            final int tourDrivingTime = (int) oldTourData.getTourDrivingTime();
+            oldBreakTime[0] += tourRecordingTime - tourDrivingTime;
+
+            // force the break time to be recomputed with the current values which are already store in the pref store
+            oldTourData.setBreakTimeSerie(null);
+
+            // recompute break time
+            oldTourData.computeTourDrivingTime();
+
+            return true;
+         }
+
+         @Override
+         public String getResultText() {
+
+            return NLS.bind(
+                  Messages.Compute_BreakTime_ForAllTour_Job_Result, //
+                  new Object[] {
+                        net.tourbook.common.UI.format_hh_mm_ss(oldBreakTime[0]),
+                        net.tourbook.common.UI.format_hh_mm_ss(newBreakTime[0]), });
+         }
+
+         @Override
+         public String getSubTaskText(final TourData savedTourData) {
+
+            String subTaskText = null;
+
+            if (savedTourData != null) {
+
+               // get new value
+               final int tourRecordingTime = (int) savedTourData.getTourRecordingTime();
+
+               // get old break time
+               final int tourDrivingTime = (int) savedTourData.getTourDrivingTime();
+               newBreakTime[0] += tourRecordingTime - tourDrivingTime;
+
+               subTaskText = NLS.bind(
+                     Messages.Compute_BreakTime_ForAllTour_Job_SubTask,//
+                     new Object[] {
+                           net.tourbook.common.UI.format_hh_mm_ss(oldBreakTime[0]),
+                           net.tourbook.common.UI.format_hh_mm_ss(newBreakTime[0]), });
+            }
+
+            return subTaskText;
+         }
+      };
+
+      TourDatabase.computeValuesForAllTours(computeTourValueConfig, null);
+
+      fireTourModifyEvent();
    }
 
    private void onCreateHrZonesFromTemplate() {
