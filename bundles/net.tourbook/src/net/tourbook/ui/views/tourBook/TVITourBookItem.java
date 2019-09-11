@@ -68,7 +68,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
             + "surfing_NumberOfEvents,    " + NL //$NON-NLS-1$
 
-            + "cadenceZoneHiking          " + NL //$NON-NLS-1$
+            + "cadenceZoneHikingTime          " + NL //$NON-NLS-1$
       ;
 
       SQL_SUM_COLUMNS = NL
@@ -102,7 +102,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
             + "SUM( CAST(Surfing_NumberOfEvents AS BIGINT)), " + NL // 21   //$NON-NLS-1$
 
-            + "AVG( CASE WHEN cadenceZoneHiking = 0         THEN NULL ELSE cadenceZoneHiking END),          " + NL //                              9   //$NON-NLS-1$
+            + "AVG( CASE WHEN cadenceZoneHikingTime = 0         THEN NULL ELSE cadenceZoneHikingTime END)          " + NL //                              21   //$NON-NLS-1$
       ;
 
    }

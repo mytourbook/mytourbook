@@ -2952,8 +2952,8 @@ public class TourDatabase {
 
             // version 41 start  -  19.X
             //
-            + " cadenceZoneHiking                     INTEGER DEFAULT -1,                 \n" //$NON-NLS-1$
-            + " cadenceZoneRunning                    INTEGER DEFAULT -1,                 \n" //$NON-NLS-1$
+            + " cadenceZoneHikingTime                     INTEGER DEFAULT -1,                 \n" //$NON-NLS-1$
+            + " cadenceZoneRunningTime                    INTEGER DEFAULT -1,                 \n" //$NON-NLS-1$
             //
             // version 41 end
 
@@ -7164,13 +7164,13 @@ public class TourDatabase {
       final Statement stmt = conn.createStatement();
       {
          // check if db is updated to version 41
-         if (isColumnAvailable(conn, TABLE_TOUR_DATA, "cadenceZoneHiking") == false) { //$NON-NLS-1$
+         if (isColumnAvailable(conn, TABLE_TOUR_DATA, "cadenceZoneHikingTime") == false) { //$NON-NLS-1$
 
 // SET_FORMATTING_OFF
 
             // Add new columns
-            SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "cadenceZoneHiking", DEFAULT_0);//$NON-NLS-1$
-            SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "cadenceZoneRunning", DEFAULT_0); //$NON-NLS-1$
+            SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "cadenceZoneHikingTime", DEFAULT_0);//$NON-NLS-1$
+            SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "cadenceZoneRunningTime", DEFAULT_0); //$NON-NLS-1$
 
 // SET_FORMATTING_ON
          }

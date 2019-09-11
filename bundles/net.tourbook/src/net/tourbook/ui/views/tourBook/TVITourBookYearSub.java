@@ -183,8 +183,8 @@ public class TVITourBookYearSub extends TVITourBookItem {
             + "training_TrainingEffect_Anaerob, " //        77   //$NON-NLS-1$
             + "training_TrainingPerformance, " //            78   //$NON-NLS-1$
 
-            + "cadenceZoneHiking, " //                       79   //$NON-NLS-1$
-            + "cadenceZoneRunning " //                      80   //$NON-NLS-1$
+            + "cadenceZoneHikingTime, " //                       79   //$NON-NLS-1$
+            + "cadenceZoneRunningTime " //                      80   //$NON-NLS-1$
 
             + UI.NEW_LINE
 
@@ -385,9 +385,9 @@ public class TVITourBookYearSub extends TVITourBookItem {
                tourItem.colCadenceMultiplier = dbCadenceMultiplier;
 
                //TOTO Here is the result for a given tour
-               final String cadenceZoneHiking = result.getInt(79) == -1 ? "0" : String.valueOf(result.getInt(79));
-               final String cadenceZoneRunning = result.getInt(80) == -1 ? "0" : String.valueOf(result.getInt(80));
-               tourItem.colHikingVsRunning = cadenceZoneHiking + " - " + cadenceZoneRunning;
+               final String cadenceZoneHikingTime = result.getInt(79) == -1 ? "0" : String.valueOf(result.getInt(79));
+               final String cadenceZoneRunningTime = result.getInt(80) == -1 ? "0" : String.valueOf(result.getInt(80));
+               tourItem.colHikingVsRunning = cadenceZoneHikingTime + " - " + cadenceZoneRunningTime;
 
                // -----------------------------------------------
 

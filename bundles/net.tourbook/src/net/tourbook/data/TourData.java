@@ -420,13 +420,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private int                   hrZone9                        = -1;                     // db-version 16
 
    /**
-    * Time spent in the "Hiking" cadence zone.
+    * Time spent (in seconds) in the "Hiking" cadence zone.
     */
-   private int                   cadenceZoneHiking                        = -1;                     // db-version 41
+   private int                   cadenceZoneHikingTime                        = -1;                     // db-version 41
    /**
-    * Time spent in the "Running" cadence zone.
+    * Time spent (in seconds) in the "Running" cadence zone.
     */
-   private int                   cadenceZoneRunning                        = -1;                     // db-version 41
+   private int                   cadenceZoneRunningTime                        = -1;                     // db-version 41
 
    /**
     * A flag indicating that the pulse is from a sensor. This is the state of the device which is
@@ -10250,5 +10250,21 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       for (final TourMarker tourMarker : tourMarkers) {
          tourMarker.updateDatabase_019_to_020();
       }
+   }
+
+   public int getCadenceZoneHikingTime() {
+      return cadenceZoneHikingTime;
+   }
+
+   public void setCadenceZoneHikingTime(int cadenceZoneHikingTime) {
+      this.cadenceZoneHikingTime = cadenceZoneHikingTime;
+   }
+
+   public int getCadenceZoneRunningTime() {
+      return cadenceZoneRunningTime;
+   }
+
+   public void setCadenceZoneRunningTime(int cadenceZoneRunningTime) {
+      this.cadenceZoneRunningTime = cadenceZoneRunningTime;
    }
 }
