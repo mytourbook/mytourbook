@@ -64,9 +64,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
@@ -94,7 +92,6 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MenuAdapter;
@@ -719,9 +716,9 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
       _columnManager = new ColumnManager(this, _state);
       defineAllColumns();
 
+      createActions();
       createUI(parent);
 
-      createActions();
       fillToolbar();
 
       addPartListener();
@@ -762,14 +759,18 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.swtDefaults().applyTo(container);
+      GridLayoutFactory.swtDefaults().numColumns(1).applyTo(container);
       {
-         _lblHeader = new Label(container, SWT.NONE);
-         _lblHeader.setText(UI.SPACE1);
-         GridDataFactory.fillDefaults()
-               .align(SWT.BEGINNING, SWT.CENTER)
-               .grab(true, true)
-               .applyTo(_lblHeader);
+         {
+            /*
+             * Label: Selected tour(s)
+             */
+            _lblHeader = new Label(container, SWT.NONE);
+            _lblHeader.setText(UI.SPACE1);
+            GridDataFactory.fillDefaults()
+                  .align(SWT.FILL, SWT.CENTER)
+//                  .grab(true, true)
+                  .applyTo(_lblHeader);
 
          createUI_30_Buttons(container);
       }
@@ -1117,6 +1118,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
    @Override
    public void doRestore() {
 
+      // replace with original tour data
       final ArrayList<TourData> allLastSelectedTours = (ArrayList<TourData>) _allSelectedTours.clone();
       updateUI_Tags_FromTourData(allLastSelectedTours);
 
@@ -1130,6 +1132,22 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
    @Override
    public void doSave(final IProgressMonitor monitor) {
 
+      // check if the tour editor contains a modified tour
+      if (TourManager.isTourEditorModified()) {
+         return;
+      }
+
+      final Dialog_SaveTags_Wizard wizard = new Dialog_SaveTags_Wizard(_allSelectedTours, _allCheckedTagIds);
+      final Dialog_SaveTags dialogSaveTags = new Dialog_SaveTags(_parent.getShell(), wizard);
+      if (dialogSaveTags.open() == Window.OK) {
+
+         _isTagDirty = false;
+
+         enableControls();
+
+         firePropertyChange(PROP_DIRTY);
+      }
+
       final int numTagIds = _allCheckedTagIds.size();
       final int numTaggedTours = _allTaggedTours.size();
       final int numSelectedTours = _allSelectedTours.size();
@@ -1138,31 +1156,25 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
       final String dialogMessage = NLS.bind(Messages.Tour_Tags_Dialog_SetTags_Message, tagNames, numSelectedTours);
 
-      // confirm deletion, show tag name and number of tours which contain a tag
-      final Display display = Display.getDefault();
-      final MessageDialog dialog = new MessageDialog(
-            display.getActiveShell(),
-            Messages.Tour_Tags_Dialog_SetTags_Title,
-            null,
-            dialogMessage,
-            MessageDialog.QUESTION,
-            new String[] {
-                  Messages.Tour_Tags_Action_SaveTags,
-                  IDialogConstants.CANCEL_LABEL },
-            1);
-
-      if (dialog.open() == Window.OK) {
-
-         BusyIndicator.showWhile(display, () -> {
-
-         });
-      }
-
-      _isTagDirty = false;
-
-      enableControls();
-
-      firePropertyChange(PROP_DIRTY);
+//      // confirm deletion, show tag name and number of tours which contain a tag
+//      final Display display = Display.getDefault();
+//      final MessageDialog dialog = new MessageDialog(
+//            display.getActiveShell(),
+//            Messages.Tour_Tags_Dialog_SetTags_Title,
+//            null,
+//            dialogMessage,
+//            MessageDialog.QUESTION,
+//            new String[] {
+//                  Messages.Tour_Tags_Action_SaveTags,
+//                  IDialogConstants.CANCEL_LABEL },
+//            1);
+//
+//      if (dialog.open() == Window.OK) {
+//
+//         BusyIndicator.showWhile(display, () -> {
+//
+//         });
+//      }
    }
 
    @Override
@@ -1216,17 +1228,16 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
        */
       final IToolBarManager tbm = actionBars.getToolBarManager();
 
-      tbm.add(_action_SaveTags);
-      tbm.add(_action_RestoreTags);
-
-      tbm.add(new Separator());
-
       tbm.add(_action_TagFilter);
       tbm.add(_action_TagLayout);
 
       tbm.add(_action_ExpandAll);
       tbm.add(_action_CollapseAll);
 
+      tbm.add(new Separator());
+
+      tbm.add(_action_SaveTags);
+      tbm.add(_action_RestoreTags);
       tbm.add(_action_PrefDialog);
    }
 
@@ -1321,7 +1332,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
    @Override
    public boolean isDirty() {
 
-      return _isTagDirty;
+      return _isTagDirty && _allSelectedTours.size() > 0;
    }
 
    @Override

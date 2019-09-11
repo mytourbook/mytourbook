@@ -686,6 +686,15 @@ public class Messages extends NLS {
    public static String        Dialog_JoinTours_Label_TourType;
    public static String        Dialog_JoinTours_Link_TourType;
 
+   public static String        Dialog_SaveTags_Button_SaveTags;
+   public static String        Dialog_SaveTags_Dialog_Title;
+   public static String        Dialog_SaveTags_Label_Info;
+   public static String        Dialog_SaveTags_Label_SelectedTags;
+   public static String        Dialog_SaveTags_Radio_AppendNewTags;
+   public static String        Dialog_SaveTags_Radio_RemoveAllTags;
+   public static String        Dialog_SaveTags_Radio_ReplaceTags;
+   public static String        Dialog_SaveTags_Wizard_Title;
+
    public static String        Dialog_SetTimeZone_Button_AdjustTimeZone;
    public static String        Dialog_SetTimeZone_Dialog_Title;
    public static String        Dialog_SetTimeZone_Label_Info;
@@ -1259,6 +1268,14 @@ public class Messages extends NLS {
    public static String        Log_RetrieveWeatherData_001_Start;
    public static String        Log_RetrieveWeatherData_002_End;
    public static String        Log_RetrieveWeatherData_010_NoGpsDataSeries;
+
+   public static String        Log_SaveTags_End;
+   public static String        Log_SaveTags_Progress_AppendTags;
+   public static String        Log_SaveTags_Progress_RemoveAllTags;
+   public static String        Log_SaveTags_Progress_ReplaceTags;
+   public static String        Log_SaveTags_Start_AppendTags;
+   public static String        Log_SaveTags_Start_RemoveAllTags;
+   public static String        Log_SaveTags_Start_ReplaceTags;
 
    public static String        Log_SetTimeZone_001_Start_FromGeo;
    public static String        Log_SetTimeZone_001_Start_FromList;

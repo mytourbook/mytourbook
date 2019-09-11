@@ -130,6 +130,7 @@ public class UI {
    public static final String       SYMBOL_AVERAGE                = "\u00f8";   //$NON-NLS-1$
    public static final String       SYMBOL_AVERAGE_WITH_SPACE     = "\u00f8 ";  //$NON-NLS-1$
    public static final String       SYMBOL_BOX                    = "\u25a0";   //$NON-NLS-1$
+   public static final String       SYMBOL_BULLET                 = "\u2022";   //$NON-NLS-1$
    public static final String       SYMBOL_DASH                   = "\u2212";   //$NON-NLS-1$
    public static final String       SYMBOL_DEGREE                 = "\u00B0";   //$NON-NLS-1$
    public static final String       SYMBOL_DBL_ANGLE_QMARK_LEFT   = "\u00AB";   //$NON-NLS-1$

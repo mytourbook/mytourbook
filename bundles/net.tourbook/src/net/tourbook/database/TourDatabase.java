@@ -1735,12 +1735,18 @@ public class TourDatabase {
       final StringBuilder sb = new StringBuilder();
 
       for (final String tagName : tagNames) {
+
          if (tagIndex++ > 0) {
             if (isVertical) {
-               sb.append("\n");//$NON-NLS-1$
+               sb.append(UI.NEW_LINE);
             } else {
-               sb.append(", ");//$NON-NLS-1$
+               sb.append(UI.COMMA_SPACE);
             }
+         }
+
+         if (isVertical) {
+            // prefix a bullet
+            sb.append(net.tourbook.common.UI.SYMBOL_BULLET + UI.SPACE);
          }
          sb.append(tagName);
       }
