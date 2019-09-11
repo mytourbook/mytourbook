@@ -16,16 +16,19 @@
 package net.tourbook.ui.views.tagging;
 
 import java.lang.reflect.InvocationTargetException;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourTag;
+import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
@@ -43,14 +46,16 @@ import org.eclipse.swt.widgets.Display;
 
 public class Dialog_SaveTags_Wizard extends Wizard {
 
-   private static final String LOG_SAVE_TAGS_START_APPEND_TAGS        = Messages.Log_SaveTags_Start_AppendTags;
-   private static final String LOG_SAVE_TAGS_START_REPLACE_TAGS       = Messages.Log_SaveTags_Start_ReplaceTags;
-   private static final String LOG_SAVE_TAGS_START_REMOVE_ALL_TAGS    = Messages.Log_SaveTags_Start_RemoveAllTags;
-   private static final String LOG_SAVE_TAGS_END                      = Messages.Log_SaveTags_End;
+   private static final String LOG_SAVE_TAGS_START_APPEND_TAGS             = Messages.Log_SaveTags_Start_AppendTags;
+   private static final String LOG_SAVE_TAGS_START_REPLACE_TAGS            = Messages.Log_SaveTags_Start_ReplaceTags;
+   private static final String LOG_SAVE_TAGS_START_REMOVE_ALL_TAGS         = Messages.Log_SaveTags_Start_RemoveAllTags;
+   private static final String LOG_SAVE_TAGS_START_REMOVE_SELECTED_TAGS    = Messages.Log_SaveTags_Start_RemoveSelectedTags;
+   private static final String LOG_SAVE_TAGS_END                           = Messages.Log_SaveTags_End;
 
-   private static final String LOG_SAVE_TAGS_PROGRESS_APPEND_TAGS     = Messages.Log_SaveTags_Progress_AppendTags;
-   private static final String LOG_SAVE_TAGS_PROGRESS_REPLACE_TAGS    = Messages.Log_SaveTags_Progress_ReplaceTags;
-   private static final String LOG_SAVE_TAGS_PROGRESS_REMOVE_ALL_TAGS = Messages.Log_SaveTags_Progress_RemoveAllTags;
+   private static final String LOG_SAVE_TAGS_PROGRESS_APPEND_TAGS          = Messages.Log_SaveTags_Progress_AppendTags;
+   private static final String LOG_SAVE_TAGS_PROGRESS_REPLACE_TAGS         = Messages.Log_SaveTags_Progress_ReplaceTags;
+   private static final String LOG_SAVE_TAGS_PROGRESS_REMOVE_ALL_TAGS      = Messages.Log_SaveTags_Progress_RemoveAllTags;
+   private static final String LOG_SAVE_TAGS_PROGRESS_REMOVE_SELECTED_TAGS = Messages.Log_SaveTags_Progress_RemoveSelectedTags;
    //
 
    private final IPreferenceStore     _prefStore = TourbookPlugin.getPrefStore();
@@ -112,16 +117,14 @@ public class Dialog_SaveTags_Wizard extends Wizard {
 
       _wizardPage.saveState();
 
-      final int timeZoneAction = _prefStore.getInt(ITourbookPreferences.DIALOG_SET_TIME_ZONE_ACTION);
-      final String timeZoneId = _prefStore.getString(ITourbookPreferences.DIALOG_SET_TIME_ZONE_SELECTED_ZONE_ID);
-      final ZoneId selectedzoneId = ZoneId.of(timeZoneId);
+      final int saveTagAction = _prefStore.getInt(ITourbookPreferences.DIALOG_SAVE_TAGS_ACTION);
 
       /*
        * Create start log message
        */
       String startLogMessage = null;
 
-      switch (timeZoneAction) {
+      switch (saveTagAction) {
       case Dialog_SaveTags.SAVE_TAG_ACTION_REPLACE_TAGS:
 
          startLogMessage = NLS.bind(LOG_SAVE_TAGS_START_REPLACE_TAGS, _selectedTours.size());
@@ -129,29 +132,41 @@ public class Dialog_SaveTags_Wizard extends Wizard {
 
       case Dialog_SaveTags.SAVE_TAG_ACTION_APPEND_NEW_TAGS:
 
-         startLogMessage = NLS.bind(LOG_SAVE_TAGS_START_APPEND_TAGS, timeZoneId, _selectedTours.size());
+         startLogMessage = NLS.bind(LOG_SAVE_TAGS_START_APPEND_TAGS, _selectedTours.size());
          break;
 
       case Dialog_SaveTags.SAVE_TAG_ACTION_REMOVE_ALL_TAGS:
 
          startLogMessage = NLS.bind(LOG_SAVE_TAGS_START_REMOVE_ALL_TAGS, _selectedTours.size());
          break;
+
+      case Dialog_SaveTags.SAVE_TAG_ACTION_REMOVE_SELECTED_TAGS:
+
+         startLogMessage = NLS.bind(LOG_SAVE_TAGS_START_REMOVE_SELECTED_TAGS, _selectedTours.size());
+         break;
       }
 
       TourLogManager.addLog(TourLogState.DEFAULT, startLogMessage);
+
+      // log selected tags
+      if (_allCheckedTagIds.size() > 0) {
+         TourLogManager.addLog(TourLogState.DEFAULT, TourDatabase.getTagNamesText(_allCheckedTagIds, true));
+      }
 
       final IRunnableWithProgress runnable = new IRunnableWithProgress() {
 
          @Override
          public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
-            monitor.beginTask(Messages.Dialog_SetTimeZone_Label_Progress_Task, _selectedTours.size());
+            monitor.beginTask(Messages.Dialog_SaveTags_Label_Progress_Task, _selectedTours.size());
 
             // sort tours by date
             Collections.sort(_selectedTours);
 
             int workedTours = 0;
             final ArrayList<TourData> savedTours = new ArrayList<>();
+
+            final HashMap<Long, TourTag> allTourTags = TourDatabase.getAllTourTags();
 
             for (final TourData tourData : _selectedTours) {
 
@@ -161,41 +176,48 @@ public class Dialog_SaveTags_Wizard extends Wizard {
 
                monitor.worked(1);
                monitor.subTask(NLS.bind(
-                     Messages.Dialog_SetTimeZone_Label_Progress_SubTask,
+                     Messages.Dialog_SaveTags_Label_Progress_SubTask,
                      ++workedTours,
                      _selectedTours.size()));
 
-               final String tourDateTime = TourManager.getTourDateTimeShort(tourData);
+               final String tourDateTime = TourManager.getTourTitleDetailed(tourData);
 
-               switch (timeZoneAction) {
+               boolean isSaveTourData = false;
+               String logMessage = null;
+
+               switch (saveTagAction) {
 
                case Dialog_SaveTags.SAVE_TAG_ACTION_APPEND_NEW_TAGS:
 
-                  // set time zone which is selected in a list
+                  // append new tags
 
-//                  tourData.setTimeZoneId(selectedzoneId.getId());
-//
-//                  TourLogManager.addLog(
-//                        TourLogState.DEFAULT,
-//                        NLS.bind(LOG_SAVE_TAGS_PROGRESS_APPEND_TAGS, tourDateTime));
+                  final Set<TourTag> currentTourTags = tourData.getTourTags();
+
+                  // append all checked tags to the current tour
+                  for (final Long requestedTagId : _allCheckedTagIds) {
+
+                     final TourTag requestedTag = allTourTags.get(requestedTagId);
+
+                     // check if new tags are set in the current tour
+                     if (currentTourTags.contains(requestedTag) == false) {
+
+                        // discovered new tag
+
+                        currentTourTags.add(requestedTag);
+                        isSaveTourData = true;
+                     }
+                  }
+
+                  if (isSaveTourData) {
+                     logMessage = NLS.bind(LOG_SAVE_TAGS_PROGRESS_APPEND_TAGS, tourDateTime);
+                  }
 
                   break;
 
                case Dialog_SaveTags.SAVE_TAG_ACTION_REPLACE_TAGS:
 
-                  // set time zone from the tour geo position
+                  // replace existing tags
 
-//                  if (tourData.latitudeSerie != null) {
-//
-//                     // get time zone from lat/lon
-//                     final double lat = tourData.latitudeSerie[0];
-//                     final double lon = tourData.longitudeSerie[0];
-//
-//                     final String rawZoneId = TimezoneMapper.latLngToTimezoneString(lat, lon);
-//                     final ZoneId zoneId = ZoneId.of(rawZoneId);
-//
-//                     tourData.setTimeZoneId(zoneId.getId());
-//
 //                     TourLogManager.addLog(
 //                           TourLogState.DEFAULT,
 //                           NLS.bind(LOG_SAVE_TAGS_PROGRESS_REPLACE_TAGS, zoneId.getId(), tourDateTime));
@@ -203,11 +225,20 @@ public class Dialog_SaveTags_Wizard extends Wizard {
 
                   break;
 
+               case Dialog_SaveTags.SAVE_TAG_ACTION_REMOVE_SELECTED_TAGS:
+
+                  // remove selected tags
+
+//
+//                  TourLogManager.addLog(
+//                        TourLogState.DEFAULT,
+//                        NLS.bind(LOG_SAVE_TAGS_PROGRESS_REMOVE_ALL_TAGS, tourDateTime));
+
+                  break;
                case Dialog_SaveTags.SAVE_TAG_ACTION_REMOVE_ALL_TAGS:
 
-                  // remove time zone
+                  // remove all tags
 
-//                  tourData.setTimeZoneId(null);
 //
 //                  TourLogManager.addLog(
 //                        TourLogState.DEFAULT,
@@ -216,15 +247,22 @@ public class Dialog_SaveTags_Wizard extends Wizard {
                   break;
 
                default:
+
                   // this should not happen
                   continue;
                }
-//TODO
-//               final TourData savedTourData = TourManager.saveModifiedTour(tourData, false);
-//
-//               if (savedTourData != null) {
-//                  savedTours.add(savedTourData);
-//               }
+
+               if (isSaveTourData) {
+
+                  final TourData savedTourData = TourManager.saveModifiedTour(tourData, false);
+
+                  if (savedTourData != null) {
+
+                     savedTours.add(savedTourData);
+
+                     TourLogManager.addLog(TourLogState.DEFAULT, logMessage);
+                  }
+               }
             }
 
             // update the UI

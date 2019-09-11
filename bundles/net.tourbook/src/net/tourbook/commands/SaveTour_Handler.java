@@ -65,6 +65,16 @@ public class SaveTour_Handler extends AbstractHandler implements IElementUpdater
 
       final IWorkbenchPart activePart = wbWindow.getActivePage().getActivePart();
 
+      if (activePart instanceof TourTags_View) {
+
+         /*
+          * Save/restore actions are always enabled in the tour tags view, this is necessary,
+          * otherwise tags must be modified that the save/restore actions are enabled
+          */
+
+         return true;
+      }
+
       if (activePart instanceof ISaveablePart) {
          return ((ISaveablePart) activePart).isDirty();
       }

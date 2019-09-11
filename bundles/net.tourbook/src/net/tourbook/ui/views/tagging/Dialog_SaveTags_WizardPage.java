@@ -44,6 +44,7 @@ class Dialog_SaveTags_WizardPage extends WizardPage {
     * UI controls
     */
    private Button _rdoRemoveAllTags;
+   private Button _rdoRemoveSelectedTags;
    private Button _rdoAppendNewTags;
    private Button _rdoReplaceTags;
 
@@ -81,9 +82,9 @@ class Dialog_SaveTags_WizardPage extends WizardPage {
    private Composite createUI(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-//      container.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_YELLOW));
+      container.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_YELLOW));
       GridDataFactory.fillDefaults()
-            .grab(true, true)
+//            .grab(true, true)
             .applyTo(container);
       GridLayoutFactory.swtDefaults().applyTo(container);
       {
@@ -100,43 +101,42 @@ class Dialog_SaveTags_WizardPage extends WizardPage {
       {
          {
             /*
-             * Info
+             * Label: Info
              */
-
-            // label
             final Label label = new Label(container, SWT.NONE);
             label.setText(Messages.Dialog_SaveTags_Label_Info);
          }
          {
             /*
-             * Append the selected tags to the existing tags
+             * Radio: Append the selected tags to the existing tags
              */
-
-            // radio
             _rdoAppendNewTags = new Button(container, SWT.RADIO);
             _rdoAppendNewTags.setText(Messages.Dialog_SaveTags_Radio_AppendNewTags);
          }
          {
             /*
-             * Replace existing tags with the selected tags
+             * Radio: Replace existing tags with the selected tags
              */
-
-            // radio
             _rdoReplaceTags = new Button(container, SWT.RADIO);
             _rdoReplaceTags.setText(Messages.Dialog_SaveTags_Radio_ReplaceTags);
          }
          {
             /*
-             * Remove all tags
+             * Radio: Remove selected tags
              */
-
-            // radio
-            _rdoRemoveAllTags = new Button(container, SWT.RADIO);
-            _rdoRemoveAllTags.setText(Messages.Dialog_SaveTags_Radio_RemoveAllTags);
+            _rdoRemoveSelectedTags = new Button(container, SWT.RADIO);
+            _rdoRemoveSelectedTags.setText(Messages.Dialog_SaveTags_Radio_RemoveTags_Selected);
          }
          {
             /*
-             * Selected tags
+             * RadioL: Remove all tags
+             */
+            _rdoRemoveAllTags = new Button(container, SWT.RADIO);
+            _rdoRemoveAllTags.setText(Messages.Dialog_SaveTags_Radio_RemoveTags_All);
+         }
+         {
+            /*
+             * Label: Selected tags
              */
 
             // label
@@ -156,25 +156,30 @@ class Dialog_SaveTags_WizardPage extends WizardPage {
 
    private void enableControls() {
 
-      final boolean isTagsSelected = _allCheckedTagIds.size() > 0;
+      final boolean isTagSelected = _allCheckedTagIds.size() > 0;
 
-      _rdoAppendNewTags.setEnabled(isTagsSelected);
-      _rdoReplaceTags.setEnabled(isTagsSelected);
+      _rdoAppendNewTags.setEnabled(isTagSelected);
+      _rdoReplaceTags.setEnabled(isTagSelected);
+      _rdoRemoveSelectedTags.setEnabled(isTagSelected);
 
       // remove all tags is only enabled when no tags are selected
-      _rdoRemoveAllTags.setEnabled(isTagsSelected == false);
+      _rdoRemoveAllTags.setEnabled(isTagSelected == false);
    }
 
    private void restoreState() {
 
       final int saveAction = _prefStore.getInt(ITourbookPreferences.DIALOG_SAVE_TAGS_ACTION);
 
-      _rdoAppendNewTags.setSelection(saveAction == Dialog_SaveTags.SAVE_TAG_ACTION_APPEND_NEW_TAGS);
-      _rdoReplaceTags.setSelection(saveAction == Dialog_SaveTags.SAVE_TAG_ACTION_REPLACE_TAGS);
-      _rdoRemoveAllTags.setSelection(saveAction == Dialog_SaveTags.SAVE_TAG_ACTION_REMOVE_ALL_TAGS);
+// SET_FORMATTING_OFF
 
-      final String tagNames = TourDatabase.getTagNamesText(_allCheckedTagIds, true);
-      _lblSelectedTags.setText(tagNames);
+      _rdoAppendNewTags.setSelection(saveAction    == Dialog_SaveTags.SAVE_TAG_ACTION_APPEND_NEW_TAGS);
+      _rdoReplaceTags.setSelection(saveAction      == Dialog_SaveTags.SAVE_TAG_ACTION_REPLACE_TAGS);
+      _rdoRemoveAllTags.setSelection(saveAction    == Dialog_SaveTags.SAVE_TAG_ACTION_REMOVE_ALL_TAGS);
+      _rdoRemoveSelectedTags.setSelection(saveAction       == Dialog_SaveTags.SAVE_TAG_ACTION_REMOVE_SELECTED_TAGS);
+
+// SET_FORMATTING_ON
+
+      _lblSelectedTags.setText(TourDatabase.getTagNamesText(_allCheckedTagIds, true));
    }
 
    void saveState() {
@@ -186,6 +191,9 @@ class Dialog_SaveTags_WizardPage extends WizardPage {
 
       } else if (_rdoReplaceTags.getSelection()) {
          saveAction = Dialog_SaveTags.SAVE_TAG_ACTION_REPLACE_TAGS;
+
+      } else if (_rdoRemoveSelectedTags.getSelection()) {
+         saveAction = Dialog_SaveTags.SAVE_TAG_ACTION_REMOVE_SELECTED_TAGS;
 
       } else if (_rdoRemoveAllTags.getSelection()) {
          saveAction = Dialog_SaveTags.SAVE_TAG_ACTION_REMOVE_ALL_TAGS;

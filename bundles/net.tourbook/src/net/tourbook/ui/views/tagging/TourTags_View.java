@@ -772,7 +772,8 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 //                  .grab(true, true)
                   .applyTo(_lblHeader);
 
-         createUI_30_Buttons(container);
+            createUI_30_Buttons(container);
+         }
       }
    }
 
@@ -1147,34 +1148,6 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
          firePropertyChange(PROP_DIRTY);
       }
-
-      final int numTagIds = _allCheckedTagIds.size();
-      final int numTaggedTours = _allTaggedTours.size();
-      final int numSelectedTours = _allSelectedTours.size();
-
-      final String tagNames = TourDatabase.getTagNamesText(_allCheckedTagIds, true);
-
-      final String dialogMessage = NLS.bind(Messages.Tour_Tags_Dialog_SetTags_Message, tagNames, numSelectedTours);
-
-//      // confirm deletion, show tag name and number of tours which contain a tag
-//      final Display display = Display.getDefault();
-//      final MessageDialog dialog = new MessageDialog(
-//            display.getActiveShell(),
-//            Messages.Tour_Tags_Dialog_SetTags_Title,
-//            null,
-//            dialogMessage,
-//            MessageDialog.QUESTION,
-//            new String[] {
-//                  Messages.Tour_Tags_Action_SaveTags,
-//                  IDialogConstants.CANCEL_LABEL },
-//            1);
-//
-//      if (dialog.open() == Window.OK) {
-//
-//         BusyIndicator.showWhile(display, () -> {
-//
-//         });
-//      }
    }
 
    @Override
@@ -1191,8 +1164,8 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
       _action_TagFilter.setEnabled(isTourAvailable);
       _action_TagLayout.setEnabled(isTourAvailable);
 
-      _action_SaveTags.setEnabled(isTourAvailable && _isTagDirty);
-      _action_RestoreTags.setEnabled(isTourAvailable && _isTagDirty);
+      _action_SaveTags.setEnabled(isTourAvailable);
+      _action_RestoreTags.setEnabled(isTourAvailable);
 
       _tagViewer.getTree().setEnabled(isTourAvailable);
    }
@@ -1443,7 +1416,10 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
       _allCheckedTagIds.clear();
       _allTaggedTours.clear();
 
-      _tagViewer.refresh();
+      // uncheck all but do not refilter the viewer
+      _tagViewer.setCheckedElements(new Object[] {});
+
+//      _tagViewer.refresh();
 
       enableControls();
 

@@ -2221,11 +2221,14 @@ THIS IS NOT YET FULLY IMPLEMENTED
          commandId   ="command.net.tourbook.tour.RestoreTour"
          class       ="net.tourbook.commands.RestoreTour_Handler"
       >
+      <!-- enabled/disabled is set in the command hander: net.tourbook.commands.RestoreTour_Handler.isEnabled()
+      
          <enabledWhen>
             <with variable="activePart">
                <test property="net.tourbook.expression.TourEditor.isDirty"/>
             </with>
          </enabledWhen>
+      -->
          
      </handler>
    
@@ -2233,11 +2236,13 @@ THIS IS NOT YET FULLY IMPLEMENTED
          commandId   ="command.net.tourbook.tour.SaveTour"
          class       ="net.tourbook.commands.SaveTour_Handler"
       >
+      <!-- enabled/disabled is set in the command hander: net.tourbook.commands.SaveTour_Handler.isEnabled()
          <enabledWhen>
             <with variable="activePart">
                <test property="net.tourbook.expression.TourEditor.isDirty"/>
             </with>
          </enabledWhen>
+      -->
          
      </handler>
       
@@ -2245,6 +2250,8 @@ THIS IS NOT YET FULLY IMPLEMENTED
    
    <extension point="org.eclipse.core.expressions.definitions">
 
+      <!-- Show the save/restore actions only when these parts are active -->
+   
       <definition id="net.tourbook.isTourEditorActive">
          <with variable="activePartId">
             <or>

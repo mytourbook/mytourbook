@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.commands;
 
+import net.tourbook.ui.views.tagging.TourTags_View;
+
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -48,6 +50,16 @@ public class RestoreTour_Handler extends AbstractHandler {
       }
 
       final IWorkbenchPart activePart = wbWindow.getActivePage().getActivePart();
+
+      if (activePart instanceof TourTags_View) {
+
+         /*
+          * Save/restore actions are always enabled in the tour tags view, this is necessary,
+          * otherwise tags must be modified that the save/restore actions are enabled
+          */
+
+         return true;
+      }
 
       if (activePart instanceof ISaveablePart) {
          return ((ISaveablePart) activePart).isDirty();

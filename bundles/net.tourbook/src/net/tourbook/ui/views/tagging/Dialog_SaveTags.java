@@ -16,7 +16,6 @@
 package net.tourbook.ui.views.tagging;
 
 import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -30,11 +29,12 @@ public class Dialog_SaveTags extends WizardDialog {
 
    public static final int SAVE_TAG_ACTION_APPEND_NEW_TAGS = 0;
    public static final int SAVE_TAG_ACTION_REPLACE_TAGS    = 10;
-   public static final int SAVE_TAG_ACTION_REMOVE_ALL_TAGS = 20;
+   public static final int SAVE_TAG_ACTION_REMOVE_SELECTED_TAGS     = 50;
+   public static final int SAVE_TAG_ACTION_REMOVE_ALL_TAGS = 60;
 
    //
 
-   private static final IDialogSettings _state = TourbookPlugin.getState("net.tourbook.ui.views.tagging.Dialog_SaveTags"); //$NON-NLS-1$
+//   private static final IDialogSettings _state = TourbookPlugin.getState("net.tourbook.ui.views.tagging.Dialog_SaveTags"); //$NON-NLS-1$
 
    public Dialog_SaveTags(final Shell parentShell, final IWizard wizard) {
 
