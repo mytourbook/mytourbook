@@ -385,12 +385,17 @@ public class TVITourBookYearSub extends TVITourBookItem {
                tourItem.colCadenceMultiplier = dbCadenceMultiplier;
 
                //TOTO Here is the result for a given tour
+               tourItem.colHikingVsRunning = "";
                final int cadenceZoneHikingTime = result.getInt(79) == -1 ? 0 : result.getInt(79);
                final int cadenceZoneRunningTime = result.getInt(80) == -1 ? 0 : result.getInt(80);
+
                final int totalCadenceTime = cadenceZoneHikingTime + cadenceZoneRunningTime;
-               final int cadenceZoneHikingPercentage = Math.round(result.getInt(79) * 100f / totalCadenceTime);
-               final int cadenceZoneRunningPercentage = Math.round(result.getInt(80) * 100f / totalCadenceTime);
-               tourItem.colHikingVsRunning = cadenceZoneHikingPercentage + " - " + cadenceZoneRunningPercentage;
+               if (totalCadenceTime != 0) {
+                  final int cadenceZoneHikingPercentage = Math.round(result.getInt(79) * 100f / totalCadenceTime);
+                  final int cadenceZoneRunningPercentage = Math.round(result.getInt(80) * 100f / totalCadenceTime);
+
+                  tourItem.colHikingVsRunning = cadenceZoneHikingPercentage + " - " + cadenceZoneRunningPercentage;
+               }
 
                // -----------------------------------------------
 

@@ -68,7 +68,8 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
             + "surfing_NumberOfEvents,    " + NL //$NON-NLS-1$
 
-            + "cadenceZoneHikingTime          " + NL //$NON-NLS-1$
+            + "cadenceZoneHikingTime,     " + NL //$NON-NLS-1$
+            + "cadenceZoneRunningTime     " + NL //$NON-NLS-1$
       ;
 
       SQL_SUM_COLUMNS = NL
@@ -102,7 +103,9 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
             + "SUM( CAST(Surfing_NumberOfEvents AS BIGINT)), " + NL // 21   //$NON-NLS-1$
 
-            + "AVG( CASE WHEN cadenceZoneHikingTime = 0         THEN NULL ELSE cadenceZoneHikingTime END)          " + NL //                              21   //$NON-NLS-1$
+            + "SUM( CAST(cadenceZoneHikingTime AS BIGINT)),  " + NL // 22   //$NON-NLS-1$
+            + "SUM( CAST(cadenceZoneRunningTime AS BIGINT))  " + NL // 23   //$NON-NLS-1$
+//            + "AVG( CASE WHEN cadenceZoneHikingTime = 0         THEN NULL ELSE cadenceZoneHikingTime END)          " + NL //                              21   //$NON-NLS-1$
       ;
 
    }
@@ -285,15 +288,23 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
 // SET_FORMATTING_ON
 
-
       colPausedTime = colTourRecordingTime - colTourDrivingTime;
 
       //     //TOTO Here is the result for week?, month, year
       // so we need the average
-      final int cadenceZoneHikingTime = result.getInt(startIndex + 22) == -1 ? 0 : result.getInt(startIndex + 22);
-      //final String cadenceZoneRunningTime = result.getInt(80) == -1 ? "0" : String.valueOf(result.getInt(80));
-      // percentage = cadenceZoneTime * 100 / colTourRecordingTime;
-      colHikingVsRunning = cadenceZoneHikingTime + " - " + "-2";
+      colHikingVsRunning = "";
+      final int totalCadenceZoneHikingTime = result.getInt(startIndex + 22) == -1 ? 0 : result.getInt(startIndex + 22);
+      final int totalCadenceZoneRunningtime = result.getInt(startIndex + 23) == -1 ? 0 : result.getInt(startIndex + 23);
+
+      final int totalCadenceTime = totalCadenceZoneHikingTime + totalCadenceZoneRunningtime;
+      if (totalCadenceTime != 0) {
+         final int cadenceZoneHikingPercentage = Math.round(totalCadenceZoneHikingTime * 100f / totalCadenceTime);
+         final int cadenceZoneRunningPercentage = Math.round(totalCadenceZoneRunningtime * 100f / totalCadenceTime);
+
+         //final string cadencezoneRunningTime = result.getInt(80) == -1 ? "0" : String.valueOf(result.getInt(80));
+         // percentage = cadenceZoneTime * 100 / colTourRecordingTime;
+         colHikingVsRunning = cadenceZoneHikingPercentage + " - " + cadenceZoneRunningPercentage;
+      }
    }
 
    @Override

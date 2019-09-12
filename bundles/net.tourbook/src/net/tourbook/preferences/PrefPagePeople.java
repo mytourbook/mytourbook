@@ -1976,35 +1976,11 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          @Override
          public boolean computeTourValues(final TourData oldTourData) {
 
-            final int tourRecordingTime = (int) oldTourData.getTourRecordingTime();
+            // TODO check if the delimiter has been modified ? if ont, we cancel ?
 
-            // get old break time
-            final int tourDrivingTime = (int) oldTourData.getTourDrivingTime();
-            oldBreakTime[0] += tourRecordingTime - tourDrivingTime;
+            // recompute times for each cadence zones
+            oldTourData.computeCadenceZonesTimes();
 
-            // force the break time to be recomputed with the current values which are already store in the pref store
-           // oldTourData.setBreakTimeSerie(null);
-
-            // recompute break time
-           // oldTourData.computeTourDrivingTime();
-            int cadenceZoneRunningTIme = 0;
-            int cadenceZoneHikingTIme = 0;
-
-            if (oldTourData.getCadenceSerie() == null) {
-               return false;
-            }
-
-            for (final float toto : oldTourData.getCadenceSerie()) {
-               if (toto >= 70) {
-                  ++cadenceZoneRunningTIme;
-               } else {
-                  ++cadenceZoneHikingTIme;
-               }
-
-            }
-
-            oldTourData.setCadenceZoneHikingTime(cadenceZoneHikingTIme);
-            oldTourData.setCadenceZoneRunningTime(cadenceZoneRunningTIme);
             return true;
          }
 
