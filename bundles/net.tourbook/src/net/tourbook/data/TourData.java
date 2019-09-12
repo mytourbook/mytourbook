@@ -3260,6 +3260,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       int prevTime = 0;
 
+      cadenceZoneRunningTime = 0;
+      cadenceZoneHikingTime = 0;
+
       // compute zone values
       for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
 
