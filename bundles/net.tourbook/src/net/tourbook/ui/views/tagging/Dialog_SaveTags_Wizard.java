@@ -63,7 +63,6 @@ public class Dialog_SaveTags_Wizard extends Wizard {
    private Dialog_SaveTags_WizardPage _wizardPage;
 
    private ArrayList<TourData>        _selectedTours;
-//   private ITourProvider2               _tourProvider;
    private HashSet<Long>              _allCheckedTagIds;
 
    public Dialog_SaveTags_Wizard(final ArrayList<TourData> selectedTours, final HashSet<Long> allCheckedTagIds) {
@@ -81,7 +80,7 @@ public class Dialog_SaveTags_Wizard extends Wizard {
    @Override
    public void addPages() {
 
-      _wizardPage = new Dialog_SaveTags_WizardPage(_allCheckedTagIds);
+      _wizardPage = new Dialog_SaveTags_WizardPage(_selectedTours, _allCheckedTagIds);
 
       addPage(_wizardPage);
    }

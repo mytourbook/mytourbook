@@ -15,11 +15,13 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tagging;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 
@@ -27,6 +29,7 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
@@ -43,17 +46,20 @@ class Dialog_SaveTags_WizardPage extends WizardPage {
    /*
     * UI controls
     */
-   private Button _rdoRemoveAllTags;
-   private Button _rdoRemoveSelectedTags;
-   private Button _rdoAppendNewTags;
-   private Button _rdoReplaceTags;
+   private Button              _rdoRemoveAllTags;
+   private Button              _rdoRemoveSelectedTags;
+   private Button              _rdoAppendNewTags;
+   private Button              _rdoReplaceTags;
 
-   private Label  _lblSelectedTags;
+   private Label               _lblSelectedTags;
 
-   protected Dialog_SaveTags_WizardPage(final HashSet<Long> allCheckedTagIds) {
+   private ArrayList<TourData> _allSelectedTours;
+
+   protected Dialog_SaveTags_WizardPage(final ArrayList<TourData> selectedTours, final HashSet<Long> allCheckedTagIds) {
 
       super(UI.EMPTY_STRING);
 
+      _allSelectedTours = selectedTours;
       _allCheckedTagIds = allCheckedTagIds;
 
       setTitle(Messages.Dialog_SaveTags_Wizard_Title);
@@ -82,7 +88,7 @@ class Dialog_SaveTags_WizardPage extends WizardPage {
    private Composite createUI(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      container.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_YELLOW));
+//      container.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_YELLOW));
       GridDataFactory.fillDefaults()
 //            .grab(true, true)
             .applyTo(container);
@@ -104,7 +110,7 @@ class Dialog_SaveTags_WizardPage extends WizardPage {
              * Label: Info
              */
             final Label label = new Label(container, SWT.NONE);
-            label.setText(Messages.Dialog_SaveTags_Label_Info);
+            label.setText(NLS.bind(Messages.Dialog_SaveTags_Label_Info, _allSelectedTours.size()));
          }
          {
             /*
@@ -134,22 +140,27 @@ class Dialog_SaveTags_WizardPage extends WizardPage {
             _rdoRemoveAllTags = new Button(container, SWT.RADIO);
             _rdoRemoveAllTags.setText(Messages.Dialog_SaveTags_Radio_RemoveTags_All);
          }
-         {
-            /*
-             * Label: Selected tags
-             */
 
-            // label
-            final Label label = new Label(container, SWT.NONE);
-            label.setText(Messages.Dialog_SaveTags_Label_SelectedTags);
-            GridDataFactory.fillDefaults().indent(0, 20).applyTo(label);
+         if (_allCheckedTagIds.size() > 0) {
 
-            // label
-            _lblSelectedTags = new Label(container, SWT.WRAP);
-            _lblSelectedTags.setText(UI.SPACE1);
-            GridDataFactory.fillDefaults()
-                  .grab(true, true)
-                  .applyTo(_lblSelectedTags);
+            // tags are selected
+            {
+               /*
+                * Label: Selected tags
+                */
+
+               // label: header
+               final Label label = new Label(container, SWT.NONE);
+               label.setText(Messages.Dialog_SaveTags_Label_SelectedTags);
+               GridDataFactory.fillDefaults().indent(0, 20).applyTo(label);
+
+               // label: tags
+               _lblSelectedTags = new Label(container, SWT.WRAP);
+               _lblSelectedTags.setText(UI.SPACE1);
+               GridDataFactory.fillDefaults()
+                     .grab(true, true)
+                     .applyTo(_lblSelectedTags);
+            }
          }
       }
    }
@@ -172,14 +183,16 @@ class Dialog_SaveTags_WizardPage extends WizardPage {
 
 // SET_FORMATTING_OFF
 
-      _rdoAppendNewTags.setSelection(saveAction    == Dialog_SaveTags.SAVE_TAG_ACTION_APPEND_NEW_TAGS);
-      _rdoReplaceTags.setSelection(saveAction      == Dialog_SaveTags.SAVE_TAG_ACTION_REPLACE_TAGS);
-      _rdoRemoveAllTags.setSelection(saveAction    == Dialog_SaveTags.SAVE_TAG_ACTION_REMOVE_ALL_TAGS);
-      _rdoRemoveSelectedTags.setSelection(saveAction       == Dialog_SaveTags.SAVE_TAG_ACTION_REMOVE_SELECTED_TAGS);
+      _rdoAppendNewTags.setSelection(saveAction          == Dialog_SaveTags.SAVE_TAG_ACTION_APPEND_NEW_TAGS);
+      _rdoRemoveAllTags.setSelection(saveAction          == Dialog_SaveTags.SAVE_TAG_ACTION_REMOVE_ALL_TAGS);
+      _rdoRemoveSelectedTags.setSelection(saveAction     == Dialog_SaveTags.SAVE_TAG_ACTION_REMOVE_SELECTED_TAGS);
+      _rdoReplaceTags.setSelection(saveAction            == Dialog_SaveTags.SAVE_TAG_ACTION_REPLACE_TAGS);
 
 // SET_FORMATTING_ON
 
-      _lblSelectedTags.setText(TourDatabase.getTagNamesText(_allCheckedTagIds, true));
+      if (_allCheckedTagIds.size() > 0) {
+         _lblSelectedTags.setText(TourDatabase.getTagNamesText(_allCheckedTagIds, true));
+      }
    }
 
    void saveState() {

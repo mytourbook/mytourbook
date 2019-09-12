@@ -49,7 +49,7 @@ public class Dialog_SaveTags extends WizardDialog {
       // set text for the OK button
       final Button button = getButton(IDialogConstants.FINISH_ID);
 
-      button.setText(Messages.Dialog_SaveTags_Button_SaveTags);
+      button.setText(Messages.App_Action_Apply);
 
 //      // ensure the button is wide enough
 //      // -> this is not OK when the text is small !!!

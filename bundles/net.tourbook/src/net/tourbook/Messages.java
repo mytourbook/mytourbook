@@ -424,6 +424,7 @@ public class Messages extends NLS {
 
    public static String        App_Action_About;
    public static String        App_Action_Add;
+   public static String        App_Action_Apply;
    public static String        App_Action_ApplyDefaults;
    public static String        App_Action_ApplyDefaults_Tooltip;
    public static String        App_Action_Cancel;
@@ -686,7 +687,6 @@ public class Messages extends NLS {
    public static String        Dialog_JoinTours_Label_TourType;
    public static String        Dialog_JoinTours_Link_TourType;
 
-   public static String        Dialog_SaveTags_Button_SaveTags;
    public static String        Dialog_SaveTags_Dialog_Title;
    public static String        Dialog_SaveTags_Label_Info;
    public static String        Dialog_SaveTags_Label_Progress_SubTask;
