@@ -290,9 +290,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
       colPausedTime = colTourRecordingTime - colTourDrivingTime;
 
-      //     //TOTO Here is the result for week?, month, year
-      // so we need the average
-      colHikingVsRunning = "";
+      colHikingVsRunning = ""; //$NON-NLS-1$
       final int totalCadenceZoneHikingTime = result.getInt(startIndex + 22) == -1 ? 0 : result.getInt(startIndex + 22);
       final int totalCadenceZoneRunningtime = result.getInt(startIndex + 23) == -1 ? 0 : result.getInt(startIndex + 23);
 
@@ -301,9 +299,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
          final int cadenceZoneHikingPercentage = Math.round(totalCadenceZoneHikingTime * 100f / totalCadenceTime);
          final int cadenceZoneRunningPercentage = Math.round(totalCadenceZoneRunningtime * 100f / totalCadenceTime);
 
-         //final string cadencezoneRunningTime = result.getInt(80) == -1 ? "0" : String.valueOf(result.getInt(80));
-         // percentage = cadenceZoneTime * 100 / colTourRecordingTime;
-         colHikingVsRunning = cadenceZoneHikingPercentage + " - " + cadenceZoneRunningPercentage;
+         colHikingVsRunning = cadenceZoneHikingPercentage + " - " + cadenceZoneRunningPercentage; //$NON-NLS-1$
       }
    }
 
