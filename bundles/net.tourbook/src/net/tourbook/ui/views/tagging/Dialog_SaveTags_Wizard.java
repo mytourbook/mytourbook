@@ -174,8 +174,7 @@ public class Dialog_SaveTags_Wizard extends Wizard {
                }
 
                monitor.worked(1);
-               monitor.subTask(NLS.bind(
-                     Messages.Dialog_SaveTags_Label_Progress_SubTask,
+               monitor.subTask(NLS.bind(Messages.Dialog_SaveTags_Label_Progress_SubTask,
                      ++workedTours,
                      _selectedTours.size()));
 
@@ -184,13 +183,13 @@ public class Dialog_SaveTags_Wizard extends Wizard {
                boolean isSaveTourData = false;
                String logMessage = null;
 
+               final Set<TourTag> currentTourTags = tourData.getTourTags();
+
                switch (saveTagAction) {
 
                case Dialog_SaveTags.SAVE_TAG_ACTION_APPEND_NEW_TAGS:
 
                   // append new tags
-
-                  final Set<TourTag> currentTourTags = tourData.getTourTags();
 
                   // append all checked tags to the current tour
                   for (final Long requestedTagId : _allCheckedTagIds) {
@@ -200,7 +199,7 @@ public class Dialog_SaveTags_Wizard extends Wizard {
                      // check if new tags are set in the current tour
                      if (currentTourTags.contains(requestedTag) == false) {
 
-                        // discovered new tag
+                        // new tag is discovered -> save it
 
                         currentTourTags.add(requestedTag);
                         isSaveTourData = true;
@@ -217,10 +216,18 @@ public class Dialog_SaveTags_Wizard extends Wizard {
 
                   // replace existing tags
 
-//                     TourLogManager.addLog(
-//                           TourLogState.DEFAULT,
-//                           NLS.bind(LOG_SAVE_TAGS_PROGRESS_REPLACE_TAGS, zoneId.getId(), tourDateTime));
-//                  }
+                  // get all checked tags
+                  final ArrayList<TourTag> allRequestedTourTags = new ArrayList<>();
+                  for (final Long requestedTagId : _allCheckedTagIds) {
+                     allRequestedTourTags.add(allTourTags.get(requestedTagId));
+                  }
+
+                  currentTourTags.clear();
+                  currentTourTags.addAll(allRequestedTourTags);
+
+                  isSaveTourData = true;
+
+                  logMessage = NLS.bind(LOG_SAVE_TAGS_PROGRESS_REPLACE_TAGS, tourDateTime);
 
                   break;
 
@@ -228,20 +235,35 @@ public class Dialog_SaveTags_Wizard extends Wizard {
 
                   // remove selected tags
 
-//
-//                  TourLogManager.addLog(
-//                        TourLogState.DEFAULT,
-//                        NLS.bind(LOG_SAVE_TAGS_PROGRESS_REMOVE_ALL_TAGS, tourDateTime));
+                  for (final Long requestedTagId : _allCheckedTagIds) {
+
+                     final TourTag requestedTag = allTourTags.get(requestedTagId);
+
+                     // check if tag is available in the current tour
+                     if (currentTourTags.contains(requestedTag)) {
+
+                        // tag is discovered -> remove it
+
+                        currentTourTags.remove(requestedTag);
+                        isSaveTourData = true;
+                     }
+                  }
+
+                  if (isSaveTourData) {
+                     logMessage = NLS.bind(LOG_SAVE_TAGS_PROGRESS_REMOVE_SELECTED_TAGS, tourDateTime);
+                  }
 
                   break;
+
                case Dialog_SaveTags.SAVE_TAG_ACTION_REMOVE_ALL_TAGS:
 
                   // remove all tags
 
-//
-//                  TourLogManager.addLog(
-//                        TourLogState.DEFAULT,
-//                        NLS.bind(LOG_SAVE_TAGS_PROGRESS_REMOVE_ALL_TAGS, tourDateTime));
+                  currentTourTags.clear();
+
+                  isSaveTourData = true;
+
+                  logMessage = NLS.bind(LOG_SAVE_TAGS_PROGRESS_REMOVE_ALL_TAGS, tourDateTime);
 
                   break;
 

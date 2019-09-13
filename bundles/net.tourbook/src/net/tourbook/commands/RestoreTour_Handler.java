@@ -33,9 +33,9 @@ public class RestoreTour_Handler extends AbstractHandler {
 
       final IWorkbenchPart part = HandlerUtil.getActivePart(event);
 
-      if (part instanceof IRestorablePart) {
+      if (part instanceof ISaveAndRestorePart) {
 
-         ((IRestorablePart) part).doRestore();
+         ((ISaveAndRestorePart) part).doRestore();
       }
 
       return null;

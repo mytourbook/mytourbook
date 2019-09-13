@@ -31,8 +31,6 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ControlAdapter;
-import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
@@ -72,23 +70,18 @@ class Dialog_SaveTags_WizardPage extends WizardPage {
 
       enableControls();
 
-      // set wizard page control
-      setControl(wizardPage);
-
       restoreState();
 
-      parent.addControlListener(new ControlAdapter() {
-         @Override
-         public void controlResized(final ControlEvent event) {
-            parent.setSize(parent.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-         }
-      });
+      parent.layout(true, true);
+
+      // set wizard page control
+      setControl(wizardPage);
    }
 
    private Composite createUI(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-//      container.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_YELLOW));
+      container.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_YELLOW));
       GridDataFactory.fillDefaults()
 //            .grab(true, true)
             .applyTo(container);
@@ -158,7 +151,7 @@ class Dialog_SaveTags_WizardPage extends WizardPage {
                _lblSelectedTags = new Label(container, SWT.WRAP);
                _lblSelectedTags.setText(UI.SPACE1);
                GridDataFactory.fillDefaults()
-                     .grab(true, true)
+//                     .grab(true, true)
                      .applyTo(_lblSelectedTags);
             }
          }

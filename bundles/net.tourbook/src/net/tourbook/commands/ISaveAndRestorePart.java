@@ -15,11 +15,16 @@
  *******************************************************************************/
 package net.tourbook.commands;
 
-public interface IRestorablePart {
+public interface ISaveAndRestorePart {
 
    /**
-    * Restore data/tour in a dirty part.
+    * Restore tour.
     */
    void doRestore();
+
+   /**
+    * Save tour.
+    */
+   void doSave();
 
 }

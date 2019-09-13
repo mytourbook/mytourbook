@@ -665,7 +665,7 @@
             tooltip        ="%Command_App_SaveTour_Tooltip"
          >
             <visibleWhen   checkEnabled="false">
-               <reference  definitionId="net.tourbook.isTourEditorActive"/>
+               <reference  definitionId="net.tourbook.definition.isTourEditorActive"/>
             </visibleWhen>
          </command>
 
@@ -676,7 +676,7 @@
             tooltip        ="%Command_App_RestoreTour_Tooltip"
          >
             <visibleWhen   checkEnabled="false">
-               <reference  definitionId="net.tourbook.isTourEditorActive"/>
+               <reference  definitionId="net.tourbook.definition.isTourEditorActive"/>
             </visibleWhen>
          </command>
 
@@ -962,7 +962,7 @@ THIS IS NOT YET FULLY IMPLEMENTED
                tooltip        ="%Command_App_SaveTour_Tooltip"
             >
                <visibleWhen   checkEnabled="false">
-                  <reference  definitionId="net.tourbook.isTourEditorActive"/>
+                  <reference  definitionId="net.tourbook.definition.isTourEditorActive"/>
                </visibleWhen>
             </command>
             
@@ -973,7 +973,7 @@ THIS IS NOT YET FULLY IMPLEMENTED
                tooltip        ="%Command_App_RestoreTour_Tooltip"
             >
                <visibleWhen   checkEnabled="false">
-                  <reference  definitionId="net.tourbook.isTourEditorActive"/>
+                  <reference  definitionId="net.tourbook.definition.isTourEditorActive"/>
                </visibleWhen>
             </command>
 
@@ -2203,8 +2203,8 @@ THIS IS NOT YET FULLY IMPLEMENTED
    
    <!-- COMMAND FRAMEWORK TO ENABLE/DISABLE MENU ITEMS -->
    
+   <!--
    <extension point="org.eclipse.core.expressions.propertyTesters">
-   
       <propertyTester
          id          ="net.tourbook.propertyTester.TourEditor_Tester"
          class       ="net.tourbook.commands.TourEditor_Tester"
@@ -2213,6 +2213,7 @@ THIS IS NOT YET FULLY IMPLEMENTED
          type        ="java.lang.Object"
       />
    </extension>
+   -->
 
    
    <extension point="org.eclipse.ui.handlers">
@@ -2221,29 +2222,28 @@ THIS IS NOT YET FULLY IMPLEMENTED
          commandId   ="command.net.tourbook.tour.RestoreTour"
          class       ="net.tourbook.commands.RestoreTour_Handler"
       >
-      <!-- enabled/disabled is set in the command hander: net.tourbook.commands.RestoreTour_Handler.isEnabled()
-      
-         <enabledWhen>
-            <with variable="activePart">
-               <test property="net.tourbook.expression.TourEditor.isDirty"/>
-            </with>
-         </enabledWhen>
-      -->
+         <!-- enabled/disabled is set in the command hander: net.tourbook.commands.RestoreTour_Handler.isEnabled()
          
+            <enabledWhen>
+               <with variable="activePart">
+                  <test property="net.tourbook.expression.TourEditor.isDirty"/>
+               </with>
+            </enabledWhen>
+         -->
      </handler>
    
       <handler
          commandId   ="command.net.tourbook.tour.SaveTour"
          class       ="net.tourbook.commands.SaveTour_Handler"
       >
-      <!-- enabled/disabled is set in the command hander: net.tourbook.commands.SaveTour_Handler.isEnabled()
-         <enabledWhen>
-            <with variable="activePart">
-               <test property="net.tourbook.expression.TourEditor.isDirty"/>
-            </with>
-         </enabledWhen>
-      -->
+         <!-- enabled/disabled is set in the command hander: net.tourbook.commands.SaveTour_Handler.isEnabled()
          
+            <enabledWhen>
+               <with variable="activePart">
+                  <test property="net.tourbook.expression.TourEditor.isDirty"/>
+               </with>
+            </enabledWhen>
+         -->
      </handler>
       
    </extension>
@@ -2252,7 +2252,7 @@ THIS IS NOT YET FULLY IMPLEMENTED
 
       <!-- Show the save/restore actions only when these parts are active -->
    
-      <definition id="net.tourbook.isTourEditorActive">
+      <definition id="net.tourbook.definition.isTourEditorActive">
          <with variable="activePartId">
             <or>
                <equals value="net.tourbook.views.TourDataEditorView"/>

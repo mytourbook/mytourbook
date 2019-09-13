@@ -17,7 +17,9 @@ package net.tourbook.commands;
 
 public interface AppCommands {
 
-   public String COMMAND_NET_TOURBOOK_TOUR_RESTORE_TOUR = "command.net.tourbook.tour.RestoreTour"; //$NON-NLS-1$
-   public String COMMAND_NET_TOURBOOK_TOUR_SAVE_TOUR    = "command.net.tourbook.tour.SaveTour";    //$NON-NLS-1$
+   public String COMMAND_NET_TOURBOOK_TOUR_RESTORE_TOUR  = "command.net.tourbook.tour.RestoreTour";      //$NON-NLS-1$
+   public String COMMAND_NET_TOURBOOK_TOUR_SAVE_TOUR     = "command.net.tourbook.tour.SaveTour";         //$NON-NLS-1$
+
+   public String COMMAND_EXPRESSION_TOUR_EDITOR_IS_DIRTY = "net.tourbook.expression.TourEditor.isDirty"; //$NON-NLS-1$
 
 }

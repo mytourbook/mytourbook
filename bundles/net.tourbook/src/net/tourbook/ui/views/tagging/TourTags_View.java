@@ -26,7 +26,7 @@ import java.util.Set;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.commands.AppCommands;
-import net.tourbook.commands.IRestorablePart;
+import net.tourbook.commands.ISaveAndRestorePart;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.util.ColumnDefinition;
@@ -57,7 +57,6 @@ import net.tourbook.ui.TreeColumnFactory;
 import net.tourbook.ui.action.ActionCollapseAll;
 import net.tourbook.ui.action.ActionExpandAll;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
@@ -93,6 +92,8 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -110,7 +111,6 @@ import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IPartListener2;
-import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
@@ -119,13 +119,10 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.dialogs.ContainerCheckedTreeViewer;
 import org.eclipse.ui.part.ViewPart;
-import org.eclipse.ui.services.IEvaluationService;
 
-public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer, ISaveablePart, IRestorablePart {
+public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer, ISaveAndRestorePart {
 
    static public final String         ID                                        = "net.tourbook.ui.views.tagging.TourTags_View"; //$NON-NLS-1$
-
-   private static final String        COMMAND_EXPRESSION_TOUR_EDITOR_IS_DIRTY   = "net.tourbook.expression.TourEditor.isDirty";  //$NON-NLS-1$
 
    private static final String        STATE_IS_HIERARCHICAL_LAYOUT              = "STATE_IS_HIERARCHICAL_LAYOUT";                //$NON-NLS-1$
    private static final String        STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS    = "STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS";      //$NON-NLS-1$
@@ -156,7 +153,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
    private ArrayList<TourData>        _allTaggedTours                           = new ArrayList<>();
 
    private boolean                    _tagViewerItem_IsChecked;
-//   private boolean                    _tagViewerItem_IsKeyPressed;
+   private boolean                    _tagViewerItem_IsKeyPressed;
    private Object                     _tagViewerItem_Data;
 
    private boolean                    _isBehaviourSingleExpandedOthersCollapse  = true;
@@ -273,7 +270,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
       @Override
       public void run() {
 
-         doSave(null);
+         doSave();
 
          updateCommandHandler();
       }
@@ -837,13 +834,13 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
          }
       });
 
-//      tree.addKeyListener(new KeyAdapter() {
-//
-//         @Override
-//         public void keyPressed(final KeyEvent e) {
-//            _tagViewerItem_IsKeyPressed = true;
-//         }
-//      });
+      tree.addKeyListener(new KeyAdapter() {
+
+         @Override
+         public void keyPressed(final KeyEvent e) {
+            _tagViewerItem_IsKeyPressed = true;
+         }
+      });
 
       /*
        * Create tag viewer
@@ -1109,11 +1106,11 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
       enableControls();
 
-      firePropertyChange(PROP_DIRTY);
+//      firePropertyChange(PROP_DIRTY);
    }
 
    @Override
-   public void doSave(final IProgressMonitor monitor) {
+   public void doSave() {
 
       // check if the tour editor contains a modified tour
       if (TourManager.isTourEditorModified()) {
@@ -1128,12 +1125,10 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
          enableControls();
 
-         firePropertyChange(PROP_DIRTY);
+//         firePropertyChange(PROP_DIRTY);
       }
    }
 
-   @Override
-   public void doSaveAs() {}
 
    private void enableControls() {
 
@@ -1284,21 +1279,12 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
       _columnSortListener = widgetSelectedAdapter(e -> onSelect_SortColumn(e));
    }
 
-   @Override
-   public boolean isDirty() {
+//   @Override
+//   public boolean isDirty() {
+//
+//      return _isTagDirty && _allSelectedTours.size() > 0;
+//   }
 
-      return _isTagDirty && _allSelectedTours.size() > 0;
-   }
-
-   @Override
-   public boolean isSaveAsAllowed() {
-      return false;
-   }
-
-   @Override
-   public boolean isSaveOnCloseNeeded() {
-      return isDirty();
-   }
 
    /**
     * Load all tag items that the categories do show the number of items
@@ -1857,7 +1843,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
       enableControls();
 
-      firePropertyChange(PROP_DIRTY);
+//      firePropertyChange(PROP_DIRTY);
    }
 
    @Override
@@ -1868,9 +1854,11 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
     */
    private void updateCommandHandler() {
 
-      final IEvaluationService evalService = PlatformUI.getWorkbench().getService(IEvaluationService.class);
+// this is not used any more because the save/restore icons are always enabled
 
-      evalService.requestEvaluation(COMMAND_EXPRESSION_TOUR_EDITOR_IS_DIRTY);
+//      final IEvaluationService evalService = PlatformUI.getWorkbench().getService(IEvaluationService.class);
+//
+//      evalService.requestEvaluation(AppCommands.COMMAND_EXPRESSION_TOUR_EDITOR_IS_DIRTY);
    }
 
    /**

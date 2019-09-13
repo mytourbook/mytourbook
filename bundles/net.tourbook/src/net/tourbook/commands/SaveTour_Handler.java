@@ -49,7 +49,15 @@ public class SaveTour_Handler extends AbstractHandler implements IElementUpdater
 
       if (part instanceof ISaveablePart) {
 
+         // tour data editor
+
          ((ISaveablePart) part).doSave(null);
+
+      } else if (part instanceof ISaveAndRestorePart) {
+
+         // tour tags editor
+
+         ((ISaveAndRestorePart) part).doSave();
       }
 
       return null;
