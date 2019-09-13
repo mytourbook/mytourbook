@@ -1097,37 +1097,38 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       {
          final Composite containerFirst = new Composite(container, SWT.NONE);
          GridDataFactory.fillDefaults().grab(true, false).applyTo(containerFirst);
-         GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerFirst);
+         GridLayoutFactory.fillDefaults().numColumns(3).applyTo(containerFirst);
          {
             /*
              * label: Hiking Cadence Zone
              */
-            final Label label = new Label(container, SWT.NONE);
+            final Label label = new Label(containerFirst, SWT.NONE);
             label.setText("Hiking");//net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit);
 
             /*
              * label:
              */
-            final Label runningLabel = new Label(container, SWT.NONE);
+            final Label runningLabel = new Label(containerFirst, SWT.NONE);
             GridDataFactory.fillDefaults()//
-                  // .grab(true, true)
-                  .align(SWT.END, SWT.CENTER)
-                  .applyTo(label);
+                  .span(1, 2)
+                  .indent(50, 0)
+                  .hint(net.tourbook.common.UI.DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
+                  .applyTo(runningLabel);
             runningLabel.setText("Running");//Messages.Pref_People_Label_Age);
 
          }
-
-         final Composite containerHr = new Composite(container, SWT.NONE);
-         GridDataFactory.fillDefaults().grab(true, false).applyTo(containerHr);
-         GridLayoutFactory.fillDefaults().numColumns(3).applyTo(containerHr);
-         {
-            createUI_71_CadenceDelimiter(containerHr);
-         }
       }
+
+      final Composite containerDelimiter = new Composite(container, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).span(3, 1).applyTo(containerDelimiter);
+      GridLayoutFactory.fillDefaults().numColumns(3).applyTo(containerDelimiter);
+         {
+         createUI_71_CadenceDelimiter(containerDelimiter);
+         }
 
       // button: compute computed values
       final Button btnComputValues = new Button(container, SWT.NONE);
-      GridDataFactory.fillDefaults().indent(0, 100).applyTo(btnComputValues);
+      GridDataFactory.fillDefaults().indent(0, 100).align(SWT.BEGINNING, SWT.FILL).applyTo(btnComputValues);
       btnComputValues.setText("Calculer les temps pour chaque zone de cadence");//Messages.Compute_BreakTime_Button_ComputeAllTours);
       btnComputValues.setToolTipText(Messages.Compute_BreakTime_Button_ComputeAllTours_Tooltip);
       btnComputValues.addSelectionListener(new SelectionAdapter() {
@@ -1196,7 +1197,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          // spinner: weight
          _spinnerCadenceDelimiter = new Spinner(container, SWT.BORDER);
          GridDataFactory.fillDefaults() //
-               .align(SWT.BEGINNING, SWT.FILL)
+         // .align(SWT.BEGINNING, SWT.FILL)
 //             .hint(_spinnerWidth, SWT.DEFAULT)
                .applyTo(_spinnerCadenceDelimiter);
          _spinnerCadenceDelimiter.setMinimum(0);
@@ -1212,24 +1213,24 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
          // label: unit
          label = new Label(container, SWT.NONE);
-         label.setText(net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit);
+         label.setText(net.tourbook.common.Messages.Graph_Label_Cadence_Unit);
       }
 
-      final Composite containerAge = new Composite(parent, SWT.NONE);
+      final Composite containerMaxCadence = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()//
             .grab(true, false)
-            .align(SWT.END, SWT.FILL)
-            .applyTo(containerAge);
-      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerAge);
+            // .align(SWT.END, SWT.FILL)
+            .applyTo(containerMaxCadence);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerMaxCadence);
 //    containerAge.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
       {
          /*
           * label:
           */
-         label = new Label(containerAge, SWT.NONE);
+         label = new Label(containerMaxCadence, SWT.NONE);
          GridDataFactory.fillDefaults()//
-               .grab(true, true)
-               .align(SWT.END, SWT.CENTER)
+               .grab(true, false)
+               // .align(SWT.END, SWT.CENTER)
                .applyTo(label);
          label.setText("140 rpm");//Messages.Pref_People_Label_Age);
       }
@@ -1992,8 +1993,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
          @Override
          public boolean computeTourValues(final TourData oldTourData) {
-
-            // TODO check if the delimiter has been modified ? if ont, we cancel ?
 
             // recompute times for each cadence zones
             oldTourData.computeCadenceZonesTimes();
