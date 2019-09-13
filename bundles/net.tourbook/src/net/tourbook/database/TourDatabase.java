@@ -3129,7 +3129,9 @@ public class TourDatabase {
             + "   rawDataPath       VARCHAR(" + TourPerson.DB_LENGTH_RAW_DATA_PATH + "),     \n" //$NON-NLS-1$ //$NON-NLS-2$
             + "   deviceReaderId    VARCHAR(" + TourPerson.DB_LENGTH_DEVICE_READER_ID + "),  \n" //$NON-NLS-1$ //$NON-NLS-2$
             //
-            + "   " + KEY_BIKE + "  BIGINT                                               \n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   " + KEY_BIKE + "  BIGINT,                                              \n" //$NON-NLS-1$ //$NON-NLS-2$
+
+            + " cadenceZonesDelimiter                      INTEGER DEFAULT 0                  \n" //$NON-NLS-1$
             //
             + ")"); //$NON-NLS-1$
    }
@@ -7172,7 +7174,20 @@ public class TourDatabase {
             SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "cadenceZoneHikingTime", DEFAULT_0);//$NON-NLS-1$
             SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "cadenceZoneRunningTime", DEFAULT_0); //$NON-NLS-1$
 
+
 // SET_FORMATTING_ON
+         }
+
+            // check if db is updated to version 41
+         if (isColumnAvailable(conn, TABLE_TOUR_PERSON, "cadenceZonesDelimiter") == false) { //$NON-NLS-1$
+
+   // SET_FORMATTING_OFF
+
+               // Add new columns
+               SQL.AddCol_Int(stmt, TABLE_TOUR_PERSON, "cadenceZonesDelimiter", DEFAULT_0); //$NON-NLS-1$
+
+
+   // SET_FORMATTING_ON
          }
       }
       stmt.close();

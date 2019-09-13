@@ -3239,20 +3239,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    public void computeCadenceZonesTimes() {
 
-      final TourPerson tourPerson = getDataPerson();
-
       if (timeSerie == null || cadenceSerie == null ) {
          return;
       }
 
-      // cadenceZoneDelimiter or Differentiator = person.getDElimterOrDifferentiator()
-
-      /*
-       * if (cadenceZoneDelimiter == null) {
-       * // hr zones are not defined
-       * return;
-       * }
-       */
+      final TourPerson tourPerson = getDataPerson();
+      final int cadenceZonesDelimiter = tourPerson.getCadenceZonesDelimiter();
 
       if (breakTimeSerie == null) {
          getBreakTime();
@@ -3286,7 +3278,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
             }
          }
 
-         if (cadence >= 70) {
+         if (cadence >= cadenceZonesDelimiter) {
             cadenceZoneRunningTime += timeDiff;
          } else {
             cadenceZoneHikingTime += timeDiff;
