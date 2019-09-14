@@ -145,11 +145,12 @@ public class Dialog_SaveTags_Wizard extends Wizard {
          break;
       }
 
-      TourLogManager.addLog(TourLogState.DEFAULT, startLogMessage);
+      TourLogManager.addLog(TourLogState.INFO, startLogMessage);
 
       // log selected tags
       if (_allCheckedTagIds.size() > 0) {
-         TourLogManager.addLog(TourLogState.DEFAULT, TourDatabase.getTagNamesText(_allCheckedTagIds, true));
+         final String tagNamesText = TourDatabase.getTagNamesText(_allCheckedTagIds, false);
+         TourLogManager.addLog(TourLogState.DEFAULT, tagNamesText);
       }
 
       final IRunnableWithProgress runnable = new IRunnableWithProgress() {

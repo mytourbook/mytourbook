@@ -147,7 +147,7 @@ public class TourLogManager {
 
 		final String logMessage = WEB.convertHTML_LineBreaks(message);
 
-		final TourLog tourLog = new TourLog(TourLogState.IMPORT_INFO, logMessage);
+		final TourLog tourLog = new TourLog(TourLogState.INFO, logMessage);
 
 		tourLog.css = TourLogView.CSS_LOG_INFO;
 
@@ -170,7 +170,7 @@ public class TourLogManager {
 
 		final String logMessage = WEB.convertHTML_LineBreaks(message);
 
-		final TourLog tourLog = new TourLog(TourLogState.IMPORT_INFO, logMessage);
+		final TourLog tourLog = new TourLog(TourLogState.INFO, logMessage);
 
 		tourLog.css = TourLogView.CSS_LOG_INFO;
 		tourLog.isSubLogItem = true;

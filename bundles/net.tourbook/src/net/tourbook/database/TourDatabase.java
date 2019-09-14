@@ -1756,7 +1756,7 @@ public class TourDatabase {
 
    public static String getTagNamesText(final Set<Long> alltagIds, final boolean isVertical) {
 
-      // ensure tour types are loaded
+      // ensure tour tags are loaded
       getAllTourTags();
 
       final ArrayList<String> tagNames = new ArrayList<>();

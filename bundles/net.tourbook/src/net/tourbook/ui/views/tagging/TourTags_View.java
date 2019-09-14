@@ -96,7 +96,6 @@ import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
-import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
@@ -152,18 +151,17 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
    private ArrayList<TourData>        _allSelectedTours                         = new ArrayList<>();
    private ArrayList<TourData>        _allTaggedTours                           = new ArrayList<>();
 
-   private boolean                    _tagViewerItem_IsChecked;
+   private boolean                    _tagViewerItem_IsCheckboxSelected;
    private boolean                    _tagViewerItem_IsKeyPressed;
    private Object                     _tagViewerItem_Data;
 
    private boolean                    _isBehaviourSingleExpandedOthersCollapse  = true;
    private boolean                    _isBehaviourAutoExpandCollapse            = true;
-   private boolean                    _isExpandingSelection;
+   private boolean                    _isInExpandingSelection;
    private boolean                    _isHierarchicalLayout;
    private boolean                    _isInCollapseAll;
    private boolean                    _isInUIUpdate;
    private boolean                    _isShowOnlyCheckedTags;
-   private boolean                    _isTagDirty;
 
 //   private OpenDialogManager                  _openDlgMgr                               = new OpenDialogManager();
 
@@ -796,12 +794,9 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
              */
             _btnUncheckAllTags = new Button(container, SWT.NONE);
             _btnUncheckAllTags.setText(Messages.App_Action_UncheckAll);
-            _btnUncheckAllTags.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onAction_UncheckAllTags();
-               }
-            });
+
+            _btnUncheckAllTags.addSelectionListener(widgetSelectedAdapter(e -> onAction_UncheckAllTags()));
+
 //            UI.setButtonLayoutData(_btnUncheckAllTags);
 //            final GridData gd = (GridData) _btnUncheckAllTags.getLayoutData();
 //            gd.horizontalAlignment = SWT.END;
@@ -826,13 +821,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
       tree.setHeaderVisible(true);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(tree);
 
-      tree.addSelectionListener(new SelectionAdapter() {
-
-         @Override
-         public void widgetSelected(final SelectionEvent event) {
-            onTagTree_Select(event);
-         }
-      });
+      tree.addSelectionListener(widgetSelectedAdapter(e -> onTagTree_Selection(e)));
 
       tree.addKeyListener(new KeyAdapter() {
 
@@ -881,6 +870,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
          @Override
          public boolean isGrayed(final Object element) {
+
             return false;
          }
       });
@@ -1102,8 +1092,6 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
       updateUI_Tags();
 
-      _isTagDirty = false;
-
       enableControls();
 
 //      firePropertyChange(PROP_DIRTY);
@@ -1121,14 +1109,11 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
       final Dialog_SaveTags dialogSaveTags = new Dialog_SaveTags(_parent.getShell(), wizard);
       if (dialogSaveTags.open() == Window.OK) {
 
-         _isTagDirty = false;
-
          enableControls();
 
 //         firePropertyChange(PROP_DIRTY);
       }
    }
-
 
    private void enableControls() {
 
@@ -1279,13 +1264,6 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
       _columnSortListener = widgetSelectedAdapter(e -> onSelect_SortColumn(e));
    }
 
-//   @Override
-//   public boolean isDirty() {
-//
-//      return _isTagDirty && _allSelectedTours.size() > 0;
-//   }
-
-
    /**
     * Load all tag items that the categories do show the number of items
     */
@@ -1379,8 +1357,6 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
    private void onAction_UncheckAllTags() {
 
-      _isTagDirty = true;
-
       _allCheckedTagIds.clear();
       _allTaggedTours.clear();
 
@@ -1455,14 +1431,14 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
       }
    }
 
-   private void onTagTree_Select(final SelectionEvent event) {
+   private void onTagTree_Selection(final SelectionEvent event) {
 
       /*
        * The tag treeviewer selection event can have another selection !!!
        */
-      _tagViewerItem_IsChecked = event.detail == SWT.CHECK;
+      _tagViewerItem_IsCheckboxSelected = event.detail == SWT.CHECK;
 
-      if (_tagViewerItem_IsChecked) {
+      if (_tagViewerItem_IsCheckboxSelected) {
 
          /*
           * Item can be null when <ctrl>+A is pressed !!!
@@ -1471,6 +1447,29 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
          _tagViewerItem_Data = item.getData();
       }
+
+      /////////////////////////////////////////////////////////////////////////////////////
+
+//      final TreeItem treeItem = (TreeItem) event.item;
+//
+//      final Object itemData = treeItem.getData();
+//
+//      if (itemData instanceof TVIPrefTagCategory) {
+//
+//         treeItem.setChecked(false);
+//         event.doit = false;
+//         return;
+//      }
+
+//      ICategory category = (ICategory) tableItem.getData();
+
+//      if (isLocked(category)) {
+//
+//         tableItem.setChecked(true);
+//         event.doit = false; // veto the check
+//         return;
+//      }
+
    }
 
    private void onTagViewer_Select(final SelectionChangedEvent event) {
@@ -1491,11 +1490,9 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
       Object selection;
 
-      if (_tagViewerItem_IsChecked) {
+      if (_tagViewerItem_IsCheckboxSelected) {
 
          // a checkbox is checked
-
-         setTagsDirty();
 
          selection = _tagViewerItem_Data;
 
@@ -1510,37 +1507,60 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
          final TVIPrefTag tviTag = (TVIPrefTag) selection;
 
+         // get current check state
+         boolean isChecked = _tagViewer.getChecked(tviTag);
+
          // toggle tag
-         if (_tagViewerItem_IsChecked == false) {
+         if (_tagViewerItem_IsCheckboxSelected) {
+
+            // checkbox is already toggled -> nothing more to do
+
+         } else {
 
             // tag is selected and NOT the checkbox !!!
 
-            setTagsDirty();
-
-            // get new check state
-            final boolean isChecked = !_tagViewer.getChecked(tviTag);
-
-            // update model
-            final long tagId = tviTag.getTourTag().getTagId();
-            if (isChecked) {
-               _allCheckedTagIds.add(tagId);
-            } else {
-               _allCheckedTagIds.remove(tagId);
-            }
+            isChecked = !isChecked;
 
             // update UI
             _tagViewer.setChecked(tviTag, isChecked);
+         }
+
+         // update model
+         final long tagId = tviTag.getTourTag().getTagId();
+         if (isChecked) {
+            _allCheckedTagIds.add(tagId);
+         } else {
+            _allCheckedTagIds.remove(tagId);
          }
 
       } else if (selection instanceof TVIPrefTagCategory) {
 
          // expand/collapse current item
 
-         if (_tagViewerItem_IsChecked == false) {
+         final TreeSelection treeSelection = (TreeSelection) event.getSelection();
+
+         if (_tagViewerItem_IsCheckboxSelected) {
+
+            // category is checked -> this is not yet supported -> too complicated
+
+// TODO           _tagViewer.setChecked(treeSelection, false);
+
+            final ArrayList<Long> allCheckedItems = new ArrayList<>();
+
+            for (final Object checkedItem : _tagViewer.getCheckedElements()) {
+
+               if (checkedItem instanceof TVIPrefTag) {
+                  final TVIPrefTag tviTag = (TVIPrefTag) checkedItem;
+                  allCheckedItems.add(tviTag.getTourTag().getTagId());
+               }
+            }
+
+            _allCheckedTagIds.clear();
+            _allCheckedTagIds.addAll(allCheckedItems);
+
+         } else {
 
             // category is selected and NOT the checkbox !!!
-
-            final TreeSelection treeSelection = (TreeSelection) event.getSelection();
 
             onTagViewer_SelectCategory(treeSelection);
          }
@@ -1549,7 +1569,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
    private void onTagViewer_SelectCategory(final TreeSelection treeSelection) {
 
-      if (_isExpandingSelection) {
+      if (_isInExpandingSelection) {
 
          // prevent endless loops
          return;
@@ -1637,7 +1657,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
    private void onTagViewer_SelectCategory_20_AutoExpandCollapse_Runnable(final TVIPrefTagCategory selectedFolderItem,
                                                                           final ITreeSelection treeSelection,
                                                                           final TreePath selectedTreePath) {
-      _isExpandingSelection = true;
+      _isInExpandingSelection = true;
       {
          final Tree tree = _tagViewer.getTree();
 
@@ -1680,7 +1700,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
          }
          tree.setRedraw(true);
       }
-      _isExpandingSelection = false;
+      _isInExpandingSelection = false;
    }
 
    @Override
@@ -1835,15 +1855,6 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
       _allSelectedTours.clear();
       _allSelectedTours.addAll(selectedTourData);
-   }
-
-   private void setTagsDirty() {
-
-      _isTagDirty = true;
-
-      enableControls();
-
-//      firePropertyChange(PROP_DIRTY);
    }
 
    @Override

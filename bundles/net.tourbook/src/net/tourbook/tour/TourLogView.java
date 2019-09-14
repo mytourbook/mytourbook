@@ -514,7 +514,7 @@ public class TourLogView extends ViewPart {
          stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateError);
          break;
 
-      case IMPORT_INFO:
+      case INFO:
          stateNoBrowser[0] = STATE_INFO;
          stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateInfo);
          break;

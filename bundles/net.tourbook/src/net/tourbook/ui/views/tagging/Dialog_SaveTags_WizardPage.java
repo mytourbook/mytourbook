@@ -31,6 +31,9 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
@@ -80,22 +83,36 @@ class Dialog_SaveTags_WizardPage extends WizardPage {
 
    private Composite createUI(final Composite parent) {
 
-      final Composite container = new Composite(parent, SWT.NONE);
-      container.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_YELLOW));
-      GridDataFactory.fillDefaults()
-//            .grab(true, true)
-            .applyTo(container);
-      GridLayoutFactory.swtDefaults().applyTo(container);
+      final ScrolledComposite scrolledContainer = new ScrolledComposite(parent, SWT.V_SCROLL | SWT.H_SCROLL);
+      scrolledContainer.setExpandVertical(true);
+      scrolledContainer.setExpandHorizontal(true);
+
+      final Composite scrolledContent = new Composite(scrolledContainer, SWT.NONE);
+      GridLayoutFactory.swtDefaults()//
+//          .spacing(0, 0)
+            .applyTo(scrolledContent);
+//    container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
       {
-         createUI_10_Controls(container);
+         createUI_10_Controls(scrolledContent);
       }
 
-      return container;
+      // setup scrolled container
+      scrolledContainer.addControlListener(new ControlAdapter() {
+         @Override
+         public void controlResized(final ControlEvent e) {
+            scrolledContainer.setMinSize(scrolledContent.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+         }
+      });
+
+      scrolledContainer.setContent(scrolledContent);
+
+      return scrolledContainer;
    }
 
    private void createUI_10_Controls(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
       GridLayoutFactory.fillDefaults().applyTo(container);
       {
          {
@@ -111,6 +128,7 @@ class Dialog_SaveTags_WizardPage extends WizardPage {
              */
             _rdoAppendNewTags = new Button(container, SWT.RADIO);
             _rdoAppendNewTags.setText(Messages.Dialog_SaveTags_Radio_AppendNewTags);
+            GridDataFactory.fillDefaults().indent(0, 10).applyTo(_rdoAppendNewTags);
          }
          {
             /*
@@ -145,14 +163,10 @@ class Dialog_SaveTags_WizardPage extends WizardPage {
                // label: header
                final Label label = new Label(container, SWT.NONE);
                label.setText(Messages.Dialog_SaveTags_Label_SelectedTags);
-               GridDataFactory.fillDefaults().indent(0, 20).applyTo(label);
+               GridDataFactory.fillDefaults().indent(0, 10).applyTo(label);
 
                // label: tags
                _lblSelectedTags = new Label(container, SWT.WRAP);
-               _lblSelectedTags.setText(UI.SPACE1);
-               GridDataFactory.fillDefaults()
-//                     .grab(true, true)
-                     .applyTo(_lblSelectedTags);
             }
          }
       }
