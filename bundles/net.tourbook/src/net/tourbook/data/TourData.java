@@ -420,6 +420,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private int                   hrZone9                        = -1;                     // db-version 16
 
    /**
+    * Time spent (in seconds) in the "Hiking" cadence zone.
+    */
+   private int                   cadenceZoneHikingTime                        = -1;                     // db-version 41
+   /**
+    * Time spent (in seconds) in the "Running" cadence zone.
+    */
+   private int                   cadenceZoneRunningTime                        = -1;                     // db-version 41
+
+   /**
     * A flag indicating that the pulse is from a sensor. This is the state of the device which is
     * not related to the availability of pulse data. Pulse data should be available but is not
     * checked.<br>
@@ -3226,6 +3235,58 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
+    * Computes seconds for each cadence zone (hiking and running).
+    */
+   public void computeCadenceZonesTimes() {
+
+      if (timeSerie == null || cadenceSerie == null ) {
+         return;
+      }
+
+      final TourPerson tourPerson = getDataPerson();
+      final int cadenceZonesDelimiter = tourPerson.getCadenceZonesDelimiter();
+
+      if (breakTimeSerie == null) {
+         getBreakTime();
+      }
+
+      int prevTime = 0;
+
+      cadenceZoneRunningTime = 0;
+      cadenceZoneHikingTime = 0;
+
+      // compute zone values
+      for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
+
+         final float cadence = cadenceSerie[serieIndex];
+         final int time = timeSerie[serieIndex];
+
+         final int timeDiff = time - prevTime;
+         prevTime = time;
+
+         // check if a break occurred, break time is ignored
+         if (breakTimeSerie != null) {
+
+            /*
+             * break time requires distance data, so it's possible that break time data are not
+             * available
+             */
+
+            if (breakTimeSerie[serieIndex] == true) {
+               // cadence zones are not set for break time
+               continue;
+            }
+         }
+
+         if (cadence >= cadenceZonesDelimiter) {
+            cadenceZoneRunningTime += timeDiff;
+         } else {
+            cadenceZoneHikingTime += timeDiff;
+         }
+      }
+   }
+
+   /**
     * Compute min/max/avg and other computed fields.
     */
    public void computeComputedValues() {
@@ -3242,6 +3303,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       computeAvg_Temperature();
 
       computeHrZones();
+      computeCadenceZonesTimes();
       computeRunningDynamics();
 
       computeGeo_Bounds();
@@ -3536,7 +3598,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          final int timeDiff = time - prevTime;
          prevTime = time;
 
-         // check if a break occured, break time is ignored
+         // check if a break occurred, break time is ignored
          if (breakTimeSerie != null) {
 
             /*
@@ -6575,6 +6637,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
    }
 
+   public int getCadenceZoneHikingTime() {
+      return cadenceZoneHikingTime;
+   }
+
+   public int getCadenceZoneRunningTime() {
+      return cadenceZoneRunningTime;
+   }
+
    /**
     * @return Returns the calories or <code>0</code> when calories are not available.
     */
@@ -8725,6 +8795,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    public void setCadenceSerie(final float[] cadenceSerieData) {
       cadenceSerie = cadenceSerieData;
+   }
+
+   public void setCadenceZoneHikingTime(final int cadenceZoneHikingTime) {
+      this.cadenceZoneHikingTime = cadenceZoneHikingTime;
+   }
+
+   public void setCadenceZoneRunningTime(final int cadenceZoneRunningTime) {
+      this.cadenceZoneRunningTime = cadenceZoneRunningTime;
    }
 
    /**

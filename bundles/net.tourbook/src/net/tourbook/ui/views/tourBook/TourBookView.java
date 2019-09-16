@@ -1011,7 +1011,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       defineColumn_Powertrain_AvgLeftTorqueEffectiveness();
       defineColumn_Powertrain_AvgRightPedalSmoothness();
       defineColumn_Powertrain_AvgRightTorqueEffectiveness();
-      defineColumn_Powertrain_PedalLeftRightBalance();
+      defineColumn_Powertrain_HikingVsRunningPercentage();
 
       // Training - Trainingsanalyse
       defineColumn_Training_FTP();
@@ -1860,6 +1860,29 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             final long value = ((TVITourBookItem) element).colRearShiftCount;
 
             colDef.printValue_0(cell, value);
+
+            setCellColor(cell, element);
+         }
+      });
+   }
+
+   /**
+    * Column: Hiking vs Running Percentage
+    */
+   private void defineColumn_Powertrain_HikingVsRunningPercentage() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.POWERTRAIN_HIKING_VS_RUNNING_PERCENTAGE.createColumn(
+            _columnManager,
+            _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            final String value = ((TVITourBookItem) element).colHikingVsRunning;
+
+            cell.setText(value);//"30 - 70");
 
             setCellColor(cell, element);
          }

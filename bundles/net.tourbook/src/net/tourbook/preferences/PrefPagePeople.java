@@ -205,6 +205,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
    private Spinner              _spinnerHeight;
    private Spinner              _spinnerRestingHR;
    private Spinner              _spinnerMaxHR;
+   private Spinner              _spinnerCadenceDelimiter;
    private Button               _rdoGenderMale;
    private Button               _rdoGenderFemale;
 
@@ -687,6 +688,11 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          tabItemHRZone.setText(Messages.Pref_People_Tab_HRZone);
          tabItemHRZone.setControl(createUI_60_Tab_HRZone(_tabFolderPerson));
 
+         // tab: cadence zones
+         final TabItem tabItemCadenceZones = new TabItem(_tabFolderPerson, SWT.NONE);
+         tabItemCadenceZones.setText("Cadence Zones");//"Zones de cadence");//Messages.Pref_People_Tab_HRZone);
+         tabItemCadenceZones.setControl(createUI_70_CadenceZones(_tabFolderPerson));
+
          // tab: data transfer
          final TabItem tabItemDataTransfer = new TabItem(_tabFolderPerson, SWT.NONE);
          tabItemDataTransfer.setText(Messages.Pref_People_Tab_DataTransfer);
@@ -1083,6 +1089,58 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       }
    }
 
+   private Control createUI_70_CadenceZones(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.swtDefaults().extendedMargins(5, 5, 10, 5).numColumns(3).applyTo(container);
+      {
+         final Composite containerFirst = new Composite(container, SWT.NONE);
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(containerFirst);
+         GridLayoutFactory.fillDefaults().numColumns(3).applyTo(containerFirst);
+         {
+            /*
+             * label: Hiking Cadence Zone
+             */
+            final Label label = new Label(containerFirst, SWT.NONE);
+            label.setText("Hiking");//net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit);
+
+            /*
+             * label:
+             */
+            final Label runningLabel = new Label(containerFirst, SWT.NONE);
+            GridDataFactory.fillDefaults()//
+                  .span(1, 2)
+                  .indent(50, 0)
+                  .hint(net.tourbook.common.UI.DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
+                  .applyTo(runningLabel);
+            runningLabel.setText("Running");//Messages.Pref_People_Label_Age);
+
+         }
+      }
+
+      final Composite containerDelimiter = new Composite(container, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).span(3, 1).applyTo(containerDelimiter);
+      GridLayoutFactory.fillDefaults().numColumns(3).applyTo(containerDelimiter);
+         {
+         createUI_71_CadenceDelimiter(containerDelimiter);
+         }
+
+      // button: compute computed values
+      final Button btnComputValues = new Button(container, SWT.NONE);
+      GridDataFactory.fillDefaults().indent(0, 100).align(SWT.BEGINNING, SWT.FILL).applyTo(btnComputValues);
+      btnComputValues.setText("Calculer les temps pour chaque zone de cadence");//Messages.Compute_BreakTime_Button_ComputeAllTours);
+      btnComputValues.setToolTipText(Messages.Compute_BreakTime_Button_ComputeAllTours_Tooltip);
+      btnComputValues.addSelectionListener(new SelectionAdapter() {
+         @Override
+         public void widgetSelected(final SelectionEvent e) {
+            onComputeCadenceZonesTimeValues();
+         }
+      });
+
+      return container;
+   }
+
    private void createUI_70_HrZone(final Composite parent) {
 
       final Composite hrZoneContainer = new Composite(parent, SWT.NONE);
@@ -1119,6 +1177,62 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
                }
             }
          });
+      }
+   }
+
+   /**
+    * field: Selection of the cadence differentiating hiking from running.
+    */
+   private void createUI_71_CadenceDelimiter(final Composite parent) {
+
+      Label label = new Label(parent, SWT.NONE);
+      label.setText("0 rpm");//Messages.Pref_People_Label_RestingHR);
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults()//
+//          .span(2, 1)
+            .applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      {
+         // spinner: weight
+         _spinnerCadenceDelimiter = new Spinner(container, SWT.BORDER);
+         GridDataFactory.fillDefaults() //
+         // .align(SWT.BEGINNING, SWT.FILL)
+//             .hint(_spinnerWidth, SWT.DEFAULT)
+               .applyTo(_spinnerCadenceDelimiter);
+         _spinnerCadenceDelimiter.setMinimum(0);
+         _spinnerCadenceDelimiter.setMaximum(200);
+         _spinnerCadenceDelimiter.addSelectionListener(_defaultSelectionListener);
+         _spinnerCadenceDelimiter.addMouseWheelListener(new MouseWheelListener() {
+            @Override
+            public void mouseScrolled(final MouseEvent event) {
+               UI.adjustSpinnerValueOnMouseScroll(event);
+               onModifyPerson();
+            }
+         });
+
+         // label: unit
+         label = new Label(container, SWT.NONE);
+         label.setText(net.tourbook.common.Messages.Graph_Label_Cadence_Unit);
+      }
+
+      final Composite containerMaxCadence = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults()//
+            .grab(true, false)
+            // .align(SWT.END, SWT.FILL)
+            .applyTo(containerMaxCadence);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerMaxCadence);
+//    containerAge.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+      {
+         /*
+          * label:
+          */
+         label = new Label(containerMaxCadence, SWT.NONE);
+         GridDataFactory.fillDefaults()//
+               .grab(true, false)
+               // .align(SWT.END, SWT.CENTER)
+               .applyTo(label);
+         label.setText("140 rpm");//Messages.Pref_People_Label_Age);
       }
    }
 
@@ -1681,6 +1795,15 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       }
    }
 
+   private void fireTourModifyEvent() {
+
+      TourManager.getInstance().removeAllToursFromCache();
+      TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR);
+
+      // fire unique event for all changes
+      TourManager.fireEvent(TourEventId.ALL_TOURS_ARE_MODIFIED);
+   }
+
    private ZonedDateTime getBirthdayFromUI() {
 
       return ZonedDateTime.of(
@@ -1846,6 +1969,75 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       enableActions();
 
       _peopleViewer.getTable().setFocus();
+   }
+
+   private void onComputeCadenceZonesTimeValues() {
+
+      if (MessageDialog.openConfirm(
+            Display.getCurrent().getActiveShell(),
+            "Youre sure to compute cadence times ?", //Messages.Compute_BreakTime_Dialog_ComputeForAllTours_Title,
+            "Youre sure to compute cadence times ?") == false) {// Messages.Compute_BreakTime_Dialog_ComputeForAllTours_Message) {// == false) {
+         return;
+      }
+
+      saveState();
+
+      final TourPerson person = getCurrentPerson();
+      person.setCadenceZonesDelimiter(_spinnerCadenceDelimiter.getSelection());
+      person.persist();
+
+      final int[] oldBreakTime = { 0 };
+      final int[] newBreakTime = { 0 };
+
+      final IComputeTourValues computeTourValueConfig = new IComputeTourValues() {
+
+         @Override
+         public boolean computeTourValues(final TourData oldTourData) {
+
+            // recompute times for each cadence zones
+            oldTourData.computeCadenceZonesTimes();
+
+            return true;
+         }
+
+         @Override
+         public String getResultText() {
+
+            return NLS.bind(
+                  Messages.Compute_BreakTime_ForAllTour_Job_Result, //
+                  new Object[] {
+                        net.tourbook.common.UI.format_hh_mm_ss(oldBreakTime[0]),
+                        net.tourbook.common.UI.format_hh_mm_ss(newBreakTime[0]), });
+         }
+
+         @Override
+         public String getSubTaskText(final TourData savedTourData) {
+
+            String subTaskText = null;
+
+            if (savedTourData != null) {
+
+               // get new value
+               final int tourRecordingTime = (int) savedTourData.getTourRecordingTime();
+
+               // get old break time
+               final int tourDrivingTime = (int) savedTourData.getTourDrivingTime();
+               newBreakTime[0] += tourRecordingTime - tourDrivingTime;
+
+               subTaskText = NLS.bind(
+                     Messages.Compute_BreakTime_ForAllTour_Job_SubTask, //
+                     new Object[] {
+                           net.tourbook.common.UI.format_hh_mm_ss(oldBreakTime[0]),
+                           net.tourbook.common.UI.format_hh_mm_ss(newBreakTime[0]), });
+            }
+
+            return subTaskText;
+         }
+      };
+
+      TourDatabase.computeValuesForAllTours(computeTourValueConfig, null);
+
+      fireTourModifyEvent();
    }
 
    private void onCreateHrZonesFromTemplate() {
@@ -2174,6 +2366,8 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       person.setGender(_rdoGenderMale.getSelection() ? 0 : 1);
       person.setRestPulse(_spinnerRestingHR.getSelection());
 
+      person.setCadenceZonesDelimiter(_spinnerCadenceDelimiter.getSelection());
+
       person.setRawDataPath(_rawDataPathEditor.getStringValue());
       person.setDeviceReaderId(deviceId);
 
@@ -2257,6 +2451,8 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          _rdoGenderMale.setSelection(gender == 0);
          _rdoGenderFemale.setSelection(gender != 0);
          _spinnerRestingHR.setSelection(restPulse == 0 ? TourPerson.DEFAULT_REST_PULSE : restPulse);
+         _spinnerCadenceDelimiter.setSelection(person.getCadenceZonesDelimiter() == 0 ? TourPerson.DEFAULT_CADENCE_ZONES_DELIMITER : person
+               .getCadenceZonesDelimiter());
 
          final int hrMaxFormulaKey = person.getHrMaxFormula();
          final int maxPulse = person.getMaxPulse();

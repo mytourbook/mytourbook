@@ -181,7 +181,10 @@ public class TVITourBookYearSub extends TVITourBookItem {
             //
             + "training_TrainingEffect_Aerob, " //          76   //$NON-NLS-1$
             + "training_TrainingEffect_Anaerob, " //        77   //$NON-NLS-1$
-            + "training_TrainingPerformance " //            78   //$NON-NLS-1$
+            + "training_TrainingPerformance, " //            78   //$NON-NLS-1$
+
+            + "cadenceZoneHikingTime, " //                       79   //$NON-NLS-1$
+            + "cadenceZoneRunningTime " //                      80   //$NON-NLS-1$
 
             + UI.NEW_LINE
 
@@ -380,6 +383,18 @@ public class TVITourBookYearSub extends TVITourBookItem {
 
                tourItem.colAvgCadence = dbAvgCadence * dbCadenceMultiplier;
                tourItem.colCadenceMultiplier = dbCadenceMultiplier;
+
+               tourItem.colHikingVsRunning = ""; //$NON-NLS-1$
+               final int cadenceZoneHikingTime = result.getInt(79) == -1 ? 0 : result.getInt(79);
+               final int cadenceZoneRunningTime = result.getInt(80) == -1 ? 0 : result.getInt(80);
+
+               final int totalCadenceTime = cadenceZoneHikingTime + cadenceZoneRunningTime;
+               if (totalCadenceTime != 0) {
+                  final int cadenceZoneHikingPercentage = Math.round(result.getInt(79) * 100f / totalCadenceTime);
+                  final int cadenceZoneRunningPercentage = Math.round(result.getInt(80) * 100f / totalCadenceTime);
+
+                  tourItem.colHikingVsRunning = cadenceZoneHikingPercentage + " - " + cadenceZoneRunningPercentage; //$NON-NLS-1$
+               }
 
                // -----------------------------------------------
 
