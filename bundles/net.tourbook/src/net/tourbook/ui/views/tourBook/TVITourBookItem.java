@@ -19,6 +19,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.ZonedDateTime;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.TreeViewerItem;
@@ -290,7 +291,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
       colPausedTime = colTourRecordingTime - colTourDrivingTime;
 
-      colHikingVsRunning = ""; //$NON-NLS-1$
+      colHikingVsRunning = UI.EMPTY_STRING;
       final int totalCadenceZoneHikingTime = result.getInt(startIndex + 22) == -1 ? 0 : result.getInt(startIndex + 22);
       final int totalCadenceZoneRunningtime = result.getInt(startIndex + 23) == -1 ? 0 : result.getInt(startIndex + 23);
 

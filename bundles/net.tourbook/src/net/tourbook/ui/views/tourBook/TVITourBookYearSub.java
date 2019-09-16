@@ -384,7 +384,7 @@ public class TVITourBookYearSub extends TVITourBookItem {
                tourItem.colAvgCadence = dbAvgCadence * dbCadenceMultiplier;
                tourItem.colCadenceMultiplier = dbCadenceMultiplier;
 
-               tourItem.colHikingVsRunning = ""; //$NON-NLS-1$
+               tourItem.colHikingVsRunning = UI.EMPTY_STRING;
                final int cadenceZoneHikingTime = result.getInt(79) == -1 ? 0 : result.getInt(79);
                final int cadenceZoneRunningTime = result.getInt(80) == -1 ? 0 : result.getInt(80);
 
