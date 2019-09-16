@@ -24,11 +24,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.NoSuchElementException;
 import java.util.Set;
-
-import org.eclipse.osgi.util.NLS;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
+import java.util.TimeZone;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.util.MtMath;
@@ -44,6 +40,11 @@ import net.tourbook.device.InvalidDeviceSAXException;
 import net.tourbook.device.Messages;
 import net.tourbook.preferences.TourTypeColorDefinition;
 import net.tourbook.ui.tourChart.ChartLabel;
+
+import org.eclipse.osgi.util.NLS;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 
 public class FitLogSAXHandler extends DefaultHandler {
 
@@ -196,6 +197,7 @@ public class FitLogSAXHandler extends DefaultHandler {
       private float  maxPower;
 
       private int    timeZoneUtcOffset;
+      private boolean hasStartTime;
 
       private int    avgCadence;
 //      private int               maxCadence;      is not yet supported
@@ -415,6 +417,18 @@ public class FitLogSAXHandler extends DefaultHandler {
 
       if (tourData.getCadenceSerie() == null) {
          tourData.setAvgCadence(_currentActivity.avgCadence);
+      }
+
+      // No need to set the timezone Id if the activity has GPS coordinates as it was already done
+      // when the time series were created.
+      if ((tourData.latitudeSerie == null || tourData.latitudeSerie.length == 0) &&
+            _currentActivity.timeZoneUtcOffset != 0 && _currentActivity.hasStartTime) {
+         final String[] zoneIds = TimeZone.getAvailableIDs(tourStartTime_FromImport.getOffset().getTotalSeconds() * 1000);
+
+         //We set the first found time zone that corresponds to the activity offset
+         if (zoneIds.length > 0) {
+            tourData.setTimeZoneId(zoneIds[0]);
+         }
       }
 
       tourData.setDeviceName(_device.visibleName);
@@ -821,7 +835,17 @@ public class FitLogSAXHandler extends DefaultHandler {
       } else if (_isInTimeZoneUtcOffset) {
 
          _isInTimeZoneUtcOffset = false;
-         _currentActivity.timeZoneUtcOffset = Integer.parseInt(_characters.toString()) / 3600;
+
+         if (_characters.length() == 0 || _characters.toString().equals(UI.EMPTY_STRING)) {
+            return;
+         }
+
+         final int timeZoneUtcOffset = Integer.parseInt(_characters.toString());
+         if (timeZoneUtcOffset == 0) {
+            return;
+         }
+
+         _currentActivity.timeZoneUtcOffset = timeZoneUtcOffset / 3600;
 
          //We update the tour start time with the retrieved UTC offset
          final ZonedDateTime tourStartTimeWithUTCOffset = _currentActivity.tourStartTime.toInstant().atOffset(ZoneOffset.ofHours(
@@ -832,9 +856,9 @@ public class FitLogSAXHandler extends DefaultHandler {
 
          _isInHasStartTime = false;
 
-         final boolean hasStartTime = Boolean.parseBoolean(_characters.toString());
+         _currentActivity.hasStartTime = Boolean.parseBoolean(_characters.toString());
 
-         if (hasStartTime == false) {
+         if (_currentActivity.hasStartTime == false) {
             //We remove the hour from the start time
             final ZonedDateTime tourDateTime = ZonedDateTime.parse(String.format("%d-%02d-%02dT00:00:00.000Z", //$NON-NLS-1$
                   _currentActivity.tourStartTime.getYear(),
