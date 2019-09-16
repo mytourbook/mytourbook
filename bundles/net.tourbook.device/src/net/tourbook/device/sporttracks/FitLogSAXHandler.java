@@ -178,28 +178,28 @@ public class FitLogSAXHandler extends DefaultHandler {
 //      private DateTime         trackTourDateTime;
 //      private long            trackTourStartTime   = Long.MIN_VALUE;
 
-      private String location;
-      private String name;
-      private String notes;
-      private String categoryName;
+      private String  location;
+      private String  name;
+      private String  notes;
+      private String  categoryName;
 
-      private int    calories;
-      private int    duration;
-      private int    distance;
+      private int     calories;
+      private int     duration;
+      private int     distance;
 
-      private int    elevationUp;
-      private int    elevationDown;
+      private int     elevationUp;
+      private int     elevationDown;
 
-      private int    avgPulse;
-      private int    maxPulse;
+      private int     avgPulse;
+      private int     maxPulse;
 
-      private float  avgPower;
-      private float  maxPower;
+      private float   avgPower;
+      private float   maxPower;
 
-      private int    timeZoneUtcOffset;
+      private int     timeZoneUtcOffset;
       private boolean hasStartTime;
 
-      private int    avgCadence;
+      private int     avgCadence;
 //      private int               maxCadence;      is not yet supported
 
       private String                        weatherText;
