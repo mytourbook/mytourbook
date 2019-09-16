@@ -197,7 +197,8 @@ public class FitLogSAXHandler extends DefaultHandler {
       private float   maxPower;
 
       private int     timeZoneUtcOffset;
-      private boolean hasStartTime;
+      private boolean hasTimeZoneUtcOffset = false;
+      private boolean hasStartTime         = false;
 
       private int     avgCadence;
 //      private int               maxCadence;      is not yet supported
@@ -422,7 +423,7 @@ public class FitLogSAXHandler extends DefaultHandler {
       // No need to set the timezone Id if the activity has GPS coordinates as it was already done
       // when the time series were created.
       if ((tourData.latitudeSerie == null || tourData.latitudeSerie.length == 0) &&
-            _currentActivity.timeZoneUtcOffset != 0 && _currentActivity.hasStartTime) {
+            _currentActivity.hasTimeZoneUtcOffset) {
          final String[] zoneIds = TimeZone.getAvailableIDs(tourStartTime_FromImport.getOffset().getTotalSeconds() * 1000);
 
          //We set the first found time zone that corresponds to the activity offset
@@ -835,16 +836,15 @@ public class FitLogSAXHandler extends DefaultHandler {
       } else if (_isInTimeZoneUtcOffset) {
 
          _isInTimeZoneUtcOffset = false;
+         _currentActivity.hasTimeZoneUtcOffset = false;
 
          if (_characters.length() == 0 || _characters.toString().equals(UI.EMPTY_STRING)) {
             return;
          }
 
          final int timeZoneUtcOffset = Integer.parseInt(_characters.toString());
-         if (timeZoneUtcOffset == 0) {
-            return;
-         }
 
+         _currentActivity.hasTimeZoneUtcOffset = true;
          _currentActivity.timeZoneUtcOffset = timeZoneUtcOffset / 3600;
 
          //We update the tour start time with the retrieved UTC offset
