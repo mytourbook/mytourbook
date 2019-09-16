@@ -1105,6 +1105,8 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
          return;
       }
 
+      updateCheckedTags();
+
       final Dialog_SaveTags_Wizard wizard = new Dialog_SaveTags_Wizard(_allSelectedTours, _allCheckedTagIds);
       final Dialog_SaveTags dialogSaveTags = new Dialog_SaveTags(_parent.getShell(), wizard);
       if (dialogSaveTags.open() == Window.OK) {
@@ -1303,7 +1305,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
       {
          if (_isShowOnlyCheckedTags && _isHierarchicalLayout) {
 
-            // tag viewer must not display a tree
+            // tag viewer must not display a tree -> show flat viewer
 
             onAction_TagLayout();
 
@@ -1316,8 +1318,6 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
                // tags in the tree hierarchie must be rechecked otherwise they are not checked
                updateUI_Tags_From_TagIds();
             });
-
-            enableControls();
          }
       }
       _parent.setRedraw(true);
@@ -1336,13 +1336,13 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
             _isShowOnlyCheckedTags = false;
             _action_TagFilter.setChecked(false);
-
-            updateUI_TagFilter();
          }
 
-         updateUI_TagLayoutAction();
-
          recreateViewer(_tagViewer);
+
+         updateUI_TagFilter();
+
+         updateUI_TagLayoutAction();
 
          _parent.getDisplay().asyncExec(() -> {
 
@@ -1541,22 +1541,9 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
          if (_tagViewerItem_IsCheckboxSelected) {
 
-            // category is checked -> this is not yet supported -> too complicated
+            // category is checked
 
-// TODO           _tagViewer.setChecked(treeSelection, false);
-
-            final ArrayList<Long> allCheckedItems = new ArrayList<>();
-
-            for (final Object checkedItem : _tagViewer.getCheckedElements()) {
-
-               if (checkedItem instanceof TVIPrefTag) {
-                  final TVIPrefTag tviTag = (TVIPrefTag) checkedItem;
-                  allCheckedItems.add(tviTag.getTourTag().getTagId());
-               }
-            }
-
-            _allCheckedTagIds.clear();
-            _allCheckedTagIds.addAll(allCheckedItems);
+            updateCheckedTags();
 
          } else {
 
@@ -1855,6 +1842,22 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
       _allSelectedTours.clear();
       _allSelectedTours.addAll(selectedTourData);
+   }
+
+   private void updateCheckedTags() {
+
+      final ArrayList<Long> allCheckedItems = new ArrayList<>();
+
+      for (final Object checkedItem : _tagViewer.getCheckedElements()) {
+
+         if (checkedItem instanceof TVIPrefTag) {
+            final TVIPrefTag tviTag = (TVIPrefTag) checkedItem;
+            allCheckedItems.add(tviTag.getTourTag().getTagId());
+         }
+      }
+
+      _allCheckedTagIds.clear();
+      _allCheckedTagIds.addAll(allCheckedItems);
    }
 
    @Override
