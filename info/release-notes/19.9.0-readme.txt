@@ -30,7 +30,7 @@ New
   when multiple power data sources are present within a given FIT file:
     - Stryd or Garmin Running Dynamics Pod
 
-* Tour Marker's view
+* Tour Marker's view (Frederic)
  - Possibility to delete marker(s) from the contextual menu and when pressing
    the DELETE key
 
@@ -56,8 +56,8 @@ Bugfix
 
   - Fitlog Import
     - Fixed tour start time year/month/day by using it's time zone
-    - Now Taking into account the pauses when importing laps
-    - Distinguishing between manual activities and activities with tracks
+    - Now Taking into account the pauses when importing laps (Frederic)
+    - Distinguishing between manual activities and activities with tracks (Frederic)
   
   - Tour Book View
     - Extended "Set Time Zone" wizard to set tour start time year/month/day with time zone   
