@@ -504,6 +504,49 @@ public class TourManager {
    }
 
    /**
+    * Computes time (seconds) spent in each cadence zone (slow and fast).
+    *
+    * @param tourDataList
+    * @return Returns <code>true</code> when time values are computed and {@link TourData} are
+    *         updated but not yet saved.
+    */
+   public static boolean computeCadenceZonesTimes(final ArrayList<TourData> tourDataList) {
+
+      if (tourDataList == null || tourDataList.size() == 0) {
+         return false;
+      }
+
+      if (MessageDialog.openConfirm(
+            Display.getCurrent().getActiveShell(),
+            Messages.TourEditor_Dialog_ComputeCadenceZonesTimes_Title,
+            NLS.bind(Messages.TourEditor_Dialog_ComputeCadenceZonesTimes_Message, UI.UNIT_LABEL_DISTANCE)) == false) {
+         return false;
+      }
+
+      final boolean[] retValue = { false };
+
+      BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+         @Override
+         public void run() {
+
+            for (final TourData tourData : tourDataList) {
+
+               final boolean isComputed = tourData.computeCadenceZonesTimes();
+
+               //TODO TOTO: Log if cadence data is not available or any other reasons
+               //Log if everything went well too ? I think so (example : time zone set)
+
+               if (isComputed) {
+                  retValue[0] = true;
+               }
+            }
+         }
+      });
+
+      return retValue[0];
+   }
+
+   /**
     * Computes distance values from geo position.
     *
     * @param tourDataList

@@ -156,7 +156,7 @@ public class TourPerson implements Comparable<Object> {
    private Set<TourPersonHRZone>           hrZones                         = new HashSet<>();
 
    /**
-    * Cadence value differentiating hiking from running
+    * Cadence value differentiating slow from fast
     * <p>
     * since: db version 41
     */
