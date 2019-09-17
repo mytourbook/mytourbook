@@ -2947,8 +2947,8 @@ public class TourDatabase {
             // version 40 start  -  19.9
             //
             + " power_DataSource     VARCHAR(" + TourData.DB_LENGTH_POWER_DATA_SOURCE + "),      \n" //$NON-NLS-1$ //$NON-NLS-2$
-            + " cadenceZoneHikingTime                     INTEGER DEFAULT -1,                 \n" //$NON-NLS-1$
-            + " cadenceZoneRunningTime                    INTEGER DEFAULT -1,                 \n" //$NON-NLS-1$
+            + " cadenceZone_SlowTime                  INTEGER DEFAULT -1,                 \n" //$NON-NLS-1$
+            + " cadenceZone_FastTime                  INTEGER DEFAULT -1,                 \n" //$NON-NLS-1$
             //
             // version 40 end
 
@@ -7135,8 +7135,8 @@ public class TourDatabase {
 
             // Add new columns
             SQL.AddCol_VarCar   (stmt, TABLE_TOUR_DATA, "power_DataSource",  TourData.DB_LENGTH_POWER_DATA_SOURCE);   //$NON-NLS-1$
-            SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "cadenceZoneHikingTime", DEFAULT_0);//$NON-NLS-1$
-            SQL.AddCol_Int(stmt, TABLE_TOUR_DATA, "cadenceZoneRunningTime", DEFAULT_0); //$NON-NLS-1$
+            SQL.AddCol_Int      (stmt, TABLE_TOUR_DATA, "cadenceZone_SlowTime", DEFAULT_0);//$NON-NLS-1$
+            SQL.AddCol_Int      (stmt, TABLE_TOUR_DATA, "cadenceZone_FastTime", DEFAULT_0); //$NON-NLS-1$
 
 // SET_FORMATTING_ON
          }

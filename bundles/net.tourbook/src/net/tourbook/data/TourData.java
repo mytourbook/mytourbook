@@ -420,13 +420,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private int                   hrZone9                        = -1;                     // db-version 16
 
    /**
-    * Time spent (in seconds) in the "Hiking" cadence zone.
+    * Time spent (in seconds) in the "Slow" cadence zone (for example: Hiking).
     */
-   private int                   cadenceZoneHikingTime                        = -1;                     // db-version 41
+   private int                   cadenceZone_SlowTime                        = -1;                     // db-version 41
    /**
-    * Time spent (in seconds) in the "Running" cadence zone.
+    * Time spent (in seconds) in the "Fast" cadence zone (for example: Running).
     */
-   private int                   cadenceZoneRunningTime                        = -1;                     // db-version 41
+   private int                   cadenceZone_FastTime                        = -1;                     // db-version 41
 
    /**
     * A flag indicating that the pulse is from a sensor. This is the state of the device which is
@@ -3239,7 +3239,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    public void computeCadenceZonesTimes() {
 
-      if (timeSerie == null || cadenceSerie == null ) {
+      if (timeSerie == null || cadenceSerie == null) {
          return;
       }
 
@@ -3252,8 +3252,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       int prevTime = 0;
 
-      cadenceZoneRunningTime = 0;
-      cadenceZoneHikingTime = 0;
+      setCadenceZone_FastTime(0);
+      setCadenceZone_SlowTime(0);
 
       // compute zone values
       for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
@@ -3279,9 +3279,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          }
 
          if (cadence >= cadenceZonesDelimiter) {
-            cadenceZoneRunningTime += timeDiff;
+            setCadenceZone_FastTime(getCadenceZone_FastTime() + timeDiff);
          } else {
-            cadenceZoneHikingTime += timeDiff;
+            setCadenceZone_SlowTime(getCadenceZone_SlowTime() + timeDiff);
          }
       }
    }
@@ -6637,14 +6637,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
    }
 
-   public int getCadenceZoneHikingTime() {
-      return cadenceZoneHikingTime;
-   }
-
-   public int getCadenceZoneRunningTime() {
-      return cadenceZoneRunningTime;
-   }
-
    /**
     * @return Returns the calories or <code>0</code> when calories are not available.
     */
@@ -8797,14 +8789,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       cadenceSerie = cadenceSerieData;
    }
 
-   public void setCadenceZoneHikingTime(final int cadenceZoneHikingTime) {
-      this.cadenceZoneHikingTime = cadenceZoneHikingTime;
-   }
-
-   public void setCadenceZoneRunningTime(final int cadenceZoneRunningTime) {
-      this.cadenceZoneRunningTime = cadenceZoneRunningTime;
-   }
-
    /**
     * Set the calendar week in the tour.
     *
@@ -10319,5 +10303,21 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       for (final TourMarker tourMarker : tourMarkers) {
          tourMarker.updateDatabase_019_to_020();
       }
+   }
+
+   public int getCadenceZone_SlowTime() {
+      return cadenceZone_SlowTime;
+   }
+
+   public void setCadenceZone_SlowTime(final int cadenceZone_SlowTime) {
+      this.cadenceZone_SlowTime = cadenceZone_SlowTime;
+   }
+
+   public int getCadenceZone_FastTime() {
+      return cadenceZone_FastTime;
+   }
+
+   public void setCadenceZone_FastTime(final int cadenceZone_FastTime) {
+      this.cadenceZone_FastTime = cadenceZone_FastTime;
    }
 }
