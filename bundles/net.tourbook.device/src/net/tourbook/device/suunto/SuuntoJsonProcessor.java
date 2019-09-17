@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.swimming.SwimStroke;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
@@ -223,7 +224,7 @@ public class SuuntoJsonProcessor {
             }
 
             final String attributesContent = sample.get(TAG_ATTRIBUTES).toString();
-            if (attributesContent == null || attributesContent == "") { //$NON-NLS-1$
+            if (attributesContent == null || attributesContent == UI.EMPTY_STRING) {
                continue;
             }
 

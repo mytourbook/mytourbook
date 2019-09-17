@@ -124,7 +124,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
          fileContent = br.lines().collect(Collectors.joining());
       } catch (final IOException e) {
          StatusUtil.log(e);
-         return ""; //$NON-NLS-1$
+         return UI.EMPTY_STRING;
       } finally {
          try {
             // close resources
@@ -176,7 +176,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
             StatusUtil.log(e);
          }
 
-         return ""; //$NON-NLS-1$
+         return UI.EMPTY_STRING;
       } finally {
          try {
             // close resources
@@ -239,7 +239,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
       try {
 
          if (jsonFileContent == null ||
-               jsonFileContent == "") { //$NON-NLS-1$
+               jsonFileContent == UI.EMPTY_STRING) {
             return false;
          }
 
