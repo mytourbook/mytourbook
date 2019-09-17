@@ -584,6 +584,11 @@ public interface ITourbookPreferences {
    public static final String DIALOG_SET_TIME_ZONE_SELECTED_ZONE_ID = "DIALOG_SET_TIME_ZONE_SELECTED_ZONE_ID"; //$NON-NLS-1$
 
    /*
+    * Save tags
+    */
+   public static final String DIALOG_SAVE_TAGS_ACTION = "DIALOG_SAVE_TAGS_ACTION"; //$NON-NLS-1$
+
+   /*
     * Fonts
     */
    public static final String FONT_LOGGING_IS_MODIFIED = "FONT_LOGGING_IS_MODIFIED"; //$NON-NLS-1$

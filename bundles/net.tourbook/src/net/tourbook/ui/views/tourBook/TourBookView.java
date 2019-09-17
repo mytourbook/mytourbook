@@ -72,32 +72,25 @@ import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.ITourProvider2;
 import net.tourbook.ui.ITourProviderByID;
 import net.tourbook.ui.TreeColumnFactory;
-import net.tourbook.ui.action.ActionAdjustTemperature;
-import net.tourbook.ui.action.ActionCadenceSubMenu;
 import net.tourbook.ui.action.ActionCollapseAll;
 import net.tourbook.ui.action.ActionCollapseOthers;
-import net.tourbook.ui.action.ActionComputeDistanceValuesFromGeoposition;
-import net.tourbook.ui.action.ActionComputeElevationGain;
 import net.tourbook.ui.action.ActionDuplicateTour;
 import net.tourbook.ui.action.ActionEditQuick;
 import net.tourbook.ui.action.ActionEditTour;
 import net.tourbook.ui.action.ActionExpandSelection;
 import net.tourbook.ui.action.ActionJoinTours;
 import net.tourbook.ui.action.ActionModifyColumns;
-import net.tourbook.ui.action.ActionMultiplyCaloriesBy1000;
 import net.tourbook.ui.action.ActionOpenTour;
 import net.tourbook.ui.action.ActionRefreshView;
-import net.tourbook.ui.action.ActionRetrieveWeatherData;
-import net.tourbook.ui.action.ActionSetAltitudeValuesFromSRTM;
 import net.tourbook.ui.action.ActionSetPerson;
-import net.tourbook.ui.action.ActionSetTimeZone;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
 import net.tourbook.ui.views.TourInfoToolTipCellLabelProvider;
 import net.tourbook.ui.views.TourInfoToolTipStyledCellLabelProvider;
 import net.tourbook.ui.views.TreeViewerTourInfoToolTip;
 import net.tourbook.ui.views.geoCompare.GeoPartComparerItem;
 import net.tourbook.ui.views.rawData.ActionMergeTour;
-import net.tourbook.ui.views.rawData.ActionReimportSubMenu;
+import net.tourbook.ui.views.rawData.Action_AdjustTourValues_SubMenu;
+import net.tourbook.ui.views.rawData.Action_Reimport_SubMenu;
 
 import org.eclipse.core.runtime.Path;
 import org.eclipse.e4.ui.di.PersistState;
@@ -262,65 +255,59 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _nf1_NoGroup.setGroupingUsed(false);
    }
    //
-   private int                                        _selectedYear              = -1;
-   private int                                        _selectedYearSub           = -1;
-   private final ArrayList<Long>                      _selectedTourIds           = new ArrayList<>();
+   private int                             _selectedYear              = -1;
+   private int                             _selectedYearSub           = -1;
+   private final ArrayList<Long>           _selectedTourIds           = new ArrayList<>();
    //
-   private boolean                                    _isCollapseOthers;
-   private boolean                                    _isInFireSelection;
-   private boolean                                    _isInReload;
-   private boolean                                    _isInStartup;
-   private boolean                                    _isShowSummaryRow;
-   private boolean                                    _isToolTipInDate;
-   private boolean                                    _isToolTipInTags;
-   private boolean                                    _isToolTipInTime;
-   private boolean                                    _isToolTipInTitle;
-   private boolean                                    _isToolTipInWeekDay;
+   private boolean                         _isCollapseOthers;
+   private boolean                         _isInFireSelection;
+   private boolean                         _isInReload;
+   private boolean                         _isInStartup;
+   private boolean                         _isShowSummaryRow;
+   private boolean                         _isToolTipInDate;
+   private boolean                         _isToolTipInTags;
+   private boolean                         _isToolTipInTime;
+   private boolean                         _isToolTipInTitle;
+   private boolean                         _isToolTipInWeekDay;
    //
-   private final TourDoubleClickState                 _tourDoubleClickState      = new TourDoubleClickState();
-   private TreeViewerTourInfoToolTip                  _tourInfoToolTip;
+   private final TourDoubleClickState      _tourDoubleClickState      = new TourDoubleClickState();
+   private TreeViewerTourInfoToolTip       _tourInfoToolTip;
    //
-   private TagMenuManager                             _tagMenuManager;
-   private MenuManager                                _viewerMenuManager;
-   private IContextMenuProvider                       _viewerContextMenuProvider = new TreeContextMenuProvider();
+   private TagMenuManager                  _tagMenuManager;
+   private MenuManager                     _viewerMenuManager;
+   private IContextMenuProvider            _viewerContextMenuProvider = new TreeContextMenuProvider();
    //
-   private ActionAdjustTemperature                    _actionAdjustTemperature;
-   private ActionSetTimeZone                          _actionSetTimeZone;
-   private ActionCollapseAll                          _actionCollapseAll;
-   private ActionCollapseOthers                       _actionCollapseOthers;
-   private ActionComputeDistanceValuesFromGeoposition _actionComputeDistanceValuesFromGeoposition;
-   private ActionComputeElevationGain                 _actionComputeElevationGain;
-   private ActionRetrieveWeatherData                  _actionRetrieveWeatherData;
-   private ActionDuplicateTour                        _actionDuplicateTour;
-   private ActionEditQuick                            _actionEditQuick;
-   private ActionExpandSelection                      _actionExpandSelection;
-   private ActionExport                               _actionExportTour;
-   private ActionExportViewCSV                        _actionExportViewCSV;
-   private ActionDeleteTourMenu                       _actionDeleteTour;
-   private ActionEditTour                             _actionEditTour;
-   private ActionJoinTours                            _actionJoinTours;
-   private ActionLinkWithOtherViews                   _actionLinkWithOtherViews;
-   private ActionMergeTour                            _actionMergeTour;
-   private ActionModifyColumns                        _actionModifyColumns;
-   private ActionMultiplyCaloriesBy1000               _actionMultiplyCaloriesBy1000;
-   private ActionOpenTour                             _actionOpenTour;
-   private ActionOpenMarkerDialog                     _actionOpenMarkerDialog;
-   private ActionOpenAdjustAltitudeDialog             _actionOpenAdjustAltitudeDialog;
-   private ActionPrint                                _actionPrintTour;
-   private ActionRefreshView                          _actionRefreshView;
-   private ActionReimportSubMenu                      _actionReimportSubMenu;
-   private ActionSelectAllTours                       _actionSelectAllTours;
-   private ActionSetAltitudeValuesFromSRTM            _actionSetAltitudeFromSRTM;
-   private ActionCadenceSubMenu                       _actionSetCadenceSubMenu;
-   private ActionSetTourTypeMenu                      _actionSetTourType;
-   private ActionSetPerson                            _actionSetOtherPerson;
-   private ActionToggleMonthWeek                      _actionToggleMonthWeek;
-   private ActionTourBookOptions                      _actionTourBookOptions;
+   private Action_AdjustTourValues_SubMenu _action_AdjustTourValues_SubMenu;
+   private Action_Reimport_SubMenu         _action_Reimport_SubMenu;
+
+   private ActionCollapseAll               _actionCollapseAll;
+   private ActionCollapseOthers            _actionCollapseOthers;
+   private ActionDuplicateTour             _actionDuplicateTour;
+   private ActionEditQuick                 _actionEditQuick;
+   private ActionExpandSelection           _actionExpandSelection;
+   private ActionExport                    _actionExportTour;
+   private ActionExportViewCSV             _actionExportViewCSV;
+   private ActionDeleteTourMenu            _actionDeleteTour;
+   private ActionEditTour                  _actionEditTour;
+   private ActionJoinTours                 _actionJoinTours;
+   private ActionLinkWithOtherViews        _actionLinkWithOtherViews;
+   private ActionMergeTour                 _actionMergeTour;
+   private ActionModifyColumns             _actionModifyColumns;
+   private ActionOpenTour                  _actionOpenTour;
+   private ActionOpenMarkerDialog          _actionOpenMarkerDialog;
+   private ActionOpenAdjustAltitudeDialog  _actionOpenAdjustAltitudeDialog;
+   private ActionPrint                     _actionPrintTour;
+   private ActionRefreshView               _actionRefreshView;
+   private ActionSelectAllTours            _actionSelectAllTours;
+   private ActionSetTourTypeMenu           _actionSetTourType;
+   private ActionSetPerson                 _actionSetOtherPerson;
+   private ActionToggleMonthWeek           _actionToggleMonthWeek;
+   private ActionTourBookOptions           _actionTourBookOptions;
    //
-   private TreeViewer                                 _tourViewer;
-   private TreeColumnDefinition                       _timeZoneOffsetColDef;
+   private TreeViewer                      _tourViewer;
+   private TreeColumnDefinition            _timeZoneOffsetColDef;
    //
-   private PixelConverter                             _pc;
+   private PixelConverter                  _pc;
 
    /*
     * UI controls
@@ -334,9 +321,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       public ActionLinkWithOtherViews() {
 
-         super(
-               TourbookPlugin.getImageDescriptor(Messages.Image__SyncViews),
-               null);
+         super(TourbookPlugin.getImageDescriptor(Messages.Image__SyncViews), null);
 
          isToggleAction = true;
          notSelectedTooltip = Messages.Calendar_View_Action_LinkWithOtherViews;
@@ -354,7 +339,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       @Override
       protected void onSelect() {
-
          super.onSelect();
       }
    }
@@ -717,12 +701,11 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
    private void createActions() {
 
-      _actionRetrieveWeatherData = new ActionRetrieveWeatherData(this);
-      _actionAdjustTemperature = new ActionAdjustTemperature(this);
+      _action_AdjustTourValues_SubMenu = new Action_AdjustTourValues_SubMenu(this, this);
+      _action_Reimport_SubMenu = new Action_Reimport_SubMenu(this);
+
       _actionCollapseAll = new ActionCollapseAll(this);
       _actionCollapseOthers = new ActionCollapseOthers(this);
-      _actionComputeDistanceValuesFromGeoposition = new ActionComputeDistanceValuesFromGeoposition(this);
-      _actionComputeElevationGain = new ActionComputeElevationGain(this);
       _actionDuplicateTour = new ActionDuplicateTour(this);
       _actionDeleteTour = new ActionDeleteTourMenu(this);
       _actionEditQuick = new ActionEditQuick(this);
@@ -735,15 +718,10 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _actionOpenAdjustAltitudeDialog = new ActionOpenAdjustAltitudeDialog(this);
       _actionMergeTour = new ActionMergeTour(this);
       _actionModifyColumns = new ActionModifyColumns(this);
-      _actionMultiplyCaloriesBy1000 = new ActionMultiplyCaloriesBy1000(this);
       _actionOpenTour = new ActionOpenTour(this);
       _actionPrintTour = new ActionPrint(this);
       _actionRefreshView = new ActionRefreshView(this);
-      _actionReimportSubMenu = new ActionReimportSubMenu(this);
-      _actionSetAltitudeFromSRTM = new ActionSetAltitudeValuesFromSRTM(this);
-      _actionSetCadenceSubMenu = new ActionCadenceSubMenu(this);
       _actionSetOtherPerson = new ActionSetPerson(this);
-      _actionSetTimeZone = new ActionSetTimeZone(this);
       _actionSetTourType = new ActionSetTourTypeMenu(this);
       _actionSelectAllTours = new ActionSelectAllTours(this);
       _actionToggleMonthWeek = new ActionToggleMonthWeek(this);
@@ -816,6 +794,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             _tourViewer.setInput(this);
 
             reselectTourViewer();
+
+            restoreState_AfterUI();
          }
       });
    }
@@ -970,6 +950,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       defineColumn_Tour_Marker();
       defineColumn_Tour_Photos();
       defineColumn_Tour_Tags();
+//      defineColumn_Tour_TagIds();
 
       // Motion / Bewegung
       defineColumn_Motion_Distance();
@@ -2705,8 +2686,46 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       });
    }
 
+//   /**
+//    * Column for debugging: Tag ids
+//    */
+//   private void defineColumn_Tour_TagIds() {
+//
+//      final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "TOUR_TAG_IDS", SWT.TRAIL); //$NON-NLS-1$
+//
+//      colDef.setColumnCategory(net.tourbook.ui.Messages.ColumnFactory_Category_Tour);
+//      colDef.setColumnLabel("Tag ID");
+//      colDef.setColumnHeaderText("Tag ID");
+//
+//      colDef.setDefaultColumnWidth(30);
+//
+//      colDef.setLabelProvider(new CellLabelProvider() {
+//
+//         @Override
+//         public void update(final ViewerCell cell) {
+//            final Object element = cell.getElement();
+//            if (element instanceof TVITourBookTour) {
+//
+//               final ArrayList<Long> tagIds = ((TVITourBookTour) element).getTagIds();
+//               if (tagIds == null) {
+//                  cell.setText(UI.EMPTY_STRING);
+//               } else {
+//
+//                  cell.setText(tagIds.stream()
+////                      .map(Object::toString)
+////                      .sorted()
+//                        .map(n -> Long.toString(n))
+//                        .collect(Collectors.joining(",")));
+//
+//                  setCellColor(cell, element);
+//               }
+//            }
+//         }
+//      });
+//   }
+
    /**
-    * column: tags
+    * Column: Tags
     */
    private void defineColumn_Tour_Tags() {
 
@@ -3159,9 +3178,10 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _tourDoubleClickState.canEditMarker = isOneTour;
       _tourDoubleClickState.canAdjustAltitude = isOneTour;
 
-      _actionComputeDistanceValuesFromGeoposition.setEnabled(isTourSelected);
-      _actionComputeElevationGain.setEnabled(true);
-      _actionRetrieveWeatherData.setEnabled(useWeatherRetrieval);
+      _action_AdjustTourValues_SubMenu.setEnabled(isTourSelected);
+      _action_AdjustTourValues_SubMenu.action_RetrieveWeatherData.setEnabled(useWeatherRetrieval);
+      _action_Reimport_SubMenu.setEnabled(isTourSelected);
+
       _actionDeleteTour.setEnabled(isTourSelected);
       _actionDuplicateTour.setEnabled(isOneTour && !isDeviceTour);
       _actionEditQuick.setEnabled(isOneTour);
@@ -3170,13 +3190,10 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _actionExportViewCSV.setEnabled(selectedItems > 0);
       _actionJoinTours.setEnabled(tourItems > 1);
       _actionMergeTour.setEnabled(canMergeTours);
-      _actionMultiplyCaloriesBy1000.setEnabled(isTourSelected);
       _actionOpenAdjustAltitudeDialog.setEnabled(isOneTour && isDeviceTour);
       _actionOpenMarkerDialog.setEnabled(isOneTour && isDeviceTour);
       _actionOpenTour.setEnabled(isOneTour);
       _actionPrintTour.setEnabled(isTourSelected);
-      _actionReimportSubMenu.setEnabled(isTourSelected);
-      _actionSetAltitudeFromSRTM.setEnabled(isTourSelected);
       _actionSetOtherPerson.setEnabled(isTourSelected);
       _actionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
 
@@ -3824,7 +3841,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       menuMgr.add(_actionMergeTour);
       menuMgr.add(_actionJoinTours);
 
-      _tagMenuManager.fillTagMenu(menuMgr);
+      _tagMenuManager.fillTagMenu(menuMgr, true);
 
       // tour type actions
       menuMgr.add(new Separator());
@@ -3842,17 +3859,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       menuMgr.add(_actionPrintTour);
 
       menuMgr.add(new Separator());
-      menuMgr.add(_actionRetrieveWeatherData);
-      menuMgr.add(_actionAdjustTemperature);
-      menuMgr.add(_actionComputeElevationGain);
-      menuMgr.add(_actionComputeDistanceValuesFromGeoposition);
-      menuMgr.add(_actionSetAltitudeFromSRTM);
-      menuMgr.add(_actionSetCadenceSubMenu);
-      menuMgr.add(_actionSetTimeZone);
-      menuMgr.add(_actionMultiplyCaloriesBy1000);
-
-      menuMgr.add(new Separator());
-      menuMgr.add(_actionReimportSubMenu);
+      menuMgr.add(_action_AdjustTourValues_SubMenu);
+      menuMgr.add(_action_Reimport_SubMenu);
       menuMgr.add(_actionSetOtherPerson);
       menuMgr.add(_actionDeleteTour);
 
@@ -4378,9 +4386,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       }
 
       _actionSelectAllTours.setChecked(_state.getBoolean(STATE_IS_SELECT_YEAR_MONTH_TOURS));
-      _actionLinkWithOtherViews.setSelection(_state.getBoolean(STATE_IS_LINK_WITH_OTHER_VIEWS));
-      _isCollapseOthers = Util.getStateBoolean(
-            _state,
+      _isCollapseOthers = Util.getStateBoolean(_state,
             STATE_LINK_AND_COLLAPSE_ALL_OTHER_ITEMS,
             STATE_LINK_AND_COLLAPSE_ALL_OTHER_ITEMS_DEFAULT);
       /*
@@ -4403,6 +4409,15 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _isShowSummaryRow = isShowSummaryRow();
 
       updateToolTipState();
+   }
+
+   private void restoreState_AfterUI() {
+
+      /*
+       * This must be selected lately otherwise the selection state is set but is not visible
+       * (button is not pressed). Could not figure out why this occures after debugging this issue
+       */
+      _actionLinkWithOtherViews.setSelection(_state.getBoolean(STATE_IS_LINK_WITH_OTHER_VIEWS));
    }
 
    @PersistState

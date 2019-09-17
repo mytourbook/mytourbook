@@ -100,6 +100,9 @@ public class Dialog_TourTag extends TitleAreaDialog {
 
       restoreState();
 
+      _txtName.selectAll();
+      _txtName.setFocus();
+
       return dlgContainer;
    }
 

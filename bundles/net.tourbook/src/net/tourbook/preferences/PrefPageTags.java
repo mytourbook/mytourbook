@@ -17,6 +17,11 @@ package net.tourbook.preferences;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.EntityManager;
@@ -37,12 +42,19 @@ import net.tourbook.tag.Dialog_TourTag_Category;
 import net.tourbook.tag.TVIPrefTag;
 import net.tourbook.tag.TVIPrefTagCategory;
 import net.tourbook.tag.TVIPrefTagRoot;
+import net.tourbook.tag.TagManager;
 import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.action.ActionCollapseAll;
 import net.tourbook.ui.action.ActionExpandSelection;
 
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.InputDialog;
@@ -61,10 +73,12 @@ import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.IElementComparer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.StyledCellLabelProvider;
@@ -83,6 +97,8 @@ import org.eclipse.swt.dnd.DragSourceListener;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
@@ -102,19 +118,27 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
 
 public class PrefPageTags extends PreferencePage implements IWorkbenchPreferencePage, ITourViewer, ITreeViewer {
 
-   public static final String      ID            = "net.tourbook.preferences.PrefPageTags"; //$NON-NLS-1$
+   public static final String       ID            = "net.tourbook.preferences.PrefPageTags"; //$NON-NLS-1$
 
-   private static final String     SORT_PROPERTY = "sort";                                  //$NON-NLS-1$
+   private static final String      SORT_PROPERTY = "sort";                                  //$NON-NLS-1$
 
-   private final IPreferenceStore  _prefStore    = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore   _prefStore    = TourbookPlugin.getPrefStore();
 
-   private IPropertyChangeListener _prefChangeListener;
+   private IPropertyChangeListener  _prefChangeListener;
 
-   private TVIPrefTagRoot          _rootItem;
+   private TreeViewer               _tagViewer;
+   private TVIPrefTagRoot           _rootItem;
 
-   private boolean                 _isModified   = false;
+   private ActionCollapseAll        _action_CollapseAll;
+   private Action_DeleteTag         _action_DeleteTag;
+   private Action_DeleteTagCategory _action_DeleteCategory;
+   private ActionExpandSelection    _action_ExpandSelection;
 
-   private long                    _dragStartTime;
+   private boolean                  _isMouseContextMenu;
+   private boolean                  _isModified   = false;
+   private boolean                  _isSelectedWithKeyboard;
+
+   private long                     _dragStartTime;
 
    /*
     * Image resources
@@ -126,17 +150,44 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
    /*
     * UI controls
     */
-   private TreeViewer _tagViewer;
-   private ToolBar    _toolBar;
+   private ToolBar _toolBar;
 
-   private Button     _btnNewTag;
-   private Button     _btnNewTagCategory;
-   private Button     _btnEditTagOrCategory;
-   private Button     _btnReset;
+   private Button  _btnEditTagOrCategory;
+   private Button  _btnNewTag;
+   private Button  _btnNewTagCategory;
+   private Button  _btnReset;
 
-   /*
-    * None UI controls
-    */
+   private class Action_DeleteTag extends Action {
+
+      Action_DeleteTag() {
+
+         super(Messages.Action_Tag_Delete, AS_PUSH_BUTTON);
+
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete_disabled));
+      }
+
+      @Override
+      public void run() {
+         onAction_DeleteTagOrCategory();
+      }
+   }
+
+   private class Action_DeleteTagCategory extends Action {
+
+      Action_DeleteTagCategory() {
+
+         super(Messages.Action_Tag_DeleteCategory, AS_PUSH_BUTTON);
+
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete_disabled));
+      }
+
+      @Override
+      public void run() {
+         onAction_DeleteTagOrCategory();
+      }
+   }
 
    /**
     * Sort the tags and categories
@@ -181,10 +232,42 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
       }
    }
 
-   private final class TagViewerContentProvicer implements ITreeContentProvider {
+   /**
+    * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
+    * <br>
+    * The comparer is necessary to set and restore the expanded elements <br>
+    * <br>
+    * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<br>
+    */
+   private class TagViewerComparer implements IElementComparer {
 
       @Override
-      public void dispose() {}
+      public boolean equals(final Object a, final Object b) {
+
+         if (a == b) {
+
+            return true;
+
+         } else if (a instanceof TVIPrefTag && b instanceof TVIPrefTag) {
+
+            return ((TVIPrefTag) a).getTourTag().getTagId() == ((TVIPrefTag) b).getTourTag().getTagId();
+
+         } else if (a instanceof TVIPrefTagCategory && b instanceof TVIPrefTagCategory) {
+
+            return ((TVIPrefTagCategory) a).getTourTagCategory().getCategoryId() == ((TVIPrefTagCategory) b).getTourTagCategory().getCategoryId();
+         }
+
+         return false;
+      }
+
+      @Override
+      public int hashCode(final Object element) {
+         return 0;
+      }
+
+   }
+
+   private final class TagViewerContentProvider implements ITreeContentProvider {
 
       @Override
       public Object[] getChildren(final Object parentElement) {
@@ -201,17 +284,10 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
          return ((TreeViewerItem) element).getParentItem();
       }
 
-//      public TreeViewerItem getRootItem() {
-//         return _rootItem;
-//      }
-
       @Override
       public boolean hasChildren(final Object element) {
          return ((TreeViewerItem) element).hasChildren();
       }
-
-      @Override
-      public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
    }
 
    public PrefPageTags() {}
@@ -234,9 +310,8 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
             if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
-               _tagViewer.getTree()
-                     .setLinesVisible(
-                           getPreferenceStore().getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+               _tagViewer.getTree().setLinesVisible(
+                     getPreferenceStore().getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
                _tagViewer.refresh();
 
@@ -252,18 +327,25 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
       _prefStore.addPropertyChangeListener(_prefChangeListener);
    }
 
+   private void createActions() {
+
+      _action_DeleteTag = new Action_DeleteTag();
+      _action_DeleteCategory = new Action_DeleteTagCategory();
+
+      _action_ExpandSelection = new ActionExpandSelection(this, true);
+      _action_CollapseAll = new ActionCollapseAll(this);
+   }
+
    @Override
    protected Control createContents(final Composite parent) {
 
       final Composite ui = createUI(parent);
 
+      createActions();
       fillToolbar();
 
-      // set root item
-      _rootItem = new TVIPrefTagRoot(_tagViewer, true);
-
       updateTagViewer();
-      enableButtons();
+      enableControls();
       addPrefListener();
 
       return ui;
@@ -274,8 +356,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
       // container
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
-      GridLayoutFactory
-            .fillDefaults()//
+      GridLayoutFactory.fillDefaults()
             .margins(0, 0)
             //            .spacing(SWT.DEFAULT, 0)
             .numColumns(2)
@@ -322,10 +403,9 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
        */
 
       final Composite layoutContainer = new Composite(parent, SWT.NONE);
-      GridDataFactory
-            .fillDefaults()//
+      GridDataFactory.fillDefaults()
             .grab(true, true)
-            .hint(200, 100)
+            .hint(400, 500)
             .applyTo(layoutContainer);
 
       final TreeColumnLayout treeLayout = new TreeColumnLayout();
@@ -349,9 +429,20 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
          @Override
          public void keyPressed(final KeyEvent e) {
 
+            _isSelectedWithKeyboard = true;
+
             switch (e.keyCode) {
+
+            case SWT.DEL:
+               // delete tag/category only when the delete action is enabled
+               if (_action_DeleteTag.isEnabled() || _action_DeleteCategory.isEnabled()) {
+                  onAction_DeleteTagOrCategory();
+               }
+
+               break;
+
             case SWT.F2:
-               onAction_EditTag();
+               onAction_Edit_TagOrCategory();
                break;
             }
          }
@@ -360,10 +451,18 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
          public void keyReleased(final KeyEvent e) {}
       });
 
+      tree.addMouseListener(new MouseAdapter() {
+         @Override
+         public void mouseDown(final MouseEvent e) {
+            _isMouseContextMenu = e.button == 3;
+         }
+      });
+
       _tagViewer = new TreeViewer(tree);
 
-      _tagViewer.setContentProvider(new TagViewerContentProvicer());
+      _tagViewer.setContentProvider(new TagViewerContentProvider());
       _tagViewer.setComparator(new TagViewerComparator());
+      _tagViewer.setComparer(new TagViewerComparer());
       _tagViewer.setUseHashlookup(true);
 
       _tagViewer.addDoubleClickListener(new IDoubleClickListener() {
@@ -376,7 +475,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
       _tagViewer.addSelectionChangedListener(new ISelectionChangedListener() {
          @Override
          public void selectionChanged(final SelectionChangedEvent event) {
-            enableButtons();
+            onTagViewer_Selection(event);
          }
       });
 
@@ -423,6 +522,25 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
             new TagDropAdapter(this, _tagViewer));
 
       defineAllColumns(treeLayout);
+
+      createUI_22_ContextMenu(tree);
+   }
+
+   private void createUI_22_ContextMenu(final Tree tree) {
+
+      final MenuManager menuManager = new MenuManager();
+
+      menuManager.setRemoveAllWhenShown(true);
+
+      menuManager.addMenuListener(new IMenuListener() {
+         @Override
+         public void menuAboutToShow(final IMenuManager manager) {
+            fillContextMenu(manager);
+            enableControls();
+         }
+      });
+
+      tree.setMenu(menuManager.createContextMenu(tree));
    }
 
    private void createUI_30_Buttons(final Composite parent) {
@@ -443,7 +561,6 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
                }
             });
             GridDataFactory.fillDefaults().grab(true, false).applyTo(_btnNewTag);
-//            setButtonLayoutData(_btnNewTag);
          }
 
          {
@@ -458,25 +575,21 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
                }
             });
             GridDataFactory.fillDefaults().grab(true, false).applyTo(_btnNewTagCategory);
-//            setButtonLayoutData(_btnNewTagCategory);
          }
 
          {
             // Button: edit tag or category
 
             _btnEditTagOrCategory = new Button(container, SWT.NONE);
-            // use wider text that the layout is not too small
             _btnEditTagOrCategory.setText(Messages.Action_TagCategory_EditCategory);
             _btnEditTagOrCategory.addSelectionListener(new SelectionAdapter() {
                @Override
                public void widgetSelected(final SelectionEvent e) {
-                  onAction_EditTag();
+                  onAction_Edit_TagOrCategory();
                }
             });
             GridDataFactory.fillDefaults().grab(true, false).applyTo(_btnEditTagOrCategory);
-//            setButtonLayoutData(_btnEditTagOrCategory);
          }
-
          {
             // Button: reset
 
@@ -489,9 +602,6 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
                }
             });
             GridDataFactory.fillDefaults().grab(true, false).indent(0, 50).applyTo(_btnReset);
-//            setButtonLayoutData(_btnReset);
-//            final GridData gd = (GridData) _btnReset.getLayoutData();
-//            gd.verticalIndent = 50;
          }
       }
    }
@@ -591,7 +701,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
          tvc = new TreeViewerColumn(_tagViewer, SWT.LEAD);
          tvcColumn = tvc.getColumn();
          tvcColumn.setText(Messages.Pref_TourTag_Column_Notes);
-         
+
          tvc.setLabelProvider(new CellLabelProvider() {
             @Override
             public void update(final ViewerCell cell) {
@@ -617,7 +727,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
                cell.setText(shortedNotes);
             }
          });
-         treeLayout.setColumnData(tvcColumn, new ColumnWeightData(100, true));
+         treeLayout.setColumnData(tvcColumn, new ColumnWeightData(80, true));
       }
    }
 
@@ -633,25 +743,48 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
       super.dispose();
    }
 
-   private void enableButtons() {
+   private void doLiveUpdate() {
 
-      final IStructuredSelection selectedItems = (IStructuredSelection) _tagViewer.getSelection();
-      final Object selection = selectedItems.getFirstElement();
+      _isModified = true;
 
-      boolean isTagSelected = false;
-      boolean isCategorySelected = false;
-      final boolean isSelection = selection != null;
+      fireModifyEvent();
+   }
 
-      if (selection instanceof TVIPrefTag) {
-         isTagSelected = true;
-      } else if (selection instanceof TVIPrefTagCategory) {
-         isCategorySelected = true;
+   private void enableControls() {
+
+      final IStructuredSelection selection = _tagViewer.getStructuredSelection();
+      final Object firstElement = selection.getFirstElement();
+
+      /*
+       * Count number of selected tours/tags/categories
+       */
+      int numTags = 0;
+      int numCategorys = 0;
+      int numOtherItems = 0;
+
+      for (final Iterator<?> iter = selection.iterator(); iter.hasNext();) {
+
+         final Object treeItem = iter.next();
+
+         if (treeItem instanceof TVIPrefTag) {
+            numTags++;
+         } else if (treeItem instanceof TVIPrefTagCategory) {
+            numCategorys++;
+         } else {
+            numOtherItems++;
+         }
       }
 
-      _btnNewTag.setEnabled(isSelection == false || isCategorySelected == true && isTagSelected == false);
-      _btnNewTagCategory.setEnabled(isSelection == false || isCategorySelected == true && isTagSelected == false);
+      final boolean isTagSelected = numTags > 0 && numCategorys == 0 && numOtherItems == 0;
+      final boolean isCategorySelected = numCategorys == 1 && numTags == 0 && numOtherItems == 0;
 
-      if (selectedItems.size() == 1) {
+      final boolean isSelection = firstElement != null;
+
+      _btnNewTag.setEnabled((isSelection == false || isCategorySelected && isTagSelected == false));
+      _btnNewTagCategory.setEnabled((isSelection == false || isCategorySelected && isTagSelected == false));
+
+      final boolean isOneItemSelected = selection.size() == 1;
+      if (isOneItemSelected) {
 
          if (isTagSelected) {
 
@@ -668,6 +801,25 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
          _btnEditTagOrCategory.setEnabled(false);
       }
+
+      _btnReset.setEnabled(true);
+      _tagViewer.getTree().setEnabled(true);
+
+      _action_CollapseAll.setEnabled(true);
+      _action_ExpandSelection.setEnabled(true);
+
+      _action_DeleteTag.setEnabled(isTagSelected);
+      _action_DeleteCategory.setEnabled(isOneItemSelected && isCategorySelected);
+   }
+
+   private void fillContextMenu(final IMenuManager menuMgr) {
+
+      menuMgr.add(_action_CollapseAll);
+      menuMgr.add(_action_ExpandSelection);
+
+      menuMgr.add(new Separator());
+      menuMgr.add(_action_DeleteTag);
+      menuMgr.add(_action_DeleteCategory);
    }
 
    /**
@@ -677,8 +829,8 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
       final ToolBarManager tbm = new ToolBarManager(_toolBar);
 
-      tbm.add(new ActionExpandSelection(this, true));
-      tbm.add(new ActionCollapseAll(this));
+      tbm.add(_action_ExpandSelection);
+      tbm.add(_action_CollapseAll);
 
       tbm.update(true);
    }
@@ -726,21 +878,69 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
    @Override
    public void init(final IWorkbench workbench) {
-      setPreferenceStore(TourbookPlugin.getDefault().getPreferenceStore());
+
+      setPreferenceStore(_prefStore);
    }
 
    @Override
    public boolean isValid() {
 
-//      saveFilterList();
-
       return true;
+   }
+
+   private void onAction_DeleteTagOrCategory() {
+
+      final ITreeSelection structuredSelection = _tagViewer.getStructuredSelection();
+      final Object firstSelectedItem = structuredSelection.getFirstElement();
+
+      if (firstSelectedItem instanceof TVIPrefTag) {
+
+         // delete tag
+
+         final List<?> allSelection = structuredSelection.toList();
+
+         final HashMap<Long, TourTag> allTourTags = TourDatabase.getAllTourTags();
+
+         final ArrayList<TourTag> allSelectedTags = new ArrayList<>();
+         for (final Object object : allSelection) {
+
+            if (object instanceof TVIPrefTag) {
+
+               final TVIPrefTag tviTag = (TVIPrefTag) object;
+
+               allSelectedTags.add(allTourTags.get(tviTag.getTourTag().getTagId()));
+            }
+         }
+
+         if (allSelectedTags.size() > 0) {
+
+            if (TagManager.deleteTourTag(allSelectedTags)) {
+
+               // update tag viewer with new loaded structure
+               updateTagViewer();
+            }
+         }
+
+      } else if (firstSelectedItem instanceof TVIPrefTagCategory) {
+
+         // delete category
+
+         final TourTagCategory tourTagCategory = ((TVIPrefTagCategory) firstSelectedItem).getTourTagCategory();
+
+         if (TagManager.deleteTourTagCategory(tourTagCategory.getCategoryId(), tourTagCategory.getCategoryName())) {
+
+            updateTagViewer();
+         }
+
+      }
+
+      setFocusToViewer();
    }
 
    /**
     * Edit selected tag/category
     */
-   private void onAction_EditTag() {
+   private void onAction_Edit_TagOrCategory() {
 
       final Object firstElement = _tagViewer.getStructuredSelection().getFirstElement();
 
@@ -1090,63 +1290,56 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
       try {
 
-         System.out.println("RESET TAG STRUCTURE"); //$NON-NLS-1$
+         TourLogManager.showLogView();
+         TourLogManager.logTitle("RESET TAG STRUCTURE"); //$NON-NLS-1$
 
-         final StringBuilder sb = new StringBuilder();
          final Connection conn = TourDatabase.getInstance().getConnection();
+         {
+            String sql;
+            int result;
 
-         /*
-          * remove join table tag->category
-          */
-         sb.append("DELETE FROM "); //$NON-NLS-1$
-         sb.append(TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAG);
-         int result = conn.createStatement().executeUpdate(sb.toString());
-         System.out.println(
-               "Deleted " //$NON-NLS-1$
-                     + result
-                     + " entries from " //$NON-NLS-1$
-                     + TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAG);
+            // remove join table tag->category
+            final Statement stmt1 = conn.createStatement();
+            {
+               sql = "DELETE FROM " + TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAG; //$NON-NLS-1$
+               result = stmt1.executeUpdate(sql);
+               TourLogManager.logInfo("Deleted " + result + " entries from " + TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAG); //$NON-NLS-1$ //$NON-NLS-2$
+            }
+            stmt1.close();
 
-         /*
-          * remove jointable category<->category
-          */
-         sb.setLength(0);
-         sb.append("DELETE FROM "); //$NON-NLS-1$
-         sb.append(TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAGCATEGORY);
-         result = conn.createStatement().executeUpdate(sb.toString());
-         System.out.println(
-               "Deleted " //$NON-NLS-1$
-                     + result
-                     + " entries from " //$NON-NLS-1$
-                     + TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAGCATEGORY);
+            // remove jointable category<->category
+            final Statement stmt2 = conn.createStatement();
+            {
+               sql = "DELETE FROM " + TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAGCATEGORY; //$NON-NLS-1$
+               result = stmt2.executeUpdate(sql);
+               TourLogManager.logInfo("Deleted " + result + " entries from " + TourDatabase.JOINTABLE__TOURTAGCATEGORY_TOURTAGCATEGORY); //$NON-NLS-1$ //$NON-NLS-2$
+            }
+            stmt2.close();
 
-         /*
-          * set tags to root
-          */
-         sb.setLength(0);
-         sb.append("UPDATE "); //$NON-NLS-1$
-         sb.append(TourDatabase.TABLE_TOUR_TAG);
-         sb.append(" SET isRoot=1"); //$NON-NLS-1$
-         result = conn.createStatement().executeUpdate(sb.toString());
-         System.out.println("Set " + result + " tour tags to root"); //$NON-NLS-1$ //$NON-NLS-2$
+            // set tags to root
+            final Statement stmt3 = conn.createStatement();
+            {
+               sql = "UPDATE " + TourDatabase.TABLE_TOUR_TAG + " SET isRoot=1"; //$NON-NLS-1$ //$NON-NLS-2$
+               result = stmt3.executeUpdate(sql);
+               TourLogManager.logInfo("Set " + result + " tour tags to root"); //$NON-NLS-1$ //$NON-NLS-2$
+            }
+            stmt3.close();
 
-         /*
-          * set categories to root
-          */
-         sb.setLength(0);
-         sb.append("UPDATE "); //$NON-NLS-1$
-         sb.append(TourDatabase.TABLE_TOUR_TAG_CATEGORY);
-         sb.append(" SET isRoot=1"); //$NON-NLS-1$
-         result = conn.createStatement().executeUpdate(sb.toString());
-         System.out.println("Set " + result + " tour categories to root"); //$NON-NLS-1$ //$NON-NLS-2$
-
+            // set categories to root
+            final Statement stmt4 = conn.createStatement();
+            {
+               sql = "UPDATE " + TourDatabase.TABLE_TOUR_TAG_CATEGORY + " SET isRoot=1"; //$NON-NLS-1$ //$NON-NLS-2$
+               result = stmt4.executeUpdate(sql);
+               TourLogManager.logInfo("Set " + result + " tour categories to root"); //$NON-NLS-1$ //$NON-NLS-2$
+            }
+            stmt4.close();
+         }
          conn.close();
 
-         // update the tag viewer
-         _rootItem = new TVIPrefTagRoot(_tagViewer, true);
+         // update tag viewer with new loaded structure
          updateTagViewer();
 
-         _isModified = true;
+         doLiveUpdate();
 
       } catch (final SQLException e) {
          net.tourbook.ui.UI.showSQLException(e);
@@ -1161,7 +1354,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
       if (isCtrl) {
 
-         onAction_EditTag();
+         onAction_Edit_TagOrCategory();
       }
    }
 
@@ -1173,7 +1366,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
          // tag is selected
 
-         onAction_EditTag();
+         onAction_Edit_TagOrCategory();
 
       } else if (selection instanceof TVIPrefTagCategory) {
 
@@ -1187,6 +1380,38 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
             _tagViewer.expandToLevel(tourItem, 1);
          }
       }
+   }
+
+   private void onTagViewer_Selection(final SelectionChangedEvent event) {
+
+      if (_isMouseContextMenu) {
+         return;
+      }
+
+      final Object selectedItem = ((IStructuredSelection) (event.getSelection())).getFirstElement();
+
+      if (selectedItem instanceof TVIPrefTag) {
+
+         // a tag is selected
+
+      } else if (selectedItem instanceof TVIPrefTagCategory) {
+
+         // expand/collapse category
+
+         if (_isSelectedWithKeyboard == false) {
+
+            if (_tagViewer.getExpandedState(selectedItem)) {
+               _tagViewer.collapseToLevel(selectedItem, 1);
+            } else {
+               _tagViewer.expandToLevel(selectedItem, 1);
+            }
+         }
+      }
+
+      // reset state
+      _isSelectedWithKeyboard = false;
+
+      enableControls();
    }
 
    @Override
@@ -1224,17 +1449,24 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
    }
 
    @Override
-   public void updateColumnHeader(final ColumnDefinition colDef) {
-      // TODO Auto-generated method stub
+   public void updateColumnHeader(final ColumnDefinition colDef) {}
 
-   }
-
+   /**
+    * Update tag viewer with new loaded structure
+    */
    private void updateTagViewer() {
 
-      // show contents in the viewers
-      _tagViewer.setInput(this);
+      final Tree tree = _tagViewer.getTree();
+      tree.setRedraw(false);
+      {
+         final Object[] expandedElements = _tagViewer.getExpandedElements();
 
-      enableButtons();
+         _tagViewer.setInput(_rootItem = new TVIPrefTagRoot(_tagViewer, true));
+         _tagViewer.setExpandedElements(expandedElements);
+      }
+      tree.setRedraw(true);
+
+      enableControls();
    }
 
 }
