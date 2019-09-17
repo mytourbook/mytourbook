@@ -516,29 +516,28 @@ public class TourManager {
          return false;
       }
 
-      if (MessageDialog.openConfirm(
-            Display.getCurrent().getActiveShell(),
-            Messages.TourEditor_Dialog_ComputeCadenceZonesTimes_Title,
-            NLS.bind(Messages.TourEditor_Dialog_ComputeCadenceZonesTimes_Message, UI.UNIT_LABEL_DISTANCE)) == false) {
-         return false;
-      }
-
       final boolean[] retValue = { false };
 
       BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
          @Override
          public void run() {
 
+            TourLogManager.addLog(TourLogState.DEFAULT, NLS.bind(Messages.Log_ComputeCadenceZonesTimes_001_Start, tourDataList.size()));
+
             for (final TourData tourData : tourDataList) {
 
                final boolean isComputed = tourData.computeCadenceZonesTimes();
-
-               //TODO TOTO: Log if cadence data is not available or any other reasons
-               //Log if everything went well too ? I think so (example : time zone set)
+               final String tourDateTime = TourManager.getTourDateTimeShort(tourData);
 
                if (isComputed) {
+                  TourLogManager.addLog(TourLogState.INFO, NLS.bind(Messages.Log_ComputeCadenceZonesTimes_010_Computed, tourDateTime));
+
                   retValue[0] = true;
+               } else {
+                  TourLogManager.addLog(TourLogState.IMPORT_ERROR,
+                        NLS.bind(Messages.Log_ComputeCadenceZonesTimes_011_No_Time_Or_Cadence_Series, tourDateTime));
                }
+
             }
          }
       });

@@ -1232,6 +1232,11 @@ public class Messages extends NLS {
    public static String        Import_Wizard_Monitor_wait_for_data;
    public static String        Import_Wizard_Thread_name_read_device_data;
 
+   public static String        Log_ComputeCadenceZonesTimes_001_Start;
+   public static String        Log_ComputeCadenceZonesTimes_010_Computed;
+   public static String        Log_ComputeCadenceZonesTimes_011_No_Time_Or_Cadence_Series;
+   public static String        Log_ComputeCadenceZonesTimes_002_End;
+
    public static String        Log_EasyImport_000_ImportStart;
    public static String        Log_EasyImport_001_BackupTourFiles;
    public static String        Log_EasyImport_001_Copy;
