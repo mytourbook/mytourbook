@@ -3126,7 +3126,7 @@ public class TourDatabase {
             //
             + "   " + KEY_BIKE + "  BIGINT,                                              \n" //$NON-NLS-1$ //$NON-NLS-2$
 
-            + " cadenceZonesDelimiter                      INTEGER DEFAULT 0                  \n" //$NON-NLS-1$
+            + " cadenceZonesDelimiter                      INTEGER DEFAULT 70                  \n" //$NON-NLS-1$
             //
             + ")"); //$NON-NLS-1$
    }
