@@ -3155,9 +3155,7 @@ public class TourDatabase {
             + "   rawDataPath       VARCHAR(" + TourPerson.DB_LENGTH_RAW_DATA_PATH + "),     \n" //$NON-NLS-1$ //$NON-NLS-2$
             + "   deviceReaderId    VARCHAR(" + TourPerson.DB_LENGTH_DEVICE_READER_ID + "),  \n" //$NON-NLS-1$ //$NON-NLS-2$
             //
-            + "   " + KEY_BIKE + "  BIGINT,                                              \n" //$NON-NLS-1$ //$NON-NLS-2$
-
-            + " cadenceZonesDelimiter                      INTEGER DEFAULT 70                  \n" //$NON-NLS-1$
+            + "   " + KEY_BIKE + "  BIGINT                                              \n" //$NON-NLS-1$ //$NON-NLS-2$
             //
             + ")"); //$NON-NLS-1$
    }
@@ -7183,13 +7181,12 @@ public class TourDatabase {
 
          if (isColumnAvailable(conn, TABLE_TOUR_PERSON, "cadenceZonesDelimiter") == false) { //$NON-NLS-1$
 
-            // SET_FORMATTING_OFF
+// SET_FORMATTING_OFF
 
-                        // Add new columns
-                        SQL.AddCol_Int(stmt, TABLE_TOUR_PERSON, "cadenceZonesDelimiter", DEFAULT_0); //$NON-NLS-1$
+             // Add new columns
+             SQL.AddCol_Int(stmt, TABLE_TOUR_PERSON, "cadenceZonesDelimiter", "70"); //$NON-NLS-1$
 
-
-            // SET_FORMATTING_ON
+// SET_FORMATTING_ON
          }
       }
       stmt.close();
