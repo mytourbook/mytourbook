@@ -218,7 +218,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private static final String    VALUE_UNIT_K_CALORIES         = net.tourbook.ui.Messages.Value_Unit_KCalories;
    //
    /**
-    * On Linux an asynch selection event is fired since e4 
+    * On Linux an asynch selection event is fired since e4
     */
    private static final String    FIX_LINUX_ASYNC_EVENT_1       = "FIX_LINUX_ASYNC_EVENT_1";                              //$NON-NLS-1$
    private static final String    FIX_LINUX_ASYNC_EVENT_2       = "FIX_LINUX_ASYNC_EVENT_2";                              //$NON-NLS-1$
@@ -5688,6 +5688,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    }
 
    @Override
+   public void doSave() {
+      doSave(null);
+   }
+
+   @Override
    public void doSave(final IProgressMonitor monitor) {
 
       if (_isCellEditorActive) {
@@ -7122,21 +7127,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    }
 
-   private void onSelectWindSpeedText() {
-
-      _isWindSpeedManuallyModified = true;
-
-      final int selectedIndex = _comboWeather_WindSpeedText.getSelectionIndex();
-      final int speed = _unitValueWindSpeed[selectedIndex];
-
-      final boolean isBackup = _isSetField;
-      _isSetField = true;
-      {
-         _spinWeather_Wind_SpeedValue.setSelection(speed);
-      }
-      _isSetField = isBackup;
-   }
-
 //   /*
 //    * this method is called when the application is shut down to save dirty tours or to cancel the
 //    * shutdown
@@ -7163,6 +7153,21 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 //
 //      return returnCode;
 //   }
+
+   private void onSelectWindSpeedText() {
+
+      _isWindSpeedManuallyModified = true;
+
+      final int selectedIndex = _comboWeather_WindSpeedText.getSelectionIndex();
+      final int speed = _unitValueWindSpeed[selectedIndex];
+
+      final boolean isBackup = _isSetField;
+      _isSetField = true;
+      {
+         _spinWeather_Wind_SpeedValue.setSelection(speed);
+      }
+      _isSetField = isBackup;
+   }
 
    private void onSelectWindSpeedValue() {
 
