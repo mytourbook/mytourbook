@@ -7127,33 +7127,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    }
 
-//   /*
-//    * this method is called when the application is shut down to save dirty tours or to cancel the
-//    * shutdown
-//    * @see org.eclipse.ui.ISaveablePart2#promptToSaveOnClose()
-//    */
-//   @Override
-//   public int promptToSaveOnClose() {
-//
-//      int returnCode;
-//
-//      if (_isTourDirty == false) {
-//         returnCode = ISaveablePart2.NO;
-//      }
-//
-//      _isSavingInProgress = true;
-//      {
-//         if (saveTourWithValidation()) {
-//            returnCode = ISaveablePart2.NO;
-//         } else {
-//            returnCode = ISaveablePart2.CANCEL;
-//         }
-//      }
-//      _isSavingInProgress = false;
-//
-//      return returnCode;
-//   }
-
    private void onSelectWindSpeedText() {
 
       _isWindSpeedManuallyModified = true;
