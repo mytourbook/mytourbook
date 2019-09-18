@@ -3177,7 +3177,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _tourDoubleClickState.canAdjustAltitude = isOneTour;
 
       _action_AdjustTourValues_SubMenu.setEnabled(isTourSelected);
-      _action_AdjustTourValues_SubMenu.action_RetrieveWeatherData.setEnabled(useWeatherRetrieval);
+      _action_AdjustTourValues_SubMenu._action_RetrieveWeatherData.setEnabled(useWeatherRetrieval);
       _action_Reimport_SubMenu.setEnabled(isTourSelected);
 
       _actionDeleteTour.setEnabled(isTourSelected);
