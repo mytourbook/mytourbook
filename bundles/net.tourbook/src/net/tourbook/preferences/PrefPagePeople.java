@@ -691,7 +691,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          // tab: cadence zones
          final TabItem tabItemCadenceZones = new TabItem(_tabFolderPerson, SWT.NONE);
          tabItemCadenceZones.setText(Messages.Pref_People_Tab_CadenceZones);
-         tabItemCadenceZones.setControl(createUI_70_CadenceZones(_tabFolderPerson));
+         tabItemCadenceZones.setControl(createUI_80_CadenceZones(_tabFolderPerson));
 
          // tab: data transfer
          final TabItem tabItemDataTransfer = new TabItem(_tabFolderPerson, SWT.NONE);
@@ -1208,59 +1208,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       }
    }
 
-   /**
-    * UI for the selection of the cadence differentiating slow cadence (hiking) from
-    * fast cadence (running).
-    */
-   private Control createUI_70_CadenceZones(final Composite parent) {
-
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(3).extendedMargins(0, 0, 7, 0).applyTo(container);
-      {
-         Label label = new Label(container, SWT.NONE);
-         label.setText(Messages.Pref_People_Label_CadenceZonesDelimiter);
-
-         // spinner: cadence zone delimiter
-         _spinnerCadenceDelimiter = new Spinner(container, SWT.BORDER);
-         GridDataFactory.fillDefaults() //
-               .applyTo(_spinnerCadenceDelimiter);
-         _spinnerCadenceDelimiter.setMinimum(0);
-         _spinnerCadenceDelimiter.setMaximum(200);
-         _spinnerCadenceDelimiter.addSelectionListener(_defaultSelectionListener);
-         _spinnerCadenceDelimiter.addMouseWheelListener(new MouseWheelListener() {
-            @Override
-            public void mouseScrolled(final MouseEvent event) {
-               UI.adjustSpinnerValueOnMouseScroll(event);
-               onModifyPerson();
-            }
-         });
-
-         // label: unit (rpm)
-         label = new Label(container, SWT.NONE);
-         label.setText(net.tourbook.common.Messages.Graph_Label_Cadence_Unit);
-      }
-
-      // label: Text explaining the meaning of the two zones
-      final Label label = new Label(container, SWT.NONE);
-      label.setText(Messages.Pref_People_Label_Description_CadenceZonesDelimiter);
-      GridDataFactory.fillDefaults().span(3, 0).align(SWT.BEGINNING, SWT.FILL).applyTo(label);
-
-      // button: compute time values
-      final Button buttonComputeTimes = new Button(container, SWT.NONE);
-      GridDataFactory.fillDefaults().span(3, 0).indent(0, 50).align(SWT.BEGINNING, SWT.FILL).applyTo(buttonComputeTimes);
-      buttonComputeTimes.setText(Messages.Pref_People_Button_CadenceZonesTimes_ComputeAllTours);
-      buttonComputeTimes.addSelectionListener(new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            onComputeCadenceZonesTimeValues();
-         }
-      });
-
-      return container;
-   }
-
-   private void createUI_80_HrZone_InnerContainer(final int hrMaxFormulaKey,
+   private void createUI_70_HrZone_InnerContainer(final int hrMaxFormulaKey,
                                                   final int hrMaxPulse,
                                                   final ZonedDateTime birthDay) {
 
@@ -1287,10 +1235,10 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
          if (hrZones.size() == 0) {
             // hr zones are not available, show info
-            createUI_81_HrZone_Info(innerContainer);
+            createUI_71_HrZone_Info(innerContainer);
          } else {
-            createUI_82_HrZone_Header(innerContainer);
-            createUI_84_HrZone_Fields(innerContainer, hrMaxFormulaKey, hrMaxPulse, birthDay);
+            createUI_72_HrZone_Header(innerContainer);
+            createUI_74_HrZone_Fields(innerContainer, hrMaxFormulaKey, hrMaxPulse, birthDay);
          }
       }
 
@@ -1305,14 +1253,14 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       }
    }
 
-   private void createUI_81_HrZone_Info(final Composite parent) {
+   private void createUI_71_HrZone_Info(final Composite parent) {
 
       final Label label = new Label(parent, SWT.WRAP);
       GridDataFactory.fillDefaults().applyTo(label);
       label.setText(Messages.Pref_People_Label_HrZoneInfo);
    }
 
-   private void createUI_82_HrZone_Header(final Composite parent) {
+   private void createUI_72_HrZone_Header(final Composite parent) {
 
       /*
        * label: color
@@ -1352,7 +1300,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 //		label.addMouseListener(_hrZoneMouseListener);
    }
 
-   private void createUI_84_HrZone_Fields(final Composite parent,
+   private void createUI_74_HrZone_Fields(final Composite parent,
                                           final int hrMaxFormulaKey,
                                           final int hrMaxPulse,
                                           final ZonedDateTime birthDay) {
@@ -1483,6 +1431,58 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          label.setText(net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit);
          label.addMouseListener(_hrZoneMouseListener);
       }
+   }
+
+   /**
+    * UI for the selection of the cadence differentiating slow cadence (hiking) from
+    * fast cadence (running).
+    */
+   private Control createUI_80_CadenceZones(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(3).extendedMargins(0, 0, 7, 0).applyTo(container);
+      {
+         Label label = new Label(container, SWT.NONE);
+         label.setText(Messages.Pref_People_Label_CadenceZonesDelimiter);
+
+         // spinner: cadence zone delimiter
+         _spinnerCadenceDelimiter = new Spinner(container, SWT.BORDER);
+         GridDataFactory.fillDefaults() //
+               .applyTo(_spinnerCadenceDelimiter);
+         _spinnerCadenceDelimiter.setMinimum(0);
+         _spinnerCadenceDelimiter.setMaximum(200);
+         _spinnerCadenceDelimiter.addSelectionListener(_defaultSelectionListener);
+         _spinnerCadenceDelimiter.addMouseWheelListener(new MouseWheelListener() {
+            @Override
+            public void mouseScrolled(final MouseEvent event) {
+               UI.adjustSpinnerValueOnMouseScroll(event);
+               onModifyPerson();
+            }
+         });
+
+         // label: unit (rpm)
+         label = new Label(container, SWT.NONE);
+         label.setText(net.tourbook.common.Messages.Graph_Label_Cadence_Unit);
+      }
+
+      // label: Text explaining the meaning of the two zones
+      final Label label = new Label(container, SWT.NONE);
+      label.setText(Messages.Pref_People_Label_Description_CadenceZonesDelimiter);
+      GridDataFactory.fillDefaults().span(3, 0).align(SWT.BEGINNING, SWT.FILL).applyTo(label);
+
+      // button: compute time values
+      final Button buttonComputeTimes = new Button(container, SWT.NONE);
+      GridDataFactory.fillDefaults().span(3, 0).indent(0, 50).align(SWT.BEGINNING, SWT.FILL).applyTo(buttonComputeTimes);
+      buttonComputeTimes.setText(Messages.Pref_People_Button_CadenceZonesTimes_ComputeAllTours);
+      buttonComputeTimes.addSelectionListener(new SelectionAdapter() {
+         @Override
+         public void widgetSelected(final SelectionEvent e) {
+            onComputeCadenceZonesTimeValues();
+         }
+      });
+
+      return container;
    }
 
    private Control createUI_90_Tab_DataTransfer(final Composite parent) {
@@ -2062,7 +2062,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       final int hrMaxFormulaKey = person.getHrMaxFormula();
       final int maxPulse = person.getMaxPulse();
 
-      createUI_80_HrZone_InnerContainer(hrMaxFormulaKey, maxPulse, getBirthdayFromUI());
+      createUI_70_HrZone_InnerContainer(hrMaxFormulaKey, maxPulse, getBirthdayFromUI());
       onModifyPerson();
    }
 
@@ -2418,7 +2418,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          updateUIHrMax(hrMaxFormulaKey, maxPulse);
          updateUISportComputer(person);
 
-         createUI_80_HrZone_InnerContainer(hrMaxFormulaKey, maxPulse, dtBirthday);
+         createUI_70_HrZone_InnerContainer(hrMaxFormulaKey, maxPulse, dtBirthday);
       }
       _isUpdateUI = false;
    }
@@ -2475,7 +2475,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       _isHrZoneModified = true;
 
       // update modified bpm in hr zones
-      createUI_80_HrZone_InnerContainer(selectedHrMaxFormulaKey, maxPulse, getBirthdayFromUI());
+      createUI_70_HrZone_InnerContainer(selectedHrMaxFormulaKey, maxPulse, getBirthdayFromUI());
 
       onModifyPerson();
    }
