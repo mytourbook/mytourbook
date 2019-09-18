@@ -1221,7 +1221,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          Label label = new Label(container, SWT.NONE);
          label.setText(Messages.Pref_People_Label_CadenceZonesDelimiter);
 
-         // spinner: weight
+         // spinner: cadence zone delimiter
          _spinnerCadenceDelimiter = new Spinner(container, SWT.BORDER);
          GridDataFactory.fillDefaults() //
                .applyTo(_spinnerCadenceDelimiter);

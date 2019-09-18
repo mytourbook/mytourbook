@@ -422,11 +422,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * Time spent (in seconds) in the "Slow" cadence zone (for example: Hiking).
     */
-   private int                   cadenceZone_SlowTime                        = -1;                     // db-version 41
+   private int                   cadenceZone_SlowTime                        = -1;                     // db-version 40
    /**
     * Time spent (in seconds) in the "Fast" cadence zone (for example: Running).
     */
-   private int                   cadenceZone_FastTime                        = -1;                     // db-version 41
+   private int                   cadenceZone_FastTime                        = -1;                     // db-version 40
 
    /**
     * A flag indicating that the pulse is from a sensor. This is the state of the device which is
