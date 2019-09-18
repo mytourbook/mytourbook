@@ -427,6 +427,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Time spent (in seconds) in the "Fast" cadence zone (for example: Running).
     */
    private int                   cadenceZone_FastTime                        = -1;                     // db-version 40
+   /**
+    * The value used for when computing the existing values of cadenceZone_SlowTime & cadenceZone_FastTime
+    */
+   @SuppressWarnings("unused")
+   private int                   cadenceZones_DelimiterValue;
 
    /**
     * A flag indicating that the pulse is from a sensor. This is the state of the device which is
@@ -3290,6 +3295,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          } else {
             cadenceZone_SlowTime += timeDiff;
          }
+      }
+
+      // If the cadence zones times were computed, we store the delimiter value used
+      if (cadenceZone_SlowTime > 0 || cadenceZone_FastTime > 0) {
+         cadenceZones_DelimiterValue = cadenceZonesDelimiter;
       }
 
       return true;

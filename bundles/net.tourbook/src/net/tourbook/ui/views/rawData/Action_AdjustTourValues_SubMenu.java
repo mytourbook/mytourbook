@@ -45,13 +45,13 @@ public class Action_AdjustTourValues_SubMenu extends Action implements IMenuCrea
    private Action_SetCadence_SubMenu                  _action_SetCadence_SubMenu;
 
    private ActionAdjustTemperature                    _action_AdjustTemperature;
+   private ActionComputeCadenceZonesTimes             _action_ComputeCadenceZonesTimes;
    private ActionComputeDistanceValuesFromGeoposition _action_ComputeDistanceValuesFromGeoposition;
    private ActionComputeElevationGain                 _action_ComputeElevationGain;
    private ActionMultiplyCaloriesBy1000               _action_MultiplyCaloriesBy1000;
    public ActionRetrieveWeatherData                   _action_RetrieveWeatherData;
    private ActionSetAltitudeValuesFromSRTM            _action_SetAltitudeFromSRTM;
    private ActionSetTimeZone                          _action_SetTimeZone;
-   private ActionComputeCadenceZonesTimes             _action_ComputeCadenceZonesTimes_SubMenu;
 
    /*
     * UI controls
@@ -70,7 +70,7 @@ public class Action_AdjustTourValues_SubMenu extends Action implements IMenuCrea
       _action_SetCadence_SubMenu = new Action_SetCadence_SubMenu(_tourProvider);
 
       _action_AdjustTemperature = new ActionAdjustTemperature(_tourProvider);
-      _action_ComputeCadenceZonesTimes_SubMenu = new ActionComputeCadenceZonesTimes(_tourProvider);
+      _action_ComputeCadenceZonesTimes = new ActionComputeCadenceZonesTimes(_tourProvider);
       _action_ComputeDistanceValuesFromGeoposition = new ActionComputeDistanceValuesFromGeoposition(_tourProvider);
       _action_ComputeElevationGain = new ActionComputeElevationGain(_tourProviderById);
       _action_MultiplyCaloriesBy1000 = new ActionMultiplyCaloriesBy1000(_tourProvider);
@@ -91,12 +91,12 @@ public class Action_AdjustTourValues_SubMenu extends Action implements IMenuCrea
    private void fillMenu(final Menu menu) {
 
       new ActionContributionItem(_action_AdjustTemperature).fill(menu, -1);
+      new ActionContributionItem(_action_ComputeCadenceZonesTimes).fill(menu, -1);
       new ActionContributionItem(_action_ComputeDistanceValuesFromGeoposition).fill(menu, -1);
       new ActionContributionItem(_action_ComputeElevationGain).fill(menu, -1);
       new ActionContributionItem(_action_MultiplyCaloriesBy1000).fill(menu, -1);
       new ActionContributionItem(_action_RetrieveWeatherData).fill(menu, -1);
       new ActionContributionItem(_action_SetAltitudeFromSRTM).fill(menu, -1);
-      new ActionContributionItem(_action_ComputeCadenceZonesTimes_SubMenu).fill(menu, -1);
       new ActionContributionItem(_action_SetCadence_SubMenu).fill(menu, -1);
       new ActionContributionItem(_action_SetTimeZone).fill(menu, -1);
    }
