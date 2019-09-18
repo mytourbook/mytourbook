@@ -18,7 +18,6 @@ package net.tourbook.ui.action;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
-import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourManager;
@@ -26,7 +25,6 @@ import net.tourbook.ui.ITourProvider;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
 
 public class ActionComputeCadenceZonesTimes extends Action {
@@ -48,7 +46,7 @@ public class ActionComputeCadenceZonesTimes extends Action {
       if (MessageDialog.openConfirm(
             Display.getCurrent().getActiveShell(),
             Messages.TourEditor_Dialog_ComputeCadenceZonesTimes_Title,
-            NLS.bind(Messages.TourEditor_Dialog_ComputeCadenceZonesTimes_Message, UI.UNIT_LABEL_DISTANCE)) == false) {
+            Messages.TourEditor_Dialog_ComputeCadenceZonesTimes_Message) == false) {
          return;
       }
 

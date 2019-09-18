@@ -992,7 +992,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       defineColumn_Powertrain_AvgLeftTorqueEffectiveness();
       defineColumn_Powertrain_AvgRightPedalSmoothness();
       defineColumn_Powertrain_AvgRightTorqueEffectiveness();
-      defineColumn_Powertrain_HikingVsRunningPercentage();
+      defineColumn_Powertrain_SlowVsFastCadencePercentage();
+      ;
 
       // Training - Trainingsanalyse
       defineColumn_Training_FTP();
@@ -1848,29 +1849,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    }
 
    /**
-    * Column: Hiking vs Running Percentage
-    */
-   private void defineColumn_Powertrain_HikingVsRunningPercentage() {
-
-      final TreeColumnDefinition colDef = TreeColumnFactory.POWERTRAIN_HIKING_VS_RUNNING_PERCENTAGE.createColumn(
-            _columnManager,
-            _pc);
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final Object element = cell.getElement();
-            final String value = ((TVITourBookItem) element).colHikingVsRunning;
-
-            cell.setText(value);//"30 - 70");
-
-            setCellColor(cell, element);
-         }
-      });
-   }
-
-   /**
     * Column: Pedal left/right balance
     */
    private void defineColumn_Powertrain_PedalLeftRightBalance() {
@@ -1887,6 +1865,29 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             final int value = ((TVITourBookItem) element).colPower_PedalLeftRightBalance;
 
             colDef.printValue_0(cell, value);
+
+            setCellColor(cell, element);
+         }
+      });
+   }
+
+   /**
+    * Column: Slow vs fast cadence Percentage
+    */
+   private void defineColumn_Powertrain_SlowVsFastCadencePercentage() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.POWERTRAIN_SLOW_VS_FAST_CADENCE_PERCENTAGES.createColumn(
+            _columnManager,
+            _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            final String value = ((TVITourBookItem) element).colSlowVsFastCadence;
+
+            cell.setText(value);
 
             setCellColor(cell, element);
          }

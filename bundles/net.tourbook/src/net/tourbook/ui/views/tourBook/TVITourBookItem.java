@@ -131,7 +131,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
    String       colTimeZoneId;
 
    String       colTourTitle;
-   long         colPersonId;          // tourPerson_personId
+   long         colPersonId;                // tourPerson_personId
 
    long         colCounter;
    long         colCalories;
@@ -174,7 +174,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
    float        colCadenceMultiplier;
 
-   String       colHikingVsRunning;
+   String       colSlowVsFastCadence;
 
    // ----------- Running Dynamics ---------
 
@@ -290,7 +290,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
       colPausedTime = colTourRecordingTime - colTourDrivingTime;
 
-      colHikingVsRunning = UI.EMPTY_STRING;
+      colSlowVsFastCadence = UI.EMPTY_STRING;
       final int cadenceZone_SlowTime = result.getInt(startIndex + 22);
       final int cadenceZone_FastTime = result.getInt(startIndex + 23);
       final int totalCadenceZone_SlowTime = cadenceZone_SlowTime == -1 ? 0 : cadenceZone_SlowTime;
@@ -301,7 +301,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
          final int cadenceZone_SlowPercentage = Math.round(totalCadenceZone_SlowTime * 100f / totalCadenceTime);
          final int cadenceZone_FastPercentage = Math.round(totalCadenceZone_FastTime * 100f / totalCadenceTime);
 
-         colHikingVsRunning = cadenceZone_SlowPercentage + " - " + cadenceZone_FastPercentage; //$NON-NLS-1$
+         colSlowVsFastCadence = cadenceZone_SlowPercentage + " - " + cadenceZone_FastPercentage; //$NON-NLS-1$
       }
    }
 

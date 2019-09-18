@@ -281,6 +281,9 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Power_Normalized_Tooltip;
    public static String        ColumnFactory_Power_PowerToWeight_Header;
    public static String        ColumnFactory_Power_PowerToWeight_Tooltip;
+   public static String        ColumnFactory_Power_Slow_Vs_Fast_Cadence_Percentages_Header;
+   public static String        ColumnFactory_Power_Slow_Vs_Fast_Cadence_Percentages_Label;
+   public static String        ColumnFactory_Power_Slow_Vs_Fast_Cadence_Percentages_Tooltip;
    public static String        ColumnFactory_Power_TotalWork;
    public static String        ColumnFactory_Power_TotalWork_Tooltip;
    public static String        ColumnFactory_Power_TrainingStressScore_Header;

@@ -384,7 +384,7 @@ public class TVITourBookYearSub extends TVITourBookItem {
                tourItem.colAvgCadence = dbAvgCadence * dbCadenceMultiplier;
                tourItem.colCadenceMultiplier = dbCadenceMultiplier;
 
-               tourItem.colHikingVsRunning = UI.EMPTY_STRING;
+               tourItem.colSlowVsFastCadence = UI.EMPTY_STRING;
                final int cadenceZone_SlowTime = result.getInt(79);
                final int cadenceZone_FastTime = result.getInt(80);
                final int totalCadenceZone_SlowTime = cadenceZone_SlowTime == -1 ? 0 : cadenceZone_SlowTime;
@@ -395,7 +395,7 @@ public class TVITourBookYearSub extends TVITourBookItem {
                   final int cadenceZone_SlowPercentage = Math.round(totalCadenceZone_SlowTime * 100f / totalCadenceTime);
                   final int cadenceZone_FastPercentage = Math.round(totalCadenceZone_FastTime * 100f / totalCadenceTime);
 
-                  tourItem.colHikingVsRunning = cadenceZone_SlowPercentage + " - " + cadenceZone_FastPercentage; //$NON-NLS-1$
+                  tourItem.colSlowVsFastCadence = cadenceZone_SlowPercentage + " - " + cadenceZone_FastPercentage; //$NON-NLS-1$
                }
 
                // -----------------------------------------------
