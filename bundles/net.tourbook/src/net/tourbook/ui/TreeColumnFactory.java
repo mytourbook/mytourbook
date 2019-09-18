@@ -611,10 +611,10 @@ public abstract class TreeColumnFactory {
                   SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Powertrain);
-            colDef.setColumnLabel(Messages.ColumnFactory_Power_Slow_Vs_Fast_Cadence_Percentages_Label);
-            colDef.setColumnHeaderText(Messages.ColumnFactory_Power_Slow_Vs_Fast_Cadence_Percentages_Header);
-            colDef.setColumnUnit(Messages.ColumnFactory_Power_Slow_Vs_Fast_Cadence_Percentages_Header);
-            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Power_Slow_Vs_Fast_Cadence_Percentages_Tooltip);
+            colDef.setColumnLabel(Messages.ColumnFactory_Power_SlowVsFast_CadencePercentages_Label);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_Power_SlowVsFast_CadencePercentages_Header);
+            colDef.setColumnUnit(Messages.ColumnFactory_Power_SlowVsFast_CadencePercentages_Header);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Power_SlowVsFast_CadencePercentages_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
