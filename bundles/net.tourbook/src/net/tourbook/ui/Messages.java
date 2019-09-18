@@ -344,11 +344,15 @@ public class Messages extends NLS {
    public static String        ColumnFactory_tour_week_header;
    public static String        ColumnFactory_tour_week_label;
    public static String        ColumnFactory_tour_week_tooltip;
-   
+
+   public static String        ColumnFactory_TagID_Header;
+   public static String        ColumnFactory_TagID_Label;
+   public static String        ColumnFactory_TagID_Tooltip;
+
    public static String        ColumnFactory_TagNotes_Header;
    public static String        ColumnFactory_TagNotes_Label;
    public static String        ColumnFactory_TagNotes_Tooltip;
-   
+
    public static String        ColumnFactory_TimeDelta_Header;
    public static String        ColumnFactory_TimeDelta_Label;
    public static String        ColumnFactory_TimeDelta_Tooltip;

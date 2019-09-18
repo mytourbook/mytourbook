@@ -145,7 +145,7 @@ public class TourContextMenu {
 		menuMgr.add(_actionComputeDistanceValuesFromGeoposition);
 		menuMgr.add(_actionSetAltitudeFromSRTM);
 
-		tagMenuMgr.fillTagMenu(menuMgr);
+      tagMenuMgr.fillTagMenu(menuMgr, true);
 
 		// tour type actions
 		menuMgr.add(new Separator());
@@ -224,7 +224,7 @@ public class TourContextMenu {
 
 		Long tourTypeId = new Long(-1); // TODO -> NOTOUR
 		if (null != firstSavedTour) {
-			final ArrayList<Long> tagIds = new ArrayList<Long>();
+			final ArrayList<Long> tagIds = new ArrayList<>();
 			for (final TourTag tag : firstSavedTour.getTourTags()) {
 				tagIds.add(tag.getTagId());
 			}
@@ -263,7 +263,7 @@ public class TourContextMenu {
 		menuMgr.add(_actionComputeDistanceValuesFromGeoposition);
 		menuMgr.add(_actionSetAltitudeFromSRTM);
 
-		_tagMenuMgr.fillTagMenu(menuMgr);
+      _tagMenuMgr.fillTagMenu(menuMgr, true);
 
 		// tour type actions
 		menuMgr.add(new Separator());

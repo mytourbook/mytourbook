@@ -79,7 +79,7 @@ import net.tourbook.ui.views.TourInfoToolTipCellLabelProvider;
 import net.tourbook.ui.views.TourInfoToolTipStyledCellLabelProvider;
 import net.tourbook.ui.views.TreeViewerTourInfoToolTip;
 import net.tourbook.ui.views.rawData.ActionMergeTour;
-import net.tourbook.ui.views.rawData.ActionReimportSubMenu;
+import net.tourbook.ui.views.rawData.Action_Reimport_SubMenu;
 import net.tourbook.ui.views.tourBook.TVITourBookTour;
 
 import org.eclipse.e4.ui.di.PersistState;
@@ -207,7 +207,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
    private ActionModifyColumns                        _actionModifyColumns;
    private ActionPrint                                _actionPrintTour;
    private ActionRefreshView                          _actionRefreshView;
-   private ActionReimportSubMenu                      _actionReimportSubMenu;
+   private Action_Reimport_SubMenu                    _actionReimportSubMenu;
    private ActionSetAltitudeValuesFromSRTM            _actionSetAltitudeFromSRTM;
    private ActionSetTourTypeMenu                      _actionSetTourType;
    private ActionSetPerson                            _actionSetOtherPerson;
@@ -478,7 +478,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
       _actionOpenTour = new ActionOpenTour(this);
       _actionPrintTour = new ActionPrint(this);
       _actionRefreshView = new ActionRefreshView(this);
-      _actionReimportSubMenu = new ActionReimportSubMenu(this);
+      _actionReimportSubMenu = new Action_Reimport_SubMenu(this);
       _actionSetAltitudeFromSRTM = new ActionSetAltitudeValuesFromSRTM(this);
       _actionSetOtherPerson = new ActionSetPerson(this);
       _actionSetTourType = new ActionSetTourTypeMenu(this);
@@ -1885,7 +1885,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
       menuMgr.add(_actionComputeDistanceValuesFromGeoposition);
       menuMgr.add(_actionSetAltitudeFromSRTM);
 
-      _tagMenuManager.fillTagMenu(menuMgr);
+      _tagMenuManager.fillTagMenu(menuMgr, true);
 
       // tour type actions
       menuMgr.add(new Separator());
