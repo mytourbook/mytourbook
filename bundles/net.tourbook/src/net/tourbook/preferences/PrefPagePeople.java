@@ -1241,11 +1241,15 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          label.setText(net.tourbook.common.Messages.Graph_Label_Cadence_Unit);
       }
 
+      // label: Text explaining the meaning of the two zones
+      final Label label = new Label(container, SWT.NONE);
+      label.setText(Messages.Pref_People_Label_Description_CadenceZonesDelimiter);
+      GridDataFactory.fillDefaults().span(3, 0).align(SWT.BEGINNING, SWT.FILL).applyTo(label);
+
       // button: compute time values
       final Button buttonComputeTimes = new Button(container, SWT.NONE);
       GridDataFactory.fillDefaults().span(3, 0).indent(0, 50).align(SWT.BEGINNING, SWT.FILL).applyTo(buttonComputeTimes);
-      //TODO TOTO CadenceZonesTimes_ComputeAllTours
-      buttonComputeTimes.setText(Messages.Pref_People_Button_CadenceZones_ComputeAllTours);
+      buttonComputeTimes.setText(Messages.Pref_People_Button_CadenceZonesTimes_ComputeAllTours);
       buttonComputeTimes.addSelectionListener(new SelectionAdapter() {
          @Override
          public void widgetSelected(final SelectionEvent e) {
@@ -1927,9 +1931,14 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       person.persist();
 
       final int[] old_CadenceZone_SlowTime = { 0 };
-      final int[] new_CadenceZone_SlowTime = { 0 };
       final int[] old_CadenceZone_FastTime = { 0 };
-      final int[] new_CadenceZone_FastTime = { 0 };
+
+      final int[] total_Old_CadenceZone_SlowTime = { 0 };
+      final int[] total_New_CadenceZone_SlowTime = { 0 };
+      final int[] total_Old_CadenceZone_FastTime = { 0 };
+      final int[] total_New_CadenceZone_FastTime = { 0 };
+
+      final int currentCadenceDelimiter = _spinnerCadenceDelimiter.getSelection();
 
       final IComputeTourValues computeTourValueConfig = new IComputeTourValues() {
 
@@ -1937,20 +1946,24 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          public boolean computeTourValues(final TourData oldTourData) {
 
             old_CadenceZone_SlowTime[0] = oldTourData.getCadenceZone_SlowTime();
+            total_Old_CadenceZone_SlowTime[0] += old_CadenceZone_SlowTime[0];
             old_CadenceZone_FastTime[0] = oldTourData.getCadenceZone_FastTime();
+            total_Old_CadenceZone_FastTime[0] += old_CadenceZone_FastTime[0];
 
-            // recompute times for each cadence zones
-            return oldTourData.computeCadenceZonesTimes();
+            // recompute times for each cadence zone
+            return oldTourData.computeCadenceZonesTimes(currentCadenceDelimiter);
          }
 
          @Override
          public String getResultText() {
 
-            return "TOTO" + "\n" + NLS.bind(
-                  "Slow time before/after", //Messages.Compute_BreakTime_ForAllTour_Job_Result, //
+            return net.tourbook.common.UI.NEW_LINE + NLS.bind(
+                  Messages.Compute_CadenceZonesTimes_ComputeForAllTours_Job_Result,
                   new Object[] {
-                        net.tourbook.common.UI.format_hh_mm_ss(new_CadenceZone_SlowTime[0]),
-                        net.tourbook.common.UI.format_hh_mm_ss(new_CadenceZone_FastTime[0]), });
+                        net.tourbook.common.UI.format_hh_mm_ss(total_Old_CadenceZone_SlowTime[0]),
+                        net.tourbook.common.UI.format_hh_mm_ss(total_New_CadenceZone_SlowTime[0]),
+                        net.tourbook.common.UI.format_hh_mm_ss(total_Old_CadenceZone_FastTime[0]),
+                        net.tourbook.common.UI.format_hh_mm_ss(total_New_CadenceZone_FastTime[0]), });
          }
 
          @Override
@@ -1962,11 +1975,13 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
                // get new values
                final int new_CadenceZone_SlowTime = savedTourData.getCadenceZone_SlowTime();
+               total_New_CadenceZone_SlowTime[0] += new_CadenceZone_SlowTime;
                final int new_CadenceZone_FastTime = savedTourData.getCadenceZone_FastTime();
+               total_New_CadenceZone_FastTime[0] += new_CadenceZone_FastTime;
 
                subTaskText = net.tourbook.common.UI.NEW_LINE +
                      NLS.bind(
-                           "Temps de cadence ancien/nouveau: \"lente\"  {0} / {1}, \"rapide\"  {2} / {3}", //Messages.Compute_BreakTime_ForAllTour_Job_SubTask, //
+                           Messages.Compute_CadenceZonesTimes_ComputeForAllTours_Job_SubTask,
                            new Object[] {
                                  net.tourbook.common.UI.format_hh_mm_ss(old_CadenceZone_SlowTime[0]),
                                  net.tourbook.common.UI.format_hh_mm_ss(new_CadenceZone_SlowTime),

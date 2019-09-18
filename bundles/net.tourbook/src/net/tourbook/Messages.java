@@ -583,6 +583,8 @@ public class Messages extends NLS {
    public static String        Compute_BreakTime_Method_SpeedBySlice;
    public static String        Compute_BreakTime_Method_TimeDistance;
 
+   public static String        Compute_CadenceZonesTimes_ComputeForAllTours_Job_Result;
+   public static String        Compute_CadenceZonesTimes_ComputeForAllTours_Job_SubTask;
    public static String        Compute_CadenceZonesTimes_Dialog_ComputeForAllTours_Message;
    public static String        Compute_CadenceZonesTimes_Dialog_ComputeForAllTours_Title;
 
@@ -1600,7 +1602,7 @@ public class Messages extends NLS {
    public static String        Pref_MapLayout_Label_TourPaintMethod_Simple_Tooltip;
 
    public static String        Pref_People_Action_add_person;
-   public static String        Pref_People_Button_CadenceZones_ComputeAllTours;
+   public static String        Pref_People_Button_CadenceZonesTimes_ComputeAllTours;
    public static String        Pref_People_Button_HrZones_ComputeAllTours;
    public static String        Pref_People_Button_HrZones_ComputeAllTours_Tooltip;
    public static String        Pref_People_Column_Birthday;
@@ -1618,6 +1620,7 @@ public class Messages extends NLS {
    public static String        Pref_People_Label_Age;
    public static String        Pref_People_Label_Birthday;
    public static String        Pref_People_Label_CadenceZonesDelimiter;
+   public static String        Pref_People_Label_Description_CadenceZonesDelimiter;
    public static String        Pref_People_Label_DataTransfer;
    public static String        Pref_People_Label_DefaultDataTransferFilePath;
    public static String        Pref_People_Label_DefaultDataTransferFilePath_Tooltip;

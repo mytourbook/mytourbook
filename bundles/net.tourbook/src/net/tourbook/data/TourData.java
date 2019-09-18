@@ -3236,15 +3236,21 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    /**
     * Computes time (seconds) spent in each cadence zone (slow and fast).
+    *
+    * @param cadenceZonesDelimiter
+    *           The cadence value delimiting the two cadence zones.
+    *           If it is equal to -1, we should use the value set by the user
     */
-   public boolean computeCadenceZonesTimes() {
+   public boolean computeCadenceZonesTimes(int cadenceZonesDelimiter) {
 
       if (timeSerie == null || cadenceSerie == null) {
          return false;
       }
 
       final TourPerson tourPerson = getDataPerson();
-      final int cadenceZonesDelimiter = tourPerson.getCadenceZonesDelimiter();
+      if (cadenceZonesDelimiter == -1) {
+         cadenceZonesDelimiter = tourPerson.getCadenceZonesDelimiter();
+      }
 
       if (breakTimeSerie == null) {
          getBreakTime();
@@ -3305,7 +3311,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       computeAvg_Temperature();
 
       computeHrZones();
-      computeCadenceZonesTimes();
+      computeCadenceZonesTimes(-1);
       computeRunningDynamics();
 
       computeGeo_Bounds();

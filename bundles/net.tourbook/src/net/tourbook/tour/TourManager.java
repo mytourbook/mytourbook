@@ -526,7 +526,7 @@ public class TourManager {
 
             for (final TourData tourData : tourDataList) {
 
-               final boolean isComputed = tourData.computeCadenceZonesTimes();
+               final boolean isComputed = tourData.computeCadenceZonesTimes(-1);
                final String tourDateTime = TourManager.getTourDateTimeShort(tourData);
 
                if (isComputed) {
