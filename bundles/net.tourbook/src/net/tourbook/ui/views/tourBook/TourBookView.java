@@ -1876,7 +1876,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_Powertrain_SlowVsFastCadencePercentage() {
 
-      final TreeColumnDefinition colDef = TreeColumnFactory.POWERTRAIN_SLOW_VS_FAST_CADENCE_PERCENTAGES.createColumn(
+      final TreeColumnDefinition colDef = TreeColumnFactory.MOTION_SLOW_VS_FAST_CADENCE_PERCENTAGES.createColumn(
             _columnManager,
             _pc);
 
