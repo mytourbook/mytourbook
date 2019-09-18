@@ -1440,8 +1440,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
    private Control createUI_80_CadenceZones(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(3).extendedMargins(0, 0, 7, 0).applyTo(container);
+      GridLayoutFactory.swtDefaults().numColumns(3).extendedMargins(0, 0, 7, 0).applyTo(container);
       {
          Label label = new Label(container, SWT.NONE);
          label.setText(Messages.Pref_People_Label_CadenceZonesDelimiter);
@@ -1461,15 +1460,22 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
             }
          });
 
-         // label: unit (rpm)
+         // label: unit
          label = new Label(container, SWT.NONE);
          label.setText(net.tourbook.common.Messages.Graph_Label_Cadence_Unit);
       }
 
-      // label: Text explaining the meaning of the two zones
-      final Label label = new Label(container, SWT.NONE);
-      label.setText(Messages.Pref_People_Label_Description_CadenceZonesDelimiter);
-      GridDataFactory.fillDefaults().span(3, 0).align(SWT.BEGINNING, SWT.FILL).applyTo(label);
+      GridDataFactory.fillDefaults().applyTo(container);
+      {
+         // label: Text explaining the meaning of the two zones
+         final Label label = new Label(container, SWT.WRAP);
+         GridDataFactory.fillDefaults()//
+               .grab(true, false)
+               .span(3, 1)
+               .hint(net.tourbook.common.UI.DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
+               .applyTo(label);
+         label.setText(Messages.Pref_People_Label_Description_CadenceZonesDelimiter);
+      }
 
       // button: compute time values
       final Button buttonComputeTimes = new Button(container, SWT.NONE);
