@@ -63,6 +63,7 @@ public abstract class TreeColumnFactory {
    public static final TreeColumnFactory POWERTRAIN_GEAR_FRONT_SHIFT_COUNT;
    public static final TreeColumnFactory POWERTRAIN_GEAR_REAR_SHIFT_COUNT;
    public static final TreeColumnFactory POWERTRAIN_PEDAL_LEFT_RIGHT_BALANCE;
+   public static final TreeColumnFactory POWERTRAIN_SLOW_VS_FAST_CADENCE_PERCENTAGES;
 
    public static final TreeColumnFactory RUN_DYN_STANCE_TIME_MIN;
    public static final TreeColumnFactory RUN_DYN_STANCE_TIME_MAX;
@@ -103,7 +104,6 @@ public abstract class TreeColumnFactory {
    public static final TreeColumnFactory MOTION_AVG_SPEED;
    public static final TreeColumnFactory MOTION_DISTANCE;
    public static final TreeColumnFactory MOTION_MAX_SPEED;
-   public static final TreeColumnFactory MOTION_SLOW_VS_FAST_CADENCE_PERCENTAGES;
 
    public static final TreeColumnFactory TOUR_REFTOUR_TOUR;
 
@@ -600,20 +600,21 @@ public abstract class TreeColumnFactory {
          }
       };
 
-      MOTION_SLOW_VS_FAST_CADENCE_PERCENTAGES = new TreeColumnFactory() {
+      POWERTRAIN_SLOW_VS_FAST_CADENCE_PERCENTAGES = new TreeColumnFactory() {
 
          @Override
          public TreeColumnDefinition createColumn(final ColumnManager columnManager,
                                                   final PixelConverter pixelConverter) {
 
             final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager,
-                  "MOTION_SLOW_VS_FAST_CADENCE_PERCENTAGES", //$NON-NLS-1$
+                  "POWERTRAIN_SLOW_VS_FAST_CADENCE_PERCENTAGES", //$NON-NLS-1$
                   SWT.TRAIL);
 
-            colDef.setColumnCategory(Messages.ColumnFactory_Category_Motion);
-            colDef.setColumnLabel(Messages.ColumnFactory_slow_vs_fast_cadence_percentages_label);
-            colDef.setColumnHeaderText(Messages.ColumnFactory_slow_vs_fast_cadence_percentages_header);
-            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_slow_vs_fast_cadence_percentages_tooltip);
+            colDef.setColumnCategory(Messages.ColumnFactory_Category_Powertrain);
+            colDef.setColumnLabel(Messages.ColumnFactory_Power_Slow_Vs_Fast_Cadence_Percentages_Label);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_Power_Slow_Vs_Fast_Cadence_Percentages_Header);
+            colDef.setColumnUnit(Messages.ColumnFactory_Power_Slow_Vs_Fast_Cadence_Percentages_Header);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Power_Slow_Vs_Fast_Cadence_Percentages_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
