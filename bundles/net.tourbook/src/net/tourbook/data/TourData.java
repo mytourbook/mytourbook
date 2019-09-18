@@ -3243,11 +3243,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    public boolean computeCadenceZonesTimes(int cadenceZonesDelimiter) {
 
-      if (timeSerie == null || cadenceSerie == null) {
+      final TourPerson tourPerson = getDataPerson();
+
+      if (timeSerie == null || cadenceSerie == null || tourPerson == null) {
          return false;
       }
 
-      final TourPerson tourPerson = getDataPerson();
       if (cadenceZonesDelimiter == -1) {
          cadenceZonesDelimiter = tourPerson.getCadenceZonesDelimiter();
       }
