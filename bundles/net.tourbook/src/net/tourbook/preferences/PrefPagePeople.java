@@ -1471,7 +1471,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          final Label label = new Label(container, SWT.WRAP);
          GridDataFactory.fillDefaults()//
                .grab(true, false)
-               .span(3, 1)
+               .span(3, 0)
                .hint(net.tourbook.common.UI.DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
                .applyTo(label);
          label.setText(Messages.Pref_People_Label_Description_CadenceZonesDelimiter);

@@ -428,7 +428,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    private int                   cadenceZone_FastTime                        = -1;                     // db-version 40
    /**
-    * The value used for when computing the existing values of cadenceZone_SlowTime & cadenceZone_FastTime
+    * The delimiter used when computing the existing values of cadenceZone_SlowTime & cadenceZone_FastTime
     */
    @SuppressWarnings("unused")
    private int                   cadenceZones_DelimiterValue;
