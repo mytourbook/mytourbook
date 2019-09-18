@@ -6,8 +6,6 @@ TODOs
 * Reduce tour book context menu with "Adjust Tour" submenu which contains computed tour actions
 * Show weather, location start/end as new columns
 * Compute min/max temperature for selected tours
-* Update SWT to 4.13 (Eclipse 2019-09) to fix the issue (Linux only) when changing the tour start time spinner
-  (cf. https://bugs.eclipse.org/bugs/show_bug.cgi?id=547489) 
 * When hovering over a graph, data appears referring to the point in the graph the mouse is on: 
   this data does not take into account whether the track has been saved as a using cadence or revolutions, and always shows revolutions.
   https://github.com/wolfgang-ch/mytourbook/issues/86
@@ -100,5 +98,10 @@ Translation
 System   
 ======
 
-  - 
+* Eclipse 2019-09 (4.13)
+
+  - This new version solves the issue (Linux only) when modifying the tour
+    start time spinner widget in the tour editor as it was not triggering 
+    the possibility to save the tour in the tour editor
+    (cf. https://bugs.eclipse.org/bugs/show_bug.cgi?id=547489) 
 
