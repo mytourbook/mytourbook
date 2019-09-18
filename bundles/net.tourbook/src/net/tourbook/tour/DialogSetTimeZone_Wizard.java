@@ -179,7 +179,7 @@ public class DialogSetTimeZone_Wizard extends Wizard {
                   tourData.setTimeZoneId(selectedzoneId.getId());
 
                   TourLogManager.addLog(
-                        TourLogState.DEFAULT,
+                        TourLogState.INFO,
                         NLS.bind(LOG_SET_TIMEZONE_010_SET_SELECTED, tourDateTime));
 
                   break;
@@ -200,7 +200,7 @@ public class DialogSetTimeZone_Wizard extends Wizard {
                      tourData.setTimeZoneId(zoneId.getId());
 
                      TourLogManager.addLog(
-                           TourLogState.DEFAULT,
+                           TourLogState.INFO,
                            NLS.bind(LOG_SET_TIMEZONE_011_SET_FROM_GEO, zoneId.getId(), tourDateTime));
 
                   } else {
@@ -219,7 +219,7 @@ public class DialogSetTimeZone_Wizard extends Wizard {
                   tourData.setTimeZoneId(null);
 
                   TourLogManager.addLog(
-                        TourLogState.DEFAULT,
+                        TourLogState.INFO,
                         NLS.bind(LOG_SET_TIMEZONE_013_REMOVED, tourDateTime));
 
                   break;
@@ -232,7 +232,7 @@ public class DialogSetTimeZone_Wizard extends Wizard {
                   tourData.setTourStartTime_YYMMDD(tourStartTime_FromLatLon);
 
                   TourLogManager.addLog(
-                        TourLogState.DEFAULT,
+                        TourLogState.INFO,
                         NLS.bind(LOG_SET_TIMEZONE_014_TOUR_START_ADJUSTED, tourDateTime));
 
                   break;
