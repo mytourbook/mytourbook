@@ -420,13 +420,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private int                   hrZone9                        = -1;                     // db-version 16
 
    /**
-    * Time spent (in seconds) in the "Hiking" cadence zone.
+    * Time spent (in seconds) in the "Slow" cadence zone (for example: Hiking).
     */
-   private int                   cadenceZoneHikingTime                        = -1;                     // db-version 41
+   private int                   cadenceZone_SlowTime                        = -1;                     // db-version 40
    /**
-    * Time spent (in seconds) in the "Running" cadence zone.
+    * Time spent (in seconds) in the "Fast" cadence zone (for example: Running).
     */
-   private int                   cadenceZoneRunningTime                        = -1;                     // db-version 41
+   private int                   cadenceZone_FastTime                        = -1;                     // db-version 40
 
    /**
     * A flag indicating that the pulse is from a sensor. This is the state of the device which is
@@ -3235,16 +3235,22 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
-    * Computes seconds for each cadence zone (hiking and running).
+    * Computes time (seconds) spent in each cadence zone (slow and fast).
+    *
+    * @param cadenceZonesDelimiter
+    *           The cadence value delimiting the two cadence zones.
+    *           If it is equal to -1, we should use the value set by the user
     */
-   public void computeCadenceZonesTimes() {
+   public boolean computeCadenceZonesTimes(int cadenceZonesDelimiter) {
 
-      if (timeSerie == null || cadenceSerie == null ) {
-         return;
+      if (timeSerie == null || cadenceSerie == null) {
+         return false;
       }
 
       final TourPerson tourPerson = getDataPerson();
-      final int cadenceZonesDelimiter = tourPerson.getCadenceZonesDelimiter();
+      if (cadenceZonesDelimiter == -1) {
+         cadenceZonesDelimiter = tourPerson.getCadenceZonesDelimiter();
+      }
 
       if (breakTimeSerie == null) {
          getBreakTime();
@@ -3252,8 +3258,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       int prevTime = 0;
 
-      cadenceZoneRunningTime = 0;
-      cadenceZoneHikingTime = 0;
+      cadenceZone_FastTime = 0;
+      cadenceZone_SlowTime = 0;
 
       // compute zone values
       for (int serieIndex = 0; serieIndex < timeSerie.length; serieIndex++) {
@@ -3279,11 +3285,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          }
 
          if (cadence >= cadenceZonesDelimiter) {
-            cadenceZoneRunningTime += timeDiff;
+            cadenceZone_FastTime += timeDiff;
          } else {
-            cadenceZoneHikingTime += timeDiff;
+            cadenceZone_SlowTime += timeDiff;
          }
       }
+
+      return true;
    }
 
    /**
@@ -3303,7 +3311,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       computeAvg_Temperature();
 
       computeHrZones();
-      computeCadenceZonesTimes();
+      computeCadenceZonesTimes(-1);
       computeRunningDynamics();
 
       computeGeo_Bounds();
@@ -6637,12 +6645,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
    }
 
-   public int getCadenceZoneHikingTime() {
-      return cadenceZoneHikingTime;
+   public int getCadenceZone_FastTime() {
+      return cadenceZone_FastTime;
    }
 
-   public int getCadenceZoneRunningTime() {
-      return cadenceZoneRunningTime;
+   public int getCadenceZone_SlowTime() {
+      return cadenceZone_SlowTime;
    }
 
    /**
@@ -8797,12 +8805,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       cadenceSerie = cadenceSerieData;
    }
 
-   public void setCadenceZoneHikingTime(final int cadenceZoneHikingTime) {
-      this.cadenceZoneHikingTime = cadenceZoneHikingTime;
+   public void setCadenceZone_FastTime(final int cadenceZone_FastTime) {
+      this.cadenceZone_FastTime = cadenceZone_FastTime;
    }
 
-   public void setCadenceZoneRunningTime(final int cadenceZoneRunningTime) {
-      this.cadenceZoneRunningTime = cadenceZoneRunningTime;
+   public void setCadenceZone_SlowTime(final int cadenceZone_SlowTime) {
+      this.cadenceZone_SlowTime = cadenceZone_SlowTime;
    }
 
    /**

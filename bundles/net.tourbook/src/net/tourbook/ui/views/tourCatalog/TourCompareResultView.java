@@ -1163,7 +1163,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
       menuMgr.add(_actionOpenTour);
 
       // tour tag actions
-      _tagMenuManager.fillTagMenu(menuMgr);
+      _tagMenuManager.fillTagMenu(menuMgr, true);
 
       // tour type actions
       menuMgr.add(new Separator());

@@ -63,9 +63,6 @@ public abstract class TreeColumnFactory {
    public static final TreeColumnFactory POWERTRAIN_GEAR_FRONT_SHIFT_COUNT;
    public static final TreeColumnFactory POWERTRAIN_GEAR_REAR_SHIFT_COUNT;
    public static final TreeColumnFactory POWERTRAIN_PEDAL_LEFT_RIGHT_BALANCE;
-   public static final TreeColumnFactory POWERTRAIN_HIKING_VS_RUNNING_PERCENTAGE;
-   //public static final TreeColumnFactory POWERTRAIN_HIKE_ZONE_TIME;
-   //public static final TreeColumnFactory POWERTRAIN_RUNNING_ZONE_TIME;
 
    public static final TreeColumnFactory RUN_DYN_STANCE_TIME_MIN;
    public static final TreeColumnFactory RUN_DYN_STANCE_TIME_MAX;
@@ -106,6 +103,7 @@ public abstract class TreeColumnFactory {
    public static final TreeColumnFactory MOTION_AVG_SPEED;
    public static final TreeColumnFactory MOTION_DISTANCE;
    public static final TreeColumnFactory MOTION_MAX_SPEED;
+   public static final TreeColumnFactory MOTION_SLOW_VS_FAST_CADENCE_PERCENTAGES;
 
    public static final TreeColumnFactory TOUR_REFTOUR_TOUR;
 
@@ -115,6 +113,7 @@ public abstract class TreeColumnFactory {
    public static final TreeColumnFactory TOUR_NUM_PHOTOS;
    public static final TreeColumnFactory TOUR_TAG_AND_CATEGORY_NOTES;
    public static final TreeColumnFactory TOUR_TAG_AND_TAGS;
+   public static final TreeColumnFactory TOUR_TAG_ID;
    public static final TreeColumnFactory TOUR_TAGS;
    public static final TreeColumnFactory TOUR_TITLE;
    public static final TreeColumnFactory TOUR_TYPE;
@@ -601,6 +600,27 @@ public abstract class TreeColumnFactory {
          }
       };
 
+      MOTION_SLOW_VS_FAST_CADENCE_PERCENTAGES = new TreeColumnFactory() {
+
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager,
+                  "MOTION_SLOW_VS_FAST_CADENCE_PERCENTAGES", //$NON-NLS-1$
+                  SWT.TRAIL);
+
+            colDef.setColumnCategory(Messages.ColumnFactory_Category_Motion);
+            colDef.setColumnLabel(Messages.ColumnFactory_slow_vs_fast_cadence_percentages_label);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_slow_vs_fast_cadence_percentages_header);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_slow_vs_fast_cadence_percentages_tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+
+            return colDef;
+         }
+      };
+
       /*
        * POWER
        */
@@ -925,27 +945,6 @@ public abstract class TreeColumnFactory {
             colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Power_LeftRightBalance_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
-
-            return colDef;
-         }
-      };
-
-      POWERTRAIN_HIKING_VS_RUNNING_PERCENTAGE = new TreeColumnFactory() {
-
-         @Override
-         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
-                                                  final PixelConverter pixelConverter) {
-
-            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager,
-                  "POWERTRAIN_HIKE_ZONE_PERCENTAGE", //$NON-NLS-1$
-                  SWT.TRAIL);
-
-            colDef.setColumnCategory(Messages.ColumnFactory_Category_Powertrain);
-            colDef.setColumnLabel("Hiking vs Running");//Messages.ColumnFactory_GearTeeth_Label);
-            colDef.setColumnHeaderText("% - %");//Messages.ColumnFactory_GearTeeth_Header);
-            colDef.setColumnHeaderToolTipText("Hiking vs Running");//Messages.ColumnFactory_GearTeeth_Tooltip);
-
-            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
             return colDef;
          }
@@ -1968,6 +1967,24 @@ public abstract class TreeColumnFactory {
             colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_tag_tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
+
+            return colDef;
+         }
+      };
+
+      TOUR_TAG_ID = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TOUR_TAG_ID", SWT.TRAIL); //$NON-NLS-1$
+
+            colDef.setColumnCategory(Messages.ColumnFactory_Category_Tour);
+            colDef.setColumnLabel(Messages.ColumnFactory_TagID_Label);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_TagID_Header);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_TagID_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
 
             return colDef;
          }

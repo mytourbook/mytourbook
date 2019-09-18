@@ -181,10 +181,10 @@ public class TVITourBookYearSub extends TVITourBookItem {
             //
             + "training_TrainingEffect_Aerob, " //          76   //$NON-NLS-1$
             + "training_TrainingEffect_Anaerob, " //        77   //$NON-NLS-1$
-            + "training_TrainingPerformance, " //            78   //$NON-NLS-1$
+            + "training_TrainingPerformance, " //           78   //$NON-NLS-1$
 
-            + "cadenceZoneHikingTime, " //                       79   //$NON-NLS-1$
-            + "cadenceZoneRunningTime " //                      80   //$NON-NLS-1$
+            + "cadenceZone_SlowTime, " //                   79   //$NON-NLS-1$
+            + "cadenceZone_FastTime " //                    80   //$NON-NLS-1$
 
             + UI.NEW_LINE
 
@@ -384,16 +384,18 @@ public class TVITourBookYearSub extends TVITourBookItem {
                tourItem.colAvgCadence = dbAvgCadence * dbCadenceMultiplier;
                tourItem.colCadenceMultiplier = dbCadenceMultiplier;
 
-               tourItem.colHikingVsRunning = ""; //$NON-NLS-1$
-               final int cadenceZoneHikingTime = result.getInt(79) == -1 ? 0 : result.getInt(79);
-               final int cadenceZoneRunningTime = result.getInt(80) == -1 ? 0 : result.getInt(80);
+               tourItem.colSlowVsFastCadence = UI.EMPTY_STRING;
+               final int cadenceZone_SlowTime = result.getInt(79);
+               final int cadenceZone_FastTime = result.getInt(80);
+               final int totalCadenceZone_SlowTime = cadenceZone_SlowTime == -1 ? 0 : cadenceZone_SlowTime;
+               final int totalCadenceZone_FastTime = cadenceZone_FastTime == -1 ? 0 : cadenceZone_FastTime;
 
-               final int totalCadenceTime = cadenceZoneHikingTime + cadenceZoneRunningTime;
+               final int totalCadenceTime = totalCadenceZone_SlowTime + totalCadenceZone_FastTime;
                if (totalCadenceTime != 0) {
-                  final int cadenceZoneHikingPercentage = Math.round(result.getInt(79) * 100f / totalCadenceTime);
-                  final int cadenceZoneRunningPercentage = Math.round(result.getInt(80) * 100f / totalCadenceTime);
+                  final int cadenceZone_SlowPercentage = Math.round(totalCadenceZone_SlowTime * 100f / totalCadenceTime);
+                  final int cadenceZone_FastPercentage = Math.round(totalCadenceZone_FastTime * 100f / totalCadenceTime);
 
-                  tourItem.colHikingVsRunning = cadenceZoneHikingPercentage + " - " + cadenceZoneRunningPercentage; //$NON-NLS-1$
+                  tourItem.colSlowVsFastCadence = cadenceZone_SlowPercentage + " - " + cadenceZone_FastPercentage; //$NON-NLS-1$
                }
 
                // -----------------------------------------------

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -30,100 +30,98 @@ import net.tourbook.ui.UI;
  */
 public class TVITagView_Root extends TVITagViewItem {
 
-//	private TaggingView	_tagView;
-	private int _tagViewStructure;
+   private int _tagViewStructure;
 
-	public TVITagView_Root(final TaggingView tagView, final int tagViewStructure) {
-//		_tagView = tagView;
-		_tagViewStructure = tagViewStructure;
-	}
+   public TVITagView_Root(final int tagViewStructure) {
+      _tagViewStructure = tagViewStructure;
+   }
 
-	@Override
-	protected void fetchChildren() {
+   @Override
+   protected void fetchChildren() {
 
-		/*
-		 * set the children for the root item, these are year items
-		 */
-		final ArrayList<TreeViewerItem> children = new ArrayList<>();
-		setChildren(children);
+      /*
+       * set the children for the root item, these are year items
+       */
+      final ArrayList<TreeViewerItem> children = new ArrayList<>();
+      setChildren(children);
 
-		final StringBuilder sb = new StringBuilder();
+      final StringBuilder sb = new StringBuilder();
 
-		try {
+      try {
 
-			final Connection conn = TourDatabase.getInstance().getConnection();
-			PreparedStatement statement;
-			ResultSet result;
+         final Connection conn = TourDatabase.getInstance().getConnection();
+         PreparedStatement statement;
+         ResultSet result;
 
-			if (_tagViewStructure == TaggingView.TAG_VIEW_LAYOUT_HIERARCHICAL) {
+         if (_tagViewStructure == TaggingView.TAG_VIEW_LAYOUT_HIERARCHICAL) {
 
-				/*
-				 * get tag categories
-				 */
-				sb.append("SELECT"); //$NON-NLS-1$
-				sb.append(" tagCategoryId,"); // 	1 //$NON-NLS-1$
-				sb.append(" name"); // 				2 //$NON-NLS-1$
+            /*
+             * get tag categories
+             */
+            sb.append("SELECT"); //$NON-NLS-1$
+            sb.append(" tagCategoryId,"); //    1 //$NON-NLS-1$
+            sb.append(" name"); //             2 //$NON-NLS-1$
 
-				sb.append(" FROM " + TourDatabase.TABLE_TOUR_TAG_CATEGORY); //$NON-NLS-1$
-				sb.append(" WHERE isRoot = 1"); //$NON-NLS-1$
-				sb.append(" ORDER BY name"); //$NON-NLS-1$
+            sb.append(" FROM " + TourDatabase.TABLE_TOUR_TAG_CATEGORY); //$NON-NLS-1$
+            sb.append(" WHERE isRoot = 1"); //$NON-NLS-1$
+            sb.append(" ORDER BY name"); //$NON-NLS-1$
 
-				statement = conn.prepareStatement(sb.toString());
-				result = statement.executeQuery();
+            statement = conn.prepareStatement(sb.toString());
+            result = statement.executeQuery();
 
-				while (result.next()) {
+            while (result.next()) {
 
-					final TVITagView_TagCategory treeItem = new TVITagView_TagCategory(this);
-					children.add(treeItem);
+               final TVITagView_TagCategory treeItem = new TVITagView_TagCategory(this);
+               children.add(treeItem);
 
-					treeItem.tagCategoryId = result.getLong(1);
-					treeItem.treeColumn = treeItem.name = result.getString(2);
-				}
-			}
+               treeItem.tagCategoryId = result.getLong(1);
+               treeItem.treeColumn = treeItem.name = result.getString(2);
+            }
+         }
 
-			/*
-			 * get tags
-			 */
-			final String whereClause = _tagViewStructure == TaggingView.TAG_VIEW_LAYOUT_FLAT
-					? UI.EMPTY_STRING
-					: _tagViewStructure == TaggingView.TAG_VIEW_LAYOUT_HIERARCHICAL ? //
-							" WHERE isRoot = 1" //$NON-NLS-1$
-							: UI.EMPTY_STRING;
+         /*
+          * get tags
+          */
+         final String whereClause = _tagViewStructure == TaggingView.TAG_VIEW_LAYOUT_FLAT
+               ? UI.EMPTY_STRING
+               : _tagViewStructure == TaggingView.TAG_VIEW_LAYOUT_HIERARCHICAL ? //
+                     " WHERE isRoot = 1" //$NON-NLS-1$
+                     : UI.EMPTY_STRING;
 
-			sb.delete(0, sb.length());
-			sb.append("SELECT"); //$NON-NLS-1$
-			sb.append(" tagId,"); //		1 //$NON-NLS-1$
-			sb.append(" name,"); //			2 //$NON-NLS-1$
-			sb.append(" expandType,"); //	3 //$NON-NLS-1$
-			sb.append(" isRoot"); //		44 //$NON-NLS-1$
+         sb.delete(0, sb.length());
+         sb.append("SELECT"); //$NON-NLS-1$
+         sb.append(" tagId,"); //      1 //$NON-NLS-1$
+         sb.append(" name,"); //         2 //$NON-NLS-1$
+         sb.append(" expandType,"); //   3 //$NON-NLS-1$
+         sb.append(" isRoot"); //      44 //$NON-NLS-1$
 
-			sb.append(" FROM " + TourDatabase.TABLE_TOUR_TAG); //$NON-NLS-1$
-			sb.append(whereClause);
-			sb.append(" ORDER BY name"); //$NON-NLS-1$
+         sb.append(" FROM " + TourDatabase.TABLE_TOUR_TAG); //$NON-NLS-1$
+         sb.append(whereClause);
+         sb.append(" ORDER BY name"); //$NON-NLS-1$
 
-			statement = conn.prepareStatement(sb.toString());
-			result = statement.executeQuery();
+         statement = conn.prepareStatement(sb.toString());
+         result = statement.executeQuery();
 
-			while (result.next()) {
+         while (result.next()) {
 
-				final TVITagView_Tag tagItem = new TVITagView_Tag(this);
-				children.add(tagItem);
+            final TVITagView_Tag tagItem = new TVITagView_Tag(this);
+            children.add(tagItem);
 
-				final long tagId = result.getLong(1);
+            final long tagId = result.getLong(1);
 
-				tagItem.tagId = tagId;
-				tagItem.treeColumn = tagItem.name = result.getString(2);
-				tagItem.setExpandType(result.getInt(3));
-				tagItem.isRoot = result.getInt(4) == 1;
+            tagItem.tagId = tagId;
+            tagItem.treeColumn = tagItem.name = result.getString(2);
+            tagItem.setExpandType(result.getInt(3));
+            tagItem.isRoot = result.getInt(4) == 1;
 
-				readTagTotals(tagItem);
-			}
+            readTagTotals(tagItem);
+         }
 
-			conn.close();
+         conn.close();
 
-		} catch (final SQLException e) {
-			UI.showSQLException(e);
-		}
-	}
+      } catch (final SQLException e) {
+         UI.showSQLException(e);
+      }
+   }
 
 }

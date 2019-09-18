@@ -133,20 +133,15 @@ public class TourLogView extends ViewPart {
          @Override
          public void run() {
 
-            if (_browser == null || _browser.isDisposed()) {
-               // this can occure when view is being closed
-               return;
-            }
-
             String jsText = UI.replaceJS_BackSlash(tourLog.message);
             jsText = UI.replaceJS_Apostrophe(jsText);
             final String message = jsText;
 
-            final String subItem = tourLog.isSubLogItem //
+            final String subItem = tourLog.isSubLogItem
                   ? CSS_LOG_SUB_ITEM
                   : UI.EMPTY_STRING;
 
-            final String css = tourLog.css == null //
+            final String css = tourLog.css == null
                   ? CSS_LOG_ITEM
                   : tourLog.css;
 
@@ -157,9 +152,7 @@ public class TourLogView extends ViewPart {
 
             final String noBrowserText = createNoBrowserText(tourLog, stateNoBrowser[0]);
 
-//            System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//                  + ("\t" + noBrowserText));
-//            // TODO remove SYSTEM.OUT.PRINTLN
+            final boolean isBrowserAvailable = _browser != null && _browser.isDisposed() == false;
 
             if (isBrowserAvailable) {
 
@@ -234,6 +227,9 @@ public class TourLogView extends ViewPart {
       }
 
       _txtNoBrowser.setText(_noBrowserLog);
+
+      // scroll to the bottom
+      _txtNoBrowser.setTopIndex(_txtNoBrowser.getLineCount() - 1);
    }
 
    private void addPartListener() {
@@ -518,7 +514,7 @@ public class TourLogView extends ViewPart {
          stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateError);
          break;
 
-      case IMPORT_INFO:
+      case INFO:
          stateNoBrowser[0] = STATE_INFO;
          stateWithBrowser[0] = js_SetStyleBgImage(_imageUrl_StateInfo);
          break;
