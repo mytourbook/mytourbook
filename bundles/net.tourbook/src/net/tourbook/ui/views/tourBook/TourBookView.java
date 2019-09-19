@@ -993,6 +993,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       defineColumn_Powertrain_AvgLeftTorqueEffectiveness();
       defineColumn_Powertrain_AvgRightPedalSmoothness();
       defineColumn_Powertrain_AvgRightTorqueEffectiveness();
+      defineColumn_Powertrain_PedalLeftRightBalance();
 
       // Training - Trainingsanalyse
       defineColumn_Training_FTP();
@@ -1850,23 +1851,22 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    /**
     * Column: Pedal left/right balance
     */
-   /*
-    * private void defineColumn_Powertrain_PedalLeftRightBalance() {
-    * final TreeColumnDefinition colDef =
-    * TreeColumnFactory.POWERTRAIN_PEDAL_LEFT_RIGHT_BALANCE.createColumn(//
-    * _columnManager,
-    * _pc);
-    * colDef.setLabelProvider(new CellLabelProvider() {
-    * @Override
-    * public void update(final ViewerCell cell) {
-    * final Object element = cell.getElement();
-    * final int value = ((TVITourBookItem) element).colPower_PedalLeftRightBalance;
-    * colDef.printValue_0(cell, value);
-    * setCellColor(cell, element);
-    * }
-    * });
-    * }
-    */
+
+   private void defineColumn_Powertrain_PedalLeftRightBalance() {
+      final TreeColumnDefinition colDef =
+            TreeColumnFactory.POWERTRAIN_PEDAL_LEFT_RIGHT_BALANCE.createColumn(//
+                  _columnManager,
+                  _pc);
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+            final Object element = cell.getElement();
+            final int value = ((TVITourBookItem) element).colPower_PedalLeftRightBalance;
+            colDef.printValue_0(cell, value);
+            setCellColor(cell, element);
+         }
+      });
+   }
 
    /**
     * Column: Slow vs fast cadence Percentage
