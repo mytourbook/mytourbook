@@ -77,6 +77,7 @@ Bugfix
     - Fixed tour start time year/month/day by using it's time zone
     - Now Taking into account the pauses when importing laps (Frederic)
     - Distinguishing between manual activities and activities with tracks (Frederic)
+    - Multiplying the calories by 1000
   
   - Tour Book View
     - Extended "Set Time Zone" wizard to set tour start time year/month/day with time zone  
