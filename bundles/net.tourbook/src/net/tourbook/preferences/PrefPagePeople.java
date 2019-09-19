@@ -939,8 +939,8 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          GridLayoutFactory.swtDefaults().extendedMargins(0, 0, -5, 0).applyTo(group);
 //			group.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
          {
-            createUI_65_HrZone(group);
-            createUI_66_HrZone_Actions(group);
+            createUI_70_HrZone(group);
+            createUI_72_HrZone_Actions(group);
          }
       }
 
@@ -1083,7 +1083,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       }
    }
 
-   private void createUI_65_HrZone(final Composite parent) {
+   private void createUI_70_HrZone(final Composite parent) {
 
       final Composite hrZoneContainer = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()//
@@ -1122,7 +1122,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       }
    }
 
-   private void createUI_66_HrZone_Actions(final Composite parent) {
+   private void createUI_72_HrZone_Actions(final Composite parent) {
 
       // compute size for the first combo item
       final Label label = new Label(parent, SWT.NONE);
@@ -1202,7 +1202,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       }
    }
 
-   private void createUI_70_HrZone_InnerContainer(final int hrMaxFormulaKey,
+   private void createUI_80_HrZone_InnerContainer(final int hrMaxFormulaKey,
                                                   final int hrMaxPulse,
                                                   final ZonedDateTime birthDay) {
 
@@ -1229,10 +1229,10 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
          if (hrZones.size() == 0) {
             // hr zones are not available, show info
-            createUI_71_HrZone_Info(innerContainer);
+            createUI_81_HrZone_Info(innerContainer);
          } else {
-            createUI_72_HrZone_Header(innerContainer);
-            createUI_74_HrZone_Fields(innerContainer, hrMaxFormulaKey, hrMaxPulse, birthDay);
+            createUI_82_HrZone_Header(innerContainer);
+            createUI_84_HrZone_Fields(innerContainer, hrMaxFormulaKey, hrMaxPulse, birthDay);
          }
       }
 
@@ -1247,14 +1247,14 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       }
    }
 
-   private void createUI_71_HrZone_Info(final Composite parent) {
+   private void createUI_81_HrZone_Info(final Composite parent) {
 
       final Label label = new Label(parent, SWT.WRAP);
       GridDataFactory.fillDefaults().applyTo(label);
       label.setText(Messages.Pref_People_Label_HrZoneInfo);
    }
 
-   private void createUI_72_HrZone_Header(final Composite parent) {
+   private void createUI_82_HrZone_Header(final Composite parent) {
 
       /*
        * label: color
@@ -1294,7 +1294,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 //		label.addMouseListener(_hrZoneMouseListener);
    }
 
-   private void createUI_74_HrZone_Fields(final Composite parent,
+   private void createUI_84_HrZone_Fields(final Composite parent,
                                           final int hrMaxFormulaKey,
                                           final int hrMaxPulse,
                                           final ZonedDateTime birthDay) {
@@ -1912,7 +1912,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       final int hrMaxFormulaKey = person.getHrMaxFormula();
       final int maxPulse = person.getMaxPulse();
 
-      createUI_70_HrZone_InnerContainer(hrMaxFormulaKey, maxPulse, getBirthdayFromUI());
+      createUI_80_HrZone_InnerContainer(hrMaxFormulaKey, maxPulse, getBirthdayFromUI());
       onModifyPerson();
    }
 
@@ -2264,7 +2264,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          updateUIHrMax(hrMaxFormulaKey, maxPulse);
          updateUISportComputer(person);
 
-         createUI_70_HrZone_InnerContainer(hrMaxFormulaKey, maxPulse, dtBirthday);
+         createUI_80_HrZone_InnerContainer(hrMaxFormulaKey, maxPulse, dtBirthday);
       }
       _isUpdateUI = false;
    }
@@ -2321,7 +2321,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       _isHrZoneModified = true;
 
       // update modified bpm in hr zones
-      createUI_70_HrZone_InnerContainer(selectedHrMaxFormulaKey, maxPulse, getBirthdayFromUI());
+      createUI_80_HrZone_InnerContainer(selectedHrMaxFormulaKey, maxPulse, getBirthdayFromUI());
 
       onModifyPerson();
    }
