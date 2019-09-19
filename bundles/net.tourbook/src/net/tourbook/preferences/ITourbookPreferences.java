@@ -344,6 +344,11 @@ public interface ITourbookPreferences {
     */
    public static final String COMPUTED_ALTITUDE_DP_TOLERANCE          = "COMPUTED_ALTITUDE_DP_TOLERANCE";             //$NON-NLS-1$
 
+   /**
+    * Cadence value differentiating slow from fast
+    */
+   public static final String CADENCE_ZONES_DELIMITER                 = "CADENCE_ZONES_DELIMITER";                    //$NON-NLS-1$
+
    /*
     * measurement system
     */

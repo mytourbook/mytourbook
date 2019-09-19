@@ -205,7 +205,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
    private Spinner              _spinnerHeight;
    private Spinner              _spinnerRestingHR;
    private Spinner              _spinnerMaxHR;
-   private Spinner              _spinnerCadenceDelimiter;
    private Button               _rdoGenderMale;
    private Button               _rdoGenderFemale;
 
@@ -489,8 +488,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
       newPerson.setGender(0);
       newPerson.setRestPulse(TourPerson.DEFAULT_REST_PULSE);
-      
-      newPerson.setCadenceZonesDelimiter(TourPerson.DEFAULT_CADENCE_ZONES_DELIMITER);
 
       return newPerson;
    }
@@ -689,11 +686,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          final TabItem tabItemHRZone = new TabItem(_tabFolderPerson, SWT.NONE);
          tabItemHRZone.setText(Messages.Pref_People_Tab_HRZone);
          tabItemHRZone.setControl(createUI_60_Tab_HRZone(_tabFolderPerson));
-
-         // tab: cadence zones
-         final TabItem tabItemCadenceZones = new TabItem(_tabFolderPerson, SWT.NONE);
-         tabItemCadenceZones.setText(Messages.Pref_People_Tab_CadenceZones);
-         tabItemCadenceZones.setControl(createUI_80_CadenceZones(_tabFolderPerson));
 
          // tab: data transfer
          final TabItem tabItemDataTransfer = new TabItem(_tabFolderPerson, SWT.NONE);
@@ -1435,64 +1427,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       }
    }
 
-   /**
-    * UI for the selection of the cadence differentiating slow cadence (hiking) from
-    * fast cadence (running).
-    */
-   private Control createUI_80_CadenceZones(final Composite parent) {
-
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridLayoutFactory.swtDefaults().numColumns(3).extendedMargins(0, 0, 7, 0).applyTo(container);
-      {
-         Label label = new Label(container, SWT.NONE);
-         label.setText(Messages.Pref_People_Label_CadenceZonesDelimiter);
-
-         // spinner: cadence zone delimiter
-         _spinnerCadenceDelimiter = new Spinner(container, SWT.BORDER);
-         GridDataFactory.fillDefaults() //
-               .applyTo(_spinnerCadenceDelimiter);
-         _spinnerCadenceDelimiter.setMinimum(0);
-         _spinnerCadenceDelimiter.setMaximum(200);
-         _spinnerCadenceDelimiter.addSelectionListener(_defaultSelectionListener);
-         _spinnerCadenceDelimiter.addMouseWheelListener(new MouseWheelListener() {
-            @Override
-            public void mouseScrolled(final MouseEvent event) {
-               UI.adjustSpinnerValueOnMouseScroll(event);
-               onModifyPerson();
-            }
-         });
-
-         // label: unit
-         label = new Label(container, SWT.NONE);
-         label.setText(net.tourbook.common.Messages.Graph_Label_Cadence_Unit);
-      }
-
-      GridDataFactory.fillDefaults().applyTo(container);
-      {
-         // label: Text explaining the meaning of the two zones
-         final Label label = new Label(container, SWT.WRAP);
-         GridDataFactory.fillDefaults()//
-               .grab(true, false)
-               .span(3, 0)
-               .hint(net.tourbook.common.UI.DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
-               .applyTo(label);
-         label.setText(Messages.Pref_People_Label_Description_CadenceZonesDelimiter);
-      }
-
-      // button: compute time values
-      final Button buttonComputeTimes = new Button(container, SWT.NONE);
-      GridDataFactory.fillDefaults().span(3, 0).indent(0, 50).align(SWT.BEGINNING, SWT.FILL).applyTo(buttonComputeTimes);
-      buttonComputeTimes.setText(Messages.Pref_People_Button_CadenceZonesTimes_ComputeAllTours);
-      buttonComputeTimes.addSelectionListener(new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            onComputeCadenceZonesTimeValues();
-         }
-      });
-
-      return container;
-   }
-
    private Control createUI_90_Tab_DataTransfer(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
@@ -1747,15 +1681,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       }
    }
 
-   private void fireTourModifyEvent() {
-
-      TourManager.getInstance().removeAllToursFromCache();
-      TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR);
-
-      // fire unique event for all changes
-      TourManager.fireEvent(TourEventId.ALL_TOURS_ARE_MODIFIED);
-   }
-
    private ZonedDateTime getBirthdayFromUI() {
 
       return ZonedDateTime.of(
@@ -1921,89 +1846,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       enableActions();
 
       _peopleViewer.getTable().setFocus();
-   }
-
-   private void onComputeCadenceZonesTimeValues() {
-
-      if (MessageDialog.openConfirm(
-            Display.getCurrent().getActiveShell(),
-            Messages.Compute_CadenceZonesTimes_Dialog_ComputeForAllTours_Title,
-            Messages.Compute_CadenceZonesTimes_Dialog_ComputeForAllTours_Message) == false) {
-         return;
-      }
-
-      saveState();
-
-      final TourPerson person = getCurrentPerson();
-      person.setCadenceZonesDelimiter(_spinnerCadenceDelimiter.getSelection());
-      person.persist();
-
-      final int[] old_CadenceZone_SlowTime = { 0 };
-      final int[] old_CadenceZone_FastTime = { 0 };
-
-      final int[] total_Old_CadenceZone_SlowTime = { 0 };
-      final int[] total_New_CadenceZone_SlowTime = { 0 };
-      final int[] total_Old_CadenceZone_FastTime = { 0 };
-      final int[] total_New_CadenceZone_FastTime = { 0 };
-
-      final int currentCadenceDelimiter = _spinnerCadenceDelimiter.getSelection();
-
-      final IComputeTourValues computeTourValueConfig = new IComputeTourValues() {
-
-         @Override
-         public boolean computeTourValues(final TourData oldTourData) {
-
-            old_CadenceZone_SlowTime[0] = oldTourData.getCadenceZone_SlowTime();
-            total_Old_CadenceZone_SlowTime[0] += old_CadenceZone_SlowTime[0];
-            old_CadenceZone_FastTime[0] = oldTourData.getCadenceZone_FastTime();
-            total_Old_CadenceZone_FastTime[0] += old_CadenceZone_FastTime[0];
-
-            // recompute times for each cadence zone
-            return oldTourData.computeCadenceZonesTimes(currentCadenceDelimiter);
-         }
-
-         @Override
-         public String getResultText() {
-
-            return net.tourbook.common.UI.NEW_LINE + NLS.bind(
-                  Messages.Compute_CadenceZonesTimes_ComputeForAllTours_Job_Result,
-                  new Object[] {
-                        net.tourbook.common.UI.format_hh_mm_ss(total_Old_CadenceZone_SlowTime[0]),
-                        net.tourbook.common.UI.format_hh_mm_ss(total_New_CadenceZone_SlowTime[0]),
-                        net.tourbook.common.UI.format_hh_mm_ss(total_Old_CadenceZone_FastTime[0]),
-                        net.tourbook.common.UI.format_hh_mm_ss(total_New_CadenceZone_FastTime[0]), });
-         }
-
-         @Override
-         public String getSubTaskText(final TourData savedTourData) {
-
-            String subTaskText = null;
-
-            if (savedTourData != null) {
-
-               // get new values
-               final int new_CadenceZone_SlowTime = savedTourData.getCadenceZone_SlowTime();
-               total_New_CadenceZone_SlowTime[0] += new_CadenceZone_SlowTime;
-               final int new_CadenceZone_FastTime = savedTourData.getCadenceZone_FastTime();
-               total_New_CadenceZone_FastTime[0] += new_CadenceZone_FastTime;
-
-               subTaskText = net.tourbook.common.UI.NEW_LINE +
-                     NLS.bind(
-                           Messages.Compute_CadenceZonesTimes_ComputeForAllTours_Job_SubTask,
-                           new Object[] {
-                                 net.tourbook.common.UI.format_hh_mm_ss(old_CadenceZone_SlowTime[0]),
-                                 net.tourbook.common.UI.format_hh_mm_ss(new_CadenceZone_SlowTime),
-                                 net.tourbook.common.UI.format_hh_mm_ss(old_CadenceZone_FastTime[0]),
-                                 net.tourbook.common.UI.format_hh_mm_ss(new_CadenceZone_FastTime), });
-            }
-
-            return subTaskText;
-         }
-      };
-
-      TourDatabase.computeValuesForAllTours(computeTourValueConfig, null);
-
-      fireTourModifyEvent();
    }
 
    private void onCreateHrZonesFromTemplate() {
@@ -2332,8 +2174,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       person.setGender(_rdoGenderMale.getSelection() ? 0 : 1);
       person.setRestPulse(_spinnerRestingHR.getSelection());
 
-      person.setCadenceZonesDelimiter(_spinnerCadenceDelimiter.getSelection());
-
       person.setRawDataPath(_rawDataPathEditor.getStringValue());
       person.setDeviceReaderId(deviceId);
 
@@ -2417,8 +2257,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          _rdoGenderMale.setSelection(gender == 0);
          _rdoGenderFemale.setSelection(gender != 0);
          _spinnerRestingHR.setSelection(restPulse == 0 ? TourPerson.DEFAULT_REST_PULSE : restPulse);
-         _spinnerCadenceDelimiter.setSelection(person.getCadenceZonesDelimiter() == 0 ? TourPerson.DEFAULT_CADENCE_ZONES_DELIMITER : person
-               .getCadenceZonesDelimiter());
 
          final int hrMaxFormulaKey = person.getHrMaxFormula();
          final int maxPulse = person.getMaxPulse();

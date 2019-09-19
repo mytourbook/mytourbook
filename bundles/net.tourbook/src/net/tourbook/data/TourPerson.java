@@ -70,11 +70,6 @@ public class TourPerson implements Comparable<Object> {
    public static final int                 DEFAULT_REST_PULSE              = 60;
 
    /**
-    * Default cadence zones delimiter
-    */
-   public static final int                 DEFAULT_CADENCE_ZONES_DELIMITER = 70;
-
-   /**
     * manually created person creates a unique id to identify it, saved person is compared with the
     * person id
     */
@@ -154,13 +149,6 @@ public class TourPerson implements Comparable<Object> {
    @OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourPerson")
    @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
    private Set<TourPersonHRZone>           hrZones                         = new HashSet<>();
-
-   /**
-    * Cadence value differentiating slow from fast
-    * <p>
-    * since: db version 41
-    */
-   private int                             cadenceZonesDelimiter;
 
    /**
     * unique id for manually created person because the {@link #personId} is
@@ -344,10 +332,6 @@ public class TourPerson implements Comparable<Object> {
       }
 
       return _zonedBirthDay;
-   }
-
-   public int getCadenceZonesDelimiter() {
-      return cadenceZonesDelimiter;
    }
 
    public String getDeviceReaderId() {
@@ -545,10 +529,6 @@ public class TourPerson implements Comparable<Object> {
 
    public void setBirthDay(final long birthDay) {
       this.birthDay = birthDay;
-   }
-
-   public void setCadenceZonesDelimiter(final int cadenceZonesDelimiter) {
-      this.cadenceZonesDelimiter = cadenceZonesDelimiter;
    }
 
    public void setDeviceReaderId(final String deviceId) {
