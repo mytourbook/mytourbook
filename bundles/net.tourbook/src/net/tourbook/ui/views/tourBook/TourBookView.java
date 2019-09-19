@@ -984,6 +984,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       defineColumn_Power_TotalWork();
 
       // Powertrain - Antrieb/Pedal
+      defineColumn_Powertrain_SlowVsFastCadencePercentage();
       defineColumn_Powertrain_AvgCadence();
       defineColumn_Powertrain_CadenceMultiplier();
       defineColumn_Powertrain_Gear_FrontShiftCount();
@@ -992,8 +993,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       defineColumn_Powertrain_AvgLeftTorqueEffectiveness();
       defineColumn_Powertrain_AvgRightPedalSmoothness();
       defineColumn_Powertrain_AvgRightTorqueEffectiveness();
-      defineColumn_Powertrain_SlowVsFastCadencePercentage();
-      ;
 
       // Training - Trainingsanalyse
       defineColumn_Training_FTP();
@@ -1851,32 +1850,30 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    /**
     * Column: Pedal left/right balance
     */
-   private void defineColumn_Powertrain_PedalLeftRightBalance() {
-
-      final TreeColumnDefinition colDef = TreeColumnFactory.POWERTRAIN_PEDAL_LEFT_RIGHT_BALANCE.createColumn(//
-            _columnManager,
-            _pc);
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final Object element = cell.getElement();
-            final int value = ((TVITourBookItem) element).colPower_PedalLeftRightBalance;
-
-            colDef.printValue_0(cell, value);
-
-            setCellColor(cell, element);
-         }
-      });
-   }
+   /*
+    * private void defineColumn_Powertrain_PedalLeftRightBalance() {
+    * final TreeColumnDefinition colDef =
+    * TreeColumnFactory.POWERTRAIN_PEDAL_LEFT_RIGHT_BALANCE.createColumn(//
+    * _columnManager,
+    * _pc);
+    * colDef.setLabelProvider(new CellLabelProvider() {
+    * @Override
+    * public void update(final ViewerCell cell) {
+    * final Object element = cell.getElement();
+    * final int value = ((TVITourBookItem) element).colPower_PedalLeftRightBalance;
+    * colDef.printValue_0(cell, value);
+    * setCellColor(cell, element);
+    * }
+    * });
+    * }
+    */
 
    /**
     * Column: Slow vs fast cadence Percentage
     */
    private void defineColumn_Powertrain_SlowVsFastCadencePercentage() {
 
-      final TreeColumnDefinition colDef = TreeColumnFactory.MOTION_SLOW_VS_FAST_CADENCE_PERCENTAGES.createColumn(
+      final TreeColumnDefinition colDef = TreeColumnFactory.POWERTRAIN_SLOW_VS_FAST_CADENCE_PERCENTAGES.createColumn(
             _columnManager,
             _pc);
 
@@ -3180,7 +3177,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _tourDoubleClickState.canAdjustAltitude = isOneTour;
 
       _action_AdjustTourValues_SubMenu.setEnabled(isTourSelected);
-      _action_AdjustTourValues_SubMenu.action_RetrieveWeatherData.setEnabled(useWeatherRetrieval);
+      _action_AdjustTourValues_SubMenu._action_RetrieveWeatherData.setEnabled(useWeatherRetrieval);
       _action_Reimport_SubMenu.setEnabled(isTourSelected);
 
       _actionDeleteTour.setEnabled(isTourSelected);

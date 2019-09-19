@@ -2980,6 +2980,7 @@ public class TourDatabase {
             + " power_DataSource     VARCHAR(" + TourData.DB_LENGTH_POWER_DATA_SOURCE + "),      \n" //$NON-NLS-1$ //$NON-NLS-2$
             + " cadenceZone_SlowTime                  INTEGER DEFAULT -1,                 \n" //$NON-NLS-1$
             + " cadenceZone_FastTime                  INTEGER DEFAULT -1,                 \n" //$NON-NLS-1$
+            + " cadenceZones_DelimiterValue           INTEGER DEFAULT 0,                  \n" //$NON-NLS-1$
             //
             // version 40 end
 
@@ -3132,30 +3133,32 @@ public class TourDatabase {
       //
             + SQL.CreateField_EntityId(ENTITY_ID_PERSON, true)
             //
-            + "   lastName          VARCHAR(" + TourPerson.DB_LENGTH_LAST_NAME + "),     \n" //$NON-NLS-1$ //$NON-NLS-2$
-            + "   firstName         VARCHAR(" + TourPerson.DB_LENGTH_FIRST_NAME + "),    \n" //$NON-NLS-1$ //$NON-NLS-2$
-            + "   weight            FLOAT,                                               \n" //$NON-NLS-1$ // kg
-            + "   height            FLOAT,                                               \n" //$NON-NLS-1$ // m
+            + "   lastName               VARCHAR(" + TourPerson.DB_LENGTH_LAST_NAME + "),         \n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   firstName              VARCHAR(" + TourPerson.DB_LENGTH_FIRST_NAME + "),        \n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   weight                 FLOAT,                                                   \n" //$NON-NLS-1$ // kg
+            + "   height                 FLOAT,                                                   \n" //$NON-NLS-1$ // m
 
             // version 15 start
             //
-            + "   BirthDay          BIGINT DEFAULT 0,                                    \n" //$NON-NLS-1$
+            + "   BirthDay               BIGINT DEFAULT 0,                                        \n" //$NON-NLS-1$
             //
             // version 15 end ---------
 
             // version 16 start
             //
-            + "   Gender            INTEGER DEFAULT 0,                                   \n" //$NON-NLS-1$
-            + "   RestPulse         INTEGER DEFAULT 0,                                   \n" //$NON-NLS-1$
-            + "   MaxPulse          INTEGER DEFAULT 0,                                   \n" //$NON-NLS-1$
-            + "   HrMaxFormula      INTEGER DEFAULT 0,                                   \n" //$NON-NLS-1$
+            + "   Gender                 INTEGER DEFAULT 0,                                       \n" //$NON-NLS-1$
+            + "   RestPulse              INTEGER DEFAULT 0,                                       \n" //$NON-NLS-1$
+            + "   MaxPulse               INTEGER DEFAULT 0,                                       \n" //$NON-NLS-1$
+            + "   HrMaxFormula           INTEGER DEFAULT 0,                                       \n" //$NON-NLS-1$
             //
             // version 16 end ---------
 
-            + "   rawDataPath       VARCHAR(" + TourPerson.DB_LENGTH_RAW_DATA_PATH + "),     \n" //$NON-NLS-1$ //$NON-NLS-2$
-            + "   deviceReaderId    VARCHAR(" + TourPerson.DB_LENGTH_DEVICE_READER_ID + "),  \n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   rawDataPath            VARCHAR(" + TourPerson.DB_LENGTH_RAW_DATA_PATH + "),     \n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   deviceReaderId         VARCHAR(" + TourPerson.DB_LENGTH_DEVICE_READER_ID + "),  \n" //$NON-NLS-1$ //$NON-NLS-2$
             //
-            + "   " + KEY_BIKE + "  BIGINT                                              \n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   " + KEY_BIKE + "       BIGINT,                                                  \n" //$NON-NLS-1$ //$NON-NLS-2$
+            //
+            + "   cadenceZonesDelimiter  INTEGER DEFAULT 0                                        \n" //$NON-NLS-1$
             //
             + ")"); //$NON-NLS-1$
    }
@@ -7172,6 +7175,7 @@ public class TourDatabase {
             SQL.AddCol_VarCar   (stmt, TABLE_TOUR_DATA, "power_DataSource",  TourData.DB_LENGTH_POWER_DATA_SOURCE);   //$NON-NLS-1$
             SQL.AddCol_Int      (stmt, TABLE_TOUR_DATA, "cadenceZone_SlowTime", DEFAULT_0);//$NON-NLS-1$
             SQL.AddCol_Int      (stmt, TABLE_TOUR_DATA, "cadenceZone_FastTime", DEFAULT_0); //$NON-NLS-1$
+            SQL.AddCol_Int      (stmt, TABLE_TOUR_DATA, "cadenceZones_DelimiterValue", DEFAULT_0); //$NON-NLS-1$
 
             // Create index in table: TOURDATA_TOURTAG - Index: TOURTAG_TAGID
             SQL.CreateIndex(  stmt, JOINTABLE__TOURDATA__TOURTAG, KEY_TAG);

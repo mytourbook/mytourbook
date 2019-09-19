@@ -133,9 +133,6 @@ public class Messages extends NLS {
    public static String        ColumnFactory_reference_tour;
    public static String        ColumnFactory_sequence;
    public static String        ColumnFactory_sequence_label;
-   public static String        ColumnFactory_slow_vs_fast_cadence_percentages_header;
-   public static String        ColumnFactory_slow_vs_fast_cadence_percentages_label;
-   public static String        ColumnFactory_slow_vs_fast_cadence_percentages_tooltip;
    public static String        ColumnFactory_speed_label;
    public static String        ColumnFactory_speed_tooltip;
    public static String        ColumnFactory_tag;
@@ -284,6 +281,9 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Power_Normalized_Tooltip;
    public static String        ColumnFactory_Power_PowerToWeight_Header;
    public static String        ColumnFactory_Power_PowerToWeight_Tooltip;
+   public static String        ColumnFactory_Power_SlowVsFast_CadencePercentages_Header;
+   public static String        ColumnFactory_Power_SlowVsFast_CadencePercentages_Label;
+   public static String        ColumnFactory_Power_SlowVsFast_CadencePercentages_Tooltip;
    public static String        ColumnFactory_Power_TotalWork;
    public static String        ColumnFactory_Power_TotalWork_Tooltip;
    public static String        ColumnFactory_Power_TrainingStressScore_Header;
