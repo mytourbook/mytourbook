@@ -918,7 +918,7 @@ public class FitLogSAXHandler extends DefaultHandler {
     * values to the configured
     *
     * @param importFilePath
-    *           The file path of a FitLogEx file
+    *           The file path of the FitLog or FitLogEx file
     */
    private void parseCustomDataFieldDefinitions(final String importFilePath) {
 
