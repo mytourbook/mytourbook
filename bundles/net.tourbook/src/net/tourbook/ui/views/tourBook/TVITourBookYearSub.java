@@ -184,7 +184,8 @@ public class TVITourBookYearSub extends TVITourBookItem {
             + "training_TrainingPerformance, " //           78   //$NON-NLS-1$
 
             + "cadenceZone_SlowTime, " //                   79   //$NON-NLS-1$
-            + "cadenceZone_FastTime " //                    80   //$NON-NLS-1$
+            + "cadenceZone_FastTime, " //                   80   //$NON-NLS-1$
+            + "cadenceZones_DelimiterValue " //             81   //$NON-NLS-1$
 
             + UI.NEW_LINE
 
@@ -397,6 +398,8 @@ public class TVITourBookYearSub extends TVITourBookItem {
 
                   tourItem.colSlowVsFastCadence = cadenceZone_SlowPercentage + " - " + cadenceZone_FastPercentage; //$NON-NLS-1$
                }
+
+               tourItem.colCadenceZonesDelimiter = result.getInt(81);
 
                // -----------------------------------------------
 
