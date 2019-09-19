@@ -489,6 +489,8 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
       newPerson.setGender(0);
       newPerson.setRestPulse(TourPerson.DEFAULT_REST_PULSE);
+      
+      newPerson.setCadenceZonesDelimiter(TourPerson.DEFAULT_CADENCE_ZONES_DELIMITER);
 
       return newPerson;
    }
