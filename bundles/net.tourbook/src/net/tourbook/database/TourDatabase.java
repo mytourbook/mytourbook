@@ -3133,30 +3133,32 @@ public class TourDatabase {
       //
             + SQL.CreateField_EntityId(ENTITY_ID_PERSON, true)
             //
-            + "   lastName          VARCHAR(" + TourPerson.DB_LENGTH_LAST_NAME + "),     \n" //$NON-NLS-1$ //$NON-NLS-2$
-            + "   firstName         VARCHAR(" + TourPerson.DB_LENGTH_FIRST_NAME + "),    \n" //$NON-NLS-1$ //$NON-NLS-2$
-            + "   weight            FLOAT,                                               \n" //$NON-NLS-1$ // kg
-            + "   height            FLOAT,                                               \n" //$NON-NLS-1$ // m
+            + "   lastName               VARCHAR(" + TourPerson.DB_LENGTH_LAST_NAME + "),         \n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   firstName              VARCHAR(" + TourPerson.DB_LENGTH_FIRST_NAME + "),        \n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   weight                 FLOAT,                                                   \n" //$NON-NLS-1$ // kg
+            + "   height                 FLOAT,                                                   \n" //$NON-NLS-1$ // m
 
             // version 15 start
             //
-            + "   BirthDay          BIGINT DEFAULT 0,                                    \n" //$NON-NLS-1$
+            + "   BirthDay               BIGINT DEFAULT 0,                                        \n" //$NON-NLS-1$
             //
             // version 15 end ---------
 
             // version 16 start
             //
-            + "   Gender            INTEGER DEFAULT 0,                                   \n" //$NON-NLS-1$
-            + "   RestPulse         INTEGER DEFAULT 0,                                   \n" //$NON-NLS-1$
-            + "   MaxPulse          INTEGER DEFAULT 0,                                   \n" //$NON-NLS-1$
-            + "   HrMaxFormula      INTEGER DEFAULT 0,                                   \n" //$NON-NLS-1$
+            + "   Gender                 INTEGER DEFAULT 0,                                       \n" //$NON-NLS-1$
+            + "   RestPulse              INTEGER DEFAULT 0,                                       \n" //$NON-NLS-1$
+            + "   MaxPulse               INTEGER DEFAULT 0,                                       \n" //$NON-NLS-1$
+            + "   HrMaxFormula           INTEGER DEFAULT 0,                                       \n" //$NON-NLS-1$
             //
             // version 16 end ---------
 
-            + "   rawDataPath       VARCHAR(" + TourPerson.DB_LENGTH_RAW_DATA_PATH + "),     \n" //$NON-NLS-1$ //$NON-NLS-2$
-            + "   deviceReaderId    VARCHAR(" + TourPerson.DB_LENGTH_DEVICE_READER_ID + "),  \n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   rawDataPath            VARCHAR(" + TourPerson.DB_LENGTH_RAW_DATA_PATH + "),     \n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   deviceReaderId         VARCHAR(" + TourPerson.DB_LENGTH_DEVICE_READER_ID + "),  \n" //$NON-NLS-1$ //$NON-NLS-2$
             //
-            + "   " + KEY_BIKE + "  BIGINT                                              \n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   " + KEY_BIKE + "       BIGINT,                                                  \n" //$NON-NLS-1$ //$NON-NLS-2$
+            //
+            + "   cadenceZonesDelimiter  INTEGER DEFAULT 0                                        \n" //$NON-NLS-1$
             //
             + ")"); //$NON-NLS-1$
    }
