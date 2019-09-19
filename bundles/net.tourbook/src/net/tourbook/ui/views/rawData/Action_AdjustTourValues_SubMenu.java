@@ -91,9 +91,9 @@ public class Action_AdjustTourValues_SubMenu extends Action implements IMenuCrea
    private void fillMenu(final Menu menu) {
 
       new ActionContributionItem(_action_AdjustTemperature).fill(menu, -1);
-      new ActionContributionItem(_action_ComputeCadenceZonesTimes).fill(menu, -1);
       new ActionContributionItem(_action_ComputeDistanceValuesFromGeoposition).fill(menu, -1);
       new ActionContributionItem(_action_ComputeElevationGain).fill(menu, -1);
+      new ActionContributionItem(_action_ComputeCadenceZonesTimes).fill(menu, -1);
       new ActionContributionItem(_action_MultiplyCaloriesBy1000).fill(menu, -1);
       new ActionContributionItem(_action_RetrieveWeatherData).fill(menu, -1);
       new ActionContributionItem(_action_SetAltitudeFromSRTM).fill(menu, -1);
