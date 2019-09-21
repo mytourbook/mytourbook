@@ -2798,6 +2798,7 @@ public class Messages extends NLS {
 
    public static String TourChart_Smoothing_Algorithm_Initial;
    public static String TourChart_Smoothing_Algorithm_Jamet;
+   public static String TourChart_Smoothing_Algorithm_NoSmoothing;
    public static String TourChart_Smoothing_Checkbox_IsAltitudeSmoothing;
    public static String TourChart_Smoothing_Checkbox_IsAltitudeSmoothing_Tooltip;
    public static String TourChart_Smoothing_Checkbox_IsPulseSmoothing;
@@ -2808,6 +2809,7 @@ public class Messages extends NLS {
    public static String TourChart_Smoothing_Dialog_SmoothAllTours_Title;
    public static String TourChart_Smoothing_Label_GradientSmoothing;
    public static String TourChart_Smoothing_Label_GradientSmoothing_Tooltip;
+   public static String TourChart_Smoothing_Label_NoSmoothingAlgorithm;
    public static String TourChart_Smoothing_Label_RepeatedSmoothing;
    public static String TourChart_Smoothing_Label_RepeatedSmoothing_Tooltip;
    public static String TourChart_Smoothing_Label_RepeatedTau;

@@ -12,8 +12,8 @@ TODOs
 * Test import because of changed device watching task + sql exception handling
 * Recommend DBeaver as SQL explorer   
 
-New   
-===
+New + Improvements
+==================
 
 * Tour Tag
   - Delete tour tag, tag is removed from tours and tag definition is deleted
@@ -40,10 +40,9 @@ New
   - Added the ability to choose whether to set the person's body weight when
     importing and saving a tour.
 
+* Tour Chart
+  - New smoothing algorithm which is not smoothing the computed speed/pace/altimeter/gradient values
  
-Improvements   
-============
-
 * Tour Editor
   - Tour can be saved with <Ctrl>+S when "Tour Editor" view is the active view
   - The save and new tour actions are removed from the view toolbar but are available at the main toolbar
@@ -51,6 +50,7 @@ Improvements
 * Tagged Tours
   - Expand/collapse tag/tag category/year/month (item) when label is selected with the mouse
   - Expand only one item and collapse any other items
+
 
 Changes
 =======
