@@ -3480,7 +3480,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       }
 
       //Now that we have a person, we can compute the cadence zones times
-      tourData.computeCadenceZonesTimes(-1);
+      tourData.computeCadenceZonesTimes();
 
       tourData.setTourBike(person.getTourBike());
 

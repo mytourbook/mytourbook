@@ -93,19 +93,20 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             + "AVG( CASE WHEN WeatherWindSpd = 0   THEN NULL ELSE WeatherWindSpd END ),   " + NL //                              13   //$NON-NLS-1$
             + "AVG( CASE WHEN RestPulse = 0        THEN NULL ELSE RestPulse END ),        " + NL //                              14   //$NON-NLS-1$
             //
-            + "SUM( CAST(Calories AS BIGINT)),               " + NL // 15   //$NON-NLS-1$
-            + "SUM( CAST(Power_TotalWork AS BIGINT)),        " + NL // 16   //$NON-NLS-1$
+            + "SUM( CAST(Calories AS BIGINT)),                      " + NL // 15   //$NON-NLS-1$
+            + "SUM( CAST(Power_TotalWork AS BIGINT)),               " + NL // 16   //$NON-NLS-1$
 
-            + "SUM( CAST(NumberOfTimeSlices AS BIGINT)),     " + NL // 17   //$NON-NLS-1$
-            + "SUM( CAST(NumberOfPhotos AS BIGINT)),         " + NL // 18   //$NON-NLS-1$
+            + "SUM( CAST(NumberOfTimeSlices AS BIGINT)),            " + NL // 17   //$NON-NLS-1$
+            + "SUM( CAST(NumberOfPhotos AS BIGINT)),                " + NL // 18   //$NON-NLS-1$
             //
-            + "SUM( CAST(FrontShiftCount AS BIGINT)),        " + NL // 19   //$NON-NLS-1$
-            + "SUM( CAST(RearShiftCount AS BIGINT)),         " + NL // 20   //$NON-NLS-1$
+            + "SUM( CAST(FrontShiftCount AS BIGINT)),               " + NL // 19   //$NON-NLS-1$
+            + "SUM( CAST(RearShiftCount AS BIGINT)),                " + NL // 20   //$NON-NLS-1$
 
-            + "SUM( CAST(Surfing_NumberOfEvents AS BIGINT)), " + NL // 21   //$NON-NLS-1$
+            + "SUM( CAST(Surfing_NumberOfEvents AS BIGINT)),        " + NL // 21   //$NON-NLS-1$
 
-            + "SUM( CAST(cadenceZone_SlowTime AS BIGINT)),   " + NL // 22   //$NON-NLS-1$
-            + "SUM( CAST(cadenceZone_FastTime AS BIGINT))    " + NL // 23   //$NON-NLS-1$
+            + "SUM( CAST(cadenceZone_SlowTime AS BIGINT)),          " + NL // 22   //$NON-NLS-1$
+            + "SUM( CAST(cadenceZone_FastTime AS BIGINT)),          " + NL // 23   //$NON-NLS-1$
+            + "SUM( CAST(cadenceZones_DelimiterValue AS BIGINT))    " + NL // 24   //$NON-NLS-1$
       ;
 
    }
@@ -175,6 +176,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
    float        colCadenceMultiplier;
 
    String       colSlowVsFastCadence;
+   int          colCadenceZonesDelimiter;
 
    // ----------- Running Dynamics ---------
 
@@ -303,6 +305,8 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
          colSlowVsFastCadence = cadenceZone_SlowPercentage + " - " + cadenceZone_FastPercentage; //$NON-NLS-1$
       }
+
+      colCadenceZonesDelimiter = result.getInt(startIndex + 24);
    }
 
    @Override

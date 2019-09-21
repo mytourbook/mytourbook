@@ -3156,9 +3156,7 @@ public class TourDatabase {
             + "   rawDataPath            VARCHAR(" + TourPerson.DB_LENGTH_RAW_DATA_PATH + "),     \n" //$NON-NLS-1$ //$NON-NLS-2$
             + "   deviceReaderId         VARCHAR(" + TourPerson.DB_LENGTH_DEVICE_READER_ID + "),  \n" //$NON-NLS-1$ //$NON-NLS-2$
             //
-            + "   " + KEY_BIKE + "       BIGINT,                                                  \n" //$NON-NLS-1$ //$NON-NLS-2$
-            //
-            + "   cadenceZonesDelimiter  INTEGER DEFAULT 0                                        \n" //$NON-NLS-1$
+            + "   " + KEY_BIKE + "       BIGINT                                                  \n" //$NON-NLS-1$ //$NON-NLS-2$
             //
             + ")"); //$NON-NLS-1$
    }
@@ -7179,16 +7177,6 @@ public class TourDatabase {
 
             // Create index in table: TOURDATA_TOURTAG - Index: TOURTAG_TAGID
             SQL.CreateIndex(  stmt, JOINTABLE__TOURDATA__TOURTAG, KEY_TAG);
-
-// SET_FORMATTING_ON
-         }
-
-         if (isColumnAvailable(conn, TABLE_TOUR_PERSON, "cadenceZonesDelimiter") == false) { //$NON-NLS-1$
-
-// SET_FORMATTING_OFF
-
-             // Add new columns
-             SQL.AddCol_Int(stmt, TABLE_TOUR_PERSON, "cadenceZonesDelimiter", "70"); //$NON-NLS-1$
 
 // SET_FORMATTING_ON
          }
