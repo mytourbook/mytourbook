@@ -43,7 +43,7 @@ Build with POM (since 16.4)
 ###########################
 
 
-Switch to workspace "C:\DAT\ws_mt-NL-projects" 
+Switch to workspace "C:\DAT\ws-mt-NL-projects" 
 ----------------------------------------------
 
    - refresh all projects with F5
