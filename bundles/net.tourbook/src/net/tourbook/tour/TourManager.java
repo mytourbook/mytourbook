@@ -838,6 +838,7 @@ public class TourManager {
             }
 
             if (fromDistanceSerie != null) {
+
                isDistanceSerie = true;
                System.arraycopy(fromDistanceSerie, 0, toDistanceSerie, toStartIndex, fromSerieLength);
             }
@@ -864,6 +865,16 @@ public class TourManager {
 
                for (int serieIndex = 0; serieIndex < fromSerieLength; serieIndex++) {
                   toDistanceSerie[toStartIndex + serieIndex] = tourDistance + fromDistanceSerie[serieIndex];
+               }
+
+            } else {
+
+               /*
+                * Distance serie is not available but fill the distance with the previous distance
+                * otherwise the graph has a strange gap and the lines go to x=0
+                */
+               for (int serieIndex = 0; serieIndex < fromSerieLength; serieIndex++) {
+                  toDistanceSerie[toStartIndex + serieIndex] = tourDistance;
                }
             }
          }

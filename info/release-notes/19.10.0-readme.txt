@@ -3,14 +3,13 @@
 TODOs
 =====
 
-* Reduce tour book context menu with "Adjust Tour" submenu which contains computed tour actions
 * Show weather, location start/end as new columns
 * Compute min/max temperature for selected tours
 * When hovering over a graph, data appears referring to the point in the graph the mouse is on: 
   this data does not take into account whether the track has been saved as a using cadence or revolutions, and always shows revolutions.
   https://github.com/wolfgang-ch/mytourbook/issues/86
 * Test import because of changed device watching task + sql exception handling
-* Recommend DBeaver as SQL explorer   
+* Recommend DBeaver as a better SQL explorer   
 
 New + Improvements
 ==================
@@ -68,23 +67,21 @@ Bugfix
 
 * Fitlog Import (Frederic)
   - Now Taking into account the pauses when importing laps 
-
-* Tour start time in tour book view was wrong needed these fixes
-
-  - Fitlog Import
-    - Fixed tour start time year/month/day by using it's time zone
-    - Now Taking into account the pauses when importing laps (Frederic)
-    - Distinguishing between manual activities and activities with tracks (Frederic)
-    - Multiplying the calories by 1000
-  
-  - Tour Book View
-    - Extended "Set Time Zone" wizard to set tour start time year/month/day with time zone  
+  - Distinguishing between manual activities and activities with tracks 
+  - Multiplying the calories by 1000
 
 * Body Weight unit (Frederic)
- - When changing the measurement unit, the body weight unit is updated in the UI
+  - When changing the measurement unit, the body weight unit is updated in the UI
+
+* Tour start time in tour book view was wrong needed these 2 fixes
+  - Fitlog Import
+    - Fixed tour start time year/month/day by using it's time zone
+  - Tour Book View
+    - Extended "Set Time Zone" wizard to set tour start time year/month/day with time zone  
     
 * Tour Chart
   - Imperial altitude/altimeter values could be wrong depending on the selected measurement system and when the tour was displayed the first time
+  - When multiple tours are displayed and some of the tours have no distance, then the line graph was painted to x=0 which was showing a corrupted graph with triangles
        
 
 Translation    
@@ -104,5 +101,5 @@ System
   - This new version solves the issue (Linux only) when modifying the tour
     start time spinner widget in the tour editor as it was not triggering 
     the possibility to save the tour in the tour editor
-    (cf. https://bugs.eclipse.org/bugs/show_bug.cgi?id=547489) 
+    (see also https://bugs.eclipse.org/bugs/show_bug.cgi?id=547489) 
 
