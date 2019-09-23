@@ -48,7 +48,6 @@ public class Action_AdjustTourValues_SubMenu extends Action implements IMenuCrea
    private ActionComputeDistanceValuesFromGeoposition _action_ComputeDistanceValuesFromGeoposition;
    private ActionComputeElevationGain                 _action_ComputeElevationGain;
    private ActionMultiplyCaloriesBy1000               _action_MultiplyCaloriesBy1000;
-   public ActionRetrieveWeatherData                   _action_RetrieveWeatherData;
    private ActionSetAltitudeValuesFromSRTM            _action_SetAltitudeFromSRTM;
    private ActionSetTimeZone                          _action_SetTimeZone;
    private Action_Weather_SubMenu                     _action_Weather_SubMenu;
