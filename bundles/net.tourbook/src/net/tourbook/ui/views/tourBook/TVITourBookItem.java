@@ -70,7 +70,8 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             + "surfing_NumberOfEvents,    " + NL //$NON-NLS-1$
 
             + "cadenceZone_SlowTime,      " + NL //$NON-NLS-1$
-            + "cadenceZone_FastTime       " + NL //$NON-NLS-1$
+            + "cadenceZone_FastTime,      " + NL //$NON-NLS-1$
+            + "cadenceZones_DelimiterValue" + NL //$NON-NLS-1$
       ;
 
       SQL_SUM_COLUMNS = NL
@@ -93,20 +94,20 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             + "AVG( CASE WHEN WeatherWindSpd = 0   THEN NULL ELSE WeatherWindSpd END ),   " + NL //                              13   //$NON-NLS-1$
             + "AVG( CASE WHEN RestPulse = 0        THEN NULL ELSE RestPulse END ),        " + NL //                              14   //$NON-NLS-1$
             //
-            + "SUM( CAST(Calories AS BIGINT)),                      " + NL // 15   //$NON-NLS-1$
-            + "SUM( CAST(Power_TotalWork AS BIGINT)),               " + NL // 16   //$NON-NLS-1$
+            + "SUM( CAST(Calories AS BIGINT)),               " + NL // 15   //$NON-NLS-1$
+            + "SUM( CAST(Power_TotalWork AS BIGINT)),        " + NL // 16   //$NON-NLS-1$
 
-            + "SUM( CAST(NumberOfTimeSlices AS BIGINT)),            " + NL // 17   //$NON-NLS-1$
-            + "SUM( CAST(NumberOfPhotos AS BIGINT)),                " + NL // 18   //$NON-NLS-1$
+            + "SUM( CAST(NumberOfTimeSlices AS BIGINT)),     " + NL // 17   //$NON-NLS-1$
+            + "SUM( CAST(NumberOfPhotos AS BIGINT)),         " + NL // 18   //$NON-NLS-1$
             //
-            + "SUM( CAST(FrontShiftCount AS BIGINT)),               " + NL // 19   //$NON-NLS-1$
-            + "SUM( CAST(RearShiftCount AS BIGINT)),                " + NL // 20   //$NON-NLS-1$
+            + "SUM( CAST(FrontShiftCount AS BIGINT)),        " + NL // 19   //$NON-NLS-1$
+            + "SUM( CAST(RearShiftCount AS BIGINT)),         " + NL // 20   //$NON-NLS-1$
 
-            + "SUM( CAST(Surfing_NumberOfEvents AS BIGINT)),        " + NL // 21   //$NON-NLS-1$
+            + "SUM( CAST(Surfing_NumberOfEvents AS BIGINT)), " + NL // 21   //$NON-NLS-1$
 
-            + "SUM( CAST(cadenceZone_SlowTime AS BIGINT)),          " + NL // 22   //$NON-NLS-1$
-            + "SUM( CAST(cadenceZone_FastTime AS BIGINT)),          " + NL // 23   //$NON-NLS-1$
-            + "SUM( CAST(cadenceZones_DelimiterValue AS BIGINT))    " + NL // 24   //$NON-NLS-1$
+            + "SUM( CAST(cadenceZone_SlowTime AS BIGINT)),   " + NL // 22   //$NON-NLS-1$
+            + "SUM( CAST(cadenceZone_FastTime AS BIGINT)),   " + NL // 23   //$NON-NLS-1$
+            + "AVG( CASE WHEN cadenceZones_DelimiterValue = 0        THEN NULL ELSE cadenceZones_DelimiterValue END ) " + NL // 24   //$NON-NLS-1$                           14
       ;
 
    }
