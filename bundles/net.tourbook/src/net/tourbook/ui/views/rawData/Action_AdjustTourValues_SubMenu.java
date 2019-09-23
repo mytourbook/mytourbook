@@ -18,7 +18,6 @@ package net.tourbook.ui.views.rawData;
 import net.tourbook.Messages;
 import net.tourbook.ui.ITourProvider2;
 import net.tourbook.ui.ITourProviderByID;
-import net.tourbook.ui.action.ActionAdjustTemperature;
 import net.tourbook.ui.action.ActionComputeCadenceZonesTimes;
 import net.tourbook.ui.action.ActionComputeDistanceValuesFromGeoposition;
 import net.tourbook.ui.action.ActionComputeElevationGain;
@@ -44,7 +43,6 @@ public class Action_AdjustTourValues_SubMenu extends Action implements IMenuCrea
 
    private Action_SetCadence_SubMenu                  _action_SetCadence_SubMenu;
 
-   private ActionAdjustTemperature                    _action_AdjustTemperature;
    private ActionComputeCadenceZonesTimes             _action_ComputeCadenceZonesTimes;
    private ActionComputeDistanceValuesFromGeoposition _action_ComputeDistanceValuesFromGeoposition;
    private ActionComputeElevationGain                 _action_ComputeElevationGain;
@@ -52,6 +50,7 @@ public class Action_AdjustTourValues_SubMenu extends Action implements IMenuCrea
    public ActionRetrieveWeatherData                   _action_RetrieveWeatherData;
    private ActionSetAltitudeValuesFromSRTM            _action_SetAltitudeFromSRTM;
    private ActionSetTimeZone                          _action_SetTimeZone;
+   private Action_Weather_SubMenu                     _action_Weather_SubMenu;
 
    /*
     * UI controls
@@ -68,13 +67,12 @@ public class Action_AdjustTourValues_SubMenu extends Action implements IMenuCrea
       _tourProviderById = tourProviderById;
 
       _action_SetCadence_SubMenu = new Action_SetCadence_SubMenu(_tourProvider);
+      _action_Weather_SubMenu = new Action_Weather_SubMenu(_tourProvider);
 
-      _action_AdjustTemperature = new ActionAdjustTemperature(_tourProvider);
       _action_ComputeCadenceZonesTimes = new ActionComputeCadenceZonesTimes(_tourProvider);
       _action_ComputeDistanceValuesFromGeoposition = new ActionComputeDistanceValuesFromGeoposition(_tourProvider);
       _action_ComputeElevationGain = new ActionComputeElevationGain(_tourProviderById);
       _action_MultiplyCaloriesBy1000 = new ActionMultiplyCaloriesBy1000(_tourProvider);
-      _action_RetrieveWeatherData = new ActionRetrieveWeatherData(_tourProvider);
       _action_SetAltitudeFromSRTM = new ActionSetAltitudeValuesFromSRTM(_tourProvider);
       _action_SetTimeZone = new ActionSetTimeZone(_tourProvider);
    }
@@ -90,15 +88,18 @@ public class Action_AdjustTourValues_SubMenu extends Action implements IMenuCrea
 
    private void fillMenu(final Menu menu) {
 
-      new ActionContributionItem(_action_AdjustTemperature).fill(menu, -1);
       new ActionContributionItem(_action_ComputeDistanceValuesFromGeoposition).fill(menu, -1);
       new ActionContributionItem(_action_ComputeElevationGain).fill(menu, -1);
       new ActionContributionItem(_action_ComputeCadenceZonesTimes).fill(menu, -1);
       new ActionContributionItem(_action_MultiplyCaloriesBy1000).fill(menu, -1);
-      new ActionContributionItem(_action_RetrieveWeatherData).fill(menu, -1);
       new ActionContributionItem(_action_SetAltitudeFromSRTM).fill(menu, -1);
       new ActionContributionItem(_action_SetCadence_SubMenu).fill(menu, -1);
       new ActionContributionItem(_action_SetTimeZone).fill(menu, -1);
+      new ActionContributionItem(_action_Weather_SubMenu).fill(menu, -1);
+   }
+
+   public ActionRetrieveWeatherData getActionRetrieveWeatherData() {
+      return _action_Weather_SubMenu.getActionRetrieveWeatherData();
    }
 
    @Override
