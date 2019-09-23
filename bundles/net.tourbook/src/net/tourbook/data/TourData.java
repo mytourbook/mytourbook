@@ -3072,6 +3072,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return (float) (timeSquare == 0 ? 0 : pulseSquare / timeSquare);
    }
 
+   /**
+    * Is computing the tour min/max/avg temperature
+    */
    public void computeAvg_Temperature() {
 
       if (temperatureSerie == null || temperatureSerie.length == 0) {

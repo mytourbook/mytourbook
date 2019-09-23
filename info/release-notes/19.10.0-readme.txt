@@ -50,6 +50,8 @@ New + Improvements
   - Expand/collapse tag/tag category/year/month (item) when label is selected with the mouse
   - Expand only one item and collapse any other items
 
+* Tour Book View
+  - Set min/max temperature values
 
 Changes
 =======
