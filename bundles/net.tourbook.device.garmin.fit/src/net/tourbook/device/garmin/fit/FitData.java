@@ -50,7 +50,7 @@ public class FitData {
    private boolean                 _isSetLastMarker;
    private int                     _lastMarkerTimeSlices;
 
-   public boolean                  _isComputeAveragePower;
+   public boolean                  isComputeAveragePower;
 
    private FitDataReader           _fitDataReader;
    private String                  _importFilePathName;
@@ -177,12 +177,14 @@ public class FitData {
          _tourData.computeComputedValues();
          _tourData.computeAltimeterGradientSerie();
 
-
          // In the case where the power was retrieved from a developer field,
          // the fit file didn't contain the average power and we need
          // to compute it ourselves.
-         if(_isComputeAveragePower) {
-            _tourData.setPower_Avg(_tourData.computeAvg_FromValues(_tourData.getPowerSerie(), 0, _tourData.getPowerSerie().length - 1));
+         if (isComputeAveragePower) {
+            final float[] powerSerie = _tourData.getPowerSerie();
+            if (powerSerie != null) {
+               _tourData.setPower_Avg(_tourData.computeAvg_FromValues(powerSerie, 0, powerSerie.length - 1));
+            }
          }
 
          // must be called after time series are created

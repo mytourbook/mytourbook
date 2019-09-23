@@ -26,6 +26,7 @@ import net.tourbook.ui.action.ActionRetrieveWeatherData;
 import net.tourbook.ui.action.ActionSetAltitudeValuesFromSRTM;
 import net.tourbook.ui.action.ActionSetTimeZone;
 import net.tourbook.ui.action.Action_SetCadence_SubMenu;
+import net.tourbook.ui.action.Action_Weather_SubMenu;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
