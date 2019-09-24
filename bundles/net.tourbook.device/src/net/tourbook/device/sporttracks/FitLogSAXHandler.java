@@ -778,6 +778,8 @@ public class FitLogSAXHandler extends DefaultHandler {
          //            <xs:attribute name="TotalCal" type="xs:decimal" use="optional"/>
          //         </xs:complexType>
          //      </xs:element>
+
+         // Converting from Calories to calories
          _currentActivity.calories = Util.parseInt0(attributes, ATTRIB_TOTAL_CAL) * 1000;
 
       } else if (name.equals(TAG_ACTIVITY_DURATION)) {
