@@ -3479,9 +3479,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          tourData.setBodyWeight(person.getWeight());
       }
 
-      //Now that we have a person, we can compute the cadence zones times
-      tourData.computeCadenceZonesTimes();
-
       tourData.setTourBike(person.getTourBike());
 
       final TourData savedTour = TourDatabase.saveTour(tourData, true);

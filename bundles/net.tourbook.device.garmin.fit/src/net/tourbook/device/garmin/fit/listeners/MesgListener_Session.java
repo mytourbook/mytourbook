@@ -128,7 +128,7 @@ public class MesgListener_Session extends AbstractMesgListener implements Sessio
             }
          }
 
-         fitData._isComputeAveragePower = true;
+         fitData.isComputeAveragePower = true;
 
          maxPower = (int) powerDataList.stream().mapToDouble(Float::doubleValue).max().getAsDouble();
          tourData.setPower_Max(maxPower);

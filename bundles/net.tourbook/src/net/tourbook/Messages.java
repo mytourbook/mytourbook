@@ -583,6 +583,7 @@ public class Messages extends NLS {
    public static String        Compute_BreakTime_Method_SpeedBySlice;
    public static String        Compute_BreakTime_Method_TimeDistance;
 
+   public static String        Compute_CadenceZonesTimes_Group;
    public static String        Compute_CadenceZonesTimes_ComputeForAllTours_Job_Result;
    public static String        Compute_CadenceZonesTimes_ComputeForAllTours_Job_SubTask;
    public static String        Compute_CadenceZonesTimes_Dialog_ComputeForAllTours_Message;
@@ -1602,7 +1603,7 @@ public class Messages extends NLS {
    public static String        Pref_MapLayout_Label_TourPaintMethod_Simple_Tooltip;
 
    public static String        Pref_People_Action_add_person;
-   public static String        Pref_People_Button_CadenceZonesTimes_ComputeAllTours;
+   public static String        Compute_CadenceZonesTimes_ComputeAllTours;
    public static String        Pref_People_Button_HrZones_ComputeAllTours;
    public static String        Pref_People_Button_HrZones_ComputeAllTours_Tooltip;
    public static String        Pref_People_Column_Birthday;
@@ -1619,8 +1620,8 @@ public class Messages extends NLS {
    public static String        Pref_People_Error_path_is_invalid;
    public static String        Pref_People_Label_Age;
    public static String        Pref_People_Label_Birthday;
-   public static String        Pref_People_Label_CadenceZonesDelimiter;
-   public static String        Pref_People_Label_Description_CadenceZonesDelimiter;
+   public static String        Compute_CadenceZonesTimes_Label_CadenceZonesDelimiter;
+   public static String        Compute_CadenceZonesTimes_Label_Description_CadenceZonesDelimiter;
    public static String        Pref_People_Label_DataTransfer;
    public static String        Pref_People_Label_DefaultDataTransferFilePath;
    public static String        Pref_People_Label_DefaultDataTransferFilePath_Tooltip;
@@ -1640,7 +1641,6 @@ public class Messages extends NLS {
    public static String        Pref_People_Link;
    public static String        Pref_People_Tab_DataTransfer;
    public static String        Pref_People_Tab_HRZone;
-   public static String        Pref_People_Tab_CadenceZones;
    public static String        Pref_People_Tab_Person;
    public static String        Pref_People_Title;
 
@@ -2343,6 +2343,10 @@ public class Messages extends NLS {
    public static String Tour_Action_show_start_time_on_x_axis;
    public static String Tour_Action_show_time_on_x_axis;
    public static String Tour_Action_show_time_on_x_axis_tooltip;
+   public static String Tour_Action_SetMinMaxTemperature;
+   public static String Tour_Action_SetMinMaxTemperature_Apply;
+   public static String Tour_Action_SetMinMaxTemperature_Message;
+   public static String Tour_Action_SetMinMaxTemperature_Title;
    public static String Tour_Action_SetTimeZone;
    public static String Tour_Action_ShowBreaktimeValues;
    public static String Tour_Action_ShowTourMarker;
@@ -2353,6 +2357,7 @@ public class Messages extends NLS {
    public static String Tour_Action_TourPhotosWithoutTooltip_Tooltip;
    public static String Tour_Action_TourPhotosWithTooltip_Tooltip;
    public static String Tour_Action_ValuePointToolTip_IsVisible;
+   public static String Tour_Action_Weather;
 
    public static String Tour_Blog_Action_EditMarker_Tooltip;
    public static String Tour_Blog_Action_EditTour_Tooltip;
@@ -2400,6 +2405,7 @@ public class Messages extends NLS {
    public static String Tour_Database_TourSaveError;
    public static String Tour_Database_update_tour;
    public static String Tour_Database_Update;
+   public static String Tour_Database_Update_MinMaxTemperature;
    public static String Tour_Database_Update_ModifyColumn;
    public static String Tour_Database_Update_Subtask;
    public static String Tour_Database_Update_TourWeek;
@@ -2812,6 +2818,7 @@ public class Messages extends NLS {
 
    public static String TourChart_Smoothing_Algorithm_Initial;
    public static String TourChart_Smoothing_Algorithm_Jamet;
+   public static String TourChart_Smoothing_Algorithm_NoSmoothing;
    public static String TourChart_Smoothing_Checkbox_IsAltitudeSmoothing;
    public static String TourChart_Smoothing_Checkbox_IsAltitudeSmoothing_Tooltip;
    public static String TourChart_Smoothing_Checkbox_IsPulseSmoothing;
@@ -2822,6 +2829,7 @@ public class Messages extends NLS {
    public static String TourChart_Smoothing_Dialog_SmoothAllTours_Title;
    public static String TourChart_Smoothing_Label_GradientSmoothing;
    public static String TourChart_Smoothing_Label_GradientSmoothing_Tooltip;
+   public static String TourChart_Smoothing_Label_NoSmoothingAlgorithm;
    public static String TourChart_Smoothing_Label_RepeatedSmoothing;
    public static String TourChart_Smoothing_Label_RepeatedSmoothing_Tooltip;
    public static String TourChart_Smoothing_Label_RepeatedTau;

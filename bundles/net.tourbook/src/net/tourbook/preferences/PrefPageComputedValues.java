@@ -214,8 +214,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
             // tab: cadence zones
             final TabItem tabItemCadenceZones = new TabItem(_tabFolder, SWT.NONE);
-            tabItemCadenceZones.setText(Messages.Pref_People_Tab_CadenceZones);
             tabItemCadenceZones.setControl(createUI_70_CadenceZones(_tabFolder));
+            tabItemCadenceZones.setText(Messages.Compute_CadenceZonesTimes_Group);
 
             /**
              * 4.8.2009 week no/year is currently disabled because a new field in the db is
@@ -802,7 +802,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
       GridLayoutFactory.swtDefaults().numColumns(3).extendedMargins(0, 0, 7, 0).applyTo(container);
       {
          Label label = new Label(container, SWT.NONE);
-         label.setText(Messages.Pref_People_Label_CadenceZonesDelimiter);
+         label.setText(Messages.Compute_CadenceZonesTimes_Label_CadenceZonesDelimiter);
 
          // spinner: cadence zone delimiter
          _spinnerCadenceDelimiter = new Spinner(container, SWT.BORDER);
@@ -836,13 +836,13 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
                .span(3, 0)
                .hint(net.tourbook.common.UI.DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
                .applyTo(label);
-         label.setText(Messages.Pref_People_Label_Description_CadenceZonesDelimiter);
+         label.setText(Messages.Compute_CadenceZonesTimes_Label_Description_CadenceZonesDelimiter);
       }
 
       // button: compute time values
       final Button buttonComputeTimes = new Button(container, SWT.NONE);
       GridDataFactory.fillDefaults().span(3, 0).indent(0, 50).align(SWT.BEGINNING, SWT.FILL).applyTo(buttonComputeTimes);
-      buttonComputeTimes.setText(Messages.Pref_People_Button_CadenceZonesTimes_ComputeAllTours);
+      buttonComputeTimes.setText(Messages.Compute_CadenceZonesTimes_ComputeAllTours);
       buttonComputeTimes.addSelectionListener(new SelectionAdapter() {
          @Override
          public void widgetSelected(final SelectionEvent e) {

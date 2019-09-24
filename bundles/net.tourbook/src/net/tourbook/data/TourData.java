@@ -2094,13 +2094,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          return;
       }
 
-      if (_prefStore
-            .getString(ITourbookPreferences.GRAPH_SMOOTHING_SMOOTHING_ALGORITHM)//
-            .equals(ISmoothingAlgorithm.SMOOTHING_ALGORITHM_JAMET)) {
+      final String smoothingAlgo = _prefStore.getString(ITourbookPreferences.GRAPH_SMOOTHING_SMOOTHING_ALGORITHM);
 
-         computeSmoothedDataSeries();
+      if (smoothingAlgo.equals(ISmoothingAlgorithm.SMOOTHING_ALGORITHM_JAMET)) {
+
+         computeDataSeries_Smoothed();
+
+      } else if (smoothingAlgo.equals(ISmoothingAlgorithm.SMOOTHING_ALGORITHM_NO_SMOOTHING)) {
+
+         computeDataSeries_NotSmoothed();
 
       } else {
+
          if (deviceTimeInterval == -1) {
             computeAltimeterGradientSerieWithVariableInterval();
          } else {
@@ -3081,6 +3086,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return (float) (timeSquare == 0 ? 0 : pulseSquare / timeSquare);
    }
 
+   /**
+    * Is computing the tour min/max/avg temperature
+    */
    public void computeAvg_Temperature() {
 
       if (temperatureSerie == null || temperatureSerie.length == 0) {
@@ -3303,7 +3311,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    public void computeComputedValues() {
 
       computePulseSmoothed();
-      computeSmoothedDataSeries();
+      computeDataSeries_Smoothed();
 
       computeMaxAltitude();
       computeMaxPulse();
@@ -3319,6 +3327,407 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       computeGeo_Bounds();
       computeGeo_Grid();
+   }
+
+   private void computeDataSeries_NotSmoothed() {
+
+      // check if the tour was created manually
+      if (timeSerie == null || timeSerie.length == 0) {
+         return;
+      }
+
+      final boolean isAltitudeAvailable = altitudeSerie != null;
+
+      // check if smoothed data are already computed
+      if (speedSerie != null && (isAltitudeAvailable && altitudeSerieSmoothed != null)) {
+         return;
+      }
+
+      final int size = timeSerie.length;
+
+      final double altitude[] = new double[size];
+
+      /*
+       * smooth altitude
+       */
+
+      if (isAltitudeAvailable) {
+
+         // convert altitude into double
+         for (int serieIndex = 0; serieIndex < size; serieIndex++) {
+            altitude[serieIndex] = altitudeSerie[serieIndex];
+         }
+
+         altitudeSerieSmoothed = new float[size];
+         altitudeSerieImperialSmoothed = new float[size];
+
+         altimeterSerie = new float[size];
+         altimeterSerieImperial = new float[size];
+
+         // altitude is NOT smoothed, copy original values
+
+         for (int serieIndex = 0; serieIndex < size; serieIndex++) {
+            altitudeSerieSmoothed[serieIndex] = altitudeSerie[serieIndex];
+            altitudeSerieImperialSmoothed[serieIndex] = (altitudeSerie[serieIndex] / UI.UNIT_FOOT);
+         }
+      }
+
+      // check if required data for speed, gradient... are available
+      if (distanceSerie == null && (latitudeSerie == null || longitudeSerie == null)) {
+         return;
+      }
+
+      speedSerie = new float[size];
+      speedSerieImperial = new float[size];
+
+      paceSerieSeconds = new float[size];
+      paceSerieSecondsImperial = new float[size];
+      paceSerieMinute = new float[size];
+      paceSerieMinuteImperial = new float[size];
+
+      // ensure data series are created to prevent exceptions
+      if (size < 2) {
+         return;
+      }
+
+      final double[] distance = new double[size];
+
+      /*
+       * get distance
+       */
+      if (distanceSerie == null) {
+
+         // compute distance from latitude and longitude data
+
+         distance[0] = 0.;
+
+         for (int serieIndex = 1; serieIndex < size; serieIndex++) {
+
+            distance[serieIndex] = distance[serieIndex - 1] + MtMath.distanceVincenty(
+                  latitudeSerie[serieIndex],
+                  latitudeSerie[serieIndex - 1],
+                  longitudeSerie[serieIndex],
+                  longitudeSerie[serieIndex - 1]);
+         }
+
+      } else {
+
+         // convert distance into double
+         for (int serieIndex = 0; serieIndex < size; serieIndex++) {
+            distance[serieIndex] = distanceSerie[serieIndex];
+         }
+      }
+
+      final int serieLength = timeSerie.length;
+
+      /*
+       * Compute the terrain slope
+       */
+      if (isAltitudeAvailable) {
+
+         final float dataSerieAltimeter[] = new float[serieLength];
+         final float dataSerieGradient[] = new float[serieLength];
+
+         for (int serieIndex = 1; serieIndex < serieLength; serieIndex++) {
+
+            final float timeDiff = timeSerie[serieIndex] - timeSerie[serieIndex - 1];
+            final float distanceDiff = distanceSerie[serieIndex] - distanceSerie[serieIndex - 1];
+            final float altitudeDiff = altitudeSerie[serieIndex] - altitudeSerie[serieIndex - 1];
+
+            // keep altimeter data
+            dataSerieAltimeter[serieIndex] = 3600 * altitudeDiff / timeDiff / UI.UNIT_VALUE_ALTITUDE;
+
+            // keep gradient data
+            dataSerieGradient[serieIndex] = distanceDiff == 0 ? 0 : altitudeDiff * 100 / distanceDiff;
+         }
+
+         if (UI.UNIT_VALUE_ALTITUDE != 1) {
+
+            // set imperial system
+
+            altimeterSerieImperial = dataSerieAltimeter;
+
+         } else {
+
+            // set metric system
+
+            altimeterSerie = dataSerieAltimeter;
+         }
+
+         gradientSerie = dataSerieGradient;
+
+      }
+
+      maxSpeed = 0.0f;
+
+      for (int serieIndex = 1; serieIndex < serieLength; serieIndex++) {
+
+         final float timeDiff = timeSerie[serieIndex] - timeSerie[serieIndex - 1];
+         final float distanceDiff = distanceSerie[serieIndex] - distanceSerie[serieIndex - 1];
+
+         final double speedMetric = distanceDiff / timeDiff * 3.6;
+         final double speedImperial = speedMetric / UI.UNIT_MILE;
+
+         if (speedMetric > maxSpeed) {
+            maxSpeed = (float) speedMetric;
+         }
+
+         speedSerie[serieIndex] = (float) speedMetric;
+         speedSerieImperial[serieIndex] = (float) speedImperial;
+
+         final float paceMetricSeconds = speedMetric < 1.0 ? 0 : (float) (3600.0 / speedMetric);
+         final float paceImperialSeconds = speedMetric < 0.6 ? 0 : (float) (3600.0 / speedImperial);
+
+         paceSerieSeconds[serieIndex] = paceMetricSeconds;
+         paceSerieSecondsImperial[serieIndex] = paceImperialSeconds;
+
+         paceSerieMinute[serieIndex] = paceMetricSeconds / 60;
+         paceSerieMinuteImperial[serieIndex] = paceImperialSeconds / 60;
+      }
+   }
+
+   /**
+    * Compute smoothed data series which depend on the distance, this is speed, pace, gradient and
+    * altimeter.<br>
+    * Additionally the altitude smoothed data series is computed.
+    * <p>
+    * This smoothing is based on the algorithm from Didier Jamet.
+    */
+   private void computeDataSeries_Smoothed() {
+
+      // check if the tour was created manually
+      if (timeSerie == null || timeSerie.length == 0) {
+         return;
+      }
+
+      final boolean isAltitudeAvailable = altitudeSerie != null;
+
+      // check if smoothed data are already computed
+      if (speedSerie != null && (isAltitudeAvailable && altitudeSerieSmoothed != null)) {
+         return;
+      }
+
+      final int size = timeSerie.length;
+
+      final double altitude[] = new double[size];
+      final double altitude_sc[] = new double[size];
+
+      final double tauGradient = _prefStore.getDouble(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_GRADIENT_TAU);
+      final double tauSpeed = _prefStore.getDouble(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_SPEED_TAU);
+
+      final int repeatedSmoothing = _prefStore.getInt(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_REPEATED_SMOOTHING);
+      final double repeatedTau = _prefStore.getDouble(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_REPEATED_TAU);
+
+      /*
+       * smooth altitude
+       */
+
+      if (isAltitudeAvailable) {
+
+         final boolean isAltitudeSmoothed = _prefStore.getBoolean(//
+               ITourbookPreferences.GRAPH_JAMET_SMOOTHING_IS_ALTITUDE);
+
+         // convert altitude into double
+         for (int serieIndex = 0; serieIndex < size; serieIndex++) {
+            altitude[serieIndex] = altitudeSerie[serieIndex];
+         }
+
+         // altitude MUST be smoothed because the values are used in the vertical speed
+         Smooth.smoothing(timeSerie, altitude, altitude_sc, tauGradient, false, repeatedSmoothing, repeatedTau);
+
+         altitudeSerieSmoothed = new float[size];
+         altitudeSerieImperialSmoothed = new float[size];
+
+         altimeterSerie = new float[size];
+         altimeterSerieImperial = new float[size];
+
+         if (isAltitudeSmoothed) {
+
+            for (int serieIndex = 0; serieIndex < size; serieIndex++) {
+               altitudeSerieSmoothed[serieIndex] = (float) altitude_sc[serieIndex];
+               altitudeSerieImperialSmoothed[serieIndex] = (float) (altitude_sc[serieIndex] / UI.UNIT_FOOT);
+            }
+         } else {
+
+            // altitude is NOT smoothed, copy original values
+
+            for (int serieIndex = 0; serieIndex < size; serieIndex++) {
+               altitudeSerieSmoothed[serieIndex] = altitudeSerie[serieIndex];
+               altitudeSerieImperialSmoothed[serieIndex] = (altitudeSerie[serieIndex] / UI.UNIT_FOOT);
+            }
+         }
+      }
+
+      // check if required data for speed, gradient... are available
+      if (distanceSerie == null && (latitudeSerie == null || longitudeSerie == null)) {
+         return;
+      }
+
+      speedSerie = new float[size];
+      speedSerieImperial = new float[size];
+
+      paceSerieSeconds = new float[size];
+      paceSerieSecondsImperial = new float[size];
+      paceSerieMinute = new float[size];
+      paceSerieMinuteImperial = new float[size];
+
+      // ensure data series are created to prevent exceptions
+      if (size < 2) {
+         return;
+      }
+
+      final double[] distance = new double[size];
+      final double[] distance_sc = new double[size];
+
+      final double Vh_ini[] = new double[size];
+      final double Vh[] = new double[size];
+      final double Vh_sc[] = new double[size];
+
+      final double Vv_ini[] = new double[size];
+      final double Vv[] = new double[size];
+      final double Vv_sc[] = new double[size];
+
+      /*
+       * get distance
+       */
+      if (distanceSerie == null) {
+
+         // compute distance from latitude and longitude data
+         distance[0] = 0.;
+         for (int serieIndex = 1; serieIndex < size; serieIndex++) {
+            distance[serieIndex] = distance[serieIndex - 1]
+                  + MtMath.distanceVincenty(
+                        latitudeSerie[serieIndex],
+                        latitudeSerie[serieIndex - 1],
+                        longitudeSerie[serieIndex],
+                        longitudeSerie[serieIndex - 1]);
+         }
+
+      } else {
+
+         // convert distance into double
+         for (int serieIndex = 0; serieIndex < size; serieIndex++) {
+            distance[serieIndex] = distanceSerie[serieIndex];
+         }
+      }
+
+      /*
+       * Compute the horizontal and vertical speeds from the raw distance and altitude data
+       */
+      for (int serieIndex = 0; serieIndex < size - 1; serieIndex++) {
+
+         if (timeSerie[serieIndex + 1] == timeSerie[serieIndex]) {
+
+            if (serieIndex == 0) {
+               Vh_ini[serieIndex] = 0.;
+               Vv_ini[serieIndex] = 0.;
+            } else {
+               Vh_ini[serieIndex] = Vh_ini[serieIndex - 1];
+               Vv_ini[serieIndex] = Vv_ini[serieIndex - 1];
+            }
+
+         } else {
+
+            Vh_ini[serieIndex] = (distance[serieIndex + 1] - distance[serieIndex])
+                  / (timeSerie[serieIndex + 1] - timeSerie[serieIndex]);
+
+            if (isAltitudeAvailable) {
+               Vv_ini[serieIndex] = (altitude[serieIndex + 1] - altitude[serieIndex])
+                     / (timeSerie[serieIndex + 1] - timeSerie[serieIndex]);
+            }
+         }
+      }
+      Vh_ini[size - 1] = Vh_ini[size - 2];
+      Vv_ini[size - 1] = Vv_ini[size - 2];
+
+      /*
+       * Smooth out the time variations of the distance
+       */
+      Smooth.smoothing(timeSerie, distance, distance_sc, tauSpeed, false, repeatedSmoothing, repeatedTau);
+
+      /*
+       * Compute the horizontal and vertical speeds from the smoothed distance and altitude
+       */
+      for (int serieIndex = 0; serieIndex < size - 1; serieIndex++) {
+
+         if (timeSerie[serieIndex + 1] == timeSerie[serieIndex]) {
+
+            // time has not changed
+
+            if (serieIndex == 0) {
+               Vh[serieIndex] = 0.;
+               Vv[serieIndex] = 0.;
+            } else {
+               Vh[serieIndex] = Vh[serieIndex - 1];
+               Vv[serieIndex] = Vv[serieIndex - 1];
+            }
+
+         } else {
+
+            Vh[serieIndex] = (distance_sc[serieIndex + 1] - distance_sc[serieIndex])
+                  / (timeSerie[serieIndex + 1] - timeSerie[serieIndex]);
+
+            if (isAltitudeAvailable) {
+               Vv[serieIndex] = (altitude_sc[serieIndex + 1] - altitude_sc[serieIndex])
+                     / (timeSerie[serieIndex + 1] - timeSerie[serieIndex]);
+            }
+         }
+      }
+      Vh[size - 1] = Vh[size - 2];
+      Vv[size - 1] = Vv[size - 2];
+
+      /*
+       * Smooth out the time variations of the horizontal and vertical speeds
+       */
+      Smooth.smoothing(timeSerie, Vh, Vh_sc, tauSpeed, false, repeatedSmoothing, repeatedTau);
+      if (isAltitudeAvailable) {
+         Smooth.smoothing(timeSerie, Vv, Vv_sc, tauGradient, false, repeatedSmoothing, repeatedTau);
+      }
+
+      /*
+       * Compute the terrain slope
+       */
+      if (isAltitudeAvailable) {
+
+         gradientSerie = new float[size];
+
+         for (int serieIndex = 0; serieIndex < size; serieIndex++) {
+
+            final double vh_sc_Value = Vh_sc[serieIndex];
+
+            // check divide by 0
+            gradientSerie[serieIndex] = vh_sc_Value == 0.0 //
+                  ? 0
+                  : (float) (Vv_sc[serieIndex] / vh_sc_Value * 100.0);
+
+            final double vSpeedSmoothed = Vv_sc[serieIndex] * 3600.0;
+            altimeterSerie[serieIndex] = (float) (vSpeedSmoothed);
+            altimeterSerieImperial[serieIndex] = (float) (vSpeedSmoothed / UI.UNIT_FOOT);
+         }
+      }
+
+      maxSpeed = 0.0f;
+      for (int serieIndex = 0; serieIndex < Vh.length; serieIndex++) {
+
+         final double speedMetric = Vh[serieIndex] * 3.6;
+         final double speedImperial = speedMetric / UI.UNIT_MILE;
+
+         if (speedMetric > maxSpeed) {
+            maxSpeed = (float) speedMetric;
+         }
+
+         speedSerie[serieIndex] = (float) speedMetric;
+         speedSerieImperial[serieIndex] = (float) speedImperial;
+
+         final float paceMetricSeconds = speedMetric < 1.0 ? 0 : (float) (3600.0 / speedMetric);
+         final float paceImperialSeconds = speedMetric < 0.6 ? 0 : (float) (3600.0 / speedImperial);
+
+         paceSerieSeconds[serieIndex] = paceMetricSeconds;
+         paceSerieSecondsImperial[serieIndex] = paceImperialSeconds;
+
+         paceSerieMinute[serieIndex] = paceMetricSeconds / 60;
+         paceSerieMinuteImperial[serieIndex] = paceImperialSeconds / 60;
+      }
    }
 
    /**
@@ -3678,7 +4087,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
 
       if (altitudeSerieSmoothed == null) {
-         computeSmoothedDataSeries();
+         computeDataSeries_Smoothed();
       }
 
       // double check was necessary because this case occured but it should not
@@ -3719,7 +4128,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    private void computeMaxSpeed() {
       if (distanceSerie != null) {
-         computeSmoothedDataSeries();
+         computeDataSeries_Smoothed();
       }
    }
 
@@ -3748,11 +4157,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          return;
       }
 
-      final boolean isInitialAlgorithm = _prefStore
-            .getString(ITourbookPreferences.GRAPH_SMOOTHING_SMOOTHING_ALGORITHM)
-            .equals(ISmoothingAlgorithm.SMOOTHING_ALGORITHM_INITIAL);
+      final boolean isJametAlgorithm = _prefStore.getString(ITourbookPreferences.GRAPH_SMOOTHING_SMOOTHING_ALGORITHM).equals(
+            ISmoothingAlgorithm.SMOOTHING_ALGORITHM_JAMET);
 
-      if (isInitialAlgorithm) {
+      if (isJametAlgorithm == false) {
 
          // smoothing is disabled for pulse values
          pulseSerieSmoothed = Arrays.copyOf(pulseSerie, pulseSerie.length);
@@ -3982,250 +4390,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
-    * Compute smoothed data series which depend on the distance, this is speed, pace, gradient and
-    * altimeter.<br>
-    * Additionally the altitude smoothed data series is computed.
-    * <p>
-    * This smoothing is based on the algorithm from Didier Jamet.
-    */
-   private void computeSmoothedDataSeries() {
-
-      // check if the tour was created manually
-      if (timeSerie == null || timeSerie.length == 0) {
-         return;
-      }
-
-      final boolean isAltitudeAvailable = altitudeSerie != null;
-
-      // check if smoothed data are already computed
-      if (speedSerie != null && (isAltitudeAvailable && altitudeSerieSmoothed != null)) {
-         return;
-      }
-
-      final int size = timeSerie.length;
-
-      final double altitude[] = new double[size];
-      final double altitude_sc[] = new double[size];
-
-      final double tauGradient = _prefStore.getDouble(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_GRADIENT_TAU);
-      final double tauSpeed = _prefStore.getDouble(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_SPEED_TAU);
-
-      final int repeatedSmoothing = _prefStore.getInt(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_REPEATED_SMOOTHING);
-      final double repeatedTau = _prefStore.getDouble(ITourbookPreferences.GRAPH_JAMET_SMOOTHING_REPEATED_TAU);
-
-      /*
-       * smooth altitude
-       */
-
-      if (isAltitudeAvailable) {
-
-         final boolean isAltitudeSmoothed = _prefStore.getBoolean(//
-               ITourbookPreferences.GRAPH_JAMET_SMOOTHING_IS_ALTITUDE);
-
-         // convert altitude into double
-         for (int serieIndex = 0; serieIndex < size; serieIndex++) {
-            altitude[serieIndex] = altitudeSerie[serieIndex];
-         }
-
-         // altitude MUST be smoothed because the values are used in the vertical speed
-         Smooth.smoothing(timeSerie, altitude, altitude_sc, tauGradient, false, repeatedSmoothing, repeatedTau);
-
-         altitudeSerieSmoothed = new float[size];
-         altitudeSerieImperialSmoothed = new float[size];
-
-         altimeterSerie = new float[size];
-         altimeterSerieImperial = new float[size];
-
-         if (isAltitudeSmoothed) {
-
-            for (int serieIndex = 0; serieIndex < size; serieIndex++) {
-               altitudeSerieSmoothed[serieIndex] = (float) altitude_sc[serieIndex];
-               altitudeSerieImperialSmoothed[serieIndex] = (float) (altitude_sc[serieIndex] / UI.UNIT_FOOT);
-            }
-         } else {
-
-            // altitude is NOT smoothed, copy original values
-
-            for (int serieIndex = 0; serieIndex < size; serieIndex++) {
-               altitudeSerieSmoothed[serieIndex] = altitudeSerie[serieIndex];
-               altitudeSerieImperialSmoothed[serieIndex] = (altitudeSerie[serieIndex] / UI.UNIT_FOOT);
-            }
-         }
-      }
-
-      // check if required data for speed, gradient... are available
-      if (distanceSerie == null && (latitudeSerie == null || longitudeSerie == null)) {
-         return;
-      }
-
-      speedSerie = new float[size];
-      speedSerieImperial = new float[size];
-
-      paceSerieSeconds = new float[size];
-      paceSerieSecondsImperial = new float[size];
-      paceSerieMinute = new float[size];
-      paceSerieMinuteImperial = new float[size];
-
-      // ensure data series are created to prevent exceptions
-      if (size < 2) {
-         return;
-      }
-
-      final double[] distance = new double[size];
-      final double[] distance_sc = new double[size];
-
-      final double Vh_ini[] = new double[size];
-      final double Vh[] = new double[size];
-      final double Vh_sc[] = new double[size];
-
-      final double Vv_ini[] = new double[size];
-      final double Vv[] = new double[size];
-      final double Vv_sc[] = new double[size];
-
-      /*
-       * get distance
-       */
-      if (distanceSerie == null) {
-
-         // compute distance from latitude and longitude data
-         distance[0] = 0.;
-         for (int serieIndex = 1; serieIndex < size; serieIndex++) {
-            distance[serieIndex] = distance[serieIndex - 1]
-                  + MtMath.distanceVincenty(
-                        latitudeSerie[serieIndex],
-                        latitudeSerie[serieIndex - 1],
-                        longitudeSerie[serieIndex],
-                        longitudeSerie[serieIndex - 1]);
-         }
-
-      } else {
-
-         // convert distance into double
-         for (int serieIndex = 0; serieIndex < size; serieIndex++) {
-            distance[serieIndex] = distanceSerie[serieIndex];
-         }
-      }
-
-      /*
-       * Compute the horizontal and vertical speeds from the raw distance and altitude data
-       */
-      for (int serieIndex = 0; serieIndex < size - 1; serieIndex++) {
-
-         if (timeSerie[serieIndex + 1] == timeSerie[serieIndex]) {
-
-            if (serieIndex == 0) {
-               Vh_ini[serieIndex] = 0.;
-               Vv_ini[serieIndex] = 0.;
-            } else {
-               Vh_ini[serieIndex] = Vh_ini[serieIndex - 1];
-               Vv_ini[serieIndex] = Vv_ini[serieIndex - 1];
-            }
-
-         } else {
-
-            Vh_ini[serieIndex] = (distance[serieIndex + 1] - distance[serieIndex])
-                  / (timeSerie[serieIndex + 1] - timeSerie[serieIndex]);
-
-            if (isAltitudeAvailable) {
-               Vv_ini[serieIndex] = (altitude[serieIndex + 1] - altitude[serieIndex])
-                     / (timeSerie[serieIndex + 1] - timeSerie[serieIndex]);
-            }
-         }
-      }
-      Vh_ini[size - 1] = Vh_ini[size - 2];
-      Vv_ini[size - 1] = Vv_ini[size - 2];
-
-      /*
-       * Smooth out the time variations of the distance
-       */
-      Smooth.smoothing(timeSerie, distance, distance_sc, tauSpeed, false, repeatedSmoothing, repeatedTau);
-
-      /*
-       * Compute the horizontal and vertical speeds from the smoothed distance and altitude
-       */
-      for (int serieIndex = 0; serieIndex < size - 1; serieIndex++) {
-
-         if (timeSerie[serieIndex + 1] == timeSerie[serieIndex]) {
-
-            // time has not changed
-
-            if (serieIndex == 0) {
-               Vh[serieIndex] = 0.;
-               Vv[serieIndex] = 0.;
-            } else {
-               Vh[serieIndex] = Vh[serieIndex - 1];
-               Vv[serieIndex] = Vv[serieIndex - 1];
-            }
-
-         } else {
-
-            Vh[serieIndex] = (distance_sc[serieIndex + 1] - distance_sc[serieIndex])
-                  / (timeSerie[serieIndex + 1] - timeSerie[serieIndex]);
-
-            if (isAltitudeAvailable) {
-               Vv[serieIndex] = (altitude_sc[serieIndex + 1] - altitude_sc[serieIndex])
-                     / (timeSerie[serieIndex + 1] - timeSerie[serieIndex]);
-            }
-         }
-      }
-      Vh[size - 1] = Vh[size - 2];
-      Vv[size - 1] = Vv[size - 2];
-
-      /*
-       * Smooth out the time variations of the horizontal and vertical speeds
-       */
-      Smooth.smoothing(timeSerie, Vh, Vh_sc, tauSpeed, false, repeatedSmoothing, repeatedTau);
-      if (isAltitudeAvailable) {
-         Smooth.smoothing(timeSerie, Vv, Vv_sc, tauGradient, false, repeatedSmoothing, repeatedTau);
-      }
-
-      /*
-       * Compute the terrain slope
-       */
-      if (isAltitudeAvailable) {
-
-         gradientSerie = new float[size];
-
-         for (int serieIndex = 0; serieIndex < size; serieIndex++) {
-
-            final double vh_sc_Value = Vh_sc[serieIndex];
-
-            // check divide by 0
-            gradientSerie[serieIndex] = vh_sc_Value == 0.0 //
-                  ? 0
-                  : (float) (Vv_sc[serieIndex] / vh_sc_Value * 100.0);
-
-            final double vSpeedSmoothed = Vv_sc[serieIndex] * 3600.0;
-            altimeterSerie[serieIndex] = (float) (vSpeedSmoothed);
-            altimeterSerieImperial[serieIndex] = (float) (vSpeedSmoothed / UI.UNIT_FOOT);
-         }
-      }
-
-      maxSpeed = 0.0f;
-      for (int serieIndex = 0; serieIndex < Vh.length; serieIndex++) {
-
-         final double speedMetric = Vh[serieIndex] * 3.6;
-         final double speedImperial = speedMetric / UI.UNIT_MILE;
-
-         if (speedMetric > maxSpeed) {
-            maxSpeed = (float) speedMetric;
-         }
-
-         speedSerie[serieIndex] = (float) speedMetric;
-         speedSerieImperial[serieIndex] = (float) speedImperial;
-
-         final float paceMetricSeconds = speedMetric < 1.0 ? 0 : (float) (3600.0 / speedMetric);
-         final float paceImperialSeconds = speedMetric < 0.6 ? 0 : (float) (3600.0 / speedImperial);
-
-         paceSerieSeconds[serieIndex] = paceMetricSeconds;
-         paceSerieSecondsImperial[serieIndex] = paceImperialSeconds;
-
-         paceSerieMinute[serieIndex] = paceMetricSeconds / 60;
-         paceSerieMinuteImperial[serieIndex] = paceImperialSeconds / 60;
-      }
-   }
-
-   /**
     * computes the speed data serie which can be retrieved with {@link TourData#getSpeedSerie()}
     */
    public void computeSpeedSerie() {
@@ -4251,11 +4415,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
          // speed is computed from distance and time
 
-         if (_prefStore
-               .getString(ITourbookPreferences.GRAPH_SMOOTHING_SMOOTHING_ALGORITHM)//
-               .equals(ISmoothingAlgorithm.SMOOTHING_ALGORITHM_JAMET)) {
+         final String smoothingAlgo = _prefStore.getString(ITourbookPreferences.GRAPH_SMOOTHING_SMOOTHING_ALGORITHM);
 
-            computeSmoothedDataSeries();
+         if (smoothingAlgo.equals(ISmoothingAlgorithm.SMOOTHING_ALGORITHM_JAMET)) {
+
+            computeDataSeries_Smoothed();
+
+         } else if (smoothingAlgo.equals(ISmoothingAlgorithm.SMOOTHING_ALGORITHM_NO_SMOOTHING)) {
+
+            computeDataSeries_NotSmoothed();
 
          } else {
 
@@ -7258,7 +7426,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
 
       if (speedSerie == null || gradientSerie == null) {
-         computeSmoothedDataSeries();
+         computeDataSeries_Smoothed();
       }
 
       // check if required data series are available

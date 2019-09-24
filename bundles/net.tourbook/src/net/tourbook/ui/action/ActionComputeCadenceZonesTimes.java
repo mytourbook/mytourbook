@@ -25,6 +25,7 @@ import net.tourbook.ui.ITourProvider;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
 
 public class ActionComputeCadenceZonesTimes extends Action {
@@ -43,18 +44,18 @@ public class ActionComputeCadenceZonesTimes extends Action {
    @Override
    public void run() {
 
+      final ArrayList<TourData> selectedTours = _tourProvider.getSelectedTours();
+
       if (MessageDialog.openConfirm(
             Display.getCurrent().getActiveShell(),
             Messages.TourEditor_Dialog_ComputeCadenceZonesTimes_Title,
-            Messages.TourEditor_Dialog_ComputeCadenceZonesTimes_Message) == false) {
+            NLS.bind(Messages.TourEditor_Dialog_ComputeCadenceZonesTimes_Message, selectedTours.size())) == false) {
          return;
       }
 
       final long start = System.currentTimeMillis();
 
       TourLogManager.showLogView();
-
-      final ArrayList<TourData> selectedTours = _tourProvider.getSelectedTours();
 
       if (TourManager.computeCadenceZonesTimes(selectedTours)) {
 
