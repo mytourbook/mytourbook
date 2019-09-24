@@ -127,7 +127,7 @@ public class PrefPageStatistic extends PreferencePage implements IWorkbenchPrefe
    }
 // SET_FORMATTING_ON
 
-   private class StatContentProvicer implements IStructuredContentProvider {
+   private class StatContentProvider implements IStructuredContentProvider {
 
       @Override
       public void dispose() {}
@@ -236,7 +236,7 @@ public class PrefPageStatistic extends PreferencePage implements IWorkbenchPrefe
       /*
        * create table viewer
        */
-      _statViewer.setContentProvider(new StatContentProvicer());
+      _statViewer.setContentProvider(new StatContentProvider());
       _statViewer.addSelectionChangedListener(new ISelectionChangedListener() {
          @Override
          public void selectionChanged(final SelectionChangedEvent event) {
