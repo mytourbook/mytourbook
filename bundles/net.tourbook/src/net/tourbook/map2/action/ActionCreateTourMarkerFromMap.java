@@ -110,12 +110,12 @@ public class ActionCreateTourMarkerFromMap extends Action {
 
       //We save instantly the marker so that it is displayed on the map while the user renames the marker name.
       //I found that otherwise, it's easy for the user to forget where the click was made.
-      this.saveModifiedTour(tourData);
+      saveModifiedTour(tourData);
 
       markerDialog.open();
 
       //We save the tour again to take into account the action of the user (renamed the marker, cancelled the dialog...)
-      this.saveModifiedTour(tourData);
+      saveModifiedTour(tourData);
    }
 
    /**
@@ -130,10 +130,12 @@ public class ActionCreateTourMarkerFromMap extends Action {
     *           The tour to be saved
     */
    private void saveModifiedTour(final TourData tourData) {
+
       final TourDataEditorView tourDataEditor = TourManager.getTourDataEditor();
       if (tourDataEditor != null) {
          tourDataEditor.updateUI(tourData);
       }
+
       TourManager.saveModifiedTour(tourData);
    }
 
