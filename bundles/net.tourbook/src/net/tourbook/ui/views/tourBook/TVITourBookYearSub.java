@@ -181,7 +181,10 @@ public class TVITourBookYearSub extends TVITourBookItem {
             //
             + "training_TrainingEffect_Aerob, " //          76   //$NON-NLS-1$
             + "training_TrainingEffect_Anaerob, " //        77   //$NON-NLS-1$
-            + "training_TrainingPerformance " //            78   //$NON-NLS-1$
+            + "training_TrainingPerformance, " //           78   //$NON-NLS-1$
+
+            + "weather_Temperature_Min, " //                79   //$NON-NLS-1$
+            + "weather_Temperature_Max " //                 80   //$NON-NLS-1$
 
             + UI.NEW_LINE
 
@@ -277,7 +280,7 @@ public class TVITourBookYearSub extends TVITourBookItem {
                tourItem.colMaxPulse             = result.getLong(16);
                tourItem.colAvgPulse             = result.getFloat(17);
                final float dbAvgCadence         = result.getFloat(18);
-               tourItem.colAvgTemperature       = result.getFloat(19);
+               tourItem.colTemperature_Avg       = result.getFloat(19);
 
                final long dbTourStartTime       = result.getLong(22);
                final String dbTimeZoneId        = result.getString(23);
@@ -370,6 +373,11 @@ public class TVITourBookYearSub extends TVITourBookItem {
                tourItem.colTraining_TrainingEffect             = result.getFloat(76);
                tourItem.colTraining_TrainingEffect_Anaerobic   = result.getFloat(77);
                tourItem.colTraining_TrainingPerformance        = result.getFloat(78);
+
+               // ---------- WEATHER -------------
+
+               tourItem.colTemperature_Min                     = result.getFloat(79);
+               tourItem.colTemperature_Max                     = result.getFloat(80);
 
 // SET_FORMATTING_ON
 

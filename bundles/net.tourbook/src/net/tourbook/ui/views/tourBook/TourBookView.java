@@ -965,7 +965,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       // Weather
       defineColumn_Weather_Clouds();
-      defineColumn_Weather_AvgTemperature();
+      defineColumn_Weather_Temperature_Avg();
+      defineColumn_Weather_Temperature_Min();
+      defineColumn_Weather_Temperature_Max();
       defineColumn_Weather_WindSpeed();
       defineColumn_Weather_WindDirection();
 
@@ -2978,29 +2980,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    }
 
    /**
-    * column: avg temperature
-    */
-   private void defineColumn_Weather_AvgTemperature() {
-
-      final TreeColumnDefinition colDef = TreeColumnFactory.WEATHER_AVG_TEMPERATURE.createColumn(_columnManager, _pc);
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final Object element = cell.getElement();
-
-            final double value = UI.convertTemperatureFromMetric(//
-                  ((TVITourBookItem) element).colAvgTemperature);
-
-            colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
-
-            setCellColor(cell, element);
-         }
-      });
-   }
-
-   /**
     * column: clouds
     */
    private void defineColumn_Weather_Clouds() {
@@ -3027,6 +3006,72 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
                   cell.setText(windClouds);
                }
             }
+
+            setCellColor(cell, element);
+         }
+      });
+   }
+
+   /**
+    * Column: Avg temperature
+    */
+   private void defineColumn_Weather_Temperature_Avg() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.WEATHER_TEMPERATURE_AVG.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            final double value = UI.convertTemperatureFromMetric(((TVITourBookItem) element).colTemperature_Avg);
+
+            colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
+
+            setCellColor(cell, element);
+         }
+      });
+   }
+
+   /**
+    * Column: Max temperature
+    */
+   private void defineColumn_Weather_Temperature_Max() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.WEATHER_TEMPERATURE_MAX.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            final double value = UI.convertTemperatureFromMetric(((TVITourBookItem) element).colTemperature_Max);
+
+            colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
+
+            setCellColor(cell, element);
+         }
+      });
+   }
+
+   /**
+    * Column: Min temperature
+    */
+   private void defineColumn_Weather_Temperature_Min() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.WEATHER_TEMPERATURE_MIN.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            final double value = UI.convertTemperatureFromMetric(((TVITourBookItem) element).colTemperature_Min);
+
+            colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
             setCellColor(cell, element);
          }
@@ -3685,7 +3730,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       // CSV_HEADER_AVERAGE_TEMPERATURE
       {
-         float temperature = tviItem.colAvgTemperature;
+         float temperature = tviItem.colTemperature_Avg;
 
          if (temperature != 0) {
             if (net.tourbook.ui.UI.UNIT_VALUE_TEMPERATURE != 1) {

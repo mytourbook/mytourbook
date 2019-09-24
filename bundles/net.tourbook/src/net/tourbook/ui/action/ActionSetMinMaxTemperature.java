@@ -166,7 +166,7 @@ public class ActionSetMinMaxTemperature extends Action {
 
       int tourIdx = 1;
 
-      // loop over all tours and calculate and set new columns
+      // loop over all tours and calculate and set min/max temperature
       for (final TourData tourData : selectedTours) {
 
          if (monitor != null) {

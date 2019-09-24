@@ -146,7 +146,10 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
    float        colAvgPace;
    float        colAvgPulse;
    float        colAvgCadence;
-   float        colAvgTemperature;
+
+   float        colTemperature_Avg;
+   float        colTemperature_Min;
+   float        colTemperature_Max;
 
    int          colWindSpd;
    int          colWindDir;
@@ -247,24 +250,24 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       colAltitudeUp        = result.getLong(startIndex + 3);
       colAltitudeDown      = result.getLong(startIndex + 4);
 
-      colCounter        = result.getLong(startIndex + 5);
+      colCounter           = result.getLong(startIndex + 5);
 
-      colMaxSpeed       = result.getFloat(startIndex + 6);
+      colMaxSpeed          = result.getFloat(startIndex + 6);
 
       // compute average speed/pace, prevent divide by 0
-      colAvgSpeed       = colTourDrivingTime == 0 ? 0 : 3.6f * colTourDistance / colTourDrivingTime;
-      colAvgPace        = colTourDistance == 0 ? 0 : colTourDrivingTime * 1000f / colTourDistance;
+      colAvgSpeed          = colTourDrivingTime == 0 ? 0 : 3.6f * colTourDistance / colTourDrivingTime;
+      colAvgPace           = colTourDistance == 0 ? 0 : colTourDrivingTime * 1000f / colTourDistance;
 
-      colMaxAltitude    = result.getLong(startIndex + 7);
-      colMaxPulse       = result.getLong(startIndex + 8);
+      colMaxAltitude       = result.getLong(startIndex + 7);
+      colMaxPulse          = result.getLong(startIndex + 8);
 
-      colAvgPulse       = result.getFloat(startIndex + 9);
-      colAvgCadence     = result.getFloat(startIndex + 10);
-      colAvgTemperature = result.getFloat(startIndex + 11);
+      colAvgPulse          = result.getFloat(startIndex + 9);
+      colAvgCadence        = result.getFloat(startIndex + 10);
+      colTemperature_Avg   = result.getFloat(startIndex + 11);
 
-      colWindDir        = result.getInt(startIndex + 12);
-      colWindSpd        = result.getInt(startIndex + 13);
-      colRestPulse      = result.getInt(startIndex + 14);
+      colWindDir           = result.getInt(startIndex + 12);
+      colWindSpd           = result.getInt(startIndex + 13);
+      colRestPulse         = result.getInt(startIndex + 14);
 
       colCalories                = result.getLong(startIndex + 15);
       colPower_TotalWork         = result.getLong(startIndex + 16);
