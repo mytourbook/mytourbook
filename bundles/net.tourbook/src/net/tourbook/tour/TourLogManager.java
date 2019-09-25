@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,179 +27,217 @@ import org.eclipse.swt.widgets.Display;
 
 public class TourLogManager {
 
-	public static final String							LOG_TOUR_DELETE_TOURS		= Messages.Log_Tour_DeleteTours;
-	public static final String							LOG_TOUR_SAVE_TOURS			= Messages.Log_Tour_SaveTours;
-	public static final String							LOG_TOUR_SAVE_TOURS_FILE	= Messages.Log_Tour_SaveTours_File;
+   public static final String                         LOG_TOUR_DELETE_TOURS    = Messages.Log_Tour_DeleteTours;
+   public static final String                         LOG_TOUR_SAVE_TOURS      = Messages.Log_Tour_SaveTours;
+   public static final String                         LOG_TOUR_SAVE_TOURS_FILE = Messages.Log_Tour_SaveTours_File;
 
-	private static final CopyOnWriteArrayList<TourLog>	_tourLogs					= new CopyOnWriteArrayList<>();
+   private static final CopyOnWriteArrayList<TourLog> _tourLogs                = new CopyOnWriteArrayList<>();
 
-	private static TourLogView							_logView;
+   private static TourLogView                         _logView;
 
-	private static void addLog(final TourLog tourLog) {
+   private static void addLog(final TourLog tourLog) {
 
-		// update model
-		_tourLogs.add(tourLog);
+      // update model
+      _tourLogs.add(tourLog);
 
-		// update UI
-		if (isTourLogOpen()) {
-			_logView.addLog(tourLog);
-		}
-	}
+      // update UI
+      if (isTourLogOpen()) {
+         _logView.addLog(tourLog);
+      }
+   }
 
-	public static void addLog(final TourLogState logState, final String message) {
+   public static void addLog(final TourLogState logState, final String message) {
 
-		final TourLog tourLog = new TourLog(logState, message);
+      final TourLog tourLog = new TourLog(logState, message);
 
-		addLog(tourLog);
-	}
+      addLog(tourLog);
+   }
 
-	public static void addLog(final TourLogState logState, final String message, final String css) {
+   public static void addLog(final TourLogState logState, final String message, final String css) {
 
-		final TourLog tourLog = new TourLog(logState, message);
+      final TourLog tourLog = new TourLog(logState, message);
 
-		tourLog.css = css;
+      tourLog.css = css;
 
-		addLog(tourLog);
-	}
+      addLog(tourLog);
+   }
 
-	public static void addSubLog(final TourLogState logState, final String message) {
+   public static void addSubLog(final TourLogState tourLogState, final String message) {
 
-		final TourLog tourLog = new TourLog(logState, message);
+      final TourLog tourLog = new TourLog(tourLogState, message);
 
-		tourLog.isSubLogItem = true;
+      tourLog.isSubLogItem = true;
 
-		addLog(tourLog);
-	}
+      addLog(tourLog);
+   }
 
-	public static void clear() {
+   public static void clear() {
 
-		_logView.clear();
-		_tourLogs.clear();
-	}
+      _logView.clear();
+      _tourLogs.clear();
+   }
 
-	public static CopyOnWriteArrayList<TourLog> getLogs() {
+   public static CopyOnWriteArrayList<TourLog> getLogs() {
 
-		return _tourLogs;
-	}
+      return _tourLogs;
+   }
 
-	private static boolean isTourLogOpen() {
+   private static boolean isTourLogOpen() {
 
-		final boolean isLogViewOpen = _logView != null && _logView.isDisposed() == false;
+      final boolean isLogViewOpen = _logView != null && _logView.isDisposed() == false;
 
-		return isLogViewOpen;
-	}
+      return isLogViewOpen;
+   }
 
-	public static void logDefault(final String message) {
+   public static void logDefault(final String message) {
 
-		final String logMessage = WEB.convertHTML_LineBreaks(message);
+      final String logMessage = WEB.convertHTML_LineBreaks(message);
 
-		final TourLog tourLog = new TourLog(TourLogState.DEFAULT, logMessage);
+      final TourLog tourLog = new TourLog(TourLogState.DEFAULT, logMessage);
 
-		addLog(tourLog);
-	}
+      addLog(tourLog);
+   }
 
-	public static void logError(final String message) {
+   public static void logError(final String message) {
 
-		final TourLog tourLog = new TourLog(TourLogState.IMPORT_ERROR, message);
+      final TourLog tourLog = new TourLog(TourLogState.IMPORT_ERROR, message);
 
-		addLog(tourLog);
-	}
+      addLog(tourLog);
+   }
 
-	public static void logError_CannotReadDataFile(final String importFilePath, final Exception e) {
+   public static void logError_CannotReadDataFile(final String importFilePath, final Exception e) {
 
-		logEx(String.format("Could not read data file '%s'", importFilePath), e); //$NON-NLS-1$
-	}
+      logEx(String.format("Could not read data file '%s'", importFilePath), e); //$NON-NLS-1$
+   }
 
-	public static void logEx(final Exception e) {
+   public static void logEx(final Exception e) {
 
-		final String stackTrace = Util.getStackTrace(e);
+      final String stackTrace = Util.getStackTrace(e);
 
-		logException(stackTrace, e);
-	}
+      logException(stackTrace, e);
+   }
 
-	public static void logEx(final String message, final Exception e) {
+   public static void logEx(final String message, final Exception e) {
 
-		final String stackTrace = Util.getStackTrace(e);
+      final String stackTrace = Util.getStackTrace(e);
 
-		logException(message + UI.NEW_LINE + stackTrace, e);
-	}
+      logException(message + UI.NEW_LINE + stackTrace, e);
+   }
 
-	private static void logException(final String message, final Exception e) {
+   private static void logException(final String message, final Exception e) {
 
-		final String logMessage = WEB.convertHTML_LineBreaks(message);
+      final String logMessage = WEB.convertHTML_LineBreaks(message);
 
-		final TourLog tourLog = new TourLog(TourLogState.IMPORT_EXCEPTION, logMessage);
+      final TourLog tourLog = new TourLog(TourLogState.IMPORT_EXCEPTION, logMessage);
 
-		addLog(tourLog);
+      addLog(tourLog);
 
-		Display.getDefault().syncExec(new Runnable() {
-			@Override
-			public void run() {
-				showLogView();
-			}
-		});
+      Display.getDefault().syncExec(new Runnable() {
+         @Override
+         public void run() {
+            showLogView();
+         }
+      });
 
-		// ensure it is logged when crashing
-		StatusUtil.log(e);
-	}
+      // ensure it is logged when crashing
+      StatusUtil.log(e);
+   }
 
-	public static void logInfo(final String message) {
+   public static void logInfo(final String message) {
 
-		final String logMessage = WEB.convertHTML_LineBreaks(message);
+      final String logMessage = WEB.convertHTML_LineBreaks(message);
 
-		final TourLog tourLog = new TourLog(TourLogState.INFO, logMessage);
+      final TourLog tourLog = new TourLog(TourLogState.INFO, logMessage);
 
-		tourLog.css = TourLogView.CSS_LOG_INFO;
+      tourLog.css = TourLogView.CSS_LOG_INFO;
 
-		addLog(tourLog);
-	}
+      addLog(tourLog);
+   }
 
-	public static void logSubError(final String message) {
+   public static void logTitle(final String message) {
 
-		final String logMessage = WEB.convertHTML_LineBreaks(message);
+      final String logMessage = WEB.convertHTML_LineBreaks(message);
 
-		final TourLog tourLog = new TourLog(TourLogState.IMPORT_ERROR, logMessage);
+      final TourLog tourLog = new TourLog(TourLogState.DEFAULT, logMessage);
 
-		tourLog.css = TourLogView.CSS_LOG_INFO;
-		tourLog.isSubLogItem = true;
+      tourLog.css = TourLogView.CSS_LOG_TITLE;
 
-		addLog(tourLog);
-	}
+      addLog(tourLog);
+   }
 
-	public static void logSubInfo(final String message) {
+   public static void setLogView(final TourLogView tourLogView) {
 
-		final String logMessage = WEB.convertHTML_LineBreaks(message);
+      _logView = tourLogView;
+   }
 
-		final TourLog tourLog = new TourLog(TourLogState.INFO, logMessage);
+   public static void showLogView() {
 
-		tourLog.css = TourLogView.CSS_LOG_INFO;
-		tourLog.isSubLogItem = true;
+      _logView = (TourLogView) Util.showView(TourLogView.ID,
 
-		addLog(tourLog);
-	}
+            // !!! log view MUST NOT be activated, otherwise events (e.g. deletion) are NOT fired from the source view !!!
 
-	public static void logTitle(final String message) {
+            false);
+   }
 
-		final String logMessage = WEB.convertHTML_LineBreaks(message);
+   /**
+    * Indent log message and do not show an icon
+    *
+    * @param message
+    */
+   public static void subLog_Default(final String message) {
 
-		final TourLog tourLog = new TourLog(TourLogState.DEFAULT, logMessage);
+      final String logMessage = WEB.convertHTML_LineBreaks(message);
 
-		tourLog.css = TourLogView.CSS_LOG_TITLE;
+      final TourLog tourLog = new TourLog(TourLogState.DEFAULT, logMessage);
+      tourLog.isSubLogItem = true;
 
-		addLog(tourLog);
-	}
+      addLog(tourLog);
+   }
 
-	public static void setLogView(final TourLogView tourLogView) {
+   /**
+    * Indent log message and show error icon
+    *
+    * @param message
+    */
+   public static void subLog_Error(final String message) {
 
-		_logView = tourLogView;
-	}
+      final String logMessage = WEB.convertHTML_LineBreaks(message);
 
-	public static void showLogView() {
+      final TourLog tourLog = new TourLog(TourLogState.IMPORT_ERROR, logMessage);
+      tourLog.isSubLogItem = true;
 
-		_logView = (TourLogView) Util.showView(TourLogView.ID,
+      addLog(tourLog);
+   }
 
-		// !!! log view MUST NOT be activated, otherwise events (e.g. deletion) are NOT fired from the source view !!!
+   /**
+    * Indent log message and show info icon
+    *
+    * @param message
+    */
+   public static void subLog_Info(final String message) {
 
-				false);
-	}
+      final String logMessage = WEB.convertHTML_LineBreaks(message);
+
+      final TourLog tourLog = new TourLog(TourLogState.INFO, logMessage);
+
+      tourLog.css = TourLogView.CSS_LOG_INFO;
+      tourLog.isSubLogItem = true;
+
+      addLog(tourLog);
+   }
+
+   /**
+    * Indent log message and show OK icon
+    *
+    * @param message
+    */
+   public static void subLog_OK(final String message) {
+
+      final String logMessage = WEB.convertHTML_LineBreaks(message);
+
+      final TourLog tourLog = new TourLog(TourLogState.IMPORT_OK, logMessage);
+      tourLog.isSubLogItem = true;
+
+      addLog(tourLog);
+   }
 }

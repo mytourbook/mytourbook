@@ -4,19 +4,55 @@ TODOs
 =====
 
 * Show weather, location start/end as new columns
-* Compute min/max temperature for selected tours
 * When hovering over a graph, data appears referring to the point in the graph the mouse is on: 
   this data does not take into account whether the track has been saved as a using cadence or revolutions, and always shows revolutions.
   https://github.com/wolfgang-ch/mytourbook/issues/86
 * Test import because of changed device watching task + sql exception handling
 * Recommend DBeaver as a better SQL explorer   
 
+
 New + Improvements
 ==================
 
-* Tour Tag
-  - Delete tour tag, tag is removed from tours and tag definition is deleted
+* Tour Tag View
+  - Show tags of all selected tours
+  - Add/delete tags of all selected tours
+  - Delete tour tag -> tag is removed from tours and tag definition is deleted
   - Delete tour tag category
+
+* Tagged Tours
+  - Expand/collapse tag/tag category/year/month (item) when label is selected with the mouse
+  - Expand only one item and collapse any other items
+
+* Tour cadence zones times (Frederic)
+  - Added the ability to see, for a given activity, month or year, the
+    percentage of time spent in each cadence zone "slow" and "fast".
+    This feature was inspired by coach Jason Koop's recommendation (see bullet
+    point #5 "Hike more"
+    https://trainright.com/8-things-ultrarunners-do-improve-training/)
+
+* Tour Marker's view (Frederic)
+ - Possibility to delete marker(s) from the contextual menu and when pressing
+   the DELETE key
+
+* Tour Chart
+  - New smoothing algorithm which is not smoothing the computed speed/pace/altimeter/gradient values
+ 
+* Tour Editor
+  - Tour can be saved with <Ctrl>+S when "Tour Editor" view is the active view
+  - The save and new tour actions are removed from the view toolbar but are available at the main toolbar
+
+* Tour Book View
+  - Show min/max temperature values
+  - Set min/max temperature values from time slices
+  
+  
+Import
+======
+
+* Import Preferences (Frederic)
+  - Added the ability to choose whether to set the person's body weight when
+    importing and saving a tour.
 
 * Import FitLogEx Files (Frederic)
   - Custom Data Field Import. The data field names and values are imported in
@@ -31,27 +67,6 @@ New + Improvements
   - when multiple power data sources are present within a given FIT file:
     - Stryd or Garmin Running Dynamics Pod
 
-* Tour Marker's view (Frederic)
- - Possibility to delete marker(s) from the contextual menu and when pressing
-   the DELETE key
-
-* Import Preferences (Frederic)
-  - Added the ability to choose whether to set the person's body weight when
-    importing and saving a tour.
-
-* Tour Chart
-  - New smoothing algorithm which is not smoothing the computed speed/pace/altimeter/gradient values
- 
-* Tour Editor
-  - Tour can be saved with <Ctrl>+S when "Tour Editor" view is the active view
-  - The save and new tour actions are removed from the view toolbar but are available at the main toolbar
-
-* Tagged Tours
-  - Expand/collapse tag/tag category/year/month (item) when label is selected with the mouse
-  - Expand only one item and collapse any other items
-
-* Tour Book View
-  - Set min/max temperature values
 
 Changes
 =======
