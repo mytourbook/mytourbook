@@ -504,6 +504,48 @@ public class TourManager {
    }
 
    /**
+    * Computes time (seconds) spent in each cadence zone (slow and fast).
+    *
+    * @param tourDataList
+    * @return Returns <code>true</code> when time values are computed and {@link TourData} are
+    *         updated but not yet saved.
+    */
+   public static boolean computeCadenceZonesTimes(final ArrayList<TourData> tourDataList) {
+
+      if (tourDataList == null || tourDataList.size() == 0) {
+         return false;
+      }
+
+      final boolean[] retValue = { false };
+
+      BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+         @Override
+         public void run() {
+
+            TourLogManager.addLog(TourLogState.DEFAULT, NLS.bind(Messages.Log_ComputeCadenceZonesTimes_001_Start, tourDataList.size()));
+
+            for (final TourData tourData : tourDataList) {
+
+               final boolean isComputed = tourData.computeCadenceZonesTimes();
+               final String tourDateTime = TourManager.getTourDateTimeShort(tourData);
+
+               if (isComputed) {
+                  TourLogManager.addLog(TourLogState.INFO, NLS.bind(Messages.Log_ComputeCadenceZonesTimes_010_Computed, tourDateTime));
+
+                  retValue[0] = true;
+               } else {
+                  TourLogManager.addLog(TourLogState.IMPORT_ERROR,
+                        NLS.bind(Messages.Log_ComputeCadenceZonesTimes_011_No_Time_Or_Cadence_Series, tourDateTime));
+               }
+
+            }
+         }
+      });
+
+      return retValue[0];
+   }
+
+   /**
     * Computes distance values from geo position.
     *
     * @param tourDataList

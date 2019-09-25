@@ -63,6 +63,8 @@ public abstract class TreeColumnFactory {
    public static final TreeColumnFactory POWERTRAIN_GEAR_FRONT_SHIFT_COUNT;
    public static final TreeColumnFactory POWERTRAIN_GEAR_REAR_SHIFT_COUNT;
    public static final TreeColumnFactory POWERTRAIN_PEDAL_LEFT_RIGHT_BALANCE;
+   public static final TreeColumnFactory POWERTRAIN_SLOW_VS_FAST_CADENCE_PERCENTAGES;
+   public static final TreeColumnFactory POWERTRAIN_SLOW_VS_FAST_CADENCE_ZONES_DELIMITER;
 
    public static final TreeColumnFactory RUN_DYN_STANCE_TIME_MIN;
    public static final TreeColumnFactory RUN_DYN_STANCE_TIME_MAX;
@@ -594,6 +596,50 @@ public abstract class TreeColumnFactory {
                   ValueFormat.NUMBER_1_1,
                   ValueFormat.NUMBER_1_1,
                   columnManager);
+
+            return colDef;
+         }
+      };
+
+      POWERTRAIN_SLOW_VS_FAST_CADENCE_ZONES_DELIMITER = new TreeColumnFactory() {
+
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager,
+                  "POWERTRAIN_SLOW_VS_FAST_CADENCE_ZONES_DELIMITER", //$NON-NLS-1$
+                  SWT.TRAIL);
+
+            colDef.setColumnCategory(Messages.ColumnFactory_Category_Powertrain);
+            colDef.setColumnLabel(Messages.ColumnFactory_Power_SlowVsFast_CadenceZonesDelimiter_Label);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_Power_SlowVsFast_CadenceZonesDelimiter_Header);
+            colDef.setColumnUnit(Messages.ColumnFactory_Power_SlowVsFast_CadenceZonesDelimiter_Header);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Power_SlowVsFast_CadenceZonesDelimiter_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+
+            return colDef;
+         }
+      };
+
+      POWERTRAIN_SLOW_VS_FAST_CADENCE_PERCENTAGES = new TreeColumnFactory() {
+
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager,
+                  "POWERTRAIN_SLOW_VS_FAST_CADENCE_PERCENTAGES", //$NON-NLS-1$
+                  SWT.TRAIL);
+
+            colDef.setColumnCategory(Messages.ColumnFactory_Category_Powertrain);
+            colDef.setColumnLabel(Messages.ColumnFactory_Power_SlowVsFast_CadencePercentages_Label);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_Power_SlowVsFast_CadencePercentages_Header);
+            colDef.setColumnUnit(Messages.ColumnFactory_Power_SlowVsFast_CadencePercentages_Header);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Power_SlowVsFast_CadencePercentages_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
             return colDef;
          }
