@@ -63,6 +63,8 @@ public abstract class TreeColumnFactory {
    public static final TreeColumnFactory POWERTRAIN_GEAR_FRONT_SHIFT_COUNT;
    public static final TreeColumnFactory POWERTRAIN_GEAR_REAR_SHIFT_COUNT;
    public static final TreeColumnFactory POWERTRAIN_PEDAL_LEFT_RIGHT_BALANCE;
+   public static final TreeColumnFactory POWERTRAIN_SLOW_VS_FAST_CADENCE_PERCENTAGES;
+   public static final TreeColumnFactory POWERTRAIN_SLOW_VS_FAST_CADENCE_ZONES_DELIMITER;
 
    public static final TreeColumnFactory RUN_DYN_STANCE_TIME_MIN;
    public static final TreeColumnFactory RUN_DYN_STANCE_TIME_MAX;
@@ -126,7 +128,9 @@ public abstract class TreeColumnFactory {
    public static final TreeColumnFactory TRAINING_TRAINING_EFFECT_ANAEROB;
    public static final TreeColumnFactory TRAINING_TRAINING_PERFORMANCE;
 
-   public static final TreeColumnFactory WEATHER_AVG_TEMPERATURE;
+   public static final TreeColumnFactory WEATHER_TEMPERATURE_AVG;
+   public static final TreeColumnFactory WEATHER_TEMPERATURE_MIN;
+   public static final TreeColumnFactory WEATHER_TEMPERATURE_MAX;
    public static final TreeColumnFactory WEATHER_CLOUDS;
    public static final TreeColumnFactory WEATHER_WIND_DIR;
    public static final TreeColumnFactory WEATHER_WIND_SPEED;
@@ -594,6 +598,50 @@ public abstract class TreeColumnFactory {
                   ValueFormat.NUMBER_1_1,
                   ValueFormat.NUMBER_1_1,
                   columnManager);
+
+            return colDef;
+         }
+      };
+
+      POWERTRAIN_SLOW_VS_FAST_CADENCE_ZONES_DELIMITER = new TreeColumnFactory() {
+
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager,
+                  "POWERTRAIN_SLOW_VS_FAST_CADENCE_ZONES_DELIMITER", //$NON-NLS-1$
+                  SWT.TRAIL);
+
+            colDef.setColumnCategory(Messages.ColumnFactory_Category_Powertrain);
+            colDef.setColumnLabel(Messages.ColumnFactory_Power_SlowVsFast_CadenceZonesDelimiter_Label);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_Power_SlowVsFast_CadenceZonesDelimiter_Header);
+            colDef.setColumnUnit(Messages.ColumnFactory_Power_SlowVsFast_CadenceZonesDelimiter_Header);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Power_SlowVsFast_CadenceZonesDelimiter_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+
+            return colDef;
+         }
+      };
+
+      POWERTRAIN_SLOW_VS_FAST_CADENCE_PERCENTAGES = new TreeColumnFactory() {
+
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager,
+                  "POWERTRAIN_SLOW_VS_FAST_CADENCE_PERCENTAGES", //$NON-NLS-1$
+                  SWT.TRAIL);
+
+            colDef.setColumnCategory(Messages.ColumnFactory_Category_Powertrain);
+            colDef.setColumnLabel(Messages.ColumnFactory_Power_SlowVsFast_CadencePercentages_Label);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_Power_SlowVsFast_CadencePercentages_Header);
+            colDef.setColumnUnit(Messages.ColumnFactory_Power_SlowVsFast_CadencePercentages_Header);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Power_SlowVsFast_CadencePercentages_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
             return colDef;
          }
@@ -2225,22 +2273,78 @@ public abstract class TreeColumnFactory {
        * Weather
        */
 
-      WEATHER_AVG_TEMPERATURE = new TreeColumnFactory() {
+      WEATHER_TEMPERATURE_AVG = new TreeColumnFactory() {
          @Override
          public TreeColumnDefinition createColumn(final ColumnManager columnManager,
                                                   final PixelConverter pixelConverter) {
 
             final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager,
-                  "WEATHER_AVG_TEMPERATURE", //$NON-NLS-1$
+                  "WEATHER_TEMPERATURE_AVG", //$NON-NLS-1$
                   SWT.TRAIL);
 
             final String unitLabel = UI.SYMBOL_AVERAGE_WITH_SPACE + UI.UNIT_LABEL_TEMPERATURE;
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Weather);
-            colDef.setColumnLabel(Messages.ColumnFactory_avg_temperature_label);
+            colDef.setColumnLabel(Messages.ColumnFactory_avg_temperature_label);//Temperature - Average
             colDef.setColumnHeaderText(unitLabel);
             colDef.setColumnUnit(unitLabel);
-            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_avg_temperature_tooltip);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_avg_temperature_tooltip);//Average temperature
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
+            colDef.setValueFormats(
+                  ValueFormatSet.Number,
+                  ValueFormat.NUMBER_1_1,
+                  ValueFormat.NUMBER_1_1,
+                  columnManager);
+
+            return colDef;
+         }
+      };
+
+      WEATHER_TEMPERATURE_MIN = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager,
+                  "WEATHER_TEMPERATURE_MIN", //$NON-NLS-1$
+                  SWT.TRAIL);
+
+            final String unitLabel = UI.SYMBOL_MIN + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE;
+
+            colDef.setColumnCategory(Messages.ColumnFactory_Category_Weather);
+            colDef.setColumnLabel(Messages.ColumnFactory_Temperature_Min_Label);//Temperature - Average
+            colDef.setColumnHeaderText(unitLabel);
+            colDef.setColumnUnit(unitLabel);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Temperature_Min_Tooltip);//Average temperature
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
+            colDef.setValueFormats(
+                  ValueFormatSet.Number,
+                  ValueFormat.NUMBER_1_1,
+                  ValueFormat.NUMBER_1_1,
+                  columnManager);
+
+            return colDef;
+         }
+      };
+
+      WEATHER_TEMPERATURE_MAX = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager,
+                  "WEATHER_TEMPERATURE_MAX", //$NON-NLS-1$
+                  SWT.TRAIL);
+
+            final String unitLabel = UI.SYMBOL_MAX + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE;
+
+            colDef.setColumnCategory(Messages.ColumnFactory_Category_Weather);
+            colDef.setColumnLabel(Messages.ColumnFactory_Temperature_Max_Label);//Temperature - Average
+            colDef.setColumnHeaderText(unitLabel);
+            colDef.setColumnUnit(unitLabel);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Temperature_Max_Tooltip);//Average temperature
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
             colDef.setValueFormats(

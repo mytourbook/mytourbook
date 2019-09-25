@@ -1115,10 +1115,10 @@ public class RawDataManager {
       if (message == null) {
 
          // undefined error
-         TourLogManager.logSubError(reimportedFile.toString());
+         TourLogManager.subLog_Error(reimportedFile.toString());
 
       } else {
-         TourLogManager.logSubError(message);
+         TourLogManager.subLog_Error(message);
       }
 
       return null;
