@@ -23,8 +23,8 @@ public enum FormatterID {
 	TOUR_DESCRIPTION, //
 
 	DISTANCE, //
-	ALTITUDE, //
    ELEVATION_CHANGE, //
+   ELEVATION_GAIN, //
 
 	SPEED, //
 	PACE, //
