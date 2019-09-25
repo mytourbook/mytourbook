@@ -91,6 +91,7 @@ public class Messages extends NLS {
    public static String        Calendar_Profile_Value_Altitude;
    public static String        Calendar_Profile_Value_Description;
    public static String        Calendar_Profile_Value_Distance;
+   public static String        Calendar_Profile_Value_Elevation_Change;
    public static String        Calendar_Profile_Value_Energy_kcal;
    public static String        Calendar_Profile_Value_Energy_MJ;
    public static String        Calendar_Profile_Value_MovingTime;
