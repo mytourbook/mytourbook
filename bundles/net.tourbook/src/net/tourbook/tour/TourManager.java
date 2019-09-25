@@ -1679,6 +1679,9 @@ public class TourManager {
    }
 
    /**
+    * Loads multiple tour data from the database and shows a progressbar when more than 5 tours are
+    * loaded.
+    *
     * @param allTourIds
     * @param allTourData
     *           Contains loaded {@link TourData} for all tour ids which pass the lat/lon check.
@@ -1710,7 +1713,7 @@ public class TourManager {
       // create a unique key for all tours
       final long newOverlayKey[] = { 0 };
 
-      if (allTourIds.size() > 20) {
+      if (allTourIds.size() > 5) {
 
          try {
 

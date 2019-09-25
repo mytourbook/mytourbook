@@ -781,22 +781,19 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _rootItem = new TVITourBookRoot(this);
 
       // delay loading, that the app filters are initialized
-      Display.getCurrent().asyncExec(new Runnable() {
-         @Override
-         public void run() {
+      Display.getCurrent().asyncExec(() -> {
 
-            if (_tourViewer.getTree().isDisposed()) {
-               return;
-            }
-
-            _isInStartup = true;
-
-            _tourViewer.setInput(this);
-
-            reselectTourViewer();
-
-            restoreState_AfterUI();
+         if (_tourViewer.getTree().isDisposed()) {
+            return;
          }
+
+         _isInStartup = true;
+
+         _tourViewer.setInput(this);
+
+         reselectTourViewer();
+
+         restoreState_AfterUI();
       });
    }
 
@@ -3214,6 +3211,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       final int selectedItems = selection.size();
       final boolean isTourSelected = tourItems > 0;
       final boolean isOneTour = tourItems == 1;
+      final boolean isAllToursSelected = _actionSelectAllTours.isChecked();
       boolean isDeviceTour = false;
       boolean canMergeTours = false;
 
@@ -3233,6 +3231,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          canMergeTours = isOneTour && isDeviceTour && firstSavedTour.getMergeSourceTourId() != null;
       }
 
+
       final boolean useWeatherRetrieval = _prefStore.getBoolean(ITourbookPreferences.WEATHER_USE_WEATHER_RETRIEVAL) &&
             !_prefStore.getString(ITourbookPreferences.WEATHER_API_KEY).equals(UI.EMPTY_STRING);
 
@@ -3245,8 +3244,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _tourDoubleClickState.canEditMarker = isOneTour;
       _tourDoubleClickState.canAdjustAltitude = isOneTour;
 
-      _action_AdjustTourValues_SubMenu.setEnabled(isTourSelected);
+      _action_AdjustTourValues_SubMenu.setEnabled(isTourSelected || isAllToursSelected);
       _action_AdjustTourValues_SubMenu.getActionRetrieveWeatherData().setEnabled(useWeatherRetrieval);
+
       _action_Reimport_SubMenu.setEnabled(isTourSelected);
 
       _actionDeleteTour.setEnabled(isTourSelected);
@@ -3944,63 +3944,43 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       return _postSelectionProvider;
    }
 
-   private void getSelectedTourData(final ArrayList<TourData> selectedTourData, final Set<Long> tourIdSet) {
-      for (final Long tourId : tourIdSet) {
-         selectedTourData.add(TourManager.getInstance().getTourData(tourId));
-      }
-   }
-
    @Override
    public Set<Long> getSelectedTourIDs() {
 
       final Set<Long> tourIds = new HashSet<>();
-
       final IStructuredSelection selectedTours = ((IStructuredSelection) _tourViewer.getSelection());
-      if (selectedTours.size() < 2) {
 
-         // one item is selected
+      for (final Iterator<?> tourIterator = selectedTours.iterator(); tourIterator.hasNext();) {
 
-         final Object selectedItem = selectedTours.getFirstElement();
-         if (selectedItem instanceof TVITourBookYear) {
+         final Object viewItem = tourIterator.next();
+
+         if (viewItem instanceof TVITourBookYear) {
 
             // one year is selected
 
             if (_actionSelectAllTours.isChecked()) {
 
                // loop: all months
-               for (final TreeViewerItem viewerItem : ((TVITourBookYear) selectedItem).getFetchedChildren()) {
+               for (final TreeViewerItem viewerItem : ((TVITourBookYear) viewItem).getFetchedChildren()) {
                   if (viewerItem instanceof TVITourBookYearSub) {
                      getYearSubTourIDs((TVITourBookYearSub) viewerItem, tourIds);
                   }
                }
             }
 
-         } else if (selectedItem instanceof TVITourBookYearSub) {
+         } else if (viewItem instanceof TVITourBookYearSub) {
 
             // one month/week is selected
 
             if (_actionSelectAllTours.isChecked()) {
-               getYearSubTourIDs((TVITourBookYearSub) selectedItem, tourIds);
+               getYearSubTourIDs((TVITourBookYearSub) viewItem, tourIds);
             }
 
-         } else if (selectedItem instanceof TVITourBookTour) {
+         } else if (viewItem instanceof TVITourBookTour) {
 
             // one tour is selected
 
-            tourIds.add(((TVITourBookTour) selectedItem).getTourId());
-         }
-
-      } else {
-
-         // multiple items are selected
-
-         // get all selected tours, ignore year and month items
-         for (final Iterator<?> tourIterator = selectedTours.iterator(); tourIterator.hasNext();) {
-            final Object viewItem = tourIterator.next();
-
-            if (viewItem instanceof TVITourBookTour) {
-               tourIds.add(((TVITourBookTour) viewItem).getTourId());
-            }
+            tourIds.add(((TVITourBookTour) viewItem).getTourId());
          }
       }
 
@@ -4011,24 +3991,13 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    public ArrayList<TourData> getSelectedTours() {
 
       // get selected tour id's
-
       final Set<Long> tourIds = getSelectedTourIDs();
 
-      /*
-       * show busyindicator when multiple tours needs to be retrieved from the database
-       */
       final ArrayList<TourData> selectedTourData = new ArrayList<>();
 
-      if (tourIds.size() > 1) {
-         BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-            @Override
-            public void run() {
-               getSelectedTourData(selectedTourData, tourIds);
-            }
-         });
-      } else {
-         getSelectedTourData(selectedTourData, tourIds);
-      }
+      BusyIndicator.showWhile(Display.getCurrent(), () -> {
+         TourManager.loadTourData(new ArrayList<>(tourIds), selectedTourData, false);
+      });
 
       return selectedTourData;
    }

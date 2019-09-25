@@ -49,15 +49,22 @@ public class TVITourBookYearSub extends TVITourBookItem {
    protected void fetchChildren() {
 
       /*
-       * set the children for the yearSub (month,week,...) item, these are tour items
+       * Set the children for the yearSub (month,week,...) item, these are tour items
        */
       String sumYear = UI.EMPTY_STRING;
       String sumYearSub = UI.EMPTY_STRING;
 
       if (_category == YearSubCategory.WEEK) {
+
+         // categorize by week
+
          sumYear = "startWeekYear"; //$NON-NLS-1$
          sumYearSub = "startWeek"; //$NON-NLS-1$
-      } else { // default to month
+
+      } else {
+
+         // categorize by month (default)
+
          sumYear = "startYear"; //$NON-NLS-1$
          sumYearSub = "startMonth"; //$NON-NLS-1$
       }
@@ -68,7 +75,7 @@ public class TVITourBookYearSub extends TVITourBookItem {
       final SQLFilter sqlFilter = new SQLFilter(SQLFilter.TAG_FILTER);
 
       final String sqlString = UI.NEW_LINE
-            //
+
             + "SELECT " //                                              //$NON-NLS-1$
             //
             + "startYear, " //                                    1     //$NON-NLS-1$
@@ -183,13 +190,13 @@ public class TVITourBookYearSub extends TVITourBookItem {
             + "training_TrainingEffect_Anaerob, " //              77    //$NON-NLS-1$
             + "training_TrainingPerformance, " //                 78    //$NON-NLS-1$
 
-            // ---------- CADENCE ZONE -------------                    
+            // ---------- CADENCE ZONE -------------
 
             + "cadenceZone_SlowTime, " //                         79    //$NON-NLS-1$
             + "cadenceZone_FastTime, " //                         80    //$NON-NLS-1$
             + "cadenceZones_DelimiterValue, " //                  81    //$NON-NLS-1$
 
-            // ---------- WEATHER -------------                         
+            // ---------- WEATHER -------------
 
             + "weather_Temperature_Min, " //                      82    //$NON-NLS-1$
             + "weather_Temperature_Max " //                       83    //$NON-NLS-1$
@@ -415,7 +422,6 @@ public class TVITourBookYearSub extends TVITourBookItem {
 
                   tourItem.colSlowVsFastCadence = cadenceZone_SlowPercentage + " - " + cadenceZone_FastPercentage; //$NON-NLS-1$
                }
-
 
                // -----------------------------------------------
 

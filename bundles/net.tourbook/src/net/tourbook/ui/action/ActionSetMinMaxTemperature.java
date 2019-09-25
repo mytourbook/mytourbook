@@ -15,30 +15,27 @@
  *******************************************************************************/
 package net.tourbook.ui.action;
 
-import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
+import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.SQL;
-import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourLogManager;
+import net.tourbook.tour.TourLogState;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.dialogs.ProgressMonitorDialog;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
 
@@ -61,11 +58,18 @@ public class ActionSetMinMaxTemperature extends Action {
          return;
       }
 
+      TourLogManager.showLogView();
+
+      TourLogManager.logDefault(Messages.Log_SetMinMaxTemperature_Startup);
+      TourLogManager.addSubLog(TourLogState.DEFAULT, Messages.Log_App_LoadingSelectedTours);
+
       final ArrayList<TourData> selectedTours = _tourProvider.getSelectedTours();
+
+      TourLogManager.logSubInfo(NLS.bind(Messages.Log_App_LoadedTours, selectedTours.size()));
 
       if (selectedTours == null || selectedTours.size() < 1) {
 
-         // a tour is not selected -> this should not happen, action should be disabled
+         // tours are not selected -> this can occure when loading tour data is canceled
 
          return;
       }
@@ -85,58 +89,48 @@ public class ActionSetMinMaxTemperature extends Action {
 
          // canceled
 
+         TourLogManager.logError(Messages.Log_App_Canceled);
+
          return;
       }
 
       // compute min/max temperature
 
-      TourLogManager.showLogView();
+      final long start = System.currentTimeMillis();
 
+      boolean isTaskDone = false;
+
+      Connection conn = null;
       try {
 
-         final IRunnableWithProgress runnable = new IRunnableWithProgress() {
-            @Override
-            public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+         conn = TourDatabase.getInstance().getConnection();
 
-               boolean isTaskDone = false;
+         isTaskDone = setMinMaxTemperature(conn, selectedTours);
 
-               Connection conn = null;
-               try {
+      } catch (final SQLException e) {
 
-                  conn = TourDatabase.getInstance().getConnection();
+         SQL.showException(e);
 
-                  isTaskDone = run_SetMinMaxTemperature(conn, monitor, selectedTours);
+      } finally {
 
-               } catch (final SQLException e) {
+         TourLogManager.logDefault(String.format(Messages.Log_App_PerformedInNSeconds, (System.currentTimeMillis() - start) / 1000.0));
 
-                  SQL.showException(e);
+         Util.closeSql(conn);
 
-               } finally {
+         if (isTaskDone) {
 
-                  Util.closeSql(conn);
+            TourManager.getInstance().clearTourDataCache();
 
-                  if (isTaskDone) {
+            Display.getDefault().asyncExec(new Runnable() {
+               @Override
+               public void run() {
 
-                     TourManager.getInstance().clearTourDataCache();
-
-                     Display.getDefault().asyncExec(new Runnable() {
-                        @Override
-                        public void run() {
-
-                           TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR);
-                           TourManager.fireEvent(TourEventId.ALL_TOURS_ARE_MODIFIED);
-                        }
-                     });
-
-                  }
+                  TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR);
+                  TourManager.fireEvent(TourEventId.ALL_TOURS_ARE_MODIFIED);
                }
-            }
-         };
+            });
 
-         new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, false, runnable);
-
-      } catch (final Exception e) {
-         StatusUtil.log(e);
+         }
       }
    }
 
@@ -145,39 +139,36 @@ public class ActionSetMinMaxTemperature extends Action {
     * {@link TimeTools#calendarWeek}
     *
     * @param conn
-    * @param monitor
     * @param selectedTours
-    * @return Returns <code>true</code> when the week is computed
+    * @return Returns <code>true</code> when values are computed or <code>false</code> when nothing
+    *         was done.
     * @throws SQLException
     */
-   private boolean run_SetMinMaxTemperature(final Connection conn,
-                                            final IProgressMonitor monitor,
-                                            final ArrayList<TourData> selectedTours) throws SQLException {
+   private boolean setMinMaxTemperature(final Connection conn,
+                                        final ArrayList<TourData> selectedTours) throws SQLException {
 
       boolean isUpdated = false;
 
-      final PreparedStatement stmtUpdate = conn.prepareStatement(
+      final PreparedStatement stmtUpdate = conn.prepareStatement(UI.EMPTY_STRING
 
-            "UPDATE " + TourDatabase.TABLE_TOUR_DATA //  //$NON-NLS-1$
-                  + " SET" //                            //$NON-NLS-1$
-                  + " weather_Temperature_Min=?, " //    //$NON-NLS-1$
-                  + " weather_Temperature_Max=? " //     //$NON-NLS-1$
-                  + " WHERE tourId=?"); //               //$NON-NLS-1$
+            + "UPDATE " + TourDatabase.TABLE_TOUR_DATA //   //$NON-NLS-1$
 
-      int tourIdx = 1;
+            + " SET" //                                     //$NON-NLS-1$
+
+            + " weather_Temperature_Min=?, " //             //$NON-NLS-1$
+            + " weather_Temperature_Max=? " //              //$NON-NLS-1$
+
+            + " WHERE tourId=?"); //                        //$NON-NLS-1$
+
+      int numComputedTour = 0;
+      int numNotComputedTour = 0;
 
       // loop over all tours and calculate and set min/max temperature
       for (final TourData tourData : selectedTours) {
 
-         if (monitor != null) {
-            final String msg = NLS.bind(
-                  Messages.Tour_Database_Update_MinMaxTemperature,
-                  new Object[] { tourIdx++, selectedTours.size() });
-
-            monitor.subTask(msg);
-         }
-
          if (tourData.temperatureSerie == null || tourData.temperatureSerie.length == 0) {
+
+            numNotComputedTour++;
 
          } else {
 
@@ -192,7 +183,14 @@ public class ActionSetMinMaxTemperature extends Action {
             stmtUpdate.executeUpdate();
 
             isUpdated = true;
+            numComputedTour++;
          }
+      }
+
+      TourLogManager.addSubLog(TourLogState.IMPORT_OK, NLS.bind(Messages.Log_SetMinMaxTemperature_Success, numComputedTour));
+
+      if (numNotComputedTour >= 0) {
+         TourLogManager.addSubLog(TourLogState.IMPORT_ERROR, NLS.bind(Messages.Log_SetMinMaxTemperature_NoSuccess, numNotComputedTour));
       }
 
       return isUpdated;
