@@ -19,6 +19,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.ZonedDateTime;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.TreeViewerItem;
@@ -66,7 +67,11 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             + "FrontShiftCount,           " + NL //$NON-NLS-1$
             + "RearShiftCount,            " + NL //$NON-NLS-1$
 
-            + "surfing_NumberOfEvents     " + NL //$NON-NLS-1$
+            + "surfing_NumberOfEvents,    " + NL //$NON-NLS-1$
+
+            + "cadenceZone_SlowTime,      " + NL //$NON-NLS-1$
+            + "cadenceZone_FastTime,      " + NL //$NON-NLS-1$
+            + "cadenceZones_DelimiterValue" + NL //$NON-NLS-1$
       ;
 
       SQL_SUM_COLUMNS = NL
@@ -89,16 +94,20 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             + "AVG( CASE WHEN WeatherWindSpd = 0   THEN NULL ELSE WeatherWindSpd END ),   " + NL //                              13   //$NON-NLS-1$
             + "AVG( CASE WHEN RestPulse = 0        THEN NULL ELSE RestPulse END ),        " + NL //                              14   //$NON-NLS-1$
             //
-            + "SUM( CAST(Calories AS BIGINT)),              " + NL // 15   //$NON-NLS-1$
-            + "SUM( CAST(Power_TotalWork AS BIGINT)),       " + NL // 16   //$NON-NLS-1$
+            + "SUM( CAST(Calories AS BIGINT)),               " + NL // 15   //$NON-NLS-1$
+            + "SUM( CAST(Power_TotalWork AS BIGINT)),        " + NL // 16   //$NON-NLS-1$
 
-            + "SUM( CAST(NumberOfTimeSlices AS BIGINT)),    " + NL // 17   //$NON-NLS-1$
-            + "SUM( CAST(NumberOfPhotos AS BIGINT)),        " + NL // 18   //$NON-NLS-1$
+            + "SUM( CAST(NumberOfTimeSlices AS BIGINT)),     " + NL // 17   //$NON-NLS-1$
+            + "SUM( CAST(NumberOfPhotos AS BIGINT)),         " + NL // 18   //$NON-NLS-1$
             //
-            + "SUM( CAST(FrontShiftCount AS BIGINT)),       " + NL // 19   //$NON-NLS-1$
-            + "SUM( CAST(RearShiftCount AS BIGINT)),        " + NL // 20   //$NON-NLS-1$
+            + "SUM( CAST(FrontShiftCount AS BIGINT)),        " + NL // 19   //$NON-NLS-1$
+            + "SUM( CAST(RearShiftCount AS BIGINT)),         " + NL // 20   //$NON-NLS-1$
 
-            + "SUM( CAST(Surfing_NumberOfEvents AS BIGINT)) " + NL // 21   //$NON-NLS-1$
+            + "SUM( CAST(Surfing_NumberOfEvents AS BIGINT)), " + NL // 21   //$NON-NLS-1$
+
+            + "SUM( CAST(cadenceZone_SlowTime AS BIGINT)),   " + NL // 22   //$NON-NLS-1$
+            + "SUM( CAST(cadenceZone_FastTime AS BIGINT)),   " + NL // 23   //$NON-NLS-1$
+            + "AVG( CASE WHEN cadenceZones_DelimiterValue = 0        THEN NULL ELSE cadenceZones_DelimiterValue END ) " + NL // 24   //$NON-NLS-1$                           14
       ;
 
    }
@@ -124,7 +133,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
    String       colTimeZoneId;
 
    String       colTourTitle;
-   long         colPersonId;          // tourPerson_personId
+   long         colPersonId;                // tourPerson_personId
 
    long         colCounter;
    long         colCalories;
@@ -169,6 +178,9 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
    long         colRearShiftCount;
 
    float        colCadenceMultiplier;
+
+   String       colSlowVsFastCadence;
+   int          colCadenceZonesDelimiter;
 
    // ----------- Running Dynamics ---------
 
@@ -283,6 +295,22 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 // SET_FORMATTING_ON
 
       colPausedTime = colTourRecordingTime - colTourDrivingTime;
+
+      colSlowVsFastCadence = UI.EMPTY_STRING;
+      final int cadenceZone_SlowTime = result.getInt(startIndex + 22);
+      final int cadenceZone_FastTime = result.getInt(startIndex + 23);
+      final int totalCadenceZone_SlowTime = cadenceZone_SlowTime == -1 ? 0 : cadenceZone_SlowTime;
+      final int totalCadenceZone_FastTime = cadenceZone_FastTime == -1 ? 0 : cadenceZone_FastTime;
+
+      final int totalCadenceTime = totalCadenceZone_SlowTime + totalCadenceZone_FastTime;
+      if (totalCadenceTime != 0) {
+         final int cadenceZone_SlowPercentage = Math.round(totalCadenceZone_SlowTime * 100f / totalCadenceTime);
+         final int cadenceZone_FastPercentage = Math.round(totalCadenceZone_FastTime * 100f / totalCadenceTime);
+
+         colSlowVsFastCadence = cadenceZone_SlowPercentage + " - " + cadenceZone_FastPercentage; //$NON-NLS-1$
+      }
+
+      colCadenceZonesDelimiter = result.getInt(startIndex + 24);
    }
 
    @Override

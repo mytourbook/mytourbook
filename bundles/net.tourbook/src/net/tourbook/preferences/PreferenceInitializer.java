@@ -439,6 +439,9 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       // DP tolerance when computing altitude up/down
       store.setDefault(ITourbookPreferences.COMPUTED_ALTITUDE_DP_TOLERANCE, 7.0f);
 
+      // Cadence zones delimiter
+      store.setDefault(ITourbookPreferences.CADENCE_ZONES_DELIMITER, 70);
+
       /*
        * view column tooltip
        */
