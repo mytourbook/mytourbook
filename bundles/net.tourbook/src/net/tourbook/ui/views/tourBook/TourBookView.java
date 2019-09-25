@@ -984,9 +984,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       defineColumn_Power_TotalWork();
 
       // Powertrain - Antrieb/Pedal
+      defineColumn_Powertrain_AvgCadence();
       defineColumn_Powertrain_SlowVsFastCadencePercentage();
       defineColumn_Powertrain_SlowVsFastCadenceZonesDelimiter();
-      defineColumn_Powertrain_AvgCadence();
       defineColumn_Powertrain_CadenceMultiplier();
       defineColumn_Powertrain_Gear_FrontShiftCount();
       defineColumn_Powertrain_Gear_RearShiftCount();
