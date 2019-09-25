@@ -366,7 +366,7 @@ public class TourManager {
       // ensure data are available
       if (temperatureSerie == null) {
 
-         TourLogManager.logSubError(
+         TourLogManager.subLog_Error(
                String.format(//
                      LOG_TEMP_ADJUST_010_NO_TEMPERATURE_DATA_SERIE,
                      getTourDateTimeShort(tourData)));
@@ -376,7 +376,7 @@ public class TourManager {
 
       if (timeSerie == null) {
 
-         TourLogManager.logSubError(
+         TourLogManager.subLog_Error(
                String.format(//
                      LOG_TEMP_ADJUST_011_NO_TIME_DATA_SERIE,
                      getTourDateTimeShort(tourData)));
@@ -402,7 +402,7 @@ public class TourManager {
       // an initial temperature could not be computed because the tour is too short
       if (initialTemperature == Integer.MIN_VALUE) {
 
-         TourLogManager.logSubError(
+         TourLogManager.subLog_Error(
                String.format(//
                      LOG_TEMP_ADJUST_005_TOUR_IS_TOO_SHORT,
                      getTourDateTimeShort(tourData)));
@@ -1679,8 +1679,7 @@ public class TourManager {
    }
 
    /**
-    * Loads multiple tour data from the database and shows a progressbar when more than 5 tours are
-    * loaded.
+    * Loads multiple tour data from the database and shows a progressbar when it takes longer.
     *
     * @param allTourIds
     * @param allTourData
@@ -1710,10 +1709,33 @@ public class TourManager {
 
       allTourData.clear();
 
+      final long start = System.currentTimeMillis();
+      boolean isLongDuration = false;
+
       // create a unique key for all tours
       final long newOverlayKey[] = { 0 };
+      final int tourIndex[] = { 0 };
+      final int loadCounter[] = { 0 };
+      final int numTourIds = allTourIds.size();
 
-      if (allTourIds.size() > 5) {
+      for (; tourIndex[0] < numTourIds;) {
+
+         final Long tourId = allTourIds.get(tourIndex[0]);
+         loadTourData_OneTour(tourId, allTourData, isCheckLatLon, newOverlayKey);
+
+         /*
+          * Check if this is a long duration -> run in progress monitor
+          */
+         final long runDuration = System.currentTimeMillis() - start;
+         if (runDuration > 500) {
+            isLongDuration = true;
+            break;
+         }
+
+         ++tourIndex[0];
+      }
+
+      if (isLongDuration) {
 
          try {
 
@@ -1722,33 +1744,24 @@ public class TourManager {
                public void run(final IProgressMonitor monitor)
                      throws InvocationTargetException, InterruptedException {
 
-                  int loadCounter = 0;
-                  final int idSize = allTourIds.size();
+                  monitor.beginTask(Messages.Tour_Data_LoadTourData_Monitor, numTourIds);
 
-                  monitor.beginTask(Messages.Tour_Data_LoadTourData_Monitor, idSize);
+                  for (; tourIndex[0] < numTourIds;) {
 
-                  for (final Long tourId : allTourIds) {
-
-                     monitor.subTask(
-                           NLS.bind(//
-                                 Messages.Tour_Data_LoadTourData_Monitor_SubTask,
-                                 ++loadCounter,
-                                 idSize));
+                     monitor.subTask(NLS.bind(Messages.Tour_Data_LoadTourData_Monitor_SubTask,
+                           ++loadCounter[0],
+                           numTourIds));
 
                      if (monitor.isCanceled()) {
                         break;
                      }
 
-                     final TourData tourData = getInstance().getTourData(tourId);
-
-                     if (isCheckLatLon == false || isLatLonAvailable(tourData)) {
-
-                        // keep tour data for each tour id
-                        allTourData.add(tourData);
-                        newOverlayKey[0] += tourData.getTourId();
-                     }
+                     final Long tourId = allTourIds.get(tourIndex[0]);
+                     loadTourData_OneTour(tourId, allTourData, isCheckLatLon, newOverlayKey);
 
                      monitor.worked(1);
+
+                     ++tourIndex[0];
                   }
                }
             };
@@ -1764,20 +1777,6 @@ public class TourManager {
          } catch (final InterruptedException e) {
             StatusUtil.showStatus(e);
          }
-
-      } else {
-
-         for (final Long tourId : allTourIds) {
-
-            final TourData tourData = getInstance().getTourData(tourId);
-
-            if (isCheckLatLon == false || isLatLonAvailable(tourData)) {
-
-               // keep tour data for each tour id
-               allTourData.add(tourData);
-               newOverlayKey[0] += tourData.getTourId();
-            }
-         }
       }
 
       _allLoaded_TourIds_Hash = allTourIds.hashCode();
@@ -1786,6 +1785,23 @@ public class TourManager {
       _allLoaded_TourData_Key = newOverlayKey[0];
 
       return _allLoaded_TourData_Key;
+   }
+
+   private static void loadTourData_OneTour(final Long tourId,
+                                            final ArrayList<TourData> allTourData,
+                                            final boolean isCheckLatLon,
+                                            final long[] newOverlayKey) {
+
+      final TourData tourData = getInstance().getTourData(tourId);
+
+      if (isCheckLatLon == false || isLatLonAvailable(tourData)) {
+
+         // keep tour data for each tour id
+         allTourData.add(tourData);
+
+         // update key for all tours
+         newOverlayKey[0] += tourData.getTourId();
+      }
    }
 
    /**
@@ -2244,7 +2260,7 @@ public class TourManager {
       // ensure data is available
       if (tourData.latitudeSerie == null || tourData.longitudeSerie == null) {
 
-         TourLogManager.logSubError(
+         TourLogManager.subLog_Error(
                String.format(
                      LOG_RETRIEVE_WEATHER_DATA_010_NO_GPS_DATA_SERIE,
                      getTourDateTimeShort(tourData)));
@@ -2256,7 +2272,7 @@ public class TourManager {
 
       final WeatherData historicalWeatherData = historicalWeatherRetriever.retrieve().getHistoricalWeatherData();
       if (historicalWeatherData == null) {
-         TourLogManager.logSubError(
+         TourLogManager.subLog_Error(
                NLS.bind(
                      Messages.Dialog_RetrieveWeather_WeatherDataNotFound,
                      new Object[] {
