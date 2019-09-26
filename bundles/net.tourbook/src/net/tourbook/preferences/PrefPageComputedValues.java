@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.preferences;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 
@@ -23,6 +25,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.form.FormTools;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
+import net.tourbook.database.IComputeNoDataserieValues;
 import net.tourbook.database.IComputeTourValues;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.BreakTimeMethod;
@@ -1012,18 +1015,33 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
       final int[] total_Old_CadenceZone_FastTime = { 0 };
       final int[] total_New_CadenceZone_FastTime = { 0 };
 
-      final IComputeTourValues computeTourValueConfig = new IComputeTourValues() {
+      final IComputeNoDataserieValues computeTourValueConfig = new IComputeNoDataserieValues() {
 
          @Override
-         public boolean computeTourValues(final TourData oldTourData) {
+         public boolean computeTourValues(final TourData originalTourData, final PreparedStatement sqlUpdateStatement) throws SQLException {
 
-            old_CadenceZone_SlowTime[0] = oldTourData.getCadenceZone_SlowTime();
+            // keep old values
+            old_CadenceZone_SlowTime[0] = originalTourData.getCadenceZone_SlowTime();
             total_Old_CadenceZone_SlowTime[0] += old_CadenceZone_SlowTime[0];
-            old_CadenceZone_FastTime[0] = oldTourData.getCadenceZone_FastTime();
+            old_CadenceZone_FastTime[0] = originalTourData.getCadenceZone_FastTime();
             total_Old_CadenceZone_FastTime[0] += old_CadenceZone_FastTime[0];
 
-            // recompute times for each cadence zone
-            return oldTourData.computeCadenceZonesTimes();
+            if (originalTourData.computeCadenceZonesTimes() == false) {
+               // cadence zones times could not be computed
+               return false;
+            }
+
+            // update total new values
+            total_New_CadenceZone_SlowTime[0] += originalTourData.getCadenceZone_SlowTime();
+            total_New_CadenceZone_FastTime[0] += originalTourData.getCadenceZone_FastTime();
+
+            // update cadence zones times in the database
+            sqlUpdateStatement.setInt(1, originalTourData.getCadenceZone_SlowTime());
+            sqlUpdateStatement.setInt(2, originalTourData.getCadenceZone_FastTime());
+            sqlUpdateStatement.setInt(3, originalTourData.getCadenceZones_DelimiterValue());
+            sqlUpdateStatement.setLong(4, originalTourData.getTourId());
+
+            return true;
          }
 
          @Override
@@ -1039,33 +1057,14 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
          }
 
          @Override
-         public String getSubTaskText(final TourData savedTourData) {
+         public String getSQLUpdateStatement() {
 
-            String subTaskText = null;
-
-            if (savedTourData != null) {
-
-               // get new values
-               final int new_CadenceZone_SlowTime = savedTourData.getCadenceZone_SlowTime();
-               total_New_CadenceZone_SlowTime[0] += new_CadenceZone_SlowTime;
-               final int new_CadenceZone_FastTime = savedTourData.getCadenceZone_FastTime();
-               total_New_CadenceZone_FastTime[0] += new_CadenceZone_FastTime;
-
-               subTaskText = net.tourbook.common.UI.NEW_LINE +
-                     NLS.bind(
-                           Messages.Compute_CadenceZonesTimes_ComputeForAllTours_Job_SubTask,
-                           new Object[] {
-                                 net.tourbook.common.UI.format_hh_mm_ss(old_CadenceZone_SlowTime[0]),
-                                 net.tourbook.common.UI.format_hh_mm_ss(new_CadenceZone_SlowTime),
-                                 net.tourbook.common.UI.format_hh_mm_ss(old_CadenceZone_FastTime[0]),
-                                 net.tourbook.common.UI.format_hh_mm_ss(new_CadenceZone_FastTime), });
-            }
-
-            return subTaskText;
+            return TourManager.cadenceZonesTimes_StatementUpdate;
          }
+
       };
 
-      TourDatabase.computeAnyValues_ForAllTours(computeTourValueConfig, null);
+      TourDatabase.computeNoDataserieValues_ForAllTours(computeTourValueConfig, null);
 
       fireTourModifyEvent();
    }
