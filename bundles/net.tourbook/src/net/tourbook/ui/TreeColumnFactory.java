@@ -31,6 +31,7 @@ public abstract class TreeColumnFactory {
    public static final TreeColumnFactory ALTITUDE_DOWN;
    public static final TreeColumnFactory ALTITUDE_UP;
    public static final TreeColumnFactory ALTITUDE_MAX;
+   public static final TreeColumnFactory AVG_ALTITUDE_CHANGE;
 
    public static final TreeColumnFactory BODY_CALORIES;
    public static final TreeColumnFactory BODY_PERSON;
@@ -194,6 +195,26 @@ public abstract class TreeColumnFactory {
             colDef.setColumnHeaderText(unitLabel);
             colDef.setColumnUnit(unitLabel);
             colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_altitude_up_tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+
+            return colDef;
+         }
+      };
+
+      AVG_ALTITUDE_CHANGE = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "AVG_ALTITUDE_CHANGE", SWT.TRAIL); //$NON-NLS-1$
+            final String unitLabel = UI.SYMBOL_AVERAGE + UI.SPACE + UI.UNIT_LABEL_ALTITUDE + "/" + UI.UNIT_LABEL_DISTANCE;// UI.UNIT_LABEL_ALTITUDE + UI.SPACE + UI.SYMBOL_ARROW_UP;
+
+            colDef.setColumnCategory(Messages.ColumnFactory_Category_Altitude);
+            colDef.setColumnLabel(Messages.ColumnFactory_avg_altitude_change_label);
+            colDef.setColumnHeaderText(unitLabel);
+            colDef.setColumnUnit(unitLabel);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_avg_altitude_change_tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 

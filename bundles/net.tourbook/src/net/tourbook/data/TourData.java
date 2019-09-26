@@ -355,6 +355,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    @XmlElement
    private int                   tourAltDown;
 
+
+   /**
+    * Average altitude change (m/km)
+    */
+   @XmlElement
+   private int                   tourAvgAltChange;
+
    // ############################################# PULSE/WEIGHT/POWER #############################################
 
    /**
@@ -2732,6 +2739,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return altitudeUpTotal > 0 ? altitudeUpTotal : altitudeDownTotal;
    }
 
+   /**
+    * Computes the average elevation change with given values of elevation gain, loss and total
+    * distance.
+    *
+    * @return
+    *         If successful, the average elevation change of a given tour, 0 otherwise.
+    */
+   public void computeAvg_AltitudeChange() {
+
+      tourAvgAltChange = tourDistance <= 0f ? 0 : (int) ((tourAltUp + tourAltDown) / (tourDistance / 1000f));
+   }
+
    private void computeAvg_Cadence() {
 
       if (cadenceSerie == null) {
@@ -3248,7 +3267,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    /**
     * Computes time (seconds) spent in each cadence zone (slow and fast).
-    *
     */
    public boolean computeCadenceZonesTimes() {
 
@@ -3316,6 +3334,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       computeMaxPulse();
       computeMaxSpeed();
 
+      computeAvg_AltitudeChange();
       computeAvg_Pulse();
       computeAvg_Cadence();
       computeAvg_Temperature();

@@ -110,7 +110,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             + "AVG( CASE WHEN cadenceZones_DelimiterValue = 0 THEN NULL ELSE cadenceZones_DelimiterValue END ), " + NL // 24   //$NON-NLS-1$
 
             + "MIN(CASE WHEN weather_Temperature_Min = 0 THEN NULL ELSE weather_Temperature_Min END), " + NL // 25   //$NON-NLS-1$
-            + "MAX(CASE WHEN weather_Temperature_Max = 0 THEN NULL ELSE weather_Temperature_Max END)  " + NL // 25   //$NON-NLS-1$
+            + "MAX(CASE WHEN weather_Temperature_Max = 0 THEN NULL ELSE weather_Temperature_Max END)  " + NL // 26   //$NON-NLS-1$
       ;
 
    }
@@ -149,6 +149,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
    long         colAltitudeUp;
    long         colAltitudeDown;
+   float        colAvgAltitudeChange;
 
    float        colMaxSpeed;
    long         colMaxAltitude;
@@ -264,6 +265,11 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
       colAltitudeUp        = result.getLong(startIndex + 3);
       colAltitudeDown      = result.getLong(startIndex + 4);
+
+      // VERY IMPORTANT !
+      // Note that we don't do an AVG(tourAvgAltChange) as it would return wrong results.
+      // Indeed, we can't do an mean average as we need to do a distance-weighted average.
+      colAvgAltitudeChange  = colTourDistance <= 0 ? 0 : (colAltitudeUp + colAltitudeDown) / (colTourDistance / 1000f);
 
       colCounter           = result.getLong(startIndex + 5);
 
