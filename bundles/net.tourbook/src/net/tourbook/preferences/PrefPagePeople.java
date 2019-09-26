@@ -418,7 +418,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          }
       };
 
-      final boolean isCanceled = TourDatabase.computeValuesForAllTours(computeTourValueConfig, null);
+      final boolean isCanceled = TourDatabase.computeAnyValues_ForAllTours(computeTourValueConfig, null);
 
       boolean returnValue = true;
 
