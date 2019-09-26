@@ -1244,9 +1244,9 @@ public class Messages extends NLS {
    public static String        Log_App_PerformedInNSeconds;
 
    public static String        Log_ComputeCadenceZonesTimes_001_Start;
-   public static String        Log_ComputeCadenceZonesTimes_010_Computed;
-   public static String        Log_ComputeCadenceZonesTimes_011_No_Time_Or_Cadence_Series;
    public static String        Log_ComputeCadenceZonesTimes_002_End;
+   public static String        Log_ComputeCadenceZonesTimes_010_Success;
+   public static String        Log_ComputeCadenceZonesTimes_011_NoSuccess;
 
    public static String        Log_EasyImport_000_ImportStart;
    public static String        Log_EasyImport_001_BackupTourFiles;
