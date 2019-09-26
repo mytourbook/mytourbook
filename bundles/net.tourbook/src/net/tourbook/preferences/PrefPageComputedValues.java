@@ -988,7 +988,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
          }
       };
 
-      TourDatabase.computeValuesForAllTours(computeTourValueConfig, null);
+      TourDatabase.computeAnyValues_ForAllTours(computeTourValueConfig, null);
 
       fireTourModifyEvent();
    }
@@ -1065,7 +1065,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
          }
       };
 
-      TourDatabase.computeValuesForAllTours(computeTourValueConfig, null);
+      TourDatabase.computeAnyValues_ForAllTours(computeTourValueConfig, null);
 
       fireTourModifyEvent();
    }
@@ -1131,7 +1131,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
          }
       };
 
-      TourDatabase.computeValuesForAllTours(computeTourValueConfig, null);
+      TourDatabase.computeAnyValues_ForAllTours(computeTourValueConfig, null);
 
       fireTourModifyEvent();
    }

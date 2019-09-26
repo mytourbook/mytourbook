@@ -16,6 +16,9 @@
 package net.tourbook.tour;
 
 import java.lang.reflect.InvocationTargetException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoField;
 import java.util.ArrayList;
@@ -503,46 +506,68 @@ public class TourManager {
       _allLoaded_TourData = null;
    }
 
-   /**
-    * Computes time (seconds) spent in each cadence zone (slow and fast).
-    *
-    * @param tourDataList
-    * @return Returns <code>true</code> when time values are computed and {@link TourData} are
-    *         updated but not yet saved.
-    */
-   public static boolean computeCadenceZonesTimes(final ArrayList<TourData> tourDataList) {
 
-      if (tourDataList == null || tourDataList.size() == 0) {
-         return false;
+
+   /**
+    * Computes time (seconds) spent in each cadence zone (slow and fast) for several given tours.
+    *
+    * @param conn
+    * @param selectedTours
+    * @return Returns <code>true</code> when values are computed or <code>false</code> when nothing
+    *         was done.
+    * @throws SQLException
+    */
+   public static boolean computeCadenceZonesTimes(final Connection conn,
+                                        final ArrayList<TourData> selectedTours) throws SQLException {
+
+      boolean isUpdated = false;
+
+      final PreparedStatement stmtUpdate = conn.prepareStatement(UI.EMPTY_STRING
+
+            + "UPDATE " + TourDatabase.TABLE_TOUR_DATA //   //$NON-NLS-1$
+
+            + " SET" //                                     //$NON-NLS-1$
+
+            + " cadenceZone_SlowTime=?, " //                //$NON-NLS-1$
+            + " cadenceZone_FastTime=?, " //                 //$NON-NLS-1$
+            + " cadenceZones_DelimiterValue=? " //          //$NON-NLS-1$
+
+            + " WHERE tourId=?"); //                        //$NON-NLS-1$
+
+      int numComputedTour = 0;
+      int numNotComputedTour = 0;
+
+      // loop over all tours and compute each cadence zone time
+      for (final TourData tourData : selectedTours) {
+
+         final boolean timeComputed = tourData.computeCadenceZonesTimes();
+         if (!timeComputed) {
+
+            numNotComputedTour++;
+
+         } else {
+
+            // update cadence zones times in the database
+            stmtUpdate.setInt(1, tourData.getCadenceZone_SlowTime());
+            stmtUpdate.setInt(2, tourData.getCadenceZone_FastTime());
+            stmtUpdate.setInt(3, tourData.getCadenceZones_DelimiterValue());
+            stmtUpdate.setLong(4, tourData.getTourId());
+
+            stmtUpdate.executeUpdate();
+
+            isUpdated = true;
+            numComputedTour++;
+         }
       }
 
-      final boolean[] retValue = { false };
+      TourLogManager.addSubLog(TourLogState.IMPORT_OK, NLS.bind(Messages.Log_ComputeCadenceZonesTimes_010_Success, numComputedTour));
 
-      BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-         @Override
-         public void run() {
+      if (numNotComputedTour >= 0) {
+         TourLogManager.addSubLog(TourLogState.IMPORT_ERROR,
+               NLS.bind(Messages.Log_ComputeCadenceZonesTimes_011_NoSuccess, numNotComputedTour));
+      }
 
-            TourLogManager.addLog(TourLogState.DEFAULT, NLS.bind(Messages.Log_ComputeCadenceZonesTimes_001_Start, tourDataList.size()));
-
-            for (final TourData tourData : tourDataList) {
-
-               final boolean isComputed = tourData.computeCadenceZonesTimes();
-               final String tourDateTime = TourManager.getTourDateTimeShort(tourData);
-
-               if (isComputed) {
-                  TourLogManager.addLog(TourLogState.INFO, NLS.bind(Messages.Log_ComputeCadenceZonesTimes_010_Computed, tourDateTime));
-
-                  retValue[0] = true;
-               } else {
-                  TourLogManager.addLog(TourLogState.IMPORT_ERROR,
-                        NLS.bind(Messages.Log_ComputeCadenceZonesTimes_011_No_Time_Or_Cadence_Series, tourDateTime));
-               }
-
-            }
-         }
-      });
-
-      return retValue[0];
+      return isUpdated;
    }
 
    /**

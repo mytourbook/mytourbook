@@ -430,7 +430,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * The delimiter used when computing the existing values of cadenceZone_SlowTime & cadenceZone_FastTime
     */
-   @SuppressWarnings("unused")
    private int                   cadenceZones_DelimiterValue;
 
    /**
@@ -6822,6 +6821,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    public int getCadenceZone_SlowTime() {
       return cadenceZone_SlowTime;
+   }
+
+   public int getCadenceZones_DelimiterValue() {
+      return cadenceZones_DelimiterValue;
    }
 
    /**

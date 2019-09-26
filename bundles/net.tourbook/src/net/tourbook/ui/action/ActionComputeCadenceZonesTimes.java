@@ -15,10 +15,16 @@
  *******************************************************************************/
 package net.tourbook.ui.action;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
+import net.tourbook.common.util.SQL;
+import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
+import net.tourbook.database.TourDatabase;
+import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
@@ -44,7 +50,16 @@ public class ActionComputeCadenceZonesTimes extends Action {
    @Override
    public void run() {
 
+      // check if the tour editor contains a modified tour
+      if (TourManager.isTourEditorModified()) {
+         return;
+      }
+
       final ArrayList<TourData> selectedTours = _tourProvider.getSelectedTours();
+      if (selectedTours == null || selectedTours.size() < 1) {
+         // tours are not selected -> this can occur when loading tour data is canceled
+         return;
+      }
 
       if (MessageDialog.openConfirm(
             Display.getCurrent().getActiveShell(),
@@ -57,15 +72,36 @@ public class ActionComputeCadenceZonesTimes extends Action {
 
       TourLogManager.showLogView();
 
-      if (TourManager.computeCadenceZonesTimes(selectedTours)) {
+      Connection sqlConnection = null;
+      boolean isTaskDone = false;
+      try {
 
-         // save all modified tours
-         TourManager.saveModifiedTours(selectedTours);
+         sqlConnection = TourDatabase.getInstance().getConnection();
+
+         isTaskDone = TourManager.computeCadenceZonesTimes(sqlConnection, selectedTours);
+
+      } catch (final SQLException e) {
+         SQL.showException(e);
+      } finally {
+
+         TourLogManager.logDefault(String.format(Messages.Log_ComputeCadenceZonesTimes_002_End, (System.currentTimeMillis() - start) / 1000.0));
+
+         Util.closeSql(sqlConnection);
+
+         if (isTaskDone) {
+
+            TourManager.getInstance().clearTourDataCache();
+
+            Display.getDefault().asyncExec(new Runnable() {
+               @Override
+               public void run() {
+
+                  TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR);
+                  TourManager.fireEvent(TourEventId.ALL_TOURS_ARE_MODIFIED);
+               }
+            });
+
+         }
       }
-
-      TourLogManager.logDefault(String.format(
-            Messages.Log_ComputeCadenceZonesTimes_002_End,
-            (System.currentTimeMillis() - start) / 1000.0));
-
    }
 }
