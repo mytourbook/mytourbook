@@ -206,7 +206,7 @@ public class FitLogSAXHandler extends DefaultHandler {
       private boolean hasTimeZoneUtcOffset = false;
       private boolean hasStartTime         = false;
 
-      private boolean _hasGpsData          = false;
+      private boolean hasGpsData           = false;
 
       private int     avgCadence;
 //      private int               maxCadence;      is not yet supported
@@ -391,7 +391,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 
          // If the activity doesn't have GPS data but contains a distance value,
          // we set the distance manually
-         if (!_currentActivity._hasGpsData &&
+         if (!_currentActivity.hasGpsData &&
                _currentActivity.distance > 0) {
             tourData.setTourDistance(_currentActivity.distance);
          }
@@ -426,10 +426,10 @@ public class FitLogSAXHandler extends DefaultHandler {
          tourData.setAvgCadence(_currentActivity.avgCadence);
       }
 
-      // No need to set the timezone Id if the activity has GPS coordinates as it was already done
-      // when the time series were created.
+      // No need to set the timezone Id if the activity has GPS coordinates (as it was already done
+      // when the time series were created) or if the activity has not time zone UTC offset or no start time.
       if ((tourData.latitudeSerie == null || tourData.latitudeSerie.length == 0) &&
-            _currentActivity.hasTimeZoneUtcOffset) {
+            _currentActivity.hasTimeZoneUtcOffset && _currentActivity.hasStartTime) {
          final String[] zoneIds = TimeZone.getAvailableIDs(tourStartTime_FromImport.getOffset().getTotalSeconds() * 1000);
 
          //We set the first found time zone that corresponds to the activity offset
@@ -1077,7 +1077,7 @@ public class FitLogSAXHandler extends DefaultHandler {
          if (latitude != Double.MIN_VALUE && longitude != Double.MIN_VALUE) {
             _prevLatitude = latitude;
             _prevLongitude = longitude;
-            _currentActivity._hasGpsData = true;
+            _currentActivity.hasGpsData = true;
          }
 
          timeSlice.absoluteDistance = (float) _distanceAbsolute;

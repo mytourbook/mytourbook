@@ -19,7 +19,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
-   private static final String BUNDLE_NAME = "net.tourbook.ui.messages";               //$NON-NLS-1$
+   private static final String BUNDLE_NAME = "net.tourbook.ui.messages";                    //$NON-NLS-1$
 
    public static String        ColumnFactory_altitude_computed_difference_tooltip;
    public static String        ColumnFactory_altitude_difference_label;
@@ -281,6 +281,12 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Power_Normalized_Tooltip;
    public static String        ColumnFactory_Power_PowerToWeight_Header;
    public static String        ColumnFactory_Power_PowerToWeight_Tooltip;
+   public static String        ColumnFactory_Power_SlowVsFast_CadenceZonesDelimiter_Header;
+   public static String        ColumnFactory_Power_SlowVsFast_CadenceZonesDelimiter_Label;
+   public static String        ColumnFactory_Power_SlowVsFast_CadenceZonesDelimiter_Tooltip;
+   public static String        ColumnFactory_Power_SlowVsFast_CadencePercentages_Header;
+   public static String        ColumnFactory_Power_SlowVsFast_CadencePercentages_Label;
+   public static String        ColumnFactory_Power_SlowVsFast_CadencePercentages_Tooltip;
    public static String        ColumnFactory_Power_TotalWork;
    public static String        ColumnFactory_Power_TotalWork_Tooltip;
    public static String        ColumnFactory_Power_TrainingStressScore_Header;
@@ -352,6 +358,11 @@ public class Messages extends NLS {
    public static String        ColumnFactory_TagNotes_Header;
    public static String        ColumnFactory_TagNotes_Label;
    public static String        ColumnFactory_TagNotes_Tooltip;
+
+   public static String        ColumnFactory_Temperature_Max_Label;
+   public static String        ColumnFactory_Temperature_Max_Tooltip;
+   public static String        ColumnFactory_Temperature_Min_Label;
+   public static String        ColumnFactory_Temperature_Min_Tooltip;
 
    public static String        ColumnFactory_TimeDelta_Header;
    public static String        ColumnFactory_TimeDelta_Label;
