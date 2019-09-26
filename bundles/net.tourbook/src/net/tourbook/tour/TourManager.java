@@ -506,8 +506,6 @@ public class TourManager {
       _allLoaded_TourData = null;
    }
 
-
-
    /**
     * Computes time (seconds) spent in each cadence zone (slow and fast) for several given tours.
     *
@@ -518,7 +516,9 @@ public class TourManager {
     * @throws SQLException
     */
    public static boolean computeCadenceZonesTimes(final Connection conn,
-                                        final ArrayList<TourData> selectedTours) throws SQLException {
+                                                  final ArrayList<TourData> selectedTours) throws SQLException {
+
+      TourLogManager.addLog(TourLogState.DEFAULT, NLS.bind(Messages.Log_ComputeCadenceZonesTimes_001_Start, selectedTours.size()));
 
       boolean isUpdated = false;
 
