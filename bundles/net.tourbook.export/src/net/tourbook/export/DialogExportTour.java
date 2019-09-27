@@ -193,13 +193,13 @@ public class DialogExportTour extends TitleAreaDialog {
 
    private final String              _formatTemplate;
 
-   private final IDialogSettings     _state              = TourbookPlugin
-         .getState("DialogExportTour");                                                                                            //$NON-NLS-1$
+   private final IDialogSettings     _state = TourbookPlugin
+         .getState("DialogExportTour");                                       //$NON-NLS-1$
 
    private final ExportTourExtension _exportExtensionPoint;
+
    private final ArrayList<TourData> _tourDataList;
    private final int                 _tourStartIndex;
-
    private final int                 _tourEndIndex;
 
    /**
@@ -228,11 +228,12 @@ public class DialogExportTour extends TitleAreaDialog {
     * Is <code>true</code> when multiple tours are exported.
     */
    private boolean                   _isSetup_MultipleTours;
-   private int                       _mergedDistance;
 
+   private int                       _mergedDistance;
    private ZonedDateTime             _mergedTime;
 
    private Point                     _shellDefaultSize;
+
    private float                     _exportState_CamouflageSpeed;
    private FileCollisionBehavior     _exportState_FileCollisionBehaviour;
    private boolean                   _exportState_isAbsoluteDistance;
@@ -240,12 +241,11 @@ public class DialogExportTour extends TitleAreaDialog {
    private boolean                   _exportState_IsDescription;
    private boolean                   _exportState_IsMergeTours;
    private boolean                   _exportState_IsOverwriteFiles;
-
    private boolean                   _exportState_IsRange;
+
    private boolean                   _exportState_GPX_IsExportAllTourData;
    private boolean                   _exportState_GPX_IsExportMarkers;
    private boolean                   _exportState_GPX_IsExportSurfingWaves;
-
    private boolean                   _exportState_GPX_IsExportWithBarometer;
    private String                    _exportState_TCX_CourseName;
    private String                    _exportState_TCX_ActivityType;
@@ -254,48 +254,48 @@ public class DialogExportTour extends TitleAreaDialog {
    private boolean                   _exportState_TCX_IsActivities;
 
    private PixelConverter            _pc;
+
    /*
     * UI controls
     */
-   private Button                    _btnSelectDirectory;
+   private Button    _btnSelectDirectory;
+   private Button    _btnSelectFile;
 
-   private Button                    _btnSelectFile;
-   private Button                    _chkCamouflageSpeed;
-   private Button                    _chkExportTourRange;
-   private Button                    _chkMergeAllTours;
+   private Button    _chkCamouflageSpeed;
+   private Button    _chkExportTourRange;
+   private Button    _chkMergeAllTours;
+   private Button    _chkOverwriteFiles;
 
-   private Button                    _chkOverwriteFiles;
-   private Button                    _chkGPX_Description;
-   private Button                    _rdoGPX_DistanceAbsolute;
-   private Button                    _rdoGPX_DistanceRelative;
-   private Button                    _chkGPX_Markers;
-   private Button                    _chkGPX_NoneGPXFields;
-   private Button                    _chkGPX_SurfingWaves;
+   private Button    _chkGPX_Description;
+   private Button    _rdoGPX_DistanceAbsolute;
+   private Button    _rdoGPX_DistanceRelative;
+   private Button    _chkGPX_Markers;
+   private Button    _chkGPX_NoneGPXFields;
+   private Button    _chkGPX_SurfingWaves;
+   private Button    _chkGPX_WithBarometer;
 
-   private Button                    _chkGPX_WithBarometer;
-   private Button                    _chkTCX_Description;
-   private Button                    _rdoTCX_Activities;
-   private Button                    _rdoTCX_Courses;
-   private Button                    _rdoTCX_NameFromField;
+   private Button    _chkTCX_Description;
+   private Button    _rdoTCX_Activities;
+   private Button    _rdoTCX_Courses;
+   private Button    _rdoTCX_NameFromField;
+   private Button    _rdoTCX_NameFromTour;
 
-   private Button                    _rdoTCX_NameFromTour;
-   private Combo                     _comboFile;
-   private Combo                     _comboPath;
-   private Combo                     _comboTcxCourseName;
-   private Combo                     _comboTcxActivityTypes;
+   private Combo     _comboFile;
+   private Combo     _comboPath;
+   private Combo     _comboTcxActivityTypes;
+   private Combo     _comboTcxCourseName;
 
-   private Composite                 _dlgContainer;
+   private Composite _dlgContainer;
+   private Composite _inputContainer;
 
-   private Composite                 _inputContainer;
-   private Label                     _lblCoumouflageSpeedUnit;
-   private Label                     _lblTcxCourseName;
-   private Label                     _lblTcxNameFrom;
+   private Label     _lblCoumouflageSpeedUnit;
+   private Label     _lblTcxActivityType;
+   private Label     _lblTcxCourseName;
+   private Label     _lblTcxNameFrom;
 
-   private Label                     _lblTcxActivityType;
+   private Spinner   _spinnerCamouflageSpeed;
 
-   private Spinner                   _spinnerCamouflageSpeed;
-
-   private Text                      _txtFilePath;
+   private Text      _txtFilePath;
 
    /**
     * @param parentShell
