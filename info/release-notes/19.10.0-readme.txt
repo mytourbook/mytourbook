@@ -45,6 +45,11 @@ New + Improvements
 * Tour Book View
   - Show min/max temperature values
   - Set min/max temperature values from time slices
+
+* TCX Export
+  - An activity type can now be specified when exporting activities in TCX
+    format. By default, the Strava activity types are proposed 
+    (see https://developers.strava.com/docs/uploads/)
   
   
 Import
