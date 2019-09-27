@@ -9,7 +9,7 @@
 			<Name>$coursename</Name>
 #else
 	<Activities>
-		<Activity Sport="Biking">
+		<Activity Sport="$activityType">
 #end
 			<Id>$dateformat.format($starttime)</Id>
 			<Lap StartTime="$dateformat.format($starttime)">

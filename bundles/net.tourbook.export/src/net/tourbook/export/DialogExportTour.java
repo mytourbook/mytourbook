@@ -29,6 +29,7 @@ import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
@@ -114,6 +115,8 @@ public class DialogExportTour extends TitleAreaDialog {
    private static final String STATE_GPX_IS_EXPORT_SURFING_WAVES = "STATE_GPX_IS_EXPORT_SURFING_WAVES"; //$NON-NLS-1$
    private static final String STATE_GPX_IS_WITH_BAROMETER       = "STATE_GPX_IS_WITH_BAROMETER";       //$NON-NLS-1$
 
+   private static final String STATE_TCX_ACTIVITY_TYPES          = "STATE_TCX_ACTIVITY_TYPES";          //$NON-NLS-1$
+   private static final String STATE_TCX_ACTIVITY_TYPE           = "STATE_TCX_ACTIVITY_TYPE";           //$NON-NLS-1$
    private static final String STATE_TCX_IS_COURSES              = "STATE_TCX_IS_COURSES";              //$NON-NLS-1$
    private static final String STATE_TCX_IS_EXPORT_DESCRITION    = "STATE_TCX_IS_EXPORT_DESCRITION";    //$NON-NLS-1$
    private static final String STATE_TCX_IS_NAME_FROM_TOUR       = "STATE_TCX_IS_NAME_FROM_TOUR";       //$NON-NLS-1$
@@ -184,15 +187,19 @@ public class DialogExportTour extends TitleAreaDialog {
       _dateFormat.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
    }
 
+   private final static String[]     StravaActivityTypes = new String[] {
+         "Biking", "Running", "Hiking", "Walking", "Swimming"                                                                      //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+   };
+
    private final String              _formatTemplate;
 
-   private final IDialogSettings     _state = TourbookPlugin
-         .getState("DialogExportTour");                                       //$NON-NLS-1$
+   private final IDialogSettings     _state              = TourbookPlugin
+         .getState("DialogExportTour");                                                                                            //$NON-NLS-1$
 
    private final ExportTourExtension _exportExtensionPoint;
-
    private final ArrayList<TourData> _tourDataList;
    private final int                 _tourStartIndex;
+
    private final int                 _tourEndIndex;
 
    /**
@@ -221,12 +228,11 @@ public class DialogExportTour extends TitleAreaDialog {
     * Is <code>true</code> when multiple tours are exported.
     */
    private boolean                   _isSetup_MultipleTours;
-
    private int                       _mergedDistance;
+
    private ZonedDateTime             _mergedTime;
 
    private Point                     _shellDefaultSize;
-
    private float                     _exportState_CamouflageSpeed;
    private FileCollisionBehavior     _exportState_FileCollisionBehaviour;
    private boolean                   _exportState_isAbsoluteDistance;
@@ -234,57 +240,62 @@ public class DialogExportTour extends TitleAreaDialog {
    private boolean                   _exportState_IsDescription;
    private boolean                   _exportState_IsMergeTours;
    private boolean                   _exportState_IsOverwriteFiles;
-   private boolean                   _exportState_IsRange;
 
+   private boolean                   _exportState_IsRange;
    private boolean                   _exportState_GPX_IsExportAllTourData;
    private boolean                   _exportState_GPX_IsExportMarkers;
    private boolean                   _exportState_GPX_IsExportSurfingWaves;
-   private boolean                   _exportState_GPX_IsExportWithBarometer;
 
+   private boolean                   _exportState_GPX_IsExportWithBarometer;
    private String                    _exportState_TCX_CourseName;
+   private String                    _exportState_TCX_ActivityType;
+
    private boolean                   _exportState_TCX_IsCourses;
+   private boolean                   _exportState_TCX_IsActivities;
 
    private PixelConverter            _pc;
-
    /*
     * UI controls
     */
-   private Button    _btnSelectDirectory;
-   private Button    _btnSelectFile;
+   private Button                    _btnSelectDirectory;
 
-   private Button    _chkCamouflageSpeed;
-   private Button    _chkExportTourRange;
-   private Button    _chkMergeAllTours;
-   private Button    _chkOverwriteFiles;
+   private Button                    _btnSelectFile;
+   private Button                    _chkCamouflageSpeed;
+   private Button                    _chkExportTourRange;
+   private Button                    _chkMergeAllTours;
 
-   private Button    _chkGPX_Description;
-   private Button    _rdoGPX_DistanceAbsolute;
-   private Button    _rdoGPX_DistanceRelative;
-   private Button    _chkGPX_Markers;
-   private Button    _chkGPX_NoneGPXFields;
-   private Button    _chkGPX_SurfingWaves;
-   private Button    _chkGPX_WithBarometer;
+   private Button                    _chkOverwriteFiles;
+   private Button                    _chkGPX_Description;
+   private Button                    _rdoGPX_DistanceAbsolute;
+   private Button                    _rdoGPX_DistanceRelative;
+   private Button                    _chkGPX_Markers;
+   private Button                    _chkGPX_NoneGPXFields;
+   private Button                    _chkGPX_SurfingWaves;
 
-   private Button    _chkTCX_Description;
-   private Button    _rdoTCX_Activities;
-   private Button    _rdoTCX_Courses;
-   private Button    _rdoTCX_NameFromField;
-   private Button    _rdoTCX_NameFromTour;
+   private Button                    _chkGPX_WithBarometer;
+   private Button                    _chkTCX_Description;
+   private Button                    _rdoTCX_Activities;
+   private Button                    _rdoTCX_Courses;
+   private Button                    _rdoTCX_NameFromField;
 
-   private Combo     _comboFile;
-   private Combo     _comboPath;
-   private Combo     _comboTcxCourseName;
+   private Button                    _rdoTCX_NameFromTour;
+   private Combo                     _comboFile;
+   private Combo                     _comboPath;
+   private Combo                     _comboTcxCourseName;
+   private Combo                     _comboTcxActivityTypes;
 
-   private Composite _dlgContainer;
-   private Composite _inputContainer;
+   private Composite                 _dlgContainer;
 
-   private Label     _lblCoumouflageSpeedUnit;
-   private Label     _lblTcxCourseName;
-   private Label     _lblTcxNameFrom;
+   private Composite                 _inputContainer;
+   private Label                     _lblCoumouflageSpeedUnit;
+   private Label                     _lblTcxCourseName;
+   private Label                     _lblTcxNameFrom;
 
-   private Spinner   _spinnerCamouflageSpeed;
+   private Label                     _lblTcxActivityType;
 
-   private Text      _txtFilePath;
+   private Spinner                   _spinnerCamouflageSpeed;
+
+   private Text                      _txtFilePath;
 
    /**
     * @param parentShell
@@ -790,7 +801,7 @@ public class DialogExportTour extends TitleAreaDialog {
             GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerActivities);
             {
                /*
-                * radio: activities
+                * radio: courses
                 */
                _rdoTCX_Courses = new Button(containerActivities, SWT.RADIO);
                GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_rdoTCX_Courses);
@@ -806,6 +817,19 @@ public class DialogExportTour extends TitleAreaDialog {
                _rdoTCX_Activities.setText(Messages.Dialog_Export_Radio_TCX_Aktivities);
                _rdoTCX_Activities.setToolTipText(Messages.Dialog_Export_Radio_TCX_Aktivities_Tooltip);
                _rdoTCX_Activities.addSelectionListener(defaultSelectionListener);
+
+               /*
+                * label: Activity type
+                */
+               _lblTcxActivityType = new Label(container, SWT.NONE);
+               GridDataFactory.fillDefaults().applyTo(_lblTcxActivityType);
+               _lblTcxActivityType.setText(Messages.Dialog_Export_Label_TCX_ActivityType);
+
+               /*
+                * combo: Activity types
+                */
+               _comboTcxActivityTypes = new Combo(container, SWT.SINGLE | SWT.BORDER);
+               GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(_comboTcxActivityTypes);
             }
          }
 
@@ -1021,6 +1045,9 @@ public class DialogExportTour extends TitleAreaDialog {
          _exportState_isAbsoluteDistance = true;
 
          _exportState_IsDescription = _chkTCX_Description.getSelection();
+
+         _exportState_TCX_IsActivities = _rdoTCX_Activities.getSelection();
+         _exportState_TCX_ActivityType = _comboTcxActivityTypes.getText();
 
          _exportState_TCX_IsCourses = _rdoTCX_Courses.getSelection();
          _exportState_TCX_CourseName = _comboTcxCourseName.getText();
@@ -1473,6 +1500,10 @@ public class DialogExportTour extends TitleAreaDialog {
                }
             }
          }
+      }
+
+      if (_exportState_TCX_IsActivities) {
+         vcContext.put("activityType", _exportState_TCX_ActivityType); //$NON-NLS-1$
       }
 
       if (starttime != null) {
@@ -1962,11 +1993,15 @@ public class DialogExportTour extends TitleAreaDialog {
       } else if (_isSetup_TCX) {
 
          final boolean isCourse = _rdoTCX_Courses.getSelection();
+         final boolean isActivity = _rdoTCX_Activities.getSelection();
          final boolean isFromField = _rdoTCX_NameFromField.getSelection();
 
          _lblTcxNameFrom.setEnabled(isCourse);
          _rdoTCX_NameFromTour.setEnabled(isCourse);
          _rdoTCX_NameFromField.setEnabled(isCourse);
+
+         _lblTcxActivityType.setEnabled(isActivity);
+         _comboTcxActivityTypes.setEnabled(isActivity);
 
          _lblTcxCourseName.setEnabled(isCourse && isFromField);
          _comboTcxCourseName.setEnabled(isCourse && isFromField);
@@ -1979,6 +2014,10 @@ public class DialogExportTour extends TitleAreaDialog {
       _lblCoumouflageSpeedUnit.setEnabled(isCamouflageSpeed);
 
       setFileName();
+   }
+
+   private String getActivityType() {
+      return _comboTcxActivityTypes.getText().trim();
    }
 
    private String getCourseName() {
@@ -2088,6 +2127,25 @@ public class DialogExportTour extends TitleAreaDialog {
 
          UI.restoreCombo(_comboTcxCourseName, _state.getArray(STATE_TCX_COURSE_NAME));
 
+         final String[] activityTypes = _state.getArray(STATE_TCX_ACTIVITY_TYPES);
+         if (activityTypes == null) {
+            /*
+             * Fill-up the default activity types
+             */
+            for (final String activitType : StravaActivityTypes) {
+               _comboTcxActivityTypes.add(activitType);
+            }
+         } else {
+            UI.restoreCombo(_comboTcxActivityTypes, activityTypes);
+         }
+
+         final String lastSelected_ActivityType = _state.get(STATE_TCX_ACTIVITY_TYPE);
+         if (lastSelected_ActivityType == null) {
+            _comboTcxActivityTypes.select(0);
+         } else {
+            _comboTcxActivityTypes.select(_comboTcxActivityTypes.indexOf(lastSelected_ActivityType));
+         }
+
          updateUI_CourseName();
       }
 
@@ -2130,6 +2188,14 @@ public class DialogExportTour extends TitleAreaDialog {
          _state.put(
                STATE_TCX_COURSE_NAME,
                Util.getUniqueItems(_comboTcxCourseName.getItems(), getCourseName(), COMBO_HISTORY_LENGTH));
+
+         final String currentText = _comboTcxActivityTypes.getText();
+         final List<String> comboItems = Arrays.asList(_comboTcxActivityTypes.getItems());
+         if (!comboItems.contains(currentText)) {
+            _comboTcxActivityTypes.add(getActivityType());
+         }
+         _state.put(STATE_TCX_ACTIVITY_TYPES, _comboTcxActivityTypes.getItems());
+         _state.put(STATE_TCX_ACTIVITY_TYPE, getActivityType());
       }
 
       // merge all tours

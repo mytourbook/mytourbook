@@ -282,6 +282,7 @@ public class Messages extends NLS {
    public static String        Dialog_Export_Group_What;
    public static String        Dialog_Export_Group_What_Tooltip;
    public static String        Dialog_Export_Label_GPX_DistanceValues;
+   public static String        Dialog_Export_Label_TCX_ActivityType;
    public static String        Dialog_Export_Label_TCX_CourseName;
    public static String        Dialog_Export_Label_TCX_NameFrom;
    public static String        Dialog_Export_Label_TCX_NameFrom_Tooltip;
