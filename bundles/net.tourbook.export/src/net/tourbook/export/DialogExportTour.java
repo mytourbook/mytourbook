@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -36,6 +36,21 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
+
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.Util;
+import net.tourbook.data.TourData;
+import net.tourbook.data.TourMarker;
+import net.tourbook.data.TourWayPoint;
+import net.tourbook.database.TourDatabase;
+import net.tourbook.ext.velocity.VelocityService;
+import net.tourbook.extension.export.ExportTourExtension;
+import net.tourbook.tour.TourManager;
+import net.tourbook.ui.FileCollisionBehavior;
 
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
@@ -86,21 +101,6 @@ import org.eclipse.swt.widgets.Text;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.osgi.framework.Version;
-
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.UI;
-import net.tourbook.common.time.TimeTools;
-import net.tourbook.common.util.StatusUtil;
-import net.tourbook.common.util.Util;
-import net.tourbook.data.TourData;
-import net.tourbook.data.TourMarker;
-import net.tourbook.data.TourWayPoint;
-import net.tourbook.database.TourDatabase;
-import net.tourbook.ext.velocity.VelocityService;
-import net.tourbook.extension.export.ExportTourExtension;
-import net.tourbook.tour.TourManager;
-import net.tourbook.ui.FileCollisionBehavior;
 
 public class DialogExportTour extends TitleAreaDialog {
 
@@ -2216,7 +2216,7 @@ public class DialogExportTour extends TitleAreaDialog {
          String postFilename = UI.EMPTY_STRING;
 
          if (_isSetup_GPX && _chkGPX_SurfingWaves.getSelection()) {
-            
+
             // append surfing parameters
 
             postFilename = String.format(
