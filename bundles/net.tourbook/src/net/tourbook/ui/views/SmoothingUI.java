@@ -205,7 +205,7 @@ public class SmoothingUI {
          }
       };
 
-      TourDatabase.computeValuesForAllTours(computeTourValueConfig, null);
+      TourDatabase.computeAnyValues_ForAllTours(computeTourValueConfig, null);
 
       fireTourModifyEvent();
    }

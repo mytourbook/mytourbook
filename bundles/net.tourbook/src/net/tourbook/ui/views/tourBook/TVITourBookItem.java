@@ -38,40 +38,44 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
       SQL_SUM_FIELDS = NL
 
-            + "TourDistance,              " + NL //$NON-NLS-1$
-            + "TourRecordingTime,         " + NL //$NON-NLS-1$
-            + "TourDrivingTime,           " + NL //$NON-NLS-1$
-            + "TourAltUp,                 " + NL //$NON-NLS-1$
-            + "TourAltDown,               " + NL //$NON-NLS-1$
+            + "TourDistance,                " + NL //$NON-NLS-1$
+            + "TourRecordingTime,           " + NL //$NON-NLS-1$
+            + "TourDrivingTime,             " + NL //$NON-NLS-1$
+            + "TourAltUp,                   " + NL //$NON-NLS-1$
+            + "TourAltDown,                 " + NL //$NON-NLS-1$
 
-            + "MaxAltitude,               " + NL //$NON-NLS-1$
-            + "MaxPulse,                  " + NL //$NON-NLS-1$
-            + "MaxSpeed,                  " + NL //$NON-NLS-1$
+            + "MaxAltitude,                 " + NL //$NON-NLS-1$
+            + "MaxPulse,                    " + NL //$NON-NLS-1$
+            + "MaxSpeed,                    " + NL //$NON-NLS-1$
 
-            + "AvgCadence,                " + NL //$NON-NLS-1$
-            + "AvgPulse,                  " + NL //$NON-NLS-1$
-            + "AvgTemperature,            " + NL //$NON-NLS-1$
-            + "CadenceMultiplier,         " + NL //$NON-NLS-1$
-            + "TemperatureScale,          " + NL //$NON-NLS-1$
-            + "WeatherWindDir,            " + NL //$NON-NLS-1$
-            + "WeatherWindSpd,            " + NL //$NON-NLS-1$
+            + "AvgCadence,                  " + NL //$NON-NLS-1$
+            + "AvgPulse,                    " + NL //$NON-NLS-1$
+            + "AvgTemperature,              " + NL //$NON-NLS-1$
+            + "CadenceMultiplier,           " + NL //$NON-NLS-1$
+            + "TemperatureScale,            " + NL //$NON-NLS-1$
+            + "WeatherWindDir,              " + NL //$NON-NLS-1$
+            + "WeatherWindSpd,              " + NL //$NON-NLS-1$
 
-            + "Calories,                  " + NL //$NON-NLS-1$
-            + "RestPulse,                 " + NL //$NON-NLS-1$
+            + "Calories,                    " + NL //$NON-NLS-1$
+            + "RestPulse,                   " + NL //$NON-NLS-1$
 
-            + "Power_TotalWork,           " + NL //$NON-NLS-1$
+            + "Power_TotalWork,             " + NL //$NON-NLS-1$
 
-            + "NumberOfTimeSlices,        " + NL //$NON-NLS-1$
-            + "NumberOfPhotos,            " + NL //$NON-NLS-1$
+            + "NumberOfTimeSlices,          " + NL //$NON-NLS-1$
+            + "NumberOfPhotos,              " + NL //$NON-NLS-1$
 
-            + "FrontShiftCount,           " + NL //$NON-NLS-1$
-            + "RearShiftCount,            " + NL //$NON-NLS-1$
+            + "FrontShiftCount,             " + NL //$NON-NLS-1$
+            + "RearShiftCount,              " + NL //$NON-NLS-1$
 
-            + "surfing_NumberOfEvents,    " + NL //$NON-NLS-1$
+            + "surfing_NumberOfEvents,      " + NL //$NON-NLS-1$
 
-            + "cadenceZone_SlowTime,      " + NL //$NON-NLS-1$
-            + "cadenceZone_FastTime,      " + NL //$NON-NLS-1$
-            + "cadenceZones_DelimiterValue" + NL //$NON-NLS-1$
+            + "cadenceZone_SlowTime,        " + NL //$NON-NLS-1$
+            + "cadenceZone_FastTime,        " + NL //$NON-NLS-1$
+            + "cadenceZones_DelimiterValue, " + NL //$NON-NLS-1$
+
+            + "weather_Temperature_Min,     " + NL //$NON-NLS-1$
+            + "weather_Temperature_Max      " + NL //$NON-NLS-1$
+
       ;
 
       SQL_SUM_COLUMNS = NL
