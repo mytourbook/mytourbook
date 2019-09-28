@@ -31,7 +31,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -832,30 +831,6 @@ public class TourDatabase {
       }
    }
 
-   private static void computeComputedValuesForAllTours(final SplashManager splashManager) {
-
-      final ArrayList<Long> tourList = getAllTourIds();
-
-      // loop: all tours, compute computed fields and save the tour
-      int tourCounter = 1;
-      for (final Long tourId : tourList) {
-
-         if (splashManager != null) {
-            splashManager.setMessage(
-                  NLS.bind(
-                        Messages.Tour_Database_update_tour, //
-                        new Object[] { tourCounter++, tourList.size() }));
-         }
-
-         final TourData tourData = getTourFromDb(tourId);
-         if (tourData != null) {
-
-            tourData.computeComputedValues();
-            saveTour(tourData, false);
-         }
-      }
-   }
-
    /**
     * @return
     */
@@ -867,13 +842,7 @@ public class TourDatabase {
     *           computed.
     * @return
     */
-   public static boolean computeValuesForAllTours(final IComputeTourValues runner, final ArrayList<Long> tourIds) {
-
-      final Shell shell = Display.getDefault().getActiveShell();
-
-      final NumberFormat nf = NumberFormat.getNumberInstance();
-      nf.setMinimumFractionDigits(0);
-      nf.setMaximumFractionDigits(0);
+   public static boolean computeAnyValues_ForAllTours(final IComputeTourValues runner, final ArrayList<Long> tourIds) {
 
       final int[] tourCounter = new int[] { 0 };
       final int[] tourListSize = new int[] { 0 };
@@ -928,10 +897,8 @@ public class TourDatabase {
 
                   // create sub task text
                   final StringBuilder sb = new StringBuilder();
-                  sb.append(
-                        NLS.bind(
-                              Messages.tour_database_computeComputeValues_subTask, //
-                              new Object[] { tourCounter[0], tourListSize[0], }));
+                  sb.append(NLS.bind(Messages.tour_database_computeComputeValues_subTask,
+                        new Object[] { tourCounter[0], tourListSize[0], }));
 
                   sb.append(UI.DASH_WITH_DOUBLE_SPACE);
                   sb.append(tourCounter[0] * 100 / tourListSize[0]);
@@ -951,14 +918,11 @@ public class TourDatabase {
                   isCanceled[0] = true;
                   break;
                }
-
-////            // debug test
-//               if (tourCounter[0] > 0) {
-//                  break;
-//               }
             }
          }
       };
+
+      final Shell shell = Display.getDefault().getActiveShell();
 
       try {
 
@@ -988,6 +952,177 @@ public class TourDatabase {
                shell,
                Messages.tour_database_computeComputedValues_resultTitle,
                sb.toString());
+      }
+
+      return isCanceled[0];
+   }
+
+   private static void computeAnyValues_ForAllTours(final SplashManager splashManager) {
+
+      final ArrayList<Long> tourList = getAllTourIds();
+
+      // loop: all tours, compute computed fields and save the tour
+      int tourCounter = 1;
+      for (final Long tourId : tourList) {
+
+         if (splashManager != null) {
+            splashManager.setMessage(
+                  NLS.bind(
+                        Messages.Tour_Database_update_tour, //
+                        new Object[] { tourCounter++, tourList.size() }));
+         }
+
+         final TourData tourData = getTourFromDb(tourId);
+         if (tourData != null) {
+
+            tourData.computeComputedValues();
+            saveTour(tourData, false);
+         }
+      }
+   }
+
+   /**
+    * @param tourRunner
+    *           {@link IComputeNoDataserieValues} interface to compute values for one tour
+    * @param tourIds
+    *           Tour ID's which should be computed, when <code>null</code>, ALL tours will be
+    *           computed.
+    * @return
+    */
+   public static boolean computeNoDataserieValues_ForAllTours(final IComputeNoDataserieValues tourRunner, final ArrayList<Long> tourIds) {
+
+      final int[] numCurrentlyProcessedTours = new int[] { 0 };
+      final int[] numAllTours = new int[] { 0 };
+      final boolean[] isCanceled = new boolean[] { false };
+
+      /*
+       * Runnable to compute values
+       */
+      final IRunnableWithProgress runnable = new IRunnableWithProgress() {
+         @Override
+         public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+
+            Connection conn = null;
+            try {
+
+               conn = TourDatabase.getInstance().getConnection();
+
+               run_AllTours(conn, monitor);
+
+            } catch (final SQLException e) {
+
+               net.tourbook.common.util.SQL.showException(e);
+
+            } finally {
+
+               Util.closeSql(conn);
+            }
+
+         }
+
+         private void run_AllTours(final Connection conn, final IProgressMonitor monitor) throws SQLException {
+
+            ArrayList<Long> allTourIds;
+            if (tourIds == null) {
+               allTourIds = getAllTourIds();
+            } else {
+               allTourIds = tourIds;
+            }
+
+            final int numTours = allTourIds.size();
+            numAllTours[0] = numTours;
+
+//            int numComputedTour = 0;
+//            int numNotComputedTour = 0;
+            long lastUIUpdateTime = 0;
+
+            monitor.beginTask(Messages.tour_database_computeComputeValues_mainTask, numTours);
+
+            final String sql = tourRunner.getSQLUpdateStatement();
+            final PreparedStatement stmtUpdate = conn.prepareStatement(sql);
+
+            // loop over all tours and compute values
+            for (final Long tourId : allTourIds) {
+
+               final TourData dbTourData = getTourFromDb(tourId);
+
+               if (dbTourData != null) {
+
+                  if (tourRunner.computeTourValues(dbTourData, stmtUpdate)) {
+
+                     stmtUpdate.executeUpdate();
+
+//                     numComputedTour++;
+
+                  } else {
+
+//                     numNotComputedTour++;
+                  }
+               }
+
+               numCurrentlyProcessedTours[0]++;
+
+               final long currentTime = System.currentTimeMillis();
+               if (currentTime > lastUIUpdateTime + 200) {
+
+                  lastUIUpdateTime = currentTime;
+
+                  // create sub task text
+                  final StringBuilder sb = new StringBuilder();
+                  sb.append(NLS.bind(Messages.tour_database_computeComputeValues_subTask,
+                        new Object[] { numCurrentlyProcessedTours[0], numTours, }));
+
+                  sb.append(UI.DASH_WITH_DOUBLE_SPACE);
+                  sb.append(numCurrentlyProcessedTours[0] * 100 / numTours);
+                  sb.append(UI.SYMBOL_PERCENTAGE);
+
+                  monitor.subTask(sb.toString());
+               }
+               monitor.worked(1);
+
+               // check if canceled
+               if (monitor.isCanceled()) {
+                  isCanceled[0] = true;
+                  break;
+               }
+            }
+         }
+      };
+
+      final Display display = Display.getDefault();
+      final Shell shell = display.getActiveShell();
+
+      try {
+
+         new ProgressMonitorDialog(shell).run(true, true, runnable);
+
+      } catch (final InvocationTargetException e) {
+         StatusUtil.log(e);
+      } catch (final InterruptedException e) {
+         StatusUtil.log(e);
+      } finally {
+
+         // show final result delayed that the user can set the update UI
+         display.asyncExec(() -> {
+
+            // create result text
+            final StringBuilder sb = new StringBuilder();
+            sb.append(NLS.bind(Messages.tour_database_computeComputedValues_resultMessage,
+                  numCurrentlyProcessedTours[0],
+                  numAllTours[0]));
+
+            // optional: add result from tour runner
+            final String runnerResultText = tourRunner.getResultText();
+            if (runnerResultText != null) {
+               sb.append(UI.NEW_LINE2);
+               sb.append(runnerResultText);
+            }
+
+            MessageDialog.openInformation(
+                  shell,
+                  Messages.tour_database_computeComputedValues_resultTitle,
+                  sb.toString());
+         });
       }
 
       return isCanceled[0];
@@ -2975,12 +3110,13 @@ public class TourDatabase {
             //
             // version 39 end
 
-            // version 40 start  -  19.9
+            // version 40 start  -  19.10
             //
             + " power_DataSource     VARCHAR(" + TourData.DB_LENGTH_POWER_DATA_SOURCE + "),      \n" //$NON-NLS-1$ //$NON-NLS-2$
             + " cadenceZone_SlowTime                  INTEGER DEFAULT -1,                 \n" //$NON-NLS-1$
             + " cadenceZone_FastTime                  INTEGER DEFAULT -1,                 \n" //$NON-NLS-1$
             + " cadenceZones_DelimiterValue           INTEGER DEFAULT 0,                  \n" //$NON-NLS-1$
+            + " tourAvgAltChange                      INTEGER DEFAULT 0,                  \n" //$NON-NLS-1$
             //
             // version 40 end
 
@@ -4746,7 +4882,7 @@ public class TourDatabase {
           * data structure in the programm code MUST be the same as in the database.
           */
          if (isPostUpdate5) {
-            TourDatabase.computeComputedValuesForAllTours(splashManager);
+            TourDatabase.computeAnyValues_ForAllTours(splashManager);
             TourManager.getInstance().removeAllToursFromCache();
          }
          if (isPostUpdate9) {
@@ -7174,6 +7310,7 @@ public class TourDatabase {
             SQL.AddCol_Int      (stmt, TABLE_TOUR_DATA, "cadenceZone_SlowTime", DEFAULT_0);//$NON-NLS-1$
             SQL.AddCol_Int      (stmt, TABLE_TOUR_DATA, "cadenceZone_FastTime", DEFAULT_0); //$NON-NLS-1$
             SQL.AddCol_Int      (stmt, TABLE_TOUR_DATA, "cadenceZones_DelimiterValue", DEFAULT_0); //$NON-NLS-1$
+            SQL.AddCol_Int      (stmt, TABLE_TOUR_DATA, "tourAvgAltChange", DEFAULT_0); //$NON-NLS-1$
 
             // Create index in table: TOURDATA_TOURTAG - Index: TOURTAG_TAGID
             SQL.CreateIndex(  stmt, JOINTABLE__TOURDATA__TOURTAG, KEY_TAG);

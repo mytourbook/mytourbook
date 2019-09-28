@@ -49,15 +49,22 @@ public class TVITourBookYearSub extends TVITourBookItem {
    protected void fetchChildren() {
 
       /*
-       * set the children for the yearSub (month,week,...) item, these are tour items
+       * Set the children for the yearSub (month,week,...) item, these are tour items
        */
       String sumYear = UI.EMPTY_STRING;
       String sumYearSub = UI.EMPTY_STRING;
 
       if (_category == YearSubCategory.WEEK) {
+
+         // categorize by week
+
          sumYear = "startWeekYear"; //$NON-NLS-1$
          sumYearSub = "startWeek"; //$NON-NLS-1$
-      } else { // default to month
+
+      } else {
+
+         // categorize by month (default)
+
          sumYear = "startYear"; //$NON-NLS-1$
          sumYearSub = "startMonth"; //$NON-NLS-1$
       }
@@ -68,124 +75,133 @@ public class TVITourBookYearSub extends TVITourBookItem {
       final SQLFilter sqlFilter = new SQLFilter(SQLFilter.TAG_FILTER);
 
       final String sqlString = UI.NEW_LINE
-            //
-            + "SELECT " //                        //$NON-NLS-1$
-            //
-            + "startYear, " //                              1   //$NON-NLS-1$
-            + "startMonth, " //                             2   //$NON-NLS-1$
-            + "startDay, " //                               3   //$NON-NLS-1$
-            + "tourDistance, " //                           4   //$NON-NLS-1$
-            + "tourRecordingTime, " //                      5   //$NON-NLS-1$
-            + "tourDrivingTime, " //                        6   //$NON-NLS-1$
-            + "tourAltUp, " //                              7   //$NON-NLS-1$
-            + "tourAltDown, " //                            8   //$NON-NLS-1$
-            + "startDistance, " //                          9   //$NON-NLS-1$
-            + "tourID, " //                                 10   //$NON-NLS-1$
-            + "tourType_typeId, " //                        11   //$NON-NLS-1$
-            + "tourTitle, " //                              12   //$NON-NLS-1$
-            + "deviceTimeInterval, " //                     13   //$NON-NLS-1$
-            + "maxSpeed, " //                               14   //$NON-NLS-1$
-            + "maxAltitude, " //                            15   //$NON-NLS-1$
-            + "maxPulse, " //                               16   //$NON-NLS-1$
-            + "avgPulse, " //                               17   //$NON-NLS-1$
-            + "avgCadence, " //                             18   //$NON-NLS-1$
-            + "(DOUBLE(avgTemperature) / temperatureScale), " // 19   //$NON-NLS-1$
-            + "jTdataTtag.TourTag_tagId, "//                20   //$NON-NLS-1$
-            + "Tmarker.markerId, "//                        21   //$NON-NLS-1$
 
-            + "TourStartTime, " //                          22   //$NON-NLS-1$
-            + "TimeZoneId, " //                             23   //$NON-NLS-1$
+            + "SELECT " //                                              //$NON-NLS-1$
+            //
+            + "startYear, " //                                    1     //$NON-NLS-1$
+            + "startMonth, " //                                   2     //$NON-NLS-1$
+            + "startDay, " //                                     3     //$NON-NLS-1$
+            + "tourDistance, " //                                 4     //$NON-NLS-1$
+            + "tourRecordingTime, " //                            5     //$NON-NLS-1$
+            + "tourDrivingTime, " //                              6     //$NON-NLS-1$
+            + "tourAltUp, " //                                    7     //$NON-NLS-1$
+            + "tourAltDown, " //                                  8     //$NON-NLS-1$
+            + "startDistance, " //                                9     //$NON-NLS-1$
+            + "tourID, " //                                       10    //$NON-NLS-1$
+            + "tourType_typeId, " //                              11    //$NON-NLS-1$
+            + "tourTitle, " //                                    12    //$NON-NLS-1$
+            + "deviceTimeInterval, " //                           13    //$NON-NLS-1$
+            + "maxSpeed, " //                                     14    //$NON-NLS-1$
+            + "maxAltitude, " //                                  15    //$NON-NLS-1$
+            + "maxPulse, " //                                     16    //$NON-NLS-1$
+            + "avgPulse, " //                                     17    //$NON-NLS-1$
+            + "avgCadence, " //                                   18    //$NON-NLS-1$
+            + "(DOUBLE(avgTemperature) / temperatureScale), " //  19    //$NON-NLS-1$
+            + "jTdataTtag.TourTag_tagId, "//                      20    //$NON-NLS-1$
+            + "Tmarker.markerId, "//                              21    //$NON-NLS-1$
 
-            + "startWeek, " //                              24   //$NON-NLS-1$
-            + "startWeekYear, " //                          25   //$NON-NLS-1$
+            + "TourStartTime, " //                                22    //$NON-NLS-1$
+            + "TimeZoneId, " //                                   23    //$NON-NLS-1$
+
+            + "startWeek, " //                                    24    //$NON-NLS-1$
+            + "startWeekYear, " //                                25    //$NON-NLS-1$
             //
-            + "weatherWindDir, " //                         26  //$NON-NLS-1$
-            + "weatherWindSpd, " //                         27  //$NON-NLS-1$
-            + "weatherClouds, " //                          28  //$NON-NLS-1$
+            + "weatherWindDir, " //                               26    //$NON-NLS-1$
+            + "weatherWindSpd, " //                               27    //$NON-NLS-1$
+            + "weatherClouds, " //                                28    //$NON-NLS-1$
             //
-            + "restPulse, " //                              29  //$NON-NLS-1$
-            + "calories, " //                               30   //$NON-NLS-1$
+            + "restPulse, " //                                    29    //$NON-NLS-1$
+            + "calories, " //                                     30    //$NON-NLS-1$
             //
-            + "tourPerson_personId, " //                    31   //$NON-NLS-1$
+            + "tourPerson_personId, " //                          31    //$NON-NLS-1$
             //
-            + "numberOfTimeSlices, " //                     32   //$NON-NLS-1$
-            + "numberOfPhotos, " //                         33   //$NON-NLS-1$
-            + "dpTolerance, " //                            34   //$NON-NLS-1$
+            + "numberOfTimeSlices, " //                           32    //$NON-NLS-1$
+            + "numberOfPhotos, " //                               33    //$NON-NLS-1$
+            + "dpTolerance, " //                                  34    //$NON-NLS-1$
             //
-            + "frontShiftCount, " //                        35   //$NON-NLS-1$
-            + "rearShiftCount," //                          36   //$NON-NLS-1$
+            + "frontShiftCount, " //                              35    //$NON-NLS-1$
+            + "rearShiftCount," //                                36    //$NON-NLS-1$
             //
             // ---------- POWER -------------
             //
-            + "power_Avg," //                               37   //$NON-NLS-1$
-            + "power_Max, " //                              38   //$NON-NLS-1$
-            + "power_Normalized, " //                       39   //$NON-NLS-1$
-            + "power_FTP, " //                              40   //$NON-NLS-1$
+            + "power_Avg," //                                     37    //$NON-NLS-1$
+            + "power_Max, " //                                    38    //$NON-NLS-1$
+            + "power_Normalized, " //                             39    //$NON-NLS-1$
+            + "power_FTP, " //                                    40    //$NON-NLS-1$
 
-            + "power_TotalWork, " //                        41   //$NON-NLS-1$
-            + "power_TrainingStressScore, " //              42   //$NON-NLS-1$
-            + "power_IntensityFactor, " //                  43   //$NON-NLS-1$
+            + "power_TotalWork, " //                              41    //$NON-NLS-1$
+            + "power_TrainingStressScore, " //                    42    //$NON-NLS-1$
+            + "power_IntensityFactor, " //                        43    //$NON-NLS-1$
 
-            + "power_PedalLeftRightBalance, " //            44   //$NON-NLS-1$
-            + "power_AvgLeftTorqueEffectiveness, " //       45   //$NON-NLS-1$
-            + "power_AvgRightTorqueEffectiveness, " //      46   //$NON-NLS-1$
-            + "power_AvgLeftPedalSmoothness, " //           47   //$NON-NLS-1$
-            + "power_AvgRightPedalSmoothness, " //          48   //$NON-NLS-1$
+            + "power_PedalLeftRightBalance, " //                  44    //$NON-NLS-1$
+            + "power_AvgLeftTorqueEffectiveness, " //             45    //$NON-NLS-1$
+            + "power_AvgRightTorqueEffectiveness, " //            46    //$NON-NLS-1$
+            + "power_AvgLeftPedalSmoothness, " //                 47    //$NON-NLS-1$
+            + "power_AvgRightPedalSmoothness, " //                48    //$NON-NLS-1$
 
-            + "bikerWeight, " //                            49   //$NON-NLS-1$
+            + "bikerWeight, " //                                  49    //$NON-NLS-1$
             //
             // ---------- IMPORT -------------
             //
-            + "tourImportFileName, " //                     50   //$NON-NLS-1$
-            + "tourImportFilePath, " //                     51   //$NON-NLS-1$
-            + "devicePluginName, " //                       52   //$NON-NLS-1$
-            + "deviceFirmwareVersion, " //                  53   //$NON-NLS-1$
+            + "tourImportFileName, " //                           50    //$NON-NLS-1$
+            + "tourImportFilePath, " //                           51    //$NON-NLS-1$
+            + "devicePluginName, " //                             52    //$NON-NLS-1$
+            + "deviceFirmwareVersion, " //                        53    //$NON-NLS-1$
 
-            + "cadenceMultiplier, " //                      54   //$NON-NLS-1$
+            + "cadenceMultiplier, " //                            54    //$NON-NLS-1$
 
             //
             // ---------- RUNNING DYNAMICS -------------
             //
-            + "runDyn_StanceTime_Min, " //                  55   //$NON-NLS-1$
-            + "runDyn_StanceTime_Max, " //                  56   //$NON-NLS-1$
-            + "runDyn_StanceTime_Avg, " //                  57   //$NON-NLS-1$
+            + "runDyn_StanceTime_Min, " //                        55    //$NON-NLS-1$
+            + "runDyn_StanceTime_Max, " //                        56    //$NON-NLS-1$
+            + "runDyn_StanceTime_Avg, " //                        57    //$NON-NLS-1$
 
-            + "runDyn_StanceTimeBalance_Min, " //           58   //$NON-NLS-1$
-            + "runDyn_StanceTimeBalance_Max, " //           59   //$NON-NLS-1$
-            + "runDyn_StanceTimeBalance_Avg, " //           60   //$NON-NLS-1$
+            + "runDyn_StanceTimeBalance_Min, " //                 58    //$NON-NLS-1$
+            + "runDyn_StanceTimeBalance_Max, " //                 59    //$NON-NLS-1$
+            + "runDyn_StanceTimeBalance_Avg, " //                 60    //$NON-NLS-1$
 
-            + "runDyn_StepLength_Min, " //                  61   //$NON-NLS-1$
-            + "runDyn_StepLength_Max, " //                  62   //$NON-NLS-1$
-            + "runDyn_StepLength_Avg, " //                  63   //$NON-NLS-1$
+            + "runDyn_StepLength_Min, " //                        61    //$NON-NLS-1$
+            + "runDyn_StepLength_Max, " //                        62    //$NON-NLS-1$
+            + "runDyn_StepLength_Avg, " //                        63    //$NON-NLS-1$
 
-            + "runDyn_VerticalOscillation_Min, " //         64   //$NON-NLS-1$
-            + "runDyn_VerticalOscillation_Max, " //         65   //$NON-NLS-1$
-            + "runDyn_VerticalOscillation_Avg, " //         66   //$NON-NLS-1$
+            + "runDyn_VerticalOscillation_Min, " //               64    //$NON-NLS-1$
+            + "runDyn_VerticalOscillation_Max, " //               65    //$NON-NLS-1$
+            + "runDyn_VerticalOscillation_Avg, " //               66    //$NON-NLS-1$
 
-            + "runDyn_VerticalRatio_Min, " //               67   //$NON-NLS-1$
-            + "runDyn_VerticalRatio_Max, " //               68   //$NON-NLS-1$
-            + "runDyn_VerticalRatio_Avg, " //               69   //$NON-NLS-1$
+            + "runDyn_VerticalRatio_Min, " //                     67    //$NON-NLS-1$
+            + "runDyn_VerticalRatio_Max, " //                     68    //$NON-NLS-1$
+            + "runDyn_VerticalRatio_Avg, " //                     69    //$NON-NLS-1$
 
             //
             // ---------- SURFING -------------
             //
-            + "surfing_NumberOfEvents, " //                 70   //$NON-NLS-1$
-            + "surfing_MinSpeed_StartStop, " //             71   //$NON-NLS-1$
-            + "surfing_MinSpeed_Surfing, " //               72   //$NON-NLS-1$
-            + "surfing_MinTimeDuration, " //                73   //$NON-NLS-1$
-            + "surfing_IsMinDistance, " //                  74   //$NON-NLS-1$
-            + "surfing_MinDistance," //                     75   //$NON-NLS-1$
+            + "surfing_NumberOfEvents, " //                       70    //$NON-NLS-1$
+            + "surfing_MinSpeed_StartStop, " //                   71    //$NON-NLS-1$
+            + "surfing_MinSpeed_Surfing, " //                     72    //$NON-NLS-1$
+            + "surfing_MinTimeDuration, " //                      73    //$NON-NLS-1$
+            + "surfing_IsMinDistance, " //                        74    //$NON-NLS-1$
+            + "surfing_MinDistance," //                           75    //$NON-NLS-1$
 
             //
             // ---------- TRAINING -------------
             //
-            + "training_TrainingEffect_Aerob, " //          76   //$NON-NLS-1$
-            + "training_TrainingEffect_Anaerob, " //        77   //$NON-NLS-1$
-            + "training_TrainingPerformance, " //           78   //$NON-NLS-1$
+            + "training_TrainingEffect_Aerob, " //                76    //$NON-NLS-1$
+            + "training_TrainingEffect_Anaerob, " //              77    //$NON-NLS-1$
+            + "training_TrainingPerformance, " //                 78    //$NON-NLS-1$
 
-            + "cadenceZone_SlowTime, " //                   79   //$NON-NLS-1$
-            + "cadenceZone_FastTime, " //                   80   //$NON-NLS-1$
-            + "cadenceZones_DelimiterValue " //             81   //$NON-NLS-1$
+            // ---------- CADENCE ZONE -------------
+
+            + "cadenceZone_SlowTime, " //                         79    //$NON-NLS-1$
+            + "cadenceZone_FastTime, " //                         80    //$NON-NLS-1$
+            + "cadenceZones_DelimiterValue, " //                  81    //$NON-NLS-1$
+
+            // ---------- WEATHER -------------
+
+            + "weather_Temperature_Min, " //                      82    //$NON-NLS-1$
+            + "weather_Temperature_Max, " //                      83    //$NON-NLS-1$
+
+            + "tourAvgAltChange" //                               84    //$NON-NLS-1$
 
             + UI.NEW_LINE
 
@@ -270,6 +286,7 @@ public class TVITourBookYearSub extends TVITourBookItem {
                final long dbDrivingTime         = tourItem.colTourDrivingTime = result.getLong(6);
                tourItem.colAltitudeUp           = result.getLong(7);
                tourItem.colAltitudeDown         = result.getLong(8);
+               tourItem.colAvgAltitudeChange    = result.getLong(84);
 
                tourItem.colStartDistance        = result.getLong(9);
                final Object tourTypeId          = result.getObject(11);
@@ -281,7 +298,7 @@ public class TVITourBookYearSub extends TVITourBookItem {
                tourItem.colMaxPulse             = result.getLong(16);
                tourItem.colAvgPulse             = result.getFloat(17);
                final float dbAvgCadence         = result.getFloat(18);
-               tourItem.colAvgTemperature       = result.getFloat(19);
+               tourItem.colTemperature_Avg      = result.getFloat(19);
 
                final long dbTourStartTime       = result.getLong(22);
                final String dbTimeZoneId        = result.getString(23);
@@ -375,6 +392,18 @@ public class TVITourBookYearSub extends TVITourBookItem {
                tourItem.colTraining_TrainingEffect_Anaerobic   = result.getFloat(77);
                tourItem.colTraining_TrainingPerformance        = result.getFloat(78);
 
+
+               // ---------- CADENCE ZONE -------------
+
+               final int cadenceZone_SlowTime                  = result.getInt(79);
+               final int cadenceZone_FastTime                  = result.getInt(80);
+               tourItem.colCadenceZonesDelimiter               = result.getInt(81);
+
+               // ---------- WEATHER -------------
+
+               tourItem.colTemperature_Min                     = result.getFloat(82);
+               tourItem.colTemperature_Max                     = result.getFloat(83);
+
 // SET_FORMATTING_ON
 
                // -----------------------------------------------
@@ -386,8 +415,6 @@ public class TVITourBookYearSub extends TVITourBookItem {
                tourItem.colCadenceMultiplier = dbCadenceMultiplier;
 
                tourItem.colSlowVsFastCadence = UI.EMPTY_STRING;
-               final int cadenceZone_SlowTime = result.getInt(79);
-               final int cadenceZone_FastTime = result.getInt(80);
                final int totalCadenceZone_SlowTime = cadenceZone_SlowTime == -1 ? 0 : cadenceZone_SlowTime;
                final int totalCadenceZone_FastTime = cadenceZone_FastTime == -1 ? 0 : cadenceZone_FastTime;
 
@@ -398,8 +425,6 @@ public class TVITourBookYearSub extends TVITourBookItem {
 
                   tourItem.colSlowVsFastCadence = cadenceZone_SlowPercentage + " - " + cadenceZone_FastPercentage; //$NON-NLS-1$
                }
-
-               tourItem.colCadenceZonesDelimiter = result.getInt(81);
 
                // -----------------------------------------------
 

@@ -355,6 +355,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    @XmlElement
    private int                   tourAltDown;
 
+
+   /**
+    * Average altitude change (m/km)
+    */
+   @XmlElement
+   private int                   tourAvgAltChange;
+
    // ############################################# PULSE/WEIGHT/POWER #############################################
 
    /**
@@ -430,7 +437,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * The delimiter used when computing the existing values of cadenceZone_SlowTime & cadenceZone_FastTime
     */
-   @SuppressWarnings("unused")
    private int                   cadenceZones_DelimiterValue;
 
    /**
@@ -2733,6 +2739,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return altitudeUpTotal > 0 ? altitudeUpTotal : altitudeDownTotal;
    }
 
+   /**
+    * Computes the average elevation change with given values of elevation gain, loss and total
+    * distance.
+    *
+    * @return
+    *         If successful, the average elevation change of a given tour, 0 otherwise.
+    */
+   private void computeAvg_AltitudeChange() {
+
+      tourAvgAltChange = tourDistance <= 0f ? 0 : (int) ((tourAltUp + tourAltDown) / (tourDistance / 1000f));
+   }
+
    private void computeAvg_Cadence() {
 
       if (cadenceSerie == null) {
@@ -3249,7 +3267,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    /**
     * Computes time (seconds) spent in each cadence zone (slow and fast).
-    *
     */
    public boolean computeCadenceZonesTimes() {
 
@@ -6824,6 +6841,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return cadenceZone_SlowTime;
    }
 
+   public int getCadenceZones_DelimiterValue() {
+      return cadenceZones_DelimiterValue;
+   }
+
    /**
     * @return Returns the calories or <code>0</code> when calories are not available.
     */
@@ -9446,6 +9467,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    public void setTourAltDown(final float tourAltDown) {
       this.tourAltDown = (int) (tourAltDown + 0.5);
+
+      // We update the average elevation change
+      // Note : We only do it here since most of the call to the function
+      // setTourAltDown() is performed AFTER setTourAltUp()
+      // Hence, we know that at this point, we will be able to compute the
+      // average elevation change with the latest values of tourAltUp and tourAltDown.
+      computeAvg_AltitudeChange();
    }
 
    public void setTourAltUp(final float tourAltUp) {

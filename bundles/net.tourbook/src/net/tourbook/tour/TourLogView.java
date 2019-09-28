@@ -148,7 +148,7 @@ public class TourLogView extends ViewPart {
             final String stateWithBrowser[] = { UI.EMPTY_STRING };
             final String stateNoBrowser[] = { UI.EMPTY_STRING };
 
-            setImportState(tourLog, stateNoBrowser, stateWithBrowser);
+            setLogStateImage(tourLog, stateNoBrowser, stateWithBrowser);
 
             final String noBrowserText = createNoBrowserText(tourLog, stateNoBrowser[0]);
 
@@ -174,35 +174,35 @@ public class TourLogView extends ViewPart {
 
                final String js = UI.EMPTY_STRING//
 
-                     + ("var tr = document.createElement('TR');\n") //$NON-NLS-1$
-                     + ("tr.className='row';\n") //$NON-NLS-1$
+                     + "var tr = document.createElement('TR');\n" //$NON-NLS-1$
+                     + "tr.className='row';\n" //$NON-NLS-1$
 
                // time
-                     + ("var td = document.createElement('TD');\n") //$NON-NLS-1$
-                     + ("td.appendChild(document.createTextNode('" + tourLog.time + "'));\n") //$NON-NLS-1$ //$NON-NLS-2$
-                     + ("tr.appendChild(td);\n") //$NON-NLS-1$
+                     + "var td = document.createElement('TD');\n" //$NON-NLS-1$
+                     + "td.appendChild(document.createTextNode('" + tourLog.time + "'));\n" //$NON-NLS-1$ //$NON-NLS-2$
+                     + "tr.appendChild(td);\n" //$NON-NLS-1$
 
-               // state
-                     + ("var td = document.createElement('TD');\n") //$NON-NLS-1$
-                     + ("td.className='column icon';\n") //$NON-NLS-1$
+               // state (icon)
+                     + "var td = document.createElement('TD');\n" //$NON-NLS-1$
+                     + "td.className='column icon';\n" //$NON-NLS-1$
                      + stateWithBrowser[0]
-                     + ("tr.appendChild(td);\n") //$NON-NLS-1$
+                     + "tr.appendChild(td);\n" //$NON-NLS-1$
 
                // message
-                     + ("var td = document.createElement('TD');\n") //$NON-NLS-1$
-                     + ("td.className='column " + subItem + " " + css + "';\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                     + "var td = document.createElement('TD');\n" //$NON-NLS-1$
+                     + "td.className='column " + subItem + " " + css + "';\n" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
                      + tdContent
 
-                     + ("tr.appendChild(td);\n") //$NON-NLS-1$
+                     + "tr.appendChild(td);\n" //$NON-NLS-1$
 
-                     + ("var logTable = document.getElementById(\"" + DOM_ID_LOG + "\");\n") //$NON-NLS-1$ //$NON-NLS-2$
-                     + ("logTable.tBodies[0].appendChild(tr);\n") //$NON-NLS-1$
+                     + "var logTable = document.getElementById(\"" + DOM_ID_LOG + "\");\n" //$NON-NLS-1$ //$NON-NLS-2$
+                     + "logTable.tBodies[0].appendChild(tr);\n" //$NON-NLS-1$
 
                // scroll to the bottom -> this do not work
-//                     + ("debugger;\n") //$NON-NLS-1$
-                     + ("var html = document.documentElement;\n") //$NON-NLS-1$
-                     + ("var scrollHeight = html.scrollHeight;\n") //$NON-NLS-1$
-                     + ("html.scrollTop = scrollHeight;\n") //$NON-NLS-1$
+//                   + ("debugger;\n") //$NON-NLS-1$
+                     + "var html = document.documentElement;\n" //$NON-NLS-1$
+                     + "var scrollHeight = html.scrollHeight;\n" //$NON-NLS-1$
+                     + "html.scrollTop = scrollHeight;\n" //$NON-NLS-1$
                ;
 
                _browser.execute(js);
@@ -495,7 +495,7 @@ public class TourLogView extends ViewPart {
       }
    }
 
-   private void setImportState(final TourLog importLog, final String[] stateNoBrowser, final String[] stateWithBrowser) {
+   private void setLogStateImage(final TourLog importLog, final String[] stateNoBrowser, final String[] stateWithBrowser) {
 
       switch (importLog.state) {
 
@@ -583,7 +583,7 @@ public class TourLogView extends ViewPart {
             final String stateWithBrowser[] = { UI.EMPTY_STRING };
             final String stateNoBrowser[] = { UI.EMPTY_STRING };
 
-            setImportState(tourLog, stateNoBrowser, stateWithBrowser);
+            setLogStateImage(tourLog, stateNoBrowser, stateWithBrowser);
             final String noBrowserText = createNoBrowserText(tourLog, stateNoBrowser[0]);
 
             addLog_NoBrowser(noBrowserText);

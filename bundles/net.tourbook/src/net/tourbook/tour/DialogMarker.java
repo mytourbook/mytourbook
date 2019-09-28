@@ -1231,7 +1231,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
             .applyTo(_tourChart);
       _tourChart.setShowZoomActions(true);
       _tourChart.setShowSlider(true);
-      _tourChart.setContextProvider(new DialogMarkerTourChartContextProvicer(this), true);
+      _tourChart.setContextProvider(new DialogMarkerTourChartContextProvider(this), true);
 
       _tourChart.setIsDisplayedInDialog(true);
 

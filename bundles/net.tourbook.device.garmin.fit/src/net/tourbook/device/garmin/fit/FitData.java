@@ -148,7 +148,7 @@ public class FitData {
             final String message =
                   "Import file %s has other session start time, sessionStartTime=%s recordStartTime=%s, Difference=%d sec";//$NON-NLS-1$
 
-            TourLogManager.logSubInfo(
+            TourLogManager.subLog_Info(
                   String.format(
                         message,
                         _importFilePathName,

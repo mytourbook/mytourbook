@@ -417,7 +417,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
       }
    }
 
-   private final class TagViewerContentProvicer implements ITreeContentProvider {
+   private final class TagViewerContentProvider implements ITreeContentProvider {
 
       @Override
       public void dispose() {}
@@ -1025,7 +1025,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
       _tagViewer = new ContainerCheckedTreeViewer(tree);
 
       _tagViewer.setUseHashlookup(true);
-      _tagViewer.setContentProvider(new TagViewerContentProvicer());
+      _tagViewer.setContentProvider(new TagViewerContentProvider());
       _tagViewer.setComparator(new TagViewerComparator());
 
       _tagViewer.addCheckStateListener(new ICheckStateListener() {

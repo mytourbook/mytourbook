@@ -1118,7 +1118,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
       _tourChart.setShowSlider(true);
       _tourChart.setNoToolbarPack();
 
-      _tourChart.setContextProvider(new DialogAdjustAltitudeChartContextProvicer(this), true);
+      _tourChart.setContextProvider(new DialogAdjustAltitudeChartContextProvider(this), true);
 
       _tourChart.addDataModelListener(new IDataModelListener() {
          @Override

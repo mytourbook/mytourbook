@@ -16,6 +16,9 @@
 package net.tourbook.tour;
 
 import java.lang.reflect.InvocationTargetException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoField;
 import java.util.ArrayList;
@@ -198,7 +201,7 @@ public class TourManager {
     * Contains all graph id's which are displayed as a graph in the tour chart and correspond to a
     * graph action
     */
-   private static final int[]                            _allGraphIDs        = new int[] {
+   private static final int[]                            _allGraphIDs                      = new int[] {
 
          GRAPH_ALTITUDE,
          GRAPH_SPEED,
@@ -223,12 +226,12 @@ public class TourManager {
          GRAPH_TOUR_COMPARE
    };
 
-   private final static IPreferenceStore                 _prefStore          = TourbookPlugin.getPrefStore();
+   private final static IPreferenceStore                 _prefStore                        = TourbookPlugin.getPrefStore();
 
    private static TourManager                            _instance;
 
-   private final static StringBuilder                    _sbFormatter        = new StringBuilder();
-   private final static Formatter                        _formatter          = new Formatter(_sbFormatter);
+   private final static StringBuilder                    _sbFormatter                      = new StringBuilder();
+   private final static Formatter                        _formatter                        = new Formatter(_sbFormatter);
 
    /**
     * contains the instance of the {@link TourDataEditorView} or <code>null</code> when this part is
@@ -236,8 +239,8 @@ public class TourManager {
     */
    private static TourDataEditorView                     _tourDataEditorInstance;
    //
-   private static LabelProviderMMSS                      _labelProviderMMSS  = new LabelProviderMMSS();
-   private static LabelProviderInt                       _labelProviderInt   = new LabelProviderInt();
+   private static LabelProviderMMSS                      _labelProviderMMSS                = new LabelProviderMMSS();
+   private static LabelProviderInt                       _labelProviderInt                 = new LabelProviderInt();
    //
    private static TourData                               _joined_TourData;
    private static int                                    _joined_TourIds_Hash;
@@ -246,8 +249,19 @@ public class TourManager {
    private static long                                   _allLoaded_TourData_Key;
    private static int                                    _allLoaded_TourIds_Hash;
    //
-   private static final ListenerList<ITourEventListener> _tourEventListeners = new ListenerList<>(ListenerList.IDENTITY);
-   private static final ListenerList<ITourSaveListener>  _tourSaveListeners  = new ListenerList<>(ListenerList.IDENTITY);
+   private static final ListenerList<ITourEventListener> _tourEventListeners               = new ListenerList<>(ListenerList.IDENTITY);
+   private static final ListenerList<ITourSaveListener>  _tourSaveListeners                = new ListenerList<>(ListenerList.IDENTITY);
+   public static final String                            cadenceZonesTimes_StatementUpdate = UI.EMPTY_STRING
+
+         + "UPDATE " + TourDatabase.TABLE_TOUR_DATA                                                                                    //   //$NON-NLS-1$
+
+         + " SET"                                                                                                                      //                                     //$NON-NLS-1$
+
+         + " cadenceZone_SlowTime=?, "                                                                                                 //                //$NON-NLS-1$
+         + " cadenceZone_FastTime=?, "                                                                                                 //                 //$NON-NLS-1$
+         + " cadenceZones_DelimiterValue=? "                                                                                           //          //$NON-NLS-1$
+
+         + " WHERE tourId=?";                                                                                                          //                        //$NON-NLS-1$
    //
    private ComputeChartValue                             _computeAvg_Altimeter;
    private ComputeChartValue                             _computeAvg_Altitude;
@@ -366,7 +380,7 @@ public class TourManager {
       // ensure data are available
       if (temperatureSerie == null) {
 
-         TourLogManager.logSubError(
+         TourLogManager.subLog_Error(
                String.format(//
                      LOG_TEMP_ADJUST_010_NO_TEMPERATURE_DATA_SERIE,
                      getTourDateTimeShort(tourData)));
@@ -376,7 +390,7 @@ public class TourManager {
 
       if (timeSerie == null) {
 
-         TourLogManager.logSubError(
+         TourLogManager.subLog_Error(
                String.format(//
                      LOG_TEMP_ADJUST_011_NO_TIME_DATA_SERIE,
                      getTourDateTimeShort(tourData)));
@@ -402,7 +416,7 @@ public class TourManager {
       // an initial temperature could not be computed because the tour is too short
       if (initialTemperature == Integer.MIN_VALUE) {
 
-         TourLogManager.logSubError(
+         TourLogManager.subLog_Error(
                String.format(//
                      LOG_TEMP_ADJUST_005_TOUR_IS_TOO_SHORT,
                      getTourDateTimeShort(tourData)));
@@ -504,45 +518,57 @@ public class TourManager {
    }
 
    /**
-    * Computes time (seconds) spent in each cadence zone (slow and fast).
+    * Computes time (seconds) spent in each cadence zone (slow and fast) for several given tours.
     *
-    * @param tourDataList
-    * @return Returns <code>true</code> when time values are computed and {@link TourData} are
-    *         updated but not yet saved.
+    * @param conn
+    * @param selectedTours
+    * @return Returns <code>true</code> when values are computed or <code>false</code> when nothing
+    *         was done.
+    * @throws SQLException
     */
-   public static boolean computeCadenceZonesTimes(final ArrayList<TourData> tourDataList) {
+   public static boolean computeCadenceZonesTimes(final Connection conn,
+                                                  final ArrayList<TourData> selectedTours) throws SQLException {
 
-      if (tourDataList == null || tourDataList.size() == 0) {
-         return false;
+      TourLogManager.addLog(TourLogState.DEFAULT, NLS.bind(Messages.Log_ComputeCadenceZonesTimes_001_Start, selectedTours.size()));
+
+      boolean isUpdated = false;
+
+      final PreparedStatement stmtUpdate = conn.prepareStatement(cadenceZonesTimes_StatementUpdate);
+
+      int numComputedTour = 0;
+      int numNotComputedTour = 0;
+
+      // loop over all tours and compute each cadence zone time
+      for (final TourData tourData : selectedTours) {
+
+         final boolean timeComputed = tourData.computeCadenceZonesTimes();
+         if (!timeComputed) {
+
+            numNotComputedTour++;
+
+         } else {
+
+            // update cadence zones times in the database
+            stmtUpdate.setInt(1, tourData.getCadenceZone_SlowTime());
+            stmtUpdate.setInt(2, tourData.getCadenceZone_FastTime());
+            stmtUpdate.setInt(3, tourData.getCadenceZones_DelimiterValue());
+            stmtUpdate.setLong(4, tourData.getTourId());
+
+            stmtUpdate.executeUpdate();
+
+            isUpdated = true;
+            numComputedTour++;
+         }
       }
 
-      final boolean[] retValue = { false };
+      TourLogManager.addSubLog(TourLogState.IMPORT_OK, NLS.bind(Messages.Log_ComputeCadenceZonesTimes_010_Success, numComputedTour));
 
-      BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-         @Override
-         public void run() {
+      if (numNotComputedTour >= 0) {
+         TourLogManager.addSubLog(TourLogState.IMPORT_ERROR,
+               NLS.bind(Messages.Log_ComputeCadenceZonesTimes_011_NoSuccess, numNotComputedTour));
+      }
 
-            TourLogManager.addLog(TourLogState.DEFAULT, NLS.bind(Messages.Log_ComputeCadenceZonesTimes_001_Start, tourDataList.size()));
-
-            for (final TourData tourData : tourDataList) {
-
-               final boolean isComputed = tourData.computeCadenceZonesTimes();
-               final String tourDateTime = TourManager.getTourDateTimeShort(tourData);
-
-               if (isComputed) {
-                  TourLogManager.addLog(TourLogState.INFO, NLS.bind(Messages.Log_ComputeCadenceZonesTimes_010_Computed, tourDateTime));
-
-                  retValue[0] = true;
-               } else {
-                  TourLogManager.addLog(TourLogState.IMPORT_ERROR,
-                        NLS.bind(Messages.Log_ComputeCadenceZonesTimes_011_No_Time_Or_Cadence_Series, tourDateTime));
-               }
-
-            }
-         }
-      });
-
-      return retValue[0];
+      return isUpdated;
    }
 
    /**
@@ -1679,6 +1705,8 @@ public class TourManager {
    }
 
    /**
+    * Loads multiple tour data from the database and shows a progressbar when it takes longer.
+    *
     * @param allTourIds
     * @param allTourData
     *           Contains loaded {@link TourData} for all tour ids which pass the lat/lon check.
@@ -1707,10 +1735,33 @@ public class TourManager {
 
       allTourData.clear();
 
+      final long start = System.currentTimeMillis();
+      boolean isLongDuration = false;
+
       // create a unique key for all tours
       final long newOverlayKey[] = { 0 };
+      final int tourIndex[] = { 0 };
+      final int loadCounter[] = { 0 };
+      final int numTourIds = allTourIds.size();
 
-      if (allTourIds.size() > 20) {
+      for (; tourIndex[0] < numTourIds;) {
+
+         final Long tourId = allTourIds.get(tourIndex[0]);
+         loadTourData_OneTour(tourId, allTourData, isCheckLatLon, newOverlayKey);
+
+         /*
+          * Check if this is a long duration -> run in progress monitor
+          */
+         final long runDuration = System.currentTimeMillis() - start;
+         if (runDuration > 500) {
+            isLongDuration = true;
+            break;
+         }
+
+         ++tourIndex[0];
+      }
+
+      if (isLongDuration) {
 
          try {
 
@@ -1719,33 +1770,24 @@ public class TourManager {
                public void run(final IProgressMonitor monitor)
                      throws InvocationTargetException, InterruptedException {
 
-                  int loadCounter = 0;
-                  final int idSize = allTourIds.size();
+                  monitor.beginTask(Messages.Tour_Data_LoadTourData_Monitor, numTourIds);
 
-                  monitor.beginTask(Messages.Tour_Data_LoadTourData_Monitor, idSize);
+                  for (; tourIndex[0] < numTourIds;) {
 
-                  for (final Long tourId : allTourIds) {
-
-                     monitor.subTask(
-                           NLS.bind(//
-                                 Messages.Tour_Data_LoadTourData_Monitor_SubTask,
-                                 ++loadCounter,
-                                 idSize));
+                     monitor.subTask(NLS.bind(Messages.Tour_Data_LoadTourData_Monitor_SubTask,
+                           ++loadCounter[0],
+                           numTourIds));
 
                      if (monitor.isCanceled()) {
                         break;
                      }
 
-                     final TourData tourData = getInstance().getTourData(tourId);
-
-                     if (isCheckLatLon == false || isLatLonAvailable(tourData)) {
-
-                        // keep tour data for each tour id
-                        allTourData.add(tourData);
-                        newOverlayKey[0] += tourData.getTourId();
-                     }
+                     final Long tourId = allTourIds.get(tourIndex[0]);
+                     loadTourData_OneTour(tourId, allTourData, isCheckLatLon, newOverlayKey);
 
                      monitor.worked(1);
+
+                     ++tourIndex[0];
                   }
                }
             };
@@ -1761,20 +1803,6 @@ public class TourManager {
          } catch (final InterruptedException e) {
             StatusUtil.showStatus(e);
          }
-
-      } else {
-
-         for (final Long tourId : allTourIds) {
-
-            final TourData tourData = getInstance().getTourData(tourId);
-
-            if (isCheckLatLon == false || isLatLonAvailable(tourData)) {
-
-               // keep tour data for each tour id
-               allTourData.add(tourData);
-               newOverlayKey[0] += tourData.getTourId();
-            }
-         }
       }
 
       _allLoaded_TourIds_Hash = allTourIds.hashCode();
@@ -1783,6 +1811,23 @@ public class TourManager {
       _allLoaded_TourData_Key = newOverlayKey[0];
 
       return _allLoaded_TourData_Key;
+   }
+
+   private static void loadTourData_OneTour(final Long tourId,
+                                            final ArrayList<TourData> allTourData,
+                                            final boolean isCheckLatLon,
+                                            final long[] newOverlayKey) {
+
+      final TourData tourData = getInstance().getTourData(tourId);
+
+      if (isCheckLatLon == false || isLatLonAvailable(tourData)) {
+
+         // keep tour data for each tour id
+         allTourData.add(tourData);
+
+         // update key for all tours
+         newOverlayKey[0] += tourData.getTourId();
+      }
    }
 
    /**
@@ -2241,7 +2286,7 @@ public class TourManager {
       // ensure data is available
       if (tourData.latitudeSerie == null || tourData.longitudeSerie == null) {
 
-         TourLogManager.logSubError(
+         TourLogManager.subLog_Error(
                String.format(
                      LOG_RETRIEVE_WEATHER_DATA_010_NO_GPS_DATA_SERIE,
                      getTourDateTimeShort(tourData)));
@@ -2253,7 +2298,7 @@ public class TourManager {
 
       final WeatherData historicalWeatherData = historicalWeatherRetriever.retrieve().getHistoricalWeatherData();
       if (historicalWeatherData == null) {
-         TourLogManager.logSubError(
+         TourLogManager.subLog_Error(
                NLS.bind(
                      Messages.Dialog_RetrieveWeather_WeatherDataNotFound,
                      new Object[] {

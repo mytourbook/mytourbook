@@ -31,13 +31,13 @@ import org.eclipse.swt.widgets.MenuItem;
  */
 public class Action_Weather_SubMenu extends Action implements IMenuCreator {
 
-   private Menu                      _menu;
+   private Menu                       _menu;
 
-   private ActionAdjustTemperature   _action_AdjustTemperature;
-   private ActionRetrieveWeatherData _action_RetrieveWeatherData;
+   private ActionAdjustTemperature    _action_AdjustTemperature;
+   private ActionRetrieveWeatherData  _action_RetrieveWeatherData;
    private ActionSetMinMaxTemperature _action_SetMinMaxTemperature;
 
-   private ITourProvider2            _tourProvider;
+   private ITourProvider2             _tourProvider;
 
    public Action_Weather_SubMenu(final ITourProvider2 tourViewer) {
 
