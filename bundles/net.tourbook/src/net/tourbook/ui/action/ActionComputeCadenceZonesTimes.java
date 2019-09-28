@@ -50,7 +50,7 @@ public class ActionComputeCadenceZonesTimes extends Action {
    @Override
    public void run() {
 
-      // check if the tour editor contains a modified tour
+      // do NOT run when tour editor contains a modified tour
       if (TourManager.isTourEditorModified()) {
          return;
       }
