@@ -67,6 +67,8 @@ Import
   - when multiple power data sources are present within a given FIT file:
     - Stryd or Garmin Running Dynamics Pod
 
+* .tcx
+  - Import Course/Name tag as tour title
 
 Changes
 =======
