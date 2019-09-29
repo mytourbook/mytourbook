@@ -201,7 +201,14 @@ public class TVITourBookYearSub extends TVITourBookItem {
             + "weather_Temperature_Min, " //                      82    //$NON-NLS-1$
             + "weather_Temperature_Max, " //                      83    //$NON-NLS-1$
 
-            + "tourAvgAltChange" //                               84    //$NON-NLS-1$
+            // ---------- TOUR START LOCATION -------------
+
+            + "tourStartPlace, " //                               84    //$NON-NLS-1$
+            + "tourEndPlace " //                                  85    //$NON-NLS-1$
+
+            // ---------- TOUR START LOCATION -------------
+
+            + "tourAvgAltChange" //                               86    //$NON-NLS-1$
 
             + UI.NEW_LINE
 
@@ -286,7 +293,7 @@ public class TVITourBookYearSub extends TVITourBookItem {
                final long dbDrivingTime         = tourItem.colTourDrivingTime = result.getLong(6);
                tourItem.colAltitudeUp           = result.getLong(7);
                tourItem.colAltitudeDown         = result.getLong(8);
-               tourItem.colAvgAltitudeChange    = result.getLong(84);
+               tourItem.colAvgAltitudeChange    = result.getLong(86);
 
                tourItem.colStartDistance        = result.getLong(9);
                final Object tourTypeId          = result.getObject(11);
