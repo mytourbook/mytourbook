@@ -274,7 +274,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       colAltitudeDown      = result.getLong(startIndex + 4);
 
       // VERY IMPORTANT !
-      // Note that we don't do an AVG(tourAvgAltChange) as it would return wrong results.
+      // Note that we don't do an AVG(avgAltitudeChange) as it would return wrong results.
       // Indeed, we can't do an mean average as we need to do a distance-weighted average.
       colAvgAltitudeChange  = colTourDistance <= 0 ? 0 : (colAltitudeUp + colAltitudeDown) / (colTourDistance / 1000f);
 
