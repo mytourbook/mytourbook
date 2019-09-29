@@ -45,7 +45,10 @@ New + Improvements
 * Tour Book View
   - Show min/max temperature values
   - Set min/max temperature values from time slices
-  
+  - Show tour start/end location
+
+* Tour Filter
+  - Filter by tour start/end location  
   
 Import
 ======

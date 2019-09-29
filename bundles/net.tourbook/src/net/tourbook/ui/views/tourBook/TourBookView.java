@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -947,7 +948,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       defineColumn_Tour_Marker();
       defineColumn_Tour_Photos();
       defineColumn_Tour_Tags();
-//      defineColumn_Tour_TagIds();
+      defineColumn_Tour_Location_Start();
+      defineColumn_Tour_Location_End();
+//    defineColumn_Tour_TagIds();            // for debugging
 
       // Motion / Bewegung
       defineColumn_Motion_Distance();
@@ -2657,6 +2660,58 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    }
 
    /**
+    * Column: Tour end location
+    */
+   private void defineColumn_Tour_Location_End() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_LOCATION_END.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            final String tourLocation = ((TVITourBookItem) element).colTourLocation_End;
+
+            if (tourLocation == null) {
+               cell.setText(UI.EMPTY_STRING);
+            } else {
+               cell.setText(tourLocation);
+            }
+
+            setCellColor(cell, element);
+         }
+      });
+   }
+
+   /**
+    * Column: Tour start location
+    */
+   private void defineColumn_Tour_Location_Start() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_LOCATION_START.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            final String tourLocation = ((TVITourBookItem) element).colTourLocation_Start;
+
+            if (tourLocation == null) {
+               cell.setText(UI.EMPTY_STRING);
+            } else {
+               cell.setText(tourLocation);
+            }
+
+            setCellColor(cell, element);
+         }
+      });
+   }
+
+   /**
     * column: markers
     */
    private void defineColumn_Tour_Marker() {
@@ -2707,11 +2762,11 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       });
    }
 
-//   /**
-//    * Column for debugging: Tag ids
-//    */
-//   private void defineColumn_Tour_TagIds() {
-//
+   /**
+    * Column for debugging: Tag ids
+    */
+   private void defineColumn_Tour_TagIds() {
+
 //      final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "TOUR_TAG_IDS", SWT.TRAIL); //$NON-NLS-1$
 //
 //      colDef.setColumnCategory(net.tourbook.ui.Messages.ColumnFactory_Category_Tour);
@@ -2743,7 +2798,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 //            }
 //         }
 //      });
-//   }
+   }
 
    /**
     * Column: Tags
@@ -2900,9 +2955,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_Training_IntensityFactor() {
 
-      final TreeColumnDefinition colDef = TreeColumnFactory.TRAINING_INTENSITY_FACTOR.createColumn(
-            _columnManager,
-            _pc);
+      final TreeColumnDefinition colDef = TreeColumnFactory.TRAINING_INTENSITY_FACTOR.createColumn(_columnManager, _pc);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -2920,8 +2973,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
    private void defineColumn_Training_PowerToWeightRatio() {
 
-      final TreeColumnDefinition colDef = TreeColumnFactory.TRAINING_POWER_TO_WEIGHT
-            .createColumn(_columnManager, _pc);
+      final TreeColumnDefinition colDef = TreeColumnFactory.TRAINING_POWER_TO_WEIGHT.createColumn(_columnManager, _pc);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -3230,7 +3282,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          isDeviceTour = firstSavedTour.isManualTour() == false;
          canMergeTours = isOneTour && isDeviceTour && firstSavedTour.getMergeSourceTourId() != null;
       }
-
 
       final boolean useWeatherRetrieval = _prefStore.getBoolean(ITourbookPreferences.WEATHER_USE_WEATHER_RETRIEVAL) &&
             !_prefStore.getString(ITourbookPreferences.WEATHER_API_KEY).equals(UI.EMPTY_STRING);
@@ -4544,7 +4595,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
                      /**
                       * <code>
-
+                     
                         Caused by: java.lang.NullPointerException
                         at org.eclipse.jface.viewers.AbstractTreeViewer.getSelection(AbstractTreeViewer.java:2956)
                         at org.eclipse.jface.viewers.StructuredViewer.handleSelect(StructuredViewer.java:1211)
@@ -4562,13 +4613,13 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
                         at org.eclipse.jface.viewers.AbstractTreeViewer.internalCollapseToLevel(AbstractTreeViewer.java:1586)
                         at org.eclipse.jface.viewers.AbstractTreeViewer.collapseToLevel(AbstractTreeViewer.java:751)
                         at org.eclipse.jface.viewers.AbstractTreeViewer.collapseAll(AbstractTreeViewer.java:733)
-
+                     
                         at net.tourbook.ui.views.tourBook.TourBookView$70.run(TourBookView.java:3406)
-
+                     
                         at org.eclipse.swt.widgets.RunnableLock.run(RunnableLock.java:35)
                         at org.eclipse.swt.widgets.Synchronizer.runAsyncMessages(Synchronizer.java:135)
                         ... 22 more
-
+                     
                       * </code>
                       */
 
