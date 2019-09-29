@@ -693,6 +693,8 @@ public class Messages extends NLS {
    public static String        Dialog_JoinTours_Label_TourType;
    public static String        Dialog_JoinTours_Link_TourType;
 
+   public static String        Dialog_QuickEdit_Label_TourLocation_Start;
+
    public static String        Dialog_SaveTags_Dialog_Title;
    public static String        Dialog_SaveTags_Label_Info;
    public static String        Dialog_SaveTags_Label_Progress_SubTask;
