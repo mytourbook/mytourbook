@@ -454,6 +454,7 @@ public class Messages extends NLS {
    public static String        App_Action_open_perspective;
    public static String        App_Action_open_preferences;
    public static String        App_Action_OpenOtherViews;
+   public static String        App_Action_RefreshView;
    public static String        App_Action_Remove;
    public static String        App_Action_Remove_Immediate;
    public static String        App_Action_Rename;
