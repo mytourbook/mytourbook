@@ -206,7 +206,7 @@ public class TVITourBookYearSub extends TVITourBookItem {
             + "tourStartPlace, " //                               84    //$NON-NLS-1$
             + "tourEndPlace " //                                  85    //$NON-NLS-1$
 
-            // ---------- TOUR START LOCATION -------------
+            // -------- AVERAGE ALTITUDE CHANGE -----------
 
             + "avgAltitudeChange" //                              86    //$NON-NLS-1$
 
@@ -293,7 +293,6 @@ public class TVITourBookYearSub extends TVITourBookItem {
                final long dbDrivingTime         = tourItem.colTourDrivingTime = result.getLong(6);
                tourItem.colAltitudeUp           = result.getLong(7);
                tourItem.colAltitudeDown         = result.getLong(8);
-               tourItem.colAvgAltitudeChange    = result.getLong(86);
 
                tourItem.colStartDistance        = result.getLong(9);
                final Object tourTypeId          = result.getObject(11);
@@ -414,6 +413,10 @@ public class TVITourBookYearSub extends TVITourBookItem {
 
                tourItem.colTourLocation_Start                  = result.getString(84);
                tourItem.colTourLocation_End                    = result.getString(85);
+
+               // -------- AVERAGE ALTITUDE CHANGE -----------
+
+               tourItem.colAltitude_AvgChange    = result.getLong(86);
 
 // SET_FORMATTING_ON
 

@@ -961,7 +961,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       defineColumn_Altitude_Up();
       defineColumn_Altitude_Down();
       defineColumn_Altitude_Max();
-      defineColumn_Avg_Altitude_Change();
+      defineColumn_Altitude_AvgChange();
 
       // Weather
       defineColumn_Weather_Clouds();
@@ -1191,9 +1191,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    /**
     * column: Average elevation change (m/km or ft/mi)
     */
-   private void defineColumn_Avg_Altitude_Change() {
+   private void defineColumn_Altitude_AvgChange() {
 
-      final TreeColumnDefinition colDef = TreeColumnFactory.AVG_ALTITUDE_CHANGE.createColumn(_columnManager, _pc);
+      final TreeColumnDefinition colDef = TreeColumnFactory.ALTITUDE_AVG_CHANGE.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
 
@@ -1203,7 +1203,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
             final Object element = cell.getElement();
 
-            final float dbAvgAltitudeChange = ((TVITourBookItem) element).colAvgAltitudeChange / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE
+            final float dbAvgAltitudeChange = ((TVITourBookItem) element).colAltitude_AvgChange / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE
                   * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 
             colDef.printValue_0(cell, dbAvgAltitudeChange);
@@ -3968,7 +3968,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       tbm.add(_actionLinkWithOtherViews);
       tbm.add(_actionTourBookOptions);
 
-
       // update that actions are fully created otherwise action enable will fail
       tbm.update(true);
    }
@@ -4638,13 +4637,13 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
                         at org.eclipse.jface.viewers.AbstractTreeViewer.internalCollapseToLevel(AbstractTreeViewer.java:1586)
                         at org.eclipse.jface.viewers.AbstractTreeViewer.collapseToLevel(AbstractTreeViewer.java:751)
                         at org.eclipse.jface.viewers.AbstractTreeViewer.collapseAll(AbstractTreeViewer.java:733)
-                     
+
                         at net.tourbook.ui.views.tourBook.TourBookView$70.run(TourBookView.java:3406)
-                     
+
                         at org.eclipse.swt.widgets.RunnableLock.run(RunnableLock.java:35)
                         at org.eclipse.swt.widgets.Synchronizer.runAsyncMessages(Synchronizer.java:135)
                         ... 22 more
-                     
+
                       * </code>
                       */
 
