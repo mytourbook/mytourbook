@@ -110,6 +110,8 @@ public abstract class TreeColumnFactory {
 
    public static final TreeColumnFactory TOUR_COLLATE_EVENT;
    public static final TreeColumnFactory TOUR_COUNTER;
+   public static final TreeColumnFactory TOUR_LOCATION_END;
+   public static final TreeColumnFactory TOUR_LOCATION_START;
    public static final TreeColumnFactory TOUR_NUM_MARKERS;
    public static final TreeColumnFactory TOUR_NUM_PHOTOS;
    public static final TreeColumnFactory TOUR_TAG_AND_CATEGORY_NOTES;
@@ -1897,6 +1899,41 @@ public abstract class TreeColumnFactory {
             colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_tour_numbers_tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
+
+            return colDef;
+         }
+      };
+
+      TOUR_LOCATION_END = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TOUR_LOCATION_END", SWT.LEAD); //$NON-NLS-1$
+
+            colDef.setColumnCategory(Messages.ColumnFactory_Category_Tour);
+            colDef.setColumnLabel(Messages.ColumnFactory_Tour_LocationEnd_Title);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_Tour_LocationEnd_Title);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Tour_LocationEnd_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
+
+            return colDef;
+         }
+      };
+      TOUR_LOCATION_START = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TOUR_LOCATION_START", SWT.LEAD); //$NON-NLS-1$
+
+            colDef.setColumnCategory(Messages.ColumnFactory_Category_Tour);
+            colDef.setColumnLabel(Messages.ColumnFactory_Tour_LocationStart_Title);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_Tour_LocationStart_Title);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Tour_LocationStart_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
 
             return colDef;
          }

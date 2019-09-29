@@ -201,7 +201,7 @@ public class TourManager {
     * Contains all graph id's which are displayed as a graph in the tour chart and correspond to a
     * graph action
     */
-   private static final int[]                            _allGraphIDs        = new int[] {
+   private static final int[]                            _allGraphIDs                      = new int[] {
 
          GRAPH_ALTITUDE,
          GRAPH_SPEED,
@@ -226,12 +226,12 @@ public class TourManager {
          GRAPH_TOUR_COMPARE
    };
 
-   private final static IPreferenceStore                 _prefStore          = TourbookPlugin.getPrefStore();
+   private final static IPreferenceStore                 _prefStore                        = TourbookPlugin.getPrefStore();
 
    private static TourManager                            _instance;
 
-   private final static StringBuilder                    _sbFormatter        = new StringBuilder();
-   private final static Formatter                        _formatter          = new Formatter(_sbFormatter);
+   private final static StringBuilder                    _sbFormatter                      = new StringBuilder();
+   private final static Formatter                        _formatter                        = new Formatter(_sbFormatter);
 
    /**
     * contains the instance of the {@link TourDataEditorView} or <code>null</code> when this part is
@@ -239,8 +239,8 @@ public class TourManager {
     */
    private static TourDataEditorView                     _tourDataEditorInstance;
    //
-   private static LabelProviderMMSS                      _labelProviderMMSS  = new LabelProviderMMSS();
-   private static LabelProviderInt                       _labelProviderInt   = new LabelProviderInt();
+   private static LabelProviderMMSS                      _labelProviderMMSS                = new LabelProviderMMSS();
+   private static LabelProviderInt                       _labelProviderInt                 = new LabelProviderInt();
    //
    private static TourData                               _joined_TourData;
    private static int                                    _joined_TourIds_Hash;
@@ -249,8 +249,19 @@ public class TourManager {
    private static long                                   _allLoaded_TourData_Key;
    private static int                                    _allLoaded_TourIds_Hash;
    //
-   private static final ListenerList<ITourEventListener> _tourEventListeners = new ListenerList<>(ListenerList.IDENTITY);
-   private static final ListenerList<ITourSaveListener>  _tourSaveListeners  = new ListenerList<>(ListenerList.IDENTITY);
+   private static final ListenerList<ITourEventListener> _tourEventListeners               = new ListenerList<>(ListenerList.IDENTITY);
+   private static final ListenerList<ITourSaveListener>  _tourSaveListeners                = new ListenerList<>(ListenerList.IDENTITY);
+   public static final String                            cadenceZonesTimes_StatementUpdate = UI.EMPTY_STRING
+
+         + "UPDATE " + TourDatabase.TABLE_TOUR_DATA                                                                                    //   //$NON-NLS-1$
+
+         + " SET"                                                                                                                      //                                     //$NON-NLS-1$
+
+         + " cadenceZone_SlowTime=?, "                                                                                                 //                //$NON-NLS-1$
+         + " cadenceZone_FastTime=?, "                                                                                                 //                 //$NON-NLS-1$
+         + " cadenceZones_DelimiterValue=? "                                                                                           //          //$NON-NLS-1$
+
+         + " WHERE tourId=?";                                                                                                          //                        //$NON-NLS-1$
    //
    private ComputeChartValue                             _computeAvg_Altimeter;
    private ComputeChartValue                             _computeAvg_Altitude;
@@ -506,8 +517,6 @@ public class TourManager {
       _allLoaded_TourData = null;
    }
 
-
-
    /**
     * Computes time (seconds) spent in each cadence zone (slow and fast) for several given tours.
     *
@@ -518,21 +527,13 @@ public class TourManager {
     * @throws SQLException
     */
    public static boolean computeCadenceZonesTimes(final Connection conn,
-                                        final ArrayList<TourData> selectedTours) throws SQLException {
+                                                  final ArrayList<TourData> selectedTours) throws SQLException {
+
+      TourLogManager.addLog(TourLogState.DEFAULT, NLS.bind(Messages.Log_ComputeCadenceZonesTimes_001_Start, selectedTours.size()));
 
       boolean isUpdated = false;
 
-      final PreparedStatement stmtUpdate = conn.prepareStatement(UI.EMPTY_STRING
-
-            + "UPDATE " + TourDatabase.TABLE_TOUR_DATA //   //$NON-NLS-1$
-
-            + " SET" //                                     //$NON-NLS-1$
-
-            + " cadenceZone_SlowTime=?, " //                //$NON-NLS-1$
-            + " cadenceZone_FastTime=?, " //                 //$NON-NLS-1$
-            + " cadenceZones_DelimiterValue=? " //          //$NON-NLS-1$
-
-            + " WHERE tourId=?"); //                        //$NON-NLS-1$
+      final PreparedStatement stmtUpdate = conn.prepareStatement(cadenceZonesTimes_StatementUpdate);
 
       int numComputedTour = 0;
       int numNotComputedTour = 0;

@@ -103,6 +103,8 @@ public class TourDatabase {
     * Version for the database which is required that the tourbook application works successfully
     */
    private static final int TOURBOOK_DB_VERSION = 40;
+
+//   private static final int TOURBOOK_DB_VERSION = 40; // 19.10
 //   private static final int TOURBOOK_DB_VERSION = 39; // 19.7
 //   private static final int TOURBOOK_DB_VERSION = 38; // 19.6
 //   private static final int TOURBOOK_DB_VERSION = 37; // 19.2
@@ -247,7 +249,7 @@ public class TourDatabase {
    private static HashMap<Long, TagCollection>            _tagCollections                 = new HashMap<>();
 
    /*
-    * cached distinct fields
+    * Cached distinct fields
     */
    private static TreeSet<String>                _dbTourTitles;
    private static TreeSet<String>                _dbTourStartPlace;
