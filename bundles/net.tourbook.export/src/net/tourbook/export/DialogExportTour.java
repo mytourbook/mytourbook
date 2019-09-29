@@ -188,7 +188,7 @@ public class DialogExportTour extends TitleAreaDialog {
    }
 
    private final static String[]     StravaActivityTypes = new String[] {
-         "Biking", "Running", "Hiking", "Walking", "Swimming"                                                                      //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+         "Biking", "Running", "Hiking", "Walking", "Swimming", "Other"                                                                      //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
    };
 
    private final String              _formatTemplate;
@@ -822,14 +822,13 @@ public class DialogExportTour extends TitleAreaDialog {
                 * label: Activity type
                 */
                _lblTcxActivityType = new Label(container, SWT.NONE);
-               GridDataFactory.fillDefaults().applyTo(_lblTcxActivityType);
                _lblTcxActivityType.setText(Messages.Dialog_Export_Label_TCX_ActivityType);
 
                /*
                 * combo: Activity types
                 */
                _comboTcxActivityTypes = new Combo(container, SWT.SINGLE | SWT.BORDER);
-               GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(_comboTcxActivityTypes);
+               GridDataFactory.fillDefaults().grab(true, false).applyTo(_comboTcxActivityTypes);
             }
          }
 
@@ -869,14 +868,13 @@ public class DialogExportTour extends TitleAreaDialog {
              * label: course name
              */
             _lblTcxCourseName = new Label(container, SWT.NONE);
-            GridDataFactory.fillDefaults().applyTo(_lblTcxCourseName);
             _lblTcxCourseName.setText(Messages.Dialog_Export_Label_TCX_CourseName);
 
             /*
              * combo: name
              */
             _comboTcxCourseName = new Combo(container, SWT.SINGLE | SWT.BORDER);
-            GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(_comboTcxCourseName);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(_comboTcxCourseName);
             _comboTcxCourseName.setVisibleItemCount(20);
             _comboTcxCourseName.addModifyListener(nameModifyListener);
          }
