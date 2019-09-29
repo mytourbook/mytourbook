@@ -3,7 +3,6 @@
 TODOs
 =====
 
-* Show weather, location start/end as new columns
 * When hovering over a graph, data appears referring to the point in the graph the mouse is on: 
   this data does not take into account whether the track has been saved as a using cadence or revolutions, and always shows revolutions.
   https://github.com/wolfgang-ch/mytourbook/issues/86
@@ -52,7 +51,13 @@ New + Improvements
 * Tour Book View
   - Show min/max temperature values
   - Set min/max temperature values from time slices
+  - Show tour start/end location
+
+* Tour Filter
+  - Filter by tour start/end location  
   
+* Dialog Quick Edit
+  - Edit tour start/end location 
   
 Import
 ======
@@ -74,6 +79,8 @@ Import
   - when multiple power data sources are present within a given FIT file:
     - Stryd or Garmin Running Dynamics Pod
 
+* .tcx
+  - Import Course/Name tag as tour title
 
 Changes
 =======
