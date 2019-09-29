@@ -204,7 +204,7 @@ public class TVITourBookYearSub extends TVITourBookItem {
             // ---------- TOUR START LOCATION -------------
 
             + "tourStartPlace, " //                               84    //$NON-NLS-1$
-            + "tourEndPlace " //                                  85    //$NON-NLS-1$
+            + "tourEndPlace, " //                                  85    //$NON-NLS-1$
 
             // -------- AVERAGE ALTITUDE CHANGE -----------
 
