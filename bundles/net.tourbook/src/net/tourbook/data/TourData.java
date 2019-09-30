@@ -875,7 +875,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    /**
     * Person which created this tour or <code>null</code> when the tour is not saved in the
-    * database
+    * database.
+    * <p>
+    * SQL access to this field:
+    * <pre>tourPerson_personId</pre>
     */
    @ManyToOne
    private TourPerson                  tourPerson;
@@ -3248,7 +3251,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    /**
     * Computes time (seconds) spent in each cadence zone (slow and fast).
-    *
     */
    public boolean computeCadenceZonesTimes() {
 

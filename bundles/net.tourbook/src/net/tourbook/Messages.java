@@ -282,6 +282,7 @@ public class Messages extends NLS {
    public static String        Dialog_Export_Group_What;
    public static String        Dialog_Export_Group_What_Tooltip;
    public static String        Dialog_Export_Label_GPX_DistanceValues;
+   public static String        Dialog_Export_Label_TCX_ActivityType;
    public static String        Dialog_Export_Label_TCX_CourseName;
    public static String        Dialog_Export_Label_TCX_NameFrom;
    public static String        Dialog_Export_Label_TCX_NameFrom_Tooltip;
@@ -454,6 +455,7 @@ public class Messages extends NLS {
    public static String        App_Action_open_perspective;
    public static String        App_Action_open_preferences;
    public static String        App_Action_OpenOtherViews;
+   public static String        App_Action_RefreshView;
    public static String        App_Action_Remove;
    public static String        App_Action_Remove_Immediate;
    public static String        App_Action_Rename;
@@ -692,6 +694,8 @@ public class Messages extends NLS {
    public static String        Dialog_JoinTours_Label_TourTime;
    public static String        Dialog_JoinTours_Label_TourType;
    public static String        Dialog_JoinTours_Link_TourType;
+
+   public static String        Dialog_QuickEdit_Label_TourLocation_Start;
 
    public static String        Dialog_SaveTags_Dialog_Title;
    public static String        Dialog_SaveTags_Label_Info;
@@ -2487,6 +2491,8 @@ public class Messages extends NLS {
    public static String Tour_Filter_Field_Season;
    public static String Tour_Filter_Field_Temperature;
    public static String Tour_Filter_Field_TourDate;
+   public static String Tour_Filter_Field_TourLocation_End;
+   public static String Tour_Filter_Field_TourLocation_Start;
    public static String Tour_Filter_Field_TourStartTime;
    public static String Tour_Filter_Field_TourTitle;
    public static String Tour_Filter_Operator_And;

@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -56,9 +56,10 @@ public class GarminSAXHandler extends DefaultHandler {
    private static final String           TAG_HISTORY                 = "History";                                                    //$NON-NLS-1$
    //
    private static final String           TAG_CREATOR                 = "Creator";                                                    //$NON-NLS-1$
-   private static final String           TAG_CREATOR_NAME            = "Name";                                                       //$NON-NLS-1$
    private static final String           TAG_CREATOR_VERSION_MAJOR   = "VersionMajor";                                               //$NON-NLS-1$
    private static final String           TAG_CREATOR_VERSION_MINOR   = "VersionMinor";                                               //$NON-NLS-1$
+   //
+   private static final String           TAG_NAME                    = "Name";                                                       //$NON-NLS-1$
    //
    private static final String           TAG_ALTITUDE_METERS         = "AltitudeMeters";                                             //$NON-NLS-1$
    private static final String           TAG_CALORIES                = "Calories";                                                   //$NON-NLS-1$
@@ -109,39 +110,42 @@ public class GarminSAXHandler extends DefaultHandler {
    }
 
    private boolean                 _importState_IsIgnoreSpeedValues;
+
    private boolean                 _isInActivity;
    private boolean                 _isInCourse;
    private boolean                 _isInLap;
-   //
-   private boolean                 _isInCalories;
-   private boolean                 _isInTrackpoint;
-   private boolean                 _isInTime;
-   private boolean                 _isInLatitude;
-   private boolean                 _isInLongitude;
+
    private boolean                 _isInAltitude;
-   private boolean                 _isInDistance;
+   private boolean                 _isInCalories;
    private boolean                 _isInCadence;
-   private boolean                 _isInRunCadence;
-   private boolean                 _isInSensorState;
+   private boolean                 _isInDistance;
    private boolean                 _isInHeartRate;
    private boolean                 _isInHeartRateValue;
+   private boolean                 _isInLatitude;
+   private boolean                 _isInLongitude;
+   private boolean                 _isInName;
    private boolean                 _isInNotes;
    private boolean                 _isInNs2Speed;
    private boolean                 _isInNs2Watts;
    private boolean                 _isInNs3Speed;
    private boolean                 _isInNs3Watts;
-   //
+   private boolean                 _isInRunCadence;
+   private boolean                 _isInSensorState;
+   private boolean                 _isInTime;
+   private boolean                 _isInTrackpoint;
+
    private boolean                 _isInCreator;
    private boolean                 _isInCreatorName;
    private boolean                 _isInCreatorVersionMajor;
    private boolean                 _isInCreatorVersionMinor;
-   //
+
    private HashMap<Long, TourData> _alreadyImportedTours;
    private HashMap<Long, TourData> _newlyImportedTours;
    private TourbookDevice          _device;
    private String                  _importFilePath;
-   //
-   private ArrayList<TimeData>     _dtList      = new ArrayList<>();
+   private boolean                 _isImported;
+
+   private ArrayList<TimeData>     _allTimeData = new ArrayList<>();
 
    private TimeData                _timeData;
 
@@ -151,8 +155,7 @@ public class GarminSAXHandler extends DefaultHandler {
 
    private boolean                 _isSetLapMarker;
    private boolean                 _isSetLapStartTime;
-   private ArrayList<Long>         _lapStart    = new ArrayList<Long>();
-   private boolean                 _isImported;
+   private ArrayList<Long>         _allLapStart = new ArrayList<>();
 
    private long                    _currentTime;
    private String                  _activitySport;
@@ -160,10 +163,12 @@ public class GarminSAXHandler extends DefaultHandler {
    private int                     _lapCalories;
    private boolean                 _isDistanceFromSensor;
    private boolean                 _isFromStrideSensor;
+
    private StringBuilder           _characters  = new StringBuilder();
 
-   private String                  _tourNotes;
    private Sport                   _sport;
+   private String                  _tourNotes;
+   private String                  _tourTitle;
 
    private class Sport {
 
@@ -211,42 +216,42 @@ public class GarminSAXHandler extends DefaultHandler {
       sbJdk.append(" " + weekYear + " | "); //$NON-NLS-1$ //$NON-NLS-2$
    }
 
-//	private static void weekCheck() {
+// private static void weekCheck() {
 //
-//		final DateTime dt = new DateTime(//
-//				2009, /* year */
-//				12, /* monthOfYear */
-//				6, /* dayOfMonth */
-//				23, /* hourOfDay */
-//				0, /* minuteOfHour */
-//				0, /* secondOfMinute */
-//				0 /* millisOfSecond */
-//		);
+//    final DateTime dt = new DateTime(//
+//          2009, /* year */
+//          12, /* monthOfYear */
+//          6, /* dayOfMonth */
+//          23, /* hourOfDay */
+//          0, /* minuteOfHour */
+//          0, /* secondOfMinute */
+//          0 /* millisOfSecond */
+//    );
 //
-//		final StringBuilder buffer = new StringBuilder()//
-//				//
-//				.append("Testing date ") //$NON-NLS-1$
-//				.append(dt.toString())
-//				.append("\n") //$NON-NLS-1$
-//				//
-//				.append("Joda-Time timezone is ") //$NON-NLS-1$
-//				.append(DateTimeZone.getDefault())
-//				.append(" yet joda wrongly thinks week is ") //$NON-NLS-1$
-//				.append(_jodaWeekFormatter.print(dt))
-//				.append("\n") //$NON-NLS-1$
-//				//
-//				.append("JDK timezone is ") //$NON-NLS-1$
-//				.append(TimeZone.getDefault().getID())
-//				.append(" yet jdk rightfully thinks week is ") //$NON-NLS-1$
-//				.append(_jdkWeekFormatter.format(dt.toDate()))
-//				.append(" (jdk got it right ?!?!)"); //$NON-NLS-1$
+//    final StringBuilder buffer = new StringBuilder()//
+//          //
+//          .append("Testing date ") //$NON-NLS-1$
+//          .append(dt.toString())
+//          .append("\n") //$NON-NLS-1$
+//          //
+//          .append("Joda-Time timezone is ") //$NON-NLS-1$
+//          .append(DateTimeZone.getDefault())
+//          .append(" yet joda wrongly thinks week is ") //$NON-NLS-1$
+//          .append(_jodaWeekFormatter.print(dt))
+//          .append("\n") //$NON-NLS-1$
+//          //
+//          .append("JDK timezone is ") //$NON-NLS-1$
+//          .append(TimeZone.getDefault().getID())
+//          .append(" yet jdk rightfully thinks week is ") //$NON-NLS-1$
+//          .append(_jdkWeekFormatter.format(dt.toDate()))
+//          .append(" (jdk got it right ?!?!)"); //$NON-NLS-1$
 //
-//		System.out.println(buffer.toString());
-//	}
+//    System.out.println(buffer.toString());
+// }
 
    public static void main(final String[] args) {
 
-//		final String pattern = "w dd.MM.yyyy";
+//    final String pattern = "w dd.MM.yyyy";
       final String jodPattern = "ww xx     "; //$NON-NLS-1$
       final String jdkPattern = "ww yy"; //$NON-NLS-1$
 
@@ -322,7 +327,7 @@ public class GarminSAXHandler extends DefaultHandler {
       int validIndex = 0;
       ZonedDateTime checkedTourStart = null;
 
-      for (final TimeData timeData : _dtList) {
+      for (final TimeData timeData : _allTimeData) {
 
          checkedTourStart = TimeTools.getZonedDateTime(timeData.absoluteTime);
 
@@ -350,7 +355,7 @@ public class GarminSAXHandler extends DefaultHandler {
 
       } else {
 
-         if (validIndex == _dtList.size()) {
+         if (validIndex == _allTimeData.size()) {
 
             // all time slices have the same "invalid" date 2007-04-01 but the date also could be valid
 
@@ -362,7 +367,7 @@ public class GarminSAXHandler extends DefaultHandler {
        * the date starts with 2007-04-01 but it changes to another date
        */
 
-      final TimeData[] timeSlices = _dtList.toArray(new TimeData[_dtList.size()]);
+      final TimeData[] timeSlices = _allTimeData.toArray(new TimeData[_allTimeData.size()]);
 
       /*
        * get average time slice duration
@@ -422,7 +427,7 @@ public class GarminSAXHandler extends DefaultHandler {
             NLS.bind(//
                   Messages.Garmin_SAXHandler_InvalidDate_2007_04_01,
                   _importFilePath,
-                  TimeTools.getZonedDateTime(_dtList.get(0).absoluteTime)));
+                  TimeTools.getZonedDateTime(_allTimeData.get(0).absoluteTime)));
    }
 
    @Override
@@ -435,6 +440,7 @@ public class GarminSAXHandler extends DefaultHandler {
             || _isInAltitude
             || _isInDistance
             || _isInCadence
+            || _isInName
             || _isInRunCadence
             || _isInSensorState
             || _isInHeartRate
@@ -458,8 +464,9 @@ public class GarminSAXHandler extends DefaultHandler {
    }
 
    public void dispose() {
-      _lapStart.clear();
-      _dtList.clear();
+      
+      _allLapStart.clear();
+      _allTimeData.clear();
    }
 
    @Override
@@ -484,7 +491,7 @@ public class GarminSAXHandler extends DefaultHandler {
 
             _isInTrackpoint = false;
 
-            finalizeTrackpoint();
+            finalize_Trackpoint();
 
          } else if (_isInNotes && name.equals(TAG_NOTES)) {
 
@@ -520,6 +527,16 @@ public class GarminSAXHandler extends DefaultHandler {
 
             } catch (final NumberFormatException e) {}
 
+         } else if (_isInCourse && _isInName) {
+
+            _isInName = false;
+
+            // "Name" tag occures multiple times
+            if (!_isInCreator) {
+
+               _tourTitle = _characters.toString();
+            }
+
          } else if (name.equals(TAG_ACTIVITY)) {
 
             /*
@@ -527,7 +544,7 @@ public class GarminSAXHandler extends DefaultHandler {
              */
             _isInActivity = false;
 
-            finalizeTour();
+            finalize_Tour();
 
          } else if (name.equals(TAG_COURSE) || name.equals(TAG_HISTORY)) {
 
@@ -537,7 +554,7 @@ public class GarminSAXHandler extends DefaultHandler {
 
             _isInCourse = false;
 
-            finalizeTour();
+            finalize_Tour();
          }
 
       } catch (final NumberFormatException e) {
@@ -548,10 +565,10 @@ public class GarminSAXHandler extends DefaultHandler {
 
    }
 
-   private void finalizeTour() {
+   private void finalize_Tour() {
 
       // check if data are available
-      if (_dtList.size() == 0) {
+      if (_allTimeData.size() == 0) {
          return;
       }
 
@@ -560,6 +577,8 @@ public class GarminSAXHandler extends DefaultHandler {
       // create data object for each tour
       final TourData tourData = new TourData();
 
+      tourData.setTourTitle(_tourTitle);
+
       // set tour notes
       setTourNotes(tourData);
 
@@ -567,7 +586,7 @@ public class GarminSAXHandler extends DefaultHandler {
        * set tour start date/time
        */
       adjustTourStart();
-      tourData.setTourStartTime(TimeTools.getZonedDateTime(_dtList.get(0).absoluteTime));
+      tourData.setTourStartTime(TimeTools.getZonedDateTime(_allTimeData.get(0).absoluteTime));
 
       tourData.setIsDistanceFromSensor(_isDistanceFromSensor);
       tourData.setIsStrideSensorPresent(_isFromStrideSensor);
@@ -583,19 +602,22 @@ public class GarminSAXHandler extends DefaultHandler {
 
       tourData.setDeviceId(_device.deviceId);
 
-      tourData.setDeviceName(
-            _device.visibleName + (deviceName == null
+      tourData.setDeviceName(_device.visibleName
+            + (deviceName == null
                   ? UI.EMPTY_STRING
                   : UI.SPACE + deviceName));
 
       tourData.setDeviceFirmwareVersion(
+
             majorVersion == null
                   ? UI.EMPTY_STRING
-                  : majorVersion + (minorVersion == null //
-                        ? UI.EMPTY_STRING
-                        : UI.SYMBOL_DOT + minorVersion));
 
-      tourData.createTimeSeries(_dtList, true);
+                  : majorVersion
+                        + (minorVersion == null
+                              ? UI.EMPTY_STRING
+                              : UI.SYMBOL_DOT + minorVersion));
+
+      tourData.createTimeSeries(_allTimeData, true);
 
       // after all data are added, the tour id can be created
       final String uniqueId = _device.createUniqueId(tourData, Util.UNIQUE_ID_SUFFIX_GARMIN_TCX);
@@ -616,7 +638,7 @@ public class GarminSAXHandler extends DefaultHandler {
       _isImported = true;
    }
 
-   private void finalizeTrackpoint() {
+   private void finalize_Trackpoint() {
 
       if (_timeData != null) {
 
@@ -632,7 +654,7 @@ public class GarminSAXHandler extends DefaultHandler {
             _timeData.markerLabel = Integer.toString(_lapCounter - 1);
          }
 
-         _dtList.add(_timeData);
+         _allTimeData.add(_timeData);
 
          _timeData = null;
 
@@ -641,13 +663,13 @@ public class GarminSAXHandler extends DefaultHandler {
 
       if (_isSetLapStartTime) {
          _isSetLapStartTime = false;
-         _lapStart.add(_currentTime);
+         _allLapStart.add(_currentTime);
       }
    }
 
    private void getData_Creator_10_Start(final String name) {
 
-      if (name.equals(TAG_CREATOR_NAME)) {
+      if (name.equals(TAG_NAME)) {
          _isInCreatorName = true;
       } else if (name.equals(TAG_CREATOR_VERSION_MAJOR)) {
          _isInCreatorVersionMajor = true;
@@ -664,7 +686,7 @@ public class GarminSAXHandler extends DefaultHandler {
 
       final String charData = _characters.toString();
 
-      if (_isInCreatorName && name.equals(TAG_CREATOR_NAME)) {
+      if (_isInCreatorName && name.equals(TAG_NAME)) {
 
          _isInCreatorName = false;
          _sport.creatorName = charData;
@@ -737,14 +759,14 @@ public class GarminSAXHandler extends DefaultHandler {
 
          _isInNs2Watts = true;
          _characters.delete(0, _characters.length());
-         
+
       } else if (name.equals(TAG_NS3_SPEED)) {
-         
+
          _isInNs3Speed = true;
          _characters.delete(0, _characters.length());
-         
+
       } else if (name.equals(TAG_NS3_WATTS)) {
-         
+
          _isInNs3Watts = true;
          _characters.delete(0, _characters.length());
 
@@ -832,22 +854,22 @@ public class GarminSAXHandler extends DefaultHandler {
          _isInNs2Watts = false;
 
          _timeData.power = Util.parseFloat(_characters.toString());
-         
+
       } else if (name.equals(TAG_NS3_SPEED)) {
-         
+
          _isInNs3Speed = false;
-         
+
          if (_importState_IsIgnoreSpeedValues == false) {
-            
+
             // use speed values from the device
-            
+
             _timeData.speed = Util.parseFloat(_characters.toString());
          }
-         
+
       } else if (name.equals(TAG_NS3_WATTS)) {
-         
+
          _isInNs3Watts = false;
-         
+
          _timeData.power = Util.parseFloat(_characters.toString());
 
       } else if (name.equals(TAG_TIME)) {
@@ -887,7 +909,7 @@ public class GarminSAXHandler extends DefaultHandler {
       }
    }
 
-   private void initializeNewLap() {
+   private void initialize_NewLap() {
 
       _isInLap = true;
 
@@ -901,16 +923,18 @@ public class GarminSAXHandler extends DefaultHandler {
       _isSetLapStartTime = true;
    }
 
-   private void initializeNewTour() {
+   private void initialize_NewTour() {
 
       _lapCounter = 0;
       _isSetLapMarker = false;
-      _lapStart.clear();
+      _allLapStart.clear();
+
+      _allTimeData.clear();
 
       _isFromStrideSensor = false;
-      _dtList.clear();
-      _tourNotes = null;
       _sport = new Sport();
+      _tourNotes = null;
+      _tourTitle = UI.EMPTY_STRING;
    }
 
    /**
@@ -922,7 +946,7 @@ public class GarminSAXHandler extends DefaultHandler {
 
    /**
     * Set the notes into the description and/or title field
-    * 
+    *
     * @param tourData
     */
    private void setTourNotes(final TourData tourData) {
@@ -958,14 +982,14 @@ public class GarminSAXHandler extends DefaultHandler {
    public void startElement(final String uri, final String localName, final String name, final Attributes attributes)
          throws SAXException {
 
-//		System.out.print("<" + name + ">\n");
+//    System.out.print("<" + name + ">\n");
 
       if (_dataVersion > 0) {
 
          if (_dataVersion == 1) {
 
             /*
-             * http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v1
+             * xsi:schemaLocation=http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v1
              */
             if (_isInCourse) {
 
@@ -982,7 +1006,7 @@ public class GarminSAXHandler extends DefaultHandler {
 
                } else if (name.equals(TAG_LAP)) {
 
-                  initializeNewLap();
+                  initialize_NewLap();
                }
 
             } else if (name.equals(TAG_COURSE) || name.equals(TAG_HISTORY)) {
@@ -993,13 +1017,13 @@ public class GarminSAXHandler extends DefaultHandler {
 
                _isInCourse = true;
 
-               initializeNewTour();
+               initialize_NewTour();
             }
 
          } else if (_dataVersion == 2) {
 
             /*
-             * http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2
+             * xsi:schemaLocation=http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2
              */
 
             if (_isInActivity) {
@@ -1025,7 +1049,7 @@ public class GarminSAXHandler extends DefaultHandler {
 
                } else if (name.equals(TAG_LAP)) {
 
-                  initializeNewLap();
+                  initialize_NewLap();
                }
 
             } else if (_isInCourse) {
@@ -1040,6 +1064,11 @@ public class GarminSAXHandler extends DefaultHandler {
 
                   // create new time item
                   _timeData = new TimeData();
+
+               } else if (name.equals(TAG_NAME)) {
+
+                  _isInName = true;
+                  _characters.delete(0, _characters.length());
                }
 
             } else if (name.equals(TAG_ACTIVITY) || name.equals(TAG_COURSE)) {
@@ -1059,7 +1088,7 @@ public class GarminSAXHandler extends DefaultHandler {
                   _isInCourse = true;
                }
 
-               initializeNewTour();
+               initialize_NewTour();
             }
          }
 
@@ -1113,12 +1142,12 @@ public class GarminSAXHandler extends DefaultHandler {
     */
    private void validateTimeSeries() {
 
-      final ArrayList<TimeData> removeTimeData = new ArrayList<TimeData>();
+      final ArrayList<TimeData> removeTimeData = new ArrayList<>();
 
       TimeData previousTimeData = null;
       TimeData firstMarkerTimeData = null;
 
-      for (final TimeData timeData : _dtList) {
+      for (final TimeData timeData : _allTimeData) {
 
          if (previousTimeData != null) {
 
@@ -1156,6 +1185,6 @@ public class GarminSAXHandler extends DefaultHandler {
          previousTimeData = timeData;
       }
 
-      _dtList.removeAll(removeTimeData);
+      _allTimeData.removeAll(removeTimeData);
    }
 }
