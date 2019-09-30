@@ -103,6 +103,8 @@ public class TourDatabase {
     * Version for the database which is required that the tourbook application works successfully
     */
    private static final int TOURBOOK_DB_VERSION = 40;
+
+//   private static final int TOURBOOK_DB_VERSION = 40; // 19.10
 //   private static final int TOURBOOK_DB_VERSION = 39; // 19.7
 //   private static final int TOURBOOK_DB_VERSION = 38; // 19.6
 //   private static final int TOURBOOK_DB_VERSION = 37; // 19.2
@@ -247,7 +249,7 @@ public class TourDatabase {
    private static HashMap<Long, TagCollection>            _tagCollections                 = new HashMap<>();
 
    /*
-    * cached distinct fields
+    * Cached distinct fields
     */
    private static TreeSet<String>                _dbTourTitles;
    private static TreeSet<String>                _dbTourStartPlace;
@@ -3116,7 +3118,7 @@ public class TourDatabase {
             + " cadenceZone_SlowTime                  INTEGER DEFAULT -1,                 \n" //$NON-NLS-1$
             + " cadenceZone_FastTime                  INTEGER DEFAULT -1,                 \n" //$NON-NLS-1$
             + " cadenceZones_DelimiterValue           INTEGER DEFAULT 0,                  \n" //$NON-NLS-1$
-            + " tourAvgAltChange                      INTEGER DEFAULT 0,                  \n" //$NON-NLS-1$
+            + " avgAltitudeChange                     INTEGER DEFAULT 0,                  \n" //$NON-NLS-1$
             //
             // version 40 end
 
@@ -7310,7 +7312,7 @@ public class TourDatabase {
             SQL.AddCol_Int      (stmt, TABLE_TOUR_DATA, "cadenceZone_SlowTime", DEFAULT_0);//$NON-NLS-1$
             SQL.AddCol_Int      (stmt, TABLE_TOUR_DATA, "cadenceZone_FastTime", DEFAULT_0); //$NON-NLS-1$
             SQL.AddCol_Int      (stmt, TABLE_TOUR_DATA, "cadenceZones_DelimiterValue", DEFAULT_0); //$NON-NLS-1$
-            SQL.AddCol_Int      (stmt, TABLE_TOUR_DATA, "tourAvgAltChange", DEFAULT_0); //$NON-NLS-1$
+            SQL.AddCol_Int      (stmt, TABLE_TOUR_DATA, "avgAltitudeChange", DEFAULT_0); //$NON-NLS-1$
 
             // Create index in table: TOURDATA_TOURTAG - Index: TOURTAG_TAGID
             SQL.CreateIndex(  stmt, JOINTABLE__TOURDATA__TOURTAG, KEY_TAG);

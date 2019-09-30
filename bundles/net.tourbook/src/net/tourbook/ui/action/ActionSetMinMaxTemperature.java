@@ -60,7 +60,7 @@ public class ActionSetMinMaxTemperature extends Action {
       TourLogManager.showLogView();
 
       // Loading selected tours...
-      TourLogManager.logDefault(Messages.Log_App_LoadingSelectedTours);
+      TourLogManager.logTitle(Messages.Log_App_LoadingSelectedTours);
 
       long start = System.currentTimeMillis();
 
@@ -102,7 +102,7 @@ public class ActionSetMinMaxTemperature extends Action {
       // compute min/max temperature
 
       // Computing min/max temperature values
-      TourLogManager.logDefault(Messages.Log_SetMinMaxTemperature_Startup);
+      TourLogManager.logTitle(Messages.Log_SetMinMaxTemperature_Startup);
 
       boolean isTaskDone = false;
 

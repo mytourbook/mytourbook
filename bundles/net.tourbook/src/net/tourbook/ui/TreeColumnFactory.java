@@ -31,7 +31,7 @@ public abstract class TreeColumnFactory {
    public static final TreeColumnFactory ALTITUDE_DOWN;
    public static final TreeColumnFactory ALTITUDE_UP;
    public static final TreeColumnFactory ALTITUDE_MAX;
-   public static final TreeColumnFactory AVG_ALTITUDE_CHANGE;
+   public static final TreeColumnFactory ALTITUDE_AVG_CHANGE;
 
    public static final TreeColumnFactory BODY_CALORIES;
    public static final TreeColumnFactory BODY_PERSON;
@@ -111,6 +111,8 @@ public abstract class TreeColumnFactory {
 
    public static final TreeColumnFactory TOUR_COLLATE_EVENT;
    public static final TreeColumnFactory TOUR_COUNTER;
+   public static final TreeColumnFactory TOUR_LOCATION_END;
+   public static final TreeColumnFactory TOUR_LOCATION_START;
    public static final TreeColumnFactory TOUR_NUM_MARKERS;
    public static final TreeColumnFactory TOUR_NUM_PHOTOS;
    public static final TreeColumnFactory TOUR_TAG_AND_CATEGORY_NOTES;
@@ -202,19 +204,19 @@ public abstract class TreeColumnFactory {
          }
       };
 
-      AVG_ALTITUDE_CHANGE = new TreeColumnFactory() {
+      ALTITUDE_AVG_CHANGE = new TreeColumnFactory() {
          @Override
          public TreeColumnDefinition createColumn(final ColumnManager columnManager,
                                                   final PixelConverter pixelConverter) {
 
-            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "AVG_ALTITUDE_CHANGE", SWT.TRAIL); //$NON-NLS-1$
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "ALTITUDE_AVG_CHANGE", SWT.TRAIL); //$NON-NLS-1$
             final String unitLabel = UI.SYMBOL_AVERAGE + UI.SPACE + UI.UNIT_LABEL_ALTITUDE + "/" + UI.UNIT_LABEL_DISTANCE; //$NON-NLS-1$
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Altitude);
-            colDef.setColumnLabel(Messages.ColumnFactory_avg_altitude_change_label);
+            colDef.setColumnLabel(Messages.ColumnFactory_Altitude_AvgChange_Label);
             colDef.setColumnHeaderText(unitLabel);
             colDef.setColumnUnit(unitLabel);
-            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_avg_altitude_change_tooltip);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Altitude_AvgChange_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
@@ -1918,6 +1920,41 @@ public abstract class TreeColumnFactory {
             colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_tour_numbers_tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
+
+            return colDef;
+         }
+      };
+
+      TOUR_LOCATION_END = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TOUR_LOCATION_END", SWT.LEAD); //$NON-NLS-1$
+
+            colDef.setColumnCategory(Messages.ColumnFactory_Category_Tour);
+            colDef.setColumnLabel(Messages.ColumnFactory_Tour_LocationEnd_Title);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_Tour_LocationEnd_Title);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Tour_LocationEnd_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
+
+            return colDef;
+         }
+      };
+      TOUR_LOCATION_START = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TOUR_LOCATION_START", SWT.LEAD); //$NON-NLS-1$
+
+            colDef.setColumnCategory(Messages.ColumnFactory_Category_Tour);
+            colDef.setColumnLabel(Messages.ColumnFactory_Tour_LocationStart_Title);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_Tour_LocationStart_Title);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Tour_LocationStart_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
 
             return colDef;
          }

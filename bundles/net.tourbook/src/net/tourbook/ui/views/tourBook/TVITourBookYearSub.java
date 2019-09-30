@@ -201,7 +201,14 @@ public class TVITourBookYearSub extends TVITourBookItem {
             + "weather_Temperature_Min, " //                      82    //$NON-NLS-1$
             + "weather_Temperature_Max, " //                      83    //$NON-NLS-1$
 
-            + "tourAvgAltChange" //                               84    //$NON-NLS-1$
+            // ---------- TOUR START LOCATION -------------
+
+            + "tourStartPlace, " //                               84    //$NON-NLS-1$
+            + "tourEndPlace, " //                                 85    //$NON-NLS-1$
+
+            // -------- AVERAGE ALTITUDE CHANGE -----------
+
+            + "avgAltitudeChange" //                              86    //$NON-NLS-1$
 
             + UI.NEW_LINE
 
@@ -286,7 +293,6 @@ public class TVITourBookYearSub extends TVITourBookItem {
                final long dbDrivingTime         = tourItem.colTourDrivingTime = result.getLong(6);
                tourItem.colAltitudeUp           = result.getLong(7);
                tourItem.colAltitudeDown         = result.getLong(8);
-               tourItem.colAvgAltitudeChange    = result.getLong(84);
 
                tourItem.colStartDistance        = result.getLong(9);
                final Object tourTypeId          = result.getObject(11);
@@ -352,7 +358,7 @@ public class TVITourBookYearSub extends TVITourBookItem {
 
                // -----------------------------------------------
 
-               final float dbCadenceMultiplier = result.getFloat(54);
+               final float dbCadenceMultiplier                 = result.getFloat(54);
 
                // ---------- RUNNING DYNAMICS -------------
 
@@ -392,7 +398,6 @@ public class TVITourBookYearSub extends TVITourBookItem {
                tourItem.colTraining_TrainingEffect_Anaerobic   = result.getFloat(77);
                tourItem.colTraining_TrainingPerformance        = result.getFloat(78);
 
-
                // ---------- CADENCE ZONE -------------
 
                final int cadenceZone_SlowTime                  = result.getInt(79);
@@ -403,6 +408,15 @@ public class TVITourBookYearSub extends TVITourBookItem {
 
                tourItem.colTemperature_Min                     = result.getFloat(82);
                tourItem.colTemperature_Max                     = result.getFloat(83);
+
+               // ---------- TOUR START LOCATION -------------
+
+               tourItem.colTourLocation_Start                  = result.getString(84);
+               tourItem.colTourLocation_End                    = result.getString(85);
+
+               // -------- AVERAGE ALTITUDE CHANGE -----------
+
+               tourItem.colAltitude_AvgChange    = result.getLong(86);
 
 // SET_FORMATTING_ON
 

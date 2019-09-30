@@ -38,8 +38,8 @@ public class Messages extends NLS {
    public static String        ColumnFactory_altitude_up_h_tooltip;
    public static String        ColumnFactory_altitude_up_label;
    public static String        ColumnFactory_altitude_up_tooltip;
-   public static String        ColumnFactory_avg_altitude_change_label;
-   public static String        ColumnFactory_avg_altitude_change_tooltip;
+   public static String        ColumnFactory_Altitude_AvgChange_Label;
+   public static String        ColumnFactory_Altitude_AvgChange_Tooltip;
    public static String        ColumnFactory_avg_cadence;
    public static String        ColumnFactory_avg_cadence_label;
    public static String        ColumnFactory_avg_cadence_tooltip;
@@ -376,6 +376,10 @@ public class Messages extends NLS {
    public static String        ColumnFactory_TimeZoneDifference_Tooltip;
    public static String        ColumnFactory_Tour_DayTime;
    public static String        ColumnFactory_Tour_DayTime_Tooltip;
+   public static String        ColumnFactory_Tour_LocationEnd_Title;
+   public static String        ColumnFactory_Tour_LocationEnd_Tooltip;
+   public static String        ColumnFactory_Tour_LocationStart_Title;
+   public static String        ColumnFactory_Tour_LocationStart_Tooltip;
    public static String        ColumnFactory_Tour_WeekDay_Header;
    public static String        ColumnFactory_Tour_WeekDay_Label;
    public static String        ColumnFactory_Tour_WeekDay_Tooltip;

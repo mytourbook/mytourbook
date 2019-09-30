@@ -84,7 +84,7 @@ public class CalendarTourDataProvider {
 
    private CalendarTourDataProvider() {
       invalidate();
-   };
+   }
 
    static CalendarTourDataProvider getInstance() {
 
@@ -233,7 +233,7 @@ public class CalendarTourDataProvider {
             + " calories,					   " + NL // 16	//$NON-NLS-1$
             + " jTdataTtag.TourTag_tagId,	" + NL // 17 //$NON-NLS-1$
 
-            + " TourAltUp					   " + NL // 18 //$NON-NLS-1$
+            + " TourAltDown   			   " + NL // 18 //$NON-NLS-1$
 
             + NL
 
@@ -341,7 +341,6 @@ public class CalendarTourDataProvider {
 
                   dbDistance.add(result.getInt(7));
                   dbElevationGain.add(result.getInt(8));
-                  dbElevationLoss.add(result.getInt(18));
 
                   dbTourRecordingTime.add(recordingTime);
                   dbTourDrivingTime.add(result.getInt(10));
@@ -368,6 +367,8 @@ public class CalendarTourDataProvider {
 
                      dbTagIds.put(tourId, tagIds);
                   }
+
+                  dbElevationLoss.add(result.getInt(18));
 
                   /*
                    * convert type id to the type index in the tour type array, this is also
