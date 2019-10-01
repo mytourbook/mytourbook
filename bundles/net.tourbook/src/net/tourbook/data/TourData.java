@@ -1457,6 +1457,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    public boolean             multipleTour_IsCadenceSpm;
 
    /**
+    * Contains the cadence multiplier for each tour to display the unit correctly.
+    */
+   @Transient
+   public float[]             multipleTours_CadenceMultiplier;
+
+   /**
     * Contains the swim start index in the swim data series for each tour.
     */
    @Transient
