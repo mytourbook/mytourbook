@@ -1272,6 +1272,7 @@ public class Messages extends NLS {
    public static String        Log_Import_Tour;
    public static String        Log_Import_Tour_End;
    public static String        Log_Import_Tour_Imported;
+   public static String        Log_Import_Tours_Imported_From_File;
 
    public static String        Log_Reimport_AllTimeSlices;
    public static String        Log_Reimport_Only_Altitude;
