@@ -274,8 +274,8 @@ public class CalendarProfileManager {
    static final int                   YEAR_COLUMN_DAY_WIDTH_MIN  = 1;
    static final int                   YEAR_COLUMN_DAY_WIDTH_MAX  = 500;
 
-   private static final DataFormatter _tourFormatter_Distance;
    private static final DataFormatter _tourFormatter_Altitude;
+   private static final DataFormatter _tourFormatter_Distance;
    private static final DataFormatter _tourFormatter_Elevation_Change;
    private static final DataFormatter _tourFormatter_Energy_kcal;
    private static final DataFormatter _tourFormatter_Energy_MJ;
@@ -287,8 +287,8 @@ public class CalendarProfileManager {
    private static final DataFormatter _tourFormatter_TourDescription;
    private static final DataFormatter _tourFormatter_TourTitle;
 
-   private static final DataFormatter _weekFormatter_Distance;
    private static final DataFormatter _weekFormatter_Altitude;
+   private static final DataFormatter _weekFormatter_Distance;
    private static final DataFormatter _weekFormatter_Elevation_Change;
    private static final DataFormatter _weekFormatter_Energy_kcal;
    private static final DataFormatter _weekFormatter_Energy_MJ;
@@ -360,8 +360,8 @@ public class CalendarProfileManager {
       };
 
       // Week
-      _weekFormatter_Distance       = createFormatter_Distance();
       _weekFormatter_Altitude       = createFormatter_Altitude();
+      _weekFormatter_Distance       = createFormatter_Distance();
       _weekFormatter_Elevation_Change       = createFormatter_Elevation_Change();
 
       _weekFormatter_Pace          = createFormatter_Pace();
@@ -3356,12 +3356,12 @@ public class CalendarProfileManager {
 
          switch (formatterData.id) {
 
-         case DISTANCE:
-            _tourFormatter_Distance.setValueFormat(valueFormat);
-            break;
-
          case ALTITUDE:
             _tourFormatter_Altitude.setValueFormat(valueFormat);
+            break;
+
+         case DISTANCE:
+            _tourFormatter_Distance.setValueFormat(valueFormat);
             break;
 
          case ELEVATION_CHANGE:
@@ -3414,16 +3414,16 @@ public class CalendarProfileManager {
 
          switch (formatterData.id) {
 
+         case ALTITUDE:
+            _weekFormatter_Altitude.setValueFormat(valueFormat);
+            break;
+
          case DISTANCE:
             _weekFormatter_Distance.setValueFormat(valueFormat);
             break;
 
          case ELEVATION_CHANGE:
             _weekFormatter_Elevation_Change.setValueFormat(valueFormat);
-            break;
-
-         case ALTITUDE:
-            _weekFormatter_Altitude.setValueFormat(valueFormat);
             break;
 
          case ENERGY_KCAL:
