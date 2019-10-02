@@ -283,6 +283,7 @@ public class Messages extends NLS {
    public static String        Dialog_Export_Group_What;
    public static String        Dialog_Export_Group_What_Tooltip;
    public static String        Dialog_Export_Label_GPX_DistanceValues;
+   public static String        Dialog_Export_Label_TCX_ActivityType;
    public static String        Dialog_Export_Label_TCX_CourseName;
    public static String        Dialog_Export_Label_TCX_NameFrom;
    public static String        Dialog_Export_Label_TCX_NameFrom_Tooltip;
@@ -1272,6 +1273,7 @@ public class Messages extends NLS {
    public static String        Log_Import_Tour;
    public static String        Log_Import_Tour_End;
    public static String        Log_Import_Tour_Imported;
+   public static String        Log_Import_Tours_Imported_From_File;
 
    public static String        Log_Reimport_AllTimeSlices;
    public static String        Log_Reimport_Only_Altitude;
