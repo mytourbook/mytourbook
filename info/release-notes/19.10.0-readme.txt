@@ -3,9 +3,6 @@
 TODOs
 =====
 
-* When hovering over a graph, data appears referring to the point in the graph the mouse is on: 
-  this data does not take into account whether the track has been saved as a using cadence or revolutions, and always shows revolutions.
-  https://github.com/wolfgang-ch/mytourbook/issues/86
 * Test import because of changed device watching task + sql exception handling
 * Recommend DBeaver as a better SQL explorer   
 
@@ -112,7 +109,8 @@ Bugfix
 * Tour Chart
   - Imperial altitude/altimeter values could be wrong depending on the selected measurement system and when the tour was displayed the first time
   - When multiple tours are displayed and some of the tours have no distance, then the line graph was painted to x=0 which was showing a corrupted graph with triangles
-       
+  - Show RPM/SPM correctly in the valuepoint tooltip https://github.com/wolfgang-ch/mytourbook/issues/86
+
 
 Translation    
 ===========

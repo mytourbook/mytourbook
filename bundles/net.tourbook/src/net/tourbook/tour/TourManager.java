@@ -811,6 +811,7 @@ public class TourManager {
       final int[] toSwim_Time = joinedTourData.swim_Time = new int[numSwimTimeSlices];
 
       final Long[] allTourIds = joinedTourData.multipleTourIds = new Long[numTours];
+      final float[] allTours_CadenceMultiplier = joinedTourData.multipleTours_CadenceMultiplier = new float[numTours];
       final int[] allStartIndex = joinedTourData.multipleTourStartIndex = new int[numTours];
       final long[] allStartTime = joinedTourData.multipleTourStartTime = new long[numTours];
       final String[] allTourTitle = joinedTourData.multipleTourTitles = new String[numTours];
@@ -954,13 +955,16 @@ public class TourManager {
             isAltitudeSerie = true;
             System.arraycopy(fromAltitudeSerie, 0, toAltitudeSerie, toStartIndex, fromSerieLength);
          }
+
          if (fromCadenceSerie != null) {
+
             isCadenceSerie = true;
             System.arraycopy(fromCadenceSerie, 0, toCadenceSerie, toStartIndex, fromSerieLength);
 
             isCadenceRpm |= !fromTourData.isCadenceSpm();
             isCadenceSpm |= fromTourData.isCadenceSpm();
          }
+
          if (fromGearSerie != null) {
             isGearSerie = true;
             System.arraycopy(fromGearSerie, 0, toGearSerie, toStartIndex, fromSerieLength);
@@ -1066,6 +1070,9 @@ public class TourManager {
          final long tourStartTime = fromTourData.getTourStartTimeMS();
          allTourTitle[tourIndex] = TimeTools.getZonedDateTime(tourStartTime).format(TimeTools.Formatter_Date_S);
          allStartTime[tourIndex] = tourStartTime;
+
+         // cadence multiplier
+         allTours_CadenceMultiplier[tourIndex] = fromTourData.getCadenceMultiplier();
 
          /*
           * Add 1 otherwise the next tour has the same start time as the previous tour end time,

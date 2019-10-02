@@ -38,6 +38,7 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
 
+import net.sf.swtaddons.autocomplete.combo.AutocompleteComboInput;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
@@ -188,13 +189,13 @@ public class DialogExportTour extends TitleAreaDialog {
    }
 
    private final static String[]     StravaActivityTypes = new String[] {
-         "Biking", "Running", "Hiking", "Walking", "Swimming", "Other"                                                                      //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+         "Biking", "Running", "Hiking", "Walking", "Swimming", "Other"                                                                                    //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
    };
 
    private final String              _formatTemplate;
 
-   private final IDialogSettings     _state = TourbookPlugin
-         .getState("DialogExportTour");                                       //$NON-NLS-1$
+   private final IDialogSettings     _state              = TourbookPlugin
+         .getState("DialogExportTour");                                                                                                                   //$NON-NLS-1$
 
    private final ExportTourExtension _exportExtensionPoint;
 
@@ -2143,6 +2144,8 @@ public class DialogExportTour extends TitleAreaDialog {
          } else {
             _comboTcxActivityTypes.select(_comboTcxActivityTypes.indexOf(lastSelected_ActivityType));
          }
+
+         new AutocompleteComboInput(_comboTcxActivityTypes);
 
          updateUI_CourseName();
       }
