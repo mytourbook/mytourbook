@@ -1156,7 +1156,6 @@ public class FitLogSAXHandler extends DefaultHandler {
                   tourTag,
                   TourDatabase.ENTITY_IS_NOT_SAVED,
                   TourTag.class);
-
          }
       }
 
