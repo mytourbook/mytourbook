@@ -277,8 +277,8 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 				lastTourMonth = (lastTourMonth == 0) ? startBlock.month : lastTourMonth;
 
 				/*
-				 * because we read the tours in decending order (last tour first), we check if the
-				 * month of the current tour is higher than from the last tour, if this is the case,
+				 * because we read the tours in descending order (last tour first), we check if the
+				 * month of the current tour is higher than from the previously imported tour, if this is the case,
 				 * we assume to have data from the previous year
 				 */
 				if (startBlock.month > lastTourMonth) {
@@ -539,8 +539,8 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 				
 				/*
 				 * make sure to end not in an endless loop where the current AA offset is the same
-				 * as the first AA offset (this seems to be unlikely but it happend already 2 Month
-				 * after the first implementation)
+				 * as the first AA offset (this seems to be unlikely but it has happened already 2 
+				 * months after the first implementation)
 				 */
 				if (offsetAARecord == initialOffsetAARecord) {
 					break;
