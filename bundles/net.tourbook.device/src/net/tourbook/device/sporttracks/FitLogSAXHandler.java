@@ -240,7 +240,7 @@ public class FitLogSAXHandler extends DefaultHandler {
       private String WeightKilograms;
 
       public String generateNotes() {
-         final StringBuilder notes = new StringBuilder(ATTRIB_EQUIPMENT_ID + ": " + Id); //$NON-NLS-1$
+         final StringBuilder notes = new StringBuilder(ATTRIB_EQUIPMENT_ID + "(SportTracks): " + Id); //$NON-NLS-1$
          if (DatePurchased != null) {
             notes.append(UI.NEW_LINE + ATTRIB_EQUIPMENT_DATE_PURCHASED + ": " + DatePurchased); //$NON-NLS-1$
          }
@@ -1120,7 +1120,22 @@ public class FitLogSAXHandler extends DefaultHandler {
                }
             }
 
-            newEquipment.Name = brand + UI.DASH_WITH_SPACE + model;
+            final StringBuilder name = new StringBuilder();
+            if (!brand.equals(UI.EMPTY_STRING)) {
+               name.append(brand);
+            }
+            if (!model.equals(UI.EMPTY_STRING)) {
+               if (name.length() > 0) {
+                  name.append(UI.DASH_WITH_SPACE + model);
+               } else {
+                  name.append(model);
+               }
+            }
+            if (name.length() == 0) {
+               // Yes, it's crazy but I tested and an equipment can have no model and brand!
+               name.append(Messages.FitLog_Equipment_Name_Not_Available);
+            }
+            newEquipment.Name = name.toString();
             _equipments.add(newEquipment);
 
          }
