@@ -42,6 +42,7 @@ import net.tourbook.ui.UI;
 
 public class CM4XXMDeviceReader extends TourbookDevice {
 
+//	private static final Logger	log					= LoggerFactory.getLogger(CM4XXMDeviceReader.class);
 	private static final int	RECORD_SIZE			= 40;
 	private static final short	CM4XXM_TIMESLICE	= 20;
 
@@ -532,6 +533,10 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 
 				offsetAARecord = DataUtil.readFileOffset(fileRawData, buffer);
 
+				if (!verifyReferenceConsitency(fileRawData, offsetDDRecord)) {
+					break;
+				}
+				
 				/*
 				 * make sure to end not in an endless loop where the current AA offset is the same
 				 * as the first AA offset (this seems to be unlikely but it happend already 2 Month
@@ -560,6 +565,45 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 		deviceData.transferYear = cm4xxmDeviceData.transferYear;
 		deviceData.transferMonth = cm4xxmDeviceData.transferMonth;
 		deviceData.transferDay = cm4xxmDeviceData.transferDay;
+
+		return true;
+	}
+
+	/*
+	 * Verify that a DD record not only points to an AA record, 
+	 * but the AA record pointed to, also references the same DD record.
+	 * In case, it doesn't, a dangling / left over DD pointer was discovered.
+	 * Even though, this is quite unlikely, it has happened before.
+	 */
+	private boolean verifyReferenceConsitency(final RandomAccessFile file, int offsetDDRecord) throws IOException {
+		final byte[] buffer = new byte[5];
+		String recordType = UI.EMPTY_STRING;
+
+		file.seek(offsetDDRecord);
+		file.read(buffer);
+		recordType = new String(buffer, 2, 2);
+
+		// make sure we read a DD record
+		if (!recordType.equalsIgnoreCase("DD")) { //$NON-NLS-1$
+//			log.debug("No DD record found!");
+			return false;
+		}
+
+		int offsetAARecord = DataUtil.readFileOffset(file, buffer);
+		file.seek(offsetAARecord);
+		file.read(buffer);
+		recordType = new String(buffer, 2, 2);
+		// make sure we read a DD record
+		if (!recordType.equalsIgnoreCase("AA")) { //$NON-NLS-1$
+//			log.debug("No AA record found!");
+			return false;
+		}
+
+		int forwardReference = DataUtil.readFileOffset(file, buffer);
+		if (forwardReference != offsetDDRecord) {
+//			log.debug("DD -> AA -> DD record references not consistent!");
+			return false;
+		}
 
 		return true;
 	}
