@@ -584,6 +584,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 
       boolean searchTagById = false;
       // If we are in a FitLogEx file, then we have parsed equipments
+      // and we need to map tour tags using each equipment's GUID.
       if (_equipments.size() > 0) {
          searchTagById = true;
       }
@@ -594,23 +595,13 @@ public class FitLogSAXHandler extends DefaultHandler {
 
             boolean isTagAvailable = false;
 
-            if (searchTagById) {
-               for (final TourTag tourTag : allTourTags) {
-                  if (tourTag.getNotes().contains(tag.Id)) {
-                     isTagAvailable = true;
+            for (final TourTag tourTag : allTourTags) {
+               if ((searchTagById && tourTag.getNotes().contains(tag.Id)) ||
+                     (!searchTagById && tourTag.getTagName().equals(tag.Name))) {
+                  isTagAvailable = true;
 
-                     tourTags.add(tourTag);
-                     break;
-                  }
-               }
-            } else {
-               for (final TourTag tourTag : allTourTags) {
-                  if (tourTag.getTagName().equals(tag.Name)) {
-                     isTagAvailable = true;
-
-                     tourTags.add(tourTag);
-                     break;
-                  }
+                  tourTags.add(tourTag);
+                  break;
                }
             }
 
@@ -619,6 +610,8 @@ public class FitLogSAXHandler extends DefaultHandler {
                // create a new tag
 
                final TourTag tourTag = new TourTag(tag.Name);
+               // There is no notes to import as we are here in a FitLog file as
+               // FitLogEx files would not have unavailable tags
                tourTag.setRoot(true);
 
                // persist tag
@@ -999,19 +992,19 @@ public class FitLogSAXHandler extends DefaultHandler {
          //read this - http://stackoverflow.com/questions/13786607/normalization-in-dom-parsing-with-java-how-does-it-work
          xmlDocument.getDocumentElement().normalize();
 
-         final NodeList nList = xmlDocument.getElementsByTagName(TAG_ACTIVITY_CUSTOM_DATA_FIELD_DEFINITION);
+         final NodeList nodeList = xmlDocument.getElementsByTagName(TAG_ACTIVITY_CUSTOM_DATA_FIELD_DEFINITION);
 
-         for (int temp = 0; temp < nList.getLength(); temp++) {
+         for (int index = 0; index < nodeList.getLength(); index++) {
 
-            final Node nNode = nList.item(temp);
+            final Node currentNode = nodeList.item(index);
 
-            if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+            if (currentNode.getNodeType() == Node.ELEMENT_NODE) {
 
-               final Element eElement = (Element) nNode;
+               final Element currentElement = (Element) currentNode;
 
-               final String customFieldName = eElement.getAttribute(ATTRIB_CUSTOM_DATA_FIELD_DEFINITION_NAME);
+               final String customFieldName = currentElement.getAttribute(ATTRIB_CUSTOM_DATA_FIELD_DEFINITION_NAME);
 
-               final String customFieldOptions = eElement.getAttribute(ATTRIB_CUSTOM_DATA_FIELD_DEFINITION_OPTIONS);
+               final String customFieldOptions = currentElement.getAttribute(ATTRIB_CUSTOM_DATA_FIELD_DEFINITION_OPTIONS);
 
                if (customFieldOptions != null && customFieldOptions.trim().length() != 0) {
 
