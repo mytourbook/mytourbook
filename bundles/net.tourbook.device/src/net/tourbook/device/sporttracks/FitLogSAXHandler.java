@@ -82,7 +82,6 @@ public class FitLogSAXHandler extends DefaultHandler {
    private static final String                  ATTRIB_CUSTOM_DATA_FIELD_DEFINITION_OPTIONS = "Options";             //$NON-NLS-1$
    private static final String                  ATTRIB_CUSTOM_DATA_FIELD_NAME               = "name";                //$NON-NLS-1$
    private static final String                  ATTRIB_CUSTOM_DATA_FIELD_VALUE              = "v";                   //$NON-NLS-1$
-   private static final String                  ATTRIB_EQUIPMENT_ID                         = "Id";                  //$NON-NLS-1$
    private static final String                  ATTRIB_EQUIPMENT_BRAND                      = "Brand";               //$NON-NLS-1$
    private static final String                  ATTRIB_EQUIPMENT_DATE_PURCHASED             = "DatePurchased";       //$NON-NLS-1$
    private static final String                  ATTRIB_EQUIPMENT_MODEL                      = "Model";               //$NON-NLS-1$
@@ -92,6 +91,7 @@ public class FitLogSAXHandler extends DefaultHandler {
    private static final String                  ATTRIB_EQUIPMENT_WEIGHT_KILOGRAMS           = "WeightKilograms";     //$NON-NLS-1$
 
    private static final String                  ATTRIB_DURATION_SECONDS                     = "DurationSeconds";     //$NON-NLS-1$
+   private static final String                  ATTRIB_EQUIPMENT_ID                         = "Id";                  //$NON-NLS-1$
    private static final String                  ATTRIB_NAME                                 = "Name";                //$NON-NLS-1$
    private static final String                  ATTRIB_START_TIME                           = "StartTime";           //$NON-NLS-1$
    private static final String                  ATTRIB_END_TIME                             = "EndTime";             //$NON-NLS-1$
