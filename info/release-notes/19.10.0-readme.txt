@@ -67,6 +67,7 @@ Import
     the tour notes
   - Setting the start time (when present) and time zone (when GPS coordinates are not present)
     using the UTC time offset.
+  - Importing and mapping unique equipments based on their GUIDs
 
 * .fit File (Frederic)
   - Added support for the developer field:
