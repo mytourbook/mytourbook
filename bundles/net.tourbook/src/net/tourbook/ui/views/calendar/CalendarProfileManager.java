@@ -308,8 +308,8 @@ public class CalendarProfileManager {
    private static final IValueFormatter   _valueFormatter_Number_1_2            = new ValueFormatter_Number_1_2(false);
    private static final IValueFormatter   _valueFormatter_Number_1_3            = new ValueFormatter_Number_1_3(false);
    private static final IValueFormatter   _valueFormatter_Time_HH               = new ValueFormatter_Time_HH();
-   private static final IValueFormatter   _valueFormatter_Time_HHMM            = new ValueFormatter_Time_HHMM();
-   private static final IValueFormatter   _valueFormatter_Time_HHMMSS         = new ValueFormatter_Time_HHMMSS();
+   private static final IValueFormatter   _valueFormatter_Time_HHMM             = new ValueFormatter_Time_HHMM();
+   private static final IValueFormatter   _valueFormatter_Time_HHMMSS           = new ValueFormatter_Time_HHMMSS();
    //
    static {
 
@@ -317,21 +317,21 @@ public class CalendarProfileManager {
       /*
        * Formatter
        */
-      DEFAULT_EMPTY_FORMATTER       = createFormatter_Empty();
+      DEFAULT_EMPTY_FORMATTER          = createFormatter_Empty();
 
       // Tour
       _tourFormatter_TourDescription   = createFormatter_Tour_Description();
-      _tourFormatter_TourTitle       = createFormatter_Tour_Title();
+      _tourFormatter_TourTitle         = createFormatter_Tour_Title();
 
-      _tourFormatter_Altitude       = createFormatter_Altitude();
-      _tourFormatter_Elevation_Change       = createFormatter_Elevation_Change();
-      _tourFormatter_Distance       = createFormatter_Distance();
+      _tourFormatter_Altitude          = createFormatter_Altitude();
+      _tourFormatter_Elevation_Change  = createFormatter_Elevation_Change();
+      _tourFormatter_Distance          = createFormatter_Distance();
 
-      _tourFormatter_Pace          = createFormatter_Pace();
-      _tourFormatter_Speed          = createFormatter_Speed();
+      _tourFormatter_Pace              = createFormatter_Pace();
+      _tourFormatter_Speed             = createFormatter_Speed();
 
       _tourFormatter_Energy_kcal       = createFormatter_Energy_kcal();
-      _tourFormatter_Energy_MJ       = createFormatter_Energy_MJ();
+      _tourFormatter_Energy_MJ         = createFormatter_Energy_MJ();
 
       _tourFormatter_Time_Moving       = createFormatter_Time_Moving();
       _tourFormatter_Time_Paused       = createFormatter_Time_Paused();
@@ -360,15 +360,15 @@ public class CalendarProfileManager {
       };
 
       // Week
-      _weekFormatter_Altitude       = createFormatter_Altitude();
-      _weekFormatter_Distance       = createFormatter_Distance();
-      _weekFormatter_Elevation_Change       = createFormatter_Elevation_Change();
+      _weekFormatter_Altitude          = createFormatter_Altitude();
+      _weekFormatter_Distance          = createFormatter_Distance();
+      _weekFormatter_Elevation_Change  = createFormatter_Elevation_Change();
 
-      _weekFormatter_Pace          = createFormatter_Pace();
-      _weekFormatter_Speed          = createFormatter_Speed();
+      _weekFormatter_Pace              = createFormatter_Pace();
+      _weekFormatter_Speed             = createFormatter_Speed();
 
       _weekFormatter_Energy_kcal       = createFormatter_Energy_kcal();
-      _weekFormatter_Energy_MJ       = createFormatter_Energy_MJ();
+      _weekFormatter_Energy_MJ         = createFormatter_Energy_MJ();
 
       _weekFormatter_Time_Moving       = createFormatter_Time_Moving();
       _weekFormatter_Time_Paused       = createFormatter_Time_Paused();
@@ -401,9 +401,9 @@ public class CalendarProfileManager {
          new FormatterData(true,      FormatterID.ALTITUDE,         _tourFormatter_Altitude.getDefaultFormat()),
          new FormatterData(true,      FormatterID.ELEVATION_CHANGE, _tourFormatter_Elevation_Change.getDefaultFormat()),
          new FormatterData(true,      FormatterID.TIME_MOVING,      _tourFormatter_Time_Moving.getDefaultFormat()),
-         new FormatterData(false,   FormatterID.EMPTY,            ValueFormat.DUMMY_VALUE),
-         new FormatterData(false,   FormatterID.EMPTY,            ValueFormat.DUMMY_VALUE),
-         new FormatterData(false,   FormatterID.EMPTY,            ValueFormat.DUMMY_VALUE),
+         new FormatterData(false,     FormatterID.EMPTY,            ValueFormat.DUMMY_VALUE),
+         new FormatterData(false,     FormatterID.EMPTY,            ValueFormat.DUMMY_VALUE),
+         new FormatterData(false,     FormatterID.EMPTY,            ValueFormat.DUMMY_VALUE),
       };
 
       NUM_DEFAULT_TOUR_FORMATTER = DEFAULT_TOUR_FORMATTER_DATA.length;
@@ -416,7 +416,7 @@ public class CalendarProfileManager {
          new FormatterData(true,      FormatterID.SPEED,            _weekFormatter_Speed.getDefaultFormat()),
          new FormatterData(true,      FormatterID.PACE,             _weekFormatter_Pace.getDefaultFormat()),
          new FormatterData(true,      FormatterID.TIME_MOVING,      _weekFormatter_Time_Moving.getDefaultFormat()),
-         new FormatterData(false,   FormatterID.EMPTY,            ValueFormat.DUMMY_VALUE),
+         new FormatterData(false,     FormatterID.EMPTY,            ValueFormat.DUMMY_VALUE),
       };
 
       NUM_DEFAULT_WEEK_FORMATTER = DEFAULT_WEEK_FORMATTER_DATA.length;
@@ -428,7 +428,7 @@ public class CalendarProfileManager {
       new DateColumn_ComboData[] {
 
          new DateColumn_ComboData(DateColumnContent.WEEK_NUMBER,   Messages.Calendar_Profile_DateColumn_WeekNumber),
-         new DateColumn_ComboData(DateColumnContent.MONTH,          Messages.Calendar_Profile_DateColumn_Month),
+         new DateColumn_ComboData(DateColumnContent.MONTH,         Messages.Calendar_Profile_DateColumn_Month),
          new DateColumn_ComboData(DateColumnContent.YEAR,          Messages.Calendar_Profile_DateColumn_Year),
       };
 
@@ -465,7 +465,7 @@ public class CalendarProfileManager {
                      TimeTools.Formatter_Day.format(LocalDate.now()))),
 
          new DayHeaderDateFormat_ComboData(DayDateFormat.DAY_MONTH,            TimeTools.Formatter_DayMonth.format(LocalDate.now())),
-         new DayHeaderDateFormat_ComboData(DayDateFormat.DAY_MONTH_YEAR,         TimeTools.Formatter_DayMonthYear.format(LocalDate.now())),
+         new DayHeaderDateFormat_ComboData(DayDateFormat.DAY_MONTH_YEAR,       TimeTools.Formatter_DayMonthYear.format(LocalDate.now())),
          new DayHeaderDateFormat_ComboData(DayDateFormat.AUTOMATIC,            Messages.Calendar_Profile_DayHeaderDateFormat_Automatic),
       };
 
@@ -478,12 +478,12 @@ public class CalendarProfileManager {
                false,
                false),
 
-         new TourBackground_ComboData(TourBackground.FILL,               Messages.Calendar_Profile_TourBackground_Fill,
+         new TourBackground_ComboData(TourBackground.FILL,                  Messages.Calendar_Profile_TourBackground_Fill,
                true,
                false,
                false),
 
-         new TourBackground_ComboData(TourBackground.CIRCLE,               Messages.Calendar_Profile_TourBackground_Circle,
+         new TourBackground_ComboData(TourBackground.CIRCLE,                Messages.Calendar_Profile_TourBackground_Circle,
                true,
                false,
                false),
@@ -493,12 +493,12 @@ public class CalendarProfileManager {
                true,
                false),
 
-         new TourBackground_ComboData(TourBackground.GRADIENT_VERTICAL,      Messages.Calendar_Profile_TourBackground_GradientVertical,
+         new TourBackground_ComboData(TourBackground.GRADIENT_VERTICAL,     Messages.Calendar_Profile_TourBackground_GradientVertical,
                true,
                true,
                false),
 
-         new TourBackground_ComboData(TourBackground.FILL_LEFT,            Messages.Calendar_Profile_TourBackground_Fill_Left,
+         new TourBackground_ComboData(TourBackground.FILL_LEFT,             Messages.Calendar_Profile_TourBackground_Fill_Left,
                true,
                false,
                true),
@@ -517,23 +517,23 @@ public class CalendarProfileManager {
                false,
                false),
 
-         new TourBorder_ComboData(TourBorder.BORDER_ALL,            Messages.Calendar_Profile_TourBorder_All,
+         new TourBorder_ComboData(TourBorder.BORDER_ALL,           Messages.Calendar_Profile_TourBorder_All,
                true,
                true),
 
-         new TourBorder_ComboData(TourBorder.BORDER_TOP,            Messages.Calendar_Profile_TourBorder_Top,
+         new TourBorder_ComboData(TourBorder.BORDER_TOP,           Messages.Calendar_Profile_TourBorder_Top,
                true,
                true),
 
-         new TourBorder_ComboData(TourBorder.BORDER_BOTTOM,         Messages.Calendar_Profile_TourBorder_Bottom,
+         new TourBorder_ComboData(TourBorder.BORDER_BOTTOM,        Messages.Calendar_Profile_TourBorder_Bottom,
                true,
                true),
 
-         new TourBorder_ComboData(TourBorder.BORDER_TOP_BOTTOM,   Messages.Calendar_Profile_TourBorder_TopBottom,
+         new TourBorder_ComboData(TourBorder.BORDER_TOP_BOTTOM,    Messages.Calendar_Profile_TourBorder_TopBottom,
                true,
                true),
 
-         new TourBorder_ComboData(TourBorder.BORDER_LEFT,         Messages.Calendar_Profile_TourBorder_Left,
+         new TourBorder_ComboData(TourBorder.BORDER_LEFT,          Messages.Calendar_Profile_TourBorder_Left,
                true,
                true),
 
@@ -541,7 +541,7 @@ public class CalendarProfileManager {
                true,
                true),
 
-         new TourBorder_ComboData(TourBorder.BORDER_LEFT_RIGHT,   Messages.Calendar_Profile_TourBorder_LeftRight,
+         new TourBorder_ComboData(TourBorder.BORDER_LEFT_RIGHT,    Messages.Calendar_Profile_TourBorder_LeftRight,
                true,
                true),
       };
@@ -551,11 +551,11 @@ public class CalendarProfileManager {
       new CalendarColor_ComboData[] {
 
          new CalendarColor_ComboData(CalendarColor.BRIGHT,         Messages.Calendar_Profile_Color_Bright),
-         new CalendarColor_ComboData(CalendarColor.DARK,            Messages.Calendar_Profile_Color_Dark),
-         new CalendarColor_ComboData(CalendarColor.LINE,            Messages.Calendar_Profile_Color_Line),
-         new CalendarColor_ComboData(CalendarColor.TEXT,            Messages.Calendar_Profile_Color_Text),
-         new CalendarColor_ComboData(CalendarColor.BLACK,         Messages.Calendar_Profile_Color_Black),
-         new CalendarColor_ComboData(CalendarColor.WHITE,         Messages.Calendar_Profile_Color_White),
+         new CalendarColor_ComboData(CalendarColor.DARK,           Messages.Calendar_Profile_Color_Dark),
+         new CalendarColor_ComboData(CalendarColor.LINE,           Messages.Calendar_Profile_Color_Line),
+         new CalendarColor_ComboData(CalendarColor.TEXT,           Messages.Calendar_Profile_Color_Text),
+         new CalendarColor_ComboData(CalendarColor.BLACK,          Messages.Calendar_Profile_Color_Black),
+         new CalendarColor_ComboData(CalendarColor.WHITE,          Messages.Calendar_Profile_Color_White),
          new CalendarColor_ComboData(CalendarColor.CUSTOM,         Messages.Calendar_Profile_Color_Custom),
       };
 
@@ -566,10 +566,10 @@ public class CalendarProfileManager {
          new ProfileDefaultId_ComboData(DefaultId.DEFAULT,         Messages.Calendar_Profile_AppDefault_Default),
          new ProfileDefaultId_ComboData(DefaultId.COMPACT,         Messages.Calendar_Profile_AppDefault_Compact),
          new ProfileDefaultId_ComboData(DefaultId.COMPACT_II,      Messages.Calendar_Profile_AppDefault_Compact_II),
-         new ProfileDefaultId_ComboData(DefaultId.COMPACT_III,      Messages.Calendar_Profile_AppDefault_Compact_III),
+         new ProfileDefaultId_ComboData(DefaultId.COMPACT_III,     Messages.Calendar_Profile_AppDefault_Compact_III),
          new ProfileDefaultId_ComboData(DefaultId.YEAR,            Messages.Calendar_Profile_AppDefault_Year),
          new ProfileDefaultId_ComboData(DefaultId.YEAR_II,         Messages.Calendar_Profile_AppDefault_Year_II),
-         new ProfileDefaultId_ComboData(DefaultId.YEAR_III,         Messages.Calendar_Profile_AppDefault_Year_III),
+         new ProfileDefaultId_ComboData(DefaultId.YEAR_III,        Messages.Calendar_Profile_AppDefault_Year_III),
          new ProfileDefaultId_ComboData(DefaultId.CLASSIC,         Messages.Calendar_Profile_AppDefault_Classic),
          new ProfileDefaultId_ComboData(DefaultId.USER_ID,         Messages.Calendar_Profile_AppDefault_UserDefault),
    };
@@ -579,13 +579,13 @@ public class CalendarProfileManager {
       new DayContentColor_ComboData[] {
 
          new DayContentColor_ComboData(CalendarColor.CONTRAST,      Messages.Calendar_Profile_Color_Contrast),
-         new DayContentColor_ComboData(CalendarColor.BRIGHT,       Messages.Calendar_Profile_Color_Bright),
+         new DayContentColor_ComboData(CalendarColor.BRIGHT,        Messages.Calendar_Profile_Color_Bright),
          new DayContentColor_ComboData(CalendarColor.DARK,          Messages.Calendar_Profile_Color_Dark),
          new DayContentColor_ComboData(CalendarColor.LINE,          Messages.Calendar_Profile_Color_Line),
          new DayContentColor_ComboData(CalendarColor.TEXT,          Messages.Calendar_Profile_Color_Text),
-         new DayContentColor_ComboData(CalendarColor.BLACK,       Messages.Calendar_Profile_Color_Black),
-         new DayContentColor_ComboData(CalendarColor.WHITE,       Messages.Calendar_Profile_Color_White),
-         new DayContentColor_ComboData(CalendarColor.CUSTOM,       Messages.Calendar_Profile_Color_Custom),
+         new DayContentColor_ComboData(CalendarColor.BLACK,         Messages.Calendar_Profile_Color_Black),
+         new DayContentColor_ComboData(CalendarColor.WHITE,         Messages.Calendar_Profile_Color_White),
+         new DayContentColor_ComboData(CalendarColor.CUSTOM,        Messages.Calendar_Profile_Color_Custom),
       };
    //
 // SET_FORMATTING_ON
