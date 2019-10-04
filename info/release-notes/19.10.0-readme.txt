@@ -32,11 +32,11 @@ New + Improvements
    the DELETE key
 
 * Tour Chart
-  - New smoothing algorithm which is not smoothing the computed speed/pace/altimeter/gradient values
+  - New smoothing algorithm which is not smoothing the computed speed/pace/altimeter/gradient values, this allows to see the raw computed data.
  
 * Tour Editor
-  - Tour can be saved with <Ctrl>+S when "Tour Editor" view is the active view
-  - The save and new tour actions are removed from the view toolbar but are available at the main toolbar
+  - Tour can be saved with <Ctrl>+s when "Tour Editor" view is the active view
+  - The save and new tour actions are removed from the view toolbar, now they are available in the main toolbar
 
 * Tour Book View
   - Show min/max temperature values
@@ -67,22 +67,23 @@ Import
     the tour notes
   - Setting the start time (when present) and time zone (when GPS coordinates are not present)
     using the UTC time offset.
+  - Importing and mapping unique equipments based on their GUIDs
 
-* .fit file (Frederic)
+* .fit File (Frederic)
   - Added support for the developer field:
     - Garmin Running Dynamics Pod
   - Added the ability to select the preferred power developer field to import
   - when multiple power data sources are present within a given FIT file:
     - Stryd or Garmin Running Dynamics Pod
 
-* .tcx
+* .tcx File
   - Import Course/Name tag as tour title
 
 Changes
 =======
 
 * Tour Book View
-  -  Moved all tour modify actions into submenu "Adjust Tour Values"
+  -  Moved all tour modify actions into the new submenu "Adjust Tour Values"
 
 
 Bugfix   
@@ -100,7 +101,8 @@ Bugfix
 * Body Weight unit (Frederic)
   - When changing the measurement unit, the body weight unit is updated in the UI
 
-* Tour start time in tour book view was wrong needed these 2 fixes
+* Fitlog Import + Tour Book View
+  The tour start time was wrong and needed these 2 fixes
   - Fitlog Import
     - Fixed tour start time year/month/day by using it's time zone
   - Tour Book View
