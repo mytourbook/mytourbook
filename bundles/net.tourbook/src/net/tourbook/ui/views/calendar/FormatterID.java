@@ -17,23 +17,23 @@ package net.tourbook.ui.views.calendar;
 
 public enum FormatterID {
 
-	EMPTY, //
+   EMPTY, //
 
-	TOUR_TITLE, //
-	TOUR_DESCRIPTION, //
+   TOUR_TITLE, //
+   TOUR_DESCRIPTION, //
 
-	DISTANCE, //
-	ELEVATION_CHANGE, //
-	ELEVATION_GAIN, //
+   DISTANCE, //
+   ALTITUDE, //
+   ELEVATION_CHANGE, //
 
-	SPEED, //
-	PACE, //
+   SPEED, //
+   PACE, //
 
-	ENERGY_KCAL, //
-	ENERGY_MJ, //
+   ENERGY_KCAL, //
+   ENERGY_MJ, //
 
-	TIME_MOVING, //
-	TIME_RECORDING, //
-	TIME_PAUSED, //
+   TIME_MOVING, //
+   TIME_RECORDING, //
+   TIME_PAUSED, //
 
 }

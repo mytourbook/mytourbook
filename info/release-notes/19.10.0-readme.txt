@@ -3,9 +3,6 @@
 TODOs
 =====
 
-* When hovering over a graph, data appears referring to the point in the graph the mouse is on: 
-  this data does not take into account whether the track has been saved as a using cadence or revolutions, and always shows revolutions.
-  https://github.com/wolfgang-ch/mytourbook/issues/86
 * Test import because of changed device watching task + sql exception handling
 * Recommend DBeaver as a better SQL explorer   
 
@@ -42,11 +39,11 @@ New + Improvements
    the DELETE key
 
 * Tour Chart
-  - New smoothing algorithm which is not smoothing the computed speed/pace/altimeter/gradient values
+  - New smoothing algorithm which is not smoothing the computed speed/pace/altimeter/gradient values, this allows to see the raw computed data.
  
 * Tour Editor
-  - Tour can be saved with <Ctrl>+S when "Tour Editor" view is the active view
-  - The save and new tour actions are removed from the view toolbar but are available at the main toolbar
+  - Tour can be saved with <Ctrl>+s when "Tour Editor" view is the active view
+  - The save and new tour actions are removed from the view toolbar, now they are available in the main toolbar
 
 * Tour Book View
   - Show min/max temperature values
@@ -55,6 +52,12 @@ New + Improvements
 
 * Tour Filter
   - Filter by tour start/end location  
+  
+* TCX Export
+  - An activity type can now be specified when exporting activities in TCX
+    format. 
+	By default, the Strava and Garmin activity types are proposed
+    (see https://developers.strava.com/docs/uploads/ and https://www8.garmin.com/xmlschemas/TrainingCenterDatabasev2.xsd)
   
 * Dialog Quick Edit
   - Edit tour start/end location 
@@ -72,21 +75,21 @@ Import
   - Setting the start time (when present) and time zone (when GPS coordinates are not present)
     using the UTC time offset.
 
-* .fit file (Frederic)
+* .fit File (Frederic)
   - Added support for the developer field:
     - Garmin Running Dynamics Pod
   - Added the ability to select the preferred power developer field to import
   - when multiple power data sources are present within a given FIT file:
     - Stryd or Garmin Running Dynamics Pod
 
-* .tcx
+* .tcx File
   - Import Course/Name tag as tour title
 
 Changes
 =======
 
 * Tour Book View
-  -  Moved all tour modify actions into submenu "Adjust Tour Values"
+  -  Moved all tour modify actions into the new submenu "Adjust Tour Values"
 
 
 Bugfix   
@@ -104,7 +107,8 @@ Bugfix
 * Body Weight unit (Frederic)
   - When changing the measurement unit, the body weight unit is updated in the UI
 
-* Tour start time in tour book view was wrong needed these 2 fixes
+* Fitlog Import + Tour Book View
+  The tour start time was wrong and needed these 2 fixes
   - Fitlog Import
     - Fixed tour start time year/month/day by using it's time zone
   - Tour Book View
@@ -113,7 +117,8 @@ Bugfix
 * Tour Chart
   - Imperial altitude/altimeter values could be wrong depending on the selected measurement system and when the tour was displayed the first time
   - When multiple tours are displayed and some of the tours have no distance, then the line graph was painted to x=0 which was showing a corrupted graph with triangles
-       
+  - Show RPM/SPM correctly in the valuepoint tooltip https://github.com/wolfgang-ch/mytourbook/issues/86
+
 
 Translation    
 ===========

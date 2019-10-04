@@ -274,9 +274,9 @@ public class CalendarProfileManager {
    static final int                   YEAR_COLUMN_DAY_WIDTH_MIN  = 1;
    static final int                   YEAR_COLUMN_DAY_WIDTH_MAX  = 500;
 
+   private static final DataFormatter _tourFormatter_Altitude;
    private static final DataFormatter _tourFormatter_Distance;
    private static final DataFormatter _tourFormatter_Elevation_Change;
-   private static final DataFormatter _tourFormatter_Elevation_Gain;
    private static final DataFormatter _tourFormatter_Energy_kcal;
    private static final DataFormatter _tourFormatter_Energy_MJ;
    private static final DataFormatter _tourFormatter_Pace;
@@ -287,9 +287,9 @@ public class CalendarProfileManager {
    private static final DataFormatter _tourFormatter_TourDescription;
    private static final DataFormatter _tourFormatter_TourTitle;
 
+   private static final DataFormatter _weekFormatter_Altitude;
    private static final DataFormatter _weekFormatter_Distance;
    private static final DataFormatter _weekFormatter_Elevation_Change;
-   private static final DataFormatter _weekFormatter_Elevation_Gain;
    private static final DataFormatter _weekFormatter_Energy_kcal;
    private static final DataFormatter _weekFormatter_Energy_MJ;
    private static final DataFormatter _weekFormatter_Pace;
@@ -323,8 +323,8 @@ public class CalendarProfileManager {
       _tourFormatter_TourDescription   = createFormatter_Tour_Description();
       _tourFormatter_TourTitle       = createFormatter_Tour_Title();
 
+      _tourFormatter_Altitude       = createFormatter_Altitude();
       _tourFormatter_Elevation_Change       = createFormatter_Elevation_Change();
-      _tourFormatter_Elevation_Gain       = createFormatter_Elevation_Gain();
       _tourFormatter_Distance       = createFormatter_Distance();
 
       _tourFormatter_Pace          = createFormatter_Pace();
@@ -345,8 +345,8 @@ public class CalendarProfileManager {
             _tourFormatter_TourDescription,
 
             _tourFormatter_Distance,
+            _tourFormatter_Altitude,
             _tourFormatter_Elevation_Change,
-            _tourFormatter_Elevation_Gain,
 
             _tourFormatter_Speed,
             _tourFormatter_Pace,
@@ -360,9 +360,9 @@ public class CalendarProfileManager {
       };
 
       // Week
+      _weekFormatter_Altitude       = createFormatter_Altitude();
       _weekFormatter_Distance       = createFormatter_Distance();
       _weekFormatter_Elevation_Change       = createFormatter_Elevation_Change();
-      _weekFormatter_Elevation_Gain       = createFormatter_Elevation_Gain();
 
       _weekFormatter_Pace          = createFormatter_Pace();
       _weekFormatter_Speed          = createFormatter_Speed();
@@ -379,8 +379,8 @@ public class CalendarProfileManager {
             DEFAULT_EMPTY_FORMATTER,
 
             _weekFormatter_Distance,
+            _weekFormatter_Altitude,
             _weekFormatter_Elevation_Change,
-            _weekFormatter_Elevation_Gain,
 
             _weekFormatter_Speed,
             _weekFormatter_Pace,
@@ -398,8 +398,8 @@ public class CalendarProfileManager {
          new FormatterData(true,      FormatterID.TOUR_TITLE,       _tourFormatter_TourTitle.getDefaultFormat()),
          new FormatterData(true,      FormatterID.TOUR_DESCRIPTION, _tourFormatter_TourDescription.getDefaultFormat()),
          new FormatterData(true,      FormatterID.DISTANCE,         _tourFormatter_Distance.getDefaultFormat()),
+         new FormatterData(true,      FormatterID.ALTITUDE,         _tourFormatter_Altitude.getDefaultFormat()),
          new FormatterData(true,      FormatterID.ELEVATION_CHANGE, _tourFormatter_Elevation_Change.getDefaultFormat()),
-         new FormatterData(true,      FormatterID.ELEVATION_GAIN,   _tourFormatter_Elevation_Gain.getDefaultFormat()),
          new FormatterData(true,      FormatterID.TIME_MOVING,      _tourFormatter_Time_Moving.getDefaultFormat()),
          new FormatterData(false,   FormatterID.EMPTY,            ValueFormat.DUMMY_VALUE),
          new FormatterData(false,   FormatterID.EMPTY,            ValueFormat.DUMMY_VALUE),
@@ -411,8 +411,8 @@ public class CalendarProfileManager {
       DEFAULT_WEEK_FORMATTER_DATA = new FormatterData[] {
 
          new FormatterData(true,      FormatterID.DISTANCE,         _weekFormatter_Distance.getDefaultFormat()),
+         new FormatterData(true,      FormatterID.ALTITUDE,         _weekFormatter_Altitude.getDefaultFormat()),
          new FormatterData(true,      FormatterID.ELEVATION_CHANGE, _weekFormatter_Elevation_Change.getDefaultFormat()),
-         new FormatterData(true,      FormatterID.ELEVATION_GAIN,   _weekFormatter_Elevation_Gain.getDefaultFormat()),
          new FormatterData(true,      FormatterID.SPEED,            _weekFormatter_Speed.getDefaultFormat()),
          new FormatterData(true,      FormatterID.PACE,             _weekFormatter_Pace.getDefaultFormat()),
          new FormatterData(true,      FormatterID.TIME_MOVING,      _weekFormatter_Time_Moving.getDefaultFormat()),
@@ -790,6 +790,63 @@ public class CalendarProfileManager {
    }
 
    /**
+    * Elevation Gain
+    *
+    * @return
+    */
+   private static DataFormatter createFormatter_Altitude() {
+
+      final DataFormatter dataFormatter = new DataFormatter(
+            FormatterID.ALTITUDE,
+            Messages.Calendar_Profile_Value_Altitude,
+            GraphColorManager.PREF_GRAPH_ALTITUDE) {
+
+         @Override
+         String format(final CalendarTourData data, final ValueFormat valueFormat, final boolean isShowValueUnit) {
+
+            if (data.elevationGain > 0) {
+
+               final float altitude = data.elevationGain / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+               final String valueText = valueFormatter.printDouble(altitude);
+
+               return isShowValueUnit
+                     ? valueText + UI.SPACE + UI.UNIT_LABEL_ALTITUDE + UI.SPACE
+                     : valueText + UI.SPACE;
+
+            } else {
+               return UI.EMPTY_STRING;
+            }
+         }
+
+         @Override
+         public ValueFormat getDefaultFormat() {
+            return ValueFormat.NUMBER_1_0;
+         }
+
+         @Override
+         public ValueFormat[] getValueFormats() {
+
+            return new ValueFormat[] {
+
+                  ValueFormat.NUMBER_1_0,
+                  ValueFormat.NUMBER_1_1 };
+         }
+
+         @Override
+         void setValueFormat(final ValueFormat valueFormat) {
+
+            valueFormatId = valueFormat;
+            valueFormatter = getFormatter_Number(valueFormat.name());
+         }
+      };
+
+      // setup default formatter
+      dataFormatter.setValueFormat(dataFormatter.getDefaultFormat());
+
+      return dataFormatter;
+   }
+
+   /**
     * Distance
     *
     * @return
@@ -870,63 +927,6 @@ public class CalendarProfileManager {
 
                return isShowValueUnit
                      ? valueText + UI.SPACE + UI.UNIT_LABEL_ALTITUDE + "/" + UI.UNIT_LABEL_DISTANCE //$NON-NLS-1$
-                     : valueText + UI.SPACE;
-
-            } else {
-               return UI.EMPTY_STRING;
-            }
-         }
-
-         @Override
-         public ValueFormat getDefaultFormat() {
-            return ValueFormat.NUMBER_1_0;
-         }
-
-         @Override
-         public ValueFormat[] getValueFormats() {
-
-            return new ValueFormat[] {
-
-                  ValueFormat.NUMBER_1_0,
-                  ValueFormat.NUMBER_1_1 };
-         }
-
-         @Override
-         void setValueFormat(final ValueFormat valueFormat) {
-
-            valueFormatId = valueFormat;
-            valueFormatter = getFormatter_Number(valueFormat.name());
-         }
-      };
-
-      // setup default formatter
-      dataFormatter.setValueFormat(dataFormatter.getDefaultFormat());
-
-      return dataFormatter;
-   }
-
-   /**
-    * Elevation Gain
-    *
-    * @return
-    */
-   private static DataFormatter createFormatter_Elevation_Gain() {
-
-      final DataFormatter dataFormatter = new DataFormatter(
-            FormatterID.ELEVATION_GAIN,
-            Messages.Calendar_Profile_Value_Elevation_Gain,
-            GraphColorManager.PREF_GRAPH_ALTITUDE) {
-
-         @Override
-         String format(final CalendarTourData data, final ValueFormat valueFormat, final boolean isShowValueUnit) {
-
-            if (data.elevationGain > 0) {
-
-               final float altitude = data.elevationGain / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
-               final String valueText = valueFormatter.printDouble(altitude);
-
-               return isShowValueUnit
-                     ? valueText + UI.SPACE + UI.UNIT_LABEL_ALTITUDE + UI.SPACE
                      : valueText + UI.SPACE;
 
             } else {
@@ -1606,8 +1606,8 @@ public class CalendarProfileManager {
          new FormatterData(true,      FormatterID.TOUR_TITLE,        ValueFormat.DUMMY_VALUE),
          new FormatterData(true,      FormatterID.TOUR_DESCRIPTION,  ValueFormat.DUMMY_VALUE),
          new FormatterData(true,      FormatterID.DISTANCE,          ValueFormat.NUMBER_1_0),
+         new FormatterData(true,      FormatterID.ALTITUDE,          ValueFormat.NUMBER_1_0),
          new FormatterData(true,      FormatterID.ELEVATION_CHANGE,  ValueFormat.NUMBER_1_0),
-         new FormatterData(true,      FormatterID.ELEVATION_GAIN,    ValueFormat.NUMBER_1_0),
          new FormatterData(true,      FormatterID.TIME_MOVING,       ValueFormat.TIME_HH_MM),
          new FormatterData(false,     FormatterID.EMPTY,             ValueFormat.DUMMY_VALUE),
          new FormatterData(false,     FormatterID.EMPTY,             ValueFormat.DUMMY_VALUE),
@@ -1618,8 +1618,8 @@ public class CalendarProfileManager {
       profile.allWeekFormatterData          = new FormatterData[] {
 
          new FormatterData(true,      FormatterID.DISTANCE,          ValueFormat.NUMBER_1_0),
+         new FormatterData(true,      FormatterID.ALTITUDE,          ValueFormat.NUMBER_1_0),
          new FormatterData(true,      FormatterID.ELEVATION_CHANGE,  ValueFormat.NUMBER_1_0),
-         new FormatterData(true,      FormatterID.ELEVATION_GAIN,    ValueFormat.NUMBER_1_0),
          new FormatterData(true,      FormatterID.SPEED,             ValueFormat.NUMBER_1_0),
          new FormatterData(true,      FormatterID.PACE,              ValueFormat.PACE_MM_SS),
          new FormatterData(true,      FormatterID.TIME_MOVING,       ValueFormat.TIME_HH_MM),
@@ -1740,8 +1740,8 @@ public class CalendarProfileManager {
          new FormatterData(true,      FormatterID.TOUR_TITLE,        ValueFormat.DUMMY_VALUE),
          new FormatterData(true,      FormatterID.TOUR_DESCRIPTION,  ValueFormat.DUMMY_VALUE),
          new FormatterData(false,     FormatterID.DISTANCE,          ValueFormat.NUMBER_1_0),
+         new FormatterData(false,     FormatterID.ALTITUDE,          ValueFormat.NUMBER_1_0),
          new FormatterData(false,     FormatterID.ELEVATION_CHANGE,  ValueFormat.NUMBER_1_0),
-         new FormatterData(false,     FormatterID.ELEVATION_GAIN,    ValueFormat.NUMBER_1_0),
          new FormatterData(false,     FormatterID.TIME_MOVING,       ValueFormat.TIME_HH_MM),
          new FormatterData(false,     FormatterID.EMPTY,             ValueFormat.DUMMY_VALUE),
          new FormatterData(false,     FormatterID.EMPTY,             ValueFormat.DUMMY_VALUE),
@@ -1752,8 +1752,8 @@ public class CalendarProfileManager {
       profile.allWeekFormatterData          = new FormatterData[] {
 
          new FormatterData(true,      FormatterID.DISTANCE,          ValueFormat.NUMBER_1_0),
+         new FormatterData(true,      FormatterID.ALTITUDE,          ValueFormat.NUMBER_1_0),
          new FormatterData(true,      FormatterID.ELEVATION_CHANGE,  ValueFormat.NUMBER_1_0),
-         new FormatterData(true,      FormatterID.ELEVATION_GAIN,    ValueFormat.NUMBER_1_0),
          new FormatterData(false,     FormatterID.SPEED,             ValueFormat.NUMBER_1_0),
          new FormatterData(false,     FormatterID.PACE,              ValueFormat.PACE_MM_SS),
          new FormatterData(false,     FormatterID.TIME_MOVING,       ValueFormat.TIME_HH_MM),
@@ -1874,8 +1874,8 @@ public class CalendarProfileManager {
          new FormatterData(true,      FormatterID.TOUR_TITLE,        ValueFormat.DUMMY_VALUE),
          new FormatterData(true,      FormatterID.TOUR_DESCRIPTION,  ValueFormat.DUMMY_VALUE),
          new FormatterData(false,     FormatterID.DISTANCE,          ValueFormat.NUMBER_1_0),
+         new FormatterData(false,     FormatterID.ALTITUDE,          ValueFormat.NUMBER_1_0),
          new FormatterData(false,     FormatterID.ELEVATION_CHANGE,  ValueFormat.NUMBER_1_0),
-         new FormatterData(false,     FormatterID.ELEVATION_GAIN,    ValueFormat.NUMBER_1_0),
          new FormatterData(false,     FormatterID.TIME_MOVING,       ValueFormat.TIME_HH),
          new FormatterData(false,     FormatterID.EMPTY,             ValueFormat.DUMMY_VALUE),
          new FormatterData(false,     FormatterID.EMPTY,             ValueFormat.DUMMY_VALUE),
@@ -1886,8 +1886,8 @@ public class CalendarProfileManager {
       profile.allWeekFormatterData          = new FormatterData[] {
 
          new FormatterData(true,      FormatterID.DISTANCE,          ValueFormat.NUMBER_1_0),
+         new FormatterData(false,     FormatterID.ALTITUDE,          ValueFormat.NUMBER_1_0),
          new FormatterData(false,     FormatterID.ELEVATION_CHANGE,  ValueFormat.NUMBER_1_0),
-         new FormatterData(false,     FormatterID.ELEVATION_GAIN,    ValueFormat.NUMBER_1_0),
          new FormatterData(false,     FormatterID.SPEED,             ValueFormat.NUMBER_1_0),
          new FormatterData(false,     FormatterID.PACE,              ValueFormat.PACE_MM_SS),
          new FormatterData(false,     FormatterID.TIME_MOVING,       ValueFormat.TIME_HH_MM),
@@ -2008,8 +2008,8 @@ public class CalendarProfileManager {
          new FormatterData(true,      FormatterID.TOUR_TITLE,        ValueFormat.DUMMY_VALUE),
          new FormatterData(true,      FormatterID.TOUR_DESCRIPTION,  ValueFormat.DUMMY_VALUE),
          new FormatterData(false,     FormatterID.DISTANCE,          ValueFormat.NUMBER_1_0),
+         new FormatterData(false,     FormatterID.ALTITUDE,          ValueFormat.NUMBER_1_0),
          new FormatterData(false,     FormatterID.ELEVATION_CHANGE,  ValueFormat.NUMBER_1_0),
-         new FormatterData(false,     FormatterID.ELEVATION_GAIN,    ValueFormat.NUMBER_1_0),
          new FormatterData(false,     FormatterID.TIME_MOVING,       ValueFormat.TIME_HH),
          new FormatterData(false,     FormatterID.EMPTY,             ValueFormat.DUMMY_VALUE),
          new FormatterData(false,     FormatterID.EMPTY,             ValueFormat.DUMMY_VALUE),
@@ -2020,8 +2020,8 @@ public class CalendarProfileManager {
       profile.allWeekFormatterData          = new FormatterData[] {
 
          new FormatterData(true,      FormatterID.DISTANCE,          ValueFormat.NUMBER_1_0),
+         new FormatterData(false,     FormatterID.ALTITUDE,          ValueFormat.NUMBER_1_0),
          new FormatterData(false,     FormatterID.ELEVATION_CHANGE,  ValueFormat.NUMBER_1_0),
-         new FormatterData(false,     FormatterID.ELEVATION_GAIN,    ValueFormat.NUMBER_1_0),
          new FormatterData(false,     FormatterID.SPEED,             ValueFormat.NUMBER_1_0),
          new FormatterData(false,     FormatterID.PACE,              ValueFormat.PACE_MM_SS),
          new FormatterData(false,     FormatterID.TIME_MOVING,       ValueFormat.TIME_HH_MM),
@@ -2141,8 +2141,8 @@ public class CalendarProfileManager {
 
          new FormatterData(false,     FormatterID.TOUR_TITLE,        ValueFormat.DUMMY_VALUE),
          new FormatterData(false,     FormatterID.TOUR_DESCRIPTION,  ValueFormat.DUMMY_VALUE),
+         new FormatterData(true,      FormatterID.ALTITUDE,          ValueFormat.NUMBER_1_0),
          new FormatterData(true,      FormatterID.ELEVATION_CHANGE,  ValueFormat.NUMBER_1_0),
-         new FormatterData(true,      FormatterID.ELEVATION_GAIN,  ValueFormat.NUMBER_1_0),
          new FormatterData(false,     FormatterID.DISTANCE,          ValueFormat.NUMBER_1_0),
          new FormatterData(false,     FormatterID.TIME_MOVING,       ValueFormat.TIME_HH_MM),
          new FormatterData(false,     FormatterID.EMPTY,             ValueFormat.DUMMY_VALUE),
@@ -2154,8 +2154,8 @@ public class CalendarProfileManager {
       profile.allWeekFormatterData          = new FormatterData[] {
 
          new FormatterData(true,      FormatterID.DISTANCE,          ValueFormat.NUMBER_1_0),
+         new FormatterData(false,     FormatterID.ALTITUDE,          ValueFormat.NUMBER_1_0),
          new FormatterData(false,     FormatterID.ELEVATION_CHANGE,  ValueFormat.NUMBER_1_0),
-         new FormatterData(false,     FormatterID.ELEVATION_GAIN,    ValueFormat.NUMBER_1_0),
          new FormatterData(false,     FormatterID.SPEED,             ValueFormat.NUMBER_1_0),
          new FormatterData(false,     FormatterID.PACE,              ValueFormat.PACE_MM_SS),
          new FormatterData(false,     FormatterID.TIME_MOVING,       ValueFormat.TIME_HH),
@@ -2284,8 +2284,8 @@ public class CalendarProfileManager {
       profile.allWeekFormatterData          = new FormatterData[] {
 
          new FormatterData(true,      FormatterID.DISTANCE,          ValueFormat.NUMBER_1_0),
+         new FormatterData(true,      FormatterID.ALTITUDE,          ValueFormat.NUMBER_1_0),
          new FormatterData(true,      FormatterID.ELEVATION_CHANGE,  ValueFormat.NUMBER_1_0),
-         new FormatterData(true,      FormatterID.ELEVATION_GAIN,    ValueFormat.NUMBER_1_0),
          new FormatterData(true,      FormatterID.SPEED,             ValueFormat.NUMBER_1_0),
          new FormatterData(true,      FormatterID.PACE,              ValueFormat.PACE_MM_SS),
          new FormatterData(true,      FormatterID.TIME_MOVING,       ValueFormat.TIME_HH_MM),
@@ -2398,8 +2398,8 @@ public class CalendarProfileManager {
          new FormatterData(true,      FormatterID.TOUR_TITLE,        ValueFormat.DUMMY_VALUE),
          new FormatterData(true,      FormatterID.TOUR_DESCRIPTION,  ValueFormat.DUMMY_VALUE),
          new FormatterData(true,      FormatterID.DISTANCE,          ValueFormat.NUMBER_1_0),
+         new FormatterData(true,      FormatterID.ALTITUDE,          ValueFormat.NUMBER_1_0),
          new FormatterData(true,      FormatterID.ELEVATION_CHANGE,  ValueFormat.NUMBER_1_0),
-         new FormatterData(true,      FormatterID.ELEVATION_GAIN,    ValueFormat.NUMBER_1_0),
          new FormatterData(true,      FormatterID.TIME_MOVING,       ValueFormat.TIME_HH_MM),
          new FormatterData(false,     FormatterID.EMPTY,             ValueFormat.DUMMY_VALUE),
          new FormatterData(false,     FormatterID.EMPTY,             ValueFormat.DUMMY_VALUE),
@@ -2410,8 +2410,8 @@ public class CalendarProfileManager {
       profile.allWeekFormatterData          = new FormatterData[] {
 
          new FormatterData(true,      FormatterID.DISTANCE,          ValueFormat.NUMBER_1_0),
+         new FormatterData(true,      FormatterID.ALTITUDE,          ValueFormat.NUMBER_1_0),
          new FormatterData(true,      FormatterID.ELEVATION_CHANGE,  ValueFormat.NUMBER_1_0),
-         new FormatterData(true,      FormatterID.ELEVATION_GAIN,    ValueFormat.NUMBER_1_0),
          new FormatterData(true,      FormatterID.SPEED,             ValueFormat.NUMBER_1_0),
          new FormatterData(true,      FormatterID.PACE,              ValueFormat.PACE_MM_SS),
          new FormatterData(true,      FormatterID.TIME_MOVING,       ValueFormat.TIME_HH_MM),
@@ -2532,8 +2532,8 @@ public class CalendarProfileManager {
 
          new FormatterData(true,      FormatterID.TOUR_TITLE,        ValueFormat.DUMMY_VALUE),
          new FormatterData(true,      FormatterID.TOUR_DESCRIPTION,  ValueFormat.DUMMY_VALUE),
+         new FormatterData(true,      FormatterID.ALTITUDE,          ValueFormat.NUMBER_1_0),
          new FormatterData(true,      FormatterID.ELEVATION_CHANGE,  ValueFormat.NUMBER_1_0),
-         new FormatterData(true,      FormatterID.ELEVATION_GAIN,    ValueFormat.NUMBER_1_0),
          new FormatterData(true,      FormatterID.DISTANCE,          ValueFormat.NUMBER_1_0),
          new FormatterData(true,      FormatterID.TIME_MOVING,       ValueFormat.TIME_HH_MM),
          new FormatterData(false,     FormatterID.EMPTY,             ValueFormat.DUMMY_VALUE),
@@ -2544,8 +2544,8 @@ public class CalendarProfileManager {
 
       profile.allWeekFormatterData          = new FormatterData[] {
 
+         new FormatterData(true,      FormatterID.ALTITUDE,          ValueFormat.NUMBER_1_0),
          new FormatterData(true,      FormatterID.ELEVATION_CHANGE,  ValueFormat.NUMBER_1_0),
-         new FormatterData(true,      FormatterID.ELEVATION_GAIN,    ValueFormat.NUMBER_1_0),
          new FormatterData(true,      FormatterID.DISTANCE,          ValueFormat.NUMBER_1_0),
          new FormatterData(true,      FormatterID.SPEED,             ValueFormat.NUMBER_1_0),
          new FormatterData(true,      FormatterID.PACE,              ValueFormat.PACE_MM_SS),
@@ -3356,16 +3356,16 @@ public class CalendarProfileManager {
 
          switch (formatterData.id) {
 
+         case ALTITUDE:
+            _tourFormatter_Altitude.setValueFormat(valueFormat);
+            break;
+
          case DISTANCE:
             _tourFormatter_Distance.setValueFormat(valueFormat);
             break;
 
          case ELEVATION_CHANGE:
             _tourFormatter_Elevation_Change.setValueFormat(valueFormat);
-            break;
-
-         case ELEVATION_GAIN:
-            _tourFormatter_Elevation_Gain.setValueFormat(valueFormat);
             break;
 
          case ENERGY_KCAL:
@@ -3414,16 +3414,16 @@ public class CalendarProfileManager {
 
          switch (formatterData.id) {
 
+         case ALTITUDE:
+            _weekFormatter_Altitude.setValueFormat(valueFormat);
+            break;
+
          case DISTANCE:
             _weekFormatter_Distance.setValueFormat(valueFormat);
             break;
 
          case ELEVATION_CHANGE:
             _weekFormatter_Elevation_Change.setValueFormat(valueFormat);
-            break;
-
-         case ELEVATION_GAIN:
-            _weekFormatter_Elevation_Gain.setValueFormat(valueFormat);
             break;
 
          case ENERGY_KCAL:
