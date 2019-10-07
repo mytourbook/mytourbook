@@ -20,7 +20,7 @@ import org.eclipse.ui.ISaveablePart;
 
 public class TourEditor_Tester extends PropertyTester {
 
-   private static final String PROPERTY_IS_DIRTY           = "isDirty";
+   private static final String PROPERTY_IS_DIRTY           = "isDirty"; //$NON-NLS-1$
 
    @Override
    public boolean test(final Object receiver, final String property, final Object[] args, final Object expectedValue) {
