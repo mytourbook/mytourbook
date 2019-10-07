@@ -429,11 +429,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * Time spent (in seconds) in the "Slow" cadence zone (for example: Hiking).
     */
-   private int                   cadenceZone_SlowTime                        = -1;                     // db-version 40
+   private int                   cadenceZone_SlowTime                        = 0;                     // db-version 40
    /**
     * Time spent (in seconds) in the "Fast" cadence zone (for example: Running).
     */
-   private int                   cadenceZone_FastTime                        = -1;                     // db-version 40
+   private int                   cadenceZone_FastTime                        = 0;                     // db-version 40
    /**
     * The delimiter used when computing the existing values of cadenceZone_SlowTime & cadenceZone_FastTime
     */
