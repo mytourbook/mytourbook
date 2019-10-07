@@ -61,6 +61,7 @@ New + Improvements
   
 * Dialog Quick Edit
   - Edit tour start/end location 
+
   
 Import
 ======
@@ -86,8 +87,12 @@ Import
 * .tcx File
   - Import Course/Name tag as tour title
 
+
 Changes
 =======
+
+* Altitude -> Elevation
+  - Changed wording from "Altitude" to "Elevation" for the english texts
 
 * Tour Book View
   -  Moved all tour modify actions into the new submenu "Adjust Tour Values"
@@ -131,7 +136,6 @@ Translation
  - German
  - Italian (Doriano)
 
- 
  
 System   
 ======
