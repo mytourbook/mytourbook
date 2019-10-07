@@ -528,9 +528,6 @@ public class TourManager {
     */
    public static boolean computeCadenceZonesTimes(final Connection conn,
                                                   final ArrayList<TourData> selectedTours) throws SQLException {
-
-      TourLogManager.addLog(TourLogState.DEFAULT, NLS.bind(Messages.Log_ComputeCadenceZonesTimes_001_Start, selectedTours.size()));
-
       boolean isUpdated = false;
 
       final PreparedStatement stmtUpdate = conn.prepareStatement(cadenceZonesTimes_StatementUpdate);

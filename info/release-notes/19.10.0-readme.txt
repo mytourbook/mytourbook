@@ -27,6 +27,13 @@ New + Improvements
     point #5 "Hike more"
     https://trainright.com/8-things-ultrarunners-do-improve-training/)
 
+* Average elevation change per unit of distance (Frederic)
+  - Added the ability to see (in the Tour Book View and Calendar profiles) for a given
+    activity, month or year, the average elevation change per unit of distance.
+    This feature was inspired by coach Jason Koop's recommendation (see bullet
+    point "Volume of vertical gain/loss"
+    https://trainright.com/data-worth-tracking-ultrarunners)
+
 * Tour Marker's view (Frederic)
  - Possibility to delete marker(s) from the contextual menu and when pressing
    the DELETE key
