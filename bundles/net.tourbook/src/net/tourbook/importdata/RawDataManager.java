@@ -517,9 +517,12 @@ public class RawDataManager {
 
                boolean isTourReImportedFromSameFile = false;
 
-               if (reimportedFile != null && _newlyImportedTours.size() > 0) {
+               final File currentTourImportFile = actionReimportTour_20_GetImportFile(oldTourData);
 
-                  // this case occures when a file contains multiple tours
+               if (reimportedFile != null && reimportedFile.equals(currentTourImportFile)
+                     && _newlyImportedTours.size() > 0) {
+
+                  // this case occurs when a file contains multiple tours
 
                   if (actionReimportTour_30(reimportId, reimportedFile, oldTourData)) {
                      isReImported = true;
@@ -529,7 +532,7 @@ public class RawDataManager {
 
                if (isTourReImportedFromSameFile == false) {
 
-                  reimportedFile = actionReimportTour_20_GetImportFile(oldTourData);
+                  reimportedFile = currentTourImportFile;
 
                   if (reimportedFile == null) {
                      // user canceled file dialog
@@ -932,7 +935,9 @@ public class RawDataManager {
 
             isTourReImported = true;
 
-            TourLogManager.addSubLog(TourLogState.IMPORT_OK, reimportFileNamePath);
+            TourLogManager.addSubLog(TourLogState.IMPORT_OK,
+                  String.format(NLS.bind(LOG_IMPORT_TOUR_IMPORTED,
+                        newTourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S)), reimportFileNamePath));
 
             // set reimport file path as new location
             newTourData.setImportFilePath(reimportFileNamePath);
