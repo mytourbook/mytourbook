@@ -128,6 +128,10 @@ Bugfix
   - When multiple tours are displayed and some of the tours have no distance, then the line graph was painted to x=0 which was showing a corrupted graph with triangles
   - Show RPM/SPM correctly in the valuepoint tooltip https://github.com/wolfgang-ch/mytourbook/issues/86
 
+* Import
+  - Fixed a bug that confused the user when re-importing multiple files. If one of them was invalid,
+    the log would display the valid re-imported files as invalid files that could not be re-imported
+
 
 Translation    
 ===========
