@@ -429,13 +429,11 @@ public class TVITourBookYearSub extends TVITourBookItem {
                tourItem.colCadenceMultiplier = dbCadenceMultiplier;
 
                tourItem.colSlowVsFastCadence = UI.EMPTY_STRING;
-               final int totalCadenceZone_SlowTime = cadenceZone_SlowTime == -1 ? 0 : cadenceZone_SlowTime;
-               final int totalCadenceZone_FastTime = cadenceZone_FastTime == -1 ? 0 : cadenceZone_FastTime;
 
-               final int totalCadenceTime = totalCadenceZone_SlowTime + totalCadenceZone_FastTime;
-               if (totalCadenceTime != 0) {
-                  final int cadenceZone_SlowPercentage = Math.round(totalCadenceZone_SlowTime * 100f / totalCadenceTime);
-                  final int cadenceZone_FastPercentage = Math.round(totalCadenceZone_FastTime * 100f / totalCadenceTime);
+               final int totalCadenceTime = cadenceZone_SlowTime + cadenceZone_FastTime;
+               if (totalCadenceTime > 0) {
+                  final int cadenceZone_SlowPercentage = Math.round(cadenceZone_SlowTime * 100f / totalCadenceTime);
+                  final int cadenceZone_FastPercentage = Math.round(cadenceZone_FastTime * 100f / totalCadenceTime);
 
                   tourItem.colSlowVsFastCadence = cadenceZone_SlowPercentage + " - " + cadenceZone_FastPercentage; //$NON-NLS-1$
                }
