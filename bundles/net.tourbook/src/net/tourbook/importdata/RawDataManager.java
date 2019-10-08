@@ -809,7 +809,6 @@ public class RawDataManager {
 
                final String tourDateTimeShort = TourManager.getTourDateTimeShort(tourData);
 
-               todo
                MessageDialog.openInformation(
                      activeShell,
                      NLS.bind(Messages.Import_Data_Dialog_Reimport_Title, tourDateTimeShort),
