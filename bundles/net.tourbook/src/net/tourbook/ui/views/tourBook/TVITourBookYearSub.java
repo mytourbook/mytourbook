@@ -204,7 +204,11 @@ public class TVITourBookYearSub extends TVITourBookItem {
             // ---------- TOUR START LOCATION -------------
 
             + "tourStartPlace, " //                               84    //$NON-NLS-1$
-            + "tourEndPlace " //                                  85    //$NON-NLS-1$
+            + "tourEndPlace, " //                                 85    //$NON-NLS-1$
+
+            // -------- AVERAGE ALTITUDE CHANGE -----------
+
+            + "avgAltitudeChange" //                              86    //$NON-NLS-1$
 
             + UI.NEW_LINE
 
@@ -409,6 +413,10 @@ public class TVITourBookYearSub extends TVITourBookItem {
 
                tourItem.colTourLocation_Start                  = result.getString(84);
                tourItem.colTourLocation_End                    = result.getString(85);
+
+               // -------- AVERAGE ALTITUDE CHANGE -----------
+
+               tourItem.colAltitude_AvgChange    = result.getLong(86);
 
 // SET_FORMATTING_ON
 

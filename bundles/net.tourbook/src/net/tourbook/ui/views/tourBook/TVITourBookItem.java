@@ -156,6 +156,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
    long         colAltitudeUp;
    long         colAltitudeDown;
+   float        colAltitude_AvgChange;
 
    float        colMaxSpeed;
    long         colMaxAltitude;
@@ -271,6 +272,11 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
       colAltitudeUp        = result.getLong(startIndex + 3);
       colAltitudeDown      = result.getLong(startIndex + 4);
+
+      // VERY IMPORTANT !
+      // Note that we don't do an AVG(avgAltitudeChange) as it would return wrong results.
+      // Indeed, we can't do an mean average as we need to do a distance-weighted average.
+      colAltitude_AvgChange  = colTourDistance <= 0 ? 0 : (colAltitudeUp + colAltitudeDown) / (colTourDistance / 1000f);
 
       colCounter           = result.getLong(startIndex + 5);
 

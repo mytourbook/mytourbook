@@ -444,13 +444,16 @@ public class CalendarProfile implements Cloneable {
 
          switch (formatterData.id) {
 
-         case ALTITUDE:
-            formatterID = FormatterID.ALTITUDE.name();
-
-            break;
-
          case DISTANCE:
             formatterID = FormatterID.DISTANCE.name();
+            break;
+
+         case ALTITUDE:
+            formatterID = FormatterID.ALTITUDE.name();
+            break;
+
+         case ELEVATION_CHANGE:
+            formatterID = FormatterID.ELEVATION_CHANGE.name();
             break;
 
          case PACE:

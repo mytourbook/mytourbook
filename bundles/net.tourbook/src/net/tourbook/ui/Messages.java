@@ -38,6 +38,8 @@ public class Messages extends NLS {
    public static String        ColumnFactory_altitude_up_h_tooltip;
    public static String        ColumnFactory_altitude_up_label;
    public static String        ColumnFactory_altitude_up_tooltip;
+   public static String        ColumnFactory_Altitude_AvgChange_Label;
+   public static String        ColumnFactory_Altitude_AvgChange_Tooltip;
    public static String        ColumnFactory_avg_cadence;
    public static String        ColumnFactory_avg_cadence_label;
    public static String        ColumnFactory_avg_cadence_tooltip;
