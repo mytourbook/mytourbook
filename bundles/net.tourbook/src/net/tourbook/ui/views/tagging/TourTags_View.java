@@ -292,7 +292,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
          super(UI.EMPTY_STRING, AS_CHECK_BOX);
 
-         setToolTipText(Messages.Action_Tag_Filter_Tooltip);
+         setToolTipText(Messages.Tour_Tags_Action_TagCheckFilter_OnlyTaggedTours_Tooltip);
          setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TagsChecked));
          setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TagsChecked_Disabled));
       }
@@ -1478,15 +1478,15 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
          return;
       }
 
-//      if (_tagViewerItem_IsKeyPressed) {
-//
-//         // ignore when selected with keyboard
-//
-//         // reset state
-//         _tagViewerItem_IsKeyPressed = false;
-//
-//         return;
-//      }
+      if (_tagViewerItem_IsKeyPressed) {
+
+         // ignore when selected with keyboard
+
+         // reset state
+         _tagViewerItem_IsKeyPressed = false;
+
+         return;
+      }
 
       Object selection;
 
