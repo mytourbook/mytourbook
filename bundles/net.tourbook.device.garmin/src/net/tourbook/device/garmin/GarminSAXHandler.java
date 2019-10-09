@@ -890,7 +890,7 @@ public class GarminSAXHandler extends DefaultHandler {
                      _currentTime = TIME_FORMAT_RFC822.parse(timeString).getTime();
                   } catch (final ParseException e3) {
                      
-                     TourLogManager.logError(e3.getMessage() + " in " + _importFilePath);
+                     TourLogManager.logError(e3.getMessage() + " in " + _importFilePath); //$NON-NLS-1$
                   }
                }
             }
