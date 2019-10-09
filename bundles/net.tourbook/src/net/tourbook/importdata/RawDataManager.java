@@ -1008,9 +1008,9 @@ public class RawDataManager {
                ? reimportTourStartTime - oldTourStartTime
                : oldTourStartTime - reimportTourStartTime;
 
-         if (timeDiff > 20000) {
-// disabled because .fit files can have different tour start times (of some seconds)
-//				continue;
+         if (timeDiff > 20000 && reimportedFile.getName().toLowerCase().endsWith(".fit") == false) {
+// disabled for .fit files because they can have different tour start times (of some seconds)
+            continue;
          }
 
          if (oldTourData.timeSerie != null && reimportedTourData.timeSerie != null) {
