@@ -108,7 +108,7 @@ Bugfix
 * Fitlog Import (Frederic)
   - Now Taking into account the pauses when importing laps 
   - Distinguishing between manual activities and activities with tracks 
-  - Converting Calories (unit used in ST) to calories (unit used in MTB)
+  - Converting Calories (unit used in ST) to kilocalories (unit used in MTB)
 
 * Body Weight unit (Frederic)
   - When changing the measurement unit, the body weight unit is updated in the UI
