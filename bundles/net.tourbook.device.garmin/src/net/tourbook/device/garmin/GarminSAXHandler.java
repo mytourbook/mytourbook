@@ -35,11 +35,10 @@ import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.TourbookDevice;
+import net.tourbook.tour.TourLogManager;
 
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.widgets.Display;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -464,7 +463,7 @@ public class GarminSAXHandler extends DefaultHandler {
    }
 
    public void dispose() {
-      
+
       _allLapStart.clear();
       _allTimeData.clear();
    }
@@ -890,15 +889,8 @@ public class GarminSAXHandler extends DefaultHandler {
                   try {
                      _currentTime = TIME_FORMAT_RFC822.parse(timeString).getTime();
                   } catch (final ParseException e3) {
-
-                     Display.getDefault().syncExec(new Runnable() {
-                        @Override
-                        public void run() {
-                           final String message = e3.getMessage();
-                           MessageDialog.openError(Display.getCurrent().getActiveShell(), "Error", message); //$NON-NLS-1$
-                           System.err.println(message + " in " + _importFilePath); //$NON-NLS-1$
-                        }
-                     });
+                     
+                     TourLogManager.logError(e3.getMessage() + " in " + _importFilePath); //$NON-NLS-1$
                   }
                }
             }
