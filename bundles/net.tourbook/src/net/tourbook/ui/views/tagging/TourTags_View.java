@@ -216,24 +216,6 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
    }
 
-//   private class Action_TourTag_Options extends ActionToolbarSlideout {
-//
-//      private Slideout_TourTag_Options __slideoutTourTagOptions;
-//
-//      @Override
-//      protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
-//
-//         __slideoutTourTagOptions = new Slideout_TourTag_Options(_parent, toolbar, TourTags_View.this, _state);
-//
-//         return __slideoutTourTagOptions;
-//      }
-//
-//      @Override
-//      protected void onBeforeOpenSlideout() {
-//         closeOpenedDialogs(this);
-//      }
-//   }
-
    private class Action_RestoreTags extends Action {
 
       public Action_RestoreTags() {

@@ -661,8 +661,8 @@
          <!-- Save Tour -->
          <command
             commandId      ="command.net.tourbook.tour.SaveTour"
-            mnemonic       ="%Command_App_SaveTour_Mnemonic"
-            tooltip        ="%Command_App_SaveTour_Tooltip"
+            mnemonic       ="%Command_Tour_SaveTour_Mnemonic"
+            tooltip        ="%Command_Tour_SaveTour_Tooltip"
          >
             <visibleWhen   checkEnabled="false">
                <reference  definitionId="net.tourbook.definition.isTourEditorActive"/>
@@ -672,8 +672,8 @@
          <!-- Restore Tour -->
          <command
             commandId      ="command.net.tourbook.tour.RestoreTour"
-            mnemonic       ="%Command_App_RestoreTour_Mnemonic"
-            tooltip        ="%Command_App_RestoreTour_Tooltip"
+            mnemonic       ="%Command_Tour_RestoreTour_Mnemonic"
+            tooltip        ="%Command_Tour_RestoreTour_Tooltip"
          >
             <visibleWhen   checkEnabled="false">
                <reference  definitionId="net.tourbook.definition.isTourEditorActive"/>
@@ -959,7 +959,7 @@ THIS IS NOT YET FULLY IMPLEMENTED
                commandId      ="command.net.tourbook.tour.SaveTour"
                icon           ="icons/save-tour.png"
                disabledIcon   ="icons/save-tour-disabled.png"
-               tooltip        ="%Command_App_SaveTour_Tooltip"
+               tooltip        ="%Command_Tour_SaveTour_Tooltip"
             >
                <visibleWhen   checkEnabled="false">
                   <reference  definitionId="net.tourbook.definition.isTourEditorActive"/>
@@ -969,8 +969,7 @@ THIS IS NOT YET FULLY IMPLEMENTED
             <!-- Restore Tour -->
             <command
                commandId      ="command.net.tourbook.tour.RestoreTour"
-               mnemonic       ="%Command_App_RestoreTour_Mnemonic"
-               tooltip        ="%Command_App_RestoreTour_Tooltip"
+               tooltip        ="%Command_Tour_RestoreTour_Tooltip"
             >
                <visibleWhen   checkEnabled="false">
                   <reference  definitionId="net.tourbook.definition.isTourEditorActive"/>
