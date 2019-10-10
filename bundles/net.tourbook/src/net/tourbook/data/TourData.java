@@ -359,7 +359,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * Average altitude change (m/km)
     */
-   @XmlElement
    private int                   avgAltitudeChange;
 
    // ############################################# PULSE/WEIGHT/POWER #############################################
