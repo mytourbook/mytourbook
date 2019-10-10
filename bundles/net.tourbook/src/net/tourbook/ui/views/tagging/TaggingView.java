@@ -1542,6 +1542,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       final int selectedItems = selection.size();
       final TVITagViewItem firstElement = (TVITagViewItem) selection.getFirstElement();
       final boolean firstElementHasChildren = firstElement == null ? false : firstElement.hasChildren();
+      final boolean isSingleExpand = _action_SingleExpand_CollapseOthers.isChecked();
 
       _tourDoubleClickState.canEditTour = isOneTour;
       _tourDoubleClickState.canOpenTour = isOneTour;
@@ -1592,7 +1593,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
             : selectedItems == 1
                   ? firstElementHasChildren
                   : true);
-
+      _action_OnMouseSelect_ExpandCollapse.setEnabled(isSingleExpand == false);
       _actionExportTour.setEnabled(isIteratedTours);
 
       _actionCollapseOthers.setEnabled(selectedItems == 1 && firstElementHasChildren);

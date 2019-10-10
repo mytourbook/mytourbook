@@ -132,6 +132,9 @@ Bugfix
   - Fixed a bug that confused the user when re-importing multiple files. If one of them was invalid,
     the log would display the valid re-imported files as invalid files that could not be re-imported
 
+  - Fixed a bug when reimporting a subset of tours contained in files that have multiple tours.
+    The reimport is now enabled for all files except .Fit files.
+
 
 Translation    
 ===========
