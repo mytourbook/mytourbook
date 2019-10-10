@@ -1945,8 +1945,9 @@ public class RawDataManager {
 
                      TourLogManager.addSubLog(//
                            TourLogState.IMPORT_OK,
-                           String.format(NLS.bind(LOG_IMPORT_TOUR_IMPORTED,
-                                 importedTourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S)), osFilePath));
+                           NLS.bind(LOG_IMPORT_TOUR_IMPORTED,
+                                 importedTourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S),
+                                 osFilePath));
                   }
 
                   TourLogManager.addSubLog(//
