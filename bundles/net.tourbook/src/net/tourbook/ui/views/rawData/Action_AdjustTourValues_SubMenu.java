@@ -93,8 +93,9 @@ public class Action_AdjustTourValues_SubMenu extends Action implements IMenuCrea
       new ActionContributionItem(_action_ComputeCadenceZonesTimes).fill(menu, -1);
       new ActionContributionItem(_action_MultiplyCaloriesBy1000).fill(menu, -1);
       new ActionContributionItem(_action_SetAltitudeFromSRTM).fill(menu, -1);
-      new ActionContributionItem(_action_SetCadence_SubMenu).fill(menu, -1);
       new ActionContributionItem(_action_SetTimeZone).fill(menu, -1);
+
+      new ActionContributionItem(_action_SetCadence_SubMenu).fill(menu, -1);
       new ActionContributionItem(_action_Weather_SubMenu).fill(menu, -1);
    }
 
