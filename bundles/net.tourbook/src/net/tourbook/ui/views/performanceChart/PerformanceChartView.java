@@ -29,10 +29,8 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.data.TourData;
-import net.tourbook.data.TourPerson;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.statistic.ActionSynchChartScale;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.TourEvent;
@@ -40,7 +38,6 @@ import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.SQLFilter;
-import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 
 import org.eclipse.e4.ui.di.PersistState;
@@ -88,8 +85,10 @@ public class PerformanceChartView extends ViewPart implements ITourProvider {
    private ITourEventListener      _tourEventListener;
    private ISelectionListener      _postSelectionListener;
 
-   private TourPerson              _activePerson;
-   private TourTypeFilter          _activeTourTypeFilter;
+   /*
+    * private TourPerson _activePerson;
+    * private TourTypeFilter _activeTourTypeFilter;
+    */
 
    private int                     _selectedYear       = -1;
 
@@ -97,17 +96,6 @@ public class PerformanceChartView extends ViewPart implements ITourProvider {
     * Contains all years which have tours for the selected tour type and person.
     */
    private TIntArrayList           _availableYears;
-
-   /**
-    * contains the statistics in the same sort order as the statistic combo box
-    */
-   private ActionSynchChartScale   _actionSynchChartScale;
-
-   private boolean                 _isSynchScaleEnabled;
-   private boolean                 _isVerticalOrderDisabled;
-
-   private int                     _minimumComboWidth;
-   private int                     _maximumComboWidth;
 
    private PixelConverter          _pc;
 
@@ -122,11 +110,6 @@ public class PerformanceChartView extends ViewPart implements ITourProvider {
 
    public static boolean isInUpdateUI() {
       return _isInUpdateUI;
-   }
-
-   void actionSynchScale(final boolean isEnabled) {
-
-      _isSynchScaleEnabled = isEnabled;
    }
 
    private void addPartListener() {
@@ -187,8 +170,8 @@ public class PerformanceChartView extends ViewPart implements ITourProvider {
                   || property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)
                   || property.equals(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED)) {
 
-               _activePerson = TourbookPlugin.getActivePerson();
-               _activeTourTypeFilter = TourbookPlugin.getActiveTourTypeFilter();
+               // _activePerson = TourbookPlugin.getActivePerson();
+               // _activeTourTypeFilter = TourbookPlugin.getActiveTourTypeFilter();
 
             } else if (property.equals(ITourbookPreferences.STATISTICS_STATISTIC_PROVIDER_IDS)) {
 
@@ -309,8 +292,8 @@ public class PerformanceChartView extends ViewPart implements ITourProvider {
          @Override
          public void run() {
 
-            _activePerson = TourbookPlugin.getActivePerson();
-            _activeTourTypeFilter = TourbookPlugin.getActiveTourTypeFilter();
+            //_activePerson = TourbookPlugin.getActivePerson();
+            //_activeTourTypeFilter = TourbookPlugin.getActiveTourTypeFilter();
 
             restoreState();
          }
@@ -506,8 +489,8 @@ public class PerformanceChartView extends ViewPart implements ITourProvider {
 
       final GC gc = new GC(parent);
       {
-         _minimumComboWidth = gc.textExtent(COMBO_MINIMUM_WIDTH).x;
-         _maximumComboWidth = gc.textExtent(COMBO_MAXIMUM_WIDTH).x;
+         //  _minimumComboWidth = gc.textExtent(COMBO_MINIMUM_WIDTH).x;
+         // _maximumComboWidth = gc.textExtent(COMBO_MAXIMUM_WIDTH).x;
       }
       gc.dispose();
    }
