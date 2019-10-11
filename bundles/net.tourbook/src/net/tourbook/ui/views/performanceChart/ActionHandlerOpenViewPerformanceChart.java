@@ -23,12 +23,12 @@ import org.eclipse.core.commands.ExecutionException;
 
 public class ActionHandlerOpenViewPerformanceChart extends AbstractHandler {
 
-	@Override
-	public Object execute(final ExecutionEvent event) throws ExecutionException {
+   @Override
+   public Object execute(final ExecutionEvent event) throws ExecutionException {
 
       Util.showView(PerformanceChartView.ID, true);
 
-		return null;
-	}
+      return null;
+   }
 
 }

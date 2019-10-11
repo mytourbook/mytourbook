@@ -66,59 +66,59 @@ import org.eclipse.ui.part.ViewPart;
 
 public class PerformanceChartView extends ViewPart implements ITourProvider {
 
-   public static final String           ID                       = "net.tourbook.ui.views.performanceChart.PerformanceChartView"; //$NON-NLS-1$
+   public static final String      ID                  = "net.tourbook.ui.views.performanceChart.PerformanceChartView"; //$NON-NLS-1$
 
-   private static final String          COMBO_MINIMUM_WIDTH      = "1234567890";                                  //$NON-NLS-1$
-   private static final String          COMBO_MAXIMUM_WIDTH      = "123456789012345678901234567890";              //$NON-NLS-1$
+   private static final String     COMBO_MINIMUM_WIDTH = "1234567890";                                                  //$NON-NLS-1$
+   private static final String     COMBO_MAXIMUM_WIDTH = "123456789012345678901234567890";                              //$NON-NLS-1$
 
-   private static final char            NL                       = net.tourbook.common.UI.NEW_LINE;
+   private static final char       NL                  = net.tourbook.common.UI.NEW_LINE;
 
-   private static final boolean         IS_OSX                   = net.tourbook.common.UI.IS_OSX;
-   private static final boolean         IS_LINUX                 = net.tourbook.common.UI.IS_LINUX;
+   private static final boolean    IS_OSX              = net.tourbook.common.UI.IS_OSX;
+   private static final boolean    IS_LINUX            = net.tourbook.common.UI.IS_LINUX;
 
-   private static boolean               _isInUpdateUI;
+   private static boolean          _isInUpdateUI;
 
-   private final IPreferenceStore       _prefStore               = TourbookPlugin.getPrefStore();
-   private final IPreferenceStore       _prefStoreCommon         = CommonActivator.getPrefStore();
-   private final IDialogSettings        _state                   = TourbookPlugin.getState("PerformanceChartView");               //$NON-NLS-1$
+   private final IPreferenceStore  _prefStore          = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore  _prefStoreCommon    = CommonActivator.getPrefStore();
+   private final IDialogSettings   _state              = TourbookPlugin.getState("PerformanceChartView");               //$NON-NLS-1$
 
-   private IPartListener2               _partListener;
-   private IPropertyChangeListener      _prefChangeListener;
-   private IPropertyChangeListener      _prefChangeListenerCommon;
-   private ITourEventListener           _tourEventListener;
-   private ISelectionListener           _postSelectionListener;
+   private IPartListener2          _partListener;
+   private IPropertyChangeListener _prefChangeListener;
+   private IPropertyChangeListener _prefChangeListenerCommon;
+   private ITourEventListener      _tourEventListener;
+   private ISelectionListener      _postSelectionListener;
 
-   private TourPerson                   _activePerson;
-   private TourTypeFilter               _activeTourTypeFilter;
+   private TourPerson              _activePerson;
+   private TourTypeFilter          _activeTourTypeFilter;
 
-   private int                          _selectedYear            = -1;
+   private int                     _selectedYear       = -1;
 
    /**
     * Contains all years which have tours for the selected tour type and person.
     */
-   private TIntArrayList                _availableYears;
+   private TIntArrayList           _availableYears;
 
    /**
     * contains the statistics in the same sort order as the statistic combo box
     */
-   private ActionSynchChartScale        _actionSynchChartScale;
+   private ActionSynchChartScale   _actionSynchChartScale;
 
-   private boolean                      _isSynchScaleEnabled;
-   private boolean                      _isVerticalOrderDisabled;
+   private boolean                 _isSynchScaleEnabled;
+   private boolean                 _isVerticalOrderDisabled;
 
-   private int                          _minimumComboWidth;
-   private int                          _maximumComboWidth;
+   private int                     _minimumComboWidth;
+   private int                     _maximumComboWidth;
 
-   private PixelConverter               _pc;
+   private PixelConverter          _pc;
 
    /*
     * UI controls
     */
-   private Combo                    _comboYear;
-   private Combo                    _comboNumberOfYears;
-   private Combo                    _comboBarVerticalOrder;
+   private Combo     _comboYear;
+   private Combo     _comboNumberOfYears;
+   private Combo     _comboBarVerticalOrder;
 
-   private Composite                _statContainer;
+   private Composite _statContainer;
 
    public static boolean isInUpdateUI() {
       return _isInUpdateUI;
@@ -190,9 +190,7 @@ public class PerformanceChartView extends ViewPart implements ITourProvider {
                _activePerson = TourbookPlugin.getActivePerson();
                _activeTourTypeFilter = TourbookPlugin.getActiveTourTypeFilter();
 
-
             } else if (property.equals(ITourbookPreferences.STATISTICS_STATISTIC_PROVIDER_IDS)) {
-
 
             } else if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
 
@@ -238,8 +236,7 @@ public class PerformanceChartView extends ViewPart implements ITourProvider {
                return;
             }
 
-            if (selection instanceof SelectionDeletedTours) {
-            }
+            if (selection instanceof SelectionDeletedTours) {}
          }
       };
 
@@ -417,8 +414,7 @@ public class PerformanceChartView extends ViewPart implements ITourProvider {
 
             _comboBarVerticalOrder.addSelectionListener(new SelectionAdapter() {
                @Override
-               public void widgetSelected(final SelectionEvent e) {
-               }
+               public void widgetSelected(final SelectionEvent e) {}
             });
          }
       }
@@ -483,7 +479,6 @@ public class PerformanceChartView extends ViewPart implements ITourProvider {
 
       return selectedYearIndex;
    }
-
 
    /**
     * @return Returns number of years which are selected in the combobox
@@ -640,8 +635,7 @@ public class PerformanceChartView extends ViewPart implements ITourProvider {
    }
 
    @PersistState
-   private void saveState() {
-   }
+   private void saveState() {}
 
    private void selectYear(final int defaultYear) {
 
