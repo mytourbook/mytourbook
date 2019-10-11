@@ -81,6 +81,7 @@ import net.tourbook.common.weather.IWeather;
 import net.tourbook.database.FIELD_VALIDATION;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.importdata.TourbookDevice;
+import net.tourbook.math.Skiba;
 import net.tourbook.math.Smooth;
 import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoCache;
@@ -663,6 +664,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * 0 == false, 1 == true
     */
    private short                  isStrideSensorPresent            = 0;
+
+   /**
+    * GOVSS (Gravity Ordered Velocity Stress Score)
+    */
+   private int                govss;                                // db-version 41
+
 
    // ############################################# MERGED DATA #############################################
 
@@ -3350,6 +3357,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       computeHrZones();
       computeCadenceZonesTimes();
       computeRunningDynamics();
+
+      govss = Skiba.ComputeGovss(tourPerson, this);
 
       computeGeo_Bounds();
       computeGeo_Grid();
