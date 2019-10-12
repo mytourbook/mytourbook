@@ -310,6 +310,7 @@ public class Messages extends NLS {
    public static String        Dialog_PersonManager_PersonIsNotAvailable_Title;
 
    public static String        Dialog_RetrieveWeather_Dialog_Title;
+   public static String        Dialog_RetrieveWeather_Label_WeatherDataNotRetrieved;
    public static String        Dialog_RetrieveWeather_WeatherDataNotFound;
 
    public static String        dialog_is_tour_editor_modified_message;
@@ -390,7 +391,6 @@ public class Messages extends NLS {
    public static String        app_action_edit_adjust_altitude;
    public static String        app_action_edit_rows_tooltip;
    public static String        app_action_edit_tour_marker;
-   public static String        app_action_delete_tour_marker;
    public static String        app_action_expand_selection_tooltip;
    public static String        app_action_expand_type_flat;
    public static String        app_action_expand_type_year_day;
@@ -431,6 +431,7 @@ public class Messages extends NLS {
    public static String        App_Action_Delete;
    public static String        App_Action_Delete_WithConfirm;
    public static String        App_Action_DeleteProfile;
+   public static String        App_Action_DeleteTourMarker;
    public static String        App_Action_Dialog_ActionIsInProgress_Message;
    public static String        App_Action_Dialog_ActionIsInProgress_Title;
    public static String        App_Action_Duplicate;
@@ -683,8 +684,6 @@ public class Messages extends NLS {
    public static String        Dialog_JoinTours_Label_TourTime;
    public static String        Dialog_JoinTours_Label_TourType;
    public static String        Dialog_JoinTours_Link_TourType;
-
-   public static String        Dialog_QuickEdit_Label_TourLocation_Start;
 
    public static String        Dialog_SaveTags_Dialog_Title;
    public static String        Dialog_SaveTags_Label_Info;
@@ -2879,7 +2878,6 @@ public class Messages extends NLS {
    public static String UI_Label_no_chart_is_selected;
    public static String UI_Label_PersonIsRequired;
    public static String UI_Label_TourIsNotSelected;
-   public static String UI_Label_WeatherDataNotRetrieved;
 
    public static String ui_tour_not_defined;
 

@@ -231,10 +231,8 @@ public class DialogSetTimeZone_Wizard extends Wizard {
                   final ZonedDateTime tourStartTime_FromLatLon = tourData.getTourStartTime();
                   tourData.setTourStartTime_YYMMDD(tourStartTime_FromLatLon);
 
-                  TourLogManager.addLog(
-                        TourLogState.INFO,
-                        NLS.bind(LOG_SET_TIMEZONE_014_TOUR_START_ADJUSTED, tourDateTime));
-
+                  TourLogManager.subLog_Info(NLS.bind(LOG_SET_TIMEZONE_014_TOUR_START_ADJUSTED, tourDateTime));
+                  
                   break;
 
                default:
