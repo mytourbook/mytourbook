@@ -936,8 +936,9 @@ public class RawDataManager {
             isTourReImported = true;
 
             TourLogManager.addSubLog(TourLogState.IMPORT_OK,
-                  String.format(NLS.bind(LOG_IMPORT_TOUR_IMPORTED,
-                        newTourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S)), reimportFileNamePath));
+                  NLS.bind(LOG_IMPORT_TOUR_IMPORTED,
+                        newTourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S),
+                        reimportFileNamePath));
 
             // set reimport file path as new location
             newTourData.setImportFilePath(reimportFileNamePath);
