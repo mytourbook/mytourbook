@@ -53,13 +53,15 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
    /*
     * UI controls
     */
-   private Button _chkAutoOpenImportLog;
-   private Button _chkCreateTourIdWithTime;
-   private Button _chkIgnoreInvalidFile;
-   private Button _chkSetBodyWeight;
+   private Button             _chkAutoOpenImportLog;
+   private Button             _chkCreateTourIdWithTime;
+   private Button             _chkIgnoreInvalidFile;
+   private Button             _chkSetBodyWeight;
 
-   private Label  _lblIdInfo;
-   private Label  _lblInvalidFilesInfo;
+   private Label              _lblIdInfo;
+   private Label              _lblInvalidFilesInfo;
+
+   private PreferenceLinkArea _linkBodyWeight;
 
    @Override
    protected Control createContents(final Composite parent) {
@@ -162,29 +164,31 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
          }
          {
             /*
-             * Checkbox: Set the person's body weight when importing and saving a tour
+             * Set the person's body weight when importing and saving a tour
              */
+
+            // checkbox
             _chkSetBodyWeight = new Button(container, SWT.CHECK);
             _chkSetBodyWeight.setText(Messages.PrefPage_Import_Checkbox_SetBodyWeight);
             _chkSetBodyWeight.addSelectionListener(_defaultSelectionListener);
             GridDataFactory.fillDefaults()
                   .indent(0, 10)
                   .applyTo(_chkSetBodyWeight);
-         }
-         {
-            final PreferenceLinkArea prefLink = new PreferenceLinkArea(
+
+            // link
+            _linkBodyWeight = new PreferenceLinkArea(
                   container,
                   SWT.NONE,
                   PrefPagePeople.ID,
-                  Messages.Pref_People_Link,
+                  Messages.Pref_People_Link_BodyWeight,
                   (IWorkbenchPreferenceContainer) getContainer(),
                   new PrefPagePeopleData(null, TourbookPlugin.getActivePerson()));
 
-            GridDataFactory.fillDefaults()//
+            GridDataFactory.fillDefaults()
                   .grab(true, false)
                   .indent(_checkboxIndent, 0)
                   .hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
-                  .applyTo(prefLink.getControl());
+                  .applyTo(_linkBodyWeight.getControl());
          }
       }
    }
@@ -196,6 +200,9 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
 
       final boolean areInvalidFilesToBeIgnored = _chkIgnoreInvalidFile.getSelection();
       _lblInvalidFilesInfo.setEnabled(areInvalidFilesToBeIgnored);
+
+      final boolean isSetBodyWeight = _chkSetBodyWeight.getSelection();
+      _linkBodyWeight.getControl().setEnabled(isSetBodyWeight);
    }
 
    @Override
