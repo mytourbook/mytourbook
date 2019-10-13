@@ -29,17 +29,17 @@ import org.eclipse.swt.widgets.MenuItem;
 
 /**
  */
-public class Action_Weather_SubMenu extends Action implements IMenuCreator {
+public class SubMenu_Weather extends Action implements IMenuCreator {
 
-   private Menu                       _menu;
+   private Menu                           _menu;
 
-   private ActionAdjustTemperature    _action_AdjustTemperature;
-   private ActionRetrieveWeatherData  _action_RetrieveWeatherData;
-   private ActionSetMinMaxTemperature _action_SetMinMaxTemperature;
+   private ActionAdjustTemperature        _action_AdjustTemperature;
+   private ActionRetrieveWeatherData      _action_RetrieveWeatherData;
+   private ActionComputeMinMaxTemperature _action_ComputeMinMaxTemperature;
 
-   private ITourProvider2             _tourProvider;
+   private ITourProvider2                 _tourProvider;
 
-   public Action_Weather_SubMenu(final ITourProvider2 tourViewer) {
+   public SubMenu_Weather(final ITourProvider2 tourViewer) {
 
       super(Messages.Tour_Action_Weather, AS_DROP_DOWN_MENU);
 
@@ -48,8 +48,8 @@ public class Action_Weather_SubMenu extends Action implements IMenuCreator {
       _tourProvider = tourViewer;
 
       _action_AdjustTemperature = new ActionAdjustTemperature(_tourProvider);
+      _action_ComputeMinMaxTemperature = new ActionComputeMinMaxTemperature(_tourProvider);
       _action_RetrieveWeatherData = new ActionRetrieveWeatherData(_tourProvider);
-      _action_SetMinMaxTemperature = new ActionSetMinMaxTemperature(_tourProvider);
    }
 
    @Override
@@ -64,8 +64,8 @@ public class Action_Weather_SubMenu extends Action implements IMenuCreator {
    private void fillMenu(final Menu menu) {
 
       new ActionContributionItem(_action_AdjustTemperature).fill(menu, -1);
+      new ActionContributionItem(_action_ComputeMinMaxTemperature).fill(menu, -1);
       new ActionContributionItem(_action_RetrieveWeatherData).fill(menu, -1);
-      new ActionContributionItem(_action_SetMinMaxTemperature).fill(menu, -1);
    }
 
    public ActionRetrieveWeatherData getActionRetrieveWeatherData() {
