@@ -29,7 +29,7 @@ import org.eclipse.swt.widgets.MenuItem;
 
 /**
  */
-public class Action_Weather_SubMenu extends Action implements IMenuCreator {
+public class SubMenu_Weather extends Action implements IMenuCreator {
 
    private Menu                       _menu;
 
@@ -39,7 +39,7 @@ public class Action_Weather_SubMenu extends Action implements IMenuCreator {
 
    private ITourProvider2             _tourProvider;
 
-   public Action_Weather_SubMenu(final ITourProvider2 tourViewer) {
+   public SubMenu_Weather(final ITourProvider2 tourViewer) {
 
       super(Messages.Tour_Action_Weather, AS_DROP_DOWN_MENU);
 

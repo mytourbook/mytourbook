@@ -2301,6 +2301,7 @@ public class Messages extends NLS {
    public static String Tour_Action_EditChartPreferences;
    public static String Tour_Action_EditSmoothingPreferences;
    public static String Tour_Action_EditStatisticPreferences;
+
    public static String Tour_Action_graph_altimeter_tooltip;
    public static String Tour_Action_graph_altitude_tooltip;
    public static String Tour_Action_graph_analyzer_tooltip;
@@ -2586,6 +2587,9 @@ public class Messages extends NLS {
    public static String Tour_Segmenter_Type_Surfing;
 
    public static String Tour_Statistic_Combo_BarVOrder_Tooltip;
+
+   public static String Tour_SubMenu_Cadence;
+   public static String Tour_SubMenu_Elevation;
 
    public static String Tour_Tag_Filter_Action_Tooltip;
 
