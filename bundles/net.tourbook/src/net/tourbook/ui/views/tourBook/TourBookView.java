@@ -89,8 +89,8 @@ import net.tourbook.ui.views.TourInfoToolTipStyledCellLabelProvider;
 import net.tourbook.ui.views.TreeViewerTourInfoToolTip;
 import net.tourbook.ui.views.geoCompare.GeoPartComparerItem;
 import net.tourbook.ui.views.rawData.ActionMergeTour;
-import net.tourbook.ui.views.rawData.Action_AdjustTourValues_SubMenu;
 import net.tourbook.ui.views.rawData.Action_Reimport_SubMenu;
+import net.tourbook.ui.views.rawData.SubMenu_AdjustTourValues;
 
 import org.eclipse.core.runtime.Path;
 import org.eclipse.e4.ui.di.PersistState;
@@ -255,59 +255,59 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _nf1_NoGroup.setGroupingUsed(false);
    }
    //
-   private int                             _selectedYear              = -1;
-   private int                             _selectedYearSub           = -1;
-   private final ArrayList<Long>           _selectedTourIds           = new ArrayList<>();
+   private int                            _selectedYear              = -1;
+   private int                            _selectedYearSub           = -1;
+   private final ArrayList<Long>          _selectedTourIds           = new ArrayList<>();
    //
-   private boolean                         _isCollapseOthers;
-   private boolean                         _isInFireSelection;
-   private boolean                         _isInReload;
-   private boolean                         _isInStartup;
-   private boolean                         _isShowSummaryRow;
-   private boolean                         _isToolTipInDate;
-   private boolean                         _isToolTipInTags;
-   private boolean                         _isToolTipInTime;
-   private boolean                         _isToolTipInTitle;
-   private boolean                         _isToolTipInWeekDay;
+   private boolean                        _isCollapseOthers;
+   private boolean                        _isInFireSelection;
+   private boolean                        _isInReload;
+   private boolean                        _isInStartup;
+   private boolean                        _isShowSummaryRow;
+   private boolean                        _isToolTipInDate;
+   private boolean                        _isToolTipInTags;
+   private boolean                        _isToolTipInTime;
+   private boolean                        _isToolTipInTitle;
+   private boolean                        _isToolTipInWeekDay;
    //
-   private final TourDoubleClickState      _tourDoubleClickState      = new TourDoubleClickState();
-   private TreeViewerTourInfoToolTip       _tourInfoToolTip;
+   private final TourDoubleClickState     _tourDoubleClickState      = new TourDoubleClickState();
+   private TreeViewerTourInfoToolTip      _tourInfoToolTip;
    //
-   private TagMenuManager                  _tagMenuManager;
-   private MenuManager                     _viewerMenuManager;
-   private IContextMenuProvider            _viewerContextMenuProvider = new TreeContextMenuProvider();
+   private TagMenuManager                 _tagMenuManager;
+   private MenuManager                    _viewerMenuManager;
+   private IContextMenuProvider           _viewerContextMenuProvider = new TreeContextMenuProvider();
    //
-   private Action_AdjustTourValues_SubMenu _action_AdjustTourValues_SubMenu;
-   private Action_Reimport_SubMenu         _action_Reimport_SubMenu;
+   private SubMenu_AdjustTourValues       _subMenu_AdjustTourValues;
+   private Action_Reimport_SubMenu        _subMenu_Reimport;
 
-   private ActionCollapseAll               _actionCollapseAll;
-   private ActionCollapseOthers            _actionCollapseOthers;
-   private ActionDuplicateTour             _actionDuplicateTour;
-   private ActionEditQuick                 _actionEditQuick;
-   private ActionExpandSelection           _actionExpandSelection;
-   private ActionExport                    _actionExportTour;
-   private ActionExportViewCSV             _actionExportViewCSV;
-   private ActionDeleteTourMenu            _actionDeleteTour;
-   private ActionEditTour                  _actionEditTour;
-   private ActionJoinTours                 _actionJoinTours;
-   private ActionLinkWithOtherViews        _actionLinkWithOtherViews;
-   private ActionMergeTour                 _actionMergeTour;
-   private ActionModifyColumns             _actionModifyColumns;
-   private ActionOpenTour                  _actionOpenTour;
-   private ActionOpenMarkerDialog          _actionOpenMarkerDialog;
-   private ActionOpenAdjustAltitudeDialog  _actionOpenAdjustAltitudeDialog;
-   private ActionPrint                     _actionPrintTour;
-   private ActionRefreshView               _actionRefreshView;
-   private ActionSelectAllTours            _actionSelectAllTours;
-   private ActionSetTourTypeMenu           _actionSetTourType;
-   private ActionSetPerson                 _actionSetOtherPerson;
-   private ActionToggleMonthWeek           _actionToggleMonthWeek;
-   private ActionTourBookOptions           _actionTourBookOptions;
+   private ActionCollapseAll              _actionCollapseAll;
+   private ActionCollapseOthers           _actionCollapseOthers;
+   private ActionDuplicateTour            _actionDuplicateTour;
+   private ActionEditQuick                _actionEditQuick;
+   private ActionExpandSelection          _actionExpandSelection;
+   private ActionExport                   _actionExportTour;
+   private ActionExportViewCSV            _actionExportViewCSV;
+   private ActionDeleteTourMenu           _actionDeleteTour;
+   private ActionEditTour                 _actionEditTour;
+   private ActionJoinTours                _actionJoinTours;
+   private ActionLinkWithOtherViews       _actionLinkWithOtherViews;
+   private ActionMergeTour                _actionMergeTour;
+   private ActionModifyColumns            _actionModifyColumns;
+   private ActionOpenTour                 _actionOpenTour;
+   private ActionOpenMarkerDialog         _actionOpenMarkerDialog;
+   private ActionOpenAdjustAltitudeDialog _actionOpenAdjustAltitudeDialog;
+   private ActionPrint                    _actionPrintTour;
+   private ActionRefreshView              _actionRefreshView;
+   private ActionSelectAllTours           _actionSelectAllTours;
+   private ActionSetTourTypeMenu          _actionSetTourType;
+   private ActionSetPerson                _actionSetOtherPerson;
+   private ActionToggleMonthWeek          _actionToggleMonthWeek;
+   private ActionTourBookOptions          _actionTourBookOptions;
    //
-   private TreeViewer                      _tourViewer;
-   private TreeColumnDefinition            _timeZoneOffsetColDef;
+   private TreeViewer                     _tourViewer;
+   private TreeColumnDefinition           _timeZoneOffsetColDef;
    //
-   private PixelConverter                  _pc;
+   private PixelConverter                 _pc;
 
    /*
     * UI controls
@@ -701,8 +701,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
    private void createActions() {
 
-      _action_AdjustTourValues_SubMenu = new Action_AdjustTourValues_SubMenu(this, this);
-      _action_Reimport_SubMenu = new Action_Reimport_SubMenu(this);
+      _subMenu_AdjustTourValues = new SubMenu_AdjustTourValues(this, this);
+      _subMenu_Reimport = new Action_Reimport_SubMenu(this);
 
       _actionCollapseAll = new ActionCollapseAll(this);
       _actionCollapseOthers = new ActionCollapseOthers(this);
@@ -1118,6 +1118,31 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    }
 
    /**
+    * column: Average elevation change (m/km or ft/mi)
+    */
+   private void defineColumn_Altitude_AvgChange() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.ALTITUDE_AVG_CHANGE.createColumn(_columnManager, _pc);
+
+      colDef.setIsDefaultColumn();
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            final float dbAvgAltitudeChange = ((TVITourBookItem) element).colAltitude_AvgChange / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE
+                  * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+
+            colDef.printValue_0(cell, dbAvgAltitudeChange);
+
+            setCellColor(cell, element);
+         }
+      });
+   }
+
+   /**
     * column: altitude down (m)
     */
    private void defineColumn_Altitude_Down() {
@@ -1182,31 +1207,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             final double value = dbAltitudeUp / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
 
             colDef.printValue_0(cell, value);
-
-            setCellColor(cell, element);
-         }
-      });
-   }
-
-   /**
-    * column: Average elevation change (m/km or ft/mi)
-    */
-   private void defineColumn_Altitude_AvgChange() {
-
-      final TreeColumnDefinition colDef = TreeColumnFactory.ALTITUDE_AVG_CHANGE.createColumn(_columnManager, _pc);
-
-      colDef.setIsDefaultColumn();
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final Object element = cell.getElement();
-
-            final float dbAvgAltitudeChange = ((TVITourBookItem) element).colAltitude_AvgChange / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE
-                  * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
-
-            colDef.printValue_0(cell, dbAvgAltitudeChange);
 
             setCellColor(cell, element);
          }
@@ -3320,10 +3320,10 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _tourDoubleClickState.canEditMarker = isOneTour;
       _tourDoubleClickState.canAdjustAltitude = isOneTour;
 
-      _action_AdjustTourValues_SubMenu.setEnabled(isTourSelected || isAllToursSelected);
-      _action_AdjustTourValues_SubMenu.getActionRetrieveWeatherData().setEnabled(useWeatherRetrieval);
+      _subMenu_AdjustTourValues.setEnabled(isTourSelected || isAllToursSelected);
+      _subMenu_AdjustTourValues.getActionRetrieveWeatherData().setEnabled(useWeatherRetrieval);
 
-      _action_Reimport_SubMenu.setEnabled(isTourSelected);
+      _subMenu_Reimport.setEnabled(isTourSelected);
 
       _actionDeleteTour.setEnabled(isTourSelected);
       _actionDuplicateTour.setEnabled(isOneTour && !isDeviceTour);
@@ -4001,8 +4001,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       menuMgr.add(_actionPrintTour);
 
       menuMgr.add(new Separator());
-      menuMgr.add(_action_AdjustTourValues_SubMenu);
-      menuMgr.add(_action_Reimport_SubMenu);
+      menuMgr.add(_subMenu_AdjustTourValues);
+      menuMgr.add(_subMenu_Reimport);
       menuMgr.add(_actionSetOtherPerson);
       menuMgr.add(_actionDeleteTour);
 
@@ -4619,7 +4619,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
                      /**
                       * <code>
-                     
+
                         Caused by: java.lang.NullPointerException
                         at org.eclipse.jface.viewers.AbstractTreeViewer.getSelection(AbstractTreeViewer.java:2956)
                         at org.eclipse.jface.viewers.StructuredViewer.handleSelect(StructuredViewer.java:1211)

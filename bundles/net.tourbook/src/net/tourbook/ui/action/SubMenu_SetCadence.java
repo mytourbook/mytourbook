@@ -33,7 +33,7 @@ import org.eclipse.swt.widgets.MenuItem;
 
 /**
  */
-public class Action_SetCadence_SubMenu extends Action implements IMenuCreator {
+public class SubMenu_SetCadence extends Action implements IMenuCreator {
 
 	private Menu			_menu;
 
@@ -67,7 +67,7 @@ public class Action_SetCadence_SubMenu extends Action implements IMenuCreator {
 		}
 	}
 
-	public Action_SetCadence_SubMenu(final ITourProvider tourViewer) {
+	public SubMenu_SetCadence(final ITourProvider tourViewer) {
 
 		super(Messages.Action_Cadence_Set, AS_DROP_DOWN_MENU);
 

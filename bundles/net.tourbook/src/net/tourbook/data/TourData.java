@@ -6674,6 +6674,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
+    * @return the avgAltitudeChange
+    */
+   public int getAvgAltitudeChange() {
+      return avgAltitudeChange;
+   }
+
+   /**
     * @return the avgCadence
     */
    public float getAvgCadence() {

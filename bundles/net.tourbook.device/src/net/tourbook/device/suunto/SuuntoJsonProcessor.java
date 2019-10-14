@@ -106,7 +106,7 @@ public class SuuntoJsonProcessor {
    }
 
    /**
-    * Cleans a processes activity and performs the following actions :
+    * Cleans a processed activity and performs the following actions :
     * - Sort the time slices chronologically
     * - Only keeps the entries every full seconds, no entries should be in between (entries with
     * milliseconds).
