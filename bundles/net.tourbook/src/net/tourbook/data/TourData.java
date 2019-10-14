@@ -134,7 +134,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    public static final int             DB_LENGTH_WEATHER                 = 1000;
    public static final int             DB_LENGTH_WEATHER_CLOUDS          = 255;
 
-    public static final int             DB_LENGTH_POWER_DATA_SOURCE       = 255;
+   public static final int             DB_LENGTH_POWER_DATA_SOURCE       = 255;
 
    /**
     * <pre>
@@ -164,7 +164,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * </pre>
     */
    public static final double          MAX_GEO_DIFF                      = 0.0001;
-
 
    public static final double          NORMALIZED_LATITUDE_OFFSET        = 90.0;
    public static final int             NORMALIZED_LATITUDE_OFFSET_E2     = 9000;
