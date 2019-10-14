@@ -143,7 +143,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *   places   degrees      DMS                  qualitative scale that           N/S or E/W      E/W at         E/W at       E/W at
     *                                              can be identified                at equator      23N/S          45N/S        67N/S
     *
-<<<<<<< HEAD
     *    0       1.0          1° 00' 0?       country or large region            111.32   km   102.47   km     78.71  km    43.496  km
     *    1       0.1          0° 06' 0?       large city or district              11.132  km    10.247  km      7.871 km     4.3496 km
     *    2       0.01         0° 00' 36?      town or village                      1.1132 km     1.0247 km    787.1   m    434.96   m
@@ -151,15 +150,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *    4       0.0001       0° 00' 0.36?    individual street, land parcel      11.132  m     10.247  m       7.871 m      4.3496 m
     *    5       0.00001      0° 00' 0.036?   individual trees                     1.1132 m      1.0247 m     787.1   mm   434.96   mm
     *    6       0.000001     0° 00' 0.0036?  individual humans                  111.32   mm   102.47   mm     78.71  mm    43.496  mm
-=======
-    *    0       1.0          1Â° 00' 0?       country or large region            111.32   km   102.47   km     78.71  km    43.496  km
-    *    1       0.1          0Â° 06' 0?       large city or district              11.132  km    10.247  km      7.871 km     4.3496 km
-    *    2       0.01         0Â° 00' 36?      town or village                      1.1132 km     1.0247 km    787.1   m    434.96   m
-    *    3       0.001        0Â° 00' 3.6?     neighborhood, street               111.32   m    102.47   m      78.71  m     43.496  m
-    *    4       0.0001       0Â° 00' 0.36?    individual street, land parcel      11.132  m     10.247  m       7.871 m      4.3496 m
-    *    5       0.00001      0Â° 00' 0.036?   individual trees                     1.1132 m      1.0247 m     787.1   mm   434.96   mm
-    *    6       0.000001     0Â° 00' 0.0036?  individual humans                  111.32   mm   102.47   mm     78.71  mm    43.496  mm
->>>>>>> refs/remotes/origin/master
     *
     * https://en.wikipedia.org/wiki/Decimal_degrees
     *
@@ -575,12 +565,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    // ############################################# TRAINING #############################################
 
    /**
-<<<<<<< HEAD
     * Naming variants from Jesús Pérez
-=======
-    * Naming variants from JesÃºs PÃ©rez
-
->>>>>>> refs/remotes/origin/master
     * <ul>
     * <li>Impact of training</li>
     * <li>Impact of effort</li>
