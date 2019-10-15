@@ -7323,6 +7323,7 @@ public class TourDatabase {
          if (isColumnAvailable(conn, TABLE_TOUR_COMPARED, "tourRecordingTime") == false) { //$NON-NLS-1$
 
 // SET_FORMATTING_OFF
+
             // Add new columns
             SQL.AddCol_Float(stmt, TABLE_TOUR_COMPARED, "tourRecordingTime", DEFAULT_0); //$NON-NLS-1$
 
