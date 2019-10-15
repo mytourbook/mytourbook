@@ -2235,8 +2235,6 @@ public class Messages extends NLS {
    public static String Slideout_TourTagFilter_Label_SelectedTags;
    public static String Slideout_TourTagFilter_Label_Title;
 
-   public static String Slideout_TourTagOptions_Label_Title;
-
    public static String Slideout_TrainingOptions_Label_Title;
 
    public static String Tag_Manager_Action_DeleteCategory;
