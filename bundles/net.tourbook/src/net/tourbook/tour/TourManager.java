@@ -674,13 +674,12 @@ public class TourManager {
       if (timeSerie == null
             || timeSerie.length == 0
             || startIndex >= distanceSerie.length
-            || endIndex >= distanceSerie.length) {
+            || endIndex >= distanceSerie.length
+            || startIndex > endIndex) {
          return 0;
       }
 
-      final int time = Math.max(0, timeSerie[endIndex] - timeSerie[startIndex]);
-
-      return time;
+      return timeSerie[endIndex] - timeSerie[startIndex];
    }
 
    /**
