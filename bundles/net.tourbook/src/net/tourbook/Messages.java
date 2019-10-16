@@ -2235,8 +2235,6 @@ public class Messages extends NLS {
    public static String Slideout_TourTagFilter_Label_SelectedTags;
    public static String Slideout_TourTagFilter_Label_Title;
 
-   public static String Slideout_TourTagOptions_Label_Title;
-
    public static String Slideout_TrainingOptions_Label_Title;
 
    public static String Tag_Manager_Action_DeleteCategory;
@@ -2301,6 +2299,7 @@ public class Messages extends NLS {
    public static String Tour_Action_EditChartPreferences;
    public static String Tour_Action_EditSmoothingPreferences;
    public static String Tour_Action_EditStatisticPreferences;
+
    public static String Tour_Action_graph_altimeter_tooltip;
    public static String Tour_Action_graph_altitude_tooltip;
    public static String Tour_Action_graph_analyzer_tooltip;
@@ -2312,6 +2311,9 @@ public class Messages extends NLS {
    public static String Tour_Action_graph_speed_tooltip;
    public static String Tour_Action_graph_temperature_tooltip;
    public static String Tour_Action_graph_tour_compare_tooltip;
+   public static String Tour_Action_ComputeCadenceZonesTimes;
+   public static String Tour_Action_ComputeCadenceZonesTimes_Message;
+   public static String Tour_Action_ComputeCadenceZonesTimes_Title;
    public static String Tour_Action_GeoCompare_Tooltip;
    public static String Tour_Action_GraphGears;
    public static String Tour_Action_GraphOverlapped;
@@ -2587,6 +2589,9 @@ public class Messages extends NLS {
 
    public static String Tour_Statistic_Combo_BarVOrder_Tooltip;
 
+   public static String Tour_SubMenu_Cadence;
+   public static String Tour_SubMenu_Elevation;
+
    public static String Tour_Tag_Filter_Action_Tooltip;
 
    public static String Tour_Tags_Action_Layout_Flat_Tooltip;
@@ -2836,7 +2841,6 @@ public class Messages extends NLS {
 
    public static String TourDataEditorView_tour_editor_status_tour_contains_ref_tour;
 
-   public static String TourEditor_Action_ComputeCadenceZonesTimes;
    public static String TourEditor_Action_ComputeDistanceValuesFromGeoPosition;
    public static String TourEditor_Action_DeleteDistanceValues;
    public static String TourEditor_Action_RemoveSwimStyle;
@@ -2844,8 +2848,6 @@ public class Messages extends NLS {
    public static String TourEditor_Action_SetStartDistanceTo0;
    public static String TourEditor_Action_SetSwimStyle;
 
-   public static String TourEditor_Dialog_ComputeCadenceZonesTimes_Message;
-   public static String TourEditor_Dialog_ComputeCadenceZonesTimes_Title;
    public static String TourEditor_Dialog_ComputeDistanceValues_Message;
    public static String TourEditor_Dialog_ComputeDistanceValues_Title;
    public static String TourEditor_Dialog_DeleteDistanceValues_Message;

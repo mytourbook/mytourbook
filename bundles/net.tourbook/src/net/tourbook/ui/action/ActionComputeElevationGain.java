@@ -103,10 +103,14 @@ public class ActionComputeElevationGain extends Action {
                return false;
             }
 
+            final int newAltitudeUp = originalTourData.getTourAltUp();
+            elevationNew[0] += newAltitudeUp;
+
             sqlUpdateStatement.setShort(1, originalTourData.getDpTolerance());
-            sqlUpdateStatement.setInt(2, originalTourData.getTourAltUp());
+            sqlUpdateStatement.setInt(2, newAltitudeUp);
             sqlUpdateStatement.setInt(3, originalTourData.getTourAltDown());
-            sqlUpdateStatement.setLong(4, originalTourData.getTourId());
+            sqlUpdateStatement.setInt(4, originalTourData.getAvgAltitudeChange());
+            sqlUpdateStatement.setLong(5, originalTourData.getTourId());
 
             return true;
          }
@@ -133,7 +137,8 @@ public class ActionComputeElevationGain extends Action {
 
                   + " dpTolerance=?, " //                         //$NON-NLS-1$
                   + " tourAltUp=?, " //                           //$NON-NLS-1$
-                  + " tourAltDown=? " //                          //$NON-NLS-1$
+                  + " tourAltDown=?, " //                         //$NON-NLS-1$
+                  + " avgAltitudeChange=? " //                    //$NON-NLS-1$
 
                   + " WHERE tourId=?"; //                         //$NON-NLS-1$
 

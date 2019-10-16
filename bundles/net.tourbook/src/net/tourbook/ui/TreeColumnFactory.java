@@ -213,10 +213,10 @@ public abstract class TreeColumnFactory {
             final String unitLabel = UI.SYMBOL_AVERAGE + UI.SPACE + UI.UNIT_LABEL_ALTITUDE + "/" + UI.UNIT_LABEL_DISTANCE; //$NON-NLS-1$
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Altitude);
-            colDef.setColumnLabel(Messages.ColumnFactory_Altitude_AvgChange_Label);
+            colDef.setColumnLabel(Messages.ColumnFactory_Elevation_AvgChange_Label);
             colDef.setColumnHeaderText(unitLabel);
             colDef.setColumnUnit(unitLabel);
-            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Altitude_AvgChange_Tooltip);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Elevation_AvgChange_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
