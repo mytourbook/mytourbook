@@ -5,7 +5,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry exported="true" kind="lib" path="joda-time-2.10.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="c3p0-0.9.1.2.jar" sourcepath="c:/e/java-resources/c3p0/c3p0-0.9.1.2.src.zip"/>
-	<classpathentry exported="true" kind="lib" path="xpp3_min-1.1.4c.jar"/>
+	<classpathentry exported="true" kind="lib" path="xpp3-1.1.6.jar"/>
 	<classpathentry exported="true" kind="lib" path="xstream-1.4.11.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="edtftpj.jar"/>
 	<classpathentry exported="true" kind="lib" path="net.sf.swtaddons_0.1.1.jar"/>
