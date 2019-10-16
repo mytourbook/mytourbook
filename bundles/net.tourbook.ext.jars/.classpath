@@ -9,7 +9,7 @@
 	<classpathentry exported="true" kind="lib" path="xstream-1.4.11.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="edtftpj.jar"/>
 	<classpathentry exported="true" kind="lib" path="net.sf.swtaddons_0.1.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="trove-3.0.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="core-3.1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="concurrentlinkedhashmap-lru-1.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="imgscalr-lib-4.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="commons-imaging-1.0-alpha1.jar"/>
