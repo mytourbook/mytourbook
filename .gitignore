@@ -3,14 +3,18 @@ bin
 dist/
 target/
 repositories/
-**/build/
+
 **/node_modules/
 **/tmp/
 **/node_modules/
 
+**/build/**/*.jar
+**/*vtm*/**/build/
+
 .apt_generated
 
 .gradle
+gradle
 
 *.js.map
 *.js.uncompressed.js

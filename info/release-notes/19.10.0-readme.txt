@@ -153,4 +153,6 @@ System
     start time spinner widget in the tour editor as it was not triggering 
     the possibility to save the tour in the tour editor
     (see also https://bugs.eclipse.org/bugs/show_bug.cgi?id=547489) 
-
+    
+* System Translation (4.12)
+  Contains translated texts which are used within Eclipse.
