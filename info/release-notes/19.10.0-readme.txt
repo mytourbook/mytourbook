@@ -2,7 +2,7 @@
 
 TODOs
 =====
-
+* Update FT search docu: FT search is updated when tour is saved
 * Test import because of changed device watching task + sql exception handling
 * Recommend DBeaver as a better SQL explorer   
 
@@ -93,6 +93,8 @@ Changes
 
 * Altitude -> Elevation
   - Changed wording from "Altitude" to "Elevation" for the english texts
+    The term elevation is mainly used when referring to points on the Earth's surface, while altitude (...) is used for points above the surface
+    https://en.wikipedia.org/wiki/Elevation
 
 * Tour Book View
   -  Moved all tour modify actions into the new submenu "Adjust Tour Values"
