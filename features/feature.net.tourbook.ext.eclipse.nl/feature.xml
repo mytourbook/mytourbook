@@ -31,11 +31,8 @@
       <import plugin="org.eclipse.ui.forms"/>
       <import plugin="org.eclipse.ui.workbench"/>
       <import plugin="org.eclipse.ui"/>
-      <import plugin="org.eclipse.equinox.launcher"/>
-      <import plugin="org.eclipse.equinox.util"/>
       <import plugin="org.eclipse.ui.views.log"/>
       <import plugin="org.eclipse.core.runtime"/>
-      <import plugin="org.eclipse.equinox.p2.ui"/>
    </requires>
 
    <plugin
@@ -136,14 +133,6 @@
 
    <plugin
          id="org.eclipse.ui.nl_de"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.equinox.launcher.nl_de"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -256,14 +245,6 @@
 
    <plugin
          id="org.eclipse.ui.nl_fr"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.equinox.launcher.nl_fr"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -391,14 +372,6 @@
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.equinox.launcher.nl_nl"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
          id="org.eclipse.ui.views.log.nl_nl"
          download-size="0"
          install-size="0"
@@ -519,14 +492,6 @@
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.equinox.launcher.nl_it"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
          id="org.eclipse.ui.views.log.nl_it"
          download-size="0"
          install-size="0"
@@ -600,14 +565,6 @@
 
    <plugin
          id="org.eclipse.core.runtime.nl_es"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.equinox.launcher.nl_es"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -728,14 +685,6 @@
 
    <plugin
          id="org.eclipse.core.runtime.nl_cs"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.equinox.launcher.nl_cs"
          download-size="0"
          install-size="0"
          version="0.0.0"
