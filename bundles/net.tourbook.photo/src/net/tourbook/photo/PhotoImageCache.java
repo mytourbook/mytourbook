@@ -333,10 +333,14 @@ public class PhotoImageCache {
    }
 
    public static void setOriginalImageCacheSize(final int newCacheSize) {
-      _imageCacheOriginal.setCapacity(newCacheSize);
+      _imageCacheOriginal.policy().eviction().ifPresent(eviction -> {
+         eviction.setMaximum(newCacheSize);
+      });
    }
 
    public static void setThumbCacheSize(final int newCacheSize) {
-      _imageCacheThumb.setCapacity(newCacheSize);
+      _imageCacheThumb.policy().eviction().ifPresent(eviction -> {
+         eviction.setMaximum(newCacheSize);
+      });
    }
 }
