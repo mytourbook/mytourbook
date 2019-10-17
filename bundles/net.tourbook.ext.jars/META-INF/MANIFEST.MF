@@ -6,7 +6,7 @@ Bundle-Version: 19.10.0.qualifier
 Eclipse-BuddyPolicy: registered
 Bundle-Vendor: MyTourbook
 Bundle-ClassPath: joda-time-2.10.4.jar,
- c3p0-0.9.1.2.jar,
+ c3p0-0.9.5.4.jar,
  xpp3-1.1.6.jar,
  xstream-1.4.11.1.jar,
  edtftpj.jar,
