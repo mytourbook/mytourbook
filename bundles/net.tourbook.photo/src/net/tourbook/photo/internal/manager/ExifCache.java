@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,51 +15,52 @@
  *******************************************************************************/
 package net.tourbook.photo.internal.manager;
 
-import net.tourbook.photo.PhotoImageMetadata;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 
-import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
+import net.tourbook.photo.PhotoImageMetadata;
 
 /**
  * Cache for exif meta data.
  */
 public class ExifCache {
 
-	/**
-	 * Cache for exif meta data, key is file path
-	 */
-	private static final ConcurrentLinkedHashMap<String, PhotoImageMetadata>	_exifCache;
+   /**
+    * Cache for exif meta data, key is file path
+    */
+   private static final Cache<String, PhotoImageMetadata> _exifCache;
 
-	static {
+   static {
 
-		_exifCache = new ConcurrentLinkedHashMap.Builder<String, PhotoImageMetadata>()
-				.maximumWeightedCapacity(20000)
-				.build();
-	}
+      _exifCache = Caffeine.newBuilder()
+            .maximumWeight(20000)
+            .build();
+   }
 
-	public static void clear() {
-		_exifCache.clear();
-	}
+   public static void clear() {
+      _exifCache.cleanUp();
+   }
 
-	public static PhotoImageMetadata get(final String imageFilePathName) {
-		return _exifCache.get(imageFilePathName);
-	}
+   public static PhotoImageMetadata get(final String imageFilePathName) {
+      return _exifCache.getIfPresent(imageFilePathName);
+   }
 
-	public static void put(final String imageFilePathName, final PhotoImageMetadata metadata) {
-		_exifCache.put(imageFilePathName, metadata);
-	}
+   public static void put(final String imageFilePathName, final PhotoImageMetadata metadata) {
+      _exifCache.put(imageFilePathName, metadata);
+   }
 
-	/**
-	 * Remove all cached metadata which starts with the folder path.
-	 * 
-	 * @param folderPath
-	 */
-	public static void remove(final String folderPath) {
+   /**
+    * Remove all cached metadata which starts with the folder path.
+    *
+    * @param folderPath
+    */
+   public static void remove(final String folderPath) {
 
-		// remove cached exif data
-		for (final String cachedPath : _exifCache.keySet()) {
-			if (cachedPath.startsWith(folderPath)) {
-				_exifCache.remove(cachedPath);
-			}
-		}
-	}
+      // remove cached exif data
+      for (final String cachedPath : _exifCache.asMap().keySet()) {
+         if (cachedPath.startsWith(folderPath)) {
+            _exifCache.invalidate(cachedPath);
+         }
+      }
+   }
 }
