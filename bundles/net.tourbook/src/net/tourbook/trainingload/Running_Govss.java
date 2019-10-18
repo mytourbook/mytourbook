@@ -141,11 +141,11 @@ public class Running_Govss {
     *
     * @return
     */
-   public double ComputePower(final float speed) {
+   public double ComputePower(final float distance, final double slope, final float initialSpeed, final float speed) {
 
       final double CAero = computeCostAerodynamicDrag(speed);
-      final double Ckin = computeCostKineticEnergy(0.0, 0.0, speed);
-      final double Cslope = computeCostDistanceWithSlope(0.0);
+      final double Ckin = computeCostKineticEnergy(distance, initialSpeed, speed);
+      final double Cslope = computeCostDistanceWithSlope(slope);
       final double efficiency = (0.25 + (0.054 * speed)) * (1 - ((0.5 * speed) / 8.33));
 
       final double power = (CAero + Ckin + Cslope * efficiency * _athleteWeight) * speed;
@@ -161,25 +161,27 @@ public class Running_Govss {
 
       final int rollingAverageInterval = 120; // The formula calls for 120 second rolling averages
       double powerValue = 0;
-      int currentRollingAverageIndex = 0;
       int serieStartIndex = 0;
       int serieEndIndex = 0;
+      float currentDistance = 0;
+      float currentSlope = 0;
+      float initialSpeed = 0;
       float currentSpeed = 0;
-      for (int index = 0; index < timeSeriesLength; ++index) {
+      for (; serieEndIndex < timeSeriesLength - 1;) {
 
-         serieStartIndex = index;
+         serieStartIndex = serieEndIndex + 1;
          serieEndIndex = serieStartIndex + rollingAverageInterval;
          if (serieEndIndex > timeSeriesLength) {
             serieEndIndex = timeSeriesLength - 1;
          }
 
-         for (; currentRollingAverageIndex < rollingAverageInterval; ++currentRollingAverageIndex) {
+         currentSpeed = TourManager.computeTourSpeed(_tourData, serieStartIndex, serieEndIndex);
+         currentDistance = TourManager.computeTourDistance(_tourData, serieStartIndex, serieEndIndex);
+         currentSlope = TourManager.computeTourAverageSlope(_tourData, serieStartIndex, serieEndIndex);
+         powerValue = ComputePower(currentDistance, currentSlope, currentSpeed, initialSpeed);
+         powerValues.add(powerValue);
 
-            currentSpeed = TourManager.computeTourSpeed(_tourData, serieStartIndex, serieEndIndex);
-            powerValue = ComputePower(currentSpeed);
-            powerValues.add(powerValue);
-         }
-
+         initialSpeed = currentSpeed;
       }
 
       return powerValues;

@@ -3359,8 +3359,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       computeCadenceZonesTimes();
       computeRunningDynamics();
 
-      final Running_Govss running_Govss = new Running_Govss(tourPerson, this);
-      govss = running_Govss.ComputeGovss();
+      computeGovss();
 
       computeGeo_Bounds();
       computeGeo_Grid();
@@ -4006,6 +4005,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       returnData.normalizedDistance = normalizedDistance - measureStartDistance;
 
       return returnData;
+   }
+
+   public boolean computeGovss() {
+
+      if (timeSerie == null || gradientSerie == null) {
+         return false;
+      }
+
+      final Running_Govss running_Govss = new Running_Govss(tourPerson, this);
+      govss = running_Govss.ComputeGovss();
+
+      return govss != 0;
    }
 
    /**
@@ -7152,6 +7163,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
 
       return _gpsBounds;
+   }
+
+   /**
+    * @return the {@link #govss}
+    */
+   public int getGovss() {
+      return govss;
    }
 
    /**

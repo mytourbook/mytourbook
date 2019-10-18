@@ -263,6 +263,16 @@ public class TourManager {
 
          + " WHERE tourId=?";                                                                                                          //                        //$NON-NLS-1$
    //
+   public static final String                            govss_StatementUpdate             = UI.EMPTY_STRING
+
+         + "UPDATE " + TourDatabase.TABLE_TOUR_DATA                                                                                    //   //$NON-NLS-1$
+
+         + " SET"                                                                                                                      //                                     //$NON-NLS-1$
+
+         + " govss=? "                                                                                                                 //                //$NON-NLS-1$
+
+         + " WHERE tourId=?";                                                                                                          //                        //$NON-NLS-1$
+   //
    private ComputeChartValue                             _computeAvg_Altimeter;
    private ComputeChartValue                             _computeAvg_Altitude;
    private ComputeChartValue                             _computeAvg_Cadence;
@@ -658,6 +668,84 @@ public class TourManager {
       tourData.distanceSerie = distanceSerie;
 
       return true;
+   }
+
+   /**
+    * Computes the GOVSS (Gravity Ordered Velocity Stress Score) value for several given tours.
+    *
+    * @param conn
+    * @param selectedTours
+    * @return Returns <code>true</code> when values are computed or <code>false</code> when nothing
+    *         was done.
+    * @throws SQLException
+    */
+   public static boolean computeGovss(final Connection conn,
+                                                  final ArrayList<TourData> selectedTours) throws SQLException {
+      boolean isUpdated = false;
+
+      final PreparedStatement stmtUpdate = conn.prepareStatement(govss_StatementUpdate);
+
+      int numComputedTour = 0;
+      int numNotComputedTour = 0;
+
+      // loop over all tours and compute each cadence zone time
+      for (final TourData tourData : selectedTours) {
+
+         final boolean timeComputed = tourData.computeGovss();
+         if (!timeComputed) {
+
+            numNotComputedTour++;
+
+         } else {
+
+            // update cadence zones times in the database
+            stmtUpdate.setInt(1, tourData.getGovss());
+            stmtUpdate.setLong(2, tourData.getTourId());
+
+            stmtUpdate.executeUpdate();
+
+            isUpdated = true;
+            numComputedTour++;
+         }
+      }
+
+      TourLogManager.addSubLog(TourLogState.IMPORT_OK, NLS.bind(Messages.Log_ComputeCadenceZonesTimes_010_Success, numComputedTour));
+
+      if (numNotComputedTour >= 0) {
+         TourLogManager.addSubLog(TourLogState.IMPORT_ERROR,
+               NLS.bind(Messages.Log_ComputeCadenceZonesTimes_011_NoSuccess, numNotComputedTour));
+      }
+
+      return isUpdated;
+   }
+
+   /**
+    * @param tourData
+    * @param startIndex
+    * @param endIndex
+    * @return Returns the slope
+    */
+   public static float computeTourAverageSlope(final TourData tourData, final int startIndex, final int endIndex) {
+
+      final float[] gradientSerie = tourData.getGradientSerie();
+
+      if (gradientSerie == null
+            || gradientSerie.length == 0
+            || startIndex >= gradientSerie.length
+            || endIndex >= gradientSerie.length
+            || startIndex > endIndex) {
+         return 0;
+      }
+
+      float averageSlope = 0;
+      for (int index = startIndex; index < endIndex; ++index) {
+         averageSlope += gradientSerie[index];
+      }
+
+      //TODO CHECK endIndex-1-startIndex ???
+      averageSlope /= (endIndex - startIndex);
+
+      return averageSlope;
    }
 
    /**
