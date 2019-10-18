@@ -81,7 +81,6 @@ import net.tourbook.common.weather.IWeather;
 import net.tourbook.database.FIELD_VALIDATION;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.importdata.TourbookDevice;
-import net.tourbook.math.Skiba;
 import net.tourbook.math.Smooth;
 import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoCache;
@@ -96,6 +95,7 @@ import net.tourbook.tour.BreakTimeTool;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.photo.TourPhotoLink;
 import net.tourbook.tour.photo.TourPhotoManager;
+import net.tourbook.trainingload.Skiba_Running;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.ChartLabel;
 import net.tourbook.ui.tourChart.ChartLayer2ndAltiSerie;
@@ -3357,7 +3357,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       computeCadenceZonesTimes();
       computeRunningDynamics();
 
-      govss = Skiba.ComputeGovss(tourPerson, this);
+      govss = Skiba_Running.ComputeGovss(tourPerson, this);
 
       computeGeo_Bounds();
       computeGeo_Grid();
