@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019  Frederic Bard and Contributors
+ * Copyright (C) 2019  Frederic Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.math;
+package net.tourbook.trainingload;
 
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
