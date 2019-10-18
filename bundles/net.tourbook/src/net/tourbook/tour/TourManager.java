@@ -664,6 +664,27 @@ public class TourManager {
     * @param tourData
     * @param startIndex
     * @param endIndex
+    * @return Returns the distance
+    */
+   public static float computeTourDistance(final TourData tourData, final int startIndex, final int endIndex) {
+
+      final float[] distanceSerie = tourData.getMetricDistanceSerie();
+
+      if (distanceSerie == null
+            || distanceSerie.length == 0
+            || startIndex >= distanceSerie.length
+            || endIndex >= distanceSerie.length
+            || startIndex > endIndex) {
+         return 0;
+      }
+
+      return distanceSerie[endIndex] - distanceSerie[startIndex];
+   }
+
+   /**
+    * @param tourData
+    * @param startIndex
+    * @param endIndex
     * @return Returns the metric speed or 0 when not available.
     */
    public static float computeTourSpeed(final TourData tourData, final int startIndex, final int endIndex) {

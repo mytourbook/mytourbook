@@ -95,7 +95,7 @@ import net.tourbook.tour.BreakTimeTool;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.photo.TourPhotoLink;
 import net.tourbook.tour.photo.TourPhotoManager;
-import net.tourbook.trainingload.Skiba_Running;
+import net.tourbook.trainingload.Running_Govss;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.ChartLabel;
 import net.tourbook.ui.tourChart.ChartLayer2ndAltiSerie;
@@ -663,6 +663,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * 0 == false, 1 == true
     */
    private short                  isStrideSensorPresent            = 0;
+
+   // ############################################# TRAINING LOAD DATA #############################################
 
    /**
     * GOVSS (Gravity Ordered Velocity Stress Score)
@@ -3357,7 +3359,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       computeCadenceZonesTimes();
       computeRunningDynamics();
 
-      govss = Skiba_Running.ComputeGovss(tourPerson, this);
+      final Running_Govss running_Govss = new Running_Govss(tourPerson, this);
+      govss = running_Govss.ComputeGovss();
 
       computeGeo_Bounds();
       computeGeo_Grid();
