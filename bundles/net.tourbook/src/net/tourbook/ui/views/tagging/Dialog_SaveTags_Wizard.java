@@ -150,7 +150,7 @@ public class Dialog_SaveTags_Wizard extends Wizard {
       // log selected tags
       if (_allCheckedTagIds.size() > 0) {
          final String tagNamesText = TourDatabase.getTagNamesText(_allCheckedTagIds, false);
-         TourLogManager.addLog(TourLogState.DEFAULT, tagNamesText);
+         TourLogManager.subLog_Default(tagNamesText);
       }
 
       final IRunnableWithProgress runnable = new IRunnableWithProgress() {
@@ -282,7 +282,7 @@ public class Dialog_SaveTags_Wizard extends Wizard {
 
                      savedTours.add(savedTourData);
 
-                     TourLogManager.addLog(TourLogState.DEFAULT, logMessage);
+                     TourLogManager.subLog_Default(logMessage);
                   }
                }
             }

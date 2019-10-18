@@ -106,7 +106,7 @@ public class SuuntoJsonProcessor {
    }
 
    /**
-    * Cleans a processes activity and performs the following actions :
+    * Cleans a processed activity and performs the following actions :
     * - Sort the time slices chronologically
     * - Only keeps the entries every full seconds, no entries should be in between (entries with
     * milliseconds).
@@ -170,12 +170,9 @@ public class SuuntoJsonProcessor {
     *
     * @param jsonFileContent
     *           The Suunto's file content in JSON format.
-    * @param isUnitTest
-    *           True if the method is run for unit test purposes.
     * @return The created tour.
     */
-   public TourData ImportActivity(final String jsonFileContent,
-                                  final boolean isUnitTest) {
+   public TourData ImportActivity(final String jsonFileContent) {
       _sampleList = new ArrayList<>();
 
       JSONArray samples = null;
@@ -322,7 +319,7 @@ public class SuuntoJsonProcessor {
          // GPS coordinates
          if (currentSampleData.contains(TAG_GPSALTITUDE) && currentSampleData.contains(TAG_LATITUDE)
                && currentSampleData.contains(TAG_LONGITUDE)) {
-            wasDataPopulated |= TryAddGpsData(currentSampleData, timeData, isUnitTest);
+            wasDataPopulated |= TryAddGpsData(currentSampleData, timeData);
          }
 
          // Heart Rate
@@ -336,8 +333,7 @@ public class SuuntoJsonProcessor {
 
          // Barometric Altitude
          if (_prefStore.getInt(IPreferences.ALTITUDE_DATA_SOURCE) == 1 ||
-               isIndoorTour ||
-               isUnitTest) {
+               isIndoorTour) {
             wasDataPopulated |= TryAddAltitudeData(currentSampleData, timeData);
          }
 
@@ -352,8 +348,7 @@ public class SuuntoJsonProcessor {
 
          // Distance
          if (_prefStore.getInt(IPreferences.DISTANCE_DATA_SOURCE) == 1 ||
-               isIndoorTour ||
-               isUnitTest) {
+               isIndoorTour) {
             wasDataPopulated |= TryAddDistanceData(currentSampleData, timeData);
          }
 
@@ -472,11 +467,9 @@ public class SuuntoJsonProcessor {
     *           The current JSON sample data.
     * @param timeData
     *           The current time data.
-    * @param isUnitTest
-    *           True if the method is run for unit test purposes.
     * @return True if successful, false otherwise.
     */
-   private boolean TryAddGpsData(final String currentSample, final TimeData timeData, final boolean isUnitTest) {
+   private boolean TryAddGpsData(final String currentSample, final TimeData timeData) {
       try {
          final JSONObject currentSampleJson = new JSONObject(currentSample);
          final float latitude = Util.parseFloat(currentSampleJson.get(TAG_LATITUDE).toString());
@@ -487,8 +480,7 @@ public class SuuntoJsonProcessor {
          timeData.longitude = (longitude * 180) / Math.PI;
 
          // GPS altitude
-         if (_prefStore.getInt(IPreferences.ALTITUDE_DATA_SOURCE) == 0 ||
-               isUnitTest) {
+         if (_prefStore.getInt(IPreferences.ALTITUDE_DATA_SOURCE) == 0) {
             timeData.absoluteAltitude = altitude;
          }
 

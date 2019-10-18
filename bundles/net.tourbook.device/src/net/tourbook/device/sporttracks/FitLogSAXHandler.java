@@ -834,7 +834,7 @@ public class FitLogSAXHandler extends DefaultHandler {
          //      </xs:element>
 
          // Converting from Calories to calories
-         _currentActivity.calories = Util.parseInt0(attributes, ATTRIB_TOTAL_CAL) * 1000;
+         _currentActivity.calories = Math.round(Util.parseFloat0(attributes, ATTRIB_TOTAL_CAL) * 1000f);
 
       } else if (name.equals(TAG_ACTIVITY_DURATION)) {
 

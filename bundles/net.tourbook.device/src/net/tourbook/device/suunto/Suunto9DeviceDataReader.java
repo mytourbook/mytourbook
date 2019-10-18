@@ -18,14 +18,10 @@ package net.tourbook.device.suunto;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
 import net.tourbook.common.UI;
@@ -41,40 +37,15 @@ import org.apache.commons.io.FilenameUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.xmlunit.builder.DiffBuilder;
-import org.xmlunit.builder.Input;
-import org.xmlunit.diff.Diff;
 
 public class Suunto9DeviceDataReader extends TourbookDevice {
 
-   // For Unit testing
-   // NOTE: Don't forget to set the smoothing parameters to default.
-   private static final boolean                   UNITTESTS             = false;
    // Make sure that the smoothing value is 10 (speed and gradient)
    public static final String                     IMPORT_FILE_PATH      = "/net/tourbook/device/suunto/testFiles/"; //$NON-NLS-1$
-   private static Map<String, String>             testFiles             = new HashMap<>();                          // Java 7
    private HashMap<TourData, ArrayList<TimeData>> _processedActivities  = new HashMap<>();
 
    private HashMap<Long, TourData>                _newlyImportedTours   = new HashMap<>();
    private HashMap<Long, TourData>                _alreadyImportedTours = new HashMap<>();
-
-   /**
-    * Compares a test transaction against a control transaction.
-    *
-    * @param controlDocument
-    *           The control Suunto 9 XML file's content.
-    * @param xmlTestDocument
-    *           The test Suunto 9 GZip file's content.
-    * @return True if no differences were found, false otherwise.
-    */
-   private static boolean CompareAgainstControl(final String controlDocument, final String xmlTestDocument) {
-      final Diff myDiff = DiffBuilder.compare(Input.fromString(controlDocument))
-            .withTest(Input.fromString(xmlTestDocument))
-            .ignoreWhitespace()
-            .build();
-
-      return !myDiff.hasDifferences();
-   }
 
    @Override
    public String buildFileNameFromRawData(final String rawDataFileName) {
@@ -93,53 +64,6 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
     */
    private void cleanUpActivities() {
       _processedActivities.clear();
-   }
-
-   /**
-    * Retrieves the content from a resource.
-    * NOTE : This method is only used by the unit tests.
-    *
-    * @param gzipFilePath
-    *           The absolute file path of the Suunto file.
-    * @param isZipFile
-    *           True if the file is a Zip archive, false otherwise.
-    * @return Returns the JSON content of the given resource file,
-    */
-   private String GetContentFromResource(final String resourceFilePath, final boolean isZipFile) {
-      String fileContent = null;
-      BufferedReader br = null;
-      GZIPInputStream gzip = null;
-
-      try {
-         final InputStream inputStream =
-               Suunto9DeviceDataReader.class.getResourceAsStream(resourceFilePath);
-
-         if (isZipFile) {
-            gzip = new GZIPInputStream(inputStream);
-            br = new BufferedReader(new InputStreamReader(gzip));
-         } else {
-            br = new BufferedReader(new InputStreamReader(inputStream));
-         }
-
-         fileContent = br.lines().collect(Collectors.joining());
-      } catch (final IOException e) {
-         StatusUtil.log(e);
-         return UI.EMPTY_STRING;
-      } finally {
-         try {
-            // close resources
-            if (br != null) {
-               br.close();
-            }
-            if (gzip != null) {
-               gzip.close();
-            }
-         } catch (final IOException e) {
-            e.printStackTrace();
-         }
-      }
-
-      return fileContent;
    }
 
    @Override
@@ -195,21 +119,6 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
       }
 
       return jsonFileContent;
-   }
-
-   /**
-    * Used only for unit tests, it retrieves the last processed activity.
-    *
-    * @return If any, the last processed activity.
-    */
-   private TourData GetLastTourDataImported() {
-      final Iterator<Entry<TourData, ArrayList<TimeData>>> it = _processedActivities.entrySet().iterator();
-      TourData lastTourData = null;
-      while (it.hasNext()) {
-         lastTourData = it.next().getKey();
-      }
-
-      return lastTourData;
    }
 
    @Override
@@ -281,9 +190,6 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
                                     final DeviceData deviceData,
                                     final HashMap<Long, TourData> alreadyImportedTours,
                                     final HashMap<Long, TourData> newlyImportedTours) {
-      if (UNITTESTS) {
-         return testSuuntoFiles();
-      }
 
       _newlyImportedTours = newlyImportedTours;
       _alreadyImportedTours = alreadyImportedTours;
@@ -337,9 +243,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
          fileName = FilenameUtils.removeExtension(fileName);
       }
 
-      final TourData activity = suuntoJsonProcessor.ImportActivity(
-            jsonFileContent,
-            UNITTESTS);
+      final TourData activity = suuntoJsonProcessor.ImportActivity(jsonFileContent);
 
       if (activity == null) {
          return false;
@@ -357,89 +261,6 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
       TryFinalizeTour(activity);
 
       return true;
-   }
-
-   /**
-    * Unit tests for the Suunto Spartan/9 import
-    *
-    * @return True if all the tests were successful, false otherwise.
-    */
-   public boolean testSuuntoFiles() {
-
-      boolean testResults = true;
-
-      // City of Rocks, ID
-      String filePath =
-            IMPORT_FILE_PATH + "1537365846902_183010004848_post_timeline-1.json.gz"; //$NON-NLS-1$
-      String controlFilePath = IMPORT_FILE_PATH + "1537365846902_183010004848_post_timeline-1.xml"; //$NON-NLS-1$
-      testFiles.put(controlFilePath, filePath);
-
-      //Maxwell, CO
-      filePath = IMPORT_FILE_PATH +
-            "1536723722706_183010004848_post_timeline-1.json.gz"; //$NON-NLS-1$
-      controlFilePath =
-            IMPORT_FILE_PATH + "1536723722706_183010004848_post_timeline-1.xml"; //$NON-NLS-1$
-      testFiles.put(controlFilePath, filePath);
-
-      //Shoreline - with laps/markers
-      filePath = IMPORT_FILE_PATH +
-            "1555291925128_183010004848_post_timeline-1.json.gz"; //$NON-NLS-1$
-      controlFilePath =
-            IMPORT_FILE_PATH + "1555291925128_183010004848_post_timeline-1.xml"; //$NON-NLS-1$
-      testFiles.put(controlFilePath, filePath);
-
-      // Reservoir Ridge with MoveSense HR belt (R-R data)
-      filePath = IMPORT_FILE_PATH +
-            "1549250450458_183010004848_post_timeline-1.json.gz"; //$NON-NLS-1$
-      controlFilePath =
-            IMPORT_FILE_PATH + "1549250450458_183010004848_post_timeline-1.xml"; //$NON-NLS-1$
-      testFiles.put(controlFilePath, filePath);
-
-      // SWIMMING
-
-      // Start -> 100m -> LAP -> LAP -> 100m -> LAP -> LAP -> 100m -> LAP -> LAP -> 100m -> Stop
-      // (courtesy of Z74)
-      filePath = IMPORT_FILE_PATH +
-            "1547628896209_184710003036_post_timeline-1.json.gz"; //$NON-NLS-1$
-      controlFilePath =
-            IMPORT_FILE_PATH + "1547628896209_184710003036_post_timeline-1.xml"; //$NON-NLS-1$
-      testFiles.put(controlFilePath, filePath);
-
-      // Start -> 100m -> Stop (courtesy of Z74)
-      filePath = IMPORT_FILE_PATH +
-            "1547628897243_184710003036_post_timeline-1.json.gz"; //$NON-NLS-1$
-      controlFilePath =
-            IMPORT_FILE_PATH + "1547628897243_184710003036_post_timeline-1.xml"; //$NON-NLS-1$
-      testFiles.put(controlFilePath, filePath);
-
-      // File with power data (courtesy of MrMen)
-      filePath = IMPORT_FILE_PATH +
-            "1539801501658_174510001687_post_timeline-1.json.gz"; //$NON-NLS-1$
-      controlFilePath =
-            IMPORT_FILE_PATH + "1539801501658_174510001687_post_timeline-1.xml"; //$NON-NLS-1$
-      testFiles.put(controlFilePath, filePath);
-
-      TourData entry;
-      String xml;
-      String controlFileContent;
-
-      for (final Map.Entry<String, String> testEntry : testFiles.entrySet()) {
-         final String jsonFileContent =
-               GetContentFromResource(testEntry.getValue(), true);
-         ProcessFile(testEntry.getValue(),
-               jsonFileContent);
-         entry = GetLastTourDataImported();
-         xml = entry.toXml();
-         controlFileContent = GetContentFromResource(testEntry.getKey(), false);
-         testResults &= CompareAgainstControl(controlFileContent, xml);
-
-         // We clear the history so that it doesn't
-         //create conflict in the unit tests as we reuse files
-         cleanUpActivities();
-      }
-
-      return testResults;
-
    }
 
    /**

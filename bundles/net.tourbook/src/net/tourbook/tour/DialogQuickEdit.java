@@ -332,8 +332,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
             /*
              * Start location
              */
-            // this label NEEDS another mnemnonic as the tour editor
-            final Label label = _tk.createLabel(section, Messages.Dialog_QuickEdit_Label_TourLocation_Start);
+            final Label label = _tk.createLabel(section, Messages.tour_editor_label_start_location);
             _firstColumnControls.add(label);
 
             _comboLocation_Start = new Combo(section, SWT.BORDER | SWT.FLAT);
