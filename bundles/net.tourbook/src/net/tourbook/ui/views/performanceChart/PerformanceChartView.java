@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Frederic Bard and Contributors
+ * Copyright (C) 2019 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -90,14 +90,14 @@ public class PerformanceChartView extends ViewPart implements ITourProvider {
     * private TourTypeFilter _activeTourTypeFilter;
     */
 
-   private int                     _selectedYear       = -1;
+   private int            _selectedYear = -1;
 
    /**
     * Contains all years which have tours for the selected tour type and person.
     */
-   private TIntArrayList           _availableYears;
+   private TIntArrayList  _availableYears;
 
-   private PixelConverter          _pc;
+   private PixelConverter _pc;
 
    /*
     * UI controls
