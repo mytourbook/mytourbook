@@ -24,6 +24,9 @@ import net.tourbook.data.TourPerson;
  */
 public class Skiba_Running {
 
+   //TODO : Add the GOVSS column in the tour book view
+   //TODO Use this equation to display an estimated power graph in the tour chart ?If yes, it's low on the totem pole
+
    /**
     * Computes Caero (This is the energy cost of overcoming aerodynamic drag)
     *
@@ -38,7 +41,6 @@ public class Skiba_Running {
       return CAero;
    }
 
-   //TODO : Add the GOVSS column in the tour book view
 
    /**
     * Computes Ci (The energy cost to cover any given distance) with i being the slope of the
@@ -101,7 +103,7 @@ public class Skiba_Running {
 
       ///Divide value above by the amount of work performed during the 10k to 1 hr test (threshold power in watts x number of seconds).
 
-      // 11. Multiply the number from step 10 by 100 to obtain the final training stress in GOVSS. 
+      // 11. Multiply the number from step 10 by 100 to obtain the final training stress in GOVSS.
 
       //Should that trigger a recompute of the Performance chart data ?
       return -1;
@@ -116,8 +118,6 @@ public class Skiba_Running {
     */
    public static double ComputePower(final double athleteHeight, final double athleteWeight) {
 
-      //TODO Use this equation to display an estimated power graph in the tour chart ?
-      //If yes, it's low on the totem pole
       final double speed = 0.0;
 
       final double CAero = computeCostAerodynamicDrag(0.0, athleteHeight, athleteWeight);
