@@ -37,6 +37,10 @@ public class ReferenceTourManager {
 
    private static final HashMap<Long, TourCompareConfig> _compareConfigCache = new HashMap<>();
 
+   /**
+    * When {@link #_geoCompare_RefId} == 0 then {@link #getTourCompareConfig(long)} will return
+    * <code>null</code>, this is wrong when refId == 0
+    */
    private static long                                   _geoCompare_RefId   = Long.MIN_VALUE;
    private static TourReference                          _geoCompare_RefTour;
    private static TourCompareConfig                      _geoCompare_RefConfig;
