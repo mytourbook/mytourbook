@@ -182,6 +182,11 @@ public class TourCompareManager {
             comparedTourItem.computedStartIndex,
             comparedTourItem.computedEndIndex);
 
+      final int tourRecordingTime = TourManager.computeTourRecordingTime(
+            tourData,
+            comparedTourItem.computedStartIndex,
+            comparedTourItem.computedEndIndex);
+
       final TourCompared comparedTour = new TourCompared();
 
       comparedTour.setStartIndex(comparedTourItem.computedStartIndex);
@@ -194,6 +199,7 @@ public class TourCompareManager {
 
       comparedTour.setAvgPulse(avgPulse);
       comparedTour.setTourSpeed(speed);
+      comparedTour.setTourRecordingTime(tourRecordingTime);
 
       // persist entity
       ts.begin();
@@ -206,6 +212,7 @@ public class TourCompareManager {
       comparedTourItem.dbEndIndex = comparedTourItem.computedEndIndex;
 
       comparedTourItem.dbSpeed = speed;
+      comparedTourItem.dbRecordingTime = tourRecordingTime;
    }
 
    public void clearCompareResult() {

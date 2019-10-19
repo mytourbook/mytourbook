@@ -18,10 +18,10 @@
    </parent>
 
    <build>
-   
+
        <finalName>myproduct-${unqualifiedVersion}</finalName>
-       
-      <plugins>
+
+     <plugins>
 
          <plugin>
             <artifactId>tycho-p2-director-plugin</artifactId>     <groupId>org.eclipse.tycho</groupId>
@@ -35,21 +35,21 @@
                   </goals>
                </execution>
             </executions>
-            
+
             <configuration>
                <products>
                   <product>
-                  
+
                      <!-- select product with ID other.product.id for the classifiers "other-<os>.<ws>.<arch>" -->
                      <id>net.tourbook.product</id>
-                     
+
                      <!--
                      <attachId>mytourbook_attachId</attachId>
                      -->
 
                      <!-- optional parameters -->
                      <rootFolder>mytourbook</rootFolder>
-                       
+
                      <!-- 
                      ${project.version}
                      <archiveFileName>CUSTOM_PREFIX__${unqualifiedVersion}__${buildQualifier}__</archiveFileName>
@@ -80,15 +80,15 @@
          <plugin>
             <artifactId>maven-antrun-plugin</artifactId>   <version>1.8</version>
             <executions>
-            
+
                <execution>
                   <id>modify-product-archives</id>
                   <phase>package</phase>
                   <goals><goal>run</goal></goals>
-                  
+
                   <configuration>
                      <target name="set-executable-flag">
-                     
+
                         <ant antfile="build-SetExecutableFlag755.xml">
                            <property name="tycho-path"      value="${project.build.directory}"/>
                            <property name="tycho-version"   value="${unqualifiedVersion}"/>
@@ -98,12 +98,12 @@
                            <property name="tycho-path"      value="${project.build.directory}"/>
                            <property name="tycho-version"   value="${unqualifiedVersion}"/>
                         </ant>
-                        
+
                      </target>
                   </configuration>
-                  
+
                </execution>
- 
+
             </executions>
          </plugin>
       </plugins>

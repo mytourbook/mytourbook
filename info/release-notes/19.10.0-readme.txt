@@ -2,7 +2,7 @@
 
 TODOs
 =====
-
+* Update FT search docu: FT search is updated when tour is saved
 * Test import because of changed device watching task + sql exception handling
 * Recommend DBeaver as a better SQL explorer   
 
@@ -62,6 +62,9 @@ New + Improvements
 * Dialog Quick Edit
   - Edit tour start/end location 
 
+* Reference Tours
+  - Show recording time
+
   
 Import
 ======
@@ -93,6 +96,8 @@ Changes
 
 * Altitude -> Elevation
   - Changed wording from "Altitude" to "Elevation" for the english texts
+    The term elevation is mainly used when referring to points on the Earth's surface, while altitude (...) is used for points above the surface
+    https://en.wikipedia.org/wiki/Elevation
 
 * Tour Book View
   -  Moved all tour modify actions into the new submenu "Adjust Tour Values"
@@ -153,4 +158,6 @@ System
     start time spinner widget in the tour editor as it was not triggering 
     the possibility to save the tour in the tour editor
     (see also https://bugs.eclipse.org/bugs/show_bug.cgi?id=547489) 
-
+    
+* System Translation (4.12)
+  Contains translated texts which are used within Eclipse.
