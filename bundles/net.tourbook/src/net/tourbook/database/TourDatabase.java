@@ -7372,7 +7372,7 @@ public class TourDatabase {
             "SELECT" //                           //$NON-NLS-1$
                   //
                   + " comparedId," //             // 1 //$NON-NLS-1$
-                  + " tourId," //                // 2 //$NON-NLS-1$
+                  + " tourId," //                 // 2 //$NON-NLS-1$
                   + " startIndex," //             // 3 //$NON-NLS-1$
                   + " endIndex" //                // 4 //$NON-NLS-1$
                   //
@@ -7381,13 +7381,13 @@ public class TourDatabase {
 
       final PreparedStatement stmtUpdate = conn.prepareStatement( //
             //
-            "UPDATE " + TABLE_TOUR_COMPARED //         //$NON-NLS-1$
+            "UPDATE " + TABLE_TOUR_COMPARED //    //$NON-NLS-1$
             //
                   + " SET" //                     //$NON-NLS-1$
                   //
-                  + " tourRecordingTime=?" //               // 1 //$NON-NLS-1$
+                  + " tourRecordingTime=?" //     // 1 //$NON-NLS-1$
                   //
-                  + " WHERE comparedId=?"); //      // 2 //$NON-NLS-1$
+                  + " WHERE comparedId=?"); //    // 2 //$NON-NLS-1$
 
       result = stmtSelect.executeQuery();
 
@@ -7421,7 +7421,7 @@ public class TourDatabase {
 
             final int tourRecordingTime = TourManager.computeTourRecordingTime(tourData, startIndex, endIndex);
 
-            // update average pulse for the compared tour
+            // update tour recording time for the compared tour
             stmtUpdate.setInt(1, tourRecordingTime);
             stmtUpdate.setLong(2, compareId);
             stmtUpdate.executeUpdate();
