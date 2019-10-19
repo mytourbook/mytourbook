@@ -25,6 +25,16 @@ import java.time.MonthDay;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import net.tourbook.Messages;
+import net.tourbook.application.ActionTourDataFilter;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.Util;
+import net.tourbook.data.TourData;
+import net.tourbook.preferences.ITourbookPreferences;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
@@ -36,16 +46,6 @@ import org.eclipse.ui.IMemento;
 import org.eclipse.ui.XMLMemento;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
-
-import net.tourbook.Messages;
-import net.tourbook.application.ActionTourDataFilter;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.UI;
-import net.tourbook.common.time.TimeTools;
-import net.tourbook.common.util.StatusUtil;
-import net.tourbook.common.util.Util;
-import net.tourbook.data.TourData;
-import net.tourbook.preferences.ITourbookPreferences;
 
 public class TourFilterManager {
 
@@ -92,6 +92,8 @@ public class TourFilterManager {
    private static final String TOUR_DATA_POWERTRAIN_REAR_SHIFT   = "TourData.rearShiftCount";                                       //$NON-NLS-1$
    private static final String TOUR_DATA_TRAINING_FTP            = "TourData.power_FTP";                                            //$NON-NLS-1$
 
+   private static final String TOUR_DATA_TOUR_LOCATION_START     = "TourData.tourStartPlace";                                       //$NON-NLS-1$
+   private static final String TOUR_DATA_TOUR_LOCATION_END       = "TourData.tourEndPlace";                                         //$NON-NLS-1$
    private static final String TOUR_DATA_TOUR_DISTANCE           = "TourData.tourDistance";                                         //$NON-NLS-1$
    private static final String TOUR_DATA_TOUR_DRIVING_TIME       = "TourData.tourDrivingTime";                                      //$NON-NLS-1$
    private static final String TOUR_DATA_TOUR_RECORDING_TIME     = "TourData.tourRecordingTime";                                    //$NON-NLS-1$
@@ -599,26 +601,40 @@ public class TourFilterManager {
       allConfigs.add(new TourFilterFieldConfig(LABEL_CATEGORY_TOUR, TourFilterFieldId.TOUR_TITLE));
 
       allConfigs.add(
-            TourFilterFieldConfig //
+            TourFilterFieldConfig
                   .name(Messages.Tour_Filter_Field_TourTitle)
                   .fieldId(TourFilterFieldId.TOUR_TITLE)
                   .fieldType(TourFilterFieldType.TEXT)
                   .fieldOperators(FILTER_OPERATORS_TEXT));
 
       allConfigs.add(
-            TourFilterFieldConfig //
+            TourFilterFieldConfig
                   .name(Messages.Tour_Filter_Field_Photos)
                   .fieldId(TourFilterFieldId.TOUR_PHOTOS)
                   .defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN)
                   .pageIncrement(10));
 
       allConfigs.add(
-            TourFilterFieldConfig //
+            TourFilterFieldConfig
                   .name(Messages.Tour_Filter_Field_ManualTour)
                   .fieldId(TourFilterFieldId.TOUR_MANUAL_TOUR)
                   .fieldOperators(FILTER_OPERATORS_BOOLEAN)
                   .defaultFieldOperator(TourFilterFieldOperator.IS_AVAILABLE)
                   .pageIncrement(10));
+
+      allConfigs.add(
+            TourFilterFieldConfig
+                  .name(Messages.Tour_Filter_Field_TourLocation_Start)
+                  .fieldId(TourFilterFieldId.TOUR_LOCATION_START)
+                  .fieldType(TourFilterFieldType.TEXT)
+                  .fieldOperators(FILTER_OPERATORS_TEXT));
+
+      allConfigs.add(
+            TourFilterFieldConfig
+                  .name(Messages.Tour_Filter_Field_TourLocation_End)
+                  .fieldId(TourFilterFieldId.TOUR_LOCATION_END)
+                  .fieldType(TourFilterFieldType.TEXT)
+                  .fieldOperators(FILTER_OPERATORS_TEXT));
    }
 
    private static void createConfig_Training(final ArrayList<TourFilterFieldConfig> allConfigs) {
@@ -1011,6 +1027,15 @@ public class TourFilterManager {
             getSQL__FieldOperators_Text(sqlWhere, sqlParameters, fieldOperator, sql, text1, text2);
             break;
 
+         case TOUR_LOCATION_START:
+            sql = TOUR_DATA_TOUR_LOCATION_START;
+            getSQL__FieldOperators_Text(sqlWhere, sqlParameters, fieldOperator, sql, text1, text2);
+            break;
+
+         case TOUR_LOCATION_END:
+            sql = TOUR_DATA_TOUR_LOCATION_END;
+            getSQL__FieldOperators_Text(sqlWhere, sqlParameters, fieldOperator, sql, text1, text2);
+            break;
          }
       }
 

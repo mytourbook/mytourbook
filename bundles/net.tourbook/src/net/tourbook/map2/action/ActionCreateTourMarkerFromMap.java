@@ -27,6 +27,7 @@ import net.tourbook.map2.view.Map2View;
 import net.tourbook.tour.DialogMarker;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.tourChart.ChartLabel;
+import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.widgets.Display;
@@ -102,18 +103,39 @@ public class ActionCreateTourMarkerFromMap extends Action {
          tourMarker.setGeoPosition(latitudeSerie[closestLatLongIndex], longitudeSerie[closestLatLongIndex]);
       }
 
-      final DialogMarker markerDialog = new DialogMarker(Display.getCurrent().getActiveShell(), tourData, tourMarker);
+      final DialogMarker markerDialog = new DialogMarker(Display.getCurrent().getActiveShell(), tourData, null);
 
       markerDialog.create();
       markerDialog.addTourMarker(tourMarker);
 
       //We save instantly the marker so that it is displayed on the map while the user renames the marker name.
       //I found that otherwise, it's easy for the user to forget where the click was made.
-      TourManager.saveModifiedTour(tourData);
+      saveModifiedTour(tourData);
 
       markerDialog.open();
 
       //We save the tour again to take into account the action of the user (renamed the marker, cancelled the dialog...)
+      saveModifiedTour(tourData);
+   }
+
+   /**
+    * Saves a modified tour. In this case, a marker was modified.
+    * Additionally, we update the tour data in the tour data editor as, otherwise, it
+    * can raise a DB out of sync error message.
+    * As an example after analysis and comparing the tour here and the one in the data editor,
+    * I found that the power series could be computed and if it was not already, the compared
+    * tours will be viewed as different.
+    *
+    * @param tourData
+    *           The tour to be saved
+    */
+   private void saveModifiedTour(final TourData tourData) {
+
+      final TourDataEditorView tourDataEditor = TourManager.getTourDataEditor();
+      if (tourDataEditor != null) {
+         tourDataEditor.updateUI(tourData);
+      }
+
       TourManager.saveModifiedTour(tourData);
    }
 

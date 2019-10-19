@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2011-2018 Matthias Helmling and Contributors
+ * Copyright (C) 2011-2019 Matthias Helmling and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,60 +20,61 @@ import java.util.ArrayList;
 
 public class CalendarTourData {
 
-	LoadingState	loadingState	= LoadingState.NOT_LOADED;
+   LoadingState    loadingState = LoadingState.NOT_LOADED;
 
-	long			tourId;
-	long			typeId;
+   long            tourId;
+   long            typeId;
 
-	int				typeColorIndex;
+   int             typeColorIndex;
 
-	int				year;
-	int				month;
-	int				day;
-	int				week;
-	int				dayOfWeek;
+   int             year;
+   int             month;
+   int             day;
+   int             week;
+   int             dayOfWeek;
 
-	int				startTime;
-	int				endTime;
+   int             startTime;
+   int             endTime;
 
-	int				altitude;
-	int				distance;
+   int             elevationGain;
+   int             elevationLoss;
+   int             distance;
 
-	int				recordingTime;
-	int				drivingTime;
+   int             recordingTime;
+   int             drivingTime;
 
-	int				calories;
+   int             calories;
 
-	String			tourTitle;
-	String			tourDescription;
+   String          tourTitle;
+   String          tourDescription;
 
-	ArrayList<Long>	tagIds;
+   ArrayList<Long> tagIds;
 
-	/**
-	 * Number of tours in a week
-	 */
-	int				numTours;
+   /**
+    * Number of tours in a week
+    */
+   int             numTours;
 
-	/**
-	 * Currently only manually created tours can be copied/dragged
-	 */
-	boolean			isManualTour;
+   /**
+    * Currently only manually created tours can be copied/dragged
+    */
+   boolean         isManualTour;
 
-	LocalDate		tourDate;
+   LocalDate       tourDate;
 
-	@Override
-	public String toString() {
+   @Override
+   public String toString() {
 
-		return "CalendarTourData [" //$NON-NLS-1$
+      return "CalendarTourData [" //$NON-NLS-1$
 
-				+ "loadingState=" + loadingState + ", " //$NON-NLS-1$ //$NON-NLS-2$
-				+ "year=" + year + ", " //$NON-NLS-1$ //$NON-NLS-2$
-				+ "month=" + month + ", " //$NON-NLS-1$ //$NON-NLS-2$
-				+ "day=" + day + ", " //$NON-NLS-1$ //$NON-NLS-2$
-				+ "week=" + week + ", " //$NON-NLS-1$ //$NON-NLS-2$
-				+ "numTours=" + numTours //$NON-NLS-1$
+            + "loadingState=" + loadingState + ", " //$NON-NLS-1$ //$NON-NLS-2$
+            + "year=" + year + ", " //$NON-NLS-1$ //$NON-NLS-2$
+            + "month=" + month + ", " //$NON-NLS-1$ //$NON-NLS-2$
+            + "day=" + day + ", " //$NON-NLS-1$ //$NON-NLS-2$
+            + "week=" + week + ", " //$NON-NLS-1$ //$NON-NLS-2$
+            + "numTours=" + numTours //$NON-NLS-1$
 
-				+ "]"; //$NON-NLS-1$
-	}
+            + "]"; //$NON-NLS-1$
+   }
 
 }

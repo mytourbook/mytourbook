@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,33 +17,35 @@ package net.tourbook.tour.filter;
 
 public enum TourFilterFieldId {
 
-	ALTITUDE_UP, //
-	ALTITUDE_DOWN, //
-	ALTITUDE_MAX, //
+   ALTITUDE_UP, //
+   ALTITUDE_DOWN, //
+   ALTITUDE_MAX, //
 
-	TIME_RECORDING_TIME, //
-	TIME_DRIVING_TIME, //
-	TIME_BREAK_TIME, //
-	TIME_TOUR_DATE, //
-	TIME_TOUR_TIME, //
+   TIME_RECORDING_TIME, //
+   TIME_DRIVING_TIME, //
+   TIME_BREAK_TIME, //
+   TIME_TOUR_DATE, //
+   TIME_TOUR_TIME, //
 
-	/**
-	 * DATE_SEASON or DATE_PERIOD, is a repeated interval, e.g. from start year until today,
-	 * repeated for each year
-	 */
-	TIME_SEASON_DATE,
+   /**
+    * DATE_SEASON or DATE_PERIOD, is a repeated interval, e.g. from start year until today,
+    * repeated for each year
+    */
+   TIME_SEASON_DATE,
 
 //	TOUR_MARKERS, //
-	TOUR_PHOTOS, //
-	TOUR_TITLE, //
-	TOUR_MANUAL_TOUR, //
+   TOUR_PHOTOS, //
+   TOUR_TITLE, //
+   TOUR_LOCATION_START, //
+   TOUR_LOCATION_END, //
+   TOUR_MANUAL_TOUR, //
 
-	MOTION_DISTANCE, //
+   MOTION_DISTANCE, //
 
-	POWER_AVERAGE, //
-	POWER_MAX, //
-	POWER_NORMALIZED, //
-	POWER_TOTAL_WORK, //
+   POWER_AVERAGE, //
+   POWER_MAX, //
+   POWER_NORMALIZED, //
+   POWER_TOTAL_WORK, //
 
 //	// Powertrain - Antrieb/Pedal
 //	defineColumn_Powertrain_AvgCadence();
@@ -56,16 +58,15 @@ public enum TourFilterFieldId {
 //	defineColumn_Powertrain_AvgRightTorqueEffectiveness();
 //	defineColumn_Powertrain_PedalLeftRightBalance();
 
-	POWERTRAIN_AVG_CADENCE, //
-	POWERTRAIN_GEAR_FRONT_SHIFT_COUNT, //
-	POWERTRAIN_GEAR_REAR_SHIFT_COUNT, //
+   POWERTRAIN_AVG_CADENCE, //
+   POWERTRAIN_GEAR_FRONT_SHIFT_COUNT, //
+   POWERTRAIN_GEAR_REAR_SHIFT_COUNT, //
 
-	TRAINING_FTP, //
-	TRAINING_POWER_TO_WEIGHT_RATIO, //
-	TRAINING_INTENSITY_FACTOR, //
-	TRAINING_STRESS_SCORE, //
+   TRAINING_FTP, //
+   TRAINING_POWER_TO_WEIGHT_RATIO, //
+   TRAINING_INTENSITY_FACTOR, //
+   TRAINING_STRESS_SCORE, //
 
-	WEATHER_TEMPERATURE, //
-
+   WEATHER_TEMPERATURE, //
 
 }

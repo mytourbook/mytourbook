@@ -97,6 +97,8 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
    private CLabel             _lblWeather_CloudIcon;
 
+   private Combo              _comboLocation_Start;
+   private Combo              _comboLocation_End;
    private Combo              _comboTitle;
    private Combo              _comboWeather_Clouds;
    private Combo              _comboWeather_Wind_DirectionText;
@@ -267,63 +269,118 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
    private void createUI_110_Title(final Composite parent) {
 
-      Label label;
       final int defaultTextWidth = _pc.convertWidthInCharsToPixels(40);
 
       final Composite section = createSection(parent, Messages.tour_editor_section_tour, true);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(section);
       {
-         /*
-          * title
-          */
+         {
+            /*
+             * Title
+             */
 
-         label = _tk.createLabel(section, Messages.tour_editor_label_tour_title);
-         _firstColumnControls.add(label);
+            final Label label = _tk.createLabel(section, Messages.tour_editor_label_tour_title);
+            _firstColumnControls.add(label);
 
-         // combo: tour title with history
-         _comboTitle = new Combo(section, SWT.BORDER | SWT.FLAT);
-         _comboTitle.setText(UI.EMPTY_STRING);
+            // combo: tour title with history
+            _comboTitle = new Combo(section, SWT.BORDER | SWT.FLAT);
+            _comboTitle.setText(UI.EMPTY_STRING);
 
-         _tk.adapt(_comboTitle, true, false);
+            _tk.adapt(_comboTitle, true, false);
 
-         GridDataFactory.fillDefaults()
-               .grab(true, false)
-               .hint(defaultTextWidth, SWT.DEFAULT)
-               .applyTo(_comboTitle);
+            GridDataFactory.fillDefaults()
+                  .grab(true, false)
+                  .hint(defaultTextWidth, SWT.DEFAULT)
+                  .applyTo(_comboTitle);
 
-         // fill combobox
-         final TreeSet<String> dbTitles = TourDatabase.getAllTourTitles();
-         for (final String title : dbTitles) {
-            _comboTitle.add(title);
+            // fill combobox
+            final TreeSet<String> dbTitles = TourDatabase.getAllTourTitles();
+            for (final String title : dbTitles) {
+               _comboTitle.add(title);
+            }
+
+            new AutocompleteComboInput(_comboTitle);
          }
+         {
+            /*
+             * Description
+             */
+            final Label label = _tk.createLabel(section, Messages.tour_editor_label_description);
+            GridDataFactory.swtDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
+            _firstColumnControls.add(label);
 
-         new AutocompleteComboInput(_comboTitle);
+            _txtDescription = _tk.createText(
+                  section, //
+                  UI.EMPTY_STRING,
+                  SWT.BORDER | SWT.WRAP | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL//
+            );
 
-         /*
-          * description
-          */
-         label = _tk.createLabel(section, Messages.tour_editor_label_description);
-         GridDataFactory.swtDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
-         _firstColumnControls.add(label);
+            final IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
 
-         _txtDescription = _tk.createText(
-               section, //
-               UI.EMPTY_STRING,
-               SWT.BORDER | SWT.WRAP | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL//
-         );
+            int descLines = store.getInt(ITourbookPreferences.TOUR_EDITOR_DESCRIPTION_HEIGHT);
+            descLines = descLines == 0 ? 5 : descLines;
 
-         final IPreferenceStore store = TourbookPlugin.getDefault().getPreferenceStore();
+            GridDataFactory.fillDefaults()
+                  .grab(true, true)
+                  //
+                  // SWT.DEFAULT causes lot's of problems with the layout therefore the hint is set
+                  //
+                  .hint(defaultTextWidth, _pc.convertHeightInCharsToPixels(descLines))
+                  .applyTo(_txtDescription);
+         }
+         {
+            /*
+             * Start location
+             */
+            final Label label = _tk.createLabel(section, Messages.tour_editor_label_start_location);
+            _firstColumnControls.add(label);
 
-         int descLines = store.getInt(ITourbookPreferences.TOUR_EDITOR_DESCRIPTION_HEIGHT);
-         descLines = descLines == 0 ? 5 : descLines;
+            _comboLocation_Start = new Combo(section, SWT.BORDER | SWT.FLAT);
+            _comboLocation_Start.setText(UI.EMPTY_STRING);
 
-         GridDataFactory.fillDefaults()
-               .grab(true, true)
-               //
-               // SWT.DEFAULT causes lot's of problems with the layout therefore the hint is set
-               //
-               .hint(defaultTextWidth, _pc.convertHeightInCharsToPixels(descLines))
-               .applyTo(_txtDescription);
+            _tk.adapt(_comboLocation_Start, true, false);
+
+            GridDataFactory.fillDefaults()
+                  .grab(true, false)
+                  .hint(defaultTextWidth, SWT.DEFAULT)
+                  .applyTo(_comboLocation_Start);
+
+            // fill combobox
+            final TreeSet<String> arr = TourDatabase.getAllTourPlaceStarts();
+            for (final String string : arr) {
+               if (string != null) {
+                  _comboLocation_Start.add(string);
+               }
+            }
+            new AutocompleteComboInput(_comboLocation_Start);
+         }
+         {
+            /*
+             * End location
+             */
+//            &End Location
+            final Label label = _tk.createLabel(section, Messages.tour_editor_label_end_location);
+            _firstColumnControls.add(label);
+
+            _comboLocation_End = new Combo(section, SWT.BORDER | SWT.FLAT);
+            _comboLocation_End.setText(UI.EMPTY_STRING);
+
+            _tk.adapt(_comboLocation_End, true, false);
+
+            GridDataFactory.fillDefaults()
+                  .grab(true, false)
+                  .hint(defaultTextWidth, SWT.DEFAULT)
+                  .applyTo(_comboLocation_End);
+
+            // fill combobox
+            final TreeSet<String> arr = TourDatabase.getAllTourPlaceEnds();
+            for (final String string : arr) {
+               if (string != null) {
+                  _comboLocation_End.add(string);
+               }
+            }
+            new AutocompleteComboInput(_comboLocation_End);
+         }
       }
    }
 
@@ -426,12 +483,12 @@ public class DialogQuickEdit extends TitleAreaDialog {
                      .applyTo(_spinBodyWeight);
                _spinBodyWeight.setDigits(1);
                _spinBodyWeight.setMinimum(0);
-               _spinBodyWeight.setMaximum(3000); // 300.0 kg
+               _spinBodyWeight.setMaximum(6614); // 300.0 kg, 661.4 lbs
 
                _spinBodyWeight.addMouseWheelListener(_mouseWheelListener);
 
                // label: unit
-               _tk.createLabel(container, UI.UNIT_WEIGHT_KG);
+               _tk.createLabel(container, UI.UNIT_LABEL_WEIGHT);
             }
 
             {
@@ -536,7 +593,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
                   if (_isUpdateUI) {
                      return;
                   }
-                  onSelectWindSpeedValue();
+                  onSelect_WindSpeed_Value();
                }
             });
             _spinWeather_Wind_SpeedValue.addSelectionListener(new SelectionAdapter() {
@@ -545,7 +602,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
                   if (_isUpdateUI) {
                      return;
                   }
-                  onSelectWindSpeedValue();
+                  onSelect_WindSpeed_Value();
                }
             });
             _spinWeather_Wind_SpeedValue.addMouseWheelListener(new MouseWheelListener() {
@@ -555,7 +612,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
                   if (_isUpdateUI) {
                      return;
                   }
-                  onSelectWindSpeedValue();
+                  onSelect_WindSpeed_Value();
                }
             });
 
@@ -579,7 +636,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
                   if (_isUpdateUI) {
                      return;
                   }
-                  onSelectWindSpeedText();
+                  onSelect_WindSpeed_Text();
                }
             });
 
@@ -614,7 +671,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
                   if (_isUpdateUI) {
                      return;
                   }
-                  onSelectWindDirectionText();
+                  onSelect_WindDirection_Text();
                }
             });
 
@@ -644,7 +701,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
                   if (_isUpdateUI) {
                      return;
                   }
-                  onSelectWindDirectionValue();
+                  onSelect_WindDirection_Value();
                }
             });
             _spinWeather_Wind_DirectionValue.addSelectionListener(new SelectionAdapter() {
@@ -653,7 +710,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
                   if (_isUpdateUI) {
                      return;
                   }
-                  onSelectWindDirectionValue();
+                  onSelect_WindDirection_Value();
                }
             });
             _spinWeather_Wind_DirectionValue.addMouseWheelListener(new MouseWheelListener() {
@@ -663,7 +720,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
                   if (_isUpdateUI) {
                      return;
                   }
-                  onSelectWindDirectionValue();
+                  onSelect_WindDirection_Value();
                }
             });
 
@@ -854,7 +911,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
       _firstColumnContainerControls.clear();
    }
 
-   private void onSelectWindDirectionText() {
+   private void onSelect_WindDirection_Text() {
 
       // N=0=0  NE=1=45  E=2=90  SE=3=135  S=4=180  SW=5=225  W=6=270  NW=7=315
       final int selectedIndex = _comboWeather_Wind_DirectionText.getSelectionIndex();
@@ -866,7 +923,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
       _spinWeather_Wind_DirectionValue.setSelection(degree);
    }
 
-   private void onSelectWindDirectionValue() {
+   private void onSelect_WindDirection_Value() {
 
       int degree = _spinWeather_Wind_DirectionValue.getSelection();
 
@@ -884,7 +941,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
       _comboWeather_Wind_DirectionText.select(net.tourbook.common.UI.getCardinalDirectionTextIndex(degree));
    }
 
-   private void onSelectWindSpeedText() {
+   private void onSelect_WindSpeed_Text() {
 
       _isWindSpeedManuallyModified = true;
 
@@ -899,7 +956,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
       _isUpdateUI = isBackup;
    }
 
-   private void onSelectWindSpeedValue() {
+   private void onSelect_WindSpeed_Value() {
 
       _isWindSpeedManuallyModified = true;
 
@@ -921,7 +978,11 @@ public class DialogQuickEdit extends TitleAreaDialog {
       _tourData.setTourTitle(_comboTitle.getText().trim());
       _tourData.setTourDescription(_txtDescription.getText().trim());
 
-      _tourData.setBodyWeight((float) (_spinBodyWeight.getSelection() / 10.0));
+      _tourData.setTourStartPlace(_comboLocation_Start.getText().trim());
+      _tourData.setTourEndPlace(_comboLocation_End.getText().trim());
+
+      final float bodyWeight = UI.convertBodyWeightToMetric(_spinBodyWeight.getSelection());
+      _tourData.setBodyWeight(bodyWeight / 10.0f);
       _tourData.setPower_FTP(_spinFTP.getSelection());
       _tourData.setRestPulse(_spinRestPuls.getSelection());
       _tourData.setCalories(_spinCalories.getSelection());
@@ -962,22 +1023,26 @@ public class DialogQuickEdit extends TitleAreaDialog {
       _isUpdateUI = true;
       {
          /*
-          * tour/event
+          * Tour/event
           */
          // set field content
          _comboTitle.setText(_tourData.getTourTitle());
          _txtDescription.setText(_tourData.getTourDescription());
 
+         _comboLocation_Start.setText(_tourData.getTourStartPlace());
+         _comboLocation_End.setText(_tourData.getTourEndPlace());
+
          /*
-          * personal details
+          * Personal details
           */
-         _spinBodyWeight.setSelection(Math.round(_tourData.getBodyWeight() * 10));
+         final float bodyWeight = UI.convertBodyWeightFromMetric(_tourData.getBodyWeight());
+         _spinBodyWeight.setSelection(Math.round(bodyWeight * 10));
          _spinFTP.setSelection(_tourData.getPower_FTP());
          _spinRestPuls.setSelection(_tourData.getRestPulse());
          _spinCalories.setSelection(_tourData.getCalories());
 
          /*
-          * wind properties
+          * Wind properties
           */
          _txtWeather.setText(_tourData.getWeather());
 
@@ -999,7 +1064,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
          displayCloudIcon();
 
          /*
-          * avg temperature
+          * Avg temperature
           */
          float avgTemperature = _tourData.getAvgTemperature();
 

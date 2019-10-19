@@ -82,7 +82,7 @@ public class ActionRetrieveWeatherData extends Action {
                MessageDialog.openInformation(
                      shell,
                      Messages.Dialog_RetrieveWeather_Dialog_Title,
-                     Messages.UI_Label_WeatherDataNotRetrieved);
+                     Messages.Dialog_RetrieveWeather_Label_WeatherDataNotRetrieved);
             }
          };
       });

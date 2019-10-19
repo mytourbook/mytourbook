@@ -344,6 +344,11 @@ public interface ITourbookPreferences {
     */
    public static final String COMPUTED_ALTITUDE_DP_TOLERANCE          = "COMPUTED_ALTITUDE_DP_TOLERANCE";             //$NON-NLS-1$
 
+   /**
+    * Cadence value differentiating slow from fast
+    */
+   public static final String CADENCE_ZONES_DELIMITER                 = "CADENCE_ZONES_DELIMITER";                    //$NON-NLS-1$
+
    /*
     * measurement system
     */
@@ -365,6 +370,10 @@ public interface ITourbookPreferences {
    public static final String MEASUREMENT_SYSTEM_ENERGY         = "system.of.energy";                  //$NON-NLS-1$
    public static final String MEASUREMENT_SYSTEM_ENERGY_JOULE   = "energy.joule";                      //$NON-NLS-1$
    public static final String MEASUREMENT_SYSTEM_ENERGY_CALORIE = "energy.calorie";                    //$NON-NLS-1$
+
+   public static final String MEASUREMENT_SYSTEM_WEIGHT         = "system.of.weight";                  //$NON-NLS-1$
+   public static final String MEASUREMENT_SYSTEM_WEIGHT_KG      = "weight.kilogram";                   //$NON-NLS-1$
+   public static final String MEASUREMENT_SYSTEM_WEIGHT_LBS     = "weight.pound";                      //$NON-NLS-1$
 
    /*
     * map settings
@@ -578,6 +587,11 @@ public interface ITourbookPreferences {
     */
    public static final String DIALOG_SET_TIME_ZONE_ACTION           = "DIALOG_SET_TIME_ZONE_ACTION";           //$NON-NLS-1$
    public static final String DIALOG_SET_TIME_ZONE_SELECTED_ZONE_ID = "DIALOG_SET_TIME_ZONE_SELECTED_ZONE_ID"; //$NON-NLS-1$
+
+   /*
+    * Save tags
+    */
+   public static final String DIALOG_SAVE_TAGS_ACTION = "DIALOG_SAVE_TAGS_ACTION"; //$NON-NLS-1$
 
    /*
     * Fonts

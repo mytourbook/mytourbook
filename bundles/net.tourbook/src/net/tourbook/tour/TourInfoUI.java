@@ -631,7 +631,7 @@ public class TourInfoUI {
 
          _lblBodyWeight = createUI_LabelValue(container, SWT.TRAIL);
 
-         createUI_Label(container, UI.UNIT_WEIGHT_KG);
+         createUI_Label(container, UI.UNIT_LABEL_WEIGHT);
       }
    }
 
@@ -1480,7 +1480,8 @@ public class TourInfoUI {
 
       // body
       _lblRestPulse.setText(Integer.toString(_tourData.getRestPulse()));
-      _lblBodyWeight.setText(_nf1.format(_tourData.getBodyWeight()));
+      final float bodyWeight = UI.convertBodyWeightFromMetric(_tourData.getBodyWeight());
+      _lblBodyWeight.setText(_nf1.format(bodyWeight));
 
       /*
        * Max values

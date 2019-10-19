@@ -23,6 +23,7 @@ public class Messages extends NLS {
 
    public static String        FitLog_CustomDataFields_Label;
    public static String        FitLog_Error_InvalidStartTime;
+   public static String        FitLog_Equipment_Name_Not_Available;
 
    public static String        Port_Listener_Error_ntd001;
    public static String        Port_Listener_Error_ntd002;

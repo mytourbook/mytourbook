@@ -3,7 +3,7 @@
 
 <product 
 
-	version		="19.7.1.qualifier" 
+	version		="19.10.0.qualifier" 
 
 	name			="MyTourbook Product" 
 	id				="net.tourbook.product" 
@@ -110,7 +110,6 @@
    <configurations>
       <plugin id="org.eclipse.core.runtime" 						autoStart="true" startLevel="4" />
       <plugin id="org.eclipse.equinox.common" 					autoStart="true" startLevel="2" />
-      <plugin id="org.eclipse.equinox.ds" 						autoStart="true" startLevel="2" />
       <plugin id="org.eclipse.equinox.simpleconfigurator" 	autoStart="true" startLevel="1" />
       <plugin id="org.eclipse.update.configurator" 			autoStart="true" startLevel="4" />
    </configurations>

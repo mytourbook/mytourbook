@@ -29,16 +29,17 @@ import org.eclipse.swt.widgets.ToolItem;
 
 public class ActionTourDataFilter extends ActionToolbarSlideoutAdv {
 
-   private static final ImageDescriptor _actionImageDescriptor         = TourbookPlugin.getImageDescriptor(Messages.Image__TourFilter);
-   private static final ImageDescriptor _actionImageDisabledDescriptor = TourbookPlugin.getImageDescriptor(Messages.Image__TourFilter_Disabled);
+   private static final ImageDescriptor _actionImageDescriptor          = TourbookPlugin.getImageDescriptor(Messages.Image__TourFilter);
+   private static final ImageDescriptor _actionImageDescriptor_Disabled = TourbookPlugin.getImageDescriptor(Messages.Image__TourFilter_Disabled);
 
-   private static final IDialogSettings _state                         = TourbookPlugin.getState("TourFilter");                                 //$NON-NLS-1$
+   private static final IDialogSettings _state                          = TourbookPlugin.getState("TourFilter");                                 //$NON-NLS-1$
 
    private SlideoutTourFilter           _slideoutTourFilter;
 
    public ActionTourDataFilter() {
 
-      super(_actionImageDescriptor, _actionImageDisabledDescriptor);
+      super(_actionImageDescriptor, _actionImageDescriptor_Disabled);
+//      super(_actionImageDescriptor, _actionImageDescriptor_Disabled, _actionImageDescriptor_Selected);
 
       isToggleAction = true;
       notSelectedTooltip = Messages.Tour_Filter_Action_Tooltip;

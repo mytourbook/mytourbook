@@ -146,7 +146,7 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
       }
    }
 
-   class PartViewerContentProvicer implements IStructuredContentProvider {
+   class PartViewerContentProvider implements IStructuredContentProvider {
 
       @Override
       public void dispose() {}
@@ -435,7 +435,7 @@ public class DialogManageOfflineImages extends TitleAreaDialog implements ITileL
        * create table viewer
        */
 
-      _partViewer.setContentProvider(new PartViewerContentProvicer());
+      _partViewer.setContentProvider(new PartViewerContentProvider());
 
       _partViewer.addSelectionChangedListener(new ISelectionChangedListener() {
          @Override

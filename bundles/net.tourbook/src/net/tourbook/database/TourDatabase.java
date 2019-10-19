@@ -31,7 +31,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -104,8 +103,10 @@ public class TourDatabase {
     * Version for the database which is required that the tourbook application works successfully
     */
    private static final int TOURBOOK_DB_VERSION = 40;
-//   private static final int TOURBOOK_DB_VERSION = 39; // 19.7 ?
-//   private static final int TOURBOOK_DB_VERSION = 38; // 19.5 ?
+
+//   private static final int TOURBOOK_DB_VERSION = 40; // 19.10
+//   private static final int TOURBOOK_DB_VERSION = 39; // 19.7
+//   private static final int TOURBOOK_DB_VERSION = 38; // 19.6
 //   private static final int TOURBOOK_DB_VERSION = 37; // 19.2
 //   private static final int TOURBOOK_DB_VERSION = 36; // 18.12
 //   private static final int TOURBOOK_DB_VERSION = 35; // 18.7
@@ -190,22 +191,22 @@ public class TourDatabase {
     */
    public static final int                                ENTITY_IS_NOT_SAVED             = -1;
    //
-   private static final String                            ENTITY_ID_BIKE                  = "BikeID";                                               //$NON-NLS-1$
-   private static final String                            ENTITY_ID_COMPARED              = "ComparedID";                                           //$NON-NLS-1$
-   private static final String                            ENTITY_ID_HR_ZONE               = "HrZoneID";                                             //$NON-NLS-1$
-   private static final String                            ENTITY_ID_MARKER                = "MarkerID";                                             //$NON-NLS-1$
-   private static final String                            ENTITY_ID_PERSON                = "PersonID";                                             //$NON-NLS-1$
-   private static final String                            ENTITY_ID_PHOTO                 = "PhotoID";                                              //$NON-NLS-1$
-   private static final String                            ENTITY_ID_REF                   = "RefID";                                                //$NON-NLS-1$
-   private static final String                            ENTITY_ID_TAG                   = "TagID";                                                //$NON-NLS-1$
-   private static final String                            ENTITY_ID_TAG_CATEGORY          = "TagCategoryID";                                        //$NON-NLS-1$
+   public static final String                             ENTITY_ID_BIKE                  = "BikeID";                                               //$NON-NLS-1$
+   public static final String                             ENTITY_ID_COMPARED              = "ComparedID";                                           //$NON-NLS-1$
+   public static final String                             ENTITY_ID_HR_ZONE               = "HrZoneID";                                             //$NON-NLS-1$
+   public static final String                             ENTITY_ID_MARKER                = "MarkerID";                                             //$NON-NLS-1$
+   public static final String                             ENTITY_ID_PERSON                = "PersonID";                                             //$NON-NLS-1$
+   public static final String                             ENTITY_ID_PHOTO                 = "PhotoID";                                              //$NON-NLS-1$
+   public static final String                             ENTITY_ID_REF                   = "RefID";                                                //$NON-NLS-1$
+   public static final String                             ENTITY_ID_TAG                   = "TagID";                                                //$NON-NLS-1$
+   public static final String                             ENTITY_ID_TAG_CATEGORY          = "TagCategoryID";                                        //$NON-NLS-1$
    public static final String                             ENTITY_ID_TOUR                  = "TourID";                                               //$NON-NLS-1$
-   private static final String                            ENTITY_ID_TYPE                  = "TypeID";                                               //$NON-NLS-1$
+   public static final String                             ENTITY_ID_TYPE                  = "TypeID";                                               //$NON-NLS-1$
    public static final String                             ENTITY_ID_WAY_POINT             = "WayPointID";                                           //$NON-NLS-1$
    //
    private static final String                            KEY_BIKE                        = TABLE_TOUR_BIKE + "_" + ENTITY_ID_BIKE;                 //$NON-NLS-1$
    private static final String                            KEY_PERSON                      = TABLE_TOUR_PERSON + "_" + ENTITY_ID_PERSON;             //$NON-NLS-1$
-   private static final String                            KEY_TAG                         = TABLE_TOUR_TAG + "_" + ENTITY_ID_TAG;                   //$NON-NLS-1$
+   public static final String                             KEY_TAG                         = TABLE_TOUR_TAG + "_" + ENTITY_ID_TAG;                   //$NON-NLS-1$
    private static final String                            KEY_TAG_CATEGORY                = TABLE_TOUR_TAG_CATEGORY + "_" + ENTITY_ID_TAG_CATEGORY; //$NON-NLS-1$
    public static final String                             KEY_TOUR                        = TABLE_TOUR_DATA + "_" + ENTITY_ID_TOUR;                 //$NON-NLS-1$
    private static final String                            KEY_TYPE                        = TABLE_TOUR_TYPE + "_" + ENTITY_ID_TYPE;                 //$NON-NLS-1$
@@ -230,6 +231,7 @@ public class TourDatabase {
    private static ArrayList<TourType>                     _activeTourTypes;
 
    private static volatile ArrayList<TourType>            _dbTourTypes;
+   private static HashMap<Long, TourType>                 _dbTourTypeIds;
 
    /**
     * Key is tag ID.
@@ -247,7 +249,7 @@ public class TourDatabase {
    private static HashMap<Long, TagCollection>            _tagCollections                 = new HashMap<>();
 
    /*
-    * cached distinct fields
+    * Cached distinct fields
     */
    private static TreeSet<String>                _dbTourTitles;
    private static TreeSet<String>                _dbTourStartPlace;
@@ -809,8 +811,12 @@ public class TourDatabase {
    public static synchronized void clearTourTypes() {
 
       if (_dbTourTypes != null) {
+
          _dbTourTypes.clear();
+         _dbTourTypeIds.clear();
+
          _dbTourTypes = null;
+         _dbTourTypeIds = null;
       }
 
       TourTypeImage.setTourTypeImagesDirty();
@@ -827,30 +833,6 @@ public class TourDatabase {
       }
    }
 
-   private static void computeComputedValuesForAllTours(final SplashManager splashManager) {
-
-      final ArrayList<Long> tourList = getAllTourIds();
-
-      // loop: all tours, compute computed fields and save the tour
-      int tourCounter = 1;
-      for (final Long tourId : tourList) {
-
-         if (splashManager != null) {
-            splashManager.setMessage(
-                  NLS.bind(
-                        Messages.Tour_Database_update_tour, //
-                        new Object[] { tourCounter++, tourList.size() }));
-         }
-
-         final TourData tourData = getTourFromDb(tourId);
-         if (tourData != null) {
-
-            tourData.computeComputedValues();
-            saveTour(tourData, false);
-         }
-      }
-   }
-
    /**
     * @return
     */
@@ -862,13 +844,7 @@ public class TourDatabase {
     *           computed.
     * @return
     */
-   public static boolean computeValuesForAllTours(final IComputeTourValues runner, final ArrayList<Long> tourIds) {
-
-      final Shell shell = Display.getDefault().getActiveShell();
-
-      final NumberFormat nf = NumberFormat.getNumberInstance();
-      nf.setMinimumFractionDigits(0);
-      nf.setMaximumFractionDigits(0);
+   public static boolean computeAnyValues_ForAllTours(final IComputeTourValues runner, final ArrayList<Long> tourIds) {
 
       final int[] tourCounter = new int[] { 0 };
       final int[] tourListSize = new int[] { 0 };
@@ -923,10 +899,8 @@ public class TourDatabase {
 
                   // create sub task text
                   final StringBuilder sb = new StringBuilder();
-                  sb.append(
-                        NLS.bind(
-                              Messages.tour_database_computeComputeValues_subTask, //
-                              new Object[] { tourCounter[0], tourListSize[0], }));
+                  sb.append(NLS.bind(Messages.tour_database_computeComputeValues_subTask,
+                        new Object[] { tourCounter[0], tourListSize[0], }));
 
                   sb.append(UI.DASH_WITH_DOUBLE_SPACE);
                   sb.append(tourCounter[0] * 100 / tourListSize[0]);
@@ -946,14 +920,11 @@ public class TourDatabase {
                   isCanceled[0] = true;
                   break;
                }
-
-////            // debug test
-//               if (tourCounter[0] > 0) {
-//                  break;
-//               }
             }
          }
       };
+
+      final Shell shell = Display.getDefault().getActiveShell();
 
       try {
 
@@ -983,6 +954,177 @@ public class TourDatabase {
                shell,
                Messages.tour_database_computeComputedValues_resultTitle,
                sb.toString());
+      }
+
+      return isCanceled[0];
+   }
+
+   private static void computeAnyValues_ForAllTours(final SplashManager splashManager) {
+
+      final ArrayList<Long> tourList = getAllTourIds();
+
+      // loop: all tours, compute computed fields and save the tour
+      int tourCounter = 1;
+      for (final Long tourId : tourList) {
+
+         if (splashManager != null) {
+            splashManager.setMessage(
+                  NLS.bind(
+                        Messages.Tour_Database_update_tour, //
+                        new Object[] { tourCounter++, tourList.size() }));
+         }
+
+         final TourData tourData = getTourFromDb(tourId);
+         if (tourData != null) {
+
+            tourData.computeComputedValues();
+            saveTour(tourData, false);
+         }
+      }
+   }
+
+   /**
+    * @param tourRunner
+    *           {@link IComputeNoDataserieValues} interface to compute values for one tour
+    * @param tourIds
+    *           Tour ID's which should be computed, when <code>null</code>, ALL tours will be
+    *           computed.
+    * @return
+    */
+   public static boolean computeNoDataserieValues_ForAllTours(final IComputeNoDataserieValues tourRunner, final ArrayList<Long> tourIds) {
+
+      final int[] numCurrentlyProcessedTours = new int[] { 0 };
+      final int[] numAllTours = new int[] { 0 };
+      final boolean[] isCanceled = new boolean[] { false };
+
+      /*
+       * Runnable to compute values
+       */
+      final IRunnableWithProgress runnable = new IRunnableWithProgress() {
+         @Override
+         public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+
+            Connection conn = null;
+            try {
+
+               conn = TourDatabase.getInstance().getConnection();
+
+               run_AllTours(conn, monitor);
+
+            } catch (final SQLException e) {
+
+               net.tourbook.common.util.SQL.showException(e);
+
+            } finally {
+
+               Util.closeSql(conn);
+            }
+
+         }
+
+         private void run_AllTours(final Connection conn, final IProgressMonitor monitor) throws SQLException {
+
+            ArrayList<Long> allTourIds;
+            if (tourIds == null) {
+               allTourIds = getAllTourIds();
+            } else {
+               allTourIds = tourIds;
+            }
+
+            final int numTours = allTourIds.size();
+            numAllTours[0] = numTours;
+
+//            int numComputedTour = 0;
+//            int numNotComputedTour = 0;
+            long lastUIUpdateTime = 0;
+
+            monitor.beginTask(Messages.tour_database_computeComputeValues_mainTask, numTours);
+
+            final String sql = tourRunner.getSQLUpdateStatement();
+            final PreparedStatement stmtUpdate = conn.prepareStatement(sql);
+
+            // loop over all tours and compute values
+            for (final Long tourId : allTourIds) {
+
+               final TourData dbTourData = getTourFromDb(tourId);
+
+               if (dbTourData != null) {
+
+                  if (tourRunner.computeTourValues(dbTourData, stmtUpdate)) {
+
+                     stmtUpdate.executeUpdate();
+
+//                     numComputedTour++;
+
+                  } else {
+
+//                     numNotComputedTour++;
+                  }
+               }
+
+               numCurrentlyProcessedTours[0]++;
+
+               final long currentTime = System.currentTimeMillis();
+               if (currentTime > lastUIUpdateTime + 200) {
+
+                  lastUIUpdateTime = currentTime;
+
+                  // create sub task text
+                  final StringBuilder sb = new StringBuilder();
+                  sb.append(NLS.bind(Messages.tour_database_computeComputeValues_subTask,
+                        new Object[] { numCurrentlyProcessedTours[0], numTours, }));
+
+                  sb.append(UI.DASH_WITH_DOUBLE_SPACE);
+                  sb.append(numCurrentlyProcessedTours[0] * 100 / numTours);
+                  sb.append(UI.SYMBOL_PERCENTAGE);
+
+                  monitor.subTask(sb.toString());
+               }
+               monitor.worked(1);
+
+               // check if canceled
+               if (monitor.isCanceled()) {
+                  isCanceled[0] = true;
+                  break;
+               }
+            }
+         }
+      };
+
+      final Display display = Display.getDefault();
+      final Shell shell = display.getActiveShell();
+
+      try {
+
+         new ProgressMonitorDialog(shell).run(true, true, runnable);
+
+      } catch (final InvocationTargetException e) {
+         StatusUtil.log(e);
+      } catch (final InterruptedException e) {
+         StatusUtil.log(e);
+      } finally {
+
+         // show final result delayed that the user can set the update UI
+         display.asyncExec(() -> {
+
+            // create result text
+            final StringBuilder sb = new StringBuilder();
+            sb.append(NLS.bind(Messages.tour_database_computeComputedValues_resultMessage,
+                  numCurrentlyProcessedTours[0],
+                  numAllTours[0]));
+
+            // optional: add result from tour runner
+            final String runnerResultText = tourRunner.getResultText();
+            if (runnerResultText != null) {
+               sb.append(UI.NEW_LINE2);
+               sb.append(runnerResultText);
+            }
+
+            MessageDialog.openInformation(
+                  shell,
+                  Messages.tour_database_computeComputedValues_resultTitle,
+                  sb.toString());
+         });
       }
 
       return isCanceled[0];
@@ -1058,21 +1200,21 @@ public class TourDatabase {
 
          conn = TourDatabase.getInstance().getConnection();
 
-         final String sqlWhere_TourId = " WHERE tourId=?"; //$NON-NLS-1$
-         final String sqlWhere_TourData_TourId = " WHERE " + TABLE_TOUR_DATA + "_tourId=?"; //$NON-NLS-1$ //$NON-NLS-2$
-
 // SET_FORMATTING_OFF
+
+         final String sqlWhere_TourId           = " WHERE tourId=?";                         //$NON-NLS-1$
+         final String sqlWhere_TourData_TourId  = " WHERE " + TABLE_TOUR_DATA + "_tourId=?"; //$NON-NLS-1$ //$NON-NLS-2$
+
          final String allSql[] = {
-               //
-               "DELETE FROM " + TABLE_TOUR_DATA             + sqlWhere_TourId, //$NON-NLS-1$
-               "DELETE FROM " + TABLE_TOUR_MARKER             + sqlWhere_TourData_TourId, //$NON-NLS-1$
-               "DELETE FROM " + TABLE_TOUR_PHOTO             + sqlWhere_TourData_TourId, //$NON-NLS-1$
-               "DELETE FROM " + TABLE_TOUR_WAYPOINT          + sqlWhere_TourData_TourId, //$NON-NLS-1$
-               "DELETE FROM " + TABLE_TOUR_REFERENCE          + sqlWhere_TourData_TourId, //$NON-NLS-1$
-               "DELETE FROM " + JOINTABLE__TOURDATA__TOURTAG    + sqlWhere_TourData_TourId, //$NON-NLS-1$
-               "DELETE FROM " + TABLE_TOUR_COMPARED          + sqlWhere_TourId, //$NON-NLS-1$
-               "DELETE FROM " + TABLE_TOUR_GEO_PARTS         + sqlWhere_TourId, //$NON-NLS-1$
-               //
+
+            "DELETE FROM " + TABLE_TOUR_DATA                + sqlWhere_TourId,            //$NON-NLS-1$
+            "DELETE FROM " + TABLE_TOUR_MARKER              + sqlWhere_TourData_TourId,   //$NON-NLS-1$
+            "DELETE FROM " + TABLE_TOUR_PHOTO               + sqlWhere_TourData_TourId,   //$NON-NLS-1$
+            "DELETE FROM " + TABLE_TOUR_WAYPOINT            + sqlWhere_TourData_TourId,   //$NON-NLS-1$
+            "DELETE FROM " + TABLE_TOUR_REFERENCE           + sqlWhere_TourData_TourId,   //$NON-NLS-1$
+            "DELETE FROM " + JOINTABLE__TOURDATA__TOURTAG   + sqlWhere_TourData_TourId,   //$NON-NLS-1$
+            "DELETE FROM " + TABLE_TOUR_COMPARED            + sqlWhere_TourId,            //$NON-NLS-1$
+            "DELETE FROM " + TABLE_TOUR_GEO_PARTS           + sqlWhere_TourId,            //$NON-NLS-1$
          };
 // SET_FORMATTING_ON
 
@@ -1327,7 +1469,7 @@ public class TourDatabase {
    }
 
    /**
-    * this method is synchronized to conform to FindBugs
+    * This method is synchronized to conform to FindBugs
     *
     * @return Returns all tour tags which are stored in the database, the hash key is the tag id
     */
@@ -1404,6 +1546,7 @@ public class TourDatabase {
 
          // create empty list
          _dbTourTypes = new ArrayList<>();
+         _dbTourTypeIds = new HashMap<>();
 
          final EntityManager em = TourDatabase.getInstance().getEntityManager();
          if (em != null) {
@@ -1415,6 +1558,10 @@ public class TourDatabase {
                         + (" ORDER  BY tourType.name")); //$NON-NLS-1$
 
             _dbTourTypes = (ArrayList<TourType>) emQuery.getResultList();
+
+            for (final TourType tourType : _dbTourTypes) {
+               _dbTourTypeIds.put(tourType.getTypeId(), tourType);
+            }
 
             em.close();
          }
@@ -1715,7 +1862,7 @@ public class TourDatabase {
       return getTagNamesText(tagNames, isVertical);
    }
 
-   private static String getTagNamesText(final ArrayList<String> tagNames, final boolean isVertical) {
+   public static String getTagNamesText(final ArrayList<String> tagNames, final boolean isVertical) {
 
       // sort tags by name
       Collections.sort(tagNames);
@@ -1725,17 +1872,38 @@ public class TourDatabase {
       final StringBuilder sb = new StringBuilder();
 
       for (final String tagName : tagNames) {
+
          if (tagIndex++ > 0) {
             if (isVertical) {
-               sb.append("\n");//$NON-NLS-1$
+               sb.append(UI.NEW_LINE);
             } else {
-               sb.append(", ");//$NON-NLS-1$
+               sb.append(UI.COMMA_SPACE);
             }
+         }
+
+         if (isVertical) {
+            // prefix a bullet
+            sb.append(net.tourbook.common.UI.SYMBOL_BULLET + UI.SPACE);
          }
          sb.append(tagName);
       }
 
       return sb.toString();
+   }
+
+   public static String getTagNamesText(final Set<Long> alltagIds, final boolean isVertical) {
+
+      // ensure tour tags are loaded
+      getAllTourTags();
+
+      final ArrayList<String> tagNames = new ArrayList<>();
+
+      for (final Long tagId : alltagIds) {
+         final TourTag tourTag = _allTourTags.get(tagId);
+         tagNames.add(tourTag.getTagName());
+      }
+
+      return getTagNamesText(tagNames, isVertical);
    }
 
    /**
@@ -2944,9 +3112,13 @@ public class TourDatabase {
             //
             // version 39 end
 
-            // version 40 start  -  19.9
+            // version 40 start  -  19.10
             //
             + " power_DataSource     VARCHAR(" + TourData.DB_LENGTH_POWER_DATA_SOURCE + "),      \n" //$NON-NLS-1$ //$NON-NLS-2$
+            + " cadenceZone_SlowTime                  INTEGER DEFAULT 0,                  \n" //$NON-NLS-1$
+            + " cadenceZone_FastTime                  INTEGER DEFAULT 0,                  \n" //$NON-NLS-1$
+            + " cadenceZones_DelimiterValue           INTEGER DEFAULT 0,                  \n" //$NON-NLS-1$
+            + " avgAltitudeChange                     INTEGER DEFAULT 0,                  \n" //$NON-NLS-1$
             //
             // version 40 end
 
@@ -3099,30 +3271,30 @@ public class TourDatabase {
       //
             + SQL.CreateField_EntityId(ENTITY_ID_PERSON, true)
             //
-            + "   lastName          VARCHAR(" + TourPerson.DB_LENGTH_LAST_NAME + "),     \n" //$NON-NLS-1$ //$NON-NLS-2$
-            + "   firstName         VARCHAR(" + TourPerson.DB_LENGTH_FIRST_NAME + "),    \n" //$NON-NLS-1$ //$NON-NLS-2$
-            + "   weight            FLOAT,                                               \n" //$NON-NLS-1$ // kg
-            + "   height            FLOAT,                                               \n" //$NON-NLS-1$ // m
+            + "   lastName               VARCHAR(" + TourPerson.DB_LENGTH_LAST_NAME + "),         \n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   firstName              VARCHAR(" + TourPerson.DB_LENGTH_FIRST_NAME + "),        \n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   weight                 FLOAT,                                                   \n" //$NON-NLS-1$ // kg
+            + "   height                 FLOAT,                                                   \n" //$NON-NLS-1$ // m
 
             // version 15 start
             //
-            + "   BirthDay          BIGINT DEFAULT 0,                                    \n" //$NON-NLS-1$
+            + "   BirthDay               BIGINT DEFAULT 0,                                        \n" //$NON-NLS-1$
             //
             // version 15 end ---------
 
             // version 16 start
             //
-            + "   Gender            INTEGER DEFAULT 0,                                   \n" //$NON-NLS-1$
-            + "   RestPulse         INTEGER DEFAULT 0,                                   \n" //$NON-NLS-1$
-            + "   MaxPulse          INTEGER DEFAULT 0,                                   \n" //$NON-NLS-1$
-            + "   HrMaxFormula      INTEGER DEFAULT 0,                                   \n" //$NON-NLS-1$
+            + "   Gender                 INTEGER DEFAULT 0,                                       \n" //$NON-NLS-1$
+            + "   RestPulse              INTEGER DEFAULT 0,                                       \n" //$NON-NLS-1$
+            + "   MaxPulse               INTEGER DEFAULT 0,                                       \n" //$NON-NLS-1$
+            + "   HrMaxFormula           INTEGER DEFAULT 0,                                       \n" //$NON-NLS-1$
             //
             // version 16 end ---------
 
-            + "   rawDataPath       VARCHAR(" + TourPerson.DB_LENGTH_RAW_DATA_PATH + "),     \n" //$NON-NLS-1$ //$NON-NLS-2$
-            + "   deviceReaderId    VARCHAR(" + TourPerson.DB_LENGTH_DEVICE_READER_ID + "),  \n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   rawDataPath            VARCHAR(" + TourPerson.DB_LENGTH_RAW_DATA_PATH + "),     \n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   deviceReaderId         VARCHAR(" + TourPerson.DB_LENGTH_DEVICE_READER_ID + "),  \n" //$NON-NLS-1$ //$NON-NLS-2$
             //
-            + "   " + KEY_BIKE + "  BIGINT                                               \n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   " + KEY_BIKE + "       BIGINT                                                  \n" //$NON-NLS-1$ //$NON-NLS-2$
             //
             + ")"); //$NON-NLS-1$
    }
@@ -3216,15 +3388,15 @@ public class TourDatabase {
       /*
        * CREATE TABLE TourReference
        */
-      exec(stmt, "CREATE TABLE " + TABLE_TOUR_REFERENCE + "   (                              \n" //$NON-NLS-1$ //$NON-NLS-2$
+      exec(stmt, "CREATE TABLE " + TABLE_TOUR_REFERENCE + "   (                           \n" //$NON-NLS-1$ //$NON-NLS-2$
       //
             + SQL.CreateField_EntityId(ENTITY_ID_REF, true)
             //
-            + "   " + KEY_TOUR + "   BIGINT,                                                \n"//$NON-NLS-1$ //$NON-NLS-2$
+            + "   " + KEY_TOUR + "     BIGINT,                                            \n"//$NON-NLS-1$ //$NON-NLS-2$
             //
-            + "   startIndex         INTEGER NOT NULL,                                       \n" //$NON-NLS-1$
-            + "   endIndex          INTEGER NOT NULL,                                       \n" //$NON-NLS-1$
-            + "   label            VARCHAR(" + TourReference.DB_LENGTH_LABEL + ")            \n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   startIndex           INTEGER NOT NULL,                                  \n" //$NON-NLS-1$
+            + "   endIndex             INTEGER NOT NULL,                                  \n" //$NON-NLS-1$
+            + "   label                VARCHAR(" + TourReference.DB_LENGTH_LABEL + ")     \n" //$NON-NLS-1$ //$NON-NLS-2$
             + ")"); //$NON-NLS-1$
    }
 
@@ -3260,21 +3432,27 @@ public class TourDatabase {
       /**
        * Create table: TOURDATA_TOURTAG
        */
-      exec(stmt, "CREATE TABLE " + JOINTABLE__TOURDATA__TOURTAG + "   (                   \n" //$NON-NLS-1$ //$NON-NLS-2$
-      //
-            + "   " + KEY_TAG + "      BIGINT NOT NULL,                                   \n"//$NON-NLS-1$ //$NON-NLS-2$
-            + "   " + KEY_TOUR + "     BIGINT NOT NULL                                    \n"//$NON-NLS-1$ //$NON-NLS-2$
-            //
-            + ")"); //$NON-NLS-1$
+      exec(stmt,
+
+            "CREATE TABLE " + JOINTABLE__TOURDATA__TOURTAG + "   (                        \n" //$NON-NLS-1$ //$NON-NLS-2$
+
+                  + "   " + KEY_TAG + "      BIGINT NOT NULL,                             \n"//$NON-NLS-1$ //$NON-NLS-2$
+                  + "   " + KEY_TOUR + "     BIGINT NOT NULL                              \n"//$NON-NLS-1$ //$NON-NLS-2$
+
+                  + ")"); //$NON-NLS-1$
 
       // Add Constraint
-      final String fkName = "fk_" + JOINTABLE__TOURDATA__TOURTAG + "_" + KEY_TOUR; //        //$NON-NLS-1$ //$NON-NLS-2$
-      exec(
-            stmt,
+      final String fkName = "fk_" + JOINTABLE__TOURDATA__TOURTAG + "_" + KEY_TOUR; //         //$NON-NLS-1$ //$NON-NLS-2$
+
+      exec(stmt,
+
             "ALTER TABLE " + JOINTABLE__TOURDATA__TOURTAG + "                             \n" //$NON-NLS-1$ //$NON-NLS-2$
                   + "   ADD CONSTRAINT " + fkName + "                                     \n" //$NON-NLS-1$ //$NON-NLS-2$
                   + "   FOREIGN KEY (" + KEY_TOUR + ")                                    \n" //$NON-NLS-1$ //$NON-NLS-2$
                   + "   REFERENCES " + TABLE_TOUR_DATA + " (" + ENTITY_ID_TOUR + ")       "); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
+      // Create index TOURTAG_TAGID
+      SQL.CreateIndex(stmt, JOINTABLE__TOURDATA__TOURTAG, KEY_TAG);
    }
 
    /**
@@ -3287,19 +3465,19 @@ public class TourDatabase {
     */
    private void createTable_TourTag_Category(final Statement stmt) throws SQLException {
 
-      /*
+      /**
        * Create table: TOURTAGCATEGORY
        */
-      exec(stmt, "CREATE TABLE " + TABLE_TOUR_TAG_CATEGORY + "   (                        \n" //$NON-NLS-1$ //$NON-NLS-2$
+      exec(stmt, "CREATE TABLE " + TABLE_TOUR_TAG_CATEGORY + "   (                                    \n" //$NON-NLS-1$ //$NON-NLS-2$
       //
             + SQL.CreateField_EntityId(ENTITY_ID_TAG_CATEGORY, true)
             //
-            + "   isRoot               INTEGER,                                           \n" //$NON-NLS-1$
-            + "   name                 VARCHAR(" + TourTag.DB_LENGTH_NAME + "),           \n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   isRoot               INTEGER,                                                       \n" //$NON-NLS-1$
+            + "   name                 VARCHAR(" + TourTag.DB_LENGTH_NAME + "),                       \n" //$NON-NLS-1$ //$NON-NLS-2$
 
             // version 38 start
             //
-            + "   notes                VARCHAR(" + TourTag.DB_LENGTH_NOTES + ")           \n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   notes                VARCHAR(" + TourTag.DB_LENGTH_NOTES + ")                       \n" //$NON-NLS-1$ //$NON-NLS-2$
             //
             // version 38 end ---------
 
@@ -3307,28 +3485,28 @@ public class TourDatabase {
             + ")" //$NON-NLS-1$
       );
 
-      /*
+      /**
        * Create table: TOURTAGCATEGORY_TOURTAG
        */
       final String jtabTag = JOINTABLE__TOURTAGCATEGORY_TOURTAG;
 
-      exec(stmt, "CREATE TABLE " + jtabTag + "   (                                        \n" //$NON-NLS-1$ //$NON-NLS-2$
+      exec(stmt, "CREATE TABLE " + jtabTag + "   (                                                    \n" //$NON-NLS-1$ //$NON-NLS-2$
       //
-            + "   " + KEY_TAG + "               BIGINT NOT NULL,                          \n"//$NON-NLS-1$ //$NON-NLS-2$
-            + "   " + KEY_TAG_CATEGORY + "      BIGINT NOT NULL                           \n"//$NON-NLS-1$ //$NON-NLS-2$
+            + "   " + KEY_TAG + "               BIGINT NOT NULL,                                      \n"//$NON-NLS-1$ //$NON-NLS-2$
+            + "   " + KEY_TAG_CATEGORY + "      BIGINT NOT NULL                                       \n"//$NON-NLS-1$ //$NON-NLS-2$
             //
             + ")"); //$NON-NLS-1$
 
       // add constraints
-      final String fkTag = "fk_" + jtabTag + "_" + KEY_TAG; //                                              //$NON-NLS-1$ //$NON-NLS-2$
-      final String fkCat = "fk_" + jtabTag + "_" + TABLE_TOUR_TAG_CATEGORY + "_" + KEY_TAG_CATEGORY; //     //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      final String fkTag = "fk_" + jtabTag + "_" + KEY_TAG; //                                           //$NON-NLS-1$ //$NON-NLS-2$
+      final String fkCat = "fk_" + jtabTag + "_" + TABLE_TOUR_TAG_CATEGORY + "_" + KEY_TAG_CATEGORY; //  //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
       exec(
             stmt,
-            "ALTER TABLE " + jtabTag + "                                                  \n"//$NON-NLS-1$ //$NON-NLS-2$
-                  + "   ADD CONSTRAINT " + fkTag + "                                      \n"//$NON-NLS-1$ //$NON-NLS-2$
-                  + "   FOREIGN KEY (" + KEY_TAG + ")                                     \n"//$NON-NLS-1$ //$NON-NLS-2$
-                  + "   REFERENCES " + TABLE_TOUR_TAG + " (" + ENTITY_ID_TAG + ")         \n"//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            "ALTER TABLE " + jtabTag + "                                                              \n"//$NON-NLS-1$ //$NON-NLS-2$
+                  + "   ADD CONSTRAINT " + fkTag + "                                                  \n"//$NON-NLS-1$ //$NON-NLS-2$
+                  + "   FOREIGN KEY (" + KEY_TAG + ")                                                 \n"//$NON-NLS-1$ //$NON-NLS-2$
+                  + "   REFERENCES " + TABLE_TOUR_TAG + " (" + ENTITY_ID_TAG + ")                     \n"//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
       );
 
       exec(
@@ -3339,21 +3517,21 @@ public class TourDatabase {
                   + "   REFERENCES " + TABLE_TOUR_TAG_CATEGORY + " (" + ENTITY_ID_TAG_CATEGORY + ")   \n"//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
       );
 
-      /*
+      /**
        * Create table: TOURTAGCATEGORY_TOURTAGCATEGORY
        */
       final String jtabCategory = JOINTABLE__TOURTAGCATEGORY_TOURTAGCATEGORY;
 
-      exec(stmt, "CREATE TABLE " + jtabCategory + "   (                                   \n"//$NON-NLS-1$ //$NON-NLS-2$
+      exec(stmt, "CREATE TABLE " + jtabCategory + "   (                                               \n"//$NON-NLS-1$ //$NON-NLS-2$
       //
-            + "   " + KEY_TAG_CATEGORY + "1   BIGINT NOT NULL,                            \n"//$NON-NLS-1$ //$NON-NLS-2$
-            + "   " + KEY_TAG_CATEGORY + "2   BIGINT NOT NULL                             \n"//$NON-NLS-1$ //$NON-NLS-2$
+            + "   " + KEY_TAG_CATEGORY + "1   BIGINT NOT NULL,                                        \n"//$NON-NLS-1$ //$NON-NLS-2$
+            + "   " + KEY_TAG_CATEGORY + "2   BIGINT NOT NULL                                         \n"//$NON-NLS-1$ //$NON-NLS-2$
             //
             + ")"); //$NON-NLS-1$
 
       // add constraints
-      final String fk1 = "fk_" + jtabCategory + "_" + KEY_TAG_CATEGORY + "1"; //             //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-      final String fk2 = "fk_" + jtabCategory + "_" + KEY_TAG_CATEGORY + "2"; //             //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      final String fk1 = "fk_" + jtabCategory + "_" + KEY_TAG_CATEGORY + "1"; //                         //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      final String fk2 = "fk_" + jtabCategory + "_" + KEY_TAG_CATEGORY + "2"; //                         //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
       exec(
             stmt,
@@ -4706,7 +4884,7 @@ public class TourDatabase {
           * data structure in the programm code MUST be the same as in the database.
           */
          if (isPostUpdate5) {
-            TourDatabase.computeComputedValuesForAllTours(splashManager);
+            TourDatabase.computeAnyValues_ForAllTours(splashManager);
             TourManager.getInstance().removeAllToursFromCache();
          }
          if (isPostUpdate9) {
@@ -7131,6 +7309,13 @@ public class TourDatabase {
 
             // Add new columns
             SQL.AddCol_VarCar   (stmt, TABLE_TOUR_DATA, "power_DataSource",  TourData.DB_LENGTH_POWER_DATA_SOURCE);   //$NON-NLS-1$
+            SQL.AddCol_Int      (stmt, TABLE_TOUR_DATA, "cadenceZone_SlowTime", DEFAULT_0);//$NON-NLS-1$
+            SQL.AddCol_Int      (stmt, TABLE_TOUR_DATA, "cadenceZone_FastTime", DEFAULT_0); //$NON-NLS-1$
+            SQL.AddCol_Int      (stmt, TABLE_TOUR_DATA, "cadenceZones_DelimiterValue", DEFAULT_0); //$NON-NLS-1$
+            SQL.AddCol_Int      (stmt, TABLE_TOUR_DATA, "avgAltitudeChange", DEFAULT_0); //$NON-NLS-1$
+
+            // Create index in table: TOURDATA_TOURTAG - Index: TOURTAG_TAGID
+            SQL.CreateIndex(  stmt, JOINTABLE__TOURDATA__TOURTAG, KEY_TAG);
 
 // SET_FORMATTING_ON
          }
@@ -7269,4 +7454,3 @@ public class TourDatabase {
    }
 
 }
-

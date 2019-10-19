@@ -130,6 +130,7 @@ public class UI {
    public static final String       SYMBOL_AVERAGE                = "\u00f8";   //$NON-NLS-1$
    public static final String       SYMBOL_AVERAGE_WITH_SPACE     = "\u00f8 ";  //$NON-NLS-1$
    public static final String       SYMBOL_BOX                    = "\u25a0";   //$NON-NLS-1$
+   public static final String       SYMBOL_BULLET                 = "\u2022";   //$NON-NLS-1$
    public static final String       SYMBOL_DASH                   = "\u2212";   //$NON-NLS-1$
    public static final String       SYMBOL_DEGREE                 = "\u00B0";   //$NON-NLS-1$
    public static final String       SYMBOL_DBL_ANGLE_QMARK_LEFT   = "\u00AB";   //$NON-NLS-1$
@@ -245,6 +246,7 @@ public class UI {
    public static String       UNIT_LABEL_TEMPERATURE;
    public static String       UNIT_LABEL_SPEED;
    public static String       UNIT_LABEL_PACE;
+   public static String       UNIT_LABEL_WEIGHT;
 
    public static final String UNIT_LABEL_TIME      = "h";      //$NON-NLS-1$
    public static final String UNIT_LABEL_DIRECTION = "\u00B0"; //$NON-NLS-1$
@@ -252,10 +254,14 @@ public class UI {
    public static float        UNIT_VALUE_TEMPERATURE;
 
    // (Celcius * 9/5) + 32 = Fahrenheit
-   public static final float UNIT_FAHRENHEIT_MULTI = 1.8f;
-   public static final float UNIT_FAHRENHEIT_ADD   = 32;
+   public static final float UNIT_FAHRENHEIT_MULTI  = 1.8f;
+   public static final float UNIT_FAHRENHEIT_ADD    = 32;
 
-   public static final float UNIT_METER_TO_INCHES  = 39.37007874f;
+   public static final float UNIT_METER_TO_INCHES   = 39.37007874f;
+
+   public static float       UNIT_VALUE_WEIGHT;
+
+   public static final float UNIT_KILOGRAM_TO_POUND = 2.204623f;
 
    /*
     * Labels for the different measurement systems
@@ -289,6 +295,7 @@ public class UI {
    public static final String          UNIT_POWER                 = "Watt";                     //$NON-NLS-1$
    public static final String          UNIT_POWER_SHORT           = "W";                        //$NON-NLS-1$
    public static final String          UNIT_WEIGHT_KG             = "kg";                       //$NON-NLS-1$
+   public static final String          UNIT_WEIGHT_LBS            = "lbs";                      //$NON-NLS-1$
 
    public static final PeriodFormatter DEFAULT_DURATION_FORMATTER;
    public static final PeriodFormatter DEFAULT_DURATION_FORMATTER_SHORT;
@@ -497,6 +504,9 @@ public class UI {
     */
 //	private static final int	VERTICAL_DIALOG_UNITS_PER_CHAR	= 8;
 
+   /**
+    * @param sash
+    */
    public static void addSashColorHandler(final Sash sash) {
 
       sash.addMouseTrackListener(new MouseTrackListener() {
@@ -581,6 +591,33 @@ public class UI {
 
       final int oldValue = spinner.getSelection();
       spinner.setSelection(oldValue + valueAdjustment);
+   }
+
+   /**
+    * @param bodyWeight
+    * @return Returns the weight in the current measurement system.
+    */
+   public static float convertBodyWeightFromMetric(final float bodyWeight) {
+
+      if (UNIT_VALUE_WEIGHT == 1) {
+         return bodyWeight;
+      }
+
+      return bodyWeight * UNIT_KILOGRAM_TO_POUND;
+   }
+
+   /**
+    * @param weight
+    * @return Returns the weight from the current measurement system converted into metric
+    *         system.
+    */
+   public static float convertBodyWeightToMetric(final float weight) {
+
+      if (UNIT_VALUE_WEIGHT == 1) {
+         return weight;
+      }
+
+      return weight / UNIT_KILOGRAM_TO_POUND;
    }
 
    /**

@@ -248,6 +248,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    public static final boolean STATE_IS_MERGE_TRACKS_DEFAULT              = false;
    public static final String  STATE_IS_IGNORE_INVALID_FILE               = "isIgnoreInvalidFile";                                            //$NON-NLS-1$
    public static final boolean STATE_IS_IGNORE_INVALID_FILE_DEFAULT       = true;
+   public static final String  STATE_IS_SET_BODY_WEIGHT                   = "isSetBodyWeight";                                                //$NON-NLS-1$
+   public static final boolean STATE_IS_SET_BODY_WEIGHT_DEFAULT           = true;
    //
    private static final String HREF_TOKEN                                 = "#";                                                              //$NON-NLS-1$
    private static final String PAGE_ABOUT_BLANK                           = "about:blank";                                                    //$NON-NLS-1$
@@ -341,7 +343,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private ActionOpenMarkerDialog         _actionOpenMarkerDialog;
    private ActionOpenAdjustAltitudeDialog _actionOpenAdjustAltitudeDialog;
    private ActionOpenPrefDialog           _actionEditImportPreferences;
-   private ActionReimportSubMenu          _actionReimportSubMenu;
+   private Action_Reimport_SubMenu        _actionReimportSubMenu;
    private ActionRemoveTour               _actionRemoveTour;
    private ActionRemoveToursWhenClosed    _actionRemoveToursWhenClosed;
    private ActionSaveTourInDatabase       _actionSaveTour;
@@ -1020,7 +1022,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       _actionOpenTourLogView = new ActionOpenTourLogView();
       _actionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
       _actionOpenTour = new ActionOpenTour(this);
-      _actionReimportSubMenu = new ActionReimportSubMenu(this);
+      _actionReimportSubMenu = new Action_Reimport_SubMenu(this);
       _actionRemoveTour = new ActionRemoveTour(this);
       _actionRemoveToursWhenClosed = new ActionRemoveToursWhenClosed();
       _actionSaveTour = new ActionSaveTourInDatabase(this, false);
@@ -3473,7 +3475,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       tourData.setTourPerson(person);
 
       // set weight from person
-      tourData.setBodyWeight(person.getWeight());
+      if (_rawDataMgr.isSetBodyWeight()) {
+         tourData.setBodyWeight(person.getWeight());
+      }
 
       tourData.setTourBike(person.getTourBike());
 
@@ -3723,7 +3727,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       TourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, this, true);
 
       // tour tag actions
-      _tagMenuManager.fillTagMenu(menuMgr);
+      _tagMenuManager.fillTagMenu(menuMgr, true);
 
       // add standard group which allows other plug-ins to contribute here
       menuMgr.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
@@ -4585,6 +4589,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       final boolean isIgnoreInvalidFile = _state.getBoolean(STATE_IS_IGNORE_INVALID_FILE);
       _rawDataMgr.setState_IsIgnoreInvalidFile(isIgnoreInvalidFile);
 
+      // restore: set body weight status before the tours are imported
+      final boolean isSetBodyWeight = Util.getStateBoolean(_state, STATE_IS_SET_BODY_WEIGHT, STATE_IS_SET_BODY_WEIGHT_DEFAULT);
+      _rawDataMgr.setState_IsSetBodyWeight(isSetBodyWeight);
+
       // auto open import log view
       final boolean isAutoOpenLogView = Util.getStateBoolean(_state, //
             STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW,
@@ -4865,7 +4873,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          // skip tours which avg temperature is above the minimum avg temperature
          if (oldTourAvgTemperature > avgMinimumTemperature) {
 
-            TourLogManager.logSubError(String.format(
+            TourLogManager.subLog_Error(String.format(
                   TourManager.LOG_TEMP_ADJUST_006_IS_ABOVE_TEMPERATURE,
                   TourManager.getTourDateTimeShort(tourData),
                   oldTourAvgTemperature,
@@ -5170,7 +5178,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          final Table table = _tourViewer.getTable();
 
          if (table.isDisposed()) {
-            
+
             // this occured when testing
             return;
          }

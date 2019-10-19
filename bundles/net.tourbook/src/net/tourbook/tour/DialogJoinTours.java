@@ -325,7 +325,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
             final Set<TourTag> joinedTourTags = _joinedTourData.getTourTags();
             final boolean isTagInTour = joinedTourTags != null && joinedTourTags.size() > 0;
 
-            _tagMenuMgr.fillTagMenu(menuMgr);
+            _tagMenuMgr.fillTagMenu(menuMgr, false);
             _tagMenuMgr.enableTagActions(true, isTagInTour, joinedTourTags);
          }
       });
