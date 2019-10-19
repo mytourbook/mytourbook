@@ -73,6 +73,7 @@ public class TVICompareResultComparedTour extends TVICompareResultItem {
    int   dbEndIndex;
 
    float dbSpeed;
+   int   dbRecordingTime;
 
    /*
     * the moved... fields contain the position of the compared tour when the user moved the

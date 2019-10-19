@@ -62,6 +62,9 @@ New + Improvements
 * Dialog Quick Edit
   - Edit tour start/end location 
 
+* Reference Tours
+  - Show recording time
+
   
 Import
 ======

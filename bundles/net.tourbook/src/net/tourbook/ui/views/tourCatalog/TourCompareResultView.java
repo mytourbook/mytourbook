@@ -281,6 +281,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
                         compareTourItem.dbEndIndex = compareTourProperty.endIndex;
 
                         compareTourItem.dbSpeed = compareTourProperty.speed;
+                        compareTourItem.dbRecordingTime = compareTourProperty.recordingTime;
 
                      } else {
 
@@ -1557,6 +1558,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
          removedTourItem.dbStartIndex = -1;
          removedTourItem.dbEndIndex = -1;
          removedTourItem.dbSpeed = 0;
+         removedTourItem.dbRecordingTime = 0;
 
 //         removedTourItem.movedStartIndex = -1;
 //         removedTourItem.movedEndIndex = -1;
