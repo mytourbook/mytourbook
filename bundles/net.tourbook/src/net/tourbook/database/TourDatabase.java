@@ -7392,14 +7392,27 @@ public class TourDatabase {
       result = stmtSelect.executeQuery();
 
       int compTourCounter = 0;
+      long lastUpdateTime = startTime;
 
       while (result.next()) {
 
          if (splashManager != null) {
-            splashManager.setMessage(
-                  NLS.bind(//
-                        Messages.Tour_Database_PostUpdate_040_SetTourRecordingTime,
-                        new Object[] { ++compTourCounter, numberOfComparedTours }));
+
+            ++compTourCounter;
+
+            final long currentTime = System.currentTimeMillis();
+            final float timeDiff = currentTime - lastUpdateTime;
+
+            // reduce logging
+            if (timeDiff > 500) {
+
+               lastUpdateTime = currentTime;
+
+               splashManager.setMessage(
+                     NLS.bind(
+                           Messages.Tour_Database_PostUpdate_040_SetTourRecordingTime,
+                           new Object[] { compTourCounter, numberOfComparedTours }));
+            }
          }
 
          final long compareId = result.getLong(1);
