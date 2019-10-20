@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -65,914 +65,918 @@ import org.eclipse.ui.part.PageBook;
 
 public class TourCatalogView_ComparedTour extends TourChartViewPart implements ISynchedChart, ITourChartViewer {
 
-	public static final String					ID				= "net.tourbook.views.tourCatalog.comparedTourView";	//$NON-NLS-1$
+   public static final String    ID     = "net.tourbook.views.tourCatalog.comparedTourView"; //$NON-NLS-1$
 
-	private final IDialogSettings				_state			= TourbookPlugin.getState(ID);
+   private final IDialogSettings _state = TourbookPlugin.getState(ID);
 
-	private boolean								_isInRefTourChanged;
-	private boolean								_isInSelectionChanged;
+   private boolean               _isInRefTourChanged;
+   private boolean               _isInSelectionChanged;
 
-	/*
-	 * keep data from the reference tour view
-	 */
-	private long								_refTourRefId	= -1;
-	private TourChart							_refTourTourChart;
+   /*
+    * keep data from the reference tour view
+    */
+   private long      _refTourRefId = -1;
+   private TourChart _refTourTourChart;
 
-	private double								_refTourXMarkerValueDifference;
+   private double    _refTourXMarkerValueDifference;
 
-	private boolean								_isGeoCompareRefTour;
+   private boolean   _isGeoCompareRefTour;
 
-	/*
-	 * CT ... (c)ompared (t)our which is displayed in this view
-	 */
+   /*
+    * CT ... (c)ompared (t)our which is displayed in this view
+    */
 
-	/**
-	 * Key for the {@link TourCompared} instance or <code>-1</code> when it's not saved in the
-	 * database
-	 */
-	private long								_ctCompareId	= -1;
+   /**
+    * Key for the {@link TourCompared} instance or <code>-1</code> when it's not saved in the
+    * database
+    */
+   private long                              _ctCompareId = -1;
 
-	/**
-	 * Tour Id for the displayed compared tour
-	 */
-	private long								_ctTourId		= -1;
+   /**
+    * Tour Id for the displayed compared tour
+    */
+   private long                              _ctTourId    = -1;
 
-	/**
-	 * Reference Id for the displayed compared tour
-	 */
-	private long								_ctRefId		= -1;
+   /**
+    * Reference Id for the displayed compared tour
+    */
+   private long                              _ctRefId     = -1;
 
-	/**
-	 * Reference tour chart for the displayed compared tour, chart is used for the synchronization
-	 */
-	private TourChart							_ctRefTourChart;
+   /**
+    * Reference tour chart for the displayed compared tour, chart is used for the synchronization
+    */
+   private TourChart                         _ctRefTourChart;
 
-	private PageBook							_pageBook;
-	private Composite							_pageNoData;
+   private PageBook                          _pageBook;
+   private Composite                         _pageNoData;
 
-	private ITourEventListener					_refTourPropertyListener;
+   private ITourEventListener                _refTourPropertyListener;
 
-	private ActionSynchChartHorizontalByScale	_actionSynchChartsByScale;
-	private ActionSynchChartHorizontalBySize	_actionSynchChartsBySize;
+   private ActionSynchChartHorizontalByScale _actionSynchChartsByScale;
+   private ActionSynchChartHorizontalBySize  _actionSynchChartsBySize;
 
-	private ActionNavigatePreviousTour			_actionNavigatePrevTour;
-	private ActionNavigateNextTour				_actionNavigateNextTour;
-	private ActionSaveComparedTour				_actionSaveComparedTour;
-	private ActionUndoChanges					_actionUndoChanges;
+   private ActionNavigatePreviousTour        _actionNavigatePrevTour;
+   private ActionNavigateNextTour            _actionNavigateNextTour;
+   private ActionSaveComparedTour            _actionSaveComparedTour;
+   private ActionUndoChanges                 _actionUndoChanges;
 
-	private boolean								_isDataDirty;
+   private boolean                           _isDataDirty;
 
-	/*
-	 * 3 positons for the marker are available: computed, default(saved) and moved
-	 */
-	private int									_movedStartIndex;
-	private int									_movedEndIndex;
+   /*
+    * 3 positons for the marker are available: computed, default(saved) and moved
+    */
+   private int    _movedStartIndex;
+   private int    _movedEndIndex;
 
-	private int									_computedStartIndex;
-	private int									_computedEndIndex;
+   private int    _computedStartIndex;
+   private int    _computedEndIndex;
 
-	private int									_defaultStartIndex;
-	private int									_defaultEndIndex;
+   private int    _defaultStartIndex;
+   private int    _defaultEndIndex;
 
-	/**
-	 * object for the currently displayed compared tour
-	 */
-	private Object								_comparedTourItem;
+   /**
+    * object for the currently displayed compared tour
+    */
+   private Object _comparedTourItem;
 
-	private class ActionNavigateNextTour extends Action {
+   private class ActionNavigateNextTour extends Action {
 
-		public ActionNavigateNextTour() {
+      public ActionNavigateNextTour() {
 
-			super(null, AS_PUSH_BUTTON);
+         super(null, AS_PUSH_BUTTON);
 
-			setToolTipText(Messages.TourCatalog_View_Action_NavigateNextTour);
+         setToolTipText(Messages.TourCatalog_View_Action_NavigateNextTour);
 
-			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__Navigate_Previous));
-			setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__save_disabled));
-		}
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__Navigate_Previous));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__save_disabled));
+      }
 
-		@Override
-		public void run() {
-			actionNavigateTour(true);
-		}
-	}
+      @Override
+      public void run() {
+         actionNavigateTour(true);
+      }
+   }
 
-	private class ActionNavigatePreviousTour extends Action {
+   private class ActionNavigatePreviousTour extends Action {
 
-		public ActionNavigatePreviousTour() {
+      public ActionNavigatePreviousTour() {
 
-			super(null, AS_PUSH_BUTTON);
+         super(null, AS_PUSH_BUTTON);
 
-			setToolTipText(Messages.TourCatalog_View_Action_NavigatePrevTour);
+         setToolTipText(Messages.TourCatalog_View_Action_NavigatePrevTour);
 
-			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__Navigate_Next));
-			setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__save_disabled));
-		}
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__Navigate_Next));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__save_disabled));
+      }
 
-		@Override
-		public void run() {
-			actionNavigateTour(false);
-		}
-	}
+      @Override
+      public void run() {
+         actionNavigateTour(false);
+      }
+   }
 
-	private class ActionSaveComparedTour extends Action {
+   private class ActionSaveComparedTour extends Action {
 
-		public ActionSaveComparedTour() {
+      public ActionSaveComparedTour() {
 
-			super(null, AS_PUSH_BUTTON);
+         super(null, AS_PUSH_BUTTON);
 
-			setToolTipText(Messages.tourCatalog_view_action_save_marker);
+         setToolTipText(Messages.tourCatalog_view_action_save_marker);
 
-			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__save));
-			setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__save_disabled));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__save));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__save_disabled));
 
-			setEnabled(false);
-		}
+         setEnabled(false);
+      }
 
-		@Override
-		public void run() {
-			saveComparedTour();
-		}
-	}
+      @Override
+      public void run() {
+         saveComparedTour();
+      }
+   }
 
-	private class ActionUndoChanges extends Action {
+   private class ActionUndoChanges extends Action {
 
-		public ActionUndoChanges() {
+      public ActionUndoChanges() {
 
-			super(null, AS_PUSH_BUTTON);
+         super(null, AS_PUSH_BUTTON);
 
-			setToolTipText(Messages.tourCatalog_view_action_undo_marker_position);
+         setToolTipText(Messages.tourCatalog_view_action_undo_marker_position);
 
-			setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__undo_edit));
-			setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__undo_edit_disabled));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__undo_edit));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__undo_edit_disabled));
 
-			setEnabled(false);
-		}
+         setEnabled(false);
+      }
 
-		@Override
-		public void run() {
-			undoChanges();
-		}
-	}
+      @Override
+      public void run() {
+         undoChanges();
+      }
+   }
 
-	private void actionNavigateTour(final boolean isNextTour) {
+   private void actionNavigateTour(final boolean isNextTour) {
 
-		boolean isNavigated = false;
+      boolean isNavigated = false;
 
-		final Object navigatedTour = TourCompareManager.getInstance().navigateTour(isNextTour);
+      final Object navigatedTour = TourCompareManager.getInstance().navigateTour(isNextTour);
 
-		if (navigatedTour instanceof TVICatalogComparedTour) {
+      if (navigatedTour instanceof TVICatalogComparedTour) {
 
-			isNavigated = true;
-			updateTourChart((TVICatalogComparedTour) navigatedTour);
+         isNavigated = true;
+         updateTourChart((TVICatalogComparedTour) navigatedTour);
 
-		} else if (navigatedTour instanceof TVICompareResultComparedTour) {
+      } else if (navigatedTour instanceof TVICompareResultComparedTour) {
 
-			isNavigated = true;
-			updateTourChart((TVICompareResultComparedTour) navigatedTour);
-		}
+         isNavigated = true;
+         updateTourChart((TVICompareResultComparedTour) navigatedTour);
+      }
 
-		if (isNavigated) {
+      if (isNavigated) {
 
-			// fire selection
-			_postSelectionProvider.setSelection(new StructuredSelection(navigatedTour));
-		}
-	}
+         // fire selection
+         _postSelectionProvider.setSelection(new StructuredSelection(navigatedTour));
+      }
+   }
 
-	private void addRefTourPropertyListener() {
+   private void addRefTourPropertyListener() {
 
-		_refTourPropertyListener = new ITourEventListener() {
-			@Override
-			public void tourChanged(final IWorkbenchPart part,
-									final TourEventId propertyId,
-									final Object propertyData) {
+      _refTourPropertyListener = new ITourEventListener() {
+         @Override
+         public void tourChanged(final IWorkbenchPart part,
+                                 final TourEventId propertyId,
+                                 final Object propertyData) {
 
-				if (propertyId == TourEventId.REFERENCE_TOUR_CHANGED
-						&& propertyData instanceof TourPropertyRefTourChanged) {
+            if (propertyId == TourEventId.REFERENCE_TOUR_CHANGED
+                  && propertyData instanceof TourPropertyRefTourChanged) {
 
-					/*
-					 * reference tour changed
-					 */
+               /*
+                * reference tour changed
+                */
 
-					final TourPropertyRefTourChanged tourProperty = (TourPropertyRefTourChanged) propertyData;
+               final TourPropertyRefTourChanged tourProperty = (TourPropertyRefTourChanged) propertyData;
 
-					_refTourRefId = tourProperty.refId;
-					_refTourTourChart = tourProperty.refTourChart;
-					_refTourXMarkerValueDifference = tourProperty.xMarkerValue;
+               _refTourRefId = tourProperty.refId;
+               _refTourTourChart = tourProperty.refTourChart;
+               _refTourXMarkerValueDifference = tourProperty.xMarkerValue;
 
-					_isInRefTourChanged = true;
-					{
-						if (updateTourChart() == false) {
-							enableSynchronization();
-						}
-					}
-					_isInRefTourChanged = false;
-				}
-			}
-		};
+               _isInRefTourChanged = true;
+               {
+                  if (updateTourChart() == false) {
+                     enableSynchronization();
+                  }
+               }
+               _isInRefTourChanged = false;
+            }
+         }
+      };
 
-		TourManager.getInstance().addTourEventListener(_refTourPropertyListener);
-	}
+      TourManager.getInstance().addTourEventListener(_refTourPropertyListener);
+   }
 
-	private void createActions() {
+   private void createActions() {
 
-		_actionSynchChartsBySize = new ActionSynchChartHorizontalBySize(this);
-		_actionSynchChartsByScale = new ActionSynchChartHorizontalByScale(this);
+      _actionSynchChartsBySize = new ActionSynchChartHorizontalBySize(this);
+      _actionSynchChartsByScale = new ActionSynchChartHorizontalByScale(this);
 
-		_actionNavigatePrevTour = new ActionNavigatePreviousTour();
-		_actionNavigateNextTour = new ActionNavigateNextTour();
-		_actionSaveComparedTour = new ActionSaveComparedTour();
-		_actionUndoChanges = new ActionUndoChanges();
-	}
+      _actionNavigatePrevTour = new ActionNavigatePreviousTour();
+      _actionNavigateNextTour = new ActionNavigateNextTour();
+      _actionSaveComparedTour = new ActionSaveComparedTour();
+      _actionUndoChanges = new ActionUndoChanges();
+   }
 
-	@Override
-	public void createPartControl(final Composite parent) {
+   @Override
+   public void createPartControl(final Composite parent) {
 
-		super.createPartControl(parent);
+      super.createPartControl(parent);
 
-		_pageBook = new PageBook(parent, SWT.NONE);
+      _pageBook = new PageBook(parent, SWT.NONE);
 
-		_pageNoData = UI.createUI_PageNoData(_pageBook, Messages.UI_Label_no_chart_is_selected);
+      _pageNoData = UI.createUI_PageNoData(_pageBook, Messages.UI_Label_no_chart_is_selected);
 
-		createTourChart();
-		createActions();
+      createTourChart();
+      createActions();
 
-		fillToolbar();
+      fillToolbar();
 
-		addRefTourPropertyListener();
+      addRefTourPropertyListener();
 
-		_pageBook.showPage(_pageNoData);
+      _pageBook.showPage(_pageNoData);
 
-		// show current selected tour
-		final ISelection selection = getSite().getWorkbenchWindow().getSelectionService().getSelection();
-		if (selection != null) {
-			onSelectionChanged(selection);
-		}
+      // show current selected tour
+      final ISelection selection = getSite().getWorkbenchWindow().getSelectionService().getSelection();
+      if (selection != null) {
+         onSelectionChanged(selection);
+      }
 
-		enableSynchronization();
-	}
+      enableSynchronization();
+   }
 
-	private void createTourChart() {
+   private void createTourChart() {
 
-		_tourChart = new TourChart(_pageBook, SWT.FLAT, getSite().getPart(), _state);
-		_tourChart.setShowZoomActions(true);
-		_tourChart.setShowSlider(true);
-		_tourChart.setToolBarManager(getViewSite().getActionBars().getToolBarManager(), true);
-		_tourChart.setContextProvider(new TourChartContextProvider(this));
-		_tourChart.setTourInfoActionsEnabled(true);
+      _tourChart = new TourChart(_pageBook, SWT.FLAT, getSite().getPart(), _state);
+      _tourChart.setShowZoomActions(true);
+      _tourChart.setShowSlider(true);
+      _tourChart.setToolBarManager(getViewSite().getActionBars().getToolBarManager(), true);
+      _tourChart.setContextProvider(new TourChartContextProvider(this));
+      _tourChart.setTourInfoActionsEnabled(true);
 
-		// fire a slider move selection when a slider was moved in the tour chart
-		_tourChart.addSliderMoveListener(new ISliderMoveListener() {
-			@Override
-			public void sliderMoved(final SelectionChartInfo chartInfoSelection) {
+      // fire a slider move selection when a slider was moved in the tour chart
+      _tourChart.addSliderMoveListener(new ISliderMoveListener() {
+         @Override
+         public void sliderMoved(final SelectionChartInfo chartInfoSelection) {
 
-				// prevent refireing selection
-				if (_isInSelectionChanged || _isInRefTourChanged) {
-					return;
-				}
+            // prevent refireing selection
+            if (_isInSelectionChanged || _isInRefTourChanged) {
+               return;
+            }
 
-				TourManager.fireEventWithCustomData(//
-						TourEventId.SLIDER_POSITION_CHANGED,
-						chartInfoSelection,
-						TourCatalogView_ComparedTour.this);
-			}
-		});
+            TourManager.fireEventWithCustomData(//
+                  TourEventId.SLIDER_POSITION_CHANGED,
+                  chartInfoSelection,
+                  TourCatalogView_ComparedTour.this);
+         }
+      });
 
-		_tourChart.addDataModelListener(new IDataModelListener() {
-			@Override
-			public void dataModelChanged(final ChartDataModel changedChartDataModel) {
+      _tourChart.addDataModelListener(new IDataModelListener() {
+         @Override
+         public void dataModelChanged(final ChartDataModel changedChartDataModel) {
 
-				if (_tourData == null) {
-					return;
-				}
+            if (_tourData == null) {
+               return;
+            }
 
-				final ChartDataXSerie xData = changedChartDataModel.getXData();
+            final ChartDataXSerie xData = changedChartDataModel.getXData();
 
-				/*
-				 * set synch marker position, this method is also called when a graph is
-				 * displayed/removed
-				 */
-				xData.setSynchMarkerValueIndex(_movedStartIndex, _movedEndIndex);
+            /*
+             * set synch marker position, this method is also called when a graph is
+             * displayed/removed
+             */
+            xData.setSynchMarkerValueIndex(_movedStartIndex, _movedEndIndex);
 
-				setRangeMarkers(xData);
+            setRangeMarkers(xData);
 
-				// set chart title
-				changedChartDataModel.setTitle(TourManager.getTourTitleDetailed(_tourData));
-			}
-		});
+            // set chart title
+            changedChartDataModel.setTitle(TourManager.getTourTitleDetailed(_tourData));
+         }
+      });
 
-		_tourChart.addXMarkerDraggingListener(new IChartListener() {
+      _tourChart.addXMarkerDraggingListener(new IChartListener() {
 
-			@Override
-			public double getXMarkerValueDiff() {
-				return _refTourXMarkerValueDifference;
-			}
+         @Override
+         public double getXMarkerValueDiff() {
+            return _refTourXMarkerValueDifference;
+         }
 
-			@Override
-			public void xMarkerMoved(final int movedXMarkerStartValueIndex, final int movedXMarkerEndValueIndex) {
-				onMoveSynchedMarker(movedXMarkerStartValueIndex, movedXMarkerEndValueIndex);
-			}
-		});
-	}
+         @Override
+         public void xMarkerMoved(final int movedXMarkerStartValueIndex, final int movedXMarkerEndValueIndex) {
+            onMoveSynchedMarker(movedXMarkerStartValueIndex, movedXMarkerEndValueIndex);
+         }
+      });
+   }
 
-	@Override
-	public void dispose() {
+   @Override
+   public void dispose() {
 
-		saveComparedTourDialog();
+      saveComparedTourDialog();
 
-		TourManager.getInstance().removeTourEventListener(_refTourPropertyListener);
+      TourManager.getInstance().removeTourEventListener(_refTourPropertyListener);
 
-		super.dispose();
-	}
+      super.dispose();
+   }
 
-	private void enableActions() {
+   private void enableActions() {
 
-		final boolean isNotMoved = _defaultStartIndex == _movedStartIndex && _defaultEndIndex == _movedEndIndex;
-		final boolean isMoved = isNotMoved == false;
+      final boolean isNotMoved = _defaultStartIndex == _movedStartIndex && _defaultEndIndex == _movedEndIndex;
+      final boolean isMoved = isNotMoved == false;
 
-		// geo compared with ref tour cannot be saved !
-		_actionSaveComparedTour.setEnabled(_isGeoCompareRefTour == false && (isMoved || _ctCompareId == -1));
-	}
+      // geo compared with ref tour cannot be saved !
+      _actionSaveComparedTour.setEnabled(_isGeoCompareRefTour == false && (isMoved || _ctCompareId == -1));
+   }
 
-	private void enableSynchronization() {
+   private void enableSynchronization() {
 
-		// check initial value
-		if (_ctRefId == -1) {
-			_actionSynchChartsByScale.setEnabled(false);
-			_actionSynchChartsBySize.setEnabled(false);
-			return;
-		}
+      // check initial value
+      if (_ctRefId == -1) {
+         _actionSynchChartsByScale.setEnabled(false);
+         _actionSynchChartsBySize.setEnabled(false);
+         return;
+      }
 
-		boolean isSynchEnabled = false;
+      boolean isSynchEnabled = false;
 
-		if (_ctRefId == _refTourRefId) {
+      if (_ctRefId == _refTourRefId) {
 
-			// reference tour for the compared chart is displayed
+         // reference tour for the compared chart is displayed
 
-			if (_ctRefTourChart != _refTourTourChart) {
-				_ctRefTourChart = _refTourTourChart;
-			}
+         if (_ctRefTourChart != _refTourTourChart) {
+            _ctRefTourChart = _refTourTourChart;
+         }
 
-			isSynchEnabled = true;
+         isSynchEnabled = true;
 
-		} else {
+      } else {
 
-			// another ref tour is displayed, disable synchronization
+         // another ref tour is displayed, disable synchronization
 
-			if (_ctRefTourChart != null) {
-				_ctRefTourChart.synchChart(false, _tourChart, Chart.SYNCH_MODE_NO);
-			}
-			_actionSynchChartsByScale.setChecked(false);
-			_actionSynchChartsBySize.setChecked(false);
-		}
+         if (_ctRefTourChart != null) {
+            _ctRefTourChart.synchChart(false, _tourChart, Chart.SYNCH_MODE_NO);
+         }
+         _actionSynchChartsByScale.setChecked(false);
+         _actionSynchChartsBySize.setChecked(false);
+      }
 
-		_actionSynchChartsByScale.setEnabled(isSynchEnabled);
-		_actionSynchChartsBySize.setEnabled(isSynchEnabled);
-	}
+      _actionSynchChartsByScale.setEnabled(isSynchEnabled);
+      _actionSynchChartsBySize.setEnabled(isSynchEnabled);
+   }
 
-	private void fillToolbar() {
-		
-		final IToolBarManager tbm = _tourChart.getToolBarManager();
+   private void fillToolbar() {
 
-		tbm.add(_actionNavigatePrevTour);
-		tbm.add(_actionNavigateNextTour);
-		tbm.add(_actionSaveComparedTour);
-		tbm.add(_actionUndoChanges);
+      final IToolBarManager tbm = _tourChart.getToolBarManager();
 
-		tbm.add(new Separator());
-		tbm.add(_actionSynchChartsByScale);
-		tbm.add(_actionSynchChartsBySize);
+      tbm.add(_actionNavigatePrevTour);
+      tbm.add(_actionNavigateNextTour);
+      tbm.add(_actionSaveComparedTour);
+      tbm.add(_actionUndoChanges);
 
-		tbm.update(true);
-	}
+      tbm.add(new Separator());
+      tbm.add(_actionSynchChartsByScale);
+      tbm.add(_actionSynchChartsBySize);
 
-	/**
-	 * update tour map and compare result view
-	 */
-	private void fireChangeEvent(final int startIndex, final int endIndex) {
+      tbm.update(true);
+   }
 
-		final float avgPulse = _tourData.computeAvg_PulseSegment(startIndex, endIndex);
-		final float speed = TourManager.computeTourSpeed(_tourData, startIndex, endIndex);
+   /**
+    * update tour map and compare result view
+    */
+   private void fireChangeEvent(final int startIndex, final int endIndex) {
 
-		fireChangeEvent(startIndex, endIndex, avgPulse, speed, false);
-	}
+      final float avgPulse = _tourData.computeAvg_PulseSegment(startIndex, endIndex);
+      final float speed = TourManager.computeTourSpeed(_tourData, startIndex, endIndex);
+      final int recordingTime = TourManager.computeTourRecordingTime(_tourData, startIndex, endIndex);
 
-	/**
-	 * update tour map and compare result view
-	 * 
-	 * @param startIndex
-	 * @param endIndex
-	 * @param speed
-	 * @param isDataSaved
-	 */
-	private void fireChangeEvent(	final int startIndex,
-									final int endIndex,
-									final float avgPulse,
-									final float speed,
-									final boolean isDataSaved) {
+      fireChangeEvent(startIndex, endIndex, avgPulse, speed, recordingTime, false);
+   }
 
-		final TourPropertyCompareTourChanged customData = new TourPropertyCompareTourChanged(
-				_ctCompareId,
-				startIndex,
-				endIndex,
-				isDataSaved,
-				_comparedTourItem);
+   /**
+    * update tour map and compare result view
+    *
+    * @param startIndex
+    * @param endIndex
+    * @param speed
+    * @param isDataSaved
+    */
+   private void fireChangeEvent(final int startIndex,
+                                final int endIndex,
+                                final float avgPulse,
+                                final float speed,
+                                final int recordingTime,
+                                final boolean isDataSaved) {
 
-		customData.avgPulse = avgPulse;
-		customData.speed = speed;
+      final TourPropertyCompareTourChanged customData = new TourPropertyCompareTourChanged(
+            _ctCompareId,
+            startIndex,
+            endIndex,
+            isDataSaved,
+            _comparedTourItem);
 
-		TourManager.fireEventWithCustomData(TourEventId.COMPARE_TOUR_CHANGED, customData, this);
-	}
+      customData.avgPulse = avgPulse;
+      customData.speed = speed;
+      customData.recordingTime = recordingTime;
 
-	@Override
-	public ArrayList<TourData> getSelectedTours() {
-		final ArrayList<TourData> selectedTours = new ArrayList<TourData>();
-		selectedTours.add(_tourData);
-		return selectedTours;
-	}
+      TourManager.fireEventWithCustomData(TourEventId.COMPARE_TOUR_CHANGED, customData, this);
+   }
 
-	@Override
-	public TourChart getTourChart() {
-		return _tourChart;
-	}
+   @Override
+   public ArrayList<TourData> getSelectedTours() {
+      final ArrayList<TourData> selectedTours = new ArrayList<>();
+      selectedTours.add(_tourData);
+      return selectedTours;
+   }
 
-	private void onMoveSynchedMarker(final int movedValueIndex, final int movedEndIndex) {
+   @Override
+   public TourChart getTourChart() {
+      return _tourChart;
+   }
 
-		// update the chart
-		final ChartDataModel chartDataModel = _tourChart.getChartDataModel();
-		final ChartDataXSerie xData = chartDataModel.getXData();
+   private void onMoveSynchedMarker(final int movedValueIndex, final int movedEndIndex) {
 
-		xData.setSynchMarkerValueIndex(movedValueIndex, movedEndIndex);
-		setRangeMarkers(xData);
+      // update the chart
+      final ChartDataModel chartDataModel = _tourChart.getChartDataModel();
+      final ChartDataXSerie xData = chartDataModel.getXData();
 
-		_tourChart.updateChart(chartDataModel, true);
+      xData.setSynchMarkerValueIndex(movedValueIndex, movedEndIndex);
+      setRangeMarkers(xData);
 
-		// keep marker position for saving the tour
-		_movedStartIndex = movedValueIndex;
-		_movedEndIndex = movedEndIndex;
+      _tourChart.updateChart(chartDataModel, true);
 
-		// check if the data are dirty
-		boolean isDataDirty;
-		if (_defaultStartIndex == _movedStartIndex && _defaultEndIndex == _movedEndIndex) {
-			isDataDirty = false;
-		} else {
-			isDataDirty = true;
-		}
-		setDataDirty(isDataDirty);
+      // keep marker position for saving the tour
+      _movedStartIndex = movedValueIndex;
+      _movedEndIndex = movedEndIndex;
 
-		fireChangeEvent(_movedStartIndex, _movedEndIndex);
-	}
+      // check if the data are dirty
+      boolean isDataDirty;
+      if (_defaultStartIndex == _movedStartIndex && _defaultEndIndex == _movedEndIndex) {
+         isDataDirty = false;
+      } else {
+         isDataDirty = true;
+      }
+      setDataDirty(isDataDirty);
 
-	private void onSelectionChanged(final ISelection selection) {
+      fireChangeEvent(_movedStartIndex, _movedEndIndex);
+   }
 
-		if (selection instanceof StructuredSelection) {
+   private void onSelectionChanged(final ISelection selection) {
 
-			final Object firstElement = ((StructuredSelection) selection).getFirstElement();
+      if (selection instanceof StructuredSelection) {
 
-			if (firstElement instanceof TVICatalogComparedTour) {
+         final Object firstElement = ((StructuredSelection) selection).getFirstElement();
 
-				updateTourChart((TVICatalogComparedTour) firstElement);
+         if (firstElement instanceof TVICatalogComparedTour) {
 
-			} else if (firstElement instanceof TVICompareResultComparedTour) {
+            updateTourChart((TVICatalogComparedTour) firstElement);
 
-				updateTourChart((TVICompareResultComparedTour) firstElement);
+         } else if (firstElement instanceof TVICompareResultComparedTour) {
 
-			} else if (firstElement instanceof GeoPartComparerItem) {
+            updateTourChart((TVICompareResultComparedTour) firstElement);
 
-				updateTourChart((GeoPartComparerItem) firstElement);
-			}
-		}
-	}
+         } else if (firstElement instanceof GeoPartComparerItem) {
 
-	@Override
-	protected void onSelectionChanged(final IWorkbenchPart part, final ISelection selection) {
+            updateTourChart((GeoPartComparerItem) firstElement);
+         }
+      }
+   }
 
-		if (part == TourCatalogView_ComparedTour.this) {
-			return;
-		}
+   @Override
+   protected void onSelectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
-		_isInSelectionChanged = true;
-		{
-			onSelectionChanged(selection);
-		}
-		_isInSelectionChanged = false;
-	}
+      if (part == TourCatalogView_ComparedTour.this) {
+         return;
+      }
 
-	/**
-	 * Persist the compared tours
-	 */
-	private void persistComparedTour() {
+      _isInSelectionChanged = true;
+      {
+         onSelectionChanged(selection);
+      }
+      _isInSelectionChanged = false;
+   }
 
-		final EntityManager em = TourDatabase.getInstance().getEntityManager();
+   /**
+    * Persist the compared tours
+    */
+   private void persistComparedTour() {
 
-		if (em != null) {
+      final EntityManager em = TourDatabase.getInstance().getEntityManager();
 
-			final EntityTransaction ts = em.getTransaction();
+      if (em != null) {
 
-			try {
+         final EntityTransaction ts = em.getTransaction();
 
-				if (_comparedTourItem instanceof TVICompareResultComparedTour) {
+         try {
 
-					final TVICompareResultComparedTour comparedTourItem =
-							(TVICompareResultComparedTour) _comparedTourItem;
+            if (_comparedTourItem instanceof TVICompareResultComparedTour) {
 
-					TourCompareManager.saveComparedTourItem(comparedTourItem, em, ts);
+               final TVICompareResultComparedTour comparedTourItem =
+                     (TVICompareResultComparedTour) _comparedTourItem;
 
-					_ctCompareId = comparedTourItem.compId;
+               TourCompareManager.saveComparedTourItem(comparedTourItem, em, ts);
 
-					// update tour map view
-					final SelectionPersistedCompareResults persistedCompareResults =
-							new SelectionPersistedCompareResults();
-					persistedCompareResults.persistedCompareResults.add(comparedTourItem);
+               _ctCompareId = comparedTourItem.compId;
 
-					_postSelectionProvider.setSelection(persistedCompareResults);
-				}
+               // update tour map view
+               final SelectionPersistedCompareResults persistedCompareResults =
+                     new SelectionPersistedCompareResults();
+               persistedCompareResults.persistedCompareResults.add(comparedTourItem);
 
-			} catch (final Exception e) {
-				e.printStackTrace();
-			} finally {
-				if (ts.isActive()) {
-					ts.rollback();
-				}
-				em.close();
-			}
-		}
-	}
+               _postSelectionProvider.setSelection(persistedCompareResults);
+            }
 
-	private void saveComparedTour() {
+         } catch (final Exception e) {
+            e.printStackTrace();
+         } finally {
+            if (ts.isActive()) {
+               ts.rollback();
+            }
+            em.close();
+         }
+      }
+   }
 
-		if (_ctCompareId == -1) {
-			persistComparedTour();
-		}
+   private void saveComparedTour() {
 
-		final EntityManager em = TourDatabase.getInstance().getEntityManager();
-		final EntityTransaction ts = em.getTransaction();
+      if (_ctCompareId == -1) {
+         persistComparedTour();
+      }
 
-		try {
-			final TourCompared comparedTour = em.find(TourCompared.class, _ctCompareId);
+      final EntityManager em = TourDatabase.getInstance().getEntityManager();
+      final EntityTransaction ts = em.getTransaction();
 
-			if (comparedTour != null) {
+      try {
+         final TourCompared comparedTour = em.find(TourCompared.class, _ctCompareId);
 
-				final ChartDataModel chartDataModel = _tourChart.getChartDataModel();
+         if (comparedTour != null) {
 
-				final float avgPulse = _tourData.computeAvg_PulseSegment(_movedStartIndex, _movedEndIndex);
-				final float speed = TourManager.computeTourSpeed(_tourData, _movedStartIndex, _movedEndIndex);
+            final ChartDataModel chartDataModel = _tourChart.getChartDataModel();
 
-				// set new data in entity
-				comparedTour.setStartIndex(_movedStartIndex);
-				comparedTour.setEndIndex(_movedEndIndex);
-				comparedTour.setAvgPulse(avgPulse);
-				comparedTour.setTourSpeed(speed);
+            final float avgPulse = _tourData.computeAvg_PulseSegment(_movedStartIndex, _movedEndIndex);
+            final float speed = TourManager.computeTourSpeed(_tourData, _movedStartIndex, _movedEndIndex);
+            final int recordingTime = TourManager.computeTourRecordingTime(_tourData, _movedStartIndex, _movedEndIndex);
 
-				// update entity
-				ts.begin();
-				em.merge(comparedTour);
-				ts.commit();
+            // set new data in entity
+            comparedTour.setStartIndex(_movedStartIndex);
+            comparedTour.setEndIndex(_movedEndIndex);
+            comparedTour.setAvgPulse(avgPulse);
+            comparedTour.setTourSpeed(speed);
 
-				_ctCompareId = comparedTour.getComparedId();
+            // update entity
+            ts.begin();
+            em.merge(comparedTour);
+            ts.commit();
 
-				setDataDirty(false);
+            _ctCompareId = comparedTour.getComparedId();
 
-				/*
-				 * update chart and viewer with new marker position
-				 */
-				_defaultStartIndex = _movedStartIndex;
-				_defaultEndIndex = _movedEndIndex;
+            setDataDirty(false);
 
-				final ChartDataXSerie xData = chartDataModel.getXData();
-				xData.setSynchMarkerValueIndex(_defaultStartIndex, _defaultEndIndex);
-				setRangeMarkers(xData);
+            /*
+             * update chart and viewer with new marker position
+             */
+            _defaultStartIndex = _movedStartIndex;
+            _defaultEndIndex = _movedEndIndex;
 
-				_tourChart.updateChart(chartDataModel, true);
-				enableActions();
+            final ChartDataXSerie xData = chartDataModel.getXData();
+            xData.setSynchMarkerValueIndex(_defaultStartIndex, _defaultEndIndex);
+            setRangeMarkers(xData);
 
-				fireChangeEvent(_defaultStartIndex, _defaultEndIndex, avgPulse, speed, true);
-			}
-		} catch (final Exception e) {
-			e.printStackTrace();
-		} finally {
-			if (ts.isActive()) {
-				ts.rollback();
-			}
-			em.close();
-		}
-	}
+            _tourChart.updateChart(chartDataModel, true);
+            enableActions();
 
-	/**
-	 * @return Returns <code>false</code> when the save dialog was canceled
-	 */
-	private boolean saveComparedTourDialog() {
+            fireChangeEvent(_defaultStartIndex, _defaultEndIndex, avgPulse, speed, recordingTime, true);
+         }
+      } catch (final Exception e) {
+         e.printStackTrace();
+      } finally {
+         if (ts.isActive()) {
+            ts.rollback();
+         }
+         em.close();
+      }
+   }
 
-		if (_ctCompareId == -1) {
-			setDataDirty(false);
-			return true;
-		}
+   /**
+    * @return Returns <code>false</code> when the save dialog was canceled
+    */
+   private boolean saveComparedTourDialog() {
 
-		if (_isDataDirty == false) {
-			return true;
-		}
+      if (_ctCompareId == -1) {
+         setDataDirty(false);
+         return true;
+      }
 
-		final MessageBox msgBox = new MessageBox(
-				Display.getDefault().getActiveShell(), //
-				SWT.ICON_QUESTION | SWT.YES | SWT.NO);
+      if (_isDataDirty == false) {
+         return true;
+      }
 
-		msgBox.setText(Messages.tourCatalog_view_dlg_save_compared_tour_title);
-		msgBox.setMessage(
-				NLS.bind(
-						Messages.tourCatalog_view_dlg_save_compared_tour_message,
-						TourManager.getTourTitleDetailed(_tourData)));
+      final MessageBox msgBox = new MessageBox(
+            Display.getDefault().getActiveShell(), //
+            SWT.ICON_QUESTION | SWT.YES | SWT.NO);
 
-		final int answer = msgBox.open();
+      msgBox.setText(Messages.tourCatalog_view_dlg_save_compared_tour_title);
+      msgBox.setMessage(
+            NLS.bind(
+                  Messages.tourCatalog_view_dlg_save_compared_tour_message,
+                  TourManager.getTourTitleDetailed(_tourData)));
 
-		if (answer == SWT.YES) {
-			saveComparedTour();
+      final int answer = msgBox.open();
+
+      if (answer == SWT.YES) {
+         saveComparedTour();
 //		} else if (answer == SWT.CANCEL) {
 // disabled, pops up for every selection when multiple selections are fired
 //			return false;
-		} else {
-			fireChangeEvent(_computedStartIndex, _computedEndIndex);
-		}
+      } else {
+         fireChangeEvent(_computedStartIndex, _computedEndIndex);
+      }
 
-		setDataDirty(false);
+      setDataDirty(false);
 
-		return true;
-	}
+      return true;
+   }
 
-	private void setDataDirty(final boolean isDirty) {
+   private void setDataDirty(final boolean isDirty) {
 
-		_isDataDirty = isDirty;
+      _isDataDirty = isDirty;
 
-		enableActions();
+      enableActions();
 
-		_actionUndoChanges.setEnabled(isDirty);
-	}
+      _actionUndoChanges.setEnabled(isDirty);
+   }
 
-	@Override
-	public void setFocus() {
+   @Override
+   public void setFocus() {
 
-		_tourChart.setFocus();
+      _tourChart.setFocus();
 
-		_postSelectionProvider.setSelection(new SelectionTourChart(_tourChart));
-	}
+      _postSelectionProvider.setSelection(new SelectionTourChart(_tourChart));
+   }
 
-	private void setRangeMarkers(final ChartDataXSerie xData) {
+   private void setRangeMarkers(final ChartDataXSerie xData) {
 
-		if (_comparedTourItem instanceof TVICatalogComparedTour
-				|| _comparedTourItem instanceof GeoPartComparerItem) {
+      if (_comparedTourItem instanceof TVICatalogComparedTour
+            || _comparedTourItem instanceof GeoPartComparerItem) {
 
-			xData.setRangeMarkers(new int[] { _defaultStartIndex }, new int[] { _defaultEndIndex });
+         xData.setRangeMarkers(new int[] { _defaultStartIndex }, new int[] { _defaultEndIndex });
 
-		} else if (_comparedTourItem instanceof TVICompareResultComparedTour) {
+      } else if (_comparedTourItem instanceof TVICompareResultComparedTour) {
 
-			xData.setRangeMarkers(
-					new int[] { _defaultStartIndex, _computedStartIndex },
-					new int[] {
-							_defaultEndIndex,
-							_computedEndIndex });
-		}
-	}
+         xData.setRangeMarkers(
+               new int[] { _defaultStartIndex, _computedStartIndex },
+               new int[] {
+                     _defaultEndIndex,
+                     _computedEndIndex });
+      }
+   }
 
-	@Override
-	public void synchCharts(final boolean isSynched, final int synchMode) {
+   @Override
+   public void synchCharts(final boolean isSynched, final int synchMode) {
 
-		if (_ctRefTourChart != null) {
+      if (_ctRefTourChart != null) {
 
-			// uncheck other synch mode
-			switch (synchMode) {
-			case Chart.SYNCH_MODE_BY_SCALE:
-				_actionSynchChartsBySize.setChecked(false);
-				break;
+         // uncheck other synch mode
+         switch (synchMode) {
+         case Chart.SYNCH_MODE_BY_SCALE:
+            _actionSynchChartsBySize.setChecked(false);
+            break;
 
-			case Chart.SYNCH_MODE_BY_SIZE:
-				_actionSynchChartsByScale.setChecked(false);
-				break;
+         case Chart.SYNCH_MODE_BY_SIZE:
+            _actionSynchChartsByScale.setChecked(false);
+            break;
 
-			default:
-				break;
-			}
+         default:
+            break;
+         }
 
-			_ctRefTourChart.synchChart(isSynched, _tourChart, synchMode);
-		}
-	}
+         _ctRefTourChart.synchChart(isSynched, _tourChart, synchMode);
+      }
+   }
 
-	private void undoChanges() {
+   private void undoChanges() {
 
-		// set synch marker to original position
-		final ChartDataModel chartDataModel = _tourChart.getChartDataModel();
-		final ChartDataXSerie xData = chartDataModel.getXData();
+      // set synch marker to original position
+      final ChartDataModel chartDataModel = _tourChart.getChartDataModel();
+      final ChartDataXSerie xData = chartDataModel.getXData();
 
-		_movedStartIndex = _defaultStartIndex;
-		_movedEndIndex = _defaultEndIndex;
+      _movedStartIndex = _defaultStartIndex;
+      _movedEndIndex = _defaultEndIndex;
 
-		xData.setSynchMarkerValueIndex(_defaultStartIndex, _defaultEndIndex);
+      xData.setSynchMarkerValueIndex(_defaultStartIndex, _defaultEndIndex);
 
-		_tourChart.updateChart(chartDataModel, true);
+      _tourChart.updateChart(chartDataModel, true);
 
-		setDataDirty(false);
+      setDataDirty(false);
 
-		fireChangeEvent(_defaultStartIndex, _defaultEndIndex);
-	}
+      fireChangeEvent(_defaultStartIndex, _defaultEndIndex);
+   }
 
-	@Override
-	protected void updateChart() {
+   @Override
+   protected void updateChart() {
 
-		if (_tourData == null) {
+      if (_tourData == null) {
 
-			_refTourRefId = -1;
+         _refTourRefId = -1;
 
-			_ctTourId = -1;
-			_ctRefId = -1;
-			_ctCompareId = -1;
+         _ctTourId = -1;
+         _ctRefId = -1;
+         _ctCompareId = -1;
 
-			_pageBook.showPage(_pageNoData);
+         _pageBook.showPage(_pageNoData);
 
-			return;
-		}
+         return;
+      }
 
-		_tourChart.updateTourChart(_tourData, _tourChartConfig, false);
+      _tourChart.updateTourChart(_tourData, _tourChartConfig, false);
 
-		_pageBook.showPage(_tourChart);
+      _pageBook.showPage(_tourChart);
 
-		// set application window title
-		setTitleToolTip(TourManager.getTourDateShort(_tourData));
-	}
+      // set application window title
+      setTitleToolTip(TourManager.getTourDateShort(_tourData));
+   }
 
-	/**
-	 * @return Returns <code>false</code> when the compared tour is not displayed
-	 */
-	private boolean updateTourChart() {
+   /**
+    * @return Returns <code>false</code> when the compared tour is not displayed
+    */
+   private boolean updateTourChart() {
 
-		final TourCompareConfig tourCompareConfig = ReferenceTourManager.getTourCompareConfig(_ctRefId);
+      final TourCompareConfig tourCompareConfig = ReferenceTourManager.getTourCompareConfig(_ctRefId);
 
-		if (tourCompareConfig != null) {
+      if (tourCompareConfig != null) {
 
-			_tourChartConfig = tourCompareConfig.getCompareTourChartConfig();
+         _tourChartConfig = tourCompareConfig.getCompareTourChartConfig();
 
-			_tourChartConfig.setMinMaxKeeper(true);
-			_tourChartConfig.canShowTourCompareGraph = true;
-			_tourChartConfig.isGeoCompareDiff = tourCompareConfig.isGeoCompareRefTour;
+         _tourChartConfig.setMinMaxKeeper(true);
+         _tourChartConfig.canShowTourCompareGraph = true;
+         _tourChartConfig.isGeoCompareDiff = tourCompareConfig.isGeoCompareRefTour;
 
-			_isGeoCompareRefTour = tourCompareConfig.isGeoCompareRefTour;
+         _isGeoCompareRefTour = tourCompareConfig.isGeoCompareRefTour;
 
-			updateChart();
-			enableSynchronization();
-			enableActions();
+         updateChart();
+         enableSynchronization();
+         enableActions();
 
-			/*
-			 * fire change event to update tour markers
-			 */
-			_postSelectionProvider.setSelection(new SelectionTourData(_tourChart, _tourChart.getTourData()));
+         /*
+          * fire change event to update tour markers
+          */
+         _postSelectionProvider.setSelection(new SelectionTourData(_tourChart, _tourChart.getTourData()));
 
-			return true;
-		}
+         return true;
+      }
 
-		return false;
-	}
+      return false;
+   }
 
-	private void updateTourChart(final GeoPartComparerItem comparerItem) {
+   private void updateTourChart(final GeoPartComparerItem comparerItem) {
 
-		if (saveComparedTourDialog() == false) {
-			return;
-		}
+      if (saveComparedTourDialog() == false) {
+         return;
+      }
 
-		final long ctTourId = comparerItem.tourId;
+      final long ctTourId = comparerItem.tourId;
 
-		// check if the compared tour is already displayed
-		if (_ctTourId == ctTourId && _comparedTourItem instanceof GeoPartComparerItem) {
-			return;
-		}
+      // check if the compared tour is already displayed
+      if (_ctTourId == ctTourId && _comparedTourItem instanceof GeoPartComparerItem) {
+         return;
+      }
 
-		// load the tourdata of the compared tour from the database
-		final TourData compTourData = TourManager.getInstance().getTourData(ctTourId);
-		if (compTourData == null) {
-			return;
-		}
+      // load the tourdata of the compared tour from the database
+      final TourData compTourData = TourManager.getInstance().getTourData(ctTourId);
+      if (compTourData == null) {
+         return;
+      }
 
-		final GeoPartItem geoPartItem = comparerItem.geoPartItem;
-		final NormalizedGeoData normalizedTourPart = geoPartItem.normalizedTourPart;
+      final GeoPartItem geoPartItem = comparerItem.geoPartItem;
+      final NormalizedGeoData normalizedTourPart = geoPartItem.normalizedTourPart;
 
-		// set data from the selection
-		_ctTourId = ctTourId;
-		_ctRefId = geoPartItem.refId;
-		_ctCompareId = -1;
+      // set data from the selection
+      _ctTourId = ctTourId;
+      _ctRefId = geoPartItem.refId;
+      _ctCompareId = -1;
 
-		_tourData = compTourData;
+      _tourData = compTourData;
 
-		// set tour compare data, this will enable the action button to see the graph for this data
-		_tourData.tourCompareSerie = comparerItem.tourLatLonDiff;
+      // set tour compare data, this will enable the action button to see the graph for this data
+      _tourData.tourCompareSerie = comparerItem.tourLatLonDiff;
 
-		_defaultStartIndex = _movedStartIndex = _computedStartIndex = comparerItem.tourFirstIndex;
-		_defaultEndIndex = _movedEndIndex = _computedEndIndex = comparerItem.tourLastIndex;
+      _defaultStartIndex = _movedStartIndex = _computedStartIndex = comparerItem.tourFirstIndex;
+      _defaultEndIndex = _movedEndIndex = _computedEndIndex = comparerItem.tourLastIndex;
 
-		_comparedTourItem = comparerItem;
+      _comparedTourItem = comparerItem;
 
-		updateTourChart();
+      updateTourChart();
 
-		// disable action after the chart was created
-		_tourChart.enableGraphAction(TourManager.GRAPH_TOUR_COMPARE, true);
-	}
+      // disable action after the chart was created
+      _tourChart.enableGraphAction(TourManager.GRAPH_TOUR_COMPARE, true);
+   }
 
-	/**
-	 * Shows the compared tour which was selected by the user in the {@link TourCatalogView}
-	 * 
-	 * @param selectionComparedTour
-	 */
-	private void updateTourChart(final TVICatalogComparedTour itemComparedTour) {
+   /**
+    * Shows the compared tour which was selected by the user in the {@link TourCatalogView}
+    *
+    * @param selectionComparedTour
+    */
+   private void updateTourChart(final TVICatalogComparedTour itemComparedTour) {
 
-		if (saveComparedTourDialog() == false) {
-			return;
-		}
+      if (saveComparedTourDialog() == false) {
+         return;
+      }
 
-		final Long ctTourId = itemComparedTour.getTourId();
+      final Long ctTourId = itemComparedTour.getTourId();
 
-		// check if the compared tour is already displayed
-		if (_ctTourId == ctTourId.longValue() && _comparedTourItem instanceof TVICatalogComparedTour) {
-			return;
-		}
+      // check if the compared tour is already displayed
+      if (_ctTourId == ctTourId.longValue() && _comparedTourItem instanceof TVICatalogComparedTour) {
+         return;
+      }
 
-		// load the tourdata of the compared tour from the database
-		final TourData compTourData = TourManager.getInstance().getTourData(ctTourId);
-		if (compTourData == null) {
-			return;
-		}
+      // load the tourdata of the compared tour from the database
+      final TourData compTourData = TourManager.getInstance().getTourData(ctTourId);
+      if (compTourData == null) {
+         return;
+      }
 
-		// set data from the selection
-		_ctTourId = ctTourId;
-		_ctRefId = itemComparedTour.getRefId();
-		_ctCompareId = itemComparedTour.getCompId();
+      // set data from the selection
+      _ctTourId = ctTourId;
+      _ctRefId = itemComparedTour.getRefId();
+      _ctCompareId = itemComparedTour.getCompId();
 
-		_tourData = compTourData;
+      _tourData = compTourData;
 
-		/*
-		 * remove tour compare data (when there are any), but set dummy object to display the action
-		 * button
-		 */
-		_tourData.tourCompareSerie = new float[0];
+      /*
+       * remove tour compare data (when there are any), but set dummy object to display the action
+       * button
+       */
+      _tourData.tourCompareSerie = new float[0];
 
-		_defaultStartIndex = _movedStartIndex = _computedStartIndex = itemComparedTour.getStartIndex();
-		_defaultEndIndex = _movedEndIndex = _computedEndIndex = itemComparedTour.getEndIndex();
+      _defaultStartIndex = _movedStartIndex = _computedStartIndex = itemComparedTour.getStartIndex();
+      _defaultEndIndex = _movedEndIndex = _computedEndIndex = itemComparedTour.getEndIndex();
 
-		_comparedTourItem = itemComparedTour;
+      _comparedTourItem = itemComparedTour;
 
-		updateTourChart();
+      updateTourChart();
 
-		// disable action after the chart was created
-		_tourChart.enableGraphAction(TourManager.GRAPH_TOUR_COMPARE, false);
-	}
+      // disable action after the chart was created
+      _tourChart.enableGraphAction(TourManager.GRAPH_TOUR_COMPARE, false);
+   }
 
-	private void updateTourChart(final TVICompareResultComparedTour compareResultItem) {
+   private void updateTourChart(final TVICompareResultComparedTour compareResultItem) {
 
-		if (saveComparedTourDialog() == false) {
-			return;
-		}
+      if (saveComparedTourDialog() == false) {
+         return;
+      }
 
-		final Long ctTourId = compareResultItem.comparedTourData.getTourId();
+      final Long ctTourId = compareResultItem.comparedTourData.getTourId();
 
-		// check if the compared tour is already displayed
-		if (_ctTourId == ctTourId && _comparedTourItem instanceof TVICompareResultComparedTour) {
-			return;
-		}
+      // check if the compared tour is already displayed
+      if (_ctTourId == ctTourId && _comparedTourItem instanceof TVICompareResultComparedTour) {
+         return;
+      }
 
-		// load the tourdata of the compared tour from the database
-		final TourData compTourData = TourManager.getInstance().getTourData(ctTourId);
-		if (compTourData == null) {
-			return;
-		}
+      // load the tourdata of the compared tour from the database
+      final TourData compTourData = TourManager.getInstance().getTourData(ctTourId);
+      if (compTourData == null) {
+         return;
+      }
 
-		// keep data from the selected compared tour
-		_ctTourId = ctTourId;
-		_ctRefId = compareResultItem.refTour.refId;
-		_ctCompareId = compareResultItem.compId;
+      // keep data from the selected compared tour
+      _ctTourId = ctTourId;
+      _ctRefId = compareResultItem.refTour.refId;
+      _ctCompareId = compareResultItem.compId;
 
-		_tourData = compTourData;
+      _tourData = compTourData;
 
-		// set tour compare data, this will show the action button to see the graph for this data
-		_tourData.tourCompareSerie = compareResultItem.altitudeDiffSerie;
+      // set tour compare data, this will show the action button to see the graph for this data
+      _tourData.tourCompareSerie = compareResultItem.altitudeDiffSerie;
 
-		if (_ctCompareId == -1) {
+      if (_ctCompareId == -1) {
 
-			// compared tour is not saved
+         // compared tour is not saved
 
-			_defaultStartIndex = _computedStartIndex = _movedStartIndex = compareResultItem.computedStartIndex;
-			_defaultEndIndex = _computedEndIndex = _movedEndIndex = compareResultItem.computedEndIndex;
+         _defaultStartIndex = _computedStartIndex = _movedStartIndex = compareResultItem.computedStartIndex;
+         _defaultEndIndex = _computedEndIndex = _movedEndIndex = compareResultItem.computedEndIndex;
 
-		} else {
+      } else {
 
-			// compared tour is saved
+         // compared tour is saved
 
-			_defaultStartIndex = _movedStartIndex = compareResultItem.dbStartIndex;
-			_defaultEndIndex = _movedEndIndex = compareResultItem.dbEndIndex;
+         _defaultStartIndex = _movedStartIndex = compareResultItem.dbStartIndex;
+         _defaultEndIndex = _movedEndIndex = compareResultItem.dbEndIndex;
 
-			_computedStartIndex = compareResultItem.computedStartIndex;
-			_computedEndIndex = compareResultItem.computedEndIndex;
-		}
+         _computedStartIndex = compareResultItem.computedStartIndex;
+         _computedEndIndex = compareResultItem.computedEndIndex;
+      }
 
-		_comparedTourItem = compareResultItem;
+      _comparedTourItem = compareResultItem;
 
-		updateTourChart();
+      updateTourChart();
 
-		// enable action after the chart was created
-		_tourChart.enableGraphAction(TourManager.GRAPH_TOUR_COMPARE, true);
-	}
+      // enable action after the chart was created
+      _tourChart.enableGraphAction(TourManager.GRAPH_TOUR_COMPARE, true);
+   }
 
 }

@@ -920,7 +920,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
 
    /**
-    * Contains time in <b>seconds</b> relativ to the tour start which is defined in
+    * Contains time in <b>seconds</b> relative to the tour start which is defined in
     * {@link #tourStartTime}.
     * <p>
     * The array {@link #timeSerie} is <code>null</code> for a manually created tour, it is
