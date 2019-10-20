@@ -3,12 +3,12 @@
 
 <product 
 
-   version     ="19.10.0.qualifier" 
+   version           ="19.10.0.qualifier" 
 
-   name        ="MyTourbook Product" 
-   id          ="net.tourbook.product" 
-   uid         ="net.tourbook.product" 
-   application ="net.tourbook.application" 
+   name              ="MyTourbook Product" 
+   id                ="net.tourbook.product" 
+   uid               ="net.tourbook.product" 
+   application       ="net.tourbook.application" 
    
    useFeatures       ="true" 
    includeLaunchers  ="true"
