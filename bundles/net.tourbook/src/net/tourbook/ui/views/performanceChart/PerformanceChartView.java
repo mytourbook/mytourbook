@@ -64,7 +64,6 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
@@ -101,17 +100,17 @@ import org.eclipse.ui.part.ViewPart;
 
 public class PerformanceChartView extends ViewPart {
 
-   public static final String      ID                  = "net.tourbook.ui.views.performanceChart.PerformanceChartView"; //$NON-NLS-1$
+   public static final String  ID                                    = "net.tourbook.ui.views.performanceChart.PerformanceChartView"; //$NON-NLS-1$
 
-   private static final int    HR_LEFT_MIN_BORDER                   = 0;
-   private static final int    HR_RIGHT_MAX_BORDER                  = 230;
+   private static final int    HR_LEFT_MIN_BORDER                    = 0;
+   private static final int    HR_RIGHT_MAX_BORDER                   = 230;
 
-   private static final String STATE_HR_CHART_LEFT_BORDER           = "HrLeftChartBorder";                  //$NON-NLS-1$
-   private static final String STATE_HR_CHART_RIGHT_BORDER          = "HrRightChartBorder";                 //$NON-NLS-1$
+   private static final String STATE_HR_CHART_LEFT_BORDER            = "HrLeftChartBorder";                                           //$NON-NLS-1$
+   private static final String STATE_HR_CHART_RIGHT_BORDER           = "HrRightChartBorder";                                          //$NON-NLS-1$
    private static final String STATE_IS_SHOW_ALL_STRESS_SCORE_VALUES = "IsShowAllStressScoreValues";                                  //$NON-NLS-1$
-   private static final String STATE_IS_SYNC_VERTICAL_CHART_SCALING = "IsSyncVerticalChartScaling";         //$NON-NLS-1$
+   private static final String STATE_IS_SYNC_VERTICAL_CHART_SCALING  = "IsSyncVerticalChartScaling";                                  //$NON-NLS-1$
 
-   private static final String GRID_PREF_PREFIX                     = "GRID_TRAINING__";                    //$NON-NLS-1$
+   private static final String GRID_PREF_PREFIX                      = "GRID_TRAINING__";                                             //$NON-NLS-1$
 
 // SET_FORMATTING_OFF
 
@@ -122,37 +121,37 @@ public class PerformanceChartView extends ViewPart {
 
 // SET_FORMATTING_ON
 
-   private final IPreferenceStore      _prefStore     = TourbookPlugin.getPrefStore();
-   private final IDialogSettings       _state         = TourbookPlugin.getState(ID);
+   private final IPreferenceStore         _prefStore     = TourbookPlugin.getPrefStore();
+   private final IDialogSettings          _state         = TourbookPlugin.getState(ID);
 
-   private IPartListener2              _partListener;
-   private ISelectionListener          _postSelectionListener;
-   private IPropertyChangeListener     _prefChangeListener;
-   private ITourEventListener          _tourEventListener;
+   private IPartListener2                 _partListener;
+   private ISelectionListener             _postSelectionListener;
+   private IPropertyChangeListener        _prefChangeListener;
+   private ITourEventListener             _tourEventListener;
 
-   private ModifyListener              _defaultSpinnerModifyListener;
-   private SelectionAdapter            _defaultSpinnerSelectionListener;
-   private MouseWheelListener          _defaultSpinnerMouseWheelListener;
+   private ModifyListener                 _defaultSpinnerModifyListener;
+   private SelectionAdapter               _defaultSpinnerSelectionListener;
+   private MouseWheelListener             _defaultSpinnerMouseWheelListener;
 
-   private TourPerson                  _currentPerson;
-   private TourData                    _tourData;
+   private TourPerson                     _currentPerson;
+   private TourData                       _tourData;
 
-   private boolean                     _isUpdateUI;
-   private boolean                     _isShowAllValues;
-   private boolean                     _isSynchChartVerticalValues;
+   private boolean                        _isUpdateUI;
+   private boolean                        _isShowAllValues;
+   private boolean                        _isSynchChartVerticalValues;
 
-   private ToolBarManager              _headerToolbarManager;
+   private ToolBarManager                 _headerToolbarManager;
 
    private ActionShowAllStressScoreValues _actionShowAllStressScoreValues;
-   private ActionSynchChartScale       _actionSynchVerticalChartScaling;
-   private ActionTrainingOptions       _actionTrainingOptions;
+   private ActionSynchChartScale          _actionSynchVerticalChartScaling;
+   private ActionTrainingOptions          _actionTrainingOptions;
 
-   private double[]                    _xSeriePulse;
+   private double[]                       _xSeriePulse;
 
-   private ArrayList<TourPersonHRZone> _personHrZones = new ArrayList<>();
-   private final MinMaxKeeper_YData    _minMaxKeeper  = new MinMaxKeeper_YData();
+   private ArrayList<TourPersonHRZone>    _personHrZones = new ArrayList<>();
+   private final MinMaxKeeper_YData       _minMaxKeeper  = new MinMaxKeeper_YData();
 
-   private final NumberFormat          _nf1           = NumberFormat.getNumberInstance();
+   private final NumberFormat             _nf1           = NumberFormat.getNumberInstance();
    {
       _nf1.setMinimumFractionDigits(1);
       _nf1.setMaximumFractionDigits(1);
@@ -161,12 +160,12 @@ public class PerformanceChartView extends ViewPart {
    /*
     * UI controls/resources
     */
-   private FormToolkit    _tk;
+   private FormToolkit _tk;
 
-   private Color[]        _hrZoneColors;
-   private Color[]        _hrZoneColorsBright;
-   private Color[]        _hrZoneColorsDark;
-   private Image          _hrZoneImage;
+   private Color[]     _hrZoneColors;
+   private Color[]     _hrZoneColorsBright;
+   private Color[]     _hrZoneColorsDark;
+   private Image       _hrZoneImage;
 
    /*
     * Pagebook for the training view
@@ -175,8 +174,6 @@ public class PerformanceChartView extends ViewPart {
    private Composite _page_HrZones;
    private Composite _page_NoTour;
    private Composite _page_NoPerson;
-   private Composite _page_NoHrZones;
-   private Composite _page_NoPulse;
 
    private Label     _lblNoHrZone;
 
@@ -200,7 +197,7 @@ public class PerformanceChartView extends ViewPart {
    /*
     * none UI
     */
-   private int      _imageCounter = 0;
+   private int _imageCounter = 0;
 
    private class ActionTrainingOptions extends ActionToolbarSlideout {
 
@@ -501,11 +498,9 @@ public class PerformanceChartView extends ViewPart {
       GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageBook);
 
       _page_HrZones = createUI_20_PageHrZones(_pageBook);
-      _page_NoHrZones = createUI_14_PageNoHrZones(_pageBook);
 
       _page_NoPerson = UI.createPage(_tk, _pageBook, Messages.UI_Label_PersonIsRequired);
       _page_NoTour = UI.createPage(_tk, _pageBook, Messages.UI_Label_no_chart_is_selected);
-      _page_NoPulse = UI.createPage(_tk, _pageBook, Messages.Training_View_Label_NoPulseData);
    }
 
    private Composite createUI_14_PageNoHrZones(final Composite parent) {
@@ -968,29 +963,6 @@ public class PerformanceChartView extends ViewPart {
       enableControls();
 
       /*
-       * check tour data
-       */
-      if (_tourData == null) {
-
-         // a tour is not selected
-         _pageBook.showPage(_page_NoTour);
-
-         return;
-      }
-
-      /*
-       * check pulse
-       */
-      final float[] pulseSerie = _tourData.pulseSerie;
-      if (pulseSerie == null || pulseSerie.length == 0) {
-
-         // pulse data are not available
-         _pageBook.showPage(_page_NoPulse);
-
-         return;
-      }
-
-      /*
        * check person
        */
       if (_currentPerson == null) {
@@ -1002,27 +974,8 @@ public class PerformanceChartView extends ViewPart {
       }
 
       /*
-       * check HR zones
-       */
-      final ArrayList<TourPersonHRZone> personHrZones = _currentPerson.getHrZonesSorted();
-      if (personHrZones.size() == 0) {
-
-         // hr zones are required
-
-         _lblNoHrZone.setText(NLS.bind(Messages.Training_View_Label_NoHrZones, _currentPerson.getName()));
-         _lblNoHrZone.getParent().layout(true, true);
-
-         _pageBook.showPage(_page_NoHrZones);
-
-         return;
-      }
-
-      /*
        * required data are available
        */
-
-      // set tooltip for the part title
-      setTitleToolTip(TourManager.getTourDateShort(_tourData));
 
       // display page for the selected chart
       _pageBook.showPage(_page_HrZones);
@@ -1077,7 +1030,7 @@ public class PerformanceChartView extends ViewPart {
          pulseMin = pulseMax = pulseSerie[0];
 
          for (final float pulse : pulseSerie) {
-               pulseMin = _tourData.getGovss();
+            pulseMin = _tourData.getGovss();
          }
 
       } else {
