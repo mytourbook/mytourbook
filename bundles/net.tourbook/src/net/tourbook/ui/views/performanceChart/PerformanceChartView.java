@@ -15,117 +15,241 @@
  *******************************************************************************/
 package net.tourbook.ui.views.performanceChart;
 
-import gnu.trove.list.array.TIntArrayList;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.time.LocalDate;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.CommonActivator;
-import net.tourbook.common.preferences.ICommonPreferences;
+import net.tourbook.chart.Chart;
+import net.tourbook.chart.ChartDataModel;
+import net.tourbook.chart.ChartDataSerie;
+import net.tourbook.chart.ChartDataXSerie;
+import net.tourbook.chart.ChartDataYSerie;
+import net.tourbook.chart.ChartType;
+import net.tourbook.chart.IBarSelectionListener;
+import net.tourbook.chart.MinMaxKeeper_YData;
+import net.tourbook.common.tooltip.ActionToolbarSlideout;
+import net.tourbook.common.tooltip.ToolbarSlideout;
+import net.tourbook.common.util.Util;
+import net.tourbook.data.HrZoneContext;
 import net.tourbook.data.TourData;
-import net.tourbook.database.TourDatabase;
+import net.tourbook.data.TourPerson;
+import net.tourbook.data.TourPersonHRZone;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.PrefPagePeople;
+import net.tourbook.preferences.PrefPagePeopleData;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionDeletedTours;
+import net.tourbook.tour.SelectionTourData;
+import net.tourbook.tour.SelectionTourId;
+import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.ITourProvider;
-import net.tourbook.ui.SQLFilter;
+import net.tourbook.training.TrainingManager;
 import net.tourbook.ui.UI;
+import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
+import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
+import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
+import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 
 import org.eclipse.e4.ui.di.PersistState;
+import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseWheelListener;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.widgets.Combo;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
+import org.eclipse.swt.widgets.Spinner;
+import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
+import org.eclipse.ui.dialogs.PreferencesUtil;
+import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
-public class PerformanceChartView extends ViewPart implements ITourProvider {
+public class PerformanceChartView extends ViewPart {
 
    public static final String      ID                  = "net.tourbook.ui.views.performanceChart.PerformanceChartView"; //$NON-NLS-1$
 
-   private static final String     COMBO_MINIMUM_WIDTH = "1234567890";                                                  //$NON-NLS-1$
-   private static final String     COMBO_MAXIMUM_WIDTH = "123456789012345678901234567890";                              //$NON-NLS-1$
+   private static final int    HR_LEFT_MIN_BORDER                   = 0;
+   private static final int    HR_RIGHT_MAX_BORDER                  = 230;
 
-   private static final char       NL                  = net.tourbook.common.UI.NEW_LINE;
+   private static final String STATE_HR_CHART_LEFT_BORDER           = "HrLeftChartBorder";                  //$NON-NLS-1$
+   private static final String STATE_HR_CHART_RIGHT_BORDER          = "HrRightChartBorder";                 //$NON-NLS-1$
+   private static final String STATE_IS_SHOW_ALL_STRESS_SCORE_VALUES = "IsShowAllStressScoreValues";                                  //$NON-NLS-1$
+   private static final String STATE_IS_SYNC_VERTICAL_CHART_SCALING = "IsSyncVerticalChartScaling";         //$NON-NLS-1$
 
-   private static final boolean    IS_OSX              = net.tourbook.common.UI.IS_OSX;
-   private static final boolean    IS_LINUX            = net.tourbook.common.UI.IS_LINUX;
+   private static final String GRID_PREF_PREFIX                     = "GRID_TRAINING__";                    //$NON-NLS-1$
 
-   private static boolean          _isInUpdateUI;
+// SET_FORMATTING_OFF
 
-   private final IPreferenceStore  _prefStore          = TourbookPlugin.getPrefStore();
-   private final IPreferenceStore  _prefStoreCommon    = CommonActivator.getPrefStore();
-   private final IDialogSettings   _state              = TourbookPlugin.getState("PerformanceChartView");               //$NON-NLS-1$
+   private static final String         GRID_IS_SHOW_VERTICAL_GRIDLINES     = (GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_IS_SHOW_VERTICAL_GRIDLINES);
+   private static final String         GRID_IS_SHOW_HORIZONTAL_GRIDLINES   = (GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_IS_SHOW_HORIZONTAL_GRIDLINES);
+   private static final String         GRID_VERTICAL_DISTANCE              = (GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE);
+   private static final String         GRID_HORIZONTAL_DISTANCE            = (GRID_PREF_PREFIX + ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE);
 
-   private IPartListener2          _partListener;
-   private IPropertyChangeListener _prefChangeListener;
-   private IPropertyChangeListener _prefChangeListenerCommon;
-   private ITourEventListener      _tourEventListener;
-   private ISelectionListener      _postSelectionListener;
+// SET_FORMATTING_ON
+
+   private final IPreferenceStore      _prefStore     = TourbookPlugin.getPrefStore();
+   private final IDialogSettings       _state         = TourbookPlugin.getState(ID);
+
+   private IPartListener2              _partListener;
+   private ISelectionListener          _postSelectionListener;
+   private IPropertyChangeListener     _prefChangeListener;
+   private ITourEventListener          _tourEventListener;
+
+   private ModifyListener              _defaultSpinnerModifyListener;
+   private SelectionAdapter            _defaultSpinnerSelectionListener;
+   private MouseWheelListener          _defaultSpinnerMouseWheelListener;
+
+   private TourPerson                  _currentPerson;
+   private TourData                    _tourData;
+
+   private boolean                     _isUpdateUI;
+   private boolean                     _isShowAllValues;
+   private boolean                     _isSynchChartVerticalValues;
+
+   private ToolBarManager              _headerToolbarManager;
+
+   private ActionShowAllStressScoreValues _actionShowAllStressScoreValues;
+   private ActionSynchChartScale       _actionSynchVerticalChartScaling;
+   private ActionTrainingOptions       _actionTrainingOptions;
+
+   private double[]                    _xSeriePulse;
+
+   private ArrayList<TourPersonHRZone> _personHrZones = new ArrayList<>();
+   private final MinMaxKeeper_YData    _minMaxKeeper  = new MinMaxKeeper_YData();
+
+   private final NumberFormat          _nf1           = NumberFormat.getNumberInstance();
+   {
+      _nf1.setMinimumFractionDigits(1);
+      _nf1.setMaximumFractionDigits(1);
+   }
 
    /*
-    * private TourPerson _activePerson;
-    * private TourTypeFilter _activeTourTypeFilter;
+    * UI controls/resources
     */
+   private FormToolkit    _tk;
 
-   private int            _selectedYear = -1;
-
-   /**
-    * Contains all years which have tours for the selected tour type and person.
-    */
-   private TIntArrayList  _availableYears;
-
-   private PixelConverter _pc;
+   private Color[]        _hrZoneColors;
+   private Color[]        _hrZoneColorsBright;
+   private Color[]        _hrZoneColorsDark;
+   private Image          _hrZoneImage;
 
    /*
-    * UI controls
+    * Pagebook for the training view
     */
-   private Combo     _comboYear;
-   private Combo     _comboNumberOfYears;
-   private Combo     _comboBarVerticalOrder;
+   private PageBook  _pageBook;
+   private Composite _page_HrZones;
+   private Composite _page_NoTour;
+   private Composite _page_NoPerson;
+   private Composite _page_NoHrZones;
+   private Composite _page_NoPulse;
 
-   private Composite _statContainer;
+   private Label     _lblNoHrZone;
 
-   public static boolean isInUpdateUI() {
-      return _isInUpdateUI;
+   private Composite _toolbar;
+   private Chart     _chartHrTime;
+
+   private Spinner   _spinnerHrLeft;
+   private Spinner   _spinnerHrRight;
+   private Label     _lblHrMin;
+   private Label     _lblHrMax;
+
+   private Composite _hrZoneDataContainerContent;
+
+   private Canvas    _canvasHrZoneImage;
+   private Label[]   _lblTourMinMaxValue;
+   private Label[]   _lblTourMinMaxHours;
+   private Label[]   _lblHRZoneName;
+   private Label[]   _lblHRZoneColor;
+   private Label[]   _lblHrZonePercent;
+
+   /*
+    * none UI
+    */
+   private int      _imageCounter = 0;
+
+   private class ActionTrainingOptions extends ActionToolbarSlideout {
+
+      @Override
+      protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+
+         return new SlideoutTrainingOptions(_pageBook, toolbar, GRID_PREF_PREFIX, PerformanceChartView.this);
+      }
+   }
+
+   public PerformanceChartView() {}
+
+   void actionEditHrZones() {
+
+      final TourPerson person = _currentPerson != null ? _currentPerson : TourbookPlugin.getActivePerson();
+
+      PreferencesUtil.createPreferenceDialogOn(
+            _pageBook.getShell(),
+            PrefPagePeople.ID,
+            null,
+            new PrefPagePeopleData(PrefPagePeople.PREF_DATA_SELECT_HR_ZONES, person)//
+      )
+            .open();
+   }
+
+   void actionShowAllStressScoreValues() {
+
+      _isShowAllValues = _actionShowAllStressScoreValues.isChecked();
+
+      updateUI_30_HrZonesFromModel();
+   }
+
+   void actionSynchChartScale() {
+
+      _isSynchChartVerticalValues = _actionSynchVerticalChartScaling.isChecked();
+
+      if (_isSynchChartVerticalValues == false) {
+         _minMaxKeeper.resetMinMax();
+      }
+
+      updateUI_30_HrZonesFromModel();
    }
 
    private void addPartListener() {
 
-      // set the part listener
-      _partListener = new IPartListener2() {
+      getViewSite().getPage().addPartListener(_partListener = new IPartListener2() {
 
          @Override
-         public void partActivated(final IWorkbenchPartReference partRef) {
-
-//          if (partRef.getPart(false) == TourStatisticsView.this) {
-//
-//             int a = 0;
-//             a++;
-//          }
-         }
+         public void partActivated(final IWorkbenchPartReference partRef) {}
 
          @Override
          public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
@@ -147,16 +271,12 @@ public class PerformanceChartView extends ViewPart implements ITourProvider {
 
          @Override
          public void partVisible(final IWorkbenchPartReference partRef) {}
-      };
-
-      // register the part listener
-      getSite().getPage().addPartListener(_partListener);
+      });
    }
 
    private void addPrefListener() {
 
       _prefChangeListener = new IPropertyChangeListener() {
-
          @Override
          public void propertyChange(final PropertyChangeEvent event) {
 
@@ -165,53 +285,35 @@ public class PerformanceChartView extends ViewPart implements ITourProvider {
             /*
              * set a new chart configuration when the preferences has changed
              */
+            if (property.equals(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED)
+                  || property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
 
-            if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)
-                  || property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)
-                  || property.equals(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED)) {
+               onModifyPerson();
 
-               // _activePerson = TourbookPlugin.getActivePerson();
-               // _activeTourTypeFilter = TourbookPlugin.getActiveTourTypeFilter();
+            } else if (property.equals(GRID_HORIZONTAL_DISTANCE)
+                  || property.equals(GRID_VERTICAL_DISTANCE)
+                  || property.equals(GRID_IS_SHOW_HORIZONTAL_GRIDLINES)
+                  || property.equals(GRID_IS_SHOW_VERTICAL_GRIDLINES)
+            //
+            ) {
 
-            } else if (property.equals(ITourbookPreferences.STATISTICS_STATISTIC_PROVIDER_IDS)) {
+               setChartProperties();
 
-            } else if (property.equals(ITourbookPreferences.MEASUREMENT_SYSTEM)) {
-
-               // measurement system has changed
-
-               UI.updateUnits();
-
+               // grid has changed, update chart
+               updateUI_30_HrZonesFromModel();
             }
          }
       };
 
-      // register the listener
       _prefStore.addPropertyChangeListener(_prefChangeListener);
-
-      /*
-       * Common preferences
-       */
-      _prefChangeListenerCommon = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
-
-            final String property = event.getProperty();
-
-            if (property.equals(ICommonPreferences.TIME_ZONE_LOCAL_ID)) {
-
-            }
-         }
-      };
-
-      // register the listener
-      _prefStoreCommon.addPropertyChangeListener(_prefChangeListenerCommon);
    }
 
+   /**
+    * listen for events when a tour is selected
+    */
    private void addSelectionListener() {
 
-      // this view part is a selection listener
       _postSelectionListener = new ISelectionListener() {
-
          @Override
          public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
@@ -219,434 +321,563 @@ public class PerformanceChartView extends ViewPart implements ITourProvider {
                return;
             }
 
-            if (selection instanceof SelectionDeletedTours) {}
+            onSelectionChanged(selection);
          }
       };
-
-      // register selection listener in the page
       getSite().getPage().addPostSelectionListener(_postSelectionListener);
    }
 
    private void addTourEventListener() {
 
       _tourEventListener = new ITourEventListener() {
+
          @Override
-         public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object propertyData) {
+         public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
-            if (eventId == TourEventId.TOUR_CHANGED && propertyData instanceof TourEvent) {
+            if (part == PerformanceChartView.this) {
+               return;
+            }
 
-               if (part == PerformanceChartView.this) {
-                  return;
+            if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
+
+               clearView();
+
+            } else if (eventId == TourEventId.TOUR_SELECTION && eventData instanceof ISelection) {
+
+               onSelectionChanged((ISelection) eventData);
+
+            } else if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
+
+               final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+
+               if ((modifiedTours != null) && (modifiedTours.size() > 0)) {
+                  updateUI_20(modifiedTours.get(0));
                }
+            } else if (eventId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
 
-               if (((TourEvent) propertyData).isTourModified) {
-                  /*
-                   * ignore edit changes because the statistics show data only from saved data
-                   */
-                  return;
+               if (_tourData != null) {
+
+                  _tourData.clearComputedSeries();
+
+                  updateUI_20(_tourData);
                }
-
-               _isInUpdateUI = true;
-
-               // update statistics
-
-               _isInUpdateUI = false;
-
-            } else if (eventId == TourEventId.UPDATE_UI || //
-                  eventId == TourEventId.ALL_TOURS_ARE_MODIFIED) {
-
             }
          }
       };
+
       TourManager.getInstance().addTourEventListener(_tourEventListener);
    }
 
-   public boolean canFireEvents() {
+   private void clearView() {
 
-      return _isInUpdateUI == false;
+      _tourData = null;
+      _currentPerson = null;
+
+//      _tourChart.updateChart(null, false);
+
+      _pageBook.showPage(_page_NoTour);
+      enableControls();
    }
 
    private void createActions() {
 
-      //_actionSynchChartScale = new ActionSynchChartScale(this);
+      _actionShowAllStressScoreValues = new ActionShowAllStressScoreValues(this);
+      _actionSynchVerticalChartScaling = new ActionSynchChartScale(this);
+      _actionTrainingOptions = new ActionTrainingOptions();
    }
 
    @Override
    public void createPartControl(final Composite parent) {
 
-      initUI(parent);
-
       createUI(parent);
 
       createActions();
+      fillToolbar();
 
-      addPartListener();
-      addPrefListener();
+      // show default page
+      _pageBook.showPage(_page_NoTour);
+
       addSelectionListener();
+      addPrefListener();
       addTourEventListener();
+      addPartListener();
 
-      /*
-       * Start async that the workspace is fully initialized with all data filters
-       */
-      parent.getDisplay().asyncExec(new Runnable() {
-         @Override
-         public void run() {
+      restoreState();
 
-            //_activePerson = TourbookPlugin.getActivePerson();
-            //_activeTourTypeFilter = TourbookPlugin.getActiveTourTypeFilter();
-
-            restoreState();
-         }
-      });
+      showTour();
    }
 
    private void createUI(final Composite parent) {
 
-      _statContainer = new Composite(parent, SWT.NONE);
-      GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(_statContainer);
-      {
-         createUI_10_Toolbar(_statContainer);
+      initUI(parent);
 
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridLayoutFactory.fillDefaults()//
+            .spacing(0, 0)
+            .applyTo(container);
+//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
+      {
+         createUI_10_Toolbar(container);
+         createUI_12_PageBook(container);
       }
    }
 
    private void createUI_10_Toolbar(final Composite parent) {
 
-      final int widgetSpacing = 15;
-
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory
-            .fillDefaults()//
+      _toolbar = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults()//
             .grab(true, false)
             .align(SWT.BEGINNING, SWT.FILL)
-            .applyTo(container);
-      GridLayoutFactory
-            .fillDefaults()//
+            .applyTo(_toolbar);
+      GridLayoutFactory.fillDefaults()//
             .numColumns(6)
             .margins(3, 3)
+            .applyTo(_toolbar);
+//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+      {
+         /*
+          * label: hr min
+          */
+         _lblHrMin = new Label(_toolbar, SWT.NONE);
+         GridDataFactory.fillDefaults()//
+//               .indent(5, 0)
+               .align(SWT.BEGINNING, SWT.CENTER)
+               .applyTo(_lblHrMin);
+         _lblHrMin.setText(Messages.Training_View_Label_LeftChartBorder);
+         _lblHrMin.setToolTipText(Messages.Training_View_Label_LeftChartBorder_Tooltip);
+
+         /*
+          * spinner: hr min
+          */
+         _spinnerHrLeft = new Spinner(_toolbar, SWT.BORDER);
+         _spinnerHrLeft.setMinimum(HR_LEFT_MIN_BORDER);
+         _spinnerHrLeft.setMaximum(HR_RIGHT_MAX_BORDER);
+         _spinnerHrLeft.addModifyListener(_defaultSpinnerModifyListener);
+         _spinnerHrLeft.addSelectionListener(_defaultSpinnerSelectionListener);
+         _spinnerHrLeft.addMouseWheelListener(_defaultSpinnerMouseWheelListener);
+
+         /*
+          * label: hr max
+          */
+         _lblHrMax = new Label(_toolbar, SWT.NONE);
+         GridDataFactory.fillDefaults()//
+               .align(SWT.BEGINNING, SWT.CENTER)
+               .applyTo(_lblHrMax);
+         _lblHrMax.setText(Messages.Training_View_Label_RightChartBorder);
+         _lblHrMax.setToolTipText(Messages.Training_View_Label_RightChartBorder_Tooltip);
+
+         /*
+          * spinner: hr max
+          */
+         _spinnerHrRight = new Spinner(_toolbar, SWT.BORDER);
+         _spinnerHrRight.setMinimum(HR_LEFT_MIN_BORDER);
+         _spinnerHrRight.setMaximum(HR_RIGHT_MAX_BORDER);
+         _spinnerHrRight.addModifyListener(_defaultSpinnerModifyListener);
+         _spinnerHrRight.addSelectionListener(_defaultSpinnerSelectionListener);
+         _spinnerHrRight.addMouseWheelListener(_defaultSpinnerMouseWheelListener);
+
+         /*
+          * toolbar actions
+          */
+         final ToolBar toolbar = new ToolBar(_toolbar, SWT.FLAT);
+         GridDataFactory.fillDefaults()//
+               .align(SWT.BEGINNING, SWT.CENTER)
+               .applyTo(toolbar);
+         _headerToolbarManager = new ToolBarManager(toolbar);
+      }
+
+//      // label: horizontal separator
+//      final Label label = new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL);
+//      GridDataFactory.fillDefaults()//
+//            .grab(true, false)
+//            .hint(SWT.DEFAULT, 1)
+//            .applyTo(label);
+//      label.setText(UI.EMPTY_STRING);
+   }
+
+   private void createUI_12_PageBook(final Composite parent) {
+
+      _pageBook = new PageBook(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageBook);
+
+      _page_HrZones = createUI_20_PageHrZones(_pageBook);
+      _page_NoHrZones = createUI_14_PageNoHrZones(_pageBook);
+
+      _page_NoPerson = UI.createPage(_tk, _pageBook, Messages.UI_Label_PersonIsRequired);
+      _page_NoTour = UI.createPage(_tk, _pageBook, Messages.UI_Label_no_chart_is_selected);
+      _page_NoPulse = UI.createPage(_tk, _pageBook, Messages.Training_View_Label_NoPulseData);
+   }
+
+   private Composite createUI_14_PageNoHrZones(final Composite parent) {
+
+      final Composite container = _tk.createComposite(parent);
+      GridDataFactory.fillDefaults().grab(true, true).align(SWT.BEGINNING, SWT.CENTER).applyTo(container);
+      GridLayoutFactory.swtDefaults().numColumns(1).applyTo(container);
+//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+      {
+         /*
+          * label: user name
+          */
+         _lblNoHrZone = _tk.createLabel(container, UI.EMPTY_STRING, SWT.WRAP);
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblNoHrZone);
+
+         /*
+          * link: create hr zones in the pref page
+          */
+         final Link link = new Link(container, SWT.WRAP);
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(link);
+         link.setText(Messages.Training_View_Link_NoHrZones);
+         link.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+               actionEditHrZones();
+            }
+         });
+         _tk.adapt(link, true, true);
+      }
+
+      return container;
+   }
+
+   private Composite createUI_20_PageHrZones(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults()//
+//            .grab(true, true)
+            .applyTo(container);
+      GridLayoutFactory.fillDefaults()//
+            .numColumns(3)
+            .spacing(0, 0)
+            .applyTo(container);
+//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+      container.setBackground(_tk.getColors().getBackground());
+      {
+         // feature request to show the zone image first https://sourceforge.net/p/mytourbook/feature-requests/132/
+         createUI_40_HrZoneImage(container);
+         createUI_30_HrZoneChart(container);
+      }
+
+      return container;
+   }
+
+   private void createUI_30_HrZoneChart(final Composite parent) {
+
+      /*
+       * chart
+       */
+      _chartHrTime = new Chart(parent, SWT.FLAT);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(_chartHrTime);
+
+      setChartProperties();
+
+      _chartHrTime.addBarSelectionListener(new IBarSelectionListener() {
+         @Override
+         public void selectionChanged(final int serieIndex, final int valueIndex) {
+
+//               _postSelectionProvider.setSelection(selection);
+         }
+      });
+   }
+
+   private void createUI_40_HrZoneImage(final Composite parent) {
+
+      final Composite container = _tk.createComposite(parent);
+      GridDataFactory.fillDefaults().applyTo(container);
+      GridLayoutFactory.fillDefaults()//
+            .numColumns(1)
+            .extendedMargins(5, 0, 5, 5)
             .applyTo(container);
       {
-         {
-            /*
-             * combo: statistics
-             */
+         _canvasHrZoneImage = new Canvas(container, SWT.DOUBLE_BUFFERED);
+         GridDataFactory.fillDefaults()//
+               .grab(false, true)
+               // force image width
+               .hint(20, SWT.DEFAULT)
+               .applyTo(_canvasHrZoneImage);
 
-         }
+         _canvasHrZoneImage.addPaintListener(new PaintListener() {
+            @Override
+            public void paintControl(final PaintEvent e) {
 
-         {
-            /*
-             * combo: year
-             */
-
-            _comboYear = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-            _comboYear.setToolTipText(Messages.Tour_Book_Combo_year_tooltip);
-            _comboYear.setVisibleItemCount(50);
-
-            GridDataFactory
-                  .fillDefaults()//
-                  .indent(widgetSpacing, 0)
-                  .hint(_pc.convertWidthInCharsToPixels(IS_OSX ? 12 : IS_LINUX ? 12 : 5), SWT.DEFAULT)
-                  .applyTo(_comboYear);
-
-            _comboYear.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onSelectYear();
+               if (_hrZoneImage == null || _hrZoneImage.isDisposed()) {
+                  return;
                }
-            });
-         }
 
-         {
-            /*
-             * combo: year numbers
-             */
+               final GC gc = e.gc;
 
-            _comboNumberOfYears = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-            _comboNumberOfYears.setToolTipText(Messages.tour_statistic_number_of_years);
-            _comboNumberOfYears.setVisibleItemCount(50);
+               /*
+                * fill background because when the part is resized, a gray background would appear
+                */
+               gc.setBackground(_tk.getColors().getBackground());
+               gc.fillRectangle(e.x, e.y, e.width, e.height);
 
-            GridDataFactory
-                  .fillDefaults()//
-                  .indent(2, 0)
-                  .hint(_pc.convertWidthInCharsToPixels(IS_OSX ? 8 : IS_LINUX ? 8 : 4), SWT.DEFAULT)
-                  .applyTo(_comboNumberOfYears);
+               gc.drawImage(_hrZoneImage, 0, 0);
+            }
+         });
 
-            _comboNumberOfYears.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onSelectYear();
+         _canvasHrZoneImage.addControlListener(new ControlAdapter() {
+            @Override
+            public void controlResized(final ControlEvent e) {
+               updateUI_44_HrZoneImage();
+            }
+         });
+
+         _canvasHrZoneImage.addDisposeListener(new DisposeListener() {
+            @Override
+            public void widgetDisposed(final DisposeEvent e) {
+               if (_hrZoneImage != null) {
+                  _hrZoneImage.dispose();
                }
-            });
-         }
-
-         {
-            /*
-             * combo: sequence for stacked charts
-             */
-
-            _comboBarVerticalOrder = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-            _comboBarVerticalOrder.setToolTipText(Messages.Tour_Statistic_Combo_BarVOrder_Tooltip);
-            _comboBarVerticalOrder.setVisibleItemCount(50);
-            _comboBarVerticalOrder.setVisible(false);
-
-            GridDataFactory
-                  .fillDefaults()//
-                  .indent(widgetSpacing, 0)
-                  //                .hint(defaultTextSize.x, SWT.DEFAULT)
-                  .applyTo(_comboBarVerticalOrder);
-
-            _comboBarVerticalOrder.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {}
-            });
-         }
+            }
+         });
       }
    }
 
    @Override
    public void dispose() {
 
-      // dispose all statistic resources
-      getViewSite().getPage().removePartListener(_partListener);
+      disposeHrZoneResources();
+
+      if (_tk != null) {
+         _tk.dispose();
+      }
+
       getSite().getPage().removePostSelectionListener(_postSelectionListener);
+
+      // an NPE occured when the part could not be created
+      if (_partListener != null) {
+         getViewSite().getPage().removePartListener(_partListener);
+      }
+
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
-      _prefStoreCommon.removePropertyChangeListener(_prefChangeListenerCommon);
 
       super.dispose();
    }
 
-   /**
-    * @param defaultYear
-    * @return Returns the index for the active year or <code>-1</code> when there are no years
-    *         available
-    */
-   private int getActiveYearComboboxIndex(final int defaultYear) {
+   private void disposeHrZoneResources() {
 
-      int selectedYearIndex = -1;
+      if (_hrZoneColors != null) {
 
-      if (_availableYears == null) {
-         return selectedYearIndex;
-      }
-
-      /*
-       * try to get the year index for the default year
-       */
-      if (defaultYear != -1) {
-
-         int yearIndex = 0;
-         for (final int year : _availableYears.toArray()) {
-
-            if (year == defaultYear) {
-
-               _selectedYear = defaultYear;
-
-               return yearIndex;
-            }
-            yearIndex++;
+         for (final Color hrZoneColor : _hrZoneColors) {
+            hrZoneColor.dispose();
          }
-      }
 
-      /*
-       * try to get year index of the selected year
-       */
-      int yearIndex = 0;
-      for (final int year : _availableYears.toArray()) {
-         if (year == _selectedYear) {
-            selectedYearIndex = yearIndex;
-            break;
+         for (int zoneIndex = 0; zoneIndex < _hrZoneColors.length; zoneIndex++) {
+            _hrZoneColors[zoneIndex].dispose();
+            _hrZoneColorsBright[zoneIndex].dispose();
+            _hrZoneColorsDark[zoneIndex].dispose();
          }
-         yearIndex++;
-      }
 
-      return selectedYearIndex;
+         _hrZoneColors = null;
+         _hrZoneColorsBright = null;
+         _hrZoneColorsDark = null;
+      }
    }
 
-   /**
-    * @return Returns number of years which are selected in the combobox
-    */
-   private int getNumberOfYears() {
+   private void enableControls() {
 
-      int numberOfYears = 1;
-      final int selectedIndex = _comboNumberOfYears.getSelectionIndex();
+      final boolean isHrZoneAvailable = TrainingManager.isRequiredHrZoneDataAvailable(_tourData);
+      final boolean isCustomScaling = isHrZoneAvailable && _isShowAllValues == false;
 
-      if (selectedIndex != -1) {
-         numberOfYears = selectedIndex + 1;
-      }
+//      _comboTrainingChart.setEnabled(canShowHrZones);
 
-      return numberOfYears;
+      _spinnerHrLeft.setEnabled(isCustomScaling);
+      _spinnerHrRight.setEnabled(isCustomScaling);
+      _lblHrMin.setEnabled(isCustomScaling);
+      _lblHrMax.setEnabled(isCustomScaling);
+
+      _actionSynchVerticalChartScaling.setEnabled(isCustomScaling);
+      _actionShowAllStressScoreValues.setEnabled(isHrZoneAvailable);
+      _actionTrainingOptions.setEnabled(isHrZoneAvailable);
    }
 
-   @Override
-   public ArrayList<TourData> getSelectedTours() {
-      return new ArrayList<>();
+   private void fillToolbar() {
+
+      /*
+       * View toolbar
+       */
+      final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
+      tbm.add(_actionTrainingOptions);
+
+      // update toolbar which creates the slideout
+      tbm.update(true);
+
+      /*
+       * Header toolbar
+       */
+      _headerToolbarManager.add(_actionShowAllStressScoreValues);
+      _headerToolbarManager.add(_actionSynchVerticalChartScaling);
+
+      _headerToolbarManager.update(true);
    }
 
    private void initUI(final Composite parent) {
 
-      _pc = new PixelConverter(parent);
+      _tk = new FormToolkit(parent.getDisplay());
 
-      final GC gc = new GC(parent);
+      _defaultSpinnerModifyListener = new ModifyListener() {
+         @Override
+         public void modifyText(final ModifyEvent e) {
+            if (_isUpdateUI) {
+               return;
+            }
+            onModifyHrBorder();
+         }
+      };
+
+      _defaultSpinnerSelectionListener = new SelectionAdapter() {
+         @Override
+         public void widgetSelected(final SelectionEvent e) {
+            if (_isUpdateUI) {
+               return;
+            }
+            onModifyHrBorder();
+         }
+      };
+
+      _defaultSpinnerMouseWheelListener = new MouseWheelListener() {
+         @Override
+         public void mouseScrolled(final MouseEvent event) {
+            Util.adjustSpinnerValueOnMouseScroll(event);
+            if (_isUpdateUI) {
+               return;
+            }
+            onModifyHrBorder();
+         }
+      };
+
+   }
+
+   private void onModifyHrBorder() {
+
+      int left = _spinnerHrLeft.getSelection();
+      int right = _spinnerHrRight.getSelection();
+
+      _isUpdateUI = true;
       {
-         //  _minimumComboWidth = gc.textExtent(COMBO_MINIMUM_WIDTH).x;
-         // _maximumComboWidth = gc.textExtent(COMBO_MAXIMUM_WIDTH).x;
+         if (left == HR_LEFT_MIN_BORDER && right == HR_LEFT_MIN_BORDER) {
+
+            right++;
+            _spinnerHrRight.setSelection(right);
+
+         } else if (left == HR_RIGHT_MAX_BORDER && right == HR_RIGHT_MAX_BORDER) {
+
+            left--;
+            _spinnerHrLeft.setSelection(left);
+
+         } else if (left >= right) {
+
+            left = right - 1;
+            _spinnerHrLeft.setSelection(left);
+         }
       }
-      gc.dispose();
-   }
+      _isUpdateUI = false;
 
-   private void onSelectStatistic() {
-
-   }
-
-   private void onSelectYear() {
-
-      final int selectedItem = _comboYear.getSelectionIndex();
-      if (selectedItem != -1) {
-
-         _selectedYear = Integer.parseInt(_comboYear.getItem(selectedItem));
-
-      }
+      updateUI_30_HrZonesFromModel();
    }
 
    /**
-    * create the year list for all tours and fill the year combobox with the available years
+    * Person and/or hr zones are modified
     */
-   private void refreshYearCombobox() {
+   private void onModifyPerson() {
 
-      final SQLFilter filter = new SQLFilter(SQLFilter.TAG_FILTER);
+      clearView();
+      showTour();
+   }
 
-      String fromTourData;
+   private void onSelectionChanged(final ISelection selection) {
 
-      final SQLFilter sqlFilter = new SQLFilter(SQLFilter.TAG_FILTER);
-      if (sqlFilter.isTagFilterActive()) {
+      if (selection instanceof SelectionTourData) {
 
-         // with tag filter
+         final TourData selectionTourData = ((SelectionTourData) selection).getTourData();
+         if (selectionTourData != null) {
 
-         fromTourData = NL
+            // prevent loading the same tour
+            if (_tourData != null && _tourData.equals(selectionTourData)) {
+               return;
+            }
 
-               + "FROM (         " + NL //$NON-NLS-1$
-
-               + " SELECT        " + NL //$NON-NLS-1$
-
-               + "  StartYear    " + NL //$NON-NLS-1$
-
-               + ("  FROM " + TourDatabase.TABLE_TOUR_DATA) + NL//$NON-NLS-1$
-
-               // get tag id's
-               + "  LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" + NL //$NON-NLS-1$ //$NON-NLS-2$
-               + "  ON tourID = jTdataTtag.TourData_tourId  " + NL //$NON-NLS-1$
-
-               + "  WHERE 1=1    " + NL //$NON-NLS-1$
-               + sqlFilter.getWhereClause()
-
-               + ") td           " + NL//$NON-NLS-1$
-         ;
-
-      } else {
-
-         // without tag filter
-
-         fromTourData = NL
-
-               + " FROM " + TourDatabase.TABLE_TOUR_DATA + NL //$NON-NLS-1$
-
-               + " WHERE 1=1        " + NL //$NON-NLS-1$
-               + sqlFilter.getWhereClause() + NL;
-      }
-
-      final String sqlString = NL +
-
-            "SELECT                 " + NL //$NON-NLS-1$
-
-            + " StartYear           " + NL //$NON-NLS-1$
-
-            + fromTourData
-
-            + " GROUP BY STARTYEAR     " + NL //$NON-NLS-1$
-            + " ORDER BY STARTYEAR     " + NL//       //$NON-NLS-1$
-      ;
-      _availableYears = new TIntArrayList();
-
-      try {
-         final Connection conn = TourDatabase.getInstance().getConnection();
-         final PreparedStatement statement = conn.prepareStatement(sqlString);
-         filter.setParameters(statement, 1);
-
-         final ResultSet result = statement.executeQuery();
-
-         while (result.next()) {
-            _availableYears.add(result.getInt(1));
+            updateUI_20(selectionTourData);
          }
 
-         conn.close();
+      } else if (selection instanceof SelectionTourIds) {
 
-      } catch (final SQLException e) {
-         UI.showSQLException(e);
-      }
-
-      _comboYear.removeAll();
-
-      /*
-       * add all years of the tours and the current year
-       */
-      final int thisYear = LocalDate.now().getYear();
-
-      boolean isThisYearSet = false;
-
-      for (final int year : _availableYears.toArray()) {
-
-         if (year == thisYear) {
-            isThisYearSet = true;
+         final SelectionTourIds selectionTourId = (SelectionTourIds) selection;
+         final ArrayList<Long> tourIds = selectionTourId.getTourIds();
+         if (tourIds != null && tourIds.size() > 0) {
+            updateUI(tourIds.get(0));
          }
 
-         _comboYear.add(Integer.toString(year));
-      }
+      } else if (selection instanceof SelectionTourId) {
 
-      // add currenty year if not set
-      if (isThisYearSet == false) {
-         _availableYears.add(thisYear);
-         _comboYear.add(Integer.toString(thisYear));
+         final SelectionTourId selectionTourId = (SelectionTourId) selection;
+         final Long tourId = selectionTourId.getTourId();
+
+         updateUI(tourId);
+
+      } else if (selection instanceof StructuredSelection) {
+
+         final Object firstElement = ((StructuredSelection) selection).getFirstElement();
+         if (firstElement instanceof TVICatalogComparedTour) {
+
+            updateUI(((TVICatalogComparedTour) firstElement).getTourId());
+
+         } else if (firstElement instanceof TVICompareResultComparedTour) {
+
+            final TVICompareResultComparedTour compareResultItem = (TVICompareResultComparedTour) firstElement;
+            final TourData tourData = TourManager.getInstance().getTourData(compareResultItem.getComparedTourData().getTourId());
+            updateUI_20(tourData);
+         }
+
+      } else if (selection instanceof SelectionTourCatalogView) {
+
+         final SelectionTourCatalogView tourCatalogSelection = (SelectionTourCatalogView) selection;
+
+         final TVICatalogRefTourItem refItem = tourCatalogSelection.getRefItem();
+         if (refItem != null) {
+            updateUI(refItem.getTourId());
+         }
+
+      } else if (selection instanceof SelectionDeletedTours) {
+
+         clearView();
       }
    }
 
-   /**
-    * Restore selected statistic
-    */
-   void restoreState() {
+   private void restoreState() {
 
+      _isShowAllValues = Util.getStateBoolean(_state, STATE_IS_SHOW_ALL_STRESS_SCORE_VALUES, false);
+      _actionShowAllStressScoreValues.setChecked(_isShowAllValues);
+
+      _isSynchChartVerticalValues = Util.getStateBoolean(_state, STATE_IS_SYNC_VERTICAL_CHART_SCALING, false);
+      _actionSynchVerticalChartScaling.setChecked(_isSynchChartVerticalValues);
+
+      _isUpdateUI = true;
+      {
+         _spinnerHrLeft.setSelection(Util.getStateInt(_state, STATE_HR_CHART_LEFT_BORDER, 60));
+         _spinnerHrRight.setSelection(Util.getStateInt(_state, STATE_HR_CHART_RIGHT_BORDER, 200));
+      }
+      _isUpdateUI = false;
    }
 
    @PersistState
-   private void saveState() {}
+   private void saveState() {
 
-   private void selectYear(final int defaultYear) {
+      _state.put(STATE_HR_CHART_LEFT_BORDER, _spinnerHrLeft.getSelection());
+      _state.put(STATE_HR_CHART_RIGHT_BORDER, _spinnerHrRight.getSelection());
 
-      int selectedYearIndex = getActiveYearComboboxIndex(defaultYear);
-      if (selectedYearIndex == -1) {
+      _state.put(STATE_IS_SHOW_ALL_STRESS_SCORE_VALUES, _actionShowAllStressScoreValues.isChecked());
+      _state.put(STATE_IS_SYNC_VERTICAL_CHART_SCALING, _actionSynchVerticalChartScaling.isChecked());
+   }
 
-         /*
-          * the active year was not found in the combo box, it's possible that the combo box needs
-          * to be update
-          */
+   private void setChartProperties() {
 
-         refreshYearCombobox();
-         selectedYearIndex = getActiveYearComboboxIndex(defaultYear);
+      UI.updateChartProperties(_chartHrTime, GRID_PREF_PREFIX);
 
-         if (selectedYearIndex == -1) {
-
-            // year is still not selected
-            final int yearCount = _comboYear.getItemCount();
-
-            // reselect the youngest year if years are available
-            if (yearCount > 0) {
-               selectedYearIndex = yearCount - 1;
-               _selectedYear = Integer.parseInt(_comboYear.getItem(yearCount - 1));
-            }
-         }
-      }
-
-      _comboYear.select(selectedYearIndex);
+      // show title
+      _chartHrTime.getChartTitleSegmentConfig().isShowSegmentTitle = true;
    }
 
    @Override
@@ -654,4 +885,485 @@ public class PerformanceChartView extends ViewPart implements ITourProvider {
 
    }
 
+   private void showTour() {
+
+      onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
+
+      if (_tourData == null) {
+         showTourFromTourProvider();
+      }
+
+      enableControls();
+   }
+
+   private void showTourFromTourProvider() {
+
+      // a tour is not displayed, find a tour provider which provides a tour
+      Display.getCurrent().asyncExec(new Runnable() {
+         @Override
+         public void run() {
+
+            // validate widget
+            if (_pageBook.isDisposed()) {
+               return;
+            }
+
+            /*
+             * check if tour was set from a selection provider
+             */
+            if (_tourData != null) {
+               return;
+            }
+
+            final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
+            if (selectedTours != null && selectedTours.size() > 0) {
+               updateUI_20(selectedTours.get(0));
+            }
+         }
+      });
+   }
+
+   private void updateUI(final long tourId) {
+
+      if (_tourData != null && _tourData.getTourId() == tourId) {
+         // optimize
+         return;
+      }
+
+      //TODO Get all tours for current user for which are the types that the stress score was selected
+      updateUI_20(TourManager.getInstance().getTourData(tourId));
+   }
+
+   private void updateUI_20(final TourData tourData) {
+
+      if (tourData == null) {
+         // nothing to do
+         return;
+      }
+
+      _tourData = tourData;
+
+      final TourPerson tourPerson = tourData.getTourPerson();
+      if (tourPerson != _currentPerson) {
+
+         /*
+          * another person is contained in the tour, dispose resources which depends on the current
+          * person
+          */
+         if (_hrZoneDataContainerContent != null) {
+            _hrZoneDataContainerContent.dispose();
+         }
+
+         _currentPerson = tourPerson;
+      }
+
+      updateUI_30_HrZonesFromModel();
+   }
+
+   /**
+    * Displays training data when a tour is available
+    */
+   private void updateUI_30_HrZonesFromModel() {
+
+      enableControls();
+
+      /*
+       * check tour data
+       */
+      if (_tourData == null) {
+
+         // a tour is not selected
+         _pageBook.showPage(_page_NoTour);
+
+         return;
+      }
+
+      /*
+       * check pulse
+       */
+      final float[] pulseSerie = _tourData.pulseSerie;
+      if (pulseSerie == null || pulseSerie.length == 0) {
+
+         // pulse data are not available
+         _pageBook.showPage(_page_NoPulse);
+
+         return;
+      }
+
+      /*
+       * check person
+       */
+      if (_currentPerson == null) {
+
+         // selected tour do not contain a person
+         _pageBook.showPage(_page_NoPerson);
+
+         return;
+      }
+
+      /*
+       * check HR zones
+       */
+      final ArrayList<TourPersonHRZone> personHrZones = _currentPerson.getHrZonesSorted();
+      if (personHrZones.size() == 0) {
+
+         // hr zones are required
+
+         _lblNoHrZone.setText(NLS.bind(Messages.Training_View_Label_NoHrZones, _currentPerson.getName()));
+         _lblNoHrZone.getParent().layout(true, true);
+
+         _pageBook.showPage(_page_NoHrZones);
+
+         return;
+      }
+
+      /*
+       * required data are available
+       */
+
+      // set tooltip for the part title
+      setTitleToolTip(TourManager.getTourDateShort(_tourData));
+
+      // display page for the selected chart
+      _pageBook.showPage(_page_HrZones);
+
+      final HrZoneContext zoneMinMaxBpm = _currentPerson.getHrZoneContext(
+            _currentPerson.getHrMaxFormula(),
+            _currentPerson.getMaxPulse(),
+            _currentPerson.getBirthDayWithDefault(),
+            _tourData.getTourStartTime());
+
+      updateUI_40_HrZoneChart(zoneMinMaxBpm);
+      updateUI_42_HrZoneData(zoneMinMaxBpm);
+
+      // update hr zone image
+      updateUI_44_HrZoneImage();
+   }
+
+   private void updateUI_40_HrZoneChart(final HrZoneContext zoneMinMaxBpm) {
+
+      final float[] pulseSerie = new float[_tourData.timeSerie.length];
+      _tourData.getPulseSmoothedSerie();
+      final int[] timeSerie = _tourData.timeSerie;
+      final boolean[] breakTimeSerie = _tourData.getBreakTimeSerie();
+      final int timeSerieSize = timeSerie.length;
+
+      final ArrayList<TourPersonHRZone> hrSortedZones = _currentPerson.getHrZonesSorted();
+      final int zoneSize = hrSortedZones.size();
+
+      final RGB[] rgbBright = new RGB[zoneSize];
+      final RGB[] rgbDark = new RGB[zoneSize];
+      final RGB[] rgbLine = new RGB[zoneSize];
+
+      int zoneIndex = 0;
+
+      for (final TourPersonHRZone hrZone : hrSortedZones) {
+
+         rgbDark[zoneIndex] = hrZone.getColor();
+         rgbBright[zoneIndex] = hrZone.getColorBright();
+         rgbLine[zoneIndex] = hrZone.getColorDark();
+
+         zoneIndex++;
+      }
+
+      /*
+       * Get min/max values
+       */
+      float pulseMin;
+      float pulseMax;
+
+      if (_isShowAllValues) {
+
+         pulseMin = pulseMax = pulseSerie[0];
+
+         for (final float pulse : pulseSerie) {
+               pulseMin = _tourData.getGovss();
+         }
+
+      } else {
+         pulseMin = _tourData.getGovss();
+         pulseMax = _tourData.getGovss();
+      }
+
+      /*
+       * create x-data series
+       */
+      final int pulseRange = 360;
+
+      _xSeriePulse = new double[pulseRange];
+      final float[] ySeriePulseDuration = new float[pulseRange];
+
+      final int[] colorIndex = new int[pulseRange];
+
+      final float[] zoneMinBpm = zoneMinMaxBpm.zoneMinBpm;
+      final float[] zoneMaxBpm = zoneMinMaxBpm.zoneMaxBpm;
+
+      for (int pulseIndex = 0; pulseIndex < pulseRange; pulseIndex++) {
+
+         _xSeriePulse[pulseIndex] = pulseIndex;
+
+         // set color index for each pulse value
+         for (zoneIndex = 0; zoneIndex < zoneSize; zoneIndex++) {
+
+            final float minValue = zoneMinBpm[zoneIndex];
+            final float maxValue = zoneMaxBpm[zoneIndex];
+
+            final double pulse = pulseMin + pulseIndex;
+
+            if (pulse >= minValue && pulse <= maxValue) {
+
+               // pulse is in the current zone
+
+               colorIndex[pulseIndex] = zoneIndex;
+
+               break;
+            }
+         }
+      }
+
+      int prevTime = 0;
+
+      /*
+       * create y-data serie: get time/color for each pulse value
+       */
+      for (int serieIndex = 0; serieIndex < timeSerieSize; serieIndex++) {
+
+         // get time for each pulse value
+         final int currentTime = timeSerie[serieIndex];
+         final int timeDiff = currentTime - prevTime;
+         prevTime = currentTime;
+
+         // check if time is in a break
+         if (breakTimeSerie != null) {
+
+            /*
+             * break time requires distance data, so it's possible that break time data are not
+             * available
+             */
+
+            if (breakTimeSerie[serieIndex] == true) {
+               // pulse time is not set within a break
+               continue;
+            }
+         }
+
+         final float pulse = pulseSerie[serieIndex];
+         final int pulseIndex = (int) (pulse - pulseMin);
+
+         // check array bounds
+         if (pulseIndex >= 0 && pulseIndex < pulseRange) {
+            ySeriePulseDuration[pulseIndex] += timeDiff;
+         }
+      }
+
+      final ChartDataModel chartDataModel = new ChartDataModel(ChartType.BAR);
+
+//      chartDataModel.setTitle(TourManager.getTourDateTimeFull(_tourData));
+      chartDataModel.setTitle(TourManager.getTourDateTimeShort(_tourData));
+
+      /*
+       * x-axis: pulse
+       */
+      final ChartDataXSerie xData = new ChartDataXSerie(_xSeriePulse);
+      xData.setAxisUnit(ChartDataXSerie.X_AXIS_UNIT_NUMBER_CENTER);
+      xData.setUnitLabel("date");//net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit);
+      xData.setUnitStartValue(pulseMin);
+
+      chartDataModel.setXData(xData);
+
+      /*
+       * y-axis: time
+       */
+      final ChartDataYSerie yData = new ChartDataYSerie(
+            ChartType.BAR,
+            ChartDataYSerie.BAR_LAYOUT_STACKED,
+            new float[][] { new float[0] },
+            new float[][] { new float[200] });
+
+      yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);
+      yData.setYTitle("GOVSS");//Messages.App_Label_H_MM);
+
+      yData.setColorIndex(new int[][] { colorIndex });
+      yData.setRgbLine(rgbLine);
+      yData.setRgbBright(rgbBright);
+      yData.setRgbDark(rgbDark);
+      yData.setDefaultRGB(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY).getRGB());
+
+      chartDataModel.addYData(yData);
+
+      if (_isSynchChartVerticalValues && _isShowAllValues == false) {
+         _minMaxKeeper.setMinMaxValues(chartDataModel);
+      }
+
+      // show the new data data model in the chart
+      _chartHrTime.updateChart(chartDataModel, false);
+   }
+
+   /**
+    * @param zoneContext
+    *           Contains age and HR max values.
+    */
+   private void updateUI_42_HrZoneData(final HrZoneContext zoneContext) {
+
+      final int personZoneSize = _personHrZones.size();
+      final int[] tourHrZoneTimes = _tourData.getHrZones();
+      final long drivingTime = _tourData.getTourDrivingTime();
+
+      final int tourHrZoneSize = tourHrZoneTimes.length;
+
+      for (int tourZoneIndex = 0; tourZoneIndex < tourHrZoneSize; tourZoneIndex++) {
+
+         if (tourZoneIndex >= personZoneSize) {
+
+            /*
+             * when zone data in the tours are not consistent, number of zones in the tour and in
+             * the person can be different
+             */
+            break;
+         }
+
+         final double zoneTime = tourHrZoneTimes[tourZoneIndex];
+         final double zoneTimePercent = drivingTime == 0 //
+               ? 0
+               : zoneTime * 100.0 / drivingTime;
+
+         if (zoneTime == -1) {
+            // this zone and following zones are not available
+            break;
+         }
+
+         final TourPersonHRZone hrZone = _personHrZones.get(tourZoneIndex);
+
+         final int zoneMaxValue = hrZone.getZoneMaxValue();
+         final String zoneMaxValueText = zoneMaxValue == Integer.MAX_VALUE //
+               ? Messages.App_Label_max
+               : Integer.toString(zoneMaxValue);
+
+         final float zoneMinBpm = zoneContext.zoneMinBpm[tourZoneIndex];
+         final float zoneMaxBmp = zoneContext.zoneMaxBpm[tourZoneIndex];
+
+         final String zoneMaxBpmText = zoneMaxBmp == Integer.MAX_VALUE //
+               ? Messages.App_Label_max
+               : Integer.toString((int) zoneMaxBmp);
+
+         final int ageYears = zoneContext.age;
+         final String ageText = UI.SPACE + ageYears + UI.SPACE2 + Messages.Pref_People_Label_Years;
+
+         final String hrZoneTooltip =
+               //
+               hrZone.getNameLongShortcutFirst()
+                     //
+                     + UI.NEW_LINE
+                     + UI.NEW_LINE
+                     //
+                     + hrZone.getZoneMinValue()
+                     + UI.DASH
+                     + zoneMaxValueText
+                     + UI.SPACE
+                     + UI.SYMBOL_PERCENTAGE
+                     //
+                     + UI.SPACE
+                     + UI.SYMBOL_EQUAL
+                     + UI.SPACE
+                     //
+                     + Integer.toString((int) zoneMinBpm)
+                     + UI.DASH
+                     + zoneMaxBpmText
+                     + UI.SPACE
+                     + net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit
+                     //
+                     + UI.NEW_LINE
+                     + UI.NEW_LINE
+                     //
+                     + Messages.Pref_People_Label_Age
+                     + ageText
+                     //
+                     + UI.DASH_WITH_DOUBLE_SPACE
+                     //
+                     + Messages.HRMax_Label
+                     + UI.SPACE
+                     + zoneContext.hrMax
+                     + net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit
+         //
+         ;
+
+         // % values
+         _lblHrZonePercent[tourZoneIndex].setText(_nf1.format(zoneTimePercent));
+         _lblHrZonePercent[tourZoneIndex].setToolTipText(hrZoneTooltip);
+
+         // bpm values
+         _lblTourMinMaxValue[tourZoneIndex].setText(((int) zoneMinBpm) + UI.DASH + zoneMaxBpmText);
+         _lblTourMinMaxValue[tourZoneIndex].setToolTipText(hrZoneTooltip);
+
+         _lblTourMinMaxHours[tourZoneIndex].setText(net.tourbook.common.UI
+               .format_hh_mm((long) (zoneTime + 30))
+               .toString());
+         _lblTourMinMaxHours[tourZoneIndex].setToolTipText(hrZoneTooltip);
+
+         _lblHRZoneName[tourZoneIndex].setToolTipText(hrZoneTooltip);
+         _lblHRZoneColor[tourZoneIndex].setToolTipText(hrZoneTooltip);
+      }
+   }
+
+   private void updateUI_44_HrZoneImage() {
+
+      Display.getDefault().asyncExec(new Runnable() {
+
+         final int __counter = ++_imageCounter;
+
+         @Override
+         public void run() {
+
+            // check if this is the newest request to create an image
+            if (__counter < _imageCounter) {
+               return;
+            }
+
+            final boolean isHrZoneDataAvailable = TrainingManager.isRequiredHrZoneDataAvailable(_tourData);
+
+            final Point imageSize = _canvasHrZoneImage.getSize();
+            final int devImageWidth = imageSize.x;
+            final int devImageHeight = imageSize.y;
+
+            if (_hrZoneImage != null) {
+               _hrZoneImage.dispose();
+            }
+
+            final Image image = _hrZoneImage = new Image(Display.getDefault(), devImageWidth, devImageHeight);
+
+            final int hrZoneSize = _personHrZones.size();
+
+            final GC gc = new GC(image);
+            {
+               int devYPos = devImageHeight;
+
+               if (isHrZoneDataAvailable) {
+
+                  for (int zoneIndex = 0; zoneIndex < hrZoneSize; zoneIndex++) {
+
+                     final int devWidth = devImageWidth - 1;
+                     final int devHeight = (int) (100.0 / 100.0 * devImageHeight - 0);
+                     final int devY = devYPos - devHeight;
+
+                     gc.setForeground(_hrZoneColorsBright[zoneIndex]);
+                     gc.setBackground(_hrZoneColors[zoneIndex]);
+                     gc.fillGradientRectangle(0, devY, devWidth, devHeight - 1, false);
+
+                     gc.setForeground(_hrZoneColorsDark[zoneIndex]);
+                     gc.drawRectangle(0, devY, devWidth - 1, devHeight - 1);
+
+                     devYPos -= devHeight;
+                  }
+
+               } else {
+                  gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
+                  gc.fillRectangle(image.getBounds());
+               }
+            }
+            gc.dispose();
+
+            _canvasHrZoneImage.redraw();
+         }
+      });
+   }
 }

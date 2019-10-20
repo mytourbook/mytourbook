@@ -4009,7 +4009,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    public boolean computeGovss() {
 
-      if (timeSerie == null || gradientSerie == null) {
+      if (timeSerie == null || gradientSerie == null || tourPerson == null) {
          return false;
       }
 

@@ -123,7 +123,7 @@ public class Running_Govss {
       final int normalizedWork = (int) Math.round(lactateNormalizedPower * _tourData.getTourRecordingTime());
 
       // 9. Multiply value obtained in step 8 by the Intensity Weighting Fraction to get a raw training stress value.
-      int trainingStressValue = normalizedWork * intensityWeighingFactor;
+      int trainingStressValue = normalizedWork * 1;//intensityWeighingFactor;
 
       // 10. Divide the values from step 9 by the amount of work performed during the 10k to 1 hr test (threshold power in watts x number of seconds).
       //TODO
