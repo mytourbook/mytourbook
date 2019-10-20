@@ -2,7 +2,7 @@
 
 TODOs
 =====
-
+* Update FT search docu: FT search is updated when tour is saved
 * Test import because of changed device watching task + sql exception handling
 * Recommend DBeaver as a better SQL explorer   
 
@@ -21,25 +21,18 @@ New + Improvements
   - Expand only one item and collapse any other items
 
 * Tour cadence zones times (Frederic)
-  - Added the ability to see, for a given activity, month or year, the
-    percentage of time spent in each cadence zone "slow" and "fast".
-    This feature was inspired by coach Jason Koop's recommendation (see bullet
-    point #5 "Hike more"
-    https://trainright.com/8-things-ultrarunners-do-improve-training/)
+  - Added the ability to see, for a given activity, month or year, the percentage of time spent in each cadence zone "slow" and "fast"
+    This feature was inspired by coach Jason Koop's recommendation (see bullet point #5 "Hike more" https://trainright.com/8-things-ultrarunners-do-improve-training/)
 
 * Average elevation change per unit of distance (Frederic)
-  - Added the ability to see (in the Tour Book View and Calendar profiles) for a given
-    activity, month or year, the average elevation change per unit of distance.
-    This feature was inspired by coach Jason Koop's recommendation (see bullet
-    point "Volume of vertical gain/loss"
-    https://trainright.com/data-worth-tracking-ultrarunners)
+  - Added the ability to see (in the Tour Book View and Calendar profiles) for a given activity, month or year, the average elevation change per unit of distance.
+    This feature was inspired by coach Jason Koop's recommendation (see bullet point "Volume of vertical gain/loss" https://trainright.com/data-worth-tracking-ultrarunners)
 
 * Tour Marker's view (Frederic)
- - Possibility to delete marker(s) from the contextual menu and when pressing
-   the DELETE key
+ - Possibility to delete marker(s) from the contextual menu and when pressing the DELETE key
 
 * Tour Chart
-  - New smoothing algorithm which is not smoothing the computed speed/pace/altimeter/gradient values, this allows to see the raw computed data.
+  - New smoothing algorithm which is not smoothing the computed speed/pace/altimeter/gradient values, this allows to see the raw computed data
  
 * Tour Editor
   - Tour can be saved with <Ctrl>+s when "Tour Editor" view is the active view
@@ -51,30 +44,28 @@ New + Improvements
   - Show tour start/end location
 
 * Tour Filter
-  - Filter by tour start/end location  
+  - Filter by tour start/end location
   
 * TCX Export
-  - An activity type can now be specified when exporting activities in TCX
-    format. 
-	By default, the Strava and Garmin activity types are proposed
-    (see https://developers.strava.com/docs/uploads/ and https://www8.garmin.com/xmlschemas/TrainingCenterDatabasev2.xsd)
+  - An activity type can now be specified when exporting activities in TCX format
+	By default, the Strava and Garmin activity types are proposed (see https://developers.strava.com/docs/uploads/ and https://www8.garmin.com/xmlschemas/TrainingCenterDatabasev2.xsd)
   
 * Dialog Quick Edit
   - Edit tour start/end location 
+
+* Reference Tours
+  - Show recording time
 
   
 Import
 ======
 
 * Import Preferences (Frederic)
-  - Added the ability to choose whether to set the person's body weight when
-    importing and saving a tour.
+  - Added the ability to choose whether to set the person's body weight when importing and saving a tour
 
 * Import FitLogEx Files (Frederic)
-  - Custom Data Field Import. The data field names and values are imported in
-    the tour notes
-  - Setting the start time (when present) and time zone (when GPS coordinates are not present)
-    using the UTC time offset.
+  - Custom Data Field Import. The data field names and values are imported in the tour notes
+  - Setting the start time (when present) and time zone (when GPS coordinates are not present) using the UTC time offset
   - Importing and mapping unique equipments based on their GUIDs
 
 * .fit File (Frederic)
@@ -93,6 +84,7 @@ Changes
 
 * Altitude -> Elevation
   - Changed wording from "Altitude" to "Elevation" for the english texts
+    The term elevation is mainly used when referring to points on the Earth's surface, while altitude (...) is used for points above the surface (see https://en.wikipedia.org/wiki/Elevation)
 
 * Tour Book View
   -  Moved all tour modify actions into the new submenu "Adjust Tour Values"
@@ -102,8 +94,7 @@ Bugfix
 ======
 
 * Weather (Frederic)
- - When entering a pressure using the metric system (mb), the format now accepts 1
-   decimal
+ - When entering a pressure using the metric system (mb), the format now accepts 1 decimal
 
 * Fitlog Import (Frederic)
   - Now Taking into account the pauses when importing laps 
@@ -129,11 +120,10 @@ Bugfix
   - Show RPM/SPM correctly in the valuepoint tooltip https://github.com/wolfgang-ch/mytourbook/issues/86
 
 * Import
-  - Fixed a bug that confused the user when re-importing multiple files. If one of them was invalid,
-    the log would display the valid re-imported files as invalid files that could not be re-imported
+  - Fixed a bug that confused the user when re-importing multiple files. If one of them was invalid, the log would display the valid re-imported files as invalid files that could not be re-imported
 
-  - Fixed a bug when reimporting a subset of tours contained in files that have multiple tours.
-    The reimport is now enabled for all files except .Fit files.
+  - Fixed a bug when reimporting a subset of tours contained in files that have multiple tours
+    The reimport is now enabled for all files except .Fit files
 
 
 Translation    
@@ -149,8 +139,8 @@ System
 
 * Eclipse 2019-09 (4.13)
 
-  - This new version solves the issue (Linux only) when modifying the tour
-    start time spinner widget in the tour editor as it was not triggering 
-    the possibility to save the tour in the tour editor
-    (see also https://bugs.eclipse.org/bugs/show_bug.cgi?id=547489) 
-
+  - This new version solves the issue (Linux only) when modifying the tour start time spinner widget in the tour editor as it was not triggering the possibility to save the tour in the tour editor
+    See also https://bugs.eclipse.org/bugs/show_bug.cgi?id=547489
+    
+* System Translation (4.12)
+  Contains translated texts which are used within Eclipse

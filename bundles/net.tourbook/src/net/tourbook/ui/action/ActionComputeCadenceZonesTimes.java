@@ -20,10 +20,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourManager;
@@ -31,12 +33,15 @@ import net.tourbook.ui.ITourProvider;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
 
 public class ActionComputeCadenceZonesTimes extends Action {
 
-   private final ITourProvider _tourProvider;
+   private static IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
+
+   private final ITourProvider     _tourProvider;
 
    public ActionComputeCadenceZonesTimes(final ITourProvider tourDataEditor) {
 
@@ -44,7 +49,7 @@ public class ActionComputeCadenceZonesTimes extends Action {
 
       _tourProvider = tourDataEditor;
 
-      setText(Messages.TourEditor_Action_ComputeCadenceZonesTimes);
+      setText(Messages.Tour_Action_ComputeCadenceZonesTimes);
    }
 
    @Override
@@ -63,8 +68,10 @@ public class ActionComputeCadenceZonesTimes extends Action {
 
       if (MessageDialog.openConfirm(
             Display.getCurrent().getActiveShell(),
-            Messages.TourEditor_Dialog_ComputeCadenceZonesTimes_Title,
-            NLS.bind(Messages.TourEditor_Dialog_ComputeCadenceZonesTimes_Message, selectedTours.size())) == false) {
+            Messages.Tour_Action_ComputeCadenceZonesTimes_Title,
+            NLS.bind(Messages.Tour_Action_ComputeCadenceZonesTimes_Message,
+                  selectedTours.size(),
+                  _prefStore.getInt(ITourbookPreferences.CADENCE_ZONES_DELIMITER))) == false) {
          return;
       }
 

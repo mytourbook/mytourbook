@@ -2789,20 +2789,26 @@ public class TourDatabase {
       //
             + SQL.CreateField_EntityId(ENTITY_ID_COMPARED, true)
             //
-            + "   RefTourId      BIGINT,                                               \n" //$NON-NLS-1$
-            + "   TourId         BIGINT,                                               \n" //$NON-NLS-1$
+            + "   RefTourId          BIGINT,                                           \n" //$NON-NLS-1$
+            + "   TourId             BIGINT,                                           \n" //$NON-NLS-1$
             //
-            + "   StartIndex     INTEGER NOT NULL,                                     \n" //$NON-NLS-1$
-            + "   EndIndex       INTEGER NOT NULL,                                     \n" //$NON-NLS-1$
-            + "   TourDate       DATE NOT NULL,                                        \n" //$NON-NLS-1$
-            + "   StartYear      INTEGER NOT NULL,                                     \n" //$NON-NLS-1$
-            + "   TourSpeed      FLOAT,                                                \n" //$NON-NLS-1$
+            + "   StartIndex         INTEGER NOT NULL,                                 \n" //$NON-NLS-1$
+            + "   EndIndex           INTEGER NOT NULL,                                 \n" //$NON-NLS-1$
+            + "   TourDate           DATE NOT NULL,                                    \n" //$NON-NLS-1$
+            + "   StartYear          INTEGER NOT NULL,                                 \n" //$NON-NLS-1$
+            + "   TourSpeed          FLOAT,                                            \n" //$NON-NLS-1$
             //
             // version 28 start
             //
-            + "   AvgPulse      FLOAT                                                  \n" //$NON-NLS-1$
+            + "   AvgPulse           FLOAT,                                            \n" //$NON-NLS-1$
             //
             // version 28 end ---------
+            //
+            // version 40 start
+            //
+            + "   tourRecordingTime  INTEGER DEFAULT 0                                 \n" //$NON-NLS-1$
+            //
+            // version 40 end ---------
             //
             + ")"); //$NON-NLS-1$
    }
@@ -4867,8 +4873,10 @@ public class TourDatabase {
          }
 
          // 39 -> 40
+         boolean isPostUpdate40 = false;
          if (currentDbVersion == 39) {
             currentDbVersion = newVersion = updateDbDesign_039_to_040(conn, splashManager);
+            isPostUpdate40 = true;
          }
 
          /*
@@ -4922,6 +4930,9 @@ public class TourDatabase {
          }
          if (isPostUpdate37) {
             updateDbDesign_036_to_037_PostUpdate(conn, splashManager);
+         }
+         if (isPostUpdate40) {
+            updateDbDesign_039_to_040_PostUpdate(conn, splashManager);
          }
 
       } catch (final SQLException e) {
@@ -7308,14 +7319,16 @@ public class TourDatabase {
 // SET_FORMATTING_OFF
 
             // Add new columns
-            SQL.AddCol_VarCar   (stmt, TABLE_TOUR_DATA, "power_DataSource",  TourData.DB_LENGTH_POWER_DATA_SOURCE);   //$NON-NLS-1$
-            SQL.AddCol_Int      (stmt, TABLE_TOUR_DATA, "cadenceZone_SlowTime", DEFAULT_0);//$NON-NLS-1$
-            SQL.AddCol_Int      (stmt, TABLE_TOUR_DATA, "cadenceZone_FastTime", DEFAULT_0); //$NON-NLS-1$
-            SQL.AddCol_Int      (stmt, TABLE_TOUR_DATA, "cadenceZones_DelimiterValue", DEFAULT_0); //$NON-NLS-1$
-            SQL.AddCol_Int      (stmt, TABLE_TOUR_DATA, "avgAltitudeChange", DEFAULT_0); //$NON-NLS-1$
+            SQL.AddCol_VarCar (stmt, TABLE_TOUR_DATA, "power_DataSource",              TourData.DB_LENGTH_POWER_DATA_SOURCE); //$NON-NLS-1$
+            SQL.AddCol_Int    (stmt, TABLE_TOUR_DATA, "cadenceZone_SlowTime",          DEFAULT_0);                            //$NON-NLS-1$
+            SQL.AddCol_Int    (stmt, TABLE_TOUR_DATA, "cadenceZone_FastTime",          DEFAULT_0);                            //$NON-NLS-1$
+            SQL.AddCol_Int    (stmt, TABLE_TOUR_DATA, "cadenceZones_DelimiterValue",   DEFAULT_0);                            //$NON-NLS-1$
+            SQL.AddCol_Int    (stmt, TABLE_TOUR_DATA, "avgAltitudeChange",             DEFAULT_0);                            //$NON-NLS-1$
+
+            SQL.AddCol_Int    (stmt, TABLE_TOUR_COMPARED, "tourRecordingTime",         DEFAULT_0);                            //$NON-NLS-1$
 
             // Create index in table: TOURDATA_TOURTAG - Index: TOURTAG_TAGID
-            SQL.CreateIndex(  stmt, JOINTABLE__TOURDATA__TOURTAG, KEY_TAG);
+            SQL.CreateIndex   (stmt, JOINTABLE__TOURDATA__TOURTAG, KEY_TAG);
 
 // SET_FORMATTING_ON
          }
@@ -7325,6 +7338,114 @@ public class TourDatabase {
       logDb_UpdateEnd(newDbVersion);
 
       return newDbVersion;
+   }
+
+   /**
+    * Set tourRecordingTime
+    *
+    * @param conn
+    * @param splashManager
+    * @throws SQLException
+    */
+   private void updateDbDesign_039_to_040_PostUpdate(final Connection conn, final SplashManager splashManager)
+         throws SQLException {
+
+      // get number of compared tours
+      final String sql = "SELECT COUNT(*) FROM " + TourDatabase.TABLE_TOUR_COMPARED; //$NON-NLS-1$
+
+      final PreparedStatement stmt = conn.prepareStatement(sql);
+      ResultSet result = stmt.executeQuery();
+
+      // get first result
+      result.next();
+
+      // get first value
+      final int numberOfComparedTours = result.getInt(1);
+      if (numberOfComparedTours == 0) {
+         return;
+      }
+
+      final long startTime = System.currentTimeMillis();
+
+      final PreparedStatement stmtSelect = conn.prepareStatement( //
+            //
+            "SELECT" //                           //$NON-NLS-1$
+                  //
+                  + " comparedId," //             // 1 //$NON-NLS-1$
+                  + " tourId," //                 // 2 //$NON-NLS-1$
+                  + " startIndex," //             // 3 //$NON-NLS-1$
+                  + " endIndex" //                // 4 //$NON-NLS-1$
+                  //
+                  + " FROM " + TourDatabase.TABLE_TOUR_COMPARED //$NON-NLS-1$
+      );
+
+      final PreparedStatement stmtUpdate = conn.prepareStatement( //
+            //
+            "UPDATE " + TABLE_TOUR_COMPARED //    //$NON-NLS-1$
+            //
+                  + " SET" //                     //$NON-NLS-1$
+                  //
+                  + " tourRecordingTime=?" //     // 1 //$NON-NLS-1$
+                  //
+                  + " WHERE comparedId=?"); //    // 2 //$NON-NLS-1$
+
+      result = stmtSelect.executeQuery();
+
+      int compTourCounter = 0;
+      long lastUpdateTime = startTime;
+
+      while (result.next()) {
+
+         if (splashManager != null) {
+
+            ++compTourCounter;
+
+            final long currentTime = System.currentTimeMillis();
+            final float timeDiff = currentTime - lastUpdateTime;
+
+            // reduce logging
+            if (timeDiff > 500) {
+
+               lastUpdateTime = currentTime;
+
+               splashManager.setMessage(
+                     NLS.bind(
+                           Messages.Tour_Database_PostUpdate_040_SetTourRecordingTime,
+                           new Object[] { compTourCounter, numberOfComparedTours }));
+            }
+         }
+
+         final long compareId = result.getLong(1);
+         final long tourId = result.getLong(2);
+         final int startIndex = result.getInt(3);
+         final int endIndex = result.getInt(4);
+
+         final TourData tourData = TourManager.getTour(tourId);
+
+         if (tourData == null) {
+
+            StatusUtil.log(
+                  NLS.bind(
+                        "Cannot get tour {0} from database to update the recording time in the compared tour {1}.", //$NON-NLS-1$
+                        tourId,
+                        compareId));
+
+         } else {
+
+            final int tourRecordingTime = TourManager.computeTourRecordingTime(tourData, startIndex, endIndex);
+
+            // update tour recording time for the compared tour
+            stmtUpdate.setInt(1, tourRecordingTime);
+            stmtUpdate.setLong(2, compareId);
+            stmtUpdate.executeUpdate();
+         }
+      }
+
+      final long timeDiff = System.currentTimeMillis() - startTime;
+
+      StatusUtil.logInfo(String.format(
+            "Database postupdate 39 -> 40 in %s mm:ss", //$NON-NLS-1$
+            net.tourbook.common.UI.formatHhMmSs(timeDiff / 1000)));
    }
 
 //   private int updateDbDesign_034_to_035(final Connection conn, final IProgressMonitor monitor) throws SQLException {

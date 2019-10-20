@@ -1,0 +1,6 @@
+###########################
+ Update Eclipse NL repo
+###########################
+
+   - Update Eclipse NL jar files in the current Eclipse installation
+   - Export "feature.net.tourbook.ext.eclipse.nl" as deployable feature into this folder "build\build.eclipse.4.12.nl.repo"

@@ -38,11 +38,11 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
 
-public class ActionSetMinMaxTemperature extends Action {
+public class ActionComputeMinMaxTemperature extends Action {
 
    private final ITourProvider _tourProvider;
 
-   public ActionSetMinMaxTemperature(final ITourProvider tourProvider) {
+   public ActionComputeMinMaxTemperature(final ITourProvider tourProvider) {
 
       super(Messages.Tour_Action_SetMinMaxTemperature, AS_PUSH_BUTTON);
 

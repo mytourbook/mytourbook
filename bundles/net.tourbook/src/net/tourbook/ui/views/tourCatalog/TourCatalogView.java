@@ -477,6 +477,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
 
                      comparedTour.setAvgPulse(compareTourProperty.avgPulse);
                      comparedTour.setTourSpeed(compareTourProperty.speed);
+                     comparedTour.setTourRecordingTime(compareTourProperty.recordingTime);
 
                      // update the viewer
                      _tourViewer.update(comparedTour, null);
@@ -693,6 +694,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
       defineColumn_Title();
       defineColumn_Tags();
       defineColumn_Speed();
+      defineColumn_Time_RecordingTime();
       defineColumn_AvgPulse();
    }
 
@@ -869,6 +871,28 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
             final Object element = cell.getElement();
             if (element instanceof TVICatalogComparedTour) {
                cell.setText(TourDatabase.getTagNames(((TVICatalogComparedTour) element).tagIds));
+            }
+         }
+      });
+   }
+
+   /**
+    * column: Recording time (hh:mm:ss)
+    */
+   private void defineColumn_Time_RecordingTime() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.TIME_RECORDING_TIME.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            if (element instanceof TVICatalogComparedTour) {
+
+               final long value = ((TVICatalogComparedTour) element).tourRecordingTime;
+
+               colDef.printLongValue(cell, value, true);
             }
          }
       });

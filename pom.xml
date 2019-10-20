@@ -14,7 +14,7 @@
    <packaging>pom</packaging>
    
    <properties>
-      <tycho.version>0.25.0</tycho.version>
+      <tycho.version>1.4.0</tycho.version>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>  
    </properties>
 
@@ -53,7 +53,7 @@
             <module>build/build.update-site-no-NL</module>
          </modules>
       </profile>
-   
+      
    </profiles>
 
 
@@ -63,7 +63,7 @@
       <!-- Eclipse E4 web repository -->
       
       <repository>
-         <id>eclipse.platform.4.13</id>                                  <layout>p2</layout>
+         <id>eclipse.platform.4.13</id>                                 <layout>p2</layout>
          <url>https://download.eclipse.org/releases/2019-09</url>
       </repository>   
    
@@ -95,8 +95,8 @@
       -->
       
       <repository>
-         <id>eclipse.3.8.2.nl</id>                                      <layout>p2</layout>
-         <url>file:build/build.eclipse.3.8.2.nl.update-site</url>
+         <id>eclipse.4.12.nl</id>                                       <layout>p2</layout>
+         <url>file:build/build.eclipse.4.12.nl.repo</url>
       </repository>
 
 
