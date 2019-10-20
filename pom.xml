@@ -96,7 +96,7 @@
       
       <repository>
          <id>eclipse.4.12.nl</id>                                       <layout>p2</layout>
-         <url>file:build/build.eclipse.4.12.nl</url>
+         <url>file:build/build.eclipse.4.12.nl.repo</url>
       </repository>
 
 

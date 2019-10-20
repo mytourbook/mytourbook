@@ -2395,6 +2395,7 @@ public class Messages extends NLS {
    public static String Tour_Database_PostUpdate_032_SetTourTimeZone;
    public static String Tour_Database_PostUpdate_034_SetTourGeoParts;
    public static String Tour_Database_PostUpdate_037_SetHasGeoData;
+   public static String Tour_Database_PostUpdate_040_SetTourRecordingTime;
    public static String Tour_Database_PostUpdate011_SetTourCreateTime;
    public static String Tour_Database_PostUpdate020_ConvertIntToFloat;
    public static String Tour_Database_PostUpdate021_SetTourStartEndTime;
