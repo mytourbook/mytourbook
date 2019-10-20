@@ -880,7 +880,9 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
     * column: Recording time (hh:mm:ss)
     */
    private void defineColumn_Time_RecordingTime() {
+
       final TreeColumnDefinition colDef = TreeColumnFactory.TIME_RECORDING_TIME.createColumn(_columnManager, _pc);
+
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
@@ -888,13 +890,9 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
             final Object element = cell.getElement();
             if (element instanceof TVICatalogComparedTour) {
 
-               final int value = ((TVICatalogComparedTour) element).tourRecordingTime;
+               final long value = ((TVICatalogComparedTour) element).tourRecordingTime;
 
-               if (value == 0) {
-                  cell.setText(UI.EMPTY_STRING);
-               } else {
-                  cell.setText(net.tourbook.common.UI.format_mm_ss(value));
-               }
+               colDef.printLongValue(cell, value, true);
             }
          }
       });
