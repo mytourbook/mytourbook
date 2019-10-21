@@ -1024,9 +1024,8 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
          newCategory.setRoot(true);
 
          /*
-          * update model
+          * Update model
           */
-
          _rootItem.getFetchedChildren().add(newCategoryItem);
 
          // persist new category
@@ -1036,8 +1035,10 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
             // update item
             newCategoryItem.setTourTagCategory(savedNewCategory);
 
-            // update viewer
-            _tagViewer.add(this, newCategoryItem);
+            /*
+             * Update UI
+             */
+            _tagViewer.add(_rootItem, newCategoryItem);
          }
 
       } else if (parentElement instanceof TVIPrefTagCategory) {
@@ -1061,7 +1062,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
             newCategoryItem.setTourTagCategory(savedNewCategory);
 
             /*
-             * update parent category
+             * Update parent category
              */
             final TourTagCategory parentCategoryEntity = em.find(
                   TourTagCategory.class,
@@ -1075,7 +1076,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
             parentCategoryEntity.setCategoryCounter(lazyTourTagCategories.size());
 
             /*
-             * persist parent category
+             * Persist parent category
              */
             final TourTagCategory savedParentCategory = TourDatabase.saveEntity(
                   parentCategoryEntity,
@@ -1088,11 +1089,9 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
                parentCategoryItem.setTourTagCategory(savedParentCategory);
 
                /*
-                * update viewer
+                * Update UI
                 */
                parentCategoryItem.clearChildren();
-
-//               fTagViewer.update(parentCategoryItem, null);
 
                _tagViewer.add(parentCategoryItem, newCategoryItem);
 
@@ -1159,7 +1158,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
          tourTag.setRoot(true);
 
          /*
-          * update model
+          * Update model
           */
          tagItem.setParentItem(_rootItem);
          _rootItem.getFetchedChildren().add(tagItem);
@@ -1173,9 +1172,9 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
             tagItem.setTourTag(savedTag);
 
             /*
-             * update viewer
+             * Update UI
              */
-            _tagViewer.add(this, tagItem);
+            _tagViewer.add(_rootItem, tagItem);
          }
 
       } else if (parentItem instanceof TVIPrefTagCategory) {
