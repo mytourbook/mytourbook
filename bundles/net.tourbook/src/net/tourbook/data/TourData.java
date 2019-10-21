@@ -95,7 +95,7 @@ import net.tourbook.tour.BreakTimeTool;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.photo.TourPhotoLink;
 import net.tourbook.tour.photo.TourPhotoManager;
-import net.tourbook.trainingload.Running_Govss;
+import net.tourbook.trainingstress.Running_Govss;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.ChartLabel;
 import net.tourbook.ui.tourChart.ChartLayer2ndAltiSerie;
@@ -664,7 +664,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    private short                  isStrideSensorPresent            = 0;
 
-   // ############################################# TRAINING LOAD DATA #############################################
+   // ############################################# TRAINING STRESS DATA #############################################
 
    /**
     * GOVSS (Gravity Ordered Velocity Stress Score)

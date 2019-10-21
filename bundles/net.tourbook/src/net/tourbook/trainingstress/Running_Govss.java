@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.trainingload;
+package net.tourbook.trainingstress;
 
 import java.util.ArrayList;
 
@@ -98,8 +98,10 @@ public class Running_Govss {
 
       // 1. Find the athlete’s velocity at LT by a 10 km to one hour maximal run.
       //Determine TP from preference page Thresholdpower
+      final float tempCriticalVelocity = 4.13f;// m/sec => 6'30 min/mile
 
       // 2. Convert this LT limited velocity to a LT limited power value using Equation 7. "Lactate limited power" may also be called "lactate adjusted power".
+      final float lactateLimitedPower = (float) ComputePower(10000, 0.0, 0, tempCriticalVelocity);
 
       // 3. Analyze the data from a particular workout from an athlete’s log, computing 120 second rolling averages from velocity and slope data.
       final ArrayList<Double> powerValues = computePowerValues();
@@ -116,8 +118,7 @@ public class Running_Govss {
       final double lactateNormalizedPower = Math.pow(averagePower, 0.25);
 
       // 7. Divide Lactate Normalized Power by Threshold Power from step 2 to get the Intensity Weighting Fraction.
-      //TODO
-      final int intensityWeighingFactor = (int) Math.round(lactateNormalizedPower / 1.0);
+      final int intensityWeighingFactor = (int) Math.round(lactateNormalizedPower / lactateLimitedPower);
 
       // 8. Multiply the Lactate Normalized Power by the duration of the workout in seconds to obtain the normalized work performed in joules.
       final int normalizedWork = (int) Math.round(lactateNormalizedPower * _tourData.getTourRecordingTime());
@@ -126,8 +127,7 @@ public class Running_Govss {
       int trainingStressValue = normalizedWork * 1;//intensityWeighingFactor;
 
       // 10. Divide the values from step 9 by the amount of work performed during the 10k to 1 hr test (threshold power in watts x number of seconds).
-      //TODO
-      trainingStressValue /= 1;
+      trainingStressValue /= (lactateLimitedPower * 60);
 
       // 11. Multiply the number from step 10 by 100 to obtain the final training stress in GOVSS.
       trainingStressValue *= 100;

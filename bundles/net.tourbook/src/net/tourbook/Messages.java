@@ -2592,6 +2592,7 @@ public class Messages extends NLS {
 
    public static String Tour_SubMenu_Cadence;
    public static String Tour_SubMenu_Elevation;
+   public static String Tour_SubMenu_TrainingStress;
 
    public static String Tour_Tag_Filter_Action_Tooltip;
 

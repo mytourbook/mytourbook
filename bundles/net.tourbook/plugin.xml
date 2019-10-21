@@ -410,6 +410,17 @@
          id="net.tourbook.preferences.PrefPageStatistic"
          class="net.tourbook.preferences.PrefPageStatistic"
       />
+      
+      
+       <!--
+         Training Stress
+      -->
+      
+      <page
+         name="%preference_page_TrainingStress"
+         id="net.tourbook.preferences.PrefPageTrainingStress"
+         class="net.tourbook.preferences.PrefPageTrainingStress"
+      />
 
 
       <!--
@@ -1150,6 +1161,15 @@ THIS IS NOT YET FULLY IMPLEMENTED
          
       </menuContribution>
 
+   </extension>
+   
+    <extension	point="org.eclipse.ui.preferencePages">
+      <page
+            category="net.tourbook.preferences.PrefPageTrainingStress"
+            class="net.tourbook.trainingstress.PrefPageGovss"
+            id="net.tourbook.trainingstress.PrefPageGovss"
+            name="GOVSS">
+      </page>
    </extension>
 
    <extension point="org.eclipse.ui.commands">

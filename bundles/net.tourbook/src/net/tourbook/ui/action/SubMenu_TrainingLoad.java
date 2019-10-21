@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui.action;
 
+import net.tourbook.Messages;
 import net.tourbook.ui.ITourProvider2;
 
 import org.eclipse.jface.action.Action;
@@ -36,9 +37,7 @@ public class SubMenu_TrainingLoad extends Action implements IMenuCreator {
 
    public SubMenu_TrainingLoad(final ITourProvider2 tourProvider) {
 
-      super("Training Load"
-      //Messages.Tour_SubMenu_Cadence
-            , AS_DROP_DOWN_MENU);
+      super(Messages.Tour_SubMenu_TrainingStress, AS_DROP_DOWN_MENU);
 
       setMenuCreator(this);
 
