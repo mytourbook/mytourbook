@@ -97,7 +97,6 @@ public class Running_Govss {
       //When identified, add them in the users preference page
 
       // 1. Find the athlete’s velocity at LT by a 10 km to one hour maximal run.
-      //Determine TP from preference page Thresholdpower
       final float tempCriticalVelocity = 4.13f;// m/sec => 6'30 min/mile
 
       // 2. Convert this LT limited velocity to a LT limited power value using Equation 7. "Lactate limited power" may also be called "lactate adjusted power".
@@ -124,7 +123,7 @@ public class Running_Govss {
       final int normalizedWork = (int) Math.round(lactateNormalizedPower * _tourData.getTourRecordingTime());
 
       // 9. Multiply value obtained in step 8 by the Intensity Weighting Fraction to get a raw training stress value.
-      int trainingStressValue = normalizedWork * 1;//intensityWeighingFactor;
+      int trainingStressValue = normalizedWork * intensityWeighingFactor;
 
       // 10. Divide the values from step 9 by the amount of work performed during the 10k to 1 hr test (threshold power in watts x number of seconds).
       trainingStressValue /= (lactateLimitedPower * 60);
