@@ -772,10 +772,10 @@
                
             <!-- Performance Chart -->
             <command
-               commandId="net.tourbook.command.PerformanceChartView"
+               commandId="net.tourbook.command.PredictedPerformanceChartView"
                icon="icons/performance-chart.png"
-               label="%Command_PerformanceChart"
-               mnemonic="%Command_PerformanceChart_Mnemonic"/>
+               label="%Command_PredictedPerformanceChart"
+               mnemonic="%Command_PredictedPerformanceChart_Mnemonic"/>
             
             <!-- Conconi Test -->
             <command
@@ -916,10 +916,10 @@ THIS IS NOT YET FULLY IMPLEMENTED
                
             <!-- Performance Chart -->
             <command 
-               commandId="net.tourbook.command.PerformanceChartView"
+               commandId="net.tourbook.command.PredictedPerformanceChartView"
                icon="icons/performance-chart.png"
-               label="%view_name_PerformanceChart"
-               mnemonic="%view_name_PerformanceChart_Mnemonic"/>
+               label="%view_name_PredictedPerformanceChart"
+               mnemonic="%view_name_PredictedPerformanceChart_Mnemonic"/>
             
          </toolbar>
       </menuContribution>
@@ -1157,7 +1157,7 @@ THIS IS NOT YET FULLY IMPLEMENTED
             category="net.tourbook.preferences.PrefPagePeopleId"
             class="net.tourbook.trainingstress.PrefPageTrainingStress"
             id="net.tourbook.trainingstress.PrefPageTrainingStress"
-            name="Training Stress">
+            name="%view_name_Training_Stress">
       </page>
    </extension>
 
@@ -1340,8 +1340,8 @@ THIS IS NOT YET FULLY IMPLEMENTED
       />
       
        <command
-         id             ="net.tourbook.command.PerformanceChartView"
-         name           ="%Command_PerformanceChart"
+         id             ="net.tourbook.command.PredictedPerformanceChartView"
+         name           ="%Command_PredictedPerformanceChart"
          defaultHandler ="net.tourbook.ui.views.performanceChart.ActionHandlerOpenViewPerformanceChart"
       />
       
@@ -1769,10 +1769,10 @@ THIS IS NOT YET FULLY IMPLEMENTED
          
          <view
             category    ="net.tourbook.category.Tools"
-            class       ="net.tourbook.ui.views.performanceChart.PerformanceChartView"
+            class       ="net.tourbook.ui.views.performanceChart.PredictedPerformanceChartView"
             icon        ="icons/performance-chart.png"
-            id          ="net.tourbook.ui.views.performanceChart.PerformanceChartView"
-            name        ="%view_name_PerformanceChart"
+            id          ="net.tourbook.ui.views.performanceChart.PredictedPerformanceChartView"
+            name        ="%view_name_PredictedPerformanceChart"
          />
 
 

@@ -26,7 +26,7 @@ public class ActionHandlerOpenViewPerformanceChart extends AbstractHandler {
    @Override
    public Object execute(final ExecutionEvent event) throws ExecutionException {
 
-      Util.showView(PerformanceChartView.ID, true);
+      Util.showView(PredictedPerformanceChartView.ID, true);
 
       return null;
    }

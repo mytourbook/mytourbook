@@ -23,20 +23,20 @@ import org.eclipse.jface.action.Action;
 
 public class ActionShowAllStressScoreValues extends Action {
 
-   private PerformanceChartView _performanceChartView;
+   private PredictedPerformanceChartView _predictedPerformanceChartView;
 
-   public ActionShowAllStressScoreValues(final PerformanceChartView performanceChartView) {
+   public ActionShowAllStressScoreValues(final PredictedPerformanceChartView predictedPerformanceChartView) {
 
 		super(UI.EMPTY_STRING, AS_CHECK_BOX);
 
 		setToolTipText(Messages.Training_View_Action_ShowAllPulseValues);
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ZoomFitGraph));
 
-      _performanceChartView = performanceChartView;
+      _predictedPerformanceChartView = predictedPerformanceChartView;
 	}
 
 	@Override
 	public void run() {
-      _performanceChartView.actionShowAllStressScoreValues();
+      _predictedPerformanceChartView.actionShowAllStressScoreValues();
 	}
 }

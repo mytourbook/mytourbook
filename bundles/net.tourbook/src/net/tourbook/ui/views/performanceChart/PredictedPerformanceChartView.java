@@ -98,9 +98,9 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
-public class PerformanceChartView extends ViewPart {
+public class PredictedPerformanceChartView extends ViewPart {
 
-   public static final String  ID                                    = "net.tourbook.ui.views.performanceChart.PerformanceChartView"; //$NON-NLS-1$
+   public static final String  ID                                    = "net.tourbook.ui.views.performanceChart.PredictedPerformanceChartView"; //$NON-NLS-1$
 
    private static final int    HR_LEFT_MIN_BORDER                    = 0;
    private static final int    HR_RIGHT_MAX_BORDER                   = 230;
@@ -204,11 +204,11 @@ public class PerformanceChartView extends ViewPart {
       @Override
       protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
 
-         return new SlideoutTrainingOptions(_pageBook, toolbar, GRID_PREF_PREFIX, PerformanceChartView.this);
+         return new SlideoutTrainingOptions(_pageBook, toolbar, GRID_PREF_PREFIX, PredictedPerformanceChartView.this);
       }
    }
 
-   public PerformanceChartView() {}
+   public PredictedPerformanceChartView() {}
 
    void actionEditHrZones() {
 
@@ -314,7 +314,7 @@ public class PerformanceChartView extends ViewPart {
          @Override
          public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
-            if (part == PerformanceChartView.this) {
+            if (part == PredictedPerformanceChartView.this) {
                return;
             }
 
@@ -331,7 +331,7 @@ public class PerformanceChartView extends ViewPart {
          @Override
          public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
-            if (part == PerformanceChartView.this) {
+            if (part == PredictedPerformanceChartView.this) {
                return;
             }
 

@@ -23,9 +23,9 @@ import org.eclipse.jface.action.Action;
 
 public class ActionSynchChartScale extends Action {
 
-   private PerformanceChartView _performanceChartView;
+   private PredictedPerformanceChartView _performanceChartView;
 
-   public ActionSynchChartScale(final PerformanceChartView performanceChartView) {
+   public ActionSynchChartScale(final PredictedPerformanceChartView performanceChartView) {
 
 		super(UI.EMPTY_STRING, AS_CHECK_BOX);
 

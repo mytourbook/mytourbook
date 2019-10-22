@@ -36,7 +36,7 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public class SlideoutTrainingOptions extends ToolbarSlideout {
 
-   private PerformanceChartView _performanceChartView;
+   private PredictedPerformanceChartView _predictedPerformanceChartView;
 
 	private Action				_actionRestoreDefaults;
 	private ActionEditHrZones	_actionEditHrZones;
@@ -50,11 +50,11 @@ public class SlideoutTrainingOptions extends ToolbarSlideout {
 	public SlideoutTrainingOptions(	final Control ownerControl,
 									final ToolBar toolBar,
 									final String prefStoreGridPrefix,
-                                  final PerformanceChartView performanceChartView) {
+                                  final PredictedPerformanceChartView predicedPerformanceChartView) {
 
 		super(ownerControl, toolBar);
 
-      _performanceChartView = performanceChartView;
+      _predictedPerformanceChartView = predicedPerformanceChartView;
 
 		_gridUI = new ChartOptions_Grid(prefStoreGridPrefix);
 	}

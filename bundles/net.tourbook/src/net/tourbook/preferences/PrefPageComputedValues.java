@@ -56,7 +56,6 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Spinner;
@@ -135,7 +134,6 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
    private Composite         _pageBreakByTimeDistance;
 
    private Label             _lblBreakDistanceUnit;
-   private Label             _labelDays;
 
    private Spinner           _spinnerBreakShortestTime;
    private Spinner           _spinnerBreakMaxDistance;
@@ -867,18 +865,15 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
    }
 
    /**
-    * UI for the selection of the cadence differentiating slow cadence (hiking) from
-    * fast cadence (running).
+    * UI for the predicted performance chart options
     */
    private Control createUI_80_PredictedPerformanceChart(final Composite parent) {
 
-      final Group container = new Group(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      container.setText(Messages.Pref_Appearance_Group_Tagging);
-      GridLayoutFactory.swtDefaults().numColumns(3).applyTo(container);
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridLayoutFactory.swtDefaults().numColumns(3).extendedMargins(0, 0, 7, 0).applyTo(container);
       {
          /*
-          * number of recent tags
+          * Fitness decay value (days)
           */
          Label label = new Label(container, NONE);
          label.setText("Fitness decay");//Messages.pref_appearance_number_of_recent_tags);
@@ -890,18 +885,18 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
                .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
                .align(SWT.BEGINNING, SWT.CENTER)
                .applyTo(_spinnerFitnessDecayTime);
-         _spinnerFitnessDecayTime.setToolTipText(Messages.pref_appearance_number_of_recent_tags_tooltip);
+         _spinnerFitnessDecayTime.setToolTipText("TODO");//Messages.pref_appearance_number_of_recent_tags_tooltip);
          _spinnerFitnessDecayTime.setMinimum(0);
-         _spinnerFitnessDecayTime.setMaximum(9);
+         _spinnerFitnessDecayTime.setMaximum(365);
          _spinnerFitnessDecayTime.addSelectionListener(_selectionListener);
          _spinnerFitnessDecayTime.addMouseWheelListener(_spinnerMouseWheelListener);
 
-         // label: ms
-         _labelDays = new Label(container, SWT.NONE);
-         _labelDays.setText("days");
+         // label: days
+         label = new Label(container, NONE);
+         label.setText("days");
 
          /*
-          * number of recent tags
+          * Fatigue decay value (days)
           */
          label = new Label(container, NONE);
          label.setText("Fatigue decay");//Messages.pref_appearance_number_of_recent_tags);
@@ -919,9 +914,9 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
          _spinnerFatigueDecayTime.addSelectionListener(_selectionListener);
          _spinnerFatigueDecayTime.addMouseWheelListener(_spinnerMouseWheelListener);
 
-         // label: ms
-         _labelDays = new Label(container, SWT.NONE);
-         _labelDays.setText("days");
+         // label: days
+         label = new Label(container, SWT.NONE);
+         label.setText("days");
 
       }
       return container;
