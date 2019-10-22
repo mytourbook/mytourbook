@@ -680,7 +680,7 @@ public class TourManager {
     * @throws SQLException
     */
    public static boolean computeGovss(final Connection conn,
-                                                  final ArrayList<TourData> selectedTours) throws SQLException {
+                                      final ArrayList<TourData> selectedTours) throws SQLException {
       boolean isUpdated = false;
 
       final PreparedStatement stmtUpdate = conn.prepareStatement(govss_StatementUpdate);
@@ -723,29 +723,31 @@ public class TourManager {
     * @param tourData
     * @param startIndex
     * @param endIndex
-    * @return Returns the slope
+    * @return Returns the average gradient
     */
-   public static float computeTourAverageSlope(final TourData tourData, final int startIndex, final int endIndex) {
+   public static float computeTourAverageGradient(final TourData tourData, final int startIndex, final int endIndex) {
 
-      final float[] gradientSerie = tourData.getGradientSerie();
+      final float[] altitudeSerie = tourData.getAltitudeSerie();
+      final double[] distanceSerie = tourData.getDistanceSerieDouble();
 
-      if (gradientSerie == null
-            || gradientSerie.length == 0
-            || startIndex >= gradientSerie.length
-            || endIndex >= gradientSerie.length
+      if (altitudeSerie == null
+            || altitudeSerie.length == 0
+            || distanceSerie == null
+            || distanceSerie.length == 0
+            || startIndex >= altitudeSerie.length
+            || endIndex >= altitudeSerie.length
             || startIndex > endIndex) {
          return 0;
       }
 
-      float averageSlope = 0;
-      for (int index = startIndex; index < endIndex; ++index) {
-         averageSlope += gradientSerie[index];
-      }
+      final float startAltitude = altitudeSerie[startIndex];
+      final float endAltitude = altitudeSerie[endIndex];
+      final double startDistance = distanceSerie[startIndex];
+      final double endDistance = distanceSerie[endIndex];
 
-      //TODO CHECK endIndex-1-startIndex ???
-      averageSlope /= (endIndex - startIndex);
+      final float averageGradient = (endAltitude - startAltitude) / (float) (endDistance - startDistance);
 
-      return averageSlope;
+      return averageGradient;
    }
 
    /**

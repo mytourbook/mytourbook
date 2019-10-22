@@ -49,7 +49,7 @@ public class ActionComputeGovss extends Action {
 
       _tourProvider = tourDataEditor;
 
-      setText("Compute GOVSS");//Messages.Tour_Action_ComputeCadenceZonesTimes);
+      setText(Messages.Tour_Action_ComputeGovss_Title);
    }
 
    @Override

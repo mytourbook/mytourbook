@@ -1048,8 +1048,10 @@ public class PerformanceChartView extends ViewPart {
 
       final int[] colorIndex = new int[pulseRange];
 
-      final float[] zoneMinBpm = zoneMinMaxBpm.zoneMinBpm;
-      final float[] zoneMaxBpm = zoneMinMaxBpm.zoneMaxBpm;
+      final float[] zoneMinBpm = new float[1];
+      zoneMinBpm[0] = 0;//zoneMinMaxBpm.zoneMinBpm;
+      final float[] zoneMaxBpm = new float[1];//zoneMinMaxBpm.zoneMaxBpm;
+      zoneMaxBpm[0] = 200;
 
       for (int pulseIndex = 0; pulseIndex < pulseRange; pulseIndex++) {
 
@@ -1162,7 +1164,7 @@ public class PerformanceChartView extends ViewPart {
       final int[] tourHrZoneTimes = _tourData.getHrZones();
       final long drivingTime = _tourData.getTourDrivingTime();
 
-      final int tourHrZoneSize = tourHrZoneTimes.length;
+      final int tourHrZoneSize = 0;//tourHrZoneTimes.length;
 
       for (int tourZoneIndex = 0; tourZoneIndex < tourHrZoneSize; tourZoneIndex++) {
 

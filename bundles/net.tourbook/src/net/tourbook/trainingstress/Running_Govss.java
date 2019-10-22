@@ -97,42 +97,42 @@ public class Running_Govss {
       //When identified, add them in the users preference page
 
       // 1. Find the athlete’s velocity at LT by a 10 km to one hour maximal run.
-      final float tempCriticalVelocity = 4.13f;// m/sec => 6'30 min/mile
+      final float tempCriticalVelocity = 4.13f;// m/sec => 6'30 min/mile 40' => 9.912km
 
       // 2. Convert this LT limited velocity to a LT limited power value using Equation 7. "Lactate limited power" may also be called "lactate adjusted power".
-      final float lactateLimitedPower = (float) ComputePower(10000, 0.0, 0, tempCriticalVelocity);
+      final float lactateLimitedPower = (float) ComputePower(14868, 0.0, 0, tempCriticalVelocity);
 
       // 3. Analyze the data from a particular workout from an athlete’s log, computing 120 second rolling averages from velocity and slope data.
       final ArrayList<Double> powerValues = computePowerValues();
 
       // 4. Raise the values in step 3 to the 4th power.
-      for (double powerValue : powerValues) {
-         powerValue = Math.pow(powerValue, 4);
+      for (int index = 0; index < powerValues.size(); index++) {
+         powerValues.set(index, Math.pow(powerValues.get(index), 4));
       }
 
       // 5. Average values from step 4.
       final double averagePower = powerValues.stream().mapToDouble(Double::doubleValue).average().getAsDouble();
 
       // 6. Take the 4th root of step 5. This is the Lactate-Normalized Power.
-      final double lactateNormalizedPower = Math.pow(averagePower, 0.25);
+      final float lactateNormalizedPower = (float) Math.pow(averagePower, 0.25);
 
       // 7. Divide Lactate Normalized Power by Threshold Power from step 2 to get the Intensity Weighting Fraction.
-      final int intensityWeighingFactor = (int) Math.round(lactateNormalizedPower / lactateLimitedPower);
+      final float intensityWeighingFactor = lactateNormalizedPower / lactateLimitedPower;
 
       // 8. Multiply the Lactate Normalized Power by the duration of the workout in seconds to obtain the normalized work performed in joules.
-      final int normalizedWork = (int) Math.round(lactateNormalizedPower * _tourData.getTourRecordingTime());
+      final int normalizedWork = Math.round(lactateNormalizedPower * _tourData.getTourRecordingTime());
 
       // 9. Multiply value obtained in step 8 by the Intensity Weighting Fraction to get a raw training stress value.
-      int trainingStressValue = normalizedWork * intensityWeighingFactor;
+      float trainingStressValue = normalizedWork * intensityWeighingFactor;
 
       // 10. Divide the values from step 9 by the amount of work performed during the 10k to 1 hr test (threshold power in watts x number of seconds).
-      trainingStressValue /= (lactateLimitedPower * 60);
+      trainingStressValue /= (lactateLimitedPower * 3600); // 2400 = 40*60 = 40min
 
       // 11. Multiply the number from step 10 by 100 to obtain the final training stress in GOVSS.
       trainingStressValue *= 100;
 
       //Should that trigger a recompute of the Performance chart data ?
-      return trainingStressValue;
+      return (int) trainingStressValue;
    }
 
    /**
@@ -153,8 +153,11 @@ public class Running_Govss {
    }
 
    private ArrayList<Double> computePowerValues() {
-      final int timeSeriesLength = _tourData.getTimeSerieDouble().length;
-      final int estimatedNumberOfRollingAverages = Math.round(timeSeriesLength / 120);
+      final long tourRecordingTime = _tourData.getTourRecordingTime();
+      final int estimatedNumberOfRollingAverages = Math.round(tourRecordingTime / 120);
+
+      final double[] timeSerie = _tourData.getTimeSerieDouble();
+      final int timeSeriesLength = timeSerie.length;
 
       final ArrayList<Double> powerValues = new ArrayList<>(estimatedNumberOfRollingAverages);
 
@@ -166,19 +169,30 @@ public class Running_Govss {
       float currentSlope = 0;
       float initialSpeed = 0;
       float currentSpeed = 0;
+
       for (; serieEndIndex < timeSeriesLength - 1;) {
 
-         serieStartIndex = serieEndIndex + 1;
-         serieEndIndex = serieStartIndex + rollingAverageInterval;
-         if (serieEndIndex > timeSeriesLength) {
-            serieEndIndex = timeSeriesLength - 1;
+         double currentRecordingTime = 0;
+         serieStartIndex = serieEndIndex;
+         serieEndIndex = serieStartIndex + 1;
+         for (; currentRecordingTime < rollingAverageInterval; ++serieEndIndex) {
+
+            if (serieEndIndex >= timeSeriesLength) {
+               serieEndIndex = timeSeriesLength - 1;
+               break;
+            }
+            currentRecordingTime = timeSerie[serieEndIndex] - timeSerie[serieStartIndex];
          }
 
          currentSpeed = TourManager.computeTourSpeed(_tourData, serieStartIndex, serieEndIndex);
+         //Convert the speed (km/h) to velocity (m/s)
+         currentSpeed /= 3.6;
          currentDistance = TourManager.computeTourDistance(_tourData, serieStartIndex, serieEndIndex);
-         currentSlope = TourManager.computeTourAverageSlope(_tourData, serieStartIndex, serieEndIndex);
+         currentSlope = TourManager.computeTourAverageGradient(_tourData, serieStartIndex, serieEndIndex);
          powerValue = ComputePower(currentDistance, currentSlope, currentSpeed, initialSpeed);
-         powerValues.add(powerValue);
+         if (powerValue > 0) {
+            powerValues.add(powerValue);
+         }
 
          initialSpeed = currentSpeed;
       }

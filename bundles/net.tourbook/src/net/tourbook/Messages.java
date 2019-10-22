@@ -2314,6 +2314,7 @@ public class Messages extends NLS {
    public static String Tour_Action_ComputeCadenceZonesTimes;
    public static String Tour_Action_ComputeCadenceZonesTimes_Message;
    public static String Tour_Action_ComputeCadenceZonesTimes_Title;
+   public static String Tour_Action_ComputeGovss_Title;
    public static String Tour_Action_GeoCompare_Tooltip;
    public static String Tour_Action_GraphGears;
    public static String Tour_Action_GraphOverlapped;

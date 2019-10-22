@@ -1165,10 +1165,10 @@ THIS IS NOT YET FULLY IMPLEMENTED
    
     <extension	point="org.eclipse.ui.preferencePages">
       <page
-            category="net.tourbook.preferences.PrefPageTrainingStress"
+            category="net.tourbook.preferences.PrefPagePeopleId"
             class="net.tourbook.trainingstress.PrefPageGovss"
             id="net.tourbook.trainingstress.PrefPageGovss"
-            name="GOVSS">
+            name="Training Stress">
       </page>
    </extension>
 
