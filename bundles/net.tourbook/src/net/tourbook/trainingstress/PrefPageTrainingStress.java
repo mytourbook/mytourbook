@@ -19,7 +19,6 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Activator;
 import net.tourbook.common.UI;
-import net.tourbook.common.util.Util;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.ui.views.rawData.RawDataView;
 
@@ -34,13 +33,15 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.TabFolder;
+import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-public class PrefPageGovss extends PreferencePage implements IWorkbenchPreferencePage {
+public class PrefPageTrainingStress extends PreferencePage implements IWorkbenchPreferencePage {
 
-   public static final String    ID           = "net.tourbook.trainingstress.PrefPageGovss"; //$NON-NLS-1$
+   public static final String    ID           = "net.tourbook.trainingstress.PrefPageTrainingStress"; //$NON-NLS-1$
 
    private IPreferenceStore      _prefStore   = Activator.getDefault().getPreferenceStore();
    private final IDialogSettings _importState = TourbookPlugin.getState(RawDataView.ID);
@@ -49,10 +50,15 @@ public class PrefPageGovss extends PreferencePage implements IWorkbenchPreferenc
 
    private PixelConverter        _pc;
    private int                   _hintDefaultSpinnerWidth;
+   private int                   DEFAULT_DESCRIPTION_WIDTH;
+
+   private boolean               _isUpdateUI;
 
    /*
     * UI controls
     */
+   private TabFolder _tabFolder;
+
    /*
     * private Button _chkConvertWayPoints;
     * private Button _chkOneTour;
@@ -78,21 +84,48 @@ public class PrefPageGovss extends PreferencePage implements IWorkbenchPreferenc
    private Composite createUI(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+      GridDataFactory
+            .fillDefaults()//
+            .grab(true, true)
+            .applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(1).spacing(0, 15).applyTo(container);
       {
-         createUI_10_Options(container);
-         createUI_20_TourTypes(container);
+         /*
+          * label: info
+          */
+         final Label label = new Label(container, SWT.WRAP);
+         GridDataFactory.fillDefaults().hint(DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT).applyTo(label);
+         label.setText(Messages.Compute_Values_Label_Info);
+
+         /*
+          * tab folder: computed values
+          */
+         _tabFolder = new TabFolder(container, SWT.TOP);
+         GridDataFactory
+               .fillDefaults()//
+               .grab(true, true)
+               .applyTo(_tabFolder);
+         {
+
+            //tab GOVSS
+            final TabItem tabGovss = new TabItem(_tabFolder, SWT.NONE);
+            tabGovss.setControl(createUI_10_Govss(_tabFolder));
+            tabGovss.setText("GOVSS");//Messages.Compute_Values_Group_Smoothing);
+         }
       }
 
-      return container;
+      return _tabFolder;
    }
 
-   private void createUI_10_Options(final Composite parent) {
-      final int defaultHIndent = 16;
-      final Composite container = new Composite(parent, SWT.NONE);
+   /**
+    * UI for ....TODO
+    */
+   private Control createUI_10_Govss(final Composite parent) {
+
+      final Group container = new Group(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+      container.setText(Messages.Pref_Appearance_Group_Tagging);
+      GridLayoutFactory.swtDefaults().numColumns(3).applyTo(container);
       {
          // checkbox: convert waypoints
          {
@@ -100,7 +133,7 @@ public class PrefPageGovss extends PreferencePage implements IWorkbenchPreferenc
             _labelApiKey = new Label(container, SWT.WRAP);
             _labelApiKey.setText("Critical velocity");//Messages.Pref_Weather_Label_ApiKey);
             GridDataFactory.fillDefaults()
-                  .indent(defaultHIndent, 0)
+                  .indent(DEFAULT_DESCRIPTION_WIDTH, 0)
                   .align(SWT.FILL, SWT.CENTER)
                   .applyTo(_labelApiKey);
 
@@ -115,45 +148,34 @@ public class PrefPageGovss extends PreferencePage implements IWorkbenchPreferenc
             _lblAutoOpenMS = new Label(container, SWT.NONE);
             _lblAutoOpenMS.setText(UI.UNIT_LABEL_PACE);
          }
-
-      }
-   }
-
-   private void createUI_20_TourTypes(final Composite parent) {
-
-      final Group group = new Group(parent, SWT.NONE);
-      GridDataFactory.fillDefaults()//
-            .grab(true, false)
-            .indent(0, _pc.convertVerticalDLUsToPixels(4))
-            .applyTo(group);
-      GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
-      //group.setText(Messages.PrefPage_GPX_Group_DistanceValues);
-      {
-         // label
          {
-            final Label label = new Label(group, SWT.NONE);
-            GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(label);
-            //label.setText(Messages.PrefPage_GPX_Label_DistanceValues);
-         }
-
-         // radio
-         {
-            final Composite container = new Composite(group, SWT.NONE);
-            GridDataFactory.fillDefaults()//
-                  .indent(_pc.convertWidthInCharsToPixels(3), 0)
-                  .applyTo(container);
-            GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+            // label
             {
-               //_rdoDistanceAbsolute = new Button(container, SWT.RADIO);
-               //	_rdoDistanceAbsolute.setText(Messages.PrefPage_GPX_Radio_DistanceAbsolute);
-               //	_rdoDistanceAbsolute.setToolTipText(Messages.PrefPage_GPX_Radio_DistanceAbsolute_Tooltip);
+               final Label label = new Label(container, SWT.NONE);
+               GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(label);
+               //label.setText(Messages.PrefPage_GPX_Label_DistanceValues);
+            }
 
-               //_rdoDistanceRelative = new Button(container, SWT.RADIO);
-               //	_rdoDistanceRelative.setText(Messages.PrefPage_GPX_Radio_DistanceRelative);
-               //	_rdoDistanceRelative.setToolTipText(Messages.PrefPage_GPX_Radio_DistanceRelative_Tooltip);
+            // radio
+            {
+               GridDataFactory.fillDefaults()//
+                     .indent(_pc.convertWidthInCharsToPixels(3), 0)
+                     .applyTo(container);
+               GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+               {
+                  //_rdoDistanceAbsolute = new Button(container, SWT.RADIO);
+                  // _rdoDistanceAbsolute.setText(Messages.PrefPage_GPX_Radio_DistanceAbsolute);
+                  // _rdoDistanceAbsolute.setToolTipText(Messages.PrefPage_GPX_Radio_DistanceAbsolute_Tooltip);
+
+                  //_rdoDistanceRelative = new Button(container, SWT.RADIO);
+                  // _rdoDistanceRelative.setText(Messages.PrefPage_GPX_Radio_DistanceRelative);
+                  // _rdoDistanceRelative.setToolTipText(Messages.PrefPage_GPX_Radio_DistanceRelative_Tooltip);
+               }
             }
          }
       }
+      return container;
+
    }
 
    @Override
@@ -163,6 +185,7 @@ public class PrefPageGovss extends PreferencePage implements IWorkbenchPreferenc
 
       _pc = new PixelConverter(parent);
 
+      DEFAULT_DESCRIPTION_WIDTH = _pc.convertWidthInCharsToPixels(80);
       _hintDefaultSpinnerWidth = UI.IS_LINUX ? SWT.DEFAULT : _pc.convertWidthInCharsToPixels(UI.IS_OSX ? 10 : 5);
 
    }
@@ -199,18 +222,19 @@ public class PrefPageGovss extends PreferencePage implements IWorkbenchPreferenc
 
    private void restoreState() {
 
-      // merge all tracks into one tour
-      final boolean isMergeIntoOneTour = Util.getStateBoolean(
-            _importState,
-            RawDataView.STATE_IS_MERGE_TRACKS,
-            RawDataView.STATE_IS_MERGE_TRACKS_DEFAULT);
-      //_chkOneTour.setSelection(isMergeIntoOneTour);
-
-      // convert waypoints
-      final boolean isConvertWayPoints = Util.getStateBoolean(
-            _importState,
-            RawDataView.STATE_IS_CONVERT_WAYPOINTS,
-            RawDataView.STATE_IS_CONVERT_WAYPOINTS_DEFAULT);
+      /*
+       * // merge all tracks into one tour
+       * final boolean isMergeIntoOneTour = Util.getStateBoolean(
+       * _importState,
+       * RawDataView.STATE_IS_MERGE_TRACKS,
+       * RawDataView.STATE_IS_MERGE_TRACKS_DEFAULT);
+       * //_chkOneTour.setSelection(isMergeIntoOneTour);
+       * // convert waypoints
+       * final boolean isConvertWayPoints = Util.getStateBoolean(
+       * _importState,
+       * RawDataView.STATE_IS_CONVERT_WAYPOINTS,
+       * RawDataView.STATE_IS_CONVERT_WAYPOINTS_DEFAULT);
+       */
       //_chkConvertWayPoints.setSelection(isConvertWayPoints);
 
       // relative/absolute distance

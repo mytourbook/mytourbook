@@ -56,6 +56,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Spinner;
@@ -109,6 +110,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
    private boolean                  _isUpdateUI;
    private SelectionAdapter         _selectionListener;
    private MouseWheelListener       _spinnerMouseWheelListener;
+   private int                      _hintDefaultSpinnerWidth;
 
    /**
     * contains the controls which are displayed in the first column, these controls are used to get
@@ -133,6 +135,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
    private Composite         _pageBreakByTimeDistance;
 
    private Label             _lblBreakDistanceUnit;
+   private Label             _labelDays;
 
    private Spinner           _spinnerBreakShortestTime;
    private Spinner           _spinnerBreakMaxDistance;
@@ -144,6 +147,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
    private Spinner           _spinnerBreakMinSliceTimeAS;
    private Spinner           _spinnerCadenceDelimiter;
    private Spinner           _spinnerDPTolerance;
+   private Spinner           _spinnerFitnessDecayTime;
+   private Spinner           _spinnerFatigueDecayTime;
 
    private ScrolledComposite _smoothingScrolledContainer;
    private Composite         _smoothingScrolledContent;
@@ -219,6 +224,11 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
             final TabItem tabItemCadenceZones = new TabItem(_tabFolder, SWT.NONE);
             tabItemCadenceZones.setControl(createUI_70_CadenceZones(_tabFolder));
             tabItemCadenceZones.setText(Messages.Compute_CadenceZonesTimes_Group);
+
+            // tab: Predicted performance chart options
+            final TabItem tabPredictedPerformanceChart = new TabItem(_tabFolder, SWT.NONE);
+            tabPredictedPerformanceChart.setControl(createUI_80_PredictedPerformanceChart(_tabFolder));
+            tabPredictedPerformanceChart.setText(Messages.Compute_PredictedPerformanceChart_Group);
 
             /**
              * 4.8.2009 week no/year is currently disabled because a new field in the db is
@@ -856,6 +866,68 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
       return container;
    }
 
+   /**
+    * UI for the selection of the cadence differentiating slow cadence (hiking) from
+    * fast cadence (running).
+    */
+   private Control createUI_80_PredictedPerformanceChart(final Composite parent) {
+
+      final Group container = new Group(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      container.setText(Messages.Pref_Appearance_Group_Tagging);
+      GridLayoutFactory.swtDefaults().numColumns(3).applyTo(container);
+      {
+         /*
+          * number of recent tags
+          */
+         Label label = new Label(container, NONE);
+         label.setText("Fitness decay");//Messages.pref_appearance_number_of_recent_tags);
+         label.setToolTipText(Messages.pref_appearance_number_of_recent_tags_tooltip);
+
+         // Fitness decay spinner
+         _spinnerFitnessDecayTime = new Spinner(container, SWT.BORDER);
+         GridDataFactory.fillDefaults()//
+               .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+               .align(SWT.BEGINNING, SWT.CENTER)
+               .applyTo(_spinnerFitnessDecayTime);
+         _spinnerFitnessDecayTime.setToolTipText(Messages.pref_appearance_number_of_recent_tags_tooltip);
+         _spinnerFitnessDecayTime.setMinimum(0);
+         _spinnerFitnessDecayTime.setMaximum(9);
+         _spinnerFitnessDecayTime.addSelectionListener(_selectionListener);
+         _spinnerFitnessDecayTime.addMouseWheelListener(_spinnerMouseWheelListener);
+
+         // label: ms
+         _labelDays = new Label(container, SWT.NONE);
+         _labelDays.setText("days");
+
+         /*
+          * number of recent tags
+          */
+         label = new Label(container, NONE);
+         label.setText("Fatigue decay");//Messages.pref_appearance_number_of_recent_tags);
+         label.setToolTipText(Messages.pref_appearance_number_of_recent_tags_tooltip);
+
+         // Fatigue decay spinner
+         _spinnerFatigueDecayTime = new Spinner(container, SWT.BORDER);
+         GridDataFactory.fillDefaults()//
+               .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+               .align(SWT.BEGINNING, SWT.CENTER)
+               .applyTo(_spinnerFatigueDecayTime);
+         _spinnerFatigueDecayTime.setToolTipText(Messages.pref_appearance_number_of_recent_tags_tooltip);
+         _spinnerFatigueDecayTime.setMinimum(0);
+         _spinnerFatigueDecayTime.setMaximum(9);
+         _spinnerFatigueDecayTime.addSelectionListener(_selectionListener);
+         _spinnerFatigueDecayTime.addMouseWheelListener(_spinnerMouseWheelListener);
+
+         // label: ms
+         _labelDays = new Label(container, SWT.NONE);
+         _labelDays.setText("days");
+
+      }
+      return container;
+
+   }
+
    @Override
    public void dispose() {
 
@@ -893,6 +965,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
       DEFAULT_DESCRIPTION_WIDTH = _pc.convertWidthInCharsToPixels(80);
       DEFAULT_V_DISTANCE_PARAGRAPH = _pc.convertVerticalDLUsToPixels(4);
+
+      _hintDefaultSpinnerWidth = UI.IS_LINUX ? SWT.DEFAULT : _pc.convertWidthInCharsToPixels(UI.IS_OSX ? 10 : 5);
 
       _selectionListener = new SelectionAdapter() {
          @Override

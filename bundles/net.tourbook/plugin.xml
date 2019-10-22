@@ -412,17 +412,6 @@
       />
       
       
-       <!--
-         Training Stress
-      -->
-      
-      <page
-         name="%preference_page_TrainingStress"
-         id="net.tourbook.preferences.PrefPageTrainingStress"
-         class="net.tourbook.preferences.PrefPageTrainingStress"
-      />
-
-
       <!--
          View
       -->
@@ -1166,8 +1155,8 @@ THIS IS NOT YET FULLY IMPLEMENTED
     <extension	point="org.eclipse.ui.preferencePages">
       <page
             category="net.tourbook.preferences.PrefPagePeopleId"
-            class="net.tourbook.trainingstress.PrefPageGovss"
-            id="net.tourbook.trainingstress.PrefPageGovss"
+            class="net.tourbook.trainingstress.PrefPageTrainingStress"
+            id="net.tourbook.trainingstress.PrefPageTrainingStress"
             name="Training Stress">
       </page>
    </extension>
