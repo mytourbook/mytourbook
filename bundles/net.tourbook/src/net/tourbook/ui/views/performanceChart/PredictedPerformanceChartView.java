@@ -105,12 +105,12 @@ public class PredictedPerformanceChartView extends ViewPart {
    private static final int    HR_LEFT_MIN_BORDER                    = 0;
    private static final int    HR_RIGHT_MAX_BORDER                   = 230;
 
-   private static final String STATE_HR_CHART_LEFT_BORDER            = "HrLeftChartBorder";                                           //$NON-NLS-1$
-   private static final String STATE_HR_CHART_RIGHT_BORDER           = "HrRightChartBorder";                                          //$NON-NLS-1$
-   private static final String STATE_IS_SHOW_ALL_STRESS_SCORE_VALUES = "IsShowAllStressScoreValues";                                  //$NON-NLS-1$
-   private static final String STATE_IS_SYNC_VERTICAL_CHART_SCALING  = "IsSyncVerticalChartScaling";                                  //$NON-NLS-1$
+   private static final String STATE_HR_CHART_LEFT_BORDER            = "HrLeftChartBorder";                                                    //$NON-NLS-1$
+   private static final String STATE_HR_CHART_RIGHT_BORDER           = "HrRightChartBorder";                                                   //$NON-NLS-1$
+   private static final String STATE_IS_SHOW_ALL_STRESS_SCORE_VALUES = "IsShowAllStressScoreValues";                                           //$NON-NLS-1$
+   private static final String STATE_IS_SYNC_VERTICAL_CHART_SCALING  = "IsSyncVerticalChartScaling";                                           //$NON-NLS-1$
 
-   private static final String GRID_PREF_PREFIX                      = "GRID_TRAINING__";                                             //$NON-NLS-1$
+   private static final String GRID_PREF_PREFIX                      = "GRID_TRAINING__";                                                      //$NON-NLS-1$
 
 // SET_FORMATTING_OFF
 

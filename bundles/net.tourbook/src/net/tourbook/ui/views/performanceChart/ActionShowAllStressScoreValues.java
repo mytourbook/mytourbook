@@ -27,16 +27,16 @@ public class ActionShowAllStressScoreValues extends Action {
 
    public ActionShowAllStressScoreValues(final PredictedPerformanceChartView predictedPerformanceChartView) {
 
-		super(UI.EMPTY_STRING, AS_CHECK_BOX);
+      super(UI.EMPTY_STRING, AS_CHECK_BOX);
 
-		setToolTipText(Messages.Training_View_Action_ShowAllPulseValues);
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ZoomFitGraph));
+      setToolTipText(Messages.Training_View_Action_ShowAllPulseValues);
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ZoomFitGraph));
 
       _predictedPerformanceChartView = predictedPerformanceChartView;
-	}
+   }
 
-	@Override
-	public void run() {
+   @Override
+   public void run() {
       _predictedPerformanceChartView.actionShowAllStressScoreValues();
-	}
+   }
 }
