@@ -1302,7 +1302,7 @@ public class UI {
    }
 
    /**
-    * Opens the control context menu, the menue is aligned below the control to the right side
+    * Opens the control context menu, the menu is aligned below the control to the right side
     *
     * @param control
     *           Controls which menu is opened
