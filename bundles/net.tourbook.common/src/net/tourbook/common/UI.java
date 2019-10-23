@@ -156,7 +156,7 @@ public class UI {
    public static final CharSequence SYMBOL_BACKSLASH              = "\\";       //$NON-NLS-1$
    public static final String       SYMBOL_COLON                  = ":";        //$NON-NLS-1$
    public static final String       SYMBOL_DOT                    = ".";        //$NON-NLS-1$
-   public static final String       SYMBOL_MIDDLE_DOT             = "·";       //$NON-NLS-1$
+   public static final String       SYMBOL_MIDDLE_DOT             = "·";        //$NON-NLS-1$
    // this looks ugly "\u2551";
    public static final String       SYMBOL_DOUBLE_VERTICAL        = "||";       //$NON-NLS-1$
    public static final String       SYMBOL_EQUAL                  = "=";        //$NON-NLS-1$
@@ -503,6 +503,12 @@ public class UI {
     * Number of vertical dialog units per character, value <code>8</code>.
     */
 //	private static final int	VERTICAL_DIALOG_UNITS_PER_CHAR	= 8;
+
+   /**
+    * When <code>true</code> then data in the UI are scrambled. This is used to create anynonymous
+    * screenshots.
+    */
+   public static boolean IS_SCRAMBLE_DATA = System.getProperty("scrambleData") != null; //$NON-NLS-1$
 
    /**
     * @param sash
@@ -1128,7 +1134,8 @@ public class UI {
 
    /**
     * @param degreeDirection
-    * @return Returns cardinal direction
+    *           The degree value is multiplied by 10, 0°...3600°
+    * @return Returns cardinal direction text
     */
    public static String getCardinalDirectionText(final int degreeDirection) {
 
@@ -1137,6 +1144,7 @@ public class UI {
 
    /**
     * @param degreeDirection
+    *           The degree value is multiplied by 10, 0°...3600°
     * @return Returns cardinal direction index for {@link IWeather#windDirectionText}
     */
    public static int getCardinalDirectionTextIndex(final int degreeDirection) {
@@ -1500,6 +1508,11 @@ public class UI {
       for (int weightIndex = 0; weightIndex < weights.length; weightIndex++) {
          memento.putInteger(weightKey + Integer.toString(weightIndex), weights[weightIndex]);
       }
+   }
+
+   public static float scrambleNumbers(final float number) {
+
+      return RANDOM_GENERATOR.nextFloat() * number;
    }
 
    public static int scrambleNumbers(final int number) {

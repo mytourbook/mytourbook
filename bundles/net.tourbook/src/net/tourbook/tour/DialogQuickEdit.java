@@ -64,8 +64,8 @@ public class DialogQuickEdit extends TitleAreaDialog {
    private static final String      GRAPH_LABEL_HEARTBEAT_UNIT     = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
    private static final String      VALUE_UNIT_K_CALORIES          = net.tourbook.ui.Messages.Value_Unit_KCalories;
 
-   private final boolean            _isOSX                         = net.tourbook.common.UI.IS_OSX;
-   private final boolean            _isLinux                       = net.tourbook.common.UI.IS_LINUX;
+   private final boolean            _isOSX                         = UI.IS_OSX;
+   private final boolean            _isLinux                       = UI.IS_LINUX;
 
    private final TourData           _tourData;
 
@@ -851,7 +851,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
       final int selectionIndex = _comboWeather_Clouds.getSelectionIndex();
 
       final String cloudKey = IWeather.cloudIcon[selectionIndex];
-      final Image cloundIcon = net.tourbook.common.UI.IMAGE_REGISTRY.get(cloudKey);
+      final Image cloundIcon = UI.IMAGE_REGISTRY.get(cloudKey);
 
       _lblWeather_CloudIcon.setImage(cloundIcon);
    }
@@ -938,7 +938,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
          _spinWeather_Wind_DirectionValue.setSelection(degree);
       }
 
-      _comboWeather_Wind_DirectionText.select(net.tourbook.common.UI.getCardinalDirectionTextIndex(degree));
+      _comboWeather_Wind_DirectionText.select(UI.getCardinalDirectionTextIndex(degree));
    }
 
    private void onSelect_WindSpeed_Text() {
@@ -999,7 +999,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
       final int cloudIndex = _comboWeather_Clouds.getSelectionIndex();
       String cloudValue = IWeather.cloudIcon[cloudIndex];
-      if (cloudValue.equals(net.tourbook.common.UI.IMAGE_EMPTY_16)) {
+      if (cloudValue.equals(UI.IMAGE_EMPTY_16)) {
          // replace invalid cloud key
          cloudValue = UI.EMPTY_STRING;
       }
@@ -1049,7 +1049,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
          // wind direction
          final int weatherWindDirDegree = _tourData.getWeatherWindDir() * 10;
          _spinWeather_Wind_DirectionValue.setSelection(weatherWindDirDegree);
-         _comboWeather_Wind_DirectionText.select(net.tourbook.common.UI.getCardinalDirectionTextIndex(weatherWindDirDegree));
+         _comboWeather_Wind_DirectionText.select(UI.getCardinalDirectionTextIndex(weatherWindDirDegree));
 
          // wind speed
          final int windSpeed = _tourData.getWeatherWindSpeed();

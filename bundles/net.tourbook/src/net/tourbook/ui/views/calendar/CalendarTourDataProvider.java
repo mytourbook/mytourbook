@@ -41,12 +41,6 @@ import net.tourbook.ui.SQLFilter;
 
 public class CalendarTourDataProvider {
 
-// SET_FORMATTING_OFF
-
-	private static boolean		_isScrambleCalendar	= System.getProperty("scrambleCalendar") != null;	//$NON-NLS-1$
-
-// SET_FORMATTING_ON
-
    private static final char                            NL                = UI.NEW_LINE;
 
    private static CalendarTourDataProvider              _instance;
@@ -441,7 +435,7 @@ public class CalendarTourDataProvider {
 
                dayData[tourIndex] = data;
 
-               if (_isScrambleCalendar) {
+               if (UI.IS_SCRAMBLE_DATA) {
 
                   data.tourTitle = UI.scrambleText(data.tourTitle);
                   data.tourDescription = UI.scrambleText(data.tourDescription);
@@ -867,7 +861,7 @@ public class CalendarTourDataProvider {
 
             weekData.numTours = result.getInt(6);
 
-            if (_isScrambleCalendar) {
+            if (UI.IS_SCRAMBLE_DATA) {
 
                weekData.elevationGain = UI.scrambleNumbers(weekData.elevationGain);
                weekData.elevationLoss = UI.scrambleNumbers(weekData.elevationLoss);

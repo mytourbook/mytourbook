@@ -1223,15 +1223,6 @@ public class TourInfoUI {
       _actionEditTour.setEnabled(true);
    }
 
-   private int getWindDirectionTextIndex(final int degreeDirection) {
-
-      final float degree = (degreeDirection + 22.5f) / 45.0f;
-
-      final int directionIndex = ((int) degree) % 8;
-
-      return directionIndex;
-   }
-
    private int getWindSpeedTextIndex(final int speed) {
 
       final int[] unitValueWindSpeed = net.tourbook.ui.UI.UNIT_VALUE_DISTANCE == 1
@@ -1407,10 +1398,9 @@ public class TourInfoUI {
       // wind direction
       final int weatherWindDirDegree = _tourData.getWeatherWindDir();
       _lblWindDirection.setText(Integer.toString(weatherWindDirDegree));
-      _lblWindDirectionUnit.setText(
-            String.format(
-                  Messages.Tour_Tooltip_Format_WindDirectionUnit,
-                  IWeather.windDirectionText[getWindDirectionTextIndex(weatherWindDirDegree)]));
+      _lblWindDirectionUnit.setText(String.format(
+            Messages.Tour_Tooltip_Format_WindDirectionUnit,
+            UI.getCardinalDirectionText(weatherWindDirDegree * 10)));
 
       // temperature
       float temperature = _tourData.getAvgTemperature();
