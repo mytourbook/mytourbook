@@ -125,7 +125,7 @@ public class PrefPageTrainingStress extends PreferencePage implements IWorkbench
       final Group container = new Group(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       container.setText(Messages.Pref_Appearance_Group_Tagging);
-      GridLayoutFactory.swtDefaults().numColumns(3).applyTo(container);
+      GridLayoutFactory.swtDefaults().numColumns(4).applyTo(container);
       {
          // checkbox: convert waypoints
          {
@@ -147,31 +147,6 @@ public class PrefPageTrainingStress extends PreferencePage implements IWorkbench
             // label: ms
             _lblAutoOpenMS = new Label(container, SWT.NONE);
             _lblAutoOpenMS.setText(UI.UNIT_LABEL_PACE);
-         }
-         {
-            // label
-            {
-               final Label label = new Label(container, SWT.NONE);
-               GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(label);
-               //label.setText(Messages.PrefPage_GPX_Label_DistanceValues);
-            }
-
-            // radio
-            {
-               GridDataFactory.fillDefaults()//
-                     .indent(_pc.convertWidthInCharsToPixels(3), 0)
-                     .applyTo(container);
-               GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-               {
-                  //_rdoDistanceAbsolute = new Button(container, SWT.RADIO);
-                  // _rdoDistanceAbsolute.setText(Messages.PrefPage_GPX_Radio_DistanceAbsolute);
-                  // _rdoDistanceAbsolute.setToolTipText(Messages.PrefPage_GPX_Radio_DistanceAbsolute_Tooltip);
-
-                  //_rdoDistanceRelative = new Button(container, SWT.RADIO);
-                  // _rdoDistanceRelative.setText(Messages.PrefPage_GPX_Radio_DistanceRelative);
-                  // _rdoDistanceRelative.setToolTipText(Messages.PrefPage_GPX_Radio_DistanceRelative_Tooltip);
-               }
-            }
          }
       }
       return container;

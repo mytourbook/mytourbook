@@ -919,6 +919,27 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
          label.setText("days");
 
       }
+
+      final Composite btnContainer = new Composite(container, SWT.NONE);
+      GridDataFactory.fillDefaults().applyTo(btnContainer);
+      GridLayoutFactory.fillDefaults().applyTo(btnContainer);
+      {
+         // button: Compute GOVSS for all tours
+         final Button btnComputValues = new Button(btnContainer, SWT.NONE);
+         GridDataFactory
+               .fillDefaults()//
+               .indent(0, DEFAULT_V_DISTANCE_PARAGRAPH)
+               .applyTo(btnComputValues);
+         btnComputValues.setText("Compute GOVSS for all tours for which the tour type is in the list above");//Messages.compute_tourValueElevation_button_computeValues);
+         btnComputValues.setToolTipText(Messages.Compute_TourValue_ElevationGain_Button_ComputeValues_Tooltip);
+         btnComputValues.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+               //  onComputeElevationGainValues();
+            }
+         });
+      }
+
       return container;
 
    }

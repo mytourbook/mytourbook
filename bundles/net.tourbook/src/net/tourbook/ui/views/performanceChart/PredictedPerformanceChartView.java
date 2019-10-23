@@ -54,7 +54,6 @@ import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
 import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 
 import org.eclipse.e4.ui.di.PersistState;
-import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -65,28 +64,16 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ControlAdapter;
-import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
-import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IPartListener2;
@@ -162,11 +149,6 @@ public class PredictedPerformanceChartView extends ViewPart {
     */
    private FormToolkit _tk;
 
-   private Color[]     _hrZoneColors;
-   private Color[]     _hrZoneColorsBright;
-   private Color[]     _hrZoneColorsDark;
-   private Image       _hrZoneImage;
-
    /*
     * Pagebook for the training view
     */
@@ -174,8 +156,6 @@ public class PredictedPerformanceChartView extends ViewPart {
    private Composite _page_HrZones;
    private Composite _page_NoTour;
    private Composite _page_NoPerson;
-
-   private Label     _lblNoHrZone;
 
    private Composite _toolbar;
    private Chart     _chartHrTime;
@@ -187,7 +167,6 @@ public class PredictedPerformanceChartView extends ViewPart {
 
    private Composite _hrZoneDataContainerContent;
 
-   private Canvas    _canvasHrZoneImage;
    private Label[]   _lblTourMinMaxValue;
    private Label[]   _lblTourMinMaxHours;
    private Label[]   _lblHRZoneName;
@@ -197,7 +176,6 @@ public class PredictedPerformanceChartView extends ViewPart {
    /*
     * none UI
     */
-   private int _imageCounter = 0;
 
    private class ActionTrainingOptions extends ActionToolbarSlideout {
 
@@ -427,7 +405,7 @@ public class PredictedPerformanceChartView extends ViewPart {
             .align(SWT.BEGINNING, SWT.FILL)
             .applyTo(_toolbar);
       GridLayoutFactory.fillDefaults()//
-            .numColumns(6)
+            .numColumns(9)
             .margins(3, 3)
             .applyTo(_toolbar);
 //      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
@@ -473,6 +451,10 @@ public class PredictedPerformanceChartView extends ViewPart {
          _spinnerHrRight.addSelectionListener(_defaultSpinnerSelectionListener);
          _spinnerHrRight.addMouseWheelListener(_defaultSpinnerMouseWheelListener);
 
+         // label: vertical separator
+         final Label label = new Label(_toolbar, SWT.SEPARATOR | SWT.VERTICAL);
+         label.setText(UI.EMPTY_STRING);
+
          /*
           * toolbar actions
           */
@@ -481,15 +463,10 @@ public class PredictedPerformanceChartView extends ViewPart {
                .align(SWT.BEGINNING, SWT.CENTER)
                .applyTo(toolbar);
          _headerToolbarManager = new ToolBarManager(toolbar);
+
       }
 
-//      // label: horizontal separator
-//      final Label label = new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL);
-//      GridDataFactory.fillDefaults()//
-//            .grab(true, false)
-//            .hint(SWT.DEFAULT, 1)
-//            .applyTo(label);
-//      label.setText(UI.EMPTY_STRING);
+
    }
 
    private void createUI_12_PageBook(final Composite parent) {
@@ -501,37 +478,6 @@ public class PredictedPerformanceChartView extends ViewPart {
 
       _page_NoPerson = UI.createPage(_tk, _pageBook, Messages.UI_Label_PersonIsRequired);
       _page_NoTour = UI.createPage(_tk, _pageBook, Messages.UI_Label_no_chart_is_selected);
-   }
-
-   private Composite createUI_14_PageNoHrZones(final Composite parent) {
-
-      final Composite container = _tk.createComposite(parent);
-      GridDataFactory.fillDefaults().grab(true, true).align(SWT.BEGINNING, SWT.CENTER).applyTo(container);
-      GridLayoutFactory.swtDefaults().numColumns(1).applyTo(container);
-//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-      {
-         /*
-          * label: user name
-          */
-         _lblNoHrZone = _tk.createLabel(container, UI.EMPTY_STRING, SWT.WRAP);
-         GridDataFactory.fillDefaults().grab(true, false).applyTo(_lblNoHrZone);
-
-         /*
-          * link: create hr zones in the pref page
-          */
-         final Link link = new Link(container, SWT.WRAP);
-         GridDataFactory.fillDefaults().grab(true, false).applyTo(link);
-         link.setText(Messages.Training_View_Link_NoHrZones);
-         link.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               actionEditHrZones();
-            }
-         });
-         _tk.adapt(link, true, true);
-      }
-
-      return container;
    }
 
    private Composite createUI_20_PageHrZones(final Composite parent) {
@@ -548,7 +494,6 @@ public class PredictedPerformanceChartView extends ViewPart {
       container.setBackground(_tk.getColors().getBackground());
       {
          // feature request to show the zone image first https://sourceforge.net/p/mytourbook/feature-requests/132/
-         createUI_40_HrZoneImage(container);
          createUI_30_HrZoneChart(container);
       }
 
@@ -573,65 +518,8 @@ public class PredictedPerformanceChartView extends ViewPart {
          }
       });
    }
-
-   private void createUI_40_HrZoneImage(final Composite parent) {
-
-      final Composite container = _tk.createComposite(parent);
-      GridDataFactory.fillDefaults().applyTo(container);
-      GridLayoutFactory.fillDefaults()//
-            .numColumns(1)
-            .extendedMargins(5, 0, 5, 5)
-            .applyTo(container);
-      {
-         _canvasHrZoneImage = new Canvas(container, SWT.DOUBLE_BUFFERED);
-         GridDataFactory.fillDefaults()//
-               .grab(false, true)
-               // force image width
-               .hint(20, SWT.DEFAULT)
-               .applyTo(_canvasHrZoneImage);
-
-         _canvasHrZoneImage.addPaintListener(new PaintListener() {
-            @Override
-            public void paintControl(final PaintEvent e) {
-
-               if (_hrZoneImage == null || _hrZoneImage.isDisposed()) {
-                  return;
-               }
-
-               final GC gc = e.gc;
-
-               /*
-                * fill background because when the part is resized, a gray background would appear
-                */
-               gc.setBackground(_tk.getColors().getBackground());
-               gc.fillRectangle(e.x, e.y, e.width, e.height);
-
-               gc.drawImage(_hrZoneImage, 0, 0);
-            }
-         });
-
-         _canvasHrZoneImage.addControlListener(new ControlAdapter() {
-            @Override
-            public void controlResized(final ControlEvent e) {
-               updateUI_44_HrZoneImage();
-            }
-         });
-
-         _canvasHrZoneImage.addDisposeListener(new DisposeListener() {
-            @Override
-            public void widgetDisposed(final DisposeEvent e) {
-               if (_hrZoneImage != null) {
-                  _hrZoneImage.dispose();
-               }
-            }
-         });
-      }
-   }
-
    @Override
    public void dispose() {
-
-      disposeHrZoneResources();
 
       if (_tk != null) {
          _tk.dispose();
@@ -649,26 +537,6 @@ public class PredictedPerformanceChartView extends ViewPart {
       _prefStore.removePropertyChangeListener(_prefChangeListener);
 
       super.dispose();
-   }
-
-   private void disposeHrZoneResources() {
-
-      if (_hrZoneColors != null) {
-
-         for (final Color hrZoneColor : _hrZoneColors) {
-            hrZoneColor.dispose();
-         }
-
-         for (int zoneIndex = 0; zoneIndex < _hrZoneColors.length; zoneIndex++) {
-            _hrZoneColors[zoneIndex].dispose();
-            _hrZoneColorsBright[zoneIndex].dispose();
-            _hrZoneColorsDark[zoneIndex].dispose();
-         }
-
-         _hrZoneColors = null;
-         _hrZoneColorsBright = null;
-         _hrZoneColorsDark = null;
-      }
    }
 
    private void enableControls() {
@@ -693,12 +561,12 @@ public class PredictedPerformanceChartView extends ViewPart {
       /*
        * View toolbar
        */
-      final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
-      tbm.add(_actionTrainingOptions);
-
-      // update toolbar which creates the slideout
-      tbm.update(true);
-
+      /*
+       * final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
+       * tbm.add(_actionTrainingOptions);
+       * // update toolbar which creates the slideout
+       * tbm.update(true);
+       */
       /*
        * Header toolbar
        */
@@ -926,6 +794,7 @@ public class PredictedPerformanceChartView extends ViewPart {
       }
 
       //TODO Get all tours for current user for which are the types that the stress score was selected
+      //==> create SQL statement ? find another location in the code that does the same
       updateUI_20(TourManager.getInstance().getTourData(tourId));
    }
 
@@ -989,8 +858,6 @@ public class PredictedPerformanceChartView extends ViewPart {
       updateUI_40_HrZoneChart(zoneMinMaxBpm);
       updateUI_42_HrZoneData(zoneMinMaxBpm);
 
-      // update hr zone image
-      updateUI_44_HrZoneImage();
    }
 
    private void updateUI_40_HrZoneChart(final HrZoneContext zoneMinMaxBpm) {
@@ -1048,9 +915,9 @@ public class PredictedPerformanceChartView extends ViewPart {
 
       final int[] colorIndex = new int[pulseRange];
 
-      final float[] zoneMinBpm = new float[1];
+      final float[] zoneMinBpm = new float[zoneSize];
       zoneMinBpm[0] = 0;//zoneMinMaxBpm.zoneMinBpm;
-      final float[] zoneMaxBpm = new float[1];//zoneMinMaxBpm.zoneMaxBpm;
+      final float[] zoneMaxBpm = new float[zoneSize];//zoneMinMaxBpm.zoneMaxBpm;
       zoneMaxBpm[0] = 200;
 
       for (int pulseIndex = 0; pulseIndex < pulseRange; pulseIndex++) {
@@ -1114,7 +981,6 @@ public class PredictedPerformanceChartView extends ViewPart {
       final ChartDataModel chartDataModel = new ChartDataModel(ChartType.BAR);
 
 //      chartDataModel.setTitle(TourManager.getTourDateTimeFull(_tourData));
-      chartDataModel.setTitle(TourManager.getTourDateTimeShort(_tourData));
 
       /*
        * x-axis: pulse
@@ -1129,13 +995,20 @@ public class PredictedPerformanceChartView extends ViewPart {
       /*
        * y-axis: time
        */
-      final ChartDataYSerie yData = new ChartDataYSerie(
-            ChartType.BAR,
-            ChartDataYSerie.BAR_LAYOUT_STACKED,
-            new float[][] { new float[0] },
-            new float[][] { new float[200] });
+      final float[][] yvalues = new float[pulseRange][1];
+      for (int toto = 0; toto < pulseRange; ++toto)
+      {
+         for (int titi = 0; titi < 1; ++titi)
+         {
+            yvalues[toto][titi] = 20;
+         }
+      }
 
-      yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_HOUR_MINUTE);
+      final ChartDataYSerie yData = new ChartDataYSerie(
+            ChartType.LINE,
+            yvalues);
+
+      yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
       yData.setYTitle("GOVSS");//Messages.App_Label_H_MM);
 
       yData.setColorIndex(new int[][] { colorIndex });
@@ -1146,10 +1019,11 @@ public class PredictedPerformanceChartView extends ViewPart {
 
       chartDataModel.addYData(yData);
 
-      if (_isSynchChartVerticalValues && _isShowAllValues == false) {
-         _minMaxKeeper.setMinMaxValues(chartDataModel);
-      }
-
+      /*
+       * if (_isSynchChartVerticalValues && _isShowAllValues == false) {
+       * _minMaxKeeper.setMinMaxValues(chartDataModel);
+       * }
+       */
       // show the new data data model in the chart
       _chartHrTime.updateChart(chartDataModel, false);
    }
@@ -1260,65 +1134,4 @@ public class PredictedPerformanceChartView extends ViewPart {
       }
    }
 
-   private void updateUI_44_HrZoneImage() {
-
-      Display.getDefault().asyncExec(new Runnable() {
-
-         final int __counter = ++_imageCounter;
-
-         @Override
-         public void run() {
-
-            // check if this is the newest request to create an image
-            if (__counter < _imageCounter) {
-               return;
-            }
-
-            final boolean isHrZoneDataAvailable = TrainingManager.isRequiredHrZoneDataAvailable(_tourData);
-
-            final Point imageSize = _canvasHrZoneImage.getSize();
-            final int devImageWidth = imageSize.x;
-            final int devImageHeight = imageSize.y;
-
-            if (_hrZoneImage != null) {
-               _hrZoneImage.dispose();
-            }
-
-            final Image image = _hrZoneImage = new Image(Display.getDefault(), devImageWidth, devImageHeight);
-
-            final int hrZoneSize = _personHrZones.size();
-
-            final GC gc = new GC(image);
-            {
-               int devYPos = devImageHeight;
-
-               if (isHrZoneDataAvailable) {
-
-                  for (int zoneIndex = 0; zoneIndex < hrZoneSize; zoneIndex++) {
-
-                     final int devWidth = devImageWidth - 1;
-                     final int devHeight = (int) (100.0 / 100.0 * devImageHeight - 0);
-                     final int devY = devYPos - devHeight;
-
-                     gc.setForeground(_hrZoneColorsBright[zoneIndex]);
-                     gc.setBackground(_hrZoneColors[zoneIndex]);
-                     gc.fillGradientRectangle(0, devY, devWidth, devHeight - 1, false);
-
-                     gc.setForeground(_hrZoneColorsDark[zoneIndex]);
-                     gc.drawRectangle(0, devY, devWidth - 1, devHeight - 1);
-
-                     devYPos -= devHeight;
-                  }
-
-               } else {
-                  gc.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
-                  gc.fillRectangle(image.getBounds());
-               }
-            }
-            gc.dispose();
-
-            _canvasHrZoneImage.redraw();
-         }
-      });
-   }
 }
