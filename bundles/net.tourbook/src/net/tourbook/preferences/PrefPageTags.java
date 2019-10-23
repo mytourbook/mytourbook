@@ -657,7 +657,12 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
                   final TourTag tourTag = ((TVIPrefTag) element).getTourTag();
 
-                  styledString.append(tourTag.getTagName(), net.tourbook.ui.UI.TAG_STYLER);
+                  String tagName = tourTag.getTagName();
+                  if (UI.IS_SCRAMBLE_DATA) {
+                     tagName = UI.scrambleText(tagName);
+                  }
+
+                  styledString.append(tagName, net.tourbook.ui.UI.TAG_STYLER);
                   cell.setImage(tourTag.isRoot() ? _imgTagRoot : _imgTag);
 
                } else if (element instanceof TVIPrefTagCategory) {
@@ -667,7 +672,11 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
                   cell.setImage(_imgTagCategory);
 
-                  styledString.append(tourTagCategory.getCategoryName(), net.tourbook.ui.UI.TAG_CATEGORY_STYLER);
+                  String categoryName = tourTagCategory.getCategoryName();
+                  if (UI.IS_SCRAMBLE_DATA) {
+                     categoryName = UI.scrambleText(categoryName);
+                  }
+                  styledString.append(categoryName, net.tourbook.ui.UI.TAG_CATEGORY_STYLER);
 
                   // get number of categories
                   final int categoryCounter = tourTagCategory.getCategoryCounter();
