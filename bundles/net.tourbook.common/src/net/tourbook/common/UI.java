@@ -156,7 +156,7 @@ public class UI {
    public static final CharSequence SYMBOL_BACKSLASH              = "\\";       //$NON-NLS-1$
    public static final String       SYMBOL_COLON                  = ":";        //$NON-NLS-1$
    public static final String       SYMBOL_DOT                    = ".";        //$NON-NLS-1$
-   public static final String       SYMBOL_MIDDLE_DOT             = "·";       //$NON-NLS-1$
+   public static final String       SYMBOL_MIDDLE_DOT             = "·";        //$NON-NLS-1$
    // this looks ugly "\u2551";
    public static final String       SYMBOL_DOUBLE_VERTICAL        = "||";       //$NON-NLS-1$
    public static final String       SYMBOL_EQUAL                  = "=";        //$NON-NLS-1$
@@ -1128,7 +1128,8 @@ public class UI {
 
    /**
     * @param degreeDirection
-    * @return Returns cardinal direction
+    *           The degree value is multiplied by 10, 0°...3600°
+    * @return Returns cardinal direction text
     */
    public static String getCardinalDirectionText(final int degreeDirection) {
 
@@ -1137,6 +1138,7 @@ public class UI {
 
    /**
     * @param degreeDirection
+    *           The degree value is multiplied by 10, 0°...3600°
     * @return Returns cardinal direction index for {@link IWeather#windDirectionText}
     */
    public static int getCardinalDirectionTextIndex(final int degreeDirection) {
