@@ -87,7 +87,7 @@ public class PrefPageTrainingStress extends PreferencePage implements IWorkbench
     * UI controls
     */
    private TableViewer _tourTypesViewer;
-   private TabFolder _tabFolder;
+   private TabFolder   _tabFolder;
 
    /*
     * private Button _chkConvertWayPoints;
@@ -125,7 +125,8 @@ public class PrefPageTrainingStress extends PreferencePage implements IWorkbench
 
       @Override
       public void run() {
-         //TODO updateUI_OneTourType(__tourType);
+         _tourTypesViewer.add(_tourType);
+         //TODO update remove button
       }
    }
 
@@ -142,6 +143,7 @@ public class PrefPageTrainingStress extends PreferencePage implements IWorkbench
 
          setMenuCreator(this);
       }
+
       @Override
       public void dispose() {
          if (_menu != null) {
@@ -178,7 +180,6 @@ public class PrefPageTrainingStress extends PreferencePage implements IWorkbench
          return null;
       }
 
-
       @Override
       public void runWithEvent(final Event event) {
          // net.tourbook.common.UI.openControlMenu(_tabFolder);
@@ -214,13 +215,13 @@ public class PrefPageTrainingStress extends PreferencePage implements IWorkbench
 
    private void createActions() {
 
-         _action_TourType_Add = new ActionTourType_Add();
-         _action_TourType_Remove = new ActionTourType_Remove();
+      _action_TourType_Add = new ActionTourType_Add();
+      _action_TourType_Remove = new ActionTourType_Remove();
 
       _actionOpenTourTypePrefs = new ActionOpenPrefDialog(
             Messages.action_tourType_modify_tourTypes,
             ITourbookPreferences.PREF_PAGE_TOUR_TYPE);
-      }
+   }
 
    @Override
    protected Control createContents(final Composite parent) {
@@ -379,7 +380,7 @@ public class PrefPageTrainingStress extends PreferencePage implements IWorkbench
 
    private void enableControls() {
 
-    _action_TourType_Remove.setEnabled(_tourTypesViewer.getTable().getItemCount()>0);
+      _action_TourType_Remove.setEnabled(_tourTypesViewer.getTable().getItemCount() > 0);
    }
 
    private void fillTourTypeMenu(final IMenuManager menuMgr) {
