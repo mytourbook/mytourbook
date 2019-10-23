@@ -505,6 +505,12 @@ public class UI {
 //	private static final int	VERTICAL_DIALOG_UNITS_PER_CHAR	= 8;
 
    /**
+    * When <code>true</code> then data in the UI are scrambled. This is used to create anynonymous
+    * screenshots.
+    */
+   public static boolean IS_SCRAMBLE_DATA = System.getProperty("scrambleData") != null; //$NON-NLS-1$
+
+   /**
     * @param sash
     */
    public static void addSashColorHandler(final Sash sash) {
@@ -1502,6 +1508,11 @@ public class UI {
       for (int weightIndex = 0; weightIndex < weights.length; weightIndex++) {
          memento.putInteger(weightKey + Integer.toString(weightIndex), weights[weightIndex]);
       }
+   }
+
+   public static float scrambleNumbers(final float number) {
+
+      return RANDOM_GENERATOR.nextFloat() * number;
    }
 
    public static int scrambleNumbers(final int number) {
