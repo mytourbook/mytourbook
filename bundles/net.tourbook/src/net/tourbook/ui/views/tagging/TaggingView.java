@@ -713,14 +713,13 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       addPrefListener();
       addPartListener();
       addSelectionListener();
-
-      enableActions(false);
-
       restoreState();
 
       reloadViewer();
 
       restoreState_Viewer();
+
+      enableActions(false);
    }
 
    private void createUI(final Composite parent) {
@@ -1397,8 +1396,14 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
             final Object element = cell.getElement();
 
             if (element instanceof TVITagView_Tour) {
-               TourDatabase.getInstance();
-               cell.setText(TourDatabase.getTagNames(((TVITagView_Tour) element).tagIds));
+
+               String tagNames = TourDatabase.getTagNames(((TVITagView_Tour) element).tagIds);
+
+               if (net.tourbook.common.UI.IS_SCRAMBLE_DATA) {
+                  tagNames = net.tourbook.common.UI.scrambleText(tagNames);
+               }
+
+               cell.setText(tagNames);
                setCellColor(cell, element);
             } else {
                cell.setText(UI.EMPTY_STRING);
@@ -1494,7 +1499,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    private void enableActions(final boolean isIterateTours) {
 
       final StructuredSelection selection = (StructuredSelection) _tagViewer.getSelection();
-      final int treeItems = _tagViewer.getTree().getItemCount();
+      final int numTreeItems = _tagViewer.getTree().getItemCount();
 
       // this can be very cpu intensive -> avoid when not necessary
       boolean isIteratedTours = false;
@@ -1537,7 +1542,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       final boolean isTagSelected = numTags > 0 && numTours == 0 && numCategorys == 0 && numOtherItems == 0;
       final boolean isCategorySelected = numCategorys == 1 && numTours == 0 && numTags == 0 && numOtherItems == 0;
       final boolean isOneTour = numTours == 1;
-      final boolean isItemsAvailable = treeItems > 0;
+      final boolean isItemsAvailable = numTreeItems > 0;
 
       final int selectedItems = selection.size();
       final TVITagViewItem firstElement = (TVITagViewItem) selection.getFirstElement();

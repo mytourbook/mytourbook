@@ -664,6 +664,28 @@ public class TourManager {
     * @param tourData
     * @param startIndex
     * @param endIndex
+    * @return Returns the recording time
+    */
+   public static int computeTourRecordingTime(final TourData tourData, final int startIndex, final int endIndex) {
+
+      final float[] distanceSerie = tourData.getMetricDistanceSerie();
+      final int[] timeSerie = tourData.timeSerie;
+
+      if (timeSerie == null
+            || timeSerie.length == 0
+            || startIndex >= distanceSerie.length
+            || endIndex >= distanceSerie.length
+            || startIndex > endIndex) {
+         return 0;
+      }
+
+      return timeSerie[endIndex] - timeSerie[startIndex];
+   }
+
+   /**
+    * @param tourData
+    * @param startIndex
+    * @param endIndex
     * @return Returns the metric speed or 0 when not available.
     */
    public static float computeTourSpeed(final TourData tourData, final int startIndex, final int endIndex) {

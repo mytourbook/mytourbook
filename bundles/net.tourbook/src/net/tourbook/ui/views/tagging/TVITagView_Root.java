@@ -21,9 +21,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.ui.UI;
 
 /**
  * root item for the tag view
@@ -76,6 +76,10 @@ public class TVITagView_Root extends TVITagViewItem {
 
                treeItem.tagCategoryId = result.getLong(1);
                treeItem.treeColumn = treeItem.name = result.getString(2);
+
+               if (UI.IS_SCRAMBLE_DATA) {
+                  treeItem.treeColumn = treeItem.name = UI.scrambleText(treeItem.name);
+               }
             }
          }
 
@@ -89,7 +93,7 @@ public class TVITagView_Root extends TVITagViewItem {
                      : UI.EMPTY_STRING;
 
          sb.delete(0, sb.length());
-         sb.append("SELECT"); //$NON-NLS-1$
+         sb.append("SELECT"); // $NON-NLS-1$
          sb.append(" tagId,"); //      1 //$NON-NLS-1$
          sb.append(" name,"); //         2 //$NON-NLS-1$
          sb.append(" expandType,"); //   3 //$NON-NLS-1$
@@ -114,13 +118,17 @@ public class TVITagView_Root extends TVITagViewItem {
             tagItem.setExpandType(result.getInt(3));
             tagItem.isRoot = result.getInt(4) == 1;
 
+            if (UI.IS_SCRAMBLE_DATA) {
+               tagItem.treeColumn = tagItem.name = UI.scrambleText(tagItem.name);
+            }
+
             readTagTotals(tagItem);
          }
 
          conn.close();
 
       } catch (final SQLException e) {
-         UI.showSQLException(e);
+         net.tourbook.ui.UI.showSQLException(e);
       }
    }
 
