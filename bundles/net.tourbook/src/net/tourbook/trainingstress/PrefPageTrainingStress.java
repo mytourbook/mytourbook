@@ -44,7 +44,14 @@ import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.viewers.CellLabelProvider;
+import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TableViewerColumn;
+import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -126,7 +133,7 @@ public class PrefPageTrainingStress extends PreferencePage implements IWorkbench
       @Override
       public void run() {
          _tourTypesViewer.add(_tourType);
-         //TODO update remove button
+         enableControls();
       }
    }
 
@@ -164,6 +171,9 @@ public class PrefPageTrainingStress extends PreferencePage implements IWorkbench
 
             final boolean isChecked = false;
             //TODO if tour type is already in the list, then we don't add it or gray it. Is that what tge isChecked is for ?
+            //TODO make a function isTourTypeAlreadySelected()
+            //final TourType[] toto = _tourTypesViewer.getTable().getItems();
+
             final Action_TourType action = new Action_TourType(tourType, isChecked);
 
             menuManager.add(action);
@@ -182,7 +192,6 @@ public class PrefPageTrainingStress extends PreferencePage implements IWorkbench
 
       @Override
       public void runWithEvent(final Event event) {
-         // net.tourbook.common.UI.openControlMenu(_tabFolder);
          if (event.widget instanceof ToolItem) {
             final ToolItem toolItem = (ToolItem) event.widget;
             final Control control = toolItem.getParent();
@@ -208,7 +217,17 @@ public class PrefPageTrainingStress extends PreferencePage implements IWorkbench
 
       @Override
       public void run() {
-         onRemoveTourType();
+
+         final int selectedIndex = _tourTypesViewer.getTable().getSelectionIndex();
+
+         final TourType _selectedTourType = (TourType) _tourTypesViewer.getElementAt(selectedIndex);
+         _tourTypesViewer.remove(_selectedTourType);
+
+         final int listSize = _tourTypesViewer.getTable().getItemCount();
+         final int newSelectedIndex = selectedIndex >= listSize ? listSize - 1 : selectedIndex;
+         _tourTypesViewer.getTable().setSelection(newSelectedIndex);
+
+         enableControls();
       }
 
    }
@@ -373,6 +392,35 @@ public class PrefPageTrainingStress extends PreferencePage implements IWorkbench
             table.setHeaderVisible(false);
             table.setLinesVisible(false);
             _tourTypesViewer = new TableViewer(table);
+
+            TableViewerColumn tvc;
+
+            // column: image + name
+            tvc = new TableViewerColumn(_tourTypesViewer, SWT.NONE);
+            tvc.setLabelProvider(new CellLabelProvider() {
+               @Override
+               public void update(final ViewerCell cell) {
+
+                  final TourType tourType = ((TourType) cell.getElement());
+
+                  final String filterName = tourType.getName();
+                  final Image filterImage = TourTypeImage.getTourTypeImage(tourType.getTypeId());
+
+                  cell.setText(filterName);
+                  cell.setImage(filterImage);
+               }
+            });
+            layouter.addColumnData(new ColumnWeightData(1));
+
+            _tourTypesViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+               @Override
+               public void selectionChanged(final SelectionChangedEvent event) {
+                  final StructuredSelection selection = (StructuredSelection) event.getSelection();
+                  if (selection != null) {
+                     enableControls();
+                  }
+               }
+            });
          }
       }
 
@@ -380,7 +428,9 @@ public class PrefPageTrainingStress extends PreferencePage implements IWorkbench
 
    private void enableControls() {
 
-      _action_TourType_Remove.setEnabled(_tourTypesViewer.getTable().getItemCount() > 0);
+      final StructuredSelection currentTourTypeViewerSelection = (StructuredSelection) _tourTypesViewer.getSelection();
+      final boolean isTourTypeSelected = currentTourTypeViewerSelection.isEmpty() ? false : true;
+      _action_TourType_Remove.setEnabled(isTourTypeSelected);
    }
 
    private void fillTourTypeMenu(final IMenuManager menuMgr) {
@@ -409,11 +459,6 @@ public class PrefPageTrainingStress extends PreferencePage implements IWorkbench
 
       DEFAULT_DESCRIPTION_WIDTH = _pc.convertWidthInCharsToPixels(80);
       _hintDefaultSpinnerWidth = UI.IS_LINUX ? SWT.DEFAULT : _pc.convertWidthInCharsToPixels(UI.IS_OSX ? 10 : 5);
-
-   }
-
-   private void onRemoveTourType() {
-      // TODO Auto-generated method stub
 
    }
 

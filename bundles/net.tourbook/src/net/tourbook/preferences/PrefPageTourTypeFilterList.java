@@ -17,6 +17,17 @@ package net.tourbook.preferences;
 
 import java.util.ArrayList;
 
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.util.TableLayoutComposite;
+import net.tourbook.data.TourType;
+import net.tourbook.database.TourDatabase;
+import net.tourbook.tour.TourTypeFilterManager;
+import net.tourbook.tourType.TourTypeImage;
+import net.tourbook.ui.TourTypeFilter;
+import net.tourbook.ui.TourTypeFilterSet;
+import net.tourbook.ui.UI;
+
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -68,17 +79,6 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
-
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.util.TableLayoutComposite;
-import net.tourbook.data.TourType;
-import net.tourbook.database.TourDatabase;
-import net.tourbook.tour.TourTypeFilterManager;
-import net.tourbook.tourType.TourTypeImage;
-import net.tourbook.ui.TourTypeFilter;
-import net.tourbook.ui.TourTypeFilterSet;
-import net.tourbook.ui.UI;
 
 public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkbenchPreferencePage {
 
@@ -332,7 +332,7 @@ public class PrefPageTourTypeFilterList extends PreferencePage implements IWorkb
                   final Table filterTable = _filterViewer.getTable();
 
                   /*
-                   * check if drag was startet from this filter, remove the filter item before the
+                   * check if drag was started from this filter, remove the filter item before the
                    * new filter is inserted
                    */
                   if (LocalSelectionTransfer.getTransfer().getSelectionSetTime() == _dragStartViewerLeft) {
