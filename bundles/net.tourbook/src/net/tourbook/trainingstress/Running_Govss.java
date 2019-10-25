@@ -33,12 +33,9 @@ public class Running_Govss {
    private float    _athleteHeight;
    private float    _athleteWeight;
 
-   private TourData _tourData;
-
-   public Running_Govss(final TourPerson _tourPerson, final TourData _tourData) {
+   public Running_Govss(final TourPerson _tourPerson) {
       this._athleteHeight = _tourPerson.getHeight();
       this._athleteWeight = _tourPerson.getWeight();
-      this._tourData = _tourData;
    }
 
    /**
@@ -92,7 +89,7 @@ public class Running_Govss {
     *
     * @return
     */
-   public int ComputeGovss() {
+   public int ComputeGovss(final TourData tourData) {
       //What data from the athlete do we need ?
       //When identified, add them in the users preference page
 
@@ -103,7 +100,7 @@ public class Running_Govss {
       final float lactateLimitedPower = (float) ComputePower(14868, 0.0, 0, tempCriticalVelocity);
 
       // 3. Analyze the data from a particular workout from an athlete’s log, computing 120 second rolling averages from velocity and slope data.
-      final ArrayList<Double> powerValues = computePowerValues();
+      final ArrayList<Double> powerValues = computePowerValues(tourData);
 
       // 4. Raise the values in step 3 to the 4th power.
       for (int index = 0; index < powerValues.size(); index++) {
@@ -120,7 +117,7 @@ public class Running_Govss {
       final float intensityWeighingFactor = lactateNormalizedPower / lactateLimitedPower;
 
       // 8. Multiply the Lactate Normalized Power by the duration of the workout in seconds to obtain the normalized work performed in joules.
-      final int normalizedWork = Math.round(lactateNormalizedPower * _tourData.getTourRecordingTime());
+      final int normalizedWork = Math.round(lactateNormalizedPower * tourData.getTourRecordingTime());
 
       // 9. Multiply value obtained in step 8 by the Intensity Weighting Fraction to get a raw training stress value.
       float trainingStressValue = normalizedWork * intensityWeighingFactor;
@@ -152,11 +149,11 @@ public class Running_Govss {
       return power;
    }
 
-   private ArrayList<Double> computePowerValues() {
-      final long tourRecordingTime = _tourData.getTourRecordingTime();
+   private ArrayList<Double> computePowerValues(final TourData tourData) {
+      final long tourRecordingTime = tourData.getTourRecordingTime();
       final int estimatedNumberOfRollingAverages = Math.round(tourRecordingTime / 120);
 
-      final double[] timeSerie = _tourData.getTimeSerieDouble();
+      final double[] timeSerie = tourData.getTimeSerieDouble();
       final int timeSeriesLength = timeSerie.length;
 
       final ArrayList<Double> powerValues = new ArrayList<>(estimatedNumberOfRollingAverages);
@@ -184,11 +181,11 @@ public class Running_Govss {
             currentRecordingTime = timeSerie[serieEndIndex] - timeSerie[serieStartIndex];
          }
 
-         currentSpeed = TourManager.computeTourSpeed(_tourData, serieStartIndex, serieEndIndex);
+         currentSpeed = TourManager.computeTourSpeed(tourData, serieStartIndex, serieEndIndex);
          //Convert the speed (km/h) to velocity (m/s)
          currentSpeed /= 3.6;
-         currentDistance = TourManager.computeTourDistance(_tourData, serieStartIndex, serieEndIndex);
-         currentSlope = TourManager.computeTourAverageGradient(_tourData, serieStartIndex, serieEndIndex);
+         currentDistance = TourManager.computeTourDistance(tourData, serieStartIndex, serieEndIndex);
+         currentSlope = TourManager.computeTourAverageGradient(tourData, serieStartIndex, serieEndIndex);
          powerValue = ComputePower(currentDistance, currentSlope, currentSpeed, initialSpeed);
          if (powerValue > 0) {
             powerValues.add(powerValue);

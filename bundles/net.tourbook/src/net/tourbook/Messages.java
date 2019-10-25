@@ -19,7 +19,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
-   private static final String BUNDLE_NAME = "net.tourbook.messages";                            //$NON-NLS-1$
+   private static final String BUNDLE_NAME = "net.tourbook.messages";                              //$NON-NLS-1$
 
    public static String        Action_Cadence_Set;
    public static String        Action_Cadence_Set_Rpm;
@@ -1649,6 +1649,14 @@ public class Messages extends NLS {
    public static String        Pref_People_Tab_Person;
    public static String        Pref_People_Title;
 
+   public static String        Pref_ThresholdPower_Label_AverageSlope;
+   public static String        Pref_ThresholdPower_Label_Distance;
+   public static String        Pref_ThresholdPower_Label_Duration;
+
+   public static String        Pref_TrainingStress_Govss_AddTourTypes;
+   public static String        Pref_TrainingStress_Govss_RemoveTourType;
+   public static String        Pref_TrainingStress_Group_ThresholdPower;
+
    public static String        pref_appearance_number_of_recent_tags;
    public static String        pref_appearance_number_of_recent_tags_tooltip;
    public static String        pref_appearance_showMemoryMonitor;
@@ -2872,6 +2880,9 @@ public class Messages extends NLS {
    public static String Training_Action_EditHrZones_Tooltip;
 
    public static String Training_HRZone_Label_Header_Zone;
+
+   public static String Training_Stress_Label_Info;
+   public static String Training_Stress_Group_Govss;
 
    public static String Training_View_Action_ShowAllPulseValues;
    public static String Training_View_Action_SynchChartScale;

@@ -23,6 +23,7 @@ import net.tourbook.chart.Activator;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.util.TableLayoutComposite;
+import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.importdata.RawDataManager;
@@ -53,6 +54,8 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -62,9 +65,11 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
@@ -98,12 +103,13 @@ public class PrefPageTrainingStress extends PreferencePage implements IWorkbench
 
    /*
     * private Button _chkConvertWayPoints;
-    * private Button _chkOneTour;
-    * private Button _rdoDistanceRelative;
-    * private Button _rdoDistanceAbsolute;
     */
-   private Label _labelCriticalVelocity;
-   private Text  _textApiKey;
+   private Label   _labelThresholdPower_Value;
+
+   private Text _textThresholdPower_Duration;
+
+   private Spinner _spinnerThresholdPower_Distance;
+   private Spinner _spinnerThresholdPower_AverageSlope;
 
    private class Action_TourType extends Action {
 
@@ -118,7 +124,6 @@ public class PrefPageTrainingStress extends PreferencePage implements IWorkbench
 
          if (isChecked == false) {
 
-            // show image when tour type can be selected, disabled images look ugly on win
             final Image tourTypeImage = TourTypeImage.getTourTypeImage(tourType.getTypeId());
             setImageDescriptor(ImageDescriptor.createFromImage(tourTypeImage));
          }
@@ -145,7 +150,7 @@ public class PrefPageTrainingStress extends PreferencePage implements IWorkbench
 
          super(null, AS_PUSH_BUTTON);
 
-         setToolTipText(Messages.Dialog_ImportConfig_Action_AddSpeed_Tooltip);
+         setToolTipText(Messages.Pref_TrainingStress_Govss_AddTourTypes);
          setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Add));
 
          setMenuCreator(this);
@@ -164,21 +169,31 @@ public class PrefPageTrainingStress extends PreferencePage implements IWorkbench
          if (_menu != null) {
             _menu.dispose();
          }
-         // add all tour types to the menu
+
+         //Getting the current selected tour types
+         final TableItem[] selectedTours = _tourTypesViewer.getTable().getItems();
+
+         // add the tour types that have not been added already to the menu
          final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
          final MenuManager menuManager = new MenuManager();
          for (final TourType tourType : tourTypes) {
 
-            final boolean isChecked = false;
-            //TODO if tour type is already in the list, then we don't add it or gray it. Is that what tge isChecked is for ?
-            //TODO make a function isTourTypeAlreadySelected()
-            //final TourType[] toto = _tourTypesViewer.getTable().getItems();
+            boolean isChecked = false;
+            for (final TableItem currentItem : selectedTours) {
+               if (currentItem.getText().equals(tourType.getName())) {
+
+                  isChecked = true;
+                  break;
+               }
+            }
 
             final Action_TourType action = new Action_TourType(tourType, isChecked);
 
             menuManager.add(action);
          }
-         // TODO add your menu items
+
+         menuManager.add(new Separator());
+         menuManager.add(_actionOpenTourTypePrefs);
 
          _menu = menuManager.createContextMenu(parent);
          return _menu;
@@ -211,7 +226,7 @@ public class PrefPageTrainingStress extends PreferencePage implements IWorkbench
 
          super(null, AS_PUSH_BUTTON);
 
-         setToolTipText(Messages.Dialog_ImportConfig_Action_AddSpeed_Tooltip);
+         setToolTipText(Messages.Pref_TrainingStress_Govss_RemoveTourType);
          setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Trash));
       }
 
@@ -274,9 +289,6 @@ public class PrefPageTrainingStress extends PreferencePage implements IWorkbench
             fillTourTypeMenu(menuMgr);
          }
       });
-      // final Menu ttContextMenu = menuMgr.createContextMenu(_linkTT_One_TourType);
-      // _action_TourType_Add.setMenuCreator(ttContextMenu);
-      //  _linkTT_One_TourType.setMenu(ttContextMenu);
    }
 
    private Composite createUI(final Composite parent) {
@@ -289,14 +301,14 @@ public class PrefPageTrainingStress extends PreferencePage implements IWorkbench
       GridLayoutFactory.fillDefaults().numColumns(1).spacing(0, 15).applyTo(container);
       {
          /*
-          * label: info
+          * label: Training stress info
           */
          final Label label = new Label(container, SWT.WRAP);
          GridDataFactory.fillDefaults().hint(DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT).applyTo(label);
-         label.setText(Messages.Compute_Values_Label_Info);
+         label.setText(Messages.Training_Stress_Label_Info);
 
          /*
-          * tab folder: computed values
+          * tab folder: training stress
           */
          _tabFolder = new TabFolder(container, SWT.TOP);
          GridDataFactory
@@ -308,7 +320,7 @@ public class PrefPageTrainingStress extends PreferencePage implements IWorkbench
             //tab GOVSS
             final TabItem tabGovss = new TabItem(_tabFolder, SWT.NONE);
             tabGovss.setControl(createUI_100_Govss(_tabFolder));
-            tabGovss.setText("GOVSS");//Messages.Compute_Values_Group_Smoothing);
+            tabGovss.setText(Messages.Training_Stress_Group_Govss);
          }
       }
 
@@ -323,7 +335,7 @@ public class PrefPageTrainingStress extends PreferencePage implements IWorkbench
       final Composite container = new Composite(parent, SWT.NONE);
       GridLayoutFactory.swtDefaults().applyTo(container);
       {
-         createUI_110_CriticalVelocity(container);
+         createUI_110_ThresholdPower(container);
          createUI_120_TourTypesList(container);
       }
 
@@ -332,32 +344,118 @@ public class PrefPageTrainingStress extends PreferencePage implements IWorkbench
    }
 
    /**
-    * UI for the critical velocity group
+    * UI for the threshold power group
     */
-   private void createUI_110_CriticalVelocity(final Composite parent) {
+   private void createUI_110_ThresholdPower(final Composite parent) {
 
       final Group container = new Group(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      container.setText(Messages.Pref_Appearance_Group_Tagging);
-      GridLayoutFactory.swtDefaults().numColumns(3).applyTo(container);
+      container.setText(Messages.Pref_TrainingStress_Group_ThresholdPower);
+      GridLayoutFactory.swtDefaults().numColumns(6).applyTo(container);
       {
          {
-            // label
-            _labelCriticalVelocity = new Label(container, SWT.NONE);
-            _labelCriticalVelocity.setText("Critical velocity");//Messages.Pref_Weather_Label_ApiKey);
+            // label : Time
+            Label label = new Label(container, SWT.NONE);
+            label.setText(Messages.Pref_ThresholdPower_Label_Duration);
             GridDataFactory.fillDefaults()
-                  .applyTo(_labelCriticalVelocity);
+                  .applyTo(label);
 
             // text
-            _textApiKey = new Text(container, SWT.BORDER);
-            _textApiKey.setToolTipText(Messages.Pref_Weather_Label_ApiKey_Tooltip);
+            _textThresholdPower_Duration = new Text(container, SWT.BORDER);
+            _textThresholdPower_Duration.setToolTipText("");//Messages.Pref_Weather_Label_ApiKey_Tooltip);
+            _textThresholdPower_Duration.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  onComputeThresholdPower();
+               }
+            });
             GridDataFactory.fillDefaults()
                   .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
-                  .applyTo(_textApiKey);
+                  .applyTo(_textThresholdPower_Duration);
 
-            // label: min/mile or km/h
-            final Label label = new Label(container, SWT.NONE);
+            // label:
+            label = new Label(container, SWT.NONE);
+            label.setText(UI.UNIT_LABEL_TIME);
+
+
+         // label : Time
+             label = new Label(container, SWT.NONE);
+            label.setText("Threshold velocity");//Messages.Pref_ThresholdPower_Label_Duration);
+            GridDataFactory.fillDefaults()
+                  .indent(60, 0)
+                  .applyTo(label);
+
+            // text
+            label = new Label(container, SWT.NONE);
+            label.setText("6");//Messages.Pref_ThresholdPower_Label_Duration);
+            GridDataFactory.fillDefaults()
+                  .applyTo(label);
+
+            // label:
+            label = new Label(container, SWT.NONE);
             label.setText(UI.UNIT_LABEL_PACE);
+
+
+
+            // label : Distance
+            label = new Label(container, SWT.NONE);
+            label.setText(Messages.Pref_ThresholdPower_Label_Distance);
+            GridDataFactory.fillDefaults()
+                  .applyTo(label);
+
+            // text
+            _spinnerThresholdPower_Distance = new Spinner(container, SWT.BORDER);
+            _spinnerThresholdPower_Distance.setToolTipText("");//Messages.Pref_Weather_Label_ApiKey_Tooltip);
+            _spinnerThresholdPower_Distance.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  onComputeThresholdPower();
+               }
+            });
+            GridDataFactory.fillDefaults()
+                  .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+                  .applyTo(_spinnerThresholdPower_Distance);
+
+            // label: m or mi
+            label = new Label(container, SWT.NONE);
+            label.setText(UI.UNIT_LABEL_DISTANCE);
+
+            // label : Time
+            label = new Label(container, SWT.NONE);
+            label.setText("Threshold Power");//Messages.Pref_ThresholdPower_Label_Duration);
+            GridDataFactory.fillDefaults()
+                  .indent(60, 0)
+                  .applyTo(label);
+
+            // text
+            _labelThresholdPower_Value = new Label(container, SWT.CENTER);
+            _labelThresholdPower_Value.setText("345W");//Messages.Pref_ThresholdPower_Label_Duration);
+            GridDataFactory.fillDefaults()
+                  .indent(60, 0)
+                  .applyTo(_labelThresholdPower_Value);
+
+            // label:
+            label = new Label(container, SWT.NONE);
+            label.setText(UI.UNIT_POWER);
+
+            // label : average slope
+            label = new Label(container, SWT.NONE);
+            label.setText(Messages.Pref_ThresholdPower_Label_AverageSlope);
+            GridDataFactory.fillDefaults()
+                  .applyTo(label);
+
+            // text
+            _spinnerThresholdPower_AverageSlope = new Spinner(container, SWT.BORDER);
+            _spinnerThresholdPower_AverageSlope.setToolTipText("");//Messages.Pref_Weather_Label_ApiKey_Tooltip);
+            _spinnerThresholdPower_AverageSlope.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  onComputeThresholdPower();
+               }
+            });
+            GridDataFactory.fillDefaults()
+                  .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+                  .applyTo(_spinnerThresholdPower_AverageSlope);
          }
       }
 
@@ -386,7 +484,7 @@ public class PrefPageTrainingStress extends PreferencePage implements IWorkbench
 
             // Table
             final TableLayoutComposite layouter = new TableLayoutComposite(container, SWT.NONE);
-            GridDataFactory.fillDefaults().grab(true, true).hint(200, SWT.DEFAULT).applyTo(layouter);
+            GridDataFactory.fillDefaults().grab(true, true).hint(100, 100).applyTo(layouter);
 
             final Table table = new Table(layouter, (SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION));
             table.setHeaderVisible(false);
@@ -460,6 +558,19 @@ public class PrefPageTrainingStress extends PreferencePage implements IWorkbench
       DEFAULT_DESCRIPTION_WIDTH = _pc.convertWidthInCharsToPixels(80);
       _hintDefaultSpinnerWidth = UI.IS_LINUX ? SWT.DEFAULT : _pc.convertWidthInCharsToPixels(UI.IS_OSX ? 10 : 5);
 
+   }
+
+   private void onComputeThresholdPower() {
+
+      final TourPerson tourPerson = TourbookPlugin.getActivePerson();
+      final Running_Govss _unning_Govss = new Running_Govss(tourPerson);
+      final double thresholdPower = _unning_Govss.ComputePower(_spinnerThresholdPower_Distance.getSelection(),
+            _spinnerThresholdPower_AverageSlope.getSelection(),
+            0f,
+            4.13f);
+
+
+      _labelThresholdPower_Value.setText(String.valueOf(thresholdPower));
    }
 
    @Override
