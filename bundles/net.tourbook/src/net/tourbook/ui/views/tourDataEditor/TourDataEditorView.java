@@ -3718,9 +3718,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       }
    }
 
-   private void createUI_Section_140_Weather(final Composite parent) {
+   private void createUI_Section_140_TrainingStress(final Composite parent) {
 
-      _sectionWeather = createSection(parent, _tk, Messages.tour_editor_section_weather, false, true);
+      _sectionWeather = createSection(parent, _tk, "Training Stress"/*
+                                                                     * Messages.
+                                                                     * tour_editor_section_weather
+                                                                     */, false, true);
       final Composite container = (Composite) _sectionWeather.getClient();
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults()
@@ -3729,16 +3732,48 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             .applyTo(container);
 //      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
       {
-         createUI_Section_141_Weather_Description(container);
+         createUI_Section_141_TrainingStress_Description(container);
 
-         createUI_Section_142_Weather_Wind_Col1(container);
-         createUI_Section_143_Weather_Wind_Col2(container);
+         /*
+          * createUI_Section_142_Weather_Wind_Col1(container);
+          * createUI_Section_143_Weather_Wind_Col2(container);
+          * createUI_Section_144_Weather_Temperature_Col1(container);
+          * createUI_Section_144_Weather_Temperature_Col2(container);
+          * createUI_Section_147_Weather_Other_Col1(container);
+          * createUI_Section_148_Weather_Other_Col2(container);
+          */
+      }
+   }
 
-         createUI_Section_144_Weather_Temperature_Col1(container);
-         createUI_Section_144_Weather_Temperature_Col2(container);
+   private void createUI_Section_141_TrainingStress_Description(final Composite parent) {
 
-         createUI_Section_147_Weather_Other_Col1(container);
-         createUI_Section_148_Weather_Other_Col2(container);
+      final Composite container = _tk.createComposite(parent);
+      GridDataFactory.fillDefaults().span(2, 1).grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+      {
+         /*
+          * training stress description
+          */
+         final Label label = _tk.createLabel(container, "Training Stress");//Messages.Tour_Editor_Label_Weather);
+         GridDataFactory.swtDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
+         _firstColumnControls.add(label);
+
+         /*
+          * _txtWeather = _tk.createText(
+          * container, //
+          * UI.EMPTY_STRING,
+          * SWT.BORDER | SWT.WRAP | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL//
+          * );
+          * _txtWeather.addModifyListener(_modifyListener);
+          * GridDataFactory.fillDefaults()
+          * .grab(true, true)
+          * //
+          * // SWT.DEFAULT causes lots of problems with the layout therefore the hint is set
+          * //
+          * .hint(_hintTextColumnWidth, _pc.convertHeightInCharsToPixels(2))
+          * .applyTo(_txtWeather);
+          */
       }
    }
 
@@ -4254,7 +4289,31 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       }
    }
 
-   private void createUI_Section_150_Characteristics(final Composite parent) {
+   private void createUI_Section_150_Weather(final Composite parent) {
+
+      _sectionWeather = createSection(parent, _tk, Messages.tour_editor_section_weather, false, true);
+      final Composite container = (Composite) _sectionWeather.getClient();
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults()
+            .numColumns(2)
+            .spacing(COLUMN_SPACING, 7)
+            .applyTo(container);
+//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+      {
+         createUI_Section_141_Weather_Description(container);
+
+         createUI_Section_142_Weather_Wind_Col1(container);
+         createUI_Section_143_Weather_Wind_Col2(container);
+
+         createUI_Section_144_Weather_Temperature_Col1(container);
+         createUI_Section_144_Weather_Temperature_Col2(container);
+
+         createUI_Section_147_Weather_Other_Col1(container);
+         createUI_Section_148_Weather_Other_Col2(container);
+      }
+   }
+
+   private void createUI_Section_160_Characteristics(final Composite parent) {
 
       _sectionCharacteristics = createSection(parent, _tk, Messages.tour_editor_section_characteristics, false, true);
       final Composite container = (Composite) _sectionCharacteristics.getClient();
@@ -4380,10 +4439,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             createUI_Section_130_Personal(_tourContainer);
             createUI_SectionSeparator(_tourContainer);
 
-            createUI_Section_140_Weather(_tourContainer);
+            createUI_Section_140_TrainingStress(_tourContainer);
             createUI_SectionSeparator(_tourContainer);
 
-            createUI_Section_150_Characteristics(_tourContainer);
+            createUI_Section_150_Weather(_tourContainer);
+            createUI_SectionSeparator(_tourContainer);
+
+            createUI_Section_160_Characteristics(_tourContainer);
          }
       }
 
