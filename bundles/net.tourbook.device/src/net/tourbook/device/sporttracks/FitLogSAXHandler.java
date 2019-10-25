@@ -80,6 +80,7 @@ public class FitLogSAXHandler extends DefaultHandler {
    private static final String                  TAG_ACTIVITY_TIMEZONE_UTC_OFFSET            = "TimeZoneUtcOffset";   //$NON-NLS-1$
    private static final String                  ATTRIB_CUSTOM_DATA_FIELD_DEFINITION_NAME    = "Name";                //$NON-NLS-1$
    private static final String                  ATTRIB_CUSTOM_DATA_FIELD_DEFINITION_OPTIONS = "Options";             //$NON-NLS-1$
+   private static final String                  ATTRIB_CUSTOM_DATA_FIELD_DEFINITION_TRIMP   = "TRIMP";               //$NON-NLS-1$
    private static final String                  ATTRIB_CUSTOM_DATA_FIELD_NAME               = "name";                //$NON-NLS-1$
    private static final String                  ATTRIB_CUSTOM_DATA_FIELD_VALUE              = "v";                   //$NON-NLS-1$
    private static final String                  ATTRIB_EQUIPMENT_BRAND                      = "Brand";               //$NON-NLS-1$
@@ -747,15 +748,17 @@ public class FitLogSAXHandler extends DefaultHandler {
     */
    private void formatCustomDataFieldValue(final Activity activity, final String customDataFieldName, final String customDataFieldValue) {
 
+      // If there is no custom data field definition for the current field, we add its value as-is.
       if (!_customDataFieldDefinitions.containsKey(customDataFieldName)) {
          activity.customDataFields.put(customDataFieldName, customDataFieldValue);
          return;
       }
 
+      //Otherwise, we round the value to the number of specified decimals
       final int numberOfDecimals = _customDataFieldDefinitions.get(customDataFieldName);
       try {
          final String format = "%." + numberOfDecimals + "f"; //$NON-NLS-1$ //$NON-NLS-2$
-         final String formattedNumber = String.format(format, Double.valueOf(customDataFieldValue));
+         final String formattedNumber = String.format(format, (double) Math.round(Double.valueOf(customDataFieldValue)));
 
          if (activity.customDataFields.containsKey(customDataFieldName)) {
             activity.customDataFields.replace(customDataFieldName, formattedNumber);
@@ -1016,6 +1019,12 @@ public class FitLogSAXHandler extends DefaultHandler {
                   final int numberOfDecimals = Integer.parseInt(tokens[1]);
 
                   _customDataFieldDefinitions.put(customFieldName, numberOfDecimals);
+               } else if (customFieldName.equals(ATTRIB_CUSTOM_DATA_FIELD_DEFINITION_TRIMP)) {
+                  // We make an exception for the TRIMP custom data field as its definition doesn't specify any specific number of decimals :
+                  // <.... Name="TRIMP" GroupAggregation="Sum" Options="">
+                  // However, this is how a TRIMP value is being exported
+                  // <... . name="TRIMP" v="81.8000717163086" />
+                  _customDataFieldDefinitions.put(customFieldName, 0);
                }
 
             }
