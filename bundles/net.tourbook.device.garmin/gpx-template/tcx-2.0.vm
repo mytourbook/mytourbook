@@ -4,7 +4,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2 http://www.garmin.com/xmlschemas/TrainingCenterDatabasev2.xsd">
 	<Activities>
-		<Activity Sport="Biking">
+		<Activity Sport="$activityType">
 			<Id>$dateformatter.format($starttime)</Id>
 			<Lap StartTime="$dateformatter.format($starttime)">
 				<TotalTimeSeconds>$double2formatter.format($totaltime)</TotalTimeSeconds>

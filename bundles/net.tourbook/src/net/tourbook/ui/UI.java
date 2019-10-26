@@ -214,6 +214,11 @@ public class UI {
    public static final float   UNIT_FOOT                      = 0.3048f;
 
    /**
+    * Imperial system for weight
+    */
+   public static final float   UNIT_POUND                     = 2.204623f;
+
+   /**
     * Contains the system of measurement value for distances relative to the metric system.
     * <p>
     * The metric system is <code>1</code>, imperial system is {@link #UNIT_MILE}
@@ -250,6 +255,12 @@ public class UI {
     * metric system Watt/Kg.
     */
    public static float         UNIT_VALUE_POWER;
+
+   /**
+    * contains the system of measurement value for the weight, is set to <code>1</code> for the
+    * metric system
+    */
+   public static float         UNIT_VALUE_WEIGHT              = 1;
 
    // (Celcius * 9/5) + 32 = Fahrenheit
    public static final float         UNIT_FAHRENHEIT_MULTI         = 1.8f;
@@ -1399,6 +1410,30 @@ public class UI {
 
          net.tourbook.common.UI.UNIT_VALUE_TEMPERATURE = 1;
          net.tourbook.common.UI.UNIT_LABEL_TEMPERATURE = net.tourbook.common.UI.UNIT_TEMPERATURE_C;
+      }
+
+      /*
+       * weight
+       */
+      if (prefStore.getString(ITourbookPreferences.MEASUREMENT_SYSTEM_WEIGHT)
+            .equals(//
+                  ITourbookPreferences.MEASUREMENT_SYSTEM_WEIGHT_LBS)) {
+
+         // set imperial measure system
+
+         UNIT_VALUE_WEIGHT = UNIT_POUND;
+
+         net.tourbook.common.UI.UNIT_VALUE_WEIGHT = UNIT_VALUE_WEIGHT;
+         net.tourbook.common.UI.UNIT_LABEL_WEIGHT = net.tourbook.common.UI.UNIT_WEIGHT_LBS;
+
+      } else {
+
+         // default is the metric measure system
+
+         UNIT_VALUE_WEIGHT = 1;
+
+         net.tourbook.common.UI.UNIT_VALUE_WEIGHT = UNIT_VALUE_WEIGHT;
+         net.tourbook.common.UI.UNIT_LABEL_WEIGHT = net.tourbook.common.UI.UNIT_WEIGHT_KG;
       }
 
       TourFilterManager.updateUnits();

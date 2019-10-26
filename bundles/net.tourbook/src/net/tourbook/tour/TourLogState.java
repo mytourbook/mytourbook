@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,54 +17,54 @@ package net.tourbook.tour;
 
 public enum TourLogState {
 
-	/**
-	 * 
-	 */
-	DEFAULT, //
+   /**
+    *
+    */
+   DEFAULT,
 
-	/**
-	 * Tour import is OK.
-	 */
-	IMPORT_OK, //
+   /**
+    * Tour import is OK.
+    */
+   IMPORT_OK,
 
-	/**
-	 * Tour import error.
-	 */
-	IMPORT_ERROR, //
+   /**
+    * Tour import error.
+    */
+   IMPORT_ERROR,
 
-	/**
-	 * 
-	 */
-	IMPORT_EXCEPTION, //
+   /**
+    *
+    */
+   IMPORT_EXCEPTION,
 
-	/**
-	 * 
-	 */
-	IMPORT_INFO, //
+   /**
+    * Show info icon in log view
+    */
+   INFO,
 
-	/**
-	 * File is copied to the backup folder.
-	 */
-	EASY_IMPORT_COPY, //
+   /**
+    * File is copied to the backup folder.
+    */
+   EASY_IMPORT_COPY,
 
-	/**
-	 * File is deleted in the device folder.
-	 */
-	EASY_IMPORT_DELETE_DEVICE, //
+   /**
+    * File is deleted in the device folder.
+    */
+   EASY_IMPORT_DELETE_DEVICE,
 
-	/**
-	 * File is deleted in the backup folder.
-	 */
-	EASY_IMPORT_DELETE_BACKUP, //
+   /**
+    * File is deleted in the backup folder.
+    */
+   EASY_IMPORT_DELETE_BACKUP,
 
-	/**
-	 * Imported tour is saved.
-	 */
-	TOUR_SAVED, //
+   /**
+    * Imported tour is saved.
+    */
+   TOUR_SAVED,
 
-	/**
-	 * A saved tour is deleted.
-	 */
-	TOUR_DELETED, //
+   /**
+    * A saved tour is deleted.
+    */
+   TOUR_DELETED,
 
 }
