@@ -40,9 +40,11 @@ _This document will not repeat already written text in the documentation._
 
 ### Other
 
-**Scramble calendar content/values**
+**Scramble content/values**
 
--DscrambleCalendar
+It is scrambeling text and values. This is used to create anynymous screenshots
+
+-DscrambleData
 
 **Each tour has a unique id so that a tour can be imported multiple times**
 

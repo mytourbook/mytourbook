@@ -657,7 +657,12 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
                   final TourTag tourTag = ((TVIPrefTag) element).getTourTag();
 
-                  styledString.append(tourTag.getTagName(), net.tourbook.ui.UI.TAG_STYLER);
+                  String tagName = tourTag.getTagName();
+                  if (UI.IS_SCRAMBLE_DATA) {
+                     tagName = UI.scrambleText(tagName);
+                  }
+
+                  styledString.append(tagName, net.tourbook.ui.UI.TAG_STYLER);
                   cell.setImage(tourTag.isRoot() ? _imgTagRoot : _imgTag);
 
                } else if (element instanceof TVIPrefTagCategory) {
@@ -667,7 +672,11 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
                   cell.setImage(_imgTagCategory);
 
-                  styledString.append(tourTagCategory.getCategoryName(), net.tourbook.ui.UI.TAG_CATEGORY_STYLER);
+                  String categoryName = tourTagCategory.getCategoryName();
+                  if (UI.IS_SCRAMBLE_DATA) {
+                     categoryName = UI.scrambleText(categoryName);
+                  }
+                  styledString.append(categoryName, net.tourbook.ui.UI.TAG_CATEGORY_STYLER);
 
                   // get number of categories
                   final int categoryCounter = tourTagCategory.getCategoryCounter();
@@ -1024,9 +1033,8 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
          newCategory.setRoot(true);
 
          /*
-          * update model
+          * Update model
           */
-
          _rootItem.getFetchedChildren().add(newCategoryItem);
 
          // persist new category
@@ -1036,8 +1044,10 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
             // update item
             newCategoryItem.setTourTagCategory(savedNewCategory);
 
-            // update viewer
-            _tagViewer.add(this, newCategoryItem);
+            /*
+             * Update UI
+             */
+            _tagViewer.add(_rootItem, newCategoryItem);
          }
 
       } else if (parentElement instanceof TVIPrefTagCategory) {
@@ -1061,7 +1071,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
             newCategoryItem.setTourTagCategory(savedNewCategory);
 
             /*
-             * update parent category
+             * Update parent category
              */
             final TourTagCategory parentCategoryEntity = em.find(
                   TourTagCategory.class,
@@ -1075,7 +1085,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
             parentCategoryEntity.setCategoryCounter(lazyTourTagCategories.size());
 
             /*
-             * persist parent category
+             * Persist parent category
              */
             final TourTagCategory savedParentCategory = TourDatabase.saveEntity(
                   parentCategoryEntity,
@@ -1088,11 +1098,9 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
                parentCategoryItem.setTourTagCategory(savedParentCategory);
 
                /*
-                * update viewer
+                * Update UI
                 */
                parentCategoryItem.clearChildren();
-
-//               fTagViewer.update(parentCategoryItem, null);
 
                _tagViewer.add(parentCategoryItem, newCategoryItem);
 
@@ -1159,7 +1167,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
          tourTag.setRoot(true);
 
          /*
-          * update model
+          * Update model
           */
          tagItem.setParentItem(_rootItem);
          _rootItem.getFetchedChildren().add(tagItem);
@@ -1173,9 +1181,9 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
             tagItem.setTourTag(savedTag);
 
             /*
-             * update viewer
+             * Update UI
              */
-            _tagViewer.add(this, tagItem);
+            _tagViewer.add(_rootItem, tagItem);
          }
 
       } else if (parentItem instanceof TVIPrefTagCategory) {

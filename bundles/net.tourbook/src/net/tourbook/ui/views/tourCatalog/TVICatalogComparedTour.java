@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -26,126 +26,132 @@ import net.tourbook.data.TourCompared;
  */
 public class TVICatalogComparedTour extends TVICatalogTourItem {
 
-	/**
-	 * unique id for the {@link TourCompared} entity
-	 */
-	long			compareId;
+   /**
+    * unique id for the {@link TourCompared} entity
+    */
+   long compareId;
 
-	/**
-	 * 
-	 */
-	long			refId		= -1;
+   /**
+    *
+    */
+   long refId      = -1;
 
-	int				startIndex	= -1;
-	int				endIndex	= -1;
+   int  startIndex = -1;
+   int  endIndex   = -1;
 
-	/*
-	 * fields from TourData
-	 */
-	long			tourTypeId;
-	String			tourTitle;
+   /*
+    * fields from TourData
+    */
+   long            tourTypeId;
+   String          tourTitle;
 
-	LocalDate		tourDate;
+   LocalDate       tourDate;
 
-	float			tourSpeed;
-	float			avgPulse;
+   float           tourSpeed;
+   int             tourRecordingTime;
 
-	ArrayList<Long>	tagIds;
+   float           avgPulse;
 
-	public TVICatalogComparedTour(final TVICatalogYearItem parentItem) {
-		setParentItem(parentItem);
-	}
+   ArrayList<Long> tagIds;
 
-	@Override
-	public boolean equals(final Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (!(obj instanceof TVICatalogComparedTour)) {
-			return false;
-		}
-		final TVICatalogComparedTour other = (TVICatalogComparedTour) obj;
-		if (compareId != other.compareId) {
-			return false;
-		}
-		if (refId != other.refId) {
-			return false;
-		}
-		return true;
-	}
+   public TVICatalogComparedTour(final TVICatalogYearItem parentItem) {
+      setParentItem(parentItem);
+   }
 
-	@Override
-	protected void fetchChildren() {}
+   @Override
+   public boolean equals(final Object obj) {
+      if (this == obj) {
+         return true;
+      }
+      if (obj == null) {
+         return false;
+      }
+      if (!(obj instanceof TVICatalogComparedTour)) {
+         return false;
+      }
+      final TVICatalogComparedTour other = (TVICatalogComparedTour) obj;
+      if (compareId != other.compareId) {
+         return false;
+      }
+      if (refId != other.refId) {
+         return false;
+      }
+      return true;
+   }
 
-	public float getAvgPulse() {
-		return avgPulse;
-	}
+   @Override
+   protected void fetchChildren() {}
 
-	/**
-	 * @return Returns the Id for {@link TourCompared} entity
-	 */
-	public long getCompId() {
-		return compareId;
-	}
+   public float getAvgPulse() {
+      return avgPulse;
+   }
 
-	public int getEndIndex() {
-		return endIndex;
-	}
+   /**
+    * @return Returns the Id for {@link TourCompared} entity
+    */
+   public long getCompId() {
+      return compareId;
+   }
 
-	public long getRefId() {
-		return refId;
-	}
+   public int getEndIndex() {
+      return endIndex;
+   }
 
-	public int getStartIndex() {
-		return startIndex;
-	}
+   public long getRefId() {
+      return refId;
+   }
 
-	public float getTourSpeed() {
-		return tourSpeed;
-	}
+   public int getStartIndex() {
+      return startIndex;
+   }
 
-	@Override
-	public boolean hasChildren() {
-		/*
-		 * compared tours do not have children
-		 */
-		return false;
-	}
+   public float getTourSpeed() {
+      return tourSpeed;
+   }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + (int) (compareId ^ (compareId >>> 32));
-		result = prime * result + (int) (refId ^ (refId >>> 32));
-		return result;
-	}
+   @Override
+   public boolean hasChildren() {
+      /*
+       * compared tours do not have children
+       */
+      return false;
+   }
 
-	void remove() {
+   @Override
+   public int hashCode() {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + (int) (compareId ^ (compareId >>> 32));
+      result = prime * result + (int) (refId ^ (refId >>> 32));
+      return result;
+   }
 
-		// remove this tour item from the parent
-		final ArrayList<TreeViewerItem> unfetchedChildren = getParentItem().getUnfetchedChildren();
-		if (unfetchedChildren != null) {
-			unfetchedChildren.remove(this);
-		}
-	}
+   void remove() {
 
-	public void setAvgPulse(final float avgPulse) {
-		this.avgPulse = avgPulse;
-	}
+      // remove this tour item from the parent
+      final ArrayList<TreeViewerItem> unfetchedChildren = getParentItem().getUnfetchedChildren();
+      if (unfetchedChildren != null) {
+         unfetchedChildren.remove(this);
+      }
+   }
 
-	void setEndIndex(final int endIndex) {
-		this.endIndex = endIndex;
-	}
+   public void setAvgPulse(final float avgPulse) {
+      this.avgPulse = avgPulse;
+   }
 
-	void setStartIndex(final int startIndex) {
-		this.startIndex = startIndex;
-	}
+   void setEndIndex(final int endIndex) {
+      this.endIndex = endIndex;
+   }
 
-	void setTourSpeed(final float tourSpeed) {
-		this.tourSpeed = tourSpeed;
-	}
+   void setStartIndex(final int startIndex) {
+      this.startIndex = startIndex;
+   }
+
+   public void setTourRecordingTime(final int tourRecordingTime) {
+      this.tourRecordingTime = tourRecordingTime;
+   }
+
+   void setTourSpeed(final float tourSpeed) {
+      this.tourSpeed = tourSpeed;
+   }
 }
