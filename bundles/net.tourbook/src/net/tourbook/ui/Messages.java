@@ -19,7 +19,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
-   private static final String BUNDLE_NAME = "net.tourbook.ui.messages";               //$NON-NLS-1$
+   private static final String BUNDLE_NAME = "net.tourbook.ui.messages";                    //$NON-NLS-1$
 
    public static String        ColumnFactory_altitude_computed_difference_tooltip;
    public static String        ColumnFactory_altitude_difference_label;
@@ -38,6 +38,8 @@ public class Messages extends NLS {
    public static String        ColumnFactory_altitude_up_h_tooltip;
    public static String        ColumnFactory_altitude_up_label;
    public static String        ColumnFactory_altitude_up_tooltip;
+   public static String        ColumnFactory_Elevation_AvgChange_Label;
+   public static String        ColumnFactory_Elevation_AvgChange_Tooltip;
    public static String        ColumnFactory_avg_cadence;
    public static String        ColumnFactory_avg_cadence_label;
    public static String        ColumnFactory_avg_cadence_tooltip;
@@ -281,6 +283,12 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Power_Normalized_Tooltip;
    public static String        ColumnFactory_Power_PowerToWeight_Header;
    public static String        ColumnFactory_Power_PowerToWeight_Tooltip;
+   public static String        ColumnFactory_Power_SlowVsFast_CadenceZonesDelimiter_Header;
+   public static String        ColumnFactory_Power_SlowVsFast_CadenceZonesDelimiter_Label;
+   public static String        ColumnFactory_Power_SlowVsFast_CadenceZonesDelimiter_Tooltip;
+   public static String        ColumnFactory_Power_SlowVsFast_CadencePercentages_Header;
+   public static String        ColumnFactory_Power_SlowVsFast_CadencePercentages_Label;
+   public static String        ColumnFactory_Power_SlowVsFast_CadencePercentages_Tooltip;
    public static String        ColumnFactory_Power_TotalWork;
    public static String        ColumnFactory_Power_TotalWork_Tooltip;
    public static String        ColumnFactory_Power_TrainingStressScore_Header;
@@ -344,11 +352,20 @@ public class Messages extends NLS {
    public static String        ColumnFactory_tour_week_header;
    public static String        ColumnFactory_tour_week_label;
    public static String        ColumnFactory_tour_week_tooltip;
-   
+
+   public static String        ColumnFactory_TagID_Header;
+   public static String        ColumnFactory_TagID_Label;
+   public static String        ColumnFactory_TagID_Tooltip;
+
    public static String        ColumnFactory_TagNotes_Header;
    public static String        ColumnFactory_TagNotes_Label;
    public static String        ColumnFactory_TagNotes_Tooltip;
-   
+
+   public static String        ColumnFactory_Temperature_Max_Label;
+   public static String        ColumnFactory_Temperature_Max_Tooltip;
+   public static String        ColumnFactory_Temperature_Min_Label;
+   public static String        ColumnFactory_Temperature_Min_Tooltip;
+
    public static String        ColumnFactory_TimeDelta_Header;
    public static String        ColumnFactory_TimeDelta_Label;
    public static String        ColumnFactory_TimeDelta_Tooltip;
@@ -359,6 +376,10 @@ public class Messages extends NLS {
    public static String        ColumnFactory_TimeZoneDifference_Tooltip;
    public static String        ColumnFactory_Tour_DayTime;
    public static String        ColumnFactory_Tour_DayTime_Tooltip;
+   public static String        ColumnFactory_Tour_LocationEnd_Title;
+   public static String        ColumnFactory_Tour_LocationEnd_Tooltip;
+   public static String        ColumnFactory_Tour_LocationStart_Title;
+   public static String        ColumnFactory_Tour_LocationStart_Tooltip;
    public static String        ColumnFactory_Tour_WeekDay_Header;
    public static String        ColumnFactory_Tour_WeekDay_Label;
    public static String        ColumnFactory_Tour_WeekDay_Tooltip;

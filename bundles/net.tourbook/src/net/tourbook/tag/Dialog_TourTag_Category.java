@@ -102,6 +102,9 @@ public class Dialog_TourTag_Category extends TitleAreaDialog {
 
       restoreState();
 
+      _txtName.selectAll();
+      _txtName.setFocus();
+
       return dlgContainer;
    }
 

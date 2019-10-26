@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -32,178 +32,181 @@ import net.tourbook.ui.UI;
  */
 public class TVICatalogYearItem extends TVICatalogItem {
 
-	long	refId;
-	int		year;
-	int		tourCounter;	// number of tours
+   long refId;
+   int  year;
+   int  tourCounter; // number of tours
 
-	/**
-	 * @param parentItem
-	 * @param refId
-	 * @param year
-	 */
-	public TVICatalogYearItem(final TreeViewerItem parentItem) {
-		this.setParentItem(parentItem);
-	}
+   /**
+    * @param parentItem
+    * @param refId
+    * @param year
+    */
+   public TVICatalogYearItem(final TreeViewerItem parentItem) {
+      this.setParentItem(parentItem);
+   }
 
-	@Override
-	public boolean equals(final Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (!(obj instanceof TVICatalogYearItem)) {
-			return false;
-		}
+   @Override
+   public boolean equals(final Object obj) {
+      if (this == obj) {
+         return true;
+      }
+      if (obj == null) {
+         return false;
+      }
+      if (!(obj instanceof TVICatalogYearItem)) {
+         return false;
+      }
 
-		final TVICatalogYearItem other = (TVICatalogYearItem) obj;
+      final TVICatalogYearItem other = (TVICatalogYearItem) obj;
 
-		if (refId != other.refId) {
-			return false;
-		}
-		if (year != other.year) {
-			return false;
-		}
-		return true;
-	}
+      if (refId != other.refId) {
+         return false;
+      }
+      if (year != other.year) {
+         return false;
+      }
+      return true;
+   }
 
-	@Override
-	protected void fetchChildren() {
+   @Override
+   protected void fetchChildren() {
 
-		final ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
-		setChildren(children);
+      final ArrayList<TreeViewerItem> children = new ArrayList<>();
+      setChildren(children);
 
-		final StringBuilder sb = new StringBuilder();
+      final StringBuilder sb = new StringBuilder();
 
-		sb.append("SELECT"); //$NON-NLS-1$
+      sb.append("SELECT"); //$NON-NLS-1$
 
-		sb.append(" TourCompared.comparedId,"); // 		1 //$NON-NLS-1$
-		sb.append(" TourCompared.tourId,"); //			2 //$NON-NLS-1$
-		sb.append(" TourCompared.tourDate,"); //		3 //$NON-NLS-1$
-		sb.append(" TourCompared.avgPulse,"); //		4 //$NON-NLS-1$
-		sb.append(" TourCompared.tourSpeed,"); //		5 //$NON-NLS-1$
-		sb.append(" TourCompared.startIndex,"); //		6 //$NON-NLS-1$
-		sb.append(" TourCompared.endIndex,"); //		7 //$NON-NLS-1$
+      sb.append(" TourCompared.comparedId,"); // 		1 //$NON-NLS-1$
+      sb.append(" TourCompared.tourId,"); //			2 //$NON-NLS-1$
+      sb.append(" TourCompared.tourDate,"); //		3 //$NON-NLS-1$
+      sb.append(" TourCompared.avgPulse,"); //		4 //$NON-NLS-1$
+      sb.append(" TourCompared.tourSpeed,"); //		5 //$NON-NLS-1$
+      sb.append(" TourCompared.startIndex,"); //		6 //$NON-NLS-1$
+      sb.append(" TourCompared.endIndex,"); //		7 //$NON-NLS-1$
 
-		sb.append(" TourData.tourTitle,"); //			8		 //$NON-NLS-1$
-		sb.append(" TourData.tourType_typeId,"); //		9 //$NON-NLS-1$
+      sb.append(" TourData.tourTitle,"); //			8		 //$NON-NLS-1$
+      sb.append(" TourData.tourType_typeId,"); //		9 //$NON-NLS-1$
 
-		sb.append(" jTdataTtag.TourTag_tagId"); //		10 //$NON-NLS-1$
+      sb.append(" jTdataTtag.TourTag_tagId,"); //		10 //$NON-NLS-1$
 
-		sb.append(" FROM " + TourDatabase.TABLE_TOUR_COMPARED + " TourCompared"); //$NON-NLS-1$ //$NON-NLS-2$
+      sb.append(" TourCompared.tourRecordingTime"); //		11 //$NON-NLS-1$
 
-		// get data for a tour
-		sb.append(" LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " TourData ON "); //$NON-NLS-1$ //$NON-NLS-2$
-		sb.append(" TourCompared.tourId = TourData.tourId"); //$NON-NLS-1$
+      sb.append(" FROM " + TourDatabase.TABLE_TOUR_COMPARED + " TourCompared"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		// get tag id's
-		sb.append(" LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag"); //$NON-NLS-1$ //$NON-NLS-2$
-		sb.append(" ON TourData.tourId = jTdataTtag.TourData_tourId"); //$NON-NLS-1$
+      // get data for a tour
+      sb.append(" LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_DATA + " TourData ON "); //$NON-NLS-1$ //$NON-NLS-2$
+      sb.append(" TourCompared.tourId = TourData.tourId"); //$NON-NLS-1$
 
-		sb.append(" WHERE TourCompared.refTourId=? AND TourCompared.startYear=?"); //$NON-NLS-1$
-		sb.append(" ORDER BY TourCompared.tourDate"); //$NON-NLS-1$
+      // get tag id's
+      sb.append(" LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag"); //$NON-NLS-1$ //$NON-NLS-2$
+      sb.append(" ON TourData.tourId = jTdataTtag.TourData_tourId"); //$NON-NLS-1$
 
-		try {
+      sb.append(" WHERE TourCompared.refTourId=? AND TourCompared.startYear=?"); //$NON-NLS-1$
+      sb.append(" ORDER BY TourCompared.tourDate"); //$NON-NLS-1$
 
-			final Connection conn = TourDatabase.getInstance().getConnection();
-			final PreparedStatement statement = conn.prepareStatement(sb.toString());
-			statement.setLong(1, refId);
-			statement.setInt(2, year);
+      try {
 
-			final ResultSet result = statement.executeQuery();
+         final Connection conn = TourDatabase.getInstance().getConnection();
+         final PreparedStatement statement = conn.prepareStatement(sb.toString());
+         statement.setLong(1, refId);
+         statement.setInt(2, year);
 
-			long lastTourId = -1;
-			ArrayList<Long> tagIds = null;
+         final ResultSet result = statement.executeQuery();
 
-			while (result.next()) {
+         long lastTourId = -1;
+         ArrayList<Long> tagIds = null;
 
-				final long tourId = result.getLong(2);
-				final Object resultTagId = result.getObject(10);
+         while (result.next()) {
 
-				if (tourId == lastTourId) {
+            final long tourId = result.getLong(2);
+            final Object resultTagId = result.getObject(10);
 
-					// get tags from outer join
+            if (tourId == lastTourId) {
 
-					if (resultTagId instanceof Long) {
-						tagIds.add((Long) resultTagId);
-					}
+               // get tags from outer join
 
-				} else {
+               if (resultTagId instanceof Long) {
+                  tagIds.add((Long) resultTagId);
+               }
 
-					// new tour is in the resultset
+            } else {
 
-					final TVICatalogComparedTour tourItem = new TVICatalogComparedTour(this);
-					children.add(tourItem);
+               // new tour is in the resultset
 
-					tourItem.refId = refId;
+               final TVICatalogComparedTour tourItem = new TVICatalogComparedTour(this);
+               children.add(tourItem);
 
-					tourItem.compareId = result.getLong(1);
-					tourItem.setTourId(tourId);
+               tourItem.refId = refId;
 
-					final Date tourDate = result.getDate(3);
+               tourItem.compareId = result.getLong(1);
+               tourItem.setTourId(tourId);
 
-					tourItem.avgPulse = result.getFloat(4);
-					tourItem.tourSpeed = result.getFloat(5);
+               final Date tourDate = result.getDate(3);
 
-					tourItem.startIndex = result.getInt(6);
-					tourItem.endIndex = result.getInt(7);
+               tourItem.avgPulse = result.getFloat(4);
+               tourItem.tourSpeed = result.getFloat(5);
+               tourItem.tourRecordingTime = result.getInt(11);
 
-					tourItem.tourTitle = result.getString(8);
-					final Object tourTypeId = result.getObject(9);
+               tourItem.startIndex = result.getInt(6);
+               tourItem.endIndex = result.getInt(7);
 
-					// tour date
-					if (tourDate != null) {
-						tourItem.tourDate = tourDate.toLocalDate();
-					}
+               tourItem.tourTitle = result.getString(8);
+               final Object tourTypeId = result.getObject(9);
 
-					// tour type
-					tourItem.tourTypeId = (tourTypeId == null ? //
-							TourDatabase.ENTITY_IS_NOT_SAVED
-							: (Long) tourTypeId);
+               // tour date
+               if (tourDate != null) {
+                  tourItem.tourDate = tourDate.toLocalDate();
+               }
 
-					// tour tags
-					if (resultTagId instanceof Long) {
+               // tour type
+               tourItem.tourTypeId = (tourTypeId == null ? //
+                     TourDatabase.ENTITY_IS_NOT_SAVED
+                     : (Long) tourTypeId);
 
-						if (tourItem.tagIds != null) {
-							tourItem.tagIds.clear();
-						}
+               // tour tags
+               if (resultTagId instanceof Long) {
 
-						tourItem.tagIds = tagIds = new ArrayList<Long>();
-						tagIds.add((Long) resultTagId);
-					}
-				}
+                  if (tourItem.tagIds != null) {
+                     tourItem.tagIds.clear();
+                  }
 
-				lastTourId = tourId;
-			}
+                  tourItem.tagIds = tagIds = new ArrayList<>();
+                  tagIds.add((Long) resultTagId);
+               }
+            }
 
-			conn.close();
+            lastTourId = tourId;
+         }
 
-		} catch (final SQLException e) {
-			UI.showSQLException(e);
-		}
-	}
+         conn.close();
 
-	TVICatalogRefTourItem getRefItem() {
-		return (TVICatalogRefTourItem) getParentItem();
-	}
+      } catch (final SQLException e) {
+         UI.showSQLException(e);
+      }
+   }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + (int) (refId ^ (refId >>> 32));
-		result = prime * result + year;
-		return result;
-	}
+   TVICatalogRefTourItem getRefItem() {
+      return (TVICatalogRefTourItem) getParentItem();
+   }
 
-	void remove() {
+   @Override
+   public int hashCode() {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + (int) (refId ^ (refId >>> 32));
+      result = prime * result + year;
+      return result;
+   }
 
-		// remove all children
-		getUnfetchedChildren().clear();
+   void remove() {
 
-		// remove this tour item from the parent
-		getParentItem().getUnfetchedChildren().remove(this);
-	}
+      // remove all children
+      getUnfetchedChildren().clear();
+
+      // remove this tour item from the parent
+      getParentItem().getUnfetchedChildren().remove(this);
+   }
 
 }

@@ -21,6 +21,27 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.action.ActionOpenPrefDialog;
+import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.Util;
+import net.tourbook.data.TourData;
+import net.tourbook.data.TourMarker;
+import net.tourbook.data.TourPerson;
+import net.tourbook.data.TourTag;
+import net.tourbook.data.TourType;
+import net.tourbook.data.TourWayPoint;
+import net.tourbook.database.PersonManager;
+import net.tourbook.database.TourDatabase;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tag.TagMenuManager;
+import net.tourbook.ui.ITourProvider2;
+import net.tourbook.ui.UI;
+import net.tourbook.ui.action.ActionSetTourTypeMenu;
+import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
+
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -50,27 +71,6 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.action.ActionOpenPrefDialog;
-import net.tourbook.common.time.TimeTools;
-import net.tourbook.common.util.StatusUtil;
-import net.tourbook.common.util.Util;
-import net.tourbook.data.TourData;
-import net.tourbook.data.TourMarker;
-import net.tourbook.data.TourPerson;
-import net.tourbook.data.TourTag;
-import net.tourbook.data.TourType;
-import net.tourbook.data.TourWayPoint;
-import net.tourbook.database.PersonManager;
-import net.tourbook.database.TourDatabase;
-import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tag.TagMenuManager;
-import net.tourbook.ui.ITourProvider2;
-import net.tourbook.ui.UI;
-import net.tourbook.ui.action.ActionSetTourTypeMenu;
-import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
 /**
  * Split tour at a time slice position and save extracted time slices as a new tour
@@ -378,7 +378,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 				final Set<TourTag> targetTourTags = _tourDataTarget.getTourTags();
 				final boolean isTagInTour = targetTourTags != null && targetTourTags.size() > 0;
 
-				_tagMenuMgr.fillTagMenu(menuMgr);
+            _tagMenuMgr.fillTagMenu(menuMgr, false);
 				_tagMenuMgr.enableTagActions(true, isTagInTour, targetTourTags);
 			}
 		});

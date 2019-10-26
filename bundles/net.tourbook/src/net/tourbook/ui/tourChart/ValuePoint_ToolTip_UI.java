@@ -67,7 +67,8 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
    private static final String   GRAPH_LABEL_ALTIMETER                     = net.tourbook.common.Messages.Graph_Label_Altimeter;
    private static final String   GRAPH_LABEL_ALTITUDE                      = net.tourbook.common.Messages.Graph_Label_Altitude;
    private static final String   GRAPH_LABEL_CADENCE                       = net.tourbook.common.Messages.Graph_Label_Cadence;
-   private static final String   GRAPH_LABEL_CADENCE_UNIT                  = net.tourbook.common.Messages.Graph_Label_Cadence_Unit;
+   private static final String   GRAPH_LABEL_CADENCE_UNIT_RPM              = net.tourbook.common.Messages.Graph_Label_Cadence_Unit;
+   private static final String   GRAPH_LABEL_CADENCE_UNIT_SPM              = net.tourbook.common.Messages.Graph_Label_Cadence_Unit_Spm;
    private static final String   GRAPH_LABEL_DISTANCE                      = net.tourbook.common.Messages.Graph_Label_Distance;
    private static final String   GRAPH_LABEL_GEARS                         = net.tourbook.common.Messages.Graph_Label_Gears;
    private static final String   GRAPH_LABEL_GRADIENT                      = net.tourbook.common.Messages.Graph_Label_Gradient;
@@ -194,6 +195,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
    private Label     _lblAltimeter;
    private Label     _lblAltitude;
    private Label     _lblCadence;
+   private Label     _lblCadence_Unit;
    private Label     _lblChartZoomFactor;
    private Label     _lblDataSerieCurrent;
    private Label     _lblDataSerieMax;
@@ -213,13 +215,6 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
    private Label     _lblRunDyn_StepLength;
    private Label     _lblRunDyn_VerticalOscillation;
    private Label     _lblRunDyn_VerticalRatio;
-
-   private Label     _lblAltitudeUnit;
-   private Label     _lblAltimeterUnit;
-   private Label     _lblDistanceUnit;
-   private Label     _lblPaceUnit;
-   private Label     _lblSpeedUnit;
-   private Label     _lblTemperatureUnit;
 
    private class ActionOpenTooltipMenu extends Action {
 
@@ -400,13 +395,15 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
        * tooltip when the mouse is hovered, which is not as it should be.
        */
       _shellContainer = new Composite(parent, SWT.NONE);
-      GridLayoutFactory
-            .fillDefaults()//
+      GridLayoutFactory.fillDefaults()
             .spacing(0, 0)
             .numColumns(2)
+
             // set margin to draw the border
             .extendedMargins(1, 1, 1, 1)
+
             .applyTo(_shellContainer);
+
       _shellContainer.setForeground(_fgColor);
       _shellContainer.setBackground(_bgColor);
       _shellContainer.addPaintListener(new PaintListener() {
@@ -435,22 +432,19 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
    private void createUI_020_AllValues(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory
-            .fillDefaults()//
+      GridDataFactory.fillDefaults()
             .align(SWT.FILL, SWT.CENTER)
             .grab(true, false)
             .applyTo(container);
 
       if (_isHorizontal) {
-         GridLayoutFactory
-               .fillDefaults()//
+         GridLayoutFactory.fillDefaults()
                .numColumns(_allVisibleAndAvailable_ValueCounter)
                .spacing(5, 0)
                .extendedMargins(3, 2, 0, 0)
                .applyTo(container);
       } else {
-         GridLayoutFactory
-               .fillDefaults()//
+         GridLayoutFactory.fillDefaults()
                .spacing(5, 0)
                .applyTo(container);
       }
@@ -525,7 +519,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
          {
 
             // label: current value
-            _lblDataSerieCurrent = createUILabelValue(
+            _lblDataSerieCurrent = createUI_Label_Value(
                   container,
                   SWT.TRAIL,
                   7,
@@ -536,7 +530,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
             createUILabel(container, ":", null, null); //$NON-NLS-1$
 
             // label: max value
-            _lblDataSerieMax = createUILabelValue(
+            _lblDataSerieMax = createUI_Label_Value(
                   container,
                   SWT.LEAD,
                   7,
@@ -552,7 +546,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
          final Composite container = createUIValueContainer(parent);
          {
-            _lblTimeDuration = createUILabelValue(
+            _lblTimeDuration = createUI_Label_Value(
                   container,
                   SWT.TRAIL,
                   8,
@@ -577,7 +571,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
          final Composite container = createUIValueContainer(parent);
          {
-            _lblTimeOfDay = createUILabelValue(
+            _lblTimeOfDay = createUI_Label_Value(
                   container,
                   SWT.TRAIL,
                   8,
@@ -602,20 +596,20 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
          final Composite container = createUIValueContainer(parent);
          {
-            _lblDistance = createUILabelValue(
+            _lblDistance = createUI_Label_Value(
                   container,
                   SWT.TRAIL,
                   9,
                   GRAPH_LABEL_DISTANCE,
                   GraphColorManager.PREF_GRAPH_DISTANCE);
 
-            _lblDistanceUnit = createUILabelValue(
+            final Label lblDistanceUnit = createUI_Label_ValueUnit(
                   container,
                   SWT.LEAD,
                   GRAPH_LABEL_DISTANCE,
                   GraphColorManager.PREF_GRAPH_DISTANCE);
 
-            _lblDistanceUnit.setText(UI.UNIT_LABEL_DISTANCE);
+            lblDistanceUnit.setText(UI.UNIT_LABEL_DISTANCE);
          }
          _firstColumnControls.add(_lblDistance);
          _firstColumnContainerControls.add(container);
@@ -628,20 +622,20 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
          final Composite container = createUIValueContainer(parent);
          {
-            _lblAltitude = createUILabelValue(
+            _lblAltitude = createUI_Label_Value(
                   container,
                   SWT.TRAIL,
                   6,
                   GRAPH_LABEL_ALTITUDE,
                   GraphColorManager.PREF_GRAPH_ALTITUDE);
 
-            _lblAltitudeUnit = createUILabelValue(
+            final Label lblAltitudeUnit = createUI_Label_ValueUnit(
                   container,
                   SWT.LEAD,
                   GRAPH_LABEL_ALTITUDE,
                   GraphColorManager.PREF_GRAPH_ALTITUDE);
 
-            _lblAltitudeUnit.setText(UI.UNIT_LABEL_ALTITUDE);
+            lblAltitudeUnit.setText(UI.UNIT_LABEL_ALTITUDE);
          }
          _firstColumnControls.add(_lblAltitude);
          _firstColumnContainerControls.add(container);
@@ -654,7 +648,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
          final Composite container = createUIValueContainer(parent);
          {
-            _lblPulse = createUILabelValue(
+            _lblPulse = createUI_Label_Value(
                   container,
                   SWT.TRAIL,
                   3,
@@ -678,20 +672,21 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
          final Composite container = createUIValueContainer(parent);
          {
-            _lblSpeed = createUILabelValue(
+            _lblSpeed = createUI_Label_Value(
                   container,
                   SWT.TRAIL,
                   4,
                   GRAPH_LABEL_SPEED,
                   GraphColorManager.PREF_GRAPH_SPEED);
 
-            _lblSpeedUnit = createUILabelValue(
+            final Label lblSpeedUnit = createUI_Label_Value(
                   container,
                   SWT.LEAD,
+                  11, // km/h needs more space
                   GRAPH_LABEL_SPEED,
                   GraphColorManager.PREF_GRAPH_SPEED);
 
-            _lblSpeedUnit.setText(UI.UNIT_LABEL_SPEED);
+            lblSpeedUnit.setText(UI.UNIT_LABEL_SPEED);
          }
          _firstColumnControls.add(_lblSpeed);
          _firstColumnContainerControls.add(container);
@@ -704,20 +699,21 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
          final Composite container = createUIValueContainer(parent);
          {
-            _lblPace = createUILabelValue(
+            _lblPace = createUI_Label_Value(
                   container,
                   SWT.TRAIL,
                   5,
                   GRAPH_LABEL_PACE,
                   GraphColorManager.PREF_GRAPH_PACE);
 
-            _lblPaceUnit = createUILabelValue(
+            final Label lblPaceUnit = createUI_Label_Value(
                   container,
                   SWT.LEAD,
+                  12, // min/km needs more space
                   GRAPH_LABEL_PACE,
                   GraphColorManager.PREF_GRAPH_PACE);
 
-            _lblPaceUnit.setText(UI.UNIT_LABEL_PACE);
+            lblPaceUnit.setText(UI.UNIT_LABEL_PACE);
          }
          _firstColumnControls.add(_lblPace);
          _firstColumnContainerControls.add(container);
@@ -730,7 +726,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
          final Composite container = createUIValueContainer(parent);
          {
-            _lblPower = createUILabelValue(
+            _lblPower = createUI_Label_Value(
                   container,
                   SWT.TRAIL,
                   4,
@@ -754,20 +750,20 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
          final Composite container = createUIValueContainer(parent);
          {
-            _lblTemperature = createUILabelValue(
+            _lblTemperature = createUI_Label_Value(
                   container,
                   SWT.TRAIL,
                   4,
                   GRAPH_LABEL_TEMPERATURE,
                   GraphColorManager.PREF_GRAPH_TEMPTERATURE);
 
-            _lblTemperatureUnit = createUILabelValue(
+            final Label lblTemperatureUnit = createUI_Label_ValueUnit(
                   container,
                   SWT.LEAD,
                   GRAPH_LABEL_TEMPERATURE,
                   GraphColorManager.PREF_GRAPH_TEMPTERATURE);
 
-            _lblTemperatureUnit.setText(UI.UNIT_LABEL_TEMPERATURE);
+            lblTemperatureUnit.setText(UI.UNIT_LABEL_TEMPERATURE);
          }
          _firstColumnControls.add(_lblTemperature);
          _firstColumnContainerControls.add(container);
@@ -780,7 +776,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
          final Composite container = createUIValueContainer(parent);
          {
-            _lblGradient = createUILabelValue(
+            _lblGradient = createUI_Label_Value(
                   container,
                   SWT.TRAIL,
                   4,
@@ -804,20 +800,20 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
          final Composite container = createUIValueContainer(parent);
          {
-            _lblAltimeter = createUILabelValue(
+            _lblAltimeter = createUI_Label_Value(
                   container,
                   SWT.TRAIL,
                   6,
                   GRAPH_LABEL_ALTIMETER,
                   GraphColorManager.PREF_GRAPH_ALTIMETER);
 
-            _lblAltimeterUnit = createUILabelValue(
+            final Label lblAltimeterUnit = createUI_Label_ValueUnit(
                   container,
                   SWT.LEAD,
                   GRAPH_LABEL_ALTIMETER,
                   GraphColorManager.PREF_GRAPH_ALTIMETER);
 
-            _lblAltimeterUnit.setText(UI.UNIT_LABEL_ALTIMETER);
+            lblAltimeterUnit.setText(UI.UNIT_LABEL_ALTIMETER);
          }
          _firstColumnControls.add(_lblAltimeter);
          _firstColumnContainerControls.add(container);
@@ -830,16 +826,16 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
          final Composite container = createUIValueContainer(parent);
          {
-            _lblCadence = createUILabelValue(
+            _lblCadence = createUI_Label_Value(
                   container,
                   SWT.TRAIL,
                   3,
                   GRAPH_LABEL_CADENCE,
                   GraphColorManager.PREF_GRAPH_CADENCE);
 
-            createUILabel(
+            _lblCadence_Unit = createUILabel(
                   container,
-                  GRAPH_LABEL_CADENCE_UNIT,
+                  GRAPH_LABEL_CADENCE_UNIT_RPM,
                   GRAPH_LABEL_CADENCE,
                   GraphColorManager.PREF_GRAPH_CADENCE);
          }
@@ -854,7 +850,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
          final Composite container = createUIValueContainer(parent);
          {
-            _lblGears = createUILabelValue(//
+            _lblGears = createUI_Label_Value(//
                   container,
                   SWT.TRAIL,
                   10,
@@ -879,7 +875,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
          final Composite container = createUIValueContainer(parent);
          {
-            _lblTourCompareResult = createUILabelValue(
+            _lblTourCompareResult = createUI_Label_Value(
                   container,
                   SWT.TRAIL,
                   12,
@@ -905,7 +901,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
          final Composite container = createUIValueContainer(parent);
          {
-            _lblRunDyn_StanceTime = createUILabelValue(
+            _lblRunDyn_StanceTime = createUI_Label_Value(
                   container,
                   SWT.TRAIL,
                   3,
@@ -929,7 +925,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
          final Composite container = createUIValueContainer(parent);
          {
-            _lblRunDyn_StanceTimeBalance = createUILabelValue(
+            _lblRunDyn_StanceTimeBalance = createUI_Label_Value(
                   container,
                   SWT.TRAIL,
                   3,
@@ -953,7 +949,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
          final Composite container = createUIValueContainer(parent);
          {
-            _lblRunDyn_StepLength = createUILabelValue(
+            _lblRunDyn_StepLength = createUI_Label_Value(
                   container,
                   SWT.TRAIL,
                   3,
@@ -977,7 +973,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
          final Composite container = createUIValueContainer(parent);
          {
-            _lblRunDyn_VerticalOscillation = createUILabelValue(
+            _lblRunDyn_VerticalOscillation = createUI_Label_Value(
                   container,
                   SWT.TRAIL,
                   3,
@@ -1001,7 +997,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
          final Composite container = createUIValueContainer(parent);
          {
-            _lblRunDyn_VerticalRatio = createUILabelValue(
+            _lblRunDyn_VerticalRatio = createUI_Label_Value(
                   container,
                   SWT.TRAIL,
                   3,
@@ -1026,7 +1022,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
          final Composite container = createUIValueContainer(parent);
          {
 
-            _lblChartZoomFactor = createUILabelValue(
+            _lblChartZoomFactor = createUI_Label_Value(
                   container,
                   SWT.TRAIL,
                   8,
@@ -1074,6 +1070,75 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
    /**
     * @param parent
+    * @param style
+    * @param chars
+    *           Hint for the width in characters.
+    * @param tooltip
+    * @param colorId
+    *           Can be <code>null</code>.
+    * @return
+    */
+   private Label createUI_Label_Value(final Composite parent,
+                                      final int style,
+                                      final int chars,
+                                      final String tooltip,
+                                      final String colorId) {
+
+      final int charsWidth;
+      if (chars == SWT.DEFAULT) {
+
+         charsWidth = SWT.DEFAULT;
+
+      } else {
+
+         final StringBuilder sb = new StringBuilder();
+         sb.append('.');
+         for (int charIndex = 0; charIndex < chars; charIndex++) {
+            sb.append('8');
+         }
+
+         final GC gc = new GC(parent);
+         charsWidth = gc.textExtent(sb.toString()).x;
+         gc.dispose();
+      }
+
+      final Label label = new Label(parent, style);
+      GridDataFactory.fillDefaults()
+            .hint(charsWidth, SWT.DEFAULT)
+            .applyTo(label);
+
+      label.setBackground(_bgColor);
+
+      if (tooltip != null) {
+         label.setToolTipText(tooltip);
+      }
+
+      if (colorId == null) {
+
+         label.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
+
+      } else {
+
+         final Color fgColor = _colorCache.getColor(//
+               colorId, //
+               _colorManager.getGraphColorDefinition(colorId).getTextColor_Active());
+
+         label.setForeground(fgColor);
+      }
+
+      return label;
+   }
+
+   private Label createUI_Label_ValueUnit(final Composite parent,
+                                          final int style,
+                                          final String tooltip,
+                                          final String colorId) {
+
+      return createUI_Label_Value(parent, style, SWT.DEFAULT, tooltip, colorId);
+   }
+
+   /**
+    * @param parent
     * @param labelText
     * @param tooltip
     * @param colorId
@@ -1108,76 +1173,6 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       return label;
    }
 
-   /**
-    * @param parent
-    * @param style
-    * @param chars
-    *           Hint for the width in characters.
-    * @param tooltip
-    * @param colorId
-    *           Can be <code>null</code>.
-    * @return
-    */
-   private Label createUILabelValue(final Composite parent,
-                                    final int style,
-                                    final int chars,
-                                    final String tooltip,
-                                    final String colorId) {
-
-      final int charsWidth;
-      if (chars == SWT.DEFAULT) {
-
-         charsWidth = SWT.DEFAULT;
-
-      } else {
-
-         final StringBuilder sb = new StringBuilder();
-         sb.append('.');
-         for (int charIndex = 0; charIndex < chars; charIndex++) {
-            sb.append('8');
-         }
-
-         final GC gc = new GC(parent);
-         charsWidth = gc.textExtent(sb.toString()).x;
-         gc.dispose();
-      }
-
-      final Label label = new Label(parent, style);
-      GridDataFactory
-            .fillDefaults()//
-            .hint(charsWidth, SWT.DEFAULT)
-            .applyTo(label);
-
-      label.setBackground(_bgColor);
-
-      if (tooltip != null) {
-         label.setToolTipText(tooltip);
-      }
-
-      if (colorId == null) {
-
-         label.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
-
-      } else {
-
-         final Color fgColor = _colorCache.getColor(//
-               colorId, //
-               _colorManager.getGraphColorDefinition(colorId).getTextColor_Active());
-
-         label.setForeground(fgColor);
-      }
-
-      return label;
-   }
-
-   private Label createUILabelValue(final Composite parent,
-                                    final int style,
-                                    final String tooltip,
-                                    final String colorId) {
-
-      return createUILabelValue(parent, style, SWT.DEFAULT, tooltip, colorId);
-   }
-
    private Composite createUIValueContainer(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
@@ -1188,6 +1183,39 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 //      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 
       return container;
+   }
+
+   private String getCadenceUnit(final int valueIndex) {
+
+      float cadenceMultiplier;
+
+      if (_tourData.isMultipleTours()) {
+
+         final int[] multipleTourStartIndex = _tourData.multipleTourStartIndex;
+         final int numTours = multipleTourStartIndex.length;
+
+         int tourIndex = numTours - 1;
+
+         // loop backwards, this is less complex
+         for (; tourIndex >= 0; tourIndex--) {
+
+            final int tourStart_Index = multipleTourStartIndex[tourIndex];
+
+            if (valueIndex >= tourStart_Index) {
+               break;
+            }
+         }
+
+         cadenceMultiplier = _tourData.multipleTours_CadenceMultiplier[tourIndex];
+
+      } else {
+
+         cadenceMultiplier = _tourData.getCadenceMultiplier();
+      }
+
+      final String cadenceUnit = cadenceMultiplier == 2.0 ? GRAPH_LABEL_CADENCE_UNIT_SPM : GRAPH_LABEL_CADENCE_UNIT_RPM;
+
+      return cadenceUnit;
    }
 
    private long getState(final long visibleValues, final long valueId) {
@@ -1576,7 +1604,9 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       }
 
       if (_isVisible_And_Available_Cadence) {
-         _lblCadence.setText(Integer.toString((int) _tourData.getCadenceSerie()[valueIndex]));
+
+         _lblCadence.setText(Integer.toString((int) _tourData.getCadenceSerieWithMuliplier()[valueIndex]));
+         _lblCadence_Unit.setText(getCadenceUnit(valueIndex));
       }
 
       if (_isVisible_And_Available_ChartZoomFactor) {
