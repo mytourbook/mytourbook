@@ -45,6 +45,7 @@ import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -56,11 +57,13 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.DateTime;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
@@ -70,7 +73,6 @@ import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.IWorkbench;
@@ -78,7 +80,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageTrainingStress extends PreferencePage implements IWorkbenchPreferencePage {
 
-   public static final String    ID           = "net.tourbook.trainingstress.PrefPageTrainingStress"; //$NON-NLS-1$
+   public static final String    ID           = "net.tourbook.trainingstress.PrefPageTrainingStress";                //$NON-NLS-1$
 
    private IPreferenceStore      _prefStore   = Activator.getDefault().getPreferenceStore();
    private final IDialogSettings _importState = TourbookPlugin.getState(RawDataView.ID);
@@ -95,6 +97,8 @@ public class PrefPageTrainingStress extends PreferencePage implements IWorkbench
    private ActionTourType_Remove _action_TourType_Remove;
    private ActionOpenPrefDialog  _actionOpenTourTypePrefs;
 
+   private Font                  _boldFont    = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
+
    /*
     * UI controls
     */
@@ -104,12 +108,12 @@ public class PrefPageTrainingStress extends PreferencePage implements IWorkbench
    /*
     * private Button _chkConvertWayPoints;
     */
-   private Label   _labelThresholdPower_Value;
+   private Label    _labelThresholdPower_Value;
 
-   private Text _textThresholdPower_Duration;
+   private DateTime _textThresholdPower_Duration;
 
-   private Spinner _spinnerThresholdPower_Distance;
-   private Spinner _spinnerThresholdPower_AverageSlope;
+   private Spinner  _spinnerThresholdPower_Distance;
+   private Spinner  _spinnerThresholdPower_AverageSlope;
 
    private class Action_TourType extends Action {
 
@@ -361,7 +365,7 @@ public class PrefPageTrainingStress extends PreferencePage implements IWorkbench
                   .applyTo(label);
 
             // text
-            _textThresholdPower_Duration = new Text(container, SWT.BORDER);
+            _textThresholdPower_Duration = new DateTime(container, SWT.TIME | SWT.MEDIUM | SWT.BORDER);
             _textThresholdPower_Duration.setToolTipText("");//Messages.Pref_Weather_Label_ApiKey_Tooltip);
             _textThresholdPower_Duration.addSelectionListener(new SelectionAdapter() {
                @Override
@@ -377,10 +381,10 @@ public class PrefPageTrainingStress extends PreferencePage implements IWorkbench
             label = new Label(container, SWT.NONE);
             label.setText(UI.UNIT_LABEL_TIME);
 
-
-         // label : Time
-             label = new Label(container, SWT.NONE);
+            // label : Time
+            label = new Label(container, SWT.NONE);
             label.setText("Threshold velocity");//Messages.Pref_ThresholdPower_Label_Duration);
+            label.setFont(_boldFont);
             GridDataFactory.fillDefaults()
                   .indent(60, 0)
                   .applyTo(label);
@@ -388,14 +392,14 @@ public class PrefPageTrainingStress extends PreferencePage implements IWorkbench
             // text
             label = new Label(container, SWT.NONE);
             label.setText("6");//Messages.Pref_ThresholdPower_Label_Duration);
+            label.setFont(_boldFont);
             GridDataFactory.fillDefaults()
                   .applyTo(label);
 
             // label:
             label = new Label(container, SWT.NONE);
             label.setText(UI.UNIT_LABEL_PACE);
-
-
+            label.setFont(_boldFont);
 
             // label : Distance
             label = new Label(container, SWT.NONE);
@@ -569,24 +573,16 @@ public class PrefPageTrainingStress extends PreferencePage implements IWorkbench
             0f,
             4.13f);
 
-
       _labelThresholdPower_Value.setText(String.valueOf(thresholdPower));
    }
 
    @Override
    protected void performDefaults() {
+      _textThresholdPower_Duration.setHours(_prefStore.getDefaultInt(ITourbookPreferences.TRAININGSTRESS_GOVSS_THRESHOLD_POWER_DURATION_HOURS));
+      _textThresholdPower_Duration.setMinutes(_prefStore.getDefaultInt(ITourbookPreferences.TRAININGSTRESS_GOVSS_THRESHOLD_POWER_DURATION_MINUTES));
+      _textThresholdPower_Duration.setSeconds(_prefStore.getDefaultInt(ITourbookPreferences.TRAININGSTRESS_GOVSS_THRESHOLD_POWER_DURATION_SECONDS));
 
-      // merge all tracks into one tour
-      //	_chkOneTour.setSelection(RawDataView.STATE_IS_MERGE_TRACKS_DEFAULT);
-
-      // convert waypoints
-      //	_chkConvertWayPoints.setSelection(RawDataView.STATE_IS_CONVERT_WAYPOINTS_DEFAULT);
-
-      // relative/absolute distance
-      //final boolean isRelativeDistance = _prefStore.getDefaultBoolean(IPreferences.GPX_IS_RELATIVE_DISTANCE_VALUE);
-
-      //_rdoDistanceAbsolute.setSelection(isRelativeDistance == false);
-      //	_rdoDistanceRelative.setSelection(isRelativeDistance);
+      enableControls();
 
       super.performDefaults();
    }
@@ -605,41 +601,16 @@ public class PrefPageTrainingStress extends PreferencePage implements IWorkbench
 
    private void restoreState() {
 
-      /*
-       * // merge all tracks into one tour
-       * final boolean isMergeIntoOneTour = Util.getStateBoolean(
-       * _importState,
-       * RawDataView.STATE_IS_MERGE_TRACKS,
-       * RawDataView.STATE_IS_MERGE_TRACKS_DEFAULT);
-       * //_chkOneTour.setSelection(isMergeIntoOneTour);
-       * // convert waypoints
-       * final boolean isConvertWayPoints = Util.getStateBoolean(
-       * _importState,
-       * RawDataView.STATE_IS_CONVERT_WAYPOINTS,
-       * RawDataView.STATE_IS_CONVERT_WAYPOINTS_DEFAULT);
-       */
-      //_chkConvertWayPoints.setSelection(isConvertWayPoints);
+      _textThresholdPower_Duration.setHours(_prefStore.getInt(ITourbookPreferences.TRAININGSTRESS_GOVSS_THRESHOLD_POWER_DURATION_HOURS));
+      _textThresholdPower_Duration.setMinutes(_prefStore.getInt(ITourbookPreferences.TRAININGSTRESS_GOVSS_THRESHOLD_POWER_DURATION_MINUTES));
+      _textThresholdPower_Duration.setSeconds(_prefStore.getInt(ITourbookPreferences.TRAININGSTRESS_GOVSS_THRESHOLD_POWER_DURATION_SECONDS));
 
-      // relative/absolute distance
-      //final boolean isRelativeDistance = _prefStore.getBoolean(IPreferences.GPX_IS_RELATIVE_DISTANCE_VALUE);
-
-      //	_rdoDistanceAbsolute.setSelection(isRelativeDistance == false);
-      //	_rdoDistanceRelative.setSelection(isRelativeDistance);
    }
 
    private void saveState() {
 
-      // merge all tracks into one tour
-      //	final boolean isMergeIntoOneTour = _chkOneTour.getSelection();
-      //	_importState.put(RawDataView.STATE_IS_MERGE_TRACKS, isMergeIntoOneTour);
-      //	_rawDataMgr.setMergeTracks(isMergeIntoOneTour);
-
-      // convert waypoints
-      //	final boolean isConvertWayPoints = _chkConvertWayPoints.getSelection();
-//		_importState.put(RawDataView.STATE_IS_CONVERT_WAYPOINTS, isConvertWayPoints);
-      //	_rawDataMgr.setState_ConvertWayPoints(isConvertWayPoints);
-
-      // relative/absolute distance
-      //_prefStore.setValue(IPreferences.GPX_IS_RELATIVE_DISTANCE_VALUE, _rdoDistanceRelative.getSelection());
+      _prefStore.setValue(ITourbookPreferences.TRAININGSTRESS_GOVSS_THRESHOLD_POWER_DURATION_HOURS, _textThresholdPower_Duration.getHours());
+      _prefStore.setValue(ITourbookPreferences.TRAININGSTRESS_GOVSS_THRESHOLD_POWER_DURATION_MINUTES, _textThresholdPower_Duration.getMinutes());
+      _prefStore.setValue(ITourbookPreferences.TRAININGSTRESS_GOVSS_THRESHOLD_POWER_DURATION_SECONDS, _textThresholdPower_Duration.getSeconds());
    }
 }
