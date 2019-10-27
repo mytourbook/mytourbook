@@ -109,6 +109,7 @@ public class PrefPageTrainingStress extends PreferencePage implements IWorkbench
     * private Button _chkConvertWayPoints;
     */
    private Label    _labelThresholdPower_Value;
+   private Label    _labelThresholdVelocity_Value;
 
    private DateTime _textThresholdPower_Duration;
 
@@ -361,12 +362,11 @@ public class PrefPageTrainingStress extends PreferencePage implements IWorkbench
             // label : Time
             Label label = new Label(container, SWT.NONE);
             label.setText(Messages.Pref_ThresholdPower_Label_Duration);
-            GridDataFactory.fillDefaults()
-                  .applyTo(label);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(label);
 
             // text
             _textThresholdPower_Duration = new DateTime(container, SWT.TIME | SWT.MEDIUM | SWT.BORDER);
-            _textThresholdPower_Duration.setToolTipText("");//Messages.Pref_Weather_Label_ApiKey_Tooltip);
+            _textThresholdPower_Duration.setToolTipText("TODO");//Messages.Pref_Weather_Label_ApiKey_Tooltip);
             _textThresholdPower_Duration.addSelectionListener(new SelectionAdapter() {
                @Override
                public void widgetSelected(final SelectionEvent e) {
@@ -375,26 +375,19 @@ public class PrefPageTrainingStress extends PreferencePage implements IWorkbench
             });
             GridDataFactory.fillDefaults()
                   .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+                  .span(2, 1)
                   .applyTo(_textThresholdPower_Duration);
-
-            // label:
-            label = new Label(container, SWT.NONE);
-            label.setText(UI.UNIT_LABEL_TIME);
 
             // label : Time
             label = new Label(container, SWT.NONE);
             label.setText("Threshold velocity");//Messages.Pref_ThresholdPower_Label_Duration);
             label.setFont(_boldFont);
-            GridDataFactory.fillDefaults()
-                  .indent(60, 0)
-                  .applyTo(label);
+            GridDataFactory.fillDefaults().indent(60, 0).applyTo(label);
 
             // text
-            label = new Label(container, SWT.NONE);
-            label.setText("6");//Messages.Pref_ThresholdPower_Label_Duration);
-            label.setFont(_boldFont);
-            GridDataFactory.fillDefaults()
-                  .applyTo(label);
+            _labelThresholdVelocity_Value = new Label(container, SWT.NONE);
+            _labelThresholdVelocity_Value.setFont(_boldFont);
+            GridDataFactory.fillDefaults().applyTo(_labelThresholdVelocity_Value);
 
             // label:
             label = new Label(container, SWT.NONE);
@@ -410,6 +403,8 @@ public class PrefPageTrainingStress extends PreferencePage implements IWorkbench
             // text
             _spinnerThresholdPower_Distance = new Spinner(container, SWT.BORDER);
             _spinnerThresholdPower_Distance.setToolTipText("");//Messages.Pref_Weather_Label_ApiKey_Tooltip);
+            _spinnerThresholdPower_Distance.setDigits(1);
+            _spinnerThresholdPower_Distance.setMinimum(0);
             _spinnerThresholdPower_Distance.addSelectionListener(new SelectionAdapter() {
                @Override
                public void widgetSelected(final SelectionEvent e) {
@@ -432,10 +427,10 @@ public class PrefPageTrainingStress extends PreferencePage implements IWorkbench
                   .applyTo(label);
 
             // text
-            _labelThresholdPower_Value = new Label(container, SWT.CENTER);
-            _labelThresholdPower_Value.setText("345W");//Messages.Pref_ThresholdPower_Label_Duration);
+            _labelThresholdPower_Value = new Label(container, SWT.NONE);
+            _labelThresholdPower_Value.setFont(_boldFont);
             GridDataFactory.fillDefaults()
-                  .indent(60, 0)
+                  .grab(true, false)
                   .applyTo(_labelThresholdPower_Value);
 
             // label:
@@ -451,6 +446,9 @@ public class PrefPageTrainingStress extends PreferencePage implements IWorkbench
             // text
             _spinnerThresholdPower_AverageSlope = new Spinner(container, SWT.BORDER);
             _spinnerThresholdPower_AverageSlope.setToolTipText("");//Messages.Pref_Weather_Label_ApiKey_Tooltip);
+            _spinnerThresholdPower_AverageSlope.setDigits(2);
+            _spinnerThresholdPower_AverageSlope.setMinimum(-50);
+            _spinnerThresholdPower_AverageSlope.setMaximum(50);
             _spinnerThresholdPower_AverageSlope.addSelectionListener(new SelectionAdapter() {
                @Override
                public void widgetSelected(final SelectionEvent e) {
@@ -567,17 +565,53 @@ public class PrefPageTrainingStress extends PreferencePage implements IWorkbench
    private void onComputeThresholdPower() {
 
       final TourPerson tourPerson = TourbookPlugin.getActivePerson();
-      final Running_Govss _unning_Govss = new Running_Govss(tourPerson);
-      final double thresholdPower = _unning_Govss.ComputePower(_spinnerThresholdPower_Distance.getSelection(),
-            _spinnerThresholdPower_AverageSlope.getSelection(),
-            0f,
-            4.13f);
 
-      _labelThresholdPower_Value.setText(String.valueOf(thresholdPower));
+      //Total duration in seconds
+      final float thresholdPowerDuration = _textThresholdPower_Duration.getHours() * 3600f + _textThresholdPower_Duration.getMinutes() * 60f +
+            _textThresholdPower_Duration.getSeconds();
+      final float thresholdPowerDistance = (_spinnerThresholdPower_Distance.getSelection() / 10f) * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+      if (tourPerson == null || thresholdPowerDuration <= 0 || thresholdPowerDistance <= 0) {
+         return;
+      }
+
+      // Speed in m/s
+      float thresholdVelocity = (thresholdPowerDistance * 1000 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE)
+            / thresholdPowerDuration;
+      final float averageSlope = _spinnerThresholdPower_AverageSlope.getSelection() / 100f;
+      final Running_Govss _running_Govss = new Running_Govss(tourPerson);
+      final double thresholdPower = _running_Govss.ComputePower(_spinnerThresholdPower_Distance.getSelection(),
+            averageSlope,
+            0f,
+            thresholdVelocity);
+
+      _labelThresholdPower_Value.setText(String.valueOf(Math.round(thresholdPower)));
+
+      //Converting speed from m/s to min/km or min/mile
+      // m/s -> s/km
+      thresholdVelocity = 1000 / thresholdVelocity;
+      // s/km -> min/km
+      thresholdVelocity /= 60f;
+      // min/km -> min/km or min/mile
+      thresholdVelocity /= net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+
+      int thresholdVelocity_Minutes = (int) Math.floor(thresholdVelocity);
+      int seconds = Math.round(60 * (thresholdVelocity - thresholdVelocity_Minutes));
+      if (seconds == 60) {
+         thresholdVelocity_Minutes += 1;
+         seconds = 0;
+      }
+      final StringBuilder criticalPace = new StringBuilder();
+      criticalPace.append(String.valueOf(thresholdVelocity_Minutes));
+      if (seconds > 0) {
+         criticalPace.append("'" + String.valueOf(seconds));
+      }
+
+      _labelThresholdVelocity_Value.setText(criticalPace.toString());
    }
 
    @Override
    protected void performDefaults() {
+
       _textThresholdPower_Duration.setHours(_prefStore.getDefaultInt(ITourbookPreferences.TRAININGSTRESS_GOVSS_THRESHOLD_POWER_DURATION_HOURS));
       _textThresholdPower_Duration.setMinutes(_prefStore.getDefaultInt(ITourbookPreferences.TRAININGSTRESS_GOVSS_THRESHOLD_POWER_DURATION_MINUTES));
       _textThresholdPower_Duration.setSeconds(_prefStore.getDefaultInt(ITourbookPreferences.TRAININGSTRESS_GOVSS_THRESHOLD_POWER_DURATION_SECONDS));
