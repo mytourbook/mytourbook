@@ -43,7 +43,6 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.CellLabelProvider;
@@ -74,46 +73,44 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchPreferencePage;
 
-public class PrefPageGovss extends PreferencePage implements IWorkbenchPreferencePage {
+public class PrefPageGovss implements IPrefPageTrainingStressModel {
 
-   public static final String           ID        = "GOVSS";                                                             //$NON-NLS-1$
+   private static DateTime              _textThresholdPower_Duration;
 
-   private static DateTime _textThresholdPower_Duration;
    private static int                   _hintDefaultSpinnerWidth;
-
    private static ActionTourType_Add    _action_TourType_Add;
 
    private static ActionTourType_Remove _action_TourType_Remove;
-   private static Font                  _boldFont    = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
+
+   private static Font                  _boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
    /*
     * UI controls
     */
-   private static TableViewer _tourTypesViewer;
-
+   private static TableViewer           _tourTypesViewer;
    /*
     * private Button _chkConvertWayPoints;
     */
-   private static Label    _labelThresholdPower_Value;
+   private static Label                _labelThresholdPower_Value;
 
-   private static Label    _labelThresholdVelocity_Value;
-   private static Spinner        _spinnerThresholdPower_Distance;
-   private static Spinner  _spinnerThresholdPower_AverageSlope;
+   private static Label                _labelThresholdVelocity_Value;
 
-   private static ActionOpenPrefDialog  _actionOpenTourTypePrefs;
+   private static Spinner              _spinnerThresholdPower_Distance;
+   private static Spinner              _spinnerThresholdPower_AverageSlope;
+   private static ActionOpenPrefDialog _actionOpenTourTypePrefs;
 
-   private IPreferenceStore      _prefStore   = Activator.getDefault().getPreferenceStore();
-   private final IDialogSettings _importState = TourbookPlugin.getState(RawDataView.ID);
+   // public  final String           ID        = "GOVSS";                                                             //$NON-NLS-1$
 
-   private RawDataManager        _rawDataMgr  = RawDataManager.getInstance();
-   private PixelConverter        _pc;
+   private IPreferenceStore            _prefStore   = Activator.getDefault().getPreferenceStore();
+   private final IDialogSettings       _importState = TourbookPlugin.getState(RawDataView.ID);
 
-   private int                   DEFAULT_DESCRIPTION_WIDTH;
+   private RawDataManager              _rawDataMgr  = RawDataManager.getInstance();
+   private PixelConverter              _pc;
 
-   private boolean               _isUpdateUI;
-   private TabFolder   _tabFolder;
+   private int                         DEFAULT_DESCRIPTION_WIDTH;
+
+   private boolean                     _isUpdateUI;
+   private TabFolder                   _tabFolder;
 
    private static class Action_TourType extends Action {
 
@@ -259,24 +256,6 @@ public class PrefPageGovss extends PreferencePage implements IWorkbenchPreferenc
       _actionOpenTourTypePrefs = new ActionOpenPrefDialog(
             Messages.action_tourType_modify_tourTypes,
             ITourbookPreferences.PREF_PAGE_TOUR_TYPE);
-   }
-
-   /**
-    * UI for the GOVSS tab
-    */
-   public static  Composite createUI(final Composite parent) {
-
-      createActions();
-
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridLayoutFactory.swtDefaults().applyTo(container);
-      {
-         createUI_110_ThresholdPower(container);
-         createUI_120_TourTypesList(container);
-      }
-
-      return container;
-
    }
 
    /**
@@ -512,22 +491,6 @@ public class PrefPageGovss extends PreferencePage implements IWorkbenchPreferenc
       _labelThresholdVelocity_Value.setText(criticalPace.toString());
    }
 
-   @Override
-   protected Control createContents(final Composite parent) {
-
-      initUI(parent);
-      createActions();
-
-      final Composite ui = createUIHere(parent);
-      createMenus();
-
-      enableControls();
-
-      restoreState();
-
-      return ui;
-   }
-
    /**
     * create the drop down menus, this must be created after the parent control is created
     */
@@ -544,6 +507,21 @@ public class PrefPageGovss extends PreferencePage implements IWorkbenchPreferenc
             fillTourTypeMenu(menuMgr);
          }
       });
+   }
+
+   /**
+    * UI for the GOVSS tab
+    */
+   @Override
+   public Composite createUI(final Composite parent) {
+
+      createActions();
+
+      createUI_110_ThresholdPower(parent);
+      createUI_120_TourTypesList(parent);
+
+      return parent;
+
    }
 
    private Composite createUIHere(final Composite parent) {
@@ -600,7 +578,11 @@ public class PrefPageGovss extends PreferencePage implements IWorkbenchPreferenc
    }
 
    @Override
-   public void init(final IWorkbench workbench) {}
+   public String getId() {
+
+      return "GOVSS";
+   }
+
 
    private void initUI(final Composite parent) {
 
@@ -611,29 +593,30 @@ public class PrefPageGovss extends PreferencePage implements IWorkbenchPreferenc
 
    }
 
-   @Override
-   protected void performDefaults() {
+   /*
+    * @Override
+    * protected void performDefaults() {
+    * _textThresholdPower_Duration.setHours(_prefStore.getDefaultInt(ITourbookPreferences.
+    * TRAININGSTRESS_GOVSS_THRESHOLD_POWER_DURATION_HOURS));
+    * _textThresholdPower_Duration.setMinutes(_prefStore.getDefaultInt(ITourbookPreferences.
+    * TRAININGSTRESS_GOVSS_THRESHOLD_POWER_DURATION_MINUTES));
+    * _textThresholdPower_Duration.setSeconds(_prefStore.getDefaultInt(ITourbookPreferences.
+    * TRAININGSTRESS_GOVSS_THRESHOLD_POWER_DURATION_SECONDS));
+    * enableControls();
+    * super.performDefaults();
+    * }
+    */
 
-      _textThresholdPower_Duration.setHours(_prefStore.getDefaultInt(ITourbookPreferences.TRAININGSTRESS_GOVSS_THRESHOLD_POWER_DURATION_HOURS));
-      _textThresholdPower_Duration.setMinutes(_prefStore.getDefaultInt(ITourbookPreferences.TRAININGSTRESS_GOVSS_THRESHOLD_POWER_DURATION_MINUTES));
-      _textThresholdPower_Duration.setSeconds(_prefStore.getDefaultInt(ITourbookPreferences.TRAININGSTRESS_GOVSS_THRESHOLD_POWER_DURATION_SECONDS));
-
-      enableControls();
-
-      super.performDefaults();
-   }
-
-   @Override
-   public boolean performOk() {
-
-      final boolean isOK = super.performOk();
-
-      if (isOK) {
-         saveState();
-      }
-
-      return isOK;
-   }
+   /*
+    * @Override
+    * public boolean performOk() {
+    * final boolean isOK = super.performOk();
+    * if (isOK) {
+    * saveState();
+    * }
+    * return isOK;
+    * }
+    */
 
    private void restoreState() {
 

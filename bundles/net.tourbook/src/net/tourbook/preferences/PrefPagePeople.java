@@ -43,6 +43,8 @@ import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.training.DialogHRZones;
 import net.tourbook.training.TrainingManager;
+import net.tourbook.trainingstress.IPrefPageTrainingStressModel;
+import net.tourbook.trainingstress.PrefPageBikeScore;
 import net.tourbook.trainingstress.PrefPageGovss;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -626,16 +628,21 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
    private Control createUI_100_Tab_TrainingStress(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults()//
-//          .grab(true, false)
-            .applyTo(container);
+
+      final ArrayList<IPrefPageTrainingStressModel> toto = new ArrayList<>();
+      final PrefPageGovss govss = new PrefPageGovss();
+      toto.add(govss);
+      final PrefPageBikeScore bikeScore = new PrefPageBikeScore();
+      toto.add(bikeScore);
+
+      GridLayoutFactory.swtDefaults().numColumns(2).extendedMargins(0, 0, 7, 0).applyTo(container);
       {
          /*
           * label: info
           */
          Label label = new Label(container, SWT.WRAP);
          GridDataFactory.fillDefaults()//
-               .span(3, 1)
+               .span(2, 1)
 //             .indent(0, 15)
                .hint(net.tourbook.common.UI.DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
                .applyTo(label);
@@ -643,32 +650,39 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
          // label
          label = new Label(container, SWT.NONE);
-         GridDataFactory.fillDefaults().indent(0, 15).align(SWT.FILL, SWT.CENTER).applyTo(label);
+         //  GridDataFactory.fillDefaults().indent(0, 15).align(SWT.FILL, SWT.CENTER).applyTo(label);
          label.setText("Training Stress Model:");//Messages.Pref_People_Label_device);
+
+
 
          // combo
          _comboTrainingStressModel = new Combo(container, SWT.READ_ONLY | SWT.DROP_DOWN);
-         GridDataFactory.swtDefaults().span(2, 1).indent(0, 15).applyTo(_cboSportComputer);
-         _comboTrainingStressModel.setVisibleItemCount(1);
+         //GridDataFactory.fillDefaults().indent(0, 15).applyTo(_comboTrainingStressModel);
+         _comboTrainingStressModel.setVisibleItemCount(2);
          _comboTrainingStressModel.addSelectionListener(_defaultSelectionListener);
-         _comboTrainingStressModel.add(PrefPageGovss.ID);
-         _comboTrainingStressModel.select(0);
+         _comboTrainingStressModel.add(toto.get(0).getId());
+         _comboTrainingStressModel.add(toto.get(1).getId());
+         _comboTrainingStressModel.select(1);
+         _comboTrainingStressModel.addSelectionListener(new SelectionAdapter() {
+            private void onModifyTrainingStressModel() {
+               // TODO How to reload the page to display the newly selected model ?
 
-         PrefPageGovss.createUI(container);
-         //createUI_92_Field_SportComputer(container);
+            }
+
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+               onModifyTrainingStressModel();
+            }
+         });
+
+
       }
 
-      // set layout after the fields are created
-      GridLayoutFactory.swtDefaults().numColumns(3).extendedMargins(0, 0, 7, 0).applyTo(container);
-
-      /*
-       * set width for the text control that the pref dialog is not as wide as the full path
-       */
-      /*
-       * final Text rawPathControl = _rawDataPathEditor.getTextControl(container);
-       * final GridData gd = (GridData) rawPathControl.getLayoutData();
-       * gd.widthHint = 200;
-       */
+      GridLayoutFactory.swtDefaults().numColumns(1).extendedMargins(0, 0, 7, 0).applyTo(container);
+      {
+         final int index = _comboTrainingStressModel.getSelectionIndex();
+         toto.get(index).createUI(container);
+      }
 
       return container;
    }
@@ -2062,6 +2076,9 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       if (performOK10() == false) {
          return false;
       }
+
+      //TODO Perform OK in the training stress model
+      //TODO what about performdefaults ?
 
       return super.performOk();
    }
