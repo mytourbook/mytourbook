@@ -1152,15 +1152,6 @@ THIS IS NOT YET FULLY IMPLEMENTED
 
    </extension>
    
-    <extension	point="org.eclipse.ui.preferencePages">
-      <page
-            category="net.tourbook.preferences.PrefPagePeopleId"
-            class="net.tourbook.trainingstress.PrefPageTrainingStress"
-            id="net.tourbook.trainingstress.PrefPageTrainingStress"
-            name="%view_name_Training_Stress">
-      </page>
-   </extension>
-
    <extension point="org.eclipse.ui.commands">
 
       <command

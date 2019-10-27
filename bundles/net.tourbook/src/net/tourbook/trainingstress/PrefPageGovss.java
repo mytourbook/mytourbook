@@ -70,7 +70,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.TabFolder;
-import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.ToolBar;
@@ -78,45 +77,45 @@ import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-public class PrefPageTrainingStress extends PreferencePage implements IWorkbenchPreferencePage {
+public class PrefPageGovss extends PreferencePage implements IWorkbenchPreferencePage {
 
-   public static final String    ID           = "net.tourbook.trainingstress.PrefPageTrainingStress";                //$NON-NLS-1$
+   public static final String           ID        = "GOVSS";                                                             //$NON-NLS-1$
+
+   private static DateTime _textThresholdPower_Duration;
+   private static int                   _hintDefaultSpinnerWidth;
+
+   private static ActionTourType_Add    _action_TourType_Add;
+
+   private static ActionTourType_Remove _action_TourType_Remove;
+   private static Font                  _boldFont    = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
+   /*
+    * UI controls
+    */
+   private static TableViewer _tourTypesViewer;
+
+   /*
+    * private Button _chkConvertWayPoints;
+    */
+   private static Label    _labelThresholdPower_Value;
+
+   private static Label    _labelThresholdVelocity_Value;
+   private static Spinner        _spinnerThresholdPower_Distance;
+   private static Spinner  _spinnerThresholdPower_AverageSlope;
+
+   private static ActionOpenPrefDialog  _actionOpenTourTypePrefs;
 
    private IPreferenceStore      _prefStore   = Activator.getDefault().getPreferenceStore();
    private final IDialogSettings _importState = TourbookPlugin.getState(RawDataView.ID);
 
    private RawDataManager        _rawDataMgr  = RawDataManager.getInstance();
-
    private PixelConverter        _pc;
-   private int                   _hintDefaultSpinnerWidth;
+
    private int                   DEFAULT_DESCRIPTION_WIDTH;
 
    private boolean               _isUpdateUI;
-
-   private ActionTourType_Add    _action_TourType_Add;
-   private ActionTourType_Remove _action_TourType_Remove;
-   private ActionOpenPrefDialog  _actionOpenTourTypePrefs;
-
-   private Font                  _boldFont    = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
-
-   /*
-    * UI controls
-    */
-   private TableViewer _tourTypesViewer;
    private TabFolder   _tabFolder;
 
-   /*
-    * private Button _chkConvertWayPoints;
-    */
-   private Label    _labelThresholdPower_Value;
-   private Label    _labelThresholdVelocity_Value;
-
-   private DateTime _textThresholdPower_Duration;
-
-   private Spinner  _spinnerThresholdPower_Distance;
-   private Spinner  _spinnerThresholdPower_AverageSlope;
-
-   private class Action_TourType extends Action {
+   private static class Action_TourType extends Action {
 
       private TourType _tourType;
 
@@ -147,7 +146,7 @@ public class PrefPageTrainingStress extends PreferencePage implements IWorkbench
       }
    }
 
-   private class ActionTourType_Add extends Action implements IMenuCreator {
+   private static class ActionTourType_Add extends Action implements IMenuCreator {
 
       private Menu _menu;
 
@@ -225,7 +224,7 @@ public class PrefPageTrainingStress extends PreferencePage implements IWorkbench
       }
    }
 
-   private class ActionTourType_Remove extends Action {
+   private static class ActionTourType_Remove extends Action {
 
       public ActionTourType_Remove() {
 
@@ -252,7 +251,7 @@ public class PrefPageTrainingStress extends PreferencePage implements IWorkbench
 
    }
 
-   private void createActions() {
+   private static void createActions() {
 
       _action_TourType_Add = new ActionTourType_Add();
       _action_TourType_Remove = new ActionTourType_Remove();
@@ -262,80 +261,12 @@ public class PrefPageTrainingStress extends PreferencePage implements IWorkbench
             ITourbookPreferences.PREF_PAGE_TOUR_TYPE);
    }
 
-   @Override
-   protected Control createContents(final Composite parent) {
-
-      initUI(parent);
-      createActions();
-
-      final Composite ui = createUI(parent);
-      createMenus();
-
-      enableControls();
-
-      restoreState();
-
-      return ui;
-   }
-
-   /**
-    * create the drop down menus, this must be created after the parent control is created
-    */
-   private void createMenus() {
-
-      /*
-       * Context menu: Tour type
-       */
-      final MenuManager menuMgr = new MenuManager();
-      menuMgr.setRemoveAllWhenShown(true);
-      menuMgr.addMenuListener(new IMenuListener() {
-         @Override
-         public void menuAboutToShow(final IMenuManager menuMgr) {
-            fillTourTypeMenu(menuMgr);
-         }
-      });
-   }
-
-   private Composite createUI(final Composite parent) {
-
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory
-            .fillDefaults()//
-            .grab(true, true)
-            .applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(1).spacing(0, 15).applyTo(container);
-      {
-         /*
-          * label: Training stress info
-          */
-         final Label label = new Label(container, SWT.WRAP);
-         GridDataFactory.fillDefaults().hint(DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT).applyTo(label);
-         label.setText(Messages.Training_Stress_Label_Info);
-
-         /*
-          * tab folder: training stress
-          */
-         _tabFolder = new TabFolder(container, SWT.TOP);
-         GridDataFactory
-               .fillDefaults()//
-               .grab(true, true)
-               .applyTo(_tabFolder);
-         {
-
-            //tab GOVSS
-            final TabItem tabGovss = new TabItem(_tabFolder, SWT.NONE);
-            tabGovss.setControl(createUI_100_Govss(_tabFolder));
-            tabGovss.setText(Messages.Training_Stress_Group_Govss);
-         }
-      }
-
-      return _tabFolder;
-   }
-
    /**
     * UI for the GOVSS tab
     */
-   private Control createUI_100_Govss(final Composite parent) {
+   public static  Composite createUI(final Composite parent) {
+
+      createActions();
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridLayoutFactory.swtDefaults().applyTo(container);
@@ -351,7 +282,7 @@ public class PrefPageTrainingStress extends PreferencePage implements IWorkbench
    /**
     * UI for the threshold power group
     */
-   private void createUI_110_ThresholdPower(final Composite parent) {
+   private static void createUI_110_ThresholdPower(final Composite parent) {
 
       final Group container = new Group(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -466,7 +397,7 @@ public class PrefPageTrainingStress extends PreferencePage implements IWorkbench
    /**
     * UI for the list of tour types
     */
-   private void createUI_120_TourTypesList(final Composite parent) {
+   private static void createUI_120_TourTypesList(final Composite parent) {
 
       final Group container = new Group(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -526,43 +457,14 @@ public class PrefPageTrainingStress extends PreferencePage implements IWorkbench
 
    }
 
-   private void enableControls() {
+   private static void enableControls() {
 
       final StructuredSelection currentTourTypeViewerSelection = (StructuredSelection) _tourTypesViewer.getSelection();
       final boolean isTourTypeSelected = currentTourTypeViewerSelection.isEmpty() ? false : true;
       _action_TourType_Remove.setEnabled(isTourTypeSelected);
    }
 
-   private void fillTourTypeMenu(final IMenuManager menuMgr) {
-
-      // add all tour types to the menu
-      final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
-
-      for (final TourType tourType : tourTypes) {
-
-         final boolean isChecked = false;
-         final Action_TourType action = new Action_TourType(tourType, isChecked);
-
-         menuMgr.add(action);
-      }
-
-      menuMgr.add(new Separator());
-      menuMgr.add(_actionOpenTourTypePrefs);
-   }
-
-   @Override
-   public void init(final IWorkbench workbench) {}
-
-   private void initUI(final Composite parent) {
-
-      _pc = new PixelConverter(parent);
-
-      DEFAULT_DESCRIPTION_WIDTH = _pc.convertWidthInCharsToPixels(80);
-      _hintDefaultSpinnerWidth = UI.IS_LINUX ? SWT.DEFAULT : _pc.convertWidthInCharsToPixels(UI.IS_OSX ? 10 : 5);
-
-   }
-
-   private void onComputeThresholdPower() {
+   private static void onComputeThresholdPower() {
 
       final TourPerson tourPerson = TourbookPlugin.getActivePerson();
 
@@ -571,6 +473,7 @@ public class PrefPageTrainingStress extends PreferencePage implements IWorkbench
             _textThresholdPower_Duration.getSeconds();
       final float thresholdPowerDistance = (_spinnerThresholdPower_Distance.getSelection() / 10f) * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
       if (tourPerson == null || thresholdPowerDuration <= 0 || thresholdPowerDistance <= 0) {
+         //TODO Put all values to 0 ?
          return;
       }
 
@@ -607,6 +510,105 @@ public class PrefPageTrainingStress extends PreferencePage implements IWorkbench
       }
 
       _labelThresholdVelocity_Value.setText(criticalPace.toString());
+   }
+
+   @Override
+   protected Control createContents(final Composite parent) {
+
+      initUI(parent);
+      createActions();
+
+      final Composite ui = createUIHere(parent);
+      createMenus();
+
+      enableControls();
+
+      restoreState();
+
+      return ui;
+   }
+
+   /**
+    * create the drop down menus, this must be created after the parent control is created
+    */
+   private void createMenus() {
+
+      /*
+       * Context menu: Tour type
+       */
+      final MenuManager menuMgr = new MenuManager();
+      menuMgr.setRemoveAllWhenShown(true);
+      menuMgr.addMenuListener(new IMenuListener() {
+         @Override
+         public void menuAboutToShow(final IMenuManager menuMgr) {
+            fillTourTypeMenu(menuMgr);
+         }
+      });
+   }
+
+   private Composite createUIHere(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory
+            .fillDefaults()//
+            .grab(true, true)
+            .applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(1).spacing(0, 15).applyTo(container);
+      {
+         /*
+          * label: Training stress info
+          */
+         final Label label = new Label(container, SWT.WRAP);
+         GridDataFactory.fillDefaults().hint(DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT).applyTo(label);
+         label.setText(Messages.Training_Stress_Label_Info);
+
+         /*
+          * tab folder: training stress
+          */
+         _tabFolder = new TabFolder(container, SWT.TOP);
+         GridDataFactory
+               .fillDefaults()//
+               .grab(true, true)
+               .applyTo(_tabFolder);
+         {
+
+            //tab GOVSS
+            // final TabItem tabGovss = new TabItem(_tabFolder, SWT.NONE);
+            // tabGovss.setControl(createUI_100_Govss(_tabFolder));
+            //   tabGovss.setText(Messages.Training_Stress_Group_Govss);
+         }
+      }
+
+      return _tabFolder;
+   }
+
+   private void fillTourTypeMenu(final IMenuManager menuMgr) {
+
+      // add all tour types to the menu
+      final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
+
+      for (final TourType tourType : tourTypes) {
+
+         final boolean isChecked = false;
+         final Action_TourType action = new Action_TourType(tourType, isChecked);
+
+         menuMgr.add(action);
+      }
+
+      menuMgr.add(new Separator());
+      menuMgr.add(_actionOpenTourTypePrefs);
+   }
+
+   @Override
+   public void init(final IWorkbench workbench) {}
+
+   private void initUI(final Composite parent) {
+
+      _pc = new PixelConverter(parent);
+
+      DEFAULT_DESCRIPTION_WIDTH = _pc.convertWidthInCharsToPixels(80);
+      _hintDefaultSpinnerWidth = UI.IS_LINUX ? SWT.DEFAULT : _pc.convertWidthInCharsToPixels(UI.IS_OSX ? 10 : 5);
+
    }
 
    @Override

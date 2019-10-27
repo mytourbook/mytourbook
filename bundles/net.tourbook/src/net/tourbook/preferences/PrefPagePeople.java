@@ -43,6 +43,7 @@ import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.training.DialogHRZones;
 import net.tourbook.training.TrainingManager;
+import net.tourbook.trainingstress.PrefPageGovss;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -218,6 +219,8 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
    private DateTime             _dtBirthday;
    private Label                _lblAgePerson;
    private Label                _lblAgeHr;
+
+   private Combo                _comboTrainingStressModel;
 
    private Text                 _txtRawDataPath;
    private DirectoryFieldEditor _rawDataPathEditor;
@@ -466,6 +469,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       final Composite container = createUI(parent);
 
       updateUIDeviceList();
+      updateUITrainingStressModelsList();
 
       // update people viewer
       _people = PersonManager.getTourPeople();
@@ -508,6 +512,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          _deviceList.add(device);
       }
    }
+
 
    private Composite createUI(final Composite parent) {
 
@@ -618,6 +623,56 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
    }
 
+   private Control createUI_100_Tab_TrainingStress(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults()//
+//          .grab(true, false)
+            .applyTo(container);
+      {
+         /*
+          * label: info
+          */
+         Label label = new Label(container, SWT.WRAP);
+         GridDataFactory.fillDefaults()//
+               .span(3, 1)
+//             .indent(0, 15)
+               .hint(net.tourbook.common.UI.DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
+               .applyTo(label);
+         label.setText(Messages.Training_Stress_Label_Info);
+
+         // label
+         label = new Label(container, SWT.NONE);
+         GridDataFactory.fillDefaults().indent(0, 15).align(SWT.FILL, SWT.CENTER).applyTo(label);
+         label.setText("Training Stress Model:");//Messages.Pref_People_Label_device);
+
+         // combo
+         _comboTrainingStressModel = new Combo(container, SWT.READ_ONLY | SWT.DROP_DOWN);
+         GridDataFactory.swtDefaults().span(2, 1).indent(0, 15).applyTo(_cboSportComputer);
+         _comboTrainingStressModel.setVisibleItemCount(1);
+         _comboTrainingStressModel.addSelectionListener(_defaultSelectionListener);
+         _comboTrainingStressModel.add(PrefPageGovss.ID);
+         _comboTrainingStressModel.select(0);
+
+         PrefPageGovss.createUI(container);
+         //createUI_92_Field_SportComputer(container);
+      }
+
+      // set layout after the fields are created
+      GridLayoutFactory.swtDefaults().numColumns(3).extendedMargins(0, 0, 7, 0).applyTo(container);
+
+      /*
+       * set width for the text control that the pref dialog is not as wide as the full path
+       */
+      /*
+       * final Text rawPathControl = _rawDataPathEditor.getTextControl(container);
+       * final GridData gd = (GridData) rawPathControl.getLayoutData();
+       * gd.widthHint = 200;
+       */
+
+      return container;
+   }
+
    private void createUI_20_People_Actions(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
@@ -693,6 +748,11 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          final TabItem tabItemDataTransfer = new TabItem(_tabFolderPerson, SWT.NONE);
          tabItemDataTransfer.setText(Messages.Pref_People_Tab_DataTransfer);
          tabItemDataTransfer.setControl(createUI_90_Tab_DataTransfer(_tabFolderPerson));
+
+         // tab: training stress
+         final TabItem tabTrainingStress = new TabItem(_tabFolderPerson, SWT.NONE);
+         tabTrainingStress.setText("Training Stress");//Messages.Pref_People_Tab_DataTransfer);
+         tabTrainingStress.setControl(createUI_100_Tab_TrainingStress(_tabFolderPerson));
       }
    }
 
@@ -2356,6 +2416,18 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          // when the device id was not found, select "<no selection>" entry
          if (deviceIndex == 0) {
             _cboSportComputer.select(0);
+         }
+      }
+   }
+
+   private void updateUITrainingStressModelsList() {
+
+      // add all training stress models to the combobox
+      for (final ExternalDevice device : _deviceList) {
+         if (device == null) {
+            _cboSportComputer.add(DeviceManager.DEVICE_IS_NOT_SELECTED);
+         } else {
+            _cboSportComputer.add(device.visibleName);
          }
       }
    }
