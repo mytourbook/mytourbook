@@ -142,10 +142,15 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
     */
    public static final String     PREF_DATA_SELECT_PERSON_INFORMATION = "SelectPersonInformation";                              //$NON-NLS-1$
 
+   private final static IPrefPageTrainingStressModel[] _trainingStressModels               = new IPrefPageTrainingStressModel[] {
+    new PrefPageGovss(),
+   new PrefPageBikeScore()
+};
    private final IPreferenceStore _prefStore                          = TourbookPlugin.getPrefStore();
-   private final IDialogSettings  _state                              = TourbookPlugin.getState(ID);
 
    // REMOVED BIKES 30.4.2011
+
+   private final IDialogSettings  _state                              = TourbookPlugin.getState(ID);
 
    private ArrayList<TourPerson>     _people;
 
@@ -153,39 +158,40 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
     * this device list has all the devices which are visible in the device combobox
     */
    private ArrayList<ExternalDevice> _deviceList;
-
    private final NumberFormat        _nf1 = NumberFormat.getNumberInstance();
    private final NumberFormat        _nf2 = NumberFormat.getNumberInstance();
+
    {
       _nf1.setMinimumFractionDigits(1);
       _nf1.setMaximumFractionDigits(1);
       _nf2.setMinimumFractionDigits(2);
       _nf2.setMaximumFractionDigits(2);
    }
-
    private final boolean             _isOSX                     = net.tourbook.common.UI.IS_OSX;
-   private final boolean             _isLinux                   = net.tourbook.common.UI.IS_LINUX;
 
+   private final boolean             _isLinux                   = net.tourbook.common.UI.IS_LINUX;
    private SelectionListener         _defaultSelectionListener;
    private ModifyListener            _defaultModifyListener;
    private MouseListener             _hrZoneMouseListener;
-   private IPropertyChangeListener   _prefChangeListener;
 
+   private IPropertyChangeListener   _prefChangeListener;
    private boolean                   _isFireModifyEvent         = false;
    private boolean                   _isPersonModified          = false;
+
    private boolean                   _isUpdateUI                = false;
-
    private HashMap<Long, TourPerson> _peopleWithModifiedHrZones = new HashMap<>();
-   private boolean                   _isHrZoneModified          = false;
 
+   private boolean                   _isHrZoneModified          = false;
    private TourPerson                _selectedPerson;
    private TourPerson                _newPerson;
+
    private Set<TourPersonHRZone>     _backupSelectedPersonHrZones;
 
    private ZonedDateTime             _today                     = TimeTools.now();
-
    private Font                      _fontItalic;
+
    private Color[]                   _hrZoneColors;
+
 
    /**
     * Is <code>true</code> when a tour in the tour editor is modified.
@@ -223,6 +229,8 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
    private Label                _lblAgeHr;
 
    private Combo                _comboTrainingStressModel;
+
+   private Group                _trainingStressGroup;
 
    private Text                 _txtRawDataPath;
    private DirectoryFieldEditor _rawDataPathEditor;
@@ -629,11 +637,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
       final Composite container = new Composite(parent, SWT.NONE);
 
-      final ArrayList<IPrefPageTrainingStressModel> toto = new ArrayList<>();
-      final PrefPageGovss govss = new PrefPageGovss();
-      toto.add(govss);
-      final PrefPageBikeScore bikeScore = new PrefPageBikeScore();
-      toto.add(bikeScore);
 
       GridLayoutFactory.swtDefaults().numColumns(2).extendedMargins(0, 0, 7, 0).applyTo(container);
       {
@@ -659,29 +662,25 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          _comboTrainingStressModel = new Combo(container, SWT.READ_ONLY | SWT.DROP_DOWN);
          //GridDataFactory.fillDefaults().indent(0, 15).applyTo(_comboTrainingStressModel);
          _comboTrainingStressModel.setVisibleItemCount(2);
-         _comboTrainingStressModel.addSelectionListener(_defaultSelectionListener);
-         _comboTrainingStressModel.add(toto.get(0).getId());
-         _comboTrainingStressModel.add(toto.get(1).getId());
-         _comboTrainingStressModel.select(1);
+         for (final IPrefPageTrainingStressModel trainingStressModel : _trainingStressModels) {
+            _comboTrainingStressModel.add(trainingStressModel.getId());
+         }
+         _comboTrainingStressModel.select(0);
+         _comboTrainingStressModel.setRedraw(true);
          _comboTrainingStressModel.addSelectionListener(new SelectionAdapter() {
-            private void onModifyTrainingStressModel() {
-               // TODO How to reload the page to display the newly selected model ?
-
-            }
 
             @Override
             public void widgetSelected(final SelectionEvent e) {
-               onModifyTrainingStressModel();
+               final int index = _comboTrainingStressModel.getSelectionIndex();
+               _trainingStressGroup = _trainingStressModels[index].getGroupUI(container);
+               _trainingStressGroup.layout(true);
             }
          });
-
-
       }
 
       GridLayoutFactory.swtDefaults().numColumns(1).extendedMargins(0, 0, 7, 0).applyTo(container);
       {
-         final int index = _comboTrainingStressModel.getSelectionIndex();
-         toto.get(index).createUI(container);
+         _trainingStressGroup = _trainingStressModels[0].getGroupUI(container);
       }
 
       return container;

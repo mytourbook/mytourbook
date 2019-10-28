@@ -15,16 +15,32 @@
  *******************************************************************************/
 package net.tourbook.trainingstress;
 
+import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
 
 public class PrefPageBikeScore implements IPrefPageTrainingStressModel {
+   private Group _bikeScoreGroup;
 
    /**
-    * UI for the GOVSS tab
+    * UI for the BikeScore preferences
     */
    @Override
-   public Composite createUI(final Composite parent) {
-      return parent;
+   public Group getGroupUI(final Composite parent) {
+
+      if (_bikeScoreGroup == null) {
+         _bikeScoreGroup = new Group(parent, SWT.NONE);
+         GridLayoutFactory.swtDefaults().numColumns(1).applyTo(_bikeScoreGroup);
+         {
+            final Label label = new Label(parent, SWT.NONE);
+            label.setText("BIKESCORE");
+         }
+      }
+
+      return _bikeScoreGroup;
+
    }
 
    @Override

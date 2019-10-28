@@ -16,10 +16,11 @@
 package net.tourbook.trainingstress;
 
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Group;
 
 public interface IPrefPageTrainingStressModel {
 
-   public abstract Composite createUI(final Composite parent);
+   public abstract Group getGroupUI(final Composite parent);
 
    public abstract String getId();
 }

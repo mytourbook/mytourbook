@@ -112,6 +112,8 @@ public class PrefPageGovss implements IPrefPageTrainingStressModel {
    private boolean                     _isUpdateUI;
    private TabFolder                   _tabFolder;
 
+   private Group                 _govssGroup;
+
    private static class Action_TourType extends Action {
 
       private TourType _tourType;
@@ -509,21 +511,6 @@ public class PrefPageGovss implements IPrefPageTrainingStressModel {
       });
    }
 
-   /**
-    * UI for the GOVSS tab
-    */
-   @Override
-   public Composite createUI(final Composite parent) {
-
-      createActions();
-
-      createUI_110_ThresholdPower(parent);
-      createUI_120_TourTypesList(parent);
-
-      return parent;
-
-   }
-
    private Composite createUIHere(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
@@ -575,6 +562,27 @@ public class PrefPageGovss implements IPrefPageTrainingStressModel {
 
       menuMgr.add(new Separator());
       menuMgr.add(_actionOpenTourTypePrefs);
+   }
+
+   /**
+    * UI for the GOVSS preferences
+    */
+   @Override
+   public Group getGroupUI(final Composite parent) {
+
+      createActions();
+
+      if (_govssGroup == null) {
+         _govssGroup = new Group(parent, SWT.NONE);
+         GridLayoutFactory.swtDefaults().numColumns(1).applyTo(_govssGroup);
+         {
+         createUI_110_ThresholdPower(_govssGroup);
+         createUI_120_TourTypesList(_govssGroup);
+         }
+      }
+
+      return _govssGroup;
+
    }
 
    @Override
