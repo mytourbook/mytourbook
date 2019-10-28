@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -69,6 +69,12 @@ public class TourPerson implements Comparable<Object> {
 	 */
 	public static final int					DEFAULT_REST_PULSE			= 60;
 
+	/**
+	 * manually created person creates a unique id to identify it, saved person is compared with the
+	 * person id
+	 */
+	private static int						_createCounter				= 0;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long							personId					= PERSON_ID_NOT_DEFINED;
@@ -80,7 +86,9 @@ public class TourPerson implements Comparable<Object> {
 
 	private float							weight;
 
-	private float							height;
+   private float							height;
+
+   private float                           govssThresholdPower;
 
 	/**
 	 * Birthday of this person in milliseconds from 1970-01-01T00:00:00, default value is 0 when
@@ -142,13 +150,7 @@ public class TourPerson implements Comparable<Object> {
 	 */
 	@OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourPerson")
 	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-	private Set<TourPersonHRZone>			hrZones						= new HashSet<TourPersonHRZone>();
-
-	/**
-	 * manually created person creates a unique id to identify it, saved person is compared with the
-	 * person id
-	 */
-	private static int						_createCounter				= 0;
+	private Set<TourPersonHRZone>			hrZones						= new HashSet<>();
 
 	/**
 	 * unique id for manually created person because the {@link #personId} is
@@ -164,7 +166,7 @@ public class TourPerson implements Comparable<Object> {
 	 * Cached HR zones, key is the age of the person
 	 */
 	@Transient
-	private HashMap<Integer, HrZoneContext>	_hrZoneMinMaxBpm			= new HashMap<Integer, HrZoneContext>();
+	private HashMap<Integer, HrZoneContext>	_hrZoneMinMaxBpm			= new HashMap<>();
 
 	/**
 	 * Sorted HR zones
@@ -346,6 +348,10 @@ public class TourPerson implements Comparable<Object> {
 		return gender;
 	}
 
+   public float getGovssThresholdPower() {
+      return govssThresholdPower;
+   }
+
 	public float getHeight() {
 		return height;
 	}
@@ -385,7 +391,7 @@ public class TourPerson implements Comparable<Object> {
 		final float[] zoneMinBmps = new float[zoneSize];
 		final float[] zoneMaxBmps = new float[zoneSize];
 
-		final ArrayList<TourPersonHRZone> hrZonesList = new ArrayList<TourPersonHRZone>(hrZones);
+		final ArrayList<TourPersonHRZone> hrZonesList = new ArrayList<>(hrZones);
 		Collections.sort(hrZonesList);
 
 		int prevMaxBpm = -1;
@@ -429,7 +435,7 @@ public class TourPerson implements Comparable<Object> {
 
 		if (_sortedHrZones == null) {
 
-			_sortedHrZones = new ArrayList<TourPersonHRZone>();
+			_sortedHrZones = new ArrayList<>();
 			_sortedHrZones.addAll(hrZones);
 			Collections.sort(_sortedHrZones);
 		}
@@ -543,6 +549,10 @@ public class TourPerson implements Comparable<Object> {
 		this.gender = gender;
 	}
 
+   public void setGovssThresholdPower(final float govssThresholdPower) {
+      this.govssThresholdPower = govssThresholdPower;
+   }
+
 	public void setHeight(final float height) {
 		this.height = height;
 	}
@@ -583,11 +593,11 @@ public class TourPerson implements Comparable<Object> {
 		this.tourBike = tourBike;
 	}
 
-	public void setWeight(final float weight) {
+   public void setWeight(final float weight) {
 		this.weight = weight;
 	}
 
-	@Override
+   @Override
 	public String toString() {
 		return "TourPerson [personId=" + personId + ", firstName=" + firstName + ", lastName=" + lastName + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 	}

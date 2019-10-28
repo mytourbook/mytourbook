@@ -30,12 +30,10 @@ public class Running_Govss {
    //TODO : Add the GOVSS column in the tour book view
    //TODO Use this equation to display an estimated power graph in the tour chart ?If yes, it's low on the totem pole
 
-   private float    _athleteHeight;
-   private float    _athleteWeight;
+   private TourPerson _tourPerson;
 
    public Running_Govss(final TourPerson _tourPerson) {
-      this._athleteHeight = _tourPerson.getHeight();
-      this._athleteWeight = _tourPerson.getWeight();
+      this._tourPerson = _tourPerson;
    }
 
    /**
@@ -46,7 +44,7 @@ public class Running_Govss {
     */
    private double computeCostAerodynamicDrag(final float speed) {
 
-      final double Af = 0.2025 * 0.266 * Math.pow(_athleteHeight, 0.725) * Math.pow(_athleteWeight, 0.425);
+      final double Af = 0.2025 * 0.266 * Math.pow(_tourPerson.getHeight(), 0.725) * Math.pow(_tourPerson.getWeight(), 0.425);
       final double CAero = 0.5 * 1.2 * 0.9 * Af * Math.pow(speed, 2);
 
       return CAero;
@@ -94,10 +92,9 @@ public class Running_Govss {
       //When identified, add them in the users preference page
 
       // 1. Find the athlete’s velocity at LT by a 10 km to one hour maximal run.
-      final float tempCriticalVelocity = 4.13f;// m/sec => 6'30 min/mile 40' => 9.912km
-
       // 2. Convert this LT limited velocity to a LT limited power value using Equation 7. "Lactate limited power" may also be called "lactate adjusted power".
-      final float lactateLimitedPower = (float) ComputePower(14868, 0.0, 0, tempCriticalVelocity);
+      //final float lactateLimitedPower = (float) ComputePower(14868, 0.0, 0, tempCriticalVelocity);
+      final float athleteThresholdPower = _tourPerson.getGovssThresholdPower();// m/sec => 6'30 min/mile 40' => 9.912km
 
       // 3. Analyze the data from a particular workout from an athlete’s log, computing 120 second rolling averages from velocity and slope data.
       final ArrayList<Double> powerValues = computePowerValues(tourData);
@@ -114,7 +111,7 @@ public class Running_Govss {
       final float lactateNormalizedPower = (float) Math.pow(averagePower, 0.25);
 
       // 7. Divide Lactate Normalized Power by Threshold Power from step 2 to get the Intensity Weighting Fraction.
-      final float intensityWeighingFactor = lactateNormalizedPower / lactateLimitedPower;
+      final float intensityWeighingFactor = lactateNormalizedPower / athleteThresholdPower;
 
       // 8. Multiply the Lactate Normalized Power by the duration of the workout in seconds to obtain the normalized work performed in joules.
       final int normalizedWork = Math.round(lactateNormalizedPower * tourData.getTourRecordingTime());
@@ -123,7 +120,8 @@ public class Running_Govss {
       float trainingStressValue = normalizedWork * intensityWeighingFactor;
 
       // 10. Divide the values from step 9 by the amount of work performed during the 10k to 1 hr test (threshold power in watts x number of seconds).
-      trainingStressValue /= (lactateLimitedPower * 3600); // 2400 = 40*60 = 40min
+      //TODO Get the duration from the preferences
+      trainingStressValue /= (athleteThresholdPower * 3600); // 2400 = 40*60 = 40min
 
       // 11. Multiply the number from step 10 by 100 to obtain the final training stress in GOVSS.
       trainingStressValue *= 100;
@@ -144,7 +142,7 @@ public class Running_Govss {
       final double Cslope = computeCostDistanceWithSlope(slope);
       final double efficiency = (0.25 + (0.054 * speed)) * (1 - ((0.5 * speed) / 8.33));
 
-      final double power = (CAero + Ckin + Cslope * efficiency * _athleteWeight) * speed;
+      final double power = (CAero + Ckin + Cslope * efficiency * _tourPerson.getHeight()) * speed;
 
       return power;
    }
