@@ -3306,6 +3306,13 @@ public class TourDatabase {
 
             + "   rawDataPath            VARCHAR(" + TourPerson.DB_LENGTH_RAW_DATA_PATH + "),     \n" //$NON-NLS-1$ //$NON-NLS-2$
             + "   deviceReaderId         VARCHAR(" + TourPerson.DB_LENGTH_DEVICE_READER_ID + "),  \n" //$NON-NLS-1$ //$NON-NLS-2$
+
+            // version 41 start
+            //
+            + "   govssThresholdPower    INTEGER DEFAULT 0,                                       \n" //$NON-NLS-1$
+            //
+            // version 41 end ---------
+
             //
             + "   " + KEY_BIKE + "       BIGINT                                                  \n" //$NON-NLS-1$ //$NON-NLS-2$
             //
@@ -7352,33 +7359,6 @@ public class TourDatabase {
       return newDbVersion;
    }
 
-   private int updateDbDesign_040_to_041(final Connection conn, final SplashManager splashManager) throws SQLException {
-
-      final int newDbVersion = 41;
-
-      logDb_UpdateStart(newDbVersion);
-      updateMonitor(splashManager, newDbVersion);
-
-      final Statement stmt = conn.createStatement();
-      {
-         // check if db is updated to version 41
-         if (isColumnAvailable(conn, TABLE_TOUR_DATA, "govss") == false) { //$NON-NLS-1$
-
-// SET_FORMATTING_OFF
-
-            // Add new columns
-            SQL.AddCol_Int      (stmt, TABLE_TOUR_DATA, "govss", DEFAULT_0);//$NON-NLS-1$
-
-// SET_FORMATTING_ON
-         }
-      }
-      stmt.close();
-
-      logDb_UpdateEnd(newDbVersion);
-
-      return newDbVersion;
-   }
-
    /**
     * Set tourRecordingTime
     *
@@ -7485,6 +7465,35 @@ public class TourDatabase {
       StatusUtil.logInfo(String.format(
             "Database postupdate 39 -> 40 in %s mm:ss", //$NON-NLS-1$
             net.tourbook.common.UI.formatHhMmSs(timeDiff / 1000)));
+   }
+
+   private int updateDbDesign_040_to_041(final Connection conn, final SplashManager splashManager) throws SQLException {
+
+      final int newDbVersion = 41;
+
+      logDb_UpdateStart(newDbVersion);
+      updateMonitor(splashManager, newDbVersion);
+
+      final Statement stmt = conn.createStatement();
+      {
+         // check if db is updated to version 41
+         if (isColumnAvailable(conn, TABLE_TOUR_DATA, "govss") == false) { //$NON-NLS-1$
+
+// SET_FORMATTING_OFF
+
+            // Add new columns
+            SQL.AddCol_Int      (stmt, TABLE_TOUR_DATA, "govss", DEFAULT_0);//$NON-NLS-1$
+
+            SQL.AddCol_Int      (stmt, TABLE_TOUR_PERSON, "govssThresholdPower", DEFAULT_0);//$NON-NLS-1$
+
+// SET_FORMATTING_ON
+         }
+      }
+      stmt.close();
+
+      logDb_UpdateEnd(newDbVersion);
+
+      return newDbVersion;
    }
 
 //   private int updateDbDesign_034_to_035(final Connection conn, final IProgressMonitor monitor) throws SQLException {
