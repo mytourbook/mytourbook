@@ -78,6 +78,7 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.KeyEvent;
@@ -113,44 +114,44 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferencePage {
 
-   private static final String    GRAPH_LABEL_HEARTBEAT_UNIT          = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
+   private static final String                         GRAPH_LABEL_HEARTBEAT_UNIT          = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
 
-   public static final String     ID                                  = "net.tourbook.preferences.PrefPagePeopleId";            //$NON-NLS-1$
+   public static final String                          ID                                  = "net.tourbook.preferences.PrefPagePeopleId";            //$NON-NLS-1$
 
    /**
     * On Linux an async selection event is fired since e4
     */
-   private static final String    FIX_LINUX_ASYNC_EVENT_1             = "FIX_LINUX_ASYNC_EVENT_1";                              //$NON-NLS-1$
-   private static final String    FIX_LINUX_ASYNC_EVENT_2             = "FIX_LINUX_ASYNC_EVENT_2";                              //$NON-NLS-1$
+   private static final String                         FIX_LINUX_ASYNC_EVENT_1             = "FIX_LINUX_ASYNC_EVENT_1";                              //$NON-NLS-1$
+   private static final String                         FIX_LINUX_ASYNC_EVENT_2             = "FIX_LINUX_ASYNC_EVENT_2";                              //$NON-NLS-1$
    //
-   private static final String    STATE_SELECTED_PERSON               = "selectedPersonId";                                     //$NON-NLS-1$
-   private static final String    STATE_SELECTED_TAB_FOLDER           = "selectedTabFolder";                                    //$NON-NLS-1$
+   private static final String                         STATE_SELECTED_PERSON               = "selectedPersonId";                                     //$NON-NLS-1$
+   private static final String                         STATE_SELECTED_TAB_FOLDER           = "selectedTabFolder";                                    //$NON-NLS-1$
 
-   public static final int        HEART_BEAT_MIN                      = 10;
-   public static final int        HEART_BEAT_MAX                      = 300;
+   public static final int                             HEART_BEAT_MIN                      = 10;
+   public static final int                             HEART_BEAT_MAX                      = 300;
 
    /**
     * Id to indicate that the hr zones should be displayed for the active person when the pref
     * dialog is opened
     */
-   public static final String     PREF_DATA_SELECT_HR_ZONES           = "SelectHrZones";                                        //$NON-NLS-1$
+   public static final String                          PREF_DATA_SELECT_HR_ZONES           = "SelectHrZones";                                        //$NON-NLS-1$
 
    /**
     * Id to indicate that the person's information should be displayed for the active person when
     * the pref
     * dialog is opened
     */
-   public static final String     PREF_DATA_SELECT_PERSON_INFORMATION = "SelectPersonInformation";                              //$NON-NLS-1$
+   public static final String                          PREF_DATA_SELECT_PERSON_INFORMATION = "SelectPersonInformation";                              //$NON-NLS-1$
 
    private final static IPrefPageTrainingStressModel[] _trainingStressModels               = new IPrefPageTrainingStressModel[] {
-    new PrefPageGovss(),
-   new PrefPageBikeScore()
-};
-   private final IPreferenceStore _prefStore                          = TourbookPlugin.getPrefStore();
+         new PrefPageGovss(),
+         new PrefPageBikeScore()
+   };
+   private final IPreferenceStore                      _prefStore                          = TourbookPlugin.getPrefStore();
 
    // REMOVED BIKES 30.4.2011
 
-   private final IDialogSettings  _state                              = TourbookPlugin.getState(ID);
+   private final IDialogSettings     _state = TourbookPlugin.getState(ID);
 
    private ArrayList<TourPerson>     _people;
 
@@ -158,8 +159,8 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
     * this device list has all the devices which are visible in the device combobox
     */
    private ArrayList<ExternalDevice> _deviceList;
-   private final NumberFormat        _nf1 = NumberFormat.getNumberInstance();
-   private final NumberFormat        _nf2 = NumberFormat.getNumberInstance();
+   private final NumberFormat        _nf1   = NumberFormat.getNumberInstance();
+   private final NumberFormat        _nf2   = NumberFormat.getNumberInstance();
 
    {
       _nf1.setMinimumFractionDigits(1);
@@ -191,7 +192,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
    private Font                      _fontItalic;
 
    private Color[]                   _hrZoneColors;
-
 
    /**
     * Is <code>true</code> when a tour in the tour editor is modified.
@@ -230,7 +230,8 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
    private Combo                _comboTrainingStressModel;
 
-   private Group                _trainingStressGroup;
+   private Composite            _trainingStressComposite;
+   private StackLayout          _trainingStressLayout;
 
    private Text                 _txtRawDataPath;
    private DirectoryFieldEditor _rawDataPathEditor;
@@ -523,7 +524,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       }
    }
 
-
    private Composite createUI(final Composite parent) {
 
       _prefPageContainer = new Composite(parent, SWT.NONE);
@@ -637,7 +637,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
       final Composite container = new Composite(parent, SWT.NONE);
 
-
       GridLayoutFactory.swtDefaults().numColumns(2).extendedMargins(0, 0, 7, 0).applyTo(container);
       {
          /*
@@ -656,8 +655,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          //  GridDataFactory.fillDefaults().indent(0, 15).align(SWT.FILL, SWT.CENTER).applyTo(label);
          label.setText("Training Stress Model:");//Messages.Pref_People_Label_device);
 
-
-
          // combo
          _comboTrainingStressModel = new Combo(container, SWT.READ_ONLY | SWT.DROP_DOWN);
          //GridDataFactory.fillDefaults().indent(0, 15).applyTo(_comboTrainingStressModel);
@@ -666,21 +663,24 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
             _comboTrainingStressModel.add(trainingStressModel.getId());
          }
          _comboTrainingStressModel.select(0);
-         _comboTrainingStressModel.setRedraw(true);
          _comboTrainingStressModel.addSelectionListener(new SelectionAdapter() {
 
             @Override
             public void widgetSelected(final SelectionEvent e) {
+
                final int index = _comboTrainingStressModel.getSelectionIndex();
-               _trainingStressGroup = _trainingStressModels[index].getGroupUI(container);
-               _trainingStressGroup.layout(true);
+               _trainingStressLayout.topControl = _trainingStressModels[index].getGroupUI(_trainingStressComposite);
+               _trainingStressComposite.layout(true);
             }
          });
       }
 
       GridLayoutFactory.swtDefaults().numColumns(1).extendedMargins(0, 0, 7, 0).applyTo(container);
       {
-         _trainingStressGroup = _trainingStressModels[0].getGroupUI(container);
+         _trainingStressComposite = new Composite(container, SWT.NONE);
+         _trainingStressLayout = new StackLayout();
+         _trainingStressComposite.setLayout(_trainingStressLayout);
+         _trainingStressLayout.topControl = _trainingStressModels[_comboTrainingStressModel.getSelectionIndex()].getGroupUI(_trainingStressComposite);
       }
 
       return container;

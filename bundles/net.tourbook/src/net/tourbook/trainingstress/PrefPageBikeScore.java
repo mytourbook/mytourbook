@@ -34,7 +34,7 @@ public class PrefPageBikeScore implements IPrefPageTrainingStressModel {
          _bikeScoreGroup = new Group(parent, SWT.NONE);
          GridLayoutFactory.swtDefaults().numColumns(1).applyTo(_bikeScoreGroup);
          {
-            final Label label = new Label(parent, SWT.NONE);
+            final Label label = new Label(_bikeScoreGroup, SWT.NONE);
             label.setText("BIKESCORE");
          }
       }

@@ -91,26 +91,26 @@ public class PrefPageGovss implements IPrefPageTrainingStressModel {
    /*
     * private Button _chkConvertWayPoints;
     */
-   private static Label                _labelThresholdPower_Value;
+   private static Label                 _labelThresholdPower_Value;
 
-   private static Label                _labelThresholdVelocity_Value;
+   private static Label                 _labelThresholdVelocity_Value;
 
-   private static Spinner              _spinnerThresholdPower_Distance;
-   private static Spinner              _spinnerThresholdPower_AverageSlope;
-   private static ActionOpenPrefDialog _actionOpenTourTypePrefs;
+   private static Spinner               _spinnerThresholdPower_Distance;
+   private static Spinner               _spinnerThresholdPower_AverageSlope;
+   private static ActionOpenPrefDialog  _actionOpenTourTypePrefs;
 
    // public  final String           ID        = "GOVSS";                                                             //$NON-NLS-1$
 
-   private IPreferenceStore            _prefStore   = Activator.getDefault().getPreferenceStore();
-   private final IDialogSettings       _importState = TourbookPlugin.getState(RawDataView.ID);
+   private IPreferenceStore      _prefStore   = Activator.getDefault().getPreferenceStore();
+   private final IDialogSettings _importState = TourbookPlugin.getState(RawDataView.ID);
 
-   private RawDataManager              _rawDataMgr  = RawDataManager.getInstance();
-   private PixelConverter              _pc;
+   private RawDataManager        _rawDataMgr  = RawDataManager.getInstance();
+   private PixelConverter        _pc;
 
-   private int                         DEFAULT_DESCRIPTION_WIDTH;
+   private int                   DEFAULT_DESCRIPTION_WIDTH;
 
-   private boolean                     _isUpdateUI;
-   private TabFolder                   _tabFolder;
+   private boolean               _isUpdateUI;
+   private TabFolder             _tabFolder;
 
    private Group                 _govssGroup;
 
@@ -576,8 +576,8 @@ public class PrefPageGovss implements IPrefPageTrainingStressModel {
          _govssGroup = new Group(parent, SWT.NONE);
          GridLayoutFactory.swtDefaults().numColumns(1).applyTo(_govssGroup);
          {
-         createUI_110_ThresholdPower(_govssGroup);
-         createUI_120_TourTypesList(_govssGroup);
+            createUI_110_ThresholdPower(_govssGroup);
+            createUI_120_TourTypesList(_govssGroup);
          }
       }
 
@@ -590,7 +590,6 @@ public class PrefPageGovss implements IPrefPageTrainingStressModel {
 
       return "GOVSS";
    }
-
 
    private void initUI(final Composite parent) {
 
