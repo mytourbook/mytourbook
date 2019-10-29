@@ -2789,24 +2789,24 @@ public class TourDatabase {
       //
             + SQL.CreateField_EntityId(ENTITY_ID_COMPARED, true)
             //
-            + "   RefTourId          BIGINT,                                               \n" //$NON-NLS-1$
-            + "   TourId             BIGINT,                                               \n" //$NON-NLS-1$
+            + "   RefTourId          BIGINT,                                           \n" //$NON-NLS-1$
+            + "   TourId             BIGINT,                                           \n" //$NON-NLS-1$
             //
-            + "   StartIndex         INTEGER NOT NULL,                                     \n" //$NON-NLS-1$
-            + "   EndIndex           INTEGER NOT NULL,                                     \n" //$NON-NLS-1$
-            + "   TourDate           DATE NOT NULL,                                        \n" //$NON-NLS-1$
-            + "   StartYear          INTEGER NOT NULL,                                     \n" //$NON-NLS-1$
-            + "   TourSpeed          FLOAT,                                                \n" //$NON-NLS-1$
+            + "   StartIndex         INTEGER NOT NULL,                                 \n" //$NON-NLS-1$
+            + "   EndIndex           INTEGER NOT NULL,                                 \n" //$NON-NLS-1$
+            + "   TourDate           DATE NOT NULL,                                    \n" //$NON-NLS-1$
+            + "   StartYear          INTEGER NOT NULL,                                 \n" //$NON-NLS-1$
+            + "   TourSpeed          FLOAT,                                            \n" //$NON-NLS-1$
             //
             // version 28 start
             //
-            + "   AvgPulse           FLOAT,                                                \n" //$NON-NLS-1$
+            + "   AvgPulse           FLOAT,                                            \n" //$NON-NLS-1$
             //
             // version 28 end ---------
             //
             // version 40 start
             //
-            + "   tourRecordingTime  INTEGER NOT NULL                                      \n" //$NON-NLS-1$
+            + "   tourRecordingTime  INTEGER DEFAULT 0                                 \n" //$NON-NLS-1$
             //
             // version 40 end ---------
             //
@@ -7319,16 +7319,16 @@ public class TourDatabase {
 // SET_FORMATTING_OFF
 
             // Add new columns
-            SQL.AddCol_VarCar (stmt, TABLE_TOUR_DATA, "power_DataSource",  TourData.DB_LENGTH_POWER_DATA_SOURCE);   //$NON-NLS-1$
-            SQL.AddCol_Int    (stmt, TABLE_TOUR_DATA, "cadenceZone_SlowTime", DEFAULT_0);//$NON-NLS-1$
-            SQL.AddCol_Int    (stmt, TABLE_TOUR_DATA, "cadenceZone_FastTime", DEFAULT_0); //$NON-NLS-1$
-            SQL.AddCol_Int    (stmt, TABLE_TOUR_DATA, "cadenceZones_DelimiterValue", DEFAULT_0); //$NON-NLS-1$
-            SQL.AddCol_Int    (stmt, TABLE_TOUR_DATA, "avgAltitudeChange", DEFAULT_0); //$NON-NLS-1$
+            SQL.AddCol_VarCar (stmt, TABLE_TOUR_DATA, "power_DataSource",              TourData.DB_LENGTH_POWER_DATA_SOURCE); //$NON-NLS-1$
+            SQL.AddCol_Int    (stmt, TABLE_TOUR_DATA, "cadenceZone_SlowTime",          DEFAULT_0);                            //$NON-NLS-1$
+            SQL.AddCol_Int    (stmt, TABLE_TOUR_DATA, "cadenceZone_FastTime",          DEFAULT_0);                            //$NON-NLS-1$
+            SQL.AddCol_Int    (stmt, TABLE_TOUR_DATA, "cadenceZones_DelimiterValue",   DEFAULT_0);                            //$NON-NLS-1$
+            SQL.AddCol_Int    (stmt, TABLE_TOUR_DATA, "avgAltitudeChange",             DEFAULT_0);                            //$NON-NLS-1$
+
+            SQL.AddCol_Int    (stmt, TABLE_TOUR_COMPARED, "tourRecordingTime",         DEFAULT_0);                            //$NON-NLS-1$
 
             // Create index in table: TOURDATA_TOURTAG - Index: TOURTAG_TAGID
             SQL.CreateIndex   (stmt, JOINTABLE__TOURDATA__TOURTAG, KEY_TAG);
-
-            SQL.AddCol_Int    (stmt, TABLE_TOUR_COMPARED, "tourRecordingTime", DEFAULT_0); //$NON-NLS-1$
 
 // SET_FORMATTING_ON
          }
@@ -7392,14 +7392,27 @@ public class TourDatabase {
       result = stmtSelect.executeQuery();
 
       int compTourCounter = 0;
+      long lastUpdateTime = startTime;
 
       while (result.next()) {
 
          if (splashManager != null) {
-            splashManager.setMessage(
-                  NLS.bind(//
-                        Messages.Tour_Database_PostUpdate_040_SetTourRecordingTime,
-                        new Object[] { ++compTourCounter, numberOfComparedTours }));
+
+            ++compTourCounter;
+
+            final long currentTime = System.currentTimeMillis();
+            final float timeDiff = currentTime - lastUpdateTime;
+
+            // reduce logging
+            if (timeDiff > 500) {
+
+               lastUpdateTime = currentTime;
+
+               splashManager.setMessage(
+                     NLS.bind(
+                           Messages.Tour_Database_PostUpdate_040_SetTourRecordingTime,
+                           new Object[] { compTourCounter, numberOfComparedTours }));
+            }
          }
 
          final long compareId = result.getLong(1);

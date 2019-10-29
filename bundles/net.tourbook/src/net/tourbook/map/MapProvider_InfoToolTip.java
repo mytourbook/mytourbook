@@ -41,6 +41,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -57,38 +58,38 @@ import org.eclipse.swt.widgets.Text;
  */
 public class MapProvider_InfoToolTip extends ToolTip {
 
-   private static final int SHELL_MARGIN = 5;
+   private static final int          SHELL_MARGIN = 5;
 
-   private MP               _mp;
+   private Slideout_Map2_MapProvider _slideout_Map2_MapProvider;
 
-   private Control          _ttControl;
+   private MP                        _mp;
 
-   private ColumnViewer     _tableViewer;
-   private ViewerCell       _viewerCell;
+   private Control                   _ttControl;
 
-   private boolean          _hasDescription;
-   private boolean          _hasOnlineMap;
-   private boolean          _hasTileLayerInfo;
-   private String           _tileLayerInfo;
+   private ColumnViewer              _tableViewer;
+   private ViewerCell                _viewerCell;
+
+   private boolean                   _hasDescription;
+   private boolean                   _hasOnlineMap;
+   private boolean                   _hasTileLayerInfo;
+   private String                    _tileLayerInfo;
 
    /*
     * UI controls
     */
-   private Composite                 _ttContainer;
+   private Composite _ttContainer;
 
-   private Button                    _chkIsIncludesHillshading;
-   private Button                    _chkIsTransparentLayer;
+   private Button    _chkIsIncludesHillshading;
+   private Button    _chkIsTransparentLayer;
 
-   private Text                      _txtDescription;
-   private Text                      _txtLayers;
-   private Text                      _txtMapProviderId;
-   private Text                      _txtMapProviderName;
-   private Text                      _txtMapProviderType;
-   private Text                      _txtOfflineFolder;
+   private Text      _txtDescription;
+   private Text      _txtLayers;
+   private Text      _txtMapProviderId;
+   private Text      _txtMapProviderName;
+   private Text      _txtMapProviderType;
+   private Text      _txtOfflineFolder;
 
-   private Link                      _linkOnlineMap;
-
-   private Slideout_Map2_MapProvider _slideout_Map2_MapProvider;
+   private Link      _linkOnlineMap;
 
    public MapProvider_InfoToolTip(final Slideout_Map2_MapProvider slideout_Map2_MapProvider, final TableViewer tableViewer) {
 
@@ -224,7 +225,8 @@ public class MapProvider_InfoToolTip extends ToolTip {
             if (_hasOnlineMap) {
 
                // label
-               createUI_Label(container, Messages.Map2Provider_Tooltip_Label_OnlineMap);
+               final Label label = createUI_Label(container, Messages.Map2Provider_Tooltip_Label_OnlineMap);
+               GridDataFactory.fillDefaults().align(SWT.FILL, SWT.TOP).applyTo(label);
 
                // link
                _linkOnlineMap = new Link(container, SWT.NONE);
@@ -246,11 +248,11 @@ public class MapProvider_InfoToolTip extends ToolTip {
              */
             if (_hasDescription) {
 
-               // label: description
+               // label
                final Label label = createUI_Label(container, Messages.Map2Provider_Tooltip_Label_Description);
                GridDataFactory.fillDefaults().align(SWT.FILL, SWT.TOP).applyTo(label);
 
-               // text: description
+               // text
                _txtDescription = new Text(container, SWT.READ_ONLY | SWT.WRAP);
                GridDataFactory.fillDefaults()
                      .span(3, 1)
@@ -298,10 +300,10 @@ public class MapProvider_InfoToolTip extends ToolTip {
              * Offline folder
              */
 
-            // label: offline folder
+            // label
             createUI_Label(container, Messages.Map2Provider_Tooltip_Lable_OfflineFolder);
 
-            // text: offline folder
+            // text
             _txtOfflineFolder = createUI_TextValue(container, SWT.LEAD);
          }
          {
@@ -484,6 +486,25 @@ public class MapProvider_InfoToolTip extends ToolTip {
 
    }
 
+   private void setMaxContentWidth(final Control control) {
+
+      final int maxContentWidth = 400;
+
+      final GridData gd = (GridData) control.getLayoutData();
+      final Point contentSize = control.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+
+      if (contentSize.x > maxContentWidth) {
+
+         // adjust max width
+         gd.widthHint = maxContentWidth;
+
+      } else {
+
+         // reset layout width
+         gd.widthHint = SWT.DEFAULT;
+      }
+   }
+
    private void setupContent() {
 
       _tileLayerInfo = MapProviderManager.getTileLayerInfo(_mp);
@@ -535,13 +556,18 @@ public class MapProvider_InfoToolTip extends ToolTip {
       _txtMapProviderName.setText(mapProvider.getName());
 
       if (_hasDescription) {
-         _txtDescription.setText(mapProvider.getDescription());
+         _txtDescription.setText(mapProvider.getDescription().trim());
+         setMaxContentWidth(_txtDescription);
       }
+
       if (_hasOnlineMap) {
          _linkOnlineMap.setText(net.tourbook.common.UI.getLinkFromText(mapProvider.getOnlineMapUrl()));
+         setMaxContentWidth(_linkOnlineMap);
       }
+
       if (_hasTileLayerInfo) {
          _txtLayers.setText(MapProviderManager.getTileLayerInfo(mapProvider));
+         setMaxContentWidth(_txtLayers);
       }
 
       // offline folder
