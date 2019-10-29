@@ -54,4 +54,16 @@ public class PrefPageBikeScore implements IPrefPageTrainingStressModel {
 
       return "BikeScore";
    }
+
+   @Override
+   public void restoreState() {
+      // TODO Auto-generated method stub
+
+   }
+
+   @Override
+   public void saveState() {
+      // TODO Auto-generated method stub
+
+   }
 }

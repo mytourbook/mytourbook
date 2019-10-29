@@ -25,4 +25,8 @@ public interface IPrefPageTrainingStressModel {
    public abstract Group getGroupUI(final Composite parent);
 
    public abstract String getId();
+
+   public abstract void restoreState();
+
+   public abstract void saveState();
 }

@@ -1711,8 +1711,8 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          _prefStore.removePropertyChangeListener(_prefChangeListener);
       }
 
-      for (int index = 0; index < _trainingStressModels.length; ++index) {
-         _trainingStressModels[index].dispose();
+      for (final IPrefPageTrainingStressModel _trainingStressModel : _trainingStressModels) {
+         _trainingStressModel.dispose();
       }
 
       if (_isNoUI) {
@@ -2153,6 +2153,10 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
       // reselected tab folder
       _tabFolderPerson.setSelection(Util.getStateInt(_state, STATE_SELECTED_TAB_FOLDER, 0));
+
+      // Current training stress model
+      final int index = _comboTrainingStressModel.getSelectionIndex();
+      _trainingStressModels[index].restoreState();
    }
 
    /**
@@ -2241,6 +2245,10 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       // selected tab folder
       final int selectedTab = _tabFolderPerson.getSelectionIndex();
       _state.put(STATE_SELECTED_TAB_FOLDER, selectedTab < 0 ? 0 : selectedTab);
+
+      // Current training stress model
+      final int index = _comboTrainingStressModel.getSelectionIndex();
+      _trainingStressModels[index].saveState();
    }
 
    private void updatePersonFromUI(final TourPerson person) {

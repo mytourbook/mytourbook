@@ -33,8 +33,6 @@ import net.tourbook.ui.views.rawData.RawDataView;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuCreator;
-import org.eclipse.jface.action.IMenuListener;
-import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.ToolBarManager;
@@ -68,7 +66,6 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Spinner;
-import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.ToolBar;
@@ -106,11 +103,6 @@ public class PrefPageGovss implements IPrefPageTrainingStressModel {
 
    private RawDataManager        _rawDataMgr  = RawDataManager.getInstance();
    private PixelConverter        _pc;
-
-   private int                   DEFAULT_DESCRIPTION_WIDTH;
-
-   private boolean               _isUpdateUI;
-   private TabFolder             _tabFolder;
 
    private Group                 _govssGroup;
 
@@ -265,8 +257,8 @@ public class PrefPageGovss implements IPrefPageTrainingStressModel {
     */
    private static void createUI_110_ThresholdPower(final Composite parent) {
 
-      final Group container = new Group(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().applyTo(container);
+      final Group container = new Group(parent, SWT.WRAP);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       container.setText(Messages.Pref_TrainingStress_Group_ThresholdPower);
       GridLayoutFactory.swtDefaults().numColumns(6).applyTo(container);
       {
@@ -274,10 +266,10 @@ public class PrefPageGovss implements IPrefPageTrainingStressModel {
             // label : Time
             Label label = new Label(container, SWT.NONE);
             label.setText(Messages.Pref_ThresholdPower_Label_Duration);
-            GridDataFactory.fillDefaults().grab(true, false).applyTo(label);
+            GridDataFactory.fillDefaults().applyTo(label);
 
             // text
-            _textThresholdPower_Duration = new DateTime(container, SWT.TIME | SWT.MEDIUM | SWT.BORDER);
+            _textThresholdPower_Duration = new DateTime(container, SWT.TIME | SWT.MEDIUM | SWT.BORDER | SWT.LEFT);
             _textThresholdPower_Duration.setToolTipText("TODO");//Messages.Pref_Weather_Label_ApiKey_Tooltip);
             _textThresholdPower_Duration.addSelectionListener(new SelectionAdapter() {
                @Override
@@ -287,14 +279,13 @@ public class PrefPageGovss implements IPrefPageTrainingStressModel {
             });
             GridDataFactory.fillDefaults()
                   .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
-                  .span(2, 1)
                   .applyTo(_textThresholdPower_Duration);
 
             // label : Time
             label = new Label(container, SWT.NONE);
             label.setText("Threshold velocity");//Messages.Pref_ThresholdPower_Label_Duration);
             label.setFont(_boldFont);
-            GridDataFactory.fillDefaults().indent(60, 0).applyTo(label);
+            GridDataFactory.fillDefaults().indent(60, 0).span(2, 1).applyTo(label);
 
             // text
             _labelThresholdVelocity_Value = new Label(container, SWT.NONE);
@@ -309,8 +300,7 @@ public class PrefPageGovss implements IPrefPageTrainingStressModel {
             // label : Distance
             label = new Label(container, SWT.NONE);
             label.setText(Messages.Pref_ThresholdPower_Label_Distance);
-            GridDataFactory.fillDefaults()
-                  .applyTo(label);
+            GridDataFactory.fillDefaults().applyTo(label);
 
             // text
             _spinnerThresholdPower_Distance = new Spinner(container, SWT.BORDER);
@@ -324,7 +314,6 @@ public class PrefPageGovss implements IPrefPageTrainingStressModel {
                }
             });
             GridDataFactory.fillDefaults()
-                  .grab(true, false)
                   .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
                   .applyTo(_spinnerThresholdPower_Distance);
 
@@ -335,13 +324,13 @@ public class PrefPageGovss implements IPrefPageTrainingStressModel {
             // label : Time
             label = new Label(container, SWT.NONE);
             label.setText("Threshold Power");//Messages.Pref_ThresholdPower_Label_Duration);
-            GridDataFactory.fillDefaults()
-                  .indent(60, 0)
+            GridDataFactory.fillDefaults().indent(60, 0)
                   .applyTo(label);
 
             // text
             _labelThresholdPower_Value = new Label(container, SWT.NONE);
             _labelThresholdPower_Value.setFont(_boldFont);
+            _labelThresholdPower_Value.setSize(50, 20);
             GridDataFactory.fillDefaults()
                   .applyTo(_labelThresholdPower_Value);
 
@@ -493,87 +482,19 @@ public class PrefPageGovss implements IPrefPageTrainingStressModel {
       _labelThresholdVelocity_Value.setText(criticalPace.toString());
    }
 
-   /**
-    * create the drop down menus, this must be created after the parent control is created
-    */
-   private void createMenus() {
-
-      /*
-       * Context menu: Tour type
-       */
-      final MenuManager menuMgr = new MenuManager();
-      menuMgr.setRemoveAllWhenShown(true);
-      menuMgr.addMenuListener(new IMenuListener() {
-         @Override
-         public void menuAboutToShow(final IMenuManager menuMgr) {
-            fillTourTypeMenu(menuMgr);
-         }
-      });
-   }
-
-   private Composite createUIHere(final Composite parent) {
-
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory
-            .fillDefaults()//
-            .grab(true, true)
-            .applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(1).spacing(0, 15).applyTo(container);
-      {
-         /*
-          * label: Training stress info
-          */
-         final Label label = new Label(container, SWT.WRAP);
-         GridDataFactory.fillDefaults().hint(DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT).applyTo(label);
-         label.setText(Messages.Training_Stress_Label_Info);
-
-         /*
-          * tab folder: training stress
-          */
-         _tabFolder = new TabFolder(container, SWT.TOP);
-         GridDataFactory
-               .fillDefaults()//
-               .grab(true, true)
-               .applyTo(_tabFolder);
-         {
-
-            //tab GOVSS
-            // final TabItem tabGovss = new TabItem(_tabFolder, SWT.NONE);
-            // tabGovss.setControl(createUI_100_Govss(_tabFolder));
-            //   tabGovss.setText(Messages.Training_Stress_Group_Govss);
-         }
-      }
-
-      return _tabFolder;
-   }
-
    @Override
    public void dispose() {
       _govssGroup = null;
 
    }
 
-   private void fillTourTypeMenu(final IMenuManager menuMgr) {
-
-      // add all tour types to the menu
-      final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
-
-      for (final TourType tourType : tourTypes) {
-
-         final boolean isChecked = false;
-         final Action_TourType action = new Action_TourType(tourType, isChecked);
-
-         menuMgr.add(action);
-      }
-
-      menuMgr.add(new Separator());
-      menuMgr.add(_actionOpenTourTypePrefs);
-   }
    /**
     * UI for the GOVSS preferences
     */
    @Override
    public Group getGroupUI(final Composite parent) {
+
+      initUI(parent);
 
       createActions();
 
@@ -600,9 +521,7 @@ public class PrefPageGovss implements IPrefPageTrainingStressModel {
 
       _pc = new PixelConverter(parent);
 
-      DEFAULT_DESCRIPTION_WIDTH = _pc.convertWidthInCharsToPixels(80);
       _hintDefaultSpinnerWidth = UI.IS_LINUX ? SWT.DEFAULT : _pc.convertWidthInCharsToPixels(UI.IS_OSX ? 10 : 5);
-
    }
 
    /*
@@ -630,7 +549,8 @@ public class PrefPageGovss implements IPrefPageTrainingStressModel {
     * }
     */
 
-   private void restoreState() {
+   @Override
+   public void restoreState() {
 
       _textThresholdPower_Duration.setHours(_prefStore.getInt(ITourbookPreferences.TRAININGSTRESS_GOVSS_THRESHOLD_POWER_DURATION_HOURS));
       _textThresholdPower_Duration.setMinutes(_prefStore.getInt(ITourbookPreferences.TRAININGSTRESS_GOVSS_THRESHOLD_POWER_DURATION_MINUTES));
@@ -638,7 +558,8 @@ public class PrefPageGovss implements IPrefPageTrainingStressModel {
 
    }
 
-   private void saveState() {
+   @Override
+   public void saveState() {
 
       _prefStore.setValue(ITourbookPreferences.TRAININGSTRESS_GOVSS_THRESHOLD_POWER_DURATION_HOURS, _textThresholdPower_Duration.getHours());
       _prefStore.setValue(ITourbookPreferences.TRAININGSTRESS_GOVSS_THRESHOLD_POWER_DURATION_MINUTES, _textThresholdPower_Duration.getMinutes());
