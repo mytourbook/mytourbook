@@ -673,7 +673,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
             public void widgetSelected(final SelectionEvent e) {
                final int index = _comboTrainingStressModel.getSelectionIndex();
                _trainingStressLayout.topControl =
-                     _trainingStressModels[index].getGroupUI(_trainingStressComposite);
+                     _trainingStressModels[index].getGroupUI(_trainingStressComposite, getCurrentPerson());
                _trainingStressComposite.layout(true);
             }
          });
@@ -683,7 +683,8 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          _trainingStressComposite.setLayout(_trainingStressLayout);
          _trainingStressLayout.topControl =
                _trainingStressModels[_comboTrainingStressModel.getSelectionIndex()].getGroupUI(
-                     _trainingStressComposite);
+                     _trainingStressComposite,
+                     getCurrentPerson());
 
          GridDataFactory
                .fillDefaults()//

@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.trainingstress;
 
+import net.tourbook.data.TourPerson;
+
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 
@@ -22,7 +24,7 @@ public interface IPrefPageTrainingStressModel {
 
    public abstract void dispose();
 
-   public abstract Group getGroupUI(final Composite parent);
+   public abstract Group getGroupUI(final Composite parent, final TourPerson tourPerson);
 
    public abstract String getId();
 

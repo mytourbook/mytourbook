@@ -515,13 +515,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ITourbookPreferences.WEATHER_USE_WEATHER_RETRIEVAL,false);
       store.setDefault(ITourbookPreferences.WEATHER_API_KEY, UI.EMPTY_STRING);
 
-      /*
-       * Training stress
-       */
-      store.setDefault(ITourbookPreferences.TRAININGSTRESS_GOVSS_THRESHOLD_POWER_DURATION_HOURS,0);
-      store.setDefault(ITourbookPreferences.TRAININGSTRESS_GOVSS_THRESHOLD_POWER_DURATION_MINUTES,0);
-      store.setDefault(ITourbookPreferences.TRAININGSTRESS_GOVSS_THRESHOLD_POWER_DURATION_SECONDS,0);
-
 // SET_FORMATTING_ON
    }
 

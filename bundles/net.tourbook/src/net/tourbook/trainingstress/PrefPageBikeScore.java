@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.trainingstress;
 
+import net.tourbook.data.TourPerson;
+
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -22,7 +24,8 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 
 public class PrefPageBikeScore implements IPrefPageTrainingStressModel {
-   private Group _bikeScoreGroup;
+   private TourPerson _tourPerson;
+   private Group      _bikeScoreGroup;
 
    @Override
    public void dispose() {
@@ -34,7 +37,9 @@ public class PrefPageBikeScore implements IPrefPageTrainingStressModel {
     * UI for the BikeScore preferences
     */
    @Override
-   public Group getGroupUI(final Composite parent) {
+   public Group getGroupUI(final Composite parent, final TourPerson tourPerson) {
+
+      _tourPerson = tourPerson;
 
       if (_bikeScoreGroup == null) {
          _bikeScoreGroup = new Group(parent, SWT.NONE);
