@@ -61,6 +61,7 @@ public class TourPerson implements Comparable<Object> {
 	public static final int					DB_LENGTH_FIRST_NAME		= 80;
 	public static final int					DB_LENGTH_RAW_DATA_PATH		= 255;
 	public static final int					DB_LENGTH_DEVICE_READER_ID	= 255;
+   public static final int                 DB_LENGTH_GOVSS_ASSOCIATED_TOUR_TYPES = 255;
 
 	public static final int					PERSON_ID_NOT_DEFINED		= -1;
 
@@ -88,7 +89,16 @@ public class TourPerson implements Comparable<Object> {
 
    private float							height;
 
+   /**
+    * Training Stress data
+    */
+
+   // GOVSS
    private int                             govssThresholdPower;
+   private int                             govssTimeTrialDuration;
+   private int                             govssTimeTrialDistance;
+   private float                           govssTimeTrialAverageSlope;
+   private String                          govssAssociatedTourTypes;
 
 	/**
 	 * Birthday of this person in milliseconds from 1970-01-01T00:00:00, default value is 0 when
@@ -348,8 +358,24 @@ public class TourPerson implements Comparable<Object> {
 		return gender;
 	}
 
-   public int getGovssThresholdPower() {
+   public String getGovssAssociatedTourTypes() {
+      return govssAssociatedTourTypes;
+   }
+
+	public int getGovssThresholdPower() {
       return govssThresholdPower;
+   }
+
+	public float getGovssTimeTrialAverageSlope() {
+      return govssTimeTrialAverageSlope;
+   }
+
+	public int getGovssTimeTrialDistance() {
+      return govssTimeTrialDistance;
+   }
+
+   public int getGovssTimeTrialDuration() {
+      return govssTimeTrialDuration;
    }
 
 	public float getHeight() {
@@ -533,7 +559,7 @@ public class TourPerson implements Comparable<Object> {
 		_hrZoneMinMaxBpm.clear();
 	}
 
-	public void setBirthDay(final long birthDay) {
+   public void setBirthDay(final long birthDay) {
 		this.birthDay = birthDay;
 	}
 
@@ -549,19 +575,35 @@ public class TourPerson implements Comparable<Object> {
 		this.gender = gender;
 	}
 
-   public void setGovssThresholdPower(final int govssThresholdPower) {
+	public void setGovssAssociatedTourTypes(final String govssAssociatedTourTypes) {
+      this.govssAssociatedTourTypes = govssAssociatedTourTypes;
+   }
+
+	public void setGovssThresholdPower(final int govssThresholdPower) {
       this.govssThresholdPower = govssThresholdPower;
    }
 
-	public void setHeight(final float height) {
+	public void setGovssTimeTrialAverageSlope(final float govssTimeTrialAverageSlope) {
+      this.govssTimeTrialAverageSlope = govssTimeTrialAverageSlope;
+   }
+
+	public void setGovssTimeTrialDistance(final int govssTimeTrialDistance) {
+      this.govssTimeTrialDistance = govssTimeTrialDistance;
+   }
+
+   public void setGovssTimeTrialDuration(final int govssTimeTrialDuration) {
+      this.govssTimeTrialDuration = govssTimeTrialDuration;
+   }
+
+   public void setHeight(final float height) {
 		this.height = height;
 	}
 
-	public void setHrMaxFormula(final int hrMaxFormula) {
+   public void setHrMaxFormula(final int hrMaxFormula) {
 		this.hrMaxFormula = hrMaxFormula;
 	}
 
-	public void setHrZones(final Set<TourPersonHRZone> hrZones) {
+   public void setHrZones(final Set<TourPersonHRZone> hrZones) {
 
 		this.hrZones = hrZones;
 
@@ -573,23 +615,23 @@ public class TourPerson implements Comparable<Object> {
 		}
 	}
 
-	public void setLastName(final String lastName) {
+   public void setLastName(final String lastName) {
 		this.lastName = lastName;
 	}
 
-	public void setMaxPulse(final int maxPulse) {
+   public void setMaxPulse(final int maxPulse) {
 		this.maxPulse = maxPulse;
 	}
 
-	public void setRawDataPath(final String rawDataPath) {
+   public void setRawDataPath(final String rawDataPath) {
 		this.rawDataPath = rawDataPath;
 	}
 
-	public void setRestPulse(final int restPulse) {
+   public void setRestPulse(final int restPulse) {
 		this.restPulse = restPulse;
 	}
 
-	public void setTourBike(final TourBike tourBike) {
+   public void setTourBike(final TourBike tourBike) {
 		this.tourBike = tourBike;
 	}
 

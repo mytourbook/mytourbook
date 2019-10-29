@@ -3309,7 +3309,11 @@ public class TourDatabase {
 
             // version 41 start
             //
-            + "   govssThresholdPower    INTEGER DEFAULT 0,                                       \n" //$NON-NLS-1$
+            + "   govssThresholdPower        INTEGER DEFAULT 0,                                       \n" //$NON-NLS-1$
+            + "   govssTimeTrialDuration     INTEGER DEFAULT 0,                                       \n" //$NON-NLS-1$
+            + "   govssTimeTrialDistance     INTEGER DEFAULT 0,                                       \n" //$NON-NLS-1$
+            + "   govssTimeTrialAverageSlope INTEGER DEFAULT 0,                                       \n" //$NON-NLS-1$
+            + "   govssAssociatedTourTypes   VARCHAR(" + TourPerson.DB_LENGTH_GOVSS_ASSOCIATED_TOUR_TYPES + "),     \n" //$NON-NLS-1$ //$NON-NLS-2$
             //
             // version 41 end ---------
 
@@ -7483,8 +7487,12 @@ public class TourDatabase {
 
             // Add new columns
             SQL.AddCol_Int      (stmt, TABLE_TOUR_DATA, "govss", DEFAULT_0);//$NON-NLS-1$
-
             SQL.AddCol_Int      (stmt, TABLE_TOUR_PERSON, "govssThresholdPower", DEFAULT_0);//$NON-NLS-1$
+            SQL.AddCol_Int      (stmt, TABLE_TOUR_PERSON, "govssTimeTrialDuration", DEFAULT_0);//$NON-NLS-1$
+            SQL.AddCol_Int      (stmt, TABLE_TOUR_PERSON, "govssTimeTrialDistance", DEFAULT_0);//$NON-NLS-1$
+            SQL.AddCol_Int      (stmt, TABLE_TOUR_PERSON, "govssTimeTrialAverageSlope", DEFAULT_0);//$NON-NLS-1$
+            SQL.AddCol_VarCar   (stmt, TABLE_TOUR_PERSON, "govssAssociatedTourTypes", TourPerson.DB_LENGTH_GOVSS_ASSOCIATED_TOUR_TYPES); //$NON-NLS-1$
+
 
 // SET_FORMATTING_ON
          }

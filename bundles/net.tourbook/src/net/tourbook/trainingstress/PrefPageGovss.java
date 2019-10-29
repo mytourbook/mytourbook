@@ -16,19 +16,15 @@
 package net.tourbook.trainingstress;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.chart.Activator;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.util.TableLayoutComposite;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.importdata.RawDataManager;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tourType.TourTypeImage;
 
@@ -40,7 +36,6 @@ import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.CellLabelProvider;
@@ -97,17 +92,12 @@ public class PrefPageGovss implements IPrefPageTrainingStressModel {
    private static Spinner               _spinnerThresholdPower_AverageSlope;
    private static ActionOpenPrefDialog  _actionOpenTourTypePrefs;
 
-   // public  final String           ID        = "GOVSS";                                                             //$NON-NLS-1$
+   private PixelConverter               _pc;
 
-   private IPreferenceStore _prefStore  = Activator.getDefault().getPreferenceStore();
+   private Group                        _govssGroup;
+   private TourPerson                   _tourPerson;
 
-   private RawDataManager   _rawDataMgr = RawDataManager.getInstance();
-   private PixelConverter   _pc;
-
-   private Group            _govssGroup;
-   private TourPerson       _tourPerson;
-
-   private static class Action_TourType extends Action {
+   private class Action_TourType extends Action {
 
       private TourType _tourType;
 
@@ -138,7 +128,7 @@ public class PrefPageGovss implements IPrefPageTrainingStressModel {
       }
    }
 
-   private static class ActionTourType_Add extends Action implements IMenuCreator {
+   private class ActionTourType_Add extends Action implements IMenuCreator {
 
       private Menu _menu;
 
@@ -241,16 +231,6 @@ public class PrefPageGovss implements IPrefPageTrainingStressModel {
          enableControls();
       }
 
-   }
-
-   private static void createActions() {
-
-      _action_TourType_Add = new ActionTourType_Add();
-      _action_TourType_Remove = new ActionTourType_Remove();
-
-      _actionOpenTourTypePrefs = new ActionOpenPrefDialog(
-            Messages.action_tourType_modify_tourTypes,
-            ITourbookPreferences.PREF_PAGE_TOUR_TYPE);
    }
 
    /**
@@ -473,15 +453,19 @@ public class PrefPageGovss implements IPrefPageTrainingStressModel {
       _action_TourType_Remove.setEnabled(isTourTypeSelected);
    }
 
+   private static int getTimeTrialDuration() {
+      return _textThresholdPower_Duration_Hours.getSelection() * 3600 + _textThresholdPower_Duration_Minutes
+            .getSelection() * 60 +
+            _textThresholdPower_Duration_Seconds.getSelection();
+   }
+
    private static void onComputeThresholdPower() {
 
       //TODO this person should be passed by the prefpagepeople code
       final TourPerson tourPerson = TourbookPlugin.getActivePerson();
 
       //Total duration in seconds
-      final float thresholdPowerDuration = _textThresholdPower_Duration_Hours.getSelection() * 3600f + _textThresholdPower_Duration_Minutes
-            .getSelection() * 60f +
-            _textThresholdPower_Duration_Seconds.getSelection();
+      final int thresholdPowerDuration = getTimeTrialDuration();
       float thresholdPowerDistance = (_spinnerThresholdPower_Distance.getSelection() / 10f) * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
       if (tourPerson == null || thresholdPowerDuration <= 0 || thresholdPowerDistance <= 0) {
          _labelThresholdPower_Value.setText("0");
@@ -526,6 +510,16 @@ public class PrefPageGovss implements IPrefPageTrainingStressModel {
 
       _labelThresholdVelocity_Value.setText(criticalPace.toString());
       _labelThresholdVelocity_Value.requestLayout();
+   }
+
+   private void createActions() {
+
+      _action_TourType_Add = new ActionTourType_Add();
+      _action_TourType_Remove = new ActionTourType_Remove();
+
+      _actionOpenTourTypePrefs = new ActionOpenPrefDialog(
+            Messages.action_tourType_modify_tourTypes,
+            ITourbookPreferences.PREF_PAGE_TOUR_TYPE);
    }
 
    @Override
@@ -580,42 +574,65 @@ public class PrefPageGovss implements IPrefPageTrainingStressModel {
    @Override
    public void restoreState() {
 
-      _textThresholdPower_Duration_Hours.setSelection(_prefStore.getInt(ITourbookPreferences.TRAININGSTRESS_GOVSS_THRESHOLD_POWER_DURATION_HOURS));
-      _textThresholdPower_Duration_Minutes.setSelection(_prefStore.getInt(
-            ITourbookPreferences.TRAININGSTRESS_GOVSS_THRESHOLD_POWER_DURATION_MINUTES));
-      _textThresholdPower_Duration_Seconds.setSelection(_prefStore.getInt(
-            ITourbookPreferences.TRAININGSTRESS_GOVSS_THRESHOLD_POWER_DURATION_SECONDS));
-      _spinnerThresholdPower_Distance.setSelection(_prefStore.getInt(ITourbookPreferences.TRAININGSTRESS_GOVSS_THRESHOLD_POWER_DISTANCE));
-      _spinnerThresholdPower_AverageSlope.setSelection(_prefStore.getInt(ITourbookPreferences.TRAININGSTRESS_GOVSS_THRESHOLD_POWER_AVERAGE_SLOPE));
+      if (_tourPerson == null) {
+         return;
+      }
 
-      //TODO a class like TourPersonHRZone
-      /*
-       * for (final TourType tourType : _tourPerson.getGovssTourTypes()) {
-       * _tourTypesViewer.add(tourType);
-       * }
-       */
+      float testDuration = _tourPerson.getGovssTimeTrialDuration() / 3600f;
+      _textThresholdPower_Duration_Hours.setSelection(Math.round(testDuration));
+      testDuration -= Math.round(testDuration);
+      testDuration *= 60f;
+      _textThresholdPower_Duration_Minutes.setSelection(Math.round(testDuration));
+      testDuration -= Math.round(testDuration);
+      testDuration *= 60f;
+      _textThresholdPower_Duration_Seconds.setSelection(Math.round(testDuration));
+
+      _spinnerThresholdPower_Distance.setSelection(_tourPerson.getGovssTimeTrialDistance());
+      _spinnerThresholdPower_AverageSlope.setSelection((int) _tourPerson.getGovssTimeTrialAverageSlope());
+
+      final String govssAssociatedTourTypes = _tourPerson.getGovssAssociatedTourTypes();
+
+      if (govssAssociatedTourTypes == null || govssAssociatedTourTypes.equals(UI.EMPTY_STRING)) {
+         return;
+      }
+
+      final String[] associatedTourTypes = _tourPerson.getGovssAssociatedTourTypes().split(";");
+
+      // add the tour types that have not been added already to the menu
+      final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
+      for (final TourType tourType : tourTypes) {
+
+         for (final String currentItem : associatedTourTypes) {
+            if (currentItem.equals(String.valueOf(tourType.getTypeId()))) {
+
+               _tourTypesViewer.add(tourType);
+               break;
+            }
+         }
+      }
+
    }
 
    @Override
    public void saveState() {
 
-      _prefStore.setValue(ITourbookPreferences.TRAININGSTRESS_GOVSS_THRESHOLD_POWER_DURATION_HOURS,
-            _textThresholdPower_Duration_Hours.getSelection());
-      _prefStore.setValue(ITourbookPreferences.TRAININGSTRESS_GOVSS_THRESHOLD_POWER_DURATION_MINUTES,
-            _textThresholdPower_Duration_Minutes.getSelection());
-      _prefStore.setValue(ITourbookPreferences.TRAININGSTRESS_GOVSS_THRESHOLD_POWER_DURATION_SECONDS,
-            _textThresholdPower_Duration_Seconds.getSelection());
-      _prefStore.setValue(ITourbookPreferences.TRAININGSTRESS_GOVSS_THRESHOLD_POWER_DISTANCE, _spinnerThresholdPower_Distance.getSelection());
-      _prefStore.setValue(ITourbookPreferences.TRAININGSTRESS_GOVSS_THRESHOLD_POWER_AVERAGE_SLOPE,
-            _spinnerThresholdPower_AverageSlope.getSelection());
+      if (_tourPerson == null) {
+         return;
+      }
 
-      final Set<TourType> govssTourTypes = new HashSet<>();
-      for (int index = 0; index < _tourTypesViewer.getTable().getSelectionCount(); ++index) {
+      _tourPerson.setGovssThresholdPower(Integer.valueOf(_labelThresholdPower_Value.getText()));
+      _tourPerson.setGovssTimeTrialDuration(getTimeTrialDuration());
+      _tourPerson.setGovssTimeTrialDistance(_spinnerThresholdPower_Distance.getSelection());
+      _tourPerson.setGovssTimeTrialAverageSlope(_spinnerThresholdPower_AverageSlope.getSelection());
+
+      final StringBuilder associatedTourTypes = new StringBuilder();
+
+      for (int index = 0; index < _tourTypesViewer.getTable().getItemCount(); ++index) {
          final TourType tourType = (TourType) _tourTypesViewer.getElementAt(index);
-         govssTourTypes.add(tourType);
+         associatedTourTypes.append(tourType.getTypeId() + ";");
 
       }
-      /* _tourPerson.setGovssTourTypes(govssTourTypes); */
-      _tourPerson.setGovssThresholdPower(Integer.valueOf(_labelThresholdPower_Value.getText()));
+
+      _tourPerson.setGovssAssociatedTourTypes(associatedTourTypes.toString());
    }
 }
