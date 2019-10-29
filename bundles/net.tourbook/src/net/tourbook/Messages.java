@@ -2686,6 +2686,8 @@ public class Messages extends NLS {
    public static String tour_editor_label_tour_tag;
    public static String tour_editor_label_tour_title;
    public static String tour_editor_label_tour_type;
+   public static String tour_editor_label_trainingstress_govss;
+   public static String tour_editor_label_trainingstress_govss_tooltip;
    public static String tour_editor_label_wind_direction;
    public static String tour_editor_label_wind_direction_Tooltip;
    public static String tour_editor_label_wind_speed;
@@ -2701,6 +2703,7 @@ public class Messages extends NLS {
    public static String tour_editor_section_date_time;
    public static String tour_editor_section_tour;
    public static String tour_editor_section_personal;
+   public static String tour_editor_section_trainingstress;
    public static String tour_editor_section_weather;
    public static String tour_editor_tabLabel_tour;
    public static String tour_editor_tabLabel_tour_data;

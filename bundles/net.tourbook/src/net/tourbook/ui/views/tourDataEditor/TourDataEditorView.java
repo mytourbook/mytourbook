@@ -612,6 +612,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private Spinner           _spinPerson_Calories;
    private Spinner           _spinPerson_FTP;
    private Spinner           _spinPerson_RestPuls;
+   private Spinner           _spinTrainingStress_Govss;
    private Spinner           _spinWeather_Humidity;
    private Spinner           _spinWeather_PrecipitationValue;
    private Spinner           _spinWeather_PressureValue;
@@ -3720,60 +3721,46 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    private void createUI_Section_140_TrainingStress(final Composite parent) {
 
-      _sectionWeather = createSection(parent, _tk, "Training Stress"/*
-                                                                     * Messages.
-                                                                     * tour_editor_section_weather
-                                                                     */, false, true);
+      _sectionWeather = createSection(parent, _tk, Messages.tour_editor_section_trainingstress, false, true);
       final Composite container = (Composite) _sectionWeather.getClient();
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults()
             .numColumns(2)
             .spacing(COLUMN_SPACING, 7)
             .applyTo(container);
-//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
       {
-         createUI_Section_141_TrainingStress_Description(container);
-
-         /*
-          * createUI_Section_142_Weather_Wind_Col1(container);
-          * createUI_Section_143_Weather_Wind_Col2(container);
-          * createUI_Section_144_Weather_Temperature_Col1(container);
-          * createUI_Section_144_Weather_Temperature_Col2(container);
-          * createUI_Section_147_Weather_Other_Col1(container);
-          * createUI_Section_148_Weather_Other_Col2(container);
-          */
+         createUI_Section_141_TrainingStress_Col1(container);
       }
    }
 
-   private void createUI_Section_141_TrainingStress_Description(final Composite parent) {
+   private void createUI_Section_141_TrainingStress_Col1(final Composite parent) {
 
       final Composite container = _tk.createComposite(parent);
-      GridDataFactory.fillDefaults().span(2, 1).grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+      GridDataFactory.fillDefaults().applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+      _firstColumnContainerControls.add(container);
       {
-         /*
-          * training stress description
-          */
-         final Label label = _tk.createLabel(container, "Training Stress");//Messages.Tour_Editor_Label_Weather);
-         GridDataFactory.swtDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
-         _firstColumnControls.add(label);
+         {
+            /*
+             * GOVSS
+             */
 
-         /*
-          * _txtWeather = _tk.createText(
-          * container, //
-          * UI.EMPTY_STRING,
-          * SWT.BORDER | SWT.WRAP | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL//
-          * );
-          * _txtWeather.addModifyListener(_modifyListener);
-          * GridDataFactory.fillDefaults()
-          * .grab(true, true)
-          * //
-          * // SWT.DEFAULT causes lots of problems with the layout therefore the hint is set
-          * //
-          * .hint(_hintTextColumnWidth, _pc.convertHeightInCharsToPixels(2))
-          * .applyTo(_txtWeather);
-          */
+            // label
+            final Label label = _tk.createLabel(container, Messages.tour_editor_label_trainingstress_govss);
+            label.setToolTipText(Messages.tour_editor_label_trainingstress_govss_tooltip);
+            _firstColumnControls.add(label);
+
+            // spinner
+            _spinTrainingStress_Govss = new Spinner(container, SWT.BORDER);
+            GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_spinTrainingStress_Govss);
+            _spinTrainingStress_Govss.setEnabled(false);
+            _spinTrainingStress_Govss.setMinimum(0);
+            _spinTrainingStress_Govss.setMaximum(1_000_000_000);
+
+            _spinTrainingStress_Govss.addMouseWheelListener(_mouseWheelListener);
+            _spinTrainingStress_Govss.addSelectionListener(_selectionListener);
+
+         }
       }
    }
 
@@ -8393,6 +8380,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       final boolean isSpm = cadence == 2.0f;
       _rdoCadence_Rpm.setSelection(!isSpm);
       _rdoCadence_Spm.setSelection(isSpm);
+
+      // Training stress
+      _spinTrainingStress_Govss.setSelection(_tourData.getGovss());
 
       /*
        * layout container to resize labels
