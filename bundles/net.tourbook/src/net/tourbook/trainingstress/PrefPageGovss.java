@@ -271,6 +271,7 @@ public class PrefPageGovss implements IPrefPageTrainingStressModel {
 
             _textThresholdPower_Duration_Hours = new Spinner(container, SWT.TIME | SWT.MEDIUM | SWT.BORDER);
             _textThresholdPower_Duration_Hours.setToolTipText("TODO");//Messages.Pref_Weather_Label_ApiKey_Tooltip);
+            _textThresholdPower_Duration_Hours.setMaximum(23);
             _textThresholdPower_Duration_Hours.addSelectionListener(new SelectionAdapter() {
                @Override
                public void widgetSelected(final SelectionEvent e) {
@@ -281,6 +282,7 @@ public class PrefPageGovss implements IPrefPageTrainingStressModel {
 
             _textThresholdPower_Duration_Minutes = new Spinner(container, SWT.TIME | SWT.MEDIUM | SWT.BORDER);
             _textThresholdPower_Duration_Minutes.setToolTipText("TODO");//Messages.Pref_Weather_Label_ApiKey_Tooltip);
+            _textThresholdPower_Duration_Minutes.setMaximum(59);
             _textThresholdPower_Duration_Minutes.addSelectionListener(new SelectionAdapter() {
                @Override
                public void widgetSelected(final SelectionEvent e) {
@@ -291,43 +293,28 @@ public class PrefPageGovss implements IPrefPageTrainingStressModel {
 
             _textThresholdPower_Duration_Seconds = new Spinner(container, SWT.TIME | SWT.MEDIUM | SWT.BORDER);
             _textThresholdPower_Duration_Seconds.setToolTipText("TODO");//Messages.Pref_Weather_Label_ApiKey_Tooltip);
+            _textThresholdPower_Duration_Seconds.setMaximum(59);
             _textThresholdPower_Duration_Seconds.addSelectionListener(new SelectionAdapter() {
                @Override
                public void widgetSelected(final SelectionEvent e) {
                   onComputeThresholdPower();
                }
             });
-            GridDataFactory.fillDefaults().hint(_hintDefaultSpinnerWidth, SWT.DEFAULT).applyTo(_textThresholdPower_Duration_Seconds);
+            GridDataFactory.fillDefaults().hint(_hintDefaultSpinnerWidth, SWT.DEFAULT).span(5, 1).align(SWT.BEGINNING, SWT.CENTER).applyTo(
+                  _textThresholdPower_Duration_Seconds);
 
-            // label : Time
-            label = new Label(container, SWT.NONE);
-            label.setText("Threshold velocity");//Messages.Pref_ThresholdPower_Label_Duration);
-            label.setFont(_boldFont);
-            GridDataFactory.fillDefaults().indent(60, 0).align(SWT.BEGINNING, SWT.CENTER).span(2, 1).applyTo(label);
-
-            // text
-            _labelThresholdVelocity_Value = new Label(container, SWT.NONE);
-            _labelThresholdVelocity_Value.setFont(_boldFont);
-            final GridData gd = new GridData();
-            gd.widthHint = _hintDefaultSpinnerWidth;
-            _labelThresholdVelocity_Value.setLayoutData(gd);
-            GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).applyTo(_labelThresholdVelocity_Value);
-
-            // label:
-            label = new Label(container, SWT.NONE);
-            label.setText(UI.UNIT_LABEL_PACE);
-            label.setFont(_boldFont);
-            GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).applyTo(label);
+            // ROW #2
 
             // label : Distance
             label = new Label(container, SWT.NONE);
             label.setText(Messages.Pref_ThresholdPower_Label_Distance);
             GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(label);
 
-            // text
+            // Text entry for the distance
             _spinnerThresholdPower_Distance = new Spinner(container, SWT.BORDER);
             _spinnerThresholdPower_Distance.setToolTipText("");//Messages.Pref_Weather_Label_ApiKey_Tooltip);
             _spinnerThresholdPower_Distance.setDigits(1);
+            _spinnerThresholdPower_Distance.setMaximum(500);
             _spinnerThresholdPower_Distance.addSelectionListener(new SelectionAdapter() {
                @Override
                public void widgetSelected(final SelectionEvent e) {
@@ -339,32 +326,34 @@ public class PrefPageGovss implements IPrefPageTrainingStressModel {
                   .align(SWT.LEFT, SWT.CENTER)
                   .applyTo(_spinnerThresholdPower_Distance);
 
-            // label: m or mi
+            // label: km or mi
             label = new Label(container, SWT.NONE);
             label.setText(UI.UNIT_LABEL_DISTANCE);
             GridDataFactory.fillDefaults()
-                  .span(3, 1)
                   .align(SWT.LEFT, SWT.CENTER)
                   .applyTo(label);
 
             // label : Time
             label = new Label(container, SWT.NONE);
-            label.setText("Threshold Power");//Messages.Pref_ThresholdPower_Label_Duration);
-            GridDataFactory.fillDefaults().indent(60, 0).align(SWT.BEGINNING, SWT.CENTER)
-                  .applyTo(label);
+            label.setText("Threshold velocity");//Messages.Pref_ThresholdPower_Label_Duration);
+            label.setFont(_boldFont);
+            GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(label);
 
             // text
-            _labelThresholdPower_Value = new Label(container, SWT.NONE);
-            _labelThresholdPower_Value.setFont(_boldFont);
-            GridDataFactory.fillDefaults()
-                  .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
-                  .align(SWT.BEGINNING, SWT.CENTER)
-                  .applyTo(_labelThresholdPower_Value);
+            _labelThresholdVelocity_Value = new Label(container, SWT.NONE);
+            _labelThresholdVelocity_Value.setFont(_boldFont);
+            final GridData gd = new GridData();
+            gd.widthHint = _hintDefaultSpinnerWidth;
+            _labelThresholdVelocity_Value.setLayoutData(gd);
+            GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_labelThresholdVelocity_Value);
 
             // label:
             label = new Label(container, SWT.NONE);
-            label.setText(UI.UNIT_POWER);
-            GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).applyTo(label);
+            label.setText(UI.UNIT_LABEL_PACE);
+            label.setFont(_boldFont);
+            GridDataFactory.fillDefaults().grab(true, false).align(SWT.BEGINNING, SWT.CENTER).span(3, 1).applyTo(label);
+
+            // ROW #3
 
             // label : average slope
             label = new Label(container, SWT.NONE);
@@ -384,10 +373,31 @@ public class PrefPageGovss implements IPrefPageTrainingStressModel {
                }
             });
             GridDataFactory.fillDefaults()
-                  .span(3, 1)
+                  .span(2, 1)
                   .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
                   .align(SWT.LEFT, SWT.CENTER)
                   .applyTo(_spinnerThresholdPower_AverageSlope);
+
+            // label : Time
+            label = new Label(container, SWT.NONE);
+            label.setText("Threshold Power");//Messages.Pref_ThresholdPower_Label_Duration);
+            label.setFont(_boldFont);
+            GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER)
+                  .applyTo(label);
+
+            // text
+            _labelThresholdPower_Value = new Label(container, SWT.NONE);
+            _labelThresholdPower_Value.setFont(_boldFont);
+            GridDataFactory.fillDefaults()
+                  .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+                  .align(SWT.BEGINNING, SWT.CENTER)
+                  .applyTo(_labelThresholdPower_Value);
+
+            // label:
+            label = new Label(container, SWT.NONE);
+            label.setText(UI.UNIT_POWER);
+            label.setFont(_boldFont);
+            GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).applyTo(label);
          }
       }
 
@@ -475,6 +485,7 @@ public class PrefPageGovss implements IPrefPageTrainingStressModel {
       float thresholdPowerDistance = (_spinnerThresholdPower_Distance.getSelection() / 10f) * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
       if (tourPerson == null || thresholdPowerDuration <= 0 || thresholdPowerDistance <= 0) {
          _labelThresholdPower_Value.setText("0");
+         _labelThresholdVelocity_Value.setText(UI.EMPTY_STRING);
          return;
       }
 

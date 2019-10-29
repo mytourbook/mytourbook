@@ -666,7 +666,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          for (final IPrefPageTrainingStressModel trainingStressModel : _trainingStressModels) {
             _comboTrainingStressModel.add(trainingStressModel.getId());
          }
-         _comboTrainingStressModel.select(0);
          _comboTrainingStressModel.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(final SelectionEvent e) {
@@ -680,10 +679,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          _trainingStressComposite = new Composite(container, SWT.NONE);
          _trainingStressLayout = new StackLayout();
          _trainingStressComposite.setLayout(_trainingStressLayout);
-         _trainingStressLayout.topControl =
-               _trainingStressModels[_comboTrainingStressModel.getSelectionIndex()].getGroupUI(
-                     _trainingStressComposite,
-                     getCurrentPerson());
 
          GridDataFactory
                .fillDefaults()//
@@ -2154,9 +2149,9 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       // reselected tab folder
       _tabFolderPerson.setSelection(Util.getStateInt(_state, STATE_SELECTED_TAB_FOLDER, 0));
 
-      // Current training stress model
-      final int index = _comboTrainingStressModel.getSelectionIndex();
-      _trainingStressModels[index].restoreState();
+      // TODOCurrent training stress model
+      //  final int index = _comboTrainingStressModel.getSelectionIndex();
+      //  _trainingStressModels[index].restoreState();
    }
 
    /**

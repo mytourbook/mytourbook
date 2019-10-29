@@ -27,7 +27,7 @@ import net.tourbook.tour.TourManager;
  */
 public class Running_Govss {
 
-   //TODO : Add the GOVSS column in the tour book view
+   //TODO : Add the GOVSS column in the tour book view and editor view
    //TODO Use this equation to display an estimated power graph in the tour chart ?If yes, it's low on the totem pole
 
    private TourPerson _tourPerson;
@@ -93,8 +93,7 @@ public class Running_Govss {
 
       // 1. Find the athlete’s velocity at LT by a 10 km to one hour maximal run.
       // 2. Convert this LT limited velocity to a LT limited power value using Equation 7. "Lactate limited power" may also be called "lactate adjusted power".
-      //final float lactateLimitedPower = (float) ComputePower(14868, 0.0, 0, tempCriticalVelocity);
-      final float athleteThresholdPower = _tourPerson.getGovssThresholdPower();// m/sec => 6'30 min/mile 40' => 9.912km
+      final float athleteThresholdPower = _tourPerson.getGovssThresholdPower();
 
       // 3. Analyze the data from a particular workout from an athlete’s log, computing 120 second rolling averages from velocity and slope data.
       final ArrayList<Double> powerValues = computePowerValues(tourData);

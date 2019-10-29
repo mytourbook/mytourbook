@@ -30,7 +30,6 @@ public class PrefPageBikeScore implements IPrefPageTrainingStressModel {
    @Override
    public void dispose() {
       _bikeScoreGroup = null;
-
    }
 
    /**
