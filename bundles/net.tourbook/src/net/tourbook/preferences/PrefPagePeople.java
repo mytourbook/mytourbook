@@ -646,9 +646,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
           * Label: Info
           */
          Label label = new Label(container, SWT.WRAP);
-
          label.setText(Messages.Training_Stress_Label_Info);
-
          GridDataFactory
                .fillDefaults()//
                .span(2, 1)
@@ -658,8 +656,9 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
          // label
          label = new Label(container, SWT.NONE);
-         GridDataFactory.fillDefaults().indent(0, 15).align(SWT.BEGINNING, SWT.FILL).applyTo(label);
+         GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(label);
          label.setText("Training Stress Model:");//Messages.Pref_People_Label_device);
+
          // combo
          _comboTrainingStressModel = new Combo(container, SWT.READ_ONLY | SWT.DROP_DOWN);
          //GridDataFactory.fillDefaults().indent(0, 15).applyTo(_comboTrainingStressModel);

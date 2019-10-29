@@ -88,7 +88,7 @@ public class TourPerson implements Comparable<Object> {
 
    private float							height;
 
-   private float                           govssThresholdPower;
+   private int                             govssThresholdPower;
 
 	/**
 	 * Birthday of this person in milliseconds from 1970-01-01T00:00:00, default value is 0 when
@@ -348,7 +348,7 @@ public class TourPerson implements Comparable<Object> {
 		return gender;
 	}
 
-   public float getGovssThresholdPower() {
+   public int getGovssThresholdPower() {
       return govssThresholdPower;
    }
 
@@ -549,7 +549,7 @@ public class TourPerson implements Comparable<Object> {
 		this.gender = gender;
 	}
 
-   public void setGovssThresholdPower(final float govssThresholdPower) {
+   public void setGovssThresholdPower(final int govssThresholdPower) {
       this.govssThresholdPower = govssThresholdPower;
    }
 
