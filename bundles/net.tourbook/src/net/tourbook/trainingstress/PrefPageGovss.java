@@ -266,7 +266,7 @@ public class PrefPageGovss implements IPrefPageTrainingStressModel {
    private static void createUI_110_ThresholdPower(final Composite parent) {
 
       final Group container = new Group(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridDataFactory.fillDefaults().applyTo(container);
       container.setText(Messages.Pref_TrainingStress_Group_ThresholdPower);
       GridLayoutFactory.swtDefaults().numColumns(6).applyTo(container);
       {
@@ -324,6 +324,7 @@ public class PrefPageGovss implements IPrefPageTrainingStressModel {
                }
             });
             GridDataFactory.fillDefaults()
+                  .grab(true, false)
                   .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
                   .applyTo(_spinnerThresholdPower_Distance);
 
@@ -342,7 +343,6 @@ public class PrefPageGovss implements IPrefPageTrainingStressModel {
             _labelThresholdPower_Value = new Label(container, SWT.NONE);
             _labelThresholdPower_Value.setFont(_boldFont);
             GridDataFactory.fillDefaults()
-                  .grab(true, false)
                   .applyTo(_labelThresholdPower_Value);
 
             // label:
@@ -547,6 +547,12 @@ public class PrefPageGovss implements IPrefPageTrainingStressModel {
       return _tabFolder;
    }
 
+   @Override
+   public void dispose() {
+      _govssGroup = null;
+
+   }
+
    private void fillTourTypeMenu(final IMenuManager menuMgr) {
 
       // add all tour types to the menu
@@ -563,7 +569,6 @@ public class PrefPageGovss implements IPrefPageTrainingStressModel {
       menuMgr.add(new Separator());
       menuMgr.add(_actionOpenTourTypePrefs);
    }
-
    /**
     * UI for the GOVSS preferences
     */

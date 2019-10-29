@@ -20,6 +20,8 @@ import org.eclipse.swt.widgets.Group;
 
 public interface IPrefPageTrainingStressModel {
 
+   public abstract void dispose();
+
    public abstract Group getGroupUI(final Composite parent);
 
    public abstract String getId();

@@ -636,25 +636,30 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
    private Control createUI_100_Tab_TrainingStress(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-
-      GridLayoutFactory.swtDefaults().numColumns(2).extendedMargins(0, 0, 7, 0).applyTo(container);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
+      GridLayoutFactory
+            .swtDefaults()
+            .numColumns(2)
+            .applyTo(container);
       {
          /*
-          * label: info
+          * Label: Info
           */
          Label label = new Label(container, SWT.WRAP);
-         GridDataFactory.fillDefaults()//
+
+         label.setText(Messages.Training_Stress_Label_Info);
+
+         GridDataFactory
+               .fillDefaults()//
                .span(2, 1)
-//             .indent(0, 15)
+               .grab(true, false)
                .hint(net.tourbook.common.UI.DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
                .applyTo(label);
-         label.setText(Messages.Training_Stress_Label_Info);
 
          // label
          label = new Label(container, SWT.NONE);
-         //  GridDataFactory.fillDefaults().indent(0, 15).align(SWT.FILL, SWT.CENTER).applyTo(label);
+         GridDataFactory.fillDefaults().indent(0, 15).align(SWT.BEGINNING, SWT.FILL).applyTo(label);
          label.setText("Training Stress Model:");//Messages.Pref_People_Label_device);
-
          // combo
          _comboTrainingStressModel = new Combo(container, SWT.READ_ONLY | SWT.DROP_DOWN);
          //GridDataFactory.fillDefaults().indent(0, 15).applyTo(_comboTrainingStressModel);
@@ -664,23 +669,29 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          }
          _comboTrainingStressModel.select(0);
          _comboTrainingStressModel.addSelectionListener(new SelectionAdapter() {
-
             @Override
             public void widgetSelected(final SelectionEvent e) {
-
                final int index = _comboTrainingStressModel.getSelectionIndex();
-               _trainingStressLayout.topControl = _trainingStressModels[index].getGroupUI(_trainingStressComposite);
+               _trainingStressLayout.topControl =
+                     _trainingStressModels[index].getGroupUI(_trainingStressComposite);
                _trainingStressComposite.layout(true);
             }
          });
-      }
 
-      GridLayoutFactory.swtDefaults().numColumns(1).extendedMargins(0, 0, 7, 0).applyTo(container);
-      {
          _trainingStressComposite = new Composite(container, SWT.NONE);
          _trainingStressLayout = new StackLayout();
          _trainingStressComposite.setLayout(_trainingStressLayout);
-         _trainingStressLayout.topControl = _trainingStressModels[_comboTrainingStressModel.getSelectionIndex()].getGroupUI(_trainingStressComposite);
+         _trainingStressLayout.topControl =
+               _trainingStressModels[_comboTrainingStressModel.getSelectionIndex()].getGroupUI(
+                     _trainingStressComposite);
+
+         GridDataFactory
+               .fillDefaults()//
+               .span(2, 1)
+               .grab(true, false)
+               .hint(net.tourbook.common.UI.DEFAULT_DESCRIPTION_WIDTH, SWT.DEFAULT)
+               .applyTo(_trainingStressComposite);
+
       }
 
       return container;
@@ -1698,6 +1709,10 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
       if (_prefChangeListener != null) {
          _prefStore.removePropertyChangeListener(_prefChangeListener);
+      }
+
+      for (int index = 0; index < _trainingStressModels.length; ++index) {
+         _trainingStressModels[index].dispose();
       }
 
       if (_isNoUI) {

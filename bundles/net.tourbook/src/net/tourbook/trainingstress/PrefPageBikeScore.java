@@ -24,6 +24,12 @@ import org.eclipse.swt.widgets.Label;
 public class PrefPageBikeScore implements IPrefPageTrainingStressModel {
    private Group _bikeScoreGroup;
 
+   @Override
+   public void dispose() {
+      _bikeScoreGroup = null;
+
+   }
+
    /**
     * UI for the BikeScore preferences
     */
