@@ -20,7 +20,12 @@ import net.tourbook.data.TourPerson;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 
-public interface IPrefPageTrainingStressModel {
+public abstract class PrefPageTrainingStressModel {
+   public IPersonModifiedListener _personModifiedListener;
+
+   public interface IPersonModifiedListener {
+      public abstract void onPersonModifiedListener();
+   }
 
    public abstract void dispose();
 
@@ -31,4 +36,8 @@ public interface IPrefPageTrainingStressModel {
    public abstract void restoreState();
 
    public abstract void saveState();
+
+   public void setPersonModifiedListener(final IPersonModifiedListener listener) {
+      _personModifiedListener = listener;
+   }
 }

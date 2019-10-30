@@ -43,9 +43,10 @@ import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.training.DialogHRZones;
 import net.tourbook.training.TrainingManager;
-import net.tourbook.trainingstress.IPrefPageTrainingStressModel;
 import net.tourbook.trainingstress.PrefPageBikeScore;
 import net.tourbook.trainingstress.PrefPageGovss;
+import net.tourbook.trainingstress.PrefPageTrainingStressModel;
+import net.tourbook.trainingstress.PrefPageTrainingStressModel.IPersonModifiedListener;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -114,40 +115,40 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferencePage {
 
-   private static final String                         GRAPH_LABEL_HEARTBEAT_UNIT          = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
+   private static final String                  GRAPH_LABEL_HEARTBEAT_UNIT          = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
 
-   public static final String                          ID                                  = "net.tourbook.preferences.PrefPagePeopleId";            //$NON-NLS-1$
+   public static final String                   ID                                  = "net.tourbook.preferences.PrefPagePeopleId";            //$NON-NLS-1$
 
    /**
     * On Linux an async selection event is fired since e4
     */
-   private static final String                         FIX_LINUX_ASYNC_EVENT_1             = "FIX_LINUX_ASYNC_EVENT_1";                              //$NON-NLS-1$
-   private static final String                         FIX_LINUX_ASYNC_EVENT_2             = "FIX_LINUX_ASYNC_EVENT_2";                              //$NON-NLS-1$
+   private static final String                  FIX_LINUX_ASYNC_EVENT_1             = "FIX_LINUX_ASYNC_EVENT_1";                              //$NON-NLS-1$
+   private static final String                  FIX_LINUX_ASYNC_EVENT_2             = "FIX_LINUX_ASYNC_EVENT_2";                              //$NON-NLS-1$
    //
-   private static final String                         STATE_SELECTED_PERSON               = "selectedPersonId";                                     //$NON-NLS-1$
-   private static final String                         STATE_SELECTED_TAB_FOLDER           = "selectedTabFolder";                                    //$NON-NLS-1$
+   private static final String                  STATE_SELECTED_PERSON               = "selectedPersonId";                                     //$NON-NLS-1$
+   private static final String                  STATE_SELECTED_TAB_FOLDER           = "selectedTabFolder";                                    //$NON-NLS-1$
 
-   public static final int                             HEART_BEAT_MIN                      = 10;
-   public static final int                             HEART_BEAT_MAX                      = 300;
+   public static final int                      HEART_BEAT_MIN                      = 10;
+   public static final int                      HEART_BEAT_MAX                      = 300;
 
    /**
     * Id to indicate that the hr zones should be displayed for the active person when the pref
     * dialog is opened
     */
-   public static final String                          PREF_DATA_SELECT_HR_ZONES           = "SelectHrZones";                                        //$NON-NLS-1$
+   public static final String                   PREF_DATA_SELECT_HR_ZONES           = "SelectHrZones";                                        //$NON-NLS-1$
 
    /**
     * Id to indicate that the person's information should be displayed for the active person when
     * the pref
     * dialog is opened
     */
-   public static final String                          PREF_DATA_SELECT_PERSON_INFORMATION = "SelectPersonInformation";                              //$NON-NLS-1$
+   public static final String                   PREF_DATA_SELECT_PERSON_INFORMATION = "SelectPersonInformation";                              //$NON-NLS-1$
 
-   private final static IPrefPageTrainingStressModel[] _trainingStressModels               = new IPrefPageTrainingStressModel[] {
-         new PrefPageGovss(),
-         new PrefPageBikeScore()
-   };
-   private final IPreferenceStore                      _prefStore                          = TourbookPlugin.getPrefStore();
+   private static PrefPageTrainingStressModel[] _trainingStressModels;
+   private static PrefPageGovss                 _prefPageGovss;
+   private static PrefPageBikeScore             _prefPageBikeScore;
+
+   private final IPreferenceStore               _prefStore                          = TourbookPlugin.getPrefStore();
 
    // REMOVED BIKES 30.4.2011
 
@@ -663,7 +664,10 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          _comboTrainingStressModel = new Combo(container, SWT.READ_ONLY | SWT.DROP_DOWN);
          //GridDataFactory.fillDefaults().indent(0, 15).applyTo(_comboTrainingStressModel);
          _comboTrainingStressModel.setVisibleItemCount(2);
-         for (final IPrefPageTrainingStressModel trainingStressModel : _trainingStressModels) {
+
+         initializeTrainingStressModels();
+
+         for (final PrefPageTrainingStressModel trainingStressModel : _trainingStressModels) {
             _comboTrainingStressModel.add(trainingStressModel.getId());
          }
          _comboTrainingStressModel.addSelectionListener(new SelectionAdapter() {
@@ -673,8 +677,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
                _trainingStressLayout.topControl =
                      _trainingStressModels[index].getGroupUI(_trainingStressComposite, getCurrentPerson());
                _trainingStressComposite.requestLayout();
-
-               onModifyPerson();
             }
          });
 
@@ -1708,7 +1710,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          _prefStore.removePropertyChangeListener(_prefChangeListener);
       }
 
-      for (final IPrefPageTrainingStressModel _trainingStressModel : _trainingStressModels) {
+      for (final PrefPageTrainingStressModel _trainingStressModel : _trainingStressModels) {
          _trainingStressModel.dispose();
       }
 
@@ -1811,6 +1813,26 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
    public void init(final IWorkbench workbench) {
       setPreferenceStore(_prefStore);
       noDefaultAndApplyButton();
+   }
+
+   /*
+    * Creates the training stress models UIs with a listener to be notified when the tour person is
+    * modified
+    */
+   private void initializeTrainingStressModels() {
+
+      _trainingStressModels = new PrefPageTrainingStressModel[2];
+      _prefPageBikeScore = new PrefPageBikeScore();
+      _prefPageGovss = new PrefPageGovss();
+      _prefPageGovss.setPersonModifiedListener(new IPersonModifiedListener() {
+
+         @Override
+         public void onPersonModifiedListener() {
+            onModifyPerson();
+         }
+      });
+      _trainingStressModels[0] = _prefPageGovss;
+      _trainingStressModels[1] = _prefPageBikeScore;
    }
 
    private void initUI(final Composite parent) {
@@ -2240,7 +2262,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       // Current training stress model
       final int index = _comboTrainingStressModel.getSelectionIndex();
       if (index >= 0 && index < _trainingStressModels.length) {
-         final IPrefPageTrainingStressModel trainingStressModel = _trainingStressModels[index];
+         final PrefPageTrainingStressModel trainingStressModel = _trainingStressModels[index];
          if (trainingStressModel != null) {
             _trainingStressModels[index].saveState();
          }

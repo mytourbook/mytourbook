@@ -66,7 +66,7 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 
-public class PrefPageGovss implements IPrefPageTrainingStressModel {
+public class PrefPageGovss extends PrefPageTrainingStressModel {
 
    /*
     * UI controls
@@ -489,7 +489,6 @@ public class PrefPageGovss implements IPrefPageTrainingStressModel {
          restoreState();
       }
 
-      onComputeThresholdPower();
       enableControls();
 
       return _govssGroup;
@@ -525,6 +524,8 @@ public class PrefPageGovss implements IPrefPageTrainingStressModel {
          _labelThresholdVelocity_Value.setText(UI.EMPTY_STRING);
          return;
       }
+
+      _personModifiedListener.onPersonModifiedListener();
 
       // Distance in meters
       thresholdPowerDistance *= 1000f;
@@ -631,4 +632,5 @@ public class PrefPageGovss implements IPrefPageTrainingStressModel {
 
       _tourPerson.setGovssAssociatedTourTypes(associatedTourTypes.toString());
    }
+
 }

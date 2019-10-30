@@ -23,7 +23,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 
-public class PrefPageBikeScore implements IPrefPageTrainingStressModel {
+public class PrefPageBikeScore extends PrefPageTrainingStressModel {
    private TourPerson _tourPerson;
    private Group      _bikeScoreGroup;
 
