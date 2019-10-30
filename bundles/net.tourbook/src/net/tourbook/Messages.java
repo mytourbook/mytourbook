@@ -1243,6 +1243,12 @@ public class Messages extends NLS {
    public static String        Log_ComputeCadenceZonesTimes_010_Success;
    public static String        Log_ComputeCadenceZonesTimes_011_NoSuccess;
 
+   public static String        Log_ComputeGovss_001_Start;
+   public static String        Log_ComputeGovss_002_End;
+   public static String        Log_ComputeGovss_010_Success;
+   public static String        Log_ComputeGovss_011_NoSuccess;
+   public static String        Log_ComputeGovss_012_Information;
+
    public static String        Log_EasyImport_000_ImportStart;
    public static String        Log_EasyImport_001_BackupTourFiles;
    public static String        Log_EasyImport_001_Copy;
@@ -2328,6 +2334,7 @@ public class Messages extends NLS {
    public static String Tour_Action_ComputeCadenceZonesTimes_Message;
    public static String Tour_Action_ComputeCadenceZonesTimes_Title;
    public static String Tour_Action_ComputeGovss_Title;
+   public static String Tour_Action_ComputeGovss_Message;
    public static String Tour_Action_GeoCompare_Tooltip;
    public static String Tour_Action_GraphGears;
    public static String Tour_Action_GraphOverlapped;

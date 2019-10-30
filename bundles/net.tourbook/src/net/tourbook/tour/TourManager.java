@@ -688,17 +688,17 @@ public class TourManager {
       int numComputedTour = 0;
       int numNotComputedTour = 0;
 
-      // loop over all tours and compute each cadence zone time
+      // loop over all tours and compute the GOVSS value
       for (final TourData tourData : selectedTours) {
 
-         final boolean timeComputed = tourData.computeGovss();
-         if (!timeComputed) {
+         final boolean govssComputed = tourData.computeGovss();
+         if (!govssComputed) {
 
             numNotComputedTour++;
 
          } else {
 
-            // update cadence zones times in the database
+            // update GOVSS values in the database
             stmtUpdate.setInt(1, tourData.getGovss());
             stmtUpdate.setLong(2, tourData.getTourId());
 
@@ -709,11 +709,11 @@ public class TourManager {
          }
       }
 
-      TourLogManager.addSubLog(TourLogState.IMPORT_OK, NLS.bind(Messages.Log_ComputeCadenceZonesTimes_010_Success, numComputedTour));
+      TourLogManager.addSubLog(TourLogState.IMPORT_OK, NLS.bind(Messages.Log_ComputeGovss_010_Success, numComputedTour));
 
       if (numNotComputedTour >= 0) {
          TourLogManager.addSubLog(TourLogState.IMPORT_ERROR,
-               NLS.bind(Messages.Log_ComputeCadenceZonesTimes_011_NoSuccess, numNotComputedTour));
+               NLS.bind(Messages.Log_ComputeGovss_011_NoSuccess, numNotComputedTour));
       }
 
       return isUpdated;

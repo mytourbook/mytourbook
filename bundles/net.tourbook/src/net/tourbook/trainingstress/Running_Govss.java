@@ -29,6 +29,7 @@ public class Running_Govss {
 
    //TODO : Add the GOVSS column in the tour book view
    //TODO Use this equation to display an estimated power graph in the tour chart ?If yes, it's low on the totem pole
+   //TODO: Add a configuration to choose between 30s or 120s rolling averages ?
 
    private TourPerson _tourPerson;
 
@@ -45,7 +46,7 @@ public class Running_Govss {
    private double computeCostAerodynamicDrag(final float speed) {
 
       final double Af = 0.2025 * 0.266 * Math.pow(_tourPerson.getHeight(), 0.725) * Math.pow(_tourPerson.getWeight(), 0.425);
-      final double CAero = 0.5 * 1.2 * 0.9 * Af * Math.pow(speed, 2);
+      final double CAero = 0.5 * 1.2 * 0.9 * Af * Math.pow(speed, 2) / _tourPerson.getWeight();
 
       return CAero;
    }
@@ -82,6 +83,7 @@ public class Running_Govss {
     * References
     * http://runscribe.com/wp-content/uploads/power/GOVSS.pdf
     * https://3record.de/about/power_estimation#ref_4
+    * https://runscribe.com/power/
     * Note : This function will assume that the tour is a run activity. If not, be aware that the
     * GOVSS value will not be accurate.
     *
@@ -97,6 +99,10 @@ public class Running_Govss {
 
       // 3. Analyze the data from a particular workout from an athlete’s log, computing 120 second rolling averages from velocity and slope data.
       final ArrayList<Double> powerValues = computePowerValues(tourData);
+
+      if (powerValues.size() == 0) {
+         return 0;
+      }
 
       // 4. Raise the values in step 3 to the 4th power.
       for (int index = 0; index < powerValues.size(); index++) {
@@ -129,7 +135,7 @@ public class Running_Govss {
    }
 
    /**
-    * Function that calculates the running power for a given distance, time and athlete.
+    * Function that calculates the running power for a given distance, slope, time and athlete.
     *
     * @return
     */
@@ -140,7 +146,7 @@ public class Running_Govss {
       final double Cslope = computeCostDistanceWithSlope(slope);
       final double efficiency = (0.25 + (0.054 * speed)) * (1 - ((0.5 * speed) / 8.33));
 
-      final double power = (CAero + Ckin + Cslope * efficiency * _tourPerson.getHeight()) * speed;
+      final double power = (CAero + Ckin + Cslope * efficiency) * speed * _tourPerson.getWeight();
 
       return power;
    }
@@ -183,11 +189,13 @@ public class Running_Govss {
          currentDistance = TourManager.computeTourDistance(tourData, serieStartIndex, serieEndIndex);
          currentSlope = TourManager.computeTourAverageGradient(tourData, serieStartIndex, serieEndIndex);
          powerValue = ComputePower(currentDistance, currentSlope, currentSpeed, initialSpeed);
+
+         initialSpeed = currentSpeed;
+
          if (powerValue > 0) {
             powerValues.add(powerValue);
          }
 
-         initialSpeed = currentSpeed;
       }
 
       return powerValues;
