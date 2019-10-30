@@ -190,11 +190,9 @@ public class Running_Govss {
          currentSlope = TourManager.computeTourAverageGradient(tourData, serieStartIndex, serieEndIndex);
          powerValue = ComputePower(currentDistance, currentSlope, currentSpeed, initialSpeed);
 
-         initialSpeed = currentSpeed;
+         powerValues.add(powerValue);
 
-         if (powerValue > 0) {
-            powerValues.add(powerValue);
-         }
+         initialSpeed = currentSpeed;
 
       }
 
