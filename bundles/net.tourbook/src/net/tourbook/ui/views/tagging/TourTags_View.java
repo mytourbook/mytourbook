@@ -1100,7 +1100,8 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
          enableControls();
 
-//         firePropertyChange(PROP_DIRTY);
+         // fire modify event
+         TourManager.fireEvent(TourEventId.TAG_STRUCTURE_CHANGED);
       }
    }
 
