@@ -47,8 +47,13 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -68,20 +73,20 @@ import org.eclipse.swt.widgets.ToolItem;
 
 public class PrefPageGovss extends PrefPageTrainingStressModel {
 
-   /*
-    * UI controls
-    */
    private static TableViewer          _tourTypesViewer;
-   /*
-    * private Button _chkConvertWayPoints;
-    */
    private static Label                _labelThresholdPower_Value;
    private static Label                _labelThresholdVelocity_Value;
 
    private static Spinner              _spinnerThresholdPower_Distance;
+
    private static Spinner              _spinnerThresholdPower_AverageSlope;
 
    private static ActionOpenPrefDialog _actionOpenTourTypePrefs;
+   private SelectionListener           _defaultSelectionListener;
+   private MouseWheelListener          _defaultMouseWheelListener;
+
+   private Group                       _govssGroup;
+   private TourPerson                  _tourPerson;
 
    private Spinner                     _textThresholdPower_Duration_Hours;
    private Spinner                     _textThresholdPower_Duration_Minutes;
@@ -93,9 +98,6 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
    private Font                        _boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 
    private PixelConverter              _pc;
-
-   private Group                       _govssGroup;
-   private TourPerson                  _tourPerson;
 
    private class Action_TourType extends Action {
 
@@ -124,6 +126,7 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
       @Override
       public void run() {
          _tourTypesViewer.add(_tourType);
+         _personModifiedListener.onPersonModifiedListener();
          enableControls();
       }
    }
@@ -222,15 +225,36 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
          final int selectedIndex = _tourTypesViewer.getTable().getSelectionIndex();
 
          final TourType _selectedTourType = (TourType) _tourTypesViewer.getElementAt(selectedIndex);
+         if (_selectedTourType == null) {
+            return;
+         }
+
          _tourTypesViewer.remove(_selectedTourType);
 
          final int listSize = _tourTypesViewer.getTable().getItemCount();
          final int newSelectedIndex = selectedIndex >= listSize ? listSize - 1 : selectedIndex;
          _tourTypesViewer.getTable().setSelection(newSelectedIndex);
 
+         _personModifiedListener.onPersonModifiedListener();
+
          enableControls();
       }
 
+   }
+
+   /**
+    * Compute the velocity of the time trial in m/s
+    *
+    * @param testDistance
+    * @param testDuration
+    * @return
+    */
+   private float computeThresholdVelocity(final float testDistance, final int testDuration) {
+
+      final float thresholdVelocity = (testDistance / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE)
+            / testDuration;
+
+      return thresholdVelocity;
    }
 
    private void createActions() {
@@ -262,34 +286,22 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
             _textThresholdPower_Duration_Hours = new Spinner(container, SWT.TIME | SWT.MEDIUM | SWT.BORDER);
             _textThresholdPower_Duration_Hours.setToolTipText("TODO");//Messages.Pref_Weather_Label_ApiKey_Tooltip);
             _textThresholdPower_Duration_Hours.setMaximum(23);
-            _textThresholdPower_Duration_Hours.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onComputeThresholdPower();
-               }
-            });
+            _textThresholdPower_Duration_Hours.addSelectionListener(_defaultSelectionListener);
+            _textThresholdPower_Duration_Hours.addMouseWheelListener(_defaultMouseWheelListener);
             GridDataFactory.fillDefaults().hint(_hintDefaultSpinnerWidth, SWT.DEFAULT).applyTo(_textThresholdPower_Duration_Hours);
 
             _textThresholdPower_Duration_Minutes = new Spinner(container, SWT.TIME | SWT.MEDIUM | SWT.BORDER);
             _textThresholdPower_Duration_Minutes.setToolTipText("TODO");//Messages.Pref_Weather_Label_ApiKey_Tooltip);
             _textThresholdPower_Duration_Minutes.setMaximum(59);
-            _textThresholdPower_Duration_Minutes.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onComputeThresholdPower();
-               }
-            });
+            _textThresholdPower_Duration_Minutes.addSelectionListener(_defaultSelectionListener);
+            _textThresholdPower_Duration_Minutes.addMouseWheelListener(_defaultMouseWheelListener);
             GridDataFactory.fillDefaults().hint(_hintDefaultSpinnerWidth, SWT.DEFAULT).applyTo(_textThresholdPower_Duration_Minutes);
 
             _textThresholdPower_Duration_Seconds = new Spinner(container, SWT.TIME | SWT.MEDIUM | SWT.BORDER);
             _textThresholdPower_Duration_Seconds.setToolTipText("TODO");//Messages.Pref_Weather_Label_ApiKey_Tooltip);
             _textThresholdPower_Duration_Seconds.setMaximum(59);
-            _textThresholdPower_Duration_Seconds.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onComputeThresholdPower();
-               }
-            });
+            _textThresholdPower_Duration_Seconds.addSelectionListener(_defaultSelectionListener);
+            _textThresholdPower_Duration_Seconds.addMouseWheelListener(_defaultMouseWheelListener);
             GridDataFactory.fillDefaults().hint(_hintDefaultSpinnerWidth, SWT.DEFAULT).span(5, 1).align(SWT.BEGINNING, SWT.CENTER).applyTo(
                   _textThresholdPower_Duration_Seconds);
 
@@ -305,12 +317,8 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
             _spinnerThresholdPower_Distance.setToolTipText("");//Messages.Pref_Weather_Label_ApiKey_Tooltip);
             _spinnerThresholdPower_Distance.setDigits(1);
             _spinnerThresholdPower_Distance.setMaximum(500);
-            _spinnerThresholdPower_Distance.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onComputeThresholdPower();
-               }
-            });
+            _spinnerThresholdPower_Distance.addSelectionListener(_defaultSelectionListener);
+            _spinnerThresholdPower_Distance.addMouseWheelListener(_defaultMouseWheelListener);
             GridDataFactory.fillDefaults()
                   .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
                   .align(SWT.LEFT, SWT.CENTER)
@@ -356,12 +364,8 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
             _spinnerThresholdPower_AverageSlope.setDigits(2);
             _spinnerThresholdPower_AverageSlope.setMinimum(-50);
             _spinnerThresholdPower_AverageSlope.setMaximum(50);
-            _spinnerThresholdPower_AverageSlope.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onComputeThresholdPower();
-               }
-            });
+            _spinnerThresholdPower_AverageSlope.addSelectionListener(_defaultSelectionListener);
+            _spinnerThresholdPower_AverageSlope.addMouseWheelListener(_defaultMouseWheelListener);
             GridDataFactory.fillDefaults()
                   .span(2, 1)
                   .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
@@ -401,7 +405,7 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
       final Group container = new Group(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       container.setText("Tour types");//Messages.Pref_Appearance_Group_Tagging);
-      GridLayoutFactory.swtDefaults().numColumns(1).applyTo(container);
+      GridLayoutFactory.swtDefaults().numColumns(2).applyTo(container);
       {
          {
             // Toolbar
@@ -413,14 +417,28 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
             tbm.add(_action_TourType_Remove);
 
             tbm.update(true);
+            GridDataFactory.fillDefaults().span(2, 1).applyTo(toolbar);
 
             // Table
             final TableLayoutComposite layouter = new TableLayoutComposite(container, SWT.NONE);
-            GridDataFactory.fillDefaults().grab(true, true).hint(100, 100).applyTo(layouter);
+            GridDataFactory.fillDefaults().hint(100, 100).applyTo(layouter);
 
             final Table table = new Table(layouter, (SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION));
             table.setHeaderVisible(false);
             table.setLinesVisible(false);
+            table.addFocusListener(new FocusListener() {
+
+               @Override
+               public void focusGained(final FocusEvent arg0) {
+                  // TODO Auto-generated method stub
+               }
+
+               @Override
+               public void focusLost(final FocusEvent arg0) {
+                  _action_TourType_Remove.setEnabled(false);
+
+               }
+            });
             _tourTypesViewer = new TableViewer(table);
 
             TableViewerColumn tvc;
@@ -501,46 +519,13 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
       return "GOVSS";
    }
 
-   private int getTimeTrialDuration() {
-      return _textThresholdPower_Duration_Hours.getSelection() * 3600 + _textThresholdPower_Duration_Minutes
-            .getSelection() * 60 +
-            _textThresholdPower_Duration_Seconds.getSelection();
-   }
-
-   private void initUI(final Composite parent) {
-
-      _pc = new PixelConverter(parent);
-
-      _hintDefaultSpinnerWidth = UI.IS_LINUX ? SWT.DEFAULT : _pc.convertWidthInCharsToPixels(UI.IS_OSX ? 10 : 5);
-   }
-
-   private void onComputeThresholdPower() {
-
-      //Total duration in seconds
-      final int thresholdPowerDuration = getTimeTrialDuration();
-      float thresholdPowerDistance = (_spinnerThresholdPower_Distance.getSelection() / 10f) * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
-      if (_tourPerson == null || thresholdPowerDuration <= 0 || thresholdPowerDistance <= 0) {
-         _labelThresholdPower_Value.setText("0");
-         _labelThresholdVelocity_Value.setText(UI.EMPTY_STRING);
-         return;
-      }
-
-      _personModifiedListener.onPersonModifiedListener();
-
-      // Distance in meters
-      thresholdPowerDistance *= 1000f;
-      // Speed in m/s
-      float thresholdVelocity = (thresholdPowerDistance / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE)
-            / thresholdPowerDuration;
-      final float averageSlope = _spinnerThresholdPower_AverageSlope.getSelection() / 100f;
-      final Running_Govss _running_Govss = new Running_Govss(_tourPerson);
-      final double thresholdPower = _running_Govss.ComputePower(thresholdPowerDistance,
-            averageSlope,
-            0f,
-            thresholdVelocity);
-
-      _labelThresholdPower_Value.setText(String.valueOf(Math.round(thresholdPower)));
-      _labelThresholdPower_Value.requestLayout();
+   /**
+    * Prints a velocity in min/mile or min/km
+    *
+    * @param thresholdVelocity
+    * @return
+    */
+   private String getThresholdVelocityString(float thresholdVelocity) {
 
       //Converting speed from m/s to min/km or min/mile
       // m/s -> s/km
@@ -561,6 +546,66 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
       if (seconds > 0) {
          criticalPace.append("'" + String.valueOf(seconds));
       }
+      return criticalPace.toString();
+   }
+
+   private int getTimeTrialDuration() {
+      return _textThresholdPower_Duration_Hours.getSelection() * 3600 + _textThresholdPower_Duration_Minutes
+            .getSelection() * 60 +
+            _textThresholdPower_Duration_Seconds.getSelection();
+   }
+
+   private void initUI(final Composite parent) {
+
+      _pc = new PixelConverter(parent);
+
+      _hintDefaultSpinnerWidth = UI.IS_LINUX ? SWT.DEFAULT : _pc.convertWidthInCharsToPixels(UI.IS_OSX ? 10 : 5);
+
+      _defaultSelectionListener = new SelectionAdapter() {
+         @Override
+         public void widgetSelected(final SelectionEvent e) {
+            onComputeThresholdPower();
+         }
+      };
+
+      _defaultMouseWheelListener = new MouseWheelListener() {
+         @Override
+         public void mouseScrolled(final MouseEvent event) {
+            UI.adjustSpinnerValueOnMouseScroll(event);
+            onComputeThresholdPower();
+         }
+      };
+
+   }
+
+   private void onComputeThresholdPower() {
+
+      //Total duration in seconds
+      final int thresholdPowerDuration = getTimeTrialDuration();
+      float thresholdPowerDistance = (_spinnerThresholdPower_Distance.getSelection() / 10f) * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+      if (_tourPerson == null || thresholdPowerDuration <= 0 || thresholdPowerDistance <= 0) {
+         _labelThresholdPower_Value.setText("0");
+         _labelThresholdVelocity_Value.setText(UI.EMPTY_STRING);
+         return;
+      }
+
+      _personModifiedListener.onPersonModifiedListener();
+
+      // Distance in meters
+      thresholdPowerDistance *= 1000f;
+      // Speed in m/s
+      final float thresholdVelocity = computeThresholdVelocity(thresholdPowerDistance, thresholdPowerDuration);
+      final float averageSlope = _spinnerThresholdPower_AverageSlope.getSelection() / 100f;
+      final Running_Govss _running_Govss = new Running_Govss(_tourPerson);
+      final double thresholdPower = _running_Govss.ComputePower(thresholdPowerDistance,
+            averageSlope,
+            0f,
+            thresholdVelocity);
+
+      _labelThresholdPower_Value.setText(String.valueOf(Math.round(thresholdPower)));
+      _labelThresholdPower_Value.requestLayout();
+
+      final String criticalPace = getThresholdVelocityString(thresholdVelocity);
 
       _labelThresholdVelocity_Value.setText(criticalPace.toString());
       _labelThresholdVelocity_Value.requestLayout();
@@ -573,17 +618,17 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
          return;
       }
 
-      float testDuration = _tourPerson.getGovssTimeTrialDuration() / 3600f;
-      _textThresholdPower_Duration_Hours.setSelection(Math.round(testDuration));
-      testDuration -= Math.round(testDuration);
-      testDuration *= 60f;
-      _textThresholdPower_Duration_Minutes.setSelection(Math.round(testDuration));
-      testDuration -= Math.round(testDuration);
-      testDuration *= 60f;
-      _textThresholdPower_Duration_Seconds.setSelection(Math.round(testDuration));
+      final int testDuration = _tourPerson.getGovssTimeTrialDuration();
+      _textThresholdPower_Duration_Seconds.setSelection(testDuration % 60);
+      _textThresholdPower_Duration_Minutes.setSelection((testDuration / 60) % 60);
+      _textThresholdPower_Duration_Hours.setSelection(testDuration / 3600);
 
       _spinnerThresholdPower_Distance.setSelection(_tourPerson.getGovssTimeTrialDistance());
       _spinnerThresholdPower_AverageSlope.setSelection((int) _tourPerson.getGovssTimeTrialAverageSlope());
+
+      final float thresholdVelocity = computeThresholdVelocity(_tourPerson.getGovssTimeTrialDistance(), testDuration);
+      _labelThresholdVelocity_Value.setText(String.valueOf(getThresholdVelocityString(thresholdVelocity)));
+      _labelThresholdPower_Value.setText(String.valueOf(_tourPerson.getGovssThresholdPower()));
 
       final String govssAssociatedTourTypes = _tourPerson.getGovssAssociatedTourTypes();
 
@@ -632,5 +677,4 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
 
       _tourPerson.setGovssAssociatedTourTypes(associatedTourTypes.toString());
    }
-
 }
