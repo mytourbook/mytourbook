@@ -672,7 +672,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
                final int index = _comboTrainingStressModel.getSelectionIndex();
                _trainingStressLayout.topControl =
                      _trainingStressModels[index].getGroupUI(_trainingStressComposite, getCurrentPerson());
-               _trainingStressComposite.layout(true);
+               _trainingStressComposite.requestLayout();
 
                onModifyPerson();
             }
@@ -2088,9 +2088,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          return false;
       }
 
-      //TODO Perform OK in the training stress model
-      //TODO what about performdefaults ?
-
       return super.performOk();
    }
 
@@ -2151,9 +2148,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       // reselected tab folder
       _tabFolderPerson.setSelection(Util.getStateInt(_state, STATE_SELECTED_TAB_FOLDER, 0));
 
-      // TODOCurrent training stress model
-      //  final int index = _comboTrainingStressModel.getSelectionIndex();
-      //  _trainingStressModels[index].restoreState();
    }
 
    /**
@@ -2373,6 +2367,13 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          updateUISportComputer(person);
 
          createUI_80_HrZone_InnerContainer(hrMaxFormulaKey, maxPulse, dtBirthday);
+
+         final int index = _comboTrainingStressModel.getSelectionIndex();
+         if (index >= 0 && index < _trainingStressModels.length) {
+            _trainingStressModels[index].restoreState();
+            //TODO problem here : When the users restores the data, how can we detect again when the model page has changed?
+            //We need to be sent an event somehow. To be continued
+         }
       }
       _isUpdateUI = false;
    }
