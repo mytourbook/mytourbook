@@ -612,7 +612,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private Spinner           _spinPerson_Calories;
    private Spinner           _spinPerson_FTP;
    private Spinner           _spinPerson_RestPuls;
-   private Spinner           _spinTrainingStress_Govss;
    private Spinner           _spinWeather_Humidity;
    private Spinner           _spinWeather_PrecipitationValue;
    private Spinner           _spinWeather_PressureValue;
@@ -627,6 +626,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private Text              _txtAltitudeUp;
    private Text              _txtDescription;
    private Text              _txtDistance;
+   private Text              _txtTrainingStress_Govss;
    private Text              _txtWeather;
    //
    private TimeDuration      _timeDriving;
@@ -3751,14 +3751,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _firstColumnControls.add(label);
 
             // spinner
-            _spinTrainingStress_Govss = new Spinner(container, SWT.BORDER);
-            GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_spinTrainingStress_Govss);
-            _spinTrainingStress_Govss.setEnabled(false);
-            _spinTrainingStress_Govss.setMinimum(0);
-            _spinTrainingStress_Govss.setMaximum(1_000_000_000);
-
-            _spinTrainingStress_Govss.addMouseWheelListener(_mouseWheelListener);
-            _spinTrainingStress_Govss.addSelectionListener(_selectionListener);
+            _txtTrainingStress_Govss = _tk.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
+            GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).hint(_hintValueFieldWidth, SWT.DEFAULT).applyTo(
+                  _txtTrainingStress_Govss);
+            _txtTrainingStress_Govss.setEnabled(false);
 
          }
       }
@@ -8382,7 +8378,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _rdoCadence_Spm.setSelection(isSpm);
 
       // Training stress
-      _spinTrainingStress_Govss.setSelection(_tourData.getGovss());
+      _txtTrainingStress_Govss.setText(String.valueOf(_tourData.getGovss()));
 
       /*
        * layout container to resize labels
