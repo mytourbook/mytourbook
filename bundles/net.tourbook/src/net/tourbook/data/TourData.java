@@ -4010,7 +4010,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    public boolean computeGovss() {
 
       if (timeSerie == null || tourPerson == null ||
-            tourPerson.getWeight() <= 0f || tourPerson.getHeight() <= 0f) {
+            tourPerson.getWeight() <= 0f || tourPerson.getHeight() <= 0f ||
+            !tourPerson.isTourTypeInGovssTourTypes(tourType.getTypeId())) {
          return false;
       }
 

@@ -596,7 +596,7 @@ public class PrefPageGovss implements IPrefPageTrainingStressModel {
          return;
       }
 
-      final String[] associatedTourTypes = _tourPerson.getGovssAssociatedTourTypes().split(";");
+      final String[] associatedTourTypes = govssAssociatedTourTypes.split(";");
 
       // add the tour types that have not been added already to the menu
       final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
