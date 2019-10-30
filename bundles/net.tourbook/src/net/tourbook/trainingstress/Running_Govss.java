@@ -27,7 +27,7 @@ import net.tourbook.tour.TourManager;
  */
 public class Running_Govss {
 
-   //TODO : Add the GOVSS column in the tour book view and editor view
+   //TODO : Add the GOVSS column in the tour book view
    //TODO Use this equation to display an estimated power graph in the tour chart ?If yes, it's low on the totem pole
 
    private TourPerson _tourPerson;
@@ -119,8 +119,7 @@ public class Running_Govss {
       float trainingStressValue = normalizedWork * intensityWeighingFactor;
 
       // 10. Divide the values from step 9 by the amount of work performed during the 10k to 1 hr test (threshold power in watts x number of seconds).
-      //TODO Get the duration from the preferences
-      trainingStressValue /= (athleteThresholdPower * 3600); // 2400 = 40*60 = 40min
+      trainingStressValue /= (athleteThresholdPower * _tourPerson.getGovssTimeTrialDuration()); // 2400 = 40*60 = 40min
 
       // 11. Multiply the number from step 10 by 100 to obtain the final training stress in GOVSS.
       trainingStressValue *= 100;

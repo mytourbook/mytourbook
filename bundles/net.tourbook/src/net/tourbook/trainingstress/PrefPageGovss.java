@@ -68,34 +68,34 @@ import org.eclipse.swt.widgets.ToolItem;
 
 public class PrefPageGovss implements IPrefPageTrainingStressModel {
 
-   private static Spinner               _textThresholdPower_Duration_Hours;
-   private static Spinner               _textThresholdPower_Duration_Minutes;
-   private static Spinner               _textThresholdPower_Duration_Seconds;
-
-   private static int                   _hintDefaultSpinnerWidth;
-   private static ActionTourType_Add    _action_TourType_Add;
-
-   private static ActionTourType_Remove _action_TourType_Remove;
-
-   private static Font                  _boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
    /*
     * UI controls
     */
-   private static TableViewer           _tourTypesViewer;
+   private static TableViewer          _tourTypesViewer;
    /*
     * private Button _chkConvertWayPoints;
     */
-   private static Label                 _labelThresholdPower_Value;
-   private static Label                 _labelThresholdVelocity_Value;
+   private static Label                _labelThresholdPower_Value;
+   private static Label                _labelThresholdVelocity_Value;
 
-   private static Spinner               _spinnerThresholdPower_Distance;
-   private static Spinner               _spinnerThresholdPower_AverageSlope;
-   private static ActionOpenPrefDialog  _actionOpenTourTypePrefs;
+   private static Spinner              _spinnerThresholdPower_Distance;
+   private static Spinner              _spinnerThresholdPower_AverageSlope;
 
-   private PixelConverter               _pc;
+   private static ActionOpenPrefDialog _actionOpenTourTypePrefs;
 
-   private Group                        _govssGroup;
-   private TourPerson                   _tourPerson;
+   private Spinner                     _textThresholdPower_Duration_Hours;
+   private Spinner                     _textThresholdPower_Duration_Minutes;
+   private Spinner                     _textThresholdPower_Duration_Seconds;
+   private int                         _hintDefaultSpinnerWidth;
+
+   private ActionTourType_Add          _action_TourType_Add;
+   private ActionTourType_Remove       _action_TourType_Remove;
+   private Font                        _boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
+
+   private PixelConverter              _pc;
+
+   private Group                       _govssGroup;
+   private TourPerson                  _tourPerson;
 
    private class Action_TourType extends Action {
 
@@ -206,7 +206,7 @@ public class PrefPageGovss implements IPrefPageTrainingStressModel {
       }
    }
 
-   private static class ActionTourType_Remove extends Action {
+   private class ActionTourType_Remove extends Action {
 
       public ActionTourType_Remove() {
 
@@ -233,10 +233,20 @@ public class PrefPageGovss implements IPrefPageTrainingStressModel {
 
    }
 
+   private void createActions() {
+
+      _action_TourType_Add = new ActionTourType_Add();
+      _action_TourType_Remove = new ActionTourType_Remove();
+
+      _actionOpenTourTypePrefs = new ActionOpenPrefDialog(
+            Messages.action_tourType_modify_tourTypes,
+            ITourbookPreferences.PREF_PAGE_TOUR_TYPE);
+   }
+
    /**
     * UI for the threshold power group
     */
-   private static void createUI_110_ThresholdPower(final Composite parent) {
+   private void createUI_110_ThresholdPower(final Composite parent) {
 
       final Group container = new Group(parent, SWT.WRAP);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -386,7 +396,7 @@ public class PrefPageGovss implements IPrefPageTrainingStressModel {
    /**
     * UI for the list of tour types
     */
-   private static void createUI_120_TourTypesList(final Composite parent) {
+   private void createUI_120_TourTypesList(final Composite parent) {
 
       final Group container = new Group(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -435,7 +445,7 @@ public class PrefPageGovss implements IPrefPageTrainingStressModel {
             _tourTypesViewer.addSelectionChangedListener(new ISelectionChangedListener() {
                @Override
                public void selectionChanged(final SelectionChangedEvent event) {
-                     enableControls();
+                  enableControls();
                }
             });
          }
@@ -443,86 +453,17 @@ public class PrefPageGovss implements IPrefPageTrainingStressModel {
 
    }
 
-   private static void enableControls() {
-
-      final StructuredSelection currentTourTypeViewerSelection = (StructuredSelection) _tourTypesViewer.getSelection();
-      final boolean isTourTypeSelected = currentTourTypeViewerSelection.isEmpty() ? false : true;
-      _action_TourType_Remove.setEnabled(isTourTypeSelected);
-   }
-
-   private static int getTimeTrialDuration() {
-      return _textThresholdPower_Duration_Hours.getSelection() * 3600 + _textThresholdPower_Duration_Minutes
-            .getSelection() * 60 +
-            _textThresholdPower_Duration_Seconds.getSelection();
-   }
-
-   private static void onComputeThresholdPower() {
-
-      //TODO this person should be passed by the prefpagepeople code
-      final TourPerson tourPerson = TourbookPlugin.getActivePerson();
-
-      //Total duration in seconds
-      final int thresholdPowerDuration = getTimeTrialDuration();
-      float thresholdPowerDistance = (_spinnerThresholdPower_Distance.getSelection() / 10f) * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
-      if (tourPerson == null || thresholdPowerDuration <= 0 || thresholdPowerDistance <= 0) {
-         _labelThresholdPower_Value.setText("0");
-         _labelThresholdVelocity_Value.setText(UI.EMPTY_STRING);
-         return;
-      }
-
-      // Distance in meters
-      thresholdPowerDistance *= 1000f;
-      // Speed in m/s
-      float thresholdVelocity = (thresholdPowerDistance / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE)
-            / thresholdPowerDuration;
-      final float averageSlope = _spinnerThresholdPower_AverageSlope.getSelection() / 100f;
-      final Running_Govss _running_Govss = new Running_Govss(tourPerson);
-      final double thresholdPower = _running_Govss.ComputePower(thresholdPowerDistance,
-            averageSlope,
-            0f,
-            thresholdVelocity);
-
-      _labelThresholdPower_Value.setText(String.valueOf(Math.round(thresholdPower)));
-      _labelThresholdPower_Value.requestLayout();
-
-      //Converting speed from m/s to min/km or min/mile
-      // m/s -> s/km
-      thresholdVelocity = 1000 / thresholdVelocity;
-      // s/km -> min/km
-      thresholdVelocity /= 60f;
-      // min/km -> min/km or min/mile
-      thresholdVelocity /= net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
-
-      int thresholdVelocity_Minutes = (int) Math.floor(thresholdVelocity);
-      int seconds = Math.round(60 * (thresholdVelocity - thresholdVelocity_Minutes));
-      if (seconds == 60) {
-         thresholdVelocity_Minutes += 1;
-         seconds = 0;
-      }
-      final StringBuilder criticalPace = new StringBuilder();
-      criticalPace.append(String.valueOf(thresholdVelocity_Minutes));
-      if (seconds > 0) {
-         criticalPace.append("'" + String.valueOf(seconds));
-      }
-
-      _labelThresholdVelocity_Value.setText(criticalPace.toString());
-      _labelThresholdVelocity_Value.requestLayout();
-   }
-
-   private void createActions() {
-
-      _action_TourType_Add = new ActionTourType_Add();
-      _action_TourType_Remove = new ActionTourType_Remove();
-
-      _actionOpenTourTypePrefs = new ActionOpenPrefDialog(
-            Messages.action_tourType_modify_tourTypes,
-            ITourbookPreferences.PREF_PAGE_TOUR_TYPE);
-   }
-
    @Override
    public void dispose() {
       _govssGroup = null;
 
+   }
+
+   private void enableControls() {
+
+      final StructuredSelection currentTourTypeViewerSelection = (StructuredSelection) _tourTypesViewer.getSelection();
+      final boolean isTourTypeSelected = currentTourTypeViewerSelection.isEmpty() ? false : true;
+      _action_TourType_Remove.setEnabled(isTourTypeSelected);
    }
 
    /**
@@ -561,11 +502,67 @@ public class PrefPageGovss implements IPrefPageTrainingStressModel {
       return "GOVSS";
    }
 
+   private int getTimeTrialDuration() {
+      return _textThresholdPower_Duration_Hours.getSelection() * 3600 + _textThresholdPower_Duration_Minutes
+            .getSelection() * 60 +
+            _textThresholdPower_Duration_Seconds.getSelection();
+   }
+
    private void initUI(final Composite parent) {
 
       _pc = new PixelConverter(parent);
 
       _hintDefaultSpinnerWidth = UI.IS_LINUX ? SWT.DEFAULT : _pc.convertWidthInCharsToPixels(UI.IS_OSX ? 10 : 5);
+   }
+
+   private void onComputeThresholdPower() {
+
+      //Total duration in seconds
+      final int thresholdPowerDuration = getTimeTrialDuration();
+      float thresholdPowerDistance = (_spinnerThresholdPower_Distance.getSelection() / 10f) * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+      if (_tourPerson == null || thresholdPowerDuration <= 0 || thresholdPowerDistance <= 0) {
+         _labelThresholdPower_Value.setText("0");
+         _labelThresholdVelocity_Value.setText(UI.EMPTY_STRING);
+         return;
+      }
+
+      // Distance in meters
+      thresholdPowerDistance *= 1000f;
+      // Speed in m/s
+      float thresholdVelocity = (thresholdPowerDistance / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE)
+            / thresholdPowerDuration;
+      final float averageSlope = _spinnerThresholdPower_AverageSlope.getSelection() / 100f;
+      final Running_Govss _running_Govss = new Running_Govss(_tourPerson);
+      final double thresholdPower = _running_Govss.ComputePower(thresholdPowerDistance,
+            averageSlope,
+            0f,
+            thresholdVelocity);
+
+      _labelThresholdPower_Value.setText(String.valueOf(Math.round(thresholdPower)));
+      _labelThresholdPower_Value.requestLayout();
+
+      //Converting speed from m/s to min/km or min/mile
+      // m/s -> s/km
+      thresholdVelocity = 1000 / thresholdVelocity;
+      // s/km -> min/km
+      thresholdVelocity /= 60f;
+      // min/km -> min/km or min/mile
+      thresholdVelocity /= net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+
+      int thresholdVelocity_Minutes = (int) Math.floor(thresholdVelocity);
+      int seconds = Math.round(60 * (thresholdVelocity - thresholdVelocity_Minutes));
+      if (seconds == 60) {
+         thresholdVelocity_Minutes += 1;
+         seconds = 0;
+      }
+      final StringBuilder criticalPace = new StringBuilder();
+      criticalPace.append(String.valueOf(thresholdVelocity_Minutes));
+      if (seconds > 0) {
+         criticalPace.append("'" + String.valueOf(seconds));
+      }
+
+      _labelThresholdVelocity_Value.setText(criticalPace.toString());
+      _labelThresholdVelocity_Value.requestLayout();
    }
 
    @Override
