@@ -574,7 +574,7 @@ public class PrefPageGovss implements IPrefPageTrainingStressModel {
    @Override
    public void restoreState() {
 
-      if (_tourPerson == null) {
+      if (_tourPerson == null || _govssGroup == null) {
          return;
       }
 

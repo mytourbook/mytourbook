@@ -673,6 +673,8 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
                _trainingStressLayout.topControl =
                      _trainingStressModels[index].getGroupUI(_trainingStressComposite, getCurrentPerson());
                _trainingStressComposite.layout(true);
+
+               onModifyPerson();
             }
          });
 
@@ -2243,7 +2245,12 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
       // Current training stress model
       final int index = _comboTrainingStressModel.getSelectionIndex();
-      _trainingStressModels[index].saveState();
+      if (index >= 0 && index < _trainingStressModels.length) {
+         final IPrefPageTrainingStressModel trainingStressModel = _trainingStressModels[index];
+         if (trainingStressModel != null) {
+            _trainingStressModels[index].saveState();
+         }
+      }
    }
 
    private void updatePersonFromUI(final TourPerson person) {
@@ -2277,6 +2284,11 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       final int hrMaxSelectionIndex = _cboHrMaxFormula.getSelectionIndex();
       person.setHrMaxFormula(TrainingManager.HRMaxFormulaKeys[hrMaxSelectionIndex]);
       person.setMaxPulse(_spinnerMaxHR.getSelection());
+
+      final int index = _comboTrainingStressModel.getSelectionIndex();
+      if (index >= 0 && index < _trainingStressModels.length) {
+         _trainingStressModels[index].saveState();
+      }
    }
 
    /**
