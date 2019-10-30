@@ -435,10 +435,7 @@ public class PrefPageGovss implements IPrefPageTrainingStressModel {
             _tourTypesViewer.addSelectionChangedListener(new ISelectionChangedListener() {
                @Override
                public void selectionChanged(final SelectionChangedEvent event) {
-                  final StructuredSelection selection = (StructuredSelection) event.getSelection();
-                  if (selection != null) {
                      enableControls();
-                  }
                }
             });
          }
@@ -596,6 +593,8 @@ public class PrefPageGovss implements IPrefPageTrainingStressModel {
          return;
       }
 
+      _tourTypesViewer.getTable().removeAll();
+
       final String[] associatedTourTypes = govssAssociatedTourTypes.split(";");
 
       // add the tour types that have not been added already to the menu
@@ -628,9 +627,9 @@ public class PrefPageGovss implements IPrefPageTrainingStressModel {
       final StringBuilder associatedTourTypes = new StringBuilder();
 
       for (int index = 0; index < _tourTypesViewer.getTable().getItemCount(); ++index) {
+
          final TourType tourType = (TourType) _tourTypesViewer.getElementAt(index);
          associatedTourTypes.append(tourType.getTypeId() + ";");
-
       }
 
       _tourPerson.setGovssAssociatedTourTypes(associatedTourTypes.toString());
