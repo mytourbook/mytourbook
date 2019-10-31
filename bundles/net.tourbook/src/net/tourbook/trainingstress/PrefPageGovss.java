@@ -430,7 +430,7 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
 
                @Override
                public void focusGained(final FocusEvent arg0) {
-                  // TODO Auto-generated method stub
+                  _action_TourType_Remove.setEnabled(true);
                }
 
                @Override
@@ -623,7 +623,7 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
       _textThresholdPower_Duration_Minutes.setSelection((testDuration / 60) % 60);
       _textThresholdPower_Duration_Hours.setSelection(testDuration / 3600);
 
-      _spinnerThresholdPower_Distance.setSelection(_tourPerson.getGovssTimeTrialDistance());
+      _spinnerThresholdPower_Distance.setSelection(_tourPerson.getGovssTimeTrialDistance() / 100);
       _spinnerThresholdPower_AverageSlope.setSelection((int) _tourPerson.getGovssTimeTrialAverageSlope());
 
       final float thresholdVelocity = computeThresholdVelocity(_tourPerson.getGovssTimeTrialDistance(), testDuration);
@@ -664,7 +664,7 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
 
       _tourPerson.setGovssThresholdPower(Integer.valueOf(_labelThresholdPower_Value.getText()));
       _tourPerson.setGovssTimeTrialDuration(getTimeTrialDuration());
-      _tourPerson.setGovssTimeTrialDistance(_spinnerThresholdPower_Distance.getSelection());
+      _tourPerson.setGovssTimeTrialDistance(_spinnerThresholdPower_Distance.getSelection() * 100);
       _tourPerson.setGovssTimeTrialAverageSlope(_spinnerThresholdPower_AverageSlope.getSelection());
 
       final StringBuilder associatedTourTypes = new StringBuilder();
