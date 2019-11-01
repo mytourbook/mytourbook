@@ -79,6 +79,7 @@ import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.database.FIELD_VALIDATION;
+import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.math.Smooth;
@@ -4008,6 +4009,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    public boolean computeGovss() {
+
+      // We make sure to retrieve the latest version of the tour's TourPerson in case it has been modified recently
+      // Note : It's not a "pretty" solution but that is the best I found as of today
+      final ArrayList<TourPerson> tourPersons = PersonManager.getTourPeople();
+      for (final TourPerson currentTourPerson : tourPersons) {
+         if (currentTourPerson.getPersonId() == tourPerson.getPersonId()) {
+               tourPerson = currentTourPerson;
+            break;
+         }
+      }
 
       if (timeSerie == null ||
             tourPerson == null || tourPerson.getWeight() <= 0f || tourPerson.getHeight() <= 0f ||

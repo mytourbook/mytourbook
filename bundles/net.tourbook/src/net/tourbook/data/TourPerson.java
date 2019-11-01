@@ -301,7 +301,7 @@ public class TourPerson implements Comparable<Object> {
          }
       } else {
 
-         // person was create
+         // person was creates
          if (_createId != other._createId) {
             return false;
          }
