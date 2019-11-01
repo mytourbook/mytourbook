@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.trainingstress;
 
+import net.tourbook.Messages;
 import net.tourbook.data.TourPerson;
 
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -24,12 +25,18 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 
 public class PrefPageBikeScore extends PrefPageTrainingStressModel {
-   private TourPerson _tourPerson;
-   private Group      _bikeScoreGroup;
+   //private TourPerson _tourPerson;
+   private Group _bikeScoreGroup;
 
    @Override
    public void dispose() {
       _bikeScoreGroup = null;
+   }
+
+   @Override
+   public String getGroupName() {
+
+      return Messages.Pref_TrainingStress_BikeScore_GroupName;
    }
 
    /**
@@ -38,25 +45,19 @@ public class PrefPageBikeScore extends PrefPageTrainingStressModel {
    @Override
    public Group getGroupUI(final Composite parent, final TourPerson tourPerson) {
 
-      _tourPerson = tourPerson;
+      //_tourPerson = tourPerson;
 
       if (_bikeScoreGroup == null) {
          _bikeScoreGroup = new Group(parent, SWT.NONE);
          GridLayoutFactory.swtDefaults().numColumns(1).applyTo(_bikeScoreGroup);
          {
             final Label label = new Label(_bikeScoreGroup, SWT.NONE);
-            label.setText("BIKESCORE");
+            label.setText("BIKESCORE"); //$NON-NLS-1$
          }
       }
 
       return _bikeScoreGroup;
 
-   }
-
-   @Override
-   public String getId() {
-
-      return "BikeScore";
    }
 
    @Override

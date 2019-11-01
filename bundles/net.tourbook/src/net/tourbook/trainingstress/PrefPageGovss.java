@@ -279,25 +279,22 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
          {
             // label : Time
             Label label = new Label(container, SWT.NONE);
-            label.setText(Messages.Pref_ThresholdPower_Label_Duration);
+            label.setText(Messages.Pref_TrainingStress_Govss_ThresholdPower_Label_Duration);
             GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(label);
 
             _textThresholdPower_Duration_Hours = new Spinner(container, SWT.TIME | SWT.MEDIUM | SWT.BORDER);
-            _textThresholdPower_Duration_Hours.setToolTipText("TODO");//Messages.Pref_Weather_Label_ApiKey_Tooltip);
             _textThresholdPower_Duration_Hours.setMaximum(23);
             _textThresholdPower_Duration_Hours.addSelectionListener(_defaultSelectionListener);
             _textThresholdPower_Duration_Hours.addMouseWheelListener(_defaultMouseWheelListener);
             GridDataFactory.fillDefaults().hint(_hintDefaultSpinnerWidth, SWT.DEFAULT).applyTo(_textThresholdPower_Duration_Hours);
 
             _textThresholdPower_Duration_Minutes = new Spinner(container, SWT.TIME | SWT.MEDIUM | SWT.BORDER);
-            _textThresholdPower_Duration_Minutes.setToolTipText("TODO");//Messages.Pref_Weather_Label_ApiKey_Tooltip);
             _textThresholdPower_Duration_Minutes.setMaximum(59);
             _textThresholdPower_Duration_Minutes.addSelectionListener(_defaultSelectionListener);
             _textThresholdPower_Duration_Minutes.addMouseWheelListener(_defaultMouseWheelListener);
             GridDataFactory.fillDefaults().hint(_hintDefaultSpinnerWidth, SWT.DEFAULT).applyTo(_textThresholdPower_Duration_Minutes);
 
             _textThresholdPower_Duration_Seconds = new Spinner(container, SWT.TIME | SWT.MEDIUM | SWT.BORDER);
-            _textThresholdPower_Duration_Seconds.setToolTipText("TODO");//Messages.Pref_Weather_Label_ApiKey_Tooltip);
             _textThresholdPower_Duration_Seconds.setMaximum(59);
             _textThresholdPower_Duration_Seconds.addSelectionListener(_defaultSelectionListener);
             _textThresholdPower_Duration_Seconds.addMouseWheelListener(_defaultMouseWheelListener);
@@ -308,12 +305,11 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
 
             // label : Distance
             label = new Label(container, SWT.NONE);
-            label.setText(Messages.Pref_ThresholdPower_Label_Distance);
+            label.setText(Messages.Pref_TrainingStress_Govss_ThresholdPower_Label_Distance);
             GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(label);
 
             // Text entry for the distance
             _spinnerThresholdPower_Distance = new Spinner(container, SWT.BORDER);
-            _spinnerThresholdPower_Distance.setToolTipText("");//Messages.Pref_Weather_Label_ApiKey_Tooltip);
             _spinnerThresholdPower_Distance.setDigits(1);
             _spinnerThresholdPower_Distance.setMaximum(500);
             _spinnerThresholdPower_Distance.addSelectionListener(_defaultSelectionListener);
@@ -332,7 +328,7 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
 
             // label : Time
             label = new Label(container, SWT.NONE);
-            label.setText("Threshold velocity");//Messages.Pref_ThresholdPower_Label_Duration);
+            label.setText(Messages.Pref_TrainingStress_Govss_Label_ThresholdVelocity);
             label.setFont(_boldFont);
             GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(label);
 
@@ -354,12 +350,12 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
 
             // label : average slope
             label = new Label(container, SWT.NONE);
-            label.setText(Messages.Pref_ThresholdPower_Label_AverageSlope);
+            label.setText(Messages.Pref_TrainingStress_Govss_ThresholdPower_Label_AverageSlope);
             GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(label);
 
             // text
             _spinnerThresholdPower_AverageSlope = new Spinner(container, SWT.BORDER);
-            _spinnerThresholdPower_AverageSlope.setToolTipText("");//Messages.Pref_Weather_Label_ApiKey_Tooltip);
+            _spinnerThresholdPower_AverageSlope.setToolTipText(Messages.Pref_TrainingStress_Govss_Label_AverageSlope);
             _spinnerThresholdPower_AverageSlope.setDigits(2);
             _spinnerThresholdPower_AverageSlope.setMinimum(-50);
             _spinnerThresholdPower_AverageSlope.setMaximum(50);
@@ -373,7 +369,7 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
 
             // label : Time
             label = new Label(container, SWT.NONE);
-            label.setText("Threshold Power");//Messages.Pref_ThresholdPower_Label_Duration);
+            label.setText(Messages.Pref_TrainingStress_Govss_ThresholdPower_Label);
             label.setFont(_boldFont);
             GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER)
                   .applyTo(label);
@@ -403,7 +399,7 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
 
       final Group container = new Group(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      container.setText("Tour types");//Messages.Pref_Appearance_Group_Tagging);
+      container.setText(Messages.Pref_TrainingStress_Group_TourTypes);
       GridLayoutFactory.swtDefaults().numColumns(2).applyTo(container);
       {
          {
@@ -483,6 +479,12 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
       _action_TourType_Remove.setEnabled(isTourTypeSelected);
    }
 
+   @Override
+   public String getGroupName() {
+
+      return Messages.Pref_TrainingStress_Govss_GroupName;
+   }
+
    /**
     * UI for the GOVSS preferences
     */
@@ -512,12 +514,6 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
 
    }
 
-   @Override
-   public String getId() {
-
-      return "GOVSS";
-   }
-
    /**
     * Prints a velocity in min/mile or min/km
     *
@@ -544,7 +540,7 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
       final StringBuilder criticalPace = new StringBuilder();
       criticalPace.append(String.valueOf(thresholdVelocity_Minutes));
       if (seconds > 0) {
-         criticalPace.append("'" + String.valueOf(seconds));
+         criticalPace.append("'" + String.valueOf(seconds)); //$NON-NLS-1$
       }
       return criticalPace.toString();
    }
@@ -584,7 +580,7 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
       final int thresholdPowerDuration = getTimeTrialDuration();
       float thresholdPowerDistance = (_spinnerThresholdPower_Distance.getSelection() / 10f) * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
       if (_tourPerson == null || thresholdPowerDuration <= 0 || thresholdPowerDistance <= 0) {
-         _labelThresholdPower_Value.setText("0");
+         _labelThresholdPower_Value.setText(String.valueOf(0));
          _labelThresholdVelocity_Value.setText(UI.EMPTY_STRING);
          return;
       }
@@ -640,7 +636,7 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
 
       _tourTypesViewer.getTable().removeAll();
 
-      final String[] associatedTourTypes = govssAssociatedTourTypes.split(";");
+      final String[] associatedTourTypes = govssAssociatedTourTypes.split(";"); //$NON-NLS-1$
 
       // add the tour types that have not been added already to the menu
       final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
@@ -677,7 +673,7 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
       for (int index = 0; index < _tourTypesViewer.getTable().getItemCount(); ++index) {
 
          final TourType tourType = (TourType) _tourTypesViewer.getElementAt(index);
-         associatedTourTypes.append(tourType.getTypeId() + ";");
+         associatedTourTypes.append(tourType.getTypeId() + ";"); //$NON-NLS-1$
       }
 
       _tourPerson.setGovssAssociatedTourTypes(associatedTourTypes.toString());

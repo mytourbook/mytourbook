@@ -658,17 +658,16 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          // label
          label = new Label(container, SWT.NONE);
          GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(label);
-         label.setText("Training Stress Model:");//Messages.Pref_People_Label_device);
+         label.setText(Messages.Pref_People_Label_TrainingStress_ModelName);
 
          // combo
          _comboTrainingStressModel = new Combo(container, SWT.READ_ONLY | SWT.DROP_DOWN);
-         //GridDataFactory.fillDefaults().indent(0, 15).applyTo(_comboTrainingStressModel);
          _comboTrainingStressModel.setVisibleItemCount(2);
 
          initializeTrainingStressModels();
 
          for (final PrefPageTrainingStressModel trainingStressModel : _trainingStressModels) {
-            _comboTrainingStressModel.add(trainingStressModel.getId());
+            _comboTrainingStressModel.add(trainingStressModel.getGroupName());
          }
          _comboTrainingStressModel.addSelectionListener(new SelectionAdapter() {
             @Override

@@ -29,9 +29,9 @@ public abstract class PrefPageTrainingStressModel {
 
    public abstract void dispose();
 
-   public abstract Group getGroupUI(final Composite parent, final TourPerson tourPerson);
+   public abstract String getGroupName();
 
-   public abstract String getId();
+   public abstract Group getGroupUI(final Composite parent, final TourPerson tourPerson);
 
    public abstract void restoreState();
 
