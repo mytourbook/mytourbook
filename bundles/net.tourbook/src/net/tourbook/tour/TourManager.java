@@ -806,6 +806,7 @@ public class TourManager {
 
       if (timeSerie == null
             || timeSerie.length == 0
+            || distanceSerie == null
             || startIndex >= distanceSerie.length
             || endIndex >= distanceSerie.length) {
          return 0;
