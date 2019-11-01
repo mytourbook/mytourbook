@@ -466,7 +466,6 @@ public class PredictedPerformanceChartView extends ViewPart {
 
       }
 
-
    }
 
    private void createUI_12_PageBook(final Composite parent) {
@@ -518,6 +517,7 @@ public class PredictedPerformanceChartView extends ViewPart {
          }
       });
    }
+
    @Override
    public void dispose() {
 
@@ -996,10 +996,8 @@ public class PredictedPerformanceChartView extends ViewPart {
        * y-axis: time
        */
       final float[][] yvalues = new float[pulseRange][1];
-      for (int toto = 0; toto < pulseRange; ++toto)
-      {
-         for (int titi = 0; titi < 1; ++titi)
-         {
+      for (int toto = 0; toto < pulseRange; ++toto) {
+         for (int titi = 0; titi < 1; ++titi) {
             yvalues[toto][titi] = 20;
          }
       }
