@@ -2259,14 +2259,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       final int selectedTab = _tabFolderPerson.getSelectionIndex();
       _state.put(STATE_SELECTED_TAB_FOLDER, selectedTab < 0 ? 0 : selectedTab);
 
-      // Current training stress model
-      final int index = _comboTrainingStressModel.getSelectionIndex();
-      if (index >= 0 && index < _trainingStressModels.length) {
-         final PrefPageTrainingStressModel trainingStressModel = _trainingStressModels[index];
-         if (trainingStressModel != null) {
-            _trainingStressModels[index].saveState();
-         }
-      }
    }
 
    private void updatePersonFromUI(final TourPerson person) {
