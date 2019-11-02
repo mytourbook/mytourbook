@@ -150,10 +150,10 @@ public class PredictedPerformanceChartView extends ViewPart {
    private FormToolkit _tk;
 
    /*
-    * Pagebook for the training view
+    * Pagebook for the predicted performance view
     */
    private PageBook  _pageBook;
-   private Composite _page_HrZones;
+   private Composite _page_TrainingStressScores;
    private Composite _page_NoTour;
    private Composite _page_NoPerson;
 
@@ -203,9 +203,9 @@ public class PredictedPerformanceChartView extends ViewPart {
 
    void actionShowAllStressScoreValues() {
 
-      _isShowAllValues = _actionShowAllStressScoreValues.isChecked();
+      _isShowAllValues = true;//_actionShowAllStressScoreValues.isChecked();
 
-      updateUI_30_HrZonesFromModel();
+      updateUI_10_stressScoreValuesFromModel();
    }
 
    void actionSynchChartScale() {
@@ -216,7 +216,7 @@ public class PredictedPerformanceChartView extends ViewPart {
          _minMaxKeeper.resetMinMax();
       }
 
-      updateUI_30_HrZonesFromModel();
+      updateUI_10_stressScoreValuesFromModel();
    }
 
    private void addPartListener() {
@@ -275,7 +275,7 @@ public class PredictedPerformanceChartView extends ViewPart {
                setChartProperties();
 
                // grid has changed, update chart
-               updateUI_30_HrZonesFromModel();
+               updateUI_10_stressScoreValuesFromModel();
             }
          }
       };
@@ -473,33 +473,30 @@ public class PredictedPerformanceChartView extends ViewPart {
       _pageBook = new PageBook(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageBook);
 
-      _page_HrZones = createUI_20_PageHrZones(_pageBook);
+      _page_TrainingStressScores = createUI_20_TrainingStressScores(_pageBook);
 
       _page_NoPerson = UI.createPage(_tk, _pageBook, Messages.UI_Label_PersonIsRequired);
       _page_NoTour = UI.createPage(_tk, _pageBook, Messages.UI_Label_no_chart_is_selected);
    }
 
-   private Composite createUI_20_PageHrZones(final Composite parent) {
+   private Composite createUI_20_TrainingStressScores(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()//
-//            .grab(true, true)
             .applyTo(container);
       GridLayoutFactory.fillDefaults()//
             .numColumns(3)
             .spacing(0, 0)
             .applyTo(container);
-//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
       container.setBackground(_tk.getColors().getBackground());
       {
-         // feature request to show the zone image first https://sourceforge.net/p/mytourbook/feature-requests/132/
-         createUI_30_HrZoneChart(container);
+         createUI_30_TrainingStressScoresChart(container);
       }
 
       return container;
    }
 
-   private void createUI_30_HrZoneChart(final Composite parent) {
+   private void createUI_30_TrainingStressScoresChart(final Composite parent) {
 
       /*
        * chart
@@ -638,7 +635,7 @@ public class PredictedPerformanceChartView extends ViewPart {
       }
       _isUpdateUI = false;
 
-      updateUI_30_HrZonesFromModel();
+      updateUI_10_stressScoreValuesFromModel();
    }
 
    /**
@@ -798,6 +795,41 @@ public class PredictedPerformanceChartView extends ViewPart {
       updateUI_20(TourManager.getInstance().getTourData(tourId));
    }
 
+   /**
+    */
+   private void updateUI_10_stressScoreValuesFromModel() {
+
+      enableControls();
+
+      /*
+       * check person
+       */
+      if (_currentPerson == null) {
+
+         // selected tour do not contain a person
+         _pageBook.showPage(_page_NoPerson);
+
+         return;
+      }
+
+      /*
+       * required data are available
+       */
+
+      // display page for the selected chart
+      _pageBook.showPage(_page_TrainingStressScores);
+
+      final HrZoneContext zoneMinMaxBpm = _currentPerson.getHrZoneContext(
+            _currentPerson.getHrMaxFormula(),
+            _currentPerson.getMaxPulse(),
+            _currentPerson.getBirthDayWithDefault(),
+            _tourData.getTourStartTime());
+
+      updateUI_40_trainingStressScoresChart(zoneMinMaxBpm);
+      //updateUI_42_HrZoneData(zoneMinMaxBpm);
+
+   }
+
    private void updateUI_20(final TourData tourData) {
 
       if (tourData == null) {
@@ -821,46 +853,10 @@ public class PredictedPerformanceChartView extends ViewPart {
          _currentPerson = tourPerson;
       }
 
-      updateUI_30_HrZonesFromModel();
+      updateUI_10_stressScoreValuesFromModel();
    }
 
-   /**
-    * Displays training data when a tour is available
-    */
-   private void updateUI_30_HrZonesFromModel() {
-
-      enableControls();
-
-      /*
-       * check person
-       */
-      if (_currentPerson == null) {
-
-         // selected tour do not contain a person
-         _pageBook.showPage(_page_NoPerson);
-
-         return;
-      }
-
-      /*
-       * required data are available
-       */
-
-      // display page for the selected chart
-      _pageBook.showPage(_page_HrZones);
-
-      final HrZoneContext zoneMinMaxBpm = _currentPerson.getHrZoneContext(
-            _currentPerson.getHrMaxFormula(),
-            _currentPerson.getMaxPulse(),
-            _currentPerson.getBirthDayWithDefault(),
-            _tourData.getTourStartTime());
-
-      updateUI_40_HrZoneChart(zoneMinMaxBpm);
-      updateUI_42_HrZoneData(zoneMinMaxBpm);
-
-   }
-
-   private void updateUI_40_HrZoneChart(final HrZoneContext zoneMinMaxBpm) {
+   private void updateUI_40_trainingStressScoresChart(final HrZoneContext zoneMinMaxBpm) {
 
       //TourManager.GETALL TOURS
       final float[] pulseSerie = new float[_tourData.timeSerie.length];
@@ -892,12 +888,12 @@ public class PredictedPerformanceChartView extends ViewPart {
       float pulseMin;
       float pulseMax;
 
-      if (_isShowAllValues) {
+      if (true) {//_isShowAllValues) {
 
          pulseMin = pulseMax = pulseSerie[0];
 
          for (final float pulse : pulseSerie) {
-            pulseMin = _tourData.getGovss();
+            pulseMin = (float) (Math.random() * 100f);//_tourData.getGovss();
          }
 
       } else {
@@ -905,6 +901,7 @@ public class PredictedPerformanceChartView extends ViewPart {
          pulseMax = _tourData.getGovss();
       }
 
+      // TODO Ca se passe ici
       /*
        * create x-data series
        */
