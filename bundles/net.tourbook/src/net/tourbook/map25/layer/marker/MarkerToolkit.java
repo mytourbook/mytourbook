@@ -40,7 +40,7 @@ import net.tourbook.common.color.ColorUtil;
 import net.tourbook.map.bookmark.MapBookmark;
 import net.tourbook.map25.Map25App;
 import net.tourbook.map25.Map25ConfigManager;
-import net.tourbook.map25.Map25App.DebugMode;
+//import net.tourbook.map25.Map25App.DebugMode;
 
 
 public class MarkerToolkit {
@@ -72,9 +72,11 @@ public class MarkerToolkit {
 
    public MarkerRendererFactory _markerRendererFactory;
    
-   public enum MarkerShape {STAR, CIRCLE};
    
-   public enum MarkerMode {DEMO, NORMAL};
+   
+   //public enum MarkerShape {STAR, CIRCLE};
+   
+   //public enum MarkerMode {DEMO, NORMAL};
    
    public boolean _isMarkerClusteredLast;
    
@@ -221,7 +223,7 @@ public class MarkerToolkit {
          pts.add(item);
       }
 
-      if (MarkerMode == net.tourbook.map25.layer.marker.MarkerToolkit.MarkerMode.NORMAL) {return pts;};
+      if (MarkerMode == MarkerMode.NORMAL) {return pts;};
 
       int COUNT = 5;
       float STEP = 100f / 110000f; // roughly 100 meters

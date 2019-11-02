@@ -60,7 +60,6 @@ import net.tourbook.map25.action.ActionSynchMapWithChartSlider;
 import net.tourbook.map25.action.ActionSynchMapWithTour;
 import net.tourbook.map25.action.ActionZoomIn;
 import net.tourbook.map25.action.ActionZoomOut;
-//import net.tourbook.map25.action.ActionShowPhotos;
 import net.tourbook.map25.layer.marker.MapMarker;
 import net.tourbook.map25.layer.marker.MarkerConfig;
 import net.tourbook.map25.layer.marker.MarkerLayer;

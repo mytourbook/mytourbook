@@ -34,7 +34,6 @@ import net.tourbook.map.bookmark.MapBookmark;
 import net.tourbook.map25.Map25App;
 import net.tourbook.map25.Map25ConfigManager;
 import net.tourbook.map25.Map25View;
-import net.tourbook.map25.layer.marker.MarkerToolkit.MarkerShape;
 import net.tourbook.photo.ILoadCallBack;
 import net.tourbook.photo.ImageQuality;
 import net.tourbook.photo.Photo;

@@ -42,8 +42,9 @@ import net.tourbook.map25.layer.marker.MarkerConfig;
 import net.tourbook.map25.layer.marker.MarkerLayer;
 import net.tourbook.map25.layer.marker.MarkerLayer.OnItemGestureListener;
 import net.tourbook.map25.layer.marker.MarkerRenderer;
+import net.tourbook.map25.layer.marker.MarkerShape;
 import net.tourbook.map25.layer.marker.MarkerToolkit;
-import net.tourbook.map25.layer.marker.MarkerToolkit.MarkerMode;
+import net.tourbook.map25.layer.marker.MarkerMode;
 import net.tourbook.map25.layer.marker.PhotoToolkit;
 import net.tourbook.map25.layer.tourtrack.SliderLocation_Layer;
 import net.tourbook.map25.layer.tourtrack.SliderPath_Layer;
@@ -158,8 +159,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	
 	private int							_tileSourceOfflineMapCount = 0;
 	
-	public static enum DebugMode {OFF, ON};
-	public static DebugMode debugMode = DebugMode.OFF;   // before releasing, set this to OFF
+	//public static enum DebugMode {OFF, ON};
+	public static DebugMode debugMode = DebugMode.ON;   // before releasing, set this to OFF
 	
 	/**
 	 * The opacity can be set in the layer but not read. This will keep the state of the hillshading opacity.
@@ -192,7 +193,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	
    private ItemizedLayer<MarkerItem> _layer_MapBookmark;
    private MarkerToolkit _markertoolkit;
-   private MarkerMode _markerMode = MarkerToolkit.MarkerMode.NORMAL; // MarkerToolkit.modeDemo or MarkerToolkit.modeNormal
+   private MarkerMode _markerMode = MarkerMode.NORMAL; // MarkerToolkit.modeDemo or MarkerToolkit.modeNormal
    
    private ItemizedLayer<MarkerItem> _layer_Photo;
    private boolean                   _isPhotoClustered = true;
@@ -1082,7 +1083,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
       // MapBookmarks
       //debugPrint(" map25: " + "################ setupMap_Layers: calling constructor"); //$NON-NLS-1$
-      _markertoolkit = new MarkerToolkit(MarkerToolkit.MarkerShape.STAR);
+      _markertoolkit = new MarkerToolkit(MarkerShape.STAR);
       if (config.isMarkerClustered) {
          _layer_MapBookmark = new ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(), _markertoolkit._markerRendererFactory, this);
       } else {
