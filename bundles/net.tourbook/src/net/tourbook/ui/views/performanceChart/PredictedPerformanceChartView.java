@@ -862,14 +862,14 @@ public class PredictedPerformanceChartView extends ViewPart {
 
    private void updateUI_40_HrZoneChart(final HrZoneContext zoneMinMaxBpm) {
 
+      //TourManager.GETALL TOURS
       final float[] pulseSerie = new float[_tourData.timeSerie.length];
-      _tourData.getPulseSmoothedSerie();
       final int[] timeSerie = _tourData.timeSerie;
       final boolean[] breakTimeSerie = _tourData.getBreakTimeSerie();
       final int timeSerieSize = timeSerie.length;
 
-      final ArrayList<TourPersonHRZone> hrSortedZones = _currentPerson.getHrZonesSorted();
-      final int zoneSize = hrSortedZones.size();
+      final ArrayList<TourPersonHRZone> hrSortedZones = new ArrayList<>();
+      final int zoneSize = 100;// hrSortedZones.size();
 
       final RGB[] rgbBright = new RGB[zoneSize];
       final RGB[] rgbDark = new RGB[zoneSize];
@@ -877,11 +877,11 @@ public class PredictedPerformanceChartView extends ViewPart {
 
       int zoneIndex = 0;
 
-      for (final TourPersonHRZone hrZone : hrSortedZones) {
+      for (int index = 0; index < 100; ++index) {
 
-         rgbDark[zoneIndex] = hrZone.getColor();
-         rgbBright[zoneIndex] = hrZone.getColorBright();
-         rgbLine[zoneIndex] = hrZone.getColorDark();
+         rgbDark[zoneIndex] = new RGB(0, 255, 255);
+         rgbBright[zoneIndex] = new RGB(0, 255, 255);
+         rgbLine[zoneIndex] = new RGB(0, 255, 255);
 
          zoneIndex++;
       }
