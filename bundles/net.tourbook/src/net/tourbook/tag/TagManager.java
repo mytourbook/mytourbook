@@ -388,7 +388,7 @@ public class TagManager {
       // remove old tags from cached tours
       TourDatabase.clearTourTags();
 
-      TagMenuManager.updateRecentTagNames();
+      TagMenuManager.clearRecentTags();
 
       TourManager.getInstance().clearTourDataCache();
 

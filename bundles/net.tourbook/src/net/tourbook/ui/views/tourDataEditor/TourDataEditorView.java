@@ -2422,7 +2422,21 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
                } else if (eventId == TourEventId.TAG_STRUCTURE_CHANGED) {
 
-                  updateUI_FromModel(_tourData, false, true);
+                  if (_isTourDirty) {
+
+                     updateUI_FromModel(_tourData, false, true);
+
+                  } else {
+
+                     /**
+                      * When tags are deleted, then the tour editor is not be dirty (this is
+                      * previously checked)
+                      * <p>
+                      * -> reload tour with removed tags
+                      */
+
+                     reloadTourData();
+                  }
 
                } else if (eventId == TourEventId.MARKER_SELECTION && eventData instanceof SelectionTourMarker) {
 
