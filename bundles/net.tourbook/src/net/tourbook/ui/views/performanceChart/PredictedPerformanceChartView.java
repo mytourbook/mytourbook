@@ -16,7 +16,11 @@
 package net.tourbook.ui.views.performanceChart;
 
 import java.text.NumberFormat;
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.format.TextStyle;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -25,8 +29,10 @@ import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
+import net.tourbook.chart.ChartToolTipInfo;
 import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IBarSelectionListener;
+import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.chart.MinMaxKeeper_YData;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.ToolbarSlideout;
@@ -380,6 +386,41 @@ public class PredictedPerformanceChartView extends ViewPart {
       restoreState();
 
       showTour();
+   }
+
+   private ChartToolTipInfo createToolTipInfo(final int serieIndex, final int valueIndex) {
+
+      final int oldestYear = 2011;//_statFirstYear - _statNumberOfYears + 1;
+
+      final LocalDate monthDate = LocalDate.of(oldestYear, 1, 1).plusMonths(valueIndex);
+
+      final String monthText = Month
+            .of(monthDate.getMonthValue())
+            .getDisplayName(TextStyle.FULL, Locale.getDefault());
+
+      /*
+       * tool tip: title
+       */
+      final StringBuilder sbTitle = new StringBuilder();
+      sbTitle.append("Score of the day");
+
+      /*
+       * tool tip: label
+       */
+      final StringBuilder toolTipLabel = new StringBuilder();
+      toolTipLabel.append("Score");
+      toolTipLabel.append(UI.NEW_LINE);
+      toolTipLabel.append("234");
+
+      /*
+       * create tool tip info
+       */
+
+      final ChartToolTipInfo toolTipInfo = new ChartToolTipInfo();
+      toolTipInfo.setTitle(sbTitle.toString());
+      toolTipInfo.setLabel(toolTipLabel.toString());
+
+      return toolTipInfo;
    }
 
    private void createUI(final Composite parent) {
@@ -975,7 +1016,7 @@ public class PredictedPerformanceChartView extends ViewPart {
          }
       }
 
-      final ChartDataModel chartDataModel = new ChartDataModel(ChartType.LINE);
+      final ChartDataModel chartDataModel = new ChartDataModel(ChartType.BAR);
 
 //      chartDataModel.setTitle(TourManager.getTourDateTimeFull(_tourData));
 
@@ -990,15 +1031,16 @@ public class PredictedPerformanceChartView extends ViewPart {
       chartDataModel.setXData(xData);
 
       /*
-       * y-axis: time
+       * y-axis: GOVSS values
        */
+//TODO Get all tours belonging to the ativerperson and that have govss values
       final float[] yvalues = new float[pulseRange];
       for (int toto = 0; toto < pulseRange; ++toto) {
          yvalues[toto] = (float) (Math.random() * 100);
       }
 
       final ChartDataYSerie yData = new ChartDataYSerie(
-            ChartType.LINE,
+            ChartType.BAR,
             yvalues,
             false);
 
@@ -1013,6 +1055,14 @@ public class PredictedPerformanceChartView extends ViewPart {
 
       chartDataModel.addYData(yData);
 
+      // set tool tip info
+      chartDataModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, new IChartInfoProvider() {
+         @Override
+         public ChartToolTipInfo getToolTipInfo(final int serieIndex, final int valueIndex) {
+            return createToolTipInfo(serieIndex, valueIndex);
+         }
+      });
+
       /*
        * if (_isSynchChartVerticalValues && _isShowAllValues == false) {
        * _minMaxKeeper.setMinMaxValues(chartDataModel);
@@ -1021,7 +1071,6 @@ public class PredictedPerformanceChartView extends ViewPart {
       // show the new data data model in the chart
       _chartHrTime.updateChart(chartDataModel, false);
    }
-
    /**
     * @param zoneContext
     *           Contains age and HR max values.
