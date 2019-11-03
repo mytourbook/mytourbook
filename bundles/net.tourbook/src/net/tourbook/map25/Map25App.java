@@ -1201,7 +1201,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	   final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
       final Layers layers = mMap.layers();
       final int layer_index_PhotoLayer = layers.indexOf(_layer_Photo);
-      final boolean isShowPhotoLayer = config.isShowPhoto; // using settings from MapBookmarks must be changed later with own config
+      final boolean isShowPhotoLayer = config.isShowPhoto;
+      // using settings from MapBookmarks must be changed later with own config
       //"STATE_IS_LAYER_PHOTO_VISIBLE"
       //debugPrint(" map25: " + "# updateUI_PhotoLayer(): #photos: " + _selectedPhotosPts.size()); //$NON-NLS-1$
       //if (config.isPhotoClustered != _phototoolkit._isMarkerClusteredLast) { // only recreate PhotoLayer when changed in UI. 

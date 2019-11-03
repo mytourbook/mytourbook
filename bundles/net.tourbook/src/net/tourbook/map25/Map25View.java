@@ -305,7 +305,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       }
    }
 
-   private class ActionShowPhoto_WithConfig extends ActionToolbarSlideout {
+/*   private class ActionShowPhoto_WithConfig extends ActionToolbarSlideout {
 
       public ActionShowPhoto_WithConfig() {
 
@@ -334,7 +334,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
          //actionShowTour(getSelection());  //hmmm
       }
-   }
+   }*/
    
    private class ActionShowTour_WithConfig extends ActionToolbarSlideout {
 
@@ -763,7 +763,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       _actionShowTour_WithOptions = new ActionShowTour_WithConfig();
       _actionZoom_In = new ActionZoomIn(this);
       _actionZoom_Out = new ActionZoomOut(this);
-      //_actionShowPhoto = new ActionShowPhoto(this);
+     //_actionShowPhoto = new ActionShowPhoto(this);
 
    }
 
@@ -1040,7 +1040,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       _actionShowEntireTour.setEnabled(canShowTour);
       _actionSyncMap_WithTour.setEnabled(canShowTour);
       _actionSyncMap_WithChartSlider.setEnabled(canShowTour);
-      //_actionShowPhotos.setEnabled(isTourAvailable);
+
       _actionMapBookmarks.setEnabled(true);
       _actionMapProvider.setEnabled(true);
       _actionMapOptions.setEnabled(true);
