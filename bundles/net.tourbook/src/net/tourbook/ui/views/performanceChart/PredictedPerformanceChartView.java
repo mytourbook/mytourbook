@@ -992,16 +992,15 @@ public class PredictedPerformanceChartView extends ViewPart {
       /*
        * y-axis: time
        */
-      final float[][] yvalues = new float[pulseRange][1];
+      final float[] yvalues = new float[pulseRange];
       for (int toto = 0; toto < pulseRange; ++toto) {
-         for (int titi = 0; titi < 1; ++titi) {
-            yvalues[toto][titi] = 20;
-         }
+         yvalues[toto] = (float) (Math.random() * 100);
       }
 
       final ChartDataYSerie yData = new ChartDataYSerie(
             ChartType.LINE,
-            yvalues);
+            yvalues,
+            false);
 
       yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
       yData.setYTitle("GOVSS");//Messages.App_Label_H_MM);
