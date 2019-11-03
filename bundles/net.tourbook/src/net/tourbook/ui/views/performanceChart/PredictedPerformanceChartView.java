@@ -971,11 +971,11 @@ public class PredictedPerformanceChartView extends ViewPart {
 
          // check array bounds
          if (pulseIndex >= 0 && pulseIndex < pulseRange) {
-            ySeriePulseDuration[pulseIndex] += timeDiff;
+            ySeriePulseDuration[pulseIndex] += Math.random() * 100;
          }
       }
 
-      final ChartDataModel chartDataModel = new ChartDataModel(ChartType.BAR);
+      final ChartDataModel chartDataModel = new ChartDataModel(ChartType.LINE);
 
 //      chartDataModel.setTitle(TourManager.getTourDateTimeFull(_tourData));
 
@@ -985,7 +985,7 @@ public class PredictedPerformanceChartView extends ViewPart {
       final ChartDataXSerie xData = new ChartDataXSerie(_xSeriePulse);
       xData.setAxisUnit(ChartDataXSerie.X_AXIS_UNIT_NUMBER_CENTER);
       xData.setUnitLabel("date");//net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit);
-      xData.setUnitStartValue(pulseMin);
+      xData.setUnitStartValue(0);
 
       chartDataModel.setXData(xData);
 
