@@ -76,7 +76,7 @@ public class PhotoToolkit extends MarkerToolkit{
       public void callBackImageIsLoaded(final boolean isUpdateUI) {
 
          debugPrint("???? PhotoToolkit: LoadCallbackImage"); //$NON-NLS-1$
-         updatePhotos();
+         //updatePhotos(); has only updateUI...
          _mapApp.updateUI_PhotoLayer();
 //         if (isUpdateUI == false) {
 //            return;
@@ -279,7 +279,7 @@ public class PhotoToolkit extends MarkerToolkit{
    }
  
    public void updatePhotos() {
-      net.tourbook.map25.Map25App.debugPrint("Update Photos");
+      net.tourbook.map25.Map25App.debugPrint("???? PhotoToolkit: Update Photos");
       _mapApp.updateUI_PhotoLayer();
    }
    
