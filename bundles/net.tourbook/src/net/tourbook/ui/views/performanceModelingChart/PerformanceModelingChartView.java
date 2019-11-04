@@ -1016,7 +1016,15 @@ public class PerformanceModelingChartView extends ViewPart {
          }
       }
 
-      final ChartDataModel chartDataModel = new ChartDataModel(ChartType.BAR);
+      final ChartDataModel chartDataModel = new ChartDataModel(ChartType.LINE);
+      chartDataModel.setIsGraphOverlapped(true);
+
+/*
+ * final ChartDataModel newChartDataModel = TourManager.getInstance().createChartDataModel(
+ * _tourData,
+ * _tcc,
+ * isPropertyChanged);
+ */
 
 //      chartDataModel.setTitle(TourManager.getTourDateTimeFull(_tourData));
 
@@ -1040,7 +1048,7 @@ public class PerformanceModelingChartView extends ViewPart {
       }
 
       final ChartDataYSerie yData = new ChartDataYSerie(
-            ChartType.BAR,
+            ChartType.LINE,
             yvalues,
             false);
 
@@ -1068,6 +1076,43 @@ public class PerformanceModelingChartView extends ViewPart {
        * _minMaxKeeper.setMinMaxValues(chartDataModel);
        * }
        */
+
+      final float[] dummyPerformanceData = new float[pulseRange];
+      for (int toto = 0; toto < pulseRange; ++toto) {
+         dummyPerformanceData[toto] = (float) (Math.random() * 100);
+      }
+
+      final ChartDataYSerie dummyPerformanceDataYAxis = new ChartDataYSerie(
+            ChartType.LINE,
+            dummyPerformanceData,
+            false);
+
+      dummyPerformanceDataYAxis.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
+      yData.setYTitle("GOVSS");//Messages.App_Label_H_MM);
+
+      final RGB[] rgbBright2 = new RGB[zoneSize];
+      final RGB[] rgbDark2 = new RGB[zoneSize];
+      final RGB[] rgbLine2 = new RGB[zoneSize];
+
+      zoneIndex = 0;
+
+      for (int index = 0; index < 100; ++index) {
+
+         rgbDark2[zoneIndex] = new RGB(203, 25, 37);
+         rgbBright2[zoneIndex] = new RGB(203, 25, 37);
+         rgbLine2[zoneIndex] = new RGB(203, 25, 37);
+
+         zoneIndex++;
+      }
+
+      dummyPerformanceDataYAxis.setColorIndex(new int[][] { colorIndex });
+      dummyPerformanceDataYAxis.setRgbLine(rgbLine2);
+      dummyPerformanceDataYAxis.setRgbBright(rgbBright2);
+      dummyPerformanceDataYAxis.setRgbDark(rgbDark2);
+      dummyPerformanceDataYAxis.setDefaultRGB(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY).getRGB());
+
+      chartDataModel.addYData(dummyPerformanceDataYAxis);
+
       // show the new data data model in the chart
       _chartHrTime.updateChart(chartDataModel, false);
    }
