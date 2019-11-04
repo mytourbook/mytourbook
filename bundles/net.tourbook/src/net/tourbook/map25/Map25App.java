@@ -154,6 +154,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	private BuildingLayer			_layer_Building;
 	private S3DBLayer					_layer_S3DB_Building;
 	private TileSource            _hillshadingSource = null;
+	private TileSource            _satelliteSource = null; 
 	private MapFileTileSource		 _tileSourceOffline;
 	private MultiMapFileTileSource _tileSourceOfflineMM;
 	
@@ -170,6 +171,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	private LabelLayerMT				_layer_Label;
 	private MarkerLayer				_layer_Marker;
 	private BitmapTileLayer			_layer_HillShading;
+	private BitmapTileLayer       _layer_Satellite;
 	private MapScaleBarLayer		_layer_ScaleBar;
 	private SliderLocation_Layer	_layer_SliderLocation;
 	private SliderPath_Layer		_layer_SliderPath;
@@ -542,6 +544,10 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	public int getLayer_HillShading_Opacity() {
       return _layer_HillShading_Opacity;
    }
+	
+   public BitmapTileLayer getLayer_Satellite() {
+      return _layer_Satellite;
+   }	
 	
 	public LabelLayerMT getLayer_Label() {
 		return _layer_Label;
@@ -1037,6 +1043,19 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	   _layer_HillShading = new BitmapTileLayer(mMap, _hillshadingSource, 1 << 20);
 	   _layer_HillShading.setEnabled(false);
 	   mMap.layers().add(_layer_HillShading);
+	   
+	   // satellite maps like google earth
+	   _satelliteSource = DefaultSources.OPENSTREETMAP
+	         .httpFactory(_httpFactory)
+            .url("http://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile")
+            .tilePath("/{Z}/{Y}/{X}.png")
+            .zoomMin(1)
+            .zoomMax(18)
+            .build();
+	   _layer_Satellite = new BitmapTileLayer(mMap, _satelliteSource, 1 << 20);
+	   _layer_Satellite.setEnabled(false);
+	   mMap.layers().add(_layer_Satellite);
+	   
 
 	   // tour
 	   _layer_Tour = new TourLayer(mMap);
