@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.views.performanceChart;
+package net.tourbook.ui.views.performanceModelingChart;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -23,13 +23,13 @@ import org.eclipse.jface.action.Action;
 
 public class ActionSynchChartScale extends Action {
 
-   private PredictedPerformanceChartView _performanceChartView;
+   private PerformanceModelingChartView _performanceModelingChartView;
 
-   public ActionSynchChartScale(final PredictedPerformanceChartView performanceChartView) {
+   public ActionSynchChartScale(final PerformanceModelingChartView performanceModelingChartView) {
 
 		super(UI.EMPTY_STRING, AS_CHECK_BOX);
 
-      _performanceChartView = performanceChartView;
+      _performanceModelingChartView = performanceModelingChartView;
 
 		setToolTipText(Messages.Training_View_Action_SynchChartScale);
 
@@ -39,6 +39,6 @@ public class ActionSynchChartScale extends Action {
 
 	@Override
 	public void run() {
-      _performanceChartView.actionSynchChartScale();
+      _performanceModelingChartView.actionSynchChartScale();
 	}
 }

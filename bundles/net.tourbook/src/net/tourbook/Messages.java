@@ -581,10 +581,10 @@ public class Messages extends NLS {
    public static String        Compute_CadenceZonesTimes_Dialog_ComputeForAllTours_Message;
    public static String        Compute_CadenceZonesTimes_Dialog_ComputeForAllTours_Title;
 
-   public static String        Compute_PredictedPerformanceChart_Group;
-   public static String        Compute_PredictedPerformanceChart_ComputeForAllTours_Job_Result;
-   public static String        Compute_PredictedPerformanceChart_Dialog_ComputeForAllTours_Message;
-   public static String        Compute_PredictedPerformanceChart_Dialog_ComputeForAllTours_Title;
+   public static String        Compute_PerformanceModelingChart_Group;
+   public static String        Compute_PerformanceModelingChart_ComputeForAllTours_Job_Result;
+   public static String        Compute_PerformanceModelingChart_Dialog_ComputeForAllTours_Message;
+   public static String        Compute_PerformanceModelingChart_Dialog_ComputeForAllTours_Title;
 
    public static String        Compute_HrZone_Group;
    public static String        Compute_HrZone_Link;
@@ -595,11 +595,11 @@ public class Messages extends NLS {
 
    public static String        Compute_PredictedPerformance_Button_ComputeValues;
    public static String        Compute_PredictedPerformance_Button_ComputeValues_Tooltip;
-   public static String        Compute_PredictedPerformanceChart_Label_Days;
-   public static String        Compute_PredictedPerformanceChart_Label_FatigueDecay;
-   public static String        Compute_PredictedPerformanceChart_Label_FatigueDecay_Tooltip;
-   public static String        Compute_PredictedPerformanceChart_Label_FitnessDecay;
-   public static String        Compute_PredictedPerformanceChart_Label_FitnessDecay_Tooltip;
+   public static String        Compute_PerformanceModelingChart_Label_Days;
+   public static String        Compute_PerformanceModelingChart_Label_FatigueDecay;
+   public static String        Compute_PerformanceModelingChart_Label_FatigueDecay_Tooltip;
+   public static String        Compute_PerformanceModelingChart_Label_FitnessDecay;
+   public static String        Compute_PerformanceModelingChart_Label_FitnessDecay_Tooltip;
 
    public static String        Compute_Smoothing_Button_ForAllTours;
    public static String        Compute_Smoothing_Button_ForAllTours_Tooltip;

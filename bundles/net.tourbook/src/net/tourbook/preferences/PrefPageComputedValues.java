@@ -224,10 +224,10 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
             tabItemCadenceZones.setControl(createUI_70_CadenceZones(_tabFolder));
             tabItemCadenceZones.setText(Messages.Compute_CadenceZonesTimes_Group);
 
-            // tab: Predicted performance chart options
-            final TabItem tabPredictedPerformanceChart = new TabItem(_tabFolder, SWT.NONE);
-            tabPredictedPerformanceChart.setControl(createUI_80_PredictedPerformanceChart(_tabFolder));
-            tabPredictedPerformanceChart.setText(Messages.Compute_PredictedPerformanceChart_Group);
+            // tab: Performance modeling chart options
+            final TabItem tabPerformanceModelingChart = new TabItem(_tabFolder, SWT.NONE);
+            tabPerformanceModelingChart.setControl(createUI_80_PerformanceModelingChart(_tabFolder));
+            tabPerformanceModelingChart.setText(Messages.Compute_PerformanceModelingChart_Group);
 
             /**
              * 4.8.2009 week no/year is currently disabled because a new field in the db is
@@ -868,7 +868,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
    /**
     * UI for the predicted performance chart options
     */
-   private Control createUI_80_PredictedPerformanceChart(final Composite parent) {
+   private Control createUI_80_PerformanceModelingChart(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridLayoutFactory.swtDefaults().numColumns(3).extendedMargins(0, 0, 7, 0).applyTo(container);
@@ -877,8 +877,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
           * Fitness decay value (days)
           */
          Label label = new Label(container, NONE);
-         label.setText(Messages.Compute_PredictedPerformanceChart_Label_FitnessDecay);
-         label.setToolTipText(Messages.Compute_PredictedPerformanceChart_Label_FitnessDecay_Tooltip);
+         label.setText(Messages.Compute_PerformanceModelingChart_Label_FitnessDecay);
+         label.setToolTipText(Messages.Compute_PerformanceModelingChart_Label_FitnessDecay_Tooltip);
 
          // Fitness decay spinner
          _spinnerFitnessDecayTime = new Spinner(container, SWT.BORDER);
@@ -893,14 +893,14 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
          // label: days
          label = new Label(container, NONE);
-         label.setText(Messages.Compute_PredictedPerformanceChart_Label_Days);
+         label.setText(Messages.Compute_PerformanceModelingChart_Label_Days);
 
          /*
           * Fatigue decay value (days)
           */
          label = new Label(container, NONE);
-         label.setText(Messages.Compute_PredictedPerformanceChart_Label_FatigueDecay);
-         label.setToolTipText(Messages.Compute_PredictedPerformanceChart_Label_FatigueDecay_Tooltip);
+         label.setText(Messages.Compute_PerformanceModelingChart_Label_FatigueDecay);
+         label.setToolTipText(Messages.Compute_PerformanceModelingChart_Label_FatigueDecay_Tooltip);
 
          // Fatigue decay spinner
          _spinnerFatigueDecayTime = new Spinner(container, SWT.BORDER);
@@ -915,7 +915,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
          // label: days
          label = new Label(container, SWT.NONE);
-         label.setText(Messages.Compute_PredictedPerformanceChart_Label_Days);
+         label.setText(Messages.Compute_PerformanceModelingChart_Label_Days);
 
          // button: Compute predicted performance chart values for all tours and all training stress models
          final Button btnComputeValues = new Button(container, SWT.NONE);

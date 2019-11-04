@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.views.performanceChart;
+package net.tourbook.ui.views.performanceModelingChart;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -36,7 +36,7 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public class SlideoutTrainingOptions extends ToolbarSlideout {
 
-   private PredictedPerformanceChartView _predictedPerformanceChartView;
+   private PerformanceModelingChartView _performanceModelingChartView;
 
 	private Action				_actionRestoreDefaults;
 	private ActionEditHrZones	_actionEditHrZones;
@@ -50,11 +50,11 @@ public class SlideoutTrainingOptions extends ToolbarSlideout {
 	public SlideoutTrainingOptions(	final Control ownerControl,
 									final ToolBar toolBar,
 									final String prefStoreGridPrefix,
-                                  final PredictedPerformanceChartView predicedPerformanceChartView) {
+                                  final PerformanceModelingChartView performanceModelingChartView) {
 
 		super(ownerControl, toolBar);
 
-      _predictedPerformanceChartView = predicedPerformanceChartView;
+      _performanceModelingChartView = performanceModelingChartView;
 
 		_gridUI = new ChartOptions_Grid(prefStoreGridPrefix);
 	}

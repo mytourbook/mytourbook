@@ -13,30 +13,22 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.views.performanceChart;
+package net.tourbook.ui.views.performanceModelingChart;
 
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.ui.UI;
+import net.tourbook.common.util.Util;
 
-import org.eclipse.jface.action.Action;
+import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
 
-public class ActionShowAllStressScoreValues extends Action {
-
-   private PredictedPerformanceChartView _predictedPerformanceChartView;
-
-   public ActionShowAllStressScoreValues(final PredictedPerformanceChartView predictedPerformanceChartView) {
-
-      super(UI.EMPTY_STRING, AS_CHECK_BOX);
-
-      setToolTipText(Messages.Training_View_Action_ShowAllPulseValues);
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ZoomFitGraph));
-
-      _predictedPerformanceChartView = predictedPerformanceChartView;
-   }
+public class ActionHandlerOpenViewPerformanceModelingChart extends AbstractHandler {
 
    @Override
-   public void run() {
-      _predictedPerformanceChartView.actionShowAllStressScoreValues();
+   public Object execute(final ExecutionEvent event) throws ExecutionException {
+
+      Util.showView(PerformanceModelingChartView.ID, true);
+
+      return null;
    }
+
 }

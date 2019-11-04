@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.views.performanceChart;
+package net.tourbook.ui.views.performanceModelingChart;
 
 import java.text.NumberFormat;
 import java.time.LocalDate;
@@ -91,9 +91,9 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
-public class PredictedPerformanceChartView extends ViewPart {
+public class PerformanceModelingChartView extends ViewPart {
 
-   public static final String  ID                                    = "net.tourbook.ui.views.performanceChart.PredictedPerformanceChartView"; //$NON-NLS-1$
+   public static final String  ID                                    = "net.tourbook.ui.views.performanceModelingChart.PerformanceModelingChartView"; //$NON-NLS-1$
 
    private static final int    HR_LEFT_MIN_BORDER                    = 0;
    private static final int    HR_RIGHT_MAX_BORDER                   = 230;
@@ -188,11 +188,11 @@ public class PredictedPerformanceChartView extends ViewPart {
       @Override
       protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
 
-         return new SlideoutTrainingOptions(_pageBook, toolbar, GRID_PREF_PREFIX, PredictedPerformanceChartView.this);
+         return new SlideoutTrainingOptions(_pageBook, toolbar, GRID_PREF_PREFIX, PerformanceModelingChartView.this);
       }
    }
 
-   public PredictedPerformanceChartView() {}
+   public PerformanceModelingChartView() {}
 
    void actionEditHrZones() {
 
@@ -298,7 +298,7 @@ public class PredictedPerformanceChartView extends ViewPart {
          @Override
          public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
 
-            if (part == PredictedPerformanceChartView.this) {
+            if (part == PerformanceModelingChartView.this) {
                return;
             }
 
@@ -315,7 +315,7 @@ public class PredictedPerformanceChartView extends ViewPart {
          @Override
          public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
-            if (part == PredictedPerformanceChartView.this) {
+            if (part == PerformanceModelingChartView.this) {
                return;
             }
 
