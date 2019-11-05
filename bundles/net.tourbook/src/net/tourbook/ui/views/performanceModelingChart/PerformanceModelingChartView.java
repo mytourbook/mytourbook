@@ -20,7 +20,9 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.time.format.TextStyle;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -98,12 +100,12 @@ public class PerformanceModelingChartView extends ViewPart {
    private static final int    HR_LEFT_MIN_BORDER                    = 0;
    private static final int    HR_RIGHT_MAX_BORDER                   = 230;
 
-   private static final String STATE_HR_CHART_LEFT_BORDER            = "HrLeftChartBorder";                                                    //$NON-NLS-1$
-   private static final String STATE_HR_CHART_RIGHT_BORDER           = "HrRightChartBorder";                                                   //$NON-NLS-1$
-   private static final String STATE_IS_SHOW_ALL_STRESS_SCORE_VALUES = "IsShowAllStressScoreValues";                                           //$NON-NLS-1$
-   private static final String STATE_IS_SYNC_VERTICAL_CHART_SCALING  = "IsSyncVerticalChartScaling";                                           //$NON-NLS-1$
+   private static final String STATE_HR_CHART_LEFT_BORDER            = "HrLeftChartBorder";                                                           //$NON-NLS-1$
+   private static final String STATE_HR_CHART_RIGHT_BORDER           = "HrRightChartBorder";                                                          //$NON-NLS-1$
+   private static final String STATE_IS_SHOW_ALL_STRESS_SCORE_VALUES = "IsShowAllStressScoreValues";                                                  //$NON-NLS-1$
+   private static final String STATE_IS_SYNC_VERTICAL_CHART_SCALING  = "IsSyncVerticalChartScaling";                                                  //$NON-NLS-1$
 
-   private static final String GRID_PREF_PREFIX                      = "GRID_TRAINING__";                                                      //$NON-NLS-1$
+   private static final String GRID_PREF_PREFIX                      = "GRID_TRAINING__";                                                             //$NON-NLS-1$
 
 // SET_FORMATTING_OFF
 
@@ -158,26 +160,27 @@ public class PerformanceModelingChartView extends ViewPart {
    /*
     * Pagebook for the predicted performance view
     */
-   private PageBook  _pageBook;
-   private Composite _page_TrainingStressScores;
-   private Composite _page_NoTour;
-   private Composite _page_NoPerson;
+   private PageBook   _pageBook;
+   private Composite  _page_TrainingStressScores;
+   private Composite  _page_NoTour;
+   private Composite  _page_NoPerson;
 
-   private Composite _toolbar;
-   private Chart     _chartHrTime;
+   private Composite  _toolbar;
+   private Chart      _chartHrTime;
 
-   private Spinner   _spinnerHrLeft;
-   private Spinner   _spinnerHrRight;
-   private Label     _lblHrMin;
-   private Label     _lblHrMax;
+   private Spinner    _spinnerHrLeft;
+   private Spinner    _spinnerHrRight;
+   private Label      _lblHrMin;
+   private Label      _lblHrMax;
 
-   private Composite _hrZoneDataContainerContent;
+   private Composite  _hrZoneDataContainerContent;
 
-   private Label[]   _lblTourMinMaxValue;
-   private Label[]   _lblTourMinMaxHours;
-   private Label[]   _lblHRZoneName;
-   private Label[]   _lblHRZoneColor;
-   private Label[]   _lblHrZonePercent;
+   private Label[]    _lblTourMinMaxValue;
+   private Label[]    _lblTourMinMaxHours;
+   private Label[]    _lblHRZoneName;
+   private Label[]    _lblHRZoneColor;
+   private Label[]    _lblHrZonePercent;
+
 
    /*
     * none UI
@@ -192,7 +195,9 @@ public class PerformanceModelingChartView extends ViewPart {
       }
    }
 
-   public PerformanceModelingChartView() {}
+   public PerformanceModelingChartView() {
+
+   }
 
    void actionEditHrZones() {
 
@@ -1061,7 +1066,7 @@ public class PerformanceModelingChartView extends ViewPart {
       yData.setRgbDark(rgbDark);
       yData.setDefaultRGB(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY).getRGB());
 
-      chartDataModel.addYData(yData);
+      //chartDataModel.addYData(yData);
 
       // set tool tip info
       chartDataModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, new IChartInfoProvider() {
@@ -1078,8 +1083,33 @@ public class PerformanceModelingChartView extends ViewPart {
        */
 
       final float[] dummyPerformanceData = new float[pulseRange];
-      for (int toto = 0; toto < pulseRange; ++toto) {
-         dummyPerformanceData[toto] = (float) (Math.random() * 100);
+      final int[] govssValues = new int[100];
+      final TourPerson tourPerson = TourbookPlugin.getActivePerson();
+
+      if (tourPerson.getPerformanceModelingData() == null) {
+         return;
+      }
+
+      final HashMap<LocalDate, ArrayList<Long>> govssEntries = tourPerson.getPerformanceModelingData().getGovssEntries();
+
+      if (govssEntries == null) {
+         return;
+      }
+
+      final int indexe = 0;
+      for (final Map.Entry<LocalDate, ArrayList<Long>> entry : govssEntries.entrySet()) {
+         final LocalDate date = entry.getKey();
+         final ArrayList<Long> tourIds = entry.getValue();
+
+         int totalGovssValue = 0;
+         for (final Long tourId : tourIds) {
+            totalGovssValue += TourManager.getTour(tourId).getGovss();
+         }
+         govssValues[indexe] = totalGovssValue;
+
+      }
+      for (int toto = 0; toto < 100; ++toto) {
+         dummyPerformanceData[toto] = govssValues[toto];
       }
 
       final ChartDataYSerie dummyPerformanceDataYAxis = new ChartDataYSerie(
@@ -1116,6 +1146,7 @@ public class PerformanceModelingChartView extends ViewPart {
       // show the new data data model in the chart
       _chartHrTime.updateChart(chartDataModel, false);
    }
+
    /**
     * @param zoneContext
     *           Contains age and HR max values.

@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.data;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -24,48 +26,52 @@ import javax.persistence.EntityTransaction;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
 
 @Entity
 public class PerformanceModelingData {
 
-   //public static final int                 DB_LENGTH_GOVSS_ASSOCIATED_TOUR_TYPES = 255;
-
-   public static final int       PERFORMANCE_MODELING_DATA_ID_NOT_DEFINED = -1;
+   public static final int PERFORMANCE_MODELING_DATA_ID_NOT_DEFINED = 0;
 
    /**
     * Default rest pulse
     */
-   public static final int       DEFAULT_REST_PULSE                       = 60;
+   //public static final int                     DEFAULT_REST_PULSE                       = 60;
 
    /**
     * manually created person creates a unique id to identify it, saved person is compared with the
     * person id
     */
-   private static int            _createCounter                           = 0;
+   private static int                          _createCounter = 0;
 
    @Id
-   @GeneratedValue(strategy = GenerationType.AUTO)
-   private long                  PerformanceModelingDataId;
+   @GeneratedValue(strategy = GenerationType.IDENTITY)
+   private long                                PerformanceModelingDataId;
 
    /**
     * Training Stress data
     */
 
    // GOVSS
-   private HashMap<Date, long[]> govssEntries;
+   @Lob
+   private HashMap<LocalDate, ArrayList<Long>> govssEntries;
 
-   private HashMap<Date, long[]> bikeScoreEntries;
-//   private HashMap<Date, long[]>           swimScoreEntries;
+   @Lob
+   private HashMap<Date, long[]>               bikeScoreEntries;
+
+   //   private HashMap<Date, long[]>           swimScoreEntries;
    //  private HashMap<Date, long[]>           trimpEntries;
    /**
     * Computed data : Fitness and fatigue
     */
 
+   @Lob
    private HashMap<Date, long[]> fitnessValuesSkiba;
-
+   @Lob
    private HashMap<Date, long[]> fatigueValuesSkiba;
 
    /**
@@ -73,7 +79,7 @@ public class PerformanceModelingData {
     */
    public PerformanceModelingData() {}
 
-   public HashMap<Date, long[]> getGovssEntries() {
+   public HashMap<LocalDate, ArrayList<Long>> getGovssEntries() {
       return govssEntries;
    }
 
@@ -90,17 +96,17 @@ public class PerformanceModelingData {
 
       try {
 
-         if (getPerformanceModelingDataId() == PERFORMANCE_MODELING_DATA_ID_NOT_DEFINED) {
-            // entity is new
-            ts.begin();
-            em.persist(this);
-            ts.commit();
-         } else {
-            // update entity
-            ts.begin();
-            em.merge(this);
-            ts.commit();
+         // entity is new
+         ts.begin();
+         {
+            final PerformanceModelingData performanceModelingDataEntity = em.find(PerformanceModelingData.class, getPerformanceModelingDataId());
+            if (performanceModelingDataEntity == null) {
+               em.persist(this);
+            } else {
+               em.merge(this);
+            }
          }
+         ts.commit();
 
       } catch (final Exception e) {
          e.printStackTrace();
@@ -120,9 +126,34 @@ public class PerformanceModelingData {
       return isSaved;
    }
 
-   public void setGovss(final long tourPersonId, final long tourStartTime, final int govss) {
+   public void setGovss(final long tourStartTime, final long tourId) {
       // we add or update the govss entry and update the fitness and fatigue values
 
+      if (govssEntries == null) {
+         govssEntries = new HashMap<>();
+      }
+
+      final LocalDate tourStartDate = TimeTools.toLocalDate(tourStartTime);
+      ArrayList<Long> tourIds = govssEntries.get(tourStartDate);
+      if (tourIds == null) {
+         tourIds = new ArrayList<>();
+
+         tourIds.add(tourId);
+         govssEntries.put(tourStartDate, tourIds);
+      } else {
+         if (tourIds.contains(tourId)) {
+            return;
+         }
+
+         tourIds.add(tourId);
+         govssEntries.replace(tourStartDate, tourIds);
+
+      }
+
+   }
+
+   public void setGovssEntries(final HashMap<LocalDate, ArrayList<Long>> govssEntries) {
+      this.govssEntries = govssEntries;
    }
 
    @Override

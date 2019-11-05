@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -101,9 +102,9 @@ public class TourPerson implements Comparable<Object> {
     * tourPerson_personId
     * </pre>
     */
-   @OneToOne(targetEntity = PerformanceModelingData.class)
+   @OneToOne(targetEntity = PerformanceModelingData.class, cascade = CascadeType.ALL)
    @JoinColumn(name = "PerformanceModelingDataId")
-   public PerformanceModelingData          performanceModelingData;
+   private PerformanceModelingData         performanceModelingData;
 
    /**
     * Training Stress data
@@ -111,11 +112,11 @@ public class TourPerson implements Comparable<Object> {
 
    // GOVSS
    private int                             govssThresholdPower;
+
    private int                             govssTimeTrialDuration;
    private int                             govssTimeTrialDistance;
    private float                           govssTimeTrialAverageSlope;
    private String                          govssAssociatedTourTypes;
-
    /**
     * Birthday of this person in milliseconds from 1970-01-01T00:00:00, default value is 0 when
     * birthday is not set.
@@ -211,6 +212,7 @@ public class TourPerson implements Comparable<Object> {
 
       this.firstName = firstName;
       this.lastName = lastName;
+      this.performanceModelingData = new PerformanceModelingData();
    }
 
    /**
@@ -270,6 +272,16 @@ public class TourPerson implements Comparable<Object> {
          // return default, this case should never happen
          return 220 - age;
       }
+   }
+
+   public void addGovssEntry(final long tourStartTime, final long tourId) {
+      if (performanceModelingData == null) {
+         performanceModelingData = new PerformanceModelingData();
+      }
+
+      performanceModelingData.setGovss(tourStartTime, tourId);
+      performanceModelingData.persist();
+      persist();
    }
 
    @Override
@@ -501,6 +513,10 @@ public class TourPerson implements Comparable<Object> {
             (lastName.equals(UI.EMPTY_STRING) ? //
                   UI.EMPTY_STRING
                   : UI.SPACE + lastName);
+   }
+
+   public PerformanceModelingData getPerformanceModelingData() {
+      return performanceModelingData;
    }
 
    public long getPersonId() {
