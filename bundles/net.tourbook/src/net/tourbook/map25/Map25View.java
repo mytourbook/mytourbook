@@ -143,6 +143,8 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
    //private static final String          STATE_IS_LAYER_S3DB_VISIBLE                      = "STATE_IS_LAYER_S3DB_VISIBLE";                            //$NON-NLS-1$
    private static final String            STATE_IS_LAYER_BOOKMARK_VISIBLE                  = "STATE_IS_LAYER_BOOKMARK_VISIBLE";                        //$NON-NLS-1$
    private static final String            STATE_IS_LAYER_HILLSHADING_VISIBLE               = "STATE_IS_LAYER_HILLSHADING_VISIBLE";                     //$NON-NLS-1$
+   private static final String            STATE_IS_LAYER_SATELLITE_VISIBLE               = "STATE_IS_LAYER_SATELLITE_VISIBLE";                         //$NON-NLS-1$   
+   
    private static final String            STATE_IS_LAYER_LABEL_VISIBLE                     = "STATE_IS_LAYER_LABEL_VISIBLE";                           //$NON-NLS-1$
    private static final String            STATE_IS_LAYER_MARKER_VISIBLE                    = "STATE_IS_LAYER_MARKER_VISIBLE";                          //$NON-NLS-1$
    private static final String            STATE_IS_LAYER_PHOTO_VISIBLE                     = "STATE_IS_LAYER_PHOTO_VISIBLE";                           //$NON-NLS-1$
@@ -1652,6 +1654,9 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       _mapApp.setLayer_HillShading_Opacity(layerHillshadingOpacity);
       layer_HillShading.setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_HILLSHADING_VISIBLE, true));
       layer_HillShading.setBitmapAlpha(layerHillshadingOpacity / 100f, true);
+      
+      // satellite maps
+      _mapApp.getLayer_Satellite().setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_SATELLITE_VISIBLE, false));
 
       // other layers
       _mapApp.getLayer_BaseMap().setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_BASE_MAP_VISIBLE, true));
@@ -1696,6 +1701,8 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       // hillshading layer
       _state.put(STATE_IS_LAYER_HILLSHADING_VISIBLE, _mapApp.getLayer_HillShading().isEnabled());
       _state.put(STATE_LAYER_HILLSHADING_OPACITY, _mapApp.getLayer_HillShading_Opacity());
+      //satellite maps
+      _state.put(STATE_IS_LAYER_SATELLITE_VISIBLE, _mapApp.getLayer_Satellite().isEnabled());
 
 
       Map25ConfigManager.saveState();

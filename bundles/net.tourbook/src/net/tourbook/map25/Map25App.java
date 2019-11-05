@@ -97,6 +97,7 @@ import org.oscim.theme.XmlRenderThemeStyleLayer;
 import org.oscim.tiling.TileSource;
 import org.oscim.tiling.TileSource.OpenResult;
 import org.oscim.tiling.source.UrlTileSource;
+import org.oscim.tiling.source.bitmap.BitmapTileSource;
 import org.oscim.tiling.source.bitmap.DefaultSources;
 import org.oscim.tiling.source.mapfile.MapFileTileSource;
 import org.oscim.tiling.source.mapfile.MultiMapFileTileSource;
@@ -1040,22 +1041,32 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	         .zoomMin(1)
 	         .zoomMax(16)
 	         .build();  
-	   _layer_HillShading = new BitmapTileLayer(mMap, _hillshadingSource, 1 << 20);
+	   _layer_HillShading = new BitmapTileLayer(mMap, _hillshadingSource, 1 << 19);
 	   _layer_HillShading.setEnabled(false);
 	   mMap.layers().add(_layer_HillShading);
 	   
 	   // satellite maps like google earth
-	   _satelliteSource = DefaultSources.OPENSTREETMAP
+	   
+	   _satelliteSource = BitmapTileSource.builder()
+	         .httpFactory(_httpFactory)
+	         .url("http://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile")
+	         .tilePath("/{Z}/{Y}/{X}.png")
+	         .zoomMin(1)
+	         .zoomMax(18)
+	         .build();
+
+	   /*_satelliteSource = DefaultSources.OPENSTREETMAP
 	         .httpFactory(_httpFactory)
             .url("http://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile")
             .tilePath("/{Z}/{Y}/{X}.png")
             .zoomMin(1)
             .zoomMax(18)
             .build();
-	   _layer_Satellite = new BitmapTileLayer(mMap, _satelliteSource, 1 << 20);
+	   */
+	   
+	   _layer_Satellite = new BitmapTileLayer(mMap, _satelliteSource, 1 << 19);
 	   _layer_Satellite.setEnabled(false);
 	   mMap.layers().add(_layer_Satellite);
-	   
 
 	   // tour
 	   _layer_Tour = new TourLayer(mMap);
