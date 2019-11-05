@@ -33,8 +33,10 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 
 import net.tourbook.common.time.TimeTools;
@@ -88,6 +90,20 @@ public class TourPerson implements Comparable<Object> {
    private float                           weight;
 
    private float                           height;
+
+   /**
+    * Person which created this tour or <code>null</code> when the tour is not saved in the
+    * database.
+    * <p>
+    * SQL access to this field:
+    *
+    * <pre>
+    * tourPerson_personId
+    * </pre>
+    */
+   @OneToOne(targetEntity = PerformanceModelingData.class)
+   @JoinColumn(name = "PerformanceModelingDataId")
+   public PerformanceModelingData          performanceModelingData;
 
    /**
     * Training Stress data

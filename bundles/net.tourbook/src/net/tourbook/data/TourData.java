@@ -4030,6 +4030,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       final Running_Govss running_Govss = new Running_Govss(tourPerson);
       govss = running_Govss.ComputeGovss(this);
 
+      tourPerson.performanceModelingData.setGovss(tourPerson.getPersonId(), tourStartTime, govss);
+
       return govss != 0;
    }
 

@@ -156,6 +156,8 @@ public class TourDatabase {
 
    private static final String TABLE_DB_VERSION                           = "DBVERSION";                                             //$NON-NLS-1$
 
+   public static final String  TABLE_PERFORMANCE_MODELING_DATA            = "PERFORMANCEMODELINGDATA";                               //$NON-NLS-1$
+
    public static final String  TABLE_TOUR_BIKE                            = "TOURBIKE";                                              //$NON-NLS-1$
    public static final String  TABLE_TOUR_COMPARED                        = "TOURCOMPARED";                                          //$NON-NLS-1$
    public static final String  TABLE_TOUR_DATA                            = "TOURDATA";                                              //$NON-NLS-1$
@@ -2752,6 +2754,32 @@ public class TourDatabase {
 //   }
 
    /**
+    * create table {@link #TABLE_PERFORMANCE_MODELING_DATA}
+    *
+    * @param stmt
+    * @throws SQLException
+    */
+   private void createTable_PerformanceModelingData(final Statement stmt) throws SQLException {
+
+      /*
+       * CREATE TABLE Performance Modeling
+       */
+      exec(stmt, "CREATE TABLE " + TABLE_PERFORMANCE_MODELING_DATA + "   (                             \n" //$NON-NLS-1$ //$NON-NLS-2$
+      //
+            + "   PerformanceModelingDataId         BIGINT   NOT NULL,                                       \n" //$NON-NLS-1$
+            //
+            + "   govssEntries           BLOB,         \n" //$NON-NLS-1$
+            + "   bikeScoreEntries       BLOB,         \n" //$NON-NLS-1$
+            + "   fitnessValuesSkiba     BLOB,         \n" //$NON-NLS-1$
+            + "   fatigueValuesSkiba     BLOB,         \n" //$NON-NLS-1$
+
+            //
+            + "   CONSTRAINT     PK_PersonID PRIMARY KEY (PerformanceModelingDataId)          \n" //$NON-NLS-1$
+            //
+            + ")"); //$NON-NLS-1$
+   }
+
+   /**
     * create table {@link #TABLE_TOUR_BIKE}
     *
     * @param stmt
@@ -3314,6 +3342,8 @@ public class TourDatabase {
             + "   govssTimeTrialDistance     INTEGER DEFAULT 0,                                       \n" //$NON-NLS-1$
             + "   govssTimeTrialAverageSlope INTEGER DEFAULT 0,                                       \n" //$NON-NLS-1$
             + "   govssAssociatedTourTypes   VARCHAR(" + TourPerson.DB_LENGTH_GOVSS_ASSOCIATED_TOUR_TYPES + "),     \n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "   PerformanceModelingDataId     INTEGER DEFAULT 0,                                       \n" //$NON-NLS-1$
+
             //
             // version 41 end ---------
 
@@ -4307,6 +4337,7 @@ public class TourDatabase {
             createTable_TourCompared(stmt);
             createTable_TourBike(stmt);
             createTable_TourGeoParts(stmt);
+            createTable_PerformanceModelingData(stmt);
 
             createTable_Version(stmt);
 
@@ -7492,7 +7523,6 @@ public class TourDatabase {
             SQL.AddCol_Int      (stmt, TABLE_TOUR_PERSON, "govssTimeTrialDistance", DEFAULT_0);//$NON-NLS-1$
             SQL.AddCol_Int      (stmt, TABLE_TOUR_PERSON, "govssTimeTrialAverageSlope", DEFAULT_0);//$NON-NLS-1$
             SQL.AddCol_VarCar   (stmt, TABLE_TOUR_PERSON, "govssAssociatedTourTypes", TourPerson.DB_LENGTH_GOVSS_ASSOCIATED_TOUR_TYPES); //$NON-NLS-1$
-
 
 // SET_FORMATTING_ON
          }
