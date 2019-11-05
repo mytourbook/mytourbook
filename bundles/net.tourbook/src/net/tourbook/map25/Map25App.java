@@ -1054,15 +1054,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	         .zoomMin(1)
 	         .zoomMax(18)
 	         .build();
-
-	   /*_satelliteSource = DefaultSources.OPENSTREETMAP
-	         .httpFactory(_httpFactory)
-            .url("http://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile")
-            .tilePath("/{Z}/{Y}/{X}.png")
-            .zoomMin(1)
-            .zoomMax(18)
-            .build();
-	   */
 	   
 	   _layer_Satellite = new BitmapTileLayer(mMap, _satelliteSource, 1 << 19);
 	   _layer_Satellite.setEnabled(false);

@@ -148,6 +148,11 @@ public class PhotoToolkit extends MarkerToolkit{
          String photoName = "";
          UUID photoKey = UUID.randomUUID();
 
+//         Map25App.debugPrint(" Map25View: *** createPhotoItemList: meta_lat: " + photo.getImageMetaData().latitude);
+//         Map25App.debugPrint(" Map25View: *** createPhotoItemList: tour_lat: " + photo.getTourLatitude());
+//         Map25App.debugPrint(" Map25View: *** createPhotoItemList: from exif: " + photo.isGeoFromExif);
+//         Map25App.debugPrint(" Map25View: *** createPhotoItemList: minimum:  " + Double.MIN_VALUE);
+      
          stars = photo.ratingStars;
          //starText = "";
          switch (stars) {
@@ -166,8 +171,22 @@ public class PhotoToolkit extends MarkerToolkit{
 
          String photoDescription = "Ratingstars: " + Integer.toString(photo.ratingStars);
          
-         Double photoLat = photo.getTourLatitude();
-         Double photoLon = photo.getTourLongitude();
+         Double photoLat = 0.0;
+         Double photoLon = 0.0;
+         if(photo.isGeoFromExif &&
+               Math.abs(photo.getImageMetaData().latitude) > Double.MIN_VALUE  &&
+               Math.abs(photo.getImageMetaData().longitude) > Double.MIN_VALUE
+               )
+         {
+//            Map25App.debugPrint(" Map25View: *** createPhotoItemList: using exif geo");
+            photoLat = photo.getImageMetaData().latitude;
+            photoLon = photo.getImageMetaData().longitude;
+         } else {
+            Map25App.debugPrint(" Map25View: *** createPhotoItemList: using tour geo");
+            photoLat = photo.getTourLatitude();
+            photoLon = photo.getTourLongitude();
+         }
+         
          MarkerItem item = new MarkerItem(photoKey, photoName, photoDescription,
                new GeoPoint(photoLat, photoLon)
                );
