@@ -136,18 +136,17 @@ public class PerformanceModelingChartView extends ViewPart {
    /*
     * Pagebook for the predicted performance view
     */
-   private PageBook   _pageBook;
-   private Composite  _page_TrainingStressScores;
-   private Composite  _page_NoPerson;
+   private PageBook  _pageBook;
+   private Composite _page_TrainingStressScores;
+   private Composite _page_NoPerson;
 
-   private Composite  _toolbar;
-   private Chart      _chartPerformanceModelingData;
+   private Composite _toolbar;
+   private Chart     _chartPerformanceModelingData;
 
-   private Spinner    _spinnerHrLeft;
-   private Spinner    _spinnerHrRight;
-   private Label      _lblHrMin;
-   private Label      _lblHrMax;
-
+   private Spinner   _spinnerHrLeft;
+   private Spinner   _spinnerHrRight;
+   private Label     _lblHrMin;
+   private Label     _lblHrMax;
 
    /*
     * none UI
@@ -221,7 +220,6 @@ public class PerformanceModelingChartView extends ViewPart {
    private void clearView() {
 
       _currentPerson = null;
-
 
       _chartPerformanceModelingData.updateChart(null, false);
 
@@ -697,7 +695,6 @@ public class PerformanceModelingChartView extends ViewPart {
          _xSeriePulse[index] = index;
       }
 
-
       final ChartDataModel chartDataModel = new ChartDataModel(ChartType.LINE);
       chartDataModel.setIsGraphOverlapped(true);
 
@@ -742,7 +739,7 @@ public class PerformanceModelingChartView extends ViewPart {
       yData.setRgbDark(rgbDark);
       yData.setDefaultRGB(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY).getRGB());
 
-      chartDataModel.addYData(yData);
+      // chartDataModel.addYData(yData);
 
       //TODO when MTB supports displaying both BAR and LINES at the same time
       // set tool tip info
@@ -773,7 +770,11 @@ public class PerformanceModelingChartView extends ViewPart {
          for (final Long tourId : tourIds) {
             totalGovssValue += TourManager.getTour(tourId).getGovss();
          }
-         govssValues[index] = totalGovssValue;
+         if (totalGovssValue > 10000 || totalGovssValue < 0) {
+            govssValues[index] = 0;
+         } else {
+            govssValues[index] = totalGovssValue;
+         }
 
       }
 
@@ -802,7 +803,7 @@ public class PerformanceModelingChartView extends ViewPart {
       dummyPerformanceDataYAxis.setRgbDark(rgbDark2);
       dummyPerformanceDataYAxis.setDefaultRGB(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY).getRGB());
 
-      //  chartDataModel.addYData(dummyPerformanceDataYAxis);
+      chartDataModel.addYData(dummyPerformanceDataYAxis);
 
       // show the new data data model in the chart
       _chartPerformanceModelingData.updateChart(chartDataModel, false);
