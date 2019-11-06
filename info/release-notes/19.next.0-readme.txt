@@ -1,0 +1,44 @@
+19.next.0                                                 ?. Month 2019
+
+
+TODO's
+======
+
+
+New + Improvements   
+==================
+
+ 
+Import
+======
+
+
+ 
+Changes  
+=======
+
+
+ 
+Fixes   
+=====
+
+* Statistics
+  - Show tooltip for the bottom bars, the hitbox for the horizontal slider starts now below the horizontal line (for a bar chart)
+  - Fixed issue: Tour type in tooltip is wrong for the first item (year/month)
+
+* Tour Tags
+  - Fixed issue: Column widths have been reset when tags are saved
+
+
+ 
+Translation    
+===========
+
+ - French (Frederic)
+ - German
+ - Italian (Doriano)
+
+ 
+System   
+======
+

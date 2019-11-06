@@ -215,7 +215,7 @@ public class DataProvider_Tour_Month extends DataProvider {
             final int monthIndex = (dbValue_Month - 1) + yearIndex * 12;
 
             /*
-             * convert type id to the type index in the tour types list which is also the color
+             * Convert type id to the type index in the tour types list which is also the color
              * index
              */
             int colorIndex = 0;

@@ -2014,6 +2014,11 @@ public class TourDatabase {
     */
    public static String getTourTypeName(final long typeId) {
 
+      /*
+       * Set default text for the case when tour type is not defined and
+       * net.tourbook.data.TourType.TOUR_TYPE_IS_NOT_USED or
+       * net.tourbook.data.TourType.TOUR_TYPE_IS_NOT_DEFINED_IN_TOUR_DATA is set.
+       */
       String tourTypeName = Messages.ui_tour_not_defined;
 
       for (final TourType tourType : getAllTourTypes()) {
