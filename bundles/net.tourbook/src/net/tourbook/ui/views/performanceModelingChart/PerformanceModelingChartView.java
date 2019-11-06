@@ -34,32 +34,15 @@ import net.tourbook.chart.ChartDataYSerie;
 import net.tourbook.chart.ChartToolTipInfo;
 import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IBarSelectionListener;
-import net.tourbook.chart.IChartInfoProvider;
 import net.tourbook.chart.MinMaxKeeper_YData;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.Util;
-import net.tourbook.data.HrZoneContext;
-import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourPersonHRZone;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.preferences.PrefPagePeople;
-import net.tourbook.preferences.PrefPagePeopleData;
-import net.tourbook.tour.ITourEventListener;
-import net.tourbook.tour.SelectionDeletedTours;
-import net.tourbook.tour.SelectionTourData;
-import net.tourbook.tour.SelectionTourId;
-import net.tourbook.tour.SelectionTourIds;
-import net.tourbook.tour.TourEvent;
-import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
-import net.tourbook.training.TrainingManager;
 import net.tourbook.ui.UI;
-import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
-import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
-import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
-import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.ToolBarManager;
@@ -69,8 +52,6 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -84,11 +65,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
-import org.eclipse.ui.IPartListener2;
-import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.IWorkbenchPartReference;
-import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
@@ -119,17 +95,13 @@ public class PerformanceModelingChartView extends ViewPart {
    private final IPreferenceStore         _prefStore     = TourbookPlugin.getPrefStore();
    private final IDialogSettings          _state         = TourbookPlugin.getState(ID);
 
-   private IPartListener2                 _partListener;
-   private ISelectionListener             _postSelectionListener;
    private IPropertyChangeListener        _prefChangeListener;
-   private ITourEventListener             _tourEventListener;
 
    private ModifyListener                 _defaultSpinnerModifyListener;
    private SelectionAdapter               _defaultSpinnerSelectionListener;
    private MouseWheelListener             _defaultSpinnerMouseWheelListener;
 
    private TourPerson                     _currentPerson;
-   private TourData                       _tourData;
 
    private boolean                        _isUpdateUI;
    private boolean                        _isShowAllValues;
@@ -166,7 +138,7 @@ public class PerformanceModelingChartView extends ViewPart {
    private Composite  _page_NoPerson;
 
    private Composite  _toolbar;
-   private Chart      _chartHrTime;
+   private Chart      _chartPerformanceModelingData;
 
    private Spinner    _spinnerHrLeft;
    private Spinner    _spinnerHrRight;
@@ -199,19 +171,6 @@ public class PerformanceModelingChartView extends ViewPart {
 
    }
 
-   void actionEditHrZones() {
-
-      final TourPerson person = _currentPerson != null ? _currentPerson : TourbookPlugin.getActivePerson();
-
-      PreferencesUtil.createPreferenceDialogOn(
-            _pageBook.getShell(),
-            PrefPagePeople.ID,
-            null,
-            new PrefPagePeopleData(PrefPagePeople.PREF_DATA_SELECT_HR_ZONES, person)//
-      )
-            .open();
-   }
-
    void actionShowAllStressScoreValues() {
 
       _isShowAllValues = true;//_actionShowAllStressScoreValues.isChecked();
@@ -228,36 +187,6 @@ public class PerformanceModelingChartView extends ViewPart {
       }
 
       updateUI_10_stressScoreValuesFromModel();
-   }
-
-   private void addPartListener() {
-
-      getViewSite().getPage().addPartListener(_partListener = new IPartListener2() {
-
-         @Override
-         public void partActivated(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partBroughtToTop(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partClosed(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partDeactivated(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partHidden(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partInputChanged(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partOpened(final IWorkbenchPartReference partRef) {}
-
-         @Override
-         public void partVisible(final IWorkbenchPartReference partRef) {}
-      });
    }
 
    private void addPrefListener() {
@@ -294,72 +223,12 @@ public class PerformanceModelingChartView extends ViewPart {
       _prefStore.addPropertyChangeListener(_prefChangeListener);
    }
 
-   /**
-    * listen for events when a tour is selected
-    */
-   private void addSelectionListener() {
-
-      _postSelectionListener = new ISelectionListener() {
-         @Override
-         public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
-
-            if (part == PerformanceModelingChartView.this) {
-               return;
-            }
-
-            onSelectionChanged(selection);
-         }
-      };
-      getSite().getPage().addPostSelectionListener(_postSelectionListener);
-   }
-
-   private void addTourEventListener() {
-
-      _tourEventListener = new ITourEventListener() {
-
-         @Override
-         public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
-
-            if (part == PerformanceModelingChartView.this) {
-               return;
-            }
-
-            if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
-
-               clearView();
-
-            } else if (eventId == TourEventId.TOUR_SELECTION && eventData instanceof ISelection) {
-
-               onSelectionChanged((ISelection) eventData);
-
-            } else if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
-
-               final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
-
-               if ((modifiedTours != null) && (modifiedTours.size() > 0)) {
-                  updateUI_20(modifiedTours.get(0));
-               }
-            } else if (eventId == TourEventId.TOUR_CHART_PROPERTY_IS_MODIFIED) {
-
-               if (_tourData != null) {
-
-                  _tourData.clearComputedSeries();
-
-                  updateUI_20(_tourData);
-               }
-            }
-         }
-      };
-
-      TourManager.getInstance().addTourEventListener(_tourEventListener);
-   }
-
    private void clearView() {
 
-      _tourData = null;
       _currentPerson = null;
 
-//      _tourChart.updateChart(null, false);
+
+      _chartPerformanceModelingData.updateChart(null, false);
 
       _pageBook.showPage(_page_NoTour);
       enableControls();
@@ -383,14 +252,11 @@ public class PerformanceModelingChartView extends ViewPart {
       // show default page
       _pageBook.showPage(_page_NoTour);
 
-      addSelectionListener();
       addPrefListener();
-      addTourEventListener();
-      addPartListener();
+
 
       restoreState();
 
-      showTour();
    }
 
    private ChartToolTipInfo createToolTipInfo(final int serieIndex, final int valueIndex) {
@@ -547,12 +413,12 @@ public class PerformanceModelingChartView extends ViewPart {
       /*
        * chart
        */
-      _chartHrTime = new Chart(parent, SWT.FLAT);
-      GridDataFactory.fillDefaults().grab(true, true).applyTo(_chartHrTime);
+      _chartPerformanceModelingData = new Chart(parent, SWT.FLAT);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(_chartPerformanceModelingData);
 
       setChartProperties();
 
-      _chartHrTime.addBarSelectionListener(new IBarSelectionListener() {
+      _chartPerformanceModelingData.addBarSelectionListener(new IBarSelectionListener() {
          @Override
          public void selectionChanged(final int serieIndex, final int valueIndex) {
 
@@ -568,15 +434,6 @@ public class PerformanceModelingChartView extends ViewPart {
          _tk.dispose();
       }
 
-      getSite().getPage().removePostSelectionListener(_postSelectionListener);
-
-      // an NPE occured when the part could not be created
-      if (_partListener != null) {
-         getViewSite().getPage().removePartListener(_partListener);
-      }
-
-      TourManager.getInstance().removeTourEventListener(_tourEventListener);
-
       _prefStore.removePropertyChangeListener(_prefChangeListener);
 
       super.dispose();
@@ -584,8 +441,7 @@ public class PerformanceModelingChartView extends ViewPart {
 
    private void enableControls() {
 
-      final boolean isHrZoneAvailable = TrainingManager.isRequiredHrZoneDataAvailable(_tourData);
-      final boolean isCustomScaling = isHrZoneAvailable && _isShowAllValues == false;
+      final boolean isCustomScaling = _isShowAllValues == false;
 
 //      _comboTrainingChart.setEnabled(canShowHrZones);
 
@@ -595,8 +451,8 @@ public class PerformanceModelingChartView extends ViewPart {
       _lblHrMax.setEnabled(isCustomScaling);
 
       _actionSynchVerticalChartScaling.setEnabled(isCustomScaling);
-      _actionShowAllStressScoreValues.setEnabled(isHrZoneAvailable);
-      _actionTrainingOptions.setEnabled(isHrZoneAvailable);
+      _actionShowAllStressScoreValues.setEnabled(true);//isHrZoneAvailable);
+      _actionTrainingOptions.setEnabled(true);//isHrZoneAvailable);
    }
 
    private void fillToolbar() {
@@ -690,66 +546,10 @@ public class PerformanceModelingChartView extends ViewPart {
    private void onModifyPerson() {
 
       clearView();
-      showTour();
-   }
+      _currentPerson = TourbookPlugin.getActivePerson();
 
-   private void onSelectionChanged(final ISelection selection) {
-
-      if (selection instanceof SelectionTourData) {
-
-         final TourData selectionTourData = ((SelectionTourData) selection).getTourData();
-         if (selectionTourData != null) {
-
-            // prevent loading the same tour
-            if (_tourData != null && _tourData.equals(selectionTourData)) {
-               return;
-            }
-
-            updateUI_20(selectionTourData);
-         }
-
-      } else if (selection instanceof SelectionTourIds) {
-
-         final SelectionTourIds selectionTourId = (SelectionTourIds) selection;
-         final ArrayList<Long> tourIds = selectionTourId.getTourIds();
-         if (tourIds != null && tourIds.size() > 0) {
-            updateUI(tourIds.get(0));
-         }
-
-      } else if (selection instanceof SelectionTourId) {
-
-         final SelectionTourId selectionTourId = (SelectionTourId) selection;
-         final Long tourId = selectionTourId.getTourId();
-
-         updateUI(tourId);
-
-      } else if (selection instanceof StructuredSelection) {
-
-         final Object firstElement = ((StructuredSelection) selection).getFirstElement();
-         if (firstElement instanceof TVICatalogComparedTour) {
-
-            updateUI(((TVICatalogComparedTour) firstElement).getTourId());
-
-         } else if (firstElement instanceof TVICompareResultComparedTour) {
-
-            final TVICompareResultComparedTour compareResultItem = (TVICompareResultComparedTour) firstElement;
-            final TourData tourData = TourManager.getInstance().getTourData(compareResultItem.getComparedTourData().getTourId());
-            updateUI_20(tourData);
-         }
-
-      } else if (selection instanceof SelectionTourCatalogView) {
-
-         final SelectionTourCatalogView tourCatalogSelection = (SelectionTourCatalogView) selection;
-
-         final TVICatalogRefTourItem refItem = tourCatalogSelection.getRefItem();
-         if (refItem != null) {
-            updateUI(refItem.getTourId());
-         }
-
-      } else if (selection instanceof SelectionDeletedTours) {
-
-         clearView();
-      }
+      // update ui to show the current person datashowTour();
+      updateUI_10_stressScoreValuesFromModel();
    }
 
    private void restoreState() {
@@ -780,10 +580,10 @@ public class PerformanceModelingChartView extends ViewPart {
 
    private void setChartProperties() {
 
-      UI.updateChartProperties(_chartHrTime, GRID_PREF_PREFIX);
+      UI.updateChartProperties(_chartPerformanceModelingData, GRID_PREF_PREFIX);
 
       // show title
-      _chartHrTime.getChartTitleSegmentConfig().isShowSegmentTitle = true;
+      _chartPerformanceModelingData.getChartTitleSegmentConfig().isShowSegmentTitle = true;
    }
 
    @Override
@@ -791,54 +591,14 @@ public class PerformanceModelingChartView extends ViewPart {
 
    }
 
-   private void showTour() {
-
-      onSelectionChanged(getSite().getWorkbenchWindow().getSelectionService().getSelection());
-
-      if (_tourData == null) {
-         showTourFromTourProvider();
-      }
-
-      enableControls();
-   }
-
-   private void showTourFromTourProvider() {
-
-      // a tour is not displayed, find a tour provider which provides a tour
-      Display.getCurrent().asyncExec(new Runnable() {
-         @Override
-         public void run() {
-
-            // validate widget
-            if (_pageBook.isDisposed()) {
-               return;
-            }
-
-            /*
-             * check if tour was set from a selection provider
-             */
-            if (_tourData != null) {
-               return;
-            }
-
-            final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
-            if (selectedTours != null && selectedTours.size() > 0) {
-               updateUI_20(selectedTours.get(0));
-            }
-         }
-      });
-   }
-
    private void updateUI(final long tourId) {
 
-      if (_tourData != null && _tourData.getTourId() == tourId) {
+      if (_currentPerson == null) {
          // optimize
          return;
       }
 
-      //TODO Get all tours for current user for which are the types that the stress score was selected
-      //==> create SQL statement ? find another location in the code that does the same
-      updateUI_20(TourManager.getInstance().getTourData(tourId));
+      updateUI_20();
    }
 
    /**
@@ -864,29 +624,17 @@ public class PerformanceModelingChartView extends ViewPart {
 
       // display page for the selected chart
       _pageBook.showPage(_page_TrainingStressScores);
-
-      final HrZoneContext zoneMinMaxBpm = _currentPerson.getHrZoneContext(
-            _currentPerson.getHrMaxFormula(),
-            _currentPerson.getMaxPulse(),
-            _currentPerson.getBirthDayWithDefault(),
-            _tourData.getTourStartTime());
-
-      updateUI_40_trainingStressScoresChart(zoneMinMaxBpm);
+      updateUI_40_trainingStressScoresChart();
       //updateUI_42_HrZoneData(zoneMinMaxBpm);
 
    }
 
-   private void updateUI_20(final TourData tourData) {
+   private void updateUI_20() {
 
-      if (tourData == null) {
+      if (_currentPerson == null) {
          // nothing to do
          return;
       }
-
-      _tourData = tourData;
-
-      final TourPerson tourPerson = tourData.getTourPerson();
-      if (tourPerson != _currentPerson) {
 
          /*
           * another person is contained in the tour, dispose resources which depends on the current
@@ -896,19 +644,14 @@ public class PerformanceModelingChartView extends ViewPart {
             _hrZoneDataContainerContent.dispose();
          }
 
-         _currentPerson = tourPerson;
-      }
-
       updateUI_10_stressScoreValuesFromModel();
    }
 
-   private void updateUI_40_trainingStressScoresChart(final HrZoneContext zoneMinMaxBpm) {
+   private void updateUI_40_trainingStressScoresChart() {
 
       //TourManager.GETALL TOURS
-      final float[] pulseSerie = new float[_tourData.timeSerie.length];
-      final int[] timeSerie = _tourData.timeSerie;
-      final boolean[] breakTimeSerie = _tourData.getBreakTimeSerie();
-      final int timeSerieSize = timeSerie.length;
+      final float[] pulseSerie = new float[100];
+      final int timeSerieSize = pulseSerie.length;
 
       final ArrayList<TourPersonHRZone> hrSortedZones = new ArrayList<>();
       final int zoneSize = 100;// hrSortedZones.size();
@@ -942,9 +685,6 @@ public class PerformanceModelingChartView extends ViewPart {
             pulseMin = (float) (Math.random() * 100f);//_tourData.getGovss();
          }
 
-      } else {
-         pulseMin = _tourData.getGovss();
-         pulseMax = _tourData.getGovss();
       }
 
       // TODO Ca se passe ici
@@ -994,23 +734,9 @@ public class PerformanceModelingChartView extends ViewPart {
       for (int serieIndex = 0; serieIndex < timeSerieSize; serieIndex++) {
 
          // get time for each pulse value
-         final int currentTime = timeSerie[serieIndex];
+         final int currentTime = (int) pulseSerie[serieIndex];
          final int timeDiff = currentTime - prevTime;
          prevTime = currentTime;
-
-         // check if time is in a break
-         if (breakTimeSerie != null) {
-
-            /*
-             * break time requires distance data, so it's possible that break time data are not
-             * available
-             */
-
-            if (breakTimeSerie[serieIndex] == true) {
-               // pulse time is not set within a break
-               continue;
-            }
-         }
 
          final float pulse = pulseSerie[serieIndex];
          final int pulseIndex = (int) (pulse - pulseMin);
@@ -1068,13 +794,17 @@ public class PerformanceModelingChartView extends ViewPart {
 
       //chartDataModel.addYData(yData);
 
+      //TODO when MTB supports displaying both BAR and LINES at the same time
       // set tool tip info
-      chartDataModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, new IChartInfoProvider() {
-         @Override
-         public ChartToolTipInfo getToolTipInfo(final int serieIndex, final int valueIndex) {
-            return createToolTipInfo(serieIndex, valueIndex);
-         }
-      });
+      /*
+       * chartDataModel.setCustomData(ChartDataModel.BAR_TOOLTIP_INFO_PROVIDER, new
+       * IChartInfoProvider() {
+       * @Override
+       * public ChartToolTipInfo getToolTipInfo(final int serieIndex, final int valueIndex) {
+       * return createToolTipInfo(serieIndex, valueIndex);
+       * }
+       * });
+       */
 
       /*
        * if (_isSynchChartVerticalValues && _isShowAllValues == false) {
@@ -1144,113 +874,7 @@ public class PerformanceModelingChartView extends ViewPart {
       chartDataModel.addYData(dummyPerformanceDataYAxis);
 
       // show the new data data model in the chart
-      _chartHrTime.updateChart(chartDataModel, false);
-   }
-
-   /**
-    * @param zoneContext
-    *           Contains age and HR max values.
-    */
-   private void updateUI_42_HrZoneData(final HrZoneContext zoneContext) {
-
-      final int personZoneSize = _personHrZones.size();
-      final int[] tourHrZoneTimes = _tourData.getHrZones();
-      final long drivingTime = _tourData.getTourDrivingTime();
-
-      final int tourHrZoneSize = 0;//tourHrZoneTimes.length;
-
-      for (int tourZoneIndex = 0; tourZoneIndex < tourHrZoneSize; tourZoneIndex++) {
-
-         if (tourZoneIndex >= personZoneSize) {
-
-            /*
-             * when zone data in the tours are not consistent, number of zones in the tour and in
-             * the person can be different
-             */
-            break;
-         }
-
-         final double zoneTime = tourHrZoneTimes[tourZoneIndex];
-         final double zoneTimePercent = drivingTime == 0 //
-               ? 0
-               : zoneTime * 100.0 / drivingTime;
-
-         if (zoneTime == -1) {
-            // this zone and following zones are not available
-            break;
-         }
-
-         final TourPersonHRZone hrZone = _personHrZones.get(tourZoneIndex);
-
-         final int zoneMaxValue = hrZone.getZoneMaxValue();
-         final String zoneMaxValueText = zoneMaxValue == Integer.MAX_VALUE //
-               ? Messages.App_Label_max
-               : Integer.toString(zoneMaxValue);
-
-         final float zoneMinBpm = zoneContext.zoneMinBpm[tourZoneIndex];
-         final float zoneMaxBmp = zoneContext.zoneMaxBpm[tourZoneIndex];
-
-         final String zoneMaxBpmText = zoneMaxBmp == Integer.MAX_VALUE //
-               ? Messages.App_Label_max
-               : Integer.toString((int) zoneMaxBmp);
-
-         final int ageYears = zoneContext.age;
-         final String ageText = UI.SPACE + ageYears + UI.SPACE2 + Messages.Pref_People_Label_Years;
-
-         final String hrZoneTooltip =
-               //
-               hrZone.getNameLongShortcutFirst()
-                     //
-                     + UI.NEW_LINE
-                     + UI.NEW_LINE
-                     //
-                     + hrZone.getZoneMinValue()
-                     + UI.DASH
-                     + zoneMaxValueText
-                     + UI.SPACE
-                     + UI.SYMBOL_PERCENTAGE
-                     //
-                     + UI.SPACE
-                     + UI.SYMBOL_EQUAL
-                     + UI.SPACE
-                     //
-                     + Integer.toString((int) zoneMinBpm)
-                     + UI.DASH
-                     + zoneMaxBpmText
-                     + UI.SPACE
-                     + net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit
-                     //
-                     + UI.NEW_LINE
-                     + UI.NEW_LINE
-                     //
-                     + Messages.Pref_People_Label_Age
-                     + ageText
-                     //
-                     + UI.DASH_WITH_DOUBLE_SPACE
-                     //
-                     + Messages.HRMax_Label
-                     + UI.SPACE
-                     + zoneContext.hrMax
-                     + net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit
-         //
-         ;
-
-         // % values
-         _lblHrZonePercent[tourZoneIndex].setText(_nf1.format(zoneTimePercent));
-         _lblHrZonePercent[tourZoneIndex].setToolTipText(hrZoneTooltip);
-
-         // bpm values
-         _lblTourMinMaxValue[tourZoneIndex].setText(((int) zoneMinBpm) + UI.DASH + zoneMaxBpmText);
-         _lblTourMinMaxValue[tourZoneIndex].setToolTipText(hrZoneTooltip);
-
-         _lblTourMinMaxHours[tourZoneIndex].setText(net.tourbook.common.UI
-               .format_hh_mm((long) (zoneTime + 30))
-               .toString());
-         _lblTourMinMaxHours[tourZoneIndex].setToolTipText(hrZoneTooltip);
-
-         _lblHRZoneName[tourZoneIndex].setToolTipText(hrZoneTooltip);
-         _lblHRZoneColor[tourZoneIndex].setToolTipText(hrZoneTooltip);
-      }
+      _chartPerformanceModelingData.updateChart(chartDataModel, false);
    }
 
 }
