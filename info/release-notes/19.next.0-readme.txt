@@ -19,10 +19,11 @@ Changes
 
 
  
-Bugfix   
-======
+Fixes   
+=====
 
 * Statistics
+  - Show tooltip for the bottom bars, the hitbox for the horizontal slider starts now below the horizontal line (for a bar chart)
   - Fixed issue: Tour type in tooltip is wrong for the first item (year/month)
 
 * Tour Tags
