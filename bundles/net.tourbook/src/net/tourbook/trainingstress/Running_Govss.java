@@ -30,6 +30,7 @@ public class Running_Govss {
    //TODO : Add the GOVSS column in the tour book view
    //TODO Use this equation to display an estimated power graph in the tour chart ?If yes, it's low on the totem pole
    //TODO: Add a configuration to choose between 30s or 120s rolling averages ?
+   //TODO; When a tour has its tour type changed, if this new tour type is not in the govss list, we remove the tourid from the performancemodeling table
 
    private TourPerson _tourPerson;
 

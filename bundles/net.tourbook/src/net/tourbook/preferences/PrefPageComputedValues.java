@@ -926,8 +926,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
          String activePersonName = UI.EMPTY_STRING;
          if (activePerson == null) {
             btnComputeValues.setEnabled(false);
-         }
-         else {
+         } else {
             activePersonName = activePerson.getName();
          }
 
