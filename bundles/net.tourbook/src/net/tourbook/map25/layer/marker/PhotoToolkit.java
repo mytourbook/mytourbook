@@ -18,11 +18,13 @@ import org.oscim.backend.canvas.Color;
 import org.oscim.backend.canvas.Paint;
 import org.oscim.core.GeoPoint;
 import org.oscim.layers.marker.ClusterMarkerRenderer;
+import org.oscim.layers.marker.ItemizedLayer;
 //import org.oscim.layers.marker.ItemizedLayer;
 import org.oscim.layers.marker.MarkerItem;
 import org.oscim.layers.marker.MarkerRendererFactory;
 import org.oscim.layers.marker.MarkerSymbol;
 import org.oscim.layers.marker.MarkerSymbol.HotspotPlace;
+import net.tourbook.map25.layer.marker.MarkerLayer.OnItemGestureListener;
 
 import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.map.Tile;
@@ -43,7 +45,7 @@ import net.tourbook.photo.PhotoLoadingState;
 import net.tourbook.photo.ImageUtils;
 
 
-public class PhotoToolkit extends MarkerToolkit{
+public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemGestureListener<MarkerItem> {
 
 
    private Bitmap _bitmapCluster;
@@ -53,6 +55,7 @@ public class PhotoToolkit extends MarkerToolkit{
 
    private Bitmap _bitmapPhoto;  //normaly the photo as Bitmap
    private Bitmap _BitmapClusterPhoto;  // The Bitmap when markers are clustered
+   private ArrayList<Photo> _allPhotos;
 
    public MarkerRendererFactory _markerRendererFactory;
    
@@ -142,6 +145,8 @@ public class PhotoToolkit extends MarkerToolkit{
          return pts;
       }*/
       
+      _allPhotos = galleryPhotos;
+      
       for (final  Photo photo : galleryPhotos) {
          int stars = 0;
          String starText = "";
@@ -199,7 +204,7 @@ public class PhotoToolkit extends MarkerToolkit{
          pts.add(item);
       }
       //_photo_pts = pts;
-      //_allPhotos = galleryPhotos; 
+      _allPhotos = galleryPhotos; 
       
       return pts;   
    }
@@ -301,5 +306,21 @@ public class PhotoToolkit extends MarkerToolkit{
       net.tourbook.map25.Map25App.debugPrint("???? PhotoToolkit: Update Photos");
       _mapApp.updateUI_PhotoLayer();
    }
+
+   @Override
+   public boolean onItemLongPress(int index, MarkerItem photoItem) {
+      // TODO Auto-generated method stub
+      //debugPrint(" ??????????? PhotoToolkit *** onItemLongPress(int index, MarkerItem photoItem): " + arg0 + " " + arg1);
+      debugPrint(" ??????????? PhotoToolkit *** onItemLongPress(int index, MarkerItem photoItem): " + _allPhotos.get(index).imageFilePathName + " " + photoItem.getTitle());
+      return false;
+   }
+
+   @Override
+   public boolean onItemSingleTapUp(int index, MarkerItem photoItem) {
+      // TODO Auto-generated method stub
+      debugPrint(" ??????????? PhotoToolkit *** onItemSingleTapUp(int index, MarkerItem photoItem): " + _allPhotos.get(index).imageFilePathName + " " + photoItem.getTitle());
+      return false;
+   }
+
    
 }
