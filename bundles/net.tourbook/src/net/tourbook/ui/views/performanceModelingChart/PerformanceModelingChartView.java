@@ -134,7 +134,6 @@ public class PerformanceModelingChartView extends ViewPart {
     */
    private PageBook   _pageBook;
    private Composite  _page_TrainingStressScores;
-   private Composite  _page_NoTour;
    private Composite  _page_NoPerson;
 
    private Composite  _toolbar;
@@ -144,14 +143,6 @@ public class PerformanceModelingChartView extends ViewPart {
    private Spinner    _spinnerHrRight;
    private Label      _lblHrMin;
    private Label      _lblHrMax;
-
-   private Composite  _hrZoneDataContainerContent;
-
-   private Label[]    _lblTourMinMaxValue;
-   private Label[]    _lblTourMinMaxHours;
-   private Label[]    _lblHRZoneName;
-   private Label[]    _lblHRZoneColor;
-   private Label[]    _lblHrZonePercent;
 
 
    /*
@@ -230,7 +221,7 @@ public class PerformanceModelingChartView extends ViewPart {
 
       _chartPerformanceModelingData.updateChart(null, false);
 
-      _pageBook.showPage(_page_NoTour);
+      _pageBook.showPage(_page_NoPerson);
       enableControls();
    }
 
@@ -250,7 +241,7 @@ public class PerformanceModelingChartView extends ViewPart {
       fillToolbar();
 
       // show default page
-      _pageBook.showPage(_page_NoTour);
+      _pageBook.showPage(_page_NoPerson);
 
       addPrefListener();
 
@@ -302,11 +293,11 @@ public class PerformanceModelingChartView extends ViewPart {
       GridLayoutFactory.fillDefaults()//
             .spacing(0, 0)
             .applyTo(container);
-//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
       {
          createUI_10_Toolbar(container);
-         createUI_12_PageBook(container);
+         createUI_20_PerformanceModelingChart(container);
       }
+
    }
 
    private void createUI_10_Toolbar(final Composite parent) {
@@ -380,15 +371,14 @@ public class PerformanceModelingChartView extends ViewPart {
 
    }
 
-   private void createUI_12_PageBook(final Composite parent) {
+   private void createUI_20_PerformanceModelingChart(final Composite parent) {
 
       _pageBook = new PageBook(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageBook);
 
       _page_TrainingStressScores = createUI_20_TrainingStressScores(_pageBook);
 
-      _page_NoPerson = UI.createPage(_tk, _pageBook, Messages.UI_Label_PersonIsRequired);
-      _page_NoTour = UI.createPage(_tk, _pageBook, Messages.UI_Label_no_chart_is_selected);
+      _page_NoPerson = UI.createPage(_tk, _pageBook, Messages.UI_Label_No_Person_Is_Selected);
    }
 
    private Composite createUI_20_TrainingStressScores(final Composite parent) {
@@ -442,8 +432,6 @@ public class PerformanceModelingChartView extends ViewPart {
    private void enableControls() {
 
       final boolean isCustomScaling = _isShowAllValues == false;
-
-//      _comboTrainingChart.setEnabled(canShowHrZones);
 
       _spinnerHrLeft.setEnabled(isCustomScaling);
       _spinnerHrRight.setEnabled(isCustomScaling);
@@ -541,7 +529,7 @@ public class PerformanceModelingChartView extends ViewPart {
    }
 
    /**
-    * Person and/or hr zones are modified
+    * A new person was selected
     */
    private void onModifyPerson() {
 
@@ -612,9 +600,7 @@ public class PerformanceModelingChartView extends ViewPart {
        */
       if (_currentPerson == null) {
 
-         // selected tour do not contain a person
          _pageBook.showPage(_page_NoPerson);
-
          return;
       }
 
@@ -624,8 +610,7 @@ public class PerformanceModelingChartView extends ViewPart {
 
       // display page for the selected chart
       _pageBook.showPage(_page_TrainingStressScores);
-      updateUI_40_trainingStressScoresChart();
-      //updateUI_42_HrZoneData(zoneMinMaxBpm);
+      updateUI_40_performanceModelingChart();
 
    }
 
@@ -636,18 +621,17 @@ public class PerformanceModelingChartView extends ViewPart {
          return;
       }
 
-         /*
-          * another person is contained in the tour, dispose resources which depends on the current
-          * person
-          */
-         if (_hrZoneDataContainerContent != null) {
-            _hrZoneDataContainerContent.dispose();
-         }
-
       updateUI_10_stressScoreValuesFromModel();
    }
 
-   private void updateUI_40_trainingStressScoresChart() {
+   /**
+    * Updates the chart displaying :
+    * - Stress scores
+    * - Fitness values
+    * - Fatigues values
+    * - Performance modeling values
+    */
+   private void updateUI_40_performanceModelingChart() {
 
       //TourManager.GETALL TOURS
       final float[] pulseSerie = new float[100];
