@@ -1,0 +1,43 @@
+19.next.0                                                 ?. Month 2019
+
+
+TODO's
+======
+
+
+New + Improvements   
+==================
+
+ 
+Import
+======
+
+
+ 
+Changes  
+=======
+
+
+ 
+Bugfix   
+======
+
+* Statistics
+  - Fixed issue: Tour type in tooltip is wrong for the first item (year/month)
+
+* Tour Tags
+  - Fixed issue: Column widths have been reset when tags are saved
+
+
+ 
+Translation    
+===========
+
+ - French (Frederic)
+ - German
+ - Italian (Doriano)
+
+ 
+System   
+======
+
