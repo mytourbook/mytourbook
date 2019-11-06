@@ -68,24 +68,14 @@ public class PerformanceModelingData {
     */
    public PerformanceModelingData() {}
 
-   /**
-    * Computes both the fitness and fatigue values for the Skiba Model.
-    *
-    * @param tourStartDate
-    *           The date at and after which the values need to be computed
-    */
-   private void computeSkibaFitnessAndFatigueValues(final LocalDate tourStartDate) {
+   public void computeFatigueValues() {
+      // TODO Auto-generated method stub
 
-      if (fitnessValuesSkiba == null) {
-         fitnessValuesSkiba = new HashMap<>();
-      }
+   }
 
-      if (!fitnessValuesSkiba.containsKey(tourStartDate)) {
-         fitnessValuesSkiba.put(tourStartDate, 0);
-      } else {
-         fitnessValuesSkiba.replace(tourStartDate, 0);
+   public void computeFitnessValues() {
+      // TODO Auto-generated method stub
 
-      }
    }
 
    public HashMap<LocalDate, ArrayList<Long>> getGovssEntries() {
@@ -159,7 +149,7 @@ public class PerformanceModelingData {
 
       }
 
-      computeSkibaFitnessAndFatigueValues(tourStartDate);
+      updateSkibaFitnessAndFatigueValues(tourStartDate);
 
    }
 
@@ -170,5 +160,25 @@ public class PerformanceModelingData {
    @Override
    public String toString() {
       return "PerformanceModelingData [performanceModelingDataId=" + PerformanceModelingDataId + "]"; //$NON-NLS-1$ //$NON-NLS-2$
+   }
+
+   /**
+    * Computes both the fitness and fatigue values for the Skiba Model.
+    *
+    * @param tourStartDate
+    *           The date at and after which the values need to be computed
+    */
+   private void updateSkibaFitnessAndFatigueValues(final LocalDate tourStartDate) {
+
+      if (fitnessValuesSkiba == null) {
+         fitnessValuesSkiba = new HashMap<>();
+      }
+
+      if (!fitnessValuesSkiba.containsKey(tourStartDate)) {
+         fitnessValuesSkiba.put(tourStartDate, 0);
+      } else {
+         fitnessValuesSkiba.replace(tourStartDate, 0);
+
+      }
    }
 }

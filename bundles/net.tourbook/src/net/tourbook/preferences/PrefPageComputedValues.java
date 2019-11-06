@@ -25,6 +25,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.form.FormTools;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourPerson;
 import net.tourbook.database.IComputeNoDataserieValues;
 import net.tourbook.database.IComputeTourValues;
 import net.tourbook.database.TourDatabase;
@@ -918,19 +919,33 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
          label.setText(Messages.Compute_PerformanceModelingChart_Label_Days);
 
          // button: Compute predicted performance chart values for all tours and all training stress models
+
          final Button btnComputeValues = new Button(container, SWT.NONE);
+
+         final TourPerson activePerson = TourbookPlugin.getActivePerson();
+         String activePersonName = UI.EMPTY_STRING;
+         if (activePerson == null) {
+            btnComputeValues.setEnabled(false);
+         }
+         else {
+            activePersonName = activePerson.getName();
+         }
+
+         activePersonName = NLS.bind(Messages.Compute_PredictedPerformance_Button_ComputeValues, activePersonName);
+
          GridDataFactory
                .fillDefaults()//
                .span(3, 1)
                .indent(0, DEFAULT_V_DISTANCE_PARAGRAPH)
                .applyTo(btnComputeValues);
-         btnComputeValues.setText(Messages.Compute_PredictedPerformance_Button_ComputeValues);
+         btnComputeValues.setText(activePersonName);
          btnComputeValues.setToolTipText(Messages.Compute_PredictedPerformance_Button_ComputeValues_Tooltip);
          btnComputeValues.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(final SelectionEvent e) {
-               //  onComputeElevationGainValues();
+               onComputePerformanceModelingValues();
             }
+
          });
       }
 
@@ -1217,6 +1232,69 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
       TourDatabase.computeAnyValues_ForAllTours(computeTourValueConfig, null);
 
       fireTourModifyEvent();
+   }
+
+   private void onComputePerformanceModelingValues() {
+
+      if (MessageDialog.openConfirm(
+            Display.getCurrent().getActiveShell(),
+            Messages.compute_tourValueElevation_dlg_computeValues_title,
+            Messages.Compute_TourValue_ElevationGain_Dlg_ComputeValues_Message) == false) {
+         return;
+      }
+
+      final TourPerson ewnfkjw = TourbookPlugin.getActivePerson();
+      ewnfkjw.computePerformanceModelingData();
+      saveState();
+
+      final int[] elevation = new int[] { 0, 0 };
+
+      final IComputeTourValues computeTourValueConfig = new IComputeTourValues() {
+
+         @Override
+         public boolean computeTourValues(final TourData oldTourData) {
+
+            // keep old value
+            elevation[0] += oldTourData.getTourAltUp();
+
+            return oldTourData.computeAltitudeUpDown();
+         }
+
+         @Override
+         public String getResultText() {
+
+            return NLS.bind(
+                  Messages.Compute_TourValue_ElevationGain_ResultText, //
+                  new Object[] {
+                        _nf0.format((elevation[1] - elevation[0]) / UI.UNIT_VALUE_ALTITUDE),
+                        net.tourbook.common.UI.UNIT_LABEL_ALTITUDE //
+                  });
+         }
+
+         @Override
+         public String getSubTaskText(final TourData savedTourData) {
+
+            String subTaskText = null;
+
+            if (savedTourData != null) {
+
+               // summarize new values
+               elevation[1] += savedTourData.getTourAltUp();
+
+               subTaskText = NLS.bind(
+                     Messages.compute_tourValueElevation_subTaskText, //
+                     new Object[] {
+                           _nf0.format((elevation[1] - elevation[0]) / UI.UNIT_VALUE_ALTITUDE),
+                           net.tourbook.common.UI.UNIT_LABEL_ALTITUDE //
+                     });
+            }
+
+            return subTaskText;
+         }
+      };
+
+      TourDatabase.computeAnyValues_ForAllTours(computeTourValueConfig, null);
+
    }
 
    private void onModifyBreakTime() {

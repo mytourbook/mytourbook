@@ -306,6 +306,16 @@ public class TourPerson implements Comparable<Object> {
       return 0;
    }
 
+   public void computePerformanceModelingData() {
+      if (performanceModelingData == null) {
+      return;
+      }
+
+      performanceModelingData.computeFitnessValues();
+      performanceModelingData.computeFatigueValues();
+   }
+
+
    @Override
    public boolean equals(final Object obj) {
 
