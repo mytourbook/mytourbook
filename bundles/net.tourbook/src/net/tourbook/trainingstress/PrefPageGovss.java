@@ -59,6 +59,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
@@ -503,6 +504,21 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
          {
             createUI_110_ThresholdPower(_govssGroup);
             createUI_120_TourTypesList(_govssGroup);
+
+            // button: compute GOVSS values
+            final Button btnComputValues = new Button(_govssGroup, SWT.NONE);
+            GridDataFactory
+                  .fillDefaults()
+                  .align(SWT.BEGINNING, SWT.CENTER)
+                  .applyTo(btnComputValues);
+            btnComputValues.setText(Messages.Compute_Govss_Button_ComputeAllTours);
+            btnComputValues.setToolTipText(Messages.Compute_Govss_Button_ComputeAllTours_Tooltip);
+            btnComputValues.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  // onComputeElevationGainValues();
+               }
+            });
          }
 
          restoreState();

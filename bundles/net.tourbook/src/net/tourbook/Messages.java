@@ -110,6 +110,9 @@ public class Messages extends NLS {
    public static String        Calendar_View_Combo_Month_Tooltip;
    public static String        Calendar_View_Combo_Year_Tooltip;
 
+   public static String        Compute_Govss_Button_ComputeAllTours;
+   public static String        Compute_Govss_Button_ComputeAllTours_Tooltip;
+
    public static String        dialog_export_btn_export;
    public static String        dialog_export_chk_camouflageSpeed;
    public static String        dialog_export_chk_camouflageSpeed_tooltip;
@@ -1662,6 +1665,7 @@ public class Messages extends NLS {
    public static String        Pref_People_Tab_DataTransfer;
    public static String        Pref_People_Tab_HRZone;
    public static String        Pref_People_Tab_Person;
+   public static String        Pref_People_Tab_TrainingStress;
    public static String        Pref_People_Title;
 
    public static String        Pref_TrainingStress_BikeScore_GroupName;

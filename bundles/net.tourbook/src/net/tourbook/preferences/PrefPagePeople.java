@@ -773,7 +773,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
          // tab: training stress
          final TabItem tabTrainingStress = new TabItem(_tabFolderPerson, SWT.NONE);
-         tabTrainingStress.setText("Training Stress");//Messages.Pref_People_Tab_DataTransfer);
+         tabTrainingStress.setText(Messages.Pref_People_Tab_TrainingStress);
          tabTrainingStress.setControl(createUI_100_Tab_TrainingStress(_tabFolderPerson));
       }
    }

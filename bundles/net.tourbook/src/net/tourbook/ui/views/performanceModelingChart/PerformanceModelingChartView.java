@@ -39,6 +39,7 @@ import net.tourbook.chart.MinMaxKeeper_YData;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.Util;
+import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourPersonHRZone;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -768,6 +769,12 @@ public class PerformanceModelingChartView extends ViewPart {
 
          int totalGovssValue = 0;
          for (final Long tourId : tourIds) {
+            final TourData currentTour = TourManager.getTour(tourId);
+
+            if (currentTour == null) {
+               continue;
+            }
+
             totalGovssValue += TourManager.getTour(tourId).getGovss();
          }
          if (totalGovssValue > 10000 || totalGovssValue < 0) {

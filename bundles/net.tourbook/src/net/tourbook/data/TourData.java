@@ -4010,6 +4010,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    public boolean computeGovss() {
 
+      if (timeSerie == null ||
+            tourPerson == null || tourPerson.getWeight() <= 0f || tourPerson.getHeight() <= 0f ||
+            tourType == null ||
+            !tourPerson.isTourTypeInGovssTourTypes(tourType.getTypeId())) {
+         return false;
+      }
+
       // We make sure to retrieve the latest version of the tour's TourPerson in case it has been modified recently
       // Note : It's not a "pretty" solution but that is the best I found as of today
       final ArrayList<TourPerson> tourPersons = PersonManager.getTourPeople();
@@ -4018,13 +4025,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
                tourPerson = currentTourPerson;
             break;
          }
-      }
-
-      if (timeSerie == null ||
-            tourPerson == null || tourPerson.getWeight() <= 0f || tourPerson.getHeight() <= 0f ||
-            tourType == null ||
-            !tourPerson.isTourTypeInGovssTourTypes(tourType.getTypeId())) {
-         return false;
       }
 
       final Running_Govss running_Govss = new Running_Govss(tourPerson);
