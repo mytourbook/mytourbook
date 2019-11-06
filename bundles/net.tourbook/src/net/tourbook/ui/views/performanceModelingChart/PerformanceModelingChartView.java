@@ -19,6 +19,7 @@ import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.format.TextStyle;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
@@ -102,6 +103,9 @@ public class PerformanceModelingChartView extends ViewPart {
    private MouseWheelListener             _defaultSpinnerMouseWheelListener;
 
    private TourPerson                     _currentPerson;
+
+   private LocalDate                      _oldestEntryDate;
+   private LocalDate                      _newestEntryDate;
 
    private boolean                        _isUpdateUI;
    private boolean                        _isShowAllValues;
@@ -245,8 +249,9 @@ public class PerformanceModelingChartView extends ViewPart {
 
       addPrefListener();
 
-
       restoreState();
+
+      updateUI_10_stressScoreValuesFromModel();
 
    }
 
@@ -463,6 +468,23 @@ public class PerformanceModelingChartView extends ViewPart {
       _headerToolbarManager.update(true);
    }
 
+   private LocalDate findExtremeDates(final HashMap<LocalDate, ArrayList<Long>> entries, final boolean oldest) {
+      Map.Entry<LocalDate, ArrayList<Long>> oldestEntry = null;
+      Map.Entry<LocalDate, ArrayList<Long>> newestEntry = null;
+
+      for (final Map.Entry<LocalDate, ArrayList<Long>> entry : entries.entrySet()) {
+
+         if (oldest && (oldestEntry == null || entry.getKey().compareTo(oldestEntry.getKey()) < 0)) {
+            oldestEntry = entry;
+         }
+         if (!oldest && (newestEntry == null || entry.getKey().compareTo(newestEntry.getKey()) > 0)) {
+            newestEntry = entry;
+         }
+      }
+
+      return oldest ? oldestEntry.getKey() : newestEntry.getKey();
+   }
+
    private void initUI(final Composite parent) {
 
       _tk = new FormToolkit(parent.getDisplay());
@@ -534,7 +556,6 @@ public class PerformanceModelingChartView extends ViewPart {
    private void onModifyPerson() {
 
       clearView();
-      _currentPerson = TourbookPlugin.getActivePerson();
 
       // update ui to show the current person datashowTour();
       updateUI_10_stressScoreValuesFromModel();
@@ -595,6 +616,8 @@ public class PerformanceModelingChartView extends ViewPart {
 
       enableControls();
 
+      _currentPerson = TourbookPlugin.getActivePerson();
+
       /*
        * check person
        */
@@ -634,102 +657,46 @@ public class PerformanceModelingChartView extends ViewPart {
    private void updateUI_40_performanceModelingChart() {
 
       //TourManager.GETALL TOURS
-      final float[] pulseSerie = new float[100];
-      final int timeSerieSize = pulseSerie.length;
 
-      final ArrayList<TourPersonHRZone> hrSortedZones = new ArrayList<>();
-      final int zoneSize = 100;// hrSortedZones.size();
-
-      final RGB[] rgbBright = new RGB[zoneSize];
-      final RGB[] rgbDark = new RGB[zoneSize];
-      final RGB[] rgbLine = new RGB[zoneSize];
-
-      int zoneIndex = 0;
-
-      for (int index = 0; index < 100; ++index) {
-
-         rgbDark[zoneIndex] = new RGB(0, 255, 255);
-         rgbBright[zoneIndex] = new RGB(0, 255, 255);
-         rgbLine[zoneIndex] = new RGB(0, 255, 255);
-
-         zoneIndex++;
+      // We get the govssentries
+      if (_currentPerson.getPerformanceModelingData() == null ||
+            _currentPerson.getPerformanceModelingData().getGovssEntries() == null) {
+         return;
       }
 
-      /*
-       * Get min/max values
-       */
-      float pulseMin;
-      float pulseMax;
+      final HashMap<LocalDate, ArrayList<Long>> govssEntries = _currentPerson.getPerformanceModelingData().getGovssEntries();
 
-      if (true) {//_isShowAllValues) {
+      // We find he oldest date
 
-         pulseMin = pulseMax = pulseSerie[0];
+      //We create an array fo which its capacity is the number of days between the first date and the last date
 
-         for (final float pulse : pulseSerie) {
-            pulseMin = (float) (Math.random() * 100f);//_tourData.getGovss();
-         }
+      _oldestEntryDate = findExtremeDates(govssEntries, true);
+      _newestEntryDate = findExtremeDates(govssEntries, false);
+      final int numberOfDays = (int) ChronoUnit.DAYS.between(_oldestEntryDate, _newestEntryDate) + 1;
 
+      final RGB[] rgbBright = new RGB[numberOfDays];
+      final RGB[] rgbDark = new RGB[numberOfDays];
+      final RGB[] rgbLine = new RGB[numberOfDays];
+
+      for (int index = 0; index < numberOfDays; ++index) {
+
+         rgbDark[index] = new RGB(0, 255, 255);
+         rgbBright[index] = new RGB(0, 255, 255);
+         rgbLine[index] = new RGB(0, 255, 255);
       }
 
-      // TODO Ca se passe ici
       /*
        * create x-data series
        */
-      final int pulseRange = 360;
+      _xSeriePulse = new double[numberOfDays];
 
-      _xSeriePulse = new double[pulseRange];
-      final float[] ySeriePulseDuration = new float[pulseRange];
+      final int[] colorIndex = new int[numberOfDays];
 
-      final int[] colorIndex = new int[pulseRange];
+      for (int index = 0; index < numberOfDays; index++) {
 
-      final float[] zoneMinBpm = new float[zoneSize];
-      zoneMinBpm[0] = 0;//zoneMinMaxBpm.zoneMinBpm;
-      final float[] zoneMaxBpm = new float[zoneSize];//zoneMinMaxBpm.zoneMaxBpm;
-      zoneMaxBpm[0] = 200;
-
-      for (int pulseIndex = 0; pulseIndex < pulseRange; pulseIndex++) {
-
-         _xSeriePulse[pulseIndex] = pulseIndex;
-
-         // set color index for each pulse value
-         for (zoneIndex = 0; zoneIndex < zoneSize; zoneIndex++) {
-
-            final float minValue = zoneMinBpm[zoneIndex];
-            final float maxValue = zoneMaxBpm[zoneIndex];
-
-            final double pulse = pulseMin + pulseIndex;
-
-            if (pulse >= minValue && pulse <= maxValue) {
-
-               // pulse is in the current zone
-
-               colorIndex[pulseIndex] = zoneIndex;
-
-               break;
-            }
-         }
+         _xSeriePulse[index] = index;
       }
 
-      int prevTime = 0;
-
-      /*
-       * create y-data serie: get time/color for each pulse value
-       */
-      for (int serieIndex = 0; serieIndex < timeSerieSize; serieIndex++) {
-
-         // get time for each pulse value
-         final int currentTime = (int) pulseSerie[serieIndex];
-         final int timeDiff = currentTime - prevTime;
-         prevTime = currentTime;
-
-         final float pulse = pulseSerie[serieIndex];
-         final int pulseIndex = (int) (pulse - pulseMin);
-
-         // check array bounds
-         if (pulseIndex >= 0 && pulseIndex < pulseRange) {
-            ySeriePulseDuration[pulseIndex] += Math.random() * 100;
-         }
-      }
 
       final ChartDataModel chartDataModel = new ChartDataModel(ChartType.LINE);
       chartDataModel.setIsGraphOverlapped(true);
@@ -756,9 +723,8 @@ public class PerformanceModelingChartView extends ViewPart {
       /*
        * y-axis: GOVSS values
        */
-//TODO Get all tours belonging to the ativerperson and that have govss values
-      final float[] yvalues = new float[pulseRange];
-      for (int toto = 0; toto < pulseRange; ++toto) {
+      final float[] yvalues = new float[numberOfDays];
+      for (int toto = 0; toto < numberOfDays; ++toto) {
          yvalues[toto] = (float) (Math.random() * 100);
       }
 
@@ -776,7 +742,7 @@ public class PerformanceModelingChartView extends ViewPart {
       yData.setRgbDark(rgbDark);
       yData.setDefaultRGB(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY).getRGB());
 
-      //chartDataModel.addYData(yData);
+      chartDataModel.addYData(yData);
 
       //TODO when MTB supports displaying both BAR and LINES at the same time
       // set tool tip info
@@ -796,57 +762,38 @@ public class PerformanceModelingChartView extends ViewPart {
        * }
        */
 
-      final float[] dummyPerformanceData = new float[pulseRange];
-      final int[] govssValues = new int[100];
-      final TourPerson tourPerson = TourbookPlugin.getActivePerson();
+      final float[] govssValues = new float[numberOfDays];
 
-      if (tourPerson.getPerformanceModelingData() == null) {
-         return;
-      }
-
-      final HashMap<LocalDate, ArrayList<Long>> govssEntries = tourPerson.getPerformanceModelingData().getGovssEntries();
-
-      if (govssEntries == null) {
-         return;
-      }
-
-      final int indexe = 0;
       for (final Map.Entry<LocalDate, ArrayList<Long>> entry : govssEntries.entrySet()) {
-         final LocalDate date = entry.getKey();
+         final LocalDate currentDate = entry.getKey();
+         final int index = (int) ChronoUnit.DAYS.between(_oldestEntryDate, currentDate);
          final ArrayList<Long> tourIds = entry.getValue();
 
          int totalGovssValue = 0;
          for (final Long tourId : tourIds) {
             totalGovssValue += TourManager.getTour(tourId).getGovss();
          }
-         govssValues[indexe] = totalGovssValue;
+         govssValues[index] = totalGovssValue;
 
-      }
-      for (int toto = 0; toto < 100; ++toto) {
-         dummyPerformanceData[toto] = govssValues[toto];
       }
 
       final ChartDataYSerie dummyPerformanceDataYAxis = new ChartDataYSerie(
             ChartType.LINE,
-            dummyPerformanceData,
+            govssValues,
             false);
 
       dummyPerformanceDataYAxis.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
       yData.setYTitle("GOVSS");//Messages.App_Label_H_MM);
 
-      final RGB[] rgbBright2 = new RGB[zoneSize];
-      final RGB[] rgbDark2 = new RGB[zoneSize];
-      final RGB[] rgbLine2 = new RGB[zoneSize];
+      final RGB[] rgbBright2 = new RGB[numberOfDays];
+      final RGB[] rgbDark2 = new RGB[numberOfDays];
+      final RGB[] rgbLine2 = new RGB[numberOfDays];
 
-      zoneIndex = 0;
+      for (int index = 0; index < numberOfDays; ++index) {
 
-      for (int index = 0; index < 100; ++index) {
-
-         rgbDark2[zoneIndex] = new RGB(203, 25, 37);
-         rgbBright2[zoneIndex] = new RGB(203, 25, 37);
-         rgbLine2[zoneIndex] = new RGB(203, 25, 37);
-
-         zoneIndex++;
+         rgbDark2[index] = new RGB(203, 25, 37);
+         rgbBright2[index] = new RGB(203, 25, 37);
+         rgbLine2[index] = new RGB(203, 25, 37);
       }
 
       dummyPerformanceDataYAxis.setColorIndex(new int[][] { colorIndex });
@@ -855,7 +802,7 @@ public class PerformanceModelingChartView extends ViewPart {
       dummyPerformanceDataYAxis.setRgbDark(rgbDark2);
       dummyPerformanceDataYAxis.setDefaultRGB(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY).getRGB());
 
-      chartDataModel.addYData(dummyPerformanceDataYAxis);
+      //  chartDataModel.addYData(dummyPerformanceDataYAxis);
 
       // show the new data data model in the chart
       _chartPerformanceModelingData.updateChart(chartDataModel, false);
