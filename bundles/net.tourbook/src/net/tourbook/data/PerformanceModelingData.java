@@ -35,18 +35,7 @@ import net.tourbook.database.TourDatabase;
 @Entity
 public class PerformanceModelingData {
 
-   public static final int PERFORMANCE_MODELING_DATA_ID_NOT_DEFINED = 0;
-
-   /**
-    * Default rest pulse
-    */
-   //public static final int                     DEFAULT_REST_PULSE                       = 60;
-
-   /**
-    * manually created person creates a unique id to identify it, saved person is compared with the
-    * person id
-    */
-   private static int                          _createCounter = 0;
+   public static final int                     PERFORMANCE_MODELING_DATA_ID_NOT_DEFINED = 0;
 
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -63,14 +52,14 @@ public class PerformanceModelingData {
    @Lob
    private HashMap<Date, long[]>               bikeScoreEntries;
 
-   //   private HashMap<Date, long[]>           swimScoreEntries;
+   //  private HashMap<Date, long[]>           swimScoreEntries;
    //  private HashMap<Date, long[]>           trimpEntries;
+
    /**
     * Computed data : Fitness and fatigue
     */
-
    @Lob
-   private HashMap<Date, long[]> fitnessValuesSkiba;
+   private HashMap<LocalDate, Integer> fitnessValuesSkiba;
    @Lob
    private HashMap<Date, long[]> fatigueValuesSkiba;
 
@@ -78,6 +67,26 @@ public class PerformanceModelingData {
     * default constructor used in ejb
     */
    public PerformanceModelingData() {}
+
+   /**
+    * Computes both the fitness and fatigue values for the Skiba Model.
+    *
+    * @param tourStartDate
+    *           The date at and after which the values need to be computed
+    */
+   private void computeSkibaFitnessAndFatigueValues(final LocalDate tourStartDate) {
+
+      if (fitnessValuesSkiba == null) {
+         fitnessValuesSkiba = new HashMap<>();
+      }
+
+      if (!fitnessValuesSkiba.containsKey(tourStartDate)) {
+         fitnessValuesSkiba.put(tourStartDate, 0);
+      } else {
+         fitnessValuesSkiba.replace(tourStartDate, 0);
+
+      }
+   }
 
    public HashMap<LocalDate, ArrayList<Long>> getGovssEntries() {
       return govssEntries;
@@ -150,6 +159,8 @@ public class PerformanceModelingData {
 
       }
 
+      computeSkibaFitnessAndFatigueValues(tourStartDate);
+
    }
 
    public void setGovssEntries(final HashMap<LocalDate, ArrayList<Long>> govssEntries) {
@@ -158,6 +169,6 @@ public class PerformanceModelingData {
 
    @Override
    public String toString() {
-      return "PerformanceModeling [performanceModelingDataId=" + PerformanceModelingDataId + "]"; //$NON-NLS-1$ //$NON-NLS-2$
+      return "PerformanceModelingData [performanceModelingDataId=" + PerformanceModelingDataId + "]"; //$NON-NLS-1$ //$NON-NLS-2$
    }
 }
