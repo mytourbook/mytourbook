@@ -27,7 +27,6 @@ import org.eclipse.swt.widgets.ToolItem;
 public class ActionShowPhotos extends Action {
 
    private Map25View   _map25View;
-   private ToolItem    _actionToolItem;  //i dont understand this. to complicate. giving up gui programming
 
 	public ActionShowPhotos(final Map25View map25View) {
 
@@ -36,15 +35,15 @@ public class ActionShowPhotos extends Action {
 		_map25View = map25View;
 
 		setToolTipText(Messages.Map_Action_ShowPhotos_Tooltip);
+		
 		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_Action_ShowPhotosInMap));
+		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_Action_ShowAllPhotosInMap_Disabled));
 	}
 
 	@Override
 	public void run() {
-	   //_map25View.actionZoomIn();
-	   //final boolean isPhotoVisible = _actionToolItem.getSelection();
-		//_map25View.actionShowPhotos(isPhotoVisible);
-	   _map25View.actionShowPhotos();
+
+	   _map25View.actionShowPhotos(isChecked());
 	   ;
 	}
 

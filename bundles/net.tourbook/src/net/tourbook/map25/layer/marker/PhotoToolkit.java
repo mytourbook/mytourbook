@@ -386,6 +386,12 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
    }
 
    public void showPhoto(Photo photo) {
+
+      final Image image = getPhotoImage(photo, PhotoLoadManager.IMAGE_SIZE_LARGE_DEFAULT);
+      if(image == null) {
+         return;
+      }
+
       final Display display = new Display();
       final Shell shell = new Shell(display);
       shell.setSize(PhotoLoadManager.IMAGE_SIZE_LARGE_DEFAULT, PhotoLoadManager.IMAGE_SIZE_LARGE_DEFAULT);
@@ -393,9 +399,10 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
       shell.setLayout(new FillLayout());
       Canvas canvas = new Canvas(shell, SWT.NONE);
 
+
       canvas.addPaintListener(new PaintListener() {
          public void paintControl(PaintEvent e) {
-            Image image = getPhotoImage(photo, PhotoLoadManager.IMAGE_SIZE_LARGE_DEFAULT);
+            //image = getPhotoImage(photo, PhotoLoadManager.IMAGE_SIZE_LARGE_DEFAULT);
 //            Image image = null;
 //            try {
 //               image = new Image(display, new FileInputStream(photo.imageFilePathName));
@@ -405,7 +412,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
 
             e.gc.drawImage(image, 10, 10);
 
-//            image.dispose();
+            image.dispose();
          }
       });
 
@@ -415,7 +422,10 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
             display.sleep();
          }
       }
+
       display.dispose();
+
+
    }
 
    
@@ -432,7 +442,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
    public boolean onItemSingleTapUp(int index, MarkerItem photoItem) {
       // TODO Auto-generated method stub
       debugPrint(" ??????????? PhotoToolkit *** onItemSingleTapUp(int index, MarkerItem photoItem): " + _allPhotos.get(index).imageFilePathName + " " + photoItem.getTitle());
-      showPhoto(_allPhotos.get(index));
+      //showPhoto(_allPhotos.get(index));
       return false;
    }
 

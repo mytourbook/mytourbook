@@ -182,6 +182,8 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
    private boolean                       _isPartVisible;
    private boolean                       _isShowTour;
    private boolean                       _isInZoom;
+   private boolean                       _isShowPhoto;
+   
    //
    private IPartListener2                _partListener;
    private ISelectionListener            _postSelectionListener;
@@ -201,14 +203,13 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
    private ActionSynchMapWithTour        _actionSyncMap_WithTour;
    private ActionShowEntireTour          _actionShowEntireTour;
    private ActionShowTour_WithConfig     _actionShowTour_WithOptions;
+   private ActionShowPhotos              _actionShowPhotos;
    //private ActionShowPhoto_WithConfig    _actionShowPhoto_WithOptions;   
    private ActionZoomIn                  _actionZoom_In;
    private ActionZoomOut                 _actionZoom_Out;
    private double                        _zoomFactor = 1.5;
 
-   // Photo stuff
-   private ActionShowPhotos              _actionShowPhotos;
-   private boolean                       _isShowPhoto;
+
 
 
    /** Contains only geo tours */
@@ -438,8 +439,8 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       enableActions();
    }
    
-   //public void actionShowPhotos(final boolean isPhotoVisible) {
-   public void actionShowPhotos() {   
+   public void actionShowPhotos(final boolean isPhotoVisible) {
+   //public void actionShowPhotos() {   
       final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 
       _isShowPhoto = _actionShowPhotos.isChecked();
@@ -447,9 +448,9 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       
       //_isShowPhoto = _actionShowPhoto_WithOptions.isEnabled();
       
-      Map25App.debugPrint("show photo: " + _isShowPhoto); //$NON-NLS-1$
+      Map25App.debugPrint("show photo: " + isPhotoVisible); //$NON-NLS-1$
 
-      _mapApp.getLayer_Photo().setEnabled(_isShowPhoto);
+      _mapApp.getLayer_Photo().setEnabled(isPhotoVisible);
 
       //paintTours_AndUpdateMap();
 
@@ -1035,10 +1036,11 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
       final boolean canShowTour = isTourAvailable && isTourLayerVisible;
 
-      _actionShowPhotos.setEnabled(isTourAvailable);
+      //_actionShowPhotos.setEnabled(isTourAvailable);
       //_actionShowPhoto_WithOptions.setEnabled(isTourAvailable);      
       _actionShowTour_WithOptions.setEnabled(isTourAvailable);
       _actionShowMarker_WithOptions.setEnabled(isTourAvailable);
+      //_actionShowPhotos.setEnabled(canShowTour);
       _actionShowEntireTour.setEnabled(canShowTour);
       _actionSyncMap_WithTour.setEnabled(canShowTour);
       _actionSyncMap_WithChartSlider.setEnabled(canShowTour);
@@ -1644,7 +1646,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       
       // photo_layer
       _isShowPhoto = Util.getStateBoolean(_state, STATE_IS_LAYER_PHOTO_VISIBLE, true);
-      _actionShowPhotos.setEnabled(_isShowPhoto);
+      _actionShowPhotos.setChecked(_isShowPhoto);
       //_actionShowPhoto_WithOptions.setSelection(_isShowPhoto);
       _mapApp.getLayer_Photo().setEnabled(_isShowPhoto);
 
