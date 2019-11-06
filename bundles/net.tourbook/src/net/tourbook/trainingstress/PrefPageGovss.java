@@ -22,10 +22,14 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.util.TableLayoutComposite;
+import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
+import net.tourbook.database.IComputeTourValues;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
 import net.tourbook.tourType.TourTypeImage;
 
 import org.eclipse.jface.action.Action;
@@ -46,6 +50,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
@@ -480,6 +485,15 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
       _action_TourType_Remove.setEnabled(isTourTypeSelected);
    }
 
+   private void fireTourModifyEvent() {
+
+      TourManager.getInstance().removeAllToursFromCache();
+      TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR);
+
+      // fire unique event for all changes
+      TourManager.fireEvent(TourEventId.ALL_TOURS_ARE_MODIFIED);
+   }
+
    @Override
    public String getGroupName() {
 
@@ -516,8 +530,9 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
             btnComputValues.addSelectionListener(new SelectionAdapter() {
                @Override
                public void widgetSelected(final SelectionEvent e) {
-                  // onComputeElevationGainValues();
+                  onComputeGovssValues();
                }
+
             });
          }
 
@@ -529,7 +544,6 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
       return _govssGroup;
 
    }
-
    /**
     * Prints a velocity in min/mile or min/km
     *
@@ -588,6 +602,61 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
          }
       };
 
+   }
+
+   private void onComputeGovssValues() {
+
+      final int[] oldGovss = new int[] { 0, 0 };
+      final int[] newGovss = new int[] { 0, 0 };
+
+      final IComputeTourValues computeTourValueConfig = new IComputeTourValues() {
+
+         @Override
+         public boolean computeTourValues(final TourData oldTourData) {
+
+            // keep old value
+            oldGovss[0] += oldTourData.getTourAltUp();
+
+            return oldTourData.computeGovss();
+         }
+
+         @Override
+         public String getResultText() {
+
+            return NLS.bind(
+                  Messages.Compute_TourValue_ElevationGain_ResultText, //
+                  new Object[] {
+                        dpTolerance,
+                        _nf0.format((elevation[1] - elevation[0]) / UI.UNIT_VALUE_ALTITUDE),
+                        net.tourbook.common.UI.UNIT_LABEL_ALTITUDE //
+                  });
+         }
+
+         @Override
+         public String getSubTaskText(final TourData savedTourData) {
+
+            String subTaskText = null;
+
+            if (savedTourData != null) {
+
+               // summarize new values
+               elevation[1] += savedTourData.getTourAltUp();
+
+               subTaskText = NLS.bind(
+                     Messages.compute_tourValueElevation_subTaskText, //
+                     new Object[] {
+                           _nf0.format((elevation[1] - elevation[0]) / UI.UNIT_VALUE_ALTITUDE),
+                           net.tourbook.common.UI.UNIT_LABEL_ALTITUDE //
+                     });
+            }
+
+            return subTaskText;
+         }
+      };
+
+      TourDatabase.computeAnyValues_ForAllTours(computeTourValueConfig, null);
+
+      fireTourModifyEvent();
    }
 
    private void onComputeThresholdPower() {
