@@ -14,7 +14,13 @@ Bugs
 New + Improvements   
 ==================
 
- 
+Views
+-----
+
+* Calendar - Weekly summary
+  
+  Time spent in "slow" vs "fast" cadence zones
+
 Import
 ======
 

@@ -294,6 +294,7 @@ public class CalendarProfileManager {
    private static final DataFormatter _weekFormatter_Energy_MJ;
    private static final DataFormatter _weekFormatter_Pace;
    private static final DataFormatter _weekFormatter_Speed;
+   private static final DataFormatter _weekFormatter_CadenceZones_TimePercentages;
    private static final DataFormatter _weekFormatter_Time_Moving;
    private static final DataFormatter _weekFormatter_Time_Paused;
    private static final DataFormatter _weekFormatter_Time_Recording;
@@ -366,6 +367,7 @@ public class CalendarProfileManager {
 
       _weekFormatter_Pace              = createFormatter_Pace();
       _weekFormatter_Speed             = createFormatter_Speed();
+      _weekFormatter_CadenceZones_TimePercentages = createFormatter_CadenceZones_TimePercentages();
 
       _weekFormatter_Energy_kcal       = createFormatter_Energy_kcal();
       _weekFormatter_Energy_MJ         = createFormatter_Energy_MJ();
@@ -384,6 +386,7 @@ public class CalendarProfileManager {
 
             _weekFormatter_Speed,
             _weekFormatter_Pace,
+            _weekFormatter_CadenceZones_TimePercentages,
 
             _weekFormatter_Energy_kcal,
             _weekFormatter_Energy_MJ,
@@ -410,12 +413,13 @@ public class CalendarProfileManager {
 
       DEFAULT_WEEK_FORMATTER_DATA = new FormatterData[] {
 
-         new FormatterData(true,      FormatterID.DISTANCE,         _weekFormatter_Distance.getDefaultFormat()),
-         new FormatterData(true,      FormatterID.ALTITUDE,         _weekFormatter_Altitude.getDefaultFormat()),
-         new FormatterData(true,      FormatterID.ELEVATION_CHANGE, _weekFormatter_Elevation_Change.getDefaultFormat()),
-         new FormatterData(true,      FormatterID.SPEED,            _weekFormatter_Speed.getDefaultFormat()),
-         new FormatterData(true,      FormatterID.PACE,             _weekFormatter_Pace.getDefaultFormat()),
-         new FormatterData(true,      FormatterID.TIME_MOVING,      _weekFormatter_Time_Moving.getDefaultFormat()),
+         new FormatterData(true,      FormatterID.DISTANCE,            _weekFormatter_Distance.getDefaultFormat()),
+         new FormatterData(true,      FormatterID.ALTITUDE,            _weekFormatter_Altitude.getDefaultFormat()),
+         new FormatterData(true,      FormatterID.ELEVATION_CHANGE,    _weekFormatter_Elevation_Change.getDefaultFormat()),
+         new FormatterData(true,      FormatterID.SPEED,               _weekFormatter_Speed.getDefaultFormat()),
+         new FormatterData(true,      FormatterID.PACE,                _weekFormatter_Pace.getDefaultFormat()),
+         new FormatterData(true,      FormatterID.CADENCE_ZONES_TIMES, _weekFormatter_CadenceZones_TimePercentages.getDefaultFormat()),
+         new FormatterData(true,      FormatterID.TIME_MOVING,         _weekFormatter_Time_Moving.getDefaultFormat()),
          new FormatterData(false,     FormatterID.EMPTY,            ValueFormat.DUMMY_VALUE),
       };
 
@@ -838,6 +842,53 @@ public class CalendarProfileManager {
             valueFormatId = valueFormat;
             valueFormatter = getFormatter_Number(valueFormat.name());
          }
+      };
+
+      // setup default formatter
+      dataFormatter.setValueFormat(dataFormatter.getDefaultFormat());
+
+      return dataFormatter;
+   }
+
+   /**
+    * Percentage of time spent in each cadence zone ("slow" vs "fast")
+    */
+   private static DataFormatter createFormatter_CadenceZones_TimePercentages() {
+
+      final DataFormatter dataFormatter = new DataFormatter(
+            FormatterID.CADENCE_ZONES_TIMES,
+            Messages.Calendar_Profile_Value_CadenceZones_TimePercentages,
+            GraphColorManager.PREF_GRAPH_CADENCE) {
+
+         @Override
+         String format(final CalendarTourData data, final ValueFormat valueFormat, final boolean isShowValueUnit) {
+
+            String cadenceZonesPercentages = UI.EMPTY_STRING;
+
+            final int totalCadenceTime = data.cadenceZone_SlowTime + data.cadenceZone_FastTime;
+            if (totalCadenceTime > 0) {
+               final int cadenceZone_SlowPercentage = Math.round(data.cadenceZone_SlowTime * 100f / totalCadenceTime);
+               final int cadenceZone_FastPercentage = Math.round(data.cadenceZone_FastTime * 100f / totalCadenceTime);
+
+               cadenceZonesPercentages = cadenceZone_SlowPercentage + " - " + cadenceZone_FastPercentage; //$NON-NLS-1$
+            }
+
+            return cadenceZonesPercentages;
+         }
+
+         @Override
+         public ValueFormat getDefaultFormat() {
+            return ValueFormat.TEXT;
+         }
+
+         @Override
+         public ValueFormat[] getValueFormats() {
+
+            return new ValueFormat[] { ValueFormat.TEXT };
+         }
+
+         @Override
+         void setValueFormat(final ValueFormat valueFormat) {}
       };
 
       // setup default formatter
@@ -3440,6 +3491,10 @@ public class CalendarProfileManager {
 
          case SPEED:
             _weekFormatter_Speed.setValueFormat(valueFormat);
+            break;
+
+         case CADENCE_ZONES_TIMES:
+            _weekFormatter_CadenceZones_TimePercentages.setValueFormat(valueFormat);
             break;
 
          case TIME_MOVING:

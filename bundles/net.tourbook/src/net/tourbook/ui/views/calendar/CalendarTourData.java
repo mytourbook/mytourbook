@@ -40,6 +40,9 @@ public class CalendarTourData {
    int             elevationLoss;
    int             distance;
 
+   int             cadenceZone_SlowTime;
+   int             cadenceZone_FastTime;
+
    int             recordingTime;
    int             drivingTime;
 
