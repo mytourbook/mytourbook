@@ -1040,7 +1040,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       //_actionShowPhoto_WithOptions.setEnabled(isTourAvailable);      
       _actionShowTour_WithOptions.setEnabled(isTourAvailable);
       _actionShowMarker_WithOptions.setEnabled(isTourAvailable);
-      //_actionShowPhotos.setEnabled(canShowTour);
+      //_actionShowPhotos.setEnabled(isTourAvailable);
       _actionShowEntireTour.setEnabled(canShowTour);
       _actionSyncMap_WithTour.setEnabled(canShowTour);
       _actionSyncMap_WithChartSlider.setEnabled(canShowTour);
