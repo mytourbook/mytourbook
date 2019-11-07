@@ -4,6 +4,12 @@
 TODO's
 ======
 
+- Website: Update contributor/translator list 
+
+Bugs
+----
+* Map2: new tour selector explodes when continously selecting markers in search view, maybe in other views
+
 
 New + Improvements   
 ==================
