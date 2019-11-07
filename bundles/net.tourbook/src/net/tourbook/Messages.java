@@ -112,6 +112,7 @@ public class Messages extends NLS {
 
    public static String        Compute_Govss_Button_ComputeAllTours;
    public static String        Compute_Govss_Button_ComputeAllTours_Tooltip;
+   public static String        Compute_GovssValues_ComputeForAllTours_Job_Result;
 
    public static String        dialog_export_btn_export;
    public static String        dialog_export_chk_camouflageSpeed;

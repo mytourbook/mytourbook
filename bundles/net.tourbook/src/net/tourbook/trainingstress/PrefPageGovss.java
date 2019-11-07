@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.trainingstress;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
@@ -25,7 +27,7 @@ import net.tourbook.common.util.TableLayoutComposite;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourType;
-import net.tourbook.database.IComputeTourValues;
+import net.tourbook.database.IComputeNoDataserieValues;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourEventId;
@@ -544,6 +546,7 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
       return _govssGroup;
 
    }
+
    /**
     * Prints a velocity in min/mile or min/km
     *
@@ -606,55 +609,52 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
 
    private void onComputeGovssValues() {
 
-      final int[] oldGovss = new int[] { 0, 0 };
-      final int[] newGovss = new int[] { 0, 0 };
+      final int[] total_Old_GovssValues = { 0 };
+      final int[] total_New_GovssValues = { 0 };
+      final int[] total_New_ToursWithGovssValues = { 0 };
 
-      final IComputeTourValues computeTourValueConfig = new IComputeTourValues() {
+      final IComputeNoDataserieValues computeTourValueConfig = new IComputeNoDataserieValues() {
 
          @Override
-         public boolean computeTourValues(final TourData oldTourData) {
+         public boolean computeTourValues(final TourData originalTourData, final PreparedStatement sqlUpdateStatement) throws SQLException {
 
-            // keep old value
-            oldGovss[0] += oldTourData.getTourAltUp();
+            // keep old values
+            total_Old_GovssValues[0] += originalTourData.getGovss();
 
-            return oldTourData.computeGovss();
+            if (originalTourData.computeGovss() == false) {
+               return false;
+            }
+
+            total_New_GovssValues[0] += originalTourData.getGovss();
+            ++total_New_ToursWithGovssValues[0];
+
+            // update govss in the database
+            sqlUpdateStatement.setInt(1, originalTourData.getGovss());
+            sqlUpdateStatement.setLong(2, originalTourData.getTourId());
+
+            return true;
          }
 
          @Override
          public String getResultText() {
 
-            return NLS.bind(
-                  Messages.Compute_TourValue_ElevationGain_ResultText, //
+            return net.tourbook.common.UI.NEW_LINE + NLS.bind(
+                  Messages.Compute_GovssValues_ComputeForAllTours_Job_Result,
                   new Object[] {
-                        dpTolerance,
-                        _nf0.format((elevation[1] - elevation[0]) / UI.UNIT_VALUE_ALTITUDE),
-                        net.tourbook.common.UI.UNIT_LABEL_ALTITUDE //
-                  });
+                        total_Old_GovssValues[0],
+                        total_New_GovssValues[0],
+                        total_New_ToursWithGovssValues[0] });
          }
 
          @Override
-         public String getSubTaskText(final TourData savedTourData) {
+         public String getSQLUpdateStatement() {
 
-            String subTaskText = null;
-
-            if (savedTourData != null) {
-
-               // summarize new values
-               elevation[1] += savedTourData.getTourAltUp();
-
-               subTaskText = NLS.bind(
-                     Messages.compute_tourValueElevation_subTaskText, //
-                     new Object[] {
-                           _nf0.format((elevation[1] - elevation[0]) / UI.UNIT_VALUE_ALTITUDE),
-                           net.tourbook.common.UI.UNIT_LABEL_ALTITUDE //
-                     });
-            }
-
-            return subTaskText;
+            return TourManager.govss_StatementUpdate;
          }
+
       };
 
-      TourDatabase.computeAnyValues_ForAllTours(computeTourValueConfig, null);
+      TourDatabase.computeNoDataserieValues_ForAllTours(computeTourValueConfig, null);
 
       fireTourModifyEvent();
    }
