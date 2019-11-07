@@ -883,7 +883,6 @@ public class CalendarProfileManager {
 
          @Override
          public ValueFormat[] getValueFormats() {
-
             return new ValueFormat[] { ValueFormat.TEXT };
          }
 
@@ -3491,10 +3490,6 @@ public class CalendarProfileManager {
 
          case SPEED:
             _weekFormatter_Speed.setValueFormat(valueFormat);
-            break;
-
-         case CADENCE_ZONES_TIMES:
-            _weekFormatter_CadenceZones_TimePercentages.setValueFormat(valueFormat);
             break;
 
          case TIME_MOVING:
