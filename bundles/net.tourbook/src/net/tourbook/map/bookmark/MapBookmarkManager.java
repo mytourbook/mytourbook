@@ -85,8 +85,8 @@ public class MapBookmarkManager {
    private static final String ATTR_MAP_POSITION_ZOOM_LEVEL    = "mapPositionZoomLevel";    //$NON-NLS-1$
    
    // for new markerposition function. not implemented yet. 07.11.2019
-   private static final String ATTR_MAP_POSITION_MARKER_X          = "mapPositionMarkerX";  //$NON-NLS-1$
-   private static final String ATTR_MAP_POSITION_MARKER_Y          = "mapPositionMarkerY";  //$NON-NLS-1$  
+   private static final String ATTR_MAP_POSITION_MARKER_X      = "mapPositionMarkerX";      //$NON-NLS-1$
+   private static final String ATTR_MAP_POSITION_MARKER_Y      = "mapPositionMarkerY";      //$NON-NLS-1$  
    
    //
    private static final String TAG_OPTIONS                     = "Options";                 //$NON-NLS-1$
@@ -638,15 +638,33 @@ public class MapBookmarkManager {
        * Map position
        */
       final MapPosition mapPosition = new MapPosition();
+      
+      //final MapPosition_with_MarkerPosition mapPosition = new MapPosition_with_MarkerPosition();
       //mapPosition needs to be extend with markerPosition
 
       mapPosition.x = Util.getXmlDouble(xmlBookmark, ATTR_MAP_POSITION_X, 0.5);
       mapPosition.y = Util.getXmlDouble(xmlBookmark, ATTR_MAP_POSITION_Y, 0.5);
       mapPosition.scale = Util.getXmlDouble(xmlBookmark, ATTR_MAP_POSITION_SCALE, 1);
+      
+      /* version <= 19.10 do not have mapPositionMarkerXY
+       * so if not found set value first to invalid value and
+       * later to mapposition.xy
+       * should only happen one time, when starting first time after upgrading from version <= 19.10
+      */
+      //Double invalidPosition = 2.0;
+      //mapPosition.mapPositionMarkerX = Util.getXmlDouble(xmlBookmark, ATTR_MAP_POSITION_MARKER_X, invalidPosition);
+      //mapPosition.mapPositionMarkerY = Util.getXmlDouble(xmlBookmark, ATTR_MAP_POSITION_MARKER_Y, invalidPosition);
 
       mapPosition.bearing = Util.getXmlFloat(xmlBookmark, ATTR_MAP_POSITION_BEARING, 0f);
       mapPosition.tilt = Util.getXmlFloat(xmlBookmark, ATTR_MAP_POSITION_TILT, 0f);
       mapPosition.zoomLevel = Util.getXmlInteger(xmlBookmark, ATTR_MAP_POSITION_ZOOM_LEVEL, 1);
+     
+      /*
+      if (mapPosition.mapPositionMarkerX >= 1.0 || mapPosition.mapPositionMarkerY > 1.0) {
+         mapPosition.mapPositionMarkerX = mapPosition.x;
+         mapPosition.mapPositionMarkerY = mapPosition.y;
+      }
+      */
       
       bookmark.setMapPosition(mapPosition);
    }
