@@ -37,6 +37,7 @@ import net.tourbook.common.formatter.ValueFormatter_Time_HHMMSS;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
+import net.tourbook.tour.TourManager;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.ListenerList;
@@ -863,17 +864,7 @@ public class CalendarProfileManager {
          @Override
          String format(final CalendarTourData data, final ValueFormat valueFormat, final boolean isShowValueUnit) {
 
-            String cadenceZonesPercentages = UI.EMPTY_STRING;
-
-            final int totalCadenceTime = data.cadenceZone_SlowTime + data.cadenceZone_FastTime;
-            if (totalCadenceTime > 0) {
-               final int cadenceZone_SlowPercentage = Math.round(data.cadenceZone_SlowTime * 100f / totalCadenceTime);
-               final int cadenceZone_FastPercentage = Math.round(data.cadenceZone_FastTime * 100f / totalCadenceTime);
-
-               cadenceZonesPercentages = cadenceZone_SlowPercentage + " - " + cadenceZone_FastPercentage; //$NON-NLS-1$
-            }
-
-            return cadenceZonesPercentages;
+            return TourManager.generateCadenceZones_TimePercentages(data.cadenceZone_SlowTime, data.cadenceZone_FastTime);
          }
 
          @Override
