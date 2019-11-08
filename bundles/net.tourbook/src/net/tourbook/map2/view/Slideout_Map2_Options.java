@@ -23,6 +23,7 @@ import net.tourbook.common.color.IColorSelectorListener;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.Util;
+import net.tourbook.map.MapZoomPosition;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageMap2Appearance;
 
@@ -64,7 +65,10 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
 
    private Button    _chkIsToggleKeyboardPanning;
    private Button    _chkIsShowHoveredTour;
-   private Button    _chkIsZoomWithMousePosition;
+
+   private Button    _rdoZoom_CenterToMousePosition;
+   private Button    _rdoZoom_CenterTour;
+   private Button    _rdoZoom_KeepCurrentCenterPosition;
 
    /**
     * @param ownerControl
@@ -191,16 +195,63 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
             }
          }
          {
-            /*
-             * Zoom to mouse position
-             */
             {
-               // checkbox
-               _chkIsZoomWithMousePosition = new Button(container, SWT.CHECK);
-               _chkIsZoomWithMousePosition.setText(Messages.Slideout_Map_Options_Checkbox_ZoomWithMousePosition);
-               _chkIsZoomWithMousePosition.setToolTipText(Messages.Slideout_Map_Options_Checkbox_ZoomWithMousePosition_Tooltip);
-               _chkIsZoomWithMousePosition.addSelectionListener(_defaultState_SelectionListener);
-               GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsZoomWithMousePosition);
+               /*
+                * Map zoom position
+                */
+               final Label label = new Label(container, SWT.NONE);
+               label.setText(Messages.Slideout_MapOptions_Label_ZoomPosition);
+               GridDataFactory.fillDefaults().span(2, 1).applyTo(label);
+
+            }
+            {
+               final Composite zoomContainer = new Composite(container, SWT.NONE);
+               GridDataFactory.fillDefaults()
+                     .span(2, 1)
+                     .indent(16, 0)
+                     .applyTo(zoomContainer);
+               GridLayoutFactory.fillDefaults().numColumns(1).applyTo(zoomContainer);
+               {
+                  /*
+                   * Keep current center position, this is useful when selecting markers and zooming
+                   * in/out, this is the old behaviour before 18.5
+                   */
+                  _rdoZoom_KeepCurrentCenterPosition = new Button(zoomContainer, SWT.RADIO);
+                  _rdoZoom_KeepCurrentCenterPosition.setText(Messages.Slideout_MapOptions_Radio_Zoom_KeepCurrentCenter);
+                  _rdoZoom_KeepCurrentCenterPosition.addSelectionListener(_defaultState_SelectionListener);
+               }
+               {
+                  /*
+                   * Center to mouse position, this behaviour is often used in web maps
+                   */
+                  _rdoZoom_CenterToMousePosition = new Button(zoomContainer, SWT.RADIO);
+                  _rdoZoom_CenterToMousePosition.setText(Messages.Slideout_MapOptions_Radio_Zoom_CenterToMousePosition);
+                  _rdoZoom_CenterToMousePosition.addSelectionListener(_defaultState_SelectionListener);
+
+//                  final String oldtext = Messages.Slideout_Map_Options_Checkbox_ZoomWithMousePosition;
+//                  &Zoom + center to the mouse position
+
+//                  final String oldToolTipText = Messages.Slideout_Map_Options_Checkbox_ZoomWithMousePosition_Tooltip;
+//                  When this feature is selected then the map is centered to the current
+//                  mouse position when zooming in/out with the mouse wheel
+//                  (this behavior is often used in web maps),
+//
+//                  otherwise the center of the map will be kept when zooming in/out
+//                  (this is the old behavior before version 18.5)
+               }
+               {
+                  /*
+                   * Center tour
+                   */
+                  _rdoZoom_CenterTour = new Button(zoomContainer, SWT.RADIO);
+                  _rdoZoom_CenterTour.setText(Messages.Slideout_MapOptions_Radio_Zoom_CenterTour);
+                  _rdoZoom_CenterTour.addSelectionListener(_defaultState_SelectionListener);
+
+//                  final String oldToolTipText = net.tourbook.map2.Messages.map_action_zoom_centered;
+//                  Center tour when map is zoomed
+
+//                  setImageDescriptor(TourbookPlugin.getImageDescriptor(net.tourbook.map2.Messages.Image_Action_Zoom_CenterTour));
+               }
             }
          }
          {
@@ -298,9 +349,14 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
 
 // SET_FORMATTING_OFF
 
-      _chkIsToggleKeyboardPanning.setSelection(   Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING_DEFAULT);
+      _chkIsToggleKeyboardPanning.setSelection(    Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING_DEFAULT);
       _chkIsShowHoveredTour.setSelection(          Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT);
-      _chkIsZoomWithMousePosition.setSelection(    Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION_DEFAULT);
+
+      final Enum<MapZoomPosition> defaultMapZoomPosition = Map2View.STATE_MAP_ZOOM_POSITION_DEFAULT;
+
+      _rdoZoom_CenterToMousePosition.setSelection(       defaultMapZoomPosition.equals(MapZoomPosition.CENTER_TO_MOUSE_POSITION));
+      _rdoZoom_CenterTour.setSelection(                  defaultMapZoomPosition.equals(MapZoomPosition.CENTER_TOUR));
+      _rdoZoom_KeepCurrentCenterPosition.setSelection(   defaultMapZoomPosition.equals(MapZoomPosition.KEEP_CURRENT_CENTER_POSITION));
 
 // SET_FORMATTING_ON
 
@@ -311,9 +367,14 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
 
 // SET_FORMATTING_OFF
 
-      _chkIsToggleKeyboardPanning.setSelection(   Util.getStateBoolean(_state,  Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING,   Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING_DEFAULT));
+      _chkIsToggleKeyboardPanning.setSelection(    Util.getStateBoolean(_state,  Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING,   Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING_DEFAULT));
       _chkIsShowHoveredTour.setSelection(          Util.getStateBoolean(_state,  Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR, Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR_DEFAULT));
-      _chkIsZoomWithMousePosition.setSelection(    Util.getStateBoolean(_state,  Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION,   Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION_DEFAULT));
+
+      final Enum<MapZoomPosition> mapZoomPosition = Util.getStateEnum(_state, Map2View.STATE_MAP_ZOOM_POSITION, Map2View.STATE_MAP_ZOOM_POSITION_DEFAULT);
+
+      _rdoZoom_CenterToMousePosition.setSelection(       mapZoomPosition.equals(MapZoomPosition.CENTER_TO_MOUSE_POSITION));
+      _rdoZoom_CenterTour.setSelection(                  mapZoomPosition.equals(MapZoomPosition.CENTER_TOUR));
+      _rdoZoom_KeepCurrentCenterPosition.setSelection(   mapZoomPosition.equals(MapZoomPosition.KEEP_CURRENT_CENTER_POSITION));
 
 // SET_FORMATTING_ON
    }
@@ -322,9 +383,19 @@ public class Slideout_Map2_Options extends ToolbarSlideout implements IColorSele
 
 // SET_FORMATTING_OFF
 
-      _state.put(Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING,   _chkIsToggleKeyboardPanning.getSelection());
+      _state.put(Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING,    _chkIsToggleKeyboardPanning.getSelection());
       _state.put(Map2View.STATE_IS_SHOW_HOVERED_SELECTED_TOUR, _chkIsShowHoveredTour.getSelection());
-      _state.put(Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION,   _chkIsZoomWithMousePosition.getSelection());
+
+
+      _state.put(Map2View.STATE_MAP_ZOOM_POSITION,
+
+            _rdoZoom_CenterToMousePosition.getSelection()      ? MapZoomPosition.CENTER_TO_MOUSE_POSITION.name()
+          : _rdoZoom_CenterTour.getSelection()                 ? MapZoomPosition.CENTER_TOUR.name()
+          : _rdoZoom_KeepCurrentCenterPosition.getSelection()  ? MapZoomPosition.KEEP_CURRENT_CENTER_POSITION.name()
+
+          // use default
+          : Map2View.STATE_MAP_ZOOM_POSITION_DEFAULT.name()
+      );
 
 // SET_FORMATTING_ON
    }

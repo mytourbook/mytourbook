@@ -2097,6 +2097,14 @@ public class Messages extends NLS {
    public static String Slideout_Map_TrackOptions_Label_Title;
    public static String Slideout_Map_TrackOptions_Label_Title_Tooltip;
 
+   public static String Slideout_MapOptions_Label_ZoomPosition;
+
+   public static String Slideout_MapOptions_Radio_Zoom_CenterToMousePosition;
+
+   public static String Slideout_MapOptions_Radio_Zoom_CenterTour;
+
+   public static String Slideout_MapOptions_Radio_Zoom_KeepCurrentCenter;
+
    public static String Slideout_RefTour_YearStatisticOptions_Label_Title;
 
    public static String Slideout_SegmenterChartOptions_Checkbox_HideSmallValues;

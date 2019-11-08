@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,31 +13,14 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.map2.action;
+package net.tourbook.map;
 
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.map2.Messages;
-import net.tourbook.map2.view.Map2View;
+public enum MapZoomPosition {
 
-import org.eclipse.jface.action.Action;
+   KEEP_CURRENT_CENTER_POSITION,
 
-public class xActionZoomCentered extends Action {
+   CENTER_TO_MOUSE_POSITION,
 
-	private Map2View _mapView;
-
-	public ActionZoomCentered(final Map2View mapView) {
-
-		super(null, AS_CHECK_BOX);
-
-		_mapView = mapView;
-
-		setToolTipText(Messages.map_action_zoom_centered);
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image_Action_Zoom_CenterTour));
-	}
-
-	@Override
-	public void run() {
-		_mapView.actionSetZoomCentered();
-	}
+   CENTER_TOUR,
 
 }

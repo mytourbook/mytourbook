@@ -35,7 +35,8 @@ Fixes
 * Tour Tags
   - Fixed issue: Column widths have been reset when tags are saved
 
-
+* Map 2
+  - Map zoom position features had 3 different states which are not correctly enabled -> Moved all map zoom position features into the map options slideout 
  
 Translation    
 ===========
