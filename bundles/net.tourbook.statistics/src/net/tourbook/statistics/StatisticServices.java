@@ -54,15 +54,6 @@ public class StatisticServices {
                                         final long[][] resortedTypeIds,
                                         final TourTypeFilter activeTourTypeFilter) {
 
-      int colorOffset = 0;
-      if (activeTourTypeFilter.showUndefinedTourTypes()) {
-         colorOffset = TOUR_TYPE_COLOR_INDEX_OFFSET;
-      }
-
-      if (serieIndex - colorOffset < 0) {
-         return Messages.ui_tour_not_defined;
-      }
-
       final long typeId = resortedTypeIds[serieIndex][valueIndex];
 
       final String tourTypeName = TourDatabase.getTourTypeName(typeId);
@@ -151,9 +142,7 @@ public class StatisticServices {
 
       for (int inverseIndex = 0; inverseIndex < 2; inverseIndex++) {
 
-         for (int typeIndex = 0; typeIndex < allTourTypes.size(); typeIndex++) {
-
-            final TourType tourType = allTourTypes.get(typeIndex);
+         for (final TourType tourType : allTourTypes) {
 
             final long tourTypeId = tourType.getTypeId();
 
