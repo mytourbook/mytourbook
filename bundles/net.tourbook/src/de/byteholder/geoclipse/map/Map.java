@@ -1525,7 +1525,7 @@ public class Map extends Canvas {
       final GeoPosition geo1 = new GeoPosition(geoLat1, geoLon1);
       final GeoPosition geo2 = new GeoPosition(geoLat2, geoLon2);
 
-      // set lat/lon to a grid of 0.01�
+      // set lat/lon to a grid of 0.01°
       int geoGrid_Lat1_E2 = (int) (geoLat1 * 100);
       int geoGrid_Lon1_E2 = (int) (geoLon1 * 100);
 
