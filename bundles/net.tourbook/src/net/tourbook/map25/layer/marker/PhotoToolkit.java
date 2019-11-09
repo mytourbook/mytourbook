@@ -85,7 +85,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
       @Override
       public void callBackImageIsLoaded(final boolean isUpdateUI) {
 
-         debugPrint("???? PhotoToolkit: LoadCallbackImage"); //$NON-NLS-1$
+//         debugPrint("???? PhotoToolkit: LoadCallbackImage"); //$NON-NLS-1$
          //updatePhotos(); has only updateUI...
          _mapApp.updateUI_PhotoLayer();
 //         if (isUpdateUI == false) {

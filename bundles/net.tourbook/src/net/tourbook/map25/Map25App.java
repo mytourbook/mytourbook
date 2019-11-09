@@ -18,8 +18,6 @@ package net.tourbook.map25;
 import java.awt.Canvas;
 import java.io.File;
 import java.io.FilenameFilter;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -28,9 +26,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import net.tourbook.common.UI;
-
-//import org.apache.commons.io.FileUtils;
-//import org.apache.commons.io.comparator.SizeFileComparator;
 
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
@@ -49,7 +44,6 @@ import net.tourbook.map25.layer.marker.PhotoToolkit;
 import net.tourbook.map25.layer.tourtrack.SliderLocation_Layer;
 import net.tourbook.map25.layer.tourtrack.SliderPath_Layer;
 import net.tourbook.map25.layer.tourtrack.TourLayer;
-import net.tourbook.photo.Photo;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.widgets.Display;
@@ -162,7 +156,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	private int							_tileSourceOfflineMapCount = 0;
 	
 	//public static enum DebugMode {OFF, ON};
-	public static DebugMode debugMode = DebugMode.ON;   // before releasing, set this to OFF
+	public static DebugMode debugMode = DebugMode.OFF;   // before releasing, set this to OFF
 	
 	/**
 	 * The opacity can be set in the layer but not read. This will keep the state of the hillshading opacity.

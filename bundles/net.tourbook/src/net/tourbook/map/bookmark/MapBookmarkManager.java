@@ -639,7 +639,7 @@ public class MapBookmarkManager {
        */
       final MapPosition mapPosition = new MapPosition();
       
-      //final MapPosition_with_MarkerPosition mapPosition = new MapPosition_with_MarkerPosition();
+      final MapPosition_with_MarkerPosition mapPosition2 = new MapPosition_with_MarkerPosition();
       //mapPosition needs to be extend with markerPosition
 
       mapPosition.x = Util.getXmlDouble(xmlBookmark, ATTR_MAP_POSITION_X, 0.5);
@@ -651,20 +651,21 @@ public class MapBookmarkManager {
        * later to mapposition.xy
        * should only happen one time, when starting first time after upgrading from version <= 19.10
       */
-      //Double invalidPosition = 2.0;
-      //mapPosition.mapPositionMarkerX = Util.getXmlDouble(xmlBookmark, ATTR_MAP_POSITION_MARKER_X, invalidPosition);
-      //mapPosition.mapPositionMarkerY = Util.getXmlDouble(xmlBookmark, ATTR_MAP_POSITION_MARKER_Y, invalidPosition);
+      Double invalidPosition = 2.0;
+      mapPosition2.mapPositionMarkerX = Util.getXmlDouble(xmlBookmark, ATTR_MAP_POSITION_MARKER_X, invalidPosition);
+      mapPosition2.mapPositionMarkerY = Util.getXmlDouble(xmlBookmark, ATTR_MAP_POSITION_MARKER_Y, invalidPosition);
 
       mapPosition.bearing = Util.getXmlFloat(xmlBookmark, ATTR_MAP_POSITION_BEARING, 0f);
       mapPosition.tilt = Util.getXmlFloat(xmlBookmark, ATTR_MAP_POSITION_TILT, 0f);
       mapPosition.zoomLevel = Util.getXmlInteger(xmlBookmark, ATTR_MAP_POSITION_ZOOM_LEVEL, 1);
      
-      /*
-      if (mapPosition.mapPositionMarkerX >= 1.0 || mapPosition.mapPositionMarkerY > 1.0) {
-         mapPosition.mapPositionMarkerX = mapPosition.x;
-         mapPosition.mapPositionMarkerY = mapPosition.y;
+      
+      if (mapPosition2.mapPositionMarkerX >= 1.0 || mapPosition2.mapPositionMarkerY > 1.0) {
+         net.tourbook.map25.Map25App.debugPrint("++++ MapBookmarkManager: parse_22_Bookmarks_One: markerPos not in xml, migrating...");
+         mapPosition2.mapPositionMarkerX = mapPosition.x;
+         mapPosition2.mapPositionMarkerY = mapPosition.y;
       }
-      */
+      
       
       bookmark.setMapPosition(mapPosition);
    }
