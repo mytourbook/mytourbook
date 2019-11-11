@@ -4012,8 +4012,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       if (timeSerie == null ||
             tourPerson == null || tourPerson.getWeight() <= 0f || tourPerson.getHeight() <= 0f ||
-            tourType == null ||
-            !tourPerson.isTourTypeInGovssTourTypes(tourType.getTypeId())) {
+            tourType == null) {
+
+         if (!tourPerson.isTourTypeInGovssTourTypes(tourType.getTypeId())) {
+            //In case the govss was previously computed and the tour is not considered a tour for
+            //which the govss should be computed anymore
+            govss = 0;
+         }
+
          return false;
       }
 
