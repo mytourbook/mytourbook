@@ -39,6 +39,7 @@ import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
@@ -69,6 +70,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
@@ -608,6 +610,15 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
    }
 
    private void onComputeGovssValues() {
+
+      if (MessageDialog.openConfirm(
+            Display.getCurrent().getActiveShell(),
+            Messages.Compute_GovssValues_Dialog_ComputeForUserTours_Title,
+            Messages.Compute_GovssValues_Dialog_ComputeForUserTours_Message) == false) {
+         return;
+      }
+
+      saveState();
 
       final int[] total_Old_GovssValues = { 0 };
       final int[] total_New_GovssValues = { 0 };

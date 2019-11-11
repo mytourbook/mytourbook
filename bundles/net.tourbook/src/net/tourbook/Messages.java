@@ -585,6 +585,9 @@ public class Messages extends NLS {
    public static String        Compute_CadenceZonesTimes_Dialog_ComputeForAllTours_Message;
    public static String        Compute_CadenceZonesTimes_Dialog_ComputeForAllTours_Title;
 
+   public static String        Compute_GovssValues_Dialog_ComputeForUserTours_Title;
+   public static String        Compute_GovssValues_Dialog_ComputeForUserTours_Message;
+
    public static String        Compute_PerformanceModelingChart_Group;
    public static String        Compute_PerformanceModelingChart_ComputeForAllTours_Job_Result;
    public static String        Compute_PerformanceModelingChart_Dialog_ComputeForAllTours_Message;
