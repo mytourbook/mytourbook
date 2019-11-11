@@ -44,6 +44,8 @@ import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
+import net.tourbook.commands.AppCommands;
+import net.tourbook.commands.ISaveAndRestorePart;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.font.MTFont;
@@ -185,12 +187,14 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IPartListener2;
-import org.eclipse.ui.ISaveablePart2;
+import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.forms.events.ExpansionAdapter;
 import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.widgets.Form;
@@ -206,18 +210,18 @@ import org.eclipse.ui.progress.UIJob;
 /**
  * This editor can edit (when all is implemented) all data for a tour
  */
-public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITourProvider2 {
+public class TourDataEditorView extends ViewPart implements ISaveablePart, ISaveAndRestorePart, ITourProvider2 {
 
    public static final String     ID                            = "net.tourbook.views.TourDataEditorView";                //$NON-NLS-1$
-
+   //
+   private static final String    GRAPH_LABEL_HEARTBEAT_UNIT    = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
+   private static final String    VALUE_UNIT_K_CALORIES         = net.tourbook.ui.Messages.Value_Unit_KCalories;
+   //
    /**
     * On Linux an asynch selection event is fired since e4
     */
    private static final String    FIX_LINUX_ASYNC_EVENT_1       = "FIX_LINUX_ASYNC_EVENT_1";                              //$NON-NLS-1$
    private static final String    FIX_LINUX_ASYNC_EVENT_2       = "FIX_LINUX_ASYNC_EVENT_2";                              //$NON-NLS-1$
-   //
-   private static final String    GRAPH_LABEL_HEARTBEAT_UNIT    = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
-   private static final String    VALUE_UNIT_K_CALORIES         = net.tourbook.ui.Messages.Value_Unit_KCalories;
    //
    private static final int       COLUMN_SPACING                = 20;
    //
@@ -392,7 +396,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
     */
    private int[][]                            _refTourRange;
 
-   private boolean                            _isPartVisible          = false;
+   private boolean                            _isPartVisible;
 
    /**
     * when <code>true</code> additional info is displayed in the title area
@@ -400,9 +404,19 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
    private boolean                            _isInfoInTitle;
 
    /**
-    * is <code>true</code> when a cell editor is activ, otherwise <code>false</code>
+    * Is <code>true</code> when a cell editor is activ, otherwise <code>false</code>
     */
-   private boolean                            _isCellEditorActive     = false;
+   private boolean                            _isCellEditorActive;
+
+   /**
+    * Current combobox cell editor or <code>null</code> when a cell editor is not active.
+    */
+   private CellEditor_ComboBox_Customized     _currentComboBox_CellEditor;
+
+   /**
+    * Current text cell editor or <code>null</code> when a cell editor is not active.
+    */
+   private CellEditor_Text_Customized         _currentTextEditor_CellEditor;
 
    /**
     * every requested UI update increased this counter
@@ -466,7 +480,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
    private Action_RemoveSwimStyle           _action_RemoveSwimStyle;
    private Action_SetSwimStyle_Header       _action_SetSwimStyle_Header;
    private ActionComputeDistanceValues      _actionComputeDistanceValues;
-   private ActionCreateTour                 _actionCreateTour;
    private ActionCreateTourMarker           _actionCreateTourMarker;
    private ActionCSVTimeSliceExport         _actionCsvTimeSliceExport;
    private ActionDeleteDistanceValues       _actionDeleteDistanceValues;
@@ -478,12 +491,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
    private ActionModifyColumns              _actionModify_SwimSliceColumns;
    private ActionOpenAdjustAltitudeDialog   _actionOpenAdjustAltitudeDialog;
    private ActionOpenMarkerDialog           _actionOpenMarkerDialog;
-   private ActionSaveTour                   _actionSaveTour;
    private ActionSetStartDistanceTo0        _actionSetStartDistanceTo_0;
    private ActionSplitTour                  _actionSplitTour;
    private ActionToggleReadEditMode         _actionToggleReadEditMode;
    private ActionToggleRowSelectMode        _actionToggleRowSelectMode;
-   private ActionUndoChanges                _actionUndoChanges;
    private ActionViewSettings               _actionViewSettings;
    //
    private ArrayList<Action_SetSwimStyle>   _allSwimStyleActions;
@@ -579,6 +590,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
    private Label             _lblAltitudeUpUnit;
    private Label             _lblAltitudeDownUnit;
    private Label             _lblDistanceUnit;
+   private Label             _lblPerson_BodyWeightUnit;
    private Label             _lblSpeedUnit;
    private Label             _lblStartTime;
    private Label             _lblTags;
@@ -672,6 +684,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
          super.activate();
 
          _isCellEditorActive = true;
+         _currentComboBox_CellEditor = this;
+
          enableActionsDelayed();
       }
 
@@ -681,7 +695,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
          super.deactivate();
 
          _isCellEditorActive = false;
+         _currentComboBox_CellEditor = null;
+
          enableActionsDelayed();
+      }
+
+      @Override
+      protected void focusLost() {
+         super.focusLost();
       }
    }
 
@@ -701,6 +722,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
          super.activate();
 
          _isCellEditorActive = true;
+         _currentTextEditor_CellEditor = this;
+
          enableActionsDelayed();
       }
 
@@ -710,7 +733,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
          super.deactivate();
 
          _isCellEditorActive = false;
+         _currentTextEditor_CellEditor = null;
+
          enableActionsDelayed();
+      }
+
+      @Override
+      protected void focusLost() {
+         super.focusLost();
       }
    }
 
@@ -2050,13 +2080,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
       }
    }
 
-   void actionSaveTour() {
-
-      // action is enabled when the tour is modified
-
-      saveTourIntoDB();
-   }
-
    void actionSetStartDistanceTo_0000() {
 
       // it is already checked if a valid data serie is available and first distance is > 0
@@ -2147,21 +2170,20 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
       recreateViewer();
    }
 
-   void actionUndoChanges() {
-
-      if (confirmUndoChanges()) {
-         discardModifications();
-      }
-   }
-
    private void addPartListener() {
 
       // set the part listener
       _partListener = new IPartListener2() {
          @Override
          public void partActivated(final IWorkbenchPartReference partRef) {
+
             if (partRef.getPart(false) == TourDataEditorView.this) {
+
                _postSelectionProvider.setSelection(new SelectionTourData(null, _tourData));
+
+               // update save icon
+               final ICommandService cs = PlatformUI.getWorkbench().getService(ICommandService.class);
+               cs.refreshElements(AppCommands.COMMAND_NET_TOURBOOK_TOUR_SAVE_TOUR, null);
             }
          }
 
@@ -2400,7 +2422,21 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
                } else if (eventId == TourEventId.TAG_STRUCTURE_CHANGED) {
 
-                  updateUI_FromModel(_tourData, false, true);
+                  if (_isTourDirty) {
+
+                     updateUI_FromModel(_tourData, false, true);
+
+                  } else {
+
+                     /**
+                      * When tags are deleted, then the tour editor is not be dirty (this is
+                      * previously checked)
+                      * <p>
+                      * -> reload tour with removed tags
+                      */
+
+                     reloadTourData();
+                  }
 
                } else if (eventId == TourEventId.MARKER_SELECTION && eventData instanceof SelectionTourMarker) {
 
@@ -2553,9 +2589,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
    private void createActions() {
 
-      _actionSaveTour = new ActionSaveTour(this);
-      _actionCreateTour = new ActionCreateTour(this);
-      _actionUndoChanges = new ActionUndoChanges(this);
       _actionDeleteDistanceValues = new ActionDeleteDistanceValues(this);
       _actionComputeDistanceValues = new ActionComputeDistanceValues(this);
       _actionToggleRowSelectMode = new ActionToggleRowSelectMode(this);
@@ -2885,7 +2918,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
             final Set<TourTag> tourTags = _tourData.getTourTags();
             final boolean isTagInTour = tourTags.size() > 0;
 
-            _tagMenuMgr.fillTagMenu(menuMgr);
+            _tagMenuMgr.fillTagMenu(menuMgr, false);
             _tagMenuMgr.enableTagActions(true, isTagInTour, tourTags);
          }
       });
@@ -3664,13 +3697,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
                   .applyTo(_spinPerson_BodyWeight);
             _spinPerson_BodyWeight.setDigits(1);
             _spinPerson_BodyWeight.setMinimum(0);
-            _spinPerson_BodyWeight.setMaximum(3000); // 300.0 kg
+            _spinPerson_BodyWeight.setMaximum(6614); // 300.0 kg, 661.4 lbs
 
             _spinPerson_BodyWeight.addMouseWheelListener(_mouseWheelListener);
             _spinPerson_BodyWeight.addSelectionListener(_selectionListener);
 
             // label: unit
-            _tk.createLabel(container, UI.UNIT_WEIGHT_KG);
+            _lblPerson_BodyWeightUnit = _tk.createLabel(container, UI.UNIT_LABEL_WEIGHT);
          }
          {
             /*
@@ -4369,24 +4402,21 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
       }
 
       // with e4 the layouts are not yet set -> NPE's -> run async which worked
-      parent.getShell().getDisplay().asyncExec(new Runnable() {
-         @Override
-         public void run() {
+      parent.getShell().getDisplay().asyncExec(() -> {
 
-            // compute width for all controls and equalize column width for the different sections
-            _tab1Container.layout(true, true);
-            UI.setEqualizeColumWidths(_firstColumnControls);
-            UI.setEqualizeColumWidths(_secondColumnControls);
+         // compute width for all controls and equalize column width for the different sections
+         _tab1Container.layout(true, true);
+         UI.setEqualizeColumWidths(_firstColumnControls);
+         UI.setEqualizeColumWidths(_secondColumnControls);
 
-            _tab1Container.layout(true, true);
-            UI.setEqualizeColumWidths(_firstColumnContainerControls);
+         _tab1Container.layout(true, true);
+         UI.setEqualizeColumWidths(_firstColumnContainerControls);
 
-            /*
-             * Reduce width that the decorator is not truncated
-             */
-            final GridData gd = (GridData) _lblTimeZone.getLayoutData();
-            gd.widthHint -= UI.DECORATOR_HORIZONTAL_INDENT;
-         }
+         /*
+          * Reduce width that the decorator is not truncated
+          */
+         final GridData gd = (GridData) _lblTimeZone.getLayoutData();
+         gd.widthHint -= UI.DECORATOR_HORIZONTAL_INDENT;
       });
 
       return _tab1Container;
@@ -5648,11 +5678,54 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
       super.dispose();
    }
 
-   /**
-    * saving is done in the {@link #promptToSaveOnClose()} method
-    */
    @Override
-   public void doSave(final IProgressMonitor monitor) {}
+   public void doRestore() {
+
+      if (_isCellEditorActive) {
+
+         /**
+          * Ensure that the active cell editor is not in edit mode, because the command shortcut can
+          * activate this restore action.
+          */
+
+         if (_currentComboBox_CellEditor != null) {
+            _currentComboBox_CellEditor.focusLost();
+         }
+         if (_currentTextEditor_CellEditor != null) {
+            _currentTextEditor_CellEditor.focusLost();
+         }
+      }
+
+      if (confirmUndoChanges()) {
+         discardModifications();
+      }
+   }
+
+   @Override
+   public void doSave() {
+      doSave(null);
+   }
+
+   @Override
+   public void doSave(final IProgressMonitor monitor) {
+
+      if (_isCellEditorActive) {
+
+         /**
+          * Ensure that the content of the active cell editor is updated in the model and also
+          * saved because the command shortcut can activate this save action.
+          */
+
+         if (_currentComboBox_CellEditor != null) {
+            _currentComboBox_CellEditor.focusLost();
+         }
+         if (_currentTextEditor_CellEditor != null) {
+            _currentTextEditor_CellEditor.focusLost();
+         }
+      }
+
+      saveTourIntoDB();
+   }
 
    @Override
    public void doSaveAs() {}
@@ -5686,13 +5759,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
       final boolean isDistanceLargerThan0 = isTourData //
             && isDistanceAvailable
             && _tourData.distanceSerie[0] > 0;
-      /*
-       * tour can only be saved when it's already saved in the database,except manual tours
-       */
-      _actionSaveTour.setEnabled(isCellEditorInactive && _isTourDirty && isTourValid);
-
-      _actionCreateTour.setEnabled(isCellEditorInactive && !_isTourDirty);
-      _actionUndoChanges.setEnabled(isCellEditorInactive && _isTourDirty);
 
       _actionOpenAdjustAltitudeDialog.setEnabled(isCellEditorInactive && canUseTool);
       _actionOpenMarkerDialog.setEnabled(isCellEditorInactive && canUseTool);
@@ -5951,8 +6017,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
        */
       final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
-      tbm.add(_actionSaveTour);
-
       tbm.add(new Separator());
       tbm.add(_actionOpenMarkerDialog);
       tbm.add(_actionOpenAdjustAltitudeDialog);
@@ -5962,7 +6026,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
       tbm.add(_actionToggleRowSelectMode);
 
       tbm.add(new Separator());
-      tbm.add(_actionCreateTour);
       tbm.add(_actionViewSettings);
 
       tbm.update(true);
@@ -5971,9 +6034,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
        * fill toolbar view menu
        */
       final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
-
-      menuMgr.add(_actionUndoChanges);
-      menuMgr.add(new Separator());
 
       menuMgr.add(_actionModify_TimeSliceColumns);
       menuMgr.add(_actionModify_SwimSliceColumns);
@@ -6326,31 +6386,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
       return 0;
    }
-
-// /**
-//  * Converts a string into a int value
-//  *
-//  * @param valueText
-//  * @return Returns the float value for the parameter valueText, return <code>0</code>
-//  * @throws IllegalArgumentException
-//  */
-// private int getIntValue(String valueText) throws IllegalArgumentException {
-//
-//    valueText = valueText.trim();
-//    if (valueText.length() == 0) {
-//
-//       return 0;
-//
-//    } else {
-//
-//       final Object convertedValue = StringToNumberConverter.toInteger(true).convert(valueText);
-//       if (convertedValue instanceof Integer) {
-//          return ((Integer) convertedValue).intValue();
-//       }
-//    }
-//
-//    return 0;
-// }
 
    TableViewer getSliceViewer() {
       return _timeSlice_Viewer;
@@ -7135,33 +7170,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
       _isSetField = isBackup;
    }
 
-   /*
-    * this method is called when the application is shut down to save dirty tours or to cancel the
-    * shutdown
-    * @see org.eclipse.ui.ISaveablePart2#promptToSaveOnClose()
-    */
-   @Override
-   public int promptToSaveOnClose() {
-
-      int returnCode;
-
-      if (_isTourDirty == false) {
-         returnCode = ISaveablePart2.NO;
-      }
-
-      _isSavingInProgress = true;
-      {
-         if (saveTourWithValidation()) {
-            returnCode = ISaveablePart2.NO;
-         } else {
-            returnCode = ISaveablePart2.CANCEL;
-         }
-      }
-      _isSavingInProgress = false;
-
-      return returnCode;
-   }
-
    private void recreateViewer() {
 
       /*
@@ -7332,72 +7340,73 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
    private boolean saveTourIntoDB() {
 
       _isSavingInProgress = true;
+      {
+         updateModel_FromUI();
 
-      updateModel_FromUI();
+         _tourData.computeAltitudeUpDown();
+         _tourData.computeTourDrivingTime();
+         _tourData.computeComputedValues();
 
-      _tourData.computeAltitudeUpDown();
-      _tourData.computeTourDrivingTime();
-      _tourData.computeComputedValues();
+         /*
+          * saveTour will check the tour editor dirty state, but when the tour is saved the dirty
+          * flag
+          * can be set before to prevent an out of synch error
+          */
+         _isTourDirty = false;
 
-      /*
-       * saveTour will check the tour editor dirty state, but when the tour is saved the dirty flag
-       * can be set before to prevent an out of synch error
-       */
-      _isTourDirty = false;
+         _tourData = TourDatabase.saveTour(_tourData, true);
 
-      _tourData = TourDatabase.saveTour(_tourData, true);
+         updateMarkerMap();
 
-      updateMarkerMap();
+         // refresh combos
 
-      // refresh combos
+         if (_isTitleModified) {
 
-      if (_isTitleModified) {
+            _comboTitle.clearSelection();
+            _comboTitle.removeAll();
 
-         _comboTitle.clearSelection();
-         _comboTitle.removeAll();
-
-         // fill combobox
-         final TreeSet<String> arr = TourDatabase.getAllTourTitles();
-         for (final String string : arr) {
-            _comboTitle.add(string);
+            // fill combobox
+            final TreeSet<String> arr = TourDatabase.getAllTourTitles();
+            for (final String string : arr) {
+               _comboTitle.add(string);
+            }
+            _comboTitle.update();
+            _isTitleModified = false;
          }
-         _comboTitle.update();
-         _isTitleModified = false;
-      }
 
-      if (_isLocationStartModified) {
+         if (_isLocationStartModified) {
 
-         _comboLocation_Start.clearSelection();
-         _comboLocation_Start.removeAll();
+            _comboLocation_Start.clearSelection();
+            _comboLocation_Start.removeAll();
 
-         // fill combobox
-         final TreeSet<String> arr = TourDatabase.getAllTourPlaceStarts();
-         for (final String string : arr) {
-            _comboLocation_Start.add(string);
+            // fill combobox
+            final TreeSet<String> arr = TourDatabase.getAllTourPlaceStarts();
+            for (final String string : arr) {
+               _comboLocation_Start.add(string);
+            }
+            _comboLocation_Start.update();
+            _isLocationStartModified = false;
          }
-         _comboLocation_Start.update();
-         _isLocationStartModified = false;
-      }
 
-      if (_isLocationEndModified) {
+         if (_isLocationEndModified) {
 
-         _comboLocation_End.clearSelection();
-         _comboLocation_End.removeAll();
+            _comboLocation_End.clearSelection();
+            _comboLocation_End.removeAll();
 
-         // fill combobox
-         final TreeSet<String> arr = TourDatabase.getAllTourPlaceEnds();
-         for (final String string : arr) {
-            _comboLocation_End.add(string);
+            // fill combobox
+            final TreeSet<String> arr = TourDatabase.getAllTourPlaceEnds();
+            for (final String string : arr) {
+               _comboLocation_End.add(string);
+            }
+            _comboLocation_End.update();
+            _isLocationEndModified = false;
          }
-         _comboLocation_End.update();
-         _isLocationEndModified = false;
+
+         setTourClean();
+
+         // notify all views
+         TourManager.fireEvent(TourEventId.TOUR_CHANGED, new TourEvent(_tourData), TourDataEditorView.this);
       }
-
-      setTourClean();
-
-      // notify all views which display the tour type
-      TourManager.fireEvent(TourEventId.TOUR_CHANGED, new TourEvent(_tourData), TourDataEditorView.this);
-
       _isSavingInProgress = false;
 
       return true;
@@ -7606,6 +7615,16 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
     */
    private void setTourDirty() {
 
+      /*
+       * Ensure that this view is the active part. It is possible to set tour dirty with the mouse
+       * wheel but the save/undo actions are not enabled.
+       */
+
+      final IWorkbenchPart activePart = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActivePart();
+      if (this != activePart) {
+         Util.showView(ID, true);
+      }
+
       if (_isTourDirty) {
          return;
       }
@@ -7614,8 +7633,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
 
       enableActions();
 
-      /*
-       * this is not an eclipse editor part but the property change must be fired to show the start
+      /**
+       * This is not an eclipse editor part but the property change must be fired to show the start
        * "*" marker in the part name
        */
       firePropertyChange(PROP_DIRTY);
@@ -7698,7 +7717,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
          _tourData.setTourStartPlace(_comboLocation_Start.getText());
          _tourData.setTourEndPlace(_comboLocation_End.getText());
 
-         _tourData.setBodyWeight((float) (_spinPerson_BodyWeight.getSelection() / 10.0));
+         final float bodyWeight = UI.convertBodyWeightToMetric(_spinPerson_BodyWeight.getSelection());
+         _tourData.setBodyWeight(bodyWeight / 10.0f);
          _tourData.setPower_FTP(_spinPerson_FTP.getSelection());
          _tourData.setCalories(_spinPerson_Calories.getSelection());
          _tourData.setRestPulse(_spinPerson_RestPuls.getSelection());
@@ -8133,7 +8153,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
       /*
        * personal details
        */
-      _spinPerson_BodyWeight.setSelection(Math.round(_tourData.getBodyWeight() * 10));
+      final float bodyWeight = UI.convertBodyWeightFromMetric(_tourData.getBodyWeight());
+      _spinPerson_BodyWeight.setSelection(Math.round(bodyWeight * 10));
+
       _spinPerson_FTP.setSelection(_tourData.getPower_FTP());
       _spinPerson_RestPuls.setSelection(_tourData.getRestPulse());
       _spinPerson_Calories.setSelection(_tourData.getCalories());
@@ -8309,6 +8331,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart2, ITou
       _lblDistanceUnit.setText(UI.UNIT_LABEL_DISTANCE);
       _lblAltitudeUpUnit.setText(UI.UNIT_LABEL_ALTITUDE);
       _lblAltitudeDownUnit.setText(UI.UNIT_LABEL_ALTITUDE);
+      _lblPerson_BodyWeightUnit.setText(UI.UNIT_LABEL_WEIGHT);
       _lblWeather_PrecipitationUnit.setText(UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
       _lblWeather_PressureUnit.setText(UI.UNIT_LABEL_PRESSURE_MB_OR_INHG);
       _lblSpeedUnit.setText(UI.UNIT_LABEL_SPEED);

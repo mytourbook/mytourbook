@@ -765,6 +765,8 @@ public class Map25ConfigManager {
 
       config.isShowMapBookmark      = Util.getXmlBoolean(xmlConfig,     ATTR_IS_SHOW_MAP_BOOKMARK,    true);
       config.isShowTourMarker       = Util.getXmlBoolean(xmlConfig,     ATTR_IS_SHOW_TOUR_MARKER,     true);
+      config.isShowPhoto            = Util.getXmlBoolean(xmlConfig,     ATTR_IS_SHOW_PHOTO,           true);
+      config.isShowPhotoTitle       = Util.getXmlBoolean(xmlConfig,     ATTR_IS_SHOW_PHOTO_TITLE,     true);
       config.markerOrientation      = Util.getXmlInteger(xmlConfig,     ATTR_MARKER_ORIENTATION,      Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD);
       
       config.markerFill_Opacity     = Util.getXmlInteger(xmlConfig,     ATTR_MARKER_FILL_OPACITY,     Map25ConfigManager.DEFAULT_MARKER_FILL_OPACITY);

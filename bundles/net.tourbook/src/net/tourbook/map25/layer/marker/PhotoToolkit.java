@@ -2,15 +2,22 @@ package net.tourbook.map25.layer.marker;
 
 import java.awt.Point;
 import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.imgscalr.Scalr.Rotation;
 import org.oscim.backend.CanvasAdapter;
 import org.oscim.backend.canvas.Bitmap;
@@ -18,11 +25,13 @@ import org.oscim.backend.canvas.Color;
 import org.oscim.backend.canvas.Paint;
 import org.oscim.core.GeoPoint;
 import org.oscim.layers.marker.ClusterMarkerRenderer;
+import org.oscim.layers.marker.ItemizedLayer;
 //import org.oscim.layers.marker.ItemizedLayer;
 import org.oscim.layers.marker.MarkerItem;
 import org.oscim.layers.marker.MarkerRendererFactory;
 import org.oscim.layers.marker.MarkerSymbol;
 import org.oscim.layers.marker.MarkerSymbol.HotspotPlace;
+import net.tourbook.map25.layer.marker.MarkerLayer.OnItemGestureListener;
 
 import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.map.Tile;
@@ -34,7 +43,6 @@ import net.tourbook.map.bookmark.MapBookmark;
 import net.tourbook.map25.Map25App;
 import net.tourbook.map25.Map25ConfigManager;
 import net.tourbook.map25.Map25View;
-import net.tourbook.map25.layer.marker.MarkerToolkit.MarkerShape;
 import net.tourbook.photo.ILoadCallBack;
 import net.tourbook.photo.ImageQuality;
 import net.tourbook.photo.Photo;
@@ -44,7 +52,7 @@ import net.tourbook.photo.PhotoLoadingState;
 import net.tourbook.photo.ImageUtils;
 
 
-public class PhotoToolkit extends MarkerToolkit{
+public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemGestureListener<MarkerItem> {
 
 
    private Bitmap _bitmapCluster;
@@ -54,6 +62,7 @@ public class PhotoToolkit extends MarkerToolkit{
 
    private Bitmap _bitmapPhoto;  //normaly the photo as Bitmap
    private Bitmap _BitmapClusterPhoto;  // The Bitmap when markers are clustered
+   private ArrayList<Photo> _allPhotos;
 
    public MarkerRendererFactory _markerRendererFactory;
    
@@ -76,8 +85,8 @@ public class PhotoToolkit extends MarkerToolkit{
       @Override
       public void callBackImageIsLoaded(final boolean isUpdateUI) {
 
-         debugPrint("???? PhotoToolkit: LoadCallbackImage"); //$NON-NLS-1$
-         updatePhotos();
+//         debugPrint("???? PhotoToolkit: LoadCallbackImage"); //$NON-NLS-1$
+         //updatePhotos(); has only updateUI...
          _mapApp.updateUI_PhotoLayer();
 //         if (isUpdateUI == false) {
 //            return;
@@ -143,12 +152,19 @@ public class PhotoToolkit extends MarkerToolkit{
          return pts;
       }*/
       
+      _allPhotos = galleryPhotos;
+      
       for (final  Photo photo : galleryPhotos) {
          int stars = 0;
          String starText = "";
          String photoName = "";
          UUID photoKey = UUID.randomUUID();
 
+//         Map25App.debugPrint(" Map25View: *** createPhotoItemList: meta_lat: " + photo.getImageMetaData().latitude);
+//         Map25App.debugPrint(" Map25View: *** createPhotoItemList: tour_lat: " + photo.getTourLatitude());
+//         Map25App.debugPrint(" Map25View: *** createPhotoItemList: from exif: " + photo.isGeoFromExif);
+//         Map25App.debugPrint(" Map25View: *** createPhotoItemList: minimum:  " + Double.MIN_VALUE);
+      
          stars = photo.ratingStars;
          //starText = "";
          switch (stars) {
@@ -167,8 +183,22 @@ public class PhotoToolkit extends MarkerToolkit{
 
          String photoDescription = "Ratingstars: " + Integer.toString(photo.ratingStars);
          
-         Double photoLat = photo.getTourLatitude();
-         Double photoLon = photo.getTourLongitude();
+         Double photoLat = 0.0;
+         Double photoLon = 0.0;
+         if(photo.isGeoFromExif &&
+               Math.abs(photo.getImageMetaData().latitude) > Double.MIN_VALUE  &&
+               Math.abs(photo.getImageMetaData().longitude) > Double.MIN_VALUE
+               )
+         {
+//            Map25App.debugPrint(" Map25View: *** createPhotoItemList: using exif geo");
+            photoLat = photo.getImageMetaData().latitude;
+            photoLon = photo.getImageMetaData().longitude;
+         } else {
+            Map25App.debugPrint(" Map25View: *** createPhotoItemList: using tour geo");
+            photoLat = photo.getTourLatitude();
+            photoLon = photo.getTourLongitude();
+         }
+         
          MarkerItem item = new MarkerItem(photoKey, photoName, photoDescription,
                new GeoPoint(photoLat, photoLon)
                );
@@ -181,26 +211,19 @@ public class PhotoToolkit extends MarkerToolkit{
          pts.add(item);
       }
       //_photo_pts = pts;
-      //_allPhotos = galleryPhotos; 
+      _allPhotos = galleryPhotos; 
       
       return pts;   
    }
    
    
-   /**
-    * same as in TourMapPainter, but for 2.5D maps
-    * @param photo
-    * @return the bitmap
-    */
-   public  Bitmap getPhotoImage(final Photo photo) {
+   public Image getPhotoImage(Photo photo, int thumbSize) {
       Image photoImage = null;
-      Bitmap photoBitmap = null;
-    
+      Image scaledThumbImage = null;
       final ImageQuality requestedImageQuality = ImageQuality.THUMB;
       
       // check if image has an loading error
       final PhotoLoadingState photoLoadingState = photo.getLoadingState(requestedImageQuality);
-
       if (photoLoadingState != PhotoLoadingState.IMAGE_IS_INVALID) {
          //debugPrint("??? entering getPhotoImage"); //$NON-NLS-1$
          // image is not yet loaded
@@ -227,7 +250,7 @@ public class PhotoToolkit extends MarkerToolkit{
             int imageWidth = originalImageWidth;
             int imageHeight = originalImageHeight;
             
-            final int thumbSize = PhotoLoadManager.IMAGE_SIZE_THUMBNAIL;
+            //final int thumbSize = PhotoLoadManager.IMAGE_SIZE_THUMBNAIL;//    PhotoLoadManager.IMAGE_SIZE_LARGE_DEFAULT;
             boolean isRotated = false;
             
             final Point bestSize = ImageUtils.getBestSize(imageWidth, imageHeight, thumbSize, thumbSize);
@@ -237,7 +260,7 @@ public class PhotoToolkit extends MarkerToolkit{
                //thumbRotation = getRotation();
             }
             
-            final Image scaledThumbImage = ImageUtils.resize(
+            scaledThumbImage = ImageUtils.resize(
                   _display,
                   photoImage,
                   bestSize.x,
@@ -246,27 +269,105 @@ public class PhotoToolkit extends MarkerToolkit{
                   SWT.LOW,
                   thumbRotation);          
             
-            try {
+  //          try {
                
                //photoBitmap = CanvasAdapter.decodeBitmap(new ByteArrayInputStream(ImageUtils.formatImage(photoImage, org.eclipse.swt.SWT.IMAGE_BMP)));
-               photoBitmap = CanvasAdapter.decodeBitmap(new ByteArrayInputStream(ImageUtils.formatImage(scaledThumbImage, org.eclipse.swt.SWT.IMAGE_BMP)));
+  //             photoBitmap = CanvasAdapter.decodeBitmap(new ByteArrayInputStream(ImageUtils.formatImage(scaledThumbImage, org.eclipse.swt.SWT.IMAGE_BMP)));
                //debugPrint("??? getPhotoImage created photoBitmap width: " + photoBitmap.getWidth() + " Height: " +  photoBitmap.getHeight()); 
                //debugPrint("??? getPhotoImage created bestsize width: " + bestSize.x + " width: " +  bestSize.y);
                //debugPrint("??? getPhotoImage created thumbnail size: " + thumbSize); 
-            } catch (IOException e) {
+  //          } catch (IOException e) {
                // TODO Auto-generated catch block
-               e.printStackTrace();
+  //             e.printStackTrace();
+  //          }
+
+         }  else {
+            scaledThumbImage = null;
+         }
+      }
+      
+      
+      return scaledThumbImage;
+   }
+   
+   
+   /**
+    * same as in TourMapPainter, but for 2.5D maps
+    * @param photo
+    * @return the bitmap
+    */
+   public  Bitmap getPhotoBitmap(final Photo photo) {
+//      Image photoImage = null;
+      Bitmap photoBitmap = null;
+    
+//      final ImageQuality requestedImageQuality = ImageQuality.THUMB;
+//
+//      final PhotoLoadingState photoLoadingState = photo.getLoadingState(requestedImageQuality);
+//
+//      if (photoLoadingState != PhotoLoadingState.IMAGE_IS_INVALID) {
+//
+//         photoImage = PhotoImageCache.getImage(photo, requestedImageQuality);
+//         
+//         if ((photoImage == null || photoImage.isDisposed())
+//               && photoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {
+//
+//            final ILoadCallBack imageLoadCallback = new LoadCallbackImage();
+//            
+//            PhotoLoadManager.putImageInLoadingQueueThumbMap(photo, requestedImageQuality, imageLoadCallback);
+//         }
+//                      
+//         if (photoImage != null){
+//            
+//            Rectangle imageBounds = photoImage.getBounds();
+//            final int originalImageWidth = imageBounds.width;
+//            final int originalImageHeight = imageBounds.height;  
+//            
+//            int imageWidth = originalImageWidth;
+//            int imageHeight = originalImageHeight;
+//            
+//            final int thumbSize = PhotoLoadManager.IMAGE_SIZE_THUMBNAIL;
+//            boolean isRotated = false;
+//            
+//            final Point bestSize = ImageUtils.getBestSize(imageWidth, imageHeight, thumbSize, thumbSize);
+//            Rotation thumbRotation = null;  
+//            if (isRotated == false) {
+//               isRotated = true;
+//            }
+            
+//            final Image scaledThumbImage = ImageUtils.resize(
+//                  _display,
+//                  photoImage,
+//                  bestSize.x,
+//                  bestSize.y,
+//                  SWT.ON,
+//                  SWT.LOW,
+//                  thumbRotation);          
+            
+            final Image scaledThumbImage = getPhotoImage(photo, PhotoLoadManager.IMAGE_SIZE_THUMBNAIL);
+            
+            if (scaledThumbImage != null) {
+               try {
+
+                  //photoBitmap = CanvasAdapter.decodeBitmap(new ByteArrayInputStream(ImageUtils.formatImage(photoImage, org.eclipse.swt.SWT.IMAGE_BMP)));
+                  photoBitmap = CanvasAdapter.decodeBitmap(new ByteArrayInputStream(ImageUtils.formatImage(scaledThumbImage, org.eclipse.swt.SWT.IMAGE_BMP)));
+                  //debugPrint("??? getPhotoImage created photoBitmap width: " + photoBitmap.getWidth() + " Height: " +  photoBitmap.getHeight()); 
+                  //debugPrint("??? getPhotoImage created bestsize width: " + bestSize.x + " width: " +  bestSize.y);
+                  //debugPrint("??? getPhotoImage created thumbnail size: " + thumbSize); 
+               } catch (IOException e) {
+                  // TODO Auto-generated catch block
+                  e.printStackTrace();
+               }
             }
 
-         }  
-      }
+   //      }  
+    //  }
       
       return photoBitmap;
    }
    
    
    public MarkerSymbol createPhotoBitmapFromPhoto(Photo photo, MarkerItem item) {
-      Bitmap bitmapImage = getPhotoImage(photo);
+      Bitmap bitmapImage = getPhotoBitmap(photo);
       MarkerSymbol bitmapPhoto = null;
       
       if (bitmapImage == null) {
@@ -280,8 +381,70 @@ public class PhotoToolkit extends MarkerToolkit{
    }
  
    public void updatePhotos() {
-      net.tourbook.map25.Map25App.debugPrint("Update Photos");
+      net.tourbook.map25.Map25App.debugPrint("???? PhotoToolkit: Update Photos");
       _mapApp.updateUI_PhotoLayer();
    }
+
+   public void showPhoto(Photo photo) {
+
+      final Image image = getPhotoImage(photo, PhotoLoadManager.IMAGE_SIZE_LARGE_DEFAULT);
+      if(image == null) {
+         return;
+      }
+
+      final Display display = new Display();
+      final Shell shell = new Shell(display);
+      shell.setSize(PhotoLoadManager.IMAGE_SIZE_LARGE_DEFAULT, PhotoLoadManager.IMAGE_SIZE_LARGE_DEFAULT);
+      shell.setText("Photo");
+      shell.setLayout(new FillLayout());
+      Canvas canvas = new Canvas(shell, SWT.NONE);
+
+
+      canvas.addPaintListener(new PaintListener() {
+         public void paintControl(PaintEvent e) {
+            //image = getPhotoImage(photo, PhotoLoadManager.IMAGE_SIZE_LARGE_DEFAULT);
+//            Image image = null;
+//            try {
+//               image = new Image(display, new FileInputStream(photo.imageFilePathName));
+//            } catch (FileNotFoundException e1) {
+//               e1.printStackTrace();
+//            }
+
+            e.gc.drawImage(image, 10, 10);
+
+            image.dispose();
+         }
+      });
+
+      shell.open();
+      while (!shell.isDisposed()) {
+         if (!display.readAndDispatch()) {
+            display.sleep();
+         }
+      }
+
+      display.dispose();
+
+
+   }
+
+   
+   
+   @Override
+   public boolean onItemLongPress(int index, MarkerItem photoItem) {
+      // TODO Auto-generated method stub
+      //debugPrint(" ??????????? PhotoToolkit *** onItemLongPress(int index, MarkerItem photoItem): " + arg0 + " " + arg1);
+      debugPrint(" ??????????? PhotoToolkit *** onItemLongPress(int index, MarkerItem photoItem): " + _allPhotos.get(index).imageFilePathName + " " + photoItem.getTitle());
+      return false;
+   }
+
+   @Override
+   public boolean onItemSingleTapUp(int index, MarkerItem photoItem) {
+      // TODO Auto-generated method stub
+      debugPrint(" ??????????? PhotoToolkit *** onItemSingleTapUp(int index, MarkerItem photoItem): " + _allPhotos.get(index).imageFilePathName + " " + photoItem.getTitle());
+      //showPhoto(_allPhotos.get(index));
+      return false;
+   }
+
    
 }

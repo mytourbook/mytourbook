@@ -18,8 +18,6 @@ package net.tourbook.map25;
 import java.awt.Canvas;
 import java.io.File;
 import java.io.FilenameFilter;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -28,9 +26,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import net.tourbook.common.UI;
-
-//import org.apache.commons.io.FileUtils;
-//import org.apache.commons.io.comparator.SizeFileComparator;
 
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
@@ -42,13 +37,13 @@ import net.tourbook.map25.layer.marker.MarkerConfig;
 import net.tourbook.map25.layer.marker.MarkerLayer;
 import net.tourbook.map25.layer.marker.MarkerLayer.OnItemGestureListener;
 import net.tourbook.map25.layer.marker.MarkerRenderer;
+import net.tourbook.map25.layer.marker.MarkerShape;
 import net.tourbook.map25.layer.marker.MarkerToolkit;
-import net.tourbook.map25.layer.marker.MarkerToolkit.MarkerMode;
+import net.tourbook.map25.layer.marker.MarkerMode;
 import net.tourbook.map25.layer.marker.PhotoToolkit;
 import net.tourbook.map25.layer.tourtrack.SliderLocation_Layer;
 import net.tourbook.map25.layer.tourtrack.SliderPath_Layer;
 import net.tourbook.map25.layer.tourtrack.TourLayer;
-import net.tourbook.photo.Photo;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.widgets.Display;
@@ -96,6 +91,7 @@ import org.oscim.theme.XmlRenderThemeStyleLayer;
 import org.oscim.tiling.TileSource;
 import org.oscim.tiling.TileSource.OpenResult;
 import org.oscim.tiling.source.UrlTileSource;
+import org.oscim.tiling.source.bitmap.BitmapTileSource;
 import org.oscim.tiling.source.bitmap.DefaultSources;
 import org.oscim.tiling.source.mapfile.MapFileTileSource;
 import org.oscim.tiling.source.mapfile.MultiMapFileTileSource;
@@ -153,12 +149,13 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	private BuildingLayer			_layer_Building;
 	private S3DBLayer					_layer_S3DB_Building;
 	private TileSource            _hillshadingSource = null;
+	private TileSource            _satelliteSource = null; 
 	private MapFileTileSource		 _tileSourceOffline;
 	private MultiMapFileTileSource _tileSourceOfflineMM;
 	
 	private int							_tileSourceOfflineMapCount = 0;
 	
-	public static enum DebugMode {OFF, ON};
+	//public static enum DebugMode {OFF, ON};
 	public static DebugMode debugMode = DebugMode.OFF;   // before releasing, set this to OFF
 	
 	/**
@@ -169,6 +166,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	private LabelLayerMT				_layer_Label;
 	private MarkerLayer				_layer_Marker;
 	private BitmapTileLayer			_layer_HillShading;
+	private BitmapTileLayer       _layer_Satellite;
 	private MapScaleBarLayer		_layer_ScaleBar;
 	private SliderLocation_Layer	_layer_SliderLocation;
 	private SliderPath_Layer		_layer_SliderPath;
@@ -192,7 +190,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	
    private ItemizedLayer<MarkerItem> _layer_MapBookmark;
    private MarkerToolkit _markertoolkit;
-   private MarkerMode _markerMode = MarkerToolkit.MarkerMode.NORMAL; // MarkerToolkit.modeDemo or MarkerToolkit.modeNormal
+   private MarkerMode _markerMode = MarkerMode.NORMAL; // MarkerToolkit.modeDemo or MarkerToolkit.modeNormal
    
    private ItemizedLayer<MarkerItem> _layer_Photo;
    private boolean                   _isPhotoClustered = true;
@@ -499,7 +497,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 			mMap.updateMap(true);
 
 		}
-
+		debugPrint(" map25: " + "####### loadtheme: leaving styleID: " + styleId); //$NON-NLS-1$
 	}
 
 	private UrlTileSource createTileSource(final Map25Provider mapProvider, final OkHttpFactoryMT httpFactory) {
@@ -541,6 +539,10 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	public int getLayer_HillShading_Opacity() {
       return _layer_HillShading_Opacity;
    }
+	
+   public BitmapTileLayer getLayer_Satellite() {
+      return _layer_Satellite;
+   }	
 	
 	public LabelLayerMT getLayer_Label() {
 		return _layer_Label;
@@ -1033,9 +1035,23 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	         .zoomMin(1)
 	         .zoomMax(16)
 	         .build();  
-	   _layer_HillShading = new BitmapTileLayer(mMap, _hillshadingSource, 1 << 20);
+	   _layer_HillShading = new BitmapTileLayer(mMap, _hillshadingSource, 1 << 19);
 	   _layer_HillShading.setEnabled(false);
 	   mMap.layers().add(_layer_HillShading);
+	   
+	   // satellite maps like google earth
+	   
+	   _satelliteSource = BitmapTileSource.builder()
+	         .httpFactory(_httpFactory)
+	         .url("http://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile")
+	         .tilePath("/{Z}/{Y}/{X}.png")
+	         .zoomMin(1)
+	         .zoomMax(18)
+	         .build();
+	   
+	   _layer_Satellite = new BitmapTileLayer(mMap, _satelliteSource, 1 << 19);
+	   _layer_Satellite.setEnabled(false);
+	   mMap.layers().add(_layer_Satellite);
 
 	   // tour
 	   _layer_Tour = new TourLayer(mMap);
@@ -1082,8 +1098,9 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
       // MapBookmarks
       //debugPrint(" map25: " + "################ setupMap_Layers: calling constructor"); //$NON-NLS-1$
-      _markertoolkit = new MarkerToolkit(MarkerToolkit.MarkerShape.STAR);
+      _markertoolkit = new MarkerToolkit(MarkerShape.STAR);
       if (config.isMarkerClustered) {
+         //_layer_MapBookmark = new ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(), _markertoolkit._markerRendererFactory, this);
          _layer_MapBookmark = new ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(), _markertoolkit._markerRendererFactory, this);
       } else {
          _layer_MapBookmark = new ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(), _markertoolkit._symbol, this);
@@ -1101,9 +1118,10 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       //Photos
       _phototoolkit = new PhotoToolkit();
       if (config.isMarkerClustered) { //sharing same setting as MapBookmarks, later photolayer should get its own configuration
-         _layer_Photo = new  ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(),  _phototoolkit._markerRendererFactory, this);
+         _layer_Photo = new  ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(),  _phototoolkit._markerRendererFactory, _phototoolkit);
       } else {
-         _layer_Photo = new  ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(),  _phototoolkit._symbol, this);
+         //_layer_Photo = new  ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(),  _phototoolkit._symbol, this);
+         _layer_Photo = new  ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(),  _phototoolkit._symbol, _phototoolkit);
       }
       //_layer_Photo.addItems(_phototoolkit._photo_pts);  //must not be done at startup, no tour is loadet yet
       _layer_Photo.setEnabled(false);
@@ -1200,7 +1218,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	   final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
       final Layers layers = mMap.layers();
       final int layer_index_PhotoLayer = layers.indexOf(_layer_Photo);
-      final boolean isShowPhotoLayer = config.isShowPhoto; // using settings from MapBookmarks must be changed later with own config
+      final boolean isShowPhotoLayer = config.isShowPhoto;
+      // using settings from MapBookmarks must be changed later with own config
       //"STATE_IS_LAYER_PHOTO_VISIBLE"
       //debugPrint(" map25: " + "# updateUI_PhotoLayer(): #photos: " + _selectedPhotosPts.size()); //$NON-NLS-1$
       //if (config.isPhotoClustered != _phototoolkit._isMarkerClusteredLast) { // only recreate PhotoLayer when changed in UI. 

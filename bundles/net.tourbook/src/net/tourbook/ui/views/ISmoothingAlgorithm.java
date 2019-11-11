@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,26 +20,27 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 
 public interface ISmoothingAlgorithm {
 
-	public static final String	SMOOTHING_ALGORITHM_JAMET	= "jamet";		//$NON-NLS-1$
-	public static final String	SMOOTHING_ALGORITHM_INITIAL	= "initial";	//$NON-NLS-1$
+   public static final String SMOOTHING_ALGORITHM_INITIAL      = "initial";     //$NON-NLS-1$
+   public static final String SMOOTHING_ALGORITHM_JAMET        = "jamet";       //$NON-NLS-1$
+   public static final String SMOOTHING_ALGORITHM_NO_SMOOTHING = "NoSmoothing"; //$NON-NLS-1$
 
-	/**
-	 * @param smoothingUI
-	 * @param parent
-	 * @param isShowDescription
-	 * @param isShowAdditionalActions
-	 * @return
-	 */
-	Composite createUI(	SmoothingUI smoothingUI,
-						Composite parent,
-						FormToolkit toolkit,
-						boolean isShowDescription,
-						boolean isShowAdditionalActions);
+   /**
+    * @param smoothingUI
+    * @param parent
+    * @param isShowDescription
+    * @param isShowAdditionalActions
+    * @return
+    */
+   Composite createUI(SmoothingUI smoothingUI,
+                      Composite parent,
+                      FormToolkit toolkit,
+                      boolean isShowDescription,
+                      boolean isShowAdditionalActions);
 
-	void dispose();
+   void dispose();
 
-	void performDefaults(boolean isFireModifications);
+   void performDefaults(boolean isFireModifications);
 
-	void updateUIFromPrefStore();
+   void updateUIFromPrefStore();
 
 }

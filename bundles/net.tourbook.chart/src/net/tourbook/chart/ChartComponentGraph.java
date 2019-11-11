@@ -6896,7 +6896,7 @@ public class ChartComponentGraph extends Canvas {
 
          final int devYSliderLine = devYMouse
                - _ySliderDragged.devYClickOffset
-               + ChartYSlider.halfSliderHitLineHeight;
+               + _ySliderDragged.getSliderHitLine_Above_GraphHorizontalAxis();
 
          _ySliderDragged.setDevYSliderLine(devYSliderLine);
          _ySliderGraphX = devXMouse;

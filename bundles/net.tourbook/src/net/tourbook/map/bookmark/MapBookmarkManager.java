@@ -83,6 +83,11 @@ public class MapBookmarkManager {
    private static final String ATTR_MAP_POSITION_BEARING       = "mapPositionBearing";      //$NON-NLS-1$
    private static final String ATTR_MAP_POSITION_TILT          = "mapPositionTilt";         //$NON-NLS-1$
    private static final String ATTR_MAP_POSITION_ZOOM_LEVEL    = "mapPositionZoomLevel";    //$NON-NLS-1$
+   
+   // for new markerposition function. not implemented yet. 07.11.2019
+   private static final String ATTR_MAP_POSITION_MARKER_X      = "mapPositionMarkerX";      //$NON-NLS-1$
+   private static final String ATTR_MAP_POSITION_MARKER_Y      = "mapPositionMarkerY";      //$NON-NLS-1$  
+   
    //
    private static final String TAG_OPTIONS                     = "Options";                 //$NON-NLS-1$
    private static final String ATTR_NUMBER_OF_BOOKMARK_ITEMS   = "numberOfBookmarkItems";   //$NON-NLS-1$
@@ -284,6 +289,13 @@ public class MapBookmarkManager {
          return;
       }
 
+      /*here we should save the mouse position additionally
+       * like in ActionCreateTourMarkerFromMap.java line 62
+       * */
+//      final double clickedTourPointLatitude = this._mapView.getMap().get_mouseMove_GeoPosition().latitude;
+//      final double clickedTourPointLongitude = this._mapView.getMap().get_mouseMove_GeoPosition().longitude;
+//      final LatLng clickedTourPoint = new LatLng(clickedTourPointLatitude, clickedTourPointLongitude);
+      
       final MapLocation mapLocation = mapBookmarks.getMapLocation();
 
       final MapBookmark newBookmark = new MapBookmark();
@@ -626,15 +638,35 @@ public class MapBookmarkManager {
        * Map position
        */
       final MapPosition mapPosition = new MapPosition();
+      
+      final MapPosition_with_MarkerPosition mapPosition2 = new MapPosition_with_MarkerPosition();
+      //mapPosition needs to be extend with markerPosition
 
       mapPosition.x = Util.getXmlDouble(xmlBookmark, ATTR_MAP_POSITION_X, 0.5);
       mapPosition.y = Util.getXmlDouble(xmlBookmark, ATTR_MAP_POSITION_Y, 0.5);
       mapPosition.scale = Util.getXmlDouble(xmlBookmark, ATTR_MAP_POSITION_SCALE, 1);
+      
+      /* version <= 19.10 do not have mapPositionMarkerXY
+       * so if not found set value first to invalid value and
+       * later to mapposition.xy
+       * should only happen one time, when starting first time after upgrading from version <= 19.10
+      */
+      Double invalidPosition = 2.0;
+      mapPosition2.mapPositionMarkerX = Util.getXmlDouble(xmlBookmark, ATTR_MAP_POSITION_MARKER_X, invalidPosition);
+      mapPosition2.mapPositionMarkerY = Util.getXmlDouble(xmlBookmark, ATTR_MAP_POSITION_MARKER_Y, invalidPosition);
 
       mapPosition.bearing = Util.getXmlFloat(xmlBookmark, ATTR_MAP_POSITION_BEARING, 0f);
       mapPosition.tilt = Util.getXmlFloat(xmlBookmark, ATTR_MAP_POSITION_TILT, 0f);
       mapPosition.zoomLevel = Util.getXmlInteger(xmlBookmark, ATTR_MAP_POSITION_ZOOM_LEVEL, 1);
-
+     
+      
+      if (mapPosition2.mapPositionMarkerX >= 1.0 || mapPosition2.mapPositionMarkerY > 1.0) {
+         net.tourbook.map25.Map25App.debugPrint("++++ MapBookmarkManager: parse_22_Bookmarks_One: markerPos not in xml, migrating...");
+         mapPosition2.mapPositionMarkerX = mapPosition.x;
+         mapPosition2.mapPositionMarkerY = mapPosition.y;
+      }
+      
+      
       bookmark.setMapPosition(mapPosition);
    }
 

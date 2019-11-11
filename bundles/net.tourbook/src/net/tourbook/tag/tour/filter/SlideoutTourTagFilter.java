@@ -226,7 +226,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
 
          super(Messages.action_tagView_flat_layout, AS_RADIO_BUTTON);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__layout_flat));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TagLayout_Flat));
       }
 
       @Override
@@ -241,7 +241,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
 
          super(Messages.action_tagView_flat_hierarchical, AS_RADIO_BUTTON);
 
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__layout_hierarchical));
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TagLayout_Hierarchical));
       }
 
       @Override
@@ -417,7 +417,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
       }
    }
 
-   private final class TagViewerContentProvicer implements ITreeContentProvider {
+   private final class TagViewerContentProvider implements ITreeContentProvider {
 
       @Override
       public void dispose() {}
@@ -1025,7 +1025,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
       _tagViewer = new ContainerCheckedTreeViewer(tree);
 
       _tagViewer.setUseHashlookup(true);
-      _tagViewer.setContentProvider(new TagViewerContentProvicer());
+      _tagViewer.setContentProvider(new TagViewerContentProvider());
       _tagViewer.setComparator(new TagViewerComparator());
 
       _tagViewer.addCheckStateListener(new ICheckStateListener() {
@@ -2123,9 +2123,6 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
 
    private void updateTags_TagViewer(final long[] tagIds) {
 
-      /*
-       * Update UI
-       */
       final ArrayList<TVIPrefTag> tagItems = new ArrayList<>(tagIds.length);
 
       if (tagIds.length > 0) {
@@ -2141,6 +2138,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
          }
       }
 
+      // update UI
       _tagViewer.setCheckedElements(tagItems.toArray());
    }
 

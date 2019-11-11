@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,35 +19,34 @@ import net.tourbook.common.time.TimeTools;
 
 class TourLog {
 
+   public String       time;
 
-	public String				time;
+   public TourLogState state;
 
-	public TourLogState			state;
+   public String       message;
+   public boolean      isSubLogItem;
 
-	public String				message;
-	public boolean				isSubLogItem;
+   public String       css;
 
-	public String				css;
+   public TourLog(final TourLogState state, final String message) {
 
-	public TourLog(final TourLogState state, final String message) {
+      this.time = TimeTools.now().format(TimeTools.Formatter_Time_ISO);
 
-		this.time = TimeTools.now().format(TimeTools.Formatter_Time_ISO);
+      this.state = state;
+      this.message = message;
+   }
 
-		this.state = state;
-		this.message = message;
-	}
+   @Override
+   public String toString() {
+      return "TourLog [" //$NON-NLS-1$
 
-	@Override
-	public String toString() {
-		return "TourLog [" //$NON-NLS-1$
+//            + ("time=" + time + ", ")
+//            + ("state=" + state + ", ")
+            + ("message=" + message + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+//            + ("isSubLogItem=" + isSubLogItem + ", ")
+//            + ("css=" + css)
 
-//				+ ("time=" + time + ", ")
-//				+ ("state=" + state + ", ")
-				+ ("message=" + message + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-//				+ ("isSubLogItem=" + isSubLogItem + ", ")
-//				+ ("css=" + css)
-
-				+ "]"; //$NON-NLS-1$
-	}
+            + "]"; //$NON-NLS-1$
+   }
 
 }

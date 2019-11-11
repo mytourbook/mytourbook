@@ -146,7 +146,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
    private Menu      _tableContextMenu;
 
-   class MarkerViewerContentProvicer implements IStructuredContentProvider {
+   class MarkerViewerContentProvider implements IStructuredContentProvider {
 
       @Override
       public void dispose() {}
@@ -509,7 +509,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
       _columnManager.createColumns(_markerViewer);
 
       _markerViewer.setUseHashlookup(true);
-      _markerViewer.setContentProvider(new MarkerViewerContentProvicer());
+      _markerViewer.setContentProvider(new MarkerViewerContentProvider());
       _markerViewer.setSorter(new MarkerViewerSorter());
 
       _markerViewer.addSelectionChangedListener(new ISelectionChangedListener() {

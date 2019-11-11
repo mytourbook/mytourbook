@@ -35,6 +35,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.eclipse.ui.dialogs.PreferenceLinkArea;
+import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 
 public class PrefPageImport extends PreferencePage implements IWorkbenchPreferencePage {
 
@@ -51,12 +53,15 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
    /*
     * UI controls
     */
-   private Button _chkAutoOpenImportLog;
-   private Button _chkCreateTourIdWithTime;
-   private Button _chkIgnoreInvalidFile;
+   private Button             _chkAutoOpenImportLog;
+   private Button             _chkCreateTourIdWithTime;
+   private Button             _chkIgnoreInvalidFile;
+   private Button             _chkSetBodyWeight;
 
-   private Label  _lblIdInfo;
-   private Label  _lblInvalidFilesInfo;
+   private Label              _lblIdInfo;
+   private Label              _lblInvalidFilesInfo;
+
+   private PreferenceLinkArea _linkBodyWeight;
 
    @Override
    protected Control createContents(final Composite parent) {
@@ -157,6 +162,34 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
                   .hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
                   .applyTo(_lblInvalidFilesInfo);
          }
+         {
+            /*
+             * Set the person's body weight when importing and saving a tour
+             */
+
+            // checkbox
+            _chkSetBodyWeight = new Button(container, SWT.CHECK);
+            _chkSetBodyWeight.setText(Messages.PrefPage_Import_Checkbox_SetBodyWeight);
+            _chkSetBodyWeight.addSelectionListener(_defaultSelectionListener);
+            GridDataFactory.fillDefaults()
+                  .indent(0, 10)
+                  .applyTo(_chkSetBodyWeight);
+
+            // link
+            _linkBodyWeight = new PreferenceLinkArea(
+                  container,
+                  SWT.NONE,
+                  PrefPagePeople.ID,
+                  Messages.Pref_People_Link_BodyWeight,
+                  (IWorkbenchPreferenceContainer) getContainer(),
+                  new PrefPagePeopleData(null, TourbookPlugin.getActivePerson()));
+
+            GridDataFactory.fillDefaults()
+                  .grab(true, false)
+                  .indent(_checkboxIndent, 0)
+                  .hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
+                  .applyTo(_linkBodyWeight.getControl());
+         }
       }
    }
 
@@ -167,6 +200,9 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
 
       final boolean areInvalidFilesToBeIgnored = _chkIgnoreInvalidFile.getSelection();
       _lblInvalidFilesInfo.setEnabled(areInvalidFilesToBeIgnored);
+
+      final boolean isSetBodyWeight = _chkSetBodyWeight.getSelection();
+      _linkBodyWeight.getControl().setEnabled(isSetBodyWeight);
    }
 
    @Override
@@ -193,6 +229,7 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
 
       _chkCreateTourIdWithTime.setSelection(RawDataView.STATE_IS_CREATE_TOUR_ID_WITH_TIME_DEFAULT);
       _chkIgnoreInvalidFile.setSelection(RawDataView.STATE_IS_IGNORE_INVALID_FILE_DEFAULT);
+      _chkSetBodyWeight.setSelection(RawDataView.STATE_IS_SET_BODY_WEIGHT_DEFAULT);
 
       enableControls();
 
@@ -231,6 +268,12 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
             RawDataView.STATE_IS_IGNORE_INVALID_FILE,
             RawDataView.STATE_IS_IGNORE_INVALID_FILE_DEFAULT);
       _chkIgnoreInvalidFile.setSelection(isIgnoreInvalidFile);
+
+      final boolean isSetBodyWeight = Util.getStateBoolean(
+            _state,
+            RawDataView.STATE_IS_SET_BODY_WEIGHT,
+            RawDataView.STATE_IS_SET_BODY_WEIGHT_DEFAULT);
+      _chkSetBodyWeight.setSelection(isSetBodyWeight);
    }
 
    private void saveState() {
@@ -238,13 +281,16 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
       final boolean isCreateTourIdWithTime = _chkCreateTourIdWithTime.getSelection();
       final boolean isOpenImportLog = _chkAutoOpenImportLog.getSelection();
       final boolean isIgnoreInvalidFile = _chkIgnoreInvalidFile.getSelection();
+      final boolean isSetBodyWeight = _chkSetBodyWeight.getSelection();
 
       _state.put(RawDataView.STATE_IS_CREATE_TOUR_ID_WITH_TIME, isCreateTourIdWithTime);
       _state.put(RawDataView.STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW, isOpenImportLog);
       _state.put(RawDataView.STATE_IS_IGNORE_INVALID_FILE, isIgnoreInvalidFile);
+      _state.put(RawDataView.STATE_IS_SET_BODY_WEIGHT, isSetBodyWeight);
 
       _rawDataMgr.setState_CreateTourIdWithTime(isCreateTourIdWithTime);
       _rawDataMgr.setState_IsOpenImportLogView(isOpenImportLog);
       _rawDataMgr.setState_IsIgnoreInvalidFile(isIgnoreInvalidFile);
+      _rawDataMgr.setState_IsSetBodyWeight(isSetBodyWeight);
    }
 }

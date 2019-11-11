@@ -37,13 +37,20 @@
 
 
 ###########################
+ Update Eclipse NL repo
+###########################
+
+see "build\build.eclipse.4.12.nl.repo\How to update this p2 repo.txt"
+
+
+###########################
 
 Build with POM (since 16.4)
 
 ###########################
 
 
-Switch to workspace "C:\DAT\ws_mt-NL-projects" 
+Switch to workspace "C:\DAT\ws-mt-NL-projects" 
 ----------------------------------------------
 
    - refresh all projects with F5

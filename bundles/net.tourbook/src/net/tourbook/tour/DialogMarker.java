@@ -105,10 +105,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 
-public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectionListener, ITourMarkerModifyListener
-/*
- * , ITourSignSetter
- */ {
+public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectionListener, ITourMarkerModifyListener {
 
    private static final String TOUR_MARKER_COLUMN_IS_VISIBLE         = net.tourbook.ui.Messages.Tour_Marker_Column_IsVisible;
    private static final String TOUR_MARKER_COLUMN_IS_VISIBLE_TOOLTIP = net.tourbook.ui.Messages.Tour_Marker_Column_IsVisible_Tooltip;
@@ -647,14 +644,14 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
       _pc = new PixelConverter(parent);
 
       final Composite shellContainer = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults()//
+      GridDataFactory.fillDefaults()
             .grab(true, true)
 //				.hint(_pc.convertWidthInCharsToPixels(150), _pc.convertHeightInCharsToPixels(40))
             .applyTo(shellContainer);
       GridLayoutFactory.swtDefaults().applyTo(shellContainer);
       {
          final Composite sashContainer = new Composite(shellContainer, SWT.NONE);
-         GridDataFactory.fillDefaults()//
+         GridDataFactory.fillDefaults()
                .grab(true, true)
                .applyTo(sashContainer);
          GridLayoutFactory.swtDefaults().applyTo(sashContainer);
@@ -697,17 +694,13 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
    private Composite createUI_10_LeftPart(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults()//
-            .grab(true, true)
-            .applyTo(container);
-      GridLayoutFactory.fillDefaults()//
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
+      GridLayoutFactory.fillDefaults()
             .extendedMargins(5, 5, 0, 0)
             .applyTo(container);
       {
          final Composite sashContainer = new Composite(container, SWT.NONE);
-         GridDataFactory.fillDefaults()//
-               .grab(true, true)
-               .applyTo(sashContainer);
+         GridDataFactory.fillDefaults().grab(true, true).applyTo(sashContainer);
 
          {
             // top part
@@ -1238,7 +1231,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
             .applyTo(_tourChart);
       _tourChart.setShowZoomActions(true);
       _tourChart.setShowSlider(true);
-      _tourChart.setContextProvider(new DialogMarkerTourChartContextProvicer(this), true);
+      _tourChart.setContextProvider(new DialogMarkerTourChartContextProvider(this), true);
 
       _tourChart.setIsDisplayedInDialog(true);
 
@@ -1932,16 +1925,10 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
    private void restoreState() {
 
       // restore width for the marker list
-      final int leftPartWidth = Util.getStateInt(_state, //
-            STATE_OUTER_SASH_WIDTH,
-            _pc.convertWidthInCharsToPixels(80));
-
+      final int leftPartWidth = Util.getStateInt(_state, STATE_OUTER_SASH_WIDTH, _pc.convertWidthInCharsToPixels(80));
       _sashOuterForm.setViewerWidth(leftPartWidth);
 
-      final int bottomPartHeight = Util.getStateInt(_state, //
-            STATE_INNER_SASH_HEIGHT,
-            _pc.convertWidthInCharsToPixels(10));
-
+      final int bottomPartHeight = Util.getStateInt(_state, STATE_INNER_SASH_HEIGHT, _pc.convertWidthInCharsToPixels(10));
       _sashInnerForm.setFixedHeight(bottomPartHeight);
    }
 

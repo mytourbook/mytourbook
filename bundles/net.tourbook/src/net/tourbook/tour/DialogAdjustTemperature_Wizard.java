@@ -153,7 +153,7 @@ public class DialogAdjustTemperature_Wizard extends Wizard {
 					// skip tours which avg temperature is above the minimum avg temperature
 					if (oldTourAvgTemperature > avgTemperature) {
 
-						TourLogManager.logSubInfo(String.format(
+						TourLogManager.subLog_Info(String.format(
 								TourManager.LOG_TEMP_ADJUST_006_IS_ABOVE_TEMPERATURE,
 								TourManager.getTourDateTimeShort(tourData),
 								oldTourAvgTemperature,
