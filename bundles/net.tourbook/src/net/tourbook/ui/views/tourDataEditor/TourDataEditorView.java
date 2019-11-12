@@ -6013,6 +6013,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _spinPerson_RestPuls.setEnabled(canEdit);
       _spinPerson_Calories.setEnabled(canEdit);
 
+      // Training stress data
+      _txtTrainingStress_Govss.setEnabled(isManualAndEdit && _tourData.getTourPerson() != null);
+
       _linkTag.setEnabled(canEdit);
       _linkTourType.setEnabled(canEdit);
 
