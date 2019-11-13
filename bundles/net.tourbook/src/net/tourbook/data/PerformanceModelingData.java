@@ -45,6 +45,7 @@ public class PerformanceModelingData {
    public static final int                     PERFORMANCE_MODELING_DATA_ID_NOT_DEFINED = 0;
 
    private static IPreferenceStore             _prefStore                               = TourbookPlugin.getPrefStore();
+   private static int                          _fitnessDecayTime                        = _prefStore.getInt(ITourbookPreferences.FITNESS_DECAY);
 
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -83,6 +84,9 @@ public class PerformanceModelingData {
    }
 
    /**
+    * Computes the fitness value for a given date and a given previous training data
+    * Fitness = g(t) = g(t-i)e^(-i/T1) + w(t)
+    *
     * @param numberOfDays
     *           The number of days between the current's day of training and the previous day of
     *           training.
@@ -92,9 +96,8 @@ public class PerformanceModelingData {
     */
    private int computeFitnessValue(final int numberOfDays, final int previousFitnessValue, final int totalGovss) {
 
-      final int fitnessDecayTime = _prefStore.getInt(ITourbookPreferences.FITNESS_DECAY);
 
-      final float exponent = (float) numberOfDays / (float) fitnessDecayTime;
+      final float exponent = numberOfDays / (float) _fitnessDecayTime;
       final int fitnessValue = (int) (previousFitnessValue * Math.exp(exponent) + totalGovss);
 
       return fitnessValue;
@@ -188,6 +191,9 @@ public class PerformanceModelingData {
 
    /**
     * Computes and updates the fitness values for the Skiba Model.
+    * The formulas are based on R. Banister's paper
+    * "Modeling human performance in running"
+    * Source : https://pdfs.semanticscholar.org/c497/9ca5064ce45e0b69da4452d2f637d7fdfd9d.pdf
     *
     * @param tourStartDate
     *           The date at and after which the values need to be computed
@@ -198,11 +204,9 @@ public class PerformanceModelingData {
          fitnessValuesSkiba = new HashMap<>();
       }
 
-      // Computing the given date's performance value
 
       // final int fatigueDecayTime = _prefStore.getInt(ITourbookPreferences.FATIGUE_DECAY);
 
-      // g(t) = g(t-i)e^(-i/T1) + w(t)
       // h(t) = h(t-i)e^(-i/T2) + w(t)
 
       int totalGovss = 0;
@@ -212,7 +216,6 @@ public class PerformanceModelingData {
       }
 
       int fitnessValue;
-
       if (fitnessValuesSkiba.size() == 0) {
 
          fitnessValue = computeFitnessValue(0, 0, totalGovss);
@@ -222,17 +225,22 @@ public class PerformanceModelingData {
 
       final LocalDate govssEntriesMinDate = Collections.min(fitnessValuesSkiba.keySet());
       //We find the previous fitness value
-       LocalDate previousDate = tourStartDate;
-      int previousFitnessValue = fitnessValuesSkiba.get(govssEntriesMinDate);
+      LocalDate previousDate = tourStartDate;
+      int previousFitnessValue = 0;
       while (previousDate.compareTo(govssEntriesMinDate) >= 0) {
+
          if (fitnessValuesSkiba.containsKey(previousDate)) {
+
             previousFitnessValue = fitnessValuesSkiba.get(previousDate);
             break;
          }
-         previousDate = tourStartDate.minusDays(1);
+         previousDate = previousDate.minusDays(1);
       }
 
-      final int numberOfDays = (int) ChronoUnit.DAYS.between(previousDate, tourStartDate);
+      // Computing the number of days separating the given workout and the previous one
+      int numberOfDays = (int) ChronoUnit.DAYS.between(previousDate, tourStartDate);
+
+      // Computing the given date's performance value
       fitnessValue = computeFitnessValue(numberOfDays, previousFitnessValue, totalGovss);
 
       if (fitnessValuesSkiba.containsKey(tourStartDate)) {
@@ -243,23 +251,26 @@ public class PerformanceModelingData {
          fitnessValuesSkiba.put(tourStartDate, fitnessValue);
       }
 
-      // Updating and creating if necessary all the fitness values after the given tour's date
+      // Updating and creating, if necessary, all the fitness values after the given tour's date
       final LocalDate govssEntriesMaxDate = Collections.max(fitnessValuesSkiba.keySet());
       LocalDate nextDate = tourStartDate.plusDays(1);
       previousFitnessValue = fitnessValue;
+      LocalDate previousTrainingDate = tourStartDate;
       while (nextDate.compareTo(govssEntriesMaxDate) <= 0) {
 
          totalGovss = 0;
-         int numberofDays = (int) ChronoUnit.DAYS.between(tourStartDate, nextDate);
          if (govssEntries.containsKey(nextDate)) {
 
             tourIds = govssEntries.get(nextDate);
             for (final Long tourId : tourIds) {
                totalGovss += TourManager.getTour(tourId).getGovss();
             }
-            numberofDays = (int) ChronoUnit.DAYS.between(tourStartDate, nextDate);
+
+            previousTrainingDate = nextDate;
          }
-         fitnessValue = computeFitnessValue(numberofDays, previousFitnessValue, totalGovss);
+
+         numberOfDays = (int) ChronoUnit.DAYS.between(previousTrainingDate, nextDate);
+         fitnessValue = computeFitnessValue(numberOfDays, previousFitnessValue, totalGovss);
 
          if (fitnessValuesSkiba.containsKey(nextDate)) {
             fitnessValuesSkiba.replace(nextDate, fitnessValue);
