@@ -103,6 +103,8 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
    private Spinner                     _textThresholdPower_Duration_Seconds;
    private int                         _hintDefaultSpinnerWidth;
 
+   private Button                      _btnComputeValues;
+
    private ActionTourType_Add          _action_TourType_Add;
    private ActionTourType_Remove       _action_TourType_Remove;
    private Font                        _boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
@@ -487,6 +489,8 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
       final StructuredSelection currentTourTypeViewerSelection = (StructuredSelection) _tourTypesViewer.getSelection();
       final boolean isTourTypeSelected = currentTourTypeViewerSelection.isEmpty() ? false : true;
       _action_TourType_Remove.setEnabled(isTourTypeSelected);
+
+      _btnComputeValues.setEnabled(_tourTypesViewer.getTable().getItemCount() > 0);
    }
 
    private void fireTourModifyEvent() {
@@ -524,14 +528,14 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
             createUI_120_TourTypesList(_govssGroup);
 
             // button: compute GOVSS values
-            final Button btnComputValues = new Button(_govssGroup, SWT.NONE);
+            _btnComputeValues = new Button(_govssGroup, SWT.NONE);
             GridDataFactory
                   .fillDefaults()
                   .align(SWT.BEGINNING, SWT.CENTER)
-                  .applyTo(btnComputValues);
-            btnComputValues.setText(Messages.Compute_Govss_Button_ComputeAllTours);
-            btnComputValues.setToolTipText(Messages.Compute_Govss_Button_ComputeAllTours_Tooltip);
-            btnComputValues.addSelectionListener(new SelectionAdapter() {
+                  .applyTo(_btnComputeValues);
+            _btnComputeValues.setText(Messages.Compute_Govss_Button_ComputeAllTours);
+            _btnComputeValues.setToolTipText(Messages.Compute_Govss_Button_ComputeAllTours_Tooltip);
+            _btnComputeValues.addSelectionListener(new SelectionAdapter() {
                @Override
                public void widgetSelected(final SelectionEvent e) {
                   onComputeGovssValues();

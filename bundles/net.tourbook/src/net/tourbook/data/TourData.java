@@ -4037,7 +4037,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       final Running_Govss running_Govss = new Running_Govss(tourPerson);
       govss = running_Govss.ComputeGovss(this);
 
-      tourPerson.addGovssEntry(tourStartTime, tourId);
+      tourPerson.addOrUpdateGovssEntry(tourStartTime, tourId);
 
       return govss != 0;
    }

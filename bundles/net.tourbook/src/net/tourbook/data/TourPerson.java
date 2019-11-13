@@ -274,7 +274,7 @@ public class TourPerson implements Comparable<Object> {
       }
    }
 
-   public void addGovssEntry(final long tourStartTime, final long tourId) {
+   public void addOrUpdateGovssEntry(final long tourStartTime, final long tourId) {
       if (performanceModelingData == null) {
          performanceModelingData = new PerformanceModelingData();
       }

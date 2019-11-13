@@ -28,14 +28,20 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.preferences.ITourbookPreferences;
+
+import org.eclipse.jface.preference.IPreferenceStore;
 
 @Entity
 public class PerformanceModelingData {
 
    public static final int                     PERFORMANCE_MODELING_DATA_ID_NOT_DEFINED = 0;
+
+   private static IPreferenceStore             _prefStore                               = TourbookPlugin.getPrefStore();
 
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -60,8 +66,9 @@ public class PerformanceModelingData {
     */
    @Lob
    private HashMap<LocalDate, Integer> fitnessValuesSkiba;
+   private LocalDate                   _govssEntriesMinDate;
    @Lob
-   private HashMap<Date, long[]> fatigueValuesSkiba;
+   private HashMap<Date, long[]>       fatigueValuesSkiba;
 
    /**
     * default constructor used in ejb
@@ -174,6 +181,30 @@ public class PerformanceModelingData {
          fitnessValuesSkiba = new HashMap<>();
       }
 
+      // Computing the given date's performance value
+      final int fitnessDecayTime = _prefStore.getInt(ITourbookPreferences.FITNESS_DECAY);
+      final int fatigueDecayTime = _prefStore.getInt(ITourbookPreferences.FATIGUE_DECAY);
+
+      // p(t) = k1.g(t) - k2.h(t)
+      // g(t) = g(t-i)e^(-i/T1) + w(t)
+      // h(t) = h(t-i)e^(-i/T2) + w(t)
+
+      //Looking for the previous performance value
+      final LocalDate previousDate = tourStartDate.minusDays(1);
+      int previousFitnessValue = -1;
+      while (previousDate.compareTo(_govssEntriesMinDate) > 0) {
+         if (fitnessValuesSkiba.containsKey(previousDate)) {
+            previousFitnessValue = fitnessValuesSkiba.get(previousDate);
+            break;
+         }
+      }
+
+      if (previousFitnessValue == -1) {
+         _govssEntriesMinDate = tourStartDate;
+         fitnessValuesSkiba.put(tourStartDate, 100);
+      }
+
+      // Updating the next dates' performance values, if there are any
       if (!fitnessValuesSkiba.containsKey(tourStartDate)) {
          fitnessValuesSkiba.put(tourStartDate, 0);
       } else {
