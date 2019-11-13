@@ -34,9 +34,14 @@ Fixes
 
 * Tour Tags
   - Fixed issue: Column widths have been reset when tags are saved
+  
+* Tour Import
+  - GPX: Fixed NPE when importing MyTourbook export files
 
-
- 
+* Tour Export
+  - GPX: <mt:bikerWeight> value was wrong
+  
+   
 Translation    
 ===========
 
