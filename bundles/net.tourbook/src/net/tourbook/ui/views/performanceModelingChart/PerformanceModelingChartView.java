@@ -41,7 +41,6 @@ import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
-import net.tourbook.data.TourPersonHRZone;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.UI;
@@ -94,8 +93,8 @@ public class PerformanceModelingChartView extends ViewPart {
 
 // SET_FORMATTING_ON
 
-   private final IPreferenceStore         _prefStore     = TourbookPlugin.getPrefStore();
-   private final IDialogSettings          _state         = TourbookPlugin.getState(ID);
+   private final IPreferenceStore         _prefStore    = TourbookPlugin.getPrefStore();
+   private final IDialogSettings          _state        = TourbookPlugin.getState(ID);
 
    private IPropertyChangeListener        _prefChangeListener;
 
@@ -120,10 +119,9 @@ public class PerformanceModelingChartView extends ViewPart {
 
    private double[]                       _xSeriePulse;
 
-   private ArrayList<TourPersonHRZone>    _personHrZones = new ArrayList<>();
-   private final MinMaxKeeper_YData       _minMaxKeeper  = new MinMaxKeeper_YData();
+   private final MinMaxKeeper_YData       _minMaxKeeper = new MinMaxKeeper_YData();
 
-   private final NumberFormat             _nf1           = NumberFormat.getNumberInstance();
+   private final NumberFormat             _nf1          = NumberFormat.getNumberInstance();
    {
       _nf1.setMinimumFractionDigits(1);
       _nf1.setMaximumFractionDigits(1);
@@ -721,14 +719,27 @@ public class PerformanceModelingChartView extends ViewPart {
       /*
        * y-axis: GOVSS values
        */
-      final float[] yvalues = new float[numberOfDays];
+      final float[] predictedPerformanceValues = new float[numberOfDays];
+      final HashMap<LocalDate, Integer> fitnessValuesSkiba = _currentPerson.getPerformanceModelingData().getFitnessValuesSkiba();
+      LocalDate currentDatetorneame = _oldestEntryDate;
       for (int toto = 0; toto < numberOfDays; ++toto) {
-         yvalues[toto] = (float) (Math.random() * 100);
+
+         if (fitnessValuesSkiba.containsKey(currentDatetorneame)) {
+
+            // g(t)
+            predictedPerformanceValues[toto] = fitnessValuesSkiba.get(currentDatetorneame);
+
+            //TODO h(t)
+
+            //TODO p(t) = g(t) - h(t)
+         }
+
+         currentDatetorneame = currentDatetorneame.plusDays(1);
       }
 
       final ChartDataYSerie yData = new ChartDataYSerie(
             ChartType.LINE,
-            yvalues,
+            predictedPerformanceValues,
             false);
 
       yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
@@ -740,7 +751,7 @@ public class PerformanceModelingChartView extends ViewPart {
       yData.setRgbDark(rgbDark);
       yData.setDefaultRGB(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY).getRGB());
 
-      // chartDataModel.addYData(yData);
+      chartDataModel.addYData(yData);
 
       //TODO when MTB supports displaying both BAR and LINES at the same time
       // set tool tip info

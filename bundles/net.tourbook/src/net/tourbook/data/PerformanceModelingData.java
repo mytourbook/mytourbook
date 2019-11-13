@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2019 Frédéric Bard
+ * Copyright (C) 2019 Frédéric Bard and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,6 +17,7 @@ package net.tourbook.data;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -33,6 +34,7 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.TourManager;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 
@@ -66,7 +68,6 @@ public class PerformanceModelingData {
     */
    @Lob
    private HashMap<LocalDate, Integer> fitnessValuesSkiba;
-   private LocalDate                   _govssEntriesMinDate;
    @Lob
    private HashMap<Date, long[]>       fatigueValuesSkiba;
 
@@ -80,9 +81,22 @@ public class PerformanceModelingData {
 
    }
 
+   private int computeFitnessValue(final int previousFitnessValue, final int totalGovss) {
+
+      final int fitnessDecayTime = _prefStore.getInt(ITourbookPreferences.FITNESS_DECAY);
+
+      final int fitnessValue = (int) (previousFitnessValue * Math.round(Math.exp((float) -2 / fitnessDecayTime)) + totalGovss);
+
+      return fitnessValue;
+   }
+
    public void computeFitnessValues() {
       // TODO Auto-generated method stub
 
+   }
+
+   public HashMap<LocalDate, Integer> getFitnessValuesSkiba() {
+      return fitnessValuesSkiba;
    }
 
    public HashMap<LocalDate, ArrayList<Long>> getGovssEntries() {
@@ -143,20 +157,13 @@ public class PerformanceModelingData {
       ArrayList<Long> tourIds = govssEntries.get(tourStartDate);
       if (tourIds == null) {
          tourIds = new ArrayList<>();
-
+      }
+      if (!tourIds.contains(tourId)) {
          tourIds.add(tourId);
          govssEntries.put(tourStartDate, tourIds);
-      } else {
-         if (tourIds.contains(tourId)) {
-            return;
-         }
-
-         tourIds.add(tourId);
-         govssEntries.replace(tourStartDate, tourIds);
-
       }
 
-      updateSkibaFitnessAndFatigueValues(tourStartDate);
+      updateSkibaFitnessValues(tourStartDate);
 
    }
 
@@ -170,46 +177,74 @@ public class PerformanceModelingData {
    }
 
    /**
-    * Computes both the fitness and fatigue values for the Skiba Model.
+    * Computes and updates the fitness values for the Skiba Model.
     *
     * @param tourStartDate
     *           The date at and after which the values need to be computed
     */
-   private void updateSkibaFitnessAndFatigueValues(final LocalDate tourStartDate) {
+   private void updateSkibaFitnessValues(final LocalDate tourStartDate) {
 
       if (fitnessValuesSkiba == null) {
          fitnessValuesSkiba = new HashMap<>();
       }
 
       // Computing the given date's performance value
-      final int fitnessDecayTime = _prefStore.getInt(ITourbookPreferences.FITNESS_DECAY);
-      final int fatigueDecayTime = _prefStore.getInt(ITourbookPreferences.FATIGUE_DECAY);
 
-      // p(t) = k1.g(t) - k2.h(t)
+      // final int fatigueDecayTime = _prefStore.getInt(ITourbookPreferences.FATIGUE_DECAY);
+
       // g(t) = g(t-i)e^(-i/T1) + w(t)
       // h(t) = h(t-i)e^(-i/T2) + w(t)
 
-      //Looking for the previous performance value
+      int totalGovss = 0;
+      ArrayList<Long> tourIds = govssEntries.get(tourStartDate);
+      for (final Long tourId : tourIds) {
+         totalGovss += TourManager.getTour(tourId).getGovss();
+      }
+
+      if (fitnessValuesSkiba.size() == 0) {
+         fitnessValuesSkiba.put(tourStartDate, totalGovss);
+         return;
+      }
+
+      final LocalDate govssEntriesMinDate = Collections.min(fitnessValuesSkiba.keySet());
+      //We find the previous fitness value
       final LocalDate previousDate = tourStartDate.minusDays(1);
-      int previousFitnessValue = -1;
-      while (previousDate.compareTo(_govssEntriesMinDate) > 0) {
+      int previousFitnessValue = fitnessValuesSkiba.get(govssEntriesMinDate);
+      while (previousDate.compareTo(govssEntriesMinDate) > 0) {
          if (fitnessValuesSkiba.containsKey(previousDate)) {
             previousFitnessValue = fitnessValuesSkiba.get(previousDate);
             break;
          }
       }
 
-      if (previousFitnessValue == -1) {
-         _govssEntriesMinDate = tourStartDate;
-         fitnessValuesSkiba.put(tourStartDate, 100);
+      final int fitnessValue = computeFitnessValue(previousFitnessValue, totalGovss);
+
+      if (fitnessValuesSkiba.containsKey(tourStartDate)) {
+
+         fitnessValuesSkiba.replace(tourStartDate, fitnessValue);
+      } else {
+
+         fitnessValuesSkiba.put(tourStartDate, fitnessValue);
       }
 
-      // Updating the next dates' performance values, if there are any
-      if (!fitnessValuesSkiba.containsKey(tourStartDate)) {
-         fitnessValuesSkiba.put(tourStartDate, 0);
-      } else {
-         fitnessValuesSkiba.replace(tourStartDate, 0);
+      final LocalDate govssEntriesMaxDate = Collections.max(fitnessValuesSkiba.keySet());
+      LocalDate nextDate = tourStartDate.plusDays(1);
+      previousFitnessValue = fitnessValue;
+      while (nextDate.compareTo(govssEntriesMaxDate) <= 0) {
 
+         totalGovss = 0;
+         if (fitnessValuesSkiba.containsKey(nextDate)) {
+
+            tourIds = govssEntries.get(nextDate);
+            for (final Long tourId : tourIds) {
+               totalGovss += TourManager.getTour(tourId).getGovss();
+            }
+         }
+         final int updatedFitnessValue = computeFitnessValue(previousFitnessValue, totalGovss);
+
+         previousFitnessValue = updatedFitnessValue;
+
+         nextDate = nextDate.plusDays(1);
       }
    }
 }
