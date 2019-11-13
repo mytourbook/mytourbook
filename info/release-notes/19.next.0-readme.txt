@@ -23,6 +23,8 @@ Import
 Changes  
 =======
 
+* Tour Import
+  - GPX: Set default to absolute distance that the defaults for export/import are the same
 
  
 Fixes   
