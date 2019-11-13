@@ -16,6 +16,7 @@
 package net.tourbook.data;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -81,11 +82,20 @@ public class PerformanceModelingData {
 
    }
 
-   private int computeFitnessValue(final int previousFitnessValue, final int totalGovss) {
+   /**
+    * @param numberOfDays
+    *           The number of days between the current's day of training and the previous day of
+    *           training.
+    * @param previousFitnessValue
+    * @param totalGovss
+    * @return
+    */
+   private int computeFitnessValue(final int numberOfDays, final int previousFitnessValue, final int totalGovss) {
 
       final int fitnessDecayTime = _prefStore.getInt(ITourbookPreferences.FITNESS_DECAY);
 
-      final int fitnessValue = (int) (previousFitnessValue * Math.round(Math.exp((float) -2 / fitnessDecayTime)) + totalGovss);
+      final float exponent = (float) numberOfDays / (float) fitnessDecayTime;
+      final int fitnessValue = (int) (previousFitnessValue * Math.exp(exponent) + totalGovss);
 
       return fitnessValue;
    }
@@ -201,23 +211,29 @@ public class PerformanceModelingData {
          totalGovss += TourManager.getTour(tourId).getGovss();
       }
 
+      int fitnessValue;
+
       if (fitnessValuesSkiba.size() == 0) {
-         fitnessValuesSkiba.put(tourStartDate, totalGovss);
+
+         fitnessValue = computeFitnessValue(0, 0, totalGovss);
+         fitnessValuesSkiba.put(tourStartDate, fitnessValue);
          return;
       }
 
       final LocalDate govssEntriesMinDate = Collections.min(fitnessValuesSkiba.keySet());
       //We find the previous fitness value
-      final LocalDate previousDate = tourStartDate.minusDays(1);
+       LocalDate previousDate = tourStartDate;
       int previousFitnessValue = fitnessValuesSkiba.get(govssEntriesMinDate);
-      while (previousDate.compareTo(govssEntriesMinDate) > 0) {
+      while (previousDate.compareTo(govssEntriesMinDate) >= 0) {
          if (fitnessValuesSkiba.containsKey(previousDate)) {
             previousFitnessValue = fitnessValuesSkiba.get(previousDate);
             break;
          }
+         previousDate = tourStartDate.minusDays(1);
       }
 
-      final int fitnessValue = computeFitnessValue(previousFitnessValue, totalGovss);
+      final int numberOfDays = (int) ChronoUnit.DAYS.between(previousDate, tourStartDate);
+      fitnessValue = computeFitnessValue(numberOfDays, previousFitnessValue, totalGovss);
 
       if (fitnessValuesSkiba.containsKey(tourStartDate)) {
 
@@ -227,22 +243,31 @@ public class PerformanceModelingData {
          fitnessValuesSkiba.put(tourStartDate, fitnessValue);
       }
 
+      // Updating and creating if necessary all the fitness values after the given tour's date
       final LocalDate govssEntriesMaxDate = Collections.max(fitnessValuesSkiba.keySet());
       LocalDate nextDate = tourStartDate.plusDays(1);
       previousFitnessValue = fitnessValue;
       while (nextDate.compareTo(govssEntriesMaxDate) <= 0) {
 
          totalGovss = 0;
-         if (fitnessValuesSkiba.containsKey(nextDate)) {
+         int numberofDays = (int) ChronoUnit.DAYS.between(tourStartDate, nextDate);
+         if (govssEntries.containsKey(nextDate)) {
 
             tourIds = govssEntries.get(nextDate);
             for (final Long tourId : tourIds) {
                totalGovss += TourManager.getTour(tourId).getGovss();
             }
+            numberofDays = (int) ChronoUnit.DAYS.between(tourStartDate, nextDate);
          }
-         final int updatedFitnessValue = computeFitnessValue(previousFitnessValue, totalGovss);
+         fitnessValue = computeFitnessValue(numberofDays, previousFitnessValue, totalGovss);
 
-         previousFitnessValue = updatedFitnessValue;
+         if (fitnessValuesSkiba.containsKey(nextDate)) {
+            fitnessValuesSkiba.replace(nextDate, fitnessValue);
+         } else {
+            fitnessValuesSkiba.put(nextDate, fitnessValue);
+         }
+
+         previousFitnessValue = fitnessValue;
 
          nextDate = nextDate.plusDays(1);
       }
