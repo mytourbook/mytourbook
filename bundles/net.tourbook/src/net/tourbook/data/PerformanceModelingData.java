@@ -96,8 +96,8 @@ public class PerformanceModelingData {
     */
    private int computeFitnessValue(final int numberOfDays, final int previousFitnessValue, final int totalGovss) {
 
+      final float exponent = numberOfDays * -1f / _fitnessDecayTime;
 
-      final float exponent = numberOfDays / (float) _fitnessDecayTime;
       final int fitnessValue = (int) (previousFitnessValue * Math.exp(exponent) + totalGovss);
 
       return fitnessValue;
@@ -203,7 +203,6 @@ public class PerformanceModelingData {
       if (fitnessValuesSkiba == null) {
          fitnessValuesSkiba = new HashMap<>();
       }
-
 
       // final int fatigueDecayTime = _prefStore.getInt(ITourbookPreferences.FATIGUE_DECAY);
 
