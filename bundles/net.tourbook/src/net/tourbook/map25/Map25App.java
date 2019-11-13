@@ -156,7 +156,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	private int							_tileSourceOfflineMapCount = 0;
 	
 	//public static enum DebugMode {OFF, ON};
-	public static DebugMode debugMode = DebugMode.OFF;   // before releasing, set this to OFF
+	public static DebugMode debugMode = DebugMode.ON;   // before releasing, set this to OFF
 	
 	/**
 	 * The opacity can be set in the layer but not read. This will keep the state of the hillshading opacity.
@@ -1096,6 +1096,19 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	   _layer_Label.setEnabled(false);
 	   layers.add(_layer_Label);
 
+      //Photos
+      _phototoolkit = new PhotoToolkit();
+      if (config.isMarkerClustered) { //sharing same setting as MapBookmarks, later photolayer should get its own configuration
+         _layer_Photo = new  ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(),  _phototoolkit._markerRendererFactory, _phototoolkit);
+      } else {
+         //_layer_Photo = new  ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(),  _phototoolkit._symbol, this);
+         _layer_Photo = new  ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(),  _phototoolkit._symbol, _phototoolkit);
+      }
+      //_layer_Photo.addItems(_phototoolkit._photo_pts);  //must not be done at startup, no tour is loadet yet
+      _layer_Photo.setEnabled(false);
+      layers.add(_layer_Photo);   
+	   
+	   
       // MapBookmarks
       //debugPrint(" map25: " + "################ setupMap_Layers: calling constructor"); //$NON-NLS-1$
       _markertoolkit = new MarkerToolkit(MarkerShape.STAR);
@@ -1114,19 +1127,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       _layer_Marker = new MarkerLayer(mMap, this);
       _layer_Marker.setEnabled(false);
       layers.add(_layer_Marker);      
-      
-      //Photos
-      _phototoolkit = new PhotoToolkit();
-      if (config.isMarkerClustered) { //sharing same setting as MapBookmarks, later photolayer should get its own configuration
-         _layer_Photo = new  ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(),  _phototoolkit._markerRendererFactory, _phototoolkit);
-      } else {
-         //_layer_Photo = new  ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(),  _phototoolkit._symbol, this);
-         _layer_Photo = new  ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(),  _phototoolkit._symbol, _phototoolkit);
-      }
-      //_layer_Photo.addItems(_phototoolkit._photo_pts);  //must not be done at startup, no tour is loadet yet
-      _layer_Photo.setEnabled(false);
-      layers.add(_layer_Photo);
-      
+            
 	   // slider location
 	   _layer_SliderLocation = new SliderLocation_Layer(mMap);
 	   _layer_SliderLocation.setEnabled(false);

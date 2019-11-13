@@ -221,7 +221,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
       Image photoImage = null;
       Image scaledThumbImage = null;
       final ImageQuality requestedImageQuality = ImageQuality.THUMB;
-      
+
       // check if image has an loading error
       final PhotoLoadingState photoLoadingState = photo.getLoadingState(requestedImageQuality);
       if (photoLoadingState != PhotoLoadingState.IMAGE_IS_INVALID) {
@@ -230,36 +230,36 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
 
          // check if image is in the cache
          photoImage = PhotoImageCache.getImage(photo, requestedImageQuality);
-         
+
          if ((photoImage == null || photoImage.isDisposed())
                && photoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {
 
             // the requested image is not available in the image cache -> image must be loaded
 
             final ILoadCallBack imageLoadCallback = new LoadCallbackImage();
-            
+
             PhotoLoadManager.putImageInLoadingQueueThumbMap(photo, requestedImageQuality, imageLoadCallback);
          }
-                      
+
          if (photoImage != null){
-            
+
             Rectangle imageBounds = photoImage.getBounds();
             final int originalImageWidth = imageBounds.width;
             final int originalImageHeight = imageBounds.height;  
-            
+
             int imageWidth = originalImageWidth;
             int imageHeight = originalImageHeight;
-            
+
             //final int thumbSize = PhotoLoadManager.IMAGE_SIZE_THUMBNAIL;//    PhotoLoadManager.IMAGE_SIZE_LARGE_DEFAULT;
             boolean isRotated = false;
-            
+
             final Point bestSize = ImageUtils.getBestSize(imageWidth, imageHeight, thumbSize, thumbSize);
             Rotation thumbRotation = null;  
             if (isRotated == false) {
                isRotated = true;
                //thumbRotation = getRotation();
             }
-            
+
             scaledThumbImage = ImageUtils.resize(
                   _display,
                   photoImage,
@@ -268,18 +268,6 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
                   SWT.ON,
                   SWT.LOW,
                   thumbRotation);          
-            
-  //          try {
-               
-               //photoBitmap = CanvasAdapter.decodeBitmap(new ByteArrayInputStream(ImageUtils.formatImage(photoImage, org.eclipse.swt.SWT.IMAGE_BMP)));
-  //             photoBitmap = CanvasAdapter.decodeBitmap(new ByteArrayInputStream(ImageUtils.formatImage(scaledThumbImage, org.eclipse.swt.SWT.IMAGE_BMP)));
-               //debugPrint("??? getPhotoImage created photoBitmap width: " + photoBitmap.getWidth() + " Height: " +  photoBitmap.getHeight()); 
-               //debugPrint("??? getPhotoImage created bestsize width: " + bestSize.x + " width: " +  bestSize.y);
-               //debugPrint("??? getPhotoImage created thumbnail size: " + thumbSize); 
-  //          } catch (IOException e) {
-               // TODO Auto-generated catch block
-  //             e.printStackTrace();
-  //          }
 
          }  else {
             scaledThumbImage = null;
@@ -299,69 +287,26 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
    public  Bitmap getPhotoBitmap(final Photo photo) {
 //      Image photoImage = null;
       Bitmap photoBitmap = null;
-    
-//      final ImageQuality requestedImageQuality = ImageQuality.THUMB;
-//
-//      final PhotoLoadingState photoLoadingState = photo.getLoadingState(requestedImageQuality);
-//
-//      if (photoLoadingState != PhotoLoadingState.IMAGE_IS_INVALID) {
-//
-//         photoImage = PhotoImageCache.getImage(photo, requestedImageQuality);
-//         
-//         if ((photoImage == null || photoImage.isDisposed())
-//               && photoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {
-//
-//            final ILoadCallBack imageLoadCallback = new LoadCallbackImage();
-//            
-//            PhotoLoadManager.putImageInLoadingQueueThumbMap(photo, requestedImageQuality, imageLoadCallback);
-//         }
-//                      
-//         if (photoImage != null){
-//            
-//            Rectangle imageBounds = photoImage.getBounds();
-//            final int originalImageWidth = imageBounds.width;
-//            final int originalImageHeight = imageBounds.height;  
-//            
-//            int imageWidth = originalImageWidth;
-//            int imageHeight = originalImageHeight;
-//            
-//            final int thumbSize = PhotoLoadManager.IMAGE_SIZE_THUMBNAIL;
-//            boolean isRotated = false;
-//            
-//            final Point bestSize = ImageUtils.getBestSize(imageWidth, imageHeight, thumbSize, thumbSize);
-//            Rotation thumbRotation = null;  
-//            if (isRotated == false) {
-//               isRotated = true;
-//            }
-            
-//            final Image scaledThumbImage = ImageUtils.resize(
-//                  _display,
-//                  photoImage,
-//                  bestSize.x,
-//                  bestSize.y,
-//                  SWT.ON,
-//                  SWT.LOW,
-//                  thumbRotation);          
-            
-            final Image scaledThumbImage = getPhotoImage(photo, PhotoLoadManager.IMAGE_SIZE_THUMBNAIL);
-            
-            if (scaledThumbImage != null) {
-               try {
 
-                  //photoBitmap = CanvasAdapter.decodeBitmap(new ByteArrayInputStream(ImageUtils.formatImage(photoImage, org.eclipse.swt.SWT.IMAGE_BMP)));
-                  photoBitmap = CanvasAdapter.decodeBitmap(new ByteArrayInputStream(ImageUtils.formatImage(scaledThumbImage, org.eclipse.swt.SWT.IMAGE_BMP)));
-                  //debugPrint("??? getPhotoImage created photoBitmap width: " + photoBitmap.getWidth() + " Height: " +  photoBitmap.getHeight()); 
-                  //debugPrint("??? getPhotoImage created bestsize width: " + bestSize.x + " width: " +  bestSize.y);
-                  //debugPrint("??? getPhotoImage created thumbnail size: " + thumbSize); 
-               } catch (IOException e) {
-                  // TODO Auto-generated catch block
-                  e.printStackTrace();
-               }
-            }
+      final Image scaledThumbImage = getPhotoImage(photo, PhotoLoadManager.IMAGE_SIZE_THUMBNAIL);
 
-   //      }  
-    //  }
-      
+      if (scaledThumbImage != null) {
+         try {
+
+            //photoBitmap = CanvasAdapter.decodeBitmap(new ByteArrayInputStream(ImageUtils.formatImage(photoImage, org.eclipse.swt.SWT.IMAGE_BMP)));
+            photoBitmap = CanvasAdapter.decodeBitmap(new ByteArrayInputStream(ImageUtils.formatImage(scaledThumbImage, org.eclipse.swt.SWT.IMAGE_BMP)));
+            //debugPrint("??? getPhotoImage created photoBitmap width: " + photoBitmap.getWidth() + " Height: " +  photoBitmap.getHeight()); 
+            //debugPrint("??? getPhotoImage created bestsize width: " + bestSize.x + " width: " +  bestSize.y);
+            //debugPrint("??? getPhotoImage created thumbnail size: " + thumbSize); 
+         } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+         }
+      }
+
+      //      }  
+      //  }
+
       return photoBitmap;
    }
    
