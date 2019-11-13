@@ -29,6 +29,8 @@ Import
 Changes  
 =======
 
+* Tour Import
+  - GPX: Set default to absolute distance that the defaults for export/import are the same
 
  
 Fixes   
@@ -40,9 +42,14 @@ Fixes
 
 * Tour Tags
   - Fixed issue: Column widths have been reset when tags are saved
+  
+* Tour Import
+  - GPX: Fixed NPE when importing MyTourbook export files
 
-
- 
+* Tour Export
+  - GPX: <mt:bikerWeight> value was wrong
+  
+   
 Translation    
 ===========
 
