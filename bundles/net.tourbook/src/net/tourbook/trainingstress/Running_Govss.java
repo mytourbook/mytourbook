@@ -86,7 +86,7 @@ public class Running_Govss {
     * https://3record.de/about/power_estimation#ref_4
     * https://runscribe.com/power/
     * Note : This function will assume that the tour is a run activity. If not, be aware that the
-    * GOVSS value will not be accurate.
+    * GOVSS value will not be accurate at best, worthless at worst.
     *
     * @return
     */
