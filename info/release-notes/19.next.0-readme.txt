@@ -4,7 +4,10 @@
 TODO's
 ======
 
-- Website: Update contributor/translator list 
+* Website
+  - Update contributor/translator list
+  - Show cheatsheet
+ 
 
 Bugs
 ----
