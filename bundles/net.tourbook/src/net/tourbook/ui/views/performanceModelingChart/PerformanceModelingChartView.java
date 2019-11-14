@@ -43,6 +43,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourManager;
+import net.tourbook.trainingstress.ITrainingStressDataListener;
 import net.tourbook.ui.UI;
 
 import org.eclipse.e4.ui.di.PersistState;
@@ -97,7 +98,7 @@ public class PerformanceModelingChartView extends ViewPart {
    private final IDialogSettings          _state        = TourbookPlugin.getState(ID);
 
    private IPropertyChangeListener        _prefChangeListener;
-//   private ITrainingStressDataListener    _trainingStressDataListener;
+   private ITrainingStressDataListener    _trainingStressDataListener;
 
    private ModifyListener                 _defaultSpinnerModifyListener;
    private SelectionAdapter               _defaultSpinnerSelectionListener;
@@ -217,23 +218,22 @@ public class PerformanceModelingChartView extends ViewPart {
       _prefStore.addPropertyChangeListener(_prefChangeListener);
    }
 
-   /*
-    * private void addTrainingStressDataListener() {
-    * //TODO when the user is changed, unregister the previous user from the listener and register
-    * the new one
-    * _trainingStressDataListener = new ITrainingStressDataListener() {
-    * @Override
-    * public void trainingStressDataIsModified() {
-    * updateUI_40_performanceModelingChart();
-    * }
-    * };
-    * _currentPerson = TourbookPlugin.getActivePerson();
-    * if (_currentPerson != null && _currentPerson.getPerformanceModelingData() != null) {
-    * _currentPerson.getPerformanceModelingData().addTrainingStressDataListener(
-    * _trainingStressDataListener);
-    * }
-    * }
-    */
+   private void addTrainingStressDataListener() {
+      //TODO when the user is changed, unregister the previous user from the listener and register
+      //final the new one
+
+      _currentPerson = TourbookPlugin.getActivePerson();
+
+      if (_currentPerson != null && _currentPerson.getPerformanceModelingData() != null) {
+         _currentPerson.getPerformanceModelingData().addTrainingStressDataListener(
+               new ITrainingStressDataListener() {
+                  @Override
+                  public void trainingStressDataIsModified() {
+                     updateUI_40_performanceModelingChart();
+                  }
+               });
+      }
+   }
 
    private void clearView() {
 
@@ -264,12 +264,11 @@ public class PerformanceModelingChartView extends ViewPart {
       _pageBook.showPage(_page_NoPerson);
 
       addPrefListener();
-      // addTrainingStressDataListener();
+      addTrainingStressDataListener();
 
       restoreState();
 
       updateUI_10_stressScoreValuesFromModel();
-
 
    }
 

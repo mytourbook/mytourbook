@@ -29,6 +29,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
+import javax.persistence.Transient;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.time.TimeTools;
@@ -36,6 +37,7 @@ import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourManager;
+import net.tourbook.trainingstress.ITrainingStressDataListener;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 
@@ -46,7 +48,9 @@ public class PerformanceModelingData {
 
    private static IPreferenceStore             _prefStore                               = TourbookPlugin.getPrefStore();
    private static int                          _fitnessDecayTime                        = _prefStore.getInt(ITourbookPreferences.FITNESS_DECAY);
-   // private ITrainingStressDataListener         _trainingStressDataListener;
+
+   @Transient
+   private ITrainingStressDataListener         _trainingStressDataListener;
 
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -79,9 +83,9 @@ public class PerformanceModelingData {
     */
    public PerformanceModelingData() {}
 
-   // public void addTrainingStressDataListener(final ITrainingStressDataListener listener) {
-   //   _trainingStressDataListener = listener;
-   // }
+   public void addTrainingStressDataListener(final ITrainingStressDataListener listener) {
+      _trainingStressDataListener = listener;
+   }
 
    public void computeFatigueValues() {
       // TODO Auto-generated method stub
@@ -201,7 +205,9 @@ public class PerformanceModelingData {
 
       updateSkibaFitnessValues(tourStartDate);
 
-      // _trainingStressDataListener.trainingStressDataIsModified();
+      if (_trainingStressDataListener != null) {
+         _trainingStressDataListener.trainingStressDataIsModified();
+      }
 
    }
 
