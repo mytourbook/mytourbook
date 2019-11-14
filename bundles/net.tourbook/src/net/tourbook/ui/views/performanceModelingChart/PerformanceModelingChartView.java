@@ -97,6 +97,7 @@ public class PerformanceModelingChartView extends ViewPart {
    private final IDialogSettings          _state        = TourbookPlugin.getState(ID);
 
    private IPropertyChangeListener        _prefChangeListener;
+//   private ITrainingStressDataListener    _trainingStressDataListener;
 
    private ModifyListener                 _defaultSpinnerModifyListener;
    private SelectionAdapter               _defaultSpinnerSelectionListener;
@@ -216,6 +217,24 @@ public class PerformanceModelingChartView extends ViewPart {
       _prefStore.addPropertyChangeListener(_prefChangeListener);
    }
 
+   /*
+    * private void addTrainingStressDataListener() {
+    * //TODO when the user is changed, unregister the previous user from the listener and register
+    * the new one
+    * _trainingStressDataListener = new ITrainingStressDataListener() {
+    * @Override
+    * public void trainingStressDataIsModified() {
+    * updateUI_40_performanceModelingChart();
+    * }
+    * };
+    * _currentPerson = TourbookPlugin.getActivePerson();
+    * if (_currentPerson != null && _currentPerson.getPerformanceModelingData() != null) {
+    * _currentPerson.getPerformanceModelingData().addTrainingStressDataListener(
+    * _trainingStressDataListener);
+    * }
+    * }
+    */
+
    private void clearView() {
 
       _currentPerson = null;
@@ -245,10 +264,12 @@ public class PerformanceModelingChartView extends ViewPart {
       _pageBook.showPage(_page_NoPerson);
 
       addPrefListener();
+      // addTrainingStressDataListener();
 
       restoreState();
 
       updateUI_10_stressScoreValuesFromModel();
+
 
    }
 
@@ -825,6 +846,7 @@ public class PerformanceModelingChartView extends ViewPart {
 
       // show the new data data model in the chart
       _chartPerformanceModelingData.updateChart(chartDataModel, false);
+      // _chartPerformanceModelingData.up = TourManager.getInstance().getActivePerformanceModelingChartView();
    }
 
 }

@@ -46,6 +46,7 @@ public class PerformanceModelingData {
 
    private static IPreferenceStore             _prefStore                               = TourbookPlugin.getPrefStore();
    private static int                          _fitnessDecayTime                        = _prefStore.getInt(ITourbookPreferences.FITNESS_DECAY);
+   // private ITrainingStressDataListener         _trainingStressDataListener;
 
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -78,6 +79,10 @@ public class PerformanceModelingData {
     */
    public PerformanceModelingData() {}
 
+   // public void addTrainingStressDataListener(final ITrainingStressDataListener listener) {
+   //   _trainingStressDataListener = listener;
+   // }
+
    public void computeFatigueValues() {
       // TODO Auto-generated method stub
 
@@ -96,9 +101,7 @@ public class PerformanceModelingData {
     */
    private int computeFitnessValue(final int numberOfDays, final int previousFitnessValue, final int totalGovss) {
 
-      final float exponent = numberOfDays * -1f / _fitnessDecayTime;
-
-      final int fitnessValue = (int) (previousFitnessValue * Math.exp(exponent) + totalGovss);
+      final int fitnessValue = computeResponseValue(_fitnessDecayTime, numberOfDays, previousFitnessValue, totalGovss);
 
       return fitnessValue;
    }
@@ -106,6 +109,26 @@ public class PerformanceModelingData {
    public void computeFitnessValues() {
       // TODO Auto-generated method stub
 
+   }
+
+   /**
+    * Computes the response level value for a given date and a given previous training data
+    *
+    * @param decayTime
+    * @param numberOfDays
+    *           The number of days between the current's day of training and the previous day of
+    *           training.
+    * @param previousResponseValue
+    * @param trainingStressValue
+    * @return
+    */
+   private int computeResponseValue(final int decayTime, final int numberOfDays, final int previousResponseValue, final int trainingStressValue) {
+
+      final float exponent = numberOfDays * -1f / decayTime;
+
+      final int responseValue = (int) (previousResponseValue * Math.exp(exponent) + trainingStressValue);
+
+      return responseValue;
    }
 
    public HashMap<LocalDate, Integer> getFitnessValuesSkiba() {
@@ -177,6 +200,8 @@ public class PerformanceModelingData {
       }
 
       updateSkibaFitnessValues(tourStartDate);
+
+      // _trainingStressDataListener.trainingStressDataIsModified();
 
    }
 
