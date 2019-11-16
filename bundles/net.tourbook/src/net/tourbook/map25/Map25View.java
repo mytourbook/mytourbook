@@ -1118,9 +1118,12 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
    @Override
    public MapLocation getMapLocation() {
 
-      final MapPosition_with_MarkerPosition mapPosition = (MapPosition_with_MarkerPosition) _mapApp.getMap().getMapPosition();
+      final MapPosition_with_MarkerPosition mapPosition2 = new MapPosition_with_MarkerPosition(_mapApp.getMap().getMapPosition());
+      
+      //final MapPosition_with_MarkerPosition mapPosition = (MapPosition_with_MarkerPosition) _mapApp.getMap().getMapPosition();
+      //final MapPosition mapPosition =  _mapApp.getMap().getMapPosition();
 
-      return new MapLocation(mapPosition);
+      return new MapLocation(mapPosition2);
    }
 
    @Override

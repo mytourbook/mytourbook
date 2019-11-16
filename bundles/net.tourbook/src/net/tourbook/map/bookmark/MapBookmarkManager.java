@@ -302,6 +302,7 @@ public class MapBookmarkManager {
 
       newBookmark.name = addDialog.getValue();
       newBookmark.setMapPosition(mapLocation.getMapPosition());
+//here we need to set mapMarkerPosition
 
       _allBookmarks.add(newBookmark);
 
@@ -660,6 +661,8 @@ public class MapBookmarkManager {
       mapPosition2.tilt = Util.getXmlFloat(xmlBookmark, ATTR_MAP_POSITION_TILT, 0f);
       mapPosition2.zoomLevel = Util.getXmlInteger(xmlBookmark, ATTR_MAP_POSITION_ZOOM_LEVEL, 1);
      
+      //net.tourbook.map25.Map25App.debugPrint("++++ MapBookmarkManager: parse_22_Bookmarks_One: name: " + bookmark.name + " x: " + mapPosition2.mapPositionMarkerX + " lat: " + mapPosition2.x);
+      
       
       if (mapPosition2.mapPositionMarkerX == invalidPosition || mapPosition2.mapPositionMarkerY == invalidPosition) {
          net.tourbook.map25.Map25App.debugPrint("++++ MapBookmarkManager: parse_22_Bookmarks_One: markerPos not in xml, migrating...");

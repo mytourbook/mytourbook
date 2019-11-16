@@ -27,6 +27,9 @@ public class MapBookmark {
 
 	private double		_latitude;
 	private double		_longitude;
+	
+	private double   _mapPositionMarkerLatitude;
+   private double   _mapPositionMarkerLongitude;
 
 	private MapPosition_with_MarkerPosition	_mapPosition;
 
@@ -65,6 +68,16 @@ public class MapBookmark {
 	public double getLongitude() {
 		return _longitude;
 	}
+	
+	public double get_mapPositionMarkerLatitude() {
+	   return _mapPositionMarkerLatitude;
+	}
+
+	public double get_mapPositionMarkerLongitude() {
+	   return _mapPositionMarkerLongitude;
+	}
+
+
 
 	public MapPosition_with_MarkerPosition getMapPosition() {
 		return _mapPosition;
@@ -87,6 +100,11 @@ public class MapBookmark {
 
 		_latitude = mapPosition.getLatitude();
 		_longitude = mapPosition.getLongitude();
+		
+		_mapPositionMarkerLatitude = mapPosition.getMarkerLatitude();
+		_mapPositionMarkerLongitude = mapPosition.getMarkerLongitude();
+		
+		
 	}
 
 	@Override
@@ -99,8 +117,10 @@ public class MapBookmark {
 
 				+ "id=" + id + ", " //$NON-NLS-1$ //$NON-NLS-2$
 				+ "name=" + name + ", " //$NON-NLS-1$ //$NON-NLS-2$
-				//				+ "latitude=" + latitude + ", "
-				//				+ "longitude=" + longitude
+				+ "latitude=" + _latitude + ", "
+				+ "longitude=" + _longitude + ", "
+	         + "marker lat=" + _mapPositionMarkerLatitude + ", "
+	         + "marker long=" +_mapPositionMarkerLongitude + ", "		
 
 				+ "]"; //$NON-NLS-1$
 	}
