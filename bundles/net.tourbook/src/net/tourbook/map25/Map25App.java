@@ -29,6 +29,7 @@ import net.tourbook.common.UI;
 
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
+import net.tourbook.map.bookmark.MapPosition_with_MarkerPosition;
 import net.tourbook.map25.Map25TileSource.Builder;
 import net.tourbook.map25.OkHttpEngineMT.OkHttpFactoryMT;
 import net.tourbook.map25.layer.labeling.LabelLayerMT;
@@ -688,7 +689,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
 		final String stateSuffixName = '_' + suffixName;
 
-		final MapPosition mapPosition = mMap.getMapPosition();
+		final MapPosition_with_MarkerPosition mapPosition = (MapPosition_with_MarkerPosition) mMap.getMapPosition();
 
 		_state.put(STATE_MAP_POS_X + stateSuffixName, mapPosition.x);
 		_state.put(STATE_MAP_POS_Y + stateSuffixName, mapPosition.y);

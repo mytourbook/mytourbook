@@ -52,6 +52,7 @@ import net.tourbook.map.bookmark.IMapBookmarks;
 import net.tourbook.map.bookmark.MapBookmark;
 import net.tourbook.map.bookmark.MapBookmarkManager;
 import net.tourbook.map.bookmark.MapLocation;
+import net.tourbook.map.bookmark.MapPosition_with_MarkerPosition;
 import net.tourbook.map25.action.ActionMap25_ShowMarker;
 import net.tourbook.map25.action.ActionShowEntireTour;
 import net.tourbook.map25.action.ActionShowPhotos;
@@ -1117,7 +1118,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
    @Override
    public MapLocation getMapLocation() {
 
-      final MapPosition mapPosition = _mapApp.getMap().getMapPosition();
+      final MapPosition_with_MarkerPosition mapPosition = (MapPosition_with_MarkerPosition) _mapApp.getMap().getMapPosition();
 
       return new MapLocation(mapPosition);
    }

@@ -72,6 +72,7 @@ import net.tourbook.map.bookmark.IMapBookmarkListener;
 import net.tourbook.map.bookmark.IMapBookmarks;
 import net.tourbook.map.bookmark.MapBookmark;
 import net.tourbook.map.bookmark.MapBookmarkManager;
+import net.tourbook.map.bookmark.MapPosition_with_MarkerPosition;
 import net.tourbook.map.bookmark.MapLocation;
 import net.tourbook.map.bookmark.IMapBookmarks.MapBookmarkEventType;
 import net.tourbook.map2.view.IDiscreteColorProvider;
@@ -1368,7 +1369,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 	@Override
 	public MapLocation getMapLocation() {
 
-		final MapPosition mapPosition = getMapPosition();
+		final MapPosition_with_MarkerPosition mapPosition = getMapPosition();
 
 		if (mapPosition == null) {
 			return null;
@@ -1377,7 +1378,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 		return new MapLocation(mapPosition);
 	}
 
-	private MapPosition getMapPosition() {
+	private MapPosition_with_MarkerPosition getMapPosition() {
 
 		final View view = _wwCanvas.getView();
 
@@ -1403,7 +1404,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
 		final double zoomLevel = 20 - Math.log(elevation);
 
-		final MapPosition mapPosition = new MapLocation(geoCenter, (int) zoomLevel + 2).getMapPosition();
+		final MapPosition_with_MarkerPosition mapPosition = new MapLocation(geoCenter, (int) zoomLevel + 2).getMapPosition();
 
 		mapPosition.bearing = -(float) basicView.getHeading().getDegrees();
 		mapPosition.tilt = (float) basicView.getPitch().getDegrees();

@@ -28,7 +28,7 @@ public class MapBookmark {
 	private double		_latitude;
 	private double		_longitude;
 
-	private MapPosition	_mapPosition;
+	private MapPosition_with_MarkerPosition	_mapPosition;
 
 	@Override
 	public boolean equals(final Object obj) {
@@ -66,7 +66,7 @@ public class MapBookmark {
 		return _longitude;
 	}
 
-	public MapPosition getMapPosition() {
+	public MapPosition_with_MarkerPosition getMapPosition() {
 		return _mapPosition;
 	}
 
@@ -81,7 +81,7 @@ public class MapBookmark {
 		return result;
 	}
 
-	public void setMapPosition(final MapPosition mapPosition) {
+	public void setMapPosition(final MapPosition_with_MarkerPosition mapPosition) {
 
 		_mapPosition = mapPosition;
 

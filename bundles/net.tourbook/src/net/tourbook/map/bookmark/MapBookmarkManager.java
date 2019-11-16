@@ -637,17 +637,18 @@ public class MapBookmarkManager {
       /*
        * Map position
        */
-      final MapPosition mapPosition = new MapPosition();
+      //final MapPosition mapPosition = new MapPosition();
+      //TODO renaming mapPosition2 into mapPosition, and removing line above
       
       final MapPosition_with_MarkerPosition mapPosition2 = new MapPosition_with_MarkerPosition();
       //mapPosition needs to be extend with markerPosition
 
-      mapPosition.x = Util.getXmlDouble(xmlBookmark, ATTR_MAP_POSITION_X, 0.5);
-      mapPosition.y = Util.getXmlDouble(xmlBookmark, ATTR_MAP_POSITION_Y, 0.5);
-      mapPosition.scale = Util.getXmlDouble(xmlBookmark, ATTR_MAP_POSITION_SCALE, 1);
+      mapPosition2.x = Util.getXmlDouble(xmlBookmark, ATTR_MAP_POSITION_X, 0.5);
+      mapPosition2.y = Util.getXmlDouble(xmlBookmark, ATTR_MAP_POSITION_Y, 0.5);
+      mapPosition2.scale = Util.getXmlDouble(xmlBookmark, ATTR_MAP_POSITION_SCALE, 1);
       
       /* version <= 19.10 do not have mapPositionMarkerXY
-       * so if not found set value first to invalid value and
+       * so if not found set value first to "invalidPosition" and
        * later to mapposition.xy
        * should only happen one time, when starting first time after upgrading from version <= 19.10
       */
@@ -655,19 +656,19 @@ public class MapBookmarkManager {
       mapPosition2.mapPositionMarkerX = Util.getXmlDouble(xmlBookmark, ATTR_MAP_POSITION_MARKER_X, invalidPosition);
       mapPosition2.mapPositionMarkerY = Util.getXmlDouble(xmlBookmark, ATTR_MAP_POSITION_MARKER_Y, invalidPosition);
 
-      mapPosition.bearing = Util.getXmlFloat(xmlBookmark, ATTR_MAP_POSITION_BEARING, 0f);
-      mapPosition.tilt = Util.getXmlFloat(xmlBookmark, ATTR_MAP_POSITION_TILT, 0f);
-      mapPosition.zoomLevel = Util.getXmlInteger(xmlBookmark, ATTR_MAP_POSITION_ZOOM_LEVEL, 1);
+      mapPosition2.bearing = Util.getXmlFloat(xmlBookmark, ATTR_MAP_POSITION_BEARING, 0f);
+      mapPosition2.tilt = Util.getXmlFloat(xmlBookmark, ATTR_MAP_POSITION_TILT, 0f);
+      mapPosition2.zoomLevel = Util.getXmlInteger(xmlBookmark, ATTR_MAP_POSITION_ZOOM_LEVEL, 1);
      
       
-      if (mapPosition2.mapPositionMarkerX >= 1.0 || mapPosition2.mapPositionMarkerY > 1.0) {
+      if (mapPosition2.mapPositionMarkerX == invalidPosition || mapPosition2.mapPositionMarkerY == invalidPosition) {
          net.tourbook.map25.Map25App.debugPrint("++++ MapBookmarkManager: parse_22_Bookmarks_One: markerPos not in xml, migrating...");
-         mapPosition2.mapPositionMarkerX = mapPosition.x;
-         mapPosition2.mapPositionMarkerY = mapPosition.y;
+         mapPosition2.mapPositionMarkerX = mapPosition2.x;
+         mapPosition2.mapPositionMarkerY = mapPosition2.y;
       }
       
       
-      bookmark.setMapPosition(mapPosition);
+      bookmark.setMapPosition(mapPosition2);
    }
 
    private static void parse_30_RecentBookmarks(final XMLMemento xmlRoot,
@@ -833,7 +834,7 @@ public class MapBookmarkManager {
             /*
              * Map position
              */
-            final MapPosition mapPosition = bookmark.getMapPosition();
+            final MapPosition_with_MarkerPosition mapPosition = bookmark.getMapPosition();
 
             Util.setXmlDouble(xmlBookmark, ATTR_MAP_POSITION_X, mapPosition.x);
             Util.setXmlDouble(xmlBookmark, ATTR_MAP_POSITION_Y, mapPosition.y);
