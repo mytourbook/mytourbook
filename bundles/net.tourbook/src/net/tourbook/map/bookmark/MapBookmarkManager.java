@@ -839,6 +839,9 @@ public class MapBookmarkManager {
             Util.setXmlDouble(xmlBookmark, ATTR_MAP_POSITION_X, mapPosition.x);
             Util.setXmlDouble(xmlBookmark, ATTR_MAP_POSITION_Y, mapPosition.y);
             Util.setXmlDouble(xmlBookmark, ATTR_MAP_POSITION_SCALE, mapPosition.scale);
+            
+            Util.setXmlDouble(xmlBookmark, ATTR_MAP_POSITION_MARKER_X, mapPosition.mapPositionMarkerX);
+            Util.setXmlDouble(xmlBookmark, ATTR_MAP_POSITION_MARKER_Y, mapPosition.mapPositionMarkerY);
 
             xmlBookmark.putFloat(ATTR_MAP_POSITION_BEARING, mapPosition.bearing);
             xmlBookmark.putFloat(ATTR_MAP_POSITION_TILT, mapPosition.tilt);

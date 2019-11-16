@@ -689,8 +689,9 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
 		final String stateSuffixName = '_' + suffixName;
 
-		final MapPosition_with_MarkerPosition mapPosition = (MapPosition_with_MarkerPosition) mMap.getMapPosition();
-
+		final MapPosition mapPosition = mMap.getMapPosition();
+		//final MapPosition_with_MarkerPosition mapPosition2 = (MapPosition_with_MarkerPosition) mMap.getMapPosition();
+	
 		_state.put(STATE_MAP_POS_X + stateSuffixName, mapPosition.x);
 		_state.put(STATE_MAP_POS_Y + stateSuffixName, mapPosition.y);
 		_state.put(STATE_MAP_POS_BEARING + stateSuffixName, mapPosition.bearing);
