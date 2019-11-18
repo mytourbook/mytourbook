@@ -70,8 +70,8 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
    
    Display  _display;
    
-   private Thread _showPhotoThread = null;
-   private Display _showPhotoDisplay = null;
+   //private Thread _showPhotoThread = null;
+   //private Display _showPhotoDisplay = null;
    private Shell _showPhotoShell = null;
    private Canvas _showPhotoCanvas = null;
    
@@ -344,38 +344,29 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
          return;
       }
 
-      _showPhotoThread = new Thread() {
-         @Override
-         public void run() {
-            if (_showPhotoDisplay == null) {
-               _showPhotoDisplay = new Display();
-               _showPhotoShell = new Shell(_showPhotoDisplay);
-               _showPhotoShell.setSize(image.getBounds().width, image.getBounds().height);
-               _showPhotoShell.setText("Photo");
-               _showPhotoShell.setLayout(new FillLayout());
-               _showPhotoCanvas = new Canvas(_showPhotoShell, SWT.NONE);
-            }
+      final Display display = new Display();
+      final Shell shell = new Shell(display);
+      shell.setSize(image.getBounds().width, image.getBounds().height);
+      shell.setText("Photo");
+      shell.setLayout(new FillLayout());
+      Canvas canvas = new Canvas(shell, SWT.NONE);
 
-            _showPhotoCanvas.addPaintListener(new PaintListener() {
-               public void paintControl(PaintEvent e) {
-                  e.gc.drawImage(image, 10, 10);
-                  image.dispose();
-               }
-            });
-
-            _showPhotoShell.open();
-            while (!_showPhotoShell.isDisposed()) {
-               if (!_showPhotoDisplay.readAndDispatch()) {
-                  _showPhotoDisplay.sleep();
-               }
-            }
-            _showPhotoDisplay.dispose();
+      canvas.addPaintListener(new PaintListener() {
+         public void paintControl(PaintEvent e) {
+            e.gc.drawImage(image, 10, 10);
+            image.dispose();
          }
-      };
-      _showPhotoThread.run();
-   }
+      });
 
-   
+      shell.open();
+      while (!shell.isDisposed()) {
+         if (!display.readAndDispatch()) {
+            display.sleep();
+         }
+      }
+
+      display.dispose();
+   }
    
    @Override
    public boolean onItemLongPress(int index, MarkerItem photoItem) {
