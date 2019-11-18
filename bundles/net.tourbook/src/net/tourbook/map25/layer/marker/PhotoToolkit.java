@@ -70,6 +70,11 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
    
    Display  _display;
    
+   private Thread _showPhotoThread = null;
+   private Display _showPhotoDisplay = null;
+   private Shell _showPhotoShell = null;
+   private Canvas _showPhotoCanvas = null;
+   
    private Map25App _mapApp;
 
    private class LoadCallbackImage implements ILoadCallBack {
@@ -339,40 +344,35 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
          return;
       }
 
-      final Display display = new Display();
-      final Shell shell = new Shell(display);
-      shell.setSize(PhotoLoadManager.IMAGE_SIZE_LARGE_DEFAULT, PhotoLoadManager.IMAGE_SIZE_LARGE_DEFAULT);
-      shell.setText("Photo");
-      shell.setLayout(new FillLayout());
-      Canvas canvas = new Canvas(shell, SWT.NONE);
+      _showPhotoThread = new Thread() {
+         @Override
+         public void run() {
+            if (_showPhotoDisplay == null) {
+               _showPhotoDisplay = new Display();
+               _showPhotoShell = new Shell(_showPhotoDisplay);
+               _showPhotoShell.setSize(image.getBounds().width, image.getBounds().height);
+               _showPhotoShell.setText("Photo");
+               _showPhotoShell.setLayout(new FillLayout());
+               _showPhotoCanvas = new Canvas(_showPhotoShell, SWT.NONE);
+            }
 
+            _showPhotoCanvas.addPaintListener(new PaintListener() {
+               public void paintControl(PaintEvent e) {
+                  e.gc.drawImage(image, 10, 10);
+                  image.dispose();
+               }
+            });
 
-      canvas.addPaintListener(new PaintListener() {
-         public void paintControl(PaintEvent e) {
-            //image = getPhotoImage(photo, PhotoLoadManager.IMAGE_SIZE_LARGE_DEFAULT);
-//            Image image = null;
-//            try {
-//               image = new Image(display, new FileInputStream(photo.imageFilePathName));
-//            } catch (FileNotFoundException e1) {
-//               e1.printStackTrace();
-//            }
-
-            e.gc.drawImage(image, 10, 10);
-
-            image.dispose();
+            _showPhotoShell.open();
+            while (!_showPhotoShell.isDisposed()) {
+               if (!_showPhotoDisplay.readAndDispatch()) {
+                  _showPhotoDisplay.sleep();
+               }
+            }
+            _showPhotoDisplay.dispose();
          }
-      });
-
-      shell.open();
-      while (!shell.isDisposed()) {
-         if (!display.readAndDispatch()) {
-            display.sleep();
-         }
-      }
-
-      display.dispose();
-
-
+      };
+      _showPhotoThread.run();
    }
 
    
@@ -389,7 +389,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
    public boolean onItemSingleTapUp(int index, MarkerItem photoItem) {
       // TODO Auto-generated method stub
       debugPrint(" ??????????? PhotoToolkit *** onItemSingleTapUp(int index, MarkerItem photoItem): " + _allPhotos.get(index).imageFilePathName + " " + photoItem.getTitle());
-      //showPhoto(_allPhotos.get(index));
+      showPhoto(_allPhotos.get(index));
       return false;
    }
 
