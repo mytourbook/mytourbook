@@ -347,7 +347,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
       final Display display = new Display();
       final Shell shell = new Shell(display);
       shell.setSize(image.getBounds().width, image.getBounds().height);
-      shell.setText("Photo");
+      shell.setText(photo.imageFileName);
       shell.setLayout(new FillLayout());
       Canvas canvas = new Canvas(shell, SWT.NONE);
 
