@@ -190,14 +190,16 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
                Math.abs(photo.getImageMetaData().longitude) > Double.MIN_VALUE
                )
          {
-//            Map25App.debugPrint(" Map25View: *** createPhotoItemList: using exif geo");
+//            Map25App.debugPrint("PhotoToolkit: *** createPhotoItemList: using exif geo");
             photoLat = photo.getImageMetaData().latitude;
             photoLon = photo.getImageMetaData().longitude;
          } else {
-            Map25App.debugPrint(" Map25View: *** createPhotoItemList: using tour geo");
+            Map25App.debugPrint("PhotoToolkit: *** createPhotoItemList: using tour geo");
             photoLat = photo.getTourLatitude();
             photoLon = photo.getTourLongitude();
          }
+         
+         //Map25App.debugPrint("PhotoToolkit: *** createPhotoItemList Name: " + photo.getImageMetaData().objectName + " Description: " + photo.getImageMetaData().captionAbstract);
          
          MarkerItem item = new MarkerItem(photoKey, photoName, photoDescription,
                new GeoPoint(photoLat, photoLon)

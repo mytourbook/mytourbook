@@ -101,6 +101,7 @@ public class MapBookmark {
 		_latitude = mapPosition.getLatitude();
 		_longitude = mapPosition.getLongitude();
 		
+		//this should be in a seperate methode like "setMapMarkerPosition():
 		_mapPositionMarkerLatitude = mapPosition.getMarkerLatitude();
 		_mapPositionMarkerLongitude = mapPosition.getMarkerLongitude();
 		
