@@ -95,18 +95,26 @@ public class MapBookmark {
 	}
 
 	public void setMapPosition(final MapPosition_with_MarkerPosition mapPosition) {
-
 		_mapPosition = mapPosition;
 
 		_latitude = mapPosition.getLatitude();
 		_longitude = mapPosition.getLongitude();
 		
 		//this should be in a seperate methode like "setMapMarkerPosition():
-		_mapPositionMarkerLatitude = mapPosition.getMarkerLatitude();
-		_mapPositionMarkerLongitude = mapPosition.getMarkerLongitude();
-		
+		//_mapPositionMarkerLatitude = mapPosition.getMarkerLatitude();
+		//_mapPositionMarkerLongitude = mapPosition.getMarkerLongitude();
 		
 	}
+	
+	  public void setMapPositionMarker(final MapPosition_with_MarkerPosition mapPosition) {
+
+	      _mapPosition = mapPosition;
+
+	      _mapPositionMarkerLatitude = mapPosition.getMarkerLatitude();
+	      _mapPositionMarkerLongitude = mapPosition.getMarkerLongitude();
+	      
+	   }
+	
 
 	@Override
 	public String toString() {
@@ -121,8 +129,8 @@ public class MapBookmark {
 				+ "latitude=" + _latitude + ", "
 				+ "longitude=" + _longitude + ", "
 	         + "marker lat=" + _mapPositionMarkerLatitude + ", "
-	         + "marker long=" +_mapPositionMarkerLongitude + ", "		
-
+	         + "marker long=" + _mapPositionMarkerLongitude + ", "		
+	         + "bearing=" + _mapPosition.bearing + ", "
 				+ "]"; //$NON-NLS-1$
 	}
 

@@ -398,6 +398,8 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
       defineColumn_50_Tilt();
       defineColumn_60_Latitude();
       defineColumn_70_Longitude();
+      defineColumn_80_PositionMarkerLatitude();
+      defineColumn_90_PositionMarkerLongitude();
    }
 
    /**
@@ -613,6 +615,60 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
       });
    }
 
+   /**
+    * Column: Map Positionmarker Latitude
+    */
+   private void defineColumn_80_PositionMarkerLatitude() {
+
+      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "PositionMarkerLatitude", SWT.TRAIL); //$NON-NLS-1$
+
+      colDef.setColumnLabel("Map_Bookmark_Column_PositionMarkerLatitude_Tooltip");
+      colDef.setColumnHeaderText("Map_Bookmark_Column_PositionMarkerLatitude");
+      colDef.setColumnHeaderToolTipText("Map_Bookmark_Column_PositionMarkerLatitude_Tooltip");
+
+      colDef.setIsDefaultColumn();
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(9));
+//      colDef.setColumnWeightData(new ColumnWeightData(9));
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final MapBookmark bookmark = (MapBookmark) cell.getElement();
+            final String valueText = _nfLatLon.format(bookmark.get_mapPositionMarkerLatitude());
+
+            cell.setText(valueText);
+         }
+      });
+   }
+   
+   /**
+    * Column: Positionmarker Longitude
+    */
+   private void defineColumn_90_PositionMarkerLongitude() {
+
+      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "PositionMarkerLongitude", SWT.TRAIL); //$NON-NLS-1$
+
+      colDef.setColumnLabel("Map_Bookmark_Column_PositionMarkerLongitude_Tooltip");
+      colDef.setColumnHeaderText("Map_Bookmark_Column_PositionMarkerLongitude");
+      colDef.setColumnHeaderToolTipText("Map_Bookmark_Column_PositionMarkerLongitude_Tooltip");
+
+      colDef.setIsDefaultColumn();
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(9));
+//      colDef.setColumnWeightData(new ColumnWeightData(9));
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final MapBookmark bookmark = (MapBookmark) cell.getElement();
+            final String valueText = _nfLatLon.format(bookmark.get_mapPositionMarkerLongitude());
+
+            cell.setText(valueText);
+         }
+      });
+   }   
+   
    @Override
    public void dispose() {
 

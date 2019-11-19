@@ -79,7 +79,15 @@ public class MapPosition_with_MarkerPosition extends org.oscim.core.MapPosition{
    } 
    
    public MapPosition_with_MarkerPosition(MapPosition mapPosition) {
-      super(mapPosition.getLatitude(), mapPosition.getLongitude(), mapPosition.getScale());
+      super(mapPosition.getLatitude(), mapPosition.getLongitude(), mapPosition.scale);
+      this.bearing = mapPosition.bearing;
+      this.roll = mapPosition.roll;
+      this.zoomLevel = mapPosition.zoomLevel;
+      this.tilt = mapPosition.tilt;
+      this.roll = mapPosition.roll;
+      this.x = mapPosition.x;
+      this.y = mapPosition.y;
+      //super(mapPosition.getLatitude(), mapPosition.getLongitude(), mapPosition.getScale());
       this.mapPositionMarkerX = mapPosition.x;
       this.mapPositionMarkerY = mapPosition.y;
       System.out.println("constructor: " + mapPosition.getLatitude() + " lon: " + mapPosition.getLongitude());

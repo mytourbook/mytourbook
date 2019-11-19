@@ -28,6 +28,7 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.map.bookmark.IMapBookmarks.MapBookmarkEventType;
+import net.tourbook.map2.view.Map2View;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.ListenerList;
@@ -303,6 +304,7 @@ public class MapBookmarkManager {
       newBookmark.name = addDialog.getValue();
       newBookmark.setMapPosition(mapLocation.getMapPosition());
 //here we need to set mapMarkerPosition
+      newBookmark.setMapPositionMarker(mapLocation.getMapPosition());
 
       _allBookmarks.add(newBookmark);
 
@@ -661,17 +663,17 @@ public class MapBookmarkManager {
       mapPosition2.tilt = Util.getXmlFloat(xmlBookmark, ATTR_MAP_POSITION_TILT, 0f);
       mapPosition2.zoomLevel = Util.getXmlInteger(xmlBookmark, ATTR_MAP_POSITION_ZOOM_LEVEL, 1);
      
-      //net.tourbook.map25.Map25App.debugPrint("++++ MapBookmarkManager: parse_22_Bookmarks_One: name: " + bookmark.name + " x: " + mapPosition2.mapPositionMarkerX + " lat: " + mapPosition2.x);
-      
+   
       
       if (mapPosition2.mapPositionMarkerX == invalidPosition || mapPosition2.mapPositionMarkerY == invalidPosition) {
          net.tourbook.map25.Map25App.debugPrint("++++ MapBookmarkManager: parse_22_Bookmarks_One: markerPos not in xml, migrating...");
          mapPosition2.mapPositionMarkerX = mapPosition2.x;
          mapPosition2.mapPositionMarkerY = mapPosition2.y;
       }
-      
+      net.tourbook.map25.Map25App.debugPrint("++++ MapBookmarkManager: parse_22_Bookmarks_One: name: " + bookmark.name + " markerpos_x: " + mapPosition2.mapPositionMarkerX + " pos_x: " + mapPosition2.x );   
       
       bookmark.setMapPosition(mapPosition2);
+      bookmark.setMapPositionMarker(mapPosition2);
    }
 
    private static void parse_30_RecentBookmarks(final XMLMemento xmlRoot,
