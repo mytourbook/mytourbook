@@ -103,7 +103,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
    
    public PhotoToolkit() {
       super(MarkerShape.CIRCLE);
-      debugPrint(" ?? PhotoToolkit + *** Constructor"); //$NON-NLS-1$
+      //debugPrint(" ?? PhotoToolkit + *** Constructor"); //$NON-NLS-1$
       final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 
       loadConfig();
@@ -333,7 +333,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
    }
  
    public void updatePhotos() {
-      net.tourbook.map25.Map25App.debugPrint("???? PhotoToolkit: Update Photos");
+      //net.tourbook.map25.Map25App.debugPrint("???? PhotoToolkit: Update Photos");
       _mapApp.updateUI_PhotoLayer();
    }
 

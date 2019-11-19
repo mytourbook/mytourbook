@@ -372,6 +372,7 @@ public class MapBookmarkManager {
             final MapLocation mapLocation = mapBookmarks.getMapLocation();
 
             lastSelectedBookmark.setMapPosition(mapLocation.getMapPosition());
+            //lastSelectedBookmark.setMapPositionMarker(mapLocation.getMapPosition());  //doesnt contain marker
 
             onUpdateBookmark(lastSelectedBookmark);
          }
@@ -670,6 +671,7 @@ public class MapBookmarkManager {
          mapPosition2.mapPositionMarkerX = mapPosition2.x;
          mapPosition2.mapPositionMarkerY = mapPosition2.y;
       }
+      
       net.tourbook.map25.Map25App.debugPrint("++++ MapBookmarkManager: parse_22_Bookmarks_One: name: " + bookmark.name + " markerpos_x: " + mapPosition2.mapPositionMarkerX + " pos_x: " + mapPosition2.x );   
       
       bookmark.setMapPosition(mapPosition2);
@@ -851,6 +853,7 @@ public class MapBookmarkManager {
             xmlBookmark.putFloat(ATTR_MAP_POSITION_BEARING, mapPosition.bearing);
             xmlBookmark.putFloat(ATTR_MAP_POSITION_TILT, mapPosition.tilt);
             xmlBookmark.putInteger(ATTR_MAP_POSITION_ZOOM_LEVEL, mapPosition.zoomLevel);
+            
          }
       }
    }
