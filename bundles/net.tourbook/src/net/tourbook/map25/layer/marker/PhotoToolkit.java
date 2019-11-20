@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
@@ -37,6 +38,7 @@ import de.byteholder.geoclipse.map.Map;
 import de.byteholder.geoclipse.map.Tile;
 import net.tourbook.common.color.ColorUtil;
 import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.map.bookmark.MapBookmark;
@@ -70,12 +72,11 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
    
    Display  _display;
    
-   //private Thread _showPhotoThread = null;
-   //private Display _showPhotoDisplay = null;
-   private Shell _showPhotoShell = null;
-   private Canvas _showPhotoCanvas = null;
-   
    private Map25App _mapApp;
+   
+//   private int  _imageSize;
+//   private static final String      STATE_PHOTO_PROPERTIES_IMAGE_SIZE      = "STATE_PHOTO_PROPERTIES_IMAGE_SIZE";       //$NON-NLS-1$
+//   private IDialogSettings       _state;
 
    private class LoadCallbackImage implements ILoadCallBack {
 
@@ -165,11 +166,6 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
          String photoName = "";
          UUID photoKey = UUID.randomUUID();
 
-//         Map25App.debugPrint(" Map25View: *** createPhotoItemList: meta_lat: " + photo.getImageMetaData().latitude);
-//         Map25App.debugPrint(" Map25View: *** createPhotoItemList: tour_lat: " + photo.getTourLatitude());
-//         Map25App.debugPrint(" Map25View: *** createPhotoItemList: from exif: " + photo.isGeoFromExif);
-//         Map25App.debugPrint(" Map25View: *** createPhotoItemList: minimum:  " + Double.MIN_VALUE);
-      
          stars = photo.ratingStars;
          //starText = "";
          switch (stars) {
@@ -292,27 +288,25 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
     * @return the bitmap
     */
    public  Bitmap getPhotoBitmap(final Photo photo) {
-//      Image photoImage = null;
       Bitmap photoBitmap = null;
 
+      // using photo image size of 2D map, not working yet
+      //_imageSize = Util.getStateInt(_state, STATE_PHOTO_PROPERTIES_IMAGE_SIZE, Photo.MAP_IMAGE_DEFAULT_WIDTH_HEIGHT);
+      // ensure that an image is displayed, it happend that image size was 0
+      //debugPrint("??? getPhotoBitmap imageSize: " + photoBitmap.getWidth() + _imageSize);
+      //final Image scaledThumbImage = getPhotoImage(photo, _imageSize);
+      
       final Image scaledThumbImage = getPhotoImage(photo, PhotoLoadManager.IMAGE_SIZE_THUMBNAIL);
 
       if (scaledThumbImage != null) {
          try {
-
             //photoBitmap = CanvasAdapter.decodeBitmap(new ByteArrayInputStream(ImageUtils.formatImage(photoImage, org.eclipse.swt.SWT.IMAGE_BMP)));
             photoBitmap = CanvasAdapter.decodeBitmap(new ByteArrayInputStream(ImageUtils.formatImage(scaledThumbImage, org.eclipse.swt.SWT.IMAGE_BMP)));
-            //debugPrint("??? getPhotoImage created photoBitmap width: " + photoBitmap.getWidth() + " Height: " +  photoBitmap.getHeight()); 
-            //debugPrint("??? getPhotoImage created bestsize width: " + bestSize.x + " width: " +  bestSize.y);
-            //debugPrint("??? getPhotoImage created thumbnail size: " + thumbSize); 
          } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
          }
       }
-
-      //      }  
-      //  }
 
       return photoBitmap;
    }
@@ -326,9 +320,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
          bitmapImage = _bitmapPhoto;
       }
       bitmapPhoto = createAdvanceSymbol(item, bitmapImage, true);
-      //debugPrint(" ??????????? PhotoToolkit *** createPhotoBitmapfromPhoto: target size x / y: " + bitmapPhoto.getBitmap().getWidth() + " / " + bitmapPhoto.getBitmap().getHeight()); //$NON-NLS-1$
-      //debugPrint(" ??????????? PhotoToolkit *** createPhotoBitmapfromPhoto Dims H + W: " + bitmapImage.getWidth() + " " + bitmapImage.getHeight()); //$NON-NLS-1$
-      
+ 
       return bitmapPhoto;
    }
  

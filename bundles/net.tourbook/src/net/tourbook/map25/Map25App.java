@@ -1444,8 +1444,26 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	   return true;
 	}
 
+   /**
+   * longpress on a mapbookmark
+   * @param index
+   * @param MarkerItem
+   * @return true, when clicked
+   */
 	@Override
 	public boolean onItemLongPress(int index, MarkerItem item) {
+	     debugPrint(" map25: " +
+	            (UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //$NON-NLS-1$ //$NON-NLS-2$
+	            + ("\tonItemLongpress") //$NON-NLS-1$
+	            + ("\tMapbookmark") //$NON-NLS-1$
+	            + ("\tTitle:" + item.getTitle()) //$NON-NLS-1$
+	            + ("\tDescription:" + item.description) //$NON-NLS-1$
+	            + ("\tindex:" + index) //$NON-NLS-1$
+	            + ("\t_isMapItemHit:" + _isMapItemHit + " -> true") //$NON-NLS-1$ //$NON-NLS-2$
+	            
+	            //Pref_Map25_Encoding_Mapsforge
+	            );
+	   
 	   if (item.getMarker() == null)
 	      ;
 	   // item.setMarker(symbol);
@@ -1457,19 +1475,26 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	   return true;
 	}
 
+	
+   /**
+   * longpress on a tourmarker
+   * @param index
+   * @param MapMarker
+   * @return true, when clicked
+   */	
 	@Override
 	public boolean onItemLongPress(int index, MapMarker item) {
 
-// System.out.println(
-//       (UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //
-//       + ("\tonItemLongPress")
-//       + ("\tindex:" + index)
-//       + ("\t_isMapItemHit:" + _isMapItemHit + " -> true")
-//       //
-//       );
-// // TODO remove SYSTEM.OUT.PRINTLN
+ System.out.println(
+       (UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //
+       + ("\tonItemLongPress (Tourmarker)")
+       + ("\tindex:" + index)
+       + ("\t_isMapItemHit:" + _isMapItemHit + " -> true")
+       //
+       );
+ // TODO remove SYSTEM.OUT.PRINTLN
 //
-// _isMapItemHit = true;
+ _isMapItemHit = true;
 //
 // return true;
 

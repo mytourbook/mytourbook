@@ -85,10 +85,9 @@ public class MapBookmarkManager {
    private static final String ATTR_MAP_POSITION_TILT          = "mapPositionTilt";         //$NON-NLS-1$
    private static final String ATTR_MAP_POSITION_ZOOM_LEVEL    = "mapPositionZoomLevel";    //$NON-NLS-1$
    
-   // for new markerposition function. not implemented yet. 07.11.2019
+   // for new markerposition function. not fully implemented yet. 20.11.2019
    private static final String ATTR_MAP_POSITION_MARKER_X      = "mapPositionMarkerX";      //$NON-NLS-1$
    private static final String ATTR_MAP_POSITION_MARKER_Y      = "mapPositionMarkerY";      //$NON-NLS-1$  
-   
    //
    private static final String TAG_OPTIONS                     = "Options";                 //$NON-NLS-1$
    private static final String ATTR_NUMBER_OF_BOOKMARK_ITEMS   = "numberOfBookmarkItems";   //$NON-NLS-1$
