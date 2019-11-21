@@ -372,7 +372,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
    public boolean onItemSingleTapUp(int index, MarkerItem photoItem) {
       // TODO Auto-generated method stub
       debugPrint(" ??????????? PhotoToolkit *** onItemSingleTapUp(int index, MarkerItem photoItem): " + _allPhotos.get(index).imageFilePathName + " " + photoItem.getTitle());
-      showPhoto(_allPhotos.get(index));
+      //showPhoto(_allPhotos.get(index));
       return false;
    }
 
