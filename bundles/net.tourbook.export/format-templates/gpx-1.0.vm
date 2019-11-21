@@ -1,54 +1,54 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <gpx
-	version="1.1"
-	creator="$creator"
-	xmlns="http://www.topografix.com/GPX/1/1"
-	xmlns:gpxdata="http://www.cluetrust.com/XML/GPXDATA/1/0"
-	xmlns:gpxx="http://www.garmin.com/xmlschemas/GpxExtensions/v3"
-	xmlns:gpxtpx="http://www.garmin.com/xmlschemas/TrackPointExtension/v1"
-	xmlns:mt="net.tourbook/1"
-	xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd 
-	http://www.cluetrust.com/XML/GPXDATA/1/0 http://www.cluetrust.com/Schemas/gpxdata10.xsd 
-	http://www.garmin.com/xmlschemas/GpxExtensions/v3 http://www.garmin.com/xmlschemas/GpxExtensionsv3.xsd 
-	http://www.garmin.com/xmlschemas/TrackPointExtension/v1 http://www.garmin.com/xmlschemas/TrackPointExtensionv1.xsd"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-	<metadata>	
-		<time>$dateformat.format($starttime)</time>
-		<bounds minlat="$nf8.format($min_latitude)" minlon="$nf8.format($min_longitude)" maxlat="$nf8.format($max_latitude)" maxlon="$nf8.format($max_longitude)"/>
+   version="1.1"
+   creator="$creator"
+   xmlns="http://www.topografix.com/GPX/1/1"
+   xmlns:gpxdata="http://www.cluetrust.com/XML/GPXDATA/1/0"
+   xmlns:gpxx="http://www.garmin.com/xmlschemas/GpxExtensions/v3"
+   xmlns:gpxtpx="http://www.garmin.com/xmlschemas/TrackPointExtension/v1"
+   xmlns:mt="net.tourbook/1"
+   xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd 
+   http://www.cluetrust.com/XML/GPXDATA/1/0 http://www.cluetrust.com/Schemas/gpxdata10.xsd 
+   http://www.garmin.com/xmlschemas/GpxExtensions/v3 http://www.garmin.com/xmlschemas/GpxExtensionsv3.xsd 
+   http://www.garmin.com/xmlschemas/TrackPointExtension/v1 http://www.garmin.com/xmlschemas/TrackPointExtensionv1.xsd"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+   <metadata>   
+      <time>$dateformat.format($starttime)</time>
+      <bounds minlat="$nf8.format($min_latitude)" minlon="$nf8.format($min_longitude)" maxlat="$nf8.format($max_latitude)" maxlon="$nf8.format($max_longitude)"/>
 ##
 ##
 ## All tour data
 ##
 ##
 #if($isExportAllTourData)
-		<extensions>
+      <extensions>
 ## tour
-			<mt:tourDescription><![CDATA[$!tourData.tourDescription]]></mt:tourDescription>
-			<mt:tourTitle><![CDATA[$!tourData.tourTitle]]></mt:tourTitle>
-			<mt:tourStartPlace><![CDATA[$!tourData.tourStartPlace]]></mt:tourStartPlace>
-			<mt:tourEndPlace><![CDATA[$!tourData.tourEndPlace]]></mt:tourEndPlace>
+         <mt:tourDescription><![CDATA[$!tourData.tourDescription]]></mt:tourDescription>
+         <mt:tourTitle><![CDATA[$!tourData.tourTitle]]></mt:tourTitle>
+         <mt:tourStartPlace><![CDATA[$!tourData.tourStartPlace]]></mt:tourStartPlace>
+         <mt:tourEndPlace><![CDATA[$!tourData.tourEndPlace]]></mt:tourEndPlace>
 ## time
-			<mt:tourStartTime>$tourData.getTourStartTimeMS()</mt:tourStartTime>
-			<mt:tourEndTime>$tourData.getTourEndTimeMS()</mt:tourEndTime>
-			<mt:tourDrivingTime>$tourData.tourDrivingTime</mt:tourDrivingTime>
-			<mt:tourRecordingTime>$tourData.tourRecordingTime</mt:tourRecordingTime>
+         <mt:tourStartTime>$tourData.getTourStartTimeMS()</mt:tourStartTime>
+         <mt:tourEndTime>$tourData.getTourEndTimeMS()</mt:tourEndTime>
+         <mt:tourDrivingTime>$tourData.tourDrivingTime</mt:tourDrivingTime>
+         <mt:tourRecordingTime>$tourData.tourRecordingTime</mt:tourRecordingTime>
 ## distance
-			<mt:tourAltDown>$tourData.tourAltDown</mt:tourAltDown>
-			<mt:tourAltUp>$tourData.tourAltUp</mt:tourAltUp>
-			<mt:tourDistance>$tourData.tourDistance</mt:tourDistance>
+         <mt:tourAltDown>$tourData.tourAltDown</mt:tourAltDown>
+         <mt:tourAltUp>$tourData.tourAltUp</mt:tourAltUp>
+         <mt:tourDistance>$tourData.tourDistance</mt:tourDistance>
 ## personal
-			<mt:calories>$tourData.Calories</mt:calories>
-			<mt:restPulse>$tourData.restPulse</mt:restPulse>
+         <mt:calories>$tourData.Calories</mt:calories>
+         <mt:restPulse>$tourData.restPulse</mt:restPulse>
 ## other
-			<mt:bikerWeight>$tourData.BikerWeight</mt:bikerWeight>
-			<mt:conconiDeflection>$tourData.ConconiDeflection</mt:conconiDeflection>
-			<mt:dpTolerance>$tourData.DpTolerance</mt:dpTolerance>
+         <mt:bikerWeight>$tourData.getBodyWeight()</mt:bikerWeight>
+         <mt:conconiDeflection>$tourData.ConconiDeflection</mt:conconiDeflection>
+         <mt:dpTolerance>$tourData.DpTolerance</mt:dpTolerance>
 ## weather
-			<mt:temperature>$tourData.AvgTemperature</mt:temperature>
-			<mt:weather><![CDATA[$!tourData.weather]]></mt:weather>
-			<mt:weatherClouds><![CDATA[$!tourData.weatherClouds]]></mt:weatherClouds>
-			<mt:weatherWindDirection>$tourData.getWeatherWindDir()</mt:weatherWindDirection>
-			<mt:weatherWindSpeed>$tourData.getWeatherWindSpeed()</mt:weatherWindSpeed>
+         <mt:temperature>$tourData.AvgTemperature</mt:temperature>
+         <mt:weather><![CDATA[$!tourData.weather]]></mt:weather>
+         <mt:weatherClouds><![CDATA[$!tourData.weatherClouds]]></mt:weatherClouds>
+         <mt:weatherWindDirection>$tourData.getWeatherWindDir()</mt:weatherWindDirection>
+         <mt:weatherWindSpeed>$tourData.getWeatherWindSpeed()</mt:weatherWindSpeed>
 ##
 ##
 ## TYPE
@@ -56,9 +56,9 @@
 ##
 #set ($tourType = $tourData.getTourType())
 #if($tourType)
-			<mt:tourType>
-				<mt:name><![CDATA[$!tourType.getName()]]></mt:name>
-			</mt:tourType>
+         <mt:tourType>
+            <mt:name><![CDATA[$!tourType.getName()]]></mt:name>
+         </mt:tourType>
 #end
 ##
 ##
@@ -66,20 +66,20 @@
 ##
 ##
 #if($tourData.getTourTags().size() > 0)
-			<mt:tags>
+         <mt:tags>
 #set ($tags = $tourData.getTourTags())
-#foreach ($tag in $tags)			
-				<mt:tag>
-					<mt:name><![CDATA[$!tag.getTagName()]]></mt:name>
-				</mt:tag>
+#foreach ($tag in $tags)         
+            <mt:tag>
+               <mt:name><![CDATA[$!tag.getTagName()]]></mt:name>
+            </mt:tag>
 #end
-			</mt:tags>
-#end
-##
-		</extensions>
+         </mt:tags>
 #end
 ##
-	</metadata>
+      </extensions>
+#end
+##
+   </metadata>
 ##
 ##
 ##
@@ -88,37 +88,37 @@
 ##
 #if($hasWayPoints)
 #foreach($point in $wayPoints)
-	<wpt lat="$nf8.format($point.Latitude)" lon="$nf8.format($point.Longitude)">
+   <wpt lat="$nf8.format($point.Latitude)" lon="$nf8.format($point.Longitude)">
 ##
 #if($point.getTime())
-		<time>$dateformat.format($point.Time)</time>
+      <time>$dateformat.format($point.Time)</time>
 #end
 ##
 #if($point.hasValidAltitude())
-		<ele>$point.Altitude</ele>
+      <ele>$point.Altitude</ele>
 #end
 ##
 #if($point.getName().length() > 0)
-		<name><![CDATA[$!point.Name]]></name>
+      <name><![CDATA[$!point.Name]]></name>
 #end
 ##
 #if($point.getComment().length() > 0)
-		<desc><![CDATA[$!point.Comment]]></desc>
+      <desc><![CDATA[$!point.Comment]]></desc>
 #end
 ##
 #if($point.getUrlAddress().length() > 0)
-		<url><![CDATA[$!point.UrlAddress]]></url>
+      <url><![CDATA[$!point.UrlAddress]]></url>
 #end
 ##
 #if($point.getUrlText().length() > 0)
-		<urlname><![CDATA[$!point.UrlText]]></urlname>
+      <urlname><![CDATA[$!point.UrlText]]></urlname>
 #end
 ##
 #if($point.getSymbolName())
-		<sym>$point.getSymbolName()</sym>
+      <sym>$point.getSymbolName()</sym>
 #end
 ##
-	</wpt>
+   </wpt>
 #end
 #end
 ##
@@ -129,43 +129,43 @@
 ##
 #if($hasTourMarkers)
 #foreach($marker in $tourMarkers)
-	<wpt lat="$nf8.format($marker.Latitude)" lon="$nf8.format($marker.Longitude)">
+   <wpt lat="$nf8.format($marker.Latitude)" lon="$nf8.format($marker.Longitude)">
 ##
-		<time>$dateformat.format($marker.MarkerTime)</time>
+      <time>$dateformat.format($marker.MarkerTime)</time>
 ##
 #if($marker.hasAltitude())
-		<ele>$nf3.format($math.toDouble($marker.Altitude))</ele>
+      <ele>$nf3.format($math.toDouble($marker.Altitude))</ele>
 #end
 ##
 #if($marker.getLabel().length() > 0)
-		<name><![CDATA[$!marker.Label]]></name>
+      <name><![CDATA[$!marker.Label]]></name>
 #end
 ##
 #if($marker.getDescription().length() > 0)
-		<desc><![CDATA[$!marker.Description]]></desc>
+      <desc><![CDATA[$!marker.Description]]></desc>
 #end
 ##
 #if($marker.getUrlAddress().length() > 0)
-		<url><![CDATA[$!marker.UrlAddress]]></url>
+      <url><![CDATA[$!marker.UrlAddress]]></url>
 #end
 ##
 #if($marker.getUrlText().length() > 0)
-		<urlname><![CDATA[$!marker.UrlText]]></urlname>
+      <urlname><![CDATA[$!marker.UrlText]]></urlname>
 #end
 ##
 #if($isExportAllTourData)
-		<extensions>
-			<mt:distance>$marker.Distance</mt:distance>
-			<mt:isVisible>$marker.isMarkerVisible()</mt:isVisible>
-			<mt:labelPos>$marker.LabelPosition</mt:labelPos>
-			<mt:labelXOffset>$marker.LabelXOffset</mt:labelXOffset>
-			<mt:labelYOffset>$marker.LabelYOffset</mt:labelYOffset>
-			<mt:serieIndex>$marker.SerieIndex</mt:serieIndex>
-			<mt:type>$marker.Type</mt:type>
-		</extensions>
+      <extensions>
+         <mt:distance>$marker.Distance</mt:distance>
+         <mt:isVisible>$marker.isMarkerVisible()</mt:isVisible>
+         <mt:labelPos>$marker.LabelPosition</mt:labelPos>
+         <mt:labelXOffset>$marker.LabelXOffset</mt:labelXOffset>
+         <mt:labelYOffset>$marker.LabelYOffset</mt:labelYOffset>
+         <mt:serieIndex>$marker.SerieIndex</mt:serieIndex>
+         <mt:type>$marker.Type</mt:type>
+      </extensions>
 #end
 ##
-	</wpt>
+   </wpt>
 #end
 #end
 ##
@@ -177,12 +177,12 @@
 #foreach($track in $tracks)
 ##
 #set($close_segment = false)
-	<trk>
+   <trk>
 #if($track.getIdentification().length() > 0)
-		<name><![CDATA[$!track.Identification]]></name>
+      <name><![CDATA[$!track.Identification]]></name>
 #end
 #if($track.getComment().length() > 0)
-		<desc><![CDATA[$!track.Comment]]></desc>
+      <desc><![CDATA[$!track.Comment]]></desc>
 #end
 ##
 ##
@@ -192,48 +192,48 @@
 ##
 #if($point.isNewTrack())
 #if($close_segment)## close trkseg, if not the first occurence
-		</trkseg>
+      </trkseg>
 #end
-		<trkseg>
+      <trkseg>
 #set($close_segment = true)
 #end
-			<trkpt lat="$nf8.format($point.Latitude)" lon="$nf8.format($point.Longitude)">
+         <trkpt lat="$nf8.format($point.Latitude)" lon="$nf8.format($point.Longitude)">
 ##
 #if($point.getDate())
-				<time>$dateformat.format($point.Date)</time>
+            <time>$dateformat.format($point.Date)</time>
 #end
 ##
 #if($point.hasValidAltitude())
-				<ele>$nf3.format($point.Altitude)</ele>
+            <ele>$nf3.format($point.Altitude)</ele>
 #end
 ##
 #if($point.hasValidExtention())
-				<extensions>
-					<gpxtpx:TrackPointExtension>
+            <extensions>
+               <gpxtpx:TrackPointExtension>
 #if($point.hasValidTemperature())
-						<gpxtpx:atemp>$nf1.format($point.Temperature)</gpxtpx:atemp>
+                  <gpxtpx:atemp>$nf1.format($point.Temperature)</gpxtpx:atemp>
 #end
 #if($point.hasValidHeartrate())
-						<gpxtpx:hr>$point.Heartrate</gpxtpx:hr>
+                  <gpxtpx:hr>$point.Heartrate</gpxtpx:hr>
 #end
 #if($point.hasValidCadence())
-						<gpxtpx:cad>$point.Cadence</gpxtpx:cad>
+                  <gpxtpx:cad>$point.Cadence</gpxtpx:cad>
 #end
-					</gpxtpx:TrackPointExtension>
+               </gpxtpx:TrackPointExtension>
 #if($point.hasValidDistance())
-					<gpxdata:distance>$nf3.format($point.Distance)</gpxdata:distance>
+               <gpxdata:distance>$nf3.format($point.Distance)</gpxdata:distance>
 #end
 #if($isExportAllTourData && $point.hasValidGear())
-					<mt:gear>$point.Gear</mt:gear>
+               <mt:gear>$point.Gear</mt:gear>
 #end
-				</extensions>
+            </extensions>
 #end
-			</trkpt>
+         </trkpt>
 #end
 #if($close_segment)
-		</trkseg>
+      </trkseg>
 #end
-	</trk>
+   </trk>
 #end
 #end
 </gpx>
