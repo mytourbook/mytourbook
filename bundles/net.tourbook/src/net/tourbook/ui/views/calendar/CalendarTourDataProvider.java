@@ -827,14 +827,16 @@ public class CalendarTourDataProvider {
 
          select = "SELECT" + NL //			  //$NON-NLS-1$
 
-               + " SUM(TourDistance),			" + NL //	1 //$NON-NLS-1$
-               + " SUM(TourAltUp),				" + NL //	2 //$NON-NLS-1$
-               + " SUM(TourRecordingTime),	" + NL //	3 //$NON-NLS-1$
-               + " SUM(TourDrivingTime),		" + NL //	4 //$NON-NLS-1$
-               + " SUM(calories),				" + NL //	5 //$NON-NLS-1$
-               + " SUM(1),						   " + NL //	6 //$NON-NLS-1$
+               + " SUM(TourDistance),		 	 " + NL //	1 //$NON-NLS-1$
+               + " SUM(TourAltUp),			    " + NL //	2 //$NON-NLS-1$
+               + " SUM(TourRecordingTime), 	 " + NL //	3 //$NON-NLS-1$
+               + " SUM(TourDrivingTime),		 " + NL //	4 //$NON-NLS-1$
+               + " SUM(calories),				 " + NL //	5 //$NON-NLS-1$
+               + " SUM(1),						    " + NL //	6 //$NON-NLS-1$
 
-               + " SUM(TourAltDown)				" + NL //	7 //$NON-NLS-1$
+               + " SUM(TourAltDown),          " + NL //	7 //$NON-NLS-1$
+               + " SUM(cadenceZone_SlowTime), " + NL //	8 //$NON-NLS-1$
+               + " SUM(cadenceZone_FastTime)	 " + NL //	9 //$NON-NLS-1$
 
                + fromTourData;
 
@@ -860,6 +862,9 @@ public class CalendarTourDataProvider {
             weekData.calories = result.getInt(5);
 
             weekData.numTours = result.getInt(6);
+
+            weekData.cadenceZone_SlowTime = result.getInt(8);
+            weekData.cadenceZone_FastTime = result.getInt(9);
 
             if (UI.IS_SCRAMBLE_DATA) {
 
