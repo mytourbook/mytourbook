@@ -29,6 +29,7 @@ import net.tourbook.common.UI;
 
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
+import net.tourbook.map.bookmark.MapPosition_with_MarkerPosition;
 import net.tourbook.map25.Map25TileSource.Builder;
 import net.tourbook.map25.OkHttpEngineMT.OkHttpFactoryMT;
 import net.tourbook.map25.layer.labeling.LabelLayerMT;
@@ -156,7 +157,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	private int							_tileSourceOfflineMapCount = 0;
 	
 	//public static enum DebugMode {OFF, ON};
-	public static DebugMode debugMode = DebugMode.OFF;   // before releasing, set this to OFF
+	public static DebugMode debugMode = DebugMode.ON;   // before releasing, set this to OFF
 	
 	/**
 	 * The opacity can be set in the layer but not read. This will keep the state of the hillshading opacity.
@@ -689,7 +690,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 		final String stateSuffixName = '_' + suffixName;
 
 		final MapPosition mapPosition = mMap.getMapPosition();
-
+		//final MapPosition_with_MarkerPosition mapPosition2 = (MapPosition_with_MarkerPosition) mMap.getMapPosition();
+	
 		_state.put(STATE_MAP_POS_X + stateSuffixName, mapPosition.x);
 		_state.put(STATE_MAP_POS_Y + stateSuffixName, mapPosition.y);
 		_state.put(STATE_MAP_POS_BEARING + stateSuffixName, mapPosition.bearing);
@@ -1096,6 +1098,19 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	   _layer_Label.setEnabled(false);
 	   layers.add(_layer_Label);
 
+      //Photos
+      _phototoolkit = new PhotoToolkit();
+      if (config.isMarkerClustered) { //sharing same setting as MapBookmarks, later photolayer should get its own configuration
+         _layer_Photo = new  ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(),  _phototoolkit._markerRendererFactory, _phototoolkit);
+      } else {
+         //_layer_Photo = new  ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(),  _phototoolkit._symbol, this);
+         _layer_Photo = new  ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(),  _phototoolkit._symbol, _phototoolkit);
+      }
+      //_layer_Photo.addItems(_phototoolkit._photo_pts);  //must not be done at startup, no tour is loadet yet
+      _layer_Photo.setEnabled(false);
+      layers.add(_layer_Photo);   
+	   
+	   
       // MapBookmarks
       //debugPrint(" map25: " + "################ setupMap_Layers: calling constructor"); //$NON-NLS-1$
       _markertoolkit = new MarkerToolkit(MarkerShape.STAR);
@@ -1114,19 +1129,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       _layer_Marker = new MarkerLayer(mMap, this);
       _layer_Marker.setEnabled(false);
       layers.add(_layer_Marker);      
-      
-      //Photos
-      _phototoolkit = new PhotoToolkit();
-      if (config.isMarkerClustered) { //sharing same setting as MapBookmarks, later photolayer should get its own configuration
-         _layer_Photo = new  ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(),  _phototoolkit._markerRendererFactory, _phototoolkit);
-      } else {
-         //_layer_Photo = new  ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(),  _phototoolkit._symbol, this);
-         _layer_Photo = new  ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(),  _phototoolkit._symbol, _phototoolkit);
-      }
-      //_layer_Photo.addItems(_phototoolkit._photo_pts);  //must not be done at startup, no tour is loadet yet
-      _layer_Photo.setEnabled(false);
-      layers.add(_layer_Photo);
-      
+            
 	   // slider location
 	   _layer_SliderLocation = new SliderLocation_Layer(mMap);
 	   _layer_SliderLocation.setEnabled(false);
@@ -1441,8 +1444,26 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	   return true;
 	}
 
+   /**
+   * longpress on a mapbookmark
+   * @param index
+   * @param MarkerItem
+   * @return true, when clicked
+   */
 	@Override
 	public boolean onItemLongPress(int index, MarkerItem item) {
+	     debugPrint(" map25: " +
+	            (UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //$NON-NLS-1$ //$NON-NLS-2$
+	            + ("\tonItemLongpress") //$NON-NLS-1$
+	            + ("\tMapbookmark") //$NON-NLS-1$
+	            + ("\tTitle:" + item.getTitle()) //$NON-NLS-1$
+	            + ("\tDescription:" + item.description) //$NON-NLS-1$
+	            + ("\tindex:" + index) //$NON-NLS-1$
+	            + ("\t_isMapItemHit:" + _isMapItemHit + " -> true") //$NON-NLS-1$ //$NON-NLS-2$
+	            
+	            //Pref_Map25_Encoding_Mapsforge
+	            );
+	   
 	   if (item.getMarker() == null)
 	      ;
 	   // item.setMarker(symbol);
@@ -1454,19 +1475,26 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	   return true;
 	}
 
+	
+   /**
+   * longpress on a tourmarker
+   * @param index
+   * @param MapMarker
+   * @return true, when clicked
+   */	
 	@Override
 	public boolean onItemLongPress(int index, MapMarker item) {
 
-// System.out.println(
-//       (UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //
-//       + ("\tonItemLongPress")
-//       + ("\tindex:" + index)
-//       + ("\t_isMapItemHit:" + _isMapItemHit + " -> true")
-//       //
-//       );
-// // TODO remove SYSTEM.OUT.PRINTLN
+ System.out.println(
+       (UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //
+       + ("\tonItemLongPress (Tourmarker)")
+       + ("\tindex:" + index)
+       + ("\t_isMapItemHit:" + _isMapItemHit + " -> true")
+       //
+       );
+ // TODO remove SYSTEM.OUT.PRINTLN
 //
-// _isMapItemHit = true;
+ _isMapItemHit = true;
 //
 // return true;
 

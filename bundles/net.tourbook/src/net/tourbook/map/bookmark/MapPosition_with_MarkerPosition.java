@@ -18,6 +18,9 @@
 
 package net.tourbook.map.bookmark;
 
+import org.oscim.core.MapPosition;
+import org.oscim.core.MercatorProjection;
+
 public class MapPosition_with_MarkerPosition extends org.oscim.core.MapPosition{
    
    /** Projected position x 0..1 */
@@ -27,37 +30,70 @@ public class MapPosition_with_MarkerPosition extends org.oscim.core.MapPosition{
       return mapPositionMarkerX;
    }
 
-
    public void setMapPositionMarkerX(double mapPositionMarkerX) {
       this.mapPositionMarkerX = mapPositionMarkerX;
    }
 
 
+   
+   /** Projected position x 0..1 */
+   public double mapPositionMarkerY;  
+   
    public double getMapPositionMarkerY() {
       return mapPositionMarkerY;
-   }
-
-
+   }  
+   
    public void setMapPositionMarkerY(double mapPositionMarkerY) {
       this.mapPositionMarkerY = mapPositionMarkerY;
    }
 
+   
+   public double getMarkerLatitude() {
+      return MercatorProjection.toLatitude(mapPositionMarkerY);
+  }
 
-   /** Projected position x 0..1 */
-   public double mapPositionMarkerY;  
+  public double getMarkerLongitude() {
+      return MercatorProjection.toLongitude(mapPositionMarkerX);
+  }
+   
+   
    
    
    public MapPosition_with_MarkerPosition() {
       super();
       this.mapPositionMarkerX = 0.5;
       this.mapPositionMarkerY = 0.5;
-      // TODO Auto-generated constructor stub
    }
 
 
    public MapPosition_with_MarkerPosition(double latitude, double longitude, int scale) {
       super(latitude, longitude, scale);
-      // TODO Auto-generated constructor stub
    }
 
+   
+   //TODO: this constuctor is not used yet. lat/long must be converted to mercador first, or?
+   public MapPosition_with_MarkerPosition(double latitude, double longitude, int scale, double markerLatitude,  double markerLongitude) {
+      super(latitude, longitude, scale);
+      //this.mapPositionMarkerY = markerLatitude;
+      //this.mapPositionMarkerX = markerLongitude;
+   } 
+   
+   public MapPosition_with_MarkerPosition(MapPosition mapPosition) {
+      super(mapPosition.getLatitude(), mapPosition.getLongitude(), mapPosition.scale);
+      this.bearing = mapPosition.bearing;
+      this.roll = mapPosition.roll;
+      this.zoomLevel = mapPosition.zoomLevel;
+      this.tilt = mapPosition.tilt;
+      this.roll = mapPosition.roll;
+      this.x = mapPosition.x;
+      this.y = mapPosition.y;
+
+      this.mapPositionMarkerX = mapPosition.x;
+      this.mapPositionMarkerY = mapPosition.y;
+      
+      
+      System.out.println("constructor lat: " + mapPosition.getLatitude() + " lon: " + mapPosition.getLongitude());
+      System.out.println("constructor y: " + mapPositionMarkerY + " x: " + mapPositionMarkerX);
+   }  
+   
 }

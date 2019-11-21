@@ -215,9 +215,11 @@ public class MarkerToolkit {
       List<MarkerItem> pts = new ArrayList<>();
      
       for (final MapBookmark mapBookmark : net.tourbook.map.bookmark.MapBookmarkManager.getAllBookmarks()) {
-         //_mapApp.debugPrint("*** Markertoolkit:  mapbookmark name: " + mapBookmark.name); //$NON-NLS-1$
+         //Map25App.debugPrint("*** Markertoolkit:  mapbookmark name: " + mapBookmark.name + " lat: " +  mapBookmark.get_mapPositionMarkerLatitude() + " lon: " + mapBookmark.get_mapPositionMarkerLongitude()); //$NON-NLS-1$
+         //Map25App.debugPrint("*** Markertoolkit: " + mapBookmark.toString());
          MarkerItem item = new MarkerItem(mapBookmark.id, mapBookmark.name, "", //$NON-NLS-1$
-               new GeoPoint(mapBookmark.getLatitude(), mapBookmark.getLongitude())
+               //new GeoPoint(mapBookmark.getLatitude(), mapBookmark.getLongitude())
+               new GeoPoint(mapBookmark.get_mapPositionMarkerLatitude(), mapBookmark.get_mapPositionMarkerLongitude())
                );
          item.setMarker(createAdvanceSymbol(item, _bitmapPoi, false));
          pts.add(item);

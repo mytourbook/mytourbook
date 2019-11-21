@@ -27,8 +27,11 @@ public class MapBookmark {
 
 	private double		_latitude;
 	private double		_longitude;
+	
+	private double   _mapPositionMarkerLatitude;
+   private double   _mapPositionMarkerLongitude;
 
-	private MapPosition	_mapPosition;
+	private MapPosition_with_MarkerPosition	_mapPosition;
 
 	@Override
 	public boolean equals(final Object obj) {
@@ -65,8 +68,18 @@ public class MapBookmark {
 	public double getLongitude() {
 		return _longitude;
 	}
+	
+	public double get_mapPositionMarkerLatitude() {
+	   return _mapPositionMarkerLatitude;
+	}
 
-	public MapPosition getMapPosition() {
+	public double get_mapPositionMarkerLongitude() {
+	   return _mapPositionMarkerLongitude;
+	}
+
+
+
+	public MapPosition_with_MarkerPosition getMapPosition() {
 		return _mapPosition;
 	}
 
@@ -81,13 +94,27 @@ public class MapBookmark {
 		return result;
 	}
 
-	public void setMapPosition(final MapPosition mapPosition) {
-
+	public void setMapPosition(final MapPosition_with_MarkerPosition mapPosition) {
 		_mapPosition = mapPosition;
 
 		_latitude = mapPosition.getLatitude();
 		_longitude = mapPosition.getLongitude();
+		
+		//this should be in a seperate methode like "setMapMarkerPosition():
+		//_mapPositionMarkerLatitude = mapPosition.getMarkerLatitude();
+		//_mapPositionMarkerLongitude = mapPosition.getMarkerLongitude();
+		
 	}
+	
+	  public void setMapPositionMarker(final MapPosition_with_MarkerPosition mapPosition) {
+
+	      _mapPosition = mapPosition;
+
+	      _mapPositionMarkerLatitude = mapPosition.getMarkerLatitude();
+	      _mapPositionMarkerLongitude = mapPosition.getMarkerLongitude();
+	      
+	   }
+	
 
 	@Override
 	public String toString() {
@@ -99,9 +126,11 @@ public class MapBookmark {
 
 				+ "id=" + id + ", " //$NON-NLS-1$ //$NON-NLS-2$
 				+ "name=" + name + ", " //$NON-NLS-1$ //$NON-NLS-2$
-				//				+ "latitude=" + latitude + ", "
-				//				+ "longitude=" + longitude
-
+				+ "latitude=" + _latitude + ", "
+				+ "longitude=" + _longitude + ", "
+	         + "marker lat=" + _mapPositionMarkerLatitude + ", "
+	         + "marker long=" + _mapPositionMarkerLongitude + ", "		
+	         + "bearing=" + _mapPosition.bearing + ", "
 				+ "]"; //$NON-NLS-1$
 	}
 
