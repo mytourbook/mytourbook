@@ -27,6 +27,7 @@ import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.tour.TourManager;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.UI;
 
@@ -428,15 +429,7 @@ public class TVITourBookYearSub extends TVITourBookItem {
                tourItem.colAvgCadence = dbAvgCadence * dbCadenceMultiplier;
                tourItem.colCadenceMultiplier = dbCadenceMultiplier;
 
-               tourItem.colSlowVsFastCadence = UI.EMPTY_STRING;
-
-               final int totalCadenceTime = cadenceZone_SlowTime + cadenceZone_FastTime;
-               if (totalCadenceTime > 0) {
-                  final int cadenceZone_SlowPercentage = Math.round(cadenceZone_SlowTime * 100f / totalCadenceTime);
-                  final int cadenceZone_FastPercentage = Math.round(cadenceZone_FastTime * 100f / totalCadenceTime);
-
-                  tourItem.colSlowVsFastCadence = cadenceZone_SlowPercentage + " - " + cadenceZone_FastPercentage; //$NON-NLS-1$
-               }
+               tourItem.colSlowVsFastCadence = TourManager.generateCadenceZones_TimePercentages(cadenceZone_SlowTime, cadenceZone_FastTime);
 
                // -----------------------------------------------
 

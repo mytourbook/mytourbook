@@ -28,14 +28,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TimeZone;
 
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.widgets.Display;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
-
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.MtMath;
@@ -53,6 +45,14 @@ import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.preferences.TourTypeColorDefinition;
+
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.widgets.Display;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 
 public class GPX_SAX_Handler extends DefaultHandler {
 
@@ -570,6 +570,10 @@ public class GPX_SAX_Handler extends DefaultHandler {
    }
 
    private void endElement_MT_Tour(final String name, final String charData) {
+
+      if (_tourData == null) {
+         initNewTrack();
+      }
 
       if (name.equals(TAG_MT_TOUR_DESCRIPTION)) {
 
@@ -1379,7 +1383,19 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
    private void initNewTrack() {
 
-      _tourData = new TourData();
+      if (_tourData != null) {
+
+         /**
+          * This can occure when MT tours are imported and tour metadata are read.
+          * <p>
+          * When an MT tour is imported, there can be only 1 tour in a gpx file. The export of
+          * multiple tours with MT data is disabled in the export dialog.
+          */
+
+      } else {
+
+         _tourData = new TourData();
+      }
 
       _timeDataList.clear();
 
@@ -1618,8 +1634,8 @@ public class GPX_SAX_Handler extends DefaultHandler {
             || name.equals(TAG_MT_TOUR_WEATHER_WIND_SPEED)) {
 
          _isMTData = true;
-
          _isInMT_Tour = true;
+
          _characters.delete(0, _characters.length());
 
       } else if (name.equals(TAG_MT_TOUR_TAG)) {
