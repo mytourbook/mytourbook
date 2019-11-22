@@ -1092,6 +1092,8 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
          return;
       }
 
+      _columnManager.saveState(_state);
+
       updateCheckedTags();
 
       final Dialog_SaveTags_Wizard wizard = new Dialog_SaveTags_Wizard(_allSelectedTours, _allCheckedTagIds);

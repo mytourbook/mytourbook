@@ -1317,6 +1317,30 @@ public class TourManager {
    }
 
    /**
+    * Generates a string containing the percentages of time spent in each cadence zone ("slow" vs
+    * "fast")
+    *
+    * @param cadenceZoneSlowTime
+    *           The time spent (in seconds) in the "slow" cadence zone.
+    * @param cadenceZoneFastTime
+    *           The time spent (in seconds) in the "fast" cadence zone.
+    * @return Returns a string of this format : "33 - 64"
+    */
+   public static String generateCadenceZones_TimePercentages(final int cadenceZoneSlowTime, final int cadenceZoneFastTime) {
+      String cadenceZonesPercentages = UI.EMPTY_STRING;
+
+      final int totalCadenceTime = cadenceZoneSlowTime + cadenceZoneFastTime;
+      if (totalCadenceTime > 0) {
+         final int cadenceZone_SlowPercentage = Math.round(cadenceZoneSlowTime * 100f / totalCadenceTime);
+         final int cadenceZone_FastPercentage = Math.round(cadenceZoneFastTime * 100f / totalCadenceTime);
+
+         cadenceZonesPercentages = cadenceZone_SlowPercentage + " - " + cadenceZone_FastPercentage; //$NON-NLS-1$
+      }
+
+      return cadenceZonesPercentages;
+   }
+
+   /**
     * Try to get the tour chart and/or editor from the active part.
     *
     * @param tourData

@@ -26,6 +26,8 @@ public enum FormatterID {
    ALTITUDE, //
    ELEVATION_CHANGE, //
 
+   CADENCE_ZONES_TIMES, //
+
    SPEED, //
    PACE, //
 
