@@ -246,6 +246,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private static final String    STATE_SECTION_CHARACTERISTICS = "STATE_SECTION_CHARACTERISTICS";                        //$NON-NLS-1$
    private static final String    STATE_SECTION_DATE_TIME       = "STATE_SECTION_DATE_TIME";                              //$NON-NLS-1$
    private static final String    STATE_SECTION_PERSONAL        = "STATE_SECTION_PERSONAL";                               //$NON-NLS-1$
+   private static final String    STATE_SECTION_TRAINING_STRESS = "STATE_SECTION_TRAINING_STRESS";                        //$NON-NLS-1$
    private static final String    STATE_SECTION_TITLE           = "STATE_SECTION_TITLE";                                  //$NON-NLS-1$
    private static final String    STATE_SECTION_WEATHER         = "STATE_SECTION_WEATHER";                                //$NON-NLS-1$
    //
@@ -548,6 +549,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private Section                  _sectionTitle;
    private Section                  _sectionDateTime;
    private Section                  _sectionPersonal;
+   private Section                  _sectionTrainingStress;
    private Section                  _sectionWeather;
    private Section                  _sectionCharacteristics;
    //
@@ -3735,8 +3737,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    private void createUI_Section_140_TrainingStress(final Composite parent) {
 
-      _sectionWeather = createSection(parent, _tk, Messages.tour_editor_section_trainingstress, false, true);
-      final Composite container = (Composite) _sectionWeather.getClient();
+      _sectionTrainingStress = createSection(parent, _tk, Messages.tour_editor_section_trainingstress, false, true);
+      final Composite container = (Composite) _sectionTrainingStress.getClient();
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults()
             .numColumns(2)
@@ -7303,6 +7305,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _sectionCharacteristics.setExpanded(Util.getStateBoolean(_state, STATE_SECTION_CHARACTERISTICS, true));
       _sectionDateTime.setExpanded(Util.getStateBoolean(_state, STATE_SECTION_DATE_TIME, true));
       _sectionPersonal.setExpanded(Util.getStateBoolean(_state, STATE_SECTION_PERSONAL, true));
+      _sectionTrainingStress.setExpanded(Util.getStateBoolean(_state, STATE_SECTION_TRAINING_STRESS, true));
       _sectionTitle.setExpanded(Util.getStateBoolean(_state, STATE_SECTION_TITLE, true));
       _sectionWeather.setExpanded(Util.getStateBoolean(_state, STATE_SECTION_WEATHER, true));
    }
@@ -7325,6 +7328,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _state.put(STATE_SECTION_CHARACTERISTICS, _sectionCharacteristics.isExpanded());
       _state.put(STATE_SECTION_DATE_TIME, _sectionDateTime.isExpanded());
       _state.put(STATE_SECTION_PERSONAL, _sectionPersonal.isExpanded());
+      _state.put(STATE_SECTION_TRAINING_STRESS, _sectionTrainingStress.isExpanded());
       _state.put(STATE_SECTION_TITLE, _sectionTitle.isExpanded());
       _state.put(STATE_SECTION_WEATHER, _sectionWeather.isExpanded());
    }
