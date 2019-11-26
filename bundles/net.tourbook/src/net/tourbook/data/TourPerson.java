@@ -39,6 +39,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Transient;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.database.PersonManager;
@@ -49,7 +51,7 @@ import net.tourbook.ui.UI;
 import org.hibernate.annotations.Cascade;
 
 @Entity
-public class TourPerson implements Comparable<Object> {
+public class TourPerson implements Comparable<Object>, ChangeListener {
 
    public static final ZonedDateTime       DEFAULT_BIRTHDAY                      = ZonedDateTime.of(
          1977,
@@ -201,6 +203,9 @@ public class TourPerson implements Comparable<Object> {
    @Transient
    private ArrayList<TourPersonHRZone>     _sortedHrZones;
 
+   @Transient
+   private ChangeListener                  _changeListener;
+
    /**
     * default constructor used in ejb
     */
@@ -274,6 +279,10 @@ public class TourPerson implements Comparable<Object> {
       }
    }
 
+   public void addChangeListener(final ChangeListener listener) {
+      _changeListener = listener;
+   }
+
    public void addOrUpdateGovssEntry(final long tourStartTime, final long tourId) {
       if (performanceModelingData == null) {
          performanceModelingData = new PerformanceModelingData();
@@ -308,13 +317,12 @@ public class TourPerson implements Comparable<Object> {
 
    public void computePerformanceModelingData() {
       if (performanceModelingData == null) {
-      return;
+         return;
       }
 
       performanceModelingData.computeFitnessValues();
       performanceModelingData.computeFatigueValues();
    }
-
 
    @Override
    public boolean equals(final Object obj) {
@@ -610,6 +618,9 @@ public class TourPerson implements Comparable<Object> {
 
       if (isSaved) {
          PersonManager.refreshPeople();
+         if (_changeListener != null) {
+            _changeListener.stateChanged(new ChangeEvent(personId));
+         }
       }
 
       return isSaved;
@@ -697,6 +708,12 @@ public class TourPerson implements Comparable<Object> {
 
    public void setWeight(final float weight) {
       this.weight = weight;
+   }
+
+   @Override
+   public void stateChanged(final ChangeEvent e) {
+      // TODO Auto-generated method stub
+
    }
 
    @Override

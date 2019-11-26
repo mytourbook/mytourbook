@@ -73,6 +73,10 @@ public class Running_Govss {
     */
    private double computeCostKineticEnergy(final double distance, final double initialSpeed, final double speed) {
 
+      if (distance == 0f) {
+         return 0;
+      }
+
       final double Ckin = 0.5 * (Math.pow(speed, 2) - Math.pow(initialSpeed, 2)) / distance;
 
       return Ckin;
@@ -170,6 +174,7 @@ public class Running_Govss {
       float initialSpeed = 0;
       float currentSpeed = 0;
 
+      int toto = 0;
       for (; serieEndIndex < timeSeriesLength - 1;) {
 
          double currentRecordingTime = 0;
@@ -182,6 +187,10 @@ public class Running_Govss {
                break;
             }
             currentRecordingTime = timeSerie[serieEndIndex] - timeSerie[serieStartIndex];
+         }
+
+         if (toto == 214) {
+            System.out.print(true);
          }
 
          currentSpeed = TourManager.computeTourSpeed(tourData, serieStartIndex, serieEndIndex);
@@ -197,8 +206,10 @@ public class Running_Govss {
 
          initialSpeed = currentSpeed;
 
+         ++toto;
       }
 
+      final int size = powerValues.size();
       return powerValues;
    }
 
