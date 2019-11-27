@@ -37,6 +37,7 @@ Changes
 
 * Tour Import
   - GPX: Set default to absolute distance that the defaults for export/import are the same
+  - FIT: Starting marker label from 1 instead of 0
 
  
 Fixes   
