@@ -4,7 +4,13 @@
 TODO's
 ======
 
-- Website: Update contributor/translator list 
+* Website
+  - Update contributor/translator list
+  - Show cheatsheet
+* Update SWT to 4.14 (Eclipse 2019-12) to fix the issue (Linux only) when
+  saving a map tile on disk
+  (cf. https://bugs.eclipse.org/bugs/show_bug.cgi?id=553240) 
+ 
 
 Bugs
 ----
@@ -29,6 +35,9 @@ Import
 Changes  
 =======
 
+* Tour Import
+  - GPX: Set default to absolute distance that the defaults for export/import are the same
+  - FIT: Starting marker label from 1 instead of 0
 
  
 Fixes   
@@ -40,9 +49,14 @@ Fixes
 
 * Tour Tags
   - Fixed issue: Column widths have been reset when tags are saved
+  
+* Tour Import
+  - GPX: Fixed NPE when importing MyTourbook export files
 
-
- 
+* Tour Export
+  - GPX: <mt:bikerWeight> value was wrong
+  
+   
 Translation    
 ===========
 
