@@ -37,6 +37,11 @@ public enum TileEncoding {
 	 * Mapsforge Map encoding
 	 */
 	MF,
-	
+	  
+   /**
+    * Mapilion MVT Tile encoding (pbf)
+    */
+   MP;
+   
 
 }

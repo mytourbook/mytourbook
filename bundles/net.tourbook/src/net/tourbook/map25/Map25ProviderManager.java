@@ -111,6 +111,27 @@ public class Map25ProviderManager {
 
       return mapProvider;
    }
+   
+   /**
+    * mapilion.com/
+    */
+   private static Map25Provider createMapProvider_Mapilion() {
+
+      final Map25Provider mapProvider = new Map25Provider();
+
+      //mapProvider.isDefault = true;
+      mapProvider.isEnabled = true;
+      mapProvider.name = "Mapilion";
+      mapProvider.online_url = "https://tiles.mapilion.com/data/v3"; //$NON-NLS-1$
+      mapProvider.online_TilePath = "/{Z}/{X}/{Y}.pbf"; //$NON-NLS-1$
+      mapProvider.tileEncoding = TileEncoding.MP;
+      mapProvider.theme = VtmThemes.OPENMAPTILES;
+      mapProvider.description = "Map25_Provider_Mapilion_Description";
+
+      //_defaultMapProvider = mapProvider;
+
+      return mapProvider;
+   }
 
    /**
     * Mapsforge
@@ -349,6 +370,7 @@ public class Map25ProviderManager {
           * Create default map providers
           */
          allMapProvider.add(_defaultMapProvider);
+         allMapProvider.add(createMapProvider_Mapilion());
          allMapProvider.add(createMapProvider_Mapzen());
          allMapProvider.add(createMapProvider_Mapsforge());
          allMapProvider.add(createMapProvider_MyTileServer());
