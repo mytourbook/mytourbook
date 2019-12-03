@@ -121,12 +121,12 @@ public class Map25ProviderManager {
 
       //mapProvider.isDefault = true;
       mapProvider.isEnabled = true;
-      mapProvider.name = "Map25_Provider_Mapilion_Name";
+      mapProvider.name = "Map25_Provider_Mapilion_Name"; //$NON-NLS-1$
       mapProvider.online_url = "https://tiles.mapilion.com/data/v3"; //$NON-NLS-1$
       mapProvider.online_TilePath = "/{Z}/{X}/{Y}.pbf"; //$NON-NLS-1$
       mapProvider.tileEncoding = TileEncoding.MP;
       mapProvider.theme = VtmThemes.OPENMAPTILES;
-      mapProvider.description = "Map25_Provider_Mapilion_Description";
+      mapProvider.description = "Map25_Provider_Mapilion_Description"; //$NON-NLS-1$
 
       //_defaultMapProvider = mapProvider;
 

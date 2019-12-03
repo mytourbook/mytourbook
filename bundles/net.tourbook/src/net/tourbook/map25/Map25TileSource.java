@@ -59,6 +59,12 @@ public class Map25TileSource extends UrlTileSource {
 			tileDecoder = new org.oscim.tiling.source.mvt.TileDecoder();
 
 			break;
+			
+      case MP:
+         // is this correct?
+         tileDecoder = new org.oscim.tiling.source.mvt.TileDecoder();
+
+         break;			
 
 		case VTM:
 		default:
