@@ -121,7 +121,7 @@ public class Map25ProviderManager {
 
       //mapProvider.isDefault = true;
       mapProvider.isEnabled = true;
-      mapProvider.name = "Mapilion";
+      mapProvider.name = "Map25_Provider_Mapilion_Name";
       mapProvider.online_url = "https://tiles.mapilion.com/data/v3"; //$NON-NLS-1$
       mapProvider.online_TilePath = "/{Z}/{X}/{Y}.pbf"; //$NON-NLS-1$
       mapProvider.tileEncoding = TileEncoding.MP;
@@ -336,8 +336,6 @@ public class Map25ProviderManager {
                   } else {
 
                      mapProvider.online_ApiKey              = Util.getXmlString(xml, ATTR_ONLINE_API_KEY, UI.EMPTY_STRING);
-                     //mapProvider.online_TilePath            = Util.getXmlString(xml, ATTR_ONLINE_TILE_PATH, UI.EMPTY_STRING);
-                     //mapProvider.online_url                 = Util.getXmlString(xml, ATTR_ONLINE_URL, UI.EMPTY_STRING);                    
                      mapProvider.online_TilePath            = Util.getXmlString(xml, ATTR_ONLINE_TILE_PATH, "/{Z}/{X}/{Y}.vtm"); //$NON-NLS-1$
                      mapProvider.online_url                 = Util.getXmlString(xml, ATTR_ONLINE_URL, "http://opensciencemap.org/tiles/vtm"); //$NON-NLS-1$
                   }
@@ -351,8 +349,8 @@ public class Map25ProviderManager {
                         ? null
                         : (VtmThemes) Util.getXmlEnum(xml, ATTR_THEME, getDefaultTheme(tileEncoding));
 
-    /*              System.out.println("################## Name, Url and online_TilePath: " + mapProvider.name + " " + mapProvider.online_url //$NON-NLS-1$//$NON-NLS-2$
-                        + mapProvider.online_TilePath);*/
+                  System.out.println("################## Name, Url and online_TilePath: " + mapProvider.name + " " + mapProvider.online_url //$NON-NLS-1$//$NON-NLS-2$
+                        + mapProvider.online_TilePath);
 
                   allMapProvider.add(mapProvider);
                }
