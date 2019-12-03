@@ -92,8 +92,8 @@ public class MapPosition_with_MarkerPosition extends org.oscim.core.MapPosition{
       this.mapPositionMarkerY = mapPosition.y;
       
       
-      System.out.println("constructor lat: " + mapPosition.getLatitude() + " lon: " + mapPosition.getLongitude());
-      System.out.println("constructor y: " + mapPositionMarkerY + " x: " + mapPositionMarkerX);
+      System.out.println("constructor lat: " + mapPosition.getLatitude() + " lon: " + mapPosition.getLongitude()); //$NON-NLS-1$ //$NON-NLS-2$
+      System.out.println("constructor y: " + mapPositionMarkerY + " x: " + mapPositionMarkerX); //$NON-NLS-1$ //$NON-NLS-2$
    }  
    
 }

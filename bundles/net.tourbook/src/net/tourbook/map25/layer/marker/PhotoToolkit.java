@@ -140,16 +140,16 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
    }
 
    public List<MarkerItem> createPhotoItemList(ArrayList<Photo> galleryPhotos){
-      Map25App.debugPrint(" Phototoolkit createPhotoItemList: entering ");
+      Map25App.debugPrint(" Phototoolkit createPhotoItemList: entering "); //$NON-NLS-1$
       List<MarkerItem> pts = new ArrayList<>();
       
       if (galleryPhotos == null) {
-         Map25App.debugPrint(" Map25View: *** createPhotoItemList: galleriePhotos was null");
+         Map25App.debugPrint(" Map25View: *** createPhotoItemList: galleriePhotos was null"); //$NON-NLS-1$
          return pts;
          }
 
       if (galleryPhotos.size() == 0) {
-         Map25App.debugPrint(" Map25View: *** createPhotoItemList: galleriePhotos.size() was 0");
+         Map25App.debugPrint(" Map25View: *** createPhotoItemList: galleriePhotos.size() was 0"); //$NON-NLS-1$
          return  pts;     
       }
       
@@ -162,27 +162,27 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
       
       for (final  Photo photo : galleryPhotos) {
          int stars = 0;
-         String starText = "";
-         String photoName = "";
+         String starText = ""; //$NON-NLS-1$
+         String photoName = ""; //$NON-NLS-1$
          UUID photoKey = UUID.randomUUID();
 
          stars = photo.ratingStars;
          //starText = "";
          switch (stars) {
          case 1:
-            starText = " *";
+            starText = " *"; //$NON-NLS-1$
          case 2:
-            starText = " **";
+            starText = " **"; //$NON-NLS-1$
          case 3:
-            starText = " ***";
+            starText = " ***"; //$NON-NLS-1$
          case 4:
-            starText = " ****";
+            starText = " ****"; //$NON-NLS-1$
          case 5:
-            starText = " *****";
+            starText = " *****"; //$NON-NLS-1$
          }
          photoName = TimeTools.getZonedDateTime(photo.imageExifTime).format(TimeTools.Formatter_Time_S) + starText;       
 
-         String photoDescription = "Ratingstars: " + Integer.toString(photo.ratingStars);
+         String photoDescription = "Ratingstars: " + Integer.toString(photo.ratingStars); //$NON-NLS-1$
          
          Double photoLat = 0.0;
          Double photoLon = 0.0;
@@ -195,7 +195,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
             photoLat = photo.getImageMetaData().latitude;
             photoLon = photo.getImageMetaData().longitude;
          } else {
-            Map25App.debugPrint("PhotoToolkit: *** createPhotoItemList: using tour geo");
+            Map25App.debugPrint("PhotoToolkit: *** createPhotoItemList: using tour geo"); //$NON-NLS-1$
             photoLat = photo.getTourLatitude();
             photoLon = photo.getTourLongitude();
          }
@@ -364,14 +364,14 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
    public boolean onItemLongPress(int index, MarkerItem photoItem) {
       // TODO Auto-generated method stub
       //debugPrint(" ??????????? PhotoToolkit *** onItemLongPress(int index, MarkerItem photoItem): " + arg0 + " " + arg1);
-      debugPrint(" ??????????? PhotoToolkit *** onItemLongPress(int index, MarkerItem photoItem): " + _allPhotos.get(index).imageFilePathName + " " + photoItem.getTitle());
+      debugPrint(" ??????????? PhotoToolkit *** onItemLongPress(int index, MarkerItem photoItem): " + _allPhotos.get(index).imageFilePathName + " " + photoItem.getTitle()); //$NON-NLS-1$ //$NON-NLS-2$
       return false;
    }
 
    @Override
    public boolean onItemSingleTapUp(int index, MarkerItem photoItem) {
       // TODO Auto-generated method stub
-      debugPrint(" ??????????? PhotoToolkit *** onItemSingleTapUp(int index, MarkerItem photoItem): " + _allPhotos.get(index).imageFilePathName + " " + photoItem.getTitle());
+      debugPrint(" ??????????? PhotoToolkit *** onItemSingleTapUp(int index, MarkerItem photoItem): " + _allPhotos.get(index).imageFilePathName + " " + photoItem.getTitle()); //$NON-NLS-1$ //$NON-NLS-2$
       //showPhoto(_allPhotos.get(index));
       return false;
    }

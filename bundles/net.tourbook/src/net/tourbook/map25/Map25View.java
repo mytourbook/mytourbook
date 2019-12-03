@@ -133,7 +133,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
    private static final String            IMAGE_ACTION_SYNCH_WITH_SLIDER_DISABLED          = net.tourbook.map2.Messages.image_action_synch_with_slider_disabled;
    private static final String            IMAGE_ACTION_SYNCH_WITH_SLIDER                   = net.tourbook.map2.Messages.image_action_synch_with_slider;
    private static final String            MAP_ACTION_SHOW_TOUR_IN_MAP                      = net.tourbook.map2.Messages.map_action_show_tour_in_map;
-   private static final String            MAP_ACTION_SHOW_PHOTO_IN_MAP                     = "show photos in map"; //must be externalyzed
+   //private static final String            MAP_ACTION_SHOW_PHOTO_IN_MAP                     = "map_actionshow photos in map"; //must be externalyzed
    
    private static final String            MAP_ACTION_SYNCH_WITH_SLIDER                     = net.tourbook.map2.Messages.map_action_synch_with_slider;
    private static final String            MAP_ACTION_SYNCH_WITH_SLIDER_CENTERED            = net.tourbook.map2.Messages.Map_Action_SynchWithSlider_Centered;
@@ -1163,7 +1163,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
     * copied from Map2View 17.07.2019
     */
    public ArrayList<Photo> paintPhotoSelection(final ISelection selection) {
-      Map25App.debugPrint("* Map25View: paintphotoselection: entering");
+      Map25App.debugPrint("* Map25View: paintphotoselection: entering"); //$NON-NLS-1$
       //_isLinkPhotoDisplayed = false;
       selection.toString();
       final ArrayList<Photo> allPhotos = new ArrayList<>();
@@ -1232,11 +1232,11 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
          if (allNewPhotoHash == _hash_AllPhotos) {
             return;
          }
-         Map25App.debugPrint("* Map25View: paintPhotos: allNewPhotos.size(): " + allNewPhotos.size());
+         Map25App.debugPrint("* Map25View: paintPhotos: allNewPhotos.size(): " + allNewPhotos.size()); //$NON-NLS-1$
 
          _allPhotos.clear(); //when active, no fotos
          _allPhotos.addAll(allNewPhotos);
-         Map25App.debugPrint("* Map25View: paintPhotos: _allPhotos: size: " + _allPhotos.size());
+         Map25App.debugPrint("* Map25View: paintPhotos: _allPhotos: size: " + _allPhotos.size()); //$NON-NLS-1$
          _hash_AllPhotos = _allPhotos.hashCode();   //done in createPhotoItem    
          
       } 
@@ -1472,7 +1472,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
    }
 
    private void paintTours_AndUpdateMap() {
-      Map25App.debugPrint(" Map25View: ** paintTours_AndUpdateMap: entering");
+      Map25App.debugPrint(" Map25View: ** paintTours_AndUpdateMap: entering"); //$NON-NLS-1$
       enableActions();
 
       if (!_isShowTour) {
@@ -1594,7 +1594,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       //_mapApp.debugPrint(" Map25View: ** paintTours_AndUpdateMap: creating photoItems with size: " + photoItems.size());
       _mapApp.updateUI_PhotoLayer();
       //photoLayer.setEnabled(true);
-      Map25App.debugPrint(" Map25View: ** paintTours_AndUpdateMap: creating photolayer with size: " + _allPhotos.size());
+      Map25App.debugPrint(" Map25View: ** paintTours_AndUpdateMap: creating photolayer with size: " + _allPhotos.size()); //$NON-NLS-1$
       
       /*
        * Update map
