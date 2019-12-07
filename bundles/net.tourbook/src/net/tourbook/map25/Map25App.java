@@ -74,6 +74,7 @@ import org.oscim.layers.tile.vector.VectorTileLayer;
 import org.oscim.map.Layers;
 import org.oscim.map.Map.UpdateListener;
 import org.oscim.map.ViewController;
+import org.oscim.map.Viewport;
 import org.oscim.renderer.BitmapRenderer;
 import org.oscim.renderer.GLViewport;
 import org.oscim.scalebar.DefaultMapScaleBar;
@@ -98,6 +99,7 @@ import org.oscim.tiling.source.bitmap.DefaultSources;
 import org.oscim.tiling.source.mapfile.MapFileTileSource;
 import org.oscim.tiling.source.mapfile.MultiMapFileTileSource;
 //import org.oscim.tiling.source.mvt.MapilionMvtTileSource;
+import org.oscim.layers.tile.bitmap.BitmapTileLayer.FadeStep;
 import org.oscim.utils.Parameters;
 
 import com.badlogic.gdx.Gdx;
@@ -158,6 +160,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	private MultiMapFileTileSource _tileSourceOfflineMM;
 	
 	private int							_tileSourceOfflineMapCount = 0;
+	private String                _mp_key = "80d7bc63-94fe-416f-a63f-7173f81a484c";
+	
 	
 	//public static enum DebugMode {OFF, ON};
 	public static DebugMode debugMode = DebugMode.ON;   // before releasing, set this to OFF
@@ -1047,13 +1051,26 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	   debugPrint(" map25: " + "################ setupMap_Layers:  entering"); //$NON-NLS-1$ //$NON-NLS-2$
 	   final Layers layers = mMap.layers();
 	   final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
-	   
-	   // hillshading with 1MB RAM Cache, using existing _httpfactory with diskcache
-	   _hillshadingSource =  DefaultSources.HIKEBIKE_HILLSHADE
-	         .httpFactory(_httpFactory)
-	         .zoomMin(1)
-	         .zoomMax(16)
-	         .build();  
+ 
+	    // hillshading from mapilion. With vtm 0.12 there is a defaultsource...
+	   _hillshadingSource = BitmapTileSource.builder()
+            .httpFactory(_httpFactory)
+            .url("https://tiles.mapilion.com/hillshades/v2") //$NON-NLS-1$
+            .tilePath("/{Z}/{X}/{Y}.png?key=" + _mp_key) //$NON-NLS-1$
+            .fadeSteps(new FadeStep[]{new FadeStep(0, Viewport.MAX_ZOOM_LEVEL, 1, 0.2f)})
+            .zoomMin(1)
+            .zoomMax(12)
+            .build()
+            //.apiKey(_mp_key) // from vtm 0.11
+            ;
+
+//	   _hillshadingSource =  DefaultSources.HIKEBIKE_HILLSHADE
+//	         .httpFactory(_httpFactory)
+//	         .zoomMin(1)
+//	         .zoomMax(16)
+//	         .build();  
+
+	// hillshading with 1MB RAM Cache, using existing _httpfactory with diskcache
 	   _layer_HillShading = new BitmapTileLayer(mMap, _hillshadingSource, 1 << 19);
 	   _layer_HillShading.setEnabled(false);
 	   mMap.layers().add(_layer_HillShading);
