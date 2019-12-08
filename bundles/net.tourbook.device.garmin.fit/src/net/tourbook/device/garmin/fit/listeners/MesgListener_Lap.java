@@ -58,9 +58,9 @@ public class MesgListener_Lap extends AbstractMesgListener implements LapMesgLis
       final Integer messageIndex = getLapMessageIndex(lapMesg);
       final TourMarker tourMarker = fitData.getCurrent_TourMarker();
 
-      tourMarker.setLabel(messageIndex == null //
+      tourMarker.setLabel(messageIndex == null
             ? Integer.toString(++_lapCounter)
-            : messageIndex.toString());
+            : Integer.toString(messageIndex + 1));
 
       float lapDistance = -1;
       final Float totalDistance = lapMesg.getTotalDistance();
