@@ -12,6 +12,7 @@ repositories/
 **/*vtm*/**/build/
 
 .apt_generated
+.log
 
 .gradle
 gradle

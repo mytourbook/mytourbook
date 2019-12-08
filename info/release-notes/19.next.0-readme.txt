@@ -1,0 +1,70 @@
+19.next.0                                                 ?. Month 2019
+
+
+TODO's
+======
+
+* Website
+  - Update contributor/translator list
+  - Show cheatsheet
+* Update SWT to 4.14 (Eclipse 2019-12) to fix the issue (Linux only) when
+  saving a map tile on disk
+  (cf. https://bugs.eclipse.org/bugs/show_bug.cgi?id=553240) 
+ 
+
+Bugs
+----
+* Map2: new tour selector explodes when continously selecting markers in search view, maybe in other views
+
+
+New + Improvements   
+==================
+
+Views
+-----
+
+* Calendar - Weekly summary
+  
+  Time spent in "slow" vs "fast" cadence zones
+
+Import
+======
+
+
+ 
+Changes  
+=======
+
+* Tour Import
+  - GPX: Set default to absolute distance that the defaults for export/import are the same
+  - FIT: Starting marker label from 1 instead of 0
+
+ 
+Fixes   
+=====
+
+* Statistics
+  - Show tooltip for the bottom bars, the hitbox for the horizontal slider starts now below the horizontal line (for a bar chart)
+  - Fixed issue: Tour type in tooltip is wrong for the first item (year/month)
+
+* Tour Tags
+  - Fixed issue: Column widths have been reset when tags are saved
+  
+* Tour Import
+  - GPX: Fixed NPE when importing MyTourbook export files
+
+* Tour Export
+  - GPX: <mt:bikerWeight> value was wrong
+  
+   
+Translation    
+===========
+
+ - French (Frederic)
+ - German
+ - Italian (Doriano)
+
+ 
+System   
+======
+

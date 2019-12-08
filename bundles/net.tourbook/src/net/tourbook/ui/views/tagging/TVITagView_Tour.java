@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,94 +20,93 @@ import java.sql.SQLException;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.ui.UI;
 
 public class TVITagView_Tour extends TVITagViewItem {
 
-	public static final String	SQL_TOUR_COLUMNS	= UI.EMPTY_STRING		//
-			//
-			+ "startYear,"																//	0 //$NON-NLS-1$
-			+ "startMonth,"															//	1 //$NON-NLS-1$
-			+ "startDay,"																//	2 //$NON-NLS-1$
-			//
-			+ "tourTitle,"																//	3 //$NON-NLS-1$
-			+ "tourType_typeId,"														//	4 //$NON-NLS-1$
-			+ "deviceTimeInterval,"													//	5 //$NON-NLS-1$
-			+ "startDistance,"														//	6 //$NON-NLS-1$
-			//
-			+ SQL_SUM_COLUMNS_TOUR;													//	7
+   public static final String SQL_TOUR_COLUMNS = UI.EMPTY_STRING
 
-	long								tourId;
+         + "startYear,"                                         //	0 //$NON-NLS-1$
+         + "startMonth,"                                        //	1 //$NON-NLS-1$
+         + "startDay,"                                          //	2 //$NON-NLS-1$
 
-	ZonedDateTime					tourDate;
+         + "tourTitle,"                                         //	3 //$NON-NLS-1$
+         + "tourType_typeId,"                                   //	4 //$NON-NLS-1$
+         + "deviceTimeInterval,"                                //	5 //$NON-NLS-1$
+         + "startDistance,"                                     //	6 //$NON-NLS-1$
 
-	int								tourYear;
-	int								tourMonth;
-	int								tourDay;
+         + SQL_SUM_COLUMNS_TOUR;                                //	7
 
-	String							tourTitle;
-	long								tourTypeId;
+   long                       tourId;
 
-	ArrayList<Long>				tagIds;
+   ZonedDateTime              tourDate;
 
-	public long						deviceStartDistance;
-	public short					deviceTimeInterval;
+   int                        tourYear;
+   int                        tourMonth;
+   int                        tourDay;
 
-	public TVITagView_Tour(final TVITagViewItem parentItem) {
-		setParentItem(parentItem);
-	}
+   String                     tourTitle;
+   long                       tourTypeId;
 
-	@Override
-	public boolean equals(final Object obj) {
+   ArrayList<Long>            tagIds;
 
-		if (obj == this) {
-			return true;
-		}
+   public long                deviceStartDistance;
+   public short               deviceTimeInterval;
 
-//		if (obj instanceof TVITagView_Tour) {
-//			final TVITagView_Tour tourItem = (TVITagView_Tour) obj;
-//			return tourId == tourItem.tourId && fParentItem == tourItem.fParentItem;
-//		}
+   public TVITagView_Tour(final TVITagViewItem parentItem) {
+      setParentItem(parentItem);
+   }
 
-		return false;
-	}
+   @Override
+   public boolean equals(final Object obj) {
 
-	@Override
-	protected void fetchChildren() {}
+      if (obj == this) {
+         return true;
+      }
 
-	public void getTourColumnData(final ResultSet result, final Object resultTagId, final int startIndex)
-			throws SQLException {
+      return false;
+   }
 
-		tourYear = result.getInt(startIndex + 0);
-		tourMonth = result.getInt(startIndex + 1);
-		tourDay = result.getInt(startIndex + 2);
+   @Override
+   protected void fetchChildren() {}
 
-		tourDate = ZonedDateTime.of(tourYear, tourMonth, tourDay, 0, 0, 0, 0, TimeTools.getDefaultTimeZone());
+   public void getTourColumnData(final ResultSet result, final Object resultTagId, final int startIndex)
+         throws SQLException {
 
-		tourTitle = result.getString(startIndex + 3);
+      tourYear = result.getInt(startIndex + 0);
+      tourMonth = result.getInt(startIndex + 1);
+      tourDay = result.getInt(startIndex + 2);
 
-		final Object resultTourTypeId = result.getObject(startIndex + 4);
-		tourTypeId = (resultTourTypeId == null ? TourDatabase.ENTITY_IS_NOT_SAVED : (Long) resultTourTypeId);
+      tourDate = ZonedDateTime.of(tourYear, tourMonth, tourDay, 0, 0, 0, 0, TimeTools.getDefaultTimeZone());
 
-		deviceTimeInterval = result.getShort(startIndex + 5);
-		deviceStartDistance = result.getLong(startIndex + 6);
+      tourTitle = result.getString(startIndex + 3);
 
-		readDefaultColumnData(result, startIndex + 7);
+      final Object resultTourTypeId = result.getObject(startIndex + 4);
+      tourTypeId = (resultTourTypeId == null ? TourDatabase.ENTITY_IS_NOT_SAVED : (Long) resultTourTypeId);
 
-		if (resultTagId instanceof Long) {
-			tagIds = new ArrayList<>();
-			tagIds.add((Long) resultTagId);
-		}
-	}
+      deviceTimeInterval = result.getShort(startIndex + 5);
+      deviceStartDistance = result.getLong(startIndex + 6);
 
-	public long getTourId() {
-		return tourId;
-	}
+      if (UI.IS_SCRAMBLE_DATA) {
+         tourTitle = UI.scrambleText(tourTitle);
+      }
 
-	@Override
-	public boolean hasChildren() {
-		return false;
-	}
+      readDefaultColumnData(result, startIndex + 7);
+
+      if (resultTagId instanceof Long) {
+         tagIds = new ArrayList<>();
+         tagIds.add((Long) resultTagId);
+      }
+   }
+
+   public long getTourId() {
+      return tourId;
+   }
+
+   @Override
+   public boolean hasChildren() {
+      return false;
+   }
 }

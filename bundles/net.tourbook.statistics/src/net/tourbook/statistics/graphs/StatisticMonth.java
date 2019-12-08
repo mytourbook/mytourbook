@@ -56,6 +56,8 @@ import org.eclipse.ui.IViewSite;
 
 public abstract class StatisticMonth extends TourbookStatistic {
 
+   private static final char        NL            = UI.NEW_LINE;
+
    private final IPreferenceStore   _prefStore    = TourbookPlugin.getPrefStore();
 
    private TourPerson               _appPerson;
@@ -170,58 +172,54 @@ public abstract class StatisticMonth extends TourbookStatistic {
       final int breakTime = recordingTime - drivingTime;
 
       /*
-       * tool tip: title
+       * Tool tip: title
        */
       final StringBuilder sbTitle = new StringBuilder();
 
-      final String tourTypeName = StatisticServices
-            .getTourTypeName(serieIndex, valueIndex, _resortedTypeIds, _appTourTypeFilter);
+      final String tourTypeName = StatisticServices.getTourTypeName(serieIndex, valueIndex, _resortedTypeIds, _appTourTypeFilter);
 
       if (tourTypeName != null && tourTypeName.length() > 0) {
          sbTitle.append(tourTypeName);
       }
 
-      final String toolTipTitle = String
-            .format(Messages.tourtime_info_date_month, sbTitle.toString(), monthText, monthDate.getYear());
+      final String toolTipTitle = String.format(Messages.tourtime_info_date_month,
+            sbTitle.toString(),
+            monthText,
+            monthDate.getYear());
 
       /*
-       * tool tip: label
+       * Tool tip: label
        */
-      final StringBuilder toolTipFormat = new StringBuilder();
-      toolTipFormat.append(Messages.tourtime_info_distance_tour);
-      toolTipFormat.append(UI.NEW_LINE);
-      toolTipFormat.append(Messages.tourtime_info_altitude);
-      toolTipFormat.append(UI.NEW_LINE);
-      toolTipFormat.append(UI.NEW_LINE);
-      toolTipFormat.append(Messages.tourtime_info_recording_time);
-      toolTipFormat.append(UI.NEW_LINE);
-      toolTipFormat.append(Messages.tourtime_info_driving_time);
-      toolTipFormat.append(UI.NEW_LINE);
-      toolTipFormat.append(Messages.tourtime_info_break_time);
-      toolTipFormat.append(UI.NEW_LINE);
-      toolTipFormat.append(UI.NEW_LINE);
-      toolTipFormat.append(Messages.TourTime_Info_NumberOfTours);
+      final String toolTipFormat = UI.EMPTY_STRING
 
-      final String toolTipLabel = String.format(
-            toolTipFormat.toString(), //
-            //
+            + Messages.tourtime_info_distance_tour + NL
+            + Messages.tourtime_info_altitude + NL
+            + NL
+            + Messages.tourtime_info_recording_time + NL
+            + Messages.tourtime_info_driving_time + NL
+            + Messages.tourtime_info_break_time + NL
+            + NL
+            + Messages.TourTime_Info_NumberOfTours;
+
+      final String toolTipLabel = String.format(toolTipFormat,
+
             _resortedDistanceHigh[serieIndex][valueIndex] / 1000,
             UI.UNIT_LABEL_DISTANCE,
-            //
+
             (int) _resortedAltitudeHigh[serieIndex][valueIndex],
             UI.UNIT_LABEL_ALTITUDE,
-            //
+
             recordingTime / 3600,
             (recordingTime % 3600) / 60,
-            //
+
             drivingTime / 3600,
             (drivingTime % 3600) / 60,
-            //
+
             breakTime / 3600,
             (breakTime % 3600) / 60,
-            //
+
             (int) _resortedNumToursHigh[serieIndex][valueIndex]
-      //
+
       ).toString();
 
       /*

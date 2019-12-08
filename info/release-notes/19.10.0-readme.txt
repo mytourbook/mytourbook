@@ -1,131 +1,245 @@
-19.10.0                                                      ?. October 2019
-
-TODOs
-=====
-* Update FT search docu: FT search is updated when tour is saved
-* Test import because of changed device watching task + sql exception handling
-* Recommend DBeaver as a better SQL explorer   
+19.10.0                                                 30. October 2019
 
 
-New + Improvements
+Experimental: Delete Tag / Tag Category
+=======================================
+
+   This is a New Feature
+
+   A new feature that deletes something should always be used with care 
+   and attention.
+
+   This feature has been tested and worked properly. However, backing up
+   the tour data is always a good advice.
+
+
+New + Improvements   
 ==================
 
-* Tour Tag View
+Views
+-----
+
+* Tour Tags
+
   - Show tags of all selected tours
-  - Add/delete tags of all selected tours
-  - Delete tour tag -> tag is removed from tours and tag definition is deleted
-  - Delete tour tag category
+  - Add/remove tags and save with <Ctrl>+S
+
 
 * Tagged Tours
-  - Expand/collapse tag/tag category/year/month (item) when label is selected with the mouse
+
+  - Expand/collapse tag/tag category/year/month (item) when label is 
+    selected with the mouse
   - Expand only one item and collapse any other items
+  - Delete tag → tag is removed from tours and tag definition is deleted
+  - Delete tag category
 
-* Tour cadence zones times (Frederic)
-  - Added the ability to see, for a given activity, month or year, the percentage of time spent in each cadence zone "slow" and "fast"
-    This feature was inspired by coach Jason Koop's recommendation (see bullet point #5 "Hike more" https://trainright.com/8-things-ultrarunners-do-improve-training/)
 
-* Average elevation change per unit of distance (Frederic)
-  - Added the ability to see (in the Tour Book View and Calendar profiles) for a given activity, month or year, the average elevation change per unit of distance.
-    This feature was inspired by coach Jason Koop's recommendation (see bullet point "Volume of vertical gain/loss" https://trainright.com/data-worth-tracking-ultrarunners)
+* Tour Book - Tour cadence zones times (Frederic)
+  
+  Added the ability to see, for a given activity, month or year, the 
+  percentage of time spent in each cadence zone "slow" and "fast".
+  
+  This feature was inspired by coach Jason Koop's recommendation, 
+  see bullet point #5 "Hike more" 
+  https://trainright.com/8-things-ultrarunners-do-improve-training/
 
-* Tour Marker's view (Frederic)
- - Possibility to delete marker(s) from the contextual menu and when pressing the DELETE key
 
-* Tour Chart
-  - New smoothing algorithm which is not smoothing the computed speed/pace/altimeter/gradient values, this allows to see the raw computed data
- 
-* Tour Editor
-  - Tour can be saved with <Ctrl>+s when "Tour Editor" view is the active view
-  - The save and new tour actions are removed from the view toolbar, now they are available in the main toolbar
+* Tour Book +  Calendar
+  
+  Average elevation change per unit of distance (Frederic)
 
-* Tour Book View
+  Added the ability to see for a given activity, month or year, the 
+  average elevation change per unit of distance.
+  
+  This feature was inspired by coach Jason Koop's recommendation, 
+  see bullet point "Volume of vertical gain/loss" 
+  https://trainright.com/data-worth-tracking-ultrarunners
+
+
+* Tour Book
+
   - Show min/max temperature values
-  - Set min/max temperature values from time slices
   - Show tour start/end location
+  - Set min/max temperature values from time slices
 
-* Tour Filter
-  - Filter by tour start/end location
-  
-* TCX Export
-  - An activity type can now be specified when exporting activities in TCX format
-	By default, the Strava and Garmin activity types are proposed (see https://developers.strava.com/docs/uploads/ and https://www8.garmin.com/xmlschemas/TrainingCenterDatabasev2.xsd)
-  
-* Dialog Quick Edit
-  - Edit tour start/end location 
+ 
+* Tour Marker (Frederic)
 
-* Reference Tours
+  - Possibility to delete marker(s) from the contextual menu and when 
+    pressing the DELETE key
+
+ 
+* Tour Chart
+
+  - New smoothing algorithm No Smoothing which is not smoothing the 
+    computed speed/pace/altimeter/gradient values, this allows to see 
+    the raw computed data
+
+ 
+* Reference Tours (Frederic)
+
   - Show recording time
 
-  
+ 
+Tools
+-----
+
+* Tour Editor
+
+  - A tour can now be saved with <Ctrl>+S when this view is the active 
+    view
+
+ 
+* Dialog Quick Edit
+
+  - Edit tour start/end location
+
+ 
+* Tour Filter
+
+  - Filter by tour start/end location
+
+ 
+* TCX Export (Frederic)
+
+  - An activity type can now be specified when exporting activities in 
+    TCX format. By default, the Strava and Garmin activity types are 
+    proposed, see https://developers.strava.com/docs/uploads/ and 
+    https://www8.garmin.com/xmlschemas/TrainingCenterDatabasev2.xsd
+
+ 
 Import
 ======
 
 * Import Preferences (Frederic)
-  - Added the ability to choose whether to set the person's body weight when importing and saving a tour
 
-* Import FitLogEx Files (Frederic)
-  - Custom Data Field Import. The data field names and values are imported in the tour notes
-  - Setting the start time (when present) and time zone (when GPS coordinates are not present) using the UTC time offset
+  - Added the ability to choose whether to set the person's body weight 
+    when importing and saving a tour
+
+ 
+* FitLogEx File (Frederic)
+
+  - Custom Data Field Import. The data field names and values are 
+    imported in the tour notes
+  - Setting the start time (when present) and time zone (when GPS 
+    coordinates are not present) using the UTC time offset
   - Importing and mapping unique equipments based on their GUIDs
 
-* .fit File (Frederic)
-  - Added support for the developer field:
-    - Garmin Running Dynamics Pod
-  - Added the ability to select the preferred power developer field to import
-  - when multiple power data sources are present within a given FIT file:
-    - Stryd or Garmin Running Dynamics Pod
+ 
+* FIT File (Frederic)
 
-* .tcx File
+  - Added support for the developer field: Garmin Running Dynamics Pod
+  - Added the ability to select the preferred power developer field to 
+    import
+  - When multiple power data sources are present within a given FIT 
+    file: Stryd or Garmin Running Dynamics Pod
+
+ 
+* TCX File
+
   - Import Course/Name tag as tour title
 
-
-Changes
+ 
+Changes  
 =======
 
-* Altitude -> Elevation
-  - Changed wording from "Altitude" to "Elevation" for the english texts
-    The term elevation is mainly used when referring to points on the Earth's surface, while altitude (...) is used for points above the surface (see https://en.wikipedia.org/wiki/Elevation)
+* Altitude -> Elevation (Frederic)
 
+  - Changed wording for the english texts from Altitude to Elevation
+
+    "The term elevation is mainly used when referring to points on the 
+    Earth's surface, while altitude (...) is used for points above the 
+    surface" https://en.wikipedia.org/wiki/Elevation
+     
+    This wording was changed because MyTourbook is mainly used for tours
+    on the earth surface and not in the air
+
+ 
 * Tour Book View
-  -  Moved all tour modify actions into the new submenu "Adjust Tour Values"
 
+  - Moved all tour modify actions into the new submenu
+    Adjust Tour Values
 
+ 
+* Tour Editor
+
+  - The save/restore and new tour actions have been removed from the 
+    view toolbar, now they are available in the app toolbar. 
+    Save and restore actions are only visible when the tour editor is 
+    the active view
+
+* Icons
+
+  - Updated icons
+
+    Save tour
+    Save tags
+    Restore tour
+    Refresh view
+
+ 
 Bugfix   
 ======
 
+* Tour Chart
+
+  - Imperial elevation/altimeter values could be wrong depending on the 
+    selected measurement system and when the tour was displayed the 
+    first time
+  - When multiple tours are displayed and some of the tours have no 
+    distance, then the line graph was painted to x=0 which was showing a
+    corrupted graph with triangles
+  - Show RPM/SPM correctly in the valuepoint tooltip 
+    https://github.com/wolfgang-ch/mytourbook/issues/86
+
+ 
 * Weather (Frederic)
- - When entering a pressure using the metric system (mb), the format now accepts 1 decimal
 
+  - When entering a pressure using the metric system (mb), the format 
+    now accepts 1 decimal
+
+ 
+* Body Weight Unit (Frederic)
+
+  - When changing the measurement unit, the body weight unit is updated 
+    in the UI
+
+ 
 * Fitlog Import (Frederic)
-  - Now Taking into account the pauses when importing laps 
-  - Distinguishing between manual activities and activities with tracks 
-  - Converting Calories (unit used in ST) to kilocalories (unit used in MTB)
 
-* Body Weight unit (Frederic)
-  - When changing the measurement unit, the body weight unit is updated in the UI
+  - Now Taking into account the pauses when importing laps
+  - Distinguishing between manual activities and activities with tracks
+  - Converting Calories (unit used in ST) to kilocalories (unit used in 
+    MTB)
 
+ 
 * Fitlog Import + Tour Book View
+
   The tour start time was wrong and needed these 2 fixes
+
   - Fitlog Import
     - Fixed tour start time year/month/day by using it's time zone
   - Tour Book View
-    - Extended "Set Time Zone" wizard to set tour start time year/month/day with time zone  
+    - Extended Set Time Zone wizard to set tour start time 
+      year/month/day with time zone  
+
+ 
+* Import (Frederic)
+
+  - Fixed a bug that confused the user when re-importing multiple files.
+    If one of them was invalid, the log would display the valid 
+    re-imported files as invalid files that could not be re-imported
+  - Fixed a bug when reimporting a subset of tours contained in files 
+    that have multiple tours. The reimport is now enabled for all files 
+    except .Fit files
+
  
 * CM4xxM Import (Meinhard)
-  - Fixed endless loop when reading a CM4xxM DAT file https://github.com/wolfgang-ch/mytourbook/issues/125 
-    
-* Tour Chart
-  - Imperial altitude/altimeter values could be wrong depending on the selected measurement system and when the tour was displayed the first time
-  - When multiple tours are displayed and some of the tours have no distance, then the line graph was painted to x=0 which was showing a corrupted graph with triangles
-  - Show RPM/SPM correctly in the valuepoint tooltip https://github.com/wolfgang-ch/mytourbook/issues/86
 
-* Import
-  - Fixed a bug that confused the user when re-importing multiple files. If one of them was invalid, the log would display the valid re-imported files as invalid files that could not be re-imported
+  - Fixed endless loop when reading a CM4xxM DAT file
+    https://github.com/wolfgang-ch/mytourbook/issues/125
 
-  - Fixed a bug when reimporting a subset of tours contained in files that have multiple tours
-    The reimport is now enabled for all files except .Fit files
-
-
+ 
 Translation    
 ===========
 
@@ -139,8 +253,12 @@ System
 
 * Eclipse 2019-09 (4.13)
 
-  - This new version solves the issue (Linux only) when modifying the tour start time spinner widget in the tour editor as it was not triggering the possibility to save the tour in the tour editor
-    See also https://bugs.eclipse.org/bugs/show_bug.cgi?id=547489
-    
-* System Translation (4.12)
+  This new version solves the issue (Linux only) when modifying the tour
+  start time spinner widget in the tour editor as it was not triggering 
+  the possibility to save the tour in the tour editor, see also 
+  https://bugs.eclipse.org/bugs/show_bug.cgi?id=547489
+
+* Eclipse Translations 2019-06 (4.12)
+
   Contains translated texts which are used within Eclipse
+  

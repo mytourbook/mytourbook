@@ -262,6 +262,12 @@ public class TagMenuManager {
       _prefStore.addPropertyChangeListener(_prefChangeListener);
    }
 
+   public static void clearRecentTags() {
+
+      _allPreviousTags.clear();
+      _recentTags.clear();
+   }
+
    static void enableRecentTagActions(final boolean isAddTagEnabled, final Set<Long> existingTagIds) {
 
       if (_actionsRecentTags == null) {
@@ -333,6 +339,7 @@ public class TagMenuManager {
    }
 
    private static void restoreAutoOpen() {
+
       _isTaggingAutoOpen = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_TAGGING_AUTO_OPEN);
       _isTaggingAnimation = _prefStore.getBoolean(ITourbookPreferences.APPEARANCE_IS_TAGGING_ANIMATION);
       _taggingAutoOpenDelay = _prefStore.getInt(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY);
@@ -410,10 +417,7 @@ public class TagMenuManager {
     */
    private static void setupRecentActions() {
 
-      _maxRecentActions = TourbookPlugin
-            .getDefault()
-            .getPreferenceStore()
-            .getInt(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TAGS);
+      _maxRecentActions = _prefStore.getInt(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TAGS);
 
       _actionsRecentTags = new ActionRecentTag[_maxRecentActions];
 
@@ -614,7 +618,7 @@ public class TagMenuManager {
 
             } else {
 
-               actionRecentTag.setupTagAction(//
+               actionRecentTag.setupTagAction(
                      tag,
                      (UI.MNEMONIC + (tagIndex + 1) + UI.SPACE2 + tag.getTagName()));
                new ActionContributionItem(actionRecentTag).fill(menu, -1);

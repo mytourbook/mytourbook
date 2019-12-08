@@ -938,10 +938,13 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
                final TourTag tourTag = ((TVIPrefTag) element).getTourTag();
 
-               styledString.append(tourTag.getTagName(), net.tourbook.ui.UI.TAG_STYLER);
-               cell.setImage(tourTag.isRoot() ? _imgTagRoot : _imgTag);
+               String tagName = tourTag.getTagName();
+               if (UI.IS_SCRAMBLE_DATA) {
+                  tagName = UI.scrambleText(tagName);
+               }
 
-//               cell.setBackground(background);
+               styledString.append(tagName, net.tourbook.ui.UI.TAG_STYLER);
+               cell.setImage(tourTag.isRoot() ? _imgTagRoot : _imgTag);
 
             } else if (element instanceof TVIPrefTagCategory) {
 
@@ -950,14 +953,16 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
                cell.setImage(_imgTagCategory);
 
-               styledString.append(tourTagCategory.getCategoryName(), net.tourbook.ui.UI.TAG_CATEGORY_STYLER);
+               String categoryName = tourTagCategory.getCategoryName();
+               if (UI.IS_SCRAMBLE_DATA) {
+                  categoryName = UI.scrambleText(categoryName);
+               }
+               styledString.append(categoryName, net.tourbook.ui.UI.TAG_CATEGORY_STYLER);
 
                // get number of categories
                final int categoryCounter = tourTagCategory.getCategoryCounter();
                final int tagCounter = tourTagCategory.getTagCounter();
                if (categoryCounter == -1 && tagCounter == -1) {
-
-//               styledString.append("  ...", StyledString.COUNTER_STYLER);
 
                } else {
 
@@ -1087,6 +1092,8 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
          return;
       }
 
+      _columnManager.saveState(_state);
+
       updateCheckedTags();
 
       final Dialog_SaveTags_Wizard wizard = new Dialog_SaveTags_Wizard(_allSelectedTours, _allCheckedTagIds);
@@ -1095,7 +1102,8 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
          enableControls();
 
-//         firePropertyChange(PROP_DIRTY);
+         // fire modify event
+         TourManager.fireEvent(TourEventId.TAG_STRUCTURE_CHANGED);
       }
    }
 
@@ -1680,6 +1688,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
          final Object[] expandedElements = _tagViewer.getExpandedElements();
          final Object[] checkedElements = _tagViewer.getCheckedElements();
          final ISelection selection = _tagViewer.getSelection();
+         final ViewerFilter[] viewerFilters = _tagViewer.getFilters();
 
          /*
           * Exclude categories as it would check ALL children
@@ -1696,6 +1705,8 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
          createUI_80_TagViewer(_viewerContainer);
          _viewerContainer.layout();
+
+         _tagViewer.setFilters(viewerFilters);
 
          reloadViewer_SetContent();
 
