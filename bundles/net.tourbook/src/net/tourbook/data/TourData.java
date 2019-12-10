@@ -2490,8 +2490,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          } else {
             altitudeDownTotal += altiDiff;
          }
-         prevAltitude = currentAltitude;
 
+         prevAltitude = currentAltitude;
       }
 
       return new AltitudeUpDown(altitudeUpTotal, -altitudeDownTotal);

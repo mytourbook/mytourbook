@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,57 +17,57 @@ package net.tourbook.algorithm;
 
 public class DPPoint {
 
-	/**
-	 * x coordinate
-	 */
-	public double	x;
+   /**
+    * x coordinate
+    */
+   public double x;
 
-	/**
-	 * y coordinate
-	 */
-	public double	y;
+   /**
+    * y coordinate
+    */
+   public double y;
 
-	/**
-	 * Index of this point in the original time serie
-	 */
-	public int		serieIndex;
+   /**
+    * Index of this point in the original time serie
+    */
+   public int    serieIndex;
 
-	public DPPoint(final double x, final double y, final int serieIndex) {
+   public DPPoint(final double x, final double y, final int serieIndex) {
 
-		this.x = x;
-		this.y = y;
+      this.x = x;
+      this.y = y;
 
-		this.serieIndex = serieIndex;
-	}
+      this.serieIndex = serieIndex;
+   }
 
-	public DPPoint add(final Vector vector) {
-		return new DPPoint(x + vector.x, y + vector.y, serieIndex);
-	}
+   public DPPoint add(final Vector vector) {
+      return new DPPoint(x + vector.x, y + vector.y, serieIndex);
+   }
 
-	/**
-	 * Squared Distance
-	 *
-	 * @param point
-	 * @return
-	 */
-	public double d2(final DPPoint point) {
-		final Vector difference = diff(point);
-		return difference.dot(difference);
-	}
+   /**
+    * Squared Distance
+    *
+    * @param point
+    * @return
+    */
+   public double d2(final DPPoint point) {
+      final Vector difference = diff(point);
+      return difference.dot(difference);
+   }
 
-	/**
-	 * Difference
-	 *
-	 * @param point
-	 * @return
-	 */
-	public Vector diff(final DPPoint point) {
-		return new Vector(x - point.x, y - point.y, serieIndex);
-	}
+   /**
+    * Difference
+    *
+    * @param point
+    * @return
+    */
+   public Vector diff(final DPPoint point) {
+      return new Vector(x - point.x, y - point.y, serieIndex);
+   }
 
    @Override
    public String toString() {
-      return "DPPoint " // //$NON-NLS-1$
+      return "DPPoint " //$NON-NLS-1$
             + String.format("i:%-5d   x=%-5.0f   y=%-5.1f", serieIndex, x, y) //$NON-NLS-1$
             + "\n"; //$NON-NLS-1$
    }
