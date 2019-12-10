@@ -73,10 +73,6 @@ public class Running_Govss {
     */
    private double computeCostKineticEnergy(final double distance, final double initialSpeed, final double speed) {
 
-      if (distance == 0f) {
-         return 0;
-      }
-
       final double Ckin = 0.5 * (Math.pow(speed, 2) - Math.pow(initialSpeed, 2)) / distance;
 
       return Ckin;
@@ -200,7 +196,8 @@ public class Running_Govss {
          currentSlope = TourManager.computeTourAverageGradient(tourData, serieStartIndex, serieEndIndex);
          powerValue = ComputePower(currentDistance, currentSlope, currentSpeed, initialSpeed);
 
-         if (currentSlope > -1 && currentSlope < 1) {
+         if (currentSlope > -1 && currentSlope < 1 &&
+               currentDistance > 0) {
             powerValues.add(powerValue);
          }
 
