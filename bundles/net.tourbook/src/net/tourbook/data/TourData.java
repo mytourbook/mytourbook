@@ -2482,7 +2482,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       for (int dbIndex = 1; dbIndex < simplifiedPoints.length; dbIndex++) {
 
          final DPPoint point = simplifiedPoints[dbIndex];
-         final float currentAltitude = altitudeSerie[point.serieIndex];
+         final float currentAltitude = (float) point.y;
          final float altiDiff = currentAltitude - prevAltitude;
 
          if (altiDiff > 0) {
@@ -2490,8 +2490,21 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          } else {
             altitudeDownTotal += altiDiff;
          }
+            prevAltitude = currentAltitude;
 
-         prevAltitude = currentAltitude;
+         //Solution 1 (Like CG)
+         /*
+          * final float currentAltitude = altitudeSerie[dbIndex];
+          * final float altiDiff = currentAltitude - prevAltitude;
+          * if (Math.abs(altiDiff) > 7f) {
+          * if (altiDiff > 0) {
+          * altitudeUpTotal += altiDiff;
+          * } else {
+          * altitudeDownTotal += altiDiff;
+          * }
+          * prevAltitude = currentAltitude;
+          * }
+          */
       }
 
       return new AltitudeUpDown(altitudeUpTotal, -altitudeDownTotal);
@@ -2500,7 +2513,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * Compute altitude up/down since version 9.08
     * <p>
-    * This algorithm is abandond because it can cause very wrong values dependend on the terrain. DP
+    * This algorithm is abandoned because it can cause very wrong values depending on the terrain.
+    * DP
     * is the preferred algorithm since 14.7.
     *
     * @param segmentSerie
