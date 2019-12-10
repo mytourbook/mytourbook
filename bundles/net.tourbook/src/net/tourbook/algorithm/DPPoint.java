@@ -1,21 +1,21 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.algorithm;
 
-public class DPPoint {
+public class DPPoint implements pl.luwi.series.reducer.Point {
 
 	/**
 	 * x coordinate
@@ -46,7 +46,7 @@ public class DPPoint {
 
 	/**
 	 * Squared Distance
-	 * 
+	 *
 	 * @param point
 	 * @return
 	 */
@@ -57,7 +57,7 @@ public class DPPoint {
 
 	/**
 	 * Difference
-	 * 
+	 *
 	 * @param point
 	 * @return
 	 */
@@ -65,11 +65,21 @@ public class DPPoint {
 		return new Vector(x - point.x, y - point.y, serieIndex);
 	}
 
-	@Override
-	public String toString() {
-		return "DPPoint " // //$NON-NLS-1$
-				+ String.format("i:%-5d   x=%-5.0f   y=%-5.1f", serieIndex, x, y) //$NON-NLS-1$
-				+ "\n"; //$NON-NLS-1$
-	}
+   @Override
+   public double getX() {
+      return x;
+   }
+
+   @Override
+   public double getY() {
+      return y;
+   }
+
+   @Override
+   public String toString() {
+      return "DPPoint " // //$NON-NLS-1$
+            + String.format("i:%-5d   x=%-5.0f   y=%-5.1f", serieIndex, x, y) //$NON-NLS-1$
+            + "\n"; //$NON-NLS-1$
+   }
 
 }

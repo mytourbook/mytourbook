@@ -107,6 +107,8 @@ import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 import org.hibernate.annotations.Cascade;
 
+import pl.luwi.series.reducer.SeriesReducer;
+
 /**
  * Tour data contains all data for a tour (except markers), an entity will be saved in the database
  */
@@ -2459,9 +2461,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
 
       // convert data series into DP points
-      final DPPoint dpPoints[] = new DPPoint[distanceSerie.length];
-      for (int serieIndex = 0; serieIndex < dpPoints.length; serieIndex++) {
-         dpPoints[serieIndex] = new DPPoint(distanceSerie[serieIndex], altitudeSerie[serieIndex], serieIndex);
+      final List<pl.luwi.series.reducer.Point> dpPoints = new ArrayList<>();
+      for (int serieIndex = 0; serieIndex < distanceSerie.length; serieIndex++) {
+         dpPoints.add(new DPPoint(distanceSerie[serieIndex], altitudeSerie[serieIndex], serieIndex));
       }
 
       int[] forcedIndices = null;
@@ -2469,7 +2471,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          forcedIndices = multipleTourStartIndex;
       }
 
-      final DPPoint[] simplifiedPoints = new DouglasPeuckerSimplifier(dpTolerance, dpPoints, forcedIndices).simplify();
+      //final DPPoint[] simplifiedPoints = new DouglasPeuckerSimplifier(dpTolerance, dpPoints, forcedIndices).simplify();
+
+      final List<pl.luwi.series.reducer.Point> reduced = SeriesReducer.reduce(dpPoints, dpTolerance);
 
       float altitudeUpTotal = 0;
       float altitudeDownTotal = 0;
@@ -2479,10 +2483,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       /*
        * Get altitude up/down from the tour altitude values which are found by DP
        */
-      for (int dbIndex = 1; dbIndex < simplifiedPoints.length; dbIndex++) {
+      for (int dbIndex = 1; dbIndex < reduced.size(); dbIndex++) {
 
-         final DPPoint point = simplifiedPoints[dbIndex];
-         final float currentAltitude = (float) point.y;
+         final pl.luwi.series.reducer.Point point = reduced.get(dbIndex);
+         final float currentAltitude = (float) point.getY();
          final float altiDiff = currentAltitude - prevAltitude;
 
          if (altiDiff > 0) {
