@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.algorithm;
 
-public class DPPoint implements pl.luwi.series.reducer.Point {
+public class DPPoint {
 
 	/**
 	 * x coordinate
@@ -64,16 +64,6 @@ public class DPPoint implements pl.luwi.series.reducer.Point {
 	public Vector diff(final DPPoint point) {
 		return new Vector(x - point.x, y - point.y, serieIndex);
 	}
-
-   @Override
-   public double getX() {
-      return x;
-   }
-
-   @Override
-   public double getY() {
-      return y;
-   }
 
    @Override
    public String toString() {

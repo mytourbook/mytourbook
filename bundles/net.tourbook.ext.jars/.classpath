@@ -19,6 +19,5 @@
 	<classpathentry exported="true" kind="lib" path="jackson-core-2.9.9.jar" sourcepath="src"/>
 	<classpathentry exported="true" kind="lib" path="jackson-databind-2.9.9.jar" sourcepath="src"/>
 	<classpathentry exported="true" kind="lib" path="jackson-annotations-2.9.9.jar" sourcepath="src"/>
-	<classpathentry exported="true" kind="lib" path="series-reducer-0.2.0.jar" sourcepath="src"/><!-- https://github.com/LukaszWiktor/series-reducer/ -->
 	<classpathentry kind="output" path="bin"/>
 </classpath>
