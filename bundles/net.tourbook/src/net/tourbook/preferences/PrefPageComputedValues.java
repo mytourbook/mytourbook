@@ -1328,7 +1328,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
     */
    private void saveState() {
 
-      //If the saveState() triggered by the change of measurement system,
+      //If the saveState() was triggered by the change of measurement system,
       //we don't save the values as they were already saved and it would convert
       //those values by error
       if (INITIAL_UNIT_IS_METRIC != net.tourbook.common.UI.UNIT_IS_METRIC) {
