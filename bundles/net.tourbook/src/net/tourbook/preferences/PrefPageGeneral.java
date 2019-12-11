@@ -190,12 +190,11 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory
-            .swtDefaults()//
+            .swtDefaults()
             .numColumns(3)
             .extendedMargins(5, 5, 10, 5)
             .spacing(20, 5)
             .applyTo(container);
-//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
       {
          /*
           * measurement system
