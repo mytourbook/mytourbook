@@ -1338,9 +1338,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
       // DP tolerance when computing altitude up/down
       _prefStore.setValue(
             ITourbookPreferences.COMPUTED_ALTITUDE_DP_TOLERANCE,
-            _spinnerDPTolerance.getSelection()
-                  / 10.0f
-                  * UI.UNIT_VALUE_ALTITUDE);
+            _spinnerDPTolerance.getSelection() / 10.0f * UI.UNIT_VALUE_ALTITUDE);
 
       /*
        * break time method
@@ -1352,10 +1350,10 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
        */
       final float breakMinAvgSpeedAS = _spinnerBreakMinAvgSpeedAS.getSelection()
             / SPEED_DIGIT_VALUE
-            / UI.UNIT_VALUE_DISTANCE;
+            * UI.UNIT_VALUE_DISTANCE;
       final float breakMinSliceSpeedAS = _spinnerBreakMinSliceSpeedAS.getSelection()
             / SPEED_DIGIT_VALUE
-            / UI.UNIT_VALUE_DISTANCE;
+            * UI.UNIT_VALUE_DISTANCE;
       final int breakMinSliceTimeAS = _spinnerBreakMinSliceTimeAS.getSelection();
 
       _prefStore.setValue(ITourbookPreferences.BREAK_TIME_MIN_AVG_SPEED_AS, breakMinAvgSpeedAS);
