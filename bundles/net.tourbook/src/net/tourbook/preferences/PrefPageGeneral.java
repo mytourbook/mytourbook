@@ -20,7 +20,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.DayOfWeek;
 import java.time.ZoneId;
-import java.util.ArrayList;
 
 import net.tourbook.Messages;
 import net.tourbook.application.MeasurementSystemContributionItem;
@@ -48,7 +47,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.TabFolder;
@@ -86,12 +84,6 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
    private boolean                  _showMeasurementSystemInUI;
 
    private PixelConverter           _pc;
-
-   /**
-    * Contains the controls which are displayed in the first column. These controls are used to get
-    * the maximum width and set the first column within the different section to the same width.
-    */
-   private final ArrayList<Control> _firstColumnControls          = new ArrayList<>();
 
    /*
     * UI controls
@@ -199,7 +191,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory
             .swtDefaults()//
-            .numColumns(2)
+            .numColumns(3)
             .extendedMargins(5, 5, 10, 5)
             .spacing(20, 5)
             .applyTo(container);
@@ -215,6 +207,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
          // combo
          _comboSystem = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
+         GridDataFactory.fillDefaults().span(2, 1).align(SWT.BEGINNING, SWT.CENTER).applyTo(_comboSystem);
          _comboSystem.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(final SelectionEvent e) {
@@ -236,18 +229,12 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
          _lblSystemAltitude.setText(Messages.Pref_general_system_altitude);
 
          // radio
-         final Composite containerAltitude = new Composite(container, SWT.NONE);
-         GridDataFactory.fillDefaults().grab(true, false).applyTo(containerAltitude);
-         GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerAltitude);
-         {
-            _rdoAltitudeMeter = new Button(containerAltitude, SWT.RADIO);
-            _rdoAltitudeMeter.setText(Messages.Pref_general_metric_unit_m);
+         _rdoAltitudeMeter = new Button(container, SWT.RADIO);
+         _rdoAltitudeMeter.setText(Messages.Pref_general_metric_unit_m);
 
-            _firstColumnControls.add(_rdoAltitudeMeter);
-
-            _rdoAltitudeFoot = new Button(containerAltitude, SWT.RADIO);
-            _rdoAltitudeFoot.setText(Messages.Pref_general_imperial_unit_feet);
-         }
+         _rdoAltitudeFoot = new Button(container, SWT.RADIO);
+         _rdoAltitudeFoot.setText(Messages.Pref_general_imperial_unit_feet);
+         GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_rdoAltitudeFoot);
 
          /*
           * radio: distance
@@ -259,18 +246,12 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
          _lblSystemDistance.setText(Messages.Pref_general_system_distance);
 
          // radio
-         final Composite containerDistance = new Composite(container, SWT.NONE);
-         GridDataFactory.fillDefaults().grab(true, false).applyTo(containerDistance);
-         GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerDistance);
-         {
-            _rdoDistanceKm = new Button(containerDistance, SWT.RADIO);
-            _rdoDistanceKm.setText(Messages.Pref_general_metric_unit_km);
+         _rdoDistanceKm = new Button(container, SWT.RADIO);
+         GridDataFactory.fillDefaults().hint(150, 0).applyTo(_rdoDistanceKm);
+         _rdoDistanceKm.setText(Messages.Pref_general_metric_unit_km);
 
-            _firstColumnControls.add(_rdoDistanceKm);
-
-            _rdoDistanceMi = new Button(containerDistance, SWT.RADIO);
-            _rdoDistanceMi.setText(Messages.Pref_general_imperial_unit_mi);
-         }
+         _rdoDistanceMi = new Button(container, SWT.RADIO);
+         _rdoDistanceMi.setText(Messages.Pref_general_imperial_unit_mi);
 
          /*
           * radio: temperature
@@ -282,18 +263,11 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
          _lblSystemTemperature.setText(Messages.Pref_general_system_temperature);
 
          // radio
-         final Composite containerTemperature = new Composite(container, SWT.NONE);
-         GridDataFactory.fillDefaults().grab(true, false).applyTo(containerTemperature);
-         GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerTemperature);
-         {
-            _rdoTemperatureCelcius = new Button(containerTemperature, SWT.RADIO);
-            _rdoTemperatureCelcius.setText(Messages.Pref_general_metric_unit_celcius);
+         _rdoTemperatureCelcius = new Button(container, SWT.RADIO);
+         _rdoTemperatureCelcius.setText(Messages.Pref_general_metric_unit_celcius);
 
-            _firstColumnControls.add(_rdoTemperatureCelcius);
-
-            _rdoTemperatureFahrenheit = new Button(containerTemperature, SWT.RADIO);
-            _rdoTemperatureFahrenheit.setText(Messages.Pref_general_imperial_unit_fahrenheit);
-         }
+         _rdoTemperatureFahrenheit = new Button(container, SWT.RADIO);
+         _rdoTemperatureFahrenheit.setText(Messages.Pref_general_imperial_unit_fahrenheit);
 
          {
             /*
@@ -310,7 +284,6 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
       }
 
       container.layout(true, true);
-      UI.setEqualizeColumWidths(_firstColumnControls);
 
       return container;
    }
@@ -620,8 +593,6 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
    @Override
    public void dispose() {
-
-      _firstColumnControls.clear();
 
       super.dispose();
    }
