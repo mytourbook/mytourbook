@@ -89,7 +89,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
    /**
     * Contains the controls which are displayed in the first column. These controls are used to get
-    * the maximum width and set the first column within the differenct section to the same width.
+    * the maximum width and set the first column within the different section to the same width.
     */
    private final ArrayList<Control> _firstColumnControls          = new ArrayList<>();
 
@@ -243,7 +243,6 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
             _rdoAltitudeMeter = new Button(containerAltitude, SWT.RADIO);
             _rdoAltitudeMeter.setText(Messages.Pref_general_metric_unit_m);
 
-            GridDataFactory.fillDefaults().applyTo(_rdoAltitudeMeter);
             _firstColumnControls.add(_rdoAltitudeMeter);
 
             _rdoAltitudeFoot = new Button(containerAltitude, SWT.RADIO);
@@ -267,37 +266,33 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
             _rdoDistanceKm = new Button(containerDistance, SWT.RADIO);
             _rdoDistanceKm.setText(Messages.Pref_general_metric_unit_km);
 
-            GridDataFactory.fillDefaults().applyTo(_rdoDistanceKm);
             _firstColumnControls.add(_rdoDistanceKm);
 
             _rdoDistanceMi = new Button(containerDistance, SWT.RADIO);
             _rdoDistanceMi.setText(Messages.Pref_general_imperial_unit_mi);
          }
 
+         /*
+          * radio: temperature
+          */
+
+         // label
+         _lblSystemTemperature = new Label(container, SWT.NONE);
+         GridDataFactory.fillDefaults().indent(20, 0).applyTo(_lblSystemTemperature);
+         _lblSystemTemperature.setText(Messages.Pref_general_system_temperature);
+
+         // radio
+         final Composite containerTemperature = new Composite(container, SWT.NONE);
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(containerTemperature);
+         GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerTemperature);
          {
-            /*
-             * radio: temperature
-             */
+            _rdoTemperatureCelcius = new Button(containerTemperature, SWT.RADIO);
+            _rdoTemperatureCelcius.setText(Messages.Pref_general_metric_unit_celcius);
 
-            // label
-            _lblSystemTemperature = new Label(container, SWT.NONE);
-            GridDataFactory.fillDefaults().indent(20, 0).applyTo(_lblSystemTemperature);
-            _lblSystemTemperature.setText(Messages.Pref_general_system_temperature);
+            _firstColumnControls.add(_rdoTemperatureCelcius);
 
-            // radio
-            final Composite containerTemperature = new Composite(container, SWT.NONE);
-            GridDataFactory.fillDefaults().grab(true, false).applyTo(containerTemperature);
-            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerTemperature);
-            {
-               _rdoTemperatureCelcius = new Button(containerTemperature, SWT.RADIO);
-               _rdoTemperatureCelcius.setText(Messages.Pref_general_metric_unit_celcius);
-
-               GridDataFactory.fillDefaults().applyTo(_rdoTemperatureCelcius);
-               _firstColumnControls.add(_rdoTemperatureCelcius);
-
-               _rdoTemperatureFahrenheit = new Button(containerTemperature, SWT.RADIO);
-               _rdoTemperatureFahrenheit.setText(Messages.Pref_general_imperial_unit_fahrenheit);
-            }
+            _rdoTemperatureFahrenheit = new Button(containerTemperature, SWT.RADIO);
+            _rdoTemperatureFahrenheit.setText(Messages.Pref_general_imperial_unit_fahrenheit);
          }
 
          {
@@ -969,9 +964,9 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
          }
          MeasurementSystemContributionItem.selectSystemInPrefStore(selectedIndex);
 
-			_prefStore.setValue(
-					ITourbookPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI,
-					_chkShowMeasurementInAppToolbar.getSelection());
+         _prefStore.setValue(
+               ITourbookPreferences.MEASUREMENT_SYSTEM_SHOW_IN_UI,
+               _chkShowMeasurementInAppToolbar.getSelection());
       }
 
       {
