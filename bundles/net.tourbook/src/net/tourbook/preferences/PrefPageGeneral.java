@@ -65,25 +65,25 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
    /*
     * contains the tab folder index
     */
-   public static final int          TAB_FOLDER_MEASUREMENT_SYSTEM = 0;
-   public static final int          TAB_FOLDER_TIME_ZONE          = 1;
-   public static final int          TAB_FOLDER_CALENDAR_WEEK      = 2;
+   public static final int  TAB_FOLDER_MEASUREMENT_SYSTEM = 0;
+   public static final int  TAB_FOLDER_TIME_ZONE          = 1;
+   public static final int  TAB_FOLDER_CALENDAR_WEEK      = 2;
 
-   private IPreferenceStore         _prefStore                    = TourbookPlugin.getPrefStore();
-   private IPreferenceStore         _prefStoreCommon              = CommonActivator.getPrefStore();
+   private IPreferenceStore _prefStore                    = TourbookPlugin.getPrefStore();
+   private IPreferenceStore _prefStoreCommon              = CommonActivator.getPrefStore();
 
-   private String                   _timeZoneId_1;
-   private String                   _timeZoneId_2;
-   private String                   _timeZoneId_3;
+   private String           _timeZoneId_1;
+   private String           _timeZoneId_2;
+   private String           _timeZoneId_3;
 
-   private int                      _backupFirstDayOfWeek;
-   private int                      _backupMinimalDaysInFirstWeek;
-   private int                      _currentFirstDayOfWeek;
-   private int                      _currentMinimalDaysInFirstWeek;
+   private int              _backupFirstDayOfWeek;
+   private int              _backupMinimalDaysInFirstWeek;
+   private int              _currentFirstDayOfWeek;
+   private int              _currentMinimalDaysInFirstWeek;
 
-   private boolean                  _showMeasurementSystemInUI;
+   private boolean          _showMeasurementSystemInUI;
 
-   private PixelConverter           _pc;
+   private PixelConverter   _pc;
 
    /*
     * UI controls
@@ -234,7 +234,6 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
          _rdoAltitudeFoot = new Button(container, SWT.RADIO);
          _rdoAltitudeFoot.setText(Messages.Pref_general_imperial_unit_feet);
-         GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_rdoAltitudeFoot);
 
          /*
           * radio: distance
@@ -247,7 +246,6 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
          // radio
          _rdoDistanceKm = new Button(container, SWT.RADIO);
-         GridDataFactory.fillDefaults().hint(150, 0).applyTo(_rdoDistanceKm);
          _rdoDistanceKm.setText(Messages.Pref_general_metric_unit_km);
 
          _rdoDistanceMi = new Button(container, SWT.RADIO);
@@ -269,18 +267,16 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
          _rdoTemperatureFahrenheit = new Button(container, SWT.RADIO);
          _rdoTemperatureFahrenheit.setText(Messages.Pref_general_imperial_unit_fahrenheit);
 
-         {
-            /*
-             * Checkbox: Show in app toolbar
-             */
-            _chkShowMeasurementInAppToolbar = new Button(container, SWT.CHECK);
-            _chkShowMeasurementInAppToolbar.setText(Messages.Pref_general_show_system_in_ui);
-            GridDataFactory
-                  .fillDefaults()//
-                  .span(2, 1)
-                  .indent(0, _pc.convertVerticalDLUsToPixels(8))
-                  .applyTo(_chkShowMeasurementInAppToolbar);
-         }
+         /*
+          * Checkbox: Show in app toolbar
+          */
+         _chkShowMeasurementInAppToolbar = new Button(container, SWT.CHECK);
+         _chkShowMeasurementInAppToolbar.setText(Messages.Pref_general_show_system_in_ui);
+         GridDataFactory
+               .fillDefaults()//
+               .span(3, 1)
+               .indent(0, _pc.convertVerticalDLUsToPixels(8))
+               .applyTo(_chkShowMeasurementInAppToolbar);
       }
 
       container.layout(true, true);
