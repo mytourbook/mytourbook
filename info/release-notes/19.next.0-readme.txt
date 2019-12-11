@@ -55,6 +55,11 @@ Fixes
 
 * Tour Export
   - GPX: <mt:bikerWeight> value was wrong
+
+* Preferences
+  - Fixed a regression, in the "Measurement System" tab, that appeared in 19.3.0 where the metric radio buttons had disappeared
+
+  - Fixed bugs in the Computed values preference page (Break Time and Elevation Gain tabs) where the speed and altitude values were not properly converted when switching between metric and imperial system units
   
    
 Translation    
