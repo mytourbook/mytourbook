@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="WINDOWS-1252"?><jardesc>
-    <jar path="net.tourbook.ext.jars/lat-lon-timezone-converter-2016-05-04.jar"/>
+    <jar path="net.tourbook.ext.jars/lat-lon-timezone-converter-2019-04-30.jar"/>
     <options buildIfNeeded="true" compress="true" descriptionLocation="/net.tourbook.ext.jars/create-lat-long-timezone-converter-jar.jardesc" exportErrors="true" exportWarnings="true" includeDirectoryEntries="false" overwrite="false" saveDescription="true" storeRefactorings="false" useSourceFolders="false"/>
     <storedRefactorings deprecationInfo="true" structuralOnly="false"/>
     <selectedProjects/>

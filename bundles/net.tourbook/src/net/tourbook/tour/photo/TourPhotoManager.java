@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -60,7 +60,7 @@ import net.tourbook.ui.SQLFilter;
 import org.apache.commons.imaging.ImageReadException;
 import org.apache.commons.imaging.ImageWriteException;
 import org.apache.commons.imaging.Imaging;
-import org.apache.commons.imaging.common.IImageMetadata;
+import org.apache.commons.imaging.common.ImageMetadata;
 import org.apache.commons.imaging.formats.jpeg.JpegImageMetadata;
 import org.apache.commons.imaging.formats.tiff.TiffImageMetadata;
 import org.apache.commons.imaging.formats.tiff.write.TiffOutputSet;
@@ -86,103 +86,102 @@ import org.eclipse.ui.PlatformUI;
 public class TourPhotoManager implements IPhotoServiceProvider {
 
 // SET_FORMATTING_OFF
-	
+
 	private static final String				STATE_CAMERA_ADJUSTMENT_NAME	= "STATE_CAMERA_ADJUSTMENT_NAME";	//$NON-NLS-1$
 	private static final String				STATE_CAMERA_ADJUSTMENT_TIME	= "STATE_CAMERA_ADJUSTMENT_TIME";	//$NON-NLS-1$
 	private static final String				STATE_REPLACE_IMAGE_FOLDER		= "STATE_REPLACE_IMAGE_FOLDER";		//$NON-NLS-1$
 
 	private static final String				CAMERA_UNKNOWN_KEY				= "CAMERA_UNKNOWN_KEY";				//$NON-NLS-1$
 
-	
+
 	private static final IDialogSettings	_state							= TourbookPlugin.getState("PhotoManager");		//$NON-NLS-1$
 	private static final IPreferenceStore	_prefStore						= TourbookPlugin.getPrefStore();
-	
+
 // SET_FORMATTING_ON
 
-	private static TourPhotoManager					_instance;
+   private static TourPhotoManager               _instance;
 
+   /**
+    * Contains all cameras which are every used, key is the camera name.
+    */
+   private static HashMap<String, Camera>        _allAvailableCameras = new HashMap<>();
+   private static String                         _replaceImageFolder;
 
-	/**
-	 * Contains all cameras which are every used, key is the camera name.
-	 */
-	private static HashMap<String, Camera>			_allAvailableCameras			= new HashMap<String, Camera>();
-	private static String							_replaceImageFolder;
+   /**
+    * Compares 2 photos by the adjusted time.
+    */
+   public static final Comparator<? super Photo> AdjustTimeComparatorLink;
+   public static final Comparator<? super Photo> AdjustTimeComparatorTour;
 
-	/**
-	 * Compares 2 photos by the adjusted time.
-	 */
-	public static final Comparator<? super Photo>	AdjustTimeComparatorLink;
-	public static final Comparator<? super Photo>	AdjustTimeComparatorTour;
+   static {
 
-	static {
+      AdjustTimeComparatorLink = new Comparator<Photo>() {
 
-		AdjustTimeComparatorLink = new Comparator<Photo>() {
+         @Override
+         public int compare(final Photo photo1, final Photo photo2) {
 
-			@Override
-			public int compare(final Photo photo1, final Photo photo2) {
+            final long diff = photo1.adjustedTimeLink - photo2.adjustedTimeLink;
 
-				final long diff = photo1.adjustedTimeLink - photo2.adjustedTimeLink;
+            return diff < 0 ? -1 : diff > 0 ? 1 : 0;
+         }
+      };
 
-				return diff < 0 ? -1 : diff > 0 ? 1 : 0;
-			}
-		};
+      AdjustTimeComparatorTour = new Comparator<Photo>() {
 
-		AdjustTimeComparatorTour = new Comparator<Photo>() {
+         @Override
+         public int compare(final Photo photo1, final Photo photo2) {
 
-			@Override
-			public int compare(final Photo photo1, final Photo photo2) {
+            final long diff = photo1.adjustedTimeTour - photo2.adjustedTimeTour;
 
-				final long diff = photo1.adjustedTimeTour - photo2.adjustedTimeTour;
+            return diff < 0 ? -1 : diff > 0 ? 1 : 0;
+         }
+      };
+   }
 
-				return diff < 0 ? -1 : diff > 0 ? 1 : 0;
-			}
-		};
-	}
-	
-	private Connection					_sqlConnection;
-	private PreparedStatement			_sqlStatement;
+   private Connection               _sqlConnection;
+   private PreparedStatement        _sqlStatement;
 
-	private long						_sqlTourStart			= Long.MAX_VALUE;
-	private long						_sqlTourEnd				= Long.MIN_VALUE;
+   private long                     _sqlTourStart        = Long.MAX_VALUE;
+   private long                     _sqlTourEnd          = Long.MIN_VALUE;
 
-	private ArrayList<TourPhotoLink>	_allDbTourPhotoLinks	= new ArrayList<TourPhotoLink>();
-	private ArrayList<TourPhotoLink>	_dbTourPhotoLinks		= new ArrayList<TourPhotoLink>();
+   private ArrayList<TourPhotoLink> _allDbTourPhotoLinks = new ArrayList<>();
+   private ArrayList<TourPhotoLink> _dbTourPhotoLinks    = new ArrayList<>();
 
-	private TourPhotoManager() {
+   private TourPhotoManager() {
 
-		// set photo service provider into the Photo plugin
-		Photo.setPhotoServiceProvider(this);
-	}
+      // set photo service provider into the Photo plugin
+      Photo.setPhotoServiceProvider(this);
+   }
 
-	public static TourPhotoManager getInstance() {
+   public static TourPhotoManager getInstance() {
 
-		if (_instance == null) {
-			_instance = new TourPhotoManager();
-		}
+      if (_instance == null) {
+         _instance = new TourPhotoManager();
+      }
 
-		return _instance;
-	}
+      return _instance;
+   }
 
-	public static TourPhotoLinkView openLinkView() {
+   public static TourPhotoLinkView openLinkView() {
 
 //		final IWorkbench wb = PlatformUI.getWorkbench();
-		final IWorkbenchWindow wbWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-		TourPhotoLinkView linkView = null;
+      final IWorkbenchWindow wbWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+      TourPhotoLinkView linkView = null;
 
-		if (wbWindow != null) {
-			try {
+      if (wbWindow != null) {
+         try {
 
-				final IWorkbenchPage activePage = wbWindow.getActivePage();
+            final IWorkbenchPage activePage = wbWindow.getActivePage();
 
-				final IViewPart linkViewPart = activePage.findView(TourPhotoLinkView.ID);
+            final IViewPart linkViewPart = activePage.findView(TourPhotoLinkView.ID);
 
-				if (linkViewPart instanceof TourPhotoLinkView) {
+            if (linkViewPart instanceof TourPhotoLinkView) {
 
-					// link view is available in the current perspective
+               // link view is available in the current perspective
 
-					linkView = (TourPhotoLinkView) linkViewPart;
+               linkView = (TourPhotoLinkView) linkViewPart;
 
-				} else {
+            } else {
 
 //					final String currentPerspectiveId = activePage.getPerspective().getId();
 //
@@ -197,815 +196,815 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 //						wb.showPerspective(PerspectiveFactoryPhoto.PERSPECTIVE_ID, wbWindow);
 //					}
 
-					linkView = (TourPhotoLinkView) Util.showView(TourPhotoLinkView.ID, false);
-				}
+               linkView = (TourPhotoLinkView) Util.showView(TourPhotoLinkView.ID, false);
+            }
 
-				// ensure link view is visible
+            // ensure link view is visible
 
-				if (linkView != null) {
+            if (linkView != null) {
 
-					// show view but do not make it active
-					if (activePage.isPartVisible(linkViewPart) == false) {
-						activePage.showView(TourPhotoLinkView.ID, null, IWorkbenchPage.VIEW_VISIBLE);
-					}
-				}
+               // show view but do not make it active
+               if (activePage.isPartVisible(linkViewPart) == false) {
+                  activePage.showView(TourPhotoLinkView.ID, null, IWorkbenchPage.VIEW_VISIBLE);
+               }
+            }
 
-			} catch (final PartInitException e) {
-				StatusUtil.showStatus(e);
+         } catch (final PartInitException e) {
+            StatusUtil.showStatus(e);
 //			} catch (final WorkbenchException e) {
 //				StatusUtil.showStatus(e);
-			}
-		}
+         }
+      }
 
-		return linkView;
-	}
-
-	public static void restoreState() {
-
-		// ensure photo service provider is set in the photo
-		getInstance();
+      return linkView;
+   }
+
+   public static void restoreState() {
+
+      // ensure photo service provider is set in the photo
+      getInstance();
 
-		/*
-		 * cameras + time adjustment
-		 */
-		final String[] cameraNames = _state.getArray(STATE_CAMERA_ADJUSTMENT_NAME);
-		final long[] adjustments = Util.getStateLongArray(_state, STATE_CAMERA_ADJUSTMENT_TIME, null);
+      /*
+       * cameras + time adjustment
+       */
+      final String[] cameraNames = _state.getArray(STATE_CAMERA_ADJUSTMENT_NAME);
+      final long[] adjustments = Util.getStateLongArray(_state, STATE_CAMERA_ADJUSTMENT_TIME, null);
 
-		if (cameraNames != null && adjustments != null && cameraNames.length == adjustments.length) {
+      if (cameraNames != null && adjustments != null && cameraNames.length == adjustments.length) {
 
-			// it seems that the values are OK, create cameras with time adjustmens
+         // it seems that the values are OK, create cameras with time adjustmens
 
-			for (int index = 0; index < cameraNames.length; index++) {
+         for (int index = 0; index < cameraNames.length; index++) {
 
-				final String cameraName = cameraNames[index];
+            final String cameraName = cameraNames[index];
 
-				final Camera camera = new Camera(cameraName);
-				camera.timeAdjustment = adjustments[index];
+            final Camera camera = new Camera(cameraName);
+            camera.timeAdjustment = adjustments[index];
 
-				_allAvailableCameras.put(cameraName, camera);
-			}
-		}
+            _allAvailableCameras.put(cameraName, camera);
+         }
+      }
 
-		/*
-		 * replace image folder
-		 */
-		_replaceImageFolder = _state.get(STATE_REPLACE_IMAGE_FOLDER);
-	}
-
-	public static void saveState() {
-
-		/*
-		 * camera time adjustment
-		 */
-		final int size = _allAvailableCameras.size();
-
-		final String[] cameras = new String[size];
-		final long[] adjustment = new long[size];
-
-		int index = 0;
-		for (final Camera camera : _allAvailableCameras.values()) {
-			cameras[index] = camera.cameraName;
-			adjustment[index] = camera.timeAdjustment;
-			index++;
-		}
-		_state.put(STATE_CAMERA_ADJUSTMENT_NAME, cameras);
-		Util.setState(_state, STATE_CAMERA_ADJUSTMENT_TIME, adjustment);
+      /*
+       * replace image folder
+       */
+      _replaceImageFolder = _state.get(STATE_REPLACE_IMAGE_FOLDER);
+   }
+
+   public static void saveState() {
+
+      /*
+       * camera time adjustment
+       */
+      final int size = _allAvailableCameras.size();
+
+      final String[] cameras = new String[size];
+      final long[] adjustment = new long[size];
+
+      int index = 0;
+      for (final Camera camera : _allAvailableCameras.values()) {
+         cameras[index] = camera.cameraName;
+         adjustment[index] = camera.timeAdjustment;
+         index++;
+      }
+      _state.put(STATE_CAMERA_ADJUSTMENT_NAME, cameras);
+      Util.setState(_state, STATE_CAMERA_ADJUSTMENT_TIME, adjustment);
 
-		/*
-		 * replace image folder
-		 */
-		if (_replaceImageFolder != null) {
-			_state.put(STATE_REPLACE_IMAGE_FOLDER, _replaceImageFolder);
-		}
-	}
+      /*
+       * replace image folder
+       */
+      if (_replaceImageFolder != null) {
+         _state.put(STATE_REPLACE_IMAGE_FOLDER, _replaceImageFolder);
+      }
+   }
 
-	private static void setTourCameras(final HashMap<String, String> cameras, final TourPhotoLink historyTour) {
+   private static void setTourCameras(final HashMap<String, String> cameras, final TourPhotoLink historyTour) {
 
-		final Collection<String> allCameras = cameras.values();
-		Collections.sort(new ArrayList<String>(allCameras));
+      final Collection<String> allCameras = cameras.values();
+      Collections.sort(new ArrayList<>(allCameras));
 
-		final StringBuilder sb = new StringBuilder();
-		boolean isFirst = true;
+      final StringBuilder sb = new StringBuilder();
+      boolean isFirst = true;
 
-		for (final String camera : allCameras) {
-			if (isFirst) {
-				isFirst = false;
-				sb.append(camera);
-			} else {
-				sb.append(UI.COMMA_SPACE);
-				sb.append(camera);
-			}
-		}
-		historyTour.tourCameras = sb.toString();
-	}
+      for (final String camera : allCameras) {
+         if (isFirst) {
+            isFirst = false;
+            sb.append(camera);
+         } else {
+            sb.append(UI.COMMA_SPACE);
+            sb.append(camera);
+         }
+      }
+      historyTour.tourCameras = sb.toString();
+   }
 
-	@Override
-	public boolean canSaveStarRating(final int selectedPhotos, final int ratingStars) {
+   @Override
+   public boolean canSaveStarRating(final int selectedPhotos, final int ratingStars) {
 
-		final int warningLevel = 5;
+      final int warningLevel = 5;
 
-		if (selectedPhotos > warningLevel) {
+      if (selectedPhotos > warningLevel) {
 
-			final boolean isShowWarning = _prefStore.getBoolean(//
-					ITourbookPreferences.TOGGLE_STATE_SHOW_STAR_RATING_SAVE_WARNING) == false;
+         final boolean isShowWarning = _prefStore.getBoolean(//
+               ITourbookPreferences.TOGGLE_STATE_SHOW_STAR_RATING_SAVE_WARNING) == false;
 
-			if (isShowWarning) {
+         if (isShowWarning) {
 
-				final MessageDialogWithToggle dialog = MessageDialogWithToggle.openOkCancelConfirm(//
-						Display.getCurrent().getActiveShell(),
-						Messages.Photo_TourPhotoMgr_Dialog_SaveStarRating_Title,
-						NLS.bind(//
-								Messages.Photo_TourPhotoMgr_Dialog_SaveStarRating_Message,
-								new Object[] { ratingStars, selectedPhotos, warningLevel }),
-						Messages.App_ToggleState_DoNotShowAgain,
-						false, // toggle default state
-						null,
-						null);
+            final MessageDialogWithToggle dialog = MessageDialogWithToggle.openOkCancelConfirm(//
+                  Display.getCurrent().getActiveShell(),
+                  Messages.Photo_TourPhotoMgr_Dialog_SaveStarRating_Title,
+                  NLS.bind(//
+                        Messages.Photo_TourPhotoMgr_Dialog_SaveStarRating_Message,
+                        new Object[] { ratingStars, selectedPhotos, warningLevel }),
+                  Messages.App_ToggleState_DoNotShowAgain,
+                  false, // toggle default state
+                  null,
+                  null);
 
-				if (dialog.getReturnCode() == Window.OK) {
+            if (dialog.getReturnCode() == Window.OK) {
 
-					// save toggle state only when OK is pressed
-					_prefStore.setValue(
-							ITourbookPreferences.TOGGLE_STATE_SHOW_STAR_RATING_SAVE_WARNING,
-							dialog.getToggleState());
+               // save toggle state only when OK is pressed
+               _prefStore.setValue(
+                     ITourbookPreferences.TOGGLE_STATE_SHOW_STAR_RATING_SAVE_WARNING,
+                     dialog.getToggleState());
 
-					return true;
+               return true;
 
-				} else {
+            } else {
 
-					return false;
-				}
-			}
-		}
+               return false;
+            }
+         }
+      }
 
-		return true;
-	}
+      return true;
+   }
 
-	/**
-	 * create pseudo tours for photos which are not contained in a tour and remove all tours which
-	 * do not contain any photos
-	 * 
-	 * @param allPhotos
-	 * @param visibleTourPhotoLinks
-	 * @param isShowToursOnlyWithPhotos
-	 * @param isShowToursWithoutSavedPhotos
-	 * @param allTourCameras
-	 */
-	void createTourPhotoLinks(	final ArrayList<Photo> allPhotos,
-								final ArrayList<TourPhotoLink> visibleTourPhotoLinks,
-								final HashMap<String, Camera> allTourCameras,
-								final boolean isShowToursOnlyWithPhotos,
-								final boolean isShowToursWithoutSavedPhotos) {
+   /**
+    * create pseudo tours for photos which are not contained in a tour and remove all tours which
+    * do not contain any photos
+    *
+    * @param allPhotos
+    * @param visibleTourPhotoLinks
+    * @param isShowToursOnlyWithPhotos
+    * @param isShowToursWithoutSavedPhotos
+    * @param allTourCameras
+    */
+   void createTourPhotoLinks(final ArrayList<Photo> allPhotos,
+                             final ArrayList<TourPhotoLink> visibleTourPhotoLinks,
+                             final HashMap<String, Camera> allTourCameras,
+                             final boolean isShowToursOnlyWithPhotos,
+                             final boolean isShowToursWithoutSavedPhotos) {
 
-		loadToursFromDb(allPhotos, true);
+      loadToursFromDb(allPhotos, true);
 
-		TourPhotoLink currentTourPhotoLink = createTourPhotoLinks_10_GetFirstTour(allPhotos);
+      TourPhotoLink currentTourPhotoLink = createTourPhotoLinks_10_GetFirstTour(allPhotos);
 
-		final HashMap<String, String> tourCameras = new HashMap<String, String>();
+      final HashMap<String, String> tourCameras = new HashMap<>();
 
-		final int numberOfRealTours = _dbTourPhotoLinks.size();
-		long nextDbTourStartTime = numberOfRealTours > 0 ? _dbTourPhotoLinks.get(0).tourStartTime : Long.MIN_VALUE;
+      final int numberOfRealTours = _dbTourPhotoLinks.size();
+      long nextDbTourStartTime = numberOfRealTours > 0 ? _dbTourPhotoLinks.get(0).tourStartTime : Long.MIN_VALUE;
 
-		int tourIndex = 0;
-		long photoTime = 0;
+      int tourIndex = 0;
+      long photoTime = 0;
 
-		// loop: all photos
-		for (final Photo photo : allPhotos) {
+      // loop: all photos
+      for (final Photo photo : allPhotos) {
 
-			photoTime = photo.adjustedTimeLink;
+         photoTime = photo.adjustedTimeLink;
 
-			// check if current photo can be put into current tour photo link
-			if (currentTourPhotoLink.isHistoryTour == false && photoTime <= currentTourPhotoLink.tourEndTime) {
+         // check if current photo can be put into current tour photo link
+         if (currentTourPhotoLink.isHistoryTour == false && photoTime <= currentTourPhotoLink.tourEndTime) {
 
-				// current photo can be put into current real tour
+            // current photo can be put into current real tour
 
-			} else if (currentTourPhotoLink.isHistoryTour && photoTime < nextDbTourStartTime) {
+         } else if (currentTourPhotoLink.isHistoryTour && photoTime < nextDbTourStartTime) {
 
-				// current photo can be put into current history tour
+            // current photo can be put into current history tour
 
-			} else {
+         } else {
 
-				// current photo do not fit into current photo link
+            // current photo do not fit into current photo link
 
-				// finalize current tour photo link
-				createTourPhotoLinks_30_FinalizeCurrentTourPhotoLink(
-						currentTourPhotoLink,
-						tourCameras,
-						visibleTourPhotoLinks,
-						isShowToursOnlyWithPhotos,
-						isShowToursWithoutSavedPhotos);
+            // finalize current tour photo link
+            createTourPhotoLinks_30_FinalizeCurrentTourPhotoLink(
+                  currentTourPhotoLink,
+                  tourCameras,
+                  visibleTourPhotoLinks,
+                  isShowToursOnlyWithPhotos,
+                  isShowToursWithoutSavedPhotos);
 
-				currentTourPhotoLink = null;
-				tourCameras.clear();
+            currentTourPhotoLink = null;
+            tourCameras.clear();
 
-				/*
-				 * create/get new merge tour
-				 */
-				if (tourIndex >= numberOfRealTours) {
+            /*
+             * create/get new merge tour
+             */
+            if (tourIndex >= numberOfRealTours) {
 
-					/*
-					 * there are no further tours which can contain photos, put remaining photos
-					 * into a history tour
-					 */
+               /*
+                * there are no further tours which can contain photos, put remaining photos
+                * into a history tour
+                */
 
-					nextDbTourStartTime = Long.MAX_VALUE;
+               nextDbTourStartTime = Long.MAX_VALUE;
 
-				} else {
+            } else {
 
-					for (; tourIndex < numberOfRealTours; tourIndex++) {
+               for (; tourIndex < numberOfRealTours; tourIndex++) {
 
-						final TourPhotoLink dbTourPhotoLink = _dbTourPhotoLinks.get(tourIndex);
+                  final TourPhotoLink dbTourPhotoLink = _dbTourPhotoLinks.get(tourIndex);
 
-						final long dbTourStart = dbTourPhotoLink.tourStartTime;
-						final long dbTourEnd = dbTourPhotoLink.tourEndTime;
+                  final long dbTourStart = dbTourPhotoLink.tourStartTime;
+                  final long dbTourEnd = dbTourPhotoLink.tourEndTime;
 
-						if (photoTime < dbTourStart) {
+                  if (photoTime < dbTourStart) {
 
-							// image time is before the next tour start, create history tour
+                     // image time is before the next tour start, create history tour
 
-							nextDbTourStartTime = dbTourStart;
+                     nextDbTourStartTime = dbTourStart;
 
-							break;
-						}
+                     break;
+                  }
 
-						if (photoTime >= dbTourStart && photoTime <= dbTourEnd) {
+                  if (photoTime >= dbTourStart && photoTime <= dbTourEnd) {
 
-							// current photo can be put into current tour
+                     // current photo can be put into current tour
 
-							currentTourPhotoLink = dbTourPhotoLink;
+                     currentTourPhotoLink = dbTourPhotoLink;
 
-							break;
-						}
+                     break;
+                  }
 
-						// current tour do not contain any images
+                  // current tour do not contain any images
 
-						if (isShowToursOnlyWithPhotos == false && isShowToursWithoutSavedPhotos == false) {
+                  if (isShowToursOnlyWithPhotos == false && isShowToursWithoutSavedPhotos == false) {
 
-							// tours without photos are displayed
+                     // tours without photos are displayed
 
-							createTourPhotoLinks_40_AddTour(dbTourPhotoLink, visibleTourPhotoLinks);
-						}
+                     createTourPhotoLinks_40_AddTour(dbTourPhotoLink, visibleTourPhotoLinks);
+                  }
 
-						// get start time for the next tour
-						if (tourIndex + 1 < numberOfRealTours) {
-							nextDbTourStartTime = _dbTourPhotoLinks.get(tourIndex + 1).tourStartTime;
-						} else {
-							nextDbTourStartTime = Long.MAX_VALUE;
-						}
-					}
-				}
+                  // get start time for the next tour
+                  if (tourIndex + 1 < numberOfRealTours) {
+                     nextDbTourStartTime = _dbTourPhotoLinks.get(tourIndex + 1).tourStartTime;
+                  } else {
+                     nextDbTourStartTime = Long.MAX_VALUE;
+                  }
+               }
+            }
 
-				if (currentTourPhotoLink == null) {
+            if (currentTourPhotoLink == null) {
 
-					// create history tour
+               // create history tour
 
-					currentTourPhotoLink = new TourPhotoLink(photoTime);
-				}
-			}
+               currentTourPhotoLink = new TourPhotoLink(photoTime);
+            }
+         }
 
-			currentTourPhotoLink.linkPhotos.add(photo);
+         currentTourPhotoLink.linkPhotos.add(photo);
 
-			// set camera into the photo
-			final Camera camera = setCamera(photo, allTourCameras);
+         // set camera into the photo
+         final Camera camera = setCamera(photo, allTourCameras);
 
-			tourCameras.put(camera.cameraName, camera.cameraName);
+         tourCameras.put(camera.cameraName, camera.cameraName);
 
-			// set number of GPS/No GPS photos
-			final double latitude = photo.getLinkLatitude();
-			if (latitude == 0) {
-				currentTourPhotoLink.numberOfNoGPSPhotos++;
-			} else {
-				currentTourPhotoLink.numberOfGPSPhotos++;
-			}
-		}
+         // set number of GPS/No GPS photos
+         final double latitude = photo.getLinkLatitude();
+         if (latitude == 0) {
+            currentTourPhotoLink.numberOfNoGPSPhotos++;
+         } else {
+            currentTourPhotoLink.numberOfGPSPhotos++;
+         }
+      }
 
-		createTourPhotoLinks_30_FinalizeCurrentTourPhotoLink(
-				currentTourPhotoLink,
-				tourCameras,
-				visibleTourPhotoLinks,
-				isShowToursOnlyWithPhotos,
-				isShowToursWithoutSavedPhotos);
+      createTourPhotoLinks_30_FinalizeCurrentTourPhotoLink(
+            currentTourPhotoLink,
+            tourCameras,
+            visibleTourPhotoLinks,
+            isShowToursOnlyWithPhotos,
+            isShowToursWithoutSavedPhotos);
 
-		createTourPhotoLinks_60_MergeHistoryTours(visibleTourPhotoLinks);
+      createTourPhotoLinks_60_MergeHistoryTours(visibleTourPhotoLinks);
 
-		/*
-		 * set tour GPS into photo
-		 */
-		final List<TourPhotoLink> tourPhotoLinksWithGps = new ArrayList<TourPhotoLink>();
+      /*
+       * set tour GPS into photo
+       */
+      final List<TourPhotoLink> tourPhotoLinksWithGps = new ArrayList<>();
 
-		for (final TourPhotoLink tourPhotoLink : visibleTourPhotoLinks) {
-			if (tourPhotoLink.tourId != Long.MIN_VALUE) {
-				tourPhotoLinksWithGps.add(tourPhotoLink);
-			}
-		}
+      for (final TourPhotoLink tourPhotoLink : visibleTourPhotoLinks) {
+         if (tourPhotoLink.tourId != Long.MIN_VALUE) {
+            tourPhotoLinksWithGps.add(tourPhotoLink);
+         }
+      }
 
-		if (tourPhotoLinksWithGps.size() > 0) {
-			setTourGpsIntoPhotos(tourPhotoLinksWithGps);
-		}
-	}
+      if (tourPhotoLinksWithGps.size() > 0) {
+         setTourGpsIntoPhotos(tourPhotoLinksWithGps);
+      }
+   }
 
-	void createTourPhotoLinks_01_OneHistoryTour(final ArrayList<Photo> allPhotos,
-												final ArrayList<TourPhotoLink> visibleTourPhotoLinks,
-												final HashMap<String, Camera> allTourCameras) {
+   void createTourPhotoLinks_01_OneHistoryTour(final ArrayList<Photo> allPhotos,
+                                               final ArrayList<TourPhotoLink> visibleTourPhotoLinks,
+                                               final HashMap<String, Camera> allTourCameras) {
 
-		loadToursFromDb(allPhotos, false);
+      loadToursFromDb(allPhotos, false);
 
-		final HashMap<String, String> tourCameras = new HashMap<String, String>();
+      final HashMap<String, String> tourCameras = new HashMap<>();
 
-		final TourPhotoLink historyTour = new TourPhotoLink(allPhotos.get(0).adjustedTimeLink);
-		historyTour.linkPhotos.addAll(allPhotos);
+      final TourPhotoLink historyTour = new TourPhotoLink(allPhotos.get(0).adjustedTimeLink);
+      historyTour.linkPhotos.addAll(allPhotos);
 
-		for (final Photo photo : allPhotos) {
+      for (final Photo photo : allPhotos) {
 
-			// set camera into the photo
-			final Camera camera = setCamera(photo, allTourCameras);
+         // set camera into the photo
+         final Camera camera = setCamera(photo, allTourCameras);
 
-			tourCameras.put(camera.cameraName, camera.cameraName);
+         tourCameras.put(camera.cameraName, camera.cameraName);
 
-			// set number of GPS/No GPS photos
-			final double latitude = photo.getLinkLatitude();
-			if (latitude == 0) {
-				historyTour.numberOfNoGPSPhotos++;
-			} else {
-				historyTour.numberOfGPSPhotos++;
-			}
-		}
+         // set number of GPS/No GPS photos
+         final double latitude = photo.getLinkLatitude();
+         if (latitude == 0) {
+            historyTour.numberOfNoGPSPhotos++;
+         } else {
+            historyTour.numberOfGPSPhotos++;
+         }
+      }
 
-		setTourCameras(tourCameras, historyTour);
+      setTourCameras(tourCameras, historyTour);
 
-		// finalize history tour
-		historyTour.setTourEndTime(Long.MAX_VALUE);
+      // finalize history tour
+      historyTour.setTourEndTime(Long.MAX_VALUE);
 
-		visibleTourPhotoLinks.add(historyTour);
-	}
+      visibleTourPhotoLinks.add(historyTour);
+   }
 
-	/**
-	 * Get/Create first tour photo link
-	 * 
-	 * @param allPhotos
-	 */
-	private TourPhotoLink createTourPhotoLinks_10_GetFirstTour(final ArrayList<Photo> allPhotos) {
+   /**
+    * Get/Create first tour photo link
+    *
+    * @param allPhotos
+    */
+   private TourPhotoLink createTourPhotoLinks_10_GetFirstTour(final ArrayList<Photo> allPhotos) {
 
-		TourPhotoLink currentTourPhotoLink = null;
+      TourPhotoLink currentTourPhotoLink = null;
 
-		if (_dbTourPhotoLinks.size() > 0) {
+      if (_dbTourPhotoLinks.size() > 0) {
 
-			// real tours are available
+         // real tours are available
 
-			final TourPhotoLink firstTour = _dbTourPhotoLinks.get(0);
-			final Photo firstPhoto = allPhotos.get(0);
+         final TourPhotoLink firstTour = _dbTourPhotoLinks.get(0);
+         final Photo firstPhoto = allPhotos.get(0);
 
-			if (firstPhoto.adjustedTimeLink < firstTour.tourStartTime) {
+         if (firstPhoto.adjustedTimeLink < firstTour.tourStartTime) {
 
-				// first photo is before the first tour, create dummy tour
+            // first photo is before the first tour, create dummy tour
 
-			} else {
+         } else {
 
-				// first tour starts before the first photo
+            // first tour starts before the first photo
 
-				currentTourPhotoLink = firstTour;
-			}
-		} else {
+            currentTourPhotoLink = firstTour;
+         }
+      } else {
 
-			// there are no real tours, create dummy tour
-		}
+         // there are no real tours, create dummy tour
+      }
 
-		if (currentTourPhotoLink == null) {
+      if (currentTourPhotoLink == null) {
 
-			// 1st tour is a history tour
+         // 1st tour is a history tour
 
-			final long tourStart = allPhotos.get(0).adjustedTimeLink;
+         final long tourStart = allPhotos.get(0).adjustedTimeLink;
 
-			currentTourPhotoLink = new TourPhotoLink(tourStart);
-		}
+         currentTourPhotoLink = new TourPhotoLink(tourStart);
+      }
 
-		return currentTourPhotoLink;
-	}
+      return currentTourPhotoLink;
+   }
 
-	/**
-	 * Keep current tour when it contains photos.
-	 * 
-	 * @param currentTourPhotoLink
-	 * @param tourCameras
-	 * @param allTourPhotoLinks
-	 * @param isShowToursOnlyWithPhotos
-	 * @param isShowToursWithoutSavedPhotos
-	 */
-	private void createTourPhotoLinks_30_FinalizeCurrentTourPhotoLink(	final TourPhotoLink currentTourPhotoLink,
-																		final HashMap<String, String> tourCameras,
-																		final ArrayList<TourPhotoLink> allTourPhotoLinks,
-																		final boolean isShowToursOnlyWithPhotos,
-																		final boolean isShowToursWithoutSavedPhotos) {
+   /**
+    * Keep current tour when it contains photos.
+    *
+    * @param currentTourPhotoLink
+    * @param tourCameras
+    * @param allTourPhotoLinks
+    * @param isShowToursOnlyWithPhotos
+    * @param isShowToursWithoutSavedPhotos
+    */
+   private void createTourPhotoLinks_30_FinalizeCurrentTourPhotoLink(final TourPhotoLink currentTourPhotoLink,
+                                                                     final HashMap<String, String> tourCameras,
+                                                                     final ArrayList<TourPhotoLink> allTourPhotoLinks,
+                                                                     final boolean isShowToursOnlyWithPhotos,
+                                                                     final boolean isShowToursWithoutSavedPhotos) {
 
-		// keep only tours which contain photos
-		final boolean isNoPhotos = currentTourPhotoLink.linkPhotos.size() == 0;
-		final boolean isTourPhotos = currentTourPhotoLink.numberOfTourPhotos > 0;
+      // keep only tours which contain photos
+      final boolean isNoPhotos = currentTourPhotoLink.linkPhotos.size() == 0;
+      final boolean isTourPhotos = currentTourPhotoLink.numberOfTourPhotos > 0;
 
-		if (//
-			//
-			// exclude history tour without photos
-		(isNoPhotos && currentTourPhotoLink.isHistoryTour) //
-				//
-				// exclude real tours without photos
-				|| (isNoPhotos && isShowToursOnlyWithPhotos)
-				//
-				// exclude real tours with saved photos
-				|| (isTourPhotos && isShowToursWithoutSavedPhotos)
-		//
-		) {
-			return;
-		}
+      if (//
+          //
+          // exclude history tour without photos
+      (isNoPhotos && currentTourPhotoLink.isHistoryTour) //
+            //
+            // exclude real tours without photos
+            || (isNoPhotos && isShowToursOnlyWithPhotos)
+            //
+            // exclude real tours with saved photos
+            || (isTourPhotos && isShowToursWithoutSavedPhotos)
+      //
+      ) {
+         return;
+      }
 
-		// set tour end time
-		if (currentTourPhotoLink.isHistoryTour) {
-			currentTourPhotoLink.setTourEndTime(Long.MAX_VALUE);
-		}
+      // set tour end time
+      if (currentTourPhotoLink.isHistoryTour) {
+         currentTourPhotoLink.setTourEndTime(Long.MAX_VALUE);
+      }
 
-		setTourCameras(tourCameras, currentTourPhotoLink);
+      setTourCameras(tourCameras, currentTourPhotoLink);
 
-		createTourPhotoLinks_40_AddTour(currentTourPhotoLink, allTourPhotoLinks);
-	}
+      createTourPhotoLinks_40_AddTour(currentTourPhotoLink, allTourPhotoLinks);
+   }
 
-	private void createTourPhotoLinks_40_AddTour(	final TourPhotoLink tourPhotoLink,
-													final ArrayList<TourPhotoLink> allTourPhotoLinks) {
+   private void createTourPhotoLinks_40_AddTour(final TourPhotoLink tourPhotoLink,
+                                                final ArrayList<TourPhotoLink> allTourPhotoLinks) {
 
-		boolean isAddLink = true;
-		final int numberOfLinks = allTourPhotoLinks.size();
+      boolean isAddLink = true;
+      final int numberOfLinks = allTourPhotoLinks.size();
 
-		if (numberOfLinks > 0) {
+      if (numberOfLinks > 0) {
 
-			// check if this tour is already added, this algorithm to add tours is a little bit complex
+         // check if this tour is already added, this algorithm to add tours is a little bit complex
 
-			final TourPhotoLink prevTour = allTourPhotoLinks.get(numberOfLinks - 1);
-			if (prevTour.equals(tourPhotoLink)) {
-				isAddLink = false;
-			}
-		}
+         final TourPhotoLink prevTour = allTourPhotoLinks.get(numberOfLinks - 1);
+         if (prevTour.equals(tourPhotoLink)) {
+            isAddLink = false;
+         }
+      }
 
-		if (isAddLink) {
-			allTourPhotoLinks.add(tourPhotoLink);
-		}
-	}
+      if (isAddLink) {
+         allTourPhotoLinks.add(tourPhotoLink);
+      }
+   }
 
-	/**
-	 * History tours can occure multiple times in sequence, when tours between history tours do not
-	 * contain photos. This will merge multiple history tours into one.
-	 * 
-	 * @param allTourPhotoLinks
-	 */
-	private void createTourPhotoLinks_60_MergeHistoryTours(final ArrayList<TourPhotoLink> allTourPhotoLinks) {
+   /**
+    * History tours can occure multiple times in sequence, when tours between history tours do not
+    * contain photos. This will merge multiple history tours into one.
+    *
+    * @param allTourPhotoLinks
+    */
+   private void createTourPhotoLinks_60_MergeHistoryTours(final ArrayList<TourPhotoLink> allTourPhotoLinks) {
 
-		if (allTourPhotoLinks.size() == 0) {
-			return;
-		}
+      if (allTourPhotoLinks.size() == 0) {
+         return;
+      }
 
-		boolean isSubsequentHistory = false;
-		boolean isHistory = false;
+      boolean isSubsequentHistory = false;
+      boolean isHistory = false;
 
-		for (final TourPhotoLink tourPhotoLink : allTourPhotoLinks) {
+      for (final TourPhotoLink tourPhotoLink : allTourPhotoLinks) {
 
-			if (isHistory && tourPhotoLink.isHistoryTour == isHistory) {
+         if (isHistory && tourPhotoLink.isHistoryTour == isHistory) {
 
-				// 2 subsequent tours contains the same tour type
-				isSubsequentHistory = true;
-				break;
-			}
+            // 2 subsequent tours contains the same tour type
+            isSubsequentHistory = true;
+            break;
+         }
 
-			isHistory = tourPhotoLink.isHistoryTour;
-		}
+         isHistory = tourPhotoLink.isHistoryTour;
+      }
 
-		if (isSubsequentHistory == false) {
-			// there is nothing to merge
-			return;
-		}
+      if (isSubsequentHistory == false) {
+         // there is nothing to merge
+         return;
+      }
 
-		final ArrayList<TourPhotoLink> mergedLinks = new ArrayList<TourPhotoLink>();
-		TourPhotoLink prevHistoryTour = null;
+      final ArrayList<TourPhotoLink> mergedLinks = new ArrayList<>();
+      TourPhotoLink prevHistoryTour = null;
 
-		for (final TourPhotoLink tourPhotoLink : allTourPhotoLinks) {
+      for (final TourPhotoLink tourPhotoLink : allTourPhotoLinks) {
 
-			final boolean isHistoryTour = tourPhotoLink.isHistoryTour;
+         final boolean isHistoryTour = tourPhotoLink.isHistoryTour;
 
-			if (isHistoryTour && prevHistoryTour == null) {
+         if (isHistoryTour && prevHistoryTour == null) {
 
-				// first history tour
+            // first history tour
 
-				prevHistoryTour = tourPhotoLink;
+            prevHistoryTour = tourPhotoLink;
 
-				continue;
-			}
+            continue;
+         }
 
-			if (isHistoryTour && prevHistoryTour != null) {
+         if (isHistoryTour && prevHistoryTour != null) {
 
-				// this is a subsequent history tour, it is merged into previous history tour
+            // this is a subsequent history tour, it is merged into previous history tour
 
-				prevHistoryTour.linkPhotos.addAll(tourPhotoLink.linkPhotos);
-				prevHistoryTour.numberOfGPSPhotos += tourPhotoLink.numberOfGPSPhotos;
-				prevHistoryTour.numberOfNoGPSPhotos += tourPhotoLink.numberOfNoGPSPhotos;
+            prevHistoryTour.linkPhotos.addAll(tourPhotoLink.linkPhotos);
+            prevHistoryTour.numberOfGPSPhotos += tourPhotoLink.numberOfGPSPhotos;
+            prevHistoryTour.numberOfNoGPSPhotos += tourPhotoLink.numberOfNoGPSPhotos;
 
-				continue;
-			}
+            continue;
+         }
 
-			if (isHistoryTour == false && prevHistoryTour != null) {
+         if (isHistoryTour == false && prevHistoryTour != null) {
 
-				// this is a real tour, finalize previous history tour
+            // this is a real tour, finalize previous history tour
 
-				prevHistoryTour.setTourEndTime(Long.MAX_VALUE);
-				mergedLinks.add(prevHistoryTour);
-			}
+            prevHistoryTour.setTourEndTime(Long.MAX_VALUE);
+            mergedLinks.add(prevHistoryTour);
+         }
 
-			prevHistoryTour = null;
+         prevHistoryTour = null;
 
-			// this is a real tour
+         // this is a real tour
 
-			mergedLinks.add(tourPhotoLink);
-		}
+         mergedLinks.add(tourPhotoLink);
+      }
 
-		if (prevHistoryTour != null) {
+      if (prevHistoryTour != null) {
 
-			// finalize previous history tour
-			prevHistoryTour.setTourEndTime(Long.MAX_VALUE);
-			mergedLinks.add(prevHistoryTour);
-		}
+         // finalize previous history tour
+         prevHistoryTour.setTourEndTime(Long.MAX_VALUE);
+         mergedLinks.add(prevHistoryTour);
+      }
 
-		allTourPhotoLinks.clear();
-		allTourPhotoLinks.addAll(mergedLinks);
-	}
+      allTourPhotoLinks.clear();
+      allTourPhotoLinks.addAll(mergedLinks);
+   }
 
-	/**
-	 * @param imageFolder
-	 * @return Returns number of photos which set in {@link TourPhoto}s for a given folder.
-	 */
-	private ArrayList<String> getTourPhotos(final String imageFolder) {
+   /**
+    * @param imageFolder
+    * @return Returns number of photos which set in {@link TourPhoto}s for a given folder.
+    */
+   private ArrayList<String> getTourPhotos(final String imageFolder) {
 
-		final ArrayList<String> tourPhotoImages = new ArrayList<String>();
+      final ArrayList<String> tourPhotoImages = new ArrayList<>();
 
-		Connection conn = null;
+      Connection conn = null;
 
-		try {
+      try {
 
-			conn = TourDatabase.getInstance().getConnection();
+         conn = TourDatabase.getInstance().getConnection();
 
-			final String sql = "SELECT imageFileName" // 						//$NON-NLS-1$
-					+ " FROM " + TourDatabase.TABLE_TOUR_PHOTO //			//$NON-NLS-1$
-					+ " WHERE imageFilePath=?"; //							//$NON-NLS-1$
+         final String sql = "SELECT imageFileName" // 						//$NON-NLS-1$
+               + " FROM " + TourDatabase.TABLE_TOUR_PHOTO //			//$NON-NLS-1$
+               + " WHERE imageFilePath=?"; //							//$NON-NLS-1$
 
-			final PreparedStatement stmt = conn.prepareStatement(sql);
+         final PreparedStatement stmt = conn.prepareStatement(sql);
 
-			stmt.setString(1, imageFolder);
+         stmt.setString(1, imageFolder);
 
-			final ResultSet result = stmt.executeQuery();
+         final ResultSet result = stmt.executeQuery();
 
-			while (result.next()) {
-				tourPhotoImages.add(result.getString(1));
-			}
+         while (result.next()) {
+            tourPhotoImages.add(result.getString(1));
+         }
 
-		} catch (final SQLException e) {
-			SQL.showException(e);
-		} finally {
-			Util.closeSql(conn);
-		}
+      } catch (final SQLException e) {
+         SQL.showException(e);
+      } finally {
+         Util.closeSql(conn);
+      }
 
-		return tourPhotoImages;
-	}
+      return tourPhotoImages;
+   }
 
-	private int getTourPhotoTours(final String imagePath) {
+   private int getTourPhotoTours(final String imagePath) {
 
-		int numberOfTours = 0;
+      int numberOfTours = 0;
 
-		Connection conn = null;
+      Connection conn = null;
 
-		try {
+      try {
 
-			conn = TourDatabase.getInstance().getConnection();
+         conn = TourDatabase.getInstance().getConnection();
 
-			final String sql = "" //													//$NON-NLS-1$
+         final String sql = "" //													//$NON-NLS-1$
 
-					// get number of tours
-					+ " SELECT COUNT(*)" // 											//$NON-NLS-1$
-					+ " FROM" //														//$NON-NLS-1$
+               // get number of tours
+               + " SELECT COUNT(*)" // 											//$NON-NLS-1$
+               + " FROM" //														//$NON-NLS-1$
 
-					// get all tours which contain the image folder
-					+ " (" //															//$NON-NLS-1$
-					//
-					+ (" SELECT DISTINCT " + TourDatabase.TABLE_TOUR_DATA + "_tourId") //$NON-NLS-1$ //$NON-NLS-2$
-					+ (" FROM " + TourDatabase.TABLE_TOUR_PHOTO) //						//$NON-NLS-1$
-					+ " WHERE imageFilePath=?" //										//$NON-NLS-1$
-					//
-					+ " ) TourId"; //													//$NON-NLS-1$
+               // get all tours which contain the image folder
+               + " (" //															//$NON-NLS-1$
+               //
+               + (" SELECT DISTINCT " + TourDatabase.TABLE_TOUR_DATA + "_tourId") //$NON-NLS-1$ //$NON-NLS-2$
+               + (" FROM " + TourDatabase.TABLE_TOUR_PHOTO) //						//$NON-NLS-1$
+               + " WHERE imageFilePath=?" //										//$NON-NLS-1$
+               //
+               + " ) TourId"; //													//$NON-NLS-1$
 
-			final PreparedStatement stmt = conn.prepareStatement(sql);
+         final PreparedStatement stmt = conn.prepareStatement(sql);
 
-			stmt.setString(1, imagePath);
+         stmt.setString(1, imagePath);
 
-			final ResultSet result = stmt.executeQuery();
+         final ResultSet result = stmt.executeQuery();
 
-			// get first result
-			result.next();
+         // get first result
+         result.next();
 
-			// get first value
-			numberOfTours = result.getInt(1);
+         // get first value
+         numberOfTours = result.getInt(1);
 
-		} catch (final SQLException e) {
-			SQL.showException(e);
-		} finally {
-			Util.closeSql(conn);
-		}
+      } catch (final SQLException e) {
+         SQL.showException(e);
+      } finally {
+         Util.closeSql(conn);
+      }
 
-		return numberOfTours;
-	}
+      return numberOfTours;
+   }
 
-	void linkPhotosWithTours(final PhotosWithExifSelection selectedPhotosWithExif) {
+   void linkPhotosWithTours(final PhotosWithExifSelection selectedPhotosWithExif) {
 
-		final TourPhotoLinkView linkView = openLinkView();
+      final TourPhotoLinkView linkView = openLinkView();
 
-		if (linkView != null) {
-			linkView.showPhotosAndTours(selectedPhotosWithExif.photos);
-		}
-	}
+      if (linkView != null) {
+         linkView.showPhotosAndTours(selectedPhotosWithExif.photos);
+      }
+   }
 
-	/**
-	 * Loads tours from the database for all photos.
-	 * 
-	 * @param allPhotos
-	 * @param isResetGeoPosition
-	 * @return Returns <code>true</code> when tours are loaded from the database, <code>false</code>
-	 *         is returned when all photo time stamps are within the previously loaded tours.
-	 */
+   /**
+    * Loads tours from the database for all photos.
+    *
+    * @param allPhotos
+    * @param isResetGeoPosition
+    * @return Returns <code>true</code> when tours are loaded from the database, <code>false</code>
+    *         is returned when all photo time stamps are within the previously loaded tours.
+    */
 
-	private void loadToursFromDb(final ArrayList<Photo> allPhotos, final boolean isResetGeoPosition) {
+   private void loadToursFromDb(final ArrayList<Photo> allPhotos, final boolean isResetGeoPosition) {
 
-		/*
-		 * get date for 1st and last photo
-		 */
-		long firstPhotoTime = allPhotos.get(0).adjustedTimeLink;
-		long lastPhotoTime = firstPhotoTime;
+      /*
+       * get date for 1st and last photo
+       */
+      long firstPhotoTime = allPhotos.get(0).adjustedTimeLink;
+      long lastPhotoTime = firstPhotoTime;
 
-		for (final Photo photo : allPhotos) {
+      for (final Photo photo : allPhotos) {
 
-			final long imageTime = photo.adjustedTimeLink;
+         final long imageTime = photo.adjustedTimeLink;
 
-			if (imageTime < firstPhotoTime) {
-				firstPhotoTime = imageTime;
-			} else if (imageTime > lastPhotoTime) {
-				lastPhotoTime = imageTime;
-			}
+         if (imageTime < firstPhotoTime) {
+            firstPhotoTime = imageTime;
+         } else if (imageTime > lastPhotoTime) {
+            lastPhotoTime = imageTime;
+         }
 
-			/*
-			 * the adjusted time can set a new position, remove old positions which are not covered
-			 * by a tour anymore
-			 */
-			if (isResetGeoPosition) {
-				photo.resetLinkGeoPositions();
-			}
-		}
+         /*
+          * the adjusted time can set a new position, remove old positions which are not covered
+          * by a tour anymore
+          */
+         if (isResetGeoPosition) {
+            photo.resetLinkGeoPositions();
+         }
+      }
 
-		// check if tours are already loaded
-		if (firstPhotoTime >= _sqlTourStart && lastPhotoTime <= _sqlTourEnd) {
+      // check if tours are already loaded
+      if (firstPhotoTime >= _sqlTourStart && lastPhotoTime <= _sqlTourEnd) {
 
-			// photos are contained in the already loaded tours, data for the 'old' links will be reset
+         // photos are contained in the already loaded tours, data for the 'old' links will be reset
 
-		} else {
+      } else {
 
-			// adjust by 5 days that time adjustments are covered
-			final long tourStartDate = firstPhotoTime - 5 * UI.DAY_IN_SECONDS * 1000;
-			final long tourEndDate = lastPhotoTime + 5 * UI.DAY_IN_SECONDS * 1000;
+         // adjust by 5 days that time adjustments are covered
+         final long tourStartDate = firstPhotoTime - 5 * UI.DAY_IN_SECONDS * 1000;
+         final long tourEndDate = lastPhotoTime + 5 * UI.DAY_IN_SECONDS * 1000;
 
-			BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-				@Override
-				public void run() {
-					loadToursFromDb_Runnable(tourStartDate, tourEndDate);
-				}
-			});
-		}
+         BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+            @Override
+            public void run() {
+               loadToursFromDb_Runnable(tourStartDate, tourEndDate);
+            }
+         });
+      }
 
-		_dbTourPhotoLinks.clear();
-		boolean isFirstTour = true;
+      _dbTourPhotoLinks.clear();
+      boolean isFirstTour = true;
 
-		for (final TourPhotoLink tourPhotoLink : _allDbTourPhotoLinks) {
+      for (final TourPhotoLink tourPhotoLink : _allDbTourPhotoLinks) {
 
-			final long tourStart = tourPhotoLink.tourStartTime;
-			final long tourEnd = tourPhotoLink.tourEndTime;
+         final long tourStart = tourPhotoLink.tourStartTime;
+         final long tourEnd = tourPhotoLink.tourEndTime;
 
-			if (isFirstTour) {
+         if (isFirstTour) {
 
-				// check if this is the first tour
+            // check if this is the first tour
 
-				if (firstPhotoTime > tourEnd) {
-					continue;
-				} else {
-					// first tour is found
-					isFirstTour = false;
-				}
+            if (firstPhotoTime > tourEnd) {
+               continue;
+            } else {
+               // first tour is found
+               isFirstTour = false;
+            }
 
-			} else {
+         } else {
 
-				// subsequent tour
+            // subsequent tour
 
-				if (tourStart > lastPhotoTime) {
-					break;
-				}
-			}
+            if (tourStart > lastPhotoTime) {
+               break;
+            }
+         }
 
-			tourPhotoLink.linkPhotos.clear();
+         tourPhotoLink.linkPhotos.clear();
 
-			tourPhotoLink.numberOfGPSPhotos = 0;
-			tourPhotoLink.numberOfNoGPSPhotos = 0;
+         tourPhotoLink.numberOfGPSPhotos = 0;
+         tourPhotoLink.numberOfNoGPSPhotos = 0;
 
-			tourPhotoLink.tourCameras = UI.EMPTY_STRING;
+         tourPhotoLink.tourCameras = UI.EMPTY_STRING;
 
-			_dbTourPhotoLinks.add(tourPhotoLink);
-		}
+         _dbTourPhotoLinks.add(tourPhotoLink);
+      }
 
-		return;
-	}
+      return;
+   }
 
-	private void loadToursFromDb_Runnable(final long dbStartDate, final long dbEndDate) {
+   private void loadToursFromDb_Runnable(final long dbStartDate, final long dbEndDate) {
 
 //		final long start = System.currentTimeMillis();
 
-		_allDbTourPhotoLinks.clear();
+      _allDbTourPhotoLinks.clear();
 
-		try {
+      try {
 
-			if (_sqlConnection == null) {
+         if (_sqlConnection == null) {
 
-				final SQLFilter sqlFilter = new SQLFilter(SQLFilter.NO_PHOTOS);
+            final SQLFilter sqlFilter = new SQLFilter(SQLFilter.NO_PHOTOS);
 
-				final String sql = UI.EMPTY_STRING //
+            final String sql = UI.EMPTY_STRING //
 
-						+ "SELECT " //$NON-NLS-1$
+                  + "SELECT " //$NON-NLS-1$
 
-						+ " TourId, " //					1 //$NON-NLS-1$
-						+ " TourStartTime, " //				2 //$NON-NLS-1$
-						+ " TourEndTime, " //				3 //$NON-NLS-1$
-						+ " TourType_TypeId, " //			4 //$NON-NLS-1$
+                  + " TourId, " //					1 //$NON-NLS-1$
+                  + " TourStartTime, " //				2 //$NON-NLS-1$
+                  + " TourEndTime, " //				3 //$NON-NLS-1$
+                  + " TourType_TypeId, " //			4 //$NON-NLS-1$
 
-						+ " numberOfPhotos, " //			5 //$NON-NLS-1$
-						+ " photoTimeAdjustment " //		6 //$NON-NLS-1$
+                  + " numberOfPhotos, " //			5 //$NON-NLS-1$
+                  + " photoTimeAdjustment " //		6 //$NON-NLS-1$
 
-						+ UI.NEW_LINE
+                  + UI.NEW_LINE
 
-						+ (" FROM " + TourDatabase.TABLE_TOUR_DATA + UI.NEW_LINE) //$NON-NLS-1$
+                  + (" FROM " + TourDatabase.TABLE_TOUR_DATA + UI.NEW_LINE) //$NON-NLS-1$
 
-						+ " WHERE" //$NON-NLS-1$
-						+ (" TourStartTime >= ?") //$NON-NLS-1$
-						+ (" AND TourEndTime <= ?") //$NON-NLS-1$
+                  + " WHERE" //$NON-NLS-1$
+                  + (" TourStartTime >= ?") //$NON-NLS-1$
+                  + (" AND TourEndTime <= ?") //$NON-NLS-1$
 
-						+ sqlFilter.getWhereClause()
+                  + sqlFilter.getWhereClause()
 
-						+ UI.NEW_LINE
+                  + UI.NEW_LINE
 
-						+ (" ORDER BY TourStartTime"); //$NON-NLS-1$
+                  + (" ORDER BY TourStartTime"); //$NON-NLS-1$
 
-				_sqlConnection = TourDatabase.getInstance().getConnection();
-				_sqlStatement = _sqlConnection.prepareStatement(sql);
+            _sqlConnection = TourDatabase.getInstance().getConnection();
+            _sqlStatement = _sqlConnection.prepareStatement(sql);
 
-				sqlFilter.setParameters(_sqlStatement, 3);
-			}
+            sqlFilter.setParameters(_sqlStatement, 3);
+         }
 
-			_sqlStatement.setLong(1, dbStartDate);
-			_sqlStatement.setLong(2, dbEndDate);
+         _sqlStatement.setLong(1, dbStartDate);
+         _sqlStatement.setLong(2, dbEndDate);
 
-			_sqlTourStart = Long.MAX_VALUE;
-			_sqlTourEnd = Long.MIN_VALUE;
+         _sqlTourStart = Long.MAX_VALUE;
+         _sqlTourEnd = Long.MIN_VALUE;
 
-			final ResultSet result = _sqlStatement.executeQuery();
+         final ResultSet result = _sqlStatement.executeQuery();
 
-			while (result.next()) {
+         while (result.next()) {
 
-				final long dbTourId = result.getLong(1);
-				final long dbTourStart = result.getLong(2);
-				final long dbTourEnd = result.getLong(3);
-				final Object dbTourTypeId = result.getObject(4);
-				final int dbNumberOfPhotos = result.getInt(5);
-				final int dbPhotoTimeAdjustment = result.getInt(6);
+            final long dbTourId = result.getLong(1);
+            final long dbTourStart = result.getLong(2);
+            final long dbTourEnd = result.getLong(3);
+            final Object dbTourTypeId = result.getObject(4);
+            final int dbNumberOfPhotos = result.getInt(5);
+            final int dbPhotoTimeAdjustment = result.getInt(6);
 
-				final TourPhotoLink dbTourPhotoLink = new TourPhotoLink(
-						dbTourId,
-						dbTourStart,
-						dbTourEnd,
-						dbNumberOfPhotos,
-						dbPhotoTimeAdjustment);
+            final TourPhotoLink dbTourPhotoLink = new TourPhotoLink(
+                  dbTourId,
+                  dbTourStart,
+                  dbTourEnd,
+                  dbNumberOfPhotos,
+                  dbPhotoTimeAdjustment);
 
-				dbTourPhotoLink.tourTypeId = (dbTourTypeId == null ? //
-						TourDatabase.ENTITY_IS_NOT_SAVED
-						: (Long) dbTourTypeId);
+            dbTourPhotoLink.tourTypeId = (dbTourTypeId == null ? //
+                  TourDatabase.ENTITY_IS_NOT_SAVED
+                  : (Long) dbTourTypeId);
 
-				_allDbTourPhotoLinks.add(dbTourPhotoLink);
+            _allDbTourPhotoLinks.add(dbTourPhotoLink);
 
-				// get range of all tour start/end
-				if (dbTourStart < _sqlTourStart) {
-					_sqlTourStart = dbTourStart;
-				}
-				if (dbTourEnd > _sqlTourEnd) {
-					_sqlTourEnd = dbTourEnd;
-				}
-			}
+            // get range of all tour start/end
+            if (dbTourStart < _sqlTourStart) {
+               _sqlTourStart = dbTourStart;
+            }
+            if (dbTourEnd > _sqlTourEnd) {
+               _sqlTourEnd = dbTourEnd;
+            }
+         }
 
-		} catch (final SQLException e) {
-			net.tourbook.ui.UI.showSQLException(e);
-		}
+      } catch (final SQLException e) {
+         net.tourbook.ui.UI.showSQLException(e);
+      }
 //		System.out.println("loadToursFromDb_Runnable()\t"
 //				+ (System.currentTimeMillis() - start)
 //				+ " ms\t"
@@ -1013,426 +1012,426 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 //				+ "\t"
 //				+ new DateTime(_sqlTourEnd));
 //		// TODO remove SYSTEM.OUT.PRINTLN
-	}
+   }
 
-	@Override
-	public void openTour(final HashMap<Long, TourPhotoReference> tourPhotoReferences) {
+   @Override
+   public void openTour(final HashMap<Long, TourPhotoReference> tourPhotoReferences) {
 
-		for (final TourPhotoReference ref : tourPhotoReferences.values()) {
+      for (final TourPhotoReference ref : tourPhotoReferences.values()) {
 
-			// fire a selection for the first tour
+         // fire a selection for the first tour
 
-			final long tourId = ref.tourId;
-			final SelectionTourId selection = new SelectionTourId(tourId);
+         final long tourId = ref.tourId;
+         final SelectionTourId selection = new SelectionTourId(tourId);
 
-			PostSelectionProvider.fireSelection(selection);
+         PostSelectionProvider.fireSelection(selection);
 
-			break;
-		}
-	}
+         break;
+      }
+   }
 
-	@Override
-	public ArrayList<ImagePathReplacement> replaceImageFilePath(final Photo sourcePhoto) {
+   @Override
+   public ArrayList<ImagePathReplacement> replaceImageFilePath(final Photo sourcePhoto) {
 
-		final Display display = Display.getDefault();
-		final Shell shell = display.getActiveShell();
+      final Display display = Display.getDefault();
+      final Shell shell = display.getActiveShell();
 
-		final String newImageFolder[] = new String[1];
-		final String oldImageFolder = sourcePhoto.imagePathName;
+      final String newImageFolder[] = new String[1];
+      final String oldImageFolder = sourcePhoto.imagePathName;
 
-		final ArrayList<String> tourPhotoImageNames = getTourPhotos(oldImageFolder);
+      final ArrayList<String> tourPhotoImageNames = getTourPhotos(oldImageFolder);
 
-		/*
-		 * show info when no images are found, this case should not happen because this method is
-		 * called with a tour photo and only when the photo image is not found
-		 */
-		if (tourPhotoImageNames.size() == 0) {
+      /*
+       * show info when no images are found, this case should not happen because this method is
+       * called with a tour photo and only when the photo image is not found
+       */
+      if (tourPhotoImageNames.size() == 0) {
 
-			MessageDialog.openInformation(
-					shell, //
-					Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_Title,
-					NLS.bind(//
-							Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_NoImage_Message,
-							oldImageFolder));
+         MessageDialog.openInformation(
+               shell, //
+               Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_Title,
+               NLS.bind(//
+                     Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_NoImage_Message,
+                     oldImageFolder));
 
-			return null;
-		}
+         return null;
+      }
 
-		final ArrayList<IPath> validImages = new ArrayList<IPath>();
-		final ArrayList<String> inValidImageNames = new ArrayList<String>();
-		final int numberOfTourPhotoTours = getTourPhotoTours(oldImageFolder);
-		final ArrayList<IPath> modifiedImages = new ArrayList<IPath>();
+      final ArrayList<IPath> validImages = new ArrayList<>();
+      final ArrayList<String> inValidImageNames = new ArrayList<>();
+      final int numberOfTourPhotoTours = getTourPhotoTours(oldImageFolder);
+      final ArrayList<IPath> modifiedImages = new ArrayList<>();
 
-		if (MessageDialog.openQuestion(
-				shell, //
-				Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_Title,
-				NLS.bind(//
-						Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_Message,
-						new Object[] { numberOfTourPhotoTours, //
-								tourPhotoImageNames.size(),
-								oldImageFolder }))) {
+      if (MessageDialog.openQuestion(
+            shell, //
+            Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_Title,
+            NLS.bind(//
+                  Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_Message,
+                  new Object[] { numberOfTourPhotoTours, //
+                        tourPhotoImageNames.size(),
+                        oldImageFolder }))) {
 
-			final DirectoryDialog dialog = new DirectoryDialog(shell, SWT.SAVE);
+         final DirectoryDialog dialog = new DirectoryDialog(shell, SWT.SAVE);
 
-			dialog.setText(Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_Title);
-			dialog.setMessage(
-					NLS.bind(
-							Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_SelectFolder_Message,
-							sourcePhoto.imageFileName,
-							oldImageFolder));
+         dialog.setText(Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_Title);
+         dialog.setMessage(
+               NLS.bind(
+                     Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_SelectFolder_Message,
+                     sourcePhoto.imageFileName,
+                     oldImageFolder));
 
-			if (_replaceImageFolder != null) {
-				dialog.setFilterPath(_replaceImageFolder);
-			}
+         if (_replaceImageFolder != null) {
+            dialog.setFilterPath(_replaceImageFolder);
+         }
 
-			newImageFolder[0] = dialog.open();
+         newImageFolder[0] = dialog.open();
 
-			if (newImageFolder[0] != null) {
+         if (newImageFolder[0] != null) {
 
-				// a folder is selected
+            // a folder is selected
 
-				_replaceImageFolder = newImageFolder[0];
+            _replaceImageFolder = newImageFolder[0];
 
-				// check which images are available at the new location
-				BusyIndicator.showWhile(display, new Runnable() {
-					@Override
-					public void run() {
+            // check which images are available at the new location
+            BusyIndicator.showWhile(display, new Runnable() {
+               @Override
+               public void run() {
 
-						final IPath folderPath = new Path(newImageFolder[0]).addTrailingSeparator();
+                  final IPath folderPath = new Path(newImageFolder[0]).addTrailingSeparator();
 
-						for (final String imageName : tourPhotoImageNames) {
+                  for (final String imageName : tourPhotoImageNames) {
 
-							final IPath imagePathName = folderPath.append(imageName);
+                     final IPath imagePathName = folderPath.append(imageName);
 
-							if (imagePathName.toFile().exists()) {
-								validImages.add(imagePathName);
-							} else {
-								inValidImageNames.add(imageName);
-							}
-						}
-					}
-				});
+                     if (imagePathName.toFile().exists()) {
+                        validImages.add(imagePathName);
+                     } else {
+                        inValidImageNames.add(imageName);
+                     }
+                  }
+               }
+            });
 
-				if (validImages.size() == 0) {
-
-					// there are no images in the new selected folder
-
-					MessageDialog.openInformation(
-							shell, //
-							Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_Title,
-							NLS.bind(//
-									Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_NoValidImages_Message,
-									newImageFolder[0],
-									oldImageFolder));
+            if (validImages.size() == 0) {
+
+               // there are no images in the new selected folder
+
+               MessageDialog.openInformation(
+                     shell, //
+                     Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_Title,
+                     NLS.bind(//
+                           Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_NoValidImages_Message,
+                           newImageFolder[0],
+                           oldImageFolder));
 
-				} else {
+            } else {
 
-					// there are images in the new selected folder
+               // there are images in the new selected folder
 
-					if (inValidImageNames.size() == 0) {
+               if (inValidImageNames.size() == 0) {
 
-						// all images can be replaced
+                  // all images can be replaced
 
-						if (MessageDialog.openQuestion(
-								shell, //
-								Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_Title,
-								NLS.bind(//
-										Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_ReplaceAll_Message,
-										new Object[] { validImages.size(), //
-												oldImageFolder,
-												newImageFolder[0] }))) {
+                  if (MessageDialog.openQuestion(
+                        shell, //
+                        Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_Title,
+                        NLS.bind(//
+                              Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_ReplaceAll_Message,
+                              new Object[] { validImages.size(), //
+                                    oldImageFolder,
+                                    newImageFolder[0] }))) {
 
-							modifiedImages.addAll(validImages);
-						}
+                     modifiedImages.addAll(validImages);
+                  }
 
-					} else {
+               } else {
 
-						// some images are not available
+                  // some images are not available
 
-						if (MessageDialog.openQuestion(
-								shell, //
-								Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_Title,
-								NLS.bind(//
-										Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_ReplacePartly_Message,
-										new Object[] {
-												validImages.size(),
-												inValidImageNames.size(),
-												oldImageFolder,
-												newImageFolder[0],
-												tourPhotoImageNames.size() }))) {
+                  if (MessageDialog.openQuestion(
+                        shell, //
+                        Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_Title,
+                        NLS.bind(//
+                              Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_ReplacePartly_Message,
+                              new Object[] {
+                                    validImages.size(),
+                                    inValidImageNames.size(),
+                                    oldImageFolder,
+                                    newImageFolder[0],
+                                    tourPhotoImageNames.size() }))) {
 
-							modifiedImages.addAll(validImages);
-						}
-					}
-				}
-			}
-		}
+                     modifiedImages.addAll(validImages);
+                  }
+               }
+            }
+         }
+      }
 
-		final ArrayList<ImagePathReplacement> replacedImages = new ArrayList<ImagePathReplacement>();
+      final ArrayList<ImagePathReplacement> replacedImages = new ArrayList<>();
 
-		if (modifiedImages.size() > 0) {
+      if (modifiedImages.size() > 0) {
 
-			BusyIndicator.showWhile(display, new Runnable() {
-				@Override
-				public void run() {
+         BusyIndicator.showWhile(display, new Runnable() {
+            @Override
+            public void run() {
 
-					final ArrayList<ImagePathReplacement> replacedImagesInDb = replaceImageFilePath_InSQLDb(
-							oldImageFolder,
-							modifiedImages);
+               final ArrayList<ImagePathReplacement> replacedImagesInDb = replaceImageFilePath_InSQLDb(
+                     oldImageFolder,
+                     modifiedImages);
 
-					replacedImages.addAll(replacedImagesInDb);
-				}
-			});
-		}
+               replacedImages.addAll(replacedImagesInDb);
+            }
+         });
+      }
 
-		/*
-		 * show error message with all invalid image names
-		 */
-		if (validImages.size() > 0 && inValidImageNames.size() > 0) {
+      /*
+       * show error message with all invalid image names
+       */
+      if (validImages.size() > 0 && inValidImageNames.size() > 0) {
 
-			// sort names
-			Collections.sort(inValidImageNames);
+         // sort names
+         Collections.sort(inValidImageNames);
 
-			final StringBuilder sb = new StringBuilder();
+         final StringBuilder sb = new StringBuilder();
 
-			sb.append(
-					NLS.bind(
-							Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_NoValidImageNames,
-							newImageFolder[0]));
+         sb.append(
+               NLS.bind(
+                     Messages.Photo_TourPhotoMgr_Dialog_ReplacePhotoImage_NoValidImageNames,
+                     newImageFolder[0]));
 
-			for (final String invalidName : inValidImageNames) {
-				sb.append(UI.NEW_LINE + invalidName);
-			}
+         for (final String invalidName : inValidImageNames) {
+            sb.append(UI.NEW_LINE + invalidName);
+         }
 
-			StatusUtil.showStatus(sb.toString());
-		}
+         StatusUtil.showStatus(sb.toString());
+      }
 
-		return replacedImages;
-	}
+      return replacedImages;
+   }
 
-	/**
-	 * Replace image file path in the tour photo table.
-	 * 
-	 * @param oldImageFolder
-	 * @param modifiedImages
-	 * @return
-	 */
-	private ArrayList<ImagePathReplacement> replaceImageFilePath_InSQLDb(	final String oldImageFolder,
-																			final ArrayList<IPath> modifiedImages) {
+   /**
+    * Replace image file path in the tour photo table.
+    *
+    * @param oldImageFolder
+    * @param modifiedImages
+    * @return
+    */
+   private ArrayList<ImagePathReplacement> replaceImageFilePath_InSQLDb(final String oldImageFolder,
+                                                                        final ArrayList<IPath> modifiedImages) {
 
-		final ArrayList<ImagePathReplacement> replacedImages = new ArrayList<ImagePathReplacement>();
+      final ArrayList<ImagePathReplacement> replacedImages = new ArrayList<>();
 
-		Connection conn = null;
+      Connection conn = null;
 
-		try {
+      try {
 
-			conn = TourDatabase.getInstance().getConnection();
+         conn = TourDatabase.getInstance().getConnection();
 
-			final String sql = "UPDATE " + TourDatabase.TABLE_TOUR_PHOTO //	//$NON-NLS-1$
+         final String sql = "UPDATE " + TourDatabase.TABLE_TOUR_PHOTO //	//$NON-NLS-1$
 
-					+ " SET" //									//$NON-NLS-1$
+               + " SET" //									//$NON-NLS-1$
 
-					+ " imageFilePath=?, " //				1	//$NON-NLS-1$
-					+ " imageFilePathName=? " //			2	//$NON-NLS-1$
+               + " imageFilePath=?, " //				1	//$NON-NLS-1$
+               + " imageFilePathName=? " //			2	//$NON-NLS-1$
 
-					+ " WHERE imageFilePathName=?"; //			3	//$NON-NLS-1$
+               + " WHERE imageFilePathName=?"; //			3	//$NON-NLS-1$
 
-			final PreparedStatement sqlUpdate = conn.prepareStatement(sql);
+         final PreparedStatement sqlUpdate = conn.prepareStatement(sql);
 
-			final IPath oldImagePath = new Path(oldImageFolder);
+         final IPath oldImagePath = new Path(oldImageFolder);
 
-			for (final IPath imagePath : modifiedImages) {
+         for (final IPath imagePath : modifiedImages) {
 
-				final String imageFilePath = imagePath.removeLastSegments(1).toOSString();
-				final String imageFilePathName = imagePath.toOSString();
+            final String imageFilePath = imagePath.removeLastSegments(1).toOSString();
+            final String imageFilePathName = imagePath.toOSString();
 
-				final String imageFileName = imagePath.lastSegment();
-				final String oldImageFilePathName = oldImagePath.append(imageFileName).toOSString();
+            final String imageFileName = imagePath.lastSegment();
+            final String oldImageFilePathName = oldImagePath.append(imageFileName).toOSString();
 
 //				if (imageFileName.equals("P1000699.JPG")) {
 //					int a = 0;
 //					a++;
 //				}
 
-				// update photo in db
-				sqlUpdate.setString(1, imageFilePath);
-				sqlUpdate.setString(2, imageFilePathName);
-				sqlUpdate.setString(3, oldImageFilePathName);
+            // update photo in db
+            sqlUpdate.setString(1, imageFilePath);
+            sqlUpdate.setString(2, imageFilePathName);
+            sqlUpdate.setString(3, oldImageFilePathName);
 
-				sqlUpdate.executeUpdate();
+            sqlUpdate.executeUpdate();
 
-				replacedImages.add(new ImagePathReplacement(oldImageFilePathName, imagePath));
-			}
+            replacedImages.add(new ImagePathReplacement(oldImageFilePathName, imagePath));
+         }
 
-		} catch (final SQLException e) {
-			net.tourbook.ui.UI.showSQLException(e);
-		} finally {
+      } catch (final SQLException e) {
+         net.tourbook.ui.UI.showSQLException(e);
+      } finally {
 
-			if (conn != null) {
-				try {
-					conn.close();
-				} catch (final SQLException e) {
-					net.tourbook.ui.UI.showSQLException(e);
-				}
-			}
-		}
+         if (conn != null) {
+            try {
+               conn.close();
+            } catch (final SQLException e) {
+               net.tourbook.ui.UI.showSQLException(e);
+            }
+         }
+      }
 
-		return replacedImages;
-	}
+      return replacedImages;
+   }
 
-	void resetTourStartEnd() {
+   void resetTourStartEnd() {
 
-		if (_sqlConnection != null) {
+      if (_sqlConnection != null) {
 
-			Util.closeSql(_sqlStatement);
-			Util.closeSql(_sqlConnection);
+         Util.closeSql(_sqlStatement);
+         Util.closeSql(_sqlConnection);
 
-			_sqlStatement = null;
-			_sqlConnection = null;
+         _sqlStatement = null;
+         _sqlConnection = null;
 
-			// force reloading cached start/end
-			_sqlTourStart = Long.MAX_VALUE;
-			_sqlTourEnd = Long.MIN_VALUE;
-		}
-	}
+         // force reloading cached start/end
+         _sqlTourStart = Long.MAX_VALUE;
+         _sqlTourEnd = Long.MIN_VALUE;
+      }
+   }
 
-	@Override
-	public void saveStarRating(final ArrayList<Photo> photos) {
+   @Override
+   public void saveStarRating(final ArrayList<Photo> photos) {
 
 //		final long start = System.nanoTime();
 
-		Connection conn = null;
+      Connection conn = null;
 
-		try {
-			conn = TourDatabase.getInstance().getConnection();
+      try {
+         conn = TourDatabase.getInstance().getConnection();
 
-			final PreparedStatement sqlUpdate = conn.prepareStatement(//
-					"UPDATE " + TourDatabase.TABLE_TOUR_PHOTO //	//$NON-NLS-1$
-							+ " SET" //								//$NON-NLS-1$
-							+ " ratingStars=? " //					//$NON-NLS-1$
-							+ " WHERE photoId=?"); //				//$NON-NLS-1$
+         final PreparedStatement sqlUpdate = conn.prepareStatement(//
+               "UPDATE " + TourDatabase.TABLE_TOUR_PHOTO //	//$NON-NLS-1$
+                     + " SET" //								//$NON-NLS-1$
+                     + " ratingStars=? " //					//$NON-NLS-1$
+                     + " WHERE photoId=?"); //				//$NON-NLS-1$
 
-			final ArrayList<Photo> updatedPhotos = new ArrayList<Photo>();
+         final ArrayList<Photo> updatedPhotos = new ArrayList<>();
 
-			for (final Photo photo : photos) {
+         for (final Photo photo : photos) {
 
-				final int ratingStars = photo.ratingStars;
-				final Collection<TourPhotoReference> photoRefs = photo.getTourPhotoReferences().values();
+            final int ratingStars = photo.ratingStars;
+            final Collection<TourPhotoReference> photoRefs = photo.getTourPhotoReferences().values();
 
-				if (photoRefs.size() > 0) {
+            if (photoRefs.size() > 0) {
 
-					for (final TourPhotoReference photoRef : photoRefs) {
+               for (final TourPhotoReference photoRef : photoRefs) {
 
-						// update db
-						sqlUpdate.setInt(1, ratingStars);
-						sqlUpdate.setLong(2, photoRef.photoId);
-						sqlUpdate.executeUpdate();
+                  // update db
+                  sqlUpdate.setInt(1, ratingStars);
+                  sqlUpdate.setLong(2, photoRef.photoId);
+                  sqlUpdate.executeUpdate();
 
-						// update tour photo
-						final TourData tourData = TourManager.getInstance().getTourData(photoRef.tourId);
-						final Set<TourPhoto> tourPhotos = tourData.getTourPhotos();
-						for (final TourPhoto tourPhoto : tourPhotos) {
-							if (tourPhoto.getPhotoId() == photoRef.photoId) {
-								tourPhoto.setRatingStars(ratingStars);
-								break;
-							}
-						}
-					}
+                  // update tour photo
+                  final TourData tourData = TourManager.getInstance().getTourData(photoRef.tourId);
+                  final Set<TourPhoto> tourPhotos = tourData.getTourPhotos();
+                  for (final TourPhoto tourPhoto : tourPhotos) {
+                     if (tourPhoto.getPhotoId() == photoRef.photoId) {
+                        tourPhoto.setRatingStars(ratingStars);
+                        break;
+                     }
+                  }
+               }
 
-					updatedPhotos.add(photo);
-				}
-			}
+               updatedPhotos.add(photo);
+            }
+         }
 
-			if (updatedPhotos.size() > 0) {
+         if (updatedPhotos.size() > 0) {
 
-				// fire notification to update all galleries with the modified rating stars
+            // fire notification to update all galleries with the modified rating stars
 
-				PhotoManager.firePhotoEvent(null, PhotoEventId.PHOTO_ATTRIBUTES_ARE_MODIFIED, photos);
-			}
+            PhotoManager.firePhotoEvent(null, PhotoEventId.PHOTO_ATTRIBUTES_ARE_MODIFIED, photos);
+         }
 
-		} catch (final SQLException e) {
-			net.tourbook.ui.UI.showSQLException(e);
-		} finally {
+      } catch (final SQLException e) {
+         net.tourbook.ui.UI.showSQLException(e);
+      } finally {
 
-			if (conn != null) {
-				try {
-					conn.close();
-				} catch (final SQLException e) {
-					net.tourbook.ui.UI.showSQLException(e);
-				}
-			}
-		}
+         if (conn != null) {
+            try {
+               conn.close();
+            } catch (final SQLException e) {
+               net.tourbook.ui.UI.showSQLException(e);
+            }
+         }
+      }
 
 //		System.out.println(net.tourbook.common.UI.timeStampNano()
 //				+ " save photo rating\t"
 //				+ ((float) (System.nanoTime() - start) / 1000000)
 //				+ " ms");
 //		// TODO remove SYSTEM.OUT.PRINTLN
-	}
+   }
 
-	/**
-	 * Creates a camera when not yet created and sets it into the photo.
-	 * 
-	 * @param photo
-	 * @param allTourCameras
-	 * @return Returns camera which is set into the photo.
-	 */
-	Camera setCamera(final Photo photo, final HashMap<String, Camera> allTourCameras) {
+   /**
+    * Creates a camera when not yet created and sets it into the photo.
+    *
+    * @param photo
+    * @param allTourCameras
+    * @return Returns camera which is set into the photo.
+    */
+   Camera setCamera(final Photo photo, final HashMap<String, Camera> allTourCameras) {
 
-		// get camera
-		String photoCameraName = null;
-		final PhotoImageMetadata metaData = photo.getImageMetaDataRaw();
-		if (metaData != null) {
-			photoCameraName = metaData.model;
-		}
+      // get camera
+      String photoCameraName = null;
+      final PhotoImageMetadata metaData = photo.getImageMetaDataRaw();
+      if (metaData != null) {
+         photoCameraName = metaData.model;
+      }
 
-		Camera camera = null;
+      Camera camera = null;
 
-		if (photoCameraName == null || photoCameraName.length() == 0) {
+      if (photoCameraName == null || photoCameraName.length() == 0) {
 
-			// camera is not set in the photo
+         // camera is not set in the photo
 
-			camera = _allAvailableCameras.get(CAMERA_UNKNOWN_KEY);
+         camera = _allAvailableCameras.get(CAMERA_UNKNOWN_KEY);
 
-			if (camera == null) {
-				camera = new Camera(Messages.Photos_AndTours_Label_NoCamera);
-				_allAvailableCameras.put(CAMERA_UNKNOWN_KEY, camera);
-			}
+         if (camera == null) {
+            camera = new Camera(Messages.Photos_AndTours_Label_NoCamera);
+            _allAvailableCameras.put(CAMERA_UNKNOWN_KEY, camera);
+         }
 
-		} else {
+      } else {
 
-			// camera is set in the photo
+         // camera is set in the photo
 
-			camera = _allAvailableCameras.get(photoCameraName);
+         camera = _allAvailableCameras.get(photoCameraName);
 
-			if (camera == null) {
-				camera = new Camera(photoCameraName);
-				_allAvailableCameras.put(photoCameraName, camera);
-			}
-		}
+         if (camera == null) {
+            camera = new Camera(photoCameraName);
+            _allAvailableCameras.put(photoCameraName, camera);
+         }
+      }
 
-		allTourCameras.put(camera.cameraName, camera);
-		photo.camera = camera;
+      allTourCameras.put(camera.cameraName, camera);
+      photo.camera = camera;
 
-		return camera;
-	}
+      return camera;
+   }
 
-	/**
-	 * @param originalJpegImageFile
-	 * @param latitude
-	 * @param longitude
-	 * @return Returns
-	 * 
-	 *         <pre>
-	 * -1 when <b>SERIOUS</b> error occured
-	 *  0 when image file is read only
-	 *  1 when geo coordinates are written into the image file
-	 *         </pre>
-	 */
-	private int setExifGPSTag_IntoImageFile(final File originalJpegImageFile,
-											final double latitude,
-											final double longitude,
-											final boolean[] isReadOnlyMessageDisplayed) {
+   /**
+    * @param originalJpegImageFile
+    * @param latitude
+    * @param longitude
+    * @return Returns
+    *
+    *         <pre>
+    * -1 when <b>SERIOUS</b> error occured
+    *  0 when image file is read only
+    *  1 when geo coordinates are written into the image file
+    *         </pre>
+    */
+   private int setExifGPSTag_IntoImageFile(final File originalJpegImageFile,
+                                           final double latitude,
+                                           final double longitude,
+                                           final boolean[] isReadOnlyMessageDisplayed) {
 
 //		final Shell activeShell = Display.getCurrent().getActiveShell();
 //
@@ -1567,263 +1566,263 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 //			Util.deleteTempFile(gpsTempFile);
 //		}
 
-		return 1;
-	}
+      return 1;
+   }
 
-	/**
-	 * This example illustrates how to set the GPS values in JPEG EXIF metadata.
-	 * 
-	 * @param jpegImageFile
-	 *            A source image file.
-	 * @param destinationFile
-	 *            The output file.
-	 * @param latitude
-	 * @param longitude
-	 * @throws IOException
-	 * @throws ImageReadException
-	 * @throws ImageWriteException
-	 */
-	private void setExifGPSTag_IntoImageFile_WithExifRewriter(	final File jpegImageFile,
-																final File destinationFile,
-																final double latitude,
-																final double longitude) throws IOException,
-			ImageReadException, ImageWriteException {
+   /**
+    * This example illustrates how to set the GPS values in JPEG EXIF metadata.
+    *
+    * @param jpegImageFile
+    *           A source image file.
+    * @param destinationFile
+    *           The output file.
+    * @param latitude
+    * @param longitude
+    * @throws IOException
+    * @throws ImageReadException
+    * @throws ImageWriteException
+    */
+   private void setExifGPSTag_IntoImageFile_WithExifRewriter(final File jpegImageFile,
+                                                             final File destinationFile,
+                                                             final double latitude,
+                                                             final double longitude) throws IOException,
+         ImageReadException, ImageWriteException {
 
-		OutputStream os = null;
+      OutputStream os = null;
 
-		try {
+      try {
 
-			TiffOutputSet outputSet = null;
+         TiffOutputSet outputSet = null;
 
-			// note that metadata might be null if no metadata is found.
-			final IImageMetadata metadata = Imaging.getMetadata(jpegImageFile);
-			final JpegImageMetadata jpegMetadata = (JpegImageMetadata) metadata;
+         // note that metadata might be null if no metadata is found.
+         final ImageMetadata metadata = Imaging.getMetadata(jpegImageFile);
+         final JpegImageMetadata jpegMetadata = (JpegImageMetadata) metadata;
 
-			if (null != jpegMetadata) {
+         if (null != jpegMetadata) {
 
-				// note that exif might be null if no Exif metadata is found.
-				final TiffImageMetadata exif = jpegMetadata.getExif();
+            // note that exif might be null if no Exif metadata is found.
+            final TiffImageMetadata exif = jpegMetadata.getExif();
 
-				if (null != exif) {
-					// TiffImageMetadata class is immutable (read-only).
-					// TiffOutputSet class represents the Exif data to write.
-					//
-					// Usually, we want to update existing Exif metadata by
-					// changing
-					// the values of a few fields, or adding a field.
-					// In these cases, it is easiest to use getOutputSet() to
-					// start with a "copy" of the fields read from the image.
-					outputSet = exif.getOutputSet();
-				}
-			}
+            if (null != exif) {
+               // TiffImageMetadata class is immutable (read-only).
+               // TiffOutputSet class represents the Exif data to write.
+               //
+               // Usually, we want to update existing Exif metadata by
+               // changing
+               // the values of a few fields, or adding a field.
+               // In these cases, it is easiest to use getOutputSet() to
+               // start with a "copy" of the fields read from the image.
+               outputSet = exif.getOutputSet();
+            }
+         }
 
-			// if file does not contain any exif metadata, we create an empty
-			// set of exif metadata. Otherwise, we keep all of the other
-			// existing tags.
-			if (null == outputSet) {
-				outputSet = new TiffOutputSet();
-			}
+         // if file does not contain any exif metadata, we create an empty
+         // set of exif metadata. Otherwise, we keep all of the other
+         // existing tags.
+         if (null == outputSet) {
+            outputSet = new TiffOutputSet();
+         }
 
-			{
-				// Example of how to add/update GPS info to output set.
+         {
+            // Example of how to add/update GPS info to output set.
 
-				// New York City
+            // New York City
 //				final double longitude = -74.0; // 74 degrees W (in Degrees East)
 //				final double latitude = 40 + 43 / 60.0; // 40 degrees N (in Degrees
-				// North)
+            // North)
 
-				outputSet.setGPSInDegrees(longitude, latitude);
-			}
+            outputSet.setGPSInDegrees(longitude, latitude);
+         }
 
-			os = new FileOutputStream(destinationFile);
-			os = new BufferedOutputStream(os);
+         os = new FileOutputStream(destinationFile);
+         os = new BufferedOutputStream(os);
 
-			/**
-			 * the lossless method causes an exception after 3 times writing the image file,
-			 * therefore the lossy method is used
-			 * 
-			 * <pre>
-			 * 
-			 * org.apache.commons.imaging.formats.jpeg.exif.ExifRewriter$ExifOverflowException: APP1 Segment is too long: 65564
-			 * 	at org.apache.commons.imaging.formats.jpeg.exif.ExifRewriter.writeSegmentsReplacingExif(ExifRewriter.java:552)
-			 * 	at org.apache.commons.imaging.formats.jpeg.exif.ExifRewriter.updateExifMetadataLossless(ExifRewriter.java:393)
-			 * 	at org.apache.commons.imaging.formats.jpeg.exif.ExifRewriter.updateExifMetadataLossless(ExifRewriter.java:293)
-			 * 	at net.tourbook.photo.PhotosAndToursView.setExifGPSTag_IntoPhoto(PhotosAndToursView.java:2309)
-			 * 	at net.tourbook.photo.PhotosAndToursView.setExifGPSTag(PhotosAndToursView.java:2141)
-			 * </pre>
-			 */
+         /**
+          * the lossless method causes an exception after 3 times writing the image file,
+          * therefore the lossy method is used
+          *
+          * <pre>
+          *
+          * org.apache.commons.imaging.formats.jpeg.exif.ExifRewriter$ExifOverflowException: APP1 Segment is too long: 65564
+          * 	at org.apache.commons.imaging.formats.jpeg.exif.ExifRewriter.writeSegmentsReplacingExif(ExifRewriter.java:552)
+          * 	at org.apache.commons.imaging.formats.jpeg.exif.ExifRewriter.updateExifMetadataLossless(ExifRewriter.java:393)
+          * 	at org.apache.commons.imaging.formats.jpeg.exif.ExifRewriter.updateExifMetadataLossless(ExifRewriter.java:293)
+          * 	at net.tourbook.photo.PhotosAndToursView.setExifGPSTag_IntoPhoto(PhotosAndToursView.java:2309)
+          * 	at net.tourbook.photo.PhotosAndToursView.setExifGPSTag(PhotosAndToursView.java:2141)
+          * </pre>
+          */
 //			new ExifRewriter().updateExifMetadataLossless(jpegImageFile, os, outputSet);
 //			new ExifRewriter().updateExifMetadataLossy(jpegImageFile, os, outputSet);
 
-			os.close();
-			os = null;
-		} finally {
-			if (os != null) {
-				try {
-					os.close();
-				} catch (final IOException e) {
+         os.close();
+         os = null;
+      } finally {
+         if (os != null) {
+            try {
+               os.close();
+            } catch (final IOException e) {
 
-				}
-			}
-		}
-	}
+            }
+         }
+      }
+   }
 
-	private void setTourGpsIntoPhotos(final List<TourPhotoLink> tourPhotoLinksWithGps) {
+   private void setTourGpsIntoPhotos(final List<TourPhotoLink> tourPhotoLinksWithGps) {
 
-		for (final TourPhotoLink tourPhotoLink : tourPhotoLinksWithGps) {
+      for (final TourPhotoLink tourPhotoLink : tourPhotoLinksWithGps) {
 
-			// set tour gps into photos
-			setTourGPSIntoPhotos_10(tourPhotoLink);
+         // set tour gps into photos
+         setTourGPSIntoPhotos_10(tourPhotoLink);
 
-			/*
-			 * update number of photos
-			 */
-			tourPhotoLink.numberOfGPSPhotos = 0;
-			tourPhotoLink.numberOfNoGPSPhotos = 0;
+         /*
+          * update number of photos
+          */
+         tourPhotoLink.numberOfGPSPhotos = 0;
+         tourPhotoLink.numberOfNoGPSPhotos = 0;
 
-			for (final Photo photo : tourPhotoLink.linkPhotos) {
+         for (final Photo photo : tourPhotoLink.linkPhotos) {
 
-				// set number of GPS/No GPS photos
-				final double latitude = photo.getLinkLatitude();
-				if (latitude == 0) {
-					tourPhotoLink.numberOfNoGPSPhotos++;
-				} else {
-					tourPhotoLink.numberOfGPSPhotos++;
-				}
-			}
-		}
-	}
+            // set number of GPS/No GPS photos
+            final double latitude = photo.getLinkLatitude();
+            if (latitude == 0) {
+               tourPhotoLink.numberOfNoGPSPhotos++;
+            } else {
+               tourPhotoLink.numberOfGPSPhotos++;
+            }
+         }
+      }
+   }
 
-	private void setTourGPSIntoPhotos_10(final TourPhotoLink tourPhotoLink) {
+   private void setTourGPSIntoPhotos_10(final TourPhotoLink tourPhotoLink) {
 
-		final ArrayList<Photo> allPhotos = tourPhotoLink.linkPhotos;
+      final ArrayList<Photo> allPhotos = tourPhotoLink.linkPhotos;
 
-		final int numberOfPhotos = allPhotos.size();
-		if (numberOfPhotos == 0) {
-			// no photos are available for this tour
-			return;
-		}
+      final int numberOfPhotos = allPhotos.size();
+      if (numberOfPhotos == 0) {
+         // no photos are available for this tour
+         return;
+      }
 
-		final TourData tourData = TourManager.getInstance().getTourData(tourPhotoLink.tourId);
+      final TourData tourData = TourManager.getInstance().getTourData(tourPhotoLink.tourId);
 
-		final double[] latitudeSerie = tourData.latitudeSerie;
-		final double[] longitudeSerie = tourData.longitudeSerie;
+      final double[] latitudeSerie = tourData.latitudeSerie;
+      final double[] longitudeSerie = tourData.longitudeSerie;
 
-		if (latitudeSerie == null) {
-			// no geo positions
-			return;
-		}
+      if (latitudeSerie == null) {
+         // no geo positions
+         return;
+      }
 
-		final int[] timeSerie = tourData.timeSerie;
-		final int numberOfTimeSlices = timeSerie.length;
+      final int[] timeSerie = tourData.timeSerie;
+      final int numberOfTimeSlices = timeSerie.length;
 
-		final long tourStartSeconds = tourData.getTourStartTime().toInstant().getEpochSecond();
-		long timeSliceEnd;
+      final long tourStartSeconds = tourData.getTourStartTime().toInstant().getEpochSecond();
+      long timeSliceEnd;
 
-		if (numberOfTimeSlices > 1) {
-			timeSliceEnd = tourStartSeconds + (long) (timeSerie[1] / 2.0);
-		} else {
-			// tour contains only 1 time slice
-			timeSliceEnd = tourStartSeconds;
-		}
+      if (numberOfTimeSlices > 1) {
+         timeSliceEnd = tourStartSeconds + (long) (timeSerie[1] / 2.0);
+      } else {
+         // tour contains only 1 time slice
+         timeSliceEnd = tourStartSeconds;
+      }
 
-		int timeIndex = 0;
-		int photoIndex = 0;
+      int timeIndex = 0;
+      int photoIndex = 0;
 
-		// get first photo
-		Photo photo = allPhotos.get(photoIndex);
+      // get first photo
+      Photo photo = allPhotos.get(photoIndex);
 
-		// loop: time serie
-		while (true) {
+      // loop: time serie
+      while (true) {
 
-			// loop: photo serie, check if a photo is in the current time slice
-			while (true) {
+         // loop: photo serie, check if a photo is in the current time slice
+         while (true) {
 
-				final long imageAdjustedTime = photo.adjustedTimeLink;
-				long imageTime = 0;
+            final long imageAdjustedTime = photo.adjustedTimeLink;
+            long imageTime = 0;
 
-				if (imageAdjustedTime != Long.MIN_VALUE) {
-					imageTime = imageAdjustedTime;
-				} else {
-					imageTime = photo.imageExifTime;
-				}
+            if (imageAdjustedTime != Long.MIN_VALUE) {
+               imageTime = imageAdjustedTime;
+            } else {
+               imageTime = photo.imageExifTime;
+            }
 
-				final long photoTime = imageTime / 1000;
+            final long photoTime = imageTime / 1000;
 
-				if (photoTime <= timeSliceEnd) {
+            if (photoTime <= timeSliceEnd) {
 
-					// photo is contained within the current time slice
+               // photo is contained within the current time slice
 
-					final double tourLatitude = latitudeSerie[timeIndex];
-					final double tourLongitude = longitudeSerie[timeIndex];
+               final double tourLatitude = latitudeSerie[timeIndex];
+               final double tourLongitude = longitudeSerie[timeIndex];
 
-					setTourGPSIntoPhotos_20(tourData, photo, tourLatitude, tourLongitude);
+               setTourGPSIntoPhotos_20(tourData, photo, tourLatitude, tourLongitude);
 
-					photoIndex++;
+               photoIndex++;
 
-				} else {
+            } else {
 
-					// advance to the next time slice
+               // advance to the next time slice
 
-					break;
-				}
+               break;
+            }
 
-				if (photoIndex < numberOfPhotos) {
-					photo = allPhotos.get(photoIndex);
-				} else {
-					break;
-				}
-			}
+            if (photoIndex < numberOfPhotos) {
+               photo = allPhotos.get(photoIndex);
+            } else {
+               break;
+            }
+         }
 
-			if (photoIndex >= numberOfPhotos) {
-				// no more photos
-				break;
-			}
+         if (photoIndex >= numberOfPhotos) {
+            // no more photos
+            break;
+         }
 
-			/*
-			 * photos are still available
-			 */
+         /*
+          * photos are still available
+          */
 
-			// advance to the next time slice on the x-axis
-			timeIndex++;
+         // advance to the next time slice on the x-axis
+         timeIndex++;
 
-			if (timeIndex >= numberOfTimeSlices - 1) {
+         if (timeIndex >= numberOfTimeSlices - 1) {
 
-				/*
-				 * end of tour is reached but there are still photos available, set remaining photos
-				 * at the end of the tour
-				 */
+            /*
+             * end of tour is reached but there are still photos available, set remaining photos
+             * at the end of the tour
+             */
 
-				while (true) {
+            while (true) {
 
-					final double tourLatitude = latitudeSerie[timeIndex];
-					final double tourLongitude = longitudeSerie[timeIndex];
+               final double tourLatitude = latitudeSerie[timeIndex];
+               final double tourLongitude = longitudeSerie[timeIndex];
 
-					setTourGPSIntoPhotos_20(tourData, photo, tourLatitude, tourLongitude);
+               setTourGPSIntoPhotos_20(tourData, photo, tourLatitude, tourLongitude);
 
-					photoIndex++;
+               photoIndex++;
 
-					if (photoIndex < numberOfPhotos) {
-						photo = allPhotos.get(photoIndex);
-					} else {
-						break;
-					}
-				}
+               if (photoIndex < numberOfPhotos) {
+                  photo = allPhotos.get(photoIndex);
+               } else {
+                  break;
+               }
+            }
 
-			} else {
+         } else {
 
-				final long valuePointTime = timeSerie[timeIndex];
-				final long sliceDuration = timeSerie[timeIndex + 1] - valuePointTime;
+            final long valuePointTime = timeSerie[timeIndex];
+            final long sliceDuration = timeSerie[timeIndex + 1] - valuePointTime;
 
-				timeSliceEnd = tourStartSeconds + valuePointTime + (sliceDuration / 2);
-			}
-		}
-	}
+            timeSliceEnd = tourStartSeconds + valuePointTime + (sliceDuration / 2);
+         }
+      }
+   }
 
-	private void setTourGPSIntoPhotos_20(	final TourData tourData,
-											final Photo photo,
-											final double tourLatitude,
-											final double tourLongitude) {
+   private void setTourGPSIntoPhotos_20(final TourData tourData,
+                                        final Photo photo,
+                                        final double tourLatitude,
+                                        final double tourLongitude) {
 
 //		if (photo.isGeoFromExif) {
 //
@@ -1838,101 +1837,101 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 //			photo.setLinkGeoPosition(tourLatitude, tourLongitude);
 //		}
 
-		/*
-		 * Tour GPS is more accurate than EXIF GPS, the best way to handle this problem is by
-		 * specifiying an preference but because my camera has written the wrong GPS into the
-		 * photos, this is now (13.4.3) the new behaviour.
-		 */
-		photo.setLinkGeoPosition(tourLatitude, tourLongitude);
-	}
+      /*
+       * Tour GPS is more accurate than EXIF GPS, the best way to handle this problem is by
+       * specifiying an preference but because my camera has written the wrong GPS into the
+       * photos, this is now (13.4.3) the new behaviour.
+       */
+      photo.setLinkGeoPosition(tourLatitude, tourLongitude);
+   }
 
-	@Override
-	public void setTourReference(final Photo photo) {
+   @Override
+   public void setTourReference(final Photo photo) {
 
 //		final long start = System.nanoTime();
 
-		Connection conn = null;
+      Connection conn = null;
 
-		try {
+      try {
 
-			conn = TourDatabase.getInstance().getConnection();
+         conn = TourDatabase.getInstance().getConnection();
 
-			final String sql = "SELECT " // 																//$NON-NLS-1$
-					//
-					+ " photoId, " //											1 //$NON-NLS-1$
-					+ (" " + TourDatabase.TABLE_TOUR_DATA + "_tourId, ") // 	2 //$NON-NLS-1$ //$NON-NLS-2$
-					//
-					+ " adjustedTime, " //										3 //$NON-NLS-1$
-					+ " imageExifTime, " //										4 //$NON-NLS-1$
-					+ " latitude, " //											5 //$NON-NLS-1$
-					+ " longitude, " //											6 //$NON-NLS-1$
-					+ " isGeoFromPhoto, " //									7 //$NON-NLS-1$
-					+ " ratingStars " //										8 //$NON-NLS-1$
-					//
-					+ " FROM " + TourDatabase.TABLE_TOUR_PHOTO //				//$NON-NLS-1$
-					//
-					+ " WHERE imageFilePathName=?"; //							//$NON-NLS-1$
+         final String sql = "SELECT " // 																//$NON-NLS-1$
+               //
+               + " photoId, " //											1 //$NON-NLS-1$
+               + (" " + TourDatabase.TABLE_TOUR_DATA + "_tourId, ") // 	2 //$NON-NLS-1$ //$NON-NLS-2$
+               //
+               + " adjustedTime, " //										3 //$NON-NLS-1$
+               + " imageExifTime, " //										4 //$NON-NLS-1$
+               + " latitude, " //											5 //$NON-NLS-1$
+               + " longitude, " //											6 //$NON-NLS-1$
+               + " isGeoFromPhoto, " //									7 //$NON-NLS-1$
+               + " ratingStars " //										8 //$NON-NLS-1$
+               //
+               + " FROM " + TourDatabase.TABLE_TOUR_PHOTO //				//$NON-NLS-1$
+               //
+               + " WHERE imageFilePathName=?"; //							//$NON-NLS-1$
 
-			final PreparedStatement stmt = conn.prepareStatement(sql);
+         final PreparedStatement stmt = conn.prepareStatement(sql);
 
-			stmt.setString(1, photo.imageFilePathName);
+         stmt.setString(1, photo.imageFilePathName);
 
-			final ResultSet result = stmt.executeQuery();
+         final ResultSet result = stmt.executeQuery();
 
-			while (result.next()) {
+         while (result.next()) {
 
-				final long dbPhotoId = result.getLong(1);
-				final long dbTourId = result.getLong(2);
+            final long dbPhotoId = result.getLong(1);
+            final long dbTourId = result.getLong(2);
 
-				final long dbAdjustedTime = result.getLong(3);
-				final long dbImageExifTime = result.getLong(4);
-				final double dbLatitude = result.getDouble(5);
-				final double dbLongitude = result.getDouble(6);
-				final int dbIsGeoFromExif = result.getInt(7);
-				final int dbRatingStars = result.getInt(8);
+            final long dbAdjustedTime = result.getLong(3);
+            final long dbImageExifTime = result.getLong(4);
+            final double dbLatitude = result.getDouble(5);
+            final double dbLongitude = result.getDouble(6);
+            final int dbIsGeoFromExif = result.getInt(7);
+            final int dbRatingStars = result.getInt(8);
 
-				photo.addTour(dbTourId, dbPhotoId);
+            photo.addTour(dbTourId, dbPhotoId);
 
-				/*
-				 * when a photo is in the photo cache it is possible that the tour is from the file
-				 * system, update tour relevant fields
-				 */
+            /*
+             * when a photo is in the photo cache it is possible that the tour is from the file
+             * system, update tour relevant fields
+             */
 
-				photo.isSavedInTour = true;
+            photo.isSavedInTour = true;
 
-				photo.adjustedTimeTour = dbAdjustedTime;
-				photo.imageExifTime = dbImageExifTime;
+            photo.adjustedTimeTour = dbAdjustedTime;
+            photo.imageExifTime = dbImageExifTime;
 
-				photo.isGeoFromExif = dbIsGeoFromExif == 1;
-				photo.isTourPhotoWithGps = dbLatitude != 0;
+            photo.isGeoFromExif = dbIsGeoFromExif == 1;
+            photo.isTourPhotoWithGps = dbLatitude != 0;
 
-				photo.ratingStars = dbRatingStars;
+            photo.ratingStars = dbRatingStars;
 
-				if (photo.getTourLatitude() == 0 && dbLatitude != 0) {
-					photo.setTourGeoPosition(dbLatitude, dbLongitude);
-				}
+            if (photo.getTourLatitude() == 0 && dbLatitude != 0) {
+               photo.setTourGeoPosition(dbLatitude, dbLongitude);
+            }
 
-				PhotoCache.setPhoto(photo);
-			}
+            PhotoCache.setPhoto(photo);
+         }
 
-		} catch (final SQLException e) {
-			net.tourbook.ui.UI.showSQLException(e);
-		} finally {
+      } catch (final SQLException e) {
+         net.tourbook.ui.UI.showSQLException(e);
+      } finally {
 
-			if (conn != null) {
-				try {
-					conn.close();
-				} catch (final SQLException e) {
-					net.tourbook.ui.UI.showSQLException(e);
-				}
-			}
-		}
+         if (conn != null) {
+            try {
+               conn.close();
+            } catch (final SQLException e) {
+               net.tourbook.ui.UI.showSQLException(e);
+            }
+         }
+      }
 
 //		System.out.println(net.tourbook.common.UI.timeStampNano()
 //				+ " load sql tourId from photo\t"
 //				+ ((float) (System.nanoTime() - start) / 1000000)
 //				+ " ms");
-		// TODO remove SYSTEM.OUT.PRINTLN
-	}
+      // TODO remove SYSTEM.OUT.PRINTLN
+   }
 
 }
