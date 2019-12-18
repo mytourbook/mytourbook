@@ -1073,8 +1073,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
    private void onComputeElevationGainValues() {
 
-      final float dpToleranceValue = _spinnerDPTolerance.getSelection() / 10.0f;
-      final String dpTolerance = _nf1.format(dpToleranceValue / UI.UNIT_VALUE_ALTITUDE);
+      final String dpTolerance = _nf1.format(_spinnerDPTolerance.getSelection() / 10.0f);
 
       if (MessageDialog.openConfirm(
             Display.getCurrent().getActiveShell(),
