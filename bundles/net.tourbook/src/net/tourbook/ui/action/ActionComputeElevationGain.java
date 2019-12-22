@@ -118,10 +118,17 @@ public class ActionComputeElevationGain extends Action {
          @Override
          public String getResultText() {
 
+            final int elevationDifference = elevationNew[0] - elevationOld[0];
+            final StringBuilder differenceResult = new StringBuilder();
+            if (elevationDifference > 0) {
+               differenceResult.append("+");
+            }
+            differenceResult.append(_nf0.format(elevationDifference / UI.UNIT_VALUE_ALTITUDE));
+
             return NLS.bind(Messages.Compute_TourValue_ElevationGain_ResultText,
                   new Object[] {
                         prefDPTolerance,
-                        _nf0.format((elevationNew[0] - elevationOld[0]) / UI.UNIT_VALUE_ALTITUDE),
+                        differenceResult,
                         net.tourbook.common.UI.UNIT_LABEL_ALTITUDE
                   });
          }

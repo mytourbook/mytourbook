@@ -1100,12 +1100,19 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
          @Override
          public String getResultText() {
 
+            final int elevationDifference = elevation[1] - elevation[0];
+            final StringBuilder differenceResult = new StringBuilder();
+            if (elevationDifference > 0) {
+               differenceResult.append("+");
+            }
+            differenceResult.append(_nf0.format((elevationDifference) / UI.UNIT_VALUE_ALTITUDE));
+
             return NLS.bind(
-                  Messages.Compute_TourValue_ElevationGain_ResultText, //
+                  Messages.Compute_TourValue_ElevationGain_ResultText,
                   new Object[] {
                         dpTolerance,
-                        _nf0.format((elevation[1] - elevation[0]) / UI.UNIT_VALUE_ALTITUDE),
-                        net.tourbook.common.UI.UNIT_LABEL_ALTITUDE //
+                        differenceResult,
+                        net.tourbook.common.UI.UNIT_LABEL_ALTITUDE
                   });
          }
 
