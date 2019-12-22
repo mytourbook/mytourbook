@@ -113,7 +113,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
    /**
     * contains the controls which are displayed in the first column, these controls are used to get
-    * the maximum width and set the first column within the differenct section to the same width
+    * the maximum width and set the first column within the different section to the same width
     */
    private final ArrayList<Control> _firstColBreakTime = new ArrayList<>();
 
@@ -1097,15 +1097,22 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
             return oldTourData.computeAltitudeUpDown();
          }
 
-         @Override
-         public String getResultText() {
+         private String getElevationDifferenceString(final int elevationDifference) {
 
-            final int elevationDifference = elevation[1] - elevation[0];
             final StringBuilder differenceResult = new StringBuilder();
             if (elevationDifference > 0) {
                differenceResult.append("+");
             }
+
             differenceResult.append(_nf0.format((elevationDifference) / UI.UNIT_VALUE_ALTITUDE));
+            return differenceResult.toString();
+         }
+
+         @Override
+         public String getResultText() {
+
+            final int elevationDifference = elevation[1] - elevation[0];
+            final String differenceResult = getElevationDifferenceString(elevationDifference);
 
             return NLS.bind(
                   Messages.Compute_TourValue_ElevationGain_ResultText,
@@ -1126,10 +1133,13 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
                // summarize new values
                elevation[1] += savedTourData.getTourAltUp();
 
+               final int elevationDifference = elevation[1] - elevation[0];
+               final String differenceResult = getElevationDifferenceString(elevationDifference);
+
                subTaskText = NLS.bind(
                      Messages.compute_tourValueElevation_subTaskText, //
                      new Object[] {
-                           _nf0.format((elevation[1] - elevation[0]) / UI.UNIT_VALUE_ALTITUDE),
+                           differenceResult,
                            net.tourbook.common.UI.UNIT_LABEL_ALTITUDE //
                      });
             }

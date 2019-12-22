@@ -58,6 +58,17 @@ public class ActionComputeElevationGain extends Action {
       setText(Messages.Action_Compute_ElevationGain);
    }
 
+   private String getElevationDifferenceString(final int elevationDifference) {
+
+      final StringBuilder differenceResult = new StringBuilder();
+      if (elevationDifference > 0) {
+         differenceResult.append("+");
+      }
+
+      differenceResult.append(_nf0.format((elevationDifference) / UI.UNIT_VALUE_ALTITUDE));
+      return differenceResult.toString();
+   }
+
    @Override
    public void run() {
 
@@ -119,11 +130,7 @@ public class ActionComputeElevationGain extends Action {
          public String getResultText() {
 
             final int elevationDifference = elevationNew[0] - elevationOld[0];
-            final StringBuilder differenceResult = new StringBuilder();
-            if (elevationDifference > 0) {
-               differenceResult.append("+");
-            }
-            differenceResult.append(_nf0.format(elevationDifference / UI.UNIT_VALUE_ALTITUDE));
+            final String differenceResult = getElevationDifferenceString(elevationDifference);
 
             return NLS.bind(Messages.Compute_TourValue_ElevationGain_ResultText,
                   new Object[] {
