@@ -7,7 +7,7 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry exported="true" kind="lib" path="avalon-framework-4.2.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="avalon-framework-api-4.3.1.jar"/> <!-- https://mvnrepository.com/artifact/org.apache.avalon.framework/avalon-framework-api -->
 	<classpathentry exported="true" kind="lib" path="batik-all-1.12.jar"/> <!-- https://mvnrepository.com/artifact/org.apache.xmlgraphics/batik-all -->
 	<classpathentry exported="true" kind="lib" path="commons-io-2.6.jar"/> <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
 	<classpathentry exported="true" kind="lib" path="commons-logging-1.2.jar"/> <!-- https://mvnrepository.com/artifact/commons-logging/commons-logging -->

@@ -5,7 +5,7 @@ Bundle-SymbolicName: net.tourbook.ext.jars.printing;singleton:=true
 Bundle-Version: 19.10.0.qualifier
 Bundle-Vendor: MyTourbook
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Bundle-ClassPath: avalon-framework-4.2.0.jar,
+Bundle-ClassPath: avalon-framework-api-4.3.1.jar,
  batik-all-1.12.jar,
  commons-io-2.6.jar,
  commons-logging-1.2.jar,
@@ -23,7 +23,6 @@ Export-Package:
  org.apache.avalon.framework.activity,
  org.apache.avalon.framework.component,
  org.apache.avalon.framework.configuration,
- org.apache.avalon.framework.container,
  org.apache.avalon.framework.context,
  org.apache.avalon.framework.logger,
  org.apache.avalon.framework.parameters,
