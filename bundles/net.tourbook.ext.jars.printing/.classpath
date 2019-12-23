@@ -11,7 +11,7 @@
 	<classpathentry exported="true" kind="lib" path="batik-all-1.7.jar"/>
 	<classpathentry exported="true" kind="lib" path="commons-io-2.6.jar"/> <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
 	<classpathentry exported="true" kind="lib" path="commons-logging-1.2.jar"/> <!-- https://mvnrepository.com/artifact/commons-logging/commons-logging -->
-	<classpathentry exported="true" kind="lib" path="xmlgraphics-commons-1.3.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="xmlgraphics-commons-2.4.jar"/> <!-- https://mvnrepository.com/artifact/org.apache.xmlgraphics/xmlgraphics-commons -->
 	<classpathentry exported="true" kind="lib" path="fop.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
