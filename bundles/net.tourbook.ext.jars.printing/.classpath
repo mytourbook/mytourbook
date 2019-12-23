@@ -12,6 +12,6 @@
 	<classpathentry exported="true" kind="lib" path="commons-io-2.6.jar"/> <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
 	<classpathentry exported="true" kind="lib" path="commons-logging-1.2.jar"/> <!-- https://mvnrepository.com/artifact/commons-logging/commons-logging -->
 	<classpathentry exported="true" kind="lib" path="xmlgraphics-commons-2.4.jar"/> <!-- https://mvnrepository.com/artifact/org.apache.xmlgraphics/xmlgraphics-commons -->
-	<classpathentry exported="true" kind="lib" path="fop.jar"/>
+	<classpathentry exported="true" kind="lib" path="fop-2.4.jar"/> <!-- https://mvnrepository.com/artifact/org.apache.xmlgraphics/fop -->
 	<classpathentry kind="output" path="bin"/>
 </classpath>

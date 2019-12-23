@@ -10,7 +10,7 @@ Bundle-ClassPath: avalon-framework-4.2.0.jar,
  commons-io-2.6.jar,
  commons-logging-1.2.jar,
  xmlgraphics-commons-2.4.jar,
- fop.jar,
+ fop-2.4.jar,
  jaxb-api-2.4.0-b180830.0359.jar
 Export-Package: 
  javax.xml.bind,
@@ -142,9 +142,6 @@ Export-Package:
  org.apache.fop.render.afp,
  org.apache.fop.render.afp.exceptions,
  org.apache.fop.render.afp.extensions,
- org.apache.fop.render.afp.fonts,
- org.apache.fop.render.afp.modca,
- org.apache.fop.render.afp.tools,
  org.apache.fop.render.awt,
  org.apache.fop.render.awt.viewer,
  org.apache.fop.render.bitmap,
