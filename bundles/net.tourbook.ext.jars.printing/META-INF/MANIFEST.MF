@@ -11,8 +11,7 @@ Bundle-ClassPath: avalon-framework-4.2.0.jar,
  commons-logging-1.2.jar,
  xmlgraphics-commons-2.4.jar,
  fop.jar,
- .,
- jaxb-api-2.3.0.jar
+ jaxb-api-2.4.0-b180830.0359.jar
 Export-Package: 
  javax.xml.bind,
  javax.xml.bind.annotation,
