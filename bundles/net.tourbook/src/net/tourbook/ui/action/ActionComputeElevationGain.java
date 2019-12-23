@@ -77,15 +77,16 @@ public class ActionComputeElevationGain extends Action {
       final float prefDPTolerance = TourbookPlugin.getPrefStore().getFloat(
             ITourbookPreferences.COMPUTED_ALTITUDE_DP_TOLERANCE);
 
+      final String dpToleranceWithUnit = _nf1.format(prefDPTolerance / UI.UNIT_VALUE_ALTITUDE) + net.tourbook.common.UI.SPACE1
+            + net.tourbook.common.UI.UNIT_LABEL_ALTITUDE;
+
       if (MessageDialog.openConfirm(
             Display.getCurrent().getActiveShell(),
             Messages.Compute_TourValue_ElevationGain_Title,
             NLS.bind(//
                   Messages.Compute_TourValue_ElevationGain_Message,
                   tourIds.size(),
-                  _nf1.format(prefDPTolerance))//
-      //
-      ) == false) {
+                  dpToleranceWithUnit)) == false) {
          return;
       }
 
@@ -93,14 +94,6 @@ public class ActionComputeElevationGain extends Action {
       final int[] elevationNew = new int[] { 0 };
 
       final IComputeNoDataserieValues configComputeTourValue = new IComputeNoDataserieValues() {
-
-//         public boolean computeTourValues(final TourData tourData) {
-//
-//            // keep old value
-//            elevationOld[0] += tourData.getTourAltUp();
-//
-//            return tourData.computeAltitudeUpDown();
-//         }
 
          @Override
          public boolean computeTourValues(final TourData originalTourData, final PreparedStatement sqlUpdateStatement) throws SQLException {
@@ -134,7 +127,7 @@ public class ActionComputeElevationGain extends Action {
 
             return NLS.bind(Messages.Compute_TourValue_ElevationGain_ResultText,
                   new Object[] {
-                        prefDPTolerance,
+                        dpToleranceWithUnit,
                         differenceResult,
                         net.tourbook.common.UI.UNIT_LABEL_ALTITUDE
                   });
@@ -158,25 +151,6 @@ public class ActionComputeElevationGain extends Action {
 
             return sql;
          }
-
-//         public String getSubTaskText(final TourData savedTourData) {
-//
-//            String subTaskText = null;
-//
-//            if (savedTourData != null) {
-//
-//               // summarize new values
-//               elevationNew[1] += savedTourData.getTourAltUp();
-//
-//               subTaskText = NLS.bind(Messages.compute_tourValueElevation_subTaskText, //
-//                     new Object[] {
-//                           _nf0.format((elevationNew[1] - elevationOld[0]) / UI.UNIT_VALUE_ALTITUDE),
-//                           net.tourbook.common.UI.UNIT_LABEL_ALTITUDE //
-//                     });
-//            }
-//
-//            return subTaskText;
-//         }
       };
 
       TourDatabase.computeNoDataserieValues_ForAllTours(configComputeTourValue, tourIds);

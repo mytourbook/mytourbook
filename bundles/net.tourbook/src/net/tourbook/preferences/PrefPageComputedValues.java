@@ -1073,12 +1073,15 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
    private void onComputeElevationGainValues() {
 
-      final String dpTolerance = _nf1.format(_spinnerDPTolerance.getSelection() / 10.0f);
+      final float prefDPTolerance = _spinnerDPTolerance.getSelection() / 10.0f;
+
+      final String dpToleranceWithUnit = _nf1.format(prefDPTolerance) + net.tourbook.common.UI.SPACE1
+            + net.tourbook.common.UI.UNIT_LABEL_ALTITUDE;
 
       if (MessageDialog.openConfirm(
             Display.getCurrent().getActiveShell(),
             Messages.compute_tourValueElevation_dlg_computeValues_title,
-            NLS.bind(Messages.Compute_TourValue_ElevationGain_Dlg_ComputeValues_Message, dpTolerance)) == false) {
+            NLS.bind(Messages.Compute_TourValue_ElevationGain_Dlg_ComputeValues_Message, dpToleranceWithUnit)) == false) {
          return;
       }
 
@@ -1117,7 +1120,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
             return NLS.bind(
                   Messages.Compute_TourValue_ElevationGain_ResultText,
                   new Object[] {
-                        dpTolerance,
+                        dpToleranceWithUnit,
                         differenceResult,
                         net.tourbook.common.UI.UNIT_LABEL_ALTITUDE
                   });
