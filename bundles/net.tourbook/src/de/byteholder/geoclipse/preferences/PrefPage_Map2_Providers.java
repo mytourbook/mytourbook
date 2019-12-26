@@ -138,8 +138,8 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.progress.UIJob;
 import org.geotools.data.ows.OperationType;
 import org.geotools.data.ows.Service;
-import org.geotools.data.ows.WMSCapabilities;
-import org.geotools.data.ows.WMSRequest;
+import org.geotools.ows.wms.WMSCapabilities;
+import org.geotools.ows.wms.WMSRequest;
 
 public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenchPreferencePage, ITourViewer {
 
