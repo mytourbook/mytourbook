@@ -5,6 +5,7 @@
 	<classpathentry kind="lib" path="libs/vtm-desktop.jar" exported="true" sourcepath="/vtm-desktop"/>
 	<classpathentry kind="lib" path="libs/vtm-gdx.jar" exported="true" sourcepath="/vtm-gdx"/>
 	<classpathentry kind="lib" path="libs/vtm-http.jar" exported="true" sourcepath="/vtm-http"/>
+	<classpathentry kind="lib" path="libs/vtm-mvt.jar" exported="true" sourcepath="/vtm-mvt"/>
 	<classpathentry kind="lib" path="libs/vtm-themes.jar" exported="true" sourcepath="/vtm-themes"/>
 	<classpathentry kind="lib" path="libs/vtm.jar" exported="true" sourcepath="/vtm"/>
 	<classpathentry sourcepath="C:/Users/WolfgangSchramm/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-simple/1.7.25/af3cd3ad1ea4b08b27b54f12529b4bf343bc5ca1/slf4j-simple-1.7.25-sources.jar" kind="lib" path="libs/slf4j-simple-1.7.25.jar" exported="true">
@@ -13,6 +14,11 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry sourcepath="C:/Users/WolfgangSchramm/.gradle/caches/modules-2/files-2.1/com.squareup.okhttp3/logging-interceptor/3.14.1/cd77025d82d0391206e684bc47a6f7133ec90e45/logging-interceptor-3.14.1-sources.jar" kind="lib" path="libs/logging-interceptor-3.14.1.jar" exported="true">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="C:/Users/WolfgangSchramm/.gradle/caches/modules-2/files-2.1/com.wdtinc/mapbox-vector-tile/3.0.0/a044b9d3886b4f5a069ccc8b050cf2f8505659cf/mapbox-vector-tile-3.0.0-sources.jar" kind="lib" path="libs/mapbox-vector-tile-3.0.0.jar" exported="true">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
@@ -63,6 +69,16 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="libs/ant-1.8.1.jar" exported="true">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="C:/Users/WolfgangSchramm/.gradle/caches/modules-2/files-2.1/com.google.protobuf/protobuf-java/3.5.1/7235a28a13938050e8cd5d9ed5133bebf7a4dca7/protobuf-java-3.5.1-sources.jar" kind="lib" path="libs/protobuf-java-3.5.1.jar" exported="true">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="C:/Users/WolfgangSchramm/.gradle/caches/modules-2/files-2.1/org.locationtech.jts/jts-core/1.15.0/85f9b98dfa591c1cee8d3d4fe5a2bf68667adf83/jts-core-1.15.0-sources.jar" kind="lib" path="libs/jts-core-1.15.0.jar" exported="true">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
