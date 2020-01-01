@@ -165,6 +165,7 @@ public class Messages extends NLS {
    public static String        ColumnFactory_tour_title;
    public static String        ColumnFactory_tour_title_label;
    public static String        ColumnFactory_tour_title_tooltip;
+   public static String        ColumnFactory_tour_type_header;
    public static String        ColumnFactory_tour_type_label;
    public static String        ColumnFactory_tour_type_tooltip;
    public static String        ColumnFactory_wind_speed_label;

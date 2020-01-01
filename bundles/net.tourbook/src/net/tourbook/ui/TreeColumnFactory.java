@@ -2118,6 +2118,7 @@ public abstract class TreeColumnFactory {
             final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TOUR_TYPE", SWT.LEAD); //$NON-NLS-1$
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Tour);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_tour_type_header);
             colDef.setColumnLabel(Messages.ColumnFactory_tour_type_label);
             colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_tour_type_tooltip);
 
