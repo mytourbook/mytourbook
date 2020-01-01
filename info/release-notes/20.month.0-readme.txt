@@ -8,9 +8,6 @@ TODO's
   - Update contributor/translator list
   - Show cheatsheet
   - Wrong text: The comparison is done by altitude, comparing by geo position is not yet supported.
-* Update SWT to 4.14 (Eclipse 2019-12) to fix the issue (Linux only) when
-  saving a map tile on disk
-  (cf. https://bugs.eclipse.org/bugs/show_bug.cgi?id=553240) 
  
 
 Bugs
@@ -70,3 +67,6 @@ Translation
 System   
 ======
 
+* Update SWT to 4.14 (Eclipse 2019-12) to fix the issue (Linux only) when
+  saving a map tile on disk
+  (cf. https://bugs.eclipse.org/bugs/show_bug.cgi?id=553240) 
