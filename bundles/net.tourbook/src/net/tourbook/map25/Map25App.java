@@ -1068,7 +1068,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 //	         .httpFactory(_httpFactory)
 //	         .zoomMin(1)
 //	         .zoomMax(16)
-//	         .build();  
+//	         .build();
 
 	// hillshading with 1MB RAM Cache, using existing _httpfactory with diskcache
 	   _layer_HillShading = new BitmapTileLayer(mMap, _hillshadingSource, 1 << 19);
