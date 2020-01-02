@@ -98,7 +98,7 @@ import org.oscim.tiling.source.bitmap.BitmapTileSource;
 import org.oscim.tiling.source.bitmap.DefaultSources;
 import org.oscim.tiling.source.mapfile.MapFileTileSource;
 import org.oscim.tiling.source.mapfile.MultiMapFileTileSource;
-//import org.oscim.tiling.source.mvt.MapilionMvtTileSource;
+import org.oscim.tiling.source.mvt.MapilionMvtTileSource;
 import org.oscim.layers.tile.bitmap.BitmapTileLayer.FadeStep;
 import org.oscim.utils.Parameters;
 
