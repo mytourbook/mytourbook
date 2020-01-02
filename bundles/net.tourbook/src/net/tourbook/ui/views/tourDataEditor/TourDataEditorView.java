@@ -404,7 +404,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private boolean                            _isInfoInTitle;
 
    /**
-    * Is <code>true</code> when a cell editor is activ, otherwise <code>false</code>
+    * Is <code>true</code> when a cell editor is active, otherwise <code>false</code>
     */
    private boolean                            _isCellEditorActive;
 
@@ -529,7 +529,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    //
    /**
     * contains the controls which are displayed in the first column, these controls are used to get
-    * the maximum width and set the first column within the differenct section to the same width
+    * the maximum width and set the first column within the different section to the same width
     */
    private final ArrayList<Control> _firstColumnControls          = new ArrayList<>();
    private final ArrayList<Control> _firstColumnContainerControls = new ArrayList<>();
@@ -798,7 +798,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   __dataSerie[serieIndex] = enteredValue;
 
                   /*
-                   * worldposition has changed, this is an absolute overkill, wenn only one position
+                   * world position has changed, this is an absolute overkill, when only one
+                   * position
                    * has changed
                    */
                   _tourData.clearWorldPositions();
@@ -862,7 +863,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
             if (_unitValueAltitude != 1) {
 
-               // none metric measurement systemm
+               // none metric measurement system
 
                displayedValue /= _unitValueAltitude;
             }
@@ -901,7 +902,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
                   if (_unitValueAltitude != 1) {
 
-                     // none metric measurement systemm
+                     // none metric measurement system
 
                      // ensure float is used
                      final float noneMetricValue = enteredValue;
@@ -1432,7 +1433,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
          _pageBook.showPage(isEditMode ? _pageEditMode : _pageReadMode);
 
-         // hide drawing artefact, this do not work 100% correct on winXP
+         // hide drawing artifact, this do not work 100% correct on winXP
          _tab1Container.setRedraw(false);
          {
             _tab1Container.layout(true, true);
@@ -2545,7 +2546,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
          /*
           * in this case, nothing is done because the method which fires the event
-          * TourEventId.CLEAR_DISPLAYED_TOUR is reponsible to use the correct TourData
+          * TourEventId.CLEAR_DISPLAYED_TOUR is responsible to use the correct TourData
           */
 
       } else {
@@ -2780,12 +2781,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             }
 
             /*
-             * tour dirty must be set after validation because an error can occure which enables
+             * tour dirty must be set after validation because an error can occur which enables
              * actions
              */
             if (_isTourDirty) {
                /*
-                * when an error occured previously and is now solved, the save action must be
+                * when an error occurred previously and is now solved, the save action must be
                 * enabled
                 */
                enableActions();
@@ -2835,12 +2836,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             }
 
             /*
-             * tour dirty must be set after validation because an error can occure which enables
+             * tour dirty must be set after validation because an error can occur which enables
              * actions
              */
             if (_isTourDirty) {
                /*
-                * when an error occured previously and is now solved, the save action must be
+                * when an error occurred previously and is now solved, the save action must be
                 * enabled
                 */
                enableActions();
@@ -5128,7 +5129,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
                if (serieIndex == 0) {
 
-                  // first time slice can contain a distance, occured in .fit files
+                  // first time slice can contain a distance, occurred in .fit files
                   distanceDiff = _serieDistance[0] / 1000 / _unitValueDistance;
 
                } else {
@@ -5845,7 +5846,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       }
 
       _actionCreateTourMarker.setEnabled(_isEditMode && isTourInDb && isOneSliceSelected && canCreateMarker);
-      _actionOpenMarkerDialog.setEnabled(_isEditMode && isTourInDb);
+      _actionOpenMarkerDialog.setEnabled(_isEditMode && isTourInDb && isOneSliceSelected && selectedMarker != null);
 
       // select marker
       _actionOpenMarkerDialog.setTourMarker(selectedMarker);
@@ -5891,7 +5892,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     * Delay enable/disable actions.
     * <p>
     * When a user traverses the edit fields in a viewer the actions are enabled and disable which
-    * flickers the UI, therefor it is delayed.
+    * flickers the UI, therefore it is delayed.
     */
    private void enableActionsDelayed() {
 
@@ -7894,7 +7895,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       } catch (final IllegalArgumentException e) {
 
-         // this should not happen (but it happend when developing the tour data editor :-)
+         // this should not happen (but it happened when developing the tour data editor :-)
          //
          // wrong characters are entered, display an error message
 
@@ -8010,7 +8011,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _uiUpdateCounter++;
 
       /*
-       * set tour data because the TOUR_PROPERTIES_CHANGED event can occure before the runnable is
+       * set tour data because the TOUR_PROPERTIES_CHANGED event can occur before the runnable is
        * executed, this ensures that tour data is already set even if the ui is not yet updated
        */
       _tourData = tourData;
@@ -8403,7 +8404,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       if ((_tabFolder.getSelection() == _tab_20_TimeSlices) && (_timeSlice_ViewerTourId != _tourData.getTourId())) {
 
          /*
-          * Time slice tab is selected and the viewer is not yeat loaded
+          * Time slice tab is selected and the viewer is not yet loaded
           */
 
          _timeSlice_TourViewer.reloadViewer();
@@ -8429,7 +8430,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       if ((_tabFolder.getSelection() == _tab_30_SwimSlices) && (_swimSlice_ViewerTourId != _tourData.getTourId())) {
 
          /*
-          * Swim slice tab is selected and the viewer is not yeat loaded
+          * Swim slice tab is selected and the viewer is not yet loaded
           */
 
          _swimSlice_TourViewer.reloadViewer();
