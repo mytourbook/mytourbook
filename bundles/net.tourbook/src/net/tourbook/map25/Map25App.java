@@ -345,7 +345,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 		
       debugPrint(" map25: " + "# create Layers: prefered language:           " + _mf_prefered_language);//$NON-NLS-1$ //$NON-NLS-2$
       debugPrint(" map25: " + "# create Layers: Map Name:                    " +_selectedMapProvider.name); //$NON-NLS-1$ //$NON-NLS-2$
-      debugPrint(" map25: " + "# create Layers: Map ONLINE/OFFLINE:          " +_selectedMapProvider.is_mf_Map); //$NON-NLS-1$ //$NON-NLS-2$
+      debugPrint(" map25: " + "# create Layers: Map if mf Map     :          " +_selectedMapProvider.is_mf_Map); //$NON-NLS-1$ //$NON-NLS-2$
       debugPrint(" map25: " + "# create Layers: Map mf_MapFilepath:          " +_selectedMapProvider.mf_MapFilepath); //$NON-NLS-1$ //$NON-NLS-2$
       debugPrint(" map25: " + "# create Layers: Map mf_ThemeFilepath:        " +_selectedMapProvider.mf_ThemeFilepath); //$NON-NLS-1$ //$NON-NLS-2$
       debugPrint(" map25: " + "# create Layers: Map encoding:                " +_selectedMapProvider.tileEncoding.toString()); //$NON-NLS-1$ //$NON-NLS-2$
@@ -353,13 +353,21 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
 		if (_selectedMapProvider.tileEncoding  != TileEncoding.MF) { // NOT mapsforge
 			_isOfflineMap = false;
-			final UrlTileSource tileSource = createTileSource(_selectedMapProvider, _httpFactory);
+			if(_selectedMapProvider.tileEncoding == TileEncoding.VTM) {
+			   final UrlTileSource tileSource = createTileSource(_selectedMapProvider, _httpFactory);
+			   setupMap(_selectedMapProvider, tileSource);
+			} else {
+			   final MapilionMvtTileSource tileSource = createMaplilionMvtTileSource(_selectedMapProvider, _httpFactory);
+			   setupMap(_selectedMapProvider, tileSource);
+			}
+			
+			
 			debugPrint(" map25: " + "# create Layers OSCI: step 1: " + mMap.layers().toString() + " size: " + mMap.layers().size());  // result 1 //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			//tileSource.getDataSource().dispose();
 			//_l = mMap.setBaseMap(tileSource);
 
 			//loadTheme(null);
-			setupMap(_selectedMapProvider, tileSource);
+			//setupMap(_selectedMapProvider, tileSource);
          debugPrint(" map25: " + "# create Layers OSCI: step 2: " + mMap.layers().toString() + " size: " + mMap.layers().size());  // result 3 //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 			debugPrint(" map25: " + "############# create Layers: is online map with theme: " + _selectedMapProvider.theme.name()); //$NON-NLS-1$ //$NON-NLS-2$
@@ -508,19 +516,18 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 		debugPrint(" map25: " + "####### loadtheme: leaving styleID: " + styleId); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
+	private MapilionMvtTileSource createMaplilionMvtTileSource(final Map25Provider mapProvider, final OkHttpFactoryMT httpFactory) {
+
+	   MapilionMvtTileSource tileSource = MapilionMvtTileSource.builder()
+	         .apiKey(_mp_key)
+	         .httpFactory(httpFactory)
+	         //.locale("en")
+	         .build();
+	   return tileSource;
+	}
+	
+	
 	private UrlTileSource createTileSource(final Map25Provider mapProvider, final OkHttpFactoryMT httpFactory) {
-//	   if(mapProvider.tileEncoding == TileEncoding.MP) {
-//	      final String API_KEY = "3b3d8353-0fb8-4513-bfe0-d620b2d77c45"; //should be more hidden
-//	      OkHttpClient.Builder builder = new OkHttpClient.Builder();
-//	      OkHttpEngine.OkHttpFactory factory = new OkHttpEngine.OkHttpFactory(builder);
-//
-//	      UrlTileSource tileSource = MapilionMvtTileSource.builder()
-//	            .apiKey(API_KEY)
-//	            .httpFactory(factory)
-//	            //.locale("en")
-//	            .build();
-//	      return tileSource;
-//	   }
 	   
 		final Builder<?> map25Builder = Map25TileSource
 				.builder(mapProvider)
@@ -749,13 +756,30 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 			debugPrint(" map25: " + "############# setMapProvider: setMapProvider NOT mf Map"); //$NON-NLS-1$ //$NON-NLS-2$
 			debugPrint(" map25: " + "############# setMapProvider: tileEncoding: " + mapProvider.tileEncoding); //$NON-NLS-1$
 			debugPrint(" map25: " + "############# setMapProvider: API: " + mapProvider.online_ApiKey); //$NON-NLS-1$
-			final UrlTileSource tileSource = createTileSource(mapProvider, _httpFactory);
-			_layer_BaseMap.setTileSource(tileSource);
-			_layer_BaseMap.setRenderTheme(ThemeLoader.load(VtmThemes.DEFAULT));  //if active, key 1-5 nor working, if not active "ERROR VectorTileLoader - no theme is set"
-			//debugPrint(" map25: " + "############# setMapProvider: set theme to-> " + mapProvider.name); //$NON-NLS-1$
+			if(mapProvider.tileEncoding == TileEncoding.VTM) {
+	         final UrlTileSource tileSource = createTileSource(mapProvider, _httpFactory);
+	         _layer_BaseMap.setTileSource(tileSource);
+	         _layer_BaseMap.setRenderTheme(ThemeLoader.load(VtmThemes.DEFAULT));  //if active, key 1-5 nor working, if not active "ERROR VectorTileLoader - no theme is set"
+	         if (onlineOfflineStatusHasChanged) {
+	            setupMap(mapProvider, tileSource);
+	         }
+	         //debugPrint(" map25: " + "############# setMapProvider: set theme to-> " + mapProvider.name); //$NON-NLS-1$
+			} else {
+			   final MapilionMvtTileSource tileSource = createMaplilionMvtTileSource(mapProvider, _httpFactory);
+            _layer_BaseMap.setTileSource(tileSource);
+            _layer_BaseMap.setRenderTheme(ThemeLoader.load(VtmThemes.OPENMAPTILES));
+            if (onlineOfflineStatusHasChanged) {
+               setupMap(mapProvider, tileSource);
+            }
+			}
+			
+//			final UrlTileSource tileSource = createTileSource(mapProvider, _httpFactory);
+//			_layer_BaseMap.setTileSource(tileSource);
+//			_layer_BaseMap.setRenderTheme(ThemeLoader.load(VtmThemes.DEFAULT));  //if active, key 1-5 nor working, if not active "ERROR VectorTileLoader - no theme is set"
+
 
          if (onlineOfflineStatusHasChanged) {
-            setupMap(mapProvider, tileSource);
+            //setupMap(mapProvider, tileSource);
             setupMap_Layers();
             /**
              * Map Viewport
@@ -941,6 +965,31 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       debugPrint(" map25: " + "### removeLayers: layers after: " + mMap.layers().toString() + " size: " + mMap.layers().size()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
    }
 	
+   /**
+    * setupMap for Mapilion online maps
+    * @param mapProvider
+    * @param tileSource
+    */
+   private void setupMap(final Map25Provider mapProvider, final MapilionMvtTileSource tileSource) {
+      debugPrint(" map25: " + "############# setupMap:  Mapilion online entering"); //$NON-NLS-1$ //$NON-NLS-2$
+      
+      CanvasAdapter.textScale = _vtm_TextScale;
+      CanvasAdapter.userScale = _vtm_UserScale;
+      
+      _layer_BaseMap = new OsmTileLayerMT(mMap);
+      
+      _tileManager = _layer_BaseMap.getManager();
+
+      _layer_BaseMap.setTileSource(tileSource);
+      
+      mMap.setBaseMap(_layer_BaseMap);
+      
+      debugPrint(" map25: " + "############# setupMap Mapilion :  mMap.setTheme(getTheme(mapProvider)): " + getTheme(mapProvider)); //$NON-NLS-1$ //$NON-NLS-2$
+      mMap.setTheme(getTheme(mapProvider));
+      debugPrint(" map25: " + "############# setupMap mAPILION:  leaving"); //$NON-NLS-1$ //$NON-NLS-2$
+   }
+   
+   
 	/**
 	 * setupMap for online maps
 	 * @param mapProvider
@@ -1053,22 +1102,27 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	   final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
  
 	    // hillshading from mapilion. With vtm 0.12 there is a defaultsource...
-	   _hillshadingSource = BitmapTileSource.builder()
-            .httpFactory(_httpFactory)
-            .url("https://tiles.mapilion.com/hillshades/v2") //$NON-NLS-1$
-            .tilePath("/{Z}/{X}/{Y}.png?key=" + _mp_key) //$NON-NLS-1$
-            .fadeSteps(new FadeStep[]{new FadeStep(0, Viewport.MAX_ZOOM_LEVEL, 1, 0.2f)})
-            .zoomMin(1)
-            .zoomMax(12)
-            .build()
-            //.apiKey(_mp_key) // from vtm 0.11
-            ;
+//	   _hillshadingSource = BitmapTileSource.builder()
+//            .httpFactory(_httpFactory)
+//            .url("https://tiles.mapilion.com/hillshades/v2") //$NON-NLS-1$
+//            .tilePath("/{Z}/{X}/{Y}.png?key=" + _mp_key) //$NON-NLS-1$
+//            .fadeSteps(new FadeStep[]{new FadeStep(0, Viewport.MAX_ZOOM_LEVEL, 1, 0.2f)})
+//            .zoomMin(1)
+//            .zoomMax(12)
+//            .build()
+//            ;
 
 //	   _hillshadingSource =  DefaultSources.HIKEBIKE_HILLSHADE
 //	         .httpFactory(_httpFactory)
 //	         .zoomMin(1)
 //	         .zoomMax(16)
-//	         .build();  
+//	         .build();
+	   
+	   _hillshadingSource =  DefaultSources.MAPILION_HILLSHADE_2
+	         .httpFactory(_httpFactory)
+	         .apiKey(_mp_key)
+	         .build();
+	   
 
 	// hillshading with 1MB RAM Cache, using existing _httpfactory with diskcache
 	   _layer_HillShading = new BitmapTileLayer(mMap, _hillshadingSource, 1 << 19);

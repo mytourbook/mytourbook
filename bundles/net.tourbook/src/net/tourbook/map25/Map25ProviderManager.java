@@ -216,6 +216,10 @@ public class Map25ProviderManager {
       case MVT:
          return VtmThemes.MAPZEN;
 
+         // Mapilion   
+      case MP:
+         return VtmThemes.OPENMAPTILES;
+
       // Open Science Map
       case VTM:
       default:
