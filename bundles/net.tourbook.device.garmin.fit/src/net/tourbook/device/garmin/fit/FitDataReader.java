@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -29,6 +29,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.data.TourData;
 import net.tourbook.device.garmin.fit.listeners.MesgListener_Activity;
@@ -117,7 +118,7 @@ public class FitDataReader extends TourbookDevice {
          /*
           * Set fields which should NOT be displayed in the log
           */
-         if (fieldName.equals("") // //$NON-NLS-1$
+         if (fieldName.equals(UI.EMPTY_STRING)
 
 //               // this is the profile name
 //               || fieldName.equals("name") //                                                            //$NON-NLS-1$
@@ -472,7 +473,7 @@ public class FitDataReader extends TourbookDevice {
          /*
           * Set fields which should NOT be displayed in the log
           */
-         if (fieldName.equals("") // //$NON-NLS-1$
+         if (fieldName.equals(UI.EMPTY_STRING)
 
 //               // Developer fields
 //

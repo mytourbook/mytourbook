@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -147,13 +147,13 @@ public class HistoricalWeatherRetriever {
          if (tourTitle.length() > 0) {
             System.out.println(tourTitle);
          }
-         
+
          System.out.println(String.format(Messages.Tour_Tooltip_Format_DateWeekTime,
                zdtTourStart.format(TimeTools.Formatter_Date_F),
                zdtTourStart.format(TimeTools.Formatter_Time_M),
                zdtTourEnd.format(TimeTools.Formatter_Time_M),
                zdtTourStart.get(TimeTools.calendarWeek.weekOfWeekBasedYear())));
-         
+
          System.out.println(weatherDataResponse);
       }
 
@@ -228,10 +228,11 @@ public class HistoricalWeatherRetriever {
          weatherData.setAveragePressure((int) Math.ceil((double) sumPressure / (double) numHourlyDatasets));
          weatherData.setPrecipitation(sumPrecipitation);
 
-      } catch (final IOException e) {
+      } catch (final Exception e) {
          StatusUtil.log(
                "WeatherHistoryRetriever.parseWeatherData : Error while parsing the historical weather JSON object :" //$NON-NLS-1$
-                     + weatherData + "\n" + e.getMessage()); //$NON-NLS-1$
+                     + weatherDataResponse + "\n" + e.getMessage()); //$NON-NLS-1$
+         return null;
       }
 
       return weatherData;

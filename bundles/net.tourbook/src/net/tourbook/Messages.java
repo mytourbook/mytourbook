@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -2458,6 +2458,8 @@ public class Messages extends NLS {
    public static String Tour_Editor_Link_SetDefautTimeZone_Tooltip;
    public static String Tour_Editor_Link_SetGeoTimeZone;
    public static String Tour_Editor_Link_SetGeoTimeZone_Tooltip;
+   public static String Tour_Editor_Link_RetrieveWeather;
+   public static String Tour_Editor_Link_RetrieveWeather_Tooltip;
    public static String Tour_Editor_NoSwimData;
    public static String Tour_Editor_Radio_Cadence_Rpm;
    public static String Tour_Editor_Radio_Cadence_Spm;
