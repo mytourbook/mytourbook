@@ -37,6 +37,8 @@ Changes
   - GPX: Set default to absolute distance that the defaults for export/import are the same
   - FIT: Starting marker label from 1 instead of 0
 
+* Tour Editor
+  - Added the ability to retrieve the weather data by clicking on the weather description label
  
 Fixes   
 =====
