@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1166,6 +1166,7 @@ public class PhotoImageLoader {
        * ensure metadata are loaded, is needed for image rotation, it can be not loaded when many
        * images are in the gallery and loading exif data has not yet finished
        */
+      @SuppressWarnings("unused")
       final PhotoImageMetadata imageMetaData = _photo.getImageMetaData();
 
       boolean isLoadingException = false;
