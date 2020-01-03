@@ -160,7 +160,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	private MultiMapFileTileSource _tileSourceOfflineMM;
 	
 	private int							_tileSourceOfflineMapCount = 0;
-	private String                _mp_key = "80d7bc63-94fe-416f-a63f-7173f81a484c";
+	private String                _mp_key = "80d7bc63-94fe-416f-a63f-7173f81a484c";  //$NON-NLS-1$
 	
 	
 	//public static enum DebugMode {OFF, ON};
@@ -517,12 +517,20 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	}
 
 	private MapilionMvtTileSource createMaplilionMvtTileSource(final Map25Provider mapProvider, final OkHttpFactoryMT httpFactory) {
-
-	   MapilionMvtTileSource tileSource = MapilionMvtTileSource.builder()
-	         .apiKey(_mp_key)
-	         .httpFactory(httpFactory)
-	         //.locale("en")
-	         .build();
+	   MapilionMvtTileSource tileSource;
+	   if (mapProvider.online_ApiKey == null || mapProvider.online_ApiKey.trim().length() == 0) {
+	      //debugPrint(" map25: " + "####### createMaplilionMvtTileSource API Key is empty using internal key: " + _mp_key); //$NON-NLS-1$ //$NON-NLS-2$
+	      tileSource = MapilionMvtTileSource.builder()
+	            .apiKey(_mp_key)
+	            .httpFactory(httpFactory)
+	            .build();
+	   } else {
+	      //debugPrint(" map25: " + "####### createMaplilionMvtTileSource API Key is not empty using it: " + mapProvider.online_ApiKey.trim()); //$NON-NLS-1$ //$NON-NLS-2$
+	      tileSource = MapilionMvtTileSource.builder()
+	            .apiKey(mapProvider.online_ApiKey.trim())
+	            .httpFactory(httpFactory)
+	            .build();
+	   }
 	   return tileSource;
 	}
 	
@@ -754,8 +762,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 			CanvasAdapter.textScale = _vtm_TextScale;
 			CanvasAdapter.userScale = _vtm_UserScale;
 			debugPrint(" map25: " + "############# setMapProvider: setMapProvider NOT mf Map"); //$NON-NLS-1$ //$NON-NLS-2$
-			debugPrint(" map25: " + "############# setMapProvider: tileEncoding: " + mapProvider.tileEncoding); //$NON-NLS-1$
-			debugPrint(" map25: " + "############# setMapProvider: API: " + mapProvider.online_ApiKey); //$NON-NLS-1$
+			debugPrint(" map25: " + "############# setMapProvider: tileEncoding: " + mapProvider.tileEncoding); //$NON-NLS-1$ //$NON-NLS-2$
+			debugPrint(" map25: " + "############# setMapProvider: API: " + mapProvider.online_ApiKey); //$NON-NLS-1$ //$NON-NLS-2$
 			if(mapProvider.tileEncoding == TileEncoding.VTM) {
 	         final UrlTileSource tileSource = createTileSource(mapProvider, _httpFactory);
 	         _layer_BaseMap.setTileSource(tileSource);
@@ -1162,7 +1170,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
        */
 //    // Buildings or S3DB  Block I
       _layer_S3DB_Building = new S3DBLayer(mMap,_layer_BaseMap, true);  //this is working with subtheme  switching, but no online buildings anymore
-      _layer_Building = new BuildingLayer(mMap, _layer_BaseMap, false, false);
+      _layer_Building = new BuildingLayer(mMap, _layer_BaseMap, false, false);  // building is not working with online maps, so deactvated also the shadow
       
 		if(_isOfflineMap) {
 //			// S3DB

@@ -91,26 +91,6 @@ public class Map25ProviderManager {
       _mapProviderListeners.add(listener);
    }
 
-   /**
-    * opensciencemap.org
-    */
-   private static Map25Provider createMapProvider_Default() {
-
-      final Map25Provider mapProvider = new Map25Provider();
-
-      mapProvider.isDefault = true;
-      mapProvider.isEnabled = true;
-      mapProvider.name = Messages.Map25_Provider_OpenScienceMap_Name;
-      mapProvider.online_url = "http://opensciencemap.org/tiles/vtm"; //$NON-NLS-1$
-      mapProvider.online_TilePath = "/{Z}/{X}/{Y}.vtm"; //$NON-NLS-1$
-      mapProvider.tileEncoding = TileEncoding.VTM;
-      mapProvider.theme = VtmThemes.DEFAULT;
-      mapProvider.description = Messages.Map25_Provider_OpenScienceMap_Description;
-
-      _defaultMapProvider = mapProvider;
-
-      return mapProvider;
-   }
    
    /**
     * mapilion.com/
@@ -119,14 +99,36 @@ public class Map25ProviderManager {
 
       final Map25Provider mapProvider = new Map25Provider();
 
-      //mapProvider.isDefault = true;
+      mapProvider.isDefault = true;
       mapProvider.isEnabled = true;
-      mapProvider.name = "Map25_Provider_Mapilion_Name"; //$NON-NLS-1$
+      mapProvider.name = Messages.Map25_Provider_Mapilion_Name; //$NON-NLS-1$
       mapProvider.online_url = "https://tiles.mapilion.com/data/v3"; //$NON-NLS-1$
       mapProvider.online_TilePath = "/{Z}/{X}/{Y}.pbf"; //$NON-NLS-1$
       mapProvider.tileEncoding = TileEncoding.MP;
       mapProvider.theme = VtmThemes.OPENMAPTILES;
-      mapProvider.description = "Map25_Provider_Mapilion_Description"; //$NON-NLS-1$
+      mapProvider.description = Messages.Map25_Provider_Mapilion_Description; //$NON-NLS-1$
+
+      _defaultMapProvider = mapProvider;
+
+      return mapProvider;
+   }
+   
+   
+   /**
+    * opensciencemap.org, server seems to be down since 2019-12
+    */
+   private static Map25Provider createMapProvider_Default() {
+
+      final Map25Provider mapProvider = new Map25Provider();
+
+      //mapProvider.isDefault = true;
+      mapProvider.isEnabled = false;
+      mapProvider.name = Messages.Map25_Provider_OpenScienceMap_Name;
+      mapProvider.online_url = "http://opensciencemap.org/tiles/vtm"; //$NON-NLS-1$
+      mapProvider.online_TilePath = "/{Z}/{X}/{Y}.vtm"; //$NON-NLS-1$
+      mapProvider.tileEncoding = TileEncoding.VTM;
+      mapProvider.theme = VtmThemes.DEFAULT;
+      mapProvider.description = Messages.Map25_Provider_OpenScienceMap_Description;
 
       //_defaultMapProvider = mapProvider;
 

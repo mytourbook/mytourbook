@@ -177,38 +177,6 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 
          {
             /*
-             * S3DB
-             */
-            //    _chkShowLayer_S3DB = new Button(group, SWT.CHECK);
-            //    _chkShowLayer_S3DB.setText("Advanced Builings");
-            //    _chkShowLayer_S3DB.addSelectionListener(_layerSelectionListener);
-         } 
-
-
-         {
-            /*
-             * Bookmark
-             */    
-/*            final Composite containerBookmark = new Composite(group, SWT.NONE);
-            GridDataFactory.fillDefaults().grab(true, false).applyTo(containerBookmark);
-            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerBookmark);
-            {
-               {
-                  _chkShowLayer_Bookmark = new Button(containerBookmark, SWT.CHECK);
-                  _chkShowLayer_Bookmark.setText("Bookmarks");
-                  _chkShowLayer_Bookmark.addSelectionListener(_layerSelectionListener);
-               }
-               {
-                  _btn_refresh_Bookmark = new Button(containerBookmark, SWT.PUSH);
-                  _btn_refresh_Bookmark.setText("Update");
-                  _btn_refresh_Bookmark.addListener(SWT.Selection, _btn_refresh_Bookmark_listener);
-               }
-            }*/
-         }
-
-
-         {
-            /*
              * Hillshading
              */
             final Composite containerHillshading = new Composite(group, SWT.NONE);
@@ -426,8 +394,6 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
       // switching off both building layers
       mapApp.getLayer_Building().setEnabled(_chkShowLayer_Building.getSelection());
       mapApp.getLayer_S3DB().setEnabled(_chkShowLayer_Building.getSelection());
-      
-
       
       enableActions();
 

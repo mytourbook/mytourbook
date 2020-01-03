@@ -1331,6 +1331,10 @@ public class Messages extends NLS {
    public static String        Map_Bookmark_Column_Latitude_Tooltip;
    public static String        Map_Bookmark_Column_Longitude;
    public static String        Map_Bookmark_Column_Longitude_Tooltip;
+   public static String        Map_Bookmark_Column_PositionMarkerLatitude;   
+   public static String        Map_Bookmark_Column_PositionMarkerLatitude_Tooltip;
+   public static String        Map_Bookmark_Column_PositionMarkerLongitude;
+   public static String        Map_Bookmark_Column_PositionMarkerLongitude_Tooltip;
    public static String        Map_Bookmark_Column_Name;
    public static String        Map_Bookmark_Column_Scale;
    public static String        Map_Bookmark_Column_Tilt;
@@ -1350,6 +1354,8 @@ public class Messages extends NLS {
    public static String        Map25_Config_SymbolOrientation_Billboard;
    public static String        Map25_Config_SymbolOrientation_Ground;
 
+   public static String        Map25_Provider_Mapilion_Description;
+   public static String        Map25_Provider_Mapilion_Name;   
    public static String        Map25_Provider_MapzenVectorTiles_Description;
    public static String        Map25_Provider_MapzenVectorTiles_Name;
    public static String        Map25_Provider_MyTileServer_Description;
@@ -1541,6 +1547,7 @@ public class Messages extends NLS {
    public static String        Pref_Map25_Action_EditMapProviderPreferences_Tooltip;
    public static String        Pref_Map25_Dialog_MapFilename_Title;
    public static String        Pref_Map25_Dialog_MapStyleFilename_Title;
+   public static String        Pref_Map25_Encoding_Mapilion;
    public static String        Pref_Map25_Encoding_Mapsforge_Offline;
    public static String        Pref_Map25_Encoding_Mapzen;
    public static String        Pref_Map25_Encoding_OpenScienceMap;
