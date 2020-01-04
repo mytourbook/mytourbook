@@ -1,4 +1,4 @@
-19.next.0                                                 ?. Month 2019
+20.?.0                                                 ?. Month 2020
 
 
 TODO's
@@ -7,6 +7,7 @@ TODO's
 * Website
   - Update contributor/translator list
   - Show cheatsheet
+  - Wrong text: The comparison is done by altitude, comparing by geo position is not yet supported.
  
 
 Bugs
@@ -17,7 +18,13 @@ Bugs
 New + Improvements   
 ==================
 
- 
+Views
+-----
+
+* Calendar - Weekly summary
+  
+  Time spent in "slow" vs "fast" cadence zones
+
 Import
 ======
 
@@ -28,6 +35,7 @@ Changes
 
 * Tour Import
   - GPX: Set default to absolute distance that the defaults for export/import are the same
+  - FIT: Starting marker label from 1 instead of 0
 
  
 Fixes   
@@ -50,6 +58,7 @@ Fixes
 Translation    
 ===========
 
+ - Dutch (Maarten)
  - French (Frederic)
  - German
  - Italian (Doriano)
@@ -58,3 +67,6 @@ Translation
 System   
 ======
 
+* Update SWT to 4.14 (Eclipse 2019-12) to fix the issue (Linux only) when
+  saving a map tile on disk
+  (cf. https://bugs.eclipse.org/bugs/show_bug.cgi?id=553240) 
