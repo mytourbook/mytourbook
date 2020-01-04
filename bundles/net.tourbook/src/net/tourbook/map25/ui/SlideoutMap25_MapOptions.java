@@ -54,7 +54,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
    private MouseWheelListener _defaultMouseWheelListener;
    private FocusListener      _keepOpenListener;
    private SelectionAdapter   _layerSelectionListener;
-   private Listener      _btn_refresh_Bookmark_listener;
+   private Listener           _btn_refresh_Bookmark_listener;
    private PixelConverter     _pc;
 
    private Map25View          _map25View;
@@ -72,9 +72,6 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
    private Button    _chkShowLayer_Scale;
    private Button    _chkShowLayer_TileInfo;
 
-//   private Button    _chkShowLayer_Bookmark;
-//   private Button    _btn_refresh_Bookmark;
-//   private Button    _chkShowLayer_S3DB;
    private Button    _chkUseDraggedKeyboardNavigation;
 
    private Spinner   _spinnerHillshadingOpacity;
@@ -239,8 +236,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
              * Satellite
              */
             _chkShowLayer_Satellite = new Button(group, SWT.CHECK);
-            _chkShowLayer_Satellite.setText("Satellite Map");
-            _chkShowLayer_Satellite.setToolTipText("Satellite Maps from ESRI");
+            _chkShowLayer_Satellite.setText(Messages.Slideout_Map25MapOptions_Checkbox_Layer_Satellite);
             _chkShowLayer_Satellite.addSelectionListener(_layerSelectionListener);
          }        
 

@@ -192,9 +192,9 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
 	private IRenderTheme				_mf_IRenderTheme;
 	private float						_mf_TextScale = 0.75f;
-	private float						_vtm_TextScale = 0.75f;
+	private float						_online_TextScale = 0.50f;
    private float                 _mf_UserScale = 2.50f;
-   private float                 _vtm_UserScale = 2.0f;	
+   private float                 _online_UserScale = 2.0f;	
 	
    private ItemizedLayer<MarkerItem> _layer_MapBookmark;
    private MarkerToolkit _markertoolkit;
@@ -454,7 +454,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 		debugPrint(" map25: " + "####### loadtheme: entering styleID: " + styleId); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		if (!_isOfflineMap) { // NOT mapsforge
-			debugPrint(" map25: " + "####### loadtheme: is online map setting textscale " +   _vtm_TextScale); //$NON-NLS-1$ //$NON-NLS-2$
+			debugPrint(" map25: " + "####### loadtheme: is online map setting textscale " +   _online_TextScale); //$NON-NLS-1$ //$NON-NLS-2$
 			//CanvasAdapter.textScale = _vtm_TextScale;
 			// if problems with switching themes via keyboard, maybe this block is the problem
 			/*if (_selectedMapProvider.theme != null && _selectedMapProvider.theme != VtmThemes.MAPZEN && _selectedMapProvider.theme != VtmThemes.OPENMAPTILES) {
@@ -759,8 +759,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 		//debugPrint(" map25: " + "############# setMapProvider MapProviderENCODING: " + mapProvider.tileEncoding); //$NON-NLS-1$
 		if (mapProvider.tileEncoding  != TileEncoding.MF) { // NOT mapsforge
 			this._isOfflineMap = false;
-			CanvasAdapter.textScale = _vtm_TextScale;
-			CanvasAdapter.userScale = _vtm_UserScale;
+			CanvasAdapter.textScale = _online_TextScale;
+			CanvasAdapter.userScale = _online_UserScale;
 			debugPrint(" map25: " + "############# setMapProvider: setMapProvider NOT mf Map"); //$NON-NLS-1$ //$NON-NLS-2$
 			debugPrint(" map25: " + "############# setMapProvider: tileEncoding: " + mapProvider.tileEncoding); //$NON-NLS-1$ //$NON-NLS-2$
 			debugPrint(" map25: " + "############# setMapProvider: API: " + mapProvider.online_ApiKey); //$NON-NLS-1$ //$NON-NLS-2$
@@ -981,8 +981,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private void setupMap(final Map25Provider mapProvider, final MapilionMvtTileSource tileSource) {
       debugPrint(" map25: " + "############# setupMap:  Mapilion online entering"); //$NON-NLS-1$ //$NON-NLS-2$
       
-      CanvasAdapter.textScale = _vtm_TextScale;
-      CanvasAdapter.userScale = _vtm_UserScale;
+      CanvasAdapter.textScale = _online_TextScale;
+      CanvasAdapter.userScale = _online_UserScale;
       
       _layer_BaseMap = new OsmTileLayerMT(mMap);
       
@@ -1006,8 +1006,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	private void setupMap(final Map25Provider mapProvider, final UrlTileSource tileSource) {
 	   debugPrint(" map25: " + "############# setupMap:  online entering"); //$NON-NLS-1$ //$NON-NLS-2$
 		
-      CanvasAdapter.textScale = _vtm_TextScale;
-      CanvasAdapter.userScale = _vtm_UserScale;
+      CanvasAdapter.textScale = _online_TextScale;
+      CanvasAdapter.userScale = _online_UserScale;
 		
       //_l = mMap.setBaseMap(tileSource);
       
@@ -1109,28 +1109,17 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	   final Layers layers = mMap.layers();
 	   final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
  
-	    // hillshading from mapilion. With vtm 0.12 there is a defaultsource...
-//	   _hillshadingSource = BitmapTileSource.builder()
-//            .httpFactory(_httpFactory)
-//            .url("https://tiles.mapilion.com/hillshades/v2") //$NON-NLS-1$
-//            .tilePath("/{Z}/{X}/{Y}.png?key=" + _mp_key) //$NON-NLS-1$
-//            .fadeSteps(new FadeStep[]{new FadeStep(0, Viewport.MAX_ZOOM_LEVEL, 1, 0.2f)})
-//            .zoomMin(1)
-//            .zoomMax(12)
-//            .build()
-//            ;
-
-//	   _hillshadingSource =  DefaultSources.HIKEBIKE_HILLSHADE
-//	         .httpFactory(_httpFactory)
-//	         .zoomMin(1)
-//	         .zoomMax(16)
-//	         .build();
-
-	   
-	   _hillshadingSource =  DefaultSources.MAPILION_HILLSHADE_2
+	   _hillshadingSource =  DefaultSources.HIKEBIKE_HILLSHADE
 	         .httpFactory(_httpFactory)
-	         .apiKey(_mp_key)
+	         .zoomMin(1)
+	         .zoomMax(16)
 	         .build();
+
+	   /* needs long copyright hint...*/
+//	   _hillshadingSource =  DefaultSources.MAPILION_HILLSHADE_2
+//	         .httpFactory(_httpFactory)
+//	         .apiKey(_mp_key)
+//	         .build();
 
 
 	// hillshading with 1MB RAM Cache, using existing _httpfactory with diskcache

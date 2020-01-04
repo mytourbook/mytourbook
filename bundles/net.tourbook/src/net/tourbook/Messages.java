@@ -2018,6 +2018,7 @@ public class Messages extends NLS {
    public static String Slideout_Map25MapOptions_Checkbox_Layer_Cartography_Tooltip;
    public static String Slideout_Map25MapOptions_Checkbox_Layer_Hillshading;
    public static String Slideout_Map25MapOptions_Checkbox_Layer_LabelSymbol;
+   public static String Slideout_Map25MapOptions_Checkbox_Layer_Satellite;
    public static String Slideout_Map25MapOptions_Checkbox_Layer_ScaleBar;
    public static String Slideout_Map25MapOptions_Checkbox_Layer_TileInfo;
    public static String Slideout_Map25MapOptions_Checkbox_UseDraggedKeyNavigation;
@@ -2058,6 +2059,7 @@ public class Messages extends NLS {
    public static String Slideout_Map25Provider_Label_MapProvider;
    public static String Slideout_Map25Provider_Label_MapProvider_Title;
    public static String Slideout_Map25Provider_Label_ThemeStyle;
+   public static String Slideout_Map25Provider_Label_Copyright;
 
    public static String Slideout_Map2MapOptions_Action_SetTourPaintingModeBasic;
    public static String Slideout_Map2MapOptions_Dialog_EnhancePaintingWarning_Message;

@@ -355,7 +355,7 @@ public class Map25ProviderManager {
                         ? null
                         : (VtmThemes) Util.getXmlEnum(xml, ATTR_THEME, getDefaultTheme(tileEncoding));
 
-                  System.out.println("################## Name, Url and online_TilePath: " + mapProvider.name + " " + mapProvider.online_url //$NON-NLS-1$//$NON-NLS-2$
+                  Map25App.debugPrint("################## Name, Url and online_TilePath: " + mapProvider.name + " " + mapProvider.online_url //$NON-NLS-1$//$NON-NLS-2$
                         + mapProvider.online_TilePath);
 
                   allMapProvider.add(mapProvider);
