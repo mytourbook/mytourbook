@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -198,7 +198,7 @@ public class EasyImportManager {
 
                /*
                 * When the watching store is stopped, then getImportFiles() could cause a SQL
-                * exceptöion when it checks the files in the db
+                * exceptï¿½ion when it checks the files in the db
                 */
 
                return returnState;
@@ -288,7 +288,7 @@ public class EasyImportManager {
       try (Connection conn = TourDatabase.getInstance().getConnection(); //
             Statement stmt = conn.createStatement()) {
 
-         final String sqlQuery = ""// 													//$NON-NLS-1$
+         final String sqlQuery = UI.EMPTY_STRING//
                + "SELECT" //															//$NON-NLS-1$
                + " TourImportFileName" //												//$NON-NLS-1$
                + " FROM " + TourDatabase.TABLE_TOUR_DATA //							//$NON-NLS-1$

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -144,7 +144,7 @@ public class TourGeoFilter_Loader {
                   // update loading state - this should not occure but is helpfull for testing
 
                   // show loading state
-                  geoLoaderData.mapGridData.gridBox_Text = Messages.TourGeoFilter_Loader_LoadingError + UI.SPACE + 
+                  geoLoaderData.mapGridData.gridBox_Text = Messages.TourGeoFilter_Loader_LoadingError + UI.SPACE +
                         TimeTools.Formatter_DateTime_SM.format(LocalDateTime.now());
                   map2View.redrawMap();
                }
@@ -202,7 +202,7 @@ public class TourGeoFilter_Loader {
          // get app filter without geo location, this is added here
          appFilter = new SQLFilter(SQLFilter.NO_GEO_LOCATION);
 
-         sqlSelect = "" //$NON-NLS-1$
+         sqlSelect = UI.EMPTY_STRING
 
                + "SELECT" + NL //                                       //$NON-NLS-1$
 
@@ -225,7 +225,7 @@ public class TourGeoFilter_Loader {
 
             // exclude geo parts
 
-            sqlSelect = "" //$NON-NLS-1$
+            sqlSelect = UI.EMPTY_STRING
 
                   + "SELECT" + NL //                                       //$NON-NLS-1$
 

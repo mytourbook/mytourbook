@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -348,7 +348,7 @@ public class TourDatabase {
                                         final String columnName,
                                         final String defaultValue) throws SQLException {
 
-         final String sql = ""//                                                          //$NON-NLS-1$
+         final String sql = UI.EMPTY_STRING//
                + "ALTER TABLE " + table //                                                //$NON-NLS-1$
                + "   ADD COLUMN   " + columnName + " BIGINT DEFAULT " + defaultValue; //   //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -368,7 +368,7 @@ public class TourDatabase {
                                          final String columnName,
                                          final String defaultValue) throws SQLException {
 
-         final String sql = ""//                                                          //$NON-NLS-1$
+         final String sql = UI.EMPTY_STRING//
                + "ALTER TABLE " + table //                                                //$NON-NLS-1$
                + "   ADD COLUMN " + columnName + " BOOLEAN DEFAULT " + defaultValue; //   //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -380,7 +380,7 @@ public class TourDatabase {
                                         final String columnName,
                                         final String defaultValue) throws SQLException {
 
-         final String sql = ""//                                                          //$NON-NLS-1$
+         final String sql = UI.EMPTY_STRING//
                + "ALTER TABLE " + table //                                                //$NON-NLS-1$
                + "   ADD COLUMN   " + columnName + " DOUBLE DEFAULT " + defaultValue; //   //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -392,7 +392,7 @@ public class TourDatabase {
                                        final String columnName,
                                        final String defaultValue) throws SQLException {
 
-         final String sql = ""//                                              //$NON-NLS-1$
+         final String sql = UI.EMPTY_STRING//
                + "ALTER TABLE " + table //                                       //$NON-NLS-1$
                + "   ADD COLUMN   " + columnName + " FLOAT DEFAULT  " + defaultValue; //      //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -412,7 +412,7 @@ public class TourDatabase {
                                      final String columnName,
                                      final String defaultValue) throws SQLException {
 
-         final String sql = ""//                                              //$NON-NLS-1$
+         final String sql = UI.EMPTY_STRING//
                + "ALTER TABLE " + table //                                       //$NON-NLS-1$
                + "   ADD COLUMN   " + columnName + " INTEGER DEFAULT " + defaultValue; //      //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -432,7 +432,7 @@ public class TourDatabase {
                                           final String columnName,
                                           final String defaultValue) throws SQLException {
 
-         final String sql = ""//                                              //$NON-NLS-1$
+         final String sql = UI.EMPTY_STRING//
                + "ALTER TABLE " + table //                                       //$NON-NLS-1$
                + "   ADD COLUMN   " + columnName + " SMALLINT DEFAULT " + defaultValue; //      //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -458,7 +458,7 @@ public class TourDatabase {
                                         final String columnName,
                                         final int columnWidth) throws SQLException {
 
-         final String sql = ""// //$NON-NLS-1$
+         final String sql = UI.EMPTY_STRING//
                + ("ALTER TABLE " + table) //$NON-NLS-1$
                + ("   ADD COLUMN   " + columnName + "   VARCHAR(" + columnWidth + ")\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
@@ -470,7 +470,7 @@ public class TourDatabase {
                                                  final String field,
                                                  final int newWidth) throws SQLException {
 
-         final String sql = "" // //$NON-NLS-1$
+         final String sql = UI.EMPTY_STRING//
                + ("ALTER TABLE " + table + "\n") //$NON-NLS-1$ //$NON-NLS-2$
                + ("   ALTER COLUMN " + field + "\n") //$NON-NLS-1$ //$NON-NLS-2$
                + ("   SET DATA TYPE   VARCHAR(" + newWidth + ")\n"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -1446,7 +1446,7 @@ public class TourDatabase {
          if (em != null) {
 
             final Query emQuery = em.createQuery(
-                  "" //$NON-NLS-1$
+                  UI.EMPTY_STRING
                         + "SELECT tourTagCategory" //$NON-NLS-1$
                         + (" FROM " + TourTagCategory.class.getSimpleName() + " AS tourTagCategory")); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -1490,7 +1490,7 @@ public class TourDatabase {
          if (em != null) {
 
             final Query emQuery = em.createQuery(
-                  "" //$NON-NLS-1$
+                  UI.EMPTY_STRING
                         + "SELECT tourTag" //$NON-NLS-1$
                         + (" FROM " + TourTag.class.getSimpleName() + " AS tourTag")); //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -1609,7 +1609,7 @@ public class TourDatabase {
                   try (Connection conn = getInstance().getConnection(); //
                         Statement stmt = conn.createStatement()) {
 
-                     final String sqlQuery = "" // //$NON-NLS-1$
+                     final String sqlQuery = UI.EMPTY_STRING //
                            + "SELECT" //$NON-NLS-1$
                            + " DISTINCT" //$NON-NLS-1$
                            + " " + fieldname //$NON-NLS-1$
@@ -6685,7 +6685,7 @@ public class TourDatabase {
       final int numTours = getAllTourIds().size();
 
       final PreparedStatement stmtSelect = conn.prepareStatement(
-            "" // //$NON-NLS-1$
+            UI.EMPTY_STRING//
                   //
                   + "SELECT" //                           //$NON-NLS-1$
                   //
@@ -6696,7 +6696,7 @@ public class TourDatabase {
       );
 
       final PreparedStatement stmtUpdate = conn.prepareStatement(
-            "" // //$NON-NLS-1$
+            UI.EMPTY_STRING//
                   //
                   + "UPDATE " + TABLE_TOUR_DATA //            //$NON-NLS-1$
                   //
@@ -7140,7 +7140,7 @@ public class TourDatabase {
             // check if db already contains the constraint
             if (isPrimaryKeyAvailable(conn, TABLE_TOUR_GEO_PARTS, "PK_TourId_GeoPart") == false) { //$NON-NLS-1$
 
-               final String sql = ""//                                                          //$NON-NLS-1$
+               final String sql = UI.EMPTY_STRING//
 
                      + "ALTER TABLE " + TABLE_TOUR_GEO_PARTS //                                 //$NON-NLS-1$
                      + "   ADD CONSTRAINT PK_TourId_GeoPart PRIMARY KEY (TourId, GeoPart)"; //  //$NON-NLS-1$

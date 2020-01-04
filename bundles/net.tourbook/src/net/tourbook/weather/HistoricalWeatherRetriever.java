@@ -22,6 +22,8 @@ import com.javadocmd.simplelatlng.LatLng;
 import com.javadocmd.simplelatlng.LatLngTool;
 import com.javadocmd.simplelatlng.util.LengthUnit;
 
+import de.byteholder.geoclipse.map.UI;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -303,7 +305,7 @@ public class HistoricalWeatherRetriever {
          isr = new InputStreamReader(connection.getInputStream());
          rd = new BufferedReader(isr);
 
-         String line = ""; //$NON-NLS-1$
+         String line = UI.EMPTY_STRING;
          while ((line = rd.readLine()) != null) {
             weatherHistory.append(line);
          }
@@ -311,7 +313,7 @@ public class HistoricalWeatherRetriever {
          StatusUtil.log(
                "WeatherHistoryRetriever.processRequest : Error while executing the historical weather request with the parameters " //$NON-NLS-1$
                      + weatherRequestWithParameters + "\n" + ex.getMessage()); //$NON-NLS-1$
-         return ""; //$NON-NLS-1$
+         return UI.EMPTY_STRING;
       } finally {
          try {
             // close resources

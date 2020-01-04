@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1278,7 +1278,7 @@ public class Photo {
 //				: _orientation == 3 ? "180" //
 //						: _orientation == 6 ? "90" : "0";
 
-      return "" //$NON-NLS-1$
+      return UI.EMPTY_STRING
 //				+"Photo " //
             + (imageFileName)
             + ("\t_exifDateTime " + _exifDateTime) //$NON-NLS-1$

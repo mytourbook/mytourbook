@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -152,13 +152,13 @@ public class WebContentServer {
 
       final String dojoSearch = WEB.IS_DEBUG //
 
-            ? "" //$NON-NLS-1$
+            ? UI.EMPTY_STRING
 
                   // DEBUG build
                   + "	<link rel='stylesheet' href='search.css'>					\n" //$NON-NLS-1$
                   + "	<script src='/dojo/dojo.js'></script>						\n" //$NON-NLS-1$
 
-            : "" //$NON-NLS-1$
+            : UI.EMPTY_STRING
 
                   // RELEASE build
                   + "	<link rel='stylesheet' href='search.css.jgz'>				\n" //$NON-NLS-1$
@@ -199,7 +199,7 @@ public class WebContentServer {
       }
    }
 
-   private String[]                       set;
+   private String[] set;
 
    private static class DefaultHandler implements HttpHandler {
 

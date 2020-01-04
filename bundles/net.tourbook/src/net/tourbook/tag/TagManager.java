@@ -62,7 +62,7 @@ public class TagManager {
    private static boolean canDeleteTourTagCategory(final long categoryId, final String categoryName) {
 
       // Category -> Tag
-      final String sql_Category_Tags = "" //$NON-NLS-1$
+      final String sql_Category_Tags = UI.EMPTY_STRING
 
             + "SELECT" + NL //                                                               //$NON-NLS-1$
             + " COUNT(TOURTAGCATEGORY_TAGCATEGORYID)" + NL //                                //$NON-NLS-1$
@@ -71,7 +71,7 @@ public class TagManager {
       ;
 
       // Category -> Category
-      final String sql_Category_Categories = "" //$NON-NLS-1$
+      final String sql_Category_Categories = UI.EMPTY_STRING
 
             + "SELECT" + NL //                                                               //$NON-NLS-1$
             + " COUNT(TOURTAGCATEGORY_TAGCATEGORYID1)" + NL //                               //$NON-NLS-1$
@@ -453,7 +453,7 @@ public class TagManager {
          sqlParameters.add(tagTag.getTagId());
       }
 
-      final String sql = "" //$NON-NLS-1$
+      final String sql = UI.EMPTY_STRING
 
             + "SELECT\n" //                                                                           //$NON-NLS-1$
 

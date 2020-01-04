@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -188,7 +188,7 @@ public class TourGeoFilter_Manager {
 //    final int partHeight = geoTopLeftE2.y - geoBottomRightE2.y;
 
       String sqlWhere;
-      final int gridSize_E2 = 1; // 0.01°
+      final int gridSize_E2 = 1; // 0.01ï¿½
 
       /**
        * Optimize sql time by using different strategies depending on the number of parts AND part
@@ -262,7 +262,7 @@ public class TourGeoFilter_Manager {
          return null;
       }
 
-      final String sqlSelectWithAllTourIdsFromGeoParts = "" //$NON-NLS-1$
+      final String sqlSelectWithAllTourIdsFromGeoParts = UI.EMPTY_STRING
 
             + "SELECT" + NL //                                                //$NON-NLS-1$
 
@@ -379,7 +379,7 @@ public class TourGeoFilter_Manager {
       // include or exclude geo parts
       final String sqlIncludeExcludeGeoParts = isIncludeGeoParts ? UI.EMPTY_STRING : "NOT"; //$NON-NLS-1$
 
-      final String sqlWhere = "" //$NON-NLS-1$
+      final String sqlWhere = UI.EMPTY_STRING
 
             + " AND HasGeoData" + NL //$NON-NLS-1$
             + " AND TourId " + sqlIncludeExcludeGeoParts + " IN (" + sqlSelect_WithAllTourIds_FromGeoParts + ") "; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$

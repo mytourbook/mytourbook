@@ -429,7 +429,7 @@ public class FitDataReader extends TourbookDevice {
          final long javaTime = (garminTimestamp * 1000) + com.garmin.fit.DateTime.OFFSET;
 
          System.out.println(
-               String.format("" //$NON-NLS-1$
+               String.format(UI.EMPTY_STRING
 
                      + "[%s]" //$NON-NLS-1$
 
@@ -443,7 +443,7 @@ public class FitDataReader extends TourbookDevice {
 
 //                     + " %s" //     RawValue       //$NON-NLS-1$
 
-                     + "", //$NON-NLS-1$
+                     + UI.EMPTY_STRING,
 
                      FitDataReader.class.getSimpleName(),
 
@@ -493,7 +493,7 @@ public class FitDataReader extends TourbookDevice {
          final long javaTime = (garminTimestamp * 1000) + com.garmin.fit.DateTime.OFFSET;
 
          System.out.println(
-               String.format("" //$NON-NLS-1$
+               String.format(UI.EMPTY_STRING
 
                      + "[%s]" //$NON-NLS-1$
 
@@ -507,7 +507,7 @@ public class FitDataReader extends TourbookDevice {
 
 //                     + " %s" //     RawValue       //$NON-NLS-1$
 
-                     + "", //$NON-NLS-1$
+                     + UI.EMPTY_STRING,
 
                      FitDataReader.class.getSimpleName(),
 
@@ -573,7 +573,7 @@ public class FitDataReader extends TourbookDevice {
 //            System.out.println("1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890");
 // SET_FORMATTING_ON
 
-            System.out.println(String.format("" //$NON-NLS-1$
+            System.out.println(String.format(UI.EMPTY_STRING
 
                   + "%-16s" //   Java //$NON-NLS-1$
                   + "%-70s" //  Timestamp //$NON-NLS-1$

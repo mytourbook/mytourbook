@@ -778,7 +778,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
          conn = TourDatabase.getInstance().getConnection();
 
-         final String sql = "" //													//$NON-NLS-1$
+         final String sql = UI.EMPTY_STRING //
 
                // get number of tours
                + " SELECT COUNT(*)" // 											//$NON-NLS-1$

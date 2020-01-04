@@ -10448,7 +10448,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    public String toStringWithHash() {
 
-      final String string = "" //$NON-NLS-1$
+      final String string = UI.EMPTY_STRING
             + ("   tourId: " + tourId) //$NON-NLS-1$
             + ("   identityHashCode: " + System.identityHashCode(this)); //$NON-NLS-1$
 
