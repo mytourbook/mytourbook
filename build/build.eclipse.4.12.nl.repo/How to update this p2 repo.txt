@@ -2,5 +2,14 @@
  Update Eclipse NL repo
 ###########################
 
-   - Update Eclipse NL jar files in the current Eclipse installation
+   - Install/update Eclipse NL jar files for all used languages in the current Eclipse IDE installation
+     - The Eclipse NL files can be downloaded from https://www.eclipse.org/babel/downloads.php
+     - MT 19.10 is using these NL files: 
+         BabelLanguagePack-eclipse-nl_4.12.0.v20190713060001.zip
+         BabelLanguagePack-eclipse-es_4.12.0.v20190713060001.zip
+         BabelLanguagePack-eclipse-it_4.12.0.v20190713060001.zip
+         BabelLanguagePack-eclipse-fr_4.12.0.v20190713060001.zip
+         BabelLanguagePack-eclipse-de_4.12.0.v20190713060001.zip
+         BabelLanguagePack-eclipse-cs_4.12.0.v20190713060001.zip
+
    - Export "feature.net.tourbook.ext.eclipse.nl" as deployable feature into this folder "build\build.eclipse.4.12.nl.repo"
