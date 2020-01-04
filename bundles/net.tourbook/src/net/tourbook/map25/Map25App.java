@@ -164,7 +164,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	
 	
 	//public static enum DebugMode {OFF, ON};
-	public static DebugMode debugMode = DebugMode.ON;   // before releasing, set this to OFF
+	public static DebugMode debugMode = DebugMode.OFF;   // before releasing, set this to OFF
 	
 	/**
 	 * The opacity can be set in the layer but not read. This will keep the state of the hillshading opacity.
