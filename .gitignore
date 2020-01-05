@@ -19,3 +19,4 @@ gradle
 
 *.js.map
 *.js.uncompressed.js
+/build/
