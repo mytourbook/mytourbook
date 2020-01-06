@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -26,6 +26,8 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourTag;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.tag.tour.filter.TourTagFilterManager;
+import net.tourbook.tag.tour.filter.TourTagFilterProfile;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourManager;
@@ -121,7 +123,7 @@ public class TagManager {
     * {@link TourEventId#TAG_STRUCTURE_CHANGED} is fired when done.
     *
     * @param allTags
-    * @return Returns <code>true</code> when deletion was sucessfull
+    * @return Returns <code>true</code> when deletion was successful
     */
    public static boolean deleteTourTag(final ArrayList<TourTag> allTags) {
 
@@ -173,6 +175,8 @@ public class TagManager {
             if (deleteTourTag_10(allTags)) {
 
                fireChangeEvent();
+
+               updateTourTagFilterProfiles(allTags);
 
                returnValue[0] = true;
             }
@@ -494,5 +498,23 @@ public class TagManager {
       }
 
       return allTourIds;
+   }
+
+   /**
+    * Updates the tag list in each tour tag filter profile as one or several tags were just deleted.
+    *
+    * @param deletedTags
+    *           An array containing the Tag Id's of the tour tags just deleted
+    */
+   private static void updateTourTagFilterProfiles(final ArrayList<TourTag> deletedTags) {
+
+      final ArrayList<TourTagFilterProfile> profiles = TourTagFilterManager.getProfiles();
+      for (final TourTagFilterProfile profile : profiles) {
+         for (final TourTag tourTag : deletedTags) {
+            if (profile.tagFilterIds.contains(tourTag.getTagId())) {
+               profile.tagFilterIds.remove(tourTag.getTagId());
+            }
+         }
+      }
    }
 }
