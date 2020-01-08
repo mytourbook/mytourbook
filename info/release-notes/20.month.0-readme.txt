@@ -21,7 +21,7 @@ New + Improvements
 Views
 -----
 
-* Calendar - Weekly summary
+* Calendar - Weekly summary (Frederic)
   
   Time spent in "slow" vs "fast" cadence zones
 
@@ -37,7 +37,7 @@ Changes
   - GPX: Set default to absolute distance that the defaults for export/import are the same
   - FIT: Starting marker label from 1 instead of 0
 
-* Tour Editor
+* Tour Editor (Frederic)
   - Added the ability to retrieve the weather data by clicking on the weather description label
  
 Fixes   
@@ -56,9 +56,15 @@ Fixes
 * Tour Export
   - GPX: <mt:bikerWeight> value was wrong
 
-* Preferences
+* Preferences (Frederic)
   - Fixed a regression, in the "Measurement System" tab, that appeared in 19.3.0 where the metric radio buttons had disappeared
   - Fixed bugs in the Computed values preference page (Break Time and Elevation Gain tabs) where the speed and altitude values were not properly converted when switching between metric and imperial system units
+
+* Tour Tag filter (Frederic)
+  - After deleting a tag, the tour tag profiles were not updated and if the recently deleteg tag was present in tour tag profiles, an NPE would appear
+
+* Tour Editor (Frederic)
+  - Fixed a bug when editing time slices. After editing a cell and saving a tour, an edited cell would not be updated with a new value
   
    
 Translation    
