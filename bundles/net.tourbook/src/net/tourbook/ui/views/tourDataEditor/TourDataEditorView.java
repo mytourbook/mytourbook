@@ -5928,27 +5928,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     */
    void editTimeSlicesValues() {
 
-      // a tour with reference tours is currently not supported
-      if (_isReferenceTourAvailable) {
-
-         MessageDialog.openInformation(
-               Display.getCurrent().getActiveShell(),
-               Messages.tour_editor_dlg_delete_rows_title,
-               Messages.tour_editor_dlg_delete_rows_message);
-
-         return;
-      }
-
-      // swimming data series have a different number of time slices
-      if (_tourData.swim_Time != null) {
-
-         MessageDialog.openInformation(
-               Display.getCurrent().getActiveShell(),
-               Messages.Tour_Editor_Dialog_DeleteSwimTimeSlices_Title,
-               Messages.Tour_Editor_Dialog_DeleteSwimTimeSlices_Message);
-         return;
-      }
-
       if (isRowSelectionMode() == false) {
          return;
       }
