@@ -268,6 +268,19 @@ public class Messages extends NLS {
    public static String        Dialog_DoubleClickAction_NoAction_Message;
    public static String        Dialog_DoubleClickAction_NoAction_Title;
 
+   public static String        Dialog_Edit_Timeslices_Values_Title;
+   public static String        Dialog_Edit_Timeslices_Values_Area_Title;
+   public static String        Dialog_Edit_Checkbox_NewValues;
+   public static String        Dialog_Edit_Checkbox_OffsetValues;
+   public static String        Dialog_Edit_Label_Altitude;
+   public static String        Dialog_Edit_Label_Pulse;
+   public static String        Dialog_Edit_Label_Cadence;
+   public static String        Dialog_Edit_Label_Temperature;
+   public static String        Dialog_Edit_Label_Altitude_Tooltip;
+   public static String        Dialog_Edit_Label_Pulse_Tooltip;
+   public static String        Dialog_Edit_Label_Cadence_Tooltip;
+   public static String        Dialog_Edit_Label_Temperature_Tooltip;
+
    public static String        Dialog_Export_Checkbox_Description;
    public static String        Dialog_Export_Checkbox_SurfingWaves;
    public static String        Dialog_Export_Checkbox_SurfingWaves_Tooltip;
@@ -2847,6 +2860,7 @@ public class Messages extends NLS {
 
    public static String TourEditor_Action_ComputeDistanceValuesFromGeoPosition;
    public static String TourEditor_Action_DeleteDistanceValues;
+   public static String TourEditor_Action_EditTimeSlicesValues;
    public static String TourEditor_Action_RemoveSwimStyle;
    public static String TourEditor_Action_SetAltitudeValuesFromSRTM;
    public static String TourEditor_Action_SetStartDistanceTo0;

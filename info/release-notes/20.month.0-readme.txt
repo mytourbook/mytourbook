@@ -8,7 +8,6 @@ TODO's
   - Update contributor/translator list
   - Show cheatsheet
   - Wrong text: The comparison is done by altitude, comparing by geo position is not yet supported.
- 
 
 Bugs
 ----
