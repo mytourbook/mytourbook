@@ -6089,6 +6089,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _actionSetStartDistanceTo_0.setEnabled(isCellEditorInactive && isNotManualTour && canEdit && isDistanceLargerThan0);
       _actionDeleteDistanceValues.setEnabled(isCellEditorInactive && isNotManualTour && canEdit && isDistanceAvailable);
       _actionComputeDistanceValues.setEnabled(isCellEditorInactive && isNotManualTour && canEdit && isGeoAvailable);
+
+      _actionEditTimeSlicesValues.setEnabled(isCellEditorInactive && canEdit);
    }
 
    private void enableActions_SwimSlices() {
