@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,11 @@
  *******************************************************************************/
 package net.tourbook.photo;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.RemovalCause;
+import com.github.benmanes.caffeine.cache.RemovalListener;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.Callable;
@@ -25,113 +30,110 @@ import net.tourbook.common.UI;
 
 import org.eclipse.core.runtime.ListenerList;
 
-import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
-import com.googlecode.concurrentlinkedhashmap.EvictionListener;
-
 /**
  * This cache is caching ALL photos.
  */
 public class PhotoCache {
 
-	private static final int								MAX_CACHE_SIZE		= 50000;
+   private static final int                                  MAX_CACHE_SIZE     = 50000;
 
-	private static ConcurrentLinkedHashMap<String, Photo>	_cache;
+   private static Cache<String, Photo>                       _cache;
 
-	private static final ListenerList						_evictionListeners	= new ListenerList(
-																						ListenerList.IDENTITY);
+   private static final ListenerList<IPhotoEvictionListener> _evictionListeners = new ListenerList<>(
+         ListenerList.IDENTITY);
 
-	static {
+   static {
 
-		final EvictionListener<String, Photo> evictionListener = new EvictionListener<String, Photo>() {
+      final RemovalListener<String, Photo> removalListener = new RemovalListener<String, Photo>() {
 
-			final ExecutorService	executor	= Executors.newSingleThreadExecutor();
+         final ExecutorService executor = Executors.newSingleThreadExecutor();
 
-			@Override
-			public void onEviction(final String fileName, final Photo photo) {
+         @Override
+         public void onRemoval(final String fileName, final Photo photo, final RemovalCause removalCause) {
 
-				executor.submit(new Callable<Void>() {
-					@Override
-					public Void call() throws IOException {
+            executor.submit(new Callable<Void>() {
+               @Override
+               public Void call() throws IOException {
 
-						final Object[] allListeners = _evictionListeners.getListeners();
-						for (final Object listener : allListeners) {
-							((IPhotoEvictionListener) listener).evictedPhoto(photo);
-						}
+                  final Object[] allListeners = _evictionListeners.getListeners();
+                  for (final Object listener : allListeners) {
+                     ((IPhotoEvictionListener) listener).evictedPhoto(photo);
+                  }
 
-						return null;
-					}
-				});
-			}
-		};
+                  return null;
+               }
+            });
+         }
+      };
 
-		_cache = new ConcurrentLinkedHashMap.Builder<String, Photo>()
-				.maximumWeightedCapacity(MAX_CACHE_SIZE)
-				.listener(evictionListener)
-				.build();
-	}
+      _cache = Caffeine.newBuilder()
+            .maximumWeight(MAX_CACHE_SIZE)
+            .removalListener(removalListener)
+            .build();
+   }
 
-	public static void addEvictionListener(final IPhotoEvictionListener listener) {
-		_evictionListeners.add(listener);
-	}
+   public static void addEvictionListener(final IPhotoEvictionListener listener) {
+      _evictionListeners.add(listener);
+   }
 
-	public static void dumpAllPhotos() {
+   public static void dumpAllPhotos() {
 
-		System.out.println(UI.timeStampNano() + " PhotoCache\t"); //$NON-NLS-1$
+      System.out.println(UI.timeStampNano() + " PhotoCache\t"); //$NON-NLS-1$
 
-		for (final Photo photo : _cache.values()) {
+      for (final Photo photo : _cache.asMap().values()) {
 
-			System.out.println(UI.timeStampNano() + " \t" + photo.imageFilePathName + ("\t")); //$NON-NLS-1$ //$NON-NLS-2$
+         System.out.println(UI.timeStampNano() + " \t" + photo.imageFilePathName + ("\t")); //$NON-NLS-1$ //$NON-NLS-2$
 
-			photo.dumpTourReferences();
-		}
-	}
+         photo.dumpTourReferences();
+      }
+   }
 
-	public static Photo getPhoto(final String imageFilePathName) {
-		return _cache.get(imageFilePathName);
-	}
+   public static Photo getPhoto(final String imageFilePathName) {
+      return _cache.getIfPresent(imageFilePathName);
+   }
 
-	public static void removeEvictionListener(final IPhotoEvictionListener listener) {
-		if (listener != null) {
-			_evictionListeners.remove(listener);
-		}
-	}
+   public static void removeEvictionListener(final IPhotoEvictionListener listener) {
+      if (listener != null) {
+         _evictionListeners.remove(listener);
+      }
+   }
 
-	public static synchronized void removePhotosFromFolder(final String folderName) {
+   public static synchronized void removePhotosFromFolder(final String folderName) {
 
-		for (final Photo photo : _cache.values()) {
+      for (final Photo photo : _cache.asMap().values()) {
 
-			if (photo.imagePathName.equals(folderName)) {
-				_cache.remove(photo.imageFilePathName);
-			}
-		}
-	}
+         if (photo.imagePathName.equals(folderName)) {
+            _cache.invalidate(photo.imageFilePathName);
+         }
+      }
+   }
 
-	public static synchronized void replaceImageFile(final ArrayList<ImagePathReplacement> replacedImages) {
+   public static synchronized void replaceImageFile(final ArrayList<ImagePathReplacement> replacedImages) {
 
-		for (final ImagePathReplacement replacedImage : replacedImages) {
+      for (final ImagePathReplacement replacedImage : replacedImages) {
 
-			final Photo cachedPhoto = _cache.remove(replacedImage.oldImageFilePathName);
+         final Photo cachedPhoto = _cache.asMap().remove(replacedImage.oldImageFilePathName);
 
-			if (cachedPhoto != null) {
+         if (cachedPhoto != null) {
 
-				// update image file path
+            // update image file path
 
-				// reset loading state to force a reload of the image in the gallery
-				cachedPhoto.replaceImageFile(replacedImage.newImageFilePathName);
+            // reset loading state to force a reload of the image in the gallery
+            cachedPhoto.replaceImageFile(replacedImage.newImageFilePathName);
 
-				// set photo with new file path name
-				setPhoto(cachedPhoto);
-			}
-		}
-	}
+            // set photo with new file path name
+            setPhoto(cachedPhoto);
+         }
+      }
+   }
 
-	/**
-	 * Keep photo in the photo cache.
-	 * 
-	 * @param photo
-	 */
-	public static void setPhoto(final Photo photo) {
-		_cache.put(photo.imageFilePathName, photo);
-	}
+   /**
+    * Keep photo in the photo cache.
+    *
+    * @param photo
+    */
+   public static void setPhoto(final Photo photo) {
+      _cache.put(photo.imageFilePathName, photo);
+   }
 
 }
