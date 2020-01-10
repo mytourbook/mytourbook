@@ -38,6 +38,7 @@ Changes
 
 * Tour Editor (Frederic)
   - Added the ability to retrieve the weather data by clicking on the weather description label
+  - Added a Time slices editor window to offer the ability to efficiently edit specific values of Altitude/Pulse/Cadence/Temperature. Those values can be quickly found thanks to the added ability to sort those columns in ascending/descending order.
  
 Fixes   
 =====
