@@ -21,6 +21,8 @@ TODO's
            at net.tourbook.importdata.RawDataManager.importRawData(RawDataManager.java:1422)
            at net.tourbook.importdata.RawDataManager$7.run(RawDataManager.java:1936)
            at org.eclipse.jface.operation.ModalContext$ModalContextThread.run(ModalContext.java:122)  
+           
+  - Calendar view: Show average pulse/power in day/week values, this is helpful for ergometer
  
 
 Bugs
