@@ -8,6 +8,22 @@ TODO's
   - Update contributor/translator list
   - Show cheatsheet
   - Wrong text: The comparison is done by altitude, comparing by geo position is not yet supported.
+  
+  - This error occured when importing propably an "empty" fit file
+      java.lang.NullPointerException
+           at net.tourbook.device.garmin.fit.FitData.finalizeTour_Marker(FitData.java:296)
+           at net.tourbook.device.garmin.fit.FitData.finalizeTour(FitData.java:193)
+           at net.tourbook.device.garmin.fit.FitDataReader.processDeviceData(FitDataReader.java:600)
+           at net.tourbook.importdata.RawDataManager.importRawData_10(RawDataManager.java:1602)
+           at net.tourbook.importdata.RawDataManager.access$8(RawDataManager.java:1552)
+           at net.tourbook.importdata.RawDataManager$5.run(RawDataManager.java:1465)
+           at org.eclipse.swt.custom.BusyIndicator.showWhile(BusyIndicator.java:55)
+           at net.tourbook.importdata.RawDataManager.importRawData(RawDataManager.java:1422)
+           at net.tourbook.importdata.RawDataManager$7.run(RawDataManager.java:1936)
+           at org.eclipse.jface.operation.ModalContext$ModalContextThread.run(ModalContext.java:122)  
+           
+  - Calendar view: Show average pulse/power in day/week values, this is helpful for ergometer
+ 
 
 Bugs
 ----
