@@ -68,6 +68,7 @@ Fixes
   
 * Tour Import
   - GPX: Fixed NPE when importing MyTourbook export files
+  - FIT: Fixed NPE when importing files with developer fields that are null
 
 * Tour Export
   - GPX: <mt:bikerWeight> value was wrong
