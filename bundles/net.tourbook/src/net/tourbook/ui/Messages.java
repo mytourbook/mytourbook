@@ -210,6 +210,10 @@ public class Messages extends NLS {
    public static String        ColumnFactory_DPTolerance_Header;
    public static String        ColumnFactory_DPTolerance_Label;
    public static String        ColumnFactory_DPTolerance_Tooltip;
+   public static String        ColumnFactory_ElevationGainDelta_Label;
+   public static String        ColumnFactory_ElevationLossDelta_Label;
+   public static String        ColumnFactory_ElevationGainDelta_Tooltip;
+   public static String        ColumnFactory_ElevationLossDelta_Tooltip;
    public static String        ColumnFactory_GearFrontShiftCount_Header;
    public static String        ColumnFactory_GearFrontShiftCount_Label;
    public static String        ColumnFactory_GearFrontShiftCount_Tooltip;
@@ -249,6 +253,8 @@ public class Messages extends NLS {
    public static String        ColumnFactory_NumberOfTours_Header;
    public static String        ColumnFactory_NumberOfTours_Label;
    public static String        ColumnFactory_NumberOfTours_Tooltip;
+   public static String        ColumnFactory_PaceDelta_Label;
+   public static String        ColumnFactory_PaceDelta_Tooltip;
    public static String        ColumnFactory_PhotoTimeAdjustment_Header;
    public static String        ColumnFactory_PhotoTimeAdjustment_Label;
    public static String        ColumnFactory_PhotoTimeAdjustment_Tooltip;

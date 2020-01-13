@@ -40,6 +40,10 @@ Views
   
   Time spent in "slow" vs "fast" cadence zones
 
+* Tour Marker (Frederic)
+  
+  Added the following columns : Elevation Gain Difference, Elevation Loss Difference, Pace Difference
+
 Import
 ======
 
