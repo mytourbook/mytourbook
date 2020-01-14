@@ -2,20 +2,20 @@ Manifest-Version: 1.0
 Bundle-ClassPath: libs/vtm-desktop-lwjgl.jar,libs/vtm-desktop.jar,libs
  /vtm-gdx.jar,libs/vtm-http.jar,libs/vtm-mvt.jar,libs/vtm-themes.jar,l
  ibs/vtm.jar,libs/slf4j-simple-1.7.25.jar,libs/logging-interceptor-3.1
- 4.1.jar,libs/mapbox-vector-tile-3.1.0.jar,libs/slf4j-api-1.7.25.jar,l
- ibs/svgSalamander-v1.1.1.jar,libs/gdx-backend-lwjgl-1.9.9.jar,libs/gd
- x-1.9.9.jar,libs/okhttp-3.14.1.jar,libs/ant-1.8.1.jar,libs/lwjgl_util
- -2.9.2.jar,libs/lwjgl-2.9.2.jar,libs/jlayer-1.0.1-gdx.jar,libs/jorbis
- -0.0.17.jar,libs/protobuf-java-3.5.1.jar,libs/jts-core-1.15.1.jar,lib
- s/okio-1.17.2.jar,libs/ant-launcher-1.8.1.jar,libs/jinput-2.0.5.jar,l
- ibs/jutils-1.0.0.jar,libs/,resources/
+ 4.1.jar,libs/mapbox-vector-tile-3.1.0.jar,libs/slf4j-api-1.7.28.jar,l
+ ibs/svgSalamander-v1.1.1.jar,libs/gdx-backend-lwjgl-1.9.10.jar,libs/g
+ dx-1.9.10.jar,libs/okhttp-3.14.1.jar,libs/ant-1.8.1.jar,libs/lwjgl_ut
+ il-2.9.3.jar,libs/lwjgl-2.9.3.jar,libs/jlayer-1.0.1-gdx.jar,libs/jorb
+ is-0.0.17.jar,libs/protobuf-java-3.5.1.jar,libs/jts-core-1.15.1.jar,l
+ ibs/okio-1.17.2.jar,libs/ant-launcher-1.8.1.jar,libs/jinput-2.0.5.jar
+ ,libs/jutils-1.0.0.jar,libs/,resources/
 Bundle-License: http://www.apache.org/licenses/LICENSE-2.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Vector map from Mapsforge
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-SymbolicName: net.tourbook.ext.vtm
 Bundle-Vendor: MyTourbook
-Bundle-Version: 19.10.0.v20200103-0718
+Bundle-Version: 19.10.0.v20200114-1337
 Export-Package: assets.patterns;version="19.10.0",assets.shaders;versi
  on="19.10.0",assets.symbols;version="19.10.0",assets.symbols.accommod
  ation;version="19.10.0",assets.symbols.amenity;version="19.10.0",asse
@@ -191,7 +191,7 @@ Export-Package: assets.patterns;version="19.10.0",assets.shaders;versi
  .oscim.utils.async;version="19.10.0",org.oscim.utils.geom;version="19
  .10.0",org.oscim.utils.math;version="19.10.0",org.oscim.utils.pool;ve
  rsion="19.10.0",org.oscim.utils.quadtree;version="19.10.0",org.slf4j;
- version="1.7.25",org.slf4j.event;version="1.7.25",org.slf4j.helpers;v
- ersion="1.7.25",org.slf4j.impl;version="1.7.25",org.slf4j.spi;version
- ="1.7.25",res.help.about;version="19.10.0",res.icons;version="19.10.0
+ version="1.7.28",org.slf4j.event;version="1.7.28",org.slf4j.helpers;v
+ ersion="1.7.28",org.slf4j.impl;version="1.7.25",org.slf4j.spi;version
+ ="1.7.28",res.help.about;version="19.10.0",res.icons;version="19.10.0
  ",xml;version="19.10.0"
