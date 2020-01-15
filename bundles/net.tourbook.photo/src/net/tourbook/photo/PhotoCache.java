@@ -67,7 +67,7 @@ public class PhotoCache {
       };
 
       _cache = Caffeine.newBuilder()
-            .maximumWeight(MAX_CACHE_SIZE)
+            .maximumSize(MAX_CACHE_SIZE)
             .removalListener(removalListener)
             .build();
    }

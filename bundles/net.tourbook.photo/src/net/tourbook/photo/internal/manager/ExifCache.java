@@ -33,7 +33,7 @@ public class ExifCache {
    static {
 
       _exifCache = Caffeine.newBuilder()
-            .maximumWeight(20000)
+            .maximumSize(20000)
             .build();
    }
 
