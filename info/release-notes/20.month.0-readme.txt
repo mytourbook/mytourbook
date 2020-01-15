@@ -86,6 +86,9 @@ Fixes
 
 * Tour Editor (Frederic)
   - Fixed a bug when editing time slices. After editing a cell and saving a tour, an edited cell would not be updated with a new value
+
+* Photos (Frederic)
+  - Fixed NPE when no folder is selected and a filter is applied
   
    
 Translation    
