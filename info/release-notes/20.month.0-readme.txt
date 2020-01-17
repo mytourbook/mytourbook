@@ -6,7 +6,7 @@ TODO's
 
 * Website
   - Update contributor/translator list
-  - Show cheatsheet
+  - Show cheatsheet (once the release number is known, update the cheatsheet to show the release number)
   - Wrong text: The comparison is done by altitude, comparing by geo position is not yet supported.
   
   - This error occured when importing propably an "empty" fit file
@@ -44,6 +44,14 @@ Views
   
   Added the following columns : Elevation Gain Difference, Elevation Loss Difference, Pace Difference
 
+* Compare Result (Frederic)
+  - Added the ability, in the Views Preference Page to show/hide the tour tooltip in the Tour Compare Result View
+ 
+* Tour Editor (Frederic)
+  - Added the ability to retrieve the weather data by clicking on the weather description label
+  - Added a Time slices editor window to offer the ability to efficiently edit specific values of Altitude/Pulse/Cadence/Temperature. Those values can be quickly found thanks to the added ability to sort those columns in ascending/descending order.
+
+
 Import
 ======
 
@@ -56,10 +64,7 @@ Changes
   - GPX: Set default to absolute distance that the defaults for export/import are the same
   - FIT: Starting marker label from 1 instead of 0
 
-* Tour Editor (Frederic)
-  - Added the ability to retrieve the weather data by clicking on the weather description label
-  - Added a Time slices editor window to offer the ability to efficiently edit specific values of Altitude/Pulse/Cadence/Temperature. Those values can be quickly found thanks to the added ability to sort those columns in ascending/descending order.
- 
+
 Fixes   
 =====
 
