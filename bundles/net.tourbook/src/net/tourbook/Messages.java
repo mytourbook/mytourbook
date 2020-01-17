@@ -1844,7 +1844,9 @@ public class Messages extends NLS {
    public static String PrefPage_ViewTooltip_Label_Tags;
    public static String PrefPage_ViewTooltip_Label_Time;
    public static String PrefPage_ViewTooltip_Label_Title;
+   public static String PrefPage_ViewTooltip_Label_Tour;
    public static String PrefPage_ViewTooltip_Label_TourBook;
+   public static String PrefPage_ViewTooltip_Label_CompareResult;
    public static String PrefPage_ViewTooltip_Label_WeekDay;
 
    public static String PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_down;
