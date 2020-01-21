@@ -608,9 +608,13 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
             final AltitudeUpDown elevationGainLoss = _tourData.computeAltitudeUpDown(previousMarkerIndex, currentMarkerIndex);
 
-            final double value = elevationGainLoss.getAltitudeUp() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+            if (elevationGainLoss == null) {
+               cell.setText(UI.EMPTY_STRING);
+            } else {
 
-            colDef.printValue_0(cell, value);
+               final double value = elevationGainLoss.getAltitudeUp() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+               colDef.printValue_0(cell, value);
+            }
          }
       });
 
@@ -641,9 +645,14 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
                   previousMarkerIndex,
                   currentMarkerIndex);
 
-            final double value = elevationGainLoss.getAltitudeDown() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+            if (elevationGainLoss == null) {
+               cell.setText(UI.EMPTY_STRING);
+            } else {
 
-            colDef.printValue_0(cell, value);
+               final double value = elevationGainLoss.getAltitudeDown() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+
+               colDef.printValue_0(cell, value);
+            }
          }
       });
 
@@ -831,7 +840,11 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
             final double[] seriePaceDouble = IntStream.range(previousMarkerIndex, currentMarkerIndex).mapToDouble(i -> seriePace[i]).toArray();
             final OptionalDouble averagePace = Arrays.stream(seriePaceDouble).average();
 
-            cell.setText(UI.format_mm_ss((long) averagePace.getAsDouble()));
+            if (averagePace.isPresent() == false) {
+               cell.setText(UI.EMPTY_STRING);
+            } else {
+               cell.setText(UI.format_mm_ss((long) averagePace.getAsDouble()));
+            }
          }
       });
    }

@@ -2475,7 +2475,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       // check if all necessary data are available
       if (altitudeSerie == null || altitudeSerie.length < 2 ||
-            startIndex > altitudeSerie.length || endIndex >= altitudeSerie.length) {
+            startIndex > altitudeSerie.length || endIndex >= altitudeSerie.length ||
+            startIndex >= endIndex) {
          return null;
       }
 
