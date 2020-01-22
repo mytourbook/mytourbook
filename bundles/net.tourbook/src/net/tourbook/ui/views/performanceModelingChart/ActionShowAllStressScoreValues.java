@@ -13,15 +13,30 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.weather;
+package net.tourbook.ui.views.performanceModelingChart;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.ui.UI;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class WWOValuesResults {
-   private String value;
+import org.eclipse.jface.action.Action;
 
-   public String getValue() {
-      return value;
+public class ActionShowAllStressScoreValues extends Action {
+
+   private PerformanceModelingChartView _performanceModelingChartView;
+
+   public ActionShowAllStressScoreValues(final PerformanceModelingChartView performanceModelingChartView) {
+
+      super(UI.EMPTY_STRING, AS_CHECK_BOX);
+
+      setToolTipText(Messages.Training_View_Action_ShowAllPulseValues);
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__ZoomFitGraph));
+
+      _performanceModelingChartView = performanceModelingChartView;
+   }
+
+   @Override
+   public void run() {
+      _performanceModelingChartView.actionShowAllStressScoreValues();
    }
 }

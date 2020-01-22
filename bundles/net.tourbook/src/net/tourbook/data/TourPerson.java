@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -33,9 +34,13 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Transient;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.database.PersonManager;
@@ -46,549 +51,673 @@ import net.tourbook.ui.UI;
 import org.hibernate.annotations.Cascade;
 
 @Entity
-public class TourPerson implements Comparable<Object> {
-
-	public static final ZonedDateTime		DEFAULT_BIRTHDAY			= ZonedDateTime.of(
-																				1977,
-																				7,
-																				7,
-																				0,
-																				0,
-																				0,
-																				0,
-																				TimeTools.getDefaultTimeZone());
-	public static final int					DB_LENGTH_LAST_NAME			= 80;
-	public static final int					DB_LENGTH_FIRST_NAME		= 80;
-	public static final int					DB_LENGTH_RAW_DATA_PATH		= 255;
-	public static final int					DB_LENGTH_DEVICE_READER_ID	= 255;
-
-	public static final int					PERSON_ID_NOT_DEFINED		= -1;
-
-	/**
-	 * Default rest pulse
-	 */
-	public static final int					DEFAULT_REST_PULSE			= 60;
-
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long							personId					= PERSON_ID_NOT_DEFINED;
-
-	@Basic(optional = false)
-	private String							firstName;
-
-	private String							lastName;
-
-	private float							weight;
-
-	private float							height;
-
-	/**
-	 * Birthday of this person in milliseconds from 1970-01-01T00:00:00, default value is 0 when
-	 * birthday is not set.
-	 * <p>
-	 * since: db version 15
-	 */
-	private long							birthDay;
-
-	/**
-	 * Gender: Male = 0, Female = 1
-	 * <p>
-	 * since: db version 16
-	 */
-	private int								gender;
-
-	/**
-	 * Resting heart rate
-	 * <p>
-	 * since: db version 16
-	 */
-	private int								restPulse;
-
-	/**
-	 * Max heart rate, when {@link #hrMaxFormula} is not computed
-	 * <p>
-	 * since: db version 16
-	 */
-	private int								maxPulse;
-
-	/**
-	 * Formula how max heart rate is computed. The formulas are defined in
-	 * {@link TrainingManager#HRMaxFormulaNames} and {@link TrainingManager#HRMaxFormulaKeys}
-	 * <p>
-	 * Default is 0 which is 220-age
-	 * <p>
-	 * since: db version 16
-	 */
-	private int								hrMaxFormula;
-
-	/**
-	 * Device used by this person, reference to the device plugin
-	 */
-	private String							deviceReaderId;
-
-	/**
-	 * path where the raw tour data will be saved after import
-	 */
-	private String							rawDataPath;
-
-	/**
-	 * default bike being used by this person
-	 */
-	@ManyToOne
-	private TourBike						tourBike;
-
-	/**
-	 * Tour hr zones
-	 */
-	@OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourPerson")
-	@Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-	private Set<TourPersonHRZone>			hrZones						= new HashSet<TourPersonHRZone>();
-
-	/**
-	 * manually created person creates a unique id to identify it, saved person is compared with the
-	 * person id
-	 */
-	private static int						_createCounter				= 0;
+public class TourPerson implements Comparable<Object>, ChangeListener {
+
+   public static final ZonedDateTime       DEFAULT_BIRTHDAY                      = ZonedDateTime.of(
+         1977,
+         7,
+         7,
+         0,
+         0,
+         0,
+         0,
+         TimeTools.getDefaultTimeZone());
+   public static final int                 DB_LENGTH_LAST_NAME                   = 80;
+   public static final int                 DB_LENGTH_FIRST_NAME                  = 80;
+   public static final int                 DB_LENGTH_RAW_DATA_PATH               = 255;
+   public static final int                 DB_LENGTH_DEVICE_READER_ID            = 255;
+   public static final int                 DB_LENGTH_GOVSS_ASSOCIATED_TOUR_TYPES = 255;
+
+   public static final int                 PERSON_ID_NOT_DEFINED                 = -1;
+
+   /**
+    * Default rest pulse
+    */
+   public static final int                 DEFAULT_REST_PULSE                    = 60;
+
+   /**
+    * manually created person creates a unique id to identify it, saved person is compared with the
+    * person id
+    */
+   private static int                      _createCounter                        = 0;
+
+   @Id
+   @GeneratedValue(strategy = GenerationType.IDENTITY)
+   private long                            personId                              = PERSON_ID_NOT_DEFINED;
+
+   @Basic(optional = false)
+   private String                          firstName;
+
+   private String                          lastName;
+
+   private float                           weight;
+
+   private float                           height;
+
+   /**
+    * Person which created this tour or <code>null</code> when the tour is not saved in the
+    * database.
+    * <p>
+    * SQL access to this field:
+    *
+    * <pre>
+    * tourPerson_personId
+    * </pre>
+    */
+   @OneToOne(targetEntity = PerformanceModelingData.class, cascade = CascadeType.ALL)
+   @JoinColumn(name = "PerformanceModelingDataId")
+   private PerformanceModelingData         performanceModelingData;
+
+   /**
+    * Training Stress data
+    */
+
+   // GOVSS
+   private int                             govssThresholdPower;
+
+   private int                             govssTimeTrialDuration;
+   private int                             govssTimeTrialDistance;
+   private float                           govssTimeTrialAverageSlope;
+   private String                          govssAssociatedTourTypes;
+   /**
+    * Birthday of this person in milliseconds from 1970-01-01T00:00:00, default value is 0 when
+    * birthday is not set.
+    * <p>
+    * since: db version 15
+    */
+   private long                            birthDay;
+
+   /**
+    * Gender: Male = 0, Female = 1
+    * <p>
+    * since: db version 16
+    */
+   private int                             gender;
+
+   /**
+    * Resting heart rate
+    * <p>
+    * since: db version 16
+    */
+   private int                             restPulse;
+
+   /**
+    * Max heart rate, when {@link #hrMaxFormula} is not computed
+    * <p>
+    * since: db version 16
+    */
+   private int                             maxPulse;
+
+   /**
+    * Formula how max heart rate is computed. The formulas are defined in
+    * {@link TrainingManager#HRMaxFormulaNames} and {@link TrainingManager#HRMaxFormulaKeys}
+    * <p>
+    * Default is 0 which is 220-age
+    * <p>
+    * since: db version 16
+    */
+   private int                             hrMaxFormula;
+
+   /**
+    * Device used by this person, reference to the device plugin
+    */
+   private String                          deviceReaderId;
+
+   /**
+    * path where the raw tour data will be saved after import
+    */
+   private String                          rawDataPath;
 
-	/**
-	 * unique id for manually created person because the {@link #personId} is
-	 * {@value #PERSON_ID_NOT_DEFINED} when it's not persisted
-	 */
-	@Transient
-	private long							_createId					= 0;
+   /**
+    * default bike being used by this person
+    */
+   @ManyToOne
+   private TourBike                        tourBike;
 
-	@Transient
-	private ZonedDateTime					_zonedBirthDay;
+   /**
+    * Tour hr zones
+    */
+   @OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourPerson")
+   @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
+   private Set<TourPersonHRZone>           hrZones                               = new HashSet<>();
 
-	/**
-	 * Cached HR zones, key is the age of the person
-	 */
-	@Transient
-	private HashMap<Integer, HrZoneContext>	_hrZoneMinMaxBpm			= new HashMap<Integer, HrZoneContext>();
+   /**
+    * unique id for manually created person because the {@link #personId} is
+    * {@value #PERSON_ID_NOT_DEFINED} when it's not persisted
+    */
+   @Transient
+   private long                            _createId                             = 0;
 
-	/**
-	 * Sorted HR zones
-	 */
-	@Transient
-	private ArrayList<TourPersonHRZone>		_sortedHrZones;
+   @Transient
+   private ZonedDateTime                   _zonedBirthDay;
 
-	/**
-	 * default constructor used in ejb
-	 */
-	public TourPerson() {}
+   /**
+    * Cached HR zones, key is the age of the person
+    */
+   @Transient
+   private HashMap<Integer, HrZoneContext> _hrZoneMinMaxBpm                      = new HashMap<>();
 
-	public TourPerson(final String firstName, final String lastName) {
+   /**
+    * Sorted HR zones
+    */
+   @Transient
+   private ArrayList<TourPersonHRZone>     _sortedHrZones;
 
-		_createId = ++_createCounter;
+   @Transient
+   private ChangeListener                  _changeListener;
 
-		this.firstName = firstName;
-		this.lastName = lastName;
-	}
+   /**
+    * default constructor used in ejb
+    */
+   public TourPerson() {}
 
-	/**
-	 * @return Returns HR max depending on the HR max formula.
-	 * @param hrMaxFormulaKey
-	 * @param maxPulse
-	 * @param age
-	 */
-	public static int getHrMax(int hrMaxFormulaKey, final int maxPulse, final int age) {
+   public TourPerson(final String firstName, final String lastName) {
 
-		if (hrMaxFormulaKey == TrainingManager.HR_MAX_NOT_COMPUTED) {
+      _createId = ++_createCounter;
 
-			// hr max is not computed
+      this.firstName = firstName;
+      this.lastName = lastName;
+      this.performanceModelingData = new PerformanceModelingData();
+   }
 
-			return maxPulse;
+   /**
+    * @return Returns HR max depending on the HR max formula.
+    * @param hrMaxFormulaKey
+    * @param maxPulse
+    * @param age
+    */
+   public static int getHrMax(int hrMaxFormulaKey, final int maxPulse, final int age) {
 
-		} else {
+      if (hrMaxFormulaKey == TrainingManager.HR_MAX_NOT_COMPUTED) {
 
-			int keyIndex = -1;
-			for (final int formulaKey : TrainingManager.HRMaxFormulaKeys) {
-				if (formulaKey == hrMaxFormulaKey) {
-					keyIndex = hrMaxFormulaKey;
-					break;
-				}
-			}
+         // hr max is not computed
 
-			if (keyIndex == -1) {
-				// key not found, use default value
-				hrMaxFormulaKey = TrainingManager.HR_MAX_FORMULA_220_AGE;
-			}
+         return maxPulse;
 
-			if (hrMaxFormulaKey == TrainingManager.HR_MAX_FORMULA_220_AGE) {
+      } else {
 
-				// HRmax = 220 - age
+         int keyIndex = -1;
+         for (final int formulaKey : TrainingManager.HRMaxFormulaKeys) {
+            if (formulaKey == hrMaxFormulaKey) {
+               keyIndex = hrMaxFormulaKey;
+               break;
+            }
+         }
 
-				return 220 - age;
+         if (keyIndex == -1) {
+            // key not found, use default value
+            hrMaxFormulaKey = TrainingManager.HR_MAX_FORMULA_220_AGE;
+         }
 
-			} else if (hrMaxFormulaKey == TrainingManager.HR_MAX_FORMULA_205_8) {
+         if (hrMaxFormulaKey == TrainingManager.HR_MAX_FORMULA_220_AGE) {
 
-				// HRmax = 205.8 - (0.685 x age)
+            // HRmax = 220 - age
 
-				return (int) (205.8 - (0.685 * age));
+            return 220 - age;
 
-			} else if (hrMaxFormulaKey == TrainingManager.HR_MAX_FORMULA_206_9) {
+         } else if (hrMaxFormulaKey == TrainingManager.HR_MAX_FORMULA_205_8) {
 
-				//  HRmax = 206.9 - (0.67 x age)
+            // HRmax = 205.8 - (0.685 x age)
 
-				return (int) (206.9 - (0.67 * age));
+            return (int) (205.8 - (0.685 * age));
 
-			} else if (hrMaxFormulaKey == TrainingManager.HR_MAX_FORMULA_191_5) {
+         } else if (hrMaxFormulaKey == TrainingManager.HR_MAX_FORMULA_206_9) {
 
-				//  HRmax = 191.5 - (0.007 x age2)
+            //  HRmax = 206.9 - (0.67 x age)
 
-				return (int) (191.5 - (0.007 * age * age));
-			}
+            return (int) (206.9 - (0.67 * age));
 
-			// return default, this case should never happen
-			return 220 - age;
-		}
-	}
+         } else if (hrMaxFormulaKey == TrainingManager.HR_MAX_FORMULA_191_5) {
 
-	@Override
-	public int compareTo(final Object o) {
+            //  HRmax = 191.5 - (0.007 x age2)
 
-		// compare by last + first name
+            return (int) (191.5 - (0.007 * age * age));
+         }
 
-		if (o instanceof TourPerson) {
+         // return default, this case should never happen
+         return 220 - age;
+      }
+   }
 
-			final TourPerson otherPerson = (TourPerson) o;
+   public void addChangeListener(final ChangeListener listener) {
+      _changeListener = listener;
+   }
 
-			final int compareLastName = lastName.compareTo(otherPerson.getLastName());
+   public void addOrUpdateGovssEntry(final long tourStartTime, final long tourId) {
+      if (performanceModelingData == null) {
+         performanceModelingData = new PerformanceModelingData();
+      }
 
-			if (compareLastName != 0) {
-				return compareLastName;
-			}
+      performanceModelingData.setGovss(tourStartTime, tourId);
+      performanceModelingData.persist();
+      persist();
+   }
 
-			return firstName.compareTo(otherPerson.getFirstName());
+   @Override
+   public int compareTo(final Object o) {
 
-		}
+      // compare by last + first name
 
-		return 0;
-	}
+      if (o instanceof TourPerson) {
 
-	@Override
-	public boolean equals(final Object obj) {
+         final TourPerson otherPerson = (TourPerson) o;
 
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (!(obj instanceof TourPerson)) {
-			return false;
-		}
+         final int compareLastName = lastName.compareTo(otherPerson.getLastName());
 
-		final TourPerson other = (TourPerson) obj;
+         if (compareLastName != 0) {
+            return compareLastName;
+         }
 
-		if (_createId == 0) {
+         return firstName.compareTo(otherPerson.getFirstName());
 
-			// person is from the database
-			if (personId != other.personId) {
-				return false;
-			}
-		} else {
+      }
 
-			// person was create
-			if (_createId != other._createId) {
-				return false;
-			}
-		}
+      return 0;
+   }
 
-		return true;
-	}
+   public void computePerformanceModelingData() {
+      if (performanceModelingData == null) {
+         return;
+      }
 
-	/**
-	 * @param dateTime
-	 * @return Returns age for this person at a specific day
-	 */
-	private int getAge(final ZonedDateTime zonedBirthDay, final ZonedDateTime dateTime) {
+      performanceModelingData.computeFitnessValues();
+      performanceModelingData.computeFatigueValues();
+   }
 
-		final Period age = Period.between(zonedBirthDay.toLocalDate(), dateTime.toLocalDate());
+   @Override
+   public boolean equals(final Object obj) {
 
-		return age.getYears();
-	}
+      if (this == obj) {
+         return true;
+      }
+      if (obj == null) {
+         return false;
+      }
+      if (!(obj instanceof TourPerson)) {
+         return false;
+      }
 
-	/**
-	 * @return Returns birthday of this person in milliseconds from 1970-01-01T00:00:00, is 0 when
-	 *         birthday is not set.
-	 */
-	public long getBirthDay() {
-		return birthDay;
-	}
+      final TourPerson other = (TourPerson) obj;
 
-	public ZonedDateTime getBirthDayWithDefault() {
+      if (_createId == 0) {
 
-		if (_zonedBirthDay == null) {
+         // person is from the database
+         if (personId != other.personId) {
+            return false;
+         }
+      } else {
 
-			if (birthDay == 0) {
+         // person was creates
+         if (_createId != other._createId) {
+            return false;
+         }
+      }
 
-				_zonedBirthDay = DEFAULT_BIRTHDAY;
+      return true;
+   }
 
-			} else {
+   /**
+    * @param dateTime
+    * @return Returns age for this person at a specific day
+    */
+   private int getAge(final ZonedDateTime zonedBirthDay, final ZonedDateTime dateTime) {
 
-				_zonedBirthDay = TimeTools.getZonedDateTime(birthDay);
-			}
-		}
+      final Period age = Period.between(zonedBirthDay.toLocalDate(), dateTime.toLocalDate());
 
-		return _zonedBirthDay;
-	}
+      return age.getYears();
+   }
 
-	public String getDeviceReaderId() {
-		return deviceReaderId;
-	}
+   /**
+    * @return Returns birthday of this person in milliseconds from 1970-01-01T00:00:00, is 0 when
+    *         birthday is not set.
+    */
+   public long getBirthDay() {
+      return birthDay;
+   }
 
-	public String getFirstName() {
-		return firstName;
-	}
+   public ZonedDateTime getBirthDayWithDefault() {
 
-	public int getGender() {
-		return gender;
-	}
+      if (_zonedBirthDay == null) {
 
-	public float getHeight() {
-		return height;
-	}
+         if (birthDay == 0) {
 
-	public int getHrMaxFormula() {
-		return hrMaxFormula;
-	}
+            _zonedBirthDay = DEFAULT_BIRTHDAY;
 
-	/**
-	 * @param hrMaxFormulaKey
-	 * @param hrMaxPulse
-	 * @param dateTime
-	 *            Date when the HR zones should be computed, this is the tour date.
-	 * @return Returns HR zone min/max bpm values or <code>null</code> when hr zones are not
-	 *         defined.
-	 */
-	public HrZoneContext getHrZoneContext(	final int hrMaxFormulaKey,
-											final int hrMaxPulse,
-											final ZonedDateTime birthDay,
-											final ZonedDateTime dateTime) {
+         } else {
 
-		if (hrZones == null || hrZones.size() == 0) {
-			return null;
-		}
+            _zonedBirthDay = TimeTools.getZonedDateTime(birthDay);
+         }
+      }
 
-		final int age = getAge(birthDay, dateTime);
-		final HrZoneContext hrZoneMinMax = _hrZoneMinMaxBpm.get(age);
+      return _zonedBirthDay;
+   }
 
-		if (hrZoneMinMax != null) {
-			// hr zones for the age is already available
-			return hrZoneMinMax;
-		}
+   public String getDeviceReaderId() {
+      return deviceReaderId;
+   }
 
-		final int hrMax = getHrMax(hrMaxFormulaKey, hrMaxPulse, age);
-		final int zoneSize = hrZones.size();
+   public String getFirstName() {
+      return firstName;
+   }
 
-		final float[] zoneMinBmps = new float[zoneSize];
-		final float[] zoneMaxBmps = new float[zoneSize];
+   public int getGender() {
+      return gender;
+   }
 
-		final ArrayList<TourPersonHRZone> hrZonesList = new ArrayList<TourPersonHRZone>(hrZones);
-		Collections.sort(hrZonesList);
+   public String getGovssAssociatedTourTypes() {
+      return govssAssociatedTourTypes;
+   }
 
-		int prevMaxBpm = -1;
+   public int getGovssThresholdPower() {
+      return govssThresholdPower;
+   }
 
-		// fill zone min/max values
-		for (int zoneIndex = 0; zoneIndex < hrZones.size(); zoneIndex++) {
+   public float getGovssTimeTrialAverageSlope() {
+      return govssTimeTrialAverageSlope;
+   }
 
-			final TourPersonHRZone hrZone = hrZonesList.get(zoneIndex);
+   public int getGovssTimeTrialDistance() {
+      return govssTimeTrialDistance;
+   }
 
-			final int zoneMaxValue = hrZone.getZoneMaxValue();
+   public int getGovssTimeTrialDuration() {
+      return govssTimeTrialDuration;
+   }
 
-			int minBpm = hrZone.getZoneMinValue() * hrMax / 100;
+   public float getHeight() {
+      return height;
+   }
 
-			final int maxBpm = zoneMaxValue == Integer.MAX_VALUE ? //
-					Integer.MAX_VALUE
-					: (zoneMaxValue * hrMax / 100);
+   public int getHrMaxFormula() {
+      return hrMaxFormula;
+   }
 
-			if (prevMaxBpm != -1) {
-				// make sure that "min" is last "max + 1"
-				minBpm = prevMaxBpm + 1;
-			}
+   /**
+    * @param hrMaxFormulaKey
+    * @param hrMaxPulse
+    * @param dateTime
+    *           Date when the HR zones should be computed, this is the tour date.
+    * @return Returns HR zone min/max bpm values or <code>null</code> when hr zones are not
+    *         defined.
+    */
+   public HrZoneContext getHrZoneContext(final int hrMaxFormulaKey,
+                                         final int hrMaxPulse,
+                                         final ZonedDateTime birthDay,
+                                         final ZonedDateTime dateTime) {
 
-			zoneMinBmps[zoneIndex] = minBpm - 0.5f;
-			zoneMaxBmps[zoneIndex] = maxBpm + 0.5f;
+      if (hrZones == null || hrZones.size() == 0) {
+         return null;
+      }
 
-			prevMaxBpm = maxBpm;
-		}
+      final int age = getAge(birthDay, dateTime);
+      final HrZoneContext hrZoneMinMax = _hrZoneMinMaxBpm.get(age);
 
-		final HrZoneContext hrZoneMinMax1 = new HrZoneContext(zoneMinBmps, zoneMaxBmps, age, hrMax);
+      if (hrZoneMinMax != null) {
+         // hr zones for the age is already available
+         return hrZoneMinMax;
+      }
 
-		_hrZoneMinMaxBpm.put(age, hrZoneMinMax1);
+      final int hrMax = getHrMax(hrMaxFormulaKey, hrMaxPulse, age);
+      final int zoneSize = hrZones.size();
 
-		return hrZoneMinMax1;
-	}
+      final float[] zoneMinBmps = new float[zoneSize];
+      final float[] zoneMaxBmps = new float[zoneSize];
 
-	/**
-	 * @return Returns a list with all HR zones for this person. When the person has no HR zones,
-	 *         the returned list is empty.
-	 */
-	public ArrayList<TourPersonHRZone> getHrZonesSorted() {
+      final ArrayList<TourPersonHRZone> hrZonesList = new ArrayList<>(hrZones);
+      Collections.sort(hrZonesList);
 
-		if (_sortedHrZones == null) {
+      int prevMaxBpm = -1;
 
-			_sortedHrZones = new ArrayList<TourPersonHRZone>();
-			_sortedHrZones.addAll(hrZones);
-			Collections.sort(_sortedHrZones);
-		}
+      // fill zone min/max values
+      for (int zoneIndex = 0; zoneIndex < hrZones.size(); zoneIndex++) {
 
-		return _sortedHrZones;
-	}
+         final TourPersonHRZone hrZone = hrZonesList.get(zoneIndex);
 
-	public String getLastName() {
-		return lastName;
-	}
+         final int zoneMaxValue = hrZone.getZoneMaxValue();
 
-	public int getMaxPulse() {
-		return maxPulse;
-	}
+         int minBpm = hrZone.getZoneMinValue() * hrMax / 100;
 
-	/**
-	 * @return Return the person first name and the last name when available.
-	 */
-	public String getName() {
-		return firstName + //
-				(lastName.equals(UI.EMPTY_STRING) ? //
-						UI.EMPTY_STRING
-						: UI.SPACE + lastName);
-	}
+         final int maxBpm = zoneMaxValue == Integer.MAX_VALUE ? //
+               Integer.MAX_VALUE
+               : (zoneMaxValue * hrMax / 100);
 
-	public long getPersonId() {
-		return personId;
-	}
+         if (prevMaxBpm != -1) {
+            // make sure that "min" is last "max + 1"
+            minBpm = prevMaxBpm + 1;
+         }
 
-	public String getRawDataPath() {
-		return rawDataPath;
-	}
+         zoneMinBmps[zoneIndex] = minBpm - 0.5f;
+         zoneMaxBmps[zoneIndex] = maxBpm + 0.5f;
 
-	public int getRestPulse() {
-		return restPulse;
-	}
+         prevMaxBpm = maxBpm;
+      }
 
-	public TourBike getTourBike() {
-		return tourBike;
-	}
+      final HrZoneContext hrZoneMinMax1 = new HrZoneContext(zoneMinBmps, zoneMaxBmps, age, hrMax);
 
-	public float getWeight() {
-		return weight;
-	}
+      _hrZoneMinMaxBpm.put(age, hrZoneMinMax1);
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + (int) (_createId ^ (_createId >>> 32));
-		result = prime * result + (int) (personId ^ (personId >>> 32));
-		return result;
-	}
+      return hrZoneMinMax1;
+   }
 
-	public boolean persist() {
+   /**
+    * @return Returns a list with all HR zones for this person. When the person has no HR zones,
+    *         the returned list is empty.
+    */
+   public ArrayList<TourPersonHRZone> getHrZonesSorted() {
 
-		boolean isSaved = false;
+      if (_sortedHrZones == null) {
 
-		final EntityManager em = TourDatabase.getInstance().getEntityManager();
-		final EntityTransaction ts = em.getTransaction();
+         _sortedHrZones = new ArrayList<>();
+         _sortedHrZones.addAll(hrZones);
+         Collections.sort(_sortedHrZones);
+      }
 
-		try {
+      return _sortedHrZones;
+   }
 
-			if (getPersonId() == PERSON_ID_NOT_DEFINED) {
-				// entity is new
-				ts.begin();
-				em.persist(this);
-				ts.commit();
-			} else {
-				// update entity
-				ts.begin();
-				em.merge(this);
-				ts.commit();
-			}
+   public String getLastName() {
+      return lastName;
+   }
 
-		} catch (final Exception e) {
-			e.printStackTrace();
-		} finally {
-			if (ts.isActive()) {
-				ts.rollback();
-			} else {
-				isSaved = true;
-			}
-			em.close();
-		}
+   public int getMaxPulse() {
+      return maxPulse;
+   }
 
-		if (isSaved) {
-			PersonManager.refreshPeople();
-		}
+   /**
+    * @return Return the person first name and the last name when available.
+    */
+   public String getName() {
+      return firstName + //
+            (lastName.equals(UI.EMPTY_STRING) ? //
+                  UI.EMPTY_STRING
+                  : UI.SPACE + lastName);
+   }
 
-		return isSaved;
-	}
+   public PerformanceModelingData getPerformanceModelingData() {
+      return performanceModelingData;
+   }
 
-	public void resetHrZones() {
-		_hrZoneMinMaxBpm.clear();
-	}
+   public long getPersonId() {
+      return personId;
+   }
 
-	public void setBirthDay(final long birthDay) {
-		this.birthDay = birthDay;
-	}
+   public String getRawDataPath() {
+      return rawDataPath;
+   }
 
-	public void setDeviceReaderId(final String deviceId) {
-		this.deviceReaderId = deviceId;
-	}
+   public int getRestPulse() {
+      return restPulse;
+   }
 
-	public void setFirstName(final String name) {
-		this.firstName = name;
-	}
+   public TourBike getTourBike() {
+      return tourBike;
+   }
 
-	public void setGender(final int gender) {
-		this.gender = gender;
-	}
+   public float getWeight() {
+      return weight;
+   }
 
-	public void setHeight(final float height) {
-		this.height = height;
-	}
+   @Override
+   public int hashCode() {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + (int) (_createId ^ (_createId >>> 32));
+      result = prime * result + (int) (personId ^ (personId >>> 32));
+      return result;
+   }
 
-	public void setHrMaxFormula(final int hrMaxFormula) {
-		this.hrMaxFormula = hrMaxFormula;
-	}
+   public boolean isTourTypeInGovssTourTypes(final long tourTypeId) {
+      if (govssAssociatedTourTypes == null || govssAssociatedTourTypes.equals(UI.EMPTY_STRING)) {
+         return false;
+      }
 
-	public void setHrZones(final Set<TourPersonHRZone> hrZones) {
+      final String[] associatedTourTypes = govssAssociatedTourTypes.split(";");
 
-		this.hrZones = hrZones;
+      for (final String currentTourType : associatedTourTypes) {
 
-		_hrZoneMinMaxBpm.clear();
+         if (currentTourType.equals(String.valueOf(tourTypeId))) {
 
-		if (_sortedHrZones != null) {
-			_sortedHrZones.clear();
-			_sortedHrZones = null;
-		}
-	}
+            return true;
+         }
+      }
 
-	public void setLastName(final String lastName) {
-		this.lastName = lastName;
-	}
+      return false;
+   }
 
-	public void setMaxPulse(final int maxPulse) {
-		this.maxPulse = maxPulse;
-	}
+   public boolean persist() {
 
-	public void setRawDataPath(final String rawDataPath) {
-		this.rawDataPath = rawDataPath;
-	}
+      boolean isSaved = false;
 
-	public void setRestPulse(final int restPulse) {
-		this.restPulse = restPulse;
-	}
+      final EntityManager em = TourDatabase.getInstance().getEntityManager();
+      final EntityTransaction ts = em.getTransaction();
 
-	public void setTourBike(final TourBike tourBike) {
-		this.tourBike = tourBike;
-	}
+      try {
 
-	public void setWeight(final float weight) {
-		this.weight = weight;
-	}
+         if (getPersonId() == PERSON_ID_NOT_DEFINED) {
+            // entity is new
+            ts.begin();
+            em.persist(this);
+            ts.commit();
+         } else {
+            // update entity
+            ts.begin();
+            em.merge(this);
+            ts.commit();
+         }
 
-	@Override
-	public String toString() {
-		return "TourPerson [personId=" + personId + ", firstName=" + firstName + ", lastName=" + lastName + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-	}
+      } catch (final Exception e) {
+         e.printStackTrace();
+      } finally {
+         if (ts.isActive()) {
+            ts.rollback();
+         } else {
+            isSaved = true;
+         }
+         em.close();
+      }
+
+      if (isSaved) {
+         PersonManager.refreshPeople();
+         if (_changeListener != null) {
+            _changeListener.stateChanged(new ChangeEvent(personId));
+         }
+      }
+
+      return isSaved;
+   }
+
+   public void resetHrZones() {
+      _hrZoneMinMaxBpm.clear();
+   }
+
+   public void setBirthDay(final long birthDay) {
+      this.birthDay = birthDay;
+   }
+
+   public void setDeviceReaderId(final String deviceId) {
+      this.deviceReaderId = deviceId;
+   }
+
+   public void setFirstName(final String name) {
+      this.firstName = name;
+   }
+
+   public void setGender(final int gender) {
+      this.gender = gender;
+   }
+
+   public void setGovssAssociatedTourTypes(final String govssAssociatedTourTypes) {
+      this.govssAssociatedTourTypes = govssAssociatedTourTypes;
+   }
+
+   public void setGovssThresholdPower(final int govssThresholdPower) {
+      this.govssThresholdPower = govssThresholdPower;
+   }
+
+   public void setGovssTimeTrialAverageSlope(final float govssTimeTrialAverageSlope) {
+      this.govssTimeTrialAverageSlope = govssTimeTrialAverageSlope;
+   }
+
+   public void setGovssTimeTrialDistance(final int govssTimeTrialDistance) {
+      this.govssTimeTrialDistance = govssTimeTrialDistance;
+   }
+
+   public void setGovssTimeTrialDuration(final int govssTimeTrialDuration) {
+      this.govssTimeTrialDuration = govssTimeTrialDuration;
+   }
+
+   public void setHeight(final float height) {
+      this.height = height;
+   }
+
+   public void setHrMaxFormula(final int hrMaxFormula) {
+      this.hrMaxFormula = hrMaxFormula;
+   }
+
+   public void setHrZones(final Set<TourPersonHRZone> hrZones) {
+
+      this.hrZones = hrZones;
+
+      _hrZoneMinMaxBpm.clear();
+
+      if (_sortedHrZones != null) {
+         _sortedHrZones.clear();
+         _sortedHrZones = null;
+      }
+   }
+
+   public void setLastName(final String lastName) {
+      this.lastName = lastName;
+   }
+
+   public void setMaxPulse(final int maxPulse) {
+      this.maxPulse = maxPulse;
+   }
+
+   public void setRawDataPath(final String rawDataPath) {
+      this.rawDataPath = rawDataPath;
+   }
+
+   public void setRestPulse(final int restPulse) {
+      this.restPulse = restPulse;
+   }
+
+   public void setTourBike(final TourBike tourBike) {
+      this.tourBike = tourBike;
+   }
+
+   public void setWeight(final float weight) {
+      this.weight = weight;
+   }
+
+   @Override
+   public void stateChanged(final ChangeEvent e) {
+      // TODO Auto-generated method stub
+
+   }
+
+   @Override
+   public String toString() {
+      return "TourPerson [personId=" + personId + ", firstName=" + firstName + ", lastName=" + lastName + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+   }
 }

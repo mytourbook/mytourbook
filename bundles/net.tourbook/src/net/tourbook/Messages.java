@@ -19,7 +19,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
-   private static final String BUNDLE_NAME = "net.tourbook.messages";                            //$NON-NLS-1$
+   private static final String BUNDLE_NAME = "net.tourbook.messages";                              //$NON-NLS-1$
 
    public static String        Action_Cadence_Set;
    public static String        Action_Cadence_Set_Rpm;
@@ -110,6 +110,10 @@ public class Messages extends NLS {
    public static String        Calendar_View_Action_LinkWithOtherViews;
    public static String        Calendar_View_Combo_Month_Tooltip;
    public static String        Calendar_View_Combo_Year_Tooltip;
+
+   public static String        Compute_Govss_Button_ComputeAllTours;
+   public static String        Compute_Govss_Button_ComputeAllTours_Tooltip;
+   public static String        Compute_GovssValues_ComputeForAllTours_Job_Result;
 
    public static String        dialog_export_btn_export;
    public static String        dialog_export_chk_camouflageSpeed;
@@ -595,12 +599,28 @@ public class Messages extends NLS {
    public static String        Compute_CadenceZonesTimes_Dialog_ComputeForAllTours_Message;
    public static String        Compute_CadenceZonesTimes_Dialog_ComputeForAllTours_Title;
 
+   public static String        Compute_GovssValues_Dialog_ComputeForUserTours_Title;
+   public static String        Compute_GovssValues_Dialog_ComputeForUserTours_Message;
+
+   public static String        Compute_PerformanceModelingChart_Group;
+   public static String        Compute_PerformanceModelingChart_ComputeForAllTours_Job_Result;
+   public static String        Compute_PerformanceModelingChart_Dialog_ComputeForAllTours_Message;
+   public static String        Compute_PerformanceModelingChart_Dialog_ComputeForAllTours_Title;
+
    public static String        Compute_HrZone_Group;
    public static String        Compute_HrZone_Link;
    public static String        Compute_HrZones_Dialog_ComputeAllTours_Title;
    public static String        Compute_HrZones_Dialog_ComputeAllTours_Title_Message;
    public static String        Compute_HrZones_Job_ComputeAllTours_Result;
    public static String        Compute_HrZones_Job_ComputeAllTours_SubTask;
+
+   public static String        Compute_PredictedPerformance_Button_ComputeValues;
+   public static String        Compute_PredictedPerformance_Button_ComputeValues_Tooltip;
+   public static String        Compute_PerformanceModelingChart_Label_Days;
+   public static String        Compute_PerformanceModelingChart_Label_FatigueDecay;
+   public static String        Compute_PerformanceModelingChart_Label_FatigueDecay_Tooltip;
+   public static String        Compute_PerformanceModelingChart_Label_FitnessDecay;
+   public static String        Compute_PerformanceModelingChart_Label_FitnessDecay_Tooltip;
 
    public static String        Compute_Smoothing_Button_ForAllTours;
    public static String        Compute_Smoothing_Button_ForAllTours_Tooltip;
@@ -1252,6 +1272,12 @@ public class Messages extends NLS {
    public static String        Log_ComputeCadenceZonesTimes_010_Success;
    public static String        Log_ComputeCadenceZonesTimes_011_NoSuccess;
 
+   public static String        Log_ComputeGovss_001_Start;
+   public static String        Log_ComputeGovss_002_End;
+   public static String        Log_ComputeGovss_010_Success;
+   public static String        Log_ComputeGovss_011_NoSuccess;
+   public static String        Log_ComputeGovss_012_Information;
+
    public static String        Log_EasyImport_000_ImportStart;
    public static String        Log_EasyImport_001_BackupTourFiles;
    public static String        Log_EasyImport_001_Copy;
@@ -1650,13 +1676,29 @@ public class Messages extends NLS {
    public static String        Pref_People_Label_last_name;
    public static String        Pref_People_Label_MaxHR;
    public static String        Pref_People_Label_RestingHR;
+   public static String        Pref_People_Label_TrainingStress_ModelName;
    public static String        Pref_People_Label_weight;
    public static String        Pref_People_Label_Years;
    public static String        Pref_People_Link_BodyWeight;
    public static String        Pref_People_Tab_DataTransfer;
    public static String        Pref_People_Tab_HRZone;
    public static String        Pref_People_Tab_Person;
+   public static String        Pref_People_Tab_TrainingStress;
    public static String        Pref_People_Title;
+
+   public static String        Pref_TrainingStress_BikeScore_GroupName;
+   public static String        Pref_TrainingStress_Govss_GroupName;
+   public static String        Pref_TrainingStress_Govss_AddTourTypes;
+   public static String        Pref_TrainingStress_Govss_RemoveTourType;
+   public static String        Pref_TrainingStress_Govss_Label_AverageSlope;
+   public static String        Pref_TrainingStress_Govss_Label_ThresholdVelocity;
+   public static String        Pref_TrainingStress_Govss_ThresholdPower_Label_AverageSlope;
+   public static String        Pref_TrainingStress_Govss_ThresholdPower_Label_Distance;
+   public static String        Pref_TrainingStress_Govss_ThresholdPower_Label_Duration;
+   public static String        Pref_TrainingStress_Group_ThresholdPower;
+   public static String        Pref_TrainingStress_Group_TourTypes;
+
+   public static String        Pref_TrainingStress_Govss_ThresholdPower_Label;
 
    public static String        pref_appearance_number_of_recent_tags;
    public static String        pref_appearance_number_of_recent_tags_tooltip;
@@ -2330,6 +2372,8 @@ public class Messages extends NLS {
    public static String Tour_Action_ComputeCadenceZonesTimes;
    public static String Tour_Action_ComputeCadenceZonesTimes_Message;
    public static String Tour_Action_ComputeCadenceZonesTimes_Title;
+   public static String Tour_Action_ComputeGovss_Title;
+   public static String Tour_Action_ComputeGovss_Message;
    public static String Tour_Action_GeoCompare_Tooltip;
    public static String Tour_Action_GraphGears;
    public static String Tour_Action_GraphOverlapped;
@@ -2610,6 +2654,7 @@ public class Messages extends NLS {
 
    public static String Tour_SubMenu_Cadence;
    public static String Tour_SubMenu_Elevation;
+   public static String Tour_SubMenu_TrainingStress;
 
    public static String Tour_Tag_Filter_Action_Tooltip;
 
@@ -2689,6 +2734,8 @@ public class Messages extends NLS {
    public static String tour_editor_label_tour_tag;
    public static String tour_editor_label_tour_title;
    public static String tour_editor_label_tour_type;
+   public static String tour_editor_label_trainingstress_govss;
+   public static String tour_editor_label_trainingstress_govss_tooltip;
    public static String tour_editor_label_wind_direction;
    public static String tour_editor_label_wind_direction_Tooltip;
    public static String tour_editor_label_wind_speed;
@@ -2704,6 +2751,7 @@ public class Messages extends NLS {
    public static String tour_editor_section_date_time;
    public static String tour_editor_section_tour;
    public static String tour_editor_section_personal;
+   public static String tour_editor_section_trainingstress;
    public static String tour_editor_section_weather;
    public static String tour_editor_tabLabel_tour;
    public static String tour_editor_tabLabel_tour_data;
@@ -2885,6 +2933,9 @@ public class Messages extends NLS {
 
    public static String Training_HRZone_Label_Header_Zone;
 
+   public static String Training_Stress_Label_Info;
+   public static String Training_Stress_Group_Govss;
+
    public static String Training_View_Action_ShowAllPulseValues;
    public static String Training_View_Action_SynchChartScale;
    public static String Training_View_Label_LeftChartBorder;
@@ -2899,6 +2950,7 @@ public class Messages extends NLS {
    public static String UI_Label_BrowserCannotBeCreated_Error;
    public static String UI_Label_no_chart_is_selected;
    public static String UI_Label_PersonIsRequired;
+   public static String UI_Label_No_Person_Is_Selected;
    public static String UI_Label_TourIsNotSelected;
 
    public static String ui_tour_not_defined;

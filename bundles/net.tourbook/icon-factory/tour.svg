@@ -4273,17 +4273,17 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="22.627417"
-     inkscape:cx="190.83715"
-     inkscape:cy="688.28558"
+     inkscape:zoom="11.313709"
+     inkscape:cx="243.1481"
+     inkscape:cy="795.86495"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
-     inkscape:window-width="1507"
-     inkscape:window-height="1066"
-     inkscape:window-x="117"
-     inkscape:window-y="29"
-     inkscape:window-maximized="0"
+     inkscape:window-width="1476"
+     inkscape:window-height="900"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
      inkscape:snap-grids="true"
      inkscape:snap-page="false"
      inkscape:snap-to-guides="false"
@@ -4323,7 +4323,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -10271,5 +10271,107 @@
        inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook\icons\tag-category.png"
        inkscape:export-xdpi="96"
        inkscape:export-ydpi="96" />
+    <g
+       transform="matrix(0.13194312,0,0,0.13385205,241.31109,223.64172)"
+       id="g1406"
+       style="fill:#000000;fill-opacity:0;stroke:#cccccc"
+       inkscape:export-filename="C:\Users\frederic\git\MT\mytourbook\bundles\net.tourbook\icons\performance-chart.png"
+       inkscape:export-xdpi="96.000458"
+       inkscape:export-ydpi="96.000458">
+      <path
+         inkscape:connector-curvature="0"
+         id="path1373"
+         d="M 8.0157828,180.88561 H 127.47247"
+         style="fill:#000000;fill-opacity:0;stroke:#cccccc;stroke-width:3.10826302;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         style="fill:#000000;fill-opacity:0;stroke:#cccccc;stroke-width:3.1092813;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="M 7.9375014,200.54037 H 127.47247"
+         id="path1375"
+         inkscape:connector-curvature="0" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path1377"
+         d="M 7.9941979,220.19513 H 127.43467"
+         style="fill:#000000;fill-opacity:0;stroke:#cccccc;stroke-width:3.10805178;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path1392"
+         d="M 7.9375014,239.69895 H 127.47247"
+         style="fill:#000000;fill-opacity:0;stroke:#cccccc;stroke-width:3.1092813;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         style="fill:#000000;fill-opacity:0;stroke:#cccccc;stroke-width:3.10805178;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="M 7.9941979,259.35371 H 127.43467"
+         id="path1394"
+         inkscape:connector-curvature="0" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path1398"
+         d="M 7.9941979,278.933 H 127.43467"
+         style="fill:#000000;fill-opacity:0;stroke:#cccccc;stroke-width:3.10805178;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    </g>
+    <g
+       id="g1420"
+       transform="matrix(0,-0.13385205,0.13194312,0,219.90936,263.40718)"
+       style="fill:#000000;fill-opacity:0;stroke:#cccccc"
+       inkscape:export-filename="C:\Users\frederic\git\MT\mytourbook\bundles\net.tourbook\icons\performance-chart.png"
+       inkscape:export-xdpi="96.000458"
+       inkscape:export-ydpi="96.000458">
+      <path
+         style="fill:#000000;fill-opacity:0;stroke:#cccccc;stroke-width:3.10826302;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="M 8.0157828,180.88561 H 127.47247"
+         id="path1408"
+         inkscape:connector-curvature="0" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path1410"
+         d="M 7.9375014,200.54037 H 127.47247"
+         style="fill:#000000;fill-opacity:0;stroke:#cccccc;stroke-width:3.1092813;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         style="fill:#000000;fill-opacity:0;stroke:#cccccc;stroke-width:3.10805178;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="M 7.9941979,220.19513 H 127.43467"
+         id="path1412"
+         inkscape:connector-curvature="0" />
+      <path
+         style="fill:#000000;fill-opacity:0;stroke:#cccccc;stroke-width:3.1092813;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="M 7.9375014,239.69895 H 127.47247"
+         id="path1414"
+         inkscape:connector-curvature="0" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path1416"
+         d="M 7.9941979,259.35371 H 127.43467"
+         style="fill:#000000;fill-opacity:0;stroke:#cccccc;stroke-width:3.10805178;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         style="fill:#000000;fill-opacity:0;stroke:#cccccc;stroke-width:3.10805178;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="M 7.9941979,278.933 H 127.43467"
+         id="path1418"
+         inkscape:connector-curvature="0" />
+    </g>
+    <path
+       style="fill:#000000;fill-opacity:0;stroke:#88aa00;stroke-width:0.52742362;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 242.6833,249.0847 c 0,0 2.81834,5.42264 5.41031,5.75075 3.81397,0.48281 9.76675,-6.21784 9.76675,-6.21784"
+       id="path1424"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cac"
+       inkscape:export-filename="C:\Users\frederic\git\MT\mytourbook\bundles\net.tourbook\icons\performance-chart.png"
+       inkscape:export-xdpi="96.000458"
+       inkscape:export-ydpi="96.000458" />
+    <path
+       style="fill:#000000;fill-opacity:0;stroke:#0055d4;stroke-width:0.52742362;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 242.93192,247.71199 c 0,0 2.19974,0.75421 3.06532,1.49756 2.94913,2.53274 3.40688,7.53163 6.68453,9.60758 1.48194,0.9386 5.17415,0.84742 5.17415,0.84742"
+       id="path1426"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="caac"
+       inkscape:export-filename="C:\Users\frederic\git\MT\mytourbook\bundles\net.tourbook\icons\performance-chart.png"
+       inkscape:export-xdpi="96.000458"
+       inkscape:export-ydpi="96.000458" />
+    <path
+       style="fill:#0055d4;fill-opacity:0.74509805;stroke:#001955;stroke-width:0.03516158px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 242.30852,262.28274 1.19692,-4.09802 3.04215,-3.08617 1.99485,-0.96127 2.14447,-0.60711 5.48586,-0.86008 2.05402,-0.55833 0.0405,10.17098 z"
+       id="path985"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="C:\Users\frederic\git\MT\mytourbook\bundles\net.tourbook\icons\performance-chart.png"
+       inkscape:export-xdpi="96.000458"
+       inkscape:export-ydpi="96.000458" />
   </g>
 </svg>
