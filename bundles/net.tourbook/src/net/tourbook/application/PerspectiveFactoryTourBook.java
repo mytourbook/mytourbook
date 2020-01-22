@@ -24,7 +24,6 @@ import net.tourbook.ui.views.TourWaypointView;
 import net.tourbook.ui.views.calendar.CalendarView;
 import net.tourbook.ui.views.collateTours.CollatedToursView;
 import net.tourbook.ui.views.geoCompare.GeoCompareView;
-import net.tourbook.ui.views.performanceModelingChart.PerformanceModelingChartView;
 import net.tourbook.ui.views.rawData.RawDataView;
 import net.tourbook.ui.views.tagging.TourTags_View;
 import net.tourbook.ui.views.tourBook.TourBookView;
@@ -86,8 +85,6 @@ public class PerspectiveFactoryTourBook implements IPerspectiveFactory {
       listFolder.addView(CalendarView.ID);
       listFolder.addPlaceholder(CollatedToursView.ID);
       listFolder.addView(StatisticView.ID);
-      //Ctrl+Shift+F
-      listFolder.addView(PerformanceModelingChartView.ID);
       listFolder.addPlaceholder(PicDirView.ID);
 
       //--------------------------------------------------------------------------------

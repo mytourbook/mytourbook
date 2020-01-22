@@ -79,7 +79,6 @@ import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.database.FIELD_VALIDATION;
-import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.math.Smooth;
@@ -96,7 +95,6 @@ import net.tourbook.tour.BreakTimeTool;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.photo.TourPhotoLink;
 import net.tourbook.tour.photo.TourPhotoManager;
-import net.tourbook.trainingstress.Running_Govss;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.ChartLabel;
 import net.tourbook.ui.tourChart.ChartLayer2ndAltiSerie;
@@ -664,14 +662,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * 0 == false, 1 == true
     */
    private short                  isStrideSensorPresent            = 0;
-
-   // ############################################# TRAINING STRESS DATA #############################################
-
-   /**
-    * GOVSS (Gravity Ordered Velocity Stress Score)
-    */
-   private int                govss;                                // db-version 41
-
 
    // ############################################# MERGED DATA #############################################
 
@@ -3385,8 +3375,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       computeCadenceZonesTimes();
       computeRunningDynamics();
 
-      computeGovss();
-
       computeGeo_Bounds();
       computeGeo_Grid();
    }
@@ -4031,40 +4019,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       returnData.normalizedDistance = normalizedDistance - measureStartDistance;
 
       return returnData;
-   }
-
-   public boolean computeGovss() {
-
-      if (timeSerie == null ||
-            tourPerson == null || tourPerson.getWeight() <= 0f || tourPerson.getHeight() <= 0f ||
-            tourType == null) {
-
-         if (tourPerson != null && tourType != null &&
-               !tourPerson.isTourTypeInGovssTourTypes(tourType.getTypeId())) {
-            //In case the govss was previously computed and the tour is not considered a tour for
-            //which the govss should be computed anymore
-            govss = 0;
-         }
-
-         return false;
-      }
-
-      // We make sure to retrieve the latest version of the tour's TourPerson in case it has been modified recently
-      // Note : It's not a "pretty" solution but that is the best I found as of today
-      final ArrayList<TourPerson> tourPersons = PersonManager.getTourPeople();
-      for (final TourPerson currentTourPerson : tourPersons) {
-         if (currentTourPerson.getPersonId() == tourPerson.getPersonId()) {
-               tourPerson = currentTourPerson;
-            break;
-         }
-      }
-
-      final Running_Govss running_Govss = new Running_Govss(tourPerson);
-      govss = running_Govss.ComputeGovss(this);
-
-      tourPerson.addOrUpdateGovssEntry(tourStartTime, tourId);
-
-      return govss != 0;
    }
 
    /**
@@ -7211,13 +7165,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
 
       return _gpsBounds;
-   }
-
-   /**
-    * @return the {@link #govss}
-    */
-   public int getGovss() {
-      return govss;
    }
 
    /**

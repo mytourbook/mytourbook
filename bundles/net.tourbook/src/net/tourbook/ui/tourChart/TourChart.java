@@ -5406,8 +5406,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       hidePhotoLayer();
       resetSegmenterSelection();
 
-      //TODO see _vsisibleGraphsSequence
-
       final ChartDataModel newChartDataModel = TourManager.getInstance().createChartDataModel(
             _tourData,
             _tcc,

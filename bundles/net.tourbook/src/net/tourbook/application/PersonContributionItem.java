@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,17 +17,6 @@ package net.tourbook.application;
 
 import java.util.ArrayList;
 
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
-import net.tourbook.Messages;
-import net.tourbook.common.UI;
-import net.tourbook.common.util.StatusUtil;
-import net.tourbook.data.TourPerson;
-import net.tourbook.database.PersonManager;
-import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.ui.CustomControlContribution;
-
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -43,269 +32,247 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
+import net.tourbook.Messages;
+import net.tourbook.common.UI;
+import net.tourbook.common.util.StatusUtil;
+import net.tourbook.data.TourPerson;
+import net.tourbook.database.PersonManager;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.ui.CustomControlContribution;
+
 public class PersonContributionItem extends CustomControlContribution {
 
-   private static final String     ID         = "net.tourbook.clientselector";  //$NON-NLS-1$
+	private static final String		ID				= "net.tourbook.clientselector";		//$NON-NLS-1$
 
-   private static TourbookPlugin   _activator = TourbookPlugin.getDefault();
+	private static TourbookPlugin		_activator	= TourbookPlugin.getDefault();
 
-   private final IDialogSettings   _state     = _activator.getDialogSettings();
-   private final IPreferenceStore  _prefStore = _activator.getPreferenceStore();
+	private final IDialogSettings		_state		= _activator.getDialogSettings();
+	private final IPreferenceStore	_prefStore	= _activator.getPreferenceStore();
 
-   private IPropertyChangeListener _prefChangeListener;
+	private IPropertyChangeListener	_prefChangeListener;
 
-   private ArrayList<TourPerson>   _allPeople;
+	private ArrayList<TourPerson>		_allPeople;
 
-   private Combo                   _cboPeople;
+	private Combo							_cboPeople;
 
-   public PersonContributionItem() {
-      this(ID);
-   }
+	public PersonContributionItem() {
+		this(ID);
+	}
 
-   protected PersonContributionItem(final String id) {
-      super(id);
-   }
+	protected PersonContributionItem(final String id) {
+		super(id);
+	}
 
-   /**
-    * listen for changes in the person list
-    */
-   private void addPrefListener() {
+	/**
+	 * listen for changes in the person list
+	 */
+	private void addPrefListener() {
 
-      _prefChangeListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+		_prefChangeListener = new IPropertyChangeListener() {
+			@Override
+			public void propertyChange(final PropertyChangeEvent event) {
 
-            final String property = event.getProperty();
+				final String property = event.getProperty();
 
-            if (property.equals(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED)) {
+				if (property.equals(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED)) {
 
-               // fill people combobox with modified people list
-               fillPeopleComboBox();
+					// fill people combobox with modified people list
+					fillPeopleComboBox();
 
-               final TourPerson currentPerson = TourbookPlugin.getActivePerson();
+					final TourPerson currentPerson = TourbookPlugin.getActivePerson();
 
-               // reselect the person which was selected before
-               if (currentPerson == null) {
-                  _cboPeople.select(0);
-               } else {
-                  // try to set and select the old person
-                  final long previousPersonId = currentPerson.getPersonId();
-                  reselectPerson(previousPersonId);
-               }
-            }
-         }
-      };
-      // register the listener
-      _prefStore.addPropertyChangeListener(_prefChangeListener);
-   }
+					// reselect the person which was selected before
+					if (currentPerson == null) {
+						_cboPeople.select(0);
+					} else {
+						// try to set and select the old person
+						final long previousPersonId = currentPerson.getPersonId();
+						reselectPerson(previousPersonId);
+					}
+				}
+			}
+		};
+		// register the listener
+		_prefStore.addPropertyChangeListener(_prefChangeListener);
+	}
 
-   private void addTourPersonListener(final TourPerson tourPerson) {
+	@Override
+	protected Control createControl(final Composite parent) {
 
-      tourPerson.addChangeListener(new ChangeListener() {
+		Composite content;
 
-         @Override
-         public void stateChanged(final ChangeEvent e) {
+		if (UI.IS_OSX) {
 
-            final long currentPersonId = (long) e.getSource();
+			content = createPeopleComboBox(parent);
 
-            _allPeople = PersonManager.getTourPeople();
+		} else {
 
-            final int selectedIndex = _cboPeople.getSelectionIndex();
-            if (selectedIndex == 0) {
-               return;
-            }
+			/*
+			 * on win32 a few pixel above and below the combobox are drawn, wrapping it into a
+			 * composite removes the pixels
+			 */
+			content = new Composite(parent, SWT.NONE);
+			GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(content);
 
-            //The selected person has changed, we need to load it again
-            for (final TourPerson tourPerson : _allPeople) {
-               if (tourPerson.getPersonId() == currentPersonId) {
-                  reselectPerson(currentPersonId);
-               }
-            }
+			final Composite control = createPeopleComboBox(content);
+			control.setLayoutData(new GridData(SWT.NONE, SWT.CENTER, false, true));
+		}
 
-         }
-      });
+		addPrefListener();
+		reselectLastPerson();
 
-   }
+		return content;
+	}
 
-   @Override
-   protected Control createControl(final Composite parent) {
+	private Composite createPeopleComboBox(final Composite parent) {
 
-      Composite content;
+		_cboPeople = new Combo(parent, SWT.DROP_DOWN | SWT.READ_ONLY);
 
-      if (UI.IS_OSX) {
+		_cboPeople.setVisibleItemCount(20);
+		_cboPeople.setToolTipText(Messages.App_People_tooltip);
 
-         content = createPeopleComboBox(parent);
+		_cboPeople.addDisposeListener(new DisposeListener() {
+			@Override
+			public void widgetDisposed(final DisposeEvent e) {
+				if (_prefChangeListener != null) {
+					_prefStore.removePropertyChangeListener(_prefChangeListener);
+				}
+			}
+		});
 
-      } else {
-
-         /*
-          * on win32 a few pixel above and below the combobox are drawn, wrapping it into a
-          * composite removes the pixels
-          */
-         content = new Composite(parent, SWT.NONE);
-         GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(content);
-
-         final Composite control = createPeopleComboBox(content);
-         control.setLayoutData(new GridData(SWT.NONE, SWT.CENTER, false, true));
-      }
-
-      addPrefListener();
-      reselectLastPerson();
-
-      return content;
-   }
-
-   private Composite createPeopleComboBox(final Composite parent) {
-
-      _cboPeople = new Combo(parent, SWT.DROP_DOWN | SWT.READ_ONLY);
-
-      _cboPeople.setVisibleItemCount(20);
-      _cboPeople.setToolTipText(Messages.App_People_tooltip);
-
-      _cboPeople.addDisposeListener(new DisposeListener() {
-         @Override
-         public void widgetDisposed(final DisposeEvent e) {
-            if (_prefChangeListener != null) {
-               _prefStore.removePropertyChangeListener(_prefChangeListener);
-            }
-         }
-      });
-
-      _cboPeople.addSelectionListener(new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            onSelectPerson();
-         }
-      });
-
-      fillPeopleComboBox();
-
-      return _cboPeople;
-   }
-
-   private void fillPeopleComboBox() {
-
-      _cboPeople.removeAll();
-
-      /*
-       * removed the dash in the "All People" string because the whole item was not displayed on mac
-       * osx
-       */
-      _cboPeople.add(Messages.App_People_item_all);
-
-      _allPeople = PersonManager.getTourPeople();
-
-      if (_allPeople == null) {
-         return;
-      }
-
-      for (final TourPerson person : _allPeople) {
-         String lastName = person.getLastName();
-         lastName = lastName.equals(UI.EMPTY_STRING) ? UI.EMPTY_STRING : UI.SPACE + lastName;
-         _cboPeople.add(person.getFirstName() + lastName);
-      }
-   }
-
-   /**
-    * fire event that person has changed
-    */
-   private void fireEventNewPersonIsSelected() {
-      _prefStore.setValue(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED, Math.random());
-   }
-
-   private void onSelectPerson() {
-
-      final int selectedIndex = _cboPeople.getSelectionIndex();
-      if (selectedIndex == -1) {
-         return;
-      }
-
-      if (selectedIndex == 0) {
-         // all people are selected
-         TourbookPlugin.setActivePerson(null);
-      } else {
-         // a person is selected
-         TourbookPlugin.setActivePerson(_allPeople.get(selectedIndex - 1));
-      }
-
-      fireEventNewPersonIsSelected();
-   }
-
-   /**
-    * select the person which was set in the dialog settings
-    */
-   private void reselectLastPerson() {
-
-      try {
-
-         final long lastPersonId = _state.getLong(ITourbookPreferences.APP_LAST_SELECTED_PERSON_ID);
-
-         // try to reselect the last person
-         reselectPerson(lastPersonId);
-
-      } catch (final NumberFormatException e) {
-         // no last person id, select all
-         _cboPeople.select(0);
-      }
-   }
-
-   private void reselectPerson(final long previousPersonId) {
-
-      if (_allPeople == null) {
-         _cboPeople.select(0);
-         return;
-      }
-
-      TourPerson currentPerson = null;
-      int personIndex = 1;
-
-      for (final TourPerson person : _allPeople) {
-         if (previousPersonId == person.getPersonId()) {
-            // previous person was found
-            _cboPeople.select(personIndex);
-            currentPerson = person;
-            addTourPersonListener(currentPerson);
-            break;
-         }
-         personIndex++;
-      }
-
-      if (currentPerson == null) {
-         // old person was not found in the new list
-         _cboPeople.select(0);
-      }
-
-      TourbookPlugin.setActivePerson(currentPerson);
-
-   }
-
-   /**
-    * save current person id in the dialog settings
-    */
-   void saveState() {
-
-      if (_cboPeople == null || _cboPeople.isDisposed()) {
-         StatusUtil.log("cannot save selected person, _cboPeople.isDisposed()");//$NON-NLS-1$
-         return;
-      }
-
-      final int selectedIndex = _cboPeople.getSelectionIndex();
-
-      long personId = -1;
-      if (selectedIndex > 0) {
-         personId = _allPeople.get(selectedIndex - 1).getPersonId();
-      }
-
-      _state.put(ITourbookPreferences.APP_LAST_SELECTED_PERSON_ID, personId);
-   }
-
-   void selectFirstPerson() {
-
-      final int peopleCount = _cboPeople.getItemCount();
-
-      if (peopleCount > 1) {
-         _cboPeople.select(1);
-      }
-   }
+		_cboPeople.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				onSelectPerson();
+			}
+		});
+
+		fillPeopleComboBox();
+
+		return _cboPeople;
+	}
+
+	private void fillPeopleComboBox() {
+
+		_cboPeople.removeAll();
+
+		/*
+		 * removed the dash in the "All People" string because the whole item was not displayed on mac
+		 * osx
+		 */
+		_cboPeople.add(Messages.App_People_item_all);
+
+		_allPeople = PersonManager.getTourPeople();
+
+		if (_allPeople == null) {
+			return;
+		}
+
+		for (final TourPerson person : _allPeople) {
+			String lastName = person.getLastName();
+			lastName = lastName.equals(UI.EMPTY_STRING) ? UI.EMPTY_STRING : UI.SPACE + lastName;
+			_cboPeople.add(person.getFirstName() + lastName);
+		}
+	}
+
+	/**
+	 * fire event that person has changed
+	 */
+	private void fireEventNewPersonIsSelected() {
+		_prefStore.setValue(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED, Math.random());
+	}
+
+	private void onSelectPerson() {
+
+		final int selectedIndex = _cboPeople.getSelectionIndex();
+		if (selectedIndex == -1) {
+			return;
+		}
+
+		if (selectedIndex == 0) {
+			// all people are selected
+			TourbookPlugin.setActivePerson(null);
+		} else {
+			// a person is selected
+			TourbookPlugin.setActivePerson(_allPeople.get(selectedIndex - 1));
+		}
+
+		fireEventNewPersonIsSelected();
+	}
+
+	/**
+	 * select the person which was set in the dialog settings
+	 */
+	private void reselectLastPerson() {
+
+		try {
+
+			final long lastPersonId = _state.getLong(ITourbookPreferences.APP_LAST_SELECTED_PERSON_ID);
+
+			// try to reselect the last person
+			reselectPerson(lastPersonId);
+
+		} catch (final NumberFormatException e) {
+			// no last person id, select all
+			_cboPeople.select(0);
+		}
+	}
+
+	private void reselectPerson(final long previousPersonId) {
+
+		if (_allPeople == null) {
+			_cboPeople.select(0);
+			return;
+		}
+
+		TourPerson currentPerson = null;
+		int personIndex = 1;
+
+		for (final TourPerson person : _allPeople) {
+			if (previousPersonId == person.getPersonId()) {
+				// previous person was found
+				_cboPeople.select(personIndex);
+				currentPerson = person;
+				break;
+			}
+			personIndex++;
+		}
+
+		if (currentPerson == null) {
+			// old person was not found in the new list
+			_cboPeople.select(0);
+		}
+
+		TourbookPlugin.setActivePerson(currentPerson);
+	}
+
+	/**
+	 * save current person id in the dialog settings
+	 */
+	void saveState() {
+
+		if (_cboPeople == null || _cboPeople.isDisposed()) {
+			StatusUtil.log("cannot save selected person, _cboPeople.isDisposed()");//$NON-NLS-1$
+			return;
+		}
+
+		final int selectedIndex = _cboPeople.getSelectionIndex();
+
+		long personId = -1;
+		if (selectedIndex > 0) {
+			personId = _allPeople.get(selectedIndex - 1).getPersonId();
+		}
+
+		_state.put(ITourbookPreferences.APP_LAST_SELECTED_PERSON_ID, personId);
+	}
+
+	void selectFirstPerson() {
+
+		final int peopleCount = _cboPeople.getItemCount();
+
+		if (peopleCount > 1) {
+			_cboPeople.select(1);
+		}
+	}
 
 }
