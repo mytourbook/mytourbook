@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -80,7 +80,7 @@ public class WizardPage_20_ReferenceTour extends WizardPage {
 
 	final IPreferenceStore					_prefStore				= TourbookPlugin.getPrefStore();
 
-	private ArrayList<RefTourItem>			_refTours				= new ArrayList<RefTourItem>();
+	private ArrayList<RefTourItem>			_refTours				= new ArrayList<>();
 	private final IReferenceTourProvider	_refTourProvider;
 
 	/*
@@ -343,7 +343,7 @@ public class WizardPage_20_ReferenceTour extends WizardPage {
 
 		_refTours.clear();
 
-		final String sql = "" //$NON-NLS-1$
+      final String sql = UI.EMPTY_STRING
 				//
 				+ "SELECT" //$NON-NLS-1$
 				//

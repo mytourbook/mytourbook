@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -370,7 +370,7 @@ public class HoveredTour_ToolTip_UI extends Pinned_ToolTip_Shell implements IPin
 
          // nothing is hovered
 
-         _label.setText(""); //$NON-NLS-1$
+         _label.setText(UI.EMPTY_STRING);
 
       } else {
 
@@ -378,7 +378,7 @@ public class HoveredTour_ToolTip_UI extends Pinned_ToolTip_Shell implements IPin
 
          final ArrayList<Long> allHoveredTours = hoveredTourData.allHoveredTourIds;
 
-         final String debugText = allHoveredTours.size() > 0 ? "" + allHoveredTours.get(0) : ""; //$NON-NLS-1$ //$NON-NLS-2$
+         final String debugText = allHoveredTours.size() > 0 ? UI.EMPTY_STRING + allHoveredTours.get(0) : UI.EMPTY_STRING;
 
          _label.setText(debugText);
       }

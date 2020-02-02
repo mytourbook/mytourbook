@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1427,18 +1427,18 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       final float selectedMinAltiDiff = (float) (_spinnerMinAltitude.getSelection() / 10.0);
 
-      final ArrayList<AltitudeUpDownSegment> tourSegements = new ArrayList<>();
+      final ArrayList<AltitudeUpDownSegment> tourSegments = new ArrayList<>();
 
       // create segment when the altitude up/down is changing
-      _tourData.computeAltitudeUpDown(tourSegements, selectedMinAltiDiff);
+      _tourData.computeAltitudeUpDown(tourSegments, selectedMinAltiDiff);
 
       // convert segment list into array
       int serieIndex = 0;
-      final int segmentLength = tourSegements.size();
+      final int segmentLength = tourSegments.size();
       final int[] segmentSerieIndex = _tourData.segmentSerieIndex = new int[segmentLength];
       final float[] altitudeDiff = _tourData.segmentSerie_Altitude_Diff_Computed = new float[segmentLength];
 
-      for (final AltitudeUpDownSegment altitudeUpDownSegment : tourSegements) {
+      for (final AltitudeUpDownSegment altitudeUpDownSegment : tourSegments) {
 
          segmentSerieIndex[serieIndex] = altitudeUpDownSegment.serieIndex;
          altitudeDiff[serieIndex] = altitudeUpDownSegment.computedAltitudeDiff;
@@ -1733,7 +1733,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             getTourIndices()).simplify();
 
       /*
-       * copie the data index for the simplified points into the tour data
+       * copies the data index for the simplified points into the tour data
        */
       final int[] segmentSerieIndex = _tourData.segmentSerieIndex = new int[simplePoints.length];
 
@@ -1768,7 +1768,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             getTourIndices()).simplify();
 
       /*
-       * copie the data index for the simplified points into the tour data
+       * copies the data index for the simplified points into the tour data
        */
       final int[] segmentSerieIndex = _tourData.segmentSerieIndex = new int[simplePoints.length];
 
@@ -1830,7 +1830,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          final float currentDistance = distanceSerie[serieIndex];
          final float currentSpeed = speedSerie[serieIndex];
 
-         // diffs to the previous time slice
+         // differences with the previous time slice
          final int timeDiff = currentTime - prevTime;
          final float distanceDiff = currentDistance - prevDistance;
 
@@ -1919,7 +1919,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
             if (segmentStartIndex == segmentEndIndex) {
 
-               // ignore, this occured
+               // ignore, this occurred
 
             } else {
 
@@ -4170,7 +4170,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
          if (tourMarker.isMarkerVisible() == false) {
 
-            // irgnore hidden marker
+            // ignore hidden marker
             continue;
          }
 

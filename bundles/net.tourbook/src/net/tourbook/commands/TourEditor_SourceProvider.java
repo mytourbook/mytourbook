@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,6 +14,8 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.commands;
+
+import de.byteholder.geoclipse.map.UI;
 
 import java.util.Collections;
 import java.util.Map;
@@ -49,7 +51,7 @@ public class TourEditor_SourceProvider extends AbstractSourceProvider implements
       final String partId = _activePartRef == null ? null : _activePartRef.getId();
 
       if (partId == null) {
-         return Collections.singletonMap(TOUR_EDITOR_PART_PROVIDER, ""); //$NON-NLS-1$
+         return Collections.singletonMap(TOUR_EDITOR_PART_PROVIDER, UI.EMPTY_STRING);
       }
 
       return Collections.singletonMap(TOUR_EDITOR_PART_PROVIDER, partId);

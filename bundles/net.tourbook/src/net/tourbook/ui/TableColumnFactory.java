@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -60,7 +60,10 @@ public abstract class TableColumnFactory {
    public static final TableColumnFactory DEVICE_NAME;
    public static final TableColumnFactory DEVICE_PROFILE;
 
+   public static final TableColumnFactory MARKER_ALTITUDE_ELEVATIONGAINDELTA;
+   public static final TableColumnFactory MARKER_ALTITUDE_ELEVATIONLOSSDELTA;
    public static final TableColumnFactory MARKER_MAP_VISIBLE;
+   public static final TableColumnFactory MARKER_PACE_DELTA;
    public static final TableColumnFactory MARKER_SERIE_INDEX;
    public static final TableColumnFactory MARKER_TIME_DELTA;
    public static final TableColumnFactory MARKER_URL;
@@ -753,6 +756,56 @@ public abstract class TableColumnFactory {
        * Marker
        */
 
+      MARKER_ALTITUDE_ELEVATIONGAINDELTA = new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(
+                  columnManager,
+                  "MARKER_ALTITUDE_ELEVATIONGAINDELTA", //$NON-NLS-1$
+                  SWT.TRAIL);
+
+            final String unitLabel = UI.SYMBOL_DIFFERENCE_WITH_SPACE + UI.UNIT_LABEL_ALTITUDE + UI.SPACE + UI.SYMBOL_ARROW_UP;
+
+            colDef.setColumnCategory(Messages.ColumnFactory_Category_Altitude);
+            colDef.setColumnLabel(Messages.ColumnFactory_ElevationGainDelta_Label);
+            colDef.setColumnHeaderText(unitLabel);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_ElevationGainDelta_Tooltip);
+            colDef.setColumnUnit(unitLabel);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(12));
+
+            return colDef;
+         }
+      };
+
+      MARKER_ALTITUDE_ELEVATIONLOSSDELTA = new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(
+                  columnManager,
+                  "MARKER_ALTITUDE_ELEVATIONLOSSDELTA", //$NON-NLS-1$
+                  SWT.TRAIL);
+
+            final String unitLabel = UI.SYMBOL_DIFFERENCE_WITH_SPACE + UI.UNIT_LABEL_ALTITUDE + UI.SPACE + UI.SYMBOL_ARROW_DOWN;
+
+            colDef.setColumnCategory(Messages.ColumnFactory_Category_Altitude);
+            colDef.setColumnLabel(Messages.ColumnFactory_ElevationLossDelta_Label);
+            colDef.setColumnHeaderText(unitLabel);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_ElevationLossDelta_Tooltip);
+            colDef.setColumnUnit(unitLabel);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(12));
+
+            return colDef;
+         }
+      };
+
       MARKER_MAP_VISIBLE = new TableColumnFactory() {
 
          @Override
@@ -772,6 +825,31 @@ public abstract class TableColumnFactory {
 
             colDef.setDefaultColumnWidth(pixelWidth);
             colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
+
+            return colDef;
+         }
+      };
+
+      MARKER_PACE_DELTA = new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(
+                  columnManager,
+                  "MARKER_PACE_DELTA", //$NON-NLS-1$
+                  SWT.TRAIL);
+
+            final String unitLabel = UI.SYMBOL_DIFFERENCE_WITH_SPACE + UI.UNIT_LABEL_PACE;
+
+            colDef.setColumnCategory(Messages.ColumnFactory_Category_Motion);
+            colDef.setColumnLabel(Messages.ColumnFactory_PaceDelta_Label);
+            colDef.setColumnHeaderText(unitLabel);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_PaceDelta_Tooltip);
+            colDef.setColumnUnit(unitLabel);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(12));
 
             return colDef;
          }
