@@ -171,7 +171,7 @@ public class DialogEditTimeSlicesValues extends TitleAreaDialog {
                   + tourStart.format(TimeTools.Formatter_Time_S));
    }
 
-   private void Create_110_AltitudeRadioButtons(final Composite parent) {
+   private void CreateUI_110_AltitudeRadioButtons(final Composite parent) {
 
       final Composite container = _tk.createComposite(parent);
       GridDataFactory.fillDefaults().span(2, 1).applyTo(container);
@@ -193,7 +193,7 @@ public class DialogEditTimeSlicesValues extends TitleAreaDialog {
       }
    }
 
-   private void Create_120_PulseRadioButtons(final Composite parent) {
+   private void CreateUI_120_PulseRadioButtons(final Composite parent) {
 
       final Composite container = _tk.createComposite(parent);
       GridDataFactory.fillDefaults().span(2, 1).applyTo(container);
@@ -218,7 +218,7 @@ public class DialogEditTimeSlicesValues extends TitleAreaDialog {
       }
    }
 
-   private void Create_130_CadenceRadioButtons(final Composite parent) {
+   private void CreateUI_130_CadenceRadioButtons(final Composite parent) {
 
       final Composite container = _tk.createComposite(parent);
       GridDataFactory.fillDefaults().span(2, 1).applyTo(container);
@@ -243,7 +243,7 @@ public class DialogEditTimeSlicesValues extends TitleAreaDialog {
       }
    }
 
-   private void Create_140_TemperatureRadioButtons(final Composite parent) {
+   private void CreateUI_140_TemperatureRadioButtons(final Composite parent) {
       final Composite container = _tk.createComposite(parent);
       GridDataFactory.fillDefaults().span(2, 1).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
@@ -399,7 +399,7 @@ public class DialogEditTimeSlicesValues extends TitleAreaDialog {
             /*
              * radio button: new value
              */
-            Create_110_AltitudeRadioButtons(container);
+            CreateUI_110_AltitudeRadioButtons(container);
 
          }
 
@@ -431,7 +431,7 @@ public class DialogEditTimeSlicesValues extends TitleAreaDialog {
             // label: bpm
             label = _tk.createLabel(container, "bpm"); //$NON-NLS-1$
 
-            Create_120_PulseRadioButtons(container);
+            CreateUI_120_PulseRadioButtons(container);
 
          }
 
@@ -461,7 +461,7 @@ public class DialogEditTimeSlicesValues extends TitleAreaDialog {
             // label: m or ft
             label = _tk.createLabel(container, "rpm");//$NON-NLS-1$
 
-            Create_130_CadenceRadioButtons(container);
+            CreateUI_130_CadenceRadioButtons(container);
 
          }
 
@@ -491,7 +491,7 @@ public class DialogEditTimeSlicesValues extends TitleAreaDialog {
             // label: Celsius or Fahrenheit
             label = _tk.createLabel(container, UI.UNIT_LABEL_TEMPERATURE);
 
-            Create_140_TemperatureRadioButtons(container);
+            CreateUI_140_TemperatureRadioButtons(container);
          }
       }
    }
