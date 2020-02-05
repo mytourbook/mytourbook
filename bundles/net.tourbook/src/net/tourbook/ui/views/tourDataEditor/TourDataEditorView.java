@@ -569,7 +569,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    //
    private Label                    _timeSlice_Label;
    private TableViewer              _timeSlice_Viewer;
-   private TimeSliceComparator      _tsComparator                 = new TimeSliceComparator();
+   private TimeSliceComparator      _timeSlice_Comparator                 = new TimeSliceComparator();
    private Object[]                 _timeSlice_ViewerItems;
    private ColumnManager            _timeSlice_ColumnManager;
    private TimeSlice_TourViewer     _timeSlice_TourViewer         = new TimeSlice_TourViewer();
@@ -4693,7 +4693,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _timeSlice_ColumnManager.createColumns(_timeSlice_Viewer);
 
       _timeSlice_Viewer.setContentProvider(new TimeSlice_ViewerContentProvider());
-      _timeSlice_Viewer.setComparator(_tsComparator);
+      _timeSlice_Viewer.setComparator(_timeSlice_Comparator);
       _timeSlice_Viewer.setUseHashlookup(true);
 
       _timeSlice_Viewer.addSelectionChangedListener(new ISelectionChangedListener() {
@@ -7055,7 +7055,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          final ISelection selectionBackup = _timeSlice_Viewer.getSelection();
 
          // toggle sorting
-         _tsComparator.setSortColumn(e.widget);
+         _timeSlice_Comparator.setSortColumn(e.widget);
          _timeSlice_Viewer.refresh();
 
          // reselect selection
