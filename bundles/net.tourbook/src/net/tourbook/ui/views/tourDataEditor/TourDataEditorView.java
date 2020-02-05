@@ -6234,17 +6234,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             && _tourData.latitudeSerie.length > 0;
 
       final boolean canEditTemperature = canEdit && _tourData != null && (_tourData.temperatureSerie == null || _tourData.isWeatherDataFromApi());
-
-      _comboTitle.setEnabled(canEdit);
-      _txtDescription.setEnabled(canEdit);
-
-      _comboLocation_Start.setEnabled(canEdit);
-      _comboLocation_End.setEnabled(canEdit);
-
-      // weather
       final boolean enableWeatherRetrieval = _prefStore.getBoolean(ITourbookPreferences.WEATHER_USE_WEATHER_RETRIEVAL) &&
             !_prefStore.getString(ITourbookPreferences.WEATHER_API_KEY).equals(UI.EMPTY_STRING);
 
+      _comboTitle.setEnabled(canEdit);
+      _txtDescription.setEnabled(canEdit);
+      _comboLocation_Start.setEnabled(canEdit);
+      _comboLocation_End.setEnabled(canEdit);
+
+      //Weather
       _linkWeather.setEnabled(canEdit && enableWeatherRetrieval);
       _comboWeather_Clouds.setEnabled(canEdit);
       _comboWeather_WindDirectionText.setEnabled(canEdit);
