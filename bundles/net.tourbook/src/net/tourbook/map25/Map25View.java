@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2018, 2019, 2020 Wolfgang Schramm and Contributors
  *
  *
  * This program is free software; you can redistribute it and/or modify it under
