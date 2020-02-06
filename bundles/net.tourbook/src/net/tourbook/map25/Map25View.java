@@ -1,5 +1,6 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * 
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,6 +14,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
+
 package net.tourbook.map25;
 
 import gnu.trove.list.array.TIntArrayList;
@@ -256,7 +258,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
    private Menu                            _swtContextMenu;
    
    //
-   /*
+   /**
     * UI controls
     */
    private Composite _swtContainer;
@@ -308,7 +310,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       }
    }
 
-/*   private class ActionShowPhoto_WithConfig extends ActionToolbarSlideout {
+/**   private class ActionShowPhoto_WithConfig extends ActionToolbarSlideout {
 
       public ActionShowPhoto_WithConfig() {
 
@@ -814,7 +816,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
             _isContextMenuVisible = false;
 
-            /*
+            /**
              * run async that the context state and tour info reset is done after the context menu
              * actions has done they tasks
              */
@@ -884,7 +886,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
             final int serieIndex = tourMarker.getSerieIndex();
 
-            /*
+            /**
              * check bounds because when a tour is split, it can happen that the marker serie index
              * is out of scope
              */
@@ -892,7 +894,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
                continue;
             }
 
-            /*
+            /**
              * draw tour marker
              */
 
@@ -950,7 +952,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
          @Override
          public void componentResized(final ComponentEvent e) {
 
-            /*
+            /**
              * Render map otherwise a black screen is displayed until the map is moved
              */
             final Map map = _mapApp.getMap();
@@ -1056,7 +1058,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
    private void fillActionBars() {
 
-      /*
+      /**
        * fill view toolbar
        */
       final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
@@ -1087,7 +1089,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       tbm.add(_actionMapOptions);
       tbm.add(_actionMapProvider);
 
-      /*
+      /**
        * fill view menu
        */
 //		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
@@ -1190,7 +1192,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
             if (galleryPhotos != null) {
                allPhotos.addAll(galleryPhotos);
-               /*playing with photos next lines*/
+               /**playing with photos next lines*/
                //Map25App.debugPrint("* Map25View: paintphotoselection else: size: " + allPhotos.size());
             }
          }
@@ -1247,7 +1249,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       final int selectionHash = selection.hashCode();
       if (_lastSelectionHash == selectionHash) {
 
-         /*
+         /**
           * Last selection has not changed, this can occure when the app lost the focus and got the
           * focus again.
           */
@@ -1445,7 +1447,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
    private void paintTours(final ArrayList<Long> tourIdList) {
 
-      /*
+      /**
        * TESTING if a map redraw can be avoided, 15.6.2015
        */
       final int tourIdsHashCode = tourIdList.hashCode();
@@ -1479,7 +1481,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
          return;
       }
 
-      /*
+      /**
        * Tours
        */
       final TourLayer tourLayer = _mapApp.getLayer_Tour();
@@ -1537,7 +1539,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
       checkSliderIndices();
 
-      /*
+      /**
        * Chart slider + path
        */
       final Map25TrackConfig activeTourTrackConfig = Map25ConfigManager.getActiveTourTrackConfig();
@@ -1573,7 +1575,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       }
 
       
-      /*
+      /**
        * Markers
        */
       final MarkerLayer markerLayer = _mapApp.getLayer_TourMarker();
@@ -1582,7 +1584,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
          markerLayer.replaceMarkers(allMarkers);
       }
 
-      /*
+      /**
        * Photos
        */
       paintPhotos(_allPhotos);
@@ -1596,7 +1598,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       //photoLayer.setEnabled(true);
       Map25App.debugPrint(" Map25View: ** paintTours_AndUpdateMap: creating photolayer with size: " + _allPhotos.size()); //$NON-NLS-1$
       
-      /*
+      /**
        * Update map
        */
       final Map map25 = _mapApp.getMap();
@@ -1633,7 +1635,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
    void restoreState() {
 
-      /*
+      /**
        * Layer
        */
 
@@ -1864,7 +1866,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
       final Map map = _mapApp.getMap();
 
-      /*
+      /**
        * Keep current tilt/bearing
        */
       final MapPosition currentMapPos = map.getMapPosition();

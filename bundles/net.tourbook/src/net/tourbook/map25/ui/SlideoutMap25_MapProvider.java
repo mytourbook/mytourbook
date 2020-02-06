@@ -64,7 +64,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
 
    private boolean                  _isInUpdateUI;
 
-   /*
+   /**
     * UI controls
     */
    private Composite _parent;
@@ -76,7 +76,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
    private Label     _lblMapProvider;
    private Label     _lblTheme;
    private Label     _lblThemeStyle;
-   
+
    private Label     _lblCopyright;
 
    /**
@@ -142,7 +142,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
 
    private void createUI_10_Title(final Composite parent) {
 
-      /*
+      /**
        * Label: Slideout title
        */
       final Label label = new Label(parent, SWT.NONE);
@@ -174,7 +174,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
       {
          {
-            /*
+            /**
              * Map provider
              */
             _lblMapProvider = new Label(container, SWT.NONE);
@@ -190,7 +190,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
             });
          }
          {
-            /*
+            /**
              * Combo: Theme
              */
             _lblTheme = new Label(container, SWT.NONE);
@@ -206,7 +206,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
             });
          }
          {
-            /*
+            /**
              * Theme style
              */
             _lblThemeStyle = new Label(container, SWT.NONE);
@@ -220,15 +220,15 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
                   onSelect_ThemeStyle();
                }
             });
-         }     
+         }
       }
 
       fillMapProvider();
    }
-   
+
    private void createUI_30_Info(final Composite parent) {
 
-      /*
+      /**
        * Label: Slideout Info with copyright Info
        */
       _lblCopyright = new Label(parent, SWT.NONE);
@@ -267,7 +267,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
          _comboMapProvider.add(map25Provider.name);
       }
 
-      /*
+      /**
        * Reselect map provider
        */
       final Map25Provider currentMapProvider = getUsedMapProvider();
@@ -305,7 +305,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
          @Override
          public void focusGained(final FocusEvent e) {
 
-            /*
+            /**
              * This will fix the problem that when the list of a combobox is displayed, then the
              * slideout will disappear :-(((
              */
@@ -443,7 +443,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
 
    private void restoreState() {
 
-      /*
+      /**
        * Reselect map provider
        */
       final Map25Provider currentMapProvider = getUsedMapProvider();
@@ -535,7 +535,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
 
    private void updateUI_Theme(final Map25Provider mapProvider) {
 
-      /*
+      /**
        * Fill theme combo
        */
       _comboTheme.removeAll();
@@ -552,7 +552,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
          _comboTheme.add(vtmTheme.toString());
       }
 
-      /*
+      /**
        * Select theme
        */
       if (mapProvider == null) {
@@ -620,7 +620,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
 
       if (mapProvider.is_mf_Map && _comboTheme.getSelectionIndex() > 0) {
 
-         /*
+         /**
           * When it's an offline map and the themes are NOT from the a file then there are no theme
           * styles
           */
@@ -636,7 +636,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
          return;
       }
 
-      /*
+      /**
        * Fill combo with all available styles
        */
 

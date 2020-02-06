@@ -2,7 +2,7 @@
  * Copyright (C) 2019 Wolfgang Schramm and Contributors
  * Copyright 2016-2018 devemux86
  * Copyright 2017 nebular
- * Copyright 2019 Thomas Theussing
+ * Copyright 2019, 2020 Thomas Theussing
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -177,7 +177,7 @@ public class MarkerToolkit {
       float half = bitmapStarSize/2;
       _fillPainter.setColor(0xFFFFFF00); // 100percent yellow
       _fillPainter.setStrokeWidth(2);
-      /*
+      /**
        * link: https://stackoverflow.com/questions/16327588/how-to-make-star-shape-in-java
        */
       defaultMarkerCanvas.drawLine(half * 0.1f  , half * 0.65f, half * 1.9f  , half * 0.65f, _fillPainter);
@@ -313,7 +313,7 @@ public class MarkerToolkit {
       titleCanvas.setBitmap(titleBitmap);
       
       { // testing block
-      /*
+      /**
        * the following three lines displaying a transparent box.
        * only for testing purposes, normally uncommented
        */

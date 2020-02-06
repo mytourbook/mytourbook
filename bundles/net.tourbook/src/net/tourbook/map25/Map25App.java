@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017, 2018, 2019, 2020 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -26,7 +26,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import net.tourbook.common.UI;
-
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.map.bookmark.MapPosition_with_MarkerPosition;
@@ -144,7 +143,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	private Map25Provider			_selectedMapProvider;
 	private TileManager				_tileManager;
 
-	/*
+	/**
 	 * if i could replace "_l" against "_layer_BaseMap", everything would be easier...
 	 * _l = mMap.setBaseMap(tileSource);  returns VectorTileLayer
 	 */
@@ -457,7 +456,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 			debugPrint(" map25: " + "####### loadtheme: is online map setting textscale " +   _online_TextScale); //$NON-NLS-1$ //$NON-NLS-2$
 			//CanvasAdapter.textScale = _vtm_TextScale;
 			// if problems with switching themes via keyboard, maybe this block is the problem
-			/*if (_selectedMapProvider.theme != null && _selectedMapProvider.theme != VtmThemes.MAPZEN && _selectedMapProvider.theme != VtmThemes.OPENMAPTILES) {
+			/**if (_selectedMapProvider.theme != null && _selectedMapProvider.theme != VtmThemes.MAPZEN && _selectedMapProvider.theme != VtmThemes.OPENMAPTILES) {
 				debugPrint(" map25: " + "############# setMapProvider: onlinemap using internal theme: " + _selectedMapProvider.theme); //$NON-NLS-1$
 				mMap.setTheme((ThemeFile) _selectedMapProvider.theme);			
 			} else { //when null or when not working MAPZEN or OPENMAPTILES is selected, using DEFAULT theme instead
@@ -798,7 +797,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
             mapViewport.setMinScale(2);
             updateUI_MarkerLayer();
             restoreState();
-
             // update actions in UI thread, run this AFTER the layers are created
             Display.getDefault().asyncExec(new Runnable() {
                @Override
@@ -848,7 +846,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 				debugPrint(" map25: " + "############# setMapProvider: Map Path: " + _mf_mapFilePath); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 
-			/* When switching subthemes buildings disapear and
+			/** When switching subthemes buildings disapear and
 			 * apears again when switching also the mapprovider
 			 * codeblock mustbe outside of the if statement otherwise all themes are allways on
 			 */
@@ -866,7 +864,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
          
          if (onlineOfflineStatusHasChanged) {
             // when this code inside this if staements, subthemes are not working and always on
-            /*final MapFileTileSource tileSource = new MapFileTileSource();
+            /**final MapFileTileSource tileSource = new MapFileTileSource();
             tileSource.setMapFile(_mf_mapFilePath);
             tileSource.setPreferredLanguage(_mf_prefered_language);
             _layer_BaseMap.setTileSource(tileSource);*/
@@ -1080,7 +1078,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 			debugPrint(" map25: " + "############# setupMap: Map Path: " + _mf_mapFilePath); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		
-		/*if (_tileSourceOfflineMapCount == 0) {
+		/**if (_tileSourceOfflineMapCount == 0) {
 			;
 			//throw new IllegalArgumentException("cannot read mapfile: " + _selectedMapProvider.mf_MapFilepath); //$NON-NLS-1$
 		} else {
@@ -1115,7 +1113,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	         .zoomMax(16)
 	         .build();
 
-	   /* needs long copyright hint...*/
+	   /** needs long copyright hint...*/
 //	   _hillshadingSource =  DefaultSources.MAPILION_HILLSHADE_2
 //	         .httpFactory(_httpFactory)
 //	         .apiKey(_mp_key)

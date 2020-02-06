@@ -53,7 +53,7 @@ public class PrefPageMap25OfflineMap extends FieldEditorPreferencePage implement
 
 	private boolean					_isModified;
 
-	/*
+	/**
 	 * UI controls
 	 */
 	private Composite				_editorContainerLocation;
@@ -87,7 +87,7 @@ public class PrefPageMap25OfflineMap extends FieldEditorPreferencePage implement
 		group.setText(Messages.Pref_Map25_Offline_Group_OfflineMap);
 		GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
 		{
-			/*
+			/**
 			 * field: use default location
 			 */
 			_editorBool_UseDefaultLocation = new BooleanFieldEditor(
@@ -105,7 +105,7 @@ public class PrefPageMap25OfflineMap extends FieldEditorPreferencePage implement
 			_editorContainerLocation = new Composite(group, SWT.NONE);
 			GridDataFactory.fillDefaults().grab(true, false).span(3, 1).applyTo(_editorContainerLocation);
 			{
-				/*
+				/**
 				 * editor: thumbnail location
 				 */
 				_editorDir_ThumbnailLocation = new DirectoryFieldEditor(
@@ -138,7 +138,7 @@ public class PrefPageMap25OfflineMap extends FieldEditorPreferencePage implement
 
 	private void enableControls() {
 
-		/*
+		/**
 		 * location
 		 */
 		final boolean useDefaultLocation = _editorBool_UseDefaultLocation.getBooleanValue();
@@ -179,7 +179,7 @@ public class PrefPageMap25OfflineMap extends FieldEditorPreferencePage implement
 
 		restoreState();
 
-		/*
+		/**
 		 * hide error messages, it appears when the thumbnail location is invalid
 		 */
 		if (_editorBool_UseDefaultLocation.getBooleanValue() == false) {
