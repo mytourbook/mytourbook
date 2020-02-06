@@ -1,15 +1,15 @@
 /*******************************************************************************
  * Copyright (C) 2019, Wolfgang Schramm and Contributors
  * Copyright 2019, 2020 Thomas Theussing
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -71,7 +71,7 @@ public class MapsforgeThemeStyle {
       if ("default".equals(language)) { //$NON-NLS-1$
          return name.get(defaultlanguage);
       } else if(language.length() > 2) { //eg, when using "en_EN, then using only first 2 chars"
-         if (name.containsKey(language.substring(0, 2))) {        
+         if (name.containsKey(language.substring(0, 2))) {
             return name.get(language.substring(0, 2));
          } else { //is already short like "en"
             return name.get(language);
@@ -82,7 +82,7 @@ public class MapsforgeThemeStyle {
          return name.get(defaultlanguage);
       }
    }
-   
+
 
    /**
     * get the style name like
@@ -120,7 +120,7 @@ public class MapsforgeThemeStyle {
             + "name= " + name.get(defaultlanguage) + " " //$NON-NLS-1$ //$NON-NLS-2$
             + "\n"; //$NON-NLS-1$
    }
-   
+
    public String toString(final String language) {
 
       return "MapsforgeThemeStyle " //$NON-NLS-1$
@@ -128,6 +128,6 @@ public class MapsforgeThemeStyle {
             + "xmlLayer=" + xmlLayer + " " //$NON-NLS-1$ //$NON-NLS-2$
             + "name= " + name.get(defaultlanguage) + " " //$NON-NLS-1$ //$NON-NLS-2$
             + "\n"; //$NON-NLS-1$
-   } 
-   
+   }
+
 }
