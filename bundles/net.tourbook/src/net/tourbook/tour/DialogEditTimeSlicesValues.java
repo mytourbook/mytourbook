@@ -171,103 +171,6 @@ public class DialogEditTimeSlicesValues extends TitleAreaDialog {
                   + tourStart.format(TimeTools.Formatter_Time_S));
    }
 
-   private void CreateUI_110_AltitudeRadioButtons(final Composite parent) {
-
-      final Composite container = _tk.createComposite(parent);
-      GridDataFactory.fillDefaults().span(2, 1).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-      {
-         _radioButton_Altitude_NewValue = new Button(container, SWT.RADIO);
-         GridDataFactory.fillDefaults().indent(_newValuesRadioButtonsIndent, 0).align(SWT.CENTER, SWT.FILL).applyTo(_radioButton_Altitude_NewValue);
-         _radioButton_Altitude_NewValue.setSelection(true);
-         _radioButton_Altitude_NewValue.addSelectionListener(_radioButtonSelectionListener);
-
-         /*
-          * radio button: offset
-          */
-         _radioButton_Altitude_OffsetValue = new Button(container, SWT.RADIO);
-         GridDataFactory.fillDefaults().indent(_offsetValuesRadioButtonsIndent, 0).align(SWT.CENTER, SWT.FILL).applyTo(
-               _radioButton_Altitude_OffsetValue);
-         _radioButton_Altitude_OffsetValue.setToolTipText(Messages.Dialog_HRZone_Label_Trash_Tooltip);
-         _radioButton_Altitude_OffsetValue.addSelectionListener(_radioButtonSelectionListener);
-      }
-   }
-
-   private void CreateUI_120_PulseRadioButtons(final Composite parent) {
-
-      final Composite container = _tk.createComposite(parent);
-      GridDataFactory.fillDefaults().span(2, 1).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-      {
-         /*
-          * radio button: new value
-          */
-         _radioButton_Pulse_NewValue = new Button(container, SWT.RADIO);
-         GridDataFactory.fillDefaults().indent(_newValuesRadioButtonsIndent, 0).align(SWT.CENTER, SWT.FILL).applyTo(_radioButton_Pulse_NewValue);
-         _radioButton_Pulse_NewValue.setSelection(true);
-         _radioButton_Pulse_NewValue.addSelectionListener(_radioButtonSelectionListener);
-
-         /*
-          * radio button: offset
-          */
-         _radioButton_Pulse_OffsetValue = new Button(container, SWT.RADIO);
-         GridDataFactory.fillDefaults().indent(_offsetValuesRadioButtonsIndent, 0).align(SWT.CENTER, SWT.FILL).applyTo(
-               _radioButton_Pulse_OffsetValue);
-         _radioButton_Pulse_OffsetValue.setToolTipText(Messages.Dialog_HRZone_Label_Trash_Tooltip);
-         _radioButton_Pulse_OffsetValue.addSelectionListener(_radioButtonSelectionListener);
-      }
-   }
-
-   private void CreateUI_130_CadenceRadioButtons(final Composite parent) {
-
-      final Composite container = _tk.createComposite(parent);
-      GridDataFactory.fillDefaults().span(2, 1).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-      {
-         /*
-          * radio button: new value
-          */
-         _radioButton_Cadence_NewValue = new Button(container, SWT.RADIO);
-         GridDataFactory.fillDefaults().indent(_newValuesRadioButtonsIndent, 0).align(SWT.CENTER, SWT.FILL).applyTo(_radioButton_Cadence_NewValue);
-         _radioButton_Cadence_NewValue.setSelection(true);
-         _radioButton_Cadence_NewValue.addSelectionListener(_radioButtonSelectionListener);
-
-         /*
-          * radio button: offset
-          */
-         _radioButton_Cadence_OffsetValue = new Button(container, SWT.RADIO);
-         GridDataFactory.fillDefaults().indent(_offsetValuesRadioButtonsIndent, 0).align(SWT.CENTER, SWT.FILL).applyTo(
-               _radioButton_Cadence_OffsetValue);
-         _radioButton_Cadence_OffsetValue.setToolTipText(Messages.Dialog_HRZone_Label_Trash_Tooltip);
-         _radioButton_Cadence_OffsetValue.addSelectionListener(_radioButtonSelectionListener);
-      }
-   }
-
-   private void CreateUI_140_TemperatureRadioButtons(final Composite parent) {
-      final Composite container = _tk.createComposite(parent);
-      GridDataFactory.fillDefaults().span(2, 1).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-      {
-         /*
-          * radio button: new value
-          */
-         _radioButton_Temperature_NewValue = new Button(container, SWT.RADIO);
-         GridDataFactory.fillDefaults().indent(_newValuesRadioButtonsIndent, 0).align(SWT.CENTER, SWT.FILL).applyTo(
-               _radioButton_Temperature_NewValue);
-         _radioButton_Temperature_NewValue.setSelection(true);
-         _radioButton_Temperature_NewValue.addSelectionListener(_radioButtonSelectionListener);
-
-         /*
-          * radio button: offset
-          */
-         _radioButton_Temperature_OffsetValue = new Button(container, SWT.RADIO);
-         GridDataFactory.fillDefaults().indent(_offsetValuesRadioButtonsIndent, 0).align(SWT.CENTER, SWT.FILL).applyTo(
-               _radioButton_Temperature_OffsetValue);
-         _radioButton_Temperature_OffsetValue.setToolTipText(Messages.Dialog_HRZone_Label_Trash_Tooltip);
-         _radioButton_Temperature_OffsetValue.addSelectionListener(_radioButtonSelectionListener);
-      }
-   }
-
    @Override
    protected final void createButtonsForButtonBar(final Composite parent) {
 
@@ -328,8 +231,7 @@ public class DialogEditTimeSlicesValues extends TitleAreaDialog {
           * Main checkboxes
           */
          {
-            _checkBox_NewValues = new Button(container, SWT.CHECK);
-            _checkBox_NewValues.setText(Messages.Dialog_Edit_Checkbox_NewValues);//"New values");
+            _checkBox_NewValues = _tk.createButton(container, Messages.Dialog_Edit_Checkbox_NewValues, SWT.CHECK);
             GridDataFactory.fillDefaults().span(4, 1).indent(175, 0).align(SWT.END, SWT.FILL).applyTo(_checkBox_NewValues);
             _checkBox_NewValues.setSelection(true);
             _checkBox_NewValues.addSelectionListener(new SelectionListener() {
@@ -349,8 +251,7 @@ public class DialogEditTimeSlicesValues extends TitleAreaDialog {
                }
             });
 
-            _checkBox_OffsetValues = new Button(container, SWT.CHECK);
-            _checkBox_OffsetValues.setText(Messages.Dialog_Edit_Checkbox_OffsetValues);//"Offset values");
+            _checkBox_OffsetValues = _tk.createButton(container, Messages.Dialog_Edit_Checkbox_OffsetValues, SWT.CHECK);
             GridDataFactory.fillDefaults().indent(20, 0).align(SWT.BEGINNING, SWT.FILL).applyTo(_checkBox_OffsetValues);
             _checkBox_OffsetValues.addSelectionListener(new SelectionListener() {
 
@@ -493,6 +394,103 @@ public class DialogEditTimeSlicesValues extends TitleAreaDialog {
 
             CreateUI_140_TemperatureRadioButtons(container);
          }
+      }
+   }
+
+   private void CreateUI_110_AltitudeRadioButtons(final Composite parent) {
+
+      final Composite container = _tk.createComposite(parent);
+      GridDataFactory.fillDefaults().span(2, 1).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      {
+         _radioButton_Altitude_NewValue = _tk.createButton(container, UI.EMPTY_STRING, SWT.RADIO);
+         GridDataFactory.fillDefaults().indent(_newValuesRadioButtonsIndent, 0).align(SWT.CENTER, SWT.FILL).applyTo(_radioButton_Altitude_NewValue);
+         _radioButton_Altitude_NewValue.setSelection(true);
+         _radioButton_Altitude_NewValue.addSelectionListener(_radioButtonSelectionListener);
+
+         /*
+          * radio button: offset
+          */
+         _radioButton_Altitude_OffsetValue = _tk.createButton(container, UI.EMPTY_STRING, SWT.RADIO);
+         GridDataFactory.fillDefaults().indent(_offsetValuesRadioButtonsIndent, 0).align(SWT.CENTER, SWT.FILL).applyTo(
+               _radioButton_Altitude_OffsetValue);
+         _radioButton_Altitude_OffsetValue.setToolTipText(Messages.Dialog_HRZone_Label_Trash_Tooltip);
+         _radioButton_Altitude_OffsetValue.addSelectionListener(_radioButtonSelectionListener);
+      }
+   }
+
+   private void CreateUI_120_PulseRadioButtons(final Composite parent) {
+
+      final Composite container = _tk.createComposite(parent);
+      GridDataFactory.fillDefaults().span(2, 1).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      {
+         /*
+          * radio button: new value
+          */
+         _radioButton_Pulse_NewValue = _tk.createButton(container, UI.EMPTY_STRING, SWT.RADIO);
+         GridDataFactory.fillDefaults().indent(_newValuesRadioButtonsIndent, 0).align(SWT.CENTER, SWT.FILL).applyTo(_radioButton_Pulse_NewValue);
+         _radioButton_Pulse_NewValue.setSelection(true);
+         _radioButton_Pulse_NewValue.addSelectionListener(_radioButtonSelectionListener);
+
+         /*
+          * radio button: offset
+          */
+         _radioButton_Pulse_OffsetValue = _tk.createButton(container, UI.EMPTY_STRING, SWT.RADIO);
+         GridDataFactory.fillDefaults().indent(_offsetValuesRadioButtonsIndent, 0).align(SWT.CENTER, SWT.FILL).applyTo(
+               _radioButton_Pulse_OffsetValue);
+         _radioButton_Pulse_OffsetValue.setToolTipText(Messages.Dialog_HRZone_Label_Trash_Tooltip);
+         _radioButton_Pulse_OffsetValue.addSelectionListener(_radioButtonSelectionListener);
+      }
+   }
+
+   private void CreateUI_130_CadenceRadioButtons(final Composite parent) {
+
+      final Composite container = _tk.createComposite(parent);
+      GridDataFactory.fillDefaults().span(2, 1).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      {
+         /*
+          * radio button: new value
+          */
+         _radioButton_Cadence_NewValue = _tk.createButton(container, UI.EMPTY_STRING, SWT.RADIO);
+         GridDataFactory.fillDefaults().indent(_newValuesRadioButtonsIndent, 0).align(SWT.CENTER, SWT.FILL).applyTo(_radioButton_Cadence_NewValue);
+         _radioButton_Cadence_NewValue.setSelection(true);
+         _radioButton_Cadence_NewValue.addSelectionListener(_radioButtonSelectionListener);
+
+         /*
+          * radio button: offset
+          */
+         _radioButton_Cadence_OffsetValue = _tk.createButton(container, UI.EMPTY_STRING, SWT.RADIO);
+         GridDataFactory.fillDefaults().indent(_offsetValuesRadioButtonsIndent, 0).align(SWT.CENTER, SWT.FILL).applyTo(
+               _radioButton_Cadence_OffsetValue);
+         _radioButton_Cadence_OffsetValue.setToolTipText(Messages.Dialog_HRZone_Label_Trash_Tooltip);
+         _radioButton_Cadence_OffsetValue.addSelectionListener(_radioButtonSelectionListener);
+      }
+   }
+
+   private void CreateUI_140_TemperatureRadioButtons(final Composite parent) {
+      final Composite container = _tk.createComposite(parent);
+      GridDataFactory.fillDefaults().span(2, 1).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      {
+         /*
+          * radio button: new value
+          */
+         _radioButton_Temperature_NewValue = _tk.createButton(container, UI.EMPTY_STRING, SWT.RADIO);
+         GridDataFactory.fillDefaults().indent(_newValuesRadioButtonsIndent, 0).align(SWT.CENTER, SWT.FILL).applyTo(
+               _radioButton_Temperature_NewValue);
+         _radioButton_Temperature_NewValue.setSelection(true);
+         _radioButton_Temperature_NewValue.addSelectionListener(_radioButtonSelectionListener);
+
+         /*
+          * radio button: offset
+          */
+         _radioButton_Temperature_OffsetValue = _tk.createButton(container, UI.EMPTY_STRING, SWT.RADIO);
+         GridDataFactory.fillDefaults().indent(_offsetValuesRadioButtonsIndent, 0).align(SWT.CENTER, SWT.FILL).applyTo(
+               _radioButton_Temperature_OffsetValue);
+         _radioButton_Temperature_OffsetValue.setToolTipText(Messages.Dialog_HRZone_Label_Trash_Tooltip);
+         _radioButton_Temperature_OffsetValue.addSelectionListener(_radioButtonSelectionListener);
       }
    }
 
