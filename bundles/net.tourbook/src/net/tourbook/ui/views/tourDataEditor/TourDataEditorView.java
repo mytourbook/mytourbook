@@ -5967,7 +5967,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                tourDataModified = true;
             }
 
-            if (newPulseValue != Float.MIN_VALUE && _seriePulse != null) {
+            if (newPulseValue != Integer.MIN_VALUE && _seriePulse != null) {
                if (dialogEditTimeSlicesValues.getIsPulseValueOffset()) {
                   _seriePulse[currentTimeSliceIndex] += newPulseValue;
                } else {
@@ -5976,7 +5976,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                tourDataModified = true;
             }
 
-            if (newCadenceValue != Float.MIN_VALUE && _serieCadence != null) {
+            if (newCadenceValue != Integer.MIN_VALUE && _serieCadence != null) {
                if (dialogEditTimeSlicesValues.getIsCadenceValueOffset()) {
                   _serieCadence[currentTimeSliceIndex] += newCadenceValue;
                } else {
