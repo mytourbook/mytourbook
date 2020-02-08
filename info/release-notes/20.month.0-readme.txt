@@ -37,12 +37,10 @@ Views
 -----
 
 * Calendar - Weekly summary (Frederic)
-  
-  Time spent in "slow" vs "fast" cadence zones
+  - Time spent in "slow" vs "fast" cadence zones
 
 * Tour Marker (Frederic)
-  
-  Added the following columns : Elevation Gain Difference, Elevation Loss Difference, Pace Difference
+  - Added the following columns : Elevation Gain Difference, Elevation Loss Difference, Pace Difference
 
 * Compare Result (Frederic)
   - Added the ability, in the Views Preference Page to show/hide the tour tooltip in the Tour Compare Result View
@@ -94,6 +92,9 @@ Fixes
 
 * Photos (Frederic)
   - Fixed NPE when no folder is selected and a filter is applied
+
+* Calendar
+  - Fixed a bug in the calendar view where the speed was always displayed in metric
   
    
 Translation    
