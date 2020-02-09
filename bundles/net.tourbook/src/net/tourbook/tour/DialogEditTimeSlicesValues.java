@@ -266,7 +266,7 @@ public class DialogEditTimeSlicesValues extends TitleAreaDialog {
           */
          {
             // label
-            _checkBox_Altitude = _tk.createButton(container, Messages.Dialog_Edit_Label_Altitude, SWT.CHECK);
+            _checkBox_Altitude = _tk.createButton(container, Messages.Dialog_Edit_Timeslices_Checkbox_Altitude, SWT.CHECK);
             _checkBox_Altitude.setToolTipText(Messages.Dialog_Edit_Label_Altitude_Tooltip);
             _checkBox_Altitude.addSelectionListener(_defaultSelectionListener);
 

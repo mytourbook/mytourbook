@@ -272,7 +272,7 @@ public class Messages extends NLS {
    public static String        Dialog_Edit_Timeslices_Values_Area_Title;
    public static String        Dialog_Edit_Checkbox_NewValues;
    public static String        Dialog_Edit_Checkbox_OffsetValues;
-   public static String        Dialog_Edit_Label_Altitude;
+   public static String        Dialog_Edit_Timeslices_Checkbox_Altitude;
    public static String        Dialog_Edit_Label_Pulse;
    public static String        Dialog_Edit_Label_Cadence;
    public static String        Dialog_Edit_Label_Temperature;
