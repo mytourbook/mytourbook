@@ -114,19 +114,13 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
       loadConfig();
       
       _fillPainter.setStyle(Paint.Style.FILL);
-      
       _bitmapCluster = createClusterBitmap(1);
-      
       //_bitmapPhoto = createPhotoBitmap();
       _bitmapPhoto = createPoiBitmap(MarkerShape.CIRCLE);
-      
       _BitmapClusterPhoto = createPoiBitmap(MarkerShape.CIRCLE); //must be replaced later, like MarkerToolkit
-      
       _symbol = new MarkerSymbol(_bitmapPhoto, MarkerSymbol.HotspotPlace.BOTTOM_CENTER, false);
-      
       _isMarkerClusteredLast = config.isMarkerClustered;
 
-      
       _markerRendererFactory = new MarkerRendererFactory() {
          @Override
          public org.oscim.layers.marker.MarkerRenderer create(final org.oscim.layers.marker.MarkerLayer markerLayer) {
@@ -255,7 +249,6 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
 
       if (scaledThumbImage != null) {
          try {
-            //photoBitmap = CanvasAdapter.decodeBitmap(new ByteArrayInputStream(ImageUtils.formatImage(photoImage, org.eclipse.swt.SWT.IMAGE_BMP)));
             photoBitmap = CanvasAdapter.decodeBitmap(new ByteArrayInputStream(ImageUtils.formatImage(scaledThumbImage, org.eclipse.swt.SWT.IMAGE_BMP)));
          } catch (final IOException e) {
             // TODO Auto-generated catch block
