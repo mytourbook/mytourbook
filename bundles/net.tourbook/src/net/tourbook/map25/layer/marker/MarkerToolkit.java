@@ -346,6 +346,14 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
 
    }
 
+   /**
+    * longpress on a mapbookmark
+    * this method is moved from map25App to here
+    *
+    * @param index
+    * @param MarkerItem
+    * @return true, when clicked
+    */
    @Override
    public boolean onItemLongPress(final int index, final MarkerItem item) {
       // TODO Auto-generated method stub
@@ -375,6 +383,14 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
 
    }
 
+   /**
+    * clicking on a mapbookmark
+    * this method is moved from map25App to here
+    *
+    * @param index
+    * @param MarkerItem
+    * @return true, when clicked
+    */
    @Override
    public boolean onItemSingleTapUp(final int index, final MarkerItem item) {
       // TODO Auto-generated method stub

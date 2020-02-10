@@ -837,30 +837,10 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
     */
    @Override
    public boolean onItemLongPress(final int index, final MarkerItem item) {
-      debugPrint(" map25: " + //$NON-NLS-1$
-            (UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("\tonItemLongpress") //$NON-NLS-1$
-            + ("\tMapbookmark") //$NON-NLS-1$
-            + ("\tTitle:" + item.getTitle()) //$NON-NLS-1$
-            + ("\tDescription:" + item.description) //$NON-NLS-1$
-            + ("\tindex:" + index) //$NON-NLS-1$
-            + ("\t_isMapItemHit:" + _isMapItemHit + " -> true") //$NON-NLS-1$ //$NON-NLS-2$
-
-      //Pref_Map25_Encoding_Mapsforge
-      );
-
-      if (item.getMarker() == null) {
-
-         // item.setMarker(symbol);
-      }
-      else {
-
-         // item.setMarker(null);
-      }
-
-      //debugPrint(" map25: " + "Marker long press " + item.getTitle()); //$NON-NLS-1$
-      return true;
+      // TODO Auto-generated method stub
+      return false;
    }
+
 
    /**
     * clicking on a tourmarker
@@ -898,31 +878,10 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
     */
    @Override
    public boolean onItemSingleTapUp(final int index, final MarkerItem item) {
-
-      debugPrint(" map25: " + //$NON-NLS-1$
-            (UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("\tonItemSingleTapUp") //$NON-NLS-1$
-            + ("\tMapbookmark") //$NON-NLS-1$
-            + ("\tTitle:" + item.getTitle()) //$NON-NLS-1$
-            + ("\tDescription:" + item.description) //$NON-NLS-1$
-            + ("\tindex:" + index) //$NON-NLS-1$
-            + ("\t_isMapItemHit:" + _isMapItemHit + " -> true") //$NON-NLS-1$ //$NON-NLS-2$
-
-
-      );
-
-      if (item.getMarker() == null) {
-
-         // item.setMarker(symbol);
-      }
-      else {
-
-         // item.setMarker(null);
-      }
-
-      //debugPrint(" map25: " + "Marker tap, index:title " + item.getTitle()); //$NON-NLS-1$
-      return true;
+      // TODO Auto-generated method stub
+      return false;
    }
+
 
    /**
     * is called from SlideOutMap25_MarkerOptions.java
@@ -1645,5 +1604,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       //_phototoolkit._isMarkerClusteredLast = config.isPhotoClustered;
       _phototoolkit._isMarkerClusteredLast = config.isMarkerClustered;// using settings from MapBookmarks must be changed later with own config
    }
+
 
 }
