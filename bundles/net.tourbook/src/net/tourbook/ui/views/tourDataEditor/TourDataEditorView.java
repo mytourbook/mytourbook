@@ -569,7 +569,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    //
    private Label                    _timeSlice_Label;
    private TableViewer              _timeSlice_Viewer;
-   private TimeSliceComparator      _timeSlice_Comparator                 = new TimeSliceComparator();
+   private TimeSliceComparator      _timeSlice_Comparator         = new TimeSliceComparator();
    private Object[]                 _timeSlice_ViewerItems;
    private ColumnManager            _timeSlice_ColumnManager;
    private TimeSlice_TourViewer     _timeSlice_TourViewer         = new TimeSlice_TourViewer();
@@ -5935,14 +5935,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       if (selection.size() == 0) {
          return;
       }
-
       final Object[] selectedTimeSlices = selection.toArray();
 
-      final int selectedIndex = selectedTimeSlices.length == 1 ? ((TimeSlice) selectedTimeSlices[0]).serieIndex : -1;
-
       final DialogEditTimeSlicesValues dialogEditTimeSlicesValues = new DialogEditTimeSlicesValues(Display.getCurrent().getActiveShell(),
-            _tourData,
-            selectedIndex);
+            _tourData);
       if (dialogEditTimeSlicesValues.open() == Window.OK) {
 
          final float newAltitudeValue = dialogEditTimeSlicesValues.getNewAltitudeValue();
