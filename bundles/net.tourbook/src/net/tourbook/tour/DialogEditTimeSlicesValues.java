@@ -169,7 +169,7 @@ public class DialogEditTimeSlicesValues extends TitleAreaDialog {
 
       super.configureShell(shell);
 
-      shell.setText(Messages.Dialog_Edit_Timeslices_Values_Title);
+      shell.setText(Messages.Dialog_EditTimeslicesValues_Title);
 
       shell.addDisposeListener(new DisposeListener() {
          @Override
@@ -184,7 +184,7 @@ public class DialogEditTimeSlicesValues extends TitleAreaDialog {
 
       super.create();
 
-      setTitle(Messages.Dialog_Edit_Timeslices_Values_Area_Title);
+      setTitle(Messages.Dialog_EditTimeslicesValues_Area_Title);
 
       final ZonedDateTime tourStart = _tourData.getTourStartTime();
 
@@ -254,10 +254,10 @@ public class DialogEditTimeSlicesValues extends TitleAreaDialog {
           * Main labels
           */
          {
-            _label_NewValues = _tk.createLabel(container, Messages.Dialog_Edit_Checkbox_NewValues, SWT.NONE);
+            _label_NewValues = _tk.createLabel(container, Messages.Dialog_EditTimeslicesValues_Label_NewValues, SWT.NONE);
             GridDataFactory.fillDefaults().span(4, 1).indent(215, 0).align(SWT.END, SWT.FILL).applyTo(_label_NewValues);
 
-            _label_OffsetValues = _tk.createLabel(container, Messages.Dialog_Edit_Checkbox_OffsetValues, SWT.NONE);
+            _label_OffsetValues = _tk.createLabel(container, Messages.Dialog_EditTimeslicesValues_Label_OffsetValues, SWT.NONE);
             GridDataFactory.fillDefaults().indent(55, 0).align(SWT.BEGINNING, SWT.FILL).applyTo(_label_OffsetValues);
          }
 
@@ -266,8 +266,8 @@ public class DialogEditTimeSlicesValues extends TitleAreaDialog {
           */
          {
             // label
-            _checkBox_Altitude = _tk.createButton(container, Messages.Dialog_Edit_Timeslices_Checkbox_Altitude, SWT.CHECK);
-            _checkBox_Altitude.setToolTipText(Messages.Dialog_Edit_Label_Altitude_Tooltip);
+            _checkBox_Altitude = _tk.createButton(container, Messages.Dialog_EditTimeslicesValues_Checkbox_Altitude, SWT.CHECK);
+            _checkBox_Altitude.setToolTipText(Messages.Dialog_EditTimeslicesValues_Checkbox_Altitude_Tooltip);
             _checkBox_Altitude.addSelectionListener(_defaultSelectionListener);
 
             // spinner
@@ -296,8 +296,8 @@ public class DialogEditTimeSlicesValues extends TitleAreaDialog {
           */
          {
             // label
-            _checkBox_Pulse = _tk.createButton(container, Messages.Dialog_Edit_Label_Pulse, SWT.CHECK);
-            _checkBox_Pulse.setToolTipText(Messages.Dialog_Edit_Label_Pulse_Tooltip);
+            _checkBox_Pulse = _tk.createButton(container, Messages.Dialog_EditTimeslicesValues_Checkbox_Pulse, SWT.CHECK);
+            _checkBox_Pulse.setToolTipText(Messages.Dialog_EditTimeslicesValues_Checkbox_Pulse_Tooltip);
             _checkBox_Pulse.addSelectionListener(_defaultSelectionListener);
 
             // spinner
@@ -322,8 +322,8 @@ public class DialogEditTimeSlicesValues extends TitleAreaDialog {
           */
          {
             // label
-            _checkBox_Cadence = _tk.createButton(container, Messages.Dialog_Edit_Label_Cadence, SWT.CHECK);
-            _checkBox_Cadence.setToolTipText(Messages.Dialog_Edit_Label_Cadence_Tooltip);
+            _checkBox_Cadence = _tk.createButton(container, Messages.Dialog_EditTimeslicesValues_Checkbox_Cadence, SWT.CHECK);
+            _checkBox_Cadence.setToolTipText(Messages.Dialog_EditTimeslicesValues_Checkbox_Cadence_Tooltip);
             _checkBox_Cadence.addSelectionListener(_defaultSelectionListener);
 
             // spinner
@@ -348,8 +348,8 @@ public class DialogEditTimeSlicesValues extends TitleAreaDialog {
           */
          {
             // label
-            _checkBox_Temperature = _tk.createButton(container, Messages.Dialog_Edit_Label_Temperature, SWT.CHECK);
-            _checkBox_Temperature.setToolTipText(Messages.Dialog_Edit_Label_Temperature_Tooltip);
+            _checkBox_Temperature = _tk.createButton(container, Messages.Dialog_EditTimeslicesValues_Checkbox_Temperature, SWT.CHECK);
+            _checkBox_Temperature.setToolTipText(Messages.Dialog_EditTimeslicesValues_Checkbox_Temperature_Tooltip);
             _checkBox_Temperature.addSelectionListener(_defaultSelectionListener);
 
             // spinner
