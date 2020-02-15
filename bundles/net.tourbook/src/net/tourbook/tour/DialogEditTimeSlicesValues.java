@@ -189,10 +189,9 @@ public class DialogEditTimeSlicesValues extends TitleAreaDialog {
 
       super.createButtonsForButtonBar(parent);
 
-      final String okText = net.tourbook.ui.UI.convertOKtoSaveUpdateButton(_tourData);
-
       final Button saveButton = getButton(IDialogConstants.OK_ID);
-      saveButton.setText(okText);
+      saveButton.setText(Messages.app_action_update);
+
       enableSaveButton();
    }
 
