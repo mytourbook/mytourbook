@@ -577,6 +577,9 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
       defineColumn_Altitude_ElevationGainDelta();
       defineColumn_Altitude_ElevationLossDelta();
 
+      //TODO WIP
+      defineColumn_Body_Pulse();
+
       defineColumn_Waypoint_Name();
       defineColumn_Waypoint_Description();
       defineColumn_Marker_Url();
