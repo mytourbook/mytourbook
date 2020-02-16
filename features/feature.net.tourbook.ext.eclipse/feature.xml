@@ -2,7 +2,7 @@
 <feature
       id="feature.net.tourbook.ext.eclipse"
       label="Additional Eclipse Plugins for MyTourbook"
-      version="4.10.0.qualifier">
+      version="4.14.0.qualifier">
 
    <description url="http://www.example.com/description">
       [Enter Feature Description here.]
@@ -17,18 +17,18 @@
    </license>
 
    <requires>
-      <import plugin="org.eclipse.core.expressions"      />
-      <import plugin="org.eclipse.core.runtime"          />
-      <import plugin="org.eclipse.e4.ui.css.core"        />
-      <import plugin="org.eclipse.e4.ui.css.swt"         />
-      <import plugin="org.eclipse.equinox.common"        />
-      <import plugin="org.eclipse.equinox.preferences"   />
-      <import plugin="org.eclipse.equinox.security"      />
-      <import plugin="org.eclipse.equinox.registry"      />
-      <import plugin="org.eclipse.equinox.security.ui"   />
-      <import plugin="org.eclipse.jface"                 />
-      <import plugin="org.eclipse.osgi"                  />
-      <import plugin="org.eclipse.ui"                    />
+      <import plugin="org.eclipse.core.expressions"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.e4.ui.css.core"/>
+      <import plugin="org.eclipse.e4.ui.css.swt"/>
+      <import plugin="org.eclipse.equinox.common"/>
+      <import plugin="org.eclipse.equinox.preferences"/>
+      <import plugin="org.eclipse.equinox.security"/>
+      <import plugin="org.eclipse.equinox.registry"/>
+      <import plugin="org.eclipse.equinox.security.ui"/>
+      <import plugin="org.eclipse.jface"/>
+      <import plugin="org.eclipse.osgi"/>
+      <import plugin="org.eclipse.ui"/>
    </requires>
 
    <plugin
