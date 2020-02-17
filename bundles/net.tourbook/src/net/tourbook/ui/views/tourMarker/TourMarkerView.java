@@ -577,6 +577,8 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
       defineColumn_Altitude_ElevationGainDelta();
       defineColumn_Altitude_ElevationLossDelta();
 
+      defineColumn_Body_AvgPulse();
+
       defineColumn_Waypoint_Name();
       defineColumn_Waypoint_Description();
       defineColumn_Marker_Url();
@@ -652,6 +654,36 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
                final double value = elevationGainLoss.getAltitudeDown() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
 
                colDef.printValue_0(cell, value);
+            }
+         }
+      });
+
+   }
+
+   private void defineColumn_Body_AvgPulse() {
+      final ColumnDefinition colDef = TableColumnFactory.BODY_AVG_PULSE.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final ViewerRow lastRow = cell.getViewerRow().getNeighbor(ViewerRow.ABOVE, false);
+            int previousMarkerIndex = 0;
+            if (null != lastRow) {
+               final Object element = lastRow.getElement();
+               if (element instanceof TourMarker) {
+                  previousMarkerIndex = ((TourMarker) element).getSerieIndex();
+               }
+            }
+
+            final int currentMarkerIndex = ((TourMarker) cell.getElement()).getSerieIndex();
+
+            final float averagePace = _tourData.computeAvg_PulseSegment(previousMarkerIndex, currentMarkerIndex);
+
+            if (averagePace == 0) {
+               cell.setText(UI.EMPTY_STRING);
+            } else {
+               colDef.printValue_0(cell, averagePace);
             }
          }
       });
