@@ -2442,7 +2442,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
          // DP needs distance
 
-         altiUpDown = computeAltitudeUpDown_20_Algorithm_DP(prefDPTolerance, startIndex, endIndex - 1);
+         altiUpDown = computeAltitudeUpDown_20_Algorithm_DP(prefDPTolerance, startIndex, endIndex);
 
          // keep this value to see in the UI (tour segmenter) the value and how it is computed
          dpTolerance = (short) (prefDPTolerance * 10);

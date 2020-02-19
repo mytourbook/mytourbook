@@ -9,7 +9,7 @@ New + Improvements
 
 * Tour Marker (Frederic)
   - Added the following columns : Elevation Gain Difference, 
-    Elevation Loss Difference, Pace Difference
+    Elevation Loss Difference, Pace Difference, Average heart rate
 
 * Compare Result (Frederic)
   - Added the ability, in the Views Preference Page to show/hide the 
