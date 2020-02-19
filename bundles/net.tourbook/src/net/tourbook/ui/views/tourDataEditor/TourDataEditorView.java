@@ -5937,14 +5937,19 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       }
       final Object[] selectedTimeSlices = selection.toArray();
 
-      final DialogEditTimeSlicesValues dialogEditTimeSlicesValues = new DialogEditTimeSlicesValues(Display.getCurrent().getActiveShell(),
-            _tourData);
+      final DialogEditTimeSlicesValues dialogEditTimeSlicesValues = new DialogEditTimeSlicesValues(Display.getCurrent().getActiveShell(), _tourData);
+
       if (dialogEditTimeSlicesValues.open() == Window.OK) {
 
          final float newAltitudeValue = dialogEditTimeSlicesValues.getNewAltitudeValue();
-         final float newPulseValue = dialogEditTimeSlicesValues.getNewPulseValue();
          final float newCadenceValue = dialogEditTimeSlicesValues.getNewCadenceValue();
+         final float newPulseValue = dialogEditTimeSlicesValues.getNewPulseValue();
          final float newTemperatureValue = dialogEditTimeSlicesValues.getNewTemperatureValue();
+
+         final boolean isAltitudeValueOffset = dialogEditTimeSlicesValues.getIsAltitudeValueOffset();
+         final boolean isCadenceValueOffset = dialogEditTimeSlicesValues.getIsCadenceValueOffset();
+         final boolean isPulseValueOffset = dialogEditTimeSlicesValues.getIsPulseValueOffset();
+         final boolean isTemperatureValueOffset = dialogEditTimeSlicesValues.getIsTemperatureValueOffset();
 
          final int[] selectedRows = new int[selectedTimeSlices.length];
          boolean tourDataModified = false;
@@ -5955,35 +5960,41 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             selectedRows[index] = currentTimeSliceIndex;
 
             if (newAltitudeValue != Float.MIN_VALUE && _serieAltitude != null) {
-               if (dialogEditTimeSlicesValues.getIsAltitudeValueOffset()) {
+
+               if (isAltitudeValueOffset) {
                   _serieAltitude[currentTimeSliceIndex] += newAltitudeValue;
                } else {
                   _serieAltitude[currentTimeSliceIndex] = newAltitudeValue;
                }
+
                tourDataModified = true;
             }
 
             if (newPulseValue != Integer.MIN_VALUE && _seriePulse != null) {
-               if (dialogEditTimeSlicesValues.getIsPulseValueOffset()) {
+
+               if (isPulseValueOffset) {
                   _seriePulse[currentTimeSliceIndex] += newPulseValue;
                } else {
                   _seriePulse[currentTimeSliceIndex] = newPulseValue;
                }
+
                tourDataModified = true;
             }
 
             if (newCadenceValue != Integer.MIN_VALUE && _serieCadence != null) {
-               if (dialogEditTimeSlicesValues.getIsCadenceValueOffset()) {
+
+               if (isCadenceValueOffset) {
                   _serieCadence[currentTimeSliceIndex] += newCadenceValue;
                } else {
                   _serieCadence[currentTimeSliceIndex] = newCadenceValue;
                }
+
                _tourData.setCadenceSerie(_serieCadence);
                tourDataModified = true;
             }
 
             if (newTemperatureValue != Float.MIN_VALUE & _serieTemperature != null) {
-               if (dialogEditTimeSlicesValues.getIsTemperatureValueOffset()) {
+               if (isTemperatureValueOffset) {
 
                   //If we are currently in imperial system, we can't just convert the offset as it will lead to errors.
                   // For example : If the user has asked for an offset of 1°F, then it could offset the metric temperature to -17.22222 °C!!!
@@ -6011,7 +6022,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             return;
          }
 
+         // force recompute values, e.g. gradient
+         _tourData.clearComputedSeries();
+
+         // recompute min/max values
          getDataSeriesFromTourData();
+
          // update UI
          updateUI_Tab_1_Tour();
          updateUI_ReferenceTourRanges();
@@ -6023,13 +6039,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          _timeSlice_Viewer.getControl().setRedraw(true);
 
          setTourDirty();
+
          // notify other viewers
          fireModifyNotification();
 
-         //We select back the previously selected indices
-
+         /*
+          * Select back the previously selected indices
+          */
          final int[] mappedTimeSlicesIndices = mapTimeSlicesIndicesWithRows(selectedRows);
-
          final Table table = (Table) _timeSlice_Viewer.getControl();
 
          table.setSelection(mappedTimeSlicesIndices);
@@ -7075,7 +7092,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                      Messages.Dialog_RetrieveWeather_Label_WeatherDataNotRetrieved);
             }
 
-         };
+         }
       });
 
    }
