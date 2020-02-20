@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1229,10 +1229,12 @@ public class CalendarProfileManager {
 
             if (data.distance > 0 && data.drivingTime > 0) {
 
-               final float speed = data.distance == 0
+               float speed = data.distance == 0
                      ? 0
                      : data.distance / (data.drivingTime / 3.6f);
 
+               //convert to the current measurement system
+               speed /= net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
                final String valueText = valueFormatter.printDouble(speed);
 
                return isShowValueUnit

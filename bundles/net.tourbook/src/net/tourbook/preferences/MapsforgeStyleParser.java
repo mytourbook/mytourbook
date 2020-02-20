@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.annotation.Generated;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -15,6 +14,8 @@ import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
+
+import net.tourbook.common.UI;
 
 /**
  * reading Mapsforge theme. after making instance call readXML
@@ -33,10 +34,10 @@ public class MapsforgeStyleParser {
 	static final String DEFAULTSTYLE = "defaultvalue"; //$NON-NLS-1$
 	static final String VALUE = "value"; //$NON-NLS-1$
 	static  Boolean Style = false;
-	String na_language = ""; //$NON-NLS-1$
-	String na_value = ""; //$NON-NLS-1$
-	String defaultlanguage = ""; //$NON-NLS-1$
-	String defaultstyle = ""; //$NON-NLS-1$
+	String na_language = UI.EMPTY_STRING;
+	String na_value = UI.EMPTY_STRING;
+	String defaultlanguage = UI.EMPTY_STRING;
+	String defaultstyle = UI.EMPTY_STRING;
 
 	/**
 	 * reading mapsforgetheme and return a list with selectable layers

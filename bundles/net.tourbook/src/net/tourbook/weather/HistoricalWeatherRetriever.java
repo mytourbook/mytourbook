@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,6 +21,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.javadocmd.simplelatlng.LatLng;
 import com.javadocmd.simplelatlng.LatLngTool;
 import com.javadocmd.simplelatlng.util.LengthUnit;
+
+import de.byteholder.geoclipse.map.UI;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -147,13 +149,13 @@ public class HistoricalWeatherRetriever {
          if (tourTitle.length() > 0) {
             System.out.println(tourTitle);
          }
-         
+
          System.out.println(String.format(Messages.Tour_Tooltip_Format_DateWeekTime,
                zdtTourStart.format(TimeTools.Formatter_Date_F),
                zdtTourStart.format(TimeTools.Formatter_Time_M),
                zdtTourEnd.format(TimeTools.Formatter_Time_M),
                zdtTourStart.get(TimeTools.calendarWeek.weekOfWeekBasedYear())));
-         
+
          System.out.println(weatherDataResponse);
       }
 
@@ -228,10 +230,11 @@ public class HistoricalWeatherRetriever {
          weatherData.setAveragePressure((int) Math.ceil((double) sumPressure / (double) numHourlyDatasets));
          weatherData.setPrecipitation(sumPrecipitation);
 
-      } catch (final IOException e) {
+      } catch (final Exception e) {
          StatusUtil.log(
                "WeatherHistoryRetriever.parseWeatherData : Error while parsing the historical weather JSON object :" //$NON-NLS-1$
-                     + weatherData + "\n" + e.getMessage()); //$NON-NLS-1$
+                     + weatherDataResponse + "\n" + e.getMessage()); //$NON-NLS-1$
+         return null;
       }
 
       return weatherData;
@@ -302,7 +305,7 @@ public class HistoricalWeatherRetriever {
          isr = new InputStreamReader(connection.getInputStream());
          rd = new BufferedReader(isr);
 
-         String line = ""; //$NON-NLS-1$
+         String line = UI.EMPTY_STRING;
          while ((line = rd.readLine()) != null) {
             weatherHistory.append(line);
          }
@@ -310,7 +313,7 @@ public class HistoricalWeatherRetriever {
          StatusUtil.log(
                "WeatherHistoryRetriever.processRequest : Error while executing the historical weather request with the parameters " //$NON-NLS-1$
                      + weatherRequestWithParameters + "\n" + ex.getMessage()); //$NON-NLS-1$
-         return ""; //$NON-NLS-1$
+         return UI.EMPTY_STRING;
       } finally {
          try {
             // close resources

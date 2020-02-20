@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -59,7 +59,7 @@ public class TagMenuManager {
 
    private static final String            SETTINGS_SECTION_RECENT_TAGS = "TagManager.RecentTags";                              //$NON-NLS-1$
    private static final String            STATE_RECENT_TAGS            = "tagId";                                              //$NON-NLS-1$
-   private static final String            STATE_PREVIOUS_TAGS          = "";                                                   //$NON-NLS-1$
+   private static final String            STATE_PREVIOUS_TAGS          = UI.EMPTY_STRING;
 
    private static final IPreferenceStore  _prefStore                   = TourbookPlugin.getPrefStore();
    private static final IDialogSettings   _state                       = TourbookPlugin.getState(SETTINGS_SECTION_RECENT_TAGS);

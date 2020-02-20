@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -60,11 +60,11 @@ public abstract class TVITagViewItem extends TreeViewerItem {
             + "tourDrivingTime," //          2   //$NON-NLS-1$
             + "tourAltUp," //                3   //$NON-NLS-1$
             + "tourAltDown," //              4   //$NON-NLS-1$
-            
+
             + "maxPulse," //                 5   //$NON-NLS-1$
             + "maxAltitude," //              6   //$NON-NLS-1$
             + "maxSpeed," //                 7   //$NON-NLS-1$
-            
+
             + "avgPulse," //                 8   //$NON-NLS-1$
             + "avgCadence," //               9   //$NON-NLS-1$
             + "(DOUBLE(AvgTemperature) / TemperatureScale)" //         10   //$NON-NLS-1$
@@ -114,7 +114,7 @@ public abstract class TVITagViewItem extends TreeViewerItem {
          /*
           * get tags
           */
-         final String sql = "" //$NON-NLS-1$
+         final String sql = UI.EMPTY_STRING
                //
                + ("SELECT " + SQL_SUM_COLUMNS) //$NON-NLS-1$
                + (" FROM " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jtblTagData") //$NON-NLS-1$ //$NON-NLS-2$

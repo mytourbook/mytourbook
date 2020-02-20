@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -291,7 +291,7 @@ public class TourLogView extends ViewPart {
 
    private String createHTML() {
 
-      final String html = "" // //$NON-NLS-1$
+      final String html = UI.EMPTY_STRING //
             + "<!DOCTYPE html>\n" // ensure that IE is using the newest version and not the quirk mode //$NON-NLS-1$
             + "<html style='height: 100%; width: 100%; margin: 0px; padding: 0px;'>\n" //$NON-NLS-1$
             + ("<head>\n" + createHTML_10_Head() + "\n</head>\n") //$NON-NLS-1$ //$NON-NLS-2$
@@ -303,7 +303,7 @@ public class TourLogView extends ViewPart {
 
    private String createHTML_10_Head() {
 
-      final String html = ""// //$NON-NLS-1$
+      final String html = UI.EMPTY_STRING//
             + "   <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />\n" //$NON-NLS-1$
             + "   <meta http-equiv='X-UA-Compatible' content='IE=edge' />\n" //$NON-NLS-1$
             + _cssFromFile
@@ -447,7 +447,7 @@ public class TourLogView extends ViewPart {
          final File webFile = WEB.getResourceFile(WEB_RESOURCE_TOUR_IMPORT_LOG_CSS);
          final String css = Util.readContentFromFile(webFile.getAbsolutePath());
 
-         _cssFromFile = ""// //$NON-NLS-1$
+         _cssFromFile = UI.EMPTY_STRING//
                + "<style>\n" //$NON-NLS-1$
                + css
                + "</style>\n"; //$NON-NLS-1$

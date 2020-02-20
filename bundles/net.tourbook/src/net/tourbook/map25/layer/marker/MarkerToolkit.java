@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2020 Wolfgang Schramm and Contributors
  * Copyright 2016-2018 devemux86
  * Copyright 2017 nebular
  * Copyright 2019 Thomas Theussing
@@ -34,6 +34,7 @@ import org.oscim.layers.marker.MarkerRendererFactory;
 import org.oscim.layers.marker.MarkerSymbol;
 import org.oscim.layers.marker.MarkerSymbol.HotspotPlace;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorUtil;
 import net.tourbook.map.bookmark.MapBookmark;
 import net.tourbook.map25.Map25ConfigManager;
@@ -189,7 +190,7 @@ public class MarkerToolkit {
      
       for (final MapBookmark mapBookmark : net.tourbook.map.bookmark.MapBookmarkManager.getAllBookmarks()) {
          //System.out.println("*** Markertoolkit:  mapbookmark name: " + mapBookmark.name); //$NON-NLS-1$
-         MarkerItem item = new MarkerItem(mapBookmark.id, mapBookmark.name, "", //$NON-NLS-1$
+         MarkerItem item = new MarkerItem(mapBookmark.id, mapBookmark.name, UI.EMPTY_STRING,
                new GeoPoint(mapBookmark.getLatitude(), mapBookmark.getLongitude())
                );
          item.setMarker(createAdvanceSymbol(item, _bitmapPoi));
@@ -251,7 +252,7 @@ public class MarkerToolkit {
       
       int subtitleWidth = 0;
       int subtitleHeight = 0;
-      String subtitle =""; //$NON-NLS-1$
+      String subtitle = UI.EMPTY_STRING;
       boolean hasSubtitle = false;
       if (mItem.description.length()>1) {
          if (mItem.description.startsWith("#")){ //$NON-NLS-1$

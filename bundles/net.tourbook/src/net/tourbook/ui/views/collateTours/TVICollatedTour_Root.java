@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -42,299 +42,299 @@ import org.eclipse.osgi.util.NLS;
 
 public class TVICollatedTour_Root extends TVICollatedTour {
 
-	TVICollatedTour_Root(final CollatedToursView view) {
-		super(view);
-	}
+   TVICollatedTour_Root(final CollatedToursView view) {
+      super(view);
+   }
 
-	@Override
-	protected void fetchChildren() {
+   @Override
+   protected void fetchChildren() {
 
-		collateToursView.setIsInUIUpdate(true);
-		{
-			// set the children for the root item
-			final ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
-			setChildren(children);
+      collateToursView.setIsInUIUpdate(true);
+      {
+         // set the children for the root item
+         final ArrayList<TreeViewerItem> children = new ArrayList<>();
+         setChildren(children);
 
-			final TourTypeSQLData sqlData = collateToursView.getCollatedSQL();
-			if (sqlData == null) {
-				return;
-			}
+         final TourTypeSQLData sqlData = collateToursView.getCollatedSQL();
+         if (sqlData == null) {
+            return;
+         }
 
-			final SQLFilter sqlFilter = new SQLFilter();
+         final SQLFilter sqlFilter = new SQLFilter();
 
-			final ArrayList<TVICollatedTour_Event> collateEvents = getCollateEvents(sqlData);
+         final ArrayList<TVICollatedTour_Event> collateEvents = getCollateEvents(sqlData);
 
-			children.addAll(collateEvents);
+         children.addAll(collateEvents);
 
-			getCollateTVI(collateEvents, sqlFilter);
-		}
-		collateToursView.setIsInUIUpdate(false);
-	}
+         getCollateTVI(collateEvents, sqlFilter);
+      }
+      collateToursView.setIsInUIUpdate(false);
+   }
 
-	/**
-	 * Get all events/tours for the selected tour type filter.
-	 * 
-	 * @param sqlData
-	 * @return
-	 */
-	private ArrayList<TVICollatedTour_Event> getCollateEvents(final TourTypeSQLData sqlData) {
+   /**
+    * Get all events/tours for the selected tour type filter.
+    *
+    * @param sqlData
+    * @return
+    */
+   private ArrayList<TVICollatedTour_Event> getCollateEvents(final TourTypeSQLData sqlData) {
 
-		final ArrayList<TVICollatedTour_Event> collateEvents = new ArrayList<>();
+      final ArrayList<TVICollatedTour_Event> collateEvents = new ArrayList<>();
 
-		final String sql = "" // //$NON-NLS-1$
+      final String sql = UI.EMPTY_STRING //
 
-				+ "SELECT" //											//$NON-NLS-1$
+            + "SELECT" //											//$NON-NLS-1$
 
-				+ " tourID, " //									1	//$NON-NLS-1$
-				+ " jTdataTtag.TourTag_tagId, "//					2	//$NON-NLS-1$
+            + " tourID, " //									1	//$NON-NLS-1$
+            + " jTdataTtag.TourTag_tagId, "//					2	//$NON-NLS-1$
 
-				+ " tourStartTime, " //								3	//$NON-NLS-1$
-				+ " tourTitle" //									4	//$NON-NLS-1$
+            + " tourStartTime, " //								3	//$NON-NLS-1$
+            + " tourTitle" //									4	//$NON-NLS-1$
 
-				+ " FROM " + TourDatabase.TABLE_TOUR_DATA + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + " FROM " + TourDatabase.TABLE_TOUR_DATA + "\n" //$NON-NLS-1$ //$NON-NLS-2$
 
-				// get tag id's
-				+ (" LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag") //$NON-NLS-1$ //$NON-NLS-2$
-				+ (" ON TourData.tourId = jTdataTtag.TourData_tourId") //$NON-NLS-1$
+            // get tag id's
+            + (" LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag") //$NON-NLS-1$ //$NON-NLS-2$
+            + (" ON TourData.tourId = jTdataTtag.TourData_tourId") //$NON-NLS-1$
 
-				+ (" WHERE 1=1" + sqlData.getWhereString()) // 			//$NON-NLS-1$
+            + (" WHERE 1=1" + sqlData.getWhereString()) // 			//$NON-NLS-1$
 
-				+ " ORDER BY tourStartTime";//							//$NON-NLS-1$
+            + " ORDER BY tourStartTime";//							//$NON-NLS-1$
 
-		Connection conn = null;
+      Connection conn = null;
 
-		try {
+      try {
 
-			int eventCounter = 0;
+         int eventCounter = 0;
 
-			conn = TourDatabase.getInstance().getConnection();
+         conn = TourDatabase.getInstance().getConnection();
 
-			final PreparedStatement statement = conn.prepareStatement(sql);
-			sqlData.setParameters(statement, 1);
+         final PreparedStatement statement = conn.prepareStatement(sql);
+         sqlData.setParameters(statement, 1);
 
-			long prevTourId = -1;
-			HashSet<Long> tagIds = null;
+         long prevTourId = -1;
+         HashSet<Long> tagIds = null;
 
-			final ResultSet result = statement.executeQuery();
-			while (result.next()) {
+         final ResultSet result = statement.executeQuery();
+         while (result.next()) {
 
-				final long dbTourId = result.getLong(1);
-				final Object dbTagId = result.getObject(2);
+            final long dbTourId = result.getLong(1);
+            final Object dbTagId = result.getObject(2);
 
-				if (dbTourId == prevTourId) {
+            if (dbTourId == prevTourId) {
 
-					// additional result set's for the same tour
+               // additional result set's for the same tour
 
-					// get tags from outer join
-					if (dbTagId instanceof Long) {
-						tagIds.add((Long) dbTagId);
-					}
+               // get tags from outer join
+               if (dbTagId instanceof Long) {
+                  tagIds.add((Long) dbTagId);
+               }
 
-				} else {
+            } else {
 
-					final long dbTourStartTime = result.getLong(3);
-					final String dbTourTitle = result.getString(4);
+               final long dbTourStartTime = result.getLong(3);
+               final String dbTourTitle = result.getString(4);
 
-					final TVICollatedTour_Event collateEvent = new TVICollatedTour_Event(collateToursView, this);
-					collateEvents.add(collateEvent);
+               final TVICollatedTour_Event collateEvent = new TVICollatedTour_Event(collateToursView, this);
+               collateEvents.add(collateEvent);
 
-					final ZonedDateTime eventStart = TimeTools.getZonedDateTime(dbTourStartTime);
+               final ZonedDateTime eventStart = TimeTools.getZonedDateTime(dbTourStartTime);
 
-					collateEvent.treeColumn = dbTourTitle == null ? UI.EMPTY_STRING : dbTourTitle;
+               collateEvent.treeColumn = dbTourTitle == null ? UI.EMPTY_STRING : dbTourTitle;
 
-					collateEvent.tourId = dbTourId;
-					collateEvent.eventStart = eventStart;
+               collateEvent.tourId = dbTourId;
+               collateEvent.eventStart = eventStart;
 
-					collateEvent.isFirstEvent = eventCounter++ == 0;
+               collateEvent.isFirstEvent = eventCounter++ == 0;
 
-					collateEvent.colTourTitle = dbTourTitle;
+               collateEvent.colTourTitle = dbTourTitle;
 
-					// get first tag id
-					if (dbTagId instanceof Long) {
+               // get first tag id
+               if (dbTagId instanceof Long) {
 
-						tagIds = new HashSet<Long>();
-						tagIds.add((Long) dbTagId);
+                  tagIds = new HashSet<>();
+                  tagIds.add((Long) dbTagId);
 
-						collateEvent.setTagIds(tagIds);
-					}
-				}
+                  collateEvent.setTagIds(tagIds);
+               }
+            }
 
-				prevTourId = dbTourId;
-			}
+            prevTourId = dbTourId;
+         }
 
-		} catch (final SQLException e) {
-			SQL.showException(e, sql);
-		} finally {
-			Util.closeSql(conn);
-		}
+      } catch (final SQLException e) {
+         SQL.showException(e, sql);
+      } finally {
+         Util.closeSql(conn);
+      }
 
-		/*
-		 * Add an additional event which shows the tours from the last event until today.
-		 */
-		final TVICollatedTour_Event collateEvent = new TVICollatedTour_Event(collateToursView, this);
-		collateEvents.add(collateEvent);
+      /*
+       * Add an additional event which shows the tours from the last event until today.
+       */
+      final TVICollatedTour_Event collateEvent = new TVICollatedTour_Event(collateToursView, this);
+      collateEvents.add(collateEvent);
 
-		final ZonedDateTime eventStart = TimeTools.now();
+      final ZonedDateTime eventStart = TimeTools.now();
 
-		collateEvent.treeColumn = UI.EMPTY_STRING;
-		collateEvent.eventStart = eventStart;
-		collateEvent.isLastEvent = true;
+      collateEvent.treeColumn = UI.EMPTY_STRING;
+      collateEvent.eventStart = eventStart;
+      collateEvent.isLastEvent = true;
 
-		return collateEvents;
-	}
+      return collateEvents;
+   }
 
-	private void getCollateTVI(final ArrayList<TVICollatedTour_Event> collatedEvents, final SQLFilter sqlFilter) {
+   private void getCollateTVI(final ArrayList<TVICollatedTour_Event> collatedEvents, final SQLFilter sqlFilter) {
 
-		final int eventSize = collatedEvents.size();
+      final int eventSize = collatedEvents.size();
 
-		Connection conn = null;
+      Connection conn = null;
 
-		final String sql = "" //$NON-NLS-1$
-				//
-				+ "SELECT " //						 //$NON-NLS-1$
-				+ SQL_SUM_COLUMNS
+      final String sql = UI.EMPTY_STRING
+            //
+            + "SELECT " //						 //$NON-NLS-1$
+            + SQL_SUM_COLUMNS
 
-				+ " FROM " + TourDatabase.TABLE_TOUR_DATA + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + " FROM " + TourDatabase.TABLE_TOUR_DATA + "\n" //$NON-NLS-1$ //$NON-NLS-2$
 
-				+ (" WHERE TourStartTime >= ? AND TourStartTime < ?") //$NON-NLS-1$
-				+ sqlFilter.getWhereClause();
+            + (" WHERE TourStartTime >= ? AND TourStartTime < ?") //$NON-NLS-1$
+            + sqlFilter.getWhereClause();
 
-		try {
+      try {
 
-			conn = TourDatabase.getInstance().getConnection();
+         conn = TourDatabase.getInstance().getConnection();
 
-			final PreparedStatement statement = conn.prepareStatement(sql);
-			sqlFilter.setParameters(statement, 3);
+         final PreparedStatement statement = conn.prepareStatement(sql);
+         sqlFilter.setParameters(statement, 3);
 
-			final long[] prevStart = { 0 };
-			final int[] eventCounter = { 0 };
-			final int[] eventIndex = { 0 };
+         final long[] prevStart = { 0 };
+         final int[] eventCounter = { 0 };
+         final int[] eventIndex = { 0 };
 
-			final long start = System.currentTimeMillis();
+         final long start = System.currentTimeMillis();
 
-			boolean isLongDuration = false;
+         boolean isLongDuration = false;
 
-			for (; eventIndex[0] < eventSize;) {
+         for (; eventIndex[0] < eventSize;) {
 
-				final int currentEventIndex = eventIndex[0]++;
+            final int currentEventIndex = eventIndex[0]++;
 
-				final boolean isFirstEvent = currentEventIndex == 0;
-				final TVICollatedTour_Event collateEvent = collatedEvents.get(currentEventIndex);
+            final boolean isFirstEvent = currentEventIndex == 0;
+            final TVICollatedTour_Event collateEvent = collatedEvents.get(currentEventIndex);
 
-				final long eventStart = isFirstEvent ? Long.MIN_VALUE : prevStart[0];
-				final long eventEnd = collateEvent.eventStart.toInstant().toEpochMilli();
+            final long eventStart = isFirstEvent ? Long.MIN_VALUE : prevStart[0];
+            final long eventEnd = collateEvent.eventStart.toInstant().toEpochMilli();
 
-				prevStart[0] = eventEnd;
+            prevStart[0] = eventEnd;
 
-				/*
-				 * This is a highly complicated algorithim that the eventStart is overwritten again
-				 */
-				collateEvent.eventStart = TimeTools.getZonedDateTime(eventStart);
-				collateEvent.eventEnd = TimeTools.getZonedDateTime(eventEnd);
-				collateEvent.isFirstEvent = isFirstEvent;
+            /*
+             * This is a highly complicated algorithim that the eventStart is overwritten again
+             */
+            collateEvent.eventStart = TimeTools.getZonedDateTime(eventStart);
+            collateEvent.eventEnd = TimeTools.getZonedDateTime(eventEnd);
+            collateEvent.isFirstEvent = isFirstEvent;
 
-				statement.setLong(1, eventStart);
-				statement.setLong(2, eventEnd);
+            statement.setLong(1, eventStart);
+            statement.setLong(2, eventEnd);
 
-				final ResultSet result = statement.executeQuery();
+            final ResultSet result = statement.executeQuery();
 
-				while (result.next()) {
-					collateEvent.addSumColumns(result, 1);
-				}
+            while (result.next()) {
+               collateEvent.addSumColumns(result, 1);
+            }
 
-				/*
-				 * Check if this is a long duration, run in progress monitor
-				 */
-				final long runDuration = System.currentTimeMillis() - start;
-				if (runDuration > 500) {
-					isLongDuration = true;
-					break;
-				}
+            /*
+             * Check if this is a long duration, run in progress monitor
+             */
+            final long runDuration = System.currentTimeMillis() - start;
+            if (runDuration > 500) {
+               isLongDuration = true;
+               break;
+            }
 
-				++eventCounter[0];
-			}
+            ++eventCounter[0];
+         }
 
-			if (isLongDuration) {
+         if (isLongDuration) {
 
-				try {
+            try {
 
-					/*
-					 * Run with a monitor because it can take a longer time until all is computed.
-					 */
+               /*
+                * Run with a monitor because it can take a longer time until all is computed.
+                */
 
-					final IRunnableWithProgress runnable = new IRunnableWithProgress() {
-						@Override
-						public void run(final IProgressMonitor monitor) throws InvocationTargetException,
-								InterruptedException {
+               final IRunnableWithProgress runnable = new IRunnableWithProgress() {
+                  @Override
+                  public void run(final IProgressMonitor monitor) throws InvocationTargetException,
+                        InterruptedException {
 
-							try {
-								monitor.beginTask(Messages.Tour_Book_Monitor_CollateTask, eventSize);
-								monitor.worked(eventCounter[0]);
+                     try {
+                        monitor.beginTask(Messages.Tour_Book_Monitor_CollateTask, eventSize);
+                        monitor.worked(eventCounter[0]);
 
-								for (; eventIndex[0] < eventSize;) {
+                        for (; eventIndex[0] < eventSize;) {
 
-									if (monitor.isCanceled()) {
-										break;
-									}
+                           if (monitor.isCanceled()) {
+                              break;
+                           }
 
-									final int currentEventIndex = eventIndex[0]++;
+                           final int currentEventIndex = eventIndex[0]++;
 
-									final boolean isFirstEvent = currentEventIndex == 0;
-									final TVICollatedTour_Event collateEvent = collatedEvents.get(currentEventIndex);
+                           final boolean isFirstEvent = currentEventIndex == 0;
+                           final TVICollatedTour_Event collateEvent = collatedEvents.get(currentEventIndex);
 
-									final long eventStart = isFirstEvent ? Long.MIN_VALUE : prevStart[0];
-									final long eventEnd = collateEvent.eventStart.toInstant().toEpochMilli();
+                           final long eventStart = isFirstEvent ? Long.MIN_VALUE : prevStart[0];
+                           final long eventEnd = collateEvent.eventStart.toInstant().toEpochMilli();
 
-									prevStart[0] = eventEnd;
+                           prevStart[0] = eventEnd;
 
-									/*
-									 * This is a highly complicated algorithim that the eventStart
-									 * is overwritten again
-									 */
-									collateEvent.eventStart = TimeTools.getZonedDateTime(eventStart);
-									collateEvent.eventEnd = TimeTools.getZonedDateTime(eventEnd);
-									collateEvent.isFirstEvent = isFirstEvent;
+                           /*
+                            * This is a highly complicated algorithim that the eventStart
+                            * is overwritten again
+                            */
+                           collateEvent.eventStart = TimeTools.getZonedDateTime(eventStart);
+                           collateEvent.eventEnd = TimeTools.getZonedDateTime(eventEnd);
+                           collateEvent.isFirstEvent = isFirstEvent;
 
-									statement.setLong(1, eventStart);
-									statement.setLong(2, eventEnd);
+                           statement.setLong(1, eventStart);
+                           statement.setLong(2, eventEnd);
 
-									final ResultSet result = statement.executeQuery();
+                           final ResultSet result = statement.executeQuery();
 
-									while (result.next()) {
-										collateEvent.addSumColumns(result, 1);
-									}
+                           while (result.next()) {
+                              collateEvent.addSumColumns(result, 1);
+                           }
 
-									monitor.subTask(NLS.bind(
-											Messages.Tour_Book_Monitor_CollateSubtask,
-											++eventCounter[0],
-											eventSize));
-									monitor.worked(1);
-								}
-							} catch (final SQLException e) {
-								SQL.showException(e, sql);
-							}
-						}
-					};
+                           monitor.subTask(NLS.bind(
+                                 Messages.Tour_Book_Monitor_CollateSubtask,
+                                 ++eventCounter[0],
+                                 eventSize));
+                           monitor.worked(1);
+                        }
+                     } catch (final SQLException e) {
+                        SQL.showException(e, sql);
+                     }
+                  }
+               };
 
-					/*
-					 * Use the shell of the main app that the tooltip is not covered with the
-					 * monitor, otherwise it would be centered of the active shell.
-					 */
-					new ProgressMonitorDialog(collateToursView.getShell()).run(true, true, runnable);
+               /*
+                * Use the shell of the main app that the tooltip is not covered with the
+                * monitor, otherwise it would be centered of the active shell.
+                */
+               new ProgressMonitorDialog(collateToursView.getShell()).run(true, true, runnable);
 
-				} catch (final InvocationTargetException e) {
-					StatusUtil.showStatus(e);
-				} catch (final InterruptedException e) {
-					StatusUtil.showStatus(e);
-				}
-			}
+            } catch (final InvocationTargetException e) {
+               StatusUtil.showStatus(e);
+            } catch (final InterruptedException e) {
+               StatusUtil.showStatus(e);
+            }
+         }
 
-		} catch (final SQLException e) {
-			SQL.showException(e, sql);
-		} finally {
-			Util.closeSql(conn);
-		}
+      } catch (final SQLException e) {
+         SQL.showException(e, sql);
+      } finally {
+         Util.closeSql(conn);
+      }
 
-	}
+   }
 
 }

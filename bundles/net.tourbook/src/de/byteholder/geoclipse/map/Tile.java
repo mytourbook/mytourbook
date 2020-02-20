@@ -41,15 +41,15 @@ public class Tile extends Observable {
 
 //   private static final double            MAX_LATITUDE_85_05112877   = 85.05112877;
 
-   private static final String             NL                 = "\n";                                //$NON-NLS-1$
-   private static final String             COLUMN_2           = "  ";                                //$NON-NLS-1$
-   private static final String             COLUMN_4           = "    ";                              //$NON-NLS-1$
-   private static final String             COLUMN_5           = "     ";                             //$NON-NLS-1$
+   private static final String             NL                        = "\n";                                //$NON-NLS-1$
+   private static final String             COLUMN_2                  = "  ";                                //$NON-NLS-1$
+   private static final String             COLUMN_4                  = "    ";                              //$NON-NLS-1$
+   private static final String             COLUMN_5                  = "     ";                             //$NON-NLS-1$
 
-   private static final ReentrantLock      TILE_LOCK          = new ReentrantLock();
-   private static final int                MAX_BOUNDS         = Map.MAP_MAX_ZOOM_LEVEL + 1;
+   private static final ReentrantLock      TILE_LOCK                 = new ReentrantLock();
+   private static final int                MAX_BOUNDS                = Map.MAP_MAX_ZOOM_LEVEL + 1;
 
-   private OverlayTourState                _overlayTourState  = OverlayTourState.TILE_IS_NOT_CHECKED;
+   private OverlayTourState                _overlayTourState         = OverlayTourState.TILE_IS_NOT_CHECKED;
 
    /**
     * <pre>
@@ -62,9 +62,9 @@ public class Tile extends Observable {
     * </pre>
     */
 
-   private OverlayImageState               _overlayImageState = OverlayImageState.NOT_SET;
+   private OverlayImageState               _overlayImageState        = OverlayImageState.NOT_SET;
 
-   private int                             _overlayContent    = 0;
+   private int                             _overlayContent           = 0;
 
    /**
     * Map zoom level
@@ -89,7 +89,7 @@ public class Tile extends Observable {
    /**
     * Map image for this tile
     */
-   private Image                           _mapImage          = null;
+   private Image                           _mapImage                 = null;
 
    /**
     * Image for the overlay tile, NOT the surrounding part tiles
@@ -113,14 +113,14 @@ public class Tile extends Observable {
 
    private Future<?>                       _future;
 
-   private boolean                         _isLoading         = false;
+   private boolean                         _isLoading                = false;
 
-   private boolean                         _isOfflineError    = false;
+   private boolean                         _isOfflineError           = false;
 
    /**
     * contains the error message when loading of the image fails
     */
-   private String                          _loadingError      = null;
+   private String                          _loadingError             = null;
 
    /**
     * url which is used to load the tile
@@ -147,7 +147,7 @@ public class Tile extends Observable {
     * {@link #_parentTile} is set to <code>null</code> to keep the tile in a cache when the tile has
     * loading errors
     */
-   private boolean                         _isChild           = false;
+   private boolean                         _isChild                  = false;
 
    /**
     * When set, this is a parent tile which has children tiles
@@ -171,9 +171,9 @@ public class Tile extends Observable {
    private ConcurrentHashMap<String, Tile> _childrenWithErrors;
 
    @SuppressWarnings("unchecked")
-   private final ArrayList<Rectangle>[]    _markerBounds      = new ArrayList[MAX_BOUNDS];
+   private final ArrayList<Rectangle>[]    _markerBounds             = new ArrayList[MAX_BOUNDS];
    @SuppressWarnings("unchecked")
-   private final ArrayList<Rectangle>[]    _markerPartBounds  = new ArrayList[MAX_BOUNDS];
+   private final ArrayList<Rectangle>[]    _markerPartBounds         = new ArrayList[MAX_BOUNDS];
 
    /**
     * Contains the {@link TourWayPoint}'s which are displayed in this tile.
@@ -182,20 +182,20 @@ public class Tile extends Observable {
     * sequence as {@link #_twp}.
     */
    @SuppressWarnings("unchecked")
-   private final ArrayList<TourWayPoint>[] _twp               = new ArrayList[MAX_BOUNDS];
+   private final ArrayList<TourWayPoint>[] _twp                      = new ArrayList[MAX_BOUNDS];
 
    @SuppressWarnings("unchecked")
-   private final ArrayList<Rectangle>[]    _twpSimpleBounds   = new ArrayList[MAX_BOUNDS];
+   private final ArrayList<Rectangle>[]    _twpSimpleBounds          = new ArrayList[MAX_BOUNDS];
 
    @SuppressWarnings("unchecked")
-   private final ArrayList<Rectangle>[]    _twpEnhancedBounds = new ArrayList[MAX_BOUNDS];
+   private final ArrayList<Rectangle>[]    _twpEnhancedBounds        = new ArrayList[MAX_BOUNDS];
 
    /**
     * The hover rectangles will be set when a tile is painted, the rectangle position is relative to
     * the tile
     */
-   public ArrayList<Rectangle>             allPainted_HoverRectangle  = new ArrayList<>();
-   public TLongArrayList                   allPainted_HoverTourID     = new TLongArrayList();
+   public ArrayList<Rectangle>             allPainted_HoverRectangle = new ArrayList<>();
+   public TLongArrayList                   allPainted_HoverTourID    = new TLongArrayList();
 
    /**
     * Create a new Tile at the specified tile point and zoom level
@@ -1102,7 +1102,7 @@ public class Tile extends Observable {
                   false
                   : true;
 
-      return "" //$NON-NLS-1$
+      return UI.EMPTY_STRING
 
 //            + " z=" + Integer.toString(_zoom).concat(COLUMN_2).substring(0, 2) // //$NON-NLS-1$
 //            + " x=" + Integer.toString(_x).concat(COLUMN_5).substring(0, 5) //$NON-NLS-1$

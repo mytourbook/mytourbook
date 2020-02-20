@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1805,6 +1805,10 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
    private void jobFilter_32_RunSubsequent() {
 
 //      final long start = System.nanoTime();
+
+      if (_allPhotos == null) {
+         return;
+      }
 
       final boolean isGPSFilter = _imageFilterGPS == PhotoFilterGPS.WITH_GPS;
       final boolean isNoGPSFilter = _imageFilterGPS == PhotoFilterGPS.NO_GPS;

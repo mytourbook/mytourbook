@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,7 +17,10 @@ package net.tourbook.ui.views.tourMarker;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.OptionalDouble;
+import java.util.stream.IntStream;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -27,6 +30,7 @@ import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.IContextMenuProvider;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.PostSelectionProvider;
+import net.tourbook.data.AltitudeUpDown;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.database.TourDatabase;
@@ -568,12 +572,122 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
       defineColumn_Motion_Distance();
       defineColumn_Motion_DistanceDelta();
+      defineColumn_Motion_PaceDelta();
+
+      defineColumn_Altitude_ElevationGainDelta();
+      defineColumn_Altitude_ElevationLossDelta();
+
+      defineColumn_Body_AvgPulse();
 
       defineColumn_Waypoint_Name();
       defineColumn_Waypoint_Description();
       defineColumn_Marker_Url();
 
       defineColumn_Data_SerieIndex();
+   }
+
+   /**
+    * Column: Elevation gain
+    */
+   private void defineColumn_Altitude_ElevationGainDelta() {
+
+      final ColumnDefinition colDef = TableColumnFactory.MARKER_ALTITUDE_ELEVATIONGAINDELTA.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final ViewerRow lastRow = cell.getViewerRow().getNeighbor(ViewerRow.ABOVE, false);
+            int previousMarkerIndex = 0;
+            if (null != lastRow) {
+               final Object element = lastRow.getElement();
+               if (element instanceof TourMarker) {
+                  previousMarkerIndex = ((TourMarker) element).getSerieIndex();
+               }
+            }
+
+            final int currentMarkerIndex = ((TourMarker) cell.getElement()).getSerieIndex();
+
+            final AltitudeUpDown elevationGainLoss = _tourData.computeAltitudeUpDown(previousMarkerIndex, currentMarkerIndex);
+
+            if (elevationGainLoss == null) {
+               cell.setText(UI.EMPTY_STRING);
+            } else {
+
+               final double value = elevationGainLoss.getAltitudeUp() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+               colDef.printValue_0(cell, value);
+            }
+         }
+      });
+
+   }
+
+   /**
+    * Column: Elevation loss
+    */
+   private void defineColumn_Altitude_ElevationLossDelta() {
+      final ColumnDefinition colDef = TableColumnFactory.MARKER_ALTITUDE_ELEVATIONLOSSDELTA.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final ViewerRow lastRow = cell.getViewerRow().getNeighbor(ViewerRow.ABOVE, false);
+            int previousMarkerIndex = 0;
+            if (null != lastRow) {
+               final Object element = lastRow.getElement();
+               if (element instanceof TourMarker) {
+                  previousMarkerIndex = ((TourMarker) element).getSerieIndex();
+               }
+            }
+
+            final int currentMarkerIndex = ((TourMarker) cell.getElement()).getSerieIndex();
+
+            final AltitudeUpDown elevationGainLoss = _tourData.computeAltitudeUpDown(
+                  previousMarkerIndex,
+                  currentMarkerIndex);
+
+            if (elevationGainLoss == null) {
+               cell.setText(UI.EMPTY_STRING);
+            } else {
+
+               final double value = elevationGainLoss.getAltitudeDown() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+
+               colDef.printValue_0(cell, value);
+            }
+         }
+      });
+
+   }
+
+   private void defineColumn_Body_AvgPulse() {
+      final ColumnDefinition colDef = TableColumnFactory.BODY_AVG_PULSE.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final ViewerRow lastRow = cell.getViewerRow().getNeighbor(ViewerRow.ABOVE, false);
+            int previousMarkerIndex = 0;
+            if (null != lastRow) {
+               final Object element = lastRow.getElement();
+               if (element instanceof TourMarker) {
+                  previousMarkerIndex = ((TourMarker) element).getSerieIndex();
+               }
+            }
+
+            final int currentMarkerIndex = ((TourMarker) cell.getElement()).getSerieIndex();
+
+            final float averagePace = _tourData.computeAvg_PulseSegment(previousMarkerIndex, currentMarkerIndex);
+
+            if (averagePace == 0) {
+               cell.setText(UI.EMPTY_STRING);
+            } else {
+               colDef.printValue_0(cell, averagePace);
+            }
+         }
+      });
+
    }
 
    /**
@@ -724,6 +838,44 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
                cell.setText(_nf3.format((markerDistance - prevDistance)
                      / 1000
                      / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Pace delta
+    */
+   private void defineColumn_Motion_PaceDelta() {
+      final ColumnDefinition colDef = TableColumnFactory.MARKER_PACE_DELTA.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final ViewerRow lastRow = cell.getViewerRow().getNeighbor(ViewerRow.ABOVE, false);
+            int previousMarkerIndex = 0;
+            if (null != lastRow) {
+               final Object element = lastRow.getElement();
+               if (element instanceof TourMarker) {
+                  previousMarkerIndex = ((TourMarker) element).getSerieIndex();
+               }
+            }
+
+            final int currentMarkerIndex = ((TourMarker) cell.getElement()).getSerieIndex();
+
+            final float[] seriePace = _tourData.getPaceSerieSeconds();
+            if (seriePace == null) {
+               return;
+            }
+
+            final double[] seriePaceDouble = IntStream.range(previousMarkerIndex, currentMarkerIndex).mapToDouble(i -> seriePace[i]).toArray();
+            final OptionalDouble averagePace = Arrays.stream(seriePaceDouble).average();
+
+            if (averagePace.isPresent() == false) {
+               cell.setText(UI.EMPTY_STRING);
+            } else {
+               cell.setText(UI.format_mm_ss((long) averagePace.getAsDouble()));
             }
          }
       });

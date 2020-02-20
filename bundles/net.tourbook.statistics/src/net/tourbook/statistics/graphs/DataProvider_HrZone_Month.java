@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -213,7 +213,7 @@ public class DataProvider_HrZone_Month extends DataProvider {
 
          final int month = (monthIndex % 12) + 1;
 
-         System.out.println(String.format("" //$NON-NLS-1$
+         System.out.println(String.format(UI.EMPTY_STRING
 
                + "%5d-%d," //$NON-NLS-1$
                + "%10d,%10d,%10d,%10d,%10d,%10d,%10d,%10d,%10d,%10d", //$NON-NLS-1$
