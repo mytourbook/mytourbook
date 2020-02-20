@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,6 +14,8 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui.views.geoCompare;
+
+import de.byteholder.geoclipse.map.UI;
 
 import java.time.ZonedDateTime;
 import java.util.concurrent.Executors;
@@ -288,7 +290,7 @@ public class GeoCompareManager {
 
          System.out.println(
                String.format(
-                     "" //$NON-NLS-1$
+                     UI.EMPTY_STRING
                            + "[%3d]" // thread //$NON-NLS-1$
                            + " tour %-20s" //$NON-NLS-1$
                            // + "   exec %5d"

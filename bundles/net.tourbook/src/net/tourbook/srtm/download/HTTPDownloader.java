@@ -1,19 +1,23 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.srtm.download;
+
+import de.byteholder.geoclipse.map.UI;
+import de.byteholder.geoclipse.map.event.TileEventId;
+import de.byteholder.geoclipse.tileinfo.TileInfoManager;
 
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
@@ -34,9 +38,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
-
-import de.byteholder.geoclipse.map.event.TileEventId;
-import de.byteholder.geoclipse.tileinfo.TileInfoManager;
 
 public class HTTPDownloader {
 
@@ -108,7 +109,7 @@ public class HTTPDownloader {
 
 							startTime = currentTime;
 
-							monitor.setTaskName("" + numWritten[0]); //$NON-NLS-1$
+                     monitor.setTaskName(UI.EMPTY_STRING + numWritten[0]);
 						}
 					}
 

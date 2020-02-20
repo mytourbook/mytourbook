@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,6 +14,8 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.device.garmin;
+
+import de.byteholder.geoclipse.map.UI;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -118,17 +120,17 @@ public class GarminExternalDevice extends ExternalDevice {
 				// device infos
 				final String productName = productInfo.getProductName();
 				context.put("devicename", productName.substring(0, productName.indexOf(' '))); //$NON-NLS-1$
-				context.put("productid", "" + productInfo.getProductId()); //$NON-NLS-1$ //$NON-NLS-2$
-				context.put("devicemajorversion", "" + (productInfo.getProductSoftware() / 100)); //$NON-NLS-1$ //$NON-NLS-2$
-				context.put("deviceminorversion", "" + (productInfo.getProductSoftware() % 100)); //$NON-NLS-1$ //$NON-NLS-2$
+            context.put("productid", UI.EMPTY_STRING + productInfo.getProductId()); //$NON-NLS-1$
+            context.put("devicemajorversion", UI.EMPTY_STRING + (productInfo.getProductSoftware() / 100)); //$NON-NLS-1$ 
+            context.put("deviceminorversion", UI.EMPTY_STRING + (productInfo.getProductSoftware() % 100)); //$NON-NLS-1$
 
 				// Version
 				String pluginmajorversion = "0"; //$NON-NLS-1$
 				String pluginminorversion = "0"; //$NON-NLS-1$
 				final Version version = Activator.getDefault().getVersion();
 				if (version != null) {
-					pluginmajorversion = "" + version.getMajor(); //$NON-NLS-1$
-					pluginminorversion = "" + version.getMinor(); //$NON-NLS-1$
+               pluginmajorversion = UI.EMPTY_STRING + version.getMajor();
+               pluginminorversion = UI.EMPTY_STRING + version.getMinor();
 				}
 				context.put("pluginmajorversion", pluginmajorversion); //$NON-NLS-1$
 				context.put("pluginminorversion", pluginminorversion); //$NON-NLS-1$
@@ -265,7 +267,7 @@ public class GarminExternalDevice extends ExternalDevice {
 			@SuppressWarnings("unchecked")
 			private void mergeActiveLog(final GarminTrack activeLog, final List<GarminTrack> tracks) {
 
-				final Map<ListIterator<GPSTrackpoint>, GPSTrackpoint> destinationTracks = new HashMap<ListIterator<GPSTrackpoint>, GPSTrackpoint>();
+				final Map<ListIterator<GPSTrackpoint>, GPSTrackpoint> destinationTracks = new HashMap<>();
 				for (final GarminTrack track : tracks) {
 					final ListIterator<GPSTrackpoint> lIter = ((List<GPSTrackpoint>) track.getWaypoints()).listIterator();
 					while (lIter.hasNext()) {
@@ -310,12 +312,13 @@ public class GarminExternalDevice extends ExternalDevice {
 				}
 			}
 
-			@SuppressWarnings("unchecked")
+			@Override
+         @SuppressWarnings("unchecked")
 			public void run(final IProgressMonitor monitor) {
 				_isCancelImport = false;
 				final Thread currentThread = Thread.currentThread();
 
-				final Hashtable<String, Comparable<?>> environment = new Hashtable<String, Comparable<?>>();
+				final Hashtable<String, Comparable<?>> environment = new Hashtable<>();
 				environment.put(GPSSerialDevice.PORT_NAME_KEY, portName);
 				environment.put(GPSSerialDevice.PORT_SPEED_KEY, 9600);
 
@@ -323,7 +326,8 @@ public class GarminExternalDevice extends ExternalDevice {
 				final Thread cancelObserver = new Thread(new Runnable() {
 
 //					@Override
-					public void run() {
+					@Override
+               public void run() {
 						while (!monitor.isCanceled()) {
 							try {
 								Thread.sleep(100);
@@ -371,16 +375,19 @@ public class GarminExternalDevice extends ExternalDevice {
 						private int	done;
 
 //						@Override
-						public void actionEnd(final String action_id) {}
+						@Override
+                  public void actionEnd(final String action_id) {}
 
 //						@Override
-						public void actionProgress(final String action_id, final int current_value) {
+						@Override
+                  public void actionProgress(final String action_id, final int current_value) {
 							monitor.worked(current_value - done);
 							done = current_value;
 						}
 
 //						@Override
-						public void actionStart(final String action_id, final int min_value, final int max_value) {
+						@Override
+                  public void actionStart(final String action_id, final int min_value, final int max_value) {
 							done = 0;
 							monitor.beginTask(monitorDevInfo, max_value);
 						}
@@ -396,7 +403,7 @@ public class GarminExternalDevice extends ExternalDevice {
 
 						// separate "ACTIVE LOG"
 						GarminTrack srcTrack = null;
-						final List<GarminTrack> destTracks = new ArrayList<GarminTrack>();
+						final List<GarminTrack> destTracks = new ArrayList<>();
 						for (final GarminTrack track : tracks) {
 							if (track.getIdentification().equals("ACTIVE LOG")) { //$NON-NLS-1$
 								srcTrack = track;
@@ -439,7 +446,7 @@ public class GarminExternalDevice extends ExternalDevice {
 							final VelocityContext context = new VelocityContext();
 
 							// prepare context
-							final ArrayList<GarminTrack> tList = new ArrayList<GarminTrack>();
+							final ArrayList<GarminTrack> tList = new ArrayList<>();
 							tList.add(track);
 							context.put("tracks", tList); //$NON-NLS-1$
 							context.put("printtracks", new Boolean(true)); //$NON-NLS-1$
@@ -473,7 +480,8 @@ public class GarminExternalDevice extends ExternalDevice {
 						if (ex instanceof GPSException && ex.getMessage().equals("Garmin device does not respond!")) { //$NON-NLS-1$
 							runnable = new Runnable() {
 //								@Override
-								public void run() {
+								@Override
+                        public void run() {
 									MessageDialog.openError(display.getActiveShell(),
 											Messages.Garmin_data_transfer_error,
 											Messages.Garmin_no_connection);
@@ -482,7 +490,8 @@ public class GarminExternalDevice extends ExternalDevice {
 						} else {
 							runnable = new Runnable() {
 //								@Override
-								public void run() {
+								@Override
+                        public void run() {
 									ex.printStackTrace();
 									ErrorDialog.openError(display.getActiveShell(),
 											Messages.Garmin_data_transfer_error,
