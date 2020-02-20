@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -94,6 +94,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
    private int                DEFAULT_DESCRIPTION_WIDTH;
    private int                DEFAULT_V_DISTANCE_PARAGRAPH;
+   private boolean            INITIAL_UNIT_IS_METRIC;
 
    private IPreferenceStore   _prefStore               = TourbookPlugin.getPrefStore();
 
@@ -112,7 +113,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
    /**
     * contains the controls which are displayed in the first column, these controls are used to get
-    * the maximum width and set the first column within the differenct section to the same width
+    * the maximum width and set the first column within the different section to the same width
     */
    private final ArrayList<Control> _firstColBreakTime = new ArrayList<>();
 
@@ -893,6 +894,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
       DEFAULT_DESCRIPTION_WIDTH = _pc.convertWidthInCharsToPixels(80);
       DEFAULT_V_DISTANCE_PARAGRAPH = _pc.convertVerticalDLUsToPixels(4);
+      INITIAL_UNIT_IS_METRIC = net.tourbook.common.UI.UNIT_IS_METRIC;
 
       _selectionListener = new SelectionAdapter() {
          @Override
@@ -1071,13 +1073,15 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
    private void onComputeElevationGainValues() {
 
-      final float dpToleranceValue = _spinnerDPTolerance.getSelection() / 10.0f;
-      final String dpTolerance = _nf1.format(dpToleranceValue / UI.UNIT_VALUE_ALTITUDE);
+      final float prefDPTolerance = _spinnerDPTolerance.getSelection() / 10.0f;
+
+      final String dpToleranceWithUnit = _nf1.format(prefDPTolerance) + net.tourbook.common.UI.SPACE1
+            + net.tourbook.common.UI.UNIT_LABEL_ALTITUDE;
 
       if (MessageDialog.openConfirm(
             Display.getCurrent().getActiveShell(),
             Messages.compute_tourValueElevation_dlg_computeValues_title,
-            NLS.bind(Messages.Compute_TourValue_ElevationGain_Dlg_ComputeValues_Message, dpTolerance)) == false) {
+            NLS.bind(Messages.Compute_TourValue_ElevationGain_Dlg_ComputeValues_Message, dpToleranceWithUnit)) == false) {
          return;
       }
 
@@ -1096,15 +1100,29 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
             return oldTourData.computeAltitudeUpDown();
          }
 
+         private String getElevationDifferenceString(final int elevationDifference) {
+
+            final StringBuilder differenceResult = new StringBuilder();
+            if (elevationDifference > 0) {
+               differenceResult.append("+");
+            }
+
+            differenceResult.append(_nf0.format((elevationDifference) / UI.UNIT_VALUE_ALTITUDE));
+            return differenceResult.toString();
+         }
+
          @Override
          public String getResultText() {
 
+            final int elevationDifference = elevation[1] - elevation[0];
+            final String differenceResult = getElevationDifferenceString(elevationDifference);
+
             return NLS.bind(
-                  Messages.Compute_TourValue_ElevationGain_ResultText, //
+                  Messages.Compute_TourValue_ElevationGain_ResultText,
                   new Object[] {
-                        dpTolerance,
-                        _nf0.format((elevation[1] - elevation[0]) / UI.UNIT_VALUE_ALTITUDE),
-                        net.tourbook.common.UI.UNIT_LABEL_ALTITUDE //
+                        dpToleranceWithUnit,
+                        differenceResult,
+                        net.tourbook.common.UI.UNIT_LABEL_ALTITUDE
                   });
          }
 
@@ -1118,10 +1136,13 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
                // summarize new values
                elevation[1] += savedTourData.getTourAltUp();
 
+               final int elevationDifference = elevation[1] - elevation[0];
+               final String differenceResult = getElevationDifferenceString(elevationDifference);
+
                subTaskText = NLS.bind(
                      Messages.compute_tourValueElevation_subTaskText, //
                      new Object[] {
-                           _nf0.format((elevation[1] - elevation[0]) / UI.UNIT_VALUE_ALTITUDE),
+                           differenceResult,
                            net.tourbook.common.UI.UNIT_LABEL_ALTITUDE //
                      });
             }
@@ -1172,7 +1193,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
           * compute altitude
           */
          final float prefDPTolerance = _prefStore.getDefaultFloat(//
-               ITourbookPreferences.COMPUTED_ALTITUDE_DP_TOLERANCE) * 10;
+               ITourbookPreferences.COMPUTED_ALTITUDE_DP_TOLERANCE) * 10 / UI.UNIT_VALUE_ALTITUDE;
          _spinnerDPTolerance.setSelection((int) prefDPTolerance);
 
       } else if (selectedTab == TAB_FOLDER_SMOOTHING) {
@@ -1203,9 +1224,9 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
                   ITourbookPreferences.BREAK_TIME_MIN_SLICE_TIME_AS);
 
             _spinnerBreakMinAvgSpeedAS.setSelection(//
-                  (int) (prefMinAvgSpeedAS * SPEED_DIGIT_VALUE * UI.UNIT_VALUE_DISTANCE));
+                  (int) (prefMinAvgSpeedAS * SPEED_DIGIT_VALUE / UI.UNIT_VALUE_DISTANCE));
             _spinnerBreakMinSliceSpeedAS.setSelection(//
-                  (int) (prefMinSliceSpeedAS * SPEED_DIGIT_VALUE * UI.UNIT_VALUE_DISTANCE));
+                  (int) (prefMinSliceSpeedAS * SPEED_DIGIT_VALUE / UI.UNIT_VALUE_DISTANCE));
             _spinnerBreakMinSliceTimeAS.setSelection(prefMinSliceTimeAS);
 
             /*
@@ -1263,7 +1284,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
          /*
           * DP tolerance
           */
-         final float prefDPTolerance = _prefStore.getFloat(ITourbookPreferences.COMPUTED_ALTITUDE_DP_TOLERANCE) * 10;
+         final float prefDPTolerance = _prefStore.getFloat(ITourbookPreferences.COMPUTED_ALTITUDE_DP_TOLERANCE) * 10 / UI.UNIT_VALUE_ALTITUDE;
          _spinnerDPTolerance.setSelection((int) prefDPTolerance);
 
          /*
@@ -1279,9 +1300,9 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
          final float prefMinSliceSpeedAS = _prefStore.getFloat(ITourbookPreferences.BREAK_TIME_MIN_SLICE_SPEED_AS);
          final int prefMinSliceTimeAS = _prefStore.getInt(ITourbookPreferences.BREAK_TIME_MIN_SLICE_TIME_AS);
          _spinnerBreakMinAvgSpeedAS.setSelection(//
-               (int) (prefMinAvgSpeedAS * SPEED_DIGIT_VALUE * UI.UNIT_VALUE_DISTANCE));
+               (int) (prefMinAvgSpeedAS * SPEED_DIGIT_VALUE / UI.UNIT_VALUE_DISTANCE));
          _spinnerBreakMinSliceSpeedAS.setSelection(//
-               (int) (prefMinSliceSpeedAS * SPEED_DIGIT_VALUE * UI.UNIT_VALUE_DISTANCE));
+               (int) (prefMinSliceSpeedAS * SPEED_DIGIT_VALUE / UI.UNIT_VALUE_DISTANCE));
          _spinnerBreakMinSliceTimeAS.setSelection(prefMinSliceTimeAS);
 
          /*
@@ -1326,10 +1347,17 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
     */
    private void saveState() {
 
+      //If the saveState() was triggered by the change of measurement system,
+      //we don't save the values as they were already saved and it would convert
+      //those values by error
+      if (INITIAL_UNIT_IS_METRIC != net.tourbook.common.UI.UNIT_IS_METRIC) {
+         return;
+      }
+
       // DP tolerance when computing altitude up/down
       _prefStore.setValue(
             ITourbookPreferences.COMPUTED_ALTITUDE_DP_TOLERANCE,
-            _spinnerDPTolerance.getSelection() / 10.0f);
+            _spinnerDPTolerance.getSelection() / 10.0f * UI.UNIT_VALUE_ALTITUDE);
 
       /*
        * break time method
@@ -1341,10 +1369,10 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
        */
       final float breakMinAvgSpeedAS = _spinnerBreakMinAvgSpeedAS.getSelection()
             / SPEED_DIGIT_VALUE
-            / UI.UNIT_VALUE_DISTANCE;
+            * UI.UNIT_VALUE_DISTANCE;
       final float breakMinSliceSpeedAS = _spinnerBreakMinSliceSpeedAS.getSelection()
             / SPEED_DIGIT_VALUE
-            / UI.UNIT_VALUE_DISTANCE;
+            * UI.UNIT_VALUE_DISTANCE;
       final int breakMinSliceTimeAS = _spinnerBreakMinSliceTimeAS.getSelection();
 
       _prefStore.setValue(ITourbookPreferences.BREAK_TIME_MIN_AVG_SPEED_AS, breakMinAvgSpeedAS);

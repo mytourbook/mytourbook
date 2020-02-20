@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -311,9 +311,11 @@ public class MesgListener_Record extends AbstractMesgListener implements RecordM
    private void setRecord_DeveloperData(final RecordMesg mesg, final TimeData timeData) {
 
       int developerFieldCount = 0;
-      for (@SuppressWarnings("unused")
-      final DeveloperField developerField : mesg.getDeveloperFields()) {
-         developerFieldCount++;
+      for (final DeveloperField developerField : mesg.getDeveloperFields()) {
+         final String fieldName = developerField.getName();
+         if (fieldName != null) {
+            developerFieldCount++;
+         }
       }
 
       if (developerFieldCount == 0) {
@@ -323,15 +325,22 @@ public class MesgListener_Record extends AbstractMesgListener implements RecordM
       int powerDataSources = 0;
 
       for (final DeveloperField developerField : mesg.getDeveloperFields()) {
-         if (developerField.getName().equals(DEV_FIELD_NAME__POWER) ||
-               developerField.getName().equals(DEV_FIELD_NAME__RP_POWER)) {
+         final String fieldName = developerField.getName();
+
+         if (fieldName != null && (fieldName.equals(DEV_FIELD_NAME__POWER) ||
+               fieldName.equals(DEV_FIELD_NAME__RP_POWER))) {
             ++powerDataSources;
          }
       }
 
       for (final DeveloperField devField : mesg.getDeveloperFields()) {
 
-         switch (devField.getName()) {
+         final String fieldName = devField.getName();
+         if (fieldName == null) {
+            continue;
+         }
+
+         switch (fieldName) {
 
          case DEV_FIELD_NAME__CADENCE:
 
@@ -376,19 +385,19 @@ public class MesgListener_Record extends AbstractMesgListener implements RecordM
             if (powerDataSources > 1) {
 
                //Stryd
-               if (devField.getName().equals(DEV_FIELD_NAME__POWER) &&
+               if (fieldName.equals(DEV_FIELD_NAME__POWER) &&
                      _prefStore.getInt(IPreferences.FIT_PREFERRED_POWER_DATA_SOURCE) != 0) {
                   break;
                }
 
                //Garmin RD Pod
-               if (devField.getName().equals(DEV_FIELD_NAME__RP_POWER) &&
+               if (fieldName.equals(DEV_FIELD_NAME__RP_POWER) &&
                      _prefStore.getInt(IPreferences.FIT_PREFERRED_POWER_DATA_SOURCE) != 1) {
                   break;
                }
             }
 
-            timeData.powerDataSource = devField.getName().equals(DEV_FIELD_NAME__POWER) ? "Stryd" : "Garmin Running Dynamics Pod"; //$NON-NLS-1$ //$NON-NLS-2$
+            timeData.powerDataSource = fieldName.equals(DEV_FIELD_NAME__POWER) ? "Stryd" : "Garmin Running Dynamics Pod"; //$NON-NLS-1$ //$NON-NLS-2$
 
             //  112 Watts
 

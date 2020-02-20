@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1085,7 +1085,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          final double rotateX = Math.random() * 10 * crazyFactor;
          final double rotateY = Math.random() * 10 * crazyFactor;
 
-         animation = ""// //$NON-NLS-1$
+         animation = UI.EMPTY_STRING//
 
                + ("body\n") //$NON-NLS-1$
                + ("{\n") //$NON-NLS-1$
@@ -1139,7 +1139,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       /*
        * CSS
        */
-      final String customCSS = "" // //$NON-NLS-1$
+      final String customCSS = UI.EMPTY_STRING //
 
             + "<style>\n" // //$NON-NLS-1$
             + animation
@@ -1162,7 +1162,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 //      prevents you from exploiting the latest features, but may offer you compatibility and stability. Lookup
 //      the online documentation for the "X-UA-Compatible" META tag to find which value is right for you.
 
-      final String html = "" // //$NON-NLS-1$
+      final String html = UI.EMPTY_STRING //
             + "<!DOCTYPE html>\n" // ensure that IE is using the newest version and not the quirk mode //$NON-NLS-1$
             + "<html style='height: 100%; width: 100%; margin: 0px; padding: 0px;'>\n" //$NON-NLS-1$
             + ("<head>\n" + createHTML_10_Head() + "\n</head>\n") //$NON-NLS-1$ //$NON-NLS-2$
@@ -1174,7 +1174,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
    private String createHTML_10_Head() {
 
-      final String html = ""// //$NON-NLS-1$
+      final String html = UI.EMPTY_STRING//
             + "   <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />\n" //$NON-NLS-1$
             + "   <meta http-equiv='X-UA-Compatible' content='IE=edge' />\n" //$NON-NLS-1$
             + _cssFonts
@@ -1226,7 +1226,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       final String watchClass = isWatchingOn() ? DOM_CLASS_DEVICE_ON : DOM_CLASS_DEVICE_OFF;
 
-      final String html = "" // //$NON-NLS-1$
+      final String html = UI.EMPTY_STRING //
 
             + "<div class='auto-import-header'>\n" //$NON-NLS-1$
             + ("   <table border=0><tbody><tr>\n") //$NON-NLS-1$
@@ -1277,7 +1277,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       final String hrefAction = HTTP_DUMMY + HREF_ACTION_DEVICE_WATCHING_ON_OFF;
       final String onOffImage = createHTML_BgImageStyle(imageUrl);
 
-      final String html = ""// //$NON-NLS-1$
+      final String html = UI.EMPTY_STRING//
 
             + "<a class='onOffIcon dash-action'" // //$NON-NLS-1$
             + ("title='" + tooltip + "'") //$NON-NLS-1$ //$NON-NLS-2$
@@ -1803,7 +1803,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       final String htmlConfig = createHTML_86_Annotations(importTile);
 
-      final String html = "" //$NON-NLS-1$
+      final String html = UI.EMPTY_STRING
 
             + ("<a href='" + href + "' title='" + tooltip + "' class='import-tile'>\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             + ("   <div class='import-tile-image'>" + htmlImage + "</div>\n") //$NON-NLS-1$ //$NON-NLS-2$
@@ -2083,9 +2083,9 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                + "'"; //$NON-NLS-1$
       }
 
-      final String validTooltip = tooltip.replace("'", ""); //$NON-NLS-1$ //$NON-NLS-2$
+      final String validTooltip = tooltip.replace("'", UI.EMPTY_STRING); //$NON-NLS-1$
 
-      final String html = "" //$NON-NLS-1$
+      final String html = UI.EMPTY_STRING
 
             + HTML_TD
             + ("<a href='" + href + "' title='" + validTooltip + "' class='import-tile'>\n") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -2250,7 +2250,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             css3 = Util.readContentFromFile(webFile.getAbsolutePath());
          }
 
-         _cssFromFile = ""// //$NON-NLS-1$
+         _cssFromFile = UI.EMPTY_STRING//
                + "<style>\n" //$NON-NLS-1$
                + css
                + css3

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -34,6 +34,7 @@ import net.tourbook.common.UI;
 
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
+import net.tourbook.common.UI;
 import net.tourbook.map25.Map25TileSource.Builder;
 import net.tourbook.map25.OkHttpEngineMT.OkHttpFactoryMT;
 import net.tourbook.map25.layer.labeling.LabelLayerMT;
@@ -173,8 +174,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	private OkHttpFactoryMT			_httpFactory;
 
 	private long						_lastRenderTime;
-	private String						_last_mf_themeFilePath = ""; //$NON-NLS-1$
-	private String						_last_mf_theme_styleID = "";	 //$NON-NLS-1$
+	private String						_last_mf_themeFilePath = UI.EMPTY_STRING;
+	private String						_last_mf_theme_styleID = UI.EMPTY_STRING;
 	private Boolean					_last_offline_IsThemeFromFile;
 
 	private IRenderTheme				_mf_IRenderTheme;
@@ -769,7 +770,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 	//		mMap.clearMap();
 	//		mMap.updateMap(true);
 
-			_mf_themeFilePath = ""; // so if mf is next themefile is parsed //$NON-NLS-1$
+			_mf_themeFilePath = UI.EMPTY_STRING; // so if mf is next themefile is parsed
 		} else { //it mapsforge map
 			this._is_mf_Map = true;
 			CanvasAdapter.textScale = _mf_TextScale;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -132,6 +132,8 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
    private ITourEventListener                 _compareTourPropertyListener;
 
    private boolean                            _isToolbarCreated;
+
+   private boolean                            _isToolTipInTour;
 
    private ColumnManager                      _columnManager;
 
@@ -379,6 +381,9 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
                 * the tree must be redrawn because the styled text does not show with the new color
                 */
                _tourViewer.getTree().redraw();
+            } else if (property.equals(ITourbookPreferences.VIEW_TOOLTIP_IS_MODIFIED)) {
+
+               updateToolTipState();
             }
          }
       };
@@ -487,6 +492,8 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
       getSite().setSelectionProvider(_postSelectionProvider = new PostSelectionProvider(ID));
 
       _tourViewer.setInput(_rootItem = new TVICompareResultRootItem());
+
+      updateToolTipState();
    }
 
    private void createUI(final Composite parent) {
@@ -657,6 +664,9 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
 
          @Override
          public Long getTourId(final ViewerCell cell) {
+            if (_isToolTipInTour == false) {
+               return null;
+            }
 
             final Object element = cell.getElement();
             if (element instanceof TVICompareResultReferenceTour) {
@@ -1679,6 +1689,11 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
    @Override
    public void updateColumnHeader(final ColumnDefinition colDef) {}
 
+   private void updateToolTipState() {
+
+      _isToolTipInTour = _prefStore.getBoolean(ITourbookPreferences.VIEW_TOOLTIP_TOURCOMPARERESULT_TIME);
+   }
+
    /**
     * !!!Recursive !!! update all tour items with new data
     *
@@ -1728,5 +1743,4 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
          }
       }
    }
-
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -267,6 +267,19 @@ public class Messages extends NLS {
    public static String        Dialog_DoubleClickAction_InvalidAction_Title;
    public static String        Dialog_DoubleClickAction_NoAction_Message;
    public static String        Dialog_DoubleClickAction_NoAction_Title;
+
+   public static String        Dialog_EditTimeslicesValues_Title;
+   public static String        Dialog_EditTimeslicesValues_Area_Title;
+   public static String        Dialog_EditTimeslicesValues_Label_NewValues;
+   public static String        Dialog_EditTimeslicesValues_Label_OffsetValues;
+   public static String        Dialog_EditTimeslicesValues_Checkbox_Altitude;
+   public static String        Dialog_EditTimeslicesValues_Checkbox_Pulse;
+   public static String        Dialog_EditTimeslicesValues_Checkbox_Cadence;
+   public static String        Dialog_EditTimeslicesValues_Checkbox_Temperature;
+   public static String        Dialog_EditTimeslicesValues_Checkbox_Altitude_Tooltip;
+   public static String        Dialog_EditTimeslicesValues_Checkbox_Pulse_Tooltip;
+   public static String        Dialog_EditTimeslicesValues_Checkbox_Cadence_Tooltip;
+   public static String        Dialog_EditTimeslicesValues_Checkbox_Temperature_Tooltip;
 
    public static String        Dialog_Export_Checkbox_Description;
    public static String        Dialog_Export_Checkbox_SurfingWaves;
@@ -1831,7 +1844,9 @@ public class Messages extends NLS {
    public static String PrefPage_ViewTooltip_Label_Tags;
    public static String PrefPage_ViewTooltip_Label_Time;
    public static String PrefPage_ViewTooltip_Label_Title;
+   public static String PrefPage_ViewTooltip_Label_Tour;
    public static String PrefPage_ViewTooltip_Label_TourBook;
+   public static String PrefPage_ViewTooltip_Label_CompareResult;
    public static String PrefPage_ViewTooltip_Label_WeekDay;
 
    public static String PrefPageTourTypeFilterList_Pref_TourTypeFilter_button_down;
@@ -2458,6 +2473,8 @@ public class Messages extends NLS {
    public static String Tour_Editor_Link_SetDefautTimeZone_Tooltip;
    public static String Tour_Editor_Link_SetGeoTimeZone;
    public static String Tour_Editor_Link_SetGeoTimeZone_Tooltip;
+   public static String Tour_Editor_Link_RetrieveWeather;
+   public static String Tour_Editor_Link_RetrieveWeather_Tooltip;
    public static String Tour_Editor_NoSwimData;
    public static String Tour_Editor_Radio_Cadence_Rpm;
    public static String Tour_Editor_Radio_Cadence_Spm;
@@ -2845,6 +2862,7 @@ public class Messages extends NLS {
 
    public static String TourEditor_Action_ComputeDistanceValuesFromGeoPosition;
    public static String TourEditor_Action_DeleteDistanceValues;
+   public static String TourEditor_Action_EditTimeSlicesValues;
    public static String TourEditor_Action_RemoveSwimStyle;
    public static String TourEditor_Action_SetAltitudeValuesFromSRTM;
    public static String TourEditor_Action_SetStartDistanceTo0;

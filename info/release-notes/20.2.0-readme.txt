@@ -1,0 +1,99 @@
+20.2.0                                                 19. February 2020 
+
+
+New + Improvements   
+==================
+
+* Calendar - Weekly summary (Frederic)
+  - Time spent in "slow" vs "fast" cadence zones
+
+* Tour Marker (Frederic)
+  - Added the following columns : Elevation Gain Difference, 
+    Elevation Loss Difference, Pace Difference, Average heart rate
+
+* Compare Result (Frederic)
+  - Added the ability, in the Views Preference Page to show/hide the 
+    tour tooltip in the Tour Compare Result View
+ 
+* Tour Editor (Frederic)
+  - Added the ability to retrieve the weather data by clicking on the 
+    weather description label
+  - Added a Time slices editor window to offer the ability to 
+    efficiently edit specific values of Altitude/Pulse/Cadence/
+    Temperature. 
+    Those values can be quickly found thanks to the added ability to 
+    sort those columns in ascending/descending order.
+
+ 
+Changes  
+=======
+
+* Tour Import
+  - GPX: Set default to absolute distance that the defaults for export/
+    import are the same
+  - FIT: Starting marker label from 1 instead of 0
+
+
+Fixes   
+=====
+
+* Statistics
+  - Show tooltip for the bottom bars, the hitbox for the horizontal 
+    slider starts now below the horizontal line (for a bar chart)
+  - Fixed issue: Tour type in tooltip is wrong for the first item 
+    (year/month)
+
+* Tour Tags
+  - Fixed issue: Column widths have been reset when tags are saved
+  
+* Tour Import
+  - GPX: Fixed NPE when importing MyTourbook export files
+  - FIT: Fixed NPE when importing files with developer fields that are 
+    null
+
+* Tour Export
+  - GPX: <mt:bikerWeight> value was wrong
+
+* Preferences (Frederic)
+  - Fixed a regression, in the "Measurement System" tab, that appeared 
+    in 19.3.0 where the metric radio buttons had disappeared
+  - Fixed bugs in the Computed values preference page (Break Time and 
+    Elevation Gain tabs) where the speed and altitude values were not 
+    properly converted when switching between metric and imperial system 
+    units
+
+* Tour Tag filter (Frederic)
+  - After deleting a tag, the tour tag profiles were not updated and if 
+    the recently deleteg tag was present in tour tag profiles, an NPE 
+    would appear
+
+* Tour Editor (Frederic)
+  - Fixed a bug when editing time slices. After editing a cell and 
+    saving a tour, an edited cell would not be updated with a new value
+
+* Photos (Frederic)
+  - Fixed NPE when no folder is selected and a filter is applied
+
+* Calendar
+  - Fixed a bug in the calendar view where the speed was always 
+    displayed in metric
+  
+   
+Translation    
+===========
+
+ - Dutch (Maarten) - 19.10
+ - French (Frederic) - 20.2
+
+ 
+System   
+======
+
+* Eclipse 2019-12 (4.14)
+  Update SWT to 4.14 to fix the issue (Linux only) when saving a map 
+  tile on disk 
+  (cf. https://bugs.eclipse.org/bugs/show_bug.cgi?id=553240) 
+
+* Eclipse Translations 2019-12 (4.14)
+  Contains translated texts which are used within Eclipse
+  

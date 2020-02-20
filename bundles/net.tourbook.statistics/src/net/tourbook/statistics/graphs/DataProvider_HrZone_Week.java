@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -254,7 +254,7 @@ public class DataProvider_HrZone_Week extends DataProvider {
          final int year = _years[yearIndex];
          final int week = weekIndex - prevSumWeeks;
 
-         System.out.println(String.format("" //$NON-NLS-1$
+         System.out.println(String.format(UI.EMPTY_STRING
 
 //               + "weekIndex:%4d     sumWeeks:%4d     prevSumWeeks:%4d       "
 

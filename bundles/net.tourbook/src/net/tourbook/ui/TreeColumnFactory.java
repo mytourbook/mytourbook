@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -2118,6 +2118,7 @@ public abstract class TreeColumnFactory {
             final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TOUR_TYPE", SWT.LEAD); //$NON-NLS-1$
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Tour);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_tour_type_header);
             colDef.setColumnLabel(Messages.ColumnFactory_tour_type_label);
             colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_tour_type_tooltip);
 

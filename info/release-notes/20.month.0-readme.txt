@@ -2,13 +2,7 @@
 
 
 TODO's
-======
-
-* Website
-  - Update contributor/translator list
-  - Show cheatsheet
-  - Wrong text: The comparison is done by altitude, comparing by geo position is not yet supported.
-  
+======  
   - This error occured when importing propably an "empty" fit file
       java.lang.NullPointerException
            at net.tourbook.device.garmin.fit.FitData.finalizeTour_Marker(FitData.java:296)
@@ -33,12 +27,11 @@ Bugs
 New + Improvements   
 ==================
 
-Views
------
+* xxx
+  - yyy
 
-* Calendar - Weekly summary
-  
-  Time spent in "slow" vs "fast" cadence zones
+* xxx (Frederic)
+  - xxx
 
 Import
 ======
@@ -48,27 +41,13 @@ Import
 Changes  
 =======
 
-* Tour Import
-  - GPX: Set default to absolute distance that the defaults for export/import are the same
-  - FIT: Starting marker label from 1 instead of 0
+* 
 
- 
+
 Fixes   
 =====
 
-* Statistics
-  - Show tooltip for the bottom bars, the hitbox for the horizontal slider starts now below the horizontal line (for a bar chart)
-  - Fixed issue: Tour type in tooltip is wrong for the first item (year/month)
-
-* Tour Tags
-  - Fixed issue: Column widths have been reset when tags are saved
-  
-* Tour Import
-  - GPX: Fixed NPE when importing MyTourbook export files
-
-* Tour Export
-  - GPX: <mt:bikerWeight> value was wrong
-  
+*   
    
 Translation    
 ===========
@@ -82,6 +61,3 @@ Translation
 System   
 ======
 
-* Update SWT to 4.14 (Eclipse 2019-12) to fix the issue (Linux only) when
-  saving a map tile on disk
-  (cf. https://bugs.eclipse.org/bugs/show_bug.cgi?id=553240) 

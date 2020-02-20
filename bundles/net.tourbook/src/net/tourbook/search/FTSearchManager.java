@@ -34,6 +34,16 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import net.tourbook.Messages;
+import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.Util;
+import net.tourbook.data.TourData;
+import net.tourbook.data.TourMarker;
+import net.tourbook.data.TourWayPoint;
+import net.tourbook.database.TourDatabase;
+import net.tourbook.tour.TourLogManager;
+import net.tourbook.ui.UI;
+
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.CharArraySet;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -82,16 +92,6 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
-
-import net.tourbook.Messages;
-import net.tourbook.common.util.StatusUtil;
-import net.tourbook.common.util.Util;
-import net.tourbook.data.TourData;
-import net.tourbook.data.TourMarker;
-import net.tourbook.data.TourWayPoint;
-import net.tourbook.database.TourDatabase;
-import net.tourbook.tour.TourLogManager;
-import net.tourbook.ui.UI;
 
 public class FTSearchManager {
 
@@ -455,7 +455,7 @@ public class FTSearchManager {
          /*
           * Get sql data
           */
-         final String sql = "" // //$NON-NLS-1$
+         final String sql = UI.EMPTY_STRING //
                //
                + "SELECT" //$NON-NLS-1$
                //
@@ -526,7 +526,7 @@ public class FTSearchManager {
          /*
           * Get sql data
           */
-         final String sql = "" // //$NON-NLS-1$
+         final String sql = UI.EMPTY_STRING //
                //
                + "SELECT" //$NON-NLS-1$
                //
@@ -599,7 +599,7 @@ public class FTSearchManager {
          /*
           * Get sql data
           */
-         final String sql = "" // //$NON-NLS-1$
+         final String sql = UI.EMPTY_STRING //
                //
                + "SELECT" //$NON-NLS-1$
                //
