@@ -188,7 +188,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
    /**
     * Sort the markers by time
     */
-   private class MarkerViewerSorter extends ViewerComparator {
+   private class MarkerViewerProfileComparator extends ViewerComparator {
 
       @Override
       public int compare(final Viewer viewer, final Object obj1, final Object obj2) {
@@ -514,7 +514,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
       _markerViewer.setUseHashlookup(true);
       _markerViewer.setContentProvider(new MarkerViewerContentProvider());
-      _markerViewer.setComparator(new MarkerViewerSorter());
+      _markerViewer.setComparator(new MarkerViewerProfileComparator());
 
       _markerViewer.addSelectionChangedListener(new ISelectionChangedListener() {
          @Override
