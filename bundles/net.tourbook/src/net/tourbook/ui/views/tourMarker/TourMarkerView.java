@@ -81,8 +81,8 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerRow;
-import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
@@ -188,7 +188,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
    /**
     * Sort the markers by time
     */
-   private class MarkerViewerSorter extends ViewerSorter {
+   private class MarkerViewerSorter extends ViewerComparator {
 
       @Override
       public int compare(final Viewer viewer, final Object obj1, final Object obj2) {
@@ -514,7 +514,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
       _markerViewer.setUseHashlookup(true);
       _markerViewer.setContentProvider(new MarkerViewerContentProvider());
-      _markerViewer.setSorter(new MarkerViewerSorter());
+      _markerViewer.setComparator(new MarkerViewerSorter());
 
       _markerViewer.addSelectionChangedListener(new ISelectionChangedListener() {
          @Override
