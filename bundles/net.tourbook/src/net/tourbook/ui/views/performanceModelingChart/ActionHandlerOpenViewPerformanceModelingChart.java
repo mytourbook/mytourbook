@@ -13,15 +13,22 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.weather;
+package net.tourbook.ui.views.performanceModelingChart;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import net.tourbook.common.util.Util;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class WWOValuesResults {
-   private String value;
+import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
 
-   public String getValue() {
-      return value;
+public class ActionHandlerOpenViewPerformanceModelingChart extends AbstractHandler {
+
+   @Override
+   public Object execute(final ExecutionEvent event) throws ExecutionException {
+
+      Util.showView(PerformanceModelingChartView.ID, true);
+
+      return null;
    }
+
 }

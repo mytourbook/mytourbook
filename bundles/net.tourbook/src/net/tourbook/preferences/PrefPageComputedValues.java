@@ -25,6 +25,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.form.FormTools;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourPerson;
 import net.tourbook.database.IComputeNoDataserieValues;
 import net.tourbook.database.IComputeTourValues;
 import net.tourbook.database.TourDatabase;
@@ -80,26 +81,27 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
    /*
     * contains the tab folder index
     */
-   public static final int    TAB_FOLDER_SMOOTHING     = 0;
-   public static final int    TAB_FOLDER_BREAK_TIME    = 1;
-   public static final int    TAB_FOLDER_ELEVATION     = 2;
-   public static final int    TAB_FOLDER_CADENCE_ZONES = 4;
+   public static final int    TAB_FOLDER_SMOOTHING             = 0;
+   public static final int    TAB_FOLDER_BREAK_TIME            = 1;
+   public static final int    TAB_FOLDER_ELEVATION             = 2;
+   public static final int    TAB_FOLDER_CADENCE_ZONES         = 4;
+   public static final int    TAB_FOLDER_PREDICTED_PERFORMANCE = 5;
 
-   private static final float SPEED_DIGIT_VALUE        = 10.0f;
+   private static final float SPEED_DIGIT_VALUE                = 10.0f;
 
    /**
     * 100 km/h is very high but it supports air planes which are slow on the ground
     */
-   public static final int    BREAK_MAX_SPEED_KM_H     = 1000;                            // 100.0 km/h
+   public static final int    BREAK_MAX_SPEED_KM_H             = 1000;                            // 100.0 km/h
 
    private int                DEFAULT_DESCRIPTION_WIDTH;
    private int                DEFAULT_V_DISTANCE_PARAGRAPH;
    private boolean            INITIAL_UNIT_IS_METRIC;
 
-   private IPreferenceStore   _prefStore               = TourbookPlugin.getPrefStore();
+   private IPreferenceStore   _prefStore                       = TourbookPlugin.getPrefStore();
 
-   private NumberFormat       _nf0                     = NumberFormat.getNumberInstance();
-   private NumberFormat       _nf1                     = NumberFormat.getNumberInstance();
+   private NumberFormat       _nf0                             = NumberFormat.getNumberInstance();
+   private NumberFormat       _nf1                             = NumberFormat.getNumberInstance();
    {
       _nf0.setMinimumFractionDigits(0);
       _nf0.setMaximumFractionDigits(0);
@@ -110,6 +112,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
    private boolean                  _isUpdateUI;
    private SelectionAdapter         _selectionListener;
    private MouseWheelListener       _spinnerMouseWheelListener;
+   private int                      _hintDefaultSpinnerWidth;
 
    /**
     * contains the controls which are displayed in the first column, these controls are used to get
@@ -145,6 +148,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
    private Spinner           _spinnerBreakMinSliceTimeAS;
    private Spinner           _spinnerCadenceDelimiter;
    private Spinner           _spinnerDPTolerance;
+   private Spinner           _spinnerFitnessDecayTime;
+   private Spinner           _spinnerFatigueDecayTime;
 
    private ScrolledComposite _smoothingScrolledContainer;
    private Composite         _smoothingScrolledContent;
@@ -220,6 +225,11 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
             final TabItem tabItemCadenceZones = new TabItem(_tabFolder, SWT.NONE);
             tabItemCadenceZones.setControl(createUI_70_CadenceZones(_tabFolder));
             tabItemCadenceZones.setText(Messages.Compute_CadenceZonesTimes_Group);
+
+            // tab: Performance modeling chart options
+            final TabItem tabPerformanceModelingChart = new TabItem(_tabFolder, SWT.NONE);
+            tabPerformanceModelingChart.setControl(createUI_80_PerformanceModelingChart(_tabFolder));
+            tabPerformanceModelingChart.setText(Messages.Compute_PerformanceModelingChart_Group);
 
             /**
              * 4.8.2009 week no/year is currently disabled because a new field in the db is
@@ -857,6 +867,92 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
       return container;
    }
 
+   /**
+    * UI for the predicted performance chart options
+    */
+   private Control createUI_80_PerformanceModelingChart(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridLayoutFactory.swtDefaults().numColumns(3).extendedMargins(0, 0, 7, 0).applyTo(container);
+      {
+         /*
+          * Fitness decay value (days)
+          */
+         Label label = new Label(container, NONE);
+         label.setText(Messages.Compute_PerformanceModelingChart_Label_FitnessDecay);
+         label.setToolTipText(Messages.Compute_PerformanceModelingChart_Label_FitnessDecay_Tooltip);
+
+         // Fitness decay spinner
+         _spinnerFitnessDecayTime = new Spinner(container, SWT.BORDER);
+         GridDataFactory.fillDefaults()//
+               .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+               .align(SWT.BEGINNING, SWT.CENTER)
+               .applyTo(_spinnerFitnessDecayTime);
+         _spinnerFitnessDecayTime.setMinimum(0);
+         _spinnerFitnessDecayTime.setMaximum(365);
+         _spinnerFitnessDecayTime.addSelectionListener(_selectionListener);
+         _spinnerFitnessDecayTime.addMouseWheelListener(_spinnerMouseWheelListener);
+
+         // label: days
+         label = new Label(container, NONE);
+         label.setText(Messages.Compute_PerformanceModelingChart_Label_Days);
+
+         /*
+          * Fatigue decay value (days)
+          */
+         label = new Label(container, NONE);
+         label.setText(Messages.Compute_PerformanceModelingChart_Label_FatigueDecay);
+         label.setToolTipText(Messages.Compute_PerformanceModelingChart_Label_FatigueDecay_Tooltip);
+
+         // Fatigue decay spinner
+         _spinnerFatigueDecayTime = new Spinner(container, SWT.BORDER);
+         GridDataFactory.fillDefaults()//
+               .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+               .align(SWT.BEGINNING, SWT.CENTER)
+               .applyTo(_spinnerFatigueDecayTime);
+         _spinnerFatigueDecayTime.setMinimum(0);
+         _spinnerFatigueDecayTime.setMinimum(365);
+         _spinnerFatigueDecayTime.addSelectionListener(_selectionListener);
+         _spinnerFatigueDecayTime.addMouseWheelListener(_spinnerMouseWheelListener);
+
+         // label: days
+         label = new Label(container, SWT.NONE);
+         label.setText(Messages.Compute_PerformanceModelingChart_Label_Days);
+
+         // button: Compute predicted performance chart values for all tours and all training stress models
+
+         final Button btnComputeValues = new Button(container, SWT.NONE);
+
+         final TourPerson activePerson = TourbookPlugin.getActivePerson();
+         String activePersonName = UI.EMPTY_STRING;
+         if (activePerson == null) {
+            btnComputeValues.setEnabled(false);
+         } else {
+            activePersonName = activePerson.getName();
+         }
+
+         activePersonName = NLS.bind(Messages.Compute_PredictedPerformance_Button_ComputeValues, activePersonName);
+
+         GridDataFactory
+               .fillDefaults()//
+               .span(3, 1)
+               .indent(0, DEFAULT_V_DISTANCE_PARAGRAPH)
+               .applyTo(btnComputeValues);
+         btnComputeValues.setText(activePersonName);
+         btnComputeValues.setToolTipText(Messages.Compute_PredictedPerformance_Button_ComputeValues_Tooltip);
+         btnComputeValues.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+               onComputePerformanceModelingValues();
+            }
+
+         });
+      }
+
+      return container;
+
+   }
+
    @Override
    public void dispose() {
 
@@ -895,6 +991,8 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
       DEFAULT_DESCRIPTION_WIDTH = _pc.convertWidthInCharsToPixels(80);
       DEFAULT_V_DISTANCE_PARAGRAPH = _pc.convertVerticalDLUsToPixels(4);
       INITIAL_UNIT_IS_METRIC = net.tourbook.common.UI.UNIT_IS_METRIC;
+
+      _hintDefaultSpinnerWidth = UI.IS_LINUX ? SWT.DEFAULT : _pc.convertWidthInCharsToPixels(UI.IS_OSX ? 10 : 5);
 
       _selectionListener = new SelectionAdapter() {
          @Override
@@ -1156,6 +1254,69 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
       fireTourModifyEvent();
    }
 
+   private void onComputePerformanceModelingValues() {
+
+      if (MessageDialog.openConfirm(
+            Display.getCurrent().getActiveShell(),
+            Messages.compute_tourValueElevation_dlg_computeValues_title,
+            Messages.Compute_TourValue_ElevationGain_Dlg_ComputeValues_Message) == false) {
+         return;
+      }
+
+      final TourPerson ewnfkjw = TourbookPlugin.getActivePerson();
+      ewnfkjw.computePerformanceModelingData();
+      saveState();
+
+      final int[] elevation = new int[] { 0, 0 };
+
+      final IComputeTourValues computeTourValueConfig = new IComputeTourValues() {
+
+         @Override
+         public boolean computeTourValues(final TourData oldTourData) {
+
+            // keep old value
+            elevation[0] += oldTourData.getTourAltUp();
+
+            return oldTourData.computeAltitudeUpDown();
+         }
+
+         @Override
+         public String getResultText() {
+
+            return NLS.bind(
+                  Messages.Compute_TourValue_ElevationGain_ResultText, //
+                  new Object[] {
+                        _nf0.format((elevation[1] - elevation[0]) / UI.UNIT_VALUE_ALTITUDE),
+                        net.tourbook.common.UI.UNIT_LABEL_ALTITUDE //
+                  });
+         }
+
+         @Override
+         public String getSubTaskText(final TourData savedTourData) {
+
+            String subTaskText = null;
+
+            if (savedTourData != null) {
+
+               // summarize new values
+               elevation[1] += savedTourData.getTourAltUp();
+
+               subTaskText = NLS.bind(
+                     Messages.compute_tourValueElevation_subTaskText, //
+                     new Object[] {
+                           _nf0.format((elevation[1] - elevation[0]) / UI.UNIT_VALUE_ALTITUDE),
+                           net.tourbook.common.UI.UNIT_LABEL_ALTITUDE //
+                     });
+            }
+
+            return subTaskText;
+         }
+      };
+
+      TourDatabase.computeAnyValues_ForAllTours(computeTourValueConfig, null);
+
+   }
+
    private void onModifyBreakTime() {
 
       saveState();
@@ -1264,6 +1425,12 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
          final int cadenceZonesDelimiterValue = _prefStore.getDefaultInt(ITourbookPreferences.CADENCE_ZONES_DELIMITER);
          _spinnerCadenceDelimiter.setSelection(cadenceZonesDelimiterValue);
 
+      } else if (selectedTab == TAB_FOLDER_PREDICTED_PERFORMANCE) {
+
+         final int fitnessDecayValue = _prefStore.getDefaultInt(ITourbookPreferences.FITNESS_DECAY);
+         _spinnerFitnessDecayTime.setSelection(fitnessDecayValue);
+         final int fatigueDecayValue = _prefStore.getDefaultInt(ITourbookPreferences.FATIGUE_DECAY);
+         _spinnerFatigueDecayTime.setSelection(fatigueDecayValue);
       }
 
       super.performDefaults();
@@ -1335,6 +1502,12 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
           * Cadence zones delimiter
           */
          _spinnerCadenceDelimiter.setSelection(_prefStore.getInt(ITourbookPreferences.CADENCE_ZONES_DELIMITER));
+
+         /*
+          * Predicted performance
+          */
+         _spinnerFitnessDecayTime.setSelection(_prefStore.getInt(ITourbookPreferences.FITNESS_DECAY));
+         _spinnerFatigueDecayTime.setSelection(_prefStore.getInt(ITourbookPreferences.FATIGUE_DECAY));
 
          updateUIShowSelectedBreakTimeMethod();
       }
@@ -1414,6 +1587,12 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
        * Cadence delimiter value
        */
       _prefStore.setValue(ITourbookPreferences.CADENCE_ZONES_DELIMITER, _spinnerCadenceDelimiter.getSelection());
+
+      /*
+       * Predicted performance decay values
+       */
+      _prefStore.setValue(ITourbookPreferences.FITNESS_DECAY, _spinnerFitnessDecayTime.getSelection());
+      _prefStore.setValue(ITourbookPreferences.FATIGUE_DECAY, _spinnerFatigueDecayTime.getSelection());
    }
 
    private void saveUIState() {

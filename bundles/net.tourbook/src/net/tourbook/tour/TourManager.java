@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -260,6 +260,16 @@ public class TourManager {
          + " cadenceZone_SlowTime=?, "                                                                                                 //                //$NON-NLS-1$
          + " cadenceZone_FastTime=?, "                                                                                                 //                 //$NON-NLS-1$
          + " cadenceZones_DelimiterValue=? "                                                                                           //          //$NON-NLS-1$
+
+         + " WHERE tourId=?";                                                                                                          //                        //$NON-NLS-1$
+   //
+   public static final String                            govss_StatementUpdate             = UI.EMPTY_STRING
+
+         + "UPDATE " + TourDatabase.TABLE_TOUR_DATA                                                                                    //   //$NON-NLS-1$
+
+         + " SET"                                                                                                                      //                                     //$NON-NLS-1$
+
+         + " govss=? "                                                                                                                 //                //$NON-NLS-1$
 
          + " WHERE tourId=?";                                                                                                          //                        //$NON-NLS-1$
    //
@@ -661,6 +671,107 @@ public class TourManager {
    }
 
    /**
+    * Computes the GOVSS (Gravity Ordered Velocity Stress Score) value for several given tours.
+    *
+    * @param conn
+    * @param selectedTours
+    * @return Returns <code>true</code> when values are computed or <code>false</code> when nothing
+    *         was done.
+    * @throws SQLException
+    */
+   public static boolean computeGovss(final Connection conn,
+                                      final ArrayList<TourData> selectedTours) throws SQLException {
+      boolean isUpdated = false;
+
+      final PreparedStatement stmtUpdate = conn.prepareStatement(govss_StatementUpdate);
+
+      int numComputedTour = 0;
+      int numNotComputedTour = 0;
+
+      // loop over all tours and compute the GOVSS value
+      for (final TourData tourData : selectedTours) {
+
+         final boolean govssComputed = tourData.computeGovss();
+         if (!govssComputed) {
+
+            numNotComputedTour++;
+
+         } else {
+
+            // update GOVSS values in the database
+            stmtUpdate.setInt(1, tourData.getGovss());
+            stmtUpdate.setLong(2, tourData.getTourId());
+
+            stmtUpdate.executeUpdate();
+
+            isUpdated = true;
+            numComputedTour++;
+         }
+      }
+
+      TourLogManager.addSubLog(TourLogState.IMPORT_OK, NLS.bind(Messages.Log_ComputeGovss_010_Success, numComputedTour));
+
+      if (numNotComputedTour >= 0) {
+         TourLogManager.addSubLog(TourLogState.IMPORT_ERROR,
+               NLS.bind(Messages.Log_ComputeGovss_011_NoSuccess, numNotComputedTour));
+      }
+
+      return isUpdated;
+   }
+
+   /**
+    * @param tourData
+    * @param startIndex
+    * @param endIndex
+    * @return Returns the average gradient
+    */
+   public static float computeTourAverageGradient(final TourData tourData, final int startIndex, final int endIndex) {
+
+      final float[] altitudeSerie = tourData.getAltitudeSerie();
+      final float[] distanceSerie = tourData.distanceSerie;
+
+      if (altitudeSerie == null
+            || altitudeSerie.length == 0
+            || distanceSerie == null
+            || distanceSerie.length == 0
+            || startIndex >= altitudeSerie.length
+            || endIndex >= altitudeSerie.length
+            || startIndex > endIndex) {
+         return 0;
+      }
+
+      final float startAltitude = altitudeSerie[startIndex];
+      final float endAltitude = altitudeSerie[endIndex];
+      final double startDistance = distanceSerie[startIndex];
+      final double endDistance = distanceSerie[endIndex];
+
+      final float averageGradient = (endAltitude - startAltitude) / (float) (endDistance - startDistance);
+
+      return averageGradient;
+   }
+
+   /**
+    * @param tourData
+    * @param startIndex
+    * @param endIndex
+    * @return Returns the distance
+    */
+   public static float computeTourDistance(final TourData tourData, final int startIndex, final int endIndex) {
+
+      final float[] distanceSerie = tourData.getMetricDistanceSerie();
+
+      if (distanceSerie == null
+            || distanceSerie.length == 0
+            || startIndex >= distanceSerie.length
+            || endIndex >= distanceSerie.length
+            || startIndex > endIndex) {
+         return 0;
+      }
+
+      return distanceSerie[endIndex] - distanceSerie[startIndex];
+   }
+
+   /**
     * @param tourData
     * @param startIndex
     * @param endIndex
@@ -686,7 +797,7 @@ public class TourManager {
     * @param tourData
     * @param startIndex
     * @param endIndex
-    * @return Returns the metric speed or 0 when not available.
+    * @return Returns the metric speed (km/h) or 0 when not available.
     */
    public static float computeTourSpeed(final TourData tourData, final int startIndex, final int endIndex) {
 
@@ -695,6 +806,7 @@ public class TourManager {
 
       if (timeSerie == null
             || timeSerie.length == 0
+            || distanceSerie == null
             || startIndex >= distanceSerie.length
             || endIndex >= distanceSerie.length) {
          return 0;

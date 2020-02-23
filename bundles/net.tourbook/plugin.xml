@@ -769,6 +769,13 @@
                icon="icons/pulse-zones.png"
                label="%View_Name_Training"
                mnemonic="%View_Name_Training_Mnemonic"/>
+               
+            <!-- Performance Chart -->
+            <command
+               commandId="net.tourbook.command.PerformanceModelingChartView"
+               icon="icons/performance-chart.png"
+               label="%Command_PerformanceModelingChart"
+               mnemonic="%Command_PerformanceModelingChart_Mnemonic"/>
             
             <!-- Conconi Test -->
             <command
@@ -906,6 +913,13 @@ THIS IS NOT YET FULLY IMPLEMENTED
                icon="icons/statistics.png"
                label="%view_name_Statistics"
                mnemonic="%view_name_Statistics_Mnemonic"/>
+               
+            <!-- Performance Chart -->
+            <command 
+               commandId="net.tourbook.command.PerformanceModelingChartView"
+               icon="icons/performance-chart.png"
+               label="%view_name_PerformanceModelingChart"
+               mnemonic="%view_name_PerformanceModelingChart_Mnemonic"/>
             
          </toolbar>
       </menuContribution>
@@ -1315,7 +1329,13 @@ THIS IS NOT YET FULLY IMPLEMENTED
          name           ="%Command_GeoParts"
          defaultHandler ="net.tourbook.ui.views.geoCompare.ActionHandler_OpenView_GeoParts"
       />
-
+      
+       <command
+         id             ="net.tourbook.command.PerformanceModelingChartView"
+         name           ="%Command_PerformanceModelingChart"
+         defaultHandler ="net.tourbook.ui.views.performanceModelingChart.ActionHandlerOpenViewPerformanceModelingChart"
+      />
+      
       <command
          id             ="net.tourbook.command.tourChart.tool.graphAnalyzer"
          name           ="%command_tourChart_tool_graphAnalyzer"
@@ -1736,6 +1756,14 @@ THIS IS NOT YET FULLY IMPLEMENTED
             icon        ="icons/pulse-zones.png"
             id          ="net.tourbook.training.TrainingView"
             name        ="%View_Name_Training"
+         />
+         
+         <view
+            category    ="net.tourbook.category.Tools"
+            class       ="net.tourbook.ui.views.performanceModelingChart.PerformanceModelingChartView"
+            icon        ="icons/performance-chart.png"
+            id          ="net.tourbook.ui.views.performanceModelingChart.PerformanceModelingChartView"
+            name        ="%view_name_PerformanceModelingChart"
          />
 
 

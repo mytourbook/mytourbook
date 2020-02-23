@@ -24,6 +24,7 @@ import net.tourbook.ui.action.ActionRetrieveWeatherData;
 import net.tourbook.ui.action.ActionSetTimeZone;
 import net.tourbook.ui.action.SubMenu_Cadence;
 import net.tourbook.ui.action.SubMenu_Elevation;
+import net.tourbook.ui.action.SubMenu_TrainingLoad;
 import net.tourbook.ui.action.SubMenu_Weather;
 
 import org.eclipse.jface.action.Action;
@@ -39,6 +40,7 @@ public class SubMenu_AdjustTourValues extends Action implements IMenuCreator {
 
    private SubMenu_Cadence                            _subMenu_Cadence;
    private SubMenu_Elevation                          _subMenu_Elevation;
+   private SubMenu_TrainingLoad                       _subMenu_TrainingLoad;
    private SubMenu_Weather                            _subMenu_Weather;
 
    private ActionComputeDistanceValuesFromGeoposition _action_ComputeDistanceValuesFromGeoposition;
@@ -58,6 +60,7 @@ public class SubMenu_AdjustTourValues extends Action implements IMenuCreator {
 
       _subMenu_Cadence = new SubMenu_Cadence(tourProvider);
       _subMenu_Elevation = new SubMenu_Elevation(tourProvider, tourProviderById);
+      _subMenu_TrainingLoad = new SubMenu_TrainingLoad(tourProvider);
       _subMenu_Weather = new SubMenu_Weather(tourProvider);
 
       _action_ComputeDistanceValuesFromGeoposition = new ActionComputeDistanceValuesFromGeoposition(tourProvider);
@@ -82,6 +85,7 @@ public class SubMenu_AdjustTourValues extends Action implements IMenuCreator {
 
       new ActionContributionItem(_subMenu_Cadence).fill(menu, -1);
       new ActionContributionItem(_subMenu_Elevation).fill(menu, -1);
+      new ActionContributionItem(_subMenu_TrainingLoad).fill(menu, -1);
       new ActionContributionItem(_subMenu_Weather).fill(menu, -1);
    }
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2019 Frédéric Bard and Contributors
+ * Copyright (C) 2019  Frédéric Bard and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,15 +13,14 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.weather;
+package net.tourbook.trainingstress;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+public interface ITrainingStressDataListener {
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class WWOValuesResults {
-   private String value;
+	/**
+    * Method is called when a training stress data is modified
+    *
+    */
+   abstract void trainingStressDataIsModified();
 
-   public String getValue() {
-      return value;
-   }
 }

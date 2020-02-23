@@ -13,15 +13,31 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.weather;
+package net.tourbook.trainingstress;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import net.tourbook.data.TourPerson;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class WWOValuesResults {
-   private String value;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Group;
 
-   public String getValue() {
-      return value;
+public abstract class PrefPageTrainingStressModel {
+   public IPersonModifiedListener _personModifiedListener;
+
+   public interface IPersonModifiedListener {
+      public abstract void onPersonModifiedListener();
+   }
+
+   public abstract void dispose();
+
+   public abstract String getGroupName();
+
+   public abstract Group getGroupUI(final Composite parent, final TourPerson tourPerson);
+
+   public abstract void restoreState();
+
+   public abstract void saveState();
+
+   public void setPersonModifiedListener(final IPersonModifiedListener listener) {
+      _personModifiedListener = listener;
    }
 }
