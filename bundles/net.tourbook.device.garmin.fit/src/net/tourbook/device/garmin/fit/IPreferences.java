@@ -29,4 +29,6 @@ public interface IPreferences {
 
    String FIT_PREFERRED_POWER_DATA_SOURCE    = "FIT_POWER_DATA_SOURCE";              //$NON-NLS-1$
 
+   String FIT_SPORT_NAME_FOR_TOUR_TYPE       = "FIT_SPORT_NAME_FOR_TOUR_TYPE";       //$NON-NLS-1$
+
 }

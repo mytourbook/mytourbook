@@ -32,6 +32,10 @@ import net.tourbook.data.SwimData;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
+import net.tourbook.data.TourType;
+import net.tourbook.database.TourDatabase;
+import net.tourbook.preferences.TourTypeColorDefinition;
+import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourLogManager;
 import net.tourbook.ui.tourChart.ChartLabel;
 
@@ -48,6 +52,7 @@ public class FitData {
 
    private boolean                 _isIgnoreLastMarker;
    private boolean                 _isSetLastMarker;
+   private boolean                 _isSportNameForTourType;
    private int                     _lastMarkerTimeSlices;
 
    public boolean                  isComputeAveragePower;
@@ -67,6 +72,8 @@ public class FitData {
 
    private String                  _sessionIndex;
    private ZonedDateTime           _sessionStartTime;
+
+   private String                  _sportName;
 
    private final List<TimeData>    _allTimeData          = new ArrayList<>();
 
@@ -94,6 +101,7 @@ public class FitData {
       _isIgnoreLastMarker = _prefStore.getBoolean(IPreferences.FIT_IS_IGNORE_LAST_MARKER);
       _isSetLastMarker = _isIgnoreLastMarker == false;
       _lastMarkerTimeSlices = _prefStore.getInt(IPreferences.FIT_IGNORE_LAST_MARKER_TIME_SLICES);
+      _isSportNameForTourType = _prefStore.getBoolean(IPreferences.FIT_SPORT_NAME_FOR_TOUR_TYPE);
 
    }
 
@@ -192,6 +200,12 @@ public class FitData {
 
          finalizeTour_Marker(_tourData, _allTourMarker);
          _tourData.finalizeTour_SwimData(_tourData, _allSwimData);
+
+        // If enabled, set Tour Type to sport name if present (ex: "Running", "Biking", etc)
+        if (_isSportNameForTourType && (_sportName != null)) {
+               finalizeTour_Type(_tourData, _sportName);
+        }
+
       }
    }
 
@@ -380,6 +394,56 @@ public class FitData {
 
       tourData.setTourMarkers(tourTourMarkers);
    }
+
+    /**
+     * @param tourData
+     * @param parsedTourTypeLabel
+     * @return <code>true</code> when a new {@link TourType} is created
+     */
+    private boolean finalizeTour_Type(final TourData tourData, final String parsedTourTypeLabel) {
+
+        final ArrayList<TourType> tourTypeMap = TourDatabase.getAllTourTypes();
+        TourType tourType = null;
+
+        // find tour type in existing tour types
+        for (final TourType mapTourType : tourTypeMap) {
+            if (parsedTourTypeLabel.equalsIgnoreCase(mapTourType.getName())) {
+                tourType = mapTourType;
+                break;
+            }
+        }
+
+        TourType newSavedTourType = null;
+
+        if (tourType == null) {
+
+            // create new tour type
+
+            final TourType newTourType = new TourType(parsedTourTypeLabel);
+
+            final TourTypeColorDefinition newColorDefinition = new TourTypeColorDefinition(newTourType,
+                    Long.toString(newTourType.getTypeId()), newTourType.getName());
+
+            newTourType.setColorBright(newColorDefinition.getGradientBright_Default());
+            newTourType.setColorDark(newColorDefinition.getGradientDark_Default());
+            newTourType.setColorLine(newColorDefinition.getLineColor_Default());
+            newTourType.setColorText(newColorDefinition.getTextColor_Default());
+
+            // save new entity
+            newSavedTourType = TourDatabase.saveEntity(newTourType, newTourType.getTypeId(), TourType.class);
+            if (newSavedTourType != null) {
+
+                tourType = newSavedTourType;
+
+                TourDatabase.clearTourTypes();
+                TourManager.getInstance().clearTourDataCache();
+            }
+        }
+
+        tourData.setTourType(tourType);
+
+        return newSavedTourType != null;
+    }
 
    public List<TimeData> getAllTimeData() {
       return _allTimeData;
@@ -585,4 +649,9 @@ public class FitData {
 
       _timeDiffMS = timeDiffMS;
    }
+
+    public void setSportname(final String sportName) {
+      _sportName = sportName;
+    }
+
 }
