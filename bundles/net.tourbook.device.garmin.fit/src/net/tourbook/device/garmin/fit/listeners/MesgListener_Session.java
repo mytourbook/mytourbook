@@ -62,6 +62,7 @@ public class MesgListener_Session extends AbstractMesgListener implements Sessio
       final Sport sport = mesg.getSport();
       if (sport != null) {
          tourData.setDeviceModeName(sport.name());
+         fitData.setSportname(sport.name());
       }
 
       final Short avgHeartRate = mesg.getAvgHeartRate();
