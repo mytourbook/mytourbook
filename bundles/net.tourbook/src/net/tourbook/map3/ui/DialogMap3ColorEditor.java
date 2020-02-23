@@ -935,6 +935,13 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
 
       final int imageWidth = imageBounds.width;
       final int imageHeight = imageBounds.height;
+
+      if (imageWidth == 0 || imageHeight == 0) {
+
+         // UI is not yet fully layouted
+         return;
+      }
+
       final boolean isDrawUnits = _dialogColorProvider.getMap3ColorProfile().isAbsoluteValues();
 
       _dialogColorProvider.configureColorProvider(//
