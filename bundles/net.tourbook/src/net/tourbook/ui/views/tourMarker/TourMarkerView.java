@@ -576,6 +576,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
       defineColumn_Altitude_ElevationGainDelta();
       defineColumn_Altitude_ElevationLossDelta();
+      defineColumn_Altitude_AvgGradient();
 
       defineColumn_Body_AvgPulse();
 
@@ -584,6 +585,44 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
       defineColumn_Marker_Url();
 
       defineColumn_Data_SerieIndex();
+   }
+
+   private void defineColumn_Altitude_AvgGradient() {
+
+      final ColumnDefinition colDef = TableColumnFactory.ALTITUDE_AVG_GRADIENT.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final ViewerRow lastRow = cell.getViewerRow().getNeighbor(ViewerRow.ABOVE, false);
+            int previousMarkerIndex = 0;
+            if (null != lastRow) {
+               final Object element = lastRow.getElement();
+               if (element instanceof TourMarker) {
+                  previousMarkerIndex = ((TourMarker) element).getSerieIndex();
+               }
+            }
+
+            final int currentMarkerIndex = ((TourMarker) cell.getElement()).getSerieIndex();
+
+            final float[] gradientSerie = _tourData.getGradientSerie();
+            if (gradientSerie == null) {
+               return;
+            }
+
+            final double[] gradientSerieDouble = IntStream.range(previousMarkerIndex, currentMarkerIndex)
+                  .mapToDouble(i -> gradientSerie[i])
+                  .toArray();
+            final OptionalDouble averageSlope = Arrays.stream(gradientSerieDouble).average();
+
+            if (averageSlope.isPresent() == false) {
+               cell.setText(UI.EMPTY_STRING);
+            } else {
+               colDef.printDetailValue(cell, averageSlope.getAsDouble());
+            }
+         }
+      });
    }
 
    /**
