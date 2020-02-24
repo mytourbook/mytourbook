@@ -30,8 +30,9 @@ New + Improvements
 * xxx
   - yyy
 
-* xxx (Frederic)
-  - xxx
+* Tour Marker (Frederic)
+  - Added the following column : Average slope
+  - Replaced pace difference column name by average pace
 
 Import
 ======
