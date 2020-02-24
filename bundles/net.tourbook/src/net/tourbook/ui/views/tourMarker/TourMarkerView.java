@@ -81,8 +81,8 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerRow;
-import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
@@ -188,7 +188,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
    /**
     * Sort the markers by time
     */
-   private class MarkerViewerSorter extends ViewerSorter {
+   private class MarkerViewerProfileComparator extends ViewerComparator {
 
       @Override
       public int compare(final Viewer viewer, final Object obj1, final Object obj2) {
@@ -514,7 +514,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
       _markerViewer.setUseHashlookup(true);
       _markerViewer.setContentProvider(new MarkerViewerContentProvider());
-      _markerViewer.setSorter(new MarkerViewerSorter());
+      _markerViewer.setComparator(new MarkerViewerProfileComparator());
 
       _markerViewer.addSelectionChangedListener(new ISelectionChangedListener() {
          @Override
@@ -572,7 +572,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
       defineColumn_Motion_Distance();
       defineColumn_Motion_DistanceDelta();
-      defineColumn_Motion_PaceDelta();
+      defineColumn_Motion_AvgPace();
 
       defineColumn_Altitude_ElevationGainDelta();
       defineColumn_Altitude_ElevationLossDelta();
@@ -774,6 +774,44 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
    }
 
    /**
+    * Column: Average Pace
+    */
+   private void defineColumn_Motion_AvgPace() {
+      final ColumnDefinition colDef = TableColumnFactory.MOTION_AVG_PACE.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final ViewerRow lastRow = cell.getViewerRow().getNeighbor(ViewerRow.ABOVE, false);
+            int previousMarkerIndex = 0;
+            if (null != lastRow) {
+               final Object element = lastRow.getElement();
+               if (element instanceof TourMarker) {
+                  previousMarkerIndex = ((TourMarker) element).getSerieIndex();
+               }
+            }
+
+            final int currentMarkerIndex = ((TourMarker) cell.getElement()).getSerieIndex();
+
+            final float[] seriePace = _tourData.getPaceSerieSeconds();
+            if (seriePace == null) {
+               return;
+            }
+
+            final double[] seriePaceDouble = IntStream.range(previousMarkerIndex, currentMarkerIndex).mapToDouble(i -> seriePace[i]).toArray();
+            final OptionalDouble averagePace = Arrays.stream(seriePaceDouble).average();
+
+            if (averagePace.isPresent() == false) {
+               cell.setText(UI.EMPTY_STRING);
+            } else {
+               cell.setText(UI.format_mm_ss((long) averagePace.getAsDouble()));
+            }
+         }
+      });
+   }
+
+   /**
     * Column: Distance km/mi
     */
    private void defineColumn_Motion_Distance() {
@@ -838,44 +876,6 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
                cell.setText(_nf3.format((markerDistance - prevDistance)
                      / 1000
                      / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
-            }
-         }
-      });
-   }
-
-   /**
-    * Column: Pace delta
-    */
-   private void defineColumn_Motion_PaceDelta() {
-      final ColumnDefinition colDef = TableColumnFactory.MARKER_PACE_DELTA.createColumn(_columnManager, _pc);
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final ViewerRow lastRow = cell.getViewerRow().getNeighbor(ViewerRow.ABOVE, false);
-            int previousMarkerIndex = 0;
-            if (null != lastRow) {
-               final Object element = lastRow.getElement();
-               if (element instanceof TourMarker) {
-                  previousMarkerIndex = ((TourMarker) element).getSerieIndex();
-               }
-            }
-
-            final int currentMarkerIndex = ((TourMarker) cell.getElement()).getSerieIndex();
-
-            final float[] seriePace = _tourData.getPaceSerieSeconds();
-            if (seriePace == null) {
-               return;
-            }
-
-            final double[] seriePaceDouble = IntStream.range(previousMarkerIndex, currentMarkerIndex).mapToDouble(i -> seriePace[i]).toArray();
-            final OptionalDouble averagePace = Arrays.stream(seriePaceDouble).average();
-
-            if (averagePace.isPresent() == false) {
-               cell.setText(UI.EMPTY_STRING);
-            } else {
-               cell.setText(UI.format_mm_ss((long) averagePace.getAsDouble()));
             }
          }
       });
