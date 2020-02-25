@@ -34,6 +34,9 @@ New + Improvements
   - Added the following column : Average slope
   - Replaced pace difference column name by average pace
 
+* 3D Map
+  - Fixed the pace format display for 3D map view (Frederic)
+
 Import
 ======
 
