@@ -1029,7 +1029,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
       case Pace:
 
-         final float[] paceSerie = tourData.getPaceSerie();
+         final float[] paceSerie = tourData.getPaceSerieSeconds();
          if (paceSerie != null) {
             final float pace = paceSerie[positionIndex];
             graphValueText = String.format(//
