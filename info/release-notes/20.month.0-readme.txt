@@ -36,6 +36,9 @@ New + Improvements
 Import
 ======
 
+* FIT File (bbbbbr)
+  - Added option to set Tour Type using Sport Name from the
+    imported file
 
  
 Changes  
