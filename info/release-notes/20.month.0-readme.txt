@@ -51,7 +51,8 @@ Changes
 Fixes   
 =====
 
-*   
+* Conconi Test View (Frederic)
+  - Disabling the deflection scale if there is no HR and/or power data (otherwise if the users modified the scale it would create an NPE)
    
 Translation    
 ===========
