@@ -38,6 +38,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(IPreferences.FIT_EXCEEDED_TIME_SLICE_DURATION, 365 * 24 * 60 * 60);
 
       store.setDefault(IPreferences.FIT_PREFERRED_POWER_DATA_SOURCE, 0);
+
+      store.setDefault(IPreferences.FIT_SPORT_NAME_FOR_TOUR_TYPE, false);
    }
 
 }

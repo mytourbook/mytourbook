@@ -56,6 +56,7 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
    private static final int      TAB_FOLDER_MARKER_FILTER      = 2;
    private static final int      TAB_FOLDER_TIME_SLIZE         = 3;
    private static final int      TAB_FOLDER_POWER              = 4;
+   private static final int      TAB_FOLDER_SPORTNAME          = 5;
 
    private static PeriodType     _tourPeriodTemplate           = PeriodType.yearMonthDayTime()
 
@@ -79,12 +80,14 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
    private Button    _chkIgnoreLastMarker;
    private Button    _chkIgnoreSpeedValues;
    private Button    _chkRemoveExceededDuration;
+   private Button    _chkSportNameForTourType;
 
    private Combo     _comboPowerDataSource;
 
    private Label     _lblIgnorLastMarker_Info;
    private Label     _lblIgnorLastMarker_TimeSlices;
    private Label     _lblIgnorSpeedValues_Info;
+   private Label     _lblSportNameForTourType_Info;
    private Label     _lblSplitTour_Duration;
    private Label     _lblSplitTour_DurationUnit;
    private Label     _lblSplitTour_Info;
@@ -140,6 +143,10 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
             final TabItem tabPower = new TabItem(_tabFolder, SWT.NONE);
             tabPower.setControl(createUI_80_Power(_tabFolder));
             tabPower.setText(Messages.PrefPage_Fit_Group_Power);
+
+            final TabItem tabSportname = new TabItem(_tabFolder, SWT.NONE);
+            tabSportname.setControl(createUI_90_SportName(_tabFolder));
+            tabSportname.setText(Messages.PrefPage_Fit_Group_SportName);
          }
       }
 
@@ -392,6 +399,36 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
       return container;
    }
 
+    private Composite createUI_90_SportName(final Composite parent) {
+
+        final Composite container = new Composite(parent, SWT.NONE);
+        GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+        GridLayoutFactory
+                .fillDefaults()//
+                .numColumns(1)
+                .extendedMargins(5, 5, 15, 5)
+                .spacing(20, 5)
+                .applyTo(container);
+        {
+            /*
+             * Sport Name for Tour Type
+             */
+
+            // checkbox: use srpot name for tour type
+            _chkSportNameForTourType = new Button(container, SWT.CHECK);
+            _chkSportNameForTourType.setText(Messages.PrefPage_Fit_Checkbox_SportNameForTourType);
+            _chkSportNameForTourType.addSelectionListener(_defaultSelectionListener);
+        }
+
+        {
+            // label: info
+            _lblSportNameForTourType_Info = createUI_InfoLabel(container, 3);
+            _lblSportNameForTourType_Info.setText(Messages.PrefPage_Fit_Label_SportNameForTourType_Info);
+        }
+
+        return container;
+    }
+
    private Label createUI_InfoLabel(final Composite parent, final int horizontalSpan) {
 
       final Label lblInfo = new Label(parent, SWT.WRAP);
@@ -411,6 +448,7 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
       final boolean isSplitTour = _chkRemoveExceededDuration.getSelection();
       final boolean isIgnoreSpeed = _chkIgnoreSpeedValues.getSelection();
       final boolean isIgnorLastMarker = _chkIgnoreLastMarker.getSelection();
+      final boolean isSportNameForTourType = _chkSportNameForTourType.getSelection();
 
       _lblIgnorSpeedValues_Info.setEnabled(isIgnoreSpeed);
 
@@ -422,6 +460,8 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
       _lblSplitTour_Duration.setEnabled(isSplitTour);
       _lblSplitTour_Info.setEnabled(isSplitTour);
       _spinnerExceededDuration.setEnabled(isSplitTour);
+
+      _lblSportNameForTourType_Info.setEnabled(isSportNameForTourType);
 
       updateUI_SplitTour();
    }
@@ -488,6 +528,9 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
       } else if (selectedTab == TAB_FOLDER_POWER) {
 
          _comboPowerDataSource.select(_prefStore.getDefaultInt(IPreferences.FIT_PREFERRED_POWER_DATA_SOURCE));
+      } else if (selectedTab == TAB_FOLDER_SPORTNAME) {
+
+         _chkSportNameForTourType.setSelection(_prefStore.getDefaultBoolean(IPreferences.FIT_SPORT_NAME_FOR_TOUR_TYPE));
       }
 
       enableControls();
@@ -535,6 +578,9 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
       // Preferred power data source
       _comboPowerDataSource.select(_prefStore.getInt(IPreferences.FIT_PREFERRED_POWER_DATA_SOURCE));
 
+      // Sport Name -> Tour Type
+      _chkSportNameForTourType.setSelection(_prefStore.getBoolean(IPreferences.FIT_SPORT_NAME_FOR_TOUR_TYPE));
+
       enableControls();
    }
 
@@ -569,6 +615,11 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
       _prefStore.setValue(
             IPreferences.FIT_PREFERRED_POWER_DATA_SOURCE,
             _comboPowerDataSource.getSelectionIndex());
+
+      // Sport Name -> Tour Type
+      _prefStore.setValue(
+            IPreferences.FIT_SPORT_NAME_FOR_TOUR_TYPE,
+            _chkSportNameForTourType.getSelection());
    }
 
    private void saveUIState() {
