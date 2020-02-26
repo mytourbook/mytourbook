@@ -1121,12 +1121,14 @@ public class ConconiView extends ViewPart {
    private void updateUI_12_SetupNewTour() {
 
       if (_conconiDataForSelectedTour == null) {
+         _scaleDeflection.setEnabled(false);
          return;
       }
 
       // update deflection scale
       final int maxDeflection = _conconiDataForSelectedTour.maxXValues.size();
       final int lastXIndex = maxDeflection - 1;
+      _scaleDeflection.setEnabled(true);
       _scaleDeflection.setMaximum(maxDeflection > 0 ? lastXIndex : 0);
 
       // ensure that too much scale ticks are displayed
