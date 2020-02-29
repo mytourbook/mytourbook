@@ -33,6 +33,17 @@ New + Improvements
 * xxx (Frederic)
   - xxx
 
+* Views
+----
+
+* Map25: (Thomas)
+  - new default map provider "mapilion". the old default "opensciencemap" is offline
+  - Satellite Map Layer
+  - Photo layer is now also available on 2.5D map
+  - when a map folder contains more than one map file, MT is automatically switching between them
+  - when a mapsforge V5 map is used, buildings with 3D tags are shown in 3D
+  - switching between online and offline is working correctly now
+
 Import
 ======
 
@@ -47,7 +58,8 @@ Changes
 Fixes   
 =====
 
-*   
+*   Map3: (Thomas)
+  - Fixed issue: track was not shown, when using java8 
    
 Translation    
 ===========
