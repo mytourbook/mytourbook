@@ -727,7 +727,7 @@ public class TourManager {
     */
    public static float computeTourAverageGradient(final TourData tourData, final int startIndex, final int endIndex) {
 
-      final float[] altitudeSerie = tourData.getAltitudeSerie();
+      final float[] altitudeSerie = tourData.altitudeSerie;
       final float[] distanceSerie = tourData.distanceSerie;
 
       if (altitudeSerie == null
