@@ -21,13 +21,17 @@ import net.tourbook.common.util.Util;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
+import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -56,7 +60,7 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
    private static final int      TAB_FOLDER_MARKER_FILTER      = 2;
    private static final int      TAB_FOLDER_TIME_SLIZE         = 3;
    private static final int      TAB_FOLDER_POWER              = 4;
-   private static final int      TAB_FOLDER_SPORTNAME          = 5;
+   private static final int      TAB_FOLDER_TOURTYPE           = 5;
 
    private static PeriodType     _tourPeriodTemplate           = PeriodType.yearMonthDayTime()
 
@@ -77,21 +81,26 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
    /*
     * UI controls
     */
+   private BooleanFieldEditor    _chkFitImportTourType;
+
    private Button    _chkIgnoreLastMarker;
    private Button    _chkIgnoreSpeedValues;
    private Button    _chkRemoveExceededDuration;
-   private Button    _chkSportNameForTourType;
 
    private Combo     _comboPowerDataSource;
 
    private Label     _lblIgnorLastMarker_Info;
    private Label     _lblIgnorLastMarker_TimeSlices;
    private Label     _lblIgnorSpeedValues_Info;
-   private Label     _lblSportNameForTourType_Info;
    private Label     _lblSplitTour_Duration;
    private Label     _lblSplitTour_DurationUnit;
    private Label     _lblSplitTour_Info;
    private Label     _lblPowerDataSource;
+
+   private Button    _rdoTourTypeFromSport;
+   private Button    _rdoTourTypeFromProfile;
+   private Button    _rdoTourTypeFromProfileElseSport;
+   private Button    _rdoTourTypeFromSportAndProfile;
 
    private Spinner   _spinnerIgnorLastMarker_TimeSlices;
    private Spinner   _spinnerExceededDuration;
@@ -144,9 +153,9 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
             tabPower.setControl(createUI_80_Power(_tabFolder));
             tabPower.setText(Messages.PrefPage_Fit_Group_Power);
 
-            final TabItem tabSportname = new TabItem(_tabFolder, SWT.NONE);
-            tabSportname.setControl(createUI_90_SportName(_tabFolder));
-            tabSportname.setText(Messages.PrefPage_Fit_Group_SportName);
+            final TabItem tabTourType = new TabItem(_tabFolder, SWT.NONE);
+            tabTourType.setControl(createUI_90_TourType(_tabFolder));
+            tabTourType.setText(Messages.PrefPage_Fit_Group_TourType);
          }
       }
 
@@ -399,35 +408,74 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
       return container;
    }
 
-    private Composite createUI_90_SportName(final Composite parent) {
+   private Composite createUI_90_TourType(final Composite parent) {
 
-        final Composite container = new Composite(parent, SWT.NONE);
-        GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-        GridLayoutFactory
-                .fillDefaults()//
-                .numColumns(1)
-                .extendedMargins(5, 5, 15, 5)
-                .spacing(20, 5)
-                .applyTo(container);
-        {
-            /*
-             * Sport Name for Tour Type
-             */
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      {
+         /*
+         * Set Tour Type using FIT file fields
+         */
 
-            // checkbox: use srpot name for tour type
-            _chkSportNameForTourType = new Button(container, SWT.CHECK);
-            _chkSportNameForTourType.setText(Messages.PrefPage_Fit_Checkbox_SportNameForTourType);
-            _chkSportNameForTourType.addSelectionListener(_defaultSelectionListener);
-        }
+         // label: info
+         {
+            final Label lblFitImportTourType_Info = createUI_InfoLabel(container, 3);
+            lblFitImportTourType_Info.setText(Messages.PrefPage_Fit_Label_FitImportTourType_Info);
+         }
 
-        {
-            // label: info
-            _lblSportNameForTourType_Info = createUI_InfoLabel(container, 3);
-            _lblSportNameForTourType_Info.setText(Messages.PrefPage_Fit_Label_SportNameForTourType_Info);
-        }
+         {
+            // checkbox: enable/disable setting Tour Type
+            _chkFitImportTourType = new BooleanFieldEditor(
+                  IPreferences.FIT_IMPORT_TOURTYPE ,
+                  Messages.PrefPage_Fit_Checkbox_FitImportTourType,
+                  container);
+            _chkFitImportTourType.setPreferenceStore(_prefStore);
+            _chkFitImportTourType.load();
+            _chkFitImportTourType.setPropertyChangeListener(new IPropertyChangeListener() {
+               public void propertyChange(final PropertyChangeEvent event) {
+                  enableControls();
+               }
+            });
+         }
 
-        return container;
-    }
+         // container: Tour Type import options
+         final Composite containerTourTypeMode = new Composite(container, SWT.NONE);
+         GridDataFactory.fillDefaults().span(2, 1).grab(true, false).indent(15, 0).applyTo(containerTourTypeMode);
+         GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerTourTypeMode);
+         {
+            // radio: from sport name
+            _rdoTourTypeFromSport = new Button(containerTourTypeMode, SWT.RADIO);
+            GridDataFactory.fillDefaults().span(2, 1).applyTo(_rdoTourTypeFromSport);
+            _rdoTourTypeFromSport.setText(Messages.PrefPage_Fit_Radio_TourTypeFromSport);
+            _rdoTourTypeFromSport.addSelectionListener(_defaultSelectionListener);
+
+            // radio: from profile name
+            _rdoTourTypeFromProfile = new Button(containerTourTypeMode, SWT.RADIO);
+            GridDataFactory.fillDefaults().span(2, 1).applyTo(_rdoTourTypeFromProfile);
+            _rdoTourTypeFromProfile.setText(Messages.PrefPage_Fit_Radio_TourTypeFromProfile);
+            _rdoTourTypeFromProfile.addSelectionListener(_defaultSelectionListener);
+
+            // radio: profile name if possible, otherwise sport name
+            _rdoTourTypeFromProfileElseSport = new Button(containerTourTypeMode, SWT.RADIO);
+            GridDataFactory.fillDefaults().span(2, 1).applyTo(_rdoTourTypeFromProfileElseSport);
+            _rdoTourTypeFromProfileElseSport.setText(Messages.PrefPage_Fit_Radio_TourTypeFromProfileElseSport);
+            _rdoTourTypeFromProfileElseSport.addSelectionListener(_defaultSelectionListener);
+
+            // radio: sport name and profile name
+            _rdoTourTypeFromSportAndProfile = new Button(containerTourTypeMode, SWT.RADIO);
+            GridDataFactory.fillDefaults().span(2, 1).applyTo(_rdoTourTypeFromSportAndProfile);
+            _rdoTourTypeFromSportAndProfile.setText(Messages.PrefPage_Fit_Radio_TourTypeFromSportAndProfile);
+            _rdoTourTypeFromSportAndProfile.addSelectionListener(_defaultSelectionListener);
+         }
+      }
+
+      // use a layout to add margins for the entire group
+      final GridLayout regionalLayout = (GridLayout) container.getLayout();
+      regionalLayout.marginWidth = 5;
+      regionalLayout.marginHeight = 5;
+
+      return container;
+   }
 
    private Label createUI_InfoLabel(final Composite parent, final int horizontalSpan) {
 
@@ -448,7 +496,7 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
       final boolean isSplitTour = _chkRemoveExceededDuration.getSelection();
       final boolean isIgnoreSpeed = _chkIgnoreSpeedValues.getSelection();
       final boolean isIgnorLastMarker = _chkIgnoreLastMarker.getSelection();
-      final boolean isSportNameForTourType = _chkSportNameForTourType.getSelection();
+      final boolean isFitImportTourType = _chkFitImportTourType.getBooleanValue();
 
       _lblIgnorSpeedValues_Info.setEnabled(isIgnoreSpeed);
 
@@ -461,7 +509,10 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
       _lblSplitTour_Info.setEnabled(isSplitTour);
       _spinnerExceededDuration.setEnabled(isSplitTour);
 
-      _lblSportNameForTourType_Info.setEnabled(isSportNameForTourType);
+      _rdoTourTypeFromSport.setEnabled(isFitImportTourType);
+      _rdoTourTypeFromProfile.setEnabled(isFitImportTourType);
+      _rdoTourTypeFromProfileElseSport.setEnabled(isFitImportTourType);
+      _rdoTourTypeFromSportAndProfile.setEnabled(isFitImportTourType);
 
       updateUI_SplitTour();
    }
@@ -528,9 +579,14 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
       } else if (selectedTab == TAB_FOLDER_POWER) {
 
          _comboPowerDataSource.select(_prefStore.getDefaultInt(IPreferences.FIT_PREFERRED_POWER_DATA_SOURCE));
-      } else if (selectedTab == TAB_FOLDER_SPORTNAME) {
+      } else if (selectedTab == TAB_FOLDER_TOURTYPE) {
 
-         _chkSportNameForTourType.setSelection(_prefStore.getDefaultBoolean(IPreferences.FIT_SPORT_NAME_FOR_TOUR_TYPE));
+         final String tourTypeMode = _prefStore.getDefaultString(IPreferences.FIT_IMPORT_TOURTYPE_MODE);
+         _rdoTourTypeFromSport.setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORT));
+         _rdoTourTypeFromProfile.setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_PROFILE));
+         _rdoTourTypeFromProfileElseSport.setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_TRYPROFILE));
+         _rdoTourTypeFromSportAndProfile.setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORTANDPROFILE));
+
       }
 
       enableControls();
@@ -578,8 +634,12 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
       // Preferred power data source
       _comboPowerDataSource.select(_prefStore.getInt(IPreferences.FIT_PREFERRED_POWER_DATA_SOURCE));
 
-      // Sport Name -> Tour Type
-      _chkSportNameForTourType.setSelection(_prefStore.getBoolean(IPreferences.FIT_SPORT_NAME_FOR_TOUR_TYPE));
+      // Tour Type during FIT import Mode
+      final String tourTypeMode = _prefStore.getString(IPreferences.FIT_IMPORT_TOURTYPE_MODE);
+      _rdoTourTypeFromSport.setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORT));
+      _rdoTourTypeFromProfile.setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_PROFILE));
+      _rdoTourTypeFromProfileElseSport.setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_TRYPROFILE));
+      _rdoTourTypeFromSportAndProfile.setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORTANDPROFILE));
 
       enableControls();
    }
@@ -616,10 +676,28 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
             IPreferences.FIT_PREFERRED_POWER_DATA_SOURCE,
             _comboPowerDataSource.getSelectionIndex());
 
-      // Sport Name -> Tour Type
+      // Set Tour Type during FIT import
+      _chkFitImportTourType.store();
+
+      // Mode for Tour Type during FIT import
+      String isTourTypeMode = _prefStore.getDefaultString(IPreferences.FIT_IMPORT_TOURTYPE_MODE);
+
+      if (_rdoTourTypeFromSport.getSelection()) {
+         isTourTypeMode = IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORT;
+
+      } else if (_rdoTourTypeFromProfile.getSelection()) {
+         isTourTypeMode = IPreferences.FIT_IMPORT_TOURTYPE_MODE_PROFILE;
+
+      } else if (_rdoTourTypeFromProfileElseSport.getSelection()) {
+         isTourTypeMode = IPreferences.FIT_IMPORT_TOURTYPE_MODE_TRYPROFILE;
+
+      } else if (_rdoTourTypeFromSportAndProfile.getSelection()) {
+         isTourTypeMode = IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORTANDPROFILE;
+      }
+
       _prefStore.setValue(
-            IPreferences.FIT_SPORT_NAME_FOR_TOUR_TYPE,
-            _chkSportNameForTourType.getSelection());
+            IPreferences.FIT_IMPORT_TOURTYPE_MODE,
+            isTourTypeMode);
    }
 
    private void saveUIState() {

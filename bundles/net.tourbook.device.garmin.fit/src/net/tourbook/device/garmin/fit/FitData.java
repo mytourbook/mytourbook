@@ -52,7 +52,8 @@ public class FitData {
 
    private boolean                 _isIgnoreLastMarker;
    private boolean                 _isSetLastMarker;
-   private boolean                 _isSportNameForTourType;
+   private boolean                 _isFitImportTourType;
+   private String                  _isFitImportTourTypeMode;
    private int                     _lastMarkerTimeSlices;
 
    public boolean                  isComputeAveragePower;
@@ -73,7 +74,8 @@ public class FitData {
    private String                  _sessionIndex;
    private ZonedDateTime           _sessionStartTime;
 
-   private String                  _sportName;
+   private String                  _sportName = "";
+   private String                  _profileName = "";
 
    private final List<TimeData>    _allTimeData          = new ArrayList<>();
 
@@ -101,7 +103,8 @@ public class FitData {
       _isIgnoreLastMarker = _prefStore.getBoolean(IPreferences.FIT_IS_IGNORE_LAST_MARKER);
       _isSetLastMarker = _isIgnoreLastMarker == false;
       _lastMarkerTimeSlices = _prefStore.getInt(IPreferences.FIT_IGNORE_LAST_MARKER_TIME_SLICES);
-      _isSportNameForTourType = _prefStore.getBoolean(IPreferences.FIT_SPORT_NAME_FOR_TOUR_TYPE);
+      _isFitImportTourType = _prefStore.getBoolean(IPreferences.FIT_IMPORT_TOURTYPE);
+      _isFitImportTourTypeMode = _prefStore.getString(IPreferences.FIT_IMPORT_TOURTYPE_MODE);
 
    }
 
@@ -201,11 +204,7 @@ public class FitData {
          finalizeTour_Marker(_tourData, _allTourMarker);
          _tourData.finalizeTour_SwimData(_tourData, _allSwimData);
 
-        // If enabled, set Tour Type to sport name if present (ex: "Running", "Biking", etc)
-        if (_isSportNameForTourType && (_sportName != null)) {
-               finalizeTour_Type(_tourData, _sportName);
-        }
-
+         finalizeTour_Type(_tourData);
       }
    }
 
@@ -395,27 +394,69 @@ public class FitData {
       tourData.setTourMarkers(tourTourMarkers);
    }
 
-    /**
-     * @param tourData
-     * @param parsedTourTypeLabel
-     * @return <code>true</code> when a new {@link TourType} is created
-     */
-    private boolean finalizeTour_Type(final TourData tourData, final String parsedTourTypeLabel) {
+   private void finalizeTour_Type(final TourData tourData) {
+      // If enabled, set Tour Type using FIT file data
+      if (_isFitImportTourType) {
 
-        final ArrayList<TourType> tourTypeMap = TourDatabase.getAllTourTypes();
-        TourType tourType = null;
+         switch (_isFitImportTourTypeMode) {
 
-        // find tour type in existing tour types
-        for (final TourType mapTourType : tourTypeMap) {
-            if (parsedTourTypeLabel.equalsIgnoreCase(mapTourType.getName())) {
-                tourType = mapTourType;
-                break;
-            }
+            case IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORT:
+
+               applyTour_Type(_tourData, _sportName);
+               break;
+
+            case IPreferences.FIT_IMPORT_TOURTYPE_MODE_PROFILE:
+
+               applyTour_Type(_tourData, _profileName);
+               break;
+
+            case IPreferences.FIT_IMPORT_TOURTYPE_MODE_TRYPROFILE:
+
+               if (!_profileName.equals("")) {
+                  applyTour_Type(_tourData, _profileName);
+               } else {
+                  applyTour_Type(_tourData, _sportName);
+               }
+               break;
+
+            case IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORTANDPROFILE:
+
+               String spacerText = "";
+
+               // Insert spacer character of Sport Name is present
+               if ((!_sportName.equals("")) && (!_profileName.equals(""))) {
+                  spacerText = " - ";
+               }
+
+               applyTour_Type(_tourData, String.format("%s%s%s", _sportName, spacerText, _profileName));
+               break;
         }
+     }
+   }
 
-        TourType newSavedTourType = null;
+   /**
+    * @param tourData
+    * @param parsedTourTypeLabel
+    * @return <code>true</code> when a new {@link TourType} is created
+    */
+   private boolean applyTour_Type(final TourData tourData, final String parsedTourTypeLabel) {
 
-        if (tourType == null) {
+      final ArrayList<TourType> tourTypeMap = TourDatabase.getAllTourTypes();
+      TourType tourType = null;
+      TourType newSavedTourType = null;
+
+      // do not add tours when label string is blank
+      if (!parsedTourTypeLabel.equals("")) {
+
+         // find tour type in existing tour types
+         for (final TourType mapTourType : tourTypeMap) {
+            if (parsedTourTypeLabel.equalsIgnoreCase(mapTourType.getName())) {
+               tourType = mapTourType;
+               break;
+            }
+         }
+
+         if (tourType == null) {
 
             // create new tour type
 
@@ -438,12 +479,13 @@ public class FitData {
                 TourDatabase.clearTourTypes();
                 TourManager.getInstance().clearTourDataCache();
             }
-        }
+         }
 
-        tourData.setTourType(tourType);
+         tourData.setTourType(tourType);
+      }
 
-        return newSavedTourType != null;
-    }
+      return newSavedTourType != null;
+   }
 
    public List<TimeData> getAllTimeData() {
       return _allTimeData;
@@ -650,8 +692,11 @@ public class FitData {
       _timeDiffMS = timeDiffMS;
    }
 
-    public void setSportname(final String sportName) {
+   public void setSportname(final String sportName) {
       _sportName = sportName;
-    }
+   }
 
+   public void setProfileName(final String profileName) {
+      _profileName = profileName;
+   }
 }
