@@ -97,8 +97,6 @@ public class Running_Govss {
     * @return
     */
    public int ComputeGovss() {
-      //What data from the athlete do we need ?
-      //When identified, add them in the users preference page
 
       // 1. Find the athlete’s velocity at LT by a 10 km to one hour maximal run.
       // 2. Convert this LT limited velocity to a LT limited power value using Equation 7. "Lactate limited power" may also be called "lactate adjusted power".
@@ -163,13 +161,10 @@ public class Running_Govss {
          return null;
       }
 
-      final long tourRecordingTime = _tourData.getTourRecordingTime();
-      final int estimatedNumberOfRollingAverages = Math.round(tourRecordingTime / 120);
-
       final int[] timeSerie = _tourData.timeSerie;
       final int timeSeriesLength = timeSerie.length;
 
-      final ArrayList<Double> powerValues = new ArrayList<>(estimatedNumberOfRollingAverages);
+      final ArrayList<Double> powerValues = new ArrayList<>();
 
       final int rollingAverageInterval = 120; // The formula calls for 120 second rolling averages
       double powerValue = 0;
@@ -180,23 +175,18 @@ public class Running_Govss {
       float initialSpeed = 0;
       float currentSpeed = 0;
 
-      int toto = 0;
       for (; serieEndIndex < timeSeriesLength - 1;) {
 
          double currentRecordingTime = 0;
          serieStartIndex = serieEndIndex;
-         serieEndIndex = serieStartIndex + 1;
-         for (; currentRecordingTime < rollingAverageInterval; ++serieEndIndex) {
+         //   serieEndIndex = serieStartIndex + 1;
 
-            if (serieEndIndex >= timeSeriesLength) {
-               serieEndIndex = timeSeriesLength - 1;
-               break;
-            }
-            currentRecordingTime = timeSerie[serieEndIndex] - timeSerie[serieStartIndex];
-         }
+         for (; currentRecordingTime < rollingAverageInterval && serieEndIndex < timeSeriesLength - 1;) {
 
-         if (toto == 214) {
-            System.out.print(true);
+            ++serieEndIndex;
+            currentRecordingTime = Math.max( //
+                  0,
+                  timeSerie[serieEndIndex] - timeSerie[serieStartIndex] - _tourData.getBreakTime(serieStartIndex, serieEndIndex));
          }
 
          currentSpeed = TourManager.computeTourSpeed(_tourData, serieStartIndex, serieEndIndex);
@@ -204,7 +194,7 @@ public class Running_Govss {
          currentSpeed /= 3.6;
          currentDistance = TourManager.computeTourDistance(_tourData, serieStartIndex, serieEndIndex);
          currentSlope = TourManager.computeTourAverageGradient(_tourData, serieStartIndex, serieEndIndex);
-         powerValue = ComputePower(currentDistance, currentSlope, currentSpeed, initialSpeed);
+         powerValue = ComputePower(currentDistance, currentSlope, initialSpeed, currentSpeed);
 
          if (currentSlope > -1 && currentSlope < 1 &&
                currentDistance > 0) {
@@ -212,11 +202,8 @@ public class Running_Govss {
          }
 
          initialSpeed = currentSpeed;
-
-         ++toto;
       }
 
-      final int size = powerValues.size();
       return powerValues;
    }
 
