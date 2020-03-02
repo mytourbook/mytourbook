@@ -242,7 +242,10 @@ public class PerformanceModelingData {
       int totalGovss = 0;
       ArrayList<Long> tourIds = govssEntries.get(tourStartDate);
       for (final Long tourId : tourIds) {
+         final TourData tour = TourManager.getTour(tourId);
+         if (tour != null) {
          totalGovss += TourManager.getTour(tourId).getGovss();
+         }
       }
 
       int fitnessValue;
