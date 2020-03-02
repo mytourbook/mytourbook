@@ -184,8 +184,7 @@ public class Running_Govss {
          for (; currentRecordingTime < rollingAverageInterval && serieEndIndex < timeSeriesLength - 1;) {
 
             ++serieEndIndex;
-            currentRecordingTime = Math.max( //
-                  0,
+            currentRecordingTime = Math.max(0,
                   timeSerie[serieEndIndex] - timeSerie[serieStartIndex] - _tourData.getBreakTime(serieStartIndex, serieEndIndex));
          }
 
@@ -196,8 +195,7 @@ public class Running_Govss {
          currentSlope = TourManager.computeTourAverageGradient(_tourData, serieStartIndex, serieEndIndex);
          powerValue = ComputePower(currentDistance, currentSlope, initialSpeed, currentSpeed);
 
-         if (currentSlope > -1 && currentSlope < 1 &&
-               currentDistance > 0) {
+         if (currentSlope > -1 && currentSlope < 1 && currentDistance > 0) {
             powerValues.add(powerValue);
          }
 
