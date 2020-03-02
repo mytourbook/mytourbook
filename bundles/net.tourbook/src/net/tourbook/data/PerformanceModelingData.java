@@ -244,7 +244,7 @@ public class PerformanceModelingData {
       for (final Long tourId : tourIds) {
          final TourData tour = TourManager.getTour(tourId);
          if (tour != null) {
-         totalGovss += TourManager.getTour(tourId).getGovss();
+            totalGovss += tour.getGovss();
          }
       }
 
@@ -296,7 +296,10 @@ public class PerformanceModelingData {
 
             tourIds = govssEntries.get(nextDate);
             for (final Long tourId : tourIds) {
-               totalGovss += TourManager.getTour(tourId).getGovss();
+               final TourData tour = TourManager.getTour(tourId);
+               if (tour != null) {
+                  totalGovss += tour.getGovss();
+               }
             }
 
             previousTrainingDate = nextDate;
