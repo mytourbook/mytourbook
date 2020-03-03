@@ -27,6 +27,7 @@ import net.tourbook.tour.TourManager;
  */
 public class Running_Govss {
 
+   //TODO: Compute GOVSS when the tour types are assigned to a tour and not in computecomputedvalues()
    //TODO : Add the GOVSS column in the tour book view
    //TODO Use this equation to display an estimated power graph in the tour chart ?If yes, it's low on the totem pole
    //TODO: Add a configuration to choose between 30s or 120s rolling averages ?
