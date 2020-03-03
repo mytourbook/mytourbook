@@ -9816,6 +9816,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    public void setTourType(final TourType tourType) {
       this.tourType = tourType;
+
+      //TODO
+      //If the tour type to be assigned is a GOVSS tour type, we compute the govss
+//otherwise, if the govss is not 0, we set it to 0
+      if (govss != 0) {
+         govss = 0;
+      }
    }
 
    public void setTraining_TrainingEffect_Aerob(final float trainingEffect) {
