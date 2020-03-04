@@ -120,7 +120,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
    private static IDialogSettings  _state;
 
-   private static String           _mf_mapFilePath                   = "";                                 //$NON-NLS-1$
+   private static String           _mf_mapFilePath                   = UI.EMPTY_STRING;
    private static String           _mf_themeFilePath                 = null;
    private static String           _mf_theme_styleID                 = null;
    private static Map25View        _map25View;
@@ -174,7 +174,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
    private long                      _lastRenderTime;
    private String                    _last_mf_themeFilePath     = "uninitialized";                        //$NON-NLS-1$
-   private String                    _last_mf_theme_styleID     = "";                                     //$NON-NLS-1$
+   private String                    _last_mf_theme_styleID     = UI.EMPTY_STRING;
    private Boolean                   _last_is_mf_Map            = true;
    private String                    _last_mf_mapFilePath       = "uninitialized";                        //$NON-NLS-1$
    private Boolean                   _last_mf_IsThemeFromFile;
@@ -1089,7 +1089,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 //		mMap.clearMap();
 //		mMap.updateMap(true);
 
-         _mf_themeFilePath = ""; // so if mf is next themefile is parsed //$NON-NLS-1$
+         _mf_themeFilePath = UI.EMPTY_STRING; // so if mf is next themefile is parsed
       } else { //it mapsforge map
          this._isOfflineMap = true;
          CanvasAdapter.textScale = _mf_TextScale;

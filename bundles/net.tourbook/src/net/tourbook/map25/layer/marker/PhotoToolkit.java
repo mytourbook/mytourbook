@@ -3,15 +3,15 @@
  * Copyright 2016-2018 devemux86
  * Copyright 2017 nebular
  * Copyright 2019, 2020 Thomas Theussing
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -47,6 +47,8 @@ import org.oscim.layers.marker.ItemizedLayer;
 import org.oscim.layers.marker.MarkerItem;
 import org.oscim.layers.marker.MarkerRendererFactory;
 import org.oscim.layers.marker.MarkerSymbol;
+
+import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.map25.Map25App;
 import net.tourbook.map25.Map25ConfigManager;
@@ -63,7 +65,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
 
    private Bitmap _bitmapCluster;
    //private boolean _isBillboard;
-   
+
    public MarkerSymbol _symbol;  //marker symbol, circle or star
 
    private Bitmap _bitmapPhoto;  //normaly the photo as Bitmap
@@ -71,13 +73,13 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
    private ArrayList<Photo> _allPhotos;
 
    public MarkerRendererFactory _markerRendererFactory;
-   
+
    public boolean _isMarkerClusteredLast;
-   
+
    Display  _display;
-   
+
    private Map25App _mapApp;
-   
+
 //   private int  _imageSize;
 //   private static final String      STATE_PHOTO_PROPERTIES_IMAGE_SIZE      = "STATE_PHOTO_PROPERTIES_IMAGE_SIZE";       //$NON-NLS-1$
 //   private IDialogSettings       _state;
@@ -103,16 +105,16 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
 //         }
 
       }
-   }   
-   
-   
+   }
+
+
    public PhotoToolkit() {
       super(MarkerShape.CIRCLE);
       //debugPrint(" ?? PhotoToolkit + *** Constructor"); //$NON-NLS-1$
       final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 
       loadConfig();
-      
+
       _fillPainter.setStyle(Paint.Style.FILL);
       _bitmapCluster = createClusterBitmap(1);
       //_bitmapPhoto = createPhotoBitmap();
@@ -140,20 +142,20 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
    public MarkerSymbol createPhotoBitmapFromPhoto(final Photo photo, final MarkerItem item) {
       Bitmap bitmapImage = getPhotoBitmap(photo);
       MarkerSymbol bitmapPhoto = null;
-      
+
       if (bitmapImage == null) {
          bitmapImage = _bitmapPhoto;
       }
       bitmapPhoto = createAdvanceSymbol(item, bitmapImage, true);
- 
+
       return bitmapPhoto;
    }
-   
-   
+
+
    public List<MarkerItem> createPhotoItemList(final ArrayList<Photo> galleryPhotos){
       Map25App.debugPrint(" Phototoolkit createPhotoItemList: entering "); //$NON-NLS-1$
       final List<MarkerItem> pts = new ArrayList<>();
-      
+
       if (galleryPhotos == null) {
          Map25App.debugPrint(" Map25View: *** createPhotoItemList: galleriePhotos was null"); //$NON-NLS-1$
          return pts;
@@ -161,24 +163,24 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
 
       if (galleryPhotos.size() == 0) {
          Map25App.debugPrint(" Map25View: *** createPhotoItemList: galleriePhotos.size() was 0"); //$NON-NLS-1$
-         return  pts;     
+         return  pts;
       }
-      
+
       /**if (!_isShowPhoto) {
          Map25App.debugPrint(" Map25View: *** createPhotoItemList: photlayer is off");
          return pts;
       }*/
-      
+
       _allPhotos = galleryPhotos;
-      
+
       for (final  Photo photo : galleryPhotos) {
          int stars = 0;
-         String starText = ""; //$NON-NLS-1$
-         String photoName = ""; //$NON-NLS-1$
+         String starText = UI.EMPTY_STRING;
+         String photoName = UI.EMPTY_STRING;
          final UUID photoKey = UUID.randomUUID();
 
          stars = photo.ratingStars;
-         //starText = "";
+         //starText = UI.EMPTY_STRING;
          switch (stars) {
          case 1:
             starText = " *"; //$NON-NLS-1$
@@ -191,10 +193,10 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
          case 5:
             starText = " *****"; //$NON-NLS-1$
          }
-         photoName = TimeTools.getZonedDateTime(photo.imageExifTime).format(TimeTools.Formatter_Time_S) + starText;       
+         photoName = TimeTools.getZonedDateTime(photo.imageExifTime).format(TimeTools.Formatter_Time_S) + starText;
 
          final String photoDescription = "Ratingstars: " + Integer.toString(photo.ratingStars); //$NON-NLS-1$
-         
+
          Double photoLat = 0.0;
          Double photoLon = 0.0;
          if(photo.isGeoFromExif &&
@@ -210,27 +212,27 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
             photoLat = photo.getTourLatitude();
             photoLon = photo.getTourLongitude();
          }
-         
+
          //Map25App.debugPrint("PhotoToolkit: *** createPhotoItemList Name: " + photo.getImageMetaData().objectName + " Description: " + photo.getImageMetaData().captionAbstract);
-         
+
          final MarkerItem item = new MarkerItem(photoKey, photoName, photoDescription,
                new GeoPoint(photoLat, photoLon)
                );
          final MarkerSymbol markerSymbol = createPhotoBitmapFromPhoto(photo, item);
-        
+
          if (markerSymbol != null) {
             item.setMarker(markerSymbol);
-         }        
-         
+         }
+
          pts.add(item);
       }
       //_photo_pts = pts;
-      _allPhotos = galleryPhotos; 
-      
-      return pts;   
+      _allPhotos = galleryPhotos;
+
+      return pts;
    }
-   
-   
+
+
    /**
     * same as in TourMapPainter, but for 2.5D maps
     * @param photo
@@ -244,7 +246,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
       // ensure that an image is displayed, it happend that image size was 0
       //debugPrint("??? getPhotoBitmap imageSize: " + photoBitmap.getWidth() + _imageSize);
       //final Image scaledThumbImage = getPhotoImage(photo, _imageSize);
-      
+
       final Image scaledThumbImage = getPhotoImage(photo, PhotoLoadManager.IMAGE_SIZE_THUMBNAIL);
 
       if (scaledThumbImage != null) {
@@ -258,8 +260,8 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
 
       return photoBitmap;
    }
-   
-   
+
+
    public Image getPhotoImage(final Photo photo, final int thumbSize) {
       Image photoImage = null;
       Image scaledThumbImage = null;
@@ -288,7 +290,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
 
             final Rectangle imageBounds = photoImage.getBounds();
             final int originalImageWidth = imageBounds.width;
-            final int originalImageHeight = imageBounds.height;  
+            final int originalImageHeight = imageBounds.height;
 
             final int imageWidth = originalImageWidth;
             final int imageHeight = originalImageHeight;
@@ -297,7 +299,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
             boolean isRotated = false;
 
             final Point bestSize = ImageUtils.getBestSize(imageWidth, imageHeight, thumbSize, thumbSize);
-            final Rotation thumbRotation = null;  
+            final Rotation thumbRotation = null;
             if (isRotated == false) {
                isRotated = true;
                //thumbRotation = getRotation();
@@ -310,17 +312,17 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
                   bestSize.y,
                   SWT.ON,
                   SWT.LOW,
-                  thumbRotation);          
+                  thumbRotation);
 
          }  else {
             scaledThumbImage = null;
          }
       }
-      
-      
+
+
       return scaledThumbImage;
    }
- 
+
    @Override
    public boolean onItemLongPress(final int index, final MarkerItem photoItem) {
       // TODO Auto-generated method stub
@@ -336,7 +338,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
       //showPhoto(_allPhotos.get(index));
       return false;
    }
-   
+
    public void showPhoto(final Photo photo) {
 
       final Image image = getPhotoImage(photo, PhotoLoadManager.IMAGE_SIZE_LARGE_DEFAULT);
@@ -374,5 +376,5 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
       _mapApp.updateUI_PhotoLayer();
    }
 
-   
+
 }

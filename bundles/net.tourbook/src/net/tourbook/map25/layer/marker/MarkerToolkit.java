@@ -137,7 +137,7 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
       final Point subtitleSize = new Point();
       final Point size = new Point();  //total  size of all elements
 
-      String subtitle =""; //$NON-NLS-1$
+      String subtitle = UI.EMPTY_STRING;
       boolean hasSubtitle = false;
       if (mItem.description.length()>1) {
          if (mItem.description.startsWith("#")){ //$NON-NLS-1$
@@ -243,7 +243,9 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
       for (final MapBookmark mapBookmark : net.tourbook.map.bookmark.MapBookmarkManager.getAllBookmarks()) {
          //Map25App.debugPrint("*** Markertoolkit:  mapbookmark name: " + mapBookmark.name + " lat: " +  mapBookmark.get_mapPositionMarkerLatitude() + " lon: " + mapBookmark.get_mapPositionMarkerLongitude()); //$NON-NLS-1$
          //Map25App.debugPrint("*** Markertoolkit: " + mapBookmark.toString());
-         final MarkerItem item = new MarkerItem(mapBookmark.id, mapBookmark.name, "", //$NON-NLS-1$
+         final MarkerItem item = new MarkerItem(mapBookmark.id,
+               mapBookmark.name,
+               UI.EMPTY_STRING,
                //new GeoPoint(mapBookmark.getLatitude(), mapBookmark.getLongitude())
                new GeoPoint(mapBookmark.get_mapPositionMarkerLatitude(), mapBookmark.get_mapPositionMarkerLongitude())
                );
