@@ -25,64 +25,22 @@ import net.tourbook.tour.TourManager;
  * Class that implements several of Dr Skiba's formulas that apply to running
  * More information can be found on www.physfarm.com
  */
-public class Running_Govss {
+public class Govss {
 
-   //TODO: Compute GOVSS when the tour types are assigned to a tour and not in computecomputedvalues()
    //TODO : Add the GOVSS column in the tour book view
    //TODO Use this equation to display an estimated power graph in the tour chart ?If yes, it's low on the totem pole
-   //TODO: Add a configuration to choose between 30s or 120s rolling averages ?
    //TODO; When a tour has its tour type changed, if this new tour type is not in the govss list, we remove the tourid from the performancemodeling table
 
    private TourPerson _tourPerson;
    private TourData   _tourData;
 
-   public Running_Govss(final TourPerson tourPerson) {
+   public Govss(final TourPerson tourPerson) {
       this._tourPerson = tourPerson;
    }
 
-   public Running_Govss(final TourPerson tourPerson, final TourData tourData) {
+   public Govss(final TourPerson tourPerson, final TourData tourData) {
       this._tourPerson = tourPerson;
       this._tourData = tourData;
-   }
-
-   /**
-    * Computes Caero (This is the energy cost of overcoming aerodynamic drag)
-    *
-    * @param speed
-    * @return
-    */
-   private double computeCostAerodynamicDrag(final float speed) {
-
-      final double Af = 0.2025 * 0.266 * Math.pow(_tourPerson.getHeight(), 0.725) * Math.pow(_tourPerson.getWeight(), 0.425);
-      final double CAero = 0.5 * 1.2 * 0.9 * Af * Math.pow(speed, 2) / _tourPerson.getWeight();
-
-      return CAero;
-   }
-
-   /**
-    * Computes Ci (The energy cost to cover any given distance) with i being the slope of the
-    * running surface (in ??? unit)
-    *
-    * @return
-    */
-   private double computeCostDistanceWithSlope(final double slope) {
-
-      final double Cslope = (155.4 * Math.pow(slope, 5)) - (30.4 * Math.pow(slope, 4)) - (43.3 * Math.pow(slope, 3)) + (46.3 * Math.pow(slope, 2))
-            + (19.5 * slope) + 3.6;
-
-      return Cslope;
-   }
-
-   /**
-    * Computes Ckin (The energy cost of changes in velocity)
-    *
-    * @return
-    */
-   private double computeCostKineticEnergy(final double distance, final double initialSpeed, final double speed) {
-
-      final double Ckin = 0.5 * (Math.pow(speed, 2) - Math.pow(initialSpeed, 2)) / distance;
-
-      return Ckin;
    }
 
    /**
@@ -95,9 +53,9 @@ public class Running_Govss {
     * Note : This function will assume that the tour is a run activity. If not, be aware that the
     * GOVSS value will be worthless.
     *
-    * @return
+    * @return The GOVSS value
     */
-   public int ComputeGovss() {
+   public int Compute() {
 
       // 1. Find the athlete’s velocity at LT by a 10 km to one hour maximal run.
       // 2. Convert this LT limited velocity to a LT limited power value using Equation 7. "Lactate limited power" may also be called "lactate adjusted power".
@@ -138,6 +96,46 @@ public class Running_Govss {
 
       //Should that trigger a recompute of the Performance chart data ?
       return (int) trainingStressValue;
+   }
+
+   /**
+    * Computes Caero (This is the energy cost of overcoming aerodynamic drag)
+    *
+    * @param speed
+    * @return
+    */
+   private double computeCostAerodynamicDrag(final float speed) {
+
+      final double Af = 0.2025 * 0.266 * Math.pow(_tourPerson.getHeight(), 0.725) * Math.pow(_tourPerson.getWeight(), 0.425);
+      final double CAero = 0.5 * 1.2 * 0.9 * Af * Math.pow(speed, 2) / _tourPerson.getWeight();
+
+      return CAero;
+   }
+
+   /**
+    * Computes Ci (The energy cost to cover any given distance) with i being the slope of the
+    * running surface (in ??? unit)
+    *
+    * @return
+    */
+   private double computeCostDistanceWithSlope(final double slope) {
+
+      final double Cslope = (155.4 * Math.pow(slope, 5)) - (30.4 * Math.pow(slope, 4)) - (43.3 * Math.pow(slope, 3)) + (46.3 * Math.pow(slope, 2))
+            + (19.5 * slope) + 3.6;
+
+      return Cslope;
+   }
+
+   /**
+    * Computes Ckin (The energy cost of changes in velocity)
+    *
+    * @return
+    */
+   private double computeCostKineticEnergy(final double distance, final double initialSpeed, final double speed) {
+
+      final double Ckin = 0.5 * (Math.pow(speed, 2) - Math.pow(initialSpeed, 2)) / distance;
+
+      return Ckin;
    }
 
    /**

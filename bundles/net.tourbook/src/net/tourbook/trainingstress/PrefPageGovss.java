@@ -692,7 +692,7 @@ public class PrefPageGovss extends PrefPageTrainingStressModel {
       // Speed in m/s
       final float thresholdVelocity = computeThresholdVelocity(thresholdPowerDistance, thresholdPowerDuration);
       final float averageSlope = _spinnerThresholdPower_AverageSlope.getSelection() / 100f;
-      final double thresholdPower = new Running_Govss(_tourPerson).ComputePower(thresholdPowerDistance,
+      final double thresholdPower = new Govss(_tourPerson).ComputePower(thresholdPowerDistance,
             averageSlope,
             0f,
             thresholdVelocity);

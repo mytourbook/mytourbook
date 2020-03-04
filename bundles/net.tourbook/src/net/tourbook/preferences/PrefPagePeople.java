@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -148,8 +148,8 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
    private static PrefPageGovss                 _prefPageGovss;
    private static PrefPageBikeScore             _prefPageBikeScore;
 
-   private final IPreferenceStore _prefStore                          = TourbookPlugin.getPrefStore();
-   private final IDialogSettings  _state                              = TourbookPlugin.getState(ID);
+   private final IPreferenceStore               _prefStore                          = TourbookPlugin.getPrefStore();
+   private final IDialogSettings                _state                              = TourbookPlugin.getState(ID);
 
    // REMOVED BIKES 30.4.2011
 
@@ -1708,8 +1708,10 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          _prefStore.removePropertyChangeListener(_prefChangeListener);
       }
 
-      for (final PrefPageTrainingStressModel _trainingStressModel : _trainingStressModels) {
-         _trainingStressModel.dispose();
+      if (_trainingStressModels != null) {
+         for (final PrefPageTrainingStressModel _trainingStressModel : _trainingStressModels) {
+            _trainingStressModel.dispose();
+         }
       }
 
       if (_isNoUI) {

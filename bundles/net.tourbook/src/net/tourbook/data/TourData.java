@@ -96,7 +96,7 @@ import net.tourbook.tour.BreakTimeTool;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.photo.TourPhotoLink;
 import net.tourbook.tour.photo.TourPhotoManager;
-import net.tourbook.trainingstress.Running_Govss;
+import net.tourbook.trainingstress.Govss;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.ChartLabel;
 import net.tourbook.ui.tourChart.ChartLayer2ndAltiSerie;
@@ -1664,6 +1664,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    public TourData() {}
 
    public boolean canGovssBeComputed() {
+
+      // We make sure to retrieve the latest version of the tour's TourPerson in case it has been modified recently
+      // Note : It's not a "pretty" solution but that is the best I found as of today
+      final ArrayList<TourPerson> tourPersons = PersonManager.getTourPeople();
+      for (final TourPerson currentTourPerson : tourPersons) {
+         if (currentTourPerson.getPersonId() == tourPerson.getPersonId()) {
+            tourPerson = currentTourPerson;
+            break;
+         }
+      }
 
       if (timeSerie == null ||
             tourPerson == null || tourPerson.getWeight() <= 0f || tourPerson.getHeight() <= 0f ||
@@ -3401,8 +3411,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       computeCadenceZonesTimes();
       computeRunningDynamics();
 
-      computeGovss();
-
       computeGeo_Bounds();
       computeGeo_Grid();
    }
@@ -4051,25 +4059,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    public boolean computeGovss() {
 
+      //TODO Function to be called whenever a tour is modified.
+      // example : a timeslice is modified, removed.
+
       if (canGovssBeComputed() == false) {
          return false;
       }
 
-      // We make sure to retrieve the latest version of the tour's TourPerson in case it has been modified recently
-      // Note : It's not a "pretty" solution but that is the best I found as of today
-      final ArrayList<TourPerson> tourPersons = PersonManager.getTourPeople();
-      for (final TourPerson currentTourPerson : tourPersons) {
-         if (currentTourPerson.getPersonId() == tourPerson.getPersonId()) {
-            tourPerson = currentTourPerson;
-            break;
-         }
-      }
-
-      govss = new Running_Govss(tourPerson, this).ComputeGovss();
+      govss = new Govss(tourPerson, this).Compute();
 
       tourPerson.addOrUpdateGovssEntry(tourStartTime, tourId);
 
-      return govss != 0;
+      return true;
    }
 
    /**
@@ -4258,8 +4259,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          return;
       }
 
-      final boolean isJametAlgorithm = _prefStore.getString(ITourbookPreferences.GRAPH_SMOOTHING_SMOOTHING_ALGORITHM).equals(
-            ISmoothingAlgorithm.SMOOTHING_ALGORITHM_JAMET);
+      final boolean isJametAlgorithm = _prefStore.getString(ITourbookPreferences.GRAPH_SMOOTHING_SMOOTHING_ALGORITHM)
+            .equals(
+                  ISmoothingAlgorithm.SMOOTHING_ALGORITHM_JAMET);
 
       if (isJametAlgorithm == false) {
 
@@ -4898,6 +4900,17 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       } else {
          final int tourDrivingTimeRaw = timeSerie[timeSerie.length - 1] - getBreakTime();
          tourDrivingTime = Math.max(0, tourDrivingTimeRaw);
+      }
+   }
+
+   private void ComputeTrainingStressData() {
+      //TODO
+
+      //GOVSS
+      //If the tour type to be assigned is a GOVSS tour type, we compute the govss
+      if (!computeGovss() && govss != 0) {
+         // otherwise, if the govss is not 0, we set it to 0
+         govss = 0;
       }
    }
 
@@ -9817,12 +9830,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    public void setTourType(final TourType tourType) {
       this.tourType = tourType;
 
-      //TODO
-      //If the tour type to be assigned is a GOVSS tour type, we compute the govss
-//otherwise, if the govss is not 0, we set it to 0
-      if (govss != 0) {
-         govss = 0;
-      }
+      ComputeTrainingStressData();
    }
 
    public void setTraining_TrainingEffect_Aerob(final float trainingEffect) {
