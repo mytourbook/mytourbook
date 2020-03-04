@@ -1665,6 +1665,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    public boolean canGovssBeComputed() {
 
+      if (tourPerson == null) {
+         return false;
+      }
+
       // We make sure to retrieve the latest version of the tour's TourPerson in case it has been modified recently
       // Note : It's not a "pretty" solution but that is the best I found as of today
       final ArrayList<TourPerson> tourPersons = PersonManager.getTourPeople();
@@ -1675,8 +1679,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          }
       }
 
-      if (timeSerie == null ||
-            tourPerson == null || tourPerson.getWeight() <= 0f || tourPerson.getHeight() <= 0f ||
+      if (timeSerie == null || altitudeSerie == null || distanceSerie == null ||
+            tourPerson.getWeight() <= 0f || tourPerson.getHeight() <= 0f ||
             tourType == null ||
             !tourPerson.isTourTypeInGovssTourTypes(tourType.getTypeId())) {
          //In case the govss was previously computed and the tour is not considered a tour for
@@ -4906,11 +4910,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       //TODO
 
       //GOVSS
-      //If the tour type to be assigned is a GOVSS tour type, we compute the govss
-      if (!computeGovss() && govss != 0) {
-         // otherwise, if the govss is not 0, we set it to 0
-         govss = 0;
-      }
+      computeGovss();
    }
 
    private float[] convertDataSeries(final int[] intDataSerie, final int scale) {

@@ -492,6 +492,9 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       enableActions();
       addPrefListener();
 
+      _comboTrainingStressModel.select(0);
+      onSelectTrainingStressModel();
+
       return container;
    }
 
@@ -661,21 +664,20 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
          // combo
          _comboTrainingStressModel = new Combo(container, SWT.READ_ONLY | SWT.DROP_DOWN);
-         _comboTrainingStressModel.setVisibleItemCount(2);
 
          initializeTrainingStressModels();
 
          for (final PrefPageTrainingStressModel trainingStressModel : _trainingStressModels) {
             _comboTrainingStressModel.add(trainingStressModel.getGroupName());
          }
+         _comboTrainingStressModel.setVisibleItemCount(_trainingStressModels.length);
+
          _comboTrainingStressModel.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(final SelectionEvent e) {
-               final int index = _comboTrainingStressModel.getSelectionIndex();
-               _trainingStressLayout.topControl =
-                     _trainingStressModels[index].getGroupUI(_trainingStressComposite, getCurrentPerson());
-               _trainingStressComposite.requestLayout();
+               onSelectTrainingStressModel();
             }
+
          });
 
          _trainingStressComposite = new Composite(container, SWT.NONE);
@@ -1821,8 +1823,8 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
     */
    private void initializeTrainingStressModels() {
 
-      _trainingStressModels = new PrefPageTrainingStressModel[2];
-      _prefPageBikeScore = new PrefPageBikeScore();
+      _trainingStressModels = new PrefPageTrainingStressModel[1];
+      //_prefPageBikeScore = new PrefPageBikeScore();
       _prefPageGovss = new PrefPageGovss();
       _prefPageGovss.setPersonModifiedListener(new IPersonModifiedListener() {
 
@@ -1832,7 +1834,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          }
       });
       _trainingStressModels[0] = _prefPageGovss;
-      _trainingStressModels[1] = _prefPageBikeScore;
+      //_trainingStressModels[1] = _prefPageBikeScore;
    }
 
    private void initUI(final Composite parent) {
@@ -2069,6 +2071,13 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       }
 
       enableActions();
+   }
+
+   private void onSelectTrainingStressModel() {
+      final int index = _comboTrainingStressModel.getSelectionIndex();
+      _trainingStressLayout.topControl =
+            _trainingStressModels[index].getGroupUI(_trainingStressComposite, getCurrentPerson());
+      _trainingStressComposite.requestLayout();
    }
 
    @Override

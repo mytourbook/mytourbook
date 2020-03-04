@@ -158,6 +158,9 @@ public class Messages extends NLS {
    public static String        Dialog_AdjustTemperature_Label_Progress_Task;
    public static String        Dialog_AdjustTemperature_Label_TemperatureAdjustmentDuration;
 
+   public static String        Dialog_ComputeGovss_Dialog_Title;
+   public static String        Dialog_ComputeGovss_Label_GovssNotComputed;
+
    public static String        Dialog_ImportConfig_Action_AddSpeed_Tooltip;
    public static String        Dialog_ImportConfig_Action_NewOneTourType;
    public static String        Dialog_ImportConfig_Action_NewOneTourType_Tooltip;

@@ -23,12 +23,12 @@ import net.tourbook.tour.TourManager;
 
 /**
  * Class that implements several of Dr Skiba's formulas that apply to running
- * More information can be found on www.physfarm.com
+ * More information can be found at http://topofusion.com/govss.php
+ * Possible features:
+ * - Use this equation to display an estimated power graph in the tour chart
+ * - Add the GOVSS column in the tour book view
  */
 public class Govss {
-
-   //TODO : Add the GOVSS column in the tour book view
-   //TODO Use this equation to display an estimated power graph in the tour chart ?If yes, it's low on the totem pole
    //TODO; When a tour has its tour type changed, if this new tour type is not in the govss list, we remove the tourid from the performancemodeling table
 
    private TourPerson _tourPerson;
@@ -136,7 +136,7 @@ public class Govss {
     */
    private double computeCostKineticEnergy(final double distance, final double initialSpeed, final double speed) {
 
-      final double Ckin = 0.5 * (Math.pow(speed, 2) - Math.pow(initialSpeed, 2)) / distance;
+      final double Ckin = distance > 0 ? 0.5 * (Math.pow(speed, 2) - Math.pow(initialSpeed, 2)) / distance : 0;
 
       return Ckin;
    }
@@ -181,7 +181,6 @@ public class Govss {
 
          double currentRecordingTime = 0;
          serieStartIndex = serieEndIndex;
-         //   serieEndIndex = serieStartIndex + 1;
 
          for (; currentRecordingTime < rollingAverageInterval && serieEndIndex < timeSeriesLength - 1;) {
 
@@ -206,5 +205,4 @@ public class Govss {
 
       return powerValues;
    }
-
 }

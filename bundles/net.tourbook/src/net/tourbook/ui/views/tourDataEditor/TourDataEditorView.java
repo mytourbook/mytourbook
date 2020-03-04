@@ -7138,8 +7138,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             } else {
                MessageDialog.openInformation(
                      Display.getCurrent().getActiveShell(),
-                     Messages.Dialog_RetrieveWeather_Dialog_Title,
-                     Messages.Dialog_RetrieveWeather_Label_WeatherDataNotRetrieved);
+                     Messages.Dialog_ComputeGovss_Dialog_Title,
+                     Messages.Dialog_ComputeGovss_Label_GovssNotComputed);
             }
 
          }
