@@ -37,8 +37,8 @@ Import
 ======
 
 * FIT File (bbbbbr)
-  - Added option to set Tour Type using Sport Name from the
-    imported file
+  - Added option to set Tour Type using Sport Name and Profile Name
+    from the imported file
 
  
 Changes  

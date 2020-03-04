@@ -43,6 +43,7 @@ import net.tourbook.device.garmin.fit.listeners.MesgListener_Lap;
 import net.tourbook.device.garmin.fit.listeners.MesgListener_Length;
 import net.tourbook.device.garmin.fit.listeners.MesgListener_Record;
 import net.tourbook.device.garmin.fit.listeners.MesgListener_Session;
+import net.tourbook.device.garmin.fit.listeners.MesgListener_Sport;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
@@ -558,6 +559,7 @@ public class FitDataReader extends TourbookDevice {
          fitBroadcaster.addListener(new MesgListener_Length(fitData));
          fitBroadcaster.addListener(new MesgListener_Record(fitData));
          fitBroadcaster.addListener(new MesgListener_Session(fitData));
+         fitBroadcaster.addListener(new MesgListener_Sport(fitData));
 
          if (_isLogging_FitData) {
 
