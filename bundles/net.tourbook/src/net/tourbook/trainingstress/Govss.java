@@ -48,7 +48,7 @@ public class Govss {
     * athlete.
     * References
     * http://runscribe.com/wp-content/uploads/power/GOVSS.pdf
-    * https://3record.de/about/power_estimation#ref_4
+    * https://3record.de/about/power_estimation#run
     * https://runscribe.com/power/
     * Note : This function will assume that the tour is a run activity. If not, be aware that the
     * GOVSS value will be worthless.
@@ -56,6 +56,9 @@ public class Govss {
     * @return The GOVSS value
     */
    public int Compute() {
+      if (_tourPerson == null || _tourData == null) {
+         return 0;
+      }
 
       // 1. Find the athlete’s velocity at LT by a 10 km to one hour maximal run.
       // 2. Convert this LT limited velocity to a LT limited power value using Equation 7. "Lactate limited power" may also be called "lactate adjusted power".

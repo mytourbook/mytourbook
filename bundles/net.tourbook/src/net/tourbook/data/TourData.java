@@ -3413,6 +3413,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       computeGeo_Bounds();
       computeGeo_Grid();
+
+      ComputeTrainingStressData();
    }
 
    private void computeDataSeries_NotSmoothed() {
@@ -4058,9 +4060,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    public boolean computeGovss() {
-
-      //TODO Function to be called whenever a tour is modified.
-      // example : a timeslice is modified, removed.
 
       if (canGovssBeComputed() == false) {
          return false;
