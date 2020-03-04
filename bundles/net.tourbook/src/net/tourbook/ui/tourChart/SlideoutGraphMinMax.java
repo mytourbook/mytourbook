@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -558,7 +558,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
       _chkMax_Pace = createUI_Checkbox(parent);
       _spinnerMax_Pace = createUI_Spinner(parent, 0, PACE_MAX);
 
-      _lblMinMax_Pace_Unit = createUI_Label(parent, Messages.app_unit_minutes);
+      _lblMinMax_Pace_Unit = createUI_Label(parent, UI.UNIT_LABEL_PACE);
    }
 
    private void createUI_67_MinMax_Cadence(final Composite parent) {
