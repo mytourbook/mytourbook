@@ -107,7 +107,7 @@ public class FitData {
       _isSetLastMarker = _isIgnoreLastMarker == false;
       _lastMarkerTimeSlices = _prefStore.getInt(IPreferences.FIT_IGNORE_LAST_MARKER_TIME_SLICES);
       _isFitImportTourType = _prefStore.getBoolean(IPreferences.FIT_IS_IMPORT_TOURTYPE);
-      _isFitImportTourTypeMode = _prefStore.getString(IPreferences.FIT_IS_IMPORT_TOURTYPE_MODE);
+      _isFitImportTourTypeMode = _prefStore.getString(IPreferences.FIT_IMPORT_TOURTYPE_MODE);
 
    }
 
@@ -403,31 +403,31 @@ public class FitData {
 
          switch (_isFitImportTourTypeMode) {
 
-            case IPreferences.FIT_IS_IMPORT_TOURTYPE_MODE_SPORT:
+            case IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORT:
 
                applyTour_Type(_tourData, _sportName);
                break;
 
-            case IPreferences.FIT_IS_IMPORT_TOURTYPE_MODE_PROFILE:
+            case IPreferences.FIT_IMPORT_TOURTYPE_MODE_PROFILE:
 
                applyTour_Type(_tourData, _profileName);
                break;
 
-            case IPreferences.FIT_IS_IMPORT_TOURTYPE_MODE_TRYPROFILE:
+            case IPreferences.FIT_IMPORT_TOURTYPE_MODE_TRYPROFILE:
 
-               if (!_profileName.equals(UI.EMPTY_STRING)) {
+               if (!UI.EMPTY_STRING.equals(_profileName)) {
                   applyTour_Type(_tourData, _profileName);
                } else {
                   applyTour_Type(_tourData, _sportName);
                }
                break;
 
-            case IPreferences.FIT_IS_IMPORT_TOURTYPE_MODE_SPORTANDPROFILE:
+            case IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORTANDPROFILE:
 
                String spacerText = UI.EMPTY_STRING;
 
                // Insert spacer character of Sport Name is present
-               if ((!_sportName.equals(UI.EMPTY_STRING)) && (!_profileName.equals(UI.EMPTY_STRING))) {
+               if ((!UI.EMPTY_STRING.equals(_sportName)) && (!UI.EMPTY_STRING.equals(_profileName))) {
                   spacerText = UI.DASH_WITH_SPACE;
                }
 
@@ -449,7 +449,7 @@ public class FitData {
       TourType newSavedTourType = null;
 
       // do not add tours when label string is blank
-      if (!parsedTourTypeLabel.equals(UI.EMPTY_STRING)) {
+      if (!UI.EMPTY_STRING.equals(parsedTourTypeLabel)) {
 
          // find tour type in existing tour types
          for (final TourType mapTourType : tourTypeMap) {

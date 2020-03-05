@@ -578,11 +578,11 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
          _chkFitImportTourType.setSelection(_prefStore.getDefaultBoolean(IPreferences.FIT_IS_IMPORT_TOURTYPE));
 
          // Mode for Tour Type during FIT import
-         final String tourTypeMode = _prefStore.getDefaultString(IPreferences.FIT_IS_IMPORT_TOURTYPE_MODE);
-         _rdoTourTypeFromSport.setSelection(tourTypeMode.equals(IPreferences.FIT_IS_IMPORT_TOURTYPE_MODE_SPORT));
-         _rdoTourTypeFromProfile.setSelection(tourTypeMode.equals(IPreferences.FIT_IS_IMPORT_TOURTYPE_MODE_PROFILE));
-         _rdoTourTypeFromProfileElseSport.setSelection(tourTypeMode.equals(IPreferences.FIT_IS_IMPORT_TOURTYPE_MODE_TRYPROFILE));
-         _rdoTourTypeFromSportAndProfile.setSelection(tourTypeMode.equals(IPreferences.FIT_IS_IMPORT_TOURTYPE_MODE_SPORTANDPROFILE));
+         final String tourTypeMode = _prefStore.getDefaultString(IPreferences.FIT_IMPORT_TOURTYPE_MODE);
+         _rdoTourTypeFromSport.setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORT));
+         _rdoTourTypeFromProfile.setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_PROFILE));
+         _rdoTourTypeFromProfileElseSport.setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_TRYPROFILE));
+         _rdoTourTypeFromSportAndProfile.setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORTANDPROFILE));
 
       }
 
@@ -635,11 +635,11 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
       _chkFitImportTourType.setSelection(_prefStore.getBoolean(IPreferences.FIT_IS_IMPORT_TOURTYPE));
 
       // Mode for Tour Type during FIT import
-      final String tourTypeMode = _prefStore.getString(IPreferences.FIT_IS_IMPORT_TOURTYPE_MODE);
-      _rdoTourTypeFromSport.setSelection(tourTypeMode.equals(IPreferences.FIT_IS_IMPORT_TOURTYPE_MODE_SPORT));
-      _rdoTourTypeFromProfile.setSelection(tourTypeMode.equals(IPreferences.FIT_IS_IMPORT_TOURTYPE_MODE_PROFILE));
-      _rdoTourTypeFromProfileElseSport.setSelection(tourTypeMode.equals(IPreferences.FIT_IS_IMPORT_TOURTYPE_MODE_TRYPROFILE));
-      _rdoTourTypeFromSportAndProfile.setSelection(tourTypeMode.equals(IPreferences.FIT_IS_IMPORT_TOURTYPE_MODE_SPORTANDPROFILE));
+      final String tourTypeMode = _prefStore.getString(IPreferences.FIT_IMPORT_TOURTYPE_MODE);
+      _rdoTourTypeFromSport.setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORT));
+      _rdoTourTypeFromProfile.setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_PROFILE));
+      _rdoTourTypeFromProfileElseSport.setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_TRYPROFILE));
+      _rdoTourTypeFromSportAndProfile.setSelection(tourTypeMode.equals(IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORTANDPROFILE));
 
       enableControls();
    }
@@ -682,23 +682,23 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
             _chkFitImportTourType.getSelection());
 
       // Mode for Tour Type during FIT import
-      String isTourTypeMode = _prefStore.getDefaultString(IPreferences.FIT_IS_IMPORT_TOURTYPE_MODE);
+      String isTourTypeMode = _prefStore.getDefaultString(IPreferences.FIT_IMPORT_TOURTYPE_MODE);
 
       if (_rdoTourTypeFromSport.getSelection()) {
-         isTourTypeMode = IPreferences.FIT_IS_IMPORT_TOURTYPE_MODE_SPORT;
+         isTourTypeMode = IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORT;
 
       } else if (_rdoTourTypeFromProfile.getSelection()) {
-         isTourTypeMode = IPreferences.FIT_IS_IMPORT_TOURTYPE_MODE_PROFILE;
+         isTourTypeMode = IPreferences.FIT_IMPORT_TOURTYPE_MODE_PROFILE;
 
       } else if (_rdoTourTypeFromProfileElseSport.getSelection()) {
-         isTourTypeMode = IPreferences.FIT_IS_IMPORT_TOURTYPE_MODE_TRYPROFILE;
+         isTourTypeMode = IPreferences.FIT_IMPORT_TOURTYPE_MODE_TRYPROFILE;
 
       } else if (_rdoTourTypeFromSportAndProfile.getSelection()) {
-         isTourTypeMode = IPreferences.FIT_IS_IMPORT_TOURTYPE_MODE_SPORTANDPROFILE;
+         isTourTypeMode = IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORTANDPROFILE;
       }
 
       _prefStore.setValue(
-            IPreferences.FIT_IS_IMPORT_TOURTYPE_MODE,
+            IPreferences.FIT_IMPORT_TOURTYPE_MODE,
             isTourTypeMode);
    }
 
