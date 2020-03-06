@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,7 +15,10 @@
  *******************************************************************************/
 package net.tourbook.chart;
 
+import java.util.Optional;
+
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.ResourceLocator;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -37,25 +40,6 @@ public class Activator extends AbstractUIPlugin {
       plugin = this;
    }
 
-   /*
-    * (non-Javadoc)
-    * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
-    */
-   @Override
-   public void start(final BundleContext context) throws Exception {
-      super.start(context);
-   }
-
-   /*
-    * (non-Javadoc)
-    * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
-    */
-   @Override
-   public void stop(final BundleContext context) throws Exception {
-      plugin = null;
-      super.stop(context);
-   }
-
    /**
     * Returns the shared instance
     *
@@ -73,6 +57,27 @@ public class Activator extends AbstractUIPlugin {
     * @return the axisImage descriptor
     */
    public static ImageDescriptor getImageDescriptor(final String path) {
-      return imageDescriptorFromPlugin(PLUGIN_ID, "icons/" + path); //$NON-NLS-1$
+      final Optional<ImageDescriptor> imageDescriptor = ResourceLocator.imageDescriptorFromBundle(PLUGIN_ID, "icons/" + path); //$NON-NLS-1$
+
+      return imageDescriptor.isPresent() ? imageDescriptor.get() : null;
+   }
+
+   /*
+    * (non-Javadoc)
+    * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
+    */
+   @Override
+   public void start(final BundleContext context) throws Exception {
+      super.start(context);
+   }
+
+   /*
+    * (non-Javadoc)
+    * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
+    */
+   @Override
+   public void stop(final BundleContext context) throws Exception {
+      plugin = null;
+      super.stop(context);
    }
 }

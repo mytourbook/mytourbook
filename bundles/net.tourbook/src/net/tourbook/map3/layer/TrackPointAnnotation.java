@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,7 +23,6 @@ import gov.nasa.worldwind.geom.Position;
 import gov.nasa.worldwind.geom.Vec4;
 import gov.nasa.worldwind.render.DrawContext;
 import gov.nasa.worldwind.render.GlobeAnnotation;
-import gov.nasa.worldwind.render.Polyline;
 import gov.nasa.worldwind.util.OGLStackHandler;
 import gov.nasa.worldwind.util.OGLUtil;
 
@@ -171,7 +170,7 @@ public class TrackPointAnnotation extends GlobeAnnotation {
          gl.glColor4ub((byte) color.getRed(), (byte) color.getGreen(), (byte) color.getBlue(), (byte) 0xff);
 
          gl.glLineWidth(1.5f);
-         gl.glHint(GL.GL_LINE_SMOOTH_HINT, Polyline.ANTIALIAS_FASTEST);
+         gl.glHint(GL.GL_LINE_SMOOTH_HINT, WorldWind.ANTIALIAS_FASTEST);
          gl.glEnable(GL.GL_LINE_SMOOTH);
 
 //			System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
