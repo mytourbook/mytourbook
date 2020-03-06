@@ -1,17 +1,17 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ *
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License along with 
+ *
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.chart;
 
@@ -24,53 +24,55 @@ import org.osgi.framework.BundleContext;
  */
 public class Activator extends AbstractUIPlugin {
 
-	// The plug-in ID
-	public static final String PLUGIN_ID = "net.tourbook.chart"; //$NON-NLS-1$
+   // The plug-in ID
+   public static final String PLUGIN_ID = "net.tourbook.chart"; //$NON-NLS-1$
 
-	// The shared instance
-	private static Activator plugin;
-	
-	/**
-	 * The constructor
-	 */
-	public Activator() {
-		plugin = this;
-	}
+   // The shared instance
+   private static Activator plugin;
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
-	 */
-	public void start(BundleContext context) throws Exception {
-		super.start(context);
-	}
+   /**
+    * The constructor
+    */
+   public Activator() {
+      plugin = this;
+   }
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
-	 */
-	public void stop(BundleContext context) throws Exception {
-		plugin = null;
-		super.stop(context);
-	}
+   /*
+    * (non-Javadoc)
+    * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
+    */
+   @Override
+   public void start(final BundleContext context) throws Exception {
+      super.start(context);
+   }
 
-	/**
-	 * Returns the shared instance
-	 *
-	 * @return the shared instance
-	 */
-	public static Activator getDefault() {
-		return plugin;
-	}
+   /*
+    * (non-Javadoc)
+    * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
+    */
+   @Override
+   public void stop(final BundleContext context) throws Exception {
+      plugin = null;
+      super.stop(context);
+   }
 
-	/**
-	 * Returns an image descriptor for images in the plug-in path.
-	 * 
-	 * @param path
-	 *        the path
-	 * @return the axisImage descriptor
-	 */
-	public static ImageDescriptor getImageDescriptor(String path) {
-		return imageDescriptorFromPlugin(PLUGIN_ID, "icons/" + path); //$NON-NLS-1$
-	}
+   /**
+    * Returns the shared instance
+    *
+    * @return the shared instance
+    */
+   public static Activator getDefault() {
+      return plugin;
+   }
+
+   /**
+    * Returns an image descriptor for images in the plug-in path.
+    *
+    * @param path
+    *           the path
+    * @return the axisImage descriptor
+    */
+   public static ImageDescriptor getImageDescriptor(final String path) {
+      return imageDescriptorFromPlugin(PLUGIN_ID, "icons/" + path); //$NON-NLS-1$
+   }
 }
