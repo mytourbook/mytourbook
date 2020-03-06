@@ -143,12 +143,12 @@ public class Map3Manager {
    /**
     * Contains custom (none default) layers, key is layerId and sorted by insertion.
     */
-   private static LinkedHashMap<String, TVIMap3Layer> _uiCustomLayers                = new LinkedHashMap<String, TVIMap3Layer>();
+   private static LinkedHashMap<String, TVIMap3Layer> _uiCustomLayers                = new LinkedHashMap<>();
 
    /**
     * Contains layers which can not be set visible in the UI but are visible on demand.
     */
-   private static LinkedHashMap<String, IToolLayer>   _toolLayers                    = new LinkedHashMap<String, IToolLayer>();
+   private static LinkedHashMap<String, IToolLayer>   _toolLayers                    = new LinkedHashMap<>();
    //
    private static TrackSliderLayer                    _wwLayer_TrackSlider;
    private static MarkerLayer                         _wwLayer_Marker;
@@ -159,9 +159,9 @@ public class Map3Manager {
    //
    private static Object[]                   _uiVisibleLayers;
    private static Object[]                   _uiExpandedCategories;
-   private static ArrayList<TVIMap3Layer>    _uiVisibleLayersFromXml      = new ArrayList<TVIMap3Layer>();
-   private static ArrayList<TVIMap3Category> _uiExpandedCategoriesFromXml = new ArrayList<TVIMap3Category>();
-   private static ArrayList<Layer>           _xmlLayers                   = new ArrayList<Layer>();
+   private static ArrayList<TVIMap3Layer>    _uiVisibleLayersFromXml      = new ArrayList<>();
+   private static ArrayList<TVIMap3Category> _uiExpandedCategoriesFromXml = new ArrayList<>();
+   private static ArrayList<Layer>           _xmlLayers                   = new ArrayList<>();
 
    static {
 
@@ -344,9 +344,9 @@ public class Map3Manager {
       createLayerXml_120_Default(xml, false, true, 1.0f, MapDefaultLayer.ID_USDA_NAIP_USGS);
       createLayerXml_120_Default(xml, true, true, 1.0f, MapDefaultLayer.ID_MS_VIRTUAL_EARTH_AERIAL);
       createLayerXml_120_Default(xml, true, true, 1.0f, MapDefaultLayer.ID_BING_IMAGERY);
-      createLayerXml_120_Default(xml, false, true, 1.0f, MapDefaultLayer.ID_USGS_TOPOGRAPHIC_MAPS_1_250K);
-      createLayerXml_120_Default(xml, false, true, 1.0f, MapDefaultLayer.ID_USGS_TOPOGRAPHIC_MAPS_1_100K);
-      createLayerXml_120_Default(xml, false, true, 1.0f, MapDefaultLayer.ID_USGS_TOPOGRAPHIC_MAPS_1_24K);
+      // createLayerXml_120_Default(xml, false, true, 1.0f, MapDefaultLayer.ID_USGS_TOPOGRAPHIC_MAPS_1_250K);
+      //  createLayerXml_120_Default(xml, false, true, 1.0f, MapDefaultLayer.ID_USGS_TOPOGRAPHIC_MAPS_1_100K);
+      //  createLayerXml_120_Default(xml, false, true, 1.0f, MapDefaultLayer.ID_USGS_TOPOGRAPHIC_MAPS_1_24K);
       createLayerXml_120_Default(xml, false, true, 1.0f, MapDefaultLayer.ID_USGS_URBAN_AREA_ORTHO);
       createLayerXml_120_Default(xml, true, true, 1.0f, MapDefaultLayer.ID_POLITICAL_BOUNDARIES);
       createLayerXml_120_Default(xml, false, true, 1.0f, MapDefaultLayer.ID_OPEN_STREET_MAP);
@@ -581,9 +581,9 @@ public class Map3Manager {
 
    /**
     * These layers are defined as default in WorldWind 1.5
-    * 
+    *
     * <pre>
-    * 
+    *
     * 		Stars							true		gov.nasa.worldwind.layers.StarsLayer
     * 		Atmosphere						true        gov.nasa.worldwind.layers.SkyGradientLayer
     * 		NASA Blue Marble Image			true        gov.nasa.worldwind.layers.Earth.BMNGOneImage
@@ -604,7 +604,7 @@ public class Map3Manager {
     * 		Scale bar						true        gov.nasa.worldwind.layers.ScalebarLayer
     * 		Compass							true        gov.nasa.worldwind.layers.CompassLayer
     * </pre>
-    * 
+    *
     * @return
     */
    private static XMLMemento createLayerXml_0_DefaultLayer() {
@@ -733,7 +733,7 @@ public class Map3Manager {
     * RECURSIVE RECURSIVE RECURSIVE RECURSIVE RECURSIVE RECURSIVE RECURSIVE RECURSIVE
     * <p>
     * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    * 
+    *
     * @param parentItem
     * @param xmlParent
     */
@@ -876,7 +876,7 @@ public class Map3Manager {
 
    /**
     * Insert the layer into the layer list just before the compass.
-    * 
+    *
     * @param wwd
     * @param newWWLayer
     * @return
@@ -915,7 +915,7 @@ public class Map3Manager {
     * RECURSIVE RECURSIVE RECURSIVE RECURSIVE RECURSIVE RECURSIVE RECURSIVE RECURSIVE
     * <p>
     * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    * 
+    *
     * @param tviParent
     * @param newWWLayer
     * @param newUILayer
@@ -953,7 +953,7 @@ public class Map3Manager {
 
    /**
     * Insert the layer into the layer list just before the placenames.
-    * 
+    *
     * @param wwd
     * @param newWWLayer
     * @return
@@ -992,7 +992,7 @@ public class Map3Manager {
     * RECURSIVE RECURSIVE RECURSIVE RECURSIVE RECURSIVE RECURSIVE RECURSIVE RECURSIVE
     * <p>
     * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    * 
+    *
     * @param tviParent
     * @param newWWLayer
     * @param newUILayer
@@ -1045,7 +1045,7 @@ public class Map3Manager {
 
    /**
     * Read/Create map layers with it's state from a xml file
-    * 
+    *
     * @return
     */
    private static TVIMap3Root parseLayerXml() {
@@ -1115,7 +1115,7 @@ public class Map3Manager {
     * RECURSIVE RECURSIVE RECURSIVE RECURSIVE RECURSIVE RECURSIVE RECURSIVE RECURSIVE
     * <p>
     * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    * 
+    *
     * @param xmlParent
     * @param tviParent
     */
@@ -1296,7 +1296,7 @@ public class Map3Manager {
        * remove categories because they are contained in this list even when only a part of the
        * children are checked
        */
-      final ArrayList<TVIMap3Layer> enabledLayers = new ArrayList<TVIMap3Layer>();
+      final ArrayList<TVIMap3Layer> enabledLayers = new ArrayList<>();
       for (final Object object : checkedElements) {
          if (object instanceof TVIMap3Layer) {
             enabledLayers.add((TVIMap3Layer) object);
@@ -1309,13 +1309,13 @@ public class Map3Manager {
 
    /**
     * Ensure All custom layers are set in the ww model.
-    * 
+    *
     * @param wwLayers
     *           Layers which are already added to the model.
     */
    private static void setCustomLayerInWWModel(final LayerList wwLayers) {
 
-      final ArrayList<TVIMap3Layer> insertedLayers = new ArrayList<TVIMap3Layer>();
+      final ArrayList<TVIMap3Layer> insertedLayers = new ArrayList<>();
 
       for (final TVIMap3Layer tviLayer : _uiCustomLayers.values()) {
 
@@ -1391,7 +1391,7 @@ public class Map3Manager {
 
    /**
     * Show/hide tour track layer.
-    * 
+    *
     * @param isTrackVisible
     */
    static void setLayerVisible_TourTrack(final boolean isTrackVisible) {
@@ -1428,7 +1428,7 @@ public class Map3Manager {
 
    /**
     * Keep track if {@link Map3View} is visible.
-    * 
+    *
     * @param map3View
     */
    static void setMap3View(final Map3View map3View) {
