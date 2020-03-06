@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -78,7 +78,7 @@ public class Map3Manager {
     * This version number is incremented, when structural changes (e.g. new category) are done.
     * When this happens, the <b>default</b> structure is created.
     */
-   private static final int                           MAP3_LAYER_STRUCTURE_VERSION   = 20;
+   private static final int                           MAP3_LAYER_STRUCTURE_VERSION   = 21;
 
    public static final String                         PROPERTY_NAME_ENABLED          = "Enabled";                                                 //$NON-NLS-1$
 
@@ -344,9 +344,9 @@ public class Map3Manager {
       createLayerXml_120_Default(xml, false, true, 1.0f, MapDefaultLayer.ID_USDA_NAIP_USGS);
       createLayerXml_120_Default(xml, true, true, 1.0f, MapDefaultLayer.ID_MS_VIRTUAL_EARTH_AERIAL);
       createLayerXml_120_Default(xml, true, true, 1.0f, MapDefaultLayer.ID_BING_IMAGERY);
-      // createLayerXml_120_Default(xml, false, true, 1.0f, MapDefaultLayer.ID_USGS_TOPOGRAPHIC_MAPS_1_250K);
-      //  createLayerXml_120_Default(xml, false, true, 1.0f, MapDefaultLayer.ID_USGS_TOPOGRAPHIC_MAPS_1_100K);
-      //  createLayerXml_120_Default(xml, false, true, 1.0f, MapDefaultLayer.ID_USGS_TOPOGRAPHIC_MAPS_1_24K);
+      createLayerXml_120_Default(xml, false, true, 1.0f, MapDefaultLayer.ID_USGS_TOPO_SCANNED_MAPS_1_250K);
+      createLayerXml_120_Default(xml, false, true, 1.0f, MapDefaultLayer.ID_USGS_TOPO_SCANNED_MAPS_1_100K);
+      createLayerXml_120_Default(xml, false, true, 1.0f, MapDefaultLayer.ID_USGS_TOPO_SCANNED_MAPS_1_24K);
       createLayerXml_120_Default(xml, false, true, 1.0f, MapDefaultLayer.ID_USGS_URBAN_AREA_ORTHO);
       createLayerXml_120_Default(xml, true, true, 1.0f, MapDefaultLayer.ID_POLITICAL_BOUNDARIES);
       createLayerXml_120_Default(xml, false, true, 1.0f, MapDefaultLayer.ID_OPEN_STREET_MAP);

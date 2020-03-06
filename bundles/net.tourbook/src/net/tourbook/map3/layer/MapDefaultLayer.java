@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -36,9 +36,9 @@ public class MapDefaultLayer {
 //	USDA NAIP USGS					gov.nasa.worldwind.wms.WMSTiledImageLayer				false
 //	MS Virtual Earth Aerial			gov.nasa.worldwind.layers.BasicTiledImageLayer			false
 //	Bing Imagery					gov.nasa.worldwind.wms.WMSTiledImageLayer				false
-//	USGS Topographic Maps 1:250K	gov.nasa.worldwind.wms.WMSTiledImageLayer				false
-//	USGS Topographic Maps 1:100K	gov.nasa.worldwind.wms.WMSTiledImageLayer				false
-//	USGS Topographic Maps 1:24K		gov.nasa.worldwind.wms.WMSTiledImageLayer				false
+//	USGS Topo Scanned Maps 1:250K	gov.nasa.worldwind.wms.WMSTiledImageLayer				false
+//	USGS Topo Scanned Maps 1:100K	gov.nasa.worldwind.wms.WMSTiledImageLayer				false
+//	USGS Topo Scanned Maps 1:24K		gov.nasa.worldwind.wms.WMSTiledImageLayer				false
 //	USGS Urban Area Ortho			gov.nasa.worldwind.layers.BasicTiledImageLayer			false
 //	Political Boundaries			gov.nasa.worldwind.layers.Earth.CountryBoundariesLayer	false
 //	Open Street 					Map	gov.nasa.worldwind.wms.WMSTiledImageLayer			false
@@ -77,12 +77,12 @@ public class MapDefaultLayer {
 
    /**
     * <code>
-    * 
-    * 
+    *
+    *
     *  These names are translated and needs to be used as a layer id.
-    * 
+    *
     * 	fr
-    * 
+    *
     * 		�toiles
     * 		Atmosph�re
     * 		NASA Blue Marble Image
@@ -92,26 +92,26 @@ public class MapDefaultLayer {
     * 		USDA NAIP USGS
     * 		MS Virtual Earth Aerial
     * 		Bing Imagery
-    * 		USGS Topographic Maps 1:250K
-    * 		USGS Topographic Maps 1:100K
-    * 		USGS Topographic Maps 1:24K
+    * 		USGS Topo Scanned Maps 1:250K
+    * 		USGS Topo Scanned Maps 1:100K
+    * 		USGS Topo Scanned Maps 1:24K
     * 		USGS Urban Area Ortho
     * 		Political Boundaries
     * 		Open Street Map
     * 		Earth at Night
-    * 
+    *
     * 		Toponymes
     * 		Carte du monde
     * 		�chelle
     * 		Boussole
-    * 
-    * 
+    *
+    *
     *  de
     * 	en
     *  es
     *  it
     *  nl
-    * 
+    *
     * 		Stars
     * 		Atmosphere
     * 		NASA Blue Marble Image
@@ -121,56 +121,56 @@ public class MapDefaultLayer {
     * 		USDA NAIP USGS
     * 		MS Virtual Earth Aerial
     * 		Bing Imagery
-    * 		USGS Topographic Maps 1:250K
-    * 		USGS Topographic Maps 1:100K
-    * 		USGS Topographic Maps 1:24K
+    * 		USGS Topo Scanned Maps 1:250K
+    * 		USGS Topo Scanned Maps 1:100K
+    * 		USGS Topo Scanned Maps 1:24K
     * 		USGS Urban Area Ortho
     * 		Political Boundaries
     * 		Open Street Map
     * 		Earth at Night
-    * 
+    *
     * 		Place Names
     * 		World Map
     * 		Scale bar
     * 		Compass
-    * 
+    *
     * </code>
     */
 
    /*
     * default layer id's
     */
-   public static final String                         ID_STARS                        = getNormalizedLayerKey("Stars");                        //$NON-NLS-1$
-   public static final String                         ID_ATMOSPHERE                   = getNormalizedLayerKey("Atmosphere");                   //$NON-NLS-1$
+   public static final String                         ID_STARS                         = getNormalizedLayerKey("Stars");                         //$NON-NLS-1$
+   public static final String                         ID_ATMOSPHERE                    = getNormalizedLayerKey("Atmosphere");                    //$NON-NLS-1$
 
-   public static final String                         ID_NASA_BLUE_MARBLE_IMAGE       = getNormalizedLayerKey("NASA Blue Marble Image");       //$NON-NLS-1$
-   public static final String                         ID_BLUE_MARBLE_WMS_2004         = getNormalizedLayerKey("Blue Marble May 2004");         //$NON-NLS-1$
-   public static final String                         ID_I_CUBED_LANDSAT              = getNormalizedLayerKey("i-cubed Landsat");              //$NON-NLS-1$
-   public static final String                         ID_USDA_NAIP                    = getNormalizedLayerKey("USDA NAIP");                    //$NON-NLS-1$
-   public static final String                         ID_USDA_NAIP_USGS               = getNormalizedLayerKey("USDA NAIP USGS");               //$NON-NLS-1$
+   public static final String                         ID_NASA_BLUE_MARBLE_IMAGE        = getNormalizedLayerKey("NASA Blue Marble Image");        //$NON-NLS-1$
+   public static final String                         ID_BLUE_MARBLE_WMS_2004          = getNormalizedLayerKey("Blue Marble May 2004");          //$NON-NLS-1$
+   public static final String                         ID_I_CUBED_LANDSAT               = getNormalizedLayerKey("i-cubed Landsat");               //$NON-NLS-1$
+   public static final String                         ID_USDA_NAIP                     = getNormalizedLayerKey("USDA NAIP");                     //$NON-NLS-1$
+   public static final String                         ID_USDA_NAIP_USGS                = getNormalizedLayerKey("USDA NAIP USGS");                //$NON-NLS-1$
 
-   public static final String                         ID_MS_VIRTUAL_EARTH_AERIAL      = getNormalizedLayerKey("MS Virtual Earth Aerial");      //$NON-NLS-1$
-   public static final String                         ID_BING_IMAGERY                 = getNormalizedLayerKey("Bing Imagery");                 //$NON-NLS-1$
-   public static final String                         ID_USGS_TOPOGRAPHIC_MAPS_1_100K = getNormalizedLayerKey("USGS Topographic Maps 1:100K"); //$NON-NLS-1$
-   public static final String                         ID_USGS_TOPOGRAPHIC_MAPS_1_24K  = getNormalizedLayerKey("USGS Topographic Maps 1:24K");  //$NON-NLS-1$
-   public static final String                         ID_USGS_TOPOGRAPHIC_MAPS_1_250K = getNormalizedLayerKey("USGS Topographic Maps 1:250K"); //$NON-NLS-1$
-   public static final String                         ID_USGS_URBAN_AREA_ORTHO        = getNormalizedLayerKey("USGS Urban Area Ortho");        //$NON-NLS-1$
+   public static final String                         ID_MS_VIRTUAL_EARTH_AERIAL       = getNormalizedLayerKey("MS Virtual Earth Aerial");       //$NON-NLS-1$
+   public static final String                         ID_BING_IMAGERY                  = getNormalizedLayerKey("Bing Imagery");                  //$NON-NLS-1$
+   public static final String                         ID_USGS_TOPO_SCANNED_MAPS_1_100K = getNormalizedLayerKey("USGS Topo Scanned Maps 1:100K"); //$NON-NLS-1$
+   public static final String                         ID_USGS_TOPO_SCANNED_MAPS_1_24K  = getNormalizedLayerKey("USGS Topo Scanned Maps 1:24K");  //$NON-NLS-1$
+   public static final String                         ID_USGS_TOPO_SCANNED_MAPS_1_250K = getNormalizedLayerKey("USGS Topo Scanned Maps 1:250K"); //$NON-NLS-1$
+   public static final String                         ID_USGS_URBAN_AREA_ORTHO         = getNormalizedLayerKey("USGS Urban Area Ortho");         //$NON-NLS-1$
 
-   public static final String                         ID_OPEN_STREET_MAP              = getNormalizedLayerKey("Open Street Map");              //$NON-NLS-1$
-   public static final String                         ID_EARTH_AT_NIGHT               = getNormalizedLayerKey("Earth at Night");               //$NON-NLS-1$
+   public static final String                         ID_OPEN_STREET_MAP               = getNormalizedLayerKey("Open Street Map");               //$NON-NLS-1$
+   public static final String                         ID_EARTH_AT_NIGHT                = getNormalizedLayerKey("Earth at Night");                //$NON-NLS-1$
 
-   public static final String                         ID_POLITICAL_BOUNDARIES         = getNormalizedLayerKey("Political Boundaries");         //$NON-NLS-1$
-   public static final String                         ID_PLACE_NAMES                  = getNormalizedLayerKey("Place Names");                  //$NON-NLS-1$
-   public static final String                         ID_WORLD_MAP                    = getNormalizedLayerKey("World Map");                    //$NON-NLS-1$
-   public static final String                         ID_SCALE_BAR                    = getNormalizedLayerKey("Scale bar");                    //$NON-NLS-1$
-   public static final String                         ID_COMPASS                      = getNormalizedLayerKey("Compass");                      //$NON-NLS-1$
+   public static final String                         ID_POLITICAL_BOUNDARIES          = getNormalizedLayerKey("Political Boundaries");          //$NON-NLS-1$
+   public static final String                         ID_PLACE_NAMES                   = getNormalizedLayerKey("Place Names");                   //$NON-NLS-1$
+   public static final String                         ID_WORLD_MAP                     = getNormalizedLayerKey("World Map");                     //$NON-NLS-1$
+   public static final String                         ID_SCALE_BAR                     = getNormalizedLayerKey("Scale bar");                     //$NON-NLS-1$
+   public static final String                         ID_COMPASS                       = getNormalizedLayerKey("Compass");                       //$NON-NLS-1$
 
-   private static final HashMap<String, DefaultLayer> _wwDefaultLayer                 = new HashMap<String, DefaultLayer>();
+   private static final HashMap<String, DefaultLayer> _wwDefaultLayer                  = new HashMap<>();
 
    /**
     * Key is the global (english) layer id, value is the locale layer id.
     */
-   private static final HashMap<String, String>       _wwLocaleLayerNames             = new HashMap<String, String>();
+   private static final HashMap<String, String>       _wwLocaleLayerNames              = new HashMap<>();
 
    static {
 
@@ -200,9 +200,9 @@ public class MapDefaultLayer {
 
          _wwLocaleLayerNames.put(ID_MS_VIRTUAL_EARTH_AERIAL, "MS Virtual Earth Aerial"); //$NON-NLS-1$
          _wwLocaleLayerNames.put(ID_BING_IMAGERY, "Bing Imagery"); //$NON-NLS-1$
-         _wwLocaleLayerNames.put(ID_USGS_TOPOGRAPHIC_MAPS_1_100K, "USGS Topographic Maps 1:100K"); //$NON-NLS-1$
-         _wwLocaleLayerNames.put(ID_USGS_TOPOGRAPHIC_MAPS_1_24K, "USGS Topographic Maps 1:24K"); //$NON-NLS-1$
-         _wwLocaleLayerNames.put(ID_USGS_TOPOGRAPHIC_MAPS_1_250K, "USGS Topographic Maps 1:250K"); //$NON-NLS-1$
+         _wwLocaleLayerNames.put(ID_USGS_TOPO_SCANNED_MAPS_1_100K, "USGS Topo Scanned Maps 1:100K"); //$NON-NLS-1$
+         _wwLocaleLayerNames.put(ID_USGS_TOPO_SCANNED_MAPS_1_24K, "USGS Topo Scanned Maps 1:24K"); //$NON-NLS-1$
+         _wwLocaleLayerNames.put(ID_USGS_TOPO_SCANNED_MAPS_1_250K, "USGS Topo Scanned Maps 1:250K"); //$NON-NLS-1$
          _wwLocaleLayerNames.put(ID_USGS_URBAN_AREA_ORTHO, "USGS Urban Area Ortho"); //$NON-NLS-1$
 
          _wwLocaleLayerNames.put(ID_OPEN_STREET_MAP, "Open Street Map"); //$NON-NLS-1$
@@ -229,9 +229,9 @@ public class MapDefaultLayer {
 
          _wwLocaleLayerNames.put(ID_MS_VIRTUAL_EARTH_AERIAL, ID_MS_VIRTUAL_EARTH_AERIAL);
          _wwLocaleLayerNames.put(ID_BING_IMAGERY, ID_BING_IMAGERY);
-         _wwLocaleLayerNames.put(ID_USGS_TOPOGRAPHIC_MAPS_1_100K, ID_USGS_TOPOGRAPHIC_MAPS_1_100K);
-         _wwLocaleLayerNames.put(ID_USGS_TOPOGRAPHIC_MAPS_1_24K, ID_USGS_TOPOGRAPHIC_MAPS_1_24K);
-         _wwLocaleLayerNames.put(ID_USGS_TOPOGRAPHIC_MAPS_1_250K, ID_USGS_TOPOGRAPHIC_MAPS_1_250K);
+         _wwLocaleLayerNames.put(ID_USGS_TOPO_SCANNED_MAPS_1_100K, ID_USGS_TOPO_SCANNED_MAPS_1_100K);
+         _wwLocaleLayerNames.put(ID_USGS_TOPO_SCANNED_MAPS_1_24K, ID_USGS_TOPO_SCANNED_MAPS_1_24K);
+         _wwLocaleLayerNames.put(ID_USGS_TOPO_SCANNED_MAPS_1_250K, ID_USGS_TOPO_SCANNED_MAPS_1_250K);
          _wwLocaleLayerNames.put(ID_USGS_URBAN_AREA_ORTHO, ID_USGS_URBAN_AREA_ORTHO);
 
          _wwLocaleLayerNames.put(ID_OPEN_STREET_MAP, ID_OPEN_STREET_MAP);
@@ -271,14 +271,14 @@ public class MapDefaultLayer {
       _wwDefaultLayer.put(ID_BING_IMAGERY, //
             new DefaultLayer(ID_BING_IMAGERY, Messages.Default_Layer_WMS_BingImagery));
 
-      _wwDefaultLayer.put(ID_USGS_TOPOGRAPHIC_MAPS_1_250K, //
-            new DefaultLayer(ID_USGS_TOPOGRAPHIC_MAPS_1_250K, Messages.Default_Layer_WMS_USGS_Topo250));
+      _wwDefaultLayer.put(ID_USGS_TOPO_SCANNED_MAPS_1_250K, //
+            new DefaultLayer(ID_USGS_TOPO_SCANNED_MAPS_1_250K, Messages.Default_Layer_WMS_USGS_Topo250));
 
-      _wwDefaultLayer.put(ID_USGS_TOPOGRAPHIC_MAPS_1_100K, //
-            new DefaultLayer(ID_USGS_TOPOGRAPHIC_MAPS_1_100K, Messages.Default_Layer_WMS_USGS_Topo100));
+      _wwDefaultLayer.put(ID_USGS_TOPO_SCANNED_MAPS_1_100K, //
+            new DefaultLayer(ID_USGS_TOPO_SCANNED_MAPS_1_100K, Messages.Default_Layer_WMS_USGS_Topo100));
 
-      _wwDefaultLayer.put(ID_USGS_TOPOGRAPHIC_MAPS_1_24K, //
-            new DefaultLayer(ID_USGS_TOPOGRAPHIC_MAPS_1_24K, Messages.Default_Layer_WMS_USGS_Topo24));
+      _wwDefaultLayer.put(ID_USGS_TOPO_SCANNED_MAPS_1_24K, //
+            new DefaultLayer(ID_USGS_TOPO_SCANNED_MAPS_1_24K, Messages.Default_Layer_WMS_USGS_Topo24));
 
       _wwDefaultLayer.put(ID_USGS_URBAN_AREA_ORTHO, //
             new DefaultLayer(ID_USGS_URBAN_AREA_ORTHO, Messages.Default_Layer_USGS_UrbanArea));
@@ -312,7 +312,7 @@ public class MapDefaultLayer {
 
    /**
     * Create a layer key from the layer name by removing none-word characters.
-    * 
+    *
     * @param layerName
     * @return
     */
