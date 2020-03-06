@@ -34,9 +34,6 @@ New + Improvements
   - Added the following column : Average slope
   - Replaced pace difference column name by average pace
 
-* 3D Map
-  - Fixed the pace format display for 3D map view (Frederic)
-
 Import
 ======
 
@@ -56,6 +53,7 @@ Fixes
 
 * 3D Map View (Frederic)
   - Fixed a regression that appeared in 17.4.1 where the USGS layers disappeared in the 3D Map Layer menu (due to the fact that WorldWind had changed the internal name of those layers from "Topographic" to "Topo Scanned")
+  - Fixed the pace format display for 3D map view (Frederic)
    
 Translation    
 ===========
