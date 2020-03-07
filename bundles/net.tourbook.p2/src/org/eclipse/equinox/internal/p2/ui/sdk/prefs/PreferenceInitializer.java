@@ -36,7 +36,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		try {
 			if (pref.keys().length == 0) {
 				// migrate preferences from instance scope to profile scope
-				Preferences oldPref = new InstanceScope().getNode(P2_Activator.PLUGIN_ID);
+				Preferences oldPref = InstanceScope.INSTANCE.getNode(P2_Activator.PLUGIN_ID);
 				// don't migrate everything.  Some of the preferences moved to
 				// another bundle.
 				pref.put(PreferenceConstants.PREF_OPEN_WIZARD_ON_ERROR_PLAN, oldPref.get(PreferenceConstants.PREF_OPEN_WIZARD_ON_ERROR_PLAN, MessageDialogWithToggle.PROMPT));
@@ -52,7 +52,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 	 * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer#initializeDefaultPreferences()
 	 */
 	public void initializeDefaultPreferences() {
-		Preferences node = new DefaultScope().getNode("org.eclipse.equinox.p2.ui.sdk"); //$NON-NLS-1$
+		Preferences node = DefaultScope.INSTANCE.getNode("org.eclipse.equinox.p2.ui.sdk"); //$NON-NLS-1$
 		// default values
 		node.putBoolean(PreferenceConstants.PREF_SHOW_LATEST_VERSION, true);
 		node.put(PreferenceConstants.PREF_OPEN_WIZARD_ON_ERROR_PLAN, MessageDialogWithToggle.PROMPT);

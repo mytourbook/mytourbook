@@ -1,37 +1,24 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.map3.layer.tourtrack;
 
-import java.awt.Color; 
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.media.opengl.GL2;
-
-import org.eclipse.swt.graphics.RGB;
-
 import com.jogamp.common.nio.Buffers;
 
-import net.tourbook.common.color.ColorUtil;
-import net.tourbook.map3.view.Map3View;
-
 import gnu.trove.list.array.TIntArrayList;
+
 import gov.nasa.worldwind.View;
 import gov.nasa.worldwind.WorldWind;
 import gov.nasa.worldwind.cache.GpuResourceCache;
@@ -42,6 +29,21 @@ import gov.nasa.worldwind.globes.Globe;
 import gov.nasa.worldwind.render.DrawContext;
 import gov.nasa.worldwind.render.Path;
 import gov.nasa.worldwind.terrain.Terrain;
+
+import java.awt.Color;
+import java.nio.Buffer;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.media.opengl.GL2;
+
+import net.tourbook.common.color.ColorUtil;
+import net.tourbook.map3.view.Map3View;
+
+import org.eclipse.swt.graphics.RGB;
 
 public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackPath {
 
@@ -90,7 +92,7 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 
 	/**
 	 * This is a copy from {@link Path#computeAbsolutePoints} with altitude adjustment.
-	 * 
+	 *
 	 * @param dc
 	 * @param positions
 	 * @param path
@@ -200,7 +202,8 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 			arrowPositions = Buffers.newDirectFloatBuffer(bufferSize);
 		}
 		pathData.setValue(ARROW_POSITION_KEY, arrowPositions);
-		arrowPositions.clear();
+      ((Buffer) arrowPositions).clear();
+      //https://stackoverflow.com/questions/48693695/java-nio-buffer-not-loading-clear-method-on-runtime
 
 		if (_arrowPositionIndizes == null || _arrowPositionIndizes.size() < polePositionSize) {
 			_arrowPositionIndizes = new TIntArrayList(polePositionSize);
@@ -339,7 +342,7 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 
 	/**
 	 * Compute the geometry of a direction arrow between two points.
-	 * 
+	 *
 	 * @param dc
 	 *            current draw context
 	 * @param polePtA
@@ -592,7 +595,7 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 	 * depth test. Since the arrows are located on the terrain, the terrain already provides the
 	 * necessary depth values and we can be certain that other ordered renderables should appear on
 	 * top of them.
-	 * 
+	 *
 	 * @param dc
 	 *            Current draw context.
 	 * @param vboIds
@@ -699,7 +702,7 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 	 * after using the currently bound GL_ARRAY_BUFFER to specify the vertex pointer. This does not
 	 * restore GL_ARRAY_BUFFER to the its previous state. If the caller intends to use that buffer
 	 * after this method returns, the caller must bind the buffer again.
-	 * 
+	 *
 	 * @param dc
 	 *            the current draw context.
 	 * @param vboIds

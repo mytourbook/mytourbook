@@ -310,7 +310,7 @@ All MT app + build files
 /feature.net.tourbook.ext.ejb3
 /feature.net.tourbook.ext.jars
 /feature.net.tourbook.ext.rxtx
-/feature.net.tourbook.ext.worldwind_2.0
+/feature.net.tourbook.ext.worldwind
 /feature.z-Dummy-Host
 /net.tourbook
 /net.tourbook.branding
@@ -337,12 +337,12 @@ All MT app + build files
 /net.tourbook.ext.rxtx.win32_2.2
 /net.tourbook.ext.rxtx.win64_2.2
 /net.tourbook.ext.velocity
-/net.tourbook.ext.worldwind_2.0
-/net.tourbook.ext.worldwind.linux32_2.0
-/net.tourbook.ext.worldwind.linux64_2.0
-/net.tourbook.ext.worldwind.macosx_2.0
-/net.tourbook.ext.worldwind.win32_2.0
-/net.tourbook.ext.worldwind.win64_2.0
+/net.tourbook.ext.worldwind
+/net.tourbook.ext.worldwind.linux32
+/net.tourbook.ext.worldwind.linux64
+/net.tourbook.ext.worldwind.macosx
+/net.tourbook.ext.worldwind.win32
+/net.tourbook.ext.worldwind.win64
 /net.tourbook.nl
 /net.tourbook.photo
 /net.tourbook.photo.nl
