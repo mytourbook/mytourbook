@@ -276,7 +276,7 @@ public final class HttpLoggingInterceptorMT implements Interceptor {
 			} else {
 				final BufferedSource source = responseBody.source();
 				source.request(Long.MAX_VALUE); // Buffer the entire body.
-				final Buffer buffer = source.buffer();
+				final Buffer buffer = source.getBuffer();
 
 				Charset charset = UTF8;
 				final MediaType contentType = responseBody.contentType();

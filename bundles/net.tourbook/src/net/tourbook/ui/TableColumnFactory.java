@@ -35,6 +35,7 @@ public abstract class TableColumnFactory {
    public static final TableColumnFactory ALTITUDE_ELEVATION_UP;
    public static final TableColumnFactory ALTITUDE_ELEVATION_SEGMENT_DOWN;
    public static final TableColumnFactory ALTITUDE_ELEVATION_SEGMENT_UP;
+   public static final TableColumnFactory ALTITUDE_AVG_GRADIENT;
    public static final TableColumnFactory ALTITUDE_GRADIENT;
    public static final String             ALTITUDE_GRADIENT_ID          = "ALTITUDE_GRADIENT";          //$NON-NLS-1$
    public static final TableColumnFactory ALTITUDE_SUMMARIZED_BORDER_DOWN;
@@ -63,7 +64,6 @@ public abstract class TableColumnFactory {
    public static final TableColumnFactory MARKER_ALTITUDE_ELEVATIONGAINDELTA;
    public static final TableColumnFactory MARKER_ALTITUDE_ELEVATIONLOSSDELTA;
    public static final TableColumnFactory MARKER_MAP_VISIBLE;
-   public static final TableColumnFactory MARKER_PACE_DELTA;
    public static final TableColumnFactory MARKER_SERIE_INDEX;
    public static final TableColumnFactory MARKER_TIME_DELTA;
    public static final TableColumnFactory MARKER_URL;
@@ -339,6 +339,32 @@ public abstract class TableColumnFactory {
             colDef.setColumnUnit(unitLabel);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
+
+            return colDef;
+         }
+      };
+
+      ALTITUDE_AVG_GRADIENT = new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, //
+                  "ALTITUDE_AVG_GRADIENT", //$NON-NLS-1$
+                  SWT.TRAIL);
+
+            colDef.setColumnCategory(Messages.ColumnFactory_Category_Altitude);
+            colDef.setColumnLabel(Messages.ColumnFactory_avg_gradient_label);
+            colDef.setColumnHeaderText(UI.SYMBOL_AVERAGE_WITH_SPACE + Messages.ColumnFactory_gradient);
+            colDef.setColumnUnit(UI.SYMBOL_AVERAGE_WITH_SPACE + Messages.ColumnFactory_avg_gradient);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_avg_gradient_tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
+            colDef.setValueFormats(//
+                  ValueFormatSet.Number,
+                  ValueFormat.NUMBER_1_1,
+                  columnManager);
 
             return colDef;
          }
@@ -825,31 +851,6 @@ public abstract class TableColumnFactory {
 
             colDef.setDefaultColumnWidth(pixelWidth);
             colDef.setColumnWeightData(new ColumnPixelData(pixelWidth, true));
-
-            return colDef;
-         }
-      };
-
-      MARKER_PACE_DELTA = new TableColumnFactory() {
-
-         @Override
-         public TableColumnDefinition createColumn(final ColumnManager columnManager,
-                                                   final PixelConverter pixelConverter) {
-
-            final TableColumnDefinition colDef = new TableColumnDefinition(
-                  columnManager,
-                  "MARKER_PACE_DELTA", //$NON-NLS-1$
-                  SWT.TRAIL);
-
-            final String unitLabel = UI.SYMBOL_DIFFERENCE_WITH_SPACE + UI.UNIT_LABEL_PACE;
-
-            colDef.setColumnCategory(Messages.ColumnFactory_Category_Motion);
-            colDef.setColumnLabel(Messages.ColumnFactory_PaceDelta_Label);
-            colDef.setColumnHeaderText(unitLabel);
-            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_PaceDelta_Tooltip);
-            colDef.setColumnUnit(unitLabel);
-
-            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(12));
 
             return colDef;
          }

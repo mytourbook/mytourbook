@@ -148,7 +148,7 @@ public class ProvisioningPreferencePage extends PreferencePage implements IWorkb
 	protected void performDefaults() {
 
 		super.performDefaults();
-		final Preferences pref = new DefaultScope().getNode(P2_Activator.PLUGIN_ID);
+      final Preferences pref = DefaultScope.INSTANCE.getNode(P2_Activator.PLUGIN_ID);
 
 		showLatestRadio.setSelection(pref.getBoolean(PreferenceConstants.PREF_SHOW_LATEST_VERSION, false));
 		showAllRadio.setSelection(!pref.getBoolean(PreferenceConstants.PREF_SHOW_LATEST_VERSION, false));
