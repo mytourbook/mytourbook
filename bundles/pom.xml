@@ -49,10 +49,10 @@
       <module>net.tourbook.ext.vtm.linux</module>
       <module>net.tourbook.ext.vtm.macosx</module>
       <module>net.tourbook.ext.vtm.windows</module>
-      <module>net.tourbook.ext.worldwind.linux64_2.0</module>
-      <module>net.tourbook.ext.worldwind.macosx_2.0</module>
-      <module>net.tourbook.ext.worldwind.win64_2.0</module>
-      <module>net.tourbook.ext.worldwind_2.0</module>
+      <module>net.tourbook.ext.worldwind.linux64</module>
+      <module>net.tourbook.ext.worldwind.macosx</module>
+      <module>net.tourbook.ext.worldwind.win64</module>
+      <module>net.tourbook.ext.worldwind</module>
 
    </modules>
 

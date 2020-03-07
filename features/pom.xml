@@ -26,7 +26,7 @@
       <module>feature.net.tourbook.ext.jars</module>
       <module>feature.net.tourbook.ext.rxtx</module>
       <module>feature.net.tourbook.ext.vtm</module>
-      <module>feature.net.tourbook.ext.worldwind_2.0</module>
+      <module>feature.net.tourbook.ext.worldwind</module>
    </modules>
 
 </project>

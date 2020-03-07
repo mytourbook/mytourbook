@@ -33,7 +33,7 @@
       <import plugin="net.tourbook.ext.velocity"/>
       <import plugin="net.tourbook.ext.jars.printing"/>
       <import plugin="net.tourbook.ext.rxtx_2.2"/>
-      <import plugin="net.tourbook.ext.worldwind_2.0"/>
+      <import plugin="net.tourbook.ext.worldwind"/>
       <import plugin="net.tourbook.ext.apache"/>
       <import plugin="net.tourbook.ext.ejb3"/>
       <import plugin="net.tourbook.ext.geoclipse"/>
