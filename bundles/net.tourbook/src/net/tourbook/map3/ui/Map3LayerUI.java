@@ -265,7 +265,7 @@ public class Map3LayerUI {
 		layoutContainer.setLayout(treeLayout);
 		GridDataFactory.fillDefaults()//
 				.grab(true, true)
-				.hint(_pc.convertWidthInCharsToPixels(45), SWT.DEFAULT)
+				.hint(_pc.convertWidthInCharsToPixels(45), _pc.convertHeightInCharsToPixels(40))
 				.applyTo(layoutContainer);
 
 		Tree tree;
