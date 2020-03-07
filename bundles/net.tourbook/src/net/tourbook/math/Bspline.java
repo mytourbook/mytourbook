@@ -33,7 +33,7 @@ public class Bspline extends Frame {
 		setSize(500, 300);
 		add("Center", new CvBspline()); //$NON-NLS-1$
 		setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
-		show();
+		setVisible(true);
 	}
 }
 
