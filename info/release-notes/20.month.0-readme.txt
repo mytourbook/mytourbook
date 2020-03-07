@@ -2,13 +2,7 @@
 
 
 TODO's
-======
-
-* Website
-  - Update contributor/translator list
-  - Show cheatsheet
-  - Wrong text: The comparison is done by altitude, comparing by geo position is not yet supported.
-  
+======  
   - This error occured when importing propably an "empty" fit file
       java.lang.NullPointerException
            at net.tourbook.device.garmin.fit.FitData.finalizeTour_Marker(FitData.java:296)
@@ -33,22 +27,12 @@ Bugs
 New + Improvements   
 ==================
 
-Views
------
-
-* Calendar - Weekly summary (Frederic)
-  - Time spent in "slow" vs "fast" cadence zones
+* xxx
+  - yyy
 
 * Tour Marker (Frederic)
-  - Added the following columns : Elevation Gain Difference, Elevation Loss Difference, Pace Difference
-
-* Compare Result (Frederic)
-  - Added the ability, in the Views Preference Page to show/hide the tour tooltip in the Tour Compare Result View
- 
-* Tour Editor (Frederic)
-  - Added the ability to retrieve the weather data by clicking on the weather description label
-  - Added a Time slices editor window to offer the ability to efficiently edit specific values of Altitude/Pulse/Cadence/Temperature. Those values can be quickly found thanks to the added ability to sort those columns in ascending/descending order.
-
+  - Added the following column : Average slope
+  - Replaced pace difference column name by average pace
 
 Import
 ======
@@ -58,44 +42,18 @@ Import
 Changes  
 =======
 
-* Tour Import
-  - GPX: Set default to absolute distance that the defaults for export/import are the same
-  - FIT: Starting marker label from 1 instead of 0
+* 
 
 
 Fixes   
 =====
 
-* Statistics
-  - Show tooltip for the bottom bars, the hitbox for the horizontal slider starts now below the horizontal line (for a bar chart)
-  - Fixed issue: Tour type in tooltip is wrong for the first item (year/month)
+* Conconi Test View (Frederic)
+  - Disabling the deflection scale if there is no HR and/or power data (otherwise if the users modified the scale it would create an NPE)
 
-* Tour Tags
-  - Fixed issue: Column widths have been reset when tags are saved
-  
-* Tour Import
-  - GPX: Fixed NPE when importing MyTourbook export files
-  - FIT: Fixed NPE when importing files with developer fields that are null
-
-* Tour Export
-  - GPX: <mt:bikerWeight> value was wrong
-
-* Preferences (Frederic)
-  - Fixed a regression, in the "Measurement System" tab, that appeared in 19.3.0 where the metric radio buttons had disappeared
-  - Fixed bugs in the Computed values preference page (Break Time and Elevation Gain tabs) where the speed and altitude values were not properly converted when switching between metric and imperial system units
-
-* Tour Tag filter (Frederic)
-  - After deleting a tag, the tour tag profiles were not updated and if the recently deleteg tag was present in tour tag profiles, an NPE would appear
-
-* Tour Editor (Frederic)
-  - Fixed a bug when editing time slices. After editing a cell and saving a tour, an edited cell would not be updated with a new value
-
-* Photos (Frederic)
-  - Fixed NPE when no folder is selected and a filter is applied
-
-* Calendar
-  - Fixed a bug in the calendar view where the speed was always displayed in metric
-  
+* 3D Map View (Frederic)
+  - Fixed a regression that appeared in 17.4.1 where the USGS layers disappeared in the 3D Map Layer menu (due to the fact that WorldWind had changed the internal name of those layers from "Topographic" to "Topo Scanned")
+  - Fixed the pace format display for 3D map view (Frederic)
    
 Translation    
 ===========
@@ -109,6 +67,3 @@ Translation
 System   
 ======
 
-* Update SWT to 4.14 (Eclipse 2019-12) to fix the issue (Linux only) when
-  saving a map tile on disk
-  (cf. https://bugs.eclipse.org/bugs/show_bug.cgi?id=553240) 

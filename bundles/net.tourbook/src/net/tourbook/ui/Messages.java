@@ -84,6 +84,9 @@ public class Messages extends NLS {
    public static String        ColumnFactory_driving_time;
    public static String        ColumnFactory_driving_time_label;
    public static String        ColumnFactory_driving_time_tooltip;
+   public static String        ColumnFactory_avg_gradient;
+   public static String        ColumnFactory_avg_gradient_label;
+   public static String        ColumnFactory_avg_gradient_tooltip;
    public static String        ColumnFactory_gradient;
    public static String        ColumnFactory_gradient_label;
    public static String        ColumnFactory_gradient_tooltip;

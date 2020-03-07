@@ -10,7 +10,7 @@
    <name>MyTourbook App</name>
 
    <artifactId>mytourbook-app</artifactId>   <groupId>net.tourbook</groupId>
-                                             <version>19.10.0-SNAPSHOT</version>
+                                             <version>20.2.0-SNAPSHOT</version>
    <packaging>pom</packaging>
    
    <properties>
@@ -95,8 +95,8 @@
       -->
       
       <repository>
-         <id>eclipse.4.12.nl</id>                                       <layout>p2</layout>
-         <url>file:build/build.eclipse.4.12.nl.repo</url>
+         <id>eclipse.4.14.nl</id>                                       <layout>p2</layout>
+         <url>file:build/build.eclipse.4.14.nl.repo</url>
       </repository>
 
 

@@ -40,7 +40,8 @@
  Update Eclipse NL repo
 ###########################
 
-see "build\build.eclipse.4.12.nl.repo\How to update this p2 repo.txt"
+see "build\build.eclipse.4.14.nl.repo\How to update this p2 repo.txt"
+
 
 
 ###########################

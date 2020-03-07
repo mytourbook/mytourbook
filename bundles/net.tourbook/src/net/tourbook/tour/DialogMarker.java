@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -42,9 +42,6 @@ import net.tourbook.ui.tourChart.ITourMarkerSelectionListener;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
 
-import org.eclipse.jface.action.IMenuListener;
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -72,7 +69,7 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
-import org.eclipse.jface.viewers.ViewerSorter;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.Clipboard;
@@ -97,7 +94,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Sash;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
@@ -374,6 +370,18 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
       }
    }
 
+   /**
+    * Sort the markers by time
+    */
+   private static class MarkerViewerComparator extends ViewerComparator {
+      @Override
+      public int compare(final Viewer viewer, final Object obj1, final Object obj2) {
+//			return ((TourMarker) (obj1)).getTime() - ((TourMarker) (obj2)).getTime();
+// time is disabled because it's not always available in gpx files
+         return ((TourMarker) (obj1)).getSerieIndex() - ((TourMarker) (obj2)).getSerieIndex();
+      }
+   }
+
    private class MarkerViewerContentProvider implements IStructuredContentProvider {
 
       @Override
@@ -390,18 +398,6 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 
       @Override
       public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
-   }
-
-   /**
-    * Sort the markers by time
-    */
-   private static class MarkerViewerSorter extends ViewerSorter {
-      @Override
-      public int compare(final Viewer viewer, final Object obj1, final Object obj2) {
-//			return ((TourMarker) (obj1)).getTime() - ((TourMarker) (obj2)).getTime();
-// time is disabled because it's not always available in gpx files
-         return ((TourMarker) (obj1)).getSerieIndex() - ((TourMarker) (obj2)).getSerieIndex();
-      }
    }
 
    /**
@@ -582,23 +578,22 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
       getButton(IDialogConstants.OK_ID).setText(okText);
    }
 
-   private void createContextMenu(final Control control) {
-
-      // link menu
-      final MenuManager menuMgr = new MenuManager();
-
-      menuMgr.setRemoveAllWhenShown(true);
-      menuMgr.addMenuListener(new IMenuListener() {
-         @Override
-         public void menuAboutToShow(final IMenuManager menuMgr) {
-            fillContextMenu(menuMgr);
-         }
-      });
-
-      // set context menu for the link
-      final Menu signContextMenu = menuMgr.createContextMenu(control);
-      control.setMenu(signContextMenu);
-   }
+   /*
+    * private void createContextMenu(final Control control) {
+    * // link menu
+    * final MenuManager menuMgr = new MenuManager();
+    * menuMgr.setRemoveAllWhenShown(true);
+    * menuMgr.addMenuListener(new IMenuListener() {
+    * @Override
+    * public void menuAboutToShow(final IMenuManager menuMgr) {
+    * fillContextMenu(menuMgr);
+    * }
+    * });
+    * // set context menu for the link
+    * final Menu signContextMenu = menuMgr.createContextMenu(control);
+    * control.setMenu(signContextMenu);
+    * }
+    */
 
    @Override
    protected Control createDialogArea(final Composite parent) {
@@ -839,7 +834,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
        * create table viewer
        */
       _markerViewer.setContentProvider(new MarkerViewerContentProvider());
-      _markerViewer.setSorter(new MarkerViewerSorter());
+      _markerViewer.setComparator(new MarkerViewerComparator());
 
       _markerViewer.addSelectionChangedListener(new ISelectionChangedListener() {
          @Override
@@ -1658,8 +1653,8 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 
    }
 
-   private void fillContextMenu(final IMenuManager menuMgr) {
-
+//   private void fillContextMenu(final IMenuManager menuMgr) {
+//
 //		/*
 //		 * Set menu items
 //		 */
@@ -1671,8 +1666,8 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 //		final boolean isSignAvailable = _selectedTourMarker.getTourSign() != null;
 //
 //		_signMenuManager.setEnabledRemoveTourSignAction(isSignAvailable);
-
-   }
+//
+//  }
 
    private void fillUI() {
 
