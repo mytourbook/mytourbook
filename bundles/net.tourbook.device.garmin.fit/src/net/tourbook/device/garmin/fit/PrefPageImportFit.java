@@ -572,6 +572,7 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
       } else if (selectedTab == TAB_FOLDER_POWER) {
 
          _comboPowerDataSource.select(_prefStore.getDefaultInt(IPreferences.FIT_PREFERRED_POWER_DATA_SOURCE));
+
       } else if (selectedTab == TAB_FOLDER_TOURTYPE) {
 
          // Set Tour Type during FIT import
@@ -682,24 +683,24 @@ public class PrefPageImportFit extends PreferencePage implements IWorkbenchPrefe
             _chkFitImportTourType.getSelection());
 
       // Mode for Tour Type during FIT import
-      String isTourTypeMode = _prefStore.getDefaultString(IPreferences.FIT_IMPORT_TOURTYPE_MODE);
+      String tourTypeMode = _prefStore.getDefaultString(IPreferences.FIT_IMPORT_TOURTYPE_MODE);
 
       if (_rdoTourTypeFromSport.getSelection()) {
-         isTourTypeMode = IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORT;
+         tourTypeMode = IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORT;
 
       } else if (_rdoTourTypeFromProfile.getSelection()) {
-         isTourTypeMode = IPreferences.FIT_IMPORT_TOURTYPE_MODE_PROFILE;
+         tourTypeMode = IPreferences.FIT_IMPORT_TOURTYPE_MODE_PROFILE;
 
       } else if (_rdoTourTypeFromProfileElseSport.getSelection()) {
-         isTourTypeMode = IPreferences.FIT_IMPORT_TOURTYPE_MODE_TRYPROFILE;
+         tourTypeMode = IPreferences.FIT_IMPORT_TOURTYPE_MODE_TRYPROFILE;
 
       } else if (_rdoTourTypeFromSportAndProfile.getSelection()) {
-         isTourTypeMode = IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORTANDPROFILE;
+         tourTypeMode = IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORTANDPROFILE;
       }
 
       _prefStore.setValue(
             IPreferences.FIT_IMPORT_TOURTYPE_MODE,
-            isTourTypeMode);
+            tourTypeMode);
    }
 
    private void saveUIState() {

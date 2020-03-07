@@ -37,8 +37,8 @@ import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.TourTypeColorDefinition;
-import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourLogManager;
+import net.tourbook.tour.TourManager;
 import net.tourbook.ui.tourChart.ChartLabel;
 
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -56,7 +56,7 @@ public class FitData {
    private boolean                 _isIgnoreLastMarker;
    private boolean                 _isSetLastMarker;
    private boolean                 _isFitImportTourType;
-   private String                  _isFitImportTourTypeMode;
+   private String                  _fitImportTourTypeMode;
    private int                     _lastMarkerTimeSlices;
 
    public boolean                  isComputeAveragePower;
@@ -107,8 +107,70 @@ public class FitData {
       _isSetLastMarker = _isIgnoreLastMarker == false;
       _lastMarkerTimeSlices = _prefStore.getInt(IPreferences.FIT_IGNORE_LAST_MARKER_TIME_SLICES);
       _isFitImportTourType = _prefStore.getBoolean(IPreferences.FIT_IS_IMPORT_TOURTYPE);
-      _isFitImportTourTypeMode = _prefStore.getString(IPreferences.FIT_IMPORT_TOURTYPE_MODE);
+      _fitImportTourTypeMode = _prefStore.getString(IPreferences.FIT_IMPORT_TOURTYPE_MODE);
 
+   }
+
+   /**
+    * @param tourData
+    * @param parsedTourTypeLabel
+    * @return <code>true</code> when a new {@link TourType} is created
+    */
+   private boolean applyTour_Type(final TourData tourData, final String parsedTourTypeLabel) {
+
+      final ArrayList<TourType> tourTypeMap = TourDatabase.getAllTourTypes();
+      TourType tourType = null;
+      TourType newSavedTourType = null;
+
+      // do not add tours when label string is blank
+      if (!UI.EMPTY_STRING.equals(parsedTourTypeLabel)) {
+
+         // find tour type in existing tour types
+         for (final TourType mapTourType : tourTypeMap) {
+            if (parsedTourTypeLabel.equalsIgnoreCase(mapTourType.getName())) {
+               tourType = mapTourType;
+               break;
+            }
+         }
+
+         if (tourType == null) {
+
+            // create new tour type
+
+            final TourType newTourType = new TourType(parsedTourTypeLabel);
+
+            final TourTypeColorDefinition newColorDefinition = new TourTypeColorDefinition(newTourType,
+                    Long.toString(newTourType.getTypeId()), newTourType.getName());
+
+            newTourType.setColorBright(newColorDefinition.getGradientBright_Default());
+            newTourType.setColorDark(newColorDefinition.getGradientDark_Default());
+            newTourType.setColorLine(newColorDefinition.getLineColor_Default());
+            newTourType.setColorText(newColorDefinition.getTextColor_Default());
+
+            // save new entity
+            newSavedTourType = TourDatabase.saveEntity(newTourType, newTourType.getTypeId(), TourType.class);
+            if (newSavedTourType != null) {
+
+                tourType = newSavedTourType;
+
+                TourDatabase.clearTourTypes();
+                TourManager.getInstance().clearTourDataCache();
+
+                // Update Tour Type (Filter) list UI
+                Display.getDefault().syncExec(new Runnable() {
+                   @Override
+                  public void run() {
+                      // fire modify event
+                      TourbookPlugin.getPrefStore().setValue(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED, Math.random());
+                   }
+                });
+            }
+         }
+
+         tourData.setTourType(tourType);
+      }
+
+      return newSavedTourType != null;
    }
 
    public void finalizeTour() {
@@ -401,7 +463,7 @@ public class FitData {
       // If enabled, set Tour Type using FIT file data
       if (_isFitImportTourType) {
 
-         switch (_isFitImportTourTypeMode) {
+         switch (_fitImportTourTypeMode) {
 
             case IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORT:
 
@@ -435,67 +497,6 @@ public class FitData {
                break;
         }
      }
-   }
-
-   /**
-    * @param tourData
-    * @param parsedTourTypeLabel
-    * @return <code>true</code> when a new {@link TourType} is created
-    */
-   private boolean applyTour_Type(final TourData tourData, final String parsedTourTypeLabel) {
-
-      final ArrayList<TourType> tourTypeMap = TourDatabase.getAllTourTypes();
-      TourType tourType = null;
-      TourType newSavedTourType = null;
-
-      // do not add tours when label string is blank
-      if (!UI.EMPTY_STRING.equals(parsedTourTypeLabel)) {
-
-         // find tour type in existing tour types
-         for (final TourType mapTourType : tourTypeMap) {
-            if (parsedTourTypeLabel.equalsIgnoreCase(mapTourType.getName())) {
-               tourType = mapTourType;
-               break;
-            }
-         }
-
-         if (tourType == null) {
-
-            // create new tour type
-
-            final TourType newTourType = new TourType(parsedTourTypeLabel);
-
-            final TourTypeColorDefinition newColorDefinition = new TourTypeColorDefinition(newTourType,
-                    Long.toString(newTourType.getTypeId()), newTourType.getName());
-
-            newTourType.setColorBright(newColorDefinition.getGradientBright_Default());
-            newTourType.setColorDark(newColorDefinition.getGradientDark_Default());
-            newTourType.setColorLine(newColorDefinition.getLineColor_Default());
-            newTourType.setColorText(newColorDefinition.getTextColor_Default());
-
-            // save new entity
-            newSavedTourType = TourDatabase.saveEntity(newTourType, newTourType.getTypeId(), TourType.class);
-            if (newSavedTourType != null) {
-
-                tourType = newSavedTourType;
-
-                TourDatabase.clearTourTypes();
-                TourManager.getInstance().clearTourDataCache();
-
-                // Update Tour Type (Filter) list UI
-                Display.getDefault().syncExec(new Runnable() {
-                   public void run() {
-                      // fire modify event
-                      TourbookPlugin.getPrefStore().setValue(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED, Math.random());
-                   }
-                });
-            }
-         }
-
-         tourData.setTourType(tourType);
-      }
-
-      return newSavedTourType != null;
    }
 
    public List<TimeData> getAllTimeData() {
@@ -673,6 +674,10 @@ public class FitData {
       _tourData.setIsPowerSensorPresent(isPowerSensorPresent);
    }
 
+   public void setProfileName(final String profileName) {
+      _profileName = profileName;
+   }
+
    public void setSessionIndex(final SessionMesg mesg) {
 
       final Integer fitMessageIndex = mesg.getFieldIntegerValue(254);
@@ -694,6 +699,10 @@ public class FitData {
       _tourData.setIsDistanceFromSensor(isSpeedSensorPresent);
    }
 
+   public void setSportname(final String sportName) {
+      _sportName = sportName;
+   }
+
    public void setStrideSensorPresent(final boolean isStrideSensorPresent) {
       _tourData.setIsStrideSensorPresent(isStrideSensorPresent);
    }
@@ -701,13 +710,5 @@ public class FitData {
    public void setTimeDiffMS(final long timeDiffMS) {
 
       _timeDiffMS = timeDiffMS;
-   }
-
-   public void setSportname(final String sportName) {
-      _sportName = sportName;
-   }
-
-   public void setProfileName(final String profileName) {
-      _profileName = profileName;
    }
 }
