@@ -78,45 +78,44 @@ public class Map3Manager {
     * This version number is incremented, when structural changes (e.g. new category) are done.
     * When this happens, the <b>default</b> structure is created.
     */
-   private static final int                           MAP3_LAYER_STRUCTURE_VERSION   = 21;
+   private static final int    MAP3_LAYER_STRUCTURE_VERSION   = 21;
 
-   public static final String                         PROPERTY_NAME_ENABLED          = "Enabled";                                                 //$NON-NLS-1$
+   public static final String  PROPERTY_NAME_ENABLED          = "Enabled";            //$NON-NLS-1$
 
-   private static final String                        MAP3_LAYER_STRUCTURE_FILE_NAME = "map3-layers.xml";                                         //$NON-NLS-1$
+   private static final String MAP3_LAYER_STRUCTURE_FILE_NAME = "map3-layers.xml";    //$NON-NLS-1$
 
-   private static final String                        ATTR_MAP3_LAYER_VERSION        = "map3LayerVersion";                                        //$NON-NLS-1$
+   private static final String ATTR_MAP3_LAYER_VERSION        = "map3LayerVersion";   //$NON-NLS-1$
 
-   private static final String                        TAG_ROOT                       = "Map3LayerStructure";                                      //$NON-NLS-1$
-   private static final String                        TAG_CATEGORY                   = "category";                                                //$NON-NLS-1$
-   private static final String                        TAG_LAYER                      = "layer";                                                   //$NON-NLS-1$
+   private static final String TAG_ROOT                       = "Map3LayerStructure"; //$NON-NLS-1$
+   private static final String TAG_CATEGORY                   = "category";           //$NON-NLS-1$
+   private static final String TAG_LAYER                      = "layer";              //$NON-NLS-1$
    //
-   private static final String                        ATTR_CAN_SET_OPACITY           = "canSetOpacity";                                           //$NON-NLS-1$
-   private static final String                        ATTR_ID                        = "id";                                                      //$NON-NLS-1$
-   private static final String                        ATTR_IS_DEFAULT_LAYER          = "isDefaultLayer";                                          //$NON-NLS-1$
-   private static final String                        ATTR_IS_ENABLED                = "isEnabled";                                               //$NON-NLS-1$
-   private static final String                        ATTR_IS_EXPANDED               = "isExpanded";                                              //$NON-NLS-1$
-   private static final String                        ATTR_OPACITY                   = "opacity";                                                 //$NON-NLS-1$
+   private static final String ATTR_CAN_SET_OPACITY           = "canSetOpacity";      //$NON-NLS-1$
+   private static final String ATTR_ID                        = "id";                 //$NON-NLS-1$
+   private static final String ATTR_IS_DEFAULT_LAYER          = "isDefaultLayer";     //$NON-NLS-1$
+   private static final String ATTR_IS_ENABLED                = "isEnabled";          //$NON-NLS-1$
+   private static final String ATTR_IS_EXPANDED               = "isExpanded";         //$NON-NLS-1$
+   private static final String ATTR_OPACITY                   = "opacity";            //$NON-NLS-1$
    //
-   private static final int                           INSERT_BEFORE_COMPASS          = 1;
-   public static final int                            INSERT_BEFORE_PLACE_NAMES      = 2;
-   //
-   private static final String                        ERROR_01                       = "NTMV_MM_001 Layer \"{0}\" is not a ww default layer.";    //$NON-NLS-1$
-   private static final String                        ERROR_02                       =
-         "NTMV_MM_002 Layer \"{0}\" is not defined as map default layer.";                                                                        //$NON-NLS-1$
-   private static final String                        ERROR_03                       = "NTMV_MM_003 XML layer \"{0}\" is not available.";         //$NON-NLS-1$
-   private static final String                        ERROR_04                       = "NTMV_MM_004 Category \"{0}\" is not a default category."; //$NON-NLS-1$
+   private static final int    INSERT_BEFORE_COMPASS          = 1;
+   public static final int     INSERT_BEFORE_PLACE_NAMES      = 2;
+
+// SET_FORMATTING_OFF
+
+   private static final String ERROR_01   = "NTMV_MM_001 Layer \"{0}\" is not a ww default layer.";               //$NON-NLS-1$
+   private static final String ERROR_02   = "NTMV_MM_002 Layer \"{0}\" is not defined as map default layer.";     //$NON-NLS-1$
+   private static final String ERROR_03   = "NTMV_MM_003 XML layer \"{0}\" is not available.";                    //$NON-NLS-1$
+   private static final String ERROR_04   = "NTMV_MM_004 Category \"{0}\" is not a default category.";            //$NON-NLS-1$
+
+// SET_FORMATTING_ON
 
    /**
     * _bundle must be set here otherwise an exception occures in saveState()
     */
-   private static final Bundle                        _bundle                        = TourbookPlugin.getDefault()                                //
-         .getBundle();
+   private static final Bundle                        _bundle         = TourbookPlugin.getDefault().getBundle();
 
-   private static final IDialogSettings               _state                         = TourbookPlugin
-         .getState(Map3Manager.class
-               .getCanonicalName());
-   private static final IPath                         _stateLocation                 = Platform
-         .getStateLocation(_bundle);
+   private static final IDialogSettings               _state          = TourbookPlugin.getState(Map3Manager.class.getCanonicalName());
+   private static final IPath                         _stateLocation  = Platform.getStateLocation(_bundle);
 
    /**
     * Root item for the layer tree viewer. This contains the UI model.
@@ -143,12 +142,12 @@ public class Map3Manager {
    /**
     * Contains custom (none default) layers, key is layerId and sorted by insertion.
     */
-   private static LinkedHashMap<String, TVIMap3Layer> _uiCustomLayers                = new LinkedHashMap<>();
+   private static LinkedHashMap<String, TVIMap3Layer> _uiCustomLayers = new LinkedHashMap<>();
 
    /**
     * Contains layers which can not be set visible in the UI but are visible on demand.
     */
-   private static LinkedHashMap<String, IToolLayer>   _toolLayers                    = new LinkedHashMap<>();
+   private static LinkedHashMap<String, IToolLayer>   _toolLayers     = new LinkedHashMap<>();
    //
    private static TrackSliderLayer                    _wwLayer_TrackSlider;
    private static MarkerLayer                         _wwLayer_Marker;
