@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.Util;
@@ -34,12 +35,14 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.TourTypeColorDefinition;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourLogManager;
 import net.tourbook.ui.tourChart.ChartLabel;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.widgets.Display;
 
 /**
  * Collects all data from a fit file
@@ -74,8 +77,8 @@ public class FitData {
    private String                  _sessionIndex;
    private ZonedDateTime           _sessionStartTime;
 
-   private String                  _sportName = "";
-   private String                  _profileName = "";
+   private String                  _sportName = UI.EMPTY_STRING;
+   private String                  _profileName = UI.EMPTY_STRING;
 
    private final List<TimeData>    _allTimeData          = new ArrayList<>();
 
@@ -103,7 +106,7 @@ public class FitData {
       _isIgnoreLastMarker = _prefStore.getBoolean(IPreferences.FIT_IS_IGNORE_LAST_MARKER);
       _isSetLastMarker = _isIgnoreLastMarker == false;
       _lastMarkerTimeSlices = _prefStore.getInt(IPreferences.FIT_IGNORE_LAST_MARKER_TIME_SLICES);
-      _isFitImportTourType = _prefStore.getBoolean(IPreferences.FIT_IMPORT_TOURTYPE);
+      _isFitImportTourType = _prefStore.getBoolean(IPreferences.FIT_IS_IMPORT_TOURTYPE);
       _isFitImportTourTypeMode = _prefStore.getString(IPreferences.FIT_IMPORT_TOURTYPE_MODE);
 
    }
@@ -412,7 +415,7 @@ public class FitData {
 
             case IPreferences.FIT_IMPORT_TOURTYPE_MODE_TRYPROFILE:
 
-               if (!_profileName.equals("")) {
+               if (!UI.EMPTY_STRING.equals(_profileName)) {
                   applyTour_Type(_tourData, _profileName);
                } else {
                   applyTour_Type(_tourData, _sportName);
@@ -421,11 +424,11 @@ public class FitData {
 
             case IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORTANDPROFILE:
 
-               String spacerText = "";
+               String spacerText = UI.EMPTY_STRING;
 
                // Insert spacer character of Sport Name is present
-               if ((!_sportName.equals("")) && (!_profileName.equals(""))) {
-                  spacerText = " - ";
+               if ((!UI.EMPTY_STRING.equals(_sportName)) && (!UI.EMPTY_STRING.equals(_profileName))) {
+                  spacerText = UI.DASH_WITH_SPACE;
                }
 
                applyTour_Type(_tourData, String.format("%s%s%s", _sportName, spacerText, _profileName));
@@ -446,7 +449,7 @@ public class FitData {
       TourType newSavedTourType = null;
 
       // do not add tours when label string is blank
-      if (!parsedTourTypeLabel.equals("")) {
+      if (!UI.EMPTY_STRING.equals(parsedTourTypeLabel)) {
 
          // find tour type in existing tour types
          for (final TourType mapTourType : tourTypeMap) {
@@ -478,6 +481,14 @@ public class FitData {
 
                 TourDatabase.clearTourTypes();
                 TourManager.getInstance().clearTourDataCache();
+
+                // Update Tour Type (Filter) list UI
+                Display.getDefault().syncExec(new Runnable() {
+                   public void run() {
+                      // fire modify event
+                      TourbookPlugin.getPrefStore().setValue(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED, Math.random());
+                   }
+                });
             }
          }
 
