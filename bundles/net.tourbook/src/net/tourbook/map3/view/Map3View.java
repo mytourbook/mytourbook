@@ -1368,11 +1368,9 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
    @Override
    public MapLocation getMapLocation() {
 
-<<<<<<< HEAD
+
 		final MapPosition_with_MarkerPosition mapPosition = getMapPosition();
-=======
-      final MapPosition mapPosition = getMapPosition();
->>>>>>> refs/remotes/origin/master
+
 
       if (mapPosition == null) {
          return null;
@@ -1381,11 +1379,9 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
       return new MapLocation(mapPosition);
    }
 
-<<<<<<< HEAD
+
 	private MapPosition_with_MarkerPosition getMapPosition() {
-=======
-   private MapPosition getMapPosition() {
->>>>>>> refs/remotes/origin/master
+
 
       final View view = _wwCanvas.getView();
 
@@ -1411,11 +1407,8 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
       final double zoomLevel = 20 - Math.log(elevation);
 
-<<<<<<< HEAD
 		final MapPosition_with_MarkerPosition mapPosition = new MapLocation(geoCenter, (int) zoomLevel + 2).getMapPosition();
-=======
-      final MapPosition mapPosition = new MapLocation(geoCenter, (int) zoomLevel + 2).getMapPosition();
->>>>>>> refs/remotes/origin/master
+
 
       mapPosition.bearing = -(float) basicView.getHeading().getDegrees();
       mapPosition.tilt = (float) basicView.getPitch().getDegrees();
