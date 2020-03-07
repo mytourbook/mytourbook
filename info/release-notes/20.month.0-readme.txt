@@ -31,12 +31,12 @@ New + Improvements
   - yyy
 
 * xxx (Frederic)
-  - xxx
+
 
 Import
 ======
 
-
+* 
  
 Changes  
 =======
@@ -47,7 +47,8 @@ Changes
 Fixes   
 =====
 
-*   
+* xxx (Frederic)
+
    
 Translation    
 ===========

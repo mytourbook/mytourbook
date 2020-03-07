@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,11 +15,14 @@
  *******************************************************************************/
 package net.tourbook.common;
 
+import java.util.Optional;
+
 import net.tourbook.common.map.MapUI;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.ResourceLocator;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -56,7 +59,9 @@ public class CommonActivator extends AbstractUIPlugin {
     * @return the axisImage descriptor
     */
    public static ImageDescriptor getImageDescriptor(final String path) {
-      return imageDescriptorFromPlugin(PLUGIN_ID, "icons/" + path); //$NON-NLS-1$
+      final Optional<ImageDescriptor> imageDescriptor = ResourceLocator.imageDescriptorFromBundle(PLUGIN_ID, "icons/" + path); //$NON-NLS-1$
+
+      return imageDescriptor.isPresent() ? imageDescriptor.get() : null;
    }
 
    public static IPreferenceStore getPrefStore() {

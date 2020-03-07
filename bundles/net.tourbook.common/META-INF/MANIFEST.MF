@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: MyTourbook Commons
 Bundle-SymbolicName: net.tourbook.common;singleton:=true
-Bundle-Version: 20.2.0.qualifier
+Bundle-Version: 20.3.0.qualifier
 Bundle-Activator: net.tourbook.common.CommonActivator
 Bundle-Vendor: MyTourbook
 Export-Package: cop.swt.widgets.viewers.table.celleditors,
@@ -34,7 +34,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.e4.ui.workbench,
  org.eclipse.e4.ui.services,
  net.tourbook.ext.jars,
- net.tourbook.ext.worldwind_2.0
+ net.tourbook.ext.worldwind
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Import-Package: com.skedgo.converter,

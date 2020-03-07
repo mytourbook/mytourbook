@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,24 +15,10 @@
  *******************************************************************************/
 package net.tourbook.map3.layer.tourtrack;
 
-import java.awt.Color;
-import java.nio.Buffer;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.media.opengl.GL2;
-
-import org.eclipse.swt.graphics.RGB;
-
 import com.jogamp.common.nio.Buffers;
 
-import net.tourbook.common.color.ColorUtil;
-import net.tourbook.map3.view.Map3View;
-
 import gnu.trove.list.array.TIntArrayList;
+
 import gov.nasa.worldwind.View;
 import gov.nasa.worldwind.WorldWind;
 import gov.nasa.worldwind.cache.GpuResourceCache;
@@ -43,6 +29,21 @@ import gov.nasa.worldwind.globes.Globe;
 import gov.nasa.worldwind.render.DrawContext;
 import gov.nasa.worldwind.render.Path;
 import gov.nasa.worldwind.terrain.Terrain;
+
+import java.awt.Color;
+import java.nio.Buffer;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.media.opengl.GL2;
+
+import net.tourbook.common.color.ColorUtil;
+import net.tourbook.map3.view.Map3View;
+
+import org.eclipse.swt.graphics.RGB;
 
 public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackPath {
 

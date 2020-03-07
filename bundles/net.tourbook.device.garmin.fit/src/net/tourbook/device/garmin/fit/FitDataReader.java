@@ -43,13 +43,13 @@ import net.tourbook.device.garmin.fit.listeners.MesgListener_Lap;
 import net.tourbook.device.garmin.fit.listeners.MesgListener_Length;
 import net.tourbook.device.garmin.fit.listeners.MesgListener_Record;
 import net.tourbook.device.garmin.fit.listeners.MesgListener_Session;
+import net.tourbook.device.garmin.fit.listeners.MesgListener_Sport;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.tour.TourLogManager;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
 
 /**
  * Garmin FIT activity reader based on the official Garmin SDK.
@@ -558,6 +558,7 @@ public class FitDataReader extends TourbookDevice {
          fitBroadcaster.addListener(new MesgListener_Length(fitData));
          fitBroadcaster.addListener(new MesgListener_Record(fitData));
          fitBroadcaster.addListener(new MesgListener_Session(fitData));
+         fitBroadcaster.addListener(new MesgListener_Sport(fitData));
 
          if (_isLogging_FitData) {
 
@@ -613,15 +614,13 @@ public class FitDataReader extends TourbookDevice {
    public boolean validateRawData(final String fileName) {
 
       boolean returnValue = false;
-      FileInputStream fis = null;
 
-      try {
+      try (FileInputStream fis = new FileInputStream(fileName)) {
 
          if (!FilenameUtils.getExtension(fileName).equalsIgnoreCase("fit")) { //$NON-NLS-1$
             return false;
          }
 
-         fis = new FileInputStream(fileName);
          returnValue = new Decode().checkFileIntegrity(fis);
 
          if (returnValue) {
@@ -653,8 +652,8 @@ public class FitDataReader extends TourbookDevice {
          TourLogManager.logError_CannotReadDataFile(fileName, e);
       } catch (final FitRuntimeException e) {
          TourLogManager.logEx(String.format("Invalid data file '%s'", fileName), e); //$NON-NLS-1$
-      } finally {
-         IOUtils.closeQuietly(fis);
+      } catch (final IOException e) {
+         TourLogManager.logEx(e);
       }
 
       return returnValue;

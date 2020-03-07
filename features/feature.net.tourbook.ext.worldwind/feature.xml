@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="feature.net.tourbook.ext.worldwind"
+      label="World Wind Java SDK"
+      version="2.1.20170207"
+      plugin="net.tourbook.branding">
+
+   <description url="http://worldwind.arc.nasa.gov/java/">
+      see http://worldwind.arc.nasa.gov/java/
+   </description>
+
+   <copyright url="http://worldwind.arc.nasa.gov/worldwind-nosa-1.3.html">
+      see http://worldwind.arc.nasa.gov/worldwind-nosa-1.3.html
+   </copyright>
+
+   <license url="http://worldwind.arc.nasa.gov/worldwind-nosa-1.3.html">
+      see http://worldwind.arc.nasa.gov/worldwind-nosa-1.3.html
+   </license>
+
+   <url>
+      <update label="MyTourbook Update Site" url="http://mytourbook.sourceforge.net/updates/"/>
+   </url>
+
+   <plugin
+         id="net.tourbook.ext.worldwind"
+         download-size="0"
+         install-size="0"
+         version="2.1.20170207.3938883"
+         unpack="false"/>
+
+   <plugin
+         id="net.tourbook.ext.worldwind.linux64"
+         os="linux"
+         arch="x86_64"
+         download-size="0"
+         install-size="0"
+         version="2.1.20170207"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="net.tourbook.ext.worldwind.macosx"
+         os="macosx"
+         arch="x86_64"
+         download-size="0"
+         install-size="0"
+         version="2.1.20170207"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="net.tourbook.ext.worldwind.win64"
+         os="win32"
+         arch="x86_64"
+         download-size="0"
+         install-size="0"
+         version="2.1.20170207"
+         fragment="true"
+         unpack="false"/>
+
+</feature>
