@@ -30,17 +30,13 @@ New + Improvements
 * xxx
   - yyy
 
-* Tour Marker (Frederic)
-  - Added the following column : Average slope
-  - Replaced pace difference column name by average pace
+* xxx (Frederic)
+
 
 Import
 ======
 
-* FIT File (bbbbbr)
-  - Added option to set Tour Type using Sport Name and Profile Name
-    from the imported file
-
+* 
  
 Changes  
 =======
@@ -51,12 +47,8 @@ Changes
 Fixes   
 =====
 
-* Conconi Test View (Frederic)
-  - Disabling the deflection scale if there is no HR and/or power data (otherwise if the users modified the scale it would create an NPE)
+* xxx (Frederic)
 
-* 3D Map View (Frederic)
-  - Fixed a regression that appeared in 17.4.1 where the USGS layers disappeared in the 3D Map Layer menu (due to the fact that WorldWind had changed the internal name of those layers from "Topographic" to "Topo Scanned")
-  - Fixed the pace format display for 3D map view (Frederic)
    
 Translation    
 ===========
