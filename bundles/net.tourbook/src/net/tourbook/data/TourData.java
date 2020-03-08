@@ -2451,6 +2451,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       final AltitudeUpDown altiUpDown = computeAltitudeUpDown(0, altitudeSerie.length - 1);
 
+      if (altiUpDown != null) {
+         setTourAltUp(altiUpDown.altitudeUp);
+         setTourAltDown(altiUpDown.altitudeDown);
+      }
+
       return altiUpDown != null;
    }
 
@@ -2461,8 +2466,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
-    * Computes and sets the altitude up/down values into {@link TourData}
+    * Computes the elevation gain/loss values for a specific range.
     *
+    * @param startIndex
+    *           The index of the range start
+    * @param endIndex
+    *           The index of the range end
     * @return Returns an <code>AltitudeUpDown</code> when altitude was computed otherwise
     *         <code>null</code>
     */
@@ -2490,11 +2499,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       } else {
 
          altiUpDown = computeAltitudeUpDown_30_Algorithm_9_08(null, prefDPTolerance);
-      }
-
-      if (altiUpDown != null) {
-         setTourAltUp(altiUpDown.altitudeUp);
-         setTourAltDown(altiUpDown.altitudeDown);
       }
 
       return altiUpDown;
