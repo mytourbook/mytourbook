@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -31,20 +31,18 @@ public class Messages extends NLS {
 
    public static String        Default_Layer_Atmosphere;
    public static String        Default_Layer_Compass;
-   public static String        Default_Layer_MS_VirtualEarchAerial;
+   public static String        Default_Layer_MS_VirtualEarthAerial;
    public static String        Default_Layer_NASABlueMarble;
    public static String        Default_Layer_PlaceNames;
    public static String        Default_Layer_PoliticalBoundaries;
    public static String        Default_Layer_ScaleBar;
    public static String        Default_Layer_Stars;
-   public static String        Default_Layer_USGS_UrbanArea;
    public static String        Default_Layer_WMS_BingImagery;
    public static String        Default_Layer_WMS_EarthAtNight;
    public static String        Default_Layer_WMS_i_cubed_Landsat;
    public static String        Default_Layer_WMS_NASABlueMarble2004;
    public static String        Default_Layer_WMS_OpenStreetMap;
-   public static String        Default_Layer_WMS_USDA_NAIP;
-   public static String        Default_Layer_WMS_USDA_NAIP_USGS;
+   public static String        Default_Layer_WMS_USGS_NAIP_PLUS;
    public static String        Default_Layer_WMS_USGS_Topo100;
    public static String        Default_Layer_WMS_USGS_Topo24;
    public static String        Default_Layer_WMS_USGS_Topo250;
