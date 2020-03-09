@@ -239,8 +239,12 @@ public class MapDefaultLayer {
       _wwDefaultLayer.put(ID_USGS_NAIP_PLUS, //
             new DefaultLayer(ID_USGS_NAIP_PLUS, Messages.Default_Layer_WMS_USGS_NAIP_PLUS));
 
-      _wwDefaultLayer.put(ID_MS_VIRTUAL_EARTH_AERIAL, //
-            new DefaultLayer(ID_MS_VIRTUAL_EARTH_AERIAL, Messages.Default_Layer_MS_VirtualEarthAerial));
+      // Commenting this layer as it is commented in the WorldWind 2.1 and hence not available
+      // Here is the error message displayed to the user :
+      // !MESSAGE NTMV_MM_001 Layer "MS Virtual Earth Aerial" is not a ww default layer.
+      // see here : https://github.com/NASAWorldWind/WorldWindJava/blob/7a329a40861f02af5c16293c2c695c3cc1493469/src/config/worldwind.layers.xml#L26
+      // _wwDefaultLayer.put(ID_MS_VIRTUAL_EARTH_AERIAL, //
+      //       new DefaultLayer(ID_MS_VIRTUAL_EARTH_AERIAL, Messages.Default_Layer_MS_VirtualEarthAerial));
 
       _wwDefaultLayer.put(ID_BING_IMAGERY, //
             new DefaultLayer(ID_BING_IMAGERY, Messages.Default_Layer_WMS_BingImagery));
