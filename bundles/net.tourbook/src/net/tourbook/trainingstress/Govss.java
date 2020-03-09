@@ -21,6 +21,9 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.tour.TourManager;
 
+import org.apache.commons.math3.analysis.UnivariateFunction;
+import org.apache.commons.math3.analysis.solvers.BrentSolver;
+
 /**
  * Class that implements several of Dr Skiba's formulas that apply to running
  * More information can be found at http://topofusion.com/govss.php
@@ -204,5 +207,36 @@ public class Govss {
       }
 
       return powerValues;
+   }
+
+   /**
+    * Tries to find, for a given Lactate-Normalized Power, the equivalent pace
+    * on a flat surface.
+    *
+    * @param normalizedPower
+    * @return
+    */
+   private double tryComputeNormalizedPace(final float normalizedPower) {
+      final BrentSolver solver = new BrentSolver();
+      final UnivariateFunction f = new UnivariateFunction() {
+
+         @Override
+         public double value(final double x) {
+            //TODO get the distance from a function parameter ?
+            // add indexes for a specific section ? that way we can get the distance from distanceSerie[endIndex] - distanceSerie[startIndex] ?
+            return ComputePower(0f, 0.0, 0f, (float) x);
+         }
+      };
+
+      double intervalStart = -10000;
+      final double intervalSize = 0.01;
+      while (intervalStart < 10000) {
+         intervalStart += intervalSize;
+         if (Math.signum(f.value(intervalStart)) != Math.signum(f.value(intervalStart + intervalSize))) {
+            System.out.println("x = " + solver.solve(1000, f, intervalStart, intervalStart + intervalSize));
+         }
+      }
+
+      return 0.0;
    }
 }
