@@ -46,6 +46,8 @@ public class Messages extends NLS {
    public static String        Default_Layer_WMS_USGS_Topo100;
    public static String        Default_Layer_WMS_USGS_Topo24;
    public static String        Default_Layer_WMS_USGS_Topo250;
+   public static String        Default_Layer_WMS_USGS_TOPO_BASE_MAP;
+   public static String        Default_Layer_WMS_USGS_TOPO_BASE_MAP_LARGE_SCALE;
    public static String        Default_Layer_WorldMap;
 
    public static String        Image_Map3_DirectionArrow;
