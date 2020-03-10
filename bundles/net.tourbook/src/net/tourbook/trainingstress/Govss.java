@@ -17,6 +17,7 @@ package net.tourbook.trainingstress;
 
 import java.util.ArrayList;
 
+import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.tour.TourManager;
@@ -99,6 +100,13 @@ public class Govss {
 
       // 11. Multiply the number from step 10 by 100 to obtain the final training stress in GOVSS.
       trainingStressValue *= 100;
+
+      //TODO Temp code until i figure out where I display the normalized pace
+
+      final double paceInSeconds = tryComputeNormalizedPace(lactateNormalizedPower);
+      final double pace = 1609 / paceInSeconds;
+      final String nPace = UI.format_mm_ss((long) pace);
+      System.out.println("Normalized pace min/mile = " + nPace);
 
       //Should that trigger a recompute of the Performance chart data ?
       return (int) trainingStressValue;
@@ -218,25 +226,38 @@ public class Govss {
     */
    private double tryComputeNormalizedPace(final float normalizedPower) {
       final BrentSolver solver = new BrentSolver();
+//TODO how do I use the solver ?, I shouldn't have to do a while myself right ?
+      // https://www.programcreek.com/java-api-examples/?code=cacheonix/cacheonix-core/cacheonix-core-master/3rdparty/commons-math-1.2-src/src/java/org/apache/commons/math/analysis/BrentSolver.java
+//TODO check if the nPaces match with the xPace in GoldenCheetah
+
+      final float tourDistance = TourManager.computeTourDistance(_tourData, 0, _tourData.distanceSerie.length - 1);
+
       final UnivariateFunction f = new UnivariateFunction() {
 
          @Override
          public double value(final double x) {
             //TODO get the distance from a function parameter ?
             // add indexes for a specific section ? that way we can get the distance from distanceSerie[endIndex] - distanceSerie[startIndex] ?
-            return ComputePower(0f, 0.0, 0f, (float) x);
+            return ComputePower(tourDistance, 0.0, 0f, (float) x);
          }
       };
 
-      double intervalStart = -10000;
+      double intervalStart = 0;
       final double intervalSize = 0.01;
+      double result = 0;
       while (intervalStart < 10000) {
          intervalStart += intervalSize;
-         if (Math.signum(f.value(intervalStart)) != Math.signum(f.value(intervalStart + intervalSize))) {
-            System.out.println("x = " + solver.solve(1000, f, intervalStart, intervalStart + intervalSize));
+
+         final double currentPower = f.value(intervalStart);
+         final double result2 = normalizedPower - currentPower;
+         if (result2 < 0.1f) {
+            result = intervalStart + intervalSize;
+            System.out.println("x = " + result);
+            break;
+            //System.out.println("x = " + solver.solve(1000, f, intervalStart, intervalStart + intervalSize));
          }
       }
 
-      return 0.0;
+      return result;
    }
 }
