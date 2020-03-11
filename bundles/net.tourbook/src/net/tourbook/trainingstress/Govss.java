@@ -18,12 +18,14 @@ package net.tourbook.trainingstress;
 import java.util.ArrayList;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.tour.TourManager;
 
 import org.apache.commons.math3.analysis.UnivariateFunction;
 import org.apache.commons.math3.analysis.solvers.BrentSolver;
+import org.apache.commons.math3.exception.NoBracketingException;
 
 /**
  * Class that implements several of Dr Skiba's formulas that apply to running
@@ -225,9 +227,8 @@ public class Govss {
     * @return
     */
    private double tryComputeNormalizedPace(final float normalizedPower) {
-      final BrentSolver solver = new BrentSolver();
+      final BrentSolver brentSolver = new BrentSolver(0.001);
 //TODO how do I use the solver ?, I shouldn't have to do a while myself right ?
-      // https://www.programcreek.com/java-api-examples/?code=cacheonix/cacheonix-core/cacheonix-core-master/3rdparty/commons-math-1.2-src/src/java/org/apache/commons/math/analysis/BrentSolver.java
 //TODO check if the nPaces match with the xPace in GoldenCheetah
 
       final float tourDistance = TourManager.computeTourDistance(_tourData, 0, _tourData.distanceSerie.length - 1);
@@ -238,25 +239,18 @@ public class Govss {
          public double value(final double x) {
             //TODO get the distance from a function parameter ?
             // add indexes for a specific section ? that way we can get the distance from distanceSerie[endIndex] - distanceSerie[startIndex] ?
-            return ComputePower(tourDistance, 0.0, 0f, (float) x);
+            return normalizedPower - ComputePower(tourDistance, 0.0, 0f, (float) x);
          }
       };
 
-      double intervalStart = 0;
-      final double intervalSize = 0.01;
-      double result = 0;
-      while (intervalStart < 10000) {
-         intervalStart += intervalSize;
+      double result = 0.0;
+      try {
+         result = brentSolver.solve(10000, f, 0.01, 10.0);
 
-         final double currentPower = f.value(intervalStart);
-         final double result2 = normalizedPower - currentPower;
-         if (result2 < 0.1f) {
-            result = intervalStart + intervalSize;
-            System.out.println("x = " + result);
-            break;
-            //System.out.println("x = " + solver.solve(1000, f, intervalStart, intervalStart + intervalSize));
-         }
+      } catch (final NoBracketingException e) {
+         StatusUtil.log(e);
       }
+
 
       return result;
    }
