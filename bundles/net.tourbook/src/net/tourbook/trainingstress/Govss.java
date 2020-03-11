@@ -18,9 +18,9 @@ package net.tourbook.trainingstress;
 import java.util.ArrayList;
 
 import net.tourbook.common.UI;
-import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
+import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourManager;
 
 import org.apache.commons.math3.analysis.UnivariateFunction;
@@ -52,6 +52,16 @@ public class Govss {
    /**
     * Function that calculates the GOVSS (Gravity Ordered Velocity Stress Score) for a given run and
     * athlete.
+    *
+    * @return The GOVSS value
+    */
+   public int Compute() {
+      return Compute(0, _tourData.timeSerie.length);
+   }
+
+   /**
+    * Function that calculates the GOVSS (Gravity Ordered Velocity Stress Score) for a given range
+    * within a run activity and athlete.
     * References
     * http://runscribe.com/wp-content/uploads/power/GOVSS.pdf
     * https://3record.de/about/power_estimation#run
@@ -61,8 +71,8 @@ public class Govss {
     *
     * @return The GOVSS value
     */
-   public int Compute() {
-      if (_tourPerson == null || _tourData == null) {
+   public int Compute(final int startIndex, final int endIndex) {
+      if (_tourPerson == null || _tourData == null || startIndex >= endIndex) {
          return 0;
       }
 
@@ -172,7 +182,7 @@ public class Govss {
    }
 
    private ArrayList<Double> computePowerValues() {
-      if (_tourData == null) {
+      if (_tourData == null || _tourData.timeSerie == null) {
          return null;
       }
 
@@ -248,9 +258,8 @@ public class Govss {
          result = brentSolver.solve(10000, f, 0.01, 10.0);
 
       } catch (final NoBracketingException e) {
-         StatusUtil.log(e);
+         TourLogManager.logEx(e);
       }
-
 
       return result;
    }

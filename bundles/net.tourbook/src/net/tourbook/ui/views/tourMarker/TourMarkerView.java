@@ -939,18 +939,12 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
             final int currentMarkerIndex = ((TourMarker) cell.getElement()).getSerieIndex();
 
-            final float[] seriePace = _tourData.getPaceSerieSeconds();
-            if (seriePace == null) {
-               return;
-            }
+            final double normalizedPace = _tourData.computeNormalizedPace(previousMarkerIndex, currentMarkerIndex);
 
-            final double[] seriePaceDouble = IntStream.range(previousMarkerIndex, currentMarkerIndex).mapToDouble(i -> seriePace[i]).toArray();
-            final OptionalDouble averagePace = Arrays.stream(seriePaceDouble).average();
-
-            if (averagePace.isPresent() == false) {
+            if (normalizedPace == 0.0) {
                cell.setText(UI.EMPTY_STRING);
             } else {
-               cell.setText(UI.format_mm_ss((long) averagePace.getAsDouble()));
+               cell.setText(UI.format_mm_ss((long) normalizedPace));
             }
          }
       });

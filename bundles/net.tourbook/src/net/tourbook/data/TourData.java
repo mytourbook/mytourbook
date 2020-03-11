@@ -4241,6 +4241,20 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
    }
 
+   public double computeNormalizedPace(final int startIndex, final int endIndex) {
+      final double result = 0.0;
+
+      if (canGovssBeComputed() == false) {
+         return result;
+      }
+
+      govss = new Govss(tourPerson, this).Compute();
+
+      tourPerson.addOrUpdateGovssEntry(tourStartTime, tourId);
+
+      return result;
+   }
+
    private void computePhotoTimeAdjustment() {
 
       long allPhotoTimeAdjustment = 0;
@@ -7407,6 +7421,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    public float[] getMetricDistanceSerie() {
       return distanceSerie;
    }
+
+
 
    /**
     * @param geoAccuracy
