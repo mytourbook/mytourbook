@@ -56,6 +56,10 @@ public class Govss {
     * @return The GOVSS value
     */
    public int Compute() {
+      if (_tourData == null || _tourData.timeSerie == null || _tourData.timeSerie.length < 2) {
+         return 0;
+      }
+
       return Compute(0, _tourData.timeSerie.length);
    }
 
@@ -113,13 +117,6 @@ public class Govss {
       // 11. Multiply the number from step 10 by 100 to obtain the final training stress in GOVSS.
       trainingStressValue *= 100;
 
-      //TODO Temp code until i figure out where I display the normalized pace
-
-      final double paceInSeconds = tryComputeNormalizedPace(lactateNormalizedPower);
-      final double pace = 1609 / paceInSeconds;
-      final String nPace = UI.format_mm_ss((long) pace);
-      System.out.println("Normalized pace min/mile = " + nPace);
-
       //Should that trigger a recompute of the Performance chart data ?
       return (int) trainingStressValue;
    }
@@ -162,6 +159,32 @@ public class Govss {
       final double Ckin = distance > 0 ? 0.5 * (Math.pow(speed, 2) - Math.pow(initialSpeed, 2)) / distance : 0;
 
       return Ckin;
+   }
+
+   /**
+    * Function that calculates the normalized pace (Gravity Ordered Velocity Stress Score) for a
+    * given range
+    * within a run activity and athlete.
+    *
+    * @return The GOVSS value
+    */
+   public int ComputeNormalizedPace(final int startIndex, final int endIndex) {
+      if (_tourData == null || _tourData.timeSerie == null || _tourData.timeSerie.length < 2) {
+         return 0;
+      }
+
+      //We compute the Lactate-Normalized Power for the given range.
+      //TODO create a function to just compute that value (to be reused in  Compute(final int startIndex, final int endIndex) {
+      //We look for the equivalent power on a flat surface of the same distance
+
+      //TODO Temp code until i figure out where I display the normalized pace
+      final float lactateNormalizedPower = 0f;
+      final double paceInSeconds = tryComputeNormalizedPace(lactateNormalizedPower);
+      final double pace = 1609 / paceInSeconds;
+      final String nPace = UI.format_mm_ss((long) pace);
+      System.out.println("Normalized pace min/mile = " + nPace);
+
+      return Compute(0, _tourData.timeSerie.length);
    }
 
    /**
