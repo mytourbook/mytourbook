@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2019 Frédéric Bard and Contributors
+ * Copyright (C) 2020 Frédéric Bard and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -119,7 +119,7 @@ public class PerformanceModelingChartView extends ViewPart {
    private ActionSynchChartScale          _actionSynchVerticalChartScaling;
    private ActionTrainingOptions          _actionTrainingOptions;
 
-   private double[]                       _xSeriePulse;
+   private double[]                       _xSerieDate;
 
    private final MinMaxKeeper_YData       _minMaxKeeper = new MinMaxKeeper_YData();
 
@@ -225,13 +225,14 @@ public class PerformanceModelingChartView extends ViewPart {
       _currentPerson = TourbookPlugin.getActivePerson();
 
       if (_currentPerson != null && _currentPerson.getPerformanceModelingData() != null) {
-         _currentPerson.getPerformanceModelingData().addTrainingStressDataListener(
-               new ITrainingStressDataListener() {
-                  @Override
-                  public void trainingStressDataIsModified() {
-                     updateUI_40_performanceModelingChart();
-                  }
-               });
+         _currentPerson.getPerformanceModelingData()
+               .addTrainingStressDataListener(
+                     new ITrainingStressDataListener() {
+                        @Override
+                        public void trainingStressDataIsModified() {
+                           updateUI_40_performanceModelingChart();
+                        }
+                     });
       }
    }
 
@@ -705,13 +706,13 @@ public class PerformanceModelingChartView extends ViewPart {
       /*
        * create x-data series
        */
-      _xSeriePulse = new double[numberOfDays];
+      _xSerieDate = new double[numberOfDays];
 
       final int[] colorIndex = new int[numberOfDays];
 
       for (int index = 0; index < numberOfDays; index++) {
 
-         _xSeriePulse[index] = index;
+         _xSerieDate[index] = index;
       }
 
       final ChartDataModel chartDataModel = new ChartDataModel(ChartType.LINE);
@@ -727,9 +728,9 @@ public class PerformanceModelingChartView extends ViewPart {
 //      chartDataModel.setTitle(TourManager.getTourDateTimeFull(_tourData));
 
       /*
-       * x-axis: pulse
+       * x-axis: Date
        */
-      final ChartDataXSerie xData = new ChartDataXSerie(_xSeriePulse);
+      final ChartDataXSerie xData = new ChartDataXSerie(_xSerieDate);
       xData.setAxisUnit(ChartDataXSerie.X_AXIS_UNIT_NUMBER_CENTER);
       xData.setUnitLabel("date");//net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit);
       xData.setUnitStartValue(0);
@@ -742,12 +743,12 @@ public class PerformanceModelingChartView extends ViewPart {
       final float[] predictedPerformanceValues = new float[numberOfDays];
       final HashMap<LocalDate, Integer> fitnessValuesSkiba = _currentPerson.getPerformanceModelingData().getFitnessValuesSkiba();
       LocalDate currentDatetorneame = _oldestEntryDate;
-      for (int toto = 0; toto < numberOfDays; ++toto) {
+      for (int index = 0; index < numberOfDays; ++index) {
 
          if (fitnessValuesSkiba.containsKey(currentDatetorneame)) {
 
             // g(t)
-            predictedPerformanceValues[toto] = fitnessValuesSkiba.get(currentDatetorneame);
+            predictedPerformanceValues[index] = fitnessValuesSkiba.get(currentDatetorneame);
 
             //TODO h(t)
 
@@ -757,21 +758,21 @@ public class PerformanceModelingChartView extends ViewPart {
          currentDatetorneame = currentDatetorneame.plusDays(1);
       }
 
-      final ChartDataYSerie yData = new ChartDataYSerie(
+      final ChartDataYSerie govssData = new ChartDataYSerie(
             ChartType.LINE,
             predictedPerformanceValues,
             false);
 
-      yData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
-      yData.setYTitle("GOVSS");//Messages.App_Label_H_MM);
+      govssData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
+      govssData.setYTitle("GOVSS");//Messages.App_Label_H_MM);
 
-      yData.setColorIndex(new int[][] { colorIndex });
-      yData.setRgbLine(rgbLine);
-      yData.setRgbBright(rgbBright);
-      yData.setRgbDark(rgbDark);
-      yData.setDefaultRGB(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY).getRGB());
+      govssData.setColorIndex(new int[][] { colorIndex });
+      govssData.setRgbLine(rgbLine);
+      govssData.setRgbBright(rgbBright);
+      govssData.setRgbDark(rgbDark);
+      govssData.setDefaultRGB(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY).getRGB());
 
-      chartDataModel.addYData(yData);
+      chartDataModel.addYData(govssData);
 
       //TODO when MTB supports displaying both BAR and LINES at the same time
       // set tool tip info
@@ -816,13 +817,13 @@ public class PerformanceModelingChartView extends ViewPart {
 
       }
 
-      final ChartDataYSerie dummyPerformanceDataYAxis = new ChartDataYSerie(
+      final ChartDataYSerie performanceData = new ChartDataYSerie(
             ChartType.LINE,
             govssValues,
             false);
 
-      dummyPerformanceDataYAxis.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
-      yData.setYTitle("GOVSS");//Messages.App_Label_H_MM);
+      performanceData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
+      performanceData.setYTitle("Performance Data");//Messages.App_Label_H_MM);
 
       final RGB[] rgbBright2 = new RGB[numberOfDays];
       final RGB[] rgbDark2 = new RGB[numberOfDays];
@@ -835,13 +836,13 @@ public class PerformanceModelingChartView extends ViewPart {
          rgbLine2[index] = new RGB(203, 25, 37);
       }
 
-      dummyPerformanceDataYAxis.setColorIndex(new int[][] { colorIndex });
-      dummyPerformanceDataYAxis.setRgbLine(rgbLine2);
-      dummyPerformanceDataYAxis.setRgbBright(rgbBright2);
-      dummyPerformanceDataYAxis.setRgbDark(rgbDark2);
-      dummyPerformanceDataYAxis.setDefaultRGB(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY).getRGB());
+      performanceData.setColorIndex(new int[][] { colorIndex });
+      performanceData.setRgbLine(rgbLine2);
+      performanceData.setRgbBright(rgbBright2);
+      performanceData.setRgbDark(rgbDark2);
+      performanceData.setDefaultRGB(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY).getRGB());
 
-      chartDataModel.addYData(dummyPerformanceDataYAxis);
+      chartDataModel.addYData(performanceData);
 
       // show the new data data model in the chart
       _chartPerformanceModelingData.updateChart(chartDataModel, false);
