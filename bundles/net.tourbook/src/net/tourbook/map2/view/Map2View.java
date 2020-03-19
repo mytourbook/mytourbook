@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -607,7 +607,7 @@ public class Map2View extends ViewPart implements
 
          _actionShowTour.setSelection(true);
 
-         // map must be synched with selected tour
+         // map must be synchronized with selected tour
          _isMapSynched_WithTour = true;
          _actionSyncMap_WithTour.setChecked(true);
 
@@ -670,7 +670,7 @@ public class Map2View extends ViewPart implements
          deactivateMapSync();
          deactivatePhotoSync();
 
-         // force tour to be repainted, that it is synched immediately
+         // force tour to be repainted, that it is synchronized immediately
          _previousTourData = null;
 
          _actionShowTour.setSelection(true);
@@ -814,7 +814,7 @@ public class Map2View extends ViewPart implements
 
       /*
        * Uncheck all other tour color actions, they could be checked in the slideout because each
-       * action has it's own toolbar !!!
+       * action has its own toolbar !!!
        */
       for (final MapGraphId graphId : _allGraphContribId) {
          if (graphId != colorId) {
@@ -999,7 +999,7 @@ public class Map2View extends ViewPart implements
 
                      if (selection instanceof SelectionTourIds) {
 
-                        // clone tour id's otherwise the original couldl be removed
+                        // clone tour id's otherwise the original could be removed
                         final SelectionTourIds selectionTourIds = (SelectionTourIds) selection;
 
                         final ArrayList<Long> allTourIds = new ArrayList<>();
@@ -1187,7 +1187,7 @@ public class Map2View extends ViewPart implements
 
             } else if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
 
-               // this can occure when tour geo filter color is modified
+               // this can occur when tour geo filter color is modified
 
                _map.paint();
             }
@@ -1781,7 +1781,8 @@ public class Map2View extends ViewPart implements
       final boolean canShowFilteredPhoto = isFilteredPhotoAvailable && _isShowPhoto;
 
       /*
-       * sync photo has a higher priority than sync tour, both cannot be synced at the same time
+       * sync photo has a higher priority than sync tour, both cannot be synchronized at the same
+       * time
        */
 //      final boolean isPhotoSynced = canShowFilteredPhoto && _isMapSynchedWithPhoto;
 //      final boolean canSyncTour = isPhotoSynced == false;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2019 Frédéric Bard and Contributors
+ * Copyright (C) 2020 Frédéric Bard and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,24 +21,22 @@ import net.tourbook.ui.UI;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionSynchChartScale extends Action {
+public class ActionShowHidePerformanceValues extends Action {
 
    private PerformanceModelingChartView _performanceModelingChartView;
 
-   public ActionSynchChartScale(final PerformanceModelingChartView performanceModelingChartView) {
+   public ActionShowHidePerformanceValues(final PerformanceModelingChartView performanceModelingChartView) {
 
-		super(UI.EMPTY_STRING, AS_CHECK_BOX);
+      super(UI.EMPTY_STRING, AS_CHECK_BOX);
+
+      setToolTipText(Messages.Training_View_Action_ShowAllPulseValues);
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__graph_pace)); //TODO replace with Image__graph_govss
 
       _performanceModelingChartView = performanceModelingChartView;
+   }
 
-		setToolTipText(Messages.Training_View_Action_SynchChartScale);
-
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__synch_statistics));
-		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__synch_statistics_Disabled));
-	}
-
-	@Override
-	public void run() {
-      _performanceModelingChartView.actionSynchChartScale();
-	}
+   @Override
+   public void run() {
+      _performanceModelingChartView.actionShowHidePerformanceValues(isChecked());
+   }
 }

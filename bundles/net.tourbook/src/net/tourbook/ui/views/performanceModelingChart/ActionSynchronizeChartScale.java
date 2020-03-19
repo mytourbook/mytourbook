@@ -21,22 +21,24 @@ import net.tourbook.ui.UI;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionShowAllStressScoreValues extends Action {
+public class ActionSynchronizeChartScale extends Action {
 
    private PerformanceModelingChartView _performanceModelingChartView;
 
-   public ActionShowAllStressScoreValues(final PerformanceModelingChartView performanceModelingChartView) {
+   public ActionSynchronizeChartScale(final PerformanceModelingChartView performanceModelingChartView) {
 
-      super(UI.EMPTY_STRING, AS_CHECK_BOX);
-
-      setToolTipText(Messages.Training_View_Action_ShowAllPulseValues);
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__graph_speed)); //TODO replace with Image__graph_govss
+		super(UI.EMPTY_STRING, AS_CHECK_BOX);
 
       _performanceModelingChartView = performanceModelingChartView;
-   }
 
-   @Override
-   public void run() {
-      _performanceModelingChartView.actionShowHidePerformanceValues(isChecked());
-   }
+		setToolTipText(Messages.Training_View_Action_SynchChartScale);
+
+		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__synch_statistics));
+		setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__synch_statistics_Disabled));
+	}
+
+	@Override
+	public void run() {
+      _performanceModelingChartView.actionSynchChartScale();
+	}
 }

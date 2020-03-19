@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -5365,7 +5365,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
     * This is the entry point for new tours.
     * <p>
     * This method is synchronized because when SRTM data are retrieved and the import view is
-    * openened, the error occured that the chart config was deleted with {@link #updateChart(null)}
+    * opened, the error occurred that the chart config was deleted with {@link #updateChart(null)}
     *
     * @param newTourData
     * @param newTCC

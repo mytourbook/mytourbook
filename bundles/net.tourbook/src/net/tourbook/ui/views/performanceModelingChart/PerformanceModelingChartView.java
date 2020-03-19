@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -55,17 +56,9 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseWheelListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.part.PageBook;
@@ -75,11 +68,6 @@ public class PerformanceModelingChartView extends ViewPart {
 
    public static final String  ID                                    = "net.tourbook.ui.views.performanceModelingChart.PerformanceModelingChartView"; //$NON-NLS-1$
 
-   private static final int    HR_LEFT_MIN_BORDER                    = 0;
-   private static final int    HR_RIGHT_MAX_BORDER                   = 230;
-
-   private static final String STATE_HR_CHART_LEFT_BORDER            = "HrLeftChartBorder";                                                           //$NON-NLS-1$
-   private static final String STATE_HR_CHART_RIGHT_BORDER           = "HrRightChartBorder";                                                          //$NON-NLS-1$
    private static final String STATE_IS_SHOW_ALL_STRESS_SCORE_VALUES = "IsShowAllStressScoreValues";                                                  //$NON-NLS-1$
    private static final String STATE_IS_SYNC_VERTICAL_CHART_SCALING  = "IsSyncVerticalChartScaling";                                                  //$NON-NLS-1$
 
@@ -94,15 +82,11 @@ public class PerformanceModelingChartView extends ViewPart {
 
 // SET_FORMATTING_ON
 
-   private final IPreferenceStore         _prefStore    = TourbookPlugin.getPrefStore();
-   private final IDialogSettings          _state        = TourbookPlugin.getState(ID);
+   private final IPreferenceStore         _prefStore      = TourbookPlugin.getPrefStore();
+   private final IDialogSettings          _state          = TourbookPlugin.getState(ID);
 
    private IPropertyChangeListener        _prefChangeListener;
    private ITrainingStressDataListener    _trainingStressDataListener;
-
-   private ModifyListener                 _defaultSpinnerModifyListener;
-   private SelectionAdapter               _defaultSpinnerSelectionListener;
-   private MouseWheelListener             _defaultSpinnerMouseWheelListener;
 
    private TourPerson                     _currentPerson;
 
@@ -113,17 +97,19 @@ public class PerformanceModelingChartView extends ViewPart {
    private boolean                        _isShowAllValues;
    private boolean                        _isSynchChartVerticalValues;
 
+   private ChartDataModel                 _chartDataModel = new ChartDataModel(ChartType.LINE);
+
    private ToolBarManager                 _headerToolbarManager;
 
    private ActionShowAllStressScoreValues _actionShowAllStressScoreValues;
-   private ActionSynchChartScale          _actionSynchVerticalChartScaling;
+   private ActionSynchronizeChartScale    _actionSynchVerticalChartScaling;
    private ActionTrainingOptions          _actionTrainingOptions;
 
    private double[]                       _xSerieDate;
 
-   private final MinMaxKeeper_YData       _minMaxKeeper = new MinMaxKeeper_YData();
+   private final MinMaxKeeper_YData       _minMaxKeeper   = new MinMaxKeeper_YData();
 
-   private final NumberFormat             _nf1          = NumberFormat.getNumberInstance();
+   private final NumberFormat             _nf1            = NumberFormat.getNumberInstance();
    {
       _nf1.setMinimumFractionDigits(1);
       _nf1.setMaximumFractionDigits(1);
@@ -144,10 +130,7 @@ public class PerformanceModelingChartView extends ViewPart {
    private Composite _toolbar;
    private Chart     _chartPerformanceModelingData;
 
-   private Spinner   _spinnerHrLeft;
-   private Spinner   _spinnerHrRight;
-   private Label     _lblHrMin;
-   private Label     _lblHrMax;
+   private int       _numberOfDays;
 
    /*
     * none UI
@@ -173,6 +156,23 @@ public class PerformanceModelingChartView extends ViewPart {
       updateUI_10_stressScoreValuesFromModel();
    }
 
+   public void actionShowHidePerformanceValues(final boolean showValues) {
+      if (showValues == false) {
+         final ChartDataModel currentData = _chartPerformanceModelingData.getChartDataModel();
+         final ArrayList<ChartDataYSerie> ySeries = currentData.getYData();
+
+         final Predicate<ChartDataYSerie> condition = serie -> serie.getYTitle().equals("Performance Data");
+         ySeries.removeIf(condition);
+
+         _chartDataModel = currentData;
+      } else {
+         final ChartDataYSerie govssSerie = addPerformanceValues();
+         _chartDataModel.addYData(govssSerie);
+      }
+
+      _chartPerformanceModelingData.updateChart(_chartDataModel, true, true);
+   }
+
    void actionSynchChartScale() {
 
       _isSynchChartVerticalValues = _actionSynchVerticalChartScaling.isChecked();
@@ -182,6 +182,60 @@ public class PerformanceModelingChartView extends ViewPart {
       }
 
       updateUI_10_stressScoreValuesFromModel();
+   }
+
+   /**
+    * GOVSS values
+    */
+   private ChartDataYSerie addPerformanceValues() {
+
+      final float[] predictedPerformanceValues = new float[_numberOfDays];
+      final HashMap<LocalDate, Integer> fitnessValuesSkiba = _currentPerson.getPerformanceModelingData().getFitnessValuesSkiba();
+      LocalDate currentDatetorneame = _oldestEntryDate;
+      for (int index = 0; index < _numberOfDays; ++index) {
+
+         if (fitnessValuesSkiba.containsKey(currentDatetorneame)) {
+
+            // g(t)
+            predictedPerformanceValues[index] = fitnessValuesSkiba.get(currentDatetorneame);
+
+            //TODO h(t)
+
+            //TODO p(t) = g(t) - h(t)
+         }
+
+         currentDatetorneame = currentDatetorneame.plusDays(1);
+      }
+
+      final ChartDataYSerie govssData = new ChartDataYSerie(
+            ChartType.LINE,
+            predictedPerformanceValues,
+            false);
+
+      govssData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
+      govssData.setYTitle("GOVSS");//Messages.App_Label_H_MM);
+
+      final RGB[] rgbBright = new RGB[_numberOfDays];
+      final RGB[] rgbDark = new RGB[_numberOfDays];
+      final RGB[] rgbLine = new RGB[_numberOfDays];
+
+      for (int index = 0; index < _numberOfDays; ++index) {
+
+         rgbDark[index] = new RGB(0, 255, 255);
+         rgbBright[index] = new RGB(0, 255, 255);
+         rgbLine[index] = new RGB(0, 255, 255);
+      }
+
+      final int[] colorIndex = new int[_numberOfDays];
+
+      govssData.setColorIndex(new int[][] { colorIndex });
+      govssData.setRgbLine(rgbLine);
+      govssData.setRgbBright(rgbBright);
+      govssData.setRgbDark(rgbDark);
+      govssData.setDefaultRGB(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY).getRGB());
+
+      return govssData;
+
    }
 
    private void addPrefListener() {
@@ -249,7 +303,7 @@ public class PerformanceModelingChartView extends ViewPart {
    private void createActions() {
 
       _actionShowAllStressScoreValues = new ActionShowAllStressScoreValues(this);
-      _actionSynchVerticalChartScaling = new ActionSynchChartScale(this);
+      _actionSynchVerticalChartScaling = new ActionSynchronizeChartScale(this);
       _actionTrainingOptions = new ActionTrainingOptions();
    }
 
@@ -330,57 +384,12 @@ public class PerformanceModelingChartView extends ViewPart {
             .grab(true, false)
             .align(SWT.BEGINNING, SWT.FILL)
             .applyTo(_toolbar);
-      GridLayoutFactory.fillDefaults()//
-            .numColumns(9)
+      GridLayoutFactory
+            .fillDefaults()
             .margins(3, 3)
             .applyTo(_toolbar);
 //      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
       {
-         /*
-          * label: hr min
-          */
-         _lblHrMin = new Label(_toolbar, SWT.NONE);
-         GridDataFactory.fillDefaults()//
-//               .indent(5, 0)
-               .align(SWT.BEGINNING, SWT.CENTER)
-               .applyTo(_lblHrMin);
-         _lblHrMin.setText(Messages.Training_View_Label_LeftChartBorder);
-         _lblHrMin.setToolTipText(Messages.Training_View_Label_LeftChartBorder_Tooltip);
-
-         /*
-          * spinner: hr min
-          */
-         _spinnerHrLeft = new Spinner(_toolbar, SWT.BORDER);
-         _spinnerHrLeft.setMinimum(HR_LEFT_MIN_BORDER);
-         _spinnerHrLeft.setMaximum(HR_RIGHT_MAX_BORDER);
-         _spinnerHrLeft.addModifyListener(_defaultSpinnerModifyListener);
-         _spinnerHrLeft.addSelectionListener(_defaultSpinnerSelectionListener);
-         _spinnerHrLeft.addMouseWheelListener(_defaultSpinnerMouseWheelListener);
-
-         /*
-          * label: hr max
-          */
-         _lblHrMax = new Label(_toolbar, SWT.NONE);
-         GridDataFactory.fillDefaults()//
-               .align(SWT.BEGINNING, SWT.CENTER)
-               .applyTo(_lblHrMax);
-         _lblHrMax.setText(Messages.Training_View_Label_RightChartBorder);
-         _lblHrMax.setToolTipText(Messages.Training_View_Label_RightChartBorder_Tooltip);
-
-         /*
-          * spinner: hr max
-          */
-         _spinnerHrRight = new Spinner(_toolbar, SWT.BORDER);
-         _spinnerHrRight.setMinimum(HR_LEFT_MIN_BORDER);
-         _spinnerHrRight.setMaximum(HR_RIGHT_MAX_BORDER);
-         _spinnerHrRight.addModifyListener(_defaultSpinnerModifyListener);
-         _spinnerHrRight.addSelectionListener(_defaultSpinnerSelectionListener);
-         _spinnerHrRight.addMouseWheelListener(_defaultSpinnerMouseWheelListener);
-
-         // label: vertical separator
-         final Label label = new Label(_toolbar, SWT.SEPARATOR | SWT.VERTICAL);
-         label.setText(UI.EMPTY_STRING);
-
          /*
           * toolbar actions
           */
@@ -456,27 +465,14 @@ public class PerformanceModelingChartView extends ViewPart {
 
       final boolean isCustomScaling = _isShowAllValues == false;
 
-      _spinnerHrLeft.setEnabled(isCustomScaling);
-      _spinnerHrRight.setEnabled(isCustomScaling);
-      _lblHrMin.setEnabled(isCustomScaling);
-      _lblHrMax.setEnabled(isCustomScaling);
-
       _actionSynchVerticalChartScaling.setEnabled(isCustomScaling);
       _actionShowAllStressScoreValues.setEnabled(true);//isHrZoneAvailable);
+      _actionShowAllStressScoreValues.setChecked(true);//TODO by default, it's displayed. Put variable to state ?
       _actionTrainingOptions.setEnabled(true);//isHrZoneAvailable);
    }
 
    private void fillToolbar() {
 
-      /*
-       * View toolbar
-       */
-      /*
-       * final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
-       * tbm.add(_actionTrainingOptions);
-       * // update toolbar which creates the slideout
-       * tbm.update(true);
-       */
       /*
        * Header toolbar
        */
@@ -503,69 +499,72 @@ public class PerformanceModelingChartView extends ViewPart {
       return oldest ? oldestEntry.getKey() : newestEntry.getKey();
    }
 
+   /**
+    * GOVSS values
+    */
+   private ChartDataYSerie getGovssYSerie() {
+
+      final float[] govssValues = new float[_numberOfDays];
+
+      final HashMap<LocalDate, ArrayList<Long>> govssEntries = _currentPerson.getPerformanceModelingData().getGovssEntries();
+
+      for (final Map.Entry<LocalDate, ArrayList<Long>> entry : govssEntries.entrySet()) {
+         final LocalDate currentDate = entry.getKey();
+         final int index = (int) ChronoUnit.DAYS.between(_oldestEntryDate, currentDate);
+         final ArrayList<Long> tourIds = entry.getValue();
+
+         int totalGovssValue = 0;
+         for (final Long tourId : tourIds) {
+            final TourData currentTour = TourManager.getTour(tourId);
+
+            if (currentTour == null) {
+               continue;
+            }
+
+            totalGovssValue += TourManager.getTour(tourId).getGovss();
+         }
+         if (totalGovssValue > 10000 || totalGovssValue < 0) {
+            govssValues[index] = 0;
+         } else {
+            govssValues[index] = totalGovssValue;
+         }
+
+      }
+
+      final ChartDataYSerie govssData = new ChartDataYSerie(
+            ChartType.LINE,
+            govssValues,
+            false);
+
+      govssData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
+      govssData.setYTitle("Performance Data");//Messages.App_Label_H_MM);
+
+      final RGB[] rgbBright2 = new RGB[_numberOfDays];
+      final RGB[] rgbDark2 = new RGB[_numberOfDays];
+      final RGB[] rgbLine2 = new RGB[_numberOfDays];
+
+      for (int index = 0; index < _numberOfDays; ++index) {
+
+         rgbDark2[index] = new RGB(203, 25, 37);
+         rgbBright2[index] = new RGB(203, 25, 37);
+         rgbLine2[index] = new RGB(203, 25, 37);
+      }
+      final int[] colorIndex = new int[_numberOfDays];
+
+      govssData.setColorIndex(new int[][] { colorIndex });
+      govssData.setRgbLine(rgbLine2);
+      govssData.setRgbBright(rgbBright2);
+      govssData.setRgbDark(rgbDark2);
+      govssData.setDefaultRGB(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY).getRGB());
+
+      return govssData;
+
+   }
+
    private void initUI(final Composite parent) {
 
       _tk = new FormToolkit(parent.getDisplay());
 
-      _defaultSpinnerModifyListener = new ModifyListener() {
-         @Override
-         public void modifyText(final ModifyEvent e) {
-            if (_isUpdateUI) {
-               return;
-            }
-            onModifyHrBorder();
-         }
-      };
-
-      _defaultSpinnerSelectionListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            if (_isUpdateUI) {
-               return;
-            }
-            onModifyHrBorder();
-         }
-      };
-
-      _defaultSpinnerMouseWheelListener = new MouseWheelListener() {
-         @Override
-         public void mouseScrolled(final MouseEvent event) {
-            Util.adjustSpinnerValueOnMouseScroll(event);
-            if (_isUpdateUI) {
-               return;
-            }
-            onModifyHrBorder();
-         }
-      };
-
-   }
-
-   private void onModifyHrBorder() {
-
-      int left = _spinnerHrLeft.getSelection();
-      int right = _spinnerHrRight.getSelection();
-
-      _isUpdateUI = true;
-      {
-         if (left == HR_LEFT_MIN_BORDER && right == HR_LEFT_MIN_BORDER) {
-
-            right++;
-            _spinnerHrRight.setSelection(right);
-
-         } else if (left == HR_RIGHT_MAX_BORDER && right == HR_RIGHT_MAX_BORDER) {
-
-            left--;
-            _spinnerHrLeft.setSelection(left);
-
-         } else if (left >= right) {
-
-            left = right - 1;
-            _spinnerHrLeft.setSelection(left);
-         }
-      }
-      _isUpdateUI = false;
-
-      updateUI_10_stressScoreValuesFromModel();
    }
 
    /**
@@ -586,20 +585,10 @@ public class PerformanceModelingChartView extends ViewPart {
 
       _isSynchChartVerticalValues = Util.getStateBoolean(_state, STATE_IS_SYNC_VERTICAL_CHART_SCALING, false);
       _actionSynchVerticalChartScaling.setChecked(_isSynchChartVerticalValues);
-
-      _isUpdateUI = true;
-      {
-         _spinnerHrLeft.setSelection(Util.getStateInt(_state, STATE_HR_CHART_LEFT_BORDER, 60));
-         _spinnerHrRight.setSelection(Util.getStateInt(_state, STATE_HR_CHART_RIGHT_BORDER, 200));
-      }
-      _isUpdateUI = false;
    }
 
    @PersistState
    private void saveState() {
-
-      _state.put(STATE_HR_CHART_LEFT_BORDER, _spinnerHrLeft.getSelection());
-      _state.put(STATE_HR_CHART_RIGHT_BORDER, _spinnerHrRight.getSelection());
 
       _state.put(STATE_IS_SHOW_ALL_STRESS_SCORE_VALUES, _actionShowAllStressScoreValues.isChecked());
       _state.put(STATE_IS_SYNC_VERTICAL_CHART_SCALING, _actionSynchVerticalChartScaling.isChecked());
@@ -686,17 +675,17 @@ public class PerformanceModelingChartView extends ViewPart {
 
       // We find he oldest date
 
-      //We create an array fo which its capacity is the number of days between the first date and the last date
+      //We create an array for which its capacity is the number of days between the first date and the last date
 
       _oldestEntryDate = findExtremeDates(govssEntries, true);
       _newestEntryDate = findExtremeDates(govssEntries, false);
-      final int numberOfDays = (int) ChronoUnit.DAYS.between(_oldestEntryDate, _newestEntryDate) + 1;
+      _numberOfDays = (int) ChronoUnit.DAYS.between(_oldestEntryDate, _newestEntryDate) + 1;
 
-      final RGB[] rgbBright = new RGB[numberOfDays];
-      final RGB[] rgbDark = new RGB[numberOfDays];
-      final RGB[] rgbLine = new RGB[numberOfDays];
+      final RGB[] rgbBright = new RGB[_numberOfDays];
+      final RGB[] rgbDark = new RGB[_numberOfDays];
+      final RGB[] rgbLine = new RGB[_numberOfDays];
 
-      for (int index = 0; index < numberOfDays; ++index) {
+      for (int index = 0; index < _numberOfDays; ++index) {
 
          rgbDark[index] = new RGB(0, 255, 255);
          rgbBright[index] = new RGB(0, 255, 255);
@@ -706,17 +695,14 @@ public class PerformanceModelingChartView extends ViewPart {
       /*
        * create x-data series
        */
-      _xSerieDate = new double[numberOfDays];
+      _xSerieDate = new double[_numberOfDays];
 
-      final int[] colorIndex = new int[numberOfDays];
-
-      for (int index = 0; index < numberOfDays; index++) {
+      for (int index = 0; index < _numberOfDays; index++) {
 
          _xSerieDate[index] = index;
       }
 
-      final ChartDataModel chartDataModel = new ChartDataModel(ChartType.LINE);
-      chartDataModel.setIsGraphOverlapped(true);
+      _chartDataModel.setIsGraphOverlapped(true);
 
 /*
  * final ChartDataModel newChartDataModel = TourManager.getInstance().createChartDataModel(
@@ -735,44 +721,10 @@ public class PerformanceModelingChartView extends ViewPart {
       xData.setUnitLabel("date");//net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit);
       xData.setUnitStartValue(0);
 
-      chartDataModel.setXData(xData);
+      _chartDataModel.setXData(xData);
 
-      /*
-       * y-axis: GOVSS values
-       */
-      final float[] predictedPerformanceValues = new float[numberOfDays];
-      final HashMap<LocalDate, Integer> fitnessValuesSkiba = _currentPerson.getPerformanceModelingData().getFitnessValuesSkiba();
-      LocalDate currentDatetorneame = _oldestEntryDate;
-      for (int index = 0; index < numberOfDays; ++index) {
-
-         if (fitnessValuesSkiba.containsKey(currentDatetorneame)) {
-
-            // g(t)
-            predictedPerformanceValues[index] = fitnessValuesSkiba.get(currentDatetorneame);
-
-            //TODO h(t)
-
-            //TODO p(t) = g(t) - h(t)
-         }
-
-         currentDatetorneame = currentDatetorneame.plusDays(1);
-      }
-
-      final ChartDataYSerie govssData = new ChartDataYSerie(
-            ChartType.LINE,
-            predictedPerformanceValues,
-            false);
-
-      govssData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
-      govssData.setYTitle("GOVSS");//Messages.App_Label_H_MM);
-
-      govssData.setColorIndex(new int[][] { colorIndex });
-      govssData.setRgbLine(rgbLine);
-      govssData.setRgbBright(rgbBright);
-      govssData.setRgbDark(rgbDark);
-      govssData.setDefaultRGB(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY).getRGB());
-
-      chartDataModel.addYData(govssData);
+      final ChartDataYSerie performanceData = addPerformanceValues();
+      _chartDataModel.addYData(performanceData);
 
       //TODO when MTB supports displaying both BAR and LINES at the same time
       // set tool tip info
@@ -792,60 +744,11 @@ public class PerformanceModelingChartView extends ViewPart {
        * }
        */
 
-      final float[] govssValues = new float[numberOfDays];
-
-      for (final Map.Entry<LocalDate, ArrayList<Long>> entry : govssEntries.entrySet()) {
-         final LocalDate currentDate = entry.getKey();
-         final int index = (int) ChronoUnit.DAYS.between(_oldestEntryDate, currentDate);
-         final ArrayList<Long> tourIds = entry.getValue();
-
-         int totalGovssValue = 0;
-         for (final Long tourId : tourIds) {
-            final TourData currentTour = TourManager.getTour(tourId);
-
-            if (currentTour == null) {
-               continue;
-            }
-
-            totalGovssValue += TourManager.getTour(tourId).getGovss();
-         }
-         if (totalGovssValue > 10000 || totalGovssValue < 0) {
-            govssValues[index] = 0;
-         } else {
-            govssValues[index] = totalGovssValue;
-         }
-
-      }
-
-      final ChartDataYSerie performanceData = new ChartDataYSerie(
-            ChartType.LINE,
-            govssValues,
-            false);
-
-      performanceData.setAxisUnit(ChartDataSerie.AXIS_UNIT_NUMBER);
-      performanceData.setYTitle("Performance Data");//Messages.App_Label_H_MM);
-
-      final RGB[] rgbBright2 = new RGB[numberOfDays];
-      final RGB[] rgbDark2 = new RGB[numberOfDays];
-      final RGB[] rgbLine2 = new RGB[numberOfDays];
-
-      for (int index = 0; index < numberOfDays; ++index) {
-
-         rgbDark2[index] = new RGB(203, 25, 37);
-         rgbBright2[index] = new RGB(203, 25, 37);
-         rgbLine2[index] = new RGB(203, 25, 37);
-      }
-
-      performanceData.setColorIndex(new int[][] { colorIndex });
-      performanceData.setRgbLine(rgbLine2);
-      performanceData.setRgbBright(rgbBright2);
-      performanceData.setRgbDark(rgbDark2);
-      performanceData.setDefaultRGB(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GRAY).getRGB());
-
-      chartDataModel.addYData(performanceData);
+      final ChartDataYSerie govssSerie = getGovssYSerie();
+      _chartDataModel.addYData(govssSerie);
 
       // show the new data data model in the chart
-      _chartPerformanceModelingData.updateChart(chartDataModel, false);
+      _chartPerformanceModelingData.updateChart(_chartDataModel, false);
       // _chartPerformanceModelingData.up = TourManager.getInstance().getActivePerformanceModelingChartView();
    }
 
