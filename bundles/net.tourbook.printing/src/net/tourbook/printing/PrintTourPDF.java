@@ -114,18 +114,6 @@ public class PrintTourPDF extends PrintTourExtension {
             // setup xml input source
             final String xml = object.toXml();
 
-//				  // debug logging
-//				  System.err.println("--------------------------------------------------------");
-//				  System.err.println(object.toXml());
-//				  System.err.println("--------------------------------------------------------");
-//				  XStream xStream = new XStream();
-//				  try {
-//				  	FileUtils.writeStringToFile(new File("/home/jkl/tourdata_xs.xml"),
-//				  	xStream.toXML(object));
-//				  } catch (IOException e) {
-//				  	e.printStackTrace();
-//				  }
-
             // prepare xsl file for transformation
             final ClassLoader classLoader = getClass().getClassLoader();
             final InputStream xslFile = classLoader.getResourceAsStream(TOURDATA_2_FO_XSL);
