@@ -13,12 +13,7 @@ Bundle-ClassPath: avalon-framework-api-4.3.1.jar,
  fop-2.4.jar,
  jaxb-api-2.4.0-b180830.0359.jar
 Export-Package: 
- javax.xml.bind,
  javax.xml.bind.annotation,
- javax.xml.bind.annotation.adapters,
- javax.xml.bind.attachment,
- javax.xml.bind.helpers,
- javax.xml.bind.util,
  org.apache.avalon.framework,
  org.apache.avalon.framework.activity,
  org.apache.avalon.framework.component,
