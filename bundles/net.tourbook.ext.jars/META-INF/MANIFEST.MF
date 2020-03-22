@@ -41,7 +41,6 @@ Export-Package:
  org.apache.commons.imaging.common,
  org.apache.commons.imaging.formats.jpeg,
  org.apache.commons.imaging.formats.jpeg.iptc,
- org.apache.commons.imaging.formats.jpeg.xmp,
  org.apache.commons.imaging.formats.tiff,
  org.apache.commons.imaging.formats.tiff.constants,
  org.apache.commons.imaging.formats.tiff.taginfos,
