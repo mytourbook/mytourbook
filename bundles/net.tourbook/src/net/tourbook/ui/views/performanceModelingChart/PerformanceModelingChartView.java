@@ -97,7 +97,7 @@ public class PerformanceModelingChartView extends ViewPart {
    private boolean                        _isShowAllValues;
    private boolean                        _isSynchChartVerticalValues;
 
-   private ChartDataModel                 _chartDataModel = new ChartDataModel(ChartType.LINE);
+   private ChartDataModel                 _chartDataModel;
 
    private ToolBarManager                 _headerToolbarManager;
 
@@ -157,6 +157,11 @@ public class PerformanceModelingChartView extends ViewPart {
    }
 
    public void actionShowHidePerformanceValues(final boolean showValues) {
+
+      if (_chartDataModel == null) {
+         return;
+      }
+
       if (showValues == false) {
          final ChartDataModel currentData = _chartPerformanceModelingData.getChartDataModel();
          final ArrayList<ChartDataYSerie> ySeries = currentData.getYData();
@@ -314,9 +319,6 @@ public class PerformanceModelingChartView extends ViewPart {
 
       createActions();
       fillToolbar();
-
-      // show default page
-      _pageBook.showPage(_page_NoPerson);
 
       addPrefListener();
       addTrainingStressDataListener();
@@ -668,8 +670,10 @@ public class PerformanceModelingChartView extends ViewPart {
       // We get the govssentries
       if (_currentPerson.getPerformanceModelingData() == null ||
             _currentPerson.getPerformanceModelingData().getGovssEntries() == null) {
+         _chartPerformanceModelingData.updateChart(null, false);
          return;
       }
+      _chartDataModel = new ChartDataModel(ChartType.LINE);
 
       final HashMap<LocalDate, ArrayList<Long>> govssEntries = _currentPerson.getPerformanceModelingData().getGovssEntries();
 
