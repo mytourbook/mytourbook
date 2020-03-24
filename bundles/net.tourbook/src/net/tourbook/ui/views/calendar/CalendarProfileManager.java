@@ -604,11 +604,11 @@ public class CalendarProfileManager {
       createProfile_0_AllDefaultDefaultProfiles(_allDefaultDefaultProfiles);
    }
    //
-   private static CalendarProfile    _activeCalendarProfile;
+   private static CalendarProfile                              _activeCalendarProfile;
    //
-   private static String             _fromXml_ActiveCalendarProfileId;
+   private static String                                       _fromXml_ActiveCalendarProfileId;
    //
-   private final static ListenerList _profileListener = new ListenerList();
+   private final static ListenerList<ICalendarProfileListener> _profileListener = new ListenerList<>();
 
    static class CalendarColor_ComboData {
 

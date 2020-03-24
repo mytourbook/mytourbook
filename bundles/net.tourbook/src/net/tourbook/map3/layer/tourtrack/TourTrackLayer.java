@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2020  Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -46,217 +46,217 @@ import org.eclipse.swt.graphics.RGB;
 
 public class TourTrackLayer extends RenderableLayer implements SelectListener, ICheckStateListener {
 
-	public static final String			MAP3_LAYER_ID			= "TourTrackLayer";			//$NON-NLS-1$
+   public static final String       MAP3_LAYER_ID        = "TourTrackLayer";          //$NON-NLS-1$
 
-	private final TourPositionColors	_tourPositionColors;
-	private IMapColorProvider			_colorProvider;
+   private final TourPositionColors _tourPositionColors;
+   private IMapColorProvider        _colorProvider;
 
-	private ITrackPath					_lastHoveredTourTrack;
-	private Integer						_lastHoveredPositionIndex;
+   private ITrackPath               _lastHoveredTourTrack;
+   private Integer                  _lastHoveredPositionIndex;
 
-	/**
-	 * Contains the track which is currently selected, otherwise <code>null</code>.
-	 */
-	private ITrackPath					_selectedTrackPath;
+   /**
+    * Contains the track which is currently selected, otherwise <code>null</code>.
+    */
+   private ITrackPath               _selectedTrackPath;
 
-	private ShapeAttributes				_normalAttributes		= new BasicShapeAttributes();
-	private ShapeAttributes				_hoveredAttributes		= new BasicShapeAttributes();
-	private ShapeAttributes				_selecedAttributes		= new BasicShapeAttributes();
-	private ShapeAttributes				_hovselAttributes		= new BasicShapeAttributes();
+   private ShapeAttributes          _normalAttributes    = new BasicShapeAttributes();
+   private ShapeAttributes          _hoveredAttributes   = new BasicShapeAttributes();
+   private ShapeAttributes          _selecedAttributes   = new BasicShapeAttributes();
+   private ShapeAttributes          _hovselAttributes    = new BasicShapeAttributes();
 
-	/**
-	 * This flag keeps track of adding/removing the listener that it is not done more than once.
-	 */
-	private int							_lastAddRemoveAction	= -1;
+   /**
+    * This flag keeps track of adding/removing the listener that it is not done more than once.
+    */
+   private int                      _lastAddRemoveAction = -1;
 
-	public TourTrackLayer(final IDialogSettings state) {
+   public TourTrackLayer(final IDialogSettings state) {
 
-		_tourPositionColors = new TourPositionColors();
+      _tourPositionColors = new TourPositionColors();
 
-		addPropertyChangeListener(this);
-	}
+      addPropertyChangeListener(this);
+   }
 
-	/**
-	 * Create a path for each tour.
-	 * 
-	 * @param allTours
-	 * @return
-	 */
-	public ArrayList<TourMap3Position> createTrackPaths(final ArrayList<TourData> allTours) {
+   /**
+    * Create a path for each tour.
+    *
+    * @param allTours
+    * @return
+    */
+   public ArrayList<TourMap3Position> createTrackPaths(final ArrayList<TourData> allTours) {
 
 //		final long start = System.currentTimeMillis();
 
-		// preserve track selection
-		Long selectedTourId = null;
-		if (_selectedTrackPath != null) {
-			selectedTourId = _selectedTrackPath.getTourTrack().getTourData().getTourId();
-		}
-		_selectedTrackPath = null;
+      // preserve track selection
+      Long selectedTourId = null;
+      if (_selectedTrackPath != null) {
+         selectedTourId = _selectedTrackPath.getTourTrack().getTourData().getTourId();
+      }
+      _selectedTrackPath = null;
 
-		// remove all tracks from layer
-		removeAllRenderables();
+      // remove all tracks from layer
+      removeAllRenderables();
 
-		final ArrayList<TourMap3Position> allPositions = new ArrayList<TourMap3Position>();
+      final ArrayList<TourMap3Position> allPositions = new ArrayList<>();
 
-		for (final TourData tourData : allTours) {
+      for (final TourData tourData : allTours) {
 
-			final double[] latSerie = tourData.latitudeSerie;
-			final double[] lonSerie = tourData.longitudeSerie;
+         final double[] latSerie = tourData.latitudeSerie;
+         final double[] lonSerie = tourData.longitudeSerie;
 
-			if (latSerie == null) {
-				continue;
-			}
+         if (latSerie == null) {
+            continue;
+         }
 
-			final float[] altiSerie = tourData.altitudeSerie;
-			final float[] dataSerie = getDataSerie(tourData);
+         final float[] altiSerie = tourData.altitudeSerie;
+         final float[] dataSerie = getDataSerie(tourData);
 
-			/*
-			 * create positions for all slices
-			 */
-			final ArrayList<TourMap3Position> trackPositions = new ArrayList<TourMap3Position>();
+         /*
+          * create positions for all slices
+          */
+         final ArrayList<TourMap3Position> trackPositions = new ArrayList<>();
 
-			for (int serieIndex = 0; serieIndex < latSerie.length; serieIndex++) {
+         for (int serieIndex = 0; serieIndex < latSerie.length; serieIndex++) {
 
-				final double lat = latSerie[serieIndex];
-				final double lon = lonSerie[serieIndex];
+            final double lat = latSerie[serieIndex];
+            final double lon = lonSerie[serieIndex];
 
-				float altitude = 0;
-				if (altiSerie != null) {
-					altitude = altiSerie[serieIndex];
-				}
+            float altitude = 0;
+            if (altiSerie != null) {
+               altitude = altiSerie[serieIndex];
+            }
 
-				float dataSerieValue = 0;
-				if (dataSerie != null) {
-					dataSerieValue = dataSerie[serieIndex];
-				}
+            float dataSerieValue = 0;
+            if (dataSerie != null) {
+               dataSerieValue = dataSerie[serieIndex];
+            }
 
-				final TourMap3Position trackPosition = new TourMap3Position(
-						LatLon.fromDegrees(lat, lon),
-						altitude,
-						dataSerieValue);
+            final TourMap3Position trackPosition = new TourMap3Position(
+                  LatLon.fromDegrees(lat, lon),
+                  altitude,
+                  dataSerieValue);
 
-				if (_colorProvider instanceof IDiscreteColorProvider) {
+            if (_colorProvider instanceof IDiscreteColorProvider) {
 
-					final IDiscreteColorProvider discreteColorProvider = (IDiscreteColorProvider) _colorProvider;
+               final IDiscreteColorProvider discreteColorProvider = (IDiscreteColorProvider) _colorProvider;
 
-					trackPosition.colorValue = discreteColorProvider.getColorValue(tourData, serieIndex);
-				}
+               trackPosition.colorValue = discreteColorProvider.getColorValue(tourData, serieIndex);
+            }
 
-				trackPositions.add(trackPosition);
-			}
+            trackPositions.add(trackPosition);
+         }
 
-			/*
-			 * create one path for each tour
-			 */
-			final ITrackPath trackPath = new TrackPathOptimized(trackPositions);
+         /*
+          * create one path for each tour
+          */
+         final ITrackPath trackPath = new TrackPathOptimized(trackPositions);
 
-			final TourTrack tourTrack = new TourTrack(trackPath, tourData, trackPositions, _colorProvider);
+         final TourTrack tourTrack = new TourTrack(trackPath, tourData, trackPositions, _colorProvider);
 
-			trackPath.setTourTrack(tourTrack);
+         trackPath.setTourTrack(tourTrack);
 
-			// Show how to make the colors vary along the paths.
-			trackPath.getPath().setPositionColors(_tourPositionColors);
+         // Show how to make the colors vary along the paths.
+         trackPath.getPath().setPositionColors(_tourPositionColors);
 
-			if (selectedTourId != null && tourData.getTourId().equals(selectedTourId)) {
-				// set selected track
-				_selectedTrackPath = trackPath;
-			}
+         if (selectedTourId != null && tourData.getTourId().equals(selectedTourId)) {
+            // set selected track
+            _selectedTrackPath = trackPath;
+         }
 
-			setPathAttributes(trackPath);
+         setPathAttributes(trackPath);
 
-			// add track to layer
-			addRenderable(trackPath.getPath());
+         // add track to layer
+         addRenderable(trackPath.getPath());
 
-			// keep all positions which is used to find the outline for ALL selected tours
-			allPositions.addAll(trackPositions);
-		}
+         // keep all positions which is used to find the outline for ALL selected tours
+         allPositions.addAll(trackPositions);
+      }
 
-		_tourPositionColors.updateColorProvider(allTours);
+      _tourPositionColors.updateColorProvider(allTours);
 
-		// initialize previously selected track
-		if (_selectedTrackPath != null) {
+      // initialize previously selected track
+      if (_selectedTrackPath != null) {
 
-			_selectedTrackPath.getTourTrack().setSelected(true);
+         _selectedTrackPath.getTourTrack().setSelected(true);
 
-			setPathHighlighAttributes(_selectedTrackPath);
-		}
+         setPathHighlighAttributes(_selectedTrackPath);
+      }
 
 //		System.out.println(UI.timeStampNano() + " showTour\t" + (System.currentTimeMillis() - start) + " ms");
 //		// TODO remove SYSTEM.OUT.PRINTLN
 
-		return allPositions;
-	}
+      return allPositions;
+   }
 
-	/**
-	 * Set the data serie which is painted
-	 * 
-	 * @param tourData
-	 */
-	private float[] getDataSerie(final TourData tourData) {
+   /**
+    * Set the data serie which is painted
+    *
+    * @param tourData
+    */
+   private float[] getDataSerie(final TourData tourData) {
 
-		switch (_colorProvider.getGraphId()) {
-		case Altitude:
-			return tourData.altitudeSerie;
+      switch (_colorProvider.getGraphId()) {
+      case Altitude:
+         return tourData.altitudeSerie;
 
-		case Gradient:
-			return tourData.getGradientSerie();
+      case Gradient:
+         return tourData.getGradientSerie();
 
-		case Pace:
-			return tourData.getPaceSerieSeconds();
+      case Pace:
+         return tourData.getPaceSerieSeconds();
 
-		case Pulse:
-			return tourData.pulseSerie;
+      case Pulse:
+         return tourData.pulseSerie;
 
-		case Speed:
-			return tourData.getSpeedSerie();
+      case Speed:
+         return tourData.getSpeedSerie();
 
-		case HrZone:
-			return tourData.pulseSerie;
+      case HrZone:
+         return tourData.pulseSerie;
 
-		default:
-			return tourData.altitudeSerie;
-		}
-	}
+      default:
+         return tourData.altitudeSerie;
+      }
+   }
 
-	/**
-	 * @return Returns selected tour track or <code>null</code> when nothing is selected.
-	 */
-	public ITrackPath getSelectedTrack() {
-		return _selectedTrackPath;
-	}
+   /**
+    * @return Returns selected tour track or <code>null</code> when nothing is selected.
+    */
+   public ITrackPath getSelectedTrack() {
+      return _selectedTrackPath;
+   }
 
-	public void onModifyConfig() {
+   public void onModifyConfig() {
 
-		final TourTrackConfig trackConfig = TourTrackConfigManager.getActiveConfig();
+      final TourTrackConfig trackConfig = TourTrackConfigManager.getActiveConfig();
 
-		if (trackConfig.isRecreateTracks()) {
+      if (trackConfig.isRecreateTracks()) {
 
-			// track data has changed
+         // track data has changed
 
-			Map3Manager.getMap3View().showAllTours(false);
+         Map3Manager.getMap3View().showAllTours(false);
 
-		} else {
+      } else {
 
-			for (final Renderable renderable : getRenderables()) {
+         for (final Renderable renderable : getRenderables()) {
 
-				if (renderable instanceof ITrackPath) {
-					setPathAttributes((ITrackPath) renderable);
-				}
-			}
+            if (renderable instanceof ITrackPath) {
+               setPathAttributes((ITrackPath) renderable);
+            }
+         }
 
-			// ensure path modifications are redrawn
-			Map3Manager.getWWCanvas().redraw();
-		}
-	}
+         // ensure path modifications are redrawn
+         Map3Manager.getWWCanvas().redraw();
+      }
+   }
 
-	@Override
-	public void onSetCheckState(final TVIMap3Layer tviMap3Layer) {
+   @Override
+   public void onSetCheckState(final TVIMap3Layer tviMap3Layer) {
 
-		setupWWSelectionListener(tviMap3Layer.isLayerVisible);
-	}
+      setupWWSelectionListener(tviMap3Layer.isLayerVisible);
+   }
 
-	@Override
-	public void propertyChange(final PropertyChangeEvent propEvent) {
+   @Override
+   public void propertyChange(final PropertyChangeEvent propEvent) {
 
 //		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] \t") //$NON-NLS-1$ //$NON-NLS-2$
 //				+ propEvent.getPropertyName()
@@ -264,604 +264,605 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 //				+ propEvent);
 //		// TODO remove SYSTEM.OUT
 
-		if (propEvent.getPropertyName().equals(Map3Manager.PROPERTY_NAME_ENABLED)) {
+      if (propEvent.getPropertyName().equals(Map3Manager.PROPERTY_NAME_ENABLED)) {
 
-			// layer is set to be visible/hidden
+         // layer is set to be visible/hidden
 
-			final boolean isLayerVisible = propEvent.getNewValue().equals(Boolean.TRUE);
+         final boolean isLayerVisible = propEvent.getNewValue().equals(Boolean.TRUE);
 
-			setupWWSelectionListener(isLayerVisible);
-		}
-	}
+         setupWWSelectionListener(isLayerVisible);
+      }
+   }
 
-	public void saveState(final IDialogSettings state) {
+   public void saveState(final IDialogSettings state) {
 
-		TourTrackConfigManager.saveState();
-	}
+      TourTrackConfigManager.saveState();
+   }
 
-	/**
-	 * This listener is set in set {@link #setupWWSelectionListener(boolean)}
-	 * <p>
-	 * {@inheritDoc}
-	 * 
-	 * @see gov.nasa.worldwind.event.SelectListener#selected(gov.nasa.worldwind.event.SelectEvent)
-	 */
-	@Override
-	public void selected(final SelectEvent event) {
+   /**
+    * This listener is set in set {@link #setupWWSelectionListener(boolean)}
+    * <p>
+    * {@inheritDoc}
+    *
+    * @see gov.nasa.worldwind.event.SelectListener#selected(gov.nasa.worldwind.event.SelectEvent)
+    */
+   @Override
+   public void selected(final SelectEvent event) {
 
-		if (event.getMouseEvent() != null && event.getMouseEvent().isConsumed()) {
-			return;
-		}
+      if (event.getMouseEvent() != null && event.getMouseEvent().isConsumed()) {
+         return;
+      }
 
-		final String eventAction = event.getEventAction();
+      final String eventAction = event.getEventAction();
 
 //		System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] \teventAction: " + eventAction);
 //		// TODO remove SYSTEM.OUT.PRINTLN
 
-		if (Map3Manager.getMap3View().isContextMenuVisible()) {
+      if (Map3Manager.getMap3View().isContextMenuVisible()) {
 
-			// prevent actions when context menu is visible
+         // prevent actions when context menu is visible
 
-			return;
-		}
+         return;
+      }
 
-		if (eventAction == SelectEvent.HOVER) {
+      if (eventAction == SelectEvent.HOVER) {
 
-			// not yet used
+         // not yet used
 
-		} else if (eventAction == SelectEvent.RIGHT_PRESS) {
+      } else if (eventAction == SelectEvent.RIGHT_PRESS) {
 
-			/**
-			 * When the context menu should be displayed and the right mouse button is pressed,
-			 * first a SelectEvent.HOVER is fired before SelectEvent.RIGHT_PRESS is fired. Therefor
-			 * the context state must be set here.
-			 * <p>
-			 * The context menu is opened with a ww mouse listener in Map3View.
-			 */
+         /**
+          * When the context menu should be displayed and the right mouse button is pressed,
+          * first a SelectEvent.HOVER is fired before SelectEvent.RIGHT_PRESS is fired. Therefor
+          * the context state must be set here.
+          * <p>
+          * The context menu is opened with a ww mouse listener in Map3View.
+          */
 
 //			map3View.setContextMenuVisible(true);
 
-		} else {
+      } else {
 
-			// get hovered object
-			final PickedObject pickedObject = event.getTopPickedObject();
+         // get hovered object
+         final PickedObject pickedObject = event.getTopPickedObject();
 
-			ITrackPath hoveredTrackPath = null;
-			Integer hoveredPositionIndex = null;
+         ITrackPath hoveredTrackPath = null;
+         Integer hoveredPositionIndex = null;
 
-			if (pickedObject != null && pickedObject.getObject() instanceof ITrackPath) {
+         if (pickedObject != null && pickedObject.getObject() instanceof ITrackPath) {
 
-				hoveredTrackPath = (ITrackPath) pickedObject.getObject();
+            hoveredTrackPath = (ITrackPath) pickedObject.getObject();
 
-				final Object pickOrdinal = pickedObject.getValue(AVKey.ORDINAL);
-				hoveredPositionIndex = (Integer) pickOrdinal;
-			}
+            final Object pickOrdinal = pickedObject.getValue(AVKey.ORDINAL);
+            hoveredPositionIndex = (Integer) pickOrdinal;
+         }
 
-			selectTrackPath(hoveredTrackPath, hoveredPositionIndex, eventAction, true);
-		}
-	}
+         selectTrackPath(hoveredTrackPath, hoveredPositionIndex, eventAction, true);
+      }
+   }
 
-	/**
-	 * @param hoveredTrackPath
-	 * @param hoveredPositionIndex
-	 *            Can be <code>null</code> when a position is not hovered.
-	 * @param eventAction
-	 *            To select a track path set this parameter to {@link SelectEvent#LEFT_CLICK}.
-	 * @param isFireSelection
-	 */
-	private void selectTrackPath(	final ITrackPath hoveredTrackPath,
-									final Integer hoveredPositionIndex,
-									final String eventAction,
-									final boolean isFireSelection) {
+   /**
+    * @param hoveredTrackPath
+    * @param hoveredPositionIndex
+    *           Can be <code>null</code> when a position is not hovered.
+    * @param eventAction
+    *           To select a track path set this parameter to {@link SelectEvent#LEFT_CLICK}.
+    * @param isFireSelection
+    */
+   private void selectTrackPath(final ITrackPath hoveredTrackPath,
+                                final Integer hoveredPositionIndex,
+                                final String eventAction,
+                                final boolean isFireSelection) {
 
-		final ITrackPath backupSelectedTrackPath = _selectedTrackPath;
+      final ITrackPath backupSelectedTrackPath = _selectedTrackPath;
 
-		if (eventAction == SelectEvent.LEFT_CLICK) {
+      if (eventAction == SelectEvent.LEFT_CLICK) {
 
-			if (_lastHoveredTourTrack != null) {
+         if (_lastHoveredTourTrack != null) {
 
-				// update select state
-				selectTrackPath_Clicked_TourTrack(_lastHoveredTourTrack);
-			}
-		}
+            // update select state
+            selectTrackPath_Clicked_TourTrack(_lastHoveredTourTrack);
+         }
+      }
 
-		if (eventAction == SelectEvent.ROLLOVER || eventAction == SelectEvent.LEFT_CLICK) {
+      if (eventAction == SelectEvent.ROLLOVER || eventAction == SelectEvent.LEFT_CLICK) {
 
-			// updated colors
+         // updated colors
 
-			selectTrackPath_Hovered_WithPositionColor(hoveredTrackPath, hoveredPositionIndex);
+         selectTrackPath_Hovered_WithPositionColor(hoveredTrackPath, hoveredPositionIndex);
 
-			_lastHoveredTourTrack = hoveredTrackPath;
-			_lastHoveredPositionIndex = hoveredPositionIndex;
-		}
+         _lastHoveredTourTrack = hoveredTrackPath;
+         _lastHoveredPositionIndex = hoveredPositionIndex;
+      }
 
-		// fire selection
-		if (isFireSelection) {
+      // fire selection
+      if (isFireSelection) {
 
-			final Map3View map3View = Map3Manager.getMap3View();
+         final Map3View map3View = Map3Manager.getMap3View();
 
-			if (_selectedTrackPath != null
-					&& (backupSelectedTrackPath == null || _selectedTrackPath != backupSelectedTrackPath)) {
+         if (_selectedTrackPath != null
+               && (backupSelectedTrackPath == null || _selectedTrackPath != backupSelectedTrackPath)) {
 
-				// a new track is selected, fire selection
+            // a new track is selected, fire selection
 
-				map3View.fireTourSelection(new SelectionTourData(_selectedTrackPath.getTourTrack().getTourData()));
+            map3View.fireTourSelection(new SelectionTourData(_selectedTrackPath.getTourTrack().getTourData()));
 
-			} else {
+         } else {
 
-				map3View.setTourInfo(hoveredTrackPath, hoveredPositionIndex);
-			}
-		}
-	}
+            map3View.setTourInfo(hoveredTrackPath, hoveredPositionIndex);
+         }
+      }
+   }
 
-	/**
-	 * @param tourData
-	 * @return Returns track positions or <code>null</code> when track is already selected.
-	 */
-	public ArrayList<TourMap3Position> selectTrackPath(final TourData tourData) {
+   /**
+    * @param tourData
+    * @return Returns track positions or <code>null</code> when track is already selected.
+    */
+   public ArrayList<TourMap3Position> selectTrackPath(final TourData tourData) {
 
-		if (_selectedTrackPath != null && _selectedTrackPath.getTourTrack().getTourData().equals(tourData)) {
+      if (_selectedTrackPath != null && _selectedTrackPath.getTourTrack().getTourData().equals(tourData)) {
 
-			// track is already selected -> nothing to do
+         // track is already selected -> nothing to do
 
-			return null;
-		}
+         return null;
+      }
 
-		for (final Renderable renderable : getRenderables()) {
+      for (final Renderable renderable : getRenderables()) {
 
-			if (renderable instanceof ITrackPath) {
+         if (renderable instanceof ITrackPath) {
 
-				final ITrackPath trackPath = (ITrackPath) renderable;
+            final ITrackPath trackPath = (ITrackPath) renderable;
 
-				if (trackPath.getTourTrack().getTourData().equals(tourData)) {
+            if (trackPath.getTourTrack().getTourData().equals(tourData)) {
 
-					// found track for the selectable tour
+               // found track for the selectable tour
 
-					// prevent to fire a selection again because we are currently within a fired selection
+               // prevent to fire a selection again because we are currently within a fired selection
 
-					// 1. hover track which should be selected, this will set the last hovered tour track
-					selectTrackPath(trackPath, null, SelectEvent.ROLLOVER, false);
+               // 1. hover track which should be selected, this will set the last hovered tour track
+               selectTrackPath(trackPath, null, SelectEvent.ROLLOVER, false);
 
-					// 2. select tour track
-					selectTrackPath(trackPath, null, SelectEvent.LEFT_CLICK, false);
+               // 2. select tour track
+               selectTrackPath(trackPath, null, SelectEvent.LEFT_CLICK, false);
 
-					// 3. simulate hover out of the track that the tour is displayed with the selected color
-					//    and not with the hovered color
-					selectTrackPath(null, null, SelectEvent.ROLLOVER, false);
+               // 3. simulate hover out of the track that the tour is displayed with the selected color
+               //    and not with the hovered color
+               selectTrackPath(null, null, SelectEvent.ROLLOVER, false);
 
-					return trackPath.getTourTrack().getTrackPositions();
-				}
-			}
-		}
+               return trackPath.getTourTrack().getTrackPositions();
+            }
+         }
+      }
 
-		// this case should not happen
-		return null;
-	}
+      // this case should not happen
+      return null;
+   }
 
-	/**
-	 * @param clickedTrack
-	 *            Contains the {@link ITrackPath} which is clicked with the mouse.
-	 */
-	private void selectTrackPath_Clicked_TourTrack(final ITrackPath clickedTrack) {
+   /**
+    * @param clickedTrack
+    *           Contains the {@link ITrackPath} which is clicked with the mouse.
+    */
+   private void selectTrackPath_Clicked_TourTrack(final ITrackPath clickedTrack) {
 
-		if (clickedTrack == _selectedTrackPath) {
+      if (clickedTrack == _selectedTrackPath) {
 
-			// same tour is clicked again, deselect path
+         // same tour is clicked again, deselect path
 
-			_selectedTrackPath.getTourTrack().setSelected(false);
-			setPathHighlighAttributes(_selectedTrackPath);
+         _selectedTrackPath.getTourTrack().setSelected(false);
+         setPathHighlighAttributes(_selectedTrackPath);
 
-			_selectedTrackPath = null;
+         _selectedTrackPath = null;
 
-		} else {
+      } else {
 
-			// another tour is clicked
+         // another tour is clicked
 
-			if (_selectedTrackPath != null) {
+         if (_selectedTrackPath != null) {
 
-				// deselect last selected tour
+            // deselect last selected tour
 
-				_selectedTrackPath.getTourTrack().setSelected(false);
-				setPathHighlighAttributes(_selectedTrackPath);
+            _selectedTrackPath.getTourTrack().setSelected(false);
+            setPathHighlighAttributes(_selectedTrackPath);
 
-				// Very Important: reset colors that the track is displayed again with position colors !!!
-				_selectedTrackPath.setPicked(false, null);
+            // Very Important: reset colors that the track is displayed again with position colors !!!
+            _selectedTrackPath.setPicked(false, null);
 
-				_selectedTrackPath = null;
-			}
+            _selectedTrackPath = null;
+         }
 
-			// select clicked tour
+         // select clicked tour
 
-			_selectedTrackPath = clickedTrack;
+         _selectedTrackPath = clickedTrack;
 
-			_selectedTrackPath.getTourTrack().setSelected(true);
-			setPathHighlighAttributes(_selectedTrackPath);
-		}
-	}
+         _selectedTrackPath.getTourTrack().setSelected(true);
+         setPathHighlighAttributes(_selectedTrackPath);
+      }
+   }
 
-	private void selectTrackPath_Hovered_WithAttributeColor(final ITrackPath hoveredTrack) {
+   @SuppressWarnings("unused")
+   private void selectTrackPath_Hovered_WithAttributeColor(final ITrackPath hoveredTrack) {
 
-		if (_lastHoveredTourTrack == hoveredTrack) {
-			// same tour as before
+      if (_lastHoveredTourTrack == hoveredTrack) {
+         // same tour as before
 //			System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] \tsame tour as before");
 //			// TODO remove SYSTEM.OUT.PRINTLN
-			return;
-		}
+         return;
+      }
 
-		// Turn off highlight if on.
-		if (_lastHoveredTourTrack != null && _lastHoveredTourTrack.getTourTrack().isSelected() == false) {
+      // Turn off highlight if on.
+      if (_lastHoveredTourTrack != null && _lastHoveredTourTrack.getTourTrack().isSelected() == false) {
 //			_lastHoveredTourTrack.setPathHighlighted(false);
-		}
+      }
 
-		// Turn on highlight if object is selected.
-		if (hoveredTrack != null) {
+      // Turn on highlight if object is selected.
+      if (hoveredTrack != null) {
 //			hoveredTrack.setPathHighlighted(true);
-		}
-	}
+      }
+   }
 
-	private void selectTrackPath_Hovered_WithPositionColor(	final ITrackPath hoveredTrack,
-															final Integer hoveredPositionIndex) {
+   private void selectTrackPath_Hovered_WithPositionColor(final ITrackPath hoveredTrack,
+                                                          final Integer hoveredPositionIndex) {
 
-		if (hoveredTrack == null) {
+      if (hoveredTrack == null) {
 
-			// a new tour track is not picked
+         // a new tour track is not picked
 
-			if (_lastHoveredTourTrack == null) {
+         if (_lastHoveredTourTrack == null) {
 
-				// nothing is picked, nothing must be reset
+            // nothing is picked, nothing must be reset
 
-			} else {
+         } else {
 
-				// reset last picked tour
+            // reset last picked tour
 
-				_lastHoveredTourTrack.setPicked(false, null);
-				setPathHighlighAttributes(_lastHoveredTourTrack);
-			}
+            _lastHoveredTourTrack.setPicked(false, null);
+            setPathHighlighAttributes(_lastHoveredTourTrack);
+         }
 
-		} else {
+      } else {
 
-			// a tour track is picked
+         // a tour track is picked
 
-			if (_lastHoveredTourTrack == null) {
+         if (_lastHoveredTourTrack == null) {
 
-				// a new track is picked
+            // a new track is picked
 
-				hoveredTrack.setPicked(true, hoveredPositionIndex);
-				setPathHighlighAttributes(hoveredTrack);
+            hoveredTrack.setPicked(true, hoveredPositionIndex);
+            setPathHighlighAttributes(hoveredTrack);
 
-			} else {
+         } else {
 
-				// an old track is picked, check if a new track is picked
+            // an old track is picked, check if a new track is picked
 
-				if (_lastHoveredTourTrack == hoveredTrack) {
+            if (_lastHoveredTourTrack == hoveredTrack) {
 
-					// the same track is picked, check if another position is picked
+               // the same track is picked, check if another position is picked
 
-					if (_lastHoveredPositionIndex == null) {
+               if (_lastHoveredPositionIndex == null) {
 
-						// a new position is picked
+                  // a new position is picked
 
-						hoveredTrack.setPicked(true, hoveredPositionIndex);
-						setPathHighlighAttributes(hoveredTrack);
+                  hoveredTrack.setPicked(true, hoveredPositionIndex);
+                  setPathHighlighAttributes(hoveredTrack);
 
-					} else {
+               } else {
 
-						// an old position is picked
+                  // an old position is picked
 
-						if (hoveredPositionIndex == null) {
+                  if (hoveredPositionIndex == null) {
 
-							// a new position is not picked, reset pick position but keep the track picked
+                     // a new position is not picked, reset pick position but keep the track picked
 
-							hoveredTrack.setPicked(true, null);
-							setPathHighlighAttributes(hoveredTrack);
+                     hoveredTrack.setPicked(true, null);
+                     setPathHighlighAttributes(hoveredTrack);
 
-						} else {
+                  } else {
 
-							if (hoveredPositionIndex.equals(_lastHoveredPositionIndex)) {
+                     if (hoveredPositionIndex.equals(_lastHoveredPositionIndex)) {
 
-								// the same position and the same track is picked, do nothing
+                        // the same position and the same track is picked, do nothing
 
-							} else {
+                     } else {
 
-								// another position is picked
+                        // another position is picked
 
-								hoveredTrack.setPicked(true, hoveredPositionIndex);
-								setPathHighlighAttributes(hoveredTrack);
-							}
-						}
-					}
+                        hoveredTrack.setPicked(true, hoveredPositionIndex);
+                        setPathHighlighAttributes(hoveredTrack);
+                     }
+                  }
+               }
 
-				} else {
+            } else {
 
-					// another track is picked
+               // another track is picked
 
-					// first reset last track
-					_lastHoveredTourTrack.setPicked(false, null);
-					setPathHighlighAttributes(_lastHoveredTourTrack);
+               // first reset last track
+               _lastHoveredTourTrack.setPicked(false, null);
+               setPathHighlighAttributes(_lastHoveredTourTrack);
 
-					// pick new track
-					hoveredTrack.setPicked(true, hoveredPositionIndex);
-					setPathHighlighAttributes(hoveredTrack);
+               // pick new track
+               hoveredTrack.setPicked(true, hoveredPositionIndex);
+               setPathHighlighAttributes(hoveredTrack);
 
-				}
-			}
-		}
-	}
+            }
+         }
+      }
+   }
 
-	public void setColorProvider(final IMapColorProvider colorProvider) {
+   public void setColorProvider(final IMapColorProvider colorProvider) {
 
-		_colorProvider = colorProvider;
+      _colorProvider = colorProvider;
 
-		_tourPositionColors.setColorProvider(colorProvider);
-	}
+      _tourPositionColors.setColorProvider(colorProvider);
+   }
 
-	public void setExpired() {
+   public void setExpired() {
 
-		for (final Renderable renderable : getRenderables()) {
+      for (final Renderable renderable : getRenderables()) {
 
-			if (renderable instanceof ITrackPath) {
-				final ITrackPath trackPath = (ITrackPath) renderable;
+         if (renderable instanceof ITrackPath) {
+            final ITrackPath trackPath = (ITrackPath) renderable;
 
-				trackPath.setExpired();
-			}
-		}
+            trackPath.setExpired();
+         }
+      }
 
-		Map3Manager.getWWCanvas().redraw();
-	}
+      Map3Manager.getWWCanvas().redraw();
+   }
 
-	/**
-	 * Set attributes from the configuration into the path but <b>only</b> when they have changed
-	 * because setting some properties will reset the path and it will be recreated.
-	 * 
-	 * @param path
-	 */
-	private void setPathAttributes(final ITrackPath trackPath) {
+   /**
+    * Set attributes from the configuration into the path but <b>only</b> when they have changed
+    * because setting some properties will reset the path and it will be recreated.
+    *
+    * @param path
+    */
+   private void setPathAttributes(final ITrackPath trackPath) {
 
 //		System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] \tsetPathAttributes()");
 //		// TODO remove SYSTEM.OUT.PRINTLN
 
-		final TourTrackConfig trackConfig = TourTrackConfigManager.getActiveConfig();
+      final TourTrackConfig trackConfig = TourTrackConfigManager.getActiveConfig();
 
-		// force the track colors to be recreated, opacity can have been changed
-		trackPath.getTourTrack().updateColors(trackConfig.trackColorOpacity);
+      // force the track colors to be recreated, opacity can have been changed
+      trackPath.getTourTrack().updateColors(trackConfig.trackColorOpacity);
 
-		final Path path = trackPath.getPath();
+      final Path path = trackPath.getPath();
 
-		path.setShowPositionsThreshold(Math.pow(10, trackConfig.trackPositionThreshold));
+      path.setShowPositionsThreshold(Math.pow(10, trackConfig.trackPositionThreshold));
 
-		final int altitudeMode = trackConfig.altitudeMode;
-		if (altitudeMode != path.getAltitudeMode()) {
-			path.setAltitudeMode(altitudeMode);
-		}
+      final int altitudeMode = trackConfig.altitudeMode;
+      if (altitudeMode != path.getAltitudeMode()) {
+         path.setAltitudeMode(altitudeMode);
+      }
 
-		final boolean isFollowTerrain = trackConfig.isFollowTerrain;
-		if (isFollowTerrain != path.isFollowTerrain()) {
-			path.setFollowTerrain(isFollowTerrain);
-		}
+      final boolean isFollowTerrain = trackConfig.isFollowTerrain;
+      if (isFollowTerrain != path.isFollowTerrain()) {
+         path.setFollowTerrain(isFollowTerrain);
+      }
 
-		final boolean isExtrudePath = trackConfig.isShowInterior;
-		if (isExtrudePath != path.isExtrude()) {
-			path.setExtrude(isExtrudePath);
-		}
+      final boolean isExtrudePath = trackConfig.isShowInterior;
+      if (isExtrudePath != path.isExtrude()) {
+         path.setExtrude(isExtrudePath);
+      }
 
-		final boolean isDrawVerticals = trackConfig.isDrawVerticals;
-		if (isDrawVerticals != path.isDrawVerticals()) {
-			path.setDrawVerticals(isDrawVerticals);
-		}
+      final boolean isDrawVerticals = trackConfig.isDrawVerticals;
+      if (isDrawVerticals != path.isDrawVerticals()) {
+         path.setDrawVerticals(isDrawVerticals);
+      }
 
-		/*
-		 * numSubsegments do not have a UI (it's disabled) but ensure that 0 subsegments are set
-		 */
-		if (path.getNumSubsegments() != 0) {
-			path.setNumSubsegments(0);
-		}
+      /*
+       * numSubsegments do not have a UI (it's disabled) but ensure that 0 subsegments are set
+       */
+      if (path.getNumSubsegments() != 0) {
+         path.setNumSubsegments(0);
+      }
 
-		/*
-		 * Set shape attributes for the path
-		 */
+      /*
+       * Set shape attributes for the path
+       */
 
-		setPathAttributes_Normal();
-		setPathAttributes_Hovered();
-		setPathAttributes_Selected();
-		setPathAttributes_HovSel();
+      setPathAttributes_Normal();
+      setPathAttributes_Hovered();
+      setPathAttributes_Selected();
+      setPathAttributes_HovSel();
 
-		path.setAttributes(_normalAttributes);
-		setPathHighlighAttributes(trackPath);
+      path.setAttributes(_normalAttributes);
+      setPathHighlighAttributes(trackPath);
 
-		/*
-		 * I don't know why this is enabled, 12.2.2014
-		 */
+      /*
+       * I don't know why this is enabled, 12.2.2014
+       */
 //		path.setEnableDepthOffset(true);
 
-		/*
-		 * ensure that cached data are recreated, e.g. direction arrow size
-		 */
-		trackPath.setExpired();
-	}
+      /*
+       * ensure that cached data are recreated, e.g. direction arrow size
+       */
+      trackPath.setExpired();
+   }
 
-	/**
-	 * Set hovered shape attributes
-	 * 
-	 * @param shapeAttributes
-	 */
-	private void setPathAttributes_Hovered() {
+   /**
+    * Set hovered shape attributes
+    *
+    * @param shapeAttributes
+    */
+   private void setPathAttributes_Hovered() {
 
-		final TourTrackConfig trackConfig = TourTrackConfigManager.getActiveConfig();
+      final TourTrackConfig trackConfig = TourTrackConfigManager.getActiveConfig();
 
-		final RGB interiorRGB = trackConfig.interiorColor_Hovered;
-		final RGB outlineRGB = trackConfig.outlineColor_Hovered;
+      final RGB interiorRGB = trackConfig.interiorColor_Hovered;
+      final RGB outlineRGB = trackConfig.outlineColor_Hovered;
 
-		final Color interiorColor = new Color(interiorRGB.red, interiorRGB.green, interiorRGB.blue);
-		final Color outlineColor = new Color(outlineRGB.red, outlineRGB.green, outlineRGB.blue);
+      final Color interiorColor = new Color(interiorRGB.red, interiorRGB.green, interiorRGB.blue);
+      final Color outlineColor = new Color(outlineRGB.red, outlineRGB.green, outlineRGB.blue);
 
-		_hoveredAttributes.setDrawOutline(true);
-		_hoveredAttributes.setOutlineWidth(trackConfig.outlineWidth);
-		_hoveredAttributes.setOutlineOpacity(trackConfig.outlineOpacity_Hovered);
-		_hoveredAttributes.setOutlineMaterial(new Material(outlineColor));
+      _hoveredAttributes.setDrawOutline(true);
+      _hoveredAttributes.setOutlineWidth(trackConfig.outlineWidth);
+      _hoveredAttributes.setOutlineOpacity(trackConfig.outlineOpacity_Hovered);
+      _hoveredAttributes.setOutlineMaterial(new Material(outlineColor));
 
-		_hoveredAttributes.setDrawInterior(true);
-		_hoveredAttributes.setInteriorOpacity(trackConfig.interiorOpacity_Hovered);
-		_hoveredAttributes.setInteriorMaterial(new Material(interiorColor));
-	}
+      _hoveredAttributes.setDrawInterior(true);
+      _hoveredAttributes.setInteriorOpacity(trackConfig.interiorOpacity_Hovered);
+      _hoveredAttributes.setInteriorMaterial(new Material(interiorColor));
+   }
 
-	/**
-	 * Set hovered & selected shape attributes
-	 * 
-	 * @param shapeAttributes
-	 */
-	private void setPathAttributes_HovSel() {
+   /**
+    * Set hovered & selected shape attributes
+    *
+    * @param shapeAttributes
+    */
+   private void setPathAttributes_HovSel() {
 
-		final TourTrackConfig trackConfig = TourTrackConfigManager.getActiveConfig();
+      final TourTrackConfig trackConfig = TourTrackConfigManager.getActiveConfig();
 
-		final RGB interiorRGB = trackConfig.interiorColor_HovSel;
-		final RGB outlineRGB = trackConfig.outlineColor_HovSel;
+      final RGB interiorRGB = trackConfig.interiorColor_HovSel;
+      final RGB outlineRGB = trackConfig.outlineColor_HovSel;
 
-		final Color interiorColor = new Color(interiorRGB.red, interiorRGB.green, interiorRGB.blue);
-		final Color outlineColor = new Color(outlineRGB.red, outlineRGB.green, outlineRGB.blue);
+      final Color interiorColor = new Color(interiorRGB.red, interiorRGB.green, interiorRGB.blue);
+      final Color outlineColor = new Color(outlineRGB.red, outlineRGB.green, outlineRGB.blue);
 
-		_hovselAttributes.setDrawOutline(true);
-		_hovselAttributes.setOutlineWidth(trackConfig.outlineWidth);
-		_hovselAttributes.setOutlineOpacity(trackConfig.outlineOpacity_HovSel);
-		_hovselAttributes.setOutlineMaterial(new Material(outlineColor));
+      _hovselAttributes.setDrawOutline(true);
+      _hovselAttributes.setOutlineWidth(trackConfig.outlineWidth);
+      _hovselAttributes.setOutlineOpacity(trackConfig.outlineOpacity_HovSel);
+      _hovselAttributes.setOutlineMaterial(new Material(outlineColor));
 
-		_hovselAttributes.setDrawInterior(true);
-		_hovselAttributes.setInteriorOpacity(trackConfig.interiorOpacity_HovSel);
-		_hovselAttributes.setInteriorMaterial(new Material(interiorColor));
-	}
+      _hovselAttributes.setDrawInterior(true);
+      _hovselAttributes.setInteriorOpacity(trackConfig.interiorOpacity_HovSel);
+      _hovselAttributes.setInteriorMaterial(new Material(interiorColor));
+   }
 
-	/**
-	 * Set default shape attributes
-	 * 
-	 * @param shapeAttributes
-	 */
-	private void setPathAttributes_Normal() {
+   /**
+    * Set default shape attributes
+    *
+    * @param shapeAttributes
+    */
+   private void setPathAttributes_Normal() {
 
-		final TourTrackConfig trackConfig = TourTrackConfigManager.getActiveConfig();
+      final TourTrackConfig trackConfig = TourTrackConfigManager.getActiveConfig();
 
-		final RGB interiorRGB = trackConfig.interiorColor;
-		final RGB outlineRGB = trackConfig.outlineColor;
+      final RGB interiorRGB = trackConfig.interiorColor;
+      final RGB outlineRGB = trackConfig.outlineColor;
 
-		final Color interiorColor = new Color(interiorRGB.red, interiorRGB.green, interiorRGB.blue);
-		final Color outlineColor = new Color(outlineRGB.red, outlineRGB.green, outlineRGB.blue);
+      final Color interiorColor = new Color(interiorRGB.red, interiorRGB.green, interiorRGB.blue);
+      final Color outlineColor = new Color(outlineRGB.red, outlineRGB.green, outlineRGB.blue);
 
-		_normalAttributes.setDrawOutline(true);
-		_normalAttributes.setOutlineWidth(trackConfig.outlineWidth);
-		_normalAttributes.setOutlineOpacity(trackConfig.outlineOpacity);
-		_normalAttributes.setOutlineMaterial(new Material(outlineColor));
+      _normalAttributes.setDrawOutline(true);
+      _normalAttributes.setOutlineWidth(trackConfig.outlineWidth);
+      _normalAttributes.setOutlineOpacity(trackConfig.outlineOpacity);
+      _normalAttributes.setOutlineMaterial(new Material(outlineColor));
 
-		_normalAttributes.setDrawInterior(true);
-		_normalAttributes.setInteriorOpacity(trackConfig.interiorOpacity);
-		_normalAttributes.setInteriorMaterial(new Material(interiorColor));
-	}
+      _normalAttributes.setDrawInterior(true);
+      _normalAttributes.setInteriorOpacity(trackConfig.interiorOpacity);
+      _normalAttributes.setInteriorMaterial(new Material(interiorColor));
+   }
 
-	/**
-	 * Set selected shape attributes
-	 * 
-	 * @param shapeAttributes
-	 */
-	private void setPathAttributes_Selected() {
+   /**
+    * Set selected shape attributes
+    *
+    * @param shapeAttributes
+    */
+   private void setPathAttributes_Selected() {
 
-		final TourTrackConfig trackConfig = TourTrackConfigManager.getActiveConfig();
+      final TourTrackConfig trackConfig = TourTrackConfigManager.getActiveConfig();
 
-		final RGB interiorRGB = trackConfig.interiorColor_Selected;
-		final RGB outlineRGB = trackConfig.outlineColor_Selected;
+      final RGB interiorRGB = trackConfig.interiorColor_Selected;
+      final RGB outlineRGB = trackConfig.outlineColor_Selected;
 
-		final Color interiorColor = new Color(interiorRGB.red, interiorRGB.green, interiorRGB.blue);
-		final Color outlineColor = new Color(outlineRGB.red, outlineRGB.green, outlineRGB.blue);
+      final Color interiorColor = new Color(interiorRGB.red, interiorRGB.green, interiorRGB.blue);
+      final Color outlineColor = new Color(outlineRGB.red, outlineRGB.green, outlineRGB.blue);
 
-		_selecedAttributes.setDrawOutline(true);
-		_selecedAttributes.setOutlineWidth(trackConfig.outlineWidth);
-		_selecedAttributes.setOutlineOpacity(trackConfig.outlineOpacity_Selected);
-		_selecedAttributes.setOutlineMaterial(new Material(outlineColor));
+      _selecedAttributes.setDrawOutline(true);
+      _selecedAttributes.setOutlineWidth(trackConfig.outlineWidth);
+      _selecedAttributes.setOutlineOpacity(trackConfig.outlineOpacity_Selected);
+      _selecedAttributes.setOutlineMaterial(new Material(outlineColor));
 
-		_selecedAttributes.setDrawInterior(true);
-		_selecedAttributes.setInteriorOpacity(trackConfig.interiorOpacity_Selected);
-		_selecedAttributes.setInteriorMaterial(new Material(interiorColor));
-	}
+      _selecedAttributes.setDrawInterior(true);
+      _selecedAttributes.setInteriorOpacity(trackConfig.interiorOpacity_Selected);
+      _selecedAttributes.setInteriorMaterial(new Material(interiorColor));
+   }
 
-	/**
-	 * Set's highlight attributes into the track path.
-	 * 
-	 * @param trackPath
-	 */
-	private void setPathHighlighAttributes(final ITrackPath trackPath) {
+   /**
+    * Set's highlight attributes into the track path.
+    *
+    * @param trackPath
+    */
+   private void setPathHighlighAttributes(final ITrackPath trackPath) {
 
-		final TourTrack tourTrack = trackPath.getTourTrack();
+      final TourTrack tourTrack = trackPath.getTourTrack();
 
-		final boolean isHovered = tourTrack.isHovered();
-		final boolean isSelected = tourTrack.isSelected();
+      final boolean isHovered = tourTrack.isHovered();
+      final boolean isSelected = tourTrack.isSelected();
 
-		final TourTrackConfig trackConfig = TourTrackConfigManager.getActiveConfig();
-		final ShapeAttributes shapeAttrs;
+      final TourTrackConfig trackConfig = TourTrackConfigManager.getActiveConfig();
+      final ShapeAttributes shapeAttrs;
 
-		// defaults are for selected/hovered
-		boolean isShowPositions;
-		double positionsScale;
+      // defaults are for selected/hovered
+      boolean isShowPositions;
+      double positionsScale;
 
-		if (isHovered && isSelected) {
+      if (isHovered && isSelected) {
 
-			shapeAttrs = _hovselAttributes;
+         shapeAttrs = _hovselAttributes;
 
-			positionsScale = trackConfig.trackPositionSize_HovSel;
-			isShowPositions = positionsScale == 0.0 ? false : true;
+         positionsScale = trackConfig.trackPositionSize_HovSel;
+         isShowPositions = positionsScale == 0.0 ? false : true;
 
-		} else if (isHovered) {
+      } else if (isHovered) {
 
-			shapeAttrs = _hoveredAttributes;
+         shapeAttrs = _hoveredAttributes;
 
-			positionsScale = trackConfig.trackPositionSize_Hovered;
-			isShowPositions = positionsScale == 0.0 ? false : true;
+         positionsScale = trackConfig.trackPositionSize_Hovered;
+         isShowPositions = positionsScale == 0.0 ? false : true;
 
-		} else if (isSelected) {
+      } else if (isSelected) {
 
-			shapeAttrs = _selecedAttributes;
+         shapeAttrs = _selecedAttributes;
 
-			positionsScale = trackConfig.trackPositionSize_Selected;
-			isShowPositions = positionsScale == 0.0 ? false : true;
+         positionsScale = trackConfig.trackPositionSize_Selected;
+         isShowPositions = positionsScale == 0.0 ? false : true;
 
-		} else {
+      } else {
 
-			// not hovered and not selected => normal
+         // not hovered and not selected => normal
 
-			shapeAttrs = _normalAttributes;
+         shapeAttrs = _normalAttributes;
 
-			isShowPositions = trackConfig.isShowTrackPosition;
-			positionsScale = trackConfig.trackPositionSize;
-		}
+         isShowPositions = trackConfig.isShowTrackPosition;
+         positionsScale = trackConfig.trackPositionSize;
+      }
 
-		final Path path = trackPath.getPath();
+      final Path path = trackPath.getPath();
 
-		path.setShowPositions(isShowPositions);
-		path.setShowPositionsScale(positionsScale / trackConfig.outlineWidth);
+      path.setShowPositions(isShowPositions);
+      path.setShowPositionsScale(positionsScale / trackConfig.outlineWidth);
 
-		path.setHighlightAttributes(shapeAttrs);
-	}
+      path.setHighlightAttributes(shapeAttrs);
+   }
 
-	private void setupWWSelectionListener(final boolean isLayerVisible) {
+   private void setupWWSelectionListener(final boolean isLayerVisible) {
 
-		final WorldWindowGLCanvas ww = Map3Manager.getWWCanvas();
+      final WorldWindowGLCanvas ww = Map3Manager.getWWCanvas();
 
-		if (isLayerVisible) {
+      if (isLayerVisible) {
 
-			if (_lastAddRemoveAction != 1) {
+         if (_lastAddRemoveAction != 1) {
 
-				_lastAddRemoveAction = 1;
-				ww.addSelectListener(this);
-			}
+            _lastAddRemoveAction = 1;
+            ww.addSelectListener(this);
+         }
 
-		} else {
+      } else {
 
-			if (_lastAddRemoveAction != 0) {
+         if (_lastAddRemoveAction != 0) {
 
-				_lastAddRemoveAction = 0;
-				ww.removeSelectListener(this);
-			}
-		}
-	}
+            _lastAddRemoveAction = 0;
+            ww.removeSelectListener(this);
+         }
+      }
+   }
 
-	public void updateColors(final ArrayList<TourData> allTours) {
+   public void updateColors(final ArrayList<TourData> allTours) {
 
-		_tourPositionColors.updateColorProvider(allTours);
-	}
+      _tourPositionColors.updateColorProvider(allTours);
+   }
 
 }

@@ -1428,6 +1428,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
     *  1 when geo coordinates are written into the image file
     *         </pre>
     */
+   @SuppressWarnings("unused")
    private int setExifGPSTag_IntoImageFile(final File originalJpegImageFile,
                                            final double latitude,
                                            final double longitude,
@@ -1582,6 +1583,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
     * @throws ImageReadException
     * @throws ImageWriteException
     */
+   @SuppressWarnings("unused")
    private void setExifGPSTag_IntoImageFile_WithExifRewriter(final File jpegImageFile,
                                                              final File destinationFile,
                                                              final double latitude,

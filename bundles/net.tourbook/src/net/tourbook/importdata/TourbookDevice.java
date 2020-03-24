@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -30,7 +30,6 @@ import net.tourbook.data.TourMarker;
 
 public abstract class TourbookDevice implements IRawDataReader {
 
-   private static final String   XML_COMMENT           = "<!--";                                           //$NON-NLS-1$
    protected static final String XML_START_ID          = "<?xml";                                          //$NON-NLS-1$
    protected static final String XML_HEADER            = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";    //$NON-NLS-1$
 

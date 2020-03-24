@@ -86,6 +86,7 @@ public class TrackPointAnnotation extends GlobeAnnotation {
 //		drawLine(dc, annotationPoint);
    }
 
+   @SuppressWarnings("unused")
    private void drawLine(final DrawContext dc, final Vec4 annotationPoint) {
 
       if (dc.isPickingMode()) {
