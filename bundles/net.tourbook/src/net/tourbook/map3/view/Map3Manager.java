@@ -78,7 +78,7 @@ public class Map3Manager {
     * This version number is incremented, when structural changes (e.g. new category) are done.
     * When this happens, the <b>default</b> structure is created.
     */
-   private static final int    MAP3_LAYER_STRUCTURE_VERSION   = 21;
+   private static final int    MAP3_LAYER_STRUCTURE_VERSION   = 22;
 
    public static final String  PROPERTY_NAME_ENABLED          = "Enabled";            //$NON-NLS-1$
 
@@ -110,7 +110,7 @@ public class Map3Manager {
 // SET_FORMATTING_ON
 
    /**
-    * _bundle must be set here otherwise an exception occures in saveState()
+    * _bundle must be set here otherwise an exception occurs in saveState()
     */
    private static final Bundle                        _bundle         = TourbookPlugin.getDefault().getBundle();
 
@@ -184,7 +184,7 @@ public class Map3Manager {
 
          SWT_AWT.embeddedFrameClass = "sun.lwawt.macosx.CViewEmbeddedFrame"; //$NON-NLS-1$
 
-//			...this error occures
+//			...this error occurs
 
 //Exception in thread "AWT-EventQueue-0" javax.media.opengl.GLException: java.lang.NoClassDefFoundError: apple/awt/ComponentModel
 //	at com.sun.opengl.impl.Java2D.invokeWithOGLContextCurrent(Java2D.java:296)
@@ -212,7 +212,7 @@ public class Map3Manager {
 
       /*
        * This needs to be set, because the jogl selfexpanded native libraries are not found, so
-       * they are packacked into platform specific plugins.
+       * they are packaged into platform specific plugins.
        */
       System.setProperty("jogamp.gluegen.UseTempJarCache", Boolean.FALSE.toString()); //$NON-NLS-1$
 //java.lang.UnsatisfiedLinkError: Can't load library: C:\E\e-3.8.2-32\eclipse\gluegen-rt.dll
@@ -339,14 +339,14 @@ public class Map3Manager {
       createLayerXml_120_Default(xml, true, true, 1.0f, MapDefaultLayer.ID_NASA_BLUE_MARBLE_IMAGE);
       createLayerXml_120_Default(xml, true, true, 1.0f, MapDefaultLayer.ID_BLUE_MARBLE_WMS_2004);
       createLayerXml_120_Default(xml, true, true, 1.0f, MapDefaultLayer.ID_I_CUBED_LANDSAT);
-      createLayerXml_120_Default(xml, false, true, 1.0f, MapDefaultLayer.ID_USDA_NAIP);
-      createLayerXml_120_Default(xml, false, true, 1.0f, MapDefaultLayer.ID_USDA_NAIP_USGS);
-      createLayerXml_120_Default(xml, true, true, 1.0f, MapDefaultLayer.ID_MS_VIRTUAL_EARTH_AERIAL);
+      createLayerXml_120_Default(xml, false, true, 1.0f, MapDefaultLayer.ID_USGS_NAIP_PLUS);
+      //createLayerXml_120_Default(xml, true, true, 1.0f, MapDefaultLayer.ID_MS_VIRTUAL_EARTH_AERIAL);
       createLayerXml_120_Default(xml, true, true, 1.0f, MapDefaultLayer.ID_BING_IMAGERY);
+      createLayerXml_120_Default(xml, true, true, 1.0f, MapDefaultLayer.ID_USGS_TOPO_BASE_MAP);
+      createLayerXml_120_Default(xml, true, true, 1.0f, MapDefaultLayer.ID_USGS_TOPO_BASE_MAP_LARGE_SCALE);
       createLayerXml_120_Default(xml, false, true, 1.0f, MapDefaultLayer.ID_USGS_TOPO_SCANNED_MAPS_1_250K);
       createLayerXml_120_Default(xml, false, true, 1.0f, MapDefaultLayer.ID_USGS_TOPO_SCANNED_MAPS_1_100K);
       createLayerXml_120_Default(xml, false, true, 1.0f, MapDefaultLayer.ID_USGS_TOPO_SCANNED_MAPS_1_24K);
-      createLayerXml_120_Default(xml, false, true, 1.0f, MapDefaultLayer.ID_USGS_URBAN_AREA_ORTHO);
       createLayerXml_120_Default(xml, true, true, 1.0f, MapDefaultLayer.ID_POLITICAL_BOUNDARIES);
       createLayerXml_120_Default(xml, false, true, 1.0f, MapDefaultLayer.ID_OPEN_STREET_MAP);
       createLayerXml_120_Default(xml, false, true, 1.0f, MapDefaultLayer.ID_EARTH_AT_NIGHT);

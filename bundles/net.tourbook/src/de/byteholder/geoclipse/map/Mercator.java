@@ -322,8 +322,8 @@ public final class Mercator extends Projection {
 
 //		function y2lat(a) { return 180/Math.PI * (2 * Math.atan(Math.exp(a*Math.PI/180)) - Math.PI/2); }
 
-      final double a = 0;
-      final double lat = 180 / Math.PI * (2 * Math.atan(Math.exp(a * Math.PI / 180)) - Math.PI / 2);
+      //final double a = 0;
+      //final double lat = 180 / Math.PI * (2 * Math.atan(Math.exp(a * Math.PI / 180)) - Math.PI / 2);
 
       final double longitude = (devX - devMapCenter.getX()) / mp.getLongitudeDegreeWidthInPixels(zoom);
 

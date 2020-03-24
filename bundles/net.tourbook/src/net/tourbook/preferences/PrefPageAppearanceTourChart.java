@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -64,40 +64,38 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageAppearanceTourChart extends PreferencePage implements IWorkbenchPreferencePage {
 
-   public static final String  ID                                          = "net.tourbook.preferences.PrefPageChartGraphs";                       //$NON-NLS-1$
+   public static final String  ID                                        = "net.tourbook.preferences.PrefPageChartGraphs";                     //$NON-NLS-1$
 
-   private static final String STATE_PREF_PAGE_CHART_GRAPHS_SELECTED_TAB   = "PrefPage.ChartGraphs.SelectedTab";                                   //$NON-NLS-1$
+   private static final String STATE_PREF_PAGE_CHART_GRAPHS_SELECTED_TAB = "PrefPage.ChartGraphs.SelectedTab";                                 //$NON-NLS-1$
 
-   private static final String GRAPH_LABEL_PREFIX_RUNNING_DYNAMICS         = net.tourbook.common.Messages.Graph_Label_Prefix_RunningDynamics;
-   private static final String GRAPH_LABEL_PREFIX_SWIMMING                 = net.tourbook.common.Messages.Graph_Label_Prefix_Swimming;
-   private static final String GRAPH_LABEL_PREFIX_TRAINING                 = net.tourbook.common.Messages.Graph_Label_Prefix_Training;
+   private static final String GRAPH_LABEL_PREFIX_RUNNING_DYNAMICS       = net.tourbook.common.Messages.Graph_Label_Prefix_RunningDynamics;
+   private static final String GRAPH_LABEL_PREFIX_SWIMMING               = net.tourbook.common.Messages.Graph_Label_Prefix_Swimming;
+   private static final String GRAPH_LABEL_PREFIX_TRAINING               = net.tourbook.common.Messages.Graph_Label_Prefix_Training;
 
-   private static final String GRAPH_LABEL_ALTIMETER                       = net.tourbook.common.Messages.Graph_Label_Altimeter;
-   private static final String GRAPH_LABEL_ALTITUDE                        = net.tourbook.common.Messages.Graph_Label_Altitude;
-   private static final String GRAPH_LABEL_CADENCE                         = net.tourbook.common.Messages.Graph_Label_Cadence;
-   private static final String GRAPH_LABEL_GEARS                           = net.tourbook.common.Messages.Graph_Label_Gears;
-   private static final String GRAPH_LABEL_GRADIENT                        = net.tourbook.common.Messages.Graph_Label_Gradient;
-   private static final String GRAPH_LABEL_HEARTBEAT                       = net.tourbook.common.Messages.Graph_Label_Heartbeat;
-   private static final String GRAPH_LABEL_PACE                            = net.tourbook.common.Messages.Graph_Label_Pace;
-   private static final String GRAPH_LABEL_POWER                           = net.tourbook.common.Messages.Graph_Label_Power;
-   private static final String GRAPH_LABEL_SHOW_HR_ZONE_BACKGROUND_TOOLTIP = net.tourbook.common.Messages.Graph_Label_ShowHrZoneBackground_Tooltip;
-   private static final String GRAPH_LABEL_SHOW_HR_ZONE_BACKGROUND         = net.tourbook.common.Messages.Graph_Label_ShowHrZoneBackground;
-   private static final String GRAPH_LABEL_SPEED                           = net.tourbook.common.Messages.Graph_Label_Speed;
-   private static final String GRAPH_LABEL_TEMPERATURE                     = net.tourbook.common.Messages.Graph_Label_Temperature;
-   private static final String GRAPH_LABEL_TOUR_COMPARE_RESULT             = net.tourbook.common.Messages.Graph_Label_Tour_Compare;
+   private static final String GRAPH_LABEL_ALTIMETER                     = net.tourbook.common.Messages.Graph_Label_Altimeter;
+   private static final String GRAPH_LABEL_ALTITUDE                      = net.tourbook.common.Messages.Graph_Label_Altitude;
+   private static final String GRAPH_LABEL_CADENCE                       = net.tourbook.common.Messages.Graph_Label_Cadence;
+   private static final String GRAPH_LABEL_GEARS                         = net.tourbook.common.Messages.Graph_Label_Gears;
+   private static final String GRAPH_LABEL_GRADIENT                      = net.tourbook.common.Messages.Graph_Label_Gradient;
+   private static final String GRAPH_LABEL_HEARTBEAT                     = net.tourbook.common.Messages.Graph_Label_Heartbeat;
+   private static final String GRAPH_LABEL_PACE                          = net.tourbook.common.Messages.Graph_Label_Pace;
+   private static final String GRAPH_LABEL_POWER                         = net.tourbook.common.Messages.Graph_Label_Power;
+   private static final String GRAPH_LABEL_SPEED                         = net.tourbook.common.Messages.Graph_Label_Speed;
+   private static final String GRAPH_LABEL_TEMPERATURE                   = net.tourbook.common.Messages.Graph_Label_Temperature;
+   private static final String GRAPH_LABEL_TOUR_COMPARE_RESULT           = net.tourbook.common.Messages.Graph_Label_Tour_Compare;
 
-   private static final String GRAPH_LABEL_RUN_DYN_STANCE_TIME             = net.tourbook.common.Messages.Graph_Label_RunDyn_StanceTime;
-   private static final String GRAPH_LABEL_RUN_DYN_STANCE_TIME_BALANCED    = net.tourbook.common.Messages.Graph_Label_RunDyn_StanceTimeBalance;
-   private static final String GRAPH_LABEL_RUN_DYN_STEP_LENGTH             = net.tourbook.common.Messages.Graph_Label_RunDyn_StepLength;
-   private static final String GRAPH_LABEL_RUN_DYN_VERTICAL_OSCILLATION    = net.tourbook.common.Messages.Graph_Label_RunDyn_VerticalOscillation;
-   private static final String GRAPH_LABEL_RUN_DYN_VERTICAL_RATIO          = net.tourbook.common.Messages.Graph_Label_RunDyn_VerticalRatio;
+   private static final String GRAPH_LABEL_RUN_DYN_STANCE_TIME           = net.tourbook.common.Messages.Graph_Label_RunDyn_StanceTime;
+   private static final String GRAPH_LABEL_RUN_DYN_STANCE_TIME_BALANCED  = net.tourbook.common.Messages.Graph_Label_RunDyn_StanceTimeBalance;
+   private static final String GRAPH_LABEL_RUN_DYN_STEP_LENGTH           = net.tourbook.common.Messages.Graph_Label_RunDyn_StepLength;
+   private static final String GRAPH_LABEL_RUN_DYN_VERTICAL_OSCILLATION  = net.tourbook.common.Messages.Graph_Label_RunDyn_VerticalOscillation;
+   private static final String GRAPH_LABEL_RUN_DYN_VERTICAL_RATIO        = net.tourbook.common.Messages.Graph_Label_RunDyn_VerticalRatio;
 
-   private static final String GRAPH_LABEL_SWIM_STROKES                    = net.tourbook.common.Messages.Graph_Label_Swim_Strokes;
-   private static final String GRAPH_LABEL_SWIM_SWOLF                      = net.tourbook.common.Messages.Graph_Label_Swim_Swolf;
+   private static final String GRAPH_LABEL_SWIM_STROKES                  = net.tourbook.common.Messages.Graph_Label_Swim_Strokes;
+   private static final String GRAPH_LABEL_SWIM_SWOLF                    = net.tourbook.common.Messages.Graph_Label_Swim_Swolf;
 
-   private static final String GRAPH_LABEL_TRAINING_EFFECT_AEROB           = net.tourbook.common.Messages.Graph_Label_Training_Effect_Aerob;
-   private static final String GRAPH_LABEL_TRAINING_EFFECT_ANAEROB         = net.tourbook.common.Messages.Graph_Label_Training_Effect_Anaerob;
-   private static final String GRAPH_LABEL_TRAINING_PERFORMANCE            = net.tourbook.common.Messages.Graph_Label_Training_Performance;
+   private static final String GRAPH_LABEL_TRAINING_EFFECT_AEROB         = net.tourbook.common.Messages.Graph_Label_Training_Effect_Aerob;
+   private static final String GRAPH_LABEL_TRAINING_EFFECT_ANAEROB       = net.tourbook.common.Messages.Graph_Label_Training_Effect_Anaerob;
+   private static final String GRAPH_LABEL_TRAINING_PERFORMANCE          = net.tourbook.common.Messages.Graph_Label_Training_Performance;
    //
    //
    private final IPreferenceStore  _prefStore = TourbookPlugin.getPrefStore();

@@ -17,7 +17,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.widgets.Display;
 
 public class AWTvSWT_Performance {
 
@@ -142,7 +141,7 @@ public class AWTvSWT_Performance {
 
 	/**
 	 * Converts a Swing BufferedImage into a lightweight ImageData object for SWT
-	 * 
+	 *
 	 * @param bufferedImage
 	 *            the image to be converted
 	 * @return An ImageData that represents the same image as bufferedImage
@@ -227,7 +226,9 @@ public class AWTvSWT_Performance {
 		}
 		return null;
 	}
-	private static void copyStripesAWT(final BufferedImage source, final BufferedImage target) {
+
+   @SuppressWarnings("unused")
+   private static void copyStripesAWT(final BufferedImage source, final BufferedImage target) {
 
 		assert (source.getWidth() == target.getWidth());
 
@@ -250,7 +251,8 @@ public class AWTvSWT_Performance {
 		g.dispose();
 	}
 
-	private static void copyStripesSWT(final Image source, final Image target) {
+   @SuppressWarnings("unused")
+   private static void copyStripesSWT(final Image source, final Image target) {
 
 		assert (source.getBounds().width == target.getBounds().width);
 
@@ -288,7 +290,7 @@ public class AWTvSWT_Performance {
 		System.out.println("AWT load: " + (System.currentTimeMillis() - start)); //$NON-NLS-1$
 
 		start = System.currentTimeMillis();
-		final Image swtSource = new Image(Display.getDefault(), args[0]);
+      //final Image swtSource = new Image(Display.getDefault(), args[0]);
 //		final Image swtTarget = new Image(
 //				Display.getDefault(),
 //				swtSource.getBounds().width,

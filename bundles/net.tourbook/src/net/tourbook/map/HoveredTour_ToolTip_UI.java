@@ -33,10 +33,8 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -49,8 +47,8 @@ import org.eclipse.swt.widgets.Shell;
  */
 public class HoveredTour_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinned_ToolTip {
 
-   private int             _devMouseX;
-   private int             _devMouseY;
+   private int _devMouseX;
+   //private int             _devMouseY;
 
    /**
     * State if the tooltip is visible.
@@ -73,7 +71,7 @@ public class HoveredTour_ToolTip_UI extends Pinned_ToolTip_Shell implements IPin
    private final ArrayList<Control> _firstColumnContainerControls = new ArrayList<>();
 
    private final ColorCache         _colorCache                   = new ColorCache();
-   private Color                    _fgBorder;
+   //private Color                    _fgBorder;
 
    /*
     * UI controls
@@ -190,7 +188,7 @@ public class HoveredTour_ToolTip_UI extends Pinned_ToolTip_Shell implements IPin
 
    private void initUI(final Composite parent) {
 
-      _fgBorder = _colorCache.getColor(new RGB(0xe5, 0xe5, 0xcb));
+      //_fgBorder = _colorCache.getColor(new RGB(0xe5, 0xe5, 0xcb));
    }
 
    @Override
@@ -243,7 +241,7 @@ public class HoveredTour_ToolTip_UI extends Pinned_ToolTip_Shell implements IPin
       }
 
       _devMouseX = devMouseX;
-      _devMouseY = devMouseY;
+      //_devMouseY = devMouseY;
 
       if (_shellContainer == null || _shellContainer.isDisposed()) {
 

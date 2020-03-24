@@ -59,44 +59,44 @@ import org.eclipse.ui.forms.widgets.Hyperlink;
 
 public class MessageManager implements IMessageManager {
 
-   private static final DefaultPrefixProvider DEFAULT_PREFIX_PROVIDER       = new DefaultPrefixProvider();
+   private static final DefaultPrefixProvider   DEFAULT_PREFIX_PROVIDER       = new DefaultPrefixProvider();
 
-   private static FieldDecoration             standardError                 = FieldDecorationRegistry.getDefault()
+   private static FieldDecoration               standardError                 = FieldDecorationRegistry.getDefault()
          .getFieldDecoration(FieldDecorationRegistry.DEC_ERROR);
-   private static FieldDecoration             standardWarning               = FieldDecorationRegistry.getDefault()
+   private static FieldDecoration               standardWarning               = FieldDecorationRegistry.getDefault()
          .getFieldDecoration(FieldDecorationRegistry.DEC_WARNING);
-   private static FieldDecoration             standardInformation           = FieldDecorationRegistry.getDefault()
+   private static FieldDecoration               standardInformation           = FieldDecorationRegistry.getDefault()
          .getFieldDecoration(FieldDecorationRegistry.DEC_INFORMATION);
-   private static final String[]              SINGLE_MESSAGE_SUMMARY_KEYS   = {
+   private static final String[]                SINGLE_MESSAGE_SUMMARY_KEYS   = {
          Messages.message_manager_sMessageSummary,
          Messages.message_manager_sMessageSummary,
          Messages.message_manager_sWarningSummary,
          Messages.message_manager_sErrorSummary };
-   private static final String[]              MULTIPLE_MESSAGE_SUMMARY_KEYS = {
+   private static final String[]                MULTIPLE_MESSAGE_SUMMARY_KEYS = {
          Messages.message_manager_pMessageSummary,
          Messages.message_manager_pMessageSummary,
          Messages.message_manager_pWarningSummary,
          Messages.message_manager_pErrorSummary };
-   private ArrayList                          messages                      = new ArrayList();
+   private ArrayList<IMessage>                  messages                      = new ArrayList<>();
 
-   private Hashtable                          decorators                    = new Hashtable();
-   private boolean                            autoUpdate                    = true;
-   private Form                               scrolledForm;
+   private Hashtable<Control, ControlDecorator> decorators                    = new Hashtable<>();
+   private boolean                              autoUpdate                    = true;
+   private Form                                 scrolledForm;
 
-   private IMessagePrefixProvider             prefixProvider                = DEFAULT_PREFIX_PROVIDER;
+   private IMessagePrefixProvider               prefixProvider                = DEFAULT_PREFIX_PROVIDER;
 
-   private int                                decorationPosition            = SWT.LEFT | SWT.BOTTOM;
+   private int                                  decorationPosition            = SWT.LEFT | SWT.BOTTOM;
 
    class ControlDecorator {
-      private ControlDecoration decoration;
-      private ArrayList         controlMessages = new ArrayList();
-      private String            prefix;
+      private ControlDecoration   decoration;
+      private ArrayList<IMessage> controlMessages = new ArrayList<>();
+      private String              prefix;
 
       ControlDecorator(final Control control) {
          this.decoration = new ControlDecoration(control, decorationPosition, scrolledForm.getBody());
       }
 
-      void addAll(final ArrayList target) {
+      void addAll(final ArrayList<IMessage> target) {
          target.addAll(controlMessages);
       }
 
@@ -158,8 +158,8 @@ public class MessageManager implements IMessageManager {
             decoration.setDescriptionText(null);
             decoration.hide();
          } else {
-            final ArrayList peers = createPeers(controlMessages);
-            final int type = ((IMessage) peers.get(0)).getMessageType();
+            final ArrayList<IMessage> peers = createPeers(controlMessages);
+            final int type = peers.get(0).getMessageType();
             final String description = createDetails(createPeers(peers), true);
             if (type == IMessageProvider.ERROR) {
                decoration.setImage(standardError.getImage());
@@ -346,7 +346,7 @@ public class MessageManager implements IMessageManager {
                           final Object data,
                           final int type,
                           final Control control) {
-      ControlDecorator dec = (ControlDecorator) decorators.get(control);
+      ControlDecorator dec = decorators.get(control);
 
       if (dec == null) {
          dec = new ControlDecorator(control);
@@ -363,7 +363,7 @@ public class MessageManager implements IMessageManager {
                               final String messageText,
                               final Object data,
                               final int type,
-                              final ArrayList list) {
+                              final ArrayList<IMessage> list) {
       Message message = findMessage(key, list);
       if (message == null) {
          message = new Message(key, messageText, type, data);
@@ -377,7 +377,7 @@ public class MessageManager implements IMessageManager {
       return message;
    }
 
-   private String createDetails(final ArrayList messages, final boolean excludePrefix) {
+   private String createDetails(final ArrayList<IMessage> messages, final boolean excludePrefix) {
       final StringWriter sw = new StringWriter();
       final PrintWriter out = new PrintWriter(sw);
 
@@ -385,18 +385,18 @@ public class MessageManager implements IMessageManager {
          if (i > 0) {
             out.println();
          }
-         final IMessage m = (IMessage) messages.get(i);
+         final IMessage m = messages.get(i);
          out.print(excludePrefix ? m.getMessage() : getFullMessage(m));
       }
       out.flush();
       return sw.toString();
    }
 
-   private ArrayList createPeers(final ArrayList messages) {
-      final ArrayList peers = new ArrayList();
+   private ArrayList<IMessage> createPeers(final ArrayList<IMessage> messages) {
+      final ArrayList<IMessage> peers = new ArrayList<>();
       int maxType = 0;
-      for (int i = 0; i < messages.size(); i++) {
-         final Message message = (Message) messages.get(i);
+      for (final IMessage message2 : messages) {
+         final Message message = (Message) message2;
          if (message.type > maxType) {
             peers.clear();
             maxType = message.type;
@@ -425,7 +425,7 @@ public class MessageManager implements IMessageManager {
     * Finds the message with the provided key in the provided list.
     */
 
-   private Message findMessage(final Object key, final ArrayList list) {
+   private Message findMessage(final Object key, final ArrayList<IMessage> list) {
       for (final Object element : list) {
          final Message message = (Message) element;
          if (message.getKey().equals(key)) {
@@ -451,7 +451,6 @@ public class MessageManager implements IMessageManager {
    /**
     * @return Returns the number of error messages
     */
-   @SuppressWarnings("unchecked")
    public int getErrorMessageCount() {
 
       int errors = 0;
@@ -492,8 +491,8 @@ public class MessageManager implements IMessageManager {
    }
 
    private void pruneControlDecorators() {
-      for (final Iterator iter = decorators.values().iterator(); iter.hasNext();) {
-         final ControlDecorator dec = (ControlDecorator) iter.next();
+      for (final Iterator<ControlDecorator> iter = decorators.values().iterator(); iter.hasNext();) {
+         final ControlDecorator dec = iter.next();
          if (dec.isDisposed()) {
             iter.remove();
          }
@@ -507,8 +506,8 @@ public class MessageManager implements IMessageManager {
    @Override
    public void removeAllMessages() {
       boolean needsUpdate = false;
-      for (final Enumeration enm = decorators.elements(); enm.hasMoreElements();) {
-         final ControlDecorator control = (ControlDecorator) enm.nextElement();
+      for (final Enumeration<ControlDecorator> enm = decorators.elements(); enm.hasMoreElements();) {
+         final ControlDecorator control = enm.nextElement();
          if (control.removeMessages()) {
             needsUpdate = true;
          }
@@ -544,7 +543,7 @@ public class MessageManager implements IMessageManager {
     */
    @Override
    public void removeMessage(final Object key, final Control control) {
-      final ControlDecorator dec = (ControlDecorator) decorators.get(control);
+      final ControlDecorator dec = decorators.get(control);
       if (dec == null) {
          return;
       }
@@ -575,7 +574,7 @@ public class MessageManager implements IMessageManager {
     */
    @Override
    public void removeMessages(final Control control) {
-      final ControlDecorator dec = (ControlDecorator) decorators.get(control);
+      final ControlDecorator dec = decorators.get(control);
       if (dec != null) {
          if (dec.removeMessages()) {
             if (isAutoUpdate()) {
@@ -605,8 +604,8 @@ public class MessageManager implements IMessageManager {
    @Override
    public void setDecorationPosition(final int position) {
       this.decorationPosition = position;
-      for (final Iterator iter = decorators.values().iterator(); iter.hasNext();) {
-         final ControlDecorator dec = (ControlDecorator) iter.next();
+      for (final Object element : decorators.values()) {
+         final ControlDecorator dec = (ControlDecorator) element;
          dec.updatePosition();
       }
    }
@@ -619,8 +618,8 @@ public class MessageManager implements IMessageManager {
    @Override
    public void setMessagePrefixProvider(final IMessagePrefixProvider provider) {
       this.prefixProvider = provider;
-      for (final Iterator iter = decorators.values().iterator(); iter.hasNext();) {
-         final ControlDecorator dec = (ControlDecorator) iter.next();
+      for (final Object element : decorators.values()) {
+         final ControlDecorator dec = (ControlDecorator) element;
          dec.updatePrefix();
       }
    }
@@ -632,27 +631,27 @@ public class MessageManager implements IMessageManager {
    @Override
    public void update() {
       // Update decorations
-      for (final Iterator iter = decorators.values().iterator(); iter.hasNext();) {
-         final ControlDecorator dec = (ControlDecorator) iter.next();
+      for (final Object element : decorators.values()) {
+         final ControlDecorator dec = (ControlDecorator) element;
          dec.update();
       }
       // Update the form
       updateForm();
    }
 
-   private void update(final ArrayList mergedList) {
+   private void update(final ArrayList<IMessage> mergedList) {
       pruneControlDecorators();
       if (scrolledForm.getHead().getBounds().height == 0 || mergedList.isEmpty() || mergedList == null) {
          scrolledForm.setMessage(null, IMessageProvider.NONE);
          return;
       }
-      final ArrayList peers = createPeers(mergedList);
-      final int maxType = ((IMessage) peers.get(0)).getMessageType();
+      final ArrayList<IMessage> peers = createPeers(mergedList);
+      final int maxType = peers.get(0).getMessageType();
       String messageText;
-      final IMessage[] array = (IMessage[]) peers.toArray(new IMessage[peers.size()]);
+      final IMessage[] array = peers.toArray(new IMessage[peers.size()]);
       if (peers.size() == 1 && ((Message) peers.get(0)).prefix == null) {
          // a single message
-         final IMessage message = (IMessage) peers.get(0);
+         final IMessage message = peers.get(0);
          messageText = message.getMessage();
          scrolledForm.setMessage(messageText, maxType, array);
       } else {
@@ -668,10 +667,10 @@ public class MessageManager implements IMessageManager {
    }
 
    private void updateForm() {
-      final ArrayList mergedList = new ArrayList();
+      final ArrayList<IMessage> mergedList = new ArrayList<>();
       mergedList.addAll(messages);
-      for (final Enumeration enm = decorators.elements(); enm.hasMoreElements();) {
-         final ControlDecorator dec = (ControlDecorator) enm.nextElement();
+      for (final Enumeration<ControlDecorator> enm = decorators.elements(); enm.hasMoreElements();) {
+         final ControlDecorator dec = enm.nextElement();
          dec.addAll(mergedList);
       }
       update(mergedList);

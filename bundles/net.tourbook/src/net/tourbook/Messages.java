@@ -2509,7 +2509,7 @@ public class Messages extends NLS {
    public static String Tour_Editor_Label_Temperature_Max_Tooltip;
    public static String Tour_Editor_Label_Temperature_Min_Tooltip;
    public static String Tour_Editor_Label_Temperature_Tooltip;
-   public static String Tour_Editor_Label_Temperature_WindCill_Tooltip;
+   public static String Tour_Editor_Label_Temperature_WindChill_Tooltip;
    public static String Tour_Editor_Label_TimeZone;
    public static String Tour_Editor_Label_TourStartTime_Tooltip;
    public static String Tour_Editor_Label_Weather;

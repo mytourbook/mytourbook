@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry exported="true" kind="lib" path="jaxb-api-2.4.0-b180830.0359.jar"/> <!-- https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api -->
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6">
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8">
 		<attributes>
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
-	<classpathentry exported="true" kind="lib" path="avalon-framework-api-4.3.1.jar"/> <!-- https://mvnrepository.com/artifact/org.apache.avalon.framework/avalon-framework-api -->
 	<classpathentry exported="true" kind="lib" path="batik-all-1.12.jar"/> <!-- https://mvnrepository.com/artifact/org.apache.xmlgraphics/batik-all -->
 	<classpathentry exported="true" kind="lib" path="commons-io-2.6.jar"/> <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
 	<classpathentry exported="true" kind="lib" path="commons-logging-1.2.jar"/> <!-- https://mvnrepository.com/artifact/commons-logging/commons-logging -->
-	<classpathentry exported="true" kind="lib" path="xmlgraphics-commons-2.4.jar"/> <!-- https://mvnrepository.com/artifact/org.apache.xmlgraphics/xmlgraphics-commons -->
 	<classpathentry exported="true" kind="lib" path="fop-2.4.jar"/> <!-- https://mvnrepository.com/artifact/org.apache.xmlgraphics/fop -->
+	<classpathentry exported="true" kind="lib" path="jaxb-api-2.4.0-b180830.0359.jar"/> <!-- https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api -->
+	<classpathentry exported="true" kind="lib" path="xmlgraphics-commons-2.4.jar"/> <!-- https://mvnrepository.com/artifact/org.apache.xmlgraphics/xmlgraphics-commons -->
 	<classpathentry kind="output" path="bin"/>
 </classpath>
