@@ -720,9 +720,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
       try {
          new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, false, runnable);
-      } catch (final InvocationTargetException e) {
-         e.printStackTrace();
-      } catch (final InterruptedException e) {
+      } catch (final InvocationTargetException | InterruptedException e) {
          e.printStackTrace();
       }
 

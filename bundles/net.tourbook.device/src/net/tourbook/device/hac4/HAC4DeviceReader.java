@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -82,10 +82,6 @@ public class HAC4DeviceReader extends TourbookDevice {
 			// read device data
 			hac4DeviceData.readFromFile(fileRawData);
 
-		} catch (final FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (final IOException e) {
-			e.printStackTrace();
 		} catch (final Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -567,11 +563,9 @@ public class HAC4DeviceReader extends TourbookDevice {
 					break;
 				}
 			}
-		} catch (final FileNotFoundException e) {
-			e.printStackTrace();
 		} catch (final IOException e) {
 			e.printStackTrace();
-		} catch (final Exception e) {
+		} catch (final  Exception e) {
 			e.printStackTrace();
 			hac4DeviceData.dumpData();
 		} finally {
@@ -734,9 +728,7 @@ public class HAC4DeviceReader extends TourbookDevice {
 				isValid = true;
 			}
 
-		} catch (final NumberFormatException nfe) {
-			return false;
-		} catch (final FileNotFoundException e) {
+		} catch (final NumberFormatException | FileNotFoundException e) {
 			return false;
 		} catch (final Exception e) {
 			e.printStackTrace();
@@ -786,8 +778,6 @@ public class HAC4DeviceReader extends TourbookDevice {
 				isValid = true;
 			}
 
-		} catch (final FileNotFoundException e) {
-			e.printStackTrace();
 		} catch (final IOException e) {
 			e.printStackTrace();
 		} catch (final NumberFormatException e) {

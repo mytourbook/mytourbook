@@ -26,12 +26,10 @@ import de.byteholder.geoclipse.preferences.IMappingPreferences;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.time.ZonedDateTime;
@@ -67,7 +65,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IMemento;
-import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.XMLMemento;
 import org.geotools.data.ows.Service;
 import org.geotools.ows.wms.CRSEnvelope;
@@ -385,9 +382,7 @@ public class MapProviderManager {
          public void run() {
             try {
                new ProgressMonitorDialog(display.getActiveShell()).run(false, false, progressRunnable);
-            } catch (final InvocationTargetException e1) {
-               StatusUtil.showStatus(e1.getMessage(), e1);
-            } catch (final InterruptedException e1) {
+            } catch (final InvocationTargetException | InterruptedException e1) {
                StatusUtil.showStatus(e1.getMessage(), e1);
             }
          }
@@ -468,9 +463,7 @@ public class MapProviderManager {
 
          new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, true, runnable);
 
-      } catch (final InvocationTargetException e) {
-         e.printStackTrace();
-      } catch (final InterruptedException e) {
+      } catch (final InvocationTargetException | InterruptedException e) {
          e.printStackTrace();
       }
 
@@ -1627,14 +1620,6 @@ public class MapProviderManager {
             readXml_MP_2(validMapProviders, mementoRoot, ROOT_CHILD_TAG_WRAPPED_MAP_PROVIDER, isMpImport, filename);
          }
 
-      } catch (final UnsupportedEncodingException e) {
-         logError(e.getMessage(), e);
-      } catch (final FileNotFoundException e) {
-         logError(e.getMessage(), e);
-      } catch (final WorkbenchException e) {
-         logError(e.getMessage(), e);
-      } catch (final NumberFormatException e) {
-         logError(e.getMessage(), e);
       } catch (final Exception e) {
          logError(e.getMessage(), e);
       } finally {

@@ -1,6 +1,6 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2012  Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2020  Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
@@ -132,9 +132,7 @@ public class DataTransferWizard extends Wizard {
 		try {
 			_runnableReceiveData = _importDevice.createImportRunnable(portName, _receivedFiles);
 			getContainer().run(true, true, _runnableReceiveData);
-		} catch (final InvocationTargetException e) {
-			e.printStackTrace();
-		} catch (final InterruptedException e) {
+      } catch (final InvocationTargetException | InterruptedException e) {
 			e.printStackTrace();
 		}
 

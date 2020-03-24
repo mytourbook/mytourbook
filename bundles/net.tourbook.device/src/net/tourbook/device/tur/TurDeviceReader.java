@@ -1,6 +1,6 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
@@ -198,7 +198,7 @@ public class TurDeviceReader extends TourbookDevice {
 			int sumPulse = 0;
 			int sumTemperature = 0;
 
-			final ArrayList<TimeData> timeDataList = new ArrayList<TimeData>();
+			final ArrayList<TimeData> timeDataList = new ArrayList<>();
 
 			for (int dataIndex = 0; dataIndex < entryCount; dataIndex++) {
 
@@ -344,12 +344,6 @@ public class TurDeviceReader extends TourbookDevice {
 				tourData.completeTourMarkerWithRelativeTime();
 			}
 
-		} catch (final FileNotFoundException e) {
-			e.printStackTrace();
-			return false;
-		} catch (final IOException e) {
-			e.printStackTrace();
-			return false;
 		} catch (final Exception e) {
 			e.printStackTrace();
 			return false;
@@ -433,9 +427,7 @@ public class TurDeviceReader extends TourbookDevice {
 
 			isValid = true;
 
-		} catch (final NumberFormatException nfe) {
-			return false;
-		} catch (final FileNotFoundException e) {
+      } catch (final NumberFormatException | FileNotFoundException e) {
 			return false;
 		} catch (final Exception e) {
 			e.printStackTrace();

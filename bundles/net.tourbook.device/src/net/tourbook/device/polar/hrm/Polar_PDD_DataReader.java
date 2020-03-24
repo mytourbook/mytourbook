@@ -18,7 +18,6 @@ package net.tourbook.device.polar.hrm;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -273,8 +272,9 @@ public class Polar_PDD_DataReader extends TourbookDevice {
          return null;
       }
 
-      final TourData[] importTourData = newlyImportedTours.values().toArray(
-            new TourData[newlyImportedTours.values().size()]);
+      final TourData[] importTourData = newlyImportedTours.values()
+            .toArray(
+                  new TourData[newlyImportedTours.values().size()]);
 
       // check bounds
       if (importTourData.length == 0) {
@@ -1025,8 +1025,6 @@ public class Polar_PDD_DataReader extends TourbookDevice {
             return false;
          }
 
-      } catch (final FileNotFoundException e) {
-         e.printStackTrace();
       } catch (final IOException e) {
          e.printStackTrace();
       } finally {

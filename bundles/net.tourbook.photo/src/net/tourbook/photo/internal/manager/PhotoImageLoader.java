@@ -308,9 +308,7 @@ public class PhotoImageLoader {
                }
             }
          }
-      } catch (final ImageReadException e) {
-         StatusUtil.log(e);
-      } catch (final IOException e) {
+      } catch (final ImageReadException | IOException e) {
          StatusUtil.log(e);
       }
 

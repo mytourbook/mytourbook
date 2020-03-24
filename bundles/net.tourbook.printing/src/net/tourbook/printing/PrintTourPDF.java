@@ -155,12 +155,8 @@ public class PrintTourPDF extends PrintTourExtension {
                e.printStackTrace();
             }
          }
-      } catch (final SAXException e1) {
-         // TODO Auto-generated catch block
-         e1.printStackTrace();
-      } catch (final IOException e1) {
-         // TODO Auto-generated catch block
-         e1.printStackTrace();
+      } catch (final SAXException | IOException e) {
+         e.printStackTrace();
       } finally {
          if (pdfContent != null) {
             try {

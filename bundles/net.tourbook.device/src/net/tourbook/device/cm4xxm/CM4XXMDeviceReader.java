@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm, Markus Stipp
+ * Copyright (C) 2005, 2020  Wolfgang Schramm, Markus Stipp
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -82,10 +82,6 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 			// read device data
 			cm4xxDeviceData.readFromFile(fileRawData);
 
-		} catch (final FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (final IOException e) {
-			e.printStackTrace();
 		} catch (final Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -546,10 +542,6 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 					break;
 				}
 			}
-		} catch (final FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (final IOException e) {
-			e.printStackTrace();
 		} catch (final Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -740,9 +732,7 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 			if (checksum == lastValue) {
 				isValid = true;
 			}
-		} catch (final NumberFormatException nfe) {
-			return false;
-		} catch (final FileNotFoundException e) {
+		} catch (final NumberFormatException | FileNotFoundException e) {
 			return false;
 		} catch (final Exception e) {
 			e.printStackTrace();

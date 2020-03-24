@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -103,14 +103,8 @@ public class SearchUtils {
 
 				return constructor.newInstance();
 			}
-		} catch (final IllegalAccessException iae) {
-			throw wrap(iae);
-		} catch (final InstantiationException ie) {
-			throw wrap(ie);
-		} catch (final InvocationTargetException ite) {
-			throw wrap(ite);
-		} catch (final NoSuchMethodException nsme) {
-			throw wrap(nsme);
+      } catch (final IllegalAccessException | InstantiationException | InvocationTargetException | NoSuchMethodException e) {
+         throw wrap(e);
 		}
 	}
 

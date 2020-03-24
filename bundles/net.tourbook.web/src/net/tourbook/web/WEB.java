@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -412,9 +412,7 @@ public class WEB {
 			final IWebBrowser browser = support.getExternalBrowser();
 			browser.openURL(new URL(encodeSpace(href)));
 
-		} catch (final MalformedURLException e) {
-			StatusUtil.showStatus(e);
-		} catch (final PartInitException e) {
+      } catch (final MalformedURLException | PartInitException e) {
 			StatusUtil.showStatus(e);
 		}
 	}

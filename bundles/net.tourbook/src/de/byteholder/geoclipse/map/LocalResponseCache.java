@@ -68,9 +68,6 @@ public class LocalResponseCache extends ResponseCache {
 		URLConnection conn;
 		try {
 			conn = remoteUri.toURL().openConnection();
-		} catch (final MalformedURLException ex) {
-			ex.printStackTrace();
-			return false;
 		} catch (final IOException ex) {
 			ex.printStackTrace();
 			return false;

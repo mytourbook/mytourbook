@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -294,9 +294,7 @@ public class ThumbnailStore {
 
 			new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, true, runnable);
 
-		} catch (final InvocationTargetException e) {
-			StatusUtil.log(e);
-		} catch (final InterruptedException e) {
+      } catch (final InvocationTargetException | InterruptedException e) {
 			StatusUtil.log(e);
 		}
 
@@ -307,7 +305,7 @@ public class ThumbnailStore {
 	}
 
 	/**
-	 * recursivly delete directory
+	 * recursively delete directory
 	 * 
 	 * @param directory
 	 * @param monitor

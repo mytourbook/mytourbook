@@ -123,9 +123,7 @@ public class MapsforgeStyleParser {
 					}
 				}
 			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (XMLStreamException e) {
+		} catch (FileNotFoundException | XMLStreamException e) {
 			e.printStackTrace();
 		}
 		return items;

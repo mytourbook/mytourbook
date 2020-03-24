@@ -21,7 +21,6 @@ import com.skedgo.converter.TimezoneMapper;
 import java.beans.PropertyVetoException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.nio.file.Path;
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -930,9 +929,7 @@ public class TourDatabase {
 
          new ProgressMonitorDialog(shell).run(true, true, runnable);
 
-      } catch (final InvocationTargetException e) {
-         e.printStackTrace();
-      } catch (final InterruptedException e) {
+      } catch (final InvocationTargetException | InterruptedException e) {
          e.printStackTrace();
       } finally {
 
@@ -1098,9 +1095,7 @@ public class TourDatabase {
 
          new ProgressMonitorDialog(shell).run(true, true, runnable);
 
-      } catch (final InvocationTargetException e) {
-         StatusUtil.log(e);
-      } catch (final InterruptedException e) {
+      } catch (final InvocationTargetException | InterruptedException e) {
          StatusUtil.log(e);
       } finally {
 
@@ -4110,8 +4105,6 @@ public class TourDatabase {
 
             try {
                _server = new NetworkServerControl(InetAddress.getByName("localhost"), 1527); //$NON-NLS-1$
-            } catch (final UnknownHostException e) {
-               StatusUtil.log(e);
             } catch (final Exception e) {
                StatusUtil.log(e);
             }

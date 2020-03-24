@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -41,15 +41,9 @@ public class Hack {
 			setter.setAccessible(true);
 			setter.invoke(table, Integer.valueOf(itemHeight));
 
-		} catch (final NoSuchMethodException e) {
-			// ignore
-		} catch (final IllegalArgumentException e) {
-			// ignore
-		} catch (final IllegalAccessException e) {
-			// ignore
-		} catch (final InvocationTargetException e) {
-			// ignore
-		}
+		 } catch (final NoSuchMethodException | IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
+	         // ignore
+	      }
 	}
 
 	/**
@@ -70,15 +64,9 @@ public class Hack {
 			setter.setAccessible(true);
 			setter.invoke(tree, Integer.valueOf(itemHeight));
 
-		} catch (final NoSuchMethodException e) {
-			// ignore
-		} catch (final IllegalArgumentException e) {
-			// ignore
-		} catch (final IllegalAccessException e) {
-			// ignore
-		} catch (final InvocationTargetException e) {
-			// ignore
-		}
+		} catch (final NoSuchMethodException | IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
+         // ignore
+      }
 	}
 
 }

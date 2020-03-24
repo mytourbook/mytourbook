@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,7 +16,6 @@
 package net.tourbook.device.polar.hrm;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.time.ZonedDateTime;
@@ -763,11 +762,11 @@ public class Polar_HRM_DataReader extends TourbookDevice {
 	 * 			0 = HR data only,
 	 * 			1 = HR + cycling data
 	 * h)  US / Euro unit
-	 * 			0 = Euro (km, km/h, m, °C)
-	 * 			1 = US (miles, mph, ft, °F)
+	 * 			0 = Euro (km, km/h, m, ï¿½C)
+	 * 			1 = US (miles, mph, ft, ï¿½F)
 	 * 
 	 * All distance, speed, altitude and temperature values depend on US/Euro unit
-	 * selection (km / miles, km/h / mph, m / ft, °C / °F).
+	 * selection (km / miles, km/h / mph, m / ft, ï¿½C / ï¿½F).
 	 * 
 	 * i)  Air pressure (0=off, 1=on)
 	 * 
@@ -1047,9 +1046,7 @@ public class Polar_HRM_DataReader extends TourbookDevice {
 					// Weight=70
 				}
 
-			} catch (final NumberFormatException e) {
-				// this should not happen, it's just ignored -> value is not set
-			} catch (final NoSuchElementException e) {
+			} catch (final NumberFormatException | NoSuchElementException e) {
 				// this should not happen, it's just ignored -> value is not set
 			}
 		}
@@ -1103,9 +1100,9 @@ public class Polar_HRM_DataReader extends TourbookDevice {
 	 * Row 1
 	 * Time         Lap time in format hh:mm:ss.d
 	 * HR           Momentary heart rate value in bpm
-	 * HR min       Lap’s minimum heart rate value in bpm
-	 * HR avg       Lap’s average heart rate value in bpm
-	 * HR max       Lap’s maximum heart rate value in bpm
+	 * HR min       Lapï¿½s minimum heart rate value in bpm
+	 * HR avg       Lapï¿½s average heart rate value in bpm
+	 * HR max       Lapï¿½s maximum heart rate value in bpm
 	 * 
 	 * Row 2
 	 * Flags        Misc lap time information in 8 bits, 87654321
@@ -1366,8 +1363,8 @@ public class Polar_HRM_DataReader extends TourbookDevice {
 	 * 
 	 * [IntNotes]  	Intermediate time note texts
 	 * 
-	 * 3  			Traffic lights  Third intermediate time’s note text.
-	 * 5  			Interval  Fifth intermediate time’s note text.
+	 * 3  			Traffic lights  Third intermediate timeï¿½s note text.
+	 * 5  			Interval  Fifth intermediate timeï¿½s note text.
 	 * </pre>
 	 * 
 	 * @param fileReader
@@ -1515,11 +1512,11 @@ public class Polar_HRM_DataReader extends TourbookDevice {
 	 * 			0 = HR data only,
 	 * 			1 = HR + cycling data
 	 * h)  US / Euro unit
-	 * 			0 = Euro (km, km/h, m, °C)
-	 * 			1 = US (miles, mph, ft, °F)
+	 * 			0 = Euro (km, km/h, m, ï¿½C)
+	 * 			1 = US (miles, mph, ft, ï¿½F)
 	 * 
 	 * All distance, speed, altitude and temperature values depend on US/Euro unit
-	 * selection (km / miles, km/h / mph, m / ft, °C / °F).
+	 * selection (km / miles, km/h / mph, m / ft, ï¿½C / ï¿½F).
 	 * 
 	 * i)  Air pressure (0=off, 1=on)
 	 * 
@@ -1604,9 +1601,7 @@ public class Polar_HRM_DataReader extends TourbookDevice {
 
 					isSliceAvailable = true;
 
-				} catch (final NumberFormatException e) {
-					break;
-				} catch (final NoSuchElementException e) {
+            } catch (final NumberFormatException | NoSuchElementException e) {
 					break;
 				}
 			}
@@ -1848,8 +1843,6 @@ public class Polar_HRM_DataReader extends TourbookDevice {
 				return false;
 			}
 
-		} catch (final FileNotFoundException e) {
-			e.printStackTrace();
 		} catch (final IOException e) {
 			e.printStackTrace();
 		} finally {

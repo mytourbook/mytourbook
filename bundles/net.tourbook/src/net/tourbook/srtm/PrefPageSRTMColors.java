@@ -544,13 +544,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
             _maxProfileId = Math.max(_maxProfileId, profileId);
          }
 
-      } catch (final UnsupportedEncodingException e) {
-         e.printStackTrace();
-      } catch (final FileNotFoundException e) {
-         e.printStackTrace();
-      } catch (final WorkbenchException e) {
-         e.printStackTrace();
-      } catch (final NumberFormatException e) {
+      } catch (final UnsupportedEncodingException | FileNotFoundException | WorkbenchException | NumberFormatException e) {
          e.printStackTrace();
       } finally {
 

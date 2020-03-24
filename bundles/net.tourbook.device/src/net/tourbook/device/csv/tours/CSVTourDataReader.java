@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,7 +16,6 @@
 package net.tourbook.device.csv.tours;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -48,7 +47,7 @@ public class CSVTourDataReader extends TourbookDevice {
 	// csv import data samples
 	//
 	// Date (yyyy-mm-dd); Time (hh-mm); Duration (sec); Paused Time (sec), Distance (m); Title; Comment; Tour Type; Tags;
-	// 2008-09-02;08-20;1200;300;8500;zur Arbeit;kein Kommentar, siehe nächste Tour;Rennvelo;Arbeitsfahrt am Abend, new tag
+	// 2008-09-02;08-20;1200;300;8500;zur Arbeit;kein Kommentar, siehe nï¿½chste Tour;Rennvelo;Arbeitsfahrt am Abend, new tag
 	// 2008-09-01;14-30;1500;20;6000;auf Fremersberg;;MTB;FB
 	// 2008-08-28;18-00;780;120;12000;Feierabendrunde;;TestTourType;no tags
 
@@ -455,8 +454,6 @@ public class CSVTourDataReader extends TourbookDevice {
 				return false;
 			}
 
-		} catch (final FileNotFoundException e) {
-			e.printStackTrace();
 		} catch (final IOException e) {
 			e.printStackTrace();
 		} finally {

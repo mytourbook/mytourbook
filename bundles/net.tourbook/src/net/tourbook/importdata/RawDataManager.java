@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,7 +18,6 @@ package net.tourbook.importdata;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -1727,9 +1726,6 @@ public class RawDataManager {
          inReader.close();
          outReader.close();
 
-      } catch (final FileNotFoundException e) {
-         TourLogManager.logEx(e);
-         return null;
       } catch (final IOException e) {
          TourLogManager.logEx(e);
          return null;
@@ -2108,9 +2104,7 @@ public class RawDataManager {
                         }
                      });
 
-            } catch (final InvocationTargetException e) {
-               TourLogManager.logEx(e);
-            } catch (final InterruptedException e) {
+            } catch (final InvocationTargetException | InterruptedException e) {
                TourLogManager.logEx(e);
             }
          } else {

@@ -992,11 +992,7 @@ public class Map3GradientColorManager {
 
          colorDefinitions = readColors_10_MapColors(xmlRoot);
 
-      } catch (final UnsupportedEncodingException e) {
-         StatusUtil.log(e);
-      } catch (final FileNotFoundException e) {
-         StatusUtil.log(e);
-      } catch (final WorkbenchException e) {
+      } catch (final UnsupportedEncodingException | FileNotFoundException | WorkbenchException e) {
          StatusUtil.log(e);
       } finally {
          if (reader != null) {

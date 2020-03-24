@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -790,13 +790,7 @@ public class GraphColorManager {
             }
          }
 
-      } catch (final UnsupportedEncodingException e) {
-         e.printStackTrace();
-      } catch (final FileNotFoundException e) {
-         e.printStackTrace();
-      } catch (final WorkbenchException e) {
-         e.printStackTrace();
-      } catch (final NumberFormatException e) {
+      } catch (final UnsupportedEncodingException | FileNotFoundException | WorkbenchException | NumberFormatException e) {
          e.printStackTrace();
       } finally {
          if (reader != null) {
