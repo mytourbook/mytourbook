@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -59,16 +59,12 @@ public class Suunto2DeviceDataReader extends TourbookDevice {
 
 	private InputStream convertIntoWellFormedXml(final String importFilePath) {
 
-		BufferedReader fileReader = null;
-		StringWriter xmlWriter = null;
+	   StringWriter xmlWriter = null;
+	   
+		try (final FileInputStream inputStream = new FileInputStream(importFilePath);
+		      BufferedReader fileReader = new BufferedReader(new InputStreamReader(inputStream, UI.UTF_8))){
 
-		try {
-
-			xmlWriter = new StringWriter();
-
-			final FileInputStream inputStream = new FileInputStream(importFilePath);
-			fileReader = new BufferedReader(new InputStreamReader(inputStream, UI.UTF_8));
-
+		   xmlWriter = new StringWriter();
 			String line = fileReader.readLine();
 			if (line.toLowerCase().startsWith(XML_START_ID)) {
 				// write "<?xml"
@@ -94,7 +90,6 @@ public class Suunto2DeviceDataReader extends TourbookDevice {
 			StatusUtil.log(e1);
 
 		} finally {
-			Util.closeReader(fileReader);
 			Util.closeWriter(xmlWriter);
 		}
 
@@ -129,14 +124,10 @@ public class Suunto2DeviceDataReader extends TourbookDevice {
 	 */
 	private boolean isSuuntoXMLFile(final String importFilePath) {
 
-		BufferedReader fileReader = null;
+		try (final FileInputStream inputStream = new FileInputStream(importFilePath);
+		      		      BufferedReader fileReader = new BufferedReader(new InputStreamReader(inputStream, UI.UTF_8))) {
 
-		try {
-
-			final FileInputStream inputStream = new FileInputStream(importFilePath);
-
-			fileReader = new BufferedReader(new InputStreamReader(inputStream, UI.UTF_8));
-
+			
 			String line = fileReader.readLine();
 			if (line == null || line.toLowerCase().startsWith(XML_START_ID) == false) {
 				return false;
@@ -158,8 +149,6 @@ public class Suunto2DeviceDataReader extends TourbookDevice {
 
 			StatusUtil.log(e1);
 
-		} finally {
-			Util.closeReader(fileReader);
 		}
 
 		return false;

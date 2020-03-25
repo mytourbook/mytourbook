@@ -18,12 +18,10 @@ package net.tourbook.tour;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -32,6 +30,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import net.tourbook.Messages;
 import net.tourbook.application.TourTypeContributionItem;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
@@ -342,11 +341,11 @@ public class TourTypeFilterManager {
          return filterList;
       }
 
-      InputStreamReader reader = null;
       long tourTypeId;
 
-      try {
-         reader = new InputStreamReader(new FileInputStream(inputFile), "UTF-8"); //$NON-NLS-1$
+      try (FileInputStream inputStream = new FileInputStream(inputFile);
+            InputStreamReader reader = new InputStreamReader(inputStream, UI.UTF_8)) {
+
          final XMLMemento mementoFilterList = XMLMemento.createReadRoot(reader);
 
          final IMemento[] mementoFilters = mementoFilterList.getChildren(MEMENTO_CHILD_FILTER);
@@ -428,16 +427,8 @@ public class TourTypeFilterManager {
             }
          }
 
-      } catch (final UnsupportedEncodingException | FileNotFoundException | WorkbenchException | NumberFormatException e) {
+      } catch (final IOException | WorkbenchException | NumberFormatException e) {
          e.printStackTrace();
-      } finally {
-         if (reader != null) {
-            try {
-               reader.close();
-            } catch (final IOException e) {
-               e.printStackTrace();
-            }
-         }
       }
 
       return filterList;

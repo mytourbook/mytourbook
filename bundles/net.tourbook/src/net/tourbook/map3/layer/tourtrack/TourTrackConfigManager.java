@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,7 +19,6 @@ import gov.nasa.worldwind.WorldWind;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
@@ -1125,8 +1124,6 @@ public class TourTrackConfigManager {
 	 */
 	private static void readConfigFromXml() {
 
-		InputStreamReader reader = null;
-
 		try {
 
 			XMLMemento xmlRoot = null;
@@ -1138,9 +1135,9 @@ public class TourTrackConfigManager {
 			final File inputFile = new File(absoluteLayerPath);
 			if (inputFile.exists()) {
 
-				try {
+			   try ( FileInputStream inputStream = new FileInputStream(inputFile);
+			         InputStreamReader reader = new InputStreamReader(inputStream, UI.UTF_8)) {
 
-					reader = new InputStreamReader(new FileInputStream(inputFile), UI.UTF_8);
 					xmlRoot = XMLMemento.createReadRoot(reader);
 
 				} catch (final Exception e) {
@@ -1184,15 +1181,6 @@ public class TourTrackConfigManager {
 
 		} catch (final Exception e) {
 			StatusUtil.log(e);
-		} finally {
-
-			if (reader != null) {
-				try {
-					reader.close();
-				} catch (final IOException e) {
-					StatusUtil.log(e);
-				}
-			}
 		}
 	}
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -216,12 +216,9 @@ public class Polar_PPD_DataReader extends TourbookDevice {
 
 		boolean returnValue = false;
 
-		BufferedReader fileReader = null;
-
-		try {
-
 			// the default charset has not handled correctly the german umlaute in uppercase on Linux/OSX
-			fileReader = new BufferedReader(new InputStreamReader(new FileInputStream(importFilePath), UI.ISO_8859_1));
+		try (InputStreamReader inputStream= new InputStreamReader(new FileInputStream(importFilePath), UI.ISO_8859_1);
+		      BufferedReader fileReader = new BufferedReader(inputStream)) {
 
 			String line;
 			while ((line = fileReader.readLine()) != null) {
@@ -252,16 +249,6 @@ public class Polar_PPD_DataReader extends TourbookDevice {
 		} catch (final Exception e) {
 			StatusUtil.showStatus(e);
 			return false;
-		} finally {
-
-			try {
-				if (fileReader != null) {
-					fileReader.close();
-				}
-			} catch (final IOException e) {
-				StatusUtil.showStatus(e);
-				return false;
-			}
 		}
 
 		return returnValue;

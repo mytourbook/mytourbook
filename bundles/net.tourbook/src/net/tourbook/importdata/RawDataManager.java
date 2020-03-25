@@ -1712,11 +1712,9 @@ public class RawDataManager {
       }
 
       // copy source file into destination file
-      FileInputStream inReader = null;
-      FileOutputStream outReader = null;
-      try {
-         inReader = new FileInputStream(fileIn);
-         outReader = new FileOutputStream(newFile);
+      try (FileInputStream inReader = new FileInputStream(fileIn);
+            FileOutputStream outReader = new FileOutputStream(newFile)) {
+
          int c;
 
          while ((c = inReader.read()) != -1) {
@@ -1729,24 +1727,6 @@ public class RawDataManager {
       } catch (final IOException e) {
          TourLogManager.logEx(e);
          return null;
-      } finally {
-         // close the files
-         if (inReader != null) {
-            try {
-               inReader.close();
-            } catch (final IOException e) {
-               TourLogManager.logEx(e);
-               return null;
-            }
-         }
-         if (outReader != null) {
-            try {
-               outReader.close();
-            } catch (final IOException e) {
-               TourLogManager.logEx(e);
-               return null;
-            }
-         }
       }
 
       // delete source file

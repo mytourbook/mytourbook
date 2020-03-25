@@ -2,6 +2,7 @@ package net.tourbook.preferences;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -49,11 +50,10 @@ public class MapsforgeStyleParser {
 	public List<MapsforgeThemeStyle> readXML(String xmlFile) {
 
 		List<MapsforgeThemeStyle> items = new ArrayList<MapsforgeThemeStyle>();
-		try {
+		try (InputStream in = new FileInputStream(xmlFile)){
 			// First, create a new XMLInputFactory
 			XMLInputFactory inputFactory = XMLInputFactory.newInstance();
 			// Setup a new eventReader
-			InputStream in = new FileInputStream(xmlFile);
 			XMLEventReader eventReader = inputFactory.createXMLEventReader(in);
 			// read the XML document
 			MapsforgeThemeStyle item = null;
@@ -123,7 +123,7 @@ public class MapsforgeStyleParser {
 					}
 				}
 			}
-		} catch (FileNotFoundException | XMLStreamException e) {
+		} catch (IOException | XMLStreamException e) {
 			e.printStackTrace();
 		}
 		return items;

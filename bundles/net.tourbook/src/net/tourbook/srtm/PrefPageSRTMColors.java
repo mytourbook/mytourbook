@@ -25,12 +25,10 @@ import de.byteholder.geoclipse.mapprovider.MP;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -448,14 +446,12 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
          profileFile = createdProfileFile;
       }
 
-      InputStreamReader reader = null;
-
-      try {
+      try (FileInputStream inputStream = new FileInputStream(profileFile);
+            InputStreamReader reader = new InputStreamReader(inputStream, UI.UTF_8)) {
 
          final ArrayList<RGBVertex> vertexList = new ArrayList<>();
          _maxProfileId = -1;
 
-         reader = new InputStreamReader(new FileInputStream(profileFile), "UTF-8"); //$NON-NLS-1$
          final XMLMemento xmlRoot = XMLMemento.createReadRoot(reader);
 
          /*
@@ -544,17 +540,9 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
             _maxProfileId = Math.max(_maxProfileId, profileId);
          }
 
-      } catch (final UnsupportedEncodingException | FileNotFoundException | WorkbenchException | NumberFormatException e) {
+      } catch (final IOException | WorkbenchException | NumberFormatException e) {
          e.printStackTrace();
       } finally {
-
-         if (reader != null) {
-            try {
-               reader.close();
-            } catch (final IOException e) {
-               e.printStackTrace();
-            }
-         }
 
          if (_profileList.size() == 0) {
 

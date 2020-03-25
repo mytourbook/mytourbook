@@ -1863,9 +1863,7 @@ public class Util {
 
       String content = UI.EMPTY_STRING;
 
-      try {
-
-         final FileInputStream stream = new FileInputStream(fileName);
+      try (FileInputStream stream = new FileInputStream(fileName)) {
 
          content = readContentFromStream(stream);
 

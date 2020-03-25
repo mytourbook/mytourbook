@@ -34,9 +34,9 @@ public final class FileZip {
 
       String outFileName = null;
       String gzipEntryName = null;
-      try {
-         // Open the GZIP file
-         final GZIPInputStream gzipInputStream = new GZIPInputStream(new FileInputStream(gzipName));
+
+      // Open the GZIP file
+      try (GZIPInputStream gzipInputStream = new GZIPInputStream(new FileInputStream(gzipName))) {
 
          gzipEntryName = gzipName;
          if (gzipEntryName.indexOf(File.separator) != -1) {
@@ -77,9 +77,8 @@ public final class FileZip {
       String outFileName = null;
       String zipEntryName = null;
 
-      try {
-         // Open the ZIP file
-         final ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(zipName));
+      // Open the ZIP file
+      try (final ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(zipName))) {
 
          // Get the first entry
          final ZipEntry zipEntry = zipInputStream.getNextEntry();
