@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,12 +18,10 @@ package net.tourbook.common.color;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -317,7 +315,7 @@ public class GraphColorManager {
          final IPath stateLocation = Platform.getStateLocation(CommonActivator.getDefault().getBundle());
          final File file = stateLocation.append(MEMENTO_LEGEND_COLOR_FILE).toFile();
 
-         writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8")); //$NON-NLS-1$
+         writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), UI.UTF_8));
 
          final XMLMemento xmlMemento = getXMLMementoRoot();
 
@@ -678,10 +676,8 @@ public class GraphColorManager {
          return;
       }
 
-      InputStreamReader reader = null;
-
-      try {
-         reader = new InputStreamReader(new FileInputStream(file), "UTF-8"); //$NON-NLS-1$
+      try (FileInputStream inputStream = new FileInputStream(file);
+            InputStreamReader reader = new InputStreamReader(inputStream, UI.UTF_8)) {
 
          final XMLMemento mementoRoot = XMLMemento.createReadRoot(reader);
          final IMemento[] mementoLegendColors = mementoRoot.getChildren(MEMENTO_CHILD_LEGEND_COLOR);
@@ -790,22 +786,8 @@ public class GraphColorManager {
             }
          }
 
-      } catch (final UnsupportedEncodingException e) {
+      } catch (final IOException | WorkbenchException | NumberFormatException e) {
          e.printStackTrace();
-      } catch (final FileNotFoundException e) {
-         e.printStackTrace();
-      } catch (final WorkbenchException e) {
-         e.printStackTrace();
-      } catch (final NumberFormatException e) {
-         e.printStackTrace();
-      } finally {
-         if (reader != null) {
-            try {
-               reader.close();
-            } catch (final IOException e) {
-               e.printStackTrace();
-            }
-         }
       }
    }
 

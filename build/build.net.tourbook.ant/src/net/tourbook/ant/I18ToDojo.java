@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -71,12 +71,7 @@ public class I18ToDojo extends Task {
 	 */
 	private Properties loadJavaProperties(final String javaProperties) {
 
-		FileInputStream fileStream = null;
-
-		try {
-
-			fileStream = new FileInputStream(new File(javaProperties));
-
+		try (FileInputStream  fileStream = new FileInputStream(new File(javaProperties))) {
 			final Properties properties = new Properties();
 
 			properties.load(fileStream);
@@ -85,14 +80,6 @@ public class I18ToDojo extends Task {
 
 		} catch (final Exception e) {
 			System.err.println(e);
-		} finally {
-			try {
-				if (fileStream != null) {
-					fileStream.close();
-				}
-			} catch (final IOException e) {
-				e.printStackTrace();
-			}
 		}
 
 		return null;

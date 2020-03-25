@@ -267,9 +267,7 @@ public abstract class TourbookDevice implements IRawDataReader {
       final String deviceTagLower = deviceTag.toLowerCase();
       BufferedReader fileReader = null;
 
-      try {
-
-         final FileInputStream inputStream = new FileInputStream(importFilePath);
+      try (FileInputStream inputStream = new FileInputStream(importFilePath)) {
 
          if (isRemoveBOM) {
 

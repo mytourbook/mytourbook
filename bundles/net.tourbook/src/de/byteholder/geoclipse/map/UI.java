@@ -26,8 +26,6 @@ public class UI {
    public static final String DOTS            = "...";           //$NON-NLS-1$
    public static final String MBYTES          = "MByte";         //$NON-NLS-1$
 
-   public static final String UTF_8           = "UTF-8";         //$NON-NLS-1$
-
    /**
     * THIS IS COPIED FROM org.eclipse.jface.dialogs.Dialog <br>
     * <br>

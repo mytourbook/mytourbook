@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -556,9 +556,7 @@ public class GarminSAXHandler extends DefaultHandler {
             finalize_Tour();
          }
 
-      } catch (final NumberFormatException e) {
-         StatusUtil.showStatus(e);
-      } catch (final ParseException e) {
+      } catch (final NumberFormatException | ParseException e) {
          StatusUtil.showStatus(e);
       }
 
@@ -889,7 +887,7 @@ public class GarminSAXHandler extends DefaultHandler {
                   try {
                      _currentTime = TIME_FORMAT_RFC822.parse(timeString).getTime();
                   } catch (final ParseException e3) {
-                     
+
                      TourLogManager.logError(e3.getMessage() + " in " + _importFilePath); //$NON-NLS-1$
                   }
                }

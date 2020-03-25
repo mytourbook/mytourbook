@@ -25,12 +25,10 @@ import de.byteholder.geoclipse.mapprovider.MP;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -195,7 +193,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
          int profileId = -1;
 
-         writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8")); //$NON-NLS-1$
+         writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), UI.UTF_8));
 
          final XMLMemento xmlRoot = getXMLRoot();
 
@@ -448,14 +446,12 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
          profileFile = createdProfileFile;
       }
 
-      InputStreamReader reader = null;
-
-      try {
+      try (FileInputStream inputStream = new FileInputStream(profileFile);
+            InputStreamReader reader = new InputStreamReader(inputStream, UI.UTF_8)) {
 
          final ArrayList<RGBVertex> vertexList = new ArrayList<>();
          _maxProfileId = -1;
 
-         reader = new InputStreamReader(new FileInputStream(profileFile), "UTF-8"); //$NON-NLS-1$
          final XMLMemento xmlRoot = XMLMemento.createReadRoot(reader);
 
          /*
@@ -544,23 +540,9 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
             _maxProfileId = Math.max(_maxProfileId, profileId);
          }
 
-      } catch (final UnsupportedEncodingException e) {
-         e.printStackTrace();
-      } catch (final FileNotFoundException e) {
-         e.printStackTrace();
-      } catch (final WorkbenchException e) {
-         e.printStackTrace();
-      } catch (final NumberFormatException e) {
+      } catch (final IOException | WorkbenchException | NumberFormatException e) {
          e.printStackTrace();
       } finally {
-
-         if (reader != null) {
-            try {
-               reader.close();
-            } catch (final IOException e) {
-               e.printStackTrace();
-            }
-         }
 
          if (_profileList.size() == 0) {
 
@@ -1612,7 +1594,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
       try {
 
          final File file = getProfileFile();
-         writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8")); //$NON-NLS-1$
+         writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), UI.UTF_8));
 
          final XMLMemento xmlRoot = getXMLRoot();
 

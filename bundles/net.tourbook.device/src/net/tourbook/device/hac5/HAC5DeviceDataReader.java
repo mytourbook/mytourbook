@@ -528,9 +528,6 @@ public class HAC5DeviceDataReader extends TourbookDevice {
             offsetDDRecord = adjustDDRecordOffset(offsetAARecordInDDRecord);
          }
 
-      } catch (final FileNotFoundException e) {
-         e.printStackTrace();
-         returnValue = false;
       } catch (final IOException e) {
          e.printStackTrace();
          returnValue = false;
@@ -680,9 +677,7 @@ public class HAC5DeviceDataReader extends TourbookDevice {
             isValid = true;
          }
 
-      } catch (final NumberFormatException nfe) {
-         return false;
-      } catch (final FileNotFoundException e) {
+      } catch (final NumberFormatException | FileNotFoundException e) {
          return false;
       } catch (final Exception e) {
          e.printStackTrace();

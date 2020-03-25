@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1109,9 +1109,7 @@ public class DialogExportTour extends TitleAreaDialog {
 
             new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, true, exportRunnable);
 
-         } catch (final InvocationTargetException e) {
-            StatusUtil.showStatus(e);
-         } catch (final InterruptedException e) {
+         } catch (final InvocationTargetException | InterruptedException e) {
             StatusUtil.showStatus(e);
          }
 

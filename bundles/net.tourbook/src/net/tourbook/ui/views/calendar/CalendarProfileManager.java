@@ -2923,8 +2923,6 @@ public class CalendarProfileManager {
     */
    private static void readProfileFromXml() {
 
-      InputStreamReader reader = null;
-
       try {
 
          XMLMemento xmlRoot = null;
@@ -2936,9 +2934,9 @@ public class CalendarProfileManager {
          final File inputFile = new File(absoluteLayerPath);
          if (inputFile.exists()) {
 
-            try {
+            try (FileInputStream inputStream = new FileInputStream(inputFile);
+                  InputStreamReader reader = new InputStreamReader(inputStream, UI.UTF_8)) {
 
-               reader = new InputStreamReader(new FileInputStream(inputFile), UI.UTF_8);
                xmlRoot = XMLMemento.createReadRoot(reader);
 
             } catch (final Exception e) {
@@ -2980,8 +2978,6 @@ public class CalendarProfileManager {
 
       } catch (final Exception e) {
          StatusUtil.log(e);
-      } finally {
-         Util.close(reader);
       }
    }
 

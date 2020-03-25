@@ -609,13 +609,7 @@ public class DialogPrintTour extends TitleAreaDialog {
                      printSettings.setCompleteFilePath(filePath.toOSString());
                      try {
                         ((PrintTourPDF) _printExtensionPoint).printPDF(tourData, printSettings);
-                     } catch (final FileNotFoundException e) {
-                        e.printStackTrace();
-                        displayErrorMessage(e);
-                     } catch (final FOPException e) {
-                        e.printStackTrace();
-                        displayErrorMessage(e);
-                     } catch (final TransformerException e) {
+                     } catch (final FileNotFoundException | FOPException | TransformerException e) {
                         e.printStackTrace();
                         displayErrorMessage(e);
                      }

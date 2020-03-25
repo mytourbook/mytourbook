@@ -308,9 +308,7 @@ public class PhotoImageLoader {
                }
             }
          }
-      } catch (final ImageReadException e) {
-         StatusUtil.log(e);
-      } catch (final IOException e) {
+      } catch (final ImageReadException | IOException e) {
          StatusUtil.log(e);
       }
 
@@ -1328,19 +1326,16 @@ public class PhotoImageLoader {
    private void loadImageProperties(final IPath requestedStoreImageFilePath) {
 
       final IPath propPath = ThumbnailStore.getPropertiesPathFromImagePath(requestedStoreImageFilePath);
-      FileInputStream fileStream = null;
 
       Properties imageProperties = null;
 
-      try {
+      try (FileInputStream fileStream = new FileInputStream(propPath.toOSString())) {
 
          final File propFile = propPath.toFile();
 
          if (propFile.isFile() == false) {
             return;
          }
-
-         fileStream = new FileInputStream(propPath.toOSString());
 
          imageProperties = new Properties();
 
@@ -1349,15 +1344,6 @@ public class PhotoImageLoader {
       } catch (final IOException e) {
          StatusUtil.log(NLS.bind("Image properties cannot be loaded from: \"{0}\"", //$NON-NLS-1$
                propPath.toOSString()), e);
-      } finally {
-
-         if (fileStream != null) {
-            try {
-               fileStream.close();
-            } catch (final IOException e) {
-               StatusUtil.log(e);
-            }
-         }
       }
 
       if (imageProperties != null) {

@@ -40,10 +40,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
-import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.NumberFormat;
@@ -2399,10 +2397,6 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
          return true;
 
-      } catch (final UnknownHostException e) {
-         StatusUtil.showStatus(e.getMessage(), e);
-      } catch (final SocketTimeoutException e) {
-         StatusUtil.showStatus(e.getMessage(), e);
       } catch (final Exception e) {
          StatusUtil.showStatus(e.getMessage(), e);
       } finally {

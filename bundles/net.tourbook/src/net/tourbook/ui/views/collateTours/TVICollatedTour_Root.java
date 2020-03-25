@@ -322,9 +322,7 @@ public class TVICollatedTour_Root extends TVICollatedTour {
                 */
                new ProgressMonitorDialog(collateToursView.getShell()).run(true, true, runnable);
 
-            } catch (final InvocationTargetException e) {
-               StatusUtil.showStatus(e);
-            } catch (final InterruptedException e) {
+            } catch (final InvocationTargetException | InterruptedException e) {
                StatusUtil.showStatus(e);
             }
          }

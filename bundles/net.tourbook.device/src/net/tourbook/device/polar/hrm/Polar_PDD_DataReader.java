@@ -18,7 +18,6 @@ package net.tourbook.device.polar.hrm;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -273,8 +272,9 @@ public class Polar_PDD_DataReader extends TourbookDevice {
          return null;
       }
 
-      final TourData[] importTourData = newlyImportedTours.values().toArray(
-            new TourData[newlyImportedTours.values().size()]);
+      final TourData[] importTourData = newlyImportedTours.values()
+            .toArray(
+                  new TourData[newlyImportedTours.values().size()]);
 
       // check bounds
       if (importTourData.length == 0) {
@@ -490,14 +490,9 @@ public class Polar_PDD_DataReader extends TourbookDevice {
 
       boolean returnValue = false;
 
-      BufferedReader fileReader = null;
-
-      try {
-
-         // fileReader = new BufferedReader(new FileReader(_importFilePath));
-
-         // the default charset has not handled correctly the german umlaute in uppercase on Linux/OSX
-         fileReader = new BufferedReader(new InputStreamReader(new FileInputStream(_importFilePath), UI.ISO_8859_1));
+      // the default charset has not handled correctly the german umlaute in uppercase on Linux/OSX
+      try (InputStreamReader inputStream = new InputStreamReader(new FileInputStream(_importFilePath), UI.ISO_8859_1);
+            BufferedReader fileReader = new BufferedReader(inputStream)) {
 
          String line;
          while ((line = fileReader.readLine()) != null) {
@@ -545,16 +540,6 @@ public class Polar_PDD_DataReader extends TourbookDevice {
       } catch (final Exception e) {
          StatusUtil.showStatus(e);
          return false;
-      } finally {
-
-         try {
-            if (fileReader != null) {
-               fileReader.close();
-            }
-         } catch (final IOException e) {
-            StatusUtil.showStatus(e);
-            return false;
-         }
       }
 
       return returnValue;
@@ -1025,8 +1010,6 @@ public class Polar_PDD_DataReader extends TourbookDevice {
             return false;
          }
 
-      } catch (final FileNotFoundException e) {
-         e.printStackTrace();
       } catch (final IOException e) {
          e.printStackTrace();
       } finally {
