@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -303,15 +303,16 @@ public abstract class AdvancedSlideoutShell {
 
    private void animation10_Start() {
 
-      final int a = 0;
+      //final int a = 0;
 
-      if (a == 1) {
-         animation10_Start_Simple();
-      } else {
-         animation10_StartKomplex();
-      }
+      //if (a == 1) {
+      //   animation10_Start_Simple();
+      //} else {
+      animation10_StartKomplex();
+      //}
    }
 
+   @SuppressWarnings("unused")
    private void animation10_Start_Simple() {
 
       if (_isShellFadingIn) {
