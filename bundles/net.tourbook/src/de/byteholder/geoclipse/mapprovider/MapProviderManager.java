@@ -1385,7 +1385,7 @@ public class MapProviderManager {
 
       try {
 
-         writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), UI.UTF_8));
+         writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), net.tourbook.common.UI.UTF_8));
 
          final XMLMemento xmlMemento = createXmlRoot(true);
 
@@ -1601,7 +1601,7 @@ public class MapProviderManager {
             return validMapProviders;
          }
 
-         reader = new InputStreamReader(new FileInputStream(inputFile), UI.UTF_8);
+         reader = new InputStreamReader(new FileInputStream(inputFile), net.tourbook.common.UI.UTF_8);
          final XMLMemento mementoRoot = XMLMemento.createReadRoot(reader);
 
          // check if this is an exported map provider
@@ -2516,7 +2516,7 @@ public class MapProviderManager {
          final IPath stateLocation = Platform.getStateLocation(TourbookPlugin.getDefault().getBundle());
          final File file = stateLocation.append(CUSTOM_MAP_PROVIDER_FILE_NAME).toFile();
 
-         writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), UI.UTF_8));
+         writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), net.tourbook.common.UI.UTF_8));
 
          final XMLMemento xmlMemento = createXmlRoot(false);
 

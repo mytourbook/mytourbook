@@ -193,7 +193,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
          int profileId = -1;
 
-         writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8")); //$NON-NLS-1$
+         writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), UI.UTF_8));
 
          final XMLMemento xmlRoot = getXMLRoot();
 
@@ -1594,7 +1594,7 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
       try {
 
          final File file = getProfileFile();
-         writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8")); //$NON-NLS-1$
+         writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), UI.UTF_8));
 
          final XMLMemento xmlRoot = getXMLRoot();
 

@@ -614,7 +614,7 @@ public class TourTypeFilterManager {
          final IPath stateLocation = Platform.getStateLocation(TourbookPlugin.getDefault().getBundle());
          final File file = stateLocation.append(MEMENTO_FILTER_LIST_FILE).toFile();
 
-         writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8")); //$NON-NLS-1$
+         writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), UI.UTF_8));
 
          final XMLMemento xmlMemento = getXMLMementoRoot();
 

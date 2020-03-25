@@ -100,8 +100,6 @@ public class WEB {
          ? WEB_CONTENT_DEVELOPMENT_FOLDER
          : WEB_CONTENT_RELEASE_FOLDER;
 
-   public static final String           UTF_8                                  = "UTF-8";                                   //$NON-NLS-1$
-
    private static final String          URL_SPACE                              = " ";                                       //$NON-NLS-1$
    private static final String          URL_SPACE_REPLACEMENT                  = "%20";                                     //$NON-NLS-1$
    private static final String          URL_SQB_OPEN                           = "\\[";                                     //$NON-NLS-1$
@@ -503,7 +501,7 @@ public class WEB {
     */
    public static JSONArray parseJSONArray(final Object jsonRawData) throws UnsupportedEncodingException {
 
-      final String jsData = URLDecoder.decode((String) jsonRawData, UTF_8);
+      final String jsData = URLDecoder.decode((String) jsonRawData, UI.UTF_8);
 
       final JSONArray jsonData = new JSONArray(jsData);
 
@@ -519,7 +517,7 @@ public class WEB {
     */
    public static JSONObject parseJSONObject(final Object jsonRawData) throws UnsupportedEncodingException {
 
-      final String jsData = URLDecoder.decode((String) jsonRawData, UTF_8);
+      final String jsData = URLDecoder.decode((String) jsonRawData, UI.UTF_8);
 
       final JSONObject jsonData = new JSONObject(jsData);
 

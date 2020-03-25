@@ -304,7 +304,7 @@ public class RawDataManager {
             file.createNewFile();
          }
 
-         writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file, true), "UTF-8")); //$NON-NLS-1$
+         writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file, true), UI.UTF_8));
          final ImportConfig importConfig = getEasyConfig().getActiveImportConfig();
 
          for (final String invalidFile : _invalidFilesList) {

@@ -120,7 +120,7 @@ public class PrintTourPDF extends PrintTourExtension {
 
             StreamSource xmlSource;
             try {
-               xmlSource = new StreamSource(new ByteArrayInputStream(xml.getBytes("UTF-8"))); //$NON-NLS-1$
+               xmlSource = new StreamSource(new ByteArrayInputStream(xml.getBytes(UI.UTF_8)));
             } catch (final UnsupportedEncodingException e) {
                //if UTF-8 fails, try default encoding
                xmlSource = new StreamSource(new ByteArrayInputStream(xml.getBytes()));
