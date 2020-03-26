@@ -15,6 +15,12 @@
  *******************************************************************************/
 package net.tourbook.ui.views.performanceModelingChart;
 
+import gnu.trove.list.array.TIntArrayList;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.Month;
@@ -42,9 +48,11 @@ import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
+import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourManager;
 import net.tourbook.trainingstress.ITrainingStressDataListener;
+import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.UI;
 
 import org.eclipse.e4.ui.di.PersistState;
@@ -74,6 +82,10 @@ public class PerformanceModelingChartView extends ViewPart {
 
    private static final String STATE_IS_SHOW_ALL_STRESS_SCORE_VALUES = "IsShowAllStressScoreValues";                                                  //$NON-NLS-1$
    private static final String STATE_IS_SYNC_VERTICAL_CHART_SCALING  = "IsSyncVerticalChartScaling";                                                  //$NON-NLS-1$
+   private static final String STATE_SELECTED_YEAR                   = "performancemodeling.container.selected-year";                                 //$NON-NLS-1$
+   private static final String STATE_NUMBER_OF_YEARS                 = "performancemodeling.container.number_of_years";                               //$NON-NLS-1$
+
+   private static final char   NL                                    = net.tourbook.common.UI.NEW_LINE;
 
    private static final String GRID_PREF_PREFIX                      = "GRID_TRAINING__";                                                             //$NON-NLS-1$
 
@@ -106,6 +118,11 @@ public class PerformanceModelingChartView extends ViewPart {
    private ChartDataModel                 _chartDataModel;
 
    private int                            _selectedYear = -1;
+
+   /**
+    * Contains all years which have tours for the selected tour type and person.
+    */
+   private TIntArrayList                  _availableYears;
 
    private ActionShowAllStressScoreValues _actionShowAllStressScoreValues;
    private ActionSynchronizeChartScale    _actionSynchVerticalChartScaling;
@@ -326,7 +343,7 @@ public class PerformanceModelingChartView extends ViewPart {
 
       createActions();
       fillToolbar();
-      updateActions();
+      updateUI();
 
       addPrefListener();
       addTrainingStressDataListener();
@@ -335,6 +352,14 @@ public class PerformanceModelingChartView extends ViewPart {
 
       updateUI_10_stressScoreValuesFromModel();
 
+   }
+
+   private void updateUI() {
+
+      // fill combobox with number of years
+      for (int years = 1; years <= 100; years++) {
+         _comboNumberOfYears.add(Integer.toString(years));
+      }
    }
 
    private ChartToolTipInfo createToolTipInfo(final int serieIndex, final int valueIndex) {
@@ -653,7 +678,185 @@ public class PerformanceModelingChartView extends ViewPart {
       _isSynchChartVerticalValues = Util.getStateBoolean(_state, STATE_IS_SYNC_VERTICAL_CHART_SCALING, false);
       _actionSynchVerticalChartScaling.setChecked(_isSynchChartVerticalValues);
 
+      // select year
+      final int defaultYear = Util.getStateInt(_state, STATE_SELECTED_YEAR, -1);
+      refreshYearCombobox();
+      selectYear(defaultYear);
+
       updateChart_10_NoReload();
+   }
+
+   private void selectYear(final int defaultYear) {
+
+      int selectedYearIndex = getActiveYearComboboxIndex(defaultYear);
+      if (selectedYearIndex == -1) {
+
+         /*
+          * the active year was not found in the combo box, it's possible that the combo box needs
+          * to be update
+          */
+
+         refreshYearCombobox();
+         selectedYearIndex = getActiveYearComboboxIndex(defaultYear);
+
+         if (selectedYearIndex == -1) {
+
+            // year is still not selected
+            final int yearCount = _comboYear.getItemCount();
+
+            // reselect the youngest year if years are available
+            if (yearCount > 0) {
+               selectedYearIndex = yearCount - 1;
+               _selectedYear = Integer.parseInt(_comboYear.getItem(yearCount - 1));
+            }
+         }
+      }
+
+      _comboYear.select(selectedYearIndex);
+   }
+
+   /**
+    * @param defaultYear
+    * @return Returns the index for the active year or <code>-1</code> when there are no years
+    *         available
+    */
+   private int getActiveYearComboboxIndex(final int defaultYear) {
+
+      int selectedYearIndex = -1;
+
+      if (_availableYears == null) {
+         return selectedYearIndex;
+      }
+
+      /*
+       * try to get the year index for the default year
+       */
+      if (defaultYear != -1) {
+
+         int yearIndex = 0;
+         for (final int year : _availableYears.toArray()) {
+
+            if (year == defaultYear) {
+
+               _selectedYear = defaultYear;
+
+               return yearIndex;
+            }
+            yearIndex++;
+         }
+      }
+
+      /*
+       * try to get year index of the selected year
+       */
+      int yearIndex = 0;
+      for (final int year : _availableYears.toArray()) {
+         if (year == _selectedYear) {
+            selectedYearIndex = yearIndex;
+            break;
+         }
+         yearIndex++;
+      }
+
+      return selectedYearIndex;
+   }
+
+   private void refreshYearCombobox() {
+      final SQLFilter filter = new SQLFilter(SQLFilter.TAG_FILTER);
+
+      String fromTourData;
+
+      final SQLFilter sqlFilter = new SQLFilter(SQLFilter.TAG_FILTER);
+      if (sqlFilter.isTagFilterActive()) {
+
+         // with tag filter
+
+         fromTourData = NL
+
+               + "FROM (         " + NL //$NON-NLS-1$
+
+               + " SELECT        " + NL //$NON-NLS-1$
+
+               + "  StartYear    " + NL //$NON-NLS-1$
+
+               + ("  FROM " + TourDatabase.TABLE_TOUR_DATA) + NL//$NON-NLS-1$
+
+               // get tag id's
+               + "  LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" + NL //$NON-NLS-1$ //$NON-NLS-2$
+               + "  ON tourID = jTdataTtag.TourData_tourId  " + NL //$NON-NLS-1$
+
+               + "  WHERE 1=1    " + NL //$NON-NLS-1$
+               + sqlFilter.getWhereClause()
+
+               + ") td           " + NL//$NON-NLS-1$
+         ;
+
+      } else {
+
+         // without tag filter
+
+         fromTourData = NL
+
+               + " FROM " + TourDatabase.TABLE_TOUR_DATA + NL //$NON-NLS-1$
+
+               + " WHERE 1=1        " + NL //$NON-NLS-1$
+               + sqlFilter.getWhereClause() + NL;
+      }
+
+      final String sqlString = NL +
+
+            "SELECT                 " + NL //$NON-NLS-1$
+
+            + " StartYear           " + NL //$NON-NLS-1$
+
+            + fromTourData
+
+            + " GROUP BY STARTYEAR     " + NL //$NON-NLS-1$
+            + " ORDER BY STARTYEAR     " + NL//       //$NON-NLS-1$
+      ;
+      _availableYears = new TIntArrayList();
+
+      try {
+         final Connection conn = TourDatabase.getInstance().getConnection();
+         final PreparedStatement statement = conn.prepareStatement(sqlString);
+         filter.setParameters(statement, 1);
+
+         final ResultSet result = statement.executeQuery();
+
+         while (result.next()) {
+            _availableYears.add(result.getInt(1));
+         }
+
+         conn.close();
+
+      } catch (final SQLException e) {
+         UI.showSQLException(e);
+      }
+
+      _comboYear.removeAll();
+
+      /*
+       * add all years of the tours and the current year
+       */
+      final int thisYear = LocalDate.now().getYear();
+
+      boolean isThisYearSet = false;
+
+      for (final int year : _availableYears.toArray()) {
+
+         if (year == thisYear) {
+            isThisYearSet = true;
+         }
+
+         _comboYear.add(Integer.toString(year));
+      }
+
+      // add currenty year if not set
+      if (isThisYearSet == false) {
+         _availableYears.add(thisYear);
+         _comboYear.add(Integer.toString(thisYear));
+      }
+
    }
 
    @PersistState
@@ -661,6 +864,8 @@ public class PerformanceModelingChartView extends ViewPart {
 
       _state.put(STATE_IS_SHOW_ALL_STRESS_SCORE_VALUES, _actionShowAllStressScoreValues.isChecked());
       _state.put(STATE_IS_SYNC_VERTICAL_CHART_SCALING, _actionSynchVerticalChartScaling.isChecked());
+
+      _state.put(STATE_SELECTED_YEAR, _selectedYear);
    }
 
    private void setChartProperties() {
@@ -824,26 +1029,27 @@ public class PerformanceModelingChartView extends ViewPart {
 
       // show the new data data model in the chart
       _chartPerformanceModelingData.updateChart(_chartDataModel, false);
+      _chartPerformanceModelingData.redrawChart();
       // _chartPerformanceModelingData.up = TourManager.getInstance().getActivePerformanceModelingChartView();
       updateActions();
    }
 
    private void updateActions() {
 
-      final ArrayList<Integer> enabledGraphIds = new ArrayList<>();
+      final ArrayList<String> enabledGraphTitles = new ArrayList<>();
 
-      for (final ChartDataSerie xyDataIterator : _chartDataModel.getXyData()) {
+      for (final ChartDataSerie xyDataIterator : _chartDataModel.getYData()) {
 
          if (xyDataIterator instanceof ChartDataYSerie) {
 
             final ChartDataYSerie yData = (ChartDataYSerie) xyDataIterator;
-            final Integer graphId = (Integer) yData.getCustomData(ChartDataYSerie.YDATA_INFO);
+            final String graphTitle = yData.getYTitle();
 
-            enabledGraphIds.add(graphId);
+            enabledGraphTitles.add(graphTitle);
          }
       }
 
-      _actionShowAllStressScoreValues.setEnabled(enabledGraphIds.contains("GOVSS"));
+      _actionShowAllStressScoreValues.setEnabled(enabledGraphTitles.contains("GOVSS"));
 
    }
 
