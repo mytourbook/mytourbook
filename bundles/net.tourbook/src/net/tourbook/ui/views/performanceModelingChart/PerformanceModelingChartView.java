@@ -33,6 +33,7 @@ import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
+import net.tourbook.chart.ChartStatisticSegments;
 import net.tourbook.chart.ChartToolTipInfo;
 import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IBarSelectionListener;
@@ -82,8 +83,8 @@ public class PerformanceModelingChartView extends ViewPart {
 
 // SET_FORMATTING_ON
 
-   private final IPreferenceStore         _prefStore      = TourbookPlugin.getPrefStore();
-   private final IDialogSettings          _state          = TourbookPlugin.getState(ID);
+   private final IPreferenceStore         _prefStore    = TourbookPlugin.getPrefStore();
+   private final IDialogSettings          _state        = TourbookPlugin.getState(ID);
 
    private IPropertyChangeListener        _prefChangeListener;
    private ITrainingStressDataListener    _trainingStressDataListener;
@@ -107,9 +108,9 @@ public class PerformanceModelingChartView extends ViewPart {
 
    private double[]                       _xSerieDate;
 
-   private final MinMaxKeeper_YData       _minMaxKeeper   = new MinMaxKeeper_YData();
+   private final MinMaxKeeper_YData       _minMaxKeeper = new MinMaxKeeper_YData();
 
-   private final NumberFormat             _nf1            = NumberFormat.getNumberInstance();
+   private final NumberFormat             _nf1          = NumberFormat.getNumberInstance();
    {
       _nf1.setMinimumFractionDigits(1);
       _nf1.setMaximumFractionDigits(1);
@@ -289,7 +290,7 @@ public class PerformanceModelingChartView extends ViewPart {
                      new ITrainingStressDataListener() {
                         @Override
                         public void trainingStressDataIsModified() {
-                           updateUI_40_performanceModelingChart();
+                           updateChart();
                         }
                      });
       }
@@ -317,8 +318,12 @@ public class PerformanceModelingChartView extends ViewPart {
 
       createUI(parent);
 
+      // set the model BEFORE actions are created/enabled/checked
+      _chartDataModel = new ChartDataModel(ChartType.LINE);
+
       createActions();
       fillToolbar();
+      updateActions();
 
       addPrefListener();
       addTrainingStressDataListener();
@@ -468,7 +473,7 @@ public class PerformanceModelingChartView extends ViewPart {
       final boolean isCustomScaling = _isShowAllValues == false;
 
       _actionSynchVerticalChartScaling.setEnabled(isCustomScaling);
-      _actionShowAllStressScoreValues.setEnabled(true);//isHrZoneAvailable);
+      //_actionShowAllStressScoreValues.setEnabled(true);//isHrZoneAvailable);
       _actionShowAllStressScoreValues.setChecked(true);//TODO by default, it's displayed. Put variable to state ?
       _actionTrainingOptions.setEnabled(true);//isHrZoneAvailable);
    }
@@ -642,7 +647,7 @@ public class PerformanceModelingChartView extends ViewPart {
 
       // display page for the selected chart
       _pageBook.showPage(_page_TrainingStressScores);
-      updateUI_40_performanceModelingChart();
+      updateChart();
 
    }
 
@@ -663,17 +668,41 @@ public class PerformanceModelingChartView extends ViewPart {
     * - Fatigues values
     * - Performance modeling values
     */
-   private void updateUI_40_performanceModelingChart() {
+   private void updateChart() {
 
       //TourManager.GETALL TOURS
+      _chartDataModel = new ChartDataModel(ChartType.LINE);
 
       // We get the govssentries
       if (_currentPerson.getPerformanceModelingData() == null ||
             _currentPerson.getPerformanceModelingData().getGovssEntries() == null) {
-         _chartPerformanceModelingData.updateChart(null, false);
+
+         // set the x-axis
+
+         //Get the current tour type filter to get the beginning date and the end date
+         //, if no filter, get the first tour date and last tour date.
+         //
+         final ChartDataXSerie xData = new ChartDataXSerie(Util.convertIntToDouble(new int[] { 34 }));//_tourTimeData.tourDOYValues));
+         xData.setAxisUnit(ChartDataXSerie.X_AXIS_UNIT_DAY);
+         xData.setVisibleMaxValue(2020);
+         xData.setChartSegments(createChartSegments());//_tourTimeData));
+         _chartDataModel.setXData(xData);
+
+         // set the bar low/high data
+         final ChartDataYSerie yData = new ChartDataYSerie(
+               ChartType.BAR,
+               Util.convertIntToFloat(new int[] { 1000 }),
+               Util.convertIntToFloat(new int[] { 1000 }));
+         yData.setYTitle("LABEL_GRAPH_DAYTIME");
+         yData.setUnitLabel("LABEL_GRAPH_TIME_UNIT");
+         yData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_NUMBER);
+         yData.setYAxisDirection(false);
+         yData.setShowYSlider(true);
+
+         _chartDataModel.addYData(yData);
+         _chartPerformanceModelingData.updateChart(_chartDataModel, false);
          return;
       }
-      _chartDataModel = new ChartDataModel(ChartType.LINE);
 
       final HashMap<LocalDate, ArrayList<Long>> govssEntries = _currentPerson.getPerformanceModelingData().getGovssEntries();
 
@@ -754,6 +783,63 @@ public class PerformanceModelingChartView extends ViewPart {
       // show the new data data model in the chart
       _chartPerformanceModelingData.updateChart(_chartDataModel, false);
       // _chartPerformanceModelingData.up = TourManager.getInstance().getActivePerformanceModelingChartView();
+      updateActions();
+   }
+
+   private void updateActions() {
+
+      final ArrayList<Integer> enabledGraphIds = new ArrayList<>();
+
+      for (final ChartDataSerie xyDataIterator : _chartDataModel.getXyData()) {
+
+         if (xyDataIterator instanceof ChartDataYSerie) {
+
+            final ChartDataYSerie yData = (ChartDataYSerie) xyDataIterator;
+            final Integer graphId = (Integer) yData.getCustomData(ChartDataYSerie.YDATA_INFO);
+
+            enabledGraphIds.add(graphId);
+         }
+      }
+
+      _actionShowAllStressScoreValues.setEnabled(enabledGraphIds.contains("GOVSS"));
+
+   }
+
+   /**
+    * create segments for the chart
+    */
+   private ChartStatisticSegments createChartSegments() {//final TourData_Time tourDataTime) {
+
+      final double segmentStart[] = new double[5];//_numberOfYears];
+      final double segmentEnd[] = new double[5];//_numberOfYears];
+      final String[] segmentTitle = new String[5];//_numberOfYears];
+
+      final int[] allYearDays = new int[] { 366 };//tourDataTime.yearDays;
+      final int oldestYear = 2020 - 5 + 1;
+      int yearDaysSum = 0;
+
+      // create segments for each year
+      for (int yearIndex = 0; yearIndex < allYearDays.length; yearIndex++) {
+
+         final int yearDays = allYearDays[yearIndex];
+
+         segmentStart[yearIndex] = yearDaysSum;
+         segmentEnd[yearIndex] = yearDaysSum + yearDays - 1;
+         segmentTitle[yearIndex] = Integer.toString(oldestYear + yearIndex);
+
+         yearDaysSum += yearDays;
+      }
+
+      final ChartStatisticSegments chartSegments = new ChartStatisticSegments();
+      chartSegments.segmentStartValue = segmentStart;
+      chartSegments.segmentEndValue = segmentEnd;
+      chartSegments.segmentTitle = segmentTitle;
+
+      chartSegments.years = new int[] { 5 };//tourDataTime.years;
+      chartSegments.yearDays = new int[] { 366 };//tourDataTime.yearDays;
+      chartSegments.allValues = 5 * 36;//tourDataTime.allDaysInAllYears;
+
+      return chartSegments;
    }
 
 }
