@@ -37,7 +37,6 @@ import net.tourbook.chart.ChartStatisticSegments;
 import net.tourbook.chart.ChartToolTipInfo;
 import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IBarSelectionListener;
-import net.tourbook.chart.MinMaxKeeper_YData;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.Util;
@@ -49,15 +48,19 @@ import net.tourbook.trainingstress.ITrainingStressDataListener;
 import net.tourbook.ui.UI;
 
 import org.eclipse.e4.ui.di.PersistState;
-import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.ToolBar;
@@ -94,13 +97,15 @@ public class PerformanceModelingChartView extends ViewPart {
    private LocalDate                      _oldestEntryDate;
    private LocalDate                      _newestEntryDate;
 
-   private boolean                        _isUpdateUI;
+   private static final boolean           IS_OSX        = net.tourbook.common.UI.IS_OSX;
+   private static final boolean           IS_LINUX      = net.tourbook.common.UI.IS_LINUX;
+
    private boolean                        _isShowAllValues;
    private boolean                        _isSynchChartVerticalValues;
 
    private ChartDataModel                 _chartDataModel;
 
-   private ToolBarManager                 _headerToolbarManager;
+   private int                            _selectedYear = -1;
 
    private ActionShowAllStressScoreValues _actionShowAllStressScoreValues;
    private ActionSynchronizeChartScale    _actionSynchVerticalChartScaling;
@@ -108,18 +113,22 @@ public class PerformanceModelingChartView extends ViewPart {
 
    private double[]                       _xSerieDate;
 
-   private final MinMaxKeeper_YData       _minMaxKeeper = new MinMaxKeeper_YData();
+   //private final MinMaxKeeper_YData       _minMaxKeeper = new MinMaxKeeper_YData();
 
-   private final NumberFormat             _nf1          = NumberFormat.getNumberInstance();
+   private final NumberFormat _nf1 = NumberFormat.getNumberInstance();
    {
       _nf1.setMinimumFractionDigits(1);
       _nf1.setMaximumFractionDigits(1);
    }
 
+   private PixelConverter _pc;
+
    /*
     * UI controls/resources
     */
    private FormToolkit _tk;
+   private Combo       _comboYear;
+   private Combo       _comboNumberOfYears;
 
    /*
     * Pagebook for the predicted performance view
@@ -133,10 +142,6 @@ public class PerformanceModelingChartView extends ViewPart {
 
    private int       _numberOfDays;
 
-   /*
-    * none UI
-    */
-
    private class ActionTrainingOptions extends ActionToolbarSlideout {
 
       @Override
@@ -144,10 +149,6 @@ public class PerformanceModelingChartView extends ViewPart {
 
          return new SlideoutTrainingOptions(_pageBook, toolbar, GRID_PREF_PREFIX, PerformanceModelingChartView.this);
       }
-   }
-
-   public PerformanceModelingChartView() {
-
    }
 
    void actionShowAllStressScoreValues() {
@@ -183,9 +184,9 @@ public class PerformanceModelingChartView extends ViewPart {
 
       _isSynchChartVerticalValues = _actionSynchVerticalChartScaling.isChecked();
 
-      if (_isSynchChartVerticalValues == false) {
-         _minMaxKeeper.resetMinMax();
-      }
+      // if (_isSynchChartVerticalValues == false) {
+      //    _minMaxKeeper.resetMinMax();
+      //  }
 
       updateUI_10_stressScoreValuesFromModel();
    }
@@ -316,6 +317,8 @@ public class PerformanceModelingChartView extends ViewPart {
    @Override
    public void createPartControl(final Composite parent) {
 
+      initUI(parent);
+
       createUI(parent);
 
       // set the model BEFORE actions are created/enabled/checked
@@ -371,20 +374,19 @@ public class PerformanceModelingChartView extends ViewPart {
 
    private void createUI(final Composite parent) {
 
-      initUI(parent);
-
       final Composite container = new Composite(parent, SWT.NONE);
-      GridLayoutFactory.fillDefaults()//
+      GridLayoutFactory.fillDefaults()
             .spacing(0, 0)
             .applyTo(container);
       {
          createUI_10_Toolbar(container);
          createUI_20_PerformanceModelingChart(container);
       }
-
    }
 
    private void createUI_10_Toolbar(final Composite parent) {
+
+      final int widgetSpacing = 15;
 
       _toolbar = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()//
@@ -393,21 +395,85 @@ public class PerformanceModelingChartView extends ViewPart {
             .applyTo(_toolbar);
       GridLayoutFactory
             .fillDefaults()
+            .numColumns(3)
             .margins(3, 3)
             .applyTo(_toolbar);
-//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
       {
-         /*
-          * toolbar actions
-          */
-         final ToolBar toolbar = new ToolBar(_toolbar, SWT.FLAT);
-         GridDataFactory.fillDefaults()//
-               .align(SWT.BEGINNING, SWT.CENTER)
-               .applyTo(toolbar);
-         _headerToolbarManager = new ToolBarManager(toolbar);
+         {
+            /*
+             * combo: year
+             */
+
+            _comboYear = new Combo(_toolbar, SWT.DROP_DOWN | SWT.READ_ONLY);
+            _comboYear.setToolTipText(Messages.Tour_Book_Combo_year_tooltip);
+            _comboYear.setVisibleItemCount(50);
+
+            GridDataFactory
+                  .fillDefaults()//
+                  .indent(widgetSpacing, 0)
+                  .hint(_pc.convertWidthInCharsToPixels(IS_OSX ? 12 : IS_LINUX ? 12 : 5), SWT.DEFAULT)
+                  .applyTo(_comboYear);
+
+            _comboYear.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  onSelectYear();
+               }
+            });
+         }
+
+         {
+            /*
+             * combo: year numbers
+             */
+
+            _comboNumberOfYears = new Combo(_toolbar, SWT.DROP_DOWN | SWT.READ_ONLY);
+            _comboNumberOfYears.setToolTipText(Messages.tour_statistic_number_of_years);
+            _comboNumberOfYears.setVisibleItemCount(50);
+
+            GridDataFactory
+                  .fillDefaults()//
+                  .indent(2, 0)
+                  .hint(_pc.convertWidthInCharsToPixels(IS_OSX ? 8 : IS_LINUX ? 8 : 4), SWT.DEFAULT)
+                  .applyTo(_comboNumberOfYears);
+
+            _comboNumberOfYears.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  onSelectYear();
+               }
+            });
+         }
 
       }
+   }
 
+   private void onSelectYear() {
+
+      final int selectedItem = _comboYear.getSelectionIndex();
+      if (selectedItem != -1) {
+
+         _selectedYear = Integer.parseInt(_comboYear.getItem(selectedItem));
+
+         updateChart_10_NoReload();
+      }
+   }
+
+   private void updateChart_10_NoReload() {
+      updateUI_Toolbar();
+
+   }
+
+   private void updateUI_Toolbar() {
+      // update view toolbar
+      final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
+      tbm.removeAll();
+
+      tbm.add(_actionShowAllStressScoreValues);
+      tbm.add(_actionSynchVerticalChartScaling);
+
+      // update toolbar to show added items
+      tbm.update(true);
    }
 
    private void createUI_20_PerformanceModelingChart(final Composite parent) {
@@ -480,13 +546,6 @@ public class PerformanceModelingChartView extends ViewPart {
 
    private void fillToolbar() {
 
-      /*
-       * Header toolbar
-       */
-      _headerToolbarManager.add(_actionShowAllStressScoreValues);
-      _headerToolbarManager.add(_actionSynchVerticalChartScaling);
-
-      _headerToolbarManager.update(true);
    }
 
    private LocalDate findExtremeDates(final HashMap<LocalDate, ArrayList<Long>> entries, final boolean oldest) {
@@ -570,6 +629,7 @@ public class PerformanceModelingChartView extends ViewPart {
 
    private void initUI(final Composite parent) {
 
+      _pc = new PixelConverter(parent);
       _tk = new FormToolkit(parent.getDisplay());
 
    }
@@ -592,6 +652,8 @@ public class PerformanceModelingChartView extends ViewPart {
 
       _isSynchChartVerticalValues = Util.getStateBoolean(_state, STATE_IS_SYNC_VERTICAL_CHART_SCALING, false);
       _actionSynchVerticalChartScaling.setChecked(_isSynchChartVerticalValues);
+
+      updateChart_10_NoReload();
    }
 
    @PersistState
@@ -612,16 +674,6 @@ public class PerformanceModelingChartView extends ViewPart {
    @Override
    public void setFocus() {
 
-   }
-
-   private void updateUI(final long tourId) {
-
-      if (_currentPerson == null) {
-         // optimize
-         return;
-      }
-
-      updateUI_20();
    }
 
    /**
@@ -649,16 +701,6 @@ public class PerformanceModelingChartView extends ViewPart {
       _pageBook.showPage(_page_TrainingStressScores);
       updateChart();
 
-   }
-
-   private void updateUI_20() {
-
-      if (_currentPerson == null) {
-         // nothing to do
-         return;
-      }
-
-      updateUI_10_stressScoreValuesFromModel();
    }
 
    /**
