@@ -1004,6 +1004,7 @@ public class Messages extends NLS {
    public static String        Image__Navigate_Previous;
    public static String        Image__options;
    public static String        Image__Options_Bright;
+   public static String        Image__PerformanceGraph_govss;
    public static String        Image__Photo_FilterNotSavedPhotos;
    public static String        Image__Photo_FilterNotSavedPhotos_Disabled;
    public static String        Image__Photo_FilterOneHistoryTour;

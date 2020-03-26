@@ -82,7 +82,7 @@ public class PerformanceModelingChartView extends ViewPart {
 
    private static final String STATE_IS_SHOW_ALL_STRESS_SCORE_VALUES = "IsShowAllStressScoreValues";                                                  //$NON-NLS-1$
    private static final String STATE_IS_SYNC_VERTICAL_CHART_SCALING  = "IsSyncVerticalChartScaling";                                                  //$NON-NLS-1$
-   private static final String STATE_SELECTED_YEAR                   = "performancemodeling.container.selected-year";                                 //$NON-NLS-1$
+   private static final String STATE_SELECTED_YEAR                   = "performancemodeling.container.selected_year";                                 //$NON-NLS-1$
    private static final String STATE_NUMBER_OF_YEARS                 = "performancemodeling.container.number_of_years";                               //$NON-NLS-1$
 
    private static final char   NL                                    = net.tourbook.common.UI.NEW_LINE;
@@ -124,7 +124,7 @@ public class PerformanceModelingChartView extends ViewPart {
     */
    private TIntArrayList                  _availableYears;
 
-   private ActionShowAllStressScoreValues _actionShowAllStressScoreValues;
+   private ActionShowGovssValues _actionShowAllStressScoreValues;
    private ActionSynchronizeChartScale    _actionSynchVerticalChartScaling;
    private ActionTrainingOptions          _actionTrainingOptions;
 
@@ -326,7 +326,7 @@ public class PerformanceModelingChartView extends ViewPart {
 
    private void createActions() {
 
-      _actionShowAllStressScoreValues = new ActionShowAllStressScoreValues(this);
+      _actionShowAllStressScoreValues = new ActionShowGovssValues(this);
       _actionSynchVerticalChartScaling = new ActionSynchronizeChartScale(this);
       _actionTrainingOptions = new ActionTrainingOptions();
    }
@@ -469,7 +469,6 @@ public class PerformanceModelingChartView extends ViewPart {
                }
             });
          }
-
       }
    }
 
@@ -683,6 +682,10 @@ public class PerformanceModelingChartView extends ViewPart {
       refreshYearCombobox();
       selectYear(defaultYear);
 
+      // select number of years
+      final int numberOfYearsIndex = Util.getStateInt(_state, STATE_NUMBER_OF_YEARS, 0);
+      _comboNumberOfYears.select(numberOfYearsIndex);
+
       updateChart_10_NoReload();
    }
 
@@ -866,6 +869,7 @@ public class PerformanceModelingChartView extends ViewPart {
       _state.put(STATE_IS_SYNC_VERTICAL_CHART_SCALING, _actionSynchVerticalChartScaling.isChecked());
 
       _state.put(STATE_SELECTED_YEAR, _selectedYear);
+      _state.put(STATE_NUMBER_OF_YEARS, _comboNumberOfYears.getSelectionIndex());
    }
 
    private void setChartProperties() {
@@ -1089,5 +1093,4 @@ public class PerformanceModelingChartView extends ViewPart {
 
       return chartSegments;
    }
-
 }
