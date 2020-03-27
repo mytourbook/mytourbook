@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -38,7 +38,7 @@ public class DataTransferWizard extends Wizard {
    public static final String     SYSPROPERTY_IMPORT_PERSON = "mytourbook.import.person"; //$NON-NLS-1$
 
    private DataTransferWizardPage _dataTransferWizardPage;
-   private final List<File>       _receivedFiles            = new ArrayList<File>();
+   private final List<File>       _receivedFiles            = new ArrayList<>();
 
    /**
     * contains the device which is used to read the data from it

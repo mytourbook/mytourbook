@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -291,7 +291,7 @@ public class HAC4DeviceReader extends TourbookDevice {
             // out.println("Offset AA Record: " + iOffsetAARecord);
 
             // create time list
-            final ArrayList<TimeData> timeDataList = new ArrayList<TimeData>();
+            final ArrayList<TimeData> timeDataList = new ArrayList<>();
 
             short temperature;
             short marker;

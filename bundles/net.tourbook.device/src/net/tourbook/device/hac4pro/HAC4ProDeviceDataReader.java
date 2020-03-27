@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -102,7 +102,7 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 
    /**
     * Adjust the offset for the DD record so it's within the tour data area
-    * 
+    *
     * @param offsetNextDDRecord
     * @return
     */
@@ -376,7 +376,7 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
             /*
              * read/save BB records
              */
-            final ArrayList<TimeData> timeDataList = new ArrayList<TimeData>();
+            final ArrayList<TimeData> timeDataList = new ArrayList<>();
 
             final short timeInterval = tourData.getDeviceTimeInterval();
 
@@ -667,7 +667,7 @@ public class HAC4ProDeviceDataReader extends TourbookDevice {
 
    /**
     * checks if the data file has a valid HAC4Pro data format
-    * 
+    *
     * @return true for a valid HAC4Pro data format
     */
    @Override

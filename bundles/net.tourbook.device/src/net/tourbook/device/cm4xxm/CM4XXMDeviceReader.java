@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020  Wolfgang Schramm, Markus Stipp
+ * Copyright (C) 2005, 2020 Wolfgang Schramm, Markus Stipp
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -277,7 +277,7 @@ public class CM4XXMDeviceReader extends TourbookDevice {
                   0);
 
             // create time list
-            final ArrayList<TimeData> timeDataList = new ArrayList<TimeData>();
+            final ArrayList<TimeData> timeDataList = new ArrayList<>();
 
             short temperature;
             short marker;
@@ -539,45 +539,6 @@ public class CM4XXMDeviceReader extends TourbookDevice {
       return true;
    }
 
-   /*
-    * Verify that a DD record not only points to an AA record,
-    * but the AA record pointed to, also references the same DD record.
-    * In case, it doesn't, a dangling / left over DD pointer was discovered.
-    * Even though, this is quite unlikely, it has happened before.
-    */
-   private boolean verifyReferenceConsitency(final RandomAccessFile file, final int offsetDDRecord) throws IOException {
-      final byte[] buffer = new byte[5];
-      String recordType = UI.EMPTY_STRING;
-
-      file.seek(offsetDDRecord);
-      file.read(buffer);
-      recordType = new String(buffer, 2, 2);
-
-      // make sure we read a DD record
-      if (!recordType.equalsIgnoreCase("DD")) { //$NON-NLS-1$
-//			log.debug("No DD record found!");
-         return false;
-      }
-
-      final int offsetAARecord = DataUtil.readFileOffset(file, buffer);
-      file.seek(offsetAARecord);
-      file.read(buffer);
-      recordType = new String(buffer, 2, 2);
-      // make sure we read a DD record
-      if (!recordType.equalsIgnoreCase("AA")) { //$NON-NLS-1$
-//			log.debug("No AA record found!");
-         return false;
-      }
-
-      final int forwardReference = DataUtil.readFileOffset(file, buffer);
-      if (forwardReference != offsetDDRecord) {
-//			log.debug("DD -> AA -> DD record references not consistent!");
-         return false;
-      }
-
-      return true;
-   }
-
    private StartBlock readStartBlock(final RandomAccessFile file, final TourData tourData) throws IOException {
 
       final StartBlock startBlock = new StartBlock();
@@ -725,6 +686,45 @@ public class CM4XXMDeviceReader extends TourbookDevice {
       }
 
       return isValid;
+   }
+
+   /*
+    * Verify that a DD record not only points to an AA record,
+    * but the AA record pointed to, also references the same DD record.
+    * In case, it doesn't, a dangling / left over DD pointer was discovered.
+    * Even though, this is quite unlikely, it has happened before.
+    */
+   private boolean verifyReferenceConsitency(final RandomAccessFile file, final int offsetDDRecord) throws IOException {
+      final byte[] buffer = new byte[5];
+      String recordType = UI.EMPTY_STRING;
+
+      file.seek(offsetDDRecord);
+      file.read(buffer);
+      recordType = new String(buffer, 2, 2);
+
+      // make sure we read a DD record
+      if (!recordType.equalsIgnoreCase("DD")) { //$NON-NLS-1$
+//			log.debug("No DD record found!");
+         return false;
+      }
+
+      final int offsetAARecord = DataUtil.readFileOffset(file, buffer);
+      file.seek(offsetAARecord);
+      file.read(buffer);
+      recordType = new String(buffer, 2, 2);
+      // make sure we read a DD record
+      if (!recordType.equalsIgnoreCase("AA")) { //$NON-NLS-1$
+//			log.debug("No AA record found!");
+         return false;
+      }
+
+      final int forwardReference = DataUtil.readFileOffset(file, buffer);
+      if (forwardReference != offsetDDRecord) {
+//			log.debug("DD -> AA -> DD record references not consistent!");
+         return false;
+      }
+
+      return true;
    }
 
 }

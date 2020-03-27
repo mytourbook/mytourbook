@@ -107,9 +107,9 @@ public class Polar_HRM_DataReader extends TourbookDevice {
 
    /**
     * <pre>
-    * 
+    *
     * Heart rate monitor type
-    * 
+    *
     *  1 = Polar Sport Tester / Vantage XL
     *  2 = Polar Vantage NV (VNV)
     *  3 = Polar Accurex Plus
@@ -507,7 +507,7 @@ public class Polar_HRM_DataReader extends TourbookDevice {
 
    /**
     * Converts {@link HRDataSlice} into {@link TimeData}
-    * 
+    *
     * @param dtTourStart
     * @return
     */
@@ -603,7 +603,7 @@ public class Polar_HRM_DataReader extends TourbookDevice {
 
    /**
     * Create a marker for each lap, the markers are currently numbered 1...n
-    * 
+    *
     * @param tourData
     */
    private void createTourData_30_CreateMarkers(final TourData tourData) {
@@ -716,13 +716,13 @@ public class Polar_HRM_DataReader extends TourbookDevice {
 
    /**
     * <pre>
-    * 
+    *
     * Date = 20040831  Date of exercise (yyyymmdd)
     * 		  01234567
-    * 
+    *
     * For example 20040831 means 31 st  August 2004)
     * </pre>
-    * 
+    *
     * @param value
     */
    private void parseFieldDate(final String value) {
@@ -741,15 +741,15 @@ public class Polar_HRM_DataReader extends TourbookDevice {
 
    /**
     * <pre>
-    * 
+    *
     * SMode = 11011010
     * 		  (abcdefgh)	With versions 1.06
-    * 
+    *
     * SMode = 110110100
     * 		  (abcdefghi)	With versions 1.07
-    * 
+    *
     * Data type parameters
-    * 
+    *
     * a)  Speed						(0=off, 1=on)
     * b)  Cadence						(0=off, 1=on)
     * c)  Altitude						(0=off, 1=on)
@@ -762,13 +762,13 @@ public class Polar_HRM_DataReader extends TourbookDevice {
     * h)  US / Euro unit
     * 			0 = Euro (km, km/h, m, �C)
     * 			1 = US (miles, mph, ft, �F)
-    * 
+    *
     * All distance, speed, altitude and temperature values depend on US/Euro unit
     * selection (km / miles, km/h / mph, m / ft, �C / �F).
-    * 
+    *
     * i)  Air pressure (0=off, 1=on)
     * </pre>
-    * 
+    *
     * @param dataType
     */
    private void parseFieldSMode(final String dataType) {
@@ -817,15 +817,15 @@ public class Polar_HRM_DataReader extends TourbookDevice {
 
    /**
     * <pre>
-    * 
+    *
     * StartTime=14:23:36.0          Start time (hh:mm:ss.d)
-    * 
+    *
     * hh:mm:ss.d	h:mm:ss.d
     * 0123456789	012345678
-    * 
+    *
     * If hours are less than 10, format h:mm:ss.d have also been used. Check time format by checking : character.
     * </pre>
-    * 
+    *
     * @param value
     */
    private void parseFieldStartTime(final String value) {
@@ -1045,50 +1045,50 @@ public class Polar_HRM_DataReader extends TourbookDevice {
 
    /**
     * <pre>
-    * 
+    *
     * 8.  Lap Times
-    * 
+    *
     * DATA  COMMENTS
-    * 
+    *
     * [IntTimes]                  							Lap times
-    * 
+    *
     * 00:03:43.7   123     100     150		200     		Row 1
     * 32           0		0		0       0  		0		Row 2       Lap time 0
     * 0  			0       0  		0       0    			Row 3
     * 0 			400     455     21      0  		0		Row 4 #
     * 0			0		0		0       0		0		Row 5 #
-    * 
+    *
     * 00:04:54.7   159     130     170     200       		Row 1
     * 32           0       0  		0       0  		0  		Row 2       Lap time 1
     * 0  			0       0  		0       0    			Row 3
     * 0  			400     470     21      0  		0  		Row 4 #
     * 0  			0       0  		0       0  		0  		Row 5 #
-    * 
+    *
     * Field descriptions:
-    * 
+    *
     * [IntTimes]   										Lap times
     * Time  		HR     	HR      HR      HR          	Row 1
     * 						min     avg     max
-    * 
+    *
     * Flags        Rec.	Rec.	Speed   Cad		Alt		Row 2
     * 				Time	HR
-    * 
+    *
     * Extra1       Extra2  Extra3  Asc		Dist            Row 3
-    * 
+    *
     * Lap type     Lap		Power   Tempe	Phas	Air		Row 4 #
     * 				Dist			rature	eLap	Pr
-    * 
+    *
     * StrideAvg   	Autom.	0  		0  		0               Row 5 #
     * 				lap
-    * 
-    * 
+    *
+    *
     * Row 1
     * Time         Lap time in format hh:mm:ss.d
     * HR           Momentary heart rate value in bpm
     * HR min       Lap�s minimum heart rate value in bpm
     * HR avg       Lap�s average heart rate value in bpm
     * HR max       Lap�s maximum heart rate value in bpm
-    * 
+    *
     * Row 2
     * Flags        Misc lap time information in 8 bits, 87654321
     * 				bit 8 = Polar Coach lap/interval flag (0 = lap, 1 = interval)
@@ -1103,17 +1103,17 @@ public class Polar_HRM_DataReader extends TourbookDevice {
     * Speed        Momentary speed in Xtrainer units (km/h or mph = X/128)
     * Cad          Momentary cadence (rpm)
     * Alt          Momentary altitude (HRM version 1.02: 10m / 10ft, version 1.05 1m/1ft)*
-    * 
+    *
     * Row 3
     * Extra 1 - 3 	Values of extra data series (0 - 3000) (the actual value is multiplied by ten)
     * Asc          Lap ascent value from XTr+ 10m / 10ft
     * Dist         Lap distance value from XTr+ 0.1km / 0.1ft
-    * 
+    *
     * Row 4 #
     * Lap type     Lap type identifier, replaces flag 8 (Polar Coach lap/interval flag) value
-    * 
+    *
     * 				Type    Description  			Type  		Description
-    * 
+    *
     *              0  		normal lap  			8192  		end of exercise
     *              1  		interval  				16384       off road
     *              2  		start of exercise  		32768       road
@@ -1128,8 +1128,8 @@ public class Polar_HRM_DataReader extends TourbookDevice {
     *              1024    sprint  				16777216	landmark
     *              2048    crash
     *              4096    timeout
-    * 
-    * 
+    *
+    *
     * Lap Dist     Manually given lap distance in meters / yards, units are depending on
     * 				US/Euro unit selection
     * Power        Momentary power value in Watts
@@ -1137,15 +1137,15 @@ public class Polar_HRM_DataReader extends TourbookDevice {
     * 				on US/Euro unit selection
     * PhaseLap     Internal phase/lap information used for interval calculation
     * AirPr        Air pressure value from AXN products
-    * 
+    *
     * Row 5 #
     * StrideAvg    Stride average in cm (RS800, RS800CX only)
     * Autom.lap    Automatic lap used (TRUE/FALSE) (RS and CS products)
-    * 
+    *
     * The rest of the new lap time parameters are reserved for future usage.
     * Lap times were formerly known as Intermediate times.
     * </pre>
-    * 
+    *
     * @param fileReader
     * @return
     * @throws IOException
@@ -1199,9 +1199,9 @@ public class Polar_HRM_DataReader extends TourbookDevice {
 
             /**
              * <pre>
-             * 
+             *
              * Row 2
-             * 
+             *
              * Flags        Misc lap time information in 8 bits, 87654321
              * 				bit 8 = Polar Coach lap/interval flag (0 = lap, 1 = interval)
              *              bit 7 = Int. time erased (for Conconi test, not included to calculation)
@@ -1226,9 +1226,9 @@ public class Polar_HRM_DataReader extends TourbookDevice {
 
             /**
              * <pre>
-             * 
+             *
              * Row 3
-             * 
+             *
              * Extra 1 - 3 	Values of extra data series (0 - 3000) (the actual value is multiplied by ten)
              * Asc          Lap ascent value from XTr+ 10m / 10ft
              * Dist         Lap distance value from XTr+ 0.1km / 0.1ft
@@ -1243,13 +1243,13 @@ public class Polar_HRM_DataReader extends TourbookDevice {
 
             /**
              * <pre>
-             * 
+             *
              * Row 4 #
-             * 
+             *
              * Lap type     Lap type identifier, replaces flag 8 (Polar Coach lap/interval flag) value
-             * 
+             *
              * 				Type    Description  			Type  		Description
-             * 
+             *
              *              0  		normal lap  			8192  		end of exercise
              *              1  		interval  				16384       off road
              *              2  		start of exercise  		32768       road
@@ -1264,8 +1264,8 @@ public class Polar_HRM_DataReader extends TourbookDevice {
              *              1024    sprint  				16777216	landmark
              *              2048    crash
              *              4096    timeout
-             * 
-             * 
+             *
+             *
              * Lap Dist     Manually given lap distance in meters / yards, units are depending on
              * 				US/Euro unit selection
              * Power        Momentary power value in Watts
@@ -1304,9 +1304,9 @@ public class Polar_HRM_DataReader extends TourbookDevice {
 
             /**
              * <pre>
-             * 
+             *
              * Row 5 #
-             * 
+             *
              * StrideAvg    Stride average in cm (RS800, RS800CX only)
              * Autom.lap    Automatic lap used (TRUE/FALSE) (RS and CS products)
              * </pre>
@@ -1336,15 +1336,15 @@ public class Polar_HRM_DataReader extends TourbookDevice {
 
    /**
     * <pre>
-    * 
+    *
     * 9.  Lap Time notes
-    * 
+    *
     * [IntNotes]  	Intermediate time note texts
-    * 
+    *
     * 3  			Traffic lights  Third intermediate time�s note text.
     * 5  			Interval  Fifth intermediate time�s note text.
     * </pre>
-    * 
+    *
     * @param fileReader
     * @return
     * @throws IOException
@@ -1387,11 +1387,11 @@ public class Polar_HRM_DataReader extends TourbookDevice {
 
    /**
     * <pre>
-    * 
+    *
     * Cycling parameters are available from XTr+, S710, S710i, S720i, S725, S725X.
-    * 
+    *
     * [Trip]  Cycling trip data
-    * 
+    *
     * 1:	87 		Distance = 8,7 km / mile
     * 2:	1400 	Ascent (hrm 1.02 10m / 10ft, hrm 1.05: 1m / 1ft)
     * 3:	92982	Total time in seconds
@@ -1401,7 +1401,7 @@ public class Polar_HRM_DataReader extends TourbookDevice {
     * 7:	3396	Maximum speed = 3396 / 128 = 26,5 km/h / mph
     * 8:	418		Odometer value at the end of an exercise, 418 = 418 km / mile
     * </pre>
-    * 
+    *
     * @param fileReader
     * @return
     * @throws IOException
@@ -1470,15 +1470,15 @@ public class Polar_HRM_DataReader extends TourbookDevice {
 
    /**
     * <pre>
-    * 
+    *
     * SMode = 11011010
     * 		  (abcdefgh)	With versions 1.06
-    * 
+    *
     * SMode = 110110100
     * 		  (abcdefghi)	With versions 1.07
-    * 
+    *
     * Data type parameters
-    * 
+    *
     * a)  Speed						(0=off, 1=on)
     * b)  Cadence						(0=off, 1=on)
     * c)  Altitude						(0=off, 1=on)
@@ -1491,18 +1491,18 @@ public class Polar_HRM_DataReader extends TourbookDevice {
     * h)  US / Euro unit
     * 			0 = Euro (km, km/h, m, �C)
     * 			1 = US (miles, mph, ft, �F)
-    * 
+    *
     * All distance, speed, altitude and temperature values depend on US/Euro unit
     * selection (km / miles, km/h / mph, m / ft, �C / �F).
-    * 
+    *
     * i)  Air pressure (0=off, 1=on)
-    * 
+    *
     * ------------------------------------------------------------------------
-    * 
+    *
     * The following data format is for HRM version 1.06
-    * 
+    *
     * DATA  COMMENTS
-    * 
+    *
     * [HRData] Heart Rates (bpm)
     * |
     * |		Speed (0.1 km/h or mph)
@@ -1519,7 +1519,7 @@ public class Polar_HRM_DataReader extends TourbookDevice {
     * 85 		171  	90		780		340		12857
     * 94 		165  	92		770		335 	12857
     * </pre>
-    * 
+    *
     * @param fileReader
     * @return
     * @throws IOException
@@ -1729,11 +1729,11 @@ public class Polar_HRM_DataReader extends TourbookDevice {
 
    /**
     * check interval
-    * 
+    *
     * <pre>
-    * 
+    *
     * Interval=5  Data type:
-    * 
+    *
     *   1     =   1 seconds recording interval
     *   2     =   2 seconds recording interval
     *   5     =   5 seconds recording interval
@@ -1741,11 +1741,11 @@ public class Polar_HRM_DataReader extends TourbookDevice {
     *  30     =  30 seconds recording interval
     *  60     =  60 seconds recording interval
     * 300     =   5 minutes recording interval
-    * 
+    *
     * 120     = 120 seconds recording interval (dynamic)
     * 240     = 240 seconds recording interval (dynamic)
     * 480     = 480 seconds recording interval (dynamic)
-    * 
+    *
     * 238     = R - R data (VNV, S810, S810i, RS, CS)
     * 204     = intermediate times only (PST, VXL, VNV, XTr+, Acc+)
     * </pre>
@@ -1805,7 +1805,6 @@ public class Polar_HRM_DataReader extends TourbookDevice {
       try (FileReader fileReader = new FileReader(fileName);
             BufferedReader bufferedReader = new BufferedReader(fileReader)) {
 
-
          final String firstLine = bufferedReader.readLine();
          if (firstLine == null || firstLine.startsWith(SECTION_PARAMS) == false) {
             return false;
@@ -1818,7 +1817,7 @@ public class Polar_HRM_DataReader extends TourbookDevice {
 
       } catch (final IOException e) {
          e.printStackTrace();
-      } 
+      }
 
       return true;
    }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -45,7 +45,7 @@ public abstract class SimpleSerialDevice extends ExternalDevice {
 
    /**
     * Append newly received data to the internal data buffer
-    * 
+    *
     * @param newData
     *           data being written into the buffer
     */
@@ -98,7 +98,7 @@ public abstract class SimpleSerialDevice extends ExternalDevice {
 
    /**
     * Reads data from the device and save it in a buffer
-    * 
+    *
     * @param monitor
     */
    private void readDeviceData(final IProgressMonitor monitor, final String portName) {
