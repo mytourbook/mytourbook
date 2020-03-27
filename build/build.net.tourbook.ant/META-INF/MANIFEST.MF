@@ -9,3 +9,4 @@ Require-Bundle: org.eclipse.ui,
  org.apache.ant
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
+Automatic-Module-Name: build.net.tourbook.ant
