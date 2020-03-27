@@ -268,7 +268,6 @@ public class RawDataManager {
    }
 
    private static ArrayList<String> readInvalidFilesToIgnoreFile() {
-      Scanner s;
       final ArrayList<String> invalidFilesList = new ArrayList<>();
 
       final File invalidFilesToIgnoreFile = getInvalidFilesToIgnoreFile();
@@ -276,12 +275,10 @@ public class RawDataManager {
          return invalidFilesList;
       }
 
-      try {
-         s = new Scanner(invalidFilesToIgnoreFile);
+      try (Scanner s = new Scanner(invalidFilesToIgnoreFile)) {
          while (s.hasNext()) {
             invalidFilesList.add(s.next());
          }
-         s.close();
       } catch (final IOException e) {
          e.printStackTrace();
       }
@@ -1720,9 +1717,6 @@ public class RawDataManager {
          while ((c = inReader.read()) != -1) {
             outReader.write(c);
          }
-
-         inReader.close();
-         outReader.close();
 
       } catch (final IOException e) {
          TourLogManager.logEx(e);

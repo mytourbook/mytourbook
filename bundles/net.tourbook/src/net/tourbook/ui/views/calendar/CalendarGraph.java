@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2011-2018 Matthias Helmling and Contributors
+ * Copyright (C) 2011-2020 Matthias Helmling and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -247,19 +247,15 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 				return;
 			}
 
-			try {
+			try ( ByteArrayOutputStream out = new ByteArrayOutputStream();
+             DataOutputStream dataOut = new DataOutputStream(out)){
 
 				final CalendarItemTransferData calendarTransferData = (CalendarItemTransferData) data;
-
-				final ByteArrayOutputStream out = new ByteArrayOutputStream();
-				final DataOutputStream dataOut = new DataOutputStream(out);
 
 				final CalendarTourData calendarTourData = calendarTransferData.calendarTourData;
 
 				dataOut.writeLong(calendarTransferData.tourId);
 				dataOut.writeInt(calendarTourData.typeColorIndex);
-
-				dataOut.close();
 
 				super.javaToNative(out.toByteArray(), transferData);
 
