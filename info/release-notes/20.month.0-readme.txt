@@ -51,6 +51,7 @@ Fixes
 
   - Removed the deprecated or unavailable layers (ID_USDA_NAIP & ID_USDA_NAIP_USGS & MS Virtual Earth Aerial). Added the layers USGS NAIP PLUS, USGS Topo Base Map and USGS Topo Base Map Large
   - Fixed an issue where the Atmosphere and Scale layers would not appear when using MyTourbook in French
+  - 3D Map colors : Fixed the pace ranges from seconds to minutes for better readability
    
 Translation    
 ===========

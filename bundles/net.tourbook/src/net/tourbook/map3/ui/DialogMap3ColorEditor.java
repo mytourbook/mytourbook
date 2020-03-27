@@ -326,7 +326,7 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
       updateUI_FromModel();
       enableGraphType();
 
-      // set UI default behaviour
+      // set UI default behavior
       _txtProfileName.setFocus();
 
       // select whole profile name that it can be easily overwritten
@@ -1115,7 +1115,7 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
 
       if (_prontoColorVertexIndex == null || _isProntoColorEnabled == false) {
 
-         // a pronto color is noch selected or is disabled
+         // a pronto color is not selected or is disabled
 
          return;
       }
@@ -1262,7 +1262,7 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
       // Ignore arrow left/right that within the text it can be navigated
       event.keyCode == SWT.ARROW_LEFT || event.keyCode == SWT.ARROW_RIGHT
 
-      // Ignore Escape key, otherwise a new profile can be created when immediatedly closing a new created profile without doing anything.
+      // Ignore Escape key, otherwise a new profile can be created when immediately closing a new created profile without doing anything.
             || event.keyCode == SWT.ESC) {
 
          return;
@@ -1406,7 +1406,7 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
       {
          for (int vertexIndex = 0; vertexIndex < vertexSize; vertexIndex++) {
 
-            // show highest value at the top accoringly to the displayed legend
+            // show highest value at the top accordingly to the displayed legend
             final int keyIndex = vertexSize - 1 - vertexIndex;
             final RGBVertex vertex = rgbVerticies.get(keyIndex);
 
