@@ -143,14 +143,11 @@ public class TurDeviceReader extends TourbookDevice {
                                     final HashMap<Long, TourData> alreadyImportedTours,
                                     final HashMap<Long, TourData> newlyImportedTours) {
 
-      FileInputStream fileTurData = null;
       final TurDeviceData turDeviceData = new TurDeviceData();
 
       final TourType defaultTourType = getTourType();
 
-      try {
-
-         fileTurData = new FileInputStream(importFilePath);
+      try (FileInputStream fileTurData = new FileInputStream(importFilePath)) {
 
          turDeviceData.readFromFile(fileTurData);
 
@@ -347,14 +344,6 @@ public class TurDeviceReader extends TourbookDevice {
       } catch (final Exception e) {
          e.printStackTrace();
          return false;
-      } finally {
-         if (fileTurData != null) {
-            try {
-               fileTurData.close();
-            } catch (final IOException e1) {
-               e1.printStackTrace();
-            }
-         }
       }
 
       return true;

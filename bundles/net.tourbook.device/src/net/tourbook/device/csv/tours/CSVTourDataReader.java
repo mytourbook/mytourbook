@@ -65,14 +65,14 @@ public class CSVTourDataReader extends TourbookDevice {
 //	private static final String	TOUR_CSV_ID			= "Date (yyyy-mm-dd); Time (hh-mm); Duration (sec); Paused Time (sec), Distance (m); Title; Comment; Tour Type; Tags;"; //$NON-NLS-1$
 
    /**
-    * 
+    *
     */
-   private static final String TOUR_CSV_ID_3       = "Date (yyyy-mm-dd); Time (hh-mm); Duration (sec); Paused Time (sec);"             //$NON-NLS-1$
-         + " Distance (m); Title; Comment; Tour Type; Tags;"                                                                           //$NON-NLS-1$
-         + " Altitude Up (m); Altitude Down (m);";                                                                                     //$NON-NLS-1$
+   private static final String TOUR_CSV_ID_3       = "Date (yyyy-mm-dd); Time (hh-mm); Duration (sec); Paused Time (sec);"              //$NON-NLS-1$
+         + " Distance (m); Title; Comment; Tour Type; Tags;"                                                                            //$NON-NLS-1$
+         + " Altitude Up (m); Altitude Down (m);";                                                                                      //$NON-NLS-1$
 
-   private static final String CSV_TOKEN_SEPARATOR = ";";                                                                              //$NON-NLS-1$
-   private static final String CSV_TAG_SEPARATOR   = ",";                                                                              //$NON-NLS-1$
+   private static final String CSV_TOKEN_SEPARATOR = ";";                                                                               //$NON-NLS-1$
+   private static final String CSV_TAG_SEPARATOR   = ",";                                                                               //$NON-NLS-1$
 
    private boolean             _isId1;
    private boolean             _isId2;
@@ -300,14 +300,11 @@ public class CSVTourDataReader extends TourbookDevice {
       boolean isNewTag = false;
       boolean isNewTourType = false;
 
-      BufferedReader fileReader = null;
-
-      try {
-
-         fileReader = new BufferedReader(new FileReader(importFilePath));
+      try (FileReader fileReader = new FileReader(importFilePath);
+            BufferedReader bufferedReader = new BufferedReader(fileReader)) {
 
          // check file header
-         final String fileHeader = fileReader.readLine();
+         final String fileHeader = bufferedReader.readLine();
          if (isFileValid(fileHeader) == false) {
             return false;
          }
@@ -316,7 +313,7 @@ public class CSVTourDataReader extends TourbookDevice {
          String tokenLine;
 
          // read all tours, each line is one tour
-         while ((tokenLine = fileReader.readLine()) != null) {
+         while ((tokenLine = bufferedReader.readLine()) != null) {
 
             int distance = 0;
             int duration = 0;
@@ -398,10 +395,6 @@ public class CSVTourDataReader extends TourbookDevice {
       } finally {
 
          try {
-            if (fileReader != null) {
-               fileReader.close();
-            }
-
             if (isNewTag) {
 
                // fire modify event
@@ -429,7 +422,7 @@ public class CSVTourDataReader extends TourbookDevice {
                });
             }
 
-         } catch (final IOException e) {
+         } catch (final Exception e) {
             StatusUtil.log(e);
          }
       }
@@ -439,33 +432,22 @@ public class CSVTourDataReader extends TourbookDevice {
 
    /**
     * checks if the data file has a valid .crp data format
-    * 
+    *
     * @return true for a valid .crp data format
     */
    @Override
    public boolean validateRawData(final String fileName) {
 
-      BufferedReader fileReader = null;
+      try (FileReader fileReader = new FileReader(fileName);
+            BufferedReader bufferedReader = new BufferedReader(fileReader)) {
 
-      try {
-
-         fileReader = new BufferedReader(new FileReader(fileName));
-
-         final String fileHeader = fileReader.readLine();
+         final String fileHeader = bufferedReader.readLine();
          if (fileHeader == null || isFileValid(fileHeader) == false) {
             return false;
          }
 
       } catch (final IOException e) {
          e.printStackTrace();
-      } finally {
-         if (fileReader != null) {
-            try {
-               fileReader.close();
-            } catch (final IOException e1) {
-               e1.printStackTrace();
-            }
-         }
       }
 
       return true;

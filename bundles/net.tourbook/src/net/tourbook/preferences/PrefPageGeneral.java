@@ -698,22 +698,12 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
          @Override
          public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
-            Connection conn = null;
-            try {
+            try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-               conn = TourDatabase.getInstance().getConnection();
                TourDatabase.updateTourWeek(conn, monitor);
 
             } catch (final SQLException e) {
                net.tourbook.ui.UI.showSQLException(e);
-            } finally {
-               if (conn != null) {
-                  try {
-                     conn.close();
-                  } catch (final SQLException e) {
-                     net.tourbook.ui.UI.showSQLException(e);
-                  }
-               }
             }
          }
       };

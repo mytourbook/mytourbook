@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -89,9 +89,8 @@ public class TourCompareManager {
       sb.append(" FROM " + TourDatabase.TABLE_TOUR_COMPARED); //$NON-NLS-1$
       sb.append(" WHERE refTourId=?"); //$NON-NLS-1$
 
-      try {
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         final Connection conn = TourDatabase.getInstance().getConnection();
          final PreparedStatement statement = conn.prepareStatement(sb.toString());
          statement.setLong(1, refId);
 
@@ -108,8 +107,6 @@ public class TourCompareManager {
 
             storedComparedTours.put(dbTourId, storedComparedTour);
          }
-
-         conn.close();
 
       } catch (final SQLException e) {
          UI.showSQLException(e);

@@ -825,7 +825,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
             } catch (final Exception e) {
                // ignore invalid characters
-            } finally {}
+            }
          }
       }
    }
@@ -945,7 +945,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
             } catch (final Exception e) {
                // ignore invalid characters
-            } finally {}
+            }
          }
       }
    }
@@ -1020,7 +1020,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
             } catch (final Exception e) {
                // ignore invalid characters
-            } finally {}
+            }
          }
       }
    }
@@ -1955,10 +1955,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       /*
        * write time slices into csv file
        */
-      Writer exportWriter = null;
-      try {
+      try (FileOutputStream fileOutputStream = new FileOutputStream(selectedFilePath);
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, UI.UTF_8);
+            BufferedWriter exportWriter = new BufferedWriter(outputStreamWriter)) {
 
-         exportWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(selectedFilePath), UI.UTF_8));
          final StringBuilder sb = new StringBuilder();
 
          writeCSVHeader(exportWriter, sb);
@@ -2075,15 +2075,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       } catch (final IOException e) {
          e.printStackTrace();
-      } finally {
-
-         if (exportWriter != null) {
-            try {
-               exportWriter.close();
-            } catch (final IOException e) {
-               e.printStackTrace();
-            }
-         }
       }
    }
 

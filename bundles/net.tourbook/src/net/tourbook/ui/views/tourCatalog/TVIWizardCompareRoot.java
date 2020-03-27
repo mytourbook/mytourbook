@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -47,9 +47,8 @@ public class TVIWizardCompareRoot extends TVIWizardCompareItem {
 		sb.append(" GROUP BY startYear"); //$NON-NLS-1$
 		sb.append(" ORDER BY startYear"); //$NON-NLS-1$
 
-		try {
+		try (Connection conn = TourDatabase.getInstance().getConnection()){
 
-			final Connection conn = TourDatabase.getInstance().getConnection();
 			final PreparedStatement statement = conn.prepareStatement(sb.toString());
 
 			final ResultSet result = statement.executeQuery();
@@ -63,8 +62,6 @@ public class TVIWizardCompareRoot extends TVIWizardCompareItem {
 				yearItem.treeColumn = Integer.toString(dbYear);
 				yearItem.tourYear = dbYear;
 			}
-
-			conn.close();
 
 		} catch (final SQLException e) {
 			UI.showSQLException(e);

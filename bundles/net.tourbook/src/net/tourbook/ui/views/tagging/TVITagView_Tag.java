@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -147,7 +147,7 @@ public class TVITagView_Tag extends TVITagViewItem {
 
 		final ArrayList<TreeViewerItem> children = new ArrayList<>();
 
-		try {
+		try (Connection conn = TourDatabase.getInstance().getConnection()){
 
 			final SQLFilter sqlFilter = new SQLFilter();
 			final StringBuilder sb = new StringBuilder();
@@ -176,8 +176,6 @@ public class TVITagView_Tag extends TVITagViewItem {
 
 			long previousTourId = -1;
 			TVITagView_Tour tourItem = null;
-
-			final Connection conn = TourDatabase.getInstance().getConnection();
 
 			final PreparedStatement statement = conn.prepareStatement(sb.toString());
 			statement.setLong(1, tagId);
@@ -211,8 +209,6 @@ public class TVITagView_Tag extends TVITagViewItem {
 				previousTourId = tourId;
 			}
 
-			conn.close();
-
 		} catch (final SQLException e) {
 			UI.showSQLException(e);
 		}
@@ -226,7 +222,7 @@ public class TVITagView_Tag extends TVITagViewItem {
 		 */
 		final ArrayList<TreeViewerItem> children = new ArrayList<>();
 
-		try {
+		try (Connection conn = TourDatabase.getInstance().getConnection()){
 
 			/*
 			 * get all tours for the tag Id of this tree item
@@ -252,8 +248,6 @@ public class TVITagView_Tag extends TVITagViewItem {
 			sb.append(" GROUP BY startYear"); //$NON-NLS-1$
 			sb.append(" ORDER BY startYear"); //$NON-NLS-1$
 
-			final Connection conn = TourDatabase.getInstance().getConnection();
-
 			final PreparedStatement statement = conn.prepareStatement(sb.toString());
 			statement.setLong(1, tagId);
 			sqlFilter.setParameters(statement, 2);
@@ -269,8 +263,6 @@ public class TVITagView_Tag extends TVITagViewItem {
 				yearItem.treeColumn = Integer.toString(dbYear);
 				yearItem.readSumColumnData(result, 2);
 			}
-
-			conn.close();
 
 		} catch (final SQLException e) {
 			UI.showSQLException(e);

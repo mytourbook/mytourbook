@@ -61,9 +61,8 @@ public class TVICatalogRootItem extends TVICatalogItem {
             + (" FROM " + TourDatabase.TABLE_TOUR_REFERENCE) //$NON-NLS-1$
             + (" ORDER BY label"); //$NON-NLS-1$
 
-      try {
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         final Connection conn = TourDatabase.getInstance().getConnection();
          final PreparedStatement statement = conn.prepareStatement(sql);
          final ResultSet result = statement.executeQuery();
 
@@ -77,8 +76,6 @@ public class TVICatalogRootItem extends TVICatalogItem {
             refItem.setTourId(result.getLong(3));
             refItem.tourCounter = result.getInt(4);
          }
-
-         conn.close();
 
       } catch (final SQLException e) {
          UI.showSQLException(e);

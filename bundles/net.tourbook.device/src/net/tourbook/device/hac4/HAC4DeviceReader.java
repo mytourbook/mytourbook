@@ -68,13 +68,9 @@ public class HAC4DeviceReader extends TourbookDevice {
    @Override
    public String buildFileNameFromRawData(final String rawDataFileName) {
 
-      RandomAccessFile fileRawData = null;
-
       final HAC4DeviceData hac4DeviceData = new HAC4DeviceData();
 
-      try {
-
-         fileRawData = new RandomAccessFile(rawDataFileName, "r"); //$NON-NLS-1$
+      try (RandomAccessFile fileRawData = new RandomAccessFile(rawDataFileName, "r")) { //$NON-NLS-1$
 
          // position file pointer to the device data
          fileRawData.seek(OFFSET_DEVICE_DATA);
@@ -84,14 +80,6 @@ public class HAC4DeviceReader extends TourbookDevice {
 
       } catch (final Exception e) {
          e.printStackTrace();
-      } finally {
-         if (fileRawData != null) {
-            try {
-               fileRawData.close();
-            } catch (final IOException e1) {
-               e1.printStackTrace();
-            }
-         }
       }
 
       final Formatter formatter = new Formatter();
@@ -187,17 +175,13 @@ public class HAC4DeviceReader extends TourbookDevice {
                                     final HashMap<Long, TourData> alreadyImportedTours,
                                     final HashMap<Long, TourData> newlyImportedTours) {
 
-      RandomAccessFile fileRawData = null;
-
       final byte[] buffer = new byte[5];
       String recordType = UI.EMPTY_STRING;
 
       final HAC4DeviceData hac4DeviceData = new HAC4DeviceData();
       final TourType defaultTourType = getTourType();
 
-      try {
-
-         fileRawData = new RandomAccessFile(importFilePath, "r"); //$NON-NLS-1$
+      try (RandomAccessFile fileRawData = new RandomAccessFile(importFilePath, "r")) { //$NON-NLS-1$
 
          // position file pointer to the device data
          fileRawData.seek(OFFSET_DEVICE_DATA);
@@ -568,14 +552,6 @@ public class HAC4DeviceReader extends TourbookDevice {
       } catch (final Exception e) {
          e.printStackTrace();
          hac4DeviceData.dumpData();
-      } finally {
-         if (fileRawData != null) {
-            try {
-               fileRawData.close();
-            } catch (final IOException e1) {
-               e1.printStackTrace();
-            }
-         }
       }
 
       deviceData.transferYear = hac4DeviceData.transferYear;
@@ -670,7 +646,7 @@ public class HAC4DeviceReader extends TourbookDevice {
 
    /**
     * checks if the data file has a valid HAC4 data format
-    * 
+    *
     * @return true for a valid HAC4 data format
     */
    @Override
@@ -749,10 +725,7 @@ public class HAC4DeviceReader extends TourbookDevice {
 
       boolean isValid = false;
 
-      RandomAccessFile file = null;
-      try {
-
-         file = new RandomAccessFile(fileName, "r"); //$NON-NLS-1$
+      try (RandomAccessFile file = new RandomAccessFile(fileName, "r")) {//$NON-NLS-1$
 
          final byte[] buffer = new byte[5];
 
@@ -782,14 +755,6 @@ public class HAC4DeviceReader extends TourbookDevice {
          e.printStackTrace();
       } catch (final NumberFormatException e) {
          return false;
-      } finally {
-         if (file != null) {
-            try {
-               file.close();
-            } catch (final IOException e) {
-               e.printStackTrace();
-            }
-         }
       }
 
       return isValid;

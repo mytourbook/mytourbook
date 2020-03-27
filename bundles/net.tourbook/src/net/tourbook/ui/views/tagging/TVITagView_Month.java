@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -113,7 +113,7 @@ public class TVITagView_Month extends TVITagViewItem {
 		final ArrayList<TreeViewerItem> children = new ArrayList<>();
 		setChildren(children);
 
-		try {
+		try (Connection conn = TourDatabase.getInstance().getConnection()){
 
 			/*
 			 * get all tours for the current month
@@ -144,8 +144,6 @@ public class TVITagView_Month extends TVITagViewItem {
 			sb.append(sqlFilter.getWhereClause());
 
 			sb.append(" ORDER BY startDay, startHour, startMinute"); //$NON-NLS-1$
-
-			final Connection conn = TourDatabase.getInstance().getConnection();
 
 			final PreparedStatement statement = conn.prepareStatement(sb.toString());
 			statement.setLong(1, _yearItem.getTagId());
@@ -185,8 +183,6 @@ public class TVITagView_Month extends TVITagViewItem {
 
 				lastTourId = tourId;
 			}
-			conn.close();
-
 		} catch (final SQLException e) {
 			UI.showSQLException(e);
 		}

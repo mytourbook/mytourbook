@@ -3366,10 +3366,10 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       /*
        * Write selected items into a csv file.
        */
-      Writer exportWriter = null;
-      try {
+      try (FileOutputStream fileOutputStream = new FileOutputStream(selectedFilePath);
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, UI.UTF_8);
+            Writer exportWriter = new BufferedWriter(outputStreamWriter)) {
 
-         exportWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(selectedFilePath), UI.UTF_8));
          final StringBuilder sb = new StringBuilder();
 
          exportCSV_10_Header(exportWriter, sb);
@@ -3409,8 +3409,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       } catch (final IOException e) {
          StatusUtil.showStatus(e);
-      } finally {
-         Util.closeWriter(exportWriter);
       }
    }
 

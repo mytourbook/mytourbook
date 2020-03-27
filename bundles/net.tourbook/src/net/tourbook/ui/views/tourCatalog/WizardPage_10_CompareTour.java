@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -449,19 +449,16 @@ public class WizardPage_10_CompareTour extends WizardPage {
 
 		final ArrayList<Long> allTourIds = new ArrayList<Long>();
 
-		try {
+		try (Connection conn = TourDatabase.getInstance().getConnection()){
 
 			final String sqlString = "SELECT tourId FROM " + TourDatabase.TABLE_TOUR_DATA; //$NON-NLS-1$
 
-			final Connection conn = TourDatabase.getInstance().getConnection();
 			final PreparedStatement statement = conn.prepareStatement(sqlString);
 
 			final ResultSet result = statement.executeQuery();
 			while (result.next()) {
 				allTourIds.add(result.getLong(1));
 			}
-
-			conn.close();
 
 		} catch (final SQLException e) {
 			net.tourbook.ui.UI.showSQLException(e);

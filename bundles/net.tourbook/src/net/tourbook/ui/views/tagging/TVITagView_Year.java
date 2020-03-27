@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -137,7 +137,7 @@ public class TVITagView_Year extends TVITagViewItem {
 
 		final ArrayList<TreeViewerItem> children = new ArrayList<>();
 
-		try {
+		try (Connection conn = TourDatabase.getInstance().getConnection()){
 
 			/*
 			 * get all tours for the tag Id of this tree item
@@ -165,8 +165,6 @@ public class TVITagView_Year extends TVITagViewItem {
 			sb.append(" GROUP BY startYear, startMonth"); //$NON-NLS-1$
 			sb.append(" ORDER BY startYear"); //$NON-NLS-1$
 
-			final Connection conn = TourDatabase.getInstance().getConnection();
-
 			final PreparedStatement statement = conn.prepareStatement(sb.toString());
 			statement.setLong(1, _tagItem.getTagId());
 			statement.setInt(2, _year);
@@ -186,8 +184,6 @@ public class TVITagView_Year extends TVITagViewItem {
 				tourItem.readSumColumnData(result, 3);
 			}
 
-			conn.close();
-
 		} catch (final SQLException e) {
 			UI.showSQLException(e);
 		}
@@ -199,7 +195,7 @@ public class TVITagView_Year extends TVITagViewItem {
 
 		final ArrayList<TreeViewerItem> children = new ArrayList<>();
 
-		try {
+		try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
 			/*
 			 * get all tours for the tag Id of this tree item
@@ -229,8 +225,6 @@ public class TVITagView_Year extends TVITagViewItem {
 			sb.append(sqlFilter.getWhereClause());
 
 			sb.append(" ORDER BY startMonth, startDay, startHour, startMinute"); //$NON-NLS-1$
-
-			final Connection conn = TourDatabase.getInstance().getConnection();
 
 			final PreparedStatement statement = conn.prepareStatement(sb.toString());
 			statement.setLong(1, _tagItem.getTagId());
@@ -270,8 +264,6 @@ public class TVITagView_Year extends TVITagViewItem {
 
 				lastTourId = tourId;
 			}
-			conn.close();
-
 		} catch (final SQLException e) {
 			UI.showSQLException(e);
 		}

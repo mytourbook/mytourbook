@@ -18,7 +18,6 @@ package net.tourbook.device.polar.hrm;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -256,7 +255,7 @@ public class Polar_PPD_DataReader extends TourbookDevice {
 
    /**
     * <pre>
-    * 
+    *
     * [PersonInfo]
     * 100	      1           6           6            4           256    // row0
     * 19650504   1 gender    168 size    1            0           3      // row1
@@ -270,7 +269,7 @@ public class Polar_PPD_DataReader extends TourbookDevice {
     *                                                                    // row9
     * C:\Program Files\Polar\Polar ProTrainer\Matthias Helmling          // row10
     * </pre>
-    * 
+    *
     * @param fileReader
     * @return
     * @throws IOException
@@ -351,7 +350,7 @@ public class Polar_PPD_DataReader extends TourbookDevice {
 
    /**
     * <pre>
-    * 
+    *
     * [PersonSports]
     * 100	3	2	6	4	256               // row0
     * 12	0	0	0	0	0                 // row1
@@ -367,7 +366,7 @@ public class Polar_PPD_DataReader extends TourbookDevice {
     * Intervall
     * INT
     * </pre>
-    * 
+    *
     * @param fileReader
     * @return
     * @throws IOException
@@ -532,29 +531,16 @@ public class Polar_PPD_DataReader extends TourbookDevice {
    @Override
    public boolean validateRawData(final String fileName) {
 
-      BufferedReader fileReader = null;
+      try (FileReader fileReader = new FileReader(fileName);
+            BufferedReader bufferedReader = new BufferedReader(fileReader)) {
 
-      try {
-
-         fileReader = new BufferedReader(new FileReader(fileName));
-
-         final String firstLine = fileReader.readLine();
+         final String firstLine = bufferedReader.readLine();
          if (firstLine == null || firstLine.startsWith(SECTION_PERSON_INFO) == false) {
             return false;
          }
 
-      } catch (final FileNotFoundException e) {
-         e.printStackTrace();
       } catch (final IOException e) {
          e.printStackTrace();
-      } finally {
-         if (fileReader != null) {
-            try {
-               fileReader.close();
-            } catch (final IOException e1) {
-               e1.printStackTrace();
-            }
-         }
       }
 
       return true;

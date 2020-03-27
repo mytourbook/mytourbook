@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -39,7 +39,7 @@ import net.tourbook.importdata.TourbookDevice;
 public class CiclotourTextDataReader extends TourbookDevice {
 
 	private static final String	FILE_HEADER_EN	= "Time:	Distance:	Alt.:	Speed:	HR:	Temperature:	Gradient:	Cadence:";	//$NON-NLS-1$
-	private static final String	FILE_HEADER_DE	= "Zeit:	Strecke:	Höhe:	Geschw:	Puls:	Temperatur:	Prozent:	Cadence:";	//$NON-NLS-1$
+	private static final String	FILE_HEADER_DE	= "Zeit:	Strecke:	Hï¿½he:	Geschw:	Puls:	Temperatur:	Prozent:	Cadence:";	//$NON-NLS-1$
 
 	public CiclotourTextDataReader() {}
 
@@ -182,11 +182,8 @@ public class CiclotourTextDataReader extends TourbookDevice {
 		int previousAlt = 0;
 		int altDelta = 0;
 
-		BufferedReader reader = null;
-
-		try {
-
-			reader = new BufferedReader(new FileReader(file));
+		  try (FileReader fileReader = new FileReader(file);
+	            BufferedReader reader = new BufferedReader(fileReader)){
 
 			// skip the header line
 			reader.readLine();
@@ -276,10 +273,7 @@ public class CiclotourTextDataReader extends TourbookDevice {
 
 			StatusUtil.showStatus(e);
 
-		} finally {
-
-			Util.closeReader(reader);
-		}
+		} 
 
 		return true;
 	}
@@ -294,11 +288,8 @@ public class CiclotourTextDataReader extends TourbookDevice {
 	@Override
 	public boolean validateRawData(final String fileName) {
 
-		BufferedReader reader = null;
-
-		try {
-
-			reader = new BufferedReader(new FileReader(fileName));
+		try (FileReader fileReader = new FileReader(fileName);
+		      BufferedReader reader = new BufferedReader(fileReader)){
 
 			final String header = reader.readLine();
 
@@ -318,15 +309,7 @@ public class CiclotourTextDataReader extends TourbookDevice {
 
 		} catch (final Exception e) {
 			StatusUtil.showStatus(e);
-		} finally {
-			if (reader != null) {
-				try {
-					reader.close();
-				} catch (final IOException e) {
-					StatusUtil.showStatus(e);
-				}
-			}
-		}
+		} 
 
 		return false;
 	}

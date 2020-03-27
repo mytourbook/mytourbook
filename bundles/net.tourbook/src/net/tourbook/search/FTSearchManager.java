@@ -1198,11 +1198,7 @@ public class FTSearchManager {
 
                      monitor.subTask(Messages.Database_Monitor_SetupLucene);
 
-                     Connection conn = null;
-
-                     try {
-
-                        conn = TourDatabase.getInstance().getConnection();
+                     try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
                         createStores_TourData(conn, monitor);
                         createStores_TourMarker(conn, monitor);
@@ -1210,8 +1206,6 @@ public class FTSearchManager {
 
                      } catch (final SQLException e) {
                         UI.showSQLException(e);
-                     } finally {
-                        Util.closeSql(conn);
                      }
                   }
                };

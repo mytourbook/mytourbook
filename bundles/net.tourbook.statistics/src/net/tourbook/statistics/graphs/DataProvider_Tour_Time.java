@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -136,7 +136,7 @@ public class DataProvider_Tour_Time extends DataProvider {
 
 				+ (" ORDER BY TourStartTime"); //$NON-NLS-1$
 
-		try {
+		try (Connection conn = TourDatabase.getInstance().getConnection()){
 
 			final TLongArrayList allTourIds = new TLongArrayList();
 
@@ -166,8 +166,6 @@ public class DataProvider_Tour_Time extends DataProvider {
 
 			long lastTourId = -1;
 			ArrayList<Long> tagIds = null;
-
-			final Connection conn = TourDatabase.getInstance().getConnection();
 
 			final PreparedStatement statement = conn.prepareStatement(sqlString);
 			sqlFilter.setParameters(statement, 1);
@@ -270,8 +268,6 @@ public class DataProvider_Tour_Time extends DataProvider {
 
 				lastTourId = dbTourId;
 			}
-
-			conn.close();
 
 			// get number of days for all years
 			int yearDays = 0;

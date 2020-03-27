@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -284,7 +284,7 @@ public class DataProvider_Tour_Day extends DataProvider {
 
 // SET_FORMATTING_ON
 
-      try {
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          final TLongArrayList dbAllTourIds = new TLongArrayList();
 
@@ -320,8 +320,6 @@ public class DataProvider_Tour_Day extends DataProvider {
 
          long lastTourId = -1;
          ArrayList<Long> tagIds = null;
-
-         final Connection conn = TourDatabase.getInstance().getConnection();
 
          final PreparedStatement statement = conn.prepareStatement(sqlString);
          sqlFilter.setParameters(statement, 1);
@@ -452,8 +450,6 @@ public class DataProvider_Tour_Day extends DataProvider {
 
             lastTourId = dbTourId;
          }
-
-         conn.close();
 
          final int[] allYearsDOY = dbAllYearsDOY.toArray();
 

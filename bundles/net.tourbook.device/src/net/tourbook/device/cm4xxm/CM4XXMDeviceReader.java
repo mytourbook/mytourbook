@@ -68,13 +68,10 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 
    @Override
    public String buildFileNameFromRawData(final String rawDataFileName) {
-      RandomAccessFile fileRawData = null;
 
       final CM4XXMDeviceData cm4xxDeviceData = new CM4XXMDeviceData();
 
-      try {
-
-         fileRawData = new RandomAccessFile(rawDataFileName, "r"); //$NON-NLS-1$
+      try (RandomAccessFile fileRawData = new RandomAccessFile(rawDataFileName, "r")) {//$NON-NLS-1$
 
          // position file pointer to the device data
          fileRawData.seek(OFFSET_DEVICE_DATA);
@@ -84,14 +81,6 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 
       } catch (final Exception e) {
          e.printStackTrace();
-      } finally {
-         if (fileRawData != null) {
-            try {
-               fileRawData.close();
-            } catch (final IOException e1) {
-               e1.printStackTrace();
-            }
-         }
       }
 
       return String.format(
@@ -174,8 +163,6 @@ public class CM4XXMDeviceReader extends TourbookDevice {
                                     final HashMap<Long, TourData> alreadyImportedTours,
                                     final HashMap<Long, TourData> newlyImportedTours) {
 
-      RandomAccessFile fileRawData = null;
-
       final byte[] buffer = new byte[5];
       String recordType = UI.EMPTY_STRING;
 
@@ -186,9 +173,7 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 
       final TourType defaultTourType = getTourType();
 
-      try {
-
-         fileRawData = new RandomAccessFile(importFilePath, "r"); //$NON-NLS-1$
+      try (RandomAccessFile fileRawData = new RandomAccessFile(importFilePath, "r")) {//$NON-NLS-1$
 
          // position file pointer to the device data
          fileRawData.seek(OFFSET_DEVICE_DATA);
@@ -545,14 +530,6 @@ public class CM4XXMDeviceReader extends TourbookDevice {
          }
       } catch (final Exception e) {
          e.printStackTrace();
-      } finally {
-         if (fileRawData != null) {
-            try {
-               fileRawData.close();
-            } catch (final IOException e1) {
-               e1.printStackTrace();
-            }
-         }
       }
 
       deviceData.transferYear = cm4xxmDeviceData.transferYear;
@@ -686,7 +663,7 @@ public class CM4XXMDeviceReader extends TourbookDevice {
 
    /**
     * checks if the data file has a valid HAC4 data format
-    * 
+    *
     * @return true for a valid HAC4 data format
     */
    @Override

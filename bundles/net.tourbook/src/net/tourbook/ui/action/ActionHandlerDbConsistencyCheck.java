@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -55,12 +55,11 @@ public class ActionHandlerDbConsistencyCheck extends AbstractHandler {
 				sbSQL.append(" WHERE s.schemaid = t.schemaid"); //$NON-NLS-1$
 				sbSQL.append("   and t.tabletype = 'T'"); //$NON-NLS-1$
 
-				try {
+				try (Connection conn = TourDatabase.getInstance().getConnection()){
 
 					final StringBuilder sbResult = new StringBuilder();
 					sbResult.append(Messages.app_db_consistencyCheck_checkIsOK);
 
-					final Connection conn = TourDatabase.getInstance().getConnection();
 					final PreparedStatement statement = conn.prepareStatement(sbSQL.toString());
 
 					final ResultSet result = statement.executeQuery();
@@ -73,8 +72,6 @@ public class ActionHandlerDbConsistencyCheck extends AbstractHandler {
 					}
 
 					resultInfo[0] = sbResult.toString();
-
-					conn.close();
 
 				} catch (final Exception e) {
 

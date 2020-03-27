@@ -120,13 +120,10 @@ public class ActionHandlerDb_CompressDB extends AbstractHandler {
          @Override
          public void run() {
 
-            Connection conn = null;
-            try {
+            try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
                final StringBuilder sbResult = new StringBuilder();
                sbResult.append(Messages.app_db_consistencyCheck_checkIsOK);
-
-               conn = TourDatabase.getInstance().getConnection();
 
                // log size BEFORE compression
                logTableSize(conn);
@@ -184,17 +181,6 @@ public class ActionHandlerDb_CompressDB extends AbstractHandler {
 
                error[0] = NLS.bind(Messages.app_db_consistencyCheck_checkFailed, message);
 
-            } finally {
-
-               if (conn != null) {
-
-                  try {
-                     conn.close();
-                  } catch (final SQLException e) {
-                     // TODO Auto-generated catch block
-                     e.printStackTrace();
-                  }
-               }
             }
          }
       });

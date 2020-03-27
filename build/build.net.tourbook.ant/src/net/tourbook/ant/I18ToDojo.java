@@ -153,18 +153,14 @@ public class I18ToDojo extends Task {
 			System.out.println("	to:   " + dojoI18PropFilePath); //$NON-NLS-1$
 			// TODO remove SYSTEM.OUT.PRINTLN
 
-			BufferedWriter writer = null;
-
-			try {
+				// create dojo file
+			try (BufferedWriter writer = new BufferedWriter(
+                  new OutputStreamWriter(
+                        new FileOutputStream(dojoI18PropFilePath, false),
+                        UTF_8))){
 
 				// ensure folder is created
 				new File(dojoI18Folder).mkdirs();
-
-				// create dojo file
-				writer = new BufferedWriter(//
-						new OutputStreamWriter(//
-								new FileOutputStream(dojoI18PropFilePath, false),
-								UTF_8));
 
 				writeDojo_I18_10_Header(writer);
 				writeDojo_Messages(writer, javaI18PropFilePath);
@@ -172,14 +168,6 @@ public class I18ToDojo extends Task {
 
 			} catch (final IOException e) {
 				e.printStackTrace();
-			} finally {
-				try {
-					if (writer != null) {
-						writer.close();
-					}
-				} catch (final IOException e) {
-					e.printStackTrace();
-				}
 			}
 		}
 	}
@@ -263,28 +251,17 @@ public class I18ToDojo extends Task {
 		System.out.println("	to:   " + dojoPropFilePath); //$NON-NLS-1$
 		// TODO remove SYSTEM.OUT.PRINTLN
 
-		BufferedWriter writer = null;
+		try(BufferedWriter writer = new BufferedWriter(
+            new OutputStreamWriter(
+                  new FileOutputStream(dojoPropFilePath, false),
+                  UTF_8))) {
 
-		try {
-
-			writer = new BufferedWriter(//
-					new OutputStreamWriter(//
-							new FileOutputStream(dojoPropFilePath, false),
-							UTF_8));
 			writeDojo_Root_10_Header(writer);
 			writeDojo_Messages(writer, javaPropFilePath);
 			writeDojo_Root_20_Footer(writer);
 
 		} catch (final IOException e) {
 			e.printStackTrace();
-		} finally {
-			try {
-				if (writer != null) {
-					writer.close();
-				}
-			} catch (final IOException e) {
-				e.printStackTrace();
-			}
 		}
 	}
 

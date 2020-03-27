@@ -134,16 +134,13 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
 
       boolean returnValue = false;
 
-      BufferedReader fileReader = null;
-
-      try {
-
-         fileReader = new BufferedReader(new FileReader(importFilePath));
+      try (FileReader fileReader = new FileReader(importFilePath);
+            BufferedReader bufferedReader = new BufferedReader(fileReader)) {
 
          /*
           * check if the file is from a Daum Ergometer
           */
-         final String fileHeader = fileReader.readLine();
+         final String fileHeader = bufferedReader.readLine();
          if (fileHeader.startsWith(DAUM_ERGO_BIKE_CSV_ID) == false) {
             return false;
          }
@@ -211,7 +208,7 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
          float kJoule = 0;
 
          // read all data points
-         while ((tokenLine = fileReader.readLine()) != null) {
+         while ((tokenLine = bufferedReader.readLine()) != null) {
 
             tokenizer = new StringTokenizer(tokenLine, CSV_STRING_TOKEN);
 
@@ -265,8 +262,6 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
             previousDistance = distance;
          }
 
-         fileReader.close();
-
          if (timeDataList.size() == 0) {
             /*
              * data are valid but have no data points
@@ -315,14 +310,6 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
          StatusUtil.log(e);
          return false;
 
-      } finally {
-         try {
-            if (fileReader != null) {
-               fileReader.close();
-            }
-         } catch (final IOException e) {
-            StatusUtil.log(e);
-         }
       }
 
       return returnValue;
@@ -330,19 +317,16 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
 
    /**
     * checks if the data file has a valid .crp data format
-    * 
+    *
     * @return true for a valid .crp data format
     */
    @Override
    public boolean validateRawData(final String fileName) {
 
-      BufferedReader fileReader = null;
+      try (FileReader fileReader = new FileReader(fileName);
+            BufferedReader bufferedReader = new BufferedReader(fileReader)) {
 
-      try {
-
-         fileReader = new BufferedReader(new FileReader(fileName));
-
-         final String fileHeader = fileReader.readLine();
+         final String fileHeader = bufferedReader.readLine();
          if (fileHeader == null) {
             return false;
          }
@@ -353,14 +337,6 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
 
       } catch (final IOException e) {
          e.printStackTrace();
-      } finally {
-         if (fileReader != null) {
-            try {
-               fileReader.close();
-            } catch (final IOException e1) {
-               e1.printStackTrace();
-            }
-         }
       }
 
       return true;

@@ -186,14 +186,13 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
     */
    private static File createXmlDefaultProfiles() {
 
-      BufferedWriter writer = null;
       final File file = getProfileFile();
 
-      try {
+      try (FileOutputStream fileOutputStream = new FileOutputStream(file);
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, UI.UTF_8);
+            BufferedWriter writer = new BufferedWriter(outputStreamWriter)) {
 
          int profileId = -1;
-
-         writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), UI.UTF_8));
 
          final XMLMemento xmlRoot = getXMLRoot();
 
@@ -311,14 +310,6 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
       } catch (final IOException e) {
          e.printStackTrace();
-      } finally {
-         if (writer != null) {
-            try {
-               writer.close();
-            } catch (final IOException e) {
-               e.printStackTrace();
-            }
-         }
       }
 
       return file;
@@ -1589,12 +1580,11 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
    private void saveProfileXMLFile() {
 
-      BufferedWriter writer = null;
+      final File file = getProfileFile();
 
-      try {
-
-         final File file = getProfileFile();
-         writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), UI.UTF_8));
+      try (FileOutputStream fileOutputStream = new FileOutputStream(file);
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, UI.UTF_8);
+            BufferedWriter writer = new BufferedWriter(outputStreamWriter)) {
 
          final XMLMemento xmlRoot = getXMLRoot();
 
@@ -1621,14 +1611,6 @@ public final class PrefPageSRTMColors extends PreferencePage implements IWorkben
 
       } catch (final IOException e) {
          e.printStackTrace();
-      } finally {
-         if (writer != null) {
-            try {
-               writer.close();
-            } catch (final IOException e) {
-               e.printStackTrace();
-            }
-         }
       }
    }
 

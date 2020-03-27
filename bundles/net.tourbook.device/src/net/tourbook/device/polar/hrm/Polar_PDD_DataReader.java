@@ -999,27 +999,16 @@ public class Polar_PDD_DataReader extends TourbookDevice {
    @Override
    public boolean validateRawData(final String fileName) {
 
-      BufferedReader fileReader = null;
+      try (FileReader fileReader = new FileReader(fileName);
+            BufferedReader bufferedReader = new BufferedReader(fileReader)) {
 
-      try {
-
-         fileReader = new BufferedReader(new FileReader(fileName));
-
-         final String firstLine = fileReader.readLine();
+         final String firstLine = bufferedReader.readLine();
          if (firstLine == null || firstLine.startsWith(SECTION_DAY_INFO) == false) {
             return false;
          }
 
       } catch (final IOException e) {
          e.printStackTrace();
-      } finally {
-         if (fileReader != null) {
-            try {
-               fileReader.close();
-            } catch (final IOException e1) {
-               e1.printStackTrace();
-            }
-         }
       }
 
       return true;

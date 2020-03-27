@@ -104,8 +104,6 @@ public class CRPDataReader extends TourbookDevice {
       // reset tour data list
       // tourDataList.clear();
 
-      BufferedReader fileReader = null;
-
       // int tourStartOdoMeter = 0;
       // int tourStartOdoSec = 0;
       // int tourStartOdoUp = 0;
@@ -115,9 +113,7 @@ public class CRPDataReader extends TourbookDevice {
       // double bikerWeight;
       // double bikerHeight;
 
-      try {
-
-         fileReader = new BufferedReader(new FileReader(importFilePath));
+      try (BufferedReader fileReader = new BufferedReader(new FileReader(importFilePath))) {
 
          final String fileHeader = fileReader.readLine();
          if (fileHeader.startsWith("HRMProfilDatas") == false) { //$NON-NLS-1$
@@ -338,8 +334,6 @@ public class CRPDataReader extends TourbookDevice {
             sumTemperature += Math.abs(temperature);
          }
 
-         fileReader.close();
-
          /*
           * set the start distance, this is not available in a .crp file but it's required to
           * create the tour-id
@@ -404,19 +398,16 @@ public class CRPDataReader extends TourbookDevice {
 
    /**
     * checks if the data file has a valid .crp data format
-    * 
+    *
     * @return true for a valid .crp data format
     */
    @Override
    public boolean validateRawData(final String fileName) {
 
-      BufferedReader fileReader = null;
+      try (FileReader fileReader = new FileReader(fileName);
+            BufferedReader bufferedReader = new BufferedReader(fileReader)) {
 
-      try {
-
-         fileReader = new BufferedReader(new FileReader(fileName));
-
-         final String fileHeader = fileReader.readLine();
+         final String fileHeader = bufferedReader.readLine();
          if (fileHeader == null) {
             return false;
          }
@@ -427,14 +418,6 @@ public class CRPDataReader extends TourbookDevice {
 
       } catch (final IOException e) {
          e.printStackTrace();
-      } finally {
-         if (fileReader != null) {
-            try {
-               fileReader.close();
-            } catch (final IOException e1) {
-               e1.printStackTrace();
-            }
-         }
       }
 
       return true;

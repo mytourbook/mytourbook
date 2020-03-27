@@ -1381,11 +1381,9 @@ public class MapProviderManager {
 
    public void exportMapProvider(final MP mapProvider, final File file) {
 
-      BufferedWriter writer = null;
-
-      try {
-
-         writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), net.tourbook.common.UI.UTF_8));
+      try (FileOutputStream fileOutputStream = new FileOutputStream(file);
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, net.tourbook.common.UI.UTF_8);
+            BufferedWriter writer = new BufferedWriter(outputStreamWriter)) {
 
          final XMLMemento xmlMemento = createXmlRoot(true);
 
@@ -1410,14 +1408,6 @@ public class MapProviderManager {
 
       } catch (final IOException e) {
          StatusUtil.log(e);
-      } finally {
-         if (writer != null) {
-            try {
-               writer.close();
-            } catch (final IOException e) {
-               StatusUtil.log(e);
-            }
-         }
       }
    }
 

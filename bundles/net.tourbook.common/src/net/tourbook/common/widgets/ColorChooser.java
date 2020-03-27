@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020  Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1233,8 +1233,7 @@ public class ColorChooser extends Composite {
 		saveState_CustomColors_Colors(xmlMemento);
 
 		// Write the XML block to the state store.
-		final Writer writer = new StringWriter();
-		try {
+		try(Writer writer = new StringWriter()) {
 
 			xmlMemento.save(writer);
 			state.put(XML_STATE_COLOR_CHOOSER_CUSTOM_COLORS, writer.toString());
@@ -1243,14 +1242,7 @@ public class ColorChooser extends Composite {
 
 			StatusUtil.log(e);
 
-		} finally {
-
-			try {
-				writer.close();
-			} catch (final IOException e) {
-				StatusUtil.log(e);
-			}
-		}
+		} 
 	}
 
 	private void saveState_CustomColors_Colors(final XMLMemento xmlMemento) {

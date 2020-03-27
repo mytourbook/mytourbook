@@ -1001,22 +1001,14 @@ public class TourDatabase {
          @Override
          public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
-            Connection conn = null;
-            try {
-
-               conn = TourDatabase.getInstance().getConnection();
+            try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
                run_AllTours(conn, monitor);
 
             } catch (final SQLException e) {
 
                net.tourbook.common.util.SQL.showException(e);
-
-            } finally {
-
-               Util.closeSql(conn);
             }
-
          }
 
          private void run_AllTours(final Connection conn, final IProgressMonitor monitor) throws SQLException {
@@ -1186,14 +1178,11 @@ public class TourDatabase {
     */
    private static void deleteTour_WithSQL(final long tourId) {
 
-      Connection conn = null;
       PreparedStatement prepStmt = null;
 
       String sql = UI.EMPTY_STRING;
 
-      try {
-
-         conn = TourDatabase.getInstance().getConnection();
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
 // SET_FORMATTING_OFF
 
@@ -1226,8 +1215,6 @@ public class TourDatabase {
       } catch (final SQLException e) {
          System.out.println(sql);
          UI.showSQLException(e);
-      } finally {
-         Util.closeSql(conn);
       }
    }
 
@@ -2343,7 +2330,6 @@ public class TourDatabase {
 
 //      final long startTime = System.nanoTime();
 
-      Connection conn = null;
       PreparedStatement deleteStmt = null;
       PreparedStatement insertStmt = null;
 
@@ -2351,11 +2337,9 @@ public class TourDatabase {
 
       int[] tourGeoParts = null;
 
-      try {
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          final long tourId = tourData.getTourId();
-
-         conn = TourDatabase.getInstance().getConnection();
 
          /*
           * Delete old geo parts
@@ -2400,7 +2384,6 @@ public class TourDatabase {
       } finally {
          Util.closeSql(deleteStmt);
          Util.closeSql(insertStmt);
-         Util.closeSql(conn);
       }
 
 //      System.out.println(
@@ -4244,11 +4227,7 @@ public class TourDatabase {
          return;
       }
 
-      Connection conn = null;
-
-      try {
-
-         conn = getConnection_Simple();
+      try (Connection conn = getConnection_Simple()) {
 
          /*
           * Check if the tourdata table exists
@@ -4270,11 +4249,7 @@ public class TourDatabase {
             splashManager.setMessage(Messages.Database_Monitor_CreateDatabase);
          }
 
-         Statement stmt = null;
-
-         try {
-
-            stmt = conn.createStatement();
+         try (Statement stmt = conn.createStatement()) {
 
             createTable_TourData(stmt);
 
@@ -4301,14 +4276,10 @@ public class TourDatabase {
 
          } catch (final SQLException e) {
             UI.showSQLException(e);
-         } finally {
-            Util.closeSql(stmt);
          }
 
       } catch (final SQLException e) {
          UI.showSQLException(e);
-      } finally {
-         Util.closeSql(conn);
       }
    }
 
@@ -4327,14 +4298,12 @@ public class TourDatabase {
          return false;
       }
 
-      Connection conn1 = null;
       Connection conn2 = null;
       Statement stmt1 = null;
       Statement stmt2 = null;
 
-      try {
+      try (Connection conn1 = getConnection_Simple()) {
 
-         conn1 = getConnection_Simple();
          {
             String sql = "SELECT * FROM " + TABLE_DB_VERSION; //$NON-NLS-1$
 
@@ -4398,7 +4367,6 @@ public class TourDatabase {
 
       } finally {
 
-         Util.closeSql(conn1);
          Util.closeSql(conn2);
          Util.closeSql(stmt1);
          Util.closeSql(stmt2);

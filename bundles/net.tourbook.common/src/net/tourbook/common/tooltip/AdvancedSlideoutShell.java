@@ -589,12 +589,12 @@ public abstract class AdvancedSlideoutShell {
 
       } catch (final Exception err) {
          StatusUtil.log(err);
-      } finally {
+      } //finally {
 
 //         final float timeDiff = (float) (System.nanoTime() - start) / 1000000;
 //         System.out.println(UI.timeStampNano() + " animation20_Runnable:\t" + timeDiff + " ms\t" + " ms");
 //         // TODO remove SYSTEM.OUT.PRINTLN
-      }
+//     }
    }
 
    protected abstract void beforeHideToolTip();

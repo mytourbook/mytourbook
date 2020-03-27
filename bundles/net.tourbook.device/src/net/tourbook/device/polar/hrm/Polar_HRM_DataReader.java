@@ -854,20 +854,18 @@ public class Polar_HRM_DataReader extends TourbookDevice {
 
       boolean returnValue = false;
 
-      BufferedReader fileReader = null;
-
-      try {
+      try (FileReader fileReader = new FileReader(importFileName);
+            BufferedReader bufferedReader = new BufferedReader(fileReader)) {
 
          String line;
-         fileReader = new BufferedReader(new FileReader(importFileName));
 
-         while ((line = fileReader.readLine()) != null) {
+         while ((line = bufferedReader.readLine()) != null) {
 
             boolean isValid = true;
 
             if (line.startsWith(SECTION_PARAMS)) {
 
-               isValid = parseSection_10_Params(fileReader, deviceData);
+               isValid = parseSection_10_Params(bufferedReader, deviceData);
 
             } else if (line.startsWith(SECTION_NOTE)) {
 
@@ -876,12 +874,12 @@ public class Polar_HRM_DataReader extends TourbookDevice {
             } else if (line.startsWith(SECTION_INT_TIMES)) {
 
                if (_hrmVersion == 106) {
-                  isValid = parseSection_20_LapData106(fileReader);
+                  isValid = parseSection_20_LapData106(bufferedReader);
                }
 
             } else if (line.startsWith(SECTION_INT_NOTES)) {
 
-               isValid = parseSection_21_LapNotes(fileReader);
+               isValid = parseSection_21_LapNotes(bufferedReader);
 
             } else if (line.startsWith(SECTION_EXTRA_DATA)) {
 
@@ -909,12 +907,12 @@ public class Polar_HRM_DataReader extends TourbookDevice {
 
             } else if (line.startsWith(SECTION_TRIP)) {
 
-               isValid = parseSection_80_Trip(fileReader);
+               isValid = parseSection_80_Trip(bufferedReader);
 
             } else if (line.startsWith(SECTION_HR_DATA)) {
 
                if (_hrmVersion == 106) {
-                  isValid = parseSection_90_HRData106(fileReader);
+                  isValid = parseSection_90_HRData106(bufferedReader);
                }
             }
 
@@ -937,15 +935,6 @@ public class Polar_HRM_DataReader extends TourbookDevice {
       } finally {
 
          cleanup();
-
-         try {
-            if (fileReader != null) {
-               fileReader.close();
-            }
-         } catch (final IOException e) {
-            StatusUtil.showStatus(e);
-            return false;
-         }
       }
       return returnValue;
    }
@@ -1813,33 +1802,23 @@ public class Polar_HRM_DataReader extends TourbookDevice {
    @Override
    public boolean validateRawData(final String fileName) {
 
-      BufferedReader fileReader = null;
+      try (FileReader fileReader = new FileReader(fileName);
+            BufferedReader bufferedReader = new BufferedReader(fileReader)) {
 
-      try {
 
-         fileReader = new BufferedReader(new FileReader(fileName));
-
-         final String firstLine = fileReader.readLine();
+         final String firstLine = bufferedReader.readLine();
          if (firstLine == null || firstLine.startsWith(SECTION_PARAMS) == false) {
             return false;
          }
 
-         final String secondLine = fileReader.readLine();
+         final String secondLine = bufferedReader.readLine();
          if (secondLine == null || secondLine.startsWith("Version=") == false) { //$NON-NLS-1$
             return false;
          }
 
       } catch (final IOException e) {
          e.printStackTrace();
-      } finally {
-         if (fileReader != null) {
-            try {
-               fileReader.close();
-            } catch (final IOException e1) {
-               e1.printStackTrace();
-            }
-         }
-      }
+      } 
 
       return true;
    }

@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.FileUtils;
 import net.tourbook.common.util.StatusUtil;
-import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 
@@ -265,9 +264,9 @@ public abstract class TourbookDevice implements IRawDataReader {
    protected boolean isValidXMLFile(final String importFilePath, final String deviceTag, final boolean isRemoveBOM) {
 
       final String deviceTagLower = deviceTag.toLowerCase();
-      BufferedReader fileReader = null;
 
-      try (FileInputStream inputStream = new FileInputStream(importFilePath)) {
+      try (FileInputStream inputStream = new FileInputStream(importFilePath);
+            BufferedReader fileReader = new BufferedReader(new InputStreamReader(inputStream, UI.UTF_8))) {
 
          if (isRemoveBOM) {
 
@@ -277,8 +276,6 @@ public abstract class TourbookDevice implements IRawDataReader {
                // just ignore it
             }
          }
-
-         fileReader = new BufferedReader(new InputStreamReader(inputStream, UI.UTF_8));
 
          String line = fileReader.readLine();
          if (line == null || line.toLowerCase().contains(XML_START_ID) == false) {
@@ -303,8 +300,6 @@ public abstract class TourbookDevice implements IRawDataReader {
 
       } catch (final Exception e1) {
          StatusUtil.log(e1);
-      } finally {
-         Util.closeReader(fileReader);
       }
 
       return true;

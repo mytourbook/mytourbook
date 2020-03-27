@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -229,9 +229,7 @@ public class TVITourBookYearSub extends TVITourBookItem {
 
             + " ORDER BY TourStartTime\n"; //$NON-NLS-1$
 
-      try {
-
-         final Connection conn = TourDatabase.getInstance().getConnection();
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
 //         TourDatabase.enableRuntimeStatistics(conn);
 
@@ -487,8 +485,6 @@ public class TVITourBookYearSub extends TVITourBookItem {
          }
 
 //       TourDatabase.disableRuntimeStatistic(conn);
-
-         conn.close();
 
       } catch (final SQLException e) {
          UI.showSQLException(e);

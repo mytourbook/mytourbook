@@ -355,11 +355,10 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
    private void loadPeopleData() {
 
-      Connection conn = null;
       final String sqlString = "SELECT *  FROM " + TourDatabase.TABLE_TOUR_PERSON; //$NON-NLS-1$
 
-      try {
-         conn = TourDatabase.getInstance().getConnection();
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
+
          final PreparedStatement statement = conn.prepareStatement(sqlString);
          final ResultSet result = statement.executeQuery();
 
@@ -376,15 +375,6 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
       } catch (final SQLException e) {
          net.tourbook.ui.UI.showSQLException(e);
-      } finally {
-
-         if (conn != null) {
-            try {
-               conn.close();
-            } catch (final SQLException e) {
-               net.tourbook.ui.UI.showSQLException(e);
-            }
-         }
       }
    }
 

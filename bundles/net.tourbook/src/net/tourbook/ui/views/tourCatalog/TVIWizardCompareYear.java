@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -53,9 +53,7 @@ public class TVIWizardCompareYear extends TVIWizardCompareItem {
 		sb.append(" GROUP BY startYear, startMonth"); //$NON-NLS-1$
 		sb.append(" ORDER BY startMonth"); //$NON-NLS-1$
 
-		try {
-
-			final Connection conn = TourDatabase.getInstance().getConnection();
+		try (Connection conn = TourDatabase.getInstance().getConnection()){
 
 			final PreparedStatement statement = conn.prepareStatement(sb.toString());
 			statement.setInt(1, tourYear);
@@ -77,8 +75,6 @@ public class TVIWizardCompareYear extends TVIWizardCompareItem {
 				monthItem.tourYear = dbYear;
 				monthItem.tourMonth = dbMonth;
 			}
-
-			conn.close();
 
 		} catch (final SQLException e) {
 			net.tourbook.ui.UI.showSQLException(e);
