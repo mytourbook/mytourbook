@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -228,6 +228,10 @@ public class MapUtils {
          if (colorProvider instanceof Map3GradientColorProvider) {
 
             // the colorProvider already contains the active color profile
+            
+            //Converting the values from seconds to minutes
+            minValue /= 60;
+            maxValue /= 60;
 
          } else {
 

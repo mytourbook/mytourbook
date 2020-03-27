@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -529,10 +529,11 @@ public class Map3GradientColorManager {
             true,
             true,
             new RGBVertex[] {
-                  new RGBVertex(0, 181, 0, 0, 1.0f),
-                  new RGBVertex(150, 255, 106, 0, 1.0f),
-                  new RGBVertex(300, 255, 255, 255, 1.0f),
-                  new RGBVertex(450, 0, 170, 255, 1.0f), },
+                  new RGBVertex(10, 181, 0, 0, 1.0f),
+                  new RGBVertex(20, 255, 106, 0, 1.0f),
+                  new RGBVertex(30, 255, 255, 255, 1.0f),
+                  new RGBVertex(40, 0, 170, 255, 1.0f)
+            },
             MapColorProfile.BRIGHTNESS_DEFAULT,
             60,
             MapColorProfile.BRIGHTNESS_DEFAULT,
@@ -543,9 +544,12 @@ public class Map3GradientColorManager {
             true,
             true,
             new RGBVertex[] {
-                  new RGBVertex(0, 0, 0, 0, 1.0f),
-                  new RGBVertex(90, 43, 80, 255, 1.0f),
-                  new RGBVertex(240, 255, 255, 0, 1.0f), },
+                  new RGBVertex(4, 38, 24, 0, 1.0f),
+                  new RGBVertex(6, 255, 255, 0, 1.0f),
+                  new RGBVertex(8, 255, 50, 0, 1.0f),
+                  new RGBVertex(10, 0, 144, 255, 1.0f),
+                  new RGBVertex(12, 87, 255, 255, 1.0f)
+            },
             MapColorProfile.BRIGHTNESS_DEFAULT,
             60,
             MapColorProfile.BRIGHTNESS_DEFAULT,
@@ -1140,7 +1144,7 @@ public class Map3GradientColorManager {
    }
 
    /**
-    * Write map color data into a xml file.
+    * Write map color data into a XML file.
     */
    public static void saveColors() {
 
