@@ -1177,10 +1177,11 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
       final boolean canShowHrZones = _allTours.stream().anyMatch(t -> t.getNumberOfHrZones() > 0) && isPulsePresent;
       final boolean isGradientPresent = _allTours.stream().anyMatch(t -> t.getGradientSerie() != null);
       final boolean isSpeedPresent = _allTours.stream().anyMatch(t -> t.getSpeedSerie() != null);
+      final boolean isPacePresent = _allTours.stream().anyMatch(t -> t.getPaceSerie() != null);
 
       _actionTourColorAltitude.setEnabled(canTourBeDisplayed);
       _actionTourColorGradient.setEnabled(canTourBeDisplayed && isGradientPresent);
-      _actionTourColorPace.setEnabled(canTourBeDisplayed);
+      _actionTourColorPace.setEnabled(canTourBeDisplayed && isPacePresent);
       _actionTourColorPulse.setEnabled(canTourBeDisplayed && isPulsePresent);
       _actionTourColorSpeed.setEnabled(canTourBeDisplayed && isSpeedPresent);
       _actionTourColorHrZone.setEnabled(canTourBeDisplayed && canShowHrZones);
