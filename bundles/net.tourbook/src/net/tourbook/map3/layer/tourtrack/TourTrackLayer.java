@@ -202,7 +202,7 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
          return tourData.getGradientSerie();
 
       case Pace:
-         return tourData.getPaceSerieSeconds();
+         return tourData.getPaceSerie();
 
       case Pulse:
          return tourData.pulseSerie;
@@ -313,7 +313,7 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 
          /**
           * When the context menu should be displayed and the right mouse button is pressed,
-          * first a SelectEvent.HOVER is fired before SelectEvent.RIGHT_PRESS is fired. Therefor
+          * first a SelectEvent.HOVER is fired before SelectEvent.RIGHT_PRESS is fired. Therefore
           * the context state must be set here.
           * <p>
           * The context menu is opened with a ww mouse listener in Map3View.
