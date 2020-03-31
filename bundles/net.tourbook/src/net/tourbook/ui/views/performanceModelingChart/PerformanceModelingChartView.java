@@ -98,41 +98,42 @@ public class PerformanceModelingChartView extends ViewPart {
 
 // SET_FORMATTING_ON
 
-   private final IPreferenceStore         _prefStore    = TourbookPlugin.getPrefStore();
-   private final IDialogSettings          _state        = TourbookPlugin.getState(ID);
+   private static final boolean        IS_OSX        = net.tourbook.common.UI.IS_OSX;
+   private static final boolean        IS_LINUX      = net.tourbook.common.UI.IS_LINUX;
 
-   private IPropertyChangeListener        _prefChangeListener;
-   private ITrainingStressDataListener    _trainingStressDataListener;
+   private final IPreferenceStore      _prefStore    = TourbookPlugin.getPrefStore();
+   private final IDialogSettings       _state        = TourbookPlugin.getState(ID);
 
-   private TourPerson                     _currentPerson;
+   private IPropertyChangeListener     _prefChangeListener;
 
-   private LocalDate                      _oldestEntryDate;
-   private LocalDate                      _newestEntryDate;
+   private ITrainingStressDataListener _trainingStressDataListener;
+   private TourPerson                  _currentPerson;
 
-   private static final boolean           IS_OSX        = net.tourbook.common.UI.IS_OSX;
-   private static final boolean           IS_LINUX      = net.tourbook.common.UI.IS_LINUX;
+   private LocalDate                   _oldestEntryDate;
+   private LocalDate                   _newestEntryDate;
 
-   private boolean                        _isShowAllValues;
-   private boolean                        _isSynchChartVerticalValues;
+   private boolean                     _isShowAllValues;
+   private boolean                     _isSynchChartVerticalValues;
 
-   private ChartDataModel                 _chartDataModel;
+   private ChartDataModel              _chartDataModel;
 
-   private int                            _selectedYear = -1;
+   private int                         _selectedYear = -1;
 
    /**
     * Contains all years which have tours for the selected tour type and person.
     */
-   private TIntArrayList                  _availableYears;
+   private TIntArrayList               _availableYears;
 
-   private ActionShowGovssValues _actionShowAllStressScoreValues;
-   private ActionSynchronizeChartScale    _actionSynchVerticalChartScaling;
-   private ActionTrainingOptions          _actionTrainingOptions;
+   /**
+    * Actions
+    */
+   private ActionShowGovssValues       _actionShowGovssValues;
+   private ActionSynchronizeChartScale _actionSynchVerticalChartScaling;
+   private ActionTrainingOptions       _actionTrainingOptions;
 
-   private double[]                       _xSerieDate;
+   private double[]                    _xSerieDate;
 
-   //private final MinMaxKeeper_YData       _minMaxKeeper = new MinMaxKeeper_YData();
-
-   private final NumberFormat _nf1 = NumberFormat.getNumberInstance();
+   private final NumberFormat          _nf1          = NumberFormat.getNumberInstance();
    {
       _nf1.setMinimumFractionDigits(1);
       _nf1.setMaximumFractionDigits(1);
@@ -148,7 +149,7 @@ public class PerformanceModelingChartView extends ViewPart {
    private Combo       _comboNumberOfYears;
 
    /*
-    * Pagebook for the predicted performance view
+    * Pagebook for the Performance Model view
     */
    private PageBook  _pageBook;
    private Composite _page_TrainingStressScores;
@@ -326,9 +327,46 @@ public class PerformanceModelingChartView extends ViewPart {
 
    private void createActions() {
 
-      _actionShowAllStressScoreValues = new ActionShowGovssValues(this);
+      _actionShowGovssValues = new ActionShowGovssValues(this);
       _actionSynchVerticalChartScaling = new ActionSynchronizeChartScale(this);
       _actionTrainingOptions = new ActionTrainingOptions();
+   }
+
+   /**
+    * create segments for the chart
+    */
+   private ChartStatisticSegments createChartSegments() {//final TourData_Time tourDataTime) {
+
+      final double segmentStart[] = new double[5];//_numberOfYears];
+      final double segmentEnd[] = new double[5];//_numberOfYears];
+      final String[] segmentTitle = new String[5];//_numberOfYears];
+
+      final int[] allYearDays = new int[] { 366 };//tourDataTime.yearDays;
+      final int oldestYear = 2020 - 5 + 1;
+      int yearDaysSum = 0;
+
+      // create segments for each year
+      for (int yearIndex = 0; yearIndex < allYearDays.length; yearIndex++) {
+
+         final int yearDays = allYearDays[yearIndex];
+
+         segmentStart[yearIndex] = yearDaysSum;
+         segmentEnd[yearIndex] = yearDaysSum + yearDays - 1;
+         segmentTitle[yearIndex] = Integer.toString(oldestYear + yearIndex);
+
+         yearDaysSum += yearDays;
+      }
+
+      final ChartStatisticSegments chartSegments = new ChartStatisticSegments();
+      chartSegments.segmentStartValue = segmentStart;
+      chartSegments.segmentEndValue = segmentEnd;
+      chartSegments.segmentTitle = segmentTitle;
+
+      chartSegments.years = new int[] { 5 };//tourDataTime.years;
+      chartSegments.yearDays = new int[] { 366 };//tourDataTime.yearDays;
+      chartSegments.allValues = 5 * 36;//tourDataTime.allDaysInAllYears;
+
+      return chartSegments;
    }
 
    @Override
@@ -343,7 +381,6 @@ public class PerformanceModelingChartView extends ViewPart {
 
       createActions();
       fillToolbar();
-      updateUI();
 
       addPrefListener();
       addTrainingStressDataListener();
@@ -352,14 +389,6 @@ public class PerformanceModelingChartView extends ViewPart {
 
       updateUI_10_stressScoreValuesFromModel();
 
-   }
-
-   private void updateUI() {
-
-      // fill combobox with number of years
-      for (int years = 1; years <= 100; years++) {
-         _comboNumberOfYears.add(Integer.toString(years));
-      }
    }
 
    private ChartToolTipInfo createToolTipInfo(final int serieIndex, final int valueIndex) {
@@ -428,7 +457,6 @@ public class PerformanceModelingChartView extends ViewPart {
             /*
              * combo: year
              */
-
             _comboYear = new Combo(_toolbar, SWT.DROP_DOWN | SWT.READ_ONLY);
             _comboYear.setToolTipText(Messages.Tour_Book_Combo_year_tooltip);
             _comboYear.setVisibleItemCount(50);
@@ -451,7 +479,6 @@ public class PerformanceModelingChartView extends ViewPart {
             /*
              * combo: year numbers
              */
-
             _comboNumberOfYears = new Combo(_toolbar, SWT.DROP_DOWN | SWT.READ_ONLY);
             _comboNumberOfYears.setToolTipText(Messages.tour_statistic_number_of_years);
             _comboNumberOfYears.setVisibleItemCount(50);
@@ -470,34 +497,6 @@ public class PerformanceModelingChartView extends ViewPart {
             });
          }
       }
-   }
-
-   private void onSelectYear() {
-
-      final int selectedItem = _comboYear.getSelectionIndex();
-      if (selectedItem != -1) {
-
-         _selectedYear = Integer.parseInt(_comboYear.getItem(selectedItem));
-
-         updateChart_10_NoReload();
-      }
-   }
-
-   private void updateChart_10_NoReload() {
-      updateUI_Toolbar();
-
-   }
-
-   private void updateUI_Toolbar() {
-      // update view toolbar
-      final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
-      tbm.removeAll();
-
-      tbm.add(_actionShowAllStressScoreValues);
-      tbm.add(_actionSynchVerticalChartScaling);
-
-      // update toolbar to show added items
-      tbm.update(true);
    }
 
    private void createUI_20_PerformanceModelingChart(final Composite parent) {
@@ -564,7 +563,7 @@ public class PerformanceModelingChartView extends ViewPart {
 
       _actionSynchVerticalChartScaling.setEnabled(isCustomScaling);
       //_actionShowAllStressScoreValues.setEnabled(true);//isHrZoneAvailable);
-      _actionShowAllStressScoreValues.setChecked(true);//TODO by default, it's displayed. Put variable to state ?
+      _actionShowGovssValues.setChecked(true);//TODO by default, it's displayed. Put variable to state ?
       _actionTrainingOptions.setEnabled(true);//isHrZoneAvailable);
    }
 
@@ -587,6 +586,52 @@ public class PerformanceModelingChartView extends ViewPart {
       }
 
       return oldest ? oldestEntry.getKey() : newestEntry.getKey();
+   }
+
+   /**
+    * @param defaultYear
+    * @return Returns the index for the active year or <code>-1</code> when there are no years
+    *         available
+    */
+   private int getActiveYearComboboxIndex(final int defaultYear) {
+
+      int selectedYearIndex = -1;
+
+      if (_availableYears == null) {
+         return selectedYearIndex;
+      }
+
+      /*
+       * try to get the year index for the default year
+       */
+      if (defaultYear != -1) {
+
+         int yearIndex = 0;
+         for (final int year : _availableYears.toArray()) {
+
+            if (year == defaultYear) {
+
+               _selectedYear = defaultYear;
+
+               return yearIndex;
+            }
+            yearIndex++;
+         }
+      }
+
+      /*
+       * try to get year index of the selected year
+       */
+      int yearIndex = 0;
+      for (final int year : _availableYears.toArray()) {
+         if (year == _selectedYear) {
+            selectedYearIndex = yearIndex;
+            break;
+         }
+         yearIndex++;
+      }
+
+      return selectedYearIndex;
    }
 
    /**
@@ -655,7 +700,6 @@ public class PerformanceModelingChartView extends ViewPart {
 
       _pc = new PixelConverter(parent);
       _tk = new FormToolkit(parent.getDisplay());
-
    }
 
    /**
@@ -669,99 +713,17 @@ public class PerformanceModelingChartView extends ViewPart {
       updateUI_10_stressScoreValuesFromModel();
    }
 
-   private void restoreState() {
+   private void onSelectYear() {
 
-      _isShowAllValues = Util.getStateBoolean(_state, STATE_IS_SHOW_ALL_STRESS_SCORE_VALUES, false);
-      _actionShowAllStressScoreValues.setChecked(_isShowAllValues);
+      final int selectedItem = _comboYear.getSelectionIndex();
+      if (selectedItem != -1) {
 
-      _isSynchChartVerticalValues = Util.getStateBoolean(_state, STATE_IS_SYNC_VERTICAL_CHART_SCALING, false);
-      _actionSynchVerticalChartScaling.setChecked(_isSynchChartVerticalValues);
+         _selectedYear = Integer.parseInt(_comboYear.getItem(selectedItem));
 
-      // select year
-      final int defaultYear = Util.getStateInt(_state, STATE_SELECTED_YEAR, -1);
-      refreshYearCombobox();
-      selectYear(defaultYear);
+         updateComboNumberOfYears(selectedItem);
 
-      // select number of years
-      final int numberOfYearsIndex = Util.getStateInt(_state, STATE_NUMBER_OF_YEARS, 0);
-      _comboNumberOfYears.select(numberOfYearsIndex);
-
-      updateChart_10_NoReload();
-   }
-
-   private void selectYear(final int defaultYear) {
-
-      int selectedYearIndex = getActiveYearComboboxIndex(defaultYear);
-      if (selectedYearIndex == -1) {
-
-         /*
-          * the active year was not found in the combo box, it's possible that the combo box needs
-          * to be update
-          */
-
-         refreshYearCombobox();
-         selectedYearIndex = getActiveYearComboboxIndex(defaultYear);
-
-         if (selectedYearIndex == -1) {
-
-            // year is still not selected
-            final int yearCount = _comboYear.getItemCount();
-
-            // reselect the youngest year if years are available
-            if (yearCount > 0) {
-               selectedYearIndex = yearCount - 1;
-               _selectedYear = Integer.parseInt(_comboYear.getItem(yearCount - 1));
-            }
-         }
+         updateChart_10_NoReload();
       }
-
-      _comboYear.select(selectedYearIndex);
-   }
-
-   /**
-    * @param defaultYear
-    * @return Returns the index for the active year or <code>-1</code> when there are no years
-    *         available
-    */
-   private int getActiveYearComboboxIndex(final int defaultYear) {
-
-      int selectedYearIndex = -1;
-
-      if (_availableYears == null) {
-         return selectedYearIndex;
-      }
-
-      /*
-       * try to get the year index for the default year
-       */
-      if (defaultYear != -1) {
-
-         int yearIndex = 0;
-         for (final int year : _availableYears.toArray()) {
-
-            if (year == defaultYear) {
-
-               _selectedYear = defaultYear;
-
-               return yearIndex;
-            }
-            yearIndex++;
-         }
-      }
-
-      /*
-       * try to get year index of the selected year
-       */
-      int yearIndex = 0;
-      for (final int year : _availableYears.toArray()) {
-         if (year == _selectedYear) {
-            selectedYearIndex = yearIndex;
-            break;
-         }
-         yearIndex++;
-      }
-
-      return selectedYearIndex;
    }
 
    private void refreshYearCombobox() {
@@ -837,6 +799,7 @@ public class PerformanceModelingChartView extends ViewPart {
       }
 
       _comboYear.removeAll();
+      _comboNumberOfYears.removeAll();
 
       /*
        * add all years of the tours and the current year
@@ -854,22 +817,76 @@ public class PerformanceModelingChartView extends ViewPart {
          _comboYear.add(Integer.toString(year));
       }
 
-      // add currenty year if not set
+      // add current year if not set
       if (isThisYearSet == false) {
          _availableYears.add(thisYear);
          _comboYear.add(Integer.toString(thisYear));
       }
 
+      updateComboNumberOfYears(_comboYear.getSelectionIndex());
+   }
+
+   private void restoreState() {
+
+      _isShowAllValues = Util.getStateBoolean(_state, STATE_IS_SHOW_ALL_STRESS_SCORE_VALUES, false);
+      _actionShowGovssValues.setChecked(_isShowAllValues);
+
+      _isSynchChartVerticalValues = Util.getStateBoolean(_state, STATE_IS_SYNC_VERTICAL_CHART_SCALING, false);
+      _actionSynchVerticalChartScaling.setChecked(_isSynchChartVerticalValues);
+
+      // select year
+      final int defaultYear = Util.getStateInt(_state, STATE_SELECTED_YEAR, -1);
+      refreshYearCombobox();
+      selectYear(defaultYear);
+
+      // select number of years
+      int numberOfYearsIndex = Util.getStateInt(_state, STATE_NUMBER_OF_YEARS, 0);
+      final int currentNumberOfYears = _comboNumberOfYears.getItemCount();
+      if (currentNumberOfYears > 0 && numberOfYearsIndex > currentNumberOfYears - 1) {
+         numberOfYearsIndex = currentNumberOfYears - 1;
+      }
+      _comboNumberOfYears.select(numberOfYearsIndex);
+
+      updateChart_10_NoReload();
    }
 
    @PersistState
    private void saveState() {
 
-      _state.put(STATE_IS_SHOW_ALL_STRESS_SCORE_VALUES, _actionShowAllStressScoreValues.isChecked());
+      _state.put(STATE_IS_SHOW_ALL_STRESS_SCORE_VALUES, _actionShowGovssValues.isChecked());
       _state.put(STATE_IS_SYNC_VERTICAL_CHART_SCALING, _actionSynchVerticalChartScaling.isChecked());
 
       _state.put(STATE_SELECTED_YEAR, _selectedYear);
       _state.put(STATE_NUMBER_OF_YEARS, _comboNumberOfYears.getSelectionIndex());
+   }
+
+   private void selectYear(final int defaultYear) {
+
+      int selectedYearIndex = getActiveYearComboboxIndex(defaultYear);
+      if (selectedYearIndex == -1) {
+
+         /*
+          * the active year was not found in the combo box, it's possible that the combo box needs
+          * to be update
+          */
+
+         refreshYearCombobox();
+         selectedYearIndex = getActiveYearComboboxIndex(defaultYear);
+
+         if (selectedYearIndex == -1) {
+
+            // year is still not selected
+            final int yearCount = _comboYear.getItemCount();
+
+            // reselect the youngest year if years are available
+            if (yearCount > 0) {
+               selectedYearIndex = yearCount - 1;
+               _selectedYear = Integer.parseInt(_comboYear.getItem(yearCount - 1));
+            }
+         }
+      }
+
+      _comboYear.select(selectedYearIndex);
    }
 
    private void setChartProperties() {
@@ -885,30 +902,22 @@ public class PerformanceModelingChartView extends ViewPart {
 
    }
 
-   /**
-    */
-   private void updateUI_10_stressScoreValuesFromModel() {
+   private void updateActions() {
 
-      enableControls();
+      final ArrayList<String> enabledGraphTitles = new ArrayList<>();
 
-      _currentPerson = TourbookPlugin.getActivePerson();
+      for (final ChartDataSerie xyDataIterator : _chartDataModel.getYData()) {
 
-      /*
-       * check person
-       */
-      if (_currentPerson == null) {
+         if (xyDataIterator instanceof ChartDataYSerie) {
 
-         _pageBook.showPage(_page_NoPerson);
-         return;
+            final ChartDataYSerie yData = (ChartDataYSerie) xyDataIterator;
+            final String graphTitle = yData.getYTitle();
+
+            enabledGraphTitles.add(graphTitle);
+         }
       }
 
-      /*
-       * required data are available
-       */
-
-      // display page for the selected chart
-      _pageBook.showPage(_page_TrainingStressScores);
-      updateChart();
+      _actionShowGovssValues.setEnabled(enabledGraphTitles.contains("GOVSS"));
 
    }
 
@@ -1038,59 +1047,78 @@ public class PerformanceModelingChartView extends ViewPart {
       updateActions();
    }
 
-   private void updateActions() {
-
-      final ArrayList<String> enabledGraphTitles = new ArrayList<>();
-
-      for (final ChartDataSerie xyDataIterator : _chartDataModel.getYData()) {
-
-         if (xyDataIterator instanceof ChartDataYSerie) {
-
-            final ChartDataYSerie yData = (ChartDataYSerie) xyDataIterator;
-            final String graphTitle = yData.getYTitle();
-
-            enabledGraphTitles.add(graphTitle);
-         }
-      }
-
-      _actionShowAllStressScoreValues.setEnabled(enabledGraphTitles.contains("GOVSS"));
+   private void updateChart_10_NoReload() {
+      updateUI_Toolbar();
 
    }
 
-   /**
-    * create segments for the chart
-    */
-   private ChartStatisticSegments createChartSegments() {//final TourData_Time tourDataTime) {
+   private void updateComboNumberOfYears(int selectedYearItem) {
 
-      final double segmentStart[] = new double[5];//_numberOfYears];
-      final double segmentEnd[] = new double[5];//_numberOfYears];
-      final String[] segmentTitle = new String[5];//_numberOfYears];
-
-      final int[] allYearDays = new int[] { 366 };//tourDataTime.yearDays;
-      final int oldestYear = 2020 - 5 + 1;
-      int yearDaysSum = 0;
-
-      // create segments for each year
-      for (int yearIndex = 0; yearIndex < allYearDays.length; yearIndex++) {
-
-         final int yearDays = allYearDays[yearIndex];
-
-         segmentStart[yearIndex] = yearDaysSum;
-         segmentEnd[yearIndex] = yearDaysSum + yearDays - 1;
-         segmentTitle[yearIndex] = Integer.toString(oldestYear + yearIndex);
-
-         yearDaysSum += yearDays;
+      if (selectedYearItem < 0) {
+         selectedYearItem = _comboYear.getItemCount() - 1;
       }
 
-      final ChartStatisticSegments chartSegments = new ChartStatisticSegments();
-      chartSegments.segmentStartValue = segmentStart;
-      chartSegments.segmentEndValue = segmentEnd;
-      chartSegments.segmentTitle = segmentTitle;
+      _comboNumberOfYears.removeAll();
+      _comboNumberOfYears.add("1");
 
-      chartSegments.years = new int[] { 5 };//tourDataTime.years;
-      chartSegments.yearDays = new int[] { 366 };//tourDataTime.yearDays;
-      chartSegments.allValues = 5 * 36;//tourDataTime.allDaysInAllYears;
+      // Adjust combo box with number of years
+      final int selectedYear = Integer.parseInt(_comboYear.getItem(selectedYearItem));
 
-      return chartSegments;
+      // fill combo box with number of years
+      int index = selectedYearItem - 1;
+      int previousYear = Integer.parseInt(_comboYear.getItem(index));
+      for (int currentYear = selectedYear; index > 0;) {
+
+         final int yearsDifference = currentYear - previousYear + 1;
+         _comboNumberOfYears.add(Integer.toString(yearsDifference));
+
+         currentYear = previousYear;
+         index -= 1;
+         previousYear = Integer.parseInt(_comboYear.getItem(index));
+      }
+
+      final int currentNumberOfYears = _comboNumberOfYears.getSelectionIndex();
+      if (currentNumberOfYears <= 0 || currentNumberOfYears > _comboNumberOfYears.getItemCount()) {
+         _comboNumberOfYears.select(0);
+      }
+   }
+
+   /**
+    */
+   private void updateUI_10_stressScoreValuesFromModel() {
+
+      enableControls();
+
+      _currentPerson = TourbookPlugin.getActivePerson();
+
+      /*
+       * check person
+       */
+      if (_currentPerson == null) {
+
+         _pageBook.showPage(_page_NoPerson);
+         return;
+      }
+
+      /*
+       * required data are available
+       */
+
+      // display page for the selected chart
+      _pageBook.showPage(_page_TrainingStressScores);
+      updateChart();
+
+   }
+
+   private void updateUI_Toolbar() {
+      // update view toolbar
+      final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
+      tbm.removeAll();
+
+      tbm.add(_actionShowGovssValues);
+      tbm.add(_actionSynchVerticalChartScaling);
+
+      // update toolbar to show added items
+      tbm.update(true);
    }
 }
