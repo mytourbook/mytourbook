@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -181,7 +181,7 @@ public class DataProvider_Tour_Week extends DataProvider {
             + (" ORDER BY StartWeekYear, StartWeek") + NL //$NON-NLS-1$
       ;
 
-      try {
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          final float[][] dbDistance = new float[numTourTypes][numWeeks];
          final float[][] dbAltitude = new float[numTourTypes][numWeeks];
@@ -194,7 +194,6 @@ public class DataProvider_Tour_Week extends DataProvider {
 
          final long[][] dbTypeIds = new long[numTourTypes][numWeeks];
 
-         final Connection conn = TourDatabase.getInstance().getConnection();
          final PreparedStatement statement = conn.prepareStatement(sqlString);
          sqlFilter.setParameters(statement, 1);
 
@@ -274,8 +273,6 @@ public class DataProvider_Tour_Week extends DataProvider {
             dbDrivingTime[colorIndex][weekIndex] = drivingTime;
             dbBreakTime[colorIndex][weekIndex] = recordingTime - drivingTime;
          }
-
-         conn.close();
 
          _tourWeekData.typeIds = dbTypeIds;
 

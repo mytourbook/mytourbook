@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -729,8 +729,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
       ;
       _availableYears = new TIntArrayList();
 
-      try {
-         final Connection conn = TourDatabase.getInstance().getConnection();
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
          final PreparedStatement statement = conn.prepareStatement(sqlString);
          filter.setParameters(statement, 1);
 
@@ -739,8 +738,6 @@ public class StatisticView extends ViewPart implements ITourProvider {
          while (result.next()) {
             _availableYears.add(result.getInt(1));
          }
-
-         conn.close();
 
       } catch (final SQLException e) {
          UI.showSQLException(e);

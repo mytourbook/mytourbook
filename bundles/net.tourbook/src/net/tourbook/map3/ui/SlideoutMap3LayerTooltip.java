@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -50,8 +50,6 @@ public class SlideoutMap3LayerTooltip extends AnimatedToolTipShell {
 	private ViewerRow					_sensitiveRowArea;
 	private ViewerRow					_viewerRow;
 
-	private IToolProvider				_defaultToolProvider	= new ToolProvider();
-
 	private TVIMap3Layer				_mapLayer;
 
 	private int							_column0_Width;
@@ -66,12 +64,13 @@ public class SlideoutMap3LayerTooltip extends AnimatedToolTipShell {
 
 	private Cursor						_cursorHand;
 
-	private final class ToolProvider extends ToolProviderAdapter {
-		@Override
-		public void createToolUI(final Composite parent) {
-			createToolTipUI(parent);
-		}
-	}
+   @SuppressWarnings("unused")
+   private final class ToolProvider extends ToolProviderAdapter {
+      @Override
+      public void createToolUI(final Composite parent) {
+         createToolTipUI(parent);
+      }
+   }
 
 	public SlideoutMap3LayerTooltip(final ContainerCheckedTreeViewer layerViewer) {
 
@@ -191,7 +190,6 @@ public class SlideoutMap3LayerTooltip extends AnimatedToolTipShell {
 		final Rectangle displayBounds = _tree.getDisplay().getBounds();
 
 		final Rectangle rowBounds = _viewerRow.getBounds();
-		final int rowWidth = rowBounds.width;
 		final int rowHeight = rowBounds.height;
 
 		final int tipWidth = tipSize.x;
@@ -306,7 +304,7 @@ public class SlideoutMap3LayerTooltip extends AnimatedToolTipShell {
 	}
 	/**
 	 * Show/hide tooltip.
-	 * 
+	 *
 	 * @param toolProvider
 	 * @param isVisible
 	 * @param isUpdateUI

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -26,63 +26,63 @@ import org.eclipse.ui.IViewPart;
 
 public class PhotoManager {
 
-	private final static IPreferenceStore	_prefStoreCommon		= CommonActivator.getPrefStore();
+   private final static IPreferenceStore                  _prefStoreCommon     = CommonActivator.getPrefStore();
 
-	private static PhotoManager				_instance;
+   private static PhotoManager                            _instance;
 
-	private static final ListenerList		_photoEventListeners	= new ListenerList(ListenerList.IDENTITY);
+   private static final ListenerList<IPhotoEventListener> _photoEventListeners = new ListenerList<>(ListenerList.IDENTITY);
 
-	static {
+   static {
 
-		final IPropertyChangeListener prefChangeListenerCommon = new IPropertyChangeListener() {
-			@Override
-			public void propertyChange(final PropertyChangeEvent event) {
+      final IPropertyChangeListener prefChangeListenerCommon = new IPropertyChangeListener() {
+         @Override
+         public void propertyChange(final PropertyChangeEvent event) {
 
-				final String property = event.getProperty();
+            final String property = event.getProperty();
 
-				if (property.equals(ICommonPreferences.TIME_ZONE_LOCAL_ID)) {
+            if (property.equals(ICommonPreferences.TIME_ZONE_LOCAL_ID)) {
 
-					// set new time zone and clear cached images that the time is set correctly when image is loaded again
-					Photo.setupTimeZone();
-					PhotoImageCache.disposeAll();
-				}
-			}
-		};
+               // set new time zone and clear cached images that the time is set correctly when image is loaded again
+               Photo.setupTimeZone();
+               PhotoImageCache.disposeAll();
+            }
+         }
+      };
 
-		// register the listener
-		_prefStoreCommon.addPropertyChangeListener(prefChangeListenerCommon);
-	}
+      // register the listener
+      _prefStoreCommon.addPropertyChangeListener(prefChangeListenerCommon);
+   }
 
-	private PhotoManager() {}
+   private PhotoManager() {}
 
-	public static void addPhotoEventListener(final IPhotoEventListener listener) {
-		_photoEventListeners.add(listener);
-	}
+   public static void addPhotoEventListener(final IPhotoEventListener listener) {
+      _photoEventListeners.add(listener);
+   }
 
-	public static void firePhotoEvent(final IViewPart viewPart, final PhotoEventId photoEventId, final Object data) {
+   public static void firePhotoEvent(final IViewPart viewPart, final PhotoEventId photoEventId, final Object data) {
 
 //		System.out.println(UI.timeStampNano() + " PhotoManager\tfireEvent\t" + data.getClass().getSimpleName());
 //		// TODO remove SYSTEM.OUT.PRINTLN
 
-		final Object[] allListeners = _photoEventListeners.getListeners();
-		for (final Object listener : allListeners) {
-			((IPhotoEventListener) listener).photoEvent(viewPart, photoEventId, data);
-		}
-	}
+      final Object[] allListeners = _photoEventListeners.getListeners();
+      for (final Object listener : allListeners) {
+         ((IPhotoEventListener) listener).photoEvent(viewPart, photoEventId, data);
+      }
+   }
 
-	public static PhotoManager getInstance() {
+   public static PhotoManager getInstance() {
 
-		if (_instance == null) {
-			_instance = new PhotoManager();
-		}
+      if (_instance == null) {
+         _instance = new PhotoManager();
+      }
 
-		return _instance;
-	}
+      return _instance;
+   }
 
-	public static void removePhotoEventListener(final IPhotoEventListener listener) {
-		if (listener != null) {
-			_photoEventListeners.remove(listener);
-		}
-	}
+   public static void removePhotoEventListener(final IPhotoEventListener listener) {
+      if (listener != null) {
+         _photoEventListeners.remove(listener);
+      }
+   }
 
 }

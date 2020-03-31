@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -34,316 +34,280 @@ import org.apache.tools.ant.Task;
  */
 public class I18ToDojo extends Task {
 
-	private static final String	UTF_8				= "UTF-8";															//$NON-NLS-1$
+   private static final String UTF_8              = "UTF-8";                                                        //$NON-NLS-1$
 
-	private String				FILE_CREATE_HEADER	= "// created with " + I18ToDojo.class.getCanonicalName() + "\n";	//$NON-NLS-1$ //$NON-NLS-2$
+   private String              FILE_CREATE_HEADER = "// created with " + I18ToDojo.class.getCanonicalName() + "\n"; //$NON-NLS-1$ //$NON-NLS-2$
 
-	/**
-	 * Java properties file.
-	 */
-	private String				_javaProperties;
-	private String				_javaPropFileName;
-	private String				_javaPropFileExt;
+   /**
+    * Java properties file.
+    */
+   private String              _javaProperties;
+   private String              _javaPropFileName;
+   private String              _javaPropFileExt;
 
-	/**
-	 * Created Javascript dojo file.
-	 */
-	private String				_dojoProperties;
+   /**
+    * Created Javascript dojo file.
+    */
+   private String              _dojoProperties;
 
-	private String				_i18dir;
+   private String              _i18dir;
 
-	private String				_rootLanguage;
+   private String              _rootLanguage;
 
-	private String[]			_otherLanguages;
+   private String[]            _otherLanguages;
 
-	@Override
-	public void execute() throws BuildException {
+   @Override
+   public void execute() throws BuildException {
 
-		writeDojo_Root();
-		writeDojo_i18();
-	}
+      writeDojo_Root();
+      writeDojo_i18();
+   }
 
-	/**
-	 * Load properties from a properties file.
-	 * 
-	 * @param javaProperties
-	 * @return Returns properties from the properties file.
-	 */
-	private Properties loadJavaProperties(final String javaProperties) {
+   /**
+    * Load properties from a properties file.
+    * 
+    * @param javaProperties
+    * @return Returns properties from the properties file.
+    */
+   private Properties loadJavaProperties(final String javaProperties) {
 
-		FileInputStream fileStream = null;
+      try (FileInputStream fileStream = new FileInputStream(new File(javaProperties))) {
+         final Properties properties = new Properties();
 
-		try {
+         properties.load(fileStream);
 
-			fileStream = new FileInputStream(new File(javaProperties));
+         return properties;
 
-			final Properties properties = new Properties();
+      } catch (final Exception e) {
+         System.err.println(e);
+      }
 
-			properties.load(fileStream);
+      return null;
+   }
 
-			return properties;
+   /**
+    * This file is created and contains the Dojo properties.
+    * 
+    * @param properties
+    *           File which contains Java properties.
+    */
+   public void setDojoProperties(final String properties) {
 
-		} catch (final Exception e) {
-			System.err.println(e);
-		} finally {
-			try {
-				if (fileStream != null) {
-					fileStream.close();
-				}
-			} catch (final IOException e) {
-				e.printStackTrace();
-			}
-		}
-
-		return null;
-	}
-
-	/**
-	 * This file is created and contains the Dojo properties.
-	 * 
-	 * @param properties
-	 *            File which contains Java properties.
-	 */
-	public void setDojoProperties(final String properties) {
-
-		_dojoProperties = properties;
+      _dojoProperties = properties;
 
 //		final String[] fileParts = properties.split("\\.");
 //		_dojoPropFileName = fileParts[0];
 //		_dojoPropFileExt = fileParts[1];
-	}
+   }
 
-	public void setI18dir(final String i18dir) {
-		_i18dir = i18dir;
-	}
+   public void setI18dir(final String i18dir) {
+      _i18dir = i18dir;
+   }
 
-	/**
-	 * This file contains the Java text strings in a properties file format.
-	 * 
-	 * @param properties
-	 *            File which contains Java properties.
-	 */
-	public void setJavaProperties(final String properties) {
+   /**
+    * This file contains the Java text strings in a properties file format.
+    * 
+    * @param properties
+    *           File which contains Java properties.
+    */
+   public void setJavaProperties(final String properties) {
 
-		_javaProperties = properties;
+      _javaProperties = properties;
 
-		final String[] fileParts = properties.split("\\."); //$NON-NLS-1$
-		_javaPropFileName = fileParts[0];
-		_javaPropFileExt = fileParts[1];
-	}
+      final String[] fileParts = properties.split("\\."); //$NON-NLS-1$
+      _javaPropFileName = fileParts[0];
+      _javaPropFileExt = fileParts[1];
+   }
 
-	public void setOtherLanguages(final String otherLanguages) {
-		_otherLanguages = otherLanguages.split(","); //$NON-NLS-1$
-	}
+   public void setOtherLanguages(final String otherLanguages) {
+      _otherLanguages = otherLanguages.split(","); //$NON-NLS-1$
+   }
 
-	public void setRootLanguage(final String rootLanguage) {
-		_rootLanguage = rootLanguage;
-	}
+   public void setRootLanguage(final String rootLanguage) {
+      _rootLanguage = rootLanguage;
+   }
 
-	private void writeDojo_i18() {
+   private void writeDojo_i18() {
 
-		System.out.println("i18 convert"); //$NON-NLS-1$
+      System.out.println("i18 convert"); //$NON-NLS-1$
 
-		for (final String language : _otherLanguages) {
+      for (final String language : _otherLanguages) {
 
 //			/net.tourbook.web/WebContent-dev/tourbook/search/nls/messages_de.properties
 //			/net.tourbook.web/WebContent-dev/tourbook/search/nls/de/Messages.js
 
-			final String dojoI18Folder = _i18dir + "/" + language; //$NON-NLS-1$
+         final String dojoI18Folder = _i18dir + "/" + language; //$NON-NLS-1$
 
-			final String javaI18PropFilePath = (_i18dir + "/" + _javaPropFileName + "_" + language + "." + _javaPropFileExt); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-			final String dojoI18PropFilePath = (dojoI18Folder + "/" + _dojoProperties); //$NON-NLS-1$
+         final String javaI18PropFilePath = (_i18dir + "/" + _javaPropFileName + "_" + language + "." + _javaPropFileExt); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+         final String dojoI18PropFilePath = (dojoI18Folder + "/" + _dojoProperties); //$NON-NLS-1$
 
-			/*
-			 * Check if java language file is available, it can be unavailable
-			 */
-			final File i18File = new File(javaI18PropFilePath);
-			if (i18File.exists() == false) {
-				continue;
-			}
+         /*
+          * Check if java language file is available, it can be unavailable
+          */
+         final File i18File = new File(javaI18PropFilePath);
+         if (i18File.exists() == false) {
+            continue;
+         }
 
-			System.out.println("	from: " + javaI18PropFilePath); //$NON-NLS-1$
-			System.out.println("	to:   " + dojoI18PropFilePath); //$NON-NLS-1$
-			// TODO remove SYSTEM.OUT.PRINTLN
+         System.out.println("	from: " + javaI18PropFilePath); //$NON-NLS-1$
+         System.out.println("	to:   " + dojoI18PropFilePath); //$NON-NLS-1$
+         // TODO remove SYSTEM.OUT.PRINTLN
 
-			BufferedWriter writer = null;
+         // create dojo file
+         try (BufferedWriter writer = new BufferedWriter(
+               new OutputStreamWriter(
+                     new FileOutputStream(dojoI18PropFilePath, false),
+                     UTF_8))) {
 
-			try {
+            // ensure folder is created
+            new File(dojoI18Folder).mkdirs();
 
-				// ensure folder is created
-				new File(dojoI18Folder).mkdirs();
+            writeDojo_I18_10_Header(writer);
+            writeDojo_Messages(writer, javaI18PropFilePath);
+            writeDojo_I18_20_Footer(writer);
 
-				// create dojo file
-				writer = new BufferedWriter(//
-						new OutputStreamWriter(//
-								new FileOutputStream(dojoI18PropFilePath, false),
-								UTF_8));
+         } catch (final IOException e) {
+            e.printStackTrace();
+         }
+      }
+   }
 
-				writeDojo_I18_10_Header(writer);
-				writeDojo_Messages(writer, javaI18PropFilePath);
-				writeDojo_I18_20_Footer(writer);
+   private void writeDojo_I18_10_Header(final BufferedWriter writer) throws IOException {
 
-			} catch (final IOException e) {
-				e.printStackTrace();
-			} finally {
-				try {
-					if (writer != null) {
-						writer.close();
-					}
-				} catch (final IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-	}
+      final String header = "" // //$NON-NLS-1$
+            + FILE_CREATE_HEADER//
+            + "define(//							\n"// //$NON-NLS-1$
+            + "{									\n"; //$NON-NLS-1$
 
-	private void writeDojo_I18_10_Header(final BufferedWriter writer) throws IOException {
+      writer.append(header);
+   }
 
-		final String header = "" // //$NON-NLS-1$
-				+ FILE_CREATE_HEADER//
-				+ "define(//							\n"// //$NON-NLS-1$
-				+ "{									\n"; //$NON-NLS-1$
+   private void writeDojo_I18_20_Footer(final BufferedWriter writer) throws IOException {
 
-		writer.append(header);
-	}
+      final String footer = ""// //$NON-NLS-1$
+            + "});		\n"; //$NON-NLS-1$
 
-	private void writeDojo_I18_20_Footer(final BufferedWriter writer) throws IOException {
+      writer.append(footer);
+   }
 
-		final String footer = ""// //$NON-NLS-1$
-				+ "});		\n"; //$NON-NLS-1$
+   /**
+    * @param writer
+    * @param javaProperties
+    * @throws IOException
+    */
+   private void writeDojo_Messages(final BufferedWriter writer, final String javaProperties) throws IOException {
 
-		writer.append(footer);
-	}
+      final Properties properties = loadJavaProperties(javaProperties);
 
-	/**
-	 * @param writer
-	 * @param javaProperties
-	 * @throws IOException
-	 */
-	private void writeDojo_Messages(final BufferedWriter writer, final String javaProperties) throws IOException {
+      /*
+       * sort keys
+       */
+      final Collection<Object> keys = properties.keySet();
 
-		final Properties properties = loadJavaProperties(javaProperties);
+      final ArrayList<String> sortedKeys = new ArrayList<String>();
+      for (final Object key : keys) {
+         if (key instanceof String) {
+            sortedKeys.add((String) key);
+         }
+      }
 
-		/*
-		 * sort keys
-		 */
-		final Collection<Object> keys = properties.keySet();
+      Collections.sort(sortedKeys);
 
-		final ArrayList<String> sortedKeys = new ArrayList<String>();
-		for (final Object key : keys) {
-			if (key instanceof String) {
-				sortedKeys.add((String) key);
-			}
-		}
+      final int lastKey = sortedKeys.size() - 1;
 
-		Collections.sort(sortedKeys);
+      for (int keyIndex = 0; keyIndex < sortedKeys.size(); keyIndex++) {
 
-		final int lastKey = sortedKeys.size() - 1;
+         final String key = sortedKeys.get(keyIndex);
+         final Object keyValue = properties.get(key);
 
-		for (int keyIndex = 0; keyIndex < sortedKeys.size(); keyIndex++) {
+         if (keyValue instanceof String) {
 
-			final String key = sortedKeys.get(keyIndex);
-			final Object keyValue = properties.get(key);
+            final String value = (String) keyValue;
 
-			if (keyValue instanceof String) {
+            // convert js string delimiter ' -> \'
+            final String jsValue = value.replace("\'", "\\\'").replace("\n", "' + '"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
-				final String value = (String) keyValue;
+            final StringBuilder message = new StringBuilder();
+            message.append(String.format("		%-50s : '%s'", key, jsValue)); //$NON-NLS-1$
 
-				// convert js string delimiter ' -> \'
-				final String jsValue = value.replace("\'", "\\\'").replace("\n", "' + '"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+            if (keyIndex == lastKey) {
+               message.append("\n"); //$NON-NLS-1$
+            } else {
+               message.append(",\n"); //$NON-NLS-1$
+            }
 
-				final StringBuilder message = new StringBuilder();
-				message.append(String.format("		%-50s : '%s'", key, jsValue)); //$NON-NLS-1$
+            writer.append(message.toString());
+         }
+      }
+   }
 
-				if (keyIndex == lastKey) {
-					message.append("\n"); //$NON-NLS-1$
-				} else {
-					message.append(",\n"); //$NON-NLS-1$
-				}
+   private void writeDojo_Root() {
 
-				writer.append(message.toString());
-			}
-		}
-	}
+      final String javaPropFilePath = _i18dir + "/" + _javaProperties; //$NON-NLS-1$
+      final String dojoPropFilePath = _i18dir + "/" + _dojoProperties; //$NON-NLS-1$
 
-	private void writeDojo_Root() {
+      System.out.println("i18 convert"); //$NON-NLS-1$
+      System.out.println("	from: " + javaPropFilePath); //$NON-NLS-1$
+      System.out.println("	to:   " + dojoPropFilePath); //$NON-NLS-1$
+      // TODO remove SYSTEM.OUT.PRINTLN
 
-		final String javaPropFilePath = _i18dir + "/" + _javaProperties; //$NON-NLS-1$
-		final String dojoPropFilePath = _i18dir + "/" + _dojoProperties; //$NON-NLS-1$
+      try (BufferedWriter writer = new BufferedWriter(
+            new OutputStreamWriter(
+                  new FileOutputStream(dojoPropFilePath, false),
+                  UTF_8))) {
 
-		System.out.println("i18 convert"); //$NON-NLS-1$
-		System.out.println("	from: " + javaPropFilePath); //$NON-NLS-1$
-		System.out.println("	to:   " + dojoPropFilePath); //$NON-NLS-1$
-		// TODO remove SYSTEM.OUT.PRINTLN
+         writeDojo_Root_10_Header(writer);
+         writeDojo_Messages(writer, javaPropFilePath);
+         writeDojo_Root_20_Footer(writer);
 
-		BufferedWriter writer = null;
+      } catch (final IOException e) {
+         e.printStackTrace();
+      }
+   }
 
-		try {
+   private void writeDojo_Root_10_Header(final BufferedWriter writer) throws IOException {
 
-			writer = new BufferedWriter(//
-					new OutputStreamWriter(//
-							new FileOutputStream(dojoPropFilePath, false),
-							UTF_8));
-			writeDojo_Root_10_Header(writer);
-			writeDojo_Messages(writer, javaPropFilePath);
-			writeDojo_Root_20_Footer(writer);
+      final String header = "" //$NON-NLS-1$
+            + "define(//							\n" //$NON-NLS-1$
+            + "{									\n" //$NON-NLS-1$
+            + ("	// 'root' is default language (" + _rootLanguage + ")	\n") //$NON-NLS-1$ //$NON-NLS-2$
+            + "										\n" //$NON-NLS-1$
+            + "	root : 								\n" //$NON-NLS-1$
+            + "	{									\n"; //$NON-NLS-1$
 
-		} catch (final IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (writer != null) {
-					writer.close();
-				}
-			} catch (final IOException e) {
-				e.printStackTrace();
-			}
-		}
-	}
+      writer.write(header);
+   }
 
-	private void writeDojo_Root_10_Header(final BufferedWriter writer) throws IOException {
+   private void writeDojo_Root_20_Footer(final BufferedWriter writer) throws IOException {
 
-		final String header = "" //$NON-NLS-1$
-				+ "define(//							\n" //$NON-NLS-1$
-				+ "{									\n" //$NON-NLS-1$
-				+ ("	// 'root' is default language (" + _rootLanguage + ")	\n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ "										\n" //$NON-NLS-1$
-				+ "	root : 								\n" //$NON-NLS-1$
-				+ "	{									\n"; //$NON-NLS-1$
+      final String footer = "" //$NON-NLS-1$
+            + "	},		\n" //$NON-NLS-1$
+            + "			\n" //$NON-NLS-1$
+            + ("	// list of available languages, default (" + _rootLanguage + ") is defined in 'root'\n") //$NON-NLS-1$ //$NON-NLS-2$
+            + writeDojo_Root_22_Languages().toString()
+            + "});		\n"; //$NON-NLS-1$
 
-		writer.write(header);
-	}
+      writer.write(footer);
+   }
 
-	private void writeDojo_Root_20_Footer(final BufferedWriter writer) throws IOException {
+   private StringBuilder writeDojo_Root_22_Languages() {
 
-		final String footer = "" //$NON-NLS-1$
-				+ "	},		\n" //$NON-NLS-1$
-				+ "			\n" //$NON-NLS-1$
-				+ ("	// list of available languages, default (" + _rootLanguage + ") is defined in 'root'\n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ writeDojo_Root_22_Languages().toString()
-				+ "});		\n"; //$NON-NLS-1$
+      final StringBuilder languages = new StringBuilder();
+      final int lastLanguage = _otherLanguages.length - 1;
 
-		writer.write(footer);
-	}
+      for (int languageIndex = 0; languageIndex < _otherLanguages.length; languageIndex++) {
 
-	private StringBuilder writeDojo_Root_22_Languages() {
+         final String language = _otherLanguages[languageIndex];
 
-		final StringBuilder languages = new StringBuilder();
-		final int lastLanguage = _otherLanguages.length - 1;
+         languages.append("\t" + language.trim() + " : true"); //$NON-NLS-1$ //$NON-NLS-2$
 
-		for (int languageIndex = 0; languageIndex < _otherLanguages.length; languageIndex++) {
+         if (languageIndex == lastLanguage) {
+            languages.append("\n"); //$NON-NLS-1$
+         } else {
+            languages.append(",\n"); //$NON-NLS-1$
+         }
+      }
 
-			final String language = _otherLanguages[languageIndex];
-
-			languages.append("\t" + language.trim() + " : true"); //$NON-NLS-1$ //$NON-NLS-2$
-
-			if (languageIndex == lastLanguage) {
-				languages.append("\n"); //$NON-NLS-1$
-			} else {
-				languages.append(",\n"); //$NON-NLS-1$
-			}
-		}
-
-		return languages;
-	}
+      return languages;
+   }
 }

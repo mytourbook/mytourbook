@@ -829,7 +829,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
             } catch (final Exception e) {
                // ignore invalid characters
-            } finally {}
+            }
          }
       }
    }
@@ -949,7 +949,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
             } catch (final Exception e) {
                // ignore invalid characters
-            } finally {}
+            }
          }
       }
    }
@@ -1024,7 +1024,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
             } catch (final Exception e) {
                // ignore invalid characters
-            } finally {}
+            }
          }
       }
    }
@@ -1959,10 +1959,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       /*
        * write time slices into csv file
        */
-      Writer exportWriter = null;
-      try {
+      try (FileOutputStream fileOutputStream = new FileOutputStream(selectedFilePath);
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, UI.UTF_8);
+            BufferedWriter exportWriter = new BufferedWriter(outputStreamWriter)) {
 
-         exportWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(selectedFilePath), UI.UTF_8));
          final StringBuilder sb = new StringBuilder();
 
          writeCSVHeader(exportWriter, sb);
@@ -2079,15 +2079,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       } catch (final IOException e) {
          e.printStackTrace();
-      } finally {
-
-         if (exportWriter != null) {
-            try {
-               exportWriter.close();
-            } catch (final IOException e) {
-               e.printStackTrace();
-            }
-         }
       }
    }
 
@@ -4258,7 +4249,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
             // spinner
             _spinWeather_Temperature_WindChill = new Spinner(container, SWT.BORDER);
-            _spinWeather_Temperature_WindChill.setToolTipText(Messages.Tour_Editor_Label_Temperature_WindCill_Tooltip);
+            _spinWeather_Temperature_WindChill.setToolTipText(Messages.Tour_Editor_Label_Temperature_WindChill_Tooltip);
             _spinWeather_Temperature_WindChill.addModifyListener(_modifyListener_Temperature);
             _spinWeather_Temperature_WindChill.addSelectionListener(_selectionListener_Temperature);
             _spinWeather_Temperature_WindChill.addMouseWheelListener(_mouseWheelListener_Temperature);

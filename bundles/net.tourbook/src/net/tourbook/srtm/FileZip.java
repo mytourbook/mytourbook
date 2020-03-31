@@ -1,17 +1,17 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *  
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License along with 
+ *
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 /**
  * @author Alfred Barten
@@ -30,124 +30,128 @@ import java.util.zip.ZipOutputStream;
 
 public final class FileZip {
 
-	public final static String gunzip(final String gzipName) throws Exception {
+   public final static String gunzip(final String gzipName) throws Exception {
 
-		String outFileName = null;
-		String gzipEntryName = null;
-		try {
-			// Open the GZIP file
-			final GZIPInputStream gzipInputStream = new GZIPInputStream(new FileInputStream(gzipName));
+      String outFileName = null;
+      String gzipEntryName = null;
 
-			gzipEntryName = gzipName;
-			if (gzipEntryName.indexOf(File.separator) != -1) // delimiter in name
-				gzipEntryName = gzipEntryName.substring(gzipEntryName.lastIndexOf(File.separator) + 1);
-			if (gzipEntryName.indexOf('.') != -1)
-				gzipEntryName = gzipEntryName.substring(0, gzipEntryName.lastIndexOf('.'));
+      // Open the GZIP file
+      try (GZIPInputStream gzipInputStream = new GZIPInputStream(new FileInputStream(gzipName))) {
 
-			outFileName = gzipName.substring(0, gzipName.lastIndexOf(File.separator)) + File.separator + gzipEntryName;
+         gzipEntryName = gzipName;
+         if (gzipEntryName.indexOf(File.separator) != -1) {
+            gzipEntryName = gzipEntryName.substring(gzipEntryName.lastIndexOf(File.separator) + 1);
+         }
+         if (gzipEntryName.indexOf('.') != -1) {
+            gzipEntryName = gzipEntryName.substring(0, gzipEntryName.lastIndexOf('.'));
+         }
 
-			System.out.println("outFileName " + outFileName); //$NON-NLS-1$
+         outFileName = gzipName.substring(0, gzipName.lastIndexOf(File.separator)) + File.separator + gzipEntryName;
 
-			final OutputStream fileOutputStream = new FileOutputStream(outFileName);
+         System.out.println("outFileName " + outFileName); //$NON-NLS-1$
 
-			// Transfer bytes from the GZIP file to the output file
-			final byte[] buf = new byte[1024];
-			int len;
-			while ((len = gzipInputStream.read(buf)) > 0) {
-				fileOutputStream.write(buf, 0, len);
-			}
+         final OutputStream fileOutputStream = new FileOutputStream(outFileName);
 
-			fileOutputStream.close();
-			gzipInputStream.close();
+         // Transfer bytes from the GZIP file to the output file
+         final byte[] buf = new byte[1024];
+         int len;
+         while ((len = gzipInputStream.read(buf)) > 0) {
+            fileOutputStream.write(buf, 0, len);
+         }
 
-			return gzipEntryName;
+         fileOutputStream.close();
+         gzipInputStream.close();
 
-		} catch (final IOException e) {
-			System.out.println("gunzip: Error: " + e.getMessage()); //$NON-NLS-1$
-			throw (e); // return exception
-		}
-	}
+         return gzipEntryName;
 
-	public static void main(final String[] args) throws Exception {}
+      } catch (final IOException e) {
+         System.out.println("gunzip: Error: " + e.getMessage()); //$NON-NLS-1$
+         throw (e); // return exception
+      }
+   }
 
-	public final static String unzip(final String zipName) throws Exception {
+   public static void main(final String[] args) throws Exception {}
 
-		String outFileName = null;
-		String zipEntryName = null;
+   public final static String unzip(final String zipName) throws Exception {
 
-		try {
-			// Open the ZIP file
-			final ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(zipName));
-			
-			// Get the first entry
-			final ZipEntry zipEntry = zipInputStream.getNextEntry();
-			if (zipEntry == null) {
-				throw new Exception("zipEntry is null"); //$NON-NLS-1$
-			}
-			
-			zipEntryName = zipEntry.getName();
-			System.out.println("zipEntryName " + zipEntryName); //$NON-NLS-1$
+      String outFileName = null;
+      String zipEntryName = null;
 
-			if (zipEntryName.indexOf(File.separator) != -1)
-				// delimiter in name (e.g. in self created kmz files)
-				zipEntryName = zipEntryName.substring(zipEntryName.lastIndexOf(File.separator) + 1);
+      // Open the ZIP file
+      try (final ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(zipName))) {
 
-			outFileName = zipName.substring(0, zipName.lastIndexOf(File.separator)) + File.separator + zipEntryName;
+         // Get the first entry
+         final ZipEntry zipEntry = zipInputStream.getNextEntry();
+         if (zipEntry == null) {
+            zipInputStream.close();
+            throw new Exception("zipEntry is null"); //$NON-NLS-1$
+         }
 
-			System.out.println("outFileName " + outFileName); //$NON-NLS-1$
+         zipEntryName = zipEntry.getName();
+         System.out.println("zipEntryName " + zipEntryName); //$NON-NLS-1$
 
-			final OutputStream fileOutputStream = new FileOutputStream(outFileName);
+         if (zipEntryName.indexOf(File.separator) != -1) {
+            // delimiter in name (e.g. in self created kmz files)
+            zipEntryName = zipEntryName.substring(zipEntryName.lastIndexOf(File.separator) + 1);
+         }
 
-			// Transfer bytes from the ZIP file to the output file
-			final byte[] buf = new byte[1024];
-			int len;
-			while ((len = zipInputStream.read(buf)) > 0) {
-				fileOutputStream.write(buf, 0, len);
-			}
+         outFileName = zipName.substring(0, zipName.lastIndexOf(File.separator)) + File.separator + zipEntryName;
 
-			fileOutputStream.close();
-			zipInputStream.close();
+         System.out.println("outFileName " + outFileName); //$NON-NLS-1$
 
-			return zipEntryName;
+         final OutputStream fileOutputStream = new FileOutputStream(outFileName);
 
-		} catch (final IOException e) {
-			System.out.println("unzip: Error: " + e.getMessage()); //$NON-NLS-1$
-			throw(e); // return exception 
-		}
-	}
+         // Transfer bytes from the ZIP file to the output file
+         final byte[] buf = new byte[1024];
+         int len;
+         while ((len = zipInputStream.read(buf)) > 0) {
+            fileOutputStream.write(buf, 0, len);
+         }
 
-	public final static void zip(String fileName, final String zipName) throws Exception {
-		try {
-			// Compress the file         
-			final File file = new File(fileName);
-			final FileInputStream fileInputStream = new FileInputStream(file);
+         fileOutputStream.close();
+         zipInputStream.close();
 
-			// Create the ZIP file
-			final ZipOutputStream zipOutputStream = new ZipOutputStream(new FileOutputStream(zipName));
+         return zipEntryName;
 
-			// Add ZIP entry to output stream (Filename only)
-			if (fileName.indexOf(File.separator) != -1)
-				fileName = fileName.substring(fileName.lastIndexOf(File.separator) + 1);
-			zipOutputStream.putNextEntry(new ZipEntry(fileName));
+      } catch (final IOException e) {
+         System.out.println("unzip: Error: " + e.getMessage()); //$NON-NLS-1$
+         throw (e); // return exception
+      }
+   }
 
-			// Create a buffer for reading the files
-			final byte[] buf = new byte[1024];
+   public final static void zip(String fileName, final String zipName) throws Exception {
+      try {
+         // Compress the file
+         final File file = new File(fileName);
+         final FileInputStream fileInputStream = new FileInputStream(file);
 
-			// Transfer bytes from the file to the ZIP file
-			int len;
-			while ((len = fileInputStream.read(buf)) > 0) {
-				zipOutputStream.write(buf, 0, len);
-			}
+         // Create the ZIP file
+         final ZipOutputStream zipOutputStream = new ZipOutputStream(new FileOutputStream(zipName));
 
-			// Complete the entry
-			zipOutputStream.closeEntry();
-			fileInputStream.close();
-			// Complete the ZIP file
-			zipOutputStream.close();
+         // Add ZIP entry to output stream (Filename only)
+         if (fileName.indexOf(File.separator) != -1) {
+            fileName = fileName.substring(fileName.lastIndexOf(File.separator) + 1);
+         }
+         zipOutputStream.putNextEntry(new ZipEntry(fileName));
 
-		} catch (final IOException e) {
-			System.out.println("zip: Error: " + e.getMessage()); //$NON-NLS-1$
-			throw (e); // return exception
-		}
-	}
+         // Create a buffer for reading the files
+         final byte[] buf = new byte[1024];
+
+         // Transfer bytes from the file to the ZIP file
+         int len;
+         while ((len = fileInputStream.read(buf)) > 0) {
+            zipOutputStream.write(buf, 0, len);
+         }
+
+         // Complete the entry
+         zipOutputStream.closeEntry();
+         fileInputStream.close();
+         // Complete the ZIP file
+         zipOutputStream.close();
+
+      } catch (final IOException e) {
+         System.out.println("zip: Error: " + e.getMessage()); //$NON-NLS-1$
+         throw (e); // return exception
+      }
+   }
 }

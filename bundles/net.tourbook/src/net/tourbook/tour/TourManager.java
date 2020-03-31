@@ -1960,9 +1960,7 @@ public class TourManager {
              */
             new ProgressMonitorDialog(TourbookPlugin.getAppShell()).run(true, true, saveRunnable);
 
-         } catch (final InvocationTargetException e) {
-            StatusUtil.showStatus(e);
-         } catch (final InterruptedException e) {
+         } catch (final InvocationTargetException | InterruptedException e) {
             StatusUtil.showStatus(e);
          }
       }
@@ -2606,9 +2604,7 @@ public class TourManager {
 
             new ProgressMonitorDialog(TourbookPlugin.getAppShell()).run(true, false, saveRunnable);
 
-         } catch (final InvocationTargetException e) {
-            StatusUtil.showStatus(e);
-         } catch (final InterruptedException e) {
+         } catch (final InvocationTargetException | InterruptedException e) {
             StatusUtil.showStatus(e);
          }
       }

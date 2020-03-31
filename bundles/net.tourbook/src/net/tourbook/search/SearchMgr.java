@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -988,17 +988,17 @@ public class SearchMgr implements XHRHandler {
 			response = xhr_Proposals(params);
 		}
 
-		writeRespone(httpExchange, response);
+		writeResponse(httpExchange, response);
 	}
 
-	private void writeRespone(final HttpExchange httpExchange, final String response) {
+	private void writeResponse(final HttpExchange httpExchange, final String response) {
 
 		OutputStream os = null;
 
 		try {
 
 //			response.setContentType("application/json;charset=UTF-8");
-			final byte[] convertedResponse = response.getBytes(WEB.UTF_8);
+			final byte[] convertedResponse = response.getBytes(UI.UTF_8);
 
 			httpExchange.sendResponseHeaders(200, convertedResponse.length);
 
@@ -1054,7 +1054,7 @@ public class SearchMgr implements XHRHandler {
 
 		if (xhrParameter instanceof String) {
 
-			final String xhrAction = URLDecoder.decode((String) xhrParameter, WEB.UTF_8);
+			final String xhrAction = URLDecoder.decode((String) xhrParameter, UI.UTF_8);
 
 			// run in UI thread
 			Display.getDefault().asyncExec(new Runnable() {
@@ -1075,7 +1075,7 @@ public class SearchMgr implements XHRHandler {
 
 		if (xhrSearchText instanceof String) {
 
-			final String searchText = URLDecoder.decode((String) xhrSearchText, WEB.UTF_8);
+			final String searchText = URLDecoder.decode((String) xhrSearchText, UI.UTF_8);
 
 			proposals = FTSearchManager.getProposals(searchText);
 		}
@@ -1135,7 +1135,7 @@ public class SearchMgr implements XHRHandler {
 				log.append("range: " + searchPosFrom + "-" + searchPosTo + "\t" + headers.entrySet()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
 
-			String searchText = URLDecoder.decode(xhrSearchText, WEB.UTF_8);
+			String searchText = URLDecoder.decode(xhrSearchText, UI.UTF_8);
 
 			// keep search text in state
 			state.put(STATE_CURRENT_SEARCH_TEXT, searchText);

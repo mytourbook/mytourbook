@@ -8,6 +8,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.util.StringTokenizer;
 
+@SuppressWarnings("serial")
 public class Bspline2nd extends java.applet.Applet implements MouseMotionListener {
 
 	Image		buffImage;
