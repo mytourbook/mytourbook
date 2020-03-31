@@ -21,16 +21,17 @@ import net.tourbook.ui.UI;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionShowAllStressScoreValues extends Action {
+public class ActionShowGovssValues extends Action {
 
    private PerformanceModelingChartView _performanceModelingChartView;
 
-   public ActionShowAllStressScoreValues(final PerformanceModelingChartView performanceModelingChartView) {
+   public ActionShowGovssValues(final PerformanceModelingChartView performanceModelingChartView) {
 
       super(UI.EMPTY_STRING, AS_CHECK_BOX);
 
+      //TODO
       setToolTipText(Messages.Training_View_Action_ShowAllPulseValues);
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__graph_speed)); //TODO replace with Image__graph_govss
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__PerformanceGraph_govss));
 
       _performanceModelingChartView = performanceModelingChartView;
    }

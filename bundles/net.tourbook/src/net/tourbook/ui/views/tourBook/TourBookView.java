@@ -2818,7 +2818,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    //   * Column for debugging: Tag ids
    //   */
    //  private void defineColumn_Tour_TagIds() {
-
 //      final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "TOUR_TAG_IDS", SWT.TRAIL); //$NON-NLS-1$
 //
 //      colDef.setColumnCategory(net.tourbook.ui.Messages.ColumnFactory_Category_Tour);

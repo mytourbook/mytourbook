@@ -15,6 +15,12 @@
  *******************************************************************************/
 package net.tourbook.ui.views.performanceModelingChart;
 
+import gnu.trove.list.array.TIntArrayList;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.Month;
@@ -33,30 +39,36 @@ import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.ChartDataSerie;
 import net.tourbook.chart.ChartDataXSerie;
 import net.tourbook.chart.ChartDataYSerie;
+import net.tourbook.chart.ChartStatisticSegments;
 import net.tourbook.chart.ChartToolTipInfo;
 import net.tourbook.chart.ChartType;
 import net.tourbook.chart.IBarSelectionListener;
-import net.tourbook.chart.MinMaxKeeper_YData;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
+import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourManager;
 import net.tourbook.trainingstress.ITrainingStressDataListener;
+import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.UI;
 
 import org.eclipse.e4.ui.di.PersistState;
-import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.ToolBar;
@@ -70,6 +82,10 @@ public class PerformanceModelingChartView extends ViewPart {
 
    private static final String STATE_IS_SHOW_ALL_STRESS_SCORE_VALUES = "IsShowAllStressScoreValues";                                                  //$NON-NLS-1$
    private static final String STATE_IS_SYNC_VERTICAL_CHART_SCALING  = "IsSyncVerticalChartScaling";                                                  //$NON-NLS-1$
+   private static final String STATE_SELECTED_YEAR                   = "performancemodeling.container.selected_year";                                 //$NON-NLS-1$
+   private static final String STATE_NUMBER_OF_YEARS                 = "performancemodeling.container.number_of_years";                               //$NON-NLS-1$
+
+   private static final char   NL                                    = net.tourbook.common.UI.NEW_LINE;
 
    private static final String GRID_PREF_PREFIX                      = "GRID_TRAINING__";                                                             //$NON-NLS-1$
 
@@ -82,8 +98,8 @@ public class PerformanceModelingChartView extends ViewPart {
 
 // SET_FORMATTING_ON
 
-   private final IPreferenceStore         _prefStore      = TourbookPlugin.getPrefStore();
-   private final IDialogSettings          _state          = TourbookPlugin.getState(ID);
+   private final IPreferenceStore         _prefStore    = TourbookPlugin.getPrefStore();
+   private final IDialogSettings          _state        = TourbookPlugin.getState(ID);
 
    private IPropertyChangeListener        _prefChangeListener;
    private ITrainingStressDataListener    _trainingStressDataListener;
@@ -93,32 +109,43 @@ public class PerformanceModelingChartView extends ViewPart {
    private LocalDate                      _oldestEntryDate;
    private LocalDate                      _newestEntryDate;
 
-   private boolean                        _isUpdateUI;
+   private static final boolean           IS_OSX        = net.tourbook.common.UI.IS_OSX;
+   private static final boolean           IS_LINUX      = net.tourbook.common.UI.IS_LINUX;
+
    private boolean                        _isShowAllValues;
    private boolean                        _isSynchChartVerticalValues;
 
-   private ChartDataModel                 _chartDataModel = new ChartDataModel(ChartType.LINE);
+   private ChartDataModel                 _chartDataModel;
 
-   private ToolBarManager                 _headerToolbarManager;
+   private int                            _selectedYear = -1;
 
-   private ActionShowAllStressScoreValues _actionShowAllStressScoreValues;
+   /**
+    * Contains all years which have tours for the selected tour type and person.
+    */
+   private TIntArrayList                  _availableYears;
+
+   private ActionShowGovssValues _actionShowAllStressScoreValues;
    private ActionSynchronizeChartScale    _actionSynchVerticalChartScaling;
    private ActionTrainingOptions          _actionTrainingOptions;
 
    private double[]                       _xSerieDate;
 
-   private final MinMaxKeeper_YData       _minMaxKeeper   = new MinMaxKeeper_YData();
+   //private final MinMaxKeeper_YData       _minMaxKeeper = new MinMaxKeeper_YData();
 
-   private final NumberFormat             _nf1            = NumberFormat.getNumberInstance();
+   private final NumberFormat _nf1 = NumberFormat.getNumberInstance();
    {
       _nf1.setMinimumFractionDigits(1);
       _nf1.setMaximumFractionDigits(1);
    }
 
+   private PixelConverter _pc;
+
    /*
     * UI controls/resources
     */
    private FormToolkit _tk;
+   private Combo       _comboYear;
+   private Combo       _comboNumberOfYears;
 
    /*
     * Pagebook for the predicted performance view
@@ -132,10 +159,6 @@ public class PerformanceModelingChartView extends ViewPart {
 
    private int       _numberOfDays;
 
-   /*
-    * none UI
-    */
-
    private class ActionTrainingOptions extends ActionToolbarSlideout {
 
       @Override
@@ -143,10 +166,6 @@ public class PerformanceModelingChartView extends ViewPart {
 
          return new SlideoutTrainingOptions(_pageBook, toolbar, GRID_PREF_PREFIX, PerformanceModelingChartView.this);
       }
-   }
-
-   public PerformanceModelingChartView() {
-
    }
 
    void actionShowAllStressScoreValues() {
@@ -157,6 +176,11 @@ public class PerformanceModelingChartView extends ViewPart {
    }
 
    public void actionShowHidePerformanceValues(final boolean showValues) {
+
+      if (_chartDataModel == null) {
+         return;
+      }
+
       if (showValues == false) {
          final ChartDataModel currentData = _chartPerformanceModelingData.getChartDataModel();
          final ArrayList<ChartDataYSerie> ySeries = currentData.getYData();
@@ -177,9 +201,9 @@ public class PerformanceModelingChartView extends ViewPart {
 
       _isSynchChartVerticalValues = _actionSynchVerticalChartScaling.isChecked();
 
-      if (_isSynchChartVerticalValues == false) {
-         _minMaxKeeper.resetMinMax();
-      }
+      // if (_isSynchChartVerticalValues == false) {
+      //    _minMaxKeeper.resetMinMax();
+      //  }
 
       updateUI_10_stressScoreValuesFromModel();
    }
@@ -284,7 +308,7 @@ public class PerformanceModelingChartView extends ViewPart {
                      new ITrainingStressDataListener() {
                         @Override
                         public void trainingStressDataIsModified() {
-                           updateUI_40_performanceModelingChart();
+                           updateChart();
                         }
                      });
       }
@@ -302,7 +326,7 @@ public class PerformanceModelingChartView extends ViewPart {
 
    private void createActions() {
 
-      _actionShowAllStressScoreValues = new ActionShowAllStressScoreValues(this);
+      _actionShowAllStressScoreValues = new ActionShowGovssValues(this);
       _actionSynchVerticalChartScaling = new ActionSynchronizeChartScale(this);
       _actionTrainingOptions = new ActionTrainingOptions();
    }
@@ -310,13 +334,16 @@ public class PerformanceModelingChartView extends ViewPart {
    @Override
    public void createPartControl(final Composite parent) {
 
+      initUI(parent);
+
       createUI(parent);
+
+      // set the model BEFORE actions are created/enabled/checked
+      _chartDataModel = new ChartDataModel(ChartType.LINE);
 
       createActions();
       fillToolbar();
-
-      // show default page
-      _pageBook.showPage(_page_NoPerson);
+      updateUI();
 
       addPrefListener();
       addTrainingStressDataListener();
@@ -325,6 +352,14 @@ public class PerformanceModelingChartView extends ViewPart {
 
       updateUI_10_stressScoreValuesFromModel();
 
+   }
+
+   private void updateUI() {
+
+      // fill combobox with number of years
+      for (int years = 1; years <= 100; years++) {
+         _comboNumberOfYears.add(Integer.toString(years));
+      }
    }
 
    private ChartToolTipInfo createToolTipInfo(final int serieIndex, final int valueIndex) {
@@ -364,20 +399,19 @@ public class PerformanceModelingChartView extends ViewPart {
 
    private void createUI(final Composite parent) {
 
-      initUI(parent);
-
       final Composite container = new Composite(parent, SWT.NONE);
-      GridLayoutFactory.fillDefaults()//
+      GridLayoutFactory.fillDefaults()
             .spacing(0, 0)
             .applyTo(container);
       {
          createUI_10_Toolbar(container);
          createUI_20_PerformanceModelingChart(container);
       }
-
    }
 
    private void createUI_10_Toolbar(final Composite parent) {
+
+      final int widgetSpacing = 15;
 
       _toolbar = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()//
@@ -386,21 +420,84 @@ public class PerformanceModelingChartView extends ViewPart {
             .applyTo(_toolbar);
       GridLayoutFactory
             .fillDefaults()
+            .numColumns(3)
             .margins(3, 3)
             .applyTo(_toolbar);
-//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
       {
-         /*
-          * toolbar actions
-          */
-         final ToolBar toolbar = new ToolBar(_toolbar, SWT.FLAT);
-         GridDataFactory.fillDefaults()//
-               .align(SWT.BEGINNING, SWT.CENTER)
-               .applyTo(toolbar);
-         _headerToolbarManager = new ToolBarManager(toolbar);
+         {
+            /*
+             * combo: year
+             */
 
+            _comboYear = new Combo(_toolbar, SWT.DROP_DOWN | SWT.READ_ONLY);
+            _comboYear.setToolTipText(Messages.Tour_Book_Combo_year_tooltip);
+            _comboYear.setVisibleItemCount(50);
+
+            GridDataFactory
+                  .fillDefaults()//
+                  .indent(widgetSpacing, 0)
+                  .hint(_pc.convertWidthInCharsToPixels(IS_OSX ? 12 : IS_LINUX ? 12 : 5), SWT.DEFAULT)
+                  .applyTo(_comboYear);
+
+            _comboYear.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  onSelectYear();
+               }
+            });
+         }
+
+         {
+            /*
+             * combo: year numbers
+             */
+
+            _comboNumberOfYears = new Combo(_toolbar, SWT.DROP_DOWN | SWT.READ_ONLY);
+            _comboNumberOfYears.setToolTipText(Messages.tour_statistic_number_of_years);
+            _comboNumberOfYears.setVisibleItemCount(50);
+
+            GridDataFactory
+                  .fillDefaults()//
+                  .indent(2, 0)
+                  .hint(_pc.convertWidthInCharsToPixels(IS_OSX ? 8 : IS_LINUX ? 8 : 4), SWT.DEFAULT)
+                  .applyTo(_comboNumberOfYears);
+
+            _comboNumberOfYears.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  onSelectYear();
+               }
+            });
+         }
       }
+   }
 
+   private void onSelectYear() {
+
+      final int selectedItem = _comboYear.getSelectionIndex();
+      if (selectedItem != -1) {
+
+         _selectedYear = Integer.parseInt(_comboYear.getItem(selectedItem));
+
+         updateChart_10_NoReload();
+      }
+   }
+
+   private void updateChart_10_NoReload() {
+      updateUI_Toolbar();
+
+   }
+
+   private void updateUI_Toolbar() {
+      // update view toolbar
+      final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
+      tbm.removeAll();
+
+      tbm.add(_actionShowAllStressScoreValues);
+      tbm.add(_actionSynchVerticalChartScaling);
+
+      // update toolbar to show added items
+      tbm.update(true);
    }
 
    private void createUI_20_PerformanceModelingChart(final Composite parent) {
@@ -466,20 +563,13 @@ public class PerformanceModelingChartView extends ViewPart {
       final boolean isCustomScaling = _isShowAllValues == false;
 
       _actionSynchVerticalChartScaling.setEnabled(isCustomScaling);
-      _actionShowAllStressScoreValues.setEnabled(true);//isHrZoneAvailable);
+      //_actionShowAllStressScoreValues.setEnabled(true);//isHrZoneAvailable);
       _actionShowAllStressScoreValues.setChecked(true);//TODO by default, it's displayed. Put variable to state ?
       _actionTrainingOptions.setEnabled(true);//isHrZoneAvailable);
    }
 
    private void fillToolbar() {
 
-      /*
-       * Header toolbar
-       */
-      _headerToolbarManager.add(_actionShowAllStressScoreValues);
-      _headerToolbarManager.add(_actionSynchVerticalChartScaling);
-
-      _headerToolbarManager.update(true);
    }
 
    private LocalDate findExtremeDates(final HashMap<LocalDate, ArrayList<Long>> entries, final boolean oldest) {
@@ -563,6 +653,7 @@ public class PerformanceModelingChartView extends ViewPart {
 
    private void initUI(final Composite parent) {
 
+      _pc = new PixelConverter(parent);
       _tk = new FormToolkit(parent.getDisplay());
 
    }
@@ -585,6 +676,190 @@ public class PerformanceModelingChartView extends ViewPart {
 
       _isSynchChartVerticalValues = Util.getStateBoolean(_state, STATE_IS_SYNC_VERTICAL_CHART_SCALING, false);
       _actionSynchVerticalChartScaling.setChecked(_isSynchChartVerticalValues);
+
+      // select year
+      final int defaultYear = Util.getStateInt(_state, STATE_SELECTED_YEAR, -1);
+      refreshYearCombobox();
+      selectYear(defaultYear);
+
+      // select number of years
+      final int numberOfYearsIndex = Util.getStateInt(_state, STATE_NUMBER_OF_YEARS, 0);
+      _comboNumberOfYears.select(numberOfYearsIndex);
+
+      updateChart_10_NoReload();
+   }
+
+   private void selectYear(final int defaultYear) {
+
+      int selectedYearIndex = getActiveYearComboboxIndex(defaultYear);
+      if (selectedYearIndex == -1) {
+
+         /*
+          * the active year was not found in the combo box, it's possible that the combo box needs
+          * to be update
+          */
+
+         refreshYearCombobox();
+         selectedYearIndex = getActiveYearComboboxIndex(defaultYear);
+
+         if (selectedYearIndex == -1) {
+
+            // year is still not selected
+            final int yearCount = _comboYear.getItemCount();
+
+            // reselect the youngest year if years are available
+            if (yearCount > 0) {
+               selectedYearIndex = yearCount - 1;
+               _selectedYear = Integer.parseInt(_comboYear.getItem(yearCount - 1));
+            }
+         }
+      }
+
+      _comboYear.select(selectedYearIndex);
+   }
+
+   /**
+    * @param defaultYear
+    * @return Returns the index for the active year or <code>-1</code> when there are no years
+    *         available
+    */
+   private int getActiveYearComboboxIndex(final int defaultYear) {
+
+      int selectedYearIndex = -1;
+
+      if (_availableYears == null) {
+         return selectedYearIndex;
+      }
+
+      /*
+       * try to get the year index for the default year
+       */
+      if (defaultYear != -1) {
+
+         int yearIndex = 0;
+         for (final int year : _availableYears.toArray()) {
+
+            if (year == defaultYear) {
+
+               _selectedYear = defaultYear;
+
+               return yearIndex;
+            }
+            yearIndex++;
+         }
+      }
+
+      /*
+       * try to get year index of the selected year
+       */
+      int yearIndex = 0;
+      for (final int year : _availableYears.toArray()) {
+         if (year == _selectedYear) {
+            selectedYearIndex = yearIndex;
+            break;
+         }
+         yearIndex++;
+      }
+
+      return selectedYearIndex;
+   }
+
+   private void refreshYearCombobox() {
+      final SQLFilter filter = new SQLFilter(SQLFilter.TAG_FILTER);
+
+      String fromTourData;
+
+      final SQLFilter sqlFilter = new SQLFilter(SQLFilter.TAG_FILTER);
+      if (sqlFilter.isTagFilterActive()) {
+
+         // with tag filter
+
+         fromTourData = NL
+
+               + "FROM (         " + NL //$NON-NLS-1$
+
+               + " SELECT        " + NL //$NON-NLS-1$
+
+               + "  StartYear    " + NL //$NON-NLS-1$
+
+               + ("  FROM " + TourDatabase.TABLE_TOUR_DATA) + NL//$NON-NLS-1$
+
+               // get tag id's
+               + "  LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" + NL //$NON-NLS-1$ //$NON-NLS-2$
+               + "  ON tourID = jTdataTtag.TourData_tourId  " + NL //$NON-NLS-1$
+
+               + "  WHERE 1=1    " + NL //$NON-NLS-1$
+               + sqlFilter.getWhereClause()
+
+               + ") td           " + NL//$NON-NLS-1$
+         ;
+
+      } else {
+
+         // without tag filter
+
+         fromTourData = NL
+
+               + " FROM " + TourDatabase.TABLE_TOUR_DATA + NL //$NON-NLS-1$
+
+               + " WHERE 1=1        " + NL //$NON-NLS-1$
+               + sqlFilter.getWhereClause() + NL;
+      }
+
+      final String sqlString = NL +
+
+            "SELECT                 " + NL //$NON-NLS-1$
+
+            + " StartYear           " + NL //$NON-NLS-1$
+
+            + fromTourData
+
+            + " GROUP BY STARTYEAR     " + NL //$NON-NLS-1$
+            + " ORDER BY STARTYEAR     " + NL//       //$NON-NLS-1$
+      ;
+      _availableYears = new TIntArrayList();
+
+      try {
+         final Connection conn = TourDatabase.getInstance().getConnection();
+         final PreparedStatement statement = conn.prepareStatement(sqlString);
+         filter.setParameters(statement, 1);
+
+         final ResultSet result = statement.executeQuery();
+
+         while (result.next()) {
+            _availableYears.add(result.getInt(1));
+         }
+
+         conn.close();
+
+      } catch (final SQLException e) {
+         UI.showSQLException(e);
+      }
+
+      _comboYear.removeAll();
+
+      /*
+       * add all years of the tours and the current year
+       */
+      final int thisYear = LocalDate.now().getYear();
+
+      boolean isThisYearSet = false;
+
+      for (final int year : _availableYears.toArray()) {
+
+         if (year == thisYear) {
+            isThisYearSet = true;
+         }
+
+         _comboYear.add(Integer.toString(year));
+      }
+
+      // add currenty year if not set
+      if (isThisYearSet == false) {
+         _availableYears.add(thisYear);
+         _comboYear.add(Integer.toString(thisYear));
+      }
+
    }
 
    @PersistState
@@ -592,6 +867,9 @@ public class PerformanceModelingChartView extends ViewPart {
 
       _state.put(STATE_IS_SHOW_ALL_STRESS_SCORE_VALUES, _actionShowAllStressScoreValues.isChecked());
       _state.put(STATE_IS_SYNC_VERTICAL_CHART_SCALING, _actionSynchVerticalChartScaling.isChecked());
+
+      _state.put(STATE_SELECTED_YEAR, _selectedYear);
+      _state.put(STATE_NUMBER_OF_YEARS, _comboNumberOfYears.getSelectionIndex());
    }
 
    private void setChartProperties() {
@@ -605,16 +883,6 @@ public class PerformanceModelingChartView extends ViewPart {
    @Override
    public void setFocus() {
 
-   }
-
-   private void updateUI(final long tourId) {
-
-      if (_currentPerson == null) {
-         // optimize
-         return;
-      }
-
-      updateUI_20();
    }
 
    /**
@@ -640,18 +908,8 @@ public class PerformanceModelingChartView extends ViewPart {
 
       // display page for the selected chart
       _pageBook.showPage(_page_TrainingStressScores);
-      updateUI_40_performanceModelingChart();
+      updateChart();
 
-   }
-
-   private void updateUI_20() {
-
-      if (_currentPerson == null) {
-         // nothing to do
-         return;
-      }
-
-      updateUI_10_stressScoreValuesFromModel();
    }
 
    /**
@@ -661,13 +919,39 @@ public class PerformanceModelingChartView extends ViewPart {
     * - Fatigues values
     * - Performance modeling values
     */
-   private void updateUI_40_performanceModelingChart() {
+   private void updateChart() {
 
       //TourManager.GETALL TOURS
+      _chartDataModel = new ChartDataModel(ChartType.LINE);
 
       // We get the govssentries
       if (_currentPerson.getPerformanceModelingData() == null ||
             _currentPerson.getPerformanceModelingData().getGovssEntries() == null) {
+
+         // set the x-axis
+
+         //Get the current tour type filter to get the beginning date and the end date
+         //, if no filter, get the first tour date and last tour date.
+         //
+         final ChartDataXSerie xData = new ChartDataXSerie(Util.convertIntToDouble(new int[] { 34 }));//_tourTimeData.tourDOYValues));
+         xData.setAxisUnit(ChartDataXSerie.X_AXIS_UNIT_DAY);
+         xData.setVisibleMaxValue(2020);
+         xData.setChartSegments(createChartSegments());//_tourTimeData));
+         _chartDataModel.setXData(xData);
+
+         // set the bar low/high data
+         final ChartDataYSerie yData = new ChartDataYSerie(
+               ChartType.BAR,
+               Util.convertIntToFloat(new int[] { 1000 }),
+               Util.convertIntToFloat(new int[] { 1000 }));
+         yData.setYTitle("LABEL_GRAPH_DAYTIME");
+         yData.setUnitLabel("LABEL_GRAPH_TIME_UNIT");
+         yData.setAxisUnit(ChartDataXSerie.AXIS_UNIT_NUMBER);
+         yData.setYAxisDirection(false);
+         yData.setShowYSlider(true);
+
+         _chartDataModel.addYData(yData);
+         _chartPerformanceModelingData.updateChart(_chartDataModel, false);
          return;
       }
 
@@ -749,7 +1033,64 @@ public class PerformanceModelingChartView extends ViewPart {
 
       // show the new data data model in the chart
       _chartPerformanceModelingData.updateChart(_chartDataModel, false);
+      _chartPerformanceModelingData.redrawChart();
       // _chartPerformanceModelingData.up = TourManager.getInstance().getActivePerformanceModelingChartView();
+      updateActions();
    }
 
+   private void updateActions() {
+
+      final ArrayList<String> enabledGraphTitles = new ArrayList<>();
+
+      for (final ChartDataSerie xyDataIterator : _chartDataModel.getYData()) {
+
+         if (xyDataIterator instanceof ChartDataYSerie) {
+
+            final ChartDataYSerie yData = (ChartDataYSerie) xyDataIterator;
+            final String graphTitle = yData.getYTitle();
+
+            enabledGraphTitles.add(graphTitle);
+         }
+      }
+
+      _actionShowAllStressScoreValues.setEnabled(enabledGraphTitles.contains("GOVSS"));
+
+   }
+
+   /**
+    * create segments for the chart
+    */
+   private ChartStatisticSegments createChartSegments() {//final TourData_Time tourDataTime) {
+
+      final double segmentStart[] = new double[5];//_numberOfYears];
+      final double segmentEnd[] = new double[5];//_numberOfYears];
+      final String[] segmentTitle = new String[5];//_numberOfYears];
+
+      final int[] allYearDays = new int[] { 366 };//tourDataTime.yearDays;
+      final int oldestYear = 2020 - 5 + 1;
+      int yearDaysSum = 0;
+
+      // create segments for each year
+      for (int yearIndex = 0; yearIndex < allYearDays.length; yearIndex++) {
+
+         final int yearDays = allYearDays[yearIndex];
+
+         segmentStart[yearIndex] = yearDaysSum;
+         segmentEnd[yearIndex] = yearDaysSum + yearDays - 1;
+         segmentTitle[yearIndex] = Integer.toString(oldestYear + yearIndex);
+
+         yearDaysSum += yearDays;
+      }
+
+      final ChartStatisticSegments chartSegments = new ChartStatisticSegments();
+      chartSegments.segmentStartValue = segmentStart;
+      chartSegments.segmentEndValue = segmentEnd;
+      chartSegments.segmentTitle = segmentTitle;
+
+      chartSegments.years = new int[] { 5 };//tourDataTime.years;
+      chartSegments.yearDays = new int[] { 366 };//tourDataTime.yearDays;
+      chartSegments.allValues = 5 * 36;//tourDataTime.allDaysInAllYears;
+
+      return chartSegments;
+   }
 }
