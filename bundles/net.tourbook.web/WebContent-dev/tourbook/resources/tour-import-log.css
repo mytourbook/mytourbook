@@ -53,7 +53,7 @@ a:VISITED
 {
    width:                  16px; 
    height:                 16px; 
-   min-width:              16px;          /* force wdith otherwise it can be smaller */
+   min-width:              16px;          /* force width otherwise it can be smaller */
 
    background-repeat:      no-repeat;
    background-position-x:  5px;           /* this must be the same as .column otherwise it is not centered */
