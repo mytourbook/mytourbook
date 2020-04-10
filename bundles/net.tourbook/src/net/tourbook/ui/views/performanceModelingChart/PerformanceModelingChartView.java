@@ -1053,28 +1053,22 @@ public class PerformanceModelingChartView extends ViewPart {
    }
 
    private void updateComboNumberOfYears(int selectedYearItem) {
-
+//TODO Put in a shared libraryso it can be used by the statistics view for example
       if (selectedYearItem < 0) {
          selectedYearItem = _comboYear.getItemCount() - 1;
       }
 
-      _comboNumberOfYears.removeAll();
-      _comboNumberOfYears.add("1");
+      final int currentYear = Integer.parseInt(_comboYear.getItem(selectedYearItem));
 
-      // Adjust combo box with number of years
-      final int selectedYear = Integer.parseInt(_comboYear.getItem(selectedYearItem));
+      _comboNumberOfYears.removeAll();
 
       // fill combo box with number of years
-      int index = selectedYearItem - 1;
-      int previousYear = Integer.parseInt(_comboYear.getItem(index));
-      for (int currentYear = selectedYear; index > 0;) {
+      for (int index = selectedYearItem; index >= 0; --index) {
+
+         final int previousYear = Integer.parseInt(_comboYear.getItem(index));
 
          final int yearsDifference = currentYear - previousYear + 1;
          _comboNumberOfYears.add(Integer.toString(yearsDifference));
-
-         currentYear = previousYear;
-         index -= 1;
-         previousYear = Integer.parseInt(_comboYear.getItem(index));
       }
 
       final int currentNumberOfYears = _comboNumberOfYears.getSelectionIndex();
