@@ -30,7 +30,8 @@ New + Improvements
 * xxx
   - yyy
 
-* xxx (Frederic)
+* Statistics (Frederic)
+  - The number of years to be displayed is now dymically filled and updated based on the number of available years.
 
 
 Import
