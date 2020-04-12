@@ -52,6 +52,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourManager;
 import net.tourbook.trainingstress.ITrainingStressDataListener;
+import net.tourbook.ui.ChartUtils;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.UI;
 
@@ -1052,24 +1053,19 @@ public class PerformanceModelingChartView extends ViewPart {
 
    }
 
-   private void updateComboNumberOfYears(int selectedYearItem) {
-//TODO Put in a shared libraryso it can be used by the statistics view for example
-      if (selectedYearItem < 0) {
-         selectedYearItem = _comboYear.getItemCount() - 1;
-      }
-
-      final int currentYear = Integer.parseInt(_comboYear.getItem(selectedYearItem));
+   /**
+    * For a given combo selection of years, it computes and returns a list of
+    * years the user can display at any time in a given chart.
+    *
+    * @param selectedYearItem
+    *           The current year selected in a given combo box
+    */
+   private void updateComboNumberOfYears(final int selectedYearItem) {
 
       _comboNumberOfYears.removeAll();
 
-      // fill combo box with number of years
-      for (int index = selectedYearItem; index >= 0; --index) {
-
-         final int previousYear = Integer.parseInt(_comboYear.getItem(index));
-
-         final int yearsDifference = currentYear - previousYear + 1;
-         _comboNumberOfYears.add(Integer.toString(yearsDifference));
-      }
+      final String[] yearsToDisplayList = ChartUtils.ProduceListOfYearsToBeDisplayed(_comboYear, selectedYearItem);
+      _comboNumberOfYears.setItems(yearsToDisplayList);
 
       final int currentNumberOfYears = _comboNumberOfYears.getSelectionIndex();
       if (currentNumberOfYears <= 0 || currentNumberOfYears > _comboNumberOfYears.getItemCount()) {
