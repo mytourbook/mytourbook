@@ -759,17 +759,19 @@ public class CalendarTourDataProvider {
 
             fromTourData = NL
 
-                  + "FROM (						" + NL //$NON-NLS-1$
+                  + "FROM (						    " + NL //$NON-NLS-1$
 
-                  + " SELECT						" + NL //$NON-NLS-1$
+                  + " SELECT					     	 " + NL //$NON-NLS-1$
 
-                  + "  TourDistance,				" + NL //$NON-NLS-1$
-                  + "  TourAltUp,					" + NL //$NON-NLS-1$
-                  + "  TourAltDown,					" + NL //$NON-NLS-1$
-                  + "  TourRecordingTime,			" + NL //$NON-NLS-1$
-                  + "  TourDrivingTime,			" + NL //$NON-NLS-1$
-                  + "  calories,					" + NL //$NON-NLS-1$
-                  + "  jTdataTtag.TourTag_tagId	" + NL //$NON-NLS-1$
+                  + "  TourDistance,				 " + NL //$NON-NLS-1$
+                  + "  TourAltUp,					 " + NL //$NON-NLS-1$
+                  + "  TourAltDown,					 " + NL //$NON-NLS-1$
+                  + "  TourRecordingTime,			 " + NL //$NON-NLS-1$
+                  + "  TourDrivingTime,			 " + NL //$NON-NLS-1$
+                  + "  calories,					    " + NL //$NON-NLS-1$
+                  + "  jTdataTtag.TourTag_tagId, " + NL //$NON-NLS-1$
+                  + "  cadenceZone_SlowTime,	    " + NL //$NON-NLS-1$
+                  + "  cadenceZone_FastTime	    " + NL //$NON-NLS-1$
 
                   + (" FROM " + TourDatabase.TABLE_TOUR_DATA) + NL//$NON-NLS-1$
 

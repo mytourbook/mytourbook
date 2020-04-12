@@ -1,8 +1,8 @@
 // created with net.tourbook.ant.I18ToDojo
 define(//							
 {									
-		Search_App_Action_EditMarker                       : 'Editer Marqueur',
-		Search_App_Action_EditTour                         : 'Editer Itinéraire',
+		Search_App_Action_EditMarker                       : 'Éditer le Marqueur',
+		Search_App_Action_EditTour                         : 'Éditer l\'Itinéraire',
 		Search_App_Action_SearchOptions_Tooltip            : 'Options de Recherche.',
 		Search_App_Action_StartSearch_Tooltip              : 'Démarrer la recherche.',
 		Search_App_Label_Status_Tooltip                    : 'Nombre de résultats - Temps de recherche',
@@ -16,9 +16,11 @@ define(//
 		Search_Options_Checkbox_ShowContentMarker          : 'Marqueurs',
 		Search_Options_Checkbox_ShowContentTour            : 'Itinéraires',
 		Search_Options_Checkbox_ShowContentWaypoint        : 'Waypoints',
-		Search_Options_Checkbox_ShowDateTime               : 'Montrer date/heure',
-		Search_Options_Checkbox_ShowItemNumber             : 'Montrer le numéro de l\'article',
-		Search_Options_Checkbox_ShowLuceneDocId            : 'Montrer le doc ID Lucene',
+		Search_Options_Checkbox_ShowDate                   : 'Afficher la date',
+		Search_Options_Checkbox_ShowDescription            : 'Afficher la description',
+		Search_Options_Checkbox_ShowItemNumber             : 'Afficher le numéro de l\'article',
+		Search_Options_Checkbox_ShowLuceneDocId            : 'Afficher le doc ID Lucene',
+		Search_Options_Checkbox_ShowTime                   : 'Afficher l\'heure',
 		Search_Options_Dialog_Header                       : 'Options de Recherche',
 		Search_Options_Group_Content                       : 'Que faut-il rechercher ?',
 		Search_Options_Group_Result                        : 'Résultats',
@@ -26,5 +28,5 @@ define(//
 		Search_Options_Label_SortAscending                 : 'Par Date',
 		Search_Options_Radio_SortAscending                 : 'Ascendant',
 		Search_Options_Radio_SortDescending                : 'Descendant',
-		Search_Validation_SearchFilter                     : 'Aucun résultat de trouvé avec ces options de recherche.'
+		Search_Validation_SearchFilter                     : 'Aucun résultat trouvé avec ces options de recherche.'
 });		
