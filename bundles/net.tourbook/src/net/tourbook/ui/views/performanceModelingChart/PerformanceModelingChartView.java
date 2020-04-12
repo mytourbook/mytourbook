@@ -1064,7 +1064,7 @@ public class PerformanceModelingChartView extends ViewPart {
 
       _comboNumberOfYears.removeAll();
 
-      final String[] yearsToDisplayList = ChartUtils.ProduceListOfYearsToBeDisplayed(_comboYear, selectedYearItem);
+      final String[] yearsToDisplayList = ChartUtils.produceListOfYearsToBeDisplayed(_comboYear, selectedYearItem);
       _comboNumberOfYears.setItems(yearsToDisplayList);
 
       final int currentNumberOfYears = _comboNumberOfYears.getSelectionIndex();
