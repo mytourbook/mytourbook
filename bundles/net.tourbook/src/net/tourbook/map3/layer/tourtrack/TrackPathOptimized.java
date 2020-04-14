@@ -1,9 +1,5 @@
 /*******************************************************************************
-<<<<<<< HEAD
- * Copyright (C) 2005, 2016, 2020 Wolfgang Schramm and Contributors
-=======
  * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
->>>>>>> refs/remotes/origin/master
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software

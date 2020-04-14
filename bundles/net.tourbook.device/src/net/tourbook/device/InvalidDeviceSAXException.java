@@ -9,11 +9,7 @@
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  * 
-<<<<<<< HEAD:net.tourbook.device.polar.hrm/src/net/tourbook/device/polar/hrm/Tour.java
- * You should have received a copy of the GNU General Public License along with 
-=======
  * You should have received a copy of the GNU General Public License along with
->>>>>>> 14432ce3ac8069f89f4901c9bf0eb194c103fb49:net.tourbook.device/src/net/tourbook/device/InvalidDeviceSAXException.java
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
