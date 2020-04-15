@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -104,7 +104,7 @@ public class GeoPartTourLoader {
 
          final char NL = UI.NEW_LINE;
 
-         final String selectGeoPart = "" //$NON-NLS-1$
+         final String selectGeoPart = UI.EMPTY_STRING
 
                + "SELECT" + NL //                       //$NON-NLS-1$
 
@@ -116,7 +116,7 @@ public class GeoPartTourLoader {
 
          if (isAppFilter) {
 
-            final String selectAppFilter = "" //$NON-NLS-1$
+            final String selectAppFilter = UI.EMPTY_STRING
 
                   + "SELECT" + NL //                    //$NON-NLS-1$
 

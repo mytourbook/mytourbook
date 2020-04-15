@@ -126,11 +126,11 @@ public class MapBookmark {
 
 				+ "id=" + id + ", " //$NON-NLS-1$ //$NON-NLS-2$
 				+ "name=" + name + ", " //$NON-NLS-1$ //$NON-NLS-2$
-				+ "latitude=" + _latitude + ", "
-				+ "longitude=" + _longitude + ", "
-	         + "marker lat=" + _mapPositionMarkerLatitude + ", "
-	         + "marker long=" + _mapPositionMarkerLongitude + ", "		
-	         + "bearing=" + _mapPosition.bearing + ", "
+				+ "latitude=" + _latitude + ", " //$NON-NLS-1$ //$NON-NLS-2$
+				+ "longitude=" + _longitude + ", " //$NON-NLS-1$ //$NON-NLS-2$
+	         + "marker lat=" + _mapPositionMarkerLatitude + ", " //$NON-NLS-1$ //$NON-NLS-2$
+	         + "marker long=" + _mapPositionMarkerLongitude + ", " //$NON-NLS-1$ //$NON-NLS-2$
+	         + "bearing=" + _mapPosition.bearing + ", " //$NON-NLS-1$ //$NON-NLS-2$
 				+ "]"; //$NON-NLS-1$
 	}
 

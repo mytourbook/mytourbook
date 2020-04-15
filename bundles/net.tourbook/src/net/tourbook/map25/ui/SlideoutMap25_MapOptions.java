@@ -54,12 +54,12 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
    private MouseWheelListener _defaultMouseWheelListener;
    private FocusListener      _keepOpenListener;
    private SelectionAdapter   _layerSelectionListener;
-   private Listener      _btn_refresh_Bookmark_listener;
+   private Listener           _btn_refresh_Bookmark_listener;
    private PixelConverter     _pc;
 
    private Map25View          _map25View;
 
-   /*
+   /**
     * UI controls
     */
    private Composite _parent;
@@ -67,14 +67,11 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
    private Button    _chkShowLayer_BaseMap;
    private Button    _chkShowLayer_Building;
    private Button    _chkShowLayer_Hillshading;
-   private Button    _chkShowLayer_Satellite;  
+   private Button    _chkShowLayer_Satellite;
    private Button    _chkShowLayer_Label;
    private Button    _chkShowLayer_Scale;
    private Button    _chkShowLayer_TileInfo;
 
-//   private Button    _chkShowLayer_Bookmark;
-//   private Button    _btn_refresh_Bookmark;
-//   private Button    _chkShowLayer_S3DB;
    private Button    _chkUseDraggedKeyboardNavigation;
 
    private Spinner   _spinnerHillshadingOpacity;
@@ -136,7 +133,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 
    private void createUI_10_Title(final Composite parent) {
 
-      /*
+      /**
        * Label: Slideout title
        */
       final Label label = new Label(parent, SWT.NONE);
@@ -159,7 +156,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
       GridLayoutFactory.swtDefaults().numColumns(1).applyTo(group);
       {
          {
-            /*
+            /**
              * Text label
              */
             _chkShowLayer_Label = new Button(group, SWT.CHECK);
@@ -167,7 +164,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
             _chkShowLayer_Label.addSelectionListener(_layerSelectionListener);
          }
          {
-            /*
+            /**
              * Building
              */
             _chkShowLayer_Building = new Button(group, SWT.CHECK);
@@ -176,39 +173,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
          }
 
          {
-            /*
-             * S3DB
-             */
-            //    _chkShowLayer_S3DB = new Button(group, SWT.CHECK);
-            //    _chkShowLayer_S3DB.setText("Advanced Builings");
-            //    _chkShowLayer_S3DB.addSelectionListener(_layerSelectionListener);
-         } 
-
-
-         {
-            /*
-             * Bookmark
-             */    
-/*            final Composite containerBookmark = new Composite(group, SWT.NONE);
-            GridDataFactory.fillDefaults().grab(true, false).applyTo(containerBookmark);
-            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerBookmark);
-            {
-               {
-                  _chkShowLayer_Bookmark = new Button(containerBookmark, SWT.CHECK);
-                  _chkShowLayer_Bookmark.setText("Bookmarks");
-                  _chkShowLayer_Bookmark.addSelectionListener(_layerSelectionListener);
-               }
-               {
-                  _btn_refresh_Bookmark = new Button(containerBookmark, SWT.PUSH);
-                  _btn_refresh_Bookmark.setText("Update");
-                  _btn_refresh_Bookmark.addListener(SWT.Selection, _btn_refresh_Bookmark_listener);
-               }
-            }*/
-         }
-
-
-         {
-            /*
+            /**
              * Hillshading
              */
             final Composite containerHillshading = new Composite(group, SWT.NONE);
@@ -221,7 +186,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
                   _chkShowLayer_Hillshading.addSelectionListener(_layerSelectionListener);
                }
                {
-                  /*
+                  /**
                    * Opacity
                    */
                   // spinner: fill
@@ -249,7 +214,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
             }
          }
          {
-            /*
+            /**
              * Scale
              */
             _chkShowLayer_Scale = new Button(group, SWT.CHECK);
@@ -257,7 +222,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
             _chkShowLayer_Scale.addSelectionListener(_layerSelectionListener);
          }
          {
-            /*
+            /**
              * Map
              */
             _chkShowLayer_BaseMap = new Button(group, SWT.CHECK);
@@ -267,18 +232,17 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
          }
 
          {
-            /*
+            /**
              * Satellite
              */
             _chkShowLayer_Satellite = new Button(group, SWT.CHECK);
-            _chkShowLayer_Satellite.setText("Satellite Map");
-            _chkShowLayer_Satellite.setToolTipText("Satellite Maps from ESRI");
+            _chkShowLayer_Satellite.setText(Messages.Slideout_Map25MapOptions_Checkbox_Layer_Satellite);
             _chkShowLayer_Satellite.addSelectionListener(_layerSelectionListener);
-         }        
+         }
 
 
          {
-            /*
+            /**
              * Tile info
              */
             _chkShowLayer_TileInfo = new Button(group, SWT.CHECK);
@@ -298,7 +262,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
             .applyTo(container);
       {
          {
-            /*
+            /**
              * Keyboard navigation
              */
 
@@ -352,7 +316,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
          @Override
          public void focusGained(final FocusEvent e) {
 
-            /*
+            /**
              * This will fix the problem that when the list of a combobox is displayed, then the
              * slideout will disappear :-(((
              */
@@ -371,7 +335,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
             onModify_Layer();
          }
       };
-      
+
       _btn_refresh_Bookmark_listener = new Listener() {
          @Override
          public void handleEvent(Event e) {
@@ -383,7 +347,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
             }
          }
       };
-      
+
    }
 
    private void onChangeUI() {
@@ -418,7 +382,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
       mapApp.getLayer_HillShading().setEnabled(_chkShowLayer_Hillshading.getSelection());
       // satellite maps
       mapApp.getLayer_Satellite().setEnabled(_chkShowLayer_Satellite.getSelection());
-      
+
       mapApp.getLayer_Label().setEnabled(_chkShowLayer_Label.getSelection());
       mapApp.getLayer_ScaleBar().setEnabled(_chkShowLayer_Scale.getSelection());
       mapApp.getLayer_TileInfo().setEnabled(_chkShowLayer_TileInfo.getSelection());
@@ -426,9 +390,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
       // switching off both building layers
       mapApp.getLayer_Building().setEnabled(_chkShowLayer_Building.getSelection());
       mapApp.getLayer_S3DB().setEnabled(_chkShowLayer_Building.getSelection());
-      
 
-      
       enableActions();
 
       mapApp.getMap().updateMap(true);
@@ -442,13 +404,13 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
       _chkShowLayer_Hillshading.setSelection(mapApp.getLayer_HillShading().isEnabled());
       //satellite maps
       _chkShowLayer_Satellite.setSelection(mapApp.getLayer_Satellite().isEnabled());
-      
+
       _chkShowLayer_Label.setSelection(mapApp.getLayer_Label().isEnabled());
       _chkShowLayer_Scale.setSelection(mapApp.getLayer_ScaleBar().isEnabled());
       _chkShowLayer_TileInfo.setSelection(mapApp.getLayer_TileInfo().isEnabled());
 
-      _chkShowLayer_Building.setSelection(mapApp.getLayer_Building().isEnabled());   
-      
+      _chkShowLayer_Building.setSelection(mapApp.getLayer_Building().isEnabled());
+
       _spinnerHillshadingOpacity.setSelection(mapApp.getLayer_HillShading_Opacity());
 
       _chkUseDraggedKeyboardNavigation.setSelection(Map25ConfigManager.useDraggedKeyboardNavigation);

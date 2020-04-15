@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -84,6 +84,9 @@ public class Messages extends NLS {
    public static String        ColumnFactory_driving_time;
    public static String        ColumnFactory_driving_time_label;
    public static String        ColumnFactory_driving_time_tooltip;
+   public static String        ColumnFactory_avg_gradient;
+   public static String        ColumnFactory_avg_gradient_label;
+   public static String        ColumnFactory_avg_gradient_tooltip;
    public static String        ColumnFactory_gradient;
    public static String        ColumnFactory_gradient_label;
    public static String        ColumnFactory_gradient_tooltip;
@@ -165,6 +168,7 @@ public class Messages extends NLS {
    public static String        ColumnFactory_tour_title;
    public static String        ColumnFactory_tour_title_label;
    public static String        ColumnFactory_tour_title_tooltip;
+   public static String        ColumnFactory_tour_type_header;
    public static String        ColumnFactory_tour_type_label;
    public static String        ColumnFactory_tour_type_tooltip;
    public static String        ColumnFactory_wind_speed_label;
@@ -209,6 +213,10 @@ public class Messages extends NLS {
    public static String        ColumnFactory_DPTolerance_Header;
    public static String        ColumnFactory_DPTolerance_Label;
    public static String        ColumnFactory_DPTolerance_Tooltip;
+   public static String        ColumnFactory_ElevationGainDelta_Label;
+   public static String        ColumnFactory_ElevationLossDelta_Label;
+   public static String        ColumnFactory_ElevationGainDelta_Tooltip;
+   public static String        ColumnFactory_ElevationLossDelta_Tooltip;
    public static String        ColumnFactory_GearFrontShiftCount_Header;
    public static String        ColumnFactory_GearFrontShiftCount_Label;
    public static String        ColumnFactory_GearFrontShiftCount_Tooltip;
@@ -248,6 +256,8 @@ public class Messages extends NLS {
    public static String        ColumnFactory_NumberOfTours_Header;
    public static String        ColumnFactory_NumberOfTours_Label;
    public static String        ColumnFactory_NumberOfTours_Tooltip;
+   public static String        ColumnFactory_PaceDelta_Label;
+   public static String        ColumnFactory_PaceDelta_Tooltip;
    public static String        ColumnFactory_PhotoTimeAdjustment_Header;
    public static String        ColumnFactory_PhotoTimeAdjustment_Label;
    public static String        ColumnFactory_PhotoTimeAdjustment_Tooltip;

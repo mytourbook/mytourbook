@@ -1,0 +1,51 @@
+20.3.0                                                     8. March 2020
+
+
+New + Improvements   
+==================
+
+* Tour Marker View (Frederic)
+
+  - Added the following column : Average slope
+  - Replaced pace difference column name by average pace
+
+All changes/fixes from Frederic are documented here
+ 
+
+* FIT File Import (bbbbbr)
+
+  - Added option to set Tour Type using Sport Name and Profile Name from
+    the simple imported file, more info is here.
+  - When easy import is used, then it will overwrite the tour type from 
+    the simple import, when it is accordingly configured.
+
+ 
+Bugfix   
+======
+
+* 3D Map (Thomas)
+
+  - Fixed java.lang.NoSuchMethodError: 
+    java.nio.FloatBuffer.clear()Ljava/nio/FloatBuffer
+  - This occured in Java 8 → tour tracks were not displayed
+
+ 
+* 3D Map (Frederic)
+
+  - Fixed a regression that appeared in 17.4.1 where the USGS layers 
+    disappeared in the 3D Map Layer menu (due to the fact that WorldWind
+    had changed the internal name of those layers from 
+    "Topographic" to "Topo Scanned")
+  - Fixed the pace format display for 3D map view
+
+ 
+* Conconi Test (Frederic)
+
+  - Disabling the deflection scale if there is no HR and/or power data 
+    (otherwise if the users modified the scale it would create an NPE)
+
+ 
+Translation    
+===========
+
+* French (Frederic)

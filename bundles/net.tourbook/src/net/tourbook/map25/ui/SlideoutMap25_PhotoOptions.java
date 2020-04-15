@@ -133,7 +133,7 @@ public class SlideoutMap25_PhotoOptions extends ToolbarSlideout {
        */
       final Label label = new Label(parent, SWT.NONE);
       //label.setText(Messages.Slideout_Map25MapOptions_Label_MapOptions);
-      label.setText("Slideout_Map25PhotoOptions_Label_PhotoOptions");
+      label.setText("Slideout_Map25PhotoOptions_Label_PhotoOptions"); //$NON-NLS-1$
       MTFont.setBannerFont(label);
       GridDataFactory
             .fillDefaults()//
@@ -144,7 +144,7 @@ public class SlideoutMap25_PhotoOptions extends ToolbarSlideout {
    private void createUI_50_Layer(final Composite parent) {
 
       final Group group = new Group(parent, SWT.NONE);
-      group.setText("Slideout_Map25PhotoOptions_Group_PhotoLayer");
+      group.setText("Slideout_Map25PhotoOptions_Group_PhotoLayer"); //$NON-NLS-1$
       GridDataFactory
             .fillDefaults()//
             .grab(true, false)
@@ -167,7 +167,7 @@ public class SlideoutMap25_PhotoOptions extends ToolbarSlideout {
              */
             _chkIsPhotoClustered = new Button(group, SWT.CHECK);
             //_chkIsPhotoClustering.setText(Messages.Slideout_Map25MapOptions_Checkbox_Layer_LabelSymbol);
-            _chkIsPhotoClustered.setText("Slideout_Map25PhotoOptions_Checkbox_Layer_Clustering");
+            _chkIsPhotoClustered.setText("Slideout_Map25PhotoOptions_Checkbox_Layer_Clustering"); //$NON-NLS-1$
             _chkIsPhotoClustered.addSelectionListener(_layerSelectionListener);
          }
          {
@@ -176,7 +176,7 @@ public class SlideoutMap25_PhotoOptions extends ToolbarSlideout {
              */
             _chkIsShowPhotoTitle = new Button(group, SWT.CHECK);
             //_chkIsShowPhotoTitle.setText(Messages.Slideout_Map25MapOptions_Checkbox_Layer_3DBuilding);
-            _chkIsShowPhotoTitle.setText("Slideout_Map25PhotoOptions_Checkbox_Layer_ShowTitle");
+            _chkIsShowPhotoTitle.setText("Slideout_Map25PhotoOptions_Checkbox_Layer_ShowTitle"); //$NON-NLS-1$
             _chkIsShowPhotoTitle.addSelectionListener(_layerSelectionListener);
          }
 
@@ -214,7 +214,7 @@ public class SlideoutMap25_PhotoOptions extends ToolbarSlideout {
    }
 
    private void enableActions() {
-      Map25App.debugPrint("slideout: enableActions");
+      Map25App.debugPrint("slideout: enableActions"); //$NON-NLS-1$
      // final boolean isHillShading = _chkShowLayer_Hillshading.getSelection();
 
      // _spinnerHillshadingOpacity.setEnabled(isHillShading);
@@ -224,7 +224,7 @@ public class SlideoutMap25_PhotoOptions extends ToolbarSlideout {
    }
 
    private void initUI(final Composite parent) {
-      Map25App.debugPrint("slideout: initUI"); 
+      Map25App.debugPrint("slideout: initUI");  //$NON-NLS-1$
       _parent = parent;
 
       _pc = new PixelConverter(parent);
@@ -261,7 +261,7 @@ public class SlideoutMap25_PhotoOptions extends ToolbarSlideout {
          public void widgetSelected(final SelectionEvent e) {
             onModify_Layer();
            _map25View.getMapApp();
-         Map25App.debugPrint("slideout: widget selected"); 
+         Map25App.debugPrint("slideout: widget selected");  //$NON-NLS-1$
          }
       };
 
@@ -269,7 +269,7 @@ public class SlideoutMap25_PhotoOptions extends ToolbarSlideout {
    }
 
    private void onChangeUI() {
-      Map25App.debugPrint("slideout: onChangeUI"); 
+      Map25App.debugPrint("slideout: onChangeUI");  //$NON-NLS-1$
       saveState();
 
       enableActions();
@@ -278,7 +278,7 @@ public class SlideoutMap25_PhotoOptions extends ToolbarSlideout {
 
 
    private void onModify_Layer() {
-      Map25App.debugPrint("slideout: onModify_Layer"); 
+      Map25App.debugPrint("slideout: onModify_Layer");  //$NON-NLS-1$
       final Map25App mapApp = _map25View.getMapApp();
 
      // mapApp.getLayer_Photo().setEnabled(_chkIsShowPhoto.getSelection());

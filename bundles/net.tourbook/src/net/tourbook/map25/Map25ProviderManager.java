@@ -91,15 +91,38 @@ public class Map25ProviderManager {
       _mapProviderListeners.add(listener);
    }
 
+   
    /**
-    * opensciencemap.org
+    * mapilion.com/
     */
-   private static Map25Provider createMapProvider_Default() {
+   private static Map25Provider createMapProvider_Mapilion() {
 
       final Map25Provider mapProvider = new Map25Provider();
 
       mapProvider.isDefault = true;
       mapProvider.isEnabled = true;
+      mapProvider.name = Messages.Map25_Provider_Mapilion_Name; //$NON-NLS-1$
+      mapProvider.online_url = "https://tiles.mapilion.com/data/v3"; //$NON-NLS-1$
+      mapProvider.online_TilePath = "/{Z}/{X}/{Y}.pbf"; //$NON-NLS-1$
+      mapProvider.tileEncoding = TileEncoding.MP;
+      mapProvider.theme = VtmThemes.OPENMAPTILES;
+      mapProvider.description = Messages.Map25_Provider_Mapilion_Description; //$NON-NLS-1$
+
+      _defaultMapProvider = mapProvider;
+
+      return mapProvider;
+   }
+   
+   
+   /**
+    * opensciencemap.org, server seems to be down since 2019-12
+    */
+   private static Map25Provider createMapProvider_Default() {
+
+      final Map25Provider mapProvider = new Map25Provider();
+
+      //mapProvider.isDefault = true;
+      mapProvider.isEnabled = false;
       mapProvider.name = Messages.Map25_Provider_OpenScienceMap_Name;
       mapProvider.online_url = "http://opensciencemap.org/tiles/vtm"; //$NON-NLS-1$
       mapProvider.online_TilePath = "/{Z}/{X}/{Y}.vtm"; //$NON-NLS-1$
@@ -107,7 +130,7 @@ public class Map25ProviderManager {
       mapProvider.theme = VtmThemes.DEFAULT;
       mapProvider.description = Messages.Map25_Provider_OpenScienceMap_Description;
 
-      _defaultMapProvider = mapProvider;
+      //_defaultMapProvider = mapProvider;
 
       return mapProvider;
    }
@@ -194,6 +217,10 @@ public class Map25ProviderManager {
       switch (tileEncoding) {
       case MVT:
          return VtmThemes.MAPZEN;
+
+         // Mapilion   
+      case MP:
+         return VtmThemes.OPENMAPTILES;
 
       // Open Science Map
       case VTM:
@@ -315,8 +342,6 @@ public class Map25ProviderManager {
                   } else {
 
                      mapProvider.online_ApiKey              = Util.getXmlString(xml, ATTR_ONLINE_API_KEY, UI.EMPTY_STRING);
-                     //mapProvider.online_TilePath            = Util.getXmlString(xml, ATTR_ONLINE_TILE_PATH, UI.EMPTY_STRING);
-                     //mapProvider.online_url                 = Util.getXmlString(xml, ATTR_ONLINE_URL, UI.EMPTY_STRING);                    
                      mapProvider.online_TilePath            = Util.getXmlString(xml, ATTR_ONLINE_TILE_PATH, "/{Z}/{X}/{Y}.vtm"); //$NON-NLS-1$
                      mapProvider.online_url                 = Util.getXmlString(xml, ATTR_ONLINE_URL, "http://opensciencemap.org/tiles/vtm"); //$NON-NLS-1$
                   }
@@ -330,8 +355,8 @@ public class Map25ProviderManager {
                         ? null
                         : (VtmThemes) Util.getXmlEnum(xml, ATTR_THEME, getDefaultTheme(tileEncoding));
 
-    /*              System.out.println("################## Name, Url and online_TilePath: " + mapProvider.name + " " + mapProvider.online_url //$NON-NLS-1$//$NON-NLS-2$
-                        + mapProvider.online_TilePath);*/
+                  Map25App.debugPrint("################## Name, Url and online_TilePath: " + mapProvider.name + " " + mapProvider.online_url //$NON-NLS-1$//$NON-NLS-2$
+                        + mapProvider.online_TilePath);
 
                   allMapProvider.add(mapProvider);
                }
@@ -345,16 +370,17 @@ public class Map25ProviderManager {
 
       } else {
 
-         /*
+         /**
           * Create default map providers
           */
          allMapProvider.add(_defaultMapProvider);
+         allMapProvider.add(createMapProvider_Mapilion());
          allMapProvider.add(createMapProvider_Mapzen());
          allMapProvider.add(createMapProvider_Mapsforge());
          allMapProvider.add(createMapProvider_MyTileServer());
       }
 
-      /*
+      /**
        * Ensure that at least one map provider is enabled
        */
       boolean isOneEnabled = false;

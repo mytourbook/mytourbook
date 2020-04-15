@@ -1,29 +1,31 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
- *   
+ * Copyright (C) 2005, 2020  Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software 
+ * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *  
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License along with 
+ *
+ * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA    
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 
 package net.tourbook.ui;
 
+import de.byteholder.geoclipse.map.UI;
+
 /* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
  * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
  * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
- * 
+ *
  * this is a copy from MessageManager.java, this implementation is using a Form instead of a ScrolledForm
- * 
+ *
  * New Methods: getMessageCount()
- *  
+ *
  * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
  * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
  * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -57,572 +59,621 @@ import org.eclipse.ui.forms.widgets.Hyperlink;
 
 public class MessageManager implements IMessageManager {
 
-	private static final DefaultPrefixProvider	DEFAULT_PREFIX_PROVIDER			= new DefaultPrefixProvider();
+   private static final DefaultPrefixProvider DEFAULT_PREFIX_PROVIDER       = new DefaultPrefixProvider();
 
-	private ArrayList							messages						= new ArrayList();
-	private Hashtable							decorators						= new Hashtable();
-	private boolean								autoUpdate						= true;
-	private Form								scrolledForm;
-	private IMessagePrefixProvider				prefixProvider					= DEFAULT_PREFIX_PROVIDER;
-	private int									decorationPosition				= SWT.LEFT | SWT.BOTTOM;
+   private static FieldDecoration             standardError                 = FieldDecorationRegistry.getDefault()
+         .getFieldDecoration(FieldDecorationRegistry.DEC_ERROR);
+   private static FieldDecoration             standardWarning               = FieldDecorationRegistry.getDefault()
+         .getFieldDecoration(FieldDecorationRegistry.DEC_WARNING);
+   private static FieldDecoration             standardInformation           = FieldDecorationRegistry.getDefault()
+         .getFieldDecoration(FieldDecorationRegistry.DEC_INFORMATION);
+   private static final String[]              SINGLE_MESSAGE_SUMMARY_KEYS   = {
+         Messages.message_manager_sMessageSummary,
+         Messages.message_manager_sMessageSummary,
+         Messages.message_manager_sWarningSummary,
+         Messages.message_manager_sErrorSummary };
+   private static final String[]              MULTIPLE_MESSAGE_SUMMARY_KEYS = {
+         Messages.message_manager_pMessageSummary,
+         Messages.message_manager_pMessageSummary,
+         Messages.message_manager_pWarningSummary,
+         Messages.message_manager_pErrorSummary };
+   private ArrayList                          messages                      = new ArrayList();
 
-	private static FieldDecoration				standardError					= FieldDecorationRegistry.getDefault()
-																						.getFieldDecoration(FieldDecorationRegistry.DEC_ERROR);
-	private static FieldDecoration				standardWarning					= FieldDecorationRegistry.getDefault()
-																						.getFieldDecoration(FieldDecorationRegistry.DEC_WARNING);
-	private static FieldDecoration				standardInformation				= FieldDecorationRegistry.getDefault()
-																						.getFieldDecoration(FieldDecorationRegistry.DEC_INFORMATION);
+   private Hashtable                          decorators                    = new Hashtable();
+   private boolean                            autoUpdate                    = true;
+   private Form                               scrolledForm;
 
-	private static final String[]				SINGLE_MESSAGE_SUMMARY_KEYS		= {
-			Messages.message_manager_sMessageSummary,
-			Messages.message_manager_sMessageSummary,
-			Messages.message_manager_sWarningSummary,
-			Messages.message_manager_sErrorSummary								};
+   private IMessagePrefixProvider             prefixProvider                = DEFAULT_PREFIX_PROVIDER;
 
-	private static final String[]				MULTIPLE_MESSAGE_SUMMARY_KEYS	= {
-			Messages.message_manager_pMessageSummary,
-			Messages.message_manager_pMessageSummary,
-			Messages.message_manager_pWarningSummary,
-			Messages.message_manager_pErrorSummary								};
+   private int                                decorationPosition            = SWT.LEFT | SWT.BOTTOM;
 
-	class ControlDecorator {
-		private ControlDecoration	decoration;
-		private ArrayList			controlMessages	= new ArrayList();
-		private String				prefix;
+   class ControlDecorator {
+      private ControlDecoration decoration;
+      private ArrayList         controlMessages = new ArrayList();
+      private String            prefix;
 
-		ControlDecorator(final Control control) {
-			this.decoration = new ControlDecoration(control, decorationPosition, scrolledForm.getBody());
-		}
+      ControlDecorator(final Control control) {
+         this.decoration = new ControlDecoration(control, decorationPosition, scrolledForm.getBody());
+      }
 
-		void addAll(final ArrayList target) {
-			target.addAll(controlMessages);
-		}
+      void addAll(final ArrayList target) {
+         target.addAll(controlMessages);
+      }
 
-		void addMessage(final Object key, final String text, final Object data, final int type) {
-			final Message message = MessageManager.this.addMessage(getPrefix(), key, text, data, type, controlMessages);
-			message.control = decoration.getControl();
-			if (isAutoUpdate())
-				update();
-		}
+      void addMessage(final Object key, final String text, final Object data, final int type) {
+         final Message message = MessageManager.this.addMessage(getPrefix(), key, text, data, type, controlMessages);
+         message.control = decoration.getControl();
+         if (isAutoUpdate()) {
+            update();
+         }
+      }
 
-		private void createPrefix() {
-			if (prefixProvider == null) {
-				prefix = ""; //$NON-NLS-1$
-				return;
-			}
-			prefix = prefixProvider.getPrefix(decoration.getControl());
-			if (prefix == null)
-				// make a prefix anyway
-				prefix = ""; //$NON-NLS-1$
-		}
+      private void createPrefix() {
+         if (prefixProvider == null) {
+            prefix = UI.EMPTY_STRING;
+            return;
+         }
+         prefix = prefixProvider.getPrefix(decoration.getControl());
+         if (prefix == null) {
+            // make a prefix anyway
+            prefix = UI.EMPTY_STRING;
+         }
+      }
 
-		String getPrefix() {
-			if (prefix == null)
-				createPrefix();
-			return prefix;
-		}
+      String getPrefix() {
+         if (prefix == null) {
+            createPrefix();
+         }
+         return prefix;
+      }
 
-		public boolean isDisposed() {
-			return decoration.getControl() == null;
-		}
+      public boolean isDisposed() {
+         return decoration.getControl() == null;
+      }
 
-		boolean removeMessage(final Object key) {
-			final Message message = findMessage(key, controlMessages);
-			if (message != null) {
-				controlMessages.remove(message);
-				if (isAutoUpdate())
-					update();
-			}
-			return message != null;
-		}
+      boolean removeMessage(final Object key) {
+         final Message message = findMessage(key, controlMessages);
+         if (message != null) {
+            controlMessages.remove(message);
+            if (isAutoUpdate()) {
+               update();
+            }
+         }
+         return message != null;
+      }
 
-		boolean removeMessages() {
-			if (controlMessages.isEmpty())
-				return false;
-			controlMessages.clear();
-			if (isAutoUpdate())
-				update();
-			return true;
-		}
+      boolean removeMessages() {
+         if (controlMessages.isEmpty()) {
+            return false;
+         }
+         controlMessages.clear();
+         if (isAutoUpdate()) {
+            update();
+         }
+         return true;
+      }
 
-		public void update() {
-			if (controlMessages.isEmpty()) {
-				decoration.setDescriptionText(null);
-				decoration.hide();
-			} else {
-				final ArrayList peers = createPeers(controlMessages);
-				final int type = ((IMessage) peers.get(0)).getMessageType();
-				final String description = createDetails(createPeers(peers), true);
-				if (type == IMessageProvider.ERROR)
-					decoration.setImage(standardError.getImage());
-				else if (type == IMessageProvider.WARNING)
-					decoration.setImage(standardWarning.getImage());
-				else if (type == IMessageProvider.INFORMATION)
-					decoration.setImage(standardInformation.getImage());
-				decoration.setDescriptionText(description);
-				decoration.show();
-			}
-		}
+      public void update() {
+         if (controlMessages.isEmpty()) {
+            decoration.setDescriptionText(null);
+            decoration.hide();
+         } else {
+            final ArrayList peers = createPeers(controlMessages);
+            final int type = ((IMessage) peers.get(0)).getMessageType();
+            final String description = createDetails(createPeers(peers), true);
+            if (type == IMessageProvider.ERROR) {
+               decoration.setImage(standardError.getImage());
+            } else if (type == IMessageProvider.WARNING) {
+               decoration.setImage(standardWarning.getImage());
+            } else if (type == IMessageProvider.INFORMATION) {
+               decoration.setImage(standardInformation.getImage());
+            }
+            decoration.setDescriptionText(description);
+            decoration.show();
+         }
+      }
 
-		void updatePosition() {
-			final Control control = decoration.getControl();
-			decoration.dispose();
-			this.decoration = new ControlDecoration(control, decorationPosition, scrolledForm.getBody());
-			update();
-		}
+      void updatePosition() {
+         final Control control = decoration.getControl();
+         decoration.dispose();
+         this.decoration = new ControlDecoration(control, decorationPosition, scrolledForm.getBody());
+         update();
+      }
 
-		void updatePrefix() {
-			prefix = null;
-		}
-	}
+      void updatePrefix() {
+         prefix = null;
+      }
+   }
 
-	static class DefaultPrefixProvider implements IMessagePrefixProvider {
+   static class DefaultPrefixProvider implements IMessagePrefixProvider {
 
-		public String getPrefix(final Control c) {
-			final Composite parent = c.getParent();
-			final Control[] siblings = parent.getChildren();
-			for (int i = 0; i < siblings.length; i++) {
-				if (siblings[i] == c) {
-					// this is us - go backward until you hit
-					// a label-like widget
-					for (int j = i - 1; j >= 0; j--) {
-						final Control label = siblings[j];
-						String ltext = null;
-						if (label instanceof Label) {
-							ltext = ((Label) label).getText();
-						} else if (label instanceof Hyperlink) {
-							ltext = ((Hyperlink) label).getText();
-						} else if (label instanceof CLabel) {
-							ltext = ((CLabel) label).getText();
-						}
-						if (ltext != null) {
-							if (!ltext.endsWith(":")) //$NON-NLS-1$
-								return ltext + ": "; //$NON-NLS-1$
-							return ltext + " "; //$NON-NLS-1$
-						}
-					}
-					break;
-				}
-			}
-			return null;
-		}
-	}
+      @Override
+      public String getPrefix(final Control c) {
+         final Composite parent = c.getParent();
+         final Control[] siblings = parent.getChildren();
+         for (int i = 0; i < siblings.length; i++) {
+            if (siblings[i] == c) {
+               // this is us - go backward until you hit
+               // a label-like widget
+               for (int j = i - 1; j >= 0; j--) {
+                  final Control label = siblings[j];
+                  String ltext = null;
+                  if (label instanceof Label) {
+                     ltext = ((Label) label).getText();
+                  } else if (label instanceof Hyperlink) {
+                     ltext = ((Hyperlink) label).getText();
+                  } else if (label instanceof CLabel) {
+                     ltext = ((CLabel) label).getText();
+                  }
+                  if (ltext != null) {
+                     if (!ltext.endsWith(":")) {
+                        return ltext + ": "; //$NON-NLS-1$
+                     }
+                     return ltext + " "; //$NON-NLS-1$
+                  }
+               }
+               break;
+            }
+         }
+         return null;
+      }
+   }
 
-	static class Message implements IMessage {
-		Control	control;
-		Object	data;
-		Object	key;
-		String	message;
-		int		type;
-		String	prefix;
+   static class Message implements IMessage {
+      Control control;
+      Object  data;
+      Object  key;
+      String  message;
+      int     type;
+      String  prefix;
 
-		Message(final Object key, final String message, final int type, final Object data) {
-			this.key = key;
-			this.message = message;
-			this.type = type;
-			this.data = data;
-		}
+      Message(final Object key, final String message, final int type, final Object data) {
+         this.key = key;
+         this.message = message;
+         this.type = type;
+         this.data = data;
+      }
 
-		/*
-		 * (non-Javadoc)
-		 * @see org.eclipse.ui.forms.messages.IMessage#getControl()
-		 */
-		public Control getControl() {
-			return control;
-		}
+      /*
+       * (non-Javadoc)
+       * @see org.eclipse.ui.forms.messages.IMessage#getControl()
+       */
+      @Override
+      public Control getControl() {
+         return control;
+      }
 
-		/*
-		 * (non-Javadoc)
-		 * @see org.eclipse.ui.forms.messages.IMessage#getData()
-		 */
-		public Object getData() {
-			return data;
-		}
+      /*
+       * (non-Javadoc)
+       * @see org.eclipse.ui.forms.messages.IMessage#getData()
+       */
+      @Override
+      public Object getData() {
+         return data;
+      }
 
-		/*
-		 * (non-Javadoc)
-		 * @see org.eclipse.jface.dialogs.IMessage#getKey()
-		 */
-		public Object getKey() {
-			return key;
-		}
+      /*
+       * (non-Javadoc)
+       * @see org.eclipse.jface.dialogs.IMessage#getKey()
+       */
+      @Override
+      public Object getKey() {
+         return key;
+      }
 
-		/*
-		 * (non-Javadoc)
-		 * @see org.eclipse.jface.dialogs.IMessageProvider#getMessage()
-		 */
-		public String getMessage() {
-			return message;
-		}
+      /*
+       * (non-Javadoc)
+       * @see org.eclipse.jface.dialogs.IMessageProvider#getMessage()
+       */
+      @Override
+      public String getMessage() {
+         return message;
+      }
 
-		/*
-		 * (non-Javadoc)
-		 * @see org.eclipse.jface.dialogs.IMessageProvider#getMessageType()
-		 */
-		public int getMessageType() {
-			return type;
-		}
+      /*
+       * (non-Javadoc)
+       * @see org.eclipse.jface.dialogs.IMessageProvider#getMessageType()
+       */
+      @Override
+      public int getMessageType() {
+         return type;
+      }
 
-		/*
-		 * (non-Javadoc)
-		 * @see org.eclipse.ui.forms.messages.IMessage#getPrefix()
-		 */
-		public String getPrefix() {
-			return prefix;
-		}
-	}
+      /*
+       * (non-Javadoc)
+       * @see org.eclipse.ui.forms.messages.IMessage#getPrefix()
+       */
+      @Override
+      public String getPrefix() {
+         return prefix;
+      }
+   }
 
-	public static String createDetails(final IMessage[] messages) {
-		if (messages == null || messages.length == 0)
-			return null;
-		final StringWriter sw = new StringWriter();
-		final PrintWriter out = new PrintWriter(sw);
+   /**
+    * Creates a new instance of the message manager that will work with the provided form.
+    *
+    * @param scrolledForm
+    *           the form to control
+    */
+   public MessageManager(final Form scrolledForm) {
+      this.scrolledForm = scrolledForm;
+   }
 
-		for (int i = 0; i < messages.length; i++) {
-			if (i > 0)
-				out.println();
-			out.print(getFullMessage(messages[i]));
-		}
-		out.flush();
-		return sw.toString();
-	}
+   public static String createDetails(final IMessage[] messages) {
+      if (messages == null || messages.length == 0) {
+         return null;
+      }
+      final StringWriter sw = new StringWriter();
+      final PrintWriter out = new PrintWriter(sw);
 
-	private static String getFullMessage(final IMessage message) {
-		if (message.getPrefix() == null)
-			return message.getMessage();
-		return message.getPrefix() + message.getMessage();
-	}
+      for (int i = 0; i < messages.length; i++) {
+         if (i > 0) {
+            out.println();
+         }
+         out.print(getFullMessage(messages[i]));
+      }
+      out.flush();
+      return sw.toString();
+   }
 
-	/**
-	 * Creates a new instance of the message manager that will work with the provided form.
-	 * 
-	 * @param scrolledForm
-	 *            the form to control
-	 */
-	public MessageManager(final Form scrolledForm) {
-		this.scrolledForm = scrolledForm;
-	}
+   private static String getFullMessage(final IMessage message) {
+      if (message.getPrefix() == null) {
+         return message.getMessage();
+      }
+      return message.getPrefix() + message.getMessage();
+   }
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.forms.IMessageManager#addMessage(java.lang.Object, java.lang.String, int)
-	 */
-	public void addMessage(final Object key, final String messageText, final Object data, final int type) {
-		addMessage(null, key, messageText, data, type, messages);
-		if (isAutoUpdate())
-			updateForm();
-	}
+   /*
+    * (non-Javadoc)
+    * @see org.eclipse.ui.forms.IMessageManager#addMessage(java.lang.Object, java.lang.String, int)
+    */
+   @Override
+   public void addMessage(final Object key, final String messageText, final Object data, final int type) {
+      addMessage(null, key, messageText, data, type, messages);
+      if (isAutoUpdate()) {
+         updateForm();
+      }
+   }
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.forms.IMessageManager#addMessage(java.lang.Object, java.lang.String, int,
-	 * org.eclipse.swt.widgets.Control)
-	 */
-	public void addMessage(	final Object key,
-							final String messageText,
-							final Object data,
-							final int type,
-							final Control control) {
-		ControlDecorator dec = (ControlDecorator) decorators.get(control);
+   /*
+    * (non-Javadoc)
+    * @see org.eclipse.ui.forms.IMessageManager#addMessage(java.lang.Object, java.lang.String, int,
+    * org.eclipse.swt.widgets.Control)
+    */
+   @Override
+   public void addMessage(final Object key,
+                          final String messageText,
+                          final Object data,
+                          final int type,
+                          final Control control) {
+      ControlDecorator dec = (ControlDecorator) decorators.get(control);
 
-		if (dec == null) {
-			dec = new ControlDecorator(control);
-			decorators.put(control, dec);
-		}
-		dec.addMessage(key, messageText, data, type);
-		if (isAutoUpdate())
-			updateForm();
-	}
+      if (dec == null) {
+         dec = new ControlDecorator(control);
+         decorators.put(control, dec);
+      }
+      dec.addMessage(key, messageText, data, type);
+      if (isAutoUpdate()) {
+         updateForm();
+      }
+   }
 
-	private Message addMessage(	final String prefix,
-								final Object key,
-								final String messageText,
-								final Object data,
-								final int type,
-								final ArrayList list) {
-		Message message = findMessage(key, list);
-		if (message == null) {
-			message = new Message(key, messageText, type, data);
-			message.prefix = prefix;
-			list.add(message);
-		} else {
-			message.message = messageText;
-			message.type = type;
-			message.data = data;
-		}
-		return message;
-	}
+   private Message addMessage(final String prefix,
+                              final Object key,
+                              final String messageText,
+                              final Object data,
+                              final int type,
+                              final ArrayList list) {
+      Message message = findMessage(key, list);
+      if (message == null) {
+         message = new Message(key, messageText, type, data);
+         message.prefix = prefix;
+         list.add(message);
+      } else {
+         message.message = messageText;
+         message.type = type;
+         message.data = data;
+      }
+      return message;
+   }
 
-	private String createDetails(final ArrayList messages, final boolean excludePrefix) {
-		final StringWriter sw = new StringWriter();
-		final PrintWriter out = new PrintWriter(sw);
+   private String createDetails(final ArrayList messages, final boolean excludePrefix) {
+      final StringWriter sw = new StringWriter();
+      final PrintWriter out = new PrintWriter(sw);
 
-		for (int i = 0; i < messages.size(); i++) {
-			if (i > 0)
-				out.println();
-			final IMessage m = (IMessage) messages.get(i);
-			out.print(excludePrefix ? m.getMessage() : getFullMessage(m));
-		}
-		out.flush();
-		return sw.toString();
-	}
+      for (int i = 0; i < messages.size(); i++) {
+         if (i > 0) {
+            out.println();
+         }
+         final IMessage m = (IMessage) messages.get(i);
+         out.print(excludePrefix ? m.getMessage() : getFullMessage(m));
+      }
+      out.flush();
+      return sw.toString();
+   }
 
-	private ArrayList createPeers(final ArrayList messages) {
-		final ArrayList peers = new ArrayList();
-		int maxType = 0;
-		for (int i = 0; i < messages.size(); i++) {
-			final Message message = (Message) messages.get(i);
-			if (message.type > maxType) {
-				peers.clear();
-				maxType = message.type;
-			}
-			if (message.type == maxType)
-				peers.add(message);
-		}
-		return peers;
-	}
+   private ArrayList createPeers(final ArrayList messages) {
+      final ArrayList peers = new ArrayList();
+      int maxType = 0;
+      for (int i = 0; i < messages.size(); i++) {
+         final Message message = (Message) messages.get(i);
+         if (message.type > maxType) {
+            peers.clear();
+            maxType = message.type;
+         }
+         if (message.type == maxType) {
+            peers.add(message);
+         }
+      }
+      return peers;
+   }
 
-	/*
-	 * Adds the message if it does not already exist in the provided list.
-	 */
+   /*
+    * Adds the message if it does not already exist in the provided list.
+    */
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.forms.IMessageManager#createSummary(org.eclipse.ui.forms.IMessage[])
-	 */
-	public String createSummary(final IMessage[] messages) {
-		return createDetails(messages);
-	}
+   /*
+    * (non-Javadoc)
+    * @see org.eclipse.ui.forms.IMessageManager#createSummary(org.eclipse.ui.forms.IMessage[])
+    */
+   @Override
+   public String createSummary(final IMessage[] messages) {
+      return createDetails(messages);
+   }
 
-	/*
-	 * Finds the message with the provided key in the provided list.
-	 */
+   /*
+    * Finds the message with the provided key in the provided list.
+    */
 
-	private Message findMessage(final Object key, final ArrayList list) {
-		for (int i = 0; i < list.size(); i++) {
-			final Message message = (Message) list.get(i);
-			if (message.getKey().equals(key))
-				return message;
-		}
-		return null;
-	}
+   private Message findMessage(final Object key, final ArrayList list) {
+      for (final Object element : list) {
+         final Message message = (Message) element;
+         if (message.getKey().equals(key)) {
+            return message;
+         }
+      }
+      return null;
+   }
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.forms.IMessageManager#getDecorationPosition()
-	 */
-	public int getDecorationPosition() {
-		return decorationPosition;
-	}
+   /*
+    * (non-Javadoc)
+    * @see org.eclipse.ui.forms.IMessageManager#getDecorationPosition()
+    */
+   @Override
+   public int getDecorationPosition() {
+      return decorationPosition;
+   }
 
-	/*
-	 * Updates the container by rolling the messages up from the controls.
-	 */
+   /*
+    * Updates the container by rolling the messages up from the controls.
+    */
 
-	/**
-	 * @return Returns the number of error messages
-	 */
-	@SuppressWarnings("unchecked")
-	public int getErrorMessageCount() {
+   /**
+    * @return Returns the number of error messages
+    */
+   @SuppressWarnings("unchecked")
+   public int getErrorMessageCount() {
 
-		int errors = 0;
+      int errors = 0;
 
-		for (final Enumeration<ControlDecorator> enm = decorators.elements(); enm.hasMoreElements();) {
-			final ControlDecorator dec = enm.nextElement();
-			final ArrayList<?> allMessages = dec.controlMessages;
+      for (final Enumeration<ControlDecorator> enm = decorators.elements(); enm.hasMoreElements();) {
+         final ControlDecorator dec = enm.nextElement();
+         final ArrayList<?> allMessages = dec.controlMessages;
 
-			for (final Object object : allMessages) {
-				if (object instanceof Message) {
-					final Message message = (Message) object;
-					if (message.getMessageType() == IMessageProvider.ERROR) {
-						errors++;
-					}
-				}
-			}
-		}
+         for (final Object object : allMessages) {
+            if (object instanceof Message) {
+               final Message message = (Message) object;
+               if (message.getMessageType() == IMessageProvider.ERROR) {
+                  errors++;
+               }
+            }
+         }
+      }
 
-		return errors;
-	}
+      return errors;
+   }
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.forms.IMessageManager#getMessagePrefixProvider()
-	 */
-	public IMessagePrefixProvider getMessagePrefixProvider() {
-		return prefixProvider;
-	}
+   /*
+    * (non-Javadoc)
+    * @see org.eclipse.ui.forms.IMessageManager#getMessagePrefixProvider()
+    */
+   @Override
+   public IMessagePrefixProvider getMessagePrefixProvider() {
+      return prefixProvider;
+   }
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.forms.IMessageManager#isAutoUpdate()
-	 */
-	public boolean isAutoUpdate() {
-		return autoUpdate;
-	}
+   /*
+    * (non-Javadoc)
+    * @see org.eclipse.ui.forms.IMessageManager#isAutoUpdate()
+    */
+   @Override
+   public boolean isAutoUpdate() {
+      return autoUpdate;
+   }
 
-	private void pruneControlDecorators() {
-		for (final Iterator iter = decorators.values().iterator(); iter.hasNext();) {
-			final ControlDecorator dec = (ControlDecorator) iter.next();
-			if (dec.isDisposed())
-				iter.remove();
-		}
-	}
+   private void pruneControlDecorators() {
+      for (final Iterator iter = decorators.values().iterator(); iter.hasNext();) {
+         final ControlDecorator dec = (ControlDecorator) iter.next();
+         if (dec.isDisposed()) {
+            iter.remove();
+         }
+      }
+   }
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.forms.IMessageManager#removeAllMessages()
-	 */
-	public void removeAllMessages() {
-		boolean needsUpdate = false;
-		for (final Enumeration enm = decorators.elements(); enm.hasMoreElements();) {
-			final ControlDecorator control = (ControlDecorator) enm.nextElement();
-			if (control.removeMessages())
-				needsUpdate = true;
-		}
-		if (!messages.isEmpty()) {
-			messages.clear();
-			needsUpdate = true;
-		}
-		if (needsUpdate && isAutoUpdate())
-			updateForm();
-	}
+   /*
+    * (non-Javadoc)
+    * @see org.eclipse.ui.forms.IMessageManager#removeAllMessages()
+    */
+   @Override
+   public void removeAllMessages() {
+      boolean needsUpdate = false;
+      for (final Enumeration enm = decorators.elements(); enm.hasMoreElements();) {
+         final ControlDecorator control = (ControlDecorator) enm.nextElement();
+         if (control.removeMessages()) {
+            needsUpdate = true;
+         }
+      }
+      if (!messages.isEmpty()) {
+         messages.clear();
+         needsUpdate = true;
+      }
+      if (needsUpdate && isAutoUpdate()) {
+         updateForm();
+      }
+   }
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.forms.IMessageManager#removeMessage(java.lang.Object)
-	 */
-	public void removeMessage(final Object key) {
-		final Message message = findMessage(key, messages);
-		if (message != null) {
-			messages.remove(message);
-			if (isAutoUpdate())
-				updateForm();
-		}
-	}
+   /*
+    * (non-Javadoc)
+    * @see org.eclipse.ui.forms.IMessageManager#removeMessage(java.lang.Object)
+    */
+   @Override
+   public void removeMessage(final Object key) {
+      final Message message = findMessage(key, messages);
+      if (message != null) {
+         messages.remove(message);
+         if (isAutoUpdate()) {
+            updateForm();
+         }
+      }
+   }
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.forms.IMessageManager#removeMessage(java.lang.Object,
-	 * org.eclipse.swt.widgets.Control)
-	 */
-	public void removeMessage(final Object key, final Control control) {
-		final ControlDecorator dec = (ControlDecorator) decorators.get(control);
-		if (dec == null)
-			return;
-		if (dec.removeMessage(key))
-			if (isAutoUpdate())
-				updateForm();
-	}
+   /*
+    * (non-Javadoc)
+    * @see org.eclipse.ui.forms.IMessageManager#removeMessage(java.lang.Object,
+    * org.eclipse.swt.widgets.Control)
+    */
+   @Override
+   public void removeMessage(final Object key, final Control control) {
+      final ControlDecorator dec = (ControlDecorator) decorators.get(control);
+      if (dec == null) {
+         return;
+      }
+      if (dec.removeMessage(key)) {
+         if (isAutoUpdate()) {
+            updateForm();
+         }
+      }
+   }
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.forms.IMessageManager#removeMessages()
-	 */
-	public void removeMessages() {
-		if (!messages.isEmpty()) {
-			messages.clear();
-			if (isAutoUpdate())
-				updateForm();
-		}
-	}
+   /*
+    * (non-Javadoc)
+    * @see org.eclipse.ui.forms.IMessageManager#removeMessages()
+    */
+   @Override
+   public void removeMessages() {
+      if (!messages.isEmpty()) {
+         messages.clear();
+         if (isAutoUpdate()) {
+            updateForm();
+         }
+      }
+   }
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.forms.IMessageManager#removeMessages(org.eclipse.swt.widgets.Control)
-	 */
-	public void removeMessages(final Control control) {
-		final ControlDecorator dec = (ControlDecorator) decorators.get(control);
-		if (dec != null) {
-			if (dec.removeMessages()) {
-				if (isAutoUpdate())
-					updateForm();
-			}
-		}
-	}
+   /*
+    * (non-Javadoc)
+    * @see org.eclipse.ui.forms.IMessageManager#removeMessages(org.eclipse.swt.widgets.Control)
+    */
+   @Override
+   public void removeMessages(final Control control) {
+      final ControlDecorator dec = (ControlDecorator) decorators.get(control);
+      if (dec != null) {
+         if (dec.removeMessages()) {
+            if (isAutoUpdate()) {
+               updateForm();
+            }
+         }
+      }
+   }
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.forms.IMessageManager#setAutoUpdate(boolean)
-	 */
-	public void setAutoUpdate(final boolean autoUpdate) {
-		final boolean needsUpdate = !this.autoUpdate && autoUpdate;
-		this.autoUpdate = autoUpdate;
-		if (needsUpdate)
-			update();
-	}
+   /*
+    * (non-Javadoc)
+    * @see org.eclipse.ui.forms.IMessageManager#setAutoUpdate(boolean)
+    */
+   @Override
+   public void setAutoUpdate(final boolean autoUpdate) {
+      final boolean needsUpdate = !this.autoUpdate && autoUpdate;
+      this.autoUpdate = autoUpdate;
+      if (needsUpdate) {
+         update();
+      }
+   }
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.forms.IMessageManager#setDecorationPosition(int)
-	 */
-	public void setDecorationPosition(final int position) {
-		this.decorationPosition = position;
-		for (final Iterator iter = decorators.values().iterator(); iter.hasNext();) {
-			final ControlDecorator dec = (ControlDecorator) iter.next();
-			dec.updatePosition();
-		}
-	}
+   /*
+    * (non-Javadoc)
+    * @see org.eclipse.ui.forms.IMessageManager#setDecorationPosition(int)
+    */
+   @Override
+   public void setDecorationPosition(final int position) {
+      this.decorationPosition = position;
+      for (final Iterator iter = decorators.values().iterator(); iter.hasNext();) {
+         final ControlDecorator dec = (ControlDecorator) iter.next();
+         dec.updatePosition();
+      }
+   }
 
-	/*
-	 * (non-Javadoc)
-	 * @seeorg.eclipse.ui.forms.IMessageManager#setMessagePrefixProvider(org.eclipse.ui.forms.
-	 * IMessagePrefixProvider)
-	 */
-	public void setMessagePrefixProvider(final IMessagePrefixProvider provider) {
-		this.prefixProvider = provider;
-		for (final Iterator iter = decorators.values().iterator(); iter.hasNext();) {
-			final ControlDecorator dec = (ControlDecorator) iter.next();
-			dec.updatePrefix();
-		}
-	}
+   /*
+    * (non-Javadoc)
+    * @seeorg.eclipse.ui.forms.IMessageManager#setMessagePrefixProvider(org.eclipse.ui.forms.
+    * IMessagePrefixProvider)
+    */
+   @Override
+   public void setMessagePrefixProvider(final IMessagePrefixProvider provider) {
+      this.prefixProvider = provider;
+      for (final Iterator iter = decorators.values().iterator(); iter.hasNext();) {
+         final ControlDecorator dec = (ControlDecorator) iter.next();
+         dec.updatePrefix();
+      }
+   }
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.forms.IMessageManager#update()
-	 */
-	public void update() {
-		// Update decorations
-		for (final Iterator iter = decorators.values().iterator(); iter.hasNext();) {
-			final ControlDecorator dec = (ControlDecorator) iter.next();
-			dec.update();
-		}
-		// Update the form
-		updateForm();
-	}
+   /*
+    * (non-Javadoc)
+    * @see org.eclipse.ui.forms.IMessageManager#update()
+    */
+   @Override
+   public void update() {
+      // Update decorations
+      for (final Iterator iter = decorators.values().iterator(); iter.hasNext();) {
+         final ControlDecorator dec = (ControlDecorator) iter.next();
+         dec.update();
+      }
+      // Update the form
+      updateForm();
+   }
 
-	private void update(final ArrayList mergedList) {
-		pruneControlDecorators();
-		if (scrolledForm.getHead().getBounds().height == 0 || mergedList.isEmpty() || mergedList == null) {
-			scrolledForm.setMessage(null, IMessageProvider.NONE);
-			return;
-		}
-		final ArrayList peers = createPeers(mergedList);
-		final int maxType = ((IMessage) peers.get(0)).getMessageType();
-		String messageText;
-		final IMessage[] array = (IMessage[]) peers.toArray(new IMessage[peers.size()]);
-		if (peers.size() == 1 && ((Message) peers.get(0)).prefix == null) {
-			// a single message
-			final IMessage message = (IMessage) peers.get(0);
-			messageText = message.getMessage();
-			scrolledForm.setMessage(messageText, maxType, array);
-		} else {
-			// show a summary message for the message
-			// and list of errors for the details
-			if (peers.size() > 1)
-				messageText = Messages.bind(MULTIPLE_MESSAGE_SUMMARY_KEYS[maxType], new String[] { peers.size() + "" }); //$NON-NLS-1$
-			else
-				messageText = SINGLE_MESSAGE_SUMMARY_KEYS[maxType];
-			scrolledForm.setMessage(messageText, maxType, array);
-		}
-	}
+   private void update(final ArrayList mergedList) {
+      pruneControlDecorators();
+      if (scrolledForm.getHead().getBounds().height == 0 || mergedList.isEmpty() || mergedList == null) {
+         scrolledForm.setMessage(null, IMessageProvider.NONE);
+         return;
+      }
+      final ArrayList peers = createPeers(mergedList);
+      final int maxType = ((IMessage) peers.get(0)).getMessageType();
+      String messageText;
+      final IMessage[] array = (IMessage[]) peers.toArray(new IMessage[peers.size()]);
+      if (peers.size() == 1 && ((Message) peers.get(0)).prefix == null) {
+         // a single message
+         final IMessage message = (IMessage) peers.get(0);
+         messageText = message.getMessage();
+         scrolledForm.setMessage(messageText, maxType, array);
+      } else {
+         // show a summary message for the message
+         // and list of errors for the details
+         if (peers.size() > 1) {
+            messageText = Messages.bind(MULTIPLE_MESSAGE_SUMMARY_KEYS[maxType], new String[] { peers.size() + UI.EMPTY_STRING });
+         } else {
+            messageText = SINGLE_MESSAGE_SUMMARY_KEYS[maxType];
+         }
+         scrolledForm.setMessage(messageText, maxType, array);
+      }
+   }
 
-	private void updateForm() {
-		final ArrayList mergedList = new ArrayList();
-		mergedList.addAll(messages);
-		for (final Enumeration enm = decorators.elements(); enm.hasMoreElements();) {
-			final ControlDecorator dec = (ControlDecorator) enm.nextElement();
-			dec.addAll(mergedList);
-		}
-		update(mergedList);
-	}
+   private void updateForm() {
+      final ArrayList mergedList = new ArrayList();
+      mergedList.addAll(messages);
+      for (final Enumeration enm = decorators.elements(); enm.hasMoreElements();) {
+         final ControlDecorator dec = (ControlDecorator) enm.nextElement();
+         dec.addAll(mergedList);
+      }
+      update(mergedList);
+   }
 }

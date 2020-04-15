@@ -11,11 +11,13 @@ public class Messages extends NLS {
    public static String        PrefPage_Fit_Checkbox_IgnoreLastMarker;
    public static String        PrefPage_Fit_Checkbox_IgnoreSpeedValues;
    public static String        PrefPage_Fit_Checkbox_ReplaceTimeSlice;
+   public static String        PrefPage_Fit_Checkbox_FitImportTourType;
    public static String        PrefPage_Fit_Group_AdjustTemperature;
    public static String        PrefPage_Fit_Group_IgnoreLastMarker;
    public static String        PrefPage_Fit_Group_Power;
    public static String        PrefPage_Fit_Group_ReplaceTimeSlice;
    public static String        PrefPage_Fit_Group_Speed;
+   public static String        PrefPage_Fit_Group_TourType;
    public static String        PrefPage_Fit_Label_AdjustTemperature;
    public static String        PrefPage_Fit_Label_AdjustTemperature_Info;
    public static String        PrefPage_Fit_Label_IgnoreLastMarker_Info;
@@ -26,6 +28,11 @@ public class Messages extends NLS {
    public static String        PrefPage_Fit_Combo_Power_Data_Source_Garmin_RD_Pod;
    public static String        PrefPage_Fit_Label_ReplaceTimeSlice_Duration;
    public static String        PrefPage_Fit_Label_ReplaceTimeSlice_Info;
+   public static String        PrefPage_Fit_Label_FitImportTourType_Info;
+   public static String        PrefPage_Fit_Radio_TourTypeFromSport;
+   public static String        PrefPage_Fit_Radio_TourTypeFromProfile;
+   public static String        PrefPage_Fit_Radio_TourTypeFromProfileElseSport;
+   public static String        PrefPage_Fit_Radio_TourTypeFromSportAndProfile;
 
    static {
       // initialize resource bundle

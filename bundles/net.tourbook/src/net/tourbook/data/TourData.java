@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -2405,6 +2405,38 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    public boolean computeAltitudeUpDown() {
 
+      if (altitudeSerie == null) {
+         return false;
+      }
+
+      final AltitudeUpDown altiUpDown = computeAltitudeUpDown(0, altitudeSerie.length - 1);
+
+      if (altiUpDown != null) {
+         setTourAltUp(altiUpDown.altitudeUp);
+         setTourAltDown(altiUpDown.altitudeDown);
+      }
+
+      return altiUpDown != null;
+   }
+
+   public AltitudeUpDown computeAltitudeUpDown(final ArrayList<AltitudeUpDownSegment> segmentSerieIndexParameter,
+                                               final float selectedMinAltiDiff) {
+
+      return computeAltitudeUpDown_30_Algorithm_9_08(segmentSerieIndexParameter, selectedMinAltiDiff);
+   }
+
+   /**
+    * Computes the elevation gain/loss values for a specific range.
+    *
+    * @param startIndex
+    *           The index of the range start
+    * @param endIndex
+    *           The index of the range end
+    * @return Returns an <code>AltitudeUpDown</code> when altitude was computed otherwise
+    *         <code>null</code>
+    */
+   public AltitudeUpDown computeAltitudeUpDown(final int startIndex, final int endIndex) {
+
       float prefDPTolerance;
 
       if (_isImportedMTTour) {
@@ -2419,9 +2451,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
          // DP needs distance
 
-         altiUpDown = computeAltitudeUpDown_20_Algorithm_DP(prefDPTolerance);
+         altiUpDown = computeAltitudeUpDown_20_Algorithm_DP(prefDPTolerance, startIndex, endIndex);
 
-         // keep this value to see in the UI (toursegmenter) the value and how it is computed
+         // keep this value to see in the UI (tour segmenter) the value and how it is computed
          dpTolerance = (short) (prefDPTolerance * 10);
 
       } else {
@@ -2429,39 +2461,35 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          altiUpDown = computeAltitudeUpDown_30_Algorithm_9_08(null, prefDPTolerance);
       }
 
-      if (altiUpDown == null) {
-         return false;
-      }
-
-      setTourAltUp(altiUpDown.altitudeUp);
-      setTourAltDown(altiUpDown.altitudeDown);
-
-      return true;
-   }
-
-   public AltitudeUpDown computeAltitudeUpDown(final ArrayList<AltitudeUpDownSegment> segmentSerieIndexParameter,
-                                               final float selectedMinAltiDiff) {
-
-      return computeAltitudeUpDown_30_Algorithm_9_08(segmentSerieIndexParameter, selectedMinAltiDiff);
+      return altiUpDown;
    }
 
    /**
-    * Compute altitude up/down with Douglas Peuker algorithm.
+    * Compute altitude up/down with Douglas Peucker algorithm.
     *
     * @param dpTolerance
+    *           The Douglas-Peucker tolerance value
+    * @param startIndex
+    *           The start of the section for which to compute the elevation gain/loss
+    * @param endIndex
+    *           The end of the section for which to compute the elevation gain/loss
     * @return Returns <code>null</code> when altitude up/down cannot be computed
     */
-   private AltitudeUpDown computeAltitudeUpDown_20_Algorithm_DP(final float dpTolerance) {
+   private AltitudeUpDown computeAltitudeUpDown_20_Algorithm_DP(final float dpTolerance, final int startIndex, final int endIndex) {
 
       // check if all necessary data are available
-      if (altitudeSerie == null || altitudeSerie.length < 2) {
+      if (altitudeSerie == null || altitudeSerie.length < 2 ||
+            startIndex > altitudeSerie.length || endIndex >= altitudeSerie.length ||
+            startIndex >= endIndex) {
          return null;
       }
 
       // convert data series into DP points
-      final DPPoint dpPoints[] = new DPPoint[distanceSerie.length];
-      for (int serieIndex = 0; serieIndex < dpPoints.length; serieIndex++) {
-         dpPoints[serieIndex] = new DPPoint(distanceSerie[serieIndex], altitudeSerie[serieIndex], serieIndex);
+      final DPPoint dpPoints[] = new DPPoint[endIndex - startIndex];
+      int dpPointsIndex = 0;
+      for (int serieIndex = startIndex; serieIndex < endIndex; serieIndex++) {
+         dpPoints[dpPointsIndex] = new DPPoint(distanceSerie[serieIndex], altitudeSerie[serieIndex], serieIndex);
+         dpPointsIndex++;
       }
 
       int[] forcedIndices = null;
@@ -2474,7 +2502,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       float altitudeUpTotal = 0;
       float altitudeDownTotal = 0;
 
-      float prevAltitude = altitudeSerie[0];
+      float prevAltitude = altitudeSerie[startIndex];
 
       /*
        * Get altitude up/down from the tour altitude values which are found by DP
@@ -2482,7 +2510,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       for (int dbIndex = 1; dbIndex < simplifiedPoints.length; dbIndex++) {
 
          final DPPoint point = simplifiedPoints[dbIndex];
-         final float currentAltitude = altitudeSerie[point.serieIndex];
+         final float currentAltitude = altitudeSerie[startIndex + point.serieIndex];
          final float altiDiff = currentAltitude - prevAltitude;
 
          if (altiDiff > 0) {
@@ -2500,7 +2528,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * Compute altitude up/down since version 9.08
     * <p>
-    * This algorithm is abandond because it can cause very wrong values dependend on the terrain. DP
+    * This algorithm is abandoned because it can cause very wrong values depending on the terrain.
+    * DP
     * is the preferred algorithm since 14.7.
     *
     * @param segmentSerie
@@ -4182,8 +4211,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          return;
       }
 
-      final boolean isJametAlgorithm = _prefStore.getString(ITourbookPreferences.GRAPH_SMOOTHING_SMOOTHING_ALGORITHM).equals(
-            ISmoothingAlgorithm.SMOOTHING_ALGORITHM_JAMET);
+      final boolean isJametAlgorithm = _prefStore.getString(ITourbookPreferences.GRAPH_SMOOTHING_SMOOTHING_ALGORITHM)
+            .equals(
+                  ISmoothingAlgorithm.SMOOTHING_ALGORITHM_JAMET);
 
       if (isJametAlgorithm == false) {
 
@@ -6727,7 +6757,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
-    * Computes break time between start and end index when and when a break occures
+    * Computes break time between start and end index when and when a break occurs
     *
     * @param startIndex
     * @param endIndex
@@ -10447,7 +10477,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    public String toStringWithHash() {
 
-      final String string = "" //$NON-NLS-1$
+      final String string = UI.EMPTY_STRING
             + ("   tourId: " + tourId) //$NON-NLS-1$
             + ("   identityHashCode: " + System.identityHashCode(this)); //$NON-NLS-1$
 

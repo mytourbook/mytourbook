@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -35,9 +35,9 @@ import net.tourbook.common.util.Util;
 
 import org.apache.commons.imaging.Imaging;
 import org.apache.commons.imaging.ImagingConstants;
-import org.apache.commons.imaging.common.IImageMetadata;
-import org.apache.commons.imaging.common.IImageMetadata.IImageMetadataItem;
-import org.apache.commons.imaging.common.ImageMetadata.Item;
+import org.apache.commons.imaging.common.GenericImageMetadata.GenericImageMetadataItem;
+import org.apache.commons.imaging.common.ImageMetadata;
+import org.apache.commons.imaging.common.ImageMetadata.ImageMetadataItem;
 import org.apache.commons.imaging.formats.jpeg.JpegImageMetadata;
 import org.apache.commons.imaging.formats.jpeg.JpegPhotoshopMetadata;
 import org.apache.commons.imaging.formats.jpeg.iptc.IptcTypes;
@@ -324,7 +324,7 @@ public class Photo {
 	 *            Can be <code>null</code> when not available
 	 * @return
 	 */
-	private PhotoImageMetadata createPhotoMetadata(final IImageMetadata imageMetadata) {
+	private PhotoImageMetadata createPhotoMetadata(final ImageMetadata imageMetadata) {
 
 		final PhotoImageMetadata photoMetadata = new PhotoImageMetadata();
 
@@ -404,13 +404,13 @@ public class Photo {
 			final JpegPhotoshopMetadata pshopMetadata = jpegMetadata.getPhotoshop();
 			if (pshopMetadata != null) {
 
-				final List<? extends IImageMetadataItem> pshopItems = pshopMetadata.getItems();
+				final List<? extends ImageMetadataItem> pshopItems = pshopMetadata.getItems();
 
-				for (final IImageMetadataItem pshopItem : pshopItems) {
+				for (final ImageMetadataItem pshopItem : pshopItems) {
 
-					if (pshopItem instanceof Item) {
+					if (pshopItem instanceof GenericImageMetadataItem) {
 
-						final Item item = (Item) pshopItem;
+						final GenericImageMetadataItem item = (GenericImageMetadataItem) pshopItem;
 						final String keyword = item.getKeyword();
 
 						if (keyword.equals(IptcTypes.OBJECT_NAME.name)) {
@@ -775,7 +775,7 @@ public class Photo {
 	 *         <code>isReadThumbnail</code> is <code>true</code>, otherwise it checks if metadata
 	 *         are already loaded.
 	 */
-	public IImageMetadata getImageMetaData(final Boolean isReadThumbnail) {
+	public ImageMetadata getImageMetaData(final Boolean isReadThumbnail) {
 
 		if (_photoImageMetadata != null && isReadThumbnail == false) {
 
@@ -789,7 +789,7 @@ public class Photo {
 			return null;
 		}
 
-		IImageMetadata imageFileMetadata = null;
+		ImageMetadata imageFileMetadata = null;
 
 		try {
 
@@ -1279,7 +1279,7 @@ public class Photo {
 //				: _orientation == 3 ? "180" //
 //						: _orientation == 6 ? "90" : "0";
 
-		return "" //$NON-NLS-1$
+		return UI.EMPTY_STRING
 //				+"Photo " //
 				+ (imageFileName)
 				+ ("\t_exifDateTime " + _exifDateTime) //$NON-NLS-1$

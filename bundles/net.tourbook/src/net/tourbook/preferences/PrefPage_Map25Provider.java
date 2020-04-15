@@ -87,6 +87,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
    private static final TileEncodingData[] _allTileEncoding                 = new TileEncodingData[] {
 
          new TileEncodingData(TileEncoding.VTM, Messages.Pref_Map25_Encoding_OpenScienceMap, false),
+         new TileEncodingData(TileEncoding.MP, Messages.Pref_Map25_Encoding_Mapilion, false),
          new TileEncodingData(TileEncoding.MVT, Messages.Pref_Map25_Encoding_Mapzen, false),
          new TileEncodingData(TileEncoding.MF, Messages.Pref_Map25_Encoding_Mapsforge_Offline, true)
    };
@@ -115,7 +116,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
     */
    private final ArrayList<Control>        _firstColumnControls             = new ArrayList<>();
    //
-   /*
+   /**
     * UI Controls
     */
    private TableViewer _mapProviderViewer;
@@ -262,7 +263,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
 
    private ArrayList<Map25Provider> createMapProviderClone() {
 
-      /*
+      /**
        * Clone original data
        */
       final ArrayList<Map25Provider> clonedMapProvider = new ArrayList<>();
@@ -271,7 +272,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
          clonedMapProvider.add((Map25Provider) mapProvider.clone());
       }
 
-      /*
+      /**
        * Sort by name
        */
       Collections.sort(clonedMapProvider, new Comparator<Map25Provider>() {
@@ -344,7 +345,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
             .hint(700, convertHeightInCharsToPixels(20))
             .applyTo(layoutContainer);
 
-      /*
+      /**
        * create table
        */
       final Table table = new Table(
@@ -401,7 +402,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
       {
          {
-            /*
+            /**
              * Button: Add
              */
             _btnProvider_Add = new Button(container, SWT.NONE);
@@ -415,7 +416,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
             });
          }
          {
-            /*
+            /**
              * Button: Delete
              */
             _btnProvider_Delete = new Button(container, SWT.NONE);
@@ -429,7 +430,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
             });
          }
          {
-            /*
+            /**
              * Button: Copy
              */
             _btnProvider_Copy = new Button(container, SWT.NONE);
@@ -460,7 +461,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
       {
 
          {
-            /*
+            /**
              * Checkbox: Is enabled
              */
 
@@ -478,7 +479,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
                   .applyTo(_chkIsMapProviderEnabled);
          }
          {
-            /*
+            /**
              * Field: Provider name
              */
             _lblProviderName = new Label(container, SWT.NONE);
@@ -493,7 +494,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
             _txtProviderName.addModifyListener(_defaultModifyListener);
          }
          {
-            /*
+            /**
              * Combo: Tile Encoding
              */
             _lblTileEncoding = new Label(container, SWT.NONE);
@@ -516,7 +517,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
             }
          }
          {
-            /*
+            /**
              * Combo: Theme
              */
             _lblTheme = new Label(container, SWT.NONE);
@@ -543,7 +544,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
          _pageBook_OnOffline.showPage(_pageMaps_Offline);
 
          {
-            /*
+            /**
              * Field: Description
              */
             _lblDescription = new Label(container, SWT.NONE);
@@ -573,7 +574,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
       {
          {
-            /*
+            /**
              * Field: Url
              */
             _lblOnline_Url = new Label(container, SWT.NONE);
@@ -586,7 +587,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
          }
 
          {
-            /*
+            /**
              * Field: Tile path
              */
             _lblOnline_TilePath = new Label(container, SWT.NONE);
@@ -598,7 +599,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
             _txtOnline_TilePath.addModifyListener(_defaultModifyListener);
          }
          {
-            /*
+            /**
              * Field: Tile Url
              */
             _lblOnline_TileUrl = new Label(container, SWT.NONE);
@@ -609,7 +610,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
             GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtTileUrl);
          }
          {
-            /*
+            /**
              * Field: API key
              */
             _lblOnline_APIKey = new Label(container, SWT.NONE);
@@ -632,7 +633,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
       {
          {
-            /*
+            /**
              * Field: Map file
              */
             _lblOffline_MapFilepath = new Label(container, SWT.NONE);
@@ -650,7 +651,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
                }
 
                {
-                  /*
+                  /**
                    * Button: browse...
                    */
                   _btnOffline_Browse_MapFile = new Button(containerMapFile, SWT.PUSH);
@@ -667,7 +668,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
             }
          }
          {
-            /*
+            /**
              * Field: Theme filepath
              */
             _lblOffline_ThemeFilepath = new Label(container, SWT.NONE);
@@ -685,7 +686,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
                }
 
                {
-                  /*
+                  /**
                    * Button: browse...
                    */
                   _btnOffline_Browse_ThemeFile = new Button(containerThemeFile, SWT.PUSH);
@@ -702,7 +703,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
             }
          }
          {
-            /*
+            /**
              * Field: Theme style
              */
             _lblOffline_ThemeStyle = new Label(container, SWT.NONE);
@@ -728,7 +729,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
       {
          {
-            /*
+            /**
              * Button: Update
              */
             _btnProvider_Update = new Button(container, SWT.NONE);
@@ -743,7 +744,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
             setButtonLayoutData(_btnProvider_Update);
          }
          {
-            /*
+            /**
              * Button: Cancel
              */
             _btnProvider_Cancel = new Button(container, SWT.NONE);
@@ -771,7 +772,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
       TableColumn tc;
 
       {
-         /*
+         /**
           * Column: Enabled
           */
          tvc = new TableViewerColumn(_mapProviderViewer, SWT.LEAD);
@@ -789,7 +790,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
          tableLayout.setColumnData(tc, new ColumnWeightData(2, minWidth));
       }
       {
-         /*
+         /**
           * Column: Offline
           */
          tvc = new TableViewerColumn(_mapProviderViewer, SWT.LEAD);
@@ -807,7 +808,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
          tableLayout.setColumnData(tc, new ColumnWeightData(2, minWidth));
       }
       {
-         /*
+         /**
           * Column: Provider name
           */
          tvc = new TableViewerColumn(_mapProviderViewer, SWT.LEAD);
@@ -822,7 +823,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
          tableLayout.setColumnData(tc, new ColumnWeightData(5, minWidth));
       }
       {
-         /*
+         /**
           * Column: Tile encoding
           */
          tvc = new TableViewerColumn(_mapProviderViewer, SWT.LEAD);
@@ -837,7 +838,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
          tableLayout.setColumnData(tc, new ColumnWeightData(2, minWidth));
       }
       {
-         /*
+         /**
           * Column: Theme
           */
          tvc = new TableViewerColumn(_mapProviderViewer, SWT.LEAD);
@@ -864,7 +865,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
          tableLayout.setColumnData(tc, new ColumnWeightData(3, minWidth));
       }
       {
-         /*
+         /**
           * Column: Url / Map filename
           */
          tvc = new TableViewerColumn(_mapProviderViewer, SWT.LEAD);
@@ -884,7 +885,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
          tableLayout.setColumnData(tc, new ColumnWeightData(7, minWidth));
       }
       {
-         /*
+         /**
           * Column: Tile path / Theme filepath
           */
          tvc = new TableViewerColumn(_mapProviderViewer, SWT.LEAD);
@@ -904,7 +905,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
          tableLayout.setColumnData(tc, new ColumnWeightData(7, minWidth));
       }
       {
-         /*
+         /**
           * Column: API key / Theme style
           */
          tvc = new TableViewerColumn(_mapProviderViewer, SWT.LEAD);
@@ -1014,7 +1015,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
          }
       }
 
-      /*
+      /**
        * return default, open science map
        */
       int defaultIndex = 0;
@@ -1393,7 +1394,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
 
    private void restoreState() {
 
-      /*
+      /**
        * select last selected map provider
        */
       final String lastMapProviderUUID = Util.getStateString(_state, STATE_LAST_SELECTED_MAP_PROVIDER, null);
@@ -1584,7 +1585,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
 
    private void updateUI_Theme(final Map25Provider mapProvider) {
 
-      /*
+      /**
        * Fill theme combo
        */
       _comboTheme.removeAll();
@@ -1601,7 +1602,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
          _comboTheme.add(vtmTheme.toString());
       }
 
-      /*
+      /**
        * Select theme
        */
       if (mapProvider == null) {
@@ -1683,7 +1684,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
          mfStyles = mapProvider.getThemeStyles(isForceThemeStyleReload);
       }
 
-      /*
+      /**
        * Fill combo with styles
        */
 
@@ -1704,7 +1705,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
          _comboOffline_ThemeStyle.add(mapsforgeThemeStyle.getLocaleName() + UI.DASH_WITH_DOUBLE_SPACE + mapsforgeThemeStyle.getXmlLayer());
       }
 
-      /*
+      /**
        * Reselect previous style
        */
 
@@ -1821,7 +1822,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
             }
          }
 
-         /*
+         /**
           * Check that at least 1 map provider is enabled
           */
          final boolean isCurrentEnabled = _chkIsMapProviderEnabled.getSelection();

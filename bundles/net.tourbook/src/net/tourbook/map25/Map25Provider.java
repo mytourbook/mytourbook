@@ -48,14 +48,14 @@ public class Map25Provider implements Cloneable {
 
    public VtmThemes theme;
 
-   /*
+   /**
     * Online map provider
     */
    public String online_url      = UI.EMPTY_STRING;
    public String online_TilePath = UI.EMPTY_STRING;
    public String online_ApiKey   = UI.EMPTY_STRING;
 
-   /*
+   /**
     * Offline map provider
     */
    public String       mf_MapFilepath   = UI.EMPTY_STRING;
@@ -64,7 +64,7 @@ public class Map25Provider implements Cloneable {
 
    public TileEncoding tileEncoding          = TileEncoding.MVT;
 
-   /*
+   /**
     * Cached theme properties
     */
    private String                    _cachedThemeFilepath;

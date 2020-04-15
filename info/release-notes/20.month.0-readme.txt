@@ -1,0 +1,80 @@
+20.?.0                                                 ?. Month 2020
+
+
+TODO's
+======  
+  - This error occured when importing propably an "empty" fit file
+      java.lang.NullPointerException
+           at net.tourbook.device.garmin.fit.FitData.finalizeTour_Marker(FitData.java:296)
+           at net.tourbook.device.garmin.fit.FitData.finalizeTour(FitData.java:193)
+           at net.tourbook.device.garmin.fit.FitDataReader.processDeviceData(FitDataReader.java:600)
+           at net.tourbook.importdata.RawDataManager.importRawData_10(RawDataManager.java:1602)
+           at net.tourbook.importdata.RawDataManager.access$8(RawDataManager.java:1552)
+           at net.tourbook.importdata.RawDataManager$5.run(RawDataManager.java:1465)
+           at org.eclipse.swt.custom.BusyIndicator.showWhile(BusyIndicator.java:55)
+           at net.tourbook.importdata.RawDataManager.importRawData(RawDataManager.java:1422)
+           at net.tourbook.importdata.RawDataManager$7.run(RawDataManager.java:1936)
+           at org.eclipse.jface.operation.ModalContext$ModalContextThread.run(ModalContext.java:122)  
+           
+  - Calendar view: Show average pulse/power in day/week values, this is helpful for ergometer
+ 
+
+Bugs
+----
+* Map2: new tour selector explodes when continously selecting markers in search view, maybe in other views
+
+
+New + Improvements   
+==================
+
+* xxx
+  - yyy
+
+* xxx (Frederic)
+
+
+* Views
+----
+
+* Map25: (Thomas)
+  - new default map provider "mapilion". the old default "opensciencemap" is offline
+  - Satellite Map Layer
+  - Photo layer is now also available on 2.5D map
+  - when a map folder contains more than one map file, MT is automatically switching between them
+  - when a mapsforge V5 map is used, buildings with 3D tags are shown in 3D
+  - switching between online and offline is working correctly now
+
+Import
+======
+
+* 
+ 
+Changes  
+=======
+
+* 
+
+
+Fixes   
+=====
+
+<<<<<<< HEAD
+*   Map3: (Thomas)
+  - Fixed issue: track was not shown, when using java8 
+=======
+* xxx (Frederic)
+
+>>>>>>> refs/remotes/origin/master
+   
+Translation    
+===========
+
+ - Dutch (Maarten)
+ - French (Frederic)
+ - German
+ - Italian (Doriano)
+
+ 
+System   
+======
+

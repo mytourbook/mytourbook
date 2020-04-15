@@ -1,21 +1,21 @@
 Manifest-Version: 1.0
-Bundle-ClassPath: libs/vtm-desktop.jar,libs/vtm-gdx.jar,libs/vtm-http.
- jar,libs/vtm-mvt.jar,libs/vtm-themes.jar,libs/vtm.jar,libs/slf4j-simp
- le-1.7.25.jar,libs/logging-interceptor-3.14.1.jar,libs/mapbox-vector-
- tile-3.0.0.jar,libs/slf4j-api-1.7.25.jar,libs/gdx-backend-lwjgl-1.9.9
- .jar,libs/svgSalamander-v1.1.1.jar,libs/gdx-1.9.9.jar,libs/okhttp-3.1
- 4.1.jar,libs/lwjgl_util-2.9.2.jar,libs/lwjgl-2.9.2.jar,libs/jlayer-1.
- 0.1-gdx.jar,libs/jorbis-0.0.17.jar,libs/ant-1.8.1.jar,libs/protobuf-j
- ava-3.5.1.jar,libs/jts-core-1.15.0.jar,libs/okio-1.17.2.jar,libs/jinp
- ut-2.0.5.jar,libs/ant-launcher-1.8.1.jar,libs/jutils-1.0.0.jar,libs/,
- resources/
+Bundle-ClassPath: libs/vtm-desktop-lwjgl.jar,libs/vtm-desktop.jar,libs
+ /vtm-gdx.jar,libs/vtm-http.jar,libs/vtm-mvt.jar,libs/vtm-themes.jar,l
+ ibs/vtm.jar,libs/slf4j-simple-1.7.25.jar,libs/logging-interceptor-3.1
+ 4.1.jar,libs/mapbox-vector-tile-3.1.0.jar,libs/slf4j-api-1.7.28.jar,l
+ ibs/svgSalamander-v1.1.1.jar,libs/gdx-backend-lwjgl-1.9.10.jar,libs/g
+ dx-1.9.10.jar,libs/okhttp-3.14.1.jar,libs/ant-1.8.1.jar,libs/lwjgl_ut
+ il-2.9.3.jar,libs/lwjgl-2.9.3.jar,libs/jlayer-1.0.1-gdx.jar,libs/jorb
+ is-0.0.17.jar,libs/protobuf-java-3.5.1.jar,libs/jts-core-1.15.1.jar,l
+ ibs/okio-1.17.2.jar,libs/ant-launcher-1.8.1.jar,libs/jinput-2.0.5.jar
+ ,libs/jutils-1.0.0.jar,libs/,resources/
 Bundle-License: http://www.apache.org/licenses/LICENSE-2.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Vector map from Mapsforge
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-SymbolicName: net.tourbook.ext.vtm
 Bundle-Vendor: MyTourbook
-Bundle-Version: 19.10.0.v20191226-2032
+Bundle-Version: 19.10.0.v20200114-1337
 Export-Package: assets.patterns;version="19.10.0",assets.shaders;versi
  on="19.10.0",assets.symbols;version="19.10.0",assets.symbols.accommod
  ation;version="19.10.0",assets.symbols.amenity;version="19.10.0",asse
@@ -120,46 +120,46 @@ Export-Package: assets.patterns;version="19.10.0",assets.shaders;versi
  exp;version="19.10.0",org.apache.tools.bzip2;version="19.10.0",org.ap
  ache.tools.mail;version="19.10.0",org.apache.tools.tar;version="19.10
  .0",org.apache.tools.zip;version="19.10.0",org.locationtech.jts;versi
- on="1.15.0",org.locationtech.jts.algorithm;version="1.15.0",org.locat
- iontech.jts.algorithm.distance;version="1.15.0",org.locationtech.jts.
- algorithm.locate;version="1.15.0",org.locationtech.jts.algorithm.matc
- h;version="1.15.0",org.locationtech.jts.awt;version="1.15.0",org.loca
- tiontech.jts.densify;version="1.15.0",org.locationtech.jts.dissolve;v
- ersion="1.15.0",org.locationtech.jts.edgegraph;version="1.15.0",org.l
- ocationtech.jts.geom;version="1.15.0",org.locationtech.jts.geom.impl;
- version="19.10.0",org.locationtech.jts.geom.prep;version="1.15.0",org
- .locationtech.jts.geom.util;version="1.15.0",org.locationtech.jts.geo
- mgraph;version="1.15.0",org.locationtech.jts.geomgraph.index;version=
- "1.15.0",org.locationtech.jts.index;version="1.15.0",org.locationtech
- .jts.index.bintree;version="1.15.0",org.locationtech.jts.index.chain;
- version="1.15.0",org.locationtech.jts.index.intervalrtree;version="1.
- 15.0",org.locationtech.jts.index.kdtree;version="1.15.0",org.location
- tech.jts.index.quadtree;version="1.15.0",org.locationtech.jts.index.s
- trtree;version="1.15.0",org.locationtech.jts.index.sweepline;version=
- "1.15.0",org.locationtech.jts.io;version="1.15.0",org.locationtech.jt
- s.io.gml2;version="1.15.0",org.locationtech.jts.io.kml;version="1.15.
- 0",org.locationtech.jts.linearref;version="1.15.0",org.locationtech.j
- ts.math;version="1.15.0",org.locationtech.jts.noding;version="1.15.0"
- ,org.locationtech.jts.noding.snapround;version="1.15.0",org.locationt
- ech.jts.operation;version="1.15.0",org.locationtech.jts.operation.buf
- fer;version="1.15.0",org.locationtech.jts.operation.buffer.validate;v
- ersion="1.15.0",org.locationtech.jts.operation.distance;version="1.15
- .0",org.locationtech.jts.operation.distance3d;version="1.15.0",org.lo
- cationtech.jts.operation.linemerge;version="1.15.0",org.locationtech.
- jts.operation.overlay;version="1.15.0",org.locationtech.jts.operation
- .overlay.snap;version="1.15.0",org.locationtech.jts.operation.overlay
- .validate;version="1.15.0",org.locationtech.jts.operation.polygonize;
- version="1.15.0",org.locationtech.jts.operation.predicate;version="1.
- 15.0",org.locationtech.jts.operation.relate;version="1.15.0",org.loca
- tiontech.jts.operation.union;version="1.15.0",org.locationtech.jts.op
- eration.valid;version="1.15.0",org.locationtech.jts.planargraph;versi
- on="1.15.0",org.locationtech.jts.planargraph.algorithm;version="1.15.
- 0",org.locationtech.jts.precision;version="1.15.0",org.locationtech.j
- ts.shape;version="1.15.0",org.locationtech.jts.shape.fractal;version=
- "1.15.0",org.locationtech.jts.shape.random;version="1.15.0",org.locat
- iontech.jts.simplify;version="1.15.0",org.locationtech.jts.triangulat
- e;version="1.15.0",org.locationtech.jts.triangulate.quadedge;version=
- "1.15.0",org.locationtech.jts.util;version="1.15.0",org.lwjgl;version
+ on="1.15.1",org.locationtech.jts.algorithm;version="1.15.1",org.locat
+ iontech.jts.algorithm.distance;version="1.15.1",org.locationtech.jts.
+ algorithm.locate;version="1.15.1",org.locationtech.jts.algorithm.matc
+ h;version="1.15.1",org.locationtech.jts.awt;version="1.15.1",org.loca
+ tiontech.jts.densify;version="1.15.1",org.locationtech.jts.dissolve;v
+ ersion="1.15.1",org.locationtech.jts.edgegraph;version="1.15.1",org.l
+ ocationtech.jts.geom;version="1.15.1",org.locationtech.jts.geom.impl;
+ version="19.10.0",org.locationtech.jts.geom.prep;version="1.15.1",org
+ .locationtech.jts.geom.util;version="1.15.1",org.locationtech.jts.geo
+ mgraph;version="1.15.1",org.locationtech.jts.geomgraph.index;version=
+ "1.15.1",org.locationtech.jts.index;version="1.15.1",org.locationtech
+ .jts.index.bintree;version="1.15.1",org.locationtech.jts.index.chain;
+ version="1.15.1",org.locationtech.jts.index.intervalrtree;version="1.
+ 15.1",org.locationtech.jts.index.kdtree;version="1.15.1",org.location
+ tech.jts.index.quadtree;version="1.15.1",org.locationtech.jts.index.s
+ trtree;version="1.15.1",org.locationtech.jts.index.sweepline;version=
+ "1.15.1",org.locationtech.jts.io;version="1.15.1",org.locationtech.jt
+ s.io.gml2;version="1.15.1",org.locationtech.jts.io.kml;version="1.15.
+ 1",org.locationtech.jts.linearref;version="1.15.1",org.locationtech.j
+ ts.math;version="1.15.1",org.locationtech.jts.noding;version="1.15.1"
+ ,org.locationtech.jts.noding.snapround;version="1.15.1",org.locationt
+ ech.jts.operation;version="1.15.1",org.locationtech.jts.operation.buf
+ fer;version="1.15.1",org.locationtech.jts.operation.buffer.validate;v
+ ersion="1.15.1",org.locationtech.jts.operation.distance;version="1.15
+ .1",org.locationtech.jts.operation.distance3d;version="1.15.1",org.lo
+ cationtech.jts.operation.linemerge;version="1.15.1",org.locationtech.
+ jts.operation.overlay;version="1.15.1",org.locationtech.jts.operation
+ .overlay.snap;version="1.15.1",org.locationtech.jts.operation.overlay
+ .validate;version="1.15.1",org.locationtech.jts.operation.polygonize;
+ version="1.15.1",org.locationtech.jts.operation.predicate;version="1.
+ 15.1",org.locationtech.jts.operation.relate;version="1.15.1",org.loca
+ tiontech.jts.operation.union;version="1.15.1",org.locationtech.jts.op
+ eration.valid;version="1.15.1",org.locationtech.jts.planargraph;versi
+ on="1.15.1",org.locationtech.jts.planargraph.algorithm;version="1.15.
+ 1",org.locationtech.jts.precision;version="1.15.1",org.locationtech.j
+ ts.shape;version="1.15.1",org.locationtech.jts.shape.fractal;version=
+ "1.15.1",org.locationtech.jts.shape.random;version="1.15.1",org.locat
+ iontech.jts.simplify;version="1.15.1",org.locationtech.jts.triangulat
+ e;version="1.15.1",org.locationtech.jts.triangulate.quadedge;version=
+ "1.15.1",org.locationtech.jts.util;version="1.15.1",org.lwjgl;version
  ="19.10.0",org.lwjgl.input;version="19.10.0",org.lwjgl.openal;version
  ="19.10.0",org.lwjgl.opencl;version="19.10.0",org.lwjgl.opencl.api;ve
  rsion="19.10.0",org.lwjgl.opengl;version="19.10.0",org.lwjgl.opengles
@@ -185,12 +185,13 @@ Export-Package: assets.patterns;version="19.10.0",assets.shaders;versi
  iling.source;version="19.10.0",org.oscim.tiling.source.bitmap;version
  ="19.10.0",org.oscim.tiling.source.mapfile;version="19.10.0",org.osci
  m.tiling.source.mapfile.header;version="19.10.0",org.oscim.tiling.sou
- rce.mvt;version="19.10.0",org.oscim.tiling.source.oscimap4;version="1
- 9.10.0",org.oscim.utils;version="19.10.0",org.oscim.utils.animation;v
- ersion="19.10.0",org.oscim.utils.async;version="19.10.0",org.oscim.ut
- ils.geom;version="19.10.0",org.oscim.utils.math;version="19.10.0",org
- .oscim.utils.pool;version="19.10.0",org.oscim.utils.quadtree;version=
- "19.10.0",org.slf4j;version="1.7.25",org.slf4j.event;version="1.7.25"
- ,org.slf4j.helpers;version="1.7.25",org.slf4j.impl;version="1.7.25",o
- rg.slf4j.spi;version="1.7.25",res.help.about;version="19.10.0",res.ic
- ons;version="19.10.0",xml;version="19.10.0"
+ rce.mapzen;version="19.10.0",org.oscim.tiling.source.mvt;version="19.
+ 10.0",org.oscim.tiling.source.oscimap4;version="19.10.0",org.oscim.ut
+ ils;version="19.10.0",org.oscim.utils.animation;version="19.10.0",org
+ .oscim.utils.async;version="19.10.0",org.oscim.utils.geom;version="19
+ .10.0",org.oscim.utils.math;version="19.10.0",org.oscim.utils.pool;ve
+ rsion="19.10.0",org.oscim.utils.quadtree;version="19.10.0",org.slf4j;
+ version="1.7.28",org.slf4j.event;version="1.7.28",org.slf4j.helpers;v
+ ersion="1.7.28",org.slf4j.impl;version="1.7.25",org.slf4j.spi;version
+ ="1.7.28",res.help.about;version="19.10.0",res.icons;version="19.10.0
+ ",xml;version="19.10.0"

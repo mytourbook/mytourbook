@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -61,7 +61,9 @@ public class MesgListener_Session extends AbstractMesgListener implements Sessio
 
       final Sport sport = mesg.getSport();
       if (sport != null) {
-         tourData.setDeviceModeName(sport.name());
+         final String sportName = sport.name().trim();
+         tourData.setDeviceModeName(sportName);
+         fitData.setSportname(sportName);
       }
 
       final Short avgHeartRate = mesg.getAvgHeartRate();

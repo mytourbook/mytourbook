@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -224,7 +224,7 @@ public class TVITourBookYear extends TVITourBookItem {
    public String toString() {
       return
 
-      "" //$NON-NLS-1$
+      UI.EMPTY_STRING
 
 //      getClass().getName() + "\n"
 
