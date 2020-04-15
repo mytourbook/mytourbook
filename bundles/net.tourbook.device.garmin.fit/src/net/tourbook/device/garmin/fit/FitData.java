@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.Util;
@@ -32,10 +33,16 @@ import net.tourbook.data.SwimData;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
+import net.tourbook.data.TourType;
+import net.tourbook.database.TourDatabase;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.TourTypeColorDefinition;
 import net.tourbook.tour.TourLogManager;
+import net.tourbook.tour.TourManager;
 import net.tourbook.ui.tourChart.ChartLabel;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.widgets.Display;
 
 /**
  * Collects all data from a fit file
@@ -48,6 +55,8 @@ public class FitData {
 
    private boolean                 _isIgnoreLastMarker;
    private boolean                 _isSetLastMarker;
+   private boolean                 _isFitImportTourType;
+   private String                  _fitImportTourTypeMode;
    private int                     _lastMarkerTimeSlices;
 
    public boolean                  isComputeAveragePower;
@@ -67,6 +76,9 @@ public class FitData {
 
    private String                  _sessionIndex;
    private ZonedDateTime           _sessionStartTime;
+
+   private String                  _sportName = UI.EMPTY_STRING;
+   private String                  _profileName = UI.EMPTY_STRING;
 
    private final List<TimeData>    _allTimeData          = new ArrayList<>();
 
@@ -94,7 +106,71 @@ public class FitData {
       _isIgnoreLastMarker = _prefStore.getBoolean(IPreferences.FIT_IS_IGNORE_LAST_MARKER);
       _isSetLastMarker = _isIgnoreLastMarker == false;
       _lastMarkerTimeSlices = _prefStore.getInt(IPreferences.FIT_IGNORE_LAST_MARKER_TIME_SLICES);
+      _isFitImportTourType = _prefStore.getBoolean(IPreferences.FIT_IS_IMPORT_TOURTYPE);
+      _fitImportTourTypeMode = _prefStore.getString(IPreferences.FIT_IMPORT_TOURTYPE_MODE);
 
+   }
+
+   /**
+    * @param tourData
+    * @param parsedTourTypeLabel
+    * @return <code>true</code> when a new {@link TourType} is created
+    */
+   private boolean applyTour_Type(final TourData tourData, final String parsedTourTypeLabel) {
+
+      final ArrayList<TourType> tourTypeMap = TourDatabase.getAllTourTypes();
+      TourType tourType = null;
+      TourType newSavedTourType = null;
+
+      // do not add tours when label string is blank
+      if (!UI.EMPTY_STRING.equals(parsedTourTypeLabel)) {
+
+         // find tour type in existing tour types
+         for (final TourType mapTourType : tourTypeMap) {
+            if (parsedTourTypeLabel.equalsIgnoreCase(mapTourType.getName())) {
+               tourType = mapTourType;
+               break;
+            }
+         }
+
+         if (tourType == null) {
+
+            // create new tour type
+
+            final TourType newTourType = new TourType(parsedTourTypeLabel);
+
+            final TourTypeColorDefinition newColorDefinition = new TourTypeColorDefinition(newTourType,
+                    Long.toString(newTourType.getTypeId()), newTourType.getName());
+
+            newTourType.setColorBright(newColorDefinition.getGradientBright_Default());
+            newTourType.setColorDark(newColorDefinition.getGradientDark_Default());
+            newTourType.setColorLine(newColorDefinition.getLineColor_Default());
+            newTourType.setColorText(newColorDefinition.getTextColor_Default());
+
+            // save new entity
+            newSavedTourType = TourDatabase.saveEntity(newTourType, newTourType.getTypeId(), TourType.class);
+            if (newSavedTourType != null) {
+
+                tourType = newSavedTourType;
+
+                TourDatabase.clearTourTypes();
+                TourManager.getInstance().clearTourDataCache();
+
+                // Update Tour Type (Filter) list UI
+                Display.getDefault().syncExec(new Runnable() {
+                   @Override
+                  public void run() {
+                      // fire modify event
+                      TourbookPlugin.getPrefStore().setValue(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED, Math.random());
+                   }
+                });
+            }
+         }
+
+         tourData.setTourType(tourType);
+      }
+
+      return newSavedTourType != null;
    }
 
    public void finalizeTour() {
@@ -192,6 +268,8 @@ public class FitData {
 
          finalizeTour_Marker(_tourData, _allTourMarker);
          _tourData.finalizeTour_SwimData(_tourData, _allSwimData);
+
+         finalizeTour_Type(_tourData);
       }
    }
 
@@ -381,6 +459,46 @@ public class FitData {
       tourData.setTourMarkers(tourTourMarkers);
    }
 
+   private void finalizeTour_Type(final TourData tourData) {
+      // If enabled, set Tour Type using FIT file data
+      if (_isFitImportTourType) {
+
+         switch (_fitImportTourTypeMode) {
+
+            case IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORT:
+
+               applyTour_Type(_tourData, _sportName);
+               break;
+
+            case IPreferences.FIT_IMPORT_TOURTYPE_MODE_PROFILE:
+
+               applyTour_Type(_tourData, _profileName);
+               break;
+
+            case IPreferences.FIT_IMPORT_TOURTYPE_MODE_TRYPROFILE:
+
+               if (!UI.EMPTY_STRING.equals(_profileName)) {
+                  applyTour_Type(_tourData, _profileName);
+               } else {
+                  applyTour_Type(_tourData, _sportName);
+               }
+               break;
+
+            case IPreferences.FIT_IMPORT_TOURTYPE_MODE_SPORTANDPROFILE:
+
+               String spacerText = UI.EMPTY_STRING;
+
+               // Insert spacer character of Sport Name is present
+               if ((!UI.EMPTY_STRING.equals(_sportName)) && (!UI.EMPTY_STRING.equals(_profileName))) {
+                  spacerText = UI.DASH_WITH_SPACE;
+               }
+
+               applyTour_Type(_tourData, String.format("%s%s%s", _sportName, spacerText, _profileName));
+               break;
+        }
+     }
+   }
+
    public List<TimeData> getAllTimeData() {
       return _allTimeData;
    }
@@ -556,6 +674,10 @@ public class FitData {
       _tourData.setIsPowerSensorPresent(isPowerSensorPresent);
    }
 
+   public void setProfileName(final String profileName) {
+      _profileName = profileName;
+   }
+
    public void setSessionIndex(final SessionMesg mesg) {
 
       final Integer fitMessageIndex = mesg.getFieldIntegerValue(254);
@@ -575,6 +697,10 @@ public class FitData {
 
    public void setSpeedSensorPresent(final boolean isSpeedSensorPresent) {
       _tourData.setIsDistanceFromSensor(isSpeedSensorPresent);
+   }
+
+   public void setSportname(final String sportName) {
+      _sportName = sportName;
    }
 
    public void setStrideSensorPresent(final boolean isStrideSensorPresent) {

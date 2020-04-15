@@ -83,6 +83,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IMemento;
+import org.eclipse.ui.PlatformUI;
 import org.epics.css.dal.Timestamp;
 import org.epics.css.dal.Timestamp.Format;
 import org.joda.time.format.PeriodFormatter;
@@ -388,6 +389,15 @@ public class UI {
    public static final int           DECORATOR_HORIZONTAL_INDENT = 2;
 
    static {
+
+      /**
+       * This creates a display which may contain also sleak options, otherwise sleak would not
+       * work.
+       * <p>
+       * Solution found here: "Sleak in RCP: Device is not tracking resource allocation"
+       * https://en.it1352.com/article/fb82e2d4ec294636ba29f786e3335066.html
+       */
+      PlatformUI.createDisplay();
 
       setupUI_FontMetrics();
 
