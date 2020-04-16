@@ -1415,7 +1415,9 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       //}else {
       //_mapApp.debugPrint("* Map25View: paintphotoselection same hash, skipping ");
       //}
+
       _photo_pts = _mapApp._phototoolkit.createPhotoItemList(_allPhotos);
+
       //PhotoToolkit phototoolkit = new PhotoToolkit();
       //_photo_pts = phototoolkit.createPhotoItemList(allPhotos);
 
@@ -1430,7 +1432,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
       _allTourData.clear();
 
-      if (tourData.latitudeSerie != null && tourData.latitudeSerie.length > 0) {
+      if (tourData != null && tourData.latitudeSerie != null && tourData.latitudeSerie.length > 0) {
          _allTourData.add(tourData);
       }
 

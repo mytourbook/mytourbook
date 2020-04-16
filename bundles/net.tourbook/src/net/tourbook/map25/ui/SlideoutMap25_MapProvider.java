@@ -76,7 +76,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
    private Label     _lblMapProvider;
    private Label     _lblTheme;
    private Label     _lblThemeStyle;
-   
+
    private Label     _lblCopyright;
 
    /**
@@ -134,7 +134,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
             createUI_12_Actions(container);
          }
          createUI_20_Options(shellContainer);
-         createUI_30_Info(shellContainer);
+         //createUI_30_Info(shellContainer);
       }
 
       return shellContainer;
@@ -220,12 +220,12 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
                   onSelect_ThemeStyle();
                }
             });
-         }     
+         }
       }
 
       fillMapProvider();
    }
-   
+
    private void createUI_30_Info(final Composite parent) {
 
       /*
