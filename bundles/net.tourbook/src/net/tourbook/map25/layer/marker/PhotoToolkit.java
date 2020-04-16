@@ -166,10 +166,12 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
          return  pts;
       }
 
-      /**if (!_isShowPhoto) {
-         Map25App.debugPrint(" Map25View: *** createPhotoItemList: photlayer is off");
-         return pts;
-      }*/
+      /*
+       * if (!_isShowPhoto) {
+       * Map25App.debugPrint(" Map25View: *** createPhotoItemList: photlayer is off");
+       * return pts;
+       * }
+       */
 
       _allPhotos = galleryPhotos;
 

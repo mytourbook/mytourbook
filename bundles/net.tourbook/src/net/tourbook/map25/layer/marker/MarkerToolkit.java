@@ -165,10 +165,10 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
       titleCanvas.setBitmap(titleBitmap);
 
       { // testing block
-      /**
-       * the following three lines displaying a transparent box.
-       * only for testing purposes, normally uncommented
-       */
+         /*
+          * the following three lines displaying a transparent box.
+          * only for testing purposes, normally uncommented
+          */
       //fillPainter.setColor(0x60ffffff);
       //markerCanvas.drawCircle(0, 0, size.x*2, fillPainter);
       //fillPainter.setColor(_bgColor);
@@ -315,7 +315,7 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
       final float half = bitmapStarSize/2;
       _fillPainter.setColor(0xFFFFFF00); // 100percent yellow
       _fillPainter.setStrokeWidth(2);
-      /**
+      /*
        * link: https://stackoverflow.com/questions/16327588/how-to-make-star-shape-in-java
        */
       defaultMarkerCanvas.drawLine(half * 0.1f  , half * 0.65f, half * 1.9f  , half * 0.65f, _fillPainter);

@@ -136,7 +136,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
    private TileManager             _tileManager;
 
-   /**
+   /*
     * if i could replace "_l" against "_layer_BaseMap", everything would be easier...
     * _l = mMap.setBaseMap(tileSource); returns VectorTileLayer
     */
@@ -733,7 +733,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
          debugPrint(" map25: " + "####### loadtheme: is online map setting textscale " + _online_TextScale); //$NON-NLS-1$ //$NON-NLS-2$
          //CanvasAdapter.textScale = _vtm_TextScale;
          // if problems with switching themes via keyboard, maybe this block is the problem
-         /**
+         /*
           * if (_selectedMapProvider.theme != null && _selectedMapProvider.theme != VtmThemes.MAPZEN
           * && _selectedMapProvider.theme != VtmThemes.OPENMAPTILES) {
           * debugPrint(" map25: " + "############# setMapProvider: onlinemap using internal theme: "
@@ -1312,7 +1312,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
          debugPrint(" map25: " + "############# setupMap: Map Path: " + _mf_mapFilePath); //$NON-NLS-1$ //$NON-NLS-2$
       }
 
-      /**
+      /*
        * if (_tileSourceOfflineMapCount == 0) {
        * ;
        * //throw new IllegalArgumentException("cannot read mapfile: " +
@@ -1386,7 +1386,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
             .zoomMax(16)
             .build();
 
-      /** needs long copyright hint... */
+      /* needs long copyright hint... */
 //	   _hillshadingSource =  DefaultSources.MAPILION_HILLSHADE_2
 //	         .httpFactory(_httpFactory)
 //	         .apiKey(_mp_key)
@@ -1423,10 +1423,10 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       layers.add(_layer_SliderPath);
 
       //buildings
-      /**
+      /*
        * here i have to investigate
-       * with this code i got always good S3DB, but online buildings did not look good with: "new S3DBLayer(mMap,_layer_BaseMap, true)"
-       *
+       * with this code i got always good S3DB, but online buildings did not look good with:
+       * "new S3DBLayer(mMap,_layer_BaseMap, true)"
        */
 //    // Buildings or S3DB  Block I
       _layer_S3DB_Building = new S3DBLayer(mMap,_layer_BaseMap, true);  //this is working with subtheme  switching, but no online buildings anymore
