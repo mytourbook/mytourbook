@@ -370,7 +370,7 @@ public class Map25ProviderManager {
 
       } else {
 
-         /**
+         /*
           * Create default map providers
           */
          allMapProvider.add(_defaultMapProvider);
@@ -380,7 +380,7 @@ public class Map25ProviderManager {
          allMapProvider.add(createMapProvider_MyTileServer());
       }
 
-      /**
+      /*
        * Ensure that at least one map provider is enabled
        */
       boolean isOneEnabled = false;
