@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
@@ -82,7 +82,7 @@ public class Messages extends NLS {
    public static String        Pref_Map_Group_Detail_SelectedMapProvider;
    public static String        Pref_Map_JobName_DropUrl;
    public static String        Pref_Map_JobName_ReadMapFactoryOfflineInfo;
-   public static String        Pref_Map_Label_AvaiablelMapProvider;
+   public static String        Pref_Map_Label_AvailablelMapProvider;
    public static String        Pref_Map_Label_Description;
    public static String        Pref_Map_Label_Layers;
    public static String        Pref_Map_Label_MapProviderDropTarget;

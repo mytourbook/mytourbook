@@ -804,7 +804,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
           */
          final Label label = new Label(headerContainer, SWT.NONE);
          GridDataFactory.fillDefaults().grab(true, false).align(SWT.FILL, SWT.CENTER).applyTo(label);
-         label.setText(Messages.Pref_Map_Label_AvaiablelMapProvider);
+         label.setText(Messages.Pref_Map_Label_AvailablelMapProvider);
 
          /*
           * button: refresh
