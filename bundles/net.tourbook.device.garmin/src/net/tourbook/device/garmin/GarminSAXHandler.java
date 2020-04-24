@@ -1193,12 +1193,12 @@ public class GarminSAXHandler extends DefaultHandler {
                   timeData.absoluteDistance = previousTimeData.absoluteDistance;
                }
             } else {
-               if (timeData.absoluteDistance > 0) {
+               if (timeData.absoluteDistance > 0) { // We are still within the same lap
                   currentTrackPointDistance = timeData.absoluteDistance;
                   timeData.absoluteDistance = currentTrackPointDistance - previousTrackPointDistance + previousTimeData.absoluteDistance;
 
                   previousTrackPointDistance = currentTrackPointDistance;
-               } else if (timeData.absoluteDistance == 0) {
+               } else if (timeData.absoluteDistance == 0) { // We are entering a new lap
 
                   timeData.absoluteDistance = previousTimeData.absoluteDistance;
                   previousTrackPointDistance = 0;
