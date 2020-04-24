@@ -54,6 +54,9 @@ Fixes
   - We disable the actions when the data series are not available
   - Fixed an issue where the Atmosphere and Scale layers would not appear when using MyTourbook in French
   - 3D Map colors : Fixed the pace ranges from seconds to minutes for better readability
+
+* TCX Import (Frederic)
+  - Fixed an issue where the distance data and display were erroneous since the distance is reset at each new lap 
    
 Translation    
 ===========
