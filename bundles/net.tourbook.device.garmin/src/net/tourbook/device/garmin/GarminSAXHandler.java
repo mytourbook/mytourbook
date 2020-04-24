@@ -1124,11 +1124,15 @@ public class GarminSAXHandler extends DefaultHandler {
    }
 
    /**
-    * Remove duplicated entries
+    * Remove duplicated entries and, if necessary, resets the distance values.
     * <p>
     * There are cases where the lap end time and the next lap start time have the same time value,
     * so there are duplicated times which causes problems like markers are not displayed because the
     * marker time is twice available.
+    * There are cases where the {@link GarminSAXHandler#TAG_DISTANCE_METERS} element is reset within
+    * each new lap.
+    * In this case, we need to reset all the {@link TimeData#absoluteDistance} values to their
+    * default value.
     */
    private void validateTimeSeries() {
 
@@ -1136,6 +1140,8 @@ public class GarminSAXHandler extends DefaultHandler {
 
       TimeData previousTimeData = null;
       TimeData firstMarkerTimeData = null;
+
+      boolean resetAbsoluteDistances = false;
 
       for (final TimeData timeData : _allTimeData) {
 
@@ -1170,11 +1176,28 @@ public class GarminSAXHandler extends DefaultHandler {
                 */
                firstMarkerTimeData = null;
             }
+
+            // If we have found that we need to reset the TimeData distances, we don't need to check anymore
+            if (resetAbsoluteDistances == false) {
+
+               final float distanceDifference = previousTimeData.absoluteDistance - timeData.absoluteDistance;
+
+               // Checking that the difference of distance is more than 5 meters
+               // as there were reported cases where the previous distance was greater by about 1 meter
+               // see https://sourceforge.net/p/mytourbook/discussion/622811/thread/926e45c3/#2208
+               if (distanceDifference > 5) {
+                  resetAbsoluteDistances = true;
+               }
+            }
          }
 
          previousTimeData = timeData;
       }
 
       _allTimeData.removeAll(removeTimeData);
+
+      if (resetAbsoluteDistances) {
+         _allTimeData.forEach(timeData -> timeData.absoluteDistance = Float.MIN_VALUE);
+      }
    }
 }
