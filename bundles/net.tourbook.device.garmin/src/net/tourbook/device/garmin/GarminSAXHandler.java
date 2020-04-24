@@ -1124,15 +1124,14 @@ public class GarminSAXHandler extends DefaultHandler {
    }
 
    /**
-    * Remove duplicated entries and, if necessary, resets the distance values.
+    * Remove duplicated entries and, if necessary, recomputes the absolute distance values.
     * <p>
     * There are cases where the lap end time and the next lap start time have the same time value,
     * so there are duplicated times which causes problems like markers are not displayed because the
     * marker time is twice available.
-    * There are cases where the {@link GarminSAXHandler#TAG_DISTANCE_METERS} element is reset within
-    * each new lap.
-    * In this case, we need to reset all the {@link TimeData#absoluteDistance} values to their
-    * default value.
+    * There are cases where the {@link GarminSAXHandler#TAG_DISTANCE_METERS} element (at the
+    * {@link GarminSAXHandler#TAG_TRACKPOINT} level) is reset within each new lap.
+    * In this case, we need to recompute correctly all the {@link TimeData#absoluteDistance} values.
     */
    private void validateTimeSeries() {
 
@@ -1141,7 +1140,9 @@ public class GarminSAXHandler extends DefaultHandler {
       TimeData previousTimeData = null;
       TimeData firstMarkerTimeData = null;
 
-      boolean resetAbsoluteDistances = false;
+      boolean recomputeAbsoluteDistances = false;
+      float previousTrackPointDistance = 0;
+      float currentTrackPointDistance = 0;
 
       for (final TimeData timeData : _allTimeData) {
 
@@ -1177,16 +1178,30 @@ public class GarminSAXHandler extends DefaultHandler {
                firstMarkerTimeData = null;
             }
 
-            // If we have found that we need to reset the TimeData distances, we don't need to check anymore
-            if (resetAbsoluteDistances == false) {
+            // If we have found that we need to recompute the TimeData distances, we don't need to check anymore
+            if (recomputeAbsoluteDistances == false) {
 
                final float distanceDifference = previousTimeData.absoluteDistance - timeData.absoluteDistance;
 
                // Checking that the difference of distance is more than 5 meters
                // as there were reported cases where the previous distance was greater by about 1 meter
                // see https://sourceforge.net/p/mytourbook/discussion/622811/thread/926e45c3/#2208
-               if (distanceDifference > 5) {
-                  resetAbsoluteDistances = true;
+               if (timeData.absoluteDistance == 0 && distanceDifference > 5) {
+
+                  recomputeAbsoluteDistances = true;
+
+                  timeData.absoluteDistance = previousTimeData.absoluteDistance;
+               }
+            } else {
+               if (timeData.absoluteDistance > 0) {
+                  currentTrackPointDistance = timeData.absoluteDistance;
+                  timeData.absoluteDistance = currentTrackPointDistance - previousTrackPointDistance + previousTimeData.absoluteDistance;
+
+                  previousTrackPointDistance = currentTrackPointDistance;
+               } else if (timeData.absoluteDistance == 0) {
+
+                  timeData.absoluteDistance = previousTimeData.absoluteDistance;
+                  previousTrackPointDistance = 0;
                }
             }
          }
@@ -1195,9 +1210,5 @@ public class GarminSAXHandler extends DefaultHandler {
       }
 
       _allTimeData.removeAll(removeTimeData);
-
-      if (resetAbsoluteDistances) {
-         _allTimeData.forEach(timeData -> timeData.absoluteDistance = Float.MIN_VALUE);
-      }
    }
 }
