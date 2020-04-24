@@ -1157,6 +1157,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
    }
 
    private void onModifyBreakTime() {
+//TODO FB If the user asked not to compute, we gray out everything
 
       saveState();
 

@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2020  Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -39,6 +39,7 @@ public class BreakTimeTool {
 	private static float					_prefMaxDistance;
 	private static int						_prefSliceDiff;
 
+   public static final String BREAK_TIME_METHOD_DO_NOT_COMPUTE     = "DoNotCompute";  //$NON-NLS-1$
 	public static final String				BREAK_TIME_METHOD_BY_AVG_SLICE_SPEED	= "AvgSliceSpeed";				//$NON-NLS-1$
 	public static final String				BREAK_TIME_METHOD_BY_AVG_SPEED			= "AvgSpeed";					//$NON-NLS-1$
 	public static final String				BREAK_TIME_METHOD_BY_SLICE_SPEED		= "SliceSpeed";				//$NON-NLS-1$
@@ -47,6 +48,9 @@ public class BreakTimeTool {
 	// sequence is used for the combo selection box
 	public static final BreakTimeMethod[]	BREAK_TIME_METHODS						= {
 																					//
+         new BreakTimeMethod(BREAK_TIME_METHOD_BY_AVG_SLICE_SPEED,                                 //
+               "Do not compute"),                                                                  //TODO Messages.Compute_BreakTime_Method_SpeedByAverageAndSlice),
+         //
 			new BreakTimeMethod(BREAK_TIME_METHOD_BY_AVG_SLICE_SPEED,//
 					Messages.Compute_BreakTime_Method_SpeedByAverageAndSlice),
 			//
@@ -153,7 +157,8 @@ public class BreakTimeTool {
 		// observe modifications
 
 		_prefStore.addPropertyChangeListener(new IPropertyChangeListener() {
-			public void propertyChange(final PropertyChangeEvent event) {
+			@Override
+         public void propertyChange(final PropertyChangeEvent event) {
 
 				final String property = event.getProperty();
 

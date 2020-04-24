@@ -218,6 +218,17 @@ import org.eclipse.ui.progress.UIJob;
  * This editor can edit (when all is implemented) all data for a tour
  */
 public class TourDataEditorView extends ViewPart implements ISaveablePart, ISaveAndRestorePart, ITourProvider2 {
+   //TODO FB : Trying to address this request : https://sourceforge.net/p/mytourbook/discussion/622811/thread/17da3fb19f/
+   // DO the FIT and S9 import to record paused time
+
+   /*
+    * class TimerPauses TORENAME
+    * {
+    * DateTime StartTime;
+    * DateTime EndTime;
+    * DateTime getPauseDuration();
+    * }
+    */
 
    public static final String     ID                            = "net.tourbook.views.TourDataEditorView";                //$NON-NLS-1$
    //
@@ -646,9 +657,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private Text              _txtDistance;
    private Text              _txtWeather;
    //
-   private TimeDuration      _timeDriving;
-   private TimeDuration      _timePaused;
-   private TimeDuration      _timeRecording;
+   private TimeDuration      _timeElapsed;                         // Total time of the activity                      //TODO FB Formerly Recording time
+   private TimeDuration      _timeRecorded;                        // Time recorded by the device = Total time - paused times
+   private TimeDuration      _timePaused;                          // Time where the user deliberately paused the device
+   private TimeDuration      _timeMoving;                          // Computed time moving
+   private TimeDuration      _timeBreak;                           // Computed time stopped
 
    private Menu              _swimViewer_ContextMenu;
    private Menu              _timeViewer_ContextMenu;
@@ -3587,23 +3600,47 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       final Composite container = _tk.createComposite(section);
       GridDataFactory.fillDefaults().applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
       {
+         final Composite elapsedTimeContainer = _tk.createComposite(container);
+         GridDataFactory.fillDefaults().align(SWT.CENTER, SWT.FILL).span(4, 1).applyTo(elapsedTimeContainer);
+         GridLayoutFactory.fillDefaults().numColumns(3).applyTo(elapsedTimeContainer);
+         {
+            {
+               /*
+                * Elapsed time
+                */
+               final Label label = _tk.createLabel(elapsedTimeContainer, "Elapsed time");//Messages.tour_editor_label_recording_time);
+               _secondColumnControls.add(label);
+
+               _timeElapsed = new TimeDuration(elapsedTimeContainer);
+            }
+         }
          {
             /*
-             * recording time
+             * Recorded time
              */
-            final Label label = _tk.createLabel(container, Messages.tour_editor_label_recording_time);
+            final Label label = _tk.createLabel(container, "Recorded time");//Messages.tour_editor_label_paused_time);
             _secondColumnControls.add(label);
 
-            _timeRecording = new TimeDuration(container);
+            _timeRecorded = new TimeDuration(container);
          }
 
          {
             /*
-             * paused time
+             * Moving time
              */
-            final Label label = _tk.createLabel(container, Messages.tour_editor_label_paused_time);
+            final Label label = _tk.createLabel(container, "Moving time");// Messages.tour_editor_label_driving_time);
+            _secondColumnControls.add(label);
+
+            _timeMoving = new TimeDuration(container);
+         }
+
+         {
+            /*
+             * Paused time
+             */
+            final Label label = _tk.createLabel(container, "Paused time");// Messages.tour_editor_label_driving_time);
             _secondColumnControls.add(label);
 
             _timePaused = new TimeDuration(container);
@@ -3611,12 +3648,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
          {
             /*
-             * driving time
+             * Break time
              */
-            final Label label = _tk.createLabel(container, Messages.tour_editor_label_driving_time);
+            final Label label = _tk.createLabel(container, "Break time");// Messages.tour_editor_label_driving_time);
             _secondColumnControls.add(label);
 
-            _timeDriving = new TimeDuration(container);
+            _timeBreak = new TimeDuration(container);
          }
       }
    }
@@ -6272,9 +6309,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _linkRemoveTimeZone.setEnabled(canEdit);
       _linkGeoTimeZone.setEnabled(canEdit && isGeoAvailable);
 
-      _timeRecording.setEditMode(isManualAndEdit);
+      _timeElapsed.setEditMode(isManualAndEdit);
+      _timeRecorded.setEditMode(isManualAndEdit);
       _timePaused.setEditMode(isManualAndEdit);
-      _timeDriving.setEditMode(isManualAndEdit);
+      _timeMoving.setEditMode(isManualAndEdit);
+      _timeBreak.setEditMode(isManualAndEdit);
 
       // distance can be edited when no distance time slices are available
       _txtDistance.setEnabled(canEdit && isDistanceSerie == false);
@@ -8262,8 +8301,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          // manual tour
          if (_isManualTour) {
 
-            _tourData.setTourRecordingTime(_timeRecording.getTime());
-            _tourData.setTourDrivingTime(_timeDriving.getTime());
+            //TODO FB _tourData.setTourRecordingTime(_timeRecording.getTime());
+            // _tourData.setTourDrivingTime(_timeDriving.getTime());
          }
 
       } catch (final IllegalArgumentException e) {
@@ -8723,9 +8762,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       final int drivingTime = (int) _tourData.getTourDrivingTime();
       final int pausedTime = recordingTime - drivingTime;
 
-      _timeRecording.setTime(recordingTime);
-      _timeDriving.setTime(drivingTime);
+      _timeElapsed.setTime(recordingTime);
+      _timeRecorded.setTime(drivingTime);
       _timePaused.setTime(pausedTime);
+      _timeMoving.setTime(recordingTime);
+      _timeBreak.setTime(drivingTime);
 
       /*
        * Time zone
@@ -8848,69 +8889,67 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       /*
        * check if a time control is currently used
        */
-      if ((widget == _timeRecording._spinHours
-            || widget == _timeRecording._spinMinutes
-            || widget == _timeRecording._spinSeconds
-            || widget == _timeDriving._spinHours
-            || widget == _timeDriving._spinMinutes
-            || widget == _timeDriving._spinSeconds
+      if ((widget == _timeElapsed._spinHours
+            || widget == _timeElapsed._spinMinutes
+            || widget == _timeElapsed._spinSeconds
+            || widget == _timeRecorded._spinHours
+            || widget == _timeRecorded._spinMinutes
+            || widget == _timeRecorded._spinSeconds
             || widget == _timePaused._spinHours
-            || widget == _timePaused._spinMinutes || widget == _timePaused._spinSeconds) == false) {
+            || widget == _timePaused._spinMinutes
+            || widget == _timePaused._spinSeconds
+            || widget == _timeMoving._spinHours
+            || widget == _timeMoving._spinMinutes
+            || widget == _timeMoving._spinSeconds
+            || widget == _timeBreak._spinHours
+            || widget == _timeBreak._spinMinutes
+            || widget == _timeBreak._spinSeconds) == false) {
 
          return;
       }
 
-      int recTime = _timeRecording.getTime();
-      int pausedTime = _timePaused.getTime();
-      int driveTime = _timeDriving.getTime();
-
-      if (recTime < 0) {
-         recTime = -recTime - 1;
-      }
-      if (pausedTime < 0) {
-         pausedTime = 0;
-      }
-
-      if (widget == _timeRecording._spinHours
-            || widget == _timeRecording._spinMinutes
-            || widget == _timeRecording._spinSeconds) {
-
-         // recording time is modified
-
-         if (pausedTime > recTime) {
-            pausedTime = recTime;
-         }
-
-         driveTime = recTime - pausedTime;
-
-      } else if (widget == _timePaused._spinHours
-            || widget == _timePaused._spinMinutes
-            || widget == _timePaused._spinSeconds) {
-
-         // paused time is modified
-
-         if (pausedTime > recTime) {
-            recTime = pausedTime;
-         }
-
-         driveTime = recTime - pausedTime;
-
-      } else if (widget == _timeDriving._spinHours
-            || widget == _timeDriving._spinMinutes
-            || widget == _timeDriving._spinSeconds) {
-
-         // driving time is modified
-
-         if (driveTime > recTime) {
-            recTime = driveTime;
-         }
-
-         pausedTime = recTime - driveTime;
-      }
-
-      _timeRecording.setTime(recTime / 3600, ((recTime % 3600) / 60), ((recTime % 3600) % 60));
-      _timeDriving.setTime(driveTime / 3600, ((driveTime % 3600) / 60), ((driveTime % 3600) % 60));
-      _timePaused.setTime(pausedTime / 3600, ((pausedTime % 3600) / 60), ((pausedTime % 3600) % 60));
+      /*
+       * TODO FB
+       * int recTime = _timeRecording.getTime();
+       * int pausedTime = _timePaused.getTime();
+       * int driveTime = _timeDriving.getTime();
+       * if (recTime < 0) {
+       * recTime = -recTime - 1;
+       * }
+       * if (pausedTime < 0) {
+       * pausedTime = 0;
+       * }
+       * if (widget == _timeRecording._spinHours
+       * || widget == _timeRecording._spinMinutes
+       * || widget == _timeRecording._spinSeconds) {
+       * // recording time is modified
+       * if (pausedTime > recTime) {
+       * pausedTime = recTime;
+       * }
+       * driveTime = recTime - pausedTime;
+       * } else if (widget == _timePaused._spinHours
+       * || widget == _timePaused._spinMinutes
+       * || widget == _timePaused._spinSeconds) {
+       * // paused time is modified
+       * if (pausedTime > recTime) {
+       * recTime = pausedTime;
+       * }
+       * driveTime = recTime - pausedTime;
+       * } else if (widget == _timeDriving._spinHours
+       * || widget == _timeDriving._spinMinutes
+       * || widget == _timeDriving._spinSeconds) {
+       * // driving time is modified
+       * if (driveTime > recTime) {
+       * recTime = driveTime;
+       * }
+       * pausedTime = recTime - driveTime;
+       * }
+       * _timeRecording.setTime(recTime / 3600, ((recTime % 3600) / 60), ((recTime % 3600) % 60));
+       * _timeDriving.setTime(driveTime / 3600, ((driveTime % 3600) / 60), ((driveTime % 3600) %
+       * 60));
+       * _timePaused.setTime(pausedTime / 3600, ((pausedTime % 3600) / 60), ((pausedTime % 3600) %
+       * 60));
+       */
    }
 
    private void updateUI_TimeZone() {
