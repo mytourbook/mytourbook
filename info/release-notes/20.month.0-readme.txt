@@ -31,7 +31,7 @@ New + Improvements
   - yyy
 
 * Statistics (Frederic)
-  - The number of years to be displayed in the graph is now dymically filled and updated based on the number of available years.
+  - The number of years to be displayed in the graph is now dynamically filled and updated based on the number of available years.
 
 
 Import
@@ -54,6 +54,9 @@ Fixes
   - We disable the actions when the data series are not available
   - Fixed an issue where the Atmosphere and Scale layers would not appear when using MyTourbook in French
   - 3D Map colors : Fixed the pace ranges from seconds to minutes for better readability
+
+* TCX Import (Frederic)
+  - Fixed an issue where the distance data and display were erroneous since the distance is reset at each new lap 
    
 Translation    
 ===========
@@ -67,5 +70,5 @@ Translation
 System   
 ======
 
-* FITSDK 21.22
+* FIT SDK 21.27
 

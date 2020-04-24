@@ -804,7 +804,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
           */
          final Label label = new Label(headerContainer, SWT.NONE);
          GridDataFactory.fillDefaults().grab(true, false).align(SWT.FILL, SWT.CENTER).applyTo(label);
-         label.setText(Messages.Pref_Map_Label_AvaiablelMapProvider);
+         label.setText(Messages.Pref_Map_Label_AvailableMapProvider);
 
          /*
           * button: refresh
@@ -1174,7 +1174,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
              */
 
             final Label label = new Label(container, SWT.NONE);
-            label.setText(Messages.Pref_Map_Lable_MapProvider);
+            label.setText(Messages.Pref_Map_Label_MapProvider);
 
             // text: map provider
             _txtMapProviderName = new Text(container, SWT.BORDER);
@@ -1196,7 +1196,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
              */
 
             final Label label = new Label(container, SWT.NONE);
-            label.setText(Messages.Pref_Map_Lable_Category);
+            label.setText(Messages.Pref_Map_Label_Category);
 
             // text: map provider
             _txtCategory = new Text(container, SWT.BORDER);
@@ -1210,7 +1210,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
             // label
             final Label label = new Label(container, SWT.NONE);
-            label.setText(Messages.Pref_Map_Lable_OnlineMap);
+            label.setText(Messages.Pref_Map_Label_OnlineMap);
 
             // text
             _txtOnlineMapUrl = new Text(container, SWT.BORDER);
@@ -1295,7 +1295,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
             // label: offline folder
             final Label label = new Label(container, SWT.NONE);
-            label.setText(Messages.Pref_Map_Lable_OfflineFolder);
+            label.setText(Messages.Pref_Map_Label_OfflineFolder);
 
             // text: offline folder
             _txtOfflineFolder = new Text(container, SWT.BORDER);
@@ -1335,7 +1335,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
              */
 
             final Label label = new Label(container, SWT.NONE);
-            label.setText(Messages.Pref_Map_Lable_MapProviderId);
+            label.setText(Messages.Pref_Map_Label_MapProviderId);
 
             // text: map provider id
             _txtMapProviderId = new Text(container, SWT.BORDER);
@@ -1375,7 +1375,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
              */
 
             final Label label = new Label(container, SWT.NONE);
-            label.setText(Messages.Pref_Map_Lable_MapProviderType);
+            label.setText(Messages.Pref_Map_Label_MapProviderType);
 
             // text: map provider type
             _txtMapProviderType = new Text(container, SWT.BORDER | SWT.READ_ONLY);
@@ -1900,7 +1900,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
             final int offlineTileCounter = ((MP) cell.getElement()).getOfflineFileCounter();
 
             if (offlineTileCounter == MP.OFFLINE_INFO_NOT_READ) {
-               cell.setText(Messages.pref_map_lable_NA);
+               cell.setText(Messages.pref_map_label_NA);
             } else if (offlineTileCounter > 0) {
                cell.setText(Integer.toString(offlineTileCounter));
             } else {
@@ -1931,7 +1931,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
             final long offlineTileSize = ((MP) cell.getElement()).getOfflineFileSize();
 
             if (offlineTileSize == MP.OFFLINE_INFO_NOT_READ) {
-               cell.setText(Messages.pref_map_lable_NA);
+               cell.setText(Messages.pref_map_label_NA);
             } else if (offlineTileSize > 0) {
                cell.setText(_nf.format((float) offlineTileSize / 1024 / 1024));
             } else {
@@ -3530,13 +3530,13 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
       if (offlineTileCounter == MP.OFFLINE_INFO_NOT_READ) {
 
-         sb.append(Messages.Pref_Map_Lable_NotRetrieved);
+         sb.append(Messages.Pref_Map_Label_NotRetrieved);
 
       } else if ((offlineTileCounter > 0) && (offlineTileSize > 0)) {
 
          sb.append(Integer.toString(offlineTileCounter));
          sb.append(UI.SPACE);
-         sb.append(Messages.Pref_Map_Lable_Files);
+         sb.append(Messages.Pref_Map_Label_Files);
          sb.append(UI.DASH_WITH_SPACE);
          sb.append(_nf.format((float) offlineTileSize / 1024 / 1024));
          sb.append(UI.SPACE);
@@ -3544,7 +3544,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
       } else {
 
-         sb.append(Messages.Pref_Map_Lable_NotAvailable);
+         sb.append(Messages.Pref_Map_Label_NotAvailable);
       }
 
       _lblOfflineFolderInfo.setText(sb.toString());
@@ -3590,7 +3590,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
             sbTotal.append(Integer.toString(tileCounter));
             sbTotal.append(UI.SPACE);
-            sbTotal.append(Messages.Pref_Map_Lable_Files);
+            sbTotal.append(Messages.Pref_Map_Label_Files);
             sbTotal.append(UI.DASH_WITH_SPACE);
             sbTotal.append(_nf.format((float) tileSize / 1024 / 1024));
             sbTotal.append(UI.SPACE);

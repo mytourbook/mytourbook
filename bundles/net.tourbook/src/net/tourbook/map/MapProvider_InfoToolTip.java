@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -287,7 +287,7 @@ public class MapProvider_InfoToolTip extends ToolTip {
              * Map provider type
              */
 
-            createUI_Label(container, Messages.Map2Provider_Tooltip_Lable_MapProviderType);
+            createUI_Label(container, Messages.Map2Provider_Tooltip_Label_MapProviderType);
 
             _txtMapProviderType = createUI_TextValue(container);
             GridDataFactory.fillDefaults()
@@ -301,7 +301,7 @@ public class MapProvider_InfoToolTip extends ToolTip {
              */
 
             // label
-            createUI_Label(container, Messages.Map2Provider_Tooltip_Lable_OfflineFolder);
+            createUI_Label(container, Messages.Map2Provider_Tooltip_Label_OfflineFolder);
 
             // text
             _txtOfflineFolder = createUI_TextValue(container, SWT.LEAD);
@@ -325,7 +325,7 @@ public class MapProvider_InfoToolTip extends ToolTip {
              * Unique id
              */
 
-            createUI_Label(container, Messages.Map2Provider_Tooltip_Lable_MapProviderId);
+            createUI_Label(container, Messages.Map2Provider_Tooltip_Label_MapProviderId);
 
             _txtMapProviderId = createUI_TextValue(container, SWT.LEAD);
          }
