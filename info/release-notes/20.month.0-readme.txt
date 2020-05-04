@@ -27,9 +27,6 @@ Bugs
 New + Improvements   
 ==================
 
-* xxx
-  - yyy
-
 * Statistics (Frederic)
   - The number of years to be displayed in the graph is now dynamically filled and updated based on the number of available years.
 
@@ -57,6 +54,9 @@ Fixes
 
 * TCX Import (Frederic)
   - Fixed an issue where the distance data and display were erroneous since the distance is reset at each new lap 
+
+* GPX/TCX Export (Frederic)
+  - Fixed and updated the GPX/TCX export templates as the file validation was failing against the schemas.
    
 Translation    
 ===========
@@ -70,5 +70,5 @@ Translation
 System   
 ======
 
-* FIT SDK 21.27
+* FIT SDK 21.30
 
