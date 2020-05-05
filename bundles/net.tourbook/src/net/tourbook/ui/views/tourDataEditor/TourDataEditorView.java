@@ -225,7 +225,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private static final String    VALUE_UNIT_K_CALORIES         = net.tourbook.ui.Messages.Value_Unit_KCalories;
    //
    /**
-    * On Linux an asynch selection event is fired since e4
+    * On Linux an async selection event is fired since e4
     */
    private static final String    FIX_LINUX_ASYNC_EVENT_1       = "FIX_LINUX_ASYNC_EVENT_1";                              //$NON-NLS-1$
    private static final String    FIX_LINUX_ASYNC_EVENT_2       = "FIX_LINUX_ASYNC_EVENT_2";                              //$NON-NLS-1$
@@ -419,7 +419,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private boolean                            _isInfoInTitle;
 
    /**
-    * Is <code>true</code> when a cell editor is activ, otherwise <code>false</code>
+    * Is <code>true</code> when a cell editor is active, otherwise <code>false</code>
     */
    private boolean                            _isCellEditorActive;
 
@@ -545,7 +545,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    //
    /**
     * contains the controls which are displayed in the first column, these controls are used to get
-    * the maximum width and set the first column within the differenct section to the same width
+    * the maximum width and set the first column within the different section to the same width
     */
    private final ArrayList<Control> _firstColumnControls          = new ArrayList<>();
    private final ArrayList<Control> _firstColumnContainerControls = new ArrayList<>();
@@ -815,7 +815,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   __dataSerie[serieIndex] = enteredValue;
 
                   /*
-                   * worldposition has changed, this is an absolute overkill, wenn only one position
+                   * world position has changed, this is an absolute overkill, when only one
+                   * position
                    * has changed
                    */
                   _tourData.clearWorldPositions();
@@ -7473,7 +7474,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _timeSlice_TourViewer.reloadViewer();
             updateStatusLine();
 
-            // run asynch because relaodViewer is also running asynch
+            // run async because reloadViewer is also running async
             Display.getCurrent().asyncExec(new Runnable() {
                @Override
                public void run() {
@@ -7497,7 +7498,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _swimSlice_TourViewer.reloadViewer();
 //          updateStatusLine();
 
-            // run asynch because relaodViewer is also running asynch
+            // run async because relaodViewer is also running async
             Display.getCurrent().asyncExec(new Runnable() {
 
                @Override
@@ -7932,6 +7933,27 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       table.showSelection();
    }
 
+   /**
+    * Select all the time slices for a given range.
+    *
+    * @param startIndex
+    *           The starting index of a given range.
+    * @param endIndex
+    *           The ending index of a given range.
+    */
+   public void selectTimeSlicesRange(final int startIndex, final int endIndex) {
+      final Table table = (Table) _timeSlice_Viewer.getControl();
+      final int itemCount = table.getItemCount();
+
+      // adjust to array bounds
+      //     int valueIndex = chartInfo.selectedSliderValuesIndex;
+      //  valueIndex = Math.max(0, Math.min(valueIndex, itemCount - 1));
+
+      table.setSelection(startIndex, endIndex);
+      table.showSelection();
+
+   }
+
    @Override
    public void setFocus() {
 
@@ -7945,7 +7967,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     * Set stroke style for the selected swim slices
     *
     * @param strokeStyle
-    *           Stroke style, can be <code>null</code> to remove the stroke styke
+    *           Stroke style, can be <code>null</code> to remove the stroke style
     */
    void setSwimStyle(final StrokeStyle strokeStyle) {
 
