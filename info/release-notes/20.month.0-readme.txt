@@ -27,8 +27,8 @@ Bugs
 New + Improvements   
 ==================
 
-* xxx
-  - yyy
+* Photo
+  - Show selected/hovered folder in the Photo view with more contrast which makes it better readable.
 
 * xxx (Frederic)
 
