@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,7 +18,6 @@ package net.tourbook.importdata;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -269,7 +268,6 @@ public class RawDataManager {
    }
 
    private static ArrayList<String> readInvalidFilesToIgnoreFile() {
-      Scanner s;
       final ArrayList<String> invalidFilesList = new ArrayList<>();
 
       final File invalidFilesToIgnoreFile = getInvalidFilesToIgnoreFile();
@@ -277,12 +275,10 @@ public class RawDataManager {
          return invalidFilesList;
       }
 
-      try {
-         s = new Scanner(invalidFilesToIgnoreFile);
+      try (Scanner s = new Scanner(invalidFilesToIgnoreFile)) {
          while (s.hasNext()) {
             invalidFilesList.add(s.next());
          }
-         s.close();
       } catch (final IOException e) {
          e.printStackTrace();
       }
@@ -305,7 +301,7 @@ public class RawDataManager {
             file.createNewFile();
          }
 
-         writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file, true), "UTF-8")); //$NON-NLS-1$
+         writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file, true), UI.UTF_8));
          final ImportConfig importConfig = getEasyConfig().getActiveImportConfig();
 
          for (final String invalidFile : _invalidFilesList) {
@@ -1713,44 +1709,18 @@ public class RawDataManager {
       }
 
       // copy source file into destination file
-      FileInputStream inReader = null;
-      FileOutputStream outReader = null;
-      try {
-         inReader = new FileInputStream(fileIn);
-         outReader = new FileOutputStream(newFile);
+      try (FileInputStream inReader = new FileInputStream(fileIn);
+            FileOutputStream outReader = new FileOutputStream(newFile)) {
+
          int c;
 
          while ((c = inReader.read()) != -1) {
             outReader.write(c);
          }
 
-         inReader.close();
-         outReader.close();
-
-      } catch (final FileNotFoundException e) {
-         TourLogManager.logEx(e);
-         return null;
       } catch (final IOException e) {
          TourLogManager.logEx(e);
          return null;
-      } finally {
-         // close the files
-         if (inReader != null) {
-            try {
-               inReader.close();
-            } catch (final IOException e) {
-               TourLogManager.logEx(e);
-               return null;
-            }
-         }
-         if (outReader != null) {
-            try {
-               outReader.close();
-            } catch (final IOException e) {
-               TourLogManager.logEx(e);
-               return null;
-            }
-         }
       }
 
       // delete source file
@@ -2108,9 +2078,7 @@ public class RawDataManager {
                         }
                      });
 
-            } catch (final InvocationTargetException e) {
-               TourLogManager.logEx(e);
-            } catch (final InterruptedException e) {
+            } catch (final InvocationTargetException | InterruptedException e) {
                TourLogManager.logEx(e);
             }
          } else {

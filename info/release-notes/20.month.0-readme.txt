@@ -27,10 +27,8 @@ Bugs
 New + Improvements   
 ==================
 
-* xxx
-  - yyy
-
-* xxx (Frederic)
+* Statistics (Frederic)
+  - The number of years to be displayed in the graph is now dynamically filled and updated based on the number of available years.
 
 
 Import
@@ -47,8 +45,18 @@ Changes
 Fixes   
 =====
 
-* xxx (Frederic)
+* 3D Map (Frederic)
 
+  - Removed the deprecated or unavailable layers (ID_USDA_NAIP & ID_USDA_NAIP_USGS & MS Virtual Earth Aerial). Added the layers USGS NAIP PLUS, USGS Topo Base Map and USGS Topo Base Map Large
+  - We disable the actions when the data series are not available
+  - Fixed an issue where the Atmosphere and Scale layers would not appear when using MyTourbook in French
+  - 3D Map colors : Fixed the pace ranges from seconds to minutes for better readability
+
+* TCX Import (Frederic)
+  - Fixed an issue where the distance data and display were erroneous since the distance is reset at each new lap 
+
+* GPX/TCX Export (Frederic)
+  - Fixed and updated the GPX/TCX export templates as the file validation was failing against the schemas.
    
 Translation    
 ===========
@@ -61,4 +69,6 @@ Translation
  
 System   
 ======
+
+* FIT SDK 21.30
 

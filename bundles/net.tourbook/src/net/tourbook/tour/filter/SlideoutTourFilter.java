@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,6 +20,15 @@ import java.time.LocalDateTime;
 import java.time.MonthDay;
 import java.util.ArrayList;
 import java.util.Collections;
+
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
+import net.tourbook.common.form.SashLeftFixedForm;
+import net.tourbook.common.tooltip.AdvancedSlideout;
+import net.tourbook.common.util.Util;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.search.SearchView;
 
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -85,15 +94,6 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Widget;
-
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.UI;
-import net.tourbook.common.form.SashLeftFixedForm;
-import net.tourbook.common.tooltip.AdvancedSlideout;
-import net.tourbook.common.util.Util;
-import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.search.SearchView;
 
 /**
  * Tour chart marker properties slideout.
@@ -938,6 +938,11 @@ public class SlideoutTourFilter extends AdvancedSlideout {
          case NUMBER_FLOAT:
             numColumns += createUI_Field_Number_Float(fieldContainer, filterProp, fldConfig, 1, true);
             break;
+
+         case TEXT:
+         case SEASON:
+         case CATEGORY:
+            break;
          }
 
          break;
@@ -983,6 +988,10 @@ public class SlideoutTourFilter extends AdvancedSlideout {
             numColumns += createUI_Field_SeasonDay(fieldContainer, filterProp, 2);
             numColumns += createUI_Field_SeasonMonth(fieldContainer, filterProp, 2);
             break;
+
+         case TEXT:
+         case CATEGORY:
+            break;
          }
 
          break;
@@ -1004,6 +1013,15 @@ public class SlideoutTourFilter extends AdvancedSlideout {
          case TEXT:
             numColumns += createUI_Field_Text(fieldContainer);
             break;
+
+         case SEASON:
+         case TIME:
+         case CATEGORY:
+         case NUMBER_INTEGER:
+         case NUMBER_FLOAT:
+         case DATE:
+         case DURATION:
+            break;
          }
 
          break;
@@ -1017,6 +1035,8 @@ public class SlideoutTourFilter extends AdvancedSlideout {
       case SEASON_TODAY_UNTIL_YEAR_END:
       case SEASON_CURRENT_DAY:
       case SEASON_CURRENT_MONTH:
+      case IS_AVAILABLE:
+      case IS_NOT_AVAILABLE:
          // no additional controls
          break;
 
@@ -2119,9 +2139,8 @@ public class SlideoutTourFilter extends AdvancedSlideout {
       {
          final ArrayList<TourFilterProperty> filterProperties = _selectedProfile.filterProperties;
 
-         for (int properyIndex = 0; properyIndex < filterProperties.size(); properyIndex++) {
+         for (final TourFilterProperty filterProperty : filterProperties) {
 
-            final TourFilterProperty filterProperty = filterProperties.get(properyIndex);
             final TourFilterFieldConfig fieldConfig = filterProperty.fieldConfig;
             final TourFilterFieldOperator fieldOperator = filterProperty.fieldOperator;
 
@@ -2206,9 +2225,8 @@ public class SlideoutTourFilter extends AdvancedSlideout {
             break;
 
          case TEXT:
-            break;
-
          case SEASON:
+         case CATEGORY:
             break;
          }
 
@@ -2250,6 +2268,9 @@ public class SlideoutTourFilter extends AdvancedSlideout {
             updateUI_PropertyDetail_Season(filterProperty, 1);
             updateUI_PropertyDetail_Season(filterProperty, 2);
             break;
+
+         case CATEGORY:
+            break;
          }
 
          break;
@@ -2288,6 +2309,11 @@ public class SlideoutTourFilter extends AdvancedSlideout {
       case SEASON_UNTIL_TODAY_FROM_DATE:
       case SEASON_TODAY_UNTIL_DATE:
          updateUI_PropertyDetail_Season(filterProperty, 1);
+         break;
+
+      case IS_AVAILABLE:
+      case IS_NOT_AVAILABLE:
+         // no additional controls
          break;
       }
    }

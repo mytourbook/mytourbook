@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2011-2019 Matthias Helmling and Contributors
+ * Copyright (C) 2011-2020 Matthias Helmling and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -33,7 +33,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
-import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
@@ -245,11 +244,7 @@ public class CalendarTourDataProvider {
 
             + (" ORDER BY StartYear, StartMonth, StartDay, StartHour, StartMinute"); //$NON-NLS-1$
 
-      Connection conn = null;
-
-      try {
-
-         conn = TourDatabase.getInstance().getConnection();
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          final PreparedStatement statement = conn.prepareStatement(select);
 
@@ -460,9 +455,6 @@ public class CalendarTourDataProvider {
          StatusUtil.log(select);
          net.tourbook.ui.UI.showSQLException(e);
 
-      } finally {
-
-         Util.closeSql(conn);
       }
 
 //		System.out.println(
@@ -492,11 +484,8 @@ public class CalendarTourDataProvider {
 
                   + (" WHERE TourId=?" + NL); //$NON-NLS-1$
 
-      Connection conn = null;
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-      try {
-
-         conn = TourDatabase.getInstance().getConnection();
          final PreparedStatement statement = conn.prepareStatement(select);
 
          statement.setLong(1, tourId);
@@ -518,9 +507,6 @@ public class CalendarTourDataProvider {
          StatusUtil.log(select);
          net.tourbook.ui.UI.showSQLException(e);
 
-      } finally {
-
-         Util.closeSql(conn);
       }
 
       return dt;
@@ -612,12 +598,9 @@ public class CalendarTourDataProvider {
          return _firstTourDateTime;
       }
 
-      Connection conn = null;
       String select = null;
 
-      try {
-
-         conn = TourDatabase.getInstance().getConnection();
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          long firstTourStartTime = 0;
 
@@ -668,10 +651,6 @@ public class CalendarTourDataProvider {
 
          StatusUtil.log(select);
          net.tourbook.ui.UI.showSQLException(e);
-
-      } finally {
-
-         Util.closeSql(conn);
       }
 
       if (_firstTourDateTime == null) {
@@ -695,12 +674,9 @@ public class CalendarTourDataProvider {
    Long getTodaysTourId() {
 
       Long todayTourId = null;
-      Connection conn = null;
       String select = null;
 
-      try {
-
-         conn = TourDatabase.getInstance().getConnection();
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          final LocalDate today = LocalDate.now();
 
@@ -733,9 +709,6 @@ public class CalendarTourDataProvider {
          StatusUtil.log(select);
          net.tourbook.ui.UI.showSQLException(e);
 
-      } finally {
-
-         Util.closeSql(conn);
       }
 
       return todayTourId;
@@ -773,10 +746,9 @@ public class CalendarTourDataProvider {
       final int week = weekLoader.week;
       final CalendarTourData weekData = weekLoader.weekData;
 
-      Connection conn = null;
       String select = null;
 
-      try {
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          final SQLFilter sqlFilter = new SQLFilter(SQLFilter.TAG_FILTER);
 
@@ -787,17 +759,19 @@ public class CalendarTourDataProvider {
 
             fromTourData = NL
 
-                  + "FROM (						" + NL //$NON-NLS-1$
+                  + "FROM (						    " + NL //$NON-NLS-1$
 
-                  + " SELECT						" + NL //$NON-NLS-1$
+                  + " SELECT					     	 " + NL //$NON-NLS-1$
 
-                  + "  TourDistance,				" + NL //$NON-NLS-1$
-                  + "  TourAltUp,					" + NL //$NON-NLS-1$
-                  + "  TourAltDown,					" + NL //$NON-NLS-1$
-                  + "  TourRecordingTime,			" + NL //$NON-NLS-1$
-                  + "  TourDrivingTime,			" + NL //$NON-NLS-1$
-                  + "  calories,					" + NL //$NON-NLS-1$
-                  + "  jTdataTtag.TourTag_tagId	" + NL //$NON-NLS-1$
+                  + "  TourDistance,				 " + NL //$NON-NLS-1$
+                  + "  TourAltUp,					 " + NL //$NON-NLS-1$
+                  + "  TourAltDown,					 " + NL //$NON-NLS-1$
+                  + "  TourRecordingTime,			 " + NL //$NON-NLS-1$
+                  + "  TourDrivingTime,			 " + NL //$NON-NLS-1$
+                  + "  calories,					    " + NL //$NON-NLS-1$
+                  + "  jTdataTtag.TourTag_tagId, " + NL //$NON-NLS-1$
+                  + "  cadenceZone_SlowTime,	    " + NL //$NON-NLS-1$
+                  + "  cadenceZone_FastTime	    " + NL //$NON-NLS-1$
 
                   + (" FROM " + TourDatabase.TABLE_TOUR_DATA) + NL//$NON-NLS-1$
 
@@ -840,7 +814,6 @@ public class CalendarTourDataProvider {
 
                + fromTourData;
 
-         conn = TourDatabase.getInstance().getConnection();
          final PreparedStatement statement = conn.prepareStatement(select);
 
          statement.setInt(1, year);
@@ -885,8 +858,6 @@ public class CalendarTourDataProvider {
          net.tourbook.ui.UI.showSQLException(e);
 
       } finally {
-
-         Util.closeSql(conn);
 
          weekData.loadingState = LoadingState.IS_LOADED;
       }

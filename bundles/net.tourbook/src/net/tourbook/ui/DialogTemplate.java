@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,13 +15,10 @@
  *******************************************************************************/
 package net.tourbook.ui;
 
-import net.tourbook.application.TourbookPlugin;
-
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -32,10 +29,7 @@ import org.eclipse.swt.widgets.Shell;
  */
 public class DialogTemplate extends TitleAreaDialog {
 
-   private static final String    ID         = "net.tourbook.ui.DialogTemplate"; //$NON-NLS-1$
-
-   private final IDialogSettings  _state     = TourbookPlugin.getState(ID);
-   private final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
+   private static final String ID = "net.tourbook.ui.DialogTemplate"; //$NON-NLS-1$
 
    public DialogTemplate(final Shell parentShell) {
 

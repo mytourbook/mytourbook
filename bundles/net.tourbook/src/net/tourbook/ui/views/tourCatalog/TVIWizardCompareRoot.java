@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -27,47 +27,44 @@ import net.tourbook.ui.UI;
 
 public class TVIWizardCompareRoot extends TVIWizardCompareItem {
 
-	@Override
-	protected void fetchChildren() {
+   @Override
+   protected void fetchChildren() {
 
-		/*
-		 * set the children for the root item, these are year items
-		 */
-		final ArrayList<TreeViewerItem> children = new ArrayList<TreeViewerItem>();
-		setChildren(children);
+      /*
+       * set the children for the root item, these are year items
+       */
+      final ArrayList<TreeViewerItem> children = new ArrayList<>();
+      setChildren(children);
 
-		final StringBuilder sb = new StringBuilder();
+      final StringBuilder sb = new StringBuilder();
 
-		sb.append("SELECT"); //$NON-NLS-1$
+      sb.append("SELECT"); //$NON-NLS-1$
 
-		sb.append(" startYear "); //$NON-NLS-1$
+      sb.append(" startYear "); //$NON-NLS-1$
 
-		sb.append(" FROM " + TourDatabase.TABLE_TOUR_DATA); //$NON-NLS-1$
+      sb.append(" FROM " + TourDatabase.TABLE_TOUR_DATA); //$NON-NLS-1$
 
-		sb.append(" GROUP BY startYear"); //$NON-NLS-1$
-		sb.append(" ORDER BY startYear"); //$NON-NLS-1$
+      sb.append(" GROUP BY startYear"); //$NON-NLS-1$
+      sb.append(" ORDER BY startYear"); //$NON-NLS-1$
 
-		try {
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-			final Connection conn = TourDatabase.getInstance().getConnection();
-			final PreparedStatement statement = conn.prepareStatement(sb.toString());
+         final PreparedStatement statement = conn.prepareStatement(sb.toString());
 
-			final ResultSet result = statement.executeQuery();
-			while (result.next()) {
+         final ResultSet result = statement.executeQuery();
+         while (result.next()) {
 
-				final int dbYear = result.getInt(1);
+            final int dbYear = result.getInt(1);
 
-				final TVIWizardCompareYear yearItem = new TVIWizardCompareYear(this);
-				children.add(yearItem);
+            final TVIWizardCompareYear yearItem = new TVIWizardCompareYear(this);
+            children.add(yearItem);
 
-				yearItem.treeColumn = Integer.toString(dbYear);
-				yearItem.tourYear = dbYear;
-			}
+            yearItem.treeColumn = Integer.toString(dbYear);
+            yearItem.tourYear = dbYear;
+         }
 
-			conn.close();
-
-		} catch (final SQLException e) {
-			UI.showSQLException(e);
-		}
-	}
+      } catch (final SQLException e) {
+         UI.showSQLException(e);
+      }
+   }
 }

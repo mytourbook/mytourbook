@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1848,9 +1848,7 @@ public class TourManager {
              */
             new ProgressMonitorDialog(TourbookPlugin.getAppShell()).run(true, true, saveRunnable);
 
-         } catch (final InvocationTargetException e) {
-            StatusUtil.showStatus(e);
-         } catch (final InterruptedException e) {
+         } catch (final InvocationTargetException | InterruptedException e) {
             StatusUtil.showStatus(e);
          }
       }
@@ -2494,9 +2492,7 @@ public class TourManager {
 
             new ProgressMonitorDialog(TourbookPlugin.getAppShell()).run(true, false, saveRunnable);
 
-         } catch (final InvocationTargetException e) {
-            StatusUtil.showStatus(e);
-         } catch (final InterruptedException e) {
+         } catch (final InvocationTargetException | InterruptedException e) {
             StatusUtil.showStatus(e);
          }
       }

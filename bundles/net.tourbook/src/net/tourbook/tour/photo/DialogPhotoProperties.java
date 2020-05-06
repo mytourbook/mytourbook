@@ -1,19 +1,21 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.tour.photo;
+
+import de.byteholder.geoclipse.map.UI;
 
 import net.tourbook.Messages;
 import net.tourbook.common.tooltip.AnimatedToolTipShell;
@@ -50,426 +52,424 @@ import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IViewPart;
 
-import de.byteholder.geoclipse.map.UI;
-
 /**
  * Photo properties dialog.
  */
 public class DialogPhotoProperties extends AnimatedToolTipShell implements IPhotoEventListener {
 
-	private static final int		SHELL_MARGIN							= 5;
+   private static final int      SHELL_MARGIN                            = 5;
 
-	private static final int		MIN_IMAGE_WIDTH							= 10;
+   private static final int      MIN_IMAGE_WIDTH                         = 10;
 
-	/**
-	 * This value is small because a map do not yet load large images !!!
-	 */
-	private static final int		MAX_IMAGE_WIDTH							= 200;
+   /**
+    * This value is small because a map do not yet load large images !!!
+    */
+   private static final int      MAX_IMAGE_WIDTH                         = 200;
 
-	private static final String		STATE_PHOTO_FILTER_RATING_STARS			= "STATE_PHOTO_FILTER_RATING_STARS";			//$NON-NLS-1$
-	private static final String		STATE_PHOTO_FILTER_RATING_STAR_OPERATOR	= "STATE_PHOTO_FILTER_RATING_STAR_OPERATOR";	//$NON-NLS-1$
-	private static final String		STATE_PHOTO_PROPERTIES_IMAGE_SIZE		= "STATE_PHOTO_PROPERTIES_IMAGE_SIZE";			//$NON-NLS-1$
+   private static final String   STATE_PHOTO_FILTER_RATING_STARS         = "STATE_PHOTO_FILTER_RATING_STARS";         //$NON-NLS-1$
+   private static final String   STATE_PHOTO_FILTER_RATING_STAR_OPERATOR = "STATE_PHOTO_FILTER_RATING_STAR_OPERATOR"; //$NON-NLS-1$
+   private static final String   STATE_PHOTO_PROPERTIES_IMAGE_SIZE       = "STATE_PHOTO_PROPERTIES_IMAGE_SIZE";       //$NON-NLS-1$
 
-	private IDialogSettings			_state;
+   public static final int       OPERATOR_IS_LESS_OR_EQUAL               = 0;
 
-	// initialize with default values which are (should) never be used
-	private Rectangle				_itemBounds								= new Rectangle(0, 0, 50, 50);
+   public static final int       OPERATOR_IS_EQUAL                       = 1;
 
-	private final WaitTimer			_waitTimer								= new WaitTimer();
+   public static final int       OPERATOR_IS_MORE_OR_EQUAL               = 2;
 
-	private boolean					_canOpenToolTip;
+   private static final String[] _ratingStarOperatorsText                = {
+         Messages.Photo_Filter_Operator_IsLess,
+         Messages.Photo_Filter_Operator_IsEqual,
+         Messages.Photo_Filter_Operator_IsMore,
+         //
+   };
 
-	private boolean					_isWaitTimerStarted;
+   /**
+    * <b>THEY MUST BE IN SYNC WITH </b> {@link #_filterRatingStarOperatorsText}
+    */
+   private static final int[]    _ratingStarOperatorsValues              = {
+         OPERATOR_IS_LESS_OR_EQUAL,
+         OPERATOR_IS_EQUAL,
+         OPERATOR_IS_MORE_OR_EQUAL,
+         //
+   };
 
-	private int						_filterRatingStars						= RatingStars.MAX_RATING_STARS;
+   private IDialogSettings       _state;
 
-	private final ListenerList		_propertiesListeners					= new ListenerList(ListenerList.IDENTITY);
+   // initialize with default values which are (should) never be used
+   private Rectangle                                    _itemBounds          = new Rectangle(0, 0, 50, 50);
 
-	private int						_imageSize;
+   private final WaitTimer                              _waitTimer           = new WaitTimer();
 
-	/*
-	 * filter operator
-	 */
-	private int						_filterRatingStarOperatorIndex;
+   private boolean                                      _canOpenToolTip;
 
-	/*
-	 * UI resources
-	 */
-	private Color					_fgColor;
-	private Color					_bgColor;
+   private boolean                                      _isWaitTimerStarted;
+   private int                                          _filterRatingStars   = RatingStars.MAX_RATING_STARS;
 
-	private MapFilterData			_oldMapFilterData;
+   private final ListenerList<IPhotoPropertiesListener> _propertiesListeners = new ListenerList<>(ListenerList.IDENTITY);
 
-	/*
-	 * UI controls
-	 */
-	private Composite				_shellContainer;
+   private int                                          _imageSize;
 
-	private Composite				_containerFilterHeader;
-	private Label					_lblAllPhotos;
-	private Label					_lblFilteredPhotos;
+   /*
+    * filter operator
+    */
+   private int           _filterRatingStarOperatorIndex;
+   /*
+    * UI resources
+    */
+   private Color         _fgColor;
+   private Color         _bgColor;
 
-	private Combo					_comboRatingStarOperators;
-	private RatingStars				_ratingStars;
+   private MapFilterData _oldMapFilterData;
+   /*
+    * UI controls
+    */
+   private Composite     _shellContainer;
 
-	private Spinner					_spinnerImageSize;
+   private Composite     _containerFilterHeader;
 
-	public static final int			OPERATOR_IS_LESS_OR_EQUAL				= 0;
-	public static final int			OPERATOR_IS_EQUAL						= 1;
-	public static final int			OPERATOR_IS_MORE_OR_EQUAL				= 2;
+   private Label         _lblAllPhotos;
+   private Label         _lblFilteredPhotos;
+   private Combo         _comboRatingStarOperators;
 
-	private static final String[]	_ratingStarOperatorsText				= {
-			Messages.Photo_Filter_Operator_IsLess,
-			Messages.Photo_Filter_Operator_IsEqual,
-			Messages.Photo_Filter_Operator_IsMore,
-																			//
-																			};
+   private RatingStars   _ratingStars;
 
-	/**
-	 * <b>THEY MUST BE IN SYNC WITH </b> {@link #_filterRatingStarOperatorsText}
-	 */
-	private static final int[]		_ratingStarOperatorsValues				= {
-			OPERATOR_IS_LESS_OR_EQUAL,
-			OPERATOR_IS_EQUAL,
-			OPERATOR_IS_MORE_OR_EQUAL,
-																			//
-																			};
+   private Spinner       _spinnerImageSize;
 
-	private final class WaitTimer implements Runnable {
-		@Override
-		public void run() {
-			open_Runnable();
-		}
-	}
+   private final class WaitTimer implements Runnable {
+      @Override
+      public void run() {
+         open_Runnable();
+      }
+   }
 
-	public DialogPhotoProperties(final Control ownerControl, final ToolBar toolBar, final IDialogSettings state) {
+   public DialogPhotoProperties(final Control ownerControl, final ToolBar toolBar, final IDialogSettings state) {
 
-		super(ownerControl);
+      super(ownerControl);
 
-		_state = state;
+      _state = state;
 
-		toolBar.addMouseTrackListener(new MouseTrackAdapter() {
-			@Override
-			public void mouseExit(final MouseEvent e) {
+      toolBar.addMouseTrackListener(new MouseTrackAdapter() {
+         @Override
+         public void mouseExit(final MouseEvent e) {
 
-				// prevent to open the tooltip
-				_canOpenToolTip = false;
-			}
-		});
+            // prevent to open the tooltip
+            _canOpenToolTip = false;
+         }
+      });
 
-		PhotoManager.addPhotoEventListener(this);
+      PhotoManager.addPhotoEventListener(this);
 
-		setToolTipCreateStyle(AnimatedToolTipShell.TOOLTIP_STYLE_KEEP_CONTENT);
-		setBehaviourOnMouseOver(AnimatedToolTipShell.MOUSE_OVER_BEHAVIOUR_IGNORE_OWNER);
-		setIsKeepShellOpenWhenMoved(false);
-		setFadeInSteps(1);
-	}
+      setToolTipCreateStyle(AnimatedToolTipShell.TOOLTIP_STYLE_KEEP_CONTENT);
+      setBehaviourOnMouseOver(AnimatedToolTipShell.MOUSE_OVER_BEHAVIOUR_IGNORE_OWNER);
+      setIsKeepShellOpenWhenMoved(false);
+      setFadeInSteps(1);
+   }
 
-	public void addPropertiesListener(final IPhotoPropertiesListener listener) {
-		_propertiesListeners.add(listener);
-	}
+   public void addPropertiesListener(final IPhotoPropertiesListener listener) {
+      _propertiesListeners.add(listener);
+   }
 
-	@Override
-	protected boolean canShowToolTip() {
-		return true;
-	}
+   @Override
+   protected boolean canShowToolTip() {
+      return true;
+   }
 
-	@Override
-	protected Composite createToolTipContentArea(final Composite parent) {
+   @Override
+   protected Composite createToolTipContentArea(final Composite parent) {
 
-		final Composite container = createUI(parent);
+      final Composite container = createUI(parent);
 
-		final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
-		_fgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_FOREGROUND);
-		_bgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND);
+      final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
+      _fgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_FOREGROUND);
+      _bgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND);
 
-		updateUI();
+      updateUI();
 
-		net.tourbook.common.UI.setChildColors(parent, _fgColor, _bgColor);
+      net.tourbook.common.UI.setChildColors(parent, _fgColor, _bgColor);
 
-		if (_oldMapFilterData != null) {
+      if (_oldMapFilterData != null) {
 
-			/*
-			 * _oldMapFilterData can be set before the UI is created
-			 */
+         /*
+          * _oldMapFilterData can be set before the UI is created
+          */
 
-			updateFilterUI(_oldMapFilterData);
-		}
+         updateFilterUI(_oldMapFilterData);
+      }
 
-		enableActions();
+      enableActions();
 
-		return container;
-	}
+      return container;
+   }
 
-	private Composite createUI(final Composite parent) {
+   private Composite createUI(final Composite parent) {
 
-		_shellContainer = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.fillDefaults()//
-				.margins(SHELL_MARGIN, SHELL_MARGIN)
-				.numColumns(3)
-				.applyTo(_shellContainer);
-		{
-			createUI_10_Filter(_shellContainer);
+      _shellContainer = new Composite(parent, SWT.NONE);
+      GridLayoutFactory.fillDefaults()//
+            .margins(SHELL_MARGIN, SHELL_MARGIN)
+            .numColumns(3)
+            .applyTo(_shellContainer);
+      {
+         createUI_10_Filter(_shellContainer);
 
-			// spacer
-			final Label label = new Label(_shellContainer, SWT.NONE);
-			GridDataFactory.fillDefaults().hint(20, 0).applyTo(label);
+         // spacer
+         final Label label = new Label(_shellContainer, SWT.NONE);
+         GridDataFactory.fillDefaults().hint(20, 0).applyTo(label);
 
-			createUI_20_ImageSize(_shellContainer);
-		}
+         createUI_20_ImageSize(_shellContainer);
+      }
 
-		return _shellContainer;
-	}
+      return _shellContainer;
+   }
 
-	private void createUI_10_Filter(final Composite parent) {
+   private void createUI_10_Filter(final Composite parent) {
 
-		final Composite container = new Composite(parent, SWT.NO_FOCUS);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-		{
-			/*
-			 * label: photo filter
-			 */
-			final Label label = new Label(container, SWT.NO_FOCUS);
-			GridDataFactory.fillDefaults().applyTo(label);
+      final Composite container = new Composite(parent, SWT.NO_FOCUS);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+      {
+         /*
+          * label: photo filter
+          */
+         final Label label = new Label(container, SWT.NO_FOCUS);
+         GridDataFactory.fillDefaults().applyTo(label);
 
-			label.setText(Messages.Photo_Filter_Label_RatingStars);
-			label.setToolTipText(Messages.Photo_Filter_Label_RatingStars_Tooltip);
+         label.setText(Messages.Photo_Filter_Label_RatingStars);
+         label.setToolTipText(Messages.Photo_Filter_Label_RatingStars_Tooltip);
 
-			createUI_12_FilterHeader(container);
+         createUI_12_FilterHeader(container);
 
-			/*
-			 * combo: > = <
-			 */
+         /*
+          * combo: > = <
+          */
 //			_comboRatingStarOperators = new Combo(container, SWT.READ_ONLY);
-			_comboRatingStarOperators = new Combo(container, SWT.READ_ONLY);
-			GridDataFactory.fillDefaults()//
-					.align(SWT.END, SWT.FILL)
+         _comboRatingStarOperators = new Combo(container, SWT.READ_ONLY);
+         GridDataFactory.fillDefaults()//
+               .align(SWT.END, SWT.FILL)
 //					.hint(_pc.convertWidthInCharsToPixels(15), SWT.DEFAULT)
-					.applyTo(_comboRatingStarOperators);
-			_comboRatingStarOperators.setVisibleItemCount(10);
+               .applyTo(_comboRatingStarOperators);
+         _comboRatingStarOperators.setVisibleItemCount(10);
 //			_comboRatingStarOperators.setToolTipText(Messages.Photos_PhotoFilter_Combo_RatingStarOperands_Tooltip);
-			_comboRatingStarOperators.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onSelectRatingStarOperands();
-				}
-			});
+         _comboRatingStarOperators.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+               onSelectRatingStarOperands();
+            }
+         });
 
-			/*
-			 * rating stars
-			 */
-			_ratingStars = new RatingStars(container);
-			_ratingStars.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onSelectRatingStars();
-				}
-			});
-		}
-	}
+         /*
+          * rating stars
+          */
+         _ratingStars = new RatingStars(container);
+         _ratingStars.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+               onSelectRatingStars();
+            }
+         });
+      }
+   }
 
-	private void createUI_12_FilterHeader(final Composite parent) {
+   private void createUI_12_FilterHeader(final Composite parent) {
 
-		_containerFilterHeader = new Composite(parent, SWT.NONE);
-		GridDataFactory.fillDefaults()//
-				.applyTo(_containerFilterHeader);
-		GridLayoutFactory.fillDefaults()//
-				.applyTo(_containerFilterHeader);
+      _containerFilterHeader = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults()//
+            .applyTo(_containerFilterHeader);
+      GridLayoutFactory.fillDefaults()//
+            .applyTo(_containerFilterHeader);
 //		_containerFilterHeader.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-		{
-			/*
-			 * inner container is used to center horizontally
-			 */
-			final Composite innerContainer = new Composite(_containerFilterHeader, SWT.NONE);
-			GridDataFactory.fillDefaults().//
-					grab(true, false)
-					.align(SWT.CENTER, SWT.FILL)
-					.applyTo(innerContainer);
-			GridLayoutFactory.fillDefaults().numColumns(3).applyTo(innerContainer);
+      {
+         /*
+          * inner container is used to center horizontally
+          */
+         final Composite innerContainer = new Composite(_containerFilterHeader, SWT.NONE);
+         GridDataFactory.fillDefaults().//
+               grab(true, false)
+               .align(SWT.CENTER, SWT.FILL)
+               .applyTo(innerContainer);
+         GridLayoutFactory.fillDefaults().numColumns(3).applyTo(innerContainer);
 //			innerContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
-			{
-				/*
-				 * value: number of all photos
-				 */
-				_lblAllPhotos = new Label(innerContainer, SWT.NO_FOCUS);
-				_lblAllPhotos.setText(UI.EMPTY_STRING);
-				_lblAllPhotos.setToolTipText(Messages.Photo_Filter_Label_NumberOfAllPhotos_Tooltip);
+         {
+            /*
+             * value: number of all photos
+             */
+            _lblAllPhotos = new Label(innerContainer, SWT.NO_FOCUS);
+            _lblAllPhotos.setText(UI.EMPTY_STRING);
+            _lblAllPhotos.setToolTipText(Messages.Photo_Filter_Label_NumberOfAllPhotos_Tooltip);
 
-				/*
-				 * label: number of filtered photos
-				 */
-				final Label label = new Label(innerContainer, SWT.NO_FOCUS);
-				label.setText(UI.DASH_WITH_SPACE);
+            /*
+             * label: number of filtered photos
+             */
+            final Label label = new Label(innerContainer, SWT.NO_FOCUS);
+            label.setText(UI.DASH_WITH_SPACE);
 
-				/*
-				 * value: number of filtered photos
-				 */
-				_lblFilteredPhotos = new Label(innerContainer, SWT.NO_FOCUS);
-				_lblFilteredPhotos.setText(UI.EMPTY_STRING);
-				_lblFilteredPhotos.setToolTipText(Messages.Photo_Filter_Label_NumberOfFilteredPhotos_Tooltip);
-			}
-		}
-	}
+            /*
+             * value: number of filtered photos
+             */
+            _lblFilteredPhotos = new Label(innerContainer, SWT.NO_FOCUS);
+            _lblFilteredPhotos.setText(UI.EMPTY_STRING);
+            _lblFilteredPhotos.setToolTipText(Messages.Photo_Filter_Label_NumberOfFilteredPhotos_Tooltip);
+         }
+      }
+   }
 
-	private void createUI_20_ImageSize(final Composite parent) {
+   private void createUI_20_ImageSize(final Composite parent) {
 
-		final Composite container = new Composite(parent, SWT.NONE);
+      final Composite container = new Composite(parent, SWT.NONE);
 //		GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-		{
-			/*
-			 * label: displayed photos
-			 */
-			final Label label = new Label(container, SWT.NO_FOCUS);
-			GridDataFactory.fillDefaults()//
+      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+      {
+         /*
+          * label: displayed photos
+          */
+         final Label label = new Label(container, SWT.NO_FOCUS);
+         GridDataFactory.fillDefaults()//
 //					.align(SWT.CENTER, SWT.BEGINNING)
-					.applyTo(label);
+               .applyTo(label);
 
-			label.setText(Messages.Photo_Properties_Label_Size);
-			label.setToolTipText(Messages.Photo_Properties_Label_ThumbnailSize_Tooltip);
+         label.setText(Messages.Photo_Properties_Label_Size);
+         label.setToolTipText(Messages.Photo_Properties_Label_ThumbnailSize_Tooltip);
 
-			/*
-			 * spinner: size
-			 */
-			_spinnerImageSize = new Spinner(container, SWT.BORDER);
-			GridDataFactory.fillDefaults() //
-					.align(SWT.BEGINNING, SWT.FILL)
-					.applyTo(_spinnerImageSize);
-			_spinnerImageSize.setMinimum(MIN_IMAGE_WIDTH);
-			_spinnerImageSize.setMaximum(MAX_IMAGE_WIDTH);
-			_spinnerImageSize.setIncrement(1);
-			_spinnerImageSize.setPageIncrement(10);
-			_spinnerImageSize.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					onSelectImageSize();
-				}
-			});
-			_spinnerImageSize.addMouseWheelListener(new MouseWheelListener() {
-				@Override
-				public void mouseScrolled(final MouseEvent event) {
-					Util.adjustSpinnerValueOnMouseScroll(event);
-					onSelectImageSize();
-				}
-			});
+         /*
+          * spinner: size
+          */
+         _spinnerImageSize = new Spinner(container, SWT.BORDER);
+         GridDataFactory.fillDefaults() //
+               .align(SWT.BEGINNING, SWT.FILL)
+               .applyTo(_spinnerImageSize);
+         _spinnerImageSize.setMinimum(MIN_IMAGE_WIDTH);
+         _spinnerImageSize.setMaximum(MAX_IMAGE_WIDTH);
+         _spinnerImageSize.setIncrement(1);
+         _spinnerImageSize.setPageIncrement(10);
+         _spinnerImageSize.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+               onSelectImageSize();
+            }
+         });
+         _spinnerImageSize.addMouseWheelListener(new MouseWheelListener() {
+            @Override
+            public void mouseScrolled(final MouseEvent event) {
+               Util.adjustSpinnerValueOnMouseScroll(event);
+               onSelectImageSize();
+            }
+         });
 
-		}
-	}
+      }
+   }
 
-	private void enableActions() {
+   private void enableActions() {
 
 //		final boolean isRatingStars = _filterRatingStars > 0;
 //
 //		_comboRatingStarOperators.setEnabled(isRatingStars);
-	}
+   }
 
-	private void firePropertiesEvent() {
+   private void firePropertiesEvent() {
 
-		final PhotoPropertiesEvent propertyEvent = new PhotoPropertiesEvent();
+      final PhotoPropertiesEvent propertyEvent = new PhotoPropertiesEvent();
 
-		propertyEvent.filterRatingStars = _filterRatingStars;
-		propertyEvent.fiterRatingStarOperator = _ratingStarOperatorsValues[_filterRatingStarOperatorIndex];
+      propertyEvent.filterRatingStars = _filterRatingStars;
+      propertyEvent.fiterRatingStarOperator = _ratingStarOperatorsValues[_filterRatingStarOperatorIndex];
 
-		final Object[] listeners = _propertiesListeners.getListeners();
-		for (final Object listener : listeners) {
-			((IPhotoPropertiesListener) listener).photoPropertyEvent(propertyEvent);
-		}
-	}
+      final Object[] listeners = _propertiesListeners.getListeners();
+      for (final Object listener : listeners) {
+         ((IPhotoPropertiesListener) listener).photoPropertyEvent(propertyEvent);
+      }
+   }
 
-	@Override
-	public Point getToolTipLocation(final Point tipSize) {
+   @Override
+   public Point getToolTipLocation(final Point tipSize) {
 
-		final int tipWidth = tipSize.x;
+      final int tipWidth = tipSize.x;
 
-		final int itemWidth = _itemBounds.width;
-		final int itemHeight = _itemBounds.height;
+      final int itemWidth = _itemBounds.width;
+      final int itemHeight = _itemBounds.height;
 
-		final int itemWidth2 = itemWidth / 2;
-		final int tipWidth2 = tipWidth / 2;
+      final int itemWidth2 = itemWidth / 2;
+      final int tipWidth2 = tipWidth / 2;
 
-		final int devX = _itemBounds.x + itemWidth2 - tipWidth2;
-		final int devY = _itemBounds.y + itemHeight + 0;
+      final int devX = _itemBounds.x + itemWidth2 - tipWidth2;
+      final int devY = _itemBounds.y + itemHeight + 0;
 
-		return new Point(devX, devY);
-	}
+      return new Point(devX, devY);
+   }
 
-	@Override
-	protected Rectangle noHideOnMouseMove() {
-		return _itemBounds;
-	}
+   @Override
+   protected Rectangle noHideOnMouseMove() {
+      return _itemBounds;
+   }
 
-	@Override
-	protected void onDispose() {
+   @Override
+   protected void onDispose() {
 
-		PhotoManager.removePhotoEventListener(this);
-	}
+      PhotoManager.removePhotoEventListener(this);
+   }
 
-	private void onSelectImageSize() {
+   private void onSelectImageSize() {
 
-		final int oldImageSize = _imageSize;
+      final int oldImageSize = _imageSize;
 
-		_imageSize = _spinnerImageSize.getSelection();
+      _imageSize = _spinnerImageSize.getSelection();
 
-		// optimize fire event
-		if (oldImageSize != _imageSize) {
+      // optimize fire event
+      if (oldImageSize != _imageSize) {
 
-			Photo.setPaintedMapImageWidth(_imageSize);
+         Photo.setPaintedMapImageWidth(_imageSize);
 
-			firePropertiesEvent();
-		}
-	}
+         firePropertiesEvent();
+      }
+   }
 
-	private void onSelectRatingStarOperands() {
+   private void onSelectRatingStarOperands() {
 
-		_filterRatingStarOperatorIndex = _comboRatingStarOperators.getSelectionIndex();
+      _filterRatingStarOperatorIndex = _comboRatingStarOperators.getSelectionIndex();
 
-		firePropertiesEvent();
-	}
+      firePropertiesEvent();
+   }
 
-	private void onSelectRatingStars() {
+   private void onSelectRatingStars() {
 
-		final int selectedStars = _ratingStars.getSelection();
+      final int selectedStars = _ratingStars.getSelection();
 
-		_filterRatingStars = selectedStars;
+      _filterRatingStars = selectedStars;
 
-		enableActions();
+      enableActions();
 
-		firePropertiesEvent();
-	}
+      firePropertiesEvent();
+   }
 
-	/**
-	 * @param itemBounds
-	 * @param isOpenDelayed
-	 */
-	public void open(final Rectangle itemBounds, final boolean isOpenDelayed) {
+   /**
+    * @param itemBounds
+    * @param isOpenDelayed
+    */
+   public void open(final Rectangle itemBounds, final boolean isOpenDelayed) {
 
-		if (isToolTipVisible()) {
-			return;
-		}
+      if (isToolTipVisible()) {
+         return;
+      }
 
-		if (isOpenDelayed == false) {
+      if (isOpenDelayed == false) {
 
-			if (itemBounds != null) {
+         if (itemBounds != null) {
 
-				_itemBounds = itemBounds;
+            _itemBounds = itemBounds;
 
-				showToolTip();
-			}
+            showToolTip();
+         }
 
-		} else {
+      } else {
 
-			if (itemBounds == null) {
+         if (itemBounds == null) {
 
-				// item is not hovered any more
+            // item is not hovered any more
 
-				_canOpenToolTip = false;
+            _canOpenToolTip = false;
 
-				return;
-			}
+            return;
+         }
 
-			_itemBounds = itemBounds;
-			_canOpenToolTip = true;
+         _itemBounds = itemBounds;
+         _canOpenToolTip = true;
 
 //		System.out.println(UI.timeStampNano()
 //				+ " open\t2\t_isWaitTimerStarted="
@@ -480,114 +480,114 @@ public class DialogPhotoProperties extends AnimatedToolTipShell implements IPhot
 //				);
 //		// TODO remove SYSTEM.OUT.PRINTLN
 
-			if (_isWaitTimerStarted == false) {
+         if (_isWaitTimerStarted == false) {
 
-				_isWaitTimerStarted = true;
+            _isWaitTimerStarted = true;
 
-				Display.getCurrent().timerExec(50, _waitTimer);
-			}
-		}
-	}
+            Display.getCurrent().timerExec(50, _waitTimer);
+         }
+      }
+   }
 
-	private void open_Runnable() {
+   private void open_Runnable() {
 
-		_isWaitTimerStarted = false;
+      _isWaitTimerStarted = false;
 
-		if (_canOpenToolTip) {
-			showToolTip();
-		}
-	}
+      if (_canOpenToolTip) {
+         showToolTip();
+      }
+   }
 
-	@Override
-	public void photoEvent(final IViewPart viewPart, final PhotoEventId photoEventId, final Object data) {
+   @Override
+   public void photoEvent(final IViewPart viewPart, final PhotoEventId photoEventId, final Object data) {
 
-		if (photoEventId == PhotoEventId.PHOTO_FILTER) {
+      if (photoEventId == PhotoEventId.PHOTO_FILTER) {
 
-			if (data instanceof MapFilterData) {
+         if (data instanceof MapFilterData) {
 
-				updateFilterUI((MapFilterData) data);
-			}
-		}
-	}
+            updateFilterUI((MapFilterData) data);
+         }
+      }
+   }
 
-	public void restoreState() {
+   public void restoreState() {
 
-		_filterRatingStars = Util.getStateInt(_state, STATE_PHOTO_FILTER_RATING_STARS, RatingStars.MAX_RATING_STARS);
-		_filterRatingStarOperatorIndex = Util.getStateInt(
-				_state,
-				STATE_PHOTO_FILTER_RATING_STAR_OPERATOR,
-				OPERATOR_IS_EQUAL);
+      _filterRatingStars = Util.getStateInt(_state, STATE_PHOTO_FILTER_RATING_STARS, RatingStars.MAX_RATING_STARS);
+      _filterRatingStarOperatorIndex = Util.getStateInt(
+            _state,
+            STATE_PHOTO_FILTER_RATING_STAR_OPERATOR,
+            OPERATOR_IS_EQUAL);
 
-		_imageSize = Util.getStateInt(_state, STATE_PHOTO_PROPERTIES_IMAGE_SIZE, Photo.MAP_IMAGE_DEFAULT_WIDTH_HEIGHT);
+      _imageSize = Util.getStateInt(_state, STATE_PHOTO_PROPERTIES_IMAGE_SIZE, Photo.MAP_IMAGE_DEFAULT_WIDTH_HEIGHT);
 
-		// ensure that an image is displayed, it happend that image size was 0
-		if (_imageSize < 10) {
-			_imageSize = Photo.MAP_IMAGE_DEFAULT_WIDTH_HEIGHT;
-		}
+      // ensure that an image is displayed, it happend that image size was 0
+      if (_imageSize < 10) {
+         _imageSize = Photo.MAP_IMAGE_DEFAULT_WIDTH_HEIGHT;
+      }
 
-		// set image size for the map photos
-		Photo.setPaintedMapImageWidth(_imageSize);
+      // set image size for the map photos
+      Photo.setPaintedMapImageWidth(_imageSize);
 
-		// set photo filter into the map
-		firePropertiesEvent();
-	}
+      // set photo filter into the map
+      firePropertiesEvent();
+   }
 
-	public void saveState() {
+   public void saveState() {
 
-		_state.put(STATE_PHOTO_FILTER_RATING_STARS, _filterRatingStars);
-		_state.put(STATE_PHOTO_FILTER_RATING_STAR_OPERATOR, _filterRatingStarOperatorIndex);
+      _state.put(STATE_PHOTO_FILTER_RATING_STARS, _filterRatingStars);
+      _state.put(STATE_PHOTO_FILTER_RATING_STAR_OPERATOR, _filterRatingStarOperatorIndex);
 
-		_state.put(STATE_PHOTO_PROPERTIES_IMAGE_SIZE, _imageSize);
-	}
+      _state.put(STATE_PHOTO_PROPERTIES_IMAGE_SIZE, _imageSize);
+   }
 
-	/**
-	 * This is called when the filter is run and filter statistics are available.
-	 * 
-	 * @param data
-	 */
-	protected void updateFilterActionUI(final MapFilterData data) {
-		// do nothing
-	}
+   /**
+    * This is called when the filter is run and filter statistics are available.
+    *
+    * @param data
+    */
+   protected void updateFilterActionUI(final MapFilterData data) {
+      // do nothing
+   }
 
-	private void updateFilterUI(final MapFilterData data) {
+   private void updateFilterUI(final MapFilterData data) {
 
-		if (_lblAllPhotos == null || _lblAllPhotos.isDisposed()) {
+      if (_lblAllPhotos == null || _lblAllPhotos.isDisposed()) {
 
-			// UI is not initialized
+         // UI is not initialized
 
-			_oldMapFilterData = data;
+         _oldMapFilterData = data;
 
-			return;
-		}
+         return;
+      }
 
-		_lblAllPhotos.setText(Integer.toString(data.allPhotos));
-		_lblFilteredPhotos.setText(Integer.toString(data.filteredPhotos));
+      _lblAllPhotos.setText(Integer.toString(data.allPhotos));
+      _lblFilteredPhotos.setText(Integer.toString(data.filteredPhotos));
 
-		_containerFilterHeader.layout();
+      _containerFilterHeader.layout();
 
-		// update action button
-		updateFilterActionUI(data);
-	}
+      // update action button
+      updateFilterActionUI(data);
+   }
 
-	private void updateUI() {
+   private void updateUI() {
 
-		// select rating star
-		_ratingStars.setSelection(_filterRatingStars);
+      // select rating star
+      _ratingStars.setSelection(_filterRatingStars);
 
-		for (final String operator : _ratingStarOperatorsText) {
-			_comboRatingStarOperators.add(operator);
-		}
+      for (final String operator : _ratingStarOperatorsText) {
+         _comboRatingStarOperators.add(operator);
+      }
 
-		// ensure array bounds
-		if (_filterRatingStarOperatorIndex >= _ratingStarOperatorsText.length) {
-			_filterRatingStarOperatorIndex = 0;
-		}
+      // ensure array bounds
+      if (_filterRatingStarOperatorIndex >= _ratingStarOperatorsText.length) {
+         _filterRatingStarOperatorIndex = 0;
+      }
 
-		// select operator
-		_comboRatingStarOperators.select(_filterRatingStarOperatorIndex);
+      // select operator
+      _comboRatingStarOperators.select(_filterRatingStarOperatorIndex);
 
-		// image size
-		_spinnerImageSize.setSelection(_imageSize);
-	}
+      // image size
+      _spinnerImageSize.setSelection(_imageSize);
+   }
 
 }

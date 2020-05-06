@@ -30,7 +30,6 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.TreeViewerItem;
-import net.tourbook.common.util.Util;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TourTypeSQLData;
@@ -101,13 +100,9 @@ public class TVICollatedTour_Root extends TVICollatedTour {
 
             + " ORDER BY tourStartTime";//							//$NON-NLS-1$
 
-      Connection conn = null;
-
-      try {
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          int eventCounter = 0;
-
-         conn = TourDatabase.getInstance().getConnection();
 
          final PreparedStatement statement = conn.prepareStatement(sql);
          sqlData.setParameters(statement, 1);
@@ -164,8 +159,6 @@ public class TVICollatedTour_Root extends TVICollatedTour {
 
       } catch (final SQLException e) {
          SQL.showException(e, sql);
-      } finally {
-         Util.closeSql(conn);
       }
 
       /*
@@ -187,8 +180,6 @@ public class TVICollatedTour_Root extends TVICollatedTour {
 
       final int eventSize = collatedEvents.size();
 
-      Connection conn = null;
-
       final String sql = UI.EMPTY_STRING
             //
             + "SELECT " //						 //$NON-NLS-1$
@@ -199,9 +190,7 @@ public class TVICollatedTour_Root extends TVICollatedTour {
             + (" WHERE TourStartTime >= ? AND TourStartTime < ?") //$NON-NLS-1$
             + sqlFilter.getWhereClause();
 
-      try {
-
-         conn = TourDatabase.getInstance().getConnection();
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          final PreparedStatement statement = conn.prepareStatement(sql);
          sqlFilter.setParameters(statement, 3);
@@ -322,19 +311,13 @@ public class TVICollatedTour_Root extends TVICollatedTour {
                 */
                new ProgressMonitorDialog(collateToursView.getShell()).run(true, true, runnable);
 
-            } catch (final InvocationTargetException e) {
-               StatusUtil.showStatus(e);
-            } catch (final InterruptedException e) {
+            } catch (final InvocationTargetException | InterruptedException e) {
                StatusUtil.showStatus(e);
             }
          }
 
       } catch (final SQLException e) {
          SQL.showException(e, sql);
-      } finally {
-         Util.closeSql(conn);
       }
-
    }
-
 }

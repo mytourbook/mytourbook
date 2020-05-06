@@ -1398,7 +1398,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    public long[]              timeSerieHistory;
 
    /**
-    * Time in double precicion that x-axis values are displayed at the correct position, this is
+    * Time in double precision that x-axis values are displayed at the correct position, this is
     * not the case when max chart pixels is 1'000'000'000 with floating point.
     */
    @Transient
@@ -1450,7 +1450,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    /**
     * List with all tour markers which is used only for multiple tours. This list is required
-    * because the tour markers cannnot be modified and a Set with all tourmarkers is not sorted as
+    * because the tour markers cannot be modified and a Set with all tourmarkers is not sorted as
     * it should.
     */
    @Transient
@@ -1721,7 +1721,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
             final float temp = temperatureSerie[serieIndex];
 
             if (temp == Float.MIN_VALUE) {
-               // remove invalid values which are set temporaritly
+               // remove invalid values which are set temporarily
                temperatureSerie[serieIndex] = 0;
             } else {
                sumTemperature += temp < 0 ? -temp : temp;
@@ -2768,7 +2768,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
 
       /**
-       * Very special behaviour until the tour chart analyzer can show both values:
+       * Very special behavior until the tour chart analyzer can show both values:
        * <p>
        * Returns the up values, when 0 then the down values
        */
@@ -2859,7 +2859,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
             if (breakTimeSerie[serieIndex] == true) {
 
-               // break has occured in this time slice
+               // break has occurred in this time slice
 
                if (serieIndex < lastIndex) {
 
@@ -2960,7 +2960,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
             if (breakTimeSerie[serieIndex] == true) {
 
-               // break has occured in this time slice
+               // break has occurred in this time slice
 
                if (serieIndex < lastIndex) {
 
