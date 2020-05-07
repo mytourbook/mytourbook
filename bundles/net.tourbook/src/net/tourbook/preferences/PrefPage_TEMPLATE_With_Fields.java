@@ -18,6 +18,7 @@ package net.tourbook.preferences;
 import net.tourbook.application.TourbookPlugin;
 
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.widgets.Composite;
@@ -33,7 +34,8 @@ public class PrefPage_TEMPLATE_With_Fields extends FieldEditorPreferencePage imp
    /*
     * UI controls
     */
-   //private PixelConverter		_pc;
+   @SuppressWarnings("unused")
+   private PixelConverter _pc;
 
    @Override
    protected void createFieldEditors() {
@@ -49,7 +51,7 @@ public class PrefPage_TEMPLATE_With_Fields extends FieldEditorPreferencePage imp
       final Composite parent = getFieldEditorParent();
       GridLayoutFactory.fillDefaults().applyTo(parent);
 
-      //_pc = new PixelConverter(parent);
+      _pc = new PixelConverter(parent);
    }
 
    private void enableControls() {
