@@ -380,6 +380,7 @@ public class RawDataManager {
     * Imports tours selected from a Dropbox folder specified in the preferences.
     */
    public void actionImportFromDropbox() {
+      //TODO FB
       final String accessToken = _commonPrefStore.getString(ICommonPreferences.DROPBOX_ACCESSTOKEN);
       final String dropboxFolder = _commonPrefStore.getString(ICommonPreferences.DROPBOX_FOLDER);
 
