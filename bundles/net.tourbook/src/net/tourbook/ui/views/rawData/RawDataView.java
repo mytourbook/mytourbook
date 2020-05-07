@@ -47,6 +47,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
+import net.tourbook.common.NIO;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.formatter.FormatManager;
@@ -206,6 +207,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    // OLD UI
    private static final String IMAGE_DATA_TRANSFER                        = "IMAGE_DATA_TRANSFER";                                            //$NON-NLS-1$
    private static final String IMAGE_DATA_TRANSFER_DIRECT                 = "IMAGE_DATA_TRANSFER_DIRECT";                                     //$NON-NLS-1$
+   private static final String IMAGE_IMPORT_FROM_DROPBOX                  = "IMAGE_IMPORT_FROM_DROPBOX";                                      //$NON-NLS-1$
    private static final String IMAGE_IMPORT_FROM_FILES                    = "IMAGE_IMPORT_FROM_FILES";                                        //$NON-NLS-1$
    private static final String IMAGE_NEW_UI                               = "IMAGE_NEW_UI";                                                   //$NON-NLS-1$
    //
@@ -263,6 +265,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
    private static String       ACTION_DEVICE_IMPORT                       = "DeviceImport";                                                   //$NON-NLS-1$
    private static String       ACTION_DEVICE_WATCHING_ON_OFF              = "DeviceOnOff";                                                    //$NON-NLS-1$
+   private static final String ACTION_IMPORT_FROM_DROPBOX                 = "ImportFromDropbox";                                              //$NON-NLS-1$
    private static final String ACTION_IMPORT_FROM_FILES                   = "ImportFromFiles";                                                //$NON-NLS-1$
    private static final String ACTION_OLD_UI                              = "OldUI";                                                          //$NON-NLS-1$
    private static final String ACTION_SERIAL_PORT_CONFIGURED              = "SerialPortConfigured";                                           //$NON-NLS-1$
@@ -281,6 +284,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    //
    private static String       HREF_ACTION_DEVICE_IMPORT;
    private static String       HREF_ACTION_DEVICE_WATCHING_ON_OFF;
+   private static String       HREF_ACTION_IMPORT_FROM_DROPBOX;
    private static String       HREF_ACTION_IMPORT_FROM_FILES;
    private static String       HREF_ACTION_OLD_UI;
    private static String       HREF_ACTION_SERIAL_PORT_CONFIGURED;
@@ -291,6 +295,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       HREF_ACTION_DEVICE_IMPORT = HREF_TOKEN + ACTION_DEVICE_IMPORT;
       HREF_ACTION_DEVICE_WATCHING_ON_OFF = HREF_TOKEN + ACTION_DEVICE_WATCHING_ON_OFF;
+      HREF_ACTION_IMPORT_FROM_DROPBOX = HREF_TOKEN + ACTION_IMPORT_FROM_DROPBOX;
       HREF_ACTION_IMPORT_FROM_FILES = HREF_TOKEN + ACTION_IMPORT_FROM_FILES;
       HREF_ACTION_OLD_UI = HREF_TOKEN + ACTION_OLD_UI;
       HREF_ACTION_SERIAL_PORT_CONFIGURED = HREF_TOKEN + ACTION_SERIAL_PORT_CONFIGURED;
@@ -381,6 +386,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private boolean                _isToolTipInTitle;
    private boolean                _isToolTipInTags;
    //
+   private boolean                _dropboxPreferencesHaveChanged;
+   //
    private TourDoubleClickState   _tourDoubleClickState       = new TourDoubleClickState();
    //
    private Thread                 _watchingStoresThread;
@@ -417,6 +424,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private String                 _imageUrl_DeviceFolder_NotAvailable;
    private String                 _imageUrl_DeviceFolder_NotChecked;
    private String                 _imageUrl_DeviceFolder_NotSetup;
+   private String                 _imageUrl_ImportFromDropbox;
    private String                 _imageUrl_ImportFromFile;
    private String                 _imageUrl_SerialPort_Configured;
    private String                 _imageUrl_SerialPort_Directly;
@@ -925,6 +933,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
        * Common preferences
        */
       _prefChangeListenerCommon = new IPropertyChangeListener() {
+
          @Override
          public void propertyChange(final PropertyChangeEvent event) {
 
@@ -933,6 +942,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             if (property.equals(ICommonPreferences.TIME_ZONE_LOCAL_ID)) {
 
                recreateViewer();
+            }
+
+            if (property.equals(ICommonPreferences.DROPBOX_ACCESSTOKEN) ||
+                  property.equals(ICommonPreferences.DROPBOX_FOLDER)) {
+
+               _dropboxPreferencesHaveChanged = true;
             }
          }
       };
@@ -2042,6 +2057,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
          createHTML_92_TileAction(
                sb,
+               Messages.Import_Data_HTML_ImportFromDropbox_Action,
+               Messages.Import_Data_HTML_ImportFromDropbox_ActionTooltip,
+               (HTTP_DUMMY
+                     + HREF_ACTION_IMPORT_FROM_DROPBOX),
+               _imageUrl_ImportFromDropbox);
+
+         createHTML_92_TileAction(
+               sb,
                Messages.Import_Data_HTML_ReceiveFromSerialPort_ConfiguredAction,
                Messages.Import_Data_HTML_ReceiveFromSerialPort_ConfiguredLink,
                (HTTP_DUMMY + HREF_ACTION_SERIAL_PORT_CONFIGURED),
@@ -2200,6 +2223,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             TourbookPlugin.getImageDescriptor(Messages.Image__RawData_Transfer));
       _images.put(IMAGE_DATA_TRANSFER_DIRECT, //
             TourbookPlugin.getImageDescriptor(Messages.Image__RawData_TransferDirect));
+      _images.put(IMAGE_IMPORT_FROM_DROPBOX, //
+            TourbookPlugin.getImageDescriptor(Messages.Image__RawData_Import_Dropbox));
       _images.put(IMAGE_IMPORT_FROM_FILES, //
             TourbookPlugin.getImageDescriptor(Messages.Image__RawData_Import));
       _images.put(IMAGE_NEW_UI, //
@@ -2259,6 +2284,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          /*
           * Image urls
           */
+         _imageUrl_ImportFromDropbox = getIconUrl(Messages.Image__RawData_Import_Dropbox);
          _imageUrl_ImportFromFile = getIconUrl(Messages.Image__RawData_Import);
          _imageUrl_SerialPort_Configured = getIconUrl(Messages.Image__RawData_Transfer);
          _imageUrl_SerialPort_Directly = getIconUrl(Messages.Image__RawData_TransferDirect);
@@ -3414,6 +3440,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       disposeConfigImages();
 
+      NIO.closeDropboxFileSystem();
+
       super.dispose();
    }
 
@@ -4130,10 +4158,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       try {
 
-         if (osFolder != null && osFolder.trim().length() > 0 && Files.exists(Paths.get(osFolder))) {
+         if (osFolder != null && osFolder.trim().length() > 0) {
+
+            final Path folderPath = NIO.getDeviceFolderPath(osFolder);
 
             // device folder exists
-            return true;
+            return folderPath != null && Files.exists(folderPath);
          }
 
       } catch (final Exception e) {}
@@ -4221,6 +4251,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       } else if (ACTION_DEVICE_WATCHING_ON_OFF.equals(hrefAction)) {
 
          action_Easy_SetDeviceWatching_OnOff();
+
+      } else if (ACTION_IMPORT_FROM_DROPBOX.equals(hrefAction)) {
+
+         _rawDataMgr.actionImportFromDropbox();
 
       } else if (ACTION_IMPORT_FROM_FILES.equals(hrefAction)) {
 
@@ -5379,9 +5413,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
             try {
 
-               // keep watcher local because it could be set to null !!!
-               folderWatcher = _folderWatcher = FileSystems.getDefault().newWatchService();
-
                final EasyConfig easyConfig = getEasyConfig();
                final ImportConfig importConfig = easyConfig.getActiveImportConfig();
 
@@ -5391,11 +5422,16 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                boolean isDeviceFolderValid = false;
                final String deviceFolder = importConfig.getDeviceOSFolder();
 
+               // keep watcher local because it could be set to null !!!
+               folderWatcher = _folderWatcher =
+                     NIO.isDropboxDevice(deviceFolder) && NIO.getDropboxFileSystem() != null ? NIO.getDropboxFileSystem().newWatchService()
+                           : FileSystems.getDefault().newWatchService();
+
                if (deviceFolder != null) {
 
                   try {
 
-                     final Path deviceFolderPath = Paths.get(deviceFolder);
+                     final Path deviceFolderPath = NIO.getDeviceFolderPath(deviceFolder);
 
                      if (Files.exists(deviceFolderPath)) {
 
@@ -5567,17 +5603,20 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                      final EasyConfig importConfig = getEasyConfig();
 
                      // check if anything should be watched
-                     if (importConfig.getActiveImportConfig().isWatchAnything()) {
+                     if (importConfig.getActiveImportConfig().isWatchAnything() ||
+                           _dropboxPreferencesHaveChanged) {
 
                         final boolean isCheckFiles = _isDeviceStateValid == false;
 
                         final DeviceImportState importState = EasyImportManager.getInstance().checkImportedFiles(isCheckFiles);
 
-                        if (importState.areTheSameStores == false || isCheckFiles) {
+                        if (importState.areTheSameStores == false || isCheckFiles ||
+                              _dropboxPreferencesHaveChanged) {
 
                            // stores have changed, update the folder watcher
 
                            thread_WatchFolders(true);
+                           _dropboxPreferencesHaveChanged = false;
                         }
 
                         if (importState.areFilesRetrieved || isCheckFiles) {

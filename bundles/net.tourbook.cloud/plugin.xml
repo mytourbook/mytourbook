@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="4.14"?>
+<plugin>
+
+	<extension	point="org.eclipse.core.runtime.preferences">
+	
+		<initializer
+			class="net.tourbook.cloud.PreferenceInitializer"/>
+			
+	</extension>
+
+   <!-- Dropbox -->
+   <extension	point="org.eclipse.ui.preferencePages">
+      <page
+            category="net.tourbook.preferences.PrefPageCloudConnectivity"
+            class="net.tourbook.cloud.dropbox.PrefPageDropbox"
+            id="net.tourbook.cloud.dropbox.PrefPageDropbox"
+            name="Dropbox">
+      </page>
+   </extension>
+
+</plugin>

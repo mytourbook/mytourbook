@@ -268,6 +268,9 @@ public class Messages extends NLS {
    public static String        Dialog_DoubleClickAction_NoAction_Message;
    public static String        Dialog_DoubleClickAction_NoAction_Title;
 
+   public static String        Dialog_DropboxFileChooser_Title;
+   public static String        Dialog_DropboxFileChooser_AccessToken_Missing;
+
    public static String        Dialog_EditTimeslicesValues_Title;
    public static String        Dialog_EditTimeslicesValues_Area_Title;
    public static String        Dialog_EditTimeslicesValues_Label_NewValues;
@@ -907,6 +910,7 @@ public class Messages extends NLS {
    public static String        Image__database_other_person;
    public static String        Image__delete;
    public static String        Image__delete_disabled;
+
    public static String        Image__edit_adjust_altitude;
    public static String        Image__edit_adjust_altitude_disabled;
    public static String        Image__edit_row;
@@ -1005,6 +1009,7 @@ public class Messages extends NLS {
    public static String        Image__RawData_DeviceFolder_NotSetup;
    public static String        Image__RawData_DeviceFolderDisabled;
    public static String        Image__RawData_Import;
+   public static String        Image__RawData_Import_Dropbox;
    public static String        Image__RawData_Transfer;
    public static String        Image__RawData_TransferDirect;
    public static String        Image__Remove;
@@ -1182,6 +1187,8 @@ public class Messages extends NLS {
    public static String        Import_Data_HTML_GetTours;
    public static String        Import_Data_HTML_ImportFromFiles_Action;
    public static String        Import_Data_HTML_ImportFromFiles_ActionTooltip;
+   public static String        Import_Data_HTML_ImportFromDropbox_Action;
+   public static String        Import_Data_HTML_ImportFromDropbox_ActionTooltip;
    public static String        Import_Data_HTML_LastMarker_No;
    public static String        Import_Data_HTML_LastMarker_Yes;
    public static String        Import_Data_HTML_MovedFiles;

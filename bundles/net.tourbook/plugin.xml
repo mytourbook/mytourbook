@@ -9,6 +9,7 @@
    <extension-point id="printTour"                    name="Print Tours"                  schema="schema/printTour.exsd"/>
    <extension-point id="net.tourbook.statisticYear"   name="Year Statistic"               schema="schema/net.tourbook.statisticYear.exsd"/>
    <extension-point id="tilefactory"                  name="TileFactory"                  schema="schema/tilefactory.exsd"/>
+   <extension-point id="cloudConnectivity"            name="CloudConnectivity"            schema="schema/cloudConnectivity.exsd"/>
 
    <extension
          id="application"
@@ -311,6 +312,15 @@
          name="%preference_page_data_import"
       />
       
+       <!--
+         Cloud Connectivity
+      -->
+      <page
+         class="net.tourbook.preferences.PrefPageCloudConnectivity"
+         id="net.tourbook.preferences.PrefPageCloudConnectivity"
+         name="%preference_page_cloud_connectivity"
+      />
+      
       
       <!-- 
       
@@ -452,6 +462,12 @@
             icon="icons/import-get-tours.png"
             label="%command_device_importFromFile"
             mnemonic="%command_device_importFromFile_mnemonic"/>
+            
+         <command
+            commandId="net.tourbook.command.device.importFromDropbox"
+            icon="icons/import-tours-from-dropbox.png"
+            label="%command_device_importFromDropbox"
+            mnemonic="%command_device_importFromDropbox_mnemonic"/>
             
          <command
             commandId="net.tourbook.command.device.synchronize"
@@ -1055,6 +1071,12 @@ THIS IS NOT YET FULLY IMPLEMENTED
             label="%command_device_importFromFile"
             mnemonic="%command_device_importFromFile_mnemonic"
          />
+         
+         <command
+            commandId="net.tourbook.command.device.importFromDropbox"
+            icon="icons/import-tours-from-dropbox.png"
+            label="%command_device_importFromDropbox"
+            mnemonic="%command_device_importFromDropbox_mnemonic"/>
 
          <command
             commandId="net.tourbook.command.device.synchronize"
@@ -1286,7 +1308,13 @@ THIS IS NOT YET FULLY IMPLEMENTED
          name           ="%command_device_importFromFile"
          defaultHandler ="net.tourbook.importdata.ActionHandlerImportFromFile"
       />
-
+      
+       <command
+         id             ="net.tourbook.command.device.importFromDropbox"
+         name           ="%command_device_importFromDropbox"
+         defaultHandler ="net.tourbook.importdata.ActionHandlerImportFromDropbox"
+      />
+      
       <command
          id             ="net.tourbook.command.device.synchronize.direct"
          name           ="%Command_Device_ReceiveFromSerialPort_Directly"
