@@ -15,8 +15,12 @@
  *******************************************************************************/
 package net.tourbook.preferences;
 
+import net.tourbook.application.TourbookPlugin;
+
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -26,7 +30,16 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPage_TEMPLATE_Without_Fields extends PreferencePage implements IWorkbenchPreferencePage {
 
-   public static final String ID = "net.tourbook.preferences.PrefPageGeneralExternalProgramsID"; //$NON-NLS-1$
+   public static final String ID         = "net.tourbook.preferences.PrefPageGeneralExternalProgramsID"; //$NON-NLS-1$
+
+   @SuppressWarnings("unused")
+   private IPreferenceStore   _prefStore = TourbookPlugin.getPrefStore();
+
+   /*
+    * UI controls
+    */
+   @SuppressWarnings("unused")
+   private PixelConverter _pc;
 
    @Override
    protected Control createContents(final Composite parent) {
@@ -40,6 +53,8 @@ public class PrefPage_TEMPLATE_Without_Fields extends PreferencePage implements 
    }
 
    private Composite createUI(final Composite parent) {
+
+      _pc = new PixelConverter(parent);
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
