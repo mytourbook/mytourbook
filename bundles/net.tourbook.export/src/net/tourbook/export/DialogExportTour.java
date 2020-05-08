@@ -54,6 +54,7 @@ import net.tourbook.extension.export.ExportTourExtension;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.FileCollisionBehavior;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.tools.generic.MathTool;
@@ -1340,7 +1341,10 @@ public class DialogExportTour extends TitleAreaDialog {
          pluginMajorVersion = Integer.toString(version.getMajor());
          pluginMinorVersion = Integer.toString(version.getMinor());
          pluginMicroVersion = Integer.toString(version.getMicro());
-         pluginQualifierVersion = version.getQualifier();
+         final String versionQualifier = version.getQualifier();
+         if (StringUtils.isNumeric(versionQualifier)) {
+            pluginQualifierVersion = versionQualifier;
+         }
       }
 
       vcContext.put("pluginMajorVersion", pluginMajorVersion); //$NON-NLS-1$
