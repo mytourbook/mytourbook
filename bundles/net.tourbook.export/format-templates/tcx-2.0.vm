@@ -2,7 +2,7 @@
 <TrainingCenterDatabase 
 	xmlns="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-	xsi:schemaLocation="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2 http://www.garmin.com/xmlschemas/TrainingCenterDatabasev2.xsd">
+	xsi:schemaLocation="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2 https://www8.garmin.com/xmlschemas/TrainingCenterDatabasev2.xsd">
 #if($iscourses)
 	<Courses>
 		<Course>
@@ -67,8 +67,8 @@
 #end
             <Creator xsi:type="Device_t">
               <Name>$creator</Name>
-              <UnitId></UnitId>
-              <ProductID></ProductID>
+              <UnitId>0</UnitId>
+              <ProductID>0</ProductID>
               <Version>
                 <VersionMajor>$pluginMajorVersion</VersionMajor>
                 <VersionMinor>$pluginMinorVersion</VersionMinor>
@@ -95,6 +95,6 @@
 			<Type>Release</Type>
 		</Build>
 		<LangID>EN</LangID>
-        <PartNumber>2009-05-23_17-26-51_ID</PartNumber>
+        <PartNumber>000-00000-00</PartNumber>
 	</Author>
 </TrainingCenterDatabase>

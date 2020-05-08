@@ -15,7 +15,8 @@ Bundle-ClassPath: lib/geoapi-3.0.1.jar,
  lib/gt-referencing-22.2.jar,
  lib/jts-1.13.jar,
  lib/commons-lang3-3.9.jar
-Export-Package: org.geotools.data.ows,
+Export-Package: org.apache.commons.lang3,
+ org.geotools.data.ows,
  org.geotools.ows;uses:="org.xml.sax",
  org.geotools.ows.wms;
   uses:="org.geotools.geometry.jts,
