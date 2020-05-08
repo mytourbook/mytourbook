@@ -1098,13 +1098,11 @@ public class Tile extends Observable {
    @Override
    public String toString() {
 
-      /*
-       * final boolean isImageOK = _mapImage == null ? //
-       * false
-       * : _mapImage.isDisposed() ? //
-       * false
-       * : true;
-       */
+      // final boolean isImageOK = _mapImage == null ? //
+      // false
+      // : _mapImage.isDisposed() ? //
+      // false
+      // : true;
 
       return UI.EMPTY_STRING
 

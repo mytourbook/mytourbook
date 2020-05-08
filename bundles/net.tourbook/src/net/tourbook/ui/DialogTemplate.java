@@ -15,10 +15,13 @@
  *******************************************************************************/
 package net.tourbook.ui;
 
+import net.tourbook.application.TourbookPlugin;
+
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -29,7 +32,12 @@ import org.eclipse.swt.widgets.Shell;
  */
 public class DialogTemplate extends TitleAreaDialog {
 
-   private static final String ID = "net.tourbook.ui.DialogTemplate"; //$NON-NLS-1$
+   private static final String    ID         = "net.tourbook.ui.DialogTemplate"; //$NON-NLS-1$
+
+   @SuppressWarnings("unused")
+   private final IDialogSettings  _state     = TourbookPlugin.getState(ID);
+   @SuppressWarnings("unused")
+   private final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
 
    public DialogTemplate(final Shell parentShell) {
 
