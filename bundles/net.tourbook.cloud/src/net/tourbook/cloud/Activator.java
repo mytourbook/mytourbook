@@ -36,7 +36,9 @@ public class Activator extends AbstractUIPlugin {
    /**
     * The constructor
     */
-   public Activator() {}
+   public Activator() {
+      plugin = this;
+   }
 
    /**
     * Returns the shared instance

@@ -53,10 +53,4 @@ public interface ICommonPreferences {
    public static final String CALENDAR_WEEK_FIRST_DAY_OF_WEEK      = "CALENDAR_WEEK_FIRST_DAY_OF_WEEK";      //$NON-NLS-1$
    public static final String CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK = "CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK"; //$NON-NLS-1$
 
-   /*
-    * Cloud preferences
-    */
-   public static final String DROPBOX_ACCESSTOKEN = "DROPBOX_ACCESSTOKEN"; //$NON-NLS-1$
-   public static final String DROPBOX_FOLDER      = "DROPBOX_FOLDER";      //$NON-NLS-1$
-
 }
