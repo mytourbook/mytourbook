@@ -17,6 +17,8 @@ TODO's
            at org.eclipse.jface.operation.ModalContext$ModalContextThread.run(ModalContext.java:122)  
            
   - Calendar view: Show average pulse/power in day/week values, this is helpful for ergometer
+  
+  - csv export of all tour fields in tourbook view
  
 
 Bugs
