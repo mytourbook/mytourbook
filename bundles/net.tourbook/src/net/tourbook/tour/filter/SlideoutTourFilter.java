@@ -786,7 +786,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
                 */
                final Combo comboFilterField = new Combo(_filterScrolled_Content, SWT.DROP_DOWN | SWT.READ_ONLY);
                comboFilterField.setData(filterProperty);
-               comboFilterField.setVisibleItemCount(30);
+               comboFilterField.setVisibleItemCount(99);
                comboFilterField.addFocusListener(_keepOpenListener);
                comboFilterField.addSelectionListener(fieldListener);
 
@@ -799,7 +799,7 @@ public class SlideoutTourFilter extends AdvancedSlideout {
                 */
                final Combo comboFieldOperator = new Combo(_filterScrolled_Content, SWT.DROP_DOWN | SWT.READ_ONLY);
                comboFieldOperator.setData(filterProperty);
-               comboFieldOperator.setVisibleItemCount(30);
+               comboFieldOperator.setVisibleItemCount(99);
                comboFieldOperator.addFocusListener(_keepOpenListener);
                comboFieldOperator.addSelectionListener(operatorListener);
 
