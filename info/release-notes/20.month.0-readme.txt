@@ -15,14 +15,17 @@ TODO's
    * Map2: new tour selector explodes when continously selecting markers in search view, maybe in other views
 
 
-New + Improvements   
+New + Improvements
 ==================
 
+* 2D Map
+  - The enhanced painting warning can be hidden in the track options slideout
+
 * Photo
-  - Show selected/hovered folder in the Photo view with more contrast which makes it better readable.
+  - Show selected/hovered folder in the Photo view with more contrast which makes it better readable
 
 * Statistics (Frederic)
-  - The number of years to be displayed in the graph is now dynamically filled and updated based on the number of available years.
+  - The number of years to be displayed in the graph is now dynamically filled and updated based on the number of available years
 
 Import
 ======
