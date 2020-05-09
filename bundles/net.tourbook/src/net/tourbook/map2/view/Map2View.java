@@ -4007,6 +4007,8 @@ public class Map2View extends ViewPart implements
          _hash_AllTourData = _allTourData.hashCode();
          _hash_AllTourIds = tourData.getTourId().hashCode();
 
+         _map.tourBreadcrumb().resetTours();
+
          paintTours_10_All();
       }
    }
