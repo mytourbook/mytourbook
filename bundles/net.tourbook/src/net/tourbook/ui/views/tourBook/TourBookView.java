@@ -15,15 +15,9 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourBook;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.text.NumberFormat;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -119,7 +113,6 @@ import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.StyledString;
-import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
@@ -149,7 +142,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 // SET_FORMATTING_OFF
 
    private static final String           COLUMN_FACTORY_TIME_ZONE_DIFF_TOOLTIP           = net.tourbook.ui.Messages.ColumnFactory_TimeZoneDifference_Tooltip;
-   private static final String           GRAPH_LABEL_HEARTBEAT_UNIT                      = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
 
 // SET_FORMATTING_ON
 
@@ -172,52 +164,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    static final boolean                  STATE_IS_SHOW_SUMMARY_ROW_DEFAULT               = true;
    static final boolean                  STATE_LINK_AND_COLLAPSE_ALL_OTHER_ITEMS_DEFAULT = true;
    //
-   private static final String           CSV_HEADER_AVERAGE_CADENCE                      = "AvgCadence";                              //$NON-NLS-1$
-   private static final String           CSV_HEADER_AVERAGE_PACE                         = "AvgPace (%s)";                            //$NON-NLS-1$
-   private static final String           CSV_HEADER_AVERAGE_PULSE                        = "AvgPulse (%s)";                           //$NON-NLS-1$
-   private static final String           CSV_HEADER_AVERAGE_SPEED                        = "AvgSpeed (%s)";                           //$NON-NLS-1$
-   private static final String           CSV_HEADER_AVERAGE_TEMPERATURE                  = "AvgTemperature (%s)";                     //$NON-NLS-1$
-   private static final String           CSV_HEADER_ALTITUDE_DOWN                        = "AltitudeDown (%s)";                       //$NON-NLS-1$
-   private static final String           CSV_HEADER_ALTITUDE_UP                          = "AltitudeUp (%s)";                         //$NON-NLS-1$
-   private static final String           CSV_HEADER_CALORIES                             = "Calories";                                //$NON-NLS-1$
-   private static final String           CSV_HEADER_DAY                                  = "Day";                                     //$NON-NLS-1$
-   private static final String           CSV_HEADER_DEVICE_START_DISTANCE                = "DeviceStartDistance";                     //$NON-NLS-1$
-   private static final String           CSV_HEADER_DISTANCE                             = "Distance (%s)";                           //$NON-NLS-1$
-   private static final String           CSV_HEADER_DP_TOLERANCE                         = "DPTolerance";                             //$NON-NLS-1$
-   private static final String           CSV_HEADER_GEAR_FRONT_SHIFT_COUNT               = "FrontShiftCount";                         //$NON-NLS-1$
-   private static final String           CSV_HEADER_GEAR_REAR_SHIFT_COUNT                = "RearShiftCount";                          //$NON-NLS-1$
-   private static final String           CSV_HEADER_ISO_DATE_TIME                        = "ISO8601";                                 //$NON-NLS-1$
-   private static final String           CSV_HEADER_MOVING_TIME                          = "MovingTime (%s)";                         //$NON-NLS-1$
-   private static final String           CSV_HEADER_NUMBER_OF_MARKER                     = "NumberOfMarkers";                         //$NON-NLS-1$
-   private static final String           CSV_HEADER_NUMBER_OF_PHOTOS                     = "NumberOfPhotos";                          //$NON-NLS-1$
-   private static final String           CSV_HEADER_NUMBER_OF_TOURS                      = "NumberOfTours";                           //$NON-NLS-1$
-   private static final String           CSV_HEADER_WEATHER                              = "Weather";                                 //$NON-NLS-1$
-   private static final String           CSV_HEADER_WIND_DIRECTION                       = "WindDirection";                           //$NON-NLS-1$
-   private static final String           CSV_HEADER_WIND_SPEED                           = "WindSpeed";                               //$NON-NLS-1$
-   private static final String           CSV_HEADER_MAX_ALTITUDE                         = "MaxAltitude (%s)";                        //$NON-NLS-1$
-   private static final String           CSV_HEADER_MAX_PULSE                            = "MaxPulse";                                //$NON-NLS-1$
-   private static final String           CSV_HEADER_MAX_SPEED                            = "MaxSpeed (%s)";                           //$NON-NLS-1$
-   private static final String           CSV_HEADER_MONTH                                = "Month";                                   //$NON-NLS-1$
-   private static final String           CSV_HEADER_PAUSED_TIME                          = "PausedTime (%s)";                         //$NON-NLS-1$
-   private static final String           CSV_HEADER_PAUSED_TIME_RELATIVE                 = "RelativePausedTime (%)";                  //$NON-NLS-1$
-   private static final String           CSV_HEADER_PERSON                               = "Person";                                  //$NON-NLS-1$
-   private static final String           CSV_HEADER_RECORDING_TIME                       = "RecordingTime (%s)";                      //$NON-NLS-1$
-   private static final String           CSV_HEADER_RESTPULSE                            = "RestPulse";                               //$NON-NLS-1$
-   private static final String           CSV_HEADER_TAGS                                 = "Tags";                                    //$NON-NLS-1$
-   private static final String           CSV_HEADER_TIME                                 = "Time";                                    //$NON-NLS-1$
-   private static final String           CSV_HEADER_TIME_INTERVAL                        = "TimeInterval";                            //$NON-NLS-1$
-   private static final String           CSV_HEADER_TIME_SLICES                          = "TimeSlices";                              //$NON-NLS-1$
-   private static final String           CSV_HEADER_TITLE                                = "Title";                                   //$NON-NLS-1$
-   private static final String           CSV_HEADER_TOUR_TYPE_ID                         = "TourTypeId";                              //$NON-NLS-1$
-   private static final String           CSV_HEADER_TOUR_TYPE_NAME                       = "TourTypeName";                            //$NON-NLS-1$
-   private static final String           CSV_HEADER_WEEK                                 = "Week";                                    //$NON-NLS-1$
-   private static final String           CSV_HEADER_WEEKDAY                              = "Weekday";                                 //$NON-NLS-1$
-   private static final String           CSV_HEADER_WEEK_YEAR                            = "WeekYear";                                //$NON-NLS-1$
-   private static final String           CSV_HEADER_YEAR                                 = "Year";                                    //$NON-NLS-1$
-   //
    private static final String           CSV_EXPORT_DEFAULT_FILE_NAME                    = "TourBook_";                               //$NON-NLS-1$
-   private static final String           CSV_EXPORT_DURATION_HHH_MM_SS                   = "hhh:mm:ss";                               //$NON-NLS-1$
-   //
+
    private static YearSubCategory        _yearSubCategory                                = YearSubCategory.MONTH;
    //
    private ColumnManager                 _columnManager;
@@ -235,7 +183,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private final NumberFormat            _nf0;
    private final NumberFormat            _nf1;
    private final NumberFormat            _nf2;
-   private final NumberFormat            _nf1_NoGroup;
    {
       _nf0 = NumberFormat.getNumberInstance();
       _nf0.setMinimumFractionDigits(0);
@@ -248,11 +195,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _nf2 = NumberFormat.getNumberInstance();
       _nf2.setMinimumFractionDigits(2);
       _nf2.setMaximumFractionDigits(2);
-
-      _nf1_NoGroup = NumberFormat.getNumberInstance();
-      _nf1_NoGroup.setMinimumFractionDigits(1);
-      _nf1_NoGroup.setMaximumFractionDigits(1);
-      _nf1_NoGroup.setGroupingUsed(false);
    }
    //
    private int                            _selectedYear              = -1;
@@ -495,12 +437,12 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          }
       }
 
-      exportCSV(selection, selectedFilePath);
+      new CSVExport(selection, selectedFilePath, this);
 
 //      // DEBUGGING: USING DEFAULT PATH
 //      final IPath path = new Path(defaultExportFilePath).removeLastSegments(1).append(defaultExportFileName);
 //
-//      exportCSV(selection, path.toOSString());
+//      new CSVExport(selection, path.toOSString());
    }
 
    void actionSelectYearMonthTours() {
@@ -907,18 +849,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       return treeContextMenu;
    }
 
-   private void csvField(final StringBuilder sb, final int fieldValue) {
-
-      sb.append(fieldValue);
-      sb.append(UI.TAB);
-   }
-
-   private void csvField(final StringBuilder sb, final String fieldValue) {
-
-      sb.append(fieldValue);
-      sb.append(UI.TAB);
-   }
-
    /**
     * Defines all columns for the table viewer in the column manager, the sequence defines the
     * default columns
@@ -933,7 +863,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       defineColumn_Time_TourStartTime();
       defineColumn_Time_TimeZoneDifference();
       defineColumn_Time_TimeZone();
-      defineColumn_Time_DrivingTime();
+      defineColumn_Time_MovingTime();
       defineColumn_Time_RecordingTime();
       defineColumn_Time_PausedTime();
       defineColumn_Time_PausedTime_Relative();
@@ -957,11 +887,11 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       defineColumn_Motion_AvgSpeed();
       defineColumn_Motion_AvgPace();
 
-      // Altitude
-      defineColumn_Altitude_Up();
-      defineColumn_Altitude_Down();
-      defineColumn_Altitude_Max();
-      defineColumn_Altitude_AvgChange();
+      // Elevation
+      defineColumn_Elevation_Up();
+      defineColumn_Elevation_Down();
+      defineColumn_Elevation_Max();
+      defineColumn_Elevation_AvgChange();
 
       // Weather
       defineColumn_Weather_Clouds();
@@ -1113,102 +1043,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
                setCellColor(cell, element);
             }
-         }
-      });
-   }
-
-   /**
-    * column: Average elevation change (m/km or ft/mi)
-    */
-   private void defineColumn_Altitude_AvgChange() {
-
-      final TreeColumnDefinition colDef = TreeColumnFactory.ALTITUDE_AVG_CHANGE.createColumn(_columnManager, _pc);
-
-      colDef.setIsDefaultColumn();
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final Object element = cell.getElement();
-
-            final float dbAvgAltitudeChange = ((TVITourBookItem) element).colAltitude_AvgChange / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE
-                  * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
-
-            colDef.printValue_0(cell, dbAvgAltitudeChange);
-
-            setCellColor(cell, element);
-         }
-      });
-   }
-
-   /**
-    * column: altitude down (m)
-    */
-   private void defineColumn_Altitude_Down() {
-
-      final TreeColumnDefinition colDef = TreeColumnFactory.ALTITUDE_DOWN.createColumn(_columnManager, _pc);
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final Object element = cell.getElement();
-
-            final double dbAltitudeDown = ((TVITourBookItem) element).colAltitudeDown;
-            final double value = -dbAltitudeDown / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
-
-            colDef.printValue_0(cell, value);
-
-            setCellColor(cell, element);
-         }
-      });
-   }
-
-   /**
-    * column: max altitude
-    */
-   private void defineColumn_Altitude_Max() {
-
-      final TreeColumnDefinition colDef = TreeColumnFactory.ALTITUDE_MAX.createColumn(_columnManager, _pc);
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final Object element = cell.getElement();
-
-            final long dbMaxAltitude = ((TVITourBookItem) element).colMaxAltitude;
-            final double value = dbMaxAltitude / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
-
-            colDef.printValue_0(cell, value);
-
-            setCellColor(cell, element);
-         }
-      });
-   }
-
-   /**
-    * column: altitude up (m)
-    */
-   private void defineColumn_Altitude_Up() {
-
-      final TreeColumnDefinition colDef = TreeColumnFactory.ALTITUDE_UP.createColumn(_columnManager, _pc);
-
-      colDef.setIsDefaultColumn();
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final Object element = cell.getElement();
-
-            final long dbAltitudeUp = ((TVITourBookItem) element).colAltitudeUp;
-            final double value = dbAltitudeUp / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
-
-            colDef.printValue_0(cell, value);
-
-            setCellColor(cell, element);
          }
       });
    }
@@ -1509,6 +1343,102 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             } else {
                cell.setText(dbValue);
             }
+
+            setCellColor(cell, element);
+         }
+      });
+   }
+
+   /**
+    * column: Average elevation change (m/km or ft/mi)
+    */
+   private void defineColumn_Elevation_AvgChange() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.ALTITUDE_AVG_CHANGE.createColumn(_columnManager, _pc);
+
+      colDef.setIsDefaultColumn();
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            final float dbAvgAltitudeChange = ((TVITourBookItem) element).colAltitude_AvgChange / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE
+                  * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+
+            colDef.printValue_0(cell, dbAvgAltitudeChange);
+
+            setCellColor(cell, element);
+         }
+      });
+   }
+
+   /**
+    * column: altitude down (m)
+    */
+   private void defineColumn_Elevation_Down() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.ALTITUDE_DOWN.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            final double dbAltitudeDown = ((TVITourBookItem) element).colAltitudeDown;
+            final double value = -dbAltitudeDown / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+
+            colDef.printValue_0(cell, value);
+
+            setCellColor(cell, element);
+         }
+      });
+   }
+
+   /**
+    * column: max altitude
+    */
+   private void defineColumn_Elevation_Max() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.ALTITUDE_MAX.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            final long dbMaxAltitude = ((TVITourBookItem) element).colMaxAltitude;
+            final double value = dbMaxAltitude / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+
+            colDef.printValue_0(cell, value);
+
+            setCellColor(cell, element);
+         }
+      });
+   }
+
+   /**
+    * column: altitude up (m)
+    */
+   private void defineColumn_Elevation_Up() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.ALTITUDE_UP.createColumn(_columnManager, _pc);
+
+      colDef.setIsDefaultColumn();
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            final long dbAltitudeUp = ((TVITourBookItem) element).colAltitudeUp;
+            final double value = dbAltitudeUp / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+
+            colDef.printValue_0(cell, value);
 
             setCellColor(cell, element);
          }
@@ -2404,7 +2334,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    /**
     * column: driving time (h)
     */
-   private void defineColumn_Time_DrivingTime() {
+   private void defineColumn_Time_MovingTime() {
 
       final TreeColumnDefinition colDef = TreeColumnFactory.TIME_DRIVING_TIME.createColumn(_columnManager, _pc);
 
@@ -3361,587 +3291,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
                   : TourDatabase.ENTITY_IS_NOT_SAVED);
    }
 
-   private void exportCSV(final ITreeSelection selection, final String selectedFilePath) {
-
-      /*
-       * Write selected items into a csv file.
-       */
-      try (FileOutputStream fileOutputStream = new FileOutputStream(selectedFilePath);
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, UI.UTF_8);
-            Writer exportWriter = new BufferedWriter(outputStreamWriter)) {
-
-         final StringBuilder sb = new StringBuilder();
-
-         exportCSV_10_Header(exportWriter, sb);
-
-         for (final TreePath treePath : selection.getPaths()) {
-
-            // truncate buffer
-            sb.setLength(0);
-
-            final int segmentCount = treePath.getSegmentCount();
-
-            for (int segmentIndex = 0; segmentIndex < segmentCount; segmentIndex++) {
-
-               final Object segment = treePath.getSegment(segmentIndex);
-               final boolean isTour = segment instanceof TVITourBookTour;
-
-               exportCSV_20_1stColumn(sb, segmentCount, segment, isTour);
-
-               if (segment instanceof TVITourBookItem) {
-
-                  final TVITourBookItem tviItem = (TVITourBookItem) segment;
-
-                  // output data only for the last segment
-                  if (segmentCount == 1
-                        || (segmentCount == 2 && segmentIndex == 1)
-                        || (segmentCount == 3 && segmentIndex == 2)) {
-
-                     exportCSV_30_OtherColumns(sb, isTour, tviItem);
-                  }
-               }
-            }
-
-            // end of line
-            sb.append(net.tourbook.ui.UI.SYSTEM_NEW_LINE);
-            exportWriter.write(sb.toString());
-         }
-
-      } catch (final IOException e) {
-         StatusUtil.showStatus(e);
-      }
-   }
-
-   private void exportCSV_10_Header(final Writer exportWriter, final StringBuilder sb) throws IOException {
-
-      // Year
-      csvField(sb, CSV_HEADER_YEAR);
-
-      // Month or Week
-      if (isYearSubWeek()) {
-         csvField(sb, CSV_HEADER_WEEK);
-         csvField(sb, CSV_HEADER_MONTH);
-      } else {
-         // defaults to month
-         csvField(sb, CSV_HEADER_MONTH);
-         csvField(sb, CSV_HEADER_WEEK);
-      }
-
-      csvField(sb, CSV_HEADER_DAY);
-      csvField(sb, CSV_HEADER_WEEKDAY);
-      csvField(sb, CSV_HEADER_TIME);
-      csvField(sb, CSV_HEADER_ISO_DATE_TIME);
-      csvField(sb, CSV_HEADER_NUMBER_OF_TOURS);
-      csvField(sb, CSV_HEADER_TOUR_TYPE_ID);
-      csvField(sb, CSV_HEADER_TOUR_TYPE_NAME);
-      csvField(sb, String.format(CSV_HEADER_DISTANCE, UI.UNIT_LABEL_DISTANCE));
-      csvField(sb, String.format(CSV_HEADER_ALTITUDE_UP, UI.UNIT_LABEL_ALTITUDE));
-      csvField(sb, String.format(CSV_HEADER_ALTITUDE_DOWN, UI.UNIT_LABEL_ALTITUDE));
-      csvField(sb, String.format(CSV_HEADER_RECORDING_TIME, Messages.App_Unit_Seconds_Small));
-      csvField(sb, String.format(CSV_HEADER_MOVING_TIME, Messages.App_Unit_Seconds_Small));
-      csvField(sb, String.format(CSV_HEADER_PAUSED_TIME, Messages.App_Unit_Seconds_Small));
-      csvField(sb, CSV_HEADER_PAUSED_TIME_RELATIVE);
-      csvField(sb, String.format(CSV_HEADER_RECORDING_TIME, CSV_EXPORT_DURATION_HHH_MM_SS));
-      csvField(sb, String.format(CSV_HEADER_MOVING_TIME, CSV_EXPORT_DURATION_HHH_MM_SS));
-      csvField(sb, String.format(CSV_HEADER_PAUSED_TIME, CSV_EXPORT_DURATION_HHH_MM_SS));
-      csvField(sb, CSV_HEADER_NUMBER_OF_MARKER);
-      csvField(sb, CSV_HEADER_NUMBER_OF_PHOTOS);
-      csvField(sb, CSV_HEADER_WEATHER);
-      csvField(sb, CSV_HEADER_WIND_SPEED);
-      csvField(sb, CSV_HEADER_WIND_DIRECTION);
-      csvField(sb, CSV_HEADER_TITLE);
-      csvField(sb, CSV_HEADER_TAGS);
-      csvField(sb, CSV_HEADER_CALORIES);
-      csvField(sb, CSV_HEADER_RESTPULSE);
-      csvField(sb, String.format(CSV_HEADER_MAX_ALTITUDE, UI.UNIT_LABEL_ALTITUDE));
-      csvField(sb, String.format(CSV_HEADER_MAX_SPEED, UI.UNIT_LABEL_SPEED));
-      csvField(sb, CSV_HEADER_MAX_PULSE);
-      csvField(sb, String.format(CSV_HEADER_AVERAGE_SPEED, UI.UNIT_LABEL_SPEED));
-      csvField(sb, String.format(CSV_HEADER_AVERAGE_PACE, UI.UNIT_LABEL_PACE));
-      csvField(sb, CSV_HEADER_AVERAGE_CADENCE);
-      csvField(sb, String.format(CSV_HEADER_AVERAGE_PULSE, GRAPH_LABEL_HEARTBEAT_UNIT));
-      csvField(sb, String.format(CSV_HEADER_AVERAGE_TEMPERATURE, UI.UNIT_LABEL_TEMPERATURE));
-      csvField(sb, CSV_HEADER_WEEK_YEAR);
-      csvField(sb, CSV_HEADER_TIME_SLICES);
-      csvField(sb, CSV_HEADER_TIME_INTERVAL);
-      csvField(sb, CSV_HEADER_DEVICE_START_DISTANCE);
-      csvField(sb, CSV_HEADER_DP_TOLERANCE);
-      csvField(sb, CSV_HEADER_PERSON);
-
-      csvField(sb, CSV_HEADER_GEAR_FRONT_SHIFT_COUNT);
-      csvField(sb, CSV_HEADER_GEAR_REAR_SHIFT_COUNT);
-
-      // end of line
-      sb.append(net.tourbook.ui.UI.SYSTEM_NEW_LINE);
-
-      exportWriter.write(sb.toString());
-   }
-
-   private void exportCSV_20_1stColumn(final StringBuilder sb,
-                                       final int segmentCount,
-                                       final Object segment,
-                                       final boolean isTour) {
-
-      if (segment instanceof TVITourBookYear) {
-
-         final TVITourBookYear tviYear = (TVITourBookYear) segment;
-
-         // year
-         csvField(sb, tviYear.tourYear);
-
-         if (segmentCount == 1) {
-
-            for (int spacerIndex = segmentCount; spacerIndex < 4; spacerIndex++) {
-               sb.append(UI.TAB);
-            }
-         }
-
-      } else if (segment instanceof TVITourBookYearSub) {
-
-         final TVITourBookYearSub tviYearSub = (TVITourBookYearSub) segment;
-
-         // month or week
-         csvField(sb, tviYearSub.tourYearSub);
-
-         if (segmentCount == 2) {
-
-            for (int spacerIndex = segmentCount; spacerIndex < 4; spacerIndex++) {
-               sb.append(UI.TAB);
-            }
-         }
-
-      } else if (isTour) {
-
-         final TVITourBookTour tviTour = (TVITourBookTour) segment;
-
-         if (isYearSubWeek()) {
-
-            // month
-            csvField(sb, tviTour.tourMonth);
-
-         } else {
-
-            // week
-            csvField(sb, tviTour.tourWeek);
-         }
-
-         // day
-         csvField(sb, tviTour.tourDay);
-      }
-   }
-
-   private void exportCSV_30_OtherColumns(final StringBuilder sb,
-                                          final boolean isTour,
-                                          final TVITourBookItem tviItem) {
-
-      TVITourBookTour tviTour = null;
-      TourDateTime tourDateTime = null;
-      ZonedDateTime tourStartDateTime = null;
-
-      if (isTour) {
-
-         tviTour = (TVITourBookTour) tviItem;
-
-         tourDateTime = tviItem.colTourDateTime;
-         tourStartDateTime = tourDateTime.tourZonedDateTime;
-      }
-
-      // CSV_HEADER_WEEKDAY
-      {
-         if (isTour) {
-            sb.append(tourDateTime.weekDay);
-         }
-         sb.append(UI.TAB);
-      }
-
-      // CSV_HEADER_TIME
-      {
-         if (isTour) {
-
-            sb.append(tourStartDateTime.format(TimeTools.Formatter_Time_M));
-         }
-         sb.append(UI.TAB);
-      }
-
-      // CSV_HEADER_ISO_DATE_TIME
-      {
-         if (isTour) {
-            sb.append(tourStartDateTime.format(DateTimeFormatter.ISO_DATE_TIME));
-         }
-         sb.append(UI.TAB);
-      }
-
-      // CSV_HEADER_NUMBER_OF_TOURS
-      {
-         if (isTour) {
-            sb.append(Long.toString(1));
-         } else {
-            sb.append(Long.toString(tviItem.colCounter));
-         }
-         sb.append(UI.TAB);
-      }
-
-      // CSV_HEADER_TOUR_TYPE_ID
-      {
-         if (isTour) {
-            sb.append(tviTour.getTourTypeId());
-         }
-         sb.append(UI.TAB);
-      }
-
-      // CSV_HEADER_TOUR_TYPE_NAME
-      {
-         if (isTour) {
-            final long tourTypeId = tviTour.getTourTypeId();
-            sb.append(net.tourbook.ui.UI.getTourTypeLabel(tourTypeId));
-         }
-         sb.append(UI.TAB);
-      }
-
-      // CSV_HEADER_DISTANCE
-      {
-         final float dbDistance = tviItem.colTourDistance;
-         if (dbDistance != 0) {
-            sb.append(_nf1_NoGroup.format(dbDistance / 1000 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
-         }
-         sb.append(UI.TAB);
-      }
-
-      // CSV_HEADER_ALTITUDE_UP
-      {
-         final long dbAltitudeUp = tviItem.colAltitudeUp;
-         if (dbAltitudeUp != 0) {
-            sb.append(Long.toString((long) (dbAltitudeUp / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)));
-         }
-         sb.append(UI.TAB);
-      }
-
-      // CSV_HEADER_ALTITUDE_DOWN
-      {
-         final long dbAltitudeDown = tviItem.colAltitudeDown;
-         if (dbAltitudeDown != 0) {
-            sb.append(Long.toString((long) (-dbAltitudeDown / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)));
-         }
-         sb.append(UI.TAB);
-      }
-
-      // CSV_HEADER_RECORDING_TIME
-      {
-         final long colRecordingTime = (tviItem).colTourRecordingTime;
-         if (colRecordingTime != 0) {
-            sb.append(Long.toString(colRecordingTime));
-         }
-         sb.append(UI.TAB);
-      }
-
-      // CSV_HEADER_MOVING_TIME
-      {
-         final long colDrivingTime = tviItem.colTourDrivingTime;
-         if (colDrivingTime != 0) {
-            sb.append(Long.toString(colDrivingTime));
-         }
-         sb.append(UI.TAB);
-      }
-
-      // CSV_HEADER_PAUSED_TIME
-      {
-         final long colPausedTime = tviItem.colPausedTime;
-         if (colPausedTime != 0) {
-            sb.append(Long.toString(colPausedTime));
-         }
-         sb.append(UI.TAB);
-      }
-
-      // CSV_HEADER_RELATIVE_PAUSED_TIME
-      {
-         final long colPausedTime = tviItem.colPausedTime;
-         final long dbPausedTime = colPausedTime;
-         final long dbRecordingTime = tviItem.colTourRecordingTime;
-         final float relativePausedTime = dbRecordingTime == 0 //
-               ? 0
-               : (float) dbPausedTime / dbRecordingTime * 100;
-         if (relativePausedTime != 0) {
-            sb.append(_nf1_NoGroup.format(relativePausedTime));
-         }
-         sb.append(UI.TAB);
-      }
-
-      // CSV_HEADER_RECORDING_TIME hhh:mm:ss
-      {
-         final long colRecordingTime = (tviItem).colTourRecordingTime;
-         if (colRecordingTime != 0) {
-            sb.append(net.tourbook.common.UI.format_hh_mm_ss(colRecordingTime));
-         }
-         sb.append(UI.TAB);
-      }
-
-      // CSV_HEADER_MOVING_TIME hhh:mm:ss
-      {
-         final long colDrivingTime = tviItem.colTourDrivingTime;
-         if (colDrivingTime != 0) {
-            sb.append(net.tourbook.common.UI.format_hh_mm_ss(colDrivingTime));
-         }
-         sb.append(UI.TAB);
-      }
-
-      // CSV_HEADER_PAUSED_TIME hhh:mm:ss
-      {
-         final long colPausedTime = tviItem.colPausedTime;
-         if (colPausedTime != 0) {
-            sb.append(net.tourbook.common.UI.format_hh_mm_ss(colPausedTime));
-         }
-         sb.append(UI.TAB);
-      }
-
-      // CSV_HEADER_NUMBER_OF_MARKER
-      {
-         if (isTour) {
-            final ArrayList<Long> markerIds = tviTour.getMarkerIds();
-            if (markerIds != null) {
-               sb.append(Integer.toString(markerIds.size()));
-            }
-         }
-         sb.append(UI.TAB);
-      }
-
-      // CSV_HEADER_NUMBER_OF_PHOTOS
-      {
-         final long numberOfPhotos = tviItem.colNumberOfPhotos;
-         if (numberOfPhotos != 0) {
-            sb.append(Long.toString(numberOfPhotos));
-         }
-
-         sb.append(UI.TAB);
-      }
-
-      // CSV_HEADER_WEATHER
-      {
-         if (isTour) {
-            final String windClouds = tviTour.colClouds;
-            if (windClouds != null) {
-               sb.append(windClouds);
-            }
-
-         }
-         sb.append(UI.TAB);
-      }
-
-      // CSV_HEADER_WIND_SPEED
-      {
-         final int windSpeed = (int) (tviItem.colWindSpd / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
-         if (windSpeed != 0) {
-            sb.append(Integer.toString(windSpeed));
-         }
-         sb.append(UI.TAB);
-      }
-
-      // CSV_HEADER_WIND_DIRECTION
-      {
-         if (isTour) {
-            final int windDir = tviItem.colWindDir;
-            if (windDir != 0) {
-               sb.append(Integer.toString(windDir));
-            }
-         }
-         sb.append(UI.TAB);
-      }
-
-      // CSV_HEADER_TITLE
-      {
-         final String dbTourTitle = tviItem.colTourTitle;
-         if (dbTourTitle != null) {
-            sb.append(dbTourTitle);
-         }
-         sb.append(UI.TAB);
-      }
-
-      // CSV_HEADER_TAGS
-      {
-         if (isTour) {
-            sb.append(TourDatabase.getTagNames(tviTour.getTagIds()));
-         }
-         sb.append(UI.TAB);
-      }
-
-      // CSV_HEADER_CALORIES
-      {
-         final long caloriesSum = tviItem.colCalories;
-         if (caloriesSum != 0) {
-            sb.append(Long.toString(caloriesSum));
-         }
-         sb.append(UI.TAB);
-      }
-
-      // CSV_HEADER_RESTPULSE
-      {
-         if (isTour) {
-            final int restPulse = tviItem.colRestPulse;
-            if (restPulse != 0) {
-               sb.append(Integer.toString(restPulse));
-            }
-         }
-         sb.append(UI.TAB);
-      }
-
-      // CSV_HEADER_MAX_ALTITUDE
-      {
-         final long dbMaxAltitude = tviItem.colMaxAltitude;
-         if (dbMaxAltitude != 0) {
-            sb.append(Long.toString((long) (dbMaxAltitude / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE)));
-         }
-         sb.append(UI.TAB);
-      }
-
-      // CSV_HEADER_MAX_SPEED
-      {
-         final float dbMaxSpeed = tviItem.colMaxSpeed;
-         if (dbMaxSpeed != 0) {
-            sb.append(_nf1_NoGroup.format(dbMaxSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
-         }
-         sb.append(UI.TAB);
-      }
-
-      // CSV_HEADER_MAX_PULSE
-      {
-         if (isTour) {
-            final long dbMaxPulse = tviItem.colMaxPulse;
-            if (dbMaxPulse != 0) {
-               sb.append(Long.toString(dbMaxPulse));
-            }
-         }
-         sb.append(UI.TAB);
-      }
-
-      // CSV_HEADER_AVERAGE_SPEED
-      {
-         final float speed = tviItem.colAvgSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
-         if (speed != 0) {
-            sb.append(_nf1_NoGroup.format(speed));
-         }
-         sb.append(UI.TAB);
-      }
-
-      // CSV_HEADER_AVERAGE_PACE
-      {
-         final float pace = tviItem.colAvgPace * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
-         if (pace != 0) {
-            sb.append(net.tourbook.common.UI.format_mm_ss((long) pace));
-         }
-         sb.append(UI.TAB);
-      }
-
-      // CSV_HEADER_AVERAGE_CADENCE
-      {
-         final float dbAvgCadence = tviItem.colAvgCadence;
-         if (dbAvgCadence != 0) {
-            sb.append(_nf1_NoGroup.format(dbAvgCadence));
-         }
-         sb.append(UI.TAB);
-      }
-
-      // CSV_HEADER_AVERAGE_PULSE
-      {
-         final float pulse = tviItem.colAvgPulse;
-         if (pulse != 0) {
-            sb.append(_nf1_NoGroup.format(pulse));
-         }
-         sb.append(UI.TAB);
-      }
-
-      // CSV_HEADER_AVERAGE_TEMPERATURE
-      {
-         float temperature = tviItem.colTemperature_Avg;
-
-         if (temperature != 0) {
-            if (net.tourbook.ui.UI.UNIT_VALUE_TEMPERATURE != 1) {
-               temperature = temperature
-                     * net.tourbook.ui.UI.UNIT_FAHRENHEIT_MULTI
-                     + net.tourbook.ui.UI.UNIT_FAHRENHEIT_ADD;
-            }
-            sb.append(_nf1_NoGroup.format(temperature));
-         }
-         sb.append(UI.TAB);
-      }
-
-      // CSV_HEADER_WEEK_YEAR
-      {
-         if (isTour) {
-            final int week = tviItem.colWeekYear;
-            if (week != 0) {
-               sb.append(Integer.toString(week));
-            }
-         }
-         sb.append(UI.TAB);
-      }
-
-      // CSV_HEADER_TIME_SLICES
-      {
-         final long numberOfTimeSlices = tviItem.colNumberOfTimeSlices;
-         if (numberOfTimeSlices != 0) {
-            sb.append(Long.toString(numberOfTimeSlices));
-         }
-         sb.append(UI.TAB);
-      }
-
-      // CSV_HEADER_TIME_INTERVAL
-      {
-         if (isTour) {
-            final short dbTimeInterval = tviTour.getColumnTimeInterval();
-            if (dbTimeInterval != 0) {
-               sb.append(Long.toString(dbTimeInterval));
-            }
-         }
-         sb.append(UI.TAB);
-      }
-
-      // CSV_HEADER_DEVICE_START_DISTANCE
-      {
-         if (isTour) {
-            final long dbStartDistance = tviTour.getColumnStartDistance();
-            if (dbStartDistance != 0) {
-               sb.append(Long.toString((long) (dbStartDistance / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE)));
-            }
-         }
-         sb.append(UI.TAB);
-      }
-
-      // CSV_HEADER_DP_TOLERANCE
-      {
-         if (isTour) {
-            final int dpTolerance = tviItem.colDPTolerance;
-            if (dpTolerance != 0) {
-               sb.append(_nf1_NoGroup.format(dpTolerance / 10.0));
-            }
-         }
-         sb.append(UI.TAB);
-      }
-
-      // CSV_HEADER_PERSON
-      {
-         if (isTour) {
-            final long dbPersonId = tviTour.colPersonId;
-            sb.append(PersonManager.getPersonName(dbPersonId));
-         }
-         sb.append(UI.TAB);
-      }
-
-      // CSV_HEADER_GEAR_FRONT_SHIFT_COUNT
-      {
-         final long shiftCount = tviItem.colFrontShiftCount;
-         sb.append(Long.toString(shiftCount));
-
-         sb.append(UI.TAB);
-      }
-
-      // CSV_HEADER_GEAR_REAR_SHIFT_COUNT
-      {
-         final long shiftCount = tviItem.colRearShiftCount;
-         sb.append(Long.toString(shiftCount));
-
-         sb.append(UI.TAB);
-      }
-   }
-
    private void fillActionBars() {
 
       /*
@@ -4102,6 +3451,13 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    }
 
    /**
+    * @return the _yearSubCategory
+    */
+   YearSubCategory getYearSubCategory() {
+      return _yearSubCategory;
+   }
+
+   /**
     * @param yearSubItem
     * @param tourIds
     * @return Return all tours for one yearSubItem
@@ -4126,14 +3482,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    boolean isShowSummaryRow() {
 
       return Util.getStateBoolean(_state, TourBookView.STATE_IS_SHOW_SUMMARY_ROW, TourBookView.STATE_IS_SHOW_SUMMARY_ROW_DEFAULT);
-   }
-
-   /**
-    * @return Returns <code>true</code> when the year subcategory is week, otherwise it is month.
-    */
-   private boolean isYearSubWeek() {
-
-      return _yearSubCategory == YearSubCategory.WEEK;
    }
 
    private void onSelectionChanged(final ISelection selection) {
@@ -4618,7 +3966,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
                      /**
                       * <code>
-                     
+
                         Caused by: java.lang.NullPointerException
                         at org.eclipse.jface.viewers.AbstractTreeViewer.getSelection(AbstractTreeViewer.java:2956)
                         at org.eclipse.jface.viewers.StructuredViewer.handleSelect(StructuredViewer.java:1211)
@@ -4636,13 +3984,13 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
                         at org.eclipse.jface.viewers.AbstractTreeViewer.internalCollapseToLevel(AbstractTreeViewer.java:1586)
                         at org.eclipse.jface.viewers.AbstractTreeViewer.collapseToLevel(AbstractTreeViewer.java:751)
                         at org.eclipse.jface.viewers.AbstractTreeViewer.collapseAll(AbstractTreeViewer.java:733)
-                     
+
                         at net.tourbook.ui.views.tourBook.TourBookView$70.run(TourBookView.java:3406)
-                     
+
                         at org.eclipse.swt.widgets.RunnableLock.run(RunnableLock.java:35)
                         at org.eclipse.swt.widgets.Synchronizer.runAsyncMessages(Synchronizer.java:135)
                         ... 22 more
-                     
+
                       * </code>
                       */
 
