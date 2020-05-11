@@ -37,18 +37,13 @@ import java.util.Scanner;
 import net.tourbook.Messages;
 import net.tourbook.application.PerspectiveFactoryRawData;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.cloud.ICloudPreferences;
-import net.tourbook.cloud.dropbox.ChooserType;
-import net.tourbook.cloud.dropbox.DropboxBrowser;
 import net.tourbook.cloud.dropbox.DropboxClient;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.NIO;
 import net.tourbook.common.UI;
-import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.ITourViewer3;
 import net.tourbook.common.util.StatusUtil;
-import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.widgets.ComboEnumEntry;
 import net.tourbook.data.TourData;
@@ -89,7 +84,6 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.WorkbenchException;
-import org.eclipse.ui.dialogs.PreferencesUtil;
 
 public class RawDataManager {
 
@@ -376,73 +370,65 @@ public class RawDataManager {
       }
    }
 
+   // IMPORTANT: We cannot offer manual file import directly from Dropbox as
+   // this file cannot have references/dependencies to Dropbox
+
    /**
     * Imports tours selected from a Dropbox folder specified in the preferences.
     */
-   public void actionImportFromDropbox() {
-      //TODO FB
-      final String accessToken = _commonPrefStore.getString(ICommonPreferences.DROPBOX_ACCESSTOKEN);
-      final String dropboxFolder = _commonPrefStore.getString(ICommonPreferences.DROPBOX_FOLDER);
-
-      if (StringUtils.isNullOrEmpty(accessToken) ||
-            StringUtils.isNullOrEmpty(dropboxFolder)) {
-         MessageDialog.openInformation(
-               Display.getCurrent().getActiveShell(),
-               Messages.Dialog_DropboxFileChooser_Title,
-               Messages.Dialog_DropboxFileChooser_AccessToken_Missing);
-
-         PreferencesUtil.createPreferenceDialogOn(
-               Display.getCurrent().getActiveShell(),
-               ICloudPreferences.PREF_PAGE_DROPBOX,
-               null,
-               null).open();
-
-         return;
-      }
-
-      final DropboxBrowser dropboxChooser[] = new DropboxBrowser[1];
-      BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-         @Override
-         public void run() {
-            dropboxChooser[0] = new DropboxBrowser(Display.getCurrent().getActiveShell(), ChooserType.File, "");
-            dropboxChooser[0].open();
-         }
-      });
-
-      final ArrayList<String> selectedFiles = dropboxChooser[0].getSelectedFiles();
-
-      if (selectedFiles == null || selectedFiles.size() == 0) {
-         return;
-      }
-
-      final ArrayList<OSFile> osFiles = new ArrayList<>();
-
-      for (final String dropboxFilePath : selectedFiles) {
-
-         final Path filePath = DropboxClient.CopyLocally(dropboxFilePath);
-         if (filePath == null) {
-            continue;
-         }
-
-         final OSFile osFile = new OSFile(filePath);
-         osFiles.add(osFile);
-      }
-
-      if (_importState_IsAutoOpenImportLog) {
-         TourLogManager.showLogView();
-      }
-
-      runImport(osFiles, false, null);
-
-      // Delete the temporary created files
-      osFiles.forEach(file -> {
-         try {
-            Files.deleteIfExists(file.getPath());
-         } catch (final IOException e) {
-            StatusUtil.log(e);
-         }
-      });
-   }
+   /*
+    * public void actionImportFromDropbox() {
+    * final String accessToken = _commonPrefStore.getString(ICommonPreferences.DROPBOX_ACCESSTOKEN);
+    * final String dropboxFolder = _commonPrefStore.getString(ICommonPreferences.DROPBOX_FOLDER);
+    * if (StringUtils.isNullOrEmpty(accessToken) ||
+    * StringUtils.isNullOrEmpty(dropboxFolder)) {
+    * MessageDialog.openInformation(
+    * Display.getCurrent().getActiveShell(),
+    * Messages.Dialog_DropboxFileChooser_Title,
+    * Messages.Dialog_DropboxFileChooser_AccessToken_Missing);
+    * PreferencesUtil.createPreferenceDialogOn(
+    * Display.getCurrent().getActiveShell(),
+    * ICloudPreferences.PREF_PAGE_DROPBOX,
+    * null,
+    * null).open();
+    * return;
+    * }
+    * final DropboxBrowser dropboxChooser[] = new DropboxBrowser[1];
+    * BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+    * @Override
+    * public void run() {
+    * dropboxChooser[0] = new DropboxBrowser(Display.getCurrent().getActiveShell(),
+    * ChooserType.File, "");
+    * dropboxChooser[0].open();
+    * }
+    * });
+    * final ArrayList<String> selectedFiles = dropboxChooser[0].getSelectedFiles();
+    * if (selectedFiles == null || selectedFiles.size() == 0) {
+    * return;
+    * }
+    * final ArrayList<OSFile> osFiles = new ArrayList<>();
+    * for (final String dropboxFilePath : selectedFiles) {
+    * final Path filePath = DropboxClient.CopyLocally(dropboxFilePath);
+    * if (filePath == null) {
+    * continue;
+    * }
+    * final OSFile osFile = new OSFile(filePath);
+    * osFiles.add(osFile);
+    * }
+    * if (_importState_IsAutoOpenImportLog) {
+    * TourLogManager.showLogView();
+    * }
+    * runImport(osFiles, false, null);
+    * // Delete the temporary created files
+    * osFiles.forEach(file -> {
+    * try {
+    * Files.deleteIfExists(file.getPath());
+    * } catch (final IOException e) {
+    * StatusUtil.log(e);
+    * }
+    * });
+    * }
+    */
 
    /**
     * Import tours from files which are selected in a file selection dialog.
