@@ -55,6 +55,8 @@ public class FileSystemManager {
 
       if (extPoint != null) {
 
+         final IExtension[] extensions = extPoint.getExtensions();
+
          for (final IExtension extension : extPoint.getExtensions()) {
 
             for (final IConfigurationElement configElement : extension.getConfigurationElements()) {
