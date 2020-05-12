@@ -944,11 +944,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                recreateViewer();
             }
 
-            if (property.equals(ICommonPreferences.DROPBOX_ACCESSTOKEN) ||
-                  property.equals(ICommonPreferences.DROPBOX_FOLDER)) {
-
-               _dropboxPreferencesHaveChanged = true;
-            }
+            // TODO FB
+            /*
+             * if (property.equals(ICommonPreferences.DROPBOX_ACCESSTOKEN) ||
+             * property.equals(ICommonPreferences.DROPBOX_FOLDER)) {
+             * _dropboxPreferencesHaveChanged = true;
+             * }
+             */
          }
       };
 
@@ -3440,7 +3442,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       disposeConfigImages();
 
-      NIO.closeDropboxFileSystem();
+      //TODO FB NIO.closeDropboxFileSystem();
 
       super.dispose();
    }
@@ -4252,11 +4254,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
          action_Easy_SetDeviceWatching_OnOff();
 
-      } else if (ACTION_IMPORT_FROM_DROPBOX.equals(hrefAction)) {
+      } //TODO FB else if (ACTION_IMPORT_FROM_DROPBOX.equals(hrefAction)) {
 
-         _rawDataMgr.actionImportFromDropbox();
+      // _rawDataMgr.actionImportFromDropbox();
 
-      } else if (ACTION_IMPORT_FROM_FILES.equals(hrefAction)) {
+      //   }
+      else if (ACTION_IMPORT_FROM_FILES.equals(hrefAction)) {
 
          _rawDataMgr.actionImportFromFile();
 

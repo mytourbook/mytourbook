@@ -39,7 +39,7 @@ public class FileSystemManager {
 
       if (_fileSystemsList == null) {
 
-         _fileSystemsList = readFileSystemsExtensions("cloudFileSystem");//TourbookPlugin.EXT_POINT_DEVICE_DATA_READER);
+         _fileSystemsList = readFileSystemsExtensions("cloudConnectivity");//TourbookPlugin.EXT_POINT_DEVICE_DATA_READER);
       }
 
       return _fileSystemsList;
@@ -48,7 +48,7 @@ public class FileSystemManager {
    @SuppressWarnings({ "rawtypes", "unchecked" })
    private static ArrayList readFileSystemsExtensions(final String extensionPointName) {
 
-      final ArrayList fileSystemsList = new ArrayList();
+      final ArrayList fileSystemsList = null;
 
       final IExtensionPoint extPoint = Platform.getExtensionRegistry()//
             .getExtensionPoint("net.tourbook", extensionPointName);

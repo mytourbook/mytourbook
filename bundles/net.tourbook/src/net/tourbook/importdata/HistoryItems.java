@@ -29,7 +29,6 @@ import net.tourbook.Messages;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.NIO;
 import net.tourbook.common.UI;
-import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.util.Util;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -529,7 +528,7 @@ class HistoryItems {
 
                      } else if (NIO.isDropboxDevice(cleanedFolderName)) {
 
-                        final String dropboxUrl = "https://www.dropbox.com/home" + _prefStore.getString(ICommonPreferences.DROPBOX_FOLDER); //$NON-NLS-1$
+                        final String dropboxUrl = "https://www.dropbox.com/";//$NON-NLS-1$
                         _labelFolderInfo.setText(dropboxUrl);
 
                      } else {

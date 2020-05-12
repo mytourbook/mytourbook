@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.cloud.dropbox.filesystem;
+package net.tourbook.cloud.dropbox;
 
 import com.github.fge.fs.dropbox.provider.DropBoxFileSystemProvider;
 import com.github.fge.fs.dropbox.provider.DropBoxFileSystemRepository;

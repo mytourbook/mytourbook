@@ -2,14 +2,11 @@
 <?eclipse version="4.14"?>
 <plugin>
 	
-   <extension   point="net.tourbook.cloudFileSystem">
-
+   <extension	point="net.tourbook.cloudConnectivity">
       <device
-         id             ="net.tourbook.cloud.DropboxFileSystem"
-         name           ="Dropbox File System"
-         class          ="net.tourbook.cloud.dropbox.filesystem"
-      />
-
+            class="net.tourbook.cloud.dropbox.filesystem"
+            id="net.tourbook.cloud.DropboxFileSystem"
+            name="Dropbox File System"/>
    </extension>
 
    <extension	point="org.eclipse.core.runtime.preferences">

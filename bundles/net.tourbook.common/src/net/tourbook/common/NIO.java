@@ -22,6 +22,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -107,7 +108,9 @@ public class NIO {
     */
    public static Path getDeviceFolderPath(final String folderName) {
 
-      return NIO.isDropboxDevice(folderName) ? getDropboxFilePath(UI.EMPTY_STRING) : Paths.get(folderName);
+      //TODO FB
+      //return NIO.isDropboxDevice(folderName) ? getDropboxFilePath(UI.EMPTY_STRING) : Paths.get(folderName);
+      return null;
    }
 
 
@@ -134,6 +137,7 @@ public class NIO {
          fileStores.add(fileStoresIterator.next());
       }
 
+      final List<FileSystem> fileSystems = FileSystemManager.getFileSystemsList();
       //TODO FB
       /*
        * final Iterable<FileStore> dropboxFileStore = getDropboxFileStores();

@@ -2,9 +2,9 @@
 <!-- Schema file written by PDE -->
 <schema targetNamespace="net.tourbook" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
-      <appinfo>
-         <meta.schema plugin="net.tourbook" id="cloudConnectivity" name="CloudConnectivity"/>
-      </appinfo>
+      <appInfo>
+         <meta.schema plugin="net.tourbook" id="cloudConnectivity" name="Cloud Connectivity"/>
+      </appInfo>
       <documentation>
          A plugin to allow connectivity to cloud applications.
       </documentation>
@@ -12,12 +12,12 @@
 
    <element name="extension">
       <annotation>
-         <appinfo>
+         <appInfo>
             <meta.element />
-         </appinfo>
+         </appInfo>
       </annotation>
       <complexType>
-         <choice>
+         <choice minOccurs="0" maxOccurs="unbounded">
             <element ref="cloudConnectivity"/>
          </choice>
          <attribute name="point" type="string" use="required">
@@ -39,9 +39,9 @@
                <documentation>
                   
                </documentation>
-               <appinfo>
+               <appInfo>
                   <meta.attribute translatable="true"/>
-               </appinfo>
+               </appInfo>
             </annotation>
          </attribute>
       </complexType>
@@ -61,45 +61,45 @@
                <documentation>
                   
                </documentation>
-               <appinfo>
+               <appInfo>
                   <meta.attribute kind="java" basedOn="net.tourbook.cloud.ICloud:"/>
-               </appinfo>
+               </appInfo>
             </annotation>
          </attribute>
       </complexType>
    </element>
 
    <annotation>
-      <appinfo>
+      <appInfo>
          <meta.section type="since"/>
-      </appinfo>
+      </appInfo>
       <documentation>
          20.X
       </documentation>
    </annotation>
 
    <annotation>
-      <appinfo>
+      <appInfo>
          <meta.section type="examples"/>
-      </appinfo>
+      </appInfo>
       <documentation>
          [Enter extension point usage example here.]
       </documentation>
    </annotation>
 
    <annotation>
-      <appinfo>
+      <appInfo>
          <meta.section type="apiInfo"/>
-      </appinfo>
+      </appInfo>
       <documentation>
          [Enter API information here.]
       </documentation>
    </annotation>
 
    <annotation>
-      <appinfo>
+      <appInfo>
          <meta.section type="implementation"/>
-      </appinfo>
+      </appInfo>
       <documentation>
          [Enter information about supplied implementation of this extension point.]
       </documentation>
