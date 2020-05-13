@@ -29,7 +29,8 @@ Import
 Changes  
 =======
 
-* 
+* CSV Export
+  The csv export is now exporting all Tour Book view columns, existing csv column headers may also be modified 
 
 
 Fixes   
