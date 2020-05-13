@@ -101,7 +101,7 @@ public class TourDatabase {
    /**
     * Version for the database which is required that the tourbook application works successfully
     */
-   private static final int TOURBOOK_DB_VERSION = 40;
+   private static final int TOURBOOK_DB_VERSION = 41;
 
 //   private static final int TOURBOOK_DB_VERSION = 40; // 19.10
 //   private static final int TOURBOOK_DB_VERSION = 39; // 19.7
@@ -3111,6 +3111,12 @@ public class TourDatabase {
             //
             // version 40 end
 
+            // version 41 start  -  20.5
+            //
+            + " maxPace                               FLOAT DEFAULT 0,                  \n" //$NON-NLS-1$
+            //
+            // version 41 end
+
             //            // version 35 start  -  18.?
             //            //
             //            + " LatitudeMinE6         INTEGER DEFAULT 0,                        \n" //$NON-NLS-1$
@@ -4845,6 +4851,11 @@ public class TourDatabase {
             isPostUpdate40 = true;
          }
 
+         // 40 -> 41
+         if (currentDbVersion == 40) {
+            currentDbVersion = newVersion = updateDbDesign_040_to_041(conn, splashManager);
+         }
+
          /*
           * Update version number
           */
@@ -4855,7 +4866,7 @@ public class TourDatabase {
           * connections and entitymanager which is checking the version number.
           * <p>
           * Also the data structure must be updated otherwise the entity manager fails because the
-          * data structure in the programm code MUST be the same as in the database.
+          * data structure in the program code MUST be the same as in the database.
           */
          if (isPostUpdate5) {
             TourDatabase.computeAnyValues_ForAllTours(splashManager);
@@ -6213,7 +6224,7 @@ public class TourDatabase {
              */
 
             /*
-             * Drop tables which will never be used, they exist since many years but it is unknows
+             * Drop tables which will never be used, they exist since many years but it is unknown
              * why they has been created.
              */
             SQL.Cleanup_DropTable(stmt, TABLE_TOUR_CATEGORY);
@@ -7412,6 +7423,33 @@ public class TourDatabase {
       StatusUtil.logInfo(String.format(
             "Database postupdate 39 -> 40 in %s mm:ss", //$NON-NLS-1$
             net.tourbook.common.UI.formatHhMmSs(timeDiff / 1000)));
+   }
+
+   private int updateDbDesign_040_to_041(final Connection conn, final SplashManager splashManager) throws SQLException {
+
+      final int newDbVersion = 41;
+
+      logDb_UpdateStart(newDbVersion);
+      updateMonitor(splashManager, newDbVersion);
+
+      final Statement stmt = conn.createStatement();
+      {
+         // check if db is updated to version 41
+         if (isColumnAvailable(conn, TABLE_TOUR_DATA, "maxPace") == false) { //$NON-NLS-1$
+
+// SET_FORMATTING_OFF
+
+            // Add new columns
+            SQL.AddCol_Float(stmt, TABLE_TOUR_DATA, "maxPace",          DEFAULT_0);                            //$NON-NLS-1$
+
+// SET_FORMATTING_ON
+         }
+      }
+      stmt.close();
+
+      logDb_UpdateEnd(newDbVersion);
+
+      return newDbVersion;
    }
 
 //   private int updateDbDesign_034_to_035(final Connection conn, final IProgressMonitor monitor) throws SQLException {

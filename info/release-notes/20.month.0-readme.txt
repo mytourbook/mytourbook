@@ -24,6 +24,12 @@ New + Improvements
 * Dialog Adjust Elevation
   - Show elevation gain/loss values before and after the adjustment, supported adjustment type: "Approach elevation with SRTM data"  
 
+* Tour Marker View (Frederic)
+  - Added the Average Speed column
+
+* Tour tooltip (Frederic)
+  - Added the maximum pace (^ Pace)
+
 * Dropbox Integration (Frederic) :
   - Ability to connect a Dropbox account to MyTourbook, and also choosing a specific a folder for this account
   - Ability to manually select one or more files to import from any location in a given Dropbox account
