@@ -45,7 +45,7 @@ public class FileSystemManager {
       return _fileSystemsList;
    }
 
-   @SuppressWarnings({ "rawtypes", "unchecked" })
+   @SuppressWarnings({ "rawtypes" })
    private static ArrayList readFileSystemsExtensions(final String extensionPointName) {
 
       final ArrayList fileSystemsList = null;

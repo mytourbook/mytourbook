@@ -49,11 +49,21 @@
 
    <element name="cloudConnectivity">
       <complexType>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  each file system requires a unique id
+               </documentation>
+            </annotation>
+         </attribute>
          <attribute name="name" type="string" use="required">
             <annotation>
                <documentation>
                   
                </documentation>
+               <appInfo>
+                  <meta.attribute translatable="true"/>
+               </appInfo>
             </annotation>
          </attribute>
          <attribute name="class" type="string" use="required">
@@ -62,7 +72,7 @@
                   
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn="net.tourbook.cloud.ICloud:"/>
+                  <meta.attribute kind="java" basedOn="net.tourbook.cloud.ICloud"/>
                </appInfo>
             </annotation>
          </attribute>

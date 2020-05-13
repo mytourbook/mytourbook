@@ -3,13 +3,11 @@
 <plugin>
 	
    <extension   point="net.tourbook.cloudConnectivity">
-
-      <cloud
+      <cloudConnectivity
          id             ="net.tourbook.cloud.DropboxFileSystem"
          name           ="Dropbox File System"
          class          ="net.tourbook.cloud.dropbox.Filesystem"
       />
-      
    </extension>
 
    <extension	point="org.eclipse.core.runtime.preferences">
