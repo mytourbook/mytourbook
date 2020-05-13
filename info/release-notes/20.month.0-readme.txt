@@ -24,6 +24,9 @@ New + Improvements
 * Tour Marker View (Frederic)
   - Added the Average Speed column
 
+* Tour tooltip (Frederic)
+  - Added the maximum pace (^ Pace)
+
 Import
 ======
 
