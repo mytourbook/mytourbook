@@ -142,6 +142,14 @@ public class Messages extends NLS {
    public static String        dialog_export_shell_text;
    public static String        dialog_export_txt_filePath_tooltip;
 
+   public static String        Dialog_AdjustAltitude_Label_ElevationGain;
+   public static String        Dialog_AdjustAltitude_Label_ElevationGain_After_Tooltip;
+   public static String        Dialog_AdjustAltitude_Label_ElevationGain_Before_Tooltip;
+   public static String        Dialog_AdjustAltitude_Label_ElevationGain_Diff_Tooltip;
+   public static String        Dialog_AdjustAltitude_Label_ElevationLoss;
+   public static String        Dialog_AdjustAltitude_Label_ElevationLoss_After_Tooltip;
+   public static String        Dialog_AdjustAltitude_Label_ElevationLoss_Before_Tooltip;
+   public static String        Dialog_AdjustAltitude_Label_ElevationLoss_Diff_Tooltip;
    public static String        Dialog_AdjustAltitude_Link_ApproachWholeTour;
 
    public static String        Dialog_AdjustTemperature_Button_AdjustTemperature;

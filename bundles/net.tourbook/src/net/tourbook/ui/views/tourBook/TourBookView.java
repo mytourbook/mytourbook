@@ -1612,7 +1612,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            final double value = ((TVITourBookItem) element).colPower_TotalWork / 1000000.0;
+            final double value = ((TVITourBookItem) element).colPower_TotalWork / 1000_000.0;
 
             colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
@@ -2893,7 +2893,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            final int dbValue = ((TVITourBookItem) element).colPower_FTP;
+            final int dbValue = ((TVITourBookItem) element).colTraining_FTP;
 
             if (dbValue == 0) {
                cell.setText(UI.EMPTY_STRING);
@@ -2918,7 +2918,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            final double value = ((TVITourBookItem) element).colPower_IntensityFactor;
+            final double value = ((TVITourBookItem) element).colTraining_IntensityFactor;
 
             colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
@@ -2936,7 +2936,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            final double value = ((TVITourBookItem) element).colPower_PowerToWeight;
+            final double value = ((TVITourBookItem) element).colTraining_PowerToWeight;
 
             colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
@@ -2957,7 +2957,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            final double value = ((TVITourBookItem) element).colPower_TrainingStressScore;
+            final double value = ((TVITourBookItem) element).colTraining_TrainingStressScore;
 
             colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
@@ -2978,7 +2978,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            final double value = ((TVITourBookItem) element).colTraining_TrainingEffect;
+            final double value = ((TVITourBookItem) element).colTraining_TrainingEffect_Aerob;
 
             colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
