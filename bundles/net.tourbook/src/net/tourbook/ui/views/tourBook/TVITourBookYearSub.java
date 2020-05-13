@@ -333,11 +333,11 @@ public class TVITourBookYearSub extends TVITourBookItem {
                tourItem.colPower_Avg = dbAvgPower;
                tourItem.colPower_Max                           = result.getInt(38);
                tourItem.colPower_Normalized                    = result.getInt(39);
-               tourItem.colPower_FTP                           = result.getInt(40);
+               tourItem.colTraining_FTP                        = result.getInt(40);
 
                tourItem.colPower_TotalWork                     = result.getLong(41);
-               tourItem.colPower_TrainingStressScore           = result.getFloat(42);
-               tourItem.colPower_IntensityFactor               = result.getFloat(43);
+               tourItem.colTraining_TrainingStressScore        = result.getFloat(42);
+               tourItem.colTraining_IntensityFactor            = result.getFloat(43);
 
                tourItem.colPower_PedalLeftRightBalance         = result.getInt(44);
                tourItem.colPower_AvgLeftTorqueEffectiveness    = result.getFloat(45);
@@ -393,7 +393,7 @@ public class TVITourBookYearSub extends TVITourBookItem {
 
                // ---------- TRAINING -------------
 
-               tourItem.colTraining_TrainingEffect             = result.getFloat(76);
+               tourItem.colTraining_TrainingEffect_Aerob       = result.getFloat(76);
                tourItem.colTraining_TrainingEffect_Anaerobic   = result.getFloat(77);
                tourItem.colTraining_TrainingPerformance        = result.getFloat(78);
 
@@ -422,7 +422,7 @@ public class TVITourBookYearSub extends TVITourBookItem {
                // -----------------------------------------------
 
                tourItem.colBodyWeight = dbBodyWeight;
-               tourItem.colPower_PowerToWeight = dbBodyWeight == 0 ? 0 : dbAvgPower / dbBodyWeight;
+               tourItem.colTraining_PowerToWeight = dbBodyWeight == 0 ? 0 : dbAvgPower / dbBodyWeight;
 
                tourItem.colAvgCadence = dbAvgCadence * dbCadenceMultiplier;
                tourItem.colCadenceMultiplier = dbCadenceMultiplier;

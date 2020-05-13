@@ -6,7 +6,7 @@ TODO's
            
   - Calendar view: Show average pulse/power in day/week values, this is helpful for ergometer
   
-  - csv export of all tour fields in tourbook view
+  - csv export: export new column(s) in tourbook view
  
 
 New + Improvements
@@ -20,6 +20,9 @@ New + Improvements
 
 * Statistics (Frederic)
   - The number of years to be displayed in the graph is now dynamically filled and updated based on the number of available years
+  
+* Dialog Adjust Elevation
+  - Show elevation gain/loss values before and after the adjustment, supported adjustment type: "Approach elevation with SRTM data"  
 
 * Dropbox Integration (Frederic) :
   - Ability to connect a Dropbox account to MyTourbook, and also choosing a specific a folder for this account
@@ -35,7 +38,8 @@ Import
 Changes  
 =======
 
-* 
+* CSV Export
+  The csv export is now exporting all Tour Book view columns, existing csv column headers may also be modified 
 
 
 Fixes   
