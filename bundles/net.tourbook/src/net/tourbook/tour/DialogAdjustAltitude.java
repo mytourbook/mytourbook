@@ -479,8 +479,9 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
       final int leftSliderIndex = _tourChart.getXSliderPosition().getLeftSliderValueIndex();
       final int serieLength = _tourData.timeSerie.length;
 
-      final float[] adjustedAltiSerie = _tourData.dataSerieAdjustedAlti = new float[serieLength];
-      final float[] diffTo2ndAlti = _tourData.dataSerieDiffTo2ndAlti = new float[serieLength];
+      final float[] metric_AdjustedElevationSerie = new float[serieLength];
+      final float[] measurementSystem_AdjustedElevationSerie = _tourData.dataSerieAdjustedAlti = new float[serieLength];
+      final float[] metric_DiffTo2ndElevation = _tourData.dataSerieDiffTo2ndAlti = new float[serieLength];
       final float[] splineDataSerie = _tourData.dataSerieSpline = new float[serieLength];
 
       final double[] xDataSerie = _tourChartConfig.isShowTimeOnXAxis
@@ -502,8 +503,8 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
        */
       for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
 
-         final float originalMetricElevation = yDataSerie[serieIndex];
-         final float srtmValue = _backupSrtmSerie[serieIndex];
+         final float metric_OriginalElevation = yDataSerie[serieIndex];
+         final float metric_SrtmValue = _backupSrtmSerie[serieIndex];
 
          if (serieIndex <= leftSliderIndex && leftSliderIndex != 0) {
 
@@ -513,7 +514,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
             final double distanceScale = 1 - (distance / _sliderXAxisValue);
 
             final float linearAdjustedAltiDiff = (float) (distanceScale * _altiDiff);
-            final float newElevation = originalMetricElevation + linearAdjustedAltiDiff;
+            final float metric_NewElevation = metric_OriginalElevation + linearAdjustedAltiDiff;
 
             float splineElevation = 0;
             try {
@@ -524,20 +525,24 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
                System.out.println(e.getMessage());
             }
 
-            final float adjustedElevation = newElevation + splineElevation;
-            final float metricAdjustedElevation = adjustedElevation / UI.UNIT_VALUE_ALTITUDE;
+            final float metric_AdjustedElevation = metric_NewElevation + splineElevation;
+            final float measurementSystem_AdjustedElevation = metric_AdjustedElevation / UI.UNIT_VALUE_ALTITUDE;
 
             splineDataSerie[serieIndex] = splineElevation;
 
-            adjustedAltiSerie[serieIndex] = metricAdjustedElevation;
-            diffTo2ndAlti[serieIndex] = srtmValue - adjustedElevation;
+            metric_AdjustedElevationSerie[serieIndex] = metric_AdjustedElevation;
+            metric_DiffTo2ndElevation[serieIndex] = metric_SrtmValue - metric_AdjustedElevation;
+            measurementSystem_AdjustedElevationSerie[serieIndex] = measurementSystem_AdjustedElevation;
 
          } else {
 
             // elevation is not adjusted
 
-            adjustedAltiSerie[serieIndex] = originalMetricElevation / UI.UNIT_VALUE_ALTITUDE;
-            diffTo2ndAlti[serieIndex] = srtmValue - originalMetricElevation;
+            final float measurementSystem_AdjustedElevation = metric_OriginalElevation / UI.UNIT_VALUE_ALTITUDE;
+
+            metric_AdjustedElevationSerie[serieIndex] = metric_OriginalElevation;
+            metric_DiffTo2ndElevation[serieIndex] = metric_SrtmValue - metric_OriginalElevation;
+            measurementSystem_AdjustedElevationSerie[serieIndex] = measurementSystem_AdjustedElevation;
          }
       }
 
@@ -574,19 +579,19 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
       /*
        * Update UI up/down values
        */
-      final AltitudeUpDown adjustedElevationUpDown = _tourData.computeAltitudeUpDown(adjustedAltiSerie);
+      final AltitudeUpDown adjustedElevationUpDown = _tourData.computeAltitudeUpDown(metric_AdjustedElevationSerie);
 
-      final int tourElevationUp = _tourData.getTourAltUp();
-      final int tourElevationDown = _tourData.getTourAltDown();
+      final float measurementSystem_TourElevationUp = _tourData.getTourAltUp() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+      final float measurementSystem_TourElevationDown = _tourData.getTourAltDown() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
 
-      final float adjustedElevationUp = adjustedElevationUpDown.getAltitudeUp();
-      final float adjustedElevationDown = adjustedElevationUpDown.getAltitudeDown();
+      final float adjustedElevationUp = adjustedElevationUpDown.getAltitudeUp() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+      final float adjustedElevationDown = adjustedElevationUpDown.getAltitudeDown() / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
 
-      final float tourElevationUp_Diff = adjustedElevationUp - tourElevationUp;
-      final float tourElevationDown_Diff = adjustedElevationDown - tourElevationDown;
+      final float tourElevationUp_Diff = adjustedElevationUp - measurementSystem_TourElevationUp;
+      final float tourElevationDown_Diff = adjustedElevationDown - measurementSystem_TourElevationDown;
 
-      _lblElevation_Up.setText(Integer.toString(tourElevationUp));
-      _lblElevation_Down.setText(Integer.toString(tourElevationDown));
+      _lblElevation_Up.setText(_nf0.format(measurementSystem_TourElevationUp));
+      _lblElevation_Down.setText(_nf0.format(measurementSystem_TourElevationDown));
 
       _lblElevation_UpAdjusted.setText(_nf0.format(adjustedElevationUp));
       _lblElevation_DownAdjusted.setText(_nf0.format(adjustedElevationDown));
