@@ -1312,7 +1312,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    public float[]             dataSerieDiffTo2ndAlti;
 
    /**
-    * contains the altitude serie which is adjusted
+    * Contains the adjusted elevation serie in the current measurement system
     */
    @Transient
    public float[]             dataSerieAdjustedAlti;
@@ -8237,10 +8237,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return tzId;
    }
 
+   /**
+    * @return Returns elevation loss in metric system (m)
+    */
    public int getTourAltDown() {
       return tourAltDown;
    }
 
+   /**
+    * @return Returns elevation gain in metric system (m)
+    */
    public int getTourAltUp() {
       return tourAltUp;
    }
