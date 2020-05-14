@@ -3,23 +3,24 @@
 
 TODO's
 ======  
-           
-  - Calendar view: Show average pulse/power in day/week values, this is helpful for ergometer
-  
+             
   - csv export: export new column(s) in tourbook view
  
 
 New + Improvements
 ==================
 
+* Calendar view
+  - Tour pulse/power average values are displayed in the tour (day) content cell
+
+* Statistics (Frederic)
+  - The number of years to be displayed in the graph is now dynamically filled and updated based on the number of available years
+
 * 2D Map
   - The enhanced painting warning can be hidden in the track options slideout
 
 * Photo
   - Show selected/hovered folder in the Photo view with more contrast which makes it better readable
-
-* Statistics (Frederic)
-  - The number of years to be displayed in the graph is now dynamically filled and updated based on the number of available years
   
 * Dialog Adjust Elevation
   - Show elevation gain/loss values before and after the adjustment, supported adjustment type: "Approach elevation with SRTM data"  
