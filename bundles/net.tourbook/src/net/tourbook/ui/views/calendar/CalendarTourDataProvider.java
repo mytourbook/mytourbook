@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2011-2020 Matthias Helmling and Contributors
+ * Copyright (C) 2011, 2020 Matthias Helmling and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,6 +14,8 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui.views.calendar;
+
+import gnu.trove.list.array.TFloatArrayList;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -129,42 +131,42 @@ public class CalendarTourDataProvider {
     */
    private CalendarTourData[][] getCalendarMonthData_FromDb(final int year, final int month) {
 
-//		final long start = System.currentTimeMillis();
+//      final long start = System.currentTimeMillis();
 
       CalendarTourData[][] monthData = null;
       CalendarTourData[] dayData = null;
 
 // disabled because dragged tours are not displayed
 //
-//		final LocalDate today = LocalDate.now();
-//		final LocalDate requestedDate = LocalDate.of(year, month, 1);
+//      final LocalDate today = LocalDate.now();
+//      final LocalDate requestedDate = LocalDate.of(year, month, 1);
 //
-//		if (
+//      if (
 //
-//		// requested data are after today -> there should be no data
-//		requestedDate.isAfter(today.plusMonths(1))
+//      // requested data are after today -> there should be no data
+//      requestedDate.isAfter(today.plusMonths(1))
 //
-//				// requested data are before first tour
-//				|| (_firstTourDateTime != null && requestedDate.isBefore(
+//            // requested data are before first tour
+//            || (_firstTourDateTime != null && requestedDate.isBefore(
 //
-//						// adjust a month before the last month, otherwise data
-//						// for the first month are not all loaded
-//						_firstTourDateTime.toLocalDate().minusMonths(1)
+//                  // adjust a month before the last month, otherwise data
+//                  // for the first month are not all loaded
+//                  _firstTourDateTime.toLocalDate().minusMonths(1)
 //
-//				))) {
+//            ))) {
 //
-//			/*
-//			 * Create dummy data
-//			 */
+//         /*
+//          * Create dummy data
+//          */
 //
-//			monthData = new CalendarTourData[31][];
+//         monthData = new CalendarTourData[31][];
 //
-//			for (int day = 0; day < 31; day++) {
-//				monthData[day] = new CalendarTourData[0];
-//			}
+//         for (int day = 0; day < 31; day++) {
+//            monthData[day] = new CalendarTourData[0];
+//         }
 //
-//			return monthData;
-//		}
+//         return monthData;
+//      }
 
       final int colorOffset = 1;
 
@@ -191,6 +193,8 @@ public class CalendarTourDataProvider {
       ArrayList<Integer> dbTourDrivingTime = null;
 
       ArrayList<Integer> dbCalories = null;
+      TFloatArrayList dbPowerAvg = null;
+      TFloatArrayList dbPulseAvg = null;
 
       ArrayList<Long> dbTypeIds = null;
       ArrayList<Integer> dbTypeColorIndex = null;
@@ -206,27 +210,30 @@ public class CalendarTourDataProvider {
 
       final String select = NL
 
-            + "SELECT 						   " + NL //$NON-NLS-1$
+            + "SELECT                     " + NL //$NON-NLS-1$
 
-            + " TourId,						   " + NL // 1 //$NON-NLS-1$
-            + " StartYear,					   " + NL // 2 //$NON-NLS-1$
-            + " StartMonth,					" + NL // 3 //$NON-NLS-1$
-            + " StartDay,					   " + NL // 4 //$NON-NLS-1$
-            + " StartHour,					   " + NL // 5 //$NON-NLS-1$
-            + " StartMinute,				   " + NL // 6 //$NON-NLS-1$
-            + " TourDistance,				   " + NL // 7 //$NON-NLS-1$
-            + " TourAltUp,					   " + NL // 8 //$NON-NLS-1$
-            + " TourRecordingTime,	      " + NL // 9 //$NON-NLS-1$
-            + " TourDrivingTime,			   " + NL // 10 //$NON-NLS-1$
-            + " TourTitle,				   	" + NL // 11 //$NON-NLS-1$
-            + " TourType_typeId,			   " + NL // 12 //$NON-NLS-1$
-            + " TourDescription,			   " + NL // 13 //$NON-NLS-1$
-            + " startWeek,				   	" + NL // 14 //$NON-NLS-1$
-            + " devicePluginId,				" + NL // 15 //$NON-NLS-1$
-            + " calories,					   " + NL // 16	//$NON-NLS-1$
-            + " jTdataTtag.TourTag_tagId,	" + NL // 17 //$NON-NLS-1$
+            + " TourId,                   " + NL // 1    //$NON-NLS-1$
+            + " StartYear,                " + NL // 2    //$NON-NLS-1$
+            + " StartMonth,               " + NL // 3    //$NON-NLS-1$
+            + " StartDay,                 " + NL // 4    //$NON-NLS-1$
+            + " StartHour,                " + NL // 5    //$NON-NLS-1$
+            + " StartMinute,              " + NL // 6    //$NON-NLS-1$
+            + " TourDistance,             " + NL // 7    //$NON-NLS-1$
+            + " TourAltUp,                " + NL // 8    //$NON-NLS-1$
+            + " TourRecordingTime,        " + NL // 9    //$NON-NLS-1$
+            + " TourDrivingTime,          " + NL // 10   //$NON-NLS-1$
+            + " TourTitle,                " + NL // 11   //$NON-NLS-1$
+            + " TourType_typeId,          " + NL // 12   //$NON-NLS-1$
+            + " TourDescription,          " + NL // 13   //$NON-NLS-1$
+            + " StartWeek,                " + NL // 14   //$NON-NLS-1$
+            + " DevicePluginId,           " + NL // 15   //$NON-NLS-1$
+            + " Calories,                 " + NL // 16   //$NON-NLS-1$
 
-            + " TourAltDown   			   " + NL // 18 //$NON-NLS-1$
+            + " jTdataTtag.TourTag_tagId, " + NL // 17   //$NON-NLS-1$
+
+            + " TourAltDown,              " + NL // 18   //$NON-NLS-1$
+            + " AvgPulse,                 " + NL // 19   //$NON-NLS-1$
+            + " Power_Avg                 " + NL // 20   //$NON-NLS-1$
 
             + NL
 
@@ -236,9 +243,9 @@ public class CalendarTourDataProvider {
             + (" LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" + NL) //$NON-NLS-1$ //$NON-NLS-2$
             + (" ON tourID = jTdataTtag.TourData_tourId" + NL) //$NON-NLS-1$
 
-            + " WHERE StartYear=?			" + NL //$NON-NLS-1$
-            + " AND   StartMonth=?			" + NL //$NON-NLS-1$
-            + " AND   StartDay=?			" + NL //$NON-NLS-1$
+            + " WHERE StartYear=?         " + NL //$NON-NLS-1$
+            + " AND   StartMonth=?        " + NL //$NON-NLS-1$
+            + " AND   StartDay=?          " + NL //$NON-NLS-1$
 
             + filter.getWhereClause()
 
@@ -287,6 +294,8 @@ public class CalendarTourDataProvider {
                   dbTourDrivingTime = new ArrayList<>();
 
                   dbCalories = new ArrayList<>();
+                  dbPowerAvg = new TFloatArrayList();
+                  dbPulseAvg = new TFloatArrayList();
 
                   dbTypeIds = new ArrayList<>();
                   dbTypeColorIndex = new ArrayList<>();
@@ -358,6 +367,8 @@ public class CalendarTourDataProvider {
                   }
 
                   dbElevationLoss.add(result.getInt(18));
+                  dbPulseAvg.add(result.getFloat(19));
+                  dbPowerAvg.add(result.getFloat(20));
 
                   /*
                    * convert type id to the type index in the tour type array, this is also
@@ -418,6 +429,8 @@ public class CalendarTourDataProvider {
                data.drivingTime = dbTourDrivingTime.get(tourIndex);
 
                data.calories = dbCalories.get(tourIndex);
+               data.power_Avg = dbPowerAvg.get(tourIndex);
+               data.pulse_Avg = dbPulseAvg.get(tourIndex);
 
                data.tourTitle = dbTourTitle.get(tourIndex);
                data.tourDescription = dbTourDescription.get(tourIndex);
@@ -457,11 +470,11 @@ public class CalendarTourDataProvider {
 
       }
 
-//		System.out.println(
-//				(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") +
-//						"getCalendarMonthData_FromDb\t\t\t" + (System.currentTimeMillis() - start) + " ms - "
-//						+ "\t" + year + " " + month);
-//		// TODO remove SYSTEM.OUT.PRINTLN
+//      System.out.println(
+//            (UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") +
+//                  "getCalendarMonthData_FromDb\t\t\t" + (System.currentTimeMillis() - start) + " ms - "
+//                  + "\t" + year + " " + month);
+//      // TODO remove SYSTEM.OUT.PRINTLN
 
       return monthData;
    }
@@ -474,11 +487,11 @@ public class CalendarTourDataProvider {
 
             "SELECT" //$NON-NLS-1$
 
-                  + " StartYear," + NL //			1 //$NON-NLS-1$
-                  + " StartMonth," + NL //		2 //$NON-NLS-1$
-                  + " StartDay," + NL //			3 //$NON-NLS-1$
-                  + " StartHour," + NL //			4 //$NON-NLS-1$
-                  + " StartMinute" //				5 //$NON-NLS-1$
+                  + " StartYear," + NL //         1 //$NON-NLS-1$
+                  + " StartMonth," + NL //      2 //$NON-NLS-1$
+                  + " StartDay," + NL //         3 //$NON-NLS-1$
+                  + " StartHour," + NL //         4 //$NON-NLS-1$
+                  + " StartMinute" //            5 //$NON-NLS-1$
 
                   + (" FROM " + TourDatabase.TABLE_TOUR_DATA + NL) //$NON-NLS-1$
 
@@ -682,9 +695,9 @@ public class CalendarTourDataProvider {
 
          select = NL
 
-               + "SELECT	" + NL //$NON-NLS-1$
+               + "SELECT   " + NL //$NON-NLS-1$
 
-               + " TourId	" + NL //$NON-NLS-1$
+               + " TourId  " + NL //$NON-NLS-1$
 
                + " FROM " + TourDatabase.TABLE_TOUR_DATA + NL //$NON-NLS-1$
 
@@ -740,7 +753,7 @@ public class CalendarTourDataProvider {
          return false;
       }
 
-//		final long start = System.currentTimeMillis();
+//      final long start = System.currentTimeMillis();
 
       final int year = weekLoader.year;
       final int week = weekLoader.week;
@@ -759,19 +772,20 @@ public class CalendarTourDataProvider {
 
             fromTourData = NL
 
-                  + "FROM (						    " + NL //$NON-NLS-1$
+                  + "FROM (                        " + NL //$NON-NLS-1$
 
-                  + " SELECT					     	 " + NL //$NON-NLS-1$
+                  + " SELECT                       " + NL //$NON-NLS-1$
 
-                  + "  TourDistance,				 " + NL //$NON-NLS-1$
-                  + "  TourAltUp,					 " + NL //$NON-NLS-1$
-                  + "  TourAltDown,					 " + NL //$NON-NLS-1$
-                  + "  TourRecordingTime,			 " + NL //$NON-NLS-1$
-                  + "  TourDrivingTime,			 " + NL //$NON-NLS-1$
-                  + "  calories,					    " + NL //$NON-NLS-1$
-                  + "  jTdataTtag.TourTag_tagId, " + NL //$NON-NLS-1$
-                  + "  cadenceZone_SlowTime,	    " + NL //$NON-NLS-1$
-                  + "  cadenceZone_FastTime	    " + NL //$NON-NLS-1$
+                  + "  TourDistance,               " + NL //$NON-NLS-1$
+                  + "  TourAltUp,                  " + NL //$NON-NLS-1$
+                  + "  TourAltDown,                " + NL //$NON-NLS-1$
+                  + "  TourRecordingTime,          " + NL //$NON-NLS-1$
+                  + "  TourDrivingTime,            " + NL //$NON-NLS-1$
+                  + "  calories,                   " + NL //$NON-NLS-1$
+                  + "  jTdataTtag.TourTag_tagId,   " + NL //$NON-NLS-1$
+
+                  + "  cadenceZone_SlowTime,       " + NL //$NON-NLS-1$
+                  + "  cadenceZone_FastTime        " + NL //$NON-NLS-1$
 
                   + (" FROM " + TourDatabase.TABLE_TOUR_DATA) + NL//$NON-NLS-1$
 
@@ -779,8 +793,8 @@ public class CalendarTourDataProvider {
                   + (" LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag") + NL //$NON-NLS-1$ //$NON-NLS-2$
                   + (" ON tourID = jTdataTtag.TourData_tourId") + NL //$NON-NLS-1$
 
-                  + " WHERE startWeekYear=?		" + NL //$NON-NLS-1$
-                  + " AND   startWeek=?			" + NL //$NON-NLS-1$
+                  + " WHERE startWeekYear=?        " + NL //$NON-NLS-1$
+                  + " AND   startWeek=?            " + NL //$NON-NLS-1$
                   + sqlFilter.getWhereClause() + NL
 
                   + ") td" //$NON-NLS-1$
@@ -799,18 +813,18 @@ public class CalendarTourDataProvider {
                   + sqlFilter.getWhereClause();
          }
 
-         select = "SELECT" + NL //			  //$NON-NLS-1$
+         select = "SELECT" + NL //           //$NON-NLS-1$
 
-               + " SUM(TourDistance),		 	 " + NL //	1 //$NON-NLS-1$
-               + " SUM(TourAltUp),			    " + NL //	2 //$NON-NLS-1$
-               + " SUM(TourRecordingTime), 	 " + NL //	3 //$NON-NLS-1$
-               + " SUM(TourDrivingTime),		 " + NL //	4 //$NON-NLS-1$
-               + " SUM(calories),				 " + NL //	5 //$NON-NLS-1$
-               + " SUM(1),						    " + NL //	6 //$NON-NLS-1$
+               + " SUM(TourDistance),              " + NL //   1  //$NON-NLS-1$
+               + " SUM(TourAltUp),                 " + NL //   2  //$NON-NLS-1$
+               + " SUM(TourRecordingTime),         " + NL //   3  //$NON-NLS-1$
+               + " SUM(TourDrivingTime),           " + NL //   4  //$NON-NLS-1$
+               + " SUM(calories),                  " + NL //   5  //$NON-NLS-1$
+               + " SUM(1),                         " + NL //   6  //$NON-NLS-1$
 
-               + " SUM(TourAltDown),          " + NL //	7 //$NON-NLS-1$
-               + " SUM(cadenceZone_SlowTime), " + NL //	8 //$NON-NLS-1$
-               + " SUM(cadenceZone_FastTime)	 " + NL //	9 //$NON-NLS-1$
+               + " SUM(TourAltDown),               " + NL //   7  //$NON-NLS-1$
+               + " SUM(cadenceZone_SlowTime),      " + NL //   8  //$NON-NLS-1$
+               + " SUM(cadenceZone_FastTime)       " + NL //   9  //$NON-NLS-1$
 
                + fromTourData;
 
@@ -862,8 +876,8 @@ public class CalendarTourDataProvider {
          weekData.loadingState = LoadingState.IS_LOADED;
       }
 
-//		System.out.println("getCalendarWeekSummaryData_FromDb\t" + (System.currentTimeMillis() - start) + " ms");
-//		// TODO remove SYSTEM.OUT.PRINTLN
+//      System.out.println("getCalendarWeekSummaryData_FromDb\t" + (System.currentTimeMillis() - start) + " ms");
+//      // TODO remove SYSTEM.OUT.PRINTLN
 
       return true;
    }
