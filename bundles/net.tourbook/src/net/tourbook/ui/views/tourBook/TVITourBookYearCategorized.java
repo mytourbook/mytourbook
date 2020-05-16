@@ -31,7 +31,7 @@ public class TVITourBookYearCategorized extends TVITourBookItem {
                                      final TVITourBookItem parentItem,
                                      final TourBookViewLayout itemType) {
 
-      super(view); 
+      super(view);
 
       _category = itemType;
 
@@ -66,24 +66,22 @@ public class TVITourBookYearCategorized extends TVITourBookItem {
 
       final String sqlString = NL
 
-            + "SELECT " //                                              //$NON-NLS-1$
+            + "SELECT " //                                                    //$NON-NLS-1$
 
-            + SQL_ALL_FIELDS
+            + SQL_ALL_TOUR_FIELDS + NL
 
-            + NL
-
-            + (" FROM " + TourDatabase.TABLE_TOUR_DATA + " TourData" + NL) //$NON-NLS-1$ //$NON-NLS-2$
+            + " FROM " + TourDatabase.TABLE_TOUR_DATA + " TourData" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
 
             // get tag id's
-            + (" LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag") //$NON-NLS-1$ //$NON-NLS-2$
-            + (" ON TourData.tourId = jTdataTtag.TourData_tourId") //   //$NON-NLS-1$
+            + " LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" //$NON-NLS-1$ //$NON-NLS-2$
+            + " ON TourData.tourId = jTdataTtag.TourData_tourId" //           //$NON-NLS-1$
 
             // get marker id's
-            + (" LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_MARKER + " Tmarker") //$NON-NLS-1$ //$NON-NLS-2$
-            + (" ON TourData.tourId = Tmarker.TourData_tourId\n") //    //$NON-NLS-1$
+            + " LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_MARKER + " Tmarker" //$NON-NLS-1$ //$NON-NLS-2$
+            + " ON TourData.tourId = Tmarker.TourData_tourId" + NL //         //$NON-NLS-1$
 
-            + (" WHERE " + sumYear + " = ?\n") //                       //$NON-NLS-1$ //$NON-NLS-2$
-            + (" AND " + sumYearSub + " = ?\n") //                      //$NON-NLS-1$ //$NON-NLS-2$
+            + " WHERE " + sumYear + " = ?" + NL //                            //$NON-NLS-1$ //$NON-NLS-2$
+            + " AND " + sumYearSub + " = ?" + NL //                           //$NON-NLS-1$ //$NON-NLS-2$
             + sqlFilter.getWhereClause()
 
             + " ORDER BY TourStartTime\n"; //$NON-NLS-1$
@@ -105,7 +103,6 @@ public class TVITourBookYearCategorized extends TVITourBookItem {
          UI.showSQLException(e);
       }
    }
-
 
    public TourBookViewLayout getCategory() {
       return _category;

@@ -37,13 +37,13 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
    static final char    NL        = net.tourbook.common.UI.NEW_LINE;
 
-   static final String  SQL_ALL_FIELDS;
+   static final String  SQL_ALL_TOUR_FIELDS;
    static final String  SQL_SUM_COLUMNS;
    static final String  SQL_SUM_FIELDS;
 
    static {
 
-      SQL_ALL_FIELDS = NL
+      SQL_ALL_TOUR_FIELDS = NL
 
             + "startYear, " //                                    1     //$NON-NLS-1$
             + "startMonth, " //                                   2     //$NON-NLS-1$
@@ -175,7 +175,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
             // -------- AVERAGE ALTITUDE CHANGE -----------
 
-            + "avgAltitudeChange" //                              86    //$NON-NLS-1$
+            + "avgAltitudeChange " //                             86    //$NON-NLS-1$
 
       ;
 
