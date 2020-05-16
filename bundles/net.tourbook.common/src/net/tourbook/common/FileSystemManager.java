@@ -39,7 +39,7 @@ public class FileSystemManager {
 
       if (_fileSystemsList == null) {
 
-         _fileSystemsList = readFileSystemsExtensions("cloudConnectivity");//TourbookPlugin.EXT_POINT_DEVICE_DATA_READER);
+         _fileSystemsList = readFileSystemsExtensions("fileSystem");//TourbookPlugin.EXT_POINT_DEVICE_DATA_READER);
       }
 
       return _fileSystemsList;
@@ -55,42 +55,38 @@ public class FileSystemManager {
 
       if (extPoint != null) {
 
-         final IExtension[] extensions = extPoint.getExtensions();
-
          for (final IExtension extension : extPoint.getExtensions()) {
 
             for (final IConfigurationElement configElement : extension.getConfigurationElements()) {
 
-               if (configElement.getName().equalsIgnoreCase("cloud")) { //$NON-NLS-1$
+               if (configElement.getName().equalsIgnoreCase("fileSystem")) { //$NON-NLS-1$
 
                   Object object;
                   try {
 
                      object = configElement.createExecutableExtension("class"); //$NON-NLS-1$
 
-                     /*
-                      * if (object instanceof TourbookDevice) {
-                      * final TourbookDevice device = (TourbookDevice) object;
-                      * device.deviceId = configElement.getAttribute("id"); //$NON-NLS-1$
-                      * device.visibleName = configElement.getAttribute("name"); //$NON-NLS-1$
-                      * final String extensionSortPriority = configElement
-                      * .getAttribute("extensionSortPriority"); //$NON-NLS-1$
-                      * if (extensionSortPriority != null) {
-                      * try {
-                      * device.extensionSortPriority = Integer.parseInt(extensionSortPriority);
-                      * } catch (final Exception e) {
-                      * // do nothing
-                      * }
-                      * }
-                      * fileSystemsList.add(device);
-                      * }
-                      * if (object instanceof ExternalDevice) {
-                      * final ExternalDevice device = (ExternalDevice) object;
-                      * device.deviceId = configElement.getAttribute("id"); //$NON-NLS-1$
-                      * device.visibleName = configElement.getAttribute("name"); //$NON-NLS-1$
-                      * fileSystemsList.add(device);
-                      * }
-                      */
+                     if (object instanceof FileSystem) {
+                        final FileSystem device = (FileSystem) object;
+//                        device.deviceId = configElement.getAttribute("id"); //$NON-NLS-1$
+//                        device.visibleName = configElement.getAttribute("name"); //$NON-NLS-1$
+//                        final String extensionSortPriority = configElement
+//                              .getAttribute("extensionSortPriority"); //$NON-NLS-1$
+//                        if (extensionSortPriority != null) {
+//                           try {
+//                              device.extensionSortPriority = Integer.parseInt(extensionSortPriority);
+//                           } catch (final Exception e) {
+//                              // do nothing
+//                           }
+//                        }
+                        fileSystemsList.add(device);
+                     }
+//                     if (object instanceof ExternalDevice) {
+//                        final ExternalDevice device = (ExternalDevice) object;
+//                        device.deviceId = configElement.getAttribute("id"); //$NON-NLS-1$
+//                        device.visibleName = configElement.getAttribute("name"); //$NON-NLS-1$
+//                        fileSystemsList.add(device);
+//                     }
 
                   } catch (final CoreException e) {
                      e.printStackTrace();
