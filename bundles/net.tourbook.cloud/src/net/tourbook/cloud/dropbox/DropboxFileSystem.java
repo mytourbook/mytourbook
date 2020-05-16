@@ -28,7 +28,6 @@ import java.util.Map;
 
 import net.tourbook.cloud.Activator;
 import net.tourbook.cloud.ICloudPreferences;
-import net.tourbook.common.IFileSystem;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 
@@ -36,7 +35,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 
-public class DropboxFileSystem implements IFileSystem {
+public class DropboxFileSystem {
 
    private java.nio.file.FileSystem _dropboxFileSystem;
 
@@ -145,15 +144,5 @@ public class DropboxFileSystem implements IFileSystem {
       }
 
       return null;
-   }
-
-   @Override
-   public String getFileSystemId() {
-      return "32942983";
-   }
-
-   @Override
-   public String getFileSystemName() {
-      return "Dropbox";
    }
 }
