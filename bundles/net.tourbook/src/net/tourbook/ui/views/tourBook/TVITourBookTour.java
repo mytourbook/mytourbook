@@ -42,6 +42,10 @@ public class TVITourBookTour extends TVITourBookItem {
     */
    private ArrayList<Long> _markerIds;
 
+   /**
+    * @param view
+    * @param parentItem
+    */
    public TVITourBookTour(final TourBookView view, final TreeViewerItem parentItem) {
 
       super(view);

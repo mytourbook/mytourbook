@@ -659,9 +659,9 @@ public class CSVExport {
             }
          }
 
-      } else if (segment instanceof TVITourBookYearSub) {
+      } else if (segment instanceof TVITourBookYearCategorized) {
 
-         final TVITourBookYearSub tviYearSub = (TVITourBookYearSub) segment;
+         final TVITourBookYearCategorized tviYearSub = (TVITourBookYearCategorized) segment;
 
          // month or week
          csvField(sb, tviYearSub.tourYearSub);
@@ -1480,6 +1480,6 @@ public class CSVExport {
     */
    private boolean isYearSubWeek() {
 
-      return _tourBookView.getYearSubCategory() == YearSubCategory.WEEK;
+      return _tourBookView.getViewLayout() == TourBookViewLayout.CATEGORY_WEEK;
    }
 }
