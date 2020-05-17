@@ -179,8 +179,7 @@ public class DropboxFileSystem extends TourbookFileSystem {
          return null;
       }
 
-      //TODO FB
-      final String dropboxFilePath = _prefStore.getString(ICloudPreferences.DROPBOX_FOLDER);// + fileName;
+      final String dropboxFilePath = _prefStore.getString(ICloudPreferences.DROPBOX_FOLDER);
       return _dropboxFileSystem.getPath(dropboxFilePath);
    }
 }

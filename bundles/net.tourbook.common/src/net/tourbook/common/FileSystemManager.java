@@ -41,22 +41,37 @@ public class FileSystemManager {
       }
    }
 
-   public static File CopyLocally(final String dropboxFilePath) {
+   /**
+    * Copy a file from a {@link TourBookFileSystem} to the user's
+    * local file system.
+    *
+    * @param absolutefilePath
+    * @return
+    */
+   public static File CopyLocally(final String absolutefilePath) {
+
       if (_fileSystemsList == null) {
          return null;
       }
 
       for (final TourbookFileSystem tourbookFileSystem : _fileSystemsList) {
-         if (dropboxFilePath.toLowerCase().startsWith(tourbookFileSystem.getId().toLowerCase())) {
-            final String dropboxFilePath2 =
-                  dropboxFilePath.substring(tourbookFileSystem.getId().length());
-            return tourbookFileSystem.copyFileLocally(dropboxFilePath2);
+
+         if (absolutefilePath.toLowerCase().startsWith(tourbookFileSystem.getId().toLowerCase())) {
+            final String filePath =
+                  absolutefilePath.substring(tourbookFileSystem.getId().length());
+            return tourbookFileSystem.copyFileLocally(filePath);
          }
       }
 
       return null;
    }
 
+   /**
+    * Returns the {@link FileSystem}, if found, for a given device folder.
+    *
+    * @param deviceFolder
+    * @return
+    */
    public static FileSystem getFileSystem(final String deviceFolder) {
 
       if (_fileSystemsList == null) {
@@ -64,7 +79,7 @@ public class FileSystemManager {
       }
 
       for (final TourbookFileSystem tourbookFileSystem : _fileSystemsList) {
-         if (tourbookFileSystem.getId().equals(deviceFolder)) {
+         if (tourbookFileSystem.getId().equalsIgnoreCase(deviceFolder.toLowerCase())) {
             return tourbookFileSystem.getFileSystem();
          }
       }
@@ -88,6 +103,7 @@ public class FileSystemManager {
       for (final TourbookFileSystem tourbookFileSystem : _fileSystemsList) {
          fileSystemsIds.add(tourbookFileSystem.getId());
       }
+
       return fileSystemsIds;
    }
 
@@ -96,12 +112,10 @@ public class FileSystemManager {
     *
     * @return Returns a list of {@link FileSystem}
     */
-   @SuppressWarnings("unchecked")
    public static List<TourbookFileSystem> getFileSystemsList() {
 
       if (_fileSystemsList == null) {
-
-         _fileSystemsList = readFileSystemsExtensions("fileSystem");//TourbookPlugin.EXT_POINT_DEVICE_DATA_READER);
+         _fileSystemsList = readFileSystemsExtensions("fileSystem"); //$NON-NLS-1$
       }
 
       return _fileSystemsList;
@@ -136,13 +150,13 @@ public class FileSystemManager {
       return false;
    }
 
-   @SuppressWarnings({ "rawtypes" })
-   private static ArrayList readFileSystemsExtensions(final String extensionPointName) {
+   private static ArrayList<TourbookFileSystem> readFileSystemsExtensions(final String extensionPointName) {
 
       final ArrayList<TourbookFileSystem> fileSystemsList = new ArrayList<>();
 
-      final IExtensionPoint extPoint = Platform.getExtensionRegistry()//
-            .getExtensionPoint("net.tourbook", extensionPointName);
+      final IExtensionPoint extPoint = Platform
+            .getExtensionRegistry()
+            .getExtensionPoint("net.tourbook", extensionPointName); //$NON-NLS-1$
 
       if (extPoint != null) {
 

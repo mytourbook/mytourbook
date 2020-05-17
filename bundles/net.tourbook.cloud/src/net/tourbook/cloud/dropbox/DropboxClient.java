@@ -39,8 +39,6 @@ import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.Version;
 
 public class DropboxClient {
-   //TOOD FB Merge in dropbox filesystem??
-   // remove unused functions
 
    private static DbxClientV2      _dropboxClient;
    private static DbxRequestConfig _requestConfig;
