@@ -31,6 +31,16 @@ public class FileSystemManager {
 
    private static List<TourbookFileSystem> _fileSystemsList;
 
+   public static void closeFileSystems() {
+      if (_fileSystemsList == null) {
+         return ;
+      }
+
+      for (final TourbookFileSystem tourbookFileSystem : _fileSystemsList) {
+         tourbookFileSystem.close();
+      }
+   }
+
    public static File CopyLocally(final String dropboxFilePath) {
       if (_fileSystemsList == null) {
          return null;

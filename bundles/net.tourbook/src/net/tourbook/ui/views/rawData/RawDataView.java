@@ -266,7 +266,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
    private static String       ACTION_DEVICE_IMPORT                       = "DeviceImport";                                                   //$NON-NLS-1$
    private static String       ACTION_DEVICE_WATCHING_ON_OFF              = "DeviceOnOff";                                                    //$NON-NLS-1$
-   private static final String ACTION_IMPORT_FROM_DROPBOX                 = "ImportFromDropbox";                                              //$NON-NLS-1$
    private static final String ACTION_IMPORT_FROM_FILES                   = "ImportFromFiles";                                                //$NON-NLS-1$
    private static final String ACTION_OLD_UI                              = "OldUI";                                                          //$NON-NLS-1$
    private static final String ACTION_SERIAL_PORT_CONFIGURED              = "SerialPortConfigured";                                           //$NON-NLS-1$
@@ -384,8 +383,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private boolean                _isToolTipInTime;
    private boolean                _isToolTipInTitle;
    private boolean                _isToolTipInTags;
-   //
-   private boolean                _dropboxPreferencesHaveChanged;
    //
    private TourDoubleClickState   _tourDoubleClickState       = new TourDoubleClickState();
    //
@@ -941,14 +938,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
                recreateViewer();
             }
-
-            // TODO FB
-            /*
-             * if (property.equals(ICommonPreferences.DROPBOX_ACCESSTOKEN) ||
-             * property.equals(ICommonPreferences.DROPBOX_FOLDER)) {
-             * _dropboxPreferencesHaveChanged = true;
-             * }
-             */
          }
       };
 
@@ -3429,7 +3418,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       disposeConfigImages();
 
-      //TODO FB NIO.closeDropboxFileSystem();
+      FileSystemManager.closeFileSystems();
 
       super.dispose();
    }
@@ -4241,12 +4230,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
          action_Easy_SetDeviceWatching_OnOff();
 
-      } //TODO FB else if (ACTION_IMPORT_FROM_DROPBOX.equals(hrefAction)) {
-
-      // _rawDataMgr.actionImportFromDropbox();
-
-      //   }
-      else if (ACTION_IMPORT_FROM_FILES.equals(hrefAction)) {
+      } else if (ACTION_IMPORT_FROM_FILES.equals(hrefAction)) {
 
          _rawDataMgr.actionImportFromFile();
 
@@ -5599,20 +5583,17 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                      final EasyConfig importConfig = getEasyConfig();
 
                      // check if anything should be watched
-                     if (importConfig.getActiveImportConfig().isWatchAnything() ||
-                           _dropboxPreferencesHaveChanged) {
+                     if (importConfig.getActiveImportConfig().isWatchAnything()) {
 
                         final boolean isCheckFiles = _isDeviceStateValid == false;
 
                         final DeviceImportState importState = EasyImportManager.getInstance().checkImportedFiles(isCheckFiles);
 
-                        if (importState.areTheSameStores == false || isCheckFiles ||
-                              _dropboxPreferencesHaveChanged) {
+                        if (importState.areTheSameStores == false || isCheckFiles) {
 
                            // stores have changed, update the folder watcher
 
                            thread_WatchFolders(true);
-                           _dropboxPreferencesHaveChanged = false;
                         }
 
                         if (importState.areFilesRetrieved || isCheckFiles) {

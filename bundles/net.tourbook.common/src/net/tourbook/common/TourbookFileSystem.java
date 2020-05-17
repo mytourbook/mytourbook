@@ -22,6 +22,8 @@ import java.nio.file.Path;
 
 public abstract class TourbookFileSystem {
 
+   protected abstract void close();
+
    protected abstract File copyFileLocally(String dropboxFilePath2);
 
    public abstract String getFile(String rawDataFileName);

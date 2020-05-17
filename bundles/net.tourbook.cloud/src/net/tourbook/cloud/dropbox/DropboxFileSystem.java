@@ -71,6 +71,12 @@ public class DropboxFileSystem extends TourbookFileSystem {
       _prefStore.addPropertyChangeListener(prefChangeListenerCommon);
    }
 
+   @Override
+   protected void close() {
+     closeDropboxFileSystem();
+
+   }
+
    /**
     * Closes the Dropbox Java 7 FileSystem.
     * This function will be called whenever the user
