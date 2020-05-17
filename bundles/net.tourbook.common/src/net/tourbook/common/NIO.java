@@ -27,23 +27,19 @@ import java.util.regex.Pattern;
 
 import net.tourbook.common.util.StatusUtil;
 
-import org.eclipse.jface.preference.IPreferenceStore;
-
 /**
  * Tools for the java.nio package.
  */
 public class NIO {
 
-   public static final String    DEVICE_FOLDER_NAME_START = "[";                                  //$NON-NLS-1$
+   public static final String   DEVICE_FOLDER_NAME_START = "[";                                  //$NON-NLS-1$
 
-   private final static Pattern  DRIVE_LETTER_PATTERN     = Pattern.compile("\\s*\\(([^(]*)\\)"); //$NON-NLS-1$
+   private final static Pattern DRIVE_LETTER_PATTERN     = Pattern.compile("\\s*\\(([^(]*)\\)"); //$NON-NLS-1$
    /** Extracts <code>W530</code> from <code>[W530]\temp\other</code> */
-   private final static Pattern  DEVICE_NAME_PATTERN      = Pattern.compile("\\s*\\[([^]]*)");    //$NON-NLS-1$
+   private final static Pattern DEVICE_NAME_PATTERN      = Pattern.compile("\\s*\\[([^]]*)");    //$NON-NLS-1$
 
    /** <code>([\\].*)</code> */
-   private final static Pattern  DEVICE_NAME_PATH_PATTERN = Pattern.compile("([\\\\].*)");        //$NON-NLS-1$
-
-   final static IPreferenceStore _prefStore               = CommonActivator.getPrefStore();
+   private final static Pattern DEVICE_NAME_PATH_PATTERN = Pattern.compile("([\\\\].*)");        //$NON-NLS-1$
 
    /**
     * Replace device name with drive letter, e.g. [MEDIA]\CACHE -> D:\CACHE. This do not validate if

@@ -27,6 +27,11 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.Platform;
 
+/**
+ * Class that manages virtual file systems.
+ *
+ * @author Frédéric Bard
+ */
 public class FileSystemManager {
 
    private static List<TourbookFileSystem> _fileSystemsList;
