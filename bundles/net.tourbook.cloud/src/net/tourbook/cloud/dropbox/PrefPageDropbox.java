@@ -135,8 +135,8 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
    private void onClickAuthorize() {
 
       final OAuth2Client client = new OAuth2Client();
-      client.setId("vye6ci8xzzsuiao"); //$NON-NLS-1$
-      client.setSecret("ovxyfwr544wrdvg"); //$NON-NLS-1$
+      client.setId("client_id"); //$NON-NLS-1$
+      client.setSecret("secret_id"); //$NON-NLS-1$
       client.setAccessTokenUrl("https://api.dropboxapi.com/oauth2/token"); //$NON-NLS-1$
       client.setAuthorizeUrl("https://www.dropbox.com/oauth2/authorize"); //$NON-NLS-1$
       client.setRedirectUri("https://sourceforge.net/projects/mytourbook"); //$NON-NLS-1$
