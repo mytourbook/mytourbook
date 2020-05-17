@@ -368,66 +368,6 @@ public class RawDataManager {
       }
    }
 
-   // IMPORTANT: We cannot offer manual file import directly from Dropbox as
-   // this file cannot have references/dependencies to Dropbox
-
-   /**
-    * Imports tours selected from a Dropbox folder specified in the preferences.
-    */
-   public void actionImportFromDropbox() {
-      /*
-       * final String accessToken =
-       * _commonPrefStore.getString(ICommonPreferences.DROPBOX_ACCESSTOKEN);
-       * final String dropboxFolder = _commonPrefStore.getString(ICommonPreferences.DROPBOX_FOLDER);
-       * if (StringUtils.isNullOrEmpty(accessToken) ||
-       * StringUtils.isNullOrEmpty(dropboxFolder)) {
-       * MessageDialog.openInformation(
-       * Display.getCurrent().getActiveShell(),
-       * Messages.Dialog_DropboxFileChooser_Title,
-       * Messages.Dialog_DropboxFileChooser_AccessToken_Missing);
-       * PreferencesUtil.createPreferenceDialogOn(
-       * Display.getCurrent().getActiveShell(),
-       * ICloudPreferences.PREF_PAGE_DROPBOX,
-       * null,
-       * null).open();
-       * return;
-       * }
-       * final DropboxBrowser dropboxChooser[] = new DropboxBrowser[1];
-       * BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-       * @Override
-       * public void run() {
-       * dropboxChooser[0] = new DropboxBrowser(Display.getCurrent().getActiveShell(),
-       * ChooserType.File, "");
-       * dropboxChooser[0].open();
-       * }
-       * });
-       * final ArrayList<String> selectedFiles = dropboxChooser[0].getSelectedFiles();
-       * if (selectedFiles == null || selectedFiles.size() == 0) {
-       * return;
-       * }
-       * final ArrayList<OSFile> osFiles = new ArrayList<>();
-       * for (final String dropboxFilePath : selectedFiles) {
-       * final Path filePath = DropboxClient.CopyLocally(dropboxFilePath);
-       * if (filePath == null) {
-       * continue;
-       * }
-       * final OSFile osFile = new OSFile(filePath);
-       * osFiles.add(osFile);
-       * }
-       * if (_importState_IsAutoOpenImportLog) {
-       * TourLogManager.showLogView();
-       * }
-       * runImport(osFiles, false, null);
-       * // Delete the temporary created files
-       * osFiles.forEach(file -> {
-       * try {
-       * Files.deleteIfExists(file.getPath());
-       * } catch (final IOException e) {
-       * StatusUtil.log(e);
-       * }
-       * });
-       */ }
-
    /**
     * Import tours from files which are selected in a file selection dialog.
     */

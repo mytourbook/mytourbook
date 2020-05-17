@@ -21,9 +21,7 @@ public class Messages extends NLS {
 
    private static final String BUNDLE_NAME = "net.tourbook.cloud.dropbox.messages";       //$NON-NLS-1$
 
-   public static String        Dialog_DropboxFileChooser_Area_Title;
    public static String        Dialog_DropboxFolderChooser_Area_Title;
-   public static String        Dialog_DropboxFileChooser_Area_Text;
    public static String        Dialog_DropboxFolderChooser_Area_Text;
    public static String        Dialog_DropboxBrowser_Button_ParentFolder_Tooltip;
    public static String        Dialog_DropboxBrowser_Text_AbsolutePath_Tooltip;

@@ -45,10 +45,10 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
    /*
     * UI controls
     */
-   private Button _btnAuthorizeConnection;
-   private Text   _textAccessToken;
-   private Button _btnChooseFolder;
-   private Text   _textFolderPath;
+   private Button           _btnAuthorizeConnection;
+   private Text             _textAccessToken;
+   private Button           _btnChooseFolder;
+   private Text             _textFolderPath;
 
    @Override
    protected void createFieldEditors() {
@@ -171,13 +171,12 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
     */
    protected void onClickChooseFolder() {
 
-      final DropboxBrowser dropboxFolderChooser[] = new DropboxBrowser[1];
+      final DropboxFolderBrowser dropboxFolderChooser[] = new DropboxFolderBrowser[1];
       final int folderChooserResult[] = new int[1];
       BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
          @Override
          public void run() {
-            dropboxFolderChooser[0] = new DropboxBrowser(Display.getCurrent().getActiveShell(),
-                  ChooserType.Folder,
+            dropboxFolderChooser[0] = new DropboxFolderBrowser(Display.getCurrent().getActiveShell(),
                   _textAccessToken.getText());
             folderChooserResult[0] = dropboxFolderChooser[0].open();
          }

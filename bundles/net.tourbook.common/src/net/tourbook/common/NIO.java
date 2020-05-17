@@ -16,7 +16,6 @@
 package net.tourbook.common;
 
 import java.nio.file.FileStore;
-import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -43,8 +42,6 @@ public class NIO {
 
    /** <code>([\\].*)</code> */
    private final static Pattern  DEVICE_NAME_PATH_PATTERN = Pattern.compile("([\\\\].*)");        //$NON-NLS-1$
-
-   private static FileSystem     _dropboxFileSystem;
 
    final static IPreferenceStore _prefStore               = CommonActivator.getPrefStore();
 
@@ -115,6 +112,10 @@ public class NIO {
 //		final long start = System.nanoTime();
 //
       final Iterable<FileStore> systemFileStore = FileSystems.getDefault().getFileStores();
+//
+//    System.out.println((UI.timeStampNano() + " " + NIO.class.getName() + " \t")
+//          + (((float) (System.nanoTime() - start) / 1000000) + " ms"));
+//    // TODO remove SYSTEM.OUT.PRINTLN
 
       final ArrayList<FileStore> fileStores = new ArrayList<>();
 

@@ -209,7 +209,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    // OLD UI
    private static final String IMAGE_DATA_TRANSFER                        = "IMAGE_DATA_TRANSFER";                                            //$NON-NLS-1$
    private static final String IMAGE_DATA_TRANSFER_DIRECT                 = "IMAGE_DATA_TRANSFER_DIRECT";                                     //$NON-NLS-1$
-   private static final String IMAGE_IMPORT_FROM_DROPBOX                  = "IMAGE_IMPORT_FROM_DROPBOX";                                      //$NON-NLS-1$
    private static final String IMAGE_IMPORT_FROM_FILES                    = "IMAGE_IMPORT_FROM_FILES";                                        //$NON-NLS-1$
    private static final String IMAGE_NEW_UI                               = "IMAGE_NEW_UI";                                                   //$NON-NLS-1$
    //
@@ -286,7 +285,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    //
    private static String       HREF_ACTION_DEVICE_IMPORT;
    private static String       HREF_ACTION_DEVICE_WATCHING_ON_OFF;
-   private static String       HREF_ACTION_IMPORT_FROM_DROPBOX;
    private static String       HREF_ACTION_IMPORT_FROM_FILES;
    private static String       HREF_ACTION_OLD_UI;
    private static String       HREF_ACTION_SERIAL_PORT_CONFIGURED;
@@ -297,7 +295,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       HREF_ACTION_DEVICE_IMPORT = HREF_TOKEN + ACTION_DEVICE_IMPORT;
       HREF_ACTION_DEVICE_WATCHING_ON_OFF = HREF_TOKEN + ACTION_DEVICE_WATCHING_ON_OFF;
-      HREF_ACTION_IMPORT_FROM_DROPBOX = HREF_TOKEN + ACTION_IMPORT_FROM_DROPBOX;
       HREF_ACTION_IMPORT_FROM_FILES = HREF_TOKEN + ACTION_IMPORT_FROM_FILES;
       HREF_ACTION_OLD_UI = HREF_TOKEN + ACTION_OLD_UI;
       HREF_ACTION_SERIAL_PORT_CONFIGURED = HREF_TOKEN + ACTION_SERIAL_PORT_CONFIGURED;
@@ -426,7 +423,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private String                 _imageUrl_DeviceFolder_NotAvailable;
    private String                 _imageUrl_DeviceFolder_NotChecked;
    private String                 _imageUrl_DeviceFolder_NotSetup;
-   private String                 _imageUrl_ImportFromDropbox;
    private String                 _imageUrl_ImportFromFile;
    private String                 _imageUrl_SerialPort_Configured;
    private String                 _imageUrl_SerialPort_Directly;
@@ -2061,14 +2057,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
          createHTML_92_TileAction(
                sb,
-               Messages.Import_Data_HTML_ImportFromDropbox_Action,
-               Messages.Import_Data_HTML_ImportFromDropbox_ActionTooltip,
-               (HTTP_DUMMY
-                     + HREF_ACTION_IMPORT_FROM_DROPBOX),
-               _imageUrl_ImportFromDropbox);
-
-         createHTML_92_TileAction(
-               sb,
                Messages.Import_Data_HTML_ReceiveFromSerialPort_ConfiguredAction,
                Messages.Import_Data_HTML_ReceiveFromSerialPort_ConfiguredLink,
                (HTTP_DUMMY + HREF_ACTION_SERIAL_PORT_CONFIGURED),
@@ -2227,8 +2215,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             TourbookPlugin.getImageDescriptor(Messages.Image__RawData_Transfer));
       _images.put(IMAGE_DATA_TRANSFER_DIRECT, //
             TourbookPlugin.getImageDescriptor(Messages.Image__RawData_TransferDirect));
-      _images.put(IMAGE_IMPORT_FROM_DROPBOX, //
-            TourbookPlugin.getImageDescriptor(Messages.Image__RawData_Import_Dropbox));
       _images.put(IMAGE_IMPORT_FROM_FILES, //
             TourbookPlugin.getImageDescriptor(Messages.Image__RawData_Import));
       _images.put(IMAGE_NEW_UI, //
@@ -2288,7 +2274,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          /*
           * Image urls
           */
-         _imageUrl_ImportFromDropbox = getIconUrl(Messages.Image__RawData_Import_Dropbox);
          _imageUrl_ImportFromFile = getIconUrl(Messages.Image__RawData_Import);
          _imageUrl_SerialPort_Configured = getIconUrl(Messages.Image__RawData_Transfer);
          _imageUrl_SerialPort_Directly = getIconUrl(Messages.Image__RawData_TransferDirect);

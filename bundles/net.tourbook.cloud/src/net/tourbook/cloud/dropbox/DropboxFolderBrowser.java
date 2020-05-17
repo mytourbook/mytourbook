@@ -56,7 +56,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
 
-public class DropboxBrowser extends TitleAreaDialog {
+public class DropboxFolderBrowser extends TitleAreaDialog {
 
    private static final String ROOT_FOLDER    = "/";                           //$NON-NLS-1$
 
@@ -69,7 +69,6 @@ public class DropboxBrowser extends TitleAreaDialog {
    private String              _selectedFolder;
 
    private ArrayList<String>   _selectedFiles = new ArrayList<>();
-   private ChooserType         _chooserType;
 
    private boolean             _isInErrorState;
 
@@ -84,13 +83,12 @@ public class DropboxBrowser extends TitleAreaDialog {
     */
    private Label _labelErrorMessage;
 
-   public DropboxBrowser(final Shell parentShell, final ChooserType chooserType, final String accessToken) {
+   public DropboxFolderBrowser(final Shell parentShell, final String accessToken) {
 
       super(parentShell);
 
       setShellStyle(getShellStyle() | SWT.RESIZE);
 
-      _chooserType = chooserType;
       _accessToken = accessToken;
 
       setDefaultImage(Activator.getImageDescriptor(Messages.Image__Dropbox_Logo).createImage());
@@ -102,11 +100,7 @@ public class DropboxBrowser extends TitleAreaDialog {
       super.configureShell(shell);
 
       String title = UI.EMPTY_STRING;
-      if (_chooserType == ChooserType.Folder) {
-         title = Messages.Dialog_DropboxFolderChooser_Area_Title;
-      } else if (_chooserType == ChooserType.File) {
-         title = Messages.Dialog_DropboxFileChooser_Area_Title;
-      }
+      title = Messages.Dialog_DropboxFolderChooser_Area_Title;
 
       shell.setText(title);
    }
@@ -117,11 +111,7 @@ public class DropboxBrowser extends TitleAreaDialog {
       super.create();
 
       String text = UI.EMPTY_STRING;
-      if (_chooserType == ChooserType.Folder) {
-         text = Messages.Dialog_DropboxFolderChooser_Area_Text;
-      } else if (_chooserType == ChooserType.File) {
-         text = Messages.Dialog_DropboxFileChooser_Area_Text;
-      }
+      text = Messages.Dialog_DropboxFolderChooser_Area_Text;
 
       setTitle(text);
    }
@@ -280,54 +270,14 @@ public class DropboxBrowser extends TitleAreaDialog {
    @Override
    protected void okPressed() {
 
-      boolean readyToQuit = true;
+      final boolean readyToQuit = true;
 
       if (_isInErrorState) {
          super.okPressed();
          return;
       }
 
-      if (_chooserType == ChooserType.Folder) {
-
-         _selectedFolder = _textSelectedAbsolutePath.getText();
-      } else if (_chooserType == ChooserType.File) {
-
-         final StructuredSelection selection = (StructuredSelection) _contentViewer.getSelection();
-
-         final Object[] selectionArray = selection.toArray();
-         if (selectionArray.length == 0) {
-            return;
-         } else {
-            boolean selectionContainsFile = false;
-
-            for (final Object item : selectionArray) {
-               if ((Metadata) item instanceof FileMetadata) {
-                  selectionContainsFile = true;
-                  break;
-               }
-            }
-
-            //If the list of selected items don't contain any files,
-            //we dive into the last folder
-            if (!selectionContainsFile) {
-
-               final Metadata lastSelecteditem = ((Metadata) selection.toArray()[selection.toArray().length - 1]);
-               selectFolder(lastSelecteditem.getPathDisplay());
-               readyToQuit = false;
-            } else {
-
-               //Otherwise, we import all the selected items that are files.
-
-               for (final Object item : selectionArray) {
-                  final Metadata metadata = ((Metadata) item);
-
-                  if (metadata instanceof FileMetadata) {
-                     _selectedFiles.add(metadata.getPathDisplay());
-                  }
-               }
-            }
-         }
-      }
+      _selectedFolder = _textSelectedAbsolutePath.getText();
 
       if (readyToQuit) {
          super.okPressed();
@@ -359,13 +309,6 @@ public class DropboxBrowser extends TitleAreaDialog {
       if (item instanceof FolderMetadata) {
 
          selectFolder(itemPath);
-      }
-
-      if (_chooserType == ChooserType.File &&
-            item instanceof FileMetadata) {
-
-         _selectedFiles.add(itemPath);
-         super.okPressed();
       }
    }
 
