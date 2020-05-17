@@ -1016,7 +1016,6 @@ public class Messages extends NLS {
    public static String        Image__RawData_DeviceFolder_NotSetup;
    public static String        Image__RawData_DeviceFolderDisabled;
    public static String        Image__RawData_Import;
-   public static String        Image__RawData_Import_Dropbox;
    public static String        Image__RawData_Transfer;
    public static String        Image__RawData_TransferDirect;
    public static String        Image__Remove;
@@ -1194,8 +1193,6 @@ public class Messages extends NLS {
    public static String        Import_Data_HTML_GetTours;
    public static String        Import_Data_HTML_ImportFromFiles_Action;
    public static String        Import_Data_HTML_ImportFromFiles_ActionTooltip;
-   public static String        Import_Data_HTML_ImportFromDropbox_Action;
-   public static String        Import_Data_HTML_ImportFromDropbox_ActionTooltip;
    public static String        Import_Data_HTML_LastMarker_No;
    public static String        Import_Data_HTML_LastMarker_Yes;
    public static String        Import_Data_HTML_MovedFiles;
