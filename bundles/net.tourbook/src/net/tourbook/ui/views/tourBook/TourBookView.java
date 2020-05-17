@@ -361,14 +361,13 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          System.out.println(" [" + getClass().getSimpleName() + "] updateElement: " + index);
 // TODO remove SYSTEM.OUT.PRINTLN
 
-         if (parent instanceof TVITourBookItem) {
+         final TVITourBookItem tviItem = (TVITourBookItem) parent;
 
-            final TVITourBookItem tviItem = (TVITourBookItem) parent;
+         final ArrayList<TreeViewerItem> tviChildren = tviItem.getChildren();
+         final TreeViewerItem tviTourItem = tviChildren.get(index);
 
-            final ArrayList<TreeViewerItem> tviChildren = tviItem.getChildren();
-
-            _tourViewer.replace(parent, index, tviChildren.get(index));
-         }
+         _tourViewer.replace(parent, index, tviTourItem);
+         _tourViewer.setChildCount(tviTourItem, 0);
       }
 
    }
@@ -547,7 +546,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             if (partRef.getPart(false) == TourBookView.this) {
 
                // ensure the tour tooltip is hidden, it occured that even closing this view did not close the tooltip
-               _tourInfoToolTip.hideToolTip();
+               if (_tourInfoToolTip != null) {
+                  _tourInfoToolTip.hideToolTip();
+               }
             }
          }
 
@@ -596,7 +597,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
                _columnManager.saveState(_state);
                _columnManager.clearColumns();
-               defineAllColumns(_viewerContainer);
+               defineAllColumns();
 
                _tourViewer = (TreeViewer) recreateViewer(_tourViewer);
 
@@ -761,7 +762,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       // define all columns for the viewer
       _columnManager = new ColumnManager(this, _state);
       _columnManager.setIsCategoryAvailable(true);
-      defineAllColumns(parent);
+      defineAllColumns();
 
       createUI(parent);
       createActions();
@@ -912,7 +913,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     *
     * @param parent
     */
-   private void defineAllColumns(final Composite parent) {
+   private void defineAllColumns() {
 
       // Time
       defineColumn_1stColumn_Date();
