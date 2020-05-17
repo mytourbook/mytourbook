@@ -25,8 +25,8 @@ import java.io.OutputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import net.tourbook.cloud.Activator;
 import net.tourbook.cloud.ICloudPreferences;
-import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
@@ -42,7 +42,7 @@ public class DropboxClient {
 
    private static DbxClientV2      _dropboxClient;
    private static DbxRequestConfig _requestConfig;
-   final static IPreferenceStore   _prefStore = CommonActivator.getPrefStore();
+   final static IPreferenceStore   _prefStore = Activator.getDefault().getPreferenceStore();
    private static String           _accessToken;
 
    static {
