@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
- *
+ * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *
+ * 
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -37,21 +37,20 @@ public class DeviceManager {
 	private static List<ExternalDevice>	_externalDeviceList;
 
 	/**
-    * Read devices from the extension registry which can import data
-    * 
-    * @return Returns a list with devices sorted by name
-    */
+	 * Read devices from the extension registry which can import data
+	 * 
+	 * @return Returns a list with devices sorted by name
+	 */
 	@SuppressWarnings("unchecked")
 	public static List<TourbookDevice> getDeviceList() {
 
 		if (_deviceList == null) {
 
-         _deviceList = readDeviceExtensions(TourbookPlugin.EXT_POINT_DEVICE_DATA_READER);
+			_deviceList = readDeviceExtensions(TourbookPlugin.EXT_POINT_DEVICE_DATA_READER);
 
 			// sort device list alphabetically
 			Collections.sort(_deviceList, new Comparator<TourbookDevice>() {
-            @Override
-            public int compare(final TourbookDevice o1, final TourbookDevice o2) {
+				public int compare(final TourbookDevice o1, final TourbookDevice o2) {
 					return o1.visibleName.compareTo(o2.visibleName);
 				}
 			});
@@ -61,10 +60,10 @@ public class DeviceManager {
 	}
 
 	/**
-    * Read external devices from the extension registry
-    * 
-    * @return
-    */
+	 * Read external devices from the extension registry
+	 * 
+	 * @return
+	 */
 	@SuppressWarnings("unchecked")
 	public static List<ExternalDevice> getExternalDeviceList() {
 
@@ -74,8 +73,7 @@ public class DeviceManager {
 
 			// sort device list alphabetically
 			Collections.sort(_externalDeviceList, new Comparator<ExternalDevice>() {
-            @Override
-            public int compare(final ExternalDevice o1, final ExternalDevice o2) {
+				public int compare(final ExternalDevice o1, final ExternalDevice o2) {
 					return o1.visibleName.compareTo(o2.visibleName);
 				}
 			});
