@@ -26,6 +26,7 @@ public class TVITourBookTour extends TVITourBookItem {
    long                    tourId;
    long                    tourTypeId;
 
+   String                  colDateTimeText;
    long                    colStartDistance;
    short                   colTimeInterval;
 

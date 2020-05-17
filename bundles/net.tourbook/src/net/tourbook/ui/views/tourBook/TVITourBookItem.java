@@ -681,6 +681,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             final TourDateTime tourDateTime = TimeTools.createTourDateTime(dbTourStartTime, dbTimeZoneId);
 
             tourItem.colTourDateTime = tourDateTime;
+            tourItem.colDateTimeText = TimeTools.Formatter_Date_S.format(tourDateTime.tourZonedDateTime);
             tourItem.colTimeZoneId = dbTimeZoneId;
             tourItem.colWeekDay = tourDateTime.weekDay;
 
