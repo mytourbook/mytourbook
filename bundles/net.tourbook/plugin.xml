@@ -1856,8 +1856,8 @@ THIS IS NOT YET FULLY IMPLEMENTED
 
    </extension>
    
-   <extension
-         point="org.eclipse.ui.keywords">
+   
+   <extension  point="org.eclipse.ui.keywords">
 
       <keyword
             id="net.tourbook.keywordReference.PrefPageTour"
@@ -1866,15 +1866,45 @@ THIS IS NOT YET FULLY IMPLEMENTED
 
    </extension>
 
-   <extension
-      point="org.eclipse.ui.bindings">
+
+   <extension  point="org.eclipse.ui.bindings">
 
       <scheme
-         id="net.tourbook.scheme"
-         name="MyTourbook Scheme"
-         parentId="org.eclipse.ui.defaultAcceleratorConfiguration"/>
+         id				="net.tourbook.scheme"
+         name			="MyTourbook Scheme"
+         parentId		="org.eclipse.ui.defaultAcceleratorConfiguration"/>
 
       <!-- Directories -->            
+
+      <key
+         commandId="command.net.tourbook.views.rawData.RawDataView"
+         sequence="%Shortcut_Key_App_TourImport"
+         contextId="org.eclipse.ui.contexts.window"
+         schemeId="net.tourbook.scheme"/>
+
+      <key
+         commandId="command.net.tourbook.views.tourListView"
+         sequence="%Shortcut_Key_App_TourBook"
+         contextId="org.eclipse.ui.contexts.window"
+         schemeId="net.tourbook.scheme"/>
+
+      <key
+         commandId="command.net.tourbook.views.tagViewID"
+         sequence="%Shortcut_Key_App_TaggedTours"
+         contextId="org.eclipse.ui.contexts.window"
+         schemeId="net.tourbook.scheme"/>
+
+      <key
+         commandId="command.net.tourbook.views.tourCatalog.TourCatalogView"
+         sequence="%Shortcut_Key_App_ReferenceTours"
+         contextId="org.eclipse.ui.contexts.window"
+         schemeId="net.tourbook.scheme"/>
+
+      <key
+         commandId="command.net.tourbook.views.collatedToursViewID"
+         sequence="%Shortcut_Key_App_CollatedTours"
+         contextId="org.eclipse.ui.contexts.window"
+         schemeId="net.tourbook.scheme"/>
 
       <key
          commandId="command.net.tourbook.views.calendar.CalendarView"
@@ -1885,6 +1915,12 @@ THIS IS NOT YET FULLY IMPLEMENTED
       <key
          commandId="command.net.tourbook.statistic.StatisticView"
          sequence="%Shortcut_Key_App_Statistic"
+         contextId="org.eclipse.ui.contexts.window"
+         schemeId="net.tourbook.scheme"/>
+
+      <key
+         commandId="command.net.tourbook.ui.views.TourMarkerAllView"
+         sequence="%Shortcut_Key_App_TourMarker"
          contextId="org.eclipse.ui.contexts.window"
          schemeId="net.tourbook.scheme"/>
 
@@ -1965,10 +2001,16 @@ THIS IS NOT YET FULLY IMPLEMENTED
       <!-- Tools -->
    
       <key
-         commandId="command.net.tourbook.search.SearchView"
-         sequence="%Shortcut_Key_App_Search"
-         contextId="org.eclipse.ui.contexts.window"
-         schemeId="net.tourbook.scheme"/>
+         commandId   ="command.net.tourbook.search.SearchView"
+         sequence    ="%Shortcut_Key_App_Search"
+         contextId   ="org.eclipse.ui.contexts.window"
+         schemeId    ="net.tourbook.scheme"/>
+   
+      <key
+         commandId   ="command.de.byteholder.geoclipse.poi.ShowPOI"
+         sequence    ="%Shortcut_Key_App_SearchPlaces"
+         contextId   ="org.eclipse.ui.contexts.window"
+         schemeId    ="net.tourbook.scheme"/>
   
    </extension>
 
