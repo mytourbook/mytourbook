@@ -32,8 +32,7 @@ New + Improvements
   - Added the maximum pace (^ Pace)
 
 * Dropbox Integration (Frederic) :
-  - Ability to connect a Dropbox account to MyTourbook, and also choosing a specific a folder for this account
-  - Ability to set up a Dropbox folder as a device to watch. In this case, added or deleted files will be automatically and immediately detected.
+  - Ability to connect a Dropbox account to MyTourbook, and also choosing a specific a folder for this account. This Dropbox folder can be set up as a device to watch. In this case, added or deleted files will be automatically and immediately detected.
 
 
 Import
