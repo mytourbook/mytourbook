@@ -33,7 +33,6 @@ New + Improvements
 
 * Dropbox Integration (Frederic) :
   - Ability to connect a Dropbox account to MyTourbook, and also choosing a specific a folder for this account
-  - Ability to manually select one or more files to import from any location in a given Dropbox account
   - Ability to set up a Dropbox folder as a device to watch. In this case, added or deleted files will be automatically and immediately detected.
 
 
