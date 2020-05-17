@@ -43,12 +43,12 @@ public class DropboxFileSystem extends TourbookFileSystem {
 
    // make sure that nothing references the cloud plugin
 
-   public static final String       FILE_SYSTEM_ID = "Dropbox";                                  //$NON-NLS-1$
-
    private java.nio.file.FileSystem _dropboxFileSystem;
-   private IPreferenceStore         _prefStore     = Activator.getDefault().getPreferenceStore();
+   private IPreferenceStore         _prefStore = Activator.getDefault().getPreferenceStore();
 
    public DropboxFileSystem() {
+
+      super("Dropbox");
 
       createDropboxFileSystem();
 
@@ -73,7 +73,7 @@ public class DropboxFileSystem extends TourbookFileSystem {
 
    @Override
    protected void close() {
-     closeDropboxFileSystem();
+      closeDropboxFileSystem();
 
    }
 
@@ -128,15 +128,10 @@ public class DropboxFileSystem extends TourbookFileSystem {
 
          result = true;
       } catch (final IOException e) {
-         //TODO FB  StatusUtil.log(e);
+         StatusUtil.log(e);
       }
 
       return result;
-   }
-
-   @Override
-   public String getFile(final String rawDataFileName) {
-      return "it works!";
    }
 
    /**
@@ -172,11 +167,6 @@ public class DropboxFileSystem extends TourbookFileSystem {
       return null;
    }
 
-   @Override
-   public String getId() {
-      return FILE_SYSTEM_ID;
-   }
-
    /**
     * Get the Dropbox {@link Path} of a given filename
     *
@@ -184,11 +174,12 @@ public class DropboxFileSystem extends TourbookFileSystem {
     * @return
     */
    @Override
-   protected Path getPath(final String folderName) {
+   protected Path getfolderPath(final String folderName) {
       if (_dropboxFileSystem == null) {
          return null;
       }
 
+      //TODO FB
       final String dropboxFilePath = _prefStore.getString(ICloudPreferences.DROPBOX_FOLDER);// + fileName;
       return _dropboxFileSystem.getPath(dropboxFilePath);
    }

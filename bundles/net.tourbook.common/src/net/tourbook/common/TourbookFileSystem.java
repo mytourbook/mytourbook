@@ -22,18 +22,55 @@ import java.nio.file.Path;
 
 public abstract class TourbookFileSystem {
 
+   private String FILE_SYSTEM_ID;
+
+   public TourbookFileSystem(final String fileSystemId) {
+      FILE_SYSTEM_ID = fileSystemId;
+   }
+
+   /**
+    * Closes all the necessary resources of the file system.
+    */
    protected abstract void close();
 
-   protected abstract File copyFileLocally(String dropboxFilePath2);
+   /**
+    * Copies a file from the file system to the local user's
+    * file system
+    *
+    * @param filePath
+    *           The absolute file path of the locally copied file
+    * @return The {@link File} of the copied file.
+    */
+   protected abstract File copyFileLocally(String filePath);
 
-   public abstract String getFile(String rawDataFileName);
-
+   /**
+    * Retrieves a list of {@link FileStore} for the file system.
+    *
+    * @return
+    */
    public abstract Iterable<FileStore> getFileStore();
 
+   /**
+    * Gets the file system as an instance of {@link FileSystem}.
+    *
+    * @return
+    */
    protected abstract FileSystem getFileSystem();
 
-   public abstract String getId();
+   /**
+    * Gets the {@link Path} of a given folder in the file system.
+    *
+    * @param folderName
+    * @return
+    */
+   protected abstract Path getfolderPath(String folderName);
 
-   protected abstract Path getPath(String folderName);
-
+   /**
+    * Gets the unique identifier of the file system.
+    *
+    * @return
+    */
+   public String getId() {
+      return FILE_SYSTEM_ID;
+   }
 }

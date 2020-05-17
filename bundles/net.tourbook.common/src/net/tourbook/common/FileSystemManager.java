@@ -33,7 +33,7 @@ public class FileSystemManager {
 
    public static void closeFileSystems() {
       if (_fileSystemsList == null) {
-         return ;
+         return;
       }
 
       for (final TourbookFileSystem tourbookFileSystem : _fileSystemsList) {
@@ -109,9 +109,13 @@ public class FileSystemManager {
 
    public static Path getfolderPath(final String folderName) {
 
+      if (_fileSystemsList == null) {
+         return null;
+      }
+
       for (final TourbookFileSystem tourbookFileSystem : _fileSystemsList) {
          if (tourbookFileSystem.getId().equals(folderName)) {
-            return tourbookFileSystem.getPath(folderName);
+            return tourbookFileSystem.getfolderPath(folderName);
          }
       }
       return null;
@@ -135,7 +139,7 @@ public class FileSystemManager {
    @SuppressWarnings({ "rawtypes" })
    private static ArrayList readFileSystemsExtensions(final String extensionPointName) {
 
-      final ArrayList fileSystemsList = new ArrayList();
+      final ArrayList<TourbookFileSystem> fileSystemsList = new ArrayList<>();
 
       final IExtensionPoint extPoint = Platform.getExtensionRegistry()//
             .getExtensionPoint("net.tourbook", extensionPointName);
@@ -155,26 +159,8 @@ public class FileSystemManager {
 
                      if (object instanceof TourbookFileSystem) {
                         final TourbookFileSystem fileSystem = (TourbookFileSystem) object;
-                        final String tata = fileSystem.getFile("");
-//                        device.deviceId = configElement.getAttribute("id"); //$NON-NLS-1$
-//                        device.visibleName = configElement.getAttribute("name"); //$NON-NLS-1$
-//                        final String extensionSortPriority = configElement
-//                              .getAttribute("extensionSortPriority"); //$NON-NLS-1$
-//                        if (extensionSortPriority != null) {
-//                           try {
-//                              device.extensionSortPriority = Integer.parseInt(extensionSortPriority);
-//                           } catch (final Exception e) {
-//                              // do nothing
-//                           }
-//                        }
                         fileSystemsList.add(fileSystem);
                      }
-//                     if (object instanceof ExternalDevice) {
-//                        final ExternalDevice device = (ExternalDevice) object;
-//                        device.deviceId = configElement.getAttribute("id"); //$NON-NLS-1$
-//                        device.visibleName = configElement.getAttribute("name"); //$NON-NLS-1$
-//                        fileSystemsList.add(device);
-//                     }
 
                   } catch (final CoreException e) {
                      e.printStackTrace();
@@ -186,5 +172,4 @@ public class FileSystemManager {
 
       return fileSystemsList;
    }
-
 }

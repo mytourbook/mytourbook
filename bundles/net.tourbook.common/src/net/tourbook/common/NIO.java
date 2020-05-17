@@ -183,7 +183,7 @@ public class NIO {
     * @param folderName
     *           A given folder name
     * @return Returns true when the folder name is equal to
-    *         {@value #VIRTUAL_DROPBOX_FOLDER_NAME}.
+    *         {@link TourBookFileSystem#getId()}.
     */
    public static boolean isTourBookFileSystem(final String folderName) {
       if (folderName == null) {
@@ -199,8 +199,6 @@ public class NIO {
       }
 
       return false;
-
-      //TODO FB return folderName.equalsIgnoreCase(VIRTUAL_DROPBOX_FOLDER_NAME);
    }
 
    private static String parseDeviceName(final String fullName) {
