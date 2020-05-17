@@ -39,9 +39,6 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 
 public class DropboxFileSystem extends TourbookFileSystem {
-   //TODO WHen the user changes the Dropbox folder, the watch service needs to be reinitialized.
-   // If too complicated,  ask to restart but it would be a bummer
-
    //Should the FileSystemManager do evetrything ? what is the role of NIO ?
 
    // make sure that nothing references the cloud plugin
@@ -49,7 +46,7 @@ public class DropboxFileSystem extends TourbookFileSystem {
    public static final String       FILE_SYSTEM_ID = "Dropbox";                                  //$NON-NLS-1$
 
    private java.nio.file.FileSystem _dropboxFileSystem;
-   private IPreferenceStore         _prefStore = Activator.getDefault().getPreferenceStore();
+   private IPreferenceStore         _prefStore     = Activator.getDefault().getPreferenceStore();
 
    public DropboxFileSystem() {
 
@@ -59,7 +56,10 @@ public class DropboxFileSystem extends TourbookFileSystem {
          @Override
          public void propertyChange(final PropertyChangeEvent event) {
 
-            if (event.getProperty().equals(ICloudPreferences.DROPBOX_ACCESSTOKEN)) {
+            if (event.getProperty().equals(ICloudPreferences.DROPBOX_ACCESSTOKEN) ||
+                  event.getProperty().equals(ICloudPreferences.DROPBOX_FOLDER)) {
+
+               closeDropboxFileSystem();
 
                // Re create the Dropbox file system
                createDropboxFileSystem();
