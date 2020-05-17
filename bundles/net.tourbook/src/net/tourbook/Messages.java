@@ -917,7 +917,6 @@ public class Messages extends NLS {
    public static String        Image__database_other_person;
    public static String        Image__delete;
    public static String        Image__delete_disabled;
-
    public static String        Image__edit_adjust_altitude;
    public static String        Image__edit_adjust_altitude_disabled;
    public static String        Image__edit_row;
