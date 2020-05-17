@@ -20,6 +20,12 @@ import java.nio.file.FileStore;
 import java.nio.file.FileSystem;
 import java.nio.file.Path;
 
+/**
+ * A class to implement and use a File System in MyTourbook.
+ * Ths file system can be used by the easyimport manager.
+ * 
+ * @author Frédéric Bard
+ */
 public abstract class TourbookFileSystem {
 
    private String FILE_SYSTEM_ID;

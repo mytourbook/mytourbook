@@ -27,6 +27,7 @@ import java.util.LinkedHashSet;
 
 import net.tourbook.Messages;
 import net.tourbook.common.CommonActivator;
+import net.tourbook.common.FileSystemManager;
 import net.tourbook.common.NIO;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
@@ -528,8 +529,7 @@ class HistoryItems {
 
                      } else if (NIO.isTourBookFileSystem(cleanedFolderName)) {
 
-                        final String dropboxUrl = "https://www.dropbox.com/";//$NON-NLS-1$
-                        _labelFolderInfo.setText(dropboxUrl);
+                        _labelFolderInfo.setText(FileSystemManager.getFileSystemId(cleanedFolderName));
 
                      } else {
 

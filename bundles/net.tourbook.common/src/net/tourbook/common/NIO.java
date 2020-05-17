@@ -174,8 +174,8 @@ public class NIO {
    }
 
    /**
-    * Gives an indication whether a given folder name is a virtual Dropbox
-    * file system
+    * Gives an indication whether a given folder name is a
+    * {@link TourbookFileSystem}
     *
     * @param folderName
     *           A given folder name
@@ -190,7 +190,7 @@ public class NIO {
       final List<String> tourBookFileSystemIds = FileSystemManager.getFileSystemsIds();
 
       for (final String tourBookFileSystemId : tourBookFileSystemIds) {
-         if (tourBookFileSystemId.equals(folderName)) {
+         if (tourBookFileSystemId.equalsIgnoreCase(folderName.toLowerCase())) {
             return true;
          }
       }

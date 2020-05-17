@@ -93,6 +93,29 @@ public class FileSystemManager {
    }
 
    /**
+    * Returns the id, if the {@link TourbookFileSystem} was found, for a given device folder name
+    *
+    * @param deviceFolderName
+    * @return
+    */
+   public static String getFileSystemId(final String deviceFolderName) {
+      String fileSystemsId = "";
+
+      if (_fileSystemsList == null) {
+         return fileSystemsId;
+      }
+
+      for (final TourbookFileSystem tourbookFileSystem : _fileSystemsList) {
+         if (tourbookFileSystem.getId().equalsIgnoreCase(deviceFolderName.toLowerCase())) {
+            fileSystemsId = tourbookFileSystem.getId();
+            return fileSystemsId;
+         }
+      }
+
+      return fileSystemsId;
+   }
+
+   /**
     * Collects all the identifiers of the available file systems
     *
     * @return Returns a list of {@link String}
@@ -133,7 +156,7 @@ public class FileSystemManager {
       }
 
       for (final TourbookFileSystem tourbookFileSystem : _fileSystemsList) {
-         if (tourbookFileSystem.getId().equals(folderName)) {
+         if (tourbookFileSystem.getId().equalsIgnoreCase(folderName.toLowerCase())) {
             return tourbookFileSystem.getfolderPath(folderName);
          }
       }
