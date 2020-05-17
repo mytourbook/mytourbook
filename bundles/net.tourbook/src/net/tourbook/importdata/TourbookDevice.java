@@ -121,7 +121,7 @@ public abstract class TourbookDevice implements IRawDataReader {
     *           index in the byte stream, this will be incremented when the return value is true
     * @param newByte
     *           received byte
-    * @return Return <code>true</code> when the receice data are correct for this device
+    * @return Return <code>true</code> when the receive data are correct for this device
     */
    public abstract boolean checkStartSequence(int byteIndex, int newByte);
 
@@ -217,7 +217,7 @@ public abstract class TourbookDevice implements IRawDataReader {
    }
 
    /**
-    * @return Returns a list of files which are also imported additonal to the selected imported
+    * @return Returns a list of files which are also imported additional to the selected imported
     *         file or <code>null</code> otherwise.
     */
    public ArrayList<String> getAdditionalImportedFiles() {
