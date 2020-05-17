@@ -108,7 +108,7 @@ class HistoryItems {
    private String createDeviceNameFolder(final Path folderPath, final String deviceName) {
 
       if (!_canShowDeviceName ||
-            NIO.isDropboxDevice(folderPath.toString())) {
+            NIO.isTourBookFileSystem(folderPath.toString())) {
          return folderPath.toString();
       }
 
@@ -526,7 +526,7 @@ class HistoryItems {
 
                         _labelFolderInfo.setText(osFolder);
 
-                     } else if (NIO.isDropboxDevice(cleanedFolderName)) {
+                     } else if (NIO.isTourBookFileSystem(cleanedFolderName)) {
 
                         final String dropboxUrl = "https://www.dropbox.com/";//$NON-NLS-1$
                         _labelFolderInfo.setText(dropboxUrl);

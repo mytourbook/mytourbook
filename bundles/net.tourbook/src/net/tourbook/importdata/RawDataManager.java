@@ -38,6 +38,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.PerspectiveFactoryRawData;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
+import net.tourbook.common.FileSystemManager;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.ITourViewer3;
@@ -1969,17 +1970,12 @@ public class RawDataManager {
                   continue;
                }
 
-               final File importFile = new File(osFilePath);
-               //TODO FB
-               /*
-                * final boolean isDropboxFile =
-                * osFilePath.toLowerCase().startsWith(NIO.VIRTUAL_DROPBOX_FOLDER_NAME);
-                * if (isDropboxFile) {
-                * final String dropboxFilePath =
-                * filePath.filePath.toString().substring(NIO.VIRTUAL_DROPBOX_FOLDER_NAME.length());
-                * importFile = DropboxClient.CopyLocally(dropboxFilePath).toFile();
-                * }
-                */
+               File importFile = new File(osFilePath);
+
+               if (FileSystemManager.isFileFromTourBookFileSystem(osFilePath)) {
+                  importFile = FileSystemManager.CopyLocally(osFilePath);
+
+               }
 
                if (importRawData(importFile, null, false, null, true)) {
 

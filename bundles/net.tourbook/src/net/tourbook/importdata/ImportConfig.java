@@ -124,7 +124,7 @@ public class ImportConfig implements Cloneable {
       }
 
       if (NIO.isDeviceNameFolder(folder) ||
-            NIO.isDropboxDevice(folder)) {
+            NIO.isTourBookFileSystem(folder)) {
 
          return NIO.convertToOSPath(folder);
 

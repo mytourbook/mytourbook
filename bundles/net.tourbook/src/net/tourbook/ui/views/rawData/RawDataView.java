@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
 import java.nio.file.ClosedWatchServiceException;
+import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -47,6 +48,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
+import net.tourbook.common.FileSystemManager;
 import net.tourbook.common.NIO;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
@@ -5425,9 +5427,15 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                boolean isDeviceFolderValid = false;
                final String deviceFolder = importConfig.getDeviceOSFolder();
 
+               final FileSystem tourbookFileSystem = NIO.isTourBookFileSystem(
+                     deviceFolder)
+                           ? FileSystemManager.getFileSystem(deviceFolder) : null;
+
                // keep watcher local because it could be set to null !!!
                folderWatcher = _folderWatcher =
-                     NIO.isDropboxDevice(deviceFolder) && NIO.getDropboxFileSystem() != null ? NIO.getDropboxFileSystem().newWatchService()
+                     tourbookFileSystem != null
+                           ? tourbookFileSystem
+                                 .newWatchService()
                            : FileSystems.getDefault().newWatchService();
 
                if (deviceFolder != null) {

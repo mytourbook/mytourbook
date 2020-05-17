@@ -21,6 +21,7 @@ Bundle-ClassPath:
  jackson-databind-2.10.3.jar,
  jackson-annotations-2.10.3.jar
 Export-Package: com.enterprisedt.net.ftp,
+ com.fasterxml.jackson.core,
  com.fasterxml.jackson.annotation,
  com.fasterxml.jackson.core.type,
  com.fasterxml.jackson.databind,

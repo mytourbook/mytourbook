@@ -15,10 +15,10 @@
  *******************************************************************************/
 package net.tourbook.cloud.dropbox;
 
+import net.tourbook.cloud.Activator;
 import net.tourbook.cloud.ICloudPreferences;
 import net.tourbook.cloud.oauth2.OAuth2Client;
 import net.tourbook.cloud.oauth2.OAuth2RequestAction;
-import net.tourbook.common.CommonActivator;
 import net.tourbook.common.util.StringUtils;
 
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -41,8 +41,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-   final IPreferenceStore _prefStore = CommonActivator.getPrefStore();
-
+   private IPreferenceStore _prefStore = Activator.getDefault().getPreferenceStore();
    /*
     * UI controls
     */
@@ -136,8 +135,8 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
    private void onClickAuthorize() {
 
       final OAuth2Client client = new OAuth2Client();
-      client.setId("CLIENT_ID"); //$NON-NLS-1$
-      client.setSecret("SECRET_ID"); //$NON-NLS-1$
+      client.setId("vye6ci8xzzsuiao"); //$NON-NLS-1$
+      client.setSecret("ovxyfwr544wrdvg"); //$NON-NLS-1$
       client.setAccessTokenUrl("https://api.dropboxapi.com/oauth2/token"); //$NON-NLS-1$
       client.setAuthorizeUrl("https://www.dropbox.com/oauth2/authorize"); //$NON-NLS-1$
       client.setRedirectUri("https://sourceforge.net/projects/mytourbook"); //$NON-NLS-1$

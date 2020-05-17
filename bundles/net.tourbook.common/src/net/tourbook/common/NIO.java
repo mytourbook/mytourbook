@@ -35,19 +35,18 @@ import org.eclipse.jface.preference.IPreferenceStore;
  */
 public class NIO {
 
-   public static final String    DEVICE_FOLDER_NAME_START    = "[";                                  //$NON-NLS-1$
-   public static final String    VIRTUAL_DROPBOX_FOLDER_NAME = "dropbox";                            //$NON-NLS-1$
+   public static final String    DEVICE_FOLDER_NAME_START = "[";                                  //$NON-NLS-1$
 
-   private final static Pattern  DRIVE_LETTER_PATTERN        = Pattern.compile("\\s*\\(([^(]*)\\)"); //$NON-NLS-1$
+   private final static Pattern  DRIVE_LETTER_PATTERN     = Pattern.compile("\\s*\\(([^(]*)\\)"); //$NON-NLS-1$
    /** Extracts <code>W530</code> from <code>[W530]\temp\other</code> */
-   private final static Pattern  DEVICE_NAME_PATTERN         = Pattern.compile("\\s*\\[([^]]*)");    //$NON-NLS-1$
+   private final static Pattern  DEVICE_NAME_PATTERN      = Pattern.compile("\\s*\\[([^]]*)");    //$NON-NLS-1$
 
    /** <code>([\\].*)</code> */
-   private final static Pattern  DEVICE_NAME_PATH_PATTERN    = Pattern.compile("([\\\\].*)");        //$NON-NLS-1$
+   private final static Pattern  DEVICE_NAME_PATH_PATTERN = Pattern.compile("([\\\\].*)");        //$NON-NLS-1$
 
    private static FileSystem     _dropboxFileSystem;
 
-   final static IPreferenceStore _prefStore                  = CommonActivator.getPrefStore();
+   final static IPreferenceStore _prefStore               = CommonActivator.getPrefStore();
 
    /**
     * Replace device name with drive letter, e.g. [MEDIA]\CACHE -> D:\CACHE. This do not validate if
@@ -96,10 +95,9 @@ public class NIO {
       return osPath;
    }
 
-
    /**
     * Returns the {@link Path} for a given folder depending on
-    * the folder's file system (Local drive, Dropbox)
+    * the folder's file system (Local drive, TourBookFileSystem such as Dropbox...)
     * Note : The file system is guessed from the folder name.
     *
     * @param folderName
@@ -108,20 +106,8 @@ public class NIO {
     */
    public static Path getDeviceFolderPath(final String folderName) {
 
-      //TODO FB
-      //return NIO.isDropboxDevice(folderName) ? getDropboxFilePath(UI.EMPTY_STRING) : Paths.get(folderName);
-      return null;
-   }
-
-
-
-   /**
-    * Retrieves the Dropbox {@link FileSystem}.
-    *
-    * @return
-    */
-   public static FileSystem getDropboxFileSystem() {
-      return _dropboxFileSystem;
+      return NIO.isTourBookFileSystem(folderName) ? FileSystemManager.getfolderPath(folderName)
+            : Paths.get(folderName);
    }
 
    public static Iterable<FileStore> getFileStores() {
@@ -132,22 +118,24 @@ public class NIO {
 
       final ArrayList<FileStore> fileStores = new ArrayList<>();
 
-      final Iterator<FileStore> fileStoresIterator = systemFileStore.iterator();
+      Iterator<FileStore> fileStoresIterator = systemFileStore.iterator();
       while (fileStoresIterator.hasNext()) {
          fileStores.add(fileStoresIterator.next());
       }
 
-      final List<FileSystem> fileSystems = FileSystemManager.getFileSystemsList();
-      //TODO FB
-      /*
-       * final Iterable<FileStore> dropboxFileStore = getDropboxFileStores();
-       * if (dropboxFileStore != null) {
-       * fileStoresIterator = dropboxFileStore.iterator();
-       * while (fileStoresIterator.hasNext()) {
-       * fileStores.add(fileStoresIterator.next());
-       * }
-       * }
-       */
+      final List<TourbookFileSystem> fileSystems = FileSystemManager.getFileSystemsList();
+
+      for (final TourbookFileSystem fileSystem : fileSystems) {
+
+         final Iterable<FileStore> fileSystemStore = fileSystem.getFileStore();
+         if (fileSystemStore != null) {
+            fileStoresIterator = fileSystemStore.iterator();
+            while (fileStoresIterator.hasNext()) {
+               fileStores.add(fileStoresIterator.next());
+            }
+         }
+      }
+
       return fileStores;
    }
 
@@ -196,12 +184,22 @@ public class NIO {
     * @return Returns true when the folder name is equal to
     *         {@value #VIRTUAL_DROPBOX_FOLDER_NAME}.
     */
-   public static boolean isDropboxDevice(final String folderName) {
+   public static boolean isTourBookFileSystem(final String folderName) {
       if (folderName == null) {
          return false;
       }
 
-      return folderName.equalsIgnoreCase(VIRTUAL_DROPBOX_FOLDER_NAME);
+      final List<String> tourBookFileSystemIds = FileSystemManager.getFileSystemsIds();
+
+      for (final String tourBookFileSystemId : tourBookFileSystemIds) {
+         if (tourBookFileSystemId.equals(folderName)) {
+            return true;
+         }
+      }
+
+      return false;
+
+      //TODO FB return folderName.equalsIgnoreCase(VIRTUAL_DROPBOX_FOLDER_NAME);
    }
 
    private static String parseDeviceName(final String fullName) {

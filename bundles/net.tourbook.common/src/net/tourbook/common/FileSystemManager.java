@@ -15,7 +15,9 @@
  *******************************************************************************/
 package net.tourbook.common;
 
+import java.io.File;
 import java.nio.file.FileSystem;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +29,57 @@ import org.eclipse.core.runtime.Platform;
 
 public class FileSystemManager {
 
-   private static List<FileSystem> _fileSystemsList;
+   private static List<TourbookFileSystem> _fileSystemsList;
+
+   public static File CopyLocally(final String dropboxFilePath) {
+      if (_fileSystemsList == null) {
+         return null;
+      }
+
+      for (final TourbookFileSystem tourbookFileSystem : _fileSystemsList) {
+         if (dropboxFilePath.toLowerCase().startsWith(tourbookFileSystem.getId().toLowerCase())) {
+            final String dropboxFilePath2 =
+                  dropboxFilePath.substring(tourbookFileSystem.getId().length());
+            return tourbookFileSystem.copyFileLocally(dropboxFilePath2);
+         }
+      }
+
+      return null;
+   }
+
+   public static FileSystem getFileSystem(final String deviceFolder) {
+
+      if (_fileSystemsList == null) {
+         return null;
+      }
+
+      for (final TourbookFileSystem tourbookFileSystem : _fileSystemsList) {
+         if (tourbookFileSystem.getId().equals(deviceFolder)) {
+            return tourbookFileSystem.getFileSystem();
+         }
+      }
+
+      return null;
+   }
+
+   /**
+    * Collects all the identifiers of the available file systems
+    *
+    * @return Returns a list of {@link String}
+    */
+   public static List<String> getFileSystemsIds() {
+
+      final ArrayList<String> fileSystemsIds = new ArrayList<>();
+
+      if (_fileSystemsList == null) {
+         return fileSystemsIds;
+      }
+
+      for (final TourbookFileSystem tourbookFileSystem : _fileSystemsList) {
+         fileSystemsIds.add(tourbookFileSystem.getId());
+      }
+      return fileSystemsIds;
+   }
 
    /**
     * Read file stores that can be used as file systems.
@@ -35,7 +87,7 @@ public class FileSystemManager {
     * @return Returns a list of {@link FileSystem}
     */
    @SuppressWarnings("unchecked")
-   public static List<FileSystem> getFileSystemsList() {
+   public static List<TourbookFileSystem> getFileSystemsList() {
 
       if (_fileSystemsList == null) {
 
@@ -45,10 +97,37 @@ public class FileSystemManager {
       return _fileSystemsList;
    }
 
+
+   public static Path getfolderPath(final String folderName) {
+
+      for (final TourbookFileSystem tourbookFileSystem : _fileSystemsList) {
+         if(tourbookFileSystem.getId().equals(folderName)) {
+            return tourbookFileSystem.getPath(folderName);
+         }
+      }
+      return null;
+   }
+
+
+   public static boolean isFileFromTourBookFileSystem(final String osFilePath) {
+
+      if (_fileSystemsList == null) {
+         return false;
+      }
+
+      for (final TourbookFileSystem tourbookFileSystem : _fileSystemsList) {
+         if (osFilePath.toLowerCase().startsWith(tourbookFileSystem.getId().toLowerCase())) {
+            return true;
+         }
+      }
+
+     return false;
+   }
+
    @SuppressWarnings({ "rawtypes" })
    private static ArrayList readFileSystemsExtensions(final String extensionPointName) {
 
-      final ArrayList fileSystemsList = null;
+      final ArrayList fileSystemsList = new ArrayList();
 
       final IExtensionPoint extPoint = Platform.getExtensionRegistry()//
             .getExtensionPoint("net.tourbook", extensionPointName);
@@ -66,8 +145,9 @@ public class FileSystemManager {
 
                      object = configElement.createExecutableExtension("class"); //$NON-NLS-1$
 
-                     if (object instanceof FileSystem) {
-                        final FileSystem device = (FileSystem) object;
+                     if (object instanceof TourbookFileSystem) {
+                        final TourbookFileSystem fileSystem = (TourbookFileSystem) object;
+                        final String tata = fileSystem.getFile("");
 //                        device.deviceId = configElement.getAttribute("id"); //$NON-NLS-1$
 //                        device.visibleName = configElement.getAttribute("name"); //$NON-NLS-1$
 //                        final String extensionSortPriority = configElement
@@ -79,7 +159,7 @@ public class FileSystemManager {
 //                              // do nothing
 //                           }
 //                        }
-                        fileSystemsList.add(device);
+                        fileSystemsList.add(fileSystem);
                      }
 //                     if (object instanceof ExternalDevice) {
 //                        final ExternalDevice device = (ExternalDevice) object;

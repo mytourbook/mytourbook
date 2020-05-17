@@ -464,7 +464,7 @@ public class EasyImportManager {
 
                   OSFile deviceFile;
 
-                  if (NIO.isDropboxDevice(folder)) {
+                  if (NIO.isTourBookFileSystem(folder)) {
                      deviceFile = new OSFile(Paths.get(folder, path.toString()));
                   } else {
                      deviceFile = new OSFile(path);

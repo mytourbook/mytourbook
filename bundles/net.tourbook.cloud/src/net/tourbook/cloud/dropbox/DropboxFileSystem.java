@@ -18,9 +18,11 @@ package net.tourbook.cloud.dropbox;
 import com.github.fge.fs.dropbox.provider.DropBoxFileSystemProvider;
 import com.github.fge.fs.dropbox.provider.DropBoxFileSystemRepository;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.FileStore;
+import java.nio.file.FileSystem;
 import java.nio.file.Path;
 import java.nio.file.spi.FileSystemProvider;
 import java.util.HashMap;
@@ -28,6 +30,7 @@ import java.util.Map;
 
 import net.tourbook.cloud.Activator;
 import net.tourbook.cloud.ICloudPreferences;
+import net.tourbook.common.TourbookFileSystem;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 
@@ -35,10 +38,19 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 
-public class DropboxFileSystem {
+public class DropboxFileSystem extends TourbookFileSystem {
+   //TODO WHen the user changes the Dropbox folder, the watch service needs to be reinitialized.
+   // If too complicated,  ask to restart but it would be a bummer
+
+   // Import files locally => done. Put dropbox in the tmp folder so that it's kept in the DB ?
+
+   //Should the FileSystemManager do evetrything ? what is the role of NIO ?
+
+   // make sure that nothing references the cloud plugin
+
+   public static final String       FILE_SYSTEM_ID = "Dropbox";                                  //$NON-NLS-1$
 
    private java.nio.file.FileSystem _dropboxFileSystem;
-
    private IPreferenceStore         _prefStore = Activator.getDefault().getPreferenceStore();
 
    public DropboxFileSystem() {
@@ -78,6 +90,11 @@ public class DropboxFileSystem {
       }
    }
 
+   @Override
+   protected File copyFileLocally(final String dropboxFilePath2) {
+      return DropboxClient.CopyLocally(dropboxFilePath2).toFile();
+   }
+
    /**
     * Creates a Java 7 FileSystem over DropBox using the library
     * https://github.com/FJBDev/java7-fs-dropbox
@@ -113,19 +130,9 @@ public class DropboxFileSystem {
       return result;
    }
 
-   /**
-    * Get the Dropbox {@link Path} of a given filename
-    *
-    * @param fileName
-    * @return
-    */
-   private Path getDropboxFilePath(final String fileName) {
-      if (_dropboxFileSystem == null) {
-         return null;
-      }
-
-      final String dropboxFilePath = _prefStore.getString(ICloudPreferences.DROPBOX_FOLDER) + fileName;
-      return _dropboxFileSystem.getPath(dropboxFilePath);
+   @Override
+   public String getFile(final String rawDataFileName) {
+      return "it works!";
    }
 
    /**
@@ -134,7 +141,8 @@ public class DropboxFileSystem {
     *
     * @return A list of Dropbox {@link FileStore}
     */
-   private Iterable<FileStore> getDropboxFileStores() {
+   @Override
+   public Iterable<FileStore> getFileStore() {
       if (_dropboxFileSystem != null) {
          return _dropboxFileSystem.getFileStores();
       } else {
@@ -144,5 +152,40 @@ public class DropboxFileSystem {
       }
 
       return null;
+   }
+
+   /**
+    * Retrieves the Dropbox {@link FileSystem}.
+    *
+    * @return
+    */
+   @Override
+   protected FileSystem getFileSystem() {
+      if (_dropboxFileSystem != null) {
+         return _dropboxFileSystem;
+      }
+
+      return null;
+   }
+
+   @Override
+   public String getId() {
+      return FILE_SYSTEM_ID;
+   }
+
+   /**
+    * Get the Dropbox {@link Path} of a given filename
+    *
+    * @param fileName
+    * @return
+    */
+   @Override
+   protected Path getPath(final String folderName) {
+      if (_dropboxFileSystem == null) {
+         return null;
+      }
+
+      final String dropboxFilePath = _prefStore.getString(ICloudPreferences.DROPBOX_FOLDER);// + fileName;
+      return _dropboxFileSystem.getPath(dropboxFilePath);
    }
 }
