@@ -79,8 +79,19 @@ public class DropboxClient {
          return null;
       }
 
+      Path dropboxDirectoryPath = null;
+
+      //Creating a "Dropbox" folder in the system's temporary directory
+      try {
+         dropboxDirectoryPath = Paths.get(FileUtils.getTempDirectoryPath(), "Dropbox");
+         FileUtils.forceMkdir(dropboxDirectoryPath.toFile());
+      } catch (final IOException e) {
+         StatusUtil.log(e);
+         return null;
+      }
+
       final String fileName = Paths.get(dropboxFilefilePath).getFileName().toString();
-      final Path filePath = Paths.get(FileUtils.getTempDirectoryPath(), fileName);
+      final Path filePath = Paths.get(dropboxDirectoryPath.toString(), fileName);
 
       //Downloading the file from Dropbox to the local disk
       try (OutputStream outputStream = new FileOutputStream(filePath.toString())) {

@@ -42,8 +42,6 @@ public class DropboxFileSystem extends TourbookFileSystem {
    //TODO WHen the user changes the Dropbox folder, the watch service needs to be reinitialized.
    // If too complicated,  ask to restart but it would be a bummer
 
-   // Import files locally => done. Put dropbox in the tmp folder so that it's kept in the DB ?
-
    //Should the FileSystemManager do evetrything ? what is the role of NIO ?
 
    // make sure that nothing references the cloud plugin

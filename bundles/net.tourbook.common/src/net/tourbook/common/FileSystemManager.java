@@ -97,17 +97,15 @@ public class FileSystemManager {
       return _fileSystemsList;
    }
 
-
    public static Path getfolderPath(final String folderName) {
 
       for (final TourbookFileSystem tourbookFileSystem : _fileSystemsList) {
-         if(tourbookFileSystem.getId().equals(folderName)) {
+         if (tourbookFileSystem.getId().equals(folderName)) {
             return tourbookFileSystem.getPath(folderName);
          }
       }
       return null;
    }
-
 
    public static boolean isFileFromTourBookFileSystem(final String osFilePath) {
 
@@ -121,7 +119,7 @@ public class FileSystemManager {
          }
       }
 
-     return false;
+      return false;
    }
 
    @SuppressWarnings({ "rawtypes" })
@@ -178,4 +176,5 @@ public class FileSystemManager {
 
       return fileSystemsList;
    }
+
 }
