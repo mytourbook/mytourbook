@@ -26,6 +26,8 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageCloudConnectivity extends PreferencePage implements IWorkbenchPreferencePage {
 
+   public static final String ID = "net.tourbook.preferences.PrefPageCloudConnectivity"; //$NON-NLS-1$
+
    @Override
    protected Control createContents(final Composite parent) {
 

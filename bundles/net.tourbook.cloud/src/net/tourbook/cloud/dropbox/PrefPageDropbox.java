@@ -41,14 +41,16 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-   private IPreferenceStore _prefStore = Activator.getDefault().getPreferenceStore();
+   public static final String ID         = "net.tourbook.cloud.PrefPageDropbox";       //$NON-NLS-1$
+
+   private IPreferenceStore   _prefStore = Activator.getDefault().getPreferenceStore();
    /*
     * UI controls
     */
-   private Button           _btnAuthorizeConnection;
-   private Text             _textAccessToken;
-   private Button           _btnChooseFolder;
-   private Text             _textFolderPath;
+   private Button             _btnAuthorizeConnection;
+   private Text               _textAccessToken;
+   private Button             _btnChooseFolder;
+   private Text               _textFolderPath;
 
    @Override
    protected void createFieldEditors() {
