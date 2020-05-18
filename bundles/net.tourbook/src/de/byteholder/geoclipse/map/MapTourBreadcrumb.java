@@ -159,7 +159,7 @@ public class MapTourBreadcrumb {
       return false;
    }
 
-   public void paint(final GC gc, final boolean isTourPaintMethodEnhanced) {
+   public void paint(final GC gc, final boolean isShowTourPaintMethodEnhancedWarning) {
 
       if (_allTours.size() == 0) {
          return;
@@ -249,7 +249,7 @@ public class MapTourBreadcrumb {
          devX += crumbRectangle.width;
       }
 
-      if (isTourPaintMethodEnhanced) {
+      if (isShowTourPaintMethodEnhancedWarning) {
 
          // show message that enhanced painting method is used and a tour cannot be selected
 

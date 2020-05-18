@@ -81,6 +81,7 @@ public class Slideout_Map2_TrackOptions extends ToolbarSlideout implements IColo
    private Composite             _parent;
 
    private Button                _chkPaintWithBorder;
+   private Button                _chkShowEnhancedWarning;
    private Button                _chkShowSlider_Location;
    private Button                _chkShowSlider_Path;
    private Button                _chkTrackOpacity;
@@ -116,9 +117,9 @@ public class Slideout_Map2_TrackOptions extends ToolbarSlideout implements IColo
     * @param map2State
     */
    public Slideout_Map2_TrackOptions(final Control ownerControl,
-                                    final ToolBar toolBar,
-                                    final Map2View map2View,
-                                    final IDialogSettings map2State) {
+                                     final ToolBar toolBar,
+                                     final Map2View map2View,
+                                     final IDialogSettings map2State) {
 
       super(ownerControl, toolBar);
 
@@ -316,6 +317,16 @@ public class Slideout_Map2_TrackOptions extends ToolbarSlideout implements IColo
                _rdoPainting_Complex = new Button(paintingContainer, SWT.RADIO);
                _rdoPainting_Complex.setText(Messages.Pref_MapLayout_Label_TourPaintMethod_Complex);
                _rdoPainting_Complex.addSelectionListener(_defaultSelectionListener);
+
+               // Checkbox: Show warning
+               _chkShowEnhancedWarning = new Button(paintingContainer, SWT.CHECK);
+               _chkShowEnhancedWarning.setText(Messages.Slideout_Map_Options_Checkbox_ShowEnhancedWarning);
+               _chkShowEnhancedWarning.setToolTipText(Messages.Slideout_Map_Options_Checkbox_ShowEnhancedWarning_Tooltip);
+               _chkShowEnhancedWarning.addSelectionListener(_defaultSelectionListener);
+               GridDataFactory.fillDefaults()
+                     .grab(true, false)
+                     .indent(_firstColumnIndent, 0)
+                     .applyTo(_chkShowEnhancedWarning);
             }
          }
       }
@@ -498,12 +509,12 @@ public class Slideout_Map2_TrackOptions extends ToolbarSlideout implements IColo
       }
    }
 
-
    private void enableControls() {
 
       final boolean isUseTrackOpacity = _chkTrackOpacity.getSelection();
       final boolean isShowSliderPath = _chkShowSlider_Path.getSelection();
       final boolean isPaintWithBorder = _chkPaintWithBorder.getSelection();
+      final boolean isEnhancedPaintingMode = _rdoPainting_Complex.getSelection();
 
       _spinnerTrackOpacity.setEnabled(isUseTrackOpacity);
 
@@ -516,6 +527,7 @@ public class Slideout_Map2_TrackOptions extends ToolbarSlideout implements IColo
       _spinnerBorderColorDarker.setEnabled(isPaintWithBorder);
       _spinnerBorderWidth.setEnabled(isPaintWithBorder);
 
+      // slider path
       _colorSliderPathColor.setEnabled(isShowSliderPath);
       _lblSliderPath_Color.setEnabled(isShowSliderPath);
       _lblSliderPath_Width.setEnabled(isShowSliderPath);
@@ -523,6 +535,9 @@ public class Slideout_Map2_TrackOptions extends ToolbarSlideout implements IColo
       _spinnerSliderPath_Opacity.setEnabled(isShowSliderPath);
       _spinnerSliderPath_Segments.setEnabled(isShowSliderPath);
       _spinnerSliderPath_LineWidth.setEnabled(isShowSliderPath);
+
+      // painting method
+      _chkShowEnhancedWarning.setEnabled(isEnhancedPaintingMode);
    }
 
    private int getBorderType() {
@@ -655,7 +670,8 @@ public class Slideout_Map2_TrackOptions extends ToolbarSlideout implements IColo
       _colorBorderColor.setColorValue(PreferenceConverter.getDefaultColor( _prefStore, ITourbookPreferences.MAP_LAYOUT_BORDER_COLOR));
 
       // painting method
-      final String paintingMethod = _prefStore.getDefaultString(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD);
+      final String paintingMethod =             _prefStore.getDefaultString(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD);
+      _chkShowEnhancedWarning.setSelection(     _prefStore.getDefaultBoolean( ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD_WARNING));
       _rdoPainting_Simple.setSelection(         PrefPageMap2Appearance.TOUR_PAINT_METHOD_SIMPLE.equals(paintingMethod));
       _rdoPainting_Complex.setSelection(        PrefPageMap2Appearance.TOUR_PAINT_METHOD_COMPLEX.equals(paintingMethod));
 
@@ -698,6 +714,7 @@ public class Slideout_Map2_TrackOptions extends ToolbarSlideout implements IColo
 
       // painting method
       final boolean isComplex = PrefPageMap2Appearance.TOUR_PAINT_METHOD_COMPLEX.equals(_prefStore.getString(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD));
+      _chkShowEnhancedWarning.setSelection(     _prefStore.getBoolean(  ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD_WARNING));
       _rdoPainting_Simple.setSelection(         isComplex==false);
       _rdoPainting_Complex.setSelection(        isComplex);
 
@@ -719,26 +736,26 @@ public class Slideout_Map2_TrackOptions extends ToolbarSlideout implements IColo
       Util.setState(_state, Map2View.STATE_SLIDER_PATH_COLOR,  _colorSliderPathColor.getColorValue());
 
       // track opacity
-      _prefStore.setValue(ITourbookPreferences.MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY,   _chkTrackOpacity.getSelection());
-      _prefStore.setValue(ITourbookPreferences.MAP2_LAYOUT_TOUR_TRACK_OPACITY,      _spinnerTrackOpacity.getSelection());
+      _prefStore.setValue(ITourbookPreferences.MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY,      _chkTrackOpacity.getSelection());
+      _prefStore.setValue(ITourbookPreferences.MAP2_LAYOUT_TOUR_TRACK_OPACITY,         _spinnerTrackOpacity.getSelection());
 
       // plot type
-      _prefStore.setValue(ITourbookPreferences.MAP_LAYOUT_PLOT_TYPE,                getPlotType());
+      _prefStore.setValue(ITourbookPreferences.MAP_LAYOUT_PLOT_TYPE,                   getPlotType());
 
       // line
-      _prefStore.setValue(ITourbookPreferences.MAP_LAYOUT_SYMBOL_WIDTH,             _spinnerLineWidth.getSelection());
+      _prefStore.setValue(ITourbookPreferences.MAP_LAYOUT_SYMBOL_WIDTH,                _spinnerLineWidth.getSelection());
 
       // border
-      _prefStore.setValue(ITourbookPreferences.MAP_LAYOUT_PAINT_WITH_BORDER,        _chkPaintWithBorder.getSelection());
-      _prefStore.setValue(ITourbookPreferences.MAP_LAYOUT_BORDER_WIDTH,             _spinnerBorderWidth.getSelection());
-      _prefStore.setValue(ITourbookPreferences.MAP_LAYOUT_BORDER_TYPE,              getBorderType());
-      _prefStore.setValue(ITourbookPreferences.MAP_LAYOUT_BORDER_DIMM_VALUE,        _spinnerBorderColorDarker.getSelection());
+      _prefStore.setValue(ITourbookPreferences.MAP_LAYOUT_PAINT_WITH_BORDER,           _chkPaintWithBorder.getSelection());
+      _prefStore.setValue(ITourbookPreferences.MAP_LAYOUT_BORDER_WIDTH,                _spinnerBorderWidth.getSelection());
+      _prefStore.setValue(ITourbookPreferences.MAP_LAYOUT_BORDER_TYPE,                 getBorderType());
+      _prefStore.setValue(ITourbookPreferences.MAP_LAYOUT_BORDER_DIMM_VALUE,           _spinnerBorderColorDarker.getSelection());
 
       PreferenceConverter.setValue(_prefStore, ITourbookPreferences.MAP_LAYOUT_BORDER_COLOR, _colorBorderColor.getColorValue());
 
       // painting method
-      _prefStore.setValue(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD,
-            _rdoPainting_Complex.getSelection()
+      _prefStore.setValue(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD_WARNING,   _chkShowEnhancedWarning.getSelection());
+      _prefStore.setValue(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD,           _rdoPainting_Complex.getSelection()
                ? PrefPageMap2Appearance.TOUR_PAINT_METHOD_COMPLEX
                : PrefPageMap2Appearance.TOUR_PAINT_METHOD_SIMPLE);
 

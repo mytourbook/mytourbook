@@ -3,35 +3,37 @@
 
 TODO's
 ======  
-  - This error occured when importing propably an "empty" fit file
-      java.lang.NullPointerException
-           at net.tourbook.device.garmin.fit.FitData.finalizeTour_Marker(FitData.java:296)
-           at net.tourbook.device.garmin.fit.FitData.finalizeTour(FitData.java:193)
-           at net.tourbook.device.garmin.fit.FitDataReader.processDeviceData(FitDataReader.java:600)
-           at net.tourbook.importdata.RawDataManager.importRawData_10(RawDataManager.java:1602)
-           at net.tourbook.importdata.RawDataManager.access$8(RawDataManager.java:1552)
-           at net.tourbook.importdata.RawDataManager$5.run(RawDataManager.java:1465)
-           at org.eclipse.swt.custom.BusyIndicator.showWhile(BusyIndicator.java:55)
-           at net.tourbook.importdata.RawDataManager.importRawData(RawDataManager.java:1422)
-           at net.tourbook.importdata.RawDataManager$7.run(RawDataManager.java:1936)
-           at org.eclipse.jface.operation.ModalContext$ModalContextThread.run(ModalContext.java:122)  
-           
-  - Calendar view: Show average pulse/power in day/week values, this is helpful for ergometer
+             
+  - csv export: export new column(s) in tourbook view
  
 
-Bugs
-----
-* Map2: new tour selector explodes when continously selecting markers in search view, maybe in other views
-
-
-New + Improvements   
+New + Improvements
 ==================
 
-* Photo
-  - Show selected/hovered folder in the Photo view with more contrast which makes it better readable.
+* Calendar view
+  - Tour pulse/power average values are displayed in the tour (day) content cell
 
 * Statistics (Frederic)
-  - The number of years to be displayed in the graph is now dynamically filled and updated based on the number of available years.
+  - The number of years to be displayed in the graph is now dynamically filled and updated based on the number of available years
+
+* 2D Map
+  - The enhanced painting warning can be hidden in the track options slideout
+
+* Photo
+  - Show selected/hovered folder in the Photo view with more contrast which makes it better readable
+  
+* Dialog Adjust Elevation
+  - Show elevation gain/loss values before and after the adjustment, supported adjustment type: "Approach elevation with SRTM data"  
+
+* Tour Marker View (Frederic)
+  - Added the Average Speed column
+
+* Tour tooltip (Frederic)
+  - Added the maximum pace (^ Pace)
+
+* Dropbox Integration (Frederic) :
+  - Ability to connect a Dropbox account to MyTourbook, and also choosing a specific a folder for this account. This Dropbox folder can be set up as a device to watch. In this case, added or deleted files will be automatically and immediately detected.
+
 
 Import
 ======
@@ -41,24 +43,28 @@ Import
 Changes  
 =======
 
-* 
+* CSV Export
+  The csv export is now exporting all Tour Book view columns, existing csv column headers may also be modified 
 
 
 Fixes   
 =====
 
 * 3D Map (Frederic)
-
   - Removed the deprecated or unavailable layers (ID_USDA_NAIP & ID_USDA_NAIP_USGS & MS Virtual Earth Aerial). Added the layers USGS NAIP PLUS, USGS Topo Base Map and USGS Topo Base Map Large
   - We disable the actions when the data series are not available
   - Fixed an issue where the Atmosphere and Scale layers would not appear when using MyTourbook in French
   - 3D Map colors : Fixed the pace ranges from seconds to minutes for better readability
-
+  
 * TCX Import (Frederic)
   - Fixed an issue where the distance data and display were erroneous since the distance is reset at each new lap 
 
 * GPX/TCX Export (Frederic)
   - Fixed and updated the GPX/TCX export templates as the file validation was failing against the schemas.
+
+* Tour Editor
+  - Show daytime with am/pm in time slices/swim slices when imperial measurement system is selected
+  - Fixed daytime to be not >24h
    
 Translation    
 ===========

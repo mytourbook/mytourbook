@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,6 +19,9 @@ import java.nio.file.FileStore;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -76,7 +79,6 @@ public class NIO {
                break;
             }
          }
-
       } else {
 
          // OS path is contained in the folder path
@@ -87,22 +89,57 @@ public class NIO {
       return osPath;
    }
 
+   /**
+    * Returns the {@link Path} for a given folder depending on
+    * the folder's file system (Local drive, TourBookFileSystem such as Dropbox...)
+    * Note : The file system is guessed from the folder name.
+    *
+    * @param folderName
+    *           A given folder name
+    * @return Returns the {@link Path} of the folder
+    */
+   public static Path getDeviceFolderPath(final String folderName) {
+
+      return NIO.isTourBookFileSystem(folderName) ? FileSystemManager.getfolderPath(folderName)
+            : Paths.get(folderName);
+   }
+
    public static Iterable<FileStore> getFileStores() {
 
 //		final long start = System.nanoTime();
 //
-      final Iterable<FileStore> fileStores = FileSystems.getDefault().getFileStores();
+      final Iterable<FileStore> systemFileStore = FileSystems.getDefault().getFileStores();
 //
-//		System.out.println((UI.timeStampNano() + " " + NIO.class.getName() + " \t")
-//				+ (((float) (System.nanoTime() - start) / 1000000) + " ms"));
-//		// TODO remove SYSTEM.OUT.PRINTLN
+//    System.out.println((UI.timeStampNano() + " " + NIO.class.getName() + " \t")
+//          + (((float) (System.nanoTime() - start) / 1000000) + " ms"));
+//    // TODO remove SYSTEM.OUT.PRINTLN
+
+      final ArrayList<FileStore> fileStores = new ArrayList<>();
+
+      Iterator<FileStore> fileStoresIterator = systemFileStore.iterator();
+      while (fileStoresIterator.hasNext()) {
+         fileStores.add(fileStoresIterator.next());
+      }
+
+      final List<TourbookFileSystem> fileSystems = FileSystemManager.getFileSystemsList();
+
+      for (final TourbookFileSystem fileSystem : fileSystems) {
+
+         final Iterable<FileStore> fileSystemStore = fileSystem.getFileStore();
+         if (fileSystemStore != null) {
+            fileStoresIterator = fileSystemStore.iterator();
+            while (fileStoresIterator.hasNext()) {
+               fileStores.add(fileStoresIterator.next());
+            }
+         }
+      }
 
       return fileStores;
    }
 
    /**
     * @param fileName
-    * @return Returns a path or <code>null</code> when an exception occures.
+    * @return Returns a path or <code>null</code> when an exception occurs.
     */
    public static Path getPath(final String fileName) {
 
@@ -123,6 +160,7 @@ public class NIO {
 
    /**
     * @param folderName
+    *           A given folder name
     * @return Returns <code>true</code> when the folder name starts with
     *         {@value #DEVICE_FOLDER_NAME_START}.
     */
@@ -133,6 +171,31 @@ public class NIO {
       }
 
       return folderName.startsWith(DEVICE_FOLDER_NAME_START);
+   }
+
+   /**
+    * Gives an indication whether a given folder name is a
+    * {@link TourbookFileSystem}
+    *
+    * @param folderName
+    *           A given folder name
+    * @return Returns true when the folder name is equal to
+    *         {@link TourBookFileSystem#getId()}.
+    */
+   public static boolean isTourBookFileSystem(final String folderName) {
+      if (folderName == null) {
+         return false;
+      }
+
+      final List<String> tourBookFileSystemIds = FileSystemManager.getFileSystemsIds();
+
+      for (final String tourBookFileSystemId : tourBookFileSystemIds) {
+         if (tourBookFileSystemId.equalsIgnoreCase(folderName.toLowerCase())) {
+            return true;
+         }
+      }
+
+      return false;
    }
 
    private static String parseDeviceName(final String fullName) {

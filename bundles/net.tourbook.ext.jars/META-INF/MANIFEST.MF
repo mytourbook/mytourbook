@@ -20,11 +20,11 @@ Bundle-ClassPath:
  jackson-core-2.10.3.jar,
  jackson-databind-2.10.3.jar,
  jackson-annotations-2.10.3.jar
-Export-Package: 
- com.enterprisedt.net.ftp,
+Export-Package: com.enterprisedt.net.ftp,
+ com.fasterxml.jackson.core,
+ com.fasterxml.jackson.annotation,
  com.fasterxml.jackson.core.type,
  com.fasterxml.jackson.databind,
- com.fasterxml.jackson.annotation,
  com.github.benmanes.caffeine.cache,
  com.javadocmd.simplelatlng,
  com.javadocmd.simplelatlng.util,

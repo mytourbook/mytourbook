@@ -50,6 +50,11 @@ public abstract class TreeColumnFactory {
    public static final TreeColumnFactory DEVICE_DISTANCE;
    public static final TreeColumnFactory DEVICE_NAME;
 
+   public static final TreeColumnFactory MOTION_AVG_PACE;
+   public static final TreeColumnFactory MOTION_AVG_SPEED;
+   public static final TreeColumnFactory MOTION_DISTANCE;
+   public static final TreeColumnFactory MOTION_MAX_SPEED;
+
    public static final TreeColumnFactory POWER_AVG;
    public static final TreeColumnFactory POWER_MAX;
    public static final TreeColumnFactory POWER_NORMALIZED;
@@ -102,19 +107,13 @@ public abstract class TreeColumnFactory {
    public static final TreeColumnFactory TIME_WEEK_NO;
    public static final TreeColumnFactory TIME_WEEKYEAR;
 
-   public static final TreeColumnFactory MOTION_AVG_PACE;
-   public static final TreeColumnFactory MOTION_AVG_SPEED;
-   public static final TreeColumnFactory MOTION_DISTANCE;
-   public static final TreeColumnFactory MOTION_MAX_SPEED;
-
-   public static final TreeColumnFactory TOUR_REFTOUR_TOUR;
-
    public static final TreeColumnFactory TOUR_COLLATE_EVENT;
    public static final TreeColumnFactory TOUR_COUNTER;
    public static final TreeColumnFactory TOUR_LOCATION_END;
    public static final TreeColumnFactory TOUR_LOCATION_START;
    public static final TreeColumnFactory TOUR_NUM_MARKERS;
    public static final TreeColumnFactory TOUR_NUM_PHOTOS;
+   public static final TreeColumnFactory TOUR_REFTOUR_TOUR;
    public static final TreeColumnFactory TOUR_TAG_AND_CATEGORY_NOTES;
    public static final TreeColumnFactory TOUR_TAG_AND_TAGS;
    public static final TreeColumnFactory TOUR_TAG_ID;
@@ -131,10 +130,10 @@ public abstract class TreeColumnFactory {
    public static final TreeColumnFactory TRAINING_TRAINING_EFFECT_ANAEROB;
    public static final TreeColumnFactory TRAINING_TRAINING_PERFORMANCE;
 
+   public static final TreeColumnFactory WEATHER_CLOUDS;
    public static final TreeColumnFactory WEATHER_TEMPERATURE_AVG;
    public static final TreeColumnFactory WEATHER_TEMPERATURE_MIN;
    public static final TreeColumnFactory WEATHER_TEMPERATURE_MAX;
-   public static final TreeColumnFactory WEATHER_CLOUDS;
    public static final TreeColumnFactory WEATHER_WIND_DIR;
    public static final TreeColumnFactory WEATHER_WIND_SPEED;
 
@@ -626,50 +625,6 @@ public abstract class TreeColumnFactory {
          }
       };
 
-      POWERTRAIN_SLOW_VS_FAST_CADENCE_ZONES_DELIMITER = new TreeColumnFactory() {
-
-         @Override
-         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
-                                                  final PixelConverter pixelConverter) {
-
-            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager,
-                  "POWERTRAIN_SLOW_VS_FAST_CADENCE_ZONES_DELIMITER", //$NON-NLS-1$
-                  SWT.TRAIL);
-
-            colDef.setColumnCategory(Messages.ColumnFactory_Category_Powertrain);
-            colDef.setColumnLabel(Messages.ColumnFactory_Power_SlowVsFast_CadenceZonesDelimiter_Label);
-            colDef.setColumnHeaderText(Messages.ColumnFactory_Power_SlowVsFast_CadenceZonesDelimiter_Header);
-            colDef.setColumnUnit(Messages.ColumnFactory_Power_SlowVsFast_CadenceZonesDelimiter_Header);
-            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Power_SlowVsFast_CadenceZonesDelimiter_Tooltip);
-
-            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
-
-            return colDef;
-         }
-      };
-
-      POWERTRAIN_SLOW_VS_FAST_CADENCE_PERCENTAGES = new TreeColumnFactory() {
-
-         @Override
-         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
-                                                  final PixelConverter pixelConverter) {
-
-            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager,
-                  "POWERTRAIN_SLOW_VS_FAST_CADENCE_PERCENTAGES", //$NON-NLS-1$
-                  SWT.TRAIL);
-
-            colDef.setColumnCategory(Messages.ColumnFactory_Category_Powertrain);
-            colDef.setColumnLabel(Messages.ColumnFactory_Power_SlowVsFast_CadencePercentages_Label);
-            colDef.setColumnHeaderText(Messages.ColumnFactory_Power_SlowVsFast_CadencePercentages_Header);
-            colDef.setColumnUnit(Messages.ColumnFactory_Power_SlowVsFast_CadencePercentages_Header);
-            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Power_SlowVsFast_CadencePercentages_Tooltip);
-
-            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
-
-            return colDef;
-         }
-      };
-
       /*
        * POWER
        */
@@ -994,6 +949,50 @@ public abstract class TreeColumnFactory {
             colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Power_LeftRightBalance_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
+
+            return colDef;
+         }
+      };
+
+      POWERTRAIN_SLOW_VS_FAST_CADENCE_ZONES_DELIMITER = new TreeColumnFactory() {
+
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager,
+                  "POWERTRAIN_SLOW_VS_FAST_CADENCE_ZONES_DELIMITER", //$NON-NLS-1$
+                  SWT.TRAIL);
+
+            colDef.setColumnCategory(Messages.ColumnFactory_Category_Powertrain);
+            colDef.setColumnLabel(Messages.ColumnFactory_Power_SlowVsFast_CadenceZonesDelimiter_Label);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_Power_SlowVsFast_CadenceZonesDelimiter_Header);
+            colDef.setColumnUnit(Messages.ColumnFactory_Power_SlowVsFast_CadenceZonesDelimiter_Header);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Power_SlowVsFast_CadenceZonesDelimiter_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+
+            return colDef;
+         }
+      };
+
+      POWERTRAIN_SLOW_VS_FAST_CADENCE_PERCENTAGES = new TreeColumnFactory() {
+
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager,
+                  "POWERTRAIN_SLOW_VS_FAST_CADENCE_PERCENTAGES", //$NON-NLS-1$
+                  SWT.TRAIL);
+
+            colDef.setColumnCategory(Messages.ColumnFactory_Category_Powertrain);
+            colDef.setColumnLabel(Messages.ColumnFactory_Power_SlowVsFast_CadencePercentages_Label);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_Power_SlowVsFast_CadencePercentages_Header);
+            colDef.setColumnUnit(Messages.ColumnFactory_Power_SlowVsFast_CadencePercentages_Header);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Power_SlowVsFast_CadencePercentages_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
             return colDef;
          }

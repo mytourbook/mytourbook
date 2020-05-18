@@ -126,6 +126,7 @@ public class UI {
 
    public static final String       SYMBOL_ARROW_UP               = "\u2191";   //$NON-NLS-1$
    public static final String       SYMBOL_ARROW_DOWN             = "\u2193";   //$NON-NLS-1$
+   public static final String       SYMBOL_ARROW_RIGHT            = "\u2192";   //$NON-NLS-1$
    public static final String       SYMBOL_ARROW_LEFT_RIGHT       = "\u2194";   //$NON-NLS-1$
    public static final String       SYMBOL_ARROW_UP_DOWN          = "\u2195";   //$NON-NLS-1$
    public static final String       SYMBOL_AVERAGE                = "\u00f8";   //$NON-NLS-1$

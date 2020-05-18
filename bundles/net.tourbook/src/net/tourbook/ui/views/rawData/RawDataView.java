@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
 import java.nio.file.ClosedWatchServiceException;
+import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -47,6 +48,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
+import net.tourbook.common.FileSystemManager;
+import net.tourbook.common.NIO;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.formatter.FormatManager;
@@ -925,6 +928,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
        * Common preferences
        */
       _prefChangeListenerCommon = new IPropertyChangeListener() {
+
          @Override
          public void propertyChange(final PropertyChangeEvent event) {
 
@@ -3414,6 +3418,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       disposeConfigImages();
 
+      FileSystemManager.closeFileSystems();
+
       super.dispose();
    }
 
@@ -4130,10 +4136,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       try {
 
-         if (osFolder != null && osFolder.trim().length() > 0 && Files.exists(Paths.get(osFolder))) {
+         if (osFolder != null && osFolder.trim().length() > 0) {
+
+            final Path folderPath = NIO.getDeviceFolderPath(osFolder);
 
             // device folder exists
-            return true;
+            return folderPath != null && Files.exists(folderPath);
          }
 
       } catch (final Exception e) {}
@@ -5379,9 +5387,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
             try {
 
-               // keep watcher local because it could be set to null !!!
-               folderWatcher = _folderWatcher = FileSystems.getDefault().newWatchService();
-
                final EasyConfig easyConfig = getEasyConfig();
                final ImportConfig importConfig = easyConfig.getActiveImportConfig();
 
@@ -5391,11 +5396,22 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                boolean isDeviceFolderValid = false;
                final String deviceFolder = importConfig.getDeviceOSFolder();
 
+               final FileSystem tourbookFileSystem = NIO.isTourBookFileSystem(
+                     deviceFolder)
+                           ? FileSystemManager.getFileSystem(deviceFolder) : null;
+
+               // keep watcher local because it could be set to null !!!
+               folderWatcher = _folderWatcher =
+                     tourbookFileSystem != null
+                           ? tourbookFileSystem
+                                 .newWatchService()
+                           : FileSystems.getDefault().newWatchService();
+
                if (deviceFolder != null) {
 
                   try {
 
-                     final Path deviceFolderPath = Paths.get(deviceFolder);
+                     final Path deviceFolderPath = NIO.getDeviceFolderPath(deviceFolder);
 
                      if (Files.exists(deviceFolderPath)) {
 

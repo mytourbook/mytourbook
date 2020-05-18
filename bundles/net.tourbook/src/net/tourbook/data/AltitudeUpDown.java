@@ -21,6 +21,7 @@ public class AltitudeUpDown {
    float altitudeDown;
 
    public AltitudeUpDown(final float altiUp, final float altiDown) {
+
       altitudeUp = altiUp;
       altitudeDown = altiDown;
    }
