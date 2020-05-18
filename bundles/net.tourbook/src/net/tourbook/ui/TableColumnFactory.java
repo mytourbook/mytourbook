@@ -115,6 +115,7 @@ public abstract class TableColumnFactory {
    public static final TableColumnFactory SWIM__TIME_TOUR_TIME_OF_DAY_HH_MM_SS;
 
    public static final TableColumnFactory TIME_BREAK_TIME;
+   public static final TableColumnFactory TIME_DATE;
    public static final TableColumnFactory TIME_DRIVING_TIME;
    public static final String             TIME_DRIVING_TIME_ID          = "TIME_DRIVING_TIME_ID";       //$NON-NLS-1$
    public static final TableColumnFactory TIME_PAUSED_TIME;
@@ -1711,10 +1712,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(
-                  columnManager,
-                  "TIME_BREAK_TIME", //$NON-NLS-1$
-                  SWT.TRAIL);
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "TIME_BREAK_TIME", SWT.TRAIL); //$NON-NLS-1$
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
             colDef.setColumnLabel(Messages.ColumnFactory_BreakTime_Label);
@@ -1722,6 +1720,24 @@ public abstract class TableColumnFactory {
             colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_BreakTime_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(3));
+
+            return colDef;
+         }
+      };
+
+      TIME_DATE = new TableColumnFactory() {
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "TIME_DATE", SWT.LEAD); //$NON-NLS-1$
+
+            colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
+            colDef.setColumnLabel(Messages.ColumnFactory_date_label);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_date);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_date_tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(18));
 
             return colDef;
          }

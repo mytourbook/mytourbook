@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -821,7 +821,7 @@ public class ColumnManager {
       /*
        * Header: > Columns <
        */
-       {
+      {
          final MenuItem menuItem = new MenuItem(contextMenu, SWT.PUSH);
          menuItem.setText(Messages.Action_ColumnManager_Column_Info);
          menuItem.setEnabled(false);
@@ -1913,6 +1913,16 @@ public class ColumnManager {
       }
    }
 
+   /**
+    * @param isCategoryAvailable
+    *           When <code>true</code>, columns can be categorized which is displayed in the UI but
+    *           it has no
+    *           other functions, default is <code>false</code>.
+    *           <p>
+    *           When only a view columns are contained in a view then it does not make sense to
+    *           categorize
+    *           these columns.
+    */
    public void setIsCategoryAvailable(final boolean isCategoryAvailable) {
       _isCategoryAvailable = isCategoryAvailable;
    }
