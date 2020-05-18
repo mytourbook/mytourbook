@@ -74,6 +74,7 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
              * Authorize button
              */
             _btnAuthorizeConnection = new Button(container, SWT.NONE);
+            setButtonLayoutData(_btnAuthorizeConnection);
             _btnAuthorizeConnection.setText(Messages.Pref_CloudConnectivity_Dropbox_Button_Authorize);
             _btnAuthorizeConnection.addSelectionListener(new SelectionAdapter() {
 
@@ -98,6 +99,7 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
              * Choose Dropbox folder
              */
             _btnChooseFolder = new Button(container, SWT.NONE);
+            setButtonLayoutData(_btnChooseFolder);
             _btnChooseFolder.setEnabled(false);
             _btnChooseFolder.setText(Messages.Pref_CloudConnectivity_Dropbox_Button_ChooseFolder);
             _btnChooseFolder.addSelectionListener(new SelectionAdapter() {
