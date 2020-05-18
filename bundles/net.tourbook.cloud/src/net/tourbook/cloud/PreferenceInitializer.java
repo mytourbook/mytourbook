@@ -15,14 +15,21 @@
  *******************************************************************************/
 package net.tourbook.cloud;
 
-public interface ICloudPreferences {
+import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
+import org.eclipse.jface.preference.IPreferenceStore;
 
-   public static final String PREF_PAGE_DROPBOX = "net.tourbook.cloud.dropbox.PrefPageDropbox";//$NON-NLS-1$
+public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
-   /*
-    * Dropbox preferences
-    */
-   public static final String DROPBOX_ACCESSTOKEN = "DROPBOX_ACCESSTOKEN"; //$NON-NLS-1$
-   public static final String DROPBOX_FOLDER      = "DROPBOX_FOLDER";      //$NON-NLS-1$
+   public PreferenceInitializer() {}
+
+   @Override
+   public void initializeDefaultPreferences() {
+
+      final IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+
+      store.setDefault(IPreferences.DROPBOX_ACCESSTOKEN, "");
+
+      store.setDefault(IPreferences.DROPBOX_FOLDER, "");
+   }
 
 }

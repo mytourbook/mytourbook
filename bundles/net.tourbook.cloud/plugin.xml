@@ -21,5 +21,13 @@
             name="Dropbox">
       </page>
    </extension>
+   
+    <extension   point="org.eclipse.core.runtime.preferences">
+   
+      <initializer
+         class="net.tourbook.cloud.PreferenceInitializer"
+      />
+
+   </extension>
 
 </plugin>

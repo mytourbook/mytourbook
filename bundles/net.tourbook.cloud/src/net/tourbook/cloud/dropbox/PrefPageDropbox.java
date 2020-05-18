@@ -16,7 +16,7 @@
 package net.tourbook.cloud.dropbox;
 
 import net.tourbook.cloud.Activator;
-import net.tourbook.cloud.ICloudPreferences;
+import net.tourbook.cloud.IPreferences;
 import net.tourbook.cloud.oauth2.OAuth2Client;
 import net.tourbook.cloud.oauth2.OAuth2RequestAction;
 import net.tourbook.common.util.StringUtils;
@@ -198,8 +198,8 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
    @Override
    protected void performDefaults() {
 
-      _textAccessToken.setText(_prefStore.getDefaultString(ICloudPreferences.DROPBOX_ACCESSTOKEN));
-      _textFolderPath.setText(_prefStore.getDefaultString(ICloudPreferences.DROPBOX_FOLDER));
+      _textAccessToken.setText(_prefStore.getDefaultString(IPreferences.DROPBOX_ACCESSTOKEN));
+      _textFolderPath.setText(_prefStore.getDefaultString(IPreferences.DROPBOX_FOLDER));
 
       enableControls();
 
@@ -213,16 +213,16 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
 
       if (isOK) {
 
-         _prefStore.setValue(ICloudPreferences.DROPBOX_ACCESSTOKEN, _textAccessToken.getText());
-         _prefStore.setValue(ICloudPreferences.DROPBOX_FOLDER, _textFolderPath.getText());
+         _prefStore.setValue(IPreferences.DROPBOX_ACCESSTOKEN, _textAccessToken.getText());
+         _prefStore.setValue(IPreferences.DROPBOX_FOLDER, _textFolderPath.getText());
       }
 
       return isOK;
    }
 
    private void restoreState() {
-      _textAccessToken.setText(_prefStore.getString(ICloudPreferences.DROPBOX_ACCESSTOKEN));
-      _textFolderPath.setText(_prefStore.getString(ICloudPreferences.DROPBOX_FOLDER));
+      _textAccessToken.setText(_prefStore.getString(IPreferences.DROPBOX_ACCESSTOKEN));
+      _textFolderPath.setText(_prefStore.getString(IPreferences.DROPBOX_FOLDER));
 
       enableControls();
    }

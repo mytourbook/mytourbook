@@ -29,7 +29,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.tourbook.cloud.Activator;
-import net.tourbook.cloud.ICloudPreferences;
+import net.tourbook.cloud.IPreferences;
 import net.tourbook.common.TourbookFileSystem;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
@@ -56,8 +56,8 @@ public class DropboxFileSystem extends TourbookFileSystem {
          @Override
          public void propertyChange(final PropertyChangeEvent event) {
 
-            if (event.getProperty().equals(ICloudPreferences.DROPBOX_ACCESSTOKEN) ||
-                  event.getProperty().equals(ICloudPreferences.DROPBOX_FOLDER)) {
+            if (event.getProperty().equals(IPreferences.DROPBOX_ACCESSTOKEN) ||
+                  event.getProperty().equals(IPreferences.DROPBOX_FOLDER)) {
 
                closeDropboxFileSystem();
 
@@ -112,7 +112,7 @@ public class DropboxFileSystem extends TourbookFileSystem {
       final URI uri = URI.create("dropbox://root"); //$NON-NLS-1$
       final Map<String, String> env = new HashMap<>();
 
-      final String accessToken = _prefStore.getString(ICloudPreferences.DROPBOX_ACCESSTOKEN);
+      final String accessToken = _prefStore.getString(IPreferences.DROPBOX_ACCESSTOKEN);
       if (StringUtils.isNullOrEmpty(accessToken)) {
          _dropboxFileSystem = null;
          return result;
@@ -179,7 +179,7 @@ public class DropboxFileSystem extends TourbookFileSystem {
          return null;
       }
 
-      final String dropboxFilePath = _prefStore.getString(ICloudPreferences.DROPBOX_FOLDER);
+      final String dropboxFilePath = _prefStore.getString(IPreferences.DROPBOX_FOLDER);
       return _dropboxFileSystem.getPath(dropboxFilePath);
    }
 }

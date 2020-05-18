@@ -26,7 +26,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import net.tourbook.cloud.Activator;
-import net.tourbook.cloud.ICloudPreferences;
+import net.tourbook.cloud.IPreferences;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
@@ -50,7 +50,7 @@ public class DropboxClient {
          @Override
          public void propertyChange(final PropertyChangeEvent event) {
 
-            if (event.getProperty().equals(ICloudPreferences.DROPBOX_ACCESSTOKEN)) {
+            if (event.getProperty().equals(IPreferences.DROPBOX_ACCESSTOKEN)) {
 
                // Re create the Dropbox client
                createDefaultDropboxClient();
@@ -109,7 +109,7 @@ public class DropboxClient {
     */
    private static void createDefaultDropboxClient() {
 
-      _accessToken = _prefStore.getString(ICloudPreferences.DROPBOX_ACCESSTOKEN);
+      _accessToken = _prefStore.getString(IPreferences.DROPBOX_ACCESSTOKEN);
 
       _dropboxClient = createDropboxClient(_accessToken);
    }
