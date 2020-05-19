@@ -10,6 +10,9 @@ TODO's
 New + Improvements
 ==================
 
+* Tour Book view
+  - Show tours in a flat view (not categorized by year/month/week)
+
 * Calendar view
   - Tour pulse/power average values are displayed in the tour (day) content cell
 
@@ -36,6 +39,9 @@ Changes
 * CSV Export
   The csv export is now exporting all Tour Book view columns, existing csv column headers may also be modified 
 
+* Tour Book view
+  Any existing column profiles must be recreated
+
 
 Fixes   
 =====
@@ -55,6 +61,7 @@ Fixes
 * Tour Editor
   - Show daytime with am/pm in time slices/swim slices when imperial measurement system is selected
   - Fixed daytime to be not >24h
+   
    
 Translation    
 ===========

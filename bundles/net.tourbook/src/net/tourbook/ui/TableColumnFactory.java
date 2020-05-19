@@ -47,8 +47,13 @@ public abstract class TableColumnFactory {
    public static final String             BODY_AVG_PULSE_ID             = "BODY_AVG_PULSE";             //$NON-NLS-1$
    public static final TableColumnFactory BODY_AVG_PULSE_DIFFERENCE;
    public static final TableColumnFactory BODY_CALORIES;
+   public static final TableColumnFactory BODY_PERSON;
    public static final TableColumnFactory BODY_PULSE;
+   public static final TableColumnFactory BODY_PULSE_MAX;
+   public static final TableColumnFactory BODY_RESTPULSE;
+   public static final TableColumnFactory BODY_WEIGHT;
 
+   public static final TableColumnFactory DATA_DP_TOLERANCE;
    public static final TableColumnFactory DATA_FIRST_COLUMN;
    public static final TableColumnFactory DATA_IMPORT_FILE_PATH;
    public static final TableColumnFactory DATA_IMPORT_FILE_NAME;
@@ -517,9 +522,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager,
-                  BODY_AVG_PULSE_ID,
-                  SWT.TRAIL);
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, BODY_AVG_PULSE_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Body);
             colDef.setColumnLabel(Messages.ColumnFactory_avg_pulse_label);
@@ -528,7 +531,7 @@ public abstract class TableColumnFactory {
             colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_avg_pulse_tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
-            colDef.setValueFormats(//
+            colDef.setValueFormats(
                   ValueFormatSet.Number,
                   ValueFormat.NUMBER_1_1,
                   columnManager);
@@ -543,9 +546,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager,
-                  "BODY_AVG_PULSE_DIFFERENCE", //$NON-NLS-1$
-                  SWT.TRAIL);
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "BODY_AVG_PULSE_DIFFERENCE", SWT.TRAIL); //$NON-NLS-1$
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Body);
             colDef.setColumnLabel(Messages.ColumnFactory_avg_pulse_difference_label);
@@ -565,9 +566,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager,
-                  "BODY_CALORIES", //$NON-NLS-1$
-                  SWT.TRAIL);
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "BODY_CALORIES", SWT.TRAIL); //$NON-NLS-1$
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Body);
             colDef.setColumnLabel(Messages.ColumnFactory_calories_label);
@@ -576,6 +575,24 @@ public abstract class TableColumnFactory {
             colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_calories_tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
+
+            return colDef;
+         }
+      };
+
+      BODY_PERSON = new TableColumnFactory() {
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "BODY_PERSON", SWT.LEAD); //$NON-NLS-1$
+
+            colDef.setColumnCategory(Messages.ColumnFactory_Category_Body);
+            colDef.setColumnLabel(Messages.ColumnFactory_TourPerson);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_TourPerson);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_TourPerson_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
 
             return colDef;
          }
@@ -605,9 +622,84 @@ public abstract class TableColumnFactory {
          }
       };
 
+      BODY_PULSE_MAX = new TableColumnFactory() {
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "BODY_PULSE_MAX", SWT.TRAIL); //$NON-NLS-1$
+
+            colDef.setColumnCategory(Messages.ColumnFactory_Category_Body);
+            colDef.setColumnLabel(Messages.ColumnFactory_max_pulse_label);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_max_pulse);
+            colDef.setColumnUnit(Messages.ColumnFactory_max_pulse);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_max_pulse_tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
+
+            return colDef;
+         }
+      };
+
+      BODY_RESTPULSE = new TableColumnFactory() {
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "BODY_RESTPULSE", SWT.TRAIL); //$NON-NLS-1$
+
+            colDef.setColumnCategory(Messages.ColumnFactory_Category_Body);
+            colDef.setColumnLabel(Messages.ColumnFactory_restpulse_label);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_restpulse);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_restpulse_tooltip);
+            colDef.setColumnUnit(Messages.ColumnFactory_restpulse);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(7));
+
+            return colDef;
+         }
+      };
+
+      BODY_WEIGHT = new TableColumnFactory() {
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "BODY_WEIGHT", SWT.TRAIL); //$NON-NLS-1$
+
+            colDef.setColumnCategory(Messages.ColumnFactory_Category_Body);
+            colDef.setColumnLabel(Messages.ColumnFactory_BodyWeight_Label);
+            colDef.setColumnHeaderText(UI.UNIT_LABEL_WEIGHT);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_BodyWeight_Tooltip);
+            colDef.setColumnUnit(UI.UNIT_LABEL_WEIGHT);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(7));
+
+            return colDef;
+         }
+      };
+
       /*
        * Data
        */
+
+      DATA_DP_TOLERANCE = new TableColumnFactory() {
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "DATA_DP_TOLERANCE", SWT.TRAIL); //$NON-NLS-1$
+
+            colDef.setColumnCategory(Messages.ColumnFactory_Category_Data);
+            colDef.setColumnLabel(Messages.ColumnFactory_DPTolerance_Label);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_DPTolerance_Header);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_DPTolerance_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(6));
+
+            return colDef;
+         }
+      };
 
       DATA_FIRST_COLUMN = new TableColumnFactory() {
 
