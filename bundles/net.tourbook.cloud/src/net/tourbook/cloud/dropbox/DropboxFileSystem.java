@@ -95,8 +95,14 @@ public class DropboxFileSystem extends TourbookFileSystem {
    }
 
    @Override
-   protected File copyFileLocally(final String dropboxFilePath2) {
-      return DropboxClient.CopyLocally(dropboxFilePath2).toFile();
+   protected File copyFileLocally(final String dropboxFilePath) {
+      final Path localFilePath = DropboxClient.CopyLocally(dropboxFilePath);
+
+      if (localFilePath != null) {
+         return localFilePath.toFile();
+      }
+
+      return null;
    }
 
    /**
