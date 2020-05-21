@@ -156,11 +156,10 @@ public class DataProvider_HrZone_Week extends DataProvider {
             + (" ORDER BY StartWeekYear, StartWeek") + NL //$NON-NLS-1$
       ;
 
-      try {
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          final int[][] dbHrZoneValues = new int[serieLength][valueLength];
 
-         final Connection conn = TourDatabase.getInstance().getConnection();
          {
             final PreparedStatement statement = conn.prepareStatement(sqlString);
             sqlFilter.setParameters(statement, 1);
@@ -194,7 +193,6 @@ public class DataProvider_HrZone_Week extends DataProvider {
                dbHrZoneValues[9][weekIndex] = result.getInt(12);
             }
          }
-         conn.close();
 
          _weekData.hrZoneValues = dbHrZoneValues;
 

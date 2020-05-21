@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,12 +18,10 @@ package net.tourbook.common.color;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -531,10 +529,11 @@ public class Map3GradientColorManager {
             true,
             true,
             new RGBVertex[] {
-                  new RGBVertex(0, 181, 0, 0, 1.0f),
-                  new RGBVertex(150, 255, 106, 0, 1.0f),
-                  new RGBVertex(300, 255, 255, 255, 1.0f),
-                  new RGBVertex(450, 0, 170, 255, 1.0f), },
+                  new RGBVertex(10, 181, 0, 0, 1.0f),
+                  new RGBVertex(20, 255, 106, 0, 1.0f),
+                  new RGBVertex(30, 255, 255, 255, 1.0f),
+                  new RGBVertex(40, 0, 170, 255, 1.0f)
+            },
             MapColorProfile.BRIGHTNESS_DEFAULT,
             60,
             MapColorProfile.BRIGHTNESS_DEFAULT,
@@ -545,9 +544,12 @@ public class Map3GradientColorManager {
             true,
             true,
             new RGBVertex[] {
-                  new RGBVertex(0, 0, 0, 0, 1.0f),
-                  new RGBVertex(90, 43, 80, 255, 1.0f),
-                  new RGBVertex(240, 255, 255, 0, 1.0f), },
+                  new RGBVertex(4, 38, 24, 0, 1.0f),
+                  new RGBVertex(6, 255, 255, 0, 1.0f),
+                  new RGBVertex(8, 255, 50, 0, 1.0f),
+                  new RGBVertex(10, 0, 144, 255, 1.0f),
+                  new RGBVertex(12, 87, 255, 255, 1.0f)
+            },
             MapColorProfile.BRIGHTNESS_DEFAULT,
             60,
             MapColorProfile.BRIGHTNESS_DEFAULT,
@@ -981,31 +983,17 @@ public class Map3GradientColorManager {
          return null;
       }
 
-      InputStreamReader reader = null;
-
       ArrayList<Map3ColorDefinition> colorDefinitions = null;
 
-      try {
-         reader = new InputStreamReader(new FileInputStream(file), UI.UTF_8);
+      try (FileInputStream inputStream = new FileInputStream(file);
+            InputStreamReader reader = new InputStreamReader(inputStream, UI.UTF_8)) {
 
          final XMLMemento xmlRoot = XMLMemento.createReadRoot(reader);
 
          colorDefinitions = readColors_10_MapColors(xmlRoot);
 
-      } catch (final UnsupportedEncodingException e) {
+      } catch (final IOException | WorkbenchException e) {
          StatusUtil.log(e);
-      } catch (final FileNotFoundException e) {
-         StatusUtil.log(e);
-      } catch (final WorkbenchException e) {
-         StatusUtil.log(e);
-      } finally {
-         if (reader != null) {
-            try {
-               reader.close();
-            } catch (final IOException e) {
-               StatusUtil.log(e);
-            }
-         }
       }
 
       /*
@@ -1156,7 +1144,7 @@ public class Map3GradientColorManager {
    }
 
    /**
-    * Write map color data into a xml file.
+    * Write map color data into a XML file.
     */
    public static void saveColors() {
 

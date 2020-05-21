@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -86,6 +86,7 @@ public class TrackPointAnnotation extends GlobeAnnotation {
 //		drawLine(dc, annotationPoint);
    }
 
+   @SuppressWarnings("unused")
    private void drawLine(final DrawContext dc, final Vec4 annotationPoint) {
 
       if (dc.isPickingMode()) {

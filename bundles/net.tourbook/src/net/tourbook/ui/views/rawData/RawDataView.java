@@ -5471,9 +5471,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                }
                while (watchKey.reset());
 
-            } catch (final InterruptedException e) {
-               //
-            } catch (final ClosedWatchServiceException e) {
+            } catch (final InterruptedException | ClosedWatchServiceException e) {
                //
             } catch (final Exception e) {
                TourLogManager.logEx(e);

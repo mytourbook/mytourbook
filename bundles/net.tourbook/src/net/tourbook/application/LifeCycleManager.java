@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -25,7 +25,6 @@ import org.eclipse.equinox.app.IApplicationContext;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventHandler;
 
-@SuppressWarnings("restriction")
 public class LifeCycleManager {
 
    private static final String SPLASH_IMAGE_FILE_NAME = "splash.bmp";//$NON-NLS-1$

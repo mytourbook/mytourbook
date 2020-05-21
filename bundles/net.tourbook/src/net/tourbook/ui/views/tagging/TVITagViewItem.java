@@ -107,7 +107,7 @@ public abstract class TVITagViewItem extends TreeViewerItem {
     */
    public static void readTagTotals(final TVITagView_Tag tagItem) {
 
-      try {
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          final SQLFilter sqlFilter = new SQLFilter();
 
@@ -126,7 +126,6 @@ public abstract class TVITagViewItem extends TreeViewerItem {
                + " WHERE jtblTagData.TourTag_TagId = ?" //$NON-NLS-1$
                + sqlFilter.getWhereClause();
 
-         final Connection conn = TourDatabase.getInstance().getConnection();
          final PreparedStatement statement = conn.prepareStatement(sql);
          statement.setLong(1, tagItem.getTagId());
          sqlFilter.setParameters(statement, 2);
@@ -135,8 +134,6 @@ public abstract class TVITagViewItem extends TreeViewerItem {
          while (result.next()) {
             tagItem.readSumColumnData(result, 1);
          }
-
-         conn.close();
 
          if (tagItem.colTourCounter == 0) {
 

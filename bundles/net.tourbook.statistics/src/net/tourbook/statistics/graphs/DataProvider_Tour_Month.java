@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -178,7 +178,7 @@ public class DataProvider_Tour_Month extends DataProvider {
 
       final int numMonths = 12 * numYears;
 
-      try {
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          final float[][] dbAltitude = new float[numTourTypes][numMonths];
          final float[][] dbDistance = new float[numTourTypes][numMonths];
@@ -194,7 +194,6 @@ public class DataProvider_Tour_Month extends DataProvider {
          final long[] usedTourTypeIds = new long[numTourTypes];
          Arrays.fill(usedTourTypeIds, TourType.TOUR_TYPE_IS_NOT_USED);
 
-         final Connection conn = TourDatabase.getInstance().getConnection();
          final PreparedStatement statement = conn.prepareStatement(sqlString);
          sqlFilter.setParameters(statement, 1);
 
@@ -252,8 +251,6 @@ public class DataProvider_Tour_Month extends DataProvider {
             tourTypeSum[colorIndex] += dbValue_Distance + dbValue_Altitude + dbValue_RecordingTime;
 
          }
-
-         conn.close();
 
          /*
           * Remove not used tour types

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -59,15 +59,12 @@ public class GPXDeviceDataReader extends TourbookDevice {
 
 	private InputStream convertIntoWellFormedXml(final String importFilePath) {
 
-		BufferedReader fileReader = null;
 		StringWriter xmlWriter = null;
 
-		try {
+		try ( FileInputStream inputStream = new FileInputStream(importFilePath);
+		      BufferedReader fileReader = new BufferedReader(new InputStreamReader(inputStream, UI.UTF_8))) {
 
 			xmlWriter = new StringWriter();
-
-			final FileInputStream inputStream = new FileInputStream(importFilePath);
-			fileReader = new BufferedReader(new InputStreamReader(inputStream, UI.UTF_8));
 
 			// write "<?xml ..." to be well conformed
 			xmlWriter.write(XML_HEADER);
@@ -81,11 +78,8 @@ public class GPXDeviceDataReader extends TourbookDevice {
 			}
 
 		} catch (final Exception e1) {
-
 			StatusUtil.log(e1);
-
 		} finally {
-			Util.closeReader(fileReader);
 			Util.closeWriter(xmlWriter);
 		}
 
@@ -136,13 +130,8 @@ public class GPXDeviceDataReader extends TourbookDevice {
 	 */
 	private boolean isGPXFile(final String importFilePath) {
 
-		BufferedReader fileReader = null;
-
-		try {
-
-			final FileInputStream inputStream = new FileInputStream(importFilePath);
-
-			fileReader = new BufferedReader(new InputStreamReader(inputStream, UI.UTF_8));
+		try (FileInputStream inputStream = new FileInputStream(importFilePath);
+		      BufferedReader fileReader = new BufferedReader(new InputStreamReader(inputStream, UI.UTF_8))){
 
 			String line;
 
@@ -157,8 +146,6 @@ public class GPXDeviceDataReader extends TourbookDevice {
 
 			StatusUtil.log(e1);
 
-		} finally {
-			Util.closeReader(fileReader);
 		}
 
 		return false;

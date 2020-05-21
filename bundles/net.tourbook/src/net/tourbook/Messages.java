@@ -98,6 +98,8 @@ public class Messages extends NLS {
    public static String        Calendar_Profile_Value_MovingTime;
    public static String        Calendar_Profile_Value_Pace;
    public static String        Calendar_Profile_Value_PausedTime;
+   public static String        Calendar_Profile_Value_PowerAvg;
+   public static String        Calendar_Profile_Value_PulseAvg;
    public static String        Calendar_Profile_Value_RecordingTime;
    public static String        Calendar_Profile_Value_ShowNothing;
    public static String        Calendar_Profile_Value_Speed;
@@ -142,6 +144,14 @@ public class Messages extends NLS {
    public static String        dialog_export_shell_text;
    public static String        dialog_export_txt_filePath_tooltip;
 
+   public static String        Dialog_AdjustAltitude_Label_ElevationGain;
+   public static String        Dialog_AdjustAltitude_Label_ElevationGain_After_Tooltip;
+   public static String        Dialog_AdjustAltitude_Label_ElevationGain_Before_Tooltip;
+   public static String        Dialog_AdjustAltitude_Label_ElevationGain_Diff_Tooltip;
+   public static String        Dialog_AdjustAltitude_Label_ElevationLoss;
+   public static String        Dialog_AdjustAltitude_Label_ElevationLoss_After_Tooltip;
+   public static String        Dialog_AdjustAltitude_Label_ElevationLoss_Before_Tooltip;
+   public static String        Dialog_AdjustAltitude_Label_ElevationLoss_Diff_Tooltip;
    public static String        Dialog_AdjustAltitude_Link_ApproachWholeTour;
 
    public static String        Dialog_AdjustTemperature_Button_AdjustTemperature;
@@ -2091,6 +2101,8 @@ public class Messages extends NLS {
    public static String Slideout_Map_Options_Checkbox_ZoomWithMousePosition_Tooltip;
    public static String Slideout_Map_Options_Label_SliderPath_Segements;
    public static String Slideout_Map_Options_Checkbox_ChartSlider;
+   public static String Slideout_Map_Options_Checkbox_ShowEnhancedWarning;
+   public static String Slideout_Map_Options_Checkbox_ShowEnhancedWarning_Tooltip;
    public static String Slideout_Map_Options_Checkbox_ShowHoveredSelectedTour;
    public static String Slideout_Map_Options_Checkbox_ShowHoveredSelectedTour_Tooltip;
    public static String Slideout_Map_Options_Checkbox_SliderPath;
@@ -2462,7 +2474,7 @@ public class Messages extends NLS {
    public static String Tour_Editor_Label_Temperature_Max_Tooltip;
    public static String Tour_Editor_Label_Temperature_Min_Tooltip;
    public static String Tour_Editor_Label_Temperature_Tooltip;
-   public static String Tour_Editor_Label_Temperature_WindCill_Tooltip;
+   public static String Tour_Editor_Label_Temperature_WindChill_Tooltip;
    public static String Tour_Editor_Label_TimeZone;
    public static String Tour_Editor_Label_TourStartTime_Tooltip;
    public static String Tour_Editor_Label_Weather;

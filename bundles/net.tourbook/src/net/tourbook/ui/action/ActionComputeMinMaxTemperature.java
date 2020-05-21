@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,7 +24,6 @@ import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.SQL;
-import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TourEventId;
@@ -108,10 +107,7 @@ public class ActionComputeMinMaxTemperature extends Action {
 
       start = System.currentTimeMillis();
 
-      Connection conn = null;
-      try {
-
-         conn = TourDatabase.getInstance().getConnection();
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          isTaskDone = setMinMaxTemperature(conn, selectedTours);
 
@@ -123,8 +119,6 @@ public class ActionComputeMinMaxTemperature extends Action {
 
          // Performed in %.3f s
          TourLogManager.logDefault(String.format(Messages.Log_App_PerformedInNSeconds, (System.currentTimeMillis() - start) / 1000.0));
-
-         Util.closeSql(conn);
 
          if (isTaskDone) {
 

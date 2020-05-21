@@ -3645,18 +3645,17 @@ public class Fmath{
 
         // COPY OF AN OBJECT (deprecated - see Conv class)
         // Returns a copy of the object
-        // An exception will be thrown if an attempt to copy a non-serialisable object is made.
+        // An exception will be thrown if an attempt to copy a non-serializable object is made.
         // Taken, with minor changes,  from { Java Techniques }
         // http://javatechniques.com/blog/
         public static Object copyObject(Object obj) {
             Object objCopy = null;
-            try {
+            try (ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                  ObjectOutputStream oos = new ObjectOutputStream(bos)){
                 // Write the object out to a byte array
-                ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                ObjectOutputStream oos = new ObjectOutputStream(bos);
+                
                 oos.writeObject(obj);
                 oos.flush();
-                oos.close();
                 // Make an input stream from the byte array and
                 // read a copy of the object back in.
                 ObjectInputStream ois = new ObjectInputStream(

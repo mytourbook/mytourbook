@@ -146,7 +146,7 @@ public class DataProvider_HrZone_Month extends DataProvider {
             + (" ORDER BY StartYear, StartMonth") + NL //                     //$NON-NLS-1$
       ;
 
-      try {
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          final int maxZones = 10; // hr zones: 0...9
          final int serieLength = maxZones;
@@ -154,7 +154,6 @@ public class DataProvider_HrZone_Month extends DataProvider {
 
          final int[][] dbHrZones = new int[serieLength][valueLength];
 
-         final Connection conn = TourDatabase.getInstance().getConnection();
          {
             final PreparedStatement statement = conn.prepareStatement(sqlString);
             sqlFilter.setParameters(statement, 1);
@@ -180,7 +179,6 @@ public class DataProvider_HrZone_Month extends DataProvider {
                dbHrZones[9][monthIndex] = result.getInt(12);
             }
          }
-         conn.close();
 
          _monthData.hrZoneValues = dbHrZones;
 

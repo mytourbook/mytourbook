@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -80,16 +80,14 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
     * @return Returns the JSON content.
     */
    private String GetJsonContentFromGZipFile(final String gzipFilePath, final boolean isValidatingFile) {
+      
       String jsonFileContent = null;
-      FileInputStream fis = null;
-      GZIPInputStream gzip = null;
-      BufferedReader br = null;
-      try {
-         fis = new FileInputStream(gzipFilePath);
-         gzip = new GZIPInputStream(fis);
-         br = new BufferedReader(new InputStreamReader(gzip));
+      try (FileInputStream fis = new FileInputStream(gzipFilePath);
+            GZIPInputStream gzip = new GZIPInputStream(fis);
+            BufferedReader br = new BufferedReader(new InputStreamReader(gzip))) {
 
          jsonFileContent = br.readLine();
+
       } catch (final IOException e) {
 
          /*
@@ -101,21 +99,6 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
          }
 
          return UI.EMPTY_STRING;
-      } finally {
-         try {
-            // close resources
-            if (br != null) {
-               br.close();
-            }
-            if (gzip != null) {
-               gzip.close();
-            }
-            if (fis != null) {
-               fis.close();
-            }
-         } catch (final IOException e) {
-            e.printStackTrace();
-         }
       }
 
       return jsonFileContent;
@@ -144,7 +127,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
     * @return Returns <code>true</code> when the file contains content of a valid activity.
     */
    protected boolean isValidActivity(final String jsonFileContent) {
-      final BufferedReader fileReader = null;
+
       try {
 
          if (jsonFileContent == null ||
@@ -163,7 +146,6 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
                            currentSample.contains(SuuntoJsonProcessor.TAG_LONGITUDE) ||
                            currentSample.contains(SuuntoJsonProcessor.TAG_LATITUDE) ||
                            currentSample.contains(SuuntoJsonProcessor.TAG_ALTITUDE))) {
-                  Util.closeReader(fileReader);
                   return true;
                }
             }
@@ -173,13 +155,9 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
             return false;
          }
 
-      } catch (
-
-      final Exception e) {
+      } catch (final Exception e) {
          StatusUtil.log(e);
          return false;
-      } finally {
-         Util.closeReader(fileReader);
       }
 
       return false;

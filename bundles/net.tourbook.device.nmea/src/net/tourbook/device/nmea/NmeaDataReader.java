@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,7 +18,6 @@ package net.tourbook.device.nmea;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -192,10 +191,8 @@ public class NmeaDataReader extends TourbookDevice {
       long nmeaTypes = Nmea0183.TYPE_NONE;
       boolean startParsing = false;
 
-      BufferedReader reader = null;
-
-      try {
-         reader = new BufferedReader(new FileReader(file));
+      try (FileReader fileReader = new FileReader(file);
+            BufferedReader reader = new BufferedReader(fileReader)) {
 
          while ((nmeaLine = reader.readLine()) != null) {
 
@@ -256,15 +253,6 @@ public class NmeaDataReader extends TourbookDevice {
 
       } catch (final Exception e) {
          StatusUtil.log(e);
-      } finally {
-
-         if (reader != null) {
-            try {
-               reader.close();
-            } catch (final IOException e) {
-               StatusUtil.log(e);
-            }
-         }
       }
 
 //   Begin of O. Budischewski, 2008.03.20
@@ -328,10 +316,9 @@ public class NmeaDataReader extends TourbookDevice {
    @Override
    public boolean validateRawData(final String fileName) {
 
-      BufferedReader reader = null;
+      try (FileReader fileReader = new FileReader(fileName);
+            BufferedReader reader = new BufferedReader(fileReader)) {
 
-      try {
-         reader = new BufferedReader(new FileReader(fileName));
          String nmeaLine;
 
          while ((nmeaLine = reader.readLine()) != null) {
@@ -342,14 +329,6 @@ public class NmeaDataReader extends TourbookDevice {
 
       } catch (final Exception e) {
          StatusUtil.log(e);
-      } finally {
-         if (reader != null) {
-            try {
-               reader.close();
-            } catch (final IOException e) {
-               StatusUtil.log(e);
-            }
-         }
       }
 
       return false;

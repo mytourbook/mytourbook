@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -62,7 +62,7 @@ public class TileImageCache {
    private static final ConcurrentHashMap<String, Image> _imageCache                = new ConcurrentHashMap<>();
    private static final ConcurrentLinkedQueue<String>    _imageCacheFifo            = new ConcurrentLinkedQueue<>();
 
-   private static final ArrayList<Image>                 _allImages                 = new ArrayList();
+   private static final ArrayList<Image>                 _allImages                 = new ArrayList<>();
 
    /**
     * Path from user preferences where tile images are stored
