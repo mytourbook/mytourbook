@@ -34,12 +34,12 @@ public class TVITourBookTour extends TVITourBookItem {
    HashSet<Long>           sqlMarkerIds;
 
    /**
-    * id's for the tags or <code>null</code> when tags are not available
+    * Id's for the tags or <code>null</code> when tags are not available
     */
    private ArrayList<Long> _tagIds;
 
    /**
-    * id's for the markers or <code>null</code> when markers are not available
+    * Id's for the markers or <code>null</code> when markers are not available
     */
    private ArrayList<Long> _markerIds;
 
@@ -52,6 +52,19 @@ public class TVITourBookTour extends TVITourBookItem {
       super(view);
 
       setParentItem(parentItem);
+   }
+
+   @Override
+   public void clearChildren() {
+
+      // cleanup
+      sqlTagIds = null;
+      sqlMarkerIds = null;
+      
+      _tagIds = null;
+      _markerIds = null;
+
+      super.clearChildren();
    }
 
    @Override

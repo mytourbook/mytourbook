@@ -35,8 +35,6 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
    static ZonedDateTime calendar8 = ZonedDateTime.now().with(TimeTools.calendarWeek.dayOfWeek(), 1);
 
-   static final char    NL        = net.tourbook.common.UI.NEW_LINE;
-
    static final String  SQL_ALL_TOUR_FIELDS;
    static final String  SQL_SUM_COLUMNS;
    static final String  SQL_SUM_FIELDS;
@@ -272,10 +270,10 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
     * Month starts with 1 for January
     */
    int          tourMonth;
+
    int          tourWeek;
    int          tourYearSub;
    int          tourDay;
-
    /**
     * Contains the tour date time with time zone info when available
     */
@@ -283,46 +281,46 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
    String       colTimeZoneId;
 
    String       colTourTitle;
+
    String       colTourLocation_Start;   // tourStartPlace
    String       colTourLocation_End;     // tourEndPlace
-
    long         colPersonId;             // tourPerson_personId
 
    long         colCounter;
+
    long         colCalories;
    long         colTourDistance;
    float        colBodyWeight;
-
    long         colTourRecordingTime;
+
    long         colTourDrivingTime;
    long         colPausedTime;
-
    long         colAltitudeUp;
+
    long         colAltitudeDown;
    float        colAltitude_AvgChange;
-
    float        colMaxSpeed;
+
    long         colMaxAltitude;
    long         colMaxPulse;
-
    float        colAvgSpeed;
+
    float        colAvgPace;
    float        colAvgPulse;
    float        colAvgCadence;
-
    float        colTemperature_Avg;
+
    float        colTemperature_Min;
    float        colTemperature_Max;
-
    int          colWindSpd;
+
    int          colWindDir;
    String       colClouds;
    int          colRestPulse;
-
    int          colWeekNo;
+
    String       colWeekDay;
    int          colWeekYear;
-
    long         colNumberOfTimeSlices;
    long         colNumberOfPhotos;
 
@@ -341,20 +339,20 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
    int   colRunDyn_StanceTime_Min;
    int   colRunDyn_StanceTime_Max;
    float colRunDyn_StanceTime_Avg;
-
    float colRunDyn_StanceTimeBalance_Min;
+
    float colRunDyn_StanceTimeBalance_Max;
    float colRunDyn_StanceTimeBalance_Avg;
-
    int   colRunDyn_StepLength_Min;
+
    int   colRunDyn_StepLength_Max;
    float colRunDyn_StepLength_Avg;
-
    float colRunDyn_VerticalOscillation_Min;
+
    float colRunDyn_VerticalOscillation_Max;
    float colRunDyn_VerticalOscillation_Avg;
-
    float colRunDyn_VerticalRatio_Min;
+
    float colRunDyn_VerticalRatio_Max;
    float colRunDyn_VerticalRatio_Avg;
 
@@ -365,8 +363,8 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
    float colPower_AvgLeftPedalSmoothness;
    float colPower_AvgRightPedalSmoothness;
    int   colPower_PedalLeftRightBalance;
-
    float colPower_Avg;
+
    int   colPower_Max;
    int   colPower_Normalized;
    long  colPower_TotalWork;
@@ -374,28 +372,28 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
    // ----------- TRAINING ---------
 
    int   colTraining_FTP;
-
    float colTraining_TrainingStressScore;
+
    float colTraining_IntensityFactor;
    float colTraining_PowerToWeight;
-
    float colTraining_TrainingEffect_Aerob;
+
    float colTraining_TrainingEffect_Anaerobic;
    float colTraining_TrainingPerformance;
 
    // ----------- SURFING ---------
 
-   long    col_Surfing_NumberOfEvents;
+   long  col_Surfing_NumberOfEvents;
    short   col_Surfing_MinSpeed_StartStop;
    short   col_Surfing_MinSpeed_Surfing;
    short   col_Surfing_MinTimeDuration;
-
    boolean col_Surfing_IsMinDistance;
+
    short   col_Surfing_MinDistance;
 
    // ----------- IMPORT ---------
 
-   String col_ImportFileName;
+   String  col_ImportFileName;
    String col_ImportFilePath;
    String col_DeviceName;
 
@@ -463,6 +461,16 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       colPausedTime = colTourRecordingTime - colTourDrivingTime;
 
       colSlowVsFastCadence = TourManager.generateCadenceZones_TimePercentages(cadenceZone_SlowTime, cadenceZone_FastTime);
+   }
+
+   @Override
+   public void clearChildren() {
+
+      // cleanup
+      tourBookView = null;
+      colTourDateTime = null;
+
+      super.clearChildren();
    }
 
    protected void fetchTourItems(final PreparedStatement statement) throws SQLException {

@@ -22,6 +22,8 @@ import java.util.ArrayList;
  */
 public abstract class TreeViewerItem {
 
+   protected static final char       NL = net.tourbook.common.UI.NEW_LINE;
+
    private TreeViewerItem            _parentItem;
 
    private ArrayList<TreeViewerItem> _children;
@@ -83,9 +85,18 @@ public abstract class TreeViewerItem {
    public void clearChildren() {
 
       if (_children != null) {
+
+         for (final TreeViewerItem treeViewerItem : _children) {
+
+            treeViewerItem.clearChildren();
+         }
+
          _children.clear();
+
          _children = null;
       }
+
+      _parentItem = null;
    }
 
    /**

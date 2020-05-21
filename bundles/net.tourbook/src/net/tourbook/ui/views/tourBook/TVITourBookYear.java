@@ -35,7 +35,7 @@ public class TVITourBookYear extends TVITourBookItem {
 
    private static final String YEAR_WEEK_FORMAT = "[%02d] %s"; //$NON-NLS-1$
 
-   private TourBookViewLayout     _subCategory;
+   private TourBookViewLayout  _subCategory;
 
    boolean                     isRowSummary;
 

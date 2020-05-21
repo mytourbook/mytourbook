@@ -1056,6 +1056,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    /**
     * Defines all columns for the table viewer in the column manager, the sequence defines the
     * default columns
+    * <p>
+    * All columns <b>MUST</b> also be defined in {@link CSVExport}
     *
     * @param parent
     */
@@ -4382,6 +4384,13 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _prefStore.removePropertyChangeListener(_prefChangeListener);
       _prefStoreCommon.removePropertyChangeListener(_prefChangeListenerCommon);
 
+      if (_rootItem_Table != null) {
+         _rootItem_Table.clearChildren();
+      }
+      if (_rootItem_Tree != null) {
+         _rootItem_Tree.clearChildren();
+      }
+
       super.dispose();
    }
 
@@ -5305,23 +5314,48 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       if (_isLayoutFlat) {
 
+         if (_rootItem_Table != null) {
+            _rootItem_Table.clearChildren();
+         }
+
          _rootItem_Table = new TVITourBookRoot(this, _viewLayout);
 
-         // set ILazyContentProvider number of items, this MUST be set befor the content provider
-         _tourViewer_Table.setItemCount(_rootItem_Table.getFetchedChildren().size());
+         // load all table items
+         final ArrayList<TreeViewerItem> fetchedChildren = _rootItem_Table.getFetchedChildren();
 
-         _tourViewer_Table.setContentProvider(new ContentProvider_Table());
+         /*
+          * There have been different exceptions depending on the sequence of the viewer methods
+          */
 
-         _tourViewer_Table.setInput(_rootItem_Table);
+         _tourViewer_Table.getTable().setRedraw(false);
+         {
+            _tourViewer_Table.setContentProvider(new ContentProvider_Table());
 
-         _pageBook.showPage(_viewerContainer_Table);
+            // set ILazyContentProvider number of items, this MUST be set before the content provider
+            _tourViewer_Table.setItemCount(fetchedChildren.size());
+
+            _tourViewer_Table.setInput(_rootItem_Table);
+
+            _pageBook.showPage(_viewerContainer_Table);
+         }
+         _tourViewer_Table.getTable().setRedraw(true);
 
       } else {
 
-         _tourViewer_Tree.setContentProvider(new ContentProvider_Tree());
-         _tourViewer_Tree.setInput(_rootItem_Tree = new TVITourBookRoot(this, _viewLayout));
+         if (_rootItem_Tree != null) {
+            _rootItem_Tree.clearChildren();
+         }
 
-         _pageBook.showPage(_viewerContainer_Tree);
+         _rootItem_Tree = new TVITourBookRoot(this, _viewLayout);
+
+         _tourViewer_Tree.getTree().setRedraw(false);
+         {
+            _tourViewer_Tree.setContentProvider(new ContentProvider_Tree());
+            _tourViewer_Tree.setInput(_rootItem_Tree);
+
+            _pageBook.showPage(_viewerContainer_Tree);
+         }
+         _tourViewer_Tree.getTree().setRedraw(true);
       }
 
    }
