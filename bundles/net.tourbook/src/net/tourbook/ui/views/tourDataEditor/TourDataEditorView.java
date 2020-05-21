@@ -5491,7 +5491,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       ColumnDefinition colDef;
 
-      _timeSlice_ColDef_Cadence = colDef = TableColumnFactory.POWERTRAIN_CADENCE.createColumn(_timeSlice_ColumnManager, _pc);
+      _timeSlice_ColDef_Cadence = colDef = TableColumnFactory.POWERTRAIN_CADENCE_TIME_SLICE.createColumn(_timeSlice_ColumnManager, _pc);
       colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {
@@ -5512,7 +5512,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     */
    private void defineColumn_TimeSlice_Powertrain_GearRatio() {
 
-      final ColumnDefinition colDef = TableColumnFactory.POWERTRAIN_GEAR_RATIO.createColumn(_timeSlice_ColumnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.POWERTRAIN_GEAR_RATIO_TIME_SLICE.createColumn(_timeSlice_ColumnManager, _pc);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -5562,7 +5562,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    }
 
    /**
-    * column: cadence
+    * Column: Paused time
     */
    private void defineColumn_TimeSlice_Time_BreakTime() {
 
@@ -5720,7 +5720,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private void defineColumn_TimeSlice_Weather_Temperature() {
 
       final ColumnDefinition colDef;
-      _timeSlice_ColDef_Temperature = colDef = TableColumnFactory.WEATHER_TEMPERATURE.createColumn(_timeSlice_ColumnManager, _pc);
+      _timeSlice_ColDef_Temperature = colDef = TableColumnFactory.WEATHER_TEMPERATURE_TIME_SLICE.createColumn(_timeSlice_ColumnManager, _pc);
       colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {

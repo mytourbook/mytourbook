@@ -3167,7 +3167,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
     */
    private void defineColumn_Tour_Marker() {
 
-      final ColumnDefinition colDef = TableColumnFactory.TOUR_MARKERS.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.TOUR_NUM_MARKERS.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
       colDef.setLabelProvider(new CellLabelProvider() {

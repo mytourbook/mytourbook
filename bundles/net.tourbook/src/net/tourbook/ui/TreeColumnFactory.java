@@ -637,6 +637,7 @@ public abstract class TreeColumnFactory {
       /*
        * POWER
        */
+
       POWER_AVG = new TreeColumnFactory() {
          @Override
          public TreeColumnDefinition createColumn(final ColumnManager columnManager,
@@ -1888,6 +1889,7 @@ public abstract class TreeColumnFactory {
             return colDef;
          }
       };
+
       TOUR_LOCATION_START = new TreeColumnFactory() {
          @Override
          public TreeColumnDefinition createColumn(final ColumnManager columnManager,
@@ -2268,6 +2270,25 @@ public abstract class TreeColumnFactory {
        * Weather
        */
 
+      WEATHER_CLOUDS = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "WEATHER_CLOUDS", SWT.TRAIL); //$NON-NLS-1$
+
+            colDef.setColumnCategory(Messages.ColumnFactory_Category_Weather);
+
+            colDef.setColumnLabel(Messages.ColumnFactory_clouds_label);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_clouds);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_clouds_tooltip);
+
+            colDef.setDefaultColumnWidth(25);
+
+            return colDef;
+         }
+      };
+
       WEATHER_TEMPERATURE_AVG = new TreeColumnFactory() {
          @Override
          public TreeColumnDefinition createColumn(final ColumnManager columnManager,
@@ -2344,25 +2365,6 @@ public abstract class TreeColumnFactory {
                   ValueFormat.NUMBER_1_1,
                   ValueFormat.NUMBER_1_1,
                   columnManager);
-
-            return colDef;
-         }
-      };
-
-      WEATHER_CLOUDS = new TreeColumnFactory() {
-         @Override
-         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
-                                                  final PixelConverter pixelConverter) {
-
-            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "WEATHER_CLOUDS", SWT.TRAIL); //$NON-NLS-1$
-
-            colDef.setColumnCategory(Messages.ColumnFactory_Category_Weather);
-
-            colDef.setColumnLabel(Messages.ColumnFactory_clouds_label);
-            colDef.setColumnHeaderText(Messages.ColumnFactory_clouds);
-            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_clouds_tooltip);
-
-            colDef.setDefaultColumnWidth(25);
 
             return colDef;
          }
