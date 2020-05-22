@@ -23,12 +23,14 @@ import com.dropbox.core.v2.files.Metadata;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.cloud.Activator;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.TableLayoutComposite;
 
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -58,30 +60,31 @@ import org.eclipse.swt.widgets.Text;
 
 public class DropboxFolderBrowser extends TitleAreaDialog {
 
-   private static final String ROOT_FOLDER    = "/";                           //$NON-NLS-1$
+   private static final String   ROOT_FOLDER    = "/";                           //$NON-NLS-1$
 
-   private static String       _accessToken;
+   private static String         _accessToken;
 
-   final IPreferenceStore      _prefStore     = CommonActivator.getPrefStore();
+   final IPreferenceStore        _prefStore     = CommonActivator.getPrefStore();
 
-   private List<Metadata>      _folderList;
-   private TableViewer         _contentViewer;
-   private String              _selectedFolder;
+   private List<Metadata>        _folderList;
+   private TableViewer           _contentViewer;
+   private String                _selectedFolder;
 
-   private ArrayList<String>   _selectedFiles = new ArrayList<>();
+   private ArrayList<String>     _selectedFiles = new ArrayList<>();
 
-   private boolean             _isInErrorState;
+   private boolean               _isInErrorState;
 
+   private final IDialogSettings _state         = TourbookPlugin
+         .getState("DropboxFolderBrowser"); //$NON-NLS-1$
    /*
     * Browser UI controls
     */
-   private Text   _textSelectedAbsolutePath;
-   private Button _buttonParentFolder;
-
+   private Text                  _textSelectedAbsolutePath;
+   private Button                _buttonParentFolder;
    /*
     * Error Message UI controls
     */
-   private Label _labelErrorMessage;
+   private Label                 _labelErrorMessage;
 
    public DropboxFolderBrowser(final Shell parentShell, final String accessToken) {
 
@@ -257,6 +260,12 @@ public class DropboxFolderBrowser extends TitleAreaDialog {
             onSelectItem(event.getSelection());
          }
       });
+   }
+
+   @Override
+   protected IDialogSettings getDialogBoundsSettings() {
+      // keep window size and position
+      return _state;
    }
 
    public ArrayList<String> getSelectedFiles() {
