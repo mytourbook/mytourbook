@@ -1323,10 +1323,11 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       _comboDeviceType.setToolTipText(Messages.Dialog_ImportConfig_Label_DeviceFolder_Tooltip);
       GridDataFactory
             .fillDefaults()//
-            .align(SWT.LEFT,
-                  SWT.CENTER)
-            .indent(_leftPadding, 0)
+            .grab(true, false)
+            .indent(CONTROL_DECORATION_WIDTH, 0)
+            .align(SWT.LEFT, SWT.CENTER)
             .applyTo(_comboDeviceType);
+
       for (final String deviceType : DeviceTypes) {
          _comboDeviceType.add(deviceType);
       }
