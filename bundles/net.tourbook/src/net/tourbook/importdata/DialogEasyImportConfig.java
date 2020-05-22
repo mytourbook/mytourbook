@@ -1319,7 +1319,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       /*
        * Drop down menu: device type
        */
-      _comboDeviceType = new Combo(parent, SWT.BORDER);
+      _comboDeviceType = new Combo(parent, SWT.READ_ONLY | SWT.BORDER);
       _comboDeviceType.setToolTipText(Messages.Dialog_ImportConfig_Label_DeviceFolder_Tooltip);
       GridDataFactory
             .fillDefaults()//
