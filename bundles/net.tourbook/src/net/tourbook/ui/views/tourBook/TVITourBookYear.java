@@ -128,13 +128,13 @@ public class TVITourBookYear extends TVITourBookItem {
             + " GROUP BY " + sumYearField + "," + sumYearFieldSub + NL //      //$NON-NLS-1$ //$NON-NLS-2$
             + " ORDER BY " + sumYearFieldSub + NL //                  //$NON-NLS-1$
       ;
-      try {
+
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          final ZonedDateTime tourWeek = calendar8.with(//
                TimeTools.calendarWeek.dayOfWeek(),
                TimeTools.calendarWeek.getFirstDayOfWeek().getValue());
 
-         final Connection conn = TourDatabase.getInstance().getConnection();
          final PreparedStatement statement = conn.prepareStatement(sql);
 
          // set sql parameters
@@ -199,8 +199,6 @@ public class TVITourBookYear extends TVITourBookItem {
 
             tourItem.addSumColumns(result, 3);
          }
-
-         conn.close();
 
       } catch (final SQLException e) {
          net.tourbook.ui.UI.showSQLException(e);

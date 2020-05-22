@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -27,72 +27,73 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPage_TEMPLATE_With_Fields extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-	public static final String	ID			= "net.tourbook.preferences.PrefPageGeneralExternalProgramsID"; //$NON-NLS-1$
+   public static final String ID         = "net.tourbook.preferences.PrefPageGeneralExternalProgramsID"; //$NON-NLS-1$
 
-	private IPreferenceStore	_prefStore	= TourbookPlugin.getPrefStore();
+   private IPreferenceStore   _prefStore = TourbookPlugin.getPrefStore();
 
-	/*
-	 * UI controls
-	 */
-	private PixelConverter		_pc;
+   /*
+    * UI controls
+    */
+   @SuppressWarnings("unused")
+   private PixelConverter _pc;
 
-	@Override
-	protected void createFieldEditors() {
+   @Override
+   protected void createFieldEditors() {
 
-		createUI();
+      createUI();
 
-		restoreState();
-		enableControls();
-	}
+      restoreState();
+      enableControls();
+   }
 
-	private void createUI() {
+   private void createUI() {
 
-		final Composite parent = getFieldEditorParent();
-		GridLayoutFactory.fillDefaults().applyTo(parent);
+      final Composite parent = getFieldEditorParent();
+      GridLayoutFactory.fillDefaults().applyTo(parent);
 
-		_pc = new PixelConverter(parent);
-	}
+      _pc = new PixelConverter(parent);
+   }
 
-	private void enableControls() {
+   private void enableControls() {
 
-	}
+   }
 
-	@Override
-	public void init(final IWorkbench workbench) {
+   @Override
+   public void init(final IWorkbench workbench) {
 
-		setPreferenceStore(_prefStore);
-	}
+      setPreferenceStore(_prefStore);
+   }
 
-	@Override
-	public boolean okToLeave() {
+   @Override
+   public boolean okToLeave() {
 
-		return super.okToLeave();
-	}
+      return super.okToLeave();
+   }
 
-	@Override
-	protected void performDefaults() {
+   @Override
+   protected void performDefaults() {
 
-		super.performDefaults();
-	}
+      super.performDefaults();
+   }
 
-	@Override
-	public boolean performOk() {
+   @Override
+   public boolean performOk() {
 
-		final boolean isOK = super.performOk();
-		if (isOK) {
+      final boolean isOK = super.performOk();
+      if (isOK) {
 
-			saveState();
+         saveState();
 
-		}
+      }
 
-		return isOK;
-	}
+      return isOK;
+   }
 
-	private void restoreState() {
+   private void restoreState() {
 
-	}
+   }
 
-	private void saveState() {
+   private void saveState() {
 
-	}
+   }
 }

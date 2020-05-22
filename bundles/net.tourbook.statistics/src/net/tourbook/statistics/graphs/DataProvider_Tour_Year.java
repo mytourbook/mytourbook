@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -174,7 +174,7 @@ public class DataProvider_Tour_Year extends DataProvider {
       int numTourTypes = colorOffset + allTourTypes.length;
       numTourTypes = numTourTypes == 0 ? 1 : numTourTypes; // ensure that at least 1 is available
 
-      try {
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          final float[][] dbDistance = new float[numTourTypes][numYears];
          final float[][] dbAltitude = new float[numTourTypes][numYears];
@@ -190,7 +190,6 @@ public class DataProvider_Tour_Year extends DataProvider {
          final long[] usedTourTypeIds = new long[numTourTypes];
          Arrays.fill(usedTourTypeIds, TourType.TOUR_TYPE_IS_NOT_USED);
 
-         final Connection conn = TourDatabase.getInstance().getConnection();
          final PreparedStatement statement = conn.prepareStatement(sqlString);
          sqlFilter.setParameters(statement, 1);
 
@@ -249,8 +248,6 @@ public class DataProvider_Tour_Year extends DataProvider {
             usedTourTypeIds[colorIndex] = typeId;
             tourTypeSum[colorIndex] += dbValue_Distance + dbValue_Altitude + dbValue_RecordingTime;
          }
-
-         conn.close();
 
          final int[] years = new int[_numberOfYears];
          int yearIndex = 0;

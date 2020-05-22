@@ -13,10 +13,6 @@
 package net.tourbook.common.util;
 
 import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * A collection of file related utilities.

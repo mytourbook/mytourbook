@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -46,163 +46,164 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 
 public class MarkerLayer extends RenderableLayer implements SelectListener, ICheckStateListener {
 
-	public static final String	MAP3_LAYER_ID			= "MarkerLayer";	//$NON-NLS-1$
+   public static final String MAP3_LAYER_ID        = "MarkerLayer"; //$NON-NLS-1$
 
-	/**
-	 * This flag keeps track of adding/removing the listener that it is not done more than once.
-	 */
-	private int					_lastAddRemoveAction	= -1;
+   /**
+    * This flag keeps track of adding/removing the listener that it is not done more than once.
+    */
+   private int                _lastAddRemoveAction = -1;
 
-	private PointPlacemark		_previousHoveredMarker;
+   private PointPlacemark     _previousHoveredMarker;
 
-	public MarkerLayer() {}
+   public MarkerLayer() {}
 
-	public void createMarker(final ArrayList<TourData> allTours) {
+   public void createMarker(final ArrayList<TourData> allTours) {
 
-		removeAllRenderables();
+      removeAllRenderables();
 
-		final PointPlacemarkAttributes ppAttributes = new PointPlacemarkAttributes();
+      final PointPlacemarkAttributes ppAttributes = new PointPlacemarkAttributes();
 //		ppAttributes.setLabelScale(1.2);
-		ppAttributes.setLabelFont(UI.AWT_FONT_ARIAL_14);
-		ppAttributes.setLabelOffset(new Offset(34.0, 9.0, AVKey.PIXELS, AVKey.PIXELS));
+      ppAttributes.setLabelFont(UI.AWT_FONT_ARIAL_14);
+      ppAttributes.setLabelOffset(new Offset(34.0, 9.0, AVKey.PIXELS, AVKey.PIXELS));
 
 //		ppAttributes.setLabelMaterial(new Material(new Color(0xff, 0x0, 0x0, 0x80)));
 
-		try {
+      try {
 
-			final URL url = TourbookPlugin.getDefault().getBundle().getEntry("/images/map3/map3-marker.png"); //$NON-NLS-1$
-			final String fileURL = FileLocator.toFileURL(url).toString();
+         final URL url = TourbookPlugin.getDefault().getBundle().getEntry("/images/map3/map3-marker.png"); //$NON-NLS-1$
+         final String fileURL = FileLocator.toFileURL(url).toString();
 
-			ppAttributes.setScale(0.7);
-			ppAttributes.setImageAddress(fileURL);
-			ppAttributes.setImageOffset(new Offset(16.0, -0.0, AVKey.PIXELS, AVKey.PIXELS));
+         ppAttributes.setScale(0.7);
+         ppAttributes.setImageAddress(fileURL);
+         ppAttributes.setImageOffset(new Offset(16.0, -0.0, AVKey.PIXELS, AVKey.PIXELS));
 
-		} catch (final Exception e) {
-			// ignore
-			StatusUtil.log(e);
-		}
+      } catch (final Exception e) {
+         // ignore
+         StatusUtil.log(e);
+      }
 
-		final TourTrackConfig config = TourTrackConfigManager.getActiveConfig();
+      final TourTrackConfig config = TourTrackConfigManager.getActiveConfig();
 
-		for (final TourData tourData : allTours) {
+      for (final TourData tourData : allTours) {
 
-			final Set<TourMarker> tourMarkerList = tourData.getTourMarkers();
-			if (tourMarkerList.size() == 0) {
-				continue;
-			}
+         final Set<TourMarker> tourMarkerList = tourData.getTourMarkers();
+         if (tourMarkerList.size() == 0) {
+            continue;
+         }
 
-			// check if geo position is available
-			final double[] latitudeSerie = tourData.latitudeSerie;
-			final double[] longitudeSerie = tourData.longitudeSerie;
-			if (latitudeSerie == null || longitudeSerie == null) {
-				continue;
-			}
+         // check if geo position is available
+         final double[] latitudeSerie = tourData.latitudeSerie;
+         final double[] longitudeSerie = tourData.longitudeSerie;
+         if (latitudeSerie == null || longitudeSerie == null) {
+            continue;
+         }
 
-			for (final TourMarker tourMarker : tourMarkerList) {
+         for (final TourMarker tourMarker : tourMarkerList) {
 
-				// skip marker when hidden or not set
-				if (tourMarker.isMarkerVisible() == false || tourMarker.getLabel().length() == 0) {
-					continue;
-				}
+            // skip marker when hidden or not set
+            if (tourMarker.isMarkerVisible() == false || tourMarker.getLabel().length() == 0) {
+               continue;
+            }
 
-				final int serieIndex = tourMarker.getSerieIndex();
+            final int serieIndex = tourMarker.getSerieIndex();
 
-				/*
-				 * check bounds because when a tour is split, it can happen that the marker serie
-				 * index is out of scope
-				 */
-				if (serieIndex >= latitudeSerie.length) {
-					continue;
-				}
+            /*
+             * check bounds because when a tour is split, it can happen that the marker serie
+             * index is out of scope
+             */
+            if (serieIndex >= latitudeSerie.length) {
+               continue;
+            }
 
-				/*
-				 * draw tour marker
-				 */
+            /*
+             * draw tour marker
+             */
 
-				int altitudeMode;
-				double absoluteAltitude = 0;
-				final float[] altitudeSerie = tourData.altitudeSerie;
+            int altitudeMode;
+            double absoluteAltitude = 0;
+            final float[] altitudeSerie = tourData.altitudeSerie;
 
-				if (altitudeSerie == null) {
+            if (altitudeSerie == null) {
 
-					altitudeMode = WorldWind.CLAMP_TO_GROUND;
+               altitudeMode = WorldWind.CLAMP_TO_GROUND;
 
-				} else {
+            } else {
 
-					altitudeMode = config.altitudeMode;
-					absoluteAltitude = altitudeSerie[serieIndex];// + 300;
-				}
+               altitudeMode = config.altitudeMode;
+               absoluteAltitude = altitudeSerie[serieIndex];// + 300;
+            }
 
-				final Position markerPosition = Position.fromDegrees(
-						latitudeSerie[serieIndex],
-						longitudeSerie[serieIndex],
-						absoluteAltitude);
+            final Position markerPosition = Position.fromDegrees(
+                  latitudeSerie[serieIndex],
+                  longitudeSerie[serieIndex],
+                  absoluteAltitude);
 
-				final PointPlacemark markerPl = new PointPlacemark(markerPosition);
+            final PointPlacemark markerPl = new PointPlacemark(markerPosition);
 
-				markerPl.setAltitudeMode(altitudeMode);
-				markerPl.setEnableDecluttering(true);
-				markerPl.setLineEnabled(true);
-				markerPl.setAttributes(ppAttributes);
+            markerPl.setAltitudeMode(altitudeMode);
+            markerPl.setEnableDecluttering(true);
+            markerPl.setLineEnabled(true);
+            markerPl.setAttributes(ppAttributes);
 
-				markerPl.setLabelText(tourMarker.getLabel());
+            markerPl.setLabelText(tourMarker.getLabel());
 
-				addRenderable(markerPl);
-			}
-		}
-	}
+            addRenderable(markerPl);
+         }
+      }
+   }
 
-	public void onModifyConfig(final ArrayList<TourData> allTours) {
+   public void onModifyConfig(final ArrayList<TourData> allTours) {
 
-		final TourTrackConfig trackConfig = TourTrackConfigManager.getActiveConfig();
+      final TourTrackConfig trackConfig = TourTrackConfigManager.getActiveConfig();
 
-		if (trackConfig.isRecreateTracks()) {
+      if (trackConfig.isRecreateTracks()) {
 
-			// track data has changed
+         // track data has changed
 
-			Map3Manager.getMap3View().showAllTours(false);
+         Map3Manager.getMap3View().showAllTours(false);
 
-		} else {
+      } else {
 
-			createMarker(allTours);
+         createMarker(allTours);
 
-			// ensure marker modifications are redrawn
+         // ensure marker modifications are redrawn
 //			Map3Manager.getWWCanvas().redraw();
-			Map3Manager.redrawMap();
-		}
-	}
+         Map3Manager.redrawMap();
+      }
+   }
 
-	@Override
-	public void onSetCheckState(final TVIMap3Layer tviMap3Layer) {
+   @Override
+   public void onSetCheckState(final TVIMap3Layer tviMap3Layer) {
 
-		setupWWSelectionListener(tviMap3Layer.isLayerVisible);
-	}
+      setupWWSelectionListener(tviMap3Layer.isLayerVisible);
+   }
 
-	private void resetPreviousHoveredMarker() {
+   @SuppressWarnings("unused")
+   private void resetPreviousHoveredMarker() {
 
-		if (_previousHoveredMarker != null) {
+      if (_previousHoveredMarker != null) {
 
-			// reset previous hovered marker
+         // reset previous hovered marker
 
 //			_previousHoveredMarker.setLabelText(null);
 
-			_previousHoveredMarker = null;
-		}
-	}
+         _previousHoveredMarker = null;
+      }
+   }
 
-	public void saveState(final IDialogSettings state) {
+   public void saveState(final IDialogSettings state) {
 
-	}
+   }
 
-	/**
-	 * This listener is set in set {@link #setupWWSelectionListener(boolean)}
-	 * <p>
-	 * {@inheritDoc}
-	 * 
-	 * @see gov.nasa.worldwind.event.SelectListener#selected(gov.nasa.worldwind.event.SelectEvent)
-	 */
-	@Override
-	public void selected(final SelectEvent event) {
+   /**
+    * This listener is set in set {@link #setupWWSelectionListener(boolean)}
+    * <p>
+    * {@inheritDoc}
+    *
+    * @see gov.nasa.worldwind.event.SelectListener#selected(gov.nasa.worldwind.event.SelectEvent)
+    */
+   @Override
+   public void selected(final SelectEvent event) {
 
 //		// check if mouse is consumed
 //		if (event.getMouseEvent() != null && event.getMouseEvent().isConsumed()) {
@@ -259,33 +260,33 @@ public class MarkerLayer extends RenderableLayer implements SelectListener, IChe
 //
 //		// ensure hovered marker is reset
 //		resetPreviousHoveredMarker();
-	}
+   }
 
-	private void setupWWSelectionListener(final boolean isLayerVisible) {
+   private void setupWWSelectionListener(final boolean isLayerVisible) {
 
-		final WorldWindowGLCanvas ww = Map3Manager.getWWCanvas();
+      final WorldWindowGLCanvas ww = Map3Manager.getWWCanvas();
 
-		if (isLayerVisible) {
+      if (isLayerVisible) {
 
-			if (_lastAddRemoveAction != 1) {
+         if (_lastAddRemoveAction != 1) {
 
-				_lastAddRemoveAction = 1;
-				ww.addSelectListener(this);
+            _lastAddRemoveAction = 1;
+            ww.addSelectListener(this);
 
 //				ww.getSceneController().setClutterFilter(_clutterFilter);
 
-			}
+         }
 
-		} else {
+      } else {
 
-			if (_lastAddRemoveAction != 0) {
+         if (_lastAddRemoveAction != 0) {
 
-				_lastAddRemoveAction = 0;
-				ww.removeSelectListener(this);
+            _lastAddRemoveAction = 0;
+            ww.removeSelectListener(this);
 
 //				ww.getSceneController().setClutterFilter(null);
-			}
-		}
-	}
+         }
+      }
+   }
 
 }

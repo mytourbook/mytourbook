@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -24,82 +24,82 @@ import org.eclipse.swt.graphics.RGB;
 
 abstract class DataFormatter {
 
-	FormatterID				id;
-	private String			_name;
+   FormatterID             id;
+   private String          _name;
 
-	ValueFormat				valueFormatId;
-	IValueFormatter			valueFormatter;
+   ValueFormat             valueFormatId;
+   IValueFormatter         valueFormatter;
 
-	private ColorDefinition	_colorDefinition;
+   private ColorDefinition _colorDefinition;
 
-	DataFormatter(final FormatterID id) {
+   DataFormatter(final FormatterID id) {
 
-		this.id = id;
-	}
+      this.id = id;
+   }
 
-	DataFormatter(final FormatterID id, final String name, final String colorName) {
+   DataFormatter(final FormatterID id, final String name, final String colorName) {
 
-		this.id = id;
-		_name = name;
+      this.id = id;
+      _name = name;
 
-		_colorDefinition = new GraphColorManager().getGraphColorDefinition(colorName);
-	}
+      _colorDefinition = new GraphColorManager().getGraphColorDefinition(colorName);
+   }
 
-	abstract String format(CalendarTourData data, ValueFormat valueFormat, boolean isShowValueUnit);
+   abstract String format(CalendarTourData data, ValueFormat valueFormat, boolean isShowValueUnit);
 
-	/**
-	 * @return Return the default format for this formatter or <code>null</code> when a formatter is
-	 *         not available.
-	 */
-	public abstract ValueFormat getDefaultFormat();
+   /**
+    * @return Return the default format for this formatter or <code>null</code> when a formatter is
+    *         not available.
+    */
+   public abstract ValueFormat getDefaultFormat();
 
-	RGB getGraphColor(final CalendarColor calendarColor) {
+   RGB getGraphColor(final CalendarColor calendarColor) {
 
-		switch (calendarColor) {
+      switch (calendarColor) {
 
-		case BRIGHT:
-			return _colorDefinition.getGradientBright_Active();
+      case BRIGHT:
+         return _colorDefinition.getGradientBright_Active();
 
-		case DARK:
-			return _colorDefinition.getGradientDark_Active();
+      case DARK:
+         return _colorDefinition.getGradientDark_Active();
 
-		case LINE:
-			return _colorDefinition.getLineColor_Active();
+      case LINE:
+         return _colorDefinition.getLineColor_Active();
 
-		case TEXT:
-		default:
-			return _colorDefinition.getTextColor_Active();
-		}
-	}
+      case TEXT:
+      default:
+         return _colorDefinition.getTextColor_Active();
+      }
+   }
 
-	String getText() {
+   String getText() {
 
-		if (null != _name) {
-			return _name;
-		} else {
-			return _colorDefinition.getVisibleName();
-		}
-	}
+      if (null != _name) {
+         return _name;
+      } else {
+         return _colorDefinition.getVisibleName();
+      }
+   }
 
-	/**
-	 * @return Returns <code>null</code> when a format is not available.
-	 */
-	public abstract ValueFormat[] getValueFormats();
+   /**
+    * @return Returns <code>null</code> when a format is not available.
+    */
+   public abstract ValueFormat[] getValueFormats();
 
-	abstract void setValueFormat(ValueFormat valueFormat);
+   abstract void setValueFormat(ValueFormat valueFormat);
 
-	@Override
-	public String toString() {
+   @Override
+   public String toString() {
 
-		return "\n" //$NON-NLS-1$
+      return "\n" //$NON-NLS-1$
 
-				+ "DataFormatter [" //$NON-NLS-1$
+            + "DataFormatter [" //$NON-NLS-1$
 
-				+ "id=" + id + ", " //$NON-NLS-1$ //$NON-NLS-2$
-				+ "_name=" + _name + ", " //$NON-NLS-1$ //$NON-NLS-2$
-				+ "_valueFormatter=" + valueFormatter //$NON-NLS-1$
-				+ "_colorDefinition=" + _colorDefinition + ", " //$NON-NLS-1$ //$NON-NLS-2$
+            + "id=" + id + ", " //$NON-NLS-1$ //$NON-NLS-2$
+            + "_name=" + _name + ", " //$NON-NLS-1$ //$NON-NLS-2$
+            + "_valueFormatter=" + valueFormatter //$NON-NLS-1$
+            + "_colorDefinition=" + _colorDefinition + ", " //$NON-NLS-1$ //$NON-NLS-2$
 
-				+ "]"; //$NON-NLS-1$
-	}
+            + "]"; //$NON-NLS-1$
+   }
 }

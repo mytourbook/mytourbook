@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -448,8 +448,8 @@ public class CalendarProfile implements Cloneable {
             formatterID = FormatterID.DISTANCE.name();
             break;
 
-         case ALTITUDE:
-            formatterID = FormatterID.ALTITUDE.name();
+         case ELEVATION:
+            formatterID = FormatterID.ELEVATION.name();
             break;
 
          case ELEVATION_CHANGE:

@@ -649,10 +649,10 @@ public class TourBlogView extends ViewPart {
          } catch (final Exception e) {
 
             /*
-             * Use mozilla browser, this is necessary for Linux when default browser fails however
+             * Use WebKit browser, this is necessary for Linux when default browser fails however
              * the XULrunner needs to be installed.
              */
-            _browser = new Browser(parent, SWT.MOZILLA);
+            _browser = new Browser(parent, SWT.WEBKIT);
          }
 
          GridDataFactory.fillDefaults().grab(true, true).applyTo(_browser);

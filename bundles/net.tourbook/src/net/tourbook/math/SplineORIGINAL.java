@@ -11,6 +11,7 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Point;
 
+@SuppressWarnings("serial")
 public class SplineORIGINAL extends Applet {
 
 	Point[]				points;			// points to be interpolated
