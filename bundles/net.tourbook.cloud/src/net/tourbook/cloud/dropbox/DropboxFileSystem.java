@@ -39,16 +39,13 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 
 public class DropboxFileSystem extends TourbookFileSystem {
-   //Should the FileSystemManager do evetrything ? what is the role of NIO ?
-
-   // make sure that nothing references the cloud plugin
 
    private java.nio.file.FileSystem _dropboxFileSystem;
    private IPreferenceStore         _prefStore = Activator.getDefault().getPreferenceStore();
 
    public DropboxFileSystem() {
 
-      super("Dropbox");
+      super("Dropbox"); //$NON-NLS-1$
 
       createDropboxFileSystem();
 
