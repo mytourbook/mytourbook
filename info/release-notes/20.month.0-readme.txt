@@ -5,6 +5,7 @@ TODO's
 ======  
              
   - csv export: export new column(s) in tourbook view
+  - Easy Import : When importing files, the tour type is set even though it is not checked in the launcher configuration (regression?)
  
 
 New + Improvements
