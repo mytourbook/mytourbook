@@ -22,7 +22,7 @@ import java.nio.file.Path;
 
 /**
  * A class to implement and use a File System in MyTourbook.
- * Ths file system can be used by the easyimport manager.
+ * This file system can be used by the easy import manager.
  *
  * @author Frédéric Bard
  */
