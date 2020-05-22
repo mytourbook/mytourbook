@@ -1659,11 +1659,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          sb.append(deviceFile.getFileName());
          sb.append(HTML_TD_END);
 
-// this is for debugging
-         sb.append("<td class='column content'>"); //$NON-NLS-1$
-         sb.append(filePathName);
-         sb.append(HTML_TD_END);
-
          sb.append("<td class='column right'>"); //$NON-NLS-1$
          sb.append(modifiedTime.format(TimeTools.Formatter_Date_S));
          sb.append(HTML_TD_END);
@@ -1674,6 +1669,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
          sb.append("<td class='right'>"); //$NON-NLS-1$
          sb.append(deviceFile.size);
+         sb.append(HTML_TD_END);
+
+         // this is for debugging
+         sb.append("<td class='column content'>"); //$NON-NLS-1$
+         sb.append(filePathName);
          sb.append(HTML_TD_END);
 
          sb.append(HTML_TR_END);
@@ -5376,9 +5376,16 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       }
    }
 
+   /**
+    * Note : A suppress warning is added because the resource "tourbookFileSystem"
+    * is actually closed in this method {@link #dispose()}
+    *
+    * @return
+    */
    private Runnable thread_WatchFolders_Runnable() {
 
       return new Runnable() {
+         @SuppressWarnings("resource")
          @Override
          public void run() {
 
