@@ -23,12 +23,15 @@ import com.dropbox.core.v2.files.Metadata;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.cloud.Activator;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.TableLayoutComposite;
 
+import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -58,30 +61,31 @@ import org.eclipse.swt.widgets.Text;
 
 public class DropboxFolderBrowser extends TitleAreaDialog {
 
-   private static final String ROOT_FOLDER    = "/";                           //$NON-NLS-1$
+   private static final String   ROOT_FOLDER    = "/";                           //$NON-NLS-1$
 
-   private static String       _accessToken;
+   private static String         _accessToken;
 
-   final IPreferenceStore      _prefStore     = CommonActivator.getPrefStore();
+   final IPreferenceStore        _prefStore     = CommonActivator.getPrefStore();
 
-   private List<Metadata>      _folderList;
-   private TableViewer         _contentViewer;
-   private String              _selectedFolder;
+   private List<Metadata>        _folderList;
+   private TableViewer           _contentViewer;
+   private String                _selectedFolder;
 
-   private ArrayList<String>   _selectedFiles = new ArrayList<>();
+   private ArrayList<String>     _selectedFiles = new ArrayList<>();
 
-   private boolean             _isInErrorState;
+   private boolean               _isInErrorState;
 
+   private final IDialogSettings _state         = TourbookPlugin
+         .getState("DropboxFolderBrowser");                                      //$NON-NLS-1$
    /*
     * Browser UI controls
     */
-   private Text   _textSelectedAbsolutePath;
-   private Button _buttonParentFolder;
-
+   private Text                  _textSelectedAbsolutePath;
+   private Button                _buttonParentFolder;
    /*
     * Error Message UI controls
     */
-   private Label _labelErrorMessage;
+   private Label                 _labelErrorMessage;
 
    public DropboxFolderBrowser(final Shell parentShell, final String accessToken) {
 
@@ -114,6 +118,15 @@ public class DropboxFolderBrowser extends TitleAreaDialog {
       text = Messages.Dialog_DropboxFolderChooser_Area_Text;
 
       setTitle(text);
+   }
+
+   @Override
+   protected final void createButtonsForButtonBar(final Composite parent) {
+
+      super.createButtonsForButtonBar(parent);
+
+      // set text for the OK button
+      getButton(IDialogConstants.OK_ID).setText(Messages.Dialog_DropboxBrowser_Button_SelectFolder);
    }
 
    @Override
@@ -165,7 +178,7 @@ public class DropboxFolderBrowser extends TitleAreaDialog {
    private Composite createUI(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().applyTo(container);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
       GridLayoutFactory.fillDefaults().margins(20, 20).numColumns(2).applyTo(container);
       {
          /*
@@ -192,13 +205,13 @@ public class DropboxFolderBrowser extends TitleAreaDialog {
          GridDataFactory.fillDefaults().grab(true, false).applyTo(_textSelectedAbsolutePath);
          _textSelectedAbsolutePath.setText(ROOT_FOLDER);
 
-         createUI_10_FilterViewer(container);
+         createUI_10_FolderViewer(container);
       }
 
       return container;
    }
 
-   private void createUI_10_FilterViewer(final Composite parent) {
+   private void createUI_10_FolderViewer(final Composite parent) {
 
       final TableLayoutComposite layouter = new TableLayoutComposite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().span(3, 1).grab(true, true).hint(600, 300).applyTo(layouter);
@@ -217,23 +230,23 @@ public class DropboxFolderBrowser extends TitleAreaDialog {
 
             final Metadata entry = ((Metadata) cell.getElement());
 
-            String filterName = null;
-            Image filterImage = null;
+            String entryName = null;
+            Image entryImage = null;
 
-            filterName = entry.getName();
+            entryName = entry.getName();
 
             if (entry instanceof FolderMetadata) {
 
-               filterImage =
+               entryImage =
                      Activator.getImageDescriptor(Messages.Image__Dropbox_Folder).createImage();
             } else if (entry instanceof FileMetadata) {
 
-               filterImage =
+               entryImage =
                      Activator.getImageDescriptor(Messages.Image__Dropbox_File).createImage();
             }
 
-            cell.setText(filterName);
-            cell.setImage(filterImage);
+            cell.setText(entryName);
+            cell.setImage(entryImage);
          }
       });
       layouter.addColumnData(new ColumnWeightData(1));
@@ -257,6 +270,12 @@ public class DropboxFolderBrowser extends TitleAreaDialog {
             onSelectItem(event.getSelection());
          }
       });
+   }
+
+   @Override
+   protected IDialogSettings getDialogBoundsSettings() {
+      // keep window size and position
+      return _state;
    }
 
    public ArrayList<String> getSelectedFiles() {

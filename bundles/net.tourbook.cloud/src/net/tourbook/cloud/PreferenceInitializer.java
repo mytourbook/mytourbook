@@ -16,11 +16,20 @@
 package net.tourbook.cloud;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
+import org.eclipse.jface.preference.IPreferenceStore;
 
 public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
    public PreferenceInitializer() {}
 
    @Override
-   public void initializeDefaultPreferences() {}
+   public void initializeDefaultPreferences() {
+
+      final IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+
+      store.setDefault(IPreferences.DROPBOX_ACCESSTOKEN, "");
+
+      store.setDefault(IPreferences.DROPBOX_FOLDER, "");
+   }
+
 }

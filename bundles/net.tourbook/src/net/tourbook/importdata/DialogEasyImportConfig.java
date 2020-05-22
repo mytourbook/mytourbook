@@ -142,6 +142,10 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
    //
    private static final int             CONTROL_DECORATION_WIDTH          = 6;
    private static final String          CSS_PX                            = "px";                                //$NON-NLS-1$
+   private final static String[]        DeviceTypes                       = new String[] {
+         Messages.Dialog_ImportConfig_Combo_Device_LocalDevice,
+         Messages.Dialog_ImportConfig_Combo_Device_Dropbox
+   };
    //
    private final IPreferenceStore       _prefStore                        = TourbookPlugin.getPrefStore();
    private final IDialogSettings        _state                            = TourbookPlugin.getState(ID);
@@ -169,40 +173,41 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
    private ActionSpeedTourType_Add      _actionTTSpeed_Add;
    private ActionSpeedTourType_Delete[] _actionTTSpeed_Delete;
    private ActionSpeedTourType_Sort     _actionTTSpeed_Sort;
+
    //
-   private PixelConverter               _pc;
+   private PixelConverter         _pc;
 
    /** Model for all configs. */
-   private EasyConfig                   _dialogEasyConfig;
-
+   private EasyConfig             _dialogEasyConfig;
    /** Model for the currently selected config. */
-   private ImportConfig                 _selectedIC;
-   private ImportLauncher               _selectedIL;
+   private ImportConfig           _selectedIC;
+   private ImportLauncher         _selectedIL;
    //
-   private RawDataView                  _rawDataView;
-   private TableViewer                  _icViewer;
-   private TableViewer                  _ilViewer;
-   private ICColumnViewer               _icColumnViewer                   = new ICColumnViewer();
-   private ILColumnViewer               _ilColumnViewer                   = new ILColumnViewer();
-   private ColumnManager                _icColumnManager;
-   private ColumnManager                _ilColumnManager;
+   private RawDataView            _rawDataView;
+   private TableViewer            _icViewer;
+   private TableViewer            _ilViewer;
+   private ICColumnViewer         _icColumnViewer     = new ICColumnViewer();
+   private ILColumnViewer         _ilColumnViewer     = new ILColumnViewer();
+   private ColumnManager          _icColumnManager;
+   private ColumnManager          _ilColumnManager;
    //
-   private TableColumnDefinition        _colDefProfileImage;
-   private int                          _columnIndexConfigImage;
+   private TableColumnDefinition  _colDefProfileImage;
+   private int                    _columnIndexConfigImage;
    //
-   private HashMap<Long, Image>         _configImages                     = new HashMap<>();
-   private HashMap<Long, Integer>       _configImageHash                  = new HashMap<>();
+   private HashMap<Long, Image>   _configImages       = new HashMap<>();
+   private HashMap<Long, Integer> _configImageHash    = new HashMap<>();
    //
-   private HistoryItems                 _deviceHistoryItems               = new HistoryItems();
-   private HistoryItems                 _backupHistoryItems               = new HistoryItems();
+   private HistoryItems           _deviceHistoryItems = new HistoryItems();
+   private HistoryItems           _backupHistoryItems = new HistoryItems();
    //
-   private long                         _dragStart;
-   private int                          _leftPadding;
-   private int                          _defaultPaneWidth;
-   private boolean                      _isInUIUpdate;
-   private int                          _initialTab;
+   private long                   _dragStart;
+   private int                    _leftPadding;
+   private int                    _defaultPaneWidth;
+   private boolean                _isInUIUpdate;
 
-   private final NumberFormat           _nf1                              = NumberFormat.getNumberInstance();
+   private int                    _initialTab;
+
+   private final NumberFormat     _nf1                = NumberFormat.getNumberInstance();
 
    {
       _nf1.setMinimumFractionDigits(1);
@@ -258,6 +263,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
    private Combo             _comboIC_BackupFolder;
    private Combo             _comboIC_DeviceFolder;
    private Combo             _comboIL_TourType;
+   private Combo             _comboDeviceType;
    //
    private Label             _lblIC_ConfigName;
    private Label             _lblIC_BackupFolder;
@@ -1288,6 +1294,13 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
    private void createUI_254_IC_DeviceFileFolder(final Composite parent) {
 
+      final ModifyListener deviceTypeListener = new ModifyListener() {
+         @Override
+         public void modifyText(final ModifyEvent e) {
+            onSelectDevice();
+         }
+      };
+
       /*
        * Checkbox: Import tour files
        */
@@ -1296,13 +1309,28 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       _chkIC_ImportFiles.addSelectionListener(_icSelectionListener);
       GridDataFactory
             .fillDefaults()//
-            .span(2, 1)
             .indent(0, convertVerticalDLUsToPixels(4))
             .applyTo(_chkIC_ImportFiles);
 
       // this control is just for info and to have a consistent UI
       _chkIC_ImportFiles.setSelection(true);
       _chkIC_ImportFiles.setEnabled(false);
+
+      /*
+       * Drop down menu: device type
+       */
+      _comboDeviceType = new Combo(parent, SWT.BORDER);
+      _comboDeviceType.setToolTipText(Messages.Dialog_ImportConfig_Label_DeviceFolder_Tooltip);
+      GridDataFactory
+            .fillDefaults()//
+            .align(SWT.LEFT,
+                  SWT.CENTER)
+            .indent(_leftPadding, 0)
+            .applyTo(_comboDeviceType);
+      for (final String deviceType : DeviceTypes) {
+         _comboDeviceType.add(deviceType);
+      }
+      _comboDeviceType.addModifyListener(deviceTypeListener);
 
       /*
        * Label: device folder
@@ -3181,6 +3209,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       _backupHistoryItems.validateModifiedPath();
 
       _btnIC_Remove.setEnabled(numConfigs > 1);
+
+      _comboDeviceType.setEnabled(_chkIC_ImportFiles.getSelection());
    }
 
    private void enable_IL_Controls() {
@@ -4066,6 +4096,43 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       redrawILViewer();
    }
 
+   private void onSelectDevice() {
+      if (_comboDeviceType == null) {
+         return;
+      }
+      final int deviceIndex = _comboDeviceType.getSelectionIndex();
+
+      if (_lblIC_DeviceFolder == null) {
+         return;
+      }
+
+      final boolean enableDeviceFolder = deviceIndex == 0; //Local device
+      _lblIC_DeviceFolder.setEnabled(enableDeviceFolder);
+      _comboIC_DeviceFolder.setEnabled(enableDeviceFolder);
+
+      final String currentDeviceFolder = _comboIC_DeviceFolder.getText();
+      if (enableDeviceFolder) {
+         _comboIC_DeviceFolder.setText(_selectedIC.getDeviceFolder());
+         if (currentDeviceFolder.equals("Dropbox")) { //$NON-NLS-1$
+            _comboIC_DeviceFolder.setText(UI.EMPTY_STRING);
+         }
+      } else {
+         _comboIC_DeviceFolder.setText("Dropbox"); //$NON-NLS-1$
+      }
+
+      _btnIC_SelectDeviceFolder.setEnabled(enableDeviceFolder);
+
+      _chkIC_CreateBackup.setEnabled(enableDeviceFolder);
+
+      if (!enableDeviceFolder) {
+         _comboIC_BackupFolder.setText(UI.EMPTY_STRING);
+         _chkIC_CreateBackup.setSelection(false);
+         _lblIC_BackupFolder.setEnabled(false);
+         _comboIC_BackupFolder.setEnabled(false);
+         _btnIC_SelectBackupFolder.setEnabled(false);
+      }
+   }
+
    private void onSpeed_IL_TT_Add() {
 
       update_Model_From_UI_IL();
@@ -4449,6 +4516,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
          _comboIC_BackupFolder.setText(_selectedIC.getBackupFolder());
          _comboIC_DeviceFolder.setText(_selectedIC.getDeviceFolder());
+         _comboDeviceType.select(_selectedIC.getDeviceFolder().equals("Dropbox") ? 1 : 0); //$NON-NLS-1$
 
          _txtIC_DeviceFiles.setText(_selectedIC.fileGlobPattern);
          _lblIC_DeleteFilesInfo.setText(createUIText_MovedFiles());

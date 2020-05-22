@@ -18,6 +18,7 @@ Bundle-ClassPath: .,
  httpcore-4.4.13.jar,
  httpclient-4.5.12.jar
 Import-Package: com.fasterxml.jackson.core,
+ net.tourbook.application,
  org.apache.commons.io,
  org.apache.http,
  org.apache.http.client.entity,

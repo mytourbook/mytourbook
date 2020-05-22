@@ -15,9 +15,7 @@
  *******************************************************************************/
 package net.tourbook.cloud;
 
-public interface ICloudPreferences {
-
-   public static final String PREF_PAGE_DROPBOX = "net.tourbook.cloud.dropbox.PrefPageDropbox";//$NON-NLS-1$
+public interface IPreferences {
 
    /*
     * Dropbox preferences

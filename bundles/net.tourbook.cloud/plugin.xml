@@ -12,19 +12,22 @@
       
    </extension>
 
-   <extension	point="org.eclipse.core.runtime.preferences">
-	<initializer
-		class="net.tourbook.cloud.PreferenceInitializer"/>
-   </extension>
-
    <!-- Dropbox -->
    <extension	point="org.eclipse.ui.preferencePages">
       <page
             category="net.tourbook.preferences.PrefPageCloudConnectivity"
             class="net.tourbook.cloud.dropbox.PrefPageDropbox"
-            id="net.tourbook.cloud.dropbox.PrefPageDropbox"
+            id="net.tourbook.cloud.PrefPageDropbox"
             name="Dropbox">
       </page>
+   </extension>
+   
+    <extension   point="org.eclipse.core.runtime.preferences">
+   
+      <initializer
+         class="net.tourbook.cloud.PreferenceInitializer"
+      />
+
    </extension>
 
 </plugin>

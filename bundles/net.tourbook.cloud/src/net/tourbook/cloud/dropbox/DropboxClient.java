@@ -26,7 +26,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import net.tourbook.cloud.Activator;
-import net.tourbook.cloud.ICloudPreferences;
+import net.tourbook.cloud.IPreferences;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
@@ -50,7 +50,7 @@ public class DropboxClient {
          @Override
          public void propertyChange(final PropertyChangeEvent event) {
 
-            if (event.getProperty().equals(ICloudPreferences.DROPBOX_ACCESSTOKEN)) {
+            if (event.getProperty().equals(IPreferences.DROPBOX_ACCESSTOKEN)) {
 
                // Re create the Dropbox client
                createDefaultDropboxClient();
@@ -67,34 +67,36 @@ public class DropboxClient {
    /**
     * Downloads a remote Dropbox file to a local temporary location
     *
-    * @param dropboxFilefilePath
+    * @param dropboxFilePath
     *           The Dropbox path of the file
     * @return The local path of the downloaded file
     */
-   public static Path CopyLocally(final String dropboxFilefilePath) {
+   public static Path CopyLocally(String dropboxFilePath) {
 
-      if (StringUtils.isNullOrEmpty(dropboxFilefilePath)) {
+      if (StringUtils.isNullOrEmpty(dropboxFilePath)) {
          return null;
       }
 
-      Path dropboxDirectoryPath = null;
+      Path dropboxTemporaryDirectoryPath = null;
 
       //Creating a "Dropbox" folder in the system's temporary directory
       try {
-         dropboxDirectoryPath = Paths.get(FileUtils.getTempDirectoryPath(), "Dropbox");
-         FileUtils.forceMkdir(dropboxDirectoryPath.toFile());
+         dropboxTemporaryDirectoryPath = Paths.get(FileUtils.getTempDirectoryPath(), "Dropbox"); //$NON-NLS-1$
+         FileUtils.forceMkdir(dropboxTemporaryDirectoryPath.toFile());
       } catch (final IOException e) {
          StatusUtil.log(e);
          return null;
       }
 
-      final String fileName = Paths.get(dropboxFilefilePath).getFileName().toString();
-      final Path filePath = Paths.get(dropboxDirectoryPath.toString(), fileName);
+      dropboxFilePath = dropboxFilePath.replace(UI.SYMBOL_BACKSLASH, "/"); //$NON-NLS-1$
+
+      final String fileName = Paths.get(dropboxFilePath).getFileName().toString();
+      final Path filePath = Paths.get(dropboxTemporaryDirectoryPath.toString(), fileName);
 
       //Downloading the file from Dropbox to the local disk
       try (OutputStream outputStream = new FileOutputStream(filePath.toString())) {
 
-         _dropboxClient.files().download(dropboxFilefilePath).download(outputStream);
+         _dropboxClient.files().download(dropboxFilePath).download(outputStream);
 
          return filePath;
       } catch (final DbxException | IOException e) {
@@ -109,7 +111,7 @@ public class DropboxClient {
     */
    private static void createDefaultDropboxClient() {
 
-      _accessToken = _prefStore.getString(ICloudPreferences.DROPBOX_ACCESSTOKEN);
+      _accessToken = _prefStore.getString(IPreferences.DROPBOX_ACCESSTOKEN);
 
       _dropboxClient = createDropboxClient(_accessToken);
    }
