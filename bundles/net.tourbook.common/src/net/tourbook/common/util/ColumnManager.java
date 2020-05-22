@@ -632,6 +632,11 @@ public class ColumnManager {
       return headerContextMenu;
    }
 
+   /**
+    * Creates the (h)eader (c)ontext (m)enu.
+    *
+    * @param contextMenu
+    */
    private void createHCM_0_MenuItems(final Menu contextMenu) {
 
       setVisibleColumnIds_FromViewer();

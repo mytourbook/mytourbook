@@ -328,14 +328,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       @Override
       public void updateElement(final int index) {
 
-//         System.out.println(" [" + getClass().getSimpleName() + "] updateElement: " + index);
-// TODO remove SYSTEM.OUT.PRINTLN
-
-//         final TVITourBookItem tviItem = (TVITourBookItem) parent;
-//
-//         final ArrayList<TreeViewerItem> tviChildren = tviItem.getChildren();
-//         final TreeViewerItem tviTourItem = tviChildren.get(index);
-
          final TreeViewerItem tableItem = _rootItem_Table.getFetchedChildren().get(index);
 
          _tourViewer_Table.replace(tableItem, index);
@@ -4636,7 +4628,15 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
    @Override
    public ColumnViewer getViewer() {
-      return _tourViewer_Tree;
+
+      if (_isLayoutFlat) {
+
+         return _tourViewer_Table;
+
+      } else {
+
+         return _tourViewer_Tree;
+      }
    }
 
    /**
@@ -4842,11 +4842,13 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       if (_isLayoutFlat) {
 
+
          _viewerContainer_Table.setRedraw(false);
          {
             final ISelection selection = _tourViewer_Table.getSelection();
 
-            _tourViewer_Table.getTable().dispose();
+            final Table table_Old = _tourViewer_Table.getTable();
+            table_Old.dispose();
 
             createUI_20_TourViewer_Table(_viewerContainer_Table);
             _viewerContainer_Table.layout();
@@ -4854,6 +4856,11 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             setupTourViewerContent();
 
             _tourViewer_Table.setSelection(selection);
+
+            // ensure that the selected item also has the focus, these are 2 different things !
+            final Table table_New = _tourViewer_Table.getTable();
+            table_New.setSelection(table_New.getSelectionIndex());
+            table_New.setFocus();
          }
          _viewerContainer_Table.setRedraw(true);
 

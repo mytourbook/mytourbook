@@ -60,7 +60,7 @@ public class TVITourBookTour extends TVITourBookItem {
       // cleanup
       sqlTagIds = null;
       sqlMarkerIds = null;
-      
+
       _tagIds = null;
       _markerIds = null;
 
@@ -119,6 +119,22 @@ public class TVITourBookTour extends TVITourBookItem {
 
    public void setTagIds(final HashSet<Long> tagIds) {
       sqlTagIds = tagIds;
+   }
+
+   @Override
+   public String toString() {
+
+      return "TVITourBookTour" + NL //$NON-NLS-1$
+
+            + "[" + NL //$NON-NLS-1$
+
+            + "colDateTimeText=" + colDateTimeText + NL //$NON-NLS-1$
+            + "colTourDateTime=" + colTourDateTime + NL //$NON-NLS-1$
+            + "colTourTitle=" + colTourTitle //$NON-NLS-1$
+
+            + NL
+
+            + "]"; //$NON-NLS-1$
    }
 
 }

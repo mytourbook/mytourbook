@@ -4249,9 +4249,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          _isInUpdate = true;
          {
             _tourViewer.setSelection(selectionBackup, true);
-
-            final Table table = _tourViewer.getTable();
-            table.showSelection();
+            _tourViewer.getTable().showSelection();
          }
          _isInUpdate = false;
       }

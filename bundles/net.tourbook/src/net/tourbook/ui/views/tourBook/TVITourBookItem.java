@@ -270,130 +270,130 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
     * Month starts with 1 for January
     */
    int          tourMonth;
-
+   //
    int          tourWeek;
    int          tourYearSub;
    int          tourDay;
+   //
    /**
     * Contains the tour date time with time zone info when available
     */
    TourDateTime colTourDateTime;
    String       colTimeZoneId;
-
+   //
    String       colTourTitle;
-
+   //
    String       colTourLocation_Start;   // tourStartPlace
    String       colTourLocation_End;     // tourEndPlace
    long         colPersonId;             // tourPerson_personId
-
+   //
    long         colCounter;
-
+   //
    long         colCalories;
    long         colTourDistance;
    float        colBodyWeight;
+   int          colRestPulse;
+   //
    long         colTourRecordingTime;
-
    long         colTourDrivingTime;
    long         colPausedTime;
+   //
    long         colAltitudeUp;
-
    long         colAltitudeDown;
    float        colAltitude_AvgChange;
+   //
    float        colMaxSpeed;
-
    long         colMaxAltitude;
    long         colMaxPulse;
+   //
    float        colAvgSpeed;
-
    float        colAvgPace;
    float        colAvgPulse;
    float        colAvgCadence;
+   //
    float        colTemperature_Avg;
-
    float        colTemperature_Min;
    float        colTemperature_Max;
+   //
    int          colWindSpd;
-
    int          colWindDir;
    String       colClouds;
-   int          colRestPulse;
+   //
    int          colWeekNo;
-
    String       colWeekDay;
    int          colWeekYear;
+   //
    long         colNumberOfTimeSlices;
    long         colNumberOfPhotos;
-
+   //
    int          colDPTolerance;
-
+   //
    long         colFrontShiftCount;
    long         colRearShiftCount;
-
+   //
    float        colCadenceMultiplier;
-
    String       colSlowVsFastCadence;
+
    int          colCadenceZonesDelimiter;
-
+   //
    // ----------- Running Dynamics ---------
-
+   //
    int   colRunDyn_StanceTime_Min;
    int   colRunDyn_StanceTime_Max;
    float colRunDyn_StanceTime_Avg;
    float colRunDyn_StanceTimeBalance_Min;
-
    float colRunDyn_StanceTimeBalance_Max;
    float colRunDyn_StanceTimeBalance_Avg;
+   //
    int   colRunDyn_StepLength_Min;
-
    int   colRunDyn_StepLength_Max;
    float colRunDyn_StepLength_Avg;
+   //
    float colRunDyn_VerticalOscillation_Min;
-
    float colRunDyn_VerticalOscillation_Max;
    float colRunDyn_VerticalOscillation_Avg;
+   //
    float colRunDyn_VerticalRatio_Min;
-
    float colRunDyn_VerticalRatio_Max;
    float colRunDyn_VerticalRatio_Avg;
-
+   //
    // ----------- POWER ---------
-
+   //
    float colPower_AvgLeftTorqueEffectiveness;
    float colPower_AvgRightTorqueEffectiveness;
    float colPower_AvgLeftPedalSmoothness;
    float colPower_AvgRightPedalSmoothness;
    int   colPower_PedalLeftRightBalance;
+   //   
    float colPower_Avg;
-
    int   colPower_Max;
    int   colPower_Normalized;
    long  colPower_TotalWork;
-
+   //
    // ----------- TRAINING ---------
-
+   //
    int   colTraining_FTP;
    float colTraining_TrainingStressScore;
-
+   //
    float colTraining_IntensityFactor;
    float colTraining_PowerToWeight;
+   //
    float colTraining_TrainingEffect_Aerob;
-
    float colTraining_TrainingEffect_Anaerobic;
    float colTraining_TrainingPerformance;
-
+   //
    // ----------- SURFING ---------
-
-   long  col_Surfing_NumberOfEvents;
+   //
+   long    col_Surfing_NumberOfEvents;
    short   col_Surfing_MinSpeed_StartStop;
    short   col_Surfing_MinSpeed_Surfing;
    short   col_Surfing_MinTimeDuration;
    boolean col_Surfing_IsMinDistance;
-
    short   col_Surfing_MinDistance;
-
+   //
    // ----------- IMPORT ---------
-
-   String  col_ImportFileName;
+   //
+   String col_ImportFileName;
    String col_ImportFilePath;
    String col_DeviceName;
 
@@ -468,9 +468,36 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
       // cleanup
       tourBookView = null;
-      colTourDateTime = null;
+
+// disabled because object compare depends on it
+//      colTourDateTime = null;
 
       super.clearChildren();
+   }
+
+   @Override
+   public boolean equals(final Object obj) {
+
+      if (this == obj) {
+         return true;
+      }
+      if (obj == null) {
+         return false;
+      }
+      if (getClass() != obj.getClass()) {
+         return false;
+      }
+
+      final TVITourBookItem other = (TVITourBookItem) obj;
+      if (colTourDateTime == null) {
+         if (other.colTourDateTime != null) {
+            return false;
+         }
+      } else if (!colTourDateTime.equals(other.colTourDateTime)) {
+         return false;
+      }
+
+      return true;
    }
 
    protected void fetchTourItems(final PreparedStatement statement) throws SQLException {
@@ -729,6 +756,14 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
    @Override
    public Long getTourId() {
       return null;
+   }
+
+   @Override
+   public int hashCode() {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + ((colTourDateTime == null) ? 0 : colTourDateTime.hashCode());
+      return result;
    }
 
 }
