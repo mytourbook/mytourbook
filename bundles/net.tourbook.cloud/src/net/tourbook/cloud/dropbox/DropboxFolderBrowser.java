@@ -30,6 +30,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.TableLayoutComposite;
 
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -75,7 +76,7 @@ public class DropboxFolderBrowser extends TitleAreaDialog {
    private boolean               _isInErrorState;
 
    private final IDialogSettings _state         = TourbookPlugin
-         .getState("DropboxFolderBrowser"); //$NON-NLS-1$
+         .getState("DropboxFolderBrowser");                                      //$NON-NLS-1$
    /*
     * Browser UI controls
     */
@@ -117,6 +118,15 @@ public class DropboxFolderBrowser extends TitleAreaDialog {
       text = Messages.Dialog_DropboxFolderChooser_Area_Text;
 
       setTitle(text);
+   }
+
+   @Override
+   protected final void createButtonsForButtonBar(final Composite parent) {
+
+      super.createButtonsForButtonBar(parent);
+
+      // set text for the OK button
+      getButton(IDialogConstants.OK_ID).setText(Messages.Dialog_DropboxBrowser_Button_SelectFolder);
    }
 
    @Override
@@ -168,7 +178,7 @@ public class DropboxFolderBrowser extends TitleAreaDialog {
    private Composite createUI(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().applyTo(container);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
       GridLayoutFactory.fillDefaults().margins(20, 20).numColumns(2).applyTo(container);
       {
          /*
@@ -195,13 +205,13 @@ public class DropboxFolderBrowser extends TitleAreaDialog {
          GridDataFactory.fillDefaults().grab(true, false).applyTo(_textSelectedAbsolutePath);
          _textSelectedAbsolutePath.setText(ROOT_FOLDER);
 
-         createUI_10_FilterViewer(container);
+         createUI_10_FolderViewer(container);
       }
 
       return container;
    }
 
-   private void createUI_10_FilterViewer(final Composite parent) {
+   private void createUI_10_FolderViewer(final Composite parent) {
 
       final TableLayoutComposite layouter = new TableLayoutComposite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().span(3, 1).grab(true, true).hint(600, 300).applyTo(layouter);
@@ -220,23 +230,23 @@ public class DropboxFolderBrowser extends TitleAreaDialog {
 
             final Metadata entry = ((Metadata) cell.getElement());
 
-            String filterName = null;
-            Image filterImage = null;
+            String entryName = null;
+            Image entryImage = null;
 
-            filterName = entry.getName();
+            entryName = entry.getName();
 
             if (entry instanceof FolderMetadata) {
 
-               filterImage =
+               entryImage =
                      Activator.getImageDescriptor(Messages.Image__Dropbox_Folder).createImage();
             } else if (entry instanceof FileMetadata) {
 
-               filterImage =
+               entryImage =
                      Activator.getImageDescriptor(Messages.Image__Dropbox_File).createImage();
             }
 
-            cell.setText(filterName);
-            cell.setImage(filterImage);
+            cell.setText(entryName);
+            cell.setImage(entryImage);
          }
       });
       layouter.addColumnData(new ColumnWeightData(1));
