@@ -137,6 +137,11 @@ public class DropboxFileSystem extends TourbookFileSystem {
       return result;
    }
 
+   @Override
+   public String getAbsoluteRootPath() {
+      return _prefStore.getString(IPreferences.DROPBOX_FOLDER);
+   }
+
    /**
     * Retrieves the Dropbox {@link FileStore}.
     * Creates it if necessary.

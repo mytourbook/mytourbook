@@ -29,6 +29,7 @@ import net.tourbook.Messages;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.FileSystemManager;
 import net.tourbook.common.NIO;
+import net.tourbook.common.TourbookFileSystem;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
 
@@ -529,8 +530,10 @@ class HistoryItems {
 
                      } else if (NIO.isTourBookFileSystem(cleanedFolderName)) {
 
-                        _labelFolderInfo.setText(FileSystemManager.getFileSystemId(cleanedFolderName));
-
+                        final TourbookFileSystem dropboxFileSystem = FileSystemManager.getTourbookFileSystem(cleanedFolderName);
+                        if (dropboxFileSystem != null) {
+                           _labelFolderInfo.setText(dropboxFileSystem.getAbsoluteRootPath());
+                        }
                      } else {
 
                         final String deviceFolder = convertTo_DeviceNameFolder(osFolder);
