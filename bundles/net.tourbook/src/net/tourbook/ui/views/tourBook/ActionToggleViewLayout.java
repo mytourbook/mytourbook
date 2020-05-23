@@ -19,26 +19,27 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.swt.widgets.Event;
 
 class ActionToggleViewLayout extends Action {
 
-	private TourBookView	_tourBookView;
+   private TourBookView _tourBookView;
 
-	/**
-	 * @param tourBookView
-	 */
-	public ActionToggleViewLayout(final TourBookView tourBookView) {
+   /**
+    * @param tourBookView
+    */
+   public ActionToggleViewLayout(final TourBookView tourBookView) {
 
-		super(null, AS_PUSH_BUTTON);
+      super(null, AS_PUSH_BUTTON);
 
       setToolTipText(Messages.Tour_Book_Action_ToggleViewLayout_Tooltip);
-		setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TourBook_Month));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TourBook_Month));
 
-		_tourBookView = tourBookView;
-	}
+      _tourBookView = tourBookView;
+   }
 
-	@Override
-	public void run() {
-		_tourBookView.actionToggleViewLayout();
-	}
-} 
+   @Override
+   public void runWithEvent(final Event event) {
+      _tourBookView.actionToggleViewLayout(event);
+   }
+}
