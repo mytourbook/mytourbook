@@ -42,9 +42,11 @@ public class Tile extends Observable {
 //   private static final double            MAX_LATITUDE_85_05112877   = 85.05112877;
 
    private static final String             NL                        = "\n";                                //$NON-NLS-1$
-   private static final String             COLUMN_2                  = "  ";                                //$NON-NLS-1$
-   private static final String             COLUMN_4                  = "    ";                              //$NON-NLS-1$
-   private static final String             COLUMN_5                  = "     ";                             //$NON-NLS-1$
+   /*
+    * private static final String COLUMN_2 = "  "; //$NON-NLS-1$
+    * private static final String COLUMN_4 = "    "; //$NON-NLS-1$
+    * private static final String COLUMN_5 = "     ";
+    */
 
    private static final ReentrantLock      TILE_LOCK                 = new ReentrantLock();
    private static final int                MAX_BOUNDS                = Map.MAP_MAX_ZOOM_LEVEL + 1;
@@ -1096,11 +1098,11 @@ public class Tile extends Observable {
    @Override
    public String toString() {
 
-      final boolean isImageOK = _mapImage == null ? //
-            false
-            : _mapImage.isDisposed() ? //
-                  false
-                  : true;
+      // final boolean isImageOK = _mapImage == null ? //
+      // false
+      // : _mapImage.isDisposed() ? //
+      // false
+      // : true;
 
       return UI.EMPTY_STRING
 

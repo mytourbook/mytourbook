@@ -79,11 +79,7 @@ public class TagManager {
             + " WHERE TOURTAGCATEGORY_TAGCATEGORYID1 = " + categoryId + NL //                //$NON-NLS-1$
       ;
 
-      Connection conn = null;
-
-      try {
-
-         conn = TourDatabase.getInstance().getConnection();
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          final long numCategory_Tags = getNumberOfItems(conn, sql_Category_Tags);
          if (numCategory_Tags > 0) {
@@ -111,8 +107,6 @@ public class TagManager {
 
       } catch (final SQLException e) {
          UI.showSQLException(e);
-      } finally {
-         Util.closeSql(conn);
       }
 
       return false;
@@ -191,15 +185,12 @@ public class TagManager {
       boolean returnResult = false;
 
       String sql;
-      Connection conn = null;
 
       PreparedStatement prepStmt_TagCategory = null;
       PreparedStatement prepStmt_TourData = null;
       PreparedStatement prepStmt_TourTag = null;
 
-      try {
-
-         conn = TourDatabase.getInstance().getConnection();
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          // remove tag from TOURDATA_TOURTAG
          sql = "DELETE" //                                                        //$NON-NLS-1$
@@ -265,7 +256,6 @@ public class TagManager {
 
       } finally {
 
-         Util.closeSql(conn);
          Util.closeSql(prepStmt_TourData);
          Util.closeSql(prepStmt_TagCategory);
          Util.closeSql(prepStmt_TourTag);
@@ -327,14 +317,11 @@ public class TagManager {
       boolean returnResult = false;
 
       String sql;
-      Connection conn = null;
 
       PreparedStatement prepStmt_CategoryCategory = null;
       PreparedStatement prepStmt_TagCategory = null;
 
-      try {
-
-         conn = TourDatabase.getInstance().getConnection();
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          // remove category from: TOURTAGCATEGORY_TOURTAGCATEGORY
          sql = "DELETE" + NL //                                                                 //$NON-NLS-1$
@@ -379,7 +366,6 @@ public class TagManager {
 
       } finally {
 
-         Util.closeSql(conn);
          Util.closeSql(prepStmt_CategoryCategory);
          Util.closeSql(prepStmt_TagCategory);
       }
@@ -403,11 +389,8 @@ public class TagManager {
    private static long getNumberOfItems(final Connection conn, final String sql) {
 
       long numItems = 0;
-      PreparedStatement stmt = null;
 
-      try {
-
-         stmt = conn.prepareStatement(sql);
+      try (PreparedStatement stmt = conn.prepareStatement(sql)) {
 
          final ResultSet result = stmt.executeQuery();
          while (result.next()) {
@@ -418,8 +401,6 @@ public class TagManager {
       } catch (final SQLException e) {
          StatusUtil.log(sql);
          UI.showSQLException(e);
-      } finally {
-         Util.closeSql(stmt);
       }
 
       return numItems;
@@ -469,31 +450,26 @@ public class TagManager {
 
             + " ORDER BY tourId\n"; //                                                 //$NON-NLS-1$
 
-      Connection conn = null;
       PreparedStatement statement = null;
 
-      try {
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         conn = TourDatabase.getInstance().getConnection();
-         {
-            statement = conn.prepareStatement(sql);
+         statement = conn.prepareStatement(sql);
 
-            // fillup parameter
-            for (int parameterIndex = 0; parameterIndex < sqlParameters.size(); parameterIndex++) {
-               statement.setLong(parameterIndex + 1, sqlParameters.get(parameterIndex));
-            }
+         // fillup parameter
+         for (int parameterIndex = 0; parameterIndex < sqlParameters.size(); parameterIndex++) {
+            statement.setLong(parameterIndex + 1, sqlParameters.get(parameterIndex));
+         }
 
-            final ResultSet result = statement.executeQuery();
-            while (result.next()) {
-               allTourIds.add(result.getLong(1));
-            }
+         final ResultSet result = statement.executeQuery();
+         while (result.next()) {
+            allTourIds.add(result.getLong(1));
          }
 
       } catch (final SQLException e) {
          StatusUtil.log(sql);
          UI.showSQLException(e);
       } finally {
-         Util.closeSql(conn);
          Util.closeSql(statement);
       }
 

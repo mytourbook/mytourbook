@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -2531,7 +2531,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
                 */
                final TreeItem[] treeChildren = treeItem.getItems();
                int itemIndex = 0;
-               int visibleLayers = 0;
+               //int visibleLayers = 0;
 
                for (final TreeItem childItem : treeChildren) {
 
@@ -2542,9 +2542,9 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
                      mtLayer.setPositionIndex(itemIndex++);
 
-                     if (mtLayer.isDisplayedInMap()) {
-                        visibleLayers++;
-                     }
+                     //if (mtLayer.isDisplayedInMap()) {
+                     //   visibleLayers++;
+                     //}
                   }
                }
 

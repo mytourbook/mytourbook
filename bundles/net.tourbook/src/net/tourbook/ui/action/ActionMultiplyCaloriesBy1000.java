@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -25,7 +25,6 @@ import net.tourbook.Messages;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.StatusUtil;
-import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.TourEventId;
@@ -43,148 +42,143 @@ import org.eclipse.swt.widgets.Display;
 
 public class ActionMultiplyCaloriesBy1000 extends Action {
 
-	private final ITourProvider _tourProvider;
+   private final ITourProvider _tourProvider;
 
-	public ActionMultiplyCaloriesBy1000(final ITourProvider tourProvider) {
+   public ActionMultiplyCaloriesBy1000(final ITourProvider tourProvider) {
 
-		super(Messages.Tour_Action_MultiplyCaloriesBy1000, AS_PUSH_BUTTON);
+      super(Messages.Tour_Action_MultiplyCaloriesBy1000, AS_PUSH_BUTTON);
 
-		_tourProvider = tourProvider;
-	}
+      _tourProvider = tourProvider;
+   }
 
-	@Override
-	public void run() {
+   @Override
+   public void run() {
 
-		// check if the tour editor contains a modified tour
-		if (TourManager.isTourEditorModified()) {
-			return;
-		}
+      // check if the tour editor contains a modified tour
+      if (TourManager.isTourEditorModified()) {
+         return;
+      }
 
-		final ArrayList<TourData> selectedTours = _tourProvider.getSelectedTours();
+      final ArrayList<TourData> selectedTours = _tourProvider.getSelectedTours();
 
-		if (selectedTours == null || selectedTours.size() < 1) {
+      if (selectedTours == null || selectedTours.size() < 1) {
 
-			// a tour is not selected -> this should not happen, action should be disabled
+         // a tour is not selected -> this should not happen, action should be disabled
 
-			return;
-		}
+         return;
+      }
 
-		final MessageDialog messageDialog = new MessageDialog(
-				Display.getDefault().getActiveShell(),
-				Messages.Tour_Action_MultiplyCaloriesBy1000_Title,
-				null,
-				NLS.bind(Messages.Tour_Action_MultiplyCaloriesBy1000_Message, selectedTours.size()),
-				MessageDialog.QUESTION,
-				new String[] {
-						Messages.Tour_Action_MultiplyCaloriesBy1000_Apply,
-						IDialogConstants.CANCEL_LABEL },
-				1);
+      final MessageDialog messageDialog = new MessageDialog(
+            Display.getDefault().getActiveShell(),
+            Messages.Tour_Action_MultiplyCaloriesBy1000_Title,
+            null,
+            NLS.bind(Messages.Tour_Action_MultiplyCaloriesBy1000_Message, selectedTours.size()),
+            MessageDialog.QUESTION,
+            new String[] {
+                  Messages.Tour_Action_MultiplyCaloriesBy1000_Apply,
+                  IDialogConstants.CANCEL_LABEL },
+            1);
 
-		if (messageDialog.open() != 0) {
+      if (messageDialog.open() != 0) {
 
-			// canceled
+         // canceled
 
-			return;
-		}
+         return;
+      }
 
-		// multiply calories
+      // multiply calories
 
-		try {
+      try {
 
-			final IRunnableWithProgress runnable = new IRunnableWithProgress() {
-				@Override
-				public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+         final IRunnableWithProgress runnable = new IRunnableWithProgress() {
+            @Override
+            public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
-					boolean isMultiplied = false;
+               boolean isMultiplied = false;
 
-					Connection conn = null;
-					try {
+               try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-						conn = TourDatabase.getInstance().getConnection();
+                  isMultiplied = run_MultiplyCalories(conn, monitor, selectedTours);
 
-						isMultiplied = run_MultiplyCalories(conn, monitor, selectedTours);
+               } catch (final SQLException e) {
 
-					} catch (final SQLException e) {
+                  SQL.showException(e);
 
-						SQL.showException(e);
+               } finally {
 
-					} finally {
+                  if (isMultiplied) {
 
-						Util.closeSql(conn);
+                     TourManager.getInstance().clearTourDataCache();
 
-						if (isMultiplied) {
+                     Display.getDefault().asyncExec(new Runnable() {
+                        @Override
+                        public void run() {
 
-							TourManager.getInstance().clearTourDataCache();
+                           TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR);
+                           TourManager.fireEvent(TourEventId.ALL_TOURS_ARE_MODIFIED);
+                        }
+                     });
 
-							Display.getDefault().asyncExec(new Runnable() {
-								@Override
-								public void run() {
+                  }
+               }
+            }
+         };
 
-									TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR);
-									TourManager.fireEvent(TourEventId.ALL_TOURS_ARE_MODIFIED);
-								}
-							});
+         new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, false, runnable);
 
-						}
-					}
-				}
-			};
+      } catch (final Exception e) {
+         StatusUtil.log(e);
+      }
+   }
 
-			new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, false, runnable);
+   /**
+    * Update calendar week for all tours with the app week settings from
+    * {@link TimeTools#calendarWeek}
+    *
+    * @param conn
+    * @param monitor
+    * @param selectedTours
+    * @return Returns <code>true</code> when the week is computed
+    * @throws SQLException
+    */
+   private boolean run_MultiplyCalories(final Connection conn,
+                                        final IProgressMonitor monitor,
+                                        final ArrayList<TourData> selectedTours) throws SQLException {
 
-		} catch (final Exception e) {
-			StatusUtil.log(e);
-		}
-	}
+      boolean isUpdated = false;
 
-	/**
-	 * Update calendar week for all tours with the app week settings from
-	 * {@link TimeTools#calendarWeek}
-	 * 
-	 * @param conn
-	 * @param monitor
-	 * @param selectedTours
-	 * @return Returns <code>true</code> when the week is computed
-	 * @throws SQLException
-	 */
-	private boolean run_MultiplyCalories(	final Connection conn,
-											final IProgressMonitor monitor,
-											final ArrayList<TourData> selectedTours) throws SQLException {
+      final PreparedStatement stmtUpdate = conn.prepareStatement(
 
-		boolean isUpdated = false;
+            "UPDATE " + TourDatabase.TABLE_TOUR_DATA//  //$NON-NLS-1$
+                  + " SET" //$NON-NLS-1$
+                  + " calories=? " //$NON-NLS-1$
+                  + " WHERE tourId=?"); //$NON-NLS-1$
 
-		final PreparedStatement stmtUpdate = conn.prepareStatement(
+      int tourIdx = 1;
 
-				"UPDATE " + TourDatabase.TABLE_TOUR_DATA//  //$NON-NLS-1$
-						+ " SET" //$NON-NLS-1$
-						+ " calories=? " //$NON-NLS-1$
-						+ " WHERE tourId=?"); //$NON-NLS-1$
+      // loop over all tours and calculate and set new columns
+      for (final TourData tourData : selectedTours) {
 
-		int tourIdx = 1;
+         if (monitor != null) {
 
-		// loop over all tours and calculate and set new columns
-		for (final TourData tourData : selectedTours) {
+            final String msg = NLS.bind(
+                  Messages.Tour_Database_Update_TourWeek,
+                  new Object[] { tourIdx++, selectedTours.size() });
 
-			if (monitor != null) {
+            monitor.subTask(msg);
+         }
 
-				final String msg = NLS.bind(
-						Messages.Tour_Database_Update_TourWeek,
-						new Object[] { tourIdx++, selectedTours.size() });
+         final int newCalories = tourData.getCalories() * 1_000;
 
-				monitor.subTask(msg);
-			}
+         // update week number/week year in the database
+         stmtUpdate.setInt(1, newCalories);
+         stmtUpdate.setLong(2, tourData.getTourId());
 
-			final int newCalories = tourData.getCalories() * 1_000;
+         stmtUpdate.executeUpdate();
 
-			// update week number/week year in the database
-			stmtUpdate.setInt(1, newCalories);
-			stmtUpdate.setLong(2, tourData.getTourId());
+         isUpdated = true;
+      }
 
-			stmtUpdate.executeUpdate();
-
-			isUpdated = true;
-		}
-
-		return isUpdated;
-	}
+      return isUpdated;
+   }
 }

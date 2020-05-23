@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -121,7 +121,7 @@ public class GarminExternalDevice extends ExternalDevice {
 				final String productName = productInfo.getProductName();
 				context.put("devicename", productName.substring(0, productName.indexOf(' '))); //$NON-NLS-1$
             context.put("productid", UI.EMPTY_STRING + productInfo.getProductId()); //$NON-NLS-1$
-            context.put("devicemajorversion", UI.EMPTY_STRING + (productInfo.getProductSoftware() / 100)); //$NON-NLS-1$ 
+            context.put("devicemajorversion", UI.EMPTY_STRING + (productInfo.getProductSoftware() / 100)); //$NON-NLS-1$
             context.put("deviceminorversion", UI.EMPTY_STRING + (productInfo.getProductSoftware() % 100)); //$NON-NLS-1$
 
 				// Version

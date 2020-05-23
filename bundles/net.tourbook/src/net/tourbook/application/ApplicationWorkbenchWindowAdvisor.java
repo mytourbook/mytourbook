@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,6 +23,35 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+
+import net.tourbook.Messages;
+import net.tourbook.common.UI;
+import net.tourbook.common.formatter.FormatManager;
+import net.tourbook.common.swimming.SwimStrokeManager;
+import net.tourbook.common.util.StatusUtil;
+import net.tourbook.data.TourPerson;
+import net.tourbook.database.PersonManager;
+import net.tourbook.database.TourDatabase;
+import net.tourbook.map.bookmark.MapBookmarkManager;
+import net.tourbook.map3.view.Map3Manager;
+import net.tourbook.map3.view.Map3State;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.PrefPagePeople;
+import net.tourbook.proxy.DefaultProxySelector;
+import net.tourbook.proxy.IPreferences;
+import net.tourbook.search.FTSearchManager;
+import net.tourbook.tag.TagMenuManager;
+import net.tourbook.tag.tour.filter.TourTagFilterManager;
+import net.tourbook.tour.TourTypeFilterManager;
+import net.tourbook.tour.TourTypeMenuManager;
+import net.tourbook.tour.filter.TourFilterManager;
+import net.tourbook.tour.filter.geo.TourGeoFilter_Manager;
+import net.tourbook.tour.photo.TourPhotoManager;
+import net.tourbook.tourType.TourTypeImage;
+import net.tourbook.tourType.TourTypeManager;
+//import net.tourbook.ui.UI;
+import net.tourbook.ui.views.rawData.RawDataView;
+import net.tourbook.web.WebContentServer;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
@@ -59,35 +88,6 @@ import org.eclipse.ui.application.WorkbenchWindowAdvisor;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.internal.IPreferenceConstants;
 import org.eclipse.ui.internal.WorkbenchPlugin;
-
-import net.tourbook.Messages;
-import net.tourbook.common.UI;
-import net.tourbook.common.formatter.FormatManager;
-import net.tourbook.common.swimming.SwimStrokeManager;
-import net.tourbook.common.util.StatusUtil;
-import net.tourbook.data.TourPerson;
-import net.tourbook.database.PersonManager;
-import net.tourbook.database.TourDatabase;
-import net.tourbook.map.bookmark.MapBookmarkManager;
-import net.tourbook.map3.view.Map3Manager;
-import net.tourbook.map3.view.Map3State;
-import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.preferences.PrefPagePeople;
-import net.tourbook.proxy.DefaultProxySelector;
-import net.tourbook.proxy.IPreferences;
-import net.tourbook.search.FTSearchManager;
-import net.tourbook.tag.TagMenuManager;
-import net.tourbook.tag.tour.filter.TourTagFilterManager;
-import net.tourbook.tour.TourTypeFilterManager;
-import net.tourbook.tour.TourTypeMenuManager;
-import net.tourbook.tour.filter.TourFilterManager;
-import net.tourbook.tour.filter.geo.TourGeoFilter_Manager;
-import net.tourbook.tour.photo.TourPhotoManager;
-import net.tourbook.tourType.TourTypeImage;
-import net.tourbook.tourType.TourTypeManager;
-//import net.tourbook.ui.UI;
-import net.tourbook.ui.views.rawData.RawDataView;
-import net.tourbook.web.WebContentServer;
 
 @SuppressWarnings("restriction")
 public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
@@ -355,11 +355,10 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
    private void loadPeopleData() {
 
-      Connection conn = null;
       final String sqlString = "SELECT *  FROM " + TourDatabase.TABLE_TOUR_PERSON; //$NON-NLS-1$
 
-      try {
-         conn = TourDatabase.getInstance().getConnection();
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
+
          final PreparedStatement statement = conn.prepareStatement(sqlString);
          final ResultSet result = statement.executeQuery();
 
@@ -376,15 +375,6 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
       } catch (final SQLException e) {
          net.tourbook.ui.UI.showSQLException(e);
-      } finally {
-
-         if (conn != null) {
-            try {
-               conn.close();
-            } catch (final SQLException e) {
-               net.tourbook.ui.UI.showSQLException(e);
-            }
-         }
       }
    }
 
@@ -481,6 +471,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
       });
    }
 
+   @SuppressWarnings("deprecation")
    @Override
    public void preWindowOpen() {
 
@@ -499,7 +490,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
       final IPreferenceStore uiPrefStore = PlatformUI.getPreferenceStore();
 
-      uiPrefStore.setValue(IWorkbenchPreferenceConstants.SHOW_TRADITIONAL_STYLE_TABS, true);
+      uiPrefStore.setValue(IWorkbenchPreferenceConstants.SHOW_TRADITIONAL_STYLE_TABS, true);//not supported since the 4.x migration
       uiPrefStore.setValue(IWorkbenchPreferenceConstants.SHOW_PROGRESS_ON_STARTUP, true);
 
       // show memory monitor

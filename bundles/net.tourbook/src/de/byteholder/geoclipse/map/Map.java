@@ -563,6 +563,7 @@ public class Map extends Canvas {
     * simple mode
     */
    private boolean             _isTourPaintMethodEnhanced;
+   private boolean             _isShowTourPaintMethodEnhancedWarning;
 
    private boolean             _isFastMapPainting;
    private boolean             _isFastMapPainting_Active;
@@ -1525,7 +1526,7 @@ public class Map extends Canvas {
       final GeoPosition geo1 = new GeoPosition(geoLat1, geoLon1);
       final GeoPosition geo2 = new GeoPosition(geoLat2, geoLon2);
 
-      // set lat/lon to a grid of 0.01°
+      // set lat/lon to a grid of 0.01ï¿½
       int geoGrid_Lat1_E2 = (int) (geoLat1 * 100);
       int geoGrid_Lon1_E2 = (int) (geoLon1 * 100);
 
@@ -3781,7 +3782,9 @@ public class Map extends Canvas {
 
       if (isPaintBreadCrumb) {
 
-         _tourBreadcrumb.paint(gc, isPaintTile_With_BasicMethod() == false);
+         final boolean isEnhancedPaintingMethod = isPaintTile_With_BasicMethod() == false;
+
+         _tourBreadcrumb.paint(gc, isEnhancedPaintingMethod && _isShowTourPaintMethodEnhancedWarning);
       }
 
       return isPaintTourInfo;
@@ -5290,7 +5293,7 @@ public class Map extends Canvas {
    private boolean parsePOIText(String text) {
 
       try {
-         text = URLDecoder.decode(text, "UTF-8"); //$NON-NLS-1$
+         text = URLDecoder.decode(text, UI.UTF_8);
       } catch (final UnsupportedEncodingException e) {
          StatusUtil.log(e);
       }
@@ -6119,9 +6122,10 @@ public class Map extends Canvas {
       _isScaleVisible = isScaleVisible;
    }
 
-   public void setTourPaintMethodEnhanced(final boolean isEnhanced) {
+   public void setTourPaintMethodEnhanced(final boolean isEnhanced, final boolean isShowWarning) {
 
       _isTourPaintMethodEnhanced = isEnhanced;
+      _isShowTourPaintMethodEnhancedWarning = isShowWarning;
 
       disposeOverlayImageCache();
    }

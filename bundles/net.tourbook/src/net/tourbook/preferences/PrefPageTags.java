@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -310,8 +310,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
             if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
-               _tagViewer.getTree().setLinesVisible(
-                     getPreferenceStore().getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+               _tagViewer.getTree().setLinesVisible(getPreferenceStore().getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
                _tagViewer.refresh();
 
@@ -1296,12 +1295,11 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
          return;
       }
 
-      try {
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          TourLogManager.showLogView();
          TourLogManager.logTitle("RESET TAG STRUCTURE"); //$NON-NLS-1$
 
-         final Connection conn = TourDatabase.getInstance().getConnection();
          {
             String sql;
             int result;
@@ -1342,7 +1340,6 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
             }
             stmt4.close();
          }
-         conn.close();
 
          // update tag viewer with new loaded structure
          updateTagViewer();

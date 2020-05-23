@@ -9,8 +9,8 @@
    xmlns:mt="net.tourbook/1"
    xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd 
    http://www.cluetrust.com/XML/GPXDATA/1/0 http://www.cluetrust.com/Schemas/gpxdata10.xsd 
-   http://www.garmin.com/xmlschemas/GpxExtensions/v3 http://www.garmin.com/xmlschemas/GpxExtensionsv3.xsd 
-   http://www.garmin.com/xmlschemas/TrackPointExtension/v1 http://www.garmin.com/xmlschemas/TrackPointExtensionv1.xsd"
+   http://www.garmin.com/xmlschemas/GpxExtensions/v3 https://www8.garmin.com/xmlschemas/GpxExtensionsv3.xsd 
+   http://www.garmin.com/xmlschemas/TrackPointExtension/v1 https://www8.garmin.com/xmlschemas/TrackPointExtensionv1.xsd"
    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
    <metadata>   
       <time>$dateformat.format($starttime)</time>
@@ -199,12 +199,12 @@
 #end
          <trkpt lat="$nf8.format($point.Latitude)" lon="$nf8.format($point.Longitude)">
 ##
-#if($point.getDate())
-            <time>$dateformat.format($point.Date)</time>
-#end
 ##
 #if($point.hasValidAltitude())
             <ele>$nf3.format($point.Altitude)</ele>
+#end
+#if($point.getDate())
+            <time>$dateformat.format($point.Date)</time>
 #end
 ##
 #if($point.hasValidExtention())

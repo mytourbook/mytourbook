@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.TreeViewerItem;
-import net.tourbook.common.util.Util;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.SQLFilter;
 
@@ -110,11 +109,7 @@ public class TVITourBookRoot extends TVITourBookItem {
             + " ORDER BY StartYear     " + NL //$NON-NLS-1$
       ;
 
-      Connection conn = null;
-
-      try {
-
-         conn = TourDatabase.getInstance().getConnection();
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          final PreparedStatement statement = conn.prepareStatement(sql);
          sqlFilter.setParameters(statement, 1);
@@ -173,8 +168,6 @@ public class TVITourBookRoot extends TVITourBookItem {
 
       } catch (final SQLException e) {
          SQL.showException(e, sql);
-      } finally {
-         Util.closeSql(conn);
       }
    }
 

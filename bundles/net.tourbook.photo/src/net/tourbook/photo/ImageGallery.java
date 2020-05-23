@@ -1505,9 +1505,7 @@ public abstract class ImageGallery implements IItemListener, IGalleryContextMenu
 
          new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, true, runnable);
 
-      } catch (final InvocationTargetException e) {
-         StatusUtil.log(e);
-      } catch (final InterruptedException e) {
+      } catch (final InvocationTargetException | InterruptedException e) {
          StatusUtil.log(e);
       }
 

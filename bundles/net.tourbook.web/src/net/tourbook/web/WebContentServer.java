@@ -24,7 +24,6 @@ import com.sun.net.httpserver.HttpServer;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
@@ -419,18 +418,16 @@ public class WebContentServer {
 
    private static void handle_File(final HttpExchange httpExchange, final File file) {
 
-      FileInputStream fs = null;
       OutputStream os = null;
 
       ReplacingOutputStream replacingOS = null;
 
-      try {
+      try (FileInputStream fs = new FileInputStream(file)) {
 
          final String extension = WEB.setResponseHeaderContentType(httpExchange, file);
 
          httpExchange.sendResponseHeaders(200, 0);
 
-         fs = new FileInputStream(file);
          os = httpExchange.getResponseBody();
 
          if (extension.equals(WEB.FILE_EXTENSION_MTHTML)) {
@@ -458,8 +455,6 @@ public class WebContentServer {
          StatusUtil.log(e);
       } finally {
 
-         Util.close(fs);
-
          if (Util.close(os) == false) {
             StatusUtil.log(String.format("File: '%s'", file.toString()));//$NON-NLS-1$
          }
@@ -484,8 +479,6 @@ public class WebContentServer {
    }
 
    private static void handle_XHR(final HttpExchange httpExchange, final String requestUriPath, final StringBuilder log) {
-
-      final InputStream reqBody = null;
 
       try {
 
@@ -518,11 +511,7 @@ public class WebContentServer {
 
       } catch (final Exception e) {
          StatusUtil.log(e);
-      } finally {
-
-         Util.close(reqBody);
       }
-
    }
 
    private static void logHeader(final StringBuilder log, final Set<Entry<String, List<String>>> headerEntries) {

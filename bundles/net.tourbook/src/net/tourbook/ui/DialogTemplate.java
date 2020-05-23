@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -34,7 +34,9 @@ public class DialogTemplate extends TitleAreaDialog {
 
    private static final String    ID         = "net.tourbook.ui.DialogTemplate"; //$NON-NLS-1$
 
+   @SuppressWarnings("unused")
    private final IDialogSettings  _state     = TourbookPlugin.getState(ID);
+   @SuppressWarnings("unused")
    private final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
 
    public DialogTemplate(final Shell parentShell) {

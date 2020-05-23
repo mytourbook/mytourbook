@@ -6,7 +6,6 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.TourManager;
-import net.tourbook.tour.printing.PrintTourExtension;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourProviderAll;
 import net.tourbook.ui.UI;
@@ -25,7 +24,7 @@ import org.eclipse.swt.widgets.Menu;
 public class ActionPrint extends Action implements IMenuCreator {
 
 	private static ArrayList<PrintTourExtension>	fPrintExtensionPoints;
- 
+
 	private Menu									fMenu;
 	private ArrayList<ActionPrintTour>				fPrintTourActions;
 
@@ -44,7 +43,8 @@ public class ActionPrint extends Action implements IMenuCreator {
 			fPrintTourExtension = printTourExtension;
 		}
 
-		ActionPrintTour(final String visibleName, final String fileExtension) {}
+      @SuppressWarnings("unused")
+      ActionPrintTour(final String visibleName, final String fileExtension) {}
 
 		@Override
 		public void run() {
@@ -96,7 +96,7 @@ public class ActionPrint extends Action implements IMenuCreator {
 			return;
 		}
 
-		fPrintTourActions = new ArrayList<ActionPrintTour>();
+		fPrintTourActions = new ArrayList<>();
 
 		// create action for each extension point
 		for (final PrintTourExtension printTourExtension : fPrintExtensionPoints) {
@@ -104,7 +104,8 @@ public class ActionPrint extends Action implements IMenuCreator {
 		}
 	}
 
-	public void dispose() {
+	@Override
+   public void dispose() {
 		if (fMenu != null) {
 			fMenu.dispose();
 			fMenu = null;
@@ -120,7 +121,7 @@ public class ActionPrint extends Action implements IMenuCreator {
 			return fPrintExtensionPoints;
 		}
 
-		fPrintExtensionPoints = new ArrayList<PrintTourExtension>();
+		fPrintExtensionPoints = new ArrayList<>();
 
 		final IExtensionPoint extPoint = Platform.getExtensionRegistry().getExtensionPoint(TourbookPlugin.PLUGIN_ID,
 				TourbookPlugin.EXT_POINT_PRINT_TOUR);
@@ -153,11 +154,13 @@ public class ActionPrint extends Action implements IMenuCreator {
 		return fPrintExtensionPoints;
 	}
 
-	public Menu getMenu(final Control parent) {
+	@Override
+   public Menu getMenu(final Control parent) {
 		return null;
 	}
 
-	public Menu getMenu(final Menu parent) {
+	@Override
+   public Menu getMenu(final Menu parent) {
 
 		dispose();
 		fMenu = new Menu(parent);

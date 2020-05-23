@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -40,6 +40,7 @@ import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.ChartUtils;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TourTypeFilter;
@@ -633,6 +634,27 @@ public class StatisticView extends ViewPart implements ITourProvider {
    private void onSelectYear() {
 
       final int selectedItem = _comboYear.getSelectionIndex();
+
+      final int currentNumberOfYearsIndexSelected = _comboNumberOfYears.getSelectionIndex();
+      final String[] yearsToDisplayList = ChartUtils.produceListOfYearsToBeDisplayed(_comboYear, selectedItem);
+      if (yearsToDisplayList != null) {
+
+         _comboNumberOfYears.setItems(yearsToDisplayList);
+
+         if (yearsToDisplayList.length > 0) {
+            int newComboIndex = currentNumberOfYearsIndexSelected;
+
+            if (currentNumberOfYearsIndexSelected == -1) {
+               newComboIndex = 0;
+            } else if (currentNumberOfYearsIndexSelected >= yearsToDisplayList.length) {
+               newComboIndex =
+                     yearsToDisplayList.length - 1;
+            }
+
+            _comboNumberOfYears.select(newComboIndex);
+         }
+      }
+
       if (selectedItem != -1) {
 
          _selectedYear = Integer.parseInt(_comboYear.getItem(selectedItem));
@@ -729,8 +751,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
       ;
       _availableYears = new TIntArrayList();
 
-      try {
-         final Connection conn = TourDatabase.getInstance().getConnection();
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
          final PreparedStatement statement = conn.prepareStatement(sqlString);
          filter.setParameters(statement, 1);
 
@@ -739,8 +760,6 @@ public class StatisticView extends ViewPart implements ITourProvider {
          while (result.next()) {
             _availableYears.add(result.getInt(1));
          }
-
-         conn.close();
 
       } catch (final SQLException e) {
          UI.showSQLException(e);
@@ -764,7 +783,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
          _comboYear.add(Integer.toString(year));
       }
 
-      // add currenty year if not set
+      // add current year if not set
       if (isThisYearSet == false) {
          _availableYears.add(thisYear);
          _comboYear.add(Integer.toString(thisYear));
@@ -781,14 +800,16 @@ public class StatisticView extends ViewPart implements ITourProvider {
          return;
       }
 
-      // select number of years
-      final int numberOfYearsIndex = Util.getStateInt(_state, STATE_NUMBER_OF_YEARS, 0);
-      _comboNumberOfYears.select(numberOfYearsIndex);
-
       // select year
       final int defaultYear = Util.getStateInt(_state, STATE_SELECTED_YEAR, -1);
       refreshYearCombobox();
       selectYear(defaultYear);
+      // We trigger the update of  _comboNumberOfYears
+      onSelectYear();
+
+      // select number of years
+      final int numberOfYearsIndex = Util.getStateInt(_state, STATE_NUMBER_OF_YEARS, 0);
+      _comboNumberOfYears.select(numberOfYearsIndex);
 
       // select statistic
       int prevStatIndex = 0;
@@ -1055,11 +1076,6 @@ public class StatisticView extends ViewPart implements ITourProvider {
    }
 
    private void updateUI() {
-
-      // fill combobox with number of years
-      for (int years = 1; years <= 100; years++) {
-         _comboNumberOfYears.add(Integer.toString(years));
-      }
 
       // fill combobox with statistic names
       for (final TourbookStatistic statistic : getAvailableStatistics()) {
