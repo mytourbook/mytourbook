@@ -1371,6 +1371,12 @@ public class Messages extends NLS {
    public static String        Map_Bookmark_Dialog_ValidationAddName;
    public static String        Map_Bookmark_Dialog_ValidationRename;
 
+   public static String        Pref_Map25_Appearance_Group_PhotoLayer;
+   public static String        Pref_Map25_Appearance_Label_PhotoTitle;
+   public static String        Pref_Map25_Appearance_Label_PhotoTitleNone;
+   public static String        Pref_Map25_Appearance_Label_PhotoTitleTime;
+   public static String        Pref_Map25_Appearance_Label_PhotoTitleStars;
+
    public static String        Map25_Config_ClusterAlgorithm_FirstMarker_Distance;
    public static String        Map25_Config_ClusterAlgorithm_FirstMarker_Grid;
    public static String        Map25_Config_ClusterAlgorithm_Grid;
