@@ -16,7 +16,6 @@
 package net.tourbook.device.suunto;
 
 import java.text.SimpleDateFormat;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,7 +29,6 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.importdata.TourbookDevice;
-import net.tourbook.tour.TourManager;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
@@ -71,16 +69,14 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
 
    // header tags
    private static final String TAG_CALORIES = "Calories"; //$NON-NLS-1$
+   private static final String TAG_DISTANCE = "Distance"; //$NON-NLS-1$
    private static final String TAG_TIME     = "Time";     //$NON-NLS-1$
 
    // device tags
    private static final String TAG_SW = "SW"; //$NON-NLS-1$
 
    // sample tags
-   private static final String TAG_ALTITUDE    = "Altitude";    //$NON-NLS-1$
    private static final String TAG_CADENCE     = "Cadence";     //$NON-NLS-1$
-   private static final String TAG_DISTANCE    = "Distance";    //$NON-NLS-1$
-   private static final String TAG_EVENTS      = "Events";      //$NON-NLS-1$
    private static final String TAG_HR          = "HR";          //$NON-NLS-1$
    private static final String TAG_LAP         = "Lap";         //$NON-NLS-1$
    private static final String TAG_TEMPERATURE = "Temperature"; //$NON-NLS-1$
@@ -123,7 +119,6 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
    private boolean             _isInCadence;
    private boolean             _isInCalories;
    private boolean             _isInDistance;
-   private boolean             _isInEvents;
    private boolean             _isInHR;
    private boolean             _isInSW;
    private boolean             _isInTime;
@@ -245,7 +240,13 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
 
          _isInCalories = false;
 
-         _tourCalories = Integer.valueOf(_characters.toString());
+         _tourCalories = Integer.valueOf(_characters.toString()) * 1000;
+
+      } else if (name.equals(TAG_DISTANCE)) {
+
+//         _isInDistance = false;
+//
+//         _tourDistance = Integer.valueOf(_characters.toString());
 
       } else if (name.equals(TAG_TIME)) {
 
@@ -322,8 +323,9 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
    private void finalizeTour() {
 
       // check if data are available
-      if (_distanceData == null &&
-            _cadenceData == null &&
+      if (_cadenceData == null &&
+            _distanceData == null
+            &&
             _pulseData == null) {
          return;
       }
@@ -332,6 +334,14 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
 
       // create data object for each tour
       final TourData tourData = new TourData();
+
+      /*
+       * set tour start date/time
+       */
+      final ZonedDateTime tourStartTime = ZonedDateTime.ofInstant(
+            _tourStartTime.toDate().toInstant(),
+            TimeTools.getDefaultTimeZone());
+      tourData.setTourStartTime(tourStartTime);
 
       //Inserting the data series into the sample list
 
@@ -342,19 +352,17 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
          timeData.cadence = _cadenceData[index];
          timeData.distance = _distanceData[index];
          timeData.pulse = _pulseData[index];
+
+         if (index > 0) {
+            timeData.time = 10;
+         }
+
+         _sampleList.add(timeData);
       }
 
-      /*
-       * set tour start date/time
-       */
-      final ZonedDateTime tourStartTime = ZonedDateTime.ofInstant(
-            _tourStartTime.toDate()
-                  .toInstant(),
-            ZoneId.systemDefault());
-      //TODO get the default configured zone
-      tourData.setTourStartTime(tourStartTime);
+//TODO 10 is the sample rate
 
-      tourData.setDeviceTimeInterval((short) 1);
+      tourData.setDeviceTimeInterval((short) 10);
       tourData.setImportFilePath(_importFilePath);
 
       tourData.setCalories(_tourCalories);
@@ -364,8 +372,6 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
       tourData.setDeviceFirmwareVersion(_tourSW == null ? UI.EMPTY_STRING : _tourSW);
 
       tourData.createTimeSeries(_sampleList, true);
-
-      setDistanceSerie(tourData);
 
       // after all data are added, the tour id can be created
       final String uniqueId = _device.createUniqueId(tourData, Util.UNIQUE_ID_SUFFIX_SUUNTOQUEST);
@@ -378,12 +384,14 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
          _newlyImportedTours.put(tourId, tourData);
 
          // create additional data
-         tourData.computeAltitudeUpDown();
          tourData.computeTourDrivingTime();
          tourData.computeComputedValues();
       }
 
       _isImported = true;
+
+      //We clear the data for the potential next tours
+      dispose();
    }
 
    /**
@@ -437,21 +445,6 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
             markerTime = _markerList.get(markerIndex).absoluteTime;
          }
       }
-   }
-
-   /**
-    * Check if distance values are not changed when geo position changed, when <code>true</code>
-    * compute distance values from geo position.
-    *
-    * @param tourData
-    */
-   private void setDistanceSerie(final TourData tourData) {
-
-      /*
-       * There are currently no data available to check if distance is changing, current data keep
-       * distance for some slices and then jumps to the next value.
-       */
-      TourManager.computeDistanceValuesFromGeoPosition(tourData);
    }
 
    @Override
@@ -563,33 +556,26 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
 
    private void startElement_InSample(final String name) {
 
-      boolean isData = false;
+      boolean isData = true;
 
       if (name.equals(TAG_CADENCE)) {
 
-         isData = true;
          _isInCadence = true;
 
       } else if (name.equals(TAG_DISTANCE)) {
 
-         isData = true;
          _isInDistance = true;
-
-      } else if (name.equals(TAG_EVENTS)) {
-
-         isData = true;
-         _isInEvents = true;
 
       } else if (name.equals(TAG_HR)) {
 
-         isData = true;
          _isInHR = true;
 
       } else if (name.equals(TAG_TEMPERATURE)) {
 
-         isData = true;
          _isInTemperature = true;
 
+      } else {
+         isData = false;
       }
 
       if (isData) {
