@@ -62,12 +62,12 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
          "yyyy-MM-dd'T'HH:mm:ssZ");                                                   //$NON-NLS-1$
 
    // root tags
-   private static final String TAG_ROOT_DEVICE     = "Device";     //$NON-NLS-1$
-   private static final String TAG_ROOT_HEADER     = "Header";     //$NON-NLS-1$
+   private static final String TAG_DEVICE          = "Device";     //$NON-NLS-1$
+   private static final String TAG_HEADER          = "Header";     //$NON-NLS-1$
    private static final String TAG_ROOT_MOVESCOUNT = "MovesCount"; //$NON-NLS-1$
-   private static final String TAG_ROOT_MOVES      = "Moves";      //$NON-NLS-1$
-   private static final String TAG_ROOT_MOVE       = "Move";       //$NON-NLS-1$
-   private static final String TAG_ROOT_SAMPLES    = "Samples";    //$NON-NLS-1$
+   private static final String TAG_MOVES           = "Moves";      //$NON-NLS-1$
+   private static final String TAG_MOVE            = "Move";       //$NON-NLS-1$
+   private static final String TAG_SAMPLES         = "Samples";    //$NON-NLS-1$
 
    // header tags
    private static final String TAG_CALORIES = "Calories"; //$NON-NLS-1$
@@ -100,39 +100,39 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
    private String                  _importFilePath;
    //
 
-   private ArrayList<TimeData>     _sampleList = new ArrayList<>();
-   private float[]                 _cadenceData;
-   private float[]                 _distanceData;
-   private float[]                 _pulseData;
+   private ArrayList<TimeData> _sampleList = new ArrayList<>();
+   private float[]             _cadenceData;
+   private float[]             _distanceData;
+   private float[]             _pulseData;
 
-   private TimeData                _markerData;
+   private TimeData            _markerData;
 
-   private ArrayList<TimeData>     _markerList = new ArrayList<>();
+   private ArrayList<TimeData> _markerList = new ArrayList<>();
 
-   private boolean                 _isImported;
-   private StringBuilder           _characters = new StringBuilder();
-   private long                    _currentTime;
+   private boolean             _isImported;
+   private StringBuilder       _characters = new StringBuilder();
+   private long                _currentTime;
 
-   private boolean                 _isInRootDevice;
-   private boolean                 _isInRootHeader;
-   private boolean                 _isInSamples;
-   private boolean                 _isInRootMovesCount;
+   private boolean             _isInDevice;
+   private boolean             _isInHeader;
+   private boolean             _isInMove;
+   private boolean             _isInMoves;
+   private boolean             _isInSamples;
+   private boolean             _isInRootMovesCount;
 
-   private boolean                 _isInCadence;
-   private boolean                 _isInCalories;
-   private boolean                 _isInDistance;
-   private boolean                 _isInEnergy;
-   private boolean                 _isInEvents;
-   private boolean                 _isInHR;
-   private boolean                 _isInMove;
-   private boolean                 _isInSW;
-   private boolean                 _isInTime;
+   private boolean             _isInCadence;
+   private boolean             _isInCalories;
+   private boolean             _isInDistance;
+   private boolean             _isInEvents;
+   private boolean             _isInHR;
+   private boolean             _isInSW;
+   private boolean             _isInTime;
 
-   private boolean                 _isInTemperature;
-   private int                     _tourCalories;
-   private DateTime                _tourStartTime;
+   private boolean             _isInTemperature;
+   private int                 _tourCalories;
+   private DateTime            _tourStartTime;
 
-   private String                  _tourSW;
+   private String              _tourSW;
 
    public SuuntoQuestSAXHandler(final TourbookDevice deviceDataReader,
                                 final String importFileName,
@@ -151,7 +151,6 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
       if (_isInCadence //
             || _isInCalories
             || _isInDistance
-            || _isInEnergy
             || _isInHR
             || _isInSW
             || _isInTemperature
@@ -199,22 +198,28 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
 
          endElement_InSamples(name);
 
-      } else if (_isInRootHeader) {
+      } else if (_isInHeader) {
 
          endElement_InHeader(name);
 
-      } else if (_isInRootDevice) {
-
-         endElement_InDevice(name);
       }
 
-      if (name.equals(TAG_ROOT_SAMPLES)) {
+      if (name.equals(TAG_SAMPLES)) {
 
          _isInSamples = false;
 
-      } else if (name.equals(TAG_ROOT_MOVE)) {
+      } else if (name.equals(TAG_HEADER)) {
 
+         _isInHeader = false;
+
+      } else if (name.equals(TAG_MOVE)) {
+
+         _isInMove = false;
          finalizeTour();
+
+      } else if (name.equals(TAG_MOVES)) {
+
+         _isInMoves = false;
 
       } else if (name.equals(TAG_ROOT_MOVESCOUNT)) {
 
@@ -453,48 +458,56 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
    public void startElement(final String uri, final String localName, final String name, final Attributes attributes)
          throws SAXException {
 
-      if (_isInSamples) {
+      if (_isInRootMovesCount) {
 
-         startElement_InSample(name);
+         if (_isInMoves) {
 
-      } else if (_isInRootHeader) {
+            if (_isInMove) {
 
-         startElement_InHeader(name);
+               startElement_InMove(name);
 
-      } else if (_isInRootMovesCount) {
+               if (_isInSamples) {
 
-         if (_isInMove) {
+                  startElement_InSample(name);
 
-            startElement_InMove(name);
+               } else if (_isInHeader) {
 
-         } else if (name.equals(TAG_ROOT_MOVE)) {
+                  startElement_InHeader(name);
 
-            _isInMove = true;
+               } else if (name.equals(TAG_SAMPLES)) {
+
+                  _isInSamples = true;
+
+                  // create new time items
+                  _markerData = new TimeData();
+
+               } else if (name.equals(TAG_HEADER)) {
+
+                  _isInHeader = true;
+
+               }
+            } else if (name.equals(TAG_MOVE)) {
+
+               _isInMove = true;
+
+            }
+         } else if (name.equals(TAG_DEVICE)) {
+
+            _isInDevice = true;
+
+         } else if (name.equals(TAG_MOVES)) {
+
+            _isInMoves = true;
+
+         } else if (_isInDevice) {
+
+            startElement_InDevice(name);
 
          }
-
-      } else if (_isInRootDevice) {
-
-         startElement_InDevice(name);
-
-      } else if (name.equals(TAG_ROOT_SAMPLES)) {
-
-         _isInSamples = true;
-
-         // create new time items
-         _markerData = new TimeData();
 
       } else if (name.equals(TAG_ROOT_MOVESCOUNT)) {
 
          _isInRootMovesCount = true;
-
-      } else if (name.equals(TAG_ROOT_DEVICE)) {
-
-         _isInRootDevice = true;
-
-      } else if (name.equals(TAG_ROOT_HEADER)) {
-
-         _isInRootHeader = true;
 
       }
 
@@ -529,7 +542,7 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
       } else if (name.equals(TAG_TIME)) {
 
          isData = true;
-         _isInEnergy = true;
+         _isInTime = true;
       }
 
       if (isData) {
@@ -541,7 +554,7 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
 
    private void startElement_InMove(final String name) {
 
-      if (name.equals(TAG_ROOT_SAMPLES)) {
+      if (name.equals(TAG_SAMPLES)) {
 
          _isInSamples = true;
 
