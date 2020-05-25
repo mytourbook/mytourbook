@@ -26,7 +26,9 @@ public class TVITourBookTour extends TVITourBookItem {
    long                    tourId;
    long                    tourTypeId;
 
-   String                  colDateTimeText;
+   long                    colDateTime_MS;
+   String                  colDateTime_Text;
+
    long                    colStartDistance;
    short                   colTimeInterval;
 
@@ -128,7 +130,8 @@ public class TVITourBookTour extends TVITourBookItem {
 
             + "[" + NL //$NON-NLS-1$
 
-            + "colDateTimeText=" + colDateTimeText + NL //$NON-NLS-1$
+            + "colDateTimeText=" + colDateTime_Text //$NON-NLS-1$
+            + NL
             + "colTourDateTime=" + colTourDateTime + NL //$NON-NLS-1$
             + "colTourTitle=" + colTourTitle //$NON-NLS-1$
 

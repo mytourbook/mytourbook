@@ -4328,6 +4328,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    }
 
    private void recreateViewer() {
+
       _columnManager.saveState(_state);
       _columnManager.clearColumns();
       defineAllColumns();

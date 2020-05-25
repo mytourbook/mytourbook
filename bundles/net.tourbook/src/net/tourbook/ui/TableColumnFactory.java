@@ -28,10 +28,11 @@ import org.eclipse.swt.SWT;
 
 public abstract class TableColumnFactory {
 
-   private static final String            APP_UNIT_SECONDS_SMALL        = net.tourbook.Messages.App_Unit_Seconds_Small;
+   private static final String            APP_UNIT_SECONDS_SMALL                             = net.tourbook.Messages.App_Unit_Seconds_Small;
 
    public static final TableColumnFactory ALTITUDE_ALTITUDE;
    public static final TableColumnFactory ALTITUDE_AVG_CHANGE;
+   public static final String             ALTITUDE_AVG_CHANGE_ID                             = "ALTITUDE_AVG_CHANGE";
    public static final TableColumnFactory ALTITUDE_DIFF_SEGMENT_BORDER;
    public static final TableColumnFactory ALTITUDE_DIFF_SEGMENT_COMPUTED;
    public static final TableColumnFactory ALTITUDE_ELEVATION_DOWN;
@@ -39,37 +40,52 @@ public abstract class TableColumnFactory {
    public static final TableColumnFactory ALTITUDE_ELEVATION_SEGMENT_DOWN;
    public static final TableColumnFactory ALTITUDE_ELEVATION_SEGMENT_UP;
    public static final TableColumnFactory ALTITUDE_GRADIENT;
-   public static final String             ALTITUDE_GRADIENT_ID          = "ALTITUDE_GRADIENT";                         //$NON-NLS-1$
+   public static final String             ALTITUDE_GRADIENT_ID                               = "ALTITUDE_GRADIENT";                              //$NON-NLS-1$
    public static final TableColumnFactory ALTITUDE_GRADIENT_AVG;
    public static final TableColumnFactory ALTITUDE_MAX;
+   public static final String             ALTITUDE_MAX_ID                                    = "ALTITUDE_MAX";
    public static final TableColumnFactory ALTITUDE_SUMMARIZED_BORDER_DOWN;
+   public static final String             ALTITUDE_SUMMARIZED_BORDER_DOWN_ID                 = "ALTITUDE_SUMMARIZED_BORDER_DOWN";
    public static final TableColumnFactory ALTITUDE_SUMMARIZED_BORDER_UP;
+   public static final String             ALTITUDE_SUMMARIZED_BORDER_UP_ID                   = "ALTITUDE_SUMMARIZED_BORDER_UP";
    public static final TableColumnFactory ALTITUDE_SUMMARIZED_COMPUTED_DOWN;
    public static final TableColumnFactory ALTITUDE_SUMMARIZED_COMPUTED_UP;
 
    public static final TableColumnFactory BODY_AVG_PULSE;
-   public static final String             BODY_AVG_PULSE_ID             = "BODY_AVG_PULSE";                            //$NON-NLS-1$
+   public static final String             BODY_AVG_PULSE_ID                                  = "BODY_AVG_PULSE";                                 //$NON-NLS-1$
    public static final TableColumnFactory BODY_AVG_PULSE_DIFFERENCE;
    public static final TableColumnFactory BODY_CALORIES;
+   public static final String             BODY_CALORIES_ID                                   = "BODY_CALORIES";
    public static final TableColumnFactory BODY_PERSON;
+   public static final String             BODY_PERSON_ID                                     = "BODY_PERSON";
    public static final TableColumnFactory BODY_PULSE;
    public static final TableColumnFactory BODY_PULSE_MAX;
+   public static final String             BODY_PULSE_MAX_ID                                  = "BODY_PULSE_MAX";
    public static final TableColumnFactory BODY_RESTPULSE;
+   public static final String             BODY_RESTPULSE_ID                                  = "BODY_RESTPULSE";
    public static final TableColumnFactory BODY_WEIGHT;
+   public static final String             BODY_WEIGHT_ID                                     = "BODY_WEIGHT";
 
    public static final TableColumnFactory DATA_DP_TOLERANCE;
+   public static final String             DATA_DP_TOLERANCE_ID                               = "DATA_DP_TOLERANCE";
    public static final TableColumnFactory DATA_FIRST_COLUMN;
-   public static final TableColumnFactory DATA_IMPORT_FILE_PATH;
    public static final TableColumnFactory DATA_IMPORT_FILE_NAME;
+   public static final String             DATA_IMPORT_FILE_NAME_ID                           = "DATA_IMPORT_FILE_NAME";
+   public static final TableColumnFactory DATA_IMPORT_FILE_PATH;
+   public static final String             DATA_IMPORT_FILE_PATH_ID                           = "DATA_IMPORT_FILE_PATH";
    public static final TableColumnFactory DATA_NUM_TIME_SLICES;
+   public static final String             DATA_NUM_TIME_SLICES_ID                            = "DATA_NUM_TIME_SLICES";
    public static final TableColumnFactory DATA_SERIE_START_END_INDEX;
-   public static final String             DATA_SERIE_START_END_INDEX_ID = "DATA_SERIE_START_END_INDEX";                //$NON-NLS-1$
+   public static final String             DATA_SERIE_START_END_INDEX_ID                      = "DATA_SERIE_START_END_INDEX";                     //$NON-NLS-1$
    public static final TableColumnFactory DATA_SEQUENCE;
-   public static final String             DATA_SEQUENCE_ID              = "DATA_SEQUENCE";                             //$NON-NLS-1$
+   public static final String             DATA_SEQUENCE_ID                                   = "DATA_SEQUENCE";                                  //$NON-NLS-1$
    public static final TableColumnFactory DATA_TIME_INTERVAL;
+   public static final String             DATA_TIME_INTERVAL_ID                              = "DATA_TIME_INTERVAL";
 
    public static final TableColumnFactory DEVICE_DISTANCE;
+   public static final String             DEVICE_DISTANCE_ID                                 = "DEVICE_DISTANCE";
    public static final TableColumnFactory DEVICE_NAME;
+   public static final String             DEVICE_NAME_ID                                     = "DEVICE_NAME";
    public static final TableColumnFactory DEVICE_PROFILE;
 
    public static final TableColumnFactory MARKER_ALTITUDE_ELEVATION_GAIN_DELTA;
@@ -80,20 +96,21 @@ public abstract class TableColumnFactory {
    public static final TableColumnFactory MARKER_URL;
 
    public static final TableColumnFactory MOTION_ALTIMETER;
-   public static final String             MOTION_ALTIMETER_ID           = "MOTION_ALTIMETER";                          //$NON-NLS-1$
+   public static final String             MOTION_ALTIMETER_ID                                = "MOTION_ALTIMETER";                               //$NON-NLS-1$
    public static final TableColumnFactory MOTION_AVG_PACE;
-   public static final String             MOTION_AVG_PACE_ID            = "MOTION_AVG_PACE";                           //$NON-NLS-1$
+   public static final String             MOTION_AVG_PACE_ID                                 = "MOTION_AVG_PACE";                                //$NON-NLS-1$
    public static final TableColumnFactory MOTION_AVG_PACE_DIFFERENCE;
    public static final TableColumnFactory MOTION_AVG_SPEED;
-   public static final String             MOTION_AVG_SPEED_ID           = "MOTION_AVG_SPEED";                          //$NON-NLS-1$
+   public static final String             MOTION_AVG_SPEED_ID                                = "MOTION_AVG_SPEED";                               //$NON-NLS-1$
    public static final TableColumnFactory MOTION_DISTANCE;
-   public static final String             MOTION_DISTANCE_ID            = "MOTION_DISTANCE";                           //$NON-NLS-1$
+   public static final String             MOTION_DISTANCE_ID                                 = "MOTION_DISTANCE";                                //$NON-NLS-1$
    public static final TableColumnFactory MOTION_DISTANCE_DELTA;
    public static final TableColumnFactory MOTION_DISTANCE_DIFF;
    public static final TableColumnFactory MOTION_DISTANCE_TOTAL;
    public static final TableColumnFactory MOTION_LATITUDE;
    public static final TableColumnFactory MOTION_LONGITUDE;
    public static final TableColumnFactory MOTION_MAX_SPEED;
+   public static final String             MOTION_MAX_SPEED_ID                                = "MOTION_MAX_SPEED";
    public static final TableColumnFactory MOTION_PACE;
    public static final TableColumnFactory MOTION_SPEED;
    public static final TableColumnFactory MOTION_SPEED_DIFF;
@@ -105,51 +122,89 @@ public abstract class TableColumnFactory {
    public static final TableColumnFactory PHOTO_TOUR_CAMERA;
 
    public static final TableColumnFactory POWER_AVG;
+   public static final String             POWER_AVG_ID                                       = "POWER_AVG";
    public static final TableColumnFactory POWER_MAX;
+   public static final String             POWER_MAX_ID                                       = "POWER_MAX";
    public static final TableColumnFactory POWER_NORMALIZED;
+   public static final String             POWER_NORMALIZED_ID                                = "POWER_NORMALIZED";
    public static final TableColumnFactory POWER_TIME_SLICE;
    public static final TableColumnFactory POWER_TOTAL_WORK;
+   public static final String             POWER_TOTAL_WORK_ID                                = "POWER_TOTAL_WORK";
 
    public static final TableColumnFactory POWERTRAIN_AVG_CADENCE;
-   public static final String             POWERTRAIN_AVG_CADENCE_ID     = "POWERTRAIN_AVG_CADENCE";                    //$NON-NLS-1$
+   public static final String             POWERTRAIN_AVG_CADENCE_ID                          = "POWERTRAIN_AVG_CADENCE";                         //$NON-NLS-1$
    public static final TableColumnFactory POWERTRAIN_AVG_LEFT_PEDAL_SMOOTHNESS;
+   public static final String             POWERTRAIN_AVG_LEFT_PEDAL_SMOOTHNESS_ID            = "POWERTRAIN_AVG_LEFT_PEDAL_SMOOTHNESS";
    public static final TableColumnFactory POWERTRAIN_AVG_RIGHT_PEDAL_SMOOTHNESS;
+   public static final String             POWERTRAIN_AVG_RIGHT_PEDAL_SMOOTHNESS_ID           = "POWERTRAIN_AVG_RIGHT_PEDAL_SMOOTHNESS";
    public static final TableColumnFactory POWERTRAIN_AVG_LEFT_TORQUE_EFFECTIVENESS;
+   public static final String             POWERTRAIN_AVG_LEFT_TORQUE_EFFECTIVENESS_ID        = "POWERTRAIN_AVG_LEFT_TORQUE_EFFECTIVENESS";
    public static final TableColumnFactory POWERTRAIN_AVG_RIGHT_TORQUE_EFFECTIVENESS;
+   public static final String             POWERTRAIN_AVG_RIGHT_TORQUE_EFFECTIVENESS_ID       = "POWERTRAIN_AVG_RIGHT_TORQUE_EFFECTIVENESS";
    public static final TableColumnFactory POWERTRAIN_CADENCE_TIME_SLICE;
    public static final TableColumnFactory POWERTRAIN_CADENCE_MULTIPLIER;
+   public static final String             POWERTRAIN_CADENCE_MULTIPLIER_ID                   = "POWERTRAIN_CADENCE_MULTIPLIER";
    public static final TableColumnFactory POWERTRAIN_GEAR_RATIO_TIME_SLICE;
    public static final TableColumnFactory POWERTRAIN_GEAR_TEETH;
    public static final TableColumnFactory POWERTRAIN_GEAR_FRONT_SHIFT_COUNT;
+   public static final String             POWERTRAIN_GEAR_FRONT_SHIFT_COUNT_ID               = "POWERTRAIN_GEAR_FRONT_SHIFT_COUNT";
    public static final TableColumnFactory POWERTRAIN_GEAR_REAR_SHIFT_COUNT;
+   public static final String             POWERTRAIN_GEAR_REAR_SHIFT_COUNT_ID                = "POWERTRAIN_GEAR_REAR_SHIFT_COUNT";
    public static final TableColumnFactory POWERTRAIN_PEDAL_LEFT_RIGHT_BALANCE;
+   public static final String             POWERTRAIN_PEDAL_LEFT_RIGHT_BALANCE_ID             = "POWERTRAIN_PEDAL_LEFT_RIGHT_BALANCE";
    public static final TableColumnFactory POWERTRAIN_SLOW_VS_FAST_CADENCE_ZONES_DELIMITER;
+   public static final String             POWERTRAIN_SLOW_VS_FAST_CADENCE_ZONES_DELIMITER_ID = "POWERTRAIN_SLOW_VS_FAST_CADENCE_ZONES_DELIMITER";
    public static final TableColumnFactory POWERTRAIN_SLOW_VS_FAST_CADENCE_PERCENTAGES;
+   public static final String             POWERTRAIN_SLOW_VS_FAST_CADENCE_PERCENTAGES_ID     = "POWERTRAIN_SLOW_VS_FAST_CADENCE_PERCENTAGES";
 
-   public static final TableColumnFactory RUN_DYN_STANCE_TIME_MIN;
-   public static final TableColumnFactory RUN_DYN_STANCE_TIME_MAX;
    public static final TableColumnFactory RUN_DYN_STANCE_TIME_AVG;
-   public static final TableColumnFactory RUN_DYN_STANCE_TIME_BALANCE_MIN;
-   public static final TableColumnFactory RUN_DYN_STANCE_TIME_BALANCE_MAX;
+   public static final String             RUN_DYN_STANCE_TIME_AVG_ID                         = "RUN_DYN_STANCE_TIME_AVG";
+   public static final TableColumnFactory RUN_DYN_STANCE_TIME_MIN;
+   public static final String             RUN_DYN_STANCE_TIME_MIN_ID                         = "RUN_DYN_STANCE_TIME_MIN";
+   public static final TableColumnFactory RUN_DYN_STANCE_TIME_MAX;
+   public static final String             RUN_DYN_STANCE_TIME_MAX_ID                         = "RUN_DYN_STANCE_TIME_MAX";
+
    public static final TableColumnFactory RUN_DYN_STANCE_TIME_BALANCE_AVG;
-   public static final TableColumnFactory RUN_DYN_STEP_LENGTH_MIN;
-   public static final TableColumnFactory RUN_DYN_STEP_LENGTH_MAX;
+   public static final String             RUN_DYN_STANCE_TIME_BALANCE_AVG_ID                 = "RUN_DYN_STANCE_TIME_BALANCE_AVG";
+   public static final TableColumnFactory RUN_DYN_STANCE_TIME_BALANCE_MIN;
+   public static final String             RUN_DYN_STANCE_TIME_BALANCE_MIN_ID                 = "RUN_DYN_STANCE_TIME_BALANCE_MIN";
+   public static final TableColumnFactory RUN_DYN_STANCE_TIME_BALANCE_MAX;
+   public static final String             RUN_DYN_STANCE_TIME_BALANCE_MAX_ID                 = "RUN_DYN_STANCE_TIME_BALANCE_MAX";
+
    public static final TableColumnFactory RUN_DYN_STEP_LENGTH_AVG;
-   public static final TableColumnFactory RUN_DYN_VERTICAL_OSCILLATION_MIN;
-   public static final TableColumnFactory RUN_DYN_VERTICAL_OSCILLATION_MAX;
+   public static final String             RUN_DYN_STEP_LENGTH_AVG_ID                         = "RUN_DYN_STEP_LENGTH_AVG";
+   public static final TableColumnFactory RUN_DYN_STEP_LENGTH_MIN;
+   public static final String             RUN_DYN_STEP_LENGTH_MIN_ID                         = "RUN_DYN_STEP_LENGTH_MIN";
+   public static final TableColumnFactory RUN_DYN_STEP_LENGTH_MAX;
+   public static final String             RUN_DYN_STEP_LENGTH_MAX_ID                         = "RUN_DYN_STEP_LENGTH_MAX";
+
    public static final TableColumnFactory RUN_DYN_VERTICAL_OSCILLATION_AVG;
-   public static final TableColumnFactory RUN_DYN_VERTICAL_RATIO_MIN;
-   public static final TableColumnFactory RUN_DYN_VERTICAL_RATIO_MAX;
+   public static final String             RUN_DYN_VERTICAL_OSCILLATION_AVG_ID                = "RUN_DYN_VERTICAL_OSCILLATION_AVG";
+   public static final TableColumnFactory RUN_DYN_VERTICAL_OSCILLATION_MIN;
+   public static final String             RUN_DYN_VERTICAL_OSCILLATION_MIN_ID                = "RUN_DYN_VERTICAL_OSCILLATION_MIN";
+   public static final TableColumnFactory RUN_DYN_VERTICAL_OSCILLATION_MAX;
+   public static final String             RUN_DYN_VERTICAL_OSCILLATION_MAX_ID                = "RUN_DYN_VERTICAL_OSCILLATION_MAX";
+
    public static final TableColumnFactory RUN_DYN_VERTICAL_RATIO_AVG;
+   public static final String             RUN_DYN_VERTICAL_RATIO_AVG_ID                      = "RUN_DYN_VERTICAL_RATIO_AVG";
+   public static final TableColumnFactory RUN_DYN_VERTICAL_RATIO_MIN;
+   public static final String             RUN_DYN_VERTICAL_RATIO_MIN_ID                      = "RUN_DYN_VERTICAL_RATIO_MIN";
+   public static final TableColumnFactory RUN_DYN_VERTICAL_RATIO_MAX;
+   public static final String             RUN_DYN_VERTICAL_RATIO_MAX_ID                      = "RUN_DYN_VERTICAL_RATIO_MAX";
 
    public static final TableColumnFactory STATE_DB_STATUS;
    public static final TableColumnFactory STATE_IMPORT_STATE;
 
    public static final TableColumnFactory SURFING_MIN_DISTANCE;
+   public static final String             SURFING_MIN_DISTANCE_ID                            = "SURFING_MIN_DISTANCE";
    public static final TableColumnFactory SURFING_MIN_SPEED_START_STOP;
+   public static final String             SURFING_MIN_SPEED_START_STOP_ID                    = "SURFING_MIN_SPEED_START_STOP";
    public static final TableColumnFactory SURFING_MIN_SPEED_SURFING;
+   public static final String             SURFING_MIN_SPEED_SURFING_ID                       = "SURFING_MIN_SPEED_SURFING";
    public static final TableColumnFactory SURFING_MIN_TIME_DURATION;
+   public static final String             SURFING_MIN_TIME_DURATION_ID                       = "SURFING_MIN_TIME_DURATION";
    public static final TableColumnFactory SURFING_NUMBER_OF_EVENTS;
+   public static final String             SURFING_NUMBER_OF_EVENTS_ID                        = "SURFING_NUMBER_OF_EVENTS";
 
    public static final TableColumnFactory SWIM__SWIM_CADENCE;
    public static final TableColumnFactory SWIM__SWIM_STROKES;
@@ -162,15 +217,20 @@ public abstract class TableColumnFactory {
 
    public static final TableColumnFactory TIME_BREAK_TIME;
    public static final TableColumnFactory TIME_DATE;
+   public static final String             TIME_DATE_ID                                       = "TIME_DATE";
    public static final TableColumnFactory TIME_DRIVING_TIME;
-   public static final String             TIME_DRIVING_TIME_ID          = "TIME_DRIVING_TIME_ID";                      //$NON-NLS-1$
+   public static final String             TIME_DRIVING_TIME_ID                               = "TIME_DRIVING_TIME_ID";                           //$NON-NLS-1$
    public static final TableColumnFactory TIME_PAUSED_TIME;
+   public static final String             TIME_PAUSED_TIME_ID                                = "TIME_PAUSED_TIME";
    public static final TableColumnFactory TIME_PAUSED_TIME_RELATIVE;
+   public static final String             TIME_PAUSED_TIME_RELATIVE_ID                       = "TIME_PAUSED_TIME_RELATIVE";
    public static final TableColumnFactory TIME_RECORDING_TIME;
-   public static final String             TIME_RECORDING_TIME_ID        = "TIME_RECORDING_TIME";                       //$NON-NLS-1$
+   public static final String             TIME_RECORDING_TIME_ID                             = "TIME_RECORDING_TIME";                            //$NON-NLS-1$
    public static final TableColumnFactory TIME_RECORDING_TIME_TOTAL;
    public static final TableColumnFactory TIME_TIME_ZONE;
+   public static final String             TIME_TIME_ZONE_ID                                  = "TIME_TIME_ZONE";
    public static final TableColumnFactory TIME_TIME_ZONE_DIFFERENCE;
+   public static final String             TIME_TIME_ZONE_DIFFERENCE_ID                       = "TIME_TIME_ZONE_DIFFERENCE";
    public static final TableColumnFactory TIME_TOUR_TIME_DIFF;
    public static final TableColumnFactory TIME_TOUR_TIME_HH_MM_SS;
    public static final TableColumnFactory TIME_TOUR_TIME;
@@ -178,30 +238,49 @@ public abstract class TableColumnFactory {
    public static final TableColumnFactory TIME_TOUR_DATE;
    public static final TableColumnFactory TIME_TOUR_DURATION_TIME;
    public static final TableColumnFactory TIME_TOUR_START_TIME;
+   public static final String             TIME_TOUR_START_TIME_ID                            = "TIME_TOUR_START_TIME";
    public static final TableColumnFactory TIME_TOUR_END_TIME;
    public static final TableColumnFactory TIME_TOUR_START_DATE;
    public static final TableColumnFactory TIME_TOUR_END_DATE;
    public static final TableColumnFactory TIME_WEEK_DAY;
+   public static final String             TIME_WEEK_DAY_ID                                   = "TIME_WEEK_DAY";
    public static final TableColumnFactory TIME_WEEK_NO;
+   public static final String             TIME_WEEK_NO_ID                                    = "TIME_WEEK_NO";
    public static final TableColumnFactory TIME_WEEKYEAR;
+   public static final String             TIME_WEEKYEAR_ID                                   = "TIME_WEEKYEAR";
 
    public static final TableColumnFactory TOUR_MARKER;
-   public static final TableColumnFactory TOUR_LOCATION_END;
    public static final TableColumnFactory TOUR_LOCATION_START;
+   public static final String             TOUR_LOCATION_START_ID                             = "TOUR_LOCATION_START";
+   public static final TableColumnFactory TOUR_LOCATION_END;
+   public static final String             TOUR_LOCATION_END_ID                               = "TOUR_LOCATION_END";
    public static final TableColumnFactory TOUR_NUM_MARKERS;
+   public static final String             TOUR_NUM_MARKERS_ID                                = "TOUR_NUM_MARKERS";
    public static final TableColumnFactory TOUR_NUM_PHOTOS;
+   public static final String             TOUR_NUM_PHOTOS_ID                                 = "TOUR_NUM_PHOTOS";
    public static final TableColumnFactory TOUR_TAGS;
+   public static final String             TOUR_TAGS_ID                                       = "TOUR_TAGS";
    public static final TableColumnFactory TOUR_TITLE;
+   public static final String             TOUR_TITLE_ID                                      = "TOUR_TITLE";
    public static final TableColumnFactory TOUR_TYPE;
+   public static final String             TOUR_TYPE_ID                                       = "TOUR_TYPE";
    public static final TableColumnFactory TOUR_TYPE_TEXT;
+   public static final String             TOUR_TYPE_TEXT_ID                                  = "TOUR_TYPE_TEXT";
 
+   public static final TableColumnFactory TRAINING_EFFECT_AEROB;
+   public static final String             TRAINING_EFFECT_AEROB_ID                           = "TRAINING_TRAINING_EFFECT_AEROB";
+   public static final TableColumnFactory TRAINING_EFFECT_ANAEROB;
+   public static final String             TRAINING_EFFECT_ANAEROB_ID                         = "TRAINING_EFFECT_ANAEROB";
    public static final TableColumnFactory TRAINING_FTP;
+   public static final String             TRAINING_FTP_ID                                    = "TRAINING_FTP";
    public static final TableColumnFactory TRAINING_INTENSITY_FACTOR;
+   public static final String             TRAINING_INTENSITY_FACTOR_ID                       = "TRAINING_INTENSITY_FACTOR";
+   public static final TableColumnFactory TRAINING_PERFORMANCE_LEVEL;
+   public static final String             TRAINING_PERFORMANCE_LEVEL_ID                      = "TRAINING_PERFORMANCE_LEVEL";
    public static final TableColumnFactory TRAINING_POWER_TO_WEIGHT;
+   public static final String             TRAINING_POWER_TO_WEIGHT_ID                        = "TRAINING_POWER_TO_WEIGHT";
    public static final TableColumnFactory TRAINING_STRESS_SCORE;
-   public static final TableColumnFactory TRAINING_TRAINING_EFFECT_AEROB;
-   public static final TableColumnFactory TRAINING_TRAINING_EFFECT_ANAEROB;
-   public static final TableColumnFactory TRAINING_TRAINING_PERFORMANCE;
+   public static final String             TRAINING_STRESS_SCORE_ID                           = "TRAINING_STRESS_SCORE";
 
    public static final TableColumnFactory WAYPOINT_ALTITUDE;
    public static final TableColumnFactory WAYPOINT_DATE;
@@ -214,12 +293,18 @@ public abstract class TableColumnFactory {
    public static final TableColumnFactory WAYPOINT_TIME;
 
    public static final TableColumnFactory WEATHER_CLOUDS;
+   public static final String             WEATHER_CLOUDS_ID                                  = "WEATHER_CLOUDS";
    public static final TableColumnFactory WEATHER_TEMPERATURE_AVG;
+   public static final String             WEATHER_TEMPERATURE_AVG_ID                         = "WEATHER_TEMPERATURE_AVG";
    public static final TableColumnFactory WEATHER_TEMPERATURE_MIN;
+   public static final String             WEATHER_TEMPERATURE_MIN_ID                         = "WEATHER_TEMPERATURE_MIN";
    public static final TableColumnFactory WEATHER_TEMPERATURE_MAX;
+   public static final String             WEATHER_TEMPERATURE_MAX_ID                         = "WEATHER_TEMPERATURE_MAX";
    public static final TableColumnFactory WEATHER_TEMPERATURE_TIME_SLICE;
    public static final TableColumnFactory WEATHER_WIND_DIR;
+   public static final String             WEATHER_WIND_DIR_ID                                = "WEATHER_WIND_DIR";
    public static final TableColumnFactory WEATHER_WIND_SPEED;
+   public static final String             WEATHER_WIND_SPEED_ID                              = "WEATHER_WIND_SPEED";
 
    static {
 
@@ -253,7 +338,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "ALTITUDE_AVG_CHANGE", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, ALTITUDE_AVG_CHANGE_ID, SWT.TRAIL);
 
             final String unitLabel = UI.SYMBOL_AVERAGE + UI.SPACE + UI.UNIT_LABEL_ALTITUDE + "/" + UI.UNIT_LABEL_DISTANCE; //$NON-NLS-1$
 
@@ -481,7 +566,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "ALTITUDE_MAX", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, ALTITUDE_MAX_ID, SWT.TRAIL);
 
             final String unitLabel = UI.SYMBOL_MAX + UI.UNIT_LABEL_ALTITUDE;
 
@@ -504,7 +589,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "ALTITUDE_SUMMARIZED_BORDER_DOWN", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, ALTITUDE_SUMMARIZED_BORDER_DOWN_ID, SWT.TRAIL);
 
             final String unitLabel = UI.SYMBOL_SUM_WITH_SPACE
                   + UI.UNIT_LABEL_ALTITUDE
@@ -530,7 +615,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "ALTITUDE_SUMMARIZED_BORDER_UP", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, ALTITUDE_SUMMARIZED_BORDER_UP_ID, SWT.TRAIL);
 
             final String unitLabel = UI.SYMBOL_SUM_WITH_SPACE
                   + UI.UNIT_LABEL_ALTITUDE
@@ -660,7 +745,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "BODY_CALORIES", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, BODY_CALORIES_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Body);
 
@@ -680,7 +765,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "BODY_PERSON", SWT.LEAD); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, BODY_PERSON_ID, SWT.LEAD);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Body);
 
@@ -724,7 +809,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "BODY_PULSE_MAX", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, BODY_PULSE_MAX_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Body);
 
@@ -744,7 +829,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "BODY_RESTPULSE", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, BODY_RESTPULSE_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Body);
 
@@ -764,7 +849,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "BODY_WEIGHT", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, BODY_WEIGHT_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Body);
 
@@ -788,7 +873,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "DATA_DP_TOLERANCE", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, DATA_DP_TOLERANCE_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Data);
 
@@ -824,7 +909,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "DATA_IMPORT_FILE_NAME", SWT.LEAD); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, DATA_IMPORT_FILE_NAME_ID, SWT.LEAD);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Data);
 
@@ -844,7 +929,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "DATA_IMPORT_FILE_PATH", SWT.LEAD); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, DATA_IMPORT_FILE_PATH_ID, SWT.LEAD);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Data);
 
@@ -863,7 +948,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "DATA_NUM_TIME_SLICES", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, DATA_NUM_TIME_SLICES_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Data);
 
@@ -922,7 +1007,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "DATA_TIME_INTERVAL", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, DATA_TIME_INTERVAL_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Data);
 
@@ -946,7 +1031,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "DEVICE_DISTANCE", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, DEVICE_DISTANCE_ID, SWT.TRAIL);
 
             final String unit = UI.UNIT_LABEL_DISTANCE + " * 1000"; //$NON-NLS-1$
 
@@ -969,7 +1054,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "DEVICE_NAME", SWT.LEAD); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, DEVICE_NAME_ID, SWT.LEAD);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Device);
 
@@ -1379,7 +1464,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "MOTION_MAX_SPEED", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, MOTION_MAX_SPEED_ID, SWT.TRAIL);
 
             final String unitLabel = UI.SYMBOL_MAX + UI.UNIT_LABEL_SPEED;
 
@@ -1581,7 +1666,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "POWER_AVG", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, POWER_AVG_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Power);
 
@@ -1607,7 +1692,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "POWER_MAX", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, POWER_MAX_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Power);
 
@@ -1633,7 +1718,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "POWER_NORMALIZED", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, POWER_NORMALIZED_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Power);
 
@@ -1675,7 +1760,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "POWER_TOTAL_WORK", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, POWER_TOTAL_WORK_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Power);
 
@@ -1790,7 +1875,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "POWERTRAIN_AVG_LEFT_PEDAL_SMOOTHNESS", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, POWERTRAIN_AVG_LEFT_PEDAL_SMOOTHNESS_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Powertrain);
 
@@ -1815,7 +1900,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "POWERTRAIN_AVG_RIGHT_PEDAL_SMOOTHNESS", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, POWERTRAIN_AVG_RIGHT_PEDAL_SMOOTHNESS_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Powertrain);
 
@@ -1840,7 +1925,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "POWERTRAIN_AVG_LEFT_TORQUE_EFFECTIVENESS", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, POWERTRAIN_AVG_LEFT_TORQUE_EFFECTIVENESS_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Powertrain);
 
@@ -1865,7 +1950,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "POWERTRAIN_AVG_RIGHT_TORQUE_EFFECTIVENESS", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, POWERTRAIN_AVG_RIGHT_TORQUE_EFFECTIVENESS_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Powertrain);
 
@@ -1890,7 +1975,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "POWERTRAIN_CADENCE_MULTIPLIER", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, POWERTRAIN_CADENCE_MULTIPLIER_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Powertrain);
 
@@ -1910,7 +1995,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "POWERTRAIN_GEAR_FRONT_SHIFT_COUNT", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, POWERTRAIN_GEAR_FRONT_SHIFT_COUNT_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Powertrain);
 
@@ -1929,7 +2014,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "POWERTRAIN_GEAR_REAR_SHIFT_COUNT", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, POWERTRAIN_GEAR_REAR_SHIFT_COUNT_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Powertrain);
 
@@ -1948,7 +2033,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "POWERTRAIN_PEDAL_LEFT_RIGHT_BALANCE", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, POWERTRAIN_PEDAL_LEFT_RIGHT_BALANCE_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Powertrain);
 
@@ -1969,7 +2054,7 @@ public abstract class TableColumnFactory {
                                                    final PixelConverter pixelConverter) {
 
             final TableColumnDefinition colDef = new TableColumnDefinition(columnManager,
-                  "POWERTRAIN_SLOW_VS_FAST_CADENCE_ZONES_DELIMITER", //$NON-NLS-1$
+                  POWERTRAIN_SLOW_VS_FAST_CADENCE_ZONES_DELIMITER_ID,
                   SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Powertrain);
@@ -1991,7 +2076,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "POWERTRAIN_SLOW_VS_FAST_CADENCE_PERCENTAGES", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, POWERTRAIN_SLOW_VS_FAST_CADENCE_PERCENTAGES_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Powertrain);
 
@@ -2015,7 +2100,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "RUN_DYN_STANCE_TIME_MIN", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, RUN_DYN_STANCE_TIME_MIN_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_RunDyn);
 
@@ -2036,7 +2121,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "RUN_DYN_STANCE_TIME_MAX", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, RUN_DYN_STANCE_TIME_MAX_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_RunDyn);
 
@@ -2057,7 +2142,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "RUN_DYN_STANCE_TIME_AVG", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, RUN_DYN_STANCE_TIME_AVG_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_RunDyn);
 
@@ -2078,7 +2163,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "RUN_DYN_STANCE_TIME_BALANCE_MIN", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, RUN_DYN_STANCE_TIME_BALANCE_MIN_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_RunDyn);
 
@@ -2104,7 +2189,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "RUN_DYN_STANCE_TIME_BALANCE_MAX", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, RUN_DYN_STANCE_TIME_BALANCE_MAX_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_RunDyn);
 
@@ -2130,7 +2215,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "RUN_DYN_STANCE_TIME_BALANCE_AVG", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, RUN_DYN_STANCE_TIME_BALANCE_AVG_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_RunDyn);
 
@@ -2163,7 +2248,7 @@ public abstract class TableColumnFactory {
                   + UI.SPACE
                   + UI.UNIT_LABEL_DISTANCE_MM_OR_INCH;
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "RUN_DYN_STEP_LENGTH_MIN", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, RUN_DYN_STEP_LENGTH_MIN_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_RunDyn);
 
@@ -2202,7 +2287,7 @@ public abstract class TableColumnFactory {
                   + UI.SPACE
                   + UI.UNIT_LABEL_DISTANCE_MM_OR_INCH;
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "RUN_DYN_STEP_LENGTH_MAX", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, RUN_DYN_STEP_LENGTH_MAX_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_RunDyn);
 
@@ -2241,7 +2326,7 @@ public abstract class TableColumnFactory {
                   + UI.SPACE
                   + UI.UNIT_LABEL_DISTANCE_MM_OR_INCH;
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "RUN_DYN_STEP_LENGTH_AVG", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, RUN_DYN_STEP_LENGTH_AVG_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_RunDyn);
 
@@ -2280,7 +2365,7 @@ public abstract class TableColumnFactory {
                   + UI.SPACE
                   + UI.UNIT_LABEL_DISTANCE_MM_OR_INCH;
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "RUN_DYN_VERTICAL_OSCILLATION_MIN", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, RUN_DYN_VERTICAL_OSCILLATION_MIN_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_RunDyn);
 
@@ -2319,7 +2404,7 @@ public abstract class TableColumnFactory {
                   + UI.SPACE
                   + UI.UNIT_LABEL_DISTANCE_MM_OR_INCH;
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "RUN_DYN_VERTICAL_OSCILLATION_MAX", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, RUN_DYN_VERTICAL_OSCILLATION_MAX_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_RunDyn);
 
@@ -2358,7 +2443,7 @@ public abstract class TableColumnFactory {
                   + UI.SPACE
                   + UI.UNIT_LABEL_DISTANCE_MM_OR_INCH;
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "RUN_DYN_VERTICAL_OSCILLATION_AVG", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, RUN_DYN_VERTICAL_OSCILLATION_AVG_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_RunDyn);
 
@@ -2397,7 +2482,7 @@ public abstract class TableColumnFactory {
                   + UI.SPACE
                   + UI.SYMBOL_PERCENTAGE;
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "RUN_DYN_VERTICAL_RATIO_MIN", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, RUN_DYN_VERTICAL_RATIO_MIN_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_RunDyn);
 
@@ -2430,7 +2515,7 @@ public abstract class TableColumnFactory {
                   + UI.SPACE
                   + UI.SYMBOL_PERCENTAGE;
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "RUN_DYN_VERTICAL_RATIO_MAX", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, RUN_DYN_VERTICAL_RATIO_MAX_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_RunDyn);
 
@@ -2463,7 +2548,7 @@ public abstract class TableColumnFactory {
                   + UI.SPACE
                   + UI.SYMBOL_PERCENTAGE;
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "RUN_DYN_VERTICAL_RATIO_AVG", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, RUN_DYN_VERTICAL_RATIO_AVG_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_RunDyn);
 
@@ -2537,7 +2622,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "SURFING_MIN_DISTANCE", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, SURFING_MIN_DISTANCE_ID, SWT.TRAIL);
 
             final String unitLabel = UI.SPACE1 + UI.UNIT_LABEL_DISTANCE_M_OR_YD;
 
@@ -2559,7 +2644,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "SURFING_MIN_SPEED_START_STOP", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, SURFING_MIN_SPEED_START_STOP_ID, SWT.TRAIL);
 
             final String unitLabel = UI.SPACE1 + UI.UNIT_LABEL_SPEED;
 
@@ -2581,7 +2666,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "SURFING_MIN_SPEED_SURFING", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, SURFING_MIN_SPEED_SURFING_ID, SWT.TRAIL);
 
             final String unitLabel = UI.SPACE1 + UI.UNIT_LABEL_SPEED;
 
@@ -2603,7 +2688,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "SURFING_MIN_TIME_DURATION", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, SURFING_MIN_TIME_DURATION_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Surfing);
 
@@ -2623,7 +2708,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "SURFING_NUMBER_OF_EVENTS", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, SURFING_NUMBER_OF_EVENTS_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Surfing);
 
@@ -2822,7 +2907,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "TIME_DATE", SWT.LEAD); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, TIME_DATE_ID, SWT.LEAD);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
 
@@ -2842,7 +2927,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "TIME_TIME_ZONE", SWT.LEAD); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, TIME_TIME_ZONE_ID, SWT.LEAD);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
 
@@ -2861,7 +2946,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "TIME_TIME_ZONE_DIFFERENCE", SWT.LEAD); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, TIME_TIME_ZONE_DIFFERENCE_ID, SWT.LEAD);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
 
@@ -2998,7 +3083,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "TIME_PAUSED_TIME", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, TIME_PAUSED_TIME_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
 
@@ -3022,7 +3107,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "TIME_PAUSED_TIME_RELATIVE", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, TIME_PAUSED_TIME_RELATIVE_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
 
@@ -3133,7 +3218,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "TIME_TOUR_START_TIME", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, TIME_TOUR_START_TIME_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
 
@@ -3215,7 +3300,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "TIME_WEEK_DAY", SWT.LEAD); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, TIME_WEEK_DAY_ID, SWT.LEAD);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
 
@@ -3234,7 +3319,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "TIME_WEEK_NO", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, TIME_WEEK_NO_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
 
@@ -3253,7 +3338,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "TIME_WEEKYEAR", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, TIME_WEEKYEAR_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
 
@@ -3297,7 +3382,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "TOUR_LOCATION_END", SWT.LEAD); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, TOUR_LOCATION_END_ID, SWT.LEAD);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Tour);
 
@@ -3316,7 +3401,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "TOUR_LOCATION_START", SWT.LEAD); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, TOUR_LOCATION_START_ID, SWT.LEAD);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Tour);
 
@@ -3335,7 +3420,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "TOUR_NUM_MARKERS", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, TOUR_NUM_MARKERS_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Tour);
 
@@ -3354,7 +3439,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "TOUR_NUM_PHOTOS", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, TOUR_NUM_PHOTOS_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Tour);
 
@@ -3374,7 +3459,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "TOUR_TAGS", SWT.LEAD); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, TOUR_TAGS_ID, SWT.LEAD);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Tour);
 
@@ -3394,7 +3479,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "TOUR_TITLE", SWT.LEAD); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, TOUR_TITLE_ID, SWT.LEAD);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Tour);
 
@@ -3414,7 +3499,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "TOUR_TYPE", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, TOUR_TYPE_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Tour);
 
@@ -3432,7 +3517,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "TOUR_TYPE_TEXT", SWT.LEAD); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, TOUR_TYPE_TEXT_ID, SWT.LEAD);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Tour);
 
@@ -3449,12 +3534,60 @@ public abstract class TableColumnFactory {
        * Training
        */
 
+      TRAINING_EFFECT_AEROB = new TableColumnFactory() {
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, TRAINING_EFFECT_AEROB_ID, SWT.TRAIL);
+
+            colDef.setColumnCategory(Messages.ColumnFactory_Category_Training);
+
+            colDef.setColumnLabel(Messages.ColumnFactory_Training_TrainingEffect_Aerob_Label);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_Training_TrainingEffect_Aerob_Header);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Training_TrainingEffect_Aerob_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
+            colDef.setValueFormats(
+                  ValueFormatSet.Number,
+                  ValueFormat.NUMBER_1_1,
+                  ValueFormat.NUMBER_1_1,
+                  columnManager);
+
+            return colDef;
+         }
+      };
+
+      TRAINING_EFFECT_ANAEROB = new TableColumnFactory() {
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, TRAINING_EFFECT_ANAEROB_ID, SWT.TRAIL);
+
+            colDef.setColumnCategory(Messages.ColumnFactory_Category_Training);
+
+            colDef.setColumnLabel(Messages.ColumnFactory_Training_TrainingEffect_Anaerob_Label);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_Training_TrainingEffect_Anaerob_Header);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Training_TrainingEffect_Anaerob_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
+            colDef.setValueFormats(
+                  ValueFormatSet.Number,
+                  ValueFormat.NUMBER_1_1,
+                  ValueFormat.NUMBER_1_1,
+                  columnManager);
+
+            return colDef;
+         }
+      };
+
       TRAINING_FTP = new TableColumnFactory() {
          @Override
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "TRAINING_FTP", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, TRAINING_FTP_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Training);
 
@@ -3474,7 +3607,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "TRAINING_INTENSITY_FACTOR", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, TRAINING_INTENSITY_FACTOR_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Training);
 
@@ -3493,60 +3626,12 @@ public abstract class TableColumnFactory {
          }
       };
 
-      TRAINING_TRAINING_EFFECT_AEROB = new TableColumnFactory() {
+      TRAINING_PERFORMANCE_LEVEL = new TableColumnFactory() {
          @Override
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "TRAINING_TRAINING_EFFECT", SWT.TRAIL); //$NON-NLS-1$
-
-            colDef.setColumnCategory(Messages.ColumnFactory_Category_Training);
-
-            colDef.setColumnLabel(Messages.ColumnFactory_Training_TrainingEffect_Aerob_Label);
-            colDef.setColumnHeaderText(Messages.ColumnFactory_Training_TrainingEffect_Aerob_Header);
-            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Training_TrainingEffect_Aerob_Tooltip);
-
-            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
-            colDef.setValueFormats(
-                  ValueFormatSet.Number,
-                  ValueFormat.NUMBER_1_1,
-                  ValueFormat.NUMBER_1_1,
-                  columnManager);
-
-            return colDef;
-         }
-      };
-
-      TRAINING_TRAINING_EFFECT_ANAEROB = new TableColumnFactory() {
-         @Override
-         public TableColumnDefinition createColumn(final ColumnManager columnManager,
-                                                   final PixelConverter pixelConverter) {
-
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "TRAINING_TRAINING_EFFECT_ANAEROBIC", SWT.TRAIL); //$NON-NLS-1$
-
-            colDef.setColumnCategory(Messages.ColumnFactory_Category_Training);
-
-            colDef.setColumnLabel(Messages.ColumnFactory_Training_TrainingEffect_Anaerob_Label);
-            colDef.setColumnHeaderText(Messages.ColumnFactory_Training_TrainingEffect_Anaerob_Header);
-            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Training_TrainingEffect_Anaerob_Tooltip);
-
-            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
-            colDef.setValueFormats(
-                  ValueFormatSet.Number,
-                  ValueFormat.NUMBER_1_1,
-                  ValueFormat.NUMBER_1_1,
-                  columnManager);
-
-            return colDef;
-         }
-      };
-
-      TRAINING_TRAINING_PERFORMANCE = new TableColumnFactory() {
-         @Override
-         public TableColumnDefinition createColumn(final ColumnManager columnManager,
-                                                   final PixelConverter pixelConverter) {
-
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "TRAINING_PERFORMANCE_LEVEL", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, TRAINING_PERFORMANCE_LEVEL_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Training);
 
@@ -3570,7 +3655,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "TRAINING_POWER_TO_WEIGHT", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, TRAINING_POWER_TO_WEIGHT_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Training);
 
@@ -3595,7 +3680,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "TRAINING_STRESS_SCORE", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, TRAINING_STRESS_SCORE_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Training);
 
@@ -3827,7 +3912,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "WEATHER_CLOUDS", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, WEATHER_CLOUDS_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Weather);
 
@@ -3846,7 +3931,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "WEATHER_TEMPERATURE_AVG", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, WEATHER_TEMPERATURE_AVG_ID, SWT.TRAIL);
 
             final String unitLabel = UI.SYMBOL_AVERAGE_WITH_SPACE + UI.UNIT_LABEL_TEMPERATURE;
 
@@ -3873,7 +3958,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "WEATHER_TEMPERATURE_MIN", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, WEATHER_TEMPERATURE_MIN_ID, SWT.TRAIL);
 
             final String unitLabel = UI.SYMBOL_MIN + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE;
 
@@ -3900,7 +3985,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "WEATHER_TEMPERATURE_MAX", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, WEATHER_TEMPERATURE_MAX_ID, SWT.TRAIL);
 
             final String unitLabel = UI.SYMBOL_MAX + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE;
 
@@ -3949,7 +4034,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "WEATHER_WIND_DIR", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, WEATHER_WIND_DIR_ID, SWT.TRAIL);
 
             final String unitLabel = UI.UNIT_LABEL_DIRECTION;
 
@@ -3971,7 +4056,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "WEATHER_WIND_SPEED", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, WEATHER_WIND_SPEED_ID, SWT.TRAIL);
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Weather);
 

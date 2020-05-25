@@ -364,7 +364,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
    float colPower_AvgLeftPedalSmoothness;
    float colPower_AvgRightPedalSmoothness;
    int   colPower_PedalLeftRightBalance;
-   //   
+   //
    float colPower_Avg;
    int   colPower_Max;
    int   colPower_Normalized;
@@ -716,7 +716,8 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             final TourDateTime tourDateTime = TimeTools.createTourDateTime(dbTourStartTime, dbTimeZoneId);
 
             tourItem.colTourDateTime = tourDateTime;
-            tourItem.colDateTimeText = TimeTools.Formatter_Date_S.format(tourDateTime.tourZonedDateTime);
+            tourItem.colDateTime_MS = TimeTools.toEpochMilli(tourDateTime.tourZonedDateTime);
+            tourItem.colDateTime_Text = TimeTools.Formatter_Date_S.format(tourDateTime.tourZonedDateTime);
             tourItem.colTimeZoneId = dbTimeZoneId;
             tourItem.colWeekDay = tourDateTime.weekDay;
 
