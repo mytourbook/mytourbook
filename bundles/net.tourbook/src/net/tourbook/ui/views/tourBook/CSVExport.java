@@ -685,7 +685,7 @@ public class CSVExport {
          } else {
 
             // week
-            csvField(sb, tviTour.tourWeek);
+            csvField(sb, tviTour.colWeekNo);
          }
 
          // day

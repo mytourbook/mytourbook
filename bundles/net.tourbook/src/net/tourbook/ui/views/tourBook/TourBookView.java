@@ -189,7 +189,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private static final NumberFormat     _nf0;
    private static final NumberFormat     _nf1;
    private static final NumberFormat     _nf2;
-
    //
    static {
       _nf0 = NumberFormat.getNumberInstance();
@@ -205,100 +204,10 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _nf2.setMaximumFractionDigits(2);
    }
    //
-   private static TourBookViewLayout _viewLayout;
+   private static TourBookViewLayout      _viewLayout;
    //
-   private ColumnManager             _columnManager_Table;
-   private ColumnManager             _columnManager_Tree;
-   //
-//   private String                         _columnId_1stColumn_Date;
-//   private String                         _columnId_Body_AvgPulse;
-//   private String                         _columnId_Body_Calories;
-//   private String                         _columnId_Body_MaxPulse;
-//   private String                         _columnId_Body_Person;
-//   private String                         _columnId_Body_RestPulse;
-//   private String                         _columnId_Body_Weight;
-//   private String                         _columnId_Data_DPTolerance;
-//   private String                         _columnId_Data_ImportFileName;
-//   private String                         _columnId_Data_ImportFilePath;
-//   private String                         _columnId_Data_NumTimeSlices;
-//   private String                         _columnId_Data_TimeInterval;
-//   private String                         _columnId_Device_Distance;
-//   private String                         _columnId_Device_Name;
-//   private String                         _columnId_Elevation_AvgChange;
-//   private String                         _columnId_Elevation_Down;
-//   private String                         _columnId_Elevation_Max;
-//   private String                         _columnId_Elevation_Up;
-//   private String                         _columnId_Motion_AvgPace;
-//   private String                         _columnId_Motion_AvgSpeed;
-//   private String                         _columnId_Motion_Distance;
-//   private String                         _columnId_Motion_MaxSpeed;
-//   private String                         _columnId_Power_Avg;
-//   private String                         _columnId_Power_Max;
-//   private String                         _columnId_Power_Normalized;
-//   private String                         _columnId_Power_TotalWork;
-//   private String                         _columnId_Powertrain_AvgCadence;
-//   private String                         _columnId_Powertrain_AvgLeftPedalSmoothness;
-//   private String                         _columnId_Powertrain_AvgLeftTorqueEffectiveness;
-//   private String                         _columnId_Powertrain_AvgRightPedalSmoothness;
-//   private String                         _columnId_Powertrain_AvgRightTorqueEffectiveness;
-//   private String                         _columnId_Powertrain_CadenceMultiplier;
-//   private String                         _columnId_Powertrain_Gear_FrontShiftCount;
-//   private String                         _columnId_Powertrain_Gear_RearShiftCount;
-//   private String                         _columnId_Powertrain_PedalLeftRightBalance;
-//   private String                         _columnId_Powertrain_SlowVsFastCadencePercentage;
-//   private String                         _columnId_Powertrain_SlowVsFastCadenceZonesDelimiter;
-//   private String                         _columnId_RunDyn_StanceTime_Avg;
-//   private String                         _columnId_RunDyn_StanceTime_Max;
-//   private String                         _columnId_RunDyn_StanceTime_Min;
-//   private String                         _columnId_RunDyn_StanceTimeBalance_Avg;
-//   private String                         _columnId_RunDyn_StanceTimeBalance_Max;
-//   private String                         _columnId_RunDyn_StanceTimeBalance_Min;
-//   private String                         _columnId_RunDyn_StepLength_Avg;
-//   private String                         _columnId_RunDyn_StepLength_Max;
-//   private String                         _columnId_RunDyn_StepLength_Min;
-//   private String                         _columnId_RunDyn_VerticalOscillation_Avg;
-//   private String                         _columnId_RunDyn_VerticalOscillation_Max;
-//   private String                         _columnId_RunDyn_VerticalOscillation_Min;
-//   private String                         _columnId_RunDyn_VerticalRatio_Avg;
-//   private String                         _columnId_RunDyn_VerticalRatio_Max;
-//   private String                         _columnId_RunDyn_VerticalRatio_Min;
-//   private String                         _columnId_Surfing_MinDistance;
-//   private String                         _columnId_Surfing_MinSpeed_StartStop;
-//   private String                         _columnId_Surfing_MinSpeed_Surfing;
-//   private String                         _columnId_Surfing_MinTimeDuration;
-//   private String                         _columnId_Surfing_NumberOfEvents;
-//   private String                         _columnId_Time_MovingTime;
-//   private String                         _columnId_Time_PausedTime;
-//   private String                         _columnId_Time_PausedTime_Relative;
-//   private String                         _columnId_Time_RecordingTime;
-//   private String                         _columnId_Time_TimeZone;
-//   private String                         _columnId_Time_TimeZoneDifference;
-//   private String                         _columnId_Time_TourStartTime;
-//   private String                         _columnId_Time_WeekDay;
-//   private String                         _columnId_Time_WeekNo;
-//   private String                         _columnId_Time_WeekYear;
-//   private String                         _columnId_Tour_Location_End;
-//   private String                         _columnId_Tour_Location_Start;
-//   private String                         _columnId_Tour_Marker;
-//   private String                         _columnId_Tour_Photos;
-//   private String                         _columnId_Tour_TagIds;
-//   private String                         _columnId_Tour_Tags;
-//   private String                         _columnId_Tour_Title;
-//   private String                         _columnId_Tour_TypeImage;
-//   private String                         _columnId_Tour_TypeText;
-//   private String                         _columnId_Training_FTP;
-//   private String                         _columnId_Training_IntensityFactor;
-//   private String                         _columnId_Training_PowerToWeightRatio;
-//   private String                         _columnId_Training_StressScore;
-//   private String                         _columnId_Training_TrainingEffect;
-//   private String                         _columnId_Training_TrainingEffect_Anaerobic;
-//   private String                         _columnId_Training_TrainingPerformance;
-//   private String                         _columnId_Weather_Clouds;
-//   private String                         _columnId_Weather_Temperature_Avg;
-//   private String                         _columnId_Weather_Temperature_Max;
-//   private String                         _columnId_Weather_Temperature_Min;
-//   private String                         _columnId_Weather_WindDirection;
-//   private String                         _columnId_Weather_WindSpeed;
+   private ColumnManager                  _columnManager_Table;
+   private ColumnManager                  _columnManager_Tree;
    //
    private OpenDialogManager              _openDlgMgr                      = new OpenDialogManager();
    //
@@ -318,7 +227,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private TableColumnDefinition          _colDef_TimeZoneOffset_Table;
    private TreeColumnDefinition           _colDef_TimeZoneOffset_Tree;
    //
-   private TVITourBookRoot                _rootItem_Table;
+   private LazyTourProvider               _lazyTourProvider                = new LazyTourProvider();
+//   private TVITourBookRoot                _rootItem_Table;
    private TVITourBookRoot                _rootItem_Tree;
    //
    private int                            _selectedYear                    = -1;
@@ -433,9 +343,16 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       @Override
       public void updateElement(final int index) {
 
-         final TreeViewerItem tableItem = _rootItem_Table.getFetchedChildren().get(index);
+         System.out.println("\tindex: " + index
+//               + "\t: " +
+         );
+// TODO remove SYSTEM.OUT.PRINTLN
 
-         _tourViewer_Table.replace(tableItem, index);
+         final TreeViewerItem tableItem = _lazyTourProvider.getTour(index);
+
+         if (tableItem != null) {
+            _tourViewer_Table.replace(tableItem, index);
+         }
       }
    }
 
@@ -5079,8 +4996,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _prefStore.removePropertyChangeListener(_prefChangeListener);
       _prefStoreCommon.removePropertyChangeListener(_prefChangeListenerCommon);
 
-      if (_rootItem_Table != null) {
-         _rootItem_Table.clearChildren();
+      if (_lazyTourProvider != null) {
+         _lazyTourProvider.dispose();
       }
       if (_rootItem_Tree != null) {
          _rootItem_Tree.clearChildren();
@@ -5413,7 +5330,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
          // update viewer with new sorting
          _tourViewer_Table_Comparator.setSortColumn(e.widget);
-         _rootItem_Table.setSorting();
+
+         _lazyTourProvider.setSortColumn(_tourViewer_Table_Comparator.__sortColumnId, _tourViewer_Table_Comparator.__sortDirection);
+
          _tourViewer_Table.refresh();
 
          // reselect
@@ -5700,7 +5619,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             _selectedYear = selectedTourItem.tourYear;
 
             if (_viewLayout == TourBookViewLayout.CATEGORY_WEEK) {
-               _selectedYearSub = selectedTourItem.tourWeek;
+               _selectedYearSub = selectedTourItem.colWeekNo;
             } else {
                _selectedYearSub = selectedTourItem.tourMonth;
             }
@@ -5892,6 +5811,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       // update comparator
       _tourViewer_Table_Comparator.__sortColumnId = sortColumnId;
       _tourViewer_Table_Comparator.__sortDirection = sortDirection;
+
+      // setup tour provider with the correct sorting
+      _lazyTourProvider.setSortColumn(sortColumnId, sortDirection);
    }
 
    @PersistState
@@ -6086,14 +6008,11 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       if (_isLayoutFlat) {
 
-         if (_rootItem_Table != null) {
-            _rootItem_Table.clearChildren();
-         }
-
-         _rootItem_Table = new TVITourBookRoot(this, _viewLayout);
-
-         // load all table items
-         final ArrayList<TreeViewerItem> fetchedChildren = _rootItem_Table.getFetchedChildren();
+//         if (_rootItem_Table != null) {
+//            _rootItem_Table.clearChildren();
+//         }
+//
+//         _rootItem_Table = new TVITourBookRoot(this, _viewLayout);
 
          /*
           * There have been different exceptions depending on the sequence of the viewer methods
@@ -6106,11 +6025,11 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
              * content provider otherwise when tour filter returns less items there will be an out
              * of bounds exception !
              */
-            _tourViewer_Table.setItemCount(fetchedChildren.size());
+            _tourViewer_Table.setItemCount(_lazyTourProvider.getNumberOfItems());
 
             _tourViewer_Table.setContentProvider(new ContentProvider_Table());
 
-            _tourViewer_Table.setInput(_rootItem_Table);
+            _tourViewer_Table.setInput(new Object());
 
             _pageBook.showPage(_viewerContainer_Table);
          }
