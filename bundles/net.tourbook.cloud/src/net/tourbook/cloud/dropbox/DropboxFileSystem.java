@@ -190,4 +190,9 @@ public class DropboxFileSystem extends TourbookFileSystem {
       final String dropboxFilePath = _prefStore.getString(IPreferences.DROPBOX_FOLDER);
       return _dropboxFileSystem.getPath(dropboxFilePath);
    }
+
+   @Override
+   public String getPreferencePageId() {
+      return PrefPageDropbox.ID;
+   }
 }

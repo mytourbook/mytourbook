@@ -86,4 +86,12 @@ public abstract class TourbookFileSystem {
    public String getId() {
       return FILE_SYSTEM_ID;
    }
+
+   /**
+    * Gets file system's preference page ID so it can be opened from a menu outside the cloud
+    * plugin.
+    *
+    * @return
+    */
+   public abstract String getPreferencePageId();
 }

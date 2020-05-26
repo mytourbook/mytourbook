@@ -55,9 +55,7 @@ public class FileSystemManager {
     */
    public static File CopyLocally(final String absolutefilePath) {
 
-      if (_fileSystemsList == null) {
-         return null;
-      }
+      getFileSystemsList();
 
       for (final TourbookFileSystem tourbookFileSystem : _fileSystemsList) {
 
@@ -97,9 +95,7 @@ public class FileSystemManager {
    public static String getFileSystemId(final String deviceFolderName) {
       String fileSystemsId = UI.EMPTY_STRING;
 
-      if (_fileSystemsList == null) {
-         return fileSystemsId;
-      }
+      getFileSystemsList();
 
       for (final TourbookFileSystem tourbookFileSystem : _fileSystemsList) {
          if (tourbookFileSystem.getId().equalsIgnoreCase(deviceFolderName.toLowerCase())) {
@@ -120,9 +116,7 @@ public class FileSystemManager {
 
       final ArrayList<String> fileSystemsIds = new ArrayList<>();
 
-      if (_fileSystemsList == null) {
-         return fileSystemsIds;
-      }
+      getFileSystemsList();
 
       for (final TourbookFileSystem tourbookFileSystem : _fileSystemsList) {
          fileSystemsIds.add(tourbookFileSystem.getId());
@@ -147,9 +141,7 @@ public class FileSystemManager {
 
    public static Path getfolderPath(final String folderName) {
 
-      if (_fileSystemsList == null) {
-         return null;
-      }
+      getFileSystemsList();
 
       for (final TourbookFileSystem tourbookFileSystem : _fileSystemsList) {
          if (tourbookFileSystem.getId().equalsIgnoreCase(folderName.toLowerCase())) {
@@ -167,9 +159,7 @@ public class FileSystemManager {
     */
    public static TourbookFileSystem getTourbookFileSystem(final String deviceName) {
 
-      if (_fileSystemsList == null) {
-         return null;
-      }
+      getFileSystemsList();
 
       for (final TourbookFileSystem tourbookFileSystem : _fileSystemsList) {
          if (tourbookFileSystem.getId().equalsIgnoreCase(deviceName.toLowerCase())) {
@@ -182,9 +172,7 @@ public class FileSystemManager {
 
    public static boolean isFileFromTourBookFileSystem(final String osFilePath) {
 
-      if (_fileSystemsList == null) {
-         return false;
-      }
+      getFileSystemsList();
 
       for (final TourbookFileSystem tourbookFileSystem : _fileSystemsList) {
          if (osFilePath.toLowerCase().startsWith(tourbookFileSystem.getId().toLowerCase())) {
