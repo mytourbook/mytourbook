@@ -550,6 +550,7 @@ public interface ITourbookPreferences {
     */
    public static final String MAP25_OFFLINE_MAP_CUSTOM_LOCATION     = "MAP25_OFFLINE_MAP_CUSTOM_LOCATION";     //$NON-NLS-1$
    public static final String MAP25_OFFLINE_MAP_IS_DEFAULT_LOCATION = "MAP25_OFFLINE_MAP_IS_DEFAULT_LOCATION"; //$NON-NLS-1$
+   public static final String MAP25_PHOTO_TITLE_TYPE = "MAP25_PHOTO_TITLE_TYPE";                               //$NON-NLS-1$
 
    /*
     * Pref page: Map3 color

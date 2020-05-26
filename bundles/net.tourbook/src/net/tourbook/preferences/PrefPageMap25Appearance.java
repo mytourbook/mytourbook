@@ -42,19 +42,24 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageMap25Appearance extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
+   public static final String   PHOTO_TITLE_TYPE_NONE    = "none";                       //$NON-NLS-1$
+
+   public static final String   PHOTO_TITLE_TYPE_TIME    = "time";                       //$NON-NLS-1$
+   public static final String   PHOTO_TITLE_TYPE_RATING  = "rating";                     //$NON-NLS-1$
+   public static final String   DEFAULT_PHOTO_TITLE_TYPE      = PHOTO_TITLE_TYPE_NONE;
    private IPreferenceStore      _prefStore   = TourbookPlugin.getPrefStore();
 
-   private PhotoTitleType   photoTitleType = PhotoTitleType.NONE;
    private boolean            _isModified;
    private SelectionAdapter _defaultSelectionListener;
+
 
    /*
 	 * UI controls
 	 */
    private Button _rdoPhotoTitleNone;
 	private Button _rdoPhotoTitleTime;
-   private Button _rdoPhotoTitleStars;
-   private enum PhotoTitleType {NONE, TIME, STARS}
+   private Button _rdoPhotoTitleRating;
+
 
 	@Override
    protected void createFieldEditors() {
@@ -109,9 +114,9 @@ public class PrefPageMap25Appearance extends FieldEditorPreferencePage implement
                _rdoPhotoTitleTime.addSelectionListener(_defaultSelectionListener);
                //_rdoPhotoTitleTime.setToolTipText("Pref_Map25_Appearance_Label_PhotoTitleTime_Tooltip");
 
-               _rdoPhotoTitleStars = new Button(container, SWT.RADIO);
-               _rdoPhotoTitleStars.setText(Messages.Pref_Map25_Appearance_Label_PhotoTitleStars);
-               _rdoPhotoTitleStars.addSelectionListener(_defaultSelectionListener);
+               _rdoPhotoTitleRating = new Button(container, SWT.RADIO);
+               _rdoPhotoTitleRating.setText(Messages.Pref_Map25_Appearance_Label_PhotoTitleStars);
+               _rdoPhotoTitleRating.addSelectionListener(_defaultSelectionListener);
                //_rdoPhotoTitleStars.setToolTipText("Pref_Map25_Appearance_Label_PhotoTitleStars_Tooltip");
 				}
 			}
@@ -122,7 +127,24 @@ public class PrefPageMap25Appearance extends FieldEditorPreferencePage implement
       //final boolean isTrackOpacity = _chkTrackOpacity.getSelection();
    }
 
-	@Override
+	private String getPhotoTitleType() {
+
+      final String photoTitleType;
+
+      if (_rdoPhotoTitleNone.getSelection()) {
+         photoTitleType = PHOTO_TITLE_TYPE_NONE;
+      } else if (_rdoPhotoTitleTime.getSelection()) {
+         photoTitleType = PHOTO_TITLE_TYPE_TIME;
+      } else if (_rdoPhotoTitleRating.getSelection()) {
+         photoTitleType = PHOTO_TITLE_TYPE_RATING;
+      } else {
+         photoTitleType = DEFAULT_PHOTO_TITLE_TYPE;
+      }
+
+      return photoTitleType;
+   }
+
+   @Override
    public void init(final IWorkbench workbench) {
       setPreferenceStore(_prefStore);
    }
@@ -168,6 +190,8 @@ public class PrefPageMap25Appearance extends FieldEditorPreferencePage implement
 
    @Override
    protected void performDefaults() {
+      _isModified = true;
+      updateUI_SetPhotoTitleType(_prefStore.getDefaultString(ITourbookPreferences.MAP25_PHOTO_TITLE_TYPE));
 
       super.performDefaults();
 
@@ -188,6 +212,7 @@ public class PrefPageMap25Appearance extends FieldEditorPreferencePage implement
 
 	private void restoreState() {
 
+      updateUI_SetPhotoTitleType(_prefStore.getString(ITourbookPreferences.MAP25_PHOTO_TITLE_TYPE));
 		// relative/absolute distance
       //final boolean isRelativeDistance = _prefStore.getBoolean(IPreferences.GPX_IS_RELATIVE_DISTANCE_VALUE);
 
@@ -198,9 +223,25 @@ public class PrefPageMap25Appearance extends FieldEditorPreferencePage implement
 	}
 
 	private void saveState() {
-
+      // photo title type
+      _prefStore.setValue(ITourbookPreferences.MAP25_PHOTO_TITLE_TYPE, getPhotoTitleType());
 
 		// relative/absolute distance
       //_prefStore.setValue(IPreferences.GPX_IS_RELATIVE_DISTANCE_VALUE, _rdoDistanceRelative.getSelection());
 	}
+
+   private void updateUI_SetPhotoTitleType(String photoTitleType) {
+
+      if      (photoTitleType.equals(PHOTO_TITLE_TYPE_NONE)   == false
+            && photoTitleType.equals(PHOTO_TITLE_TYPE_TIME)   == false
+            && photoTitleType.equals(PHOTO_TITLE_TYPE_RATING) == false) {
+
+         photoTitleType = DEFAULT_PHOTO_TITLE_TYPE;
+      }
+
+      _rdoPhotoTitleNone.setSelection(photoTitleType.equals(PHOTO_TITLE_TYPE_NONE));
+      _rdoPhotoTitleTime.setSelection(photoTitleType.equals(PHOTO_TITLE_TYPE_TIME));
+      _rdoPhotoTitleRating.setSelection(photoTitleType.equals(PHOTO_TITLE_TYPE_RATING));
+   }
+
 }
