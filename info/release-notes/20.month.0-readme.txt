@@ -25,6 +25,8 @@ New + Improvements
 * Dialog Adjust Elevation
   - Show elevation gain/loss values before and after the adjustment, supported adjustment type: "Approach elevation with SRTM data"  
 
+* Import Suunto Quest Files (Frederic)
+
 Import
 ======
 

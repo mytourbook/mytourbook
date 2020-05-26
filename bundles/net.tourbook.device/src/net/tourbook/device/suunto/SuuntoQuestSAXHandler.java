@@ -88,9 +88,9 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
 
    // mark tags
    private static final String TAG_MARK_INDEX = "Index";    //$NON-NLS-1$
-   private static final String TAG_MARK_TIME = "Time";     //$NON-NLS-1$
+   private static final String TAG_MARK_TIME  = "Time";     //$NON-NLS-1$
 
-   private static final String ATTR_TIMEZONE = "TimeZone"; //$NON-NLS-1$
+   private static final String ATTR_TIMEZONE  = "TimeZone"; //$NON-NLS-1$
 
    static {
 
@@ -393,8 +393,7 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
 
       // check if data are available
       if (_cadenceData == null &&
-            _distanceData == null
-            &&
+            _distanceData == null &&
             _pulseData == null) {
          return;
       }
@@ -443,7 +442,6 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
 
       tourData.createTimeSeries(_sampleList, true);
 
-
       // after all data are added, the tour id can be created
       final String uniqueId = _device.createUniqueId(tourData, Util.UNIQUE_ID_SUFFIX_SUUNTOQUEST);
       final Long tourId = tourData.createTourId(uniqueId);
@@ -488,6 +486,7 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
       int markerIndex = 0;
 
       long markerTime = _markerList.get(markerIndex).relativeTime;
+      final ArrayList<TimeData> _markersToAdd = new ArrayList<>();
 
       for (final TimeData sampleData : _sampleList) {
 
@@ -497,8 +496,8 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
 
             continue;
 
-         } else {
-
+         } else if (sampleTime == markerTime) {
+            //If we find a sample at the same time, we reuse it
             //TODO set absolutetime ?
             // markerTime >= sampleTime
 
@@ -515,8 +514,35 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
             }
 
             markerTime = _markerList.get(markerIndex).relativeTime;
+         } else if (sampleTime > markerTime) {
+
+            //TODO set absolutetime ?
+            // markerTime >= sampleTime
+            final TimeData newSample = new TimeData();
+            newSample.marker = 1;
+            newSample.markerLabel = Integer.toString(markerIndex + 1);
+
+            final TimeData currentMarker = _markerList.get(markerIndex);
+            newSample.cadence = currentMarker.cadence;
+            newSample.distance = currentMarker.distance;
+            newSample.pulse = currentMarker.pulse;
+
+            _markersToAdd.add(newSample);
+
+            /*
+             * check if another marker is available
+             */
+            markerIndex++;
+
+            if (markerIndex >= markerSize) {
+               break;
+            }
+
+            markerTime = newSample.relativeTime;
          }
       }
+
+      _sampleList.addAll(_markersToAdd);
    }
 
    @Override
