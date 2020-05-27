@@ -42,7 +42,6 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 public class SuuntoQuestSAXHandler extends DefaultHandler {
-//TODO FB isDistanceFromSensor
 //TODO time of markers
 
    // root tags
