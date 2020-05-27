@@ -15,30 +15,310 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourBook;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicLong;
+
+import net.tourbook.common.UI;
+import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.TreeViewerItem;
+import net.tourbook.database.TourDatabase;
+import net.tourbook.ui.SQLFilter;
+import net.tourbook.ui.TableColumnFactory;
 
 public class LazyTourProvider {
 
-   void dispose() {
-      // TODO Auto-generated method stub
+   private static final char                             NL                   = net.tourbook.common.UI.NEW_LINE;
 
+   private static final int                              FETCH_SIZE           = 200;
+
+   private ConcurrentHashMap<Integer, Integer>           _pageNumbers_Fetched = new ConcurrentHashMap<>();
+   private ConcurrentHashMap<Integer, Integer>           _pageNumbers_Loading = new ConcurrentHashMap<>();
+
+   private ConcurrentHashMap<Integer, TVITourBookTour>   _fetchedTourItems    = new ConcurrentHashMap<>();
+
+   private final AtomicLong                              _loaderExecuterId    = new AtomicLong();
+   private final LinkedBlockingDeque<LazyTourLoaderItem> _loaderWaitingQueue  = new LinkedBlockingDeque<>();
+
+   private ExecutorService                               _loadingExecutor;
+   {
+
+      final ThreadFactory threadFactory = new ThreadFactory() {
+
+         @Override
+         public Thread newThread(final Runnable r) {
+
+            final Thread thread = new Thread(r, "LazyTourProvider: Loading tours");//$NON-NLS-1$
+
+            thread.setPriority(Thread.MIN_PRIORITY);
+            thread.setDaemon(true);
+
+            return thread;
+         }
+      };
+
+      _loadingExecutor = Executors.newSingleThreadExecutor(threadFactory);
    }
 
+   private String       _sqlSortField;
+
+   private String       _sqlSortDirection;
+
+   /**
+    * Number of all tours for the current lazy loader
+    */
+   private int          _numAllTourItems;
+
+   private TourBookView _tourBookView;
+
+   LazyTourProvider(final TourBookView tourBookView) {
+
+      _tourBookView = tourBookView;
+   }
+
+   void dispose() {
+
+      resetTourItems();
+   }
+
+   private int fetchNumberOfItems() {
+
+      final SQLFilter sqlFilter = new SQLFilter(SQLFilter.TAG_FILTER);
+
+      // get number of tours
+      final String sql = NL
+
+            + "SELECT COUNT(*)"
+            + " FROM " + TourDatabase.TABLE_TOUR_DATA
+
+            + " WHERE 1=1" + NL //
+            + sqlFilter.getWhereClause() + NL;
+
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
+
+//       TourDatabase.enableRuntimeStatistics(conn);
+
+         final PreparedStatement prepStmt = conn.prepareStatement(sql);
+
+         // set filter parameters
+         sqlFilter.setParameters(prepStmt, 1);
+
+         final ResultSet result = prepStmt.executeQuery();
+
+         // get first result
+         result.next();
+
+         // get first value
+         return result.getInt(1);
+
+//       TourDatabase.disableRuntimeStatistic(conn);
+
+      } catch (final SQLException e) {
+         SQL.showException(e, sql);
+      }
+
+      return 0;
+   }
+
+   /**
+    * @return Returns number of all tours for the current lazy loader
+    */
    int getNumberOfItems() {
 
-      final int numItems = 100;
+      _numAllTourItems = fetchNumberOfItems();
 
-      return numItems;
+      return _numAllTourItems;
    }
 
    TreeViewerItem getTour(final int index) {
-      // TODO Auto-generated method stub
+
+      final TVITourBookTour loadedTourItem = _fetchedTourItems.get(index);
+
+      if (loadedTourItem != null) {
+
+         // tour is loaded
+
+         return loadedTourItem;
+      }
+
+      /*
+       * Check if the tour is currently fetched
+       */
+      final int fetchKey = index / FETCH_SIZE;
+
+      final Integer loadingKey = _pageNumbers_Loading.get(fetchKey);
+
+      if (loadingKey != null) {
+
+         // tour is currently being loading -> wait until finished loading
+
+         return null;
+      }
+
+      /*
+       * Tour is not yet loaded or not yet loading -> load it now
+       */
+
+      // invalidate old requests
+      final long executerId = _loaderExecuterId.incrementAndGet();
+
+      final LazyTourLoaderItem loaderItem = new LazyTourLoaderItem(executerId);
+
+      loaderItem.sqlOffset = fetchKey * FETCH_SIZE;
+      loaderItem.fetchKey = fetchKey;
+
+      _pageNumbers_Loading.put(fetchKey, fetchKey);
+
+      _loaderWaitingQueue.add(loaderItem);
+
+      final Runnable executorTask = new Runnable() {
+         @Override
+         public void run() {
+
+            // get last added loader item
+            final LazyTourLoaderItem loaderItem = _loaderWaitingQueue.pollFirst();
+
+            if (loaderItem == null) {
+               return;
+            }
+
+            if (loadPagedTourItems(loaderItem)) {
+               _tourBookView.updateUI_LazyTourItems(loaderItem);
+            }
+
+            final int loaderItemFetchKey = loaderItem.fetchKey;
+
+            _pageNumbers_Fetched.put(loaderItemFetchKey, loaderItemFetchKey);
+            _pageNumbers_Loading.remove(loaderItemFetchKey);
+         }
+      };
+
+      _loadingExecutor.submit(executorTask);
+
       return null;
    }
 
-   void setSortColumn(final String sortColumnId, final int sortDirection) {
-      // TODO Auto-generated method stub
+   private boolean loadPagedTourItems(final LazyTourLoaderItem loaderItem) {
 
+      final SQLFilter sqlFilter = new SQLFilter(SQLFilter.TAG_FILTER);
+
+      final String sql = NL
+
+            + "SELECT " //                                                             //$NON-NLS-1$
+
+            + TVITourBookItem.SQL_ALL_TOUR_FIELDS + NL
+
+            + " FROM " + TourDatabase.TABLE_TOUR_DATA + " TourData" + NL //            //$NON-NLS-1$ //$NON-NLS-2$
+
+            + " WHERE 1=1" + NL //
+            + sqlFilter.getWhereClause() + NL
+
+            + " ORDER BY " + _sqlSortField + UI.SPACE + _sqlSortDirection + NL //      //$NON-NLS-1$
+
+            + " OFFSET ? ROWS FETCH NEXT ? ROWS ONLY" + NL //                          //$NON-NLS-1$
+      ;
+
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
+
+//       TourDatabase.enableRuntimeStatistics(conn);
+
+         int rowIndex = loaderItem.sqlOffset;
+
+         final PreparedStatement prepStmt = conn.prepareStatement(sql);
+
+         // set filter parameters
+         sqlFilter.setParameters(prepStmt, 1);
+
+         // set other parameters
+         int paramIndex = sqlFilter.getLastParameterIndex();
+
+         prepStmt.setInt(paramIndex++, loaderItem.sqlOffset);
+         prepStmt.setInt(paramIndex++, FETCH_SIZE);
+
+         final ResultSet result = prepStmt.executeQuery();
+         while (result.next()) {
+
+            final TVITourBookTour tourItem = new TVITourBookTour(null, null);
+
+            tourItem.tourId = result.getLong(1);
+
+            TVITourBookItem.readTourItems(result, tourItem);
+
+            _fetchedTourItems.put(rowIndex++, tourItem);
+         }
+
+//       TourDatabase.disableRuntimeStatistic(conn);
+
+      } catch (final SQLException e) {
+
+         SQL.showException(e, sql);
+
+         return false;
+      }
+
+      return true;
    }
 
+   void resetTourItems() {
+
+      for (final TVITourBookTour tourItem : _fetchedTourItems.values()) {
+         tourItem.clearChildren();
+      }
+
+      _fetchedTourItems.clear();
+      _pageNumbers_Fetched.clear();
+      _pageNumbers_Loading.clear();
+   }
+
+   void setSortColumn(final String sortColumnId, final int sortDirection) {
+
+      // cleanup old fetched tours
+      resetTourItems();
+
+      /*
+       * Set sort order
+       */
+      if (sortDirection == TourBookView.ItemComparator_Table.ASCENDING) {
+         _sqlSortDirection = "ASC"; //$NON-NLS-1$
+      } else {
+         _sqlSortDirection = "DESC"; //$NON-NLS-1$
+      }
+
+      /*
+       * Set sort direction
+       */
+
+// SET_FORMATTING_OFF
+
+      switch (sortColumnId) {
+
+      case TableColumnFactory.TIME_DATE_ID:                 _sqlSortField = "TourStartTime";          break; //$NON-NLS-1$
+      case TableColumnFactory.TOUR_TITLE_ID:                _sqlSortField = "TourTitle";              break; //$NON-NLS-1$
+      case TableColumnFactory.TIME_TOUR_START_TIME_ID:      _sqlSortField = "TourStartTime";          break; //$NON-NLS-1$
+
+      case TableColumnFactory.DATA_IMPORT_FILE_NAME_ID:     _sqlSortField = "TourImportFileName";     break; //$NON-NLS-1$
+
+      case TableColumnFactory.TIME_WEEK_NO_ID:              _sqlSortField = "StartWeek";              break; //$NON-NLS-1$
+      case TableColumnFactory.TIME_WEEKYEAR_ID:             _sqlSortField = "StartWeekYear";          break; //$NON-NLS-1$
+
+// these fields are not yet displayed in tourbook view but are available in tour data indicies
+//
+//      case TableColumnFactory.:      _sqlSortField = "TourEndTime";          break; //$NON-NLS-1$
+//      case TableColumnFactory.:      _sqlSortField = "HasGeoData";           break; //$NON-NLS-1$
+
+      default:
+         _sqlSortField = "TourStartTime"; //$NON-NLS-1$
+         break;
+      }
+
+// SET_FORMATTING_ON
+
+   }
 }

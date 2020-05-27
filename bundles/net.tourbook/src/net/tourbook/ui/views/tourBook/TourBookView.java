@@ -227,7 +227,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private TableColumnDefinition          _colDef_TimeZoneOffset_Table;
    private TreeColumnDefinition           _colDef_TimeZoneOffset_Tree;
    //
-   private LazyTourProvider               _lazyTourProvider                = new LazyTourProvider();
+   private LazyTourProvider               _lazyTourProvider                = new LazyTourProvider(this);
 //   private TVITourBookRoot                _rootItem_Table;
    private TVITourBookRoot                _rootItem_Tree;
    //
@@ -343,11 +343,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       @Override
       public void updateElement(final int index) {
 
-         System.out.println("\tindex: " + index
-//               + "\t: " +
-         );
-// TODO remove SYSTEM.OUT.PRINTLN
-
          final TreeViewerItem tableItem = _lazyTourProvider.getTour(index);
 
          if (tableItem != null) {
@@ -436,7 +431,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
    }
 
-   private class ItemComparator_Table extends ViewerComparator {
+   class ItemComparator_Table extends ViewerComparator {
 
       static final int         ASCENDING  = 0;
       private static final int DESCENDING = 1;
@@ -5568,6 +5563,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          return;
       }
 
+      _lazyTourProvider.resetTourItems();
+
       if (_isLayoutFlat) {
 
          final Table table = _tourViewer_Table.getTable();
@@ -5905,7 +5902,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
                      /**
                       * <code>
-
+                     
                         Caused by: java.lang.NullPointerException
                         at org.eclipse.jface.viewers.AbstractTreeViewer.getSelection(AbstractTreeViewer.java:2956)
                         at org.eclipse.jface.viewers.StructuredViewer.handleSelect(StructuredViewer.java:1211)
@@ -5923,13 +5920,13 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
                         at org.eclipse.jface.viewers.AbstractTreeViewer.internalCollapseToLevel(AbstractTreeViewer.java:1586)
                         at org.eclipse.jface.viewers.AbstractTreeViewer.collapseToLevel(AbstractTreeViewer.java:751)
                         at org.eclipse.jface.viewers.AbstractTreeViewer.collapseAll(AbstractTreeViewer.java:733)
-
+                     
                         at net.tourbook.ui.views.tourBook.TourBookView$70.run(TourBookView.java:3406)
-
+                     
                         at org.eclipse.swt.widgets.RunnableLock.run(RunnableLock.java:35)
                         at org.eclipse.swt.widgets.Synchronizer.runAsyncMessages(Synchronizer.java:135)
                         ... 22 more
-
+                     
                       * </code>
                       */
 
@@ -6109,6 +6106,11 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _isShowSummaryRow = isShowSummaryRow();
 
       reloadViewer();
+   }
+
+   void updateUI_LazyTourItems(final LazyTourLoaderItem loaderItem) {
+      // TODO Auto-generated method stub
+
    }
 
    /**

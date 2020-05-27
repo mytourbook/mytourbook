@@ -36,6 +36,8 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
    static ZonedDateTime calendar8 = ZonedDateTime.now().with(TimeTools.calendarWeek.dayOfWeek(), 1);
 
    static final String  SQL_ALL_TOUR_FIELDS;
+   static final String  SQL_ALL_OTHER_FIELDS;
+
    static final String  SQL_SUM_COLUMNS;
    static final String  SQL_SUM_FIELDS;
 
@@ -172,15 +174,17 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
             // -------- AVERAGE ALTITUDE CHANGE -----------
 
-            + "avgAltitudeChange, " //                            84    //$NON-NLS-1$
+            + "avgAltitudeChange " //                             84    //$NON-NLS-1$
+      ;
+
+      SQL_ALL_OTHER_FIELDS = NL
 
             /////////////////////////////////////////////////////////////////////////
-            // -------- JOINT TABLES, they should be always at the end --------------
+            // -------- JOINT TABLES, they are added at the end --------------
             /////////////////////////////////////////////////////////////////////////
 
-            + "jTdataTtag.TourTag_tagId, "//                      85    //$NON-NLS-1$
-            + "Tmarker.markerId "//                               86    //$NON-NLS-1$
-
+            + "jTdataTtag.TourTag_tagId, "//                      last+1   //$NON-NLS-1$
+            + "Tmarker.markerId "//                               last+2   //$NON-NLS-1$
       ;
 
       SQL_SUM_FIELDS = NL
@@ -407,6 +411,209 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       tourBookView = view;
    }
 
+   /**
+    * Read tour fields from a resultset which is created with these fields
+    * {@link #SQL_ALL_TOUR_FIELDS}
+    *
+    * @param result
+    * @param tourId
+    * @return
+    * @throws SQLException
+    */
+   static TVITourBookTour readTourItems(final ResultSet result,
+                                        final TVITourBookTour tourItem) throws SQLException {
+
+// SET_FORMATTING_OFF
+
+      final int dbYear                 = result.getInt(2);
+      final int dbMonth                = result.getInt(3);
+      final int dbDay                  = result.getInt(4);
+
+      tourItem.treeColumn              = Integer.toString(dbDay);
+      tourItem.tourYear                = dbYear;
+      tourItem.tourMonth               = dbMonth;
+      tourItem.tourDay                 = dbDay;
+
+      final long dbDistance            = tourItem.colTourDistance = result.getLong(5);
+      tourItem.colTourRecordingTime    = result.getLong(6);
+      final long dbDrivingTime         = tourItem.colTourDrivingTime = result.getLong(7);
+      tourItem.colAltitudeUp           = result.getLong(8);
+      tourItem.colAltitudeDown         = result.getLong(9);
+
+      tourItem.colStartDistance        = result.getLong(10);
+      final Object tourTypeId          = result.getObject(11);
+      tourItem.colTourTitle            = result.getString(12);
+      tourItem.colTimeInterval         = result.getShort(13);
+
+      tourItem.colMaxSpeed             = result.getFloat(14);
+      tourItem.colMaxAltitude          = result.getLong(15);
+      tourItem.colMaxPulse             = result.getLong(16);
+      tourItem.colAvgPulse             = result.getFloat(17);
+      final float dbAvgCadence         = result.getFloat(18);
+      tourItem.colTemperature_Avg      = result.getFloat(19);
+
+      final long dbTourStartTime       = result.getLong(20);
+      final String dbTimeZoneId        = result.getString(21);
+
+      tourItem.colWeekNo               = result.getInt(22);
+      tourItem.colWeekYear             = result.getInt(23);
+
+      tourItem.colWindDir              = result.getInt(24);
+      tourItem.colWindSpd              = result.getInt(25);
+      tourItem.colClouds               = result.getString(26);
+      tourItem.colRestPulse            = result.getInt(27);
+
+      tourItem.colCalories             = result.getLong(28);
+      tourItem.colPersonId             = result.getLong(29);
+
+      tourItem.colNumberOfTimeSlices   = result.getLong(30);
+      tourItem.colNumberOfPhotos       = result.getLong(31);
+      tourItem.colDPTolerance          = result.getInt(32);
+
+      tourItem.colFrontShiftCount      = result.getLong(33);
+      tourItem.colRearShiftCount       = result.getLong(34);
+
+      // ----------------- POWER ------------------
+
+      final float dbAvgPower                          = result.getFloat(35);
+
+      tourItem.colPower_Avg = dbAvgPower;
+      tourItem.colPower_Max                           = result.getInt(36);
+      tourItem.colPower_Normalized                    = result.getInt(37);
+      tourItem.colTraining_FTP                        = result.getInt(38);
+
+      tourItem.colPower_TotalWork                     = result.getLong(39);
+      tourItem.colTraining_TrainingStressScore        = result.getFloat(40);
+      tourItem.colTraining_IntensityFactor            = result.getFloat(41);
+
+      tourItem.colPower_PedalLeftRightBalance         = result.getInt(42);
+      tourItem.colPower_AvgLeftTorqueEffectiveness    = result.getFloat(43);
+      tourItem.colPower_AvgRightTorqueEffectiveness   = result.getFloat(44);
+      tourItem.colPower_AvgLeftPedalSmoothness        = result.getFloat(45);
+      tourItem.colPower_AvgRightPedalSmoothness       = result.getFloat(46);
+
+      final float dbBodyWeight                        = result.getFloat(47);
+
+      // --------------------- IMPORT ------------------
+
+      tourItem.col_ImportFileName                     = result.getString(48);
+      tourItem.col_ImportFilePath                     = result.getString(49);
+
+      String dbDeviceName                             = result.getString(50);
+      String dbFirmwareVersion                        = result.getString(51);
+
+      // -----------------------------------------------
+
+      final float dbCadenceMultiplier                 = result.getFloat(52);
+
+      // ---------- RUNNING DYNAMICS -------------
+
+      tourItem.colRunDyn_StanceTime_Min               = result.getInt(53);
+      tourItem.colRunDyn_StanceTime_Max               = result.getInt(54);
+      tourItem.colRunDyn_StanceTime_Avg               = result.getFloat(55);
+
+      tourItem.colRunDyn_StanceTimeBalance_Min        = result.getInt(56)     / TourData.RUN_DYN_DATA_MULTIPLIER;
+      tourItem.colRunDyn_StanceTimeBalance_Max        = result.getInt(57)     / TourData.RUN_DYN_DATA_MULTIPLIER;
+      tourItem.colRunDyn_StanceTimeBalance_Avg        = result.getFloat(58)   / TourData.RUN_DYN_DATA_MULTIPLIER;
+
+      tourItem.colRunDyn_StepLength_Min               = result.getInt(59);
+      tourItem.colRunDyn_StepLength_Max               = result.getInt(60);
+      tourItem.colRunDyn_StepLength_Avg               = result.getFloat(61);
+
+      tourItem.colRunDyn_VerticalOscillation_Min      = result.getInt(62)     / TourData.RUN_DYN_DATA_MULTIPLIER;
+      tourItem.colRunDyn_VerticalOscillation_Max      = result.getInt(63)     / TourData.RUN_DYN_DATA_MULTIPLIER;
+      tourItem.colRunDyn_VerticalOscillation_Avg      = result.getFloat(64)   / TourData.RUN_DYN_DATA_MULTIPLIER;
+
+      tourItem.colRunDyn_VerticalRatio_Min            = result.getInt(65)     / TourData.RUN_DYN_DATA_MULTIPLIER;
+      tourItem.colRunDyn_VerticalRatio_Max            = result.getInt(66)     / TourData.RUN_DYN_DATA_MULTIPLIER;
+      tourItem.colRunDyn_VerticalRatio_Avg            = result.getFloat(67)   / TourData.RUN_DYN_DATA_MULTIPLIER;
+
+      // ---------- SURFING -------------
+
+      tourItem.col_Surfing_NumberOfEvents             = result.getLong(68);
+      tourItem.col_Surfing_MinSpeed_StartStop         = result.getShort(69);
+      tourItem.col_Surfing_MinSpeed_Surfing           = result.getShort(70);
+      tourItem.col_Surfing_MinTimeDuration            = result.getShort(71);
+
+      tourItem.col_Surfing_IsMinDistance              = result.getBoolean(72);
+      tourItem.col_Surfing_MinDistance                = result.getShort(73);
+
+      // ---------- TRAINING -------------
+
+      tourItem.colTraining_TrainingEffect_Aerob       = result.getFloat(74);
+      tourItem.colTraining_TrainingEffect_Anaerobic   = result.getFloat(75);
+      tourItem.colTraining_TrainingPerformance        = result.getFloat(76);
+
+      // ---------- CADENCE ZONE -------------
+
+      final int cadenceZone_SlowTime                  = result.getInt(77);
+      final int cadenceZone_FastTime                  = result.getInt(78);
+      tourItem.colCadenceZonesDelimiter               = result.getInt(79);
+
+      // ---------- WEATHER -------------
+
+      tourItem.colTemperature_Min                     = result.getFloat(80);
+      tourItem.colTemperature_Max                     = result.getFloat(81);
+
+      // ---------- TOUR START LOCATION -------------
+
+      tourItem.colTourLocation_Start                  = result.getString(82);
+      tourItem.colTourLocation_End                    = result.getString(83);
+
+      // -------- AVERAGE ALTITUDE CHANGE -----------
+
+      tourItem.colAltitude_AvgChange                  = result.getLong(84);
+
+// SET_FORMATTING_ON
+
+      // -----------------------------------------------
+
+      tourItem.colBodyWeight = dbBodyWeight;
+      tourItem.colTraining_PowerToWeight = dbBodyWeight == 0 ? 0 : dbAvgPower / dbBodyWeight;
+
+      tourItem.colAvgCadence = dbAvgCadence * dbCadenceMultiplier;
+      tourItem.colCadenceMultiplier = dbCadenceMultiplier;
+
+      tourItem.colSlowVsFastCadence = TourManager.generateCadenceZones_TimePercentages(cadenceZone_SlowTime, cadenceZone_FastTime);
+
+      // -----------------------------------------------
+
+      dbDeviceName = dbDeviceName == null ? UI.EMPTY_STRING : dbDeviceName;
+      dbFirmwareVersion = dbFirmwareVersion == null ? UI.EMPTY_STRING : dbFirmwareVersion;
+
+      final String deviceName = dbFirmwareVersion.length() == 0//
+            ? dbDeviceName
+            : dbDeviceName
+                  + UI.SPACE
+                  + UI.SYMBOL_BRACKET_LEFT
+                  + dbFirmwareVersion
+                  + UI.SYMBOL_BRACKET_RIGHT;
+
+      tourItem.col_DeviceName = deviceName;
+
+      // -----------------------------------------------
+
+      final TourDateTime tourDateTime = TimeTools.createTourDateTime(dbTourStartTime, dbTimeZoneId);
+
+      tourItem.colTourDateTime = tourDateTime;
+      tourItem.colDateTime_MS = TimeTools.toEpochMilli(tourDateTime.tourZonedDateTime);
+      tourItem.colDateTime_Text = TimeTools.Formatter_Date_S.format(tourDateTime.tourZonedDateTime);
+      tourItem.colTimeZoneId = dbTimeZoneId;
+      tourItem.colWeekDay = tourDateTime.weekDay;
+
+      tourItem.tourTypeId = (tourTypeId == null //
+            ? TourDatabase.ENTITY_IS_NOT_SAVED
+            : (Long) tourTypeId);
+
+      // compute average speed/pace, prevent divide by 0
+      tourItem.colAvgSpeed = dbDrivingTime == 0 ? 0 : 3.6f * dbDistance / dbDrivingTime;
+      tourItem.colAvgPace = dbDistance == 0 ? 0 : dbDrivingTime * 1000 / dbDistance;
+
+      tourItem.colPausedTime = tourItem.colTourRecordingTime - tourItem.colTourDrivingTime;
+
+      return tourItem;
+   }
+
    void addSumColumns(final ResultSet result, final int startIndex) throws SQLException {
 
 // SET_FORMATTING_OFF
@@ -517,23 +724,23 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       final ResultSet result = statement.executeQuery();
       while (result.next()) {
 
-         final long resultTourId = result.getLong(1);
+         final long result_TourId = result.getLong(1);
 
-         final Object resultTagId = result.getObject(85);
-         final Object resultMarkerId = result.getObject(86);
+         final Object result_TagId = result.getObject(85);
+         final Object result_MarkerId = result.getObject(86);
 
-         if (resultTourId == prevTourId) {
+         if (result_TourId == prevTourId) {
 
-            // additional result set's for the same tour
+            // these are additional result set's for the same tour
 
             // get tags from outer join
-            if (resultTagId instanceof Long) {
-               tagIds.add((Long) resultTagId);
+            if (result_TagId instanceof Long) {
+               tagIds.add((Long) result_TagId);
             }
 
             // get markers from outer join
-            if (resultMarkerId instanceof Long) {
-               markerIds.add((Long) resultMarkerId);
+            if (result_MarkerId instanceof Long) {
+               markerIds.add((Long) result_MarkerId);
             }
 
          } else {
@@ -541,219 +748,34 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             // first resultset for a new tour
 
             final TVITourBookTour tourItem = new TVITourBookTour(tourBookView, this);
+
+            tourItem.tourId = result_TourId;
+            tourItem.tourYearSub = tourYearSub;
+
+            readTourItems(result, tourItem);
+
             children.add(tourItem);
 
-            tourItem.tourId = resultTourId;
-
-// SET_FORMATTING_OFF
-
-            final int dbYear                 = result.getInt(2);
-            final int dbMonth                = result.getInt(3);
-            final int dbDay                  = result.getInt(4);
-
-            tourItem.treeColumn              = Integer.toString(dbDay);
-            tourItem.tourYear                = dbYear;
-            tourItem.tourYearSub             = tourYearSub;
-            tourItem.tourMonth               = dbMonth;
-            tourItem.tourDay                 = dbDay;
-
-            final long dbDistance            = tourItem.colTourDistance = result.getLong(5);
-            tourItem.colTourRecordingTime    = result.getLong(6);
-            final long dbDrivingTime         = tourItem.colTourDrivingTime = result.getLong(7);
-            tourItem.colAltitudeUp           = result.getLong(8);
-            tourItem.colAltitudeDown         = result.getLong(9);
-
-            tourItem.colStartDistance        = result.getLong(10);
-            final Object tourTypeId          = result.getObject(11);
-            tourItem.colTourTitle            = result.getString(12);
-            tourItem.colTimeInterval         = result.getShort(13);
-
-            tourItem.colMaxSpeed             = result.getFloat(14);
-            tourItem.colMaxAltitude          = result.getLong(15);
-            tourItem.colMaxPulse             = result.getLong(16);
-            tourItem.colAvgPulse             = result.getFloat(17);
-            final float dbAvgCadence         = result.getFloat(18);
-            tourItem.colTemperature_Avg      = result.getFloat(19);
-
-            final long dbTourStartTime       = result.getLong(20);
-            final String dbTimeZoneId        = result.getString(21);
-
-            tourItem.colWeekNo               = result.getInt(22);
-            tourItem.colWeekYear             = result.getInt(23);
-
-            tourItem.colWindDir              = result.getInt(24);
-            tourItem.colWindSpd              = result.getInt(25);
-            tourItem.colClouds               = result.getString(26);
-            tourItem.colRestPulse            = result.getInt(27);
-
-            tourItem.colCalories             = result.getLong(28);
-            tourItem.colPersonId             = result.getLong(29);
-
-            tourItem.colNumberOfTimeSlices   = result.getLong(30);
-            tourItem.colNumberOfPhotos       = result.getLong(31);
-            tourItem.colDPTolerance          = result.getInt(32);
-
-            tourItem.colFrontShiftCount      = result.getLong(33);
-            tourItem.colRearShiftCount       = result.getLong(34);
-
-            // ----------------- POWER ------------------
-
-            final float dbAvgPower                          = result.getFloat(35);
-
-            tourItem.colPower_Avg = dbAvgPower;
-            tourItem.colPower_Max                           = result.getInt(36);
-            tourItem.colPower_Normalized                    = result.getInt(37);
-            tourItem.colTraining_FTP                        = result.getInt(38);
-
-            tourItem.colPower_TotalWork                     = result.getLong(39);
-            tourItem.colTraining_TrainingStressScore        = result.getFloat(40);
-            tourItem.colTraining_IntensityFactor            = result.getFloat(41);
-
-            tourItem.colPower_PedalLeftRightBalance         = result.getInt(42);
-            tourItem.colPower_AvgLeftTorqueEffectiveness    = result.getFloat(43);
-            tourItem.colPower_AvgRightTorqueEffectiveness   = result.getFloat(44);
-            tourItem.colPower_AvgLeftPedalSmoothness        = result.getFloat(45);
-            tourItem.colPower_AvgRightPedalSmoothness       = result.getFloat(46);
-
-            final float dbBodyWeight                        = result.getFloat(47);
-
-            // --------------------- IMPORT ------------------
-
-            tourItem.col_ImportFileName                     = result.getString(48);
-            tourItem.col_ImportFilePath                     = result.getString(49);
-
-            String dbDeviceName                             = result.getString(50);
-            String dbFirmwareVersion                        = result.getString(51);
-
-            // -----------------------------------------------
-
-            final float dbCadenceMultiplier                 = result.getFloat(52);
-
-            // ---------- RUNNING DYNAMICS -------------
-
-            tourItem.colRunDyn_StanceTime_Min               = result.getInt(53);
-            tourItem.colRunDyn_StanceTime_Max               = result.getInt(54);
-            tourItem.colRunDyn_StanceTime_Avg               = result.getFloat(55);
-
-            tourItem.colRunDyn_StanceTimeBalance_Min        = result.getInt(56)     / TourData.RUN_DYN_DATA_MULTIPLIER;
-            tourItem.colRunDyn_StanceTimeBalance_Max        = result.getInt(57)     / TourData.RUN_DYN_DATA_MULTIPLIER;
-            tourItem.colRunDyn_StanceTimeBalance_Avg        = result.getFloat(58)   / TourData.RUN_DYN_DATA_MULTIPLIER;
-
-            tourItem.colRunDyn_StepLength_Min               = result.getInt(59);
-            tourItem.colRunDyn_StepLength_Max               = result.getInt(60);
-            tourItem.colRunDyn_StepLength_Avg               = result.getFloat(61);
-
-            tourItem.colRunDyn_VerticalOscillation_Min      = result.getInt(62)     / TourData.RUN_DYN_DATA_MULTIPLIER;
-            tourItem.colRunDyn_VerticalOscillation_Max      = result.getInt(63)     / TourData.RUN_DYN_DATA_MULTIPLIER;
-            tourItem.colRunDyn_VerticalOscillation_Avg      = result.getFloat(64)   / TourData.RUN_DYN_DATA_MULTIPLIER;
-
-            tourItem.colRunDyn_VerticalRatio_Min            = result.getInt(65)     / TourData.RUN_DYN_DATA_MULTIPLIER;
-            tourItem.colRunDyn_VerticalRatio_Max            = result.getInt(66)     / TourData.RUN_DYN_DATA_MULTIPLIER;
-            tourItem.colRunDyn_VerticalRatio_Avg            = result.getFloat(67)   / TourData.RUN_DYN_DATA_MULTIPLIER;
-
-            // ---------- SURFING -------------
-
-            tourItem.col_Surfing_NumberOfEvents             = result.getLong(68);
-            tourItem.col_Surfing_MinSpeed_StartStop         = result.getShort(69);
-            tourItem.col_Surfing_MinSpeed_Surfing           = result.getShort(70);
-            tourItem.col_Surfing_MinTimeDuration            = result.getShort(71);
-
-            tourItem.col_Surfing_IsMinDistance              = result.getBoolean(72);
-            tourItem.col_Surfing_MinDistance                = result.getShort(73);
-
-            // ---------- TRAINING -------------
-
-            tourItem.colTraining_TrainingEffect_Aerob       = result.getFloat(74);
-            tourItem.colTraining_TrainingEffect_Anaerobic   = result.getFloat(75);
-            tourItem.colTraining_TrainingPerformance        = result.getFloat(76);
-
-            // ---------- CADENCE ZONE -------------
-
-            final int cadenceZone_SlowTime                  = result.getInt(77);
-            final int cadenceZone_FastTime                  = result.getInt(78);
-            tourItem.colCadenceZonesDelimiter               = result.getInt(79);
-
-            // ---------- WEATHER -------------
-
-            tourItem.colTemperature_Min                     = result.getFloat(80);
-            tourItem.colTemperature_Max                     = result.getFloat(81);
-
-            // ---------- TOUR START LOCATION -------------
-
-            tourItem.colTourLocation_Start                  = result.getString(82);
-            tourItem.colTourLocation_End                    = result.getString(83);
-
-            // -------- AVERAGE ALTITUDE CHANGE -----------
-
-            tourItem.colAltitude_AvgChange                  = result.getLong(84);
-
-// SET_FORMATTING_ON
-
-            // -----------------------------------------------
-
-            tourItem.colBodyWeight = dbBodyWeight;
-            tourItem.colTraining_PowerToWeight = dbBodyWeight == 0 ? 0 : dbAvgPower / dbBodyWeight;
-
-            tourItem.colAvgCadence = dbAvgCadence * dbCadenceMultiplier;
-            tourItem.colCadenceMultiplier = dbCadenceMultiplier;
-
-            tourItem.colSlowVsFastCadence = TourManager.generateCadenceZones_TimePercentages(cadenceZone_SlowTime, cadenceZone_FastTime);
-
-            // -----------------------------------------------
-
-            dbDeviceName = dbDeviceName == null ? UI.EMPTY_STRING : dbDeviceName;
-            dbFirmwareVersion = dbFirmwareVersion == null ? UI.EMPTY_STRING : dbFirmwareVersion;
-
-            final String deviceName = dbFirmwareVersion.length() == 0//
-                  ? dbDeviceName
-                  : dbDeviceName
-                        + UI.SPACE
-                        + UI.SYMBOL_BRACKET_LEFT
-                        + dbFirmwareVersion
-                        + UI.SYMBOL_BRACKET_RIGHT;
-
-            tourItem.col_DeviceName = deviceName;
-
-            // -----------------------------------------------
-
-            final TourDateTime tourDateTime = TimeTools.createTourDateTime(dbTourStartTime, dbTimeZoneId);
-
-            tourItem.colTourDateTime = tourDateTime;
-            tourItem.colDateTime_MS = TimeTools.toEpochMilli(tourDateTime.tourZonedDateTime);
-            tourItem.colDateTime_Text = TimeTools.Formatter_Date_S.format(tourDateTime.tourZonedDateTime);
-            tourItem.colTimeZoneId = dbTimeZoneId;
-            tourItem.colWeekDay = tourDateTime.weekDay;
-
-            tourItem.tourTypeId = (tourTypeId == null //
-                  ? TourDatabase.ENTITY_IS_NOT_SAVED
-                  : (Long) tourTypeId);
-
-            // compute average speed/pace, prevent divide by 0
-            tourItem.colAvgSpeed = dbDrivingTime == 0 ? 0 : 3.6f * dbDistance / dbDrivingTime;
-            tourItem.colAvgPace = dbDistance == 0 ? 0 : dbDrivingTime * 1000 / dbDistance;
-
-            tourItem.colPausedTime = tourItem.colTourRecordingTime - tourItem.colTourDrivingTime;
-
             // get first tag id
-            if (resultTagId instanceof Long) {
+            if (result_TagId instanceof Long) {
 
                tagIds = new HashSet<>();
-               tagIds.add((Long) resultTagId);
+               tagIds.add((Long) result_TagId);
 
                tourItem.setTagIds(tagIds);
             }
 
             // get first marker id
-            if (resultMarkerId instanceof Long) {
+            if (result_MarkerId instanceof Long) {
 
                markerIds = new HashSet<>();
-               markerIds.add((Long) resultMarkerId);
+               markerIds.add((Long) result_MarkerId);
 
                tourItem.setMarkerIds(markerIds);
             }
          }
 
-         prevTourId = resultTourId;
+         prevTourId = result_TourId;
       }
    }
 
