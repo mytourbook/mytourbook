@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Scanner;
+import java.util.stream.Stream;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
@@ -42,7 +43,6 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 public class SuuntoQuestSAXHandler extends DefaultHandler {
-//TODO time of markers
 
    // root tags
    private static final String TAG_ROOT_MOVESCOUNT     = "MovesCount";    //$NON-NLS-1$
@@ -76,7 +76,6 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
    private static final String TAG_MARKS      = "Marks";      //$NON-NLS-1$
    private static final String TAG_MARK       = "Mark";       //$NON-NLS-1$
    private static final String TAG_MARK_INDEX = "Index";      //$NON-NLS-1$
-   private static final String TAG_MARK_TIME  = "Time";       //$NON-NLS-1$
    // -- header tags
    private static final String TAG_CALORIES   = "Calories";   //$NON-NLS-1$
    private static final String TAG_HEADER     = "Header";     //$NON-NLS-1$
@@ -402,8 +401,7 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
    }
 
    private void endElement_InMarks(final String name) {
-//TODO HR, cadence, distance
-      if (name.equals(TAG_MARK_TIME)) {
+      if (name.equals(TAG_TIME)) {
 
          _isInMarkTime = false;
 
@@ -427,6 +425,30 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
          if (_markIndex > 0) {
             _markerData.relativeTime += _markerList.get(_markIndex - 1).relativeTime;
          }
+
+      } else if (name.equals(TAG_CADENCE)) {
+
+         _isInCadence = false;
+
+         _markerData.cadence = Float.valueOf(_characters.toString());
+
+      } else if (name.equals(TAG_DISTANCE)) {
+
+         _isInDistance = false;
+
+         _markerData.absoluteDistance = Float.valueOf(_characters.toString());
+
+         //If existing, we need to use the previous marker absolute distance
+         //to determine the current marker's absolute distance
+         if (_markIndex > 0) {
+            _markerData.absoluteDistance += _markerList.get(_markIndex - 1).absoluteDistance;
+         }
+
+      } else if (name.equals(TAG_HR)) {
+
+         _isInHR = false;
+
+         _markerData.pulse = Float.valueOf(_characters.toString());
 
       }
    }
@@ -467,34 +489,43 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
 
       //Inserting
       int relativeTime = 0;
-      int totalDistance = 0;
-      for (int index = 0; index < _distanceData.length; ++index) {
+
+      int maxIndex = Math.max(_distanceData.length, _cadenceData.length);
+      maxIndex = Math.max(maxIndex, _pulseData.length);
+
+      for (int index = 0; index < maxIndex; ++index) {
 
          final TimeData timeData = new TimeData();
 
-         timeData.cadence = _cadenceData[index];
-         timeData.pulse = _pulseData[index];
-
-         float distance = _distanceData[index];
-         if (_distanceUnit.equalsIgnoreCase("mile")) { //$NON-NLS-1$
-            distance *= net.tourbook.ui.UI.UNIT_MILE;
+         if (index < _cadenceData.length) {
+            timeData.cadence = _cadenceData[index];
          }
-         timeData.distance = distance;
-         totalDistance += timeData.distance;
-         timeData.absoluteDistance += totalDistance;
+         if (index < _pulseData.length) {
+            timeData.pulse = _pulseData[index];
+         }
 
-         relativeTime += _tourSampleRate;
-         timeData.relativeTime = relativeTime;
-         timeData.absoluteTime = (tourStartTime.toEpochSecond() + relativeTime) * 1000;
+         if (index < _distanceData.length) {
+            timeData.distance = _distanceData[index];
+         }
+
+         if (index > 0) {
+            relativeTime += _tourSampleRate;
+            timeData.relativeTime = relativeTime;
+            timeData.time = _tourSampleRate;
+         }
 
          _sampleList.add(timeData);
       }
 
-      for (final TimeData marker : _markerList) {
-         marker.absoluteTime = (tourStartTime.toEpochSecond() + marker.relativeTime) * 1000;
+      mergeMarkers();
+
+      //Converting the distance data to meters if needed
+      if (_distanceUnit.equalsIgnoreCase("mile")) { //$NON-NLS-1$
+         _sampleList.forEach((s) -> s.distance *= net.tourbook.ui.UI.UNIT_MILE);
       }
 
-      mergeMarkers();
+      //We sort the sample lists as it could be out of order if we added markers above
+      Collections.sort(_sampleList, (left, right) -> left.relativeTime - right.relativeTime);
    }
 
    private void finalizeTour() {
@@ -556,6 +587,21 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
    }
 
    /**
+    * Compute the total distance from the start of the samples to a specific index.
+    *
+    * @param endIndex
+    *           A given index
+    * @return
+    *         The sum of the distances
+    */
+   private float getSamplesRangeAbsoluteDistance(final int endIndex) {
+      final Stream<TimeData> samplesRange = _sampleList.stream().skip(0).limit(endIndex + 1);
+
+      return samplesRange.map(sample -> sample.distance)
+            .reduce(0f, Float::sum);
+   }
+
+   /**
     * @return Returns <code>true</code> when a tour was imported
     */
    public boolean isImported() {
@@ -569,76 +615,62 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
     */
    private void mergeMarkers() {
 
-      final int markerSize = _markerList.size();
+      for (final TimeData marker : _markerList) {
+         //We search for a sample that is at the same point in time
+         final TimeData equivalentSample = _sampleList.stream()
+               .filter((s) -> s.relativeTime == marker.relativeTime)
+               .findFirst()
+               .orElse(null);
 
-      if (markerSize == 0) {
-         return;
-      }
+         //If it was found, we mark it as a marker
+         if (equivalentSample != null) {
+            equivalentSample.marker = 1;
+            equivalentSample.markerLabel = marker.markerLabel;
 
-      int markerIndex = 0;
+            //If the current sample has no distance, we replace it with the one from the marker
+            if (equivalentSample.distance == 0f &&
+                  marker.absoluteDistance > 0) {
+               final int sampleIndex = _sampleList.indexOf(equivalentSample);
 
-      long markerTime = _markerList.get(markerIndex).absoluteTime;
-      final ArrayList<TimeData> _markersToAdd = new ArrayList<>();
-
-      for (final TimeData sampleData : _sampleList) {
-
-         final long sampleTime = sampleData.absoluteTime;
-
-         if (sampleTime < markerTime) {
-
-            continue;
-
-         } else if (sampleTime == markerTime) {
-            //If we find a sample at the same time, we reuse it
-
-            sampleData.marker = 1;
-            sampleData.markerLabel = Integer.toString(markerIndex++);
-
-            /*
-             * check if another marker is available
-             */
-            if (markerIndex >= markerSize) {
-               break;
+               final float totalDistance = getSamplesRangeAbsoluteDistance(sampleIndex - 1);
+               equivalentSample.distance = marker.absoluteDistance > totalDistance ?
+                     marker.absoluteDistance - totalDistance : 0f;
+            }
+            if (equivalentSample.pulse == 0) {
+               equivalentSample.pulse = marker.pulse;
+            }
+            if (equivalentSample.cadence == 0) {
+               equivalentSample.cadence = marker.cadence;
             }
 
-            markerTime = _markerList.get(markerIndex).absoluteTime;
-         } else if (sampleTime > markerTime) {
+         } else {
+            //If that doesn't exist, we insert the marker in the sample list and update the 2 adjacent elements
+            TimeData closestSample = _sampleList.stream()
+                  .filter((s) -> s.relativeTime > marker.relativeTime)
+                  .findFirst()
+                  .orElse(null);
 
-            final TimeData newSample = new TimeData();
-            newSample.marker = 1;
-            newSample.markerLabel = Integer.toString(markerIndex + 1);
-
-            final TimeData currentMarker = _markerList.get(markerIndex);
-            newSample.cadence = currentMarker.cadence;
-
-            float distance = currentMarker.distance;
-            if (_distanceUnit.equalsIgnoreCase("mile")) { //$NON-NLS-1$
-               distance *= net.tourbook.ui.UI.UNIT_MILE;
-            }
-            newSample.distance = distance;
-
-            newSample.pulse = currentMarker.pulse;
-            newSample.absoluteTime = currentMarker.absoluteTime;
-
-            _markersToAdd.add(newSample);
-
-            /*
-             * check if another marker is available
-             */
-            ++markerIndex;
-            if (markerIndex >= markerSize) {
-               break;
+            if (closestSample == null) {
+               continue;
             }
 
-            markerTime = newSample.absoluteTime;
+            final int closestSampleIndex = _sampleList.indexOf(closestSample);
+
+            closestSample.time = closestSample.relativeTime - marker.relativeTime;
+
+            float totalDistance = getSamplesRangeAbsoluteDistance(closestSampleIndex);
+            closestSample.distance = totalDistance - marker.absoluteDistance;
+
+            closestSample = _sampleList.get(closestSampleIndex - 1);
+            marker.time = marker.relativeTime - closestSample.relativeTime;
+
+            totalDistance = getSamplesRangeAbsoluteDistance(closestSampleIndex - 1);
+            marker.distance = marker.absoluteDistance - totalDistance;
+
+            marker.marker = 1;
+            _sampleList.add(closestSampleIndex, marker);
          }
       }
-
-      //Adding the potentially newly created samples that are markers
-      _sampleList.addAll(_markersToAdd);
-
-      //We sort the sample lists as it could be out of order if we added markers above
-      Collections.sort(_sampleList, (left, right) -> (int) left.absoluteTime - (int) right.absoluteTime);
    }
 
    @Override
@@ -687,6 +719,7 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
                      // create new time items
                      _markerData = new TimeData();
                      _markIndex = Integer.valueOf(attributes.getValue(TAG_MARK_INDEX));
+                     _markerData.markerLabel = String.valueOf(_markIndex + 1);
 
                   }
                } else if (_isInHeader) {
@@ -824,11 +857,24 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
    }
 
    private void startElement_InMark(final String name) {
+
       boolean isData = true;
 
-      if (name.equals(TAG_MARK_TIME)) {
+      if (name.equals(TAG_TIME)) {
 
          _isInMarkTime = true;
+
+      } else if (name.equals(TAG_CADENCE)) {
+
+         _isInCadence = true;
+
+      } else if (name.equals(TAG_DISTANCE)) {
+
+         _isInDistance = true;
+
+      } else if (name.equals(TAG_HR)) {
+
+         _isInHR = true;
 
       } else {
          isData = false;
