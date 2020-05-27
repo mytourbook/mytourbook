@@ -42,7 +42,6 @@ import org.xml.sax.helpers.DefaultHandler;
 public class SuuntoQuestSAXHandler extends DefaultHandler {
 //TODO FB isDistanceFromSensor
 //TODO time of markers
-//TODO FB t with imperial mile distance file (modify manually)
 
    // root tags
    private static final String TAG_DEVICE          = "Device";     //$NON-NLS-1$
@@ -60,10 +59,11 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
    private static final String TAG_TIME       = "Time";       //$NON-NLS-1$
 
    // device tags
-   private static final String TAG_DISTANCE_UNIT = "DistanceUnit"; //$NON-NLS-1$
-   private static final String TAG_VERSION       = "Version";      //$NON-NLS-1$
-   private static final String TAG_WEIGHT        = "Weight";       //$NON-NLS-1$
-   private static final String TAG_WEIGHT_UNIT   = "WeightUnit";   //$NON-NLS-1$
+   private static final String TAG_DISTANCE_UNIT    = "DistanceUnit";    //$NON-NLS-1$
+   private static final String TAG_SEARCHED_DEVICES = "SearchedDevices"; //$NON-NLS-1$
+   private static final String TAG_VERSION          = "Version";         //$NON-NLS-1$
+   private static final String TAG_WEIGHT           = "Weight";          //$NON-NLS-1$
+   private static final String TAG_WEIGHT_UNIT      = "WeightUnit";      //$NON-NLS-1$
 
    // move tags
    private static final String TAG_CADENCE  = "Cadence";  //$NON-NLS-1$
@@ -110,6 +110,7 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
    private boolean             _isInHR;
    private boolean             _isInMarkTime;
    private boolean             _isInSampleRate;
+   private boolean             _isInSearchedDevices;
    private boolean             _isInTime;
    private boolean             _isInVersion;
    private boolean             _isInWeight;
@@ -118,6 +119,7 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
    private int                 _tourCalories;
    private String              _deviceVersion;
    private String              _distanceUnit;
+   private String              _searchedDevices;
    private short               _tourSampleRate;
    private LocalDateTime       _tourStartTime;
    private int                 _tourTimezone;
@@ -145,6 +147,7 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
             || _isInHR
             || _isInMarkTime
             || _isInSampleRate
+            || _isInSearchedDevices
             || _isInVersion
             || _isInWeight
             || _isInWeightUnit
@@ -271,6 +274,12 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
 
          _distanceUnit = _characters.toString();
 
+      } else if (name.equals(TAG_SEARCHED_DEVICES)) {
+
+         _isInSearchedDevices = false;
+
+         _searchedDevices = _characters.toString();
+
       }
    }
 
@@ -374,7 +383,7 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
 
          float distance = _distanceData[index];
          if (_distanceUnit.equalsIgnoreCase("mile")) { //$NON-NLS-1$
-            distance /= net.tourbook.ui.UI.UNIT_MILE;
+            distance *= net.tourbook.ui.UI.UNIT_MILE;
          }
          timeData.distance = distance;
          totalDistance += timeData.distance;
@@ -422,6 +431,9 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
       tourData.setImportFilePath(_importFilePath);
       tourData.setCalories(_tourCalories);
       tourData.setBodyWeight(_weightUnit.equalsIgnoreCase(UI.UNIT_WEIGHT_KG) ? _weight : _weight / UI.UNIT_KILOGRAM_TO_POUND);
+
+      tourData.setIsPulseSensorPresent(_searchedDevices.contains("HR"));
+      tourData.setIsDistanceFromSensor(_searchedDevices.contains("POD"));
 
       tourData.setDeviceId(_device.deviceId);
       tourData.setDeviceName(_device.visibleName);
@@ -629,6 +641,10 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
       } else if (name.equals(TAG_DISTANCE_UNIT)) {
 
          _isInDistanceUnit = true;
+
+      } else if (name.equals(TAG_SEARCHED_DEVICES)) {
+
+         _isInSearchedDevices = true;
 
       } else {
          isData = false;
