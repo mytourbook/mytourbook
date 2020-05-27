@@ -42,7 +42,9 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 public class SuuntoQuestSAXHandler extends DefaultHandler {
-
+//TODO FB isDistanceFromSensor
+//TODO time of markers
+//TODO FB t with imperial mile distance file (modify manually)
    /**
     * This time is used when a time is not available.
     */
@@ -75,17 +77,19 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
 
    // header tags
    private static final String TAG_CALORIES   = "Calories";   //$NON-NLS-1$
-   private static final String TAG_DISTANCE   = "Distance";   //$NON-NLS-1$
    private static final String TAG_SAMPLERATE = "SampleRate"; //$NON-NLS-1$
    private static final String TAG_TIME       = "Time";       //$NON-NLS-1$
 
    // device tags
-   private static final String TAG_SW = "SW"; //$NON-NLS-1$
+   private static final String TAG_DISTANCE_UNIT = "DistanceUnit"; //$NON-NLS-1$
+   private static final String TAG_VERSION       = "Version";      //$NON-NLS-1$
+   private static final String TAG_WEIGHT        = "Weight";       //$NON-NLS-1$
+   private static final String TAG_WEIGHT_UNIT   = "WeightUnit";   //$NON-NLS-1$
 
    // move tags
-   private static final String TAG_CADENCE     = "Cadence";     //$NON-NLS-1$
-   private static final String TAG_HR          = "HR";          //$NON-NLS-1$
-   private static final String TAG_TEMPERATURE = "Temperature"; //$NON-NLS-1$
+   private static final String TAG_CADENCE  = "Cadence";  //$NON-NLS-1$
+   private static final String TAG_DISTANCE = "Distance"; //$NON-NLS-1$
+   private static final String TAG_HR       = "HR";       //$NON-NLS-1$
 
    // mark tags
    private static final String TAG_MARK_INDEX = "Index";    //$NON-NLS-1$
@@ -119,7 +123,6 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
 
    private boolean             _isImported;
    private StringBuilder       _characters = new StringBuilder();
-   private long                _currentTime;
 
    private boolean             _isInDevice;
    private boolean             _isInHeader;
@@ -132,19 +135,23 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
    private boolean             _isInCadence;
    private boolean             _isInCalories;
    private boolean             _isInDistance;
+   private boolean             _isInDistanceUnit;
    private boolean             _isInHR;
    private boolean             _isInMarkTime;
-   private boolean             _isInSW;
    private boolean             _isInSampleRate;
    private boolean             _isInTime;
+   private boolean             _isInVersion;
+   private boolean             _isInWeight;
+   private boolean             _isInWeightUnit;
 
-   private boolean             _isInTemperature;
    private int                 _tourCalories;
+   private String              _deviceVersion;
+   private String              _distanceUnit;
    private short               _tourSampleRate;
    private DateTime            _tourStartTime;
    private int                 _tourTimezone;
-
-   private String              _tourSW;
+   private float               _weight;
+   private String              _weightUnit;
 
    public SuuntoQuestSAXHandler(final TourbookDevice deviceDataReader,
                                 final String importFileName,
@@ -163,11 +170,13 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
       if (_isInCadence //
             || _isInCalories
             || _isInDistance
+            || _isInDistanceUnit
             || _isInHR
             || _isInMarkTime
             || _isInSampleRate
-            || _isInSW
-            || _isInTemperature
+            || _isInVersion
+            || _isInWeight
+            || _isInWeightUnit
             || _isInTime
       //
       ) {
@@ -181,7 +190,7 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
          return null;
       }
 
-      final String[] individualValues = values.split(" ");
+      final String[] individualValues = values.split(UI.SPACE1);
       final float[] serie = new float[individualValues.length];
 
       try (Scanner scanner = new Scanner(values)) {
@@ -208,7 +217,11 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
    @Override
    public void endElement(final String uri, final String localName, final String name) throws SAXException {
 
-      if (_isInSamples) {
+      if (_isInDevice) {
+
+         endElement_InDevice(name);
+
+      } else if (_isInSamples) {
 
          endElement_InSamples(name);
 
@@ -263,11 +276,30 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
 
    private void endElement_InDevice(final String name) {
 
-      if (name.equals(TAG_SW)) {
+      if (name.equals(TAG_VERSION)) {
 
-         _isInSW = false;
+         _isInVersion = false;
 
-         _tourSW = _characters.toString();
+         _deviceVersion = _characters.toString();
+
+      } else if (name.equals(TAG_WEIGHT)) {
+
+         _isInWeight = false;
+
+         _weight = Float.valueOf(_characters.toString());
+
+      } else if (name.equals(TAG_WEIGHT_UNIT)) {
+
+         _isInWeightUnit = false;
+
+         _weightUnit = _characters.toString();
+
+      } else if (name.equals(TAG_DISTANCE_UNIT)) {
+
+         _isInDistanceUnit = false;
+
+         _distanceUnit = _characters.toString();
+
       }
    }
 
@@ -279,17 +311,11 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
 
          _tourCalories = Integer.valueOf(_characters.toString()) * 1000;
 
-      } else if (name.equals(TAG_DISTANCE)) {
-
-//         _isInDistance = false;
-//
-//         _tourDistance = Integer.valueOf(_characters.toString());
-
       } else if (name.equals(TAG_TIME)) {
 
          _isInTime = false;
 
-         final DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
+         final DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"); //$NON-NLS-1$
 
          _tourStartTime = formatter.parseDateTime(_characters.toString());
 
@@ -306,17 +332,15 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
       if (name.equals(TAG_MARK_TIME)) {
 
          _isInMarkTime = false;
-//TODO marker.id
 
          final PeriodFormatter periodFormatter =
                new PeriodFormatterBuilder().printZeroAlways()
                      .appendHours()
-                     .appendSeparator(":")
+                     .appendSeparator(UI.SYMBOL_COLON)
                      .appendMinutes()
-                     .appendSeparator(":")
+                     .appendSeparator(UI.SYMBOL_COLON)
                      .appendSeconds()
-                     .appendSeparator(
-                           ".")
+                     .appendSeparator(UI.SYMBOL_DOT)
                      .appendMillis()
                      .maximumParsedDigits(2)
                      .toFormatter();
@@ -356,38 +380,47 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
       }
    }
 
-   private void finalizeSample() {
+   /**
+    * Fills the necessary data for the samples :
+    * computes {@see TimeData#absoluteTime} for each {@link TimeData}, merges markers with the
+    * samples
+    * And inserts the data series into the sample list.
+    *
+    * @param tourStartTime
+    *           The tour start time that is used to compute the {@see TimeData#absoluteTime}
+    */
+   private void finalizeSamples(final ZonedDateTime tourStartTime) {
 
-      final long sampleTime;
-      if (_currentTime == Long.MIN_VALUE) {
+      //Inserting
+      int relativeTime = 0;
+      int totalDistance = 0;
+      for (int index = 0; index < _distanceData.length; ++index) {
 
-         sampleTime = DEFAULT_TIME;
+         final TimeData timeData = new TimeData();
 
-      } else {
+         timeData.cadence = _cadenceData[index];
+         timeData.pulse = _pulseData[index];
 
-         /*
-          * Remove milliseconds because this can cause wrong data. Position of a marker can be at
-          * the wrong second and multiple samples can have the same second but other
-          * milliseconds.
-          */
-         sampleTime = _currentTime / 1000 * 1000;
+         float distance = _distanceData[index];
+         if (_distanceUnit.equalsIgnoreCase("mile")) { //$NON-NLS-1$
+            distance /= net.tourbook.ui.UI.UNIT_MILE;
+         }
+         timeData.distance = distance;
+         totalDistance += timeData.distance;
+         timeData.absoluteDistance += totalDistance;
+
+         relativeTime += _tourSampleRate;
+         timeData.relativeTime = relativeTime;
+         timeData.absoluteTime = (tourStartTime.toEpochSecond() + relativeTime) * 1000;
+
+         _sampleList.add(timeData);
       }
 
-      /*
-       * A lap do not contain a sample type
-       */
-      if (_markerData.marker == 1) {
-
-         // set virtual time if time is not available
-         _markerData.absoluteTime = sampleTime;
-
-         _markerList.add(_markerData);
-
+      for (final TimeData marker : _markerList) {
+         marker.absoluteTime = (tourStartTime.toEpochSecond() + marker.relativeTime) * 1000;
       }
 
-      _markerData = null;
-
-      _currentTime = Long.MIN_VALUE;
+      mergeMarkers();
    }
 
    private void finalizeTour() {
@@ -413,37 +446,16 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
 //      final ZoneOffset t = ZoneOffset.ofHours(_tourTimezone);
       tourData.setTourStartTime(tourStartTime);
 
-      //Inserting the data series into the sample list
-      int relativeTime = 0;
-      for (int index = 0; index < _distanceData.length; ++index) {
-
-         final TimeData timeData = new TimeData();
-
-         timeData.cadence = _cadenceData[index];
-         timeData.absoluteDistance = _distanceData[index];
-         timeData.pulse = _pulseData[index];
-
-         relativeTime += _tourSampleRate;
-         timeData.relativeTime = relativeTime;
-         timeData.absoluteTime = (tourStartTime.toEpochSecond() + relativeTime) * 1000;
-
-         _sampleList.add(timeData);
-      }
-
-      for (final TimeData marker : _markerList) {
-         marker.absoluteTime = (tourStartTime.toEpochSecond() + marker.relativeTime) * 1000;
-      }
-
-      setData_Marker();
+      finalizeSamples(tourStartTime);
 
       tourData.setDeviceTimeInterval(_tourSampleRate);
       tourData.setImportFilePath(_importFilePath);
-
       tourData.setCalories(_tourCalories);
+      tourData.setBodyWeight(_weightUnit.equalsIgnoreCase(UI.UNIT_WEIGHT_KG) ? _weight : _weight * UI.UNIT_KILOGRAM_TO_POUND);
 
       tourData.setDeviceId(_device.deviceId);
       tourData.setDeviceName(_device.visibleName);
-      tourData.setDeviceFirmwareVersion(_tourSW == null ? UI.EMPTY_STRING : _tourSW);
+      tourData.setDeviceFirmwareVersion(_deviceVersion == null ? UI.EMPTY_STRING : _deviceVersion);
 
       tourData.createTimeSeries(_sampleList, true);
 
@@ -480,7 +492,7 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
     * <p>
     * Merge is necessary because there are separate time slices for markers.
     */
-   private void setData_Marker() {
+   private void mergeMarkers() {
 
       final int markerSize = _markerList.size();
 
@@ -523,7 +535,13 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
 
             final TimeData currentMarker = _markerList.get(markerIndex);
             newSample.cadence = currentMarker.cadence;
-            newSample.absoluteDistance = currentMarker.absoluteDistance;
+
+            float distance = currentMarker.distance;
+            if (_distanceUnit.equalsIgnoreCase("mile")) { //$NON-NLS-1$
+               distance /= net.tourbook.ui.UI.UNIT_MILE;
+            }
+            newSample.distance = distance;
+
             newSample.pulse = currentMarker.pulse;
             newSample.absoluteTime = currentMarker.absoluteTime;
 
@@ -541,7 +559,7 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
          }
       }
 
-      //Adding the potential newly created samples that are markers
+      //Adding the potentially newly created samples that are markers
       _sampleList.addAll(_markersToAdd);
 
       //We sort the sample lists as it could be out of order if we added markers above
@@ -616,20 +634,34 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
 
          _isInRootMovesCount = true;
 
-         _tourTimezone = Integer.valueOf(attributes.getValue("TimeZone")) / 60;
+         // The value is in minutes so we transform it into hours
+         _tourTimezone = Integer.valueOf(attributes.getValue(ATTR_TIMEZONE)) / 60;
 
       }
-
    }
 
    private void startElement_InDevice(final String name) {
 
-      boolean isData = false;
+      boolean isData = true;
 
-      if (name.equals(TAG_SW)) {
+      if (name.equals(TAG_VERSION)) {
 
-         isData = true;
-         _isInSW = true;
+         _isInVersion = true;
+
+      } else if (name.equals(TAG_WEIGHT)) {
+
+         _isInWeight = true;
+
+      } else if (name.equals(TAG_WEIGHT_UNIT)) {
+
+         _isInWeightUnit = true;
+
+      } else if (name.equals(TAG_DISTANCE_UNIT)) {
+
+         _isInDistanceUnit = true;
+
+      } else {
+         isData = false;
       }
 
       if (isData) {
@@ -650,6 +682,7 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
       } else if (name.equals(TAG_TIME)) {
 
          _isInTime = true;
+
       } else if (name.equals(TAG_SAMPLERATE)) {
 
          _isInSampleRate = true;
@@ -699,10 +732,6 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
       } else if (name.equals(TAG_HR)) {
 
          _isInHR = true;
-
-      } else if (name.equals(TAG_TEMPERATURE)) {
-
-         _isInTemperature = true;
 
       } else {
          isData = false;
