@@ -18,6 +18,7 @@ package net.tourbook.device.suunto;
 import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Scanner;
 import java.util.TimeZone;
@@ -413,20 +414,24 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
       tourData.setTourStartTime(tourStartTime);
 
       //Inserting the data series into the sample list
-
       int relativeTime = 0;
       for (int index = 0; index < _distanceData.length; ++index) {
 
          final TimeData timeData = new TimeData();
 
          timeData.cadence = _cadenceData[index];
-         timeData.distance = _distanceData[index];
+         timeData.absoluteDistance = _distanceData[index];
          timeData.pulse = _pulseData[index];
 
          relativeTime += _tourSampleRate;
          timeData.relativeTime = relativeTime;
+         timeData.absoluteTime = (tourStartTime.toEpochSecond() + relativeTime) * 1000;
 
          _sampleList.add(timeData);
+      }
+
+      for (final TimeData marker : _markerList) {
+         marker.absoluteTime = (tourStartTime.toEpochSecond() + marker.relativeTime) * 1000;
       }
 
       setData_Marker();
@@ -485,12 +490,12 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
 
       int markerIndex = 0;
 
-      long markerTime = _markerList.get(markerIndex).relativeTime;
+      long markerTime = _markerList.get(markerIndex).absoluteTime;
       final ArrayList<TimeData> _markersToAdd = new ArrayList<>();
 
       for (final TimeData sampleData : _sampleList) {
 
-         final long sampleTime = sampleData.relativeTime;
+         final long sampleTime = sampleData.absoluteTime;
 
          if (sampleTime < markerTime) {
 
@@ -498,51 +503,49 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
 
          } else if (sampleTime == markerTime) {
             //If we find a sample at the same time, we reuse it
-            //TODO set absolutetime ?
-            // markerTime >= sampleTime
 
             sampleData.marker = 1;
-            sampleData.markerLabel = Integer.toString(markerIndex + 1);
+            sampleData.markerLabel = Integer.toString(markerIndex++);
 
             /*
              * check if another marker is available
              */
-            markerIndex++;
-
             if (markerIndex >= markerSize) {
                break;
             }
 
-            markerTime = _markerList.get(markerIndex).relativeTime;
+            markerTime = _markerList.get(markerIndex).absoluteTime;
          } else if (sampleTime > markerTime) {
 
-            //TODO set absolutetime ?
-            // markerTime >= sampleTime
             final TimeData newSample = new TimeData();
             newSample.marker = 1;
             newSample.markerLabel = Integer.toString(markerIndex + 1);
 
             final TimeData currentMarker = _markerList.get(markerIndex);
             newSample.cadence = currentMarker.cadence;
-            newSample.distance = currentMarker.distance;
+            newSample.absoluteDistance = currentMarker.absoluteDistance;
             newSample.pulse = currentMarker.pulse;
+            newSample.absoluteTime = currentMarker.absoluteTime;
 
             _markersToAdd.add(newSample);
 
             /*
              * check if another marker is available
              */
-            markerIndex++;
-
+            ++markerIndex;
             if (markerIndex >= markerSize) {
                break;
             }
 
-            markerTime = newSample.relativeTime;
+            markerTime = newSample.absoluteTime;
          }
       }
 
+      //Adding the potential newly created samples that are markers
       _sampleList.addAll(_markersToAdd);
+
+      //We sort the sample lists as it could be out of order if we added markers above
+      Collections.sort(_sampleList, (left, right) -> (int) left.absoluteTime - (int) right.absoluteTime);
    }
 
    @Override
@@ -679,15 +682,6 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
          _characters.delete(0, _characters.length());
       }
 
-   }
-
-   private void startElement_InMove(final String name) {
-
-      if (name.equals(TAG_SAMPLES)) {
-
-         _isInSamples = true;
-
-      }
    }
 
    private void startElement_InSamples(final String name) {
