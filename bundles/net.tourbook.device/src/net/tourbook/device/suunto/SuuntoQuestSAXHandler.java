@@ -30,6 +30,8 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourType;
+import net.tourbook.database.TourDatabase;
 import net.tourbook.importdata.TourbookDevice;
 
 import org.joda.time.Period;
@@ -44,87 +46,107 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
 //TODO time of markers
 
    // root tags
-   private static final String TAG_DEVICE          = "Device";     //$NON-NLS-1$
-   private static final String TAG_HEADER          = "Header";     //$NON-NLS-1$
-   private static final String TAG_ROOT_MOVESCOUNT = "MovesCount"; //$NON-NLS-1$
-   private static final String TAG_MARKS           = "Marks";      //$NON-NLS-1$
-   private static final String TAG_MARK            = "Mark";       //$NON-NLS-1$
-   private static final String TAG_MOVES           = "Moves";      //$NON-NLS-1$
-   private static final String TAG_MOVE            = "Move";       //$NON-NLS-1$
-   private static final String TAG_SAMPLES         = "Samples";    //$NON-NLS-1$
+   private static final String TAG_ROOT_MOVESCOUNT     = "MovesCount";    //$NON-NLS-1$
+   private static final String TAG_ROOT_EXERCISE_MODES = "ExerciseModes"; //$NON-NLS-1$
+   private static final String TAG_ROOT_DEVICE         = "Device";        //$NON-NLS-1$
+   private static final String TAG_ROOT_MOVES          = "Moves";         //$NON-NLS-1$
 
-   // header tags
-   private static final String TAG_CALORIES   = "Calories";   //$NON-NLS-1$
-   private static final String TAG_SAMPLERATE = "SampleRate"; //$NON-NLS-1$
-   private static final String TAG_TIME       = "Time";       //$NON-NLS-1$
+   // MovesCount
+   private static final String ATTR_TIMEZONE = "TimeZone"; //$NON-NLS-1$
 
    // device tags
-   private static final String TAG_DISTANCE_UNIT    = "DistanceUnit";    //$NON-NLS-1$
+   private static final String TAG_DISTANCE_UNIT = "DistanceUnit"; //$NON-NLS-1$
+   private static final String TAG_VERSION       = "Version";      //$NON-NLS-1$
+   private static final String TAG_WEIGHT        = "Weight";       //$NON-NLS-1$
+   private static final String TAG_WEIGHT_UNIT   = "WeightUnit";   //$NON-NLS-1$
+
+   // exercise mode tags
+   private static final String TAG_EXERCISE_MODE    = "ExerciseMode";    //$NON-NLS-1$
+   private static final String TAG_ACTIVITY         = "Activity";        //$NON-NLS-1$
+   private static final String TAG_NAME             = "Name";            //$NON-NLS-1$
    private static final String TAG_SEARCHED_DEVICES = "SearchedDevices"; //$NON-NLS-1$
-   private static final String TAG_VERSION          = "Version";         //$NON-NLS-1$
-   private static final String TAG_WEIGHT           = "Weight";          //$NON-NLS-1$
-   private static final String TAG_WEIGHT_UNIT      = "WeightUnit";      //$NON-NLS-1$
 
    // move tags
-   private static final String TAG_CADENCE  = "Cadence";  //$NON-NLS-1$
-   private static final String TAG_DISTANCE = "Distance"; //$NON-NLS-1$
-   private static final String TAG_HR       = "HR";       //$NON-NLS-1$
-
-   // mark tags
-   private static final String TAG_MARK_INDEX = "Index";    //$NON-NLS-1$
-   private static final String TAG_MARK_TIME  = "Time";     //$NON-NLS-1$
-
-   private static final String ATTR_TIMEZONE  = "TimeZone"; //$NON-NLS-1$
+   // -- samples tags
+   private static final String TAG_MOVE       = "Move";       //$NON-NLS-1$
+   private static final String TAG_SAMPLES    = "Samples";    //$NON-NLS-1$
+   private static final String TAG_CADENCE    = "Cadence";    //$NON-NLS-1$
+   private static final String TAG_DISTANCE   = "Distance";   //$NON-NLS-1$
+   private static final String TAG_HR         = "HR";         //$NON-NLS-1$
+   // -- marks tags
+   private static final String TAG_MARKS      = "Marks";      //$NON-NLS-1$
+   private static final String TAG_MARK       = "Mark";       //$NON-NLS-1$
+   private static final String TAG_MARK_INDEX = "Index";      //$NON-NLS-1$
+   private static final String TAG_MARK_TIME  = "Time";       //$NON-NLS-1$
+   // -- header tags
+   private static final String TAG_CALORIES   = "Calories";   //$NON-NLS-1$
+   private static final String TAG_HEADER     = "Header";     //$NON-NLS-1$
+   private static final String TAG_SAMPLERATE = "SampleRate"; //$NON-NLS-1$
+   private static final String TAG_TIME       = "Time";       //$NON-NLS-1$
 
    //
    private HashMap<Long, TourData> _alreadyImportedTours;
    private HashMap<Long, TourData> _newlyImportedTours;
    private TourbookDevice          _device;
    private String                  _importFilePath;
+   private ArrayList<TourType>     _allTourTypes;
    //
 
-   private ArrayList<TimeData> _sampleList = new ArrayList<>();
-   private float[]             _cadenceData;
-   private float[]             _distanceData;
-   private float[]             _pulseData;
+   private ArrayList<TimeData>     _sampleList        = new ArrayList<>();
+   private float[]                 _cadenceData;
+   private float[]                 _distanceData;
+   private float[]                 _pulseData;
 
-   private TimeData            _markerData;
-   private int                 _markIndex;
-   private ArrayList<TimeData> _markerList = new ArrayList<>();
+   private TimeData                _markerData;
+   private int                     _markIndex;
+   private ArrayList<TimeData>     _markerList        = new ArrayList<>();
 
-   private boolean             _isImported;
-   private StringBuilder       _characters = new StringBuilder();
+   private ExerciseMode            _exerciseModeData;
+   private ArrayList<ExerciseMode> _exerciseModesList = new ArrayList<>();
 
-   private boolean             _isInDevice;
-   private boolean             _isInHeader;
-   private boolean             _isInMarks;
-   private boolean             _isInMark;
-   private boolean             _isInMove;
-   private boolean             _isInMoves;
-   private boolean             _isInSamples;
-   private boolean             _isInRootMovesCount;
-   private boolean             _isInCadence;
-   private boolean             _isInCalories;
-   private boolean             _isInDistance;
-   private boolean             _isInDistanceUnit;
-   private boolean             _isInHR;
-   private boolean             _isInMarkTime;
-   private boolean             _isInSampleRate;
-   private boolean             _isInSearchedDevices;
-   private boolean             _isInTime;
-   private boolean             _isInVersion;
-   private boolean             _isInWeight;
-   private boolean             _isInWeightUnit;
+   private boolean                 _isImported;
+   private StringBuilder           _characters        = new StringBuilder();
 
-   private int                 _tourCalories;
-   private String              _deviceVersion;
-   private String              _distanceUnit;
-   private String              _searchedDevices;
-   private short               _tourSampleRate;
-   private LocalDateTime       _tourStartTime;
-   private int                 _tourTimezone;
-   private float               _weight;
-   private String              _weightUnit;
+   private boolean                 _isInActivity;
+   private boolean                 _isInDevice;
+   private boolean                 _isInExerciseMode;
+   private boolean                 _isInExerciseModes;
+   private boolean                 _isInHeader;
+   private boolean                 _isInMarks;
+   private boolean                 _isInMark;
+   private boolean                 _isInMove;
+   private boolean                 _isInMoves;
+   private boolean                 _isInName;
+   private boolean                 _isInSamples;
+   private boolean                 _isInRootMovesCount;
+   private boolean                 _isInCadence;
+   private boolean                 _isInCalories;
+   private boolean                 _isInDistance;
+   private boolean                 _isInDistanceUnit;
+   private boolean                 _isInHR;
+   private boolean                 _isInMarkTime;
+   private boolean                 _isInSampleRate;
+   private boolean                 _isInSearchedDevices;
+   private boolean                 _isInTime;
+   private boolean                 _isInVersion;
+   private boolean                 _isInWeight;
+   private boolean                 _isInWeightUnit;
+
+   private int                     _tourActivity;
+   private int                     _tourCalories;
+   private String                  _deviceVersion;
+   private String                  _distanceUnit;
+   private short                   _tourSampleRate;
+   private LocalDateTime           _tourStartTime;
+   private int                     _tourTimezone;
+   private float                   _weight;
+   private String                  _weightUnit;
+
+   public class ExerciseMode {
+      public int    activity;
+      public String name;
+      public String searchedDevices;
+   }
 
    public SuuntoQuestSAXHandler(final TourbookDevice deviceDataReader,
                                 final String importFileName,
@@ -135,17 +157,51 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
       _importFilePath = importFileName;
       _alreadyImportedTours = alreadyImportedTours;
       _newlyImportedTours = newlyImportedTours;
+      _allTourTypes = TourDatabase.getAllTourTypes();
+   }
+
+   /**
+    * Assigns, to a given tour, additional data such as calories, sensors indicators and tour type
+    *
+    * @param tourData
+    *           A given tour data
+    */
+   private void assignAdditionalData(final TourData tourData) {
+
+      final ExerciseMode exerciseMode = _exerciseModesList.stream()
+            .filter((e) -> e.activity == _tourActivity)
+            .findFirst()
+            .orElse(null);
+
+      if (exerciseMode == null) {
+         return;
+      }
+
+      final TourType tourType = _allTourTypes.stream()
+            .filter((t) -> t.getName().equalsIgnoreCase(exerciseMode.name))
+            .findFirst()
+            .orElse(null);
+
+      if (tourType != null) {
+         tourData.setTourType(tourType);
+      }
+
+      tourData.setIsPulseSensorPresent(exerciseMode.searchedDevices.contains("HR")); //$NON-NLS-1$
+      tourData.setIsDistanceFromSensor(exerciseMode.searchedDevices.contains("POD")); //$NON-NLS-1$
+
    }
 
    @Override
    public void characters(final char[] chars, final int startIndex, final int length) throws SAXException {
 
       if (_isInCadence //
+            || _isInActivity
             || _isInCalories
             || _isInDistance
             || _isInDistanceUnit
             || _isInHR
             || _isInMarkTime
+            || _isInName
             || _isInSampleRate
             || _isInSearchedDevices
             || _isInVersion
@@ -195,6 +251,10 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
 
          endElement_InDevice(name);
 
+      } else if (_isInExerciseModes) {
+
+         endElement_InExerciseModes(name);
+
       } else if (_isInSamples) {
 
          endElement_InSamples(name);
@@ -233,11 +293,24 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
          _isInMove = false;
          finalizeTour();
 
-      } else if (name.equals(TAG_MOVES)) {
+         _tourActivity = -1;
+
+      } else if (name.equals(TAG_ROOT_MOVES)) {
 
          _isInMoves = false;
 
-      } else if (name.equals(TAG_DEVICE)) {
+      } else if (name.equals(TAG_EXERCISE_MODE)) {
+
+         _isInExerciseMode = false;
+
+         _exerciseModesList.add(_exerciseModeData);
+         _exerciseModeData = null;
+
+      } else if (name.equals(TAG_ROOT_EXERCISE_MODES)) {
+
+         _isInExerciseModes = false;
+
+      } else if (name.equals(TAG_ROOT_DEVICE)) {
 
          _isInDevice = false;
 
@@ -274,18 +347,40 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
 
          _distanceUnit = _characters.toString();
 
+      }
+   }
+
+   private void endElement_InExerciseModes(final String name) {
+      if (name.equals(TAG_ACTIVITY)) {
+
+         _isInActivity = false;
+
+         _exerciseModeData.activity = Integer.valueOf(_characters.toString());
+
+      } else if (name.equals(TAG_NAME)) {
+
+         _isInName = false;
+
+         _exerciseModeData.name = _characters.toString();
+
       } else if (name.equals(TAG_SEARCHED_DEVICES)) {
 
          _isInSearchedDevices = false;
 
-         _searchedDevices = _characters.toString();
+         _exerciseModeData.searchedDevices = _characters.toString();
 
       }
    }
 
    private void endElement_InHeader(final String name) {
 
-      if (name.equals(TAG_CALORIES)) {
+      if (name.equals(TAG_ACTIVITY)) {
+
+         _isInActivity = false;
+
+         _tourActivity = Integer.valueOf(_characters.toString());
+
+      } else if (name.equals(TAG_CALORIES)) {
 
          _isInCalories = false;
 
@@ -308,7 +403,7 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
    }
 
    private void endElement_InMarks(final String name) {
-
+//TODO HR, cadence, distance
       if (name.equals(TAG_MARK_TIME)) {
 
          _isInMarkTime = false;
@@ -427,13 +522,12 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
 
       finalizeSamples(tourStartTime);
 
+      assignAdditionalData(tourData);
+
       tourData.setDeviceTimeInterval(_tourSampleRate);
       tourData.setImportFilePath(_importFilePath);
       tourData.setCalories(_tourCalories);
       tourData.setBodyWeight(_weightUnit.equalsIgnoreCase(UI.UNIT_WEIGHT_KG) ? _weight : _weight / UI.UNIT_KILOGRAM_TO_POUND);
-
-      tourData.setIsPulseSensorPresent(_searchedDevices.contains("HR"));
-      tourData.setIsDistanceFromSensor(_searchedDevices.contains("POD"));
 
       tourData.setDeviceId(_device.deviceId);
       tourData.setDeviceName(_device.visibleName);
@@ -554,7 +648,26 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
 
       if (_isInRootMovesCount) {
 
-         if (_isInMoves) {
+         if (_isInDevice) {
+
+            startElement_InDevice(name);
+
+         } else if (_isInExerciseModes) {
+
+            if (_isInExerciseMode) {
+
+               startElement_InExerciseMode(name);
+
+            } else if (name.equals(TAG_EXERCISE_MODE)) {
+
+               _isInExerciseMode = true;
+
+               // create new time items
+               _exerciseModeData = new ExerciseMode();
+
+            }
+
+         } else if (_isInMoves) {
 
             if (_isInMove) {
 
@@ -599,15 +712,15 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
                _isInMove = true;
 
             }
-         } else if (_isInDevice) {
-
-            startElement_InDevice(name);
-
-         } else if (name.equals(TAG_DEVICE)) {
+         } else if (name.equals(TAG_ROOT_DEVICE)) {
 
             _isInDevice = true;
 
-         } else if (name.equals(TAG_MOVES)) {
+         } else if (name.equals(TAG_ROOT_EXERCISE_MODES)) {
+
+            _isInExerciseModes = true;
+
+         } else if (name.equals(TAG_ROOT_MOVES)) {
 
             _isInMoves = true;
 
@@ -642,6 +755,28 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
 
          _isInDistanceUnit = true;
 
+      } else {
+         isData = false;
+      }
+
+      if (isData) {
+
+         // clear char buffer
+         _characters.delete(0, _characters.length());
+      }
+   }
+
+   private void startElement_InExerciseMode(final String name) {
+      boolean isData = true;
+
+      if (name.equals(TAG_ACTIVITY)) {
+
+         _isInActivity = true;
+
+      } else if (name.equals(TAG_NAME)) {
+
+         _isInName = true;
+
       } else if (name.equals(TAG_SEARCHED_DEVICES)) {
 
          _isInSearchedDevices = true;
@@ -655,13 +790,18 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
          // clear char buffer
          _characters.delete(0, _characters.length());
       }
+
    }
 
    private void startElement_InHeader(final String name) {
 
       boolean isData = true;
 
-      if (name.equals(TAG_CALORIES)) {
+      if (name.equals(TAG_ACTIVITY)) {
+
+         _isInActivity = true;
+
+      } else if (name.equals(TAG_CALORIES)) {
 
          _isInCalories = true;
 
