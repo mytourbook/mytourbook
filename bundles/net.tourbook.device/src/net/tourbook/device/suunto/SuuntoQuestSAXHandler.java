@@ -15,13 +15,14 @@
  *******************************************************************************/
 package net.tourbook.device.suunto;
 
-import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Scanner;
-import java.util.TimeZone;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
@@ -31,10 +32,7 @@ import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.importdata.TourbookDevice;
 
-import org.joda.time.DateTime;
 import org.joda.time.Period;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
 import org.xml.sax.Attributes;
@@ -45,25 +43,6 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
 //TODO FB isDistanceFromSensor
 //TODO time of markers
 //TODO FB t with imperial mile distance file (modify manually)
-   /**
-    * This time is used when a time is not available.
-    */
-   private static final long DEFAULT_TIME;
-
-   static {
-
-      DEFAULT_TIME = ZonedDateTime
-            .of(2007, 4, 1, 0, 0, 0, 0, TimeTools.getDefaultTimeZone())
-            .toInstant()
-            .toEpochMilli();
-   }
-
-   private static final SimpleDateFormat TIME_FORMAT        = new SimpleDateFormat(   //
-         "yyyy-MM-dd'T'HH:mm:ss'Z'");                                                 //$NON-NLS-1$
-   private static final SimpleDateFormat TIME_FORMAT_SSSZ   = new SimpleDateFormat(   //
-         "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");                                             //$NON-NLS-1$
-   private static final SimpleDateFormat TIME_FORMAT_RFC822 = new SimpleDateFormat(   //
-         "yyyy-MM-dd'T'HH:mm:ssZ");                                                   //$NON-NLS-1$
 
    // root tags
    private static final String TAG_DEVICE          = "Device";     //$NON-NLS-1$
@@ -97,14 +76,6 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
 
    private static final String ATTR_TIMEZONE  = "TimeZone"; //$NON-NLS-1$
 
-   static {
-
-      final TimeZone utc = TimeZone.getTimeZone("UTC"); //$NON-NLS-1$
-
-      TIME_FORMAT.setTimeZone(utc);
-      TIME_FORMAT_SSSZ.setTimeZone(utc);
-      TIME_FORMAT_RFC822.setTimeZone(utc);
-   }
    //
    private HashMap<Long, TourData> _alreadyImportedTours;
    private HashMap<Long, TourData> _newlyImportedTours;
@@ -148,7 +119,7 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
    private String              _deviceVersion;
    private String              _distanceUnit;
    private short               _tourSampleRate;
-   private DateTime            _tourStartTime;
+   private LocalDateTime       _tourStartTime;
    private int                 _tourTimezone;
    private float               _weight;
    private String              _weightUnit;
@@ -315,9 +286,9 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
 
          _isInTime = false;
 
-         final DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss"); //$NON-NLS-1$
+         final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"); //$NON-NLS-1$
 
-         _tourStartTime = formatter.parseDateTime(_characters.toString());
+         _tourStartTime = LocalDateTime.parse(_characters.toString(), formatter);
 
       } else if (name.equals(TAG_SAMPLERATE)) {
 
@@ -438,12 +409,11 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
       /*
        * set tour start date/time
        */
-      //TODO
+      final ZoneOffset zoneOffset = ZoneOffset.ofHours(_tourTimezone);
       final ZonedDateTime tourStartTime = ZonedDateTime.ofInstant(
-            _tourStartTime.toDate().toInstant(),
-            TimeTools.getDefaultTimeZone());
-//      ZonedDateTime.
-//      final ZoneOffset t = ZoneOffset.ofHours(_tourTimezone);
+            _tourStartTime,
+            zoneOffset,
+            TimeTools.UTC);
       tourData.setTourStartTime(tourStartTime);
 
       finalizeSamples(tourStartTime);

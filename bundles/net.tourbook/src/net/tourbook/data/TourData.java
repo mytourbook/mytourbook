@@ -9782,8 +9782,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
-    * Set tour start yeay/month/day which are used in views, e.g. tourbook view, they are
-    * accessed with sql statements.
+    * Set tour start year/month/day which are used in views, e.g. tourbook view, they are
+    * accessed with SQL statements.
     *
     * @param tourStartTime
     */
