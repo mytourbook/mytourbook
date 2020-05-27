@@ -421,7 +421,7 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
       tourData.setDeviceTimeInterval(_tourSampleRate);
       tourData.setImportFilePath(_importFilePath);
       tourData.setCalories(_tourCalories);
-      tourData.setBodyWeight(_weightUnit.equalsIgnoreCase(UI.UNIT_WEIGHT_KG) ? _weight : _weight * UI.UNIT_KILOGRAM_TO_POUND);
+      tourData.setBodyWeight(_weightUnit.equalsIgnoreCase(UI.UNIT_WEIGHT_KG) ? _weight : _weight / UI.UNIT_KILOGRAM_TO_POUND);
 
       tourData.setDeviceId(_device.deviceId);
       tourData.setDeviceName(_device.visibleName);
@@ -508,7 +508,7 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
 
             float distance = currentMarker.distance;
             if (_distanceUnit.equalsIgnoreCase("mile")) { //$NON-NLS-1$
-               distance /= net.tourbook.ui.UI.UNIT_MILE;
+               distance *= net.tourbook.ui.UI.UNIT_MILE;
             }
             newSample.distance = distance;
 
