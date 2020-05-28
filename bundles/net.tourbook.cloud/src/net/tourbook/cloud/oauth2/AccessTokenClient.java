@@ -95,9 +95,9 @@ public class AccessTokenClient {
    private List<NameValuePair> getParams(final String code) {
       final List<NameValuePair> params = new ArrayList<>();
       params.add(new BasicNameValuePair(IOAuth2Constants.PARAM_CLIENT_ID,
-            client.getId()));
+            client.getId().toString()));
       params.add(new BasicNameValuePair(IOAuth2Constants.PARAM_CLIENT_SECRET,
-            client.getSecret()));
+            client.getSecret().toString()));
       params.add(new BasicNameValuePair(IOAuth2Constants.PARAM_CODE, code));
       params.add(new BasicNameValuePair(IOAuth2Constants.PARAM_GRANT_TYPE, "authorization_code")); //$NON-NLS-1$
       params.add(new BasicNameValuePair(IOAuth2Constants.PARAM_REDIRECT_URI, client.getRedirectUri()));

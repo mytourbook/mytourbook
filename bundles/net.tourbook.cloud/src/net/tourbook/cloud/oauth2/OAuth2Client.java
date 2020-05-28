@@ -23,11 +23,11 @@ public class OAuth2Client {
 
    private String authorizeUrl;
 
-   private String id;
+   private char[] id;
 
    private String redirectUri;
 
-   private String secret;
+   private char[] secret;
 
    /**
     * @return accessTokenUrl
@@ -46,7 +46,7 @@ public class OAuth2Client {
    /**
     * @return id
     */
-   public String getId() {
+   public char[] getId() {
       return id;
    }
 
@@ -60,7 +60,7 @@ public class OAuth2Client {
    /**
     * @return secret
     */
-   public String getSecret() {
+   public char[] getSecret() {
       return secret;
    }
 
@@ -82,7 +82,7 @@ public class OAuth2Client {
     * @param id
     * @return this client
     */
-   public OAuth2Client setId(final String id) {
+   public OAuth2Client setId(final char[] id) {
       this.id = id;
       return this;
    }
@@ -100,7 +100,7 @@ public class OAuth2Client {
     * @param secret
     * @return this client
     */
-   public OAuth2Client setSecret(final String secret) {
+   public OAuth2Client setSecret(final char[] secret) {
       this.secret = secret;
       return this;
    }

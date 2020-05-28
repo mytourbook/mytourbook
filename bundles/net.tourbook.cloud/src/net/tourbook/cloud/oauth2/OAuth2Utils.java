@@ -41,7 +41,7 @@ public class OAuth2Utils {
       params.add(new BasicNameValuePair(IOAuth2Constants.PARAM_REDIRECT_URI,
             client.getRedirectUri()));
       params.add(new BasicNameValuePair(IOAuth2Constants.PARAM_CLIENT_ID,
-            client.getId()));
+            client.getId().toString()));
       params.add(new BasicNameValuePair(
             IOAuth2Constants.RESPONSE_TYPE,
             IOAuth2Constants.PARAM_CODE));

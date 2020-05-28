@@ -139,8 +139,16 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
    private void onClickAuthorize() {
 
       final OAuth2Client client = new OAuth2Client();
-      client.setId("client_id"); //$NON-NLS-1$
-      client.setSecret("secret_id"); //$NON-NLS-1$
+
+      //As recommended :
+      //First step, you should change your password-handling from String to character array.
+      //Source https://stackoverflow.com/questions/12937641/handling-passwords-used-for-auth-in-source-code
+
+      final char[] clientId = { 'c', 'l', 'i', 'e', 'n', 't' };
+      client.setId(clientId);
+
+      final char[] secretId = { 's', 'e', 'c', 'r', 'e', 't' };
+      client.setSecret(secretId);
       client.setAccessTokenUrl("https://api.dropboxapi.com/oauth2/token"); //$NON-NLS-1$
       client.setAuthorizeUrl("https://www.dropbox.com/oauth2/authorize"); //$NON-NLS-1$
       client.setRedirectUri("https://sourceforge.net/projects/mytourbook"); //$NON-NLS-1$
