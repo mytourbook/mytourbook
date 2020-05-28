@@ -43,7 +43,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 public class SuuntoQuestSAXHandler extends DefaultHandler {
-
+//TODO review all the files
    // root tags
    private static final String TAG_ROOT_MOVESCOUNT     = "MovesCount";    //$NON-NLS-1$
    private static final String TAG_ROOT_EXERCISE_MODES = "ExerciseModes"; //$NON-NLS-1$
@@ -418,7 +418,8 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
                      .toFormatter();
 
          final Period markerPeriod = periodFormatter.parsePeriod(_characters.toString());
-         _markerData.relativeTime = markerPeriod.toStandardSeconds().getSeconds();
+         _markerData.relativeTime = markerPeriod.toStandardSeconds().getSeconds()
+               + Math.round((float) markerPeriod.getMillis() / 1000);
 
          //If existing, we need to use the previous marker relative time
          //to determine the current marker's relative time
@@ -633,8 +634,7 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
                final int sampleIndex = _sampleList.indexOf(equivalentSample);
 
                final float totalDistance = getSamplesRangeAbsoluteDistance(sampleIndex - 1);
-               equivalentSample.distance = marker.absoluteDistance > totalDistance ?
-                     marker.absoluteDistance - totalDistance : 0f;
+               equivalentSample.distance = marker.absoluteDistance > totalDistance ? marker.absoluteDistance - totalDistance : 0f;
             }
             if (equivalentSample.pulse == 0) {
                equivalentSample.pulse = marker.pulse;
@@ -650,25 +650,33 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
                   .findFirst()
                   .orElse(null);
 
-            if (closestSample == null) {
-               continue;
-            }
-
-            final int closestSampleIndex = _sampleList.indexOf(closestSample);
-
-            closestSample.time = closestSample.relativeTime - marker.relativeTime;
-
-            float totalDistance = getSamplesRangeAbsoluteDistance(closestSampleIndex);
-            closestSample.distance = totalDistance - marker.absoluteDistance;
-
-            closestSample = _sampleList.get(closestSampleIndex - 1);
-            marker.time = marker.relativeTime - closestSample.relativeTime;
-
-            totalDistance = getSamplesRangeAbsoluteDistance(closestSampleIndex - 1);
-            marker.distance = marker.absoluteDistance - totalDistance;
-
             marker.marker = 1;
-            _sampleList.add(closestSampleIndex, marker);
+
+            if (closestSample == null) {
+               //This marker is the last sample
+               closestSample = _sampleList.get(_sampleList.size() - 1);
+               marker.time = marker.relativeTime - closestSample.relativeTime;
+               final float totalDistance = getSamplesRangeAbsoluteDistance(_sampleList.size() - 1);
+               marker.distance = marker.absoluteDistance - totalDistance;
+
+               _sampleList.add(marker);
+            } else {
+
+               final int closestSampleIndex = _sampleList.indexOf(closestSample);
+
+               closestSample.time = closestSample.relativeTime - marker.relativeTime;
+
+               float totalDistance = getSamplesRangeAbsoluteDistance(closestSampleIndex);
+               closestSample.distance = totalDistance - marker.absoluteDistance;
+
+               closestSample = _sampleList.get(closestSampleIndex - 1);
+               marker.time = marker.relativeTime - closestSample.relativeTime;
+
+               totalDistance = getSamplesRangeAbsoluteDistance(closestSampleIndex - 1);
+               marker.distance = marker.absoluteDistance - totalDistance;
+
+               _sampleList.add(closestSampleIndex, marker);
+            }
          }
       }
    }
