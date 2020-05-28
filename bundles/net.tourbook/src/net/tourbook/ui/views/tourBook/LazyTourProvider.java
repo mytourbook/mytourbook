@@ -24,7 +24,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.atomic.AtomicLong;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.util.SQL;
@@ -33,21 +32,22 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TableColumnFactory;
 
+import org.eclipse.jface.viewers.TableViewer;
+
 public class LazyTourProvider {
 
-   private static final char                             NL                   = net.tourbook.common.UI.NEW_LINE;
+   private static final char                              NL                   = net.tourbook.common.UI.NEW_LINE;
 
-   private static final int                              FETCH_SIZE           = 200;
+   private static final int                               FETCH_SIZE           = 500;
 
-   private ConcurrentHashMap<Integer, Integer>           _pageNumbers_Fetched = new ConcurrentHashMap<>();
-   private ConcurrentHashMap<Integer, Integer>           _pageNumbers_Loading = new ConcurrentHashMap<>();
+   private ConcurrentHashMap<Integer, Integer>            _pageNumbers_Fetched = new ConcurrentHashMap<>();
+   private ConcurrentHashMap<Integer, LazyTourLoaderItem> _pageNumbers_Loading = new ConcurrentHashMap<>();
 
-   private ConcurrentHashMap<Integer, TVITourBookTour>   _fetchedTourItems    = new ConcurrentHashMap<>();
+   private ConcurrentHashMap<Integer, TVITourBookTour>    _fetchedTourItems    = new ConcurrentHashMap<>();
 
-   private final AtomicLong                              _loaderExecuterId    = new AtomicLong();
-   private final LinkedBlockingDeque<LazyTourLoaderItem> _loaderWaitingQueue  = new LinkedBlockingDeque<>();
+   private final LinkedBlockingDeque<LazyTourLoaderItem>  _loaderWaitingQueue  = new LinkedBlockingDeque<>();
 
-   private ExecutorService                               _loadingExecutor;
+   private ExecutorService                                _loadingExecutor;
    {
 
       final ThreadFactory threadFactory = new ThreadFactory() {
@@ -153,11 +153,13 @@ public class LazyTourProvider {
        */
       final int fetchKey = index / FETCH_SIZE;
 
-      final Integer loadingKey = _pageNumbers_Loading.get(fetchKey);
+      LazyTourLoaderItem loaderItem = _pageNumbers_Loading.get(fetchKey);
 
-      if (loadingKey != null) {
+      if (loaderItem != null) {
 
          // tour is currently being loading -> wait until finished loading
+
+         loaderItem.requestedIndices.add(index);
 
          return null;
       }
@@ -166,15 +168,14 @@ public class LazyTourProvider {
        * Tour is not yet loaded or not yet loading -> load it now
        */
 
-      // invalidate old requests
-      final long executerId = _loaderExecuterId.incrementAndGet();
-
-      final LazyTourLoaderItem loaderItem = new LazyTourLoaderItem(executerId);
+      loaderItem = new LazyTourLoaderItem();
 
       loaderItem.sqlOffset = fetchKey * FETCH_SIZE;
       loaderItem.fetchKey = fetchKey;
 
-      _pageNumbers_Loading.put(fetchKey, fetchKey);
+      loaderItem.requestedIndices.add(index);
+
+      _pageNumbers_Loading.put(fetchKey, loaderItem);
 
       _loaderWaitingQueue.add(loaderItem);
 
@@ -190,7 +191,7 @@ public class LazyTourProvider {
             }
 
             if (loadPagedTourItems(loaderItem)) {
-               _tourBookView.updateUI_LazyTourItems(loaderItem);
+//               _tourBookView.updateUI_LazyTourItems(loaderItem);
             }
 
             final int loaderItemFetchKey = loaderItem.fetchKey;
@@ -248,11 +249,29 @@ public class LazyTourProvider {
             final TVITourBookTour tourItem = new TVITourBookTour(null, null);
 
             tourItem.tourId = result.getLong(1);
+            tourItem.col_Sequence = rowIndex + 1;
 
             TVITourBookItem.readTourItems(result, tourItem);
 
             _fetchedTourItems.put(rowIndex++, tourItem);
          }
+
+         /*
+          * Update UI
+          */
+         final TableViewer tourViewer_Table = _tourBookView.getTourViewer_Table();
+
+         tourViewer_Table.getTable().getDisplay().asyncExec(() -> {
+
+            for (final Integer index : loaderItem.requestedIndices) {
+
+               final TreeViewerItem tableItem = _fetchedTourItems.get(index);
+
+               if (tableItem != null) {
+                  tourViewer_Table.replace(tableItem, index);
+               }
+            }
+         });
 
 //       TourDatabase.disableRuntimeStatistic(conn);
 
@@ -299,14 +318,18 @@ public class LazyTourProvider {
 
       switch (sortColumnId) {
 
-      case TableColumnFactory.TIME_DATE_ID:                 _sqlSortField = "TourStartTime";          break; //$NON-NLS-1$
-      case TableColumnFactory.TOUR_TITLE_ID:                _sqlSortField = "TourTitle";              break; //$NON-NLS-1$
-      case TableColumnFactory.TIME_TOUR_START_TIME_ID:      _sqlSortField = "TourStartTime";          break; //$NON-NLS-1$
+      // tour date
+      case TableColumnFactory.TIME_DATE_ID:                 _sqlSortField = "TourStartTime";                         break; //$NON-NLS-1$
 
-      case TableColumnFactory.DATA_IMPORT_FILE_NAME_ID:     _sqlSortField = "TourImportFileName";     break; //$NON-NLS-1$
+      // tour time
+      case TableColumnFactory.TIME_TOUR_START_TIME_ID:      _sqlSortField = "TourStartTime";                         break; //$NON-NLS-1$
 
-      case TableColumnFactory.TIME_WEEK_NO_ID:              _sqlSortField = "StartWeek";              break; //$NON-NLS-1$
-      case TableColumnFactory.TIME_WEEKYEAR_ID:             _sqlSortField = "StartWeekYear";          break; //$NON-NLS-1$
+      case TableColumnFactory.TOUR_TITLE_ID:                _sqlSortField = "TourTitle,         TourStartTime";      break; //$NON-NLS-1$
+
+      case TableColumnFactory.DATA_IMPORT_FILE_NAME_ID:     _sqlSortField = "TourImportFileName";                    break; //$NON-NLS-1$
+
+      case TableColumnFactory.TIME_WEEK_NO_ID:              _sqlSortField = "StartWeek,         TourStartTime";      break; //$NON-NLS-1$
+      case TableColumnFactory.TIME_WEEKYEAR_ID:             _sqlSortField = "StartWeekYear,     TourStartTime";      break; //$NON-NLS-1$
 
 // these fields are not yet displayed in tourbook view but are available in tour data indicies
 //

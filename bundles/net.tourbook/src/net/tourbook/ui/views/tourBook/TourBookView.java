@@ -122,7 +122,6 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
-import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -170,16 +169,17 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private static final String           STATE_CSV_EXPORT_PATH                           = "STATE_CSV_EXPORT_PATH";                   //$NON-NLS-1$
    //
    private static final String           STATE_IS_LINK_WITH_OTHER_VIEWS                  = "STATE_IS_LINK_WITH_OTHER_VIEWS";          //$NON-NLS-1$
-   private static final String           STATE_IS_SELECT_YEAR_MONTH_TOURS                = "IsSelectYearMonthTours";                  //$NON-NLS-1$
+   private static final String           STATE_IS_SELECT_YEAR_MONTH_TOURS                = "STATE_IS_SELECT_YEAR_MONTH_TOURS";        //$NON-NLS-1$
    static final String                   STATE_IS_SHOW_SUMMARY_ROW                       = "STATE_IS_SHOW_SUMMARY_ROW";               //$NON-NLS-1$
    static final String                   STATE_LINK_AND_COLLAPSE_ALL_OTHER_ITEMS         = "STATE_LINK_AND_COLLAPSE_ALL_OTHER_ITEMS"; //$NON-NLS-1$
-   private static final String           STATE_SELECTED_YEAR                             = "SelectedYear";                            //$NON-NLS-1$
-   private static final String           STATE_SELECTED_MONTH                            = "SelectedMonth";                           //$NON-NLS-1$
-   private static final String           STATE_SELECTED_TOURS                            = "SelectedTours";                           //$NON-NLS-1$
+   private static final String           STATE_SELECTED_TABLE_INDEX                      = "STATE_SELECTED_TABLE_INDEX";              //$NON-NLS-1$
+   private static final String           STATE_SELECTED_MONTH                            = "STATE_SELECTED_MONTH";                    //$NON-NLS-1$
+   private static final String           STATE_SELECTED_TOURS                            = "STATE_SELECTED_TOURS";                    //$NON-NLS-1$
+   private static final String           STATE_SELECTED_YEAR                             = "STATE_SELECTED_YEAR";                     //$NON-NLS-1$
    private static final String           STATE_VIEW_LAYOUT                               = "STATE_VIEW_LAYOUT";                       //$NON-NLS-1$
    //
-   private static final String           STATE_SORT_COLUMN_DIRECTION                     = "STATE_SORT_COLUMN_DIRECTION";
-   private static final String           STATE_SORT_COLUMN_ID                            = "STATE_SORT_COLUMN_ID";
+   private static final String           STATE_SORT_COLUMN_DIRECTION                     = "STATE_SORT_COLUMN_DIRECTION";             //$NON-NLS-1$
+   private static final String           STATE_SORT_COLUMN_ID                            = "STATE_SORT_COLUMN_ID";                    //$NON-NLS-1$
    //
    private static final String           CSV_EXPORT_DEFAULT_FILE_NAME                    = "TourBook_";                               //$NON-NLS-1$
    //
@@ -189,6 +189,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private static final NumberFormat     _nf0;
    private static final NumberFormat     _nf1;
    private static final NumberFormat     _nf2;
+
    //
    static {
       _nf0 = NumberFormat.getNumberInstance();
@@ -346,7 +347,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          final TreeViewerItem tableItem = _lazyTourProvider.getTour(index);
 
          if (tableItem != null) {
-            _tourViewer_Table.replace(tableItem, index);
+            getTourViewer_Table().replace(tableItem, index);
          }
       }
    }
@@ -431,7 +432,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
    }
 
-   class ItemComparator_Table extends ViewerComparator {
+   class ItemComparator_Table /* extends ViewerComparator */ {
 
       static final int         ASCENDING  = 0;
       private static final int DESCENDING = 1;
@@ -439,335 +440,339 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       private String           __sortColumnId;
       private int              __sortDirection;
 
-      @Override
-      public int compare(final Viewer viewer, final Object obj1, final Object obj2) {
-
-         final TVITourBookTour tourItem1 = ((TVITourBookTour) obj1);
-         final TVITourBookTour tourItem2 = ((TVITourBookTour) obj2);
-
-         int result = 0;
-
-         switch (__sortColumnId) {
-
-         case TableColumnFactory.TIME_DATE_ID:
-
-            // 1st Column: Date/time
-
-            result = tourItem1.colDateTime_MS > tourItem2.colDateTime_MS ? 1 : -1;
-            break;
-
-         /*
-          * BODY
-          */
-
-         case TableColumnFactory.BODY_AVG_PULSE_ID:
-            break;
-
-         case TableColumnFactory.BODY_CALORIES_ID:
-            break;
-
-         case TableColumnFactory.BODY_PULSE_MAX_ID:
-            break;
-
-         case TableColumnFactory.BODY_PERSON_ID:
-            break;
-
-         case TableColumnFactory.BODY_RESTPULSE_ID:
-            break;
-
-         case TableColumnFactory.BODY_WEIGHT_ID:
-            break;
-
-         /*
-          * DATA
-          */
-
-         case TableColumnFactory.DATA_DP_TOLERANCE_ID:
-            break;
-
-         case TableColumnFactory.DATA_IMPORT_FILE_NAME_ID:
-            break;
-
-         case TableColumnFactory.DATA_IMPORT_FILE_PATH_ID:
-            break;
-
-         case TableColumnFactory.DATA_NUM_TIME_SLICES_ID:
-            break;
-
-         case TableColumnFactory.DATA_TIME_INTERVAL_ID:
-            break;
-
-         /*
-          * DEVICE
-          */
-         case TableColumnFactory.DEVICE_DISTANCE_ID:
-            break;
-
-         case TableColumnFactory.DEVICE_NAME_ID:
-            break;
-
-         /*
-          * ELEVATION
-          */
-
-         case TableColumnFactory.ALTITUDE_AVG_CHANGE_ID:
-            break;
-
-         case TableColumnFactory.ALTITUDE_MAX_ID:
-            break;
-
-         case TableColumnFactory.ALTITUDE_SUMMARIZED_BORDER_DOWN_ID:
-            break;
-
-         case TableColumnFactory.ALTITUDE_SUMMARIZED_BORDER_UP_ID:
-            break;
-
-         /*
-          * MOTION
-          */
-
-         case TableColumnFactory.MOTION_AVG_PACE_ID:
-            break;
-
-         case TableColumnFactory.MOTION_AVG_SPEED_ID:
-            break;
-
-         case TableColumnFactory.MOTION_DISTANCE_ID:
-            break;
-
-         case TableColumnFactory.MOTION_MAX_SPEED_ID:
-            break;
-
-         /*
-          * POWER
-          */
-
-         case TableColumnFactory.POWER_AVG_ID:
-            break;
-
-         case TableColumnFactory.POWER_MAX_ID:
-            break;
-
-         case TableColumnFactory.POWER_NORMALIZED_ID:
-            break;
-
-         case TableColumnFactory.POWER_TOTAL_WORK_ID:
-            break;
-
-         /*
-          * POWERTRAIN
-          */
-
-         case TableColumnFactory.POWERTRAIN_AVG_CADENCE_ID:
-            break;
-
-         case TableColumnFactory.POWERTRAIN_AVG_LEFT_PEDAL_SMOOTHNESS_ID:
-            break;
-
-         case TableColumnFactory.POWERTRAIN_AVG_LEFT_TORQUE_EFFECTIVENESS_ID:
-            break;
-
-         case TableColumnFactory.POWERTRAIN_AVG_RIGHT_PEDAL_SMOOTHNESS_ID:
-            break;
-
-         case TableColumnFactory.POWERTRAIN_AVG_RIGHT_TORQUE_EFFECTIVENESS_ID:
-            break;
-
-         case TableColumnFactory.POWERTRAIN_CADENCE_MULTIPLIER_ID:
-            break;
-
-         case TableColumnFactory.POWERTRAIN_GEAR_FRONT_SHIFT_COUNT_ID:
-            break;
-
-         case TableColumnFactory.POWERTRAIN_GEAR_REAR_SHIFT_COUNT_ID:
-            break;
-
-         case TableColumnFactory.POWERTRAIN_SLOW_VS_FAST_CADENCE_PERCENTAGES_ID:
-            break;
-
-         case TableColumnFactory.POWERTRAIN_SLOW_VS_FAST_CADENCE_ZONES_DELIMITER_ID:
-            break;
-
-         /*
-          * RUNNING DYNAMICS
-          */
-
-         case TableColumnFactory.RUN_DYN_STANCE_TIME_AVG_ID:
-            break;
-
-         case TableColumnFactory.RUN_DYN_STANCE_TIME_MIN_ID:
-            break;
-
-         case TableColumnFactory.RUN_DYN_STANCE_TIME_MAX_ID:
-            break;
-
-         case TableColumnFactory.RUN_DYN_STANCE_TIME_BALANCE_AVG_ID:
-            break;
-
-         case TableColumnFactory.RUN_DYN_STANCE_TIME_BALANCE_MIN_ID:
-            break;
-
-         case TableColumnFactory.RUN_DYN_STANCE_TIME_BALANCE_MAX_ID:
-            break;
-
-         case TableColumnFactory.RUN_DYN_STEP_LENGTH_AVG_ID:
-            break;
-
-         case TableColumnFactory.RUN_DYN_STEP_LENGTH_MIN_ID:
-            break;
-
-         case TableColumnFactory.RUN_DYN_STEP_LENGTH_MAX_ID:
-            break;
-
-         case TableColumnFactory.RUN_DYN_VERTICAL_OSCILLATION_AVG_ID:
-            break;
-
-         case TableColumnFactory.RUN_DYN_VERTICAL_OSCILLATION_MIN_ID:
-            break;
-
-         case TableColumnFactory.RUN_DYN_VERTICAL_OSCILLATION_MAX_ID:
-            break;
-
-         case TableColumnFactory.RUN_DYN_VERTICAL_RATIO_AVG_ID:
-            break;
-
-         case TableColumnFactory.RUN_DYN_VERTICAL_RATIO_MIN_ID:
-            break;
-
-         case TableColumnFactory.RUN_DYN_VERTICAL_RATIO_MAX_ID:
-            break;
-
-         /*
-          * SURFING
-          */
-
-         case TableColumnFactory.SURFING_MIN_DISTANCE_ID:
-            break;
-
-         case TableColumnFactory.SURFING_MIN_SPEED_START_STOP_ID:
-            break;
-
-         case TableColumnFactory.SURFING_MIN_SPEED_SURFING_ID:
-            break;
-
-         case TableColumnFactory.SURFING_MIN_TIME_DURATION_ID:
-            break;
-
-         case TableColumnFactory.SURFING_NUMBER_OF_EVENTS_ID:
-            break;
-
-         /*
-          * TIME
-          */
-
-         case TableColumnFactory.TIME_DRIVING_TIME_ID:
-            break;
-
-         case TableColumnFactory.TIME_PAUSED_TIME_ID:
-            break;
-
-         case TableColumnFactory.TIME_PAUSED_TIME_RELATIVE_ID:
-            break;
-
-         case TableColumnFactory.TIME_RECORDING_TIME_ID:
-            break;
-
-         case TableColumnFactory.TIME_TIME_ZONE_ID:
-            break;
-
-         case TableColumnFactory.TIME_TIME_ZONE_DIFFERENCE_ID:
-            break;
-
-         case TableColumnFactory.TIME_TOUR_START_TIME_ID:
-            break;
-
-         case TableColumnFactory.TIME_WEEK_DAY_ID:
-            break;
-
-         case TableColumnFactory.TIME_WEEK_NO_ID:
-            break;
-
-         case TableColumnFactory.TIME_WEEKYEAR_ID:
-            break;
-
-         /*
-          * TOUR
-          */
-
-         case TableColumnFactory.TOUR_LOCATION_START_ID:
-            break;
-
-         case TableColumnFactory.TOUR_LOCATION_END_ID:
-            break;
-
-         case TableColumnFactory.TOUR_NUM_MARKERS_ID:
-            break;
-
-         case TableColumnFactory.TOUR_NUM_PHOTOS_ID:
-            break;
-
-         case TableColumnFactory.TOUR_TAGS_ID:
-            break;
-
-         case TableColumnFactory.TOUR_TITLE_ID:
-            break;
-
-         case TableColumnFactory.TOUR_TYPE_ID:
-            break;
-
-         case TableColumnFactory.TOUR_TYPE_TEXT_ID:
-            break;
-
-         /*
-          * TRAINING
-          */
-
-         case TableColumnFactory.TRAINING_EFFECT_AEROB_ID:
-            break;
-
-         case TableColumnFactory.TRAINING_EFFECT_ANAEROB_ID:
-            break;
-
-         case TableColumnFactory.TRAINING_FTP_ID:
-            break;
-
-         case TableColumnFactory.TRAINING_INTENSITY_FACTOR_ID:
-            break;
-
-         case TableColumnFactory.TRAINING_POWER_TO_WEIGHT_ID:
-            break;
-
-         case TableColumnFactory.TRAINING_STRESS_SCORE_ID:
-            break;
-
-         case TableColumnFactory.TRAINING_PERFORMANCE_LEVEL_ID:
-            break;
-
-         /*
-          * WEATHER
-          */
-
-         case TableColumnFactory.WEATHER_CLOUDS_ID:
-            break;
-
-         case TableColumnFactory.WEATHER_TEMPERATURE_AVG_ID:
-            break;
-
-         case TableColumnFactory.WEATHER_TEMPERATURE_MIN_ID:
-            break;
-
-         case TableColumnFactory.WEATHER_TEMPERATURE_MAX_ID:
-            break;
-
-         case TableColumnFactory.WEATHER_WIND_DIR_ID:
-            break;
-
-         case TableColumnFactory.WEATHER_WIND_SPEED_ID:
-            break;
-
-         default:
-            break;
-         }
+//      @Override
+//      public int compare(final Viewer viewer, final Object obj1, final Object obj2) {
+//
+//         final TVITourBookTour tourItem1 = ((TVITourBookTour) obj1);
+//         final TVITourBookTour tourItem2 = ((TVITourBookTour) obj2);
+//
+//         int result = 0;
+//
+//         switch (__sortColumnId) {
+//
+//         case TableColumnFactory.TIME_DATE_ID:
+//
+//            // 1st Column: Date/time
+//
+//            result = tourItem1.colDateTime_MS > tourItem2.colDateTime_MS ? 1 : -1;
+//            break;
+//
+//         /*
+//          * BODY
+//          */
+//
+//         case TableColumnFactory.BODY_AVG_PULSE_ID:
+//            break;
+//
+//         case TableColumnFactory.BODY_CALORIES_ID:
+//            break;
+//
+//         case TableColumnFactory.BODY_PULSE_MAX_ID:
+//            break;
+//
+//         case TableColumnFactory.BODY_PERSON_ID:
+//            break;
+//
+//         case TableColumnFactory.BODY_RESTPULSE_ID:
+//            break;
+//
+//         case TableColumnFactory.BODY_WEIGHT_ID:
+//            break;
+//
+//         /*
+//          * DATA
+//          */
+//
+//         case TableColumnFactory.DATA_DP_TOLERANCE_ID:
+//            break;
+//
+//         case TableColumnFactory.DATA_IMPORT_FILE_NAME_ID:
+//            break;
+//
+//         case TableColumnFactory.DATA_IMPORT_FILE_PATH_ID:
+//            break;
+//
+//         case TableColumnFactory.DATA_NUM_TIME_SLICES_ID:
+//            break;
+//
+//         case TableColumnFactory.DATA_TIME_INTERVAL_ID:
+//            break;
+//
+//         /*
+//          * DEVICE
+//          */
+//         case TableColumnFactory.DEVICE_DISTANCE_ID:
+//            break;
+//
+//         case TableColumnFactory.DEVICE_NAME_ID:
+//            break;
+//
+//         /*
+//          * ELEVATION
+//          */
+//
+//         case TableColumnFactory.ALTITUDE_AVG_CHANGE_ID:
+//            break;
+//
+//         case TableColumnFactory.ALTITUDE_MAX_ID:
+//            break;
+//
+//         case TableColumnFactory.ALTITUDE_SUMMARIZED_BORDER_DOWN_ID:
+//            break;
+//
+//         case TableColumnFactory.ALTITUDE_SUMMARIZED_BORDER_UP_ID:
+//            break;
+//
+//         /*
+//          * MOTION
+//          */
+//
+//         case TableColumnFactory.MOTION_AVG_PACE_ID:
+//            break;
+//
+//         case TableColumnFactory.MOTION_AVG_SPEED_ID:
+//            break;
+//
+//         case TableColumnFactory.MOTION_DISTANCE_ID:
+//            break;
+//
+//         case TableColumnFactory.MOTION_MAX_SPEED_ID:
+//            break;
+//
+//         /*
+//          * POWER
+//          */
+//
+//         case TableColumnFactory.POWER_AVG_ID:
+//            break;
+//
+//         case TableColumnFactory.POWER_MAX_ID:
+//            break;
+//
+//         case TableColumnFactory.POWER_NORMALIZED_ID:
+//            break;
+//
+//         case TableColumnFactory.POWER_TOTAL_WORK_ID:
+//            break;
+//
+//         /*
+//          * POWERTRAIN
+//          */
+//
+//         case TableColumnFactory.POWERTRAIN_AVG_CADENCE_ID:
+//            break;
+//
+//         case TableColumnFactory.POWERTRAIN_AVG_LEFT_PEDAL_SMOOTHNESS_ID:
+//            break;
+//
+//         case TableColumnFactory.POWERTRAIN_AVG_LEFT_TORQUE_EFFECTIVENESS_ID:
+//            break;
+//
+//         case TableColumnFactory.POWERTRAIN_AVG_RIGHT_PEDAL_SMOOTHNESS_ID:
+//            break;
+//
+//         case TableColumnFactory.POWERTRAIN_AVG_RIGHT_TORQUE_EFFECTIVENESS_ID:
+//            break;
+//
+//         case TableColumnFactory.POWERTRAIN_CADENCE_MULTIPLIER_ID:
+//            break;
+//
+//         case TableColumnFactory.POWERTRAIN_GEAR_FRONT_SHIFT_COUNT_ID:
+//            break;
+//
+//         case TableColumnFactory.POWERTRAIN_GEAR_REAR_SHIFT_COUNT_ID:
+//            break;
+//
+//         case TableColumnFactory.POWERTRAIN_SLOW_VS_FAST_CADENCE_PERCENTAGES_ID:
+//            break;
+//
+//         case TableColumnFactory.POWERTRAIN_SLOW_VS_FAST_CADENCE_ZONES_DELIMITER_ID:
+//            break;
+//
+//         /*
+//          * RUNNING DYNAMICS
+//          */
+//
+//         case TableColumnFactory.RUN_DYN_STANCE_TIME_AVG_ID:
+//            break;
+//
+//         case TableColumnFactory.RUN_DYN_STANCE_TIME_MIN_ID:
+//            break;
+//
+//         case TableColumnFactory.RUN_DYN_STANCE_TIME_MAX_ID:
+//            break;
+//
+//         case TableColumnFactory.RUN_DYN_STANCE_TIME_BALANCE_AVG_ID:
+//            break;
+//
+//         case TableColumnFactory.RUN_DYN_STANCE_TIME_BALANCE_MIN_ID:
+//            break;
+//
+//         case TableColumnFactory.RUN_DYN_STANCE_TIME_BALANCE_MAX_ID:
+//            break;
+//
+//         case TableColumnFactory.RUN_DYN_STEP_LENGTH_AVG_ID:
+//            break;
+//
+//         case TableColumnFactory.RUN_DYN_STEP_LENGTH_MIN_ID:
+//            break;
+//
+//         case TableColumnFactory.RUN_DYN_STEP_LENGTH_MAX_ID:
+//            break;
+//
+//         case TableColumnFactory.RUN_DYN_VERTICAL_OSCILLATION_AVG_ID:
+//            break;
+//
+//         case TableColumnFactory.RUN_DYN_VERTICAL_OSCILLATION_MIN_ID:
+//            break;
+//
+//         case TableColumnFactory.RUN_DYN_VERTICAL_OSCILLATION_MAX_ID:
+//            break;
+//
+//         case TableColumnFactory.RUN_DYN_VERTICAL_RATIO_AVG_ID:
+//            break;
+//
+//         case TableColumnFactory.RUN_DYN_VERTICAL_RATIO_MIN_ID:
+//            break;
+//
+//         case TableColumnFactory.RUN_DYN_VERTICAL_RATIO_MAX_ID:
+//            break;
+//
+//         /*
+//          * SURFING
+//          */
+//
+//         case TableColumnFactory.SURFING_MIN_DISTANCE_ID:
+//            break;
+//
+//         case TableColumnFactory.SURFING_MIN_SPEED_START_STOP_ID:
+//            break;
+//
+//         case TableColumnFactory.SURFING_MIN_SPEED_SURFING_ID:
+//            break;
+//
+//         case TableColumnFactory.SURFING_MIN_TIME_DURATION_ID:
+//            break;
+//
+//         case TableColumnFactory.SURFING_NUMBER_OF_EVENTS_ID:
+//            break;
+//
+//         /*
+//          * TIME
+//          */
+//
+//         case TableColumnFactory.TIME_DRIVING_TIME_ID:
+//            break;
+//
+//         case TableColumnFactory.TIME_PAUSED_TIME_ID:
+//            break;
+//
+//         case TableColumnFactory.TIME_PAUSED_TIME_RELATIVE_ID:
+//            break;
+//
+//         case TableColumnFactory.TIME_RECORDING_TIME_ID:
+//            break;
+//
+//         case TableColumnFactory.TIME_TIME_ZONE_ID:
+//            break;
+//
+//         case TableColumnFactory.TIME_TIME_ZONE_DIFFERENCE_ID:
+//            break;
+//
+//         case TableColumnFactory.TIME_TOUR_START_TIME_ID:
+//            break;
+//
+//         case TableColumnFactory.TIME_WEEK_DAY_ID:
+//            break;
+//
+//         case TableColumnFactory.TIME_WEEK_NO_ID:
+//            break;
+//
+//         case TableColumnFactory.TIME_WEEKYEAR_ID:
+//            break;
+//
+//         /*
+//          * TOUR
+//          */
+//
+//         case TableColumnFactory.TOUR_LOCATION_START_ID:
+//            break;
+//
+//         case TableColumnFactory.TOUR_LOCATION_END_ID:
+//            break;
+//
+//         case TableColumnFactory.TOUR_NUM_MARKERS_ID:
+//            break;
+//
+//         case TableColumnFactory.TOUR_NUM_PHOTOS_ID:
+//            break;
+//
+//         case TableColumnFactory.TOUR_TAGS_ID:
+//            break;
+//
+//         case TableColumnFactory.TOUR_TITLE_ID:
+//            break;
+//
+//         case TableColumnFactory.TOUR_TYPE_ID:
+//            break;
+//
+//         case TableColumnFactory.TOUR_TYPE_TEXT_ID:
+//            break;
+//
+//         /*
+//          * TRAINING
+//          */
+//
+//         case TableColumnFactory.TRAINING_EFFECT_AEROB_ID:
+//            break;
+//
+//         case TableColumnFactory.TRAINING_EFFECT_ANAEROB_ID:
+//            break;
+//
+//         case TableColumnFactory.TRAINING_FTP_ID:
+//            break;
+//
+//         case TableColumnFactory.TRAINING_INTENSITY_FACTOR_ID:
+//            break;
+//
+//         case TableColumnFactory.TRAINING_POWER_TO_WEIGHT_ID:
+//            break;
+//
+//         case TableColumnFactory.TRAINING_STRESS_SCORE_ID:
+//            break;
+//
+//         case TableColumnFactory.TRAINING_PERFORMANCE_LEVEL_ID:
+//            break;
+//
+//         /*
+//          * WEATHER
+//          */
+//
+//         case TableColumnFactory.WEATHER_CLOUDS_ID:
+//            break;
+//
+//         case TableColumnFactory.WEATHER_TEMPERATURE_AVG_ID:
+//            break;
+//
+//         case TableColumnFactory.WEATHER_TEMPERATURE_MIN_ID:
+//            break;
+//
+//         case TableColumnFactory.WEATHER_TEMPERATURE_MAX_ID:
+//            break;
+//
+//         case TableColumnFactory.WEATHER_WIND_DIR_ID:
+//            break;
+//
+//         case TableColumnFactory.WEATHER_WIND_SPEED_ID:
+//            break;
+//
+//         case TableColumnFactory.DATA_SEQUENCE_ID:
+//         default:
+//
+//            result = tourItem1.col_Sequence > tourItem2.col_Sequence ? 1 : -1;
+//
+//            break;
+//         }
 
 //         if (__sortColumnId.equals(_columnId_1stColumn_Date)) {
 //
@@ -817,19 +822,19 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 //               result = -1;
 //            }
 //         }
-
+//
 // do a 2nd sorting by date/time when not yet sorted
-         if (result == 0) {
-            result = tourItem1.colDateTime_MS > tourItem2.colDateTime_MS ? 1 : -1;
-         }
-
-         // if descending order, flip the direction
-         if (__sortDirection == DESCENDING) {
-            result = -result;
-         }
-
-         return result;
-      }
+//         if (result == 0) {
+//            result = tourItem1.colDateTime_MS > tourItem2.colDateTime_MS ? 1 : -1;
+//         }
+//
+//         // if descending order, flip the direction
+//         if (__sortDirection == DESCENDING) {
+//            result = -result;
+//         }
+//
+//         return result;
+//      }
 
       /**
        * Does the sort. If it's a different column from the previous sort, do an ascending sort. If
@@ -1355,7 +1360,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _tourViewer_Table.addSelectionChangedListener(new ISelectionChangedListener() {
          @Override
          public void selectionChanged(final SelectionChangedEvent event) {
-            onSelectTreeItem(event);
+            onSelect_TableItem(event);
          }
       });
 
@@ -1410,7 +1415,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _tourViewer_Tree.addSelectionChangedListener(new ISelectionChangedListener() {
          @Override
          public void selectionChanged(final SelectionChangedEvent event) {
-            onSelectTreeItem(event);
+            onSelect_TreeItem(event);
          }
       });
 
@@ -1536,8 +1541,10 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineAllColumns() {
 
+      defineColumn_0_RowNumbering();
+
       // Time
-      defineColumn_1stColumn_Date();
+      defineColumn_1_Date();
       defineColumn_Time_WeekDay();
       defineColumn_Time_TourStartTime();
       defineColumn_Time_TimeZoneDifference();
@@ -1657,9 +1664,51 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    }
 
    /**
+    * Column: #
+    * <p>
+    * This is only used for the table view.
+    */
+   private void defineColumn_0_RowNumbering() {
+
+      {
+         // Column: 1st column will be hidden because the alignment for the first column is always to the left
+
+         final ColumnDefinition colDef = TableColumnFactory.DATA_FIRST_COLUMN.createColumn(_columnManager_Table, _pc);
+
+         colDef.setIsDefaultColumn();
+         colDef.setCanModifyVisibility(true);
+         colDef.setIsColumnMoveable(true);
+         colDef.setHideColumn();
+         colDef.setLabelProvider(new CellLabelProvider() {
+            @Override
+            public void update(final ViewerCell cell) {}
+         });
+      }
+
+      {
+         // Column: #
+
+         final ColumnDefinition colDef = TableColumnFactory.DATA_SEQUENCE.createColumn(_columnManager_Table, _pc);
+
+         colDef.setIsDefaultColumn();
+         colDef.setCanModifyVisibility(true);
+         colDef.setIsColumnMoveable(true);
+         colDef.setLabelProvider(new CellLabelProvider() {
+            @Override
+            public void update(final ViewerCell cell) {
+
+               final int tourSequence = ((TVITourBookItem) cell.getElement()).col_Sequence;
+
+               cell.setText(Integer.toString(tourSequence));
+            }
+         });
+      }
+   }
+
+   /**
     * Column: Date
     */
-   private void defineColumn_1stColumn_Date() {
+   private void defineColumn_1_Date() {
 
       final TableColumnDefinition colDef_Table = TableColumnFactory.TIME_DATE.createColumn(_columnManager_Table, _pc);
 
@@ -4458,7 +4507,14 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             final Object element = cell.getElement();
             if (element instanceof TVITourBookTour) {
 
-               cell.setText(((TVITourBookTour) element).colTourTitle);
+               final String colTourTitle = ((TVITourBookTour) element).colTourTitle;
+
+               if (colTourTitle == null) {
+                  cell.setText("<NULL>");
+               } else {
+                  cell.setText(colTourTitle);
+               }
+
                setCellColor(cell, element);
             }
          }
@@ -5003,37 +5059,54 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
    private void enableActions() {
 
-      final ITreeSelection selection = (ITreeSelection) _tourViewer_Tree.getSelection();
+      int numTourItems = 0;
+      int numSelectedItems = 0;
 
-      /*
-       * count number of selected items
-       */
-      int tourItems = 0;
+      boolean firstElementHasChildren = false;
 
+      TVITourBookItem firstElement = null;
       TVITourBookTour firstTour = null;
 
-      for (final Iterator<?> iter = selection.iterator(); iter.hasNext();) {
+      if (_isLayoutFlat) {
 
-         final Object treeItem = iter.next();
-         if (treeItem instanceof TVITourBookTour) {
-            if (tourItems == 0) {
-               firstTour = (TVITourBookTour) treeItem;
+         final IStructuredSelection selection = _tourViewer_Table.getStructuredSelection();
+
+         numTourItems = numSelectedItems = selection.size();
+
+         firstTour = (TVITourBookTour) (firstElement = (TVITourBookItem) selection.getFirstElement());
+
+      } else {
+
+         final ITreeSelection selection = (ITreeSelection) _tourViewer_Tree.getSelection();
+
+         /*
+          * count number of selected items
+          */
+
+         for (final Iterator<?> iter = selection.iterator(); iter.hasNext();) {
+
+            final Object treeItem = iter.next();
+            if (treeItem instanceof TVITourBookTour) {
+               if (numTourItems == 0) {
+                  firstTour = (TVITourBookTour) treeItem;
+               }
+               numTourItems++;
             }
-            tourItems++;
          }
+
+         firstElement = (TVITourBookItem) selection.getFirstElement();
+         firstElementHasChildren = firstElement == null ? false : firstElement.hasChildren();
+         numSelectedItems = selection.size();
       }
 
-      final int selectedItems = selection.size();
-      final boolean isTourSelected = tourItems > 0;
-      final boolean isOneTour = tourItems == 1;
+      final boolean isTourSelected = numTourItems > 0;
+      final boolean isOneTour = numTourItems == 1;
       final boolean isAllToursSelected = _actionSelectAllTours.isChecked();
       boolean isDeviceTour = false;
       boolean canMergeTours = false;
 
       final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
 
-      final TVITourBookItem firstElement = (TVITourBookItem) selection.getFirstElement();
-      final boolean firstElementHasChildren = firstElement == null ? false : firstElement.hasChildren();
       TourData firstSavedTour = null;
 
       if (isOneTour) {
@@ -5068,8 +5141,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _actionEditQuick.setEnabled(isOneTour);
       _actionEditTour.setEnabled(isOneTour);
       _actionExportTour.setEnabled(isTourSelected);
-      _actionExportViewCSV.setEnabled(selectedItems > 0);
-      _actionJoinTours.setEnabled(tourItems > 1);
+      _actionExportViewCSV.setEnabled(numSelectedItems > 0);
+      _actionJoinTours.setEnabled(numTourItems > 1);
       _actionMergeTour.setEnabled(canMergeTours);
       _actionOpenAdjustAltitudeDialog.setEnabled(isOneTour && isDeviceTour);
       _actionOpenMarkerDialog.setEnabled(isOneTour && isDeviceTour);
@@ -5078,11 +5151,11 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _actionSetOtherPerson.setEnabled(isTourSelected);
       _actionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
 
-      _actionCollapseOthers.setEnabled(selectedItems == 1 && firstElementHasChildren);
+      _actionCollapseOthers.setEnabled(numSelectedItems == 1 && firstElementHasChildren);
       _actionExpandSelection.setEnabled(
             firstElement == null
                   ? false
-                  : selectedItems == 1
+                  : numSelectedItems == 1
                         ? firstElementHasChildren
                         : true);
 
@@ -5178,7 +5251,13 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    public Set<Long> getSelectedTourIDs() {
 
       final Set<Long> tourIds = new HashSet<>();
-      final IStructuredSelection selectedTours = ((IStructuredSelection) _tourViewer_Tree.getSelection());
+
+      IStructuredSelection selectedTours;
+      if (_isLayoutFlat) {
+         selectedTours = _tourViewer_Table.getStructuredSelection();
+      } else {
+         selectedTours = _tourViewer_Tree.getStructuredSelection();
+      }
 
       for (final Iterator<?> tourIterator = selectedTours.iterator(); tourIterator.hasNext();) {
 
@@ -5257,6 +5336,13 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       return _state;
    }
 
+   /**
+    * @return the _tourViewer_Table
+    */
+   public TableViewer getTourViewer_Table() {
+      return _tourViewer_Table;
+   }
+
    @Override
    public TreeViewer getTreeViewer() {
       return _tourViewer_Tree;
@@ -5316,6 +5402,48 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       return Util.getStateBoolean(_state, TourBookView.STATE_IS_SHOW_SUMMARY_ROW, TourBookView.STATE_IS_SHOW_SUMMARY_ROW_DEFAULT);
    }
 
+   private void onSelect_CreateTourSelection(final HashSet<Long> tourIds) {
+
+      ISelection selection;
+      if (tourIds.size() == 0) {
+
+         // fire selection that nothing is selected
+
+         selection = new SelectionTourIds(new ArrayList<Long>());
+
+      } else {
+
+         // keep selected tour id's
+         _selectedTourIds.clear();
+         _selectedTourIds.addAll(tourIds);
+
+         selection = tourIds.size() == 1 //
+               ? new SelectionTourId(_selectedTourIds.get(0))
+               : new SelectionTourIds(_selectedTourIds);
+
+      }
+
+      _isInFireSelection = true;
+      {
+         // _postSelectionProvider should be removed when all parts are listening to the TourManager event
+         if (_isInStartup) {
+
+            _isInStartup = false;
+
+            // this view can be inactive -> selection is not fired with the SelectionProvider interface
+
+            TourManager.fireEventWithCustomData(TourEventId.TOUR_SELECTION, selection, this);
+
+         } else {
+
+            _postSelectionProvider.setSelection(selection);
+         }
+      }
+      _isInFireSelection = false;
+
+      enableActions();
+   }
+
    private void onSelect_SortColumn(final SelectionEvent e) {
 
       _viewerContainer_Table.setRedraw(false);
@@ -5341,39 +5469,33 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _viewerContainer_Table.setRedraw(true);
    }
 
-   private void onSelectionChanged(final ISelection selection) {
+   private void onSelect_TableItem(final SelectionChangedEvent event) {
 
-      if (_isInFireSelection) {
+      if (_isInReload) {
          return;
       }
 
-      // show and select the selected tour
-      if (selection instanceof SelectionTourId) {
+      final HashSet<Long> tourIds = new HashSet<>();
 
-         final long newTourId = ((SelectionTourId) selection).getTourId();
+      final IStructuredSelection selectedTours = (IStructuredSelection) (event.getSelection());
 
-         selectTour(newTourId);
+      // loop: all selected items
+      for (final Iterator<?> itemIterator = selectedTours.iterator(); itemIterator.hasNext();) {
 
-      } else if (selection instanceof StructuredSelection) {
+         final Object treeItem = itemIterator.next();
 
-         final Object firstElement = ((StructuredSelection) selection).getFirstElement();
+         if (treeItem instanceof TVITourBookTour) {
 
-         if (firstElement instanceof GeoPartComparerItem) {
+            final TVITourBookTour tourItem = (TVITourBookTour) treeItem;
 
-            // show selected compared tour
-
-            final GeoPartComparerItem comparerItem = (GeoPartComparerItem) firstElement;
-
-            selectTour(comparerItem.tourId);
+            tourIds.add(tourItem.getTourId());
          }
-
-      } else if (selection instanceof SelectionDeletedTours) {
-
-         reloadViewer();
       }
+
+      onSelect_CreateTourSelection(tourIds);
    }
 
-   private void onSelectTreeItem(final SelectionChangedEvent event) {
+   private void onSelect_TreeItem(final SelectionChangedEvent event) {
 
       if (_isInReload) {
          return;
@@ -5465,44 +5587,39 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          }
       }
 
-      ISelection selection;
-      if (tourIds.size() == 0) {
+      onSelect_CreateTourSelection(tourIds);
+   }
 
-         // fire selection that nothing is selected
+   private void onSelectionChanged(final ISelection selection) {
 
-         selection = new SelectionTourIds(new ArrayList<Long>());
-
-      } else {
-
-         // keep selected tour id's
-         _selectedTourIds.clear();
-         _selectedTourIds.addAll(tourIds);
-
-         selection = tourIds.size() == 1 //
-               ? new SelectionTourId(_selectedTourIds.get(0))
-               : new SelectionTourIds(_selectedTourIds);
-
+      if (_isInFireSelection) {
+         return;
       }
 
-      _isInFireSelection = true;
-      {
-         // _postSelectionProvider should be removed when all parts are listening to the TourManager event
-         if (_isInStartup) {
+      // show and select the selected tour
+      if (selection instanceof SelectionTourId) {
 
-            _isInStartup = false;
+         final long newTourId = ((SelectionTourId) selection).getTourId();
 
-            // this view can be inactive -> selection is not fired with the SelectionProvider interface
+         selectTour(newTourId);
 
-            TourManager.fireEventWithCustomData(TourEventId.TOUR_SELECTION, selection, this);
+      } else if (selection instanceof StructuredSelection) {
 
-         } else {
+         final Object firstElement = ((StructuredSelection) selection).getFirstElement();
 
-            _postSelectionProvider.setSelection(selection);
+         if (firstElement instanceof GeoPartComparerItem) {
+
+            // show selected compared tour
+
+            final GeoPartComparerItem comparerItem = (GeoPartComparerItem) firstElement;
+
+            selectTour(comparerItem.tourId);
          }
-      }
-      _isInFireSelection = false;
 
-      enableActions();
+      } else if (selection instanceof SelectionDeletedTours) {
+
+         reloadViewer();
+      }
    }
 
    @Override
@@ -5601,42 +5718,47 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
    void reopenFirstSelectedTour() {
 
-      _selectedYear = -1;
-      _selectedYearSub = -1;
-      TVITourBookTour selectedTourItem = null;
+      if (_isLayoutFlat) {
 
-      final ISelection oldSelection = _tourViewer_Tree.getSelection();
-      if (oldSelection != null) {
+      } else {
 
-         final Object selection = ((IStructuredSelection) oldSelection).getFirstElement();
-         if (selection instanceof TVITourBookTour) {
+         _selectedYear = -1;
+         _selectedYearSub = -1;
+         TVITourBookTour selectedTourItem = null;
 
-            selectedTourItem = (TVITourBookTour) selection;
+         final ISelection oldSelection = _tourViewer_Tree.getSelection();
+         if (oldSelection != null) {
 
-            _selectedYear = selectedTourItem.tourYear;
+            final Object selection = ((IStructuredSelection) oldSelection).getFirstElement();
+            if (selection instanceof TVITourBookTour) {
 
-            if (_viewLayout == TourBookViewLayout.CATEGORY_WEEK) {
-               _selectedYearSub = selectedTourItem.colWeekNo;
-            } else {
-               _selectedYearSub = selectedTourItem.tourMonth;
+               selectedTourItem = (TVITourBookTour) selection;
+
+               _selectedYear = selectedTourItem.tourYear;
+
+               if (_viewLayout == TourBookViewLayout.CATEGORY_WEEK) {
+                  _selectedYearSub = selectedTourItem.colWeekNo;
+               } else {
+                  _selectedYearSub = selectedTourItem.tourMonth;
+               }
             }
          }
-      }
 
-      reloadViewer();
-      reselectTourViewer();
+         reloadViewer();
+         reselectTourViewer();
 
-      final IStructuredSelection newSelection = (IStructuredSelection) _tourViewer_Tree.getSelection();
-      if (newSelection != null) {
+         final IStructuredSelection newSelection = (IStructuredSelection) _tourViewer_Tree.getSelection();
+         if (newSelection != null) {
 
-         final Object selection = newSelection.getFirstElement();
-         if (selection instanceof TVITourBookTour) {
+            final Object selection = newSelection.getFirstElement();
+            if (selection instanceof TVITourBookTour) {
 
-            selectedTourItem = (TVITourBookTour) selection;
+               selectedTourItem = (TVITourBookTour) selection;
 
-            _tourViewer_Tree.collapseAll();
-            _tourViewer_Tree.expandToLevel(selectedTourItem, 0);
-            _tourViewer_Tree.setSelection(new StructuredSelection(selectedTourItem), false);
+               _tourViewer_Tree.collapseAll();
+               _tourViewer_Tree.expandToLevel(selectedTourItem, 0);
+               _tourViewer_Tree.setSelection(new StructuredSelection(selectedTourItem), false);
+            }
          }
       }
    }
@@ -5644,83 +5766,100 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private void reselectTourViewer() {
 
       if (_isLayoutFlat) {
-         return;
-      }
 
-      // find the old selected year/[month/week] in the new tour items
-      TreeViewerItem reselectYearItem = null;
-      TreeViewerItem reselectYearSubItem = null;
-      final ArrayList<TreeViewerItem> reselectTourItems = new ArrayList<>();
+         final int[] stateSelectedTourIndices = Util.getStateIntArray(_state, STATE_SELECTED_TABLE_INDEX, null);
 
-      /*
-       * get the year/month/tour item in the data model
-       */
-      final ArrayList<TreeViewerItem> rootItems = _rootItem_Tree.getChildren();
+         final Table table = _tourViewer_Table.getTable();
 
-      for (final TreeViewerItem rootItem : rootItems) {
+         if (stateSelectedTourIndices != null) {
 
-         if (rootItem instanceof TVITourBookYear) {
+            table.setSelection(stateSelectedTourIndices);
+            table.setFocus();
+         }
 
-            final TVITourBookYear tourBookYear = ((TVITourBookYear) rootItem);
-            if (tourBookYear.tourYear == _selectedYear) {
+         // move the horizontal scrollbar to the left border
+         final ScrollBar horizontalBar = table.getHorizontalBar();
+         if (horizontalBar != null) {
+            horizontalBar.setSelection(0);
+         }
 
-               reselectYearItem = rootItem;
+      } else {
 
-               final Object[] yearSubItems = tourBookYear.getFetchedChildrenAsArray();
-               for (final Object yearSub : yearSubItems) {
+         // find the old selected year/[month/week] in the new tour items
+         TreeViewerItem reselectYearItem = null;
+         TreeViewerItem reselectYearSubItem = null;
+         final ArrayList<TreeViewerItem> reselectTourItems = new ArrayList<>();
 
-                  final TVITourBookYearCategorized tourBookYearSub = ((TVITourBookYearCategorized) yearSub);
-                  if (tourBookYearSub.tourYearSub == _selectedYearSub) {
+         /*
+          * get the year/month/tour item in the data model
+          */
+         final ArrayList<TreeViewerItem> rootItems = _rootItem_Tree.getChildren();
 
-                     reselectYearSubItem = tourBookYearSub;
+         for (final TreeViewerItem rootItem : rootItems) {
 
-                     final Object[] tourItems = tourBookYearSub.getFetchedChildrenAsArray();
-                     for (final Object tourItem : tourItems) {
+            if (rootItem instanceof TVITourBookYear) {
 
-                        final TVITourBookTour tourBookTour = ((TVITourBookTour) tourItem);
-                        final long treeTourId = tourBookTour.tourId;
+               final TVITourBookYear tourBookYear = ((TVITourBookYear) rootItem);
+               if (tourBookYear.tourYear == _selectedYear) {
 
-                        for (final Long tourId : _selectedTourIds) {
-                           if (treeTourId == tourId) {
-                              reselectTourItems.add(tourBookTour);
-                              break;
+                  reselectYearItem = rootItem;
+
+                  final Object[] yearSubItems = tourBookYear.getFetchedChildrenAsArray();
+                  for (final Object yearSub : yearSubItems) {
+
+                     final TVITourBookYearCategorized tourBookYearSub = ((TVITourBookYearCategorized) yearSub);
+                     if (tourBookYearSub.tourYearSub == _selectedYearSub) {
+
+                        reselectYearSubItem = tourBookYearSub;
+
+                        final Object[] tourItems = tourBookYearSub.getFetchedChildrenAsArray();
+                        for (final Object tourItem : tourItems) {
+
+                           final TVITourBookTour tourBookTour = ((TVITourBookTour) tourItem);
+                           final long treeTourId = tourBookTour.tourId;
+
+                           for (final Long tourId : _selectedTourIds) {
+                              if (treeTourId == tourId) {
+                                 reselectTourItems.add(tourBookTour);
+                                 break;
+                              }
                            }
                         }
+                        break;
                      }
-                     break;
                   }
+                  break;
                }
-               break;
             }
          }
-      }
 
-      // select year/month/tour in the viewer
-      if (reselectTourItems.size() > 0) {
+         // select year/month/tour in the viewer
+         if (reselectTourItems.size() > 0) {
 
-         _tourViewer_Tree.setSelection(new StructuredSelection(reselectTourItems) {}, false);
+            _tourViewer_Tree.setSelection(new StructuredSelection(reselectTourItems) {}, false);
 
-      } else if (reselectYearSubItem != null) {
+         } else if (reselectYearSubItem != null) {
 
-         _tourViewer_Tree.setSelection(new StructuredSelection(reselectYearSubItem) {}, false);
+            _tourViewer_Tree.setSelection(new StructuredSelection(reselectYearSubItem) {}, false);
 
-      } else if (reselectYearItem != null) {
+         } else if (reselectYearItem != null) {
 
-         _tourViewer_Tree.setSelection(new StructuredSelection(reselectYearItem) {}, false);
+            _tourViewer_Tree.setSelection(new StructuredSelection(reselectYearItem) {}, false);
 
-      } else if (rootItems.size() > 0) {
+         } else if (rootItems.size() > 0) {
 
-         // the old year was not found, select the newest year
+            // the old year was not found, select the newest year
 
 //         final TreeViewerItem yearItem = rootItems.get(rootItems.size() - 1);
 
 //         _tourViewer.setSelection(new StructuredSelection(yearItem) {}, true);
-      }
+         }
 
-      // move the horizontal scrollbar to the left border
-      final ScrollBar horizontalBar = _tourViewer_Tree.getTree().getHorizontalBar();
-      if (horizontalBar != null) {
-         horizontalBar.setSelection(0);
+         // move the horizontal scrollbar to the left border
+         final ScrollBar horizontalBar = _tourViewer_Tree.getTree().getHorizontalBar();
+         if (horizontalBar != null) {
+            horizontalBar.setSelection(0);
+         }
       }
    }
 
@@ -5833,11 +5972,25 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _state.put(STATE_IS_LINK_WITH_OTHER_VIEWS, _actionLinkWithOtherViews.getSelection());
       _state.put(STATE_VIEW_LAYOUT, _viewLayout.name());
 
+      Util.setState(_state, STATE_SELECTED_TABLE_INDEX, _tourViewer_Table.getTable().getSelectionIndices());
+
+      // viewer columns
+      _state.put(STATE_SORT_COLUMN_ID, _tourViewer_Table_Comparator.__sortColumnId);
+      _state.put(STATE_SORT_COLUMN_DIRECTION, _tourViewer_Table_Comparator.__sortDirection);
+
       _columnManager_Table.saveState(_state_Table);
       _columnManager_Tree.saveState(_state_Tree);
    }
 
    private void selectTour(final long tourId) {
+
+      if (_isLayoutFlat) {
+
+         // for performance reasons a tour cannot be selected by it's ID only by table index
+         // todo: get table index from db
+
+         return;
+      }
 
       // check if enabled
       if (_actionLinkWithOtherViews.getSelection() == false) {
@@ -5902,7 +6055,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
                      /**
                       * <code>
-                     
+
                         Caused by: java.lang.NullPointerException
                         at org.eclipse.jface.viewers.AbstractTreeViewer.getSelection(AbstractTreeViewer.java:2956)
                         at org.eclipse.jface.viewers.StructuredViewer.handleSelect(StructuredViewer.java:1211)
@@ -5920,13 +6073,13 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
                         at org.eclipse.jface.viewers.AbstractTreeViewer.internalCollapseToLevel(AbstractTreeViewer.java:1586)
                         at org.eclipse.jface.viewers.AbstractTreeViewer.collapseToLevel(AbstractTreeViewer.java:751)
                         at org.eclipse.jface.viewers.AbstractTreeViewer.collapseAll(AbstractTreeViewer.java:733)
-                     
+
                         at net.tourbook.ui.views.tourBook.TourBookView$70.run(TourBookView.java:3406)
-                     
+
                         at org.eclipse.swt.widgets.RunnableLock.run(RunnableLock.java:35)
                         at org.eclipse.swt.widgets.Synchronizer.runAsyncMessages(Synchronizer.java:135)
                         ... 22 more
-                     
+
                       * </code>
                       */
 
@@ -6004,12 +6157,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private void setupTourViewerContent() {
 
       if (_isLayoutFlat) {
-
-//         if (_rootItem_Table != null) {
-//            _rootItem_Table.clearChildren();
-//         }
-//
-//         _rootItem_Table = new TVITourBookRoot(this, _viewLayout);
 
          /*
           * There have been different exceptions depending on the sequence of the viewer methods
@@ -6106,11 +6253,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _isShowSummaryRow = isShowSummaryRow();
 
       reloadViewer();
-   }
-
-   void updateUI_LazyTourItems(final LazyTourLoaderItem loaderItem) {
-      // TODO Auto-generated method stub
-
    }
 
    /**

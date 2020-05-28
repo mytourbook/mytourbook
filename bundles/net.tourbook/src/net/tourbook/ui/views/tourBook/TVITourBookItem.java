@@ -274,6 +274,8 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
    String       treeColumn;
 
+   int          col_Sequence;
+
    int          tourYear;
 
    /**

@@ -15,16 +15,19 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourBook;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 public class LazyTourLoaderItem {
 
-   private long _executerId;
+   int           sqlOffset;
+   int           fetchKey;
 
-   int          sqlOffset;
-   int          fetchKey;
+   List<Integer> requestedIndices = Collections.synchronizedList(new ArrayList<Integer>());
 
-   public LazyTourLoaderItem(final long executerId) {
+   public LazyTourLoaderItem() {
 
-      _executerId = executerId;
    }
 
 }
