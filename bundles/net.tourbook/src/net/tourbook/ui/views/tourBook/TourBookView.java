@@ -16,11 +16,15 @@
 package net.tourbook.ui.views.tourBook;
 
 import java.io.File;
+import java.io.Serializable;
 import java.text.NumberFormat;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import net.tourbook.Messages;
@@ -98,6 +102,7 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -122,6 +127,31 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.nebula.widgets.nattable.NatTable;
+import org.eclipse.nebula.widgets.nattable.data.IColumnPropertyAccessor;
+import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
+import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
+import org.eclipse.nebula.widgets.nattable.data.IRowIdAccessor;
+import org.eclipse.nebula.widgets.nattable.data.ListDataProvider;
+import org.eclipse.nebula.widgets.nattable.data.ReflectiveColumnPropertyAccessor;
+import org.eclipse.nebula.widgets.nattable.dataset.person.Person;
+import org.eclipse.nebula.widgets.nattable.dataset.person.PersonService;
+import org.eclipse.nebula.widgets.nattable.grid.data.DefaultColumnHeaderDataProvider;
+import org.eclipse.nebula.widgets.nattable.grid.data.DefaultCornerDataProvider;
+import org.eclipse.nebula.widgets.nattable.grid.data.DefaultRowHeaderDataProvider;
+import org.eclipse.nebula.widgets.nattable.grid.layer.ColumnHeaderLayer;
+import org.eclipse.nebula.widgets.nattable.grid.layer.CornerLayer;
+import org.eclipse.nebula.widgets.nattable.grid.layer.DefaultRowHeaderDataLayer;
+import org.eclipse.nebula.widgets.nattable.grid.layer.GridLayer;
+import org.eclipse.nebula.widgets.nattable.grid.layer.RowHeaderLayer;
+import org.eclipse.nebula.widgets.nattable.layer.DataLayer;
+import org.eclipse.nebula.widgets.nattable.layer.ILayer;
+import org.eclipse.nebula.widgets.nattable.selection.RowSelectionModel;
+import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
+import org.eclipse.nebula.widgets.nattable.selection.config.DefaultRowSelectionLayerConfiguration;
+import org.eclipse.nebula.widgets.nattable.style.theme.ModernNatTableThemeConfiguration;
+import org.eclipse.nebula.widgets.nattable.style.theme.ThemeConfiguration;
+import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -221,6 +251,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private IPropertyChangeListener        _prefChangeListener;
    private IPropertyChangeListener        _prefChangeListenerCommon;
    //
+   private NatTable                       _tourViewer_NatTable;
    private TableViewer                    _tourViewer_Table;
    private TreeViewer                     _tourViewer_Tree;
    private ItemComparator_Table           _tourViewer_Table_Comparator     = new ItemComparator_Table();
@@ -1341,80 +1372,23 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       _pageBook = new PageBook(parent, SWT.NONE);
 
-      _viewerContainer_Table = new Composite(_pageBook, SWT.NONE);
-      GridLayoutFactory.fillDefaults().applyTo(_viewerContainer_Table);
-      {
-         createUI_20_TourViewer_Table(_viewerContainer_Table);
-      }
-
       _viewerContainer_Tree = new Composite(_pageBook, SWT.NONE);
       GridLayoutFactory.fillDefaults().applyTo(_viewerContainer_Tree);
       {
          createUI_20_TourViewer_Tree(_viewerContainer_Tree);
       }
 
+      _viewerContainer_Table = new Composite(_pageBook, SWT.NONE);
+      GridLayoutFactory.fillDefaults().applyTo(_viewerContainer_Table);
+      {
+         createUI_30_TourViewer_Table(_viewerContainer_Table);
+      }
+
       _viewerContainer_NatTable = new Composite(_pageBook, SWT.NONE);
       GridLayoutFactory.fillDefaults().applyTo(_viewerContainer_NatTable);
       {
-         createUI_30_TourViewer_NatTable(_viewerContainer_NatTable);
+         createUI_40_TourViewer_NatTable(_viewerContainer_NatTable);
       }
-   }
-
-   private void createUI_20_TourViewer_Table(final Composite parent) {
-
-      // must be called before the columns are created
-      updateUI_TourViewerColumns_Table();
-
-      // tour tree
-      final Table Table = new Table(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FLAT | SWT.FULL_SELECTION | SWT.MULTI | SWT.VIRTUAL);
-
-      Table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-
-      Table.setHeaderVisible(true);
-      Table.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
-
-      _tourViewer_Table = new TableViewer(Table);
-      _columnManager_Table.createColumns(_tourViewer_Table);
-
-      // virtual table do not use the comparator to do the sort, this must be done by myself
-      // https://bugs.eclipse.org/bugs/show_bug.cgi?id=145061#c1
-      // _tourViewer_Table.setComparator(_tourViewer_Table_Comparator);
-      _tourViewer_Table.setUseHashlookup(true);
-
-      _tourViewer_Table.addSelectionChangedListener(new ISelectionChangedListener() {
-         @Override
-         public void selectionChanged(final SelectionChangedEvent event) {
-            onSelect_TableItem(event);
-         }
-      });
-
-      _tourViewer_Table.addDoubleClickListener(new IDoubleClickListener() {
-
-         @Override
-         public void doubleClick(final DoubleClickEvent event) {
-
-            final Object selection = ((IStructuredSelection) _tourViewer_Table.getSelection()).getFirstElement();
-
-            if (selection instanceof TVITourBookTour) {
-
-               TourManager.getInstance().tourDoubleClickAction(TourBookView.this, _tourDoubleClickState);
-            }
-         }
-      });
-
-      // show the sorting indicator in the viewer
-      updateUI_ShowSortDirection(
-            _tourViewer_Table_Comparator.__sortColumnId,
-            _tourViewer_Table_Comparator.__sortDirection);
-
-      /*
-       * The context menu must be created after the viewer is created which is also done after the
-       * measurement system has changed
-       */
-      createUI_50_ContextMenu_Table();
-
-      // set tour info tooltip provider
-      _tourInfoToolTip_Table = new TableViewerTourInfoToolTip(_tourViewer_Table);
    }
 
    private void createUI_20_TourViewer_Tree(final Composite parent) {
@@ -1479,9 +1453,143 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _tourInfoToolTip_Tree = new TreeViewerTourInfoToolTip(_tourViewer_Tree);
    }
 
-   private void createUI_30_TourViewer_NatTable(final Composite parent) {
-      // TODO Auto-generated method stub
+   private void createUI_30_TourViewer_Table(final Composite parent) {
 
+      // must be called before the columns are created
+      updateUI_TourViewerColumns_Table();
+
+      // tour tree
+      final Table Table = new Table(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FLAT | SWT.FULL_SELECTION | SWT.MULTI | SWT.VIRTUAL);
+
+      Table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+      Table.setHeaderVisible(true);
+      Table.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+
+      _tourViewer_Table = new TableViewer(Table);
+      _columnManager_Table.createColumns(_tourViewer_Table);
+
+      // virtual table do not use the comparator to do the sort, this must be done by myself
+      // https://bugs.eclipse.org/bugs/show_bug.cgi?id=145061#c1
+      // _tourViewer_Table.setComparator(_tourViewer_Table_Comparator);
+      _tourViewer_Table.setUseHashlookup(true);
+
+      _tourViewer_Table.addSelectionChangedListener(new ISelectionChangedListener() {
+         @Override
+         public void selectionChanged(final SelectionChangedEvent event) {
+            onSelect_TableItem(event);
+         }
+      });
+
+      _tourViewer_Table.addDoubleClickListener(new IDoubleClickListener() {
+
+         @Override
+         public void doubleClick(final DoubleClickEvent event) {
+
+            final Object selection = ((IStructuredSelection) _tourViewer_Table.getSelection()).getFirstElement();
+
+            if (selection instanceof TVITourBookTour) {
+
+               TourManager.getInstance().tourDoubleClickAction(TourBookView.this, _tourDoubleClickState);
+            }
+         }
+      });
+
+      // show the sorting indicator in the viewer
+      updateUI_ShowSortDirection(
+            _tourViewer_Table_Comparator.__sortColumnId,
+            _tourViewer_Table_Comparator.__sortDirection);
+
+      /*
+       * The context menu must be created after the viewer is created which is also done after the
+       * measurement system has changed
+       */
+      createUI_50_ContextMenu_Table();
+
+      // set tour info tooltip provider
+      _tourInfoToolTip_Table = new TableViewerTourInfoToolTip(_tourViewer_Table);
+   }
+
+   private void createUI_40_TourViewer_NatTable(final Composite parent) {
+
+      // property names of the Person class
+      final String[] propertyNames = {
+            "id",
+            "firstName",
+            "lastName",
+            "gender",
+            "married",
+            "birthday",
+            "money",
+            "description"
+      };
+
+      // mapping from property to label, needed for column header labels
+      final Map<String, String> propertyToLabelMap = new HashMap<>();
+      propertyToLabelMap.put("firstName", "Firstname");
+      propertyToLabelMap.put("lastName", "Lastname");
+      propertyToLabelMap.put("gender", "Gender");
+      propertyToLabelMap.put("married", "Married");
+      propertyToLabelMap.put("birthday", "Birthday");
+      propertyToLabelMap.put("id", "id");
+      propertyToLabelMap.put("money", "money");
+      propertyToLabelMap.put("description", "description");
+
+      final IColumnPropertyAccessor<Person> columnPropertyAccessor = new ReflectiveColumnPropertyAccessor<>(propertyNames);
+
+      final List<Person> data = PersonService.getPersons(100_000);
+
+      // create the body layer stack
+      final IRowDataProvider<Person> body_DataProvider = new ListDataProvider<>(data, columnPropertyAccessor);
+      final DataLayer body_DataLayer = new DataLayer(body_DataProvider);
+
+      // create a SelectionLayer without using the default configuration
+      // this enables us to add the row selection configuration cleanly
+      // afterwards
+      final SelectionLayer selection_Layer = new SelectionLayer(body_DataLayer, false);
+      final ViewportLayer grid_BodyLayer = new ViewportLayer(selection_Layer);
+
+      // use a RowSelectionModel that will perform row selections and is able
+      // to identify a row via unique ID
+      selection_Layer.setSelectionModel(new RowSelectionModel<>(selection_Layer, body_DataProvider, new IRowIdAccessor<Person>() {
+
+         @Override
+         public Serializable getRowId(final Person rowObject) {
+            return rowObject.getId();
+         }
+
+      }));
+
+      // register the DefaultRowSelectionLayerConfiguration that contains the
+      // default styling and functionality bindings (search, tick update)
+      // and different configurations for a move command handler that always
+      // moves by a row and row only selection bindings
+      selection_Layer.addConfiguration(new DefaultRowSelectionLayerConfiguration());
+
+      // create the column header layer stack
+      final IDataProvider columnHeader_DataProvider = new DefaultColumnHeaderDataProvider(propertyNames, propertyToLabelMap);
+      final DataLayer columnHeader_DataLayer = new DataLayer(columnHeader_DataProvider);
+      final ILayer columnHeader_Layer = new ColumnHeaderLayer(columnHeader_DataLayer, grid_BodyLayer, selection_Layer);
+
+      // create the row header layer stack
+      final DefaultRowHeaderDataProvider rowHeader_DataProvider = new DefaultRowHeaderDataProvider(body_DataProvider);
+      final DefaultRowHeaderDataLayer rowHeader_DataLayer = new DefaultRowHeaderDataLayer(rowHeader_DataProvider);
+      final ILayer rowHeader_Layer = new RowHeaderLayer(rowHeader_DataLayer, grid_BodyLayer, selection_Layer);
+
+      // create the corner layer stack
+      final DefaultCornerDataProvider corner_DataProvider = new DefaultCornerDataProvider(columnHeader_DataProvider, rowHeader_DataProvider);
+      final DataLayer corner_DataLayer = new DataLayer(corner_DataProvider);
+      final ILayer corner_Layer = new CornerLayer(corner_DataLayer, rowHeader_Layer, columnHeader_Layer);
+
+      // create the grid layer composed with the prior created layer stacks
+      final GridLayer gridLayer = new GridLayer(grid_BodyLayer, columnHeader_Layer, rowHeader_Layer, corner_Layer);
+
+      _tourViewer_NatTable = new NatTable(parent, gridLayer);
+
+      final ThemeConfiguration modernTheme = new ModernNatTableThemeConfiguration();
+      _tourViewer_NatTable.setTheme(modernTheme);
+
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(_tourViewer_NatTable);
    }
 
    /**
@@ -5674,7 +5782,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             final Table table_Old = _tourViewer_Table.getTable();
             table_Old.dispose();
 
-            createUI_20_TourViewer_Table(_viewerContainer_Table);
+            createUI_30_TourViewer_Table(_viewerContainer_Table);
             _viewerContainer_Table.layout();
 
             setupTourViewerContent();
@@ -5690,7 +5798,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
          return _tourViewer_Table;
 
-      } else if(_isLayoutNatTable){
+      } else if (_isLayoutNatTable) {
 
          setupTourViewerContent();
 
