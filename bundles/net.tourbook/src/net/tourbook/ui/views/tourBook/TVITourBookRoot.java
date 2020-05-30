@@ -46,7 +46,7 @@ public class TVITourBookRoot extends TVITourBookItem {
    @Override
    protected void fetchChildren() {
 
-      if (_viewLayout == TourBookViewLayout.FLAT) {
+      if (_viewLayout == TourBookViewLayout.TABLE) {
          getItemsFlat();
       } else {
          getItemsHierarchical();

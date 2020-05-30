@@ -229,7 +229,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private TreeColumnDefinition           _colDef_TimeZoneOffset_Tree;
    //
    private LazyTourProvider               _lazyTourProvider                = new LazyTourProvider(this);
-//   private TVITourBookRoot                _rootItem_Table;
    private TVITourBookRoot                _rootItem_Tree;
    //
    private int                            _selectedYear                    = -1;
@@ -240,7 +239,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private boolean                        _isInFireSelection;
    private boolean                        _isInReload;
    private boolean                        _isInStartup;
-   private boolean                        _isLayoutFlat;
+   private boolean                        _isLayoutNatTable;
+   private boolean                        _isLayoutTable;
    private boolean                        _isShowSummaryRow;
    private boolean                        _isShowToolTipIn_Date;
    private boolean                        _isShowToolTipIn_Tags;
@@ -293,6 +293,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private PageBook  _pageBook;
    //
    private Composite _parent;
+   private Composite _viewerContainer_NatTable;
    private Composite _viewerContainer_Table;
    private Composite _viewerContainer_Tree;
    //
@@ -966,10 +967,12 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    }
 
    /**
-    * Toggle view layout, when the <Ctrl> key is pressed, then the toggle action is backwards.
+    * Toggle view layout, when the <Ctrl> key is pressed, then the toggle action is reversed.
     * <p>
-    * Forwards: month -> week -> flat -> month...<br>
-    * Backward: month -> flat -> week -> month...
+    * <code>
+    * Forward:    month    -> week        -> table   -> natTable  -> month...<br>
+    * Reverse:    month    -> natTable    -> table   -> week      -> month...
+    * </code>
     *
     * @param event
     */
@@ -977,49 +980,64 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       final boolean isForwards = UI.isCtrlKey(event) == false;
 
-      if (_viewLayout == TourBookViewLayout.FLAT) {
-
-         if (isForwards) {
-
-            // flat -> month
-
-            toggleLayout_Month();
-
-         } else {
-
-            // flat -> week
-
-            toggleLayout_Week();
-         }
-
-      } else if (_viewLayout == TourBookViewLayout.CATEGORY_MONTH) {
+      if (_viewLayout == TourBookViewLayout.CATEGORY_MONTH) {
 
          if (isForwards) {
 
             // month -> week
 
-            toggleLayout_Week();
+            toggleLayout_Category_Week();
 
          } else {
 
-            // month -> flat
+            // month -> natTable
 
-            toggleLayout_Flat();
+            toggleLayout_NatTable();
          }
 
-      } else {
+      } else if (_viewLayout == TourBookViewLayout.CATEGORY_WEEK) {
 
          if (isForwards) {
 
-            // week -> flat
+            // week -> table
 
-            toggleLayout_Flat();
+            toggleLayout_Table();
 
          } else {
 
             // week -> month
 
-            toggleLayout_Month();
+            toggleLayout_Category_Month();
+         }
+
+      } else if (_viewLayout == TourBookViewLayout.TABLE) {
+
+         if (isForwards) {
+
+            // table -> natTable
+
+            toggleLayout_NatTable();
+
+         } else {
+
+            // table -> week
+
+            toggleLayout_Category_Week();
+         }
+
+      } else if (_viewLayout == TourBookViewLayout.NAT_TABLE) {
+
+         if (isForwards) {
+
+            // natTable -> month
+
+            toggleLayout_Category_Month();
+
+         } else {
+
+            // natTable -> table
+
+            toggleLayout_Table();
          }
       }
 
@@ -1334,6 +1352,12 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       {
          createUI_20_TourViewer_Tree(_viewerContainer_Tree);
       }
+
+      _viewerContainer_NatTable = new Composite(_pageBook, SWT.NONE);
+      GridLayoutFactory.fillDefaults().applyTo(_viewerContainer_NatTable);
+      {
+         createUI_30_TourViewer_NatTable(_viewerContainer_NatTable);
+      }
    }
 
    private void createUI_20_TourViewer_Table(final Composite parent) {
@@ -1453,6 +1477,11 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       // set tour info tooltip provider
       _tourInfoToolTip_Tree = new TreeViewerTourInfoToolTip(_tourViewer_Tree);
+   }
+
+   private void createUI_30_TourViewer_NatTable(final Composite parent) {
+      // TODO Auto-generated method stub
+
    }
 
    /**
@@ -1784,7 +1813,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
                final TVITourBookTour tourItem = (TVITourBookTour) tviItem;
 
-               if (_isLayoutFlat) {
+               if (_isLayoutTable) {
 
                   // show full date
                   cell.setText(tourItem.colDateTime_Text);
@@ -5067,13 +5096,15 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       TVITourBookItem firstElement = null;
       TVITourBookTour firstTour = null;
 
-      if (_isLayoutFlat) {
+      if (_isLayoutTable) {
 
          final IStructuredSelection selection = _tourViewer_Table.getStructuredSelection();
 
          numTourItems = numSelectedItems = selection.size();
 
          firstTour = (TVITourBookTour) (firstElement = (TVITourBookItem) selection.getFirstElement());
+
+      } else if (_isLayoutNatTable) {
 
       } else {
 
@@ -5253,8 +5284,13 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       final Set<Long> tourIds = new HashSet<>();
 
       IStructuredSelection selectedTours;
-      if (_isLayoutFlat) {
+      if (_isLayoutTable) {
          selectedTours = _tourViewer_Table.getStructuredSelection();
+
+      } else if (_isLayoutNatTable) {
+
+         return tourIds;
+
       } else {
          selectedTours = _tourViewer_Tree.getStructuredSelection();
       }
@@ -5351,9 +5387,13 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    @Override
    public ColumnViewer getViewer() {
 
-      if (_isLayoutFlat) {
+      if (_isLayoutTable) {
 
          return _tourViewer_Table;
+
+      } else if (_isLayoutNatTable) {
+
+         return null;
 
       } else {
 
@@ -5625,7 +5665,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    @Override
    public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
 
-      if (_isLayoutFlat) {
+      if (_isLayoutTable) {
 
          _viewerContainer_Table.setRedraw(false);
          {
@@ -5649,6 +5689,12 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          _viewerContainer_Table.setRedraw(true);
 
          return _tourViewer_Table;
+
+      } else if(_isLayoutNatTable){
+
+         setupTourViewerContent();
+
+         return null;
 
       } else {
 
@@ -5682,7 +5728,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       _lazyTourProvider.resetTourItems();
 
-      if (_isLayoutFlat) {
+      if (_isLayoutTable) {
 
          final Table table = _tourViewer_Table.getTable();
          table.setRedraw(false);
@@ -5696,6 +5742,10 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          }
          _isInReload = false;
          table.setRedraw(true);
+
+      } else if (_isLayoutNatTable) {
+
+         setupTourViewerContent();
 
       } else {
 
@@ -5718,7 +5768,13 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
    void reopenFirstSelectedTour() {
 
-      if (_isLayoutFlat) {
+      if (_isLayoutTable) {
+
+         setupTourViewerContent();
+
+      } else if (_isLayoutNatTable) {
+
+         setupTourViewerContent();
 
       } else {
 
@@ -5765,7 +5821,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
    private void reselectTourViewer() {
 
-      if (_isLayoutFlat) {
+      if (_isLayoutTable) {
 
          final int[] stateSelectedTourIndices = Util.getStateIntArray(_state, STATE_SELECTED_TABLE_INDEX, null);
 
@@ -5782,6 +5838,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          if (horizontalBar != null) {
             horizontalBar.setSelection(0);
          }
+
+      } else if (_isLayoutNatTable) {
 
       } else {
 
@@ -5895,28 +5953,41 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _isCollapseOthers = Util.getStateBoolean(_state,
             STATE_LINK_AND_COLLAPSE_ALL_OTHER_ITEMS,
             STATE_LINK_AND_COLLAPSE_ALL_OTHER_ITEMS_DEFAULT);
+
       /*
        * View layout
        */
-      _viewLayout = (TourBookViewLayout) Util.getStateEnum(_state,
-            STATE_VIEW_LAYOUT,
-            TourBookViewLayout.CATEGORY_MONTH);
+      _viewLayout = (TourBookViewLayout) Util.getStateEnum(_state, STATE_VIEW_LAYOUT, TourBookViewLayout.CATEGORY_MONTH);
 
-      final String viewLayoutImage;
+      String viewLayoutImage = null;
+
       if (_viewLayout == TourBookViewLayout.CATEGORY_MONTH) {
 
          viewLayoutImage = Messages.Image__TourBook_Month;
-         _isLayoutFlat = false;
+
+         _isLayoutTable = false;
+         _isLayoutNatTable = false;
 
       } else if (_viewLayout == TourBookViewLayout.CATEGORY_WEEK) {
 
          viewLayoutImage = Messages.Image__TourBook_Week;
-         _isLayoutFlat = false;
 
-      } else {
+         _isLayoutTable = false;
+         _isLayoutNatTable = false;
 
-         viewLayoutImage = Messages.Image__TourBook_Flat;
-         _isLayoutFlat = true;
+      } else if (_viewLayout == TourBookViewLayout.TABLE) {
+
+         viewLayoutImage = Messages.Image__TourBook_Table;
+
+         _isLayoutTable = true;
+         _isLayoutNatTable = false;
+
+      } else if (_viewLayout == TourBookViewLayout.NAT_TABLE) {
+
+         viewLayoutImage = Messages.Image__TourBook_NatTable;
+
+         _isLayoutTable = false;
+         _isLayoutNatTable = true;
       }
 
       _actionToggleViewLayout.setImageDescriptor(TourbookPlugin.getImageDescriptor(viewLayoutImage));
@@ -5984,7 +6055,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
    private void selectTour(final long tourId) {
 
-      if (_isLayoutFlat) {
+      if (_isLayoutTable || _isLayoutNatTable) {
 
          // for performance reasons a tour cannot be selected by it's ID only by table index
          // todo: get table index from db
@@ -6127,7 +6198,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    @Override
    public void setFocus() {
 
-      if (_isLayoutFlat) {
+      if (_isLayoutTable) {
 
          final Table table = _tourViewer_Table.getTable();
 
@@ -6136,6 +6207,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          }
 
          table.setFocus();
+
+      } else if (_isLayoutNatTable) {
 
       } else {
 
@@ -6156,7 +6229,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
    private void setupTourViewerContent() {
 
-      if (_isLayoutFlat) {
+      if (_isLayoutTable) {
 
          /*
           * There have been different exceptions depending on the sequence of the viewer methods
@@ -6179,6 +6252,10 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          }
          _tourViewer_Table.getTable().setRedraw(true);
 
+      } else if (_isLayoutNatTable) {
+
+         _pageBook.showPage(_viewerContainer_NatTable);
+
       } else {
 
          if (_rootItem_Tree != null) {
@@ -6199,31 +6276,44 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
    }
 
-   private void toggleLayout_Flat() {
-
-      _viewLayout = TourBookViewLayout.FLAT;
-
-      _actionToggleViewLayout.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TourBook_Flat));
-
-      _isLayoutFlat = true;
-   }
-
-   private void toggleLayout_Month() {
+   private void toggleLayout_Category_Month() {
 
       _viewLayout = TourBookViewLayout.CATEGORY_MONTH;
 
       _actionToggleViewLayout.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TourBook_Month));
 
-      _isLayoutFlat = false;
+      _isLayoutTable = false;
+      _isLayoutNatTable = false;
    }
 
-   private void toggleLayout_Week() {
+   private void toggleLayout_Category_Week() {
 
       _viewLayout = TourBookViewLayout.CATEGORY_WEEK;
 
       _actionToggleViewLayout.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TourBook_Week));
 
-      _isLayoutFlat = false;
+      _isLayoutTable = false;
+      _isLayoutNatTable = false;
+   }
+
+   private void toggleLayout_NatTable() {
+
+      _viewLayout = TourBookViewLayout.NAT_TABLE;
+
+      _actionToggleViewLayout.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TourBook_NatTable));
+
+      _isLayoutNatTable = true;
+      _isLayoutTable = false;
+   }
+
+   private void toggleLayout_Table() {
+
+      _viewLayout = TourBookViewLayout.TABLE;
+
+      _actionToggleViewLayout.setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TourBook_Table));
+
+      _isLayoutTable = true;
+      _isLayoutNatTable = false;
    }
 
    @Override

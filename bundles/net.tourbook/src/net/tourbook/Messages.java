@@ -1083,9 +1083,10 @@ public class Messages extends NLS {
    public static String        Image__Tour;
    public static String        Image__Tour_Duplicate;
    public static String        Image__Tour_Duplicate_disabled;
-   public static String        Image__TourBook_Flat;
    public static String        Image__TourBook_Month;
+   public static String        Image__TourBook_NatTable;
    public static String        Image__TourBook_SelectAll;
+   public static String        Image__TourBook_Table;
    public static String        Image__TourBook_Week;
    public static String        Image__TourFilter;
    public static String        Image__TourFilter_Disabled;
