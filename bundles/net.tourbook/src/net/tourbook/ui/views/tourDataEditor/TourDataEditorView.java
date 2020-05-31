@@ -5872,6 +5872,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _secondColumnControls.clear();
       _firstColumnContainerControls.clear();
 
+      /*
+       * Tour MUST be set clean otherwise a Ctrl+W whould "close" the tour editor but closing the
+       * app is asking to save the tour!
+       */
+      setTourClean();
+
       super.dispose();
    }
 
@@ -6243,6 +6249,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    private void enableControls() {
 
+      final Table timeSliceTable = _timeSlice_Viewer.getTable();
+      if (timeSliceTable.isDisposed()) {
+         return;
+      }
+
       final boolean canEdit = _isEditMode && isTourInDb();
       final boolean isManualAndEdit = _isManualTour && canEdit;
       final boolean isDeviceTour = _isManualTour == false;
@@ -6306,7 +6317,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _linkTag.setEnabled(canEdit);
       _linkTourType.setEnabled(canEdit);
 
-      _timeSlice_Viewer.getTable().setEnabled(isDeviceTour);
+      timeSliceTable.setEnabled(isDeviceTour);
    }
 
    private void fillContextMenu_SwimSlice(final IMenuManager menuMgr) {
@@ -8964,6 +8975,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     * Update title of the view with the modified date/time
     */
    private void updateUI_Title() {
+
+      if (_dtTourDate.isDisposed()) {
+         return;
+      }
 
       final ZoneId zoneId = _tourData == null //
             ? TimeTools.getDefaultTimeZone()

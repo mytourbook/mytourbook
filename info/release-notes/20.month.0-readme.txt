@@ -7,11 +7,14 @@ TODO's
   - csv export: export new column(s) in tourbook view
  
 
-New + Improvements
-==================
+New
+===
 
 * Tour Book view
-  - Show tours in a flat view (not categorized by year/month/week)
+  - Show tours in a not categorized view (not categorized by year/month/week)
+
+Improvements
+============
 
 * Calendar view
   - Tour pulse/power average values are displayed in the tour (day) content cell
@@ -27,6 +30,10 @@ New + Improvements
   
 * Dialog Adjust Elevation
   - Show elevation gain/loss values before and after the adjustment, supported adjustment type: "Approach elevation with SRTM data"  
+
+* Keyboard shortcuts
+  - Ctrl+W - Close current view or tour  
+  - Ctrl+Shift+? - Open all directory views with a key shortcut
 
 Import
 ======
