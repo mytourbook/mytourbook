@@ -47,5 +47,4 @@ public class TableColumnDefinition extends ColumnDefinition {
    public void setTableColumn(final TableColumn tableColumn) {
       _tableColumn = tableColumn;
    }
-
 }

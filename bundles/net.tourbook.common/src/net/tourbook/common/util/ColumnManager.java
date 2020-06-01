@@ -1432,7 +1432,7 @@ public class ColumnManager {
     *
     * @return Returns ALL columns, first the visible then the hidden columns.
     */
-   private ArrayList<ColumnDefinition> getRearrangedColumns() {
+   public ArrayList<ColumnDefinition> getRearrangedColumns() {
 
       final ArrayList<ColumnDefinition> allRearrangedColumns = new ArrayList<>();
       final ArrayList<ColumnDefinition> allColDefClone = new ArrayList<>();

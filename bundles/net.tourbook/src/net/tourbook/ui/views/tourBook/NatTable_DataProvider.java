@@ -19,6 +19,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -26,19 +27,20 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadFactory;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.util.ColumnDefinition;
+import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.SQL;
-import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TableColumnFactory;
 
-import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.nebula.widgets.nattable.NatTable;
 
-public class LazyTourProvider {
+public class NatTable_DataProvider {
 
    private static final char                              NL                   = net.tourbook.common.UI.NEW_LINE;
 
-   private static final int                               FETCH_SIZE           = 500;
+   private static final int                               FETCH_SIZE           = 1000;
 
    private ConcurrentHashMap<Integer, Integer>            _pageNumbers_Fetched = new ConcurrentHashMap<>();
    private ConcurrentHashMap<Integer, LazyTourLoaderItem> _pageNumbers_Loading = new ConcurrentHashMap<>();
@@ -67,27 +69,52 @@ public class LazyTourProvider {
       _loadingExecutor = Executors.newSingleThreadExecutor(threadFactory);
    }
 
-   private String       _sqlSortField;
-   private String       _sqlSortDirection;
+   private String              _sqlSortField;
+   private String              _sqlSortDirection;
 
-   /**
-    * Number of all tours for the current lazy loader
-    */
-   private int          _numAllTourItems;
+   ArrayList<ColumnDefinition> allSortedColumns;
+   int                         numVisibleColumns;
 
-   private TourBookView _tourBookView;
+   ColumnManager               columnManager;
 
-   LazyTourProvider(final TourBookView tourBookView) {
+   private int                 _numAllTourItems = -1;
+
+   private TourBookView        _tourBookView;
+
+   public NatTable_DataProvider(final TourBookView tourBookView, final ColumnManager columnManager) {
 
       _tourBookView = tourBookView;
+      this.columnManager = columnManager;
+
+      createColumnHeaderData();
    }
 
-   void dispose() {
+   void cleanup_Tours() {
 
-      resetTourItems();
+      _numAllTourItems = -1;
    }
 
-   private int fetchNumberOfItems() {
+   private void createColumnHeaderData() {
+
+      allSortedColumns = columnManager.getRearrangedColumns();
+
+      numVisibleColumns = 0;
+
+      for (final ColumnDefinition colDef : allSortedColumns) {
+
+         if (colDef.isColumnDisplayed()) {
+
+            // ignore special column
+            if (colDef.getColumnId().equals(TableColumnFactory.DATA_FIRST_COLUMN_ID)) {
+               continue;
+            }
+
+            numVisibleColumns++;
+         }
+      }
+   }
+
+   private int fetchNumberOfTours() {
 
       final SQLFilter sqlFilter = new SQLFilter(SQLFilter.TAG_FILTER);
 
@@ -129,14 +156,20 @@ public class LazyTourProvider {
    /**
     * @return Returns number of all tours for the current lazy loader
     */
-   int getNumberOfItems() {
+   int getNumberOfTours() {
 
-      _numAllTourItems = fetchNumberOfItems();
+      if (_numAllTourItems == -1) {
+         _numAllTourItems = fetchNumberOfTours();
+      }
 
       return _numAllTourItems;
    }
 
-   TreeViewerItem getTour(final int index) {
+   /**
+    * @param index
+    * @return Returns tour at requested row index or <code>null</code> when not yet available.
+    */
+   TVITourBookTour getTour(final int index) {
 
       final TVITourBookTour loadedTourItem = _fetchedTourItems.get(index);
 
@@ -158,8 +191,6 @@ public class LazyTourProvider {
 
          // tour is currently being loading -> wait until finished loading
 
-         loaderItem.requestedIndices.add(index);
-
          return null;
       }
 
@@ -171,8 +202,6 @@ public class LazyTourProvider {
 
       loaderItem.sqlOffset = fetchKey * FETCH_SIZE;
       loaderItem.fetchKey = fetchKey;
-
-      loaderItem.requestedIndices.add(index);
 
       _pageNumbers_Loading.put(fetchKey, loaderItem);
 
@@ -258,19 +287,15 @@ public class LazyTourProvider {
          /*
           * Update UI
           */
-         final TableViewer tourViewer_Table = _tourBookView.getTourViewer_Table();
+         final NatTable tourViewer_NatTable = _tourBookView.getTourViewer_NatTable();
 
-         tourViewer_Table.getTable().getDisplay().asyncExec(() -> {
+         tourViewer_NatTable.getDisplay()
 
-            for (final Integer index : loaderItem.requestedIndices) {
+               .asyncExec(() -> {
 
-               final TreeViewerItem tableItem = _fetchedTourItems.get(index);
-
-               if (tableItem != null) {
-                  tourViewer_Table.replace(tableItem, index);
-               }
-            }
-         });
+                  // do a simple redraw, would not work with table/tree widget
+                  tourViewer_NatTable.redraw();
+               });
 
 //       TourDatabase.disableRuntimeStatistic(conn);
 

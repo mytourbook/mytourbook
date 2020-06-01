@@ -15,53 +15,41 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourBook;
 
-import net.tourbook.common.util.ColumnManager;
+import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 
-import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
+public class NatTable_DataProvider_ColumnHeader implements IDataProvider {
 
-public class NatTable_TourDataProvider implements IRowDataProvider<TVITourBookTour> {
+   private NatTable_DataProvider _dataProvider;
 
-   private ColumnManager _columnManager;
+   public NatTable_DataProvider_ColumnHeader(final NatTable_DataProvider natTable_DataProvider) {
 
-   public NatTable_TourDataProvider(final ColumnManager columnManager) {
-
-      _columnManager = columnManager;
+      _dataProvider = natTable_DataProvider;
    }
 
    @Override
    public int getColumnCount() {
-      // TODO Auto-generated method stub
-      return 0;
+      return _dataProvider.numVisibleColumns;
    }
 
    @Override
    public Object getDataValue(final int columnIndex, final int rowIndex) {
-      // TODO Auto-generated method stub
-      return null;
+
+      if (columnIndex < 0 || columnIndex >= _dataProvider.numVisibleColumns + 1) {
+         return null;
+      }
+
+      // ignore first column TableColumnFactory.DATA_FIRST_COLUMN_ID
+      return _dataProvider.allSortedColumns.get(columnIndex + 1).getColumnHeaderText(_dataProvider.columnManager);
    }
 
    @Override
    public int getRowCount() {
-      // TODO Auto-generated method stub
-      return 0;
-   }
-
-   @Override
-   public TVITourBookTour getRowObject(final int rowIndex) {
-      // TODO Auto-generated method stub
-      return null;
-   }
-
-   @Override
-   public int indexOfRowObject(final TVITourBookTour rowObject) {
-      // TODO Auto-generated method stub
-      return 0;
+      return 1;
    }
 
    @Override
    public void setDataValue(final int columnIndex, final int rowIndex, final Object newValue) {
-      // TODO Auto-generated method stub
-
+      throw new UnsupportedOperationException();
    }
 
 }

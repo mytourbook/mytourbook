@@ -54,60 +54,61 @@ public class ColumnDefinition implements Cloneable {
    /**
     * Visible name in the modify dialog.
     */
-   private String            _label;
+   private String                 _label;
 
    /**
     * every column in a table must have a unique id
     */
-   private String            _columnId;
+   private String                 _columnId;
 
    /**
     * Visibility status used in the modify dialog, this is used if the dialog is canceled to not
     * touch the visible status
     */
-   private boolean           _isColumnDisplayed;
+   private boolean                _isColumnDisplayed;
 
    /**
     * when <code>true</code> the visibility for this column can be changed
     */
-   private boolean           _canModifyVisibility = true;
+   private boolean                _canModifyVisibility = true;
 
-   protected int             _style;
+   protected int                  _style;
 
-   private CellLabelProvider _cellLabelProvider;
+   private CellLabelProvider      _cellLabelProvider;
+   private NatTable_LabelProvider _natTable_LabelProvider;
 
-   private String            _columnCategory;
-   private String            _columnHeaderText;
-   private String            _columnToolTipText;
+   private String                 _columnCategory;
+   private String                 _columnHeaderText;
+   private String                 _columnToolTipText;
 
-   private String            _columnUnit;
-   private int               _columnWidth;
+   private String                 _columnUnit;
+   private int                    _columnWidth;
 
-   private boolean           _isColumnResizable   = true;
-   private boolean           _isColumnMoveable    = true;
+   private boolean                _isColumnResizable   = true;
+   private boolean                _isColumnMoveable    = true;
 
-   private ControlListener   _columnControlListener;
-   private SelectionListener _columnSelectionListener;
+   private ControlListener        _columnControlListener;
+   private SelectionListener      _columnSelectionListener;
 
-   private int               _createIndex;
+   private int                    _createIndex;
 
    /**
     * when <code>true</code> this column will be checked in the modify dialog when the default
     * button is selected
     */
-   private boolean           _isDefaultColumn     = false;
+   private boolean                _isDefaultColumn     = false;
 
-   private int               _defaultColumnWidth;
+   private int                    _defaultColumnWidth;
 
    /**
     * column will have the width 0 to be hidden, this is necessary that the first visible column can
     * be right aligned
     */
-   private boolean           _isColumnHidden      = false;
+   private boolean                _isColumnHidden      = false;
 
-   private EditingSupport    _editingSupport;
+   private EditingSupport         _editingSupport;
 
-   private ColumnLayoutData  _columnLayoutData;
+   private ColumnLayoutData       _columnLayoutData;
 
    /*
     * Value formatter
@@ -247,7 +248,7 @@ public class ColumnDefinition implements Cloneable {
       String columnHeaderText = _columnHeaderText;
 
       // add annotations to this text
-      if (columnManager.isShowColumnAnnotations() //
+      if (columnManager.isShowColumnAnnotations()
             && (_defaultValueFormat_Category != null || _defaultValueFormat_Detail != null)) {
 
          if (_columnHeaderText == null) {
@@ -315,6 +316,13 @@ public class ColumnDefinition implements Cloneable {
 
    public EditingSupport getEditingSupport() {
       return _editingSupport;
+   }
+
+   /**
+    * @return the _natTable_LabelProvider
+    */
+   public NatTable_LabelProvider getNatTable_LabelProvider() {
+      return _natTable_LabelProvider;
    }
 
    public ValueFormat getValueFormat_Category() {
@@ -424,6 +432,26 @@ public class ColumnDefinition implements Cloneable {
     * @param cell
     * @param value
     * @param isDetail
+    * @return
+    */
+   public String printDoubleValue(final double value) {
+
+      if (value == 0) {
+
+         return UI.EMPTY_STRING;
+
+      } else {
+
+         return getValueFormatter_Detail().printDouble(value);
+      }
+   }
+
+   /**
+    * Print double value with a value formatter.
+    *
+    * @param cell
+    * @param value
+    * @param isDetail
     */
    public void printDoubleValue(final ViewerCell cell, final double value, final boolean isDetail) {
 
@@ -448,6 +476,25 @@ public class ColumnDefinition implements Cloneable {
     * @param value
     * @param isDetail
     */
+   public String printLongValue(final long value) {
+
+      if (value == 0) {
+
+         return UI.EMPTY_STRING;
+
+      } else {
+
+         return getValueFormatter_Detail().printLong(value);
+      }
+   }
+
+   /**
+    * Print long value with a value formatter.
+    *
+    * @param cell
+    * @param value
+    * @param isDetail
+    */
    public void printLongValue(final ViewerCell cell, final long value, final boolean isDetail) {
 
       if (value == 0) {
@@ -461,6 +508,21 @@ public class ColumnDefinition implements Cloneable {
       } else {
 
          cell.setText(getValueFormatter().printLong(value));
+      }
+   }
+
+   /**
+    * Print double value without fraction digits.
+    *
+    * @param cell
+    * @param value
+    */
+   public String printValue_0(final double value) {
+
+      if (value == 0) {
+         return UI.EMPTY_STRING;
+      } else {
+         return _nf0.format(value);
       }
    }
 
@@ -629,6 +691,10 @@ public class ColumnDefinition implements Cloneable {
 
    public void setLabelProvider(final CellLabelProvider cellLabelProvider) {
       _cellLabelProvider = cellLabelProvider;
+   }
+
+   public void setLabelProvider_NatTable(final NatTable_LabelProvider natTable_LabelProvider) {
+      _natTable_LabelProvider = natTable_LabelProvider;
    }
 
    /**

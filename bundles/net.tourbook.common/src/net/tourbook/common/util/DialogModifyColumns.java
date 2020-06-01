@@ -1280,8 +1280,7 @@ public class DialogModifyColumns extends TrayDialog {
                final ValueFormat valueFormat_Category = definedColDef.getDefaultValueFormat_Category();
                final ValueFormat valueFormat_Detail = definedColDef.getDefaultValueFormat_Detail();
 
-               final IValueFormatter valueFormatter_Category = _columnManager
-                     .getValueFormatter(valueFormat_Category);
+               final IValueFormatter valueFormatter_Category = _columnManager.getValueFormatter(valueFormat_Category);
                final IValueFormatter valueFormatter_Detail = _columnManager.getValueFormatter(valueFormat_Detail);
 
                // visible columns in the viewer will be checked
@@ -1313,8 +1312,7 @@ public class DialogModifyColumns extends TrayDialog {
                      }
 
                      final IValueFormatter valueFormatter = _columnManager.getValueFormatter(valueFormat);
-                     final IValueFormatter valueFormatter_Detail = _columnManager
-                           .getValueFormatter(valueFormat_Detail);
+                     final IValueFormatter valueFormatter_Detail = _columnManager.getValueFormatter(valueFormat_Detail);
 
                      colDefClone.setIsColumnDisplayed(currentColDef.isColumnDisplayed());
 
