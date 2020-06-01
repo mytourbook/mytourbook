@@ -2,6 +2,7 @@
 bin
 dist/
 target/
+secret-keys/
 repositories/
 
 **/node_modules/

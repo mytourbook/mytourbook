@@ -7,9 +7,11 @@ plugins {
 def _mtVersionRaw                = project(':mytourbook').ext.myTourbookVersion      // '18.2.0'
 def _mtVersion                   = _mtVersionRaw.replaceAll('\'', '')                // 18.2.0
 
+def _dirBuildFiles               = file('../../../../mytourbook-BUILD-autocreated/core')
 def _dirProductBuilt             = file('../build.net.tourbook.product/target/products')
 def _dirProductArchive           = file('../../../../mytourbook-PRODUCT/' + _mtVersion)
 def _dirProductReleaseNotes      = file('../../info/release-notes')
+def _dirSecretKeys               = file('../../secret-keys')
 def _pathProductArchive          = _dirProductArchive.absolutePath
                                  
 def _dirWinInnoSetup             = file('../../INSTALL-UPDATES/installer-net.tourbook/win-Inno.Setup')
@@ -36,6 +38,7 @@ task mt_0_Build
 mt_0_Build.dependsOn( 
 
    'mt_10_CreateBuildFiles',
+   'mt_11_InsertDropboxAppKeys',
    'mt_20_BuildProduct',
    'mt_30_CopyProduct',
    'mt_40_ExtractWinFiles',
@@ -56,6 +59,80 @@ task mt_10_CreateBuildFiles {
    dependsOn('create-build-files')
 }
 
+/*
+* 1. a) Insert the Dropbox MyTourbook app client_id and secret_id from a local file.
+* Note: The build will fail if the values were not found.
+* The file is expected to be here : secret-keys/dropbox.txt
+* with this format :
+* client_id={value}
+* secret_id={value}
+*
+* IMPORTANT: DO NOT COMMIT THE CLIENT_ID & SECRET_ID KEYS TO GITHUB!!!!
+*/
+task mt_11_InsertDropboxAppKeys {
+
+  ext.convertStringToCharArray = { stringToConvert ->
+
+	def charArray="";
+
+     	for (int index = 0; index < stringToConvert.length(); ++index) {
+		   charArray += '\''
+		   charArray += stringToConvert.charAt(index)
+		   charArray += '\''
+		   if (index < stringToConvert.length() -1) {
+		   	charArray += ', '
+		   }
+		}
+
+	return charArray
+    }
+
+  doLast {
+
+      def Properties dropboxKeys = new Properties()
+      def clientId;
+      def secretId; 
+      def clientIdCharArray;
+      def secretIdCharArray; 
+      def dropboxKeysFilename = 'dropbox.txt'
+      
+      def dropboxKeysFile = file(_dirSecretKeys.absolutePath + '/' + dropboxKeysFilename)
+      def prefPageDropboxDirectoryPath = file(_dirBuildFiles.absolutePath + '/net.tourbook.cloud/src/net/tourbook/cloud/dropbox')
+      def prefPageDropboxFileName = 'PrefPageDropbox.java'
+      def prefPageDropboxFile = file(prefPageDropboxDirectoryPath.absolutePath + '/' + prefPageDropboxFileName)
+
+      if (dropboxKeysFile.exists() && dropboxKeysFile.canRead()) {
+      
+	 // Extract the keys
+	 dropboxKeys.load(new FileInputStream(dropboxKeysFile))
+
+ 	 if (dropboxKeys!=null && dropboxKeys.containsKey('client_id') && dropboxKeys.containsKey('secret_id')) {
+
+	 clientId = dropboxKeys['client_id']
+	 secretId = dropboxKeys['secret_id']
+	}
+
+	if (prefPageDropboxFile.exists() && prefPageDropboxFile.canWrite()) {
+		clientIdCharArray=convertStringToCharArray(clientId)
+		secretIdCharArray=convertStringToCharArray(secretId)
+
+      		// Copy the keys into the Java code
+		ant.replaceregexp(match:'\'c\', \'l\', \'i\', \'e\', \'n\', \'t\'', replace:clientIdCharArray, flags:'g', byline:true) {
+        		fileset(dir: prefPageDropboxDirectoryPath, includes: prefPageDropboxFileName)
+		}
+		ant.replaceregexp(match:'\'s\', \'e\', \'c\', \'r\', \'e\', \'t\'', replace:secretIdCharArray, flags:'g', byline:true) {
+        		fileset(dir: prefPageDropboxDirectoryPath, includes: prefPageDropboxFileName)
+		}
+	}
+
+        println "\t ${STOPHERE} copied"
+      } else {
+
+ 	 ant.fail('The file containing the dropbox secret key is missing!')
+      }
+   }
+
+}
 
 /*
 * 2. Build product with maven/tycho
@@ -109,6 +186,8 @@ task mt_30_CopyProduct {
       }
    }
 }
+
+//TODO FB obfsucate ONLY the dropbox prefpage class
 
 
 /*
