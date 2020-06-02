@@ -35,9 +35,9 @@ public interface IOAuth2Constants {
    String PARAM_CLIENT_SECRET = "client_secret"; //$NON-NLS-1$
 
    /**
-    * PARAM_CODE
+    * PARAM_TOKEN
     */
-   String PARAM_CODE          = "code";          //$NON-NLS-1$
+   String PARAM_TOKEN         = "token";         //$NON-NLS-1$
 
    /**
     * PARAM_GRANT_TYPE

@@ -19,22 +19,11 @@ package net.tourbook.cloud.oauth2;
  */
 public class OAuth2Client {
 
-   private String accessTokenUrl;
-
    private String authorizeUrl;
 
-   private char[] id;
+   private String id;
 
    private String redirectUri;
-
-   private char[] secret;
-
-   /**
-    * @return accessTokenUrl
-    */
-   public String getAccessTokenUrl() {
-      return accessTokenUrl;
-   }
 
    /**
     * @return authorizeUrl
@@ -46,7 +35,7 @@ public class OAuth2Client {
    /**
     * @return id
     */
-   public char[] getId() {
+   public String getId() {
       return id;
    }
 
@@ -55,20 +44,6 @@ public class OAuth2Client {
     */
    public String getRedirectUri() {
       return redirectUri;
-   }
-
-   /**
-    * @return secret
-    */
-   public char[] getSecret() {
-      return secret;
-   }
-
-   /**
-    * @param accessTokenUrl
-    */
-   public void setAccessTokenUrl(final String accessTokenUrl) {
-      this.accessTokenUrl = accessTokenUrl;
    }
 
    /**
@@ -82,7 +57,7 @@ public class OAuth2Client {
     * @param id
     * @return this client
     */
-   public OAuth2Client setId(final char[] id) {
+   public OAuth2Client setId(final String id) {
       this.id = id;
       return this;
    }
@@ -93,15 +68,6 @@ public class OAuth2Client {
     */
    public OAuth2Client setRedirectUri(final String redirectUri) {
       this.redirectUri = redirectUri;
-      return this;
-   }
-
-   /**
-    * @param secret
-    * @return this client
-    */
-   public OAuth2Client setSecret(final char[] secret) {
-      this.secret = secret;
       return this;
    }
 }

@@ -44,7 +44,7 @@ public class OAuth2Utils {
             client.getId().toString()));
       params.add(new BasicNameValuePair(
             IOAuth2Constants.RESPONSE_TYPE,
-            IOAuth2Constants.PARAM_CODE));
+            IOAuth2Constants.PARAM_TOKEN));
 
       final String query = URLEncodedUtils.format(params, StandardCharsets.UTF_8);
       return client.getAuthorizeUrl() + '?' + query;
