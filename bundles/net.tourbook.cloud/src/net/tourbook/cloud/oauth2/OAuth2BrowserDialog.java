@@ -26,7 +26,6 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.LocationAdapter;
@@ -153,18 +152,7 @@ public class OAuth2BrowserDialog extends Dialog {
       return true;
    }
 
-   /**
-    * Get code for client, scope, and shell
-    *
-    * @param client
-    * @param shell
-    * @return code
-    */
-   public String requestAccessToken() {
-
-      if (open() == Window.OK) {
-         return token;
-      }
-      return null;
+   public String getToken() {
+      return token;
    }
 }

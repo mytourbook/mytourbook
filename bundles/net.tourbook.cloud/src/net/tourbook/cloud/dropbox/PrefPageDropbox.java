@@ -158,7 +158,11 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
 
       final OAuth2BrowserDialog oAuth2Browser = new OAuth2BrowserDialog(client);
       //Opens the dialog
-      final String token = oAuth2Browser.requestAccessToken();
+      if (oAuth2Browser.open() != Window.OK) {
+         return;
+      }
+
+      final String token = oAuth2Browser.getToken();
       final String dialogMessage = StringUtils.isNullOrEmpty(token) ? NLS.bind(Messages.Pref_CloudConnectivity_Dropbox_AccessToken_NotRetrieved,
             oAuth2Browser.getResponse()) : Messages.Pref_CloudConnectivity_Dropbox_AccessToken_Retrieved;
 
