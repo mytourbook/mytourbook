@@ -75,7 +75,7 @@ public class DropboxFileSystem extends TourbookFileSystem {
    }
 
    /**
-    * Closes the Dropbox Java 7 FileSystem.
+    * Closes the Dropbox Java 8 FileSystem.
     * This function will be called whenever the user
     * stops the folder watch or quits MyTourbook.
     */
@@ -168,11 +168,7 @@ public class DropboxFileSystem extends TourbookFileSystem {
     */
    @Override
    protected FileSystem getFileSystem() {
-      if (_dropboxFileSystem != null) {
-         return _dropboxFileSystem;
-      }
-
-      return null;
+      return _dropboxFileSystem;
    }
 
    /**
