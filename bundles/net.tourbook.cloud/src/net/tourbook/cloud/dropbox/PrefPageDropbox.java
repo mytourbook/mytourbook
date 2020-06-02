@@ -140,10 +140,6 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
 
       final OAuth2Client client = new OAuth2Client();
 
-      //As recommended :
-      //First step, you should change your password-handling from String to character array.
-      //Source https://stackoverflow.com/questions/12937641/handling-passwords-used-for-auth-in-source-code
-
       // Per Dropbox recommendation :
       // "The app key is considered public and does not need to be protected."
       // source https://www.dropboxforum.com/t5/Dropbox-API-Support-Feedback/Proper-way-of-handling-APP-KEY-and-APP-SECRET/m-p/410478
