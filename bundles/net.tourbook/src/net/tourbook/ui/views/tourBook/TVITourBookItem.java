@@ -35,7 +35,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
    static ZonedDateTime calendar8 = ZonedDateTime.now().with(TimeTools.calendarWeek.dayOfWeek(), 1);
 
-   static final String  SQL_ALL_TOUR_FIELDS;
+   public static final String SQL_ALL_TOUR_FIELDS;
    static final String  SQL_ALL_OTHER_FIELDS;
 
    static final String  SQL_SUM_COLUMNS;
@@ -274,7 +274,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
    String       treeColumn;
 
-   int          col_Sequence;
+   public int   col_Sequence;
 
    int          tourYear;
 
@@ -422,7 +422,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
     * @return
     * @throws SQLException
     */
-   static TVITourBookTour readTourItems(final ResultSet result,
+   public static TVITourBookTour readTourItems(final ResultSet result,
                                         final TVITourBookTour tourItem) throws SQLException {
 
 // SET_FORMATTING_OFF

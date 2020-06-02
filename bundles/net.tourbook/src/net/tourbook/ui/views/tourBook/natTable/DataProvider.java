@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.views.tourBook;
+package net.tourbook.ui.views.tourBook.natTable;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -33,10 +33,14 @@ import net.tourbook.common.util.SQL;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TableColumnFactory;
+import net.tourbook.ui.views.tourBook.LazyTourLoaderItem;
+import net.tourbook.ui.views.tourBook.TVITourBookItem;
+import net.tourbook.ui.views.tourBook.TVITourBookTour;
+import net.tourbook.ui.views.tourBook.TourBookView;
 
 import org.eclipse.nebula.widgets.nattable.NatTable;
 
-public class NatTable_DataProvider {
+public class DataProvider {
 
    private static final char                              NL                   = net.tourbook.common.UI.NEW_LINE;
 
@@ -57,7 +61,7 @@ public class NatTable_DataProvider {
          @Override
          public Thread newThread(final Runnable r) {
 
-            final Thread thread = new Thread(r, "LazyTourProvider: Loading tours");//$NON-NLS-1$
+            final Thread thread = new Thread(r, "NatTable DataProvider: Loading tours");//$NON-NLS-1$
 
             thread.setPriority(Thread.MIN_PRIORITY);
             thread.setDaemon(true);
@@ -69,19 +73,19 @@ public class NatTable_DataProvider {
       _loadingExecutor = Executors.newSingleThreadExecutor(threadFactory);
    }
 
-   private String              _sqlSortField;
-   private String              _sqlSortDirection;
+   private String                     _sqlSortField;
+   private String                     _sqlSortDirection;
 
-   ArrayList<ColumnDefinition> allSortedColumns;
-   int                         numVisibleColumns;
+   public ArrayList<ColumnDefinition> allSortedColumns;
+   int                                numVisibleColumns;
 
-   ColumnManager               columnManager;
+   ColumnManager                      columnManager;
 
-   private int                 _numAllTourItems = -1;
+   private int                        _numAllTourItems = -1;
 
-   private TourBookView        _tourBookView;
+   private TourBookView               _tourBookView;
 
-   public NatTable_DataProvider(final TourBookView tourBookView, final ColumnManager columnManager) {
+   public DataProvider(final TourBookView tourBookView, final ColumnManager columnManager) {
 
       _tourBookView = tourBookView;
       this.columnManager = columnManager;
@@ -89,7 +93,7 @@ public class NatTable_DataProvider {
       createColumnHeaderData();
    }
 
-   void cleanup_Tours() {
+   public void cleanup_Tours() {
 
       _numAllTourItems = -1;
    }
@@ -309,7 +313,7 @@ public class NatTable_DataProvider {
       return true;
    }
 
-   void resetTourItems() {
+   public void resetTourItems() {
 
       for (final TVITourBookTour tourItem : _fetchedTourItems.values()) {
          tourItem.clearChildren();
@@ -320,7 +324,7 @@ public class NatTable_DataProvider {
       _pageNumbers_Loading.clear();
    }
 
-   void setSortColumn(final String sortColumnId, final int sortDirection) {
+   public void setSortColumn(final String sortColumnId, final int sortDirection) {
 
       // cleanup old fetched tours
       resetTourItems();

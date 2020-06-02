@@ -90,6 +90,9 @@ import net.tourbook.ui.views.geoCompare.GeoPartComparerItem;
 import net.tourbook.ui.views.rawData.ActionMergeTour;
 import net.tourbook.ui.views.rawData.Action_Reimport_SubMenu;
 import net.tourbook.ui.views.rawData.SubMenu_AdjustTourValues;
+import net.tourbook.ui.views.tourBook.natTable.DataProvider;
+import net.tourbook.ui.views.tourBook.natTable.DataProvider_ColumnHeader;
+import net.tourbook.ui.views.tourBook.natTable.DataProvider_Tour;
 
 import org.eclipse.core.runtime.Path;
 import org.eclipse.e4.ui.di.PersistState;
@@ -125,6 +128,10 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.nebula.widgets.nattable.NatTable;
+import org.eclipse.nebula.widgets.nattable.config.AbstractRegistryConfiguration;
+import org.eclipse.nebula.widgets.nattable.config.CellConfigAttributes;
+import org.eclipse.nebula.widgets.nattable.config.DefaultNatTableStyleConfiguration;
+import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.nebula.widgets.nattable.grid.data.DefaultCornerDataProvider;
@@ -134,13 +141,18 @@ import org.eclipse.nebula.widgets.nattable.grid.layer.CornerLayer;
 import org.eclipse.nebula.widgets.nattable.grid.layer.DefaultRowHeaderDataLayer;
 import org.eclipse.nebula.widgets.nattable.grid.layer.GridLayer;
 import org.eclipse.nebula.widgets.nattable.grid.layer.RowHeaderLayer;
+import org.eclipse.nebula.widgets.nattable.hover.HoverLayer;
 import org.eclipse.nebula.widgets.nattable.layer.DataLayer;
 import org.eclipse.nebula.widgets.nattable.layer.ILayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.selection.command.SelectRowsCommand;
 import org.eclipse.nebula.widgets.nattable.selection.config.DefaultRowSelectionLayerConfiguration;
+import org.eclipse.nebula.widgets.nattable.style.CellStyleAttributes;
+import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
+import org.eclipse.nebula.widgets.nattable.style.Style;
 import org.eclipse.nebula.widgets.nattable.style.theme.ModernNatTableThemeConfiguration;
 import org.eclipse.nebula.widgets.nattable.style.theme.ThemeConfiguration;
+import org.eclipse.nebula.widgets.nattable.util.GUIHelper;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -177,39 +189,41 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
    static public final String            ID                                              = "net.tourbook.views.tourListView";         //$NON-NLS-1$
 
+   private final static IPreferenceStore _prefStore                                      = TourbookPlugin.getPrefStore();
+
+   private final static IPreferenceStore _prefStoreCommon                                = CommonActivator.getPrefStore();
+
+   //
+   private static final IDialogSettings _state                                          = TourbookPlugin.getState(ID);
+
 // SET_FORMATTING_ON
 
-   private final static IPreferenceStore _prefStore                                      = TourbookPlugin.getPrefStore();
-   private final static IPreferenceStore _prefStoreCommon                                = CommonActivator.getPrefStore();
+   private static final IDialogSettings _state_Table                                    = TourbookPlugin.getState(ID + "_TABLE");    //$NON-NLS-1$
+   private static final IDialogSettings _state_Tree                                     = TourbookPlugin.getState(ID + "_TREE");     //$NON-NLS-1$
    //
-   private static final IDialogSettings  _state                                          = TourbookPlugin.getState(ID);
-   private static final IDialogSettings  _state_Table                                    = TourbookPlugin.getState(ID + "_TABLE");    //$NON-NLS-1$
-   private static final IDialogSettings  _state_Tree                                     = TourbookPlugin.getState(ID + "_TREE");     //$NON-NLS-1$
+   private static final String          STATE_CSV_EXPORT_PATH                           = "STATE_CSV_EXPORT_PATH";                   //$NON-NLS-1$
    //
-   private static final String           STATE_CSV_EXPORT_PATH                           = "STATE_CSV_EXPORT_PATH";                   //$NON-NLS-1$
+   private static final String          STATE_IS_LINK_WITH_OTHER_VIEWS                  = "STATE_IS_LINK_WITH_OTHER_VIEWS";          //$NON-NLS-1$
+   private static final String          STATE_IS_SELECT_YEAR_MONTH_TOURS                = "STATE_IS_SELECT_YEAR_MONTH_TOURS";        //$NON-NLS-1$
+   static final String                  STATE_IS_SHOW_SUMMARY_ROW                       = "STATE_IS_SHOW_SUMMARY_ROW";               //$NON-NLS-1$
+   static final String                  STATE_LINK_AND_COLLAPSE_ALL_OTHER_ITEMS         = "STATE_LINK_AND_COLLAPSE_ALL_OTHER_ITEMS"; //$NON-NLS-1$
+   private static final String          STATE_SELECTED_TABLE_INDEX                      = "STATE_SELECTED_TABLE_INDEX";              //$NON-NLS-1$
+   private static final String          STATE_SELECTED_MONTH                            = "STATE_SELECTED_MONTH";                    //$NON-NLS-1$
+   private static final String          STATE_SELECTED_TOURS                            = "STATE_SELECTED_TOURS";                    //$NON-NLS-1$
+   private static final String          STATE_SELECTED_YEAR                             = "STATE_SELECTED_YEAR";                     //$NON-NLS-1$
+   private static final String          STATE_VIEW_LAYOUT                               = "STATE_VIEW_LAYOUT";                       //$NON-NLS-1$
    //
-   private static final String           STATE_IS_LINK_WITH_OTHER_VIEWS                  = "STATE_IS_LINK_WITH_OTHER_VIEWS";          //$NON-NLS-1$
-   private static final String           STATE_IS_SELECT_YEAR_MONTH_TOURS                = "STATE_IS_SELECT_YEAR_MONTH_TOURS";        //$NON-NLS-1$
-   static final String                   STATE_IS_SHOW_SUMMARY_ROW                       = "STATE_IS_SHOW_SUMMARY_ROW";               //$NON-NLS-1$
-   static final String                   STATE_LINK_AND_COLLAPSE_ALL_OTHER_ITEMS         = "STATE_LINK_AND_COLLAPSE_ALL_OTHER_ITEMS"; //$NON-NLS-1$
-   private static final String           STATE_SELECTED_TABLE_INDEX                      = "STATE_SELECTED_TABLE_INDEX";              //$NON-NLS-1$
-   private static final String           STATE_SELECTED_MONTH                            = "STATE_SELECTED_MONTH";                    //$NON-NLS-1$
-   private static final String           STATE_SELECTED_TOURS                            = "STATE_SELECTED_TOURS";                    //$NON-NLS-1$
-   private static final String           STATE_SELECTED_YEAR                             = "STATE_SELECTED_YEAR";                     //$NON-NLS-1$
-   private static final String           STATE_VIEW_LAYOUT                               = "STATE_VIEW_LAYOUT";                       //$NON-NLS-1$
+   private static final String          STATE_SORT_COLUMN_DIRECTION                     = "STATE_SORT_COLUMN_DIRECTION";             //$NON-NLS-1$
+   private static final String          STATE_SORT_COLUMN_ID                            = "STATE_SORT_COLUMN_ID";                    //$NON-NLS-1$
    //
-   private static final String           STATE_SORT_COLUMN_DIRECTION                     = "STATE_SORT_COLUMN_DIRECTION";             //$NON-NLS-1$
-   private static final String           STATE_SORT_COLUMN_ID                            = "STATE_SORT_COLUMN_ID";                    //$NON-NLS-1$
+   private static final String          CSV_EXPORT_DEFAULT_FILE_NAME                    = "TourBook_";                               //$NON-NLS-1$
    //
-   private static final String           CSV_EXPORT_DEFAULT_FILE_NAME                    = "TourBook_";                               //$NON-NLS-1$
+   static final boolean                 STATE_IS_SHOW_SUMMARY_ROW_DEFAULT               = true;
+   static final boolean                 STATE_LINK_AND_COLLAPSE_ALL_OTHER_ITEMS_DEFAULT = true;
    //
-   static final boolean                  STATE_IS_SHOW_SUMMARY_ROW_DEFAULT               = true;
-   static final boolean                  STATE_LINK_AND_COLLAPSE_ALL_OTHER_ITEMS_DEFAULT = true;
-   //
-   private static final NumberFormat     _nf0;
-   private static final NumberFormat     _nf1;
-   private static final NumberFormat     _nf2;
-
+   private static final NumberFormat    _nf0;
+   private static final NumberFormat    _nf1;
+   private static final NumberFormat    _nf2;
    //
    static {
       _nf0 = NumberFormat.getNumberInstance();
@@ -228,6 +242,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private static TourBookViewLayout      _viewLayout;
    //
    private ColumnManager                  _columnManager_Table;
+
    private ColumnManager                  _columnManager_Tree;
    //
    private OpenDialogManager              _openDlgMgr                      = new OpenDialogManager();
@@ -252,7 +267,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private TVITourBookRoot                _rootItem_Tree;
    //
    private NatTable                       _tourViewer_NatTable;
-   private NatTable_DataProvider          _natTable_DataProvider;
+   private DataProvider                   _natTable_DataProvider;
    private ViewportLayer                  _natTable_Grid_BodyLayer;
    //
    private int                            _selectedYear                    = -1;
@@ -457,9 +472,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
    }
 
-   class ItemComparator_Table /* extends ViewerComparator */ {
+   public class ItemComparator_Table /* extends ViewerComparator */ {
 
-      static final int         ASCENDING  = 0;
+      public static final int  ASCENDING  = 0;
       private static final int DESCENDING = 1;
 
       private String           __sortColumnId;
@@ -928,6 +943,36 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       public int hashCode(final Object element) {
          return 0;
       }
+   }
+
+   public class ModernNatTableThemeConfiguration_MT extends ModernNatTableThemeConfiguration {
+
+      public ModernNatTableThemeConfiguration_MT() {
+
+         super();
+
+         /*
+          * Overwrite default modern theme
+          */
+
+         // hide grid lines
+         this.renderBodyGridLines = false;
+
+         // show selection header with default colors
+         this.cHeaderSelectionBgColor = cHeaderBgColor;
+         this.cHeaderSelectionFgColor = cHeaderFgColor;
+
+//         public static final Color COLOR_LIST_SELECTION = Display.getDefault().getSystemColor(SWT.COLOR_LIST_SELECTION);
+//         public static final Color COLOR_LIST_SELECTION_TEXT = Display.getDefault().getSystemColor(SWT.COLOR_LIST_SELECTION_TEXT);
+
+         // default selection style
+//         this.defaultSelectionBgColor = GUIHelper.COLOR_LIST_SELECTION;
+//         this.defaultSelectionFgColor = GUIHelper.COLOR_LIST_SELECTION_TEXT;
+         this.defaultSelectionBgColor = GUIHelper.COLOR_BLACK;
+         this.defaultSelectionFgColor = GUIHelper.COLOR_YELLOW;
+
+      }
+
    }
 
    void actionExportViewCSV() {
@@ -1505,7 +1550,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
    private void createUI_40_TourViewer_NatTable(final Composite parent) {
 
-      _natTable_DataProvider = new NatTable_DataProvider(this, _columnManager_Table);
+      _natTable_DataProvider = new DataProvider(this, _columnManager_Table);
 
       final String sortColumnId = _tourViewer_Table_Comparator.__sortColumnId;
       final int sortDirection = _tourViewer_Table_Comparator.__sortDirection;
@@ -1515,13 +1560,33 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       /*
        * Create the body layer stack
        */
-      final IRowDataProvider<TVITourBookTour> body_DataProvider = new NatTable_DataProvider_Tour(_natTable_DataProvider);
+      final IRowDataProvider<TVITourBookTour> body_DataProvider = new DataProvider_Tour(_natTable_DataProvider);
       final DataLayer body_DataLayer = new DataLayer(body_DataProvider);
 
+      /*
+       * Create: Hover layer
+       */
+//      final HoverLayer body_HoverLayer = new HoverLayer(body_DataLayer, false);
+//      // we need to ensure that the hover styling is removed when the mouse
+//      // cursor moves out of the cell area
+//      body_HoverLayer.addConfiguration(new SimpleHoverStylingBindings(body_HoverLayer));
+
+//      DataLayer bodyDataLayer = new DataLayer(body_DataProvider);
+      final HoverLayer body_HoverLayer = new HoverLayer(body_DataLayer);
+//      SelectionLayer selectionLayer = new SelectionLayer(hoverLayer);
+//      ViewportLayer viewportLayer = new ViewportLayer(selectionLayer);
+
+      /*
+       * Create: Selection layer
+       */
       // create a SelectionLayer without using the default configuration
       // this enables us to add the row selection configuration cleanly
       // afterwards
-      final SelectionLayer selection_Layer = new SelectionLayer(body_DataLayer, false);
+      final SelectionLayer selection_Layer = new SelectionLayer(body_HoverLayer, false);
+
+      /*
+       * Create: Grid viewport layer
+       */
       _natTable_Grid_BodyLayer = new ViewportLayer(selection_Layer);
 
       // set column widths
@@ -1537,8 +1602,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
          body_DataLayer.setColumnWidthByPosition(colIndex - 1, colDef.getColumnWidth(), false);
       }
-//      body_DataLayer.fireLayerEvent(new ColumnResizeEvent(body_DataLayer, 0));
 
+// have not yet understood how this works !!!
+//
       // use a RowSelectionModel that will perform row selections and is able
       // to identify a row via unique ID
 //      selection_Layer.setSelectionModel(new RowSelectionModel<>(selection_Layer, body_DataProvider, new IRowIdAccessor<Person>() {
@@ -1557,37 +1623,66 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       selection_Layer.addConfiguration(new DefaultRowSelectionLayerConfiguration());
 
       /*
-       * Create the column header layer stack
+       * Create: Column header layer
        */
-      final IDataProvider columnHeader_DataProvider = new NatTable_DataProvider_ColumnHeader(_natTable_DataProvider);
+      final IDataProvider columnHeader_DataProvider = new DataProvider_ColumnHeader(_natTable_DataProvider);
       final DataLayer columnHeader_DataLayer = new DataLayer(columnHeader_DataProvider);
       final ILayer columnHeader_Layer = new ColumnHeaderLayer(columnHeader_DataLayer, _natTable_Grid_BodyLayer, selection_Layer);
 
       /*
-       * Create the row header layer stack
+       * Create: Row header layer
        */
       final DefaultRowHeaderDataProvider rowHeader_DataProvider = new DefaultRowHeaderDataProvider(body_DataProvider);
       final DefaultRowHeaderDataLayer rowHeader_DataLayer = new DefaultRowHeaderDataLayer(rowHeader_DataProvider);
       final ILayer rowHeader_Layer = new RowHeaderLayer(rowHeader_DataLayer, _natTable_Grid_BodyLayer, selection_Layer);
 
       /*
-       * Create the corner layer stack
+       * Create: Corner layer
        */
       final DefaultCornerDataProvider corner_DataProvider = new DefaultCornerDataProvider(columnHeader_DataProvider, rowHeader_DataProvider);
       final DataLayer corner_DataLayer = new DataLayer(corner_DataProvider);
       final ILayer corner_Layer = new CornerLayer(corner_DataLayer, rowHeader_Layer, columnHeader_Layer);
 
       /*
-       * Create the grid layer composed with the prior created layer stacks
+       * Create: Grid layer composed with the prior created layer stacks
        */
       final GridLayer gridLayer = new GridLayer(_natTable_Grid_BodyLayer, columnHeader_Layer, rowHeader_Layer, corner_Layer);
 
       /*
-       * Create table
+       * Create: Table
        */
-      _tourViewer_NatTable = new NatTable(parent, gridLayer);
+      // turn the auto configuration off as we want to add our hover styling configuration
+      _tourViewer_NatTable = new NatTable(parent, gridLayer, false);
 
-      final ThemeConfiguration modernTheme = new ModernNatTableThemeConfiguration();
+      /*
+       * Configure table
+       */
+      // as the autoconfiguration of the NatTable is turned off, we have to add the DefaultNatTableStyleConfiguration manually
+      _tourViewer_NatTable.addConfiguration(new DefaultNatTableStyleConfiguration());
+
+      // add the style configuration for hover
+      _tourViewer_NatTable.addConfiguration(new AbstractRegistryConfiguration() {
+
+         @Override
+         public void configureRegistry(final IConfigRegistry configRegistry) {
+
+            Style style = new Style();
+
+            style.setAttributeValue(CellStyleAttributes.BACKGROUND_COLOR, GUIHelper.COLOR_YELLOW);
+
+            configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, style, DisplayMode.HOVER);
+
+            style = new Style();
+
+            style.setAttributeValue(CellStyleAttributes.BACKGROUND_COLOR, GUIHelper.COLOR_RED);
+
+            configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, style, DisplayMode.SELECT_HOVER);
+         }
+      });
+      _tourViewer_NatTable.configure();
+
+      // overwrite theme with MT's own theme based on the modern theme
+      final ThemeConfiguration modernTheme = new ModernNatTableThemeConfiguration_MT();
       _tourViewer_NatTable.setTheme(modernTheme);
 
       GridDataFactory.fillDefaults().grab(true, true).applyTo(_tourViewer_NatTable);
@@ -7045,6 +7140,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       } else if (_isLayoutNatTable) {
 
+         // select first row -> needs to be improved
          _tourViewer_NatTable.doCommand(new SelectRowsCommand(_natTable_Grid_BodyLayer, 0, 0, false, false));
 
       } else {
@@ -7110,7 +7206,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
             _tourViewer_Tree.setSelection(new StructuredSelection(reselectYearItem) {}, false);
 
-         } else if (rootItems.size() > 0) {
+         } else if (rootItems.size() > 0)
+
+         {
 
             // the old year was not found, select the newest year
 
@@ -7426,6 +7524,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 //               _tourViewer_NatTable.setFocus();
 //            }
 //         });
+
+         _tourViewer_NatTable.setFocus();
 
       } else {
 

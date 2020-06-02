@@ -23,7 +23,7 @@ import net.tourbook.database.TourDatabase;
 
 public class TVITourBookTour extends TVITourBookItem {
 
-   long                    tourId;
+   public long             tourId;
    long                    tourTypeId;
 
    long                    colDateTime_MS;

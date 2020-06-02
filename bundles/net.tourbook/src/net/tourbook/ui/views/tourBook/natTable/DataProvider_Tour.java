@@ -13,18 +13,19 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.views.tourBook;
+package net.tourbook.ui.views.tourBook.natTable;
 
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.NatTable_LabelProvider;
+import net.tourbook.ui.views.tourBook.TVITourBookTour;
 
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 
-public class NatTable_DataProvider_Tour implements IRowDataProvider<TVITourBookTour> {
+public class DataProvider_Tour implements IRowDataProvider<TVITourBookTour> {
 
-   private NatTable_DataProvider _dataProvider;
+   private DataProvider _dataProvider;
 
-   public NatTable_DataProvider_Tour(final NatTable_DataProvider natTable_DataProvider) {
+   public DataProvider_Tour(final DataProvider natTable_DataProvider) {
 
       _dataProvider = natTable_DataProvider;
    }

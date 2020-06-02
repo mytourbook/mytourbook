@@ -21,8 +21,8 @@ import java.util.List;
 
 public class LazyTourLoaderItem {
 
-   int           sqlOffset;
-   int           fetchKey;
+   public int    sqlOffset;
+   public int    fetchKey;
 
    List<Integer> requestedIndices = Collections.synchronizedList(new ArrayList<Integer>());
 
