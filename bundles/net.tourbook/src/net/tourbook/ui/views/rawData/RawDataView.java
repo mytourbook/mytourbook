@@ -1273,7 +1273,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       tooltip = UI.replaceHTML_NewLine(tooltip);
 
-      // shwo red image when off
+      // show red image when off
       final String imageUrl = isWatchingOn //
             ? _imageUrl_Device_TurnOn
             : _imageUrl_Device_TurnOff;
@@ -1521,7 +1521,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                ? Messages.Import_Data_HTML_WatchingOff
                : Messages.Import_Data_HTML_WatchingOn;
 
-         // shwo red image when off
+         // show red image when off
          final String imageUrl = isWatchingOff //
                ? _imageUrl_Device_TurnOff
                : _imageUrl_Device_TurnOn;
@@ -2687,7 +2687,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    }
 
    /**
-    * Defines all columns for the table viewer in the column manager, the sequenze defines the
+    * Defines all columns for the table viewer in the column manager, the sequence defines the
     * default columns
     *
     * @param parent
@@ -4526,7 +4526,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    }
 
    /**
-    * This will also aktivate/deactivate the folder/store watcher.
+    * This will also activate/deactivate the folder/store watcher.
     *
     * @see net.tourbook.common.util.ITourViewer#reloadViewer()
     */
@@ -5187,7 +5187,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
          if (table.isDisposed()) {
 
-            // this occured when testing
+            // this occurred when testing
             return;
          }
 
@@ -5300,7 +5300,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
    /**
     * @param isStartWatching
-    *           When <code>true</code> a new watcher ist restarted, otherwise this thread is
+    *           When <code>true</code> a new watcher is restarted, otherwise this thread is
     *           canceled.
     */
    private void thread_WatchFolders(final boolean isStartWatching) {
