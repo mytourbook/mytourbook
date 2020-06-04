@@ -22,8 +22,8 @@ import java.nio.file.Path;
 
 /**
  * A class to implement and use a File System in MyTourbook.
- * Ths file system can be used by the easyimport manager.
- * 
+ * This file system can be used by the easy import manager.
+ *
  * @author Frédéric Bard
  */
 public abstract class TourbookFileSystem {
@@ -48,6 +48,13 @@ public abstract class TourbookFileSystem {
     * @return The {@link File} of the copied file.
     */
    protected abstract File copyFileLocally(String filePath);
+
+   /**
+    * Gets the absolute path of the root folder of the file system.
+    *
+    * @return
+    */
+   public abstract String getAbsoluteRootPath();
 
    /**
     * Retrieves a list of {@link FileStore} for the file system.
@@ -79,4 +86,12 @@ public abstract class TourbookFileSystem {
    public String getId() {
       return FILE_SYSTEM_ID;
    }
+
+   /**
+    * Gets file system's preference page ID so it can be opened from a menu outside the cloud
+    * plugin.
+    *
+    * @return
+    */
+   public abstract String getPreferencePageId();
 }

@@ -16,6 +16,7 @@ package net.tourbook.cloud.oauth2;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import org.apache.http.NameValuePair;
@@ -25,7 +26,6 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.LocationAdapter;
@@ -46,15 +46,20 @@ public class OAuth2BrowserDialog extends Dialog {
 
    private final String paramName;
 
-   private String       code;
+   private String       token;
+
+   private String       response;
 
    /**
     * @param shell
     * @param url
     * @param redirectUri
     */
-   public OAuth2BrowserDialog(final Shell shell, final String url, final String redirectUri) {
-      this(shell, url, IOAuth2Constants.PARAM_CODE, redirectUri);
+   public OAuth2BrowserDialog(final OAuth2Client client) {
+
+      this(PlatformUI.getWorkbench()
+            .getDisplay()
+            .getActiveShell(), OAuth2Utils.getAuthorizeUrl(client), IOAuth2Constants.PARAM_ACCESS_TOKEN, client.getRedirectUri());
    }
 
    /**
@@ -71,42 +76,6 @@ public class OAuth2BrowserDialog extends Dialog {
       this.url = url;
       paramName = parameterName;
       this.redirectUri = redirectUri;
-   }
-
-   /**
-    * Get code for client and scope
-    *
-    * @param client
-    * @param scope
-    * @return code
-    */
-   public static String getCode(final OAuth2Client client) {
-      return getCode(client,
-            PlatformUI.getWorkbench()
-                  .getDisplay()
-                  .getActiveShell());
-   }
-
-   /**
-    * Get code for client, scope, and shell
-    *
-    * @param client
-    * @param shell
-    * @return code
-    */
-   public static String getCode(final OAuth2Client client,
-                                final Shell shell) {
-      final String url = OAuth2Utils.getAuthorizeUrl(client);
-
-      final OAuth2BrowserDialog dialog =
-            new OAuth2BrowserDialog(
-                  shell,
-                  url,
-                  client.getRedirectUri());
-      if (dialog.open() == Window.OK) {
-         return dialog.getCode();
-      }
-      return null;
    }
 
    @Override
@@ -145,10 +114,12 @@ public class OAuth2BrowserDialog extends Dialog {
             } catch (final URISyntaxException ignored) {
                return;
             }
-            final List<NameValuePair> params = URLEncodedUtils.parse(uri, java.nio.charset.Charset.defaultCharset());
+            final char[] separators = { '#', '&' };
+            response = uri.toString();
+            final List<NameValuePair> params = URLEncodedUtils.parse(response, StandardCharsets.UTF_8, separators);
             for (final NameValuePair param : params) {
                if (paramName.equals(param.getName())) {
-                  code = param.getValue();
+                  token = param.getValue();
                   break;
                }
             }
@@ -158,15 +129,6 @@ public class OAuth2BrowserDialog extends Dialog {
       });
       getShell().setText(Messages.OAuth2BrowserDialog_Title);
       return control;
-   }
-
-   /**
-    * Get code
-    *
-    * @return code
-    */
-   public String getCode() {
-      return code;
    }
 
    @Override
@@ -181,8 +143,16 @@ public class OAuth2BrowserDialog extends Dialog {
       return section;
    }
 
+   public String getResponse() {
+      return response;
+   }
+
    @Override
    protected boolean isResizable() {
       return true;
+   }
+
+   public String getToken() {
+      return token;
    }
 }

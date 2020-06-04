@@ -55,9 +55,7 @@ public class FileSystemManager {
     */
    public static File CopyLocally(final String absolutefilePath) {
 
-      if (_fileSystemsList == null) {
-         return null;
-      }
+      getFileSystemsList();
 
       for (final TourbookFileSystem tourbookFileSystem : _fileSystemsList) {
 
@@ -79,14 +77,10 @@ public class FileSystemManager {
     */
    public static FileSystem getFileSystem(final String deviceFolder) {
 
-      if (_fileSystemsList == null) {
-         return null;
-      }
+      final TourbookFileSystem tourbookFileSystem = getTourbookFileSystem(deviceFolder);
 
-      for (final TourbookFileSystem tourbookFileSystem : _fileSystemsList) {
-         if (tourbookFileSystem.getId().equalsIgnoreCase(deviceFolder.toLowerCase())) {
-            return tourbookFileSystem.getFileSystem();
-         }
+      if (tourbookFileSystem != null) {
+         return tourbookFileSystem.getFileSystem();
       }
 
       return null;
@@ -99,11 +93,9 @@ public class FileSystemManager {
     * @return
     */
    public static String getFileSystemId(final String deviceFolderName) {
-      String fileSystemsId = "";
+      String fileSystemsId = UI.EMPTY_STRING;
 
-      if (_fileSystemsList == null) {
-         return fileSystemsId;
-      }
+      getFileSystemsList();
 
       for (final TourbookFileSystem tourbookFileSystem : _fileSystemsList) {
          if (tourbookFileSystem.getId().equalsIgnoreCase(deviceFolderName.toLowerCase())) {
@@ -124,9 +116,7 @@ public class FileSystemManager {
 
       final ArrayList<String> fileSystemsIds = new ArrayList<>();
 
-      if (_fileSystemsList == null) {
-         return fileSystemsIds;
-      }
+      getFileSystemsList();
 
       for (final TourbookFileSystem tourbookFileSystem : _fileSystemsList) {
          fileSystemsIds.add(tourbookFileSystem.getId());
@@ -151,9 +141,7 @@ public class FileSystemManager {
 
    public static Path getfolderPath(final String folderName) {
 
-      if (_fileSystemsList == null) {
-         return null;
-      }
+      getFileSystemsList();
 
       for (final TourbookFileSystem tourbookFileSystem : _fileSystemsList) {
          if (tourbookFileSystem.getId().equalsIgnoreCase(folderName.toLowerCase())) {
@@ -163,11 +151,28 @@ public class FileSystemManager {
       return null;
    }
 
+   /**
+    * Returns the {@link TourbookFileSystem}, if found, for a given device folder.
+    *
+    * @param deviceName
+    * @return
+    */
+   public static TourbookFileSystem getTourbookFileSystem(final String deviceName) {
+
+      getFileSystemsList();
+
+      for (final TourbookFileSystem tourbookFileSystem : _fileSystemsList) {
+         if (tourbookFileSystem.getId().equalsIgnoreCase(deviceName.toLowerCase())) {
+            return tourbookFileSystem;
+         }
+      }
+
+      return null;
+   }
+
    public static boolean isFileFromTourBookFileSystem(final String osFilePath) {
 
-      if (_fileSystemsList == null) {
-         return false;
-      }
+      getFileSystemsList();
 
       for (final TourbookFileSystem tourbookFileSystem : _fileSystemsList) {
          if (osFilePath.toLowerCase().startsWith(tourbookFileSystem.getId().toLowerCase())) {

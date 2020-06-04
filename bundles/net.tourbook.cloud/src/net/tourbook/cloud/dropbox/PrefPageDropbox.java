@@ -17,8 +17,8 @@ package net.tourbook.cloud.dropbox;
 
 import net.tourbook.cloud.Activator;
 import net.tourbook.cloud.IPreferences;
+import net.tourbook.cloud.oauth2.OAuth2BrowserDialog;
 import net.tourbook.cloud.oauth2.OAuth2Client;
-import net.tourbook.cloud.oauth2.OAuth2RequestAction;
 import net.tourbook.common.util.StringUtils;
 
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -139,18 +139,28 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
    private void onClickAuthorize() {
 
       final OAuth2Client client = new OAuth2Client();
-      client.setId("client_id"); //$NON-NLS-1$
-      client.setSecret("secret_id"); //$NON-NLS-1$
-      client.setAccessTokenUrl("https://api.dropboxapi.com/oauth2/token"); //$NON-NLS-1$
+
+      // Per Dropbox recommendation :
+      // "The app key is considered public and does not need to be protected."
+      // source https://www.dropboxforum.com/t5/Dropbox-API-Support-Feedback/Proper-way-of-handling-APP-KEY-and-APP-SECRET/m-p/410478
+      // We use the implicit grant flow as we can't keep the secret_id secure
+      // "It is intended to be used for user-agent-based clients (e.g. single page web apps)
+      // that can’t keep a client secret because all of the application code and storage is easily accessible."
+      // source : https://alexbilbie.com/guide-to-oauth-2-grants/
+      client.setId("vye6ci8xzzsuiao"); //$NON-NLS-1$
+
       client.setAuthorizeUrl("https://www.dropbox.com/oauth2/authorize"); //$NON-NLS-1$
       client.setRedirectUri("https://sourceforge.net/projects/mytourbook"); //$NON-NLS-1$
 
-      final OAuth2RequestAction request = new OAuth2RequestAction(client);
+      final OAuth2BrowserDialog oAuth2Browser = new OAuth2BrowserDialog(client);
       //Opens the dialog
-      request.run();
-      final String token = request.getAccessToken();
+      if (oAuth2Browser.open() != Window.OK) {
+         return;
+      }
+
+      final String token = oAuth2Browser.getToken();
       final String dialogMessage = StringUtils.isNullOrEmpty(token) ? NLS.bind(Messages.Pref_CloudConnectivity_Dropbox_AccessToken_NotRetrieved,
-            request.getResponse()) : Messages.Pref_CloudConnectivity_Dropbox_AccessToken_Retrieved;
+            oAuth2Browser.getResponse()) : Messages.Pref_CloudConnectivity_Dropbox_AccessToken_Retrieved;
 
       if (!StringUtils.isNullOrEmpty(token)) {
          _textAccessToken.setText(token);
