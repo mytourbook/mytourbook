@@ -134,6 +134,7 @@ import org.eclipse.nebula.widgets.nattable.config.DefaultNatTableStyleConfigurat
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
+import org.eclipse.nebula.widgets.nattable.grid.GridRegion;
 import org.eclipse.nebula.widgets.nattable.grid.data.DefaultCornerDataProvider;
 import org.eclipse.nebula.widgets.nattable.grid.data.DefaultRowHeaderDataProvider;
 import org.eclipse.nebula.widgets.nattable.grid.layer.ColumnHeaderLayer;
@@ -144,14 +145,18 @@ import org.eclipse.nebula.widgets.nattable.grid.layer.RowHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.hover.HoverLayer;
 import org.eclipse.nebula.widgets.nattable.layer.DataLayer;
 import org.eclipse.nebula.widgets.nattable.layer.ILayer;
+import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnOverrideLabelAccumulator;
+import org.eclipse.nebula.widgets.nattable.painter.cell.BackgroundImagePainter;
+import org.eclipse.nebula.widgets.nattable.painter.cell.ICellPainter;
+import org.eclipse.nebula.widgets.nattable.painter.cell.TextPainter;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.selection.command.SelectRowsCommand;
 import org.eclipse.nebula.widgets.nattable.selection.config.DefaultRowSelectionLayerConfiguration;
 import org.eclipse.nebula.widgets.nattable.style.CellStyleAttributes;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
+import org.eclipse.nebula.widgets.nattable.style.HorizontalAlignmentEnum;
 import org.eclipse.nebula.widgets.nattable.style.Style;
 import org.eclipse.nebula.widgets.nattable.style.theme.ModernNatTableThemeConfiguration;
-import org.eclipse.nebula.widgets.nattable.style.theme.ThemeConfiguration;
 import org.eclipse.nebula.widgets.nattable.util.GUIHelper;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 import org.eclipse.osgi.util.NLS;
@@ -945,9 +950,123 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       }
    }
 
-   public class ModernNatTableThemeConfiguration_MT extends ModernNatTableThemeConfiguration {
+   private final class NatTable_Configuration_Hover extends AbstractRegistryConfiguration {
+      @Override
+      public void configureRegistry(final IConfigRegistry configRegistry) {
 
-      public ModernNatTableThemeConfiguration_MT() {
+         Style style = new Style();
+
+         style.setAttributeValue(CellStyleAttributes.BACKGROUND_COLOR, GUIHelper.COLOR_YELLOW);
+
+         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, style, DisplayMode.HOVER);
+
+         style = new Style();
+
+         style.setAttributeValue(CellStyleAttributes.BACKGROUND_COLOR, GUIHelper.COLOR_RED);
+
+         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, style, DisplayMode.SELECT_HOVER);
+      }
+   }
+
+   private class NatTable_Configuration_Painter extends AbstractRegistryConfiguration {
+
+      private ArrayList<ColumnDefinition> _allSortedColumns;
+
+      public NatTable_Configuration_Painter(final ArrayList<ColumnDefinition> allSortedColumns) {
+
+         _allSortedColumns = allSortedColumns;
+      }
+
+      @Override
+      public void configureRegistry(final IConfigRegistry configRegistry) {
+
+         // override column header style configuration to make use of the BackgroundImagePainter
+         registerColumnHeaderStyle(configRegistry);
+
+         for (int colIndex = 0; colIndex < _allSortedColumns.size(); colIndex++) {
+
+            final ColumnDefinition colDef = _allSortedColumns.get(colIndex);
+
+            // skip first "hidden" column
+            if (colIndex == 0) {
+               continue;
+            }
+
+            if (!colDef.isColumnDisplayed()) {
+               // visible columns are displayed first
+               break;
+            }
+
+            final Style style = new Style();
+
+            final HorizontalAlignmentEnum columnAlignment = natTableConvert_ColumnAlignment(colDef.getColumnStyle());
+
+            style.setAttributeValue(CellStyleAttributes.HORIZONTAL_ALIGNMENT, columnAlignment);
+
+            configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE,
+                  style,
+                  DisplayMode.NORMAL,
+                  colDef.getColumnId());
+         }
+      }
+
+      /**
+       * Convert col def style into nat table style
+       *
+       * @param columnStyle
+       * @return
+       */
+      private HorizontalAlignmentEnum natTableConvert_ColumnAlignment(final int columnStyle) {
+
+         switch (columnStyle) {
+
+         case SWT.LEFT:
+            return HorizontalAlignmentEnum.LEFT;
+
+         case SWT.RIGHT:
+            return HorizontalAlignmentEnum.RIGHT;
+
+         default:
+            return HorizontalAlignmentEnum.CENTER;
+         }
+      }
+
+      private void registerColumnHeaderStyle(final IConfigRegistry configRegistry) {
+
+         final Image bgImage = GUIHelper.getImageByURL(
+               "columnHeaderBg",
+               getClass().getResource("/org/eclipse/nebula/widgets/nattable/examples/resources/column_header_bg.png"));
+
+         final Image selectedBgImage = GUIHelper.getImageByURL(
+               "selectedColumnHeaderBg",
+               getClass().getResource("/org/eclipse/nebula/widgets/nattable/examples/resources/selected_column_header_bg.png"));
+
+         final TextPainter txtPainter = new TextPainter(false, false);
+
+         final ICellPainter bgImagePainter = new BackgroundImagePainter(txtPainter, bgImage, GUIHelper.getColor(192, 192, 192));
+
+         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER,
+               bgImagePainter,
+               DisplayMode.NORMAL,
+               GridRegion.COLUMN_HEADER);
+
+         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER,
+               bgImagePainter,
+               DisplayMode.NORMAL,
+               GridRegion.CORNER);
+
+         final ICellPainter selectedHeaderPainter = new BackgroundImagePainter(txtPainter, selectedBgImage, GUIHelper.getColor(192, 192, 192));
+
+         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER,
+               selectedHeaderPainter,
+               DisplayMode.SELECT,
+               GridRegion.COLUMN_HEADER);
+      }
+   }
+
+   public class NatTable_Configuration_Theme extends ModernNatTableThemeConfiguration {
+
+      public NatTable_Configuration_Theme() {
 
          super();
 
@@ -970,9 +1089,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 //         this.defaultSelectionFgColor = GUIHelper.COLOR_LIST_SELECTION_TEXT;
          this.defaultSelectionBgColor = GUIHelper.COLOR_BLACK;
          this.defaultSelectionFgColor = GUIHelper.COLOR_YELLOW;
-
       }
-
    }
 
    void actionExportViewCSV() {
@@ -1550,6 +1667,11 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
    private void createUI_40_TourViewer_NatTable(final Composite parent) {
 
+      // for testing
+      if (_columnManager_Table == null) {
+         _columnManager_Table = new ColumnManager(this, _state_Table);
+      }
+
       _natTable_DataProvider = new DataProvider(this, _columnManager_Table);
 
       final String sortColumnId = _tourViewer_Table_Comparator.__sortColumnId;
@@ -1558,10 +1680,44 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _natTable_DataProvider.setSortColumn(sortColumnId, sortDirection);
 
       /*
-       * Create the body layer stack
+       * Create: Body layer
        */
       final IRowDataProvider<TVITourBookTour> body_DataProvider = new DataProvider_Tour(_natTable_DataProvider);
       final DataLayer body_DataLayer = new DataLayer(body_DataProvider);
+
+      // set column widths
+      final ArrayList<ColumnDefinition> allSortedColumns = _natTable_DataProvider.allSortedColumns;
+      for (int colIndex = 0; colIndex < allSortedColumns.size(); colIndex++) {
+
+         // skip first "hidden" column
+         if (colIndex == 0) {
+            continue;
+         }
+
+         final ColumnDefinition colDef = allSortedColumns.get(colIndex);
+
+         if (!colDef.isColumnDisplayed()) {
+            // visible columns are displayed first
+            break;
+         }
+
+         body_DataLayer.setColumnWidthByPosition(colIndex - 1, colDef.getColumnWidth(), false);
+      }
+
+      // register column labels
+      final ColumnOverrideLabelAccumulator columnLabelAccumulator = new ColumnOverrideLabelAccumulator(body_DataLayer);
+      body_DataLayer.setConfigLabelAccumulator(columnLabelAccumulator);
+
+      for (int colIndex = 0; colIndex < allSortedColumns.size(); colIndex++) {
+
+         // skip first "hidden" column
+         if (colIndex == 0) {
+            continue;
+         }
+
+         final ColumnDefinition colDef = allSortedColumns.get(colIndex);
+         columnLabelAccumulator.registerColumnOverrides(colIndex - 1, colDef.getColumnId());
+      }
 
       /*
        * Create: Hover layer
@@ -1571,10 +1727,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 //      // cursor moves out of the cell area
 //      body_HoverLayer.addConfiguration(new SimpleHoverStylingBindings(body_HoverLayer));
 
-//      DataLayer bodyDataLayer = new DataLayer(body_DataProvider);
       final HoverLayer body_HoverLayer = new HoverLayer(body_DataLayer);
-//      SelectionLayer selectionLayer = new SelectionLayer(hoverLayer);
-//      ViewportLayer viewportLayer = new ViewportLayer(selectionLayer);
 
       /*
        * Create: Selection layer
@@ -1588,20 +1741,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
        * Create: Grid viewport layer
        */
       _natTable_Grid_BodyLayer = new ViewportLayer(selection_Layer);
-
-      // set column widths
-      final ArrayList<ColumnDefinition> allSortedColumns = _natTable_DataProvider.allSortedColumns;
-      for (int colIndex = 0; colIndex < allSortedColumns.size(); colIndex++) {
-
-         // skip first "hidden" column
-         if (colIndex == 0) {
-            continue;
-         }
-
-         final ColumnDefinition colDef = allSortedColumns.get(colIndex);
-
-         body_DataLayer.setColumnWidthByPosition(colIndex - 1, colDef.getColumnWidth(), false);
-      }
 
 // have not yet understood how this works !!!
 //
@@ -1657,33 +1796,19 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       /*
        * Configure table
        */
+
       // as the autoconfiguration of the NatTable is turned off, we have to add the DefaultNatTableStyleConfiguration manually
       _tourViewer_NatTable.addConfiguration(new DefaultNatTableStyleConfiguration());
 
+      _tourViewer_NatTable.addConfiguration(new NatTable_Configuration_Painter(_natTable_DataProvider.allSortedColumns));
+
       // add the style configuration for hover
-      _tourViewer_NatTable.addConfiguration(new AbstractRegistryConfiguration() {
+      _tourViewer_NatTable.addConfiguration(new NatTable_Configuration_Hover());
 
-         @Override
-         public void configureRegistry(final IConfigRegistry configRegistry) {
-
-            Style style = new Style();
-
-            style.setAttributeValue(CellStyleAttributes.BACKGROUND_COLOR, GUIHelper.COLOR_YELLOW);
-
-            configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, style, DisplayMode.HOVER);
-
-            style = new Style();
-
-            style.setAttributeValue(CellStyleAttributes.BACKGROUND_COLOR, GUIHelper.COLOR_RED);
-
-            configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, style, DisplayMode.SELECT_HOVER);
-         }
-      });
       _tourViewer_NatTable.configure();
 
       // overwrite theme with MT's own theme based on the modern theme
-      final ThemeConfiguration modernTheme = new ModernNatTableThemeConfiguration_MT();
-      _tourViewer_NatTable.setTheme(modernTheme);
+      _tourViewer_NatTable.setTheme(new NatTable_Configuration_Theme());
 
       GridDataFactory.fillDefaults().grab(true, true).applyTo(_tourViewer_NatTable);
    }

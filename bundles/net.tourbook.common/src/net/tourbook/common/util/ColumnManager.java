@@ -1297,6 +1297,12 @@ public class ColumnManager {
 
       final String[] values = _activeProfile.visibleColumnIdsAndWidth;
 
+      if (values == null) {
+
+         // may need another value
+         return 88;
+      }
+
       for (int columnIndex = 0; columnIndex < values.length; columnIndex++) {
 
          final String columnId = values[columnIndex];

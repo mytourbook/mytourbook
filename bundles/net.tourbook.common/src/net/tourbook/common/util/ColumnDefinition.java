@@ -29,6 +29,8 @@ import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.Tree;
 
 public class ColumnDefinition implements Cloneable {
 
@@ -101,8 +103,8 @@ public class ColumnDefinition implements Cloneable {
    private int                    _defaultColumnWidth;
 
    /**
-    * column will have the width 0 to be hidden, this is necessary that the first visible column can
-    * be right aligned
+    * The column will have the width of 0 to be hidden, this is necessary that the first visible
+    * column can be right aligned
     */
    private boolean                _isColumnHidden      = false;
 
@@ -367,6 +369,10 @@ public class ColumnDefinition implements Cloneable {
       return _isColumnDisplayed;
    }
 
+   /**
+    * @return Returns <code>true</code> when it is displayed but the width is 0, this is necessary
+    *         that the first visiblecolumn can be right aligned in a {@link Table} or {@link Tree}.
+    */
    public boolean isColumnHidden() {
       return _isColumnHidden;
    }

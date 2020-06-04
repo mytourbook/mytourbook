@@ -76,6 +76,10 @@ public class DataProvider {
    private String                     _sqlSortField;
    private String                     _sqlSortDirection;
 
+   /**
+    * Contains all columns (also hidden columns), sorted in the order how they are displayed in the
+    * UI.
+    */
    public ArrayList<ColumnDefinition> allSortedColumns;
    int                                numVisibleColumns;
 
