@@ -107,16 +107,12 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
       }
    }
 
-//   private int  _imageSize;
-//   private static final String      STATE_PHOTO_PROPERTIES_IMAGE_SIZE      = "STATE_PHOTO_PROPERTIES_IMAGE_SIZE";       //$NON-NLS-1$
-//   private IDialogSettings       _state;
-
    private enum PHOTO_TITLE_TYPE {NONE, RATING, TIME}
 
 
    public PhotoToolkit() {
       super(MarkerShape.CIRCLE);
-      //debugPrint(" ?? PhotoToolkit + *** Constructor"); //$NON-NLS-1$
+      Map25App.debugPrint(" ?? PhotoToolkit + *** Constructor"); //$NON-NLS-1$
       final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 
       loadConfig();
@@ -182,7 +178,6 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
       }
 
 
-
       /*
        * if (!_isShowPhoto) {
        * Map25App.debugPrint(" Phototoolkit: *** createPhotoItemList: photlayer is off");
@@ -202,15 +197,20 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
          //starText = UI.EMPTY_STRING;
          switch (stars) {
          case 1:
-            starText = " *"; //$NON-NLS-1$
+            starText = "*"; //$NON-NLS-1$
+            break;
          case 2:
-            starText = " **"; //$NON-NLS-1$
+            starText = "**"; //$NON-NLS-1$
+            break;
          case 3:
-            starText = " ***"; //$NON-NLS-1$
+            starText = "***"; //$NON-NLS-1$
+            break;
          case 4:
-            starText = " ****"; //$NON-NLS-1$
+            starText = "****"; //$NON-NLS-1$
+            break;
          case 5:
-            starText = " *****"; //$NON-NLS-1$
+            starText = "*****"; //$NON-NLS-1$
+            break;
          }
 
          if (_prefStore.getString(ITourbookPreferences.MAP25_PHOTO_TITLE_TYPE)

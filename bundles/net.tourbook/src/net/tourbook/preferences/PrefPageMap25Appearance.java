@@ -85,36 +85,34 @@ public class PrefPageMap25Appearance extends FieldEditorPreferencePage implement
 
    private void createUI_10_PhotoTitle(final Composite parent) {
 
-		final Group group = new Group(parent, SWT.NONE);
-      group.setText(Messages.Pref_Map25_Appearance_Group_PhotoLayer);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
-      GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
-
+		final Group groupContainer = new Group(parent, SWT.NONE);
+      GridLayoutFactory.swtDefaults().numColumns(2).applyTo(groupContainer);
+      groupContainer.setText(Messages.Pref_Map25_Appearance_Group_PhotoLayer);
+      //GridDataFactory.fillDefaults().grab(true, false).applyTo(groupContainer);
+      GridLayoutFactory.swtDefaults().numColumns(2).applyTo(groupContainer);
 		{
 			// label
 			{
-				final Label label = new Label(group, SWT.NONE);
-				GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(label);
+				final Label label = new Label(groupContainer, SWT.NONE);
             label.setText(Messages.Pref_Map25_Appearance_Label_PhotoTitle);
-			}
+            //GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(label);
 
-			// radio
-			{
-				final Composite container = new Composite(group, SWT.NONE);
-				GridDataFactory.fillDefaults().grab(true, false).span(3, 1).applyTo(container);
-            GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+            final Composite radioContainer = new Composite(groupContainer, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(radioContainer);
+            GridLayoutFactory.fillDefaults().numColumns(3).applyTo(radioContainer);
+
 				{
-               _rdoPhotoTitleNone = new Button(container, SWT.RADIO);
+               _rdoPhotoTitleNone = new Button(radioContainer, SWT.RADIO);
                _rdoPhotoTitleNone.setText(Messages.Pref_Map25_Appearance_Label_PhotoTitleNone);
                _rdoPhotoTitleNone.addSelectionListener(_defaultSelectionListener);
                //_rdoPhotoTitleNone.setToolTipText("Pref_Map25_Appearance_Label_PhotoTitleNone_Tooltip");
 
-               _rdoPhotoTitleTime = new Button(container, SWT.RADIO);
+               _rdoPhotoTitleTime = new Button(radioContainer, SWT.RADIO);
                _rdoPhotoTitleTime.setText(Messages.Pref_Map25_Appearance_Label_PhotoTitleTime);
                _rdoPhotoTitleTime.addSelectionListener(_defaultSelectionListener);
                //_rdoPhotoTitleTime.setToolTipText("Pref_Map25_Appearance_Label_PhotoTitleTime_Tooltip");
 
-               _rdoPhotoTitleRating = new Button(container, SWT.RADIO);
+               _rdoPhotoTitleRating = new Button(radioContainer, SWT.RADIO);
                _rdoPhotoTitleRating.setText(Messages.Pref_Map25_Appearance_Label_PhotoTitleStars);
                _rdoPhotoTitleRating.addSelectionListener(_defaultSelectionListener);
                //_rdoPhotoTitleStars.setToolTipText("Pref_Map25_Appearance_Label_PhotoTitleStars_Tooltip");
@@ -175,15 +173,12 @@ public class PrefPageMap25Appearance extends FieldEditorPreferencePage implement
 
    private void initUI(final Control parent) {
 
-
       _defaultSelectionListener = new SelectionAdapter() {
          @Override
          public void widgetSelected(final SelectionEvent e) {
             //onChangeProperty();
          }
       };
-
-
 
    }
 
@@ -211,23 +206,14 @@ public class PrefPageMap25Appearance extends FieldEditorPreferencePage implement
 	}
 
 	private void restoreState() {
-
       updateUI_SetPhotoTitleType(_prefStore.getString(ITourbookPreferences.MAP25_PHOTO_TITLE_TYPE));
-		// relative/absolute distance
-      //final boolean isRelativeDistance = _prefStore.getBoolean(IPreferences.GPX_IS_RELATIVE_DISTANCE_VALUE);
-
-      //_rdoPhotoTitleTime.setSelection(isRelativeDistance == false);
-      //_rdoDistanceRelative.setSelection(isRelativeDistance);
       enableControls();
-
 	}
 
 	private void saveState() {
       // photo title type
       _prefStore.setValue(ITourbookPreferences.MAP25_PHOTO_TITLE_TYPE, getPhotoTitleType());
 
-		// relative/absolute distance
-      //_prefStore.setValue(IPreferences.GPX_IS_RELATIVE_DISTANCE_VALUE, _rdoDistanceRelative.getSelection());
 	}
 
    private void updateUI_SetPhotoTitleType(String photoTitleType) {
@@ -242,6 +228,7 @@ public class PrefPageMap25Appearance extends FieldEditorPreferencePage implement
       _rdoPhotoTitleNone.setSelection(photoTitleType.equals(PHOTO_TITLE_TYPE_NONE));
       _rdoPhotoTitleTime.setSelection(photoTitleType.equals(PHOTO_TITLE_TYPE_TIME));
       _rdoPhotoTitleRating.setSelection(photoTitleType.equals(PHOTO_TITLE_TYPE_RATING));
+
    }
 
 }

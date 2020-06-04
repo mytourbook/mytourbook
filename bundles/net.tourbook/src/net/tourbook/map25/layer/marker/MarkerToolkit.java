@@ -53,8 +53,11 @@ public class MarkerToolkit extends FieldEditorPreferencePage implements Itemized
    private IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
 
    //ItemizedLayer<MarkerItem> mMarkerLayer;
-   protected int _fgColor = 0xFF000000; // 100 percent black. AARRGGBB
-   protected int _bgColor = 0x80FF69B4; // 50 percent pink. AARRGGBB
+   protected int _fgColor                = 0xFF000000;  // 100 percent black. AARRGGBB
+   protected int _bgColor                = 0x80FF69B4;  // 50 percent pink. AARRGGBB
+   protected int _ratingStarColor        = 0xFFFFFF00;  // 100 percent yellow like in other photo views
+   protected int _poiColor               = 0xFF91c7ff;  // 100 blue like mapBookmark in toolbar
+
    protected int _clusterSymbolSizeDP = net.tourbook.map25.layer.marker.MarkerRenderer.MAP_MARKER_CLUSTER_SIZE_DP;
    protected int _clusterForegroundColor = net.tourbook.map25.layer.marker.MarkerRenderer.CLUSTER_COLOR_TEXT;
    protected int _clusterBackgroundColor = net.tourbook.map25.layer.marker.MarkerRenderer.CLUSTER_COLOR_BACK;
@@ -86,7 +89,7 @@ public class MarkerToolkit extends FieldEditorPreferencePage implements Itemized
       final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 
       loadConfig();
-      //_mapApp.debugPrint("*** Markertoolkit:  entering constructor"); //$NON-NLS-1$
+      debugPrint("*** Markertoolkit:  entering constructor"); //$NON-NLS-1$
 
       _fillPainter.setStyle(Paint.Style.FILL);
       _linePainter.setStyle(Paint.Style.STROKE);
@@ -97,7 +100,7 @@ public class MarkerToolkit extends FieldEditorPreferencePage implements Itemized
       if(shape == MarkerShape.CIRCLE) {
          _BitmapClusterSymbol = drawCircle(_clusterSymbol_Size);
       } else {
-         _BitmapClusterSymbol = drawStar(_clusterSymbol_Size);
+         _BitmapClusterSymbol = drawStar(_clusterSymbol_Size ,_poiColor);
       }
 
       _symbol = new MarkerSymbol(_bitmapPoi, MarkerSymbol.HotspotPlace.CENTER, false);
@@ -109,7 +112,7 @@ public class MarkerToolkit extends FieldEditorPreferencePage implements Itemized
                @Override
                protected Bitmap getClusterBitmap(final int size) {
                   // Can customize cluster bitmap here
-                  //_mapApp.debugPrint("*** Markertoolkit:  cluster size: " + size); //$NON-NLS-1$
+                  //debugPrint("*** Markertoolkit:  cluster size: " + size); //$NON-NLS-1$
                   _bitmapCluster = createClusterBitmap(size);
                   return _bitmapCluster;
                }
@@ -131,9 +134,14 @@ public class MarkerToolkit extends FieldEditorPreferencePage implements Itemized
       final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
       final boolean isBillboard = config.markerOrientation == Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD;
       createPoiBitmap(MarkerShape.STAR);
+
       final Paint textPainter = CanvasAdapter.newPaint();
       textPainter.setStyle(Paint.Style.STROKE);
       textPainter.setColor(_fgColor);
+
+      final Paint textRatingStarPainter = CanvasAdapter.newPaint();
+      textRatingStarPainter.setStyle(Paint.Style.STROKE);
+      textRatingStarPainter.setColor(_ratingStarColor);
 
       final Paint fillPainter = CanvasAdapter.newPaint();
       fillPainter.setStyle(Paint.Style.FILL);
@@ -146,7 +154,7 @@ public class MarkerToolkit extends FieldEditorPreferencePage implements Itemized
        * sometimes height is wrongly calculated eg for "*", than using the height of a capital "I"
        * could be improved, but only oocours when photo title is set to rating
        */
-      final int titleSizeHeight = java.lang.Math.max((int) textPainter.getTextHeight(mItem.title), (int) textPainter.getTextHeight("I"));
+      final int titleSizeHeight = java.lang.Math.max((int) textPainter.getTextHeight(mItem.title), (int) textPainter.getTextHeight("I")); //$NON-NLS-1$
 
       final Point titleSize = new Point((int) textPainter.getTextWidth(mItem.title) + 2 * margin, titleSizeHeight + 2 * margin);
 
@@ -194,8 +202,20 @@ public class MarkerToolkit extends FieldEditorPreferencePage implements Itemized
       // draw an oversized transparent circle, so the canvas is completely filled with a transparent color
       // titleCanvas.fillRectangle() does not support transparency
       titleCanvas.drawCircle(0, 0, size.x*2, fillPainter);
+      if (isPhoto) {
+         if (_prefStore
+               .getString(
+               ITourbookPreferences.MAP25_PHOTO_TITLE_TYPE)
+               .equals(net.tourbook.preferences.PrefPageMap25Appearance.PHOTO_TITLE_TYPE_RATING)) {
+            debugPrint("*** Markertoolkit: phototitle type rating : " + _prefStore.getString(ITourbookPreferences.MAP25_PHOTO_TITLE_TYPE)); //$NON-NLS-1$
+            titleCanvas.drawText(mItem.title, margin, titleSize.y - margin, textRatingStarPainter);
+         } else {
+            titleCanvas.drawText(mItem.title, margin, titleSize.y - margin, textPainter);
+         }
 
-      titleCanvas.drawText(mItem.title, margin, titleSize.y - margin , textPainter);
+      } else {
+         titleCanvas.drawText(mItem.title, margin, titleSize.y - margin, textPainter);
+      }
 
       if (hasSubtitle) {
          final Bitmap subtitleBitmap = CanvasAdapter.newBitmap( subtitleSize.x + margin, subtitleSize.y + margin, 0);
@@ -217,7 +237,7 @@ public class MarkerToolkit extends FieldEditorPreferencePage implements Itemized
       if (!(_prefStore.getString(
             ITourbookPreferences.MAP25_PHOTO_TITLE_TYPE)
             .equals(net.tourbook.preferences.PrefPageMap25Appearance.PHOTO_TITLE_TYPE_NONE))) {
-         //Map25App.debugPrint("*** Markertoolkit: phototitle type: " + _prefStore.getString(ITourbookPreferences.MAP25_PHOTO_TITLE_TYPE));
+         //debugPrint("*** Markertoolkit: phototitle type: " + _prefStore.getString(ITourbookPreferences.MAP25_PHOTO_TITLE_TYPE));
          if (!mItem.title.isEmpty()) {
             markerCanvas.drawBitmap(titleBitmap, size.x / 2 - (titleSize.x / 2), 0);
          }
@@ -270,12 +290,12 @@ public class MarkerToolkit extends FieldEditorPreferencePage implements Itemized
    public List<MarkerItem> createMarkerItemList(final MarkerMode MarkerMode){
       loadConfig();
       createPoiBitmap(MarkerShape.STAR);
-      _BitmapClusterSymbol = drawStar(_clusterSymbol_Size);
+      _BitmapClusterSymbol = drawStar(_clusterSymbol_Size, _poiColor);
       final List<MarkerItem> pts = new ArrayList<>();
 
       for (final MapBookmark mapBookmark : net.tourbook.map.bookmark.MapBookmarkManager.getAllBookmarks()) {
-         //Map25App.debugPrint("*** Markertoolkit:  mapbookmark name: " + mapBookmark.name + " lat: " +  mapBookmark.get_mapPositionMarkerLatitude() + " lon: " + mapBookmark.get_mapPositionMarkerLongitude()); //$NON-NLS-1$
-         //Map25App.debugPrint("*** Markertoolkit: " + mapBookmark.toString());
+         //debugPrint("*** Markertoolkit:  mapbookmark name: " + mapBookmark.name + " lat: " +  mapBookmark.get_mapPositionMarkerLatitude() + " lon: " + mapBookmark.get_mapPositionMarkerLongitude()); //$NON-NLS-1$
+         //debugPrint("*** Markertoolkit: " + mapBookmark.toString());
          final MarkerItem item = new MarkerItem(mapBookmark.id,
                mapBookmark.name,
                UI.EMPTY_STRING,
@@ -317,7 +337,7 @@ public class MarkerToolkit extends FieldEditorPreferencePage implements Itemized
       if(shape == MarkerShape.CIRCLE) {
          _bitmapPoi = drawCircle(_symbolSizeInt);
       } else {
-         _bitmapPoi = drawStar(_symbolSizeInt);
+         _bitmapPoi = drawStar(_symbolSizeInt, _poiColor);
       }
      return _bitmapPoi;
 
@@ -340,13 +360,13 @@ public class MarkerToolkit extends FieldEditorPreferencePage implements Itemized
       return _bitmapCircle;
    }
 
-   public Bitmap drawStar(final int bitmapStarSize) {
-      //_mapApp.debugPrint("*** Markertoolkit:  drawstar: "); //$NON-NLS-1$
+   public Bitmap drawStar(final int bitmapStarSize, final int starColor) {
+      //debugPrint("*** Markertoolkit:  drawstar: "); //$NON-NLS-1$
       _bitmapStar = CanvasAdapter.newBitmap(bitmapStarSize, bitmapStarSize, 0);
       final org.oscim.backend.canvas.Canvas defaultMarkerCanvas = CanvasAdapter.newCanvas();
       defaultMarkerCanvas.setBitmap(_bitmapStar);
       final float half = bitmapStarSize/2;
-      _fillPainter.setColor(0xFFFFFF00); // 100percent yellow
+      _fillPainter.setColor(starColor);
       _fillPainter.setStrokeWidth(2);
       /*
        * link: https://stackoverflow.com/questions/16327588/how-to-make-star-shape-in-java
@@ -381,8 +401,8 @@ public class MarkerToolkit extends FieldEditorPreferencePage implements Itemized
       _symbolSizeInt = (int) Math.ceil(_symbolSize);
       _clusterSymbol_Size = config.clusterSymbol_Size;
 
-      //_mapApp.debugPrint("*** Markertoolkit:  fillradius for star: " + config.clusterSymbol_Size + " " + config.clusterSymbol_Weight); //$NON-NLS-1$
-      //_mapApp.debugPrint("*** Markertoolkit:  _clusterOutlineSize for star: " + _clusterOutlineSize + " , _clusterSymbol_Size: " + _clusterSymbol_Size); //$NON-NLS-1$
+      //debugPrint("*** Markertoolkit:  fillradius for star: " + config.clusterSymbol_Size + " " + config.clusterSymbol_Weight); //$NON-NLS-1$
+      //debugPrint("*** Markertoolkit:  _clusterOutlineSize for star: " + _clusterOutlineSize + " , _clusterSymbol_Size: " + _clusterSymbol_Size); //$NON-NLS-1$
 
    }
 
@@ -426,7 +446,6 @@ public class MarkerToolkit extends FieldEditorPreferencePage implements Itemized
    /**
     * clicking on a mapbookmark
     * this method is moved from map25App to here
-    *
     * @param index
     * @param MarkerItem
     * @return true, when clicked
