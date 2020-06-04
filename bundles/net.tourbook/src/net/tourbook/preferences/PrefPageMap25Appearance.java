@@ -34,7 +34,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-/*based on this files:
+/*
+ *  based on this files:
  *  net.tourbook.device.gpx.PrefPageImportGPX.java
  *  net.tourbook.preferences.PrefPageMap2Appearance.java
  *  net.tourbook.preferences.PrefPageMap25OfflineMap.java
@@ -43,7 +44,6 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 public class PrefPageMap25Appearance extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
    public static final String   PHOTO_TITLE_TYPE_NONE    = "none";                       //$NON-NLS-1$
-
    public static final String   PHOTO_TITLE_TYPE_TIME    = "time";                       //$NON-NLS-1$
    public static final String   PHOTO_TITLE_TYPE_RATING  = "rating";                     //$NON-NLS-1$
    public static final String   DEFAULT_PHOTO_TITLE_TYPE      = PHOTO_TITLE_TYPE_NONE;

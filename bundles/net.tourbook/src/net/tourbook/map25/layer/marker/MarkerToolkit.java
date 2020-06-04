@@ -23,6 +23,12 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.preference.FieldEditorPreferencePage;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.oscim.backend.CanvasAdapter;
 import org.oscim.backend.canvas.Bitmap;
 import org.oscim.backend.canvas.Color;
@@ -36,12 +42,16 @@ import org.oscim.layers.marker.MarkerRendererFactory;
 import org.oscim.layers.marker.MarkerSymbol;
 import org.oscim.layers.marker.MarkerSymbol.HotspotPlace;
 
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorUtil;
 import net.tourbook.map.bookmark.MapBookmark;
 import net.tourbook.map25.Map25ConfigManager;
+import net.tourbook.preferences.ITourbookPreferences;
 
-public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<MarkerItem> {
+public class MarkerToolkit extends FieldEditorPreferencePage implements ItemizedLayer.OnItemGestureListener<MarkerItem>, IWorkbenchPreferencePage {
+   private IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
+
    //ItemizedLayer<MarkerItem> mMarkerLayer;
    protected int _fgColor = 0xFF000000; // 100 percent black. AARRGGBB
    protected int _bgColor = 0x80FF69B4; // 50 percent pink. AARRGGBB
@@ -132,7 +142,14 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
       final int margin = 3;
       final int dist2symbol = 30;
 
-      final Point titleSize = new Point((int) textPainter.getTextWidth(mItem.title) + 2 * margin, (int) textPainter.getTextHeight(mItem.title) + 2 * margin);
+      /*
+       * sometimes height is wrongly calculated eg for "*", than using the height of a capital "I"
+       * could be improved, but only oocours when photo title is set to rating
+       */
+      final int titleSizeHeight = java.lang.Math.max((int) textPainter.getTextHeight(mItem.title), (int) textPainter.getTextHeight("I"));
+
+      final Point titleSize = new Point((int) textPainter.getTextWidth(mItem.title) + 2 * margin, titleSizeHeight + 2 * margin);
+
       final Point symbolSize = new Point(poiBitmap.getWidth(),poiBitmap.getHeight());
       final Point subtitleSize = new Point();
       final Point size = new Point();  //total  size of all elements
@@ -169,9 +186,9 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
           * the following three lines displaying a transparent box.
           * only for testing purposes, normally uncommented
           */
-      //fillPainter.setColor(0x60ffffff);
-      //markerCanvas.drawCircle(0, 0, size.x*2, fillPainter);
-      //fillPainter.setColor(_bgColor);
+         //fillPainter.setColor(0x60ffffff);
+         //markerCanvas.drawCircle(0, 0, size.x * 2, fillPainter);
+         //fillPainter.setColor(_bgColor);
       }
 
       // draw an oversized transparent circle, so the canvas is completely filled with a transparent color
@@ -187,7 +204,7 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
          subtitleCanvas.drawCircle(0, 0, size.x*2, fillPainter);
          subtitleCanvas.drawText(subtitle, margin, titleSize.y - margin, textPainter);
          markerCanvas.drawBitmap(subtitleBitmap, size.x/2-(subtitleSize.x/2), size.y - (subtitleSize.y + margin));
-      } else if (isPhoto){
+      } else if (isPhoto) { // draw line, to point where photo was taken
          final int lineLength = 20;
          textPainter.setStrokeWidth(2);
          final Bitmap subtitleBitmap = CanvasAdapter.newBitmap( lineLength, lineLength, 0); //heigth as title
@@ -197,9 +214,17 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
          markerCanvas.drawBitmap(subtitleBitmap, size.x/2-(lineLength / 2), size.y - lineLength);
       }
 
-      if (config.isShowTourMarker) {
-         markerCanvas.drawBitmap(titleBitmap, size.x/2-(titleSize.x/2), 0);
+      if (!(_prefStore.getString(
+            ITourbookPreferences.MAP25_PHOTO_TITLE_TYPE)
+            .equals(net.tourbook.preferences.PrefPageMap25Appearance.PHOTO_TITLE_TYPE_NONE))) {
+         //Map25App.debugPrint("*** Markertoolkit: phototitle type: " + _prefStore.getString(ITourbookPreferences.MAP25_PHOTO_TITLE_TYPE));
+         if (!mItem.title.isEmpty()) {
+            markerCanvas.drawBitmap(titleBitmap, size.x / 2 - (titleSize.x / 2), 0);
+         }
       }
+      //    if (config.isShowTourMarker) {
+      //       markerCanvas.drawBitmap(titleBitmap, size.x/2-(titleSize.x/2), 0);
+      //    }
 
       markerCanvas.drawBitmap(poiBitmap, size.x/2-(symbolSize.x/2), size.y/2-(symbolSize.y/2));
 
@@ -232,6 +257,14 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
 
       final Bitmap paintedBitmap = drawable.getBitmap(_BitmapClusterSymbol);
       return paintedBitmap;
+   }
+
+   @Override
+   protected void createFieldEditors() {
+      final Composite parent = getFieldEditorParent();
+      GridLayoutFactory.fillDefaults().applyTo(parent);
+      //createUI(parent);
+      //restoreState();
    }
 
    public List<MarkerItem> createMarkerItemList(final MarkerMode MarkerMode){
@@ -290,6 +323,7 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
 
    }
 
+
    public void debugPrint(final String debugText) {
       net.tourbook.map25.Map25App.debugPrint(debugText);
    }
@@ -305,7 +339,6 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
       defaultMarkerCanvas.drawCircle(half, half, half * 0.8f, _linePainter);
       return _bitmapCircle;
    }
-
 
    public Bitmap drawStar(final int bitmapStarSize) {
       //_mapApp.debugPrint("*** Markertoolkit:  drawstar: "); //$NON-NLS-1$
@@ -324,6 +357,11 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
       defaultMarkerCanvas.drawLine(half         ,   0         , half * 1.60f , half * 1.65f, _fillPainter);
       defaultMarkerCanvas.drawLine(half * 1.60f , half * 1.65f, half * 0.1f  , half * 0.65f, _fillPainter);
       return _bitmapStar;
+   }
+
+   @Override
+   public void init(final IWorkbench workbench) {
+      setPreferenceStore(_prefStore);
    }
 
    public void loadConfig () {

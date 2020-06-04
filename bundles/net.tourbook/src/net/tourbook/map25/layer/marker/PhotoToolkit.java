@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
@@ -48,6 +49,7 @@ import org.oscim.layers.marker.MarkerItem;
 import org.oscim.layers.marker.MarkerRendererFactory;
 import org.oscim.layers.marker.MarkerSymbol;
 
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.map25.Map25App;
@@ -59,19 +61,21 @@ import net.tourbook.photo.PhotoImageCache;
 import net.tourbook.photo.PhotoLoadManager;
 import net.tourbook.photo.PhotoLoadingState;
 import net.tourbook.photo.ImageUtils;
-
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.PrefPageMap25Appearance;
 
 public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemGestureListener<MarkerItem> {
-
+   private static IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
    private Bitmap _bitmapCluster;
    //private boolean _isBillboard;
 
    public MarkerSymbol _symbol;  //marker symbol, circle or star
 
-   private Bitmap _bitmapPhoto;  //normaly the photo as Bitmap
+   private PHOTO_TITLE_TYPE     _photoTitleType;
+   private Bitmap               _bitmapPhoto;          //normaly the photo as Bitmap
+
    private Bitmap _BitmapClusterPhoto;  // The Bitmap when markers are clustered
    private ArrayList<Photo> _allPhotos;
-
    public MarkerRendererFactory _markerRendererFactory;
 
    public boolean _isMarkerClusteredLast;
@@ -79,10 +83,6 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
    Display  _display;
 
    private Map25App _mapApp;
-
-//   private int  _imageSize;
-//   private static final String      STATE_PHOTO_PROPERTIES_IMAGE_SIZE      = "STATE_PHOTO_PROPERTIES_IMAGE_SIZE";       //$NON-NLS-1$
-//   private IDialogSettings       _state;
 
    private class LoadCallbackImage implements ILoadCallBack {
 
@@ -107,6 +107,12 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
       }
    }
 
+//   private int  _imageSize;
+//   private static final String      STATE_PHOTO_PROPERTIES_IMAGE_SIZE      = "STATE_PHOTO_PROPERTIES_IMAGE_SIZE";       //$NON-NLS-1$
+//   private IDialogSettings       _state;
+
+   private enum PHOTO_TITLE_TYPE {NONE, RATING, TIME}
+
 
    public PhotoToolkit() {
       super(MarkerShape.CIRCLE);
@@ -114,6 +120,15 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
       final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 
       loadConfig();
+      _photoTitleType = PHOTO_TITLE_TYPE.NONE;
+      if (_prefStore.getString(ITourbookPreferences.MAP25_PHOTO_TITLE_TYPE).equals(PrefPageMap25Appearance.PHOTO_TITLE_TYPE_NONE)) {
+         _photoTitleType = PHOTO_TITLE_TYPE.NONE;
+      } else if (_prefStore.getString(ITourbookPreferences.MAP25_PHOTO_TITLE_TYPE).equals(PrefPageMap25Appearance.PHOTO_TITLE_TYPE_TIME)) {
+         _photoTitleType = PHOTO_TITLE_TYPE.TIME;
+      } else if (_prefStore.getString(ITourbookPreferences.MAP25_PHOTO_TITLE_TYPE).equals(PrefPageMap25Appearance.PHOTO_TITLE_TYPE_RATING)) {
+         _photoTitleType = PHOTO_TITLE_TYPE.RATING;
+      }
+      Map25App.debugPrint(" PhotoToolkit: *** photoTitleType: " + _photoTitleType); //$NON-NLS-1$
 
       _fillPainter.setStyle(Paint.Style.FILL);
       _bitmapCluster = createClusterBitmap(1);
@@ -157,18 +172,20 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
       final List<MarkerItem> pts = new ArrayList<>();
 
       if (galleryPhotos == null) {
-         Map25App.debugPrint(" Map25View: *** createPhotoItemList: galleriePhotos was null"); //$NON-NLS-1$
+         Map25App.debugPrint(" Phototoolkit: *** createPhotoItemList: galleriePhotos was null"); //$NON-NLS-1$
          return pts;
          }
 
       if (galleryPhotos.size() == 0) {
-         Map25App.debugPrint(" Map25View: *** createPhotoItemList: galleriePhotos.size() was 0"); //$NON-NLS-1$
+         Map25App.debugPrint(" Phototoolkit: *** createPhotoItemList: galleriePhotos.size() was 0"); //$NON-NLS-1$
          return  pts;
       }
 
+
+
       /*
        * if (!_isShowPhoto) {
-       * Map25App.debugPrint(" Map25View: *** createPhotoItemList: photlayer is off");
+       * Map25App.debugPrint(" Phototoolkit: *** createPhotoItemList: photlayer is off");
        * return pts;
        * }
        */
@@ -195,7 +212,16 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
          case 5:
             starText = " *****"; //$NON-NLS-1$
          }
-         photoName = TimeTools.getZonedDateTime(photo.imageExifTime).format(TimeTools.Formatter_Time_S) + starText;
+
+         if (_prefStore.getString(ITourbookPreferences.MAP25_PHOTO_TITLE_TYPE)
+               .equals(net.tourbook.preferences.PrefPageMap25Appearance.PHOTO_TITLE_TYPE_RATING)) {
+            photoName = starText;
+         } else if (_prefStore.getString(ITourbookPreferences.MAP25_PHOTO_TITLE_TYPE)
+               .equals(net.tourbook.preferences.PrefPageMap25Appearance.PHOTO_TITLE_TYPE_TIME)) {
+            photoName = TimeTools.getZonedDateTime(photo.imageExifTime).format(TimeTools.Formatter_Time_S);
+         }
+
+         //photoName = TimeTools.getZonedDateTime(photo.imageExifTime).format(TimeTools.Formatter_Time_S) + starText;
 
          final String photoDescription = "Ratingstars: " + Integer.toString(photo.ratingStars); //$NON-NLS-1$
 
