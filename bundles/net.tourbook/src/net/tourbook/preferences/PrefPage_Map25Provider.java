@@ -87,6 +87,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
    private static final TileEncodingData[] _allTileEncoding                 = new TileEncodingData[] {
 
          new TileEncodingData(TileEncoding.VTM, Messages.Pref_Map25_Encoding_OpenScienceMap, false),
+         new TileEncodingData(TileEncoding.MP, Messages.Pref_Map25_Encoding_Mapilion, false),
          new TileEncodingData(TileEncoding.MVT, Messages.Pref_Map25_Encoding_Mapzen, false),
          new TileEncodingData(TileEncoding.MF, Messages.Pref_Map25_Encoding_Mapsforge_Offline, true)
    };

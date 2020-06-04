@@ -26,12 +26,10 @@ import de.byteholder.geoclipse.preferences.IMappingPreferences;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.time.ZonedDateTime;
@@ -67,7 +65,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IMemento;
-import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.XMLMemento;
 import org.geotools.data.ows.Service;
 import org.geotools.ows.wms.CRSEnvelope;
@@ -385,9 +382,7 @@ public class MapProviderManager {
          public void run() {
             try {
                new ProgressMonitorDialog(display.getActiveShell()).run(false, false, progressRunnable);
-            } catch (final InvocationTargetException e1) {
-               StatusUtil.showStatus(e1.getMessage(), e1);
-            } catch (final InterruptedException e1) {
+            } catch (final InvocationTargetException | InterruptedException e1) {
                StatusUtil.showStatus(e1.getMessage(), e1);
             }
          }
@@ -468,9 +463,7 @@ public class MapProviderManager {
 
          new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, true, runnable);
 
-      } catch (final InvocationTargetException e) {
-         e.printStackTrace();
-      } catch (final InterruptedException e) {
+      } catch (final InvocationTargetException | InterruptedException e) {
          e.printStackTrace();
       }
 
@@ -1388,11 +1381,9 @@ public class MapProviderManager {
 
    public void exportMapProvider(final MP mapProvider, final File file) {
 
-      BufferedWriter writer = null;
-
-      try {
-
-         writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), UI.UTF_8));
+      try (FileOutputStream fileOutputStream = new FileOutputStream(file);
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, net.tourbook.common.UI.UTF_8);
+            BufferedWriter writer = new BufferedWriter(outputStreamWriter)) {
 
          final XMLMemento xmlMemento = createXmlRoot(true);
 
@@ -1417,14 +1408,6 @@ public class MapProviderManager {
 
       } catch (final IOException e) {
          StatusUtil.log(e);
-      } finally {
-         if (writer != null) {
-            try {
-               writer.close();
-            } catch (final IOException e) {
-               StatusUtil.log(e);
-            }
-         }
       }
    }
 
@@ -1608,7 +1591,7 @@ public class MapProviderManager {
             return validMapProviders;
          }
 
-         reader = new InputStreamReader(new FileInputStream(inputFile), UI.UTF_8);
+         reader = new InputStreamReader(new FileInputStream(inputFile), net.tourbook.common.UI.UTF_8);
          final XMLMemento mementoRoot = XMLMemento.createReadRoot(reader);
 
          // check if this is an exported map provider
@@ -1627,14 +1610,6 @@ public class MapProviderManager {
             readXml_MP_2(validMapProviders, mementoRoot, ROOT_CHILD_TAG_WRAPPED_MAP_PROVIDER, isMpImport, filename);
          }
 
-      } catch (final UnsupportedEncodingException e) {
-         logError(e.getMessage(), e);
-      } catch (final FileNotFoundException e) {
-         logError(e.getMessage(), e);
-      } catch (final WorkbenchException e) {
-         logError(e.getMessage(), e);
-      } catch (final NumberFormatException e) {
-         logError(e.getMessage(), e);
       } catch (final Exception e) {
          logError(e.getMessage(), e);
       } finally {
@@ -2531,7 +2506,7 @@ public class MapProviderManager {
          final IPath stateLocation = Platform.getStateLocation(TourbookPlugin.getDefault().getBundle());
          final File file = stateLocation.append(CUSTOM_MAP_PROVIDER_FILE_NAME).toFile();
 
-         writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), UI.UTF_8));
+         writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), net.tourbook.common.UI.UTF_8));
 
          final XMLMemento xmlMemento = createXmlRoot(false);
 

@@ -72,6 +72,7 @@ import net.tourbook.map.bookmark.IMapBookmarkListener;
 import net.tourbook.map.bookmark.IMapBookmarks;
 import net.tourbook.map.bookmark.MapBookmark;
 import net.tourbook.map.bookmark.MapBookmarkManager;
+import net.tourbook.map.bookmark.MapPosition_with_MarkerPosition;
 import net.tourbook.map.bookmark.MapLocation;
 import net.tourbook.map2.view.IDiscreteColorProvider;
 import net.tourbook.map2.view.SelectionMapPosition;
@@ -1173,12 +1174,18 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
       final boolean isTourAvailable = _allTours.size() > 0;
       final boolean canTourBeDisplayed = isTrackVisible && isTourAvailable;
 
+      final boolean isPulsePresent = _allTours.stream().anyMatch(t -> t.pulseSerie != null);
+      final boolean canShowHrZones = _allTours.stream().anyMatch(t -> t.getNumberOfHrZones() > 0) && isPulsePresent;
+      final boolean isGradientPresent = _allTours.stream().anyMatch(t -> t.getGradientSerie() != null);
+      final boolean isSpeedPresent = _allTours.stream().anyMatch(t -> t.getSpeedSerie() != null);
+      final boolean isPacePresent = _allTours.stream().anyMatch(t -> t.getPaceSerie() != null);
+
       _actionTourColorAltitude.setEnabled(canTourBeDisplayed);
-      _actionTourColorGradient.setEnabled(canTourBeDisplayed);
-      _actionTourColorPace.setEnabled(canTourBeDisplayed);
-      _actionTourColorPulse.setEnabled(canTourBeDisplayed);
-      _actionTourColorSpeed.setEnabled(canTourBeDisplayed);
-      _actionTourColorHrZone.setEnabled(canTourBeDisplayed);
+      _actionTourColorGradient.setEnabled(canTourBeDisplayed && isGradientPresent);
+      _actionTourColorPace.setEnabled(canTourBeDisplayed && isPacePresent);
+      _actionTourColorPulse.setEnabled(canTourBeDisplayed && isPulsePresent);
+      _actionTourColorSpeed.setEnabled(canTourBeDisplayed && isSpeedPresent);
+      _actionTourColorHrZone.setEnabled(canTourBeDisplayed && canShowHrZones);
 
       _actionShowEntireTour.setEnabled(canTourBeDisplayed);
 
@@ -1367,7 +1374,9 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
    @Override
    public MapLocation getMapLocation() {
 
-      final MapPosition mapPosition = getMapPosition();
+
+		final MapPosition_with_MarkerPosition mapPosition = getMapPosition();
+
 
       if (mapPosition == null) {
          return null;
@@ -1376,7 +1385,9 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
       return new MapLocation(mapPosition);
    }
 
-   private MapPosition getMapPosition() {
+
+	private MapPosition_with_MarkerPosition getMapPosition() {
+
 
       final View view = _wwCanvas.getView();
 
@@ -1402,7 +1413,8 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
       final double zoomLevel = 20 - Math.log(elevation);
 
-      final MapPosition mapPosition = new MapLocation(geoCenter, (int) zoomLevel + 2).getMapPosition();
+		final MapPosition_with_MarkerPosition mapPosition = new MapLocation(geoCenter, (int) zoomLevel + 2).getMapPosition();
+
 
       mapPosition.bearing = -(float) basicView.getHeading().getDegrees();
       mapPosition.tilt = (float) basicView.getPitch().getDegrees();
@@ -1425,7 +1437,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
          if (tourData == null) {
 
-            // this occured, propably when there is no tour in the db
+            // this occurred, probably when there is no tour in the db
             continue;
          }
 
@@ -1914,7 +1926,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
       try {
          _state.put(STATE_MAP3_VIEW, view.getRestorableState());
       } catch (final Exception e) {
-         // this can occure
+         // this can occur
 //			StatusUtil.log(e);
       }
    }
@@ -2480,7 +2492,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
       final long timeDiff = System.currentTimeMillis() - _lastFiredSyncEventTime;
 
       if (timeDiff < 1000) {
-         // ignore because it causes LOTS of problems when synching moved map
+         // ignore because it causes LOTS of problems when synchronizing moved map
          return;
       }
 

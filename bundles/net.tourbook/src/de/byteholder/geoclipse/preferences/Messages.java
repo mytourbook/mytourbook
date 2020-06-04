@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
@@ -38,9 +38,9 @@ public class Messages extends NLS {
    public static String        Map2Provider_Tooltip_Label_Description;
    public static String        Map2Provider_Tooltip_Label_Layers;
    public static String        Map2Provider_Tooltip_Label_OnlineMap;
-   public static String        Map2Provider_Tooltip_Lable_MapProviderId;
-   public static String        Map2Provider_Tooltip_Lable_MapProviderType;
-   public static String        Map2Provider_Tooltip_Lable_OfflineFolder;
+   public static String        Map2Provider_Tooltip_Label_MapProviderId;
+   public static String        Map2Provider_Tooltip_Label_MapProviderType;
+   public static String        Map2Provider_Tooltip_Label_OfflineFolder;
 
    public static String        pref_cache_clear_cache;
    public static String        pref_cache_location;
@@ -82,7 +82,7 @@ public class Messages extends NLS {
    public static String        Pref_Map_Group_Detail_SelectedMapProvider;
    public static String        Pref_Map_JobName_DropUrl;
    public static String        Pref_Map_JobName_ReadMapFactoryOfflineInfo;
-   public static String        Pref_Map_Label_AvaiablelMapProvider;
+   public static String        Pref_Map_Label_AvailableMapProvider;
    public static String        Pref_Map_Label_Description;
    public static String        Pref_Map_Label_Layers;
    public static String        Pref_Map_Label_MapProviderDropTarget;
@@ -92,15 +92,15 @@ public class Messages extends NLS {
    public static String        Pref_Map_Label_OfflineInfo_Total;
    public static String        Pref_Map_Label_WmsDropTarget;
    public static String        Pref_Map_Label_WmsDropTarget_Tooltip;
-   public static String        Pref_Map_Lable_Category;
-   public static String        Pref_Map_Lable_Files;
-   public static String        Pref_Map_Lable_MapProvider;
-   public static String        Pref_Map_Lable_MapProviderId;
-   public static String        Pref_Map_Lable_MapProviderType;
-   public static String        Pref_Map_Lable_NotAvailable;
-   public static String        Pref_Map_Lable_NotRetrieved;
-   public static String        Pref_Map_Lable_OfflineFolder;
-   public static String        Pref_Map_Lable_OnlineMap;
+   public static String        Pref_Map_Label_Category;
+   public static String        Pref_Map_Label_Files;
+   public static String        Pref_Map_Label_MapProvider;
+   public static String        Pref_Map_Label_MapProviderId;
+   public static String        Pref_Map_Label_MapProviderType;
+   public static String        Pref_Map_Label_NotAvailable;
+   public static String        Pref_Map_Label_NotRetrieved;
+   public static String        Pref_Map_Label_OfflineFolder;
+   public static String        Pref_Map_Label_OnlineMap;
    public static String        Pref_Map_Link_MapProvider;
    public static String        Pref_Map_Link_MapProvider_Tooltip;
    public static String        Pref_Map_ProviderType_Custom;
@@ -138,7 +138,7 @@ public class Messages extends NLS {
    public static String        pref_map_dlg_saveModifiedMapProvider_message;
    public static String        pref_map_dlg_saveModifiedMapProvider_title;
    public static String        pref_map_dlg_saveOtherMapProvider_message;
-   public static String        pref_map_lable_NA;
+   public static String        pref_map_label_NA;
    public static String        pref_map_message_loadingWmsCapabilities;
    public static String        pref_map_show_tile_info;
    public static String        pref_map_validationError_factoryIdIsAlreadyUsed;

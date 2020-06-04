@@ -77,6 +77,8 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
    private Label     _lblTheme;
    private Label     _lblThemeStyle;
 
+   private Label     _lblCopyright;
+
    /**
     * @param ownerControl
     * @param toolBar
@@ -132,6 +134,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
             createUI_12_Actions(container);
          }
          createUI_20_Options(shellContainer);
+         //createUI_30_Info(shellContainer);
       }
 
       return shellContainer;
@@ -221,6 +224,17 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
       }
 
       fillMapProvider();
+   }
+
+   private void createUI_30_Info(final Composite parent) {
+
+      /*
+       * Label: Slideout Info with copyright Info
+       */
+      _lblCopyright = new Label(parent, SWT.NONE);
+      _lblCopyright.setText(Messages.Slideout_Map25Provider_Label_Copyright);
+
+      GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_lblCopyright);
    }
 
    private void fillMapProvider() {

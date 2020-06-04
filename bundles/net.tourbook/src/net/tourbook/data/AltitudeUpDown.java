@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,6 +21,7 @@ public class AltitudeUpDown {
    float altitudeDown;
 
    public AltitudeUpDown(final float altiUp, final float altiDown) {
+
       altitudeUp = altiUp;
       altitudeDown = altiDown;
    }

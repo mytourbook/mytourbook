@@ -1108,6 +1108,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
     * @return Returns the first ref tour which is selected or <code>null</code> when a ref tour is
     *         not selected.
     */
+   @SuppressWarnings("unused")
    private TVICatalogRefTourItem getFirstSelectedRefTour() {
 
       final IStructuredSelection selectedTours = ((IStructuredSelection) _tourViewer.getSelection());
@@ -1129,6 +1130,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
     * @return Returns the first tour which is selected or <code>null</code> when a tour is not
     *         selected.
     */
+   @SuppressWarnings("unused")
    private TVICatalogComparedTour getFirstSelectedTour() {
 
       final IStructuredSelection selectedTours = ((IStructuredSelection) _tourViewer.getSelection());
@@ -1150,6 +1152,7 @@ public class TourCatalogView extends ViewPart implements ITourViewer, ITourProvi
     * @return Returns the first year which is selected or <code>null</code> when a year is not
     *         selected.
     */
+   @SuppressWarnings("unused")
    private TVICatalogYearItem getFirstSelectedYear() {
 
       final IStructuredSelection selectedTours = ((IStructuredSelection) _tourViewer.getSelection());

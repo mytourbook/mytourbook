@@ -256,8 +256,8 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
 
 			tvc = new TableViewerColumn(_bookmarkViewer, SWT.TRAIL);
 			tc = tvc.getColumn();
-			tc.setText(Messages.Map_Bookmark_Column_ZoomLevel);
-			tc.setToolTipText(Messages.Map_Bookmark_Column_ZoomLevel_Tooltip);
+			tc.setText(Messages.Map_Bookmark_Column_ZoomLevel2);
+			tc.setToolTipText(Messages.Map_Bookmark_Column_ZoomLevel2_Tooltip);
 			tvc.setLabelProvider(new CellLabelProvider() {
 				@Override
 				public void update(final ViewerCell cell) {

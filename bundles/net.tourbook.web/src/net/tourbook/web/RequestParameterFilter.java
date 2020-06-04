@@ -15,6 +15,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.tourbook.common.UI;
+
 import com.sun.net.httpserver.Filter;
 import com.sun.net.httpserver.HttpExchange;
 
@@ -63,7 +65,7 @@ public class RequestParameterFilter extends Filter {
 			@SuppressWarnings("unchecked")
 			final Map<String, Object> parameters = (Map<String, Object>) exchange.getAttribute(ATTRIBUTE_PARAMETERS);
 
-			final InputStreamReader isr = new InputStreamReader(exchange.getRequestBody(), WEB.UTF_8);
+			final InputStreamReader isr = new InputStreamReader(exchange.getRequestBody(), UI.UTF_8);
 			final BufferedReader br = new BufferedReader(isr);
 			final String query = br.readLine();
 
@@ -87,11 +89,11 @@ public class RequestParameterFilter extends Filter {
 				String value = null;
 
 				if (param.length > 0) {
-					key = URLDecoder.decode(param[0], WEB.UTF_8);
+					key = URLDecoder.decode(param[0], UI.UTF_8);
 				}
 
 				if (param.length > 1) {
-					value = URLDecoder.decode(param[1], WEB.UTF_8);
+					value = URLDecoder.decode(param[1], UI.UTF_8);
 				}
 
 				if (parameters.containsKey(key)) {

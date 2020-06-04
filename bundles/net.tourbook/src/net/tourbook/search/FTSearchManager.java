@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1198,11 +1198,7 @@ public class FTSearchManager {
 
                      monitor.subTask(Messages.Database_Monitor_SetupLucene);
 
-                     Connection conn = null;
-
-                     try {
-
-                        conn = TourDatabase.getInstance().getConnection();
+                     try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
                         createStores_TourData(conn, monitor);
                         createStores_TourMarker(conn, monitor);
@@ -1210,17 +1206,13 @@ public class FTSearchManager {
 
                      } catch (final SQLException e) {
                         UI.showSQLException(e);
-                     } finally {
-                        Util.closeSql(conn);
                      }
                   }
                };
 
                new ProgressMonitorDialog(Display.getDefault().getActiveShell()).run(true, false, runnable);
 
-            } catch (final InvocationTargetException e) {
-               StatusUtil.log(e);
-            } catch (final InterruptedException e) {
+            } catch (final InvocationTargetException | InterruptedException e) {
                StatusUtil.log(e);
             }
          }

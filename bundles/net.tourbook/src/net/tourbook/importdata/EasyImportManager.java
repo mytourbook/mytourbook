@@ -285,7 +285,7 @@ public class EasyImportManager {
 
       final String deviceFileNameINList = sb.toString();
 
-      try (Connection conn = TourDatabase.getInstance().getConnection(); //
+      try (Connection conn = TourDatabase.getInstance().getConnection();
             Statement stmt = conn.createStatement()) {
 
          final String sqlQuery = UI.EMPTY_STRING//

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,20 +15,14 @@
  *******************************************************************************/
 package net.tourbook.sign;
 
-import java.io.File;
-
-import net.tourbook.photo.PicDirView;
-
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.handlers.HandlerUtil;
 
 public class ActionHandlerImportSignsFromFolder_DISABLED extends AbstractHandler {
 
-	@Override
-	public Object execute(final ExecutionEvent event) throws ExecutionException {
+   @Override
+   public Object execute(final ExecutionEvent event) throws ExecutionException {
 
 //		final IWorkbenchPart activePart = HandlerUtil.getActiveWorkbenchWindow(event).getActivePage().getActivePart();
 //
@@ -42,6 +36,6 @@ public class ActionHandlerImportSignsFromFolder_DISABLED extends AbstractHandler
 //			}
 //		}
 
-		return null;
-	}
+      return null;
+   }
 }

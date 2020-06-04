@@ -217,7 +217,7 @@ public class MarkerRenderer extends BucketRenderer {
 
 		_symbolBucket = new SymbolBucket();
 		
-		_markertoolkit = new MarkerToolkit(MarkerToolkit.MarkerShape.CIRCLE);
+		_markertoolkit = new MarkerToolkit(MarkerShape.CIRCLE);
 
 		configureRenderer();
 	}
@@ -825,7 +825,7 @@ public class MarkerRenderer extends BucketRenderer {
 
             //create dummy MarkerItem with dummy coordinates. only need it for create the label
 			   MarkerItem item = new MarkerItem(title, subtitle, new GeoPoint(5.0, 5.0));
-			   item.setMarker(_markertoolkit.createAdvanceSymbol(item, markerSymbol.getBitmap()));
+			   item.setMarker(_markertoolkit.createAdvanceSymbol(item, markerSymbol.getBitmap(), false));
 			   
 			   mapSymbol.set(projItem.mapX, projItem.mapY, item.getMarker().getBitmap(), markerSymbol.mBillboard); 
 			   mapSymbol.offset = markerSymbol.getHotspot();

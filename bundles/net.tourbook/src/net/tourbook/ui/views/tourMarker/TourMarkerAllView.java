@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1370,13 +1370,10 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
 
 //      final double latLonFactor = Math.pow(10, _latLonDigits);
 
-      Connection conn = null;
       PreparedStatement statement = null;
       ResultSet result = null;
 
-      try {
-
-         conn = TourDatabase.getInstance().getConnection();
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          final String tblTourMarker = TourDatabase.TABLE_TOUR_MARKER;
          final String tourKey = TourDatabase.KEY_TOUR;
@@ -1455,7 +1452,6 @@ public class TourMarkerAllView extends ViewPart implements ITourProvider, ITourV
       } catch (final SQLException e) {
          SQL.showException(e);
       } finally {
-         Util.closeSql(conn);
          Util.closeSql(statement);
          Util.closeSql(result);
       }

@@ -237,13 +237,10 @@ public class TourGeoFilter_Loader {
       }
 
       final int numGeoParts = allLatLonParts.size();
-      Connection conn = null;
 
       final ArrayList<Long> allTourIds = new ArrayList<>();
 
-      try {
-
-         conn = TourDatabase.getInstance().getConnection();
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          final PreparedStatement stmtSelect = conn.prepareStatement(sqlSelect);
 
@@ -283,9 +280,6 @@ public class TourGeoFilter_Loader {
          StatusUtil.log(sqlSelect);
          net.tourbook.ui.UI.showSQLException(e);
 
-      } finally {
-
-         Util.closeSql(conn);
       }
 
       final long timeDiff = System.currentTimeMillis() - timerStart;
