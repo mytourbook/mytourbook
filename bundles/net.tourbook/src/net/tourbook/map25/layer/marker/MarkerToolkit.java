@@ -194,9 +194,9 @@ public class MarkerToolkit extends FieldEditorPreferencePage implements Itemized
           * the following three lines displaying a transparent box.
           * only for testing purposes, normally uncommented
           */
-         //fillPainter.setColor(0x60ffffff);
-         //markerCanvas.drawCircle(0, 0, size.x * 2, fillPainter);
-         //fillPainter.setColor(_bgColor);
+//         fillPainter.setColor(0x60ffffff);
+//         markerCanvas.drawCircle(0, 0, size.x * 2, fillPainter);
+//         fillPainter.setColor(_bgColor);
       }
 
       // draw an oversized transparent circle, so the canvas is completely filled with a transparent color
