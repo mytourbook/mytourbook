@@ -39,16 +39,13 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 
 public class DropboxFileSystem extends TourbookFileSystem {
-   //Should the FileSystemManager do evetrything ? what is the role of NIO ?
-
-   // make sure that nothing references the cloud plugin
 
    private java.nio.file.FileSystem _dropboxFileSystem;
    private IPreferenceStore         _prefStore = Activator.getDefault().getPreferenceStore();
 
    public DropboxFileSystem() {
 
-      super("Dropbox");
+      super("Dropbox"); //$NON-NLS-1$
 
       createDropboxFileSystem();
 
@@ -78,7 +75,7 @@ public class DropboxFileSystem extends TourbookFileSystem {
    }
 
    /**
-    * Closes the Dropbox Java 7 FileSystem.
+    * Closes the Dropbox Java 8 FileSystem.
     * This function will be called whenever the user
     * stops the folder watch or quits MyTourbook.
     */
@@ -140,6 +137,11 @@ public class DropboxFileSystem extends TourbookFileSystem {
       return result;
    }
 
+   @Override
+   public String getAbsoluteRootPath() {
+      return _prefStore.getString(IPreferences.DROPBOX_FOLDER);
+   }
+
    /**
     * Retrieves the Dropbox {@link FileStore}.
     * Creates it if necessary.
@@ -166,11 +168,7 @@ public class DropboxFileSystem extends TourbookFileSystem {
     */
    @Override
    protected FileSystem getFileSystem() {
-      if (_dropboxFileSystem != null) {
-         return _dropboxFileSystem;
-      }
-
-      return null;
+      return _dropboxFileSystem;
    }
 
    /**
@@ -187,5 +185,10 @@ public class DropboxFileSystem extends TourbookFileSystem {
 
       final String dropboxFilePath = _prefStore.getString(IPreferences.DROPBOX_FOLDER);
       return _dropboxFileSystem.getPath(dropboxFilePath);
+   }
+
+   @Override
+   public String getPreferencePageId() {
+      return PrefPageDropbox.ID;
    }
 }
