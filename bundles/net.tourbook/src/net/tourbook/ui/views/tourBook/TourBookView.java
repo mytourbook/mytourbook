@@ -134,7 +134,6 @@ import org.eclipse.nebula.widgets.nattable.config.DefaultNatTableStyleConfigurat
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
-import org.eclipse.nebula.widgets.nattable.grid.GridRegion;
 import org.eclipse.nebula.widgets.nattable.grid.data.DefaultCornerDataProvider;
 import org.eclipse.nebula.widgets.nattable.grid.data.DefaultRowHeaderDataProvider;
 import org.eclipse.nebula.widgets.nattable.grid.layer.ColumnHeaderLayer;
@@ -146,9 +145,10 @@ import org.eclipse.nebula.widgets.nattable.hover.HoverLayer;
 import org.eclipse.nebula.widgets.nattable.layer.DataLayer;
 import org.eclipse.nebula.widgets.nattable.layer.ILayer;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnOverrideLabelAccumulator;
-import org.eclipse.nebula.widgets.nattable.painter.cell.BackgroundImagePainter;
-import org.eclipse.nebula.widgets.nattable.painter.cell.ICellPainter;
+import org.eclipse.nebula.widgets.nattable.layer.cell.ILayerCell;
+import org.eclipse.nebula.widgets.nattable.painter.cell.ImagePainter;
 import org.eclipse.nebula.widgets.nattable.painter.cell.TextPainter;
+import org.eclipse.nebula.widgets.nattable.painter.cell.decorator.CellPainterDecorator;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.selection.command.SelectRowsCommand;
 import org.eclipse.nebula.widgets.nattable.selection.config.DefaultRowSelectionLayerConfiguration;
@@ -157,6 +157,7 @@ import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.eclipse.nebula.widgets.nattable.style.HorizontalAlignmentEnum;
 import org.eclipse.nebula.widgets.nattable.style.Style;
 import org.eclipse.nebula.widgets.nattable.style.theme.ModernNatTableThemeConfiguration;
+import org.eclipse.nebula.widgets.nattable.ui.util.CellEdgeEnum;
 import org.eclipse.nebula.widgets.nattable.util.GUIHelper;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 import org.eclipse.osgi.util.NLS;
@@ -950,29 +951,11 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       }
    }
 
-   private final class NatTable_Configuration_Hover extends AbstractRegistryConfiguration {
-      @Override
-      public void configureRegistry(final IConfigRegistry configRegistry) {
-
-         Style style = new Style();
-
-         style.setAttributeValue(CellStyleAttributes.BACKGROUND_COLOR, GUIHelper.COLOR_YELLOW);
-
-         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, style, DisplayMode.HOVER);
-
-         style = new Style();
-
-         style.setAttributeValue(CellStyleAttributes.BACKGROUND_COLOR, GUIHelper.COLOR_RED);
-
-         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, style, DisplayMode.SELECT_HOVER);
-      }
-   }
-
-   private class NatTable_Configuration_Painter extends AbstractRegistryConfiguration {
+   private class NatTable_Configuration_CellStyle extends AbstractRegistryConfiguration {
 
       private ArrayList<ColumnDefinition> _allSortedColumns;
 
-      public NatTable_Configuration_Painter(final ArrayList<ColumnDefinition> allSortedColumns) {
+      public NatTable_Configuration_CellStyle(final ArrayList<ColumnDefinition> allSortedColumns) {
 
          _allSortedColumns = allSortedColumns;
       }
@@ -980,9 +963,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       @Override
       public void configureRegistry(final IConfigRegistry configRegistry) {
 
-         // override column header style configuration to make use of the BackgroundImagePainter
-         registerColumnHeaderStyle(configRegistry);
-
+         // loop: all displayed columns
          for (int colIndex = 0; colIndex < _allSortedColumns.size(); colIndex++) {
 
             final ColumnDefinition colDef = _allSortedColumns.get(colIndex);
@@ -997,16 +978,27 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
                break;
             }
 
-            final Style style = new Style();
+            final String columnId = colDef.getColumnId();
 
-            final HorizontalAlignmentEnum columnAlignment = natTableConvert_ColumnAlignment(colDef.getColumnStyle());
+            switch (columnId) {
+            case TableColumnFactory.TOUR_TYPE_ID:
 
-            style.setAttributeValue(CellStyleAttributes.HORIZONTAL_ALIGNMENT, columnAlignment);
+               break;
 
-            configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE,
-                  style,
-                  DisplayMode.NORMAL,
-                  colDef.getColumnId());
+            default:
+
+               final Style style = new Style();
+
+               final HorizontalAlignmentEnum columnAlignment = natTableConvert_ColumnAlignment(colDef.getColumnStyle());
+
+               style.setAttributeValue(CellStyleAttributes.HORIZONTAL_ALIGNMENT, columnAlignment);
+
+               configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE,
+                     style,
+                     DisplayMode.NORMAL,
+                     columnId);
+               break;
+            }
          }
       }
 
@@ -1030,41 +1022,28 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             return HorizontalAlignmentEnum.CENTER;
          }
       }
+   }
 
-      private void registerColumnHeaderStyle(final IConfigRegistry configRegistry) {
+   private final class NatTable_Configuration_Hover extends AbstractRegistryConfiguration {
 
-         final Image bgImage = GUIHelper.getImageByURL(
-               "columnHeaderBg",
-               getClass().getResource("/org/eclipse/nebula/widgets/nattable/examples/resources/column_header_bg.png"));
+      @Override
+      public void configureRegistry(final IConfigRegistry configRegistry) {
 
-         final Image selectedBgImage = GUIHelper.getImageByURL(
-               "selectedColumnHeaderBg",
-               getClass().getResource("/org/eclipse/nebula/widgets/nattable/examples/resources/selected_column_header_bg.png"));
+         Style style;
 
-         final TextPainter txtPainter = new TextPainter(false, false);
+         style = new Style();
+         style.setAttributeValue(CellStyleAttributes.BACKGROUND_COLOR, GUIHelper.COLOR_YELLOW);
 
-         final ICellPainter bgImagePainter = new BackgroundImagePainter(txtPainter, bgImage, GUIHelper.getColor(192, 192, 192));
+         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, style, DisplayMode.HOVER);
 
-         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER,
-               bgImagePainter,
-               DisplayMode.NORMAL,
-               GridRegion.COLUMN_HEADER);
+         style = new Style();
+         style.setAttributeValue(CellStyleAttributes.BACKGROUND_COLOR, GUIHelper.COLOR_RED);
 
-         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER,
-               bgImagePainter,
-               DisplayMode.NORMAL,
-               GridRegion.CORNER);
-
-         final ICellPainter selectedHeaderPainter = new BackgroundImagePainter(txtPainter, selectedBgImage, GUIHelper.getColor(192, 192, 192));
-
-         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER,
-               selectedHeaderPainter,
-               DisplayMode.SELECT,
-               GridRegion.COLUMN_HEADER);
+         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, style, DisplayMode.SELECT_HOVER);
       }
    }
 
-   public class NatTable_Configuration_Theme extends ModernNatTableThemeConfiguration {
+   private class NatTable_Configuration_Theme extends ModernNatTableThemeConfiguration {
 
       public NatTable_Configuration_Theme() {
 
@@ -1089,6 +1068,52 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 //         this.defaultSelectionFgColor = GUIHelper.COLOR_LIST_SELECTION_TEXT;
          this.defaultSelectionBgColor = GUIHelper.COLOR_BLACK;
          this.defaultSelectionFgColor = GUIHelper.COLOR_YELLOW;
+      }
+   }
+
+   private final class NatTable_Configuration_TourType extends AbstractRegistryConfiguration {
+
+      private IRowDataProvider<TVITourBookTour> _dataProvider;
+
+      private NatTable_Configuration_TourType(final IRowDataProvider<TVITourBookTour> body_DataProvider) {
+
+         _dataProvider = body_DataProvider;
+      }
+
+      @Override
+      public void configureRegistry(final IConfigRegistry configRegistry) {
+
+         final ImagePainter decoratorCellPainter = new ImagePainter() {
+
+            @Override
+            protected Image getImage(final ILayerCell cell, final IConfigRegistry configRegistry) {
+
+               // get the row object
+
+               final int rowIndex = cell.getRowIndex();
+
+               final TVITourBookTour tviTour = _dataProvider.getRowObject(rowIndex);
+
+               if (tviTour == null) {
+                  return null;
+               }
+
+               final long tourTypeId = tviTour.getTourTypeId();
+               final Image tourTypeImage = TourTypeImage.getTourTypeImage(tourTypeId);
+
+               return tourTypeImage;
+            }
+         };
+
+         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER,
+
+               new CellPainterDecorator(
+                     new TextPainter(),
+                     CellEdgeEnum.LEFT,
+                     decoratorCellPainter),
+
+               DisplayMode.NORMAL,
+               TableColumnFactory.TOUR_TYPE_ID);
       }
    }
 
@@ -1704,21 +1729,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          body_DataLayer.setColumnWidthByPosition(colIndex - 1, colDef.getColumnWidth(), false);
       }
 
-      // register column labels
-      final ColumnOverrideLabelAccumulator columnLabelAccumulator = new ColumnOverrideLabelAccumulator(body_DataLayer);
-      body_DataLayer.setConfigLabelAccumulator(columnLabelAccumulator);
-
-      for (int colIndex = 0; colIndex < allSortedColumns.size(); colIndex++) {
-
-         // skip first "hidden" column
-         if (colIndex == 0) {
-            continue;
-         }
-
-         final ColumnDefinition colDef = allSortedColumns.get(colIndex);
-         columnLabelAccumulator.registerColumnOverrides(colIndex - 1, colDef.getColumnId());
-      }
-
       /*
        * Create: Hover layer
        */
@@ -1788,6 +1798,29 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       final GridLayer gridLayer = new GridLayer(_natTable_Grid_BodyLayer, columnHeader_Layer, rowHeader_Layer, corner_Layer);
 
       /*
+       * Register column labels for the body and header -> this is necessary to apply styling
+       */
+      final ColumnOverrideLabelAccumulator body_ColumnLabelAccumulator = new ColumnOverrideLabelAccumulator(body_DataLayer);
+      final ColumnOverrideLabelAccumulator columnHeader_ColumnLabelAccumulator = new ColumnOverrideLabelAccumulator(columnHeader_DataLayer);
+
+      body_DataLayer.setConfigLabelAccumulator(body_ColumnLabelAccumulator);
+      columnHeader_DataLayer.setConfigLabelAccumulator(columnHeader_ColumnLabelAccumulator);
+
+      for (int colIndex = 0; colIndex < allSortedColumns.size(); colIndex++) {
+
+         // skip first "hidden" column
+         if (colIndex == 0) {
+            continue;
+         }
+
+         final ColumnDefinition colDef = allSortedColumns.get(colIndex);
+         final String columnId = colDef.getColumnId();
+
+         columnHeader_ColumnLabelAccumulator.registerColumnOverrides(colIndex - 1, columnId);
+         body_ColumnLabelAccumulator.registerColumnOverrides(colIndex - 1, columnId);
+      }
+
+      /*
        * Create: Table
        */
       // turn the auto configuration off as we want to add our hover styling configuration
@@ -1800,7 +1833,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       // as the autoconfiguration of the NatTable is turned off, we have to add the DefaultNatTableStyleConfiguration manually
       _tourViewer_NatTable.addConfiguration(new DefaultNatTableStyleConfiguration());
 
-      _tourViewer_NatTable.addConfiguration(new NatTable_Configuration_Painter(_natTable_DataProvider.allSortedColumns));
+      _tourViewer_NatTable.addConfiguration(new NatTable_Configuration_CellStyle(_natTable_DataProvider.allSortedColumns));
+
+      _tourViewer_NatTable.addConfiguration(new NatTable_Configuration_TourType(body_DataProvider));
 
       // add the style configuration for hover
       _tourViewer_NatTable.addConfiguration(new NatTable_Configuration_Hover());
@@ -5833,7 +5868,15 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
          @Override
          public String getValueText(final Object element) {
-            return "Image is not yet supported";
+
+            /**
+             * Tour type image for the NatTable is implemented in
+             * net.tourbook.ui.views.tourBook.TourBookView.NatTable_Configuration_TourType
+             * <p>
+             * When a label provider is not defined then a warning message is displayed from the
+             * data provider !
+             */
+            return UI.EMPTY_STRING;
          }
       });
 
@@ -7555,7 +7598,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
                      /**
                       * <code>
-
+                     
                         Caused by: java.lang.NullPointerException
                         at org.eclipse.jface.viewers.AbstractTreeViewer.getSelection(AbstractTreeViewer.java:2956)
                         at org.eclipse.jface.viewers.StructuredViewer.handleSelect(StructuredViewer.java:1211)
@@ -7573,13 +7616,13 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
                         at org.eclipse.jface.viewers.AbstractTreeViewer.internalCollapseToLevel(AbstractTreeViewer.java:1586)
                         at org.eclipse.jface.viewers.AbstractTreeViewer.collapseToLevel(AbstractTreeViewer.java:751)
                         at org.eclipse.jface.viewers.AbstractTreeViewer.collapseAll(AbstractTreeViewer.java:733)
-
+                     
                         at net.tourbook.ui.views.tourBook.TourBookView$70.run(TourBookView.java:3406)
-
+                     
                         at org.eclipse.swt.widgets.RunnableLock.run(RunnableLock.java:35)
                         at org.eclipse.swt.widgets.Synchronizer.runAsyncMessages(Synchronizer.java:135)
                         ... 22 more
-
+                     
                       * </code>
                       */
 

@@ -51,7 +51,7 @@ public class DataProvider_Tour implements IRowDataProvider<TVITourBookTour> {
 
       if (labelProvider == null) {
 
-         return "n/a";
+         return "A LabelProvider is not defined";
 
       } else {
 
