@@ -1597,7 +1597,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
          _layer_Photo.removeAllItems();
       }
 
-      _selectedPhotosPts = _phototoolkit.createPhotoItemList(_map25View.get_allPhotos()); //hopefully done in map25view "paintToursAndUpdate"
+      _selectedPhotosPts = _phototoolkit.createPhotoItemList(_map25View.get_allPhotos(), getIsPhotoShowTitle()); //hopefully done in map25view "paintToursAndUpdate"
       debugPrint(" map25: " + "# updateUI_PhotoLayer(): #photos: " + _selectedPhotosPts.size() + " enabled: " + "isShowPhotoLayer"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
       _layer_Photo.addItems(_selectedPhotosPts); //hopefully done in map25view "paintToursAndUpdate"
       _layer_Photo.setEnabled(isShowPhotoLayer);

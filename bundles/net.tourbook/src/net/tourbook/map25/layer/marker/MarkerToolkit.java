@@ -109,14 +109,33 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
    }
 
    /**
-    * creates a transparent symbol with text and description.
-    * @param mItem  -> the MarkerItem to process, containing title and description
-    * if description starts with a '#' the first line of the description is drawn.
-    * @param poiBitmap  -> poi bitmap for the center
-    * @return MarkerSymbol with title, description and symbol
-    *
+    * creates a transparent symbol with text and description. for marker.
+    * short version of createAdvanceSymbol(final MarkerItem mItem, final Bitmap poiBitmap, false, false)
+    * 
+    * @param mItem
+    * @param poiBitmap
+    * @return
     */
-   public MarkerSymbol createAdvanceSymbol(final MarkerItem mItem, final Bitmap poiBitmap, final Boolean isPhoto) {
+   public MarkerSymbol createAdvanceSymbol(final MarkerItem mItem, final Bitmap poiBitmap) {
+      return createAdvanceSymbol(mItem, poiBitmap, false, false);
+   }
+
+   /**
+    * creates a transparent symbol with text and description. for photos and marker.
+    *
+    * @param mItem
+    *           -> the MarkerItem to process, containing title and description
+    *           if description starts with a '#' the first line of the description is drawn.
+    * @param poiBitmap
+    *           -> poi bitmap for the center
+    * @param isPhoto
+    *           -> called from PhotoToolkit yes/no
+    * @param showPhotoTitle
+    *           -> when isPhoto = true show photo title on/off. when isPhoto = false, this param is
+    *           ignored
+    * @return MarkerSymbol with title, description and symbol
+    */
+   public MarkerSymbol createAdvanceSymbol(final MarkerItem mItem, final Bitmap poiBitmap, final Boolean isPhoto, final boolean showPhotoTitle) {
       loadConfig();
       final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
       final boolean isBillboard = config.markerOrientation == Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD;
@@ -249,7 +268,7 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
                //new GeoPoint(mapBookmark.getLatitude(), mapBookmark.getLongitude())
                new GeoPoint(mapBookmark.get_mapPositionMarkerLatitude(), mapBookmark.get_mapPositionMarkerLongitude())
                );
-         item.setMarker(createAdvanceSymbol(item, _bitmapPoi, false));
+         item.setMarker(createAdvanceSymbol(item, _bitmapPoi));
          pts.add(item);
       }
 
@@ -269,7 +288,7 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
             final MarkerItem item = new MarkerItem(y + ", " + x, "Title " + demo_lat + "/" + demo_lon,"Description "  + x + "/" + y, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
                   new GeoPoint(demo_lat + y * STEP + random, demo_lon + x * STEP + random)
                   );
-            item.setMarker(createAdvanceSymbol(item, _bitmapPoi, false));
+            item.setMarker(createAdvanceSymbol(item, _bitmapPoi));
             pts.add(item);
          }
       }

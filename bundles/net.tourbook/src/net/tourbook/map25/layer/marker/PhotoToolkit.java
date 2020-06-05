@@ -139,20 +139,20 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
       };
    }
 
-   public MarkerSymbol createPhotoBitmapFromPhoto(final Photo photo, final MarkerItem item) {
+   public MarkerSymbol createPhotoBitmapFromPhoto(final Photo photo, final MarkerItem item, final boolean showPhotoTitle) {
       Bitmap bitmapImage = getPhotoBitmap(photo);
       MarkerSymbol bitmapPhoto = null;
 
       if (bitmapImage == null) {
          bitmapImage = _bitmapPhoto;
       }
-      bitmapPhoto = createAdvanceSymbol(item, bitmapImage, true);
+      bitmapPhoto = createAdvanceSymbol(item, bitmapImage, true, showPhotoTitle);
 
       return bitmapPhoto;
    }
 
 
-   public List<MarkerItem> createPhotoItemList(final ArrayList<Photo> galleryPhotos){
+   public List<MarkerItem> createPhotoItemList(final ArrayList<Photo> galleryPhotos, final boolean showPhotoTitle){
       Map25App.debugPrint(" Phototoolkit createPhotoItemList: entering "); //$NON-NLS-1$
       final List<MarkerItem> pts = new ArrayList<>();
 
@@ -220,7 +220,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
          final MarkerItem item = new MarkerItem(photoKey, photoName, photoDescription,
                new GeoPoint(photoLat, photoLon)
                );
-         final MarkerSymbol markerSymbol = createPhotoBitmapFromPhoto(photo, item);
+         final MarkerSymbol markerSymbol = createPhotoBitmapFromPhoto(photo, item, showPhotoTitle);
 
          if (markerSymbol != null) {
             item.setMarker(markerSymbol);
