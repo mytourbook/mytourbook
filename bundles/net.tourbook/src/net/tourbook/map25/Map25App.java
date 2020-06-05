@@ -126,7 +126,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private static Map25View        _map25View;
    private static LwjglApplication _lwjglApp;
 
-   public static DebugMode         debugMode                         = DebugMode.OFF;                      // before releasing, set this to OFF
+   public static DebugMode         debugMode                         = DebugMode.ON;                       // before releasing, set this to OFF
    private Boolean                 _mf_IsThemeFromFile               = null;
 
    private Boolean                 _firstRun                         = true;

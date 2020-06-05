@@ -194,9 +194,9 @@ public class MarkerToolkit extends FieldEditorPreferencePage implements Itemized
           * the following three lines displaying a transparent box.
           * only for testing purposes, normally uncommented
           */
-//         fillPainter.setColor(0x60ffffff);
-//         markerCanvas.drawCircle(0, 0, size.x * 2, fillPainter);
-//         fillPainter.setColor(_bgColor);
+         fillPainter.setColor(0x60ffffff);
+         markerCanvas.drawCircle(0, 0, size.x * 2, fillPainter);
+         fillPainter.setColor(_bgColor);
       }
 
       // draw an oversized transparent circle, so the canvas is completely filled with a transparent color
@@ -207,13 +207,14 @@ public class MarkerToolkit extends FieldEditorPreferencePage implements Itemized
                .getString(
                ITourbookPreferences.MAP25_PHOTO_TITLE_TYPE)
                .equals(net.tourbook.preferences.PrefPageMap25Appearance.PHOTO_TITLE_TYPE_RATING)) {
-            debugPrint("*** Markertoolkit: phototitle type rating : " + _prefStore.getString(ITourbookPreferences.MAP25_PHOTO_TITLE_TYPE)); //$NON-NLS-1$
+            //debugPrint("*** Markertoolkit: phototitle type rating : " + _prefStore.getString(ITourbookPreferences.MAP25_PHOTO_TITLE_TYPE)); //$NON-NLS-1$
             titleCanvas.drawText(mItem.title, margin, titleSize.y - margin, textRatingStarPainter);
          } else {
             titleCanvas.drawText(mItem.title, margin, titleSize.y - margin, textPainter);
          }
 
       } else {
+         debugPrint("*** Markertoolkit: not photo title: " + mItem.title + " size.x:" + titleSize.x + " size.y: " + titleSize.y); //$NON-NLS-1$
          titleCanvas.drawText(mItem.title, margin, titleSize.y - margin, textPainter);
       }
 
