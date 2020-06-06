@@ -43,9 +43,10 @@ import net.tourbook.map25.Map25ConfigManager;
 
 public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<MarkerItem> {
    //ItemizedLayer<MarkerItem> mMarkerLayer;
-   protected int _fgColor = 0xFF000000; // 100 percent black. AARRGGBB
-   protected int _bgColor = 0x80FF69B4; // 50 percent pink. AARRGGBB
-   protected int  _poiColor               = 0xFF91c7ff;                                                               // 100 blue like mapBookmark in toolbar
+   protected int _fgColor = 0xFF000000;   // 100 percent black. AARRGGBB
+   protected int _bgColor = 0x80FF69B4;   // 50 percent pink. AARRGGBB
+   //protected int _poiColor = 0xFF91c7ff;  // blue like toolbar
+   protected int  _poiColor               = 0xFFFFFF00;                                                               // yellow is better to see                                                             // 100percent yellow
    protected int _clusterSymbolSizeDP = net.tourbook.map25.layer.marker.MarkerRenderer.MAP_MARKER_CLUSTER_SIZE_DP;
    protected int _clusterForegroundColor = net.tourbook.map25.layer.marker.MarkerRenderer.CLUSTER_COLOR_TEXT;
    protected int _clusterBackgroundColor = net.tourbook.map25.layer.marker.MarkerRenderer.CLUSTER_COLOR_BACK;
@@ -337,7 +338,7 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
       final org.oscim.backend.canvas.Canvas defaultMarkerCanvas = CanvasAdapter.newCanvas();
       defaultMarkerCanvas.setBitmap(_bitmapStar);
       final float half = bitmapStarSize/2;
-      _fillPainter.setColor(0xFFFFFF00); // 100percent yellow
+      _fillPainter.setColor(starColor);
       _fillPainter.setStrokeWidth(2);
       /*
        * link: https://stackoverflow.com/questions/16327588/how-to-make-star-shape-in-java
