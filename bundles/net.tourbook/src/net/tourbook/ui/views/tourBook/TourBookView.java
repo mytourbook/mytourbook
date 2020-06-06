@@ -193,47 +193,47 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
    private static final String           COLUMN_FACTORY_TIME_ZONE_DIFF_TOOLTIP           = net.tourbook.ui.Messages.ColumnFactory_TimeZoneDifference_Tooltip;
 
-   static public final String            ID                                              = "net.tourbook.views.tourListView";         //$NON-NLS-1$
-
+// SET_FORMATTING_ON
+ 
+   static public final String            ID                                              = "net.tourbook.views.tourListView";          //$NON-NLS-1$
+   //
    private final static IPreferenceStore _prefStore                                      = TourbookPlugin.getPrefStore();
    private final static IPreferenceStore _prefStoreCommon                                = CommonActivator.getPrefStore();
    //
-   private static final IDialogSettings _state                                          = TourbookPlugin.getState(ID);
-
-// SET_FORMATTING_ON
-
-   private static final IDialogSettings _state_Table                                    = TourbookPlugin.getState(ID + "_TABLE");    //$NON-NLS-1$
-   private static final IDialogSettings _state_Tree                                     = TourbookPlugin.getState(ID + "_TREE");     //$NON-NLS-1$
+   private static final IDialogSettings  _state                                          = TourbookPlugin.getState(ID);
+   private static final IDialogSettings  _state_NatTable                                 = TourbookPlugin.getState(ID + "_NAT_TABLE"); //$NON-NLS-1$
+   private static final IDialogSettings  _state_Table                                    = TourbookPlugin.getState(ID + "_TABLE");     //$NON-NLS-1$
+   private static final IDialogSettings  _state_Tree                                     = TourbookPlugin.getState(ID + "_TREE");      //$NON-NLS-1$
    //
-   private static final String          STATE_CSV_EXPORT_PATH                           = "STATE_CSV_EXPORT_PATH";                   //$NON-NLS-1$
+   private static final String           STATE_CSV_EXPORT_PATH                           = "STATE_CSV_EXPORT_PATH";                    //$NON-NLS-1$
    //
-   private static final String          STATE_IS_LINK_WITH_OTHER_VIEWS                  = "STATE_IS_LINK_WITH_OTHER_VIEWS";          //$NON-NLS-1$
-   private static final String          STATE_IS_SELECT_YEAR_MONTH_TOURS                = "STATE_IS_SELECT_YEAR_MONTH_TOURS";        //$NON-NLS-1$
-   static final String                  STATE_IS_SHOW_SUMMARY_ROW                       = "STATE_IS_SHOW_SUMMARY_ROW";               //$NON-NLS-1$
-   static final String                  STATE_LINK_AND_COLLAPSE_ALL_OTHER_ITEMS         = "STATE_LINK_AND_COLLAPSE_ALL_OTHER_ITEMS"; //$NON-NLS-1$
-   private static final String          STATE_SELECTED_TABLE_INDEX                      = "STATE_SELECTED_TABLE_INDEX";              //$NON-NLS-1$
-   private static final String          STATE_SELECTED_MONTH                            = "STATE_SELECTED_MONTH";                    //$NON-NLS-1$
-   private static final String          STATE_SELECTED_TOURS                            = "STATE_SELECTED_TOURS";                    //$NON-NLS-1$
-   private static final String          STATE_SELECTED_YEAR                             = "STATE_SELECTED_YEAR";                     //$NON-NLS-1$
-   private static final String          STATE_VIEW_LAYOUT                               = "STATE_VIEW_LAYOUT";                       //$NON-NLS-1$
+   private static final String           STATE_IS_LINK_WITH_OTHER_VIEWS                  = "STATE_IS_LINK_WITH_OTHER_VIEWS";           //$NON-NLS-1$
+   private static final String           STATE_IS_SELECT_YEAR_MONTH_TOURS                = "STATE_IS_SELECT_YEAR_MONTH_TOURS";         //$NON-NLS-1$
+   static final String                   STATE_IS_SHOW_SUMMARY_ROW                       = "STATE_IS_SHOW_SUMMARY_ROW";                //$NON-NLS-1$
+   static final String                   STATE_LINK_AND_COLLAPSE_ALL_OTHER_ITEMS         = "STATE_LINK_AND_COLLAPSE_ALL_OTHER_ITEMS";  //$NON-NLS-1$
+   private static final String           STATE_SELECTED_TABLE_INDEX                      = "STATE_SELECTED_TABLE_INDEX";               //$NON-NLS-1$
+   private static final String           STATE_SELECTED_MONTH                            = "STATE_SELECTED_MONTH";                     //$NON-NLS-1$
+   private static final String           STATE_SELECTED_TOURS                            = "STATE_SELECTED_TOURS";                     //$NON-NLS-1$
+   private static final String           STATE_SELECTED_YEAR                             = "STATE_SELECTED_YEAR";                      //$NON-NLS-1$
+   private static final String           STATE_VIEW_LAYOUT                               = "STATE_VIEW_LAYOUT";                        //$NON-NLS-1$
    //
-   private static final String          STATE_SORT_COLUMN_DIRECTION                     = "STATE_SORT_COLUMN_DIRECTION";             //$NON-NLS-1$
-   private static final String          STATE_SORT_COLUMN_ID                            = "STATE_SORT_COLUMN_ID";                    //$NON-NLS-1$
+   private static final String           STATE_SORT_COLUMN_DIRECTION                     = "STATE_SORT_COLUMN_DIRECTION";              //$NON-NLS-1$
+   private static final String           STATE_SORT_COLUMN_ID                            = "STATE_SORT_COLUMN_ID";                     //$NON-NLS-1$
    //
-   static final boolean                 STATE_IS_SHOW_SUMMARY_ROW_DEFAULT               = true;
-   static final boolean                 STATE_LINK_AND_COLLAPSE_ALL_OTHER_ITEMS_DEFAULT = true;
+   static final boolean                  STATE_IS_SHOW_SUMMARY_ROW_DEFAULT               = true;
+   static final boolean                  STATE_LINK_AND_COLLAPSE_ALL_OTHER_ITEMS_DEFAULT = true;
    //
-   private static final String          CSV_EXPORT_DEFAULT_FILE_NAME                    = "TourBook_";                               //$NON-NLS-1$
+   private static final String           CSV_EXPORT_DEFAULT_FILE_NAME                    = "TourBook_";                                //$NON-NLS-1$
    //
    /**
     * The header column id needs a different id than the body column otherwise drag&drop or column
     * selection shows the 1st row image :-(
     */
-   private static final String          HEADER_COLUMN_ID_POSTFIX                        = "_HEADER";
+   private static final String           HEADER_COLUMN_ID_POSTFIX                        = "_HEADER";
    //
-   private static final NumberFormat    _nf0;
-   private static final NumberFormat    _nf1;
-   private static final NumberFormat    _nf2;
+   private static final NumberFormat     _nf0;
+   private static final NumberFormat     _nf1;
+   private static final NumberFormat     _nf2;
    //
    static {
       _nf0 = NumberFormat.getNumberInstance();
@@ -251,6 +251,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    //
    private static TourBookViewLayout      _viewLayout;
    //
+   private ColumnManager                  _columnManager_NatTable;
    private ColumnManager                  _columnManager_Table;
    private ColumnManager                  _columnManager_Tree;
    //
@@ -1391,6 +1392,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
                // measurement system has changed
 
+               _columnManager_NatTable.saveState(_state_NatTable);
+               _columnManager_NatTable.clearColumns();
+
                _columnManager_Table.saveState(_state_Table);
                _columnManager_Table.clearColumns();
 
@@ -1575,6 +1579,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       createMenuManager();
 
       // define all columns for the viewer
+      _columnManager_NatTable = new ColumnManager(this, _state_NatTable);
+
       _columnManager_Table = new ColumnManager(this, _state_Table);
       _columnManager_Table.setIsCategoryAvailable(true);
 
@@ -1761,14 +1767,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
    private void createUI_40_TourViewer_NatTable(final Composite parent) {
 
-      // for testing
-      if (_columnManager_Table == null) {
-         _columnManager_Table = new ColumnManager(this, _state_Table);
-      }
+      _columnManager_NatTable.setupNatTableColumns();
 
-      _columnManager_Table.setupNatTableColumns();
-
-      _natTable_DataProvider = new DataProvider(this, _columnManager_Table);
+      _natTable_DataProvider = new DataProvider(this, _columnManager_NatTable);
       final ArrayList<ColumnDefinition> allSortedColumns = _natTable_DataProvider.allSortedColumns;
 
       final String sortColumnId = _tourViewer_Table_Comparator.__sortColumnId;
@@ -1834,7 +1835,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       /*
        * Create: Column header layer
        */
-      final IDataProvider columnHeader_DataProvider = new DataProvider_ColumnHeader(_natTable_DataProvider, _columnManager_Table);
+      final IDataProvider columnHeader_DataProvider = new DataProvider_ColumnHeader(_natTable_DataProvider, _columnManager_NatTable);
       final DataLayer columnHeader_DataLayer = new DataLayer(columnHeader_DataProvider);
       final ILayer columnHeader_Layer = new ColumnHeaderLayer(columnHeader_DataLayer, _natTable_Grid_BodyLayer, selection_Layer);
 
@@ -2144,8 +2145,22 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_1_Date() {
 
-      final TableColumnDefinition colDef_Table = TableColumnFactory.TIME_DATE.createColumn(_columnManager_Table, _pc);
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.TIME_DATE.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setIsDefaultColumn();
+      colDef_NatTable.setCanModifyVisibility(false);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
 
+         @Override
+         public String getValueText(final Object element) {
+
+            final TVITourBookTour tourItem = (TVITourBookTour) (TVITourBookItem) element;
+
+            // show full date
+            return tourItem.colDateTime_Text;
+         }
+      });
+
+      final TableColumnDefinition colDef_Table = TableColumnFactory.TIME_DATE.createColumn(_columnManager_Table, _pc);
       colDef_Table.setIsDefaultColumn();
       colDef_Table.setCanModifyVisibility(false);
       colDef_Table.setColumnSelectionListener(_columnSortListener);
@@ -2177,23 +2192,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          }
       });
 
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final TVITourBookTour tourItem = (TVITourBookTour) (TVITourBookItem) element;
-
-            // show full date
-            return tourItem.colDateTime_Text;
-         }
-      });
-
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.TIME_DATE.createColumn(_columnManager_Tree, _pc);
-
       colDef_Tree.setIsDefaultColumn();
       colDef_Tree.setCanModifyVisibility(false);
-
       colDef_Tree.setLabelProvider(new TourInfoToolTipStyledCellLabelProvider() {
 
          @Override
@@ -2271,6 +2272,18 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_Body_AvgPulse() {
 
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.BODY_AVG_PULSE.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final double value = ((TVITourBookItem) element).colAvgPulse;
+
+            return colDef_NatTable.printDoubleValue(value);
+         }
+      });
+
       final TableColumnDefinition colDef_Table = TableColumnFactory.BODY_AVG_PULSE.createColumn(_columnManager_Table, _pc);
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(new CellLabelProvider() {
@@ -2284,17 +2297,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             colDef_Table.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
             setCellColor(cell, element);
-         }
-      });
-
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final double value = ((TVITourBookItem) element).colAvgPulse;
-
-            return colDef_Table.printDoubleValue(value);
          }
       });
 
@@ -2319,6 +2321,18 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_Body_Calories() {
 
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.BODY_CALORIES.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final double value = ((TVITourBookItem) element).colCalories / 1000.0;
+
+            return colDef_NatTable.printDoubleValue(value);
+         }
+      });
+
       final TableColumnDefinition colDef_Table = TableColumnFactory.BODY_CALORIES.createColumn(_columnManager_Table, _pc);
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(new CellLabelProvider() {
@@ -2331,17 +2345,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             colDef_Table.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
             setCellColor(cell, element);
-         }
-      });
-
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final double value = ((TVITourBookItem) element).colCalories / 1000.0;
-
-            return colDef_Table.printDoubleValue(value);
          }
       });
 
@@ -2365,6 +2368,18 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_Body_MaxPulse() {
 
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.BODY_PULSE_MAX.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final long value = ((TVITourBookItem) element).colMaxPulse;
+
+            return colDef_NatTable.printValue_0(value);
+         }
+      });
+
       final TableColumnDefinition colDef_Table = TableColumnFactory.BODY_PULSE_MAX.createColumn(_columnManager_Table, _pc);
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(new CellLabelProvider() {
@@ -2377,17 +2392,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             colDef_Table.printValue_0(cell, value);
 
             setCellColor(cell, element);
-         }
-      });
-
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final long value = ((TVITourBookItem) element).colMaxPulse;
-
-            return colDef_Table.printValue_0(value);
          }
       });
 
@@ -2411,6 +2415,18 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_Body_Person() {
 
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.BODY_PERSON.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final long dbPersonId = ((TVITourBookTour) element).colPersonId;
+
+            return PersonManager.getPersonName(dbPersonId);
+         }
+      });
+
       final CellLabelProvider cellLabelProvider = new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
@@ -2429,17 +2445,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(cellLabelProvider);
 
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final long dbPersonId = ((TVITourBookTour) element).colPersonId;
-
-            return PersonManager.getPersonName(dbPersonId);
-         }
-      });
-
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.BODY_PERSON.createColumn(_columnManager_Tree, _pc);
       colDef_Tree.setLabelProvider(cellLabelProvider);
    }
@@ -2448,6 +2453,22 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     * Column: Body - Rest pulse
     */
    private void defineColumn_Body_RestPulse() {
+
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.BODY_RESTPULSE.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final int restPulse = ((TVITourBookItem) element).colRestPulse;
+
+            if (restPulse == 0) {
+               return UI.EMPTY_STRING;
+            } else {
+               return Integer.toString(restPulse);
+            }
+         }
+      });
 
       final CellLabelProvider cellLabelProvider = new CellLabelProvider() {
 
@@ -2471,21 +2492,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(cellLabelProvider);
 
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final int restPulse = ((TVITourBookItem) element).colRestPulse;
-
-            if (restPulse == 0) {
-               return UI.EMPTY_STRING;
-            } else {
-               return Integer.toString(restPulse);
-            }
-         }
-      });
-
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.BODY_RESTPULSE.createColumn(_columnManager_Tree, _pc);
       colDef_Tree.setLabelProvider(cellLabelProvider);
    }
@@ -2494,6 +2500,22 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     * Column: Body - Body weight
     */
    private void defineColumn_Body_Weight() {
+
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.BODY_WEIGHT.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final double weight = UI.convertBodyWeightFromMetric(((TVITourBookItem) element).colBodyWeight);
+
+            if (weight == 0) {
+               return UI.EMPTY_STRING;
+            } else {
+               return _nf1.format(weight);
+            }
+         }
+      });
 
       final CellLabelProvider cellLabelProvider = new CellLabelProvider() {
          @Override
@@ -2516,21 +2538,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(cellLabelProvider);
 
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final double weight = UI.convertBodyWeightFromMetric(((TVITourBookItem) element).colBodyWeight);
-
-            if (weight == 0) {
-               return UI.EMPTY_STRING;
-            } else {
-               return _nf1.format(weight);
-            }
-         }
-      });
-
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.BODY_WEIGHT.createColumn(_columnManager_Tree, _pc);
       colDef_Tree.setLabelProvider(cellLabelProvider);
    }
@@ -2539,6 +2546,22 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     * Column: Data - DP tolerance
     */
    private void defineColumn_Data_DPTolerance() {
+
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.DATA_DP_TOLERANCE.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final int dpTolerance = ((TVITourBookItem) element).colDPTolerance;
+
+            if (dpTolerance == 0) {
+               return UI.EMPTY_STRING;
+            } else {
+               return _nf1.format(dpTolerance / 10.0);
+            }
+         }
+      });
 
       final CellLabelProvider cellLabelProvider = new CellLabelProvider() {
          @Override
@@ -2561,21 +2584,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(cellLabelProvider);
 
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final int dpTolerance = ((TVITourBookItem) element).colDPTolerance;
-
-            if (dpTolerance == 0) {
-               return UI.EMPTY_STRING;
-            } else {
-               return _nf1.format(dpTolerance / 10.0);
-            }
-         }
-      });
-
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.DATA_DP_TOLERANCE.createColumn(_columnManager_Tree, _pc);
       colDef_Tree.setLabelProvider(cellLabelProvider);
    }
@@ -2584,6 +2592,16 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     * Column: Data - Import filename
     */
    private void defineColumn_Data_ImportFileName() {
+
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.DATA_IMPORT_FILE_NAME.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            return ((TVITourBookTour) element).col_ImportFileName;
+         }
+      });
 
       final CellLabelProvider cellLabelProvider = new CellLabelProvider() {
          @Override
@@ -2603,15 +2621,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(cellLabelProvider);
 
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            return ((TVITourBookTour) element).col_ImportFileName;
-         }
-      });
-
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.DATA_IMPORT_FILE_NAME.createColumn(_columnManager_Tree, _pc);
       colDef_Tree.setLabelProvider(cellLabelProvider);
    }
@@ -2620,6 +2629,16 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     * Column: Data - Import filepath
     */
    private void defineColumn_Data_ImportFilePath() {
+
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.DATA_IMPORT_FILE_PATH.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            return ((TVITourBookTour) element).col_ImportFilePath;
+         }
+      });
 
       final CellLabelProvider cellLabelProvider = new CellLabelProvider() {
          @Override
@@ -2638,15 +2657,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(cellLabelProvider);
 
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            return ((TVITourBookTour) element).col_ImportFilePath;
-         }
-      });
-
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.DATA_IMPORT_FILE_PATH.createColumn(_columnManager_Tree, _pc);
       colDef_Tree.setLabelProvider(cellLabelProvider);
    }
@@ -2655,6 +2665,18 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     * Column: Data - Number of time slices
     */
    private void defineColumn_Data_NumTimeSlices() {
+
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.DATA_NUM_TIME_SLICES.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final long value = ((TVITourBookItem) element).colNumberOfTimeSlices;
+
+            return colDef_NatTable.printDoubleValue(value);
+         }
+      });
 
       final TableColumnDefinition colDef_Table = TableColumnFactory.DATA_NUM_TIME_SLICES.createColumn(_columnManager_Table, _pc);
       colDef_Table.setColumnSelectionListener(_columnSortListener);
@@ -2668,17 +2690,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             colDef_Table.printValue_0(cell, value);
 
             setCellColor(cell, element);
-         }
-      });
-
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final long value = ((TVITourBookItem) element).colNumberOfTimeSlices;
-
-            return colDef_Table.printDoubleValue(value);
          }
       });
 
@@ -2703,6 +2714,21 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
    private void defineColumn_Data_TimeInterval() {
 
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.DATA_TIME_INTERVAL.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final short dbTimeInterval = ((TVITourBookTour) element).getColumnTimeInterval();
+            if (dbTimeInterval == 0) {
+               return UI.EMPTY_STRING;
+            } else {
+               return Long.toString(dbTimeInterval);
+            }
+         }
+      });
+
       final CellLabelProvider cellLabelProvider = new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
@@ -2726,20 +2752,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(cellLabelProvider);
 
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final short dbTimeInterval = ((TVITourBookTour) element).getColumnTimeInterval();
-            if (dbTimeInterval == 0) {
-               return UI.EMPTY_STRING;
-            } else {
-               return Long.toString(dbTimeInterval);
-            }
-         }
-      });
-
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.DATA_TIME_INTERVAL.createColumn(_columnManager_Tree, _pc);
       colDef_Tree.setLabelProvider(cellLabelProvider);
    }
@@ -2748,6 +2760,19 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     * Column: Device - Device distance
     */
    private void defineColumn_Device_Distance() {
+
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.DEVICE_DISTANCE.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final long dbStartDistance = ((TVITourBookTour) element).getColumnStartDistance();
+            final double value = dbStartDistance / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+
+            return colDef_NatTable.printValue_0(value);
+         }
+      });
 
       final TableColumnDefinition colDef_Table = TableColumnFactory.DEVICE_DISTANCE.createColumn(_columnManager_Table, _pc);
       colDef_Table.setColumnSelectionListener(_columnSortListener);
@@ -2765,18 +2790,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
                setCellColor(cell, element);
             }
-         }
-      });
-
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final long dbStartDistance = ((TVITourBookTour) element).getColumnStartDistance();
-            final double value = dbStartDistance / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
-
-            return colDef_Table.printValue_0(value);
          }
       });
 
@@ -2804,6 +2817,22 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_Device_Name() {
 
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.DEVICE_NAME.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final String dbValue = ((TVITourBookItem) element).col_DeviceName;
+
+            if (dbValue == null) {
+               return UI.EMPTY_STRING;
+            } else {
+               return dbValue;
+            }
+         }
+      });
+
       final CellLabelProvider cellLabelProvider = new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
@@ -2825,21 +2854,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(cellLabelProvider);
 
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final String dbValue = ((TVITourBookItem) element).col_DeviceName;
-
-            if (dbValue == null) {
-               return UI.EMPTY_STRING;
-            } else {
-               return dbValue;
-            }
-         }
-      });
-
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.DEVICE_NAME.createColumn(_columnManager_Tree, _pc);
       colDef_Tree.setLabelProvider(cellLabelProvider);
    }
@@ -2849,11 +2863,24 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_Elevation_AvgChange() {
 
-      final TableColumnDefinition colDef_Table = TableColumnFactory.ALTITUDE_AVG_CHANGE.createColumn(_columnManager_Table, _pc);
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.ALTITUDE_AVG_CHANGE.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setIsDefaultColumn();
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
 
+         @Override
+         public String getValueText(final Object element) {
+
+            final float value = ((TVITourBookItem) element).colAltitude_AvgChange
+                  / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE
+                  * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+
+            return colDef_NatTable.printValue_0(value);
+         }
+      });
+
+      final TableColumnDefinition colDef_Table = TableColumnFactory.ALTITUDE_AVG_CHANGE.createColumn(_columnManager_Table, _pc);
       colDef_Table.setIsDefaultColumn();
       colDef_Table.setColumnSelectionListener(_columnSortListener);
-
       colDef_Table.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
@@ -2870,23 +2897,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          }
       });
 
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final float value = ((TVITourBookItem) element).colAltitude_AvgChange
-                  / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE
-                  * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
-
-            return colDef_Table.printValue_0(value);
-         }
-      });
-
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.ALTITUDE_AVG_CHANGE.createColumn(_columnManager_Tree, _pc);
-
       colDef_Tree.setIsDefaultColumn();
-
       colDef_Tree.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
@@ -2908,8 +2920,20 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_Elevation_Down() {
 
-      final TableColumnDefinition colDef_Table = TableColumnFactory.ALTITUDE_SUMMARIZED_BORDER_DOWN.createColumn(_columnManager_Table, _pc);
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.ALTITUDE_SUMMARIZED_BORDER_DOWN.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
 
+         @Override
+         public String getValueText(final Object element) {
+
+            final double dbAltitudeDown = ((TVITourBookItem) element).colAltitudeDown;
+            final double value = -dbAltitudeDown / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+
+            return colDef_NatTable.printValue_0(value);
+         }
+      });
+
+      final TableColumnDefinition colDef_Table = TableColumnFactory.ALTITUDE_SUMMARIZED_BORDER_DOWN.createColumn(_columnManager_Table, _pc);
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -2926,20 +2950,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          }
       });
 
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final double dbAltitudeDown = ((TVITourBookItem) element).colAltitudeDown;
-            final double value = -dbAltitudeDown / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
-
-            return colDef_Table.printValue_0(value);
-         }
-      });
-
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.ALTITUDE_DOWN.createColumn(_columnManager_Tree, _pc);
-
       colDef_Tree.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
@@ -2961,8 +2972,20 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_Elevation_Max() {
 
-      final TableColumnDefinition colDef_Table = TableColumnFactory.ALTITUDE_MAX.createColumn(_columnManager_Table, _pc);
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.ALTITUDE_MAX.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
 
+         @Override
+         public String getValueText(final Object element) {
+
+            final long dbMaxAltitude = ((TVITourBookItem) element).colMaxAltitude;
+            final double value = dbMaxAltitude / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+
+            return colDef_NatTable.printValue_0(value);
+         }
+      });
+
+      final TableColumnDefinition colDef_Table = TableColumnFactory.ALTITUDE_MAX.createColumn(_columnManager_Table, _pc);
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -2979,20 +3002,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          }
       });
 
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final long dbMaxAltitude = ((TVITourBookItem) element).colMaxAltitude;
-            final double value = dbMaxAltitude / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
-
-            return colDef_Table.printValue_0(value);
-         }
-      });
-
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.ALTITUDE_MAX.createColumn(_columnManager_Tree, _pc);
-
       colDef_Tree.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
@@ -3014,8 +3024,21 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_Elevation_Up() {
 
-      final TableColumnDefinition colDef_Table = TableColumnFactory.ALTITUDE_SUMMARIZED_BORDER_UP.createColumn(_columnManager_Table, _pc);
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.ALTITUDE_SUMMARIZED_BORDER_UP.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setIsDefaultColumn();
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
 
+         @Override
+         public String getValueText(final Object element) {
+
+            final long dbAltitudeUp = ((TVITourBookItem) element).colAltitudeUp;
+            final double value = dbAltitudeUp / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
+
+            return colDef_NatTable.printValue_0(value);
+         }
+      });
+
+      final TableColumnDefinition colDef_Table = TableColumnFactory.ALTITUDE_SUMMARIZED_BORDER_UP.createColumn(_columnManager_Table, _pc);
       colDef_Table.setIsDefaultColumn();
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(new CellLabelProvider() {
@@ -3033,22 +3056,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          }
       });
 
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final long dbAltitudeUp = ((TVITourBookItem) element).colAltitudeUp;
-            final double value = dbAltitudeUp / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE;
-
-            return colDef_Table.printValue_0(value);
-         }
-      });
-
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.ALTITUDE_UP.createColumn(_columnManager_Tree, _pc);
-
       colDef_Tree.setIsDefaultColumn();
-
       colDef_Tree.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
@@ -3069,6 +3078,22 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     * Column: Motion - Avg pace min/km - min/mi
     */
    private void defineColumn_Motion_AvgPace() {
+
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.MOTION_AVG_PACE.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final double pace = ((TVITourBookItem) element).colAvgPace * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+
+            if (pace == 0) {
+               return UI.EMPTY_STRING;
+            } else {
+               return UI.format_mm_ss((long) pace);
+            }
+         }
+      });
 
       final CellLabelProvider cellLabelProvider = new CellLabelProvider() {
          @Override
@@ -3091,21 +3116,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(cellLabelProvider);
 
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final double pace = ((TVITourBookItem) element).colAvgPace * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
-
-            if (pace == 0) {
-               return UI.EMPTY_STRING;
-            } else {
-               return UI.format_mm_ss((long) pace);
-            }
-         }
-      });
-
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.MOTION_AVG_PACE.createColumn(_columnManager_Tree, _pc);
       colDef_Tree.setLabelProvider(cellLabelProvider);
    }
@@ -3115,8 +3125,19 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_Motion_AvgSpeed() {
 
-      final TableColumnDefinition colDef_Table = TableColumnFactory.MOTION_AVG_SPEED.createColumn(_columnManager_Table, _pc);
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.MOTION_AVG_SPEED.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
 
+         @Override
+         public String getValueText(final Object element) {
+
+            final double value = ((TVITourBookItem) element).colAvgSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+
+            return colDef_NatTable.printDoubleValue(value);
+         }
+      });
+
+      final TableColumnDefinition colDef_Table = TableColumnFactory.MOTION_AVG_SPEED.createColumn(_columnManager_Table, _pc);
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -3131,19 +3152,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          }
       });
 
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final double value = ((TVITourBookItem) element).colAvgSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
-
-            return colDef_Table.printDoubleValue(value);
-         }
-      });
-
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.MOTION_AVG_SPEED.createColumn(_columnManager_Tree, _pc);
-
       colDef_Tree.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
@@ -3163,10 +3172,23 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_Motion_Distance() {
 
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.MOTION_DISTANCE.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setIsDefaultColumn();
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final double value = ((TVITourBookItem) element).colTourDistance
+                  / 1000.0
+                  / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+
+            return colDef_NatTable.printDoubleValue(value);
+         }
+      });
+
       final TableColumnDefinition colDef_Table = TableColumnFactory.MOTION_DISTANCE.createColumn(_columnManager_Table, _pc);
-
       colDef_Table.setIsDefaultColumn();
-
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -3183,23 +3205,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          }
       });
 
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final double value = ((TVITourBookItem) element).colTourDistance
-                  / 1000.0
-                  / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
-
-            return colDef_Table.printDoubleValue(value);
-         }
-      });
-
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.MOTION_DISTANCE.createColumn(_columnManager_Tree, _pc);
-
       colDef_Tree.setIsDefaultColumn();
-
       colDef_Tree.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
@@ -3221,8 +3228,19 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_Motion_MaxSpeed() {
 
-      final TableColumnDefinition colDef_Table = TableColumnFactory.MOTION_MAX_SPEED.createColumn(_columnManager_Table, _pc);
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.MOTION_MAX_SPEED.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
 
+         @Override
+         public String getValueText(final Object element) {
+
+            final double value = ((TVITourBookItem) element).colMaxSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+
+            return colDef_NatTable.printDoubleValue(value);
+         }
+      });
+
+      final TableColumnDefinition colDef_Table = TableColumnFactory.MOTION_MAX_SPEED.createColumn(_columnManager_Table, _pc);
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -3237,19 +3255,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          }
       });
 
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final double value = ((TVITourBookItem) element).colMaxSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
-
-            return colDef_Table.printDoubleValue(value);
-         }
-      });
-
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.MOTION_MAX_SPEED.createColumn(_columnManager_Tree, _pc);
-
       colDef_Tree.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
@@ -3269,8 +3275,19 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_Power_Avg() {
 
-      final TableColumnDefinition colDef_Table = TableColumnFactory.POWER_AVG.createColumn(_columnManager_Table, _pc);
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.POWER_AVG.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
 
+         @Override
+         public String getValueText(final Object element) {
+
+            final double value = ((TVITourBookItem) element).colPower_Avg;
+
+            return colDef_NatTable.printDoubleValue(value);
+         }
+      });
+
+      final TableColumnDefinition colDef_Table = TableColumnFactory.POWER_AVG.createColumn(_columnManager_Table, _pc);
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -3285,19 +3302,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          }
       });
 
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final double value = ((TVITourBookItem) element).colPower_Avg;
-
-            return colDef_Table.printDoubleValue(value);
-         }
-      });
-
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.POWER_AVG.createColumn(_columnManager_Tree, _pc);
-
       colDef_Tree.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
@@ -3317,8 +3322,19 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_Power_Max() {
 
-      final TableColumnDefinition colDef_Table = TableColumnFactory.POWER_MAX.createColumn(_columnManager_Table, _pc);
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.POWER_MAX.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
 
+         @Override
+         public String getValueText(final Object element) {
+
+            final int value = ((TVITourBookItem) element).colPower_Max;
+
+            return colDef_NatTable.printDoubleValue(value);
+         }
+      });
+
+      final TableColumnDefinition colDef_Table = TableColumnFactory.POWER_MAX.createColumn(_columnManager_Table, _pc);
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -3333,19 +3349,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          }
       });
 
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final int value = ((TVITourBookItem) element).colPower_Max;
-
-            return colDef_Table.printDoubleValue(value);
-         }
-      });
-
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.POWER_MAX.createColumn(_columnManager_Tree, _pc);
-
       colDef_Tree.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
@@ -3365,8 +3369,19 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_Power_Normalized() {
 
-      final TableColumnDefinition colDef_Table = TableColumnFactory.POWER_NORMALIZED.createColumn(_columnManager_Table, _pc);
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.POWER_NORMALIZED.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
 
+         @Override
+         public String getValueText(final Object element) {
+
+            final int value = ((TVITourBookItem) element).colPower_Normalized;
+
+            return colDef_NatTable.printValue_0(value);
+         }
+      });
+
+      final TableColumnDefinition colDef_Table = TableColumnFactory.POWER_NORMALIZED.createColumn(_columnManager_Table, _pc);
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -3381,19 +3396,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          }
       });
 
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final int value = ((TVITourBookItem) element).colPower_Normalized;
-
-            return colDef_Table.printValue_0(value);
-         }
-      });
-
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.POWER_NORMALIZED.createColumn(_columnManager_Tree, _pc);
-
       colDef_Tree.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
@@ -3413,8 +3416,19 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_Power_TotalWork() {
 
-      final TableColumnDefinition colDef_Table = TableColumnFactory.POWER_TOTAL_WORK.createColumn(_columnManager_Table, _pc);
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.POWER_TOTAL_WORK.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
 
+         @Override
+         public String getValueText(final Object element) {
+
+            final double value = ((TVITourBookItem) element).colPower_TotalWork / 1000_000.0;
+
+            return colDef_NatTable.printDoubleValue(value);
+         }
+      });
+
+      final TableColumnDefinition colDef_Table = TableColumnFactory.POWER_TOTAL_WORK.createColumn(_columnManager_Table, _pc);
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -3429,19 +3443,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          }
       });
 
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final double value = ((TVITourBookItem) element).colPower_TotalWork / 1000_000.0;
-
-            return colDef_Table.printDoubleValue(value);
-         }
-      });
-
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.POWER_TOTAL_WORK.createColumn(_columnManager_Tree, _pc);
-
       colDef_Tree.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
@@ -3461,8 +3463,19 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_Powertrain_AvgCadence() {
 
-      final TableColumnDefinition colDef_Table = TableColumnFactory.POWERTRAIN_AVG_CADENCE.createColumn(_columnManager_Table, _pc);
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.POWERTRAIN_AVG_CADENCE.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
 
+         @Override
+         public String getValueText(final Object element) {
+
+            final double value = ((TVITourBookItem) element).colAvgCadence;
+
+            return colDef_NatTable.printDoubleValue(value);
+         }
+      });
+
+      final TableColumnDefinition colDef_Table = TableColumnFactory.POWERTRAIN_AVG_CADENCE.createColumn(_columnManager_Table, _pc);
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -3477,19 +3490,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          }
       });
 
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final double value = ((TVITourBookItem) element).colAvgCadence;
-
-            return colDef_Table.printDoubleValue(value);
-         }
-      });
-
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.POWERTRAIN_AVG_CADENCE.createColumn(_columnManager_Tree, _pc);
-
       colDef_Tree.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
@@ -3509,8 +3510,20 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_Powertrain_AvgLeftPedalSmoothness() {
 
-      final TableColumnDefinition colDef_Table = TableColumnFactory.POWERTRAIN_AVG_LEFT_PEDAL_SMOOTHNESS.createColumn(_columnManager_Table, _pc);
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.POWERTRAIN_AVG_LEFT_PEDAL_SMOOTHNESS.createColumn(_columnManager_NatTable,
+            _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
 
+         @Override
+         public String getValueText(final Object element) {
+
+            final double value = ((TVITourBookItem) element).colPower_AvgLeftPedalSmoothness;
+
+            return colDef_NatTable.printDoubleValue(value);
+         }
+      });
+
+      final TableColumnDefinition colDef_Table = TableColumnFactory.POWERTRAIN_AVG_LEFT_PEDAL_SMOOTHNESS.createColumn(_columnManager_Table, _pc);
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -3525,19 +3538,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          }
       });
 
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final double value = ((TVITourBookItem) element).colPower_AvgLeftPedalSmoothness;
-
-            return colDef_Table.printDoubleValue(value);
-         }
-      });
-
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.POWERTRAIN_AVG_LEFT_PEDAL_SMOOTHNESS.createColumn(_columnManager_Tree, _pc);
-
       colDef_Tree.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
@@ -3557,8 +3558,20 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_Powertrain_AvgLeftTorqueEffectiveness() {
 
-      final TableColumnDefinition colDef_Table = TableColumnFactory.POWERTRAIN_AVG_LEFT_TORQUE_EFFECTIVENESS.createColumn(_columnManager_Table, _pc);
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.POWERTRAIN_AVG_LEFT_TORQUE_EFFECTIVENESS.createColumn(_columnManager_NatTable,
+            _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
 
+         @Override
+         public String getValueText(final Object element) {
+
+            final double value = ((TVITourBookItem) element).colPower_AvgLeftTorqueEffectiveness;
+
+            return colDef_NatTable.printDoubleValue(value);
+         }
+      });
+
+      final TableColumnDefinition colDef_Table = TableColumnFactory.POWERTRAIN_AVG_LEFT_TORQUE_EFFECTIVENESS.createColumn(_columnManager_Table, _pc);
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -3573,19 +3586,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          }
       });
 
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final double value = ((TVITourBookItem) element).colPower_AvgLeftTorqueEffectiveness;
-
-            return colDef_Table.printDoubleValue(value);
-         }
-      });
-
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.POWERTRAIN_AVG_LEFT_TORQUE_EFFECTIVENESS.createColumn(_columnManager_Tree, _pc);
-
       colDef_Tree.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
@@ -3605,8 +3606,20 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_Powertrain_AvgRightPedalSmoothness() {
 
-      final TableColumnDefinition colDef_Table = TableColumnFactory.POWERTRAIN_AVG_RIGHT_PEDAL_SMOOTHNESS.createColumn(_columnManager_Table, _pc);
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.POWERTRAIN_AVG_RIGHT_PEDAL_SMOOTHNESS.createColumn(_columnManager_NatTable,
+            _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
 
+         @Override
+         public String getValueText(final Object element) {
+
+            final double value = ((TVITourBookItem) element).colPower_AvgRightPedalSmoothness;
+
+            return colDef_NatTable.printDoubleValue(value);
+         }
+      });
+
+      final TableColumnDefinition colDef_Table = TableColumnFactory.POWERTRAIN_AVG_RIGHT_PEDAL_SMOOTHNESS.createColumn(_columnManager_Table, _pc);
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -3621,19 +3634,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          }
       });
 
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final double value = ((TVITourBookItem) element).colPower_AvgRightPedalSmoothness;
-
-            return colDef_Table.printDoubleValue(value);
-         }
-      });
-
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.POWERTRAIN_AVG_RIGHT_PEDAL_SMOOTHNESS.createColumn(_columnManager_Tree, _pc);
-
       colDef_Tree.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
@@ -3653,8 +3654,20 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_Powertrain_AvgRightTorqueEffectiveness() {
 
-      final TableColumnDefinition colDef_Table = TableColumnFactory.POWERTRAIN_AVG_RIGHT_TORQUE_EFFECTIVENESS.createColumn(_columnManager_Table, _pc);
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.POWERTRAIN_AVG_RIGHT_TORQUE_EFFECTIVENESS.createColumn(_columnManager_NatTable,
+            _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
 
+         @Override
+         public String getValueText(final Object element) {
+
+            final double value = ((TVITourBookItem) element).colPower_AvgRightTorqueEffectiveness;
+
+            return colDef_NatTable.printDoubleValue(value);
+         }
+      });
+
+      final TableColumnDefinition colDef_Table = TableColumnFactory.POWERTRAIN_AVG_RIGHT_TORQUE_EFFECTIVENESS.createColumn(_columnManager_Table, _pc);
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -3669,19 +3682,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          }
       });
 
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final double value = ((TVITourBookItem) element).colPower_AvgRightTorqueEffectiveness;
-
-            return colDef_Table.printDoubleValue(value);
-         }
-      });
-
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.POWERTRAIN_AVG_RIGHT_TORQUE_EFFECTIVENESS.createColumn(_columnManager_Tree, _pc);
-
       colDef_Tree.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
@@ -3700,6 +3701,22 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     * Column: Powertrain - Cadence multiplier
     */
    private void defineColumn_Powertrain_CadenceMultiplier() {
+
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.POWERTRAIN_CADENCE_MULTIPLIER.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final double dbCadenceMultiplier = ((TVITourBookItem) element).colCadenceMultiplier;
+
+            if (dbCadenceMultiplier == 0) {
+               return UI.EMPTY_STRING;
+            } else {
+               return _nf1.format(dbCadenceMultiplier);
+            }
+         }
+      });
 
       final CellLabelProvider cellLabelProvider = new CellLabelProvider() {
          @Override
@@ -3722,21 +3739,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(cellLabelProvider);
 
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final double dbCadenceMultiplier = ((TVITourBookItem) element).colCadenceMultiplier;
-
-            if (dbCadenceMultiplier == 0) {
-               return UI.EMPTY_STRING;
-            } else {
-               return _nf1.format(dbCadenceMultiplier);
-            }
-         }
-      });
-
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.POWERTRAIN_CADENCE_MULTIPLIER.createColumn(_columnManager_Tree, _pc);
       colDef_Tree.setLabelProvider(cellLabelProvider);
    }
@@ -3746,8 +3748,19 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_Powertrain_Gear_FrontShiftCount() {
 
-      final TableColumnDefinition colDef_Table = TableColumnFactory.POWERTRAIN_GEAR_FRONT_SHIFT_COUNT.createColumn(_columnManager_Table, _pc);
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.POWERTRAIN_GEAR_FRONT_SHIFT_COUNT.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
 
+         @Override
+         public String getValueText(final Object element) {
+
+            final long value = ((TVITourBookItem) element).colFrontShiftCount;
+
+            return colDef_NatTable.printValue_0(value);
+         }
+      });
+
+      final TableColumnDefinition colDef_Table = TableColumnFactory.POWERTRAIN_GEAR_FRONT_SHIFT_COUNT.createColumn(_columnManager_Table, _pc);
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -3762,19 +3775,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          }
       });
 
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final long value = ((TVITourBookItem) element).colFrontShiftCount;
-
-            return colDef_Table.printValue_0(value);
-         }
-      });
-
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.POWERTRAIN_GEAR_FRONT_SHIFT_COUNT.createColumn(_columnManager_Tree, _pc);
-
       colDef_Tree.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
@@ -3794,8 +3795,19 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_Powertrain_Gear_RearShiftCount() {
 
-      final TableColumnDefinition colDef_Table = TableColumnFactory.POWERTRAIN_GEAR_REAR_SHIFT_COUNT.createColumn(_columnManager_Table, _pc);
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.POWERTRAIN_GEAR_REAR_SHIFT_COUNT.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
 
+         @Override
+         public String getValueText(final Object element) {
+
+            final long value = ((TVITourBookItem) element).colRearShiftCount;
+
+            return colDef_NatTable.printValue_0(value);
+         }
+      });
+
+      final TableColumnDefinition colDef_Table = TableColumnFactory.POWERTRAIN_GEAR_REAR_SHIFT_COUNT.createColumn(_columnManager_Table, _pc);
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -3810,19 +3822,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          }
       });
 
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final long value = ((TVITourBookItem) element).colRearShiftCount;
-
-            return colDef_Table.printValue_0(value);
-         }
-      });
-
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.POWERTRAIN_GEAR_REAR_SHIFT_COUNT.createColumn(_columnManager_Tree, _pc);
-
       colDef_Tree.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
@@ -3843,8 +3843,19 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
    private void defineColumn_Powertrain_PedalLeftRightBalance() {
 
-      final TableColumnDefinition colDef_Table = TableColumnFactory.POWERTRAIN_PEDAL_LEFT_RIGHT_BALANCE.createColumn(_columnManager_Table, _pc);
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.POWERTRAIN_PEDAL_LEFT_RIGHT_BALANCE.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
 
+         @Override
+         public String getValueText(final Object element) {
+
+            final int value = ((TVITourBookItem) element).colPower_PedalLeftRightBalance;
+
+            return colDef_NatTable.printValue_0(value);
+         }
+      });
+
+      final TableColumnDefinition colDef_Table = TableColumnFactory.POWERTRAIN_PEDAL_LEFT_RIGHT_BALANCE.createColumn(_columnManager_Table, _pc);
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -3859,19 +3870,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          }
       });
 
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final int value = ((TVITourBookItem) element).colPower_PedalLeftRightBalance;
-
-            return colDef_Table.printValue_0(value);
-         }
-      });
-
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.POWERTRAIN_PEDAL_LEFT_RIGHT_BALANCE.createColumn(_columnManager_Tree, _pc);
-
       colDef_Tree.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
@@ -3891,6 +3890,20 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_Powertrain_SlowVsFastCadencePercentage() {
 
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.POWERTRAIN_SLOW_VS_FAST_CADENCE_PERCENTAGES.createColumn(
+            _columnManager_NatTable,
+            _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final String value = ((TVITourBookItem) element).colSlowVsFastCadence;
+
+            return value;
+         }
+      });
+
       final CellLabelProvider cellLabelProvider = new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
@@ -3909,17 +3922,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(cellLabelProvider);
 
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final String value = ((TVITourBookItem) element).colSlowVsFastCadence;
-
-            return value;
-         }
-      });
-
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.POWERTRAIN_SLOW_VS_FAST_CADENCE_PERCENTAGES.createColumn(_columnManager_Tree, _pc);
       colDef_Tree.setLabelProvider(cellLabelProvider);
    }
@@ -3929,9 +3931,23 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_Powertrain_SlowVsFastCadenceZonesDelimiter() {
 
-      final TableColumnDefinition colDef_Table = TableColumnFactory.POWERTRAIN_SLOW_VS_FAST_CADENCE_ZONES_DELIMITER.createColumn(_columnManager_Table,
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.POWERTRAIN_SLOW_VS_FAST_CADENCE_ZONES_DELIMITER.createColumn(
+            _columnManager_NatTable,
             _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
 
+         @Override
+         public String getValueText(final Object element) {
+
+            final int value = ((TVITourBookItem) element).colCadenceZonesDelimiter;
+
+            return colDef_NatTable.printValue_0(value);
+         }
+      });
+
+      final TableColumnDefinition colDef_Table = TableColumnFactory.POWERTRAIN_SLOW_VS_FAST_CADENCE_ZONES_DELIMITER.createColumn(
+            _columnManager_Table,
+            _pc);
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -3946,20 +3962,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          }
       });
 
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final int value = ((TVITourBookItem) element).colCadenceZonesDelimiter;
-
-            return colDef_Table.printValue_0(value);
-         }
-      });
-
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.POWERTRAIN_SLOW_VS_FAST_CADENCE_ZONES_DELIMITER.createColumn(_columnManager_Tree,
             _pc);
-
       colDef_Tree.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
@@ -3979,6 +3983,18 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_RunDyn_StanceTime_Avg() {
 
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.RUN_DYN_STANCE_TIME_AVG.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final double value = ((TVITourBookItem) element).colRunDyn_StanceTime_Avg;
+
+            return colDef_NatTable.printValue_0(value);
+         }
+      });
+
       final TableColumnDefinition colDef_Table = TableColumnFactory.RUN_DYN_STANCE_TIME_AVG.createColumn(_columnManager_Table, _pc);
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(new CellLabelProvider() {
@@ -3991,17 +4007,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             colDef_Table.printValue_0(cell, value);
 
             setCellColor(cell, element);
-         }
-      });
-
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final double value = ((TVITourBookItem) element).colRunDyn_StanceTime_Avg;
-
-            return colDef_Table.printValue_0(value);
          }
       });
 
@@ -4025,6 +4030,18 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_RunDyn_StanceTime_Max() {
 
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.RUN_DYN_STANCE_TIME_MAX.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final double value = ((TVITourBookItem) element).colRunDyn_StanceTime_Max;
+
+            return colDef_NatTable.printValue_0(value);
+         }
+      });
+
       final TableColumnDefinition colDef_Table = TableColumnFactory.RUN_DYN_STANCE_TIME_MAX.createColumn(_columnManager_Table, _pc);
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(new CellLabelProvider() {
@@ -4037,17 +4054,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             colDef_Table.printValue_0(cell, value);
 
             setCellColor(cell, element);
-         }
-      });
-
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final double value = ((TVITourBookItem) element).colRunDyn_StanceTime_Max;
-
-            return colDef_Table.printValue_0(value);
          }
       });
 
@@ -4071,6 +4077,18 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_RunDyn_StanceTime_Min() {
 
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.RUN_DYN_STANCE_TIME_MIN.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final double value = ((TVITourBookItem) element).colRunDyn_StanceTime_Min;
+
+            return colDef_NatTable.printValue_0(value);
+         }
+      });
+
       final TableColumnDefinition colDef_Table = TableColumnFactory.RUN_DYN_STANCE_TIME_MIN.createColumn(_columnManager_Table, _pc);
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(new CellLabelProvider() {
@@ -4083,17 +4101,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             colDef_Table.printValue_0(cell, value);
 
             setCellColor(cell, element);
-         }
-      });
-
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final double value = ((TVITourBookItem) element).colRunDyn_StanceTime_Min;
-
-            return colDef_Table.printValue_0(value);
          }
       });
 
@@ -4117,6 +4124,18 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_RunDyn_StanceTimeBalance_Avg() {
 
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.RUN_DYN_STANCE_TIME_BALANCE_AVG.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final double value = ((TVITourBookItem) element).colRunDyn_StanceTimeBalance_Avg;
+
+            return colDef_NatTable.printDoubleValue(value);
+         }
+      });
+
       final TableColumnDefinition colDef_Table = TableColumnFactory.RUN_DYN_STANCE_TIME_BALANCE_AVG.createColumn(_columnManager_Table, _pc);
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(new CellLabelProvider() {
@@ -4129,17 +4148,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             colDef_Table.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
             setCellColor(cell, element);
-         }
-      });
-
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final double value = ((TVITourBookItem) element).colRunDyn_StanceTimeBalance_Avg;
-
-            return colDef_Table.printDoubleValue(value);
          }
       });
 
@@ -4163,6 +4171,18 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_RunDyn_StanceTimeBalance_Max() {
 
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.RUN_DYN_STANCE_TIME_BALANCE_MAX.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final double value = ((TVITourBookItem) element).colRunDyn_StanceTimeBalance_Max;
+
+            return colDef_NatTable.printDoubleValue(value);
+         }
+      });
+
       final TableColumnDefinition colDef_Table = TableColumnFactory.RUN_DYN_STANCE_TIME_BALANCE_MAX.createColumn(_columnManager_Table, _pc);
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(new CellLabelProvider() {
@@ -4175,17 +4195,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             colDef_Table.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
             setCellColor(cell, element);
-         }
-      });
-
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final double value = ((TVITourBookItem) element).colRunDyn_StanceTimeBalance_Max;
-
-            return colDef_Table.printDoubleValue(value);
          }
       });
 
@@ -4209,6 +4218,18 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_RunDyn_StanceTimeBalance_Min() {
 
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.RUN_DYN_STANCE_TIME_BALANCE_MIN.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final double value = ((TVITourBookItem) element).colRunDyn_StanceTimeBalance_Min;
+
+            return colDef_NatTable.printDoubleValue(value);
+         }
+      });
+
       final TableColumnDefinition colDef_Table = TableColumnFactory.RUN_DYN_STANCE_TIME_BALANCE_MIN.createColumn(_columnManager_Table, _pc);
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(new CellLabelProvider() {
@@ -4221,17 +4242,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             colDef_Table.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
             setCellColor(cell, element);
-         }
-      });
-
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final double value = ((TVITourBookItem) element).colRunDyn_StanceTimeBalance_Min;
-
-            return colDef_Table.printDoubleValue(value);
          }
       });
 
@@ -4255,6 +4265,23 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_RunDyn_StepLength_Avg() {
 
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.RUN_DYN_STEP_LENGTH_AVG.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final double value = ((TVITourBookItem) element).colRunDyn_StepLength_Avg
+                  * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
+
+            if (UI.UNIT_IS_METRIC) {
+               return colDef_NatTable.printValue_0(value);
+            } else {
+               return colDef_NatTable.printDoubleValue(value);
+            }
+         }
+      });
+
       final TableColumnDefinition colDef_Table = TableColumnFactory.RUN_DYN_STEP_LENGTH_AVG.createColumn(_columnManager_Table, _pc);
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(new CellLabelProvider() {
@@ -4272,22 +4299,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             }
 
             setCellColor(cell, element);
-         }
-      });
-
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final double value = ((TVITourBookItem) element).colRunDyn_StepLength_Avg
-                  * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
-
-            if (UI.UNIT_IS_METRIC) {
-               return colDef_Table.printValue_0(value);
-            } else {
-               return colDef_Table.printDoubleValue(value);
-            }
          }
       });
 
@@ -4316,6 +4327,23 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_RunDyn_StepLength_Max() {
 
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.RUN_DYN_STEP_LENGTH_MAX.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final double value = ((TVITourBookItem) element).colRunDyn_StepLength_Max
+                  * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
+
+            if (UI.UNIT_IS_METRIC) {
+               return colDef_NatTable.printValue_0(value);
+            } else {
+               return colDef_NatTable.printDoubleValue(value);
+            }
+         }
+      });
+
       final TableColumnDefinition colDef_Table = TableColumnFactory.RUN_DYN_STEP_LENGTH_MAX.createColumn(_columnManager_Table, _pc);
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(new CellLabelProvider() {
@@ -4333,22 +4361,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             }
 
             setCellColor(cell, element);
-         }
-      });
-
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final double value = ((TVITourBookItem) element).colRunDyn_StepLength_Max
-                  * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
-
-            if (UI.UNIT_IS_METRIC) {
-               return colDef_Table.printValue_0(value);
-            } else {
-               return colDef_Table.printDoubleValue(value);
-            }
          }
       });
 
@@ -4377,6 +4389,23 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_RunDyn_StepLength_Min() {
 
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.RUN_DYN_STEP_LENGTH_MIN.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final double value = ((TVITourBookItem) element).colRunDyn_StepLength_Min
+                  * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
+
+            if (UI.UNIT_IS_METRIC) {
+               return colDef_NatTable.printValue_0(value);
+            } else {
+               return colDef_NatTable.printDoubleValue(value);
+            }
+         }
+      });
+
       final TableColumnDefinition colDef_Table = TableColumnFactory.RUN_DYN_STEP_LENGTH_MIN.createColumn(_columnManager_Table, _pc);
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(new CellLabelProvider() {
@@ -4394,22 +4423,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             }
 
             setCellColor(cell, element);
-         }
-      });
-
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final double value = ((TVITourBookItem) element).colRunDyn_StepLength_Min
-                  * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
-
-            if (UI.UNIT_IS_METRIC) {
-               return colDef_Table.printValue_0(value);
-            } else {
-               return colDef_Table.printDoubleValue(value);
-            }
          }
       });
 
@@ -4438,6 +4451,23 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_RunDyn_VerticalOscillation_Avg() {
 
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.RUN_DYN_VERTICAL_OSCILLATION_AVG.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final double value = ((TVITourBookItem) element).colRunDyn_VerticalOscillation_Avg
+                  * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
+
+            if (UI.UNIT_IS_METRIC) {
+               return colDef_NatTable.printValue_0(value);
+            } else {
+               return colDef_NatTable.printDoubleValue(value);
+            }
+         }
+      });
+
       final TableColumnDefinition colDef_Table = TableColumnFactory.RUN_DYN_VERTICAL_OSCILLATION_AVG.createColumn(_columnManager_Table, _pc);
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(new CellLabelProvider() {
@@ -4455,22 +4485,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             }
 
             setCellColor(cell, element);
-         }
-      });
-
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final double value = ((TVITourBookItem) element).colRunDyn_VerticalOscillation_Avg
-                  * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
-
-            if (UI.UNIT_IS_METRIC) {
-               return colDef_Table.printValue_0(value);
-            } else {
-               return colDef_Table.printDoubleValue(value);
-            }
          }
       });
 
@@ -4499,6 +4513,23 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_RunDyn_VerticalOscillation_Max() {
 
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.RUN_DYN_VERTICAL_OSCILLATION_MAX.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final double value = ((TVITourBookItem) element).colRunDyn_VerticalOscillation_Max
+                  * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
+
+            if (UI.UNIT_IS_METRIC) {
+               return colDef_NatTable.printValue_0(value);
+            } else {
+               return colDef_NatTable.printDoubleValue(value);
+            }
+         }
+      });
+
       final TableColumnDefinition colDef_Table = TableColumnFactory.RUN_DYN_VERTICAL_OSCILLATION_MAX.createColumn(_columnManager_Table, _pc);
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(new CellLabelProvider() {
@@ -4516,22 +4547,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             }
 
             setCellColor(cell, element);
-         }
-      });
-
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final double value = ((TVITourBookItem) element).colRunDyn_VerticalOscillation_Max
-                  * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
-
-            if (UI.UNIT_IS_METRIC) {
-               return colDef_Table.printValue_0(value);
-            } else {
-               return colDef_Table.printDoubleValue(value);
-            }
          }
       });
 
@@ -4560,6 +4575,23 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_RunDyn_VerticalOscillation_Min() {
 
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.RUN_DYN_VERTICAL_OSCILLATION_MIN.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final double value = ((TVITourBookItem) element).colRunDyn_VerticalOscillation_Min
+                  * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
+
+            if (UI.UNIT_IS_METRIC) {
+               return colDef_NatTable.printValue_0(value);
+            } else {
+               return colDef_NatTable.printDoubleValue(value);
+            }
+         }
+      });
+
       final TableColumnDefinition colDef_Table = TableColumnFactory.RUN_DYN_VERTICAL_OSCILLATION_MIN.createColumn(_columnManager_Table, _pc);
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(new CellLabelProvider() {
@@ -4577,22 +4609,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             }
 
             setCellColor(cell, element);
-         }
-      });
-
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final double value = ((TVITourBookItem) element).colRunDyn_VerticalOscillation_Min
-                  * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE_MM_OR_INCH;
-
-            if (UI.UNIT_IS_METRIC) {
-               return colDef_Table.printValue_0(value);
-            } else {
-               return colDef_Table.printDoubleValue(value);
-            }
          }
       });
 
@@ -4621,6 +4637,18 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_RunDyn_VerticalRatio_Avg() {
 
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.RUN_DYN_VERTICAL_RATIO_AVG.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final double value = ((TVITourBookItem) element).colRunDyn_VerticalRatio_Avg;
+
+            return colDef_NatTable.printDoubleValue(value);
+         }
+      });
+
       final TableColumnDefinition colDef_Table = TableColumnFactory.RUN_DYN_VERTICAL_RATIO_AVG.createColumn(_columnManager_Table, _pc);
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(new CellLabelProvider() {
@@ -4633,17 +4661,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             colDef_Table.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
             setCellColor(cell, element);
-         }
-      });
-
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final double value = ((TVITourBookItem) element).colRunDyn_VerticalRatio_Avg;
-
-            return colDef_Table.printDoubleValue(value);
          }
       });
 
@@ -4667,6 +4684,18 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_RunDyn_VerticalRatio_Max() {
 
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.RUN_DYN_VERTICAL_RATIO_MAX.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final double value = ((TVITourBookItem) element).colRunDyn_VerticalRatio_Max;
+
+            return colDef_NatTable.printDoubleValue(value);
+         }
+      });
+
       final TableColumnDefinition colDef_Table = TableColumnFactory.RUN_DYN_VERTICAL_RATIO_MAX.createColumn(_columnManager_Table, _pc);
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(new CellLabelProvider() {
@@ -4679,17 +4708,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             colDef_Table.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
             setCellColor(cell, element);
-         }
-      });
-
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final double value = ((TVITourBookItem) element).colRunDyn_VerticalRatio_Max;
-
-            return colDef_Table.printDoubleValue(value);
          }
       });
 
@@ -4713,6 +4731,18 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_RunDyn_VerticalRatio_Min() {
 
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.RUN_DYN_VERTICAL_RATIO_MIN.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final double value = ((TVITourBookItem) element).colRunDyn_VerticalRatio_Min;
+
+            return colDef_NatTable.printDoubleValue(value);
+         }
+      });
+
       final TableColumnDefinition colDef_Table = TableColumnFactory.RUN_DYN_VERTICAL_RATIO_MIN.createColumn(_columnManager_Table, _pc);
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(new CellLabelProvider() {
@@ -4725,17 +4755,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             colDef_Table.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
             setCellColor(cell, element);
-         }
-      });
-
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final double value = ((TVITourBookItem) element).colRunDyn_VerticalRatio_Min;
-
-            return colDef_Table.printDoubleValue(value);
          }
       });
 
@@ -4758,6 +4777,31 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     * Column: Surfing - Min distance
     */
    private void defineColumn_Surfing_MinDistance() {
+
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.SURFING_MIN_DISTANCE.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final short value = ((TVITourBookItem) element).col_Surfing_MinDistance;
+            final boolean isMinDistance = ((TVITourBookItem) element).col_Surfing_IsMinDistance;
+
+            if (value == 0 || value == TourData.SURFING_VALUE_IS_NOT_SET || isMinDistance == false) {
+               return UI.EMPTY_STRING;
+            } else {
+
+               int minSurfingDistance = value;
+
+               // convert imperial -> metric
+               if (net.tourbook.ui.UI.UNIT_VALUE_DISTANCE == net.tourbook.ui.UI.UNIT_MILE) {
+                  minSurfingDistance = (int) (minSurfingDistance / net.tourbook.ui.UI.UNIT_YARD + 0.5);
+               }
+
+               return Integer.toString(minSurfingDistance);
+            }
+         }
+      });
 
       final CellLabelProvider cellLabelProvider = new CellLabelProvider() {
          @Override
@@ -4789,30 +4833,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(cellLabelProvider);
 
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final short value = ((TVITourBookItem) element).col_Surfing_MinDistance;
-            final boolean isMinDistance = ((TVITourBookItem) element).col_Surfing_IsMinDistance;
-
-            if (value == 0 || value == TourData.SURFING_VALUE_IS_NOT_SET || isMinDistance == false) {
-               return UI.EMPTY_STRING;
-            } else {
-
-               int minSurfingDistance = value;
-
-               // convert imperial -> metric
-               if (net.tourbook.ui.UI.UNIT_VALUE_DISTANCE == net.tourbook.ui.UI.UNIT_MILE) {
-                  minSurfingDistance = (int) (minSurfingDistance / net.tourbook.ui.UI.UNIT_YARD + 0.5);
-               }
-
-               return Integer.toString(minSurfingDistance);
-            }
-         }
-      });
-
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.SURFING_MIN_DISTANCE.createColumn(_columnManager_Tree, _pc);
       colDef_Tree.setLabelProvider(cellLabelProvider);
    }
@@ -4821,6 +4841,22 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     * Column: Surfing - Min start/stop speed
     */
    private void defineColumn_Surfing_MinSpeed_StartStop() {
+
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.SURFING_MIN_SPEED_START_STOP.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final short value = ((TVITourBookItem) element).col_Surfing_MinSpeed_StartStop;
+
+            if (value == 0 || value == TourData.SURFING_VALUE_IS_NOT_SET) {
+               return UI.EMPTY_STRING;
+            } else {
+               return Integer.toString(value);
+            }
+         }
+      });
 
       final CellLabelProvider cellLabelProvider = new CellLabelProvider() {
          @Override
@@ -4843,21 +4879,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(cellLabelProvider);
 
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final short value = ((TVITourBookItem) element).col_Surfing_MinSpeed_StartStop;
-
-            if (value == 0 || value == TourData.SURFING_VALUE_IS_NOT_SET) {
-               return UI.EMPTY_STRING;
-            } else {
-               return Integer.toString(value);
-            }
-         }
-      });
-
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.SURFING_MIN_SPEED_START_STOP.createColumn(_columnManager_Tree, _pc);
       colDef_Tree.setLabelProvider(cellLabelProvider);
    }
@@ -4866,6 +4887,22 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     * Column: Surfing - Min surfing speed
     */
    private void defineColumn_Surfing_MinSpeed_Surfing() {
+
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.SURFING_MIN_SPEED_SURFING.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final short value = ((TVITourBookItem) element).col_Surfing_MinSpeed_Surfing;
+
+            if (value == 0 || value == TourData.SURFING_VALUE_IS_NOT_SET) {
+               return UI.EMPTY_STRING;
+            } else {
+               return Integer.toString(value);
+            }
+         }
+      });
 
       final CellLabelProvider cellLabelProvider = new CellLabelProvider() {
          @Override
@@ -4888,21 +4925,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(cellLabelProvider);
 
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final short value = ((TVITourBookItem) element).col_Surfing_MinSpeed_Surfing;
-
-            if (value == 0 || value == TourData.SURFING_VALUE_IS_NOT_SET) {
-               return UI.EMPTY_STRING;
-            } else {
-               return Integer.toString(value);
-            }
-         }
-      });
-
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.SURFING_MIN_SPEED_SURFING.createColumn(_columnManager_Tree, _pc);
       colDef_Tree.setLabelProvider(cellLabelProvider);
    }
@@ -4911,6 +4933,22 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     * Column: Surfing - Min surfing time duration
     */
    private void defineColumn_Surfing_MinTimeDuration() {
+
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.SURFING_MIN_TIME_DURATION.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final short value = ((TVITourBookItem) element).col_Surfing_MinTimeDuration;
+
+            if (value == 0 || value == TourData.SURFING_VALUE_IS_NOT_SET) {
+               return UI.EMPTY_STRING;
+            } else {
+               return Integer.toString(value);
+            }
+         }
+      });
 
       final CellLabelProvider cellLabelProvider = new CellLabelProvider() {
          @Override
@@ -4933,21 +4971,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(cellLabelProvider);
 
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final short value = ((TVITourBookItem) element).col_Surfing_MinTimeDuration;
-
-            if (value == 0 || value == TourData.SURFING_VALUE_IS_NOT_SET) {
-               return UI.EMPTY_STRING;
-            } else {
-               return Integer.toString(value);
-            }
-         }
-      });
-
       final TreeColumnDefinition colDefTree = TreeColumnFactory.SURFING_MIN_TIME_DURATION.createColumn(_columnManager_Tree, _pc);
       colDefTree.setLabelProvider(cellLabelProvider);
    }
@@ -4956,6 +4979,22 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     * Column: Surfing - Number of surfing events
     */
    private void defineColumn_Surfing_NumberOfEvents() {
+
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.SURFING_NUMBER_OF_EVENTS.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final long value = ((TVITourBookItem) element).col_Surfing_NumberOfEvents;
+
+            if (value == 0 || value == TourData.SURFING_VALUE_IS_NOT_SET) {
+               return UI.EMPTY_STRING;
+            } else {
+               return Long.toString(value);
+            }
+         }
+      });
 
       final CellLabelProvider cellLabelProvider = new CellLabelProvider() {
          @Override
@@ -4978,21 +5017,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(cellLabelProvider);
 
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final long value = ((TVITourBookItem) element).col_Surfing_NumberOfEvents;
-
-            if (value == 0 || value == TourData.SURFING_VALUE_IS_NOT_SET) {
-               return UI.EMPTY_STRING;
-            } else {
-               return Long.toString(value);
-            }
-         }
-      });
-
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.SURFING_NUMBER_OF_EVENTS.createColumn(_columnManager_Tree, _pc);
       colDef_Tree.setLabelProvider(cellLabelProvider);
    }
@@ -5002,10 +5026,21 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_Time_MovingTime() {
 
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.TIME_DRIVING_TIME.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setIsDefaultColumn();
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final long value = ((TVITourBookItem) element).colTourDrivingTime;
+
+            return colDef_NatTable.printLongValue(value);
+         }
+      });
+
       final TableColumnDefinition colDef_Table = TableColumnFactory.TIME_DRIVING_TIME.createColumn(_columnManager_Table, _pc);
-
       colDef_Table.setIsDefaultColumn();
-
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -5020,21 +5055,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          }
       });
 
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final long value = ((TVITourBookItem) element).colTourDrivingTime;
-
-            return colDef_Table.printLongValue(value);
-         }
-      });
-
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.TIME_DRIVING_TIME.createColumn(_columnManager_Tree, _pc);
-
       colDef_Tree.setIsDefaultColumn();
-
       colDef_Tree.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
@@ -5054,6 +5076,18 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_Time_PausedTime() {
 
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.TIME_PAUSED_TIME.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final long value = ((TVITourBookItem) element).colPausedTime;
+
+            return colDef_NatTable.printLongValue(value);
+         }
+      });
+
       final TableColumnDefinition colDef_Table = TableColumnFactory.TIME_PAUSED_TIME.createColumn(_columnManager_Table, _pc);
 
       colDef_Table.setColumnSelectionListener(_columnSortListener);
@@ -5067,17 +5101,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             colDef_Table.printLongValue(cell, value, element instanceof TVITourBookTour);
 
             setCellColor(cell, element);
-         }
-      });
-
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final long value = ((TVITourBookItem) element).colPausedTime;
-
-            return colDef_Table.printLongValue(value);
          }
       });
 
@@ -5103,6 +5126,25 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     * Column: Time - Relative paused time %
     */
    private void defineColumn_Time_PausedTime_Relative() {
+
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.TIME_PAUSED_TIME_RELATIVE.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final TVITourBookItem item = (TVITourBookItem) element;
+
+            final long dbPausedTime = item.colPausedTime;
+            final long dbRecordingTime = item.colTourRecordingTime;
+
+            final double relativePausedTime = dbRecordingTime == 0
+                  ? 0
+                  : (double) dbPausedTime / dbRecordingTime * 100;
+
+            return _nf1.format(relativePausedTime);
+         }
+      });
 
       final CellLabelProvider cellLabelProvider = new CellLabelProvider() {
          @Override
@@ -5132,24 +5174,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(cellLabelProvider);
 
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final TVITourBookItem item = (TVITourBookItem) element;
-
-            final long dbPausedTime = item.colPausedTime;
-            final long dbRecordingTime = item.colTourRecordingTime;
-
-            final double relativePausedTime = dbRecordingTime == 0
-                  ? 0
-                  : (double) dbPausedTime / dbRecordingTime * 100;
-
-            return _nf1.format(relativePausedTime);
-         }
-      });
-
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.TIME_PAUSED_TIME_RELATIVE.createColumn(_columnManager_Tree, _pc);
       colDef_Tree.setLabelProvider(cellLabelProvider);
    }
@@ -5158,6 +5182,18 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     * Column: Time - Recording time (h)
     */
    private void defineColumn_Time_RecordingTime() {
+
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.TIME_RECORDING_TIME.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final long value = ((TVITourBookItem) element).colTourRecordingTime;
+
+            return colDef_NatTable.printLongValue(value);
+         }
+      });
 
       final TableColumnDefinition colDef_Table = TableColumnFactory.TIME_RECORDING_TIME.createColumn(_columnManager_Table, _pc);
 
@@ -5172,17 +5208,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             colDef_Table.printLongValue(cell, value, element instanceof TVITourBookTour);
 
             setCellColor(cell, element);
-         }
-      });
-
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final long value = ((TVITourBookItem) element).colTourRecordingTime;
-
-            return colDef_Table.printLongValue(value);
          }
       });
 
@@ -5207,6 +5232,18 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_Time_TimeZone() {
 
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.TIME_TIME_ZONE.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final String timeZoneId = ((TVITourBookTour) element).colTimeZoneId;
+
+            return timeZoneId == null ? UI.EMPTY_STRING : timeZoneId;
+         }
+      });
+
       final CellLabelProvider cellLabelProvider = new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
@@ -5226,17 +5263,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       final TableColumnDefinition colDef_Table = TableColumnFactory.TIME_TIME_ZONE.createColumn(_columnManager_Table, _pc);
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(cellLabelProvider);
-
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final String timeZoneId = ((TVITourBookTour) element).colTimeZoneId;
-
-            return timeZoneId == null ? UI.EMPTY_STRING : timeZoneId;
-         }
-      });
 
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.TIME_TIME_ZONE.createColumn(_columnManager_Tree, _pc);
       colDef_Tree.setLabelProvider(cellLabelProvider);
@@ -5286,6 +5312,26 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_Time_TourStartTime() {
 
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.TIME_TOUR_START_TIME.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setIsDefaultColumn();
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final TourDateTime tourDateTime = ((TVITourBookTour) element).colTourDateTime;
+            final ZonedDateTime tourStartDateTime = tourDateTime.tourZonedDateTime;
+
+            final ValueFormat valueFormatter = colDef_NatTable.getValueFormat_Detail();
+
+            if (valueFormatter.equals(ValueFormat.TIME_HH_MM_SS)) {
+               return tourStartDateTime.format(TimeTools.Formatter_Time_M);
+            } else {
+               return tourStartDateTime.format(TimeTools.Formatter_Time_S);
+            }
+         }
+      });
+
       final TableColumnDefinition colDef_Table = TableColumnFactory.TIME_TOUR_START_TIME.createColumn(_columnManager_Table, _pc);
       colDef_Table.setIsDefaultColumn();
       colDef_Table.setColumnSelectionListener(_columnSortListener);
@@ -5324,24 +5370,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
                }
 
                setCellColor(cell, element);
-            }
-         }
-      });
-
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final TourDateTime tourDateTime = ((TVITourBookTour) element).colTourDateTime;
-            final ZonedDateTime tourStartDateTime = tourDateTime.tourZonedDateTime;
-
-            final ValueFormat valueFormatter = colDef_Table.getValueFormat_Detail();
-
-            if (valueFormatter.equals(ValueFormat.TIME_HH_MM_SS)) {
-               return tourStartDateTime.format(TimeTools.Formatter_Time_M);
-            } else {
-               return tourStartDateTime.format(TimeTools.Formatter_Time_S);
             }
          }
       });
@@ -5393,6 +5421,17 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_Time_WeekDay() {
 
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.TIME_WEEK_DAY.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setIsDefaultColumn();
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            return ((TVITourBookTour) element).colWeekDay;
+         }
+      });
+
       final TourInfoToolTipCellLabelProvider cellLabelProvider = new TourInfoToolTipCellLabelProvider() {
 
          @Override
@@ -5427,15 +5466,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(cellLabelProvider);
 
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            return ((TVITourBookTour) element).colWeekDay;
-         }
-      });
-
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.TIME_WEEK_DAY.createColumn(_columnManager_Tree, _pc);
       colDef_Tree.setIsDefaultColumn();
       colDef_Tree.setLabelProvider(cellLabelProvider);
@@ -5445,6 +5475,22 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     * Column: Time - Week
     */
    private void defineColumn_Time_WeekNo() {
+
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.TIME_WEEK_NO.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final int week = ((TVITourBookItem) element).colWeekNo;
+
+            if (week == 0) {
+               return UI.EMPTY_STRING;
+            } else {
+               return Integer.toString(week);
+            }
+         }
+      });
 
       final CellLabelProvider cellLabelProvider = new CellLabelProvider() {
 
@@ -5468,21 +5514,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(cellLabelProvider);
 
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final int week = ((TVITourBookItem) element).colWeekNo;
-
-            if (week == 0) {
-               return UI.EMPTY_STRING;
-            } else {
-               return Integer.toString(week);
-            }
-         }
-      });
-
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.TIME_WEEK_NO.createColumn(_columnManager_Tree, _pc);
       colDef_Tree.setLabelProvider(cellLabelProvider);
    }
@@ -5491,6 +5522,22 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     * Column: Time - Week year
     */
    private void defineColumn_Time_WeekYear() {
+
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.TIME_WEEKYEAR.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final int week = ((TVITourBookItem) element).colWeekYear;
+
+            if (week == 0) {
+               return UI.EMPTY_STRING;
+            } else {
+               return Integer.toString(week);
+            }
+         }
+      });
 
       final CellLabelProvider cellLabelProvider = new CellLabelProvider() {
 
@@ -5514,21 +5561,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(cellLabelProvider);
 
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final int week = ((TVITourBookItem) element).colWeekYear;
-
-            if (week == 0) {
-               return UI.EMPTY_STRING;
-            } else {
-               return Integer.toString(week);
-            }
-         }
-      });
-
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.TIME_WEEKYEAR.createColumn(_columnManager_Tree, _pc);
       colDef_Tree.setLabelProvider(cellLabelProvider);
    }
@@ -5537,6 +5569,22 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     * Column: Tour - Tour end location
     */
    private void defineColumn_Tour_Location_End() {
+
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.TOUR_LOCATION_END.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final String tourLocation = ((TVITourBookItem) element).colTourLocation_End;
+
+            if (tourLocation == null) {
+               return UI.EMPTY_STRING;
+            } else {
+               return tourLocation;
+            }
+         }
+      });
 
       final CellLabelProvider cellLabelProvider = new CellLabelProvider() {
 
@@ -5560,21 +5608,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(cellLabelProvider);
 
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final String tourLocation = ((TVITourBookItem) element).colTourLocation_End;
-
-            if (tourLocation == null) {
-               return UI.EMPTY_STRING;
-            } else {
-               return tourLocation;
-            }
-         }
-      });
-
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.TOUR_LOCATION_END.createColumn(_columnManager_Tree, _pc);
       colDef_Tree.setLabelProvider(cellLabelProvider);
    }
@@ -5583,6 +5616,22 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     * Column: Tour - Tour start location
     */
    private void defineColumn_Tour_Location_Start() {
+
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.TOUR_LOCATION_START.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final String tourLocation = ((TVITourBookItem) element).colTourLocation_Start;
+
+            if (tourLocation == null) {
+               return UI.EMPTY_STRING;
+            } else {
+               return tourLocation;
+            }
+         }
+      });
 
       final CellLabelProvider cellLabelProvider = new CellLabelProvider() {
 
@@ -5606,21 +5655,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(cellLabelProvider);
 
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final String tourLocation = ((TVITourBookItem) element).colTourLocation_Start;
-
-            if (tourLocation == null) {
-               return UI.EMPTY_STRING;
-            } else {
-               return tourLocation;
-            }
-         }
-      });
-
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.TOUR_LOCATION_START.createColumn(_columnManager_Tree, _pc);
       colDef_Tree.setLabelProvider(cellLabelProvider);
    }
@@ -5629,6 +5663,22 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     * Column: Tour - Markers
     */
    private void defineColumn_Tour_Marker() {
+
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.TOUR_NUM_MARKERS.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setIsDefaultColumn();
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final ArrayList<Long> markerIds = ((TVITourBookTour) element).getMarkerIds();
+            if (markerIds == null) {
+               return UI.EMPTY_STRING;
+            } else {
+               return _nf0.format(markerIds.size());
+            }
+         }
+      });
 
       final CellLabelProvider cellLabelProvider = new CellLabelProvider() {
          @Override
@@ -5654,20 +5704,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(cellLabelProvider);
 
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final ArrayList<Long> markerIds = ((TVITourBookTour) element).getMarkerIds();
-            if (markerIds == null) {
-               return UI.EMPTY_STRING;
-            } else {
-               return _nf0.format(markerIds.size());
-            }
-         }
-      });
-
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.TOUR_NUM_MARKERS.createColumn(_columnManager_Tree, _pc);
       colDef_Tree.setIsDefaultColumn();
       colDef_Tree.setLabelProvider(cellLabelProvider);
@@ -5677,6 +5713,19 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     * Column: Tour - Number of photos
     */
    private void defineColumn_Tour_Photos() {
+
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.TOUR_NUM_PHOTOS.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setIsDefaultColumn();
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final long value = ((TVITourBookItem) element).colNumberOfPhotos;
+
+            return colDef_NatTable.printValue_0(value);
+         }
+      });
 
       final TableColumnDefinition colDef_Table = TableColumnFactory.TOUR_NUM_PHOTOS.createColumn(_columnManager_Table, _pc);
       colDef_Table.setIsDefaultColumn();
@@ -5691,17 +5740,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             colDef_Table.printValue_0(cell, value);
 
             setCellColor(cell, element);
-         }
-      });
-
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final long value = ((TVITourBookItem) element).colNumberOfPhotos;
-
-            return colDef_Table.printValue_0(value);
          }
       });
 
@@ -5765,6 +5803,16 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_Tour_Tags() {
 
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.TOUR_TAGS.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setIsDefaultColumn();
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+            return "this is not yet supported";
+         }
+      });
+
       final TourInfoToolTipCellLabelProvider cellLabelProvider = new TourInfoToolTipCellLabelProvider() {
 
          @Override
@@ -5798,14 +5846,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(cellLabelProvider);
 
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-            return "this is not yet supported";
-         }
-      });
-
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.TOUR_TAGS.createColumn(_columnManager_Tree, _pc);
       colDef_Tree.setIsDefaultColumn();
       colDef_Tree.setLabelProvider(cellLabelProvider);
@@ -5815,6 +5855,23 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     * Column: Tour - Title
     */
    private void defineColumn_Tour_Title() {
+
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.TOUR_TITLE.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setIsDefaultColumn();
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final String colTourTitle = ((TVITourBookTour) element).colTourTitle;
+
+            if (colTourTitle == null) {
+               return "<NULL>";
+            } else {
+               return colTourTitle;
+            }
+         }
+      });
 
       final TourInfoToolTipCellLabelProvider cellLabelProvider = new TourInfoToolTipCellLabelProvider() {
 
@@ -5856,21 +5913,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(cellLabelProvider);
 
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final String colTourTitle = ((TVITourBookTour) element).colTourTitle;
-
-            if (colTourTitle == null) {
-               return "<NULL>";
-            } else {
-               return colTourTitle;
-            }
-         }
-      });
-
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.TOUR_TITLE.createColumn(_columnManager_Tree, _pc);
       colDef_Tree.setIsDefaultColumn();
       colDef_Tree.setLabelProvider(cellLabelProvider);
@@ -5880,6 +5922,24 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     * Column: Tour - Tour type image
     */
    private void defineColumn_Tour_TypeImage() {
+
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.TOUR_TYPE.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setIsDefaultColumn();
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            /**
+             * Tour type image for the NatTable is implemented in
+             * net.tourbook.ui.views.tourBook.TourBookView.NatTable_Configuration_TourType
+             * <p>
+             * When a label provider is not defined then a warning message is displayed from the
+             * data provider !
+             */
+            return UI.EMPTY_STRING;
+         }
+      });
 
       final CellLabelProvider cellLabelProvider = new CellLabelProvider() {
          @Override
@@ -5905,22 +5965,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(cellLabelProvider);
 
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            /**
-             * Tour type image for the NatTable is implemented in
-             * net.tourbook.ui.views.tourBook.TourBookView.NatTable_Configuration_TourType
-             * <p>
-             * When a label provider is not defined then a warning message is displayed from the
-             * data provider !
-             */
-            return UI.EMPTY_STRING;
-         }
-      });
-
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.TOUR_TYPE.createColumn(_columnManager_Tree, _pc);
       colDef_Tree.setIsDefaultColumn();
       colDef_Tree.setLabelProvider(cellLabelProvider);
@@ -5930,6 +5974,17 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     * Column: Tour - Tour type text
     */
    private void defineColumn_Tour_TypeText() {
+
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.TOUR_TYPE_TEXT.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final long tourTypeId = ((TVITourBookTour) element).getTourTypeId();
+            return net.tourbook.ui.UI.getTourTypeLabel(tourTypeId);
+         }
+      });
 
       final CellLabelProvider cellLabelProvider = new CellLabelProvider() {
          @Override
@@ -5947,16 +6002,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(cellLabelProvider);
 
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final long tourTypeId = ((TVITourBookTour) element).getTourTypeId();
-            return net.tourbook.ui.UI.getTourTypeLabel(tourTypeId);
-         }
-      });
-
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.TOUR_TYPE_TEXT.createColumn(_columnManager_Tree, _pc);
       colDef_Tree.setLabelProvider(cellLabelProvider);
    }
@@ -5965,6 +6010,22 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     * Column: Training - FTP
     */
    private void defineColumn_Training_FTP() {
+
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.TRAINING_FTP.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final int dbValue = ((TVITourBookItem) element).colTraining_FTP;
+
+            if (dbValue == 0) {
+               return UI.EMPTY_STRING;
+            } else {
+               return Integer.toString(dbValue);
+            }
+         }
+      });
 
       final CellLabelProvider cellLabelProvider = new CellLabelProvider() {
          @Override
@@ -5987,21 +6048,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(cellLabelProvider);
 
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final int dbValue = ((TVITourBookItem) element).colTraining_FTP;
-
-            if (dbValue == 0) {
-               return UI.EMPTY_STRING;
-            } else {
-               return Integer.toString(dbValue);
-            }
-         }
-      });
-
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.TRAINING_FTP.createColumn(_columnManager_Tree, _pc);
       colDef_Tree.setLabelProvider(cellLabelProvider);
    }
@@ -6010,6 +6056,18 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     * Column: Training - PowerIntensityFactor
     */
    private void defineColumn_Training_IntensityFactor() {
+
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.TRAINING_INTENSITY_FACTOR.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final double value = ((TVITourBookItem) element).colTraining_IntensityFactor;
+
+            return colDef_NatTable.printDoubleValue(value);
+         }
+      });
 
       final TableColumnDefinition colDef_Table = TableColumnFactory.TRAINING_INTENSITY_FACTOR.createColumn(_columnManager_Table, _pc);
       colDef_Table.setColumnSelectionListener(_columnSortListener);
@@ -6023,17 +6081,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             colDef_Table.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
             setCellColor(cell, element);
-         }
-      });
-
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final double value = ((TVITourBookItem) element).colTraining_IntensityFactor;
-
-            return colDef_Table.printDoubleValue(value);
          }
       });
 
@@ -6054,6 +6101,18 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
    private void defineColumn_Training_PowerToWeightRatio() {
 
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.TRAINING_POWER_TO_WEIGHT.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final double value = ((TVITourBookItem) element).colTraining_PowerToWeight;
+
+            return colDef_NatTable.printDoubleValue(value);
+         }
+      });
+
       final TableColumnDefinition colDef_Table = TableColumnFactory.TRAINING_POWER_TO_WEIGHT.createColumn(_columnManager_Table, _pc);
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(new CellLabelProvider() {
@@ -6066,17 +6125,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             colDef_Table.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
             setCellColor(cell, element);
-         }
-      });
-
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final double value = ((TVITourBookItem) element).colTraining_PowerToWeight;
-
-            return colDef_Table.printDoubleValue(value);
          }
       });
 
@@ -6100,6 +6148,18 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_Training_StressScore() {
 
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.TRAINING_STRESS_SCORE.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final double value = ((TVITourBookItem) element).colTraining_TrainingStressScore;
+
+            return colDef_NatTable.printDoubleValue(value);
+         }
+      });
+
       final TableColumnDefinition colDef_Table = TableColumnFactory.TRAINING_STRESS_SCORE.createColumn(_columnManager_Table, _pc);
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(new CellLabelProvider() {
@@ -6112,17 +6172,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             colDef_Table.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
             setCellColor(cell, element);
-         }
-      });
-
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final double value = ((TVITourBookItem) element).colTraining_TrainingStressScore;
-
-            return colDef_Table.printDoubleValue(value);
          }
       });
 
@@ -6146,6 +6195,18 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_Training_TrainingEffect() {
 
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.TRAINING_EFFECT_AEROB.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final double value = ((TVITourBookItem) element).colTraining_TrainingEffect_Aerob;
+
+            return colDef_NatTable.printDoubleValue(value);
+         }
+      });
+
       final TableColumnDefinition colDef_Table = TableColumnFactory.TRAINING_EFFECT_AEROB.createColumn(_columnManager_Table, _pc);
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(new CellLabelProvider() {
@@ -6158,17 +6219,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             colDef_Table.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
             setCellColor(cell, element);
-         }
-      });
-
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final double value = ((TVITourBookItem) element).colTraining_TrainingEffect_Aerob;
-
-            return colDef_Table.printDoubleValue(value);
          }
       });
 
@@ -6192,6 +6242,18 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_Training_TrainingEffect_Anaerobic() {
 
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.TRAINING_EFFECT_ANAEROB.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final double value = ((TVITourBookItem) element).colTraining_TrainingEffect_Anaerobic;
+
+            return colDef_NatTable.printDoubleValue(value);
+         }
+      });
+
       final TableColumnDefinition colDef_Table = TableColumnFactory.TRAINING_EFFECT_ANAEROB.createColumn(_columnManager_Table, _pc);
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(new CellLabelProvider() {
@@ -6204,17 +6266,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             colDef_Table.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
             setCellColor(cell, element);
-         }
-      });
-
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final double value = ((TVITourBookItem) element).colTraining_TrainingEffect_Anaerobic;
-
-            return colDef_Table.printDoubleValue(value);
          }
       });
 
@@ -6238,6 +6289,18 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_Training_TrainingPerformance() {
 
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.TRAINING_PERFORMANCE_LEVEL.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final double value = ((TVITourBookItem) element).colTraining_TrainingPerformance;
+
+            return colDef_NatTable.printDoubleValue(value);
+         }
+      });
+
       final TableColumnDefinition colDef_Table = TableColumnFactory.TRAINING_PERFORMANCE_LEVEL.createColumn(_columnManager_Table, _pc);
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(new CellLabelProvider() {
@@ -6250,17 +6313,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             colDef_Table.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
             setCellColor(cell, element);
-         }
-      });
-
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final double value = ((TVITourBookItem) element).colTraining_TrainingPerformance;
-
-            return colDef_Table.printDoubleValue(value);
          }
       });
 
@@ -6283,6 +6335,24 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     * Column: Weather - Clouds
     */
    private void defineColumn_Weather_Clouds() {
+
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.WEATHER_CLOUDS.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setIsDefaultColumn();
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            /**
+             * Image for the NatTable is implemented in TourBookView.NatTable_ConfigField_Weather
+             * <p>
+             * When a label provider is not defined then a warning message is displayed from the
+             * data provider !
+             */
+
+            return UI.EMPTY_STRING;
+         }
+      });
 
       final CellLabelProvider cellLabelProvider = new CellLabelProvider() {
          @Override
@@ -6311,14 +6381,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(cellLabelProvider);
 
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-            return "image is not yet displayed";
-         }
-      });
-
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.WEATHER_CLOUDS.createColumn(_columnManager_Tree, _pc);
       colDef_Tree.setIsDefaultColumn();
       colDef_Tree.setLabelProvider(cellLabelProvider);
@@ -6328,6 +6390,18 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     * Column: Weather - Avg temperature
     */
    private void defineColumn_Weather_Temperature_Avg() {
+
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.WEATHER_TEMPERATURE_AVG.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final double value = UI.convertTemperatureFromMetric(((TVITourBookItem) element).colTemperature_Avg);
+
+            return colDef_NatTable.printDoubleValue(value);
+         }
+      });
 
       final TableColumnDefinition colDef_Table = TableColumnFactory.WEATHER_TEMPERATURE_AVG.createColumn(_columnManager_Table, _pc);
       colDef_Table.setColumnSelectionListener(_columnSortListener);
@@ -6342,17 +6416,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             colDef_Table.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
             setCellColor(cell, element);
-         }
-      });
-
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final double value = UI.convertTemperatureFromMetric(((TVITourBookItem) element).colTemperature_Avg);
-
-            return colDef_Table.printDoubleValue(value);
          }
       });
 
@@ -6377,6 +6440,18 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_Weather_Temperature_Max() {
 
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.WEATHER_TEMPERATURE_MAX.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final double value = UI.convertTemperatureFromMetric(((TVITourBookItem) element).colTemperature_Max);
+
+            return colDef_NatTable.printDoubleValue(value);
+         }
+      });
+
       final TableColumnDefinition colDef_Table = TableColumnFactory.WEATHER_TEMPERATURE_MAX.createColumn(_columnManager_Table, _pc);
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(new CellLabelProvider() {
@@ -6390,17 +6465,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             colDef_Table.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
             setCellColor(cell, element);
-         }
-      });
-
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final double value = UI.convertTemperatureFromMetric(((TVITourBookItem) element).colTemperature_Max);
-
-            return colDef_Table.printDoubleValue(value);
          }
       });
 
@@ -6425,6 +6489,18 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_Weather_Temperature_Min() {
 
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.WEATHER_TEMPERATURE_MIN.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final double value = UI.convertTemperatureFromMetric(((TVITourBookItem) element).colTemperature_Min);
+
+            return colDef_NatTable.printDoubleValue(value);
+         }
+      });
+
       final TableColumnDefinition colDef_Table = TableColumnFactory.WEATHER_TEMPERATURE_MIN.createColumn(_columnManager_Table, _pc);
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(new CellLabelProvider() {
@@ -6438,17 +6514,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             colDef_Table.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
             setCellColor(cell, element);
-         }
-      });
-
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final double value = UI.convertTemperatureFromMetric(((TVITourBookItem) element).colTemperature_Min);
-
-            return colDef_Table.printDoubleValue(value);
          }
       });
 
@@ -6473,6 +6538,22 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_Weather_WindDirection() {
 
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.WEATHER_WIND_DIR.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final int windDir = ((TVITourBookItem) element).colWindDir;
+
+            if (windDir == 0) {
+               return UI.EMPTY_STRING;
+            } else {
+               return Integer.toString(windDir);
+            }
+         }
+      });
+
       final CellLabelProvider cellLabelProvider = new CellLabelProvider() {
 
          @Override
@@ -6495,21 +6576,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(cellLabelProvider);
 
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final int windDir = ((TVITourBookItem) element).colWindDir;
-
-            if (windDir == 0) {
-               return UI.EMPTY_STRING;
-            } else {
-               return Integer.toString(windDir);
-            }
-         }
-      });
-
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.WEATHER_WIND_DIR.createColumn(_columnManager_Tree, _pc);
       colDef_Tree.setLabelProvider(cellLabelProvider);
    }
@@ -6518,6 +6584,22 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     * Column: Weather - Wind speed
     */
    private void defineColumn_Weather_WindSpeed() {
+
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.WEATHER_WIND_SPEED.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final int windSpeed = (int) (((TVITourBookItem) element).colWindSpd / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
+
+            if (windSpeed == 0) {
+               return UI.EMPTY_STRING;
+            } else {
+               return Integer.toString(windSpeed);
+            }
+         }
+      });
 
       final CellLabelProvider cellLabelProvider = new CellLabelProvider() {
 
@@ -6540,21 +6622,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       final TableColumnDefinition colDef_Table = TableColumnFactory.WEATHER_WIND_SPEED.createColumn(_columnManager_Table, _pc);
       colDef_Table.setColumnSelectionListener(_columnSortListener);
       colDef_Table.setLabelProvider(cellLabelProvider);
-
-      colDef_Table.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final int windSpeed = (int) (((TVITourBookItem) element).colWindSpd / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE);
-
-            if (windSpeed == 0) {
-               return UI.EMPTY_STRING;
-            } else {
-               return Integer.toString(windSpeed);
-            }
-         }
-      });
 
       final TreeColumnDefinition colDef_Tree = TreeColumnFactory.WEATHER_WIND_SPEED.createColumn(_columnManager_Tree, _pc);
       colDef_Tree.setLabelProvider(cellLabelProvider);

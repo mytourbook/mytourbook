@@ -86,8 +86,7 @@ import org.eclipse.ui.XMLMemento;
  */
 public class ColumnManager {
 
-   private static final String XML_STATE_COLUMN_MANAGER = "XML_STATE_COLUMN_MANAGER"; //$NON-NLS-1$
-
+   private static final String XML_STATE_COLUMN_MANAGER          = "XML_STATE_COLUMN_MANAGER"; //$NON-NLS-1$
    //
    private static final String TAG_ROOT                          = "ColumnProfiles";           //$NON-NLS-1$
    //
@@ -2010,8 +2009,9 @@ public class ColumnManager {
    public void setupNatTableColumns() {
 
       setVisibleColDefs(_activeProfile);
+      setupValueFormatter(_activeProfile);
    }
-
+ 
    private void setupValueFormatter(final ColumnProfile activeProfile) {
 
       final ArrayList<ColumnProperties> profileColumnProperties = new ArrayList<>();
