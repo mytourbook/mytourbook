@@ -404,6 +404,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
       enableActions();
 
       mapApp.getMap().updateMap(true);
+      mapApp.updateUI_PhotoLayer();
    }
 
    private void restoreState() {

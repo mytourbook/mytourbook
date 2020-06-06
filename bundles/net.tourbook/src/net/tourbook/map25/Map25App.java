@@ -1001,6 +1001,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
    public void setIsPhotoShowTitle(final boolean state) {
       this._isPhotoShowTitle = state;
+      debugPrint(" map25: " + "############# setIsPhotoShowTitle: " + state); //$NON-NLS-1$ //$NON-NLS-2$
    }
 
 
