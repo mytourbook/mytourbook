@@ -46,7 +46,7 @@ public class DataProvider_Tour implements IRowDataProvider<TVITourBookTour> {
          return null;
       }
 
-      final ColumnDefinition colDef = _dataProvider.allSortedColumns.get(columnIndex + 1);
+      final ColumnDefinition colDef = _dataProvider.allSortedColumns.get(columnIndex);
       final NatTable_LabelProvider labelProvider = colDef.getNatTable_LabelProvider();
 
       if (labelProvider == null) {

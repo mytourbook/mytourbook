@@ -147,8 +147,8 @@ import org.eclipse.nebula.widgets.nattable.layer.ILayer;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnOverrideLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ILayerCell;
 import org.eclipse.nebula.widgets.nattable.painter.cell.ImagePainter;
-import org.eclipse.nebula.widgets.nattable.painter.cell.TextPainter;
 import org.eclipse.nebula.widgets.nattable.painter.cell.decorator.CellPainterDecorator;
+import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.selection.command.SelectRowsCommand;
 import org.eclipse.nebula.widgets.nattable.selection.config.DefaultRowSelectionLayerConfiguration;
@@ -196,9 +196,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    static public final String            ID                                              = "net.tourbook.views.tourListView";         //$NON-NLS-1$
 
    private final static IPreferenceStore _prefStore                                      = TourbookPlugin.getPrefStore();
-
    private final static IPreferenceStore _prefStoreCommon                                = CommonActivator.getPrefStore();
-
    //
    private static final IDialogSettings _state                                          = TourbookPlugin.getState(ID);
 
@@ -222,10 +220,16 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private static final String          STATE_SORT_COLUMN_DIRECTION                     = "STATE_SORT_COLUMN_DIRECTION";             //$NON-NLS-1$
    private static final String          STATE_SORT_COLUMN_ID                            = "STATE_SORT_COLUMN_ID";                    //$NON-NLS-1$
    //
-   private static final String          CSV_EXPORT_DEFAULT_FILE_NAME                    = "TourBook_";                               //$NON-NLS-1$
-   //
    static final boolean                 STATE_IS_SHOW_SUMMARY_ROW_DEFAULT               = true;
    static final boolean                 STATE_LINK_AND_COLLAPSE_ALL_OTHER_ITEMS_DEFAULT = true;
+   //
+   private static final String          CSV_EXPORT_DEFAULT_FILE_NAME                    = "TourBook_";                               //$NON-NLS-1$
+   //
+   /**
+    * The header column id needs a different id than the body column otherwise drag&drop or column
+    * selection shows the 1st row image :-(
+    */
+   private static final String          HEADER_COLUMN_ID_POSTFIX                        = "_HEADER";
    //
    private static final NumberFormat    _nf0;
    private static final NumberFormat    _nf1;
@@ -248,7 +252,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private static TourBookViewLayout      _viewLayout;
    //
    private ColumnManager                  _columnManager_Table;
-
    private ColumnManager                  _columnManager_Tree;
    //
    private OpenDialogManager              _openDlgMgr                      = new OpenDialogManager();
@@ -274,7 +277,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    //
    private NatTable                       _tourViewer_NatTable;
    private DataProvider                   _natTable_DataProvider;
+   private ColumnReorderLayer             _natTable_ColumnReorder_Layer;
    private ViewportLayer                  _natTable_Grid_BodyLayer;
+   private DataLayer                      _natTable_DataLayer_Body;
    //
    private int                            _selectedYear                    = -1;
    private int                            _selectedYearSub                 = -1;
@@ -951,6 +956,100 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       }
    }
 
+   private final class NatTable_ConfigField_TourType extends AbstractRegistryConfiguration {
+
+      private IRowDataProvider<TVITourBookTour> _dataProvider;
+
+      private NatTable_ConfigField_TourType(final IRowDataProvider<TVITourBookTour> body_DataProvider) {
+
+         _dataProvider = body_DataProvider;
+      }
+
+      @Override
+      public void configureRegistry(final IConfigRegistry configRegistry) {
+
+         final ImagePainter decoratorCellPainter = new ImagePainter() {
+
+            @Override
+            protected Image getImage(final ILayerCell cell, final IConfigRegistry configRegistry) {
+
+               // get the row object
+
+               final int rowIndex = cell.getRowIndex();
+
+               final TVITourBookTour tviTour = _dataProvider.getRowObject(rowIndex);
+
+               if (tviTour == null) {
+                  return null;
+               }
+
+               final long tourTypeId = tviTour.getTourTypeId();
+               final Image tourTypeImage = TourTypeImage.getTourTypeImage(tourTypeId);
+
+               return tourTypeImage;
+            }
+         };
+
+         // apply painter to the body cells and not to the header cells
+         configRegistry.registerConfigAttribute(
+
+               CellConfigAttributes.CELL_PAINTER,
+               new CellPainterDecorator(null, CellEdgeEnum.LEFT, decoratorCellPainter),
+               DisplayMode.NORMAL,
+               TableColumnFactory.TOUR_TYPE_ID);
+      }
+   }
+
+   private final class NatTable_ConfigField_Weather extends AbstractRegistryConfiguration {
+
+      private IRowDataProvider<TVITourBookTour> _dataProvider;
+
+      private NatTable_ConfigField_Weather(final IRowDataProvider<TVITourBookTour> body_DataProvider) {
+
+         _dataProvider = body_DataProvider;
+      }
+
+      @Override
+      public void configureRegistry(final IConfigRegistry configRegistry) {
+
+         final ImagePainter decoratorCellPainter = new ImagePainter() {
+
+            @Override
+            protected Image getImage(final ILayerCell cell, final IConfigRegistry configRegistry) {
+
+               // get the row object
+
+               final int rowIndex = cell.getRowIndex();
+
+               final TVITourBookTour tviTour = _dataProvider.getRowObject(rowIndex);
+
+               if (tviTour == null) {
+                  return null;
+               }
+
+               final String windClouds = tviTour.colClouds;
+
+               if (windClouds == null) {
+                  return null;
+               } else {
+                  final Image cellImage = net.tourbook.common.UI.IMAGE_REGISTRY.get(windClouds);
+                  if (cellImage == null) {
+                     return null;
+                  } else {
+                     return cellImage;
+                  }
+               }
+            }
+         };
+
+         configRegistry.registerConfigAttribute(
+               CellConfigAttributes.CELL_PAINTER,
+               new CellPainterDecorator(null, CellEdgeEnum.LEFT, decoratorCellPainter),
+               DisplayMode.NORMAL,
+               TableColumnFactory.WEATHER_CLOUDS_ID);
+      }
+   }
+
    private class NatTable_Configuration_CellStyle extends AbstractRegistryConfiguration {
 
       private ArrayList<ColumnDefinition> _allSortedColumns;
@@ -964,14 +1063,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       public void configureRegistry(final IConfigRegistry configRegistry) {
 
          // loop: all displayed columns
-         for (int colIndex = 0; colIndex < _allSortedColumns.size(); colIndex++) {
-
-            final ColumnDefinition colDef = _allSortedColumns.get(colIndex);
-
-            // skip first "hidden" column
-            if (colIndex == 0) {
-               continue;
-            }
+         for (final ColumnDefinition colDef : _allSortedColumns) {
 
             if (!colDef.isColumnDisplayed()) {
                // visible columns are displayed first
@@ -981,22 +1073,34 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             final String columnId = colDef.getColumnId();
 
             switch (columnId) {
-            case TableColumnFactory.TOUR_TYPE_ID:
 
+            case TableColumnFactory.TOUR_TYPE_ID:
+            case TableColumnFactory.WEATHER_CLOUDS_ID:
+
+               // images are displayed for these column
                break;
 
             default:
 
-               final Style style = new Style();
+               Style style;
 
                final HorizontalAlignmentEnum columnAlignment = natTableConvert_ColumnAlignment(colDef.getColumnStyle());
 
+               // body style
+               style = new Style();
                style.setAttributeValue(CellStyleAttributes.HORIZONTAL_ALIGNMENT, columnAlignment);
 
                configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE,
                      style,
                      DisplayMode.NORMAL,
                      columnId);
+
+               // header style
+               style = style.clone();
+               configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE,
+                     style,
+                     DisplayMode.NORMAL,
+                     columnId + HEADER_COLUMN_ID_POSTFIX);
                break;
             }
          }
@@ -1071,51 +1175,16 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       }
    }
 
-   private final class NatTable_Configuration_TourType extends AbstractRegistryConfiguration {
-
-      private IRowDataProvider<TVITourBookTour> _dataProvider;
-
-      private NatTable_Configuration_TourType(final IRowDataProvider<TVITourBookTour> body_DataProvider) {
-
-         _dataProvider = body_DataProvider;
-      }
-
-      @Override
-      public void configureRegistry(final IConfigRegistry configRegistry) {
-
-         final ImagePainter decoratorCellPainter = new ImagePainter() {
-
-            @Override
-            protected Image getImage(final ILayerCell cell, final IConfigRegistry configRegistry) {
-
-               // get the row object
-
-               final int rowIndex = cell.getRowIndex();
-
-               final TVITourBookTour tviTour = _dataProvider.getRowObject(rowIndex);
-
-               if (tviTour == null) {
-                  return null;
-               }
-
-               final long tourTypeId = tviTour.getTourTypeId();
-               final Image tourTypeImage = TourTypeImage.getTourTypeImage(tourTypeId);
-
-               return tourTypeImage;
-            }
-         };
-
-         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER,
-
-               new CellPainterDecorator(
-                     new TextPainter(),
-                     CellEdgeEnum.LEFT,
-                     decoratorCellPainter),
-
-               DisplayMode.NORMAL,
-               TableColumnFactory.TOUR_TYPE_ID);
-      }
-   }
+//   private final class NatTable_DataLayer_Body extends DataLayer {
+//
+//      private NatTable_DataLayer_Body(final IDataProvider dataProvider) {
+//         super(dataProvider);
+//      }
+//
+//      private SizeConfig getColumnWidthConfig() {
+//         return columnWidthConfig;
+//      }
+//   }
 
    void actionExportViewCSV() {
 
@@ -1697,7 +1766,10 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          _columnManager_Table = new ColumnManager(this, _state_Table);
       }
 
+      _columnManager_Table.setupNatTableColumns();
+
       _natTable_DataProvider = new DataProvider(this, _columnManager_Table);
+      final ArrayList<ColumnDefinition> allSortedColumns = _natTable_DataProvider.allSortedColumns;
 
       final String sortColumnId = _tourViewer_Table_Comparator.__sortColumnId;
       final int sortDirection = _tourViewer_Table_Comparator.__sortDirection;
@@ -1708,26 +1780,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
        * Create: Body layer
        */
       final IRowDataProvider<TVITourBookTour> body_DataProvider = new DataProvider_Tour(_natTable_DataProvider);
-      final DataLayer body_DataLayer = new DataLayer(body_DataProvider);
-
-      // set column widths
-      final ArrayList<ColumnDefinition> allSortedColumns = _natTable_DataProvider.allSortedColumns;
-      for (int colIndex = 0; colIndex < allSortedColumns.size(); colIndex++) {
-
-         // skip first "hidden" column
-         if (colIndex == 0) {
-            continue;
-         }
-
-         final ColumnDefinition colDef = allSortedColumns.get(colIndex);
-
-         if (!colDef.isColumnDisplayed()) {
-            // visible columns are displayed first
-            break;
-         }
-
-         body_DataLayer.setColumnWidthByPosition(colIndex - 1, colDef.getColumnWidth(), false);
-      }
+      _natTable_DataLayer_Body = new DataLayer(body_DataProvider);
 
       /*
        * Create: Hover layer
@@ -1737,7 +1790,12 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 //      // cursor moves out of the cell area
 //      body_HoverLayer.addConfiguration(new SimpleHoverStylingBindings(body_HoverLayer));
 
-      final HoverLayer body_HoverLayer = new HoverLayer(body_DataLayer);
+      final HoverLayer body_HoverLayer = new HoverLayer(_natTable_DataLayer_Body);
+
+      /*
+       * Create: Column drag&drop layer
+       */
+      _natTable_ColumnReorder_Layer = new ColumnReorderLayer(body_HoverLayer);
 
       /*
        * Create: Selection layer
@@ -1745,12 +1803,13 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       // create a SelectionLayer without using the default configuration
       // this enables us to add the row selection configuration cleanly
       // afterwards
-      final SelectionLayer selection_Layer = new SelectionLayer(body_HoverLayer, false);
+      final SelectionLayer selection_Layer = new SelectionLayer(_natTable_ColumnReorder_Layer, false);
 
-      /*
-       * Create: Grid viewport layer
-       */
-      _natTable_Grid_BodyLayer = new ViewportLayer(selection_Layer);
+      // register the DefaultRowSelectionLayerConfiguration that contains the
+      // default styling and functionality bindings (search, tick update)
+      // and different configurations for a move command handler that always
+      // moves by a row and row only selection bindings
+      selection_Layer.addConfiguration(new DefaultRowSelectionLayerConfiguration());
 
 // have not yet understood how this works !!!
 //
@@ -1765,16 +1824,17 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 //
 //      }));
 
-      // register the DefaultRowSelectionLayerConfiguration that contains the
-      // default styling and functionality bindings (search, tick update)
-      // and different configurations for a move command handler that always
-      // moves by a row and row only selection bindings
-      selection_Layer.addConfiguration(new DefaultRowSelectionLayerConfiguration());
+      /*
+       * Create: Grid viewport layer
+       */
+      _natTable_Grid_BodyLayer = new ViewportLayer(selection_Layer);
+      _natTable_Grid_BodyLayer.addConfiguration(new NatTable_ConfigField_TourType(body_DataProvider));
+      _natTable_Grid_BodyLayer.addConfiguration(new NatTable_ConfigField_Weather(body_DataProvider));
 
       /*
        * Create: Column header layer
        */
-      final IDataProvider columnHeader_DataProvider = new DataProvider_ColumnHeader(_natTable_DataProvider);
+      final IDataProvider columnHeader_DataProvider = new DataProvider_ColumnHeader(_natTable_DataProvider, _columnManager_Table);
       final DataLayer columnHeader_DataLayer = new DataLayer(columnHeader_DataProvider);
       final ILayer columnHeader_Layer = new ColumnHeaderLayer(columnHeader_DataLayer, _natTable_Grid_BodyLayer, selection_Layer);
 
@@ -1798,27 +1858,10 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       final GridLayer gridLayer = new GridLayer(_natTable_Grid_BodyLayer, columnHeader_Layer, rowHeader_Layer, corner_Layer);
 
       /*
-       * Register column labels for the body and header -> this is necessary to apply styling
+       * Setup other data
        */
-      final ColumnOverrideLabelAccumulator body_ColumnLabelAccumulator = new ColumnOverrideLabelAccumulator(body_DataLayer);
-      final ColumnOverrideLabelAccumulator columnHeader_ColumnLabelAccumulator = new ColumnOverrideLabelAccumulator(columnHeader_DataLayer);
-
-      body_DataLayer.setConfigLabelAccumulator(body_ColumnLabelAccumulator);
-      columnHeader_DataLayer.setConfigLabelAccumulator(columnHeader_ColumnLabelAccumulator);
-
-      for (int colIndex = 0; colIndex < allSortedColumns.size(); colIndex++) {
-
-         // skip first "hidden" column
-         if (colIndex == 0) {
-            continue;
-         }
-
-         final ColumnDefinition colDef = allSortedColumns.get(colIndex);
-         final String columnId = colDef.getColumnId();
-
-         columnHeader_ColumnLabelAccumulator.registerColumnOverrides(colIndex - 1, columnId);
-         body_ColumnLabelAccumulator.registerColumnOverrides(colIndex - 1, columnId);
-      }
+      natTable_SetColumnWidths(allSortedColumns, _natTable_DataLayer_Body);
+      natTable_RegisterColumnLabels(allSortedColumns, _natTable_DataLayer_Body, columnHeader_DataLayer);
 
       /*
        * Create: Table
@@ -1834,8 +1877,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _tourViewer_NatTable.addConfiguration(new DefaultNatTableStyleConfiguration());
 
       _tourViewer_NatTable.addConfiguration(new NatTable_Configuration_CellStyle(_natTable_DataProvider.allSortedColumns));
-
-      _tourViewer_NatTable.addConfiguration(new NatTable_Configuration_TourType(body_DataProvider));
 
       // add the style configuration for hover
       _tourViewer_NatTable.addConfiguration(new NatTable_Configuration_Hover());
@@ -2063,20 +2104,20 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void defineColumn_0_RowNumbering() {
 
-      {
-         // Column: 1st column will be hidden because the alignment for the first column is always to the left
-
-         final ColumnDefinition colDef = TableColumnFactory.DATA_FIRST_COLUMN.createColumn(_columnManager_Table, _pc);
-
-         colDef.setIsDefaultColumn();
-         colDef.setCanModifyVisibility(true);
-         colDef.setIsColumnMoveable(true);
-         colDef.setHideColumn();
-         colDef.setLabelProvider(new CellLabelProvider() {
-            @Override
-            public void update(final ViewerCell cell) {}
-         });
-      }
+//      {
+//         // Column: 1st column will be hidden because the alignment for the first column is always to the left
+//
+//         final ColumnDefinition colDef = TableColumnFactory.DATA_FIRST_COLUMN.createColumn(_columnManager_Table, _pc);
+//
+//         colDef.setIsDefaultColumn();
+//         colDef.setCanModifyVisibility(true);
+//         colDef.setIsColumnMoveable(true);
+//         colDef.setHideColumn();
+//         colDef.setLabelProvider(new CellLabelProvider() {
+//            @Override
+//            public void update(final ViewerCell cell) {}
+//         });
+//      }
 
 //      {
 //         // Column: #
@@ -6902,6 +6943,62 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       return Util.getStateBoolean(_state, TourBookView.STATE_IS_SHOW_SUMMARY_ROW, TourBookView.STATE_IS_SHOW_SUMMARY_ROW_DEFAULT);
    }
 
+   /**
+    * Register column labels for the body and header -> this is necessary to apply styling, images,
+    * ...
+    *
+    * @param allSortedColumns
+    * @param body_DataLayer
+    * @param columnHeader_DataLayer
+    */
+   private void natTable_RegisterColumnLabels(final ArrayList<ColumnDefinition> allSortedColumns,
+                                              final DataLayer body_DataLayer,
+                                              final DataLayer columnHeader_DataLayer) {
+
+      final ColumnOverrideLabelAccumulator body_ColumnLabelAccumulator = new ColumnOverrideLabelAccumulator(body_DataLayer);
+      final ColumnOverrideLabelAccumulator columnHeader_ColumnLabelAccumulator = new ColumnOverrideLabelAccumulator(columnHeader_DataLayer);
+
+      body_DataLayer.setConfigLabelAccumulator(body_ColumnLabelAccumulator);
+      columnHeader_DataLayer.setConfigLabelAccumulator(columnHeader_ColumnLabelAccumulator);
+
+      for (int colIndex = 0; colIndex < allSortedColumns.size(); colIndex++) {
+
+         final ColumnDefinition colDef = allSortedColumns.get(colIndex);
+
+         if (!colDef.isColumnDisplayed()) {
+            // ignore hidden colums
+            return;
+         }
+
+         final String columnId = colDef.getColumnId();
+
+         columnHeader_ColumnLabelAccumulator.registerColumnOverrides(colIndex, columnId + HEADER_COLUMN_ID_POSTFIX);
+
+         body_ColumnLabelAccumulator.registerColumnOverrides(colIndex, columnId);
+      }
+   }
+
+   /**
+    * @param allSortedColumns
+    * @param body_DataLayer
+    */
+   private void natTable_SetColumnWidths(final ArrayList<ColumnDefinition> allSortedColumns, final DataLayer body_DataLayer) {
+
+      // set column widths
+      for (int colIndex = 0; colIndex < allSortedColumns.size(); colIndex++) {
+
+         final ColumnDefinition colDef = allSortedColumns.get(colIndex);
+
+         if (!colDef.isColumnDisplayed()) {
+            // visible columns are displayed first
+            continue;
+//            break;
+         }
+
+         body_DataLayer.setColumnWidthByPosition(colIndex, colDef.getColumnWidth(), false);
+      }
+   }
+
    private void onSelect_CreateTourSelection(final HashSet<Long> tourIds) {
 
       ISelection selection;
@@ -7523,6 +7620,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       _columnManager_Table.saveState(_state_Table);
       _columnManager_Tree.saveState(_state_Tree);
+
+      _columnManager_Table.saveState(_state_Table, _natTable_DataLayer_Body, _natTable_ColumnReorder_Layer);
+
    }
 
    private void selectTour(final long tourId) {
@@ -7598,7 +7698,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
                      /**
                       * <code>
-                     
+
                         Caused by: java.lang.NullPointerException
                         at org.eclipse.jface.viewers.AbstractTreeViewer.getSelection(AbstractTreeViewer.java:2956)
                         at org.eclipse.jface.viewers.StructuredViewer.handleSelect(StructuredViewer.java:1211)
@@ -7616,13 +7716,13 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
                         at org.eclipse.jface.viewers.AbstractTreeViewer.internalCollapseToLevel(AbstractTreeViewer.java:1586)
                         at org.eclipse.jface.viewers.AbstractTreeViewer.collapseToLevel(AbstractTreeViewer.java:751)
                         at org.eclipse.jface.viewers.AbstractTreeViewer.collapseAll(AbstractTreeViewer.java:733)
-                     
+
                         at net.tourbook.ui.views.tourBook.TourBookView$70.run(TourBookView.java:3406)
-                     
+
                         at org.eclipse.swt.widgets.RunnableLock.run(RunnableLock.java:35)
                         at org.eclipse.swt.widgets.Synchronizer.runAsyncMessages(Synchronizer.java:135)
                         ... 22 more
-                     
+
                       * </code>
                       */
 

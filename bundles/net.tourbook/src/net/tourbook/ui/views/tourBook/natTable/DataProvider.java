@@ -83,16 +83,15 @@ public class DataProvider {
    public ArrayList<ColumnDefinition> allSortedColumns;
    int                                numVisibleColumns;
 
-   ColumnManager                      columnManager;
-
    private int                        _numAllTourItems = -1;
 
    private TourBookView               _tourBookView;
+   private ColumnManager              _columnManager;
 
    public DataProvider(final TourBookView tourBookView, final ColumnManager columnManager) {
 
       _tourBookView = tourBookView;
-      this.columnManager = columnManager;
+      _columnManager = columnManager;
 
       createColumnHeaderData();
    }
@@ -104,19 +103,13 @@ public class DataProvider {
 
    private void createColumnHeaderData() {
 
-      allSortedColumns = columnManager.getRearrangedColumns();
+      allSortedColumns = _columnManager.getVisibleAndSortedColumns();
 
       numVisibleColumns = 0;
 
       for (final ColumnDefinition colDef : allSortedColumns) {
 
          if (colDef.isColumnDisplayed()) {
-
-            // ignore special column
-            if (colDef.getColumnId().equals(TableColumnFactory.DATA_FIRST_COLUMN_ID)) {
-               continue;
-            }
-
             numVisibleColumns++;
          }
       }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -32,12 +32,14 @@ public class ColumnProfile implements Cloneable {
    ArrayList<ColumnDefinition>        visibleColumnDefinitions = new ArrayList<>();
 
    /**
-    * Contains the column ids which are visible in the viewer.
+    * Contains the column id's (with the correct sort order) which are visible in the viewer.
     */
    String[]                           visibleColumnIds;
 
    /**
     * Contains a pair with column id/column width for visible columns.
+    * <p>
+    * <b>The sort order is differently!</b>
     */
    String[]                           visibleColumnIdsAndWidth;
 

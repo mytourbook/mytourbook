@@ -15,15 +15,19 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourBook.natTable;
 
+import net.tourbook.common.util.ColumnManager;
+
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 
 public class DataProvider_ColumnHeader implements IDataProvider {
 
-   private DataProvider _dataProvider;
+   private DataProvider  _dataProvider;
+   private ColumnManager _columnManager;
 
-   public DataProvider_ColumnHeader(final DataProvider natTable_DataProvider) {
+   public DataProvider_ColumnHeader(final DataProvider natTable_DataProvider, final ColumnManager columnManager) {
 
       _dataProvider = natTable_DataProvider;
+      _columnManager = columnManager;
    }
 
    @Override
@@ -34,12 +38,11 @@ public class DataProvider_ColumnHeader implements IDataProvider {
    @Override
    public Object getDataValue(final int columnIndex, final int rowIndex) {
 
-      if (columnIndex < 0 || columnIndex >= _dataProvider.numVisibleColumns + 1) {
+      if (columnIndex < 0 || columnIndex >= _dataProvider.numVisibleColumns) {
          return null;
       }
 
-      // ignore first column TableColumnFactory.DATA_FIRST_COLUMN_ID
-      return _dataProvider.allSortedColumns.get(columnIndex + 1).getColumnHeaderText(_dataProvider.columnManager);
+      return _dataProvider.allSortedColumns.get(columnIndex).getColumnHeaderText(_columnManager);
    }
 
    @Override

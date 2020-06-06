@@ -52,6 +52,8 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
+import org.eclipse.nebula.widgets.nattable.layer.DataLayer;
+import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -1280,7 +1282,7 @@ public class ColumnManager {
          return null;
       }
 
-      // create columns in the correct sort order
+      // create column id'ss with the visible sort order
       for (final int createIndex : columnOrder) {
 
          final ColumnDefinition colDef = getColDef_ByCreateIndex(createIndex);
@@ -1555,6 +1557,10 @@ public class ColumnManager {
       }
    }
 
+   public ArrayList<ColumnDefinition> getVisibleAndSortedColumns() {
+      return _activeProfile.visibleColumnDefinitions;
+   }
+
    public boolean isCategoryAvailable() {
       return _isCategoryAvailable;
    }
@@ -1674,8 +1680,7 @@ public class ColumnManager {
                   final String xmlColumnIdsAndWidth = xmlProfile.getString(ATTR_VISIBLE_COLUMN_IDS_AND_WIDTH);
                   if (xmlColumnIdsAndWidth != null) {
 
-                     currentProfile.visibleColumnIdsAndWidth = StringToArrayConverter
-                           .convertStringToArray(xmlColumnIdsAndWidth);
+                     currentProfile.visibleColumnIdsAndWidth = StringToArrayConverter.convertStringToArray(xmlColumnIdsAndWidth);
                   }
 
                   /*
@@ -1775,6 +1780,58 @@ public class ColumnManager {
          _activeProfile.visibleColumnIdsAndWidth = visibleColumnIdsAndWidth;
       }
 
+      saveState_All(state);
+   }
+
+   public void saveState(final IDialogSettings state, final DataLayer dataLayer, final ColumnReorderLayer columnReorderLayer) {
+
+      if (dataLayer == null) {
+         return;
+      }
+
+      /*
+       * Update state for the active profile
+       */
+
+      final int numColumns = dataLayer.getColumnCount();
+      final int[] columnOrder = new int[numColumns];
+      final int[] columnWidth = new int[numColumns];
+
+      final ArrayList<String> orderedColumnIds = new ArrayList<>();
+      final ArrayList<String> columnIdsAndWidth = new ArrayList<>();
+
+      for (int columnIndex = 0; columnIndex < numColumns; columnIndex++) {
+
+         // the reorder layer contains the correct column order in casees when columns are moved with drag&drop
+         final int columnPosition = columnReorderLayer.getColumnPositionByIndex(columnIndex);
+
+         final int colIndexByPos = dataLayer.getColumnIndexByPosition(columnPosition);
+         final int colWidthByPos = dataLayer.getColumnWidthByPosition(columnPosition);
+
+         columnOrder[columnIndex] = colIndexByPos;
+         columnWidth[columnIndex] = colWidthByPos;
+
+         final ColumnDefinition colDef = getColDef_ByCreateIndex(colIndexByPos);
+
+         if (colDef != null) {
+            orderedColumnIds.add(colDef.getColumnId());
+            setColumnIdAndWidth(columnIdsAndWidth, colDef.getColumnId(), colWidthByPos);
+         }
+      }
+
+      _activeProfile.visibleColumnIds = orderedColumnIds.toArray(new String[orderedColumnIds.size()]);
+      _activeProfile.visibleColumnIdsAndWidth = columnIdsAndWidth.toArray(new String[columnIdsAndWidth.size()]);
+
+      saveState_All(state);
+   }
+
+   /**
+    * Save states for all profiles
+    *
+    * @param state
+    */
+   private void saveState_All(final IDialogSettings state) {
+
       // Build the XML block for writing the bindings and active scheme.
       final XMLMemento xmlMemento = XMLMemento.createWriteRoot(TAG_ROOT);
 
@@ -1867,9 +1924,9 @@ public class ColumnManager {
          // column is visible
 
          if (columnWidth == 0) {
-            /*
-             * there is somewhere an error that the column width is 0,
-             */
+
+            // there is somewhere an error that the column width is 0,
+
             columnWidth = colDef.getDefaultColumnWidth();
             columnWidth = Math.max(MINIMUM_COLUMN_WIDTH, columnWidth);
          }
@@ -1948,6 +2005,11 @@ public class ColumnManager {
 
    public void setSlideoutShell(final AdvancedSlideoutShell slideoutShell) {
       _slideoutShell = slideoutShell;
+   }
+
+   public void setupNatTableColumns() {
+
+      setVisibleColDefs(_activeProfile);
    }
 
    private void setupValueFormatter(final ColumnProfile activeProfile) {
@@ -2080,7 +2142,7 @@ public class ColumnManager {
       }
 
       /*
-       * when no columns are visible (which is the first time), show only the default columns
+       * When no columns are visible (which is the first time), show only the default columns
        * because every column reduces performance
        */
       if ((visibleColDefs.size() == 0) && (_allDefinedColumnDefinitions.size() > 0)) {
@@ -2102,7 +2164,7 @@ public class ColumnManager {
       }
 
       /*
-       * when no default columns are set, use the first column
+       * When no default columns are set, use the first column
        */
       if ((visibleColDefs.size() == 0) && (_allDefinedColumnDefinitions.size() > 0)) {
 
@@ -2153,6 +2215,29 @@ public class ColumnManager {
          }
 
          columnProfile.visibleColumnIds = columnIds.toArray(new String[columnIds.size()]);
+      }
+
+      /*
+       * Ensure that each visible column has also set it's column width
+       */
+      int numVisibleColumns = 0;
+      for (final ColumnDefinition colDef : visibleColDefs) {
+
+         if (colDef.getColumnWidth() == 0) {
+            colDef.setColumnWidth(colDef.getDefaultColumnWidth());
+         }
+
+         if (colDef.isColumnDisplayed()) {
+            numVisibleColumns++;
+         }
+      }
+      if (numVisibleColumns == 0) {
+
+         // nothing is displayed -> show all columns
+
+         for (final ColumnDefinition colDef : visibleColDefs) {
+            colDef.setIsColumnDisplayed(true);
+         }
       }
    }
 
