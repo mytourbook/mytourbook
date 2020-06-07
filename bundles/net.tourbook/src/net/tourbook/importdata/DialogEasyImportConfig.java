@@ -17,7 +17,6 @@ package net.tourbook.importdata;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -4054,6 +4053,9 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
          try {
             //We use the retrieved TourbookFileSystem's implementation to select the folder to watch
             selectedFolder = fileSystem.selectFileSystemFolder(_parent.getShell());
+            if (!StringUtils.isNullOrEmpty(selectedFolder)) {
+               _comboIC_DeviceFolder.setText(selectedFolder);
+            }
          } catch (final Exception e) {
             StatusUtil.log(e);
          }
@@ -4131,21 +4133,22 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       _comboIC_DeviceFolder.setEnabled(enableDeviceFolder);
 
       final String currentDeviceFolder = _comboIC_DeviceFolder.getText();
-      if (enableDeviceFolder) {
          _comboIC_DeviceFolder.setText(_selectedIC.getDeviceFolder());
-
-         final boolean isDeviceNotLocal = Arrays.stream(_comboDeviceType.getItems())
-               .filter(deviceType -> currentDeviceFolder.equals(deviceType))
-               .findAny()
-               .isPresent();
-
-         if (isDeviceNotLocal) {
-            // A non local device is selected (example : Dropbox)
-            _comboIC_DeviceFolder.setText(UI.EMPTY_STRING);
-         }
-      } else {
-         _comboIC_DeviceFolder.setText(_comboDeviceType.getItem(deviceIndex));
-      }
+//      if (enableDeviceFolder) {
+//
+////         final boolean isDeviceNotLocal = Arrays.stream(_comboDeviceType.getItems())
+////               .filter(deviceType -> currentDeviceFolder.equals(deviceType))
+////               .findAny()
+////               .isPresent();
+//         final boolean isDeviceNotLocal = NIO.isTourBookFileSystem(currentDeviceFolder);
+//
+//         if (isDeviceNotLocal) {
+//            // A non local device is selected (example : Dropbox)
+//            _comboIC_DeviceFolder.setText(UI.EMPTY_STRING);
+//         }
+//      } else {
+//         _comboIC_DeviceFolder.setText(_comboDeviceType.getItem(deviceIndex));
+//      }
 
       _chkIC_CreateBackup.setEnabled(enableDeviceFolder);
 
@@ -4384,6 +4387,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       _selectedIC.isTurnOffWatching = _chkIC_TurnOffWatching.getSelection();
 
       _selectedIC.setBackupFolder(_comboIC_BackupFolder.getText());
+      _selectedIC.setDeviceType(_comboDeviceType.getSelectionIndex());
       _selectedIC.setDeviceFolder(_comboIC_DeviceFolder.getText());
 
       _selectedIC.fileGlobPattern = _txtIC_DeviceFiles.getText();
@@ -4543,15 +4547,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
          _comboIC_BackupFolder.setText(_selectedIC.getBackupFolder());
          _comboIC_DeviceFolder.setText(_selectedIC.getDeviceFolder());
-
-         int selectedDeviceIndex = 0;
-         for (int index = 0; index < _comboDeviceType.getItemCount(); ++index) {
-            if (_comboDeviceType.getItem(index).equals(_selectedIC.getDeviceFolder())) {
-               selectedDeviceIndex = index;
-               break;
-            }
-         }
-         _comboDeviceType.select(selectedDeviceIndex);
+         _comboDeviceType.select(_selectedIC.getDeviceType());
 
          _txtIC_DeviceFiles.setText(_selectedIC.fileGlobPattern);
          _lblIC_DeleteFilesInfo.setText(createUIText_MovedFiles());

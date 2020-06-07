@@ -144,7 +144,7 @@ public class FileSystemManager {
       getFileSystemsList();
 
       for (final TourbookFileSystem tourbookFileSystem : _fileSystemsList) {
-         if (tourbookFileSystem.getId().equalsIgnoreCase(folderName.toLowerCase())) {
+         if (folderName.toLowerCase().startsWith(tourbookFileSystem.getId().toLowerCase())) {
             return tourbookFileSystem.getfolderPath(folderName);
          }
       }
@@ -154,15 +154,15 @@ public class FileSystemManager {
    /**
     * Returns the {@link TourbookFileSystem}, if found, for a given device folder.
     *
-    * @param deviceName
+    * @param deviceFolder
     * @return
     */
-   public static TourbookFileSystem getTourbookFileSystem(final String deviceName) {
+   public static TourbookFileSystem getTourbookFileSystem(final String deviceFolder) {
 
       getFileSystemsList();
 
       for (final TourbookFileSystem tourbookFileSystem : _fileSystemsList) {
-         if (tourbookFileSystem.getId().equalsIgnoreCase(deviceName.toLowerCase())) {
+         if (deviceFolder.toLowerCase().startsWith(tourbookFileSystem.getId().toLowerCase())) {
             return tourbookFileSystem;
          }
       }

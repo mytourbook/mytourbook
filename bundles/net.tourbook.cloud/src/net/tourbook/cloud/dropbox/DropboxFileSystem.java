@@ -188,7 +188,8 @@ public class DropboxFileSystem extends TourbookFileSystem {
          return null;
       }
 
-      final String dropboxFilePath = _prefStore.getString(IPreferences.DROPBOX_FOLDER);
+      //We remove the "Dropbox" string from the folderName
+      final String dropboxFilePath = folderName.substring(7);
       return _dropboxFileSystem.getPath(dropboxFilePath);
    }
 
@@ -218,7 +219,7 @@ public class DropboxFileSystem extends TourbookFileSystem {
          if (!StringUtils.isNullOrEmpty(selectedFolder)) {
             FILE_SYSTEM_FOLDER = selectedFolder;
 
-            return selectedFolder;
+            return getId() + selectedFolder;
          }
       }
 

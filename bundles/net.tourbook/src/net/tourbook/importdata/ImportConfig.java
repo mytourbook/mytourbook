@@ -31,6 +31,7 @@ public class ImportConfig implements Cloneable {
    public boolean             isCreateBackup       = true;
    private String             _backupFolder        = UI.EMPTY_STRING;
 
+   private int                _deviceType          = 0;
    private String             _deviceFolder        = UI.EMPTY_STRING;
 
    /**
@@ -113,6 +114,10 @@ public class ImportConfig implements Cloneable {
       return getOSFolder(_deviceFolder);
    }
 
+   public int getDeviceType() {
+      return _deviceType;
+   }
+
    public long getId() {
       return _id;
    }
@@ -162,6 +167,10 @@ public class ImportConfig implements Cloneable {
 
    public void setDeviceFolder(final String deviceFolder) {
       _deviceFolder = deviceFolder;
+   }
+
+   public void setDeviceType(final int deviceType) {
+      this._deviceType = deviceType;
    }
 
    @Override
