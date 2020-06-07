@@ -58,8 +58,7 @@ public class DropboxFileSystem extends TourbookFileSystem {
          @Override
          public void propertyChange(final PropertyChangeEvent event) {
 
-            if (event.getProperty().equals(IPreferences.DROPBOX_ACCESSTOKEN) ||
-                  event.getProperty().equals(IPreferences.DROPBOX_FOLDER)) {
+            if (event.getProperty().equals(IPreferences.DROPBOX_ACCESSTOKEN)) {
 
                closeDropboxFileSystem();
 
@@ -142,11 +141,6 @@ public class DropboxFileSystem extends TourbookFileSystem {
       return result;
    }
 
-   @Override
-   public String getAbsoluteRootPath() {
-      return _prefStore.getString(IPreferences.DROPBOX_FOLDER);
-   }
-
    /**
     * Retrieves the Dropbox {@link FileStore}.
     * Creates it if necessary.
@@ -198,6 +192,11 @@ public class DropboxFileSystem extends TourbookFileSystem {
       return PrefPageDropbox.ID;
    }
 
+   /**
+    * When the user clicks on the "Choose Folder" button, a dialog is opened
+    * so that the user can choose which folder will be used when using their Dropbox
+    * account as a device to watch.
+    */
    @Override
    public String selectFileSystemFolder(final Shell shell) {
       final DropboxFolderBrowser dropboxFolderChooser[] = new DropboxFolderBrowser[1];

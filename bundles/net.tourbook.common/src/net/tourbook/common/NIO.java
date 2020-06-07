@@ -189,8 +189,10 @@ public class NIO {
 
       final List<String> tourBookFileSystemIds = FileSystemManager.getFileSystemsIds();
 
-      //TODO FB remove choose folder from prefpage and prefstore
       //TODO FB send the apirate limit exception in java7-fs-dropbox
+      //if its the reason why its slow switching from one dropbox config to another, mention that to Wolfgang
+      //TODO FB check the history items in windows HistoryItems line 566
+      //TODO DO a thorough testing with an empty db and metadata
       for (final String tourBookFileSystemId : tourBookFileSystemIds) {
          if (folderName.toLowerCase().startsWith(tourBookFileSystemId.toLowerCase())) {
             return true;

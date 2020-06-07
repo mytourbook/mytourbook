@@ -53,13 +53,6 @@ public abstract class TourbookFileSystem {
    protected abstract File copyFileLocally(String filePath);
 
    /**
-    * Gets the absolute path of the root folder of the file system.
-    *
-    * @return
-    */
-   public abstract String getAbsoluteRootPath();
-
-   /**
     * Retrieves a list of {@link FileStore} for the file system.
     *
     * @return

@@ -184,6 +184,7 @@ public class ImportConfig implements Cloneable {
             + ("isTurnOffWatching=" + isTurnOffWatching + ", \n") //$NON-NLS-1$ //$NON-NLS-2$
             + ("_id=" + _id + ", \n") //$NON-NLS-1$ //$NON-NLS-2$
             + ("_backupFolder=" + _backupFolder + ", \n") //$NON-NLS-1$ //$NON-NLS-2$
+            + ("_deviceType=" + _deviceType + ", \n") //$NON-NLS-1$ //$NON-NLS-2$
             + ("_deviceFolder=" + _deviceFolder + ", \n") //$NON-NLS-1$ //$NON-NLS-2$
             + ("deviceFiles=" + fileGlobPattern) //$NON-NLS-1$
 

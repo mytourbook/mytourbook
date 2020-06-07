@@ -21,6 +21,4 @@ public interface IPreferences {
     * Dropbox preferences
     */
    public static final String DROPBOX_ACCESSTOKEN = "DROPBOX_ACCESSTOKEN"; //$NON-NLS-1$
-   public static final String DROPBOX_FOLDER      = "DROPBOX_FOLDER";      //$NON-NLS-1$
-
 }

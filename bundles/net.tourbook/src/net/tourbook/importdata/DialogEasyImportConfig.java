@@ -24,6 +24,7 @@ import java.util.List;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.FileSystemManager;
+import net.tourbook.common.NIO;
 import net.tourbook.common.TourbookFileSystem;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
@@ -263,8 +264,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
    //
    private Combo             _comboIC_BackupFolder;
    private Combo             _comboIC_DeviceFolder;
+   private Combo             _comboIC_DeviceType;
    private Combo             _comboIL_TourType;
-   private Combo             _comboDeviceType;
    //
    private Label             _lblIC_ConfigName;
    private Label             _lblIC_BackupFolder;
@@ -1320,21 +1321,21 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       /*
        * Drop down menu: device type
        */
-      _comboDeviceType = new Combo(parent, SWT.READ_ONLY | SWT.BORDER);
-      _comboDeviceType.setToolTipText(Messages.Dialog_ImportConfig_Label_DeviceFolder_Tooltip);
+      _comboIC_DeviceType = new Combo(parent, SWT.READ_ONLY | SWT.BORDER);
+      _comboIC_DeviceType.setToolTipText(Messages.Dialog_ImportConfig_Label_DeviceFolder_Tooltip);
       GridDataFactory
             .fillDefaults()//
             .grab(true, false)
             .indent(CONTROL_DECORATION_WIDTH, 0)
             .align(SWT.LEFT, SWT.CENTER)
-            .applyTo(_comboDeviceType);
+            .applyTo(_comboIC_DeviceType);
 
-      _comboDeviceType.add(Messages.Dialog_ImportConfig_Combo_Device_LocalDevice);
+      _comboIC_DeviceType.add(Messages.Dialog_ImportConfig_Combo_Device_LocalDevice);
       final List<String> fileSystemsIds = FileSystemManager.getFileSystemsIds();
       for (final String fileSystemsId : fileSystemsIds) {
-         _comboDeviceType.add(fileSystemsId);
+         _comboIC_DeviceType.add(fileSystemsId);
       }
-      _comboDeviceType.addModifyListener(deviceTypeListener);
+      _comboIC_DeviceType.addModifyListener(deviceTypeListener);
 
       /*
        * Label: device folder
@@ -3214,7 +3215,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
       _btnIC_Remove.setEnabled(numConfigs > 1);
 
-      _comboDeviceType.setEnabled(_chkIC_ImportFiles.getSelection());
+      _comboIC_DeviceType.setEnabled(_chkIC_ImportFiles.getSelection());
    }
 
    private void enable_IL_Controls() {
@@ -4119,44 +4120,36 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
    }
 
    private void onSelectDevice() {
-      if (_comboDeviceType == null) {
+      if (_comboIC_DeviceType == null) {
          return;
       }
-      final int deviceIndex = _comboDeviceType.getSelectionIndex();
+      final int deviceIndex = _comboIC_DeviceType.getSelectionIndex();
 
       if (_lblIC_DeviceFolder == null) {
          return;
       }
 
-      final boolean enableDeviceFolder = deviceIndex == 0; //Local device
-      _lblIC_DeviceFolder.setEnabled(enableDeviceFolder);
-      _comboIC_DeviceFolder.setEnabled(enableDeviceFolder);
+      final boolean isDeviceLocal = deviceIndex == 0; //Local device
+      _lblIC_DeviceFolder.setEnabled(isDeviceLocal);
+      _comboIC_DeviceFolder.setEnabled(isDeviceLocal);
 
-      final String currentDeviceFolder = _comboIC_DeviceFolder.getText();
-         _comboIC_DeviceFolder.setText(_selectedIC.getDeviceFolder());
-//      if (enableDeviceFolder) {
-//
-////         final boolean isDeviceNotLocal = Arrays.stream(_comboDeviceType.getItems())
-////               .filter(deviceType -> currentDeviceFolder.equals(deviceType))
-////               .findAny()
-////               .isPresent();
-//         final boolean isDeviceNotLocal = NIO.isTourBookFileSystem(currentDeviceFolder);
-//
-//         if (isDeviceNotLocal) {
-//            // A non local device is selected (example : Dropbox)
-//            _comboIC_DeviceFolder.setText(UI.EMPTY_STRING);
-//         }
-//      } else {
-//         _comboIC_DeviceFolder.setText(_comboDeviceType.getItem(deviceIndex));
-//      }
+      String deviceFolder = _selectedIC.getDeviceFolder();
 
-      _chkIC_CreateBackup.setEnabled(enableDeviceFolder);
+      if (isDeviceLocal && NIO.isTourBookFileSystem(deviceFolder)) {
+         deviceFolder = UI.EMPTY_STRING;
+      } else if (!isDeviceLocal && StringUtils.isNullOrEmpty(deviceFolder)) {
+         deviceFolder = _comboIC_DeviceType.getText();
+      }
+      _comboIC_DeviceFolder.setText(deviceFolder);
 
-      if (!enableDeviceFolder) {
+      _chkIC_CreateBackup.setEnabled(isDeviceLocal);
+      _chkIC_DeleteDeviceFiles.setEnabled(isDeviceLocal);
+
+      if (!isDeviceLocal) {
          _comboIC_BackupFolder.setText(UI.EMPTY_STRING);
+         _comboIC_BackupFolder.setEnabled(false);
          _chkIC_CreateBackup.setSelection(false);
          _lblIC_BackupFolder.setEnabled(false);
-         _comboIC_BackupFolder.setEnabled(false);
          _btnIC_SelectBackupFolder.setEnabled(false);
          _backupHistoryItems.setIsValidateFolder(false);
          _backupHistoryItems.validateModifiedPath();
@@ -4387,7 +4380,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       _selectedIC.isTurnOffWatching = _chkIC_TurnOffWatching.getSelection();
 
       _selectedIC.setBackupFolder(_comboIC_BackupFolder.getText());
-      _selectedIC.setDeviceType(_comboDeviceType.getSelectionIndex());
+      _selectedIC.setDeviceType(_comboIC_DeviceType.getSelectionIndex());
       _selectedIC.setDeviceFolder(_comboIC_DeviceFolder.getText());
 
       _selectedIC.fileGlobPattern = _txtIC_DeviceFiles.getText();
@@ -4547,7 +4540,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
          _comboIC_BackupFolder.setText(_selectedIC.getBackupFolder());
          _comboIC_DeviceFolder.setText(_selectedIC.getDeviceFolder());
-         _comboDeviceType.select(_selectedIC.getDeviceType());
+         _comboIC_DeviceType.select(_selectedIC.getDeviceType());
 
          _txtIC_DeviceFiles.setText(_selectedIC.fileGlobPattern);
          _lblIC_DeleteFilesInfo.setText(createUIText_MovedFiles());
