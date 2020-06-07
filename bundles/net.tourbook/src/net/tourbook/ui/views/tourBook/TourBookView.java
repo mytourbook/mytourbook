@@ -38,6 +38,7 @@ import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.IContextMenuProvider;
+import net.tourbook.common.util.INatTablePropertiesProvider; 
 import net.tourbook.common.util.ITourViewer3;
 import net.tourbook.common.util.ITreeViewer;
 import net.tourbook.common.util.NatTable_LabelProvider;
@@ -82,7 +83,6 @@ import net.tourbook.ui.action.ActionOpenTour;
 import net.tourbook.ui.action.ActionRefreshView;
 import net.tourbook.ui.action.ActionSetPerson;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
-import net.tourbook.ui.views.TableViewerTourInfoToolTip;
 import net.tourbook.ui.views.TourInfoToolTipCellLabelProvider;
 import net.tourbook.ui.views.TourInfoToolTipStyledCellLabelProvider;
 import net.tourbook.ui.views.TreeViewerTourInfoToolTip;
@@ -129,6 +129,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.config.AbstractRegistryConfiguration;
+import org.eclipse.nebula.widgets.nattable.config.AbstractUiBindingConfiguration;
 import org.eclipse.nebula.widgets.nattable.config.CellConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.config.DefaultNatTableStyleConfiguration;
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
@@ -158,14 +159,17 @@ import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.eclipse.nebula.widgets.nattable.style.HorizontalAlignmentEnum;
 import org.eclipse.nebula.widgets.nattable.style.Style;
 import org.eclipse.nebula.widgets.nattable.style.theme.ModernNatTableThemeConfiguration;
+import org.eclipse.nebula.widgets.nattable.ui.binding.UiBindingRegistry;
+import org.eclipse.nebula.widgets.nattable.ui.matcher.MouseEventMatcher;
 import org.eclipse.nebula.widgets.nattable.ui.menu.AbstractHeaderMenuConfiguration;
+import org.eclipse.nebula.widgets.nattable.ui.menu.PopupMenuAction;
 import org.eclipse.nebula.widgets.nattable.ui.menu.PopupMenuBuilder;
 import org.eclipse.nebula.widgets.nattable.ui.util.CellEdgeEnum;
 import org.eclipse.nebula.widgets.nattable.util.GUIHelper;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.BusyIndicator; 
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -190,7 +194,7 @@ import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
-public class TourBookView extends ViewPart implements ITourProvider2, ITourViewer3, ITourProviderByID, ITreeViewer {
+public class TourBookView extends ViewPart implements ITourProvider2, ITourViewer3, ITourProviderByID, ITreeViewer, INatTablePropertiesProvider {
 
 // SET_FORMATTING_OFF
 
@@ -252,66 +256,72 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _nf2.setMaximumFractionDigits(2);
    }
    //
-   private static TourBookViewLayout      _viewLayout;
+   private static TourBookViewLayout  _viewLayout;
    //
-   private ColumnManager                  _columnManager_NatTable;
-   private ColumnManager                  _columnManager_Table;
-   private ColumnManager                  _columnManager_Tree;
+   private ColumnManager              _columnManager_NatTable;
+   private ColumnManager              _columnManager_Table;
+   private ColumnManager              _columnManager_Tree;
    //
-   private OpenDialogManager              _openDlgMgr                      = new OpenDialogManager();
+   private OpenDialogManager          _openDlgMgr                  = new OpenDialogManager();
    //
-   private PostSelectionProvider          _postSelectionProvider;
+   private PostSelectionProvider      _postSelectionProvider;
    //
-   private SelectionAdapter               _columnSortListener;
-   private ISelectionListener             _postSelectionListener;
-   private IPartListener2                 _partListener;
-   private ITourEventListener             _tourPropertyListener;
-   private IPropertyChangeListener        _prefChangeListener;
-   private IPropertyChangeListener        _prefChangeListenerCommon;
+   private SelectionAdapter           _columnSortListener;
+   private ISelectionListener         _postSelectionListener;
+   private IPartListener2             _partListener;
+   private ITourEventListener         _tourPropertyListener;
+   private IPropertyChangeListener    _prefChangeListener;
+   private IPropertyChangeListener    _prefChangeListenerCommon;
    //
-   private NatTable                       _tourViewer_NatTable;
-   private TableViewer                    _tourViewer_Table;
-   private TreeViewer                     _tourViewer_Tree;
-   private ItemComparator_Table           _tourViewer_Table_Comparator     = new ItemComparator_Table();
+   private NatTable                   _tourViewer_NatTable;
+   private TableViewer                _tourViewer_Table;
+   private TreeViewer                 _tourViewer_Tree;
+   private ItemComparator_Table       _tourViewer_Table_Comparator = new ItemComparator_Table();
    //
-   private TableColumnDefinition          _colDef_TimeZoneOffset_Table;
-   private TreeColumnDefinition           _colDef_TimeZoneOffset_Tree;
+   private TableColumnDefinition      _colDef_TimeZoneOffset_Table;
+   private TreeColumnDefinition       _colDef_TimeZoneOffset_Tree;
    //
-   private LazyTourProvider               _tableTourProvider               = new LazyTourProvider(this);
-   private TVITourBookRoot                _rootItem_Tree;
+   private LazyTourProvider           _tableTourProvider           = new LazyTourProvider(this);
+   private TVITourBookRoot            _rootItem_Tree;
    //
-   private ColumnReorderLayer             _natTable_Body_ColumnReorderLayer;
-   private DataLayer                      _natTable_Body_DataLayer;
-   private ColumnHideShowLayer            _natTable_Body_ColumnHideShowLayer;
-   private ViewportLayer                  _natTable_Body_ViewportLayer;
-   private DataProvider                   _natTable_DataProvider;
+   private DataLayer                  _natTable_ColumnHeader_DataLayer;
+   private ColumnHeaderLayer          _natTable_ColumnHeader_Layer;
+   private ColumnHideShowLayer        _natTable_Body_ColumnHideShowLayer;
+   private ColumnReorderLayer         _natTable_Body_ColumnReorderLayer;
+   private DataLayer                  _natTable_Body_DataLayer;
+   private SelectionLayer             _natTable_Body_SelectionLayer;
+   private ViewportLayer              _natTable_Body_ViewportLayer;
+   private DataProvider               _natTable_DataProvider;
    //
-   private int                            _selectedYear                    = -1;
-   private int                            _selectedYearSub                 = -1;
-   private final ArrayList<Long>          _selectedTourIds                 = new ArrayList<>();
+   private int                        _selectedYear                = -1;
+   private int                        _selectedYearSub             = -1;
+   private final ArrayList<Long>      _selectedTourIds             = new ArrayList<>();
    //
-   private boolean                        _isCollapseOthers;
-   private boolean                        _isInFireSelection;
-   private boolean                        _isInReload;
-   private boolean                        _isInStartup;
-   private boolean                        _isLayoutNatTable;
-   private boolean                        _isLayoutTable;
-   private boolean                        _isShowSummaryRow;
-   private boolean                        _isShowToolTipIn_Date;
-   private boolean                        _isShowToolTipIn_Tags;
-   private boolean                        _isShowToolTipIn_Time;
-   private boolean                        _isShowToolTipIn_Title;
-   private boolean                        _isShowToolTipIn_WeekDay;
+   private boolean                    _isCollapseOthers;
+   private boolean                    _isInFireSelection;
+   private boolean                    _isInReload;
+   private boolean                    _isInStartup;
+   private boolean                    _isLayoutNatTable;
+   private boolean                    _isLayoutTable;
+   private boolean                    _isShowSummaryRow;
+   private boolean                    _isShowToolTipIn_Date;
+   private boolean                    _isShowToolTipIn_Tags;
+   private boolean                    _isShowToolTipIn_Time;
+   private boolean                    _isShowToolTipIn_Title;
+   private boolean                    _isShowToolTipIn_WeekDay;
    //
-   private final TourDoubleClickState     _tourDoubleClickState            = new TourDoubleClickState();
-   private TableViewerTourInfoToolTip     _tourInfoToolTip_Table;
+   private final TourDoubleClickState _tourDoubleClickState        = new TourDoubleClickState();
+//   private TableViewerTourInfoToolTip     _tourInfoToolTip_NatTable;
+//   private TableViewerTourInfoToolTip     _tourInfoToolTip_Table;
    private TreeViewerTourInfoToolTip      _tourInfoToolTip_Tree;
    //
    private TagMenuManager                 _tagMenuManager;
+   private MenuManager                    _viewerMenuManager_NatTable;
    private MenuManager                    _viewerMenuManager_Table;
    private MenuManager                    _viewerMenuManager_Tree;
-   private IContextMenuProvider           _viewerContextMenuProvider_Table = new ContextMenuProvider_Table();
-   private IContextMenuProvider           _viewerContextMenuProvider_Tree  = new ContextMenuProvider_Tree();
+   private IContextMenuProvider           _viewerContextMenuProvider_NatTable = new ContextMenuProvider_NatTable();
+   private IContextMenuProvider           _viewerContextMenuProvider_Table    = new ContextMenuProvider_Table();
+   private IContextMenuProvider           _viewerContextMenuProvider_Tree     = new ContextMenuProvider_Tree();
    //
    private SubMenu_AdjustTourValues       _subMenu_AdjustTourValues;
    private Action_Reimport_SubMenu        _subMenu_Reimport;
@@ -352,6 +362,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private Composite _viewerContainer_Table;
    private Composite _viewerContainer_Tree;
    //
+   private Menu      _contextMenu_NatTable;
    private Menu      _contextMenu_Table;
    private Menu      _contextMenu_Tree;
 
@@ -432,6 +443,33 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       @Override
       public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
+   }
+
+   private class ContextMenuProvider_NatTable implements IContextMenuProvider {
+
+      @Override
+      public void disposeContextMenu() {
+
+         if (_contextMenu_NatTable != null) {
+            _contextMenu_NatTable.dispose();
+         }
+      }
+
+      @Override
+      public Menu getContextMenu() {
+         return _contextMenu_NatTable;
+      }
+
+      @Override
+      public Menu recreateContextMenu() {
+
+         disposeContextMenu();
+
+         _contextMenu_NatTable = createUI_52_CreateViewerContextMenu_NatTable();
+
+         return _contextMenu_NatTable;
+      }
+
    }
 
    private class ContextMenuProvider_Table implements IContextMenuProvider {
@@ -959,6 +997,43 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       public int hashCode(final Object element) {
          return 0;
       }
+   }
+
+   /**
+    * [1] IConfiguration for registering a UI binding to open a menu
+    */
+   private class NatTable_Config_DebugMenu extends AbstractUiBindingConfiguration {
+
+      private final Menu debugMenu;
+
+      public NatTable_Config_DebugMenu(final NatTable natTable) {
+
+         // [2] create the menu using the PopupMenuBuilder
+         this.debugMenu = new PopupMenuBuilder(natTable)
+               .withInspectLabelsMenuItem()
+               .build();
+      }
+
+      @Override
+      public void configureUiBindings(final UiBindingRegistry uiBindingRegistry) {
+
+         // [3] bind the PopupMenuAction to a right click
+         // using GridRegion.COLUMN_HEADER instead of null would
+         // for example open the menu only on performing a right
+         // click on the column header instead of any region
+
+         uiBindingRegistry.registerMouseDownBinding(
+
+               new MouseEventMatcher(
+                     SWT.NONE,
+                     null,
+                     MouseEventMatcher.RIGHT_BUTTON),
+
+               new PopupMenuAction(this.debugMenu)
+
+         );
+      }
+
    }
 
    private final class NatTable_Config_Menu extends AbstractHeaderMenuConfiguration {
@@ -1572,13 +1647,25 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       _tagMenuManager = new TagMenuManager(this, true);
 
+      _viewerMenuManager_NatTable = new MenuManager("#PopupMenu"); //$NON-NLS-1$
+      _viewerMenuManager_NatTable.setRemoveAllWhenShown(true);
+      _viewerMenuManager_NatTable.addMenuListener(new IMenuListener() {
+         @Override
+         public void menuAboutToShow(final IMenuManager manager) {
+
+//            _tourInfoToolTip_NatTable.hideToolTip();
+
+            fillContextMenu(manager);
+         }
+      });
+
       _viewerMenuManager_Table = new MenuManager("#PopupMenu"); //$NON-NLS-1$
       _viewerMenuManager_Table.setRemoveAllWhenShown(true);
       _viewerMenuManager_Table.addMenuListener(new IMenuListener() {
          @Override
          public void menuAboutToShow(final IMenuManager manager) {
 
-            _tourInfoToolTip_Table.hideToolTip();
+//            _tourInfoToolTip_Table.hideToolTip();
 
             fillContextMenu(manager);
          }
@@ -1791,12 +1878,12 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       createUI_50_ContextMenu_Table();
 
       // set tour info tooltip provider
-      _tourInfoToolTip_Table = new TableViewerTourInfoToolTip(_tourViewer_Table);
+//      _tourInfoToolTip_Table = new TableViewerTourInfoToolTip(_tourViewer_Table);
    }
 
    private void createUI_40_TourViewer_NatTable(final Composite parent) {
 
-      _columnManager_NatTable.setupNatTableColumns();
+      _columnManager_NatTable.setupNatTable(this);
 
       _natTable_DataProvider = new DataProvider(this, _columnManager_NatTable);
       final ArrayList<ColumnDefinition> allSortedColumns = _natTable_DataProvider.allSortedColumns;
@@ -1833,13 +1920,13 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       // create a SelectionLayer without using the default configuration
       // this enables us to add the row selection configuration cleanly
       // afterwards
-      final SelectionLayer selection_Layer = new SelectionLayer(_natTable_Body_ColumnHideShowLayer, false);
+      _natTable_Body_SelectionLayer = new SelectionLayer(_natTable_Body_ColumnHideShowLayer, false);
 
       // register the DefaultRowSelectionLayerConfiguration that contains the
       // default styling and functionality bindings (search, tick update)
       // and different configurations for a move command handler that always
       // moves by a row and row only selection bindings
-      selection_Layer.addConfiguration(new DefaultRowSelectionLayerConfiguration());
+      _natTable_Body_SelectionLayer.addConfiguration(new DefaultRowSelectionLayerConfiguration());
 
 // have not yet understood how this works !!!
 //
@@ -1855,9 +1942,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 //      }));
 
       /*
-       * Create: Grid viewport layer
+       * Body viewport
        */
-      _natTable_Body_ViewportLayer = new ViewportLayer(selection_Layer);
+      _natTable_Body_ViewportLayer = new ViewportLayer(_natTable_Body_SelectionLayer);
       _natTable_Body_ViewportLayer.addConfiguration(new NatTable_ConfigField_TourType(body_DataProvider));
       _natTable_Body_ViewportLayer.addConfiguration(new NatTable_ConfigField_Weather(body_DataProvider));
 
@@ -1865,33 +1952,36 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
        * Create: Column header layer
        */
       final IDataProvider columnHeader_DataProvider = new DataProvider_ColumnHeader(_natTable_DataProvider, _columnManager_NatTable);
-      final DataLayer columnHeader_DataLayer = new DataLayer(columnHeader_DataProvider);
-      final ILayer columnHeader_Layer = new ColumnHeaderLayer(columnHeader_DataLayer, _natTable_Body_ViewportLayer, selection_Layer);
+      _natTable_ColumnHeader_DataLayer = new DataLayer(columnHeader_DataProvider);
+      _natTable_ColumnHeader_Layer = new ColumnHeaderLayer(
+            _natTable_ColumnHeader_DataLayer,
+            _natTable_Body_ViewportLayer,
+            _natTable_Body_SelectionLayer);
 
       /*
        * Create: Row header layer
        */
       final DefaultRowHeaderDataProvider rowHeader_DataProvider = new DefaultRowHeaderDataProvider(body_DataProvider);
       final DefaultRowHeaderDataLayer rowHeader_DataLayer = new DefaultRowHeaderDataLayer(rowHeader_DataProvider);
-      final ILayer rowHeader_Layer = new RowHeaderLayer(rowHeader_DataLayer, _natTable_Body_ViewportLayer, selection_Layer);
+      final ILayer rowHeader_Layer = new RowHeaderLayer(rowHeader_DataLayer, _natTable_Body_ViewportLayer, _natTable_Body_SelectionLayer);
 
       /*
        * Create: Corner layer
        */
       final DefaultCornerDataProvider corner_DataProvider = new DefaultCornerDataProvider(columnHeader_DataProvider, rowHeader_DataProvider);
       final DataLayer corner_DataLayer = new DataLayer(corner_DataProvider);
-      final ILayer corner_Layer = new CornerLayer(corner_DataLayer, rowHeader_Layer, columnHeader_Layer);
+      final ILayer corner_Layer = new CornerLayer(corner_DataLayer, rowHeader_Layer, _natTable_ColumnHeader_Layer);
 
       /*
        * Create: Grid layer composed with the prior created layer stacks
        */
-      final GridLayer gridLayer = new GridLayer(_natTable_Body_ViewportLayer, columnHeader_Layer, rowHeader_Layer, corner_Layer);
+      final GridLayer gridLayer = new GridLayer(_natTable_Body_ViewportLayer, _natTable_ColumnHeader_Layer, rowHeader_Layer, corner_Layer);
 
       /*
        * Setup other data
        */
       natTable_SetColumnWidths(allSortedColumns, _natTable_Body_DataLayer);
-      natTable_RegisterColumnLabels(allSortedColumns, _natTable_Body_DataLayer, columnHeader_DataLayer);
+      natTable_RegisterColumnLabels(allSortedColumns, _natTable_Body_DataLayer, _natTable_ColumnHeader_DataLayer);
 
       /*
        * Create: Table
@@ -1912,7 +2002,10 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _tourViewer_NatTable.addConfiguration(new NatTable_Configuration_Hover());
 
       // add the header menu configuration for adding the column header menu with hide/show actions
-      _tourViewer_NatTable.addConfiguration(new NatTable_Config_Menu(_tourViewer_NatTable));
+//      _tourViewer_NatTable.addConfiguration(new NatTable_Config_Menu(_tourViewer_NatTable));
+
+      // [4] add the menu configuration to a NatTable instance
+//      _tourViewer_NatTable.addConfiguration(new NatTable_Config_DebugMenu(_tourViewer_NatTable));
 
       _tourViewer_NatTable.configure();
 
@@ -1920,6 +2013,21 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _tourViewer_NatTable.setTheme(new NatTable_Configuration_Theme());
 
       GridDataFactory.fillDefaults().grab(true, true).applyTo(_tourViewer_NatTable);
+
+      createUI_50_ContextMenu_NatTable();
+   }
+
+   /**
+    * Setup context menu for the nattable
+    */
+   private void createUI_50_ContextMenu_NatTable() {
+
+      _contextMenu_NatTable = createUI_52_CreateViewerContextMenu_NatTable();
+
+      _columnManager_NatTable.createHeaderContextMenu(
+            _tourViewer_NatTable,
+            _viewerContextMenuProvider_NatTable,
+            _natTable_ColumnHeader_Layer);
    }
 
    /**
@@ -1951,13 +2059,11 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     *
     * @return Returns the {@link Menu} widget
     */
-   private Menu createUI_52_CreateViewerContextMenu_Table() {
+   private Menu createUI_52_CreateViewerContextMenu_NatTable() {
 
-      final Table table = (Table) _tourViewer_Table.getControl();
+      final Menu contextMenu = _viewerMenuManager_NatTable.createContextMenu(_tourViewer_NatTable);
 
-      final Menu treeContextMenu = _viewerMenuManager_Table.createContextMenu(table);
-
-      treeContextMenu.addMenuListener(new MenuAdapter() {
+      contextMenu.addMenuListener(new MenuAdapter() {
          @Override
          public void menuHidden(final MenuEvent e) {
             _tagMenuManager.onHideMenu();
@@ -1965,11 +2071,39 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
          @Override
          public void menuShown(final MenuEvent menuEvent) {
-            _tagMenuManager.onShowMenu(menuEvent, table, Display.getCurrent().getCursorLocation(), _tourInfoToolTip_Tree);
+//            _tagMenuManager.onShowMenu(menuEvent, _tourViewer_NatTable, Display.getCurrent().getCursorLocation(), _tourInfoToolTip_NatTable);
+            _tagMenuManager.onShowMenu(menuEvent, _tourViewer_NatTable, Display.getCurrent().getCursorLocation(), null);
          }
       });
 
-      return treeContextMenu;
+      return contextMenu;
+   }
+
+   /**
+    * Creates context menu for the viewer
+    *
+    * @return Returns the {@link Menu} widget
+    */
+   private Menu createUI_52_CreateViewerContextMenu_Table() {
+
+      final Table table = (Table) _tourViewer_Table.getControl();
+
+      final Menu contextMenu = _viewerMenuManager_Table.createContextMenu(table);
+
+      contextMenu.addMenuListener(new MenuAdapter() {
+         @Override
+         public void menuHidden(final MenuEvent e) {
+            _tagMenuManager.onHideMenu();
+         }
+
+         @Override
+         public void menuShown(final MenuEvent menuEvent) {
+//            _tagMenuManager.onShowMenu(menuEvent, table, Display.getCurrent().getCursorLocation(), _tourInfoToolTip_Table);
+            _tagMenuManager.onShowMenu(menuEvent, table, Display.getCurrent().getCursorLocation(), null);
+         }
+      });
+
+      return contextMenu;
    }
 
    /**
@@ -1981,9 +2115,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       final Tree tree = (Tree) _tourViewer_Tree.getControl();
 
-      final Menu treeContextMenu = _viewerMenuManager_Tree.createContextMenu(tree);
+      final Menu contextMenu = _viewerMenuManager_Tree.createContextMenu(tree);
 
-      treeContextMenu.addMenuListener(new MenuAdapter() {
+      contextMenu.addMenuListener(new MenuAdapter() {
          @Override
          public void menuHidden(final MenuEvent e) {
             _tagMenuManager.onHideMenu();
@@ -1995,7 +2129,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          }
       });
 
-      return treeContextMenu;
+      return contextMenu;
    }
 
    /**
@@ -6864,6 +6998,21 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    @Override
    public ColumnManager getColumnManager() {
       return _columnManager_Tree;
+   }
+
+   @Override
+   public ColumnHideShowLayer getNatTable_Body_ColumnHideShowLayer() {
+      return _natTable_Body_ColumnHideShowLayer;
+   }
+
+   @Override
+   public ColumnReorderLayer getNatTable_Body_ColumnReorderLayer() {
+      return _natTable_Body_ColumnReorderLayer;
+   }
+
+   @Override
+   public DataLayer getNatTable_Body_DataLayer() {
+      return _natTable_Body_DataLayer;
    }
 
    @Override

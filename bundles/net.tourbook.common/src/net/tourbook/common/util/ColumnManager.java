@@ -52,12 +52,15 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
+import org.eclipse.nebula.widgets.nattable.NatTable;
+import org.eclipse.nebula.widgets.nattable.grid.layer.ColumnHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.hideshow.ColumnHideShowLayer;
 import org.eclipse.nebula.widgets.nattable.layer.DataLayer;
+import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
 import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.BusyIndicator; 
+import org.eclipse.swt.SWT; 
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
@@ -159,9 +162,15 @@ public class ColumnManager {
     */
    private ColumnViewer                      _columnViewer;
 
-   private ColumnWrapper                     _headerColumn;
+   private ColumnWrapper                     _headerColumnItem;
 
    private AdvancedSlideoutShell             _slideoutShell;
+
+   /**
+    * Provides properties from a {@link NatTable}, is <code>null</code> when a NatTable is not
+    * supported.
+    */
+   private INatTablePropertiesProvider       _natTablePropertiesProvider;
 
    /**
     * Context menu listener
@@ -197,18 +206,18 @@ public class ColumnManager {
    }
 
    /**
-    * A column wrapper which contains a {@link TableColumn} or a {@link TreeColumn}.
+    * A column wrapper which contains a {@link TableColumn}, {@link TreeColumn} or {@link NatTable}
     */
    public class ColumnWrapper {
 
-      Object tableOrTreeColumn;
+      Object columnItem;
 
       int    columnLeftBorder;
       int    columnRightBorder;
 
-      public ColumnWrapper(final Object tableOrTreeColumn, final int columnLeftBorder, final int columnRightBorder) {
+      public ColumnWrapper(final Object columnItem, final int columnLeftBorder, final int columnRightBorder) {
 
-         this.tableOrTreeColumn = tableOrTreeColumn;
+         this.columnItem = columnItem;
 
          this.columnLeftBorder = columnLeftBorder;
          this.columnRightBorder = columnRightBorder;
@@ -651,7 +660,7 @@ public class ColumnManager {
 
    private void createHCM_10_CurrentColumn(final Menu contextMenu) {
 
-      if (_headerColumn == null) {
+      if (_headerColumnItem == null) {
          // this is required
          return;
       }
@@ -704,6 +713,7 @@ public class ColumnManager {
          });
 
          if (colDef.canModifyVisibility() == false) {
+
             // column cannot be hidden, disable it
             menuItem.setEnabled(false);
          }
@@ -881,6 +891,113 @@ public class ColumnManager {
       }
    }
 
+   public void createHeaderContextMenu(final NatTable natTable,
+                                       final IContextMenuProvider defaultContextMenuProvider,
+                                       final ColumnHeaderLayer columnHeaderLayer) {
+
+      // remove old listener
+      if (_table_MenuDetect_Listener != null) {
+         natTable.removeListener(SWT.MenuDetect, _table_MenuDetect_Listener);
+      }
+
+      final Shell contextMenuShell = natTable.getShell();
+      final Menu headerContextMenu[] = { createHCM_0_Menu(natTable, contextMenuShell, defaultContextMenuProvider) };
+
+      // add the context menu to the table
+      _table_MenuDetect_Listener = new Listener() {
+
+         @Override
+         public void handleEvent(final Event event) {
+
+            final Display display = natTable.getShell().getDisplay();
+            final Point mousePosition = display.map(null, natTable, new Point(event.x, event.y));
+
+            final Rectangle clientArea = natTable.getClientArea();
+
+//            final int headerHeight = natTable.getHeaderHeight();
+            final int headerHeight = columnHeaderLayer.getHeight();
+            final int headerBottom = clientArea.y + headerHeight;
+
+            final boolean isTableHeaderHit = clientArea.y <= mousePosition.y
+                  && mousePosition.y < (clientArea.y + headerHeight);
+
+            _headerColumnItem = getHeaderColumn(natTable, mousePosition, isTableHeaderHit, columnHeaderLayer);
+
+            Menu contextMenu = getContextMenu(isTableHeaderHit, headerContextMenu[0], defaultContextMenuProvider);
+
+            if (contextMenu != null) {
+
+               // can be null when context menu is not set
+
+               if (contextMenu == headerContextMenu[0] && contextMenu.getShell() != natTable.getShell()) {
+
+                  /**
+                   * java.lang.IllegalArgumentException: Widget has the wrong parent
+                   * <p>
+                   * When a view is minimized, then the context menu is already created
+                   * but has the wrong parent when the view is displayed lateron.
+                   */
+
+                  headerContextMenu[0].dispose();
+
+                  headerContextMenu[0] = createHCM_0_Menu(natTable, natTable.getShell(), defaultContextMenuProvider);
+
+                  contextMenu = getContextMenu(isTableHeaderHit, headerContextMenu[0], defaultContextMenuProvider);
+
+                  StatusUtil.log("Table header context menu has had the wrong parent and is recreated."); //$NON-NLS-1$
+
+               } else if (defaultContextMenuProvider != null
+                     && contextMenu == defaultContextMenuProvider.getContextMenu()
+                     && contextMenu.getShell() != natTable.getShell()) {
+
+                  contextMenu = defaultContextMenuProvider.recreateContextMenu();
+
+                  StatusUtil.log("Table context menu has had the wrong parent and is recreated."); //$NON-NLS-1$
+               }
+            }
+
+            try {
+
+               natTable.setMenu(contextMenu);
+
+            } catch (final IllegalArgumentException e) {
+
+               StatusUtil.showStatus(e);
+            }
+
+            /*
+             * Set context menu position to the right border of the column
+             */
+            if (_headerColumnItem != null) {
+
+               int posX = _headerColumnItem.columnRightBorder;
+               int xOffset = 0;
+
+               final ScrollBar hBar = natTable.getHorizontalBar();
+
+               if (hBar != null) {
+                  xOffset = hBar.getSelection();
+               }
+
+               /*
+                * It is possible that the context menu is outside of the tree, this occures when the
+                * column is very wide and horizonal scrolled.
+                */
+               if (posX - xOffset > clientArea.width) {
+                  posX = xOffset + clientArea.width;
+               }
+
+               final Point displayPosition = natTable.toDisplay(posX, headerBottom);
+
+               event.x = displayPosition.x - 1;
+               event.y = displayPosition.y - 2;
+            }
+         }
+      };
+
+      natTable.addListener(SWT.MenuDetect, _table_MenuDetect_Listener);
+   }
+
    /**
     * set context menu depending on the position of the mouse
     *
@@ -915,6 +1032,7 @@ public class ColumnManager {
 
       // add the context menu to the table
       _table_MenuDetect_Listener = new Listener() {
+
          @Override
          public void handleEvent(final Event event) {
 
@@ -929,7 +1047,7 @@ public class ColumnManager {
             final boolean isTableHeaderHit = clientArea.y <= mousePosition.y
                   && mousePosition.y < (clientArea.y + headerHeight);
 
-            _headerColumn = getHeaderColumn(table, mousePosition, isTableHeaderHit);
+            _headerColumnItem = getHeaderColumn(table, mousePosition, isTableHeaderHit);
 
             Menu contextMenu = getContextMenu(isTableHeaderHit, headerContextMenu[0], defaultContextMenuProvider);
 
@@ -976,9 +1094,9 @@ public class ColumnManager {
             /*
              * Set context menu position to the right border of the column
              */
-            if (_headerColumn != null) {
+            if (_headerColumnItem != null) {
 
-               int posX = _headerColumn.columnRightBorder;
+               int posX = _headerColumnItem.columnRightBorder;
                int xOffset = 0;
 
                final ScrollBar hBar = table.getHorizontalBar();
@@ -1056,7 +1174,7 @@ public class ColumnManager {
 
             final boolean isTreeHeaderHit = clientArea.y <= mousePosition.y && mousePosition.y < headerBottom;
 
-            _headerColumn = getHeaderColumn(tree, mousePosition, isTreeHeaderHit);
+            _headerColumnItem = getHeaderColumn(tree, mousePosition, isTreeHeaderHit);
 
             Menu contextMenu = getContextMenu(isTreeHeaderHit, headerContextMenu[0], defaultContextMenuProvider);
 
@@ -1113,9 +1231,9 @@ public class ColumnManager {
             /*
              * Set context menu position to the right border of the column
              */
-            if (_headerColumn != null) {
+            if (_headerColumnItem != null) {
 
-               int posX = _headerColumn.columnRightBorder;
+               int posX = _headerColumnItem.columnRightBorder;
                int xOffset = 0;
 
                final ScrollBar hBar = tree.getHorizontalBar();
@@ -1191,7 +1309,7 @@ public class ColumnManager {
 
       ColumnDefinition colDef = null;
 
-      final Object column = _headerColumn.tableOrTreeColumn;
+      final Object column = _headerColumnItem.columnItem;
 
       if (column instanceof TableColumn) {
 
@@ -1204,6 +1322,10 @@ public class ColumnManager {
          final TreeColumn treeColumn = (TreeColumn) column;
 
          colDef = (ColumnDefinition) treeColumn.getData();
+
+      } else if (column instanceof NatTable) {
+
+//         colDef = (ColumnDefinition) treeColumn.getData();
       }
 
       return colDef;
@@ -1261,34 +1383,76 @@ public class ColumnManager {
 
       int[] columnOrder = null;
 
-      if (_columnViewer instanceof TableViewer) {
+      if (_natTablePropertiesProvider != null) {
 
-         final Table table = ((TableViewer) _columnViewer).getTable();
-         if (table.isDisposed()) {
+         final DataLayer dataLayer = _natTablePropertiesProvider.getNatTable_Body_DataLayer();
+         final ColumnHideShowLayer columnHideShowLayer = _natTablePropertiesProvider.getNatTable_Body_ColumnHideShowLayer();
+         final ColumnReorderLayer columnReorderLayer = _natTablePropertiesProvider.getNatTable_Body_ColumnReorderLayer();
+
+         final int numColumns = dataLayer.getColumnCount();
+
+         final ArrayList<String> allOrderedColumnIds = new ArrayList<>();
+
+         for (int columnIndex = 0; columnIndex < numColumns; columnIndex++) {
+
+            /*
+             * This looks a bit complicated, it is. It respects reordered and hidden columns. This
+             * solution was found with trial and error until it worked.
+             */
+
+            // the reorder layer contains the correct column order for cases when columns are moved with drag&drop
+            final int reorderColIndex = columnReorderLayer.getColumnIndexByPosition(columnIndex);
+
+            final int colIndexByPos = dataLayer.getColumnIndexByPosition(reorderColIndex);
+
+            // the column hide show layer has the info if a column was set to hidden by the user
+            final boolean isColumnHidden = columnHideShowLayer.isColumnIndexHidden(colIndexByPos);
+            if (isColumnHidden) {
+               continue;
+            }
+
+            final ColumnDefinition colDef = getColDef_ByCreateIndex(colIndexByPos);
+            if (colDef != null) {
+
+               final String columnId = colDef.getColumnId();
+
+               allOrderedColumnIds.add(columnId);
+            }
+         }
+
+         return allOrderedColumnIds.toArray(new String[allOrderedColumnIds.size()]);
+
+      } else {
+
+         if (_columnViewer instanceof TableViewer) {
+
+            final Table table = ((TableViewer) _columnViewer).getTable();
+            if (table.isDisposed()) {
+               return null;
+            }
+            columnOrder = table.getColumnOrder();
+
+         } else if (_columnViewer instanceof TreeViewer) {
+
+            final Tree tree = ((TreeViewer) _columnViewer).getTree();
+            if (tree.isDisposed()) {
+               return null;
+            }
+            columnOrder = tree.getColumnOrder();
+         }
+
+         if (columnOrder == null) {
             return null;
          }
-         columnOrder = table.getColumnOrder();
 
-      } else if (_columnViewer instanceof TreeViewer) {
+         // create column id'ss with the visible sort order
+         for (final int createIndex : columnOrder) {
 
-         final Tree tree = ((TreeViewer) _columnViewer).getTree();
-         if (tree.isDisposed()) {
-            return null;
-         }
-         columnOrder = tree.getColumnOrder();
-      }
+            final ColumnDefinition colDef = getColDef_ByCreateIndex(createIndex);
 
-      if (columnOrder == null) {
-         return null;
-      }
-
-      // create column id'ss with the visible sort order
-      for (final int createIndex : columnOrder) {
-
-         final ColumnDefinition colDef = getColDef_ByCreateIndex(createIndex);
-
-         if (colDef != null) {
-            orderedColumnIds.add(colDef.getColumnId());
+            if (colDef != null) {
+               orderedColumnIds.add(colDef.getColumnId());
+            }
          }
       }
 
@@ -1368,6 +1532,54 @@ public class ColumnManager {
       }
 
       return contextMenu;
+   }
+
+   /**
+    * @param natTable
+    * @param mousePosition
+    * @param isTableHeaderHit
+    * @param columnHeaderLayer
+    * @return Returns a column item or <code>null</code> when the header is not hit.
+    */
+   private ColumnWrapper getHeaderColumn(final NatTable natTable,
+                                         final Point mousePosition,
+                                         final boolean isTableHeaderHit,
+                                         final ColumnHeaderLayer columnHeaderLayer) {
+
+      if (isTableHeaderHit) {
+
+         final int columnWidths = 0;
+
+         final int columnPosition = natTable.getColumnPositionByX(mousePosition.x);
+         final int rowPosition = natTable.getRowPositionByY(mousePosition.y);
+
+         final LabelStack headerConfigLabels = columnHeaderLayer.getConfigLabelsByPosition(columnPosition, rowPosition);
+
+//         final int bodyRowPosition = LayerUtil.convertRowPosition(natTable, rowPosition, selectionLayer);
+
+//         final TableColumn[] columns = natTable.getColumns();
+//         final int[] columnOrder = natTable.getColumnOrder();
+
+//         for (final int creationIndex : columnOrder) {
+//
+//            final TableColumn tc = columns[creationIndex];
+//
+//            final int columnWidth = tc.getWidth();
+//
+//            if (columnWidths < mousePosition.x && mousePosition.x < columnWidths + columnWidth) {
+//
+//               final int columnLeftBorder = columnWidths;
+//               final int columnRightBorder = columnWidths + columnWidth;
+//
+//               // column found
+//               return new ColumnWrapper(tc, columnLeftBorder, columnRightBorder);
+//            }
+//
+//            columnWidths += columnWidth;
+//         }
+      }
+
+      return null;
    }
 
    private ColumnWrapper getHeaderColumn(final Table table, final Point mousePosition, final boolean isTableHeaderHit) {
@@ -2019,7 +2231,9 @@ public class ColumnManager {
       _slideoutShell = slideoutShell;
    }
 
-   public void setupNatTableColumns() {
+   public void setupNatTable(final INatTablePropertiesProvider natTablePropertiesProvider) {
+
+      _natTablePropertiesProvider = natTablePropertiesProvider;
 
       setVisibleColDefs(_activeProfile);
       setupValueFormatter(_activeProfile);
@@ -2482,7 +2696,7 @@ public class ColumnManager {
     */
    private void setVisibleColumnIds_FromViewer() {
 
-      // get the sorting order and column width from the viewer
+      // get the sorting order and column width from the viewer/nattable
       _activeProfile.visibleColumnIds = getColumns_FromViewer_Ids();
       _activeProfile.visibleColumnIdsAndWidth = getColumns_FromViewer_IdAndWidth();
    }
