@@ -141,6 +141,7 @@ import org.eclipse.nebula.widgets.nattable.grid.layer.CornerLayer;
 import org.eclipse.nebula.widgets.nattable.grid.layer.DefaultRowHeaderDataLayer;
 import org.eclipse.nebula.widgets.nattable.grid.layer.GridLayer;
 import org.eclipse.nebula.widgets.nattable.grid.layer.RowHeaderLayer;
+import org.eclipse.nebula.widgets.nattable.hideshow.ColumnHideShowLayer;
 import org.eclipse.nebula.widgets.nattable.hover.HoverLayer;
 import org.eclipse.nebula.widgets.nattable.layer.DataLayer;
 import org.eclipse.nebula.widgets.nattable.layer.ILayer;
@@ -157,12 +158,14 @@ import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.eclipse.nebula.widgets.nattable.style.HorizontalAlignmentEnum;
 import org.eclipse.nebula.widgets.nattable.style.Style;
 import org.eclipse.nebula.widgets.nattable.style.theme.ModernNatTableThemeConfiguration;
+import org.eclipse.nebula.widgets.nattable.ui.menu.AbstractHeaderMenuConfiguration;
+import org.eclipse.nebula.widgets.nattable.ui.menu.PopupMenuBuilder;
 import org.eclipse.nebula.widgets.nattable.ui.util.CellEdgeEnum;
 import org.eclipse.nebula.widgets.nattable.util.GUIHelper;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.custom.BusyIndicator; 
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -194,7 +197,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private static final String           COLUMN_FACTORY_TIME_ZONE_DIFF_TOOLTIP           = net.tourbook.ui.Messages.ColumnFactory_TimeZoneDifference_Tooltip;
 
 // SET_FORMATTING_ON
- 
+
    static public final String            ID                                              = "net.tourbook.views.tourListView";          //$NON-NLS-1$
    //
    private final static IPreferenceStore _prefStore                                      = TourbookPlugin.getPrefStore();
@@ -266,6 +269,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private IPropertyChangeListener        _prefChangeListener;
    private IPropertyChangeListener        _prefChangeListenerCommon;
    //
+   private NatTable                       _tourViewer_NatTable;
    private TableViewer                    _tourViewer_Table;
    private TreeViewer                     _tourViewer_Tree;
    private ItemComparator_Table           _tourViewer_Table_Comparator     = new ItemComparator_Table();
@@ -276,11 +280,11 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private LazyTourProvider               _tableTourProvider               = new LazyTourProvider(this);
    private TVITourBookRoot                _rootItem_Tree;
    //
-   private NatTable                       _tourViewer_NatTable;
+   private ColumnReorderLayer             _natTable_Body_ColumnReorderLayer;
+   private DataLayer                      _natTable_Body_DataLayer;
+   private ColumnHideShowLayer            _natTable_Body_ColumnHideShowLayer;
+   private ViewportLayer                  _natTable_Body_ViewportLayer;
    private DataProvider                   _natTable_DataProvider;
-   private ColumnReorderLayer             _natTable_ColumnReorder_Layer;
-   private ViewportLayer                  _natTable_Grid_BodyLayer;
-   private DataLayer                      _natTable_DataLayer_Body;
    //
    private int                            _selectedYear                    = -1;
    private int                            _selectedYearSub                 = -1;
@@ -957,6 +961,28 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       }
    }
 
+   private final class NatTable_Config_Menu extends AbstractHeaderMenuConfiguration {
+
+      private NatTable_Config_Menu(final NatTable natTable) {
+         super(natTable);
+      }
+
+      @Override
+      protected PopupMenuBuilder createColumnHeaderMenu(final NatTable natTable) {
+
+         return super.createColumnHeaderMenu(natTable)
+               .withHideColumnMenuItem()
+               .withShowAllColumnsMenuItem();
+      }
+
+      @Override
+      protected PopupMenuBuilder createCornerMenu(final NatTable natTable) {
+
+         return super.createCornerMenu(natTable)
+               .withShowAllColumnsMenuItem();
+      }
+   }
+
    private final class NatTable_ConfigField_TourType extends AbstractRegistryConfiguration {
 
       private IRowDataProvider<TVITourBookTour> _dataProvider;
@@ -1392,7 +1418,10 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
                // measurement system has changed
 
-               _columnManager_NatTable.saveState(_state_NatTable);
+               _columnManager_NatTable.saveState(_state_NatTable,
+                     _natTable_Body_DataLayer,
+                     _natTable_Body_ColumnReorderLayer,
+                     _natTable_Body_ColumnHideShowLayer);
                _columnManager_NatTable.clearColumns();
 
                _columnManager_Table.saveState(_state_Table);
@@ -1778,25 +1807,25 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _natTable_DataProvider.setSortColumn(sortColumnId, sortDirection);
 
       /*
-       * Create: Body layer
+       * Body layer
        */
       final IRowDataProvider<TVITourBookTour> body_DataProvider = new DataProvider_Tour(_natTable_DataProvider);
-      _natTable_DataLayer_Body = new DataLayer(body_DataProvider);
+      _natTable_Body_DataLayer = new DataLayer(body_DataProvider);
 
       /*
-       * Create: Hover layer
+       * Hover layer
        */
-//      final HoverLayer body_HoverLayer = new HoverLayer(body_DataLayer, false);
-//      // we need to ensure that the hover styling is removed when the mouse
-//      // cursor moves out of the cell area
-//      body_HoverLayer.addConfiguration(new SimpleHoverStylingBindings(body_HoverLayer));
-
-      final HoverLayer body_HoverLayer = new HoverLayer(_natTable_DataLayer_Body);
+      final HoverLayer body_HoverLayer = new HoverLayer(_natTable_Body_DataLayer);
 
       /*
-       * Create: Column drag&drop layer
+       * Column drag&drop layer
        */
-      _natTable_ColumnReorder_Layer = new ColumnReorderLayer(body_HoverLayer);
+      _natTable_Body_ColumnReorderLayer = new ColumnReorderLayer(body_HoverLayer);
+
+      /*
+       * Show/hide columns
+       */
+      _natTable_Body_ColumnHideShowLayer = new ColumnHideShowLayer(_natTable_Body_ColumnReorderLayer);
 
       /*
        * Create: Selection layer
@@ -1804,7 +1833,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       // create a SelectionLayer without using the default configuration
       // this enables us to add the row selection configuration cleanly
       // afterwards
-      final SelectionLayer selection_Layer = new SelectionLayer(_natTable_ColumnReorder_Layer, false);
+      final SelectionLayer selection_Layer = new SelectionLayer(_natTable_Body_ColumnHideShowLayer, false);
 
       // register the DefaultRowSelectionLayerConfiguration that contains the
       // default styling and functionality bindings (search, tick update)
@@ -1828,23 +1857,23 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       /*
        * Create: Grid viewport layer
        */
-      _natTable_Grid_BodyLayer = new ViewportLayer(selection_Layer);
-      _natTable_Grid_BodyLayer.addConfiguration(new NatTable_ConfigField_TourType(body_DataProvider));
-      _natTable_Grid_BodyLayer.addConfiguration(new NatTable_ConfigField_Weather(body_DataProvider));
+      _natTable_Body_ViewportLayer = new ViewportLayer(selection_Layer);
+      _natTable_Body_ViewportLayer.addConfiguration(new NatTable_ConfigField_TourType(body_DataProvider));
+      _natTable_Body_ViewportLayer.addConfiguration(new NatTable_ConfigField_Weather(body_DataProvider));
 
       /*
        * Create: Column header layer
        */
       final IDataProvider columnHeader_DataProvider = new DataProvider_ColumnHeader(_natTable_DataProvider, _columnManager_NatTable);
       final DataLayer columnHeader_DataLayer = new DataLayer(columnHeader_DataProvider);
-      final ILayer columnHeader_Layer = new ColumnHeaderLayer(columnHeader_DataLayer, _natTable_Grid_BodyLayer, selection_Layer);
+      final ILayer columnHeader_Layer = new ColumnHeaderLayer(columnHeader_DataLayer, _natTable_Body_ViewportLayer, selection_Layer);
 
       /*
        * Create: Row header layer
        */
       final DefaultRowHeaderDataProvider rowHeader_DataProvider = new DefaultRowHeaderDataProvider(body_DataProvider);
       final DefaultRowHeaderDataLayer rowHeader_DataLayer = new DefaultRowHeaderDataLayer(rowHeader_DataProvider);
-      final ILayer rowHeader_Layer = new RowHeaderLayer(rowHeader_DataLayer, _natTable_Grid_BodyLayer, selection_Layer);
+      final ILayer rowHeader_Layer = new RowHeaderLayer(rowHeader_DataLayer, _natTable_Body_ViewportLayer, selection_Layer);
 
       /*
        * Create: Corner layer
@@ -1856,13 +1885,13 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       /*
        * Create: Grid layer composed with the prior created layer stacks
        */
-      final GridLayer gridLayer = new GridLayer(_natTable_Grid_BodyLayer, columnHeader_Layer, rowHeader_Layer, corner_Layer);
+      final GridLayer gridLayer = new GridLayer(_natTable_Body_ViewportLayer, columnHeader_Layer, rowHeader_Layer, corner_Layer);
 
       /*
        * Setup other data
        */
-      natTable_SetColumnWidths(allSortedColumns, _natTable_DataLayer_Body);
-      natTable_RegisterColumnLabels(allSortedColumns, _natTable_DataLayer_Body, columnHeader_DataLayer);
+      natTable_SetColumnWidths(allSortedColumns, _natTable_Body_DataLayer);
+      natTable_RegisterColumnLabels(allSortedColumns, _natTable_Body_DataLayer, columnHeader_DataLayer);
 
       /*
        * Create: Table
@@ -1881,6 +1910,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       // add the style configuration for hover
       _tourViewer_NatTable.addConfiguration(new NatTable_Configuration_Hover());
+
+      // add the header menu configuration for adding the column header menu with hide/show actions
+      _tourViewer_NatTable.addConfiguration(new NatTable_Config_Menu(_tourViewer_NatTable));
 
       _tourViewer_NatTable.configure();
 
@@ -7473,7 +7505,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       } else if (_isLayoutNatTable) {
 
          // select first row -> needs to be improved
-         _tourViewer_NatTable.doCommand(new SelectRowsCommand(_natTable_Grid_BodyLayer, 0, 0, false, false));
+         _tourViewer_NatTable.doCommand(new SelectRowsCommand(_natTable_Body_ViewportLayer, 0, 0, false, false));
 
       } else {
 
@@ -7688,7 +7720,11 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _columnManager_Table.saveState(_state_Table);
       _columnManager_Tree.saveState(_state_Tree);
 
-      _columnManager_Table.saveState(_state_Table, _natTable_DataLayer_Body, _natTable_ColumnReorder_Layer);
+      _columnManager_NatTable.saveState(
+            _state_NatTable,
+            _natTable_Body_DataLayer,
+            _natTable_Body_ColumnReorderLayer,
+            _natTable_Body_ColumnHideShowLayer);
 
    }
 

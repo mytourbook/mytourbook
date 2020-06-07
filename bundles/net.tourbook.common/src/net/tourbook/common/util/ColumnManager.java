@@ -52,11 +52,12 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
+import org.eclipse.nebula.widgets.nattable.hideshow.ColumnHideShowLayer;
 import org.eclipse.nebula.widgets.nattable.layer.DataLayer;
 import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.custom.BusyIndicator; 
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
@@ -1782,7 +1783,10 @@ public class ColumnManager {
       saveState_All(state);
    }
 
-   public void saveState(final IDialogSettings state, final DataLayer dataLayer, final ColumnReorderLayer columnReorderLayer) {
+   public void saveState(final IDialogSettings state,
+                         final DataLayer dataLayer,
+                         final ColumnReorderLayer columnReorderLayer,
+                         final ColumnHideShowLayer columnHideShowLayer) {
 
       if (dataLayer == null) {
          return;
@@ -1793,33 +1797,42 @@ public class ColumnManager {
        */
 
       final int numColumns = dataLayer.getColumnCount();
-      final int[] columnOrder = new int[numColumns];
-      final int[] columnWidth = new int[numColumns];
 
-      final ArrayList<String> orderedColumnIds = new ArrayList<>();
-      final ArrayList<String> columnIdsAndWidth = new ArrayList<>();
+      final ArrayList<String> allOrderedColumnIds = new ArrayList<>();
+      final ArrayList<String> allColumnIdsAndWidth = new ArrayList<>();
 
       for (int columnIndex = 0; columnIndex < numColumns; columnIndex++) {
 
-         // the reorder layer contains the correct column order in casees when columns are moved with drag&drop
-         final int columnPosition = columnReorderLayer.getColumnPositionByIndex(columnIndex);
+         /*
+          * This looks a bit complicated, it is. It respects reordered and hidden columns. This
+          * solution was found with trial and error until it worked.
+          */
 
-         final int colIndexByPos = dataLayer.getColumnIndexByPosition(columnPosition);
-         final int colWidthByPos = dataLayer.getColumnWidthByPosition(columnPosition);
+         // the reorder layer contains the correct column order for cases when columns are moved with drag&drop
+         final int reorderColIndex = columnReorderLayer.getColumnIndexByPosition(columnIndex);
 
-         columnOrder[columnIndex] = colIndexByPos;
-         columnWidth[columnIndex] = colWidthByPos;
+         final int colIndexByPos = dataLayer.getColumnIndexByPosition(reorderColIndex);
+
+         // the column hide show layer has the info if a column was set to hidden by the user
+         final boolean isColumnHidden = columnHideShowLayer.isColumnIndexHidden(colIndexByPos);
+         if (isColumnHidden) {
+            continue;
+         }
 
          final ColumnDefinition colDef = getColDef_ByCreateIndex(colIndexByPos);
-
          if (colDef != null) {
-            orderedColumnIds.add(colDef.getColumnId());
-            setColumnIdAndWidth(columnIdsAndWidth, colDef.getColumnId(), colWidthByPos);
+
+            final int colWidthByPos = dataLayer.getColumnWidthByPosition(reorderColIndex);
+
+            final String columnId = colDef.getColumnId();
+
+            allOrderedColumnIds.add(columnId);
+            setColumnIdAndWidth(allColumnIdsAndWidth, columnId, colWidthByPos);
          }
       }
 
-      _activeProfile.visibleColumnIds = orderedColumnIds.toArray(new String[orderedColumnIds.size()]);
-      _activeProfile.visibleColumnIdsAndWidth = columnIdsAndWidth.toArray(new String[columnIdsAndWidth.size()]);
+      _activeProfile.visibleColumnIds = allOrderedColumnIds.toArray(new String[allOrderedColumnIds.size()]);
+      _activeProfile.visibleColumnIdsAndWidth = allColumnIdsAndWidth.toArray(new String[allColumnIdsAndWidth.size()]);
 
       saveState_All(state);
    }
@@ -2011,7 +2024,7 @@ public class ColumnManager {
       setVisibleColDefs(_activeProfile);
       setupValueFormatter(_activeProfile);
    }
- 
+
    private void setupValueFormatter(final ColumnProfile activeProfile) {
 
       final ArrayList<ColumnProperties> profileColumnProperties = new ArrayList<>();
