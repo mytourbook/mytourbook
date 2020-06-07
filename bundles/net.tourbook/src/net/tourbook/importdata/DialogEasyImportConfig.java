@@ -25,12 +25,15 @@ import java.util.List;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.FileSystemManager;
+import net.tourbook.common.TourbookFileSystem;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.EmptyContextMenuProvider;
 import net.tourbook.common.util.ITourViewer;
+import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.TableColumnDefinition;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.widgets.ComboEnumEntry;
@@ -176,9 +179,9 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
    //
    private PixelConverter         _pc;
 
-   /** Model for all configs. */
+   /** Model for all configurations. */
    private EasyConfig             _dialogEasyConfig;
-   /** Model for the currently selected config. */
+   /** Model for the currently selected configuration. */
    private ImportConfig           _selectedIC;
    private ImportLauncher         _selectedIL;
    //
@@ -4042,15 +4045,30 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
             _comboIC_DeviceFolder.getText(),
             _selectedIC.getDeviceFolder());
 
-      final DirectoryDialog dialog = new DirectoryDialog(_parent.getShell(), SWT.SAVE);
+      String selectedFolder = null;
 
-      dialog.setText(Messages.Dialog_ImportConfig_Dialog_DeviceFolder_Title);
-      dialog.setMessage(Messages.Dialog_ImportConfig_Dialog_DeviceFolder_Message);
-      dialog.setFilterPath(filterOSPath);
+      final TourbookFileSystem fileSystem = FileSystemManager.getTourbookFileSystem(filterOSPath);
+      if (fileSystem != null) {
+         // The current device is an external device (Dropbox...)
 
-      final String selectedFolder = dialog.open();
+         try {
+            //We use the retrieved TourbookFileSystem's implementation to select the folder to watch
+            selectedFolder = fileSystem.selectFileSystemFolder(_parent.getShell());
+         } catch (final Exception e) {
+            StatusUtil.log(e);
+         }
+      } else {
+         final DirectoryDialog dialog = new DirectoryDialog(_parent.getShell(), SWT.SAVE);
 
-      if (selectedFolder != null) {
+         dialog.setText(Messages.Dialog_ImportConfig_Dialog_DeviceFolder_Title);
+         dialog.setMessage(Messages.Dialog_ImportConfig_Dialog_DeviceFolder_Message);
+         dialog.setFilterPath(filterOSPath);
+
+         selectedFolder = dialog.open();
+
+         if (StringUtils.isNullOrEmpty(selectedFolder)) {
+            return;
+         }
 
          setErrorMessage(null);
 
@@ -4128,8 +4146,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       } else {
          _comboIC_DeviceFolder.setText(_comboDeviceType.getItem(deviceIndex));
       }
-
-      _btnIC_SelectDeviceFolder.setEnabled(enableDeviceFolder);
 
       _chkIC_CreateBackup.setEnabled(enableDeviceFolder);
 

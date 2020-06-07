@@ -31,12 +31,17 @@ import java.util.Map;
 import net.tourbook.cloud.Activator;
 import net.tourbook.cloud.IPreferences;
 import net.tourbook.common.TourbookFileSystem;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.window.Window;
+import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 
 public class DropboxFileSystem extends TourbookFileSystem {
 
@@ -190,5 +195,33 @@ public class DropboxFileSystem extends TourbookFileSystem {
    @Override
    public String getPreferencePageId() {
       return PrefPageDropbox.ID;
+   }
+
+   @Override
+   public String selectFileSystemFolder(final Shell shell) {
+      final DropboxFolderBrowser dropboxFolderChooser[] = new DropboxFolderBrowser[1];
+      final int folderChooserResult[] = new int[1];
+      BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+         @Override
+         public void run() {
+            final String accessToken = _prefStore.getString(IPreferences.DROPBOX_ACCESSTOKEN);
+
+            dropboxFolderChooser[0] = new DropboxFolderBrowser(Display.getCurrent().getActiveShell(),
+                  accessToken);
+            folderChooserResult[0] = dropboxFolderChooser[0].open();
+         }
+      });
+
+      if (folderChooserResult[0] == Window.OK) {
+
+         final String selectedFolder = dropboxFolderChooser[0].getSelectedFolder();
+         if (!StringUtils.isNullOrEmpty(selectedFolder)) {
+            FILE_SYSTEM_FOLDER = selectedFolder;
+
+            return selectedFolder;
+         }
+      }
+
+      return UI.EMPTY_STRING;
    }
 }

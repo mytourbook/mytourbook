@@ -189,6 +189,8 @@ public class NIO {
 
       final List<String> tourBookFileSystemIds = FileSystemManager.getFileSystemsIds();
 
+      //TODO FB if foldername.startwith()
+      //TODO FB remove choose folder from prefpage and prefstore
       for (final String tourBookFileSystemId : tourBookFileSystemIds) {
          if (tourBookFileSystemId.equalsIgnoreCase(folderName.toLowerCase())) {
             return true;

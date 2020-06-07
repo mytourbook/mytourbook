@@ -564,7 +564,7 @@ class HistoryItems {
 
                         final TourbookFileSystem dropboxFileSystem = FileSystemManager.getTourbookFileSystem(cleanedFolderName);
                         if (dropboxFileSystem != null) {
-                           _linkFolderInfo.setText(dropboxFileSystem.getAbsoluteRootPath());
+                           _linkFolderInfo.setText(cleanedFolderName);
                         }
                      } else {
 
