@@ -26,7 +26,6 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 
 import net.tourbook.Messages;
-import net.tourbook.common.CommonActivator;
 import net.tourbook.common.FileSystemManager;
 import net.tourbook.common.NIO;
 import net.tourbook.common.TourbookFileSystem;
@@ -36,7 +35,6 @@ import net.tourbook.common.util.Util;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -58,8 +56,6 @@ class HistoryItems {
 
    private static final int      COMBO_HISTORY_LENGTH = 20;
    private static final String   COMBO_SEPARATOR      = "- - - - - - - - - - - - - - - - - - - - - - - - - - -"; //$NON-NLS-1$
-
-   final static IPreferenceStore _prefStore           = CommonActivator.getPrefStore();
 
    private boolean               _canShowDeviceName   = UI.IS_WIN;
 
@@ -608,7 +604,6 @@ class HistoryItems {
 
                folderInfoMessage.append(NLS.bind(Messages.Action_FileSystem_Preferences, dropboxFileSystem.getId()));
 
-               //We remove the listener if it was already present as we don't
                boolean addlistener = true;
                for (final Listener listener : _linkFolderInfo.getListeners(SWT.Selection)) {
                   if (listener instanceof TypedListener) {

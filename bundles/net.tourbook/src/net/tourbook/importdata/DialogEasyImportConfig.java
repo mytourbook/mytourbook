@@ -1322,7 +1322,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
        * Drop down menu: device type
        */
       _comboIC_DeviceType = new Combo(parent, SWT.READ_ONLY | SWT.BORDER);
-      _comboIC_DeviceType.setToolTipText(Messages.Dialog_ImportConfig_Label_DeviceFolder_Tooltip);
+      _comboIC_DeviceType.setToolTipText(Messages.Dialog_ImportConfig_Label_DeviceType_Tooltip);
       GridDataFactory
             .fillDefaults()//
             .grab(true, false)
@@ -4152,7 +4152,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
          _lblIC_BackupFolder.setEnabled(false);
          _btnIC_SelectBackupFolder.setEnabled(false);
          _backupHistoryItems.setIsValidateFolder(false);
-         _backupHistoryItems.validateModifiedPath();
       }
    }
 
