@@ -27,6 +27,8 @@ public class Messages extends NLS {
 
    public static String        Action_Compute_ElevationGain;
 
+   public static String        Action_FileSystem_Preferences;
+
    public static String        Action_Map_AddBookmark;
    public static String        Action_Map_RenameBookmark;
    public static String        Action_Map_UpdateBookmark;
@@ -98,6 +100,8 @@ public class Messages extends NLS {
    public static String        Calendar_Profile_Value_MovingTime;
    public static String        Calendar_Profile_Value_Pace;
    public static String        Calendar_Profile_Value_PausedTime;
+   public static String        Calendar_Profile_Value_PowerAvg;
+   public static String        Calendar_Profile_Value_PulseAvg;
    public static String        Calendar_Profile_Value_RecordingTime;
    public static String        Calendar_Profile_Value_ShowNothing;
    public static String        Calendar_Profile_Value_Speed;
@@ -142,6 +146,14 @@ public class Messages extends NLS {
    public static String        dialog_export_shell_text;
    public static String        dialog_export_txt_filePath_tooltip;
 
+   public static String        Dialog_AdjustAltitude_Label_ElevationGain;
+   public static String        Dialog_AdjustAltitude_Label_ElevationGain_After_Tooltip;
+   public static String        Dialog_AdjustAltitude_Label_ElevationGain_Before_Tooltip;
+   public static String        Dialog_AdjustAltitude_Label_ElevationGain_Diff_Tooltip;
+   public static String        Dialog_AdjustAltitude_Label_ElevationLoss;
+   public static String        Dialog_AdjustAltitude_Label_ElevationLoss_After_Tooltip;
+   public static String        Dialog_AdjustAltitude_Label_ElevationLoss_Before_Tooltip;
+   public static String        Dialog_AdjustAltitude_Label_ElevationLoss_Diff_Tooltip;
    public static String        Dialog_AdjustAltitude_Link_ApproachWholeTour;
 
    public static String        Dialog_AdjustTemperature_Button_AdjustTemperature;
@@ -179,6 +191,8 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Checkbox_ShowInDashboard_Tooltip;
    public static String        Dialog_ImportConfig_Checkbox_TourType;
    public static String        Dialog_ImportConfig_Checkbox_TourType_Tooltip;
+
+   public static String        Dialog_ImportConfig_Combo_Device_LocalDevice;
 
    public static String        Dialog_ImportConfig_Column_AdjustTemperature_Header;
    public static String        Dialog_ImportConfig_Column_AdjustTemperature_Label;
@@ -2091,6 +2105,8 @@ public class Messages extends NLS {
    public static String Slideout_Map_Options_Checkbox_ZoomWithMousePosition_Tooltip;
    public static String Slideout_Map_Options_Label_SliderPath_Segements;
    public static String Slideout_Map_Options_Checkbox_ChartSlider;
+   public static String Slideout_Map_Options_Checkbox_ShowEnhancedWarning;
+   public static String Slideout_Map_Options_Checkbox_ShowEnhancedWarning_Tooltip;
    public static String Slideout_Map_Options_Checkbox_ShowHoveredSelectedTour;
    public static String Slideout_Map_Options_Checkbox_ShowHoveredSelectedTour_Tooltip;
    public static String Slideout_Map_Options_Checkbox_SliderPath;

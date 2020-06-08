@@ -65,7 +65,7 @@ public class I18ToDojo extends Task {
 
    /**
     * Load properties from a properties file.
-    * 
+    *
     * @param javaProperties
     * @return Returns properties from the properties file.
     */
@@ -79,7 +79,7 @@ public class I18ToDojo extends Task {
          return properties;
 
       } catch (final Exception e) {
-         System.err.println(e);
+         e.printStackTrace();
       }
 
       return null;
@@ -87,7 +87,7 @@ public class I18ToDojo extends Task {
 
    /**
     * This file is created and contains the Dojo properties.
-    * 
+    *
     * @param properties
     *           File which contains Java properties.
     */
@@ -106,7 +106,7 @@ public class I18ToDojo extends Task {
 
    /**
     * This file contains the Java text strings in a properties file format.
-    * 
+    *
     * @param properties
     *           File which contains Java properties.
     */
@@ -204,7 +204,7 @@ public class I18ToDojo extends Task {
        */
       final Collection<Object> keys = properties.keySet();
 
-      final ArrayList<String> sortedKeys = new ArrayList<String>();
+      final ArrayList<String> sortedKeys = new ArrayList<>();
       for (final Object key : keys) {
          if (key instanceof String) {
             sortedKeys.add((String) key);

@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -26,535 +26,611 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 
 import net.tourbook.Messages;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.FileSystemManager;
 import net.tourbook.common.NIO;
+import net.tourbook.common.TourbookFileSystem;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.TypedListener;
+import org.eclipse.ui.dialogs.PreferencesUtil;
 
 /**
  * Manage combo box folder items.
  */
 class HistoryItems {
 
-	private static final String		NO_DEVICE_NAME			= "[?]";													//$NON-NLS-1$
+   private static final String   NO_DEVICE_NAME       = "[?]";                                                   //$NON-NLS-1$
 
-	private static final int		COMBO_HISTORY_LENGTH	= 20;
-	private static final String		COMBO_SEPARATOR			= "- - - - - - - - - - - - - - - - - - - - - - - - - - -";	//$NON-NLS-1$
+   private static final int      COMBO_HISTORY_LENGTH = 20;
+   private static final String   COMBO_SEPARATOR      = "- - - - - - - - - - - - - - - - - - - - - - - - - - -"; //$NON-NLS-1$
 
-	private boolean					_canShowDeviceName		= UI.IS_WIN;
+   final static IPreferenceStore _prefStore           = CommonActivator.getPrefStore();
 
-	private LinkedHashSet<String>	_folderItems			= new LinkedHashSet<>();
+   private boolean               _canShowDeviceName   = UI.IS_WIN;
 
-	/** Contains paths with the device name and not the drive letter (only for Windows). */
-	private LinkedHashSet<String>	_deviceNameItems		= new LinkedHashSet<>();
+   private LinkedHashSet<String> _folderItems         = new LinkedHashSet<>();
 
-	/** Toggle history sorting. */
-	private boolean					_isSortHistoryReversed;
+   /** Contains paths with the device name and not the drive letter (only for Windows). */
+   private LinkedHashSet<String> _deviceNameItems     = new LinkedHashSet<>();
 
-	/*
-	 * UI controls
-	 */
-	private Combo					_combo;
-	private ControlDecoration		_comboError;
+   /** Toggle history sorting. */
+   private boolean               _isSortHistoryReversed;
 
-	private Label					_labelFolderInfo;
+   /*
+    * UI controls
+    */
+   private Combo             _combo;
+   private ControlDecoration _comboError;
 
-	private boolean					_isValidateFolder		= true;
+   private Link              _linkFolderInfo;
 
-	private String cleanupFolderDeviceName(final String deviceNameFolder) {
+   private boolean           _isValidateFolder = true;
 
-		final String cleanedDeviceNameFolder = deviceNameFolder.replace(
-				Messages.Dialog_ImportConfig_Info_NoDeviceName,
-				UI.EMPTY_STRING);
+   private SelectionAdapter  _linkFolderInfoSelectionAdapter;
 
-		return cleanedDeviceNameFolder;
-	}
+   private String cleanupFolderDeviceName(final String deviceNameFolder) {
 
-	private String convertTo_DeviceNameFolder(final String osFolder) {
+      final String cleanedDeviceNameFolder = deviceNameFolder.replace(
+            Messages.Dialog_ImportConfig_Info_NoDeviceName,
+            UI.EMPTY_STRING);
 
-		try {
+      return cleanedDeviceNameFolder;
+   }
 
-			final Path newPath = Paths.get(osFolder);
+   private String convertTo_DeviceNameFolder(final String osFolder) {
 
-			final String deviceName = getDeviceName(newPath);
+      try {
 
-			if (deviceName == null) {
-				return null;
-			}
+         final Path newPath = Paths.get(osFolder);
 
-			final String deviceFolderName = createDeviceNameFolder(newPath, deviceName);
+         final String deviceName = getDeviceName(newPath);
 
-			return deviceFolderName;
+         if (deviceName == null) {
+            return null;
+         }
 
-		} catch (final Exception e) {
-			// folder can be invalid
-		}
+         final String deviceFolderName = createDeviceNameFolder(newPath, deviceName);
 
-		return null;
-	}
+         return deviceFolderName;
 
-	private String createDeviceNameFolder(final Path folderPath, final String deviceName) {
+      } catch (final Exception e) {
+         // folder can be invalid
+      }
 
-		if (!_canShowDeviceName) {
-			return folderPath.toString();
-		}
+      return null;
+   }
 
-		final int nameCount = folderPath.getNameCount();
-		final Comparable<?> subPath = nameCount > 0 ? folderPath.subpath(0, nameCount) : UI.EMPTY_STRING;
+   private String createDeviceNameFolder(final Path folderPath, final String deviceName) {
 
-		String deviceFolder = null;
+      if (!_canShowDeviceName ||
+            NIO.isTourBookFileSystem(folderPath.toString())) {
+         return folderPath.toString();
+      }
 
-		// construct device name folder
-		if (deviceName == null) {
+      final int nameCount = folderPath.getNameCount();
+      final Comparable<?> subPath = nameCount > 0 ? folderPath.subpath(0, nameCount) : UI.EMPTY_STRING;
 
-			deviceFolder = NO_DEVICE_NAME + File.separator + subPath;
+      String deviceFolder = null;
 
-		} else {
+      // construct device name folder
+      if (deviceName == null) {
 
-			if (deviceName.trim().length() == 0) {
+         deviceFolder = NO_DEVICE_NAME + File.separator + subPath;
 
-				deviceFolder = '[' + Messages.Dialog_ImportConfig_Info_NoDeviceName + ']' + File.separator + subPath;
+      } else {
 
-			} else {
+         if (deviceName.trim().length() == 0) {
 
-				deviceFolder = '[' + deviceName + ']' + File.separator + subPath;
-			}
-		}
+            deviceFolder = '[' + Messages.Dialog_ImportConfig_Info_NoDeviceName + ']' + File.separator + subPath;
 
-		return deviceFolder;
-	}
+         } else {
 
-	private void fillControls(final String newFolder, final String newDeviceNameFolder, final String selectedFolder) {
+            deviceFolder = '[' + deviceName + ']' + File.separator + subPath;
+         }
+      }
 
-		// prevent to remove the combo text field
-		_combo.removeAll();
+      return deviceFolder;
+   }
 
-		String folderText = UI.EMPTY_STRING;
-		String folderInfo = UI.EMPTY_STRING;
+   private void createLinkFolderInfoSelectionAdapter(final String preferencePageId) {
 
-		if (selectedFolder != null) {
+      if (_linkFolderInfoSelectionAdapter == null) {
+         _linkFolderInfoSelectionAdapter = new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
 
-			folderText = selectedFolder;
+               final int returnResult = PreferencesUtil.createPreferenceDialogOn(
+                     Display.getCurrent().getActiveShell(),
+                     preferencePageId,
+                     null,
+                     null).open();
 
-			folderInfo = NIO.isDeviceNameFolder(selectedFolder)
-					? newFolder == null ? UI.EMPTY_STRING : newFolder
-					: newDeviceNameFolder == null ? UI.EMPTY_STRING : newDeviceNameFolder;
-		}
+               if (returnResult == 0) // The OK button was clicked
+               {
+                  validateModifiedPath();
+               }
+            }
+         };
+      }
 
-		_labelFolderInfo.setText(folderInfo);
-		_combo.setText(folderText);
+      _linkFolderInfo.addSelectionListener(_linkFolderInfoSelectionAdapter);
+   }
 
-		boolean isAdded = false;
+   private void fillControls(final String newFolder, final String newDeviceNameFolder, final String selectedFolder) {
 
-		/*
-		 * Combo items
-		 */
-		if (newFolder != null && newFolder.length() > 0) {
-			_combo.add(newFolder);
-			isAdded = true;
-		}
+      // prevent to remove the combo text field
+      _combo.removeAll();
 
-		if (_canShowDeviceName) {
+      String folderText = UI.EMPTY_STRING;
+      String folderInfo = UI.EMPTY_STRING;
 
-			if (newDeviceNameFolder != null && newDeviceNameFolder.length() > 0) {
-				_combo.add(newDeviceNameFolder);
-				isAdded = true;
-			}
+      if (selectedFolder != null) {
 
-			if (_deviceNameItems.size() > 0) {
+         folderText = selectedFolder;
 
-				if (isAdded) {
-					_combo.add(COMBO_SEPARATOR);
-				}
+         folderInfo = NIO.isDeviceNameFolder(selectedFolder)
+               ? newFolder == null ? UI.EMPTY_STRING : newFolder
+               : newDeviceNameFolder == null ? UI.EMPTY_STRING : newDeviceNameFolder;
+      }
 
-				isAdded = true;
+      _linkFolderInfo.setText(folderInfo);
+      _combo.setText(folderText);
 
-				for (final String deviceFolder : reverseHistory(_deviceNameItems)) {
-					_combo.add(deviceFolder);
-				}
-			}
-		}
+      boolean isAdded = false;
 
-		if (_folderItems.size() > 0) {
+      /*
+       * Combo items
+       */
+      if (newFolder != null && newFolder.length() > 0) {
+         _combo.add(newFolder);
+         isAdded = true;
+      }
 
-			if (isAdded) {
-				_combo.add(COMBO_SEPARATOR);
-			}
+      if (_canShowDeviceName) {
 
-			isAdded = true;
+         if (newDeviceNameFolder != null && newDeviceNameFolder.length() > 0) {
+            _combo.add(newDeviceNameFolder);
+            isAdded = true;
+         }
 
-			for (final String driveFolder : reverseHistory(_folderItems)) {
-				_combo.add(driveFolder);
-			}
-		}
-	}
+         if (_deviceNameItems.size() > 0) {
 
-	/**
-	 * @param deviceRoot
-	 * @return Returns the device name for the drive or <code>null</code> when not available
-	 */
-	private String getDeviceName(final Path path) {
+            if (isAdded) {
+               _combo.add(COMBO_SEPARATOR);
+            }
 
-		/*
-		 * This feature is available only for windows.
-		 */
-		if (!_canShowDeviceName) {
-			return null;
-		}
+            isAdded = true;
 
-		final Path root = path.getRoot();
+            for (final String deviceFolder : reverseHistory(_deviceNameItems)) {
+               _combo.add(deviceFolder);
+            }
+         }
+      }
 
-		if (root == null) {
-			return null;
-		}
+      if (_folderItems.size() > 0) {
 
-		String deviceDrive = root.toString();
-		deviceDrive = deviceDrive.substring(0, 2);
+         if (isAdded) {
+            _combo.add(COMBO_SEPARATOR);
+         }
 
-		final Iterable<FileStore> fileStores = NIO.getFileStores();
+         isAdded = true;
 
-		for (final FileStore store : fileStores) {
+         for (final String driveFolder : reverseHistory(_folderItems)) {
+            _combo.add(driveFolder);
+         }
+      }
+   }
 
-			final String drive = NIO.parseDriveLetter(store);
+   /**
+    * @param deviceRoot
+    * @return Returns the device name for the drive or <code>null</code> when not available
+    */
+   private String getDeviceName(final Path path) {
 
-			if (deviceDrive.equalsIgnoreCase(drive)) {
+      /*
+       * This feature is available only for windows.
+       */
+      if (!_canShowDeviceName) {
+         return null;
+      }
 
-				return store.name();
-			}
-		}
+      final Path root = path.getRoot();
 
-		return null;
-	}
+      if (root == null) {
+         return null;
+      }
 
-	String getOSPath(final String defaultFolder, final String configFolder) {
+      String deviceDrive = root.toString();
+      deviceDrive = deviceDrive.substring(0, 2);
 
-		String osPath = null;
+      final Iterable<FileStore> fileStores = NIO.getFileStores();
 
-		if (defaultFolder != null) {
-			osPath = NIO.convertToOSPath(defaultFolder);
-		}
+      for (final FileStore store : fileStores) {
 
-		if (osPath == null) {
-			osPath = NIO.convertToOSPath(configFolder);
-		}
+         final String drive = NIO.parseDriveLetter(store);
 
-		return osPath;
-	}
+         if (deviceDrive.equalsIgnoreCase(drive)) {
 
-	private void keepOldPathInHistory() {
+            return store.name();
+         }
+      }
 
-		final String oldFolder = _combo.getText().trim();
+      return null;
+   }
 
-		if (oldFolder.length() == 0) {
-			return;
-		}
+   String getOSPath(final String defaultFolder, final String configFolder) {
 
-		if (oldFolder.trim().startsWith(NIO.DEVICE_FOLDER_NAME_START)) {
+      String osPath = null;
 
-			// this is a device name folder
+      if (defaultFolder != null) {
+         osPath = NIO.convertToOSPath(defaultFolder);
+      }
 
-			final String cleanHistoryItem = cleanupFolderDeviceName(oldFolder);
-			_deviceNameItems.remove(cleanHistoryItem);
-			_deviceNameItems.add(cleanHistoryItem);
+      if (osPath == null) {
+         osPath = NIO.convertToOSPath(configFolder);
+      }
 
-		} else {
+      return osPath;
+   }
 
-			_folderItems.remove(oldFolder);
-			_folderItems.add(oldFolder);
-		}
-	}
+   private void keepOldPathInHistory() {
 
-	/**
-	 * A new folder is selected in the system folder dialog.
-	 * 
-	 * @param newFolder
-	 */
-	void onSelectFolderInDialog(final String newFolder) {
+      final String oldFolder = _combo.getText().trim();
 
-		try {
+      if (oldFolder.length() == 0) {
+         return;
+      }
 
-			final Path newPath = Paths.get(newFolder);
+      if (oldFolder.trim().startsWith(NIO.DEVICE_FOLDER_NAME_START)) {
 
-			final String deviceName = getDeviceName(newPath);
-			final String deviceNameFolder = createDeviceNameFolder(newPath, deviceName);
+         // this is a device name folder
 
-			updateModel(newFolder, deviceNameFolder);
-			fillControls(newFolder, deviceNameFolder, newFolder);
+         final String cleanHistoryItem = cleanupFolderDeviceName(oldFolder);
+         _deviceNameItems.remove(cleanHistoryItem);
+         _deviceNameItems.add(cleanHistoryItem);
 
-		} catch (final Exception e) {
-			// folder can be invalid
-		}
-	}
+      } else {
 
-	/**
-	 * Remove item from history.
-	 * 
-	 * @param text
-	 */
-	void removeFromHistory(final String itemText) {
+         _folderItems.remove(oldFolder);
+         _folderItems.add(oldFolder);
+      }
+   }
 
-		/*
-		 * Remove from both histories because it could be in the wrong list
-		 */
-		_folderItems.remove(itemText);
-		_deviceNameItems.remove(itemText);
+   /**
+    * A new folder is selected in the system folder dialog.
+    *
+    * @param newFolder
+    */
+   void onSelectFolderInDialog(final String newFolder) {
 
-		fillControls(null, null, null);
-	}
+      try {
 
-	void restoreState(final String[] restoredFolderItems, final String[] restoredDeviceItems) {
+         final Path newPath = Paths.get(newFolder);
 
-		if (restoredFolderItems != null) {
-			_folderItems.addAll(Arrays.asList(restoredFolderItems));
-		}
+         final String deviceName = getDeviceName(newPath);
+         final String deviceNameFolder = createDeviceNameFolder(newPath, deviceName);
 
-		if (restoredDeviceItems != null) {
-			_deviceNameItems.addAll(Arrays.asList(restoredDeviceItems));
-		}
+         updateModel(newFolder, deviceNameFolder);
+         fillControls(newFolder, deviceNameFolder, newFolder);
 
-		// fill history
-		fillControls(null, null, null);
-	}
+      } catch (final Exception e) {
+         // folder can be invalid
+      }
+   }
 
-	private String[] reverseHistory(final LinkedHashSet<String> folderHistory) {
+   /**
+    * Remove item from history.
+    *
+    * @param text
+    */
+   void removeFromHistory(final String itemText) {
 
-		final String[] folterItems = folderHistory.toArray(new String[folderHistory.size()]);
-		final String[] reversedArray = Util.arrayReverse(folterItems);
+      /*
+       * Remove from both histories because it could be in the wrong list
+       */
+      _folderItems.remove(itemText);
+      _deviceNameItems.remove(itemText);
 
-		return reversedArray;
-	}
+      fillControls(null, null, null);
+   }
 
-	/**
-	 * Save history items.
-	 * 
-	 * @param state
-	 * @param stateFolderHistoryItems
-	 * @param stateDeviceHistoryItems
-	 */
-	void saveState(	final IDialogSettings state,
-					final String stateFolderHistoryItems,
-					final String stateDeviceHistoryItems) {
+   void restoreState(final String[] restoredFolderItems, final String[] restoredDeviceItems) {
 
-		state.put(stateFolderHistoryItems, _folderItems.toArray(new String[_folderItems.size()]));
-		state.put(stateDeviceHistoryItems, _deviceNameItems.toArray(new String[_deviceNameItems.size()]));
-	}
+      if (restoredFolderItems != null) {
+         _folderItems.addAll(Arrays.asList(restoredFolderItems));
+      }
 
-	void setControls(final Combo comboFolder, final Label lblFolderPath) {
+      if (restoredDeviceItems != null) {
+         _deviceNameItems.addAll(Arrays.asList(restoredDeviceItems));
+      }
 
-		_combo = comboFolder;
-		_labelFolderInfo = lblFolderPath;
+      // fill history
+      fillControls(null, null, null);
+   }
 
-		final Image image = FieldDecorationRegistry
-				.getDefault()
-				.getFieldDecoration(FieldDecorationRegistry.DEC_ERROR)
-				.getImage();
+   private String[] reverseHistory(final LinkedHashSet<String> folderHistory) {
 
-		_comboError = new ControlDecoration(_combo, SWT.LEFT | SWT.TOP);
+      final String[] folterItems = folderHistory.toArray(new String[folderHistory.size()]);
+      final String[] reversedArray = Util.arrayReverse(folterItems);
 
-		_comboError.setImage(image);
-		_comboError.setDescriptionText(Messages.Dialog_ImportConfig_Error_FolderIsInvalid);
-	}
+      return reversedArray;
+   }
 
-	void setIsValidateFolder(final boolean isValidateFolder) {
-		_isValidateFolder = isValidateFolder;
-	}
+   /**
+    * Save history items.
+    *
+    * @param state
+    * @param stateFolderHistoryItems
+    * @param stateDeviceHistoryItems
+    */
+   void saveState(final IDialogSettings state,
+                  final String stateFolderHistoryItems,
+                  final String stateDeviceHistoryItems) {
 
-	void sortHistory() {
+      state.put(stateFolderHistoryItems, _folderItems.toArray(new String[_folderItems.size()]));
+      state.put(stateDeviceHistoryItems, _deviceNameItems.toArray(new String[_deviceNameItems.size()]));
+   }
 
-		// toggle sorting
-		_isSortHistoryReversed = !_isSortHistoryReversed;
+   void setControls(final Combo comboFolder, final Link linkFolderPath) {
 
-		/*
-		 * Sort folder items
-		 */
-		final ArrayList<String> folderItems = new ArrayList<String>(_folderItems);
-		Collections.sort(folderItems);
-		if (_isSortHistoryReversed) {
-			Collections.reverse(folderItems);
-		}
-		_folderItems.clear();
-		_folderItems.addAll(folderItems);
+      _combo = comboFolder;
+      _linkFolderInfo = linkFolderPath;
 
-		/*
-		 * Sort named folder items
-		 */
-		final ArrayList<String> namedFolderItems = new ArrayList<String>(_deviceNameItems);
-		Collections.sort(namedFolderItems);
-		if (_isSortHistoryReversed) {
-			Collections.reverse(namedFolderItems);
-		}
-		_deviceNameItems.clear();
-		_deviceNameItems.addAll(namedFolderItems);
+      final Image image = FieldDecorationRegistry
+            .getDefault()
+            .getFieldDecoration(FieldDecorationRegistry.DEC_ERROR)
+            .getImage();
 
-		// update UI
-		final String selectedFolderRaw = _combo.getText();
-		fillControls(null, null, selectedFolderRaw);
-	}
+      _comboError = new ControlDecoration(_combo, SWT.LEFT | SWT.TOP);
 
-	/**
-	 * Set selected/entered folder in the combo box into the history. This maintains the history
-	 * with manually created paths.
-	 */
-	void updateHistory() {
+      _comboError.setImage(image);
+      _comboError.setDescriptionText(Messages.Dialog_ImportConfig_Error_FolderIsInvalid);
+   }
 
-		final String selectedFolderRaw = _combo.getText();
+   void setIsValidateFolder(final boolean isValidateFolder) {
+      _isValidateFolder = isValidateFolder;
+   }
 
-		String selectedFolder = null;
+   void sortHistory() {
 
-		if (NIO.isDeviceNameFolder(selectedFolderRaw)) {
-			selectedFolder = NIO.convertToOSPath(selectedFolderRaw);
-		} else {
-			selectedFolder = selectedFolderRaw;
-		}
+      // toggle sorting
+      _isSortHistoryReversed = !_isSortHistoryReversed;
 
-		if (selectedFolder == null || selectedFolder.trim().length() == 0) {
-			return;
-		}
+      /*
+       * Sort folder items
+       */
+      final ArrayList<String> folderItems = new ArrayList<>(_folderItems);
+      Collections.sort(folderItems);
+      if (_isSortHistoryReversed) {
+         Collections.reverse(folderItems);
+      }
+      _folderItems.clear();
+      _folderItems.addAll(folderItems);
 
-		try {
+      /*
+       * Sort named folder items
+       */
+      final ArrayList<String> namedFolderItems = new ArrayList<>(_deviceNameItems);
+      Collections.sort(namedFolderItems);
+      if (_isSortHistoryReversed) {
+         Collections.reverse(namedFolderItems);
+      }
+      _deviceNameItems.clear();
+      _deviceNameItems.addAll(namedFolderItems);
 
-			final Path newPath = Paths.get(selectedFolder);
+      // update UI
+      final String selectedFolderRaw = _combo.getText();
+      fillControls(null, null, selectedFolderRaw);
+   }
 
-			final String deviceName = getDeviceName(newPath);
-			final String deviceNameFolder = createDeviceNameFolder(newPath, deviceName);
+   /**
+    * Set selected/entered folder in the combo box into the history. This maintains the history
+    * with manually created paths.
+    */
+   void updateHistory() {
 
-			updateModel(selectedFolder, deviceNameFolder);
-			fillControls(selectedFolder, deviceNameFolder, selectedFolderRaw);
+      final String selectedFolderRaw = _combo.getText();
 
-		} catch (final Exception e) {
-			// this can occure when the entered path is totally invalid
-		}
-	}
+      String selectedFolder = null;
 
-	private void updateHistory(final LinkedHashSet<String> historyItems, final String newItem) {
+      if (NIO.isDeviceNameFolder(selectedFolderRaw)) {
+         selectedFolder = NIO.convertToOSPath(selectedFolderRaw);
+      } else {
+         selectedFolder = selectedFolderRaw;
+      }
 
-		if (newItem == null || newItem.trim().length() == 0) {
-			// there is no new item
-			return;
-		}
+      if (selectedFolder == null || selectedFolder.trim().length() == 0) {
+         return;
+      }
 
-		// move the new folder path to the top of the history
-		final String cleanHistoryItem = cleanupFolderDeviceName(newItem);
-		historyItems.remove(cleanHistoryItem);
-		historyItems.add(cleanHistoryItem);
+      try {
 
-		if (historyItems.size() < COMBO_HISTORY_LENGTH) {
-			return;
-		}
+         final Path newPath = Paths.get(selectedFolder);
 
-		// force history length
-		final ArrayList<String> removedItems = new ArrayList<>();
+         final String deviceName = getDeviceName(newPath);
+         final String deviceNameFolder = createDeviceNameFolder(newPath, deviceName);
 
-		int numFolder = 0;
+         updateModel(selectedFolder, deviceNameFolder);
+         fillControls(selectedFolder, deviceNameFolder, selectedFolderRaw);
 
-		for (final String folderItem : historyItems) {
-			if (++numFolder < COMBO_HISTORY_LENGTH) {
-				continue;
-			} else {
-				removedItems.add(folderItem);
-			}
-		}
+      } catch (final Exception e) {
+         // this can occur when the entered path is totally invalid
+      }
+   }
 
-		historyItems.removeAll(removedItems);
-	}
+   private void updateHistory(final LinkedHashSet<String> historyItems, final String newItem) {
 
-	private void updateModel(final String folderPath, final String deviceNamePath) {
+      if (newItem == null || newItem.trim().length() == 0) {
+         // there is no new item
+         return;
+      }
 
-		keepOldPathInHistory();
+      // move the new folder path to the top of the history
+      final String cleanHistoryItem = cleanupFolderDeviceName(newItem);
+      historyItems.remove(cleanHistoryItem);
+      historyItems.add(cleanHistoryItem);
 
-		updateHistory(_folderItems, folderPath);
-		updateHistory(_deviceNameItems, deviceNamePath);
-	}
+      if (historyItems.size() < COMBO_HISTORY_LENGTH) {
+         return;
+      }
 
-	/**
-	 */
-	void validateModifiedPath() {
+      // force history length
+      final ArrayList<String> removedItems = new ArrayList<>();
 
-		if (_isValidateFolder == false) {
+      int numFolder = 0;
 
-			_comboError.hide();
-			_labelFolderInfo.setText(UI.EMPTY_STRING);
+      for (final String folderItem : historyItems) {
+         if (++numFolder < COMBO_HISTORY_LENGTH) {
+            continue;
+         } else {
+            removedItems.add(folderItem);
+         }
+      }
 
-			return;
-		}
+      historyItems.removeAll(removedItems);
+   }
 
-		boolean isFolderValid = false;
+   private void updateModel(final String folderPath, final String deviceNamePath) {
 
-		final String modifiedFolder = _combo.getText().trim();
+      keepOldPathInHistory();
 
-		if (COMBO_SEPARATOR.equals(modifiedFolder)) {
+      updateHistory(_folderItems, folderPath);
+      updateHistory(_deviceNameItems, deviceNamePath);
+   }
 
-			// ignore special texts
+   /**
+    */
+   void validateModifiedPath() {
 
-			isFolderValid = true;
-			_labelFolderInfo.setText(UI.EMPTY_STRING);
+      if (_isValidateFolder == false) {
 
-		} else {
+         _comboError.hide();
+         _linkFolderInfo.setText(UI.EMPTY_STRING);
 
-			final String cleanedFolderName = cleanupFolderDeviceName(modifiedFolder);
+         return;
+      }
 
-			final String osFolder = NIO.convertToOSPath(cleanedFolderName);
+      boolean isFolderValid = false;
 
-			if (osFolder != null) {
+      final String modifiedFolder = _combo.getText().trim();
 
-				try {
+      if (COMBO_SEPARATOR.equals(modifiedFolder)) {
 
-					final Path osPath = Paths.get(osFolder);
+         // ignore special texts
 
-					isFolderValid = Files.exists(osPath);
+         isFolderValid = true;
+         _linkFolderInfo.setText(UI.EMPTY_STRING);
 
-					if (isFolderValid) {
+      } else {
 
-						if (_canShowDeviceName) {
+         final String cleanedFolderName = cleanupFolderDeviceName(modifiedFolder);
 
-							if (NIO.isDeviceNameFolder(cleanedFolderName)) {
+         final String osFolder = NIO.convertToOSPath(cleanedFolderName);
 
-								// this is a device folder name
+         if (osFolder != null) {
 
-								_labelFolderInfo.setText(osFolder);
+            try {
 
-							} else {
+               final Path osPath = NIO.getDeviceFolderPath(osFolder);
 
-								final String deviceFolder = convertTo_DeviceNameFolder(osFolder);
+               isFolderValid = osPath != null && Files.exists(osPath);
 
-								if (deviceFolder == null) {
-									isFolderValid = false;
-								} else {
+               if (isFolderValid) {
 
-									_labelFolderInfo.setText(deviceFolder);
-								}
-							}
+                  if (_canShowDeviceName) {
 
-						} else {
+                     if (NIO.isDeviceNameFolder(cleanedFolderName)) {
 
-							_labelFolderInfo.setText(UI.EMPTY_STRING);
-						}
-					}
+                        // this is a device folder name
 
-				} catch (final Exception e) {
-					isFolderValid = false;
-				}
-			}
-		}
+                        _linkFolderInfo.setText(osFolder);
 
-		if (isFolderValid) {
+                     } else if (NIO.isTourBookFileSystem(cleanedFolderName)) {
 
-			_comboError.hide();
-			_labelFolderInfo.setForeground(null);
+                        final TourbookFileSystem dropboxFileSystem = FileSystemManager.getTourbookFileSystem(cleanedFolderName);
+                        if (dropboxFileSystem != null) {
+                           _linkFolderInfo.setText(dropboxFileSystem.getAbsoluteRootPath());
+                        }
+                     } else {
 
-		} else {
+                        final String deviceFolder = convertTo_DeviceNameFolder(osFolder);
 
-			_comboError.show();
-			_labelFolderInfo.setText(Messages.Dialog_ImportConfig_Error_FolderIsInvalid);
-			_labelFolderInfo.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-		}
-	}
+                        if (deviceFolder == null) {
+                           isFolderValid = false;
+                        } else {
+
+                           _linkFolderInfo.setText(deviceFolder);
+                        }
+                     }
+
+                  } else {
+
+                     _linkFolderInfo.setText(UI.EMPTY_STRING);
+                  }
+               }
+
+            } catch (final Exception e) {
+               isFolderValid = false;
+            }
+         }
+      }
+
+      if (isFolderValid) {
+
+         _comboError.hide();
+         _linkFolderInfo.setForeground(null);
+
+      } else {
+
+         _comboError.show();
+         final StringBuilder folderInfoMessage = new StringBuilder();
+         folderInfoMessage.append(Messages.Dialog_ImportConfig_Error_FolderIsInvalid);
+
+         if (NIO.isTourBookFileSystem(modifiedFolder)) {
+
+            final TourbookFileSystem dropboxFileSystem = FileSystemManager.getTourbookFileSystem(modifiedFolder);
+            if (dropboxFileSystem != null) {
+
+               folderInfoMessage.append(NLS.bind(Messages.Action_FileSystem_Preferences, modifiedFolder));
+
+               //We remove the listener if it was already present as we don't
+               boolean addlistener = true;
+               for (final Listener listener : _linkFolderInfo.getListeners(SWT.Selection)) {
+                  if (listener instanceof TypedListener) {
+                     addlistener = false;
+                  }
+               }
+               if (addlistener) {
+                  createLinkFolderInfoSelectionAdapter(dropboxFileSystem.getPreferencePageId());
+               }
+
+            }
+         } else {
+
+            if (_linkFolderInfoSelectionAdapter != null) {
+               _linkFolderInfo.removeSelectionListener(_linkFolderInfoSelectionAdapter);
+               _linkFolderInfoSelectionAdapter = null;
+            }
+         }
+
+         _linkFolderInfo.setText(folderInfoMessage.toString());
+
+         _linkFolderInfo.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+      }
+   }
 }
