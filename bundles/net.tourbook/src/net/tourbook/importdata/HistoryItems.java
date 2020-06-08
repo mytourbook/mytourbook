@@ -606,7 +606,7 @@ class HistoryItems {
             final TourbookFileSystem dropboxFileSystem = FileSystemManager.getTourbookFileSystem(modifiedFolder);
             if (dropboxFileSystem != null) {
 
-               folderInfoMessage.append(NLS.bind(Messages.Action_FileSystem_Preferences, modifiedFolder));
+               folderInfoMessage.append(NLS.bind(Messages.Action_FileSystem_Preferences, dropboxFileSystem.getId()));
 
                //We remove the listener if it was already present as we don't
                boolean addlistener = true;
