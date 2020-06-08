@@ -75,7 +75,6 @@ public class DropboxFileSystem extends TourbookFileSystem {
    @Override
    protected void close() {
       closeDropboxFileSystem();
-
    }
 
    /**
@@ -116,22 +115,20 @@ public class DropboxFileSystem extends TourbookFileSystem {
 
       boolean result = false;
 
-      final URI uri = URI.create("dropbox://root"); //$NON-NLS-1$
-      final Map<String, String> env = new HashMap<>();
-
       final String accessToken = _prefStore.getString(IPreferences.DROPBOX_ACCESSTOKEN);
       if (StringUtils.isNullOrEmpty(accessToken)) {
          _dropboxFileSystem = null;
          return result;
       }
 
-      env.put("accessToken", accessToken); //$NON-NLS-1$
+      final URI uri = URI.create("dropbox://root"); //$NON-NLS-1$
+      final Map<String, String> properties = new HashMap<>();
+      properties.put("accessToken", accessToken); //$NON-NLS-1$
 
       final FileSystemProvider provider = new DropBoxFileSystemProvider(new DropBoxFileSystemRepository());
 
       try {
-
-         _dropboxFileSystem = provider.newFileSystem(uri, env);
+         _dropboxFileSystem = provider.newFileSystem(uri, properties);
 
          result = true;
       } catch (final IOException e) {
@@ -183,7 +180,7 @@ public class DropboxFileSystem extends TourbookFileSystem {
       }
 
       //We remove the "Dropbox" string from the folderName
-      final String dropboxFilePath = folderName.substring(7);
+      final String dropboxFilePath = folderName.substring(FILE_SYSTEM_ID.length());
       return _dropboxFileSystem.getPath(dropboxFilePath);
    }
 
