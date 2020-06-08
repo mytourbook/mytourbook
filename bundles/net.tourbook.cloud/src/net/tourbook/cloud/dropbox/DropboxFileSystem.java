@@ -180,7 +180,7 @@ public class DropboxFileSystem extends TourbookFileSystem {
       }
 
       //We remove the "Dropbox" string from the folderName
-      final String dropboxFilePath = folderName.substring(FILE_SYSTEM_ID.length());
+      final String dropboxFilePath = folderName.substring(getId().length());
       return _dropboxFileSystem.getPath(dropboxFilePath);
    }
 

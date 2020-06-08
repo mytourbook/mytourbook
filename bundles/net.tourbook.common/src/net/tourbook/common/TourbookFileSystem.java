@@ -30,7 +30,7 @@ import org.eclipse.swt.widgets.Shell;
  */
 public abstract class TourbookFileSystem {
 
-   protected String FILE_SYSTEM_ID;
+   private String   FILE_SYSTEM_ID;
    protected String FILE_SYSTEM_FOLDER;
 
    public TourbookFileSystem(final String fileSystemId) {

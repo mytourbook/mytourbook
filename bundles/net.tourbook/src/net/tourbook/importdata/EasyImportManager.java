@@ -465,7 +465,8 @@ public class EasyImportManager {
                   OSFile deviceFile;
 
                   if (NIO.isTourBookFileSystem(folder)) {
-                     deviceFile = new OSFile(Paths.get(folder, path.toString()));
+                     final String fileName = path.getFileName().toString();
+                     deviceFile = new OSFile(Paths.get(folder, fileName));
                   } else {
                      deviceFile = new OSFile(path);
                   }
