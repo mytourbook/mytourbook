@@ -15,10 +15,6 @@
  *******************************************************************************/
 package net.tourbook.chart;
 
-import net.tourbook.tour.TourEventId;
-import net.tourbook.tour.TourManager;
-import net.tourbook.ui.tourChart.TourChartView;
-
 import org.eclipse.jface.action.Action;
 
 public class ActionSelectAllTimeSlices extends Action {
@@ -43,10 +39,11 @@ public class ActionSelectAllTimeSlices extends Action {
        * fireTourChangeEvent(tourData);
        * }
        */
-      TourManager.fireEventWithCustomData(//
-            TourEventId.SLIDER_POSITION_CHANGED,
-            chartInfo,
-            TourChartView.this);
+//      final TourDataEditorView tourDataEditor = TourManager.getTourDataEditor();
+//      TourManager.fireEventWithCustomData(//
+//            TourEventId.SLIDER_POSITION_CHANGED,
+//            chartInfo,
+//            TourChartView.this);
 	}
 
 }

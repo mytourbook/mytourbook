@@ -7887,11 +7887,21 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       final Table table = (Table) _timeSlice_Viewer.getControl();
       final int itemCount = table.getItemCount();
 
+      final boolean istotoactivated =
+            _prefStore.getBoolean(
+            ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE);
+
       // adjust to array bounds
       int valueIndex = chartInfo.selectedSliderValuesIndex;
       valueIndex = Math.max(0, Math.min(valueIndex, itemCount - 1));
 
-      table.setSelection(valueIndex);
+      if (istotoactivated) {
+         table.setSelection(chartInfo.leftSliderValuesIndex, valueIndex);
+         System.out.println("left index value " + chartInfo.leftSliderValuesIndex);
+         System.out.println("right index value " + valueIndex);
+      } else {
+         table.setSelection(valueIndex);
+      }
       table.showSelection();
 
       // fire slider position
