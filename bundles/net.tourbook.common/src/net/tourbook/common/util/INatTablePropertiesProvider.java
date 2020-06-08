@@ -1,6 +1,6 @@
 /*******************************************************************************
  * Copyright (C) 2020 Wolfgang Schramm and Contributors
- *
+ * 
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
@@ -15,11 +15,14 @@
  *******************************************************************************/
 package net.tourbook.common.util;
 
+import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.hideshow.ColumnHideShowLayer;
 import org.eclipse.nebula.widgets.nattable.layer.DataLayer;
 import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
 
 public interface INatTablePropertiesProvider {
+
+   public NatTable getNatTable();
 
    public ColumnHideShowLayer getNatTable_Body_ColumnHideShowLayer();
 
@@ -27,4 +30,4 @@ public interface INatTablePropertiesProvider {
 
    public DataLayer getNatTable_Body_DataLayer();
 
-} 
+}

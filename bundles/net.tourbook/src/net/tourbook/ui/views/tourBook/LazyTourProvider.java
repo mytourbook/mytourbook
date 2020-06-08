@@ -82,15 +82,10 @@ public class LazyTourProvider {
       _tourBookView = tourBookView;
    }
 
-   void dispose() {
-
-      resetTourItems();
-   }
-
    private int fetchNumberOfItems() {
 
       final SQLFilter sqlFilter = new SQLFilter(SQLFilter.TAG_FILTER);
-
+ 
       // get number of tours
       final String sql = NL
 

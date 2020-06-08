@@ -38,7 +38,7 @@ import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.IContextMenuProvider;
-import net.tourbook.common.util.INatTablePropertiesProvider; 
+import net.tourbook.common.util.INatTablePropertiesProvider;
 import net.tourbook.common.util.ITourViewer3;
 import net.tourbook.common.util.ITreeViewer;
 import net.tourbook.common.util.NatTable_LabelProvider;
@@ -1507,10 +1507,12 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
                defineAllColumns();
 
-               _tourViewer_Tree = (TreeViewer) recreateViewer(_tourViewer_Tree);
+               recreateViewer_NatTable();
+               _tourViewer_Table = (TableViewer) recreateViewer_Table();
+               _tourViewer_Tree = (TreeViewer) recreateViewer_Tree();
 
             } else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
-
+ 
                _tourViewer_Tree.getTree().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
                _tourViewer_Tree.refresh();
@@ -1537,8 +1539,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
             if (property.equals(ICommonPreferences.TIME_ZONE_LOCAL_ID)) {
 
-               _tourViewer_Table = (TableViewer) recreateViewer(_tourViewer_Table);
-               _tourViewer_Tree = (TreeViewer) recreateViewer(_tourViewer_Tree);
+               recreateViewer_NatTable();
+               _tourViewer_Table = (TableViewer) recreateViewer_Table();
+               _tourViewer_Tree = (TreeViewer) recreateViewer_Tree();
             }
          }
       };
@@ -1655,7 +1658,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
 //            _tourInfoToolTip_NatTable.hideToolTip();
 
-            fillContextMenu(manager);
+            fillContextMenu(manager, false);
          }
       });
 
@@ -1667,7 +1670,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
 //            _tourInfoToolTip_Table.hideToolTip();
 
-            fillContextMenu(manager);
+            fillContextMenu(manager, false);
          }
       });
 
@@ -1679,7 +1682,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
             _tourInfoToolTip_Tree.hideToolTip();
 
-            fillContextMenu(manager);
+            fillContextMenu(manager, true);
          }
       });
    }
@@ -1696,6 +1699,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       // define all columns for the viewer
       _columnManager_NatTable = new ColumnManager(this, _state_NatTable);
+      _columnManager_NatTable.setIsCategoryAvailable(true);
 
       _columnManager_Table = new ColumnManager(this, _state_Table);
       _columnManager_Table.setIsCategoryAvailable(true);
@@ -6803,11 +6807,17 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _prefStore.removePropertyChangeListener(_prefChangeListener);
       _prefStoreCommon.removePropertyChangeListener(_prefChangeListenerCommon);
 
+      if (_natTable_DataProvider != null) {
+         _natTable_DataProvider.resetTourItems();
+         _natTable_DataProvider = null;
+      }
       if (_tableTourProvider != null) {
-         _tableTourProvider.dispose();
+         _tableTourProvider.resetTourItems();
+         _tableTourProvider = null;
       }
       if (_rootItem_Tree != null) {
          _rootItem_Tree.clearChildren();
+         _rootItem_Tree = null;
       }
 
       super.dispose();
@@ -6958,7 +6968,12 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       tbm.update(true);
    }
 
-   private void fillContextMenu(final IMenuManager menuMgr) {
+   /**
+    * @param menuMgr
+    * @param isTree
+    *           When <code>true</code> then tree actions are also displayed.
+    */
+   private void fillContextMenu(final IMenuManager menuMgr, final boolean isTree) {
 
       menuMgr.add(_actionEditQuick);
       menuMgr.add(_actionEditTour);
@@ -6976,10 +6991,14 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       menuMgr.add(_actionSetTourType);
       TourTypeMenuManager.fillMenuWithRecentTourTypes(menuMgr, this, true);
 
-      menuMgr.add(new Separator());
-      menuMgr.add(_actionCollapseOthers);
-      menuMgr.add(_actionExpandSelection);
-      menuMgr.add(_actionCollapseAll);
+      // add tree only items
+      if (isTree) {
+
+         menuMgr.add(new Separator());
+         menuMgr.add(_actionCollapseOthers);
+         menuMgr.add(_actionExpandSelection);
+         menuMgr.add(_actionCollapseAll);
+      }
 
       menuMgr.add(new Separator());
       menuMgr.add(_actionExportTour);
@@ -6998,6 +7017,11 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    @Override
    public ColumnManager getColumnManager() {
       return _columnManager_Tree;
+   }
+
+   @Override
+   public NatTable getNatTable()  {
+      return _tourViewer_NatTable;
    }
 
    @Override
@@ -7474,58 +7498,86 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    @Override
    public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
 
-      if (_isLayoutTable) {
+      if (_isLayoutNatTable) {
 
-         _viewerContainer_Table.setRedraw(false);
-         {
-            final ISelection selection = _tourViewer_Table.getSelection();
+         return recreateViewer_NatTable();
 
-            final Table table_Old = _tourViewer_Table.getTable();
-            table_Old.dispose();
+      } else if (_isLayoutTable) {
 
-            createUI_30_TourViewer_Table(_viewerContainer_Table);
-            _viewerContainer_Table.layout();
-
-            setupTourViewerContent();
-
-            _tourViewer_Table.setSelection(selection);
-
-            // ensure that the selected item also has the focus, these are 2 different things !
-            final Table table_New = _tourViewer_Table.getTable();
-            table_New.setSelection(table_New.getSelectionIndex());
-            table_New.setFocus();
-         }
-         _viewerContainer_Table.setRedraw(true);
-
-         return _tourViewer_Table;
-
-      } else if (_isLayoutNatTable) {
-
-         setupTourViewerContent();
-
-         return null;
+         return recreateViewer_Table();
 
       } else {
 
-         _viewerContainer_Tree.setRedraw(false);
-         {
-            final Object[] expandedElements = _tourViewer_Tree.getExpandedElements();
-            final ISelection selection = _tourViewer_Tree.getSelection();
-
-            _tourViewer_Tree.getTree().dispose();
-
-            createUI_20_TourViewer_Tree(_viewerContainer_Tree);
-            _viewerContainer_Tree.layout();
-
-            setupTourViewerContent();
-
-            _tourViewer_Tree.setExpandedElements(expandedElements);
-            _tourViewer_Tree.setSelection(selection);
-         }
-         _viewerContainer_Tree.setRedraw(true);
-
-         return _tourViewer_Tree;
+         return recreateViewer_Tree();
       }
+   }
+
+   private ColumnViewer recreateViewer_NatTable() {
+
+      _viewerContainer_NatTable.setRedraw(false);
+      {
+         // maybe prevent memory leaks
+         _natTable_DataProvider.resetTourItems();
+
+         _tourViewer_NatTable.dispose();
+
+         createUI_40_TourViewer_NatTable(_viewerContainer_NatTable);
+      }
+      _viewerContainer_NatTable.setRedraw(true);
+
+      _viewerContainer_NatTable.layout(true, true);
+
+      setupTourViewerContent();
+
+      return null;
+   }
+
+   private ColumnViewer recreateViewer_Table() {
+
+      _viewerContainer_Table.setRedraw(false);
+      {
+         final ISelection selection = _tourViewer_Table.getSelection();
+
+         final Table table_Old = _tourViewer_Table.getTable();
+         table_Old.dispose();
+
+         createUI_30_TourViewer_Table(_viewerContainer_Table);
+         _viewerContainer_Table.layout();
+
+         setupTourViewerContent();
+
+         _tourViewer_Table.setSelection(selection);
+
+         // ensure that the selected item also has the focus, these are 2 different things !
+         final Table table_New = _tourViewer_Table.getTable();
+         table_New.setSelection(table_New.getSelectionIndex());
+         table_New.setFocus();
+      }
+      _viewerContainer_Table.setRedraw(true);
+
+      return _tourViewer_Table;
+   }
+
+   private ColumnViewer recreateViewer_Tree() {
+
+      _viewerContainer_Tree.setRedraw(false);
+      {
+         final Object[] expandedElements = _tourViewer_Tree.getExpandedElements();
+         final ISelection selection = _tourViewer_Tree.getSelection();
+
+         _tourViewer_Tree.getTree().dispose();
+
+         createUI_20_TourViewer_Tree(_viewerContainer_Tree);
+         _viewerContainer_Tree.layout();
+
+         setupTourViewerContent();
+
+         _tourViewer_Tree.setExpandedElements(expandedElements);
+         _tourViewer_Tree.setSelection(selection);
+      }
+      _viewerContainer_Tree.setRedraw(true);
+
+      return _tourViewer_Tree;
    }
 
    @Override
@@ -7538,7 +7590,13 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _tableTourProvider.resetTourItems();
       _natTable_DataProvider.resetTourItems();
 
-      if (_isLayoutTable) {
+      if (_isLayoutNatTable) {
+
+         _natTable_DataProvider.cleanup_Tours();
+
+         setupTourViewerContent();
+
+      } else if (_isLayoutTable) {
 
          final Table table = _tourViewer_Table.getTable();
          table.setRedraw(false);
@@ -7552,12 +7610,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          }
          _isInReload = false;
          table.setRedraw(true);
-
-      } else if (_isLayoutNatTable) {
-
-         _natTable_DataProvider.cleanup_Tours();
-
-         setupTourViewerContent();
 
       } else {
 

@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.common.util;
 
+import gnu.trove.list.array.TIntArrayList;
+ 
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
@@ -58,8 +60,10 @@ import org.eclipse.nebula.widgets.nattable.hideshow.ColumnHideShowLayer;
 import org.eclipse.nebula.widgets.nattable.layer.DataLayer;
 import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
 import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
+import org.eclipse.nebula.widgets.nattable.resize.command.InitializeAutoResizeColumnsCommand;
+import org.eclipse.nebula.widgets.nattable.selection.command.SelectAllCommand;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.SWT; 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.SelectionListener;
@@ -167,8 +171,8 @@ public class ColumnManager {
    private AdvancedSlideoutShell             _slideoutShell;
 
    /**
-    * Provides properties from a {@link NatTable}, is <code>null</code> when a NatTable is not
-    * supported.
+    * When {@link #_natTablePropertiesProvider} is defined then this {@link ColumnManager} is used
+    * for a {@link NatTable}, it provides properties from a {@link NatTable}.
     */
    private INatTablePropertiesProvider       _natTablePropertiesProvider;
 
@@ -244,61 +248,80 @@ public class ColumnManager {
 
       // larger tables/trees needs more time to resize
 
-      BusyIndicator.showWhile(_columnViewer.getControl().getDisplay(), new Runnable() {
-         @Override
-         public void run() {
+      if (_natTablePropertiesProvider != null) {
 
-            boolean isColumn0Visible = true;
+         final NatTable natTable = _natTablePropertiesProvider.getNatTable();
 
-            if (_tourViewer instanceof ITourViewer2) {
-               isColumn0Visible = ((ITourViewer2) _tourViewer).isColumn0Visible(_columnViewer);
-            }
+//         natTable.doCommand(command);
 
-            if (_columnViewer instanceof TableViewer) {
+         _natTablePropertiesProvider.getNatTable_Body_DataLayer();
 
-               final Table table = ((TableViewer) _columnViewer).getTable();
-               if (table.isDisposed()) {
-                  return;
+         // Select all columns
+         gridLayer.doCommand(new SelectAllCommand());
+
+         // Resize all selected columns
+         final InitializeAutoResizeColumnsCommand command = new InitializeAutoResizeColumnsCommand(gridLayer, 1, this.configRegistry, this.gcFactory);
+         gridLayer.doCommand(command);
+
+      } else {
+
+         BusyIndicator.showWhile(_columnViewer.getControl().getDisplay(), new Runnable() {
+            @Override
+            public void run() {
+
+               boolean isColumn0Visible = true;
+
+               if (_tourViewer instanceof ITourViewer2) {
+                  isColumn0Visible = ((ITourViewer2) _tourViewer).isColumn0Visible(_columnViewer);
                }
 
-               table.setRedraw(false);
-               {
-                  final TableColumn[] allColumns = table.getColumns();
+               if (_columnViewer instanceof TableViewer) {
 
-                  for (int columnIndex = 0; columnIndex < allColumns.length; columnIndex++) {
-                     final TableColumn tableColumn = allColumns[columnIndex];
-                     if (columnIndex == 0) {
+                  final Table table = ((TableViewer) _columnViewer).getTable();
+                  if (table.isDisposed()) {
+                     return;
+                  }
 
-                        if (isColumn0Visible) {
-                           tableColumn.pack();
+                  table.setRedraw(false);
+                  {
+                     final TableColumn[] allColumns = table.getColumns();
+
+                     for (int columnIndex = 0; columnIndex < allColumns.length; columnIndex++) {
+                        final TableColumn tableColumn = allColumns[columnIndex];
+                        if (columnIndex == 0) {
+
+                           if (isColumn0Visible) {
+                              tableColumn.pack();
+                           } else {
+                              tableColumn.setWidth(0);
+                           }
                         } else {
-                           tableColumn.setWidth(0);
+                           tableColumn.pack();
                         }
-                     } else {
+                     }
+                  }
+                  table.setRedraw(true);
+
+               } else if (_columnViewer instanceof TreeViewer) {
+
+                  final Tree tree = ((TreeViewer) _columnViewer).getTree();
+                  if (tree.isDisposed()) {
+                     return;
+                  }
+
+                  tree.setRedraw(false);
+                  {
+                     final TreeColumn[] allColumns = tree.getColumns();
+                     for (final TreeColumn tableColumn : allColumns) {
                         tableColumn.pack();
                      }
                   }
+                  tree.setRedraw(true);
                }
-               table.setRedraw(true);
-
-            } else if (_columnViewer instanceof TreeViewer) {
-
-               final Tree tree = ((TreeViewer) _columnViewer).getTree();
-               if (tree.isDisposed()) {
-                  return;
-               }
-
-               tree.setRedraw(false);
-               {
-                  final TreeColumn[] allColumns = tree.getColumns();
-                  for (final TreeColumn tableColumn : allColumns) {
-                     tableColumn.pack();
-                  }
-               }
-               tree.setRedraw(true);
             }
-         }
-      });
+         });
+      }
+
    }
 
    void action_SetValueFormatter(final ColumnDefinition colDef,
@@ -921,8 +944,6 @@ public class ColumnManager {
             final boolean isTableHeaderHit = clientArea.y <= mousePosition.y
                   && mousePosition.y < (clientArea.y + headerHeight);
 
-            _headerColumnItem = getHeaderColumn(natTable, mousePosition, isTableHeaderHit, columnHeaderLayer);
-
             Menu contextMenu = getContextMenu(isTableHeaderHit, headerContextMenu[0], defaultContextMenuProvider);
 
             if (contextMenu != null) {
@@ -968,6 +989,8 @@ public class ColumnManager {
             /*
              * Set context menu position to the right border of the column
              */
+            _headerColumnItem = getHeaderColumn(natTable, mousePosition, isTableHeaderHit, columnHeaderLayer);
+
             if (_headerColumnItem != null) {
 
                int posX = _headerColumnItem.columnRightBorder;
@@ -1336,9 +1359,46 @@ public class ColumnManager {
     */
    private String[] getColumns_FromViewer_IdAndWidth() {
 
-      final ArrayList<String> columnIdsAndWidth = new ArrayList<>();
+      final ArrayList<String> allColumnIdsAndWidth = new ArrayList<>();
 
-      if (_columnViewer instanceof TableViewer) {
+      if (_natTablePropertiesProvider != null) {
+
+         final DataLayer dataLayer = _natTablePropertiesProvider.getNatTable_Body_DataLayer();
+         final ColumnHideShowLayer columnHideShowLayer = _natTablePropertiesProvider.getNatTable_Body_ColumnHideShowLayer();
+         final ColumnReorderLayer columnReorderLayer = _natTablePropertiesProvider.getNatTable_Body_ColumnReorderLayer();
+
+         final int numColumns = dataLayer.getColumnCount();
+
+         for (int columnIndex = 0; columnIndex < numColumns; columnIndex++) {
+
+            /*
+             * This looks a bit complicated, it is. It respects reordered and hidden columns. This
+             * solution was found with trial and error until it worked.
+             */
+
+            // the reorder layer contains the correct column order for cases when columns are moved with drag&drop
+            final int reorderColIndex = columnReorderLayer.getColumnIndexByPosition(columnIndex);
+
+            final int colIndexByPos = dataLayer.getColumnIndexByPosition(reorderColIndex);
+
+            // the column hide show layer has the info if a column was set to hidden by the user
+            final boolean isColumnHidden = columnHideShowLayer.isColumnIndexHidden(colIndexByPos);
+            if (isColumnHidden) {
+               continue;
+            }
+
+            final ColumnDefinition colDef = getColDef_ByCreateIndex(colIndexByPos);
+            if (colDef != null) {
+
+               final int colWidthByPos = dataLayer.getColumnWidthByPosition(reorderColIndex);
+
+               final String columnId = colDef.getColumnId();
+
+               setColumnIdAndWidth(allColumnIdsAndWidth, columnId, colWidthByPos);
+            }
+         }
+
+      } else if (_columnViewer instanceof TableViewer) {
 
          final Table table = ((TableViewer) _columnViewer).getTable();
          if (table.isDisposed()) {
@@ -1350,7 +1410,7 @@ public class ColumnManager {
             final String columnId = ((ColumnDefinition) column.getData()).getColumnId();
             final int columnWidth = column.getWidth();
 
-            setColumnIdAndWidth(columnIdsAndWidth, columnId, columnWidth);
+            setColumnIdAndWidth(allColumnIdsAndWidth, columnId, columnWidth);
          }
 
       } else if (_columnViewer instanceof TreeViewer) {
@@ -1365,15 +1425,15 @@ public class ColumnManager {
             final String columnId = ((TreeColumnDefinition) column.getData()).getColumnId();
             final int columnWidth = column.getWidth();
 
-            setColumnIdAndWidth(columnIdsAndWidth, columnId, columnWidth);
+            setColumnIdAndWidth(allColumnIdsAndWidth, columnId, columnWidth);
          }
       }
 
-      return columnIdsAndWidth.toArray(new String[columnIdsAndWidth.size()]);
+      return allColumnIdsAndWidth.toArray(new String[allColumnIdsAndWidth.size()]);
    }
 
    /**
-    * Read the column order from a table/tree.
+    * Read the column order from a table/tree and nattable
     *
     * @return Returns <code>null</code> when table/tree cannot be accessed.
     */
@@ -1647,14 +1707,72 @@ public class ColumnManager {
    /**
     * Read the order/width for the columns, this is necessary because the user can have rearranged
     * the columns and/or resized the columns with the mouse.
-    * <p>
-    * This will also update the model with the current column width.
     *
     * @return Returns ALL columns, first the visible then the hidden columns.
     */
    public ArrayList<ColumnDefinition> getRearrangedColumns() {
 
-      final ArrayList<ColumnDefinition> allRearrangedColumns = new ArrayList<>();
+      /*
+       * Get column order from viewer
+       */
+      int[] columnOrder = null;
+
+      if (_natTablePropertiesProvider != null) {
+
+         final DataLayer dataLayer = _natTablePropertiesProvider.getNatTable_Body_DataLayer();
+         final ColumnHideShowLayer columnHideShowLayer = _natTablePropertiesProvider.getNatTable_Body_ColumnHideShowLayer();
+         final ColumnReorderLayer columnReorderLayer = _natTablePropertiesProvider.getNatTable_Body_ColumnReorderLayer();
+
+         final int numColumns = dataLayer.getColumnCount();
+
+         final TIntArrayList allOrderedColumns = new TIntArrayList();
+
+         for (int columnIndex = 0; columnIndex < numColumns; columnIndex++) {
+
+            /*
+             * This looks a bit complicated, it is. It respects reordered and hidden columns. This
+             * solution was found with trial and error until it worked.
+             */
+
+            // the reorder layer contains the correct column order for cases when columns are moved with drag&drop
+            final int reorderColIndex = columnReorderLayer.getColumnIndexByPosition(columnIndex);
+
+            final int colIndexByPos = dataLayer.getColumnIndexByPosition(reorderColIndex);
+
+            // the column hide show layer has the info if a column was set to hidden by the user
+            final boolean isColumnHidden = columnHideShowLayer.isColumnIndexHidden(colIndexByPos);
+            if (isColumnHidden) {
+               continue;
+            }
+
+            allOrderedColumns.add(colIndexByPos);
+         }
+
+         columnOrder = allOrderedColumns.toArray();
+
+      } else {
+
+         if (_columnViewer instanceof TableViewer) {
+
+            final Table table = ((TableViewer) _columnViewer).getTable();
+            if (table.isDisposed()) {
+               return null;
+            }
+            columnOrder = table.getColumnOrder();
+
+         } else if (_columnViewer instanceof TreeViewer) {
+
+            final Tree tree = ((TreeViewer) _columnViewer).getTree();
+            if (tree.isDisposed()) {
+               return null;
+            }
+            columnOrder = tree.getColumnOrder();
+         }
+      }
+
+      /*
+       * Clone all columns
+       */
       final ArrayList<ColumnDefinition> allColDefClone = new ArrayList<>();
 
       try {
@@ -1665,31 +1783,11 @@ public class ColumnManager {
          StatusUtil.log(e);
       }
 
-      int[] columnOrder = null;
-
       /*
-       * get column order from viewer
+       * Add visible columns in the current sort order
        */
-      if (_columnViewer instanceof TableViewer) {
+      final ArrayList<ColumnDefinition> allRearrangedColumns = new ArrayList<>();
 
-         final Table table = ((TableViewer) _columnViewer).getTable();
-         if (table.isDisposed()) {
-            return null;
-         }
-         columnOrder = table.getColumnOrder();
-
-      } else if (_columnViewer instanceof TreeViewer) {
-
-         final Tree tree = ((TreeViewer) _columnViewer).getTree();
-         if (tree.isDisposed()) {
-            return null;
-         }
-         columnOrder = tree.getColumnOrder();
-      }
-
-      /*
-       * Add visible columns in the sort order of the modify dialog
-       */
       for (final int createIndex : columnOrder) {
 
          final ColumnDefinition colDef = getColDef_ByCreateIndex(createIndex);
