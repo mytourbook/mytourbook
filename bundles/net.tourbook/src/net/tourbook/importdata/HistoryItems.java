@@ -618,7 +618,6 @@ class HistoryItems {
                if (addlistener) {
                   createLinkFolderInfoSelectionAdapter(dropboxFileSystem.getPreferencePageId());
                }
-
             }
          } else {
 
