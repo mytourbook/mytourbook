@@ -245,7 +245,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
          {
             /*
              * Options to select all the time slices in between the left and right sliders or only
-             * the left and right slider ones
+             * the current slider's one
              */
             _chkSelectAllTimeSlices = new Button(container, SWT.CHECK);
             _chkSelectAllTimeSlices.setText(Messages.Tour_Action_Select_Inbetween_Timeslices);
@@ -335,7 +335,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
       final TourChartConfiguration tcc = _tourChart.getTourChartConfig();
 
       if (tcc == null) {
-         // this occured when tour chart is empty
+         // this occurred when tour chart is empty
          return;
       }
 
