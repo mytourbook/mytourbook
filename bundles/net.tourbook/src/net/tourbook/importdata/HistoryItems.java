@@ -595,10 +595,10 @@ class HistoryItems {
 
          if (NIO.isTourBookFileSystem(modifiedFolder)) {
 
-            final TourbookFileSystem dropboxFileSystem = FileSystemManager.getTourbookFileSystem(modifiedFolder);
-            if (dropboxFileSystem != null) {
+            final TourbookFileSystem tourbookFileSystem = FileSystemManager.getTourbookFileSystem(modifiedFolder);
+            if (tourbookFileSystem != null) {
 
-               folderInfoMessage.append(NLS.bind(Messages.Action_FileSystem_Preferences, dropboxFileSystem.getId()));
+               folderInfoMessage.append(NLS.bind(Messages.Action_FileSystem_Preferences, tourbookFileSystem.getId()));
 
                boolean addlistener = true;
                for (final Listener listener : _linkFolderInfo.getListeners(SWT.Selection)) {
@@ -607,7 +607,7 @@ class HistoryItems {
                   }
                }
                if (addlistener) {
-                  createLinkFolderInfoSelectionAdapter(dropboxFileSystem.getPreferencePageId());
+                  createLinkFolderInfoSelectionAdapter(tourbookFileSystem.getPreferencePageId());
                }
             }
          } else {
