@@ -63,6 +63,15 @@ public class NIO {
          // replace device name with drive letter, [MEDIA]\CACHE ->  D:\CACHE
 
          final String deviceName = parseDeviceName(folder);
+
+         if (isTourBookFileSystem(deviceName)) {
+            final TourbookFileSystem tourbookFileSystem = FileSystemManager.getTourbookFileSystem(deviceName);
+
+            osPath = folder.replace(tourbookFileSystem.getDisplayId(), tourbookFileSystem.getId());
+
+            return osPath;
+         }
+
          final Iterable<FileStore> fileStores = getFileStores();
 
          for (final FileStore store : fileStores) {

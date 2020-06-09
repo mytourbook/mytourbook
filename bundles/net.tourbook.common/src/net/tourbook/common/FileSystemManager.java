@@ -157,7 +157,8 @@ public class FileSystemManager {
       getFileSystemsList();
 
       final Optional<TourbookFileSystem> fileSystemSearchResult = _fileSystemsList.stream()
-            .filter(tfs -> deviceFolder.toLowerCase().startsWith(tfs.getId().toLowerCase()))
+            .filter(tfs -> deviceFolder.toLowerCase().startsWith(tfs.getId().toLowerCase()) ||
+                  deviceFolder.toLowerCase().startsWith(tfs.getDisplayId().toLowerCase()))
             .findAny();
 
       if (fileSystemSearchResult.isPresent()) {

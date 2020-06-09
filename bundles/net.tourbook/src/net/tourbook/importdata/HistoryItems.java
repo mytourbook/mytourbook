@@ -552,15 +552,13 @@ class HistoryItems {
 
                      if (NIO.isDeviceNameFolder(cleanedFolderName)) {
 
-                        // this is a device folder name
+                        if (NIO.isTourBookFileSystem(cleanedFolderName)) {
 
-                        _linkFolderInfo.setText(osFolder);
+                           _linkFolderInfo.setText(modifiedFolder);
+                        } else {
+                           // this is a device folder name
 
-                     } else if (NIO.isTourBookFileSystem(cleanedFolderName)) {
-
-                        final TourbookFileSystem dropboxFileSystem = FileSystemManager.getTourbookFileSystem(cleanedFolderName);
-                        if (dropboxFileSystem != null) {
-                           _linkFolderInfo.setText(cleanedFolderName);
+                           _linkFolderInfo.setText(osFolder);
                         }
                      } else {
 
@@ -573,13 +571,11 @@ class HistoryItems {
                            _linkFolderInfo.setText(deviceFolder);
                         }
                      }
-
                   } else {
 
                      _linkFolderInfo.setText(UI.EMPTY_STRING);
                   }
                }
-
             } catch (final Exception e) {
                isFolderValid = false;
             }

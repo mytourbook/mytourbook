@@ -53,6 +53,16 @@ public abstract class TourbookFileSystem {
    protected abstract File copyFileLocally(String filePath);
 
    /**
+    * Gets the unique identifier of the file system displayed
+    * as a device.
+    *
+    * @return
+    */
+   public String getDisplayId() {
+      return NIO.DEVICE_FOLDER_NAME_START + FILE_SYSTEM_ID + "]"; //$NON-NLS-1$
+   }
+
+   /**
     * Retrieves a list of {@link FileStore} for the file system.
     *
     * @return
