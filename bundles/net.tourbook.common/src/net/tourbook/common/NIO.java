@@ -26,6 +26,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.StringUtils;
 
 /**
  * Tools for the java.nio package.
@@ -183,23 +184,9 @@ public class NIO {
     *         {@link TourBookFileSystem#getId()}.
     */
    public static boolean isTourBookFileSystem(final String folderName) {
-      if (folderName == null) {
-         return false;
-      }
 
-      final List<String> tourBookFileSystemIds = FileSystemManager.getFileSystemsIds();
-
-      //TODO FB send the apirate limit exception in java7-fs-dropbox
-      //if its the reason why its slow switching from one dropbox config to another, mention that to Wolfgang
-      //TODO FB check the history items in windows HistoryItems line 566
-      //TODO DO a thorough testing with an empty db and metadata
-      for (final String tourBookFileSystemId : tourBookFileSystemIds) {
-         if (folderName.toLowerCase().startsWith(tourBookFileSystemId.toLowerCase())) {
-            return true;
-         }
-      }
-
-      return false;
+      return !StringUtils.isNullOrEmpty(folderName) &&
+            FileSystemManager.getTourbookFileSystem(folderName) != null;
    }
 
    private static String parseDeviceName(final String fullName) {
