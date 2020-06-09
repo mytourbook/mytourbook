@@ -544,7 +544,7 @@ public interface ITourbookPreferences {
     * Indicator to either select all time slices in between left and right slider or just the
     * current slider's time slice.
     */
-   public static final String TOGGLE_STATE_SELECT_INBETWEEN_TIME_SLICES = "TOGGLE_STATE_SELECT_ALL_TIME_SLICES"; //$NON-NLS-1$
+   public static final String TOGGLE_STATE_SELECT_INBETWEEN_TIME_SLICES = "TOGGLE_STATE_SELECT_INBETWEEN_TIME_SLICES"; //$NON-NLS-1$
 
    /*
     * Map 2 D
