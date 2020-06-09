@@ -4153,6 +4153,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
          _lblIC_BackupFolder.setEnabled(false);
          _btnIC_SelectBackupFolder.setEnabled(false);
          _backupHistoryItems.setIsValidateFolder(false);
+         _backupHistoryItems.validateModifiedPath();
       }
    }
 
