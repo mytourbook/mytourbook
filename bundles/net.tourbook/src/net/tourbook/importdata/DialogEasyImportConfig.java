@@ -4137,7 +4137,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
       if (isDeviceLocal && NIO.isTourBookFileSystem(deviceFolder)) {
          deviceFolder = UI.EMPTY_STRING;
-      } else if (!isDeviceLocal && StringUtils.isNullOrEmpty(deviceFolder)) {
+      } else if (!isDeviceLocal &&
+            !NIO.isTourBookFileSystem(deviceFolder)) {
          deviceFolder = _comboIC_DeviceType.getText();
       }
       _comboIC_DeviceFolder.setText(deviceFolder);
