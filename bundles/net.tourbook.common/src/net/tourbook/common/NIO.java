@@ -47,8 +47,8 @@ public class NIO {
     * the path exists.
     *
     * @param folder
-    * @return Returns the os path or <code>null</code> when the device name cannot be converted into
-    *         a driveletter.
+    * @return Returns the OS path or <code>null</code> when the device name cannot be converted into
+    *         a drive letter.
     */
    public static String convertToOSPath(final String folder) {
 
@@ -179,7 +179,7 @@ public class NIO {
     *
     * @param folderName
     *           A given folder name
-    * @return Returns true when the folder name is equal to
+    * @return Returns true when the folder name starts with
     *         {@link TourBookFileSystem#getId()}.
     */
    public static boolean isTourBookFileSystem(final String folderName) {
@@ -189,8 +189,12 @@ public class NIO {
 
       final List<String> tourBookFileSystemIds = FileSystemManager.getFileSystemsIds();
 
+      //TODO FB send the apirate limit exception in java7-fs-dropbox
+      //if its the reason why its slow switching from one dropbox config to another, mention that to Wolfgang
+      //TODO FB check the history items in windows HistoryItems line 566
+      //TODO DO a thorough testing with an empty db and metadata
       for (final String tourBookFileSystemId : tourBookFileSystemIds) {
-         if (tourBookFileSystemId.equalsIgnoreCase(folderName.toLowerCase())) {
+         if (folderName.toLowerCase().startsWith(tourBookFileSystemId.toLowerCase())) {
             return true;
          }
       }

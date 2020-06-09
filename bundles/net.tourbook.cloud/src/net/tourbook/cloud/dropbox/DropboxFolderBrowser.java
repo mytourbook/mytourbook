@@ -61,7 +61,7 @@ import org.eclipse.swt.widgets.Text;
 
 public class DropboxFolderBrowser extends TitleAreaDialog {
 
-   private static final String   ROOT_FOLDER    = "/";                           //$NON-NLS-1$
+   private static final String   ROOT_FOLDER    = "/";                                             //$NON-NLS-1$
 
    private static String         _accessToken;
 
@@ -75,8 +75,7 @@ public class DropboxFolderBrowser extends TitleAreaDialog {
 
    private boolean               _isInErrorState;
 
-   private final IDialogSettings _state         = TourbookPlugin
-         .getState("DropboxFolderBrowser");                                      //$NON-NLS-1$
+   private final IDialogSettings _state         = TourbookPlugin.getState("DropboxFolderBrowser"); //$NON-NLS-1$
    /*
     * Browser UI controls
     */
@@ -127,6 +126,10 @@ public class DropboxFolderBrowser extends TitleAreaDialog {
 
       // set text for the OK button
       getButton(IDialogConstants.OK_ID).setText(Messages.Dialog_DropboxBrowser_Button_SelectFolder);
+
+      if (_isInErrorState) {
+         getButton(IDialogConstants.OK_ID).setEnabled(false);
+      }
    }
 
    @Override

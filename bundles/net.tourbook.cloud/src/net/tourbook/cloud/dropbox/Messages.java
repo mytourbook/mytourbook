@@ -37,8 +37,6 @@ public class Messages extends NLS {
    public static String        Pref_CloudConnectivity_Dropbox_AccessToken_Retrieval_Title;
    public static String        Pref_CloudConnectivity_Dropbox_AccessToken_Retrieved;
    public static String        Pref_CloudConnectivity_Dropbox_Button_Authorize;
-   public static String        Pref_CloudConnectivity_Dropbox_Button_ChooseFolder;
-   public static String        Pref_CloudConnectivity_Dropbox_FolderPath_Tooltip;
 
    static {
       // initialize resource bundle

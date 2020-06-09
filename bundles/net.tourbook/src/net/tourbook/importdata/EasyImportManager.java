@@ -84,6 +84,7 @@ public class EasyImportManager {
    private static final String      ATTR_BACKUP_FOLDER                        = "backupFolder";                                     //$NON-NLS-1$
    private static final String      ATTR_DEVICE_FILES                         = "deviceFiles";                                      //$NON-NLS-1$
    private static final String      ATTR_DEVICE_FOLDER                        = "deviceFolder";                                     //$NON-NLS-1$
+   private static final String      ATTR_DEVICE_TYPE                          = "deviceType";                                       //$NON-NLS-1$
    private static final String      ATTR_IS_ACTIVE_CONFIG                     = "isActiveConfig";                                   //$NON-NLS-1$
    private static final String      ATTR_IS_CREATE_BACKUP                     = "isCreateBackup";                                   //$NON-NLS-1$
    private static final String      ATTR_IS_DELETE_DEVICE_FILES               = "isDeleteDeviceFiles";                              //$NON-NLS-1$
@@ -465,7 +466,8 @@ public class EasyImportManager {
                   OSFile deviceFile;
 
                   if (NIO.isTourBookFileSystem(folder)) {
-                     deviceFile = new OSFile(Paths.get(folder, path.toString()));
+                     final String fileName = path.getFileName().toString();
+                     deviceFile = new OSFile(Paths.get(folder, fileName));
                   } else {
                      deviceFile = new OSFile(path);
                   }
@@ -695,6 +697,7 @@ public class EasyImportManager {
 
       importConfig.setBackupFolder(Util.getXmlString(xmlConfig, ATTR_BACKUP_FOLDER, UI.EMPTY_STRING));
       importConfig.setDeviceFolder(Util.getXmlString(xmlConfig, ATTR_DEVICE_FOLDER, UI.EMPTY_STRING));
+      importConfig.setDeviceType(Util.getXmlInteger(xmlConfig, ATTR_DEVICE_TYPE, 0));
 
       importConfig.fileGlobPattern = Util.getXmlString(
             xmlConfig,
@@ -1079,6 +1082,7 @@ public class EasyImportManager {
 
          xmlConfig.putString(ATTR_BACKUP_FOLDER, importConfig.getBackupFolder());
          xmlConfig.putString(ATTR_DEVICE_FOLDER, importConfig.getDeviceFolder());
+         xmlConfig.putInteger(ATTR_DEVICE_TYPE, importConfig.getDeviceType());
 
          xmlConfig.putString(ATTR_DEVICE_FILES, importConfig.fileGlobPattern);
       }

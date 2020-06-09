@@ -31,6 +31,7 @@ public class ImportConfig implements Cloneable {
    public boolean             isCreateBackup       = true;
    private String             _backupFolder        = UI.EMPTY_STRING;
 
+   private int                _deviceType          = 0;
    private String             _deviceFolder        = UI.EMPTY_STRING;
 
    /**
@@ -113,6 +114,10 @@ public class ImportConfig implements Cloneable {
       return getOSFolder(_deviceFolder);
    }
 
+   public int getDeviceType() {
+      return _deviceType;
+   }
+
    public long getId() {
       return _id;
    }
@@ -164,6 +169,10 @@ public class ImportConfig implements Cloneable {
       _deviceFolder = deviceFolder;
    }
 
+   public void setDeviceType(final int deviceType) {
+      this._deviceType = deviceType;
+   }
+
    @Override
    public String toString() {
 
@@ -175,6 +184,7 @@ public class ImportConfig implements Cloneable {
             + ("isTurnOffWatching=" + isTurnOffWatching + ", \n") //$NON-NLS-1$ //$NON-NLS-2$
             + ("_id=" + _id + ", \n") //$NON-NLS-1$ //$NON-NLS-2$
             + ("_backupFolder=" + _backupFolder + ", \n") //$NON-NLS-1$ //$NON-NLS-2$
+            + ("_deviceType=" + _deviceType + ", \n") //$NON-NLS-1$ //$NON-NLS-2$
             + ("_deviceFolder=" + _deviceFolder + ", \n") //$NON-NLS-1$ //$NON-NLS-2$
             + ("deviceFiles=" + fileGlobPattern) //$NON-NLS-1$
 
