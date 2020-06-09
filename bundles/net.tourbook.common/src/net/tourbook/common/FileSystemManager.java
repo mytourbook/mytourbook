@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import net.tourbook.common.util.StringUtils;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
@@ -147,6 +149,10 @@ public class FileSystemManager {
     * @return
     */
    public static TourbookFileSystem getTourbookFileSystem(final String deviceFolder) {
+
+      if (StringUtils.isNullOrEmpty(deviceFolder)) {
+         return null;
+      }
 
       getFileSystemsList();
 

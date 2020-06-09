@@ -26,7 +26,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.tourbook.common.util.StatusUtil;
-import net.tourbook.common.util.StringUtils;
 
 /**
  * Tools for the java.nio package.
@@ -185,8 +184,7 @@ public class NIO {
     */
    public static boolean isTourBookFileSystem(final String folderName) {
 
-      return !StringUtils.isNullOrEmpty(folderName) &&
-            FileSystemManager.getTourbookFileSystem(folderName) != null;
+      return FileSystemManager.getTourbookFileSystem(folderName) != null;
    }
 
    private static String parseDeviceName(final String fullName) {
