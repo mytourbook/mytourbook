@@ -1512,7 +1512,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
                _tourViewer_Tree = (TreeViewer) recreateViewer_Tree();
 
             } else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
- 
+
                _tourViewer_Tree.getTree().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
                _tourViewer_Tree.refresh();
@@ -1887,6 +1887,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
    private void createUI_40_TourViewer_NatTable(final Composite parent) {
 
+      // this MUST be done after the nattable is created
       _columnManager_NatTable.setupNatTable(this);
 
       _natTable_DataProvider = new DataProvider(this, _columnManager_NatTable);
@@ -1896,7 +1897,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       final int sortDirection = _tourViewer_Table_Comparator.__sortDirection;
 
       _natTable_DataProvider.setSortColumn(sortColumnId, sortDirection);
-
+ 
       /*
        * Body layer
        */
@@ -1992,6 +1993,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
        */
       // turn the auto configuration off as we want to add our hover styling configuration
       _tourViewer_NatTable = new NatTable(parent, gridLayer, false);
+
+      _columnManager_NatTable.setupNatTable_PostCreate();
 
       /*
        * Configure table
@@ -7020,7 +7023,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    }
 
    @Override
-   public NatTable getNatTable()  {
+   public NatTable getNatTable() {
       return _tourViewer_NatTable;
    }
 

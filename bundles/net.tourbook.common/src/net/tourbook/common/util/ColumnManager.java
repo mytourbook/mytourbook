@@ -16,7 +16,7 @@
 package net.tourbook.common.util;
 
 import gnu.trove.list.array.TIntArrayList;
- 
+
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
@@ -55,18 +55,23 @@ import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.nebula.widgets.nattable.NatTable;
+import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.grid.layer.ColumnHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.hideshow.ColumnHideShowLayer;
 import org.eclipse.nebula.widgets.nattable.layer.DataLayer;
+import org.eclipse.nebula.widgets.nattable.layer.ILayer;
 import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
+import org.eclipse.nebula.widgets.nattable.painter.IOverlayPainter;
 import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
 import org.eclipse.nebula.widgets.nattable.resize.command.InitializeAutoResizeColumnsCommand;
-import org.eclipse.nebula.widgets.nattable.selection.command.SelectAllCommand;
+import org.eclipse.nebula.widgets.nattable.ui.util.CellEdgeDetectUtil;
+import org.eclipse.nebula.widgets.nattable.util.GCFactory;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.SWT;
+import org.eclipse.swt.SWT; 
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
@@ -155,6 +160,7 @@ public class ColumnManager {
    private boolean                           _isShowCategory               = true;
 
    private boolean                           _isShowColumnAnnotations;
+   private boolean                           _isSizeAllColumnsToFit;
 
    private Comparator<ColumnProfile>         _profileSorter;
 
@@ -244,86 +250,6 @@ public class ColumnManager {
       setVisibleColumnIds_Column_Show(colDef, false);
    }
 
-   private void action_FitAllColumnSize() {
-
-      // larger tables/trees needs more time to resize
-
-      if (_natTablePropertiesProvider != null) {
-
-         final NatTable natTable = _natTablePropertiesProvider.getNatTable();
-
-//         natTable.doCommand(command);
-
-         _natTablePropertiesProvider.getNatTable_Body_DataLayer();
-
-         // Select all columns
-         gridLayer.doCommand(new SelectAllCommand());
-
-         // Resize all selected columns
-         final InitializeAutoResizeColumnsCommand command = new InitializeAutoResizeColumnsCommand(gridLayer, 1, this.configRegistry, this.gcFactory);
-         gridLayer.doCommand(command);
-
-      } else {
-
-         BusyIndicator.showWhile(_columnViewer.getControl().getDisplay(), new Runnable() {
-            @Override
-            public void run() {
-
-               boolean isColumn0Visible = true;
-
-               if (_tourViewer instanceof ITourViewer2) {
-                  isColumn0Visible = ((ITourViewer2) _tourViewer).isColumn0Visible(_columnViewer);
-               }
-
-               if (_columnViewer instanceof TableViewer) {
-
-                  final Table table = ((TableViewer) _columnViewer).getTable();
-                  if (table.isDisposed()) {
-                     return;
-                  }
-
-                  table.setRedraw(false);
-                  {
-                     final TableColumn[] allColumns = table.getColumns();
-
-                     for (int columnIndex = 0; columnIndex < allColumns.length; columnIndex++) {
-                        final TableColumn tableColumn = allColumns[columnIndex];
-                        if (columnIndex == 0) {
-
-                           if (isColumn0Visible) {
-                              tableColumn.pack();
-                           } else {
-                              tableColumn.setWidth(0);
-                           }
-                        } else {
-                           tableColumn.pack();
-                        }
-                     }
-                  }
-                  table.setRedraw(true);
-
-               } else if (_columnViewer instanceof TreeViewer) {
-
-                  final Tree tree = ((TreeViewer) _columnViewer).getTree();
-                  if (tree.isDisposed()) {
-                     return;
-                  }
-
-                  tree.setRedraw(false);
-                  {
-                     final TreeColumn[] allColumns = tree.getColumns();
-                     for (final TreeColumn tableColumn : allColumns) {
-                        tableColumn.pack();
-                     }
-                  }
-                  tree.setRedraw(true);
-               }
-            }
-         });
-      }
-
-   }
-
    void action_SetValueFormatter(final ColumnDefinition colDef,
                                  final ValueFormat valueFormat,
                                  final boolean isDetailFormat) {
@@ -389,6 +315,94 @@ public class ColumnManager {
 
          _columnViewer = _tourViewer.recreateViewer(_columnViewer);
       }
+   }
+
+   private void action_SizeAllColumnToFit() {
+
+      if (_natTablePropertiesProvider != null) {
+
+         _isSizeAllColumnsToFit = true;
+
+//         _natTablePropertiesProvider.getNatTable().redraw();
+         _natTablePropertiesProvider.getNatTable().layout(true, true);
+
+//         final NatTable natTable = _natTablePropertiesProvider.getNatTable();
+//         final DataLayer gridLayer = _natTablePropertiesProvider.getNatTable_Body_DataLayer();
+//         final IConfigRegistry configRegistry = natTable.getConfigRegistry();
+//         final GCFactory gcFactory = new GCFactory(natTable);
+//
+////         natTable.doCommand(command);
+//
+//         // Select all columns
+//         gridLayer.doCommand(new SelectAllCommand());
+//
+//         // Resize all selected columns
+//         final InitializeAutoResizeColumnsCommand command = new InitializeAutoResizeColumnsCommand(gridLayer, 1, configRegistry, gcFactory);
+//         gridLayer.doCommand(command);
+
+      } else {
+
+         // larger tables/trees are needing more time to resize
+
+         BusyIndicator.showWhile(_columnViewer.getControl().getDisplay(), new Runnable() {
+            @Override
+            public void run() {
+
+               boolean isColumn0Visible = true;
+
+               if (_tourViewer instanceof ITourViewer2) {
+                  isColumn0Visible = ((ITourViewer2) _tourViewer).isColumn0Visible(_columnViewer);
+               }
+
+               if (_columnViewer instanceof TableViewer) {
+
+                  final Table table = ((TableViewer) _columnViewer).getTable();
+                  if (table.isDisposed()) {
+                     return;
+                  }
+
+                  table.setRedraw(false);
+                  {
+                     final TableColumn[] allColumns = table.getColumns();
+
+                     for (int columnIndex = 0; columnIndex < allColumns.length; columnIndex++) {
+
+                        final TableColumn tableColumn = allColumns[columnIndex];
+
+                        if (columnIndex == 0) {
+
+                           if (isColumn0Visible) {
+                              tableColumn.pack();
+                           } else {
+                              tableColumn.setWidth(0);
+                           }
+                        } else {
+                           tableColumn.pack();
+                        }
+                     }
+                  }
+                  table.setRedraw(true);
+
+               } else if (_columnViewer instanceof TreeViewer) {
+
+                  final Tree tree = ((TreeViewer) _columnViewer).getTree();
+                  if (tree.isDisposed()) {
+                     return;
+                  }
+
+                  tree.setRedraw(false);
+                  {
+                     final TreeColumn[] allColumns = tree.getColumns();
+                     for (final TreeColumn tableColumn : allColumns) {
+                        tableColumn.pack();
+                     }
+                  }
+                  tree.setRedraw(true);
+               }
+            }
+         });
+      }
+
    }
 
    public void addColumn(final ColumnDefinition colDef) {
@@ -764,7 +778,7 @@ public class ColumnManager {
          fitMenuItem.addListener(SWT.Selection, new Listener() {
             @Override
             public void handleEvent(final Event event) {
-               action_FitAllColumnSize();
+               action_SizeAllColumnToFit();
             }
          });
       }
@@ -1608,6 +1622,10 @@ public class ColumnManager {
 
       if (isTableHeaderHit) {
 
+//         final Point clickPoint = new Point(event.x, event.y);
+
+         final int column = CellEdgeDetectUtil.getColumnPositionToResize(natTable, mousePosition);
+
          final int columnWidths = 0;
 
          final int columnPosition = natTable.getColumnPositionByX(mousePosition.x);
@@ -2335,6 +2353,84 @@ public class ColumnManager {
 
       setVisibleColDefs(_activeProfile);
       setupValueFormatter(_activeProfile);
+   }
+
+   /**
+    * Setup {@link NatTable} after it was created.
+    */
+   public void setupNatTable_PostCreate() {
+
+      final NatTable natTable = _natTablePropertiesProvider.getNatTable();
+
+      /**
+       * Found this solution in https://www.eclipse.org/nattable/documentation.php?page=faq
+       */
+      natTable.addOverlayPainter(new IOverlayPainter() {
+
+//         private HashSet<Integer> colset = new HashSet<>();
+//         private HashSet<Integer> rowset = new HashSet<>();
+
+         @Override
+         public void paintOverlay(final GC gc, final ILayer layer) {
+
+            if (!_isSizeAllColumnsToFit) {
+               return;
+            }
+
+            // reset flag, resizing is done only once when the corresponding action is selected
+            _isSizeAllColumnsToFit = false;
+
+            final int count = natTable.getColumnCount();
+
+            final IConfigRegistry configRegistry = natTable.getConfigRegistry();
+            final GCFactory gcFactory = new GCFactory(natTable);
+
+            for (int columnIndex = 0; columnIndex < count; columnIndex++) {
+
+               if (natTable.isColumnPositionResizable(columnIndex) == false) {
+                  continue;
+               }
+
+//               final int columnPos = natTable.getColumnIndexByPosition(columnIndex);
+
+//               if (colset.contains(columnPos)) {
+//                  continue;
+//               }
+//
+//               colset.add(columnPos);
+
+               final InitializeAutoResizeColumnsCommand columnCommand = new InitializeAutoResizeColumnsCommand(
+                     natTable,
+                     columnIndex,
+                     configRegistry,
+                     gcFactory);
+
+               natTable.doCommand(columnCommand);
+            }
+
+//            count = natTable.getRowCount();
+//            for (int i = 0; i < count; i++) {
+//               if (natTable.isRowPositionResizable(i) == false) {
+//                  continue;
+//               }
+//
+//               final int pos = natTable.getRowIndexByPosition(i);
+//               if (rowset.contains(pos)) {
+//                  continue;
+//               }
+//
+//               rowset.add(pos);
+//
+//               final InitializeAutoResizeRowsCommand rowCommand = new InitializeAutoResizeRowsCommand(natTable,
+//                     i,
+//                     configRegistry,
+//                     gcFactory);
+//
+//               natTable.doCommand(rowCommand);
+//            }
+         }
+      });
+
    }
 
    private void setupValueFormatter(final ColumnProfile activeProfile) {
