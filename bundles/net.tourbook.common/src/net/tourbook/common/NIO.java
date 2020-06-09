@@ -26,6 +26,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.StringUtils;
 
 /**
  * Tools for the java.nio package.
@@ -47,8 +48,8 @@ public class NIO {
     * the path exists.
     *
     * @param folder
-    * @return Returns the os path or <code>null</code> when the device name cannot be converted into
-    *         a driveletter.
+    * @return Returns the OS path or <code>null</code> when the device name cannot be converted into
+    *         a drive letter.
     */
    public static String convertToOSPath(final String folder) {
 
@@ -179,23 +180,13 @@ public class NIO {
     *
     * @param folderName
     *           A given folder name
-    * @return Returns true when the folder name is equal to
+    * @return Returns true when the folder name starts with
     *         {@link TourBookFileSystem#getId()}.
     */
    public static boolean isTourBookFileSystem(final String folderName) {
-      if (folderName == null) {
-         return false;
-      }
 
-      final List<String> tourBookFileSystemIds = FileSystemManager.getFileSystemsIds();
-
-      for (final String tourBookFileSystemId : tourBookFileSystemIds) {
-         if (tourBookFileSystemId.equalsIgnoreCase(folderName.toLowerCase())) {
-            return true;
-         }
-      }
-
-      return false;
+      return !StringUtils.isNullOrEmpty(folderName) &&
+            FileSystemManager.getTourbookFileSystem(folderName) != null;
    }
 
    private static String parseDeviceName(final String fullName) {
