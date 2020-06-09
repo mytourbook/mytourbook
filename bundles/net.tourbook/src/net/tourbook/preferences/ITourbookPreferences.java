@@ -541,6 +541,12 @@ public interface ITourbookPreferences {
    public static final String VALUE_POINT_TOOL_TIP_IS_VISIBLE = "VALUE_POINT_TOOL_TIP_IS_VISIBLE"; //$NON-NLS-1$
 
    /*
+    * Indicator to either select all time slices in between left and right slider or just the left
+    * and right slider time slices.
+    */
+   public static final String TOGGLE_STATE_SELECT_INBETWEEN_TIME_SLICES = "TOGGLE_STATE_SELECT_ALL_TIME_SLICES"; //$NON-NLS-1$
+
+   /*
     * Map 2 D
     */
    public static final String MAP2_OPTIONS_IS_MODIFIED = "MAP2_OPTIONS_IS_MODIFIED"; //$NON-NLS-1$

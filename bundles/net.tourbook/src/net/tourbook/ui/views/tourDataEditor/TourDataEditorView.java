@@ -653,6 +653,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    private Menu              _swimViewer_ContextMenu;
    private Menu              _timeViewer_ContextMenu;
+   protected boolean         _isSelectInBetweenTimeSlices;
+   private SelectionChartInfo _lastSelectedChartInfo;
 
    private class Action_RemoveSwimStyle extends Action {
 
@@ -2469,6 +2471,26 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                // updateUITab4Info(); do NOT work
                //
                // tour data must be reloaded
+            } else if (property.equals(ITourbookPreferences.TOGGLE_STATE_SELECT_INBETWEEN_TIME_SLICES)) {
+
+               _isSelectInBetweenTimeSlices = _prefStore.getBoolean(ITourbookPreferences.TOGGLE_STATE_SELECT_INBETWEEN_TIME_SLICES);
+
+               final Table table = (Table) _timeSlice_Viewer.getControl();
+               final int[] selectionIndices = table.getSelectionIndices();
+
+               if (selectionIndices.length == 0) {
+                  return;
+               }
+
+               table.deselectAll();
+
+               if (_isSelectInBetweenTimeSlices) {
+                  //TODO FB min and max as left can be on the right ?
+                  table.select(_lastSelectedChartInfo.leftSliderValuesIndex, _lastSelectedChartInfo.rightSliderValuesIndex);
+               } else {
+                  table.select(selectionIndices[0]);
+               }
+               table.showSelection();
             }
          }
       };
@@ -7650,6 +7672,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       _latLonDigits = Util.getStateInt(_state, STATE_LAT_LON_DIGITS, DEFAULT_LAT_LON_DIGITS);
       setup_LatLonDigits();
+
+      _isSelectInBetweenTimeSlices = _prefStore.getBoolean(ITourbookPreferences.TOGGLE_STATE_SELECT_INBETWEEN_TIME_SLICES);
    }
 
    private void restoreState_WithUI() {
@@ -7887,21 +7911,19 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       final Table table = (Table) _timeSlice_Viewer.getControl();
       final int itemCount = table.getItemCount();
 
-      final boolean istotoactivated =
-            _prefStore.getBoolean(
-            ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE);
-
-      // adjust to array bounds
-      int valueIndex = chartInfo.selectedSliderValuesIndex;
-      valueIndex = Math.max(0, Math.min(valueIndex, itemCount - 1));
-
-      if (istotoactivated) {
-         table.setSelection(chartInfo.leftSliderValuesIndex, valueIndex);
-         System.out.println("left index value " + chartInfo.leftSliderValuesIndex);
-         System.out.println("right index value " + valueIndex);
+      _lastSelectedChartInfo = chartInfo;
+      if (_isSelectInBetweenTimeSlices) {
+         final int minSelectedValue = Math.min(chartInfo.leftSliderValuesIndex, chartInfo.rightSliderValuesIndex);
+         final int maxSelectedValue = Math.max(chartInfo.leftSliderValuesIndex, chartInfo.rightSliderValuesIndex);
+         table.setSelection(minSelectedValue, maxSelectedValue);
       } else {
+         // adjust to array bounds
+         int valueIndex = chartInfo.selectedSliderValuesIndex;
+         valueIndex = Math.max(0, Math.min(valueIndex, itemCount - 1));
+
          table.setSelection(valueIndex);
       }
+
       table.showSelection();
 
       // fire slider position
@@ -7957,27 +7979,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       }
 
       table.showSelection();
-   }
-
-   /**
-    * Select all the time slices for a given range.
-    *
-    * @param startIndex
-    *           The starting index of a given range.
-    * @param endIndex
-    *           The ending index of a given range.
-    */
-   public void selectTimeSlicesRange(final int startIndex, final int endIndex) {
-      final Table table = (Table) _timeSlice_Viewer.getControl();
-      final int itemCount = table.getItemCount();
-
-      // adjust to array bounds
-      //     int valueIndex = chartInfo.selectedSliderValuesIndex;
-      //  valueIndex = Math.max(0, Math.min(valueIndex, itemCount - 1));
-
-      table.setSelection(startIndex, endIndex);
-      table.showSelection();
-
    }
 
    @Override
