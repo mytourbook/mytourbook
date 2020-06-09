@@ -17,6 +17,7 @@ package net.tourbook.ui.tourChart;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
@@ -259,11 +260,8 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
                @Override
                public void widgetSelected(final SelectionEvent e) {
 
-                  // set in pref store, tooltip is listening pref store modifications
-                  _prefStore.setValue(
-                        ITourbookPreferences.TOGGLE_STATE_SELECT_INBETWEEN_TIME_SLICES,
-                        _chkSelectAllTimeSlices.getSelection());
-
+                  final SelectionChartInfo chartInfo = _tourChart.getChartInfo();
+                  chartInfo.isSelectInBetweenTimeSlices = !chartInfo.isSelectInBetweenTimeSlices;
                }
             });
          }
@@ -304,8 +302,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
       final boolean isShowValuePointTooltip = _prefStore.getDefaultBoolean(//
             ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE);
 
-      final boolean isSelectInBetweenTimeSlices = _prefStore.getDefaultBoolean(//
-            ITourbookPreferences.TOGGLE_STATE_SELECT_INBETWEEN_TIME_SLICES);
+      final boolean isSelectInBetweenTimeSlices = _tourChart.getChartInfo().isSelectInBetweenTimeSlices;
 
       final X_AXIS_START_TIME xAxisStartTime = isTourStartTime
             ? X_AXIS_START_TIME.TOUR_START_TIME
@@ -323,7 +320,6 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
 
       // this is not set in saveState()
       _prefStore.setValue(ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE, isShowValuePointTooltip);
-      _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_SELECT_INBETWEEN_TIME_SLICES, isSelectInBetweenTimeSlices);
 
       _gridUI.resetToDefaults();
 
@@ -335,7 +331,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
       final TourChartConfiguration tcc = _tourChart.getTourChartConfig();
 
       if (tcc == null) {
-         // this occurred when tour chart is empty
+         // this occur when tour chart is empty
          return;
       }
 
@@ -353,13 +349,15 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
       _chkShowValuePointTooltip.setSelection(_prefStore.getBoolean(//
             ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE));
 
-      _chkSelectAllTimeSlices.setSelection(_prefStore.getBoolean(//
-            ITourbookPreferences.TOGGLE_STATE_SELECT_INBETWEEN_TIME_SLICES));
+      _chkSelectAllTimeSlices.setSelection(_tourChart.getChartInfo().isSelectInBetweenTimeSlices);
 
       _gridUI.restoreState();
    }
 
    private void saveState() {
+
+      final SelectionChartInfo chartInfo = _tourChart.getChartInfo();
+      chartInfo.isSelectInBetweenTimeSlices = _chkSelectAllTimeSlices.getSelection();
 
       final TourChartConfiguration tcc = _tourChart.getTourChartConfig();
 
@@ -389,5 +387,4 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
       tcc.isSRTMDataVisible = isSrtmDataVisible;
       tcc.xAxisTime = xAxisStartTime;
    }
-
 }

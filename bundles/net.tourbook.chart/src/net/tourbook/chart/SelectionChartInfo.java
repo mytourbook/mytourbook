@@ -26,6 +26,7 @@ public class SelectionChartInfo implements ISelection {
 
    public int              leftSliderValuesIndex;
    public int              rightSliderValuesIndex;
+   public boolean          isSelectInBetweenTimeSlices;
 
    /**
     * contains the value index for the slider which is selected
@@ -56,9 +57,9 @@ public class SelectionChartInfo implements ISelection {
 //				+ ("chartDrawingData=" + chartDrawingData + ", ")
             + ("leftSliderValuesIndex=" + leftSliderValuesIndex + ", ") //$NON-NLS-1$ //$NON-NLS-2$
             + ("rightSliderValuesIndex=" + rightSliderValuesIndex + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+            + ("isSelectInBetweenTimeSlices=" + isSelectInBetweenTimeSlices + ", ") //$NON-NLS-1$ //$NON-NLS-2$
             + ("selectedSliderValuesIndex=" + selectedSliderValuesIndex) //$NON-NLS-1$
             //
             + "]"; //$NON-NLS-1$
    }
-
 }
