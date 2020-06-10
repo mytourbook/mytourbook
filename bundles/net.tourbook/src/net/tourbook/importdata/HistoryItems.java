@@ -552,9 +552,9 @@ class HistoryItems {
 
                      if (NIO.isDeviceNameFolder(cleanedFolderName)) {
 
-                           // this is a device folder name
+                        // this is a device folder name
 
-                           _linkFolderInfo.setText(osFolder);
+                        _linkFolderInfo.setText(osFolder);
 
                      } else if (NIO.isTourBookFileSystem(cleanedFolderName)) {
 
