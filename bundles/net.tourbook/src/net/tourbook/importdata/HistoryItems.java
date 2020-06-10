@@ -552,14 +552,10 @@ class HistoryItems {
 
                      if (NIO.isDeviceNameFolder(cleanedFolderName)) {
 
-                        if (NIO.isTourBookFileSystem(cleanedFolderName)) {
-
-                           _linkFolderInfo.setText(modifiedFolder);
-                        } else {
                            // this is a device folder name
 
                            _linkFolderInfo.setText(osFolder);
-                        }
+
                      } else if (NIO.isTourBookFileSystem(cleanedFolderName)) {
 
                         final TourbookFileSystem dropboxFileSystem = FileSystemManager.getTourbookFileSystem(cleanedFolderName);
