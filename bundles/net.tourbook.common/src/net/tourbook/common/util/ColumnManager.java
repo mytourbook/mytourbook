@@ -60,15 +60,13 @@ import org.eclipse.nebula.widgets.nattable.grid.layer.ColumnHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.hideshow.ColumnHideShowLayer;
 import org.eclipse.nebula.widgets.nattable.layer.DataLayer;
 import org.eclipse.nebula.widgets.nattable.layer.ILayer;
-import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
 import org.eclipse.nebula.widgets.nattable.painter.IOverlayPainter;
 import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
 import org.eclipse.nebula.widgets.nattable.resize.command.InitializeAutoResizeColumnsCommand;
-import org.eclipse.nebula.widgets.nattable.ui.util.CellEdgeDetectUtil;
 import org.eclipse.nebula.widgets.nattable.util.GCFactory;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.SWT; 
-import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator; 
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.GC;
@@ -218,18 +216,18 @@ public class ColumnManager {
    /**
     * A column wrapper which contains a {@link TableColumn}, {@link TreeColumn} or {@link NatTable}
     */
-   public class ColumnWrapper {
+   private class ColumnWrapper {
 
       Object columnItem;
 
-      int    columnLeftBorder;
-      int    columnRightBorder;
+//      int    columnLeftBorder;
+      int columnRightBorder;
 
       public ColumnWrapper(final Object columnItem, final int columnLeftBorder, final int columnRightBorder) {
 
          this.columnItem = columnItem;
 
-         this.columnLeftBorder = columnLeftBorder;
+//         this.columnLeftBorder = columnLeftBorder;
          this.columnRightBorder = columnRightBorder;
       }
    }
@@ -285,10 +283,17 @@ public class ColumnManager {
        * Update UI
        */
 
-      // allow the viewer to update the header
-      _tourViewer.updateColumnHeader(colDef);
+      if (_natTablePropertiesProvider != null) {
 
-      _tourViewer.getViewer().refresh();
+         _natTablePropertiesProvider.getNatTable().redraw();
+
+      } else {
+
+         // allow the viewer to update the header
+         _tourViewer.updateColumnHeader(colDef);
+
+         _tourViewer.getViewer().refresh();
+      }
    }
 
    private void action_ShowAllColumns() {
@@ -321,30 +326,25 @@ public class ColumnManager {
 
       if (_natTablePropertiesProvider != null) {
 
-         _isSizeAllColumnsToFit = true;
+         final NatTable natTable = _natTablePropertiesProvider.getNatTable();
 
-//         _natTablePropertiesProvider.getNatTable().redraw();
-         _natTablePropertiesProvider.getNatTable().layout(true, true);
+         BusyIndicator.showWhile(natTable.getDisplay(), new Runnable() {
+            @Override
+            public void run() {
 
-//         final NatTable natTable = _natTablePropertiesProvider.getNatTable();
-//         final DataLayer gridLayer = _natTablePropertiesProvider.getNatTable_Body_DataLayer();
-//         final IConfigRegistry configRegistry = natTable.getConfigRegistry();
-//         final GCFactory gcFactory = new GCFactory(natTable);
-//
-////         natTable.doCommand(command);
-//
-//         // Select all columns
-//         gridLayer.doCommand(new SelectAllCommand());
-//
-//         // Resize all selected columns
-//         final InitializeAutoResizeColumnsCommand command = new InitializeAutoResizeColumnsCommand(gridLayer, 1, configRegistry, gcFactory);
-//         gridLayer.doCommand(command);
+               _isSizeAllColumnsToFit = true;
+
+               natTable.redraw();
+               natTable.update();
+            }
+         });
 
       } else {
 
          // larger tables/trees are needing more time to resize
 
          BusyIndicator.showWhile(_columnViewer.getControl().getDisplay(), new Runnable() {
+
             @Override
             public void run() {
 
@@ -710,12 +710,12 @@ public class ColumnManager {
       }
 
       final String[] visibleIds = _activeProfile.visibleColumnIds;
-      final boolean isHideColumn = visibleIds.length > 1;
+      final boolean canColumnBeSetToHidden = visibleIds.length > 1;
 
       final ValueFormat[] availableFormatter = colDef.getAvailableFormatter();
-      final boolean isValueFormatter = availableFormatter != null && availableFormatter.length > 0;
+      final boolean isValueFormatterAvailable = availableFormatter != null && availableFormatter.length > 0;
 
-      if (!isValueFormatter && !isHideColumn) {
+      if (!isValueFormatterAvailable && !canColumnBeSetToHidden) {
          // nothing can be done
          return;
       }
@@ -726,9 +726,7 @@ public class ColumnManager {
           */
 
          // create menu item text
-         final String menuItemText = NLS.bind(
-               Messages.Action_ColumnManager_ColumnActions_Info,
-               createColumnLabel(colDef, false));
+         final String menuItemText = NLS.bind(Messages.Action_ColumnManager_ColumnActions_Info, createColumnLabel(colDef, false));
 
          final MenuItem menuItem = new MenuItem(contextMenu, SWT.PUSH);
          menuItem.setText(menuItemText);
@@ -738,7 +736,7 @@ public class ColumnManager {
       /*
        * Action: Hide current column
        */
-      if (isHideColumn) {
+      if (canColumnBeSetToHidden) {
 
          final MenuItem menuItem = new MenuItem(contextMenu, SWT.PUSH);
          menuItem.setText(Messages.Action_ColumnManager_HideCurrentColumn);
@@ -759,7 +757,7 @@ public class ColumnManager {
       /*
        * Actions: Value Formatter
        */
-      if (isValueFormatter) {
+      if (isValueFormatterAvailable) {
 
          new ColumnFormatSubMenu(contextMenu, colDef, this);
       }
@@ -951,12 +949,14 @@ public class ColumnManager {
 
             final Rectangle clientArea = natTable.getClientArea();
 
-//            final int headerHeight = natTable.getHeaderHeight();
             final int headerHeight = columnHeaderLayer.getHeight();
             final int headerBottom = clientArea.y + headerHeight;
 
             final boolean isTableHeaderHit = clientArea.y <= mousePosition.y
                   && mousePosition.y < (clientArea.y + headerHeight);
+
+            // !!! header column must be set BEFORE the menu is created !!!
+            _headerColumnItem = getHeaderColumn(natTable, mousePosition, isTableHeaderHit, columnHeaderLayer);
 
             Menu contextMenu = getContextMenu(isTableHeaderHit, headerContextMenu[0], defaultContextMenuProvider);
 
@@ -1003,8 +1003,6 @@ public class ColumnManager {
             /*
              * Set context menu position to the right border of the column
              */
-            _headerColumnItem = getHeaderColumn(natTable, mousePosition, isTableHeaderHit, columnHeaderLayer);
-
             if (_headerColumnItem != null) {
 
                int posX = _headerColumnItem.columnRightBorder;
@@ -1346,23 +1344,23 @@ public class ColumnManager {
 
       ColumnDefinition colDef = null;
 
-      final Object column = _headerColumnItem.columnItem;
+      final Object columnItem = _headerColumnItem.columnItem;
 
-      if (column instanceof TableColumn) {
+      if (columnItem instanceof TableColumn) {
 
-         final TableColumn tableColumn = (TableColumn) column;
+         final TableColumn tableColumn = (TableColumn) columnItem;
 
          colDef = (ColumnDefinition) tableColumn.getData();
 
-      } else if (column instanceof TreeColumn) {
+      } else if (columnItem instanceof TreeColumn) {
 
-         final TreeColumn treeColumn = (TreeColumn) column;
+         final TreeColumn treeColumn = (TreeColumn) columnItem;
 
          colDef = (ColumnDefinition) treeColumn.getData();
 
-      } else if (column instanceof NatTable) {
+      } else if (columnItem instanceof ColumnDefinition) {
 
-//         colDef = (ColumnDefinition) treeColumn.getData();
+         colDef = (ColumnDefinition) columnItem;
       }
 
       return colDef;
@@ -1622,39 +1620,28 @@ public class ColumnManager {
 
       if (isTableHeaderHit) {
 
-//         final Point clickPoint = new Point(event.x, event.y);
+         final int gridColumnPosition = natTable.getColumnPositionByX(mousePosition.x);
+         final int colIndexByPos = natTable.getColumnIndexByPosition(gridColumnPosition);
 
-         final int column = CellEdgeDetectUtil.getColumnPositionToResize(natTable, mousePosition);
+         if (colIndexByPos == -1) {
 
-         final int columnWidths = 0;
+            // a column is not hit
+            return null;
+         }
 
-         final int columnPosition = natTable.getColumnPositionByX(mousePosition.x);
-         final int rowPosition = natTable.getRowPositionByY(mousePosition.y);
+         final ColumnDefinition colDef = _activeProfile.visibleColumnDefinitions.get(colIndexByPos);
+         if (colDef != null) {
 
-         final LabelStack headerConfigLabels = columnHeaderLayer.getConfigLabelsByPosition(columnPosition, rowPosition);
+            // column found
 
-//         final int bodyRowPosition = LayerUtil.convertRowPosition(natTable, rowPosition, selectionLayer);
+            final int gridColumnStartX = natTable.getStartXOfColumnPosition(colIndexByPos);
+            final int columnWidth = natTable.getColumnWidthByPosition(colIndexByPos);
 
-//         final TableColumn[] columns = natTable.getColumns();
-//         final int[] columnOrder = natTable.getColumnOrder();
+            final int columnLeftBorder = gridColumnStartX;
+            final int columnRightBorder = gridColumnStartX + columnWidth;
 
-//         for (final int creationIndex : columnOrder) {
-//
-//            final TableColumn tc = columns[creationIndex];
-//
-//            final int columnWidth = tc.getWidth();
-//
-//            if (columnWidths < mousePosition.x && mousePosition.x < columnWidths + columnWidth) {
-//
-//               final int columnLeftBorder = columnWidths;
-//               final int columnRightBorder = columnWidths + columnWidth;
-//
-//               // column found
-//               return new ColumnWrapper(tc, columnLeftBorder, columnRightBorder);
-//            }
-//
-//            columnWidths += columnWidth;
-//         }
+            return new ColumnWrapper(colDef, columnLeftBorder, columnRightBorder);
+         }
       }
 
       return null;
@@ -2367,9 +2354,6 @@ public class ColumnManager {
        */
       natTable.addOverlayPainter(new IOverlayPainter() {
 
-//         private HashSet<Integer> colset = new HashSet<>();
-//         private HashSet<Integer> rowset = new HashSet<>();
-
          @Override
          public void paintOverlay(final GC gc, final ILayer layer) {
 
@@ -2391,14 +2375,6 @@ public class ColumnManager {
                   continue;
                }
 
-//               final int columnPos = natTable.getColumnIndexByPosition(columnIndex);
-
-//               if (colset.contains(columnPos)) {
-//                  continue;
-//               }
-//
-//               colset.add(columnPos);
-
                final InitializeAutoResizeColumnsCommand columnCommand = new InitializeAutoResizeColumnsCommand(
                      natTable,
                      columnIndex,
@@ -2407,30 +2383,8 @@ public class ColumnManager {
 
                natTable.doCommand(columnCommand);
             }
-
-//            count = natTable.getRowCount();
-//            for (int i = 0; i < count; i++) {
-//               if (natTable.isRowPositionResizable(i) == false) {
-//                  continue;
-//               }
-//
-//               final int pos = natTable.getRowIndexByPosition(i);
-//               if (rowset.contains(pos)) {
-//                  continue;
-//               }
-//
-//               rowset.add(pos);
-//
-//               final InitializeAutoResizeRowsCommand rowCommand = new InitializeAutoResizeRowsCommand(natTable,
-//                     i,
-//                     configRegistry,
-//                     gcFactory);
-//
-//               natTable.doCommand(rowCommand);
-//            }
          }
       });
-
    }
 
    private void setupValueFormatter(final ColumnProfile activeProfile) {
@@ -2722,19 +2676,21 @@ public class ColumnManager {
 
    private void setVisibleColumnIds_Column_Show(final ColumnDefinition colDef_New, final boolean isFirstColumn) {
 
-      final ArrayList<String> visibleColumnIds = new ArrayList<>();
-      final ArrayList<String> visibleIdsAndWidth = new ArrayList<>();
+      final ArrayList<String> allNewVisibleColumnIds = new ArrayList<>();
+      final ArrayList<String> allNewVisibleIdsAndWidth = new ArrayList<>();
 
       boolean isNewColumnAdded = false;
+
+      final String columnId_New = colDef_New.getColumnId();
 
       if (isFirstColumn) {
 
          // set visible columns
-         visibleColumnIds.add(colDef_New.getColumnId());
+         allNewVisibleColumnIds.add(columnId_New);
 
          // set column id and width
-         visibleIdsAndWidth.add(colDef_New.getColumnId());
-         visibleIdsAndWidth.add(Integer.toString(colDef_New.getColumnWidth()));
+         allNewVisibleIdsAndWidth.add(columnId_New);
+         allNewVisibleIdsAndWidth.add(Integer.toString(colDef_New.getColumnWidth()));
 
          isNewColumnAdded = true;
       }
@@ -2743,42 +2699,45 @@ public class ColumnManager {
 
          final ColumnDefinition colDef = getColDef_ByColumnId(columnId);
 
-         if (colDef_New.getColumnId() == colDef.getColumnId() && isNewColumnAdded) {
+         if (columnId_New == colDef.getColumnId() && isNewColumnAdded) {
 
             // column is already added
             continue;
          }
 
+         // ensure the column is also displayed, it could be hidden when it was previously displayed and then set to hidden !!!
+         colDef.setIsColumnDisplayed(true);
+
          // set visible columns
-         visibleColumnIds.add(columnId);
+         allNewVisibleColumnIds.add(columnId);
 
          // set column id and width
-         visibleIdsAndWidth.add(columnId);
-         visibleIdsAndWidth.add(Integer.toString(colDef.getColumnWidth()));
+         allNewVisibleIdsAndWidth.add(columnId);
+         allNewVisibleIdsAndWidth.add(Integer.toString(colDef.getColumnWidth()));
 
-         if (colDef_New.getColumnId() == colDef.getColumnId()) {
+         if (columnId_New == colDef.getColumnId()) {
             isNewColumnAdded = true;
          }
       }
 
       /*
-       * Append new column
+       * Append new column to the end, this could be improved to insert after the current column
        */
       if (isNewColumnAdded == false) {
 
          // set visible columns
-         visibleColumnIds.add(colDef_New.getColumnId());
+         allNewVisibleColumnIds.add(columnId_New);
 
          // set column id and width
-         visibleIdsAndWidth.add(colDef_New.getColumnId());
-         visibleIdsAndWidth.add(Integer.toString(colDef_New.getColumnWidth()));
+         allNewVisibleIdsAndWidth.add(columnId_New);
+         allNewVisibleIdsAndWidth.add(Integer.toString(colDef_New.getColumnWidth()));
       }
 
       /*
        * Update model
        */
-      _activeProfile.visibleColumnIds = visibleColumnIds.toArray(new String[visibleColumnIds.size()]);
-      _activeProfile.visibleColumnIdsAndWidth = visibleIdsAndWidth.toArray(new String[visibleIdsAndWidth.size()]);
+      _activeProfile.visibleColumnIds = allNewVisibleColumnIds.toArray(new String[allNewVisibleColumnIds.size()]);
+      _activeProfile.visibleColumnIdsAndWidth = allNewVisibleIdsAndWidth.toArray(new String[allNewVisibleIdsAndWidth.size()]);
 
       /*
        * Update UI
@@ -2886,11 +2845,10 @@ public class ColumnManager {
    }
 
    /**
-    * Read the sorting order and column width from the viewer.
+    * Read the sorting order and column width from the viewer/nattable.
     */
    private void setVisibleColumnIds_FromViewer() {
 
-      // get the sorting order and column width from the viewer/nattable
       _activeProfile.visibleColumnIds = getColumns_FromViewer_Ids();
       _activeProfile.visibleColumnIdsAndWidth = getColumns_FromViewer_IdAndWidth();
    }

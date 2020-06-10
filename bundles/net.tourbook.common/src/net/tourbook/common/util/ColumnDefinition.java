@@ -720,7 +720,7 @@ public class ColumnDefinition implements Cloneable {
 
       setValueFormats(availableFormats, null, defaultDetailFormat, columnManager);
    }
-
+ 
    /**
     * Set formats which are used to render the column.
     * <p>
@@ -763,6 +763,7 @@ public class ColumnDefinition implements Cloneable {
 //				+ ("_label=" + _label + ", ") //$NON-NLS-1$ //$NON-NLS-2$
 //				+ ("_isCheckedInDialog=" + _isCheckedInDialog + ", ") //$NON-NLS-1$ //$NON-NLS-2$
             + ("_columnId=" + _columnId + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+            + ("_isColumnDisplayed=" + _isColumnDisplayed + ", ") //$NON-NLS-1$ //$NON-NLS-2$
 //            + ("_valueFormat=" + _valueFormat_Category + ", ") //$NON-NLS-1$ //$NON-NLS-2$
 //            + ("_valueFormat_Detail=" + _valueFormat_Detail + ", ") //$NON-NLS-1$ //$NON-NLS-2$
 //				+ ("_columnWidth=" + _columnWidth + ", ") //$NON-NLS-1$ //$NON-NLS-2$

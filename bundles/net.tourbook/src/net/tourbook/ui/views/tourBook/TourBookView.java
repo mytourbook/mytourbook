@@ -161,7 +161,6 @@ import org.eclipse.nebula.widgets.nattable.style.Style;
 import org.eclipse.nebula.widgets.nattable.style.theme.ModernNatTableThemeConfiguration;
 import org.eclipse.nebula.widgets.nattable.ui.binding.UiBindingRegistry;
 import org.eclipse.nebula.widgets.nattable.ui.matcher.MouseEventMatcher;
-import org.eclipse.nebula.widgets.nattable.ui.menu.AbstractHeaderMenuConfiguration;
 import org.eclipse.nebula.widgets.nattable.ui.menu.PopupMenuAction;
 import org.eclipse.nebula.widgets.nattable.ui.menu.PopupMenuBuilder;
 import org.eclipse.nebula.widgets.nattable.ui.util.CellEdgeEnum;
@@ -172,7 +171,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
-import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionAdapter; 
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
@@ -1036,28 +1035,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
    }
 
-   private final class NatTable_Config_Menu extends AbstractHeaderMenuConfiguration {
-
-      private NatTable_Config_Menu(final NatTable natTable) {
-         super(natTable);
-      }
-
-      @Override
-      protected PopupMenuBuilder createColumnHeaderMenu(final NatTable natTable) {
-
-         return super.createColumnHeaderMenu(natTable)
-               .withHideColumnMenuItem()
-               .withShowAllColumnsMenuItem();
-      }
-
-      @Override
-      protected PopupMenuBuilder createCornerMenu(final NatTable natTable) {
-
-         return super.createCornerMenu(natTable)
-               .withShowAllColumnsMenuItem();
-      }
-   }
-
    private final class NatTable_ConfigField_TourType extends AbstractRegistryConfiguration {
 
       private IRowDataProvider<TVITourBookTour> _dataProvider;
@@ -1479,6 +1456,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
             } else if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
 
+               _tourViewer_NatTable.refresh();
+
                // update tourbook viewer
                _tourViewer_Tree.refresh();
 
@@ -1897,7 +1876,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       final int sortDirection = _tourViewer_Table_Comparator.__sortDirection;
 
       _natTable_DataProvider.setSortColumn(sortColumnId, sortDirection);
- 
+
       /*
        * Body layer
        */
@@ -2007,9 +1986,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       // add the style configuration for hover
       _tourViewer_NatTable.addConfiguration(new NatTable_Configuration_Hover());
-
-      // add the header menu configuration for adding the column header menu with hide/show actions
-//      _tourViewer_NatTable.addConfiguration(new NatTable_Config_Menu(_tourViewer_NatTable));
 
       // [4] add the menu configuration to a NatTable instance
 //      _tourViewer_NatTable.addConfiguration(new NatTable_Config_DebugMenu(_tourViewer_NatTable));
@@ -8121,7 +8097,13 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
    private void setupTourViewerContent() {
 
-      if (_isLayoutTable) {
+      if (_isLayoutNatTable) {
+
+         _tourViewer_NatTable.refresh();
+
+         _pageBook.showPage(_viewerContainer_NatTable);
+
+      } else if (_isLayoutTable) {
 
          /*
           * There have been different exceptions depending on the sequence of the viewer methods
@@ -8143,10 +8125,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             _pageBook.showPage(_viewerContainer_Table);
          }
          _tourViewer_Table.getTable().setRedraw(true);
-
-      } else if (_isLayoutNatTable) {
-
-         _pageBook.showPage(_viewerContainer_NatTable);
 
       } else {
 
