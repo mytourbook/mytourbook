@@ -59,7 +59,7 @@ public abstract class TourbookFileSystem {
     * @return
     */
    public String getDisplayId() {
-      return NIO.DEVICE_FOLDER_NAME_START + FILE_SYSTEM_ID + "]"; //$NON-NLS-1$
+      return "{" + FILE_SYSTEM_ID + "}"; //$NON-NLS-1$ //$NON-NLS-2$
    }
 
    /**

@@ -560,6 +560,12 @@ class HistoryItems {
 
                            _linkFolderInfo.setText(osFolder);
                         }
+                     } else if (NIO.isTourBookFileSystem(cleanedFolderName)) {
+
+                        final TourbookFileSystem dropboxFileSystem = FileSystemManager.getTourbookFileSystem(cleanedFolderName);
+                        if (dropboxFileSystem != null) {
+                           _linkFolderInfo.setText(cleanedFolderName);
+                        }
                      } else {
 
                         final String deviceFolder = convertTo_DeviceNameFolder(osFolder);
