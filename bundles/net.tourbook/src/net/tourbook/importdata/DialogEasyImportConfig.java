@@ -1411,7 +1411,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
                .indent(CONTROL_DECORATION_WIDTH + convertHorizontalDLUsToPixels(4), 0)
                .applyTo(_linkIC_DeviceFolderPath);
 
-         _deviceHistoryItems.setControls(_comboIC_DeviceFolder, _linkIC_DeviceFolderPath);
+         _deviceHistoryItems.setControls(_comboIC_DeviceFolder, _linkIC_DeviceFolderPath, _btnIC_SelectDeviceFolder);
       }
 
       {
