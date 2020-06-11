@@ -124,7 +124,9 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
             this,
             Messages.tourCatalog_view_action_create_marker);
 
-      _actionSelectInBetweenTimeSlices = new ActionSelectInBetweenTimeSlices(this);
+      _actionSelectInBetweenTimeSlices = new ActionSelectInBetweenTimeSlices(
+            this,
+            _tourChartViewer.getTourChart());
 
       _actionDeleteMarker = new ActionDeleteMarker(tourChart);
       _actionSetMarkerVisible = new ActionSetMarkerVisible(tourChart);

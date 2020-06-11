@@ -21,6 +21,8 @@ import net.tourbook.chart.IChartContextProvider;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.common.util.Util;
 import net.tourbook.tour.TourManager;
+import net.tourbook.ui.tourChart.TourChart;
+import net.tourbook.ui.tourChart.TourChartConfiguration;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
 import org.eclipse.jface.action.Action;
@@ -31,29 +33,47 @@ public class ActionSelectInBetweenTimeSlices extends Action {
     *
     */
    private final IChartContextProvider _chartContextProvider;
+   private final TourChart             _tourChart;
 
-   public ActionSelectInBetweenTimeSlices(final IChartContextProvider chartContextProvider) {
+   public ActionSelectInBetweenTimeSlices(final IChartContextProvider chartContextProvider,
+                                          final TourChart tourChart) {
 
       //TODO FB
       setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour_marker_new));
       setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour_marker_new_disabled));
 
       _chartContextProvider = chartContextProvider;
+      _tourChart = tourChart;
    }
 
    @Override
    public void run() {
 
+      //Opens the TourDataEditorView
       Util.showView(TourDataEditorView.ID, true);
 
       final TourDataEditorView tourDataEditorView = TourManager.getTourDataEditor();
       final SelectionChartInfo selectionChartInfo = _chartContextProvider.getChart().getChartInfo();
+      final TourChartConfiguration tcc= _tourChart.getTourChartConfig();
 
+      for (final int actionId : tcc.getVisibleGraphs()) {
+
+         switch (actionId) {
+         case TourManager.GRAPH_SWIM_STROKES:
+         case TourManager.GRAPH_SWIM_SWOLF:
+            System.out.println("SWIM GRAPH");
+            break;
+            default:
+            System.out.println("NOT SWIM GRAPH");
+            break;
+         }
+      }
       if (selectionChartInfo == null || tourDataEditorView == null) {
          return;
       }
 
-      //Opens the TourDataEditorView and TimeSlice tabs
+      //TODO fb detect if it swim graph and opens the swim slice ?
+      //Opens the TimeSlice tab
       tourDataEditorView.selectTimeSlicesTab();
 
       tourDataEditorView.setRowEditModeEnabled(true);
