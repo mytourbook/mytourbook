@@ -215,7 +215,7 @@ public class DropboxFileSystem extends TourbookFileSystem {
          if (!StringUtils.isNullOrEmpty(selectedFolder)) {
             FILE_SYSTEM_FOLDER = selectedFolder;
 
-            return getId() + selectedFolder;
+            return getDisplayId() + selectedFolder;
          }
       }
 

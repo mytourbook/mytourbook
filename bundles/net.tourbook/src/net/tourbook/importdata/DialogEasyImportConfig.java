@@ -4137,8 +4137,9 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
       if (isDeviceLocal && NIO.isTourBookFileSystem(deviceFolder)) {
          deviceFolder = UI.EMPTY_STRING;
-      } else if (!isDeviceLocal && StringUtils.isNullOrEmpty(deviceFolder)) {
-         deviceFolder = _comboIC_DeviceType.getText();
+      } else if (!isDeviceLocal &&
+            !NIO.isTourBookFileSystem(deviceFolder)) {
+         deviceFolder = FileSystemManager.getTourbookFileSystem(_comboIC_DeviceType.getText()).getDisplayId();
       }
       _comboIC_DeviceFolder.setText(deviceFolder);
 
@@ -4152,6 +4153,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
          _lblIC_BackupFolder.setEnabled(false);
          _btnIC_SelectBackupFolder.setEnabled(false);
          _backupHistoryItems.setIsValidateFolder(false);
+         _backupHistoryItems.validateModifiedPath();
       }
    }
 

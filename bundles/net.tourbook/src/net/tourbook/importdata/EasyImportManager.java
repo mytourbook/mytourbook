@@ -983,7 +983,9 @@ public class EasyImportManager {
          return;
       }
 
-      TourLogManager.addLog(TourLogState.DEFAULT, LOG_EASY_IMPORT_003_TOUR_TYPE);
+      if (importLauncher.isSetTourType) {
+         TourLogManager.addLog(TourLogState.DEFAULT, LOG_EASY_IMPORT_003_TOUR_TYPE);
+      }
 
       final ImportConfig importConfig = getEasyConfig().getActiveImportConfig();
 
@@ -1004,7 +1006,9 @@ public class EasyImportManager {
          }
 
          // set tour type
-         setTourType(tourData, importLauncher);
+         if (importLauncher.isSetTourType) {
+            setTourType(tourData, importLauncher);
+         }
 
          // set import path
          if (importConfig.isCreateBackup) {
@@ -1088,7 +1092,7 @@ public class EasyImportManager {
       }
 
       /*
-       * Import laucher configs
+       * Import launcher configs
        */
       for (final ImportLauncher importLauncher : dashConfig.importLaunchers) {
 
