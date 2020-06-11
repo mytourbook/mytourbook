@@ -66,7 +66,7 @@ import org.eclipse.nebula.widgets.nattable.resize.command.InitializeAutoResizeCo
 import org.eclipse.nebula.widgets.nattable.util.GCFactory;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.BusyIndicator; 
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.GC;
@@ -844,13 +844,20 @@ public class ColumnManager {
        */
       Collections.sort(_allProfiles, _profileSorter);
 
-      for (final ColumnProfile columnProfile : _allProfiles) {
+      for (int columnIndex = 0; columnIndex < _allProfiles.size(); columnIndex++) {
 
+         final ColumnProfile columnProfile = _allProfiles.get(columnIndex);
          final boolean isChecked = columnProfile == _activeProfile;
-
-         final String menuText = columnProfile.name
+ 
+         String menuText =
+               columnProfile.name
                + COLUMN_TEXT_SEPARATOR
                + Integer.toString(columnProfile.visibleColumnIds.length);
+
+         // add a mnemonic to select a profile easier when debugging
+         if (columnIndex < 10) {
+            menuText = UI.SYMBOL_MNEMONIC + Integer.toString(columnIndex + 1) + UI.SPACE + menuText;
+         }
 
          final MenuItem menuItem = new MenuItem(contextMenu, SWT.CHECK);
 
@@ -1024,8 +1031,9 @@ public class ColumnManager {
 
                final Point displayPosition = natTable.toDisplay(posX, headerBottom);
 
+               // micro adjust position to show exactly on the header lines otherwise it looks ugly
                event.x = displayPosition.x - 1;
-               event.y = displayPosition.y - 2;
+               event.y = displayPosition.y - 1;
             }
          }
       };
@@ -1611,7 +1619,8 @@ public class ColumnManager {
     * @param mousePosition
     * @param isTableHeaderHit
     * @param columnHeaderLayer
-    * @return Returns a column item or <code>null</code> when the header is not hit.
+    * @return Returns a column item or <code>null</code> when the header is not hit or the columns
+    *         is not found
     */
    private ColumnWrapper getHeaderColumn(final NatTable natTable,
                                          final Point mousePosition,
@@ -1634,8 +1643,8 @@ public class ColumnManager {
 
             // column found
 
-            final int gridColumnStartX = natTable.getStartXOfColumnPosition(colIndexByPos);
-            final int columnWidth = natTable.getColumnWidthByPosition(colIndexByPos);
+            final int gridColumnStartX = natTable.getStartXOfColumnPosition(gridColumnPosition);
+            final int columnWidth = natTable.getColumnWidthByPosition(gridColumnPosition);
 
             final int columnLeftBorder = gridColumnStartX;
             final int columnRightBorder = gridColumnStartX + columnWidth;
@@ -2685,6 +2694,10 @@ public class ColumnManager {
 
       if (isFirstColumn) {
 
+         // ensure the column is also displayed, it could be hidden when it was previously displayed and then set to hidden !!!
+         final ColumnDefinition colDef = getColDef_ByColumnId(columnId_New);
+         colDef.setIsColumnDisplayed(true);
+
          // set visible columns
          allNewVisibleColumnIds.add(columnId_New);
 
@@ -2699,14 +2712,14 @@ public class ColumnManager {
 
          final ColumnDefinition colDef = getColDef_ByColumnId(columnId);
 
+         // ensure the column is also displayed, it could be hidden when it was previously displayed and then set to hidden !!!
+         colDef.setIsColumnDisplayed(true);
+
          if (columnId_New == colDef.getColumnId() && isNewColumnAdded) {
 
             // column is already added
             continue;
          }
-
-         // ensure the column is also displayed, it could be hidden when it was previously displayed and then set to hidden !!!
-         colDef.setIsColumnDisplayed(true);
 
          // set visible columns
          allNewVisibleColumnIds.add(columnId);
@@ -2724,6 +2737,10 @@ public class ColumnManager {
        * Append new column to the end, this could be improved to insert after the current column
        */
       if (isNewColumnAdded == false) {
+
+         // ensure the column is also displayed, it could be hidden when it was previously displayed and then set to hidden !!!
+         final ColumnDefinition colDef = getColDef_ByColumnId(columnId_New);
+         colDef.setIsColumnDisplayed(true);
 
          // set visible columns
          allNewVisibleColumnIds.add(columnId_New);

@@ -1473,50 +1473,52 @@ public class DialogModifyColumns extends TrayDialog {
    private void onProfile_Remove() {
 
       _isInUpdate = true;
+      {
+         final Table profileTable = _profileViewer.getTable();
+ 
+         final int selectedIndex = profileTable.getSelectionIndex();
 
-      final Table profileTable = _profileViewer.getTable();
+         final ColumnProfile selectedProfile = getSelectedProfile();
 
-      final int selectedIndex = profileTable.getSelectionIndex();
+         // update UI
+         _dialog_Profiles.remove(selectedProfile);
 
-      final ColumnProfile selectedProfile = getSelectedProfile();
+         // update model
+         _profileViewer.remove(selectedProfile);
 
-      // update UI
-      _dialog_Profiles.remove(selectedProfile);
-
-      // update model
-      _profileViewer.remove(selectedProfile);
-
-      /*
-       * Select profile at the same position
-       */
-      final int profilesSize = _dialog_Profiles.size();
-      int newIndex = selectedIndex;
-      if (newIndex >= profilesSize) {
-         newIndex = profilesSize - 1;
-      }
-
-      int nextIndex = 0;
-      final TableItem nextItem = profileTable.getItem(newIndex);
-      final ColumnProfile nextProfile = (ColumnProfile) nextItem.getData();
-
-      for (int profileIndex = 0; profileIndex < _dialog_Profiles.size(); profileIndex++) {
-
-         final ColumnProfile profile = _dialog_Profiles.get(profileIndex);
-
-         if (profile.getID() == nextProfile.getID()) {
-            nextIndex = profileIndex;
-            break;
+         /*
+          * Select profile at the same position
+          */
+         final int profilesSize = _dialog_Profiles.size();
+         int newIndex = selectedIndex;
+         if (newIndex >= profilesSize) {
+            newIndex = profilesSize - 1;
          }
+
+         int nextIndex = 0;
+         final TableItem nextItem = profileTable.getItem(newIndex);
+         final ColumnProfile nextProfile = (ColumnProfile) nextItem.getData();
+
+         for (int profileIndex = 0; profileIndex < _dialog_Profiles.size(); profileIndex++) {
+
+            final ColumnProfile profile = _dialog_Profiles.get(profileIndex);
+
+            if (profile.getID() == nextProfile.getID()) {
+               nextIndex = profileIndex;
+               break;
+            }
+         }
+         _selectedProfile = _dialog_Profiles.get(nextIndex);
+
+         // update UI
+         _profileViewer.setSelection(new StructuredSelection(_selectedProfile), true);
+
+         enableProfileActions();
+
+         setupColumnProfile(_selectedProfile);
+
+         profileTable.setFocus();
       }
-      _selectedProfile = _dialog_Profiles.get(nextIndex);
-
-      // update UI
-      _profileViewer.setSelection(new StructuredSelection(_selectedProfile), true);
-
-      enableProfileActions();
-
-      profileTable.setFocus();
-
       _isInUpdate = false;
    }
 
@@ -1582,14 +1584,7 @@ public class DialogModifyColumns extends TrayDialog {
 
       _selectedProfile = selectedProfile;
 
-      /*
-       * Update column viewer from the selected profile
-       */
-      _columnViewerModel = createColumnViewerModel(selectedProfile);
-
-      setupColumnsInViewer();
-
-      enableProfileActions();
+      setupColumnProfile(selectedProfile);
    }
 
    /**
@@ -1692,6 +1687,20 @@ public class DialogModifyColumns extends TrayDialog {
       if (colDef.canModifyVisibility() == false) {
          cell.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
       }
+   }
+
+   /**
+    * Update column viewer from the selected profile
+    *
+    * @param selectedProfile
+    */
+   private void setupColumnProfile(final ColumnProfile selectedProfile) {
+
+      _columnViewerModel = createColumnViewerModel(selectedProfile);
+
+      setupColumnsInViewer();
+
+      enableProfileActions();
    }
 
    private void setupColumnsInViewer() {
