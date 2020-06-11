@@ -19,6 +19,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.IChartContextProvider;
 import net.tourbook.chart.SelectionChartInfo;
+import net.tourbook.common.util.Util;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
@@ -42,14 +43,21 @@ public class ActionSelectInBetweenTimeSlices extends Action {
 
    @Override
    public void run() {
+
+      Util.showView(TourDataEditorView.ID, true);
+
+      final TourDataEditorView tourDataEditorView = TourManager.getTourDataEditor();
       final SelectionChartInfo selectionChartInfo = _chartContextProvider.getChart().getChartInfo();
 
-      final TourDataEditorView tourDataEditor = TourManager.getTourDataEditor();
-
-      if (selectionChartInfo == null && tourDataEditor == null) {
+      if (selectionChartInfo == null || tourDataEditorView == null) {
          return;
       }
 
-      tourDataEditor.selectTimeSlices(selectionChartInfo);
+      //Opens the TourDataEditorView and TimeSlice tabs
+      tourDataEditorView.selectTimeSlicesTab();
+
+      tourDataEditorView.setRowEditModeEnabled(true);
+
+      tourDataEditorView.selectTimeSlices(selectionChartInfo);
    }
 }

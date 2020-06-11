@@ -2321,9 +2321,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    void actionToggleRowSelectMode() {
 
-      _isRowEditMode = _actionToggleRowSelectMode.isChecked();
-
-      recreateViewer();
+      setRowEditModeEnabled(_actionToggleRowSelectMode.isChecked());
    }
 
    private void addPartListener() {
@@ -7954,11 +7952,17 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       final Table table = (Table) _timeSlice_Viewer.getControl();
 
+      System.out.println("left slider value" + chartInfo.leftSliderValuesIndex);
+      System.out.println("right slider value" + chartInfo.rightSliderValuesIndex);
       final int minSelectedValue = Math.min(chartInfo.leftSliderValuesIndex, chartInfo.rightSliderValuesIndex);
       final int maxSelectedValue = Math.max(chartInfo.leftSliderValuesIndex, chartInfo.rightSliderValuesIndex);
       table.setSelection(minSelectedValue, maxSelectedValue);
 
       table.showSelection();
+   }
+
+   public void selectTimeSlicesTab() {
+      _tabFolder.setSelection(_tab_20_TimeSlices);
    }
 
    @Override
@@ -7968,6 +7972,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 //    fTabFolder.setFocus();
 
       _page_EditorForm.setFocus();
+   }
+
+   public void setRowEditModeEnabled(final boolean enabled) {
+
+      _isRowEditMode = enabled;
+
+      recreateViewer();
    }
 
    /**
@@ -8817,7 +8828,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    }
 
-   private void updateUI_Tab_2_TimeSlices() {
+   public void updateUI_Tab_2_TimeSlices() {
 
       if (_uiRunnableForce_TimeSliceReload) {
          _timeSlice_ViewerTourId = -1L;
