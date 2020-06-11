@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.text.NumberFormat;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -5144,7 +5145,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    }
 
    /**
-    * column: time of day in hh:mm:ss
+    * Column: Time of day in hh:mm:ss or hh:mm:ss am/pm
     */
    private void defineColumn_SwimSlice_Time_TimeOfDay() {
 
@@ -5160,7 +5161,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
                final int serieIndex = ((SwimSlice) cell.getElement()).serieIndex;
 
-               cell.setText(UI.format_hh_mm_ss(_tourStartDayTime + _swimSerie_Time[serieIndex]));
+               final int timeOfDay = _tourStartDayTime + _swimSerie_Time[serieIndex];
+               final int secondOfDay24 = timeOfDay % 86_400;
+
+               if (UI.UNIT_IS_METRIC) {
+                  cell.setText(UI.format_hhh_mm_ss(secondOfDay24));
+               } else {
+                  cell.setText(LocalTime.ofSecondOfDay(secondOfDay24).format(TimeTools.Formatter_DayTimeSecondsAmPm));
+               }
+
             }
          }
       });
@@ -5709,7 +5718,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    }
 
    /**
-    * column: time of day in hh:mm:ss
+    * Column: Time of day in hh:mm:ss or hh:mm:ss am/pm
     */
    private void defineColumn_TimeSlice_Time_TimeOfDay() {
 
@@ -5725,7 +5734,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
                final int serieIndex = ((TimeSlice) cell.getElement()).serieIndex;
 
-               cell.setText(UI.format_hh_mm_ss(_tourStartDayTime + _serieTime[serieIndex]));
+               final int timeOfDay = _tourStartDayTime + _serieTime[serieIndex];
+               final int secondOfDay24 = timeOfDay % 86_400;
+
+               if (UI.UNIT_IS_METRIC) {
+                  cell.setText(UI.format_hhh_mm_ss(secondOfDay24));
+               } else {
+                  cell.setText(LocalTime.ofSecondOfDay(secondOfDay24).format(TimeTools.Formatter_DayTimeSecondsAmPm));
+               }
             }
          }
       });

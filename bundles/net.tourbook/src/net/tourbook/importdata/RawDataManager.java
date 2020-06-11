@@ -38,9 +38,11 @@ import net.tourbook.Messages;
 import net.tourbook.application.PerspectiveFactoryRawData;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
+import net.tourbook.common.FileSystemManager;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.ITourViewer3;
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.widgets.ComboEnumEntry;
 import net.tourbook.data.TourData;
@@ -135,6 +137,7 @@ public class RawDataManager {
    private static RawDataManager           _instance                           = null;
 
    private static ArrayList<String>        _invalidFilesList                   = new ArrayList<>();
+   final static IPreferenceStore           _commonPrefStore                    = CommonActivator.getPrefStore();
    private final IPreferenceStore          _prefStore                          = TourbookPlugin.getPrefStore();
 
    private final IDialogSettings           _importState                        = TourbookPlugin.getState(RawDataView.ID);
@@ -185,7 +188,7 @@ public class RawDataManager {
    private final ArrayList<TourTag>        _tempTourTags                       = new ArrayList<>();
 
    /**
-    * Filepath from the previous reimported tour
+    * Filepath from the previous re-imported tour
     */
    private IPath                           _previousSelectedReimportFolder;
 
@@ -253,7 +256,7 @@ public class RawDataManager {
    }
 
    /**
-    * @return temp directory where received data are stored temporarily
+    * @return temporary directory where received data are stored temporarily
     */
    public static String getTempDir() {
       return TourbookPlugin.getDefault().getStateLocation().toFile().getAbsolutePath();
@@ -436,9 +439,9 @@ public class RawDataManager {
 
    /**
     * @param reimportId
-    *           ID how a tour is reimported.
+    *           ID how a tour is re-imported.
     * @param tourViewer
-    *           Tour viewer where the selected tours should be reimported.
+    *           Tour viewer where the selected tours should be re-imported.
     */
    public void actionReimportTour(final ReImport reimportId, final ITourViewer3 tourViewer) {
 
@@ -482,7 +485,7 @@ public class RawDataManager {
             for (final Object element : selectedTours.toArray()) {
 
                if (monitor.isCanceled()) {
-                  // stop reimporting but process reimported tours
+                  // stop re-importing but process re-imported tours
                   break;
                }
 
@@ -822,7 +825,7 @@ public class RawDataManager {
                   if (_previousSelectedReimportFolder != null) {
 
                      /*
-                      * try to use the folder from the previously reimported tour
+                      * try to use the folder from the previously re-imported tour
                       */
 
                      final String oldImportFileName = new org.eclipse.core.runtime.Path(oldImportFilePathName)
@@ -833,7 +836,7 @@ public class RawDataManager {
                      final File newImportFile = new File(newImportFilePathName);
                      if (newImportFile.exists()) {
 
-                        // reimport file exists in the same folder
+                        // re-import file exists in the same folder
                         reimportFilePathName[0] = newImportFilePathName;
                      }
                   }
@@ -885,7 +888,8 @@ public class RawDataManager {
       }
 
       /*
-       * Keep selected file path which is used to reimport following tours from the same folder that
+       * Keep selected file path which is used to re-import following tours from the same folder
+       * that
        * the user do not have to reselect again and again.
        */
       _previousSelectedReimportFolder = new org.eclipse.core.runtime.Path(reimportFilePathName[0])
@@ -912,7 +916,7 @@ public class RawDataManager {
       if (importRawData(reimportedFile, null, false, null, false)) {
 
          /*
-          * tour(s) could be reimported from the file, check if it contains a valid tour
+          * tour(s) could be re-imported from the file, check if it contains a valid tour
           */
          TourData newTourData = actionReimportTour_40(reimportId, reimportedFile, oldTourData);
 
@@ -929,14 +933,14 @@ public class RawDataManager {
                         newTourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S),
                         reimportFileNamePath));
 
-            // set reimport file path as new location
+            // set re-import file path as new location
             newTourData.setImportFilePath(reimportFileNamePath);
 
             // check if tour is saved
             final TourPerson tourPerson = oldTourData.getTourPerson();
             if (tourPerson != null) {
 
-               // resave tour when the reimported tour was already saved
+               // re-save tour when the re-imported tour was already saved
 
                newTourData.setTourPerson(tourPerson);
 
@@ -964,7 +968,7 @@ public class RawDataManager {
 
          if (oldTourDataInImportView != null) {
 
-            // reattach removed tour
+            // re-attach removed tour
 
             _toursInImportView.put(oldTourId, oldTourDataInImportView);
          }
@@ -977,8 +981,8 @@ public class RawDataManager {
     * @param reimportId
     * @param reimportedFile
     * @param oldTourData
-    * @return Returns {@link TourData} with the reimported time slices or <code>null</code> when an
-    *         error occured.
+    * @return Returns {@link TourData} with the re-imported time slices or <code>null</code> when an
+    *         error occurred.
     */
    private TourData actionReimportTour_40(final ReImport reimportId,
                                           final File reimportedFile,
@@ -1028,7 +1032,7 @@ public class RawDataManager {
          }
 
          /*
-          * ensure that the reimported tour has the same tour id
+          * ensure that the re-imported tour has the same tour id
           */
          final long oldTourId = oldTourData.getTourId().longValue();
          final long reimportTourId = reimportedTourData.getTourId().longValue();
@@ -1080,7 +1084,7 @@ public class RawDataManager {
 
          } else if (reimportId == ReImport.OnlyTourMarker) {
 
-            // reimport only tour markers
+            // re-import only tour markers
 
             oldTourData.setTourMarkers(reimportedTourData.getTourMarkers());
 
@@ -1106,7 +1110,7 @@ public class RawDataManager {
       }
 
       /*
-       * A reimport failed, display an error message
+       * A re-import failed, display an error message
        */
       if (message == null) {
 
@@ -1127,14 +1131,14 @@ public class RawDataManager {
       // ALTITUDE
       if (reimportId == ReImport.AllTimeSlices || reimportId == ReImport.OnlyAltitudeValues) {
 
-         // reimport altitude only
+         // re-import altitude only
          oldTourData.altitudeSerie = reimportedTourData.altitudeSerie;
       }
 
       // CADENCE
       if (reimportId == ReImport.AllTimeSlices || reimportId == ReImport.OnlyCadenceValues) {
 
-         // reimport cadence/stride only
+         // re-import cadence/stride only
          oldTourData.setCadenceSerie(reimportedTourData.getCadenceSerie());
          oldTourData.setCadenceMultiplier(reimportedTourData.getCadenceMultiplier());
          oldTourData.setIsStrideSensorPresent(reimportedTourData.isStrideSensorPresent());
@@ -1143,7 +1147,7 @@ public class RawDataManager {
       // GEAR
       if (reimportId == ReImport.AllTimeSlices || reimportId == ReImport.OnlyGearValues) {
 
-         // reimport gear only
+         // re-import gear only
          oldTourData.gearSerie = reimportedTourData.gearSerie;
          oldTourData.setFrontShiftCount(reimportedTourData.getFrontShiftCount());
          oldTourData.setRearShiftCount(reimportedTourData.getRearShiftCount());
@@ -1156,7 +1160,7 @@ public class RawDataManager {
 
          oldTourData.setCalories(reimportedTourData.getCalories());
 
-         // reimport power and speed only when it's from the device
+         // re-import power and speed only when it's from the device
          final boolean isDevicePower = reimportedTourData.isPowerSerieFromDevice();
          if (isDevicePower) {
 
@@ -1167,20 +1171,20 @@ public class RawDataManager {
 
 //SET_FORMATTING_OFF
 
-				oldTourData.setPower_Avg(									reimportedTourData.getPower_Avg());
-				oldTourData.setPower_Max(									reimportedTourData.getPower_Max());
-				oldTourData.setPower_Normalized(							reimportedTourData.getPower_Normalized());
-				oldTourData.setPower_FTP(									reimportedTourData.getPower_FTP());
+            oldTourData.setPower_Avg(                          reimportedTourData.getPower_Avg());
+            oldTourData.setPower_Max(                          reimportedTourData.getPower_Max());
+            oldTourData.setPower_Normalized(                   reimportedTourData.getPower_Normalized());
+            oldTourData.setPower_FTP(                          reimportedTourData.getPower_FTP());
 
-				oldTourData.setPower_TotalWork(							reimportedTourData.getPower_TotalWork());
-				oldTourData.setPower_TrainingStressScore(				reimportedTourData.getPower_TrainingStressScore());
-				oldTourData.setPower_IntensityFactor(					reimportedTourData.getPower_IntensityFactor());
+            oldTourData.setPower_TotalWork(                    reimportedTourData.getPower_TotalWork());
+            oldTourData.setPower_TrainingStressScore(          reimportedTourData.getPower_TrainingStressScore());
+            oldTourData.setPower_IntensityFactor(              reimportedTourData.getPower_IntensityFactor());
 
-				oldTourData.setPower_PedalLeftRightBalance(			reimportedTourData.getPower_PedalLeftRightBalance());
-				oldTourData.setPower_AvgLeftPedalSmoothness(			reimportedTourData.getPower_AvgLeftPedalSmoothness());
-				oldTourData.setPower_AvgLeftTorqueEffectiveness(	reimportedTourData.getPower_AvgLeftTorqueEffectiveness());
-				oldTourData.setPower_AvgRightPedalSmoothness(		reimportedTourData.getPower_AvgRightPedalSmoothness());
-				oldTourData.setPower_AvgRightTorqueEffectiveness(	reimportedTourData.getPower_AvgRightTorqueEffectiveness());
+            oldTourData.setPower_PedalLeftRightBalance(        reimportedTourData.getPower_PedalLeftRightBalance());
+            oldTourData.setPower_AvgLeftPedalSmoothness(       reimportedTourData.getPower_AvgLeftPedalSmoothness());
+            oldTourData.setPower_AvgLeftTorqueEffectiveness(   reimportedTourData.getPower_AvgLeftTorqueEffectiveness());
+            oldTourData.setPower_AvgRightPedalSmoothness(      reimportedTourData.getPower_AvgRightPedalSmoothness());
+            oldTourData.setPower_AvgRightTorqueEffectiveness(  reimportedTourData.getPower_AvgRightTorqueEffectiveness());
 
 //SET_FORMATTING_ON
          }
@@ -1189,7 +1193,7 @@ public class RawDataManager {
       // PULSE
       if (reimportId == ReImport.AllTimeSlices || reimportId == ReImport.OnlyPowerAndPulseValues) {
 
-         // reimport pulse
+         // re-import pulse
 
          oldTourData.pulseSerie = reimportedTourData.pulseSerie;
          oldTourData.pulseTimeSerie = reimportedTourData.pulseTimeSerie;
@@ -1198,7 +1202,7 @@ public class RawDataManager {
       // SPEED
       if (reimportId == ReImport.AllTimeSlices || reimportId == ReImport.OnlyPowerAndSpeedValues) {
 
-         // reimport speed
+         // re-import speed
 
          final boolean isDeviceSpeed = reimportedTourData.isSpeedSerieFromDevice();
          if (isDeviceSpeed) {
@@ -1212,7 +1216,7 @@ public class RawDataManager {
       // RUNNING DYNAMICS
       if (reimportId == ReImport.AllTimeSlices || reimportId == ReImport.OnlyRunningDynamics) {
 
-         // reimport only running dynamics
+         // re-import only running dynamics
 
          oldTourData.runDyn_StanceTime = reimportedTourData.runDyn_StanceTime;
          oldTourData.runDyn_StanceTimeBalance = reimportedTourData.runDyn_StanceTimeBalance;
@@ -1224,7 +1228,7 @@ public class RawDataManager {
       // SWIMMING
       if (reimportId == ReImport.AllTimeSlices || reimportId == ReImport.OnlySwimming) {
 
-         // reimport only swimming
+         // re-import only swimming
 
          oldTourData.swim_LengthType = reimportedTourData.swim_LengthType;
          oldTourData.swim_Cadence = reimportedTourData.swim_Cadence;
@@ -1236,7 +1240,7 @@ public class RawDataManager {
       // TEMPERATURE
       if (reimportId == ReImport.AllTimeSlices || reimportId == ReImport.OnlyTemperatureValues) {
 
-         // reimport temperature only
+         // re-import temperature only
 
          oldTourData.temperatureSerie = reimportedTourData.temperatureSerie;
       }
@@ -1244,7 +1248,7 @@ public class RawDataManager {
       // TRAINING
       if (reimportId == ReImport.AllTimeSlices || reimportId == ReImport.OnlyTrainingValues) {
 
-         // reimport training only
+         // re-import training only
 
          oldTourData.setTraining_TrainingEffect_Aerob(reimportedTourData.getTraining_TrainingEffect_Aerob());
          oldTourData.setTraining_TrainingEffect_Anaerob(reimportedTourData.getTraining_TrainingEffect_Anaerob());
@@ -1254,7 +1258,7 @@ public class RawDataManager {
       // ALL
       if (reimportId == ReImport.AllTimeSlices) {
 
-         // reimport all other data series
+         // re-import all other data series
 
          // update device data
          oldTourData.setDeviceFirmwareVersion(reimportedTourData.getDeviceFirmwareVersion());
@@ -1289,7 +1293,7 @@ public class RawDataManager {
             @Override
             public int compare(final TourbookDevice o1, final TourbookDevice o2) {
 
-               // 1. sort by prio
+               // 1. sort by priority
                final int sortByPrio = o1.extensionSortPriority - o2.extensionSortPriority;
 
                // 2. sort by name
@@ -1384,24 +1388,28 @@ public class RawDataManager {
       // check if importFile exist
       if (importFile.exists() == false) {
 
-         display.syncExec(new Runnable() {
-            @Override
-            public void run() {
+         // check if importFile exist
+         if (importFile.exists() == false) {
 
-               final Shell activeShell = display.getActiveShell();
+            display.syncExec(new Runnable() {
+               @Override
+               public void run() {
 
-               // during initialisation there is no active shell
-               if (activeShell != null) {
+                  final Shell activeShell = display.getActiveShell();
 
-                  MessageDialog.openError(
-                        activeShell,
-                        Messages.DataImport_Error_file_does_not_exist_title,
-                        NLS.bind(Messages.DataImport_Error_file_does_not_exist_msg, importFilePathName));
+                  // during initialization there is no active shell
+                  if (activeShell != null) {
+
+                     MessageDialog.openError(
+                           activeShell,
+                           Messages.DataImport_Error_file_does_not_exist_title,
+                           NLS.bind(Messages.DataImport_Error_file_does_not_exist_msg, importFilePathName));
+                  }
                }
-            }
-         });
+            });
 
-         return false;
+            return false;
+         }
       }
 
       // find the file extension in the filename
@@ -1609,7 +1617,7 @@ public class RawDataManager {
             _toursInImportView.putAll(_newlyImportedTours);
          }
 
-         // keep tours in _newlyImportedTours because they are used when tours are reimported
+         // keep tours in _newlyImportedTours because they are used when tours are re-imported
 
          return isImported;
       }
@@ -1760,7 +1768,7 @@ public class RawDataManager {
 
       /*
        * Check if all tours from a file are removed, when yes, remove file path that the file can
-       * not be reimported. When at least one tour is still used, all tours will be reimported
+       * not be re-imported. When at least one tour is still used, all tours will be re-imported
        * because it's not yet saved which tours are removed from a file and which are not.
        */
       for (final Object item : oldFileNames) {
@@ -1903,7 +1911,14 @@ public class RawDataManager {
                   continue;
                }
 
-               if (importRawData(new File(osFilePath), null, false, null, true)) {
+               File importFile = new File(osFilePath);
+
+               if (FileSystemManager.isFileFromTourBookFileSystem(osFilePath)) {
+                  importFile = FileSystemManager.CopyLocally(osFilePath);
+
+               }
+
+               if (importRawData(importFile, null, false, null, true)) {
 
                   importCounter++;
 
@@ -1929,6 +1944,16 @@ public class RawDataManager {
 
                   TourLogManager.addSubLog(TourLogState.IMPORT_ERROR, osFilePath);
                }
+
+               if (FileSystemManager.isFileFromTourBookFileSystem(osFilePath)) {
+                  // Delete the temporary created file
+                  try {
+                     Files.deleteIfExists(importFile.toPath());
+                  } catch (final IOException e) {
+                     StatusUtil.log(e);
+                  }
+               }
+
             }
 
             save_InvalidFilesToIgnore_InTxt();

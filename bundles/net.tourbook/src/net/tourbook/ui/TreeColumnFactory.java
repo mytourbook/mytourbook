@@ -50,6 +50,12 @@ public abstract class TreeColumnFactory {
    public static final TreeColumnFactory DEVICE_DISTANCE;
    public static final TreeColumnFactory DEVICE_NAME;
 
+   public static final TreeColumnFactory MOTION_AVG_PACE;
+   public static final TreeColumnFactory MOTION_AVG_SPEED;
+   public static final TreeColumnFactory MOTION_DISTANCE;
+   public static final TreeColumnFactory MOTION_MAX_SPEED;
+   public static final TreeColumnFactory MOTION_NORMALIZED_PACE;
+
    public static final TreeColumnFactory POWER_AVG;
    public static final TreeColumnFactory POWER_MAX;
    public static final TreeColumnFactory POWER_NORMALIZED;
@@ -102,20 +108,13 @@ public abstract class TreeColumnFactory {
    public static final TreeColumnFactory TIME_WEEK_NO;
    public static final TreeColumnFactory TIME_WEEKYEAR;
 
-   public static final TreeColumnFactory MOTION_AVG_PACE;
-   public static final TreeColumnFactory MOTION_AVG_SPEED;
-   public static final TreeColumnFactory MOTION_DISTANCE;
-   public static final TreeColumnFactory MOTION_MAX_SPEED;
-   public static final TreeColumnFactory MOTION_NORMALIZED_PACE;
-
-   public static final TreeColumnFactory TOUR_REFTOUR_TOUR;
-
    public static final TreeColumnFactory TOUR_COLLATE_EVENT;
    public static final TreeColumnFactory TOUR_COUNTER;
    public static final TreeColumnFactory TOUR_LOCATION_END;
    public static final TreeColumnFactory TOUR_LOCATION_START;
    public static final TreeColumnFactory TOUR_NUM_MARKERS;
    public static final TreeColumnFactory TOUR_NUM_PHOTOS;
+   public static final TreeColumnFactory TOUR_REFTOUR_TOUR;
    public static final TreeColumnFactory TOUR_TAG_AND_CATEGORY_NOTES;
    public static final TreeColumnFactory TOUR_TAG_AND_TAGS;
    public static final TreeColumnFactory TOUR_TAG_ID;
@@ -132,10 +131,10 @@ public abstract class TreeColumnFactory {
    public static final TreeColumnFactory TRAINING_TRAINING_EFFECT_ANAEROB;
    public static final TreeColumnFactory TRAINING_TRAINING_PERFORMANCE;
 
+   public static final TreeColumnFactory WEATHER_CLOUDS;
    public static final TreeColumnFactory WEATHER_TEMPERATURE_AVG;
    public static final TreeColumnFactory WEATHER_TEMPERATURE_MIN;
    public static final TreeColumnFactory WEATHER_TEMPERATURE_MAX;
-   public static final TreeColumnFactory WEATHER_CLOUDS;
    public static final TreeColumnFactory WEATHER_WIND_DIR;
    public static final TreeColumnFactory WEATHER_WIND_SPEED;
 

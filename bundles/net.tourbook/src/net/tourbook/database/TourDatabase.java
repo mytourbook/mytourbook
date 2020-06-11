@@ -101,7 +101,7 @@ public class TourDatabase {
    /**
     * Version for the database which is required that the tourbook application works successfully
     */
-   private static final int TOURBOOK_DB_VERSION = 41;
+   private static final int TOURBOOK_DB_VERSION = 42;
 
 //   private static final int TOURBOOK_DB_VERSION = 41; // 19.XX
 //   private static final int TOURBOOK_DB_VERSION = 40; // 19.10
@@ -3142,11 +3142,16 @@ public class TourDatabase {
             //
             // version 40 end
 
-            // version 41 start  -  19.XX
+            // version 41 start  -  20.5
             //
-            + " govss                  INTEGER DEFAULT 0,                  \n" //$NON-NLS-1$
+            + " maxPace                               FLOAT DEFAULT 0,                  \n" //$NON-NLS-1$
             //
             // version 41 end
+
+            // version 42 start  -  19.XX
+            //
+            + " govss                  INTEGER DEFAULT 0,                  \n" //$NON-NLS-1$
+            // version 42 end
 
             //            // version 35 start  -  18.?
             //            //
@@ -4907,6 +4912,11 @@ public class TourDatabase {
             currentDbVersion = newVersion = updateDbDesign_040_to_041(conn, splashManager);
          }
 
+         // 41 -> 42
+         if (currentDbVersion == 41) {
+            currentDbVersion = newVersion = updateDbDesign_041_to_042(conn, splashManager);
+         }
+
          /*
           * Update version number
           */
@@ -4917,7 +4927,7 @@ public class TourDatabase {
           * connections and entitymanager which is checking the version number.
           * <p>
           * Also the data structure must be updated otherwise the entity manager fails because the
-          * data structure in the programm code MUST be the same as in the database.
+          * data structure in the program code MUST be the same as in the database.
           */
          if (isPostUpdate5) {
             TourDatabase.computeAnyValues_ForAllTours(splashManager);
@@ -6275,7 +6285,7 @@ public class TourDatabase {
              */
 
             /*
-             * Drop tables which will never be used, they exist since many years but it is unknows
+             * Drop tables which will never be used, they exist since many years but it is unknown
              * why they has been created.
              */
             SQL.Cleanup_DropTable(stmt, TABLE_TOUR_CATEGORY);
@@ -7486,32 +7496,58 @@ public class TourDatabase {
       final Statement stmt = conn.createStatement();
       {
          // check if db is updated to version 41
-         if (isColumnAvailable(conn, TABLE_TOUR_DATA, "govss") == false) { //$NON-NLS-1$
+         if (isColumnAvailable(conn, TABLE_TOUR_DATA, "maxPace") == false) { //$NON-NLS-1$
 
 // SET_FORMATTING_OFF
 
             // Add new columns
-            SQL.AddCol_Int      (stmt, TABLE_TOUR_DATA, "govss", DEFAULT_0);//$NON-NLS-1$
-            SQL.AddCol_Int      (stmt, TABLE_TOUR_PERSON, "govssThresholdPower", DEFAULT_0);//$NON-NLS-1$
-            SQL.AddCol_Int      (stmt, TABLE_TOUR_PERSON, "govssTimeTrialDuration", DEFAULT_0);//$NON-NLS-1$
-            SQL.AddCol_Int      (stmt, TABLE_TOUR_PERSON, "govssTimeTrialDistance", DEFAULT_0);//$NON-NLS-1$
-            SQL.AddCol_Int      (stmt, TABLE_TOUR_PERSON, "govssTimeTrialAverageSlope", DEFAULT_0);//$NON-NLS-1$
-            SQL.AddCol_VarCar   (stmt, TABLE_TOUR_PERSON, "govssAssociatedTourTypes", TourPerson.DB_LENGTH_GOVSS_ASSOCIATED_TOUR_TYPES); //$NON-NLS-1$
-
-            createTable_PerformanceModelingData(stmt);
-
-             String sql = "ALTER TABLE " + TABLE_TOUR_PERSON //$NON-NLS-1$
-                  + "   ADD " + ENTITY_ID_PERFORMANCE_MODELING_DATA  + "     BIGINT \n";//$NON-NLS-1$ //$NON-NLS-2$
-
-            exec(stmt, sql);
-
-             sql = "ALTER TABLE " + TABLE_TOUR_PERSON //$NON-NLS-1$
-                  + "   ADD CONSTRAINT " + FK_PERSON_PERFORMANCE_MODELING_DATA  + " FOREIGN KEY (" + ENTITY_ID_PERFORMANCE_MODELING_DATA + ")" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                  + "   REFERENCES " + TABLE_PERFORMANCE_MODELING_DATA  + " (" + ENTITY_ID_PERFORMANCE_MODELING_DATA + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-
-            exec(stmt, sql);
-
+            SQL.AddCol_Float(stmt, TABLE_TOUR_DATA, "maxPace",          DEFAULT_0);                            //$NON-NLS-1$
 // SET_FORMATTING_ON
+         }
+      }
+      stmt.close();
+
+      logDb_UpdateEnd(newDbVersion);
+
+      return newDbVersion;
+   }
+
+   private int updateDbDesign_041_to_042(final Connection conn, final SplashManager splashManager) throws SQLException {
+
+      final int newDbVersion = 42;
+
+      logDb_UpdateStart(newDbVersion);
+      updateMonitor(splashManager, newDbVersion);
+
+      final Statement stmt = conn.createStatement();
+      {
+         // check if db is updated to version 42
+         if (isColumnAvailable(conn, TABLE_TOUR_DATA, "govss") == false) { //$NON-NLS-1$
+
+   // SET_FORMATTING_OFF
+
+               // Add new columns
+               SQL.AddCol_Int      (stmt, TABLE_TOUR_DATA, "govss", DEFAULT_0);//$NON-NLS-1$
+               SQL.AddCol_Int      (stmt, TABLE_TOUR_PERSON, "govssThresholdPower", DEFAULT_0);//$NON-NLS-1$
+               SQL.AddCol_Int      (stmt, TABLE_TOUR_PERSON, "govssTimeTrialDuration", DEFAULT_0);//$NON-NLS-1$
+               SQL.AddCol_Int      (stmt, TABLE_TOUR_PERSON, "govssTimeTrialDistance", DEFAULT_0);//$NON-NLS-1$
+               SQL.AddCol_Int      (stmt, TABLE_TOUR_PERSON, "govssTimeTrialAverageSlope", DEFAULT_0);//$NON-NLS-1$
+               SQL.AddCol_VarCar   (stmt, TABLE_TOUR_PERSON, "govssAssociatedTourTypes", TourPerson.DB_LENGTH_GOVSS_ASSOCIATED_TOUR_TYPES); //$NON-NLS-1$
+
+               createTable_PerformanceModelingData(stmt);
+
+                String sql = "ALTER TABLE " + TABLE_TOUR_PERSON //$NON-NLS-1$
+                     + "   ADD " + ENTITY_ID_PERFORMANCE_MODELING_DATA  + "     BIGINT \n";//$NON-NLS-1$ //$NON-NLS-2$
+
+               exec(stmt, sql);
+
+                sql = "ALTER TABLE " + TABLE_TOUR_PERSON //$NON-NLS-1$
+                     + "   ADD CONSTRAINT " + FK_PERSON_PERFORMANCE_MODELING_DATA  + " FOREIGN KEY (" + ENTITY_ID_PERFORMANCE_MODELING_DATA + ")" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                     + "   REFERENCES " + TABLE_PERFORMANCE_MODELING_DATA  + " (" + ENTITY_ID_PERFORMANCE_MODELING_DATA + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
+               exec(stmt, sql);
+
+   // SET_FORMATTING_ON
          }
       }
       stmt.close();
