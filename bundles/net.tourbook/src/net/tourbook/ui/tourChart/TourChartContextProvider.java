@@ -44,6 +44,7 @@ import net.tourbook.ui.tourChart.action.ActionCreateMarkerFromSlider;
 import net.tourbook.ui.tourChart.action.ActionCreateMarkerFromValuePoint;
 import net.tourbook.ui.tourChart.action.ActionCreateRefTour;
 import net.tourbook.ui.tourChart.action.ActionDeleteMarker;
+import net.tourbook.ui.tourChart.action.ActionSelectInBetweenTimeSlices;
 import net.tourbook.ui.tourChart.action.ActionSetMarkerLabelPositionMenu;
 import net.tourbook.ui.tourChart.action.ActionSetMarkerVisible;
 
@@ -71,6 +72,7 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
    private ActionOpenMarkerDialog           _actionOpenMarkerDialog;
    private ActionOpenPrefDialog             _actionPrefDialog;
    private ActionOpenTour                   _actionOpenTour;
+   private ActionSelectInBetweenTimeSlices  _actionSelectInBetweenTimeSlices;
    private ActionSetTourTypeMenu            _actionSetTourType;
    private ActionSetMarkerVisible           _actionSetMarkerVisible;
    private ActionSetMarkerLabelPositionMenu _actionSetMarkerPosition;
@@ -121,6 +123,8 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
       _actionCreateMarkerFromValuePoint = new ActionCreateMarkerFromValuePoint(
             this,
             Messages.tourCatalog_view_action_create_marker);
+
+      _actionSelectInBetweenTimeSlices = new ActionSelectInBetweenTimeSlices(this);
 
       _actionDeleteMarker = new ActionDeleteMarker(tourChart);
       _actionSetMarkerVisible = new ActionSetMarkerVisible(tourChart);
@@ -301,6 +305,8 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
             menuMgr.add(_actionCreateMarkerFromSliderLeft);
             menuMgr.add(_actionCreateMarkerFromSliderRight);
          }
+
+         menuMgr.add(_actionSelectInBetweenTimeSlices);
 
          menuMgr.add(_actionCreateRefTour);
 

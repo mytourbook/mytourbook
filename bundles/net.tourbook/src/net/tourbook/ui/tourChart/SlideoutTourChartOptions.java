@@ -63,7 +63,6 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
    private Button    _chkShowSrtmData;
    private Button    _chkShowStartTimeOnXAxis;
    private Button    _chkShowValuePointTooltip;
-   private Button    _chkSelectAllTimeSlices;
 
    /**
     * @param ownerControl
@@ -243,28 +242,6 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
                }
             });
          }
-         {
-            /*
-             * Options to select all the time slices in between the left and right sliders or only
-             * the current slider's one
-             */
-            _chkSelectAllTimeSlices = new Button(container, SWT.CHECK);
-            _chkSelectAllTimeSlices.setText(Messages.Tour_Action_Select_Inbetween_Timeslices);
-            _chkSelectAllTimeSlices.setToolTipText(Messages.Tour_Action_Select_Inbetween_Timeslices_Tooltip);
-
-            GridDataFactory.fillDefaults()//
-                  .span(2, 1)
-                  .applyTo(_chkSelectAllTimeSlices);
-
-            _chkSelectAllTimeSlices.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-
-                  final SelectionChartInfo chartInfo = _tourChart.getChartInfo();
-                  chartInfo.isSelectInBetweenTimeSlices = !chartInfo.isSelectInBetweenTimeSlices;
-               }
-            });
-         }
       }
    }
 
@@ -302,8 +279,6 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
       final boolean isShowValuePointTooltip = _prefStore.getDefaultBoolean(//
             ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE);
 
-      final boolean isSelectInBetweenTimeSlices = _tourChart.getChartInfo().isSelectInBetweenTimeSlices;
-
       final X_AXIS_START_TIME xAxisStartTime = isTourStartTime
             ? X_AXIS_START_TIME.TOUR_START_TIME
             : X_AXIS_START_TIME.START_WITH_0;
@@ -316,7 +291,6 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
       _chkShowSrtmData.setSelection(isSrtmDataVisible);
       _chkShowStartTimeOnXAxis.setSelection(isTourStartTime);
       _chkShowValuePointTooltip.setSelection(isShowValuePointTooltip);
-      _chkSelectAllTimeSlices.setSelection(isSelectInBetweenTimeSlices);
 
       // this is not set in saveState()
       _prefStore.setValue(ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE, isShowValuePointTooltip);
@@ -349,15 +323,12 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
       _chkShowValuePointTooltip.setSelection(_prefStore.getBoolean(//
             ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE));
 
-      _chkSelectAllTimeSlices.setSelection(_tourChart.getChartInfo().isSelectInBetweenTimeSlices);
-
       _gridUI.restoreState();
    }
 
    private void saveState() {
 
       final SelectionChartInfo chartInfo = _tourChart.getChartInfo();
-      chartInfo.isSelectInBetweenTimeSlices = _chkSelectAllTimeSlices.getSelection();
 
       final TourChartConfiguration tcc = _tourChart.getTourChartConfig();
 
