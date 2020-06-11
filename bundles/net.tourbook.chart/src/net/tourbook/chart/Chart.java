@@ -766,7 +766,6 @@ public class Chart extends ViewForm {
 	public SelectionChartXSliderPosition getXSliderPosition() {
 
 		final ChartComponentGraph chartGraph = _chartComponents.getChartComponentGraph();
-      //TODO FB HERE TOO!?!?
 
 		return new SelectionChartXSliderPosition(//
 				this,

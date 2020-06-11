@@ -7954,13 +7954,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       final Table table = (Table) _timeSlice_Viewer.getControl();
 
-      //TODO FB remove this property ??
       final int minSelectedValue = Math.min(chartInfo.leftSliderValuesIndex, chartInfo.rightSliderValuesIndex);
       final int maxSelectedValue = Math.max(chartInfo.leftSliderValuesIndex, chartInfo.rightSliderValuesIndex);
       table.setSelection(minSelectedValue, maxSelectedValue);
 
       table.showSelection();
-
    }
 
    @Override
