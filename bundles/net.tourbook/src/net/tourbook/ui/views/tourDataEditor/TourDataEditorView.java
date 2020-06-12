@@ -7923,7 +7923,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     *           Can be {@link SelectionChartXSliderPosition#IGNORE_SLIDER_POSITION} when this
     *           position should not be set.
     */
-   private void selectTimeSlice_InViewer(final int valueIndexStart, final int valueIndexEnd) {
+   public void selectTimeSlice_InViewer(final int valueIndexStart, final int valueIndexEnd) {
 
       final Table table = (Table) _timeSlice_Viewer.getControl();
       final int itemCount = table.getItemCount();

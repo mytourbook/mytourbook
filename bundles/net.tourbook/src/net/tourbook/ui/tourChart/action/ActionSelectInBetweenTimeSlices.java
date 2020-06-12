@@ -60,6 +60,7 @@ public class ActionSelectInBetweenTimeSlices extends Action {
 
       tourDataEditorView.setRowEditModeEnabled(true);
 
-      tourDataEditorView.selectTimeSlices(selectionChartInfo);
+      //tourDataEditorView.selectTimeSlices(selectionChartInfo);
+      tourDataEditorView.selectTimeSlice_InViewer(selectionChartInfo.leftSliderValuesIndex, selectionChartInfo.rightSliderValuesIndex);
    }
 }
