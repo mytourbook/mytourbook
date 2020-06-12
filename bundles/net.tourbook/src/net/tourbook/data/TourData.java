@@ -6468,7 +6468,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       out.println("TOUR DATA"); //$NON-NLS-1$
       out.println("----------------------------------------------------"); //$NON-NLS-1$
 // out.println("Typ: " + getDeviceTourType()); //$NON-NLS-1$
-      out.println("Date:               " + startDay + "." + startMonth + "." + startYear); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      out.println("Date:               " + startDay + UI.SYMBOL_DOT + startMonth + UI.SYMBOL_DOT + startYear); //$NON-NLS-1$
       out.println("Time:               " + startHour + ":" + startMinute); //$NON-NLS-1$ //$NON-NLS-2$
       out.println("Total distance:     " + getStartDistance()); //$NON-NLS-1$
       // out.println("Distance:           " + getDistance());

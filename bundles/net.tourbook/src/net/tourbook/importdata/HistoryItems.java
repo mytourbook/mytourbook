@@ -26,7 +26,6 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 
 import net.tourbook.Messages;
-import net.tourbook.common.CommonActivator;
 import net.tourbook.common.FileSystemManager;
 import net.tourbook.common.NIO;
 import net.tourbook.common.TourbookFileSystem;
@@ -36,12 +35,12 @@ import net.tourbook.common.util.Util;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Link;
@@ -59,8 +58,6 @@ class HistoryItems {
    private static final int      COMBO_HISTORY_LENGTH = 20;
    private static final String   COMBO_SEPARATOR      = "- - - - - - - - - - - - - - - - - - - - - - - - - - -"; //$NON-NLS-1$
 
-   final static IPreferenceStore _prefStore           = CommonActivator.getPrefStore();
-
    private boolean               _canShowDeviceName   = UI.IS_WIN;
 
    private LinkedHashSet<String> _folderItems         = new LinkedHashSet<>();
@@ -76,6 +73,7 @@ class HistoryItems {
     */
    private Combo             _combo;
    private ControlDecoration _comboError;
+   private Button            _buttonBrowse;
 
    private Link              _linkFolderInfo;
 
@@ -402,6 +400,13 @@ class HistoryItems {
       _comboError.setDescriptionText(Messages.Dialog_ImportConfig_Error_FolderIsInvalid);
    }
 
+   void setControls(final Combo comboFolder, final Link linkFolderPath, final Button buttonBrowse) {
+
+      setControls(comboFolder, linkFolderPath);
+      _buttonBrowse = buttonBrowse;
+
+   }
+
    void setIsValidateFolder(final boolean isValidateFolder) {
       _isValidateFolder = isValidateFolder;
    }
@@ -564,7 +569,7 @@ class HistoryItems {
 
                         final TourbookFileSystem dropboxFileSystem = FileSystemManager.getTourbookFileSystem(cleanedFolderName);
                         if (dropboxFileSystem != null) {
-                           _linkFolderInfo.setText(dropboxFileSystem.getAbsoluteRootPath());
+                           _linkFolderInfo.setText(cleanedFolderName);
                         }
                      } else {
 
@@ -577,13 +582,11 @@ class HistoryItems {
                            _linkFolderInfo.setText(deviceFolder);
                         }
                      }
-
                   } else {
 
                      _linkFolderInfo.setText(UI.EMPTY_STRING);
                   }
                }
-
             } catch (final Exception e) {
                isFolderValid = false;
             }
@@ -593,6 +596,9 @@ class HistoryItems {
       if (isFolderValid) {
 
          _comboError.hide();
+         if (_buttonBrowse != null) {
+            _buttonBrowse.setEnabled(true);
+         }
          _linkFolderInfo.setForeground(null);
 
       } else {
@@ -602,13 +608,15 @@ class HistoryItems {
          folderInfoMessage.append(Messages.Dialog_ImportConfig_Error_FolderIsInvalid);
 
          if (NIO.isTourBookFileSystem(modifiedFolder)) {
+            if (_buttonBrowse != null) {
+               _buttonBrowse.setEnabled(false);
+            }
 
-            final TourbookFileSystem dropboxFileSystem = FileSystemManager.getTourbookFileSystem(modifiedFolder);
-            if (dropboxFileSystem != null) {
+            final TourbookFileSystem tourbookFileSystem = FileSystemManager.getTourbookFileSystem(modifiedFolder);
+            if (tourbookFileSystem != null) {
 
-               folderInfoMessage.append(NLS.bind(Messages.Action_FileSystem_Preferences, modifiedFolder));
+               folderInfoMessage.append(NLS.bind(Messages.Action_FileSystem_Preferences, tourbookFileSystem.getId()));
 
-               //We remove the listener if it was already present as we don't
                boolean addlistener = true;
                for (final Listener listener : _linkFolderInfo.getListeners(SWT.Selection)) {
                   if (listener instanceof TypedListener) {
@@ -616,15 +624,18 @@ class HistoryItems {
                   }
                }
                if (addlistener) {
-                  createLinkFolderInfoSelectionAdapter(dropboxFileSystem.getPreferencePageId());
+                  createLinkFolderInfoSelectionAdapter(tourbookFileSystem.getPreferencePageId());
                }
-
             }
          } else {
 
             if (_linkFolderInfoSelectionAdapter != null) {
                _linkFolderInfo.removeSelectionListener(_linkFolderInfoSelectionAdapter);
                _linkFolderInfoSelectionAdapter = null;
+            }
+
+            if (_buttonBrowse != null) {
+               _buttonBrowse.setEnabled(true);
             }
          }
 

@@ -51,45 +51,45 @@ public class Polar_HRM_DataReader extends TourbookDevice {
     */
    private static final int       SPEED_SCALING           = 10;
 
-   private static final String    DATA_DELIMITER          = "\t";                        //$NON-NLS-1$
+   private static final String    DATA_DELIMITER          = "\t";             //$NON-NLS-1$
 
-   private static final String    SECTION_START_CHARACTER = "[";                         //$NON-NLS-1$
-   private static final String    SECTION_PARAMS          = "[Params]";                  //$NON-NLS-1$
+   private static final String    SECTION_START_CHARACTER = "[";              //$NON-NLS-1$
+   private static final String    SECTION_PARAMS          = "[Params]";       //$NON-NLS-1$
    //
-   private static final String    SECTION_NOTE            = "[Note]";                    //$NON-NLS-1$
-   private static final String    SECTION_INT_TIMES       = "[IntTimes]";                //$NON-NLS-1$
-   private static final String    SECTION_INT_NOTES       = "[IntNotes]";                //$NON-NLS-1$
-   private static final String    SECTION_EXTRA_DATA      = "[ExtraData]";               //$NON-NLS-1$
-   private static final String    SECTION_LAP_NAMES       = "[LapNames]";                //$NON-NLS-1$
-   private static final String    SECTION_SUMMARY_123     = "[Summary-123]";             //$NON-NLS-1$
-   private static final String    SECTION_SUMMARY_TH      = "[Summary-TH]";              //$NON-NLS-1$
-   private static final String    SECTION_HR_ZONES        = "[HRZones]";                 //$NON-NLS-1$
-   private static final String    SECTION_SWAP_TIMES      = "[SwapTimes]";               //$NON-NLS-1$
-   private static final String    SECTION_TRIP            = "[Trip]";                    //$NON-NLS-1$
-   private static final String    SECTION_HR_DATA         = "[HRData]";                  //$NON-NLS-1$
+   private static final String    SECTION_NOTE            = "[Note]";         //$NON-NLS-1$
+   private static final String    SECTION_INT_TIMES       = "[IntTimes]";     //$NON-NLS-1$
+   private static final String    SECTION_INT_NOTES       = "[IntNotes]";     //$NON-NLS-1$
+   private static final String    SECTION_EXTRA_DATA      = "[ExtraData]";    //$NON-NLS-1$
+   private static final String    SECTION_LAP_NAMES       = "[LapNames]";     //$NON-NLS-1$
+   private static final String    SECTION_SUMMARY_123     = "[Summary-123]";  //$NON-NLS-1$
+   private static final String    SECTION_SUMMARY_TH      = "[Summary-TH]";   //$NON-NLS-1$
+   private static final String    SECTION_HR_ZONES        = "[HRZones]";      //$NON-NLS-1$
+   private static final String    SECTION_SWAP_TIMES      = "[SwapTimes]";    //$NON-NLS-1$
+   private static final String    SECTION_TRIP            = "[Trip]";         //$NON-NLS-1$
+   private static final String    SECTION_HR_DATA         = "[HRData]";       //$NON-NLS-1$
    //
-   private static final String    PARAMS_MONITOR          = "Monitor";                   //$NON-NLS-1$
-   private static final String    PARAMS_VERSION          = "Version";                   //$NON-NLS-1$
-   private static final String    PARAMS_S_MODE           = "SMode";                     //$NON-NLS-1$
-   private static final String    PARAMS_DATE             = "Date";                      //$NON-NLS-1$
-   private static final String    PARAMS_START_TIME       = "StartTime";                 //$NON-NLS-1$
-   private static final String    PARAMS_LENGTH           = "Length";                    //$NON-NLS-1$
-   private static final String    PARAMS_INTERVAL         = "Interval";                  //$NON-NLS-1$
-   private static final String    PARAMS_UPPER1           = "Upper1";                    //$NON-NLS-1$
-   private static final String    PARAMS_LOWER1           = "Lower1";                    //$NON-NLS-1$
-   private static final String    PARAMS_UPPER2           = "Upper2";                    //$NON-NLS-1$
-   private static final String    PARAMS_LOWER2           = "Lower2";                    //$NON-NLS-1$
-   private static final String    PARAMS_UPPER3           = "Upper3";                    //$NON-NLS-1$
-   private static final String    PARAMS_LOWER3           = "Lower3";                    //$NON-NLS-1$
-   private static final String    PARAMS_TIMER1           = "Timer1";                    //$NON-NLS-1$
-   private static final String    PARAMS_TIMER2           = "Timer2";                    //$NON-NLS-1$
-   private static final String    PARAMS_TIMER3           = "Timer3";                    //$NON-NLS-1$
-   private static final String    PARAMS_ACTIVE_LIMIT     = "ActiveLimit";               //$NON-NLS-1$
-   private static final String    PARAMS_MAX_HR           = "MaxHR";                     //$NON-NLS-1$
-   private static final String    PARAMS_REST_HR          = "RestHR";                    //$NON-NLS-1$
-   private static final String    PARAMS_START_DELAY      = "StartDelay";                //$NON-NLS-1$
-   private static final String    PARAMS_VO2MAX           = "VO2max";                    //$NON-NLS-1$
-   private static final String    PARAMS_WEIGHT           = "Weight";                    //$NON-NLS-1$
+   private static final String    PARAMS_MONITOR          = "Monitor";        //$NON-NLS-1$
+   private static final String    PARAMS_VERSION          = "Version";        //$NON-NLS-1$
+   private static final String    PARAMS_S_MODE           = "SMode";          //$NON-NLS-1$
+   private static final String    PARAMS_DATE             = "Date";           //$NON-NLS-1$
+   private static final String    PARAMS_START_TIME       = "StartTime";      //$NON-NLS-1$
+   private static final String    PARAMS_LENGTH           = "Length";         //$NON-NLS-1$
+   private static final String    PARAMS_INTERVAL         = "Interval";       //$NON-NLS-1$
+   private static final String    PARAMS_UPPER1           = "Upper1";         //$NON-NLS-1$
+   private static final String    PARAMS_LOWER1           = "Lower1";         //$NON-NLS-1$
+   private static final String    PARAMS_UPPER2           = "Upper2";         //$NON-NLS-1$
+   private static final String    PARAMS_LOWER2           = "Lower2";         //$NON-NLS-1$
+   private static final String    PARAMS_UPPER3           = "Upper3";         //$NON-NLS-1$
+   private static final String    PARAMS_LOWER3           = "Lower3";         //$NON-NLS-1$
+   private static final String    PARAMS_TIMER1           = "Timer1";         //$NON-NLS-1$
+   private static final String    PARAMS_TIMER2           = "Timer2";         //$NON-NLS-1$
+   private static final String    PARAMS_TIMER3           = "Timer3";         //$NON-NLS-1$
+   private static final String    PARAMS_ACTIVE_LIMIT     = "ActiveLimit";    //$NON-NLS-1$
+   private static final String    PARAMS_MAX_HR           = "MaxHR";          //$NON-NLS-1$
+   private static final String    PARAMS_REST_HR          = "RestHR";         //$NON-NLS-1$
+   private static final String    PARAMS_START_DELAY      = "StartDelay";     //$NON-NLS-1$
+   private static final String    PARAMS_VO2MAX           = "VO2max";         //$NON-NLS-1$
+   private static final String    PARAMS_WEIGHT           = "Weight";         //$NON-NLS-1$
    //
    private DeviceData             _deviceData;
    private String                 _importFilePath;
@@ -99,9 +99,9 @@ public class Polar_HRM_DataReader extends TourbookDevice {
    private SectionParams          _sectionParams;
    private SectionTrip            _sectionTrip;
 
-   private ArrayList<LapData>     _sectionLapData         = new ArrayList<LapData>();
-   private ArrayList<LapNotes>    _sectionLapNotes        = new ArrayList<LapNotes>();
-   private ArrayList<HRDataSlice> _sectionHRData          = new ArrayList<HRDataSlice>();
+   private ArrayList<LapData>     _sectionLapData         = new ArrayList<>();
+   private ArrayList<LapNotes>    _sectionLapNotes        = new ArrayList<>();
+   private ArrayList<HRDataSlice> _sectionHRData          = new ArrayList<>();
    //
    private boolean                _isDebug                = false;
 
@@ -519,7 +519,7 @@ public class Polar_HRM_DataReader extends TourbookDevice {
       int relativeTime = 0;
       float absoluteDistance = 0;
 
-      final ArrayList<TimeData> timeDataList = new ArrayList<TimeData>();
+      final ArrayList<TimeData> timeDataList = new ArrayList<>();
 
       for (final HRDataSlice hrSlice : _sectionHRData) {
 
@@ -1182,8 +1182,8 @@ public class Polar_HRM_DataReader extends TourbookDevice {
             // HRM Files exported by polarpersonaltrainer.com can contain lap times with
             // one digit hours and/or minutes: e.g. 9:5:45.0 (9 hours, 5 min, 45.0 sec)
 
-            final String timeString = token.substring(0, token.indexOf(".")); //$NON-NLS-1$
-            final StringTokenizer timeTokens = new StringTokenizer(timeString, ":"); //$NON-NLS-1$
+            final String timeString = token.substring(0, token.indexOf(UI.SYMBOL_DOT));
+            final StringTokenizer timeTokens = new StringTokenizer(timeString, UI.SYMBOL_COLON);
 
             final int timeHour = Integer.parseInt(timeTokens.nextToken());
             final int timeMin = Integer.parseInt(timeTokens.nextToken());
