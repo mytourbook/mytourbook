@@ -26,7 +26,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.tourbook.common.util.StatusUtil;
-import net.tourbook.common.util.StringUtils;
 
 /**
  * Tools for the java.nio package.
@@ -64,6 +63,7 @@ public class NIO {
          // replace device name with drive letter, [MEDIA]\CACHE ->  D:\CACHE
 
          final String deviceName = parseDeviceName(folder);
+
          final Iterable<FileStore> fileStores = getFileStores();
 
          for (final FileStore store : fileStores) {
@@ -80,6 +80,12 @@ public class NIO {
                break;
             }
          }
+      } else if (isTourBookFileSystem(folder)) {
+         final TourbookFileSystem tourbookFileSystem = FileSystemManager.getTourbookFileSystem(folder);
+
+         osPath = folder.replace(tourbookFileSystem.getDisplayId(), tourbookFileSystem.getId());
+
+         return osPath;
       } else {
 
          // OS path is contained in the folder path
@@ -185,8 +191,7 @@ public class NIO {
     */
    public static boolean isTourBookFileSystem(final String folderName) {
 
-      return !StringUtils.isNullOrEmpty(folderName) &&
-            FileSystemManager.getTourbookFileSystem(folderName) != null;
+      return FileSystemManager.getTourbookFileSystem(folderName) != null;
    }
 
    private static String parseDeviceName(final String fullName) {

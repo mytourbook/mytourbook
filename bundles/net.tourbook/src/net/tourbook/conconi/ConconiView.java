@@ -335,7 +335,7 @@ public class ConconiView extends ViewPart {
 
       _selectedTour = markedTour;
 
-      final String prefGraphName = ICommonPreferences.GRAPH_COLORS + GraphColorManager.PREF_GRAPH_HEARTBEAT + "."; //$NON-NLS-1$
+      final String prefGraphName = ICommonPreferences.GRAPH_COLORS + GraphColorManager.PREF_GRAPH_HEARTBEAT + UI.SYMBOL_DOT;
 
       final RGB rgbPrefLine = PreferenceConverter.getColor(//
             _commonPrefStore,

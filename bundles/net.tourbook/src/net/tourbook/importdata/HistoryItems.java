@@ -40,6 +40,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Link;
@@ -72,6 +73,7 @@ class HistoryItems {
     */
    private Combo             _combo;
    private ControlDecoration _comboError;
+   private Button            _buttonBrowse;
 
    private Link              _linkFolderInfo;
 
@@ -398,6 +400,13 @@ class HistoryItems {
       _comboError.setDescriptionText(Messages.Dialog_ImportConfig_Error_FolderIsInvalid);
    }
 
+   void setControls(final Combo comboFolder, final Link linkFolderPath, final Button buttonBrowse) {
+
+      setControls(comboFolder, linkFolderPath);
+      _buttonBrowse = buttonBrowse;
+
+   }
+
    void setIsValidateFolder(final boolean isValidateFolder) {
       _isValidateFolder = isValidateFolder;
    }
@@ -573,13 +582,11 @@ class HistoryItems {
                            _linkFolderInfo.setText(deviceFolder);
                         }
                      }
-
                   } else {
 
                      _linkFolderInfo.setText(UI.EMPTY_STRING);
                   }
                }
-
             } catch (final Exception e) {
                isFolderValid = false;
             }
@@ -589,6 +596,9 @@ class HistoryItems {
       if (isFolderValid) {
 
          _comboError.hide();
+         if (_buttonBrowse != null) {
+            _buttonBrowse.setEnabled(true);
+         }
          _linkFolderInfo.setForeground(null);
 
       } else {
@@ -598,11 +608,14 @@ class HistoryItems {
          folderInfoMessage.append(Messages.Dialog_ImportConfig_Error_FolderIsInvalid);
 
          if (NIO.isTourBookFileSystem(modifiedFolder)) {
+            if (_buttonBrowse != null) {
+               _buttonBrowse.setEnabled(false);
+            }
 
-            final TourbookFileSystem dropboxFileSystem = FileSystemManager.getTourbookFileSystem(modifiedFolder);
-            if (dropboxFileSystem != null) {
+            final TourbookFileSystem tourbookFileSystem = FileSystemManager.getTourbookFileSystem(modifiedFolder);
+            if (tourbookFileSystem != null) {
 
-               folderInfoMessage.append(NLS.bind(Messages.Action_FileSystem_Preferences, dropboxFileSystem.getId()));
+               folderInfoMessage.append(NLS.bind(Messages.Action_FileSystem_Preferences, tourbookFileSystem.getId()));
 
                boolean addlistener = true;
                for (final Listener listener : _linkFolderInfo.getListeners(SWT.Selection)) {
@@ -611,7 +624,7 @@ class HistoryItems {
                   }
                }
                if (addlistener) {
-                  createLinkFolderInfoSelectionAdapter(dropboxFileSystem.getPreferencePageId());
+                  createLinkFolderInfoSelectionAdapter(tourbookFileSystem.getPreferencePageId());
                }
             }
          } else {
@@ -619,6 +632,10 @@ class HistoryItems {
             if (_linkFolderInfoSelectionAdapter != null) {
                _linkFolderInfo.removeSelectionListener(_linkFolderInfoSelectionAdapter);
                _linkFolderInfoSelectionAdapter = null;
+            }
+
+            if (_buttonBrowse != null) {
+               _buttonBrowse.setEnabled(true);
             }
          }
 

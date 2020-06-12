@@ -1537,7 +1537,7 @@ public class TourManager {
     */
    public static RGB getGraphColor(final String graphName, final String colorProfileName) {
 
-      final String prefGraphName = ICommonPreferences.GRAPH_COLORS + graphName + "."; //$NON-NLS-1$
+      final String prefGraphName = ICommonPreferences.GRAPH_COLORS + graphName + UI.SYMBOL_DOT;
 
       // get COLOR from common pref store
       final IPreferenceStore commonPrefStore = CommonActivator.getPrefStore();
@@ -2748,7 +2748,7 @@ public class TourManager {
     */
    public static void setGraphColor(final ChartDataYSerie yData, final String graphName) {
 
-      final String prefGraphName = ICommonPreferences.GRAPH_COLORS + graphName + "."; //$NON-NLS-1$
+      final String prefGraphName = ICommonPreferences.GRAPH_COLORS + graphName + UI.SYMBOL_DOT;
 
       // get COLOR from common pref store
       final IPreferenceStore commonPrefStore = CommonActivator.getPrefStore();
