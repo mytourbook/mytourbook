@@ -91,7 +91,7 @@ public class ColumnProfile implements Cloneable {
          return false;
       }
       return true;
-   }
+   } 
 
    /**
     * @param columnId
@@ -111,6 +111,13 @@ public class ColumnProfile implements Cloneable {
 
    public long getID() {
       return _id;
+   }
+
+   /**
+    * @return Returns {@link #visibleColumnDefinitions}
+    */
+   public ArrayList<ColumnDefinition> getVisibleColumnDefinitions() {
+      return visibleColumnDefinitions;
    }
 
    @Override

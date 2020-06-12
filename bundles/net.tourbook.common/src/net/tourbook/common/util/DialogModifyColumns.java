@@ -1475,7 +1475,7 @@ public class DialogModifyColumns extends TrayDialog {
       _isInUpdate = true;
       {
          final Table profileTable = _profileViewer.getTable();
- 
+
          final int selectedIndex = profileTable.getSelectionIndex();
 
          final ColumnProfile selectedProfile = getSelectedProfile();
@@ -1645,9 +1645,7 @@ public class DialogModifyColumns extends TrayDialog {
       _columnManager.setIsShowCategory(_isShowCategory);
       _columnManager.setIsShowColumnAnnotations(_isShowColumnAnnotations);
 
-      _columnManager.updateColumns(//
-            _selectedProfile,
-            _columnViewer.getTable().getItems());
+      _columnManager.updateColumns(_selectedProfile, _columnViewer.getTable().getItems());
    }
 
    /**
@@ -1658,7 +1656,7 @@ public class DialogModifyColumns extends TrayDialog {
       // save columns
       _columnManager.setVisibleColumnIds_FromModifyDialog(//
             _selectedProfile,
-            _columnViewer.getTable().getItems());
+            _columnViewer.getTable().getItems()); 
 
       /*
        * Update column proprerties (value formats) from the model

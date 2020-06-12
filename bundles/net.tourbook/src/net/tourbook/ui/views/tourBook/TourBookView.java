@@ -93,9 +93,10 @@ import net.tourbook.ui.views.rawData.SubMenu_AdjustTourValues;
 import net.tourbook.ui.views.tourBook.natTable.DataProvider;
 import net.tourbook.ui.views.tourBook.natTable.DataProvider_ColumnHeader;
 import net.tourbook.ui.views.tourBook.natTable.DataProvider_Tour;
+import net.tourbook.ui.views.tourBook.natTable.NatTable_Header_Tooltip;
 
 import org.eclipse.core.runtime.Path;
-import org.eclipse.e4.ui.di.PersistState;
+import org.eclipse.e4.ui.di.PersistState; 
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -159,6 +160,7 @@ import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.eclipse.nebula.widgets.nattable.style.HorizontalAlignmentEnum;
 import org.eclipse.nebula.widgets.nattable.style.Style;
 import org.eclipse.nebula.widgets.nattable.style.theme.ModernNatTableThemeConfiguration;
+import org.eclipse.nebula.widgets.nattable.tooltip.NatTableContentTooltip;
 import org.eclipse.nebula.widgets.nattable.ui.binding.UiBindingRegistry;
 import org.eclipse.nebula.widgets.nattable.ui.matcher.MouseEventMatcher;
 import org.eclipse.nebula.widgets.nattable.ui.menu.PopupMenuAction;
@@ -171,7 +173,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
-import org.eclipse.swt.events.SelectionAdapter; 
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
@@ -200,7 +202,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private static final String           COLUMN_FACTORY_TIME_ZONE_DIFF_TOOLTIP           = net.tourbook.ui.Messages.ColumnFactory_TimeZoneDifference_Tooltip;
 
 // SET_FORMATTING_ON
-
+   //
    static public final String            ID                                              = "net.tourbook.views.tourListView";          //$NON-NLS-1$
    //
    private final static IPreferenceStore _prefStore                                      = TourbookPlugin.getPrefStore();
@@ -292,6 +294,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private ViewportLayer              _natTable_Body_ViewportLayer;
    private DataProvider               _natTable_DataProvider;
    //
+   private NatTableContentTooltip     _natTable_Tooltip;
+   //
    private int                        _selectedYear                = -1;
    private int                        _selectedYearSub             = -1;
    private final ArrayList<Long>      _selectedTourIds             = new ArrayList<>();
@@ -310,10 +314,10 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private boolean                    _isShowToolTipIn_WeekDay;
    //
    private final TourDoubleClickState _tourDoubleClickState        = new TourDoubleClickState();
-//   private TableViewerTourInfoToolTip     _tourInfoToolTip_NatTable;
+   //   private TableViewerTourInfoToolTip     _tourInfoToolTip_NatTable;
 //   private TableViewerTourInfoToolTip     _tourInfoToolTip_Table;
    private TreeViewerTourInfoToolTip      _tourInfoToolTip_Tree;
-   //
+//
    private TagMenuManager                 _tagMenuManager;
    private MenuManager                    _viewerMenuManager_NatTable;
    private MenuManager                    _viewerMenuManager_Table;
@@ -1974,6 +1978,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _tourViewer_NatTable = new NatTable(parent, gridLayer, false);
 
       _columnManager_NatTable.setupNatTable_PostCreate();
+
+      _natTable_Tooltip = new NatTable_Header_Tooltip(_tourViewer_NatTable, this);
+      _natTable_Tooltip.setPopupDelay(0);
 
       /*
        * Configure table
@@ -6812,15 +6819,15 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       TVITourBookItem firstElement = null;
       TVITourBookTour firstTour = null;
 
-      if (_isLayoutTable) {
+      if (_isLayoutNatTable) {
+
+      } else if (_isLayoutTable) {
 
          final IStructuredSelection selection = _tourViewer_Table.getStructuredSelection();
 
          numTourItems = numSelectedItems = selection.size();
 
          firstTour = (TVITourBookTour) (firstElement = (TVITourBookItem) selection.getFirstElement());
-
-      } else if (_isLayoutNatTable) {
 
       } else {
 
@@ -6993,9 +7000,24 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       enableActions();
    }
 
+   /**
+    * Returns the {@link ColumnManager} of the currently selected nattable/table/tree
+    */
    @Override
    public ColumnManager getColumnManager() {
-      return _columnManager_Tree;
+
+      if (_isLayoutNatTable) {
+
+         return _columnManager_NatTable;
+
+      } else if (_isLayoutTable) {
+
+         return _columnManager_Table;
+
+      } else {
+
+         return _columnManager_Tree;
+      }
    }
 
    @Override
@@ -7029,12 +7051,14 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       final Set<Long> tourIds = new HashSet<>();
 
       IStructuredSelection selectedTours;
-      if (_isLayoutTable) {
-         selectedTours = _tourViewer_Table.getStructuredSelection();
 
-      } else if (_isLayoutNatTable) {
+      if (_isLayoutNatTable) {
 
          return tourIds;
+
+      } else if (_isLayoutTable) {
+
+         selectedTours = _tourViewer_Table.getStructuredSelection();
 
       } else {
          selectedTours = _tourViewer_Tree.getStructuredSelection();
@@ -7139,13 +7163,13 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    @Override
    public ColumnViewer getViewer() {
 
-      if (_isLayoutTable) {
-
-         return _tourViewer_Table;
-
-      } else if (_isLayoutNatTable) {
+      if (_isLayoutNatTable) {
 
          return null;
+
+      } else if (_isLayoutTable) {
+
+         return _tourViewer_Table;
 
       } else {
 
@@ -7611,11 +7635,11 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
    void reopenFirstSelectedTour() {
 
-      if (_isLayoutTable) {
+      if (_isLayoutNatTable) {
 
          setupTourViewerContent();
 
-      } else if (_isLayoutNatTable) {
+      } else if (_isLayoutTable) {
 
          setupTourViewerContent();
 
@@ -7664,7 +7688,12 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
    private void reselectTourViewer() {
 
-      if (_isLayoutTable) {
+      if (_isLayoutNatTable) {
+
+         // select first row -> needs to be improved
+         _tourViewer_NatTable.doCommand(new SelectRowsCommand(_natTable_Body_ViewportLayer, 0, 0, false, false));
+
+      } else if (_isLayoutTable) {
 
          final int[] stateSelectedTourIndices = Util.getStateIntArray(_state, STATE_SELECTED_TABLE_INDEX, null);
 
@@ -7681,11 +7710,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          if (horizontalBar != null) {
             horizontalBar.setSelection(0);
          }
-
-      } else if (_isLayoutNatTable) {
-
-         // select first row -> needs to be improved
-         _tourViewer_NatTable.doCommand(new SelectRowsCommand(_natTable_Body_ViewportLayer, 0, 0, false, false));
 
       } else {
 
@@ -8053,17 +8077,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    @Override
    public void setFocus() {
 
-      if (_isLayoutTable) {
-
-         final Table table = _tourViewer_Table.getTable();
-
-         if (table.isDisposed()) {
-            return;
-         }
-
-         table.setFocus();
-
-      } else if (_isLayoutNatTable) {
+      if (_isLayoutNatTable) {
 
 // this do not work, the workaround is to select a row:
 //
@@ -8077,6 +8091,16 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 //         });
 
          _tourViewer_NatTable.setFocus();
+
+      } else if (_isLayoutTable) {
+
+         final Table table = _tourViewer_Table.getTable();
+
+         if (table.isDisposed()) {
+            return;
+         }
+
+         table.setFocus();
 
       } else {
 

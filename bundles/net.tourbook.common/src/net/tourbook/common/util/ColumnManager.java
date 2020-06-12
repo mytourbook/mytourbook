@@ -848,11 +848,11 @@ public class ColumnManager {
 
          final ColumnProfile columnProfile = _allProfiles.get(columnIndex);
          final boolean isChecked = columnProfile == _activeProfile;
- 
+
          String menuText =
                columnProfile.name
-               + COLUMN_TEXT_SEPARATOR
-               + Integer.toString(columnProfile.visibleColumnIds.length);
+                     + COLUMN_TEXT_SEPARATOR
+                     + Integer.toString(columnProfile.visibleColumnIds.length);
 
          // add a mnemonic to select a profile easier when debugging
          if (columnIndex < 10) {
@@ -2843,16 +2843,24 @@ public class ColumnManager {
       // recreate columns in the correct sort order
       for (final TableItem tableItem : tableItems) {
 
-         if (tableItem.getChecked()) {
+         // data in the table item contains the input items for the viewer
+         final ColumnDefinition colDef = (ColumnDefinition) tableItem.getData();
 
-            // data in the table item contains the input items for the viewer
-            final ColumnDefinition colDef = (ColumnDefinition) tableItem.getData();
+         final String columnId = colDef.getColumnId();
+
+         final boolean isColumnVisible = tableItem.getChecked();
+
+         // update original model, otherwise it could be hidden when it was previously displayed and then set to hidden !!!
+         final ColumnDefinition colDef_Original = getColDef_ByColumnId(columnId);
+         colDef_Original.setIsColumnDisplayed(isColumnVisible);
+
+         if (isColumnVisible) { 
 
             // set the visible columns
-            visibleColumnIds.add(colDef.getColumnId());
+            visibleColumnIds.add(columnId);
 
             // set column id and width
-            columnIdsAndWidth.add(colDef.getColumnId());
+            columnIdsAndWidth.add(columnId);
             columnIdsAndWidth.add(Integer.toString(colDef.getColumnWidth()));
          }
       }
