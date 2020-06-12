@@ -19,15 +19,21 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.FileSystemManager;
+import net.tourbook.common.NIO;
+import net.tourbook.common.TourbookFileSystem;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.EmptyContextMenuProvider;
 import net.tourbook.common.util.ITourViewer;
+import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.TableColumnDefinition;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.widgets.ComboEnumEntry;
@@ -142,10 +148,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
    //
    private static final int             CONTROL_DECORATION_WIDTH          = 6;
    private static final String          CSS_PX                            = "px";                                //$NON-NLS-1$
-   private final static String[]        DeviceTypes                       = new String[] {
-         Messages.Dialog_ImportConfig_Combo_Device_LocalDevice,
-         Messages.Dialog_ImportConfig_Combo_Device_Dropbox
-   };
    //
    private final IPreferenceStore       _prefStore                        = TourbookPlugin.getPrefStore();
    private final IDialogSettings        _state                            = TourbookPlugin.getState(ID);
@@ -177,9 +179,9 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
    //
    private PixelConverter         _pc;
 
-   /** Model for all configs. */
+   /** Model for all configurations. */
    private EasyConfig             _dialogEasyConfig;
-   /** Model for the currently selected config. */
+   /** Model for the currently selected configuration. */
    private ImportConfig           _selectedIC;
    private ImportLauncher         _selectedIL;
    //
@@ -262,15 +264,13 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
    //
    private Combo             _comboIC_BackupFolder;
    private Combo             _comboIC_DeviceFolder;
+   private Combo             _comboIC_DeviceType;
    private Combo             _comboIL_TourType;
-   private Combo             _comboDeviceType;
    //
    private Label             _lblIC_ConfigName;
    private Label             _lblIC_BackupFolder;
-   private Label             _lblIC_LocalFolderPath;
    private Label             _lblIC_DeleteFilesInfo;
    private Label             _lblIC_DeviceFolder;
-   private Label             _lblIC_DeviceFolderPath;
    private Label             _lblIL_AvgTemperature;
    private Label             _lblIL_AvgTemperature_Unit;
    private Label             _lblIL_ConfigDescription;
@@ -286,6 +286,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
    //
    private Link[]            _linkTT_Speed_TourType;
    private Link              _linkTT_One_TourType;
+   private Link              _linkIC_LocalFolderPath;
+   private Link              _linkIC_DeviceFolderPath;
    private Link              _linkIC_ILActions;
    //
    private Spinner           _spinnerDash_AnimationCrazinessFactor;
@@ -1279,16 +1281,16 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
          new Label(parent, SWT.NONE);
 
          /*
-          * Label: local folder absolute path
+          * Link: local folder absolute path
           */
-         _lblIC_LocalFolderPath = new Label(parent, SWT.NONE);
+         _linkIC_LocalFolderPath = new Link(parent, SWT.NONE);
          GridDataFactory
                .fillDefaults()//
                .grab(true, false)
                .indent(CONTROL_DECORATION_WIDTH + convertHorizontalDLUsToPixels(4), 0)
-               .applyTo(_lblIC_LocalFolderPath);
+               .applyTo(_linkIC_LocalFolderPath);
 
-         _backupHistoryItems.setControls(_comboIC_BackupFolder, _lblIC_LocalFolderPath);
+         _backupHistoryItems.setControls(_comboIC_BackupFolder, _linkIC_LocalFolderPath);
       }
    }
 
@@ -1319,18 +1321,21 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       /*
        * Drop down menu: device type
        */
-      _comboDeviceType = new Combo(parent, SWT.BORDER);
-      _comboDeviceType.setToolTipText(Messages.Dialog_ImportConfig_Label_DeviceFolder_Tooltip);
+      _comboIC_DeviceType = new Combo(parent, SWT.READ_ONLY | SWT.BORDER);
+      _comboIC_DeviceType.setToolTipText(Messages.Dialog_ImportConfig_Label_DeviceType_Tooltip);
       GridDataFactory
             .fillDefaults()//
-            .align(SWT.LEFT,
-                  SWT.CENTER)
-            .indent(_leftPadding, 0)
-            .applyTo(_comboDeviceType);
-      for (final String deviceType : DeviceTypes) {
-         _comboDeviceType.add(deviceType);
+            .grab(true, false)
+            .indent(CONTROL_DECORATION_WIDTH, 0)
+            .align(SWT.LEFT, SWT.CENTER)
+            .applyTo(_comboIC_DeviceType);
+
+      _comboIC_DeviceType.add(Messages.Dialog_ImportConfig_Combo_Device_LocalDevice);
+      final List<String> fileSystemsIds = FileSystemManager.getFileSystemsIds();
+      for (final String fileSystemsId : fileSystemsIds) {
+         _comboIC_DeviceType.add(fileSystemsId);
       }
-      _comboDeviceType.addModifyListener(deviceTypeListener);
+      _comboIC_DeviceType.addModifyListener(deviceTypeListener);
 
       /*
        * Label: device folder
@@ -1397,16 +1402,16 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
          new Label(parent, SWT.NONE);
 
          /*
-          * Label: device folder absolute path
+          * Link: device folder absolute path
           */
-         _lblIC_DeviceFolderPath = new Label(parent, SWT.NONE);
+         _linkIC_DeviceFolderPath = new Link(parent, SWT.NONE);
          GridDataFactory
                .fillDefaults()//
                .grab(true, false)
                .indent(CONTROL_DECORATION_WIDTH + convertHorizontalDLUsToPixels(4), 0)
-               .applyTo(_lblIC_DeviceFolderPath);
+               .applyTo(_linkIC_DeviceFolderPath);
 
-         _deviceHistoryItems.setControls(_comboIC_DeviceFolder, _lblIC_DeviceFolderPath);
+         _deviceHistoryItems.setControls(_comboIC_DeviceFolder, _linkIC_DeviceFolderPath, _btnIC_SelectDeviceFolder);
       }
 
       {
@@ -3210,7 +3215,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
       _btnIC_Remove.setEnabled(numConfigs > 1);
 
-      _comboDeviceType.setEnabled(_chkIC_ImportFiles.getSelection());
+      _comboIC_DeviceType.setEnabled(_chkIC_ImportFiles.getSelection());
    }
 
    private void enable_IL_Controls() {
@@ -4040,15 +4045,33 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
             _comboIC_DeviceFolder.getText(),
             _selectedIC.getDeviceFolder());
 
-      final DirectoryDialog dialog = new DirectoryDialog(_parent.getShell(), SWT.SAVE);
+      String selectedFolder = null;
 
-      dialog.setText(Messages.Dialog_ImportConfig_Dialog_DeviceFolder_Title);
-      dialog.setMessage(Messages.Dialog_ImportConfig_Dialog_DeviceFolder_Message);
-      dialog.setFilterPath(filterOSPath);
+      final TourbookFileSystem fileSystem = FileSystemManager.getTourbookFileSystem(filterOSPath);
+      if (fileSystem != null) {
+         // The current device is an external device (Dropbox...)
 
-      final String selectedFolder = dialog.open();
+         try {
+            //We use the retrieved TourbookFileSystem's implementation to select the folder to watch
+            selectedFolder = fileSystem.selectFileSystemFolder(_parent.getShell());
+            if (!StringUtils.isNullOrEmpty(selectedFolder)) {
+               _comboIC_DeviceFolder.setText(selectedFolder);
+            }
+         } catch (final Exception e) {
+            StatusUtil.log(e);
+         }
+      } else {
+         final DirectoryDialog dialog = new DirectoryDialog(_parent.getShell(), SWT.SAVE);
 
-      if (selectedFolder != null) {
+         dialog.setText(Messages.Dialog_ImportConfig_Dialog_DeviceFolder_Title);
+         dialog.setMessage(Messages.Dialog_ImportConfig_Dialog_DeviceFolder_Message);
+         dialog.setFilterPath(filterOSPath);
+
+         selectedFolder = dialog.open();
+
+         if (StringUtils.isNullOrEmpty(selectedFolder)) {
+            return;
+         }
 
          setErrorMessage(null);
 
@@ -4097,39 +4120,40 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
    }
 
    private void onSelectDevice() {
-      if (_comboDeviceType == null) {
+      if (_comboIC_DeviceType == null) {
          return;
       }
-      final int deviceIndex = _comboDeviceType.getSelectionIndex();
+      final int deviceIndex = _comboIC_DeviceType.getSelectionIndex();
 
       if (_lblIC_DeviceFolder == null) {
          return;
       }
 
-      final boolean enableDeviceFolder = deviceIndex == 0; //Local device
-      _lblIC_DeviceFolder.setEnabled(enableDeviceFolder);
-      _comboIC_DeviceFolder.setEnabled(enableDeviceFolder);
+      final boolean isDeviceLocal = deviceIndex == 0; //Local device
+      _lblIC_DeviceFolder.setEnabled(isDeviceLocal);
+      _comboIC_DeviceFolder.setEnabled(isDeviceLocal);
 
-      final String currentDeviceFolder = _comboIC_DeviceFolder.getText();
-      if (enableDeviceFolder) {
-         _comboIC_DeviceFolder.setText(_selectedIC.getDeviceFolder());
-         if (currentDeviceFolder.equals("Dropbox")) { //$NON-NLS-1$
-            _comboIC_DeviceFolder.setText(UI.EMPTY_STRING);
-         }
-      } else {
-         _comboIC_DeviceFolder.setText("Dropbox"); //$NON-NLS-1$
+      String deviceFolder = _selectedIC.getDeviceFolder();
+
+      if (isDeviceLocal && NIO.isTourBookFileSystem(deviceFolder)) {
+         deviceFolder = UI.EMPTY_STRING;
+      } else if (!isDeviceLocal &&
+            !NIO.isTourBookFileSystem(deviceFolder)) {
+         deviceFolder = FileSystemManager.getTourbookFileSystem(_comboIC_DeviceType.getText()).getDisplayId();
       }
+      _comboIC_DeviceFolder.setText(deviceFolder);
 
-      _btnIC_SelectDeviceFolder.setEnabled(enableDeviceFolder);
+      _chkIC_CreateBackup.setEnabled(isDeviceLocal);
+      _chkIC_DeleteDeviceFiles.setEnabled(isDeviceLocal);
 
-      _chkIC_CreateBackup.setEnabled(enableDeviceFolder);
-
-      if (!enableDeviceFolder) {
+      if (!isDeviceLocal) {
          _comboIC_BackupFolder.setText(UI.EMPTY_STRING);
+         _comboIC_BackupFolder.setEnabled(false);
          _chkIC_CreateBackup.setSelection(false);
          _lblIC_BackupFolder.setEnabled(false);
-         _comboIC_BackupFolder.setEnabled(false);
          _btnIC_SelectBackupFolder.setEnabled(false);
+         _backupHistoryItems.setIsValidateFolder(false);
+         _backupHistoryItems.validateModifiedPath();
       }
    }
 
@@ -4357,6 +4381,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       _selectedIC.isTurnOffWatching = _chkIC_TurnOffWatching.getSelection();
 
       _selectedIC.setBackupFolder(_comboIC_BackupFolder.getText());
+      _selectedIC.setDeviceType(_comboIC_DeviceType.getSelectionIndex());
       _selectedIC.setDeviceFolder(_comboIC_DeviceFolder.getText());
 
       _selectedIC.fileGlobPattern = _txtIC_DeviceFiles.getText();
@@ -4516,7 +4541,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
          _comboIC_BackupFolder.setText(_selectedIC.getBackupFolder());
          _comboIC_DeviceFolder.setText(_selectedIC.getDeviceFolder());
-         _comboDeviceType.select(_selectedIC.getDeviceFolder().equals("Dropbox") ? 1 : 0); //$NON-NLS-1$
+         _comboIC_DeviceType.select(_selectedIC.getDeviceType());
 
          _txtIC_DeviceFiles.setText(_selectedIC.fileGlobPattern);
          _lblIC_DeleteFilesInfo.setText(createUIText_MovedFiles());

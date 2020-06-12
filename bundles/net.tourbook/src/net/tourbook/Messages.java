@@ -27,6 +27,8 @@ public class Messages extends NLS {
 
    public static String        Action_Compute_ElevationGain;
 
+   public static String        Action_FileSystem_Preferences;
+
    public static String        Action_Map_AddBookmark;
    public static String        Action_Map_RenameBookmark;
    public static String        Action_Map_UpdateBookmark;
@@ -189,8 +191,8 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Checkbox_ShowInDashboard_Tooltip;
    public static String        Dialog_ImportConfig_Checkbox_TourType;
    public static String        Dialog_ImportConfig_Checkbox_TourType_Tooltip;
+
    public static String        Dialog_ImportConfig_Combo_Device_LocalDevice;
-   public static String        Dialog_ImportConfig_Combo_Device_Dropbox;
 
    public static String        Dialog_ImportConfig_Column_AdjustTemperature_Header;
    public static String        Dialog_ImportConfig_Column_AdjustTemperature_Label;
@@ -246,6 +248,7 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Label_DeviceFiles_Tooltip;
    public static String        Dialog_ImportConfig_Label_DeviceFolder;
    public static String        Dialog_ImportConfig_Label_DeviceFolder_Tooltip;
+   public static String        Dialog_ImportConfig_Label_DeviceType_Tooltip;
    public static String        Dialog_ImportConfig_Label_ImportColumns;
    public static String        Dialog_ImportConfig_Label_ImportColumns_Tooltip;
    public static String        Dialog_ImportConfig_Label_ImportLauncher;

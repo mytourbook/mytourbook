@@ -20,6 +20,9 @@ import java.nio.file.FileSystem;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
+import net.tourbook.common.util.StringUtils;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -41,9 +44,7 @@ public class FileSystemManager {
          return;
       }
 
-      for (final TourbookFileSystem tourbookFileSystem : _fileSystemsList) {
-         tourbookFileSystem.close();
-      }
+      _fileSystemsList.forEach(tfs -> tfs.close());
    }
 
    /**
@@ -55,20 +56,15 @@ public class FileSystemManager {
     */
    public static File CopyLocally(final String absolutefilePath) {
 
-      if (_fileSystemsList == null) {
+      final TourbookFileSystem tourbookFileSystem = getTourbookFileSystem(absolutefilePath);
+
+      if (tourbookFileSystem == null) {
          return null;
       }
 
-      for (final TourbookFileSystem tourbookFileSystem : _fileSystemsList) {
-
-         if (absolutefilePath.toLowerCase().startsWith(tourbookFileSystem.getId().toLowerCase())) {
-            final String filePath =
-                  absolutefilePath.substring(tourbookFileSystem.getId().length());
-            return tourbookFileSystem.copyFileLocally(filePath);
-         }
-      }
-
-      return null;
+      final String filePath =
+            absolutefilePath.substring(tourbookFileSystem.getId().length());
+      return tourbookFileSystem.copyFileLocally(filePath);
    }
 
    /**
@@ -79,14 +75,10 @@ public class FileSystemManager {
     */
    public static FileSystem getFileSystem(final String deviceFolder) {
 
-      if (_fileSystemsList == null) {
-         return null;
-      }
+      final TourbookFileSystem tourbookFileSystem = getTourbookFileSystem(deviceFolder);
 
-      for (final TourbookFileSystem tourbookFileSystem : _fileSystemsList) {
-         if (tourbookFileSystem.getId().equalsIgnoreCase(deviceFolder.toLowerCase())) {
-            return tourbookFileSystem.getFileSystem();
-         }
+      if (tourbookFileSystem != null) {
+         return tourbookFileSystem.getFileSystem();
       }
 
       return null;
@@ -99,20 +91,14 @@ public class FileSystemManager {
     * @return
     */
    public static String getFileSystemId(final String deviceFolderName) {
-      String fileSystemsId = "";
 
-      if (_fileSystemsList == null) {
-         return fileSystemsId;
+      final TourbookFileSystem tourbookFileSystem = getTourbookFileSystem(deviceFolderName);
+
+      if (tourbookFileSystem != null) {
+         return tourbookFileSystem.getId();
       }
 
-      for (final TourbookFileSystem tourbookFileSystem : _fileSystemsList) {
-         if (tourbookFileSystem.getId().equalsIgnoreCase(deviceFolderName.toLowerCase())) {
-            fileSystemsId = tourbookFileSystem.getId();
-            return fileSystemsId;
-         }
-      }
-
-      return fileSystemsId;
+      return UI.EMPTY_STRING;
    }
 
    /**
@@ -124,13 +110,9 @@ public class FileSystemManager {
 
       final ArrayList<String> fileSystemsIds = new ArrayList<>();
 
-      if (_fileSystemsList == null) {
-         return fileSystemsIds;
-      }
+      getFileSystemsList();
 
-      for (final TourbookFileSystem tourbookFileSystem : _fileSystemsList) {
-         fileSystemsIds.add(tourbookFileSystem.getId());
-      }
+      _fileSystemsList.forEach(tfs -> fileSystemsIds.add(tfs.getId()));
 
       return fileSystemsIds;
    }
@@ -151,33 +133,65 @@ public class FileSystemManager {
 
    public static Path getfolderPath(final String folderName) {
 
-      if (_fileSystemsList == null) {
-         return null;
+      final TourbookFileSystem tourbookFileSystem = getTourbookFileSystem(folderName);
+
+      if (tourbookFileSystem != null) {
+         return tourbookFileSystem.getfolderPath(folderName);
       }
 
-      for (final TourbookFileSystem tourbookFileSystem : _fileSystemsList) {
-         if (tourbookFileSystem.getId().equalsIgnoreCase(folderName.toLowerCase())) {
-            return tourbookFileSystem.getfolderPath(folderName);
-         }
-      }
       return null;
    }
 
-   public static boolean isFileFromTourBookFileSystem(final String osFilePath) {
+   /**
+    * Returns the {@link TourbookFileSystem}, if found, for a given device folder.
+    *
+    * @param deviceFolder
+    * @return
+    */
+   public static TourbookFileSystem getTourbookFileSystem(final String deviceFolder) {
 
-      if (_fileSystemsList == null) {
-         return false;
+      if (StringUtils.isNullOrEmpty(deviceFolder)) {
+         return null;
       }
 
-      for (final TourbookFileSystem tourbookFileSystem : _fileSystemsList) {
-         if (osFilePath.toLowerCase().startsWith(tourbookFileSystem.getId().toLowerCase())) {
-            return true;
-         }
+      getFileSystemsList();
+
+      final Optional<TourbookFileSystem> fileSystemSearchResult = _fileSystemsList.stream()
+            .filter(tfs -> deviceFolder.toLowerCase().startsWith(tfs.getId().toLowerCase()) ||
+                  deviceFolder.toLowerCase().startsWith(tfs.getDisplayId().toLowerCase()))
+            .findAny();
+
+      if (fileSystemSearchResult.isPresent()) {
+         return fileSystemSearchResult.get();
       }
 
-      return false;
+      return null;
    }
 
+   /**
+    * Determines, for a given file path, if it belongs to a {@link TourbookFileSystem}
+    *
+    * @param absoluteFilePath
+    *           A given absolute file path
+    * @return True if the file comes from a {@link TourbookFileSystem}, false otherwise.
+    */
+   public static boolean isFileFromTourBookFileSystem(final String absoluteFilePath) {
+
+      getFileSystemsList();
+
+      return _fileSystemsList.stream()
+            .filter(tfs -> absoluteFilePath.toLowerCase().startsWith(tfs.getId().toLowerCase()))
+            .findAny()
+            .isPresent();
+   }
+
+   /**
+    * Read and collects all the extensions that implement {@link TourbookFileSystem}.
+    *
+    * @param extensionPointName
+    *           The extension point name
+    * @return The list of {@link TourbookFileSystem}.
+    */
    private static ArrayList<TourbookFileSystem> readFileSystemsExtensions(final String extensionPointName) {
 
       final ArrayList<TourbookFileSystem> fileSystemsList = new ArrayList<>();

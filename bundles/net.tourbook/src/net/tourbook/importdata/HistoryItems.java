@@ -26,21 +26,27 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 
 import net.tourbook.Messages;
-import net.tourbook.common.CommonActivator;
 import net.tourbook.common.FileSystemManager;
 import net.tourbook.common.NIO;
+import net.tourbook.common.TourbookFileSystem;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
-import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.TypedListener;
+import org.eclipse.ui.dialogs.PreferencesUtil;
 
 /**
  * Manage combo box folder items.
@@ -51,8 +57,6 @@ class HistoryItems {
 
    private static final int      COMBO_HISTORY_LENGTH = 20;
    private static final String   COMBO_SEPARATOR      = "- - - - - - - - - - - - - - - - - - - - - - - - - - -"; //$NON-NLS-1$
-
-   final static IPreferenceStore _prefStore           = CommonActivator.getPrefStore();
 
    private boolean               _canShowDeviceName   = UI.IS_WIN;
 
@@ -69,10 +73,13 @@ class HistoryItems {
     */
    private Combo             _combo;
    private ControlDecoration _comboError;
+   private Button            _buttonBrowse;
 
-   private Label             _labelFolderInfo;
+   private Link              _linkFolderInfo;
 
    private boolean           _isValidateFolder = true;
+
+   private SelectionAdapter  _linkFolderInfoSelectionAdapter;
 
    private String cleanupFolderDeviceName(final String deviceNameFolder) {
 
@@ -138,6 +145,30 @@ class HistoryItems {
       return deviceFolder;
    }
 
+   private void createLinkFolderInfoSelectionAdapter(final String preferencePageId) {
+
+      if (_linkFolderInfoSelectionAdapter == null) {
+         _linkFolderInfoSelectionAdapter = new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+
+               final int returnResult = PreferencesUtil.createPreferenceDialogOn(
+                     Display.getCurrent().getActiveShell(),
+                     preferencePageId,
+                     null,
+                     null).open();
+
+               if (returnResult == 0) // The OK button was clicked
+               {
+                  validateModifiedPath();
+               }
+            }
+         };
+      }
+
+      _linkFolderInfo.addSelectionListener(_linkFolderInfoSelectionAdapter);
+   }
+
    private void fillControls(final String newFolder, final String newDeviceNameFolder, final String selectedFolder) {
 
       // prevent to remove the combo text field
@@ -155,7 +186,7 @@ class HistoryItems {
                : newDeviceNameFolder == null ? UI.EMPTY_STRING : newDeviceNameFolder;
       }
 
-      _labelFolderInfo.setText(folderInfo);
+      _linkFolderInfo.setText(folderInfo);
       _combo.setText(folderText);
 
       boolean isAdded = false;
@@ -353,10 +384,10 @@ class HistoryItems {
       state.put(stateDeviceHistoryItems, _deviceNameItems.toArray(new String[_deviceNameItems.size()]));
    }
 
-   void setControls(final Combo comboFolder, final Label lblFolderPath) {
+   void setControls(final Combo comboFolder, final Link linkFolderPath) {
 
       _combo = comboFolder;
-      _labelFolderInfo = lblFolderPath;
+      _linkFolderInfo = linkFolderPath;
 
       final Image image = FieldDecorationRegistry
             .getDefault()
@@ -367,6 +398,13 @@ class HistoryItems {
 
       _comboError.setImage(image);
       _comboError.setDescriptionText(Messages.Dialog_ImportConfig_Error_FolderIsInvalid);
+   }
+
+   void setControls(final Combo comboFolder, final Link linkFolderPath, final Button buttonBrowse) {
+
+      setControls(comboFolder, linkFolderPath);
+      _buttonBrowse = buttonBrowse;
+
    }
 
    void setIsValidateFolder(final boolean isValidateFolder) {
@@ -487,7 +525,7 @@ class HistoryItems {
       if (_isValidateFolder == false) {
 
          _comboError.hide();
-         _labelFolderInfo.setText(UI.EMPTY_STRING);
+         _linkFolderInfo.setText(UI.EMPTY_STRING);
 
          return;
       }
@@ -501,7 +539,7 @@ class HistoryItems {
          // ignore special texts
 
          isFolderValid = true;
-         _labelFolderInfo.setText(UI.EMPTY_STRING);
+         _linkFolderInfo.setText(UI.EMPTY_STRING);
 
       } else {
 
@@ -525,12 +563,14 @@ class HistoryItems {
 
                         // this is a device folder name
 
-                        _labelFolderInfo.setText(osFolder);
+                        _linkFolderInfo.setText(osFolder);
 
                      } else if (NIO.isTourBookFileSystem(cleanedFolderName)) {
 
-                        _labelFolderInfo.setText(FileSystemManager.getFileSystemId(cleanedFolderName));
-
+                        final TourbookFileSystem dropboxFileSystem = FileSystemManager.getTourbookFileSystem(cleanedFolderName);
+                        if (dropboxFileSystem != null) {
+                           _linkFolderInfo.setText(cleanedFolderName);
+                        }
                      } else {
 
                         final String deviceFolder = convertTo_DeviceNameFolder(osFolder);
@@ -539,16 +579,14 @@ class HistoryItems {
                            isFolderValid = false;
                         } else {
 
-                           _labelFolderInfo.setText(deviceFolder);
+                           _linkFolderInfo.setText(deviceFolder);
                         }
                      }
-
                   } else {
 
-                     _labelFolderInfo.setText(UI.EMPTY_STRING);
+                     _linkFolderInfo.setText(UI.EMPTY_STRING);
                   }
                }
-
             } catch (final Exception e) {
                isFolderValid = false;
             }
@@ -558,13 +596,52 @@ class HistoryItems {
       if (isFolderValid) {
 
          _comboError.hide();
-         _labelFolderInfo.setForeground(null);
+         if (_buttonBrowse != null) {
+            _buttonBrowse.setEnabled(true);
+         }
+         _linkFolderInfo.setForeground(null);
 
       } else {
 
          _comboError.show();
-         _labelFolderInfo.setText(Messages.Dialog_ImportConfig_Error_FolderIsInvalid);
-         _labelFolderInfo.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+         final StringBuilder folderInfoMessage = new StringBuilder();
+         folderInfoMessage.append(Messages.Dialog_ImportConfig_Error_FolderIsInvalid);
+
+         if (NIO.isTourBookFileSystem(modifiedFolder)) {
+            if (_buttonBrowse != null) {
+               _buttonBrowse.setEnabled(false);
+            }
+
+            final TourbookFileSystem tourbookFileSystem = FileSystemManager.getTourbookFileSystem(modifiedFolder);
+            if (tourbookFileSystem != null) {
+
+               folderInfoMessage.append(NLS.bind(Messages.Action_FileSystem_Preferences, tourbookFileSystem.getId()));
+
+               boolean addlistener = true;
+               for (final Listener listener : _linkFolderInfo.getListeners(SWT.Selection)) {
+                  if (listener instanceof TypedListener) {
+                     addlistener = false;
+                  }
+               }
+               if (addlistener) {
+                  createLinkFolderInfoSelectionAdapter(tourbookFileSystem.getPreferencePageId());
+               }
+            }
+         } else {
+
+            if (_linkFolderInfoSelectionAdapter != null) {
+               _linkFolderInfo.removeSelectionListener(_linkFolderInfoSelectionAdapter);
+               _linkFolderInfoSelectionAdapter = null;
+            }
+
+            if (_buttonBrowse != null) {
+               _buttonBrowse.setEnabled(true);
+            }
+         }
+
+         _linkFolderInfo.setText(folderInfoMessage.toString());
+
+         _linkFolderInfo.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
       }
    }
 }

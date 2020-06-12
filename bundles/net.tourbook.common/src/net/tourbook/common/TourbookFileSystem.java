@@ -20,15 +20,18 @@ import java.nio.file.FileStore;
 import java.nio.file.FileSystem;
 import java.nio.file.Path;
 
+import org.eclipse.swt.widgets.Shell;
+
 /**
  * A class to implement and use a File System in MyTourbook.
- * Ths file system can be used by the easyimport manager.
- * 
+ * This file system can be used by the easy import manager.
+ *
  * @author Frédéric Bard
  */
 public abstract class TourbookFileSystem {
 
-   private String FILE_SYSTEM_ID;
+   private String   FILE_SYSTEM_ID;
+   protected String FILE_SYSTEM_FOLDER;
 
    public TourbookFileSystem(final String fileSystemId) {
       FILE_SYSTEM_ID = fileSystemId;
@@ -50,6 +53,16 @@ public abstract class TourbookFileSystem {
    protected abstract File copyFileLocally(String filePath);
 
    /**
+    * Gets the unique identifier of the file system displayed
+    * as a device.
+    *
+    * @return
+    */
+   public String getDisplayId() {
+      return "{" + FILE_SYSTEM_ID + "}"; //$NON-NLS-1$ //$NON-NLS-2$
+   }
+
+   /**
     * Retrieves a list of {@link FileStore} for the file system.
     *
     * @return
@@ -62,6 +75,10 @@ public abstract class TourbookFileSystem {
     * @return
     */
    protected abstract FileSystem getFileSystem();
+
+   public String getFileSystemFolder() {
+      return FILE_SYSTEM_FOLDER;
+   }
 
    /**
     * Gets the {@link Path} of a given folder in the file system.
@@ -79,4 +96,20 @@ public abstract class TourbookFileSystem {
    public String getId() {
       return FILE_SYSTEM_ID;
    }
+
+   /**
+    * Gets file system's preference page ID so it can be opened from a menu outside the cloud
+    * plugin.
+    *
+    * @return
+    */
+   public abstract String getPreferencePageId();
+
+   /**
+    * Provides a way, for the user, to select a specific folder to be used in this file system.
+    * The chosen folder path needs to be saved in {@link #FILE_SYSTEM_FOLDER}
+    *
+    * @param shell
+    */
+   public abstract String selectFileSystemFolder(Shell shell);
 }

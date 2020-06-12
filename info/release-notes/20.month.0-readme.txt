@@ -5,7 +5,6 @@ TODO's
 ======  
              
   - csv export: export new column(s) in tourbook view
- 
 
 New + Improvements
 ==================
@@ -66,6 +65,10 @@ Fixes
 * Tour Editor
   - Show daytime with am/pm in time slices/swim slices when imperial measurement system is selected
   - Fixed daytime to be not >24h
+
+* Easy Import (Frederic)
+  - When importing files, the tour type is set only if it is checked in the launcher configuration
+ 
    
 Translation    
 ===========

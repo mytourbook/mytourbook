@@ -31,24 +31,26 @@ import java.util.Map;
 import net.tourbook.cloud.Activator;
 import net.tourbook.cloud.IPreferences;
 import net.tourbook.common.TourbookFileSystem;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.window.Window;
+import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 
 public class DropboxFileSystem extends TourbookFileSystem {
-   //Should the FileSystemManager do evetrything ? what is the role of NIO ?
-
-   // make sure that nothing references the cloud plugin
 
    private java.nio.file.FileSystem _dropboxFileSystem;
    private IPreferenceStore         _prefStore = Activator.getDefault().getPreferenceStore();
 
    public DropboxFileSystem() {
 
-      super("Dropbox");
+      super("Dropbox"); //$NON-NLS-1$
 
       createDropboxFileSystem();
 
@@ -56,8 +58,7 @@ public class DropboxFileSystem extends TourbookFileSystem {
          @Override
          public void propertyChange(final PropertyChangeEvent event) {
 
-            if (event.getProperty().equals(IPreferences.DROPBOX_ACCESSTOKEN) ||
-                  event.getProperty().equals(IPreferences.DROPBOX_FOLDER)) {
+            if (event.getProperty().equals(IPreferences.DROPBOX_ACCESSTOKEN)) {
 
                closeDropboxFileSystem();
 
@@ -74,11 +75,10 @@ public class DropboxFileSystem extends TourbookFileSystem {
    @Override
    protected void close() {
       closeDropboxFileSystem();
-
    }
 
    /**
-    * Closes the Dropbox Java 7 FileSystem.
+    * Closes the Dropbox Java 8 FileSystem.
     * This function will be called whenever the user
     * stops the folder watch or quits MyTourbook.
     */
@@ -115,22 +115,20 @@ public class DropboxFileSystem extends TourbookFileSystem {
 
       boolean result = false;
 
-      final URI uri = URI.create("dropbox://root"); //$NON-NLS-1$
-      final Map<String, String> env = new HashMap<>();
-
       final String accessToken = _prefStore.getString(IPreferences.DROPBOX_ACCESSTOKEN);
       if (StringUtils.isNullOrEmpty(accessToken)) {
          _dropboxFileSystem = null;
          return result;
       }
 
-      env.put("accessToken", accessToken); //$NON-NLS-1$
+      final URI uri = URI.create("dropbox://root"); //$NON-NLS-1$
+      final Map<String, String> properties = new HashMap<>();
+      properties.put("accessToken", accessToken); //$NON-NLS-1$
 
       final FileSystemProvider provider = new DropBoxFileSystemProvider(new DropBoxFileSystemRepository());
 
       try {
-
-         _dropboxFileSystem = provider.newFileSystem(uri, env);
+         _dropboxFileSystem = provider.newFileSystem(uri, properties);
 
          result = true;
       } catch (final IOException e) {
@@ -166,11 +164,7 @@ public class DropboxFileSystem extends TourbookFileSystem {
     */
    @Override
    protected FileSystem getFileSystem() {
-      if (_dropboxFileSystem != null) {
-         return _dropboxFileSystem;
-      }
-
-      return null;
+      return _dropboxFileSystem;
    }
 
    /**
@@ -185,7 +179,46 @@ public class DropboxFileSystem extends TourbookFileSystem {
          return null;
       }
 
-      final String dropboxFilePath = _prefStore.getString(IPreferences.DROPBOX_FOLDER);
+      //We remove the "Dropbox" string from the folderName
+      final String dropboxFilePath = folderName.substring(getId().length());
       return _dropboxFileSystem.getPath(dropboxFilePath);
+   }
+
+   @Override
+   public String getPreferencePageId() {
+      return PrefPageDropbox.ID;
+   }
+
+   /**
+    * When the user clicks on the "Choose Folder" button, a dialog is opened
+    * so that the user can choose which folder will be used when using their Dropbox
+    * account as a device to watch.
+    */
+   @Override
+   public String selectFileSystemFolder(final Shell shell) {
+      final DropboxFolderBrowser dropboxFolderChooser[] = new DropboxFolderBrowser[1];
+      final int folderChooserResult[] = new int[1];
+      BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+         @Override
+         public void run() {
+            final String accessToken = _prefStore.getString(IPreferences.DROPBOX_ACCESSTOKEN);
+
+            dropboxFolderChooser[0] = new DropboxFolderBrowser(Display.getCurrent().getActiveShell(),
+                  accessToken);
+            folderChooserResult[0] = dropboxFolderChooser[0].open();
+         }
+      });
+
+      if (folderChooserResult[0] == Window.OK) {
+
+         final String selectedFolder = dropboxFolderChooser[0].getSelectedFolder();
+         if (!StringUtils.isNullOrEmpty(selectedFolder)) {
+            FILE_SYSTEM_FOLDER = selectedFolder;
+
+            return getDisplayId() + selectedFolder;
+         }
+      }
+
+      return UI.EMPTY_STRING;
    }
 }

@@ -39,9 +39,9 @@ import org.xml.sax.SAXException;
  */
 public class PrintTourPDF extends PrintTourExtension {
 
-   private static final String TOURDATA_2_FO_XSL = "/printing-templates/tourdata2fo.xsl";        //$NON-NLS-1$
+   private static final String TOURDATA_2_FO_XSL = "/printing-templates/tourdata2fo.xsl";                  //$NON-NLS-1$
 
-   private final FopFactory    _fopFactory       = FopFactory.newInstance(new File(".").toURI());
+   private final FopFactory    _fopFactory       = FopFactory.newInstance(new File(UI.SYMBOL_DOT).toURI());
 
    private DialogPrintTour     dpt;
 

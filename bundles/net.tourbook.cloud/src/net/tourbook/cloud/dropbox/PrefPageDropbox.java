@@ -17,8 +17,8 @@ package net.tourbook.cloud.dropbox;
 
 import net.tourbook.cloud.Activator;
 import net.tourbook.cloud.IPreferences;
+import net.tourbook.cloud.oauth2.OAuth2BrowserDialog;
 import net.tourbook.cloud.oauth2.OAuth2Client;
-import net.tourbook.cloud.oauth2.OAuth2RequestAction;
 import net.tourbook.common.util.StringUtils;
 
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -29,7 +29,6 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
@@ -49,8 +48,6 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
     */
    private Button             _btnAuthorizeConnection;
    private Text               _textAccessToken;
-   private Button             _btnChooseFolder;
-   private Text               _textFolderPath;
 
    @Override
    protected void createFieldEditors() {
@@ -83,7 +80,7 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
                   onClickAuthorize();
                }
             });
-
+            
             /*
              * Access Token
              */
@@ -94,38 +91,7 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
                   .grab(true, false)
                   .applyTo(_textAccessToken);
          }
-         {
-            /*
-             * Choose Dropbox folder
-             */
-            _btnChooseFolder = new Button(container, SWT.NONE);
-            setButtonLayoutData(_btnChooseFolder);
-            _btnChooseFolder.setEnabled(false);
-            _btnChooseFolder.setText(Messages.Pref_CloudConnectivity_Dropbox_Button_ChooseFolder);
-            _btnChooseFolder.addSelectionListener(new SelectionAdapter() {
-
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onClickChooseFolder();
-               }
-            });
-
-            /*
-             * Dropbox folder path
-             */
-            _textFolderPath = new Text(container, SWT.BORDER);
-            _textFolderPath.setEditable(false);
-            _textFolderPath.setToolTipText(Messages.Pref_CloudConnectivity_Dropbox_FolderPath_Tooltip);
-            GridDataFactory.fillDefaults()
-                  .grab(true, false)
-                  .applyTo(_textFolderPath);
-         }
       }
-   }
-
-   private void enableControls() {
-
-      _btnChooseFolder.setEnabled(!StringUtils.isNullOrEmpty(_textAccessToken.getText()));
    }
 
    @Override
@@ -139,69 +105,43 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
    private void onClickAuthorize() {
 
       final OAuth2Client client = new OAuth2Client();
-      client.setId("client_id"); //$NON-NLS-1$
-      client.setSecret("secret_id"); //$NON-NLS-1$
-      client.setAccessTokenUrl("https://api.dropboxapi.com/oauth2/token"); //$NON-NLS-1$
+
+      // Per Dropbox recommendation :
+      // "The app key is considered public and does not need to be protected."
+      // source https://www.dropboxforum.com/t5/Dropbox-API-Support-Feedback/Proper-way-of-handling-APP-KEY-and-APP-SECRET/m-p/410478
+      // We use the implicit grant flow as we can't keep the secret_id secure
+      // "It is intended to be used for user-agent-based clients (e.g. single page web apps)
+      // that can’t keep a client secret because all of the application code and storage is easily accessible."
+      // source : https://alexbilbie.com/guide-to-oauth-2-grants/
+      client.setId("vye6ci8xzzsuiao"); //$NON-NLS-1$
+
       client.setAuthorizeUrl("https://www.dropbox.com/oauth2/authorize"); //$NON-NLS-1$
       client.setRedirectUri("https://sourceforge.net/projects/mytourbook"); //$NON-NLS-1$
 
-      final OAuth2RequestAction request = new OAuth2RequestAction(client);
+      final OAuth2BrowserDialog oAuth2Browser = new OAuth2BrowserDialog(client);
       //Opens the dialog
-      request.run();
-      final String token = request.getAccessToken();
+      if (oAuth2Browser.open() != Window.OK) {
+         return;
+      }
+
+      final String token = oAuth2Browser.getToken();
       final String dialogMessage = StringUtils.isNullOrEmpty(token) ? NLS.bind(Messages.Pref_CloudConnectivity_Dropbox_AccessToken_NotRetrieved,
-            request.getResponse()) : Messages.Pref_CloudConnectivity_Dropbox_AccessToken_Retrieved;
+            oAuth2Browser.getResponse()) : Messages.Pref_CloudConnectivity_Dropbox_AccessToken_Retrieved;
 
       if (!StringUtils.isNullOrEmpty(token)) {
          _textAccessToken.setText(token);
-
-         // Once we retrieve a valid token, by default, we set the user folder to the root folder of
-         // their Dropbox account.
-         _textFolderPath.setText("/");//$NON-NLS-1$
       }
 
       MessageDialog.openInformation(
             Display.getCurrent().getActiveShell(),
             Messages.Pref_CloudConnectivity_Dropbox_AccessToken_Retrieval_Title,
             dialogMessage);
-
-      enableControls();
-   }
-
-   /**
-    * When the user clicks on the "Choose Folder" button, a dialog is opened
-    * so that the user can choose which folder will be used when using their Dropbox
-    * account as a device to watch.
-    */
-   protected void onClickChooseFolder() {
-
-      final DropboxFolderBrowser dropboxFolderChooser[] = new DropboxFolderBrowser[1];
-      final int folderChooserResult[] = new int[1];
-      BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-         @Override
-         public void run() {
-            dropboxFolderChooser[0] = new DropboxFolderBrowser(Display.getCurrent().getActiveShell(),
-                  _textAccessToken.getText());
-            folderChooserResult[0] = dropboxFolderChooser[0].open();
-         }
-      });
-
-      if (folderChooserResult[0] == Window.OK) {
-
-         final String selectedFolder = dropboxFolderChooser[0].getSelectedFolder();
-         if (!StringUtils.isNullOrEmpty(selectedFolder)) {
-            _textFolderPath.setText(selectedFolder);
-         }
-      }
    }
 
    @Override
    protected void performDefaults() {
 
       _textAccessToken.setText(_prefStore.getDefaultString(IPreferences.DROPBOX_ACCESSTOKEN));
-      _textFolderPath.setText(_prefStore.getDefaultString(IPreferences.DROPBOX_FOLDER));
-
-      enableControls();
 
       super.performDefaults();
    }
@@ -212,9 +152,7 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
       final boolean isOK = super.performOk();
 
       if (isOK) {
-
          _prefStore.setValue(IPreferences.DROPBOX_ACCESSTOKEN, _textAccessToken.getText());
-         _prefStore.setValue(IPreferences.DROPBOX_FOLDER, _textFolderPath.getText());
       }
 
       return isOK;
@@ -222,8 +160,5 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
 
    private void restoreState() {
       _textAccessToken.setText(_prefStore.getString(IPreferences.DROPBOX_ACCESSTOKEN));
-      _textFolderPath.setText(_prefStore.getString(IPreferences.DROPBOX_FOLDER));
-
-      enableControls();
    }
 }
