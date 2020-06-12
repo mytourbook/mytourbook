@@ -307,9 +307,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       // value point tool tip
       store.setDefault(ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE, true);
 
-      // Selection of time slices related to the position of the left and right cursors
-      store.setDefault(ITourbookPreferences.TOGGLE_STATE_SELECT_INBETWEEN_TIME_SLICES, false);
-
       /*
        * graph smoothing
        */

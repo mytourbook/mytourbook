@@ -585,76 +585,74 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    /*
     * tab: tour
     */
-   private Combo              _comboTitle;
+   private Combo             _comboTitle;
    //
-   private Button             _rdoCadence_Rpm;
-   private Button             _rdoCadence_Spm;
+   private Button            _rdoCadence_Rpm;
+   private Button            _rdoCadence_Spm;
    //
-   private CLabel             _lblCloudIcon;
-   private CLabel             _lblTourType;
+   private CLabel            _lblCloudIcon;
+   private CLabel            _lblTourType;
    //
-   private ControlDecoration  _decoTimeZone;
+   private ControlDecoration _decoTimeZone;
    //
-   private Combo              _comboLocation_Start;
-   private Combo              _comboLocation_End;
-   private Combo              _comboTimeZone;
-   private Combo              _comboWeather_Clouds;
-   private Combo              _comboWeather_WindDirectionText;
-   private Combo              _comboWeather_WindSpeedText;
+   private Combo             _comboLocation_Start;
+   private Combo             _comboLocation_End;
+   private Combo             _comboTimeZone;
+   private Combo             _comboWeather_Clouds;
+   private Combo             _comboWeather_WindDirectionText;
+   private Combo             _comboWeather_WindSpeedText;
    //
-   private DateTime           _dtStartTime;
-   private DateTime           _dtTourDate;
+   private DateTime          _dtStartTime;
+   private DateTime          _dtTourDate;
    //
-   private Label              _lblAltitudeUpUnit;
-   private Label              _lblAltitudeDownUnit;
-   private Label              _lblDistanceUnit;
-   private Label              _lblPerson_BodyWeightUnit;
-   private Label              _lblSpeedUnit;
-   private Label              _lblStartTime;
-   private Label              _lblTags;
-   private Label              _lblTimeZone;
-   private Label              _lblWeather_PrecipitationUnit;
-   private Label              _lblWeather_PressureUnit;
-   private Label              _lblWeather_TemperatureUnit_Avg;
-   private Label              _lblWeather_TemperatureUnit_Max;
-   private Label              _lblWeather_TemperatureUnit_Min;
-   private Label              _lblWeather_TemperatureUnit_WindChill;
+   private Label             _lblAltitudeUpUnit;
+   private Label             _lblAltitudeDownUnit;
+   private Label             _lblDistanceUnit;
+   private Label             _lblPerson_BodyWeightUnit;
+   private Label             _lblSpeedUnit;
+   private Label             _lblStartTime;
+   private Label             _lblTags;
+   private Label             _lblTimeZone;
+   private Label             _lblWeather_PrecipitationUnit;
+   private Label             _lblWeather_PressureUnit;
+   private Label             _lblWeather_TemperatureUnit_Avg;
+   private Label             _lblWeather_TemperatureUnit_Max;
+   private Label             _lblWeather_TemperatureUnit_Min;
+   private Label             _lblWeather_TemperatureUnit_WindChill;
    //
-   private Link               _linkDefaultTimeZone;
-   private Link               _linkGeoTimeZone;
-   private Link               _linkRemoveTimeZone;
-   private Link               _linkTag;
-   private Link               _linkTourType;
-   private Link               _linkWeather;
+   private Link              _linkDefaultTimeZone;
+   private Link              _linkGeoTimeZone;
+   private Link              _linkRemoveTimeZone;
+   private Link              _linkTag;
+   private Link              _linkTourType;
+   private Link              _linkWeather;
    //
-   private Spinner            _spinPerson_BodyWeight;
-   private Spinner            _spinPerson_Calories;
-   private Spinner            _spinPerson_FTP;
-   private Spinner            _spinPerson_RestPuls;
-   private Spinner            _spinWeather_Humidity;
-   private Spinner            _spinWeather_PrecipitationValue;
-   private Spinner            _spinWeather_PressureValue;
-   private Spinner            _spinWeather_Temperature_Average;
-   private Spinner            _spinWeather_Temperature_Min;
-   private Spinner            _spinWeather_Temperature_Max;
-   private Spinner            _spinWeather_Temperature_WindChill;
-   private Spinner            _spinWeather_Wind_DirectionValue;
-   private Spinner            _spinWeather_Wind_SpeedValue;
+   private Spinner           _spinPerson_BodyWeight;
+   private Spinner           _spinPerson_Calories;
+   private Spinner           _spinPerson_FTP;
+   private Spinner           _spinPerson_RestPuls;
+   private Spinner           _spinWeather_Humidity;
+   private Spinner           _spinWeather_PrecipitationValue;
+   private Spinner           _spinWeather_PressureValue;
+   private Spinner           _spinWeather_Temperature_Average;
+   private Spinner           _spinWeather_Temperature_Min;
+   private Spinner           _spinWeather_Temperature_Max;
+   private Spinner           _spinWeather_Temperature_WindChill;
+   private Spinner           _spinWeather_Wind_DirectionValue;
+   private Spinner           _spinWeather_Wind_SpeedValue;
    //
-   private Text               _txtAltitudeDown;
-   private Text               _txtAltitudeUp;
-   private Text               _txtDescription;
-   private Text               _txtDistance;
-   private Text               _txtWeather;
+   private Text              _txtAltitudeDown;
+   private Text              _txtAltitudeUp;
+   private Text              _txtDescription;
+   private Text              _txtDistance;
+   private Text              _txtWeather;
    //
-   private TimeDuration       _timeDriving;
-   private TimeDuration       _timePaused;
-   private TimeDuration       _timeRecording;
+   private TimeDuration      _timeDriving;
+   private TimeDuration      _timePaused;
+   private TimeDuration      _timeRecording;
 
-   private Menu               _swimViewer_ContextMenu;
-   private Menu               _timeViewer_ContextMenu;
-   protected boolean          _isSelectInBetweenTimeSlices;
-   private SelectionChartInfo _lastSelectedChartInfo;
+   private Menu              _swimViewer_ContextMenu;
+   private Menu              _timeViewer_ContextMenu;
 
    private class Action_RemoveSwimStyle extends Action {
 
@@ -2323,9 +2321,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    void actionToggleRowSelectMode() {
 
-      _isRowEditMode = _actionToggleRowSelectMode.isChecked();
-
-      recreateViewer();
+      setRowEditModeEnabled(_actionToggleRowSelectMode.isChecked());
    }
 
    private void addPartListener() {
@@ -2471,27 +2467,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                // updateUITab4Info(); do NOT work
                //
                // tour data must be reloaded
-            } else if (property.equals(ITourbookPreferences.TOGGLE_STATE_SELECT_INBETWEEN_TIME_SLICES)) {
-
-               _isSelectInBetweenTimeSlices = _prefStore.getBoolean(ITourbookPreferences.TOGGLE_STATE_SELECT_INBETWEEN_TIME_SLICES);
-
-               final Table table = (Table) _timeSlice_Viewer.getControl();
-               final int[] selectionIndices = table.getSelectionIndices();
-
-               if (selectionIndices.length == 0) {
-                  return;
-               }
-
-               table.deselectAll();
-
-               if (_isSelectInBetweenTimeSlices) {
-                  final int minSelectedValue = Math.min(_lastSelectedChartInfo.leftSliderValuesIndex, _lastSelectedChartInfo.rightSliderValuesIndex);
-                  final int maxSelectedValue = Math.max(_lastSelectedChartInfo.leftSliderValuesIndex, _lastSelectedChartInfo.rightSliderValuesIndex);
-                  table.select(minSelectedValue, maxSelectedValue);
-               } else {
-                  table.select(selectionIndices[0]);
-               }
-               table.showSelection();
             }
          }
       };
@@ -7673,8 +7648,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       _latLonDigits = Util.getStateInt(_state, STATE_LAT_LON_DIGITS, DEFAULT_LAT_LON_DIGITS);
       setup_LatLonDigits();
-
-      _isSelectInBetweenTimeSlices = _prefStore.getBoolean(ITourbookPreferences.TOGGLE_STATE_SELECT_INBETWEEN_TIME_SLICES);
    }
 
    private void restoreState_WithUI() {
@@ -7912,18 +7885,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       final Table table = (Table) _timeSlice_Viewer.getControl();
       final int itemCount = table.getItemCount();
 
-      _lastSelectedChartInfo = chartInfo;
-      if (_isSelectInBetweenTimeSlices) {
-         final int minSelectedValue = Math.min(chartInfo.leftSliderValuesIndex, chartInfo.rightSliderValuesIndex);
-         final int maxSelectedValue = Math.max(chartInfo.leftSliderValuesIndex, chartInfo.rightSliderValuesIndex);
-         table.setSelection(minSelectedValue, maxSelectedValue);
-      } else {
-         // adjust to array bounds
-         int valueIndex = chartInfo.selectedSliderValuesIndex;
-         valueIndex = Math.max(0, Math.min(valueIndex, itemCount - 1));
+      // adjust to array bounds
+      int valueIndex = chartInfo.selectedSliderValuesIndex;
+      valueIndex = Math.max(0, Math.min(valueIndex, itemCount - 1));
 
-         table.setSelection(valueIndex);
-      }
+      table.setSelection(valueIndex);
 
       table.showSelection();
 
@@ -7957,7 +7923,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     *           Can be {@link SelectionChartXSliderPosition#IGNORE_SLIDER_POSITION} when this
     *           position should not be set.
     */
-   private void selectTimeSlice_InViewer(final int valueIndexStart, final int valueIndexEnd) {
+   public void selectTimeSlice_InViewer(final int valueIndexStart, final int valueIndexEnd) {
 
       final Table table = (Table) _timeSlice_Viewer.getControl();
       final int itemCount = table.getItemCount();
@@ -7982,6 +7948,23 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       table.showSelection();
    }
 
+   public void selectTimeSlices(final SelectionChartInfo chartInfo) {
+
+      final Table table = (Table) _timeSlice_Viewer.getControl();
+
+      System.out.println("left slider value" + chartInfo.leftSliderValuesIndex);
+      System.out.println("right slider value" + chartInfo.rightSliderValuesIndex);
+      final int minSelectedValue = Math.min(chartInfo.leftSliderValuesIndex, chartInfo.rightSliderValuesIndex);
+      final int maxSelectedValue = Math.max(chartInfo.leftSliderValuesIndex, chartInfo.rightSliderValuesIndex);
+      table.setSelection(minSelectedValue, maxSelectedValue);
+
+      table.showSelection();
+   }
+
+   public void selectTimeSlicesTab() {
+      _tabFolder.setSelection(_tab_20_TimeSlices);
+   }
+
    @Override
    public void setFocus() {
 
@@ -7989,6 +7972,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 //    fTabFolder.setFocus();
 
       _page_EditorForm.setFocus();
+   }
+
+   public void setRowEditModeEnabled(final boolean enabled) {
+
+      _isRowEditMode = enabled;
+
+      recreateViewer();
    }
 
    /**
@@ -8838,7 +8828,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    }
 
-   private void updateUI_Tab_2_TimeSlices() {
+   public void updateUI_Tab_2_TimeSlices() {
 
       if (_uiRunnableForce_TimeSliceReload) {
          _timeSlice_ViewerTourId = -1L;
