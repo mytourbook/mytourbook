@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
 import net.tourbook.common.UI;
@@ -191,14 +190,8 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
     * @return True if the activity has already been processed, false otherwise.
     */
    private boolean processedActivityExists(final long tourId) {
-      for (final Map.Entry<TourData, ArrayList<TimeData>> entry : _processedActivities.entrySet()) {
-         final TourData key = entry.getKey();
-         if (key.getTourId() == tourId) {
-            return true;
-         }
-      }
 
-      return false;
+      return _processedActivities.entrySet().stream().anyMatch(entry -> entry.getKey().getTourId() == tourId);
    }
 
    /**
