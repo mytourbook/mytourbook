@@ -5,7 +5,6 @@ TODO's
 ======  
              
   - csv export: export new column(s) in tourbook view
- 
 
 New
 ===
@@ -34,6 +33,16 @@ Improvements
 * Keyboard shortcuts
   - Ctrl+W - Close current view or tour  
   - Ctrl+Shift+? - Open all directory views with a key shortcut
+
+* Tour Marker View (Frederic)
+  - Added the Average Speed column
+
+* Tour tooltip (Frederic)
+  - Added the maximum pace (^ Pace)
+
+* Dropbox Integration (Frederic) :
+  - Ability to connect a Dropbox account to MyTourbook, and also choosing a specific a folder for this account. This Dropbox folder can be set up as a device to watch. In this case, added or deleted files will be automatically and immediately detected.
+
 
 Import
 ======
@@ -68,7 +77,10 @@ Fixes
 * Tour Editor
   - Show daytime with am/pm in time slices/swim slices when imperial measurement system is selected
   - Fixed daytime to be not >24h
-   
+
+* Easy Import (Frederic)
+  - When importing files, the tour type is set only if it is checked in the launcher configuration
+ 
    
 Translation    
 ===========

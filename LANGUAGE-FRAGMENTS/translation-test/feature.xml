@@ -14,6 +14,7 @@
    <requires>
       <import plugin="net.tourbook"/>
       <import plugin="net.tourbook.chart"/>
+      <import plugin="net.tourbook.cloud"/>
       <import plugin="net.tourbook.common"/>
       <import plugin="net.tourbook.device"/>
       <import plugin="net.tourbook.device.garmin"/>
@@ -26,6 +27,14 @@
 
    <plugin
          id="net.tourbook.chart.nl"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+  <plugin
+         id="net.tourbook.cloud.nl"
          download-size="0"
          install-size="0"
          version="0.0.0"

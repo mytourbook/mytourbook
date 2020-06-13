@@ -26,6 +26,7 @@ import net.tourbook.importdata.ExternalDevice;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
+import net.tourbook.ui.UI;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -211,7 +212,7 @@ public abstract class SimpleSerialDevice extends ExternalDevice {
       try {
 
          final File tempFile = File.createTempFile("myTourbook", //$NON-NLS-1$
-               "." + getFileExtension(), //$NON-NLS-1$
+               UI.SYMBOL_DOT + getFileExtension(),
                new File(RawDataManager.getTempDir()));
 
          final FileOutputStream fileStream = new FileOutputStream(tempFile);

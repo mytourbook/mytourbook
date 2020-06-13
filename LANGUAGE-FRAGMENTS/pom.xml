@@ -17,6 +17,7 @@
 	
 	<modules>
 		<module>net.tourbook.chart.nl</module>		
+		<module>net.tourbook.cloud.nl</module>		
 		<module>net.tourbook.common.nl</module>		
 		<module>net.tourbook.device.garmin.fit.nl</module>		
 		<module>net.tourbook.device.garmin.nl</module>		

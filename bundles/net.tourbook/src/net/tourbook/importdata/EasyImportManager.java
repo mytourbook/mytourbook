@@ -47,6 +47,7 @@ import net.tourbook.common.NIO;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.SQL;
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
@@ -83,6 +84,7 @@ public class EasyImportManager {
    private static final String      ATTR_BACKUP_FOLDER                        = "backupFolder";                                     //$NON-NLS-1$
    private static final String      ATTR_DEVICE_FILES                         = "deviceFiles";                                      //$NON-NLS-1$
    private static final String      ATTR_DEVICE_FOLDER                        = "deviceFolder";                                     //$NON-NLS-1$
+   private static final String      ATTR_DEVICE_TYPE                          = "deviceType";                                       //$NON-NLS-1$
    private static final String      ATTR_IS_ACTIVE_CONFIG                     = "isActiveConfig";                                   //$NON-NLS-1$
    private static final String      ATTR_IS_CREATE_BACKUP                     = "isCreateBackup";                                   //$NON-NLS-1$
    private static final String      ATTR_IS_DELETE_DEVICE_FILES               = "isDeleteDeviceFiles";                              //$NON-NLS-1$
@@ -198,13 +200,13 @@ public class EasyImportManager {
 
                /*
                 * When the watching store is stopped, then getImportFiles() could cause a SQL
-                * except�ion when it checks the files in the db
+                * exception when it checks the files in the db
                 */
 
                return returnState;
             }
 
-            getImportFiles();
+            getImportFiles(fileStores);
 
          } finally {
             STORE_LOCK.unlock();
@@ -216,11 +218,11 @@ public class EasyImportManager {
       return returnState;
    }
 
-   private HashSet<String> getBackupFiles(final String folder) {
+   private HashSet<String> getBackupFiles(final String folder, final Iterable<FileStore> fileStores) {
 
       final HashSet<String> backupFiles = new HashSet<>();
 
-      final Path validPath = getValidPath(folder);
+      final Path validPath = getValidPath(folder, fileStores);
       if (validPath == null) {
          return backupFiles;
       }
@@ -244,7 +246,7 @@ public class EasyImportManager {
                }
 
             } catch (final Exception e) {
-// this can occure too often
+// this can occur too often
 //					TourLogManager.logEx(e);
             }
 
@@ -322,7 +324,7 @@ public class EasyImportManager {
 
    /**
     */
-   private void getImportFiles() {
+   private void getImportFiles(final Iterable<FileStore> fileStores) {
 
       final ArrayList<OSFile> movedFiles = new ArrayList<>();
       final ArrayList<OSFile> notImportedFiles = new ArrayList<>();
@@ -341,7 +343,7 @@ public class EasyImportManager {
       HashSet<String> availableBackupFiles = null;
       if (importConfig.isCreateBackup) {
 
-         availableBackupFiles = getBackupFiles(importConfig.getBackupOSFolder());
+         availableBackupFiles = getBackupFiles(importConfig.getBackupOSFolder(), fileStores);
       }
 
       /*
@@ -349,13 +351,14 @@ public class EasyImportManager {
        */
       final List<OSFile> existingDeviceFiles = getOSFiles(
             importConfig.getDeviceOSFolder(),
-            importConfig.fileGlobPattern);
+            importConfig.fileGlobPattern,
+            fileStores);
 
       easyConfig.numDeviceFiles = existingDeviceFiles.size();
 
       /*
        * Get moved files, these are files which are available in the backup folder but not in the
-       * device folder. This case can occure when files are imported, deleted in the device folder
+       * device folder. This case can occur when files are imported, deleted in the device folder
        * but not saved in MT.
        */
       if (importConfig.isCreateBackup) {
@@ -364,7 +367,8 @@ public class EasyImportManager {
 
          final List<OSFile> existingBackupFiles = getOSFiles(
                importConfig.getBackupOSFolder(),
-               importConfig.fileGlobPattern);
+               importConfig.fileGlobPattern,
+               fileStores);
 
          for (final OSFile backupFile : existingBackupFiles) {
 
@@ -428,11 +432,13 @@ public class EasyImportManager {
       });
    }
 
-   private List<OSFile> getOSFiles(final String folder, final String globFilePattern) {
+   private List<OSFile> getOSFiles(final String folder,
+                                   final String globFilePattern,
+                                   final Iterable<FileStore> fileStores) {
 
       final List<OSFile> osFiles = new ArrayList<>();
 
-      final Path validPath = getValidPath(folder);
+      final Path validPath = getValidPath(folder, fileStores);
       if (validPath == null) {
          return osFiles;
       }
@@ -446,7 +452,6 @@ public class EasyImportManager {
       try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(validPath, globPattern)) {
 
          for (final Path path : directoryStream) {
-
             try {
 
                final BasicFileAttributeView fileAttributesView = Files.getFileAttributeView(
@@ -458,7 +463,14 @@ public class EasyImportManager {
                // ignore not regular files
                if (fileAttributes.isRegularFile()) {
 
-                  final OSFile deviceFile = new OSFile(path);
+                  OSFile deviceFile;
+
+                  if (NIO.isTourBookFileSystem(folder)) {
+                     final String fileName = path.getFileName().toString();
+                     deviceFile = new OSFile(Paths.get(folder, fileName));
+                  } else {
+                     deviceFile = new OSFile(path);
+                  }
 
                   deviceFile.size = fileAttributes.size();
                   deviceFile.modifiedTime = fileAttributes.lastModifiedTime().toMillis();
@@ -467,8 +479,8 @@ public class EasyImportManager {
                }
 
             } catch (final Exception e) {
-// this can occure too often
-//					TourLogManager.logEx(e);
+// this can occur too often
+               //              TourLogManager.logEx(e);
             }
 
          }
@@ -484,19 +496,20 @@ public class EasyImportManager {
     * @param osFolder
     * @return Returns the device OS path or <code>null</code> when this folder is not valid.
     */
-   private Path getValidPath(final String osFolder) {
+   private Path getValidPath(final String osFolder, final Iterable<FileStore> fileStores) {
 
       if (osFolder != null && osFolder.trim().length() > 0) {
 
          try {
 
-            final Path devicePath = Paths.get(osFolder);
+            final Path devicePath = NIO.getDeviceFolderPath(osFolder);
 
-            if (Files.exists(devicePath)) {
+            if (devicePath != null && Files.exists(devicePath)) {
                return devicePath;
             }
-
-         } catch (final Exception e) {}
+         } catch (final Exception e) {
+            StatusUtil.log(e);
+         }
       }
 
       return null;
@@ -515,11 +528,10 @@ public class EasyImportManager {
          // check file
          try {
 
-            final Path deviceFolderPath = Paths.get(osFolder);
-            if (Files.exists(deviceFolderPath)) {
+            final Path deviceFolderPath = NIO.getDeviceFolderPath(osFolder);
+            if (deviceFolderPath != null && Files.exists(deviceFolderPath)) {
                isFolderValid = true;
             }
-
          } catch (final Exception e) {
             // path can be invalid
          }
@@ -685,6 +697,7 @@ public class EasyImportManager {
 
       importConfig.setBackupFolder(Util.getXmlString(xmlConfig, ATTR_BACKUP_FOLDER, UI.EMPTY_STRING));
       importConfig.setDeviceFolder(Util.getXmlString(xmlConfig, ATTR_DEVICE_FOLDER, UI.EMPTY_STRING));
+      importConfig.setDeviceType(Util.getXmlInteger(xmlConfig, ATTR_DEVICE_TYPE, 0));
 
       importConfig.fileGlobPattern = Util.getXmlString(
             xmlConfig,
@@ -970,7 +983,9 @@ public class EasyImportManager {
          return;
       }
 
-      TourLogManager.addLog(TourLogState.DEFAULT, LOG_EASY_IMPORT_003_TOUR_TYPE);
+      if (importLauncher.isSetTourType) {
+         TourLogManager.addLog(TourLogState.DEFAULT, LOG_EASY_IMPORT_003_TOUR_TYPE);
+      }
 
       final ImportConfig importConfig = getEasyConfig().getActiveImportConfig();
 
@@ -983,15 +998,17 @@ public class EasyImportManager {
          if (tourData.getTourPerson() != null) {
 
             /*
-             * Do not change already saved tours. This case can occure when the device is not
-             * watched any more but an import launcher is still startet.
+             * Do not change already saved tours. This case can occur when the device is not
+             * watched any more but an import launcher is still started.
              */
 
             continue;
          }
 
          // set tour type
-         setTourType(tourData, importLauncher);
+         if (importLauncher.isSetTourType) {
+            setTourType(tourData, importLauncher);
+         }
 
          // set import path
          if (importConfig.isCreateBackup) {
@@ -1069,12 +1086,13 @@ public class EasyImportManager {
 
          xmlConfig.putString(ATTR_BACKUP_FOLDER, importConfig.getBackupFolder());
          xmlConfig.putString(ATTR_DEVICE_FOLDER, importConfig.getDeviceFolder());
+         xmlConfig.putInteger(ATTR_DEVICE_TYPE, importConfig.getDeviceType());
 
          xmlConfig.putString(ATTR_DEVICE_FILES, importConfig.fileGlobPattern);
       }
 
       /*
-       * Import laucher configs
+       * Import launcher configs
        */
       for (final ImportLauncher importLauncher : dashConfig.importLaunchers) {
 

@@ -20,9 +20,9 @@ Bundle-ClassPath:
  jackson-core-2.10.3.jar,
  jackson-databind-2.10.3.jar,
  jackson-annotations-2.10.3.jar
-Export-Package: 
+Export-Package: com.enterprisedt.net.ftp,
  com.enterprisedt,
- com.enterprisedt.net.ftp,
+ com.enterprisedt.net.ftp.test,
  com.enterprisedt.net.ftp.internal,
  com.enterprisedt.net.ftp.test,
  com.enterprisedt.util,
@@ -113,6 +113,7 @@ Export-Package:
  com.mchange.v2.sql,
  com.mchange.v2.sql.filter,
  com.mchange.v2.util,
+ com.mchange.v2.util,
  com.skedgo.converter,
  gnu.trove,
  gnu.trove.decorator,
@@ -188,6 +189,22 @@ Export-Package:
  org.joda.time.field,
  org.joda.time.format,
  org.joda.time.tz,
+ org.joda.time.tz.data,
+ org.joda.time.tz.data.Africa,
+ org.joda.time.tz.data.America,
+ org.joda.time.tz.data.America.Argentina,
+ org.joda.time.tz.data.America.Indiana,
+ org.joda.time.tz.data.America.Kentucky,
+ org.joda.time.tz.data.America.North_Dakota,
+ org.joda.time.tz.data.Antarctica,
+ org.joda.time.tz.data.Arctic,
+ org.joda.time.tz.data.Asia,
+ org.joda.time.tz.data.Atlantic,
+ org.joda.time.tz.data.Australia,
+ org.joda.time.tz.data.Etc,
+ org.joda.time.tz.data.Europe,
+ org.joda.time.tz.data.Indian,
+ org.joda.time.tz.data.Pacific,
  org.json
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Automatic-Module-Name: net.tourbook.ext.jars
