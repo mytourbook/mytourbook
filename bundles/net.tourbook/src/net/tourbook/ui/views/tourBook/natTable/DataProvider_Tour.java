@@ -33,7 +33,7 @@ public class DataProvider_Tour implements IRowDataProvider<TVITourBookTour> {
    @Override
    public int getColumnCount() {
       return _dataProvider.numVisibleColumns;
-   }
+   } 
 
    @Override
    public Object getDataValue(final int columnIndex, final int rowIndex) {
@@ -76,7 +76,7 @@ public class DataProvider_Tour implements IRowDataProvider<TVITourBookTour> {
 
       // a lazy data provider cannot easily get the index by it's object
 
-      return -1;
+      return _dataProvider.getFetchedTourIndex(rowObject);
    }
 
    @Override

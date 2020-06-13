@@ -49,7 +49,17 @@ public class DataProvider {
    private ConcurrentHashMap<Integer, Integer>            _pageNumbers_Fetched = new ConcurrentHashMap<>();
    private ConcurrentHashMap<Integer, LazyTourLoaderItem> _pageNumbers_Loading = new ConcurrentHashMap<>();
 
+   /**
+    * Key: Row index<br>
+    * Value: Tour item 
+    */
    private ConcurrentHashMap<Integer, TVITourBookTour>    _fetchedTourItems    = new ConcurrentHashMap<>();
+
+   /**
+    * Key: Tour ID <br>
+    * Value: Row index
+    */
+   private ConcurrentHashMap<Long, Integer>               _fetchedTourIndex    = new ConcurrentHashMap<>();
 
    private final LinkedBlockingDeque<LazyTourLoaderItem>  _loaderWaitingQueue  = new LinkedBlockingDeque<>();
 
@@ -152,6 +162,33 @@ public class DataProvider {
       }
 
       return 0;
+   }
+
+   /**
+    * @param hoveredRow
+    * @return Returns the fetched tour by it's row index or <code>null</code> when tour is not yet
+    *         fetched from the backend.
+    */
+   public TVITourBookTour getFetchedTour(final int hoveredRow) {
+
+      return _fetchedTourItems.get(hoveredRow);
+   }
+
+   /**
+    * @param tviTour
+    * @return Returns the tour index but only when it was already fetched (which was done for
+    *         displayed tour), otherwise -1.
+    */
+   public int getFetchedTourIndex(final TVITourBookTour tviTour) {
+
+      final long tourId = tviTour.tourId;
+
+      final Integer rowIndex = _fetchedTourIndex.get(tourId);
+      if (rowIndex == null) {
+         return -1;
+      } else {
+         return rowIndex;
+      }
    }
 
    /**
@@ -282,7 +319,10 @@ public class DataProvider {
 
             TVITourBookItem.readTourItems(result, tourItem);
 
-            _fetchedTourItems.put(rowIndex++, tourItem);
+            final int natTableRowIndex = rowIndex++;
+
+            _fetchedTourItems.put(natTableRowIndex, tourItem);
+            _fetchedTourIndex.put(tourItem.tourId, natTableRowIndex);
          }
 
          /*
@@ -317,6 +357,8 @@ public class DataProvider {
       }
 
       _fetchedTourItems.clear();
+      _fetchedTourIndex.clear();
+
       _pageNumbers_Fetched.clear();
       _pageNumbers_Loading.clear();
    }

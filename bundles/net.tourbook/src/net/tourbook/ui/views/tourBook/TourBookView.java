@@ -16,11 +16,13 @@
 package net.tourbook.ui.views.tourBook;
 
 import java.io.File;
+import java.io.Serializable;
 import java.text.NumberFormat;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List; 
 import java.util.Set;
 
 import net.tourbook.Messages;
@@ -96,7 +98,7 @@ import net.tourbook.ui.views.tourBook.natTable.DataProvider_Tour;
 import net.tourbook.ui.views.tourBook.natTable.NatTable_Header_Tooltip;
 
 import org.eclipse.core.runtime.Path;
-import org.eclipse.e4.ui.di.PersistState; 
+import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -130,12 +132,13 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.config.AbstractRegistryConfiguration;
-import org.eclipse.nebula.widgets.nattable.config.AbstractUiBindingConfiguration;
 import org.eclipse.nebula.widgets.nattable.config.CellConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.config.DefaultNatTableStyleConfiguration;
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
+import org.eclipse.nebula.widgets.nattable.coordinate.Range;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
+import org.eclipse.nebula.widgets.nattable.data.IRowIdAccessor;
 import org.eclipse.nebula.widgets.nattable.grid.data.DefaultCornerDataProvider;
 import org.eclipse.nebula.widgets.nattable.grid.data.DefaultRowHeaderDataProvider;
 import org.eclipse.nebula.widgets.nattable.grid.layer.ColumnHeaderLayer;
@@ -152,6 +155,7 @@ import org.eclipse.nebula.widgets.nattable.layer.cell.ILayerCell;
 import org.eclipse.nebula.widgets.nattable.painter.cell.ImagePainter;
 import org.eclipse.nebula.widgets.nattable.painter.cell.decorator.CellPainterDecorator;
 import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
+import org.eclipse.nebula.widgets.nattable.selection.RowSelectionModel;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.selection.command.SelectRowsCommand;
 import org.eclipse.nebula.widgets.nattable.selection.config.DefaultRowSelectionLayerConfiguration;
@@ -161,10 +165,8 @@ import org.eclipse.nebula.widgets.nattable.style.HorizontalAlignmentEnum;
 import org.eclipse.nebula.widgets.nattable.style.Style;
 import org.eclipse.nebula.widgets.nattable.style.theme.ModernNatTableThemeConfiguration;
 import org.eclipse.nebula.widgets.nattable.tooltip.NatTableContentTooltip;
-import org.eclipse.nebula.widgets.nattable.ui.binding.UiBindingRegistry;
+import org.eclipse.nebula.widgets.nattable.ui.action.IMouseAction;
 import org.eclipse.nebula.widgets.nattable.ui.matcher.MouseEventMatcher;
-import org.eclipse.nebula.widgets.nattable.ui.menu.PopupMenuAction;
-import org.eclipse.nebula.widgets.nattable.ui.menu.PopupMenuBuilder;
 import org.eclipse.nebula.widgets.nattable.ui.util.CellEdgeEnum;
 import org.eclipse.nebula.widgets.nattable.util.GUIHelper;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
@@ -173,9 +175,11 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -284,12 +288,14 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    //
    private LazyTourProvider           _tableTourProvider           = new LazyTourProvider(this);
    private TVITourBookRoot            _rootItem_Tree;
+   private long                       _hoveredTourId;
    //
    private DataLayer                  _natTable_ColumnHeader_DataLayer;
    private ColumnHeaderLayer          _natTable_ColumnHeader_Layer;
    private ColumnHideShowLayer        _natTable_Body_ColumnHideShowLayer;
    private ColumnReorderLayer         _natTable_Body_ColumnReorderLayer;
    private DataLayer                  _natTable_Body_DataLayer;
+   private HoverLayer                 _natTable_Body_HoverLayer;
    private SelectionLayer             _natTable_Body_SelectionLayer;
    private ViewportLayer              _natTable_Body_ViewportLayer;
    private DataProvider               _natTable_DataProvider;
@@ -1002,42 +1008,42 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       }
    }
 
-   /**
-    * [1] IConfiguration for registering a UI binding to open a menu
-    */
-   private class NatTable_Config_DebugMenu extends AbstractUiBindingConfiguration {
-
-      private final Menu debugMenu;
-
-      public NatTable_Config_DebugMenu(final NatTable natTable) {
-
-         // [2] create the menu using the PopupMenuBuilder
-         this.debugMenu = new PopupMenuBuilder(natTable)
-               .withInspectLabelsMenuItem()
-               .build();
-      }
-
-      @Override
-      public void configureUiBindings(final UiBindingRegistry uiBindingRegistry) {
-
-         // [3] bind the PopupMenuAction to a right click
-         // using GridRegion.COLUMN_HEADER instead of null would
-         // for example open the menu only on performing a right
-         // click on the column header instead of any region
-
-         uiBindingRegistry.registerMouseDownBinding(
-
-               new MouseEventMatcher(
-                     SWT.NONE,
-                     null,
-                     MouseEventMatcher.RIGHT_BUTTON),
-
-               new PopupMenuAction(this.debugMenu)
-
-         );
-      }
-
-   }
+//   /**
+//    * [1] IConfiguration for registering a UI binding to open a menu
+//    */
+//   private class NatTable_Config_DebugMenu extends AbstractUiBindingConfiguration {
+//
+//      private final Menu debugMenu;
+//
+//      public NatTable_Config_DebugMenu(final NatTable natTable) {
+//
+//         // [2] create the menu using the PopupMenuBuilder
+//         this.debugMenu = new PopupMenuBuilder(natTable)
+//               .withInspectLabelsMenuItem()
+//               .build();
+//      }
+//
+//      @Override
+//      public void configureUiBindings(final UiBindingRegistry uiBindingRegistry) {
+//
+//         // [3] bind the PopupMenuAction to a right click
+//         // using GridRegion.COLUMN_HEADER instead of null would
+//         // for example open the menu only on performing a right
+//         // click on the column header instead of any region
+//
+//         uiBindingRegistry.registerMouseDownBinding(
+//
+//               new MouseEventMatcher(
+//                     SWT.NONE,
+//                     null,
+//                     MouseEventMatcher.RIGHT_BUTTON),
+//
+//               new PopupMenuAction(this.debugMenu)
+//
+//         );
+//      }
+//
+//   }
 
    private final class NatTable_ConfigField_TourType extends AbstractRegistryConfiguration {
 
@@ -1873,6 +1879,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       // this MUST be done after the nattable is created
       _columnManager_NatTable.setupNatTable(this);
 
+      // data provider
       _natTable_DataProvider = new DataProvider(this, _columnManager_NatTable);
       final ArrayList<ColumnDefinition> allSortedColumns = _natTable_DataProvider.allSortedColumns;
 
@@ -1881,33 +1888,20 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       _natTable_DataProvider.setSortColumn(sortColumnId, sortDirection);
 
-      /*
-       * Body layer
-       */
+      // body layer
       final IRowDataProvider<TVITourBookTour> body_DataProvider = new DataProvider_Tour(_natTable_DataProvider);
       _natTable_Body_DataLayer = new DataLayer(body_DataProvider);
 
-      /*
-       * Hover layer
-       */
-      final HoverLayer body_HoverLayer = new HoverLayer(_natTable_Body_DataLayer);
+      // hover layer
+      _natTable_Body_HoverLayer = new HoverLayer(_natTable_Body_DataLayer);
 
-      /*
-       * Column drag&drop layer
-       */
-      _natTable_Body_ColumnReorderLayer = new ColumnReorderLayer(body_HoverLayer);
+      // column drag&drop layer
+      _natTable_Body_ColumnReorderLayer = new ColumnReorderLayer(_natTable_Body_HoverLayer);
 
-      /*
-       * Show/hide columns
-       */
+      // show/hide columns
       _natTable_Body_ColumnHideShowLayer = new ColumnHideShowLayer(_natTable_Body_ColumnReorderLayer);
 
-      /*
-       * Create: Selection layer
-       */
-      // create a SelectionLayer without using the default configuration
-      // this enables us to add the row selection configuration cleanly
-      // afterwards
+      // selection layer
       _natTable_Body_SelectionLayer = new SelectionLayer(_natTable_Body_ColumnHideShowLayer, false);
 
       // register the DefaultRowSelectionLayerConfiguration that contains the
@@ -1916,22 +1910,21 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       // moves by a row and row only selection bindings
       _natTable_Body_SelectionLayer.addConfiguration(new DefaultRowSelectionLayerConfiguration());
 
-// have not yet understood how this works !!!
-//
-      // use a RowSelectionModel that will perform row selections and is able
-      // to identify a row via unique ID
-//      selection_Layer.setSelectionModel(new RowSelectionModel<>(selection_Layer, body_DataProvider, new IRowIdAccessor<Person>() {
-//
-//         @Override
-//         public Serializable getRowId(final Person rowObject) {
-//            return rowObject.getId();
-//         }
-//
-//      }));
+      // use a RowSelectionModel that will perform row selections and is able to identify a row via unique ID
+      final IRowIdAccessor<TVITourBookTour> rowIdAccessor = new IRowIdAccessor<TVITourBookTour>() {
 
-      /*
-       * Body viewport
-       */
+         @Override
+         public Serializable getRowId(final TVITourBookTour rowObject) {
+            return rowObject.tourId;
+         }
+
+      };
+      _natTable_Body_SelectionLayer.setSelectionModel(new RowSelectionModel<>(
+            _natTable_Body_SelectionLayer,
+            body_DataProvider,
+            rowIdAccessor));
+
+      // body viewport
       _natTable_Body_ViewportLayer = new ViewportLayer(_natTable_Body_SelectionLayer);
       _natTable_Body_ViewportLayer.addConfiguration(new NatTable_ConfigField_TourType(body_DataProvider));
       _natTable_Body_ViewportLayer.addConfiguration(new NatTable_ConfigField_Weather(body_DataProvider));
@@ -1979,11 +1972,25 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       _columnManager_NatTable.setupNatTable_PostCreate();
 
+      // set header tooltip
       _natTable_Tooltip = new NatTable_Header_Tooltip(_tourViewer_NatTable, this);
       _natTable_Tooltip.setPopupDelay(0);
 
+      // Add a double click listener
+      _tourViewer_NatTable.getUiBindingRegistry()
+            .registerDoubleClickBinding(
+                  MouseEventMatcher.bodyLeftClick(SWT.NONE),
+
+                  new IMouseAction() {
+
+                     @Override
+                     public void run(final NatTable natTable, final MouseEvent event) {
+                        TourManager.getInstance().tourDoubleClickAction(TourBookView.this, _tourDoubleClickState);
+                     }
+                  });
+
       /*
-       * Configure table
+       * Do NatTable configuration
        */
 
       // as the autoconfiguration of the NatTable is turned off, we have to add the DefaultNatTableStyleConfiguration manually
@@ -2061,7 +2068,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
          @Override
          public void menuShown(final MenuEvent menuEvent) {
-//            _tagMenuManager.onShowMenu(menuEvent, _tourViewer_NatTable, Display.getCurrent().getCursorLocation(), _tourInfoToolTip_NatTable);
             _tagMenuManager.onShowMenu(menuEvent, _tourViewer_NatTable, Display.getCurrent().getCursorLocation(), null);
          }
       });
@@ -6819,7 +6825,54 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       TVITourBookItem firstElement = null;
       TVITourBookTour firstTour = null;
 
+      _hoveredTourId = -1;
+
       if (_isLayoutNatTable) {
+
+         final RowSelectionModel<TVITourBookTour> rowSelectionModel = getNatTable_SelectionModel();
+
+         boolean isHoveredInSelection = false;
+         int hoveredRow = -1;
+
+         final Point hoveredPosition = _natTable_Body_HoverLayer.getCurrentHoveredCellPosition();
+         if (hoveredPosition != null) {
+
+            hoveredRow = hoveredPosition.y;
+
+            final Set<Range> allSelectedRowPositions = rowSelectionModel.getSelectedRowPositions();
+            for (final Range range : allSelectedRowPositions) {
+               if (range.contains(hoveredRow)) {
+                  isHoveredInSelection = true;
+                  break;
+               }
+            }
+         }
+
+         if (isHoveredInSelection) {
+
+            // mouse is hovering the selected tours
+
+            numTourItems = numSelectedItems = rowSelectionModel.getSelectedRowCount();
+
+            final List<TVITourBookTour> selection = rowSelectionModel.getSelectedRowObjects();
+
+            if (selection.isEmpty() == false) {
+               firstTour = selection.get(0);
+            }
+
+         } else {
+
+            // mouse is not hovering a tour selection
+
+            final TVITourBookTour fetchedTour = _natTable_DataProvider.getFetchedTour(hoveredRow);
+            if (fetchedTour != null) {
+
+               numTourItems = numSelectedItems = 1;
+               firstTour = fetchedTour;
+
+               _hoveredTourId = fetchedTour.tourId;
+            }
+         }
 
       } else if (_isLayoutTable) {
 
@@ -6876,15 +6929,16 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       final boolean useWeatherRetrieval = _prefStore.getBoolean(ITourbookPreferences.WEATHER_USE_WEATHER_RETRIEVAL) &&
             !_prefStore.getString(ITourbookPreferences.WEATHER_API_KEY).equals(UI.EMPTY_STRING);
 
-      /*
-       * enable actions
-       */
+      // set double click infos
       _tourDoubleClickState.canEditTour = isOneTour;
       _tourDoubleClickState.canOpenTour = isOneTour;
       _tourDoubleClickState.canQuickEditTour = isOneTour;
       _tourDoubleClickState.canEditMarker = isOneTour;
       _tourDoubleClickState.canAdjustAltitude = isOneTour;
 
+      /*
+       * enable actions
+       */
       _subMenu_AdjustTourValues.setEnabled(isTourSelected || isAllToursSelected);
       _subMenu_AdjustTourValues.getActionRetrieveWeatherData().setEnabled(useWeatherRetrieval);
 
@@ -7040,6 +7094,40 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       return _natTable_Body_DataLayer;
    }
 
+   /**
+    * @param event
+    * @return Returns the {@link ColumnDefinition} of the currently selected row or
+    *         <code>null</code> when nothing is selected.
+    */
+   public ColumnDefinition getNatTable_SelectedColumnDefinition(final Event event) {
+
+      final NatTable natTable = _tourViewer_NatTable;
+
+      final int colPos = natTable.getColumnPositionByX(event.x);
+      final int rowPos = natTable.getRowPositionByY(event.y);
+
+      final ILayerCell cell = natTable.getCellByPosition(colPos, rowPos);
+      if (cell != null) {
+
+         final int colIndexByPos = natTable.getColumnIndexByPosition(colPos);
+         if (colIndexByPos == -1) {
+
+            // a column is not hit
+            return null;
+         }
+
+         return _columnManager_NatTable.getActiveProfile().getVisibleColumnDefinitions().get(colIndexByPos);
+      }
+
+      return null;
+   }
+
+   @SuppressWarnings("unchecked")
+   private RowSelectionModel<TVITourBookTour> getNatTable_SelectionModel() {
+
+      return (RowSelectionModel<TVITourBookTour>) _natTable_Body_SelectionLayer.getSelectionModel();
+   }
+
    @Override
    public PostSelectionProvider getPostSelectionProvider() {
       return _postSelectionProvider;
@@ -7053,6 +7141,21 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       IStructuredSelection selectedTours;
 
       if (_isLayoutNatTable) {
+
+         final RowSelectionModel<TVITourBookTour> rowSelectionModel = getNatTable_SelectionModel();
+
+         final List<TVITourBookTour> selectedTVITours = rowSelectionModel.getSelectedRowObjects();
+
+         for (final TVITourBookTour tviTourBookTour : selectedTVITours) {
+            tourIds.add(tviTourBookTour.tourId);
+         }
+
+         if (tourIds.size() == 0 && _hoveredTourId != -1) {
+
+            // when nothing is selected but mouse is hovering a tour, return this tour id
+
+            tourIds.add(_hoveredTourId);
+         }
 
          return tourIds;
 
@@ -7595,9 +7698,21 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       if (_isLayoutNatTable) {
 
-         _natTable_DataProvider.cleanup_Tours();
+         _tourViewer_NatTable.setRedraw(false);
+         _isInReload = true;
+         {
+//   ???         _natTable_DataProvider.cleanup_Tours();
 
-         setupTourViewerContent();
+            final RowSelectionModel<TVITourBookTour> selectionModel = getNatTable_SelectionModel();
+            final Set<Range> selectedRowPositions = selectionModel.getSelectedRowPositions();
+
+
+            setupTourViewerContent();
+
+//            _tourViewer_NatTable.doCommand(new SelectRowsCommand(ILayer layer, int columnPosition, int rowPosition, boolean withShiftMask, boolean withControlMask));
+         }
+         _isInReload = false;
+         _tourViewer_NatTable.setRedraw(true);
 
       } else if (_isLayoutTable) {
 
