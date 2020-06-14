@@ -33,13 +33,13 @@ import net.tourbook.ui.UI;
 
 public abstract class TVITourBookItem extends TreeViewerItem implements ITourItem {
 
-   static ZonedDateTime calendar8 = ZonedDateTime.now().with(TimeTools.calendarWeek.dayOfWeek(), 1);
+   static ZonedDateTime       calendar8 = ZonedDateTime.now().with(TimeTools.calendarWeek.dayOfWeek(), 1);
 
    public static final String SQL_ALL_TOUR_FIELDS;
-   static final String  SQL_ALL_OTHER_FIELDS;
+   static final String        SQL_ALL_OTHER_FIELDS;
 
-   static final String  SQL_SUM_COLUMNS;
-   static final String  SQL_SUM_FIELDS;
+   static final String        SQL_SUM_COLUMNS;
+   static final String        SQL_SUM_FIELDS;
 
    static {
 
@@ -423,7 +423,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
     * @throws SQLException
     */
    public static TVITourBookTour readTourItems(final ResultSet result,
-                                        final TVITourBookTour tourItem) throws SQLException {
+                                               final TVITourBookTour tourItem) throws SQLException {
 
 // SET_FORMATTING_OFF
 

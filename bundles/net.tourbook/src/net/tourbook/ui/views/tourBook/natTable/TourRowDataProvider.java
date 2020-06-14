@@ -21,24 +21,24 @@ import net.tourbook.ui.views.tourBook.TVITourBookTour;
 
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 
-public class DataProvider_Tour implements IRowDataProvider<TVITourBookTour> {
+public class TourRowDataProvider implements IRowDataProvider<TVITourBookTour> {
 
-   private DataProvider _dataProvider;
+   private NatTable_DataLoader _dataLoader;
 
-   public DataProvider_Tour(final DataProvider natTable_DataProvider) {
+   public TourRowDataProvider(final NatTable_DataLoader natTable_DataProvider) {
 
-      _dataProvider = natTable_DataProvider;
+      _dataLoader = natTable_DataProvider;
    }
 
    @Override
    public int getColumnCount() {
-      return _dataProvider.numVisibleColumns;
-   } 
+      return _dataLoader.numVisibleColumns;
+   }
 
    @Override
    public Object getDataValue(final int columnIndex, final int rowIndex) {
 
-      final TVITourBookTour tviTour = _dataProvider.getTour(rowIndex);
+      final TVITourBookTour tviTour = _dataLoader.getTour(rowIndex);
 
       if (tviTour == null) {
 
@@ -46,7 +46,7 @@ public class DataProvider_Tour implements IRowDataProvider<TVITourBookTour> {
          return null;
       }
 
-      final ColumnDefinition colDef = _dataProvider.allSortedColumns.get(columnIndex);
+      final ColumnDefinition colDef = _dataLoader.allSortedColumns.get(columnIndex);
       final NatTable_LabelProvider labelProvider = colDef.getNatTable_LabelProvider();
 
       if (labelProvider == null) {
@@ -62,13 +62,13 @@ public class DataProvider_Tour implements IRowDataProvider<TVITourBookTour> {
    @Override
    public int getRowCount() {
 
-      return _dataProvider.getNumberOfTours();
+      return _dataLoader.getNumberOfTours();
    }
 
    @Override
    public TVITourBookTour getRowObject(final int rowIndex) {
 
-      return _dataProvider.getTour(rowIndex);
+      return _dataLoader.getTour(rowIndex);
    }
 
    @Override
@@ -76,7 +76,7 @@ public class DataProvider_Tour implements IRowDataProvider<TVITourBookTour> {
 
       // a lazy data provider cannot easily get the index by it's object
 
-      return _dataProvider.getFetchedTourIndex(rowObject);
+      return _dataLoader.getFetchedTourIndex(rowObject);
    }
 
    @Override

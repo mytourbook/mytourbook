@@ -21,10 +21,10 @@ import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 
 public class DataProvider_ColumnHeader implements IDataProvider {
 
-   private DataProvider  _dataProvider;
+   private NatTable_DataLoader  _dataProvider;
    private ColumnManager _columnManager;
 
-   public DataProvider_ColumnHeader(final DataProvider natTable_DataProvider, final ColumnManager columnManager) {
+   public DataProvider_ColumnHeader(final NatTable_DataLoader natTable_DataProvider, final ColumnManager columnManager) {
 
       _dataProvider = natTable_DataProvider;
       _columnManager = columnManager;

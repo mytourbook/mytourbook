@@ -15,11 +15,14 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourBook.natTable;
 
+import gnu.trove.list.array.TLongArrayList;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -39,8 +42,9 @@ import net.tourbook.ui.views.tourBook.TVITourBookTour;
 import net.tourbook.ui.views.tourBook.TourBookView;
 
 import org.eclipse.nebula.widgets.nattable.NatTable;
+import org.eclipse.swt.widgets.Display;
 
-public class DataProvider {
+public class NatTable_DataLoader {
 
    private static final char                              NL                   = net.tourbook.common.UI.NEW_LINE;
 
@@ -51,7 +55,7 @@ public class DataProvider {
 
    /**
     * Key: Row index<br>
-    * Value: Tour item 
+    * Value: Tour item
     */
    private ConcurrentHashMap<Integer, TVITourBookTour>    _fetchedTourItems    = new ConcurrentHashMap<>();
 
@@ -64,6 +68,7 @@ public class DataProvider {
    private final LinkedBlockingDeque<LazyTourLoaderItem>  _loaderWaitingQueue  = new LinkedBlockingDeque<>();
 
    private ExecutorService                                _loadingExecutor;
+   private ExecutorService                                _rowIndexExecutor;
    {
 
       final ThreadFactory threadFactory = new ThreadFactory() {
@@ -71,7 +76,7 @@ public class DataProvider {
          @Override
          public Thread newThread(final Runnable r) {
 
-            final Thread thread = new Thread(r, "NatTable DataProvider: Loading tours");//$NON-NLS-1$
+            final Thread thread = new Thread(r, "NatTable_DataLoader: Loading tours/row indices");//$NON-NLS-1$
 
             thread.setPriority(Thread.MIN_PRIORITY);
             thread.setDaemon(true);
@@ -81,6 +86,7 @@ public class DataProvider {
       };
 
       _loadingExecutor = Executors.newSingleThreadExecutor(threadFactory);
+      _rowIndexExecutor = Executors.newSingleThreadExecutor(threadFactory);
    }
 
    private String                     _sqlSortField;
@@ -98,17 +104,18 @@ public class DataProvider {
    private TourBookView               _tourBookView;
    private ColumnManager              _columnManager;
 
-   public DataProvider(final TourBookView tourBookView, final ColumnManager columnManager) {
+   /**
+    * Contains all tour id's for the currently fetched tours, this is used to get the row index for
+    * a tour.
+    */
+   private long[]                     _allLoadedTourIds;
+
+   public NatTable_DataLoader(final TourBookView tourBookView, final ColumnManager columnManager) {
 
       _tourBookView = tourBookView;
       _columnManager = columnManager;
 
       createColumnHeaderData();
-   }
-
-   public void cleanup_Tours() {
-
-      _numAllTourItems = -1;
    }
 
    private void createColumnHeaderData() {
@@ -123,6 +130,46 @@ public class DataProvider {
             numVisibleColumns++;
          }
       }
+   }
+
+   private int[] createRowIndicesFromTourIds(final ArrayList<Long> allRequestedTourIds) {
+
+      final int numRequestedTourIds = allRequestedTourIds.size();
+      final int[] allRowIndices = new int[numRequestedTourIds];
+
+      if (numRequestedTourIds == 0) {
+
+         // nothing more to do
+         return allRowIndices;
+      }
+
+      final int numAllAvailableTourIds = _allLoadedTourIds.length;
+
+      int rowPosition = 0;
+      long requestedTourId = allRequestedTourIds.get(rowPosition);
+
+      for (int tourIdIndex = 0; tourIdIndex < numAllAvailableTourIds; tourIdIndex++) {
+
+         final long loadedTourId = _allLoadedTourIds[tourIdIndex];
+
+         if (loadedTourId == requestedTourId) {
+
+            allRowIndices[rowPosition] = tourIdIndex;
+
+            // advance to the next requested tour id
+
+            rowPosition++;
+
+            // check end of requested tour id's
+            if (rowPosition >= numRequestedTourIds) {
+               break;
+            }
+
+            requestedTourId = allRequestedTourIds.get(rowPosition);
+         }
+      }
+
+      return allRowIndices;
    }
 
    private int fetchNumberOfTours() {
@@ -203,6 +250,30 @@ public class DataProvider {
       return _numAllTourItems;
    }
 
+   public int[] getRowIndexFromTourId(final ArrayList<Long> allRequestedTourIds) {
+
+      if (_allLoadedTourIds != null) {
+         return createRowIndicesFromTourIds(allRequestedTourIds);
+      }
+
+      CompletableFuture.runAsync(() -> {
+
+         _allLoadedTourIds = loadAllTourIds();
+
+      }, _rowIndexExecutor).thenRun(() -> {
+
+         final int[] rowIndicesFromTourIds = createRowIndicesFromTourIds(allRequestedTourIds);
+
+         // update UI
+         final Display display = _tourBookView.getTourViewer_NatTable().getDisplay();
+         display.asyncExec(() -> {
+            _tourBookView.natTable_SelectTours(rowIndicesFromTourIds);
+         });
+      });
+
+      return null;
+   }
+
    /**
     * @param index
     * @return Returns tour at requested row index or <code>null</code> when not yet available.
@@ -245,7 +316,7 @@ public class DataProvider {
 
       _loaderWaitingQueue.add(loaderItem);
 
-      final Runnable executorTask = new Runnable() {
+      _loadingExecutor.submit(new Runnable() {
          @Override
          public void run() {
 
@@ -265,11 +336,52 @@ public class DataProvider {
             _pageNumbers_Fetched.put(loaderItemFetchKey, loaderItemFetchKey);
             _pageNumbers_Loading.remove(loaderItemFetchKey);
          }
-      };
-
-      _loadingExecutor.submit(executorTask);
+      });
 
       return null;
+   }
+
+   /**
+    * Loads all tour id's for the current sort and tour filter
+    *
+    * @return
+    */
+   private long[] loadAllTourIds() {
+
+      final SQLFilter sqlFilter = new SQLFilter(SQLFilter.TAG_FILTER);
+
+      final String sql = NL
+
+            + "SELECT TOURID" //                                                       //$NON-NLS-1$
+
+            + " FROM " + TourDatabase.TABLE_TOUR_DATA + " TourData" + NL //            //$NON-NLS-1$ //$NON-NLS-2$
+
+            + " WHERE 1=1" + NL //
+            + sqlFilter.getWhereClause() + NL
+
+            + " ORDER BY " + _sqlSortField + UI.SPACE + _sqlSortDirection + NL //      //$NON-NLS-1$
+      ;
+
+      final TLongArrayList allTourIds = new TLongArrayList();
+
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
+
+         final PreparedStatement prepStmt = conn.prepareStatement(sql);
+
+         // set filter parameters
+         sqlFilter.setParameters(prepStmt, 1);
+
+         final ResultSet result = prepStmt.executeQuery();
+         while (result.next()) {
+            allTourIds.add(result.getLong(1));
+         }
+
+      } catch (final SQLException e) {
+
+         SQL.showException(e, sql);
+      }
+
+      return allTourIds.toArray();
    }
 
    private boolean loadPagedTourItems(final LazyTourLoaderItem loaderItem) {
@@ -361,6 +473,10 @@ public class DataProvider {
 
       _pageNumbers_Fetched.clear();
       _pageNumbers_Loading.clear();
+
+      _allLoadedTourIds = null;
+
+      _numAllTourItems = -1;
    }
 
    public void setSortColumn(final String sortColumnId, final int sortDirection) {
