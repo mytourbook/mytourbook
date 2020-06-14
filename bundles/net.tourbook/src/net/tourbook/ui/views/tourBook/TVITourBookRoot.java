@@ -30,69 +30,20 @@ import net.tourbook.ui.SQLFilter;
 
 public class TVITourBookRoot extends TVITourBookItem {
 
-   private TourBookViewLayout _viewLayout;
 
    /**
     * @param view
     * @param viewLayout
     */
-   TVITourBookRoot(final TourBookView view, final TourBookViewLayout viewLayout) {
+   TVITourBookRoot(final TourBookView view) {
 
       super(view);
-
-      _viewLayout = viewLayout;
    }
 
    @Override
    protected void fetchChildren() {
 
-      if (_viewLayout == TourBookViewLayout.TABLE) {
-         getItemsFlat();
-      } else {
-         getItemsHierarchical();
-      }
-
-   }
-
-   private void getItemsFlat() {
-
-      final SQLFilter sqlFilter = new SQLFilter(SQLFilter.TAG_FILTER);
-
-      final String sql = NL
-
-            + "SELECT " //                                                       //$NON-NLS-1$
-
-            + SQL_ALL_TOUR_FIELDS + NL
-
-            + " FROM " + TourDatabase.TABLE_TOUR_DATA + " TourData" + NL //      //$NON-NLS-1$ //$NON-NLS-2$
-
-            // get tag id's
-            + " LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" //$NON-NLS-1$ //$NON-NLS-2$
-            + " ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //         //$NON-NLS-1$
-
-            // get marker id's
-            + " LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_MARKER + " Tmarker" //$NON-NLS-1$ //$NON-NLS-2$
-            + " ON TourData.tourId = Tmarker.TourData_tourId" + NL //            //$NON-NLS-1$
-
-            + " WHERE 1=1" + NL //                                               //$NON-NLS-1$
-            + sqlFilter.getWhereClause() + NL
-
-            + " ORDER BY TourStartTime" + NL; //$NON-NLS-1$
-
-      try (Connection conn = TourDatabase.getInstance().getConnection()) {
-
-//         TourDatabase.enableRuntimeStatistics(conn);
-
-         final PreparedStatement statement = conn.prepareStatement(sql);
-         sqlFilter.setParameters(statement, 1);
-
-         fetchTourItems(statement);
-
-//       TourDatabase.disableRuntimeStatistic(conn);
-
-      } catch (final SQLException e) {
-         SQL.showException(e, sql);
-      }
+      getItemsHierarchical();
    }
 
    private void getItemsHierarchical() {

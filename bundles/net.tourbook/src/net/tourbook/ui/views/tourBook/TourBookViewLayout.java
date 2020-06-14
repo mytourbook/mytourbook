@@ -28,10 +28,6 @@ public enum TourBookViewLayout {
    CATEGORY_WEEK,
 
    /**
-    */
-   TABLE,
-
-   /**
     * Tour Book view is displayed with the NatTable control
     */
    NAT_TABLE
