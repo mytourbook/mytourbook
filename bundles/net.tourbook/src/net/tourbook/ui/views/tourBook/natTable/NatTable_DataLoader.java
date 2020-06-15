@@ -356,7 +356,10 @@ public class NatTable_DataLoader {
             + " FROM " + TourDatabase.TABLE_TOUR_DATA + " TourData" + NL //            //$NON-NLS-1$ //$NON-NLS-2$
 
             + " WHERE 1=1" + NL //
-            + sqlFilter.getWhereClause() + NL;
+            + sqlFilter.getWhereClause() + NL
+
+            + " ORDER BY " + _sqlSortField + UI.SPACE + _sqlSortDirection + NL //      //$NON-NLS-1$
+      ;
 
       final TLongArrayList allTourIds = new TLongArrayList();
 
