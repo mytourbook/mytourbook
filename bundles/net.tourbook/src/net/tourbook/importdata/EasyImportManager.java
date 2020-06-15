@@ -43,7 +43,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.FileSystemManager;
 import net.tourbook.common.NIO;
+import net.tourbook.common.TourbookFileSystem;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.SQL;
@@ -825,7 +827,7 @@ public class EasyImportManager {
       /*
        * Check device folder
        */
-      final String deviceOSFolder = importConfig.getDeviceOSFolder();
+      String deviceOSFolder = importConfig.getDeviceOSFolder();
 
       if (!isFolderValid(
             deviceOSFolder,
@@ -868,6 +870,14 @@ public class EasyImportManager {
        */
       final ArrayList<OSFile> notImportedFiles = easyConfig.notImportedFiles;
       if (notImportedFiles.size() == 0) {
+
+         if (NIO.isTourBookFileSystem(deviceOSFolder)) {
+
+            final TourbookFileSystem tourbookFileSystem = FileSystemManager.getTourbookFileSystem(deviceOSFolder);
+
+            deviceOSFolder = deviceOSFolder.replace(tourbookFileSystem.getId(), tourbookFileSystem.getDisplayId());
+
+         }
 
          MessageDialog.openInformation(
                Display.getDefault().getActiveShell(),
