@@ -4150,10 +4150,15 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
          _comboIC_BackupFolder.setText(UI.EMPTY_STRING);
          _comboIC_BackupFolder.setEnabled(false);
          _chkIC_CreateBackup.setSelection(false);
+         _chkIC_DeleteDeviceFiles.setSelection(false);
+         _lblIC_DeleteFilesInfo.setText(UI.EMPTY_STRING);
          _lblIC_BackupFolder.setEnabled(false);
          _btnIC_SelectBackupFolder.setEnabled(false);
          _backupHistoryItems.setIsValidateFolder(false);
          _backupHistoryItems.validateModifiedPath();
+      }
+      else {
+         enable_IC_Controls();
       }
    }
 
