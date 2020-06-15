@@ -24,11 +24,13 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
-import net.tourbook.common.UI;
+import net.tourbook.common.UI; 
 import net.tourbook.common.formatter.ValueFormat;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
@@ -1392,7 +1394,18 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
             if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
 
+               @SuppressWarnings("unchecked")
+               final ArrayList<Long> backupTourIds = (ArrayList<Long>) _selectedTourIds.clone();
+
                reloadViewer();
+
+               // reloadViewer() is reselecting by row position and not by tour id
+               if (_isLayoutNatTable) {
+
+                  _tourViewer_NatTable.getDisplay().timerExec(300, () -> {
+                     reselectNatTableViewer(backupTourIds);
+                  });
+               }
 
             } else if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
 
@@ -5986,22 +5999,30 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     *
     * @param allRowPositions
     */
-   public void natTable_SelectTours(final int[] allRowPositions) {
+   private void natTable_SelectTours(final int[] allRowPositions) {
 
-      if (allRowPositions == null || allRowPositions.length == 0) {
+      if (allRowPositions == null || allRowPositions.length == 0 || allRowPositions[0] == -1) {
          return;
       }
 
-      _tourViewer_NatTable.getDisplay().timerExec(500, () -> {
+      Display.getDefault().asyncExec(() -> {
 
-         _natTable_Body_SelectionLayer.doCommand(new SelectRowsCommand(
-               _natTable_Body_SelectionLayer,
-               0,
-               allRowPositions,
-               false,
-               true,
-               allRowPositions[allRowPositions.length - 1]));
+         /*
+          * timerExec() MUST be run in the UI thread, without asyncExec() it is NOT in the UI thread
+          */
+
+         Display.getDefault().timerExec(500, () -> {
+
+            _natTable_Body_SelectionLayer.doCommand(new SelectRowsCommand(
+                  _natTable_Body_SelectionLayer,
+                  0,
+                  allRowPositions,
+                  false,
+                  true,
+                  allRowPositions[allRowPositions.length - 1]));
+         });
       });
+
    }
 
    /**
@@ -6366,17 +6387,37 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       }
    }
 
+   /**
+    * Reselect tours in {@link NatTable} with the provided tour id's
+    *
+    * @param selectedTourIds
+    */
+   private void reselectNatTableViewer(final ArrayList<Long> selectedTourIds) {
+
+      final CompletableFuture<int[]> allRowPositions = _natTable_DataLoader.getRowIndexFromTourId(selectedTourIds);
+
+      allRowPositions.thenRun(() -> {
+
+         try {
+
+            natTable_SelectTours(allRowPositions.get());
+
+         } catch (InterruptedException | ExecutionException e) {
+
+            // ignore, should not happen (hopefully :-)
+            e.printStackTrace();
+         }
+      });
+   }
+
+   /**
+    * Reselect tours from {@link #_selectedTourIds}
+    */
    private void reselectTourViewer() {
 
       if (_isLayoutNatTable) {
 
-         // select first row -> needs to be improved
-//         _tourViewer_NatTable.doCommand(new SelectRowsCommand(_natTable_Body_ViewportLayer, 0, 0, false, false));
-
-
-         final int[] allRowPositions = _natTable_DataLoader.getRowIndexFromTourId(_selectedTourIds);
-
-         natTable_SelectTours(allRowPositions);
+         reselectNatTableViewer(_selectedTourIds);
 
       } else {
 

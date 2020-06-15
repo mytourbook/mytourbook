@@ -42,11 +42,10 @@ import net.tourbook.ui.views.tourBook.TVITourBookTour;
 import net.tourbook.ui.views.tourBook.TourBookView;
 
 import org.eclipse.nebula.widgets.nattable.NatTable;
-import org.eclipse.swt.widgets.Display;
 
 public class NatTable_DataLoader {
 
-   private static final char                              NL                   = net.tourbook.common.UI.NEW_LINE;
+   private static final char                               NL                   = net.tourbook.common.UI.NEW_LINE;
 
    private static final int                               FETCH_SIZE           = 1000;
 
@@ -132,7 +131,7 @@ public class NatTable_DataLoader {
       }
    }
 
-   private int[] createRowIndicesFromTourIds(final ArrayList<Long> allRequestedTourIds) {
+   private int[] createRowIndicesFromTourIds(final ArrayList<Long> allRequestedTourIds, final long[] allLoadedTourIds) {
 
       final int numRequestedTourIds = allRequestedTourIds.size();
       final int[] allRowIndices = new int[numRequestedTourIds];
@@ -143,29 +142,24 @@ public class NatTable_DataLoader {
          return allRowIndices;
       }
 
-      final int numAllAvailableTourIds = _allLoadedTourIds.length;
+      final int numAllAvailableTourIds = allLoadedTourIds.length;
 
-      int rowPosition = 0;
-      long requestedTourId = allRequestedTourIds.get(rowPosition);
+      // loop: all requested tour id's
+      for (int rowPosition = 0; rowPosition < allRequestedTourIds.size(); rowPosition++) {
 
-      for (int tourIdIndex = 0; tourIdIndex < numAllAvailableTourIds; tourIdIndex++) {
+         final long requestedTourId = allRequestedTourIds.get(rowPosition);
 
-         final long loadedTourId = _allLoadedTourIds[tourIdIndex];
+         // loop: all available tour id's
+         for (int tourIdIndex = 0; tourIdIndex < numAllAvailableTourIds; tourIdIndex++) {
 
-         if (loadedTourId == requestedTourId) {
+            final long loadedTourId = allLoadedTourIds[tourIdIndex];
 
-            allRowIndices[rowPosition] = tourIdIndex;
+            if (loadedTourId == requestedTourId) {
 
-            // advance to the next requested tour id
+               allRowIndices[rowPosition] = tourIdIndex;
 
-            rowPosition++;
-
-            // check end of requested tour id's
-            if (rowPosition >= numRequestedTourIds) {
                break;
             }
-
-            requestedTourId = allRequestedTourIds.get(rowPosition);
          }
       }
 
@@ -250,28 +244,33 @@ public class NatTable_DataLoader {
       return _numAllTourItems;
    }
 
-   public int[] getRowIndexFromTourId(final ArrayList<Long> allRequestedTourIds) {
+   public CompletableFuture<int[]> getRowIndexFromTourId(final ArrayList<Long> allRequestedTourIds) {
 
-      if (_allLoadedTourIds != null) {
-         return createRowIndicesFromTourIds(allRequestedTourIds);
+      if (_allLoadedTourIds == null) {
+
+         // firstly load all tour id's
+
+         return CompletableFuture.supplyAsync(() -> {
+
+            _allLoadedTourIds = loadAllTourIds();
+
+            final int[] rowIndicesFromTourIds = createRowIndicesFromTourIds(allRequestedTourIds, _allLoadedTourIds);
+
+            return rowIndicesFromTourIds;
+
+         }, _rowIndexExecutor);
+
+      } else {
+
+         return CompletableFuture.supplyAsync(() -> {
+
+            final int[] rowIndices = createRowIndicesFromTourIds(allRequestedTourIds, _allLoadedTourIds);
+
+            return rowIndices;
+
+         }, _rowIndexExecutor);
+
       }
-
-      CompletableFuture.runAsync(() -> {
-
-         _allLoadedTourIds = loadAllTourIds();
-
-      }, _rowIndexExecutor).thenRun(() -> {
-
-         final int[] rowIndicesFromTourIds = createRowIndicesFromTourIds(allRequestedTourIds);
-
-         // update UI
-         final Display display = _tourBookView.getTourViewer_NatTable().getDisplay();
-         display.asyncExec(() -> {
-            _tourBookView.natTable_SelectTours(rowIndicesFromTourIds);
-         });
-      });
-
-      return null;
    }
 
    /**
@@ -357,10 +356,7 @@ public class NatTable_DataLoader {
             + " FROM " + TourDatabase.TABLE_TOUR_DATA + " TourData" + NL //            //$NON-NLS-1$ //$NON-NLS-2$
 
             + " WHERE 1=1" + NL //
-            + sqlFilter.getWhereClause() + NL
-
-            + " ORDER BY " + _sqlSortField + UI.SPACE + _sqlSortDirection + NL //      //$NON-NLS-1$
-      ;
+            + sqlFilter.getWhereClause() + NL;
 
       final TLongArrayList allTourIds = new TLongArrayList();
 
@@ -493,6 +489,7 @@ public class NatTable_DataLoader {
          _sqlSortDirection = "DESC"; //$NON-NLS-1$
       }
 
+      _sqlSortDirection = "ASC";
       /*
        * Set sort direction
        */
