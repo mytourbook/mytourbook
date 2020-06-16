@@ -2582,7 +2582,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
                // label
                Label label = new Label(_groupData, SWT.NONE);
                label.setText(Messages.Dialog_ImportConfig_Label_StateTooltipWidth);
-               GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+               GridDataFactory.fillDefaults().applyTo(label);
 
                // spinner
                _spinnerDash_StateTooltipWidth = new Spinner(_groupData, SWT.BORDER);
@@ -2592,7 +2592,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
                _spinnerDash_StateTooltipWidth.addMouseWheelListener(_liveUpdateMouseWheelListener);
                GridDataFactory
                      .fillDefaults()//
-                     .align(SWT.FILL, SWT.CENTER)
                      .applyTo(_spinnerDash_StateTooltipWidth);
 
                // label: px
@@ -2612,7 +2611,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
                      doLiveUpdate();
                   }
                });
-               GridDataFactory.fillDefaults().span(3, 1).applyTo(_chkDash_DisplayAbsoluteFilePath);
+               GridDataFactory.fillDefaults().applyTo(_chkDash_DisplayAbsoluteFilePath);
             }
          }
          {
