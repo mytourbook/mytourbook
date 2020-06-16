@@ -124,8 +124,6 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
             this,
             Messages.tourCatalog_view_action_create_marker);
 
-      _actionSelectInBetweenTimeSlices = new ActionSelectInBetweenTimeSlices(this);
-
       _actionDeleteMarker = new ActionDeleteMarker(tourChart);
       _actionSetMarkerVisible = new ActionSetMarkerVisible(tourChart);
       _actionSetMarkerPosition = new ActionSetMarkerLabelPositionMenu(tourChart);
@@ -147,6 +145,8 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
       _actionPrefDialog = new ActionOpenPrefDialog(
             Messages.Tour_Action_EditChartPreferences,
             PrefPageAppearanceTourChart.ID);
+
+      _actionSelectInBetweenTimeSlices = new ActionSelectInBetweenTimeSlices(this);
    }
 
    @Override
@@ -306,12 +306,13 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
             menuMgr.add(_actionCreateMarkerFromSliderRight);
          }
 
-         menuMgr.add(_actionSelectInBetweenTimeSlices);
-
          menuMgr.add(_actionCreateRefTour);
 
          menuMgr.add(new Separator());
          menuMgr.add(_actionOpenMarkerDialog);
+
+         menuMgr.add(new Separator());
+         menuMgr.add(_actionSelectInBetweenTimeSlices);
 
          /////////////////////////////////////////////////////////////////////////////
          /////////////////////////////////////////////////////////////////////////////
@@ -334,6 +335,8 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
          _actionCreateRefTour.setEnabled(canCreateRefTours);
 
          _actionOpenMarkerDialog.setEnabled(isTourSaved);
+
+         _actionSelectInBetweenTimeSlices.setEnabled(isTourSaved);
       }
    }
 

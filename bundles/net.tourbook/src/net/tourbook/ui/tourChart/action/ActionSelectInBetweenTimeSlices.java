@@ -36,7 +36,6 @@ public class ActionSelectInBetweenTimeSlices extends Action {
 
       //TODO FB
       setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour_marker_new));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour_marker_new_disabled));
 
       _chartContextProvider = chartContextProvider;
    }
