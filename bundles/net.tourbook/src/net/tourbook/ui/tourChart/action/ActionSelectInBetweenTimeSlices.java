@@ -15,7 +15,6 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart.action;
 
-import net.tourbook.Messages;
 import net.tourbook.chart.IChartContextProvider;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.common.util.Util;
@@ -31,9 +30,9 @@ public class ActionSelectInBetweenTimeSlices extends Action {
     */
    private final IChartContextProvider _chartContextProvider;
 
-   public ActionSelectInBetweenTimeSlices(final IChartContextProvider chartContextProvider) {
+   public ActionSelectInBetweenTimeSlices(final IChartContextProvider chartContextProvider, final String text) {
 
-      setText(Messages.Tour_Action_Select_Inbetween_Timeslices);
+      super(text);
 
       _chartContextProvider = chartContextProvider;
    }

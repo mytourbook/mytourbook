@@ -146,7 +146,9 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
             Messages.Tour_Action_EditChartPreferences,
             PrefPageAppearanceTourChart.ID);
 
-      _actionSelectInBetweenTimeSlices = new ActionSelectInBetweenTimeSlices(this);
+      _actionSelectInBetweenTimeSlices = new ActionSelectInBetweenTimeSlices(
+            this,
+            Messages.tourCatalog_view_action_select_inbetween_timeslices);
    }
 
    @Override
