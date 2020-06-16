@@ -7948,19 +7948,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       table.showSelection();
    }
 
-   public void selectTimeSlices(final SelectionChartInfo chartInfo) {
-
-      final Table table = (Table) _timeSlice_Viewer.getControl();
-
-      System.out.println("left slider value" + chartInfo.leftSliderValuesIndex);
-      System.out.println("right slider value" + chartInfo.rightSliderValuesIndex);
-      final int minSelectedValue = Math.min(chartInfo.leftSliderValuesIndex, chartInfo.rightSliderValuesIndex);
-      final int maxSelectedValue = Math.max(chartInfo.leftSliderValuesIndex, chartInfo.rightSliderValuesIndex);
-      table.setSelection(minSelectedValue, maxSelectedValue);
-
-      table.showSelection();
-   }
-
    public void selectTimeSlicesTab() {
       _tabFolder.setSelection(_tab_20_TimeSlices);
    }
@@ -7974,11 +7961,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _page_EditorForm.setFocus();
    }
 
+   /**
+    * Programmatically toggles the row select mode
+    * 
+    * @param enabled
+    *           True to activate the row select mode, false to disactivate it.
+    */
    public void setRowEditModeEnabled(final boolean enabled) {
 
-      _isRowEditMode = enabled;
-
-      recreateViewer();
+      _actionToggleRowSelectMode.setChecked(enabled);
    }
 
    /**
