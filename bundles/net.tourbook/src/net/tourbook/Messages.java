@@ -2389,7 +2389,6 @@ public class Messages extends NLS {
    public static String Tour_Action_TourPhotosWithTooltip_Tooltip;
    public static String Tour_Action_ValuePointToolTip_IsVisible;
    public static String Tour_Action_Select_Inbetween_Timeslices;
-   public static String Tour_Action_Select_Inbetween_Timeslices_Tooltip;
    public static String Tour_Action_Weather;
 
    public static String Tour_Blog_Action_EditMarker_Tooltip;

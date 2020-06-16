@@ -2321,7 +2321,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    void actionToggleRowSelectMode() {
 
-      setRowEditModeEnabled(_actionToggleRowSelectMode.isChecked());
+      _isRowEditMode = _actionToggleRowSelectMode.isChecked();
+
+      recreateViewer();
    }
 
    private void addPartListener() {
@@ -7598,7 +7600,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _isSetField = isBackup;
    }
 
-   private void recreateViewer() {
+   public void recreateViewer() {
 
       /*
        * Recreate time slice viewer
@@ -7963,13 +7965,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    /**
     * Programmatically toggles the row select mode
-    * 
+    *
     * @param enabled
     *           True to activate the row select mode, false to disactivate it.
     */
    public void setRowEditModeEnabled(final boolean enabled) {
 
       _actionToggleRowSelectMode.setChecked(enabled);
+
+      actionToggleRowSelectMode();
    }
 
    /**

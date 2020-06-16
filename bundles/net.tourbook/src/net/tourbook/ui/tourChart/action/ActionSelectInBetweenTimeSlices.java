@@ -16,7 +16,6 @@
 package net.tourbook.ui.tourChart.action;
 
 import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.IChartContextProvider;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.common.util.Util;
@@ -34,8 +33,7 @@ public class ActionSelectInBetweenTimeSlices extends Action {
 
    public ActionSelectInBetweenTimeSlices(final IChartContextProvider chartContextProvider) {
 
-      //TODO FB
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__edit_tour_marker_new));
+      setText(Messages.Tour_Action_Select_Inbetween_Timeslices);
 
       _chartContextProvider = chartContextProvider;
    }
@@ -53,14 +51,14 @@ public class ActionSelectInBetweenTimeSlices extends Action {
          return;
       }
 
-      //TODO fb detect if it swim graph and opens the swim slice ?
       //Opens the TimeSlice tab
       tourDataEditorView.selectTimeSlicesTab();
 
       tourDataEditorView.setRowEditModeEnabled(true);
 
-      //tourDataEditorView.selectTimeSlices(selectionChartInfo);
       tourDataEditorView.selectTimeSlice_InViewer(selectionChartInfo.leftSliderValuesIndex, selectionChartInfo.rightSliderValuesIndex);
-      tourDataEditorView.setRowEditModeEnabled(true);
+
+      //We recreate the viewer to take into account the new selection
+      tourDataEditorView.recreateViewer();
    }
 }
