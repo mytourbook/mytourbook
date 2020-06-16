@@ -25,9 +25,6 @@ import org.eclipse.jface.action.Action;
 
 public class ActionSelectInBetweenTimeSlices extends Action {
 
-   /**
-    *
-    */
    private final IChartContextProvider _chartContextProvider;
 
    public ActionSelectInBetweenTimeSlices(final IChartContextProvider chartContextProvider, final String text) {
