@@ -233,7 +233,6 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
                return;
             }
 
-            //TODO FB
             onSelectionChanged(selection);
          }
       };
