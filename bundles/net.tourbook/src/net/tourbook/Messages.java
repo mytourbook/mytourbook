@@ -1094,6 +1094,8 @@ public class Messages extends NLS {
    public static String        Image__TourBook_Week;
    public static String        Image__TourFilter;
    public static String        Image__TourFilter_Disabled;
+   public static String        Image__TourFilter_Selected;
+   public static String        Image__TourFilter_Selected_Disabled;
    public static String        Image__TourGeoFilter;
    public static String        Image__TourInfo;
    public static String        Image__TourInfo_Disabled;
@@ -2406,6 +2408,8 @@ public class Messages extends NLS {
    public static String Tour_Book_Action_DeleteSelectedTours_Monitor;
    public static String Tour_Book_Action_DeleteSelectedTours_MonitorSubtask;
    public static String Tour_Book_Action_ExportViewCSV;
+
+   public static String Tour_Book_Action_ShowOnlySelectedTours_Tooltip;
    public static String Tour_Book_Action_ToggleViewLayout_Tooltip;
    public static String Tour_Book_Combo_statistic_tooltip;
    public static String Tour_Book_Combo_year_tooltip;

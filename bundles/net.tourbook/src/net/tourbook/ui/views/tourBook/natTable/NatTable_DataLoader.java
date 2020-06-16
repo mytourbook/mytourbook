@@ -47,7 +47,8 @@ public class NatTable_DataLoader {
 
    private static final char                               NL                   = net.tourbook.common.UI.NEW_LINE;
 
-   private static final int                               FETCH_SIZE           = 1000;
+   // TODO fix fetch size
+   private static final int                               FETCH_SIZE           = 10;
 
    private ConcurrentHashMap<Integer, Integer>            _pageNumbers_Fetched = new ConcurrentHashMap<>();
    private ConcurrentHashMap<Integer, LazyTourLoaderItem> _pageNumbers_Loading = new ConcurrentHashMap<>();
