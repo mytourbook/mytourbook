@@ -60,9 +60,9 @@ public class EasyConfig {
 
    public static final int TEMPERATURE_ADJUSTMENT_DURATION_DEFAULT = 12 * 60; // 12 minutes
 
-   public static final int TEMPERATURE_AVG_TEMPERATURE_DEFAULT     = 15;      // 15 �C
-   public static final int TEMPERATURE_AVG_TEMPERATURE_MIN         = 0;       // 0 �C
-   public static final int TEMPERATURE_AVG_TEMPERATURE_MAX         = 100;     // 30 �C / 100 �F
+   public static final int TEMPERATURE_AVG_TEMPERATURE_DEFAULT     = 15;      // 15 °C
+   public static final int TEMPERATURE_AVG_TEMPERATURE_MIN         = 0;       // 0 °C
+   public static final int TEMPERATURE_AVG_TEMPERATURE_MAX         = 100;     // 30 °C / 100 °F
 
    /*
     * Dash fields
