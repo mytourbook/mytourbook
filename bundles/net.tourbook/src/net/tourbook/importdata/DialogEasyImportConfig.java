@@ -2569,53 +2569,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
          }
          {
             /*
-             * State Tooltip
-             */
-            _groupData = new Group(container, SWT.NONE);
-            _groupData.setText(Messages.Dialog_ImportConfig_Group_StateTooltip);
-            GridLayoutFactory.swtDefaults().numColumns(3).applyTo(_groupData);
-            GridDataFactory.fillDefaults().span(3, 1).grab(true, false).applyTo(_groupData);
-            {
-               /*
-                * Width
-                */
-               // label
-               Label label = new Label(_groupData, SWT.NONE);
-               label.setText(Messages.Dialog_ImportConfig_Label_StateTooltipWidth);
-               GridDataFactory.fillDefaults().applyTo(label);
-
-               // spinner
-               _spinnerDash_StateTooltipWidth = new Spinner(_groupData, SWT.BORDER);
-               _spinnerDash_StateTooltipWidth.setMaximum(EasyConfig.STATE_TOOLTIP_WIDTH_MAX);
-               _spinnerDash_StateTooltipWidth.setMinimum(EasyConfig.STATE_TOOLTIP_WIDTH_MIN);
-               _spinnerDash_StateTooltipWidth.addSelectionListener(_liveUpdateListener);
-               _spinnerDash_StateTooltipWidth.addMouseWheelListener(_liveUpdateMouseWheelListener);
-               GridDataFactory
-                     .fillDefaults()//
-                     .applyTo(_spinnerDash_StateTooltipWidth);
-
-               // label: px
-               label = new Label(_groupData, SWT.NONE);
-               label.setText(CSS_PX);
-
-               /*
-                * Display absolute file path
-                */
-               // Checkbox
-               _chkDash_DisplayAbsoluteFilePath = new Button(_groupData, SWT.CHECK);
-               _chkDash_DisplayAbsoluteFilePath.setText(Messages.Dialog_ImportConfig_Label_StateTooltip_DisplayAbsoluteFilePath);
-               _chkDash_DisplayAbsoluteFilePath.setToolTipText(Messages.Dialog_ImportConfig_Label_StateTooltip_DisplayAbsoluteFilePath_Tooltip);
-               _chkDash_DisplayAbsoluteFilePath.addSelectionListener(new SelectionAdapter() {
-                  @Override
-                  public void widgetSelected(final SelectionEvent e) {
-                     doLiveUpdate();
-                  }
-               });
-               GridDataFactory.fillDefaults().applyTo(_chkDash_DisplayAbsoluteFilePath);
-            }
-         }
-         {
-            /*
              * Animation duration
              */
             // label
@@ -2693,6 +2646,53 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
             // fill 3rd column
             new Label(container, SWT.NONE);
+         }
+         {
+            /*
+             * State Tooltip
+             */
+            _groupData = new Group(container, SWT.NONE);
+            _groupData.setText(Messages.Dialog_ImportConfig_Group_StateTooltip);
+            GridLayoutFactory.swtDefaults().numColumns(3).applyTo(_groupData);
+            GridDataFactory.fillDefaults().span(3, 1).grab(true, false).applyTo(_groupData);
+            {
+               /*
+                * Width
+                */
+               // label
+               Label label = new Label(_groupData, SWT.NONE);
+               label.setText(Messages.Dialog_ImportConfig_Label_StateTooltipWidth);
+               GridDataFactory.fillDefaults().applyTo(label);
+
+               // spinner
+               _spinnerDash_StateTooltipWidth = new Spinner(_groupData, SWT.BORDER);
+               _spinnerDash_StateTooltipWidth.setMaximum(EasyConfig.STATE_TOOLTIP_WIDTH_MAX);
+               _spinnerDash_StateTooltipWidth.setMinimum(EasyConfig.STATE_TOOLTIP_WIDTH_MIN);
+               _spinnerDash_StateTooltipWidth.addSelectionListener(_liveUpdateListener);
+               _spinnerDash_StateTooltipWidth.addMouseWheelListener(_liveUpdateMouseWheelListener);
+               GridDataFactory
+                     .fillDefaults()//
+                     .applyTo(_spinnerDash_StateTooltipWidth);
+
+               // label: px
+               label = new Label(_groupData, SWT.NONE);
+               label.setText(CSS_PX);
+
+               /*
+                * Display absolute file path
+                */
+               // Checkbox
+               _chkDash_DisplayAbsoluteFilePath = new Button(_groupData, SWT.CHECK);
+               _chkDash_DisplayAbsoluteFilePath.setText(Messages.Dialog_ImportConfig_Label_StateTooltip_DisplayAbsoluteFilePath);
+               _chkDash_DisplayAbsoluteFilePath.setToolTipText(Messages.Dialog_ImportConfig_Label_StateTooltip_DisplayAbsoluteFilePath_Tooltip);
+               _chkDash_DisplayAbsoluteFilePath.addSelectionListener(new SelectionAdapter() {
+                  @Override
+                  public void widgetSelected(final SelectionEvent e) {
+                     doLiveUpdate();
+                  }
+               });
+               GridDataFactory.fillDefaults().applyTo(_chkDash_DisplayAbsoluteFilePath);
+            }
          }
       }
    }
