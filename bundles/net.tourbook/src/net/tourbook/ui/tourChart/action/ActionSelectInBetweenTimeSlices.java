@@ -37,6 +37,11 @@ public class ActionSelectInBetweenTimeSlices extends Action {
    @Override
    public void run() {
 
+      // make sure the tour editor does not contain a modified tour
+      if (TourManager.isTourEditorModified()) {
+         return;
+      }
+
       //Opens the TourDataEditorView
       Util.showView(TourDataEditorView.ID, true);
 
