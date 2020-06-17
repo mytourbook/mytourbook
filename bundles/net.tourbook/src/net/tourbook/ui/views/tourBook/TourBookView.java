@@ -19,10 +19,11 @@ import java.io.File;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
+import java.util.Set; 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -1362,18 +1363,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
             if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
 
-               @SuppressWarnings("unchecked")
-               final ArrayList<Long> backupTourIds = (ArrayList<Long>) _selectedTourIds.clone();
-
                reloadViewer();
-
-               // reloadViewer() is reselecting by row position and not by tour id
-               if (_isLayoutNatTable) {
-
-                  _tourViewer_NatTable.getDisplay().timerExec(300, () -> {
-                     reselectNatTableViewer(backupTourIds);
-                  });
-               }
 
             } else if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
 
@@ -1681,7 +1671,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       // show/hide columns
       _natTable_Body_ColumnHideShowLayer = new ColumnHideShowLayer(_natTable_Body_ColumnReorderLayer);
 
-      // selection layer
+      /*
+       * Selection layer
+       */
       _natTable_Body_SelectionLayer = new SelectionLayer(_natTable_Body_ColumnHideShowLayer, false);
 
       // register the DefaultRowSelectionLayerConfiguration that contains the
@@ -1704,7 +1696,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             body_DataProvider,
             rowIdAccessor));
 
-      // body viewport
+      /*
+       * Body viewport
+       */
       _natTable_Body_ViewportLayer = new ViewportLayer(_natTable_Body_SelectionLayer);
       _natTable_Body_ViewportLayer.addConfiguration(new NatTable_ConfigField_TourType(body_DataProvider));
       _natTable_Body_ViewportLayer.addConfiguration(new NatTable_ConfigField_Weather(body_DataProvider));
@@ -2463,17 +2457,39 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     */
    private void natTable_SelectTours(final int[] allRowPositions) {
 
+      // ensure there is something to be selected
       if (allRowPositions == null || allRowPositions.length == 0 || allRowPositions[0] == -1) {
          return;
       }
 
       Display.getDefault().asyncExec(() -> {
 
+         // sort rows ascending
+         Arrays.sort(allRowPositions);
+
+         System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] natTable_SelectTours()"
+               + "\tallRowPositions: " + Arrays.toString(allRowPositions)
+//            + "\t: " +
+         );
+// TODO remove SYSTEM.OUT.PRINTLN
+
+         final int firstRowPosition = allRowPositions[0];
+
+         final Display display = Display.getDefault();
+
+         /*
+          * First move to the position, otherwise the row selection do NOT select the rows when they
+          * are hidden !
+          */
+         display.asyncExec(() -> {
+
+            _natTable_Body_ViewportLayer.moveRowPositionIntoViewport(firstRowPosition);
+         });
+
          /*
           * timerExec() MUST be run in the UI thread, without asyncExec() it is NOT in the UI thread
           */
-
-         Display.getDefault().timerExec(500, () -> {
+         display.timerExec(1000, () -> {
 
             /*
              * It took me hours to solve this issue, first deselect the old selection otherwise is
@@ -2487,12 +2503,13 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
                   allRowPositions,
                   false,
                   true,
-//                allRowPositions[allRowPositions.length - 1] //
-                  allRowPositions[0] //
-//                  -1 // do not scroll into view
-            );
+                  firstRowPosition);
 
-            _natTable_Body_SelectionLayer.doCommand(command);
+            _isInReload = true;
+            {
+               _natTable_Body_SelectionLayer.doCommand(command);
+            }
+            _isInReload = false;
          });
       });
    }
@@ -2561,6 +2578,12 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    }
 
    private void onSelect_NatTableItem(final SelectionChangedEvent event) {
+
+      System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] onSelect_NatTableItem()"
+            + "\t_isInReload: " + _isInReload
+//            + "\t: " +
+      );
+// TODO remove SYSTEM.OUT.PRINTLN
 
       if (_isInReload) {
          return;
@@ -2776,20 +2799,15 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       if (_isLayoutNatTable) {
 
-         int[] allRowPositions;
-
          _tourViewer_NatTable.setRedraw(false);
          _isInReload = true;
          {
-            final RowSelectionModel<TVITourBookTour> selectionModel = getNatTable_SelectionModel();
-            allRowPositions = selectionModel.getFullySelectedRowPositions(0);
-
             setupTourViewerContent();
          }
          _isInReload = false;
          _tourViewer_NatTable.setRedraw(true);
 
-         natTable_SelectTours(allRowPositions);
+         reselectTourViewer();
 
       } else {
 
@@ -2860,13 +2878,23 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    }
 
    /**
-    * Reselect tours in {@link NatTable} with the provided tour id's
-    *
-    * @param selectedTourIds
+    * Reselect tours from {@link #_selectedTourIds}
     */
-   private void reselectNatTableViewer(final ArrayList<Long> selectedTourIds) {
+   private void reselectTourViewer() {
 
-      final CompletableFuture<int[]> allRowPositions = _natTable_DataLoader.getRowIndexFromTourId(selectedTourIds);
+      if (_isLayoutNatTable) {
+
+         reselectTourViewer_NatTable();
+
+      } else {
+
+         reselectTourViewer_Tree();
+      }
+   }
+
+   private void reselectTourViewer_NatTable() {
+
+      final CompletableFuture<int[]> allRowPositions = _natTable_DataLoader.getRowIndexFromTourId(_selectedTourIds);
 
       allRowPositions.thenRun(() -> {
 
@@ -2882,94 +2910,84 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       });
    }
 
-   /**
-    * Reselect tours from {@link #_selectedTourIds}
-    */
-   private void reselectTourViewer() {
+   private void reselectTourViewer_Tree() {
 
-      if (_isLayoutNatTable) {
+      // find the old selected year/[month/week] in the new tour items
+      TreeViewerItem reselectYearItem = null;
+      TreeViewerItem reselectYearSubItem = null;
+      final ArrayList<TreeViewerItem> reselectTourItems = new ArrayList<>();
 
-         reselectNatTableViewer(_selectedTourIds);
+      /*
+       * get the year/month/tour item in the data model
+       */
+      final ArrayList<TreeViewerItem> rootItems = _rootItem_Tree.getChildren();
 
-      } else {
+      for (final TreeViewerItem rootItem : rootItems) {
 
-         // find the old selected year/[month/week] in the new tour items
-         TreeViewerItem reselectYearItem = null;
-         TreeViewerItem reselectYearSubItem = null;
-         final ArrayList<TreeViewerItem> reselectTourItems = new ArrayList<>();
+         if (rootItem instanceof TVITourBookYear) {
 
-         /*
-          * get the year/month/tour item in the data model
-          */
-         final ArrayList<TreeViewerItem> rootItems = _rootItem_Tree.getChildren();
+            final TVITourBookYear tourBookYear = ((TVITourBookYear) rootItem);
+            if (tourBookYear.tourYear == _selectedYear) {
 
-         for (final TreeViewerItem rootItem : rootItems) {
+               reselectYearItem = rootItem;
 
-            if (rootItem instanceof TVITourBookYear) {
+               final Object[] yearSubItems = tourBookYear.getFetchedChildrenAsArray();
+               for (final Object yearSub : yearSubItems) {
 
-               final TVITourBookYear tourBookYear = ((TVITourBookYear) rootItem);
-               if (tourBookYear.tourYear == _selectedYear) {
+                  final TVITourBookYearCategorized tourBookYearSub = ((TVITourBookYearCategorized) yearSub);
+                  if (tourBookYearSub.tourYearSub == _selectedYearSub) {
 
-                  reselectYearItem = rootItem;
+                     reselectYearSubItem = tourBookYearSub;
 
-                  final Object[] yearSubItems = tourBookYear.getFetchedChildrenAsArray();
-                  for (final Object yearSub : yearSubItems) {
+                     final Object[] tourItems = tourBookYearSub.getFetchedChildrenAsArray();
+                     for (final Object tourItem : tourItems) {
 
-                     final TVITourBookYearCategorized tourBookYearSub = ((TVITourBookYearCategorized) yearSub);
-                     if (tourBookYearSub.tourYearSub == _selectedYearSub) {
+                        final TVITourBookTour tourBookTour = ((TVITourBookTour) tourItem);
+                        final long treeTourId = tourBookTour.tourId;
 
-                        reselectYearSubItem = tourBookYearSub;
-
-                        final Object[] tourItems = tourBookYearSub.getFetchedChildrenAsArray();
-                        for (final Object tourItem : tourItems) {
-
-                           final TVITourBookTour tourBookTour = ((TVITourBookTour) tourItem);
-                           final long treeTourId = tourBookTour.tourId;
-
-                           for (final Long tourId : _selectedTourIds) {
-                              if (treeTourId == tourId) {
-                                 reselectTourItems.add(tourBookTour);
-                                 break;
-                              }
+                        for (final Long tourId : _selectedTourIds) {
+                           if (treeTourId == tourId) {
+                              reselectTourItems.add(tourBookTour);
+                              break;
                            }
                         }
-                        break;
                      }
+                     break;
                   }
-                  break;
                }
+               break;
             }
          }
+      }
 
-         // select year/month/tour in the viewer
-         if (reselectTourItems.size() > 0) {
+      // select year/month/tour in the viewer
+      if (reselectTourItems.size() > 0) {
 
-            _tourViewer_Tree.setSelection(new StructuredSelection(reselectTourItems) {}, false);
+         _tourViewer_Tree.setSelection(new StructuredSelection(reselectTourItems) {}, false);
 
-         } else if (reselectYearSubItem != null) {
+      } else if (reselectYearSubItem != null) {
 
-            _tourViewer_Tree.setSelection(new StructuredSelection(reselectYearSubItem) {}, false);
+         _tourViewer_Tree.setSelection(new StructuredSelection(reselectYearSubItem) {}, false);
 
-         } else if (reselectYearItem != null) {
+      } else if (reselectYearItem != null) {
 
-            _tourViewer_Tree.setSelection(new StructuredSelection(reselectYearItem) {}, false);
+         _tourViewer_Tree.setSelection(new StructuredSelection(reselectYearItem) {}, false);
 
-         } else if (rootItems.size() > 0)
+      } else if (rootItems.size() > 0)
 
-         {
+      {
 
-            // the old year was not found, select the newest year
+         // the old year was not found, select the newest year
 
 //         final TreeViewerItem yearItem = rootItems.get(rootItems.size() - 1);
 
 //         _tourViewer.setSelection(new StructuredSelection(yearItem) {}, true);
-         }
+      }
 
-         // move the horizontal scrollbar to the left border
-         final ScrollBar horizontalBar = _tourViewer_Tree.getTree().getHorizontalBar();
-         if (horizontalBar != null) {
-            horizontalBar.setSelection(0);
-         }
+      // move the horizontal scrollbar to the left border
+      final ScrollBar horizontalBar = _tourViewer_Tree.getTree().getHorizontalBar();
+      if (horizontalBar != null) {
+         horizontalBar.setSelection(0);
       }
    }
 

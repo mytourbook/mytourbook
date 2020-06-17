@@ -15,13 +15,14 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourBook.natTable;
 
+import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.list.array.TLongArrayList;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.ArrayList; 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -42,10 +43,11 @@ import net.tourbook.ui.views.tourBook.TVITourBookTour;
 import net.tourbook.ui.views.tourBook.TourBookView;
 
 import org.eclipse.nebula.widgets.nattable.NatTable;
+import org.eclipse.swt.widgets.Display;
 
 public class NatTable_DataLoader {
 
-   private static final char                               NL                   = net.tourbook.common.UI.NEW_LINE;
+   private static final char NL = net.tourbook.common.UI.NEW_LINE;
 
    // TODO fix fetch size
    private static final int                               FETCH_SIZE           = 10;
@@ -135,20 +137,18 @@ public class NatTable_DataLoader {
    private int[] createRowIndicesFromTourIds(final ArrayList<Long> allRequestedTourIds, final long[] allLoadedTourIds) {
 
       final int numRequestedTourIds = allRequestedTourIds.size();
-      final int[] allRowIndices = new int[numRequestedTourIds];
+      final TIntArrayList allRowIndices = new TIntArrayList();
 
       if (numRequestedTourIds == 0) {
 
          // nothing more to do
-         return allRowIndices;
+         return allRowIndices.toArray();
       }
 
       final int numAllAvailableTourIds = allLoadedTourIds.length;
 
       // loop: all requested tour id's
-      for (int rowPosition = 0; rowPosition < allRequestedTourIds.size(); rowPosition++) {
-
-         final long requestedTourId = allRequestedTourIds.get(rowPosition);
+      for (final Long requestedTourId : allRequestedTourIds) {
 
          // loop: all available tour id's
          for (int tourIdIndex = 0; tourIdIndex < numAllAvailableTourIds; tourIdIndex++) {
@@ -157,14 +157,14 @@ public class NatTable_DataLoader {
 
             if (loadedTourId == requestedTourId) {
 
-               allRowIndices[rowPosition] = tourIdIndex;
+               allRowIndices.add(tourIdIndex);
 
                break;
             }
          }
       }
 
-      return allRowIndices;
+      return allRowIndices.toArray();
    }
 
    private int fetchNumberOfTours() {
@@ -276,7 +276,8 @@ public class NatTable_DataLoader {
 
    /**
     * @param index
-    * @return Returns tour at requested row index or <code>null</code> when not yet available.
+    * @return Returns tour at requested row index or <code>null</code> when not yet available. When
+    *         tour is not yet loaded then the data will be fetched from the backend.
     */
    TVITourBookTour getTour(final int index) {
 
@@ -441,14 +442,13 @@ public class NatTable_DataLoader {
           * Update UI
           */
          final NatTable tourViewer_NatTable = _tourBookView.getTourViewer_NatTable();
+         final Display display = tourViewer_NatTable.getDisplay();
 
-         tourViewer_NatTable.getDisplay()
+         display.asyncExec(() -> {
 
-               .asyncExec(() -> {
-
-                  // do a simple redraw, would not work with table/tree widget
-                  tourViewer_NatTable.redraw();
-               });
+            // do a simple redraw, would not work with table/tree widget
+            tourViewer_NatTable.redraw();
+         });
 
 //       TourDatabase.disableRuntimeStatistic(conn);
 
@@ -462,6 +462,9 @@ public class NatTable_DataLoader {
       return true;
    }
 
+   /**
+    * Cleanup all loaded data that the next time they are newly fetched when requested.
+    */
    public void resetTourItems() {
 
       for (final TVITourBookTour tourItem : _fetchedTourItems.values()) {
