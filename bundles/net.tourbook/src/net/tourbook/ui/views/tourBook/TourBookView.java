@@ -23,7 +23,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set; 
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -2467,12 +2467,12 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          // sort rows ascending
          Arrays.sort(allRowPositions);
 
-         System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] natTable_SelectTours()"
-               + "\tallRowPositions: " + Arrays.toString(allRowPositions)
-//            + "\t: " +
-         );
-// TODO remove SYSTEM.OUT.PRINTLN
-
+//         System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] natTable_SelectTours()"
+//               + "\t\tallRowPositions: " + Arrays.toString(allRowPositions)
+////            + "\t: " +
+//         );
+//// TODO remove SYSTEM.OUT.PRINTLN
+ 
          final int firstRowPosition = allRowPositions[0];
 
          final Display display = Display.getDefault();
@@ -2578,12 +2578,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    }
 
    private void onSelect_NatTableItem(final SelectionChangedEvent event) {
-
-      System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] onSelect_NatTableItem()"
-            + "\t_isInReload: " + _isInReload
-//            + "\t: " +
-      );
-// TODO remove SYSTEM.OUT.PRINTLN
 
       if (_isInReload) {
          return;

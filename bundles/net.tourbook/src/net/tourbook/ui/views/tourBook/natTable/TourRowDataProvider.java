@@ -25,8 +25,10 @@ public class TourRowDataProvider implements IRowDataProvider<TVITourBookTour> {
 
    private NatTable_DataLoader _dataLoader;
 
-   public TourRowDataProvider(final NatTable_DataLoader natTable_DataProvider) {
+   private TVITourBookTour     _dummyTourItem = new TVITourBookTour(null, null);
 
+   public TourRowDataProvider(final NatTable_DataLoader natTable_DataProvider) {
+ 
       _dataLoader = natTable_DataProvider;
    }
 
@@ -68,15 +70,32 @@ public class TourRowDataProvider implements IRowDataProvider<TVITourBookTour> {
    @Override
    public TVITourBookTour getRowObject(final int rowIndex) {
 
-      return _dataLoader.getTour(rowIndex);
+      final TVITourBookTour tourItem = _dataLoader.getTour(rowIndex);
+
+      /**
+       * Very important !
+       * <p>
+       * When <code>null</code> is returned then reselecting of tours which are not in the viewport
+       * fails. It took me several days to debug this issue finally.
+       */
+      if (tourItem == null) {
+
+         final long tourId = _dataLoader.getTourId(rowIndex);
+
+         _dummyTourItem.tourId = tourId;
+
+         return _dummyTourItem;
+      }
+
+      return tourItem;
    }
 
    @Override
-   public int indexOfRowObject(final TVITourBookTour rowObject) {
+   public int indexOfRowObject(final TVITourBookTour tourItem) {
 
       // a lazy data provider cannot easily get the index by it's object
 
-      return _dataLoader.getFetchedTourIndex(rowObject);
+      return _dataLoader.getFetchedTourIndex(tourItem.tourId);
    }
 
    @Override

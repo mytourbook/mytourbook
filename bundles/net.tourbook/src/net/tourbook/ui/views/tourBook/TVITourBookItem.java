@@ -274,8 +274,6 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
    String       treeColumn;
 
-   public int   col_Sequence;
-
    int          tourYear;
 
    /**
@@ -285,7 +283,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
    //
    int          tourYearSub;
    int          tourDay;
-   //
+   // 
    /**
     * Contains the tour date time with time zone info when available
     */
@@ -414,16 +412,16 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
    }
 
    /**
-    * Read tour fields from a resultset which is created with these fields
-    * {@link #SQL_ALL_TOUR_FIELDS}
+    * Read tour data fields into {@code tourItem} from a resultset which is created with these
+    * fields {@link #SQL_ALL_TOUR_FIELDS}
     *
     * @param result
-    * @param tourId
+    * @param tourItem
     * @return
     * @throws SQLException
     */
-   public static TVITourBookTour readTourItems(final ResultSet result,
-                                               final TVITourBookTour tourItem) throws SQLException {
+   public static TVITourBookTour getTourDataFields(final ResultSet result,
+                                                   final TVITourBookTour tourItem) throws SQLException {
 
 // SET_FORMATTING_OFF
 
@@ -754,7 +752,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             tourItem.tourId = result_TourId;
             tourItem.tourYearSub = tourYearSub;
 
-            readTourItems(result, tourItem);
+            getTourDataFields(result, tourItem);
 
             children.add(tourItem);
 
