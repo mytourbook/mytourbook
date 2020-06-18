@@ -35,6 +35,7 @@ import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TimeData;
+import net.tourbook.data.TimerPause;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourTag;
@@ -468,6 +469,15 @@ public class FitLogSAXHandler extends DefaultHandler {
 
       if (tourData.getCadenceSerie() == null) {
          tourData.setAvgCadence(_currentActivity.avgCadence);
+      }
+
+      if (_currentActivity.pauses.size() > 0) {
+
+         final TimerPause[] toto = new TimerPause[_currentActivity.pauses.size()];
+         for (int index = 0; index < _currentActivity.pauses.size(); ++index) {
+            toto[index] = new TimerPause(_currentActivity.pauses.get(index).startTime, _currentActivity.pauses.get(index).endTime);
+         }
+         tourData.setTimerPauses(toto);
       }
 
       // No need to set the timezone Id if the activity has GPS coordinates (as it was already done
@@ -950,8 +960,10 @@ public class FitLogSAXHandler extends DefaultHandler {
          _currentActivity.timeZoneUtcOffset = timeZoneUtcOffset / 3600;
 
          //We update the tour start time with the retrieved UTC offset
-         final ZonedDateTime tourStartTimeWithUTCOffset = _currentActivity.tourStartTime.toInstant().atOffset(ZoneOffset.ofHours(
-               _currentActivity.timeZoneUtcOffset)).toZonedDateTime();
+         final ZonedDateTime tourStartTimeWithUTCOffset = _currentActivity.tourStartTime.toInstant()
+               .atOffset(ZoneOffset.ofHours(
+                     _currentActivity.timeZoneUtcOffset))
+               .toZonedDateTime();
          _currentActivity.tourStartTime = tourStartTimeWithUTCOffset;
 
       } else if (_isInHasStartTime) {

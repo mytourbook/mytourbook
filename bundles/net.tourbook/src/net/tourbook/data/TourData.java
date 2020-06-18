@@ -313,6 +313,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    @XmlElement
    private String                timeZoneId;
 
+   /**
+    * An array of timer pause.
+    * A timer pause is triggered by the device user.
+    */
+   @XmlElement
+   private TimerPause[]                timerPauses;
+
    // ############################################# DISTANCE #############################################
 
    /**
@@ -7489,6 +7496,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
    }
 
+   public int getPausedTime() {
+      if (timerPauses == null) {
+         return 0;
+      }
+
+      final long pausedTime = Arrays.stream(timerPauses).mapToLong(TimerPause::getPauseDuration).sum();
+
+      return (int) (pausedTime / 1000);
+   }
+
    public int getPhotoTimeAdjustment() {
       return photoTimeAdjustment;
    }
@@ -9567,6 +9584,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    public void setSurfing_NumberOfEvents(final short surfing_NumberOfEvents) {
       this.surfing_NumberOfEvents = surfing_NumberOfEvents;
+   }
+
+   public void setTimerPauses(final TimerPause[] timerPauses) {
+
+      this.timerPauses = timerPauses;
    }
 
    public void setTimeSerieDouble(final double[] timeSerieDouble) {

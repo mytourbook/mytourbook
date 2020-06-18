@@ -101,7 +101,7 @@ public class TourDatabase {
    /**
     * Version for the database which is required that the tourbook application works successfully
     */
-   private static final int TOURBOOK_DB_VERSION = 41;
+   private static final int TOURBOOK_DB_VERSION = 43;
 
 //   private static final int TOURBOOK_DB_VERSION = 40; // 19.10
 //   private static final int TOURBOOK_DB_VERSION = 39; // 19.7
@@ -3117,6 +3117,12 @@ public class TourDatabase {
             //
             // version 41 end
 
+            // version 43 start  -  20.X
+            //
+            + " timerPauses                               BLOB,                  \n" //$NON-NLS-1$
+            //
+            // version 43 end
+
             //            // version 35 start  -  18.?
             //            //
             //            + " LatitudeMinE6         INTEGER DEFAULT 0,                        \n" //$NON-NLS-1$
@@ -4854,6 +4860,11 @@ public class TourDatabase {
          // 40 -> 41
          if (currentDbVersion == 40) {
             currentDbVersion = newVersion = updateDbDesign_040_to_041(conn, splashManager);
+         }
+
+         // 42 -> 43
+         if (currentDbVersion == 41) {
+            currentDbVersion = newVersion = updateDbDesign_042_to_043(conn, splashManager);
          }
 
          /*
@@ -7441,6 +7452,33 @@ public class TourDatabase {
 
             // Add new columns
             SQL.AddCol_Float(stmt, TABLE_TOUR_DATA, "maxPace",          DEFAULT_0);                            //$NON-NLS-1$
+
+// SET_FORMATTING_ON
+         }
+      }
+      stmt.close();
+
+      logDb_UpdateEnd(newDbVersion);
+
+      return newDbVersion;
+   }
+
+   private int updateDbDesign_042_to_043(final Connection conn, final SplashManager splashManager) throws SQLException {
+
+      final int newDbVersion = 43;
+
+      logDb_UpdateStart(newDbVersion);
+      updateMonitor(splashManager, newDbVersion);
+
+      final Statement stmt = conn.createStatement();
+      {
+         // check if db is updated to version 43
+         if (isColumnAvailable(conn, TABLE_TOUR_DATA, "timerPauses") == false) { //$NON-NLS-1$
+
+// SET_FORMATTING_OFF
+
+            // Add new columns
+            SQL.AddCol_Float(stmt, TABLE_TOUR_DATA, "timerPauses",          DEFAULT_0);                            //$NON-NLS-1$
 
 // SET_FORMATTING_ON
          }
