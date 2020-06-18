@@ -15,7 +15,11 @@
  *******************************************************************************/
 package net.tourbook.data;
 
-public class TimerPause {
+import java.io.Serializable;
+
+public class TimerPause implements Serializable {
+
+   private static final long serialVersionUID = 1L;
 
    private long _startTime;
    private long _endTime;

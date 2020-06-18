@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -473,11 +473,11 @@ public class FitLogSAXHandler extends DefaultHandler {
 
       if (_currentActivity.pauses.size() > 0) {
 
-         final TimerPause[] toto = new TimerPause[_currentActivity.pauses.size()];
+         final TimerPause[] tourTimerPauses = new TimerPause[_currentActivity.pauses.size()];
          for (int index = 0; index < _currentActivity.pauses.size(); ++index) {
-            toto[index] = new TimerPause(_currentActivity.pauses.get(index).startTime, _currentActivity.pauses.get(index).endTime);
+            tourTimerPauses[index] = new TimerPause(_currentActivity.pauses.get(index).startTime, _currentActivity.pauses.get(index).endTime);
          }
-         tourData.setTimerPauses(toto);
+         tourData.setTimerPauses(tourTimerPauses);
       }
 
       // No need to set the timezone Id if the activity has GPS coordinates (as it was already done

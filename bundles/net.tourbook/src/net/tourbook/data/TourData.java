@@ -316,9 +316,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * An array of timer pause.
     * A timer pause is triggered by the device user.
+    * TODO FB rename to ?
+    * tourDevicePauses
+    * tourUserPauses
+    * .....
     */
    @XmlElement
-   private TimerPause[]                timerPauses;
+   private TimerPause[]                tourTimerPauses;
 
    // ############################################# DISTANCE #############################################
 
@@ -7497,11 +7501,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    public int getPausedTime() {
-      if (timerPauses == null) {
+      if (tourTimerPauses == null) {
          return 0;
       }
 
-      final long pausedTime = Arrays.stream(timerPauses).mapToLong(TimerPause::getPauseDuration).sum();
+      final long pausedTime = Arrays.stream(tourTimerPauses).mapToLong(TimerPause::getPauseDuration).sum();
 
       return (int) (pausedTime / 1000);
    }
@@ -7661,6 +7665,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    public int getRearShiftCount() {
       return rearShiftCount;
+   }
+
+   public long getRecordedTime() {
+      return tourRecordingTime - getPausedTime();
    }
 
    public int getRestPulse() {
@@ -9588,7 +9596,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    public void setTimerPauses(final TimerPause[] timerPauses) {
 
-      this.timerPauses = timerPauses;
+      this.tourTimerPauses = timerPauses;
    }
 
    public void setTimeSerieDouble(final double[] timeSerieDouble) {

@@ -220,16 +220,7 @@ import org.eclipse.ui.progress.UIJob;
  */
 public class TourDataEditorView extends ViewPart implements ISaveablePart, ISaveAndRestorePart, ITourProvider2 {
    //TODO FB : Trying to address this request : https://sourceforge.net/p/mytourbook/discussion/622811/thread/17da3fb19f/
-   // DO the FIT and S9 import to record paused time
-
-   /*
-    * class TimerPauses TORENAME
-    * {
-    * DateTime StartTime;
-    * DateTime EndTime;
-    * DateTime getPauseDuration();
-    * }
-    */
+   // DO the FIT, Ambit2 xml and sml,  S9 import to record paused time
 
    public static final String     ID                            = "net.tourbook.views.TourDataEditorView";                //$NON-NLS-1$
    //
@@ -8773,16 +8764,17 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _txtAltitudeUp.setText(Integer.toString((int) (altitudeUp / _unitValueAltitude)));
       _txtAltitudeDown.setText(Integer.toString((int) (altitudeDown / _unitValueAltitude)));
 
-      // tour time's
-      final int recordingTime = (int) _tourData.getTourRecordingTime();
+      // tour times
+      final int elapsedTime = (int) _tourData.getTourRecordingTime();
       final int drivingTime = (int) _tourData.getTourDrivingTime();
-      final int pausedTime = (int) _tourData.getPausedTime();
+      final int recordedTime = (int) _tourData.getRecordedTime();
+      final int pausedTime = _tourData.getPausedTime();
 
-      _timeElapsed.setTime(3600);
-      _timeRecorded.setTime(3300);
+      _timeElapsed.setTime(elapsedTime);
+      _timeRecorded.setTime(recordedTime);
       _timePaused.setTime(pausedTime);
-      _timeMoving.setTime(3120);
-      _timeBreak.setTime(480);
+      _timeMoving.setTime(drivingTime);
+      _timeBreak.setTime(elapsedTime - drivingTime);
 
       /*
        * Time zone

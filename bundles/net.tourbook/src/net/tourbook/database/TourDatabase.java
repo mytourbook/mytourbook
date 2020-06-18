@@ -3119,7 +3119,7 @@ public class TourDatabase {
 
             // version 43 start  -  20.X
             //
-            + " timerPauses                               BLOB,                  \n" //$NON-NLS-1$
+            + " tourTimerPauses                               BLOB,                  \n" //$NON-NLS-1$
             //
             // version 43 end
 
@@ -7473,12 +7473,12 @@ public class TourDatabase {
       final Statement stmt = conn.createStatement();
       {
          // check if db is updated to version 43
-         if (isColumnAvailable(conn, TABLE_TOUR_DATA, "timerPauses") == false) { //$NON-NLS-1$
+         if (isColumnAvailable(conn, TABLE_TOUR_DATA, "tourTimerPauses") == false) { //$NON-NLS-1$
 
 // SET_FORMATTING_OFF
 
             // Add new columns
-            SQL.AddCol_Float(stmt, TABLE_TOUR_DATA, "timerPauses",          DEFAULT_0);                            //$NON-NLS-1$
+            SQL.AddCol_Float(stmt, TABLE_TOUR_DATA, "tourTimerPauses",          DEFAULT_0);                            //$NON-NLS-1$
 
 // SET_FORMATTING_ON
          }
