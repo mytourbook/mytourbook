@@ -121,7 +121,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
    private Button              _btnOk;
 
    /*
-    * next/prev buttons are disabled because the offline folder is wront
+    * next/prev buttons are disabled because the offline folder is wrong
     */
 //	private Button							fBtnPrevMapProvider;
 //	private Button							fBtnNextMapProvider;
@@ -454,7 +454,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
          // ############################################################
 
          /*
-          * next/prev buttons are disabled because the offline folder is wront
+          * next/prev buttons are disabled because the offline folder is wrong
           */
 //			// button: previous map provider
 //			fBtnPrevMapProvider = new Button(container, SWT.NONE);
@@ -674,7 +674,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
                   final Table layerTable = _layerViewer.getTable();
 
                   /*
-                   * check if drag was startet from this filter, remove the filter item before
+                   * check if drag was started from this filter, remove the filter item before
                    * the new filter is inserted
                    */
                   if (LocalSelectionTransfer.getTransfer().getSelectionSetTime() == _dragStartViewerLeft) {
@@ -1573,7 +1573,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
          _statIsQueued--;
       }
 
-      // when stat is cleared, que can get negative, prevent this
+      // when stat is cleared, queue can get negative, prevent this
       if (_statIsQueued < 0) {
          _statIsQueued = 0;
       }
@@ -1599,7 +1599,7 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 
             // check if this is the last created runnable
             if (fRunnableCounter != _statUpdateCounter) {
-               // a new update event occured
+               // a new update event occurred
                return;
             }
 

@@ -9,6 +9,7 @@
    <extension-point id="printTour"                    name="Print Tours"                  schema="schema/printTour.exsd"/>
    <extension-point id="net.tourbook.statisticYear"   name="Year Statistic"               schema="schema/net.tourbook.statisticYear.exsd"/>
    <extension-point id="tilefactory"                  name="TileFactory"                  schema="schema/tilefactory.exsd"/>
+   <extension-point id="fileSystem"                   name="File System"                  schema="schema/fileSystem.exsd"/>
 
    <extension
          id="application"
@@ -309,6 +310,15 @@
          class="net.tourbook.preferences.PrefPageImport"
          id="net.tourbook.preferences.PrefPageImport"
          name="%preference_page_data_import"
+      />
+      
+       <!--
+         Cloud Connectivity
+      -->
+      <page
+         class="net.tourbook.preferences.PrefPageCloudConnectivity"
+         id="net.tourbook.preferences.PrefPageCloudConnectivity"
+         name="%preference_page_cloud_connectivity"
       />
       
       
@@ -1286,7 +1296,7 @@ THIS IS NOT YET FULLY IMPLEMENTED
          name           ="%command_device_importFromFile"
          defaultHandler ="net.tourbook.importdata.ActionHandlerImportFromFile"
       />
-
+      
       <command
          id             ="net.tourbook.command.device.synchronize.direct"
          name           ="%Command_Device_ReceiveFromSerialPort_Directly"

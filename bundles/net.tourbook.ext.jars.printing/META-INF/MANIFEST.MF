@@ -15,6 +15,7 @@ Bundle-ClassPath:
 Export-Package: 
  javax.xml.bind.annotation,
  org.apache.commons.io,
+ org.apache.commons.logging,
  org.apache.fop.apps,
  org.apache.xmlgraphics.util
 Automatic-Module-Name: net.tourbook.ext.jars.printing

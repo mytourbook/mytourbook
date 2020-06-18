@@ -563,6 +563,7 @@ public class Map extends Canvas {
     * simple mode
     */
    private boolean             _isTourPaintMethodEnhanced;
+   private boolean             _isShowTourPaintMethodEnhancedWarning;
 
    private boolean             _isFastMapPainting;
    private boolean             _isFastMapPainting_Active;
@@ -3781,7 +3782,9 @@ public class Map extends Canvas {
 
       if (isPaintBreadCrumb) {
 
-         _tourBreadcrumb.paint(gc, isPaintTile_With_BasicMethod() == false);
+         final boolean isEnhancedPaintingMethod = isPaintTile_With_BasicMethod() == false;
+
+         _tourBreadcrumb.paint(gc, isEnhancedPaintingMethod && _isShowTourPaintMethodEnhancedWarning);
       }
 
       return isPaintTourInfo;
@@ -6119,9 +6122,10 @@ public class Map extends Canvas {
       _isScaleVisible = isScaleVisible;
    }
 
-   public void setTourPaintMethodEnhanced(final boolean isEnhanced) {
+   public void setTourPaintMethodEnhanced(final boolean isEnhanced, final boolean isShowWarning) {
 
       _isTourPaintMethodEnhanced = isEnhanced;
+      _isShowTourPaintMethodEnhancedWarning = isShowWarning;
 
       disposeOverlayImageCache();
    }

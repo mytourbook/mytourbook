@@ -73,7 +73,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ITourbookPreferences.MEASUREMENT_SYSTEM_ENERGY,        ITourbookPreferences.MEASUREMENT_SYSTEM_ENERGY_JOULE);
 
       store.setDefault(ITourbookPreferences.REGIONAL_USE_CUSTOM_DECIMAL_FORMAT, false);
-      store.setDefault(ITourbookPreferences.REGIONAL_DECIMAL_SEPARATOR, "."); //$NON-NLS-1$
+      store.setDefault(ITourbookPreferences.REGIONAL_DECIMAL_SEPARATOR, UI.SYMBOL_DOT);
       store.setDefault(ITourbookPreferences.REGIONAL_GROUP_SEPARATOR, "'"); //$NON-NLS-1$
 
       /*
@@ -358,6 +358,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       PreferenceConverter.setDefault(store, ITourbookPreferences.MAP_LAYOUT_BORDER_COLOR,    new RGB(0x50, 0x50, 0x50));
       PreferenceConverter.setDefault(store, ITourbookPreferences.MAP_LAYOUT_MAP_DIMM_COLOR,  new RGB(0x00, 0x00, 0x00));
       store.setDefault(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD,  PrefPageMap2Appearance.TOUR_PAINT_METHOD_SIMPLE);
+      store.setDefault(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD_WARNING,  true);
       store.setDefault(ITourbookPreferences.MAP_LAYOUT_LIVE_UPDATE, true);
 
       store.setDefault(ITourbookPreferences.MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY,   false);

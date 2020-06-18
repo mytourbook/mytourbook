@@ -20,6 +20,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -713,10 +714,9 @@ public class SuuntoJsonProcessor {
       }
 
       final String[] stringValues = elements.split(","); //$NON-NLS-1$
-      for (final String stringValue : stringValues) {
-         final Integer rrValue = Integer.parseInt(stringValue);
-         elementValues.add(rrValue);
-      }
+
+      Arrays.stream(stringValues).forEach(stringValue -> elementValues.add(Integer.parseInt(stringValue)));
+
       return elementValues;
 
    }
