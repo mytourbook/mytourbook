@@ -24,6 +24,8 @@ public class TimerPause implements Serializable {
    private long _startTime;
    private long _endTime;
 
+   public TimerPause() {}
+
    public TimerPause(final long startTime, final long endTime) {
       _startTime = startTime;
       _endTime = endTime;

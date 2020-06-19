@@ -16,6 +16,7 @@
 package net.tourbook.device.garmin.fit.listeners;
 
 import com.garmin.fit.DateTime;
+import com.garmin.fit.EventType;
 import com.garmin.fit.SessionMesg;
 import com.garmin.fit.SessionMesgListener;
 import com.garmin.fit.Sport;
@@ -53,6 +54,14 @@ public class MesgListener_Session extends AbstractMesgListener implements Sessio
 //      This problem is corrected in FIT SDK 14.10 but it took me several days to investigate it
 //    and then came the idea to check for a new FIT SDK which solved this problem.
 // !!!!
+
+      final EventType toto = mesg.getEventType();
+
+      if (toto != null && toto == EventType.STOP) {
+         //Get total_timer_time field Units: s Comment: Exclude pauses
+         final float titi = mesg.getTotalTimerTime();
+
+      }
 
       final ZonedDateTime tourStartTime = TimeTools.getZonedDateTime(startTime.getDate().getTime());
 

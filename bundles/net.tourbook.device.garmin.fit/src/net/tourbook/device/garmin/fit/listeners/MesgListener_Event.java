@@ -15,12 +15,16 @@
  *******************************************************************************/
 package net.tourbook.device.garmin.fit.listeners;
 
+import com.garmin.fit.DateTime;
 import com.garmin.fit.EventMesg;
 import com.garmin.fit.EventMesgListener;
+import com.garmin.fit.EventType;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.tourbook.data.GearData;
+import net.tourbook.data.TimerPause;
 import net.tourbook.device.garmin.fit.FitData;
 
 /**
@@ -29,16 +33,39 @@ import net.tourbook.device.garmin.fit.FitData;
 public class MesgListener_Event extends AbstractMesgListener implements EventMesgListener {
 
    List<GearData> _gearData;
+   List<TimerPause> _timerPauses;
 
    public MesgListener_Event(final FitData fitData) {
 
       super(fitData);
 
       _gearData = fitData.getGearData();
+      _timerPauses = new ArrayList<>();
    }
 
    @Override
    public void onMesg(final EventMesg mesg) {
+
+      final EventType toto = mesg.getEventType();
+      if (toto != null && (toto == EventType.STOP_ALL ||
+            toto == EventType.STOP)) {
+         System.out.println("STOP");
+         final DateTime titi = mesg.getTimestamp();
+         System.out.println(titi);
+         //Get total_timer_time field Units: s Comment: Exclude pauses
+
+         final TimerPause tata = new TimerPause();
+         tata.setStartTime(titi.getTimestamp());
+         _timerPauses.add(tata);
+      }
+      if (toto != null && toto == EventType.START) {
+         System.out.println("START");
+         final DateTime titi = mesg.getTimestamp();
+         System.out.println(titi);
+         //Get total_timer_time field Units: s Comment: Exclude pauses
+         _timerPauses.stream().findFirst().get().setEndTime(titi.getTimestamp());
+
+      }
 
       final Long gearChangeData = mesg.getGearChangeData();
 
