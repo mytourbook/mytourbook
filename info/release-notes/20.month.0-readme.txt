@@ -33,6 +33,9 @@ New + Improvements
 * Dropbox Integration (Frederic) :
   - Ability to connect a Dropbox account to MyTourbook, and also choosing a specific a folder for this account. This Dropbox folder can be set up as a device to watch. In this case, added or deleted files will be automatically and immediately detected.
 
+* Tour Chart (Frederic) :
+  - Adding the ability to select all the time slices in between the left and right sliders.
+
 
 Import
 ======
