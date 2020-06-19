@@ -1671,10 +1671,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          sb.append(deviceFile.size);
          sb.append(HTML_TD_END);
 
+         final EasyConfig easyConfig = getEasyConfig();
          // this is for debugging
-         sb.append("<td class='column content'>"); //$NON-NLS-1$
-         sb.append(filePathName);
-         sb.append(HTML_TD_END);
+         if (easyConfig.stateToolTipDisplayAbsoluteFilePath) {
+            sb.append("<td class='column content'>"); //$NON-NLS-1$
+            sb.append(filePathName);
+            sb.append(HTML_TD_END);
+         }
 
          sb.append(HTML_TR_END);
       }
@@ -5652,6 +5655,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       easyConfig.backgroundOpacity = modifiedConfig.backgroundOpacity;
       easyConfig.isLiveUpdate = modifiedConfig.isLiveUpdate;
       easyConfig.numHorizontalTiles = modifiedConfig.numHorizontalTiles;
+      easyConfig.stateToolTipDisplayAbsoluteFilePath = modifiedConfig.stateToolTipDisplayAbsoluteFilePath;
       easyConfig.stateToolTipWidth = modifiedConfig.stateToolTipWidth;
       easyConfig.tileSize = modifiedConfig.tileSize;
 

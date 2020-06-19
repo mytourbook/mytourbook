@@ -81,6 +81,7 @@ public class DropboxFolderBrowser extends TitleAreaDialog {
     */
    private Text                  _textSelectedAbsolutePath;
    private Button                _buttonParentFolder;
+   private Button                _btnOk;
    /*
     * Error Message UI controls
     */
@@ -125,10 +126,12 @@ public class DropboxFolderBrowser extends TitleAreaDialog {
       super.createButtonsForButtonBar(parent);
 
       // set text for the OK button
-      getButton(IDialogConstants.OK_ID).setText(Messages.Dialog_DropboxBrowser_Button_SelectFolder);
+      _btnOk = getButton(IDialogConstants.OK_ID);
+      _btnOk.setText(Messages.Dialog_DropboxBrowser_Button_SelectFolder);
+      setButtonLayoutData(_btnOk);
 
       if (_isInErrorState) {
-         getButton(IDialogConstants.OK_ID).setEnabled(false);
+         _btnOk.setEnabled(false);
       }
    }
 
