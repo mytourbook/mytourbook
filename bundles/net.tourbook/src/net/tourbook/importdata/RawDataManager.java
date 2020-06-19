@@ -137,7 +137,6 @@ public class RawDataManager {
    private static RawDataManager           _instance                           = null;
 
    private static ArrayList<String>        _invalidFilesList                   = new ArrayList<>();
-   final static IPreferenceStore           _commonPrefStore                    = CommonActivator.getPrefStore();
    private final IPreferenceStore          _prefStore                          = TourbookPlugin.getPrefStore();
 
    private final IDialogSettings           _importState                        = TourbookPlugin.getState(RawDataView.ID);

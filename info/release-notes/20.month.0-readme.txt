@@ -94,5 +94,5 @@ Translation
 System   
 ======
 
-* FIT SDK 21.30
+* FIT SDK 21.32
 
