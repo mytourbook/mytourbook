@@ -24,7 +24,12 @@ import net.tourbook.database.TourDatabase;
 public class TVITourBookTour extends TVITourBookItem {
 
    public long             tourId;
-   long                    tourTypeId;
+
+   /**
+    * The default for tour type id is not 0 because 0 is a valid tour type id and would be used even
+    * when tour type id is not set.
+    */
+   long                    tourTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
 
    long                    colDateTime_MS;
    String                  colDateTime_Text;

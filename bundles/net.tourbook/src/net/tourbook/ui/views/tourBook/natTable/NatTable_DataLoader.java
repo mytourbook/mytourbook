@@ -47,10 +47,12 @@ import org.eclipse.swt.widgets.Display;
 
 public class NatTable_DataLoader {
 
-   private static final char NL = net.tourbook.common.UI.NEW_LINE;
+   private static final char                              NL                   = net.tourbook.common.UI.NEW_LINE;
 
-   // TODO fix fetch size
-   private static final int                               FETCH_SIZE           = 10;
+   private static final int                               FETCH_SIZE           = 1000;
+
+   private static final ExecutorService                   _loadingExecutor     = createExecuter_TourLoading();
+   private static final ExecutorService                   _rowIndexExecutor    = createExecuter_TourId_RowIndex();
 
    private ConcurrentHashMap<Integer, Integer>            _pageNumbers_Fetched = new ConcurrentHashMap<>();
    private ConcurrentHashMap<Integer, LazyTourLoaderItem> _pageNumbers_Loading = new ConcurrentHashMap<>();
@@ -62,7 +64,7 @@ public class NatTable_DataLoader {
     * Value: {@link TVITourBookTour}
     */
    private ConcurrentHashMap<Integer, TVITourBookTour>    _fetchedTourItems    = new ConcurrentHashMap<>();
- 
+
    /**
     * Relation between tour id and row position
     * <p>
@@ -70,10 +72,10 @@ public class NatTable_DataLoader {
     * Value: Row position
     */
    private ConcurrentHashMap<Long, Integer>               _fetchedTourIndex    = new ConcurrentHashMap<>();
-
    private final LinkedBlockingDeque<LazyTourLoaderItem>  _loaderWaitingQueue  = new LinkedBlockingDeque<>();
 
    private String                                         _sqlSortField;
+
    private String                                         _sqlSortDirection;
 
    /**
@@ -86,31 +88,36 @@ public class NatTable_DataLoader {
     * Number of columns which are visible in the natTable
     */
    int                                                    numVisibleColumns;
-
    /**
     * Number of all tours for the current lazy loader
     */
    private int                                            _numAllTourItems     = -1;
 
    private TourBookView                                   _tourBookView;
-   private ColumnManager                                  _columnManager;
 
+   private ColumnManager                                  _columnManager;
    /**
     * Contains all tour id's for the current tour filter and tour sorting, this is used
     * to get the row index for a tour.
     */
    private long[]                                         _allLoadedTourIds;
 
-   private ExecutorService                                _loadingExecutor;
-   private ExecutorService                                _rowIndexExecutor;
-   {
+   public NatTable_DataLoader(final TourBookView tourBookView, final ColumnManager columnManager) {
+
+      _tourBookView = tourBookView;
+      _columnManager = columnManager;
+
+      createColumnHeaderData();
+   }
+
+   private static ExecutorService createExecuter_TourId_RowIndex() {
 
       final ThreadFactory threadFactory = new ThreadFactory() {
 
          @Override
          public Thread newThread(final Runnable r) {
 
-            final Thread thread = new Thread(r, "NatTable_DataLoader: Loading tours/row indices");//$NON-NLS-1$
+            final Thread thread = new Thread(r, "NatTable_DataLoader: Loading row indices");//$NON-NLS-1$
 
             thread.setPriority(Thread.MIN_PRIORITY);
             thread.setDaemon(true);
@@ -119,16 +126,37 @@ public class NatTable_DataLoader {
          }
       };
 
-      _loadingExecutor = Executors.newSingleThreadExecutor(threadFactory);
-      _rowIndexExecutor = Executors.newSingleThreadExecutor(threadFactory);
+      return Executors.newSingleThreadExecutor(threadFactory);
    }
 
-   public NatTable_DataLoader(final TourBookView tourBookView, final ColumnManager columnManager) {
+   private static ExecutorService createExecuter_TourLoading() {
 
-      _tourBookView = tourBookView;
-      _columnManager = columnManager;
+      final ThreadFactory threadFactory = new ThreadFactory() {
 
-      createColumnHeaderData();
+         @Override
+         public Thread newThread(final Runnable r) {
+
+            final Thread thread = new Thread(r, "NatTable_DataLoader: Loading tours");//$NON-NLS-1$
+
+            thread.setPriority(Thread.MIN_PRIORITY);
+            thread.setDaemon(true);
+
+            return thread;
+         }
+      };
+
+// !!! newCachedThreadPool is not working, part of the view is not updated !!!
+//
+//      final ExecutorService loadingExecutor = Executors.newCachedThreadPool(threadFactory);
+//
+//      final ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) loadingExecutor;
+//
+//      threadPoolExecutor.setKeepAliveTime(1, TimeUnit.SECONDS);
+//      threadPoolExecutor.setMaximumPoolSize(Runtime.getRuntime().availableProcessors());
+//
+//      return loadingExecutor;
+
+      return Executors.newSingleThreadExecutor(threadFactory);
    }
 
    private void createColumnHeaderData() {
@@ -349,7 +377,11 @@ public class NatTable_DataLoader {
 
                display.asyncExec(() -> {
 
-                  // do a simple redraw, would not work with table/tree widget
+                  if (tourViewer_NatTable.isDisposed()) {
+                     return;
+                  }
+
+                  // do a simple redraw as it retrieves values from the model
                   tourViewer_NatTable.redraw();
                });
             }

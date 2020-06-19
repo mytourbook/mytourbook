@@ -283,7 +283,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
    //
    int          tourYearSub;
    int          tourDay;
-   // 
+   //
    /**
     * Contains the tour date time with time zone info when available
     */
@@ -601,7 +601,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       tourItem.colTimeZoneId = dbTimeZoneId;
       tourItem.colWeekDay = tourDateTime.weekDay;
 
-      tourItem.tourTypeId = (tourTypeId == null //
+      tourItem.tourTypeId = (tourTypeId == null
             ? TourDatabase.ENTITY_IS_NOT_SAVED
             : (Long) tourTypeId);
 

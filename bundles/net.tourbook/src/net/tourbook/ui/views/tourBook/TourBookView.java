@@ -982,9 +982,14 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
                }
 
                final long tourTypeId = tviTour.getTourTypeId();
-               final Image tourTypeImage = TourTypeImage.getTourTypeImage(tourTypeId);
+               if (tourTypeId == -1) {
 
-               return tourTypeImage;
+                  // this can occur when the dummy tour is displayed
+
+                  return null;
+               }
+
+               return TourTypeImage.getTourTypeImage(tourTypeId);
             }
          };
 
@@ -1245,8 +1250,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    }
 
    void actionShowOnlySelectedTours() {
-      // TODO Auto-generated method stub
 
+      // TODO Auto-generated method stub
    }
 
    /**
@@ -2043,21 +2048,39 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       final boolean isTourSelected = numTourItems > 0;
       final boolean isOneTour = numTourItems == 1;
       final boolean isAllToursSelected = _actionSelectAllTours.isChecked();
-      boolean isDeviceTour = false;
-      boolean canMergeTours = false;
 
       final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
 
-      TourData firstSavedTour = null;
-
       if (isOneTour) {
-         firstSavedTour = TourManager.getInstance().getTourData(firstTour.getTourId());
-      }
 
-      if (firstSavedTour != null) {
+         // loading the first tour is very expensive (with a delay in the UI) -> run it async
 
-         isDeviceTour = firstSavedTour.isManualTour() == false;
-         canMergeTours = isOneTour && isDeviceTour && firstSavedTour.getMergeSourceTourId() != null;
+         // set initial state to false until data are loaded
+         _actionDuplicateTour.setEnabled(false);
+         _actionMergeTour.setEnabled(false);
+         _actionOpenAdjustAltitudeDialog.setEnabled(false);
+         _actionOpenMarkerDialog.setEnabled(false);
+
+         // make var to a effectively final var, otherwise an exception occurs
+         final TVITourBookTour finalFirstTour = firstTour;
+
+         CompletableFuture.supplyAsync(() -> {
+
+            return TourManager.getInstance().getTourData(finalFirstTour.getTourId());
+
+         }).thenAccept(savedTour -> {
+
+            if (savedTour != null) {
+
+               final boolean isDeviceTour = savedTour.isManualTour() == false;
+               final boolean canMergeTours = isOneTour && isDeviceTour && savedTour.getMergeSourceTourId() != null;
+
+               _actionDuplicateTour.setEnabled(isOneTour && !isDeviceTour);
+               _actionMergeTour.setEnabled(canMergeTours);
+               _actionOpenAdjustAltitudeDialog.setEnabled(isOneTour && isDeviceTour);
+               _actionOpenMarkerDialog.setEnabled(isOneTour && isDeviceTour);
+            }
+         });
       }
 
       final boolean useWeatherRetrieval = _prefStore.getBoolean(ITourbookPreferences.WEATHER_USE_WEATHER_RETRIEVAL) &&
@@ -2082,15 +2105,11 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _subMenu_Reimport.setEnabled(isTourSelected);
 
       _actionDeleteTour.setEnabled(isTourSelected);
-      _actionDuplicateTour.setEnabled(isOneTour && !isDeviceTour);
       _actionEditQuick.setEnabled(isOneTour);
       _actionEditTour.setEnabled(isOneTour);
       _actionExportTour.setEnabled(isTourSelected);
       _actionExportViewCSV.setEnabled(numSelectedItems > 0);
       _actionJoinTours.setEnabled(numTourItems > 1);
-      _actionMergeTour.setEnabled(canMergeTours);
-      _actionOpenAdjustAltitudeDialog.setEnabled(isOneTour && isDeviceTour);
-      _actionOpenMarkerDialog.setEnabled(isOneTour && isDeviceTour);
       _actionOpenTour.setEnabled(isOneTour);
       _actionPrintTour.setEnabled(isTourSelected);
       _actionSetOtherPerson.setEnabled(isTourSelected);
@@ -2467,50 +2486,33 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          // sort rows ascending
          Arrays.sort(allRowPositions);
 
-//         System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] natTable_SelectTours()"
-//               + "\t\tallRowPositions: " + Arrays.toString(allRowPositions)
-////            + "\t: " +
-//         );
-//// TODO remove SYSTEM.OUT.PRINTLN
- 
          final int firstRowPosition = allRowPositions[0];
 
-         final Display display = Display.getDefault();
-
          /*
-          * First move to the position, otherwise the row selection do NOT select the rows when they
-          * are hidden !
+          * It took me hours to solve this issue, first deselect the old selection otherwise is
+          * was PRESERVED :-(((
           */
-         display.asyncExec(() -> {
+         _natTable_Body_SelectionLayer.clear(false);
 
-            _natTable_Body_ViewportLayer.moveRowPositionIntoViewport(firstRowPosition);
-         });
+         final SelectRowsCommand command = new SelectRowsCommand(
+               _natTable_Body_SelectionLayer,
+               0,
+               allRowPositions,
+               false,
+               true,
+               firstRowPosition);
 
-         /*
-          * timerExec() MUST be run in the UI thread, without asyncExec() it is NOT in the UI thread
-          */
-         display.timerExec(1000, () -> {
+         _isInReload = true;
+         {
+            _natTable_Body_SelectionLayer.doCommand(command);
+         }
+         _isInReload = false;
 
-            /*
-             * It took me hours to solve this issue, first deselect the old selection otherwise is
-             * was PRESERVED :-(((
-             */
-            _natTable_Body_SelectionLayer.clear(false);
-
-            final SelectRowsCommand command = new SelectRowsCommand(
-                  _natTable_Body_SelectionLayer,
-                  0,
-                  allRowPositions,
-                  false,
-                  true,
-                  firstRowPosition);
-
-            _isInReload = true;
-            {
-               _natTable_Body_SelectionLayer.doCommand(command);
-            }
-            _isInReload = false;
-         });
+         // center vertically the first selected row, TODO# sometimes it is the top row
+         final int numVisibleRows = _natTable_Body_ViewportLayer.getRowCount();
+         final int scrollableRowCenterPosition = numVisibleRows / 2;
+         final int rowVerticalCenterPosition = firstRowPosition + scrollableRowCenterPosition;
+         _natTable_Body_ViewportLayer.moveRowPositionIntoViewport(rowVerticalCenterPosition);
       });
    }
 

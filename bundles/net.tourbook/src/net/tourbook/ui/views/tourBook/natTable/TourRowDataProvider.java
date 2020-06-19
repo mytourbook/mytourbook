@@ -28,7 +28,7 @@ public class TourRowDataProvider implements IRowDataProvider<TVITourBookTour> {
    private TVITourBookTour     _dummyTourItem = new TVITourBookTour(null, null);
 
    public TourRowDataProvider(final NatTable_DataLoader natTable_DataProvider) {
- 
+
       _dataLoader = natTable_DataProvider;
    }
 
