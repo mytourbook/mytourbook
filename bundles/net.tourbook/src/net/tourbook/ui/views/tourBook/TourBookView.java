@@ -25,7 +25,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -2890,19 +2889,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
    private void reselectTourViewer_NatTable() {
 
-      final CompletableFuture<int[]> allRowPositions = _natTable_DataLoader.getRowIndexFromTourId(_selectedTourIds);
+      _natTable_DataLoader.getRowIndexFromTourId(_selectedTourIds).thenAccept((allRowPositions) -> {
 
-      allRowPositions.thenRun(() -> {
-
-         try {
-
-            natTable_SelectTours(allRowPositions.get());
-
-         } catch (InterruptedException | ExecutionException e) {
-
-            // ignore, should not happen (hopefully :-)
-            e.printStackTrace();
-         }
+         natTable_SelectTours(allRowPositions);
       });
    }
 
