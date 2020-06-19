@@ -228,6 +228,7 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Error_FolderIsInvalid;
    public static String        Dialog_ImportConfig_Group_ImportActions;
    public static String        Dialog_ImportConfig_Group_ImportLauncherConfig;
+   public static String        Dialog_ImportConfig_Group_StateTooltip;
    public static String        Dialog_ImportConfig_Info_ConfigDragDrop;
    public static String        Dialog_ImportConfig_Info_ImportActions;
    public static String        Dialog_ImportConfig_Info_MovedDeviceFiles;
@@ -255,6 +256,8 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Label_LastMarkerDistance;
    public static String        Dialog_ImportConfig_Label_LastMarkerDistance_Tooltip;
    public static String        Dialog_ImportConfig_Label_LastMarkerText;
+   public static String        Dialog_ImportConfig_Label_StateTooltip_DisplayAbsoluteFilePath;
+   public static String        Dialog_ImportConfig_Label_StateTooltip_DisplayAbsoluteFilePath_Tooltip;
    public static String        Dialog_ImportConfig_Label_StateTooltipWidth;
    public static String        Dialog_ImportConfig_Link_OtherActions;
    public static String        Dialog_ImportConfig_Link_TourType;
@@ -2807,6 +2810,7 @@ public class Messages extends NLS {
    public static String tourCatalog_view_label_chart_title_reference_tour;
    public static String tourCatalog_view_label_year_chart_title;
    public static String tourCatalog_view_label_year_not_selected;
+   public static String tourCatalog_view_action_select_inbetween_timeslices;
    public static String tourCatalog_view_tooltip_speed;
 
    public static String tourCatalog_wizard_Action_deselect_all;
