@@ -47,6 +47,11 @@ public class TimerPause implements Serializable {
       this._endTime = endTime;
    }
 
+   /**
+    * Sets the timer pause start time (in milliseconds)
+    *
+    * @param startTime
+    */
    public void setStartTime(final long startTime) {
       this._startTime = startTime;
    }

@@ -34,6 +34,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.LengthType;
 import net.tourbook.data.SwimData;
 import net.tourbook.data.TimeData;
+import net.tourbook.data.TimerPause;
 import net.tourbook.data.TourData;
 
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -71,19 +72,20 @@ public class SuuntoJsonProcessor {
    private static final String TAG_TEMPERATURE = "Temperature";      //$NON-NLS-1$
 
    // Swimming
-   private static final String Swimming             = "Swimming";                                      //$NON-NLS-1$
-   private static final String Breaststroke         = "Breaststroke";                                  //$NON-NLS-1$
-   private static final String Freestyle            = "Freestyle";                                     //$NON-NLS-1$
-   private static final String Other                = "Other";                                         //$NON-NLS-1$
-   private static final String PoolLengthStyle      = "PrevPoolLengthStyle";                           //$NON-NLS-1$
-   private static final String TotalLengths         = "TotalLengths";                                  //$NON-NLS-1$
-   private static final String Stroke               = "Stroke";                                        //$NON-NLS-1$
-   private static final String Turn                 = "Turn";                                          //$NON-NLS-1$
-   private static final String Type                 = "Type";                                          //$NON-NLS-1$
-   private static int          previousTotalLengths = 0;
+   private static final String   Swimming             = "Swimming";                                      //$NON-NLS-1$
+   private static final String   Breaststroke         = "Breaststroke";                                  //$NON-NLS-1$
+   private static final String   Freestyle            = "Freestyle";                                     //$NON-NLS-1$
+   private static final String   Other                = "Other";                                         //$NON-NLS-1$
+   private static final String   PoolLengthStyle      = "PrevPoolLengthStyle";                           //$NON-NLS-1$
+   private static final String   TotalLengths         = "TotalLengths";                                  //$NON-NLS-1$
+   private static final String   Stroke               = "Stroke";                                        //$NON-NLS-1$
+   private static final String   Turn                 = "Turn";                                          //$NON-NLS-1$
+   private static final String   Type                 = "Type";                                          //$NON-NLS-1$
+   private static int            previousTotalLengths = 0;
 
-   private ArrayList<TimeData> _sampleList;
-   final IPreferenceStore      _prefStore           = TourbookPlugin.getDefault().getPreferenceStore();
+   private ArrayList<TimeData>   _sampleList;
+   private ArrayList<TimerPause> _timerPauses;
+   final IPreferenceStore        _prefStore           = TourbookPlugin.getDefault().getPreferenceStore();
 
    /**
     * Parses and stores all the R-R interval for a given data sample.
@@ -175,6 +177,7 @@ public class SuuntoJsonProcessor {
     */
    public TourData ImportActivity(final String jsonFileContent) {
       _sampleList = new ArrayList<>();
+      _timerPauses = new ArrayList<>();
 
       JSONArray samples = null;
       try {
@@ -286,6 +289,7 @@ public class SuuntoJsonProcessor {
             timeData.absoluteTime = currentTime;
          }
 
+         //TODO display the pauses in the Map like in ST if it's possible ?
          if (currentSampleData.contains(TAG_PAUSE)) {
             if (!isPaused) {
                if (currentSampleData.contains(Boolean.TRUE.toString())) {
@@ -295,6 +299,9 @@ public class SuuntoJsonProcessor {
             } else {
                if (currentSampleData.contains(Boolean.FALSE.toString())) {
                   isPaused = false;
+
+                  final TimerPause timerPause = new TimerPause(pauseStartTime.toEpochSecond() * 1000, currentZonedDateTime.toEpochSecond() * 1000);
+                  _timerPauses.add(timerPause);
                }
             }
          }
@@ -375,6 +382,10 @@ public class SuuntoJsonProcessor {
       TryComputeHeartRateData(_sampleList, _allRRData, _rrDataStartTime);
 
       tourData.createTimeSeries(_sampleList, true);
+
+      if (_timerPauses.size() > 0) {
+         tourData.setTimerPauses(_timerPauses.toArray(new TimerPause[] {}));
+      }
 
       tourData.finalizeTour_SwimData(tourData, _allSwimData);
 
