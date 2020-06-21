@@ -245,10 +245,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private ItemComparator_Table           _tourViewer_Table_Comparator                    = new ItemComparator_Table();
    //
    private TVITourBookRoot                _rootItem_Tree;
-   private long                           _hoveredTourId;
    //
    private DataLayer                      _natTable_ColumnHeader_DataLayer;
-   private ColumnHeaderLayer              _natTable_ColumnHeader_Layer;
+   private ColumnHeaderLayer               _natTable_ColumnHeader_Layer;
    private ColumnHideShowLayer            _natTable_Body_ColumnHideShowLayer;
    private ColumnReorderLayer             _natTable_Body_ColumnReorderLayer;
    private DataLayer                      _natTable_Body_DataLayer;
@@ -1546,6 +1545,12 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          @Override
          public void menuAboutToShow(final IMenuManager manager) {
 
+            if (isHoveredSelectedTour_NatTable() == false) {
+
+               // a hovered tour will first be selected and them the menu is opened
+               return;
+            }
+
 //            _tourInfoToolTip_NatTable.hideToolTip();
 
             fillContextMenu(manager, false);
@@ -1971,13 +1976,11 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       TVITourBookItem firstElement = null;
       TVITourBookTour firstTour = null;
 
-      _hoveredTourId = -1;
-
       if (_isLayoutNatTable) {
 
          final RowSelectionModel<TVITourBookTour> rowSelectionModel = getNatTable_SelectionModel();
 
-         boolean isHoveredInSelection = false;
+         boolean isSelectionHovered = false;
          int hoveredRow = -1;
 
          final Point hoveredPosition = _natTable_Body_HoverLayer.getCurrentHoveredCellPosition();
@@ -1988,13 +1991,13 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             final Set<Range> allSelectedRowPositions = rowSelectionModel.getSelectedRowPositions();
             for (final Range range : allSelectedRowPositions) {
                if (range.contains(hoveredRow)) {
-                  isHoveredInSelection = true;
+                  isSelectionHovered = true;
                   break;
                }
             }
          }
 
-         if (isHoveredInSelection) {
+         if (isSelectionHovered) {
 
             // mouse is hovering the selected tours
 
@@ -2015,8 +2018,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
                numTourItems = numSelectedItems = 1;
                firstTour = fetchedTour;
-
-               _hoveredTourId = fetchedTour.tourId;
             }
          }
 
@@ -2303,12 +2304,12 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             tourIds.add(tviTourBookTour.tourId);
          }
 
-         if (tourIds.size() == 0 && _hoveredTourId != -1) {
-
-            // when nothing is selected but mouse is hovering a tour, return this tour id
-
-            tourIds.add(_hoveredTourId);
-         }
+//         if (tourIds.size() == 0 && _hoveredTourId != -1) {
+//
+//            // when nothing is selected but mouse is hovering a tour, return this tour id
+//
+//            tourIds.add(_hoveredTourId);
+//         }
 
          return tourIds;
 
@@ -2427,6 +2428,49 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _pc = new PixelConverter(parent);
    }
 
+   /**
+    * @return Returns <code>true</code> when a hovered tour is also selected, otherwise
+    *         <code>false</code> and the tour will be selected.
+    */
+   private boolean isHoveredSelectedTour_NatTable() {
+
+      final RowSelectionModel<TVITourBookTour> rowSelectionModel = getNatTable_SelectionModel();
+
+      int hoveredRow = -1;
+
+      final Point hoveredPosition = _natTable_Body_HoverLayer.getCurrentHoveredCellPosition();
+      if (hoveredPosition != null) {
+
+         hoveredRow = hoveredPosition.y;
+
+         final Set<Range> allSelectedRowPositions = rowSelectionModel.getSelectedRowPositions();
+         for (final Range range : allSelectedRowPositions) {
+
+            if (range.contains(hoveredRow)) {
+               // tour selection is hovered
+               return true;
+            }
+         }
+      }
+
+      if (hoveredRow == -1) {
+
+         // nothing is hovered
+         return false;
+      }
+
+      // mouse is not hovering a tour selection -> select tour
+
+      selectTours_NatTable(new int[] { hoveredRow }, true, false);
+
+      // show context menu again
+      Display.getDefault().timerExec(10, () -> {
+         UI.openContextMenu(_tourViewer_NatTable);
+      });
+
+      return false;
+   }
+
    boolean isShowSummaryRow() {
 
       return Util.getStateBoolean(_state, TourBookView.STATE_IS_SHOW_SUMMARY_ROW, TourBookView.STATE_IS_SHOW_SUMMARY_ROW_DEFAULT);
@@ -2465,54 +2509,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
          body_ColumnLabelAccumulator.registerColumnOverrides(colIndex, columnId);
       }
-   }
-
-   /**
-    * Select tours (rows) in the NatTable by it's row positions, the selection is delayed that tours
-    * are loaded ahead.
-    *
-    * @param allRowPositions
-    */
-   private void natTable_SelectTours(final int[] allRowPositions) {
-
-      // ensure there is something to be selected
-      if (allRowPositions == null || allRowPositions.length == 0 || allRowPositions[0] == -1) {
-         return;
-      }
-
-      Display.getDefault().asyncExec(() -> {
-
-         // sort rows ascending
-         Arrays.sort(allRowPositions);
-
-         final int firstRowPosition = allRowPositions[0];
-
-         /*
-          * It took me hours to solve this issue, first deselect the old selection otherwise is
-          * was PRESERVED :-(((
-          */
-         _natTable_Body_SelectionLayer.clear(false);
-
-         final SelectRowsCommand command = new SelectRowsCommand(
-               _natTable_Body_SelectionLayer,
-               0,
-               allRowPositions,
-               false,
-               true,
-               firstRowPosition);
-
-         _isInReload = true;
-         {
-            _natTable_Body_SelectionLayer.doCommand(command);
-         }
-         _isInReload = false;
-
-         // center vertically the first selected row, TODO# sometimes it is the top row
-         final int numVisibleRows = _natTable_Body_ViewportLayer.getRowCount();
-         final int scrollableRowCenterPosition = numVisibleRows / 2;
-         final int rowVerticalCenterPosition = firstRowPosition + scrollableRowCenterPosition;
-         _natTable_Body_ViewportLayer.moveRowPositionIntoViewport(rowVerticalCenterPosition);
-      });
    }
 
    /**
@@ -2756,7 +2752,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       }
       _viewerContainer_NatTable.setRedraw(true);
 
-      natTable_SelectTours(allRowPositions);
+      selectTours_NatTable(allRowPositions, true, true);
 
       return null;
    }
@@ -2891,7 +2887,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       _natTable_DataLoader.getRowIndexFromTourId(_selectedTourIds).thenAccept((allRowPositions) -> {
 
-         natTable_SelectTours(allRowPositions);
+         selectTours_NatTable(allRowPositions, true, true);
       });
    }
 
@@ -3209,6 +3205,65 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             }
             _isInReload = false;
             tree.setRedraw(true);
+         }
+      });
+   }
+
+   /**
+    * Select tours (rows) in the NatTable by it's row positions, the selection is delayed that tours
+    * are loaded ahead.
+    *
+    * @param allRowPositions
+    * @param isClearSelection
+    *           When <code>true</code> then only the provided rows will be selected, otherwise the
+    *           provided tours will be added to the existing selection.
+    * @param isScrollIntoView
+    */
+   private void selectTours_NatTable(final int[] allRowPositions, final boolean isClearSelection, final boolean isScrollIntoView) {
+
+      // ensure there is something to be selected
+      if (allRowPositions == null || allRowPositions.length == 0 || allRowPositions[0] == -1) {
+         return;
+      }
+
+      Display.getDefault().asyncExec(() -> {
+
+         // sort rows ascending
+         Arrays.sort(allRowPositions);
+
+         final int firstRowPosition = allRowPositions[0];
+
+         /*
+          * It took me hours to solve this issue, first deselect the old selection otherwise is
+          * was PRESERVED :-(((
+          */
+         if (isClearSelection) {
+            _natTable_Body_SelectionLayer.clear(false);
+         }
+
+         final SelectRowsCommand command = new SelectRowsCommand(
+               _natTable_Body_SelectionLayer,
+               0,
+               allRowPositions,
+               false,
+               true,
+               firstRowPosition);
+
+         _isInReload = true;
+         {
+            _natTable_Body_SelectionLayer.doCommand(command);
+         }
+         _isInReload = false;
+
+         if (isScrollIntoView) {
+
+            // center vertically the first selected row, TODO# sometimes it is the top row
+
+            final int numVisibleRows = _natTable_Body_ViewportLayer.getRowCount();
+            final int scrollableRowCenterPosition = numVisibleRows / 2;
+            final int rowVerticalCenterPosition = firstRowPosition + scrollableRowCenterPosition;
+
+            _natTable_Body_ViewportLayer.moveRowPositionIntoViewport(rowVerticalCenterPosition);
          }
       });
    }
