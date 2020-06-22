@@ -40,7 +40,7 @@ import org.eclipse.jface.viewers.ColumnViewerEditor;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy;
 import org.eclipse.jface.viewers.FocusCellOwnerDrawHighlighter;
-import org.eclipse.jface.viewers.TableViewer; 
+import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerEditor;
 import org.eclipse.jface.viewers.TableViewerFocusCellManager;
 import org.eclipse.jface.viewers.TreePath;
@@ -1314,76 +1314,73 @@ public class UI {
    }
 
    /**
-    * Copied from {@link org.eclipse.ui.internal.handlers.ContextMenuHandler}
+    * Copied from {@link org.eclipse.ui.internal.handlers.ContextMenuHandler} and adjusted.
     *
     * @param control
     */
    @SuppressWarnings("restriction")
    public static void openContextMenu(final Control control) {
 
+      if (control == null || control.isDisposed()) {
+         return;
+      }
+
       final Shell shell = control.getShell();
       final Display display = shell == null ? Display.getCurrent() : shell.getDisplay();
-      final Control focusControl = display.getFocusControl();
 
-      if (focusControl != null) {
+      final Point cursorLocation = display.getCursorLocation();
 
-         final Point pt = display.getCursorLocation();
-         final Event event = new Event();
-         event.x = pt.x;
-         event.y = pt.y;
-         event.detail = SWT.MENU_KEYBOARD;
+      final Event event = new Event();
+      event.x = cursorLocation.x;
+      event.y = cursorLocation.y;
+      event.detail = SWT.MENU_MOUSE;
 
-         focusControl.notifyListeners(SWT.MenuDetect, event);
+      control.notifyListeners(SWT.MenuDetect, event);
 
-         if (focusControl.isDisposed()) {
-            return;
+      if (!event.doit) {
+         return;
+      }
+
+      final Menu menu = control.getMenu();
+
+      if (menu != null && !menu.isDisposed()) {
+
+         if (event.x != cursorLocation.x || event.y != cursorLocation.y) {
+            menu.setLocation(event.x, event.y);
          }
+         menu.setVisible(true);
 
-         if (!event.doit) {
-            return;
-         }
+      } else {
 
-         final Menu menu = focusControl.getMenu();
+         final Point size = control.getSize();
+         final Point location = control.toDisplay(0, 0);
 
-         if (menu != null && !menu.isDisposed()) {
+         final Event mouseEvent = new Event();
+         mouseEvent.widget = control;
 
-            if (event.x != pt.x || event.y != pt.y) {
-               menu.setLocation(event.x, event.y);
-            }
-            menu.setVisible(true);
+         if (event.x < location.x
+               || location.x + size.x <= event.x
+               || event.y < location.y
+               || location.y + size.y <= event.y) {
+
+            final Point center = control.toDisplay(Geometry.divide(size, 2));
+            mouseEvent.x = center.x;
+            mouseEvent.y = center.y;
+            mouseEvent.type = SWT.MouseMove;
+            display.post(mouseEvent);
 
          } else {
 
-            final Point size = focusControl.getSize();
-            final Point location = focusControl.toDisplay(0, 0);
-
-            final Event mouseEvent = new Event();
-            mouseEvent.widget = focusControl;
-
-            if (event.x < location.x
-                  || location.x + size.x <= event.x
-                  || event.y < location.y
-                  || location.y + size.y <= event.y) {
-
-               final Point center = focusControl.toDisplay(Geometry.divide(size, 2));
-               mouseEvent.x = center.x;
-               mouseEvent.y = center.y;
-               mouseEvent.type = SWT.MouseMove;
-               display.post(mouseEvent);
-
-            } else {
-
-               mouseEvent.x = event.x;
-               mouseEvent.y = event.y;
-            }
-
-            mouseEvent.button = 2;
-            mouseEvent.type = SWT.MouseDown;
-            display.post(mouseEvent);
-
-            mouseEvent.type = SWT.MouseUp;
-            display.post(mouseEvent);
+            mouseEvent.x = event.x;
+            mouseEvent.y = event.y;
          }
+
+         mouseEvent.button = 2;
+         mouseEvent.type = SWT.MouseDown;
+         display.post(mouseEvent);
+
+         mouseEvent.type = SWT.MouseUp;
+         display.post(mouseEvent);
       }
    }
 
