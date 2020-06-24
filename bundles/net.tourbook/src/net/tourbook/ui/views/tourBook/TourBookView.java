@@ -89,6 +89,7 @@ import net.tourbook.ui.views.rawData.SubMenu_AdjustTourValues;
 import net.tourbook.ui.views.tourBook.natTable.DataProvider_ColumnHeader;
 import net.tourbook.ui.views.tourBook.natTable.NatTable_DataLoader;
 import net.tourbook.ui.views.tourBook.natTable.NatTable_Header_Tooltip;
+import net.tourbook.ui.views.tourBook.natTable.NatTable_SortModel;
 import net.tourbook.ui.views.tourBook.natTable.TourRowDataProvider;
 
 import org.eclipse.core.runtime.Path;
@@ -123,6 +124,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.config.AbstractRegistryConfiguration;
 import org.eclipse.nebula.widgets.nattable.config.CellConfigAttributes;
+import org.eclipse.nebula.widgets.nattable.config.ConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.config.DefaultNatTableStyleConfiguration;
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.coordinate.PositionCoordinate;
@@ -151,6 +153,7 @@ import org.eclipse.nebula.widgets.nattable.selection.RowSelectionProvider;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.selection.command.SelectRowsCommand;
 import org.eclipse.nebula.widgets.nattable.selection.config.DefaultRowSelectionLayerConfiguration;
+import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.style.CellStyleAttributes;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.eclipse.nebula.widgets.nattable.style.HorizontalAlignmentEnum;
@@ -1661,6 +1664,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       // this MUST be done after the nattable is created
       _columnManager_NatTable.setupNatTable(this);
 
+      // create a new ConfigRegistry which will be needed for GlazedLists handling
+      final ConfigRegistry configRegistry = new ConfigRegistry();
+
       // data provider
       _natTable_DataLoader = new NatTable_DataLoader(this, _columnManager_NatTable);
       final ArrayList<ColumnDefinition> allSortedColumns = _natTable_DataLoader.allSortedColumns;
@@ -1725,6 +1731,22 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             _natTable_Body_ViewportLayer,
             _natTable_Body_SelectionLayer);
 
+      final NatTable_SortModel glazedListsSortModel = new NatTable_SortModel(
+            configRegistry,
+            _natTable_ColumnHeader_DataLayer);
+
+      final SortHeaderLayer<TVITourBookTour> sortHeaderLayer = new SortHeaderLayer<>(_natTable_ColumnHeader_Layer, glazedListsSortModel);
+
+//      ColumnHeaderLayer columnHeaderLayer = new ColumnHeaderLayer(columnHeaderDataLayer, bodyLayer, bodyLayer.getSelectionLayer());
+//
+//      SortHeaderLayer<ExtendedPersonWithAddress> sortHeaderLayer = new SortHeaderLayer<>(
+//            columnHeaderLayer,
+//            new GlazedListsSortModel<>(
+//                  bodyLayer.getSortedList(),
+//                  columnPropertyAccessor,
+//                  configRegistry,
+//                  columnHeaderDataLayer));
+
       /*
        * Create: Row header layer
        */
@@ -1737,12 +1759,12 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
        */
       final DefaultCornerDataProvider corner_DataProvider = new DefaultCornerDataProvider(columnHeader_DataProvider, rowHeader_DataProvider);
       final DataLayer corner_DataLayer = new DataLayer(corner_DataProvider);
-      final ILayer corner_Layer = new CornerLayer(corner_DataLayer, rowHeader_Layer, _natTable_ColumnHeader_Layer);
+      final ILayer corner_Layer = new CornerLayer(corner_DataLayer, rowHeader_Layer, sortHeaderLayer);
 
       /*
        * Create: Grid layer composed with the prior created layer stacks
        */
-      final GridLayer gridLayer = new GridLayer(_natTable_Body_ViewportLayer, _natTable_ColumnHeader_Layer, rowHeader_Layer, corner_Layer);
+      final GridLayer gridLayer = new GridLayer(_natTable_Body_ViewportLayer, sortHeaderLayer, rowHeader_Layer, corner_Layer);
 
       /*
        * Setup other data
@@ -1757,6 +1779,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _tourViewer_NatTable = new NatTable(parent, gridLayer, false);
 
       _columnManager_NatTable.setupNatTable_PostCreate();
+      _tourViewer_NatTable.setConfigRegistry(configRegistry);
 
       // add mouse double click listener
       final IMouseAction mouseDoubleClickAction = new IMouseAction() {
@@ -2715,42 +2738,47 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       final Set<Range> allSelectedRowPositions = getNatTable_SelectionModel().getSelectedRowPositions();
       final TIntArrayList allSelectedRowPos = new TIntArrayList();
+
+      // convert all ranges into a list
       for (final Range rowRange : allSelectedRowPositions) {
-         for (final int rowPos : rowRange.getMembersArray()) {
+         for (final Integer rowPos : rowRange.getMembers()) {
             allSelectedRowPos.add(rowPos);
          }
       }
 
-      final int[] allRowPositions = allSelectedRowPos.toArray();
-      boolean isSelectedTourHovered = false;
+      if (allSelectedRowPos.size() > 0) {
 
-      final Point hoveredPosition = _natTable_Body_HoverLayer.getCurrentHoveredCellPosition();
-      if (hoveredPosition != null) {
+         final int[] allRowPositions = allSelectedRowPos.toArray();
+         boolean isSelectedTourHovered = false;
 
-         final int hoveredRow = hoveredPosition.y;
+         final Point hoveredPosition = _natTable_Body_HoverLayer.getCurrentHoveredCellPosition();
+         if (hoveredPosition != null) {
 
-         for (final int rowPosition : allRowPositions) {
+            final int hoveredRow = hoveredPosition.y;
 
-            if (rowPosition == hoveredRow) {
+            for (final int rowPosition : allRowPositions) {
 
-               // tour selection is also hovered
+               if (rowPosition == hoveredRow) {
 
-               isSelectedTourHovered = true;
+                  // tour selection is also hovered
 
-               break;
+                  isSelectedTourHovered = true;
+
+                  break;
+               }
             }
          }
-      }
 
-      if (!isSelectedTourHovered) {
+         if (!isSelectedTourHovered) {
 
-         // no selected tour is hovered -> set one tour also to be hovered
+            // a selected tour is NOT hovered -> set one tour also to be hovered
 
-         final PositionCoordinate selectionAnchor = _natTable_Body_SelectionLayer.getSelectionAnchor();
+            final PositionCoordinate selectionAnchor = _natTable_Body_SelectionLayer.getSelectionAnchor();
 
-         _natTable_Body_HoverLayer.setCurrentHoveredCellPosition(
-               selectionAnchor.columnPosition,
-               allRowPositions[0]);
+            _natTable_Body_HoverLayer.setCurrentHoveredCellPosition(
+                  selectionAnchor.columnPosition,
+                  allRowPositions[0]);
+         }
       }
 
       onSelect_CreateTourSelection(tourIds);
