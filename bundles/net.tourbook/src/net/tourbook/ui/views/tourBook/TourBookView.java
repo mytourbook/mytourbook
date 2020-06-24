@@ -191,7 +191,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
 // SET_FORMATTING_OFF
 
-   private static final String           COLUMN_FACTORY_TIME_ZONE_DIFF_TOOLTIP           = net.tourbook.ui.Messages.ColumnFactory_TimeZoneDifference_Tooltip;
+   private static final String           COLUMN_FACTORY_TIME_ZONE_DIFF_TOOLTIP            = net.tourbook.ui.Messages.ColumnFactory_TimeZoneDifference_Tooltip;
 
 // SET_FORMATTING_ON
    //
@@ -317,21 +317,19 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private ActionTourBookOptions          _actionTourBookOptions;
    //
    private PixelConverter                 _pc;
-   //
-   //
    /*
     * UI controls
     */
-   private PageBook                    _pageBook;
+   private PageBook                       _pageBook;
    //
-   private Composite                   _parent;
-   private Composite                   _viewerContainer_NatTable;
-   private Composite                   _viewerContainer_Tree;
+   private Composite                      _parent;
+   private Composite                      _viewerContainer_NatTable;
+   private Composite                      _viewerContainer_Tree;
    //
-   private Menu                        _contextMenu_NatTable;
-   private Menu                        _contextMenu_Tree;
+   private Menu                           _contextMenu_NatTable;
+   private Menu                           _contextMenu_Tree;
 
-   private ActionShowOnlySelectedTours _actionShowOnlySelectedTours;
+   private ActionShowOnlySelectedTours    _actionShowOnlySelectedTours;
 
    private class ActionLinkWithOtherViews extends ActionToolbarSlideout {
 
@@ -1755,7 +1753,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       /*
        * Create: Table
        */
-      // turn the auto configuration off as we want to add our hover styling configuration
+      // turn the auto configuration off as we want to add custom configurations
       _tourViewer_NatTable = new NatTable(parent, gridLayer, false);
 
       _columnManager_NatTable.setupNatTable_PostCreate();
