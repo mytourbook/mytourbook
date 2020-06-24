@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourBook;
 
+import gnu.trove.list.array.TIntArrayList;
+
 import java.io.File;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
@@ -260,7 +262,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private NatTable_DataLoader            _natTable_DataLoader;
    //
    private NatTableContentTooltip         _natTable_Tooltip;
-   // 
+   //
    /**
     * Contains {@link SWT#MENU_MOUSE} or {@link SWT#MENU_KEYBOARD} when context menu is being opened
     */
@@ -1556,7 +1558,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
          @Override
          public void menuAboutToShow(final IMenuManager manager) {
-            onOpen_ContextMenu_NatTable(manager);
+            natTable_ContextMenu_OnShow(manager);
          }
       });
 
@@ -1566,7 +1568,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          @Override
          public void menuAboutToShow(final IMenuManager manager) {
 
-//            _tourInfoToolTip_Table.hideToolTip();
+// TODO     _tourInfoToolTip_Table.hideToolTip();
 
             fillContextMenu(manager, false);
          }
@@ -1836,7 +1838,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
          @Override
          public void handleEvent(final Event event) {
-            onMenuDetect_NatTable(event);
+            natTable_ContextMenu_OnMenuDetect(event);
          }
       });
 
@@ -1990,9 +1992,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       if (_isLayoutNatTable) {
 
          final RowSelectionModel<TVITourBookTour> rowSelectionModel = getNatTable_SelectionModel();
-         final Set<Range> allSelectedRowPositions = rowSelectionModel.getSelectedRowPositions();
 
          switch (_natTable_ContextMenuActivator) {
+
          case SWT.MENU_KEYBOARD:
 
             numTourItems = numSelectedItems = rowSelectionModel.getSelectedRowCount();
@@ -2015,8 +2017,10 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
                hoveredRow = hoveredPosition.y;
 
-               for (final Range range : allSelectedRowPositions) {
+               for (final Range range : rowSelectionModel.getSelectedRowPositions()) {
+
                   if (range.contains(hoveredRow)) {
+
                      isSelectionHovered = true;
                      break;
                   }
@@ -2463,6 +2467,129 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    }
 
    /**
+    * Set the context menu position when it's opened with the keyboard.
+    *
+    * @param event
+    */
+   private void natTable_ContextMenu_OnMenuDetect(final Event event) {
+
+      _natTable_ContextMenuActivator = event.detail;
+
+      if (event.detail == SWT.MENU_MOUSE) {
+
+         // ignore mouse event
+
+         return;
+      }
+
+      // positon context menu to the selected tour
+
+      final RowSelectionModel<TVITourBookTour> rowSelectionModel = getNatTable_SelectionModel();
+      final Set<Range> allSelectedRowPositions = rowSelectionModel.getSelectedRowPositions();
+
+      final int numSelectedRows = allSelectedRowPositions.size();
+
+      if (numSelectedRows == 0) {
+         return;
+      }
+
+      final NatTable natTable = _tourViewer_NatTable;
+
+      final Range[] allRanges = allSelectedRowPositions.toArray(new Range[numSelectedRows]);
+      final Range lastRange = allRanges[numSelectedRows - 1];
+
+      final int lastRow = lastRange.end;
+
+      final int lastRowIndex = _natTable_Body_ViewportLayer.getRowPositionByIndex(lastRow);
+      final int devY_LastRowIndex = _natTable_Body_ViewportLayer.getStartYOfRowPosition(lastRowIndex);
+
+      final PositionCoordinate selectionAnchor = _natTable_Body_SelectionLayer.getSelectionAnchor();
+      final int anchorColumnPosition = selectionAnchor.columnPosition;
+
+      final int devX_Anchor = _natTable_Body_ViewportLayer.getStartXOfColumnPosition(anchorColumnPosition);
+      final int anchorColumnWidth = _natTable_Body_ViewportLayer.getColumnWidthByPosition(anchorColumnPosition);
+
+// this do not have the expected position
+//      final int devY_Anchor = _natTable_Body_ViewportLayer.getStartYOfRowPosition(selectionAnchor.rowPosition);
+//      final Point displayPosition = natTable.toDisplay(devX_Anchor, devY_Anchor);
+
+      final Point displayPosition = natTable.toDisplay(devX_Anchor, devY_LastRowIndex);
+
+      /*
+       * TODO Have no idea why horizontally it must be adjusted by 40 to be to the right of the
+       * anchor cell ?-(
+       */
+      final int xOffset = 40;
+
+      // micro adjust position to show exactly on the header lines otherwise it looks ugly
+      event.x = displayPosition.x + anchorColumnWidth + xOffset;
+      event.y = displayPosition.y - 0;
+   }
+
+   private void natTable_ContextMenu_OnShow(final IMenuManager manager) {
+
+// TODO _tourInfoToolTip_NatTable.hideToolTip();
+
+      final Set<Range> allSelectedRowPositions = getNatTable_SelectionModel().getSelectedRowPositions();
+
+      final int numSelectedRows = allSelectedRowPositions.size();
+
+      switch (_natTable_ContextMenuActivator) {
+
+      case SWT.MENU_KEYBOARD:
+
+         if (numSelectedRows == 0) {
+            return;
+         }
+
+         fillContextMenu(manager, false);
+
+         break;
+
+      case SWT.MENU_MOUSE:
+
+         int hoveredRow = -1;
+
+         final Point hoveredPosition = _natTable_Body_HoverLayer.getCurrentHoveredCellPosition();
+         if (hoveredPosition != null) {
+
+            hoveredRow = hoveredPosition.y;
+
+            for (final Range range : allSelectedRowPositions) {
+
+               if (range.contains(hoveredRow)) {
+
+                  // tour selection is hovered
+
+                  fillContextMenu(manager, false);
+                  return;
+               }
+            }
+         }
+
+         if (hoveredRow == -1) {
+
+            // nothing is hovered, this should not occure because when a tour is selected it's row is set to be also hovered
+
+            return;
+         }
+
+         // mouse is not hovering a tour selection -> select tour
+
+         selectTours_NatTable(new int[] { hoveredRow }, true, false);
+
+         // show context menu again
+         Display.getDefault().timerExec(10, () -> {
+            UI.openContextMenu(_tourViewer_NatTable);
+         });
+
+         fillContextMenu(manager, false);
+
+         break;
+      }
+   }
+
+   /**
     * Register column labels for the body and header -> this is necessary to apply styling, images,
     * ...
     *
@@ -2519,124 +2646,11 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    }
 
    /**
-    * Set the context menu position when it's opened with the keyboard.
+    * Set's the tour selection {@link #_selectedTourIds} and fires an
+    * {@link TourEventId#TOUR_SELECTION} event.
     *
-    * @param event
+    * @param tourIds
     */
-   private void onMenuDetect_NatTable(final Event event) {
-
-      _natTable_ContextMenuActivator = event.detail;
-
-      if (event.detail == SWT.MENU_MOUSE) {
-
-         // ignore mouse event
-
-         return;
-      }
-
-      // positon context menu to the selected tour
-
-      final RowSelectionModel<TVITourBookTour> rowSelectionModel = getNatTable_SelectionModel();
-      final Set<Range> allSelectedRowPositions = rowSelectionModel.getSelectedRowPositions();
-
-      final int numSelectedRows = allSelectedRowPositions.size();
-
-      if (numSelectedRows == 0) {
-         return;
-      }
-
-      final NatTable natTable = _tourViewer_NatTable;
-
-      final Range[] allRanges = allSelectedRowPositions.toArray(new Range[numSelectedRows]);
-      final Range lastRange = allRanges[numSelectedRows - 1];
-
-      final int lastRow = lastRange.end;
-
-      final int lastRowIndex = _natTable_Body_ViewportLayer.getRowPositionByIndex(lastRow);
-      final int devY_LastRowIndex = _natTable_Body_ViewportLayer.getStartYOfRowPosition(lastRowIndex);
-
-      final PositionCoordinate selectionAnchor = _natTable_Body_SelectionLayer.getSelectionAnchor();
-      final int anchorColumnPosition = selectionAnchor.columnPosition;
-
-      final int devX_Anchor = _natTable_Body_ViewportLayer.getStartXOfColumnPosition(anchorColumnPosition);
-      final int anchorColumnWidth = _natTable_Body_ViewportLayer.getColumnWidthByPosition(anchorColumnPosition);
-
-//      final int devY_Anchor = _natTable_Body_ViewportLayer.getStartYOfRowPosition(selectionAnchor.rowPosition);
-
-//      final Point displayPosition = natTable.toDisplay(devX_Anchor, devY_Anchor);
-      final Point displayPosition = natTable.toDisplay(devX_Anchor, devY_LastRowIndex);
-
-      /*
-       * TODO Have no idea why horizontally it must be adjusted to be to the right of the anchor
-       * cell ?-(
-       */
-      final int xOffset = 40;
-
-      // micro adjust position to show exactly on the header lines otherwise it looks ugly
-      event.x = displayPosition.x + anchorColumnWidth + xOffset;
-      event.y = displayPosition.y - 0;
-   }
-
-   private void onOpen_ContextMenu_NatTable(final IMenuManager manager) {
-
-//    _tourInfoToolTip_NatTable.hideToolTip();
-
-      final RowSelectionModel<TVITourBookTour> rowSelectionModel = getNatTable_SelectionModel();
-      final Set<Range> allSelectedRowPositions = rowSelectionModel.getSelectedRowPositions();
-
-      final int numSelectedRows = allSelectedRowPositions.size();
-
-      switch (_natTable_ContextMenuActivator) {
-
-      case SWT.MENU_KEYBOARD:
-
-         if (numSelectedRows == 0) {
-            return;
-         }
-
-         fillContextMenu(manager, false);
-
-         break;
-
-      case SWT.MENU_MOUSE:
-
-         int hoveredRow = -1;
-
-         final Point hoveredPosition = _natTable_Body_HoverLayer.getCurrentHoveredCellPosition();
-         if (hoveredPosition != null) {
-
-            hoveredRow = hoveredPosition.y;
-
-            for (final Range range : allSelectedRowPositions) {
-
-               if (range.contains(hoveredRow)) {
-                  // tour selection is hovered
-                  return;
-               }
-            }
-         }
-
-         if (hoveredRow == -1) {
-
-            // nothing is hovered
-            return;
-         }
-
-         // mouse is not hovering a tour selection -> select tour
-
-         selectTours_NatTable(new int[] { hoveredRow }, true, false);
-
-         // show context menu again
-         Display.getDefault().timerExec(10, () -> {
-            UI.openContextMenu(_tourViewer_NatTable);
-         });
-
-         fillContextMenu(manager, false);
-
-         break;
-      }
-   }
-
    private void onSelect_CreateTourSelection(final HashSet<Long> tourIds) {
 
       ISelection selection;
@@ -2690,6 +2704,55 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       for (final Object selectedItem : selection) {
          tourIds.add(((TVITourBookTour) selectedItem).tourId);
+      }
+
+      /*
+       * Set hovered tour to a selected tour otherwise the context menu is not opened as it requires
+       * a hovered tour.
+       * This sounds strange but after many try and error tests, this was the only "simple"
+       * solution which I've found.
+       * It seems that the context menu for the NatTable can not be implemented as easy as for a SWT
+       * table or tree.
+       */
+
+      final Set<Range> allSelectedRowPositions = getNatTable_SelectionModel().getSelectedRowPositions();
+      final TIntArrayList allSelectedRowPos = new TIntArrayList();
+      for (final Range rowRange : allSelectedRowPositions) {
+         for (final int rowPos : rowRange.getMembersArray()) {
+            allSelectedRowPos.add(rowPos);
+         }
+      }
+
+      final int[] allRowPositions = allSelectedRowPos.toArray();
+      boolean isSelectedTourHovered = false;
+
+      final Point hoveredPosition = _natTable_Body_HoverLayer.getCurrentHoveredCellPosition();
+      if (hoveredPosition != null) {
+
+         final int hoveredRow = hoveredPosition.y;
+
+         for (final int rowPosition : allRowPositions) {
+
+            if (rowPosition == hoveredRow) {
+
+               // tour selection is also hovered
+
+               isSelectedTourHovered = true;
+
+               break;
+            }
+         }
+      }
+
+      if (!isSelectedTourHovered) {
+
+         // no selected tour is hovered -> set one tour also to be hovered
+
+         final PositionCoordinate selectionAnchor = _natTable_Body_SelectionLayer.getSelectionAnchor();
+
+         _natTable_Body_HoverLayer.setCurrentHoveredCellPosition(
+               selectionAnchor.columnPosition,
+               allRowPositions[0]);
       }
 
       onSelect_CreateTourSelection(tourIds);
@@ -3273,7 +3336,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
                      /**
                       * <code>
-                     
+
                         Caused by: java.lang.NullPointerException
                         at org.eclipse.jface.viewers.AbstractTreeViewer.getSelection(AbstractTreeViewer.java:2956)
                         at org.eclipse.jface.viewers.StructuredViewer.handleSelect(StructuredViewer.java:1211)
@@ -3291,13 +3354,13 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
                         at org.eclipse.jface.viewers.AbstractTreeViewer.internalCollapseToLevel(AbstractTreeViewer.java:1586)
                         at org.eclipse.jface.viewers.AbstractTreeViewer.collapseToLevel(AbstractTreeViewer.java:751)
                         at org.eclipse.jface.viewers.AbstractTreeViewer.collapseAll(AbstractTreeViewer.java:733)
-                     
+
                         at net.tourbook.ui.views.tourBook.TourBookView$70.run(TourBookView.java:3406)
-                     
+
                         at org.eclipse.swt.widgets.RunnableLock.run(RunnableLock.java:35)
                         at org.eclipse.swt.widgets.Synchronizer.runAsyncMessages(Synchronizer.java:135)
                         ... 22 more
-                     
+
                       * </code>
                       */
 
@@ -3362,7 +3425,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
          if (isScrollIntoView) {
 
-            // center vertically the first selected row, TODO# sometimes it is the top row
+            // show first selected row in the vertical middle, TODO# sometimes it is the top row
 
             final int numVisibleRows = _natTable_Body_ViewportLayer.getRowCount();
             final int scrollableRowCenterPosition = numVisibleRows / 2;
