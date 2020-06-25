@@ -1881,6 +1881,10 @@ public class ColumnManager {
       }
    }
 
+   /**
+    * @return Returns column definitions which are visible in the table/tree in the sort order of
+    *         the table/tree.
+    */
    public ArrayList<ColumnDefinition> getVisibleAndSortedColumns() {
       return _activeProfile.visibleColumnDefinitions;
    }
@@ -2854,7 +2858,7 @@ public class ColumnManager {
          final ColumnDefinition colDef_Original = getColDef_ByColumnId(columnId);
          colDef_Original.setIsColumnDisplayed(isColumnVisible);
 
-         if (isColumnVisible) { 
+         if (isColumnVisible) {
 
             // set the visible columns
             visibleColumnIds.add(columnId);

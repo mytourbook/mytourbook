@@ -43,6 +43,7 @@ import net.tourbook.ui.views.tourBook.TVITourBookTour;
 import net.tourbook.ui.views.tourBook.TourBookView;
 
 import org.eclipse.nebula.widgets.nattable.NatTable;
+import org.eclipse.nebula.widgets.nattable.sort.SortDirectionEnum;
 import org.eclipse.swt.widgets.Display;
 
 public class NatTable_DataLoader {
@@ -74,8 +75,10 @@ public class NatTable_DataLoader {
    private ConcurrentHashMap<Long, Integer>               _fetchedTourIndex    = new ConcurrentHashMap<>();
    private final LinkedBlockingDeque<LazyTourLoaderItem>  _loaderWaitingQueue  = new LinkedBlockingDeque<>();
 
-   private String                                         _sqlSortField;
+   private String                                         _sortColumnId;
+   private SortDirectionEnum                              _sortDirection;
 
+   private String                                         _sqlSortField;
    private String                                         _sqlSortDirection;
 
    /**
@@ -285,6 +288,10 @@ public class NatTable_DataLoader {
       return _numAllTourItems;
    }
 
+   /**
+    * @param allRequestedTourIds
+    * @return Returns NatTable row indices from the requested tour id's.
+    */
    public CompletableFuture<int[]> getRowIndexFromTourId(final ArrayList<Long> allRequestedTourIds) {
 
       if (_allLoadedTourIds == null) {
@@ -295,9 +302,7 @@ public class NatTable_DataLoader {
 
             loadAllTourIds();
 
-            final int[] rowIndicesFromTourIds = createRowIndicesFromTourIds(allRequestedTourIds);
-
-            return rowIndicesFromTourIds;
+            return createRowIndicesFromTourIds(allRequestedTourIds);
 
          }, _rowIndexExecutor);
 
@@ -305,13 +310,206 @@ public class NatTable_DataLoader {
 
          return CompletableFuture.supplyAsync(() -> {
 
-            final int[] rowIndices = createRowIndicesFromTourIds(allRequestedTourIds);
-
-            return rowIndices;
+            return createRowIndicesFromTourIds(allRequestedTourIds);
 
          }, _rowIndexExecutor);
+      }
+   }
+
+   public String getSortColumnId() {
+      return _sortColumnId;
+   }
+
+   public Enum<SortDirectionEnum> getSortDirection() {
+      return _sortDirection;
+   }
+
+   /**
+    * Map column field -> database field
+    *
+    * @param sortColumnId
+    * @return Returns database field
+    */
+   private String getSqlField(final String sortColumnId) {
+
+// SET_FORMATTING_OFF
+
+      switch (sortColumnId) {
+
+      /**
+       * These fields have a database index
+       */
+
+      // tour date
+      case TableColumnFactory.TIME_DATE_ID:                          return "TourStartTime";          //$NON-NLS-1$
+
+      // tour time, THERE IS CURRENTLY NO DATE ONLY FIELD
+      case TableColumnFactory.TIME_TOUR_START_TIME_ID:               return "TourStartTime";          //$NON-NLS-1$
+
+      case TableColumnFactory.TOUR_TITLE_ID:                         return "TourTitle";              //$NON-NLS-1$
+      case TableColumnFactory.DATA_IMPORT_FILE_NAME_ID:              return "TourImportFileName";     //$NON-NLS-1$
+
+      case TableColumnFactory.TIME_WEEK_NO_ID:                       return "StartWeek";              //$NON-NLS-1$
+      case TableColumnFactory.TIME_WEEKYEAR_ID:                      return "StartWeekYear";          //$NON-NLS-1$
+
+// these fields are not yet displayed in tourbook view but are available in tour data indicies
+//
+//    case TableColumnFactory.:                                      return "TourEndTime";            //$NON-NLS-1$
+//    case TableColumnFactory.:                                      return "HasGeoData";             //$NON-NLS-1$
+
+      /**
+       * These fields have NO database index
+       */
+
+      /*
+      * BODY
+      */
+      case TableColumnFactory.BODY_AVG_PULSE_ID:                     return "avgPulse";               //$NON-NLS-1$
+      case TableColumnFactory.BODY_CALORIES_ID:                      return "calories";               //$NON-NLS-1$
+      case TableColumnFactory.BODY_PULSE_MAX_ID:                     return "maxPulse";               //$NON-NLS-1$
+      case TableColumnFactory.BODY_PERSON_ID:                        return "tourPerson_personId";    //$NON-NLS-1$
+      case TableColumnFactory.BODY_RESTPULSE_ID:                     return "restPulse";              //$NON-NLS-1$
+      case TableColumnFactory.BODY_WEIGHT_ID:                        return "bikerWeight";            //$NON-NLS-1$
+
+      /*
+       * DATA
+       */
+      case TableColumnFactory.DATA_DP_TOLERANCE_ID:                  return "dpTolerance";            //$NON-NLS-1$
+//    case TableColumnFactory.DATA_IMPORT_FILE_NAME_ID:              // see indexed fields
+      case TableColumnFactory.DATA_IMPORT_FILE_PATH_ID:              return "tourImportFilePath";     //$NON-NLS-1$
+      case TableColumnFactory.DATA_NUM_TIME_SLICES_ID:               return "numberOfTimeSlices";     //$NON-NLS-1$
+      case TableColumnFactory.DATA_TIME_INTERVAL_ID:                 return "deviceTimeInterval";     //$NON-NLS-1$
+
+      /*
+       * DEVICE
+       */
+      case TableColumnFactory.DEVICE_DISTANCE_ID:                    return "startDistance";          //$NON-NLS-1$
+      case TableColumnFactory.DEVICE_NAME_ID:                        return "devicePluginName";       //$NON-NLS-1$
+
+      /*
+       * ELEVATION
+       */
+      case TableColumnFactory.ALTITUDE_AVG_CHANGE_ID:                return "avgAltitudeChange";      //$NON-NLS-1$
+      case TableColumnFactory.ALTITUDE_MAX_ID:                       return "maxAltitude";            //$NON-NLS-1$
+      case TableColumnFactory.ALTITUDE_SUMMARIZED_BORDER_DOWN_ID:    return "tourAltDown";            //$NON-NLS-1$
+      case TableColumnFactory.ALTITUDE_SUMMARIZED_BORDER_UP_ID:      return "tourAltUp";              //$NON-NLS-1$
+
+      /*
+       * MOTION
+       */
+//    case TableColumnFactory.MOTION_AVG_PACE_ID:                    return "";                       //$NON-NLS-1$
+//    case TableColumnFactory.MOTION_AVG_SPEED_ID:                   return "";                       //$NON-NLS-1$
+      case TableColumnFactory.MOTION_DISTANCE_ID:                    return "tourDistance";           //$NON-NLS-1$
+      case TableColumnFactory.MOTION_MAX_SPEED_ID:                   return "maxSpeed";               //$NON-NLS-1$
+
+      /*
+       * POWER
+       */
+      case TableColumnFactory.POWER_AVG_ID:                          return "power_Avg";              //$NON-NLS-1$
+      case TableColumnFactory.POWER_MAX_ID:                          return "power_Max";              //$NON-NLS-1$
+      case TableColumnFactory.POWER_NORMALIZED_ID:                   return "power_Normalized";       //$NON-NLS-1$
+      case TableColumnFactory.POWER_TOTAL_WORK_ID:                   return "power_TotalWork";        //$NON-NLS-1$
+
+      /*
+       * POWERTRAIN
+       */
+      case TableColumnFactory.POWERTRAIN_AVG_CADENCE_ID:                            return "avgCadence";                          //$NON-NLS-1$
+      case TableColumnFactory.POWERTRAIN_AVG_LEFT_PEDAL_SMOOTHNESS_ID:              return "power_AvgLeftPedalSmoothness";        //$NON-NLS-1$
+      case TableColumnFactory.POWERTRAIN_AVG_LEFT_TORQUE_EFFECTIVENESS_ID:          return "power_AvgLeftTorqueEffectiveness";    //$NON-NLS-1$
+      case TableColumnFactory.POWERTRAIN_AVG_RIGHT_PEDAL_SMOOTHNESS_ID:             return "power_AvgRightPedalSmoothness";       //$NON-NLS-1$
+      case TableColumnFactory.POWERTRAIN_AVG_RIGHT_TORQUE_EFFECTIVENESS_ID:         return "power_AvgRightTorqueEffectiveness";   //$NON-NLS-1$
+      case TableColumnFactory.POWERTRAIN_CADENCE_MULTIPLIER_ID:                     return "cadenceMultiplier";                   //$NON-NLS-1$
+      case TableColumnFactory.POWERTRAIN_GEAR_FRONT_SHIFT_COUNT_ID:                 return "frontShiftCount";                     //$NON-NLS-1$
+      case TableColumnFactory.POWERTRAIN_GEAR_REAR_SHIFT_COUNT_ID:                  return "rearShiftCount";                      //$NON-NLS-1$
+//    case TableColumnFactory.POWERTRAIN_SLOW_VS_FAST_CADENCE_PERCENTAGES_ID:       return "";      //$NON-NLS-1$
+//    case TableColumnFactory.POWERTRAIN_SLOW_VS_FAST_CADENCE_ZONES_DELIMITER_ID:   return "";      //$NON-NLS-1$
+
+      /*
+       * RUNNING DYNAMICS
+       */
+      case TableColumnFactory.RUN_DYN_STANCE_TIME_AVG_ID:            return "runDyn_StanceTime_Avg";            //$NON-NLS-1$
+      case TableColumnFactory.RUN_DYN_STANCE_TIME_MIN_ID:            return "runDyn_StanceTime_Min";            //$NON-NLS-1$
+      case TableColumnFactory.RUN_DYN_STANCE_TIME_MAX_ID:            return "runDyn_StanceTime_Max";            //$NON-NLS-1$
+      case TableColumnFactory.RUN_DYN_STANCE_TIME_BALANCE_AVG_ID:    return "runDyn_StanceTimeBalance_Avg";     //$NON-NLS-1$
+      case TableColumnFactory.RUN_DYN_STANCE_TIME_BALANCE_MIN_ID:    return "runDyn_StanceTimeBalance_Min";     //$NON-NLS-1$
+      case TableColumnFactory.RUN_DYN_STANCE_TIME_BALANCE_MAX_ID:    return "runDyn_StanceTimeBalance_Max";     //$NON-NLS-1$
+      case TableColumnFactory.RUN_DYN_STEP_LENGTH_AVG_ID:            return "runDyn_StepLength_Avg";            //$NON-NLS-1$
+      case TableColumnFactory.RUN_DYN_STEP_LENGTH_MIN_ID:            return "runDyn_StepLength_Min";            //$NON-NLS-1$
+      case TableColumnFactory.RUN_DYN_STEP_LENGTH_MAX_ID:            return "runDyn_StepLength_Max";            //$NON-NLS-1$
+      case TableColumnFactory.RUN_DYN_VERTICAL_OSCILLATION_AVG_ID:   return "runDyn_VerticalOscillation_Avg";   //$NON-NLS-1$
+      case TableColumnFactory.RUN_DYN_VERTICAL_OSCILLATION_MIN_ID:   return "runDyn_VerticalOscillation_Min";   //$NON-NLS-1$
+      case TableColumnFactory.RUN_DYN_VERTICAL_OSCILLATION_MAX_ID:   return "runDyn_VerticalOscillation_Max";   //$NON-NLS-1$
+      case TableColumnFactory.RUN_DYN_VERTICAL_RATIO_AVG_ID:         return "runDyn_VerticalRatio_Avg";         //$NON-NLS-1$
+      case TableColumnFactory.RUN_DYN_VERTICAL_RATIO_MIN_ID:         return "runDyn_VerticalRatio_Min";         //$NON-NLS-1$
+      case TableColumnFactory.RUN_DYN_VERTICAL_RATIO_MAX_ID:         return "runDyn_VerticalRatio_Max";         //$NON-NLS-1$
+
+      /*
+       * SURFING
+       */
+      case TableColumnFactory.SURFING_MIN_DISTANCE_ID:               return "surfing_MinDistance";              //$NON-NLS-1$
+      case TableColumnFactory.SURFING_MIN_SPEED_START_STOP_ID:       return "surfing_MinSpeed_StartStop";       //$NON-NLS-1$
+      case TableColumnFactory.SURFING_MIN_SPEED_SURFING_ID:          return "surfing_MinSpeed_Surfing";         //$NON-NLS-1$
+      case TableColumnFactory.SURFING_MIN_TIME_DURATION_ID:          return "surfing_MinTimeDuration";          //$NON-NLS-1$
+      case TableColumnFactory.SURFING_NUMBER_OF_EVENTS_ID:           return "surfing_NumberOfEvents";           //$NON-NLS-1$
+
+      /*
+       * TIME
+       */
+      case TableColumnFactory.TIME_DRIVING_TIME_ID:                  return "tourDrivingTime";                  //$NON-NLS-1$
+//    case TableColumnFactory.TIME_PAUSED_TIME_ID:                   return "";                                 //$NON-NLS-1$
+//    case TableColumnFactory.TIME_PAUSED_TIME_RELATIVE_ID:          return "";                                 //$NON-NLS-1$
+      case TableColumnFactory.TIME_RECORDING_TIME_ID:                return "tourRecordingTime";                //$NON-NLS-1$
+      case TableColumnFactory.TIME_TIME_ZONE_ID:                     return "TimeZoneId";                       //$NON-NLS-1$
+//    case TableColumnFactory.TIME_TIME_ZONE_DIFFERENCE_ID:          return "";                                 //$NON-NLS-1$
+//    case TableColumnFactory.TIME_TOUR_START_TIME_ID:               // see indexed fields
+//    case TableColumnFactory.TIME_WEEK_DAY_ID:                      return "";                                 //$NON-NLS-1$
+//    case TableColumnFactory.TIME_WEEK_NO_ID:                       // see indexed fields
+//    case TableColumnFactory.TIME_WEEKYEAR_ID:                      // see indexed fields
+
+      /*
+       * TOUR
+       */
+      case TableColumnFactory.TOUR_LOCATION_START_ID:                return "tourStartPlace";                   //$NON-NLS-1$
+      case TableColumnFactory.TOUR_LOCATION_END_ID:                  return "tourEndPlace";                     //$NON-NLS-1$
+//    case TableColumnFactory.TOUR_NUM_MARKERS_ID:                   return "";                                 //$NON-NLS-1$
+//    case TableColumnFactory.TOUR_NUM_PHOTOS_ID:                    return "";                                 //$NON-NLS-1$
+//    case TableColumnFactory.TOUR_TAGS_ID:                          return "";                                 //$NON-NLS-1$
+//    case TableColumnFactory.TOUR_TITLE_ID:                         // see indexed fields
+//    case TableColumnFactory.TOUR_TYPE_ID:                          return "";                                 //$NON-NLS-1$
+//    case TableColumnFactory.TOUR_TYPE_TEXT_ID:                     return "";                                 //$NON-NLS-1$
+
+      /*
+       * TRAINING
+       */
+      case TableColumnFactory.TRAINING_EFFECT_AEROB_ID:              return "training_TrainingEffect_Aerob";    //$NON-NLS-1$
+      case TableColumnFactory.TRAINING_EFFECT_ANAEROB_ID:            return "training_TrainingEffect_Anaerob";  //$NON-NLS-1$
+      case TableColumnFactory.TRAINING_FTP_ID:                       return "power_FTP";                        //$NON-NLS-1$
+      case TableColumnFactory.TRAINING_INTENSITY_FACTOR_ID:          return "power_IntensityFactor";            //$NON-NLS-1$
+//    case TableColumnFactory.TRAINING_POWER_TO_WEIGHT_ID:           return "";                                 //$NON-NLS-1$
+      case TableColumnFactory.TRAINING_STRESS_SCORE_ID:              return "power_TrainingStressScore";        //$NON-NLS-1$
+      case TableColumnFactory.TRAINING_PERFORMANCE_LEVEL_ID:         return "training_TrainingPerformance";     //$NON-NLS-1$
+
+      /*
+       * WEATHER
+       */
+      case TableColumnFactory.WEATHER_CLOUDS_ID:                     return "weatherClouds";                                //$NON-NLS-1$
+      case TableColumnFactory.WEATHER_TEMPERATURE_AVG_ID:            return "(DOUBLE(avgTemperature) / temperatureScale)";  //$NON-NLS-1$
+      case TableColumnFactory.WEATHER_TEMPERATURE_MIN_ID:            return "weather_Temperature_Min";                      //$NON-NLS-1$
+      case TableColumnFactory.WEATHER_TEMPERATURE_MAX_ID:            return "weather_Temperature_Max";                      //$NON-NLS-1$
+      case TableColumnFactory.WEATHER_WIND_DIR_ID:                   return "weatherWindDir";                               //$NON-NLS-1$
+      case TableColumnFactory.WEATHER_WIND_SPEED_ID:                 return "weatherWindSpd";                               //$NON-NLS-1$
+
+      default:
+
+         System.out.println((System.currentTimeMillis() + String.format(" The sort column \"%s\" is not defined",sortColumnId)));
+         // TODO remove SYSTEM.OUT.PRINTLN
+
+         return "TourStartTime"; //$NON-NLS-1$
 
       }
+
+   // SET_FORMATTING_ON
+
    }
 
    /**
@@ -478,6 +676,9 @@ public class NatTable_DataLoader {
             + " OFFSET ? ROWS FETCH NEXT ? ROWS ONLY" + NL //                          //$NON-NLS-1$
       ;
 
+//      System.out.println((System.currentTimeMillis() + sql));
+//      // TODO remove SYSTEM.OUT.PRINTLN
+
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          int rowIndex = loaderItem.sqlOffset;
@@ -538,7 +739,16 @@ public class NatTable_DataLoader {
       _numAllTourItems = -1;
    }
 
-   public void setSortColumn(final String sortColumnId, final int sortDirection) {
+   /**
+    * Sets sort column id/direction but firstly the previous loaded tours are cleaned up
+    *
+    * @param sortColumnId
+    * @param sortDirection
+    */
+   public void setupSortColumn(final String sortColumnId, final SortDirectionEnum sortDirection) {
+
+      _sortColumnId = sortColumnId;
+      _sortDirection = sortDirection;
 
       // cleanup old fetched tours
       resetTourItems();
@@ -546,46 +756,15 @@ public class NatTable_DataLoader {
       /*
        * Set sort order
        */
-      if (sortDirection == TourBookView.ItemComparator_Table.ASCENDING) {
+      if (sortDirection == SortDirectionEnum.ASC) {
          _sqlSortDirection = "ASC"; //$NON-NLS-1$
       } else {
          _sqlSortDirection = "DESC"; //$NON-NLS-1$
       }
 
-      _sqlSortDirection = "ASC";
-
       /*
-       * Set sort direction
+       * Set sort field
        */
-
-// SET_FORMATTING_OFF
-
-      switch (sortColumnId) {
-
-      // tour date
-      case TableColumnFactory.TIME_DATE_ID:                 _sqlSortField = "TourStartTime";                         break; //$NON-NLS-1$
-
-      // tour time
-      case TableColumnFactory.TIME_TOUR_START_TIME_ID:      _sqlSortField = "TourStartTime";                         break; //$NON-NLS-1$
-
-      case TableColumnFactory.TOUR_TITLE_ID:                _sqlSortField = "TourTitle,         TourStartTime";      break; //$NON-NLS-1$
-
-      case TableColumnFactory.DATA_IMPORT_FILE_NAME_ID:     _sqlSortField = "TourImportFileName";                    break; //$NON-NLS-1$
-
-      case TableColumnFactory.TIME_WEEK_NO_ID:              _sqlSortField = "StartWeek,         TourStartTime";      break; //$NON-NLS-1$
-      case TableColumnFactory.TIME_WEEKYEAR_ID:             _sqlSortField = "StartWeekYear,     TourStartTime";      break; //$NON-NLS-1$
-
-// these fields are not yet displayed in tourbook view but are available in tour data indicies
-//
-//      case TableColumnFactory.:      _sqlSortField = "TourEndTime";          break; //$NON-NLS-1$
-//      case TableColumnFactory.:      _sqlSortField = "HasGeoData";           break; //$NON-NLS-1$
-
-      default:
-         _sqlSortField = "TourStartTime"; //$NON-NLS-1$
-         break;
-      }
-
-// SET_FORMATTING_ON
-
+      _sqlSortField = getSqlField(sortColumnId);
    }
 }

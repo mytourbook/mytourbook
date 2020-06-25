@@ -145,6 +145,7 @@ import org.eclipse.nebula.widgets.nattable.layer.DataLayer;
 import org.eclipse.nebula.widgets.nattable.layer.ILayer;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnOverrideLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ILayerCell;
+import org.eclipse.nebula.widgets.nattable.layer.event.ILayerEvent;
 import org.eclipse.nebula.widgets.nattable.painter.cell.ImagePainter;
 import org.eclipse.nebula.widgets.nattable.painter.cell.decorator.CellPainterDecorator;
 import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
@@ -153,7 +154,10 @@ import org.eclipse.nebula.widgets.nattable.selection.RowSelectionProvider;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.selection.command.SelectRowsCommand;
 import org.eclipse.nebula.widgets.nattable.selection.config.DefaultRowSelectionLayerConfiguration;
+import org.eclipse.nebula.widgets.nattable.sort.SortDirectionEnum;
 import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
+import org.eclipse.nebula.widgets.nattable.sort.config.SingleClickSortConfiguration;
+import org.eclipse.nebula.widgets.nattable.sort.event.SortColumnEvent;
 import org.eclipse.nebula.widgets.nattable.style.CellStyleAttributes;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.eclipse.nebula.widgets.nattable.style.HorizontalAlignmentEnum;
@@ -250,7 +254,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    //
    private NatTable                       _tourViewer_NatTable;
    private TreeViewer                     _tourViewer_Tree;
-   private ItemComparator_Table           _tourViewer_Table_Comparator                    = new ItemComparator_Table();
    //
    private TVITourBookRoot                _rootItem_Tree;
    //
@@ -262,8 +265,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private HoverLayer                     _natTable_Body_HoverLayer;
    private SelectionLayer                 _natTable_Body_SelectionLayer;
    private ViewportLayer                  _natTable_Body_ViewportLayer;
-   private NatTable_DataLoader            _natTable_DataLoader;
    //
+   private NatTable_DataLoader            _natTable_DataLoader;
+   private NatTable_SortModel             _natTable_SortModel;
    private NatTableContentTooltip         _natTable_Tooltip;
    //
    /**
@@ -454,440 +458,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
    }
 
-   public class ItemComparator_Table /* extends ViewerComparator */ {
-
-      public static final int  ASCENDING  = 0;
-      private static final int DESCENDING = 1;
-
-      private String           __sortColumnId;
-      private int              __sortDirection;
-
-//      @Override
-//      public int compare(final Viewer viewer, final Object obj1, final Object obj2) {
-//
-//         final TVITourBookTour tourItem1 = ((TVITourBookTour) obj1);
-//         final TVITourBookTour tourItem2 = ((TVITourBookTour) obj2);
-//
-//         int result = 0;
-//
-//         switch (__sortColumnId) {
-//
-//         case TableColumnFactory.TIME_DATE_ID:
-//
-//            // 1st Column: Date/time
-//
-//            result = tourItem1.colDateTime_MS > tourItem2.colDateTime_MS ? 1 : -1;
-//            break;
-//
-//         /*
-//          * BODY
-//          */
-//
-//         case TableColumnFactory.BODY_AVG_PULSE_ID:
-//            break;
-//
-//         case TableColumnFactory.BODY_CALORIES_ID:
-//            break;
-//
-//         case TableColumnFactory.BODY_PULSE_MAX_ID:
-//            break;
-//
-//         case TableColumnFactory.BODY_PERSON_ID:
-//            break;
-//
-//         case TableColumnFactory.BODY_RESTPULSE_ID:
-//            break;
-//
-//         case TableColumnFactory.BODY_WEIGHT_ID:
-//            break;
-//
-//         /*
-//          * DATA
-//          */
-//
-//         case TableColumnFactory.DATA_DP_TOLERANCE_ID:
-//            break;
-//
-//         case TableColumnFactory.DATA_IMPORT_FILE_NAME_ID:
-//            break;
-//
-//         case TableColumnFactory.DATA_IMPORT_FILE_PATH_ID:
-//            break;
-//
-//         case TableColumnFactory.DATA_NUM_TIME_SLICES_ID:
-//            break;
-//
-//         case TableColumnFactory.DATA_TIME_INTERVAL_ID:
-//            break;
-//
-//         /*
-//          * DEVICE
-//          */
-//         case TableColumnFactory.DEVICE_DISTANCE_ID:
-//            break;
-//
-//         case TableColumnFactory.DEVICE_NAME_ID:
-//            break;
-//
-//         /*
-//          * ELEVATION
-//          */
-//
-//         case TableColumnFactory.ALTITUDE_AVG_CHANGE_ID:
-//            break;
-//
-//         case TableColumnFactory.ALTITUDE_MAX_ID:
-//            break;
-//
-//         case TableColumnFactory.ALTITUDE_SUMMARIZED_BORDER_DOWN_ID:
-//            break;
-//
-//         case TableColumnFactory.ALTITUDE_SUMMARIZED_BORDER_UP_ID:
-//            break;
-//
-//         /*
-//          * MOTION
-//          */
-//
-//         case TableColumnFactory.MOTION_AVG_PACE_ID:
-//            break;
-//
-//         case TableColumnFactory.MOTION_AVG_SPEED_ID:
-//            break;
-//
-//         case TableColumnFactory.MOTION_DISTANCE_ID:
-//            break;
-//
-//         case TableColumnFactory.MOTION_MAX_SPEED_ID:
-//            break;
-//
-//         /*
-//          * POWER
-//          */
-//
-//         case TableColumnFactory.POWER_AVG_ID:
-//            break;
-//
-//         case TableColumnFactory.POWER_MAX_ID:
-//            break;
-//
-//         case TableColumnFactory.POWER_NORMALIZED_ID:
-//            break;
-//
-//         case TableColumnFactory.POWER_TOTAL_WORK_ID:
-//            break;
-//
-//         /*
-//          * POWERTRAIN
-//          */
-//
-//         case TableColumnFactory.POWERTRAIN_AVG_CADENCE_ID:
-//            break;
-//
-//         case TableColumnFactory.POWERTRAIN_AVG_LEFT_PEDAL_SMOOTHNESS_ID:
-//            break;
-//
-//         case TableColumnFactory.POWERTRAIN_AVG_LEFT_TORQUE_EFFECTIVENESS_ID:
-//            break;
-//
-//         case TableColumnFactory.POWERTRAIN_AVG_RIGHT_PEDAL_SMOOTHNESS_ID:
-//            break;
-//
-//         case TableColumnFactory.POWERTRAIN_AVG_RIGHT_TORQUE_EFFECTIVENESS_ID:
-//            break;
-//
-//         case TableColumnFactory.POWERTRAIN_CADENCE_MULTIPLIER_ID:
-//            break;
-//
-//         case TableColumnFactory.POWERTRAIN_GEAR_FRONT_SHIFT_COUNT_ID:
-//            break;
-//
-//         case TableColumnFactory.POWERTRAIN_GEAR_REAR_SHIFT_COUNT_ID:
-//            break;
-//
-//         case TableColumnFactory.POWERTRAIN_SLOW_VS_FAST_CADENCE_PERCENTAGES_ID:
-//            break;
-//
-//         case TableColumnFactory.POWERTRAIN_SLOW_VS_FAST_CADENCE_ZONES_DELIMITER_ID:
-//            break;
-//
-//         /*
-//          * RUNNING DYNAMICS
-//          */
-//
-//         case TableColumnFactory.RUN_DYN_STANCE_TIME_AVG_ID:
-//            break;
-//
-//         case TableColumnFactory.RUN_DYN_STANCE_TIME_MIN_ID:
-//            break;
-//
-//         case TableColumnFactory.RUN_DYN_STANCE_TIME_MAX_ID:
-//            break;
-//
-//         case TableColumnFactory.RUN_DYN_STANCE_TIME_BALANCE_AVG_ID:
-//            break;
-//
-//         case TableColumnFactory.RUN_DYN_STANCE_TIME_BALANCE_MIN_ID:
-//            break;
-//
-//         case TableColumnFactory.RUN_DYN_STANCE_TIME_BALANCE_MAX_ID:
-//            break;
-//
-//         case TableColumnFactory.RUN_DYN_STEP_LENGTH_AVG_ID:
-//            break;
-//
-//         case TableColumnFactory.RUN_DYN_STEP_LENGTH_MIN_ID:
-//            break;
-//
-//         case TableColumnFactory.RUN_DYN_STEP_LENGTH_MAX_ID:
-//            break;
-//
-//         case TableColumnFactory.RUN_DYN_VERTICAL_OSCILLATION_AVG_ID:
-//            break;
-//
-//         case TableColumnFactory.RUN_DYN_VERTICAL_OSCILLATION_MIN_ID:
-//            break;
-//
-//         case TableColumnFactory.RUN_DYN_VERTICAL_OSCILLATION_MAX_ID:
-//            break;
-//
-//         case TableColumnFactory.RUN_DYN_VERTICAL_RATIO_AVG_ID:
-//            break;
-//
-//         case TableColumnFactory.RUN_DYN_VERTICAL_RATIO_MIN_ID:
-//            break;
-//
-//         case TableColumnFactory.RUN_DYN_VERTICAL_RATIO_MAX_ID:
-//            break;
-//
-//         /*
-//          * SURFING
-//          */
-//
-//         case TableColumnFactory.SURFING_MIN_DISTANCE_ID:
-//            break;
-//
-//         case TableColumnFactory.SURFING_MIN_SPEED_START_STOP_ID:
-//            break;
-//
-//         case TableColumnFactory.SURFING_MIN_SPEED_SURFING_ID:
-//            break;
-//
-//         case TableColumnFactory.SURFING_MIN_TIME_DURATION_ID:
-//            break;
-//
-//         case TableColumnFactory.SURFING_NUMBER_OF_EVENTS_ID:
-//            break;
-//
-//         /*
-//          * TIME
-//          */
-//
-//         case TableColumnFactory.TIME_DRIVING_TIME_ID:
-//            break;
-//
-//         case TableColumnFactory.TIME_PAUSED_TIME_ID:
-//            break;
-//
-//         case TableColumnFactory.TIME_PAUSED_TIME_RELATIVE_ID:
-//            break;
-//
-//         case TableColumnFactory.TIME_RECORDING_TIME_ID:
-//            break;
-//
-//         case TableColumnFactory.TIME_TIME_ZONE_ID:
-//            break;
-//
-//         case TableColumnFactory.TIME_TIME_ZONE_DIFFERENCE_ID:
-//            break;
-//
-//         case TableColumnFactory.TIME_TOUR_START_TIME_ID:
-//            break;
-//
-//         case TableColumnFactory.TIME_WEEK_DAY_ID:
-//            break;
-//
-//         case TableColumnFactory.TIME_WEEK_NO_ID:
-//            break;
-//
-//         case TableColumnFactory.TIME_WEEKYEAR_ID:
-//            break;
-//
-//         /*
-//          * TOUR
-//          */
-//
-//         case TableColumnFactory.TOUR_LOCATION_START_ID:
-//            break;
-//
-//         case TableColumnFactory.TOUR_LOCATION_END_ID:
-//            break;
-//
-//         case TableColumnFactory.TOUR_NUM_MARKERS_ID:
-//            break;
-//
-//         case TableColumnFactory.TOUR_NUM_PHOTOS_ID:
-//            break;
-//
-//         case TableColumnFactory.TOUR_TAGS_ID:
-//            break;
-//
-//         case TableColumnFactory.TOUR_TITLE_ID:
-//            break;
-//
-//         case TableColumnFactory.TOUR_TYPE_ID:
-//            break;
-//
-//         case TableColumnFactory.TOUR_TYPE_TEXT_ID:
-//            break;
-//
-//         /*
-//          * TRAINING
-//          */
-//
-//         case TableColumnFactory.TRAINING_EFFECT_AEROB_ID:
-//            break;
-//
-//         case TableColumnFactory.TRAINING_EFFECT_ANAEROB_ID:
-//            break;
-//
-//         case TableColumnFactory.TRAINING_FTP_ID:
-//            break;
-//
-//         case TableColumnFactory.TRAINING_INTENSITY_FACTOR_ID:
-//            break;
-//
-//         case TableColumnFactory.TRAINING_POWER_TO_WEIGHT_ID:
-//            break;
-//
-//         case TableColumnFactory.TRAINING_STRESS_SCORE_ID:
-//            break;
-//
-//         case TableColumnFactory.TRAINING_PERFORMANCE_LEVEL_ID:
-//            break;
-//
-//         /*
-//          * WEATHER
-//          */
-//
-//         case TableColumnFactory.WEATHER_CLOUDS_ID:
-//            break;
-//
-//         case TableColumnFactory.WEATHER_TEMPERATURE_AVG_ID:
-//            break;
-//
-//         case TableColumnFactory.WEATHER_TEMPERATURE_MIN_ID:
-//            break;
-//
-//         case TableColumnFactory.WEATHER_TEMPERATURE_MAX_ID:
-//            break;
-//
-//         case TableColumnFactory.WEATHER_WIND_DIR_ID:
-//            break;
-//
-//         case TableColumnFactory.WEATHER_WIND_SPEED_ID:
-//            break;
-//
-//         case TableColumnFactory.DATA_SEQUENCE_ID:
-//         default:
-//
-//            result = tourItem1.col_Sequence > tourItem2.col_Sequence ? 1 : -1;
-//
-//            break;
-//         }
-
-//         if (__sortColumnId.equals(_columnId_1stColumn_Date)) {
-//
-//         } else if (__sortColumnId.equals(_columnId_Title)) {
-//
-//            // title
-//
-//            result = tourItem1.getTourTitle().compareTo(tourItem2.getTourTitle());
-//
-//         } else if (__sortColumnId.equals(_columnId_ImportFileName)) {
-//
-//            // file name
-//
-//            final String importFilePath1 = tourItem1.getImportFilePath();
-//            final String importFilePath2 = tourItem2.getImportFilePath();
-//
-//            if (importFilePath1 != null && importFilePath2 != null) {
-//
-//               result = importFilePath1.compareTo(importFilePath2);
-//            }
-//
-//         } else if (__sortColumnId.equals(_columnId_DeviceName)) {
-//
-//            // device name
-//
-//            result = tourItem1.getDeviceName().compareTo(tourItem2.getDeviceName());
-//
-//         } else if (__sortColumnId.equals(_columnId_TimeZone)) {
-//
-//            // time zone
-//
-//            final String timeZoneId1 = tourItem1.getTimeZoneId();
-//            final String timeZoneId2 = tourItem2.getTimeZoneId();
-//
-//            if (timeZoneId1 != null && timeZoneId2 != null) {
-//
-//               final int zoneCompareResult = timeZoneId1.compareTo(timeZoneId2);
-//
-//               result = zoneCompareResult;
-//
-//            } else if (timeZoneId1 != null) {
-//
-//               result = 1;
-//
-//            } else if (timeZoneId2 != null) {
-//
-//               result = -1;
-//            }
-//         }
-//
-// do a 2nd sorting by date/time when not yet sorted
-//         if (result == 0) {
-//            result = tourItem1.colDateTime_MS > tourItem2.colDateTime_MS ? 1 : -1;
-//         }
-//
-//         // if descending order, flip the direction
-//         if (__sortDirection == DESCENDING) {
-//            result = -result;
-//         }
-//
-//         return result;
-//      }
-
-      /**
-       * Does the sort. If it's a different column from the previous sort, do an ascending sort. If
-       * it's the same column as the last sort, toggle the sort direction.
-       *
-       * @param widget
-       *           Column widget
-       */
-//      private void setSortColumn(final Widget widget) {
-//
-//         final ColumnDefinition columnDefinition = (ColumnDefinition) widget.getData();
-//         final String columnId = columnDefinition.getColumnId();
-//
-//         if (columnId.equals(__sortColumnId)) {
-//
-//            // Same column as last sort; toggle the direction
-//
-//            __sortDirection = 1 - __sortDirection;
-//
-//         } else {
-//
-//            // New column; do an ascent sorting
-//
-//            __sortColumnId = columnId;
-//            __sortDirection = ASCENDING;
-//         }
-//
-//         updateUI_ShowSortDirection(__sortColumnId, __sortDirection);
-//      }
-   }
-
    private static class ItemComparer_Tree implements IElementComparer {
 
       @Override
@@ -926,43 +496,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          return 0;
       }
    }
-
-//   /**
-//    * [1] IConfiguration for registering a UI binding to open a menu
-//    */
-//   private class NatTable_Config_DebugMenu extends AbstractUiBindingConfiguration {
-//
-//      private final Menu debugMenu;
-//
-//      public NatTable_Config_DebugMenu(final NatTable natTable) {
-//
-//         // [2] create the menu using the PopupMenuBuilder
-//         this.debugMenu = new PopupMenuBuilder(natTable)
-//               .withInspectLabelsMenuItem()
-//               .build();
-//      }
-//
-//      @Override
-//      public void configureUiBindings(final UiBindingRegistry uiBindingRegistry) {
-//
-//         // [3] bind the PopupMenuAction to a right click
-//         // using GridRegion.COLUMN_HEADER instead of null would
-//         // for example open the menu only on performing a right
-//         // click on the column header instead of any region
-//
-//         uiBindingRegistry.registerMouseDownBinding(
-//
-//               new MouseEventMatcher(
-//                     SWT.NONE,
-//                     null,
-//                     MouseEventMatcher.RIGHT_BUTTON),
-//
-//               new PopupMenuAction(this.debugMenu)
-//
-//         );
-//      }
-//
-//   }
 
    private final class NatTable_ConfigField_TourType extends AbstractRegistryConfiguration {
 
@@ -1594,7 +1127,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _parent = parent;
 
       initUI(parent);
-      restoreState_BeforeUI();
 
       createMenuManager();
 
@@ -1669,12 +1201,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       // data provider
       _natTable_DataLoader = new NatTable_DataLoader(this, _columnManager_NatTable);
-      final ArrayList<ColumnDefinition> allSortedColumns = _natTable_DataLoader.allSortedColumns;
-
-      final String sortColumnId = _tourViewer_Table_Comparator.__sortColumnId;
-      final int sortDirection = _tourViewer_Table_Comparator.__sortDirection;
-
-      _natTable_DataLoader.setSortColumn(sortColumnId, sortDirection);
 
       // body layer
       final IRowDataProvider<TVITourBookTour> body_DataProvider = new TourRowDataProvider(_natTable_DataLoader);
@@ -1722,7 +1248,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _natTable_Body_ViewportLayer.addConfiguration(new NatTable_ConfigField_Weather(body_DataProvider));
 
       /*
-       * Create: Column header layer
+       * Column header layer
        */
       final IDataProvider columnHeader_DataProvider = new DataProvider_ColumnHeader(_natTable_DataLoader, _columnManager_NatTable);
       _natTable_ColumnHeader_DataLayer = new DataLayer(columnHeader_DataProvider);
@@ -1731,31 +1257,29 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             _natTable_Body_ViewportLayer,
             _natTable_Body_SelectionLayer);
 
-      final NatTable_SortModel glazedListsSortModel = new NatTable_SortModel(
-            configRegistry,
-            _natTable_ColumnHeader_DataLayer);
+      // header sorting
+      _natTable_SortModel = new NatTable_SortModel(_columnManager_NatTable, _natTable_DataLoader);
+      restoreState_BeforeUI();
 
-      final SortHeaderLayer<TVITourBookTour> sortHeaderLayer = new SortHeaderLayer<>(_natTable_ColumnHeader_Layer, glazedListsSortModel);
+      final SortHeaderLayer<TVITourBookTour> sortHeaderLayer = new SortHeaderLayer<>(
+            _natTable_ColumnHeader_Layer,
+            _natTable_SortModel);
 
-//      ColumnHeaderLayer columnHeaderLayer = new ColumnHeaderLayer(columnHeaderDataLayer, bodyLayer, bodyLayer.getSelectionLayer());
-//
-//      SortHeaderLayer<ExtendedPersonWithAddress> sortHeaderLayer = new SortHeaderLayer<>(
-//            columnHeaderLayer,
-//            new GlazedListsSortModel<>(
-//                  bodyLayer.getSortedList(),
-//                  columnPropertyAccessor,
-//                  configRegistry,
-//                  columnHeaderDataLayer));
+      // add single click handler to sort the column without pressing additional the ALT key
+      sortHeaderLayer.addConfiguration(new SingleClickSortConfiguration());
+      sortHeaderLayer.addLayerListener(listener -> {
+         natTable_OnColumnSort(listener);
+      });
 
       /*
-       * Create: Row header layer
+       * Row header layer
        */
       final DefaultRowHeaderDataProvider rowHeader_DataProvider = new DefaultRowHeaderDataProvider(body_DataProvider);
       final DefaultRowHeaderDataLayer rowHeader_DataLayer = new DefaultRowHeaderDataLayer(rowHeader_DataProvider);
       final ILayer rowHeader_Layer = new RowHeaderLayer(rowHeader_DataLayer, _natTable_Body_ViewportLayer, _natTable_Body_SelectionLayer);
 
       /*
-       * Create: Corner layer
+       * Corner layer
        */
       final DefaultCornerDataProvider corner_DataProvider = new DefaultCornerDataProvider(columnHeader_DataProvider, rowHeader_DataProvider);
       final DataLayer corner_DataLayer = new DataLayer(corner_DataProvider);
@@ -1769,11 +1293,13 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       /*
        * Setup other data
        */
+      final ArrayList<ColumnDefinition> allSortedColumns = _natTable_DataLoader.allSortedColumns;
+
       natTable_SetColumnWidths(allSortedColumns, _natTable_Body_DataLayer);
       natTable_RegisterColumnLabels(allSortedColumns, _natTable_Body_DataLayer, _natTable_ColumnHeader_DataLayer);
 
       /*
-       * Create: Table
+       * Create table
        */
       // turn the auto configuration off as we want to add custom configurations
       _tourViewer_NatTable = new NatTable(parent, gridLayer, false);
@@ -2611,6 +2137,21 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    }
 
    /**
+    * Column header is clicked to sort table by this column
+    *
+    * @param listener
+    */
+   private void natTable_OnColumnSort(final ILayerEvent listener) {
+
+      if (listener instanceof SortColumnEvent) {
+
+         Display.getDefault().timerExec(300, () -> {
+            natTable_ScrollSelectedToursIntoView();
+         });
+      }
+   }
+
+   /**
     * Register column labels for the body and header -> this is necessary to apply styling, images,
     * ...
     *
@@ -2643,6 +2184,48 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
          body_ColumnLabelAccumulator.registerColumnOverrides(colIndex, columnId);
       }
+   }
+
+   private void natTable_ScrollSelectedToursIntoView() {
+
+      _natTable_DataLoader.getRowIndexFromTourId(_selectedTourIds).thenAccept((allRowPositions) -> {
+
+         final int firstRowPosition = allRowPositions[0];
+         final int numVisibleRows = _natTable_Body_ViewportLayer.getRowCount();
+         final int scrollableRowCenterPosition = numVisibleRows / 2;
+
+         final Enum<SortDirectionEnum> sortDirection = _natTable_DataLoader.getSortDirection();
+         final String sortColumnId = _natTable_DataLoader.getSortColumnId();
+
+//         System.out.println((System.currentTimeMillis() + " " + sortColumnId));
+//         // TODO remove SYSTEM.OUT.PRINTLN
+
+         /*
+          * TODO Have no idea why this is necessary: needs an offset to make row visible, otherwise
+          * it is hidden, depending on the sort direction and column :-?
+          */
+         int rowOffset = 0;
+         switch (sortColumnId) {
+
+         case TableColumnFactory.ALTITUDE_SUMMARIZED_BORDER_UP_ID:
+         case TableColumnFactory.TIME_DATE_ID:
+         case TableColumnFactory.MOTION_DISTANCE_ID:
+         case TableColumnFactory.MOTION_MAX_SPEED_ID:
+
+            rowOffset = sortDirection.equals(SortDirectionEnum.DESC) ? -numVisibleRows : 0;
+            break;
+
+         case TableColumnFactory.TOUR_TITLE_ID:
+         case TableColumnFactory.DEVICE_NAME_ID:
+
+            rowOffset = sortDirection.equals(SortDirectionEnum.ASC) ? -numVisibleRows : 0;
+            break;
+         }
+
+         final int rowVerticalCenterPosition = firstRowPosition + scrollableRowCenterPosition + rowOffset;
+
+         _natTable_Body_ViewportLayer.moveRowPositionIntoViewport(rowVerticalCenterPosition);
+      });
    }
 
    /**
@@ -3077,6 +2660,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       }
    }
 
+   /**
+    *
+    */
    private void reselectTourViewer_NatTable() {
 
       _natTable_DataLoader.getRowIndexFromTourId(_selectedTourIds).thenAccept((allRowPositions) -> {
@@ -3206,7 +2792,13 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       String viewLayoutImage = null;
 
-      if (_viewLayout == TourBookViewLayout.CATEGORY_MONTH) {
+      if (_viewLayout == TourBookViewLayout.NAT_TABLE) {
+
+         viewLayoutImage = Messages.Image__TourBook_NatTable;
+
+         _isLayoutNatTable = true;
+
+      } else if (_viewLayout == TourBookViewLayout.CATEGORY_MONTH) {
 
          viewLayoutImage = Messages.Image__TourBook_Month;
 
@@ -3218,11 +2810,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
          _isLayoutNatTable = false;
 
-      } else if (_viewLayout == TourBookViewLayout.NAT_TABLE) {
-
-         viewLayoutImage = Messages.Image__TourBook_NatTable;
-
-         _isLayoutNatTable = true;
       }
 
       _actionToggleViewLayout.setImageDescriptor(TourbookPlugin.getImageDescriptor(viewLayoutImage));
@@ -3248,11 +2835,10 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       // sorting
       final String sortColumnId = Util.getStateString(_state, STATE_SORT_COLUMN_ID, TableColumnFactory.TIME_DATE_ID);
-      final int sortDirection = Util.getStateInt(_state, STATE_SORT_COLUMN_DIRECTION, ItemComparator_Table.DESCENDING);
+      final Enum<SortDirectionEnum> sortDirection = Util.getStateEnum(_state, STATE_SORT_COLUMN_DIRECTION, SortDirectionEnum.DESC);
 
-      // update comparator
-      _tourViewer_Table_Comparator.__sortColumnId = sortColumnId;
-      _tourViewer_Table_Comparator.__sortDirection = sortDirection;
+      // setup data loader
+      _natTable_DataLoader.setupSortColumn(sortColumnId, (SortDirectionEnum) sortDirection);
    }
 
    @PersistState
@@ -3276,8 +2862,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _state.put(STATE_VIEW_LAYOUT, _viewLayout.name());
 
       // viewer columns
-      _state.put(STATE_SORT_COLUMN_ID, _tourViewer_Table_Comparator.__sortColumnId);
-      _state.put(STATE_SORT_COLUMN_DIRECTION, _tourViewer_Table_Comparator.__sortDirection);
+      _state.put(STATE_SORT_COLUMN_ID, _natTable_DataLoader.getSortColumnId());
+      Util.setStateEnum(_state, STATE_SORT_COLUMN_DIRECTION, _natTable_DataLoader.getSortDirection());
 
       _columnManager_Tree.saveState(_state_Tree);
 
@@ -3286,7 +2872,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             _natTable_Body_DataLayer,
             _natTable_Body_ColumnReorderLayer,
             _natTable_Body_ColumnHideShowLayer);
-
    }
 
    private void selectTour(final long tourId) {
