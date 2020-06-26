@@ -88,6 +88,7 @@ public class ColumnDefinition implements Cloneable {
 
    private boolean                _isColumnResizable   = true;
    private boolean                _isColumnMoveable    = true;
+   private boolean                _isColumnFreezed;
 
    private ControlListener        _columnControlListener;
    private SelectionListener      _columnSelectionListener;
@@ -367,6 +368,13 @@ public class ColumnDefinition implements Cloneable {
     */
    public boolean isColumnDisplayed() {
       return _isColumnDisplayed;
+   }
+
+   /**
+    * @return the _isColumnFreezed
+    */
+   public boolean isColumnFreezed() {
+      return _isColumnFreezed;
    }
 
    /**
@@ -683,6 +691,13 @@ public class ColumnDefinition implements Cloneable {
       _isColumnDisplayed = isDisplayed;
    }
 
+   /**
+    * @param _isColumnFreezed the _isColumnFreezed to set
+    */
+   public void setIsColumnFreezed(final boolean _isColumnFreezed) {
+      this._isColumnFreezed = _isColumnFreezed;
+   }
+
    public void setIsColumnMoveable(final boolean isColumnMovablee) {
       _isColumnMoveable = isColumnMovablee;
    }
@@ -720,7 +735,7 @@ public class ColumnDefinition implements Cloneable {
 
       setValueFormats(availableFormats, null, defaultDetailFormat, columnManager);
    }
- 
+
    /**
     * Set formats which are used to render the column.
     * <p>

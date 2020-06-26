@@ -19,6 +19,8 @@ import java.util.ArrayList;
 
 import net.tourbook.common.UI;
 
+import org.eclipse.nebula.widgets.nattable.NatTable;
+
 public class ColumnProfile implements Cloneable {
 
    private static long                _idCreator;
@@ -49,6 +51,11 @@ public class ColumnProfile implements Cloneable {
     * @since 16.5
     */
    public ArrayList<ColumnProperties> columnProperties         = new ArrayList<>();
+
+   /**
+    * Column id which is frozen in a {@link NatTable} or <code>null</code> when nothing is frozen.
+    */
+   String                             frozenColumnId;
 
    private long                       _id;
 
@@ -91,7 +98,7 @@ public class ColumnProfile implements Cloneable {
          return false;
       }
       return true;
-   } 
+   }
 
    /**
     * @param columnId
@@ -107,6 +114,13 @@ public class ColumnProfile implements Cloneable {
       }
 
       return -1;
+   }
+
+   /**
+    * @return the frozenColumnId
+    */
+   public String getFrozenColumnId() {
+      return frozenColumnId;
    }
 
    public long getID() {

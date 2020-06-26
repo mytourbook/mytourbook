@@ -56,14 +56,19 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
+import org.eclipse.nebula.widgets.nattable.freeze.command.FreezeColumnCommand;
+import org.eclipse.nebula.widgets.nattable.freeze.command.UnFreezeGridCommand;
 import org.eclipse.nebula.widgets.nattable.grid.layer.ColumnHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.hideshow.ColumnHideShowLayer;
 import org.eclipse.nebula.widgets.nattable.layer.DataLayer;
 import org.eclipse.nebula.widgets.nattable.layer.ILayer;
 import org.eclipse.nebula.widgets.nattable.painter.IOverlayPainter;
+import org.eclipse.nebula.widgets.nattable.print.command.TurnViewportOffCommand;
+import org.eclipse.nebula.widgets.nattable.print.command.TurnViewportOnCommand;
 import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
 import org.eclipse.nebula.widgets.nattable.resize.command.InitializeAutoResizeColumnsCommand;
 import org.eclipse.nebula.widgets.nattable.util.GCFactory;
+import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -112,6 +117,7 @@ public class ColumnManager {
    private static final String ATTR_COLUMN_FORMAT_CATEGORY       = "categoryFormat";           //$NON-NLS-1$
    private static final String ATTR_COLUMN_FORMAT_DETAIL         = "detailFormat";             //$NON-NLS-1$
    private static final String ATTR_NAME                         = "name";                     //$NON-NLS-1$
+   private static final String ATTR_FROZEN_COLUMN_ID             = "frozenColumnId";           //$NON-NLS-1$
 
    private static final String ATTR_VISIBLE_COLUMN_IDS           = "visibleColumnIds";         //$NON-NLS-1$
    private static final String ATTR_VISIBLE_COLUMN_IDS_AND_WIDTH = "visibleColumnIdsAndWidth"; //$NON-NLS-1$
@@ -246,6 +252,41 @@ public class ColumnManager {
    void action_AddColumn(final ColumnDefinition colDef) {
 
       setVisibleColumnIds_Column_Show(colDef, false);
+   }
+
+   public void action_FreezeColumn(final ColumnDefinition colDef) {
+
+      // first unfreeze previous columns
+      action_UnFreezeAllColumns();
+
+      // update model
+      colDef.setIsColumnFreezed(true);
+      _activeProfile.frozenColumnId = colDef.getColumnId();
+
+      // update UI
+      final String columnId = colDef.getColumnId();
+      int currentColumnIndex = -1;
+
+      final String[] visibleColumnIds = _activeProfile.visibleColumnIds;
+      for (int columnIndex = 0; columnIndex < visibleColumnIds.length; columnIndex++) {
+
+         final String visibleColumnId = visibleColumnIds[columnIndex];
+
+         if (columnId.equals(visibleColumnId)) {
+            currentColumnIndex = columnIndex;
+            break;
+         }
+      }
+
+      final NatTable natTable = _natTablePropertiesProvider.getNatTable();
+
+      // keep current viewport otherwise the freeze command will move the viewport to the top
+      natTable.doCommand(new TurnViewportOffCommand());
+      {
+         natTable.doCommand(new FreezeColumnCommand(natTable, currentColumnIndex + 1));
+      }
+      natTable.doCommand(new TurnViewportOnCommand());
+
    }
 
    void action_SetValueFormatter(final ColumnDefinition colDef,
@@ -405,8 +446,56 @@ public class ColumnManager {
 
    }
 
+   private void action_UnFreezeAllColumns() {
+
+      /*
+       * Update model
+       */
+      _activeProfile.frozenColumnId = null;
+
+      boolean isAnyColumnFreezed = false;
+      for (final ColumnDefinition colDef : _allDefinedColumnDefinitions) {
+
+         isAnyColumnFreezed |= colDef.isColumnFreezed();
+
+         colDef.setIsColumnFreezed(false);
+      }
+
+      if (isAnyColumnFreezed == false) {
+
+         // there is nothing to unfreeze in the UI0
+         return;
+      }
+
+      /*
+       * Update UI
+       */
+      final ViewportLayer viewportLayer = _natTablePropertiesProvider.getNatTableLayer_Viewport();
+
+      // keep current viewport otherwise the unfreeze command will move the viewport to the top
+      viewportLayer.doCommand(new TurnViewportOffCommand());
+      {
+         _natTablePropertiesProvider.getNatTable().doCommand(new UnFreezeGridCommand());
+      }
+      viewportLayer.doCommand(new TurnViewportOnCommand());
+   }
+
    public void addColumn(final ColumnDefinition colDef) {
       _allDefinedColumnDefinitions.add(colDef);
+   }
+
+   /**
+    * @return Returns <code>true</code> when at least one column is freezed.
+    */
+   private boolean areColumnFreezed() {
+
+      for (final ColumnDefinition colDef : _allDefinedColumnDefinitions) {
+         if (colDef.isColumnFreezed()) {
+            return true;
+         }
+      }
+
+      return false;
    }
 
    /**
@@ -678,259 +767,6 @@ public class ColumnManager {
       });
 
       return headerContextMenu;
-   }
-
-   /**
-    * Creates the (h)eader (c)ontext (m)enu.
-    *
-    * @param contextMenu
-    */
-   private void createHCM_0_MenuItems(final Menu contextMenu) {
-
-      setVisibleColumnIds_FromViewer();
-
-      createHCM_10_CurrentColumn(contextMenu);
-      createHCM_20_AllColumns(contextMenu);
-      createHCM_30_Profiles(contextMenu);
-      createHCM_40_Columns(contextMenu);
-   }
-
-   private void createHCM_10_CurrentColumn(final Menu contextMenu) {
-
-      if (_headerColumnItem == null) {
-         // this is required
-         return;
-      }
-
-      final ColumnDefinition colDef = getColDef_FromHeaderColumn();
-
-      if (colDef == null) {
-         // this should not occure
-         return;
-      }
-
-      final String[] visibleIds = _activeProfile.visibleColumnIds;
-      final boolean canColumnBeSetToHidden = visibleIds.length > 1;
-
-      final ValueFormat[] availableFormatter = colDef.getAvailableFormatter();
-      final boolean isValueFormatterAvailable = availableFormatter != null && availableFormatter.length > 0;
-
-      if (!isValueFormatterAvailable && !canColumnBeSetToHidden) {
-         // nothing can be done
-         return;
-      }
-
-      {
-         /*
-          * Menu title: > Column: ... <
-          */
-
-         // create menu item text
-         final String menuItemText = NLS.bind(Messages.Action_ColumnManager_ColumnActions_Info, createColumnLabel(colDef, false));
-
-         final MenuItem menuItem = new MenuItem(contextMenu, SWT.PUSH);
-         menuItem.setText(menuItemText);
-         menuItem.setEnabled(false);
-      }
-
-      /*
-       * Action: Hide current column
-       */
-      if (canColumnBeSetToHidden) {
-
-         final MenuItem menuItem = new MenuItem(contextMenu, SWT.PUSH);
-         menuItem.setText(Messages.Action_ColumnManager_HideCurrentColumn);
-         menuItem.addListener(SWT.Selection, new Listener() {
-            @Override
-            public void handleEvent(final Event event) {
-               setVisibleColumnIds_Column_Hide(colDef);
-            }
-         });
-
-         if (colDef.canModifyVisibility() == false) {
-
-            // column cannot be hidden, disable it
-            menuItem.setEnabled(false);
-         }
-      }
-
-      /*
-       * Actions: Value Formatter
-       */
-      if (isValueFormatterAvailable) {
-
-         new ColumnFormatSubMenu(contextMenu, colDef, this);
-      }
-
-      createMenuSeparator(contextMenu);
-   }
-
-   private void createHCM_20_AllColumns(final Menu contextMenu) {
-
-      {
-         /*
-          * Action: Size All Columns to Fit
-          */
-         final MenuItem fitMenuItem = new MenuItem(contextMenu, SWT.PUSH);
-         fitMenuItem.setText(Messages.Action_App_SizeAllColumnsToFit);
-         fitMenuItem.addListener(SWT.Selection, new Listener() {
-            @Override
-            public void handleEvent(final Event event) {
-               action_SizeAllColumnToFit();
-            }
-         });
-      }
-
-      {
-         /*
-          * Action: Show all columns
-          */
-         final MenuItem allColumnsMenuItem = new MenuItem(contextMenu, SWT.PUSH);
-         allColumnsMenuItem.setText(Messages.Action_ColumnManager_ShowAllColumns);
-         allColumnsMenuItem.addListener(SWT.Selection, new Listener() {
-            @Override
-            public void handleEvent(final Event event) {
-               action_ShowAllColumns();
-            }
-         });
-      }
-
-      {
-         /*
-          * Action: Show default columns
-          */
-         final MenuItem defaultColumnsMenuItem = new MenuItem(contextMenu, SWT.PUSH);
-         defaultColumnsMenuItem.setText(Messages.Action_ColumnManager_ShowDefaultColumns);
-         defaultColumnsMenuItem.addListener(SWT.Selection, new Listener() {
-            @Override
-            public void handleEvent(final Event event) {
-               action_ShowDefaultColumns();
-            }
-         });
-      }
-
-      {
-         /*
-          * Action: &Customize Profiles/Columns...
-          */
-         final MenuItem configMenuItem = new MenuItem(contextMenu, SWT.PUSH);
-         configMenuItem.setText(Messages.Action_App_CustomizeColumnsAndProfiles);
-         configMenuItem.setImage(UI.IMAGE_REGISTRY.get(UI.IMAGE_CONFIGURE_COLUMNS));
-         configMenuItem.addListener(SWT.Selection, new Listener() {
-            @Override
-            public void handleEvent(final Event event) {
-               openColumnDialog();
-            }
-         });
-      }
-
-      createMenuSeparator(contextMenu);
-   }
-
-   /**
-    * Action: Profiles
-    */
-   private void createHCM_30_Profiles(final Menu contextMenu) {
-
-      {
-         // menu title
-         final MenuItem menuItem = new MenuItem(contextMenu, SWT.PUSH);
-         menuItem.setText(Messages.Action_ColumnManager_Profile_Info);
-         menuItem.setEnabled(false);
-      }
-
-      /*
-       * Actions: All profiles
-       */
-      Collections.sort(_allProfiles, _profileSorter);
-
-      for (int columnIndex = 0; columnIndex < _allProfiles.size(); columnIndex++) {
-
-         final ColumnProfile columnProfile = _allProfiles.get(columnIndex);
-         final boolean isChecked = columnProfile == _activeProfile;
-
-         String menuText =
-               columnProfile.name
-                     + COLUMN_TEXT_SEPARATOR
-                     + Integer.toString(columnProfile.visibleColumnIds.length);
-
-         // add a mnemonic to select a profile easier when debugging
-         if (columnIndex < 10) {
-            menuText = UI.SYMBOL_MNEMONIC + Integer.toString(columnIndex + 1) + UI.SPACE + menuText;
-         }
-
-         final MenuItem menuItem = new MenuItem(contextMenu, SWT.CHECK);
-
-         menuItem.setText(menuText);
-//			menuItem.setEnabled(true);
-         menuItem.setSelection(isChecked);
-
-         menuItem.setData(columnProfile);
-         menuItem.addListener(SWT.Selection, _colMenuItem_Listener);
-      }
-
-      createMenuSeparator(contextMenu);
-   }
-
-   /**
-    * Action: Columns
-    */
-   private void createHCM_40_Columns(final Menu contextMenu) {
-
-      /*
-       * Header: > Columns <
-       */
-      {
-         final MenuItem menuItem = new MenuItem(contextMenu, SWT.PUSH);
-         menuItem.setText(Messages.Action_ColumnManager_Column_Info);
-         menuItem.setEnabled(false);
-      }
-
-      /*
-       * Actions: All columns
-       */
-      final ArrayList<ColumnDefinition> allColumns = getRearrangedColumns();
-
-      final ArrayList<ColumnDefinition> displayedColumns = new ArrayList<>();
-      final ArrayList<ColumnDefinition> notDisplyedColumns = new ArrayList<>();
-      final HashSet<String> categorizedNames = new HashSet<>();
-
-      for (final ColumnDefinition colDef : allColumns) {
-
-         if (colDef.isColumnDisplayed()) {
-
-            displayedColumns.add(colDef);
-
-         } else {
-
-            notDisplyedColumns.add(colDef);
-
-            final String columnCategory = colDef.getColumnCategory();
-
-            if (columnCategory != null) {
-               categorizedNames.add(columnCategory);
-            }
-         }
-      }
-
-      // create menu items for each visible column
-      createColumnMenuItems(contextMenu, displayedColumns);
-
-      if (_isCategoryAvailable) {
-
-         // create submenus for each category
-
-         // sort by category name
-         final ArrayList<String> categories = new ArrayList<>(categorizedNames);
-         Collections.sort(categories);
-
-         new ColumnContextMenu(contextMenu, categories, notDisplyedColumns, this);
-
-      } else {
-
-         // create not categorized menu items
-         createColumnMenuItems(contextMenu, notDisplyedColumns);
-      }
    }
 
    public void createHeaderContextMenu(final NatTable natTable,
@@ -1309,6 +1145,290 @@ public class ColumnManager {
       new MenuItem(contextMenu, SWT.SEPARATOR);
    }
 
+   /**
+    * Creates the (h)eader (c)ontext (m)enu.
+    *
+    * @param contextMenu
+    */
+   private void fillHeaderCtxMenu_0_MenuItems(final Menu contextMenu) {
+
+      setVisibleColumnIds_FromViewer();
+
+      fillHeaderCtxMenu_10_CurrentColumn(contextMenu);
+      fillHeaderCtxMenu_20_AllColumns(contextMenu);
+      fillHeaderCtxMenu_30_Profiles(contextMenu);
+      fillHeaderCtxMenu_40_Columns(contextMenu);
+   }
+
+   private void fillHeaderCtxMenu_10_CurrentColumn(final Menu contextMenu) {
+
+      if (_headerColumnItem == null) {
+         // this is required
+         return;
+      }
+
+      final ColumnDefinition colDef = getColDef_FromHeaderColumn();
+      if (colDef == null) {
+         // this should not occure
+         return;
+      }
+
+      final String[] visibleIds = _activeProfile.visibleColumnIds;
+      final boolean canColumnBeSetToHidden = visibleIds.length > 1;
+
+      final ValueFormat[] availableFormatter = colDef.getAvailableFormatter();
+      final boolean isValueFormatterAvailable = availableFormatter != null && availableFormatter.length > 0;
+
+      if (!isValueFormatterAvailable && !canColumnBeSetToHidden) {
+         // nothing can be done
+         return;
+      }
+
+      {
+         /*
+          * Menu title: > Column: ... <
+          */
+
+         // create menu item text
+         final String menuItemText = NLS.bind(Messages.Action_ColumnManager_ColumnActions_Info, createColumnLabel(colDef, false));
+
+         final MenuItem menuItem = new MenuItem(contextMenu, SWT.PUSH);
+         menuItem.setText(menuItemText);
+         menuItem.setEnabled(false);
+      }
+
+      {
+         /*
+          * Action: Hide current column
+          */
+         if (canColumnBeSetToHidden) {
+
+            final MenuItem menuItem = new MenuItem(contextMenu, SWT.PUSH);
+            menuItem.setText(Messages.Action_ColumnManager_HideCurrentColumn);
+            menuItem.addListener(SWT.Selection, new Listener() {
+               @Override
+               public void handleEvent(final Event event) {
+                  setVisibleColumnIds_Column_Hide(colDef);
+               }
+            });
+
+            if (colDef.canModifyVisibility() == false) {
+
+               // column cannot be hidden, disable it
+               menuItem.setEnabled(false);
+            }
+         }
+      }
+
+      // set action only for the NatTable
+      if (_natTablePropertiesProvider != null) {
+         {
+            /*
+             * Action: Freeze current column
+             */
+            final MenuItem menuItem = new MenuItem(contextMenu, SWT.PUSH);
+            menuItem.setText(Messages.Action_ColumnManager_FreezeCurrentColumn);
+            menuItem.addListener(SWT.Selection, (event) -> {
+               action_FreezeColumn(colDef);
+            });
+
+            menuItem.setEnabled(colDef.isColumnFreezed() == false);
+         }
+         {
+            /*
+             * Action: Unfreeze all columns
+             */
+            final MenuItem menuItem = new MenuItem(contextMenu, SWT.PUSH);
+            menuItem.setText(Messages.Action_ColumnManager_UnFreezeAllColumns);
+            menuItem.addListener(SWT.Selection, (event) -> {
+               action_UnFreezeAllColumns();
+            });
+
+            menuItem.setEnabled(areColumnFreezed());
+         }
+      }
+
+      {
+         /*
+          * Actions: Value Formatter
+          */
+         if (isValueFormatterAvailable) {
+
+            new ColumnFormatSubMenu(contextMenu, colDef, this);
+         }
+      }
+
+      createMenuSeparator(contextMenu);
+   }
+
+   private void fillHeaderCtxMenu_20_AllColumns(final Menu contextMenu) {
+
+      {
+         /*
+          * Action: Size All Columns to Fit
+          */
+         final MenuItem fitMenuItem = new MenuItem(contextMenu, SWT.PUSH);
+         fitMenuItem.setText(Messages.Action_App_SizeAllColumnsToFit);
+         fitMenuItem.addListener(SWT.Selection, new Listener() {
+            @Override
+            public void handleEvent(final Event event) {
+               action_SizeAllColumnToFit();
+            }
+         });
+      }
+
+      {
+         /*
+          * Action: Show all columns
+          */
+         final MenuItem allColumnsMenuItem = new MenuItem(contextMenu, SWT.PUSH);
+         allColumnsMenuItem.setText(Messages.Action_ColumnManager_ShowAllColumns);
+         allColumnsMenuItem.addListener(SWT.Selection, new Listener() {
+            @Override
+            public void handleEvent(final Event event) {
+               action_ShowAllColumns();
+            }
+         });
+      }
+
+      {
+         /*
+          * Action: Show default columns
+          */
+         final MenuItem defaultColumnsMenuItem = new MenuItem(contextMenu, SWT.PUSH);
+         defaultColumnsMenuItem.setText(Messages.Action_ColumnManager_ShowDefaultColumns);
+         defaultColumnsMenuItem.addListener(SWT.Selection, new Listener() {
+            @Override
+            public void handleEvent(final Event event) {
+               action_ShowDefaultColumns();
+            }
+         });
+      }
+
+      {
+         /*
+          * Action: &Customize Profiles/Columns...
+          */
+         final MenuItem configMenuItem = new MenuItem(contextMenu, SWT.PUSH);
+         configMenuItem.setText(Messages.Action_App_CustomizeColumnsAndProfiles);
+         configMenuItem.setImage(UI.IMAGE_REGISTRY.get(UI.IMAGE_CONFIGURE_COLUMNS));
+         configMenuItem.addListener(SWT.Selection, new Listener() {
+            @Override
+            public void handleEvent(final Event event) {
+               openColumnDialog();
+            }
+         });
+      }
+
+      createMenuSeparator(contextMenu);
+   }
+
+   /**
+    * Action: Profiles
+    */
+   private void fillHeaderCtxMenu_30_Profiles(final Menu contextMenu) {
+
+      {
+         // menu title
+         final MenuItem menuItem = new MenuItem(contextMenu, SWT.PUSH);
+         menuItem.setText(Messages.Action_ColumnManager_Profile_Info);
+         menuItem.setEnabled(false);
+      }
+
+      /*
+       * Actions: All profiles
+       */
+      Collections.sort(_allProfiles, _profileSorter);
+
+      for (int columnIndex = 0; columnIndex < _allProfiles.size(); columnIndex++) {
+
+         final ColumnProfile columnProfile = _allProfiles.get(columnIndex);
+         final boolean isChecked = columnProfile == _activeProfile;
+
+         String menuText =
+               columnProfile.name
+                     + COLUMN_TEXT_SEPARATOR
+                     + Integer.toString(columnProfile.visibleColumnIds.length);
+
+         // add a mnemonic to select a profile easier when debugging
+         if (columnIndex < 10) {
+            menuText = UI.SYMBOL_MNEMONIC + Integer.toString(columnIndex + 1) + UI.SPACE + menuText;
+         }
+
+         final MenuItem menuItem = new MenuItem(contextMenu, SWT.CHECK);
+
+         menuItem.setText(menuText);
+//			menuItem.setEnabled(true);
+         menuItem.setSelection(isChecked);
+
+         menuItem.setData(columnProfile);
+         menuItem.addListener(SWT.Selection, _colMenuItem_Listener);
+      }
+
+      createMenuSeparator(contextMenu);
+   }
+
+   /**
+    * Action: Columns
+    */
+   private void fillHeaderCtxMenu_40_Columns(final Menu contextMenu) {
+
+      /*
+       * Header: > Columns <
+       */
+      {
+         final MenuItem menuItem = new MenuItem(contextMenu, SWT.PUSH);
+         menuItem.setText(Messages.Action_ColumnManager_Column_Info);
+         menuItem.setEnabled(false);
+      }
+
+      /*
+       * Actions: All columns
+       */
+      final ArrayList<ColumnDefinition> allColumns = getRearrangedColumns();
+
+      final ArrayList<ColumnDefinition> displayedColumns = new ArrayList<>();
+      final ArrayList<ColumnDefinition> notDisplyedColumns = new ArrayList<>();
+      final HashSet<String> categorizedNames = new HashSet<>();
+
+      for (final ColumnDefinition colDef : allColumns) {
+
+         if (colDef.isColumnDisplayed()) {
+
+            displayedColumns.add(colDef);
+
+         } else {
+
+            notDisplyedColumns.add(colDef);
+
+            final String columnCategory = colDef.getColumnCategory();
+
+            if (columnCategory != null) {
+               categorizedNames.add(columnCategory);
+            }
+         }
+      }
+
+      // create menu items for each visible column
+      createColumnMenuItems(contextMenu, displayedColumns);
+
+      if (_isCategoryAvailable) {
+
+         // create submenus for each category
+
+         // sort by category name
+         final ArrayList<String> categories = new ArrayList<>(categorizedNames);
+         Collections.sort(categories);
+
+         new ColumnContextMenu(contextMenu, categories, notDisplyedColumns, this);
+
+      } else {
+
+         // create not categorized menu items
+         createColumnMenuItems(contextMenu, notDisplyedColumns);
+      }
+   }
+
    public ColumnProfile getActiveProfile() {
       return _activeProfile;
    }
@@ -1383,9 +1503,9 @@ public class ColumnManager {
 
       if (_natTablePropertiesProvider != null) {
 
-         final DataLayer dataLayer = _natTablePropertiesProvider.getNatTable_Body_DataLayer();
-         final ColumnHideShowLayer columnHideShowLayer = _natTablePropertiesProvider.getNatTable_Body_ColumnHideShowLayer();
-         final ColumnReorderLayer columnReorderLayer = _natTablePropertiesProvider.getNatTable_Body_ColumnReorderLayer();
+         final DataLayer dataLayer = _natTablePropertiesProvider.getNatTableLayer_Data();
+         final ColumnHideShowLayer columnHideShowLayer = _natTablePropertiesProvider.getNatTableLayer_ColumnHideShow();
+         final ColumnReorderLayer columnReorderLayer = _natTablePropertiesProvider.getNatTableLayer_ColumnReorder();
 
          final int numColumns = dataLayer.getColumnCount();
 
@@ -1465,9 +1585,9 @@ public class ColumnManager {
 
       if (_natTablePropertiesProvider != null) {
 
-         final DataLayer dataLayer = _natTablePropertiesProvider.getNatTable_Body_DataLayer();
-         final ColumnHideShowLayer columnHideShowLayer = _natTablePropertiesProvider.getNatTable_Body_ColumnHideShowLayer();
-         final ColumnReorderLayer columnReorderLayer = _natTablePropertiesProvider.getNatTable_Body_ColumnReorderLayer();
+         final DataLayer dataLayer = _natTablePropertiesProvider.getNatTableLayer_Data();
+         final ColumnHideShowLayer columnHideShowLayer = _natTablePropertiesProvider.getNatTableLayer_ColumnHideShow();
+         final ColumnReorderLayer columnReorderLayer = _natTablePropertiesProvider.getNatTableLayer_ColumnReorder();
 
          final int numColumns = dataLayer.getColumnCount();
 
@@ -1602,7 +1722,7 @@ public class ColumnManager {
             menuItem.dispose();
          }
 
-         createHCM_0_MenuItems(headerContextMenu);
+         fillHeaderCtxMenu_0_MenuItems(headerContextMenu);
 
       } else {
 
@@ -1733,9 +1853,9 @@ public class ColumnManager {
 
       if (_natTablePropertiesProvider != null) {
 
-         final DataLayer dataLayer = _natTablePropertiesProvider.getNatTable_Body_DataLayer();
-         final ColumnHideShowLayer columnHideShowLayer = _natTablePropertiesProvider.getNatTable_Body_ColumnHideShowLayer();
-         final ColumnReorderLayer columnReorderLayer = _natTablePropertiesProvider.getNatTable_Body_ColumnReorderLayer();
+         final DataLayer dataLayer = _natTablePropertiesProvider.getNatTableLayer_Data();
+         final ColumnHideShowLayer columnHideShowLayer = _natTablePropertiesProvider.getNatTableLayer_ColumnHideShow();
+         final ColumnReorderLayer columnReorderLayer = _natTablePropertiesProvider.getNatTableLayer_ColumnReorder();
 
          final int numColumns = dataLayer.getColumnCount();
 
@@ -1997,6 +2117,12 @@ public class ColumnManager {
                      activeProfile = currentProfile;
                   }
 
+                  // frozen column id
+                  final String xmlFrozenColumnId = xmlProfile.getString(ATTR_FROZEN_COLUMN_ID);
+                  if (xmlIsShowAnnotations != null) {
+                     currentProfile.frozenColumnId = xmlFrozenColumnId;
+                  }
+
                   // visible column id's
                   final String xmlColumnIds = xmlProfile.getString(ATTR_VISIBLE_COLUMN_IDS);
                   if (xmlColumnIds != null) {
@@ -2201,8 +2327,18 @@ public class ColumnManager {
 
          xmlProfile.putString(ATTR_NAME, profile.name);
 
+         /*
+          * Set flag which is the active profile
+          */
          if (profile == _activeProfile) {
             xmlProfile.putBoolean(ATTR_IS_ACTIVE_PROFILE, true);
+         }
+
+         /*
+          * frozenColumnId
+          */
+         if (profile.frozenColumnId != null) {
+            xmlProfile.putString(ATTR_FROZEN_COLUMN_ID, profile.frozenColumnId);
          }
 
          /*
@@ -2210,10 +2346,7 @@ public class ColumnManager {
           */
          final String[] visibleColumnIds = profile.visibleColumnIds;
          if (visibleColumnIds != null) {
-
-            xmlProfile.putString(
-                  ATTR_VISIBLE_COLUMN_IDS,
-                  StringToArrayConverter.convertArrayToString(visibleColumnIds));
+            xmlProfile.putString(ATTR_VISIBLE_COLUMN_IDS, StringToArrayConverter.convertArrayToString(visibleColumnIds));
          }
 
          /*
@@ -2221,10 +2354,7 @@ public class ColumnManager {
           */
          final String[] visibleColumnIdsAndWidth = profile.visibleColumnIdsAndWidth;
          if (visibleColumnIdsAndWidth != null) {
-
-            xmlProfile.putString(
-                  ATTR_VISIBLE_COLUMN_IDS_AND_WIDTH,
-                  StringToArrayConverter.convertArrayToString(visibleColumnIdsAndWidth));
+            xmlProfile.putString(ATTR_VISIBLE_COLUMN_IDS_AND_WIDTH, StringToArrayConverter.convertArrayToString(visibleColumnIdsAndWidth));
          }
 
          /*

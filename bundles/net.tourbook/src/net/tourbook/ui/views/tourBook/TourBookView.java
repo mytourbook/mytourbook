@@ -132,6 +132,8 @@ import org.eclipse.nebula.widgets.nattable.coordinate.Range;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.nebula.widgets.nattable.data.IRowIdAccessor;
+import org.eclipse.nebula.widgets.nattable.freeze.CompositeFreezeLayer;
+import org.eclipse.nebula.widgets.nattable.freeze.FreezeLayer;
 import org.eclipse.nebula.widgets.nattable.grid.data.DefaultCornerDataProvider;
 import org.eclipse.nebula.widgets.nattable.grid.data.DefaultRowHeaderDataProvider;
 import org.eclipse.nebula.widgets.nattable.grid.layer.ColumnHeaderLayer;
@@ -146,8 +148,11 @@ import org.eclipse.nebula.widgets.nattable.layer.ILayer;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnOverrideLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ILayerCell;
 import org.eclipse.nebula.widgets.nattable.layer.event.ILayerEvent;
+import org.eclipse.nebula.widgets.nattable.painter.cell.BackgroundPainter;
 import org.eclipse.nebula.widgets.nattable.painter.cell.ImagePainter;
+import org.eclipse.nebula.widgets.nattable.painter.cell.TextPainter;
 import org.eclipse.nebula.widgets.nattable.painter.cell.decorator.CellPainterDecorator;
+import org.eclipse.nebula.widgets.nattable.painter.cell.decorator.PaddingDecorator;
 import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
 import org.eclipse.nebula.widgets.nattable.selection.RowSelectionModel;
 import org.eclipse.nebula.widgets.nattable.selection.RowSelectionProvider;
@@ -158,6 +163,8 @@ import org.eclipse.nebula.widgets.nattable.sort.SortDirectionEnum;
 import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.sort.config.SingleClickSortConfiguration;
 import org.eclipse.nebula.widgets.nattable.sort.event.SortColumnEvent;
+import org.eclipse.nebula.widgets.nattable.sort.painter.SortIconPainter;
+import org.eclipse.nebula.widgets.nattable.sort.painter.SortableHeaderTextPainter;
 import org.eclipse.nebula.widgets.nattable.style.CellStyleAttributes;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.eclipse.nebula.widgets.nattable.style.HorizontalAlignmentEnum;
@@ -611,7 +618,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          // loop: all displayed columns
          for (final ColumnDefinition colDef : _allSortedColumns) {
 
-            if (!colDef.isColumnDisplayed()) {
+            if (colDef.isColumnDisplayed() == false) {
                // visible columns are displayed first
                break;
             }
@@ -623,7 +630,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             case TableColumnFactory.TOUR_TYPE_ID:
             case TableColumnFactory.WEATHER_CLOUDS_ID:
 
-               // images are displayed for these column
+               // images are displayed for these columns -> do not set a style
                break;
 
             default:
@@ -632,10 +639,13 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
                final HorizontalAlignmentEnum columnAlignment = natTableConvert_ColumnAlignment(colDef.getColumnStyle());
 
-               // body style
+               // setup style for body+header
                style = new Style();
                style.setAttributeValue(CellStyleAttributes.HORIZONTAL_ALIGNMENT, columnAlignment);
 
+               // apply style:
+
+               // body style
                configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE,
                      style,
                      DisplayMode.NORMAL,
@@ -653,7 +663,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       }
 
       /**
-       * Convert col def style into nat table style
+       * Convert col def style -> nat table style
        *
        * @param columnStyle
        * @return
@@ -710,14 +720,36 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          this.cHeaderSelectionBgColor = cHeaderBgColor;
          this.cHeaderSelectionFgColor = cHeaderFgColor;
 
-//         public static final Color COLOR_LIST_SELECTION = Display.getDefault().getSystemColor(SWT.COLOR_LIST_SELECTION);
-//         public static final Color COLOR_LIST_SELECTION_TEXT = Display.getDefault().getSystemColor(SWT.COLOR_LIST_SELECTION_TEXT);
+//       public static final Color COLOR_LIST_SELECTION = Display.getDefault().getSystemColor(SWT.COLOR_LIST_SELECTION);
+//       public static final Color COLOR_LIST_SELECTION_TEXT = Display.getDefault().getSystemColor(SWT.COLOR_LIST_SELECTION_TEXT);
 
          // default selection style
-//         this.defaultSelectionBgColor = GUIHelper.COLOR_LIST_SELECTION;
-//         this.defaultSelectionFgColor = GUIHelper.COLOR_LIST_SELECTION_TEXT;
+//       this.defaultSelectionBgColor = GUIHelper.COLOR_LIST_SELECTION;
+//       this.defaultSelectionFgColor = GUIHelper.COLOR_LIST_SELECTION_TEXT;
          this.defaultSelectionBgColor = GUIHelper.COLOR_BLACK;
          this.defaultSelectionFgColor = GUIHelper.COLOR_YELLOW;
+
+         // show sort column indicator in black than in white
+         final SortableHeaderTextPainter interiorPainter = new SortableHeaderTextPainter(
+               new TextPainter(false, false),
+               CellEdgeEnum.RIGHT,
+//             new SortIconPainter(false, true),
+               new SortIconPainter(false, false),
+               false,
+               0,
+//             false);
+               true);
+
+         this.selectedSortHeaderCellPainter = new BackgroundPainter(new PaddingDecorator(interiorPainter,
+               0, // top
+               2, // right
+               0, // bottom
+               5, // left
+               false // is paint bg
+         ));
+
+         // freeze column separator
+         this.freezeSeparatorColor = GUIHelper.COLOR_WIDGET_BORDER;
       }
    }
 
@@ -1247,6 +1279,12 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _natTable_Body_ViewportLayer.addConfiguration(new NatTable_ConfigField_TourType(body_DataProvider));
       _natTable_Body_ViewportLayer.addConfiguration(new NatTable_ConfigField_Weather(body_DataProvider));
 
+      final FreezeLayer freezeLayer = new FreezeLayer(_natTable_Body_SelectionLayer);
+      final CompositeFreezeLayer compositeFreezeLayer = new CompositeFreezeLayer(
+            freezeLayer,
+            _natTable_Body_ViewportLayer,
+            _natTable_Body_SelectionLayer);
+
       /*
        * Column header layer
        */
@@ -1254,7 +1292,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _natTable_ColumnHeader_DataLayer = new DataLayer(columnHeader_DataProvider);
       _natTable_ColumnHeader_Layer = new ColumnHeaderLayer(
             _natTable_ColumnHeader_DataLayer,
-            _natTable_Body_ViewportLayer,
+            compositeFreezeLayer,
             _natTable_Body_SelectionLayer);
 
       // header sorting
@@ -1276,7 +1314,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
        */
       final DefaultRowHeaderDataProvider rowHeader_DataProvider = new DefaultRowHeaderDataProvider(body_DataProvider);
       final DefaultRowHeaderDataLayer rowHeader_DataLayer = new DefaultRowHeaderDataLayer(rowHeader_DataProvider);
-      final ILayer rowHeader_Layer = new RowHeaderLayer(rowHeader_DataLayer, _natTable_Body_ViewportLayer, _natTable_Body_SelectionLayer);
+      final ILayer rowHeader_Layer = new RowHeaderLayer(rowHeader_DataLayer, compositeFreezeLayer, _natTable_Body_SelectionLayer);
 
       /*
        * Corner layer
@@ -1288,7 +1326,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       /*
        * Create: Grid layer composed with the prior created layer stacks
        */
-      final GridLayer gridLayer = new GridLayer(_natTable_Body_ViewportLayer, sortHeaderLayer, rowHeader_Layer, corner_Layer);
+      final GridLayer gridLayer = new GridLayer(compositeFreezeLayer, sortHeaderLayer, rowHeader_Layer, corner_Layer);
 
       /*
        * Setup other data
@@ -1813,21 +1851,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       return _tourViewer_NatTable;
    }
 
-   @Override
-   public ColumnHideShowLayer getNatTable_Body_ColumnHideShowLayer() {
-      return _natTable_Body_ColumnHideShowLayer;
-   }
-
-   @Override
-   public ColumnReorderLayer getNatTable_Body_ColumnReorderLayer() {
-      return _natTable_Body_ColumnReorderLayer;
-   }
-
-   @Override
-   public DataLayer getNatTable_Body_DataLayer() {
-      return _natTable_Body_DataLayer;
-   }
-
    /**
     * @param event
     * @return Returns the {@link ColumnDefinition} of the currently selected row or
@@ -1860,6 +1883,26 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private RowSelectionModel<TVITourBookTour> getNatTable_SelectionModel() {
 
       return (RowSelectionModel<TVITourBookTour>) _natTable_Body_SelectionLayer.getSelectionModel();
+   }
+
+   @Override
+   public ColumnHideShowLayer getNatTableLayer_ColumnHideShow() {
+      return _natTable_Body_ColumnHideShowLayer;
+   }
+
+   @Override
+   public ColumnReorderLayer getNatTableLayer_ColumnReorder() {
+      return _natTable_Body_ColumnReorderLayer;
+   }
+
+   @Override
+   public DataLayer getNatTableLayer_Data() {
+      return _natTable_Body_DataLayer;
+   }
+
+   @Override
+   public ViewportLayer getNatTableLayer_Viewport() {
+      return _natTable_Body_ViewportLayer;
    }
 
    @Override
@@ -2661,7 +2704,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    }
 
    /**
-    *
+    * Reselect tours from {@link #_selectedTourIds}
     */
    private void reselectTourViewer_NatTable() {
 
@@ -2809,7 +2852,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          viewLayoutImage = Messages.Image__TourBook_Week;
 
          _isLayoutNatTable = false;
-
       }
 
       _actionToggleViewLayout.setImageDescriptor(TourbookPlugin.getImageDescriptor(viewLayoutImage));
@@ -2818,8 +2860,24 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
        * View options
        */
       _columnFactory.setIsShowSummaryRow(isShowSummaryRow());
-
       _columnFactory.updateToolTipState();
+
+      /*
+       * NatTable
+       */
+      // restore frozen column
+      final String frozenColumnId = _columnManager_NatTable.getActiveProfile().getFrozenColumnId();
+      if (frozenColumnId != null) {
+
+         for (final ColumnDefinition colDef : _columnManager_NatTable.getVisibleAndSortedColumns()) {
+
+            if (frozenColumnId.equals(colDef.getColumnId())) {
+
+               _columnManager_NatTable.action_FreezeColumn(colDef);
+               break;
+            }
+         }
+      }
    }
 
    private void restoreState_AfterUI() {
