@@ -50,6 +50,8 @@ public class NatTable_DataLoader {
 
    private static final char                              NL                    = net.tourbook.common.UI.NEW_LINE;
 
+   private static final String                            SQL_DEFAULT_FIELD     = "TourStartTime";                 //$NON-NLS-1$
+
    /**
     * Dummy field name for fields which currently cannot be sorted in the NatTable.
     */
@@ -346,10 +348,10 @@ public class NatTable_DataLoader {
        */
 
       // tour date
-      case TableColumnFactory.TIME_DATE_ID:                          return "TourStartTime";          //$NON-NLS-1$
+      case TableColumnFactory.TIME_DATE_ID:                          return SQL_DEFAULT_FIELD;
 
       // tour time, THERE IS CURRENTLY NO DATE ONLY FIELD
-      case TableColumnFactory.TIME_TOUR_START_TIME_ID:               return "TourStartTime";          //$NON-NLS-1$
+      case TableColumnFactory.TIME_TOUR_START_TIME_ID:               return FIELD_WITHOUT_SORTING;
 
       case TableColumnFactory.TOUR_TITLE_ID:                         return "TourTitle";              //$NON-NLS-1$
       case TableColumnFactory.DATA_IMPORT_FILE_NAME_ID:              return "TourImportFileName";     //$NON-NLS-1$
@@ -507,8 +509,7 @@ public class NatTable_DataLoader {
       default:
 
          // ensure a valid field is returned
-         return "TourStartTime"; //$NON-NLS-1$
-
+         return SQL_DEFAULT_FIELD;
       }
 
    // SET_FORMATTING_ON
@@ -764,6 +765,13 @@ public class NatTable_DataLoader {
       /*
        * Set sort field
        */
-      _sqlSortField = getSqlField(sortColumnId);
+      String sqlField = getSqlField(sortColumnId);
+
+      // ensure that the dummy field is not used in the sql statement, this should not happen but it did during development
+      if (FIELD_WITHOUT_SORTING.equals(sqlField)) {
+         sqlField = SQL_DEFAULT_FIELD;
+      }
+
+      _sqlSortField = sqlField;
    }
 }

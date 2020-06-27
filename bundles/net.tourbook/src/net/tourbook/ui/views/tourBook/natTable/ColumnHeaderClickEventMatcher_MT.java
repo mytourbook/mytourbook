@@ -39,6 +39,8 @@ public class ColumnHeaderClickEventMatcher_MT extends ColumnHeaderClickEventMatc
    }
 
    /**
+    * Not all columns can currently be used to sort the NatTable
+    *
     * @param event
     * @return Returns <code>true</code> when the column on the mouse click can be sorted.
     */

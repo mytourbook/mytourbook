@@ -1307,7 +1307,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       // header sorting
       _natTable_SortModel = new NatTable_SortModel(_columnManager_NatTable, _natTable_DataLoader);
-      restoreState_SortColumns();
 
       final SortHeaderLayer<TVITourBookTour> sortHeaderLayer = new SortHeaderLayer<>(_natTable_ColumnHeader_Layer, _natTable_SortModel);
 
@@ -1349,10 +1348,11 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
        */
       // turn the auto configuration off as we want to add custom configurations
       _tourViewer_NatTable = new NatTable(parent, gridLayer, false);
+      _tourViewer_NatTable.setConfigRegistry(configRegistry);
 
       _columnManager_NatTable.setupNatTable_PostCreate();
-      _tourViewer_NatTable.setConfigRegistry(configRegistry);
       setupColumnSorting();
+      restoreState_SortColumns();
 
       final UiBindingRegistry uiBindingRegistry = _tourViewer_NatTable.getUiBindingRegistry();
 
@@ -1379,9 +1379,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          }
       });
 
-      // prevent select all cells when column header is clicked on a column which cannot be sorted
+      // prevent selecting all cells when column header is clicked on a column which cannot be sorted
       uiBindingRegistry.registerSingleClickBinding(MouseEventMatcher.columnHeaderLeftClick(SWT.NONE), null);
-//      uiBindingRegistry.registerSingleClickBinding(MouseEventMatcher.columnHeaderLeftClick(SWT.NONE), new ViewportSelectColumnAction(false, false));
 
       /*
        * Do NatTable configuration
@@ -1397,8 +1396,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       _tourViewer_NatTable.addConfiguration(new NatTable_Configuration_Sorting());
 
-      // [4] add the menu configuration to a NatTable instance
-//      _tourViewer_NatTable.addConfiguration(new NatTable_Config_DebugMenu(_tourViewer_NatTable));
+      // add debug menu, this will hide MT context menu
+//    _tourViewer_NatTable.addConfiguration(new DebugMenuConfiguration(_tourViewer_NatTable));
 
       _tourViewer_NatTable.configure();
 
@@ -2910,9 +2909,11 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
    private void restoreState_SortColumns() {
 
-      // sorting
+      // get sorting state
       final String sortColumnId = Util.getStateString(_state, STATE_SORT_COLUMN_ID, TableColumnFactory.TIME_DATE_ID);
       final Enum<SortDirectionEnum> sortDirection = Util.getStateEnum(_state, STATE_SORT_COLUMN_DIRECTION, SortDirectionEnum.DESC);
+
+      _natTable_SortModel.setupSortColumn(sortColumnId, sortDirection);
 
       // setup data loader
       _natTable_DataLoader.setupSortColumn(sortColumnId, (SortDirectionEnum) sortDirection);

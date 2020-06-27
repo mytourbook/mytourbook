@@ -36,31 +36,31 @@ public class NatTable_SortModel implements ISortModel {
     * Array that contains the sort direction for every column. Needed to
     * access the current sort state of a column.
     */
-   protected SortDirectionEnum[] sortDirections;
+   private SortDirectionEnum[] _sortDirections;
 
    /**
     * Array that contains the sorted flags for every column. Needed to
     * access the current sort state of a column.
     */
-   protected boolean[]           sorted;
+   private boolean[]           _sorted;
 
    /**
     * As this implementation only supports single column sorting, this
     * property contains the the column index of the column that is
     * currently used for sorting. Initial value = -1 for no sort column
     */
-   protected int                 currentSortColumn    = -1;
+   private int                 _currentSortColumn    = -1;
 
    /**
     * As this implementation only supports single column sorting, this
     * property contains the current sort direction of the column that is
     * currently used for sorting.
     */
-   protected SortDirectionEnum   currentSortDirection = SortDirectionEnum.ASC;
+   private SortDirectionEnum   _currentSortDirection = SortDirectionEnum.ASC;
 
-   private ColumnManager         _columnManager;
+   private ColumnManager       _columnManager;
 
-   private NatTable_DataLoader   _dataLoader;
+   private NatTable_DataLoader _dataLoader;
 
    public NatTable_SortModel(final ColumnManager columnManager, final NatTable_DataLoader dataLoader) {
 
@@ -70,20 +70,20 @@ public class NatTable_SortModel implements ISortModel {
       final ArrayList<ColumnDefinition> allVisibleColums = _columnManager.getVisibleAndSortedColumns();
       final int numVisibleColums = allVisibleColums.size();
 
-      this.sortDirections = new SortDirectionEnum[numVisibleColums];
-      Arrays.fill(this.sortDirections, SortDirectionEnum.NONE);
+      _sortDirections = new SortDirectionEnum[numVisibleColums];
+      Arrays.fill(_sortDirections, SortDirectionEnum.NONE);
 
-      this.sorted = new boolean[numVisibleColums];
-      Arrays.fill(this.sorted, false);
+      _sorted = new boolean[numVisibleColums];
+      Arrays.fill(_sorted, false);
    }
 
    @Override
    public void clear() {
 
-      Arrays.fill(this.sortDirections, SortDirectionEnum.NONE);
-      Arrays.fill(this.sorted, false);
+      Arrays.fill(_sortDirections, SortDirectionEnum.NONE);
+      Arrays.fill(_sorted, false);
 
-      this.currentSortColumn = -1;
+      _currentSortColumn = -1;
    }
 
    @Override
@@ -103,7 +103,7 @@ public class NatTable_SortModel implements ISortModel {
     */
    @Override
    public SortDirectionEnum getSortDirection(final int columnIndex) {
-      return this.sortDirections[columnIndex];
+      return _sortDirections[columnIndex];
    }
 
    /**
@@ -114,8 +114,8 @@ public class NatTable_SortModel implements ISortModel {
    @Override
    public List<Integer> getSortedColumnIndexes() {
       final List<Integer> indexes = new ArrayList<>();
-      if (this.currentSortColumn > -1) {
-         indexes.add(Integer.valueOf(this.currentSortColumn));
+      if (_currentSortColumn > -1) {
+         indexes.add(Integer.valueOf(_currentSortColumn));
       }
       return indexes;
    }
@@ -134,7 +134,23 @@ public class NatTable_SortModel implements ISortModel {
     */
    @Override
    public boolean isColumnIndexSorted(final int columnIndex) {
-      return this.sorted[columnIndex];
+      return _sorted[columnIndex];
+   }
+
+   public void setupSortColumn(final String sortColumnId, final Enum<SortDirectionEnum> sortDirection) {
+
+      final ArrayList<ColumnDefinition> allVisibleColums = _columnManager.getVisibleAndSortedColumns();
+
+      for (int columnIndex = 0; columnIndex < allVisibleColums.size(); columnIndex++) {
+         final ColumnDefinition colDef = allVisibleColums.get(columnIndex);
+         if (sortColumnId.equals(colDef.getColumnId())) {
+
+            // setup sort fields, this will not start the sorting
+            sort(columnIndex, (SortDirectionEnum) sortDirection, false);
+
+            return;
+         }
+      }
    }
 
    @Override
@@ -152,12 +168,11 @@ public class NatTable_SortModel implements ISortModel {
          sortDirectionAdjusted = SortDirectionEnum.ASC;
       }
 
+      _sortDirections[columnIndex] = sortDirectionAdjusted;
+      _sorted[columnIndex] = sortDirectionAdjusted.equals(SortDirectionEnum.NONE) ? false : true;
 
-      this.sortDirections[columnIndex] = sortDirectionAdjusted;
-      this.sorted[columnIndex] = sortDirectionAdjusted.equals(SortDirectionEnum.NONE) ? false : true;
-
-      this.currentSortColumn = columnIndex;
-      this.currentSortDirection = sortDirectionAdjusted;
+      _currentSortColumn = columnIndex;
+      _currentSortDirection = sortDirectionAdjusted;
 
       final ArrayList<ColumnDefinition> allColumns = _columnManager.getVisibleAndSortedColumns();
       final String sortColumnId = allColumns.get(columnIndex).getColumnId();

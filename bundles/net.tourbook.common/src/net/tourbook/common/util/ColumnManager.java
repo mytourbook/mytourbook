@@ -164,7 +164,7 @@ public class ColumnManager {
    private boolean                           _isShowCategory               = true;
 
    private boolean                           _isShowColumnAnnotations;
-   private boolean                           _isSizeAllColumnsToFit;
+   private boolean                           _isDoAResizeForAllColumnsToFit;
 
    private Comparator<ColumnProfile>         _profileSorter;
 
@@ -373,7 +373,7 @@ public class ColumnManager {
             @Override
             public void run() {
 
-               _isSizeAllColumnsToFit = true;
+               _isDoAResizeForAllColumnsToFit = true;
 
                natTable.redraw();
                natTable.update();
@@ -2486,7 +2486,7 @@ public class ColumnManager {
    }
 
    /**
-    * Setup {@link NatTable} after it was created.
+    * Setup {@link NatTable} for autoresizing all columns after the table was created.
     */
    public void setupNatTable_PostCreate() {
 
@@ -2500,19 +2500,19 @@ public class ColumnManager {
          @Override
          public void paintOverlay(final GC gc, final ILayer layer) {
 
-            if (!_isSizeAllColumnsToFit) {
+            if (!_isDoAResizeForAllColumnsToFit) {
                return;
             }
 
             // reset flag, resizing is done only once when the corresponding action is selected
-            _isSizeAllColumnsToFit = false;
+            _isDoAResizeForAllColumnsToFit = false;
 
-            final int count = natTable.getColumnCount();
+            final int numColumns = natTable.getColumnCount();
 
             final IConfigRegistry configRegistry = natTable.getConfigRegistry();
             final GCFactory gcFactory = new GCFactory(natTable);
 
-            for (int columnIndex = 0; columnIndex < count; columnIndex++) {
+            for (int columnIndex = 0; columnIndex < numColumns; columnIndex++) {
 
                if (natTable.isColumnPositionResizable(columnIndex) == false) {
                   continue;
