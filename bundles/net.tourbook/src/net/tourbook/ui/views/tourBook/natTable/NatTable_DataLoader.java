@@ -48,15 +48,20 @@ import org.eclipse.swt.widgets.Display;
 
 public class NatTable_DataLoader {
 
-   private static final char                              NL                   = net.tourbook.common.UI.NEW_LINE;
+   private static final char                              NL                    = net.tourbook.common.UI.NEW_LINE;
 
-   private static final int                               FETCH_SIZE           = 1000;
+   /**
+    * Dummy field name for fields which currently cannot be sorted in the NatTable.
+    */
+   public static final String                             FIELD_WITHOUT_SORTING = "FIELD_WITHOUT_SORTING";         //$NON-NLS-1$
 
-   private static final ExecutorService                   _loadingExecutor     = createExecuter_TourLoading();
-   private static final ExecutorService                   _rowIndexExecutor    = createExecuter_TourId_RowIndex();
+   private static final int                               FETCH_SIZE            = 1000;
 
-   private ConcurrentHashMap<Integer, Integer>            _pageNumbers_Fetched = new ConcurrentHashMap<>();
-   private ConcurrentHashMap<Integer, LazyTourLoaderItem> _pageNumbers_Loading = new ConcurrentHashMap<>();
+   private static final ExecutorService                   _loadingExecutor      = createExecuter_TourLoading();
+   private static final ExecutorService                   _rowIndexExecutor     = createExecuter_TourId_RowIndex();
+
+   private ConcurrentHashMap<Integer, Integer>            _pageNumbers_Fetched  = new ConcurrentHashMap<>();
+   private ConcurrentHashMap<Integer, LazyTourLoaderItem> _pageNumbers_Loading  = new ConcurrentHashMap<>();
 
    /**
     * Relation between row position and tour item
@@ -64,7 +69,7 @@ public class NatTable_DataLoader {
     * Key: Row position<br>
     * Value: {@link TVITourBookTour}
     */
-   private ConcurrentHashMap<Integer, TVITourBookTour>    _fetchedTourItems    = new ConcurrentHashMap<>();
+   private ConcurrentHashMap<Integer, TVITourBookTour>    _fetchedTourItems     = new ConcurrentHashMap<>();
 
    /**
     * Relation between tour id and row position
@@ -72,8 +77,8 @@ public class NatTable_DataLoader {
     * Key: Tour ID <br>
     * Value: Row position
     */
-   private ConcurrentHashMap<Long, Integer>               _fetchedTourIndex    = new ConcurrentHashMap<>();
-   private final LinkedBlockingDeque<LazyTourLoaderItem>  _loaderWaitingQueue  = new LinkedBlockingDeque<>();
+   private ConcurrentHashMap<Long, Integer>               _fetchedTourIndex     = new ConcurrentHashMap<>();
+   private final LinkedBlockingDeque<LazyTourLoaderItem>  _loaderWaitingQueue   = new LinkedBlockingDeque<>();
 
    private String                                         _sortColumnId;
    private SortDirectionEnum                              _sortDirection;
@@ -94,7 +99,7 @@ public class NatTable_DataLoader {
    /**
     * Number of all tours for the current lazy loader
     */
-   private int                                            _numAllTourItems     = -1;
+   private int                                            _numAllTourItems      = -1;
 
    private TourBookView                                   _tourBookView;
 
@@ -325,12 +330,12 @@ public class NatTable_DataLoader {
    }
 
    /**
-    * Map column field -> database field
+    * Maps column field -> database field
     *
     * @param sortColumnId
     * @return Returns database field
     */
-   private String getSqlField(final String sortColumnId) {
+   public String getSqlField(final String sortColumnId) {
 
 // SET_FORMATTING_OFF
 
@@ -397,8 +402,8 @@ public class NatTable_DataLoader {
       /*
        * MOTION
        */
-//    case TableColumnFactory.MOTION_AVG_PACE_ID:                    return "";                       //$NON-NLS-1$
-//    case TableColumnFactory.MOTION_AVG_SPEED_ID:                   return "";                       //$NON-NLS-1$
+      case TableColumnFactory.MOTION_AVG_PACE_ID:                    return FIELD_WITHOUT_SORTING;
+      case TableColumnFactory.MOTION_AVG_SPEED_ID:                   return FIELD_WITHOUT_SORTING;
       case TableColumnFactory.MOTION_DISTANCE_ID:                    return "tourDistance";           //$NON-NLS-1$
       case TableColumnFactory.MOTION_MAX_SPEED_ID:                   return "maxSpeed";               //$NON-NLS-1$
 
@@ -421,8 +426,8 @@ public class NatTable_DataLoader {
       case TableColumnFactory.POWERTRAIN_CADENCE_MULTIPLIER_ID:                     return "cadenceMultiplier";                   //$NON-NLS-1$
       case TableColumnFactory.POWERTRAIN_GEAR_FRONT_SHIFT_COUNT_ID:                 return "frontShiftCount";                     //$NON-NLS-1$
       case TableColumnFactory.POWERTRAIN_GEAR_REAR_SHIFT_COUNT_ID:                  return "rearShiftCount";                      //$NON-NLS-1$
-//    case TableColumnFactory.POWERTRAIN_SLOW_VS_FAST_CADENCE_PERCENTAGES_ID:       return "";      //$NON-NLS-1$
-//    case TableColumnFactory.POWERTRAIN_SLOW_VS_FAST_CADENCE_ZONES_DELIMITER_ID:   return "";      //$NON-NLS-1$
+      case TableColumnFactory.POWERTRAIN_SLOW_VS_FAST_CADENCE_PERCENTAGES_ID:       return FIELD_WITHOUT_SORTING;
+      case TableColumnFactory.POWERTRAIN_SLOW_VS_FAST_CADENCE_ZONES_DELIMITER_ID:   return FIELD_WITHOUT_SORTING;
 
       /*
        * RUNNING DYNAMICS
@@ -456,13 +461,13 @@ public class NatTable_DataLoader {
        * TIME
        */
       case TableColumnFactory.TIME_DRIVING_TIME_ID:                  return "tourDrivingTime";                  //$NON-NLS-1$
-//    case TableColumnFactory.TIME_PAUSED_TIME_ID:                   return "";                                 //$NON-NLS-1$
-//    case TableColumnFactory.TIME_PAUSED_TIME_RELATIVE_ID:          return "";                                 //$NON-NLS-1$
+      case TableColumnFactory.TIME_PAUSED_TIME_ID:                   return FIELD_WITHOUT_SORTING;
+      case TableColumnFactory.TIME_PAUSED_TIME_RELATIVE_ID:          return FIELD_WITHOUT_SORTING;
       case TableColumnFactory.TIME_RECORDING_TIME_ID:                return "tourRecordingTime";                //$NON-NLS-1$
       case TableColumnFactory.TIME_TIME_ZONE_ID:                     return "TimeZoneId";                       //$NON-NLS-1$
-//    case TableColumnFactory.TIME_TIME_ZONE_DIFFERENCE_ID:          return "";                                 //$NON-NLS-1$
+      case TableColumnFactory.TIME_TIME_ZONE_DIFFERENCE_ID:          return FIELD_WITHOUT_SORTING;
 //    case TableColumnFactory.TIME_TOUR_START_TIME_ID:               // see indexed fields
-//    case TableColumnFactory.TIME_WEEK_DAY_ID:                      return "";                                 //$NON-NLS-1$
+      case TableColumnFactory.TIME_WEEK_DAY_ID:                      return FIELD_WITHOUT_SORTING;
 //    case TableColumnFactory.TIME_WEEK_NO_ID:                       // see indexed fields
 //    case TableColumnFactory.TIME_WEEKYEAR_ID:                      // see indexed fields
 
@@ -471,12 +476,12 @@ public class NatTable_DataLoader {
        */
       case TableColumnFactory.TOUR_LOCATION_START_ID:                return "tourStartPlace";                   //$NON-NLS-1$
       case TableColumnFactory.TOUR_LOCATION_END_ID:                  return "tourEndPlace";                     //$NON-NLS-1$
-//    case TableColumnFactory.TOUR_NUM_MARKERS_ID:                   return "";                                 //$NON-NLS-1$
-//    case TableColumnFactory.TOUR_NUM_PHOTOS_ID:                    return "";                                 //$NON-NLS-1$
-//    case TableColumnFactory.TOUR_TAGS_ID:                          return "";                                 //$NON-NLS-1$
+      case TableColumnFactory.TOUR_NUM_MARKERS_ID:                   return FIELD_WITHOUT_SORTING;
+      case TableColumnFactory.TOUR_NUM_PHOTOS_ID:                    return FIELD_WITHOUT_SORTING;
+      case TableColumnFactory.TOUR_TAGS_ID:                          return FIELD_WITHOUT_SORTING;
 //    case TableColumnFactory.TOUR_TITLE_ID:                         // see indexed fields
-//    case TableColumnFactory.TOUR_TYPE_ID:                          return "";                                 //$NON-NLS-1$
-//    case TableColumnFactory.TOUR_TYPE_TEXT_ID:                     return "";                                 //$NON-NLS-1$
+      case TableColumnFactory.TOUR_TYPE_ID:                          return FIELD_WITHOUT_SORTING;
+      case TableColumnFactory.TOUR_TYPE_TEXT_ID:                     return FIELD_WITHOUT_SORTING;
 
       /*
        * TRAINING
@@ -485,7 +490,7 @@ public class NatTable_DataLoader {
       case TableColumnFactory.TRAINING_EFFECT_ANAEROB_ID:            return "training_TrainingEffect_Anaerob";  //$NON-NLS-1$
       case TableColumnFactory.TRAINING_FTP_ID:                       return "power_FTP";                        //$NON-NLS-1$
       case TableColumnFactory.TRAINING_INTENSITY_FACTOR_ID:          return "power_IntensityFactor";            //$NON-NLS-1$
-//    case TableColumnFactory.TRAINING_POWER_TO_WEIGHT_ID:           return "";                                 //$NON-NLS-1$
+      case TableColumnFactory.TRAINING_POWER_TO_WEIGHT_ID:           return FIELD_WITHOUT_SORTING;
       case TableColumnFactory.TRAINING_STRESS_SCORE_ID:              return "power_TrainingStressScore";        //$NON-NLS-1$
       case TableColumnFactory.TRAINING_PERFORMANCE_LEVEL_ID:         return "training_TrainingPerformance";     //$NON-NLS-1$
 
@@ -501,15 +506,12 @@ public class NatTable_DataLoader {
 
       default:
 
-         System.out.println((System.currentTimeMillis() + String.format(" The sort column \"%s\" is not defined",sortColumnId)));
-         // TODO remove SYSTEM.OUT.PRINTLN
-
+         // ensure a valid field is returned
          return "TourStartTime"; //$NON-NLS-1$
 
       }
 
    // SET_FORMATTING_ON
-
    }
 
    /**
@@ -675,9 +677,6 @@ public class NatTable_DataLoader {
 
             + " OFFSET ? ROWS FETCH NEXT ? ROWS ONLY" + NL //                          //$NON-NLS-1$
       ;
-
-//      System.out.println((System.currentTimeMillis() + sql));
-//      // TODO remove SYSTEM.OUT.PRINTLN
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 

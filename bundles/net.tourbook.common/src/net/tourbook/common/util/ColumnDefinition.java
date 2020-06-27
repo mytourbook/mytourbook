@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,6 +27,7 @@ import org.eclipse.jface.viewers.ColumnLayoutData;
 import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Table;
@@ -99,7 +100,7 @@ public class ColumnDefinition implements Cloneable {
     * when <code>true</code> this column will be checked in the modify dialog when the default
     * button is selected
     */
-   private boolean                _isDefaultColumn     = false;
+   private boolean                _isDefaultColumn;
 
    private int                    _defaultColumnWidth;
 
@@ -107,11 +108,16 @@ public class ColumnDefinition implements Cloneable {
     * The column will have the width of 0 to be hidden, this is necessary that the first visible
     * column can be right aligned
     */
-   private boolean                _isColumnHidden      = false;
+   private boolean                _isColumnHidden;
 
    private EditingSupport         _editingSupport;
 
    private ColumnLayoutData       _columnLayoutData;
+
+   /**
+    * When <code>true</code> then this column can be sorted in the {@link NatTable}
+    */
+   private boolean                _canSortColumn;
 
    /*
     * Value formatter
@@ -149,6 +155,10 @@ public class ColumnDefinition implements Cloneable {
     */
    public boolean canModifyVisibility() {
       return _canModifyVisibility;
+   }
+
+   public boolean canSortColumn() {
+      return _canSortColumn;
    }
 
    @Override
@@ -565,6 +575,14 @@ public class ColumnDefinition implements Cloneable {
       _canModifyVisibility = canModifyVisibility;
    }
 
+   /**
+    * @param canSortColumn
+    *           the _canSortColumn to set
+    */
+   public void setCanSortColumn(final boolean canSortColumn) {
+      _canSortColumn = canSortColumn;
+   }
+
    public void setColumnCategory(final String category) {
       _columnCategory = category;
    }
@@ -692,7 +710,8 @@ public class ColumnDefinition implements Cloneable {
    }
 
    /**
-    * @param _isColumnFreezed the _isColumnFreezed to set
+    * @param _isColumnFreezed
+    *           the _isColumnFreezed to set
     */
    public void setIsColumnFreezed(final boolean _isColumnFreezed) {
       this._isColumnFreezed = _isColumnFreezed;

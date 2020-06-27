@@ -90,6 +90,7 @@ import net.tourbook.ui.views.tourBook.natTable.DataProvider_ColumnHeader;
 import net.tourbook.ui.views.tourBook.natTable.NatTable_DataLoader;
 import net.tourbook.ui.views.tourBook.natTable.NatTable_Header_Tooltip;
 import net.tourbook.ui.views.tourBook.natTable.NatTable_SortModel;
+import net.tourbook.ui.views.tourBook.natTable.SingleClickSortConfiguration_MT;
 import net.tourbook.ui.views.tourBook.natTable.TourRowDataProvider;
 
 import org.eclipse.core.runtime.Path;
@@ -161,7 +162,6 @@ import org.eclipse.nebula.widgets.nattable.selection.command.SelectRowsCommand;
 import org.eclipse.nebula.widgets.nattable.selection.config.DefaultRowSelectionLayerConfiguration;
 import org.eclipse.nebula.widgets.nattable.sort.SortDirectionEnum;
 import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
-import org.eclipse.nebula.widgets.nattable.sort.config.SingleClickSortConfiguration;
 import org.eclipse.nebula.widgets.nattable.sort.event.SortColumnEvent;
 import org.eclipse.nebula.widgets.nattable.sort.painter.SortIconPainter;
 import org.eclipse.nebula.widgets.nattable.sort.painter.SortableHeaderTextPainter;
@@ -172,6 +172,7 @@ import org.eclipse.nebula.widgets.nattable.style.Style;
 import org.eclipse.nebula.widgets.nattable.style.theme.ModernNatTableThemeConfiguration;
 import org.eclipse.nebula.widgets.nattable.tooltip.NatTableContentTooltip;
 import org.eclipse.nebula.widgets.nattable.ui.action.IMouseAction;
+import org.eclipse.nebula.widgets.nattable.ui.binding.UiBindingRegistry;
 import org.eclipse.nebula.widgets.nattable.ui.matcher.MouseEventMatcher;
 import org.eclipse.nebula.widgets.nattable.ui.util.CellEdgeEnum;
 import org.eclipse.nebula.widgets.nattable.util.GUIHelper;
@@ -209,8 +210,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
 // SET_FORMATTING_ON
    //
-   static public final String             ID                                              = "net.tourbook.views.tourListView";          //$NON-NLS-1$
-   //
+   static public final String ID = "net.tourbook.views.tourListView"; //$NON-NLS-1$
+
+//
    private final static IPreferenceStore  _prefStore                                      = TourbookPlugin.getPrefStore();
    private final static IPreferenceStore  _prefStoreCommon                                = CommonActivator.getPrefStore();
    //
@@ -293,7 +295,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private boolean                        _isLayoutNatTable;
    //
    private final TourDoubleClickState     _tourDoubleClickState                           = new TourDoubleClickState();
-//   private TableViewerTourInfoToolTip     _tourInfoToolTip_NatTable;
+   //   private TableViewerTourInfoToolTip     _tourInfoToolTip_NatTable;
    private TreeViewerTourInfoToolTip      _tourInfoToolTip_Tree;
 //
    private TagMenuManager                 _tagMenuManager;
@@ -342,7 +344,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    //
    private Menu                           _contextMenu_NatTable;
    private Menu                           _contextMenu_Tree;
-
    private ActionShowOnlySelectedTours    _actionShowOnlySelectedTours;
 
    private class ActionLinkWithOtherViews extends ActionToolbarSlideout {
@@ -703,6 +704,25 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       }
    }
 
+   private class NatTable_Configuration_Sorting extends AbstractRegistryConfiguration {
+
+      @Override
+      public void configureRegistry(final IConfigRegistry configRegistry) {
+
+//         for (final ColumnDefinition colDef : _columnManager_NatTable.getRearrangedColumns()) {
+//
+//            final String columnId = colDef.getColumnId();
+//
+//            // register null comparator to disable sorting for some columns
+//            configRegistry.registerConfigAttribute(
+//                  SortConfigAttributes.SORT_COMPARATOR,
+//                  new NullComparator(),
+//                  DisplayMode.NORMAL,
+//                  columnId + HEADER_COLUMN_ID_POSTFIX);
+//         }
+      }
+   }
+
    private class NatTable_Configuration_Theme extends ModernNatTableThemeConfiguration {
 
       public NatTable_Configuration_Theme() {
@@ -724,10 +744,10 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 //       public static final Color COLOR_LIST_SELECTION_TEXT = Display.getDefault().getSystemColor(SWT.COLOR_LIST_SELECTION_TEXT);
 
          // default selection style
-//       this.defaultSelectionBgColor = GUIHelper.COLOR_LIST_SELECTION;
-//       this.defaultSelectionFgColor = GUIHelper.COLOR_LIST_SELECTION_TEXT;
-         this.defaultSelectionBgColor = GUIHelper.COLOR_BLACK;
-         this.defaultSelectionFgColor = GUIHelper.COLOR_YELLOW;
+         this.defaultSelectionBgColor = GUIHelper.COLOR_LIST_SELECTION;
+         this.defaultSelectionFgColor = GUIHelper.COLOR_LIST_SELECTION_TEXT;
+//         this.defaultSelectionBgColor = GUIHelper.COLOR_BLACK;
+//         this.defaultSelectionFgColor = GUIHelper.COLOR_YELLOW;
 
          // show sort column indicator in black than in white
          final SortableHeaderTextPainter interiorPainter = new SortableHeaderTextPainter(
@@ -738,7 +758,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
                false,
                0,
 //             false);
-               true);
+               true // with this fix, the sort column indicator is not writter over the column label
+         );
 
          this.selectedSortHeaderCellPainter = new BackgroundPainter(new PaddingDecorator(interiorPainter,
                0, // top
@@ -752,17 +773,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          this.freezeSeparatorColor = GUIHelper.COLOR_WIDGET_BORDER;
       }
    }
-
-//   private final class NatTable_DataLayer_Body extends DataLayer {
-//
-//      private NatTable_DataLayer_Body(final IDataProvider dataProvider) {
-//         super(dataProvider);
-//      }
-//
-//      private SizeConfig getColumnWidthConfig() {
-//         return columnWidthConfig;
-//      }
-//   }
 
    void actionExportViewCSV() {
 
@@ -1297,14 +1307,12 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       // header sorting
       _natTable_SortModel = new NatTable_SortModel(_columnManager_NatTable, _natTable_DataLoader);
-      restoreState_BeforeUI();
+      restoreState_SortColumns();
 
-      final SortHeaderLayer<TVITourBookTour> sortHeaderLayer = new SortHeaderLayer<>(
-            _natTable_ColumnHeader_Layer,
-            _natTable_SortModel);
+      final SortHeaderLayer<TVITourBookTour> sortHeaderLayer = new SortHeaderLayer<>(_natTable_ColumnHeader_Layer, _natTable_SortModel);
 
       // add single click handler to sort the column without pressing additional the ALT key
-      sortHeaderLayer.addConfiguration(new SingleClickSortConfiguration());
+      sortHeaderLayer.addConfiguration(new SingleClickSortConfiguration_MT(_columnManager_NatTable));
       sortHeaderLayer.addLayerListener(listener -> {
          natTable_OnColumnSort(listener);
       });
@@ -1344,6 +1352,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       _columnManager_NatTable.setupNatTable_PostCreate();
       _tourViewer_NatTable.setConfigRegistry(configRegistry);
+      setupColumnSorting();
+
+      final UiBindingRegistry uiBindingRegistry = _tourViewer_NatTable.getUiBindingRegistry();
 
       // add mouse double click listener
       final IMouseAction mouseDoubleClickAction = new IMouseAction() {
@@ -1353,7 +1364,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             TourManager.getInstance().tourDoubleClickAction(TourBookView.this, _tourDoubleClickState);
          }
       };
-      _tourViewer_NatTable.getUiBindingRegistry().registerDoubleClickBinding(MouseEventMatcher.bodyLeftClick(SWT.NONE), mouseDoubleClickAction);
+      uiBindingRegistry.registerDoubleClickBinding(MouseEventMatcher.bodyLeftClick(SWT.NONE), mouseDoubleClickAction);
 
       // setup selection listener for the nattable
       final ISelectionProvider selectionProvider = new RowSelectionProvider<>(
@@ -1368,6 +1379,10 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          }
       });
 
+      // prevent select all cells when column header is clicked on a column which cannot be sorted
+      uiBindingRegistry.registerSingleClickBinding(MouseEventMatcher.columnHeaderLeftClick(SWT.NONE), null);
+//      uiBindingRegistry.registerSingleClickBinding(MouseEventMatcher.columnHeaderLeftClick(SWT.NONE), new ViewportSelectColumnAction(false, false));
+
       /*
        * Do NatTable configuration
        */
@@ -1379,6 +1394,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       // add the style configuration for hover
       _tourViewer_NatTable.addConfiguration(new NatTable_Configuration_Hover());
+
+      _tourViewer_NatTable.addConfiguration(new NatTable_Configuration_Sorting());
 
       // [4] add the menu configuration to a NatTable instance
 //      _tourViewer_NatTable.addConfiguration(new NatTable_Config_DebugMenu(_tourViewer_NatTable));
@@ -2188,7 +2205,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       if (listener instanceof SortColumnEvent) {
 
-         Display.getDefault().timerExec(300, () -> {
+         // move selected tour into view
+
+         Display.getDefault().timerExec(10, () -> {
             natTable_ScrollSelectedToursIntoView();
          });
       }
@@ -2247,23 +2266,23 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
           * TODO Have no idea why this is necessary: needs an offset to make row visible, otherwise
           * it is hidden, depending on the sort direction and column :-?
           */
-         int rowOffset = 0;
-         switch (sortColumnId) {
-
-         case TableColumnFactory.ALTITUDE_SUMMARIZED_BORDER_UP_ID:
-         case TableColumnFactory.TIME_DATE_ID:
-         case TableColumnFactory.MOTION_DISTANCE_ID:
-         case TableColumnFactory.MOTION_MAX_SPEED_ID:
-
-            rowOffset = sortDirection.equals(SortDirectionEnum.DESC) ? -numVisibleRows : 0;
-            break;
-
-         case TableColumnFactory.TOUR_TITLE_ID:
-         case TableColumnFactory.DEVICE_NAME_ID:
-
-            rowOffset = sortDirection.equals(SortDirectionEnum.ASC) ? -numVisibleRows : 0;
-            break;
-         }
+         final int rowOffset = 0;
+//         switch (sortColumnId) {
+//
+//         case TableColumnFactory.ALTITUDE_SUMMARIZED_BORDER_UP_ID:
+//         case TableColumnFactory.TIME_DATE_ID:
+//         case TableColumnFactory.MOTION_DISTANCE_ID:
+//         case TableColumnFactory.MOTION_MAX_SPEED_ID:
+//
+//            rowOffset = sortDirection.equals(SortDirectionEnum.DESC) ? -numVisibleRows : 0;
+//            break;
+//
+//         case TableColumnFactory.TOUR_TITLE_ID:
+//         case TableColumnFactory.DEVICE_NAME_ID:
+//
+//            rowOffset = sortDirection.equals(SortDirectionEnum.ASC) ? -numVisibleRows : 0;
+//            break;
+//         }
 
          final int rowVerticalCenterPosition = firstRowPosition + scrollableRowCenterPosition + rowOffset;
 
@@ -2889,7 +2908,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _actionLinkWithOtherViews.setSelection(_state.getBoolean(STATE_IS_LINK_WITH_OTHER_VIEWS));
    }
 
-   private void restoreState_BeforeUI() {
+   private void restoreState_SortColumns() {
 
       // sorting
       final String sortColumnId = Util.getStateString(_state, STATE_SORT_COLUMN_ID, TableColumnFactory.TIME_DATE_ID);
@@ -3142,6 +3161,19 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    void setLinkAndCollapse(final boolean isCollapseOthers) {
 
       _isCollapseOthers = isCollapseOthers;
+   }
+
+   /**
+    * Set flag in all {@link ColumnDefinition}s if the column can be sorted or not.
+    */
+   private void setupColumnSorting() {
+
+      for (final ColumnDefinition colDef : _columnManager_NatTable.getRearrangedColumns()) {
+
+         final String sqlField = _natTable_DataLoader.getSqlField(colDef.getColumnId());
+
+         colDef.setCanSortColumn(NatTable_DataLoader.FIELD_WITHOUT_SORTING.equals(sqlField) == false);
+      }
    }
 
    private void setupTourViewerContent() {

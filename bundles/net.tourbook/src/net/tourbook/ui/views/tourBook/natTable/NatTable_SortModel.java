@@ -138,30 +138,32 @@ public class NatTable_SortModel implements ISortModel {
    }
 
    @Override
-   public void sort(final int columnIndex, SortDirectionEnum sortDirection, final boolean isAccumulate) {
+   public void sort(final int columnIndex, final SortDirectionEnum sortDirection, final boolean isAccumulate) {
 
       if (!isColumnIndexSorted(columnIndex)) {
          clear();
       }
 
+      SortDirectionEnum sortDirectionAdjusted = sortDirection;
+
       if (sortDirection.equals(SortDirectionEnum.NONE)) {
 
          // we don't support NONE as user action
-         sortDirection = SortDirectionEnum.ASC;
+         sortDirectionAdjusted = SortDirectionEnum.ASC;
       }
 
 
-      this.sortDirections[columnIndex] = sortDirection;
-      this.sorted[columnIndex] = sortDirection.equals(SortDirectionEnum.NONE) ? false : true;
+      this.sortDirections[columnIndex] = sortDirectionAdjusted;
+      this.sorted[columnIndex] = sortDirectionAdjusted.equals(SortDirectionEnum.NONE) ? false : true;
 
       this.currentSortColumn = columnIndex;
-      this.currentSortDirection = sortDirection;
+      this.currentSortDirection = sortDirectionAdjusted;
 
       final ArrayList<ColumnDefinition> allColumns = _columnManager.getVisibleAndSortedColumns();
       final String sortColumnId = allColumns.get(columnIndex).getColumnId();
 
-      // setup the data loader with the new sorting field
-      _dataLoader.setupSortColumn(sortColumnId, sortDirection);
+      // setup the data loader with the new sorting field/direction
+      _dataLoader.setupSortColumn(sortColumnId, sortDirectionAdjusted);
    }
 
 }
