@@ -267,7 +267,7 @@ public class ColumnManager {
       final String columnId = colDef.getColumnId();
       int currentColumnIndex = -1;
 
-      final String[] visibleColumnIds = _activeProfile.visibleColumnIds;
+      final String[] visibleColumnIds = _activeProfile.getVisibleColumnIds();
       for (int columnIndex = 0; columnIndex < visibleColumnIds.length; columnIndex++) {
 
          final String visibleColumnId = visibleColumnIds[columnIndex];
@@ -549,7 +549,7 @@ public class ColumnManager {
 
          colMenuItem.setText(columnLabel);
          colMenuItem.setEnabled(colDef.canModifyVisibility());
-         colMenuItem.setSelection(colDef.isColumnDisplayed());
+         colMenuItem.setSelection(colDef.isColumnCheckedInContextMenu());
 
          colMenuItem.setData(colDef);
          colMenuItem.addListener(SWT.Selection, _colMenuItem_Listener);
@@ -565,7 +565,7 @@ public class ColumnManager {
 
       _columnViewer = columnViewer;
 
-      setVisibleColDefs(_activeProfile);
+      setupVisibleColDefs(_activeProfile);
 
       if (columnViewer instanceof TableViewer) {
 
@@ -1173,7 +1173,7 @@ public class ColumnManager {
          return;
       }
 
-      final String[] visibleIds = _activeProfile.visibleColumnIds;
+      final String[] visibleIds = _activeProfile.getVisibleColumnIds();
       final boolean canColumnBeSetToHidden = visibleIds.length > 1;
 
       final ValueFormat[] availableFormatter = colDef.getAvailableFormatter();
@@ -1349,7 +1349,7 @@ public class ColumnManager {
                + COLUMN_TEXT_SEPARATOR
 
                // show number of visible columns
-               + Integer.toString(columnProfile.visibleColumnIds.length);
+               + Integer.toString(columnProfile.getVisibleColumnIds().length);
 
          // add a mnemonic to select a profile easier when debugging
          if (columnIndex < 10) {
@@ -1394,7 +1394,7 @@ public class ColumnManager {
 
       for (final ColumnDefinition colDef : allColumns) {
 
-         if (colDef.isColumnDisplayed()) {
+         if (colDef.isColumnCheckedInContextMenu()) {
 
             displayedColumns.add(colDef);
 
@@ -1930,7 +1930,7 @@ public class ColumnManager {
          if (colDef != null) {
 
             // check all visible columns in the dialog
-            colDef.setIsColumnDisplayed(true);
+            colDef.setIsColumnChecked(true);
 
             // set column width
             colDef.setColumnWidth(getColumnWidth(colDef.getColumnId()));
@@ -1948,7 +1948,7 @@ public class ColumnManager {
       for (final ColumnDefinition colDef : allColDefClone) {
 
          // uncheck hidden columns
-         colDef.setIsColumnDisplayed(false);
+         colDef.setIsColumnChecked(false);
 
          // set column default width
          colDef.setColumnWidth(colDef.getDefaultColumnWidth());
@@ -2128,7 +2128,7 @@ public class ColumnManager {
                   final String xmlColumnIds = xmlProfile.getString(ATTR_VISIBLE_COLUMN_IDS);
                   if (xmlColumnIds != null) {
 
-                     currentProfile.visibleColumnIds = StringToArrayConverter.convertStringToArray(xmlColumnIds);
+                     currentProfile.setVisibleColumnIds(StringToArrayConverter.convertStringToArray(xmlColumnIds));
                   }
 
                   // visible column id's and width
@@ -2226,7 +2226,7 @@ public class ColumnManager {
       // save column sort order
       final String[] visibleColumnIds = getColumns_FromViewer_Ids();
       if (visibleColumnIds != null) {
-         _activeProfile.visibleColumnIds = visibleColumnIds;
+         _activeProfile.setVisibleColumnIds(visibleColumnIds);
       }
 
       // save columns width and keep it for internal use
@@ -2286,7 +2286,7 @@ public class ColumnManager {
          }
       }
 
-      _activeProfile.visibleColumnIds = allOrderedColumnIds.toArray(new String[allOrderedColumnIds.size()]);
+      _activeProfile.setVisibleColumnIds(allOrderedColumnIds.toArray(new String[allOrderedColumnIds.size()]));
       _activeProfile.visibleColumnIdsAndWidth = allColumnIdsAndWidth.toArray(new String[allColumnIdsAndWidth.size()]);
 
       saveState_All(state);
@@ -2345,7 +2345,7 @@ public class ColumnManager {
          /*
           * visibleColumnIds
           */
-         final String[] visibleColumnIds = profile.visibleColumnIds;
+         final String[] visibleColumnIds = profile.getVisibleColumnIds();
          if (visibleColumnIds != null) {
             xmlProfile.putString(ATTR_VISIBLE_COLUMN_IDS, StringToArrayConverter.convertArrayToString(visibleColumnIds));
          }
@@ -2438,7 +2438,7 @@ public class ColumnManager {
          // show column
 
          // even more complicated -> update model otherwise column is not painted
-         columnDefinition.setIsColumnDisplayed(true);
+         columnDefinition.setIsColumnChecked(true);
 
          setVisibleColumnIds_Column_Show(columnDefinition, true);
 
@@ -2446,7 +2446,7 @@ public class ColumnManager {
 
          // hide column
 
-         columnDefinition.setIsColumnDisplayed(false);
+         columnDefinition.setIsColumnChecked(false);
 
          setVisibleColumnIds_Column_Hide(columnDefinition);
       }
@@ -2482,7 +2482,7 @@ public class ColumnManager {
 
       _natTablePropertiesProvider = natTablePropertiesProvider;
 
-      setVisibleColDefs(_activeProfile);
+      setupVisibleColDefs(_activeProfile);
       setupValueFormatter(_activeProfile);
    }
 
@@ -2619,19 +2619,20 @@ public class ColumnManager {
     *
     * @param columnProfile
     */
-   void setVisibleColDefs(final ColumnProfile columnProfile) {
+   void setupVisibleColDefs(final ColumnProfile columnProfile) {
 
       final ArrayList<ColumnDefinition> visibleColDefs = columnProfile.visibleColumnDefinitions;
 
       visibleColDefs.clear();
 
-      if (columnProfile.visibleColumnIds != null) {
+      final String[] visibleColumnIds = columnProfile.getVisibleColumnIds();
+      if (visibleColumnIds != null) {
 
-         // create columns with the correct sort order
+         // fill columns with the visible order
 
          int createIndex = 0;
 
-         for (final String columnId : columnProfile.visibleColumnIds) {
+         for (final String columnId : visibleColumnIds) {
 
             final ColumnDefinition colDef = getColDef_ByColumnId(columnId);
             if (colDef != null) {
@@ -2679,7 +2680,7 @@ public class ColumnManager {
             }
          }
 
-         columnProfile.visibleColumnIds = columnIds.toArray(new String[columnIds.size()]);
+         columnProfile.setVisibleColumnIds(columnIds.toArray(new String[columnIds.size()]));
       }
 
       /*
@@ -2692,8 +2693,8 @@ public class ColumnManager {
 
          visibleColDefs.add(firstColumn);
 
-         columnProfile.visibleColumnIds = new String[1];
-         columnProfile.visibleColumnIds[0] = firstColumn.getColumnId();
+         columnProfile.setVisibleColumnIds(new String[1]);
+         visibleColumnIds[0] = firstColumn.getColumnId();
       }
 
       /*
@@ -2733,29 +2734,29 @@ public class ColumnManager {
             columnIds.add(colDef.getColumnId());
          }
 
-         columnProfile.visibleColumnIds = columnIds.toArray(new String[columnIds.size()]);
+         columnProfile.setVisibleColumnIds(columnIds.toArray(new String[columnIds.size()]));
       }
 
       /*
        * Ensure that each visible column has also set it's column width
        */
-      int numVisibleColumns = 0;
+      int numCheckedColumns = 0;
       for (final ColumnDefinition colDef : visibleColDefs) {
 
          if (colDef.getColumnWidth() == 0) {
             colDef.setColumnWidth(colDef.getDefaultColumnWidth());
          }
 
-         if (colDef.isColumnDisplayed()) {
-            numVisibleColumns++;
+         if (colDef.isColumnCheckedInContextMenu()) {
+            numCheckedColumns++;
          }
       }
-      if (numVisibleColumns == 0) {
+      if (numCheckedColumns == 0) {
 
          // nothing is displayed -> show all columns
 
          for (final ColumnDefinition colDef : visibleColDefs) {
-            colDef.setIsColumnDisplayed(true);
+            colDef.setIsColumnChecked(true);
          }
       }
    }
@@ -2774,17 +2775,17 @@ public class ColumnManager {
          visibleIdsAndWidth.add(colDef.getColumnId());
          visibleIdsAndWidth.add(Integer.toString(colDef.getColumnWidth()));
 
-         colDef.setIsColumnDisplayed(true);
+         colDef.setIsColumnChecked(true);
       }
 
-      _activeProfile.visibleColumnIds = visibleColumnIds.toArray(new String[visibleColumnIds.size()]);
+      _activeProfile.setVisibleColumnIds(visibleColumnIds.toArray(new String[visibleColumnIds.size()]));
       _activeProfile.visibleColumnIdsAndWidth = visibleIdsAndWidth.toArray(new String[visibleIdsAndWidth.size()]);
    }
 
    private void setVisibleColumnIds_Column_Hide(final ColumnDefinition colDef_HeaderHit) {
 
       final String headerHitColId = colDef_HeaderHit.getColumnId();
-      final String[] visibleIds = _activeProfile.visibleColumnIds;
+      final String[] visibleIds = _activeProfile.getVisibleColumnIds();
 
       final ArrayList<String> visibleColumnIds = new ArrayList<>();
       final ArrayList<String> visibleIdsAndWidth = new ArrayList<>();
@@ -2795,7 +2796,7 @@ public class ColumnManager {
 
             // set state that column is hidden
 
-            colDef_HeaderHit.setIsColumnDisplayed(false);
+            colDef_HeaderHit.setIsColumnChecked(false);
 
          } else {
 
@@ -2812,7 +2813,7 @@ public class ColumnManager {
          }
       }
 
-      _activeProfile.visibleColumnIds = visibleColumnIds.toArray(new String[visibleColumnIds.size()]);
+      _activeProfile.setVisibleColumnIds(visibleColumnIds.toArray(new String[visibleColumnIds.size()]));
       _activeProfile.visibleColumnIdsAndWidth = visibleIdsAndWidth.toArray(new String[visibleIdsAndWidth.size()]);
 
       _columnViewer = _tourViewer.recreateViewer(_columnViewer);
@@ -2831,7 +2832,7 @@ public class ColumnManager {
 
          // ensure the column is also displayed, it could be hidden when it was previously displayed and then set to hidden !!!
          final ColumnDefinition colDef = getColDef_ByColumnId(columnId_New);
-         colDef.setIsColumnDisplayed(true);
+         colDef.setIsColumnChecked(true);
 
          // set visible columns
          allNewVisibleColumnIds.add(columnId_New);
@@ -2843,12 +2844,12 @@ public class ColumnManager {
          isNewColumnAdded = true;
       }
 
-      for (final String columnId : _activeProfile.visibleColumnIds) {
+      for (final String columnId : _activeProfile.getVisibleColumnIds()) {
 
          final ColumnDefinition colDef = getColDef_ByColumnId(columnId);
 
          // ensure the column is also displayed, it could be hidden when it was previously displayed and then set to hidden !!!
-         colDef.setIsColumnDisplayed(true);
+         colDef.setIsColumnChecked(true);
 
          if (columnId_New == colDef.getColumnId() && isNewColumnAdded) {
 
@@ -2875,7 +2876,7 @@ public class ColumnManager {
 
          // ensure the column is also displayed, it could be hidden when it was previously displayed and then set to hidden !!!
          final ColumnDefinition colDef = getColDef_ByColumnId(columnId_New);
-         colDef.setIsColumnDisplayed(true);
+         colDef.setIsColumnChecked(true);
 
          // set visible columns
          allNewVisibleColumnIds.add(columnId_New);
@@ -2888,7 +2889,7 @@ public class ColumnManager {
       /*
        * Update model
        */
-      _activeProfile.visibleColumnIds = allNewVisibleColumnIds.toArray(new String[allNewVisibleColumnIds.size()]);
+      _activeProfile.setVisibleColumnIds(allNewVisibleColumnIds.toArray(new String[allNewVisibleColumnIds.size()]));
       _activeProfile.visibleColumnIdsAndWidth = allNewVisibleIdsAndWidth.toArray(new String[allNewVisibleIdsAndWidth.size()]);
 
       /*
@@ -2913,15 +2914,15 @@ public class ColumnManager {
             visibleIdsAndWidth.add(colDef.getColumnId());
             visibleIdsAndWidth.add(Integer.toString(colDef.getColumnWidth()));
 
-            colDef.setIsColumnDisplayed(true);
+            colDef.setIsColumnChecked(true);
 
          } else {
 
-            colDef.setIsColumnDisplayed(false);
+            colDef.setIsColumnChecked(false);
          }
       }
 
-      _activeProfile.visibleColumnIds = visibleColumnIds.toArray(new String[visibleColumnIds.size()]);
+      _activeProfile.setVisibleColumnIds(visibleColumnIds.toArray(new String[visibleColumnIds.size()]));
       _activeProfile.visibleColumnIdsAndWidth = visibleIdsAndWidth.toArray(new String[visibleIdsAndWidth.size()]);
    }
 
@@ -2951,16 +2952,16 @@ public class ColumnManager {
                columnIdsAndWidth.add(colDef.getColumnId());
                columnIdsAndWidth.add(Integer.toString(colDef.getColumnWidth()));
 
-               colDef.setIsColumnDisplayed(true);
+               colDef.setIsColumnChecked(true);
 
             } else {
 
-               colDef.setIsColumnDisplayed(false);
+               colDef.setIsColumnChecked(false);
             }
          }
       }
 
-      _activeProfile.visibleColumnIds = visibleColumnIds.toArray(new String[visibleColumnIds.size()]);
+      _activeProfile.setVisibleColumnIds(visibleColumnIds.toArray(new String[visibleColumnIds.size()]));
       _activeProfile.visibleColumnIdsAndWidth = columnIdsAndWidth.toArray(new String[columnIdsAndWidth.size()]);
    }
 
@@ -2987,7 +2988,7 @@ public class ColumnManager {
 
          // update original model, otherwise it could be hidden when it was previously displayed and then set to hidden !!!
          final ColumnDefinition colDef_Original = getColDef_ByColumnId(columnId);
-         colDef_Original.setIsColumnDisplayed(isColumnVisible);
+         colDef_Original.setIsColumnChecked(isColumnVisible);
 
          if (isColumnVisible) {
 
@@ -3000,7 +3001,7 @@ public class ColumnManager {
          }
       }
 
-      profile.visibleColumnIds = visibleColumnIds.toArray(new String[visibleColumnIds.size()]);
+      profile.setVisibleColumnIds(visibleColumnIds.toArray(new String[visibleColumnIds.size()]));
       profile.visibleColumnIdsAndWidth = columnIdsAndWidth.toArray(new String[columnIdsAndWidth.size()]);
    }
 
@@ -3009,7 +3010,7 @@ public class ColumnManager {
     */
    private void setVisibleColumnIds_FromViewer() {
 
-      _activeProfile.visibleColumnIds = getColumns_FromViewer_Ids();
+      _activeProfile.setVisibleColumnIds(getColumns_FromViewer_Ids());
       _activeProfile.visibleColumnIdsAndWidth = getColumns_FromViewer_IdAndWidth();
    }
 

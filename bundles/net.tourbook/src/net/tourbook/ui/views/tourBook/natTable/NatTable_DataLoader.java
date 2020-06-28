@@ -173,14 +173,7 @@ public class NatTable_DataLoader {
 
       allSortedColumns = _columnManager.getVisibleAndSortedColumns();
 
-      numVisibleColumns = 0;
-
-      for (final ColumnDefinition colDef : allSortedColumns) {
-
-         if (colDef.isColumnDisplayed()) {
-            numVisibleColumns++;
-         }
-      }
+      numVisibleColumns = allSortedColumns.size();
    }
 
    private int[] createRowIndicesFromTourIds(final ArrayList<Long> allRequestedTourIds) {

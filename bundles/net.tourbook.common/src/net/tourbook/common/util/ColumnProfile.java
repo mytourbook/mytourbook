@@ -36,7 +36,7 @@ public class ColumnProfile implements Cloneable {
    /**
     * Contains the column id's (with the correct sort order) which are visible in the viewer.
     */
-   String[]                           visibleColumnIds;
+   private String[]                   _visibleColumnIds;
 
    /**
     * Contains a pair with column id/column width for visible columns.
@@ -106,8 +106,8 @@ public class ColumnProfile implements Cloneable {
     */
    public int getColumnIndex(final String columnId) {
 
-      for (int columnIndex = 0; columnIndex < visibleColumnIds.length; columnIndex++) {
-         final String visibleColumnId = visibleColumnIds[columnIndex];
+      for (int columnIndex = 0; columnIndex < getVisibleColumnIds().length; columnIndex++) {
+         final String visibleColumnId = getVisibleColumnIds()[columnIndex];
          if (visibleColumnId.equals(columnId)) {
             return columnIndex;
          }
@@ -134,12 +134,27 @@ public class ColumnProfile implements Cloneable {
       return visibleColumnDefinitions;
    }
 
+   /**
+    * @return the {@link #_visibleColumnIds}
+    */
+   public String[] getVisibleColumnIds() {
+      return _visibleColumnIds;
+   }
+
    @Override
    public int hashCode() {
       final int prime = 31;
       int result = 1;
       result = prime * result + (int) (_id ^ (_id >>> 32));
       return result;
+   }
+
+   /**
+    * @param visibleColumnIds
+    *           the visibleColumnIds to set
+    */
+   public void setVisibleColumnIds(final String[] visibleColumnIds) {
+      _visibleColumnIds = visibleColumnIds;
    }
 
    @Override

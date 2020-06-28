@@ -68,7 +68,7 @@ public class ColumnDefinition implements Cloneable {
     * Visibility status used in the modify dialog, this is used if the dialog is canceled to not
     * touch the visible status
     */
-   private boolean                _isColumnDisplayed;
+   private boolean                _isColumnChecked;
 
    /**
     * when <code>true</code> the visibility for this column can be changed
@@ -166,30 +166,32 @@ public class ColumnDefinition implements Cloneable {
 
       final ColumnDefinition clone = (ColumnDefinition) super.clone();
 
-      clone._label = _label;
-      clone._columnId = _columnId;
-      clone._isColumnDisplayed = _isColumnDisplayed;
-      clone._canModifyVisibility = _canModifyVisibility;
-
-      clone._style = _style;
-
-      clone._cellLabelProvider = _cellLabelProvider;
-      clone._columnCategory = _columnCategory;
-      clone._columnHeaderText = _columnHeaderText;
-      clone._columnToolTipText = _columnToolTipText;
-      clone._columnWidth = _columnWidth;
-      clone._defaultColumnWidth = _defaultColumnWidth;
-      clone._isColumnResizable = _isColumnResizable;
-
-      clone._isColumnMoveable = _isColumnMoveable;
-      clone._columnSelectionListener = _columnSelectionListener;
-
-      clone._defaultValueFormat_Category = _defaultValueFormat_Category;
-      clone._availableFormats = _availableFormats;
-      clone._valueFormat_Category = _valueFormat_Category;
-      clone._valueFormatter_Category = _valueFormatter_Category;
-
-      clone._createIndex = _createIndex;
+// this seems to be not necesary
+//
+//      clone._label = _label;
+//      clone._columnId = _columnId;
+//      clone._isColumnDisplayed = _isColumnDisplayed;
+//      clone._canModifyVisibility = _canModifyVisibility;
+//
+//      clone._style = _style;
+//
+//      clone._cellLabelProvider = _cellLabelProvider;
+//      clone._columnCategory = _columnCategory;
+//      clone._columnHeaderText = _columnHeaderText;
+//      clone._columnToolTipText = _columnToolTipText;
+//      clone._columnWidth = _columnWidth;
+//      clone._defaultColumnWidth = _defaultColumnWidth;
+//      clone._isColumnResizable = _isColumnResizable;
+//
+//      clone._isColumnMoveable = _isColumnMoveable;
+//      clone._columnSelectionListener = _columnSelectionListener;
+//
+//      clone._defaultValueFormat_Category = _defaultValueFormat_Category;
+//      clone._availableFormats = _availableFormats;
+//      clone._valueFormat_Category = _valueFormat_Category;
+//      clone._valueFormatter_Category = _valueFormatter_Category;
+//
+//      clone._createIndex = _createIndex;
 
       return clone;
    }
@@ -373,11 +375,11 @@ public class ColumnDefinition implements Cloneable {
    }
 
    /**
-    * @return Returns <code>true</code> when the column is displayed in the UI, otherwise
-    *         <code>false</code>.
+    * @return Returns the visibility status used in the modify dialog, this is used if the dialog is
+    *         canceled to not touch the visible status.
     */
-   public boolean isColumnDisplayed() {
-      return _isColumnDisplayed;
+   public boolean isColumnCheckedInContextMenu() {
+      return _isColumnChecked;
    }
 
    /**
@@ -705,8 +707,8 @@ public class ColumnDefinition implements Cloneable {
       _isColumnHidden = true;
    }
 
-   public void setIsColumnDisplayed(final boolean isDisplayed) {
-      _isColumnDisplayed = isDisplayed;
+   public void setIsColumnChecked(final boolean isChecked) {
+      _isColumnChecked = isChecked;
    }
 
    /**
@@ -793,16 +795,22 @@ public class ColumnDefinition implements Cloneable {
 
    @Override
    public String toString() {
+
+// SET_FORMATTING_OFF
       return "ColumnDefinition [" //$NON-NLS-1$
-//				+ ("_label=" + _label + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-//				+ ("_isCheckedInDialog=" + _isCheckedInDialog + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("_columnId=" + _columnId + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("_isColumnDisplayed=" + _isColumnDisplayed + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-//            + ("_valueFormat=" + _valueFormat_Category + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-//            + ("_valueFormat_Detail=" + _valueFormat_Detail + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-//				+ ("_columnWidth=" + _columnWidth + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-//				+ ("_defaultColumnWidth=" + _defaultColumnWidth) //$NON-NLS-1$
+
+//				+ "_label="                + _label                + ", "   //$NON-NLS-1$ //$NON-NLS-2$
+//				+ "_isCheckedInDialog="    + _isCheckedInDialog    + ", "   //$NON-NLS-1$ //$NON-NLS-2$
+            + "_columnId="             + _columnId             + ", "   //$NON-NLS-1$ //$NON-NLS-2$
+            + "_isColumnChecked="      + _isColumnChecked      + ", "   //$NON-NLS-1$ //$NON-NLS-2$
+//          + "_valueFormat="          + _valueFormat_Category + ", "   //$NON-NLS-1$ //$NON-NLS-2$
+//          + "_valueFormat_Detail="   + _valueFormat_Detail   + ", "   //$NON-NLS-1$ //$NON-NLS-2$
+//				+ "_columnWidth="          + _columnWidth          + ", "   //$NON-NLS-1$ //$NON-NLS-2$
+//				+ "_defaultColumnWidth="   + _defaultColumnWidth            //$NON-NLS-1$
+
             + "]\n"; //$NON-NLS-1$
+
+// SET_FORMATTING_ON
    }
 
 }

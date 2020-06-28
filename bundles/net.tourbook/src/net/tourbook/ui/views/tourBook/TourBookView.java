@@ -619,10 +619,10 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          // loop: all displayed columns
          for (final ColumnDefinition colDef : _allSortedColumns) {
 
-            if (colDef.isColumnDisplayed() == false) {
-               // visible columns are displayed first
-               break;
-            }
+//            if (colDef.isColumnCheckedInContextMenu() == false) {
+//               // visible columns are displayed first
+//               break;
+//            }
 
             final String columnId = colDef.getColumnId();
 
@@ -2234,10 +2234,10 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
          final ColumnDefinition colDef = allSortedColumns.get(colIndex);
 
-         if (!colDef.isColumnDisplayed()) {
-            // ignore hidden colums
-            return;
-         }
+//         if (!colDef.isColumnCheckedInContextMenu()) {
+//            // ignore hidden colums
+//            return;
+//         }
 
          final String columnId = colDef.getColumnId();
 
@@ -2300,11 +2300,11 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
          final ColumnDefinition colDef = allSortedColumns.get(colIndex);
 
-         if (!colDef.isColumnDisplayed()) {
-            // visible columns are displayed first
-            continue;
-//            break;
-         }
+//         if (!colDef.isColumnCheckedInContextMenu()) {
+//            // visible columns are displayed first
+//            continue;
+////            break;
+//         }
 
          body_DataLayer.setColumnWidthByPosition(colIndex, colDef.getColumnWidth(), false);
       }
