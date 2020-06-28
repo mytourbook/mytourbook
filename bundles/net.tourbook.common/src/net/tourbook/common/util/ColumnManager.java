@@ -1345,10 +1345,11 @@ public class ColumnManager {
          final ColumnProfile columnProfile = _allProfiles.get(columnIndex);
          final boolean isChecked = columnProfile == _activeProfile;
 
-         String menuText =
-               columnProfile.name
-                     + COLUMN_TEXT_SEPARATOR
-                     + Integer.toString(columnProfile.visibleColumnIds.length);
+         String menuText = columnProfile.name
+               + COLUMN_TEXT_SEPARATOR
+
+               // show number of visible columns
+               + Integer.toString(columnProfile.visibleColumnIds.length);
 
          // add a mnemonic to select a profile easier when debugging
          if (columnIndex < 10) {
