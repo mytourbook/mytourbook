@@ -1679,7 +1679,7 @@ public class DialogModifyColumns extends TrayDialog {
    private void saveState_CurrentProfileColumns() {
 
       // save columns
-      _columnManager.setVisibleColumnIds_FromModifyDialog(//
+      _columnManager.setVisibleColumnIds_FromModifyDialog(
             _selectedProfile,
             _columnViewer.getTable().getItems());
 
@@ -1728,18 +1728,18 @@ public class DialogModifyColumns extends TrayDialog {
 
    private void setupColumnsInColumnViewer() {
 
-      // load columns into the viewer
-      _columnViewer.setInput(new Object[0]);
+         // load columns into the viewer
+         _columnViewer.setInput(new Object[0]);
 
-      // check columns
-      final ArrayList<ColumnDefinition> checkedColumns = new ArrayList<>();
+         // check columns
+         final ArrayList<ColumnDefinition> checkedColumns = new ArrayList<>();
 
-      for (final ColumnDefinition colDef : _columnViewerModel) {
-         if (colDef.isColumnCheckedInContextMenu()) {
-            checkedColumns.add(colDef);
+         for (final ColumnDefinition colDef : _columnViewerModel) {
+            if (colDef.isColumnCheckedInContextMenu()) {
+               checkedColumns.add(colDef);
+            }
          }
-      }
-      _columnViewer.setCheckedElements(checkedColumns.toArray());
+         _columnViewer.setCheckedElements(checkedColumns.toArray());
 
       enableUpDownActions();
    }

@@ -20,7 +20,6 @@ import net.tourbook.common.util.ColumnManager;
 import org.eclipse.nebula.widgets.nattable.sort.action.SortColumnAction;
 import org.eclipse.nebula.widgets.nattable.sort.config.SingleClickSortConfiguration;
 import org.eclipse.nebula.widgets.nattable.ui.binding.UiBindingRegistry;
-import org.eclipse.nebula.widgets.nattable.ui.matcher.MouseEventMatcher;
 import org.eclipse.swt.SWT;
 
 /**
@@ -38,18 +37,22 @@ public class SingleClickSortConfiguration_MT extends SingleClickSortConfiguratio
 
    /**
     * Remove the original key bindings and implement new ones.
+    * <p>
+    * Register new bindings by overwriting existing binding with
+    * <code>register<b>First</b>SingleClickBinding</code>
+    * instead of <code>registerSingleClickBinding</code>
     */
    @Override
    public void configureUiBindings(final UiBindingRegistry uiBindingRegistry) {
 
-      // Register new bindings
-
       uiBindingRegistry.registerFirstSingleClickBinding(
+
             new ColumnHeaderClickEventMatcher_MT(SWT.NONE, 1, _columnManager),
             new SortColumnAction(false));
 
-      uiBindingRegistry.registerSingleClickBinding(
-            MouseEventMatcher.columnHeaderLeftClick(SWT.MOD3),
+      uiBindingRegistry.registerFirstSingleClickBinding(
+
+            new ColumnHeaderClickEventMatcher_MT(SWT.MOD3, 1, _columnManager),
             new SortColumnAction(true));
    }
 }

@@ -157,6 +157,9 @@ public class ColumnDefinition implements Cloneable {
       return _canModifyVisibility;
    }
 
+   /**
+    * @return <code>true</code> when this column can be sorted in the NatTable
+    */
    public boolean canSortColumn() {
       return _canSortColumn;
    }

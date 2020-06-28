@@ -23,6 +23,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -49,6 +50,9 @@ import org.eclipse.swt.widgets.Display;
 public class NatTable_DataLoader {
 
    private static final char                              NL                    = net.tourbook.common.UI.NEW_LINE;
+
+   private static final String                            SQL_ASCENDING         = "ASC";
+   private static final String                            SQL_DESCENDING        = "DESC";
 
    private static final String                            SQL_DEFAULT_FIELD     = "TourStartTime";                 //$NON-NLS-1$
 
@@ -82,11 +86,11 @@ public class NatTable_DataLoader {
    private ConcurrentHashMap<Long, Integer>               _fetchedTourIndex     = new ConcurrentHashMap<>();
    private final LinkedBlockingDeque<LazyTourLoaderItem>  _loaderWaitingQueue   = new LinkedBlockingDeque<>();
 
-   private String                                         _sortColumnId;
-   private SortDirectionEnum                              _sortDirection;
+   private ArrayList<String>                              _allSortColumnIds;
+   private List<SortDirectionEnum>                        _allSortDirections;
 
-   private String                                         _sqlSortField;
-   private String                                         _sqlSortDirection;
+   private ArrayList<String>                              _allSqlSortFields     = new ArrayList<>();
+   private ArrayList<String>                              _allSqlSortDirections = new ArrayList<>();
 
    /**
     * Contains all columns (also hidden columns), sorted in the order how they are displayed in the
@@ -316,12 +320,12 @@ public class NatTable_DataLoader {
       }
    }
 
-   public String getSortColumnId() {
-      return _sortColumnId;
+   public ArrayList<String> getSortColumnId() {
+      return _allSortColumnIds;
    }
 
-   public Enum<SortDirectionEnum> getSortDirection() {
-      return _sortDirection;
+   public List<SortDirectionEnum> getSortDirection() {
+      return _allSortDirections;
    }
 
    /**
@@ -620,7 +624,7 @@ public class NatTable_DataLoader {
             + " WHERE 1=1" + NL //
             + sqlFilter.getWhereClause() + NL
 
-            + " ORDER BY " + _sqlSortField + UI.SPACE + _sqlSortDirection + NL //      //$NON-NLS-1$
+            + " ORDER BY " + _allSqlSortFields + UI.SPACE + _allSqlSortDirections + NL //      //$NON-NLS-1$
       ;
 
       final TLongArrayList allTourIds = new TLongArrayList();
@@ -667,7 +671,7 @@ public class NatTable_DataLoader {
             + " WHERE 1=1" + NL //
             + sqlFilter.getWhereClause() + NL
 
-            + " ORDER BY " + _sqlSortField + UI.SPACE + _sqlSortDirection + NL //      //$NON-NLS-1$
+            + " ORDER BY " + _allSqlSortFields + UI.SPACE + _allSqlSortDirections + NL //      //$NON-NLS-1$
 
             + " OFFSET ? ROWS FETCH NEXT ? ROWS ONLY" + NL //                          //$NON-NLS-1$
       ;
@@ -735,36 +739,43 @@ public class NatTable_DataLoader {
    /**
     * Sets sort column id/direction but firstly the previous loaded tours are cleaned up
     *
-    * @param sortColumnId
-    * @param sortDirection
+    * @param allSortedColumnIds
+    * @param allSortDirections
     */
-   public void setupSortColumn(final String sortColumnId, final SortDirectionEnum sortDirection) {
+   public void setupSortColumn(final ArrayList<String> allSortedColumnIds, final List<SortDirectionEnum> allSortDirections) {
 
-      _sortColumnId = sortColumnId;
-      _sortDirection = sortDirection;
+      _allSortColumnIds = allSortedColumnIds;
+      _allSortDirections = allSortDirections;
 
       // cleanup old fetched tours
       resetTourItems();
 
-      /*
-       * Set sort order
-       */
-      if (sortDirection == SortDirectionEnum.ASC) {
-         _sqlSortDirection = "ASC"; //$NON-NLS-1$
-      } else {
-         _sqlSortDirection = "DESC"; //$NON-NLS-1$
+      _allSqlSortFields.clear();
+      _allSqlSortDirections.clear();
+
+      for (int columnIndex = 0; columnIndex < allSortDirections.size(); columnIndex++) {
+
+         /*
+          * Set sort order
+          */
+         final SortDirectionEnum sortDirectionEnum = allSortDirections.get(columnIndex);
+         if (sortDirectionEnum == SortDirectionEnum.ASC) {
+            _allSqlSortDirections.add(SQL_ASCENDING);
+         } else {
+            _allSqlSortDirections.add(SQL_DESCENDING);
+         }
+
+         /*
+          * Set sort field
+          */
+         String sqlField = getSqlField(allSortedColumnIds.get(columnIndex));
+
+         // ensure that the dummy field is not used in the sql statement, this should not happen but it did during development
+         if (FIELD_WITHOUT_SORTING.equals(sqlField)) {
+            sqlField = SQL_DEFAULT_FIELD;
+         }
+
+         _allSqlSortFields.add(sqlField);
       }
-
-      /*
-       * Set sort field
-       */
-      String sqlField = getSqlField(sortColumnId);
-
-      // ensure that the dummy field is not used in the sql statement, this should not happen but it did during development
-      if (FIELD_WITHOUT_SORTING.equals(sqlField)) {
-         sqlField = SQL_DEFAULT_FIELD;
-      }
-
-      _sqlSortField = sqlField;
    }
 }

@@ -1052,6 +1052,47 @@ public class Util {
     * @param state
     * @param key
     * @param defaultValue
+    * @return Returns a string value from {@link IDialogSettings}. When the key is not found, the
+    *         default value is returned.
+    */
+   @SuppressWarnings("unchecked")
+   public static <E extends Enum<E>> Enum<E>[] getStateEnum(final IDialogSettings state,
+                                                            final String key,
+                                                            final Enum<E>[] defaultValue) {
+
+      if (state == null) {
+         return defaultValue;
+      }
+
+      final String[] allStateValues = state.getArray(key);
+      if (allStateValues == null || allStateValues.length == 0) {
+         return defaultValue;
+      }
+
+      final ArrayList<E> allEnumValues = new ArrayList<>();
+
+      try {
+
+         final Class<E> declaringClass = defaultValue[0].getDeclaringClass();
+
+         for (final String stateValue : allStateValues) {
+            if (stateValue != null) {
+               allEnumValues.add(Enum.valueOf(declaringClass, stateValue));
+            }
+         }
+
+      } catch (final IllegalArgumentException ex) {
+
+         return defaultValue;
+      }
+
+      return (Enum<E>[]) allEnumValues.toArray();
+   }
+
+   /**
+    * @param state
+    * @param key
+    * @param defaultValue
     * @return Returns a float value from {@link IDialogSettings}. When the key is not found, the
     *         default value is returned.
     */
@@ -2345,11 +2386,27 @@ public class Util {
                                                        final String key,
                                                        final Enum<E> value) {
 
-      if (value == null) {
-         return;
+      if (value != null) {
+         state.put(key, value.name());
+      }
+   }
+
+   public static <E extends Enum<E>> void setStateEnum(final IDialogSettings state,
+                                                       final String stateKey,
+                                                       final List<E> allValues) {
+
+      final ArrayList<String> allEnumNames = new ArrayList<>();
+
+      for (final E enumValue : allValues) {
+
+         if (allEnumNames != null) {
+            allEnumNames.add(enumValue.name());
+         }
       }
 
-      state.put(key, value.name());
+      if (allEnumNames.size() > 0) {
+         state.put(stateKey, allEnumNames.toArray(new String[allEnumNames.size()]));
+      }
    }
 
    public static void setXmlDefaultHeader(final XMLMemento xmlHeader, final Bundle bundle) {

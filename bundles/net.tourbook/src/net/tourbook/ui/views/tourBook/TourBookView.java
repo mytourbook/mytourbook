@@ -619,11 +619,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          // loop: all displayed columns
          for (final ColumnDefinition colDef : _allSortedColumns) {
 
-//            if (colDef.isColumnCheckedInContextMenu() == false) {
-//               // visible columns are displayed first
-//               break;
-//            }
-
             final String columnId = colDef.getColumnId();
 
             switch (columnId) {
@@ -2234,11 +2229,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
          final ColumnDefinition colDef = allSortedColumns.get(colIndex);
 
-//         if (!colDef.isColumnCheckedInContextMenu()) {
-//            // ignore hidden colums
-//            return;
-//         }
-
          final String columnId = colDef.getColumnId();
 
          columnHeader_ColumnLabelAccumulator.registerColumnOverrides(colIndex, columnId + HEADER_COLUMN_ID_POSTFIX);
@@ -2299,12 +2289,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       for (int colIndex = 0; colIndex < allSortedColumns.size(); colIndex++) {
 
          final ColumnDefinition colDef = allSortedColumns.get(colIndex);
-
-//         if (!colDef.isColumnCheckedInContextMenu()) {
-//            // visible columns are displayed first
-//            continue;
-////            break;
-//         }
 
          body_DataLayer.setColumnWidthByPosition(colIndex, colDef.getColumnWidth(), false);
       }
@@ -2911,12 +2895,20 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       // get sorting state
       final String sortColumnId = Util.getStateString(_state, STATE_SORT_COLUMN_ID, TableColumnFactory.TIME_DATE_ID);
-      final Enum<SortDirectionEnum> sortDirection = Util.getStateEnum(_state, STATE_SORT_COLUMN_DIRECTION, SortDirectionEnum.DESC);
 
-      _natTable_SortModel.setupSortColumn(sortColumnId, sortDirection);
+      final ArrayList<Enum<SortDirectionEnum>> defaultValues = new <Enum<SortDirectionEnum>> [];
 
-      // setup data loader
-      _natTable_DataLoader.setupSortColumn(sortColumnId, (SortDirectionEnum) sortDirection);
+//      defaultValues.add(SortDirectionEnum.DESC);
+//      defaultArray = (<Enum<SortDirectionEnum>> )defaultValues.toArray();
+
+//      final Enum<SortDirectionEnum>[] sortDirection = Util.getStateEnum(_state,
+//            STATE_SORT_COLUMN_DIRECTION,
+//            defaultArray);
+
+//      _natTable_SortModel.setupSortColumn(sortColumnId, sortDirection);
+//
+//      // setup data loader
+//      _natTable_DataLoader.setupSortColumn(sortColumnId, (SortDirectionEnum) sortDirection);
    }
 
    @PersistState
@@ -2940,7 +2932,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _state.put(STATE_VIEW_LAYOUT, _viewLayout.name());
 
       // viewer columns
-      _state.put(STATE_SORT_COLUMN_ID, _natTable_DataLoader.getSortColumnId());
+//      Util.state
+      final ArrayList<String> allSortColumnIds = _natTable_DataLoader.getSortColumnId();
+      _state.put(STATE_SORT_COLUMN_ID, allSortColumnIds.toArray(new String[allSortColumnIds.size()]));
       Util.setStateEnum(_state, STATE_SORT_COLUMN_DIRECTION, _natTable_DataLoader.getSortDirection());
 
       _columnManager_Tree.saveState(_state_Tree);

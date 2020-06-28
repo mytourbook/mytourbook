@@ -59,6 +59,7 @@ public class ColumnHeaderClickEventMatcher_MT extends ColumnHeaderClickEventMatc
    @Override
    public boolean matches(final NatTable natTable, final MouseEvent event, final LabelStack regionLabels) {
 
-      return super.matches(natTable, event, regionLabels) && canSortColumn(event);
+      return super.matches(natTable, event, regionLabels)
+            && canSortColumn(event);
    }
 }
