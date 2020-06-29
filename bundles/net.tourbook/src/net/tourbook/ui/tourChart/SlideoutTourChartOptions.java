@@ -256,14 +256,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
                   .span(2, 1)
                   .applyTo(_chkSelectAllTimeSlices);
 
-            _chkSelectAllTimeSlices.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-
-                  final SelectionChartInfo chartInfo = _tourChart.getChartInfo();
-                  chartInfo.isSelectInBetweenTimeSlices = !chartInfo.isSelectInBetweenTimeSlices;
-               }
-            });
+            _chkSelectAllTimeSlices.addSelectionListener(_defaultSelectionListener);
          }
       }
    }
@@ -302,7 +295,8 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
       final boolean isShowValuePointTooltip = _prefStore.getDefaultBoolean(//
             ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE);
 
-      final boolean isSelectInBetweenTimeSlices = _tourChart.getChartInfo().isSelectInBetweenTimeSlices;
+      final boolean isSelectInBetweenTimeSlices = _prefStore.getDefaultBoolean(//
+            ITourbookPreferences.TOGGLE_STATE_SELECT_INBETWEEN_TIME_SLICES);
 
       final X_AXIS_START_TIME xAxisStartTime = isTourStartTime
             ? X_AXIS_START_TIME.TOUR_START_TIME
@@ -349,7 +343,8 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
       _chkShowValuePointTooltip.setSelection(_prefStore.getBoolean(//
             ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE));
 
-      _chkSelectAllTimeSlices.setSelection(_tourChart.getChartInfo().isSelectInBetweenTimeSlices);
+      final SelectionChartInfo chartInfo = _tourChart.getChartInfo();
+      _chkSelectAllTimeSlices.setSelection(chartInfo.isSelectInBetweenTimeSlices);
 
       _gridUI.restoreState();
    }
@@ -357,7 +352,9 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
    private void saveState() {
 
       final SelectionChartInfo chartInfo = _tourChart.getChartInfo();
-      chartInfo.isSelectInBetweenTimeSlices = _chkSelectAllTimeSlices.getSelection();
+      final boolean isSelectInBetweenTimeSlices = _chkSelectAllTimeSlices.getSelection();
+      _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_SELECT_INBETWEEN_TIME_SLICES, isSelectInBetweenTimeSlices);
+      chartInfo.isSelectInBetweenTimeSlices = isSelectInBetweenTimeSlices;
 
       final TourChartConfiguration tcc = _tourChart.getTourChartConfig();
 

@@ -932,6 +932,9 @@ public class TourChartAnalyzerView extends ViewPart {
       chartInfo.leftSliderValuesIndex = sliderPosition.getLeftSliderValueIndex();
       chartInfo.rightSliderValuesIndex = sliderPosition.getRightSliderValueIndex();
 
+      chartInfo.isSelectInBetweenTimeSlices = _prefStore.getDefaultBoolean(
+            ITourbookPreferences.TOGGLE_STATE_SELECT_INBETWEEN_TIME_SLICES);
+
       updateInfo(chartInfo, false);
    }
 

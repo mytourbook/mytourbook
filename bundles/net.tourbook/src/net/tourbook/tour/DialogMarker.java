@@ -37,6 +37,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.tourChart.ChartLabel;
 import net.tourbook.ui.tourChart.ITourMarkerSelectionListener;
 import net.tourbook.ui.tourChart.TourChart;
@@ -50,6 +51,7 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.layout.TableColumnLayout;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.CheckboxCellEditor;
@@ -120,33 +122,35 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 //	private int							ROW_DEFAULT_HEIGHT;
 //	private int							ROW_MAX_HEIGHT;
 
-   private final IDialogSettings _state        = TourbookPlugin
-         .getState("DialogMarker");                               //$NON-NLS-1$
+   private final IPreferenceStore _prefStore    = TourbookPlugin.getPrefStore();
 
-   private TourChart             _tourChart;
-   private TourData              _tourData;
+   private final IDialogSettings  _state        = TourbookPlugin
+         .getState("DialogMarker");                                             //$NON-NLS-1$
+
+   private TourChart              _tourChart;
+   private TourData               _tourData;
 
    /**
     * marker which is currently selected
     */
-   private TourMarker            _selectedTourMarker;
+   private TourMarker             _selectedTourMarker;
 
    /**
     * backup for the selected tour marker
     */
-   private TourMarker            _backupMarker = new TourMarker();
+   private TourMarker             _backupMarker = new TourMarker();
 
-   private Set<TourMarker>       _originalTourMarkers;
-   private HashSet<TourMarker>   _dialogTourMarkers;
+   private Set<TourMarker>        _originalTourMarkers;
+   private HashSet<TourMarker>    _dialogTourMarkers;
 
    /**
     * initial tour marker
     */
-   private TourMarker            _initialTourMarker;
+   private TourMarker             _initialTourMarker;
 
-   private ModifyListener        _defaultModifyListener;
-   private MouseWheelListener    _defaultMouseWheelListener;
-   private SelectionAdapter      _defaultSelectionAdapter;
+   private ModifyListener         _defaultModifyListener;
+   private MouseWheelListener     _defaultMouseWheelListener;
+   private SelectionAdapter       _defaultSelectionAdapter;
 
 //	private SignMenuManager				_signMenuManager			= new SignMenuManager(this);
 
@@ -162,7 +166,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 
    /**
     * Contains the controls which are displayed in the first column, these controls are used to get
-    * the maximum width and set the first column within the differenct section to the same width.
+    * the maximum width and set the first column within the different section to the same width.
     */
    private final ArrayList<Control> _firstColumnControls = new ArrayList<>();
 
@@ -438,7 +442,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
    }
 
    /**
-    * remove selected markers from the view and update dependened structures
+    * remove selected markers from the view and update dependent structures
     */
    private void actionDeleteMarker() {
 
@@ -1900,7 +1904,9 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
          final SelectionChartXSliderPosition sliderSelection = new SelectionChartXSliderPosition(
                _tourChart,
                newSelectedMarker.getSerieIndex(),
-               SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION);
+               SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION,
+               _prefStore.getDefaultBoolean(
+                     ITourbookPreferences.TOGGLE_STATE_SELECT_INBETWEEN_TIME_SLICES));
 
          // set x-slider in the tour chart but do not fire a default event
          _tourChart.setXSliderPosition(sliderSelection, false);

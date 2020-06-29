@@ -35,8 +35,14 @@ public class SelectionChartXSliderPosition implements ISelection {
    private boolean         _isCenterSliderPosition         = false;
 
    /**
+    * When <code>true</code>, all the time slices in between the left and right sliders
+    * are selected in the Time slices view.
+    */
+   public boolean          _isSelectInBetweenTimeSlices    = false;
+
+   /**
     * When <code>true</code> then the slider will be set visible in the chart by repositioning the
-    * graph (this is the old default behaviour), otherwise <code>false</code>.
+    * graph (this is the old default behavior), otherwise <code>false</code>.
     */
    private boolean         _isMoveChartToShowSlider        = true;
 
@@ -56,20 +62,26 @@ public class SelectionChartXSliderPosition implements ISelection {
 
    private Object          _customData;
 
-   public SelectionChartXSliderPosition(final Chart chart, final int leftValueIndex, final int rightValueIndex) {
+   public SelectionChartXSliderPosition(final Chart chart,
+                                        final int leftValueIndex,
+                                        final int rightValueIndex,
+                                        final boolean isSelectInBetweenTimeSlices) {
 
       _chart = chart;
 
       _leftSliderValueIndex = leftValueIndex;
       _rightSliderValueIndex = rightValueIndex;
+      _isSelectInBetweenTimeSlices = isSelectInBetweenTimeSlices;
+
    }
 
    public SelectionChartXSliderPosition(final Chart chart,
                                         final int startIndex,
                                         final int endIndex,
+                                        final boolean isSelectInBetweenTimeSlices,
                                         final boolean isAdjustStartIndex) {
 
-      this(chart, startIndex, endIndex);
+      this(chart, startIndex, endIndex, isSelectInBetweenTimeSlices);
 
       _isAdjustStartIndex = isAdjustStartIndex;
 
@@ -78,9 +90,10 @@ public class SelectionChartXSliderPosition implements ISelection {
    public SelectionChartXSliderPosition(final Chart chart,
                                         final int serieIndex0,
                                         final int serieIndex1,
-                                        final int serieIndex2) {
+                                        final int serieIndex2,
+                                        final boolean isSelectInBetweenTimeSlices) {
 
-      this(chart, serieIndex1, serieIndex2);
+      this(chart, serieIndex1, serieIndex2, isSelectInBetweenTimeSlices);
 
       _beforeLeftSliderIndex = serieIndex0;
    }
@@ -95,6 +108,10 @@ public class SelectionChartXSliderPosition implements ISelection {
 
    public Object getCustomData() {
       return _customData;
+   }
+
+   public boolean isSelectInBetweenTimeSlices() {
+      return _isSelectInBetweenTimeSlices;
    }
 
    /**

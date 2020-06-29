@@ -6545,7 +6545,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   _tourChart,
                   serieIndex0,
                   serieIndex1,
-                  serieIndex2);
+                  serieIndex2,
+                  _prefStore.getDefaultBoolean(
+                        ITourbookPreferences.TOGGLE_STATE_SELECT_INBETWEEN_TIME_SLICES));
 
             xSliderSelection.setCenterSliderPosition(true);
 
