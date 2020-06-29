@@ -137,7 +137,6 @@ public class RawDataManager {
    private static RawDataManager           _instance                           = null;
 
    private static ArrayList<String>        _invalidFilesList                   = new ArrayList<>();
-   final static IPreferenceStore           _commonPrefStore                    = CommonActivator.getPrefStore();
    private final IPreferenceStore          _prefStore                          = TourbookPlugin.getPrefStore();
 
    private final IDialogSettings           _importState                        = TourbookPlugin.getState(RawDataView.ID);
@@ -1413,7 +1412,7 @@ public class RawDataManager {
       }
 
       // find the file extension in the filename
-      final int dotPos = importFilePathName.lastIndexOf("."); //$NON-NLS-1$
+      final int dotPos = importFilePathName.lastIndexOf(UI.SYMBOL_DOT);
       if (dotPos == -1) {
          return false;
       }
@@ -1438,7 +1437,7 @@ public class RawDataManager {
 
                final String deviceFileExtension = device.fileExtension;
 
-               if (deviceFileExtension.equals("*") || deviceFileExtension.equalsIgnoreCase(fileExtension)) { //$NON-NLS-1$
+               if (deviceFileExtension.equals(UI.SYMBOL_STAR) || deviceFileExtension.equalsIgnoreCase(fileExtension)) {
 
                   // Check if the file we want to import requires confirmation and if yes, ask user
                   if (device.userConfirmationRequired()) {

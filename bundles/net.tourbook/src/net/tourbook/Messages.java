@@ -228,6 +228,7 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Error_FolderIsInvalid;
    public static String        Dialog_ImportConfig_Group_ImportActions;
    public static String        Dialog_ImportConfig_Group_ImportLauncherConfig;
+   public static String        Dialog_ImportConfig_Group_StateTooltip;
    public static String        Dialog_ImportConfig_Info_ConfigDragDrop;
    public static String        Dialog_ImportConfig_Info_ImportActions;
    public static String        Dialog_ImportConfig_Info_MovedDeviceFiles;
@@ -248,12 +249,15 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Label_DeviceFiles_Tooltip;
    public static String        Dialog_ImportConfig_Label_DeviceFolder;
    public static String        Dialog_ImportConfig_Label_DeviceFolder_Tooltip;
+   public static String        Dialog_ImportConfig_Label_DeviceType_Tooltip;
    public static String        Dialog_ImportConfig_Label_ImportColumns;
    public static String        Dialog_ImportConfig_Label_ImportColumns_Tooltip;
    public static String        Dialog_ImportConfig_Label_ImportLauncher;
    public static String        Dialog_ImportConfig_Label_LastMarkerDistance;
    public static String        Dialog_ImportConfig_Label_LastMarkerDistance_Tooltip;
    public static String        Dialog_ImportConfig_Label_LastMarkerText;
+   public static String        Dialog_ImportConfig_Label_StateTooltip_DisplayAbsoluteFilePath;
+   public static String        Dialog_ImportConfig_Label_StateTooltip_DisplayAbsoluteFilePath_Tooltip;
    public static String        Dialog_ImportConfig_Label_StateTooltipWidth;
    public static String        Dialog_ImportConfig_Link_OtherActions;
    public static String        Dialog_ImportConfig_Link_TourType;

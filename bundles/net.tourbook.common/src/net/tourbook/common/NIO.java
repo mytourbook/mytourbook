@@ -47,8 +47,8 @@ public class NIO {
     * the path exists.
     *
     * @param folder
-    * @return Returns the os path or <code>null</code> when the device name cannot be converted into
-    *         a driveletter.
+    * @return Returns the OS path or <code>null</code> when the device name cannot be converted into
+    *         a drive letter.
     */
    public static String convertToOSPath(final String folder) {
 
@@ -63,6 +63,7 @@ public class NIO {
          // replace device name with drive letter, [MEDIA]\CACHE ->  D:\CACHE
 
          final String deviceName = parseDeviceName(folder);
+
          final Iterable<FileStore> fileStores = getFileStores();
 
          for (final FileStore store : fileStores) {
@@ -79,6 +80,12 @@ public class NIO {
                break;
             }
          }
+      } else if (isTourBookFileSystem(folder)) {
+         final TourbookFileSystem tourbookFileSystem = FileSystemManager.getTourbookFileSystem(folder);
+
+         osPath = folder.replace(tourbookFileSystem.getDisplayId(), tourbookFileSystem.getId());
+
+         return osPath;
       } else {
 
          // OS path is contained in the folder path
@@ -179,23 +186,12 @@ public class NIO {
     *
     * @param folderName
     *           A given folder name
-    * @return Returns true when the folder name is equal to
+    * @return Returns true when the folder name starts with
     *         {@link TourBookFileSystem#getId()}.
     */
    public static boolean isTourBookFileSystem(final String folderName) {
-      if (folderName == null) {
-         return false;
-      }
 
-      final List<String> tourBookFileSystemIds = FileSystemManager.getFileSystemsIds();
-
-      for (final String tourBookFileSystemId : tourBookFileSystemIds) {
-         if (tourBookFileSystemId.equalsIgnoreCase(folderName.toLowerCase())) {
-            return true;
-         }
-      }
-
-      return false;
+      return FileSystemManager.getTourbookFileSystem(folderName) != null;
    }
 
    private static String parseDeviceName(final String fullName) {
