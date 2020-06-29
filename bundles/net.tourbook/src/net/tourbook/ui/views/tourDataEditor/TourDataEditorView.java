@@ -7603,7 +7603,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _isSetField = isBackup;
    }
 
-   private void recreateViewer() {
+   public void recreateViewer() {
 
       /*
        * Recreate time slice viewer
@@ -7936,7 +7936,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     *           Can be {@link SelectionChartXSliderPosition#IGNORE_SLIDER_POSITION} when this
     *           position should not be set.
     */
-   private void selectTimeSlice_InViewer(final int valueIndexStart, final int valueIndexEnd) {
+   public void selectTimeSlice_InViewer(final int valueIndexStart, final int valueIndexEnd) {
 
       final Table table = (Table) _timeSlice_Viewer.getControl();
       final int itemCount = table.getItemCount();
@@ -7961,6 +7961,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       table.showSelection();
    }
 
+   public void selectTimeSlicesTab() {
+      _tabFolder.setSelection(_tab_20_TimeSlices);
+   }
+
    @Override
    public void setFocus() {
 
@@ -7968,6 +7972,19 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 //    fTabFolder.setFocus();
 
       _page_EditorForm.setFocus();
+   }
+
+   /**
+    * Programmatically toggles the row select mode
+    *
+    * @param enabled
+    *           True to activate the row select mode, false to disactivate it.
+    */
+   public void setRowEditModeEnabled(final boolean enabled) {
+
+      _actionToggleRowSelectMode.setChecked(enabled);
+
+      actionToggleRowSelectMode();
    }
 
    /**
@@ -8817,7 +8834,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    }
 
-   private void updateUI_Tab_2_TimeSlices() {
+   public void updateUI_Tab_2_TimeSlices() {
 
       if (_uiRunnableForce_TimeSliceReload) {
          _timeSlice_ViewerTourId = -1L;
