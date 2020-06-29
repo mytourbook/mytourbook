@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -592,7 +592,9 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
                            new SelectionChartXSliderPosition(//
                                  _tourChart,
                                  tourDataSelection.getLeftSliderValueIndex(),
-                                 tourDataSelection.getRightSliderValueIndex()));
+                                 tourDataSelection.getRightSliderValueIndex(),
+                                 _prefStore.getDefaultBoolean(
+                                       ITourbookPreferences.TOGGLE_STATE_SELECT_INBETWEEN_TIME_SLICES)));
                   }
                }
             }
@@ -785,7 +787,9 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
                _tourChart,
                SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION,
                leftSliderValueIndex,
-               rightSliderValueIndex);
+               rightSliderValueIndex,
+               _prefStore.getDefaultBoolean(
+                     ITourbookPreferences.TOGGLE_STATE_SELECT_INBETWEEN_TIME_SLICES));
 
          xSliderPosition.setCenterSliderPosition(true);
 
@@ -930,7 +934,9 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
          final SelectionChartXSliderPosition xSliderPosition = new SelectionChartXSliderPosition(
                _tourChart,
                leftSliderValuesIndex,
-               rightSliderValuesIndex);
+               rightSliderValuesIndex,
+               _prefStore.getDefaultBoolean(
+                     ITourbookPreferences.TOGGLE_STATE_SELECT_INBETWEEN_TIME_SLICES));
 
          xSliderPosition.setCenterSliderPosition(true);
 

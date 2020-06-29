@@ -782,7 +782,9 @@ public class TourBlogView extends ViewPart {
          _postSelectionProvider.setSelection(new SelectionChartXSliderPosition(
                _tourChart,
                ((TourMarker) selectedMarker[0]).getSerieIndex(),
-               ((TourMarker) selectedMarker[selectedMarker.length - 1]).getSerieIndex()));
+               ((TourMarker) selectedMarker[selectedMarker.length - 1]).getSerieIndex(),
+               _prefStore.getDefaultBoolean(
+                     ITourbookPreferences.TOGGLE_STATE_SELECT_INBETWEEN_TIME_SLICES)));
 
       } else if (selectedMarker.length > 0) {
 
@@ -791,7 +793,9 @@ public class TourBlogView extends ViewPart {
          _postSelectionProvider.setSelection(new SelectionChartXSliderPosition(
                _tourChart,
                ((TourMarker) selectedMarker[0]).getSerieIndex(),
-               SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION));
+               SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION,
+               _prefStore.getDefaultBoolean(
+                     ITourbookPreferences.TOGGLE_STATE_SELECT_INBETWEEN_TIME_SLICES)));
       }
    }
 

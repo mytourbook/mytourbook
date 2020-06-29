@@ -59,7 +59,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
 
-public class DropboxFolderBrowser extends TitleAreaDialog {
+public class DialogDropboxFolderBrowser extends TitleAreaDialog {
 
    private static final String   ROOT_FOLDER    = "/";                                             //$NON-NLS-1$
 
@@ -75,7 +75,7 @@ public class DropboxFolderBrowser extends TitleAreaDialog {
 
    private boolean               _isInErrorState;
 
-   private final IDialogSettings _state         = TourbookPlugin.getState("DropboxFolderBrowser"); //$NON-NLS-1$
+   private final IDialogSettings _state         = TourbookPlugin.getState("DialogDropboxFolderBrowser"); //$NON-NLS-1$
    /*
     * Browser UI controls
     */
@@ -87,7 +87,7 @@ public class DropboxFolderBrowser extends TitleAreaDialog {
     */
    private Label                 _labelErrorMessage;
 
-   public DropboxFolderBrowser(final Shell parentShell, final String accessToken) {
+   public DialogDropboxFolderBrowser(final Shell parentShell, final String accessToken) {
 
       super(parentShell);
 

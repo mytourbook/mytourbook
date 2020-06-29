@@ -607,4 +607,10 @@ public interface ITourbookPreferences {
    public static final String WEATHER_USE_WEATHER_RETRIEVAL = "WEATHER_STATE_USE_WEATHER_RETRIEVAL"; //$NON-NLS-1$
    public static final String WEATHER_API_KEY               = "WEATHER_API_KEY";                     //$NON-NLS-1$
 
+   /*
+    * Indicator to either select all time slices in between left and right sliders or just the left
+    * and right sliders time slices.
+    */
+   public static final String TOGGLE_STATE_SELECT_INBETWEEN_TIME_SLICES = "TOGGLE_STATE_SELECT_ALL_TIME_SLICES"; //$NON-NLS-1$
+
 }
