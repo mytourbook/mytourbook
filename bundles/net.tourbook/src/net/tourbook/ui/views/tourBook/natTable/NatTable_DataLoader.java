@@ -23,7 +23,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -51,8 +50,8 @@ public class NatTable_DataLoader {
 
    private static final char                              NL                    = net.tourbook.common.UI.NEW_LINE;
 
-   private static final String                            SQL_ASCENDING         = "ASC";
-   private static final String                            SQL_DESCENDING        = "DESC";
+   private static final String                            SQL_ASCENDING         = "ASC";                           //$NON-NLS-1$
+   private static final String                            SQL_DESCENDING        = "DESC";                          //$NON-NLS-1$
 
    private static final String                            SQL_DEFAULT_FIELD     = "TourStartTime";                 //$NON-NLS-1$
 
@@ -86,8 +85,8 @@ public class NatTable_DataLoader {
    private ConcurrentHashMap<Long, Integer>               _fetchedTourIndex     = new ConcurrentHashMap<>();
    private final LinkedBlockingDeque<LazyTourLoaderItem>  _loaderWaitingQueue   = new LinkedBlockingDeque<>();
 
-   private ArrayList<String>                              _allSortColumnIds;
-   private List<SortDirectionEnum>                        _allSortDirections;
+   private String[]                                       _allSortColumnIds;
+   private ArrayList<SortDirectionEnum>                   _allSortDirections;
 
    private ArrayList<String>                              _allSqlSortFields     = new ArrayList<>();
    private ArrayList<String>                              _allSqlSortDirections = new ArrayList<>();
@@ -216,17 +215,48 @@ public class NatTable_DataLoader {
       return allRowIndices.toArray();
    }
 
+   private String createSqlOrderBy() {
+
+      final int numOrderFields = _allSqlSortFields.size();
+
+      if (numOrderFields == 0) {
+         return UI.EMPTY_STRING;
+      }
+
+      final StringBuilder sb = new StringBuilder();
+
+      sb.append(" ORDER BY ");//$NON-NLS-1$
+
+      for (int fieldIndex = 0; fieldIndex < numOrderFields; fieldIndex++) {
+
+         final String fieldName = _allSqlSortFields.get(fieldIndex);
+         final String sortDirection = _allSqlSortDirections.get(fieldIndex);
+
+         if (fieldIndex > 0) {
+            // separate from previous order item
+            sb.append(UI.COMMA_SPACE + NL);
+         }
+
+         sb.append(fieldName + UI.SPACE + sortDirection); //
+      }
+
+      sb.append(NL);
+
+      return sb.toString();
+   }
+
    private int fetchNumberOfTours() {
+
 
       final SQLFilter sqlFilter = new SQLFilter(SQLFilter.TAG_FILTER);
 
       // get number of tours
       final String sql = NL
 
-            + "SELECT COUNT(*)"
-            + " FROM " + TourDatabase.TABLE_TOUR_DATA
+            + "SELECT COUNT(*)" //$NON-NLS-1$
+            + " FROM " + TourDatabase.TABLE_TOUR_DATA //$NON-NLS-1$
 
-            + " WHERE 1=1" + NL //
+            + " WHERE 1=1" + NL // //$NON-NLS-1$
             + sqlFilter.getWhereClause() + NL;
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
@@ -320,11 +350,11 @@ public class NatTable_DataLoader {
       }
    }
 
-   public ArrayList<String> getSortColumnId() {
+   public String[] getSortColumnIds() {
       return _allSortColumnIds;
    }
 
-   public List<SortDirectionEnum> getSortDirection() {
+   public ArrayList<SortDirectionEnum> getSortDirections() {
       return _allSortDirections;
    }
 
@@ -431,39 +461,39 @@ public class NatTable_DataLoader {
       /*
        * RUNNING DYNAMICS
        */
-      case TableColumnFactory.RUN_DYN_STANCE_TIME_AVG_ID:            return "runDyn_StanceTime_Avg";            //$NON-NLS-1$
-      case TableColumnFactory.RUN_DYN_STANCE_TIME_MIN_ID:            return "runDyn_StanceTime_Min";            //$NON-NLS-1$
-      case TableColumnFactory.RUN_DYN_STANCE_TIME_MAX_ID:            return "runDyn_StanceTime_Max";            //$NON-NLS-1$
-      case TableColumnFactory.RUN_DYN_STANCE_TIME_BALANCE_AVG_ID:    return "runDyn_StanceTimeBalance_Avg";     //$NON-NLS-1$
-      case TableColumnFactory.RUN_DYN_STANCE_TIME_BALANCE_MIN_ID:    return "runDyn_StanceTimeBalance_Min";     //$NON-NLS-1$
-      case TableColumnFactory.RUN_DYN_STANCE_TIME_BALANCE_MAX_ID:    return "runDyn_StanceTimeBalance_Max";     //$NON-NLS-1$
-      case TableColumnFactory.RUN_DYN_STEP_LENGTH_AVG_ID:            return "runDyn_StepLength_Avg";            //$NON-NLS-1$
-      case TableColumnFactory.RUN_DYN_STEP_LENGTH_MIN_ID:            return "runDyn_StepLength_Min";            //$NON-NLS-1$
-      case TableColumnFactory.RUN_DYN_STEP_LENGTH_MAX_ID:            return "runDyn_StepLength_Max";            //$NON-NLS-1$
-      case TableColumnFactory.RUN_DYN_VERTICAL_OSCILLATION_AVG_ID:   return "runDyn_VerticalOscillation_Avg";   //$NON-NLS-1$
-      case TableColumnFactory.RUN_DYN_VERTICAL_OSCILLATION_MIN_ID:   return "runDyn_VerticalOscillation_Min";   //$NON-NLS-1$
-      case TableColumnFactory.RUN_DYN_VERTICAL_OSCILLATION_MAX_ID:   return "runDyn_VerticalOscillation_Max";   //$NON-NLS-1$
-      case TableColumnFactory.RUN_DYN_VERTICAL_RATIO_AVG_ID:         return "runDyn_VerticalRatio_Avg";         //$NON-NLS-1$
-      case TableColumnFactory.RUN_DYN_VERTICAL_RATIO_MIN_ID:         return "runDyn_VerticalRatio_Min";         //$NON-NLS-1$
-      case TableColumnFactory.RUN_DYN_VERTICAL_RATIO_MAX_ID:         return "runDyn_VerticalRatio_Max";         //$NON-NLS-1$
+      case TableColumnFactory.RUN_DYN_STANCE_TIME_AVG_ID:            return "runDyn_StanceTime_Avg";           //$NON-NLS-1$
+      case TableColumnFactory.RUN_DYN_STANCE_TIME_MIN_ID:            return "runDyn_StanceTime_Min";           //$NON-NLS-1$
+      case TableColumnFactory.RUN_DYN_STANCE_TIME_MAX_ID:            return "runDyn_StanceTime_Max";           //$NON-NLS-1$
+      case TableColumnFactory.RUN_DYN_STANCE_TIME_BALANCE_AVG_ID:    return "runDyn_StanceTimeBalance_Avg";    //$NON-NLS-1$
+      case TableColumnFactory.RUN_DYN_STANCE_TIME_BALANCE_MIN_ID:    return "runDyn_StanceTimeBalance_Min";    //$NON-NLS-1$
+      case TableColumnFactory.RUN_DYN_STANCE_TIME_BALANCE_MAX_ID:    return "runDyn_StanceTimeBalance_Max";    //$NON-NLS-1$
+      case TableColumnFactory.RUN_DYN_STEP_LENGTH_AVG_ID:            return "runDyn_StepLength_Avg";           //$NON-NLS-1$
+      case TableColumnFactory.RUN_DYN_STEP_LENGTH_MIN_ID:            return "runDyn_StepLength_Min";           //$NON-NLS-1$
+      case TableColumnFactory.RUN_DYN_STEP_LENGTH_MAX_ID:            return "runDyn_StepLength_Max";           //$NON-NLS-1$
+      case TableColumnFactory.RUN_DYN_VERTICAL_OSCILLATION_AVG_ID:   return "runDyn_VerticalOscillation_Avg";  //$NON-NLS-1$
+      case TableColumnFactory.RUN_DYN_VERTICAL_OSCILLATION_MIN_ID:   return "runDyn_VerticalOscillation_Min";  //$NON-NLS-1$
+      case TableColumnFactory.RUN_DYN_VERTICAL_OSCILLATION_MAX_ID:   return "runDyn_VerticalOscillation_Max";  //$NON-NLS-1$
+      case TableColumnFactory.RUN_DYN_VERTICAL_RATIO_AVG_ID:         return "runDyn_VerticalRatio_Avg";        //$NON-NLS-1$
+      case TableColumnFactory.RUN_DYN_VERTICAL_RATIO_MIN_ID:         return "runDyn_VerticalRatio_Min";        //$NON-NLS-1$
+      case TableColumnFactory.RUN_DYN_VERTICAL_RATIO_MAX_ID:         return "runDyn_VerticalRatio_Max";        //$NON-NLS-1$
 
       /*
        * SURFING
        */
-      case TableColumnFactory.SURFING_MIN_DISTANCE_ID:               return "surfing_MinDistance";              //$NON-NLS-1$
-      case TableColumnFactory.SURFING_MIN_SPEED_START_STOP_ID:       return "surfing_MinSpeed_StartStop";       //$NON-NLS-1$
-      case TableColumnFactory.SURFING_MIN_SPEED_SURFING_ID:          return "surfing_MinSpeed_Surfing";         //$NON-NLS-1$
-      case TableColumnFactory.SURFING_MIN_TIME_DURATION_ID:          return "surfing_MinTimeDuration";          //$NON-NLS-1$
-      case TableColumnFactory.SURFING_NUMBER_OF_EVENTS_ID:           return "surfing_NumberOfEvents";           //$NON-NLS-1$
+      case TableColumnFactory.SURFING_MIN_DISTANCE_ID:               return "surfing_MinDistance";             //$NON-NLS-1$
+      case TableColumnFactory.SURFING_MIN_SPEED_START_STOP_ID:       return "surfing_MinSpeed_StartStop";      //$NON-NLS-1$
+      case TableColumnFactory.SURFING_MIN_SPEED_SURFING_ID:          return "surfing_MinSpeed_Surfing";        //$NON-NLS-1$
+      case TableColumnFactory.SURFING_MIN_TIME_DURATION_ID:          return "surfing_MinTimeDuration";         //$NON-NLS-1$
+      case TableColumnFactory.SURFING_NUMBER_OF_EVENTS_ID:           return "surfing_NumberOfEvents";          //$NON-NLS-1$
 
       /*
        * TIME
        */
-      case TableColumnFactory.TIME_DRIVING_TIME_ID:                  return "tourDrivingTime";                  //$NON-NLS-1$
+      case TableColumnFactory.TIME_DRIVING_TIME_ID:                  return "tourDrivingTime";                 //$NON-NLS-1$
       case TableColumnFactory.TIME_PAUSED_TIME_ID:                   return FIELD_WITHOUT_SORTING;
       case TableColumnFactory.TIME_PAUSED_TIME_RELATIVE_ID:          return FIELD_WITHOUT_SORTING;
-      case TableColumnFactory.TIME_RECORDING_TIME_ID:                return "tourRecordingTime";                //$NON-NLS-1$
-      case TableColumnFactory.TIME_TIME_ZONE_ID:                     return "TimeZoneId";                       //$NON-NLS-1$
+      case TableColumnFactory.TIME_RECORDING_TIME_ID:                return "tourRecordingTime";               //$NON-NLS-1$
+      case TableColumnFactory.TIME_TIME_ZONE_ID:                     return "TimeZoneId";                      //$NON-NLS-1$
       case TableColumnFactory.TIME_TIME_ZONE_DIFFERENCE_ID:          return FIELD_WITHOUT_SORTING;
 //    case TableColumnFactory.TIME_TOUR_START_TIME_ID:               // see indexed fields
       case TableColumnFactory.TIME_WEEK_DAY_ID:                      return FIELD_WITHOUT_SORTING;
@@ -473,35 +503,35 @@ public class NatTable_DataLoader {
       /*
        * TOUR
        */
-      case TableColumnFactory.TOUR_LOCATION_START_ID:                return "tourStartPlace";                   //$NON-NLS-1$
-      case TableColumnFactory.TOUR_LOCATION_END_ID:                  return "tourEndPlace";                     //$NON-NLS-1$
+      case TableColumnFactory.TOUR_LOCATION_START_ID:                return "tourStartPlace";                              //$NON-NLS-1$
+      case TableColumnFactory.TOUR_LOCATION_END_ID:                  return "tourEndPlace";                                //$NON-NLS-1$
       case TableColumnFactory.TOUR_NUM_MARKERS_ID:                   return FIELD_WITHOUT_SORTING;
       case TableColumnFactory.TOUR_NUM_PHOTOS_ID:                    return FIELD_WITHOUT_SORTING;
       case TableColumnFactory.TOUR_TAGS_ID:                          return FIELD_WITHOUT_SORTING;
 //    case TableColumnFactory.TOUR_TITLE_ID:                         // see indexed fields
-      case TableColumnFactory.TOUR_TYPE_ID:                          return FIELD_WITHOUT_SORTING;
+      case TableColumnFactory.TOUR_TYPE_ID:                          return "tourType_typeId";  // an icon is displayed    //$NON-NLS-1$
       case TableColumnFactory.TOUR_TYPE_TEXT_ID:                     return FIELD_WITHOUT_SORTING;
 
       /*
        * TRAINING
        */
-      case TableColumnFactory.TRAINING_EFFECT_AEROB_ID:              return "training_TrainingEffect_Aerob";    //$NON-NLS-1$
-      case TableColumnFactory.TRAINING_EFFECT_ANAEROB_ID:            return "training_TrainingEffect_Anaerob";  //$NON-NLS-1$
-      case TableColumnFactory.TRAINING_FTP_ID:                       return "power_FTP";                        //$NON-NLS-1$
-      case TableColumnFactory.TRAINING_INTENSITY_FACTOR_ID:          return "power_IntensityFactor";            //$NON-NLS-1$
+      case TableColumnFactory.TRAINING_EFFECT_AEROB_ID:              return "training_TrainingEffect_Aerob";               //$NON-NLS-1$
+      case TableColumnFactory.TRAINING_EFFECT_ANAEROB_ID:            return "training_TrainingEffect_Anaerob";             //$NON-NLS-1$
+      case TableColumnFactory.TRAINING_FTP_ID:                       return "power_FTP";                                   //$NON-NLS-1$
+      case TableColumnFactory.TRAINING_INTENSITY_FACTOR_ID:          return "power_IntensityFactor";                       //$NON-NLS-1$
       case TableColumnFactory.TRAINING_POWER_TO_WEIGHT_ID:           return FIELD_WITHOUT_SORTING;
-      case TableColumnFactory.TRAINING_STRESS_SCORE_ID:              return "power_TrainingStressScore";        //$NON-NLS-1$
-      case TableColumnFactory.TRAINING_PERFORMANCE_LEVEL_ID:         return "training_TrainingPerformance";     //$NON-NLS-1$
+      case TableColumnFactory.TRAINING_STRESS_SCORE_ID:              return "power_TrainingStressScore";                   //$NON-NLS-1$
+      case TableColumnFactory.TRAINING_PERFORMANCE_LEVEL_ID:         return "training_TrainingPerformance";                //$NON-NLS-1$
 
       /*
        * WEATHER
        */
-      case TableColumnFactory.WEATHER_CLOUDS_ID:                     return "weatherClouds";                                //$NON-NLS-1$
-      case TableColumnFactory.WEATHER_TEMPERATURE_AVG_ID:            return "(DOUBLE(avgTemperature) / temperatureScale)";  //$NON-NLS-1$
-      case TableColumnFactory.WEATHER_TEMPERATURE_MIN_ID:            return "weather_Temperature_Min";                      //$NON-NLS-1$
-      case TableColumnFactory.WEATHER_TEMPERATURE_MAX_ID:            return "weather_Temperature_Max";                      //$NON-NLS-1$
-      case TableColumnFactory.WEATHER_WIND_DIR_ID:                   return "weatherWindDir";                               //$NON-NLS-1$
-      case TableColumnFactory.WEATHER_WIND_SPEED_ID:                 return "weatherWindSpd";                               //$NON-NLS-1$
+      case TableColumnFactory.WEATHER_CLOUDS_ID:                     return "weatherClouds";   // an icon is displayed     //$NON-NLS-1$
+      case TableColumnFactory.WEATHER_TEMPERATURE_AVG_ID:            return "(DOUBLE(avgTemperature) / temperatureScale)"; //$NON-NLS-1$
+      case TableColumnFactory.WEATHER_TEMPERATURE_MIN_ID:            return "weather_Temperature_Min";                     //$NON-NLS-1$
+      case TableColumnFactory.WEATHER_TEMPERATURE_MAX_ID:            return "weather_Temperature_Max";                     //$NON-NLS-1$
+      case TableColumnFactory.WEATHER_WIND_DIR_ID:                   return "weatherWindDir";                              //$NON-NLS-1$
+      case TableColumnFactory.WEATHER_WIND_SPEED_ID:                 return "weatherWindSpd";                              //$NON-NLS-1$
 
       default:
 
@@ -621,11 +651,10 @@ public class NatTable_DataLoader {
 
             + " FROM " + TourDatabase.TABLE_TOUR_DATA + " TourData" + NL //            //$NON-NLS-1$ //$NON-NLS-2$
 
-            + " WHERE 1=1" + NL //
+            + " WHERE 1=1" + NL // //$NON-NLS-1$
             + sqlFilter.getWhereClause() + NL
 
-            + " ORDER BY " + _allSqlSortFields + UI.SPACE + _allSqlSortDirections + NL //      //$NON-NLS-1$
-      ;
+            + createSqlOrderBy();
 
       final TLongArrayList allTourIds = new TLongArrayList();
 
@@ -658,6 +687,8 @@ public class NatTable_DataLoader {
 
    private boolean loadPagedTourItems(final LazyTourLoaderItem loaderItem) {
 
+//      final long start = System.nanoTime();
+
       final SQLFilter sqlFilter = new SQLFilter(SQLFilter.TAG_FILTER);
 
       final String sql = NL
@@ -668,13 +699,16 @@ public class NatTable_DataLoader {
 
             + " FROM " + TourDatabase.TABLE_TOUR_DATA + " TourData" + NL //            //$NON-NLS-1$ //$NON-NLS-2$
 
-            + " WHERE 1=1" + NL //
+            + " WHERE 1=1" + NL // //$NON-NLS-1$
             + sqlFilter.getWhereClause() + NL
 
-            + " ORDER BY " + _allSqlSortFields + UI.SPACE + _allSqlSortDirections + NL //      //$NON-NLS-1$
+            + createSqlOrderBy()
 
             + " OFFSET ? ROWS FETCH NEXT ? ROWS ONLY" + NL //                          //$NON-NLS-1$
       ;
+
+//      System.out.println((System.currentTimeMillis() + " sql:" + sql));
+//      // TODO remove SYSTEM.OUT.PRINTLN
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
@@ -688,7 +722,7 @@ public class NatTable_DataLoader {
          // set other parameters
          int paramIndex = sqlFilter.getLastParameterIndex();
 
-         prepStmt.setInt(paramIndex++, loaderItem.sqlOffset);
+         prepStmt.setInt(paramIndex++, rowIndex);
          prepStmt.setInt(paramIndex++, FETCH_SIZE);
 
          final ResultSet result = prepStmt.executeQuery();
@@ -712,6 +746,10 @@ public class NatTable_DataLoader {
 
          return false;
       }
+
+//      System.out.println((UI.timeStampNano() + " " + this.getClass().getName() + " \t")
+//            + (((float) (System.nanoTime() - start) / 1000000) + " ms"));
+//      // TODO remove SYSTEM.OUT.PRINTLN
 
       return true;
    }
@@ -737,45 +775,52 @@ public class NatTable_DataLoader {
    }
 
    /**
-    * Sets sort column id/direction but firstly the previous loaded tours are cleaned up
+    * Sets sort column id/direction but first cleanup the previous loaded tours.
     *
-    * @param allSortedColumnIds
+    * @param allSortColumnIds
     * @param allSortDirections
     */
-   public void setupSortColumn(final ArrayList<String> allSortedColumnIds, final List<SortDirectionEnum> allSortDirections) {
-
-      _allSortColumnIds = allSortedColumnIds;
-      _allSortDirections = allSortDirections;
+   public void setupSortColumns(final String[] allSortColumnIds, final ArrayList<SortDirectionEnum> allSortDirections) {
 
       // cleanup old fetched tours
       resetTourItems();
 
+      _allSortColumnIds = allSortColumnIds;
+      _allSortDirections = allSortDirections;
+
       _allSqlSortFields.clear();
       _allSqlSortDirections.clear();
 
-      for (int columnIndex = 0; columnIndex < allSortDirections.size(); columnIndex++) {
+      final int numSortColumns = allSortDirections.size();
 
-         /*
-          * Set sort order
-          */
-         final SortDirectionEnum sortDirectionEnum = allSortDirections.get(columnIndex);
-         if (sortDirectionEnum == SortDirectionEnum.ASC) {
-            _allSqlSortDirections.add(SQL_ASCENDING);
-         } else {
-            _allSqlSortDirections.add(SQL_DESCENDING);
-         }
+      for (int columnIndex = 0; columnIndex < numSortColumns; columnIndex++) {
 
-         /*
-          * Set sort field
-          */
-         String sqlField = getSqlField(allSortedColumnIds.get(columnIndex));
+         final String sqlField = getSqlField(allSortColumnIds[columnIndex]);
 
          // ensure that the dummy field is not used in the sql statement, this should not happen but it did during development
-         if (FIELD_WITHOUT_SORTING.equals(sqlField)) {
-            sqlField = SQL_DEFAULT_FIELD;
-         }
+         if (FIELD_WITHOUT_SORTING.equals(sqlField) == false) {
 
-         _allSqlSortFields.add(sqlField);
+            final SortDirectionEnum sortDirectionEnum = allSortDirections.get(columnIndex);
+
+            // skip field which are not sorted
+            if (sortDirectionEnum.equals(SortDirectionEnum.NONE) == false) {
+
+               /*
+                * Set sort order
+                */
+               if (sortDirectionEnum == SortDirectionEnum.ASC) {
+                  _allSqlSortDirections.add(SQL_ASCENDING);
+               } else {
+                  _allSqlSortDirections.add(SQL_DESCENDING);
+               }
+
+               /*
+                * Set sort field
+                */
+               _allSqlSortFields.add(sqlField);
+            }
+         }
       }
    }
+
 }

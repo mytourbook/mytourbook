@@ -1051,29 +1051,28 @@ public class Util {
    /**
     * @param state
     * @param key
-    * @param defaultValue
+    * @param allDefaultValues
     * @return Returns a string value from {@link IDialogSettings}. When the key is not found, the
     *         default value is returned.
     */
-   @SuppressWarnings("unchecked")
-   public static <E extends Enum<E>> Enum<E>[] getStateEnum(final IDialogSettings state,
-                                                            final String key,
-                                                            final Enum<E>[] defaultValue) {
+   public static <E extends Enum<E>> ArrayList<E> getStateEnumList(final IDialogSettings state,
+                                                                   final String key,
+                                                                   final ArrayList<E> allDefaultValues) {
 
       if (state == null) {
-         return defaultValue;
+         return allDefaultValues;
       }
 
       final String[] allStateValues = state.getArray(key);
-      if (allStateValues == null || allStateValues.length == 0) {
-         return defaultValue;
+      if (allStateValues == null || allStateValues.length == 0 || allDefaultValues == null || allDefaultValues.size() == 0) {
+         return allDefaultValues;
       }
 
       final ArrayList<E> allEnumValues = new ArrayList<>();
 
       try {
 
-         final Class<E> declaringClass = defaultValue[0].getDeclaringClass();
+         final Class<E> declaringClass = allDefaultValues.get(0).getDeclaringClass();
 
          for (final String stateValue : allStateValues) {
             if (stateValue != null) {
@@ -1083,10 +1082,10 @@ public class Util {
 
       } catch (final IllegalArgumentException ex) {
 
-         return defaultValue;
+         return allDefaultValues;
       }
 
-      return (Enum<E>[]) allEnumValues.toArray();
+      return allEnumValues;
    }
 
    /**
@@ -1273,6 +1272,24 @@ public class Util {
       }
 
       final String stateValue = state.get(key);
+
+      return stateValue == null ? defaultValue : stateValue;
+   }
+
+   /**
+    * @param state
+    * @param key
+    * @param defaultValue
+    * @return Returns a string value from {@link IDialogSettings}. When the key is not found, the
+    *         default value is returned.
+    */
+   public static String[] getStateStringArray(final IDialogSettings state, final String key, final String[] defaultValue) {
+
+      if (state == null) {
+         return defaultValue;
+      }
+
+      final String[] stateValue = state.getArray(key);
 
       return stateValue == null ? defaultValue : stateValue;
    }
@@ -2383,21 +2400,12 @@ public class Util {
    }
 
    public static <E extends Enum<E>> void setStateEnum(final IDialogSettings state,
-                                                       final String key,
-                                                       final Enum<E> value) {
-
-      if (value != null) {
-         state.put(key, value.name());
-      }
-   }
-
-   public static <E extends Enum<E>> void setStateEnum(final IDialogSettings state,
                                                        final String stateKey,
-                                                       final List<E> allValues) {
+                                                       final ArrayList<E> allValues) {
 
       final ArrayList<String> allEnumNames = new ArrayList<>();
 
-      for (final E enumValue : allValues) {
+      for (final Enum<E> enumValue : allValues) {
 
          if (allEnumNames != null) {
             allEnumNames.add(enumValue.name());
@@ -2406,6 +2414,15 @@ public class Util {
 
       if (allEnumNames.size() > 0) {
          state.put(stateKey, allEnumNames.toArray(new String[allEnumNames.size()]));
+      }
+   }
+
+   public static <E extends Enum<E>> void setStateEnum(final IDialogSettings state,
+                                                       final String key,
+                                                       final Enum<E> value) {
+
+      if (value != null) {
+         state.put(key, value.name());
       }
    }
 

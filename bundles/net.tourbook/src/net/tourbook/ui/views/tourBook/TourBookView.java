@@ -206,7 +206,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
 // SET_FORMATTING_OFF
 
-   private static final String           COLUMN_FACTORY_TIME_ZONE_DIFF_TOOLTIP            = net.tourbook.ui.Messages.ColumnFactory_TimeZoneDifference_Tooltip;
+   private static final String            COLUMN_FACTORY_TIME_ZONE_DIFF_TOOLTIP            = net.tourbook.ui.Messages.ColumnFactory_TimeZoneDifference_Tooltip;
 
 // SET_FORMATTING_ON
    //
@@ -247,7 +247,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    //
    private static TourBookViewLayout      _viewLayout;
    //
-   private ColumnFactory                  _columnFactory;
+   private TourBook_ColumnFactory         _columnFactory;
    private ColumnManager                  _columnManager_NatTable;
    private ColumnManager                  _columnManager_Tree;
    //
@@ -1174,7 +1174,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _columnManager_Tree = new ColumnManager(this, _state_Tree);
       _columnManager_Tree.setIsCategoryAvailable(true);
 
-      _columnFactory = new ColumnFactory(_columnManager_NatTable, _columnManager_Tree, _pc);
+      _columnFactory = new TourBook_ColumnFactory(_columnManager_NatTable, _columnManager_Tree, _pc);
       _columnFactory.defineAllColumns();
 
       createUI(parent);
@@ -1343,6 +1343,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
        */
       // turn the auto configuration off as we want to add custom configurations
       _tourViewer_NatTable = new NatTable(parent, gridLayer, false);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(_tourViewer_NatTable);
+
       _tourViewer_NatTable.setConfigRegistry(configRegistry);
 
       _columnManager_NatTable.setupNatTable_PostCreate();
@@ -1377,8 +1379,11 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       // prevent selecting all cells when column header is clicked on a column which cannot be sorted
       uiBindingRegistry.registerSingleClickBinding(MouseEventMatcher.columnHeaderLeftClick(SWT.NONE), null);
 
+      // prevent sorting columns with Alt key which sorting is disabled
+      uiBindingRegistry.registerSingleClickBinding(MouseEventMatcher.columnHeaderLeftClick(SWT.MOD3), null);
+
       /*
-       * Do NatTable configuration
+       * Setup NatTable configuration
        */
 
       // as the autoconfiguration of the NatTable is turned off, we have to add the DefaultNatTableStyleConfiguration manually
@@ -1398,8 +1403,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       // overwrite theme with MT's own theme based on the modern theme
       _tourViewer_NatTable.setTheme(new NatTable_Configuration_Theme());
-
-      GridDataFactory.fillDefaults().grab(true, true).applyTo(_tourViewer_NatTable);
 
       // set header tooltip
       _natTable_Tooltip = new NatTable_Header_Tooltip(_tourViewer_NatTable, this);
@@ -1862,6 +1865,10 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       return _tourViewer_NatTable;
    }
 
+   public ColumnManager getNatTable_ColumnManager() {
+      return _columnManager_NatTable;
+   }
+
    /**
     * @param event
     * @return Returns the {@link ColumnDefinition} of the currently selected row or
@@ -1909,6 +1916,10 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    @Override
    public DataLayer getNatTableLayer_Data() {
       return _natTable_Body_DataLayer;
+   }
+
+   public NatTable_SortModel getNatTableLayer_SortModel() {
+      return _natTable_SortModel;
    }
 
    @Override
@@ -2201,7 +2212,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
          // move selected tour into view
 
-         Display.getDefault().timerExec(10, () -> {
+         Display.getDefault().timerExec(1, () -> {
             natTable_ScrollSelectedToursIntoView();
          });
       }
@@ -2245,8 +2256,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          final int numVisibleRows = _natTable_Body_ViewportLayer.getRowCount();
          final int scrollableRowCenterPosition = numVisibleRows / 2;
 
-         final Enum<SortDirectionEnum> sortDirection = _natTable_DataLoader.getSortDirection();
-         final String sortColumnId = _natTable_DataLoader.getSortColumnId();
+         final ArrayList<SortDirectionEnum> sortDirection = _natTable_DataLoader.getSortDirections();
+         final String[] sortColumnId = _natTable_DataLoader.getSortColumnIds();
 
 //         System.out.println((System.currentTimeMillis() + " " + sortColumnId));
 //         // TODO remove SYSTEM.OUT.PRINTLN
@@ -2893,22 +2904,27 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
    private void restoreState_SortColumns() {
 
-      // get sorting state
-      final String sortColumnId = Util.getStateString(_state, STATE_SORT_COLUMN_ID, TableColumnFactory.TIME_DATE_ID);
+      final String[] columnIdDefaultValues = new String[] { TableColumnFactory.TIME_DATE_ID };
+      final ArrayList<SortDirectionEnum> directionDefaultValues = new ArrayList<>();
+      directionDefaultValues.add(SortDirectionEnum.DESC);
 
-      final ArrayList<Enum<SortDirectionEnum>> defaultValues = new <Enum<SortDirectionEnum>> [];
+      String[] allSortColumnIds = Util.getStateStringArray(_state, STATE_SORT_COLUMN_ID, columnIdDefaultValues);
+      final ArrayList<SortDirectionEnum> allSortDirections = Util.getStateEnumList(_state, STATE_SORT_COLUMN_DIRECTION, directionDefaultValues);
 
-//      defaultValues.add(SortDirectionEnum.DESC);
-//      defaultArray = (<Enum<SortDirectionEnum>> )defaultValues.toArray();
+      // validate values, must have the same number of items
+      if (allSortColumnIds.length != allSortDirections.size()) {
 
-//      final Enum<SortDirectionEnum>[] sortDirection = Util.getStateEnum(_state,
-//            STATE_SORT_COLUMN_DIRECTION,
-//            defaultArray);
+         // data are invalid -> cleanup
 
-//      _natTable_SortModel.setupSortColumn(sortColumnId, sortDirection);
-//
-//      // setup data loader
-//      _natTable_DataLoader.setupSortColumn(sortColumnId, (SortDirectionEnum) sortDirection);
+         allSortColumnIds = new String[0];
+         allSortDirections.clear();
+      }
+
+      // setup model
+      _natTable_SortModel.setupSortColumns(allSortColumnIds, allSortDirections);
+
+      // setup data loader
+      _natTable_DataLoader.setupSortColumns(allSortColumnIds, allSortDirections);
    }
 
    @PersistState
@@ -2931,11 +2947,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _state.put(STATE_IS_LINK_WITH_OTHER_VIEWS, _actionLinkWithOtherViews.getSelection());
       _state.put(STATE_VIEW_LAYOUT, _viewLayout.name());
 
-      // viewer columns
-//      Util.state
-      final ArrayList<String> allSortColumnIds = _natTable_DataLoader.getSortColumnId();
-      _state.put(STATE_SORT_COLUMN_ID, allSortColumnIds.toArray(new String[allSortColumnIds.size()]));
-      Util.setStateEnum(_state, STATE_SORT_COLUMN_DIRECTION, _natTable_DataLoader.getSortDirection());
+      // sort columns
+      _state.put(STATE_SORT_COLUMN_ID, _natTable_DataLoader.getSortColumnIds());
+      Util.setStateEnum(_state, STATE_SORT_COLUMN_DIRECTION, _natTable_DataLoader.getSortDirections());
 
       _columnManager_Tree.saveState(_state_Tree);
 

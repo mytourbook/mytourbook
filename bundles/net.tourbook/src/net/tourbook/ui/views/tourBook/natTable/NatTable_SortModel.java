@@ -31,13 +31,13 @@ import org.eclipse.nebula.widgets.nattable.sort.SortDirectionEnum;
  */
 public class NatTable_SortModel implements ISortModel {
 
-   private List<Integer>           _sortedColumnIndexes;
-   private List<Integer>           _sortOrder;
-   private List<SortDirectionEnum> _sortDirection;
+   private ArrayList<Integer>           _allSortedColumnIndexes = new ArrayList<>();
+   private ArrayList<Integer>           _allSortOrders          = new ArrayList<>();
+   private ArrayList<SortDirectionEnum> _allSortDirections      = new ArrayList<>();
 
-   private ColumnManager           _columnManager;
+   private ColumnManager                _columnManager;
 
-   private NatTable_DataLoader     _dataLoader;
+   private NatTable_DataLoader          _dataLoader;
 
    public NatTable_SortModel(final ColumnManager columnManager, final NatTable_DataLoader dataLoader) {
 
@@ -48,9 +48,9 @@ public class NatTable_SortModel implements ISortModel {
    @Override
    public void clear() {
 
-      _sortedColumnIndexes.clear();
-      _sortOrder.clear();
-      _sortDirection.clear();
+      _allSortedColumnIndexes.clear();
+      _allSortOrders.clear();
+      _allSortDirections.clear();
    }
 
    @Override
@@ -71,8 +71,8 @@ public class NatTable_SortModel implements ISortModel {
    @Override
    public SortDirectionEnum getSortDirection(final int columnIndex) {
 
-      if (_sortedColumnIndexes.contains(columnIndex)) {
-         return this._sortDirection.get(this._sortOrder.indexOf(columnIndex));
+      if (_allSortedColumnIndexes.contains(columnIndex)) {
+         return this._allSortDirections.get(this._allSortOrders.indexOf(columnIndex));
       }
 
       return SortDirectionEnum.NONE;
@@ -80,14 +80,14 @@ public class NatTable_SortModel implements ISortModel {
 
    @Override
    public List<Integer> getSortedColumnIndexes() {
-      return _sortedColumnIndexes;
+      return _allSortedColumnIndexes;
    }
 
    @Override
    public int getSortOrder(final int columnIndex) {
 
-      if (_sortedColumnIndexes.contains(columnIndex)) {
-         return _sortOrder.indexOf(columnIndex);
+      if (_allSortedColumnIndexes.contains(columnIndex)) {
+         return _allSortOrders.indexOf(columnIndex);
       }
 
       return -1;
@@ -95,59 +95,94 @@ public class NatTable_SortModel implements ISortModel {
 
    @Override
    public boolean isColumnIndexSorted(final int columnIndex) {
-      return _sortedColumnIndexes.contains(columnIndex);
+      return _allSortedColumnIndexes.contains(columnIndex);
    }
 
-   public void setupSortColumn(final String sortColumnId, final Enum<SortDirectionEnum> sortDirection) {
+   public void setupSortColumns(final String[] allSortColumnIds, final ArrayList<SortDirectionEnum> allSortDirections) {
 
-      final ArrayList<ColumnDefinition> allVisibleColums = _columnManager.getVisibleAndSortedColumns();
+      clear();
 
-      for (int columnIndex = 0; columnIndex < allVisibleColums.size(); columnIndex++) {
-         final ColumnDefinition colDef = allVisibleColums.get(columnIndex);
-         if (sortColumnId.equals(colDef.getColumnId())) {
+      for (int columnIdIndex = 0; columnIdIndex < allSortColumnIds.length; columnIdIndex++) {
 
-            // setup sort fields, this will not start the sorting
-            sort(columnIndex, (SortDirectionEnum) sortDirection, false);
+         final String columnId = allSortColumnIds[columnIdIndex];
+         final SortDirectionEnum sortDirection = allSortDirections.get(columnIdIndex);
 
-            return;
+         final ArrayList<ColumnDefinition> allVisibleColums = _columnManager.getVisibleAndSortedColumns();
+
+         for (int columnIndex = 0; columnIndex < allVisibleColums.size(); columnIndex++) {
+
+            final ColumnDefinition colDef = allVisibleColums.get(columnIndex);
+            if (columnId.equals(colDef.getColumnId())) {
+
+               _allSortedColumnIndexes.add(columnIndex);
+               _allSortOrders.add(columnIndex);
+               _allSortDirections.add(sortDirection);
+
+               break;
+            }
          }
       }
+
+      _dataLoader.setupSortColumns(allSortColumnIds, allSortDirections);
    }
 
    @Override
    public void sort(final int columnIndex, final SortDirectionEnum sortDirection, final boolean isAccumulate) {
 
       if (isAccumulate == false) {
+
+         // don't accumulate -> start a new sort
+
          clear();
-      }
 
-      _sortedColumnIndexes.add(columnIndex);
-      _sortOrder.add(columnIndex);
-      _sortDirection.add(sortDirection);
+         if (sortDirection.equals(SortDirectionEnum.NONE)) {
 
-      if (!isColumnIndexSorted(columnIndex)) {
-         clear();
-      }
+            // do not sort anything, this occures when the sort direction is toggled
 
-      SortDirectionEnum sortDirectionAdjusted = sortDirection;
+         } else {
 
-      if (sortDirection.equals(SortDirectionEnum.NONE)) {
+            // start a new sorting
 
-         // we don't support NONE as user action
-         sortDirectionAdjusted = SortDirectionEnum.ASC;
+            _allSortedColumnIndexes.add(columnIndex);
+            _allSortOrders.add(columnIndex);
+            _allSortDirections.add(sortDirection);
+         }
+
+      } else {
+
+         // accumulate colum sortings
+
+         // check if an already sorting column is clicked again
+         if (isColumnIndexSorted(columnIndex) == false) {
+
+            // a new column is selected
+
+            _allSortedColumnIndexes.add(columnIndex);
+            _allSortOrders.add(columnIndex);
+            _allSortDirections.add(sortDirection);
+
+         } else {
+
+            // a click on an already sorted column is done -> revert sorting
+
+            final int orderIndex = _allSortOrders.indexOf(columnIndex);
+            final SortDirectionEnum newSortDirection = _allSortDirections.get(orderIndex).getNextSortDirection();
+
+            _allSortDirections.set(orderIndex, newSortDirection);
+         }
       }
 
       // convert column index into column id
-      final ArrayList<ColumnDefinition> allColumns = _columnManager.getVisibleAndSortedColumns();
-
+      final ArrayList<ColumnDefinition> allColumnDefs = _columnManager.getVisibleAndSortedColumns();
       final ArrayList<String> allSortedColumnIds = new ArrayList<>();
-
-      for (final Integer sortedIndex : _sortedColumnIndexes) {
-         allSortedColumnIds.add(allColumns.get(sortedIndex).getColumnId());
+      for (final Integer sortedIndex : _allSortedColumnIndexes) {
+         allSortedColumnIds.add(allColumnDefs.get(sortedIndex).getColumnId());
       }
 
       // setup the data loader with the new sorting field/direction
-      _dataLoader.setupSortColumn(allSortedColumnIds, _sortDirection);
+      final String[] allSortedColumnIdsArray = allSortedColumnIds.toArray(new String[allSortedColumnIds.size()]);
+
+      _dataLoader.setupSortColumns(allSortedColumnIdsArray, _allSortDirections);
    }
 
 }
