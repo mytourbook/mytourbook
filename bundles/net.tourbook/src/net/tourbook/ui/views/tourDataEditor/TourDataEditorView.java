@@ -220,7 +220,12 @@ import org.eclipse.ui.progress.UIJob;
  */
 public class TourDataEditorView extends ViewPart implements ISaveablePart, ISaveAndRestorePart, ITourProvider2 {
    //TODO FB : Trying to address this request : https://sourceforge.net/p/mytourbook/discussion/622811/thread/17da3fb19f/
-   // DO the FIT, Ambit2 xml and sml,  S9 import to record paused time
+   // Do the following formats :
+   // FIT
+   // Ambit2 xml
+   // Ambit 2 sml
+   // S9 import to record paused time
+   // Sporttracks fitlog
 
    public static final String     ID                            = "net.tourbook.views.TourDataEditorView";                //$NON-NLS-1$
    //
