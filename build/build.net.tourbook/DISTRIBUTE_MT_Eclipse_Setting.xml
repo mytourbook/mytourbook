@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="distribute-mt-eclipse-settings" default="distribute-mt-eclipse-settings">
+
+   <!--
+      Copies the eclipse settings folder ".settings" from the project "net.tourbook" 
+      into all other MT projects
+   -->
+   
+   <property name="path-root"                value="../.." />
+   <property name="path-mt-all-projects"     value="${path-root}/bundles" />
+	
+   <property name="path-from-project"        value="${path-mt-all-projects}/net.tourbook/.settings" />
+
+   <!--
+      DEFAULT target
+   -->
+   <target name="distribute-mt-eclipse-settings">
+
+      <echo message="${ant.version}" />
+      <echo message="Copy settings from '${path-from-project}'" />
+      	
+      <copy todir="${path-build-translation}" preservelastmodified="true" includeemptydirs="false">
+          <fileset dir="${path-mt-nl}" >
+             <include name="**/*" />
+             <exclude name="**/*z-DUMMY-HOST*/**" />
+             <exclude name="**/*z-Dummy-Host*/**" />
+          </fileset>
+       </copy>
+
+   </target>
+
+</project>
