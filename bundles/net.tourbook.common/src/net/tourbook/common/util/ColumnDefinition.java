@@ -808,7 +808,7 @@ public class ColumnDefinition implements Cloneable {
             + "_isColumnChecked="      + _isColumnChecked      + ", "   //$NON-NLS-1$ //$NON-NLS-2$
 //          + "_valueFormat="          + _valueFormat_Category + ", "   //$NON-NLS-1$ //$NON-NLS-2$
 //          + "_valueFormat_Detail="   + _valueFormat_Detail   + ", "   //$NON-NLS-1$ //$NON-NLS-2$
-//				+ "_columnWidth="          + _columnWidth          + ", "   //$NON-NLS-1$ //$NON-NLS-2$
+				+ "_columnWidth="          + _columnWidth          + ", "   //$NON-NLS-1$ //$NON-NLS-2$
 //				+ "_defaultColumnWidth="   + _defaultColumnWidth            //$NON-NLS-1$
 
             + "]\n"; //$NON-NLS-1$

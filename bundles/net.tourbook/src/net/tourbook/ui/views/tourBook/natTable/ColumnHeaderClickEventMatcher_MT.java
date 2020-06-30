@@ -50,8 +50,12 @@ public class ColumnHeaderClickEventMatcher_MT extends ColumnHeaderClickEventMatc
          event.data = NatEventData.createInstanceFromEvent(event);
       }
 
-      final int columnPosition = ((NatEventData) event.data).getColumnPosition();
-      final ColumnDefinition colDef = _columnManager.getVisibleAndSortedColumns().get(columnPosition - 1);
+      final NatEventData natEventData = (NatEventData) event.data;
+
+      final int columnPosition = natEventData.getColumnPosition();
+      final int columnIndex = natEventData.getNatTable().getColumnIndexByPosition(columnPosition);
+
+      final ColumnDefinition colDef = _columnManager.getVisibleAndSortedColumns().get(columnIndex);
 
       return colDef.canSortColumn();
    }

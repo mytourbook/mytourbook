@@ -181,8 +181,9 @@ public class ColumnManager {
    private AdvancedSlideoutShell             _slideoutShell;
 
    /**
-    * When {@link #_natTablePropertiesProvider} is defined then this {@link ColumnManager} is used
-    * for a {@link NatTable}, it provides properties from a {@link NatTable}.
+    * When {@link #_natTablePropertiesProvider} is not <code>null</code> then this
+    * {@link ColumnManager} is used for a {@link NatTable}, it provides properties from a
+    * {@link NatTable}.
     */
    private INatTablePropertiesProvider       _natTablePropertiesProvider;
 
@@ -1453,15 +1454,15 @@ public class ColumnManager {
    }
 
    /**
-    * @param orderIndex
+    * @param createIndex
     *           column create id
     * @return Returns the column definition for the column create index, or <code>null</code> when
     *         the column is not available
     */
-   private ColumnDefinition getColDef_ByCreateIndex(final int orderIndex) {
+   private ColumnDefinition getColDef_ByCreateIndex(final int createIndex) {
 
       for (final ColumnDefinition colDef : _activeProfile.visibleColumnDefinitions) {
-         if (colDef.getCreateIndex() == orderIndex) {
+         if (colDef.getCreateIndex() == createIndex) {
             return colDef;
          }
       }
@@ -1574,7 +1575,7 @@ public class ColumnManager {
    }
 
    /**
-    * Read the column order from a table/tree and nattable
+    * Read the column order from a swt table/tree or nattable
     *
     * @return Returns <code>null</code> when table/tree cannot be accessed.
     */
@@ -2256,7 +2257,7 @@ public class ColumnManager {
       final ArrayList<String> allOrderedColumnIds = new ArrayList<>();
       final ArrayList<String> allColumnIdsAndWidth = new ArrayList<>();
 
-      for (int columnIndex = 0; columnIndex < numColumns; columnIndex++) {
+      for (int uiColumnPos = 0; uiColumnPos < numColumns; uiColumnPos++) {
 
          /*
           * This looks a bit complicated, it is. It respects reordered and hidden columns. This
@@ -2264,9 +2265,9 @@ public class ColumnManager {
           */
 
          // the reorder layer contains the correct column order for cases when columns are moved with drag&drop
-         final int reorderColIndex = columnReorderLayer.getColumnIndexByPosition(columnIndex);
+         final int createdColumnIndex = columnReorderLayer.getColumnIndexByPosition(uiColumnPos);
 
-         final int colIndexByPos = dataLayer.getColumnIndexByPosition(reorderColIndex);
+         final int colIndexByPos = dataLayer.getColumnIndexByPosition(createdColumnIndex);
 
          // the column hide show layer has the info if a column was set to hidden by the user
          final boolean isColumnHidden = columnHideShowLayer.isColumnIndexHidden(colIndexByPos);
@@ -2277,7 +2278,7 @@ public class ColumnManager {
          final ColumnDefinition colDef = getColDef_ByCreateIndex(colIndexByPos);
          if (colDef != null) {
 
-            final int colWidthByPos = dataLayer.getColumnWidthByPosition(reorderColIndex);
+            final int colWidthByPos = dataLayer.getColumnWidthByPosition(createdColumnIndex);
 
             final String columnId = colDef.getColumnId();
 
@@ -2615,7 +2616,7 @@ public class ColumnManager {
    }
 
    /**
-    * Set column definitions in the {@link ColumnProfile} from the visible id's.
+    * Sync column definitions in the {@link ColumnProfile} from the visible id's.
     *
     * @param columnProfile
     */
@@ -3008,10 +3009,32 @@ public class ColumnManager {
    /**
     * Read the sorting order and column width from the viewer/nattable.
     */
-   private void setVisibleColumnIds_FromViewer() {
+   public void setVisibleColumnIds_FromViewer() {
 
-      _activeProfile.setVisibleColumnIds(getColumns_FromViewer_Ids());
+      final String[] visibleColumnIds = getColumns_FromViewer_Ids();
+
+      _activeProfile.setVisibleColumnIds(visibleColumnIds);
       _activeProfile.visibleColumnIdsAndWidth = getColumns_FromViewer_IdAndWidth();
+
+//      // sync with visible columm definitions
+//      final ArrayList<ColumnDefinition> visibleColDefs = _activeProfile.visibleColumnDefinitions;
+//      visibleColDefs.clear();
+//
+//      for (final String columnId : visibleColumnIds) {
+//
+//         final ColumnDefinition colDef = getColDef_ByColumnId(columnId);
+//
+//         if (colDef != null) {
+//
+//            visibleColDefs.add(colDef);
+//
+//            // update column width
+//            colDef.setColumnWidth(getColumnWidth(colDef.getColumnId()));
+//         }
+//      }
+//
+//      int a = 0;
+//      a++;
    }
 
    private void updateColumns(final ColumnProfile profile) {
