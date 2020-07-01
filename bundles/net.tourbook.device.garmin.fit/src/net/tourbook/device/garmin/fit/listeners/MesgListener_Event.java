@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.tourbook.data.GearData;
-import net.tourbook.data.TimerPause;
+import net.tourbook.data.TourTimerPause;
 import net.tourbook.device.garmin.fit.FitData;
 
 /**
@@ -33,7 +33,7 @@ import net.tourbook.device.garmin.fit.FitData;
 public class MesgListener_Event extends AbstractMesgListener implements EventMesgListener {
 
    List<GearData> _gearData;
-   List<TimerPause> _timerPauses;
+   List<TourTimerPause> _timerPauses;
 
    public MesgListener_Event(final FitData fitData) {
 
@@ -54,7 +54,7 @@ public class MesgListener_Event extends AbstractMesgListener implements EventMes
          System.out.println(titi);
          //Get total_timer_time field Units: s Comment: Exclude pauses
 
-         final TimerPause tata = new TimerPause();
+         final TourTimerPause tata = new TourTimerPause();
          tata.setStartTime(titi.getTimestamp());
          _timerPauses.add(tata);
       }

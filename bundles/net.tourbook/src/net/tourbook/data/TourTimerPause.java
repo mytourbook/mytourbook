@@ -17,34 +17,52 @@ package net.tourbook.data;
 
 import java.io.Serializable;
 
-public class TimerPause implements Serializable {
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.xml.bind.annotation.XmlElement;
+
+import net.tourbook.database.TourDatabase;
+
+@Entity
+public class TourTimerPause implements Serializable {
 
    private static final long serialVersionUID = 1L;
 
-   private long _startTime;
-   private long _endTime;
+   /**
+    * Unique id for the {@link TourTimerPause} entity
+    */
+   @Id
+   @GeneratedValue(strategy = GenerationType.AUTO)
+   private long              timerPauseId     = TourDatabase.ENTITY_IS_NOT_SAVED;
 
-   public TimerPause() {}
+   @XmlElement
+   private long              startTime;
+   @XmlElement
+   private long              endTime;
 
-   public TimerPause(final long startTime, final long endTime) {
-      _startTime = startTime;
-      _endTime = endTime;
+   public TourTimerPause() {}
+
+   public TourTimerPause(final long startTime, final long endTime) {
+      this.startTime = startTime;
+      this.endTime = endTime;
    }
 
    public long getEndTime() {
-      return _endTime;
+      return endTime;
    }
 
    public long getPauseDuration() {
-      return _endTime - _startTime;
+      return endTime - startTime;
    }
 
    public long getStartTime() {
-      return _startTime;
+      return startTime;
    }
 
    public void setEndTime(final long endTime) {
-      this._endTime = endTime;
+      this.endTime = endTime;
    }
 
    /**
@@ -53,6 +71,6 @@ public class TimerPause implements Serializable {
     * @param startTime
     */
    public void setStartTime(final long startTime) {
-      this._startTime = startTime;
+      this.startTime = startTime;
    }
 }

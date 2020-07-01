@@ -34,7 +34,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.LengthType;
 import net.tourbook.data.SwimData;
 import net.tourbook.data.TimeData;
-import net.tourbook.data.TimerPause;
+import net.tourbook.data.TourTimerPause;
 import net.tourbook.data.TourData;
 
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -84,7 +84,7 @@ public class SuuntoJsonProcessor {
    private static int            previousTotalLengths = 0;
 
    private ArrayList<TimeData>   _sampleList;
-   private ArrayList<TimerPause> _timerPauses;
+   private ArrayList<TourTimerPause> _timerPauses;
    final IPreferenceStore        _prefStore           = TourbookPlugin.getDefault().getPreferenceStore();
 
    /**
@@ -300,7 +300,7 @@ public class SuuntoJsonProcessor {
                if (currentSampleData.contains(Boolean.FALSE.toString())) {
                   isPaused = false;
 
-                  final TimerPause timerPause = new TimerPause(pauseStartTime.toEpochSecond() * 1000, currentZonedDateTime.toEpochSecond() * 1000);
+                  final TourTimerPause timerPause = new TourTimerPause(pauseStartTime.toEpochSecond() * 1000, currentZonedDateTime.toEpochSecond() * 1000);
                   _timerPauses.add(timerPause);
                }
             }
@@ -384,7 +384,7 @@ public class SuuntoJsonProcessor {
       tourData.createTimeSeries(_sampleList, true);
 
       if (_timerPauses.size() > 0) {
-         tourData.setTimerPauses(_timerPauses.toArray(new TimerPause[] {}));
+         tourData.setTimerPauses(_timerPauses);
       }
 
       tourData.finalizeTour_SwimData(tourData, _allSwimData);

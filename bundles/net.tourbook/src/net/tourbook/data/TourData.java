@@ -321,8 +321,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * tourUserPauses
     * .....
     */
-   @XmlElement
-   private TimerPause[]                tourTimerPauses;
+   @OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
+   @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
+   @XmlElementWrapper(name = "TourTimerPauses")
+   @XmlElement(name = "TourTimerPause")
+   private List<TourTimerPause>             tourTimerPauses                         = new ArrayList<>();
+
 
    // ############################################# DISTANCE #############################################
 
@@ -7505,7 +7509,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          return 0;
       }
 
-      final long pausedTime = Arrays.stream(tourTimerPauses).mapToLong(TimerPause::getPauseDuration).sum();
+      final long pausedTime = tourTimerPauses.stream().mapToLong(TourTimerPause::getPauseDuration).sum();
 
       return (int) (pausedTime / 1000);
    }
@@ -9594,7 +9598,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       this.surfing_NumberOfEvents = surfing_NumberOfEvents;
    }
 
-   public void setTimerPauses(final TimerPause[] timerPauses) {
+   public void setTimerPauses(final List<TourTimerPause> timerPauses) {
 
       this.tourTimerPauses = timerPauses;
    }

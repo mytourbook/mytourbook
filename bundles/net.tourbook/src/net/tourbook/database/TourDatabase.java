@@ -67,6 +67,7 @@ import net.tourbook.data.TourPhoto;
 import net.tourbook.data.TourReference;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
+import net.tourbook.data.TourTimerPause;
 import net.tourbook.data.TourType;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -164,6 +165,7 @@ public class TourDatabase {
    public static final String  TABLE_TOUR_REFERENCE                       = "TOURREFERENCE";                                         //$NON-NLS-1$
    public static final String  TABLE_TOUR_TAG                             = "TOURTAG";                                               //$NON-NLS-1$
    public static final String  TABLE_TOUR_TAG_CATEGORY                    = "TOURTAGCATEGORY";                                       //$NON-NLS-1$
+   public static final String  TABLE_TOUR_TIMER_PAUSE                     = "TOURTIMERPAUSE";                                        //$NON-NLS-1$
    public static final String  TABLE_TOUR_TYPE                            = "TOURTYPE";                                              //$NON-NLS-1$
    public static final String  TABLE_TOUR_WAYPOINT                        = "TOURWAYPOINT";                                          //$NON-NLS-1$
    public static final String  TABLE_TOUR_GEO_PARTS                       = "TourGeoParts";                                          //$NON-NLS-1$
@@ -3552,6 +3554,30 @@ public class TourDatabase {
    }
 
    /**
+    * Create table {@link #TABLE_TOUR_TIMER_PAUSE} for {@link TourTimerPause}.
+    *
+    * @param stmt
+    * @throws SQLException
+    */
+   private void createTable_TourTimerPauses(final Statement stmt) throws SQLException {
+
+      /*
+       * CREATE TABLE TourTimerPause
+       */
+      exec(stmt, "CREATE TABLE " + TABLE_TOUR_TIMER_PAUSE + "   (                           \n" //$NON-NLS-1$ //$NON-NLS-2$
+      //
+            + "   timerPauseId         BIGINT   NOT NULL,                                       \n" //$NON-NLS-1$
+            + "   startTime      BIGINT   NOT NULL,                                       \n" //$NON-NLS-1$
+            + "   endTime        BIGINT   NOT NULL,                                       \n" //$NON-NLS-1$
+
+            + "   CONSTRAINT     PK_TourId_TimerPause PRIMARY KEY (TourId)          \n" //$NON-NLS-1$
+
+            + ")"); //$NON-NLS-1$
+
+      SQL.CreateIndex(stmt, TABLE_TOUR_TIMER_PAUSE, "TourId"); //$NON-NLS-1$
+   }
+
+   /**
     * create table {@link #TABLE_TOUR_TYPE}
     *
     * @param stmt
@@ -4285,6 +4311,8 @@ public class TourDatabase {
 
 //            createTable_TourSign(stmt);
 //            createTable_TourSignCategory(stmt);
+
+            createTable_TourTimerPauses(stmt);
 
          } catch (final SQLException e) {
             UI.showSQLException(e);
@@ -7463,33 +7491,6 @@ public class TourDatabase {
       return newDbVersion;
    }
 
-   private int updateDbDesign_042_to_043(final Connection conn, final SplashManager splashManager) throws SQLException {
-
-      final int newDbVersion = 43;
-
-      logDb_UpdateStart(newDbVersion);
-      updateMonitor(splashManager, newDbVersion);
-
-      final Statement stmt = conn.createStatement();
-      {
-         // check if db is updated to version 43
-         if (isColumnAvailable(conn, TABLE_TOUR_DATA, "tourTimerPauses") == false) { //$NON-NLS-1$
-
-// SET_FORMATTING_OFF
-
-            // Add new columns
-            SQL.AddCol_Float(stmt, TABLE_TOUR_DATA, "tourTimerPauses",          DEFAULT_0);                            //$NON-NLS-1$
-
-// SET_FORMATTING_ON
-         }
-      }
-      stmt.close();
-
-      logDb_UpdateEnd(newDbVersion);
-
-      return newDbVersion;
-   }
-
 //   private int updateDbDesign_034_to_035(final Connection conn, final IProgressMonitor monitor) throws SQLException {
 //
 //      final int newDbVersion = 35;
@@ -7597,6 +7598,28 @@ public class TourDatabase {
 //                  "Database postupdate 34->35 in %s mm:ss", //$NON-NLS-1$
 //                  net.tourbook.common.UI.formatHhMmSs(timeDiff / 1000)));
 //   }
+
+   private int updateDbDesign_042_to_043(final Connection conn, final SplashManager splashManager) throws SQLException {
+
+      final int newDbVersion = 43;
+
+      logDb_UpdateStart(newDbVersion);
+      updateMonitor(splashManager, newDbVersion);
+
+      final Statement stmt = conn.createStatement();
+      {
+         // double check if db is already updated
+         if (isTableAvailable(conn, TABLE_TOUR_TIMER_PAUSE) == false) {
+
+            createTable_TourTimerPauses(stmt);
+         }
+      }
+      stmt.close();
+
+      logDb_UpdateEnd(newDbVersion);
+
+      return newDbVersion;
+   }
 
    private void updateDbDesign_VersionNumber(final Connection conn, final int newVersion) throws SQLException {
 

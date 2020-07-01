@@ -35,7 +35,7 @@ import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TimeData;
-import net.tourbook.data.TimerPause;
+import net.tourbook.data.TourTimerPause;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourTag;
@@ -473,10 +473,11 @@ public class FitLogSAXHandler extends DefaultHandler {
 
       if (_currentActivity.pauses.size() > 0) {
 
-         final TimerPause[] tourTimerPauses = new TimerPause[_currentActivity.pauses.size()];
-         for (int index = 0; index < _currentActivity.pauses.size(); ++index) {
-            tourTimerPauses[index] = new TimerPause(_currentActivity.pauses.get(index).startTime, _currentActivity.pauses.get(index).endTime);
+         final ArrayList<TourTimerPause> tourTimerPauses = new ArrayList<>();
+         for (final Pause element : _currentActivity.pauses) {
+            tourTimerPauses.add(new TourTimerPause(element.startTime, element.endTime));
          }
+
          tourData.setTimerPauses(tourTimerPauses);
       }
 
