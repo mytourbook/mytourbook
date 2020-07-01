@@ -3,8 +3,13 @@
 <project name="distribute-mt-eclipse-settings" default="distribute-mt-eclipse-settings">
 
    <!--
-      Copies the eclipse settings folder ".settings" from the project "net.tourbook" 
-      into all other MT projects
+      Copies all files in the eclipse settings folder ".settings" 
+      from the project "net.tourbook" into all other MT projects
+      
+      This will force these setting values in all MT projects.
+      
+      See also this discussion for more info
+      https://stackoverflow.com/questions/15927484/is-settings-org-eclipse-jdt-core-prefs-part-of-the-project
    -->
 
    <property name="path-root"                value="../.." />
