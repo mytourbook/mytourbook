@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -327,6 +327,9 @@ public class Chart extends ViewForm {
 		} else {
 			chartInfo.selectedSliderValuesIndex = hoveredLineValueIndex;
 		}
+
+      //TODO FB  not sure how to retrieve IsSelectInBetweenTimeSlices from here !?
+      chartInfo.isSelectInBetweenTimeSlices = true;
 
 		return chartInfo;
 	}
@@ -770,7 +773,9 @@ public class Chart extends ViewForm {
 		return new SelectionChartXSliderPosition(//
 				this,
 				chartGraph.getLeftSlider().getValuesIndex(),
-				chartGraph.getRightSlider().getValuesIndex());
+            chartGraph.getRightSlider().getValuesIndex(),
+            //TODO FB not sure how to retrieve IsSelectInBetweenTimeSlices from here !?
+            true);
 	}
 
 	public long getXXDevViewPortLeftBorder() {

@@ -585,74 +585,75 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    /*
     * tab: tour
     */
-   private Combo             _comboTitle;
+   private Combo              _comboTitle;
    //
-   private Button            _rdoCadence_Rpm;
-   private Button            _rdoCadence_Spm;
+   private Button             _rdoCadence_Rpm;
+   private Button             _rdoCadence_Spm;
    //
-   private CLabel            _lblCloudIcon;
-   private CLabel            _lblTourType;
+   private CLabel             _lblCloudIcon;
+   private CLabel             _lblTourType;
    //
-   private ControlDecoration _decoTimeZone;
+   private ControlDecoration  _decoTimeZone;
    //
-   private Combo             _comboLocation_Start;
-   private Combo             _comboLocation_End;
-   private Combo             _comboTimeZone;
-   private Combo             _comboWeather_Clouds;
-   private Combo             _comboWeather_WindDirectionText;
-   private Combo             _comboWeather_WindSpeedText;
+   private Combo              _comboLocation_Start;
+   private Combo              _comboLocation_End;
+   private Combo              _comboTimeZone;
+   private Combo              _comboWeather_Clouds;
+   private Combo              _comboWeather_WindDirectionText;
+   private Combo              _comboWeather_WindSpeedText;
    //
-   private DateTime          _dtStartTime;
-   private DateTime          _dtTourDate;
+   private DateTime           _dtStartTime;
+   private DateTime           _dtTourDate;
    //
-   private Label             _lblAltitudeUpUnit;
-   private Label             _lblAltitudeDownUnit;
-   private Label             _lblDistanceUnit;
-   private Label             _lblPerson_BodyWeightUnit;
-   private Label             _lblSpeedUnit;
-   private Label             _lblStartTime;
-   private Label             _lblTags;
-   private Label             _lblTimeZone;
-   private Label             _lblWeather_PrecipitationUnit;
-   private Label             _lblWeather_PressureUnit;
-   private Label             _lblWeather_TemperatureUnit_Avg;
-   private Label             _lblWeather_TemperatureUnit_Max;
-   private Label             _lblWeather_TemperatureUnit_Min;
-   private Label             _lblWeather_TemperatureUnit_WindChill;
+   private Label              _lblAltitudeUpUnit;
+   private Label              _lblAltitudeDownUnit;
+   private Label              _lblDistanceUnit;
+   private Label              _lblPerson_BodyWeightUnit;
+   private Label              _lblSpeedUnit;
+   private Label              _lblStartTime;
+   private Label              _lblTags;
+   private Label              _lblTimeZone;
+   private Label              _lblWeather_PrecipitationUnit;
+   private Label              _lblWeather_PressureUnit;
+   private Label              _lblWeather_TemperatureUnit_Avg;
+   private Label              _lblWeather_TemperatureUnit_Max;
+   private Label              _lblWeather_TemperatureUnit_Min;
+   private Label              _lblWeather_TemperatureUnit_WindChill;
    //
-   private Link              _linkDefaultTimeZone;
-   private Link              _linkGeoTimeZone;
-   private Link              _linkRemoveTimeZone;
-   private Link              _linkTag;
-   private Link              _linkTourType;
-   private Link              _linkWeather;
+   private Link               _linkDefaultTimeZone;
+   private Link               _linkGeoTimeZone;
+   private Link               _linkRemoveTimeZone;
+   private Link               _linkTag;
+   private Link               _linkTourType;
+   private Link               _linkWeather;
    //
-   private Spinner           _spinPerson_BodyWeight;
-   private Spinner           _spinPerson_Calories;
-   private Spinner           _spinPerson_FTP;
-   private Spinner           _spinPerson_RestPuls;
-   private Spinner           _spinWeather_Humidity;
-   private Spinner           _spinWeather_PrecipitationValue;
-   private Spinner           _spinWeather_PressureValue;
-   private Spinner           _spinWeather_Temperature_Average;
-   private Spinner           _spinWeather_Temperature_Min;
-   private Spinner           _spinWeather_Temperature_Max;
-   private Spinner           _spinWeather_Temperature_WindChill;
-   private Spinner           _spinWeather_Wind_DirectionValue;
-   private Spinner           _spinWeather_Wind_SpeedValue;
+   private Spinner            _spinPerson_BodyWeight;
+   private Spinner            _spinPerson_Calories;
+   private Spinner            _spinPerson_FTP;
+   private Spinner            _spinPerson_RestPuls;
+   private Spinner            _spinWeather_Humidity;
+   private Spinner            _spinWeather_PrecipitationValue;
+   private Spinner            _spinWeather_PressureValue;
+   private Spinner            _spinWeather_Temperature_Average;
+   private Spinner            _spinWeather_Temperature_Min;
+   private Spinner            _spinWeather_Temperature_Max;
+   private Spinner            _spinWeather_Temperature_WindChill;
+   private Spinner            _spinWeather_Wind_DirectionValue;
+   private Spinner            _spinWeather_Wind_SpeedValue;
    //
-   private Text              _txtAltitudeDown;
-   private Text              _txtAltitudeUp;
-   private Text              _txtDescription;
-   private Text              _txtDistance;
-   private Text              _txtWeather;
+   private Text               _txtAltitudeDown;
+   private Text               _txtAltitudeUp;
+   private Text               _txtDescription;
+   private Text               _txtDistance;
+   private Text               _txtWeather;
    //
-   private TimeDuration      _timeDriving;
-   private TimeDuration      _timePaused;
-   private TimeDuration      _timeRecording;
+   private TimeDuration       _timeDriving;
+   private TimeDuration       _timePaused;
+   private TimeDuration       _timeRecording;
 
-   private Menu              _swimViewer_ContextMenu;
-   private Menu              _timeViewer_ContextMenu;
+   private Menu               _swimViewer_ContextMenu;
+   private Menu               _timeViewer_ContextMenu;
+   private SelectionChartInfo _lastSelectedChartInfo;
 
    private class Action_RemoveSwimStyle extends Action {
 
@@ -6544,7 +6545,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   _tourChart,
                   serieIndex0,
                   serieIndex1,
-                  serieIndex2);
+                  serieIndex2,
+                  _prefStore.getDefaultBoolean(
+                        ITourbookPreferences.TOGGLE_STATE_SELECT_INBETWEEN_TIME_SLICES));
 
             xSliderSelection.setCenterSliderPosition(true);
 
@@ -7887,11 +7890,19 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       final Table table = (Table) _timeSlice_Viewer.getControl();
       final int itemCount = table.getItemCount();
 
-      // adjust to array bounds
-      int valueIndex = chartInfo.selectedSliderValuesIndex;
-      valueIndex = Math.max(0, Math.min(valueIndex, itemCount - 1));
+      //TODO FB remove this property ??
+      _lastSelectedChartInfo = chartInfo;
+      if (chartInfo.isSelectInBetweenTimeSlices) {
+         final int minSelectedValue = Math.min(chartInfo.leftSliderValuesIndex, chartInfo.rightSliderValuesIndex);
+         final int maxSelectedValue = Math.max(chartInfo.leftSliderValuesIndex, chartInfo.rightSliderValuesIndex);
+         table.setSelection(minSelectedValue, maxSelectedValue);
+      } else {
+         // adjust to array bounds
+         int valueIndex = chartInfo.selectedSliderValuesIndex;
+         valueIndex = Math.max(0, Math.min(valueIndex, itemCount - 1));
 
-      table.setSelection(valueIndex);
+         table.setSelection(valueIndex);
+      }
 
       table.showSelection();
 
