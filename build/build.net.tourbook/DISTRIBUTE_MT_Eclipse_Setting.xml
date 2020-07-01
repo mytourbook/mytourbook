@@ -6,10 +6,10 @@
       Copies the eclipse settings folder ".settings" from the project "net.tourbook" 
       into all other MT projects
    -->
-   
+
    <property name="path-root"                value="../.." />
    <property name="path-mt-all-projects"     value="${path-root}/bundles" />
-	
+
    <property name="path-from-project"        value="${path-mt-all-projects}/net.tourbook/.settings" />
 
    <!--
@@ -19,14 +19,71 @@
 
       <echo message="${ant.version}" />
       <echo message="Copy settings from '${path-from-project}'" />
-      	
-      <copy todir="${path-build-translation}" preservelastmodified="true" includeemptydirs="false">
-          <fileset dir="${path-mt-nl}" >
-             <include name="**/*" />
-             <exclude name="**/*z-DUMMY-HOST*/**" />
-             <exclude name="**/*z-Dummy-Host*/**" />
-          </fileset>
-       </copy>
+
+   	<antcall target="copy-into-project">
+   		<param name="project-folder" value="${path-mt-all-projects}/net.tourbook.chart"/>
+   	</antcall>
+   	
+   	<antcall target="copy-into-project">
+   		<param name="project-folder" value="${path-mt-all-projects}/net.tourbook.cloud"/>
+   	</antcall>
+
+   	<antcall target="copy-into-project">
+   		<param name="project-folder" value="${path-mt-all-projects}/net.tourbook.common"/>
+   	</antcall>
+
+   	<antcall target="copy-into-project">
+   		<param name="project-folder" value="${path-mt-all-projects}/net.tourbook.device"/>
+   	</antcall>
+
+   	<antcall target="copy-into-project">
+   		<param name="project-folder" value="${path-mt-all-projects}/net.tourbook.device.garmin"/>
+   	</antcall>
+
+   	<antcall target="copy-into-project">
+   		<param name="project-folder" value="${path-mt-all-projects}/net.tourbook.device.garmin.fit"/>
+   	</antcall>
+
+   	<antcall target="copy-into-project">
+   		<param name="project-folder" value="${path-mt-all-projects}/net.tourbook.device.nmea"/>
+   	</antcall>
+
+   	<antcall target="copy-into-project">
+   		<param name="project-folder" value="${path-mt-all-projects}/net.tourbook.export"/>
+   	</antcall>
+
+   	<antcall target="copy-into-project">
+   		<param name="project-folder" value="${path-mt-all-projects}/net.tourbook.p2"/>
+   	</antcall>
+
+   	<antcall target="copy-into-project">
+   		<param name="project-folder" value="${path-mt-all-projects}/net.tourbook.photo"/>
+   	</antcall>
+
+   	<antcall target="copy-into-project">
+   		<param name="project-folder" value="${path-mt-all-projects}/net.tourbook.printing"/>
+   	</antcall>
+
+   	<antcall target="copy-into-project">
+   		<param name="project-folder" value="${path-mt-all-projects}/net.tourbook.statistics"/>
+   	</antcall>
+
+   	<antcall target="copy-into-project">
+   		<param name="project-folder" value="${path-mt-all-projects}/net.tourbook.web"/>
+   	</antcall>
+
+
+   </target>
+
+   <target name="copy-into-project">
+
+      <property name="param-project-folder" value="${project-folder}"/>
+
+      <copy todir="${param-project-folder}/.settings" preservelastmodified="true" overwrite="true">
+         <fileset dir="${path-from-project}" >
+            <include name="**/*" />
+         </fileset>
+      </copy>
 
    </target>
 
