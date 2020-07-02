@@ -10,9 +10,11 @@ New
 ===
 
 * Flat Tour Book View
-  - Displayed tours are not categorized
-  - Sort tours with multiple columns
-  - Fixed columns for horizontal scrolling
+  - Displayed tours are not categorized by date
+  - Tours can be sorted
+    - By many columns except when a column is computed or have an SQL relation
+    - Using multiple columns (by pressing the Alt key)
+  - Columns can be freezed for horizontal scrolling
 
 * Dropbox Integration (Frederic)
   - Ability to connect a Dropbox account to MyTourbook, and also choosing a specific a folder for this account. This Dropbox folder can be set up as a device to watch. In this case, added or deleted files will be automatically and immediately detected.
@@ -35,15 +37,18 @@ Improvements
 * Dialog Adjust Elevation
   - Show elevation gain/loss values before and after the adjustment, supported adjustment type: "Approach elevation with SRTM data"  
 
-* Keyboard shortcuts
-  - Ctrl+W - Close current view or tour  
-  - Ctrl+Shift+<Key> - Open all directory views with a key shortcut
-
 * Tour Marker View (Frederic)
   - Added the Average Speed column
 
 * Tour tooltip (Frederic)
   - Added the maximum pace (^ Pace)
+
+* Tree/Table Columns
+  - A new column is added at the current mouse position and not at the end (nobody complained it)
+
+* Keyboard shortcuts
+  - Ctrl+W - Close current view or tour  
+  - Ctrl+Shift+<Key> - Open all directory views with a key shortcut
 
 Import
 ======

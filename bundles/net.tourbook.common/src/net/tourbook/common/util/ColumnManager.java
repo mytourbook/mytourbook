@@ -347,7 +347,7 @@ public class ColumnManager {
 
          setVisibleColumnIds_All();
 
-         _columnViewer = _tourViewer.recreateViewer(_columnViewer);
+         recreateViewer();
       }
    }
 
@@ -360,7 +360,7 @@ public class ColumnManager {
 
          setVisibleColumnIds_Default();
 
-         _columnViewer = _tourViewer.recreateViewer(_columnViewer);
+         recreateViewer();
       }
    }
 
@@ -464,7 +464,7 @@ public class ColumnManager {
 
       if (isAnyColumnFreezed == false) {
 
-         // there is nothing to unfreeze in the UI0
+         // there is nothing to unfreeze in the UI
          return;
       }
 
@@ -2068,6 +2068,18 @@ public class ColumnManager {
       }
    }
 
+   private void recreateViewer() {
+
+      _columnViewer = _tourViewer.recreateViewer(_columnViewer);
+
+      // restore frozen column to the frozen column id in the active profile
+      final String frozenColumnId = _activeProfile.frozenColumnId;
+
+      if (frozenColumnId != null) {
+         action_FreezeColumn(getColDef_ByColumnId(frozenColumnId));
+      }
+   }
+
    /**
     * Restore the column order and width from a memento
     *
@@ -2817,7 +2829,7 @@ public class ColumnManager {
       _activeProfile.setVisibleColumnIds(visibleColumnIds.toArray(new String[visibleColumnIds.size()]));
       _activeProfile.visibleColumnIdsAndWidth = visibleIdsAndWidth.toArray(new String[visibleIdsAndWidth.size()]);
 
-      _columnViewer = _tourViewer.recreateViewer(_columnViewer);
+      recreateViewer();
    }
 
    private void setVisibleColumnIds_Column_Show(final ColumnDefinition colDef_New, final boolean isFirstColumn) {
@@ -2871,20 +2883,54 @@ public class ColumnManager {
       }
 
       /*
-       * Append new column to the end, this could be improved to insert after the current column
+       * Insert new column at the current mouse position, after many years of frustration to move a
+       * new column to the correct position
        */
+      int newColumnPosition = -1;
       if (isNewColumnAdded == false) {
+
+         final ColumnDefinition headerColDef = getColDef_FromHeaderColumn();
+         if (headerColDef != null) {
+
+            // find current header column position
+
+            final String headerColumnId = headerColDef.getColumnId();
+
+            for (int visibleIndex = 0; visibleIndex < allNewVisibleColumnIds.size(); visibleIndex++) {
+
+               if (allNewVisibleColumnIds.get(visibleIndex).equals(headerColumnId)) {
+
+                  // set position after the current column
+                  newColumnPosition = visibleIndex + 1;
+                  break;
+               }
+            }
+         }
 
          // ensure the column is also displayed, it could be hidden when it was previously displayed and then set to hidden !!!
          final ColumnDefinition colDef = getColDef_ByColumnId(columnId_New);
          colDef.setIsColumnChecked(true);
 
-         // set visible columns
-         allNewVisibleColumnIds.add(columnId_New);
+         if (newColumnPosition == -1) {
 
-         // set column id and width
-         allNewVisibleIdsAndWidth.add(columnId_New);
-         allNewVisibleIdsAndWidth.add(Integer.toString(colDef_New.getColumnWidth()));
+            // a new column position could not be found (should not happen), add column to the end
+
+            // set visible columns
+            allNewVisibleColumnIds.add(columnId_New);
+
+            // set column id and width
+            allNewVisibleIdsAndWidth.add(columnId_New);
+            allNewVisibleIdsAndWidth.add(Integer.toString(colDef_New.getColumnWidth()));
+
+         } else {
+
+            // set visible columns
+            allNewVisibleColumnIds.add(newColumnPosition, columnId_New);
+
+            // set column id and width
+            allNewVisibleIdsAndWidth.add(newColumnPosition * 2, columnId_New);
+            allNewVisibleIdsAndWidth.add(newColumnPosition * 2 + 1, Integer.toString(colDef_New.getColumnWidth()));
+         }
       }
 
       /*
@@ -2896,7 +2942,7 @@ public class ColumnManager {
       /*
        * Update UI
        */
-      _columnViewer = _tourViewer.recreateViewer(_columnViewer);
+      recreateViewer();
    }
 
    private void setVisibleColumnIds_Default() {
@@ -3041,7 +3087,7 @@ public class ColumnManager {
 
       _activeProfile = profile;
 
-      _columnViewer = _tourViewer.recreateViewer(_columnViewer);
+      recreateViewer();
    }
 
    /**
@@ -3057,13 +3103,14 @@ public class ColumnManager {
 
       setVisibleColumnIds_FromModifyDialog(_activeProfile, tableItems);
 
-      _columnViewer = _tourViewer.recreateViewer(_columnViewer);
+      recreateViewer();
    }
 
    private void updateColumns(final MenuItem[] menuItems) {
 
       setVisibleColumnIds_FromMenu(menuItems);
 
-      _columnViewer = _tourViewer.recreateViewer(_columnViewer);
+      recreateViewer();
+
    }
 }
