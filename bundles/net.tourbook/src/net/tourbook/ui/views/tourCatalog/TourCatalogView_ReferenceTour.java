@@ -208,8 +208,7 @@ public class TourCatalogView_ReferenceTour extends TourChartViewPart implements 
                new SelectionChartXSliderPosition(
                      _tourChart,
                      oldXSliderPosition.getLeftSliderValueIndex(),
-                     oldXSliderPosition.getRightSliderValueIndex(),
-                     oldXSliderPosition.isSelectInBetweenTimeSlices()));
+                     oldXSliderPosition.getRightSliderValueIndex()));
       }
 
       _tourChart.addDataModelListener(new IDataModelListener() {

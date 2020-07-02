@@ -1972,9 +1972,7 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
             new SelectionChartXSliderPosition(
                   _tourChart, //
                   maxIndex,
-                  maxIndex,
-                  _prefStore.getDefaultBoolean(
-                        ITourbookPreferences.TOGGLE_STATE_SELECT_INBETWEEN_TIME_SLICES)));
+                  maxIndex));
 
       _tourChart.getDisplay().timerExec(100, new Runnable() {
          @Override

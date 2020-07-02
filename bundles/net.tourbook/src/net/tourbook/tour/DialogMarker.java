@@ -37,7 +37,6 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.database.TourDatabase;
-import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.tourChart.ChartLabel;
 import net.tourbook.ui.tourChart.ITourMarkerSelectionListener;
 import net.tourbook.ui.tourChart.TourChart;
@@ -1904,9 +1903,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
          final SelectionChartXSliderPosition sliderSelection = new SelectionChartXSliderPosition(
                _tourChart,
                newSelectedMarker.getSerieIndex(),
-               SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION,
-               _prefStore.getDefaultBoolean(
-                     ITourbookPreferences.TOGGLE_STATE_SELECT_INBETWEEN_TIME_SLICES));
+               SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION);
 
          // set x-slider in the tour chart but do not fire a default event
          _tourChart.setXSliderPosition(sliderSelection, false);

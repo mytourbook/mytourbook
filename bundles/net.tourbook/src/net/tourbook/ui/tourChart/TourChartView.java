@@ -592,9 +592,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
                            new SelectionChartXSliderPosition(//
                                  _tourChart,
                                  tourDataSelection.getLeftSliderValueIndex(),
-                                 tourDataSelection.getRightSliderValueIndex(),
-                                 _prefStore.getDefaultBoolean(
-                                       ITourbookPreferences.TOGGLE_STATE_SELECT_INBETWEEN_TIME_SLICES)));
+                                 tourDataSelection.getRightSliderValueIndex()));
                   }
                }
             }
@@ -787,9 +785,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
                _tourChart,
                SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION,
                leftSliderValueIndex,
-               rightSliderValueIndex,
-               _prefStore.getDefaultBoolean(
-                     ITourbookPreferences.TOGGLE_STATE_SELECT_INBETWEEN_TIME_SLICES));
+               rightSliderValueIndex);
 
          xSliderPosition.setCenterSliderPosition(true);
 
@@ -934,9 +930,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
          final SelectionChartXSliderPosition xSliderPosition = new SelectionChartXSliderPosition(
                _tourChart,
                leftSliderValuesIndex,
-               rightSliderValuesIndex,
-               _prefStore.getDefaultBoolean(
-                     ITourbookPreferences.TOGGLE_STATE_SELECT_INBETWEEN_TIME_SLICES));
+               rightSliderValuesIndex);
 
          xSliderPosition.setCenterSliderPosition(true);
 

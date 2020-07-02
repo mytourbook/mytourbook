@@ -328,9 +328,6 @@ public class Chart extends ViewForm {
 			chartInfo.selectedSliderValuesIndex = hoveredLineValueIndex;
 		}
 
-      //TODO FB  not sure how to retrieve IsSelectInBetweenTimeSlices from here !?
-      chartInfo.isSelectInBetweenTimeSlices = true;
-
 		return chartInfo;
 	}
 
@@ -773,9 +770,7 @@ public class Chart extends ViewForm {
 		return new SelectionChartXSliderPosition(//
 				this,
 				chartGraph.getLeftSlider().getValuesIndex(),
-            chartGraph.getRightSlider().getValuesIndex(),
-            //TODO FB not sure how to retrieve IsSelectInBetweenTimeSlices from here !?
-            true);
+            chartGraph.getRightSlider().getValuesIndex());
 	}
 
 	public long getXXDevViewPortLeftBorder() {

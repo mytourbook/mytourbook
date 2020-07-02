@@ -381,8 +381,7 @@ public class TourEditor extends EditorPart implements IPersistableEditor {
                         new SelectionChartXSliderPosition(
                               _tourChart,
                               chartInfo.leftSliderValuesIndex,
-                              chartInfo.rightSliderValuesIndex,
-                              chartInfo.isSelectInBetweenTimeSlices));
+                              chartInfo.rightSliderValuesIndex));
                }
             }
          }
