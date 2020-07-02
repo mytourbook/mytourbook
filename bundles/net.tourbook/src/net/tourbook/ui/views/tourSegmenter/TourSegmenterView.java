@@ -4490,8 +4490,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             final SelectionChartXSliderPosition selectionSliderPosition = new SelectionChartXSliderPosition(
                   _tourChart,
                   serieStartIndex,
-                  serieEndIndex,
-                  true);
+                  serieEndIndex);
 
             /*
              * Extend default selection with the segment positions

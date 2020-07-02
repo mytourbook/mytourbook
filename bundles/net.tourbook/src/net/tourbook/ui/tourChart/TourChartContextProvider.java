@@ -44,7 +44,6 @@ import net.tourbook.ui.tourChart.action.ActionCreateMarkerFromSlider;
 import net.tourbook.ui.tourChart.action.ActionCreateMarkerFromValuePoint;
 import net.tourbook.ui.tourChart.action.ActionCreateRefTour;
 import net.tourbook.ui.tourChart.action.ActionDeleteMarker;
-import net.tourbook.ui.tourChart.action.ActionSelectInBetweenTimeSlices;
 import net.tourbook.ui.tourChart.action.ActionSetMarkerLabelPositionMenu;
 import net.tourbook.ui.tourChart.action.ActionSetMarkerVisible;
 
@@ -72,7 +71,6 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
    private ActionOpenMarkerDialog           _actionOpenMarkerDialog;
    private ActionOpenPrefDialog             _actionPrefDialog;
    private ActionOpenTour                   _actionOpenTour;
-   private ActionSelectInBetweenTimeSlices  _actionSelectInBetweenTimeSlices;
    private ActionSetTourTypeMenu            _actionSetTourType;
    private ActionSetMarkerVisible           _actionSetMarkerVisible;
    private ActionSetMarkerLabelPositionMenu _actionSetMarkerPosition;
@@ -145,10 +143,6 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
       _actionPrefDialog = new ActionOpenPrefDialog(
             Messages.Tour_Action_EditChartPreferences,
             PrefPageAppearanceTourChart.ID);
-
-      _actionSelectInBetweenTimeSlices = new ActionSelectInBetweenTimeSlices(
-            this,
-            Messages.tourCatalog_view_action_select_inbetween_timeslices);
    }
 
    @Override
@@ -313,9 +307,6 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
          menuMgr.add(new Separator());
          menuMgr.add(_actionOpenMarkerDialog);
 
-         menuMgr.add(new Separator());
-         menuMgr.add(_actionSelectInBetweenTimeSlices);
-
          /////////////////////////////////////////////////////////////////////////////
          /////////////////////////////////////////////////////////////////////////////
 
@@ -337,8 +328,6 @@ public class TourChartContextProvider implements IChartContextProvider, ITourPro
          _actionCreateRefTour.setEnabled(canCreateRefTours);
 
          _actionOpenMarkerDialog.setEnabled(isTourSaved);
-
-         _actionSelectInBetweenTimeSlices.setEnabled(isTourSaved);
       }
    }
 

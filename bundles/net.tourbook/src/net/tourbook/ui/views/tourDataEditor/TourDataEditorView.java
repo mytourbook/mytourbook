@@ -531,6 +531,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    // ################################################## UI controls ##################################################
    //
 
+   private Composite                _parent;
    private PageBook                 _pageBook;
    private Composite                _page_NoTourData;
    private Form                     _page_EditorForm;
@@ -6848,6 +6849,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    private void initUI(final Composite parent) {
 
+      _parent = parent;
+
       _pc = new PixelConverter(parent);
 
       _hintDefaultSpinnerWidth = _isLinux //
@@ -7887,11 +7890,32 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       final Table table = (Table) _timeSlice_Viewer.getControl();
       final int itemCount = table.getItemCount();
 
-      // adjust to array bounds
-      int valueIndex = chartInfo.selectedSliderValuesIndex;
-      valueIndex = Math.max(0, Math.min(valueIndex, itemCount - 1));
+      if (_prefStore.getBoolean(
+            ITourbookPreferences.TOGGLE_STATE_SELECT_INBETWEEN_TIME_SLICES)) {
 
-      table.setSelection(valueIndex);
+         // delay the selection of multiple lines, moving the mouse can occur very often
+         _parent.getDisplay().timerExec(50, new Runnable() {
+
+            @Override
+            public void run() {
+
+               if (_parent.isDisposed()) {
+                  return;
+               }
+
+               final int minSelectedValue = Math.min(chartInfo.leftSliderValuesIndex, chartInfo.rightSliderValuesIndex);
+               final int maxSelectedValue = Math.max(chartInfo.leftSliderValuesIndex, chartInfo.rightSliderValuesIndex);
+               table.setSelection(minSelectedValue, maxSelectedValue);
+            }
+         });
+
+      } else {
+         // adjust to array bounds
+         int valueIndex = chartInfo.selectedSliderValuesIndex;
+         valueIndex = Math.max(0, Math.min(valueIndex, itemCount - 1));
+
+         table.setSelection(valueIndex);
+      }
 
       table.showSelection();
 
