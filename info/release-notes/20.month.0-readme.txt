@@ -9,8 +9,13 @@ TODO's
 New
 ===
 
-* Tour Book view
-  - Show tours in a not categorized view (not categorized by year/month/week)
+* Flat Tour Book View
+  - Displayed tours are not categorized
+  - Sort tours with multiple columns
+  - Fixed columns for horizontal scrolling
+
+* Dropbox Integration (Frederic)
+  - Ability to connect a Dropbox account to MyTourbook, and also choosing a specific a folder for this account. This Dropbox folder can be set up as a device to watch. In this case, added or deleted files will be automatically and immediately detected.
 
 Improvements
 ============
@@ -32,17 +37,13 @@ Improvements
 
 * Keyboard shortcuts
   - Ctrl+W - Close current view or tour  
-  - Ctrl+Shift+? - Open all directory views with a key shortcut
+  - Ctrl+Shift+<Key> - Open all directory views with a key shortcut
 
 * Tour Marker View (Frederic)
   - Added the Average Speed column
 
 * Tour tooltip (Frederic)
   - Added the maximum pace (^ Pace)
-
-* Dropbox Integration (Frederic) :
-  - Ability to connect a Dropbox account to MyTourbook, and also choosing a specific a folder for this account. This Dropbox folder can be set up as a device to watch. In this case, added or deleted files will be automatically and immediately detected.
-
 
 Import
 ======
