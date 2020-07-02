@@ -50,7 +50,6 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.layout.TableColumnLayout;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.CheckboxCellEditor;
@@ -120,8 +119,6 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 //	private int							IMAGE_MIN_WIDTH;
 //	private int							ROW_DEFAULT_HEIGHT;
 //	private int							ROW_MAX_HEIGHT;
-
-   private final IPreferenceStore _prefStore    = TourbookPlugin.getPrefStore();
 
    private final IDialogSettings  _state        = TourbookPlugin
          .getState("DialogMarker");                                             //$NON-NLS-1$
