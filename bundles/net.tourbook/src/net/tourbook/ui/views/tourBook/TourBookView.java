@@ -46,7 +46,8 @@ import net.tourbook.common.util.ITourViewer3;
 import net.tourbook.common.util.ITreeViewer;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.StatusUtil;
-import net.tourbook.common.util.TreeViewerItem;
+import net.tourbook.common.util.ToolTip;
+import net.tourbook.common.util.TreeViewerItem; 
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
@@ -81,6 +82,7 @@ import net.tourbook.ui.action.ActionOpenTour;
 import net.tourbook.ui.action.ActionRefreshView;
 import net.tourbook.ui.action.ActionSetPerson;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
+import net.tourbook.ui.views.NatTableViewer_TourInfo_ToolTip;
 import net.tourbook.ui.views.TreeViewerTourInfoToolTip;
 import net.tourbook.ui.views.geoCompare.GeoPartComparerItem;
 import net.tourbook.ui.views.rawData.ActionMergeTour;
@@ -215,138 +217,138 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    static public final String ID = "net.tourbook.views.tourListView"; //$NON-NLS-1$
 
 //
-   private final static IPreferenceStore  _prefStore                                      = TourbookPlugin.getPrefStore();
-   private final static IPreferenceStore  _prefStoreCommon                                = CommonActivator.getPrefStore();
+   private final static IPreferenceStore   _prefStore                                      = TourbookPlugin.getPrefStore();
+   private final static IPreferenceStore   _prefStoreCommon                                = CommonActivator.getPrefStore();
    //
-   private static final IDialogSettings   _state                                          = TourbookPlugin.getState(ID);
-   private static final IDialogSettings   _state_NatTable                                 = TourbookPlugin.getState(ID + "_NAT_TABLE"); //$NON-NLS-1$
-   private static final IDialogSettings   _state_Tree                                     = TourbookPlugin.getState(ID + "_TREE");      //$NON-NLS-1$
+   private static final IDialogSettings    _state                                          = TourbookPlugin.getState(ID);
+   private static final IDialogSettings    _state_NatTable                                 = TourbookPlugin.getState(ID + "_NAT_TABLE"); //$NON-NLS-1$
+   private static final IDialogSettings    _state_Tree                                     = TourbookPlugin.getState(ID + "_TREE");      //$NON-NLS-1$
    //
-   private static final String            STATE_CSV_EXPORT_PATH                           = "STATE_CSV_EXPORT_PATH";                    //$NON-NLS-1$
+   private static final String             STATE_CSV_EXPORT_PATH                           = "STATE_CSV_EXPORT_PATH";                    //$NON-NLS-1$
    //
-   private static final String            STATE_IS_LINK_WITH_OTHER_VIEWS                  = "STATE_IS_LINK_WITH_OTHER_VIEWS";           //$NON-NLS-1$
-   private static final String            STATE_IS_SELECT_YEAR_MONTH_TOURS                = "STATE_IS_SELECT_YEAR_MONTH_TOURS";         //$NON-NLS-1$
-   static final String                    STATE_IS_SHOW_SUMMARY_ROW                       = "STATE_IS_SHOW_SUMMARY_ROW";                //$NON-NLS-1$
-   static final String                    STATE_LINK_AND_COLLAPSE_ALL_OTHER_ITEMS         = "STATE_LINK_AND_COLLAPSE_ALL_OTHER_ITEMS";  //$NON-NLS-1$
-   private static final String            STATE_SELECTED_MONTH                            = "STATE_SELECTED_MONTH";                     //$NON-NLS-1$
-   private static final String            STATE_SELECTED_TOURS                            = "STATE_SELECTED_TOURS";                     //$NON-NLS-1$
-   private static final String            STATE_SELECTED_YEAR                             = "STATE_SELECTED_YEAR";                      //$NON-NLS-1$
-   private static final String            STATE_VIEW_LAYOUT                               = "STATE_VIEW_LAYOUT";                        //$NON-NLS-1$
+   private static final String             STATE_IS_LINK_WITH_OTHER_VIEWS                  = "STATE_IS_LINK_WITH_OTHER_VIEWS";           //$NON-NLS-1$
+   private static final String             STATE_IS_SELECT_YEAR_MONTH_TOURS                = "STATE_IS_SELECT_YEAR_MONTH_TOURS";         //$NON-NLS-1$
+   static final String                     STATE_IS_SHOW_SUMMARY_ROW                       = "STATE_IS_SHOW_SUMMARY_ROW";                //$NON-NLS-1$
+   static final String                     STATE_LINK_AND_COLLAPSE_ALL_OTHER_ITEMS         = "STATE_LINK_AND_COLLAPSE_ALL_OTHER_ITEMS";  //$NON-NLS-1$
+   private static final String             STATE_SELECTED_MONTH                            = "STATE_SELECTED_MONTH";                     //$NON-NLS-1$
+   private static final String             STATE_SELECTED_TOURS                            = "STATE_SELECTED_TOURS";                     //$NON-NLS-1$
+   private static final String             STATE_SELECTED_YEAR                             = "STATE_SELECTED_YEAR";                      //$NON-NLS-1$
+   private static final String             STATE_VIEW_LAYOUT                               = "STATE_VIEW_LAYOUT";                        //$NON-NLS-1$
    //
-   private static final String            STATE_SORT_COLUMN_DIRECTION                     = "STATE_SORT_COLUMN_DIRECTION";              //$NON-NLS-1$
-   private static final String            STATE_SORT_COLUMN_ID                            = "STATE_SORT_COLUMN_ID";                     //$NON-NLS-1$
+   private static final String             STATE_SORT_COLUMN_DIRECTION                     = "STATE_SORT_COLUMN_DIRECTION";              //$NON-NLS-1$
+   private static final String             STATE_SORT_COLUMN_ID                            = "STATE_SORT_COLUMN_ID";                     //$NON-NLS-1$
    //
-   static final boolean                   STATE_IS_SHOW_SUMMARY_ROW_DEFAULT               = true;
-   static final boolean                   STATE_LINK_AND_COLLAPSE_ALL_OTHER_ITEMS_DEFAULT = true;
+   static final boolean                    STATE_IS_SHOW_SUMMARY_ROW_DEFAULT               = true;
+   static final boolean                    STATE_LINK_AND_COLLAPSE_ALL_OTHER_ITEMS_DEFAULT = true;
    //
-   private static final String            CSV_EXPORT_DEFAULT_FILE_NAME                    = "TourBook_";                                //$NON-NLS-1$
+   private static final String             CSV_EXPORT_DEFAULT_FILE_NAME                    = "TourBook_";                                //$NON-NLS-1$
    //
    /**
     * The header column id needs a different id than the body column otherwise drag&drop or column
     * selection shows the 1st row image :-(
     */
-   private static final String            HEADER_COLUMN_ID_POSTFIX                        = "_HEADER";
+   private static final String             HEADER_COLUMN_ID_POSTFIX                        = "_HEADER";
    //
-   private static TourBookViewLayout      _viewLayout;
+   private static TourBookViewLayout       _viewLayout;
    //
-   private TourBook_ColumnFactory         _columnFactory;
-   private ColumnManager                  _columnManager_NatTable;
-   private ColumnManager                  _columnManager_Tree;
+   private TourBook_ColumnFactory          _columnFactory;
+   private ColumnManager                   _columnManager_NatTable;
+   private ColumnManager                   _columnManager_Tree;
    //
-   private OpenDialogManager              _openDlgMgr                                     = new OpenDialogManager();
+   private OpenDialogManager               _openDlgMgr                                     = new OpenDialogManager();
    //
-   private PostSelectionProvider          _postSelectionProvider;
+   private PostSelectionProvider           _postSelectionProvider;
    //
-   private ISelectionListener             _postSelectionListener;
-   private IPartListener2                 _partListener;
-   private ITourEventListener             _tourPropertyListener;
-   private IPropertyChangeListener        _prefChangeListener;
-   private IPropertyChangeListener        _prefChangeListenerCommon;
+   private ISelectionListener              _postSelectionListener;
+   private IPartListener2                  _partListener;
+   private ITourEventListener              _tourPropertyListener;
+   private IPropertyChangeListener         _prefChangeListener;
+   private IPropertyChangeListener         _prefChangeListenerCommon;
    //
-   private NatTable                       _tourViewer_NatTable;
-   private TreeViewer                     _tourViewer_Tree;
+   private NatTable                        _tourViewer_NatTable;
+   private TreeViewer                      _tourViewer_Tree;
    //
-   private TVITourBookRoot                _rootItem_Tree;
+   private TVITourBookRoot                 _rootItem_Tree;
    //
-   private DataLayer                      _natTable_ColumnHeader_DataLayer;
-   private ColumnHeaderLayer              _natTable_ColumnHeader_Layer;
-   private ColumnHideShowLayer            _natTable_Body_ColumnHideShowLayer;
-   private ColumnReorderLayer             _natTable_Body_ColumnReorderLayer;
-   private DataLayer                      _natTable_Body_DataLayer;
-   private HoverLayer                     _natTable_Body_HoverLayer;
-   private SelectionLayer                 _natTable_Body_SelectionLayer;
-   private ViewportLayer                  _natTable_Body_ViewportLayer;
+   private DataLayer                       _natTable_ColumnHeader_DataLayer;
+   private ColumnHeaderLayer               _natTable_ColumnHeader_Layer;
+   private ColumnHideShowLayer             _natTable_Body_ColumnHideShowLayer;
+   private ColumnReorderLayer              _natTable_Body_ColumnReorderLayer;
+   private DataLayer                       _natTable_Body_DataLayer;
+   private HoverLayer                      _natTable_Body_HoverLayer;
+   private SelectionLayer                  _natTable_Body_SelectionLayer;
+   private ViewportLayer                   _natTable_Body_ViewportLayer;
    //
-   private NatTable_DataLoader            _natTable_DataLoader;
-   private NatTable_SortModel             _natTable_SortModel;
-   private NatTableContentTooltip         _natTable_Tooltip;
+   private NatTable_DataLoader             _natTable_DataLoader;
+   private NatTable_SortModel              _natTable_SortModel;
+   private NatTableContentTooltip          _natTable_Tooltip;
    //
    /**
     * Contains {@link SWT#MENU_MOUSE} or {@link SWT#MENU_KEYBOARD} when context menu is being opened
     */
-   private int                            _natTable_ContextMenuActivator;
+   private int                             _natTable_ContextMenuActivator;
    //
-   private int                            _selectedYear                                   = -1;
-   private int                            _selectedYearSub                                = -1;
-   private final ArrayList<Long>          _selectedTourIds                                = new ArrayList<>();
+   private int                             _selectedYear                                   = -1;
+   private int                             _selectedYearSub                                = -1;
+   private final ArrayList<Long>           _selectedTourIds                                = new ArrayList<>();
    //
-   private boolean                        _isCollapseOthers;
-   private boolean                        _isInFireSelection;
-   private boolean                        _isInReload;
-   private boolean                        _isInStartup;
-   private boolean                        _isLayoutNatTable;
+   private boolean                         _isCollapseOthers;
+   private boolean                         _isInFireSelection;
+   private boolean                         _isInReload;
+   private boolean                         _isInStartup;
+   private boolean                         _isLayoutNatTable;
    //
-   private final TourDoubleClickState     _tourDoubleClickState                           = new TourDoubleClickState();
-   //   private TableViewerTourInfoToolTip     _tourInfoToolTip_NatTable;
-   private TreeViewerTourInfoToolTip      _tourInfoToolTip_Tree;
-//
-   private TagMenuManager                 _tagMenuManager;
-   private MenuManager                    _viewerMenuManager_NatTable;
-   private MenuManager                    _viewerMenuManager_Table;
-   private MenuManager                    _viewerMenuManager_Tree;
-   private IContextMenuProvider           _viewerContextMenuProvider_NatTable             = new ContextMenuProvider_NatTable();
-   private IContextMenuProvider           _viewerContextMenuProvider_Tree                 = new ContextMenuProvider_Tree();
+   private final TourDoubleClickState      _tourDoubleClickState                           = new TourDoubleClickState();
    //
-   private SubMenu_AdjustTourValues       _subMenu_AdjustTourValues;
-   private Action_Reimport_SubMenu        _subMenu_Reimport;
+   private NatTableViewer_TourInfo_ToolTip _tourInfoToolTip_NatTable;
+   private TreeViewerTourInfoToolTip       _tourInfoToolTip_Tree;
    //
-   private ActionCollapseAll              _actionCollapseAll;
-   private ActionCollapseOthers           _actionCollapseOthers;
-   private ActionDuplicateTour            _actionDuplicateTour;
-   private ActionEditQuick                _actionEditQuick;
-   private ActionExpandSelection          _actionExpandSelection;
-   private ActionExport                   _actionExportTour;
-   private ActionExportViewCSV            _actionExportViewCSV;
-   private ActionDeleteTourMenu           _actionDeleteTour;
-   private ActionEditTour                 _actionEditTour;
-   private ActionJoinTours                _actionJoinTours;
-   private ActionLinkWithOtherViews       _actionLinkWithOtherViews;
-   private ActionMergeTour                _actionMergeTour;
-   private ActionModifyColumns            _actionModifyColumns;
-   private ActionOpenTour                 _actionOpenTour;
-   private ActionOpenMarkerDialog         _actionOpenMarkerDialog;
-   private ActionOpenAdjustAltitudeDialog _actionOpenAdjustAltitudeDialog;
-   private ActionPrint                    _actionPrintTour;
-   private ActionRefreshView              _actionRefreshView;
-   private ActionSelectAllTours           _actionSelectAllTours;
-   private ActionSetTourTypeMenu          _actionSetTourType;
-   private ActionSetPerson                _actionSetOtherPerson;
-   private ActionToggleViewLayout         _actionToggleViewLayout;
-   private ActionTourBookOptions          _actionTourBookOptions;
+   private TagMenuManager                  _tagMenuManager;
+   private MenuManager                     _viewerMenuManager_NatTable;
+   private MenuManager                     _viewerMenuManager_Tree;
+   private IContextMenuProvider            _viewerContextMenuProvider_NatTable             = new ContextMenuProvider_NatTable();
+   private IContextMenuProvider            _viewerContextMenuProvider_Tree                 = new ContextMenuProvider_Tree();
    //
-   private PixelConverter                 _pc;
+   private SubMenu_AdjustTourValues        _subMenu_AdjustTourValues;
+   private Action_Reimport_SubMenu         _subMenu_Reimport;
+   //
+   private ActionCollapseAll               _actionCollapseAll;
+   private ActionCollapseOthers            _actionCollapseOthers;
+   private ActionDuplicateTour             _actionDuplicateTour;
+   private ActionEditQuick                 _actionEditQuick;
+   private ActionExpandSelection           _actionExpandSelection;
+   private ActionExport                    _actionExportTour;
+   private ActionExportViewCSV             _actionExportViewCSV;
+   private ActionDeleteTourMenu            _actionDeleteTour;
+   private ActionEditTour                  _actionEditTour;
+   private ActionJoinTours                 _actionJoinTours;
+   private ActionLinkWithOtherViews        _actionLinkWithOtherViews;
+   private ActionMergeTour                 _actionMergeTour;
+   private ActionModifyColumns             _actionModifyColumns;
+   private ActionOpenTour                  _actionOpenTour;
+   private ActionOpenMarkerDialog          _actionOpenMarkerDialog;
+   private ActionOpenAdjustAltitudeDialog  _actionOpenAdjustAltitudeDialog;
+   private ActionPrint                     _actionPrintTour;
+   private ActionRefreshView               _actionRefreshView;
+   private ActionSelectAllTours            _actionSelectAllTours;
+   private ActionSetTourTypeMenu           _actionSetTourType;
+   private ActionSetPerson                 _actionSetOtherPerson;
+   private ActionToggleViewLayout          _actionToggleViewLayout;
+   private ActionTourBookOptions           _actionTourBookOptions;
+   //
+   private PixelConverter                  _pc;
    /*
     * UI controls
     */
-   private PageBook                       _pageBook;
+   private PageBook                        _pageBook;
    //
-   private Composite                      _parent;
-   private Composite                      _viewerContainer_NatTable;
-   private Composite                      _viewerContainer_Tree;
+   private Composite                       _parent;
+   private Composite                       _viewerContainer_NatTable;
+   private Composite                       _viewerContainer_Tree;
    //
-   private Menu                           _contextMenu_NatTable;
-   private Menu                           _contextMenu_Tree;
-   private ActionShowOnlySelectedTours    _actionShowOnlySelectedTours;
+   private Menu                            _contextMenu_NatTable;
+   private Menu                            _contextMenu_Tree;
+//   private ActionShowOnlySelectedTours    _actionShowOnlySelectedTours;
 
    private class ActionLinkWithOtherViews extends ActionToolbarSlideout {
 
@@ -922,6 +924,10 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             if (partRef.getPart(false) == TourBookView.this) {
 
                // ensure the tour tooltip is hidden, it occured that even closing this view did not close the tooltip
+               if (_tourInfoToolTip_NatTable != null) {
+                  _tourInfoToolTip_NatTable.hideToolTip();
+               }
+
                if (_tourInfoToolTip_Tree != null) {
                   _tourInfoToolTip_Tree.hideToolTip();
                }
@@ -1113,7 +1119,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _actionSetOtherPerson = new ActionSetPerson(this);
       _actionSetTourType = new ActionSetTourTypeMenu(this);
       _actionSelectAllTours = new ActionSelectAllTours(this);
-      _actionShowOnlySelectedTours = new ActionShowOnlySelectedTours(this);
+//      _actionShowOnlySelectedTours = new ActionShowOnlySelectedTours(this);
       _actionToggleViewLayout = new ActionToggleViewLayout(this);
       _actionTourBookOptions = new ActionTourBookOptions();
 
@@ -1134,19 +1140,10 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
          @Override
          public void menuAboutToShow(final IMenuManager manager) {
+
+            _tourInfoToolTip_NatTable.hideToolTip();
+
             natTable_ContextMenu_OnShow(manager);
-         }
-      });
-
-      _viewerMenuManager_Table = new MenuManager();
-      _viewerMenuManager_Table.setRemoveAllWhenShown(true);
-      _viewerMenuManager_Table.addMenuListener(new IMenuListener() {
-         @Override
-         public void menuAboutToShow(final IMenuManager manager) {
-
-// TODO     _tourInfoToolTip_Table.hideToolTip();
-
-            fillContextMenu(manager, false);
          }
       });
 
@@ -1416,6 +1413,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _natTable_Tooltip.setPopupDelay(0);
 
       createUI_22_NatTable_ContextMenu();
+
+      // set tour info tooltip provider
+      _tourInfoToolTip_NatTable = new NatTableViewer_TourInfo_ToolTip(this, ToolTip.NO_RECREATE);
    }
 
    /**
@@ -1456,7 +1456,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
          @Override
          public void menuShown(final MenuEvent menuEvent) {
-            _tagMenuManager.onShowMenu(menuEvent, _tourViewer_NatTable, Display.getCurrent().getCursorLocation(), null);
+            _tagMenuManager.onShowMenu(menuEvent, _tourViewer_NatTable, Display.getCurrent().getCursorLocation(), _tourInfoToolTip_NatTable);
          }
       });
 
@@ -1752,7 +1752,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _actionPrintTour.setEnabled(isTourSelected);
       _actionSetOtherPerson.setEnabled(isTourSelected);
       _actionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
-      _actionShowOnlySelectedTours.setEnabled(isTableLayout);
+//      _actionShowOnlySelectedTours.setEnabled(isTableLayout);
 
       _actionCollapseOthers.setEnabled(numSelectedItems == 1 && firstElementHasChildren);
       _actionExpandSelection.setEnabled(
@@ -1792,7 +1792,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       tbm.add(_actionSelectAllTours);
       tbm.add(_actionToggleViewLayout);
-      tbm.add(_actionShowOnlySelectedTours);
+//      tbm.add(_actionShowOnlySelectedTours);
 
       tbm.add(new Separator());
       tbm.add(_actionExpandSelection);
@@ -3153,6 +3153,13 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
    public void setActiveYear(final int activeYear) {
       _selectedYear = activeYear;
+   }
+
+   /**
+    * @return the _natTable_Body_HoverLayer
+    */
+   public HoverLayer getNatTableLayer_Hover() {
+      return _natTable_Body_HoverLayer;
    }
 
    @Override
