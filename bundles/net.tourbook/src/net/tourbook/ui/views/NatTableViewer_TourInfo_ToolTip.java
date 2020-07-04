@@ -3,7 +3,7 @@
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
- * Foundation version 2 of the License. 
+ * Foundation version 2 of the License.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -17,26 +17,28 @@ package net.tourbook.ui.views;
 
 import java.util.ArrayList;
 
+import net.tourbook.common.UI;
+import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ITourToolTipProvider;
+import net.tourbook.common.util.NatTable_LabelProvider;
+import net.tourbook.common.util.NatTable_LabelProvider_WithTourTooltip;
 import net.tourbook.common.util.ToolTip;
 import net.tourbook.common.util.TourToolTip;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.TourInfoUI;
+import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
+import net.tourbook.ui.views.tourBook.TVITourBookTour;
 import net.tourbook.ui.views.tourBook.TourBookView;
 
-import org.eclipse.jface.layout.GridDataFactory;
-import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.nebula.widgets.nattable.NatTable;
-import org.eclipse.nebula.widgets.nattable.ui.NatEventData;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Label;
 
 /**
  * Tour info tooltip, implemented custom tooltip similar like
@@ -45,25 +47,27 @@ import org.eclipse.swt.widgets.Label;
  */
 public class NatTableViewer_TourInfo_ToolTip extends ToolTip implements ITourProvider, ITourToolTipProvider {
 
-   private final TourInfoUI _tourInfoUI = new TourInfoUI();
+   private final TourInfoUI   _tourInfoUI = new TourInfoUI();
 
-   private Long             _tourId;
-   private TourData         _tourData;
+   private TourData           _tourData;
 
    /**
     * Tooltip control
     */
-   private NatTable         _ttControl;
-
-//   private ColumnViewer       _columnViewer;
-//   private ViewerCell         _viewerCell;
-//   private Object             _viewerCell_Data;
+   private NatTable           _ttControl;
 
    private ITooltipUIProvider _tooltipUIProvider;
 
    private NatTable           _natTable;
 
    private TourBookView       _tourBookView;
+
+   private Point              _hoveredCellPos;
+//   private NatTable_LabelProvider_WithTourTooltip _hoveredLabelProvider;
+   private Long               _hoveredTourId;
+   private Rectangle          _hoveredBounds;
+
+   private Object             _viewerCell_Data;
 
    public NatTableViewer_TourInfo_ToolTip(final TourBookView tourBookView, final int style) {
 
@@ -73,7 +77,6 @@ public class NatTableViewer_TourInfo_ToolTip extends ToolTip implements ITourPro
       _natTable = tourBookView.getNatTable();
 
       _ttControl = _natTable;
-//      _columnViewer = columnViewer;
 
       setHideOnMouseDown(false);
    }
@@ -88,138 +91,137 @@ public class NatTableViewer_TourInfo_ToolTip extends ToolTip implements ITourPro
 
       super.afterHideToolTip(event);
 
-//      _viewerCell = null;
+      _hoveredCellPos = null;
    }
 
    @Override
    public Composite createToolTipContentArea(final Event event, final Composite parent) {
 
-//      Composite container;
-//
-//      if (_viewerCell_Data != null && _tooltipUIProvider != null) {
-//
-//         // a cell with custom data is hovered
-//
-//         container = _tooltipUIProvider.createTooltipUI(parent, _viewerCell_Data, this);
-//
-//         // allow the actions to be selected
-//         setHideOnMouseDown(false);
-//
-//      } else {
-//
-//         // a tour is hovered
-//
-//         if (_tourId != null && _tourId != -1) {
-//
-//            // first get data from the tour id when it is set
-//            _tourData = TourManager.getInstance().getTourData(_tourId);
-//         }
-//
-//         if (_tourData == null) {
-//
-//            // there are no data available
-//
-//            container = _tourInfoUI.createUI_NoData(parent);
-//
-//            // allow the actions to be selected
-//            setHideOnMouseDown(true);
-//
-//         } else {
-//
-//            // tour data is available
-//
-//            container = _tourInfoUI.createContentArea(parent, _tourData, this, this);
-//
-//            _tourInfoUI.setActionsEnabled(true);
-//
-//            // allow the actions to be selected
-//            setHideOnMouseDown(false);
-//         }
-//
-//         parent.addDisposeListener(new DisposeListener() {
-//            @Override
-//            public void widgetDisposed(final DisposeEvent e) {
-//               _tourInfoUI.dispose();
-//            }
-//         });
-//      }
-//
-//      return container;
+      Composite container;
 
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-      {
-         final Label label = new Label(container, SWT.NONE);
-         GridDataFactory.fillDefaults().applyTo(label);
-         label.setText("nat table tooltip");
+      if (_viewerCell_Data != null && _tooltipUIProvider != null) {
+
+         // a cell with custom data is hovered
+
+         container = _tooltipUIProvider.createTooltipUI(parent, _viewerCell_Data, this);
+
+         // allow the actions to be selected
+         setHideOnMouseDown(false);
+
+      } else {
+
+         // a tour is hovered
+
+         if (_hoveredTourId != null && _hoveredTourId != -1) {
+
+            // first get data from the tour id when it is set
+            _tourData = TourManager.getInstance().getTourData(_hoveredTourId);
+         }
+
+         if (_tourData == null) {
+
+            // there are no data available
+
+            container = _tourInfoUI.createUI_NoData(parent);
+
+            // allow the actions to be selected
+            setHideOnMouseDown(true);
+
+         } else {
+
+            // tour data is available
+
+            container = _tourInfoUI.createContentArea(parent, _tourData, this, this);
+
+            _tourInfoUI.setActionsEnabled(true);
+
+            // allow the actions to be selected
+            setHideOnMouseDown(false);
+         }
+
+         parent.addDisposeListener(new DisposeListener() {
+            @Override
+            public void widgetDisposed(final DisposeEvent e) {
+               _tourInfoUI.dispose();
+            }
+         });
       }
 
       return container;
+
+//      final Composite container = new Composite(parent, SWT.NONE);
+////      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+//      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
+//      {
+//         final Label label = new Label(container, SWT.NONE);
+//         GridDataFactory.fillDefaults().applyTo(label);
+//         label.setText("nat table tooltip");
+//      }
+//
+//      return container;
    }
 
    @Override
    public Point getLocation(final Point tipSize, final Event event) {
 
-//      // try to position the tooltip at the bottom of the cell
-//      final ViewerCell cell = _columnViewer.getCell(new Point(event.x, event.y));
-//
-//      if (cell != null) {
-//
-//         final Rectangle cellBounds = cell.getBounds();
-//         final int cellWidth2 = cellBounds.width / 2;
-//         final int cellHeight = cellBounds.height;
-//
-//         final int devXDefault = cellBounds.x + cellWidth2;// + cellBounds.width; //event.x;
-//         final int devY = cellBounds.y + cellHeight;
-//
-//         /*
-//          * check if the tooltip is outside of the tree, this can happen when the column is very
-//          * wide and partly hidden
-//          */
-//         final Rectangle treeBounds = _ttControl.getBounds();
-//         boolean isDevXAdjusted = false;
-//         int devX = devXDefault;
-//
-//         if (devXDefault >= treeBounds.width) {
-//            devX = treeBounds.width - 40;
-//            isDevXAdjusted = true;
-//         }
-//
-//         final Rectangle displayBounds = _ttControl.getDisplay().getBounds();
-//
-//         Point ttDisplayLocation = _ttControl.toDisplay(devX, devY);
-//         final int tipSizeWidth = tipSize.x;
-//         final int tipSizeHeight = tipSize.y;
-//
-//         if (ttDisplayLocation.x + tipSizeWidth > displayBounds.width) {
-//
-//            /*
-//             * adjust horizontal position, it is outside of the display, prevent default
-//             * repositioning
-//             */
-//
-//            if (isDevXAdjusted) {
-//
-//               ttDisplayLocation = _ttControl.toDisplay(devXDefault - cellWidth2 + 20 - tipSizeWidth, devY);
-//
-//            } else {
-//               ttDisplayLocation.x = ttDisplayLocation.x - tipSizeWidth;
-//            }
-//         }
-//
-//         if (ttDisplayLocation.y + tipSizeHeight > displayBounds.height) {
-//
-//            /*
-//             * adjust vertical position, it is outside of the display, prevent default
-//             * repositioning
-//             */
-//
-//            ttDisplayLocation.y = ttDisplayLocation.y - tipSizeHeight - cellHeight;
-//         }
-//
-//         return fixupDisplayBoundsWithMonitor(tipSize, ttDisplayLocation);
-//      }
+      // try to position the tooltip at the bottom of the cell
+
+      if (_hoveredBounds != null) {
+
+         final Rectangle cellBounds = _hoveredBounds;
+         final int cellWidth2 = cellBounds.width / 2;
+         final int cellHeight = cellBounds.height;
+
+         final int devXDefault = cellBounds.x + cellWidth2;// + cellBounds.width; //event.x;
+         final int devY = cellBounds.y + cellHeight;
+
+         /*
+          * check if the tooltip is outside of the control, this can happen when the column is very
+          * wide and partly hidden
+          */
+         final Rectangle controlBounds = _ttControl.getBounds();
+         boolean isDevXAdjusted = false;
+         int devX = devXDefault;
+
+         if (devXDefault >= controlBounds.width) {
+            devX = controlBounds.width - 40;
+            isDevXAdjusted = true;
+         }
+
+         final Rectangle displayBounds = _ttControl.getDisplay().getBounds();
+
+         Point ttDisplayLocation = _ttControl.toDisplay(devX, devY);
+         final int tipSizeWidth = tipSize.x;
+         final int tipSizeHeight = tipSize.y;
+
+         if (ttDisplayLocation.x + tipSizeWidth > displayBounds.width) {
+
+            /*
+             * adjust horizontal position, it is outside of the display, prevent default
+             * repositioning
+             */
+
+            if (isDevXAdjusted) {
+
+               ttDisplayLocation = _ttControl.toDisplay(devXDefault - cellWidth2 + 20 - tipSizeWidth, devY);
+
+            } else {
+               ttDisplayLocation.x = ttDisplayLocation.x - tipSizeWidth;
+            }
+         }
+
+         if (ttDisplayLocation.y + tipSizeHeight > displayBounds.height) {
+
+            /*
+             * adjust vertical position, it is outside of the display, prevent default
+             * repositioning
+             */
+
+            ttDisplayLocation.y = ttDisplayLocation.y - tipSizeHeight - cellHeight;
+         }
+
+         return fixupDisplayBoundsWithMonitor(tipSize, ttDisplayLocation);
+      }
 
       return super.getLocation(tipSize, event);
    }
@@ -240,60 +242,85 @@ public class NatTableViewer_TourInfo_ToolTip extends ToolTip implements ITourPro
    @Override
    protected Object getToolTipArea(final Event event) {
 
-      if (event.data == null) {
-         final MouseEvent mouseEvent = new MouseEvent(event);
-         event.data = NatEventData.createInstanceFromEvent(mouseEvent);
+      _hoveredTourId = null;
+      _hoveredBounds = null;
+      _hoveredCellPos = null;
+
+      final int colPosByX = _natTable.getColumnPositionByX(event.x);
+      final int rowPosByY = _natTable.getRowPositionByY(event.y);
+
+      if (colPosByX == 0) {
+
+         // first column (with row number is hovered)
+
+         return null;
       }
 
-      final NatEventData natEventData = (NatEventData) event.data;
+      _hoveredCellPos = _tourBookView.getNatTableLayer_Hover().getCurrentHoveredCellPosition();
+      if (_hoveredCellPos == null) {
 
-      final int columnPosition = natEventData.getColumnPosition();
-      int rowPosition = natEventData.getRowPosition();
+         // TODO This occures when a frozen column is hovered AND not yet another,
+         //      have not found a solution to solve this issue
 
-      final int columnIndex = _natTable.getColumnIndexByPosition(columnPosition);
+         return null;
+      }
 
-      rowPosition = _tourBookView.getNatTableLayer_Viewport().getRowPositionByY(event.y);
-      final Point cellPos = _tourBookView.getNatTableLayer_Hover().getCurrentHoveredCellPosition();
+//      final int hoveredColumnPosition = _hoveredCellPos.x;
+      final int hoveredRowPosition = _hoveredCellPos.y;
 
-//      final ColumnDefinition colDef = _ttControl._columnManager.getVisibleAndSortedColumns().get(columnIndex);
+      // get hovered label provider from the column, this is needed to show the tour tooltip only for specific columns
+      final int hoveredColumnIndex = _natTable.getColumnIndexByPosition(colPosByX);
+      if (hoveredColumnIndex == -1) {
 
-//      return colDef;
+         // a cell is not hovered
 
-      System.out.println((System.currentTimeMillis() + " " + columnPosition + " / " + rowPosition));
-      System.out.println((System.currentTimeMillis() + " " + cellPos.x + " / " + cellPos.y));
-      // TODO remove SYSTEM.OUT.PRINTLN
+         _hoveredCellPos = null;
 
-      return null;
+      } else {
 
-//      _viewerCell = _columnViewer.getCell(new Point(event.x, event.y));
-//      _viewerCell_Data = null;
-//
-//      if (_viewerCell != null) {
-//
-//         /*
-//          * Get tour id from hovered cell label provider
-//          */
-//         Long tourId = null;
-//         final CellLabelProvider labelProvider = _columnViewer.getLabelProvider(_viewerCell.getColumnIndex());
-//
-//         if (labelProvider instanceof IColumnViewerTourIdProvider) {
-//
-//            final IColumnViewerTourIdProvider columnViewerTourIdProvider = (IColumnViewerTourIdProvider) labelProvider;
-//
-//            tourId = columnViewerTourIdProvider.getTourId(_viewerCell);
-//
-//            _viewerCell_Data = columnViewerTourIdProvider.getData(_viewerCell);
-//         }
-//
-//         _tourId = tourId;
-//
-//         // hide current tooltip when a cell without tooltip is hovered
-//         if (tourId == null && _viewerCell_Data == null) {
-//            _viewerCell = null;
-//         }
-//      }
-//
-//      return _viewerCell;
+         _hoveredCellPos = new Point(colPosByX, rowPosByY);
+
+         final ArrayList<ColumnDefinition> visibleAndSortedColumns = _tourBookView.getNatTable_ColumnManager().getVisibleAndSortedColumns();
+         final ColumnDefinition colDef = visibleAndSortedColumns.get(hoveredColumnIndex);
+
+         System.out.println((System.currentTimeMillis()
+               + "  colPosByX:" + colPosByX
+               + "  rowPosByY:" + rowPosByY
+               + "  hoveredRowPosition:" + hoveredRowPosition
+               + "  colIdx:" + hoveredColumnIndex
+               + "  " + colDef.getColumnId()));
+// TODO remove SYSTEM.OUT.PRINTLN
+
+         // hide current tooltip when a cell without tooltip is hovered
+         final NatTable_LabelProvider hoveredLabelProvider = colDef.getNatTable_LabelProvider();
+         if (hoveredLabelProvider instanceof NatTable_LabelProvider_WithTourTooltip) {
+
+            final NatTable_LabelProvider_WithTourTooltip _hoveredLabelProvider = (NatTable_LabelProvider_WithTourTooltip) hoveredLabelProvider;
+            if (_hoveredLabelProvider.isShowTooltip() == false) {
+               _hoveredCellPos = null;
+            }
+         } else {
+
+            _hoveredCellPos = null;
+         }
+
+      }
+
+      if (_hoveredCellPos != null) {
+
+         // get hovered tour id
+         final TVITourBookTour hoveredTourItem = _tourBookView.getNatTable_DataProvider().getRowObject(hoveredRowPosition);
+         _hoveredTourId = hoveredTourItem.tourId;
+
+         final int devX = _natTable.getStartXOfColumnPosition(colPosByX);
+         final int devY = _natTable.getStartYOfRowPosition(rowPosByY);
+         final int cellWidth = _natTable.getColumnWidthByPosition(colPosByX);
+         final int cellHeight = _natTable.getRowHeightByPosition(rowPosByY);
+
+         _hoveredBounds = new Rectangle(devX, devY, cellWidth, cellHeight);
+      }
+
+      return _hoveredCellPos;
    }
 
    @Override
@@ -332,24 +359,24 @@ public class NatTableViewer_TourInfo_ToolTip extends ToolTip implements ITourPro
          return false;
       }
 
-//      if (_viewerCell == null) {
-//         return false;
-//      }
+      if (_hoveredCellPos == null) {
+         return false;
+      }
 
-      final boolean isShowTooltip = false;
+      boolean isShowTooltip = false;
 
-//      if (_tourId == null && _viewerCell_Data == null) {
-//
-//         // show default tooltip
-//         _ttControl.setToolTipText(null);
-//
-//      } else {
-//
-//         // hide default tooltip and display the custom tooltip
-//         _ttControl.setToolTipText(UI.EMPTY_STRING);
-//
-//         isShowTooltip = true;
-//      }
+      if (_hoveredTourId == null && _hoveredCellPos == null) {
+
+         // show default tooltip
+         _ttControl.setToolTipText(null);
+
+      } else {
+
+         // hide default tooltip and display the custom tooltip
+         _ttControl.setToolTipText(UI.EMPTY_STRING);
+
+         isShowTooltip = true;
+      }
 
       return isShowTooltip;
    }

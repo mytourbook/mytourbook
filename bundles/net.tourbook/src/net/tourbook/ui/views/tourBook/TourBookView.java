@@ -47,7 +47,7 @@ import net.tourbook.common.util.ITreeViewer;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.ToolTip;
-import net.tourbook.common.util.TreeViewerItem; 
+import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
@@ -280,6 +280,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private ViewportLayer                   _natTable_Body_ViewportLayer;
    //
    private NatTable_DataLoader             _natTable_DataLoader;
+   private TourRowDataProvider             _natTable_DataProvider;
    private NatTable_SortModel              _natTable_SortModel;
    private NatTableContentTooltip          _natTable_Tooltip;
    //
@@ -1242,8 +1243,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _natTable_DataLoader = new NatTable_DataLoader(this, _columnManager_NatTable);
 
       // body layer
-      final IRowDataProvider<TVITourBookTour> body_DataProvider = new TourRowDataProvider(_natTable_DataLoader);
-      _natTable_Body_DataLayer = new DataLayer(body_DataProvider);
+      _natTable_DataProvider = new TourRowDataProvider(_natTable_DataLoader);
+      _natTable_Body_DataLayer = new DataLayer(_natTable_DataProvider);
 
       // hover layer
       _natTable_Body_HoverLayer = new HoverLayer(_natTable_Body_DataLayer);
@@ -1276,15 +1277,15 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       };
       _natTable_Body_SelectionLayer.setSelectionModel(new RowSelectionModel<>(
             _natTable_Body_SelectionLayer,
-            body_DataProvider,
+            _natTable_DataProvider,
             rowIdAccessor));
 
       /*
        * Body viewport
        */
       _natTable_Body_ViewportLayer = new ViewportLayer(_natTable_Body_SelectionLayer);
-      _natTable_Body_ViewportLayer.addConfiguration(new NatTable_ConfigField_TourType(body_DataProvider));
-      _natTable_Body_ViewportLayer.addConfiguration(new NatTable_ConfigField_Weather(body_DataProvider));
+      _natTable_Body_ViewportLayer.addConfiguration(new NatTable_ConfigField_TourType(_natTable_DataProvider));
+      _natTable_Body_ViewportLayer.addConfiguration(new NatTable_ConfigField_Weather(_natTable_DataProvider));
       _natTable_Body_ViewportLayer.addLayerListener(new NatTable_ReorderListener());
 
       /*
@@ -1320,7 +1321,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       /*
        * Row header layer
        */
-      final DefaultRowHeaderDataProvider rowHeader_DataProvider = new DefaultRowHeaderDataProvider(body_DataProvider);
+      final DefaultRowHeaderDataProvider rowHeader_DataProvider = new DefaultRowHeaderDataProvider(_natTable_DataProvider);
       final DefaultRowHeaderDataLayer rowHeader_DataLayer = new DefaultRowHeaderDataLayer(rowHeader_DataProvider);
       final ILayer rowHeader_Layer = new RowHeaderLayer(rowHeader_DataLayer, compositeFreezeLayer, _natTable_Body_SelectionLayer);
 
@@ -1372,7 +1373,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       // setup selection listener for the nattable
       final ISelectionProvider selectionProvider = new RowSelectionProvider<>(
             _natTable_Body_SelectionLayer,
-            body_DataProvider,
+            _natTable_DataProvider,
             false); // Provides rows where any cell in the row is selected
 
       selectionProvider.addSelectionChangedListener(new ISelectionChangedListener() {
@@ -1876,6 +1877,10 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       return _columnManager_NatTable;
    }
 
+   public TourRowDataProvider getNatTable_DataProvider() {
+      return _natTable_DataProvider;
+   }
+
    /**
     * @param event
     * @return Returns the {@link ColumnDefinition} of the currently selected row or
@@ -1923,6 +1928,13 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    @Override
    public DataLayer getNatTableLayer_Data() {
       return _natTable_Body_DataLayer;
+   }
+
+   /**
+    * @return the _natTable_Body_HoverLayer
+    */
+   public HoverLayer getNatTableLayer_Hover() {
+      return _natTable_Body_HoverLayer;
    }
 
    public NatTable_SortModel getNatTableLayer_SortModel() {
@@ -3153,13 +3165,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
    public void setActiveYear(final int activeYear) {
       _selectedYear = activeYear;
-   }
-
-   /**
-    * @return the _natTable_Body_HoverLayer
-    */
-   public HoverLayer getNatTableLayer_Hover() {
-      return _natTable_Body_HoverLayer;
    }
 
    @Override

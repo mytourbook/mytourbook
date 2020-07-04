@@ -28,6 +28,7 @@ import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.NatTable_LabelProvider;
+import net.tourbook.common.util.NatTable_LabelProvider_WithTourTooltip;
 import net.tourbook.common.util.TableColumnDefinition;
 import net.tourbook.common.util.TreeColumnDefinition;
 import net.tourbook.data.TourData;
@@ -275,15 +276,20 @@ public class TourBook_ColumnFactory {
       final TableColumnDefinition colDef_NatTable = TableColumnFactory.TIME_DATE.createColumn(_columnManager_NatTable, _pc);
       colDef_NatTable.setIsDefaultColumn();
       colDef_NatTable.setCanModifyVisibility(false);
-      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider_WithTourTooltip() {
 
          @Override
-         public String getValueText(final Object element) {
+         public String getValueText(final Object item) {
 
-            final TVITourBookTour tourItem = (TVITourBookTour) (TVITourBookItem) element;
+            final TVITourBookTour tourItem = (TVITourBookTour) (TVITourBookItem) item;
 
             // show full date
             return tourItem.colDateTime_Text;
+         }
+
+         @Override
+         public boolean isShowTooltip() {
+            return _isShowToolTipIn_Date;
          }
       });
 
@@ -2578,7 +2584,7 @@ public class TourBook_ColumnFactory {
 
       final TableColumnDefinition colDef_NatTable = TableColumnFactory.TIME_TOUR_START_TIME.createColumn(_columnManager_NatTable, _pc);
       colDef_NatTable.setIsDefaultColumn();
-      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider_WithTourTooltip() {
 
          @Override
          public String getValueText(final Object element) {
@@ -2593,6 +2599,11 @@ public class TourBook_ColumnFactory {
             } else {
                return tourStartDateTime.format(TimeTools.Formatter_Time_S);
             }
+         }
+
+         @Override
+         public boolean isShowTooltip() {
+            return _isShowToolTipIn_Time;
          }
       });
 
@@ -2645,12 +2656,17 @@ public class TourBook_ColumnFactory {
 
       final TableColumnDefinition colDef_NatTable = TableColumnFactory.TIME_WEEK_DAY.createColumn(_columnManager_NatTable, _pc);
       colDef_NatTable.setIsDefaultColumn();
-      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider_WithTourTooltip() {
 
          @Override
          public String getValueText(final Object element) {
 
             return ((TVITourBookTour) element).colWeekDay;
+         }
+
+         @Override
+         public boolean isShowTooltip() {
+            return _isShowToolTipIn_WeekDay;
          }
       });
 
@@ -2973,11 +2989,16 @@ public class TourBook_ColumnFactory {
 
       final TableColumnDefinition colDef_NatTable = TableColumnFactory.TOUR_TAGS.createColumn(_columnManager_NatTable, _pc);
       colDef_NatTable.setIsDefaultColumn();
-      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider_WithTourTooltip() {
 
          @Override
          public String getValueText(final Object element) {
             return "this is not yet supported";
+         }
+
+         @Override
+         public boolean isShowTooltip() {
+            return _isShowToolTipIn_Tags;
          }
       });
 
@@ -3019,7 +3040,7 @@ public class TourBook_ColumnFactory {
 
       final TableColumnDefinition colDef_NatTable = TableColumnFactory.TOUR_TITLE.createColumn(_columnManager_NatTable, _pc);
       colDef_NatTable.setIsDefaultColumn();
-      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider_WithTourTooltip() {
 
          @Override
          public String getValueText(final Object element) {
@@ -3031,6 +3052,11 @@ public class TourBook_ColumnFactory {
             } else {
                return colTourTitle;
             }
+         }
+
+         @Override
+         public boolean isShowTooltip() {
+            return _isShowToolTipIn_Title;
          }
       });
 

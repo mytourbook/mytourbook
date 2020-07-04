@@ -543,13 +543,13 @@ public class NatTable_DataLoader {
    }
 
    /**
-    * @param index
+    * @param rowIndex
     * @return Returns tour item at the requested row index or <code>null</code> when not yet
     *         available. When tour is not yet loaded then the data will be fetched from the backend.
     */
-   TVITourBookTour getTour(final int index) {
+   TVITourBookTour getTour(final int rowIndex) {
 
-      final TVITourBookTour loadedTourItem = _fetchedTourItems.get(index);
+      final TVITourBookTour loadedTourItem = _fetchedTourItems.get(rowIndex);
 
       if (loadedTourItem != null) {
 
@@ -561,7 +561,7 @@ public class NatTable_DataLoader {
       /*
        * Check if the tour is currently fetched
        */
-      final int fetchKey = index / FETCH_SIZE;
+      final int fetchKey = rowIndex / FETCH_SIZE;
 
       LazyTourLoaderItem loaderItem = _pageNumbers_Loading.get(fetchKey);
 
