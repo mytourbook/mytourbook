@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,7 +14,7 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui.views;
-
+ 
 import java.util.ArrayList;
 
 import net.tourbook.common.UI;
@@ -62,8 +62,7 @@ public class NatTableViewer_TourInfo_ToolTip extends ToolTip implements ITourPro
 
    private TourBookView       _tourBookView;
 
-   private Point              _hoveredCellPos;
-//   private NatTable_LabelProvider_WithTourTooltip _hoveredLabelProvider;
+   private Point              _tooltipCellPos;
    private Long               _hoveredTourId;
    private Rectangle          _hoveredBounds;
 
@@ -79,6 +78,7 @@ public class NatTableViewer_TourInfo_ToolTip extends ToolTip implements ITourPro
       _ttControl = _natTable;
 
       setHideOnMouseDown(false);
+      setPopupDelay(20);
    }
 
    @Override
@@ -91,7 +91,7 @@ public class NatTableViewer_TourInfo_ToolTip extends ToolTip implements ITourPro
 
       super.afterHideToolTip(event);
 
-      _hoveredCellPos = null;
+      _tooltipCellPos = null;
    }
 
    @Override
@@ -148,17 +148,6 @@ public class NatTableViewer_TourInfo_ToolTip extends ToolTip implements ITourPro
       }
 
       return container;
-
-//      final Composite container = new Composite(parent, SWT.NONE);
-////      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-//      GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-//      {
-//         final Label label = new Label(container, SWT.NONE);
-//         GridDataFactory.fillDefaults().applyTo(label);
-//         label.setText("nat table tooltip");
-//      }
-//
-//      return container;
    }
 
    @Override
@@ -244,29 +233,23 @@ public class NatTableViewer_TourInfo_ToolTip extends ToolTip implements ITourPro
 
       _hoveredTourId = null;
       _hoveredBounds = null;
-      _hoveredCellPos = null;
+      _tooltipCellPos = null;
 
       final int colPosByX = _natTable.getColumnPositionByX(event.x);
       final int rowPosByY = _natTable.getRowPositionByY(event.y);
 
-      if (colPosByX == 0) {
+      if (colPosByX == 0 || rowPosByY == 0) {
 
-         // first column (with row number is hovered)
-
-         return null;
-      }
-
-      _hoveredCellPos = _tourBookView.getNatTableLayer_Hover().getCurrentHoveredCellPosition();
-      if (_hoveredCellPos == null) {
-
-         // TODO This occures when a frozen column is hovered AND not yet another,
-         //      have not found a solution to solve this issue
+         // first column or first row (this is the row number or table header)
 
          return null;
       }
 
-//      final int hoveredColumnPosition = _hoveredCellPos.x;
-      final int hoveredRowPosition = _hoveredCellPos.y;
+// !!! this do not work for freezed columns !!!
+//      _hoveredCellPos = _tourBookView.getNatTableLayer_Hover().getCurrentHoveredCellPosition();
+
+// NatTable advanced: With lot of debugging found solution to get absolute row from relative row
+      final int hoveredRowPosition = _tourBookView.getNatTableLayer_Viewport().localToUnderlyingRowPosition(rowPosByY - 1);
 
       // get hovered label provider from the column, this is needed to show the tour tooltip only for specific columns
       final int hoveredColumnIndex = _natTable.getColumnIndexByPosition(colPosByX);
@@ -274,39 +257,40 @@ public class NatTableViewer_TourInfo_ToolTip extends ToolTip implements ITourPro
 
          // a cell is not hovered
 
-         _hoveredCellPos = null;
+         _tooltipCellPos = null;
 
       } else {
 
-         _hoveredCellPos = new Point(colPosByX, rowPosByY);
+         _tooltipCellPos = new Point(colPosByX, rowPosByY);
 
          final ArrayList<ColumnDefinition> visibleAndSortedColumns = _tourBookView.getNatTable_ColumnManager().getVisibleAndSortedColumns();
          final ColumnDefinition colDef = visibleAndSortedColumns.get(hoveredColumnIndex);
 
-         System.out.println((System.currentTimeMillis()
-               + "  colPosByX:" + colPosByX
-               + "  rowPosByY:" + rowPosByY
-               + "  hoveredRowPosition:" + hoveredRowPosition
-               + "  colIdx:" + hoveredColumnIndex
-               + "  " + colDef.getColumnId()));
-// TODO remove SYSTEM.OUT.PRINTLN
+//         System.out.println((System.currentTimeMillis()
+//               + "  colPosByX:" + colPosByX
+//               + "  rowPosByY:" + rowPosByY
+//               + "  hoveredRowPosition:" + hoveredRowPosition
+//               + "  colIdx:" + hoveredColumnIndex
+//               + "  " + colDef.getColumnId()));
+//// TODO remove SYSTEM.OUT.PRINTLN
 
          // hide current tooltip when a cell without tooltip is hovered
-         final NatTable_LabelProvider hoveredLabelProvider = colDef.getNatTable_LabelProvider();
-         if (hoveredLabelProvider instanceof NatTable_LabelProvider_WithTourTooltip) {
+         final NatTable_LabelProvider labelProvider = colDef.getNatTable_LabelProvider();
+         if (labelProvider instanceof NatTable_LabelProvider_WithTourTooltip) {
 
-            final NatTable_LabelProvider_WithTourTooltip _hoveredLabelProvider = (NatTable_LabelProvider_WithTourTooltip) hoveredLabelProvider;
-            if (_hoveredLabelProvider.isShowTooltip() == false) {
-               _hoveredCellPos = null;
+            final NatTable_LabelProvider_WithTourTooltip tooltipLabelProvider = (NatTable_LabelProvider_WithTourTooltip) labelProvider;
+            if (tooltipLabelProvider.isShowTooltip() == false) {
+               _tooltipCellPos = null;
             }
+
          } else {
 
-            _hoveredCellPos = null;
+            _tooltipCellPos = null;
          }
 
       }
 
-      if (_hoveredCellPos != null) {
+      if (_tooltipCellPos != null) {
 
          // get hovered tour id
          final TVITourBookTour hoveredTourItem = _tourBookView.getNatTable_DataProvider().getRowObject(hoveredRowPosition);
@@ -320,7 +304,7 @@ public class NatTableViewer_TourInfo_ToolTip extends ToolTip implements ITourPro
          _hoveredBounds = new Rectangle(devX, devY, cellWidth, cellHeight);
       }
 
-      return _hoveredCellPos;
+      return _tooltipCellPos;
    }
 
    @Override
@@ -359,13 +343,13 @@ public class NatTableViewer_TourInfo_ToolTip extends ToolTip implements ITourPro
          return false;
       }
 
-      if (_hoveredCellPos == null) {
+      if (_tooltipCellPos == null) {
          return false;
       }
 
       boolean isShowTooltip = false;
 
-      if (_hoveredTourId == null && _hoveredCellPos == null) {
+      if (_hoveredTourId == null && _tooltipCellPos == null) {
 
          // show default tooltip
          _ttControl.setToolTipText(null);
