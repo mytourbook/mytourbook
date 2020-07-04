@@ -50,6 +50,7 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.FileSystemManager;
 import net.tourbook.common.NIO;
+import net.tourbook.common.TourbookFileSystem;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.formatter.FormatManager;
@@ -1634,13 +1635,15 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       sb.append("<table border=0 class='deviceList'><tbody>"); //$NON-NLS-1$
 
+      final EasyConfig easyConfig = getEasyConfig();
+
       for (final OSFile deviceFile : notImportedFiles) {
 
          final String fileMoveState = deviceFile.isBackupImportFile
                ? Messages.Import_Data_HTML_Title_Moved_State
                : UI.EMPTY_STRING;
 
-         final String filePathName = UI.replaceHTML_BackSlash(deviceFile.getPath().getParent().toString());
+         String filePathName = UI.replaceHTML_BackSlash(deviceFile.getPath().getParent().toString());
          final ZonedDateTime modifiedTime = TimeTools.getZonedDateTime(deviceFile.modifiedTime);
 
          sb.append(HTML_TR);
@@ -1665,9 +1668,16 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          sb.append(deviceFile.size);
          sb.append(HTML_TD_END);
 
-         final EasyConfig easyConfig = getEasyConfig();
          // this is for debugging
          if (easyConfig.stateToolTipDisplayAbsoluteFilePath) {
+
+            if (NIO.isTourBookFileSystem(filePathName)) {
+
+               final TourbookFileSystem tourbookFileSystem = FileSystemManager.getTourbookFileSystem(filePathName);
+
+               filePathName = filePathName.replace(tourbookFileSystem.getId(), tourbookFileSystem.getDisplayId());
+            }
+
             sb.append("<td class='column content'>"); //$NON-NLS-1$
             sb.append(filePathName);
             sb.append(HTML_TD_END);

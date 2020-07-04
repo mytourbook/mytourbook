@@ -226,7 +226,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private static final String    VALUE_UNIT_K_CALORIES         = net.tourbook.ui.Messages.Value_Unit_KCalories;
    //
    /**
-    * On Linux an asynch selection event is fired since e4
+    * On Linux an async selection event is fired since e4
     */
    private static final String    FIX_LINUX_ASYNC_EVENT_1       = "FIX_LINUX_ASYNC_EVENT_1";                              //$NON-NLS-1$
    private static final String    FIX_LINUX_ASYNC_EVENT_2       = "FIX_LINUX_ASYNC_EVENT_2";                              //$NON-NLS-1$
@@ -420,7 +420,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private boolean                            _isInfoInTitle;
 
    /**
-    * Is <code>true</code> when a cell editor is activ, otherwise <code>false</code>
+    * Is <code>true</code> when a cell editor is active, otherwise <code>false</code>
     */
    private boolean                            _isCellEditorActive;
 
@@ -546,7 +546,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    //
    /**
     * contains the controls which are displayed in the first column, these controls are used to get
-    * the maximum width and set the first column within the differenct section to the same width
+    * the maximum width and set the first column within the different section to the same width
     */
    private final ArrayList<Control> _firstColumnControls          = new ArrayList<>();
    private final ArrayList<Control> _firstColumnContainerControls = new ArrayList<>();
@@ -816,7 +816,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   __dataSerie[serieIndex] = enteredValue;
 
                   /*
-                   * worldposition has changed, this is an absolute overkill, wenn only one position
+                   * world position has changed, this is an absolute overkill, when only one
+                   * position
                    * has changed
                    */
                   _tourData.clearWorldPositions();
@@ -7500,7 +7501,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _timeSlice_TourViewer.reloadViewer();
             updateStatusLine();
 
-            // run asynch because relaodViewer is also running asynch
+            // run async because reloadViewer is also running async
             Display.getCurrent().asyncExec(new Runnable() {
                @Override
                public void run() {
@@ -7524,7 +7525,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _swimSlice_TourViewer.reloadViewer();
 //          updateStatusLine();
 
-            // run asynch because relaodViewer is also running asynch
+            // run async because relaodViewer is also running async
             Display.getCurrent().asyncExec(new Runnable() {
 
                @Override
@@ -7610,7 +7611,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _isSetField = isBackup;
    }
 
-   private void recreateViewer() {
+   public void recreateViewer() {
 
       /*
        * Recreate time slice viewer
@@ -7902,6 +7903,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       valueIndex = Math.max(0, Math.min(valueIndex, itemCount - 1));
 
       table.setSelection(valueIndex);
+
       table.showSelection();
 
       // fire slider position
@@ -7934,7 +7936,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     *           Can be {@link SelectionChartXSliderPosition#IGNORE_SLIDER_POSITION} when this
     *           position should not be set.
     */
-   private void selectTimeSlice_InViewer(final int valueIndexStart, final int valueIndexEnd) {
+   public void selectTimeSlice_InViewer(final int valueIndexStart, final int valueIndexEnd) {
 
       final Table table = (Table) _timeSlice_Viewer.getControl();
       final int itemCount = table.getItemCount();
@@ -7959,6 +7961,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       table.showSelection();
    }
 
+   public void selectTimeSlicesTab() {
+      _tabFolder.setSelection(_tab_20_TimeSlices);
+   }
+
    @Override
    public void setFocus() {
 
@@ -7969,10 +7975,23 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    }
 
    /**
+    * Programmatically toggles the row select mode
+    *
+    * @param enabled
+    *           True to activate the row select mode, false to disactivate it.
+    */
+   public void setRowEditModeEnabled(final boolean enabled) {
+
+      _actionToggleRowSelectMode.setChecked(enabled);
+
+      actionToggleRowSelectMode();
+   }
+
+   /**
     * Set stroke style for the selected swim slices
     *
     * @param strokeStyle
-    *           Stroke style, can be <code>null</code> to remove the stroke styke
+    *           Stroke style, can be <code>null</code> to remove the stroke style
     */
    void setSwimStyle(final StrokeStyle strokeStyle) {
 
@@ -8815,7 +8834,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    }
 
-   private void updateUI_Tab_2_TimeSlices() {
+   public void updateUI_Tab_2_TimeSlices() {
 
       if (_uiRunnableForce_TimeSliceReload) {
          _timeSlice_ViewerTourId = -1L;

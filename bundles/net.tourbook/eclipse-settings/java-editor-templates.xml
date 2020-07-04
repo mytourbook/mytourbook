@@ -219,7 +219,12 @@ ${label}.setText(${word_selection}${});&#13;
 ${imp:import(org.eclipse.swt.SWT)}${cursor}</template><template autoinsert="true" context="swt-statements" deleted="false" description="" enabled="true" name="Label2 fill">${labelType:newType(org.eclipse.swt.widgets.Label)} ${label:newName(org.eclipse.swt.widgets.Label)}= new ${labelType}(${parent:var(org.eclipse.swt.widgets.Composite)}, ${style:link(SWT.NONE, SWT.WRAP, 'SWT.SEPARATOR | SWT.HORIZONTAL', 'SWT.SEPARATOR | SWT.VERTICAL')});&#13;
 GridDataFactory.fillDefaults().applyTo(${label});&#13;
 ${label}.setText(${word_selection}${});&#13;
-${imp:import(org.eclipse.swt.SWT)}${cursor}</template><template autoinsert="false" context="java-statements" deleted="false" description="lazy creation" enabled="true" id="org.eclipse.jdt.ui.templates.lazy" name="lazy">if (${name:var} == null) {
+${imp:import(org.eclipse.swt.SWT)}${cursor}</template><template autoinsert="true" context="swt-statements" deleted="false" description="" enabled="true" name="Label2 fill">${labelType:newType(org.eclipse.swt.widgets.Label)} ${label:newName(org.eclipse.swt.widgets.Label)}= new ${labelType}(${parent:var(org.eclipse.swt.widgets.Composite)}, ${style:link(SWT.NONE, SWT.WRAP, 'SWT.SEPARATOR | SWT.HORIZONTAL', 'SWT.SEPARATOR | SWT.VERTICAL')});&#13;
+GridDataFactory.fillDefaults().applyTo(${label});&#13;
+${label}.setText(${word_selection}${});&#13;
+${imp:import(org.eclipse.swt.SWT)}${cursor}</template><template autoinsert="true" context="java" deleted="false" description="" enabled="true" name="lambda">() -&gt; {&#13;
+   ${cursor}&#13;
+}</template><template autoinsert="false" context="java-statements" deleted="false" description="lazy creation" enabled="true" id="org.eclipse.jdt.ui.templates.lazy" name="lazy">if (${name:var} == null) {
 	${name} = new ${type}(${arguments});
 	${cursor}
 }

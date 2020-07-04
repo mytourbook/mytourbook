@@ -90,6 +90,7 @@ public class Util {
    public static final String UNIQUE_ID_SUFFIX_SUUNTO2             = "92145"; //$NON-NLS-1$
    public static final String UNIQUE_ID_SUFFIX_SUUNTO3             = "73198"; //$NON-NLS-1$
    public static final String UNIQUE_ID_SUFFIX_SUUNTO9             = "93281"; //$NON-NLS-1$
+   public static final String UNIQUE_ID_SUFFIX_SUUNTOQUEST         = "41502"; //$NON-NLS-1$
 
    /*
     * Default xml tags
@@ -1944,9 +1945,7 @@ public class Util {
          final StringBuilder sb = new StringBuilder();
          String line;
 
-         try {
-
-            final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, UI.UTF_8));
+         try (final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, UI.UTF_8))) {
 
             while ((line = reader.readLine()) != null) {
                sb.append(line).append(UI.NEW_LINE);
