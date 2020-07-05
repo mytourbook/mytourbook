@@ -3048,7 +3048,9 @@ public class TourBook_ColumnFactory {
             final String colTourTitle = ((TVITourBookTour) element).colTourTitle;
 
             if (colTourTitle == null) {
-               return "<NULL>";
+// used for debugging
+//             return "<NULL>";
+               return UI.EMPTY_STRING;
             } else {
                return colTourTitle;
             }
