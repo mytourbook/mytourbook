@@ -5469,7 +5469,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     */
    private void defineColumn_TimeSlice_Power() {
 
-      final ColumnDefinition colDef = TableColumnFactory.POWER.createColumn(_timeSlice_ColumnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.POWER_TIME_SLICE.createColumn(_timeSlice_ColumnManager, _pc);
       colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {
@@ -5493,7 +5493,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       ColumnDefinition colDef;
 
-      _timeSlice_ColDef_Cadence = colDef = TableColumnFactory.POWERTRAIN_CADENCE.createColumn(_timeSlice_ColumnManager, _pc);
+      _timeSlice_ColDef_Cadence = colDef = TableColumnFactory.POWERTRAIN_CADENCE_TIME_SLICE.createColumn(_timeSlice_ColumnManager, _pc);
       colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {
@@ -5514,7 +5514,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     */
    private void defineColumn_TimeSlice_Powertrain_GearRatio() {
 
-      final ColumnDefinition colDef = TableColumnFactory.POWERTRAIN_GEAR_RATIO.createColumn(_timeSlice_ColumnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.POWERTRAIN_GEAR_RATIO_TIME_SLICE.createColumn(_timeSlice_ColumnManager, _pc);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -5564,7 +5564,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    }
 
    /**
-    * column: cadence
+    * Column: Paused time
     */
    private void defineColumn_TimeSlice_Time_BreakTime() {
 
@@ -5722,7 +5722,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private void defineColumn_TimeSlice_Weather_Temperature() {
 
       final ColumnDefinition colDef;
-      _timeSlice_ColDef_Temperature = colDef = TableColumnFactory.WEATHER_TEMPERATURE.createColumn(_timeSlice_ColumnManager, _pc);
+      _timeSlice_ColDef_Temperature = colDef = TableColumnFactory.WEATHER_TEMPERATURE_TIME_SLICE.createColumn(_timeSlice_ColumnManager, _pc);
       colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {
@@ -5873,6 +5873,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _firstColumnControls.clear();
       _secondColumnControls.clear();
       _firstColumnContainerControls.clear();
+
+      /*
+       * Tour MUST be set clean otherwise a Ctrl+W whould "close" the tour editor but closing the
+       * app is asking to save the tour!
+       */
+      setTourClean();
 
       super.dispose();
    }
@@ -6245,6 +6251,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    private void enableControls() {
 
+      final Table timeSliceTable = _timeSlice_Viewer.getTable();
+      if (timeSliceTable.isDisposed()) {
+         return;
+      }
+
       final boolean canEdit = _isEditMode && isTourInDb();
       final boolean isManualAndEdit = _isManualTour && canEdit;
       final boolean isDeviceTour = _isManualTour == false;
@@ -6308,7 +6319,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _linkTag.setEnabled(canEdit);
       _linkTourType.setEnabled(canEdit);
 
-      _timeSlice_Viewer.getTable().setEnabled(isDeviceTour);
+      timeSliceTable.setEnabled(isDeviceTour);
    }
 
    private void fillContextMenu_SwimSlice(final IMenuManager menuMgr) {
@@ -9007,6 +9018,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     * Update title of the view with the modified date/time
     */
    private void updateUI_Title() {
+
+      if (_dtTourDate.isDisposed()) {
+         return;
+      }
 
       final ZoneId zoneId = _tourData == null //
             ? TimeTools.getDefaultTimeZone()

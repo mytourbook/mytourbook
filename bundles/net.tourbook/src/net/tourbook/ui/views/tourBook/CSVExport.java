@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -119,8 +119,8 @@ public class CSVExport {
    private static final String HEADER_TIME_WEEKDAY                                    = "TIME Weekday";                                     //$NON-NLS-1$
    private static final String HEADER_TIME_YEAR                                       = "TIME Year";                                        //$NON-NLS-1$
 
-   private static final String HEADER_TOUR_LOCATION_START                             = "TOUR Start Location";
-   private static final String HEADER_TOUR_LOCATION_END                               = "TOUR End Location";
+   private static final String HEADER_TOUR_LOCATION_START                             = "TOUR Start Location";                              //$NON-NLS-1$
+   private static final String HEADER_TOUR_LOCATION_END                               = "TOUR End Location";                                //$NON-NLS-1$
    private static final String HEADER_TOUR_NUMBER_OF_MARKER                           = "TOUR Number of markers";                           //$NON-NLS-1$
    private static final String HEADER_TOUR_NUMBER_OF_PHOTOS                           = "TOUR Number of photos";                            //$NON-NLS-1$
    private static final String HEADER_TOUR_NUMBER_OF_TOURS                            = "TOUR Number of tours";                             //$NON-NLS-1$
@@ -659,9 +659,9 @@ public class CSVExport {
             }
          }
 
-      } else if (segment instanceof TVITourBookYearSub) {
+      } else if (segment instanceof TVITourBookYearCategorized) {
 
-         final TVITourBookYearSub tviYearSub = (TVITourBookYearSub) segment;
+         final TVITourBookYearCategorized tviYearSub = (TVITourBookYearCategorized) segment;
 
          // month or week
          csvField(sb, tviYearSub.tourYearSub);
@@ -685,7 +685,7 @@ public class CSVExport {
          } else {
 
             // week
-            csvField(sb, tviTour.tourWeek);
+            csvField(sb, tviTour.colWeekNo);
          }
 
          // day
@@ -1480,6 +1480,6 @@ public class CSVExport {
     */
    private boolean isYearSubWeek() {
 
-      return _tourBookView.getYearSubCategory() == YearSubCategory.WEEK;
+      return _tourBookView.getViewLayout() == TourBookViewLayout.CATEGORY_WEEK;
    }
 }

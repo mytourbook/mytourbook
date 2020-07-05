@@ -57,9 +57,9 @@ public class TVITagView_Root extends TVITagViewItem {
             /*
              * get tag categories
              */
-            sb.append("SELECT"); //$NON-NLS-1$
+            sb.append("SELECT"); //               //$NON-NLS-1$
             sb.append(" tagCategoryId,"); //    1 //$NON-NLS-1$
-            sb.append(" name"); //             2 //$NON-NLS-1$
+            sb.append(" name"); //              2 //$NON-NLS-1$
 
             sb.append(" FROM " + TourDatabase.TABLE_TOUR_TAG_CATEGORY); //$NON-NLS-1$
             sb.append(" WHERE isRoot = 1"); //$NON-NLS-1$
@@ -92,11 +92,11 @@ public class TVITagView_Root extends TVITagViewItem {
                      : UI.EMPTY_STRING;
 
          sb.delete(0, sb.length());
-         sb.append("SELECT"); // $NON-NLS-1$
-         sb.append(" tagId,"); //      1 //$NON-NLS-1$
-         sb.append(" name,"); //         2 //$NON-NLS-1$
-         sb.append(" expandType,"); //   3 //$NON-NLS-1$
-         sb.append(" isRoot"); //      44 //$NON-NLS-1$
+         sb.append("SELECT"); //            //$NON-NLS-1$
+         sb.append(" tagId,"); //         1 //$NON-NLS-1$
+         sb.append(" name,"); //          2 //$NON-NLS-1$
+         sb.append(" expandType,"); //    3 //$NON-NLS-1$
+         sb.append(" isRoot"); //         4 //$NON-NLS-1$
 
          sb.append(" FROM " + TourDatabase.TABLE_TOUR_TAG); //$NON-NLS-1$
          sb.append(whereClause);

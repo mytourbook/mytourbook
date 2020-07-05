@@ -39,8 +39,7 @@ public class PhotoCache {
 
    private static Cache<String, Photo>                       _cache;
 
-   private static final ListenerList<IPhotoEvictionListener> _evictionListeners = new ListenerList<>(
-         ListenerList.IDENTITY);
+   private static final ListenerList<IPhotoEvictionListener> _evictionListeners = new ListenerList<>(ListenerList.IDENTITY);
 
    static {
 
