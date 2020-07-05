@@ -6,18 +6,22 @@ TODO's
              
   - csv export: export new column(s) in tourbook view
 
+
 New
 ===
 
 * Flat Tour Book View
   - Displayed tours are not categorized by date
   - Tours can be sorted
-    - By many columns except when a column is computed or have an SQL relation
+    - By many columns except when a column is computed or have a SQL relation
     - Using multiple columns (by pressing the Alt key)
-  - Columns can be freezed for horizontal scrolling
+  - Columns can be freezed for horizontal scrolling (freeze action is in the header context menu)
 
 * Dropbox Integration (Frederic)
   - Ability to connect a Dropbox account to MyTourbook, and also choosing a specific a folder for this account. This Dropbox folder can be set up as a device to watch. In this case, added or deleted files will be automatically and immediately detected.
+
+* Import Suunto Quest Files (Frederic)
+
 
 Improvements
 ============
@@ -37,8 +41,6 @@ Improvements
 * Dialog Adjust Elevation
   - Show elevation gain/loss values before and after the adjustment, supported adjustment type: "Approach elevation with SRTM data"  
 
-* Import Suunto Quest Files (Frederic)
-
 * Tour Marker View (Frederic)
   - Added the Average Speed column
 
@@ -46,20 +48,22 @@ Improvements
   - Added the maximum pace (^ Pace)
 
 * Tree/Table Columns
-  - A new column is added at the current mouse position and not at the end (nobody complained it)
+  - A new column is now added at the current mouse position and not at the end (nobody complained it)
 
-* Tour Chart (Frederic) :
+* Tour Chart (Frederic)
   - Adding the ability to select all the time slices in between the left and right sliders.
 
 * Keyboard shortcuts
   - Ctrl+W - Close current view or tour  
   - Ctrl+Shift+<Key> - Open all directory views with a key shortcut
 
+
 Import
 ======
 
 * 
- 
+
+
 Changes  
 =======
 
