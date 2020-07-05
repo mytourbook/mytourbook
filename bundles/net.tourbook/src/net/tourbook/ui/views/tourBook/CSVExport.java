@@ -119,8 +119,8 @@ public class CSVExport {
    private static final String HEADER_TIME_WEEKDAY                                    = "TIME Weekday";                                     //$NON-NLS-1$
    private static final String HEADER_TIME_YEAR                                       = "TIME Year";                                        //$NON-NLS-1$
 
-   private static final String HEADER_TOUR_LOCATION_START                             = "TOUR Start Location";
-   private static final String HEADER_TOUR_LOCATION_END                               = "TOUR End Location";
+   private static final String HEADER_TOUR_LOCATION_START                             = "TOUR Start Location";                              //$NON-NLS-1$
+   private static final String HEADER_TOUR_LOCATION_END                               = "TOUR End Location";                                //$NON-NLS-1$
    private static final String HEADER_TOUR_NUMBER_OF_MARKER                           = "TOUR Number of markers";                           //$NON-NLS-1$
    private static final String HEADER_TOUR_NUMBER_OF_PHOTOS                           = "TOUR Number of photos";                            //$NON-NLS-1$
    private static final String HEADER_TOUR_NUMBER_OF_TOURS                            = "TOUR Number of tours";                             //$NON-NLS-1$

@@ -2544,9 +2544,7 @@ public class TourBook_ColumnFactory {
             if (element instanceof TVITourBookTour) {
 
                final String timeZoneId = ((TVITourBookTour) element).colTimeZoneId;
-
-               cell.setText(timeZoneId == null ? "<null>" : timeZoneId);
-//               cell.setText(timeZoneId == null ? UI.EMPTY_STRING : timeZoneId);
+               cell.setText(timeZoneId == null ? UI.EMPTY_STRING : timeZoneId);
 
                setCellColor(cell, element);
             }
@@ -2877,13 +2875,7 @@ public class TourBook_ColumnFactory {
 
          @Override
          public String getValueText(final Object element) {
-
-            final ArrayList<Long> markerIds = ((TVITourBookTour) element).getMarkerIds();
-            if (markerIds == null) {
-               return UI.EMPTY_STRING;
-            } else {
-               return _nf0.format(markerIds.size());
-            }
+            return "Tour markers are not yet supported, they are from a join table";
          }
       });
 
@@ -2993,7 +2985,7 @@ public class TourBook_ColumnFactory {
 
          @Override
          public String getValueText(final Object element) {
-            return "this is not yet supported";
+            return "Tour tags are not yet supported, they are from a join table";
          }
 
          @Override
@@ -3089,7 +3081,7 @@ public class TourBook_ColumnFactory {
                final String colTourTitle = ((TVITourBookTour) element).colTourTitle;
 
                if (colTourTitle == null) {
-                  cell.setText("<NULL>");
+                  cell.setText(UI.EMPTY_STRING);
                } else {
                   cell.setText(colTourTitle);
                }

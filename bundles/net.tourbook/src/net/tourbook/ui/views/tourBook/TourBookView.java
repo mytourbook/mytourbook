@@ -247,7 +247,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     * The header column id needs a different id than the body column otherwise drag&drop or column
     * selection shows the 1st row image :-(
     */
-   private static final String             HEADER_COLUMN_ID_POSTFIX                        = "_HEADER";
+   private static final String             HEADER_COLUMN_ID_POSTFIX                        = "_HEADER";                                  //$NON-NLS-1$
    //
    private static TourBookViewLayout       _viewLayout;
    //
