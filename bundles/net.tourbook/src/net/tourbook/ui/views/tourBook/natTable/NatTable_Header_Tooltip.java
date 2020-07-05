@@ -23,7 +23,6 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.ui.views.tourBook.TourBookView;
 
-import org.eclipse.jface.window.ToolTip;
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.grid.GridRegion;
 import org.eclipse.nebula.widgets.nattable.sort.SortDirectionEnum;
@@ -39,7 +38,15 @@ public class NatTable_Header_Tooltip extends NatTableContentTooltip {
 
    public NatTable_Header_Tooltip(final NatTable natTable, final TourBookView tourBookView) {
 
-      super(natTable, ToolTip.NO_RECREATE, false);
+// The 4th parameter is necessarry otherwise the build process fails !!!
+//
+//[ERROR] Failed to execute goal org.eclipse.tycho:tycho-compiler-plugin:1.4.0:compile (default-compile) on project net.tourbook: Compilation failure: Compilation failure:
+//[ERROR] C:\DAT\mytourbook-BUILD-autocreated\core\net.tourbook\src\net\tourbook\\ui\views\tourBook\natTable\NatTable_Header_Tooltip.java:[42]
+//[ERROR]         super(natTable, ToolTip.NO_RECREATE, false);
+//[ERROR]         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+//[ERROR] The constructor NatTableContentTooltip(NatTable, int, boolean) is undefined
+
+      super(natTable, UI.EMPTY_STRING);
 
       _tourBookView = tourBookView;
 
