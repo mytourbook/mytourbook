@@ -19,13 +19,15 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
-   private static final String BUNDLE_NAME = "net.tourbook.messages";                            //$NON-NLS-1$
+   private static final String BUNDLE_NAME = "net.tourbook.messages";                                 //$NON-NLS-1$
 
    public static String        Action_Cadence_Set;
    public static String        Action_Cadence_Set_Rpm;
    public static String        Action_Cadence_Set_Spm;
 
    public static String        Action_Compute_ElevationGain;
+
+   public static String        Action_FileSystem_Preferences;
 
    public static String        Action_Map_AddBookmark;
    public static String        Action_Map_RenameBookmark;
@@ -190,6 +192,8 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Checkbox_TourType;
    public static String        Dialog_ImportConfig_Checkbox_TourType_Tooltip;
 
+   public static String        Dialog_ImportConfig_Combo_Device_LocalDevice;
+
    public static String        Dialog_ImportConfig_Column_AdjustTemperature_Header;
    public static String        Dialog_ImportConfig_Column_AdjustTemperature_Label;
    public static String        Dialog_ImportConfig_Column_AdjustTemperature_Tooltip;
@@ -224,6 +228,7 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Error_FolderIsInvalid;
    public static String        Dialog_ImportConfig_Group_ImportActions;
    public static String        Dialog_ImportConfig_Group_ImportLauncherConfig;
+   public static String        Dialog_ImportConfig_Group_StateTooltip;
    public static String        Dialog_ImportConfig_Info_ConfigDragDrop;
    public static String        Dialog_ImportConfig_Info_ImportActions;
    public static String        Dialog_ImportConfig_Info_MovedDeviceFiles;
@@ -244,12 +249,15 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Label_DeviceFiles_Tooltip;
    public static String        Dialog_ImportConfig_Label_DeviceFolder;
    public static String        Dialog_ImportConfig_Label_DeviceFolder_Tooltip;
+   public static String        Dialog_ImportConfig_Label_DeviceType_Tooltip;
    public static String        Dialog_ImportConfig_Label_ImportColumns;
    public static String        Dialog_ImportConfig_Label_ImportColumns_Tooltip;
    public static String        Dialog_ImportConfig_Label_ImportLauncher;
    public static String        Dialog_ImportConfig_Label_LastMarkerDistance;
    public static String        Dialog_ImportConfig_Label_LastMarkerDistance_Tooltip;
    public static String        Dialog_ImportConfig_Label_LastMarkerText;
+   public static String        Dialog_ImportConfig_Label_StateTooltip_DisplayAbsoluteFilePath;
+   public static String        Dialog_ImportConfig_Label_StateTooltip_DisplayAbsoluteFilePath_Tooltip;
    public static String        Dialog_ImportConfig_Label_StateTooltipWidth;
    public static String        Dialog_ImportConfig_Link_OtherActions;
    public static String        Dialog_ImportConfig_Link_TourType;
@@ -517,6 +525,10 @@ public class Messages extends NLS {
    public static String        App_Label_NotAvailable_Shortcut;
 
    public static String        App_Link_RestoreDefaultValues;
+
+   public static String        App_SortDirection_Ascending;
+   public static String        App_SortDirection_Descending;
+   public static String        App_SortDirection_None;
 
    public static String        App_Splash_Copyright;
 
@@ -1084,10 +1096,13 @@ public class Messages extends NLS {
    public static String        Image__Tour_Duplicate;
    public static String        Image__Tour_Duplicate_disabled;
    public static String        Image__TourBook_Month;
+   public static String        Image__TourBook_NatTable;
    public static String        Image__TourBook_SelectAll;
    public static String        Image__TourBook_Week;
    public static String        Image__TourFilter;
    public static String        Image__TourFilter_Disabled;
+   public static String        Image__TourFilter_Selected;
+   public static String        Image__TourFilter_Selected_Disabled;
    public static String        Image__TourGeoFilter;
    public static String        Image__TourInfo;
    public static String        Image__TourInfo_Disabled;
@@ -2400,14 +2415,17 @@ public class Messages extends NLS {
    public static String Tour_Book_Action_DeleteSelectedTours_Monitor;
    public static String Tour_Book_Action_DeleteSelectedTours_MonitorSubtask;
    public static String Tour_Book_Action_ExportViewCSV;
-   public static String Tour_Book_Action_ToggleMonthWeek_Tooltip;
+
+   public static String Tour_Book_Action_ShowOnlySelectedTours_Tooltip;
+   public static String Tour_Book_Action_ToggleViewLayout_Tooltip;
    public static String Tour_Book_Combo_statistic_tooltip;
    public static String Tour_Book_Combo_year_tooltip;
    public static String Tour_Book_Label_chart_title;
    public static String Tour_Book_Label_Total;
    public static String Tour_Book_Monitor_CollateSubtask;
    public static String Tour_Book_Monitor_CollateTask;
-
+   public static String Tour_Book_SortColumnTooltip;
+   
    public static String Tour_Data_LoadTourData_Monitor;
    public static String Tour_Data_LoadTourData_Monitor_SubTask;
    public static String Tour_Data_SaveTour_Monitor;
@@ -2802,6 +2820,7 @@ public class Messages extends NLS {
    public static String tourCatalog_view_label_chart_title_reference_tour;
    public static String tourCatalog_view_label_year_chart_title;
    public static String tourCatalog_view_label_year_not_selected;
+   public static String tourCatalog_view_action_select_inbetween_timeslices;
    public static String tourCatalog_view_tooltip_speed;
 
    public static String tourCatalog_wizard_Action_deselect_all;

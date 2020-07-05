@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -659,9 +659,9 @@ public class CSVExport {
             }
          }
 
-      } else if (segment instanceof TVITourBookYearSub) {
+      } else if (segment instanceof TVITourBookYearCategorized) {
 
-         final TVITourBookYearSub tviYearSub = (TVITourBookYearSub) segment;
+         final TVITourBookYearCategorized tviYearSub = (TVITourBookYearCategorized) segment;
 
          // month or week
          csvField(sb, tviYearSub.tourYearSub);
@@ -685,7 +685,7 @@ public class CSVExport {
          } else {
 
             // week
-            csvField(sb, tviTour.tourWeek);
+            csvField(sb, tviTour.colWeekNo);
          }
 
          // day
@@ -1480,6 +1480,6 @@ public class CSVExport {
     */
    private boolean isYearSubWeek() {
 
-      return _tourBookView.getYearSubCategory() == YearSubCategory.WEEK;
+      return _tourBookView.getViewLayout() == TourBookViewLayout.CATEGORY_WEEK;
    }
 }
