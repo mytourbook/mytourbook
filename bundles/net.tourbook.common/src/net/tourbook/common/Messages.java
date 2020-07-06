@@ -127,8 +127,6 @@ public class Messages extends NLS {
    public static String        Graph_Label_Pace;
    public static String        Graph_Label_Power;
    public static String        Graph_Label_Power_Unit;
-   public static String        Graph_Label_ShowHrZoneBackground;
-   public static String        Graph_Label_ShowHrZoneBackground_Tooltip;
    public static String        Graph_Label_Speed;
    public static String        Graph_Label_Temperature;
    public static String        Graph_Label_TimeDuration;
