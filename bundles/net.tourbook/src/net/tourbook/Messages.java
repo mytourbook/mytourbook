@@ -443,7 +443,6 @@ public class Messages extends NLS {
    public static String        app_dlg_confirmFileOverwrite_message;
    public static String        app_dlg_confirmFileOverwrite_title;
 
-   public static String        app_unit_minutes;
    public static String        app_unit_seconds;
 
    public static String        App__False;

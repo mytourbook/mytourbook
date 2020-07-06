@@ -31,7 +31,6 @@ public class Messages extends NLS {
 
    public static String        Default_Layer_Atmosphere;
    public static String        Default_Layer_Compass;
-   public static String        Default_Layer_MS_VirtualEarthAerial;
    public static String        Default_Layer_NASABlueMarble;
    public static String        Default_Layer_PlaceNames;
    public static String        Default_Layer_PoliticalBoundaries;
