@@ -5416,8 +5416,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                // keep watcher local because it could be set to null !!!
                folderWatcher = _folderWatcher =
                      tourbookFileSystem != null
-                           ? tourbookFileSystem
-                                 .newWatchService()
+                           ? tourbookFileSystem.newWatchService()
                            : FileSystems.getDefault().newWatchService();
 
                if (deviceFolder != null) {
