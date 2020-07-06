@@ -19,7 +19,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
-   private static final String BUNDLE_NAME = "net.tourbook.messages";                            //$NON-NLS-1$
+   private static final String BUNDLE_NAME = "net.tourbook.messages";                                 //$NON-NLS-1$
 
    public static String        Action_Cadence_Set;
    public static String        Action_Cadence_Set_Rpm;
@@ -443,7 +443,6 @@ public class Messages extends NLS {
    public static String        app_dlg_confirmFileOverwrite_message;
    public static String        app_dlg_confirmFileOverwrite_title;
 
-   public static String        app_unit_minutes;
    public static String        app_unit_seconds;
 
    public static String        App__False;
@@ -525,6 +524,10 @@ public class Messages extends NLS {
    public static String        App_Label_NotAvailable_Shortcut;
 
    public static String        App_Link_RestoreDefaultValues;
+
+   public static String        App_SortDirection_Ascending;
+   public static String        App_SortDirection_Descending;
+   public static String        App_SortDirection_None;
 
    public static String        App_Splash_Copyright;
 
@@ -1092,10 +1095,13 @@ public class Messages extends NLS {
    public static String        Image__Tour_Duplicate;
    public static String        Image__Tour_Duplicate_disabled;
    public static String        Image__TourBook_Month;
+   public static String        Image__TourBook_NatTable;
    public static String        Image__TourBook_SelectAll;
    public static String        Image__TourBook_Week;
    public static String        Image__TourFilter;
    public static String        Image__TourFilter_Disabled;
+   public static String        Image__TourFilter_Selected;
+   public static String        Image__TourFilter_Selected_Disabled;
    public static String        Image__TourGeoFilter;
    public static String        Image__TourInfo;
    public static String        Image__TourInfo_Disabled;
@@ -2391,6 +2397,8 @@ public class Messages extends NLS {
    public static String Tour_Action_TourPhotosWithoutTooltip_Tooltip;
    public static String Tour_Action_TourPhotosWithTooltip_Tooltip;
    public static String Tour_Action_ValuePointToolTip_IsVisible;
+   public static String Tour_Action_Select_Inbetween_Timeslices;
+   public static String Tour_Action_Select_Inbetween_Timeslices_Tooltip;
    public static String Tour_Action_Weather;
 
    public static String Tour_Blog_Action_EditMarker_Tooltip;
@@ -2408,14 +2416,17 @@ public class Messages extends NLS {
    public static String Tour_Book_Action_DeleteSelectedTours_Monitor;
    public static String Tour_Book_Action_DeleteSelectedTours_MonitorSubtask;
    public static String Tour_Book_Action_ExportViewCSV;
-   public static String Tour_Book_Action_ToggleMonthWeek_Tooltip;
+
+   public static String Tour_Book_Action_ShowOnlySelectedTours_Tooltip;
+   public static String Tour_Book_Action_ToggleViewLayout_Tooltip;
    public static String Tour_Book_Combo_statistic_tooltip;
    public static String Tour_Book_Combo_year_tooltip;
    public static String Tour_Book_Label_chart_title;
    public static String Tour_Book_Label_Total;
    public static String Tour_Book_Monitor_CollateSubtask;
    public static String Tour_Book_Monitor_CollateTask;
-
+   public static String Tour_Book_SortColumnTooltip;
+   
    public static String Tour_Data_LoadTourData_Monitor;
    public static String Tour_Data_LoadTourData_Monitor_SubTask;
    public static String Tour_Data_SaveTour_Monitor;
@@ -2810,6 +2821,7 @@ public class Messages extends NLS {
    public static String tourCatalog_view_label_chart_title_reference_tour;
    public static String tourCatalog_view_label_year_chart_title;
    public static String tourCatalog_view_label_year_not_selected;
+   public static String tourCatalog_view_action_select_inbetween_timeslices;
    public static String tourCatalog_view_tooltip_speed;
 
    public static String tourCatalog_wizard_Action_deselect_all;

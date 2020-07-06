@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -237,8 +237,8 @@ public class DialogModifyColumns extends TrayDialog {
     */
    private ArrayList<ColumnDefinition> createColumnViewerModel(final ColumnProfile columnProfile) {
 
-      // Set column definitions in the ColumnProfile from the visible id's.
-      _columnManager.setVisibleColDefs(columnProfile);
+      // set column definitions in the ColumnProfile from the visible id's.
+      _columnManager.setupVisibleColDefs(columnProfile);
 
       final ArrayList<ColumnDefinition> modelColumns = new ArrayList<>();
 
@@ -280,7 +280,7 @@ public class DialogModifyColumns extends TrayDialog {
                }
             }
 
-            modelColDef.setIsColumnDisplayed(true);
+            modelColDef.setIsColumnChecked(true);
 
             modelColDef.setColumnWidth(colDef.getColumnWidth());
             modelColDef.setValueFormatter_Category(valueFormat, valueFormatter);
@@ -302,7 +302,7 @@ public class DialogModifyColumns extends TrayDialog {
             final IValueFormatter valueFormatter_Detail = _columnManager.getValueFormatter(valueFormat_Detail);
 
             // set default values
-            colDef.setIsColumnDisplayed(false);
+            colDef.setIsColumnChecked(false);
 
             colDef.setColumnWidth(colDef.getDefaultColumnWidth());
             colDef.setValueFormatter_Category(valueFormat, valueFormatter);
@@ -341,7 +341,7 @@ public class DialogModifyColumns extends TrayDialog {
       createActions();
       createUI(dlgContainer);
 
-      setupColumnsInViewer();
+      setupColumnsInColumnViewer();
 
       restoreState();
 
@@ -440,22 +440,41 @@ public class DialogModifyColumns extends TrayDialog {
       });
 
       /*
-       * Create single column
+       * Create columns
        */
       TableViewerColumn tvc;
+      {
+         /*
+          * Name
+          */
+         tvc = new TableViewerColumn(_profileViewer, SWT.NONE);
+         tvc.setLabelProvider(new CellLabelProvider() {
+            @Override
+            public void update(final ViewerCell cell) {
 
-      // column: name
-      tvc = new TableViewerColumn(_profileViewer, SWT.NONE);
-      tvc.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
+               final ColumnProfile profile = ((ColumnProfile) cell.getElement());
 
-            final ColumnProfile profile = ((ColumnProfile) cell.getElement());
+               cell.setText(profile.name);
+            }
+         });
+         tableLayout.setColumnData(tvc.getColumn(), new ColumnWeightData(10));
+      }
+      {
+         /*
+          * Number of columns
+          */
+         tvc = new TableViewerColumn(_profileViewer, SWT.NONE);
+         tvc.setLabelProvider(new CellLabelProvider() {
+            @Override
+            public void update(final ViewerCell cell) {
 
-            cell.setText(profile.name);
-         }
-      });
-      tableLayout.setColumnData(tvc.getColumn(), new ColumnWeightData(1));
+               final ColumnProfile profile = ((ColumnProfile) cell.getElement());
+
+               cell.setText(Integer.toString(profile.getVisibleColumnIds().length));
+            }
+         });
+         tableLayout.setColumnData(tvc.getColumn(), new ColumnWeightData(1));
+      }
    }
 
    private void createUI_14_ProfileActions(final Composite parent) {
@@ -615,10 +634,17 @@ public class DialogModifyColumns extends TrayDialog {
             if (colDef.canModifyVisibility()) {
 
                // keep the checked status
-               colDef.setIsColumnDisplayed(event.getChecked());
+               colDef.setIsColumnChecked(event.getChecked());
 
                // select the checked item
                _columnViewer.setSelection(new StructuredSelection(colDef));
+
+               // run async otherwise it is displayed by the next checkbox change
+               table.getDisplay().asyncExec(() -> {
+
+                  // update profile viewer
+                  _profileViewer.update(getSelectedProfile(), IS_SORTER_PROPERTY);
+               });
 
             } else {
 
@@ -844,7 +870,7 @@ public class DialogModifyColumns extends TrayDialog {
 
                   // update model
                   for (final ColumnDefinition colDef : _columnViewerModel) {
-                     colDef.setIsColumnDisplayed(true);
+                     colDef.setIsColumnChecked(true);
                   }
 
                   // update viewer
@@ -871,9 +897,9 @@ public class DialogModifyColumns extends TrayDialog {
                   for (final ColumnDefinition colDef : _columnViewerModel) {
                      if (colDef.canModifyVisibility() == false) {
                         checkedElements.add(colDef);
-                        colDef.setIsColumnDisplayed(true);
+                        colDef.setIsColumnChecked(true);
                      } else {
-                        colDef.setIsColumnDisplayed(false);
+                        colDef.setIsColumnChecked(false);
                      }
                   }
 
@@ -904,7 +930,7 @@ public class DialogModifyColumns extends TrayDialog {
 
                   _columnViewerModel = getDefaultColumns(true);
 
-                  setupColumnsInViewer();
+                  setupColumnsInColumnViewer();
                }
             });
             setButtonLayoutData(_btnColumn_Default);
@@ -949,7 +975,7 @@ public class DialogModifyColumns extends TrayDialog {
 
                   _columnViewerModel = getDefaultColumns(false);
 
-                  setupColumnsInViewer();
+                  setupColumnsInColumnViewer();
                }
             });
             setButtonLayoutData(_btnColumn_Sort);
@@ -1280,12 +1306,11 @@ public class DialogModifyColumns extends TrayDialog {
                final ValueFormat valueFormat_Category = definedColDef.getDefaultValueFormat_Category();
                final ValueFormat valueFormat_Detail = definedColDef.getDefaultValueFormat_Detail();
 
-               final IValueFormatter valueFormatter_Category = _columnManager
-                     .getValueFormatter(valueFormat_Category);
+               final IValueFormatter valueFormatter_Category = _columnManager.getValueFormatter(valueFormat_Category);
                final IValueFormatter valueFormatter_Detail = _columnManager.getValueFormatter(valueFormat_Detail);
 
                // visible columns in the viewer will be checked
-               colDefClone.setIsColumnDisplayed(definedColDef.isDefaultColumn());
+               colDefClone.setIsColumnChecked(definedColDef.isDefaultColumn());
 
                colDefClone.setColumnWidth(definedColDef.getDefaultColumnWidth());
                colDefClone.setValueFormatter_Category(valueFormat_Category, valueFormatter_Category);
@@ -1313,10 +1338,9 @@ public class DialogModifyColumns extends TrayDialog {
                      }
 
                      final IValueFormatter valueFormatter = _columnManager.getValueFormatter(valueFormat);
-                     final IValueFormatter valueFormatter_Detail = _columnManager
-                           .getValueFormatter(valueFormat_Detail);
+                     final IValueFormatter valueFormatter_Detail = _columnManager.getValueFormatter(valueFormat_Detail);
 
-                     colDefClone.setIsColumnDisplayed(currentColDef.isColumnDisplayed());
+                     colDefClone.setIsColumnChecked(currentColDef.isColumnCheckedInContextMenu());
 
                      colDefClone.setColumnWidth(currentColDef.getColumnWidth());
                      colDefClone.setValueFormatter_Category(valueFormat, valueFormatter);
@@ -1349,7 +1373,6 @@ public class DialogModifyColumns extends TrayDialog {
    private ColumnProfile getSelectedProfile() {
 
       final StructuredSelection selection = (StructuredSelection) _profileViewer.getSelection();
-
       final ColumnProfile selectedProfile = (ColumnProfile) selection.getFirstElement();
 
       return selectedProfile;
@@ -1367,7 +1390,7 @@ public class DialogModifyColumns extends TrayDialog {
 
       // create new item
       _columnViewer.insert(colDef, index);
-      _columnViewer.setChecked(colDef, colDef.isColumnDisplayed());
+      _columnViewer.setChecked(colDef, colDef.isColumnCheckedInContextMenu());
    }
 
    /**
@@ -1475,50 +1498,52 @@ public class DialogModifyColumns extends TrayDialog {
    private void onProfile_Remove() {
 
       _isInUpdate = true;
+      {
+         final Table profileTable = _profileViewer.getTable();
 
-      final Table profileTable = _profileViewer.getTable();
+         final int selectedIndex = profileTable.getSelectionIndex();
 
-      final int selectedIndex = profileTable.getSelectionIndex();
+         final ColumnProfile selectedProfile = getSelectedProfile();
 
-      final ColumnProfile selectedProfile = getSelectedProfile();
+         // update UI
+         _dialog_Profiles.remove(selectedProfile);
 
-      // update UI
-      _dialog_Profiles.remove(selectedProfile);
+         // update model
+         _profileViewer.remove(selectedProfile);
 
-      // update model
-      _profileViewer.remove(selectedProfile);
-
-      /*
-       * Select profile at the same position
-       */
-      final int profilesSize = _dialog_Profiles.size();
-      int newIndex = selectedIndex;
-      if (newIndex >= profilesSize) {
-         newIndex = profilesSize - 1;
-      }
-
-      int nextIndex = 0;
-      final TableItem nextItem = profileTable.getItem(newIndex);
-      final ColumnProfile nextProfile = (ColumnProfile) nextItem.getData();
-
-      for (int profileIndex = 0; profileIndex < _dialog_Profiles.size(); profileIndex++) {
-
-         final ColumnProfile profile = _dialog_Profiles.get(profileIndex);
-
-         if (profile.getID() == nextProfile.getID()) {
-            nextIndex = profileIndex;
-            break;
+         /*
+          * Select profile at the same position
+          */
+         final int profilesSize = _dialog_Profiles.size();
+         int newIndex = selectedIndex;
+         if (newIndex >= profilesSize) {
+            newIndex = profilesSize - 1;
          }
+
+         int nextIndex = 0;
+         final TableItem nextItem = profileTable.getItem(newIndex);
+         final ColumnProfile nextProfile = (ColumnProfile) nextItem.getData();
+
+         for (int profileIndex = 0; profileIndex < _dialog_Profiles.size(); profileIndex++) {
+
+            final ColumnProfile profile = _dialog_Profiles.get(profileIndex);
+
+            if (profile.getID() == nextProfile.getID()) {
+               nextIndex = profileIndex;
+               break;
+            }
+         }
+         _selectedProfile = _dialog_Profiles.get(nextIndex);
+
+         // update UI
+         _profileViewer.setSelection(new StructuredSelection(_selectedProfile), true);
+
+         enableProfileActions();
+
+         setupColumnProfile(_selectedProfile);
+
+         profileTable.setFocus();
       }
-      _selectedProfile = _dialog_Profiles.get(nextIndex);
-
-      // update UI
-      _profileViewer.setSelection(new StructuredSelection(_selectedProfile), true);
-
-      enableProfileActions();
-
-      profileTable.setFocus();
-
       _isInUpdate = false;
    }
 
@@ -1584,14 +1609,7 @@ public class DialogModifyColumns extends TrayDialog {
 
       _selectedProfile = selectedProfile;
 
-      /*
-       * Update column viewer from the selected profile
-       */
-      _columnViewerModel = createColumnViewerModel(selectedProfile);
-
-      setupColumnsInViewer();
-
-      enableProfileActions();
+      setupColumnProfile(selectedProfile);
    }
 
    /**
@@ -1652,9 +1670,7 @@ public class DialogModifyColumns extends TrayDialog {
       _columnManager.setIsShowCategory(_isShowCategory);
       _columnManager.setIsShowColumnAnnotations(_isShowColumnAnnotations);
 
-      _columnManager.updateColumns(//
-            _selectedProfile,
-            _columnViewer.getTable().getItems());
+      _columnManager.updateColumns(_selectedProfile, _columnViewer.getTable().getItems());
    }
 
    /**
@@ -1663,7 +1679,7 @@ public class DialogModifyColumns extends TrayDialog {
    private void saveState_CurrentProfileColumns() {
 
       // save columns
-      _columnManager.setVisibleColumnIds_FromModifyDialog(//
+      _columnManager.setVisibleColumnIds_FromModifyDialog(
             _selectedProfile,
             _columnViewer.getTable().getItems());
 
@@ -1696,20 +1712,34 @@ public class DialogModifyColumns extends TrayDialog {
       }
    }
 
-   private void setupColumnsInViewer() {
+   /**
+    * Update column viewer from the selected profile
+    *
+    * @param selectedProfile
+    */
+   private void setupColumnProfile(final ColumnProfile selectedProfile) {
 
-      // load columns into the viewer
-      _columnViewer.setInput(new Object[0]);
+      _columnViewerModel = createColumnViewerModel(selectedProfile);
 
-      // check columns
-      final ArrayList<ColumnDefinition> checkedColumns = new ArrayList<>();
+      setupColumnsInColumnViewer();
 
-      for (final ColumnDefinition colDef : _columnViewerModel) {
-         if (colDef.isColumnDisplayed()) {
-            checkedColumns.add(colDef);
+      enableProfileActions();
+   }
+
+   private void setupColumnsInColumnViewer() {
+
+         // load columns into the viewer
+         _columnViewer.setInput(new Object[0]);
+
+         // check columns
+         final ArrayList<ColumnDefinition> checkedColumns = new ArrayList<>();
+
+         for (final ColumnDefinition colDef : _columnViewerModel) {
+            if (colDef.isColumnCheckedInContextMenu()) {
+               checkedColumns.add(colDef);
+            }
          }
-      }
-      _columnViewer.setCheckedElements(checkedColumns.toArray());
+         _columnViewer.setCheckedElements(checkedColumns.toArray());
 
       enableUpDownActions();
    }

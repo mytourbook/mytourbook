@@ -1,6 +1,6 @@
-###########################
- Update Eclipse NL repo
-###########################
+##############################
+ Create/Update Eclipse NL repo
+##############################
 
    - Install/update Eclipse NL jar files for all used languages in the current Eclipse IDE installation
    

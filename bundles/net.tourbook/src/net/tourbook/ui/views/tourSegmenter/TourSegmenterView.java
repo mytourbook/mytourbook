@@ -297,6 +297,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             SEGMENTER_REQUIRES_DISTANCE));
 
    }
+
    /**
     * This must be in sync with the columns in the {@link SegmenterComparator}
     */
@@ -314,6 +315,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       _allSortableColumns.add(TableColumnFactory.POWERTRAIN_AVG_CADENCE_ID);
       _allSortableColumns.add(TableColumnFactory.TIME_RECORDING_TIME_ID);
    }
+
    private static final SurfingFilter[] _allSurfingSegmentFilter = new SurfingFilter[] {
 
          new SurfingFilter(SurfingFilterType.All, Messages.Tour_Segmenter_SurfingFilter_All),
@@ -4490,8 +4492,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             final SelectionChartXSliderPosition selectionSliderPosition = new SelectionChartXSliderPosition(
                   _tourChart,
                   serieStartIndex,
-                  serieEndIndex,
-                  true);
+                  serieEndIndex);
 
             /*
              * Extend default selection with the segment positions

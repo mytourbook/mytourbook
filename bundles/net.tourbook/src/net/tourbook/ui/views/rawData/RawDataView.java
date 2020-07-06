@@ -230,12 +230,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private static final String CSS_IMPORT_BACKGROUND                      = "div.import-background";                                          //$NON-NLS-1$
    private static final String CSS_IMPORT_TILE                            = "a.import-tile";                                                  //$NON-NLS-1$
    //
-   static final int            COLUMN_DATE                                = 0;
-   static final int            COLUMN_TITLE                               = 1;
-   static final int            COLUMN_DATA_FORMAT                         = 2;
-   static final int            COLUMN_FILE_NAME                           = 3;
-   static final int            COLUMN_TIME_ZONE                           = 4;
-   //
    private static final String STATE_IMPORTED_FILENAMES                   = "importedFilenames";                                              //$NON-NLS-1$
    private static final String STATE_SELECTED_TOUR_INDICES                = "SelectedTourIndices";                                            //$NON-NLS-1$
    //
@@ -3190,7 +3184,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
     */
    private void defineColumn_Tour_Marker() {
 
-      final ColumnDefinition colDef = TableColumnFactory.TOUR_MARKERS.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.TOUR_NUM_MARKERS.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
       colDef.setLabelProvider(new CellLabelProvider() {
@@ -4276,9 +4270,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          _isInUpdate = true;
          {
             _tourViewer.setSelection(selectionBackup, true);
-
-            final Table table = _tourViewer.getTable();
-            table.showSelection();
+            _tourViewer.getTable().showSelection();
          }
          _isInUpdate = false;
       }
@@ -4357,6 +4349,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    }
 
    private void recreateViewer() {
+
       _columnManager.saveState(_state);
       _columnManager.clearColumns();
       defineAllColumns();

@@ -305,8 +305,9 @@ public class TourInfoUI {
 
       final Composite container = createUI(parent);
 
+// this do not help to remove flickering, first an empty tooltip window is displayed then also it's content
 //      _ttContainer.setRedraw(false);
-
+ 
       updateUI();
       updateUI_Layout();
 
