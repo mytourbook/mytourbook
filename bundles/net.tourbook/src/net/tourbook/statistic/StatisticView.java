@@ -573,7 +573,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
       final int selectedIndex = _comboNumberOfYears.getSelectionIndex();
 
       if (selectedIndex != -1) {
-         numberOfYears = selectedIndex + 1;
+         numberOfYears = Integer.parseInt(_comboNumberOfYears.getItem(selectedIndex));
       }
 
       return numberOfYears;
@@ -804,7 +804,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
       final int defaultYear = Util.getStateInt(_state, STATE_SELECTED_YEAR, -1);
       refreshYearCombobox();
       selectYear(defaultYear);
-      // We trigger the update of  _comboNumberOfYears
+      // We trigger the update of _comboNumberOfYears
       onSelectYear();
 
       // select number of years
