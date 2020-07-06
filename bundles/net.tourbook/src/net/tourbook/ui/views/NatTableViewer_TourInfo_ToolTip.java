@@ -14,7 +14,7 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui.views;
- 
+
 import java.util.ArrayList;
 
 import net.tourbook.common.UI;
@@ -238,9 +238,9 @@ public class NatTableViewer_TourInfo_ToolTip extends ToolTip implements ITourPro
       final int colPosByX = _natTable.getColumnPositionByX(event.x);
       final int rowPosByY = _natTable.getRowPositionByY(event.y);
 
-      if (colPosByX == 0 || rowPosByY == 0) {
+      if (colPosByX <= 0 || rowPosByY <= 0) {
 
-         // first column or first row (this is the row number or table header)
+         // first column or first row (this is the row number or table header) or an empty nattable (rowPosByY == -1)
 
          return null;
       }
