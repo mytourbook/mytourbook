@@ -928,6 +928,7 @@ public class Messages extends NLS {
    public static String        Image__database_other_person;
    public static String        Image__delete;
    public static String        Image__delete_disabled;
+   public static String        Image__easy_import_config_harddrive;
    public static String        Image__edit_adjust_altitude;
    public static String        Image__edit_adjust_altitude_disabled;
    public static String        Image__edit_row;
@@ -2426,7 +2427,7 @@ public class Messages extends NLS {
    public static String Tour_Book_Monitor_CollateSubtask;
    public static String Tour_Book_Monitor_CollateTask;
    public static String Tour_Book_SortColumnTooltip;
-   
+
    public static String Tour_Data_LoadTourData_Monitor;
    public static String Tour_Data_LoadTourData_Monitor_SubTask;
    public static String Tour_Data_SaveTour_Monitor;

@@ -270,6 +270,9 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
    //
    private Group             _groupData;
    //
+   private Image             _imageFileSystem;
+   //
+   private Label             _lblIC_FileSystemImage;
    private Label             _lblIC_ConfigName;
    private Label             _lblIC_BackupFolder;
    private Label             _lblIC_DeleteFilesInfo;
@@ -1322,24 +1325,43 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       _chkIC_ImportFiles.setSelection(true);
       _chkIC_ImportFiles.setEnabled(false);
 
-      /*
-       * Drop down menu: device type
-       */
-      _comboIC_DeviceType = new Combo(parent, SWT.READ_ONLY | SWT.BORDER);
-      _comboIC_DeviceType.setToolTipText(Messages.Dialog_ImportConfig_Label_DeviceType_Tooltip);
-      GridDataFactory
-            .fillDefaults()//
-            .grab(true, false)
-            .indent(CONTROL_DECORATION_WIDTH, 0)
-            .align(SWT.LEFT, SWT.CENTER)
-            .applyTo(_comboIC_DeviceType);
+      final Composite childContainer = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(childContainer);
+      GridLayoutFactory
+            .fillDefaults()
+            .numColumns(2)
+            .applyTo(childContainer);
+      {
+         /*
+          * File System image
+          */
+         _lblIC_FileSystemImage = new Label(childContainer, SWT.NONE);
+         _imageFileSystem = TourbookPlugin.getImageDescriptor(Messages.Image__easy_import_config_harddrive).createImage();
+         _lblIC_FileSystemImage.setImage(_imageFileSystem);
+         GridDataFactory
+               .fillDefaults()//
+               .indent(CONTROL_DECORATION_WIDTH, 0)
+               .align(SWT.LEFT, SWT.CENTER)
+               .applyTo(_lblIC_FileSystemImage);
 
-      _comboIC_DeviceType.add(Messages.Dialog_ImportConfig_Combo_Device_LocalDevice);
-      final List<String> fileSystemsIds = FileSystemManager.getFileSystemsIds();
-      for (final String fileSystemsId : fileSystemsIds) {
-         _comboIC_DeviceType.add(fileSystemsId);
+         /*
+          * Drop down menu: device type
+          */
+         _comboIC_DeviceType = new Combo(childContainer, SWT.READ_ONLY | SWT.BORDER);
+         _comboIC_DeviceType.setToolTipText(Messages.Dialog_ImportConfig_Label_DeviceType_Tooltip);
+         GridDataFactory
+               .fillDefaults()//
+               .indent(CONTROL_DECORATION_WIDTH, 0)
+               .align(SWT.LEFT, SWT.CENTER)
+               .applyTo(_comboIC_DeviceType);
+
+         _comboIC_DeviceType.add(Messages.Dialog_ImportConfig_Combo_Device_LocalDevice);
+         final List<String> fileSystemsIds = FileSystemManager.getFileSystemsIds();
+         for (final String fileSystemsId : fileSystemsIds) {
+            _comboIC_DeviceType.add(fileSystemsId);
+         }
+         _comboIC_DeviceType.addModifyListener(deviceTypeListener);
       }
-      _comboIC_DeviceType.addModifyListener(deviceTypeListener);
 
       /*
        * Label: device folder
@@ -3203,6 +3225,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
       _configImages.clear();
       _configImageHash.clear();
+
+      Util.disposeResource(_imageFileSystem);
    }
 
    /**
@@ -4147,6 +4171,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
    }
 
    private void onSelectDevice() {
+
       if (_comboIC_DeviceType == null) {
          return;
       }
@@ -4161,6 +4186,20 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       _comboIC_DeviceFolder.setEnabled(isDeviceLocal);
 
       String deviceFolder = _selectedIC.getDeviceFolder();
+
+      //We update the file system icon
+      Util.disposeResource(_imageFileSystem);
+      if (isDeviceLocal) {
+         _imageFileSystem = TourbookPlugin.getImageDescriptor(Messages.Image__easy_import_config_harddrive).createImage();
+      } else if (NIO.isTourBookFileSystem(_comboIC_DeviceType.getText())) {
+         final ImageDescriptor fileSystemImageDescriptor = FileSystemManager.getTourbookFileSystem(_comboIC_DeviceType.getText())
+               .getFileSystemImageDescriptor();
+         _imageFileSystem = fileSystemImageDescriptor.createImage();
+      }
+
+      if (_imageFileSystem != null && !_imageFileSystem.isDisposed()) {
+         _lblIC_FileSystemImage.setImage(_imageFileSystem);
+      }
 
       if (isDeviceLocal && NIO.isTourBookFileSystem(deviceFolder)) {
          deviceFolder = UI.EMPTY_STRING;
