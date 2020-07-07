@@ -35,10 +35,10 @@ import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TimeData;
-import net.tourbook.data.TourTimerPause;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourTag;
+import net.tourbook.data.TourTimerPause;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.device.InvalidDeviceSAXException;
@@ -475,7 +475,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 
          final ArrayList<TourTimerPause> tourTimerPauses = new ArrayList<>();
          for (final Pause element : _currentActivity.pauses) {
-            tourTimerPauses.add(new TourTimerPause(element.startTime, element.endTime));
+            tourTimerPauses.add(new TourTimerPause(tourData, element.startTime, element.endTime));
          }
 
          tourData.setTimerPauses(tourTimerPauses);

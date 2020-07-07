@@ -201,6 +201,7 @@ public class TourDatabase {
    public static final String                             ENTITY_ID_REF                   = "RefID";                                                //$NON-NLS-1$
    public static final String                             ENTITY_ID_TAG                   = "TagID";                                                //$NON-NLS-1$
    public static final String                             ENTITY_ID_TAG_CATEGORY          = "TagCategoryID";                                        //$NON-NLS-1$
+   public static final String                             ENTITY_ID_TIMERPAUSE            = "timerPauseId";                                         //$NON-NLS-1$
    public static final String                             ENTITY_ID_TOUR                  = "TourID";                                               //$NON-NLS-1$
    public static final String                             ENTITY_ID_TYPE                  = "TypeID";                                               //$NON-NLS-1$
    public static final String                             ENTITY_ID_WAY_POINT             = "WayPointID";                                           //$NON-NLS-1$
@@ -3566,15 +3567,14 @@ public class TourDatabase {
        */
       exec(stmt, "CREATE TABLE " + TABLE_TOUR_TIMER_PAUSE + "   (                           \n" //$NON-NLS-1$ //$NON-NLS-2$
       //
-            + "   timerPauseId         BIGINT   NOT NULL,                                       \n" //$NON-NLS-1$
-            + "   startTime      BIGINT   NOT NULL,                                       \n" //$NON-NLS-1$
-            + "   endTime        BIGINT   NOT NULL,                                       \n" //$NON-NLS-1$
-
-            + "   CONSTRAINT     PK_TourId_TimerPause PRIMARY KEY (TourId)          \n" //$NON-NLS-1$
+            + SQL.CreateField_EntityId(ENTITY_ID_TIMERPAUSE, true)
+            //
+            + "   " + KEY_TOUR + "         BIGINT,                                          \n" //$NON-NLS-1$ //$NON-NLS-2$
+            //
+            + "   startTime      BIGINT   NOT NULL,                                        \n" //$NON-NLS-1$
+            + "   endTime        BIGINT   NOT NULL                                        \n" //$NON-NLS-1$
 
             + ")"); //$NON-NLS-1$
-
-      SQL.CreateIndex(stmt, TABLE_TOUR_TIMER_PAUSE, "TourId"); //$NON-NLS-1$
    }
 
    /**

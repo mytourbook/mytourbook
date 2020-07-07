@@ -16,6 +16,7 @@
 		<class>net.tourbook.data.TourPersonHRZone</class>
 		<class>net.tourbook.data.TourPhoto</class>
 		<class>net.tourbook.data.TourReference</class>
+		<class>net.tourbook.data.TourTimerPause</class>
 		
 <!--
 		<class>net.tourbook.data.TourSign</class>

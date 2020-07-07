@@ -34,8 +34,8 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.LengthType;
 import net.tourbook.data.SwimData;
 import net.tourbook.data.TimeData;
-import net.tourbook.data.TourTimerPause;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourTimerPause;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.json.JSONArray;
@@ -300,7 +300,9 @@ public class SuuntoJsonProcessor {
                if (currentSampleData.contains(Boolean.FALSE.toString())) {
                   isPaused = false;
 
-                  final TourTimerPause timerPause = new TourTimerPause(pauseStartTime.toEpochSecond() * 1000, currentZonedDateTime.toEpochSecond() * 1000);
+                  final TourTimerPause timerPause = new TourTimerPause(tourData,
+                        pauseStartTime.toEpochSecond() * 1000,
+                        currentZonedDateTime.toEpochSecond() * 1000);
                   _timerPauses.add(timerPause);
                }
             }

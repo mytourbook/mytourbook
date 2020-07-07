@@ -21,6 +21,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.xml.bind.annotation.XmlElement;
 
 import net.tourbook.database.TourDatabase;
@@ -34,17 +35,22 @@ public class TourTimerPause implements Serializable {
     * Unique id for the {@link TourTimerPause} entity
     */
    @Id
-   @GeneratedValue(strategy = GenerationType.AUTO)
+   @GeneratedValue(strategy = GenerationType.IDENTITY)
    private long              timerPauseId     = TourDatabase.ENTITY_IS_NOT_SAVED;
+
+   @ManyToOne(optional = false)
+   private TourData          tourData;
 
    @XmlElement
    private long              startTime;
    @XmlElement
    private long              endTime;
 
+   // constructor is required for hibernate
    public TourTimerPause() {}
 
-   public TourTimerPause(final long startTime, final long endTime) {
+   public TourTimerPause(final TourData tourData, final long startTime, final long endTime) {
+      this.tourData = tourData;
       this.startTime = startTime;
       this.endTime = endTime;
    }

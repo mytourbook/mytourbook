@@ -314,8 +314,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private String                timeZoneId;
 
    /**
-    * An array of timer pause.
-    * A timer pause is triggered by the device user.
+    * An array of {@link TourTimerPause}
+    * A timer pause is a device event triggered by the user.
     * TODO FB rename to ?
     * tourDevicePauses
     * tourUserPauses
