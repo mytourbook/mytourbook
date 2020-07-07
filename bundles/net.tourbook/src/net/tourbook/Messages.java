@@ -2426,7 +2426,6 @@ public class Messages extends NLS {
    public static String Tour_Book_Action_DeleteSelectedTours_MonitorSubtask;
    public static String Tour_Book_Action_ExportViewCSV;
 
-   public static String Tour_Book_Action_ShowOnlySelectedTours_Tooltip;
    public static String Tour_Book_Action_ToggleViewLayout_Tooltip;
    public static String Tour_Book_Combo_statistic_tooltip;
    public static String Tour_Book_Combo_year_tooltip;
