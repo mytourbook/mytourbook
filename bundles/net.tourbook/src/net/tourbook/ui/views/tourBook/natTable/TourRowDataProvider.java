@@ -53,7 +53,7 @@ public class TourRowDataProvider implements IRowDataProvider<TVITourBookTour> {
 
       if (labelProvider == null) {
 
-         return "A LabelProvider is not defined";
+         return "A LabelProvider is not defined"; //$NON-NLS-1$
 
       } else {
 

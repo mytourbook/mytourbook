@@ -1472,6 +1472,10 @@ public class ColumnManager {
 
    private ColumnDefinition getColDef_FromHeaderColumn() {
 
+      if (_headerColumnItem == null) {
+         return null;
+      }
+
       ColumnDefinition colDef = null;
 
       final Object columnItem = _headerColumnItem.columnItem;

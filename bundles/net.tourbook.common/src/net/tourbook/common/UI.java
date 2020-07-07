@@ -169,6 +169,7 @@ public class UI {
    public static final String       SYMBOL_MNEMONIC               = "&";        //$NON-NLS-1$
    public static final String       SYMBOL_NUMBER_SIGN            = "#";        //$NON-NLS-1$
    public static final String       SYMBOL_PERCENTAGE             = "%";        //$NON-NLS-1$
+   public static final String       SYMBOL_PLUS                   = "+";        //$NON-NLS-1$
    public static final String       SYMBOL_QUESTION_MARK          = "?";        //$NON-NLS-1$
    public static final char         SYMBOL_SEMICOLON              = ';';
    public static final String       SYMBOL_STAR                   = "*";        //$NON-NLS-1$
