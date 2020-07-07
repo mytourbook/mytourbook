@@ -321,6 +321,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * tourUserPauses
     * .....
     */
+   //TODO FB Can't i map it just with the tourid ???
    @OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
    @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
    @XmlElementWrapper(name = "TourTimerPauses")

@@ -40,5 +40,6 @@ public enum FormatterID {
    TIME_MOVING, //
    TIME_RECORDING, //
    TIME_PAUSED, //
+   TIME_BREAK, //
 
 }

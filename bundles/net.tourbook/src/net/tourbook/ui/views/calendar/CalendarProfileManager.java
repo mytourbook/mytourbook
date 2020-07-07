@@ -286,6 +286,7 @@ public class CalendarProfileManager {
    private static final DataFormatter _tourFormatter_Speed;
    private static final DataFormatter _tourFormatter_Time_Moving;
    private static final DataFormatter _tourFormatter_Time_Paused;
+   private static final DataFormatter _tourFormatter_Time_Break;
    private static final DataFormatter _tourFormatter_Time_Recording;
    private static final DataFormatter _tourFormatter_TourDescription;
    private static final DataFormatter _tourFormatter_TourTitle;
@@ -341,6 +342,7 @@ public class CalendarProfileManager {
 
       _tourFormatter_Time_Moving       = createFormatter_Time_Moving();
       _tourFormatter_Time_Paused       = createFormatter_Time_Paused();
+      _tourFormatter_Time_Break        = createFormatter_Time_Break();
       _tourFormatter_Time_Recording    = createFormatter_Time_Recording();
 
       allTourContentFormatter = new DataFormatter[] {
@@ -366,6 +368,7 @@ public class CalendarProfileManager {
             _tourFormatter_Time_Recording,
             _tourFormatter_Time_Moving,
             _tourFormatter_Time_Paused,
+            _tourFormatter_Time_Break,
       };
 
       // Week
@@ -1374,6 +1377,63 @@ public class CalendarProfileManager {
 
             valueFormatId = valueFormat;
             valueFormatter = getFormatter_Number(valueFormat.name());
+         }
+      };
+
+      // setup default formatter
+      dataFormatter.setValueFormat(dataFormatter.getDefaultFormat());
+
+      return dataFormatter;
+   }
+
+   /**
+    * Break time
+    *
+    * @return
+    */
+   private static DataFormatter createFormatter_Time_Break() {
+
+      final DataFormatter dataFormatter = new DataFormatter(
+            FormatterID.TIME_BREAK,
+            Messages.Calendar_Profile_Value_BreakTime,
+            GraphColorManager.PREF_GRAPH_TIME) {
+
+         @Override
+         String format(final CalendarTourData data, final ValueFormat valueFormat, final boolean isShowValueUnit) {
+
+// TODO FB
+            if (data.recordingTime > 0) {
+
+               final String valueText = valueFormatter.printLong(data.recordingTime - data.drivingTime);
+
+               return isShowValueUnit
+                     ? valueText + UI.SPACE + UI.UNIT_LABEL_TIME + UI.SPACE
+                     : valueText + UI.SPACE;
+
+            } else {
+               return UI.EMPTY_STRING;
+            }
+         }
+
+         @Override
+         public ValueFormat getDefaultFormat() {
+            return ValueFormat.TIME_HH_MM;
+         }
+
+         @Override
+         public ValueFormat[] getValueFormats() {
+
+            return new ValueFormat[] {
+                  ValueFormat.TIME_HH,
+                  ValueFormat.TIME_HH_MM,
+                  ValueFormat.TIME_HH_MM_SS };
+         }
+
+         @Override
+         void setValueFormat(final ValueFormat valueFormat) {
+
+            valueFormatId = valueFormat;
+            valueFormatter = getFormatter_Time(valueFormat.name());
          }
       };
 
@@ -3546,6 +3606,10 @@ public class CalendarProfileManager {
 
          case TIME_PAUSED:
             _tourFormatter_Time_Paused.setValueFormat(valueFormat);
+            break;
+
+         case TIME_BREAK:
+            _tourFormatter_Time_Break.setValueFormat(valueFormat);
             break;
 
          case TIME_RECORDING:

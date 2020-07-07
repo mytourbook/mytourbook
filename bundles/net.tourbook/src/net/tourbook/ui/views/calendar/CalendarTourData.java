@@ -45,6 +45,7 @@ public class CalendarTourData {
 
    int             recordingTime;
    int             drivingTime;
+   //TODO FB add the pause and break time
 
    int             calories;
    float           power_Avg;
