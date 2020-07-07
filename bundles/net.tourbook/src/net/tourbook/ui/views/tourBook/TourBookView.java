@@ -349,7 +349,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    //
    private Menu                            _contextMenu_NatTable;
    private Menu                            _contextMenu_Tree;
-//   private ActionShowOnlySelectedTours    _actionShowOnlySelectedTours;
 
    private class ActionLinkWithOtherViews extends ActionToolbarSlideout {
 
@@ -837,11 +836,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       }
    }
 
-   void actionShowOnlySelectedTours() {
-
-      // TODO Auto-generated method stub
-   }
-
    /**
     * Toggle view layout, when the Ctrl-key is pressed, then the toggle action is reversed.
     * <p>
@@ -1120,7 +1114,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _actionSetOtherPerson = new ActionSetPerson(this);
       _actionSetTourType = new ActionSetTourTypeMenu(this);
       _actionSelectAllTours = new ActionSelectAllTours(this);
-//      _actionShowOnlySelectedTours = new ActionShowOnlySelectedTours(this);
       _actionToggleViewLayout = new ActionToggleViewLayout(this);
       _actionTourBookOptions = new ActionTourBookOptions();
 
@@ -1753,7 +1746,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _actionPrintTour.setEnabled(isTourSelected);
       _actionSetOtherPerson.setEnabled(isTourSelected);
       _actionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
-//      _actionShowOnlySelectedTours.setEnabled(isTableLayout);
 
       _actionCollapseOthers.setEnabled(numSelectedItems == 1 && firstElementHasChildren);
       _actionExpandSelection.setEnabled(
@@ -1793,7 +1785,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       tbm.add(_actionSelectAllTours);
       tbm.add(_actionToggleViewLayout);
-//      tbm.add(_actionShowOnlySelectedTours);
 
       tbm.add(new Separator());
       tbm.add(_actionExpandSelection);

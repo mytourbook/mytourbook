@@ -27,8 +27,6 @@ public class Messages extends NLS {
 
    public static String        Action_Compute_ElevationGain;
 
-   public static String        Action_FileSystem_Preferences;
-
    public static String        Action_Map_AddBookmark;
    public static String        Action_Map_RenameBookmark;
    public static String        Action_Map_UpdateBookmark;
@@ -193,6 +191,7 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Checkbox_TourType_Tooltip;
 
    public static String        Dialog_ImportConfig_Combo_Device_LocalDevice;
+   public static String        Dialog_ImportConfig_Combo_Folder_Tooltip;
 
    public static String        Dialog_ImportConfig_Column_AdjustTemperature_Header;
    public static String        Dialog_ImportConfig_Column_AdjustTemperature_Label;
@@ -218,21 +217,25 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Column_TurnOFF_Header;
    public static String        Dialog_ImportConfig_Column_TurnOFF_Label;
    public static String        Dialog_ImportConfig_Column_TurnOFF_Tooltip;
-   public static String        Dialog_ImportConfig_Combo_Folder_Tooltip;
+
    public static String        Dialog_ImportConfig_Dialog_BackupFolder_Message;
    public static String        Dialog_ImportConfig_Dialog_BackupFolder_Title;
    public static String        Dialog_ImportConfig_Dialog_DeviceFolder_Message;
    public static String        Dialog_ImportConfig_Dialog_DeviceFolder_Title;
    public static String        Dialog_ImportConfig_Dialog_Message;
    public static String        Dialog_ImportConfig_Dialog_Title;
+
    public static String        Dialog_ImportConfig_Error_FolderIsInvalid;
+
    public static String        Dialog_ImportConfig_Group_ImportActions;
    public static String        Dialog_ImportConfig_Group_ImportLauncherConfig;
    public static String        Dialog_ImportConfig_Group_StateTooltip;
+
    public static String        Dialog_ImportConfig_Info_ConfigDragDrop;
    public static String        Dialog_ImportConfig_Info_ImportActions;
    public static String        Dialog_ImportConfig_Info_MovedDeviceFiles;
    public static String        Dialog_ImportConfig_Info_NoDeviceName;
+
    public static String        Dialog_ImportConfig_Label_AnimationCrazyFactor;
    public static String        Dialog_ImportConfig_Label_AnimationCrazyFactor_Tooltip;
    public static String        Dialog_ImportConfig_Label_AnimationDuration;
@@ -259,11 +262,16 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Label_StateTooltip_DisplayAbsoluteFilePath;
    public static String        Dialog_ImportConfig_Label_StateTooltip_DisplayAbsoluteFilePath_Tooltip;
    public static String        Dialog_ImportConfig_Label_StateTooltipWidth;
+
+   public static String        Dialog_ImportConfig_Link_FileSystem_Preferences;
    public static String        Dialog_ImportConfig_Link_OtherActions;
    public static String        Dialog_ImportConfig_Link_TourType;
+
    public static String        Dialog_ImportConfig_Spinner_Speed_Tooltip;
+
    public static String        Dialog_ImportConfig_State_OFF;
    public static String        Dialog_ImportConfig_State_ON;
+
    public static String        Dialog_ImportConfig_Tab_Configuration;
    public static String        Dialog_ImportConfig_Tab_Dashboard;
    public static String        Dialog_ImportConfig_Tab_Launcher;
@@ -928,6 +936,7 @@ public class Messages extends NLS {
    public static String        Image__database_other_person;
    public static String        Image__delete;
    public static String        Image__delete_disabled;
+   public static String        Image__easy_import_config_harddrive;
    public static String        Image__edit_adjust_altitude;
    public static String        Image__edit_adjust_altitude_disabled;
    public static String        Image__edit_row;
@@ -2426,7 +2435,7 @@ public class Messages extends NLS {
    public static String Tour_Book_Monitor_CollateSubtask;
    public static String Tour_Book_Monitor_CollateTask;
    public static String Tour_Book_SortColumnTooltip;
-   
+
    public static String Tour_Data_LoadTourData_Monitor;
    public static String Tour_Data_LoadTourData_Monitor_SubTask;
    public static String Tour_Data_SaveTour_Monitor;

@@ -36,6 +36,7 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.window.Window;
@@ -165,6 +166,11 @@ public class DropboxFileSystem extends TourbookFileSystem {
    @Override
    protected FileSystem getFileSystem() {
       return _dropboxFileSystem;
+   }
+
+   @Override
+   public ImageDescriptor getFileSystemImageDescriptor() {
+      return Activator.getImageDescriptor(Messages.Image__Dropbox_Logo);
    }
 
    /**
