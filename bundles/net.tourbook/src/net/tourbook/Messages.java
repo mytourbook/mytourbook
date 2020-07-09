@@ -354,6 +354,8 @@ public class Messages extends NLS {
    public static String        Dialog_RetrieveWeather_Label_WeatherDataNotRetrieved;
    public static String        Dialog_RetrieveWeather_WeatherDataNotFound;
 
+   public static String        Dialog_SetWeatherDescription_Dialog_Title;
+
    public static String        dialog_is_tour_editor_modified_message;
    public static String        dialog_is_tour_editor_modified_title;
 
@@ -2398,6 +2400,7 @@ public class Messages extends NLS {
    public static String Tour_Action_SetMinMaxTemperature_Message;
    public static String Tour_Action_SetMinMaxTemperature_Title;
    public static String Tour_Action_SetTimeZone;
+   public static String Tour_Action_SetWeatherConditions;
    public static String Tour_Action_ShowBreaktimeValues;
    public static String Tour_Action_ShowTourMarker;
    public static String Tour_Action_Swim_Strokes_Tooltip;

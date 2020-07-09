@@ -58,6 +58,9 @@ Improvements
   - Ctrl+W - Close current view or tour  
   - Ctrl+Shift+<Key> - Open all directory views with a key shortcut
 
+* Tour Book view (Frederic)
+  - Adding the ability to bulk edit the weather conditions
+
 
 Import
 ======
