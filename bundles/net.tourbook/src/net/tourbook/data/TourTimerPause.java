@@ -67,6 +67,11 @@ public class TourTimerPause implements Serializable {
       return startTime;
    }
 
+   /**
+    * Sets the timer pause end time (in milliseconds)
+    *
+    * @param endTime
+    */
    public void setEndTime(final long endTime) {
       this.endTime = endTime;
    }

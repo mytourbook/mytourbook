@@ -1,5 +1,6 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2019, 2020 Frédéric Bard and Contributors
+
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -72,20 +73,20 @@ public class SuuntoJsonProcessor {
    private static final String TAG_TEMPERATURE = "Temperature";      //$NON-NLS-1$
 
    // Swimming
-   private static final String   Swimming             = "Swimming";                                      //$NON-NLS-1$
-   private static final String   Breaststroke         = "Breaststroke";                                  //$NON-NLS-1$
-   private static final String   Freestyle            = "Freestyle";                                     //$NON-NLS-1$
-   private static final String   Other                = "Other";                                         //$NON-NLS-1$
-   private static final String   PoolLengthStyle      = "PrevPoolLengthStyle";                           //$NON-NLS-1$
-   private static final String   TotalLengths         = "TotalLengths";                                  //$NON-NLS-1$
-   private static final String   Stroke               = "Stroke";                                        //$NON-NLS-1$
-   private static final String   Turn                 = "Turn";                                          //$NON-NLS-1$
-   private static final String   Type                 = "Type";                                          //$NON-NLS-1$
-   private static int            previousTotalLengths = 0;
+   private static final String       Swimming             = "Swimming";                                      //$NON-NLS-1$
+   private static final String       Breaststroke         = "Breaststroke";                                  //$NON-NLS-1$
+   private static final String       Freestyle            = "Freestyle";                                     //$NON-NLS-1$
+   private static final String       Other                = "Other";                                         //$NON-NLS-1$
+   private static final String       PoolLengthStyle      = "PrevPoolLengthStyle";                           //$NON-NLS-1$
+   private static final String       TotalLengths         = "TotalLengths";                                  //$NON-NLS-1$
+   private static final String       Stroke               = "Stroke";                                        //$NON-NLS-1$
+   private static final String       Turn                 = "Turn";                                          //$NON-NLS-1$
+   private static final String       Type                 = "Type";                                          //$NON-NLS-1$
+   private static int                previousTotalLengths = 0;
 
-   private ArrayList<TimeData>   _sampleList;
+   private ArrayList<TimeData>       _sampleList;
    private ArrayList<TourTimerPause> _timerPauses;
-   final IPreferenceStore        _prefStore           = TourbookPlugin.getDefault().getPreferenceStore();
+   final IPreferenceStore            _prefStore           = TourbookPlugin.getDefault().getPreferenceStore();
 
    /**
     * Parses and stores all the R-R interval for a given data sample.
