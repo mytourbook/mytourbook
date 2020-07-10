@@ -224,8 +224,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    // FIT
    // Ambit2 xml
    // Ambit 2 sml
-   // DONE : S9 import to record paused time
-   // Sporttracks fitlog
+   // DONE: S9 import to record paused time
+   // DONE: Sporttracks fitlog
+
+   // Statistics view tooltip
+   // display a pause sign on the gps track like in ST
 
    public static final String     ID                            = "net.tourbook.views.TourDataEditorView";                //$NON-NLS-1$
    //
