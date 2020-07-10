@@ -7506,16 +7506,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
    }
 
-   public int getPausedTime() {
-      if (tourTimerPauses == null) {
-         return 0;
-      }
-
-      final long pausedTime = tourTimerPauses.stream().mapToLong(TourTimerPause::getPauseDuration).sum();
-
-      return (int) (pausedTime / 1000);
-   }
-
    public int getPhotoTimeAdjustment() {
       return photoTimeAdjustment;
    }
@@ -7671,10 +7661,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    public int getRearShiftCount() {
       return rearShiftCount;
-   }
-
-   public long getRecordedTime() {
-      return tourRecordingTime - getPausedTime();
    }
 
    public int getRestPulse() {
@@ -8389,6 +8375,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return _sortedMarkers;
    }
 
+   public int getTourPausedTime() {
+      if (tourTimerPauses == null) {
+         return 0;
+      }
+
+      final long pausedTime = tourTimerPauses.stream().mapToLong(TourTimerPause::getPauseDuration).sum();
+
+      return (int) (pausedTime / 1000);
+   }
+
    /**
     * @return Returns the person for which the tour is saved or <code>null</code> when the tour is
     *         not saved in the database.
@@ -8402,6 +8398,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    public Set<TourPhoto> getTourPhotos() {
       return tourPhotos;
+   }
+
+   public long getTourRecordedTime() {
+      return tourRecordingTime - getTourPausedTime();
    }
 
    /**
