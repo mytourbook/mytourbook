@@ -358,15 +358,18 @@ public class StatisticView extends ViewPart implements ITourProvider {
       /*
        * Start async that the workspace is fully initialized with all data filters
        */
-      parent.getDisplay().asyncExec(new Runnable() {
-         @Override
-         public void run() {
+      parent.getDisplay().asyncExec(() -> {
 
-            _activePerson = TourbookPlugin.getActivePerson();
-            _activeTourTypeFilter = TourbookPlugin.getActiveTourTypeFilter();
+         if (_statContainer.isDisposed()) {
 
-            restoreState();
+            // this can occure when view is closed (very early) but not yet visible
+            return;
          }
+
+         _activePerson = TourbookPlugin.getActivePerson();
+         _activeTourTypeFilter = TourbookPlugin.getActiveTourTypeFilter();
+
+         restoreState();
       });
    }
 

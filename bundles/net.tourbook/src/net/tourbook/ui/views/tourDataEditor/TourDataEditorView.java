@@ -4577,6 +4577,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       // with e4 the layouts are not yet set -> NPE's -> run async which worked
       parent.getShell().getDisplay().asyncExec(() -> {
 
+         if (_tab1Container.isDisposed()) {
+
+            // this can occure when view is closed (very early) but not yet visible
+            return;
+         }
+
          // compute width for all controls and equalize column width for the different sections
          _tab1Container.layout(true, true);
          UI.setEqualizeColumWidths(_firstColumnControls);
