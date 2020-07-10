@@ -39,6 +39,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import net.sf.swtaddons.autocomplete.combo.AutocompleteComboInput;
 import net.tourbook.Messages;
@@ -571,6 +572,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    //
    private Label                    _timeSlice_Label;
    private TableViewer              _timeSlice_Viewer;
+   private AtomicInteger            _timeSlice_Viewer_RunningId   = new AtomicInteger();
    private TimeSliceComparator      _timeSlice_Comparator         = new TimeSliceComparator();
    private Object[]                 _timeSlice_ViewerItems;
    private ColumnManager            _timeSlice_ColumnManager;
@@ -7912,13 +7914,26 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       if (_prefStore.getBoolean(
             ITourbookPreferences.TOGGLE_STATE_SELECT_INBETWEEN_TIME_SLICES)) {
 
+         final int runnableRunningId = _timeSlice_Viewer_RunningId.incrementAndGet();
+
          // delay the selection of multiple lines, moving the mouse can occur very often
          _parent.getDisplay().timerExec(50, new Runnable() {
+
+            private int __runningId = runnableRunningId;
 
             @Override
             public void run() {
 
                if (_parent.isDisposed()) {
+                  return;
+               }
+
+               final int currentId = _timeSlice_Viewer_RunningId.get();
+
+               if (__runningId != currentId) {
+
+                  // a newer runnable is created
+
                   return;
                }
 
