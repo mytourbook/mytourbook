@@ -3942,7 +3942,7 @@ public class Map extends Canvas {
       final long movingTime = tourData.getTourDrivingTime();
       final String textMovingTime = String.format(VALUE_FORMAT_2,
             TOUR_TOOLTIP_LABEL_MOVING_TIME,
-            FormatManager.formatDrivingTime(movingTime));
+            FormatManager.formatMovingTime(movingTime));
 
       final float distance = tourData.getTourDistance() / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
       final String textDistance = String.format(VALUE_FORMAT_3,

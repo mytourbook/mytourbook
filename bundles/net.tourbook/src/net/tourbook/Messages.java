@@ -1492,7 +1492,6 @@ public class Messages extends NLS {
    public static String        Pref_ChartColors_unit_min;
 
    public static String        Pref_DisplayFormat_Label_Altitude;
-   public static String        Pref_DisplayFormat_Label_BreakTime;
    public static String        Pref_DisplayFormat_Label_Cadence;
    public static String        Pref_DisplayFormat_Label_Distance;
    public static String        Pref_DisplayFormat_Label_Info;
@@ -1735,8 +1734,11 @@ public class Messages extends NLS {
    public static String        pref_view_layout_display_lines_Tooltip;
    public static String        pref_view_layout_label_category;
    public static String        pref_view_layout_label_color_group;
-   public static String        pref_view_layout_label_driving_time_format;
-   public static String        pref_view_layout_label_recording_time_format;
+   public static String        pref_view_layout_label_elapsed_time_format;
+   public static String        pref_view_layout_label_recorded_time_format;
+   public static String        pref_view_layout_label_paused_time_format;
+   public static String        pref_view_layout_label_moving_time_format;
+   public static String        pref_view_layout_label_break_time_format;
    public static String        pref_view_layout_label_sub;
    public static String        pref_view_layout_label_sub_sub;
    public static String        pref_view_layout_label_title;

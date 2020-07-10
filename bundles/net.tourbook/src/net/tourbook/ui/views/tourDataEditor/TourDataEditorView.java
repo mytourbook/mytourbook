@@ -8367,8 +8367,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          // manual tour
          if (_isManualTour) {
 
-            //TODO FB _tourData.setTourRecordingTime(_timeRecording.getTime());
-            // _tourData.setTourDrivingTime(_timeDriving.getTime());
+            _tourData.setTourRecordingTime(_timeElapsed.getTime());
+            _tourData.setTourDrivingTime(_timeMoving.getTime());
          }
 
       } catch (final IllegalArgumentException e) {

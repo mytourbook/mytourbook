@@ -1186,11 +1186,11 @@ public class CalendarProfileManager {
          @Override
          String format(final CalendarTourData data, final ValueFormat valueFormat, final boolean isShowValueUnit) {
 
-            if (data.drivingTime > 0 && data.distance > 0) {
+            if (data.movingTime > 0 && data.distance > 0) {
 
                final float pace = data.distance == 0
                      ? 0
-                     : 1000 * data.drivingTime / data.distance * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+                     : 1000 * data.movingTime / data.distance * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 
                final String valueText = UI.format_mm_ss((long) pace);
 
@@ -1339,11 +1339,11 @@ public class CalendarProfileManager {
          @Override
          String format(final CalendarTourData data, final ValueFormat valueFormat, final boolean isShowValueUnit) {
 
-            if (data.distance > 0 && data.drivingTime > 0) {
+            if (data.distance > 0 && data.movingTime > 0) {
 
                float speed = data.distance == 0
                      ? 0
-                     : data.distance / (data.drivingTime / 3.6f);
+                     : data.distance / (data.movingTime / 3.6f);
 
                //convert to the current measurement system
                speed /= net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
@@ -1401,10 +1401,9 @@ public class CalendarProfileManager {
          @Override
          String format(final CalendarTourData data, final ValueFormat valueFormat, final boolean isShowValueUnit) {
 
-// TODO FB
-            if (data.recordingTime > 0) {
+            if (data.elapsedTime > 0) {
 
-               final String valueText = valueFormatter.printLong(data.recordingTime - data.drivingTime);
+               final String valueText = valueFormatter.printLong(data.elapsedTime - data.movingTime);
 
                return isShowValueUnit
                      ? valueText + UI.SPACE + UI.UNIT_LABEL_TIME + UI.SPACE
@@ -1458,9 +1457,9 @@ public class CalendarProfileManager {
          @Override
          String format(final CalendarTourData data, final ValueFormat valueFormat, final boolean isShowValueUnit) {
 
-            if (data.drivingTime > 0) {
+            if (data.movingTime > 0) {
 
-               final String valueText = valueFormatter.printLong(data.drivingTime);
+               final String valueText = valueFormatter.printLong(data.movingTime);
 
                return isShowValueUnit
                      ? valueText + UI.SPACE + UI.UNIT_LABEL_TIME + UI.SPACE
@@ -1514,9 +1513,9 @@ public class CalendarProfileManager {
          @Override
          String format(final CalendarTourData data, final ValueFormat valueFormat, final boolean isShowValueUnit) {
 
-            if (data.recordingTime > 0) {
+            if (data.elapsedTime > 0) {
 
-               final String valueText = valueFormatter.printLong(data.recordingTime - data.drivingTime);
+               final String valueText = valueFormatter.printLong(data.elapsedTime - data.movingTime);
 
                return isShowValueUnit
                      ? valueText + UI.SPACE + UI.UNIT_LABEL_TIME + UI.SPACE
@@ -1570,9 +1569,9 @@ public class CalendarProfileManager {
          @Override
          String format(final CalendarTourData data, final ValueFormat valueFormat, final boolean isShowValueUnit) {
 
-            if (data.recordingTime > 0) {
+            if (data.elapsedTime > 0) {
 
-               final String valueText = valueFormatter.printLong(data.recordingTime);
+               final String valueText = valueFormatter.printLong(data.elapsedTime);
 
                return isShowValueUnit
                      ? valueText + UI.SPACE + UI.UNIT_LABEL_TIME + UI.SPACE

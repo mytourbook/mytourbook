@@ -425,8 +425,9 @@ public class CalendarTourDataProvider {
                data.elevationGain = dbElevationGain.get(tourIndex);
                data.elevationLoss = dbElevationGain.get(tourIndex);
 
-               data.recordingTime = dbTourRecordingTime.get(tourIndex);
-               data.drivingTime = dbTourDrivingTime.get(tourIndex);
+               //TODO fb
+               data.elapsedTime = dbTourRecordingTime.get(tourIndex);
+               data.movingTime = dbTourDrivingTime.get(tourIndex);
 
                data.calories = dbCalories.get(tourIndex);
                data.power_Avg = dbPowerAvg.get(tourIndex);
@@ -453,8 +454,8 @@ public class CalendarTourDataProvider {
                   data.elevationLoss = UI.scrambleNumbers(data.elevationLoss);
                   data.calories = UI.scrambleNumbers(data.calories);
 
-                  data.recordingTime = UI.scrambleNumbers(data.recordingTime);
-                  data.drivingTime = UI.scrambleNumbers(data.drivingTime);
+                  data.elapsedTime = UI.scrambleNumbers(data.elapsedTime);
+                  data.movingTime = UI.scrambleNumbers(data.movingTime);
                }
 
             } // create data for this day
@@ -844,8 +845,8 @@ public class CalendarTourDataProvider {
             weekData.distance = result.getInt(1);
             weekData.elevationGain = result.getInt(2);
             weekData.elevationLoss = result.getInt(7);
-            weekData.recordingTime = result.getInt(3);
-            weekData.drivingTime = result.getInt(4);
+            weekData.elapsedTime = result.getInt(3);
+            weekData.movingTime = result.getInt(4);
             weekData.calories = result.getInt(5);
 
             weekData.numTours = result.getInt(6);
@@ -859,8 +860,8 @@ public class CalendarTourDataProvider {
                weekData.elevationLoss = UI.scrambleNumbers(weekData.elevationLoss);
                weekData.distance = UI.scrambleNumbers(weekData.distance);
 
-               weekData.recordingTime = UI.scrambleNumbers(weekData.recordingTime);
-               weekData.drivingTime = UI.scrambleNumbers(weekData.drivingTime);
+               weekData.elapsedTime = UI.scrambleNumbers(weekData.elapsedTime);
+               weekData.movingTime = UI.scrambleNumbers(weekData.movingTime);
 
                weekData.calories = UI.scrambleNumbers(weekData.calories);
             }

@@ -297,6 +297,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @since Is long since db version 22, before it was int
     */
    @XmlElement
+   //TODO FB rename into elapsed
    private long                  tourRecordingTime;
 
    /**
@@ -5242,8 +5243,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       int segmentIndex2nd = 0;
 
-      int totalTime_Recording = 0;
-      int totalTime_Driving = 0;
+      int totalTime_Elapsed = 0;
+      int totalTime_Moving = 0;
       int totalTime_Break = 0;
       float totalDistance = 0;
       float totalAltitude_Up = 0;
@@ -5276,13 +5277,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
          final float segmentDrivingTime = segmentRecordingTime - segmentBreakTime;
 
-         segmentSerie_Time_Recording[segmentIndex] = segment.time_Recording = segmentRecordingTime;
-         segmentSerie_Time_Driving[segmentIndex] = segment.time_Driving = (int) segmentDrivingTime;
+         segmentSerie_Time_Recording[segmentIndex] = segment.time_Elapsed = segmentRecordingTime;
+         segmentSerie_Time_Driving[segmentIndex] = segment.time_Moving = (int) segmentDrivingTime;
          segmentSerie_Time_Break[segmentIndex] = segment.time_Break = segmentBreakTime;
          segmentSerie_Time_Total[segmentIndex] = segment.time_Total = timeTotal += segmentRecordingTime;
 
-         totalTime_Recording += segmentRecordingTime;
-         totalTime_Driving += segmentDrivingTime;
+         totalTime_Elapsed += segmentRecordingTime;
+         totalTime_Moving += segmentDrivingTime;
          totalTime_Break += segmentBreakTime;
 
          float segmentDistance = 0.0f;
@@ -5436,7 +5437,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
             segmentSerie_Cadence[segmentIndex] = segment.cadence = segmentAvgCadence;
 
             // stride length with rule of 3
-            final float revolutionTotal = segmentAvgCadence / 60 * segment.time_Driving;
+            final float revolutionTotal = segmentAvgCadence / 60 * segment.time_Elapsed;
             segment.strideLength = segment.distance_Diff / revolutionTotal;
          }
 
@@ -5447,20 +5448,20 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       /*
        * Add total segment
        */
-      final float totalSpeed = totalTime_Driving == 0 //
+      final float totalSpeed = totalTime_Moving == 0 //
             ? 0
-            : totalDistance / totalTime_Driving * 3.6f / UI.UNIT_VALUE_DISTANCE;
+            : totalDistance / totalTime_Moving * 3.6f / UI.UNIT_VALUE_DISTANCE;
 
       final float totalPace = totalDistance == 0 //
             ? 0
-            : totalTime_Driving * 1000 / (totalDistance / UI.UNIT_VALUE_DISTANCE);
+            : totalTime_Moving * 1000 / (totalDistance / UI.UNIT_VALUE_DISTANCE);
 
       final TourSegment totalSegment = new TourSegment();
 
       totalSegment.isTotal = true;
 
-      totalSegment.time_Recording = totalTime_Recording;
-      totalSegment.time_Driving = totalTime_Driving;
+      totalSegment.time_Elapsed = totalTime_Elapsed;
+      totalSegment.time_Moving = totalTime_Moving;
       totalSegment.time_Break = totalTime_Break;
 
       totalSegment.distance_Diff = totalDistance;
@@ -9653,6 +9654,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @param tourDrivingTime
     */
    public void setTourDrivingTime(final int tourDrivingTime) {
+      //TODO FB rename into moving time ?
       this.tourDrivingTime = tourDrivingTime;
    }
 

@@ -1346,8 +1346,8 @@ public class TourInfoUI {
          _lblMovingTimeHour.setVisible(true);
          _lblBreakTimeHour.setVisible(true);
 
-         _lblRecordingTime.setText(FormatManager.formatRecordingTime(recordingTime));
-         _lblMovingTime.setText(FormatManager.formatDrivingTime(movingTime));
+         _lblRecordingTime.setText(FormatManager.formatElapsedTime(recordingTime));
+         _lblMovingTime.setText(FormatManager.formatMovingTime(movingTime));
          _lblBreakTime.setText(FormatManager.formatPausedTime(breakTime));
 
          /*

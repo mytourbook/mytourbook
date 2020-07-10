@@ -566,7 +566,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             break;
 
          case TableColumnFactory.TIME_RECORDING_TIME_ID:
-            rc = segment1.time_Recording - segment2.time_Recording;
+            rc = segment1.time_Elapsed - segment2.time_Elapsed;
             break;
 
          case TableColumnFactory.DATA_SERIE_START_END_INDEX_ID:
@@ -3222,16 +3222,16 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
             final TourSegment segment = (TourSegment) cell.getElement();
 
-            final int drivingTime = segment.time_Driving;
+            final int movingTime = segment.time_Moving;
 
-            if (drivingTime == 0) {
+            if (movingTime == 0) {
                cell.setText(UI.EMPTY_STRING);
             } else {
 
                final double altitudeDiff = segment.altitude_Segment_Border_Diff;
                final double value = altitudeDiff > 0 //
                      ? 0
-                     : (altitudeDiff / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE) / drivingTime * 3600;
+                     : (altitudeDiff / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE) / movingTime * 3600;
 
                colDef.printValue_0(cell, value);
             }
@@ -3257,16 +3257,16 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
             final TourSegment segment = (TourSegment) cell.getElement();
 
-            final int drivingTime = segment.time_Driving;
+            final int movingTime = segment.time_Moving;
 
-            if (drivingTime == 0) {
+            if (movingTime == 0) {
                cell.setText(UI.EMPTY_STRING);
             } else {
 
                final double altitudeDiff = segment.altitude_Segment_Border_Diff;
                final double value = altitudeDiff < 0 //
                      ? 0
-                     : (altitudeDiff / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE) / drivingTime * 3600;
+                     : (altitudeDiff / net.tourbook.ui.UI.UNIT_VALUE_ALTITUDE) / movingTime * 3600;
 
                colDef.printValue_0(cell, value);
             }
@@ -3782,7 +3782,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          public void update(final ViewerCell cell) {
 
             final TourSegment segment = (TourSegment) cell.getElement();
-            final int value = segment.time_Driving;
+            final int value = segment.time_Moving;
 
             colDef.printDetailValue(cell, value);
 
@@ -3838,7 +3838,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          public void update(final ViewerCell cell) {
 
             final TourSegment segment = (TourSegment) cell.getElement();
-            final int value = segment.time_Recording;
+            final int value = segment.time_Elapsed;
 
             colDef.printDetailValue(cell, value);
 
