@@ -912,7 +912,7 @@ public class TourFilterManager {
 
             value1 = (LocalDate
                   .of(dateTime1.getYear(), dateTime1.getMonthValue(), dateTime1.getDayOfMonth())
-                  .toEpochDay() + 1) * 86400_000;
+                  .toEpochDay()) * 86400_000;
 
             value2 = (LocalDate
                   .of(dateTime2.getYear(), dateTime2.getMonthValue(), dateTime2.getDayOfMonth())
@@ -1054,7 +1054,7 @@ public class TourFilterManager {
                                                        final ArrayList<Object> sqlParameters,
                                                        final TourFilterFieldOperator fieldOperator,
                                                        final String sqlField,
-                                                       final Long value1,
+                                                       Long value1,
                                                        final Long value2) {
 
       switch (fieldOperator) {
@@ -1062,10 +1062,12 @@ public class TourFilterManager {
          getSQL_LessThan(sqlWhere, sqlParameters, sqlField, value1);
          break;
       case LESS_THAN_OR_EQUAL:
+         value1 += 86400_000;
          getSQL_LessThanOrEqual(sqlWhere, sqlParameters, sqlField, value1);
          break;
 
       case GREATER_THAN:
+         value1 += 86400_000;
          getSQL_GreaterThan(sqlWhere, sqlParameters, sqlField, value1);
          break;
       case GREATER_THAN_OR_EQUAL:
