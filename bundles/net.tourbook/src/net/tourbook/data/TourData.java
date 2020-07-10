@@ -297,7 +297,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @since Is long since db version 22, before it was int
     */
    @XmlElement
-   //TODO FB rename into elapsed
+   //TODO FB rename into elapsed ????
    private long                  tourRecordingTime;
 
    /**
@@ -329,6 +329,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    @XmlElement(name = "TourTimerPause")
    private List<TourTimerPause>             tourTimerPauses                         = new ArrayList<>();
 
+
+   /**
+    * Total recorded time in seconds
+    */
+   @XmlElement
+   private long                  tourRecordedTime;
 
    // ############################################# DISTANCE #############################################
 
@@ -8401,7 +8407,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    public long getTourRecordedTime() {
-      return tourRecordingTime - getTourPausedTime();
+      return tourRecordedTime;
    }
 
    /**
@@ -9603,6 +9609,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    public void setTimerPauses(final List<TourTimerPause> timerPauses) {
 
       this.tourTimerPauses = timerPauses;
+
+      this.tourRecordedTime = tourRecordingTime - getTourPausedTime();
    }
 
    public void setTimeSerieDouble(final double[] timeSerieDouble) {

@@ -3123,6 +3123,7 @@ public class TourDatabase {
             // version 43 start  -  20.X
             //
             + " tourTimerPauses                               BLOB,                  \n" //$NON-NLS-1$
+            + " tourRecordedTime                              BIGINT,                  \n" //$NON-NLS-1$
             //
             // version 43 end
 
@@ -7612,6 +7613,17 @@ public class TourDatabase {
          if (isTableAvailable(conn, TABLE_TOUR_TIMER_PAUSE) == false) {
 
             createTable_TourTimerPauses(stmt);
+         }
+
+         // check if db is updated to version 43
+         if (isColumnAvailable(conn, TABLE_TOUR_DATA, "tourRecordedTime") == false) { //$NON-NLS-1$
+
+// SET_FORMATTING_OFF
+
+            // Add new columns
+            SQL.AddCol_BigInt(stmt, TABLE_TOUR_DATA, "tourRecordedTime",          DEFAULT_0);                            //$NON-NLS-1$
+
+// SET_FORMATTING_ON
          }
       }
       stmt.close();

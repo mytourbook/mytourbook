@@ -20,32 +20,32 @@ import java.util.ArrayList;
 
 public class CalendarTourData {
 
-   LoadingState loadingState = LoadingState.NOT_LOADED;
+   LoadingState    loadingState = LoadingState.NOT_LOADED;
 
-   long         tourId;
-   long         typeId;
+   long            tourId;
+   long            typeId;
 
-   int          typeColorIndex;
+   int             typeColorIndex;
 
-   int          year;
-   int          month;
-   int          day;
-   int          week;
-   int          dayOfWeek;
+   int             year;
+   int             month;
+   int             day;
+   int             week;
+   int             dayOfWeek;
 
-   int          startTime;
-   int          endTime;
+   int             startTime;
+   int             endTime;
 
-   int          elevationGain;
-   int          elevationLoss;
-   int          distance;
+   int             elevationGain;
+   int             elevationLoss;
+   int             distance;
 
-   int          cadenceZone_SlowTime;
-   int          cadenceZone_FastTime;
+   int             cadenceZone_SlowTime;
+   int             cadenceZone_FastTime;
 
-   int          elapsedTime;
-   int          movingTime;
-   //TODO FB add the pause and break time ??
+   int             elapsedTime;
+   int             recordedTime;
+   int             movingTime;
 
    int             calories;
    float           power_Avg;
