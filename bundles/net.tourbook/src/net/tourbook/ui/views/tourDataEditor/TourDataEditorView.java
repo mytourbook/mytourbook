@@ -300,7 +300,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private boolean[]               _serieBreakTime;
    //
    private short[]                 _swimSerie_Cadence;
-// private short[]                  _swimSerie_LengthType;
+// private short[]                 _swimSerie_LengthType;
    private short[]                 _swimSerie_Strokes;
    private short[]                 _swimSerie_StrokeStyle;
    private int[]                   _swimSerie_Time;
@@ -4995,7 +4995,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                final SwimSlice swimSlice = (SwimSlice) cell.getElement();
                final short value = _swimSerie_StrokeStyle[swimSlice.serieIndex];
 
-               if (value == Short.MIN_VALUE) {
+               if (value == Short.MIN_VALUE || value == SwimStroke.INVALID.getValue()) {
+
+                  // show nothing instead of "<Invalid Style>"
 
                   cell.setText(UI.EMPTY_STRING);
 
@@ -7994,6 +7996,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     *           Stroke style, can be <code>null</code> to remove the stroke style
     */
    void setSwimStyle(final StrokeStyle strokeStyle) {
+
+      // check if stroke style data are available
+      if (_swimSerie_StrokeStyle == null) {
+
+         _swimSerie_StrokeStyle = _tourData.swim_StrokeStyle = new short[_swimSerie_Time.length];
+
+         // setup all stroke styles with SwimStroke.INVALID, 0 is the swim stroke for freestyle !!!
+         Arrays.fill(_swimSerie_StrokeStyle, SwimStroke.INVALID.getValue());
+      }
 
       final StructuredSelection selection = (StructuredSelection) _swimSlice_Viewer.getSelection();
 
