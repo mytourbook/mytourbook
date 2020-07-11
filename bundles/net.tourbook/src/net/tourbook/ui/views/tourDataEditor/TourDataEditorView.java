@@ -7911,8 +7911,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       final Table table = (Table) _timeSlice_Viewer.getControl();
       final int itemCount = table.getItemCount();
 
-      if (_prefStore.getBoolean(
-            ITourbookPreferences.TOGGLE_STATE_SELECT_INBETWEEN_TIME_SLICES)) {
+      if (_prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SELECT_INBETWEEN_TIME_SLICES)) {
 
          final int runnableRunningId = _timeSlice_Viewer_RunningId.incrementAndGet();
 
