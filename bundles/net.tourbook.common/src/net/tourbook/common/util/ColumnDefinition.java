@@ -263,22 +263,28 @@ public class ColumnDefinition implements Cloneable {
     */
    public String getColumnHeaderText(final ColumnManager columnManager) {
 
-      String columnHeaderText = _columnHeaderText;
+      final StringBuilder sb = new StringBuilder();
+      sb.append(_columnHeaderText);
 
       // add annotations to this text
-      if (columnManager.isShowColumnAnnotations()
+      if (columnManager.isShowColumnAnnotation_Formatting()
             && (_defaultValueFormat_Category != null || _defaultValueFormat_Detail != null)) {
 
          if (_columnHeaderText == null) {
-            columnHeaderText = UI.EMPTY_STRING;
+            sb.setLength(0);
+            sb.append(UI.EMPTY_STRING);
          }
 
          if (_defaultValueFormat_Category != null || _defaultValueFormat_Detail != null) {
-            columnHeaderText += UI.SPACE1 + Messages.App_Annotation_1;
+            sb.append(UI.SPACE1 + Messages.Column_Annotation_Formatting);
          }
       }
 
-      return columnHeaderText;
+      if (columnManager.isNatTableColumnManager() && columnManager.isShowColumnAnnotation_Sorting() && _canSortColumn) {
+         sb.append(UI.SPACE1 + Messages.Column_Annotation_Sorting);
+      }
+
+      return sb.toString();
    }
 
    public String getColumnHeaderToolTipText() {

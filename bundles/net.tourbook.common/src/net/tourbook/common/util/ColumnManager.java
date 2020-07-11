@@ -102,33 +102,34 @@ import org.eclipse.ui.XMLMemento;
  */
 public class ColumnManager {
 
-   private static final String XML_STATE_COLUMN_MANAGER          = "XML_STATE_COLUMN_MANAGER"; //$NON-NLS-1$
+   private static final String XML_STATE_COLUMN_MANAGER                  = "XML_STATE_COLUMN_MANAGER";          //$NON-NLS-1$
    //
-   private static final String TAG_ROOT                          = "ColumnProfiles";           //$NON-NLS-1$
+   private static final String TAG_ROOT                                  = "ColumnProfiles";                    //$NON-NLS-1$
    //
-   private static final String TAG_COLUMN                        = "Column";                   //$NON-NLS-1$
-   private static final String TAG_PROFILE                       = "Profile";                  //$NON-NLS-1$
+   private static final String TAG_COLUMN                                = "Column";                            //$NON-NLS-1$
+   private static final String TAG_PROFILE                               = "Profile";                           //$NON-NLS-1$
    //
-   private static final String ATTR_IS_ACTIVE_PROFILE            = "isActiveProfile";          //$NON-NLS-1$
-   private static final String ATTR_IS_SHOW_CATEGORY             = "isShowCategory";           //$NON-NLS-1$
-   private static final String ATTR_IS_SHOW_COLUMN_ANNOTATIONS   = "isShowColumnAnnotations";  //$NON-NLS-1$
+   private static final String ATTR_IS_ACTIVE_PROFILE                    = "isActiveProfile";                   //$NON-NLS-1$
+   private static final String ATTR_IS_SHOW_CATEGORY                     = "isShowCategory";                    //$NON-NLS-1$
+   private static final String ATTR_IS_SHOW_COLUMN_ANNOTATION_FORMATTING = "isShowColumnAnnotation_Formatting"; //$NON-NLS-1$
+   private static final String ATTR_IS_SHOW_COLUMN_ANNOTATION_SORTING    = "isShowColumnAnnotation_Sorting";    //$NON-NLS-1$
    //
-   private static final String ATTR_COLUMN_ID                    = "columnId";                 //$NON-NLS-1$
-   private static final String ATTR_COLUMN_FORMAT_CATEGORY       = "categoryFormat";           //$NON-NLS-1$
-   private static final String ATTR_COLUMN_FORMAT_DETAIL         = "detailFormat";             //$NON-NLS-1$
-   private static final String ATTR_NAME                         = "name";                     //$NON-NLS-1$
-   private static final String ATTR_FROZEN_COLUMN_ID             = "frozenColumnId";           //$NON-NLS-1$
+   private static final String ATTR_COLUMN_ID                            = "columnId";                          //$NON-NLS-1$
+   private static final String ATTR_COLUMN_FORMAT_CATEGORY               = "categoryFormat";                    //$NON-NLS-1$
+   private static final String ATTR_COLUMN_FORMAT_DETAIL                 = "detailFormat";                      //$NON-NLS-1$
+   private static final String ATTR_NAME                                 = "name";                              //$NON-NLS-1$
+   private static final String ATTR_FROZEN_COLUMN_ID                     = "frozenColumnId";                    //$NON-NLS-1$
 
-   private static final String ATTR_VISIBLE_COLUMN_IDS           = "visibleColumnIds";         //$NON-NLS-1$
-   private static final String ATTR_VISIBLE_COLUMN_IDS_AND_WIDTH = "visibleColumnIdsAndWidth"; //$NON-NLS-1$
+   private static final String ATTR_VISIBLE_COLUMN_IDS                   = "visibleColumnIds";                  //$NON-NLS-1$
+   private static final String ATTR_VISIBLE_COLUMN_IDS_AND_WIDTH         = "visibleColumnIdsAndWidth";          //$NON-NLS-1$
    //
-   static final String         COLUMN_CATEGORY_SEPARATOR         = "   \u00bb   ";             //$NON-NLS-1$
-   static final String         COLUMN_TEXT_SEPARATOR             = "   \u00B7   ";             //$NON-NLS-1$
+   static final String         COLUMN_CATEGORY_SEPARATOR                 = "   \u00bb   ";                      //$NON-NLS-1$
+   static final String         COLUMN_TEXT_SEPARATOR                     = "   \u00B7   ";                      //$NON-NLS-1$
 
    /**
     * Minimum column width, when the column width is 0, there was a bug that this happened.
     */
-   private static final int    MINIMUM_COLUMN_WIDTH              = 7;
+   private static final int    MINIMUM_COLUMN_WIDTH                      = 7;
 
    /*
     * Value formatter
@@ -163,7 +164,8 @@ public class ColumnManager {
     */
    private boolean                           _isShowCategory               = true;
 
-   private boolean                           _isShowColumnAnnotations;
+   private boolean                           _isShowColumnAnnotation_Formatting;
+   private boolean                           _isShowColumnAnnotation_Sorting;
    private boolean                           _isDoAResizeForAllColumnsToFit;
 
    private Comparator<ColumnProfile>         _profileSorter;
@@ -325,7 +327,7 @@ public class ColumnManager {
        * Update UI
        */
 
-      if (_natTablePropertiesProvider != null) {
+      if (isNatTableColumnManager()) {
 
          _natTablePropertiesProvider.getNatTable().redraw();
 
@@ -366,7 +368,7 @@ public class ColumnManager {
 
    private void action_SizeAllColumnToFit() {
 
-      if (_natTablePropertiesProvider != null) {
+      if (isNatTableColumnManager()) {
 
          final NatTable natTable = _natTablePropertiesProvider.getNatTable();
 
@@ -1222,7 +1224,7 @@ public class ColumnManager {
       }
 
       // set action only for the NatTable
-      if (_natTablePropertiesProvider != null) {
+      if (isNatTableColumnManager()) {
          {
             /*
              * Action: Freeze current column
@@ -1507,7 +1509,7 @@ public class ColumnManager {
 
       final ArrayList<String> allColumnIdsAndWidth = new ArrayList<>();
 
-      if (_natTablePropertiesProvider != null) {
+      if (isNatTableColumnManager()) {
 
          final DataLayer dataLayer = _natTablePropertiesProvider.getNatTableLayer_Data();
          final ColumnHideShowLayer columnHideShowLayer = _natTablePropertiesProvider.getNatTableLayer_ColumnHideShow();
@@ -1589,7 +1591,7 @@ public class ColumnManager {
 
       int[] columnOrder = null;
 
-      if (_natTablePropertiesProvider != null) {
+      if (isNatTableColumnManager()) {
 
          final DataLayer dataLayer = _natTablePropertiesProvider.getNatTableLayer_Data();
          final ColumnHideShowLayer columnHideShowLayer = _natTablePropertiesProvider.getNatTableLayer_ColumnHideShow();
@@ -1857,7 +1859,7 @@ public class ColumnManager {
        */
       int[] columnOrder = null;
 
-      if (_natTablePropertiesProvider != null) {
+      if (isNatTableColumnManager()) {
 
          final DataLayer dataLayer = _natTablePropertiesProvider.getNatTableLayer_Data();
          final ColumnHideShowLayer columnHideShowLayer = _natTablePropertiesProvider.getNatTableLayer_ColumnHideShow();
@@ -2019,12 +2021,24 @@ public class ColumnManager {
       return _isCategoryAvailable;
    }
 
+   /**
+    * @return Returns <code>true</code> when this {@link ColumnManager} is used for a
+    *         {@link NatTable}.
+    */
+   public boolean isNatTableColumnManager() {
+      return _natTablePropertiesProvider != null;
+   }
+
    public boolean isShowCategory() {
       return _isShowCategory;
    }
 
-   public boolean isShowColumnAnnotations() {
-      return _isShowColumnAnnotations;
+   public boolean isShowColumnAnnotation_Formatting() {
+      return _isShowColumnAnnotation_Formatting;
+   }
+
+   public boolean isShowColumnAnnotation_Sorting() {
+      return _isShowColumnAnnotation_Sorting;
    }
 
    private void onSelectColumnItem(final Event event) {
@@ -2108,10 +2122,14 @@ public class ColumnManager {
                _isShowCategory = xmlIsShowCategory;
             }
 
-            // get category column state
-            final Boolean xmlIsShowAnnotations = xmlMemento.getBoolean(ATTR_IS_SHOW_COLUMN_ANNOTATIONS);
-            if (xmlIsShowAnnotations != null) {
-               _isShowColumnAnnotations = xmlIsShowAnnotations;
+            // get annotation states
+            final Boolean xmlIsShowAnnotation_Formatting = xmlMemento.getBoolean(ATTR_IS_SHOW_COLUMN_ANNOTATION_FORMATTING);
+            if (xmlIsShowAnnotation_Formatting != null) {
+               _isShowColumnAnnotation_Formatting = xmlIsShowAnnotation_Formatting;
+            }
+            final Boolean xmlIsShowAnnotation_Sorting = xmlMemento.getBoolean(ATTR_IS_SHOW_COLUMN_ANNOTATION_SORTING);
+            if (xmlIsShowAnnotation_Sorting != null) {
+               _isShowColumnAnnotation_Sorting = xmlIsShowAnnotation_Sorting;
             }
 
             // get profiles
@@ -2137,7 +2155,7 @@ public class ColumnManager {
 
                   // frozen column id
                   final String xmlFrozenColumnId = xmlProfile.getString(ATTR_FROZEN_COLUMN_ID);
-                  if (xmlIsShowAnnotations != null) {
+                  if (xmlFrozenColumnId != null) {
                      currentProfile.frozenColumnId = xmlFrozenColumnId;
                   }
 
@@ -2321,7 +2339,8 @@ public class ColumnManager {
 
       // save other states
       xmlMemento.putBoolean(ATTR_IS_SHOW_CATEGORY, _isShowCategory);
-      xmlMemento.putBoolean(ATTR_IS_SHOW_COLUMN_ANNOTATIONS, _isShowColumnAnnotations);
+      xmlMemento.putBoolean(ATTR_IS_SHOW_COLUMN_ANNOTATION_FORMATTING, _isShowColumnAnnotation_Formatting);
+      xmlMemento.putBoolean(ATTR_IS_SHOW_COLUMN_ANNOTATION_SORTING, _isShowColumnAnnotation_Sorting);
 
       // save profiles
       saveState_Profiles(xmlMemento);
@@ -2487,8 +2506,12 @@ public class ColumnManager {
       _isShowCategory = isShowCategory;
    }
 
-   void setIsShowColumnAnnotations(final boolean isShowColumnAnnotations) {
-      _isShowColumnAnnotations = isShowColumnAnnotations;
+   void setIsShowColumnAnnotation_Formatting(final boolean isShowColumnAnnotation_Formatting) {
+      _isShowColumnAnnotation_Formatting = isShowColumnAnnotation_Formatting;
+   }
+
+   public void setIsShowColumnAnnotation_Sorting(final boolean isShowColumnAnnotation_Sorting) {
+      _isShowColumnAnnotation_Sorting = isShowColumnAnnotation_Sorting;
    }
 
    public void setSlideoutShell(final AdvancedSlideoutShell slideoutShell) {

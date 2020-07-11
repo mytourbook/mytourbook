@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -47,6 +47,9 @@ public class Messages extends NLS {
 
    public static String        Advanced_Menu_AnimationSymbol;
 
+   public static String        Column_Annotation_Formatting;
+   public static String        Column_Annotation_Sorting;
+
    public static String        Column_Profile_Dialog_ShowAllColumns_Message;
    public static String        Column_Profile_Dialog_ShowDefaultColumns_Message;
    public static String        Column_Profile_Dialog_Title;
@@ -64,6 +67,7 @@ public class Messages extends NLS {
    public static String        ColumnModifyDialog_Button_Sort;
    public static String        ColumnModifyDialog_Button_Sort_Tooltip;
    public static String        ColumnModifyDialog_Checkbox_ShowFormatAnnotations;
+   public static String        ColumnModifyDialog_Checkbox_ShowSortingAnnotations;
    public static String        ColumnModifyDialog_Column_Category;
    public static String        ColumnModifyDialog_Column_FormatCategory;
    public static String        ColumnModifyDialog_Column_FormatTour;

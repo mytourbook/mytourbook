@@ -3505,6 +3505,7 @@ public abstract class TableColumnFactory {
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Tour);
 
             colDef.setColumnLabel(Messages.ColumnFactory_tour_type_label);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_tour_type_header);
             colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_tour_type_tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
