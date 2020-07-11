@@ -73,7 +73,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
    private PixelConverter           _pc;
 
    /**
-    * contains the controls which are displayed in the first column, these controls are used to get
+    * Contains the controls which are displayed in the first column, these controls are used to get
     * the maximum width and set the first column within the different section to the same width
     */
    private final ArrayList<Control> _firstColumnControls           = new ArrayList<>();

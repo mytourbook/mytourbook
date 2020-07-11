@@ -227,9 +227,11 @@ public class Messages extends NLS {
 
    public static String        Dialog_ImportConfig_Error_FolderIsInvalid;
 
+   public static String        Dialog_ImportConfig_Group_Dashboard;
    public static String        Dialog_ImportConfig_Group_ImportActions;
    public static String        Dialog_ImportConfig_Group_ImportLauncherConfig;
    public static String        Dialog_ImportConfig_Group_StateTooltip;
+   public static String        Dialog_ImportConfig_Group_Tiles;
 
    public static String        Dialog_ImportConfig_Info_ConfigDragDrop;
    public static String        Dialog_ImportConfig_Info_ImportActions;
