@@ -25,6 +25,7 @@ import javax.xml.parsers.SAXParserFactory;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourData;
 import net.tourbook.device.InvalidDeviceSAXException;
 import net.tourbook.importdata.DeviceData;
@@ -33,7 +34,7 @@ import net.tourbook.importdata.TourbookDevice;
 
 public class SuuntoQuestDeviceDataReader extends TourbookDevice {
 
-   public static final String  TAG_MOVESCOUNT     = "";               //$NON-NLS-1$
+   public static final String  TAG_MOVESCOUNT     = UI.EMPTY_STRING;
 
    private static final String DOCTYPE_XML        = "<!doctype xml>"; //$NON-NLS-1$
    private static final String MOVESCOUNT_TAG     = "<movescount";    //$NON-NLS-1$
@@ -83,17 +84,17 @@ public class SuuntoQuestDeviceDataReader extends TourbookDevice {
             final BufferedReader fileReader = new BufferedReader(new InputStreamReader(inputStream, UI.UTF_8))) {
 
          String line = fileReader.readLine();
-         if (line == null || line.toLowerCase().startsWith(XML_START_ID) == false) {
+         if (StringUtils.isNullOrEmpty(line) || line.toLowerCase().startsWith(XML_START_ID) == false) {
             return false;
          }
 
          line = fileReader.readLine();
-         if (line == null || line.toLowerCase().startsWith(DOCTYPE_XML) == false) {
+         if (StringUtils.isNullOrEmpty(line) || line.toLowerCase().startsWith(DOCTYPE_XML) == false) {
             return false;
          }
 
          line = fileReader.readLine();
-         if (line == null || line.toLowerCase().startsWith(MOVESCOUNT_TAG) == false) {
+         if (StringUtils.isNullOrEmpty(line) || line.toLowerCase().startsWith(MOVESCOUNT_TAG) == false) {
             return false;
          }
 
@@ -107,7 +108,6 @@ public class SuuntoQuestDeviceDataReader extends TourbookDevice {
       } catch (final Exception e) {
 
          StatusUtil.log(e);
-
       }
 
       return false;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -25,76 +25,76 @@ import net.tourbook.data.TourReference;
  */
 public class GeoPartItem {
 
-	/**
-	 * Id of the {@link TourReference}, is -1 when not available
-	 */
-	public long						refId			= -1;
+   /**
+    * Id of the {@link TourReference}, is -1 when not available
+    */
+   public long                    refId         = -1;
 
-	long							executorId;
+   long                           executorId;
 
-	/**
-	 * When <code>true</code> then the loading/comparing of tours in this loader is canceled.
-	 */
-	boolean							isCanceled;
+   /**
+    * When <code>true</code> then the loading/comparing of tours in this loader is canceled.
+    */
+   boolean                        isCanceled;
 
-	boolean							isUseAppFilter;
+   boolean                        isUseAppFilter;
 
-	/**
-	 * Geo part which should be compared
-	 */
-	public NormalizedGeoData		normalizedTourPart;
+   /**
+    * Geo part which should be compared
+    */
+   public NormalizedGeoData       normalizedTourPart;
 
-	/**
-	 * Geo parts which are affected
-	 */
-	int[]							geoParts;
+   /**
+    * Geo parts which are affected
+    */
+   int[]                          geoParts;
 
-	/**
-	 * Tour id's which are having at least one of the {@link #geoParts}
-	 */
-	long[]							tourIds;
+   /**
+    * Tour id's which are having at least one of the {@link #geoParts}
+    */
+   long[]                         tourIds;
 
-	/**
-	 * Results of the compared tours
-	 */
-	ArrayList<GeoPartComparerItem>	comparedTours	= new ArrayList<>();
+   /**
+    * Results of the compared tours
+    */
+   ArrayList<GeoPartComparerItem> comparedTours = new ArrayList<>();
 
-	/**
-	 * Time in ms to calculate sql data
-	 */
-	long							sqlRunningTime;
+   /**
+    * Time in ms to calculate sql data
+    */
+   long                           sqlRunningTime;
 
-	/**
-	 * 
-	 */
-	boolean							isReselectedInUI;
+   /**
+    *
+    */
+   boolean                        isReselectedInUI;
 
-	@SuppressWarnings("unused")
-	private GeoPartItem() {}
+   @SuppressWarnings("unused")
+   private GeoPartItem() {}
 
-	public GeoPartItem(	final long executorId,
-						final int[] geoParts,
-						final NormalizedGeoData normalizedTourPart,
-						final boolean useAppFilter) {
+   public GeoPartItem(final long executorId,
+                      final int[] geoParts,
+                      final NormalizedGeoData normalizedTourPart,
+                      final boolean useAppFilter) {
 
-		this.executorId = executorId;
+      this.executorId = executorId;
 
-		this.geoParts = geoParts;
-		this.normalizedTourPart = normalizedTourPart;
+      this.geoParts = geoParts;
+      this.normalizedTourPart = normalizedTourPart;
 
-		this.isUseAppFilter = useAppFilter;
-	}
+      this.isUseAppFilter = useAppFilter;
+   }
 
-	@Override
-	public String toString() {
-		return "GeoPartItem [" //$NON-NLS-1$
-				+ "executorId=" + executorId + ", " //$NON-NLS-1$ //$NON-NLS-2$
-				//				+ "geoParts=" + Arrays.toString(geoParts) + ", "
-				//				+ "latPartSerie5=" + Arrays.toString(latPartSerie5) + ", "
-				//				+ "lonPartSerie5=" + Arrays.toString(lonPartSerie5) + ", tourIds=" + Arrays.toString(tourIds) + ", "
-				//				+ "isUseAppFilter=" + isUseAppFilter + ", "
-				//				+ "sqlRunningTime=" + sqlRunningTime
-				+ "]"; //$NON-NLS-1$
-	}
+   @Override
+   public String toString() {
+      return "GeoPartItem [" //$NON-NLS-1$
+            + "executorId=" + executorId + ", " //$NON-NLS-1$ //$NON-NLS-2$
+            //				+ "geoParts=" + Arrays.toString(geoParts) + ", "
+            //				+ "latPartSerie5=" + Arrays.toString(latPartSerie5) + ", "
+            //				+ "lonPartSerie5=" + Arrays.toString(lonPartSerie5) + ", tourIds=" + Arrays.toString(tourIds) + ", "
+            //				+ "isUseAppFilter=" + isUseAppFilter + ", "
+            //				+ "sqlRunningTime=" + sqlRunningTime
+            + "]"; //$NON-NLS-1$
+   }
 
 }

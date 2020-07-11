@@ -39,6 +39,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import net.sf.swtaddons.autocomplete.combo.AutocompleteComboInput;
 import net.tourbook.Messages;
@@ -300,7 +301,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private boolean[]               _serieBreakTime;
    //
    private short[]                 _swimSerie_Cadence;
-// private short[]                  _swimSerie_LengthType;
+// private short[]                 _swimSerie_LengthType;
    private short[]                 _swimSerie_Strokes;
    private short[]                 _swimSerie_StrokeStyle;
    private int[]                   _swimSerie_Time;
@@ -531,6 +532,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    // ################################################## UI controls ##################################################
    //
 
+   private Composite                _parent;
    private PageBook                 _pageBook;
    private Composite                _page_NoTourData;
    private Form                     _page_EditorForm;
@@ -570,6 +572,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    //
    private Label                    _timeSlice_Label;
    private TableViewer              _timeSlice_Viewer;
+   private AtomicInteger            _timeSlice_Viewer_RunningId   = new AtomicInteger();
    private TimeSliceComparator      _timeSlice_Comparator         = new TimeSliceComparator();
    private Object[]                 _timeSlice_ViewerItems;
    private ColumnManager            _timeSlice_ColumnManager;
@@ -585,75 +588,74 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    /*
     * tab: tour
     */
-   private Combo              _comboTitle;
+   private Combo             _comboTitle;
    //
-   private Button             _rdoCadence_Rpm;
-   private Button             _rdoCadence_Spm;
+   private Button            _rdoCadence_Rpm;
+   private Button            _rdoCadence_Spm;
    //
-   private CLabel             _lblCloudIcon;
-   private CLabel             _lblTourType;
+   private CLabel            _lblCloudIcon;
+   private CLabel            _lblTourType;
    //
-   private ControlDecoration  _decoTimeZone;
+   private ControlDecoration _decoTimeZone;
    //
-   private Combo              _comboLocation_Start;
-   private Combo              _comboLocation_End;
-   private Combo              _comboTimeZone;
-   private Combo              _comboWeather_Clouds;
-   private Combo              _comboWeather_WindDirectionText;
-   private Combo              _comboWeather_WindSpeedText;
+   private Combo             _comboLocation_Start;
+   private Combo             _comboLocation_End;
+   private Combo             _comboTimeZone;
+   private Combo             _comboWeather_Clouds;
+   private Combo             _comboWeather_WindDirectionText;
+   private Combo             _comboWeather_WindSpeedText;
    //
-   private DateTime           _dtStartTime;
-   private DateTime           _dtTourDate;
+   private DateTime          _dtStartTime;
+   private DateTime          _dtTourDate;
    //
-   private Label              _lblAltitudeUpUnit;
-   private Label              _lblAltitudeDownUnit;
-   private Label              _lblDistanceUnit;
-   private Label              _lblPerson_BodyWeightUnit;
-   private Label              _lblSpeedUnit;
-   private Label              _lblStartTime;
-   private Label              _lblTags;
-   private Label              _lblTimeZone;
-   private Label              _lblWeather_PrecipitationUnit;
-   private Label              _lblWeather_PressureUnit;
-   private Label              _lblWeather_TemperatureUnit_Avg;
-   private Label              _lblWeather_TemperatureUnit_Max;
-   private Label              _lblWeather_TemperatureUnit_Min;
-   private Label              _lblWeather_TemperatureUnit_WindChill;
+   private Label             _lblAltitudeUpUnit;
+   private Label             _lblAltitudeDownUnit;
+   private Label             _lblDistanceUnit;
+   private Label             _lblPerson_BodyWeightUnit;
+   private Label             _lblSpeedUnit;
+   private Label             _lblStartTime;
+   private Label             _lblTags;
+   private Label             _lblTimeZone;
+   private Label             _lblWeather_PrecipitationUnit;
+   private Label             _lblWeather_PressureUnit;
+   private Label             _lblWeather_TemperatureUnit_Avg;
+   private Label             _lblWeather_TemperatureUnit_Max;
+   private Label             _lblWeather_TemperatureUnit_Min;
+   private Label             _lblWeather_TemperatureUnit_WindChill;
    //
-   private Link               _linkDefaultTimeZone;
-   private Link               _linkGeoTimeZone;
-   private Link               _linkRemoveTimeZone;
-   private Link               _linkTag;
-   private Link               _linkTourType;
-   private Link               _linkWeather;
+   private Link              _linkDefaultTimeZone;
+   private Link              _linkGeoTimeZone;
+   private Link              _linkRemoveTimeZone;
+   private Link              _linkTag;
+   private Link              _linkTourType;
+   private Link              _linkWeather;
    //
-   private Spinner            _spinPerson_BodyWeight;
-   private Spinner            _spinPerson_Calories;
-   private Spinner            _spinPerson_FTP;
-   private Spinner            _spinPerson_RestPuls;
-   private Spinner            _spinWeather_Humidity;
-   private Spinner            _spinWeather_PrecipitationValue;
-   private Spinner            _spinWeather_PressureValue;
-   private Spinner            _spinWeather_Temperature_Average;
-   private Spinner            _spinWeather_Temperature_Min;
-   private Spinner            _spinWeather_Temperature_Max;
-   private Spinner            _spinWeather_Temperature_WindChill;
-   private Spinner            _spinWeather_Wind_DirectionValue;
-   private Spinner            _spinWeather_Wind_SpeedValue;
+   private Spinner           _spinPerson_BodyWeight;
+   private Spinner           _spinPerson_Calories;
+   private Spinner           _spinPerson_FTP;
+   private Spinner           _spinPerson_RestPuls;
+   private Spinner           _spinWeather_Humidity;
+   private Spinner           _spinWeather_PrecipitationValue;
+   private Spinner           _spinWeather_PressureValue;
+   private Spinner           _spinWeather_Temperature_Average;
+   private Spinner           _spinWeather_Temperature_Min;
+   private Spinner           _spinWeather_Temperature_Max;
+   private Spinner           _spinWeather_Temperature_WindChill;
+   private Spinner           _spinWeather_Wind_DirectionValue;
+   private Spinner           _spinWeather_Wind_SpeedValue;
    //
-   private Text               _txtAltitudeDown;
-   private Text               _txtAltitudeUp;
-   private Text               _txtDescription;
-   private Text               _txtDistance;
-   private Text               _txtWeather;
+   private Text              _txtAltitudeDown;
+   private Text              _txtAltitudeUp;
+   private Text              _txtDescription;
+   private Text              _txtDistance;
+   private Text              _txtWeather;
    //
-   private TimeDuration       _timeDriving;
-   private TimeDuration       _timePaused;
-   private TimeDuration       _timeRecording;
+   private TimeDuration      _timeDriving;
+   private TimeDuration      _timePaused;
+   private TimeDuration      _timeRecording;
 
-   private Menu               _swimViewer_ContextMenu;
-   private Menu               _timeViewer_ContextMenu;
-   private SelectionChartInfo _lastSelectedChartInfo;
+   private Menu              _swimViewer_ContextMenu;
+   private Menu              _timeViewer_ContextMenu;
 
    private class Action_RemoveSwimStyle extends Action {
 
@@ -4578,6 +4580,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       // with e4 the layouts are not yet set -> NPE's -> run async which worked
       parent.getShell().getDisplay().asyncExec(() -> {
 
+         if (_tab1Container.isDisposed()) {
+
+            // this can occure when view is closed (very early) but not yet visible
+            return;
+         }
+
          // compute width for all controls and equalize column width for the different sections
          _tab1Container.layout(true, true);
          UI.setEqualizeColumWidths(_firstColumnControls);
@@ -4996,7 +5004,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                final SwimSlice swimSlice = (SwimSlice) cell.getElement();
                final short value = _swimSerie_StrokeStyle[swimSlice.serieIndex];
 
-               if (value == Short.MIN_VALUE) {
+               if (value == Short.MIN_VALUE || value == SwimStroke.INVALID.getValue()) {
+
+                  // show nothing instead of "<Invalid Style>"
 
                   cell.setText(UI.EMPTY_STRING);
 
@@ -5469,7 +5479,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     */
    private void defineColumn_TimeSlice_Power() {
 
-      final ColumnDefinition colDef = TableColumnFactory.POWER.createColumn(_timeSlice_ColumnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.POWER_TIME_SLICE.createColumn(_timeSlice_ColumnManager, _pc);
       colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {
@@ -5493,7 +5503,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       ColumnDefinition colDef;
 
-      _timeSlice_ColDef_Cadence = colDef = TableColumnFactory.POWERTRAIN_CADENCE.createColumn(_timeSlice_ColumnManager, _pc);
+      _timeSlice_ColDef_Cadence = colDef = TableColumnFactory.POWERTRAIN_CADENCE_TIME_SLICE.createColumn(_timeSlice_ColumnManager, _pc);
       colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {
@@ -5514,7 +5524,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     */
    private void defineColumn_TimeSlice_Powertrain_GearRatio() {
 
-      final ColumnDefinition colDef = TableColumnFactory.POWERTRAIN_GEAR_RATIO.createColumn(_timeSlice_ColumnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.POWERTRAIN_GEAR_RATIO_TIME_SLICE.createColumn(_timeSlice_ColumnManager, _pc);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -5564,7 +5574,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    }
 
    /**
-    * column: cadence
+    * Column: Paused time
     */
    private void defineColumn_TimeSlice_Time_BreakTime() {
 
@@ -5722,7 +5732,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private void defineColumn_TimeSlice_Weather_Temperature() {
 
       final ColumnDefinition colDef;
-      _timeSlice_ColDef_Temperature = colDef = TableColumnFactory.WEATHER_TEMPERATURE.createColumn(_timeSlice_ColumnManager, _pc);
+      _timeSlice_ColDef_Temperature = colDef = TableColumnFactory.WEATHER_TEMPERATURE_TIME_SLICE.createColumn(_timeSlice_ColumnManager, _pc);
       colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {
@@ -5873,6 +5883,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _firstColumnControls.clear();
       _secondColumnControls.clear();
       _firstColumnContainerControls.clear();
+
+      /*
+       * Tour MUST be set clean otherwise a Ctrl+W whould "close" the tour editor but closing the
+       * app is asking to save the tour!
+       */
+      setTourClean();
 
       super.dispose();
    }
@@ -6245,6 +6261,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    private void enableControls() {
 
+      final Table timeSliceTable = _timeSlice_Viewer.getTable();
+      if (timeSliceTable.isDisposed()) {
+         return;
+      }
+
       final boolean canEdit = _isEditMode && isTourInDb();
       final boolean isManualAndEdit = _isManualTour && canEdit;
       final boolean isDeviceTour = _isManualTour == false;
@@ -6308,7 +6329,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _linkTag.setEnabled(canEdit);
       _linkTourType.setEnabled(canEdit);
 
-      _timeSlice_Viewer.getTable().setEnabled(isDeviceTour);
+      timeSliceTable.setEnabled(isDeviceTour);
    }
 
    private void fillContextMenu_SwimSlice(final IMenuManager menuMgr) {
@@ -6545,9 +6566,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   _tourChart,
                   serieIndex0,
                   serieIndex1,
-                  serieIndex2,
-                  _prefStore.getDefaultBoolean(
-                        ITourbookPreferences.TOGGLE_STATE_SELECT_INBETWEEN_TIME_SLICES));
+                  serieIndex2);
 
             xSliderSelection.setCenterSliderPosition(true);
 
@@ -6850,6 +6869,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    }
 
    private void initUI(final Composite parent) {
+
+      _parent = parent;
 
       _pc = new PixelConverter(parent);
 
@@ -7890,12 +7911,38 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       final Table table = (Table) _timeSlice_Viewer.getControl();
       final int itemCount = table.getItemCount();
 
-      //TODO FB remove this property ??
-      _lastSelectedChartInfo = chartInfo;
-      if (chartInfo.isSelectInBetweenTimeSlices) {
-         final int minSelectedValue = Math.min(chartInfo.leftSliderValuesIndex, chartInfo.rightSliderValuesIndex);
-         final int maxSelectedValue = Math.max(chartInfo.leftSliderValuesIndex, chartInfo.rightSliderValuesIndex);
-         table.setSelection(minSelectedValue, maxSelectedValue);
+      if (_prefStore.getBoolean(
+            ITourbookPreferences.TOGGLE_STATE_SELECT_INBETWEEN_TIME_SLICES)) {
+
+         final int runnableRunningId = _timeSlice_Viewer_RunningId.incrementAndGet();
+
+         // delay the selection of multiple lines, moving the mouse can occur very often
+         _parent.getDisplay().timerExec(50, new Runnable() {
+
+            private int __runningId = runnableRunningId;
+
+            @Override
+            public void run() {
+
+               if (_parent.isDisposed()) {
+                  return;
+               }
+
+               final int currentId = _timeSlice_Viewer_RunningId.get();
+
+               if (__runningId != currentId) {
+
+                  // a newer runnable is created
+
+                  return;
+               }
+
+               final int minSelectedValue = Math.min(chartInfo.leftSliderValuesIndex, chartInfo.rightSliderValuesIndex);
+               final int maxSelectedValue = Math.max(chartInfo.leftSliderValuesIndex, chartInfo.rightSliderValuesIndex);
+               table.setSelection(minSelectedValue, maxSelectedValue);
+            }
+         });
+
       } else {
          // adjust to array bounds
          int valueIndex = chartInfo.selectedSliderValuesIndex;
@@ -7994,6 +8041,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     *           Stroke style, can be <code>null</code> to remove the stroke style
     */
    void setSwimStyle(final StrokeStyle strokeStyle) {
+
+      // check if stroke style data are available
+      if (_swimSerie_StrokeStyle == null) {
+
+         _swimSerie_StrokeStyle = _tourData.swim_StrokeStyle = new short[_swimSerie_Time.length];
+
+         // setup all stroke styles with SwimStroke.INVALID, 0 is the swim stroke for freestyle !!!
+         Arrays.fill(_swimSerie_StrokeStyle, SwimStroke.INVALID.getValue());
+      }
 
       final StructuredSelection selection = (StructuredSelection) _swimSlice_Viewer.getSelection();
 
@@ -8994,6 +9050,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     * Update title of the view with the modified date/time
     */
    private void updateUI_Title() {
+
+      if (_dtTourDate.isDisposed()) {
+         return;
+      }
 
       final ZoneId zoneId = _tourData == null //
             ? TimeTools.getDefaultTimeZone()

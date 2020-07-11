@@ -17,7 +17,6 @@ package net.tourbook.ui.tourChart;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
@@ -343,18 +342,16 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
       _chkShowValuePointTooltip.setSelection(_prefStore.getBoolean(//
             ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE));
 
-      final SelectionChartInfo chartInfo = _tourChart.getChartInfo();
-      _chkSelectAllTimeSlices.setSelection(chartInfo.isSelectInBetweenTimeSlices);
+      _chkSelectAllTimeSlices.setSelection(_prefStore.getBoolean(//
+            ITourbookPreferences.TOGGLE_STATE_SELECT_INBETWEEN_TIME_SLICES));
 
       _gridUI.restoreState();
    }
 
    private void saveState() {
 
-      final SelectionChartInfo chartInfo = _tourChart.getChartInfo();
       final boolean isSelectInBetweenTimeSlices = _chkSelectAllTimeSlices.getSelection();
       _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_SELECT_INBETWEEN_TIME_SLICES, isSelectInBetweenTimeSlices);
-      chartInfo.isSelectInBetweenTimeSlices = isSelectInBetweenTimeSlices;
 
       final TourChartConfiguration tcc = _tourChart.getTourChartConfig();
 

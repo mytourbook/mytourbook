@@ -437,7 +437,7 @@
             category    ="net.tourbook.preferences.PrefPageViews"
          />
 
-  	<!--
+   <!--
          Weather
       -->
       <page
@@ -458,35 +458,42 @@
       <menuContribution locationURI="menu:m_New?after=ci_New">
 
          <command
-            commandId="net.tourbook.command.device.importFromFile"
-            icon="icons/import-get-tours.png"
-            label="%command_device_importFromFile"
-            mnemonic="%command_device_importFromFile_mnemonic"/>
-            
+            commandId   ="net.tourbook.command.device.importFromFile"
+            icon        ="icons/import-get-tours.png"
+            label       ="%command_device_importFromFile"
+            mnemonic    ="%command_device_importFromFile_mnemonic"/>
+
          <command
-            commandId="net.tourbook.command.device.synchronize"
-            icon="icons/device-synchronize.png"
-            label="%Command_Device_ReceiveFromSerialPort_Configured"
-            mnemonic="%Command_Device_ReceiveFromSerialPort_Configured_Mnemonic"
-            tooltip="%Command_Device_ReceiveFromSerialPort_Configured_Tooltip"/>
-            
+            commandId   ="net.tourbook.command.device.synchronize"
+            icon        ="icons/device-synchronize.png"
+            label       ="%Command_Device_ReceiveFromSerialPort_Configured"
+            mnemonic    ="%Command_Device_ReceiveFromSerialPort_Configured_Mnemonic"
+            tooltip     ="%Command_Device_ReceiveFromSerialPort_Configured_Tooltip"/>
+
          <command
-            commandId="net.tourbook.command.device.synchronize.direct"
-            icon="icons/device-synchronize-direct.png"
-            label="%Command_Device_ReceiveFromSerialPort_Directly"
-            mnemonic="%Command_Device_ReceiveFromSerialPort_Directly_Mnemonic"
-            tooltip="%Command_Device_ReceiveFromSerialPort_Directly_Tooltip"/>
-            
+            commandId   ="net.tourbook.command.device.synchronize.direct"
+            icon        ="icons/device-synchronize-direct.png"
+            label       ="%Command_Device_ReceiveFromSerialPort_Directly"
+            mnemonic    ="%Command_Device_ReceiveFromSerialPort_Directly_Mnemonic"
+            tooltip     ="%Command_Device_ReceiveFromSerialPort_Directly_Tooltip"/>
+
          <separator
             name="net.tourbook.separator.new"
             visible="true"/>
-      
+
          <command
             commandId   ="net.tourbook.command.createNewTour"
             icon        ="icons/tour-new.png"
             label       ="%Command_App_CreateNewTour"
             mnemonic    ="%Command_App_CreateNewTour_Mnemonic"/>
             
+         <command
+            commandId   ="net.tourbook.command.App_ClosePart"
+            label       ="%Command_App_ClosePart"
+            mnemonic    ="%Command_App_ClosePart_Mnemonic"
+            tooltip     ="%Command_App_ClosePart_Tooltip"
+         />
+
          <separator
             name        ="net.tourbook.separator.additional"
             visible     ="true"/>
@@ -946,31 +953,29 @@ THIS IS NOT YET FULLY IMPLEMENTED
       <!--
          Important tools are displayed in the app toolbar
       -->
-      
+
       <menuContribution locationURI="toolbar:org.eclipse.ui.main.toolbar">
-      
+
          <toolbar id="mc_tb_TourEditor" label="%Toolbar_Name_Tools">
 
             <command
-               commandId   ="net.tourbook.command.tourDataEditor"
-               icon        ="icons/tour-editor.png"
-               label       ="%command_view_tourEditor"
-               tooltip     ="%command_view_tourEditor_tooltip"
-            />
+               commandId      ="net.tourbook.command.tourDataEditor"
+               icon           ="icons/tour-editor.png"
+               label          ="%command_view_tourEditor"
+               tooltip        ="%command_view_tourEditor_tooltip"/>
 
             <command
-               commandId   ="net.tourbook.command.createNewTour"
-               icon        ="icons/tour-new.png"
-               tooltip     ="%Command_App_CreateNewTour_Tooltip"
-            />
+               commandId      ="net.tourbook.command.createNewTour"
+               icon           ="icons/tour-new.png"
+               tooltip        ="%Command_App_CreateNewTour_Tooltip"/>
 
             <!-- Save Tour -->
             <command
                commandId      ="command.net.tourbook.tour.SaveTour"
                icon           ="icons/save-tour.png"
                disabledIcon   ="icons/save-tour-disabled.png"
-               tooltip        ="%Command_Tour_SaveTour_Tooltip"
-            >
+               tooltip        ="%Command_Tour_SaveTour_Tooltip">
+
                <visibleWhen   checkEnabled="false">
                   <reference  definitionId="net.tourbook.definition.isTourEditorActive"/>
                </visibleWhen>
@@ -979,8 +984,8 @@ THIS IS NOT YET FULLY IMPLEMENTED
             <!-- Restore Tour -->
             <command
                commandId      ="command.net.tourbook.tour.RestoreTour"
-               tooltip        ="%Command_Tour_RestoreTour_Tooltip"
-            >
+               tooltip        ="%Command_Tour_RestoreTour_Tooltip">
+
                <visibleWhen   checkEnabled="false">
                   <reference  definitionId="net.tourbook.definition.isTourEditorActive"/>
                </visibleWhen>
@@ -1356,15 +1361,21 @@ THIS IS NOT YET FULLY IMPLEMENTED
          defaultHandler ="net.tourbook.ui.action.ActionHandlerCreateNewTour"
       />
 
+      <!-- 
+         The trick is to NOT define a "defaultHandler" otherwise 2 handlers are defined which causes an error !
+       -->
+      <command
+         id             ="net.tourbook.command.App_ClosePart"
+         name           ="%Command_App_ClosePart"/>
+
       <command
          id             ="net.tourbook.command.dbTool.consistencyCheck"
          name           ="%command_dbtool_consistency_check"
-         defaultHandler ="net.tourbook.ui.action.ActionHandlerDbConsistencyCheck"
-      />
+         defaultHandler ="net.tourbook.ui.action.ActionHandlerDbConsistencyCheck"/>
 
-      <!-- 
+<!-- 
 
-      THIS IS NOT YET FULLY IMPLEMENTED
+   THIS IS NOT YET FULLY IMPLEMENTED
 
       <command
          id            ="net.tourbook.command.dbTool.CompressDB"
@@ -1372,7 +1383,7 @@ THIS IS NOT YET FULLY IMPLEMENTED
          defaultHandler   ="net.tourbook.ui.action.ActionHandlerDb_CompressDB"
       />
 
-      -->
+-->
 
       <command
          id             ="net.tourbook.command.OpenHomePage"
@@ -1866,8 +1877,8 @@ THIS IS NOT YET FULLY IMPLEMENTED
 
    </extension>
    
-   <extension
-         point="org.eclipse.ui.keywords">
+   
+   <extension  point="org.eclipse.ui.keywords">
 
       <keyword
             id="net.tourbook.keywordReference.PrefPageTour"
@@ -1876,15 +1887,53 @@ THIS IS NOT YET FULLY IMPLEMENTED
 
    </extension>
 
-   <extension
-      point="org.eclipse.ui.bindings">
+
+   <extension  point="org.eclipse.ui.bindings">
 
       <scheme
-         id="net.tourbook.scheme"
-         name="MyTourbook Scheme"
-         parentId="org.eclipse.ui.defaultAcceleratorConfiguration"/>
+         id          ="net.tourbook.scheme"
+         name        ="MyTourbook Scheme"
+         parentId    ="org.eclipse.ui.defaultAcceleratorConfiguration"/>
+
+      <!-- New -->
+
+      <key
+         commandId   ="net.tourbook.command.App_ClosePart"
+         sequence    ="%Shortcut_Key_App_ClosePart"
+         contextId   ="org.eclipse.ui.contexts.window"
+         schemeId    ="net.tourbook.scheme"/>
 
       <!-- Directories -->            
+
+      <key
+         commandId="command.net.tourbook.views.rawData.RawDataView"
+         sequence="%Shortcut_Key_App_TourImport"
+         contextId="org.eclipse.ui.contexts.window"
+         schemeId="net.tourbook.scheme"/>
+
+      <key
+         commandId="command.net.tourbook.views.tourListView"
+         sequence="%Shortcut_Key_App_TourBook"
+         contextId="org.eclipse.ui.contexts.window"
+         schemeId="net.tourbook.scheme"/>
+
+      <key
+         commandId="command.net.tourbook.views.tagViewID"
+         sequence="%Shortcut_Key_App_TaggedTours"
+         contextId="org.eclipse.ui.contexts.window"
+         schemeId="net.tourbook.scheme"/>
+
+      <key
+         commandId="command.net.tourbook.views.tourCatalog.TourCatalogView"
+         sequence="%Shortcut_Key_App_ReferenceTours"
+         contextId="org.eclipse.ui.contexts.window"
+         schemeId="net.tourbook.scheme"/>
+
+      <key
+         commandId="command.net.tourbook.views.collatedToursViewID"
+         sequence="%Shortcut_Key_App_CollatedTours"
+         contextId="org.eclipse.ui.contexts.window"
+         schemeId="net.tourbook.scheme"/>
 
       <key
          commandId="command.net.tourbook.views.calendar.CalendarView"
@@ -1895,6 +1944,12 @@ THIS IS NOT YET FULLY IMPLEMENTED
       <key
          commandId="command.net.tourbook.statistic.StatisticView"
          sequence="%Shortcut_Key_App_Statistic"
+         contextId="org.eclipse.ui.contexts.window"
+         schemeId="net.tourbook.scheme"/>
+
+      <key
+         commandId="command.net.tourbook.ui.views.TourMarkerAllView"
+         sequence="%Shortcut_Key_App_TourMarker"
          contextId="org.eclipse.ui.contexts.window"
          schemeId="net.tourbook.scheme"/>
 
@@ -1975,10 +2030,16 @@ THIS IS NOT YET FULLY IMPLEMENTED
       <!-- Tools -->
    
       <key
-         commandId="command.net.tourbook.search.SearchView"
-         sequence="%Shortcut_Key_App_Search"
-         contextId="org.eclipse.ui.contexts.window"
-         schemeId="net.tourbook.scheme"/>
+         commandId   ="command.net.tourbook.search.SearchView"
+         sequence    ="%Shortcut_Key_App_Search"
+         contextId   ="org.eclipse.ui.contexts.window"
+         schemeId    ="net.tourbook.scheme"/>
+   
+      <key
+         commandId   ="command.de.byteholder.geoclipse.poi.ShowPOI"
+         sequence    ="%Shortcut_Key_App_SearchPlaces"
+         contextId   ="org.eclipse.ui.contexts.window"
+         schemeId    ="net.tourbook.scheme"/>
   
    </extension>
 
@@ -2231,7 +2292,7 @@ THIS IS NOT YET FULLY IMPLEMENTED
          commandId   ="command.net.tourbook.tour.RestoreTour"
          class       ="net.tourbook.commands.RestoreTour_Handler"
       >
-         <!-- enabled/disabled is set in the command hander: net.tourbook.commands.RestoreTour_Handler.isEnabled()
+         <!-- enabled/disabled is set in the command handler: net.tourbook.commands.RestoreTour_Handler.isEnabled()
          
             <enabledWhen>
                <with variable="activePart">
@@ -2240,13 +2301,13 @@ THIS IS NOT YET FULLY IMPLEMENTED
             </enabledWhen>
          -->
      </handler>
-   
+
       <handler
          commandId   ="command.net.tourbook.tour.SaveTour"
          class       ="net.tourbook.commands.SaveTour_Handler"
       >
-         <!-- enabled/disabled is set in the command hander: net.tourbook.commands.SaveTour_Handler.isEnabled()
-         
+         <!-- enabled/disabled is set in the command handler: net.tourbook.commands.SaveTour_Handler.isEnabled()
+
             <enabledWhen>
                <with variable="activePart">
                   <test property="net.tourbook.expression.TourEditor.isDirty"/>
@@ -2254,13 +2315,27 @@ THIS IS NOT YET FULLY IMPLEMENTED
             </enabledWhen>
          -->
      </handler>
-      
+
+      <!-- This handler is enabled when at least one part is opened -->
+      <handler
+            commandId   ="net.tourbook.command.App_ClosePart"
+            class       ="net.tourbook.commands.ClosePart_Handler"
+      >
+         <enabledWhen>
+            <with variable="activePart">
+               <not>
+                  <equals value=""/>
+               </not>
+            </with>
+         </enabledWhen>
+      </handler>
+
    </extension>
-   
+
    <extension point="org.eclipse.core.expressions.definitions">
 
       <!-- Show the save/restore actions only when these parts are active -->
-   
+
       <definition id="net.tourbook.definition.isTourEditorActive">
          <with variable="activePartId">
             <or>

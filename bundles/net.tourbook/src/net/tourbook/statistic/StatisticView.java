@@ -358,15 +358,18 @@ public class StatisticView extends ViewPart implements ITourProvider {
       /*
        * Start async that the workspace is fully initialized with all data filters
        */
-      parent.getDisplay().asyncExec(new Runnable() {
-         @Override
-         public void run() {
+      parent.getDisplay().asyncExec(() -> {
 
-            _activePerson = TourbookPlugin.getActivePerson();
-            _activeTourTypeFilter = TourbookPlugin.getActiveTourTypeFilter();
+         if (_statContainer.isDisposed()) {
 
-            restoreState();
+            // this can occure when view is closed (very early) but not yet visible
+            return;
          }
+
+         _activePerson = TourbookPlugin.getActivePerson();
+         _activeTourTypeFilter = TourbookPlugin.getActiveTourTypeFilter();
+
+         restoreState();
       });
    }
 
@@ -573,7 +576,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
       final int selectedIndex = _comboNumberOfYears.getSelectionIndex();
 
       if (selectedIndex != -1) {
-         numberOfYears = selectedIndex + 1;
+         numberOfYears = Integer.parseInt(_comboNumberOfYears.getItem(selectedIndex));
       }
 
       return numberOfYears;
@@ -804,7 +807,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
       final int defaultYear = Util.getStateInt(_state, STATE_SELECTED_YEAR, -1);
       refreshYearCombobox();
       selectYear(defaultYear);
-      // We trigger the update of  _comboNumberOfYears
+      // We trigger the update of _comboNumberOfYears
       onSelectYear();
 
       // select number of years

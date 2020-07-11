@@ -413,7 +413,7 @@ public class TagMenuManager {
    }
 
    /**
-    * create actions for recenct tags
+    * create actions for recent tags
     */
    private static void setupRecentActions() {
 

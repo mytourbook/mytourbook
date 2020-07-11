@@ -4190,9 +4190,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       final SelectionChartXSliderPosition selectionSliderPosition = new SelectionChartXSliderPosition(
             this,
             xSliderSerieIndexLeft,
-            xSliderSerieIndexRight,
-            _prefStore.getDefaultBoolean(
-                  ITourbookPreferences.TOGGLE_STATE_SELECT_INBETWEEN_TIME_SLICES));
+            xSliderSerieIndexRight);
 
       /*
        * Extend default selection with the segment positions
