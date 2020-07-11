@@ -7938,22 +7938,46 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
                final int minSelectedValue = Math.min(chartInfo.leftSliderValuesIndex, chartInfo.rightSliderValuesIndex);
                final int maxSelectedValue = Math.max(chartInfo.leftSliderValuesIndex, chartInfo.rightSliderValuesIndex);
+
                table.setSelection(minSelectedValue, maxSelectedValue);
+               table.showSelection();
             }
          });
 
       } else {
-         // adjust to array bounds
-         int valueIndex = chartInfo.selectedSliderValuesIndex;
-         valueIndex = Math.max(0, Math.min(valueIndex, itemCount - 1));
 
-         table.setSelection(valueIndex);
+         final int runnableRunningId = _timeSlice_Viewer_RunningId.incrementAndGet();
+
+         // delay the selection of multiple lines, moving the mouse can occur very often
+         _parent.getDisplay().timerExec(20, new Runnable() {
+
+            private int __runningId = runnableRunningId;
+
+            @Override
+            public void run() {
+
+               if (_parent.isDisposed()) {
+                  return;
+               }
+
+               final int currentId = _timeSlice_Viewer_RunningId.get();
+
+               if (__runningId != currentId) {
+
+                  // a newer runnable is created
+
+                  return;
+               }
+
+               // adjust to array bounds
+               int valueIndex = chartInfo.selectedSliderValuesIndex;
+               valueIndex = Math.max(0, Math.min(valueIndex, itemCount - 1));
+
+               table.setSelection(valueIndex);
+               table.showSelection();
+            }
+         });
       }
-
-      table.showSelection();
-
-      // fire slider position
-//    fDataViewer.setSelection(fDataViewer.getSelection());
    }
 
    private void selectTimeSlice(final SelectionChartXSliderPosition sliderPosition) {
