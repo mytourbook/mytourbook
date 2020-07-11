@@ -503,11 +503,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       }
 
       @Override
-      public void updateColumnHeader(final ColumnDefinition colDef) {
-         // TODO Auto-generated method stub
-
-      }
-
+      public void updateColumnHeader(final ColumnDefinition colDef) {}
    }
 
    private class ICContentProvider implements IStructuredContentProvider {
@@ -570,11 +566,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       }
 
       @Override
-      public void updateColumnHeader(final ColumnDefinition colDef) {
-         // TODO Auto-generated method stub
-
-      }
-
+      public void updateColumnHeader(final ColumnDefinition colDef) {}
    }
 
    private class ILContentProvider implements IStructuredContentProvider {
