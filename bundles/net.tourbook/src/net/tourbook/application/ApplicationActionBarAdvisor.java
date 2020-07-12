@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -48,15 +48,14 @@ import org.eclipse.ui.application.IActionBarConfigurer;
  */
 public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
-   private static final String     MENU_CONTRIB_TOOLBAR_APP_FILTER = "mc_tb_AppFilter";            //$NON-NLS-1$
+   private static final String               MENU_CONTRIB_TOOLBAR_APP_FILTER = "mc_tb_AppFilter";            //$NON-NLS-1$
 
-   private static IPreferenceStore _prefStore                      = TourbookPlugin.getPrefStore();
+   private static IPreferenceStore           _prefStore                      = TourbookPlugin.getPrefStore();
 
-   private IWorkbenchWindow        _window;
+   private IWorkbenchWindow                  _window;
 
-   private IWorkbenchAction        _actionPreferences;
+   private IWorkbenchAction                  _actionPreferences;
 
-//   private IWorkbenchAction                  _action_Save;
    private IWorkbenchAction                  _actionAbout;
    private IWorkbenchAction                  _actionQuit;
 

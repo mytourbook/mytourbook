@@ -206,7 +206,7 @@ public class MessageManager implements IMessageManager {
                      ltext = ((CLabel) label).getText();
                   }
                   if (ltext != null) {
-                     if (!ltext.endsWith(":")) {
+                     if (!ltext.endsWith(":")) { //$NON-NLS-1$
                         return ltext + ": "; //$NON-NLS-1$
                      }
                      return ltext + " "; //$NON-NLS-1$

@@ -5556,7 +5556,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
             if (swimSerieStartIndex >= swimSerieSize) {
 
-               // there are no further swim data, this can occure when the last tour(s) have no swim data
+               // there are no further swim data, this can occur when the last tour(s) have no swim data
                break;
             }
 
@@ -5741,7 +5741,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          long lastValidTime = 0;
          long lastValidAbsoluteTime = 0;
 
-         // convert data from the tour format into interger[] arrays
+         // convert data from the tour format into integer[] arrays
          for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
 
             final TimeData timeData = timeDataSerie[serieIndex];
@@ -5919,13 +5919,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       } else {
 
          /*
-          * relativ data is available, these data are NOT from GPS devices
+          * relative data is available, these data are NOT from GPS devices
           */
 
          int distanceAbsolute = 0;
          int altitudeAbsolute = 0;
 
-         // convert data from the tour format into an interger[]
+         // convert data from the tour format into an integer[]
          for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
 
             final TimeData timeData = timeDataSerie[serieIndex];
@@ -6071,7 +6071,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       /*
        * Distance is measured with the gps device and not with a sensor. Remove all distance values
        * which are set but lat/lon is not available, this case can happen when a device is in a
-       * tunnel. Distance values will be interpolited later.
+       * tunnel. Distance values will be interpolated later.
        */
 
       final int size = timeSerie.length;
@@ -6087,7 +6087,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Because of the current algorithm, the first distance value can be <code>0</code> and the other
     * values can be {@link Float#MIN_VALUE}.
     * <p>
-    * When this occures, set all distance values to {@link Float#MIN_VALUE}, that distance values
+    * When this occurs, set all distance values to {@link Float#MIN_VALUE}, that distance values
     * are not recognized.
     */
    private void createTimeSeries_14_RemoveInvalidDistanceValues() {
@@ -6127,7 +6127,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       } else {
 
-         // this case needs more investigation if it occures
+         // this case needs more investigation if it occurs
       }
    }
 
@@ -6294,7 +6294,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
                if (pulseTime != 0) {
 
                   if (pulseTime == 65535) {
-                     // ignore, this value occured in daum data
+                     // ignore, this value occurred in daum data
                   } else {
 
                      pulseTimes.add(pulseTime);
@@ -6378,7 +6378,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       try {
          /*
           * this is the default implementation to create a tour id, but on the 5.5.2007 a
-          * NumberFormatException occured so the calculation for the tour id was adjusted
+          * NumberFormatException occurred so the calculation for the tour id was adjusted
           */
          tourIdKey = Short.toString(startYear)
                + Short.toString(startMonth)
@@ -9805,8 +9805,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
-    * Set tour start yeay/month/day which are used in views, e.g. tourbook view, they are
-    * accessed with sql statements.
+    * Set tour start year/month/day which are used in views, e.g. tourbook view, they are
+    * accessed with SQL statements.
     *
     * @param tourStartTime
     */

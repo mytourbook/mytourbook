@@ -297,6 +297,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             SEGMENTER_REQUIRES_DISTANCE));
 
    }
+
    /**
     * This must be in sync with the columns in the {@link SegmenterComparator}
     */
@@ -314,6 +315,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       _allSortableColumns.add(TableColumnFactory.POWERTRAIN_AVG_CADENCE_ID);
       _allSortableColumns.add(TableColumnFactory.TIME_RECORDING_TIME_ID);
    }
+
    private static final SurfingFilter[] _allSurfingSegmentFilter = new SurfingFilter[] {
 
          new SurfingFilter(SurfingFilterType.All, Messages.Tour_Segmenter_SurfingFilter_All),
@@ -402,7 +404,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    //
    /**
     * contains the controls which are displayed in the first column, these controls are used to get
-    * the maximum width and set the first column within the differenct section to the same width
+    * the maximum width and set the first column within the different section to the same width
     */
    private final ArrayList<Control>       _firstColBreakTime  = new ArrayList<>();
    //
@@ -1287,7 +1289,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             getTourIndices()).simplify();
 
       /*
-       * copie the data index for the simplified points into the tour data
+       * copies the data index for the simplified points into the tour data
        */
 
       final int[] segmentSerieIndex = _tourData.segmentSerieIndex = new int[dpPoints.length];
@@ -1327,7 +1329,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             forcedIndices).simplify();
 
       /*
-       * copie the data index for the simplified points into the tour data
+       * copies the data index for the simplified points into the tour data
        */
 
       int forcedIndex = 0;
@@ -4490,8 +4492,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             final SelectionChartXSliderPosition selectionSliderPosition = new SelectionChartXSliderPosition(
                   _tourChart,
                   serieStartIndex,
-                  serieEndIndex,
-                  true);
+                  serieEndIndex);
 
             /*
              * Extend default selection with the segment positions
@@ -4756,7 +4757,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 //						/*
 //						 * when a tour is saved, the change notification is not fired because
 //						 * another tour is already selected, but to update the tour in a TourViewer,
-//						 * a change nofification must be fired afterwords
+//						 * a change notification must be fired afterwards
 //						 */
 ////				Display.getCurrent().asyncExec(new Runnable() {
 ////					public void run() {
@@ -5673,7 +5674,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
    /**
     * Set the sort column direction indicator for a column or hide indicator when it is not a
-    * sorable column.
+    * sortable column.
     *
     * @param sortColumnId
     * @param isSortableColumn

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -36,6 +36,7 @@ public class SubMenu_Weather extends Action implements IMenuCreator {
    private ActionAdjustTemperature        _action_AdjustTemperature;
    private ActionRetrieveWeatherData      _action_RetrieveWeatherData;
    private ActionComputeMinMaxTemperature _action_ComputeMinMaxTemperature;
+   private SubMenu_SetWeatherConditions   _subMenu_SetWeatherConditions;
 
    private ITourProvider2                 _tourProvider;
 
@@ -50,6 +51,7 @@ public class SubMenu_Weather extends Action implements IMenuCreator {
       _action_AdjustTemperature = new ActionAdjustTemperature(_tourProvider);
       _action_ComputeMinMaxTemperature = new ActionComputeMinMaxTemperature(_tourProvider);
       _action_RetrieveWeatherData = new ActionRetrieveWeatherData(_tourProvider);
+      _subMenu_SetWeatherConditions = new SubMenu_SetWeatherConditions(_tourProvider);
    }
 
    @Override
@@ -66,6 +68,7 @@ public class SubMenu_Weather extends Action implements IMenuCreator {
       new ActionContributionItem(_action_AdjustTemperature).fill(menu, -1);
       new ActionContributionItem(_action_ComputeMinMaxTemperature).fill(menu, -1);
       new ActionContributionItem(_action_RetrieveWeatherData).fill(menu, -1);
+      new ActionContributionItem(_subMenu_SetWeatherConditions).fill(menu, -1);
    }
 
    public ActionRetrieveWeatherData getActionRetrieveWeatherData() {
