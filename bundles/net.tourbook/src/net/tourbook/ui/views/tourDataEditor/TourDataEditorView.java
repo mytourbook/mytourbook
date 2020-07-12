@@ -377,8 +377,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     * contains the tour id from the last selection event
     */
    private Long                               _selectionTourId;
-   //
-   private KeyAdapter                         _keyListener;
    private ModifyListener                     _modifyListener;
    private ModifyListener                     _modifyListener_Temperature;
    private MouseWheelListener                 _mouseWheelListener;
@@ -2871,13 +2869,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             setTourDirty();
          }
       };
-      _keyListener = new KeyAdapter() {
-         @Override
-         public void keyReleased(final KeyEvent e) {
-            onModifyContent();
-         }
-      };
-
+      
       /*
        * listener for recording/driving/paused time
        */
@@ -3248,7 +3240,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   .hint(_hintTextColumnWidth, SWT.DEFAULT)
                   .applyTo(_comboTitle);
 
-            _comboTitle.addKeyListener(_keyListener);
             _comboTitle.addModifyListener(new ModifyListener() {
 
                @Override
@@ -3882,6 +3873,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _spinPerson_FTP.setMaximum(10000);
 
             _spinPerson_FTP.addMouseWheelListener(_mouseWheelListener);
+            _spinPerson_FTP.addSelectionListener(_selectionListener);
 
             // spacer
             _tk.createLabel(container, UI.EMPTY_STRING);
@@ -8185,7 +8177,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
              * rounding errors
              */
 
-            _tourData.setWeatherWindSpeed((int) (_spinWeather_Wind_SpeedValue.getSelection() * _unitValueDistance));
+            _tourData.setWeatherWindSpeed(Math.round((_spinWeather_Wind_SpeedValue.getSelection() * _unitValueDistance)));
          }
 
          final int cloudIndex = _comboWeather_Clouds.getSelectionIndex();
@@ -8623,7 +8615,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       // wind speed
       final int windSpeed = _tourData.getWeatherWindSpeed();
-      final int speed = (int) (windSpeed / _unitValueDistance);
+      final int speed = Math.round(windSpeed / _unitValueDistance);
       _spinWeather_Wind_SpeedValue.setSelection(speed);
       _comboWeather_WindSpeedText.select(getWindSpeedTextIndex(speed));
 
