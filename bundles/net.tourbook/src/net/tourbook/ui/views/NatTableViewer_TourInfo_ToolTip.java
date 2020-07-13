@@ -339,7 +339,14 @@ public class NatTableViewer_TourInfo_ToolTip extends ToolTip implements ITourPro
    @Override
    protected boolean shouldCreateToolTip(final Event event) {
 
+
       if (!super.shouldCreateToolTip(event)) {
+
+         // ensure default tooltip is displayed
+
+// it seems that a default tooltip is not supported in natnable
+//         _ttControl.setToolTipText(null);
+
          return false;
       }
 

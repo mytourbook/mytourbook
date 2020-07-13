@@ -887,7 +887,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
       if (hoveredLabel != null && isTooltipClosing()) {
 
          /**
-          * This case occures when the tooltip is opened but is currently closing and the mouse is
+          * This case occurs when the tooltip is opened but is currently closing and the mouse is
           * moved from the tooltip back to the hovered label.
           * <p>
           * This prevents that when the mouse is over the hovered label but not moved, that the

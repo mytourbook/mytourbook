@@ -282,20 +282,11 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
 
       final TourChartConfiguration tcc = _tourChart.getTourChartConfig();
 
-      final boolean isShowBreaktimeValues = _prefStore.getDefaultBoolean(//
-            ITourbookPreferences.GRAPH_IS_BREAKTIME_VALUES_VISIBLE);
-
-      final boolean isTourStartTime = _prefStore.getDefaultBoolean(//
-            ITourbookPreferences.GRAPH_X_AXIS_STARTTIME);
-
-      final boolean isSrtmDataVisible = _prefStore.getDefaultBoolean(//
-            ITourbookPreferences.GRAPH_X_AXIS_STARTTIME);
-
-      final boolean isShowValuePointTooltip = _prefStore.getDefaultBoolean(//
-            ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE);
-
-      final boolean isSelectInBetweenTimeSlices = _prefStore.getDefaultBoolean(//
-            ITourbookPreferences.TOGGLE_STATE_SELECT_INBETWEEN_TIME_SLICES);
+      final boolean isSelectInBetweenTimeSlices = _prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_IS_SELECT_INBETWEEN_TIME_SLICES);
+      final boolean isShowBreaktimeValues = _prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_IS_BREAKTIME_VALUES_VISIBLE);
+      final boolean isShowValuePointTooltip = _prefStore.getDefaultBoolean(ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE);
+      final boolean isSrtmDataVisible = _prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME);
+      final boolean isTourStartTime = _prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME);
 
       final X_AXIS_START_TIME xAxisStartTime = isTourStartTime
             ? X_AXIS_START_TIME.TOUR_START_TIME
@@ -339,25 +330,20 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
       _chkShowStartTimeOnXAxis.setEnabled(canShowTimeOnXAxis);
       _chkShowStartTimeOnXAxis.setSelection(tcc.xAxisTime == X_AXIS_START_TIME.TOUR_START_TIME);
 
-      _chkShowValuePointTooltip.setSelection(_prefStore.getBoolean(//
-            ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE));
-
-      _chkSelectAllTimeSlices.setSelection(_prefStore.getBoolean(//
-            ITourbookPreferences.TOGGLE_STATE_SELECT_INBETWEEN_TIME_SLICES));
+      _chkShowValuePointTooltip.setSelection(_prefStore.getBoolean(ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE));
+      _chkSelectAllTimeSlices.setSelection(_prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SELECT_INBETWEEN_TIME_SLICES));
 
       _gridUI.restoreState();
    }
 
    private void saveState() {
 
-      final boolean isSelectInBetweenTimeSlices = _chkSelectAllTimeSlices.getSelection();
-      _prefStore.setValue(ITourbookPreferences.TOGGLE_STATE_SELECT_INBETWEEN_TIME_SLICES, isSelectInBetweenTimeSlices);
-
       final TourChartConfiguration tcc = _tourChart.getTourChartConfig();
 
+      final boolean isSelectInBetweenTimeSlices = _chkSelectAllTimeSlices.getSelection();
       final boolean isShowBreaktimeValues = _chkShowBreaktimeValues.getSelection();
-      final boolean isTourStartTime = _chkShowStartTimeOnXAxis.getSelection();
       final boolean isSrtmDataVisible = _chkShowSrtmData.getSelection();
+      final boolean isTourStartTime = _chkShowStartTimeOnXAxis.getSelection();
 
       final X_AXIS_START_TIME xAxisStartTime = isTourStartTime
             ? X_AXIS_START_TIME.TOUR_START_TIME
@@ -367,6 +353,7 @@ public class SlideoutTourChartOptions extends ToolbarSlideout {
        * Update pref store
        */
       _prefStore.setValue(ITourbookPreferences.GRAPH_IS_BREAKTIME_VALUES_VISIBLE, isShowBreaktimeValues);
+      _prefStore.setValue(ITourbookPreferences.GRAPH_IS_SELECT_INBETWEEN_TIME_SLICES, isSelectInBetweenTimeSlices);
       _prefStore.setValue(ITourbookPreferences.GRAPH_IS_SRTM_VISIBLE, isSrtmDataVisible);
       _prefStore.setValue(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME, isTourStartTime);
 

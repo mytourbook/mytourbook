@@ -98,10 +98,6 @@ public class NatTable_DataLoader {
    public ArrayList<ColumnDefinition>                     allSortedColumns;
 
    /**
-    * Number of columns which are visible in the natTable
-    */
-   int                                                    numVisibleColumns;
-   /**
     * Number of all tours for the current lazy loader
     */
    private int                                            _numAllTourItems      = -1;
@@ -175,8 +171,6 @@ public class NatTable_DataLoader {
    private void createColumnHeaderData() {
 
       allSortedColumns = _columnManager.getVisibleAndSortedColumns();
-
-      numVisibleColumns = allSortedColumns.size();
    }
 
    private int[] createRowIndicesFromTourIds(final ArrayList<Long> allRequestedTourIds) {
@@ -246,7 +240,6 @@ public class NatTable_DataLoader {
    }
 
    private int fetchNumberOfTours() {
-
 
       final SQLFilter sqlFilter = new SQLFilter(SQLFilter.TAG_FILTER);
 
@@ -320,6 +313,14 @@ public class NatTable_DataLoader {
       }
 
       return _numAllTourItems;
+   }
+
+   /**
+    * Number of columns which are visible in the natTable
+    */
+   int getNumberOfVisibleColumns() {
+
+      return allSortedColumns.size();
    }
 
    /**
@@ -455,6 +456,7 @@ public class NatTable_DataLoader {
       case TableColumnFactory.POWERTRAIN_CADENCE_MULTIPLIER_ID:                     return "cadenceMultiplier";                   //$NON-NLS-1$
       case TableColumnFactory.POWERTRAIN_GEAR_FRONT_SHIFT_COUNT_ID:                 return "frontShiftCount";                     //$NON-NLS-1$
       case TableColumnFactory.POWERTRAIN_GEAR_REAR_SHIFT_COUNT_ID:                  return "rearShiftCount";                      //$NON-NLS-1$
+      case TableColumnFactory.POWERTRAIN_PEDAL_LEFT_RIGHT_BALANCE_ID:               return "power_PedalLeftRightBalance";         //$NON-NLS-1$
       case TableColumnFactory.POWERTRAIN_SLOW_VS_FAST_CADENCE_PERCENTAGES_ID:       return FIELD_WITHOUT_SORTING;
       case TableColumnFactory.POWERTRAIN_SLOW_VS_FAST_CADENCE_ZONES_DELIMITER_ID:   return FIELD_WITHOUT_SORTING;
 
@@ -535,7 +537,15 @@ public class NatTable_DataLoader {
 
       default:
 
-         // ensure a valid field is returned
+         // ensure a valid field is returned, this case should not happen
+
+         System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] getSqlField()"
+               + "\tsortColumnId: \"" + sortColumnId + "\""
+               + " has not a valid sql field"
+               );
+// TODO remove SYSTEM.OUT.PRINTLN
+
+
          return SQL_DEFAULT_FIELD;
       }
 
