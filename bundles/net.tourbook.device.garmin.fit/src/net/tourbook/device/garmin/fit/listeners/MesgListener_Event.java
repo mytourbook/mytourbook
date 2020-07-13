@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,7 +20,6 @@ import com.garmin.fit.EventMesg;
 import com.garmin.fit.EventMesgListener;
 import com.garmin.fit.EventType;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import net.tourbook.data.GearData;
@@ -32,7 +31,7 @@ import net.tourbook.device.garmin.fit.FitData;
  */
 public class MesgListener_Event extends AbstractMesgListener implements EventMesgListener {
 
-   List<GearData> _gearData;
+   List<GearData>       _gearData;
    List<TourTimerPause> _timerPauses;
 
    public MesgListener_Event(final FitData fitData) {
@@ -40,15 +39,15 @@ public class MesgListener_Event extends AbstractMesgListener implements EventMes
       super(fitData);
 
       _gearData = fitData.getGearData();
-      _timerPauses = new ArrayList<>();
+      _timerPauses = fitData.getTourTimerPauses();
    }
 
    @Override
    public void onMesg(final EventMesg mesg) {
 
       final EventType toto = mesg.getEventType();
-      if (toto != null && (toto == EventType.STOP_ALL ||
-            toto == EventType.STOP)) {
+      if (toto != null && (toto == EventType.STOP_ALL
+            || toto == EventType.STOP)) {
          System.out.println("STOP");
          final DateTime titi = mesg.getTimestamp();
          System.out.println(titi);

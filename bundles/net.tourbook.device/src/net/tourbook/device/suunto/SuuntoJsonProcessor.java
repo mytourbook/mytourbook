@@ -387,7 +387,7 @@ public class SuuntoJsonProcessor {
       tourData.createTimeSeries(_sampleList, true);
 
       if (_timerPauses.size() > 0) {
-         tourData.setTimerPauses(_timerPauses);
+         tourData.setTourTimerPauses(_timerPauses);
       }
 
       tourData.finalizeTour_SwimData(tourData, _allSwimData);

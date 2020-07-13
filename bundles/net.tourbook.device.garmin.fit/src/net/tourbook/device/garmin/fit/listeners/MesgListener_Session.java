@@ -23,17 +23,23 @@ import com.garmin.fit.Sport;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.List;
 
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourTimerPause;
 import net.tourbook.device.garmin.fit.FitData;
 import net.tourbook.device.garmin.fit.FitDataReaderException;
 
 public class MesgListener_Session extends AbstractMesgListener implements SessionMesgListener {
 
+   List<TourTimerPause> _tourTimerPauses;
+
    public MesgListener_Session(final FitData fitData) {
       super(fitData);
+
+      _tourTimerPauses = new ArrayList<>();
    }
 
    @Override
@@ -57,9 +63,28 @@ public class MesgListener_Session extends AbstractMesgListener implements Sessio
 
       final EventType toto = mesg.getEventType();
 
-      if (toto != null && toto == EventType.STOP) {
+      if (toto != null && (toto == EventType.STOP_ALL ||
+            toto == EventType.STOP)) {
          //Get total_timer_time field Units: s Comment: Exclude pauses
-         final float titi = mesg.getTotalTimerTime();
+         //final float titi = mesg.getTotalTimerTime();
+
+         System.out.println("STOP");
+         final DateTime titi = mesg.getTimestamp();
+         System.out.println(titi);
+         //Get total_timer_time field Units: s Comment: Exclude pauses
+
+         final TourTimerPause tata = new TourTimerPause();
+         tata.setStartTime(titi.getTimestamp());
+         _tourTimerPauses.add(tata);
+
+      }
+
+      if (toto != null && toto == EventType.START) {
+         System.out.println("START");
+         final DateTime titi = mesg.getTimestamp();
+         System.out.println(titi);
+         //Get total_timer_time field Units: s Comment: Exclude pauses
+         _tourTimerPauses.stream().findFirst().get().setEndTime(titi.getTimestamp());
 
       }
 

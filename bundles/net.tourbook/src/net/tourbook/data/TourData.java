@@ -9606,13 +9606,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       this.surfing_NumberOfEvents = surfing_NumberOfEvents;
    }
 
-   public void setTimerPauses(final List<TourTimerPause> timerPauses) {
-
-      this.tourTimerPauses = timerPauses;
-
-      this.tourRecordedTime = tourRecordingTime - getTourPausedTime();
-   }
-
    public void setTimeSerieDouble(final double[] timeSerieDouble) {
       this.timeSerieDouble = timeSerieDouble;
    }
@@ -9867,6 +9860,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    public void setTourTags(final Set<TourTag> tourTags) {
       this.tourTags = tourTags;
+   }
+
+   public void setTourTimerPauses(final List<TourTimerPause> timerPauses) {
+
+      this.tourTimerPauses = timerPauses;
+
+      this.tourRecordedTime = tourRecordingTime - getTourPausedTime();
    }
 
    /**

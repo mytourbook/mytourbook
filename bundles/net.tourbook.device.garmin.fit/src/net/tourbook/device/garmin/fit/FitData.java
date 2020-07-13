@@ -33,6 +33,7 @@ import net.tourbook.data.SwimData;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
+import net.tourbook.data.TourTimerPause;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -85,6 +86,7 @@ public class FitData {
    private final List<GearData>    _allGearData          = new ArrayList<>();
    private final List<SwimData>    _allSwimData          = new ArrayList<>();
    private final List<TourMarker>  _allTourMarker        = new ArrayList<>();
+   private final List<TourTimerPause> _tourTimerPauses      = new ArrayList<>();
 
    private TimeData                _current_TimeData;
    private TimeData                _previous_TimeData;
@@ -271,6 +273,10 @@ public class FitData {
          _tourData.finalizeTour_SwimData(_tourData, _allSwimData);
 
          finalizeTour_Type(_tourData);
+
+         if (_tourTimerPauses.size() > 0) {
+            _tourData.setTourTimerPauses(_tourTimerPauses);
+         }
       }
    }
 
@@ -557,6 +563,10 @@ public class FitData {
 
    public TourData getTourData() {
       return _tourData;
+   }
+
+   public List<TourTimerPause> getTourTimerPauses() {
+      return _tourTimerPauses;
    }
 
    public String getTourTitle() {
