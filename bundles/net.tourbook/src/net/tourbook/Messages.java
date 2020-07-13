@@ -227,9 +227,11 @@ public class Messages extends NLS {
 
    public static String        Dialog_ImportConfig_Error_FolderIsInvalid;
 
+   public static String        Dialog_ImportConfig_Group_Dashboard;
    public static String        Dialog_ImportConfig_Group_ImportActions;
    public static String        Dialog_ImportConfig_Group_ImportLauncherConfig;
    public static String        Dialog_ImportConfig_Group_StateTooltip;
+   public static String        Dialog_ImportConfig_Group_Tiles;
 
    public static String        Dialog_ImportConfig_Info_ConfigDragDrop;
    public static String        Dialog_ImportConfig_Info_ImportActions;
@@ -571,6 +573,9 @@ public class Messages extends NLS {
    public static String        Collate_Tours_Label_TooltipHeader_Single;
    public static String        Collate_Tours_Link_SelectTourType;
    public static String        Collate_Tours_Link_SelectTourType_Tooltip;
+
+   public static String        Column_SortInfo_CanNotSort;
+   public static String        Column_SortInfo_CanSort;
 
    public static String        Compare_Result_Action_check_selected_tours;
    public static String        Compare_Result_Action_remove_save_result;

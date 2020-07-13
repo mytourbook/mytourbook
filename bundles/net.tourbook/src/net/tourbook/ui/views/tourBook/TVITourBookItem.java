@@ -434,9 +434,9 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       tourItem.tourMonth               = dbMonth;
       tourItem.tourDay                 = dbDay;
 
-      final long dbDistance            = tourItem.colTourDistance = result.getLong(5);
+      tourItem.colTourDistance         = result.getLong(5);
       tourItem.colTourRecordingTime    = result.getLong(6);
-      final long dbDrivingTime         = tourItem.colTourDrivingTime = result.getLong(7);
+      tourItem.colTourDrivingTime      = result.getLong(7);
       tourItem.colAltitudeUp           = result.getLong(8);
       tourItem.colAltitudeDown         = result.getLong(9);
 
@@ -606,6 +606,8 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             : (Long) tourTypeId);
 
       // compute average speed/pace, prevent divide by 0
+      final long dbDistance = tourItem.colTourDistance;
+      final long dbDrivingTime = tourItem.colTourDrivingTime;
       tourItem.colAvgSpeed = dbDrivingTime == 0 ? 0 : 3.6f * dbDistance / dbDrivingTime;
       tourItem.colAvgPace = dbDistance == 0 ? 0 : dbDrivingTime * 1000 / dbDistance;
 
@@ -628,8 +630,8 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
       // VERY IMPORTANT !
       // Note that we don't do an AVG(avgAltitudeChange) as it would return wrong results.
-      // Indeed, we can't do an mean average as we need to do a distance-weighted average.
-      colAltitude_AvgChange  = colTourDistance <= 0 ? 0 : (colAltitudeUp + colAltitudeDown) / (colTourDistance / 1000f);
+      // Indeed, we can't do a mean average as we need to do a distance-weighted average.
+      colAltitude_AvgChange            = colTourDistance <= 0 ? 0 : (colAltitudeUp + colAltitudeDown) / (colTourDistance / 1000f);
 
       colCounter                       = result.getLong(startIndex + 5);
 
