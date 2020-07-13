@@ -112,6 +112,7 @@ public class MesgListener_Session extends AbstractMesgListener implements Sessio
       final Float totalTimerTime = mesg.getTotalTimerTime();
       if (totalTimerTime != null) {
          tourData.setTourDrivingTime(Math.round(totalTimerTime));
+         tourData.setTourRecordedTime(Math.round(totalTimerTime));
       }
 
       // -----------------------POWER -----------------------

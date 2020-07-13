@@ -1251,7 +1251,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private int[]              segmentSerie_Time_Break;
    @Transient
    private float[]            segmentSerie_Distance_Diff;
-
    @Transient
    private float[]            segmentSerie_Distance_Total;
    @Transient
@@ -8382,13 +8381,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    public int getTourPausedTime() {
-      if (tourTimerPauses == null) {
-         return 0;
+      if (tourTimerPauses != null && tourTimerPauses.size() > 0) {
+
+         final long pausedTime = tourTimerPauses.stream().mapToLong(TourTimerPause::getPauseDuration).sum();
+
+         return (int) (pausedTime / 1000);
       }
 
-      final long pausedTime = tourTimerPauses.stream().mapToLong(TourTimerPause::getPauseDuration).sum();
-
-      return (int) (pausedTime / 1000);
+      return (int) (tourRecordingTime - tourRecordedTime);
    }
 
    /**
@@ -9751,6 +9751,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       numberOfPhotos = tourPhotos.size();
 
       computePhotoTimeAdjustment();
+   }
+
+   public void setTourRecordedTime(final long tourRecordedTime) {
+      this.tourRecordedTime = tourRecordedTime;
    }
 
    /**
