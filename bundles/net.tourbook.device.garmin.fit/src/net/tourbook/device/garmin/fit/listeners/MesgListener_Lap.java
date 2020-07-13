@@ -16,7 +16,6 @@
 package net.tourbook.device.garmin.fit.listeners;
 
 import com.garmin.fit.DateTime;
-import com.garmin.fit.EventType;
 import com.garmin.fit.LapMesg;
 import com.garmin.fit.LapMesgListener;
 import com.garmin.fit.Mesg;
@@ -47,13 +46,6 @@ public class MesgListener_Lap extends AbstractMesgListener implements LapMesgLis
    @Override
    public void onMesg(final LapMesg lapMesg) {
 
-      final EventType toto = lapMesg.getEventType();
-
-      if (toto != null && toto == EventType.START) {
-         final float titi = lapMesg.getTotalElapsedTime();
-         //Get total_timer_time field Units: s Comment: Exclude pauses
-
-      }
       fitData.onSetup_Lap_10_Initialize();
       {
          setMarker(lapMesg);
