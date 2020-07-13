@@ -99,6 +99,9 @@ Fixes
 
 * Easy Import (Frederic)
   - When importing files, the tour type is set only if it is checked in the launcher configuration
+
+* Tour Filter (Frederic)
+  - When filtering on start dates, the filters "Greater Than or Equal", "Less than", "Equals", "Not Equals" were not working
  
    
 Translation    

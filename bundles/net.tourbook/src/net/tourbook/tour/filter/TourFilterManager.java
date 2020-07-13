@@ -704,7 +704,7 @@ public class TourFilterManager {
             // skip all events which has not yet been executed
             if (__runnableCounter != _fireEventCounter[0]) {
 
-               // a new event occured
+               // a new event occurred
                return;
             }
 
@@ -1054,31 +1054,32 @@ public class TourFilterManager {
                                                        final ArrayList<Object> sqlParameters,
                                                        final TourFilterFieldOperator fieldOperator,
                                                        final String sqlField,
-                                                       Long value1,
+                                                       final Long value1,
                                                        final Long value2) {
 
       switch (fieldOperator) {
       case LESS_THAN:
-         getSQL_LessThan(sqlWhere, sqlParameters, sqlField, value1);
+         getSQL_LessThan(sqlWhere, sqlParameters, sqlField, value1, OP_AND);
          break;
       case LESS_THAN_OR_EQUAL:
-         value1 += 86400_000;
-         getSQL_LessThanOrEqual(sqlWhere, sqlParameters, sqlField, value1);
+         //To be less than or equal, we include the next day (i.e.: + 86400_000)
+         getSQL_LessThanOrEqual(sqlWhere, sqlParameters, sqlField, value1 + 86400_000);
          break;
 
       case GREATER_THAN:
-         value1 += 86400_000;
-         getSQL_GreaterThan(sqlWhere, sqlParameters, sqlField, value1);
+         //To be greater than, we go to the next day (i.e.: + 86400_000)
+         getSQL_GreaterThan(sqlWhere, sqlParameters, sqlField, value1 + 86400_000, OP_AND);
          break;
       case GREATER_THAN_OR_EQUAL:
          getSQL_GreaterThanOrEqual(sqlWhere, sqlParameters, sqlField, value1);
          break;
 
       case EQUALS:
-         getSQL_Equals(sqlWhere, sqlParameters, sqlField, value1, true);
+         getSQL_GreaterThanOrEqual(sqlWhere, sqlParameters, sqlField, value1);
+         getSQL_LessThanOrEqual(sqlWhere, sqlParameters, sqlField, value1 + 86400_000);
          break;
       case NOT_EQUALS:
-         getSQL_Equals(sqlWhere, sqlParameters, sqlField, value1, false);
+         getSQL_Between(sqlWhere, sqlParameters, sqlField, value1, value1 + 86400_000, false);
          break;
 
       case BETWEEN:
@@ -1100,14 +1101,14 @@ public class TourFilterManager {
 
       switch (fieldOperator) {
       case LESS_THAN:
-         getSQL_LessThan(sqlWhere, sqlParameters, sqlField, value1);
+         getSQL_LessThan(sqlWhere, sqlParameters, sqlField, value1, OP_AND);
          break;
       case LESS_THAN_OR_EQUAL:
          getSQL_LessThanOrEqual(sqlWhere, sqlParameters, sqlField, value1);
          break;
 
       case GREATER_THAN:
-         getSQL_GreaterThan(sqlWhere, sqlParameters, sqlField, value1);
+         getSQL_GreaterThan(sqlWhere, sqlParameters, sqlField, value1, OP_AND);
          break;
       case GREATER_THAN_OR_EQUAL:
          getSQL_GreaterThanOrEqual(sqlWhere, sqlParameters, sqlField, value1);
@@ -1363,12 +1364,21 @@ public class TourFilterManager {
       sqlParameters.add(value1);
    }
 
+   /**
+    * @param sqlWhere
+    * @param sqlParameters
+    * @param sqlField
+    * @param value1
+    * @param operand
+    *           The type of operand: either {@link #OP_AND} or {@link #OP_OR}
+    */
    private static void getSQL_GreaterThan(final StringBuilder sqlWhere,
                                           final ArrayList<Object> sqlParameters,
                                           final String sqlField,
-                                          final Object value1) {
+                                          final Object value1,
+                                          final String operand) {
 
-      sqlWhere.append(OP_AND + sqlField + OP_GREATER_THAN);
+      sqlWhere.append(operand + sqlField + OP_GREATER_THAN);
       sqlParameters.add(value1);
    }
 
@@ -1381,12 +1391,21 @@ public class TourFilterManager {
       sqlParameters.add(value1);
    }
 
+   /**
+    * @param sqlWhere
+    * @param sqlParameters
+    * @param sqlField
+    * @param value1
+    * @param operand
+    *           The type of operand: either {@link #OP_AND} or {@link #OP_OR}
+    */
    private static void getSQL_LessThan(final StringBuilder sqlWhere,
                                        final ArrayList<Object> sqlParameters,
                                        final String sqlField,
-                                       final Object value1) {
+                                       final Object value1,
+                                       final String operand) {
 
-      sqlWhere.append(OP_AND + sqlField + OP_LESS_THAN);
+      sqlWhere.append(operand + sqlField + OP_LESS_THAN);
       sqlParameters.add(value1);
    }
 
