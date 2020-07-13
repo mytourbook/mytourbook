@@ -761,7 +761,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
          if (event instanceof ColumnReorderEvent) {
 
-            _tourViewer_NatTable.getDisplay().asyncExec(() -> {
+            _parent.getDisplay().asyncExec(() -> {
 
 //               // update MT column manager with the reordered columns
 //               _columnManager_NatTable.setVisibleColumnIds_FromViewer();
@@ -2150,8 +2150,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
    private void natTable_ContextMenu_OnShow(final IMenuManager manager) {
 
-// TODO _tourInfoToolTip_NatTable.hideToolTip();
-
       final Set<Range> allSelectedRowPositions = getNatTable_SelectionModel().getSelectedRowPositions();
 
       final int numSelectedRows = allSelectedRowPositions.size();
@@ -2264,8 +2262,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          final int numVisibleRows = _natTable_Body_ViewportLayer.getRowCount();
          final int scrollableRowCenterPosition = numVisibleRows / 2;
 
-         final ArrayList<SortDirectionEnum> sortDirection = _natTable_DataLoader.getSortDirections();
-         final String[] sortColumnId = _natTable_DataLoader.getSortColumnIds();
+//         final ArrayList<SortDirectionEnum> sortDirection = _natTable_DataLoader.getSortDirections();
+//         final String[] sortColumnId = _natTable_DataLoader.getSortColumnIds();
 
 //         System.out.println((System.currentTimeMillis() + " " + sortColumnId));
 //         // TODO remove SYSTEM.OUT.PRINTLN
@@ -2322,7 +2320,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
          final String sqlField = _natTable_DataLoader.getSqlField(colDef.getColumnId());
 
-         boolean canSortColumn = NatTable_DataLoader.FIELD_WITHOUT_SORTING.equals(sqlField) == false;
+         final boolean canSortColumn = NatTable_DataLoader.FIELD_WITHOUT_SORTING.equals(sqlField) == false;
          colDef.setCanSortColumn(canSortColumn);
       }
    }
@@ -3113,7 +3111,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          return;
       }
 
-      Display.getDefault().asyncExec(() -> {
+      _parent.getDisplay().asyncExec(() -> {
+
+         _tourViewer_NatTable.setFocus();
 
          // sort rows ascending
          Arrays.sort(allRowPositions);

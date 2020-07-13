@@ -223,6 +223,8 @@ public class DialogModifyColumns extends TrayDialog {
       // copy all defined columns into the dialog columns
       _columnViewerModel = cloneAllColumns(false);
 
+      updateProfileModel_From_Model(_columnViewerModel);
+
       setupColumnsInColumnViewer();
    }
 
@@ -243,10 +245,10 @@ public class DialogModifyColumns extends TrayDialog {
          colDef.setIsColumnChecked(true);
       }
 
-      updateModel();
-
       // update UI
       _columnViewer.setAllChecked(true);
+
+      updateProfileModel_From_ColumnViewer();
 
       updateUI_ProfileViewer();
    }
@@ -260,7 +262,7 @@ public class DialogModifyColumns extends TrayDialog {
       // update Model
       _columnViewerModel = cloneAllColumns(true);
 
-      updateModel();
+      updateProfileModel_From_Model(_columnViewerModel);
 
       // update UI
       setupColumnsInColumnViewer();
@@ -283,7 +285,7 @@ public class DialogModifyColumns extends TrayDialog {
          }
       }
 
-      updateModel();
+      updateProfileModel_From_Model(_columnViewerModel);
 
       // update UI
       _columnViewer.setCheckedElements(checkedElements.toArray());
@@ -306,15 +308,9 @@ public class DialogModifyColumns extends TrayDialog {
          return;
       }
 
-      updateModel();
-
       /*
        * Create new profile
        */
-
-      // create default columns for a new profile
-      _columnViewerModel = cloneAllColumns(true);
-
       final ColumnProfile newProfile = new ColumnProfile();
 
       // set profile name
@@ -324,6 +320,11 @@ public class DialogModifyColumns extends TrayDialog {
       _dialog_Profiles.add(newProfile);
       _selectedProfile = newProfile;
 
+      // create columns for a new profile by copying current selected columns
+      _columnViewerModel = cloneAllColumns(false);
+
+      updateProfileModel_From_Model(_columnViewerModel);
+
       // update UI
       _profileViewer.add(newProfile);
 
@@ -331,6 +332,9 @@ public class DialogModifyColumns extends TrayDialog {
 
       // force that horizontal scrollbar is NOT visible
       _uiContainer.layout(true, true);
+
+      // show number of columns in the profile viewer
+      updateUI_ProfileViewer();
 
       enableProfileActions();
 
@@ -947,7 +951,7 @@ public class DialogModifyColumns extends TrayDialog {
             }
 
             // save columns in profile
-            updateModel();
+            updateProfileModel_From_ColumnViewer();
          }
       });
 
@@ -1306,7 +1310,7 @@ public class DialogModifyColumns extends TrayDialog {
        * This column CANNOT be the first column because it would contain the checkbox, but with the
        * reorder feature this column is set as first column :-)
        */
-      defineColumn_Category(tableLayout);
+      defineColumn_99_Category(tableLayout);
    }
 
    /**
@@ -1354,7 +1358,7 @@ public class DialogModifyColumns extends TrayDialog {
             setColor(cell, colDef);
          }
       });
-      tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(20), true));
+      tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(16), true));
    }
 
    /**
@@ -1378,7 +1382,7 @@ public class DialogModifyColumns extends TrayDialog {
             setColor(cell, colDef);
          }
       });
-      tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(14), true));
+      tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(12), true));
    }
 
    /**
@@ -1478,7 +1482,7 @@ public class DialogModifyColumns extends TrayDialog {
    /**
     * Column: Category
     */
-   private void defineColumn_Category(final TableColumnLayout tableLayout) {
+   private void defineColumn_99_Category(final TableColumnLayout tableLayout) {
 
       if (_isCategoryAvailable) {
 
@@ -1664,7 +1668,7 @@ public class DialogModifyColumns extends TrayDialog {
       }
 
       // keep previous selected columns
-      updateModel();
+      updateProfileModel_From_ColumnViewer();
 
       _selectedProfile = selectedProfile;
 
@@ -1725,7 +1729,7 @@ public class DialogModifyColumns extends TrayDialog {
 
    private void saveState() {
 
-      updateModel();
+      updateProfileModel_From_ColumnViewer();
 
       // replace column mgr profiles
       _columnMgr_Profiles.clear();
@@ -1762,20 +1766,27 @@ public class DialogModifyColumns extends TrayDialog {
 
    private void setupColumnsInColumnViewer() {
 
-      // load columns into the viewer
-      _columnViewer.setInput(new Object[0]);
+      // run async because displaying the column table it is soooo slow, with async it seems also to be faster
+      _columnViewer.getTable().getDisplay().asyncExec(() -> {
 
-      // check columns
-      final ArrayList<ColumnDefinition> checkedColumns = new ArrayList<>();
+         // load columns into the viewer
+         _columnViewer.setInput(new Object[0]);
 
-      for (final ColumnDefinition colDef : _columnViewerModel) {
-         if (colDef.isColumnCheckedInContextMenu()) {
-            checkedColumns.add(colDef);
+         // check columns
+         final ArrayList<ColumnDefinition> checkedColumns = new ArrayList<>();
+
+         for (final ColumnDefinition colDef : _columnViewerModel) {
+            if (colDef.isColumnCheckedInContextMenu()) {
+               checkedColumns.add(colDef);
+            }
          }
-      }
-      _columnViewer.setCheckedElements(checkedColumns.toArray());
+         _columnViewer.setCheckedElements(checkedColumns.toArray());
 
-      enableUpDownActions();
+         enableUpDownActions();
+
+         // force that horizontal scrollbar is NOT visible
+         _uiContainer.layout(true, true);
+      });
    }
 
    private void sortDialogProfiles() {
@@ -1792,7 +1803,7 @@ public class DialogModifyColumns extends TrayDialog {
     * Set {@link ColumnProfile#visibleColumnIds} from the current column viewer into the current
     * profile.
     */
-   private void updateModel() {
+   private void updateProfileModel_From_ColumnViewer() {
 
       // update profile
       _columnManager.setVisibleColumnIds_FromModifyDialog(
@@ -1819,6 +1830,34 @@ public class DialogModifyColumns extends TrayDialog {
       }
    }
 
+   private void updateProfileModel_From_Model(final ArrayList<ColumnDefinition> columnViewerModel) {
+
+      // update profile
+      _columnManager.setVisibleColumnIds_FromModel(_selectedProfile, columnViewerModel);
+
+      /*
+       * Update value formats from the model
+       */
+      for (final ColumnDefinition colDef : _columnViewerModel) {
+
+         final String columnId = colDef.getColumnId();
+
+         for (final ColumnProperties columnProperties : _selectedProfile.columnProperties) {
+
+            if (columnId.equals(columnProperties.columnId)) {
+
+               columnProperties.valueFormat_Category = colDef.getValueFormat_Category();
+               columnProperties.valueFormat_Detail = colDef.getValueFormat_Detail();
+
+               break;
+            }
+         }
+      }
+   }
+
+   /**
+    * Update current profile in the profile viewer to show modified number of columns
+    */
    private void updateUI_ProfileViewer() {
 
       // run async otherwise it is displayed by the next checkbox change
