@@ -203,6 +203,10 @@ public class Suunto2SAXHandler extends DefaultHandler {
 
          endElement_InPause(name);
 
+      } else if (_isInEvents) {
+
+         // Nothing to do
+
       } else if (_isInRootSamples) {
 
          endElement_InSamples(name);
@@ -277,10 +281,12 @@ public class Suunto2SAXHandler extends DefaultHandler {
          final String stateValue = _characters.toString();
 
          if (stateValue.equalsIgnoreCase(Boolean.TRUE.toString())) {
+
             final TourTimerPause tourTimerPause = new TourTimerPause();
             tourTimerPause.setStartTime(_currentTime);
 
             _tourTimerPauses.add(tourTimerPause);
+
          } else if (stateValue.equalsIgnoreCase(Boolean.FALSE.toString())) {
 
             if (_tourTimerPauses.size() == 0) {
@@ -288,6 +294,7 @@ public class Suunto2SAXHandler extends DefaultHandler {
             }
 
             _tourTimerPauses.get(_tourTimerPauses.size() - 1).setEndTime(_currentTime);
+
          }
       }
 
