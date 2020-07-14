@@ -539,12 +539,10 @@ public class NatTable_DataLoader {
 
          // ensure a valid field is returned, this case should not happen
 
-         System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] getSqlField()"
-               + "\tsortColumnId: \"" + sortColumnId + "\""
-               + " has not a valid sql field"
+         System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] getSqlField()" //$NON-NLS-1$ //$NON-NLS-2$
+               + "\tsortColumnId: \"" + sortColumnId + "\"" //$NON-NLS-1$ //$NON-NLS-2$
+               + " has not a valid sql field" //$NON-NLS-1$
                );
-// TODO remove SYSTEM.OUT.PRINTLN
-
 
          return SQL_DEFAULT_FIELD;
       }

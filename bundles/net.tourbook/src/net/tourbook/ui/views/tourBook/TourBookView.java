@@ -1868,6 +1868,10 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       return _columnManager_NatTable;
    }
 
+   public NatTable_DataLoader getNatTable_DataLoader() {
+      return _natTable_DataLoader;
+   }
+
    public TourRowDataProvider getNatTable_DataProvider() {
       return _natTable_DataProvider;
    }
@@ -2018,7 +2022,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       final ArrayList<TourData> selectedTourData = new ArrayList<>();
 
-      BusyIndicator.showWhile(Display.getCurrent(), () -> {
+      BusyIndicator.showWhile(_pageBook.getDisplay(), () -> {
          TourManager.loadTourData(new ArrayList<>(tourIds), selectedTourData, false);
       });
 
@@ -2081,6 +2085,14 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private void initUI(final Composite parent) {
 
       _pc = new PixelConverter(parent);
+   }
+
+   /**
+    * @return Returns <code>true</code> when tourbook view displays the flat table, otherwise the
+    *         tree.
+    */
+   public boolean isLayoutNatTable() {
+      return _isLayoutNatTable;
    }
 
    boolean isShowSummaryRow() {
@@ -2199,7 +2211,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          selectTours_NatTable(new int[] { hoveredRow }, true, false);
 
          // show context menu again
-         Display.getDefault().timerExec(10, () -> {
+         _pageBook.getDisplay().timerExec(10, () -> {
             UI.openContextMenu(_tourViewer_NatTable);
          });
 
@@ -2220,7 +2232,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
          // move selected tour into view
 
-         Display.getDefault().timerExec(1, () -> {
+         _pageBook.getDisplay().timerExec(1, () -> {
             natTable_ScrollSelectedToursIntoView();
          });
       }
@@ -3104,7 +3116,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     *           provided tours will be added to the existing selection.
     * @param isScrollIntoView
     */
-   private void selectTours_NatTable(final int[] allRowPositions, final boolean isClearSelection, final boolean isScrollIntoView) {
+   void selectTours_NatTable(final int[] allRowPositions, final boolean isClearSelection, final boolean isScrollIntoView) {
 
       // ensure there is something to be selected
       if (allRowPositions == null || allRowPositions.length == 0 || allRowPositions[0] == -1) {
