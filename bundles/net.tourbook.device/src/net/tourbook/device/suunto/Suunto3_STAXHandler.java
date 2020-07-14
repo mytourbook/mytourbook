@@ -306,6 +306,8 @@ public class Suunto3_STAXHandler {
    }
 
    private void finalizeTour_TimerPauses(final TourData tourData) {
+
+      //TODO FB this function is duplicatd, where to put it to be a shared function ?
       if (_tourTimerPauses.size() == 0) {
          return;
       }
