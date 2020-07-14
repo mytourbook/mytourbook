@@ -1,6 +1,6 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
@@ -20,6 +20,7 @@ import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.TimeZone;
 
 import javax.xml.stream.FactoryConfigurationError;
@@ -37,6 +38,7 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourTimerPause;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.tour.TourManager;
 
@@ -88,7 +90,9 @@ public class Suunto3_STAXHandler {
    private static final String TAG_SAMPLE_LAP               = "Lap";              //$NON-NLS-1$
    private static final String TAG_SAMPLE_LATITUDE          = "Latitude";         //$NON-NLS-1$
    private static final String TAG_SAMPLE_LONGITUDE         = "Longitude";        //$NON-NLS-1$
+   private static final String TAG_SAMPLE_PAUSE             = "Pause";            //$NON-NLS-1$
    private static final String TAG_SAMPLE_PERFORMANCE_LEVEL = "PerformanceLevel"; //$NON-NLS-1$
+   private static final String TAG_SAMPLE_STATE             = "State";            //$NON-NLS-1$
    private static final String TAG_SAMPLE_TEMPERATURE       = "Temperature";      //$NON-NLS-1$
    private static final String TAG_SAMPLE_TIME              = "Time";             //$NON-NLS-1$
    private static final String TAG_SAMPLE_TYPE              = "SampleType";       //$NON-NLS-1$
@@ -107,42 +111,44 @@ public class Suunto3_STAXHandler {
       // is the actual recorded local time.
    }
    //
-   private HashMap<Long, TourData> _alreadyImportedTours;
-   private HashMap<Long, TourData> _newlyImportedTours;
-   private TourbookDevice          _device;
-   private String                  _importFilePath;
+   private HashMap<Long, TourData>   _alreadyImportedTours;
+   private HashMap<Long, TourData>   _newlyImportedTours;
+   private TourbookDevice            _device;
+   private String                    _importFilePath;
    //
-   private TimeData                _sampleData;
+   private TimeData                  _sampleData;
 
-   private ArrayList<TimeData>     _sampleList = new ArrayList<>();
-   private TimeData                _gpsData;
+   private ArrayList<TimeData>       _sampleList      = new ArrayList<>();
+   private TimeData                  _gpsData;
 
-   private ArrayList<TimeData>     _gpsList    = new ArrayList<>();
-   private TimeData                _markerData;
+   private ArrayList<TimeData>       _gpsList         = new ArrayList<>();
+   private TimeData                  _markerData;
 
-   private ArrayList<TimeData>     _markerList = new ArrayList<>();
+   private ArrayList<TimeData>       _markerList      = new ArrayList<>();
 
-   private boolean                 _isImported;
-   private String                  _currentSampleType;
-   private long                    _currentUtcTime;
-   private long                    _currentTime;
+   private ArrayList<TourTimerPause> _tourTimerPauses = new ArrayList<>();
 
-   private long                    _prevSampleTime;
+   private boolean                   _isImported;
+   private String                    _currentSampleType;
+   private long                      _currentUtcTime;
+   private long                      _currentTime;
 
-   private boolean                 _isInEvents;
+   private long                      _prevSampleTime;
 
-   private float                   _tourPeakTrainingEffect;
-   private float                   _tourPerformanceLevel;
+   private boolean                   _isInEvents;
 
-   private int                     _tourCalories;
+   private float                     _tourPeakTrainingEffect;
+   private float                     _tourPerformanceLevel;
+
+   private int                       _tourCalories;
 
    /**
     * This time is used when a time is not available.
     */
-   private long                    _tourStartTime;
-   private String                  _tourDeviceSW;
+   private long                      _tourStartTime;
+   private String                    _tourDeviceSW;
 
-   private String                  _tourDeviceName;
+   private String                    _tourDeviceName;
 
    public Suunto3_STAXHandler(final TourbookDevice deviceDataReader,
                               final String importFilePath,
@@ -162,6 +168,7 @@ public class Suunto3_STAXHandler {
       _sampleList.clear();
       _gpsList.clear();
       _markerList.clear();
+      _tourTimerPauses.clear();
    }
 
    private void finalizeSample() {
@@ -275,6 +282,8 @@ public class Suunto3_STAXHandler {
 
       tourData.createTimeSeries(_sampleList, true);
 
+      finalizeTour_TimerPauses(tourData);
+
       setDistanceSerie(tourData);
 
       // after all data are added, the tour id can be created
@@ -294,6 +303,22 @@ public class Suunto3_STAXHandler {
       }
 
       _isImported = true;
+   }
+
+   private void finalizeTour_TimerPauses(final TourData tourData) {
+      if (_tourTimerPauses.size() == 0) {
+         return;
+      }
+
+      final List<TourTimerPause> _finalTourtimerPauses = new ArrayList<>();
+
+      for (final TourTimerPause tourTimerPause : _tourTimerPauses) {
+         if (tourTimerPause.getStartTime() > 0 && tourTimerPause.getEndTime() > 0) {
+            _finalTourtimerPauses.add(tourTimerPause);
+         }
+      }
+
+      tourData.setTourTimerPauses(_finalTourtimerPauses);
    }
 
    /**
@@ -538,6 +563,7 @@ public class Suunto3_STAXHandler {
 
             case TAG_SAMPLE_EVENTS:
                _isInEvents = true;
+               parseXML_36_Events(eventReader);
                break;
 
             case TAG_SAMPLE_DISTANCE:
@@ -634,6 +660,90 @@ public class Suunto3_STAXHandler {
             case TAG_SAMPLE:
                finalizeSample();
                return;
+            }
+         }
+      }
+   }
+
+   private void parseXML_36_Events(final XMLEventReader eventReader) throws XMLStreamException {
+
+      while (eventReader.hasNext()) {
+
+         final XMLEvent xmlEvent = eventReader.nextEvent();
+
+         if (xmlEvent.isStartElement()) {
+
+            final StartElement startElement = xmlEvent.asStartElement();
+            final String elementName = startElement.getName().getLocalPart();
+
+            switch (elementName) {
+            case TAG_SAMPLE_PAUSE:
+               parseXML_37_Pause(eventReader);
+               break;
+
+            }
+         }
+
+         if (xmlEvent.isEndElement()) {
+
+            final String elementName = xmlEvent.asEndElement().getName().getLocalPart();
+
+            if (TAG_SAMPLE_EVENTS.equals(elementName)) {
+
+               // </Events>
+
+               break;
+            }
+         }
+      }
+   }
+
+   private void parseXML_37_Pause(final XMLEventReader eventReader) throws XMLStreamException {
+
+      String data;
+
+      while (eventReader.hasNext()) {
+
+         final XMLEvent xmlEvent = eventReader.nextEvent();
+
+         if (xmlEvent.isStartElement()) {
+
+            final String elementName = xmlEvent.asStartElement().getName().getLocalPart();
+
+            switch (elementName) {
+            case TAG_SAMPLE_STATE:
+               data = ((Characters) eventReader.nextEvent()).getData();
+
+               if (data.equalsIgnoreCase(Boolean.TRUE.toString())) {
+
+                  final TourTimerPause tourTimerPause = new TourTimerPause();
+                  tourTimerPause.setStartTime(_currentUtcTime);
+
+                  _tourTimerPauses.add(tourTimerPause);
+
+               } else if (data.equalsIgnoreCase(Boolean.FALSE.toString())) {
+
+                  if (_tourTimerPauses.size() == 0) {
+                     return;
+                  }
+
+                  _tourTimerPauses.get(_tourTimerPauses.size() - 1).setEndTime(_currentUtcTime);
+
+               }
+               break;
+
+            }
+         }
+
+         if (xmlEvent.isEndElement()) {
+
+            final String elementName = xmlEvent.asEndElement().getName().getLocalPart();
+
+            if (TAG_SAMPLE_PAUSE.equals(elementName)) {
+
+               // </Pause>
+
+               break;
             }
          }
       }
