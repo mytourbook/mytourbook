@@ -223,7 +223,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    //TODO FB : Trying to address this request : https://sourceforge.net/p/mytourbook/discussion/622811/thread/17da3fb19f/
    // Do the following formats :
    // DONE BUT TO CHECK WITH MULTIPLE FILES: FIT
-   // Ambit2 xml
+   // DONE BUT TO CHECK WITH MULTIPLE FILES: Ambit2 xml
    // Ambit 2 sml
    // DONE: S9 import to record paused time
    // DONE: Sporttracks fitlog
