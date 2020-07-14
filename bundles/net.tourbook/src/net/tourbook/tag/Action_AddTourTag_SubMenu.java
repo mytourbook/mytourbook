@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -172,10 +172,10 @@ public class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, I
     */
    private class ActionTourTagCategory extends Action implements IMenuCreator {
 
-      private Menu                   __categoryMenu;
+      private Menu                            __categoryMenu;
 
       private final Action_AddTourTag_SubMenu __actionAddTourTag;
-      private final TourTagCategory  __tagCategory;
+      private final TourTagCategory           __tagCategory;
 
       public ActionTourTagCategory(final Action_AddTourTag_SubMenu actionAddTourTag, final TourTagCategory tagCategory) {
 
@@ -255,7 +255,7 @@ public class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, I
     *
     * @param tagMenuMgr
     * @param isAutoOpen
-    *           This parameter is ignored but it indicates that the menu auto open behaviour is
+    *           This parameter is ignored but it indicates that the menu auto open behavior is
     *           used.
     */
    public Action_AddTourTag_SubMenu(final TagMenuManager tagMenuMgr, final Object isAutoOpen) {

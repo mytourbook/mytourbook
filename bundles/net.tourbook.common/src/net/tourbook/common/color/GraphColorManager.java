@@ -70,9 +70,9 @@ public class GraphColorManager {
    public static final String            PREF_GRAPH_RUN_DYN_VERTICAL_RATIO       = "RunDyn_VerticalRatio";       //$NON-NLS-1$
    public static final String            PREF_GRAPH_SWIM_STROKES                 = "Swim_Strokes";               //$NON-NLS-1$
    public static final String            PREF_GRAPH_SWIM_SWOLF                   = "Swim_Swolf";                 //$NON-NLS-1$
-   public static final String            PREF_GRAPH_TRINING_EFFECT_AEROB         = "Training_Effect_Aerob";      //$NON-NLS-1$
-   public static final String            PREF_GRAPH_TRINING_EFFECT_ANAEROB       = "Training_Effect_Anaerob";    //$NON-NLS-1$
-   public static final String            PREF_GRAPH_TRINING_PERFORMANCE          = "Training_Performance";       //$NON-NLS-1$
+   public static final String            PREF_GRAPH_TRAINING_EFFECT_AEROB        = "Training_Effect_Aerob";      //$NON-NLS-1$
+   public static final String            PREF_GRAPH_TRAINING_EFFECT_ANAEROB      = "Training_Effect_Anaerob";    //$NON-NLS-1$
+   public static final String            PREF_GRAPH_TRAINING_PERFORMANCE         = "Training_Performance";       //$NON-NLS-1$
 
    public static final String            PREF_COLOR_BRIGHT                       = "bright";                     //$NON-NLS-1$
    public static final String            PREF_COLOR_DARK                         = "dark";                       //$NON-NLS-1$
@@ -522,7 +522,7 @@ public class GraphColorManager {
       /*
        * Training
        */
-      allColorDef.add(new ColorDefinition(PREF_GRAPH_TRINING_EFFECT_AEROB,
+      allColorDef.add(new ColorDefinition(PREF_GRAPH_TRAINING_EFFECT_AEROB,
             Messages.Graph_Label_Prefix_Training + uiSpacing + Messages.Graph_Label_Training_Effect_Aerob,
             new RGB(0xff, 0xff, 0xff),
             new RGB(0x0, 0x8b, 0xe9),
@@ -530,7 +530,7 @@ public class GraphColorManager {
             new RGB(0x0, 0x53, 0x8a),
             null));
 
-      allColorDef.add(new ColorDefinition(PREF_GRAPH_TRINING_EFFECT_ANAEROB,
+      allColorDef.add(new ColorDefinition(PREF_GRAPH_TRAINING_EFFECT_ANAEROB,
             Messages.Graph_Label_Prefix_Training + uiSpacing + Messages.Graph_Label_Training_Effect_Anaerob,
             new RGB(0xff, 0xff, 0xff),
             new RGB(0xa3, 0xd4, 0xe),
@@ -538,7 +538,7 @@ public class GraphColorManager {
             new RGB(0x5c, 0x78, 0x7),
             null));
 
-      allColorDef.add(new ColorDefinition(PREF_GRAPH_TRINING_PERFORMANCE,
+      allColorDef.add(new ColorDefinition(PREF_GRAPH_TRAINING_PERFORMANCE,
             Messages.Graph_Label_Prefix_Training + uiSpacing + Messages.Graph_Label_Training_Performance,
             new RGB(0xff, 0xff, 0xff),
             new RGB(0xff, 0x40, 0x0),

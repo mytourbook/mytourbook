@@ -464,25 +464,26 @@ public class EasyImportManager {
                final BasicFileAttributes fileAttributes = fileAttributesView.readAttributes();
 
                // ignore not regular files
-               if (fileAttributes.isRegularFile()) {
-
-                  OSFile deviceFile;
-
-                  if (NIO.isTourBookFileSystem(folder)) {
-                     final String fileName = path.getFileName().toString();
-                     deviceFile = new OSFile(Paths.get(folder, fileName));
-                  } else {
-                     deviceFile = new OSFile(path);
-                  }
-
-                  deviceFile.size = fileAttributes.size();
-                  deviceFile.modifiedTime = fileAttributes.lastModifiedTime().toMillis();
-
-                  osFiles.add(deviceFile);
+               if (!fileAttributes.isRegularFile()) {
+                  continue;
                }
 
+               OSFile deviceFile;
+
+               if (NIO.isTourBookFileSystem(folder)) {
+                  final String fileName = path.getFileName().toString();
+                  deviceFile = new OSFile(Paths.get(folder, fileName));
+               } else {
+                  deviceFile = new OSFile(path);
+               }
+
+               deviceFile.size = fileAttributes.size();
+               deviceFile.modifiedTime = fileAttributes.lastModifiedTime().toMillis();
+
+               osFiles.add(deviceFile);
+
             } catch (final Exception e) {
-// this can occur too often
+               // this can occur too often
                //              TourLogManager.logEx(e);
             }
 

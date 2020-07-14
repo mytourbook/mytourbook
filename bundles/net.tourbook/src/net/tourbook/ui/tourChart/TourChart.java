@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -780,7 +780,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       _state = state;
 
 //      /*
-//       * when the focus is changed, fire a tour chart selection, this is neccesarry to update the
+//       * when the focus is changed, fire a tour chart selection, this is necessary to update the
 //       * tour markers when a tour chart got the focus
 //       */
 //      addFocusListener(new Listener() {
@@ -1363,7 +1363,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
                      isMinMaxEnabled);
 
                /*
-                * Runing dynamics: Stance time
+                * Running dynamics: Stance time
                 */
                isChartModified |= setMinDefaultValue(
                      property,
@@ -1386,7 +1386,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
                      isMinMaxEnabled);
 
                /*
-                * Runing dynamics: Stance time balance
+                * Running dynamics: Stance time balance
                 */
                isChartModified |= setMinDefaultValue(
                      property,
@@ -1409,7 +1409,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
                      isMinMaxEnabled);
 
                /*
-                * Runing dynamics: Step length
+                * Running dynamics: Step length
                 */
                isChartModified |= setMinDefaultValue(
                      property,
@@ -1432,7 +1432,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
                      isMinMaxEnabled);
 
                /*
-                * Runing dynamics: Vertical oscillation
+                * Running dynamics: Vertical oscillation
                 */
                isChartModified |= setMinDefaultValue(
                      property,
@@ -1455,7 +1455,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
                      isMinMaxEnabled);
 
                /*
-                * Runing dynamics: Vertical ratio
+                * Running dynamics: Vertical ratio
                 */
                isChartModified |= setMinDefaultValue(
                      property,
@@ -1606,7 +1606,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       /*
        * This is a special case because the quick edit action in the tour info tooltip can not yet
-       * been initialized and creates a NPE when this action is run, therfore a hidden action is
+       * been initialized and creates a NPE when this action is run, therefore a hidden action is
        * used.
        */
       _actionEditQuick = new ActionEditQuick(this);
@@ -2839,7 +2839,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       } else {
 
-         // do not do a toolbar pack this would resize the tour chart to the default size, occures in dialogAdjustAltitude
+         // do not do a toolbar pack this would resize the tour chart to the default size, occurs in dialogAdjustAltitude
 
          tbm.update(true);
       }
@@ -3084,7 +3084,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    private SegmenterSegment getHoveredSegmenterSegment(final ChartMouseEvent mouseEvent) {
 
       if (_layerTourSegmenterAltitude == null) {
-         // this occured, it is possible that an event is fired but this layer is not yet set
+         // this occurred, it is possible that an event is fired but this layer is not yet set
          return null;
       }
 
@@ -3655,7 +3655,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       /*
        * Only visible segments are painted, during a resize the selection has not changed but the
-       * visible segments -> make the selected segements visible again.
+       * visible segments -> make the selected segments visible again.
        */
       if (_segmenterSelection != null) {
          selectXSliders_Segments(_segmenterSelection);
@@ -4041,7 +4041,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             }
 
             if (segmentIndex1 == segmentIndex2) {
-               // this case can occure when selection is reduced -> disable multiple selections
+               // this case can occur when selection is reduced -> disable multiple selections
                segmentIndex2 = -1;
             }
 
@@ -4193,7 +4193,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
             xSliderSerieIndexRight);
 
       /*
-       * Extend default selection with the sement positions
+       * Extend default selection with the segment positions
        */
       final SelectedTourSegmenterSegments selectedSegments = new SelectedTourSegmenterSegments();
       selectedSegments.tourData = _tourData;
@@ -4275,7 +4275,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    void selectXSliders(final SelectionChartXSliderPosition xSliderPosition) {
 
       if (_tourData == null) {
-         // this occured
+         // this occurred
          return;
       }
 
@@ -4349,7 +4349,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       }
 
       if (paintedSegmentLabels.size() == 0) {
-         // this case do propably not occure;
+         // this case do probably not occur;
          return;
       }
 
@@ -5365,7 +5365,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
     * This is the entry point for new tours.
     * <p>
     * This method is synchronized because when SRTM data are retrieved and the import view is
-    * openened, the error occured that the chart config was deleted with {@link #updateChart(null)}
+    * open, the error occurred that the chart config was deleted with {@link #updateChart(null)}
     *
     * @param newTourData
     * @param newTCC
@@ -5406,10 +5406,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       hidePhotoLayer();
       resetSegmenterSelection();
 
-      final ChartDataModel newChartDataModel = TourManager.getInstance().createChartDataModel(
-            _tourData,
-            _tcc,
-            isPropertyChanged);
+      final ChartDataModel newChartDataModel = TourManager.getInstance()
+            .createChartDataModel(
+                  _tourData,
+                  _tcc,
+                  isPropertyChanged);
 
       // set the model BEFORE actions are created/enabled/checked
       setDataModel(newChartDataModel);

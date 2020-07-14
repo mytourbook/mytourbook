@@ -18,7 +18,8 @@ New
   - Columns can be freezed for horizontal scrolling (freeze action is in the header context menu)
 
 * Dropbox Integration (Frederic)
-  - Ability to connect a Dropbox account to MyTourbook, and also choosing a specific a folder for this account. This Dropbox folder can be set up as a device to watch. In this case, added or deleted files will be automatically and immediately detected.
+  - Ability to connect a Dropbox account to MyTourbook, and also choosing a specific a folder for this account. This Dropbox folder can be set up as a device to watch in the Easy Import Dashboard. In this case, added or deleted files will be automatically and immediately detected.
+  
 
 * Import Suunto Quest Files (Frederic)
 
@@ -56,6 +57,9 @@ Improvements
 * Keyboard shortcuts
   - Ctrl+W - Close current view or tour  
   - Ctrl+Shift+<Key> - Open all directory views with a key shortcut
+
+* Tour Book view (Frederic)
+  - Adding the ability to bulk edit the weather conditions
 
 
 Import

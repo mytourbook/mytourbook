@@ -184,9 +184,8 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
          tourData.setTourType(tourType);
       }
 
-      tourData.setIsPulseSensorPresent(exerciseMode.searchedDevices.contains("HR")); //$NON-NLS-1$
+      tourData.setIsPulseSensorPresent(exerciseMode.searchedDevices.contains(TAG_HR));
       tourData.setIsDistanceFromSensor(exerciseMode.searchedDevices.contains("POD")); //$NON-NLS-1$
-
    }
 
    @Override
@@ -240,6 +239,7 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
 
       _sampleList.clear();
       _markerList.clear();
+      _exerciseModesList.clear();
    }
 
    @Override
