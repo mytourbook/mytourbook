@@ -20,6 +20,7 @@ import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.TimeZone;
 
 import net.tourbook.common.UI;
@@ -27,6 +28,7 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourTimerPause;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.tour.TourManager;
 
@@ -59,17 +61,17 @@ public class Suunto2SAXHandler extends DefaultHandler {
             .toEpochMilli();
    }
 
-   private static final SimpleDateFormat TIME_FORMAT           = new SimpleDateFormat(  //
-         "yyyy-MM-dd'T'HH:mm:ss'Z'");                                                   //$NON-NLS-1$
-   private static final SimpleDateFormat TIME_FORMAT_SSSZ      = new SimpleDateFormat(  //
-         "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");                                               //$NON-NLS-1$
-   private static final SimpleDateFormat TIME_FORMAT_RFC822    = new SimpleDateFormat(  //
-         "yyyy-MM-dd'T'HH:mm:ssZ");                                                     //$NON-NLS-1$
+   private static final SimpleDateFormat TIME_FORMAT           = new SimpleDateFormat(   //
+         "yyyy-MM-dd'T'HH:mm:ss'Z'");                                                    //$NON-NLS-1$
+   private static final SimpleDateFormat TIME_FORMAT_SSSZ      = new SimpleDateFormat(   //
+         "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");                                                //$NON-NLS-1$
+   private static final SimpleDateFormat TIME_FORMAT_RFC822    = new SimpleDateFormat(   //
+         "yyyy-MM-dd'T'HH:mm:ssZ");                                                      //$NON-NLS-1$
 
-   private static final String           SAMPLE_TYPE_GPS_BASE  = "gps-base";            //$NON-NLS-1$
-   private static final String           SAMPLE_TYPE_GPS_TINY  = "gps-tiny";            //$NON-NLS-1$
-   private static final String           SAMPLE_TYPE_GPS_SMALL = "gps-small";           //$NON-NLS-1$
-   private static final String           SAMPLE_TYPE_PERIODIC  = "periodic";            //$NON-NLS-1$
+   private static final String           SAMPLE_TYPE_GPS_BASE  = "gps-base";             //$NON-NLS-1$
+   private static final String           SAMPLE_TYPE_GPS_TINY  = "gps-tiny";             //$NON-NLS-1$
+   private static final String           SAMPLE_TYPE_GPS_SMALL = "gps-small";            //$NON-NLS-1$
+   private static final String           SAMPLE_TYPE_PERIODIC  = "periodic";             //$NON-NLS-1$
 
    // root tags
    private static final String TAG_ROOT_DEVICE  = "Device";  //$NON-NLS-1$
@@ -91,8 +93,10 @@ public class Suunto2SAXHandler extends DefaultHandler {
    private static final String TAG_LAP         = "Lap";         //$NON-NLS-1$
    private static final String TAG_LATITUDE    = "Latitude";    //$NON-NLS-1$
    private static final String TAG_LONGITUDE   = "Longitude";   //$NON-NLS-1$
+   private static final String TAG_PAUSE       = "Pause";       //$NON-NLS-1$
    private static final String TAG_SAMPLE      = "Sample";      //$NON-NLS-1$
    private static final String TAG_SAMPLE_TYPE = "SampleType";  //$NON-NLS-1$
+   private static final String TAG_STATE       = "State";       //$NON-NLS-1$
    private static final String TAG_TEMPERATURE = "Temperature"; //$NON-NLS-1$
    private static final String TAG_UTC         = "UTC";         //$NON-NLS-1$
 
@@ -105,48 +109,52 @@ public class Suunto2SAXHandler extends DefaultHandler {
       TIME_FORMAT_RFC822.setTimeZone(utc);
    }
    //
-   private HashMap<Long, TourData> _alreadyImportedTours;
-   private HashMap<Long, TourData> _newlyImportedTours;
-   private TourbookDevice          _device;
-   private String                  _importFilePath;
+   private HashMap<Long, TourData>   _alreadyImportedTours;
+   private HashMap<Long, TourData>   _newlyImportedTours;
+   private TourbookDevice            _device;
+   private String                    _importFilePath;
    //
-   private TimeData                _sampleData;
+   private TimeData                  _sampleData;
 
-   private ArrayList<TimeData>     _sampleList = new ArrayList<>();
-   private TimeData                _gpsData;
+   private ArrayList<TimeData>       _sampleList      = new ArrayList<>();
+   private TimeData                  _gpsData;
 
-   private ArrayList<TimeData>     _gpsList    = new ArrayList<>();
-   private TimeData                _markerData;
+   private ArrayList<TimeData>       _gpsList         = new ArrayList<>();
+   private TimeData                  _markerData;
 
-   private ArrayList<TimeData>     _markerList = new ArrayList<>();
+   private ArrayList<TimeData>       _markerList      = new ArrayList<>();
 
-   private boolean                 _isImported;
-   private StringBuilder           _characters = new StringBuilder();
-   private String                  _currentSampleType;
-   private long                    _currentTime;
+   private ArrayList<TourTimerPause> _tourTimerPauses = new ArrayList<>();
 
-   private long                    _prevSampleTime;
-   private boolean                 _isInRootDevice;
-   private boolean                 _isInRootSamples;
+   private boolean                   _isImported;
+   private StringBuilder             _characters      = new StringBuilder();
+   private String                    _currentSampleType;
+   private long                      _currentTime;
 
-   private boolean                 _isInRootHeader;
-   private boolean                 _isInAltitude;
-   private boolean                 _isInCadence;
-   private boolean                 _isInDistance;
-   private boolean                 _isInEnergy;
-   private boolean                 _isInEvents;
-   private boolean                 _isInHR;
-   private boolean                 _isInLatitude;
-   private boolean                 _isInLongitude;
-   private boolean                 _isInSample;
-   private boolean                 _isInSampleType;
-   private boolean                 _isInSW;
-   private boolean                 _isInUTC;
+   private long                      _prevSampleTime;
+   private boolean                   _isInRootDevice;
+   private boolean                   _isInRootSamples;
 
-   private boolean                 _isInTemperature;
-   private int                     _tourCalories;
+   private boolean                   _isInRootHeader;
+   private boolean                   _isInAltitude;
+   private boolean                   _isInCadence;
+   private boolean                   _isInDistance;
+   private boolean                   _isInEnergy;
+   private boolean                   _isInEvents;
+   private boolean                   _isInHR;
+   private boolean                   _isInLatitude;
+   private boolean                   _isInLongitude;
+   private boolean                   _isInPause;
+   private boolean                   _isInSample;
+   private boolean                   _isInSampleType;
+   private boolean                   _isInState;
+   private boolean                   _isInSW;
+   private boolean                   _isInUTC;
 
-   private String                  _tourSW;
+   private boolean                   _isInTemperature;
+   private int                       _tourCalories;
+
+   private String                    _tourSW;
 
    public Suunto2SAXHandler(final TourbookDevice deviceDataReader,
                             final String importFileName,
@@ -170,6 +178,7 @@ public class Suunto2SAXHandler extends DefaultHandler {
             || _isInHR
             || _isInLatitude
             || _isInLongitude
+            || _isInState
             || _isInSW
             || _isInTemperature
             || _isInUTC
@@ -184,12 +193,17 @@ public class Suunto2SAXHandler extends DefaultHandler {
       _sampleList.clear();
       _gpsList.clear();
       _markerList.clear();
+      _tourTimerPauses.clear();
    }
 
    @Override
    public void endElement(final String uri, final String localName, final String name) throws SAXException {
 
-      if (_isInRootSamples) {
+      if (_isInPause) {
+
+         endElement_InPause(name);
+
+      } else if (_isInRootSamples) {
 
          endElement_InSamples(name);
 
@@ -202,7 +216,15 @@ public class Suunto2SAXHandler extends DefaultHandler {
          endElement_InDevice(name);
       }
 
-      if (name.equals(TAG_SAMPLE)) {
+      if (name.equals(TAG_PAUSE)) {
+
+         _isInPause = false;
+
+      } else if (name.equals(TAG_EVENTS)) {
+
+         _isInEvents = false;
+
+      } else if (name.equals(TAG_SAMPLE)) {
 
          _isInSample = false;
 
@@ -246,6 +268,31 @@ public class Suunto2SAXHandler extends DefaultHandler {
       }
    }
 
+   private void endElement_InPause(final String name) {
+
+      if (name.equals(TAG_STATE)) {
+
+         _isInState = false;
+
+         final String stateValue = _characters.toString();
+
+         if (stateValue.equalsIgnoreCase(Boolean.TRUE.toString())) {
+            final TourTimerPause tourTimerPause = new TourTimerPause();
+            tourTimerPause.setStartTime(_currentTime);
+
+            _tourTimerPauses.add(tourTimerPause);
+         } else if (stateValue.equalsIgnoreCase(Boolean.FALSE.toString())) {
+
+            if (_tourTimerPauses.size() == 0) {
+               return;
+            }
+
+            _tourTimerPauses.get(_tourTimerPauses.size() - 1).setEndTime(_currentTime);
+         }
+      }
+
+   }
+
    private void endElement_InSamples(final String name) {
 
       if (name.equals(TAG_SAMPLE_TYPE)) {
@@ -278,10 +325,6 @@ public class Suunto2SAXHandler extends DefaultHandler {
 
             _sampleData.absoluteDistance = Util.parseFloat(_characters.toString());
          }
-
-      } else if (name.equals(TAG_EVENTS)) {
-
-         _isInEvents = false;
 
       } else if (name.equals(TAG_HR)) {
 
@@ -453,6 +496,8 @@ public class Suunto2SAXHandler extends DefaultHandler {
 
       tourData.createTimeSeries(_sampleList, true);
 
+      finalizeTour_TimerPauses(tourData);
+
       setDistanceSerie(tourData);
 
       // after all data are added, the tour id can be created
@@ -472,6 +517,22 @@ public class Suunto2SAXHandler extends DefaultHandler {
       }
 
       _isImported = true;
+   }
+
+   private void finalizeTour_TimerPauses(final TourData tourData) {
+      if (_tourTimerPauses.size() == 0) {
+         return;
+      }
+
+      final List<TourTimerPause> _finalTourtimerPauses = new ArrayList<>();
+
+      for (final TourTimerPause tourTimerPause : _tourTimerPauses) {
+         if (tourTimerPause.getStartTime() > 0 && tourTimerPause.getEndTime() > 0) {
+            _finalTourtimerPauses.add(tourTimerPause);
+         }
+      }
+
+      tourData.setTourTimerPauses(_finalTourtimerPauses);
    }
 
    /**
@@ -677,6 +738,28 @@ public class Suunto2SAXHandler extends DefaultHandler {
       }
    }
 
+   private void startElement_InEvents(final String name) {
+
+      boolean isData = false;
+
+      if (_isInPause) {
+
+         startElement_InPause(name);
+
+      } else if (name.equals(TAG_PAUSE)) {
+
+         isData = true;
+         _isInPause = true;
+
+      }
+
+      if (isData) {
+
+         // clear char buffer
+         _characters.delete(0, _characters.length());
+      }
+   }
+
    private void startElement_InHeader(final String name) {
 
       boolean isData = false;
@@ -694,11 +777,34 @@ public class Suunto2SAXHandler extends DefaultHandler {
       }
    }
 
+   private void startElement_InPause(final String name) {
+
+      boolean isData = false;
+
+      if (name.equals(TAG_STATE)) {
+
+         isData = true;
+         _isInState = true;
+
+      }
+
+      if (isData) {
+
+         // clear char buffer
+         _characters.delete(0, _characters.length());
+      }
+
+   }
+
    private void startElement_InSample(final String name) {
 
       boolean isData = false;
 
-      if (name.equals(TAG_SAMPLE_TYPE)) {
+      if (_isInEvents) {
+
+         startElement_InEvents(name);
+
+      } else if (name.equals(TAG_SAMPLE_TYPE)) {
 
          isData = true;
          _isInSampleType = true;
