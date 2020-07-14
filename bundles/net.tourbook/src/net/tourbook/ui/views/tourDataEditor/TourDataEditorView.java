@@ -225,7 +225,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    // DONE BUT TO CHECK WITH MULTIPLE FILES: FIT
    // DONE BUT TO CHECK WITH MULTIPLE FILES: Ambit2 xml
    // DONE BUT TO CHECK WITH MULTIPLE FILES: Ambit 2 sml
-   // DONE: S9 import to record paused time
+   // TODO Numbers are wrong when I compare to movescount: S9 import to record paused time
    // DONE: Sporttracks fitlog
 
    // Statistics view tooltip

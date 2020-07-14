@@ -3123,6 +3123,7 @@ public abstract class TableColumnFactory {
          }
       };
 
+      //TODO FB
       TIME_RECORDING_TIME = new TableColumnFactory() {
 
          @Override
