@@ -22,23 +22,17 @@ import com.garmin.fit.Sport;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.List;
 
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
-import net.tourbook.data.TourTimerPause;
 import net.tourbook.device.garmin.fit.FitData;
 import net.tourbook.device.garmin.fit.FitDataReaderException;
 
 public class MesgListener_Session extends AbstractMesgListener implements SessionMesgListener {
 
-   List<TourTimerPause> _tourTimerPauses;
-
    public MesgListener_Session(final FitData fitData) {
       super(fitData);
-
-      _tourTimerPauses = new ArrayList<>();
    }
 
    @Override
