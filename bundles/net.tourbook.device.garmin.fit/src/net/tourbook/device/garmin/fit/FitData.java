@@ -477,6 +477,7 @@ public class FitData {
 
       for (final TourTimerPause tourTimerPause : _tourTimerPauses) {
          if (tourTimerPause.getStartTime() > 0 && tourTimerPause.getEndTime() > 0) {
+            tourTimerPause.setTourData(tourData);
             _finalTourtimerPauses.add(tourTimerPause);
          }
       }

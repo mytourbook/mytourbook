@@ -307,7 +307,7 @@ public class Suunto3_STAXHandler {
 
    private void finalizeTour_TimerPauses(final TourData tourData) {
 
-      //TODO FB this function is duplicatd, where to put it to be a shared function ?
+      //TODO FB this function is duplicated, where to put it to be a shared function ?
       if (_tourTimerPauses.size() == 0) {
          return;
       }
@@ -316,6 +316,7 @@ public class Suunto3_STAXHandler {
 
       for (final TourTimerPause tourTimerPause : _tourTimerPauses) {
          if (tourTimerPause.getStartTime() > 0 && tourTimerPause.getEndTime() > 0) {
+            tourTimerPause.setTourData(tourData);
             _finalTourtimerPauses.add(tourTimerPause);
          }
       }

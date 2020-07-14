@@ -43,6 +43,7 @@ public class TourTimerPause implements Serializable {
 
    @XmlElement
    private long              startTime;
+
    @XmlElement
    private long              endTime;
 
@@ -83,5 +84,9 @@ public class TourTimerPause implements Serializable {
     */
    public void setStartTime(final long startTime) {
       this.startTime = startTime;
+   }
+
+   public void setTourData(final TourData tourData) {
+      this.tourData = tourData;
    }
 }
