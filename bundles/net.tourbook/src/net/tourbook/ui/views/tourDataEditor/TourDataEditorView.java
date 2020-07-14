@@ -222,7 +222,7 @@ import org.eclipse.ui.progress.UIJob;
 public class TourDataEditorView extends ViewPart implements ISaveablePart, ISaveAndRestorePart, ITourProvider2 {
    //TODO FB : Trying to address this request : https://sourceforge.net/p/mytourbook/discussion/622811/thread/17da3fb19f/
    // Do the following formats :
-   // FIT
+   // DONE BUT TO CHECK WITH MULTIPLE FILES: FIT
    // Ambit2 xml
    // Ambit 2 sml
    // DONE: S9 import to record paused time
