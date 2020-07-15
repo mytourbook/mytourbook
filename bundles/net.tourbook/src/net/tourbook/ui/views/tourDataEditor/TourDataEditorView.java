@@ -300,7 +300,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private float[][]               _serieGears;
    private boolean[]               _serieBreakTime;
    //
-   private short[]                 _swimSerie_Cadence;
+   private short[]                 _swimSerie_StrokeRate;
 // private short[]                 _swimSerie_LengthType;
    private short[]                 _swimSerie_Strokes;
    private short[]                 _swimSerie_StrokeStyle;
@@ -313,7 +313,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private ColumnDefinition        _timeSlice_ColDef_Latitude;
    private ColumnDefinition        _timeSlice_ColDef_Longitude;
    //
-   private ColumnDefinition        _swimSlice_ColDef_Cadence;
+   private ColumnDefinition        _swimSlice_ColDef_StrokeRate;
    private ColumnDefinition        _swimSlice_ColDef_Strokes;
    private ColumnDefinition        _swimSlice_ColDef_StrokeStyle;
    //
@@ -456,7 +456,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private SliceEditingSupport_Double         _timeSlice_LatitudeEditingSupport;
    private SliceEditingSupport_Double         _timeSlice_LongitudeEditingSupport;
    //
-   private SliceEditingSupport_Short          _swimSlice_CadenceEditingSupport;
+   private SliceEditingSupport_Short          _swimSlice_StrokeRateEditingSupport;
    private SliceEditingSupport_Short          _swimSlice_StrokesEditingSupport;
    private SliceEditor_ComboBox_StrokeStyle   _swimSlice_StrokeStyleEditingSupport;
    //
@@ -4789,11 +4789,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _swimSlice_Viewer.getTable(),
             SwimStrokeManager.getAllSortedSwimStrokeLabel());
 
-      _swimSlice_CadenceEditingSupport = new SliceEditingSupport_Short(textCellEditor, _swimSerie_Cadence);
+      _swimSlice_StrokeRateEditingSupport = new SliceEditingSupport_Short(textCellEditor, _swimSerie_StrokeRate);
       _swimSlice_StrokesEditingSupport = new SliceEditingSupport_Short(textCellEditor, _swimSerie_Strokes);
       _swimSlice_StrokeStyleEditingSupport = new SliceEditor_ComboBox_StrokeStyle(strokeStyleCellEditor, _swimSerie_StrokeStyle);
 
-      _swimSlice_ColDef_Cadence.setEditingSupport(_swimSlice_CadenceEditingSupport);
+      _swimSlice_ColDef_StrokeRate.setEditingSupport(_swimSlice_StrokeRateEditingSupport);
       _swimSlice_ColDef_Strokes.setEditingSupport(_swimSlice_StrokesEditingSupport);
       _swimSlice_ColDef_StrokeStyle.setEditingSupport(_swimSlice_StrokeStyleEditingSupport);
 
@@ -4847,7 +4847,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       defineColumn_SwimSlice_Time_TimeDiff();
 
       defineColumn_SwimSlice_Swim_Strokes();
-      defineColumn_SwimSlice_Swim_Cadence();
+      defineColumn_SwimSlice_Swim_StrokeRate();
       defineColumn_SwimSlice_Swim_StrokeStyle();
    }
 
@@ -4926,21 +4926,21 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       });
    }
 
-   private void defineColumn_SwimSlice_Swim_Cadence() {
+   private void defineColumn_SwimSlice_Swim_StrokeRate() {
 
       TableColumnDefinition colDef;
 
-      _swimSlice_ColDef_Cadence = colDef = TableColumnFactory.SWIM__SWIM_CADENCE.createColumn(_swimSlice_ColumnManager, _pc);
+      _swimSlice_ColDef_StrokeRate = colDef = TableColumnFactory.SWIM__SWIM_STROKE_RATE.createColumn(_swimSlice_ColumnManager, _pc);
 
       colDef.setIsDefaultColumn();
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
-            if (_swimSerie_Cadence != null) {
+            if (_swimSerie_StrokeRate != null) {
 
                final SwimSlice timeSlice = (SwimSlice) cell.getElement();
-               final short value = _swimSerie_Cadence[timeSlice.serieIndex];
+               final short value = _swimSerie_StrokeRate[timeSlice.serieIndex];
 
                if (value == 0) {
                   cell.setText(UI.EMPTY_STRING);
@@ -6598,13 +6598,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       _serieTemperature = _tourData.temperatureSerie;
 
-      _swimSerie_Cadence = _tourData.swim_Cadence;
+      _swimSerie_StrokeRate = _tourData.swim_Cadence;
 //    _swimSerie_LengthType = _tourData.swim_LengthType;
       _swimSerie_Strokes = _tourData.swim_Strokes;
       _swimSerie_StrokeStyle = _tourData.swim_StrokeStyle;
       _swimSerie_Time = _tourData.swim_Time;
 
-      _swimSlice_CadenceEditingSupport.setDataSerie(_swimSerie_Cadence);
+      _swimSlice_StrokeRateEditingSupport.setDataSerie(_swimSerie_StrokeRate);
       _swimSlice_StrokesEditingSupport.setDataSerie(_swimSerie_Strokes);
       _swimSlice_StrokeStyleEditingSupport.setDataSerie(_swimSerie_StrokeStyle);
 
