@@ -4926,6 +4926,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       });
    }
 
+   /**
+    * Stroke Rate or number of strokes per minute.
+    */
    private void defineColumn_SwimSlice_Swim_StrokeRate() {
 
       TableColumnDefinition colDef;

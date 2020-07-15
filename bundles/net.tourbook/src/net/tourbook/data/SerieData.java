@@ -18,10 +18,10 @@
  */
 package net.tourbook.data;
 
+import de.byteholder.geoclipse.map.UI;
+
 import java.io.Serializable;
 import java.util.Arrays;
-
-import de.byteholder.geoclipse.map.UI;
 
 /**
  * All time serie data from a device are stored in the database with this class, when data are not
@@ -101,7 +101,7 @@ public class SerieData implements Serializable {
    public short[]   swim_LengthType;      // e.g. active, idle
 
    public short[]   swim_Cadence;         // strokes/min
-   public short[]   swim_Strokes;         // number of strokes
+   public short[]   swim_Strokes;         // strokes/length
    public short[]   swim_StrokeStyle;     // e.g. freestyle, breaststroke
    public int[]     swim_Time;            // relative time to the start time
 
