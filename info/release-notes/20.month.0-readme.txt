@@ -77,6 +77,10 @@ Changes
 * Tour Book view
   Any existing column profiles must be recreated
 
+* Swim slices (Frederic)
+  - Renamed the column "Strokes" to "Stk/length" (Number of strokes per length)
+  - Renamed the column "Cadence" to "Stk/min" (Number of strokes per minute)
+
 
 Fixes   
 =====
