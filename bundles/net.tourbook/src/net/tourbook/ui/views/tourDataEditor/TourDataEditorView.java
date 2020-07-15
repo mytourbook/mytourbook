@@ -225,8 +225,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    // DONE BUT TO CHECK WITH MULTIPLE FILES: FIT
    // DONE BUT TO CHECK WITH MULTIPLE FILES: Ambit2 xml
    // DONE BUT TO CHECK WITH MULTIPLE FILES: Ambit 2 sml
-   // TODO Numbers are wrong when I compare to movescount: S9 import to record paused time
+   // TODO Numbers are wrong when I compare to movescount: Suunto 9
    // DONE: Sporttracks fitlog
+
+   // Add entries in time slices for pauses ? or just add a column "paused" like "break" and select the checkbox if it is a pause ?
+   //it would be very useful if not mandatory to have the ability to see in the slices where pauses are
 
    // Statistics view tooltip
    // display a pause sign on the gps track like in ST
