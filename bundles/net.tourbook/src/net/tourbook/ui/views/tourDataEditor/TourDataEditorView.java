@@ -378,8 +378,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     * contains the tour id from the last selection event
     */
    private Long                               _selectionTourId;
-   //
-   private KeyAdapter                         _keyListener;
    private ModifyListener                     _modifyListener;
    private ModifyListener                     _modifyListener_Temperature;
    private MouseWheelListener                 _mouseWheelListener;
@@ -2875,12 +2873,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             setTourDirty();
          }
       };
-      _keyListener = new KeyAdapter() {
-         @Override
-         public void keyReleased(final KeyEvent e) {
-            onModifyContent();
-         }
-      };
 
       /*
        * listener for recording/driving/paused time
@@ -3252,16 +3244,19 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   .hint(_hintTextColumnWidth, SWT.DEFAULT)
                   .applyTo(_comboTitle);
 
-            _comboTitle.addKeyListener(_keyListener);
             _comboTitle.addModifyListener(new ModifyListener() {
 
                @Override
                public void modifyText(final ModifyEvent e) {
+
                   if (_isSetField || _isSavingInProgress) {
                      return;
                   }
+
                   _isTitleModified = true;
                   setTourDirty();
+
+//                onModifyContent();
                }
             });
 
@@ -3447,7 +3442,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
                updateUI_Title();
 
-               onModifyContent();
+//             onModifyContent();
             }
          });
 
@@ -3496,7 +3491,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
                   updateUI_Title();
 
-                  onModifyContent();
+//                onModifyContent();
                }
             });
          }
@@ -3886,6 +3881,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _spinPerson_FTP.setMaximum(10000);
 
             _spinPerson_FTP.addMouseWheelListener(_mouseWheelListener);
+            _spinPerson_FTP.addSelectionListener(_selectionListener);
 
             // spacer
             _tk.createLabel(container, UI.EMPTY_STRING);
@@ -7072,6 +7068,18 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 //          form.reflow(false);
    }
 
+   /**
+    * Update other views when tour title is modified
+    * <p>
+    * Deactivated because it slows down the text input in the title field (when this is also applied
+    * to the title field modifyListener).
+    * <p>
+    * The bug https://sourceforge.net/p/mytourbook/bugs/115/ needed some UI behavior changes which
+    * was introduced when Ctrl+S was introduced to save tour in tour editor.
+    * <p>
+    * Keep code to may be used later.
+    */
+   @SuppressWarnings("unused")
    private void onModifyContent() {
 
       if (_tourData == null) {
@@ -7911,8 +7919,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       final Table table = (Table) _timeSlice_Viewer.getControl();
       final int itemCount = table.getItemCount();
 
-      if (_prefStore.getBoolean(
-            ITourbookPreferences.TOGGLE_STATE_SELECT_INBETWEEN_TIME_SLICES)) {
+      if (_prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SELECT_INBETWEEN_TIME_SLICES)) {
 
          final int runnableRunningId = _timeSlice_Viewer_RunningId.incrementAndGet();
 
@@ -7939,22 +7946,46 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
                final int minSelectedValue = Math.min(chartInfo.leftSliderValuesIndex, chartInfo.rightSliderValuesIndex);
                final int maxSelectedValue = Math.max(chartInfo.leftSliderValuesIndex, chartInfo.rightSliderValuesIndex);
+
                table.setSelection(minSelectedValue, maxSelectedValue);
+               table.showSelection();
             }
          });
 
       } else {
-         // adjust to array bounds
-         int valueIndex = chartInfo.selectedSliderValuesIndex;
-         valueIndex = Math.max(0, Math.min(valueIndex, itemCount - 1));
 
-         table.setSelection(valueIndex);
+         final int runnableRunningId = _timeSlice_Viewer_RunningId.incrementAndGet();
+
+         // delay the selection of multiple lines, moving the mouse can occur very often
+         _parent.getDisplay().timerExec(20, new Runnable() {
+
+            private int __runningId = runnableRunningId;
+
+            @Override
+            public void run() {
+
+               if (_parent.isDisposed()) {
+                  return;
+               }
+
+               final int currentId = _timeSlice_Viewer_RunningId.get();
+
+               if (__runningId != currentId) {
+
+                  // a newer runnable is created
+
+                  return;
+               }
+
+               // adjust to array bounds
+               int valueIndex = chartInfo.selectedSliderValuesIndex;
+               valueIndex = Math.max(0, Math.min(valueIndex, itemCount - 1));
+
+               table.setSelection(valueIndex);
+               table.showSelection();
+            }
+         });
       }
-
-      table.showSelection();
-
-      // fire slider position
-//    fDataViewer.setSelection(fDataViewer.getSelection());
    }
 
    private void selectTimeSlice(final SelectionChartXSliderPosition sliderPosition) {
@@ -8271,7 +8302,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
              * rounding errors
              */
 
-            _tourData.setWeatherWindSpeed((int) (_spinWeather_Wind_SpeedValue.getSelection() * _unitValueDistance));
+            _tourData.setWeatherWindSpeed(Math.round((_spinWeather_Wind_SpeedValue.getSelection() * _unitValueDistance)));
          }
 
          final int cloudIndex = _comboWeather_Clouds.getSelectionIndex();
@@ -8709,7 +8740,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       // wind speed
       final int windSpeed = _tourData.getWeatherWindSpeed();
-      final int speed = (int) (windSpeed / _unitValueDistance);
+      final int speed = Math.round(windSpeed / _unitValueDistance);
       _spinWeather_Wind_SpeedValue.setSelection(speed);
       _comboWeather_WindSpeedText.select(getWindSpeedTextIndex(speed));
 

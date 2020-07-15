@@ -761,7 +761,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
          if (event instanceof ColumnReorderEvent) {
 
-            _tourViewer_NatTable.getDisplay().asyncExec(() -> {
+            _parent.getDisplay().asyncExec(() -> {
 
 //               // update MT column manager with the reordered columns
 //               _columnManager_NatTable.setVisibleColumnIds_FromViewer();
@@ -1868,6 +1868,10 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       return _columnManager_NatTable;
    }
 
+   public NatTable_DataLoader getNatTable_DataLoader() {
+      return _natTable_DataLoader;
+   }
+
    public TourRowDataProvider getNatTable_DataProvider() {
       return _natTable_DataProvider;
    }
@@ -2018,7 +2022,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       final ArrayList<TourData> selectedTourData = new ArrayList<>();
 
-      BusyIndicator.showWhile(Display.getCurrent(), () -> {
+      BusyIndicator.showWhile(_pageBook.getDisplay(), () -> {
          TourManager.loadTourData(new ArrayList<>(tourIds), selectedTourData, false);
       });
 
@@ -2081,6 +2085,14 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private void initUI(final Composite parent) {
 
       _pc = new PixelConverter(parent);
+   }
+
+   /**
+    * @return Returns <code>true</code> when tourbook view displays the flat table, otherwise the
+    *         tree.
+    */
+   public boolean isLayoutNatTable() {
+      return _isLayoutNatTable;
    }
 
    boolean isShowSummaryRow() {
@@ -2150,8 +2162,6 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
    private void natTable_ContextMenu_OnShow(final IMenuManager manager) {
 
-// TODO _tourInfoToolTip_NatTable.hideToolTip();
-
       final Set<Range> allSelectedRowPositions = getNatTable_SelectionModel().getSelectedRowPositions();
 
       final int numSelectedRows = allSelectedRowPositions.size();
@@ -2201,7 +2211,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          selectTours_NatTable(new int[] { hoveredRow }, true, false);
 
          // show context menu again
-         Display.getDefault().timerExec(10, () -> {
+         _pageBook.getDisplay().timerExec(10, () -> {
             UI.openContextMenu(_tourViewer_NatTable);
          });
 
@@ -2222,7 +2232,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
          // move selected tour into view
 
-         Display.getDefault().timerExec(1, () -> {
+         _pageBook.getDisplay().timerExec(1, () -> {
             natTable_ScrollSelectedToursIntoView();
          });
       }
@@ -2264,8 +2274,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          final int numVisibleRows = _natTable_Body_ViewportLayer.getRowCount();
          final int scrollableRowCenterPosition = numVisibleRows / 2;
 
-         final ArrayList<SortDirectionEnum> sortDirection = _natTable_DataLoader.getSortDirections();
-         final String[] sortColumnId = _natTable_DataLoader.getSortColumnIds();
+//         final ArrayList<SortDirectionEnum> sortDirection = _natTable_DataLoader.getSortDirections();
+//         final String[] sortColumnId = _natTable_DataLoader.getSortColumnIds();
 
 //         System.out.println((System.currentTimeMillis() + " " + sortColumnId));
 //         // TODO remove SYSTEM.OUT.PRINTLN
@@ -2322,7 +2332,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
          final String sqlField = _natTable_DataLoader.getSqlField(colDef.getColumnId());
 
-         colDef.setCanSortColumn(NatTable_DataLoader.FIELD_WITHOUT_SORTING.equals(sqlField) == false);
+         final boolean canSortColumn = NatTable_DataLoader.FIELD_WITHOUT_SORTING.equals(sqlField) == false;
+         colDef.setCanSortColumn(canSortColumn);
       }
    }
 
@@ -3105,14 +3116,16 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     *           provided tours will be added to the existing selection.
     * @param isScrollIntoView
     */
-   private void selectTours_NatTable(final int[] allRowPositions, final boolean isClearSelection, final boolean isScrollIntoView) {
+   void selectTours_NatTable(final int[] allRowPositions, final boolean isClearSelection, final boolean isScrollIntoView) {
 
       // ensure there is something to be selected
       if (allRowPositions == null || allRowPositions.length == 0 || allRowPositions[0] == -1) {
          return;
       }
 
-      Display.getDefault().asyncExec(() -> {
+      _parent.getDisplay().asyncExec(() -> {
+
+         _tourViewer_NatTable.setFocus();
 
          // sort rows ascending
          Arrays.sort(allRowPositions);
