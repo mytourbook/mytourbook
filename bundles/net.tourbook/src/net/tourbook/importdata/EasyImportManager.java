@@ -446,7 +446,7 @@ public class EasyImportManager {
          return osFiles;
       }
 
-      String globPattern = globFilePattern.trim();
+      String globPattern = globFilePattern.trim().toLowerCase();
 
       if (globPattern.length() == 0) {
          globPattern = ImportConfig.DEVICE_FILES_DEFAULT;
