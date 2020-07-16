@@ -2215,7 +2215,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
          // mouse is not hovering a tour selection -> select tour
 
-         selectTours_NatTable(new int[] { hoveredRow }, true, false);
+         selectTours_NatTable(new int[] { hoveredRow }, true, false, true);
 
          // show context menu again
          _pageBook.getDisplay().timerExec(10, () -> {
@@ -2624,7 +2624,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       }
       _viewerContainer_NatTable.setRedraw(true);
 
-      selectTours_NatTable(allRowPositions, true, true);
+      selectTours_NatTable(allRowPositions, true, true, true);
 
       return null;
    }
@@ -2762,7 +2762,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       _natTable_DataLoader.getRowIndexFromTourId(_selectedTourIds).thenAccept((allRowPositions) -> {
 
-         selectTours_NatTable(allRowPositions, true, true);
+         // don't check reload that a tour selection is fired
+         selectTours_NatTable(allRowPositions, true, true, false);
       });
    }
 
@@ -3122,8 +3123,12 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     *           When <code>true</code> then only the provided rows will be selected, otherwise the
     *           provided tours will be added to the existing selection.
     * @param isScrollIntoView
+    * @param isCheckReload
     */
-   void selectTours_NatTable(final int[] allRowPositions, final boolean isClearSelection, final boolean isScrollIntoView) {
+   void selectTours_NatTable(final int[] allRowPositions,
+                             final boolean isClearSelection,
+                             final boolean isScrollIntoView,
+                             final boolean isCheckReload) {
 
       // ensure there is something to be selected
       if (allRowPositions == null || allRowPositions.length == 0 || allRowPositions[0] == -1) {
@@ -3155,11 +3160,15 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
                true,
                firstRowPosition);
 
-         _isInReload = true;
+         if (isCheckReload) {
+            _isInReload = true;
+         }
          {
             _natTable_Body_SelectionLayer.doCommand(command);
          }
-         _isInReload = false;
+         if (isCheckReload) {
+            _isInReload = false;
+         }
 
          if (isScrollIntoView) {
 
