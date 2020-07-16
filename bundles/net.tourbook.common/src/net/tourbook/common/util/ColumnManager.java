@@ -187,7 +187,7 @@ public class ColumnManager {
     * {@link ColumnManager} is used for a {@link NatTable}, it provides properties from a
     * {@link NatTable}.
     */
-   private INatTablePropertiesProvider       _natTablePropertiesProvider;
+   private INatTable_PropertiesProvider       _natTablePropertiesProvider;
 
    /**
     * Context menu listener
@@ -2518,7 +2518,7 @@ public class ColumnManager {
       _slideoutShell = slideoutShell;
    }
 
-   public void setupNatTable(final INatTablePropertiesProvider natTablePropertiesProvider) {
+   public void setupNatTable(final INatTable_PropertiesProvider natTablePropertiesProvider) {
 
       _natTablePropertiesProvider = natTablePropertiesProvider;
 
