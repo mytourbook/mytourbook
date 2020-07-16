@@ -41,7 +41,7 @@ import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.IContextMenuProvider;
-import net.tourbook.common.util.INatTablePropertiesProvider;
+import net.tourbook.common.util.INatTable_PropertiesProvider;
 import net.tourbook.common.util.ITourViewer3;
 import net.tourbook.common.util.ITreeViewer;
 import net.tourbook.common.util.PostSelectionProvider;
@@ -67,6 +67,7 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourTypeMenuManager;
 import net.tourbook.tour.printing.ActionPrint;
 import net.tourbook.tourType.TourTypeImage;
+import net.tourbook.ui.INatTable_TourProvider;
 import net.tourbook.ui.ITourProvider2;
 import net.tourbook.ui.ITourProviderByID;
 import net.tourbook.ui.TableColumnFactory;
@@ -90,6 +91,7 @@ import net.tourbook.ui.views.rawData.Action_Reimport_SubMenu;
 import net.tourbook.ui.views.rawData.SubMenu_AdjustTourValues;
 import net.tourbook.ui.views.tourBook.natTable.DataProvider_ColumnHeader;
 import net.tourbook.ui.views.tourBook.natTable.NatTable_DataLoader;
+import net.tourbook.ui.views.tourBook.natTable.NatTable_DummyColumnViewer;
 import net.tourbook.ui.views.tourBook.natTable.NatTable_Header_Tooltip;
 import net.tourbook.ui.views.tourBook.natTable.NatTable_SortModel;
 import net.tourbook.ui.views.tourBook.natTable.SingleClickSortConfiguration_MT;
@@ -206,7 +208,8 @@ import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
-public class TourBookView extends ViewPart implements ITourProvider2, ITourViewer3, ITourProviderByID, ITreeViewer, INatTablePropertiesProvider {
+public class TourBookView extends ViewPart implements ITourProvider2, ITourViewer3, ITourProviderByID, ITreeViewer, INatTable_PropertiesProvider,
+      INatTable_TourProvider {
 
 // SET_FORMATTING_OFF
 
@@ -265,8 +268,10 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
    private IPropertyChangeListener         _prefChangeListener;
    private IPropertyChangeListener         _prefChangeListenerCommon;
    //
-   private NatTable                        _tourViewer_NatTable;
    private TreeViewer                      _tourViewer_Tree;
+   //
+   private NatTable                        _tourViewer_NatTable;
+   private NatTable_DummyColumnViewer      _natTable_DummyColumnViewer;
    //
    private TVITourBookRoot                 _rootItem_Tree;
    //
@@ -1410,6 +1415,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       // set tour info tooltip provider
       _tourInfoToolTip_NatTable = new NatTableViewer_TourInfo_ToolTip(this, ToolTip.NO_RECREATE);
+
+      _natTable_DummyColumnViewer = new NatTable_DummyColumnViewer(this);
    }
 
    /**
@@ -2050,7 +2057,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       if (_isLayoutNatTable) {
 
-         return null;
+         return _natTable_DummyColumnViewer;
 
       } else {
 
