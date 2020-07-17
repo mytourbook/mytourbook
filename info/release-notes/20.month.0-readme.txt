@@ -42,7 +42,7 @@ Improvements
   - storing marker position into mapbookmark. currently not further used. https://github.com/wolfgang-ch/mytourbook/pull/158
   - "S3DB" layer. when using offline mapsforge V5 maps, Buildings are looking nicely. https://github.com/wolfgang-ch/mytourbook/pull/61
   - vtm map engine updated to version 0.13 https://github.com/wolfgang-ch/mytourbook/pull/167
-  - multimapfile support for offline maps. when multiple map files are in the same folder, mt automatically switching between them. https://github.com/wolfgang-ch/mytourbook/pull/61
+  - when multiple map files are in the same folder, mt automatically switching between them. https://github.com/wolfgang-ch/mytourbook/pull/61
   - new online provider mapilion. the old provider opensciencemap is dead.
   - switching between online/offline is working almost correct now, without restart app
 
