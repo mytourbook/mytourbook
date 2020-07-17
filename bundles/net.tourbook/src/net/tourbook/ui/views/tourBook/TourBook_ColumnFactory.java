@@ -2875,7 +2875,7 @@ public class TourBook_ColumnFactory {
 
          @Override
          public String getValueText(final Object element) {
-            return "Tour markers are not yet supported, they are from a join table";
+            return "Tour markers are not yet supported, they are from a join table"; //$NON-NLS-1$
          }
       });
 
@@ -2985,7 +2985,7 @@ public class TourBook_ColumnFactory {
 
          @Override
          public String getValueText(final Object element) {
-            return "Tour tags are not yet supported, they are from a join table";
+            return "Tour tags are not yet supported, they are from a join table"; //$NON-NLS-1$
          }
 
          @Override

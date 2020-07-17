@@ -35,6 +35,16 @@ Improvements
 
 * 2D Map
   - The enhanced painting warning can be hidden in the track options slideout
+  
+* 2.5D Map (Thomas), many news: https://github.com/wolfgang-ch/mytourbook/pull/167
+  - New layer with satellite maps. https://github.com/wolfgang-ch/mytourbook/pull/158
+  - new layer with linked photos. https://github.com/wolfgang-ch/mytourbook/pull/100
+  - storing marker position into mapbookmark. currently not further used. https://github.com/wolfgang-ch/mytourbook/pull/158
+  - "S3DB" layer. when using offline mapsforge V5 maps, Buildings are looking nicely. https://github.com/wolfgang-ch/mytourbook/pull/61
+  - vtm map engine updated to version 0.13 https://github.com/wolfgang-ch/mytourbook/pull/167
+  - when multiple map files are in the same folder, mt automatically switching between them. https://github.com/wolfgang-ch/mytourbook/pull/61
+  - new online provider mapilion. the old provider opensciencemap is dead.
+  - switching between online/offline is working almost correct now, without restart app
 
 * Photo
   - Show selected/hovered folder in the Photo view with more contrast which makes it better readable
@@ -77,6 +87,10 @@ Changes
 * Tour Book view
   Any existing column profiles must be recreated
 
+* Tour Editor View - Swim slices (Frederic)
+  - Renamed the column "Strokes" to "Stk/length" (Number of strokes per length)
+  - Renamed the column "Cadence" to "Stk/min" (Number of strokes per minute)
+
 
 Fixes   
 =====
@@ -99,6 +113,9 @@ Fixes
 
 * Easy Import (Frederic)
   - When importing files, the tour type is set only if it is checked in the launcher configuration
+
+* Tour Filter (Frederic)
+  - When filtering on start dates, the filters "Greater Than or Equal", "Less than", "Equals", "Not Equals" were not working
  
    
 Translation    
