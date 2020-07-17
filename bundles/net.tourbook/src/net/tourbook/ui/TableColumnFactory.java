@@ -207,8 +207,8 @@ public abstract class TableColumnFactory {
    public static final TableColumnFactory SURFING_NUMBER_OF_EVENTS;
    public static final String             SURFING_NUMBER_OF_EVENTS_ID                        = "SURFING_NUMBER_OF_EVENTS";                        //$NON-NLS-1$
 
-   public static final TableColumnFactory SWIM__SWIM_CADENCE;
-   public static final TableColumnFactory SWIM__SWIM_STROKES;
+   public static final TableColumnFactory SWIM__SWIM_STROKE_RATE;
+   public static final TableColumnFactory SWIM__SWIM_STROKES_PER_LENGTH;
    public static final TableColumnFactory SWIM__SWIM_STROKE_STYLE;
 
    public static final TableColumnFactory SWIM__TIME_TOUR_TIME_DIFF;
@@ -2727,20 +2727,20 @@ public abstract class TableColumnFactory {
       /*
        * Swimming
        */
-      SWIM__SWIM_CADENCE = new TableColumnFactory() {
+      SWIM__SWIM_STROKE_RATE = new TableColumnFactory() {
 
          @Override
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "SWIM__SWIM_CADENCE", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "SWIM__SWIM_STROKE_RATE", SWT.TRAIL); //$NON-NLS-1$
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Swimming);
 
-            colDef.setColumnLabel(Messages.ColumnFactory_Swim_Cadence_Label);
-            colDef.setColumnHeaderText(Messages.ColumnFactory_Swim_Cadence_Label);
+            colDef.setColumnLabel(Messages.ColumnFactory_Swim_StrokeRate_Label);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_Swim_StrokeRate_Label);
 //				colDef.setColumnUnit(Messages.ColumnFactory_Swim_Cadence_Label);
-            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Swim_Cadence_Tooltip);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Swim_StrokeRate_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
 
@@ -2748,20 +2748,20 @@ public abstract class TableColumnFactory {
          }
       };
 
-      SWIM__SWIM_STROKES = new TableColumnFactory() {
+      SWIM__SWIM_STROKES_PER_LENGTH = new TableColumnFactory() {
 
          @Override
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "SWIM__SWIM_STROKES", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "SWIM__SWIM_STROKES_PER_LENGTH", SWT.TRAIL); //$NON-NLS-1$
 
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Swimming);
 
-            colDef.setColumnLabel(Messages.ColumnFactory_Swim_Strokes_Label);
-            colDef.setColumnHeaderText(Messages.ColumnFactory_Swim_Strokes_Label);
+            colDef.setColumnLabel(Messages.ColumnFactory_Swim_StrokesPerLength_Label);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_Swim_StrokesPerLength_Label);
 //				colDef.setColumnUnit(Messages.ColumnFactory_Swim_Strokes_Label);
-            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Swim_Strokes_Tooltip);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_Swim_StrokesPerLength_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(9));
 
