@@ -1231,6 +1231,7 @@ public class ColumnManager {
              */
             final MenuItem menuItem = new MenuItem(contextMenu, SWT.PUSH);
             menuItem.setText(Messages.Action_ColumnManager_FreezeCurrentColumn);
+            menuItem.setToolTipText(Messages.Action_ColumnManager_FreezeCurrentColumn_Tooltip);
             menuItem.addListener(SWT.Selection, (event) -> {
                action_FreezeColumn(colDef);
             });
@@ -1362,7 +1363,6 @@ public class ColumnManager {
          final MenuItem menuItem = new MenuItem(contextMenu, SWT.CHECK);
 
          menuItem.setText(menuText);
-//			menuItem.setEnabled(true);
          menuItem.setSelection(isChecked);
 
          menuItem.setData(columnProfile);
@@ -3037,6 +3037,43 @@ public class ColumnManager {
 
       _activeProfile.setVisibleColumnIds(visibleColumnIds.toArray(new String[visibleColumnIds.size()]));
       _activeProfile.visibleColumnIdsAndWidth = columnIdsAndWidth.toArray(new String[columnIdsAndWidth.size()]);
+   }
+
+   /**
+    * Set the columns in {@link #_activeProfile._visibleColumnDefinitions} to the order of the
+    * <code>tableItems</code> in the {@link DialogModifyColumns}
+    *
+    * @param columnViewerModel
+    */
+   void setVisibleColumnIds_FromModel(final ColumnProfile profile, final ArrayList<ColumnDefinition> columnViewerModel) {
+
+      final ArrayList<String> visibleColumnIds = new ArrayList<>();
+      final ArrayList<String> columnIdsAndWidth = new ArrayList<>();
+
+      // recreate columns in the correct sort order
+      for (final ColumnDefinition colDef : columnViewerModel) {
+
+         final String columnId = colDef.getColumnId();
+
+         final boolean isColumnVisible = colDef.isColumnCheckedInContextMenu();
+
+         // update original model, otherwise it could be hidden when it was previously displayed and then set to hidden !!!
+         final ColumnDefinition colDef_Original = getColDef_ByColumnId(columnId);
+         colDef_Original.setIsColumnChecked(isColumnVisible);
+
+         if (isColumnVisible) {
+
+            // set the visible columns
+            visibleColumnIds.add(columnId);
+
+            // set column id and width
+            columnIdsAndWidth.add(columnId);
+            columnIdsAndWidth.add(Integer.toString(colDef.getColumnWidth()));
+         }
+      }
+
+      profile.setVisibleColumnIds(visibleColumnIds.toArray(new String[visibleColumnIds.size()]));
+      profile.visibleColumnIdsAndWidth = columnIdsAndWidth.toArray(new String[columnIdsAndWidth.size()]);
    }
 
    /**

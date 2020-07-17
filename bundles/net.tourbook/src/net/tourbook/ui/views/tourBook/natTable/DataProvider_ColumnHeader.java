@@ -32,13 +32,13 @@ public class DataProvider_ColumnHeader implements IDataProvider {
 
    @Override
    public int getColumnCount() {
-      return _dataProvider.numVisibleColumns;
+      return _dataProvider.getNumberOfVisibleColumns();
    }
 
    @Override
    public Object getDataValue(final int columnIndex, final int rowIndex) {
 
-      if (columnIndex < 0 || columnIndex >= _dataProvider.numVisibleColumns) {
+      if (columnIndex < 0 || columnIndex >= _dataProvider.getNumberOfVisibleColumns()) {
          return null;
       }
 

@@ -213,6 +213,9 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
             Messages.App_Dialog_FirstStartup_Title,
             Messages.App_Dialog_FirstStartup_Message);
 
+      // select measurement system
+      new DialogSelectMeasurementSystem(activeShell).open();
+
       // tell the pref page to create a new default person
       final Boolean isCreatePerson = new Boolean(true);
 
@@ -232,8 +235,6 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
       TourbookPlugin.setActivePerson(allPeople.get(0));
       _prefStore.setValue(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED, Math.random());
 
-      // select measurement system
-      new DialogSelectMeasurementSystem(activeShell).open();
 
       // tip to save tour
       MessageDialog.openInformation(
@@ -426,9 +427,6 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
    @Override
    public void postWindowCreate() {
 
-//		System.out.println("postWindowCreate()\t");
-//		// TODO remove SYSTEM.OUT.PRINTLN
-
       // show editor area
 //		IWorkbenchPage activePage = getWindowConfigurer().getWindow().getActivePage();
 //		activePage.setEditorAreaVisible(true);
@@ -452,9 +450,6 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
    @Override
    public void postWindowOpen() {
-
-//		System.out.println("postWindowOpen()\t");
-//		// TODO remove SYSTEM.OUT.PRINTLN
 
       Display.getDefault().asyncExec(new Runnable() {
          @Override

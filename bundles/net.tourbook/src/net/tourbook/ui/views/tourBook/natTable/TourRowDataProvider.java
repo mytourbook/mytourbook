@@ -34,7 +34,7 @@ public class TourRowDataProvider implements IRowDataProvider<TVITourBookTour> {
 
    @Override
    public int getColumnCount() {
-      return _dataLoader.numVisibleColumns;
+      return _dataLoader.getNumberOfVisibleColumns();
    }
 
    @Override

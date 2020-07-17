@@ -2873,7 +2873,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             setTourDirty();
          }
       };
-      
+
       /*
        * listener for recording/driving/paused time
        */
@@ -3248,11 +3248,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
                @Override
                public void modifyText(final ModifyEvent e) {
+
                   if (_isSetField || _isSavingInProgress) {
                      return;
                   }
+
                   _isTitleModified = true;
                   setTourDirty();
+
+//                onModifyContent();
                }
             });
 
@@ -3438,7 +3442,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
                updateUI_Title();
 
-               onModifyContent();
+//             onModifyContent();
             }
          });
 
@@ -3487,7 +3491,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
                   updateUI_Title();
 
-                  onModifyContent();
+//                onModifyContent();
                }
             });
          }
@@ -7064,6 +7068,18 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 //          form.reflow(false);
    }
 
+   /**
+    * Update other views when tour title is modified
+    * <p>
+    * Deactivated because it slows down the text input in the title field (when this is also applied
+    * to the title field modifyListener).
+    * <p>
+    * The bug https://sourceforge.net/p/mytourbook/bugs/115/ needed some UI behavior changes which
+    * was introduced when Ctrl+S was introduced to save tour in tour editor.
+    * <p>
+    * Keep code to may be used later.
+    */
+   @SuppressWarnings("unused")
    private void onModifyContent() {
 
       if (_tourData == null) {
