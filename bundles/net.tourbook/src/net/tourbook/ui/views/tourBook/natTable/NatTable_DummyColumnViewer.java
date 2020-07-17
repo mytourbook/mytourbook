@@ -32,7 +32,8 @@ import org.eclipse.swt.widgets.Widget;
 
 /**
  * This is a {@link ColumnViewer} implementation for a {@link NatTable} that it can be used where a
- * {@link ColumnViewer} is required but only with a small subset of {@link ColumnViewer} methods.
+ * {@link ColumnViewer} is required. It contains only a small subset of {@link ColumnViewer}
+ * methods.
  */
 public class NatTable_DummyColumnViewer extends ColumnViewer {
 
@@ -103,6 +104,6 @@ public class NatTable_DummyColumnViewer extends ColumnViewer {
    public void reveal(final Object element) {}
 
    @Override
-   protected void setSelectionToWidget(final List l, final boolean reveal) {}
+   protected void setSelectionToWidget(@SuppressWarnings("rawtypes") final List l, final boolean reveal) {}
 
 }
