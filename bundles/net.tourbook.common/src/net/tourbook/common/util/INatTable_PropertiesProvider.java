@@ -21,7 +21,7 @@ import org.eclipse.nebula.widgets.nattable.layer.DataLayer;
 import org.eclipse.nebula.widgets.nattable.reorder.ColumnReorderLayer;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 
-public interface INatTablePropertiesProvider {
+public interface INatTable_PropertiesProvider {
 
    public NatTable getNatTable();
 
