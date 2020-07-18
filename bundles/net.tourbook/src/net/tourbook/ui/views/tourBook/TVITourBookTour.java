@@ -23,8 +23,16 @@ import net.tourbook.database.TourDatabase;
 
 public class TVITourBookTour extends TVITourBookItem {
 
-   long                    tourId;
-   long                    tourTypeId;
+   public long             tourId;
+
+   /**
+    * The default for tour type id is not 0 because 0 is a valid tour type id and would be used even
+    * when tour type id is not set.
+    */
+   long                    tourTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
+
+   long                    colDateTime_MS;
+   String                  colDateTime_Text;
 
    long                    colStartDistance;
    short                   colTimeInterval;
@@ -33,20 +41,37 @@ public class TVITourBookTour extends TVITourBookItem {
    HashSet<Long>           sqlMarkerIds;
 
    /**
-    * id's for the tags or <code>null</code> when tags are not available
+    * Id's for the tags or <code>null</code> when tags are not available
     */
    private ArrayList<Long> _tagIds;
 
    /**
-    * id's for the markers or <code>null</code> when markers are not available
+    * Id's for the markers or <code>null</code> when markers are not available
     */
    private ArrayList<Long> _markerIds;
 
+   /**
+    * @param view
+    * @param parentItem
+    */
    public TVITourBookTour(final TourBookView view, final TreeViewerItem parentItem) {
 
       super(view);
 
       setParentItem(parentItem);
+   }
+
+   @Override
+   public void clearChildren() {
+
+      // cleanup
+      sqlTagIds = null;
+      sqlMarkerIds = null;
+
+      _tagIds = null;
+      _markerIds = null;
+
+      super.clearChildren();
    }
 
    @Override
@@ -101,6 +126,23 @@ public class TVITourBookTour extends TVITourBookItem {
 
    public void setTagIds(final HashSet<Long> tagIds) {
       sqlTagIds = tagIds;
+   }
+
+   @Override
+   public String toString() {
+
+      return "TVITourBookTour" + NL //$NON-NLS-1$
+
+            + "[" + NL //$NON-NLS-1$
+
+            + "colDateTimeText=" + colDateTime_Text //$NON-NLS-1$
+            + NL
+            + "colTourDateTime=" + colTourDateTime + NL //$NON-NLS-1$
+            + "colTourTitle=" + colTourTitle //$NON-NLS-1$
+
+            + NL
+
+            + "]"; //$NON-NLS-1$
    }
 
 }

@@ -70,6 +70,8 @@ import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 
 public class PrefPageComputedValues extends PreferencePage implements IWorkbenchPreferencePage {
 
+   private static final String GRAPH_LABEL_CADENCE_UNIT = net.tourbook.common.Messages.Graph_Label_Cadence_Unit;
+
    public static final String  ID                                = "net.tourbook.preferences.PrefPageComputedValues"; //$NON-NLS-1$
 
    public static final String  URL_DOUGLAS_PEUCKER_ALGORITHM     =
@@ -828,7 +830,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
          // label: unit
          label = new Label(container, SWT.NONE);
-         label.setText(net.tourbook.common.Messages.Graph_Label_Cadence_Unit);
+         label.setText(GRAPH_LABEL_CADENCE_UNIT);
       }
 
       GridDataFactory.fillDefaults().applyTo(container);
@@ -1104,7 +1106,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
             final StringBuilder differenceResult = new StringBuilder();
             if (elevationDifference > 0) {
-               differenceResult.append("+");
+               differenceResult.append(net.tourbook.common.UI.SYMBOL_PLUS);
             }
 
             differenceResult.append(_nf0.format((elevationDifference) / UI.UNIT_VALUE_ALTITUDE));

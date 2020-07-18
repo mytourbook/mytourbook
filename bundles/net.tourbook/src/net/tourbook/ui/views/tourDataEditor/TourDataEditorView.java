@@ -39,6 +39,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import net.sf.swtaddons.autocomplete.combo.AutocompleteComboInput;
 import net.tourbook.Messages;
@@ -226,7 +227,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private static final String    VALUE_UNIT_K_CALORIES         = net.tourbook.ui.Messages.Value_Unit_KCalories;
    //
    /**
-    * On Linux an asynch selection event is fired since e4
+    * On Linux an async selection event is fired since e4
     */
    private static final String    FIX_LINUX_ASYNC_EVENT_1       = "FIX_LINUX_ASYNC_EVENT_1";                              //$NON-NLS-1$
    private static final String    FIX_LINUX_ASYNC_EVENT_2       = "FIX_LINUX_ASYNC_EVENT_2";                              //$NON-NLS-1$
@@ -299,9 +300,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private float[][]               _serieGears;
    private boolean[]               _serieBreakTime;
    //
-   private short[]                 _swimSerie_Cadence;
-// private short[]                  _swimSerie_LengthType;
-   private short[]                 _swimSerie_Strokes;
+   private short[]                 _swimSerie_StrokeRate;
+// private short[]                 _swimSerie_LengthType;
+   private short[]                 _swimSerie_StrokesPerlength;
    private short[]                 _swimSerie_StrokeStyle;
    private int[]                   _swimSerie_Time;
    //
@@ -312,7 +313,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private ColumnDefinition        _timeSlice_ColDef_Latitude;
    private ColumnDefinition        _timeSlice_ColDef_Longitude;
    //
-   private ColumnDefinition        _swimSlice_ColDef_Cadence;
+   private ColumnDefinition        _swimSlice_ColDef_StrokeRate;
    private ColumnDefinition        _swimSlice_ColDef_Strokes;
    private ColumnDefinition        _swimSlice_ColDef_StrokeStyle;
    //
@@ -377,8 +378,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     * contains the tour id from the last selection event
     */
    private Long                               _selectionTourId;
-   //
-   private KeyAdapter                         _keyListener;
    private ModifyListener                     _modifyListener;
    private ModifyListener                     _modifyListener_Temperature;
    private MouseWheelListener                 _mouseWheelListener;
@@ -420,7 +419,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private boolean                            _isInfoInTitle;
 
    /**
-    * Is <code>true</code> when a cell editor is activ, otherwise <code>false</code>
+    * Is <code>true</code> when a cell editor is active, otherwise <code>false</code>
     */
    private boolean                            _isCellEditorActive;
 
@@ -457,7 +456,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private SliceEditingSupport_Double         _timeSlice_LatitudeEditingSupport;
    private SliceEditingSupport_Double         _timeSlice_LongitudeEditingSupport;
    //
-   private SliceEditingSupport_Short          _swimSlice_CadenceEditingSupport;
+   private SliceEditingSupport_Short          _swimSlice_StrokeRateEditingSupport;
    private SliceEditingSupport_Short          _swimSlice_StrokesEditingSupport;
    private SliceEditor_ComboBox_StrokeStyle   _swimSlice_StrokeStyleEditingSupport;
    //
@@ -531,6 +530,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    // ################################################## UI controls ##################################################
    //
 
+   private Composite                _parent;
    private PageBook                 _pageBook;
    private Composite                _page_NoTourData;
    private Form                     _page_EditorForm;
@@ -546,7 +546,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    //
    /**
     * contains the controls which are displayed in the first column, these controls are used to get
-    * the maximum width and set the first column within the differenct section to the same width
+    * the maximum width and set the first column within the different section to the same width
     */
    private final ArrayList<Control> _firstColumnControls          = new ArrayList<>();
    private final ArrayList<Control> _firstColumnContainerControls = new ArrayList<>();
@@ -570,6 +570,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    //
    private Label                    _timeSlice_Label;
    private TableViewer              _timeSlice_Viewer;
+   private AtomicInteger            _timeSlice_Viewer_RunningId   = new AtomicInteger();
    private TimeSliceComparator      _timeSlice_Comparator         = new TimeSliceComparator();
    private Object[]                 _timeSlice_ViewerItems;
    private ColumnManager            _timeSlice_ColumnManager;
@@ -816,7 +817,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   __dataSerie[serieIndex] = enteredValue;
 
                   /*
-                   * worldposition has changed, this is an absolute overkill, wenn only one position
+                   * world position has changed, this is an absolute overkill, when only one
+                   * position
                    * has changed
                    */
                   _tourData.clearWorldPositions();
@@ -2871,12 +2873,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             setTourDirty();
          }
       };
-      _keyListener = new KeyAdapter() {
-         @Override
-         public void keyReleased(final KeyEvent e) {
-            onModifyContent();
-         }
-      };
 
       /*
        * listener for recording/driving/paused time
@@ -3248,16 +3244,19 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   .hint(_hintTextColumnWidth, SWT.DEFAULT)
                   .applyTo(_comboTitle);
 
-            _comboTitle.addKeyListener(_keyListener);
             _comboTitle.addModifyListener(new ModifyListener() {
 
                @Override
                public void modifyText(final ModifyEvent e) {
+
                   if (_isSetField || _isSavingInProgress) {
                      return;
                   }
+
                   _isTitleModified = true;
                   setTourDirty();
+
+//                onModifyContent();
                }
             });
 
@@ -3443,7 +3442,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
                updateUI_Title();
 
-               onModifyContent();
+//             onModifyContent();
             }
          });
 
@@ -3492,7 +3491,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
                   updateUI_Title();
 
-                  onModifyContent();
+//                onModifyContent();
                }
             });
          }
@@ -3882,6 +3881,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _spinPerson_FTP.setMaximum(10000);
 
             _spinPerson_FTP.addMouseWheelListener(_mouseWheelListener);
+            _spinPerson_FTP.addSelectionListener(_selectionListener);
 
             // spacer
             _tk.createLabel(container, UI.EMPTY_STRING);
@@ -4576,6 +4576,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       // with e4 the layouts are not yet set -> NPE's -> run async which worked
       parent.getShell().getDisplay().asyncExec(() -> {
 
+         if (_tab1Container.isDisposed()) {
+
+            // this can occure when view is closed (very early) but not yet visible
+            return;
+         }
+
          // compute width for all controls and equalize column width for the different sections
          _tab1Container.layout(true, true);
          UI.setEqualizeColumWidths(_firstColumnControls);
@@ -4783,11 +4789,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _swimSlice_Viewer.getTable(),
             SwimStrokeManager.getAllSortedSwimStrokeLabel());
 
-      _swimSlice_CadenceEditingSupport = new SliceEditingSupport_Short(textCellEditor, _swimSerie_Cadence);
-      _swimSlice_StrokesEditingSupport = new SliceEditingSupport_Short(textCellEditor, _swimSerie_Strokes);
+      _swimSlice_StrokeRateEditingSupport = new SliceEditingSupport_Short(textCellEditor, _swimSerie_StrokeRate);
+      _swimSlice_StrokesEditingSupport = new SliceEditingSupport_Short(textCellEditor, _swimSerie_StrokesPerlength);
       _swimSlice_StrokeStyleEditingSupport = new SliceEditor_ComboBox_StrokeStyle(strokeStyleCellEditor, _swimSerie_StrokeStyle);
 
-      _swimSlice_ColDef_Cadence.setEditingSupport(_swimSlice_CadenceEditingSupport);
+      _swimSlice_ColDef_StrokeRate.setEditingSupport(_swimSlice_StrokeRateEditingSupport);
       _swimSlice_ColDef_Strokes.setEditingSupport(_swimSlice_StrokesEditingSupport);
       _swimSlice_ColDef_StrokeStyle.setEditingSupport(_swimSlice_StrokeStyleEditingSupport);
 
@@ -4840,8 +4846,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       defineColumn_SwimSlice_Time_TimeInSeconds();
       defineColumn_SwimSlice_Time_TimeDiff();
 
-      defineColumn_SwimSlice_Swim_Strokes();
-      defineColumn_SwimSlice_Swim_Cadence();
+      defineColumn_SwimSlice_Swim_StrokesPerLength();
+      defineColumn_SwimSlice_Swim_StrokeRate();
       defineColumn_SwimSlice_Swim_StrokeStyle();
    }
 
@@ -4920,21 +4926,24 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       });
    }
 
-   private void defineColumn_SwimSlice_Swim_Cadence() {
+   /**
+    * Stroke Rate or number of strokes per minute.
+    */
+   private void defineColumn_SwimSlice_Swim_StrokeRate() {
 
       TableColumnDefinition colDef;
 
-      _swimSlice_ColDef_Cadence = colDef = TableColumnFactory.SWIM__SWIM_CADENCE.createColumn(_swimSlice_ColumnManager, _pc);
+      _swimSlice_ColDef_StrokeRate = colDef = TableColumnFactory.SWIM__SWIM_STROKE_RATE.createColumn(_swimSlice_ColumnManager, _pc);
 
       colDef.setIsDefaultColumn();
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
-            if (_swimSerie_Cadence != null) {
+            if (_swimSerie_StrokeRate != null) {
 
                final SwimSlice timeSlice = (SwimSlice) cell.getElement();
-               final short value = _swimSerie_Cadence[timeSlice.serieIndex];
+               final short value = _swimSerie_StrokeRate[timeSlice.serieIndex];
 
                if (value == 0) {
                   cell.setText(UI.EMPTY_STRING);
@@ -4949,21 +4958,21 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       });
    }
 
-   private void defineColumn_SwimSlice_Swim_Strokes() {
+   private void defineColumn_SwimSlice_Swim_StrokesPerLength() {
 
       final ColumnDefinition colDef;
 
-      _swimSlice_ColDef_Strokes = colDef = TableColumnFactory.SWIM__SWIM_STROKES.createColumn(_swimSlice_ColumnManager, _pc);
+      _swimSlice_ColDef_Strokes = colDef = TableColumnFactory.SWIM__SWIM_STROKES_PER_LENGTH.createColumn(_swimSlice_ColumnManager, _pc);
 
       colDef.setIsDefaultColumn();
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
-            if (_swimSerie_Strokes != null) {
+            if (_swimSerie_StrokesPerlength != null) {
 
                final SwimSlice timeSlice = (SwimSlice) cell.getElement();
-               final short value = _swimSerie_Strokes[timeSlice.serieIndex];
+               final short value = _swimSerie_StrokesPerlength[timeSlice.serieIndex];
 
                if (value == 0) {
                   cell.setText(UI.EMPTY_STRING);
@@ -4994,7 +5003,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                final SwimSlice swimSlice = (SwimSlice) cell.getElement();
                final short value = _swimSerie_StrokeStyle[swimSlice.serieIndex];
 
-               if (value == Short.MIN_VALUE) {
+               if (value == Short.MIN_VALUE || value == SwimStroke.INVALID.getValue()) {
+
+                  // show nothing instead of "<Invalid Style>"
 
                   cell.setText(UI.EMPTY_STRING);
 
@@ -5467,7 +5478,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     */
    private void defineColumn_TimeSlice_Power() {
 
-      final ColumnDefinition colDef = TableColumnFactory.POWER.createColumn(_timeSlice_ColumnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.POWER_TIME_SLICE.createColumn(_timeSlice_ColumnManager, _pc);
       colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {
@@ -5491,7 +5502,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       ColumnDefinition colDef;
 
-      _timeSlice_ColDef_Cadence = colDef = TableColumnFactory.POWERTRAIN_CADENCE.createColumn(_timeSlice_ColumnManager, _pc);
+      _timeSlice_ColDef_Cadence = colDef = TableColumnFactory.POWERTRAIN_CADENCE_TIME_SLICE.createColumn(_timeSlice_ColumnManager, _pc);
       colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {
@@ -5512,7 +5523,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     */
    private void defineColumn_TimeSlice_Powertrain_GearRatio() {
 
-      final ColumnDefinition colDef = TableColumnFactory.POWERTRAIN_GEAR_RATIO.createColumn(_timeSlice_ColumnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.POWERTRAIN_GEAR_RATIO_TIME_SLICE.createColumn(_timeSlice_ColumnManager, _pc);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -5562,7 +5573,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    }
 
    /**
-    * column: cadence
+    * Column: Paused time
     */
    private void defineColumn_TimeSlice_Time_BreakTime() {
 
@@ -5720,7 +5731,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private void defineColumn_TimeSlice_Weather_Temperature() {
 
       final ColumnDefinition colDef;
-      _timeSlice_ColDef_Temperature = colDef = TableColumnFactory.WEATHER_TEMPERATURE.createColumn(_timeSlice_ColumnManager, _pc);
+      _timeSlice_ColDef_Temperature = colDef = TableColumnFactory.WEATHER_TEMPERATURE_TIME_SLICE.createColumn(_timeSlice_ColumnManager, _pc);
       colDef.setColumnSelectionListener(_columnSortListener);
 
       colDef.setLabelProvider(new CellLabelProvider() {
@@ -5871,6 +5882,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _firstColumnControls.clear();
       _secondColumnControls.clear();
       _firstColumnContainerControls.clear();
+
+      /*
+       * Tour MUST be set clean otherwise a Ctrl+W whould "close" the tour editor but closing the
+       * app is asking to save the tour!
+       */
+      setTourClean();
 
       super.dispose();
    }
@@ -6243,6 +6260,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    private void enableControls() {
 
+      final Table timeSliceTable = _timeSlice_Viewer.getTable();
+      if (timeSliceTable.isDisposed()) {
+         return;
+      }
+
       final boolean canEdit = _isEditMode && isTourInDb();
       final boolean isManualAndEdit = _isManualTour && canEdit;
       final boolean isDeviceTour = _isManualTour == false;
@@ -6306,7 +6328,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _linkTag.setEnabled(canEdit);
       _linkTourType.setEnabled(canEdit);
 
-      _timeSlice_Viewer.getTable().setEnabled(isDeviceTour);
+      timeSliceTable.setEnabled(isDeviceTour);
    }
 
    private void fillContextMenu_SwimSlice(final IMenuManager menuMgr) {
@@ -6579,14 +6601,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       _serieTemperature = _tourData.temperatureSerie;
 
-      _swimSerie_Cadence = _tourData.swim_Cadence;
+      _swimSerie_StrokeRate = _tourData.swim_Cadence;
 //    _swimSerie_LengthType = _tourData.swim_LengthType;
-      _swimSerie_Strokes = _tourData.swim_Strokes;
+      _swimSerie_StrokesPerlength = _tourData.swim_Strokes;
       _swimSerie_StrokeStyle = _tourData.swim_StrokeStyle;
       _swimSerie_Time = _tourData.swim_Time;
 
-      _swimSlice_CadenceEditingSupport.setDataSerie(_swimSerie_Cadence);
-      _swimSlice_StrokesEditingSupport.setDataSerie(_swimSerie_Strokes);
+      _swimSlice_StrokeRateEditingSupport.setDataSerie(_swimSerie_StrokeRate);
+      _swimSlice_StrokesEditingSupport.setDataSerie(_swimSerie_StrokesPerlength);
       _swimSlice_StrokeStyleEditingSupport.setDataSerie(_swimSerie_StrokeStyle);
 
       _timeSlice_AltitudeEditingSupport.setDataSerie(_serieAltitude);
@@ -6847,6 +6869,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    private void initUI(final Composite parent) {
 
+      _parent = parent;
+
       _pc = new PixelConverter(parent);
 
       _hintDefaultSpinnerWidth = _isLinux //
@@ -7047,6 +7071,18 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 //          form.reflow(false);
    }
 
+   /**
+    * Update other views when tour title is modified
+    * <p>
+    * Deactivated because it slows down the text input in the title field (when this is also applied
+    * to the title field modifyListener).
+    * <p>
+    * The bug https://sourceforge.net/p/mytourbook/bugs/115/ needed some UI behavior changes which
+    * was introduced when Ctrl+S was introduced to save tour in tour editor.
+    * <p>
+    * Keep code to may be used later.
+    */
+   @SuppressWarnings("unused")
    private void onModifyContent() {
 
       if (_tourData == null) {
@@ -7489,7 +7525,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _timeSlice_TourViewer.reloadViewer();
             updateStatusLine();
 
-            // run asynch because relaodViewer is also running asynch
+            // run async because reloadViewer is also running async
             Display.getCurrent().asyncExec(new Runnable() {
                @Override
                public void run() {
@@ -7513,7 +7549,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _swimSlice_TourViewer.reloadViewer();
 //          updateStatusLine();
 
-            // run asynch because relaodViewer is also running asynch
+            // run async because relaodViewer is also running async
             Display.getCurrent().asyncExec(new Runnable() {
 
                @Override
@@ -7599,7 +7635,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _isSetField = isBackup;
    }
 
-   private void recreateViewer() {
+   public void recreateViewer() {
 
       /*
        * Recreate time slice viewer
@@ -7886,15 +7922,73 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       final Table table = (Table) _timeSlice_Viewer.getControl();
       final int itemCount = table.getItemCount();
 
-      // adjust to array bounds
-      int valueIndex = chartInfo.selectedSliderValuesIndex;
-      valueIndex = Math.max(0, Math.min(valueIndex, itemCount - 1));
+      if (_prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SELECT_INBETWEEN_TIME_SLICES)) {
 
-      table.setSelection(valueIndex);
-      table.showSelection();
+         final int runnableRunningId = _timeSlice_Viewer_RunningId.incrementAndGet();
 
-      // fire slider position
-//    fDataViewer.setSelection(fDataViewer.getSelection());
+         // delay the selection of multiple lines, moving the mouse can occur very often
+         _parent.getDisplay().timerExec(50, new Runnable() {
+
+            private int __runningId = runnableRunningId;
+
+            @Override
+            public void run() {
+
+               if (_parent.isDisposed()) {
+                  return;
+               }
+
+               final int currentId = _timeSlice_Viewer_RunningId.get();
+
+               if (__runningId != currentId) {
+
+                  // a newer runnable is created
+
+                  return;
+               }
+
+               final int minSelectedValue = Math.min(chartInfo.leftSliderValuesIndex, chartInfo.rightSliderValuesIndex);
+               final int maxSelectedValue = Math.max(chartInfo.leftSliderValuesIndex, chartInfo.rightSliderValuesIndex);
+
+               table.setSelection(minSelectedValue, maxSelectedValue);
+               table.showSelection();
+            }
+         });
+
+      } else {
+
+         final int runnableRunningId = _timeSlice_Viewer_RunningId.incrementAndGet();
+
+         // delay the selection of multiple lines, moving the mouse can occur very often
+         _parent.getDisplay().timerExec(20, new Runnable() {
+
+            private int __runningId = runnableRunningId;
+
+            @Override
+            public void run() {
+
+               if (_parent.isDisposed()) {
+                  return;
+               }
+
+               final int currentId = _timeSlice_Viewer_RunningId.get();
+
+               if (__runningId != currentId) {
+
+                  // a newer runnable is created
+
+                  return;
+               }
+
+               // adjust to array bounds
+               int valueIndex = chartInfo.selectedSliderValuesIndex;
+               valueIndex = Math.max(0, Math.min(valueIndex, itemCount - 1));
+
+               table.setSelection(valueIndex);
+               table.showSelection();
+            }
+         });
+      }
    }
 
    private void selectTimeSlice(final SelectionChartXSliderPosition sliderPosition) {
@@ -7923,7 +8017,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     *           Can be {@link SelectionChartXSliderPosition#IGNORE_SLIDER_POSITION} when this
     *           position should not be set.
     */
-   private void selectTimeSlice_InViewer(final int valueIndexStart, final int valueIndexEnd) {
+   public void selectTimeSlice_InViewer(final int valueIndexStart, final int valueIndexEnd) {
 
       final Table table = (Table) _timeSlice_Viewer.getControl();
       final int itemCount = table.getItemCount();
@@ -7948,6 +8042,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       table.showSelection();
    }
 
+   public void selectTimeSlicesTab() {
+      _tabFolder.setSelection(_tab_20_TimeSlices);
+   }
+
    @Override
    public void setFocus() {
 
@@ -7958,12 +8056,34 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    }
 
    /**
+    * Programmatically toggles the row select mode
+    *
+    * @param enabled
+    *           True to activate the row select mode, false to disactivate it.
+    */
+   public void setRowEditModeEnabled(final boolean enabled) {
+
+      _actionToggleRowSelectMode.setChecked(enabled);
+
+      actionToggleRowSelectMode();
+   }
+
+   /**
     * Set stroke style for the selected swim slices
     *
     * @param strokeStyle
-    *           Stroke style, can be <code>null</code> to remove the stroke styke
+    *           Stroke style, can be <code>null</code> to remove the stroke style
     */
    void setSwimStyle(final StrokeStyle strokeStyle) {
+
+      // check if stroke style data are available
+      if (_swimSerie_StrokeStyle == null) {
+
+         _swimSerie_StrokeStyle = _tourData.swim_StrokeStyle = new short[_swimSerie_Time.length];
+
+         // setup all stroke styles with SwimStroke.INVALID, 0 is the swim stroke for freestyle !!!
+         Arrays.fill(_swimSerie_StrokeStyle, SwimStroke.INVALID.getValue());
+      }
 
       final StructuredSelection selection = (StructuredSelection) _swimSlice_Viewer.getSelection();
 
@@ -8185,7 +8305,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
              * rounding errors
              */
 
-            _tourData.setWeatherWindSpeed((int) (_spinWeather_Wind_SpeedValue.getSelection() * _unitValueDistance));
+            _tourData.setWeatherWindSpeed(Math.round((_spinWeather_Wind_SpeedValue.getSelection() * _unitValueDistance)));
          }
 
          final int cloudIndex = _comboWeather_Clouds.getSelectionIndex();
@@ -8623,7 +8743,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       // wind speed
       final int windSpeed = _tourData.getWeatherWindSpeed();
-      final int speed = (int) (windSpeed / _unitValueDistance);
+      final int speed = Math.round(windSpeed / _unitValueDistance);
       _spinWeather_Wind_SpeedValue.setSelection(speed);
       _comboWeather_WindSpeedText.select(getWindSpeedTextIndex(speed));
 
@@ -8804,7 +8924,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    }
 
-   private void updateUI_Tab_2_TimeSlices() {
+   public void updateUI_Tab_2_TimeSlices() {
 
       if (_uiRunnableForce_TimeSliceReload) {
          _timeSlice_ViewerTourId = -1L;
@@ -8964,6 +9084,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     * Update title of the view with the modified date/time
     */
    private void updateUI_Title() {
+
+      if (_dtTourDate.isDisposed()) {
+         return;
+      }
 
       final ZoneId zoneId = _tourData == null //
             ? TimeTools.getDefaultTimeZone()

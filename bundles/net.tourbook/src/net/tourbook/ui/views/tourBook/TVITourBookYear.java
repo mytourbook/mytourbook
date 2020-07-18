@@ -35,7 +35,7 @@ public class TVITourBookYear extends TVITourBookItem {
 
    private static final String YEAR_WEEK_FORMAT = "[%02d] %s"; //$NON-NLS-1$
 
-   private YearSubCategory     _subCategory;
+   private TourBookViewLayout  _subCategory;
 
    boolean                     isRowSummary;
 
@@ -43,7 +43,7 @@ public class TVITourBookYear extends TVITourBookItem {
 
       super(view);
 
-      _subCategory = view.getYearSub();
+      _subCategory = view.getViewLayout();
 
       setParentItem(parentItem);
    }
@@ -51,7 +51,7 @@ public class TVITourBookYear extends TVITourBookItem {
    @Override
    protected void fetchChildren() {
 
-      final boolean isWeekDisplayed = _subCategory == YearSubCategory.WEEK;
+      final boolean isWeekDisplayed = _subCategory == TourBookViewLayout.CATEGORY_WEEK;
 
       final ArrayList<TreeViewerItem> children = new ArrayList<>();
       setChildren(children);
@@ -144,7 +144,7 @@ public class TVITourBookYear extends TVITourBookItem {
          final ResultSet result = statement.executeQuery();
          while (result.next()) {
 
-            final TVITourBookItem tourItem = new TVITourBookYearSub(tourBookView, this, _subCategory);
+            final TVITourBookItem tourItem = new TVITourBookYearCategorized(tourBookView, this, _subCategory);
 
             children.add(tourItem);
 

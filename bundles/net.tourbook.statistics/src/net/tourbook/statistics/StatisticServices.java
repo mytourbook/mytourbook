@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -200,7 +200,7 @@ public class StatisticServices {
 
       final IPreferenceStore commonPrefStore = CommonActivator.getPrefStore();
 
-      final String defaultColorName = ICommonPreferences.GRAPH_COLORS + graphName + "."; //$NON-NLS-1$
+      final String defaultColorName = ICommonPreferences.GRAPH_COLORS + graphName + UI.SYMBOL_DOT;
 
       // put the color into the chart data
       yData.setDefaultRGB(PreferenceConverter.getColor(//
@@ -274,7 +274,7 @@ public class StatisticServices {
           * color index 0: default color
           */
          final IPreferenceStore commonPrefStore = CommonActivator.getPrefStore();
-         final String defaultColorName = ICommonPreferences.GRAPH_COLORS + graphName + "."; //$NON-NLS-1$
+         final String defaultColorName = ICommonPreferences.GRAPH_COLORS + graphName + UI.SYMBOL_DOT;
 
          rgbBright.add(PreferenceConverter.getColor(
                commonPrefStore,

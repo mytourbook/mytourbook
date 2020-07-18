@@ -395,8 +395,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
          final SelectionChartXSliderPosition xSliderSelection = new SelectionChartXSliderPosition(
                tourChart,
                serieIndex0,
-               serieIndexLeft,
-               true);
+               serieIndexLeft);
 
          xSliderSelection.setCenterSliderPosition(true);
 

@@ -494,12 +494,12 @@ public class FitData {
 
             String spacerText = UI.EMPTY_STRING;
 
-            // Insert spacer character of Sport Name is present
+            // Insert spacer character if Sport Name is present
             if ((!UI.EMPTY_STRING.equals(_sportName)) && (!UI.EMPTY_STRING.equals(_profileName))) {
                spacerText = UI.DASH_WITH_SPACE;
             }
 
-            applyTour_Type(_tourData, String.format("%s%s%s", _sportName, spacerText, _profileName));
+            applyTour_Type(_tourData, _sportName + spacerText + _profileName);
             break;
          }
       }

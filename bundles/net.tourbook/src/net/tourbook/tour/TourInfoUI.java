@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -191,6 +191,8 @@ public class TourInfoUI {
    private Label             _lblGearRearShifts;
    private Label             _lblMaxAltitude;
    private Label             _lblMaxAltitudeUnit;
+   private Label             _lblMaxPace;
+   private Label             _lblMaxPaceUnit;
    private Label             _lblMaxPulse;
    private Label             _lblMaxPulseUnit;
    private Label             _lblMaxSpeed;
@@ -303,8 +305,9 @@ public class TourInfoUI {
 
       final Composite container = createUI(parent);
 
+// this do not help to remove flickering, first an empty tooltip window is displayed then also it's content
 //      _ttContainer.setRedraw(false);
-
+ 
       updateUI();
       updateUI_Layout();
 
@@ -714,6 +717,14 @@ public class TourInfoUI {
 
       _lblMaxSpeed = createUI_LabelValue(container, SWT.TRAIL);
       _lblMaxSpeedUnit = createUI_LabelValue(container, SWT.LEAD);
+
+      /*
+       * max pace
+       */
+      createUI_Label(container, Messages.Tour_Tooltip_Label_MaxPace);
+
+      _lblMaxPace = createUI_LabelValue(container, SWT.TRAIL);
+      _lblMaxPaceUnit = createUI_LabelValue(container, SWT.LEAD);
 
       /*
        * max altitude
@@ -1481,6 +1492,17 @@ public class TourInfoUI {
 
       _lblMaxPulse.setText(FormatManager.formatPulse(_tourData.getMaxPulse()));
       _lblMaxPulseUnit.setText(Messages.Value_Unit_Pulse);
+
+      float maxPace = _tourData.getMaxPace();
+      //If maxPace is equal to the maximum float value,
+      //it means that the Tour may not have a pace serie data.
+      //In this case, we set it to 0, otherwise it will display
+      //a gigantic value.
+      if (maxPace == Float.MAX_VALUE) {
+         maxPace = 0;
+      }
+      _lblMaxPace.setText(UI.format_mm_ss((long) (maxPace * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE)));
+      _lblMaxPaceUnit.setText(UI.UNIT_LABEL_PACE);
 
       _lblMaxSpeed.setText(FormatManager.formatSpeed(_tourData.getMaxSpeed() / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE));
       _lblMaxSpeedUnit.setText(UI.UNIT_LABEL_SPEED);

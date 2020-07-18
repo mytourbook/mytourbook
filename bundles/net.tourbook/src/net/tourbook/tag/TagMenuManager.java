@@ -413,7 +413,7 @@ public class TagMenuManager {
    }
 
    /**
-    * create actions for recenct tags
+    * create actions for recent tags
     */
    private static void setupRecentActions() {
 
@@ -605,28 +605,31 @@ public class TagMenuManager {
       // add all recent tags
       int tagIndex = 0;
       for (final ActionRecentTag actionRecentTag : _actionsRecentTags) {
-         try {
 
-            final TourTag tag = _recentTags.get(tagIndex);
+         if (tagIndex >= _recentTags.size()) {
 
-            if (menu == null) {
-
-               actionRecentTag.setupTagAction(
-                     tag,
-                     (UI.SPACE4 + UI.MNEMONIC + (tagIndex + 1) + UI.SPACE2 + tag.getTagName()));
-               menuMgr.add(new ActionContributionItem(actionRecentTag));
-
-            } else {
-
-               actionRecentTag.setupTagAction(
-                     tag,
-                     (UI.MNEMONIC + (tagIndex + 1) + UI.SPACE2 + tag.getTagName()));
-               new ActionContributionItem(actionRecentTag).fill(menu, -1);
-            }
-
-         } catch (final IndexOutOfBoundsException e) {
             // there are no more recent tags
+
             break;
+         }
+
+         final TourTag tag = _recentTags.get(tagIndex);
+
+         if (menu == null) {
+
+            actionRecentTag.setupTagAction(
+                  tag,
+                  (UI.SPACE4 + UI.MNEMONIC + (tagIndex + 1) + UI.SPACE2 + tag.getTagName()));
+
+            menuMgr.add(new ActionContributionItem(actionRecentTag));
+
+         } else {
+
+            actionRecentTag.setupTagAction(
+                  tag,
+                  (UI.MNEMONIC + (tagIndex + 1) + UI.SPACE2 + tag.getTagName()));
+
+            new ActionContributionItem(actionRecentTag).fill(menu, -1);
          }
 
          tagIndex++;

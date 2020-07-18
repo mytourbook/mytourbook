@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -26,8 +26,6 @@ public class Messages extends NLS {
    public static String        App_Action_Remove_NoConfirm;
    public static String        App_Action_Rename_WithConfirm;
 
-   public static String        App_Annotation_1;
-
    public static String        App_Error_NotSupportedValueFormatter;
 
    public static String        Action_App_CustomizeColumnsAndProfiles;
@@ -35,15 +33,21 @@ public class Messages extends NLS {
 
    public static String        Action_ColumnManager_Column_Info;
    public static String        Action_ColumnManager_ColumnActions_Info;
+   public static String        Action_ColumnManager_FreezeCurrentColumn;
+   public static String        Action_ColumnManager_FreezeCurrentColumn_Tooltip;
    public static String        Action_ColumnManager_HideCurrentColumn;
    public static String        Action_ColumnManager_Profile_Info;
    public static String        Action_ColumnManager_ShowAllColumns;
    public static String        Action_ColumnManager_ShowDefaultColumns;
+   public static String        Action_ColumnManager_UnFreezeAllColumns;
    public static String        Action_ColumnManager_ValueFormatter_Category;
    public static String        Action_ColumnManager_ValueFormatter_Detail;
    public static String        Action_ColumnManager_ValueFormatter_Tour;
 
    public static String        Advanced_Menu_AnimationSymbol;
+
+   public static String        Column_Annotation_Formatting;
+   public static String        Column_Annotation_Sorting;
 
    public static String        Column_Profile_Dialog_ShowAllColumns_Message;
    public static String        Column_Profile_Dialog_ShowDefaultColumns_Message;
@@ -62,6 +66,7 @@ public class Messages extends NLS {
    public static String        ColumnModifyDialog_Button_Sort;
    public static String        ColumnModifyDialog_Button_Sort_Tooltip;
    public static String        ColumnModifyDialog_Checkbox_ShowFormatAnnotations;
+   public static String        ColumnModifyDialog_Checkbox_ShowSortingAnnotations;
    public static String        ColumnModifyDialog_Column_Category;
    public static String        ColumnModifyDialog_Column_FormatCategory;
    public static String        ColumnModifyDialog_Column_FormatTour;
@@ -125,8 +130,6 @@ public class Messages extends NLS {
    public static String        Graph_Label_Pace;
    public static String        Graph_Label_Power;
    public static String        Graph_Label_Power_Unit;
-   public static String        Graph_Label_ShowHrZoneBackground;
-   public static String        Graph_Label_ShowHrZoneBackground_Tooltip;
    public static String        Graph_Label_Speed;
    public static String        Graph_Label_Temperature;
    public static String        Graph_Label_TimeDuration;
