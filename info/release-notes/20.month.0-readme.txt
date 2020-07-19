@@ -4,7 +4,6 @@
 TODO's
 ======  
              
-  - csv export: export new column(s) in tourbook view
 
 
 New
@@ -137,6 +136,7 @@ Translation
 System   
 ======
 
-* Eclipse 2020-06
 * FIT SDK 21.32
+* Eclipse 2020-06
+* Java 9+ runtime support
 
