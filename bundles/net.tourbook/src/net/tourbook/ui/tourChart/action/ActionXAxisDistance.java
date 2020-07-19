@@ -34,13 +34,13 @@ public class ActionXAxisDistance extends Action {
 
       setToolTipText(Messages.Tour_Action_show_distance_on_x_axis_tooltip);
 
-      final String imagePath = UI.UNIT_IS_METRIC
-            ? Messages.Image__show_distance_on_x_axis
-            : Messages.Image__show_distance_on_x_axis_imperial;
+      String imagePath = Messages.Image__show_distance_on_x_axis;
+      String disabledImagePath = Messages.Image__show_distance_on_x_axis_disabled;
 
-      final String disabledImagePath = UI.UNIT_IS_METRIC
-            ? Messages.Image__show_distance_on_x_axis_disabled
-            : Messages.Image__show_distance_on_x_axis_imperial_disabled;
+      if (!UI.UNIT_IS_METRIC) {
+         imagePath = Messages.Image__show_distance_on_x_axis_imperial;
+         disabledImagePath = Messages.Image__show_distance_on_x_axis_imperial_disabled;
+      }
 
       setImageDescriptor(TourbookPlugin.getImageDescriptor(imagePath));
       setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(disabledImagePath));
