@@ -80,7 +80,7 @@ UI Themes
    -cssTheme org.eclipse.e4.ui.css.theme.e4_default
    -cssTheme org.eclipse.e4.ui.css.theme.e4_dark
 
-  The "dark" theme can also be used, but MyTourbook is not yet prepared for it, however it looks not very bad. 
+  The "dark" theme can be used but MyTourbook is not yet prepared for it, however it looks not very bad. 
   The "classic" theme is a little bit different compared with the theme in MyTourbook before 20.8.
   
 
