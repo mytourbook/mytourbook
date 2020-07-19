@@ -17,6 +17,7 @@ package net.tourbook.ui.tourChart.action;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.ui.tourChart.TourChart;
 
 import org.eclipse.jface.action.Action;
@@ -32,8 +33,17 @@ public class ActionXAxisDistance extends Action {
       this.fTourChart = tourChart;
 
       setToolTipText(Messages.Tour_Action_show_distance_on_x_axis_tooltip);
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__show_distance_on_x_axis));
-      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__show_distance_on_x_axis_disabled));
+
+      final String imagePath = UI.UNIT_IS_METRIC
+            ? Messages.Image__show_distance_on_x_axis
+            : Messages.Image__show_distance_on_x_axis_imperial;
+
+      final String disabledImagePath = UI.UNIT_IS_METRIC
+            ? Messages.Image__show_distance_on_x_axis_disabled
+            : Messages.Image__show_distance_on_x_axis_imperial_disabled;
+
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(imagePath));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(disabledImagePath));
 
       setChecked(!tourChart.getTourChartConfig().isShowTimeOnXAxis);
    }

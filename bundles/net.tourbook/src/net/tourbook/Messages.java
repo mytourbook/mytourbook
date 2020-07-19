@@ -1057,6 +1057,8 @@ public class Messages extends NLS {
    public static String        Image__save_tour_disabled;
    public static String        Image__show_distance_on_x_axis;
    public static String        Image__show_distance_on_x_axis_disabled;
+   public static String        Image__show_distance_on_x_axis_imperial;
+   public static String        Image__show_distance_on_x_axis_imperial_disabled;
    public static String        Image__show_time_on_x_axis;
    public static String        Image__spline_point;
    public static String        Image__synch_graph_byScale;
