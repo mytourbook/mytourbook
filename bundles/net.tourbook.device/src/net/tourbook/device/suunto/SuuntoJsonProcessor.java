@@ -29,9 +29,9 @@ import java.util.List;
 import java.util.Set;
 
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.UI;
 import net.tourbook.common.swimming.SwimStroke;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.LengthType;
 import net.tourbook.data.SwimData;
@@ -231,7 +231,7 @@ public class SuuntoJsonProcessor {
             }
 
             final String attributesContent = sample.get(TAG_ATTRIBUTES).toString();
-            if (attributesContent == null || attributesContent == UI.EMPTY_STRING) {
+            if (StringUtils.isNullOrEmpty(attributesContent)) {
                continue;
             }
 
@@ -774,4 +774,3 @@ public class SuuntoJsonProcessor {
       return result;
    }
 }
-

@@ -900,34 +900,34 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
          // label: unit
          label = new Label(containerHeight, SWT.NONE);
-         
+
          _spinnerHeightInches = new Spinner(containerHeight, SWT.BORDER);
-         
+
          if (UI.UNIT_IS_METRIC) { // Metric units
             _spinnerHeight.setDigits(2);
             _spinnerHeight.setMinimum(0);
             _spinnerHeight.setMaximum(300); // 3.00 m
-            
+
             _spinnerHeightInches.setVisible(false);
-            
+
             label.setText(UI.UNIT_METER);
          } else {  // Imperial units
             _spinnerHeight.setDigits(0);
             _spinnerHeight.setMinimum(0);
             _spinnerHeight.setMaximum(10);
-            
-            label.setText(UI.UNIT_HEIGHT_FT);  
-            
+
+            label.setText(UI.UNIT_HEIGHT_FT);
+
             _spinnerHeightInches.addSelectionListener(_defaultSelectionListener);
             _spinnerHeightInches.addMouseWheelListener(_defaultMouseWheelListener);
-            
+
             _spinnerHeightInches.setDigits(0);
             _spinnerHeightInches.setMinimum(0);
             _spinnerHeightInches.setMaximum(11);
             _spinnerHeightInches.setVisible(true);
-            
+
             label = new Label(containerHeight, SWT.NONE);
-            label.setText(UI.UNIT_HEIGHT_IN); 
+            label.setText(UI.UNIT_HEIGHT_IN);
          }
       }
 
@@ -1602,26 +1602,26 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
        */
       tvc = new TableViewerColumn(_peopleViewer, SWT.TRAIL);
       tc = tvc.getColumn();
-      
+
       if (UI.UNIT_IS_METRIC) {
-         tc.setText(Messages.Pref_People_Column_height);         
+         tc.setText(Messages.Pref_People_Column_height);
       } else {
-         tc.setText(UI.UNIT_HEIGHT_FT + "-" + UI.UNIT_HEIGHT_IN); 
+         tc.setText(UI.UNIT_HEIGHT_FT + "-" + UI.UNIT_HEIGHT_IN);
       }
-      
+
       tvc.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
-            
+
             if (UI.UNIT_IS_METRIC) {
                final float height = ((TourPerson) cell.getElement()).getHeight();
                cell.setText(_nf2.format(height));
             } else {
                final float bodyHeight = UI.convertBodyHeightFromMetric(((TourPerson) cell.getElement()).getHeight());
-               
-               final String heightString = "" + (int) Math.floor(bodyHeight / 12) + "'" + (int) bodyHeight % 12 + "\""; 
-                     
-               cell.setText(heightString);               
+
+               final String heightString = UI.EMPTY_STRING + (int) Math.floor(bodyHeight / 12) + "'" + (int) bodyHeight % 12 + "\"";
+
+               cell.setText(heightString);
             }
          }
       });
@@ -1773,7 +1773,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
             onModifyPerson();
          }
       };
-      
+
       _defaultModifyListener = new ModifyListener() {
          @Override
          public void modifyText(final ModifyEvent e) {
@@ -2203,9 +2203,9 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
       final float bodyWeight = UI.convertBodyWeightToMetric(_spinnerWeight.getSelection());
       person.setWeight(bodyWeight / 10.0f);
-      
+
       final float bodyHeight = UI.convertBodyHeightToMetric(_spinnerHeight.getSelection(), _spinnerHeightInches.getSelection());
-      person.setHeight(bodyHeight / 100.0f);      
+      person.setHeight(bodyHeight / 100.0f);
 
       person.setGender(_rdoGenderMale.getSelection() ? 0 : 1);
       person.setRestPulse(_spinnerRestingHR.getSelection());
@@ -2289,14 +2289,14 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          _spinnerWeight.setSelection((int) (bodyWeight * 10));
 
          final float bodyHeight = UI.convertBodyHeightFromMetric(person.getHeight());
-         
+
          if (UI.UNIT_IS_METRIC) {
-            _spinnerHeight.setSelection(Math.round(bodyHeight * 100));   
+            _spinnerHeight.setSelection(Math.round(bodyHeight * 100));
          } else {
             _spinnerHeight.setSelection((int) Math.floor(bodyHeight / 12));
-            _spinnerHeightInches.setSelection((int) bodyHeight % 12);            
+            _spinnerHeightInches.setSelection((int) bodyHeight % 12);
          }
-         
+
          _rawDataPathEditor.setStringValue(person.getRawDataPath());
          _rdoGenderMale.setSelection(gender == 0);
          _rdoGenderFemale.setSelection(gender != 0);

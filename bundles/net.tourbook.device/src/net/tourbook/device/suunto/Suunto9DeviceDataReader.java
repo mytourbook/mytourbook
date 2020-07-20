@@ -226,34 +226,27 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
     */
    protected boolean isValidActivity(final String jsonFileContent) {
 
+      if (StringUtils.isNullOrEmpty(jsonFileContent)) {
+         return false;
+      }
+
       try {
+         final JSONObject jsonContent = new JSONObject(jsonFileContent);
+         final JSONArray samples = (JSONArray) jsonContent.get(SuuntoJsonProcessor.TAG_SAMPLES);
 
-         if (jsonFileContent == null || jsonFileContent == UI.EMPTY_STRING) {
-            return false;
-         }
-
-         try {
-            final JSONObject jsonContent = new JSONObject(jsonFileContent);
-            final JSONArray samples = (JSONArray) jsonContent.get(SuuntoJsonProcessor.TAG_SAMPLES);
-
-            for (int index = 0; index < samples.length(); ++index) {
-               final String currentSample = samples.getJSONObject(index).toString();
-               if (currentSample.contains(SuuntoJsonProcessor.TAG_SAMPLE) &&
-                     (currentSample.contains(SuuntoJsonProcessor.TAG_GPSALTITUDE) ||
-                           currentSample.contains(SuuntoJsonProcessor.TAG_LONGITUDE) ||
-                           currentSample.contains(SuuntoJsonProcessor.TAG_LATITUDE) ||
-                           currentSample.contains(SuuntoJsonProcessor.TAG_ALTITUDE))) {
-                  return true;
-               }
+         for (int index = 0; index < samples.length(); ++index) {
+            final String currentSample = samples.getJSONObject(index).toString();
+            if (currentSample.contains(SuuntoJsonProcessor.TAG_SAMPLE) &&
+                  (currentSample.contains(SuuntoJsonProcessor.TAG_GPSALTITUDE) ||
+                        currentSample.contains(SuuntoJsonProcessor.TAG_LONGITUDE) ||
+                        currentSample.contains(SuuntoJsonProcessor.TAG_LATITUDE) ||
+                        currentSample.contains(SuuntoJsonProcessor.TAG_ALTITUDE))) {
+               return true;
             }
-
-         } catch (final JSONException ex) {
-            StatusUtil.log(ex);
-            return false;
          }
 
-      } catch (final Exception e) {
-         StatusUtil.log(e);
+      } catch (final JSONException ex) {
+         StatusUtil.log(ex);
          return false;
       }
 
