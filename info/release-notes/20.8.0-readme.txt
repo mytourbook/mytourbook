@@ -12,7 +12,6 @@ New
 
 * Dropbox Integration (Frederic)
   - Ability to connect a Dropbox account to MyTourbook, and also choosing a specific a folder for this account. This Dropbox folder can be set up as a device to watch in the Easy Import Dashboard. In this case, added or deleted files will be automatically and immediately detected.
-  
 
 * Import Suunto Quest Files (Frederic)
 
@@ -90,6 +89,9 @@ Changes
 * Tour Editor View - Swim slices (Frederic)
   - Renamed the column "Strokes" to "Stk/length" (Number of strokes per length)
   - Renamed the column "Cadence" to "Stk/min" (Number of strokes per minute)
+
+* Suunto 9 (Fredric)
+  Support for activities that are split into several physical files (i.e.: long activities)
 
 
 Fixes   
