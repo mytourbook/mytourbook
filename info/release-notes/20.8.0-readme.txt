@@ -64,7 +64,11 @@ Improvements
 * Tour Book view (Frederic)
   - Adding the ability to bulk edit the weather conditions
 
+* Better Imperial Unit Support (rtdog)
+  - Changed first run wizard so that user can select units before configuring first user https://github.com/wolfgang-ch/mytourbook/pull/204 
+  - Changed user height unit to feet and inches instead of meters for users using imperial units https://github.com/wolfgang-ch/mytourbook/pull/204 
 
+  
 UI Themes
 =========
 
@@ -117,6 +121,8 @@ Fixes
 * Tour Filter (Frederic)
   - When filtering on start dates, the filters "Greater Than or Equal", "Less than", "Equals", "Not Equals" were not working
  
+ * TourData Editor Save (rtdog)
+  - Using the hotkey to save a modified tour on TourData Editor saved to DB but not on local screen.  Fixed. https://github.com/wolfgang-ch/mytourbook/pull/201
    
 Translation    
 ===========
