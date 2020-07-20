@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -206,7 +206,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
    private Combo                _cboSportComputer;
    private Spinner              _spinnerWeight;
    private Spinner              _spinnerHeight;
-   private Spinner              _spinnerHeightInches; // If needed for imperial units
+   private Spinner              _spinnerHeightInches;         // If needed for imperial units
    private Spinner              _spinnerRestingHR;
    private Spinner              _spinnerMaxHR;
    private Button               _rdoGenderMale;
@@ -911,7 +911,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
             _spinnerHeightInches.setVisible(false);
 
             label.setText(UI.UNIT_METER);
-         } else {  // Imperial units
+         } else { // Imperial units
             _spinnerHeight.setDigits(0);
             _spinnerHeight.setMinimum(0);
             _spinnerHeight.setMaximum(10);
@@ -1606,7 +1606,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       if (UI.UNIT_IS_METRIC) {
          tc.setText(Messages.Pref_People_Column_height);
       } else {
-         tc.setText(UI.UNIT_HEIGHT_FT + "-" + UI.UNIT_HEIGHT_IN);
+         tc.setText(UI.UNIT_HEIGHT_FT + UI.DASH + UI.UNIT_HEIGHT_IN);
       }
 
       tvc.setLabelProvider(new CellLabelProvider() {
@@ -1619,7 +1619,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
             } else {
                final float bodyHeight = UI.convertBodyHeightFromMetric(((TourPerson) cell.getElement()).getHeight());
 
-               final String heightString = UI.EMPTY_STRING + (int) Math.floor(bodyHeight / 12) + "'" + (int) bodyHeight % 12 + "\"";
+               final String heightString = UI.EMPTY_STRING + (int) Math.floor(bodyHeight / 12) + "'" + (int) bodyHeight % 12 + "\""; //$NON-NLS-1$ //$NON-NLS-2$
 
                cell.setText(heightString);
             }
@@ -1722,9 +1722,9 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
    }
 
    /**
-    * @return Returns person which is currently displayed, one person is at least available therefor
-    *         this should never return <code>null</code> but it can be <code>null</code> when the
-    *         application is started the first time and people are not yet created.
+    * @return Returns person which is currently displayed, one person is at least available
+    *         therefore this should never return <code>null</code> but it can be <code>null</code>
+    *         when the application is started the first time and people are not yet created.
     */
    private TourPerson getCurrentPerson() {
 
@@ -1901,7 +1901,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       // check if hr zones are already available
 //		if (hrZones != null && hrZones.size() > 0) {
 //
-//			// hr zones are availabe
+//			// hr zones are available
 //			if (MessageDialog.openQuestion(
 //					getShell(),
 //					Messages.Pref_People_Dialog_ReplaceHrZones_Title,
