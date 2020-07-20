@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2018, 2020 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,8 +23,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
@@ -35,6 +37,7 @@ import net.tourbook.data.LengthType;
 import net.tourbook.data.SwimData;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourMarker;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.json.JSONArray;
@@ -171,9 +174,15 @@ public class SuuntoJsonProcessor {
     *
     * @param jsonFileContent
     *           The Suunto's file content in JSON format.
+    * @param activityToReUse
+    *           If provided, the activity to concatenate the provided file to.
+    * @param sampleListToReUse
+    *           If provided, the activity's data from the activity to reuse.
     * @return The created tour.
     */
-   public TourData ImportActivity(final String jsonFileContent) {
+   public TourData ImportActivity(final String jsonFileContent,
+                                  final TourData activityToReUse,
+                                  final ArrayList<TimeData> sampleListToReUse) {
       _sampleList = new ArrayList<>();
 
       JSONArray samples = null;
@@ -187,7 +196,8 @@ public class SuuntoJsonProcessor {
 
       final JSONObject firstSample = (JSONObject) samples.get(0);
 
-      final TourData tourData = InitializeActivity(firstSample);
+      int numLaps = 0;
+      final TourData tourData = InitializeActivity(firstSample, activityToReUse, sampleListToReUse, numLaps);
 
       if (tourData == null) {
          return null;
@@ -209,7 +219,6 @@ public class SuuntoJsonProcessor {
       final List<SwimData> _allSwimData = new ArrayList<>();
       final List<Integer> _allRRData = new ArrayList<>();
       long _rrDataStartTime = Integer.MIN_VALUE;
-      int numLaps = 0;
 
       for (int i = 0; i < samples.length(); ++i) {
          String currentSampleSml;
@@ -386,10 +395,19 @@ public class SuuntoJsonProcessor {
     *
     * @param firstSample
     *           The activity start time as a string.
-    * @return If valid, the initialized tour.
+    * @param activityToReuse
+    *           If provided, the activity to concatenate the current activity with.
+    * @param sampleListToReUse
+    *           If provided, the activity's data from the activity to reuse.
+    * @param numLaps
+    *           The number of laps in the activity.
+    * @return If valid, the initialized tour
     */
-   private TourData InitializeActivity(final JSONObject firstSample) {
-      final TourData tourData = new TourData();
+   private TourData InitializeActivity(final JSONObject firstSample,
+                                       final TourData activityToReUse,
+                                       final ArrayList<TimeData> sampleListToReUse,
+                                       int numLaps) {
+      TourData tourData = new TourData();
       final String firstSampleAttributes = firstSample.get(TAG_ATTRIBUTES).toString();
 
       if (firstSampleAttributes.contains(TAG_LAP) &&
@@ -398,6 +416,19 @@ public class SuuntoJsonProcessor {
 
          final ZonedDateTime startTime = ZonedDateTime.parse(firstSample.get(TAG_TIMEISO8601).toString());
          tourData.setTourStartTime(startTime);
+
+      } else if (activityToReUse != null) {
+
+         final Set<TourMarker> tourMarkers = activityToReUse.getTourMarkers();
+         for (final TourMarker tourMarker : tourMarkers) {
+            numLaps = Integer.valueOf(tourMarker.getLabel());
+         }
+         activityToReUse.setTourMarkers(new HashSet<TourMarker>());
+
+         tourData = activityToReUse;
+         _sampleList = sampleListToReUse;
+         tourData.clearComputedSeries();
+         tourData.timeSerie = null;
 
       } else {
          return null;
