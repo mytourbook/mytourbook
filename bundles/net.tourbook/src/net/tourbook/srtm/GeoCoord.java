@@ -243,13 +243,13 @@ public class GeoCoord {
       //  [SW] vorne  -> - vorne
       //  [SW] hinten -> - vorne
       if (s.startsWith("S")) { //$NON-NLS-1$
-         s = "-" + s.substring(1); //$NON-NLS-1$
+         s = UI.DASH + s.substring(1);
       } else if (s.startsWith("W")) { //$NON-NLS-1$
-         s = "-" + s.substring(1); //$NON-NLS-1$
+         s = UI.DASH + s.substring(1);
       } else if (s.endsWith("S")) { //$NON-NLS-1$
-         s = "-" + s.substring(0, s.length() - 1); //$NON-NLS-1$
+         s = UI.DASH + s.substring(0, s.length() - 1);
       } else if (s.endsWith("W")) { //$NON-NLS-1$
-         s = "-" + s.substring(0, s.length() - 1); //$NON-NLS-1$
+         s = UI.DASH + s.substring(0, s.length() - 1);
       }
 
       //  ,           -> .
@@ -366,7 +366,7 @@ public class GeoCoord {
          break;
       }
 
-      if (matcher.group(1).equals("-")) { //$NON-NLS-1$
+      if (matcher.group(1).equals(UI.DASH)) {
          direction = directionMinus();
       } else {
          direction = directionPlus();
