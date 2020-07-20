@@ -35,6 +35,7 @@ import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.util.Geometry;
 import org.eclipse.jface.viewers.ColumnViewerEditor;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy;
@@ -168,6 +169,7 @@ public class UI {
    public static final String       SYMBOL_MNEMONIC               = "&";        //$NON-NLS-1$
    public static final String       SYMBOL_NUMBER_SIGN            = "#";        //$NON-NLS-1$
    public static final String       SYMBOL_PERCENTAGE             = "%";        //$NON-NLS-1$
+   public static final String       SYMBOL_PLUS                   = "+";        //$NON-NLS-1$
    public static final String       SYMBOL_QUESTION_MARK          = "?";        //$NON-NLS-1$
    public static final char         SYMBOL_SEMICOLON              = ';';
    public static final String       SYMBOL_STAR                   = "*";        //$NON-NLS-1$
@@ -298,6 +300,8 @@ public class UI {
    public static final String          UNIT_POWER_SHORT           = "W";                        //$NON-NLS-1$
    public static final String          UNIT_WEIGHT_KG             = "kg";                       //$NON-NLS-1$
    public static final String          UNIT_WEIGHT_LBS            = "lbs";                      //$NON-NLS-1$
+   public static final String          UNIT_HEIGHT_FT             = "ft";                       //$NON-NLS-1$
+   public static final String          UNIT_HEIGHT_IN             = "in";                       //$NON-NLS-1$
 
    public static final PeriodFormatter DEFAULT_DURATION_FORMATTER;
    public static final PeriodFormatter DEFAULT_DURATION_FORMATTER_SHORT;
@@ -608,6 +612,23 @@ public class UI {
 
       final int oldValue = spinner.getSelection();
       spinner.setSelection(oldValue + valueAdjustment);
+   }
+
+   public static float convertBodyHeightFromMetric(final float height) {
+      if (UNIT_IS_METRIC) {
+         return height;
+      }
+
+      return height * UNIT_METER_TO_INCHES;
+   }
+
+   public static float convertBodyHeightToMetric(final float primaryHeight, final int subHeight) {
+
+      if (UNIT_IS_METRIC) {
+         return primaryHeight;
+      }
+
+      return 100 * (primaryHeight * 12 + subHeight) / UNIT_METER_TO_INCHES;
    }
 
    /**
@@ -1310,6 +1331,77 @@ public class UI {
       }
 
       return "0.0"; //$NON-NLS-1$
+   }
+
+   /**
+    * Copied from {@link org.eclipse.ui.internal.handlers.ContextMenuHandler} and adjusted.
+    *
+    * @param control
+    */
+   @SuppressWarnings("restriction")
+   public static void openContextMenu(final Control control) {
+
+      if (control == null || control.isDisposed()) {
+         return;
+      }
+
+      final Shell shell = control.getShell();
+      final Display display = shell == null ? Display.getCurrent() : shell.getDisplay();
+
+      final Point cursorLocation = display.getCursorLocation();
+
+      final Event event = new Event();
+      event.x = cursorLocation.x;
+      event.y = cursorLocation.y;
+      event.detail = SWT.MENU_MOUSE;
+
+      control.notifyListeners(SWT.MenuDetect, event);
+
+      if (!event.doit) {
+         return;
+      }
+
+      final Menu menu = control.getMenu();
+
+      if (menu != null && !menu.isDisposed()) {
+
+         if (event.x != cursorLocation.x || event.y != cursorLocation.y) {
+            menu.setLocation(event.x, event.y);
+         }
+         menu.setVisible(true);
+
+      } else {
+
+         final Point size = control.getSize();
+         final Point location = control.toDisplay(0, 0);
+
+         final Event mouseEvent = new Event();
+         mouseEvent.widget = control;
+
+         if (event.x < location.x
+               || location.x + size.x <= event.x
+               || event.y < location.y
+               || location.y + size.y <= event.y) {
+
+            final Point center = control.toDisplay(Geometry.divide(size, 2));
+            mouseEvent.x = center.x;
+            mouseEvent.y = center.y;
+            mouseEvent.type = SWT.MouseMove;
+            display.post(mouseEvent);
+
+         } else {
+
+            mouseEvent.x = event.x;
+            mouseEvent.y = event.y;
+         }
+
+         mouseEvent.button = 2;
+         mouseEvent.type = SWT.MouseDown;
+         display.post(mouseEvent);
+
+         mouseEvent.type = SWT.MouseUp;
+         display.post(mouseEvent);
+      }
    }
 
    /**

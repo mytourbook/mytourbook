@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,8 +27,11 @@ import org.eclipse.jface.viewers.ColumnLayoutData;
 import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.Tree;
 
 public class ColumnDefinition implements Cloneable {
 
@@ -54,60 +57,67 @@ public class ColumnDefinition implements Cloneable {
    /**
     * Visible name in the modify dialog.
     */
-   private String            _label;
+   private String                 _label;
 
    /**
     * every column in a table must have a unique id
     */
-   private String            _columnId;
+   private String                 _columnId;
 
    /**
     * Visibility status used in the modify dialog, this is used if the dialog is canceled to not
     * touch the visible status
     */
-   private boolean           _isColumnDisplayed;
+   private boolean                _isColumnChecked;
 
    /**
     * when <code>true</code> the visibility for this column can be changed
     */
-   private boolean           _canModifyVisibility = true;
+   private boolean                _canModifyVisibility = true;
 
-   protected int             _style;
+   protected int                  _style;
 
-   private CellLabelProvider _cellLabelProvider;
+   private CellLabelProvider      _cellLabelProvider;
+   private NatTable_LabelProvider _natTable_LabelProvider;
 
-   private String            _columnCategory;
-   private String            _columnHeaderText;
-   private String            _columnToolTipText;
+   private String                 _columnCategory;
+   private String                 _columnHeaderText;
+   private String                 _columnToolTipText;
 
-   private String            _columnUnit;
-   private int               _columnWidth;
+   private String                 _columnUnit;
+   private int                    _columnWidth;
 
-   private boolean           _isColumnResizable   = true;
-   private boolean           _isColumnMoveable    = true;
+   private boolean                _isColumnResizable   = true;
+   private boolean                _isColumnMoveable    = true;
+   private boolean                _isColumnFreezed;
 
-   private ControlListener   _columnControlListener;
-   private SelectionListener _columnSelectionListener;
+   private ControlListener        _columnControlListener;
+   private SelectionListener      _columnSelectionListener;
 
-   private int               _createIndex;
+   private int                    _createIndex;
 
    /**
     * when <code>true</code> this column will be checked in the modify dialog when the default
     * button is selected
     */
-   private boolean           _isDefaultColumn     = false;
+   private boolean                _isDefaultColumn;
 
-   private int               _defaultColumnWidth;
+   private int                    _defaultColumnWidth;
 
    /**
-    * column will have the width 0 to be hidden, this is necessary that the first visible column can
-    * be right aligned
+    * The column will have the width of 0 to be hidden, this is necessary that the first visible
+    * column can be right aligned
     */
-   private boolean           _isColumnHidden      = false;
+   private boolean                _isColumnHidden;
 
-   private EditingSupport    _editingSupport;
+   private EditingSupport         _editingSupport;
 
-   private ColumnLayoutData  _columnLayoutData;
+   private ColumnLayoutData       _columnLayoutData;
+
+   /**
+    * When <code>true</code> then this column can be sorted in the {@link NatTable}
+    */
+   private boolean                _canSortColumn;
 
    /*
     * Value formatter
@@ -147,35 +157,44 @@ public class ColumnDefinition implements Cloneable {
       return _canModifyVisibility;
    }
 
+   /**
+    * @return <code>true</code> when this column can be sorted in the NatTable
+    */
+   public boolean canSortColumn() {
+      return _canSortColumn;
+   }
+
    @Override
    public Object clone() throws CloneNotSupportedException {
 
       final ColumnDefinition clone = (ColumnDefinition) super.clone();
 
-      clone._label = _label;
-      clone._columnId = _columnId;
-      clone._isColumnDisplayed = _isColumnDisplayed;
-      clone._canModifyVisibility = _canModifyVisibility;
-
-      clone._style = _style;
-
-      clone._cellLabelProvider = _cellLabelProvider;
-      clone._columnCategory = _columnCategory;
-      clone._columnHeaderText = _columnHeaderText;
-      clone._columnToolTipText = _columnToolTipText;
-      clone._columnWidth = _columnWidth;
-      clone._defaultColumnWidth = _defaultColumnWidth;
-      clone._isColumnResizable = _isColumnResizable;
-
-      clone._isColumnMoveable = _isColumnMoveable;
-      clone._columnSelectionListener = _columnSelectionListener;
-
-      clone._defaultValueFormat_Category = _defaultValueFormat_Category;
-      clone._availableFormats = _availableFormats;
-      clone._valueFormat_Category = _valueFormat_Category;
-      clone._valueFormatter_Category = _valueFormatter_Category;
-
-      clone._createIndex = _createIndex;
+// this seems to be not necesary
+//
+//      clone._label = _label;
+//      clone._columnId = _columnId;
+//      clone._isColumnDisplayed = _isColumnDisplayed;
+//      clone._canModifyVisibility = _canModifyVisibility;
+//
+//      clone._style = _style;
+//
+//      clone._cellLabelProvider = _cellLabelProvider;
+//      clone._columnCategory = _columnCategory;
+//      clone._columnHeaderText = _columnHeaderText;
+//      clone._columnToolTipText = _columnToolTipText;
+//      clone._columnWidth = _columnWidth;
+//      clone._defaultColumnWidth = _defaultColumnWidth;
+//      clone._isColumnResizable = _isColumnResizable;
+//
+//      clone._isColumnMoveable = _isColumnMoveable;
+//      clone._columnSelectionListener = _columnSelectionListener;
+//
+//      clone._defaultValueFormat_Category = _defaultValueFormat_Category;
+//      clone._availableFormats = _availableFormats;
+//      clone._valueFormat_Category = _valueFormat_Category;
+//      clone._valueFormatter_Category = _valueFormatter_Category;
+//
+//      clone._createIndex = _createIndex;
 
       return clone;
    }
@@ -244,22 +263,28 @@ public class ColumnDefinition implements Cloneable {
     */
    public String getColumnHeaderText(final ColumnManager columnManager) {
 
-      String columnHeaderText = _columnHeaderText;
+      final StringBuilder sb = new StringBuilder();
+      sb.append(_columnHeaderText);
 
       // add annotations to this text
-      if (columnManager.isShowColumnAnnotations() //
+      if (columnManager.isShowColumnAnnotation_Formatting()
             && (_defaultValueFormat_Category != null || _defaultValueFormat_Detail != null)) {
 
          if (_columnHeaderText == null) {
-            columnHeaderText = UI.EMPTY_STRING;
+            sb.setLength(0);
+            sb.append(UI.EMPTY_STRING);
          }
 
          if (_defaultValueFormat_Category != null || _defaultValueFormat_Detail != null) {
-            columnHeaderText += UI.SPACE1 + Messages.App_Annotation_1;
+            sb.append(UI.SPACE1 + Messages.Column_Annotation_Formatting);
          }
       }
 
-      return columnHeaderText;
+      if (columnManager.isNatTableColumnManager() && columnManager.isShowColumnAnnotation_Sorting() && _canSortColumn) {
+         sb.append(UI.SPACE1 + Messages.Column_Annotation_Sorting);
+      }
+
+      return sb.toString();
    }
 
    public String getColumnHeaderToolTipText() {
@@ -317,6 +342,13 @@ public class ColumnDefinition implements Cloneable {
       return _editingSupport;
    }
 
+   /**
+    * @return the _natTable_LabelProvider
+    */
+   public NatTable_LabelProvider getNatTable_LabelProvider() {
+      return _natTable_LabelProvider;
+   }
+
    public ValueFormat getValueFormat_Category() {
       return _valueFormat_Category;
    }
@@ -352,13 +384,24 @@ public class ColumnDefinition implements Cloneable {
    }
 
    /**
-    * @return Returns <code>true</code> when the column is displayed in the UI, otherwise
-    *         <code>false</code>.
+    * @return Returns the visibility status used in the modify dialog, this is used if the dialog is
+    *         canceled to not touch the visible status.
     */
-   public boolean isColumnDisplayed() {
-      return _isColumnDisplayed;
+   public boolean isColumnCheckedInContextMenu() {
+      return _isColumnChecked;
    }
 
+   /**
+    * @return the _isColumnFreezed
+    */
+   public boolean isColumnFreezed() {
+      return _isColumnFreezed;
+   }
+
+   /**
+    * @return Returns <code>true</code> when it is displayed but the width is 0, this is necessary
+    *         that the first visiblecolumn can be right aligned in a {@link Table} or {@link Tree}.
+    */
    public boolean isColumnHidden() {
       return _isColumnHidden;
    }
@@ -424,6 +467,26 @@ public class ColumnDefinition implements Cloneable {
     * @param cell
     * @param value
     * @param isDetail
+    * @return
+    */
+   public String printDoubleValue(final double value) {
+
+      if (value == 0) {
+
+         return UI.EMPTY_STRING;
+
+      } else {
+
+         return getValueFormatter_Detail().printDouble(value);
+      }
+   }
+
+   /**
+    * Print double value with a value formatter.
+    *
+    * @param cell
+    * @param value
+    * @param isDetail
     */
    public void printDoubleValue(final ViewerCell cell, final double value, final boolean isDetail) {
 
@@ -438,6 +501,25 @@ public class ColumnDefinition implements Cloneable {
       } else {
 
          cell.setText(getValueFormatter().printDouble(value));
+      }
+   }
+
+   /**
+    * Print long value with a value formatter.
+    *
+    * @param cell
+    * @param value
+    * @param isDetail
+    */
+   public String printLongValue(final long value) {
+
+      if (value == 0) {
+
+         return UI.EMPTY_STRING;
+
+      } else {
+
+         return getValueFormatter_Detail().printLong(value);
       }
    }
 
@@ -470,6 +552,21 @@ public class ColumnDefinition implements Cloneable {
     * @param cell
     * @param value
     */
+   public String printValue_0(final double value) {
+
+      if (value == 0) {
+         return UI.EMPTY_STRING;
+      } else {
+         return _nf0.format(value);
+      }
+   }
+
+   /**
+    * Print double value without fraction digits.
+    *
+    * @param cell
+    * @param value
+    */
    public void printValue_0(final ViewerCell cell, final double value) {
 
       if (value == 0) {
@@ -487,6 +584,14 @@ public class ColumnDefinition implements Cloneable {
     */
    public void setCanModifyVisibility(final boolean canModifyVisibility) {
       _canModifyVisibility = canModifyVisibility;
+   }
+
+   /**
+    * @param canSortColumn
+    *           the _canSortColumn to set
+    */
+   public void setCanSortColumn(final boolean canSortColumn) {
+      _canSortColumn = canSortColumn;
    }
 
    public void setColumnCategory(final String category) {
@@ -611,8 +716,16 @@ public class ColumnDefinition implements Cloneable {
       _isColumnHidden = true;
    }
 
-   public void setIsColumnDisplayed(final boolean isDisplayed) {
-      _isColumnDisplayed = isDisplayed;
+   public void setIsColumnChecked(final boolean isChecked) {
+      _isColumnChecked = isChecked;
+   }
+
+   /**
+    * @param _isColumnFreezed
+    *           the _isColumnFreezed to set
+    */
+   public void setIsColumnFreezed(final boolean _isColumnFreezed) {
+      this._isColumnFreezed = _isColumnFreezed;
    }
 
    public void setIsColumnMoveable(final boolean isColumnMovablee) {
@@ -629,6 +742,10 @@ public class ColumnDefinition implements Cloneable {
 
    public void setLabelProvider(final CellLabelProvider cellLabelProvider) {
       _cellLabelProvider = cellLabelProvider;
+   }
+
+   public void setLabelProvider_NatTable(final NatTable_LabelProvider natTable_LabelProvider) {
+      _natTable_LabelProvider = natTable_LabelProvider;
    }
 
    /**
@@ -687,15 +804,22 @@ public class ColumnDefinition implements Cloneable {
 
    @Override
    public String toString() {
+
+// SET_FORMATTING_OFF
       return "ColumnDefinition [" //$NON-NLS-1$
-//				+ ("_label=" + _label + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-//				+ ("_isCheckedInDialog=" + _isCheckedInDialog + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("_columnId=" + _columnId + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("_valueFormat=" + _valueFormat_Category + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("_valueFormat_Detail=" + _valueFormat_Detail + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-//				+ ("_columnWidth=" + _columnWidth + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-//				+ ("_defaultColumnWidth=" + _defaultColumnWidth) //$NON-NLS-1$
+
+//				+ "_label="                + _label                + ", "   //$NON-NLS-1$ //$NON-NLS-2$
+            + "_isDefaultColumn="      + String.format("%-5s", Boolean.toString(_isDefaultColumn))    + ", "   //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            + "_isColumnChecked="      + String.format("%-5s", Boolean.toString(_isColumnChecked))    + ", "   //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            + "_columnId="             + String.format("%-40s", _columnId)                            + ", "   //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+//          + "_valueFormat="          + _valueFormat_Category + ", "   //$NON-NLS-1$ //$NON-NLS-2$
+//          + "_valueFormat_Detail="   + _valueFormat_Detail   + ", "   //$NON-NLS-1$ //$NON-NLS-2$
+				+ "_columnWidth="          + _columnWidth          + ", "   //$NON-NLS-1$ //$NON-NLS-2$
+//				+ "_defaultColumnWidth="   + _defaultColumnWidth            //$NON-NLS-1$
+
             + "]\n"; //$NON-NLS-1$
+
+// SET_FORMATTING_ON
    }
 
 }

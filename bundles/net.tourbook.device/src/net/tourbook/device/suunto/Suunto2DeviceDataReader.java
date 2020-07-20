@@ -122,7 +122,7 @@ public class Suunto2DeviceDataReader extends TourbookDevice {
     * Check if the file is a valid Suunto xml file by checking some tags.
     *
     * @param importFilePath
-    * @return Returns <code>true</code> when the file contains garmin content.
+    * @return Returns <code>true</code> when the file contains Suunto content.
     */
    private boolean isSuuntoXMLFile(final String importFilePath) {
 

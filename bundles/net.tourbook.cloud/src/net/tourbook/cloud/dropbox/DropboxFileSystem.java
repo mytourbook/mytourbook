@@ -36,6 +36,7 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.window.Window;
@@ -167,6 +168,11 @@ public class DropboxFileSystem extends TourbookFileSystem {
       return _dropboxFileSystem;
    }
 
+   @Override
+   public ImageDescriptor getFileSystemImageDescriptor() {
+      return Activator.getImageDescriptor(Messages.Image__Dropbox_Logo);
+   }
+
    /**
     * Get the Dropbox {@link Path} of a given filename
     *
@@ -196,14 +202,14 @@ public class DropboxFileSystem extends TourbookFileSystem {
     */
    @Override
    public String selectFileSystemFolder(final Shell shell) {
-      final DropboxFolderBrowser dropboxFolderChooser[] = new DropboxFolderBrowser[1];
+      final DialogDropboxFolderBrowser dropboxFolderChooser[] = new DialogDropboxFolderBrowser[1];
       final int folderChooserResult[] = new int[1];
       BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
          @Override
          public void run() {
             final String accessToken = _prefStore.getString(IPreferences.DROPBOX_ACCESSTOKEN);
 
-            dropboxFolderChooser[0] = new DropboxFolderBrowser(Display.getCurrent().getActiveShell(),
+            dropboxFolderChooser[0] = new DialogDropboxFolderBrowser(Display.getCurrent().getActiveShell(),
                   accessToken);
             folderChooserResult[0] = dropboxFolderChooser[0].open();
          }

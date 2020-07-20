@@ -615,7 +615,7 @@ class HistoryItems {
             final TourbookFileSystem tourbookFileSystem = FileSystemManager.getTourbookFileSystem(modifiedFolder);
             if (tourbookFileSystem != null) {
 
-               folderInfoMessage.append(NLS.bind(Messages.Action_FileSystem_Preferences, tourbookFileSystem.getId()));
+               folderInfoMessage.append(UI.SPACE + NLS.bind(Messages.Dialog_ImportConfig_Link_FileSystem_Preferences, tourbookFileSystem.getId()));
 
                boolean addlistener = true;
                for (final Listener listener : _linkFolderInfo.getListeners(SWT.Selection)) {

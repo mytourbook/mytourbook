@@ -1753,7 +1753,7 @@ public class Slideout_Map2_MapProvider extends AdvancedSlideout implements ITour
          return;
       }
 
-      if (_colDef_IsMPVisible.isColumnDisplayed()) {
+      if (_colDef_IsMPVisible.isColumnCheckedInContextMenu()) {
 
          // toggle only when visible column is displayed
 
