@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.zip.GZIPInputStream;
 
 import net.tourbook.common.UI;
@@ -136,10 +137,12 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
     * @return If found, the child activity.
     */
    private Entry<String, String> getChildActivity(final String filePath) {
-      return _childrenActivitiesToProcess.entrySet().stream()
+
+      final Optional<Entry<String, String>> childActivity = _childrenActivitiesToProcess.entrySet().stream()
             .filter(entry -> entry.getKey().contains(filePath))
-            .findFirst()
-            .get();
+            .findFirst();
+
+      return childActivity.isPresent() ? childActivity.get() : null;
    }
 
    @Override
@@ -299,7 +302,6 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
     * @return The Suunto activity as a tour.
     */
    private boolean processFile(final String filePath, final String jsonFileContent) {
-
 
       String fileName = FilenameUtils.removeExtension(filePath);
 
