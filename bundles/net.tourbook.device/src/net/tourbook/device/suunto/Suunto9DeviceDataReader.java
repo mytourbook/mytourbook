@@ -85,7 +85,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
     * @param currentActivity
     *           The current activity processed and created.
     */
-   private void ConcatenateChildrenActivities(final String filePath,
+   private void concatenateChildrenActivities(final String filePath,
                                               int currentFileNumber,
                                               final TourData currentActivity,
                                               final ArrayList<TimeData> sampleListToReUse) {
@@ -350,7 +350,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 
             final String parentFileName = GetFileNameWithoutNumber(
                   FilenameUtils.getBaseName(filePath)) +
-                  "-" + //$NON-NLS-1$
+                  UI.DASH +
                   String.valueOf(fileNumber - 1) +
                   ".json.gz"; //$NON-NLS-1$
 
@@ -394,7 +394,7 @@ public class Suunto9DeviceDataReader extends TourbookDevice {
 
          activity.setImportFilePath(filePath);
 
-         ConcatenateChildrenActivities(
+         concatenateChildrenActivities(
                filePath,
                fileNumber,
                activity,
