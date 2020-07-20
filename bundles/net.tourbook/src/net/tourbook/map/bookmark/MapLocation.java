@@ -23,21 +23,21 @@ import org.oscim.core.MapPosition;
  */
 public class MapLocation {
 
-	private MapPosition _mapPosition;
+	private MapPosition_with_MarkerPosition _mapPosition;
 
 	public MapLocation(final GeoPosition geoPosition, final int mapZoomLevel) {
 
-		_mapPosition = new MapPosition(geoPosition.latitude, geoPosition.longitude, /* set dummy */1);
+		_mapPosition = new MapPosition_with_MarkerPosition(geoPosition.latitude, geoPosition.longitude, /* set dummy */1);
 
 		_mapPosition.setZoomLevel(mapZoomLevel);
 	}
 
-	public MapLocation(final MapPosition mapPosition) {
+	public MapLocation(final MapPosition_with_MarkerPosition mapPosition) {
 
 		_mapPosition = mapPosition;
 	}
 
-	public MapPosition getMapPosition() {
+	public MapPosition_with_MarkerPosition getMapPosition() {
 		return _mapPosition;
 	}
 
