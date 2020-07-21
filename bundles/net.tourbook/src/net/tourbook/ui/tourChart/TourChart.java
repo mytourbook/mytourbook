@@ -1148,6 +1148,9 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
                   _valuePointTooltip.reopen();
 
+                  final ActionXAxisDistance tourAction = (ActionXAxisDistance) _allTourChartActions.get(ACTION_ID_X_AXIS_DISTANCE);
+                  tourAction.setImages();
+
                }
 
                /**

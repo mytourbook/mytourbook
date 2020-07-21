@@ -36,6 +36,7 @@ import java.util.Collections;
 import java.util.List;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.ui.UI;
 
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -160,7 +161,7 @@ public class DefaultProxySelector extends ProxySelector {
 
       int port = parseProxyPortValue(prefStore.getString(IPreferences.PROXY_SERVER_PORT));
       String host = prefStore.getString(IPreferences.PROXY_SERVER_ADDRESS);
-      if (host != null && !host.trim().equals("") && port > 0) { //$NON-NLS-1$
+      if (!StringUtils.isNullOrEmpty(host) && port > 0) {
          httpProxySocketAddress = new InetSocketAddress(host, port);
       } else {
          httpProxySocketAddress = null;
@@ -173,7 +174,7 @@ public class DefaultProxySelector extends ProxySelector {
       port = parseProxyPortValue(prefStore.getString(IPreferences.SOCKS_PROXY_SERVER_PORT));
       host = prefStore.getString(IPreferences.SOCKS_PROXY_SERVER_ADDRESS);
 
-      if (host != null && !host.trim().equals("") && port > 0) { //$NON-NLS-1$
+      if (!StringUtils.isNullOrEmpty(host) && port > 0) {
          socksProxySocketAddress = new InetSocketAddress(host, port);
       } else {
          socksProxySocketAddress = null;

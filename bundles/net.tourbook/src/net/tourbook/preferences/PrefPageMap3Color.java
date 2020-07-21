@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -825,11 +825,12 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
       _colDefGraphImage = colDef;
 
       colDef.setColumnLabel(Messages.Pref_Map3Color_Column_GraphImage);
+      colDef.setColumnHeaderText(Messages.Pref_Map3Color_Column_GraphImage);
       colDef.setDefaultColumnWidth(20);
       colDef.setIsDefaultColumn();
       colDef.setLabelProvider(new CellLabelProvider() {
 
-         // !!! set dummy label provider, otherwise an error occures !!!
+         // !!! set dummy label provider, otherwise an error occurs !!!
          @Override
          public void update(final ViewerCell cell) {}
       });
@@ -851,7 +852,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
       colDef.setCanModifyVisibility(false);
       colDef.setLabelProvider(new CellLabelProvider() {
 
-         // !!! set dummy label provider, otherwise an error occures !!!
+         // !!! set dummy label provider, otherwise an error occurs !!!
          @Override
          public void update(final ViewerCell cell) {}
       });
@@ -943,8 +944,9 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 
       final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "relativeMarker", SWT.CENTER); //$NON-NLS-1$
 
-      colDef.setColumnLabel(Messages.Pref_Map3Color_Column_AbsoluteRelativValue_Label);
-      colDef.setColumnHeaderToolTipText(Messages.Pref_Map3Color_Column_AbsoluteRelativValue_Tooltip);
+      colDef.setColumnLabel(Messages.Pref_Map3Color_Column_AbsoluteRelativeValue_Label);
+      colDef.setColumnHeaderText(Messages.Pref_Map3Color_Column_AbsoluteRelativeValue_Label);
+      colDef.setColumnHeaderToolTipText(Messages.Pref_Map3Color_Column_AbsoluteRelativeValue_Tooltip);
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(3));
       colDef.setIsDefaultColumn();
       colDef.setLabelProvider(new CellLabelProvider() {
@@ -979,6 +981,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
       final TreeColumnDefinition colDef = new TreeColumnDefinition(_columnManager, "legendMinMaxOverwrite", SWT.CENTER); //$NON-NLS-1$
 
       colDef.setColumnLabel(Messages.Pref_Map3Color_Column_OverwriteLegendMinMax_Label);
+      colDef.setColumnHeaderText(Messages.Pref_Map3Color_Column_OverwriteLegendMinMax_Label);
       colDef.setColumnHeaderToolTipText(Messages.Pref_Map3Color_Column_OverwriteLegendMinMax_Label_Tooltip);
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(3));
       colDef.setIsDefaultColumn();
@@ -1101,7 +1104,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 
          _colorProfileViewer.expandToLevel(treeItem, 1);
 
-         // expanding the treeangle, the layout is correctly done but not with double click
+         // expanding the triangle, the layout is correctly done but not with double click
          _viewerContainer.layout(true, true);
       }
    }
@@ -1500,7 +1503,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 
       _colorProfileViewer.setInput(this);
 
-      // prevent to check color defintions
+      // prevent to check color definitions
       _colorProfileViewer.setGrayedElements(getColorDefinitions());
    }
 

@@ -300,6 +300,8 @@ public class UI {
    public static final String          UNIT_POWER_SHORT           = "W";                        //$NON-NLS-1$
    public static final String          UNIT_WEIGHT_KG             = "kg";                       //$NON-NLS-1$
    public static final String          UNIT_WEIGHT_LBS            = "lbs";                      //$NON-NLS-1$
+   public static final String          UNIT_HEIGHT_FT             = "ft";                       //$NON-NLS-1$
+   public static final String          UNIT_HEIGHT_IN             = "in";                       //$NON-NLS-1$
 
    public static final PeriodFormatter DEFAULT_DURATION_FORMATTER;
    public static final PeriodFormatter DEFAULT_DURATION_FORMATTER_SHORT;
@@ -610,6 +612,23 @@ public class UI {
 
       final int oldValue = spinner.getSelection();
       spinner.setSelection(oldValue + valueAdjustment);
+   }
+
+   public static float convertBodyHeightFromMetric(final float height) {
+      if (UNIT_IS_METRIC) {
+         return height;
+      }
+
+      return height * UNIT_METER_TO_INCHES;
+   }
+
+   public static float convertBodyHeightToMetric(final float primaryHeight, final int subHeight) {
+
+      if (UNIT_IS_METRIC) {
+         return primaryHeight;
+      }
+
+      return 100 * (primaryHeight * 12 + subHeight) / UNIT_METER_TO_INCHES;
    }
 
    /**

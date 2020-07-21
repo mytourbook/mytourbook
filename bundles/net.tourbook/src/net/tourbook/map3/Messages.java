@@ -117,8 +117,8 @@ public class Messages extends NLS {
 
    public static String        Pref_Map3Color_Checkbox_ShowDropDownColorSelector;
    public static String        Pref_Map3Color_Checkbox_ShowDropDownColorSelector_Tooltip;
-   public static String        Pref_Map3Color_Column_AbsoluteRelativValue_Label;
-   public static String        Pref_Map3Color_Column_AbsoluteRelativValue_Tooltip;
+   public static String        Pref_Map3Color_Column_AbsoluteRelativeValue_Label;
+   public static String        Pref_Map3Color_Column_AbsoluteRelativeValue_Tooltip;
    public static String        Pref_Map3Color_Column_Colors;
    public static String        Pref_Map3Color_Column_GraphImage;
    public static String        Pref_Map3Color_Column_Id_Header;
