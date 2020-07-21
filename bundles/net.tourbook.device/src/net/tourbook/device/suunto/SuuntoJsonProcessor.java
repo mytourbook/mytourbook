@@ -86,7 +86,7 @@ public class SuuntoJsonProcessor {
    private static int          previousTotalLengths = 0;
 
    private ArrayList<TimeData> _sampleList;
-   private int                 _lapCounter;
+   private int                 _numLaps;
    final IPreferenceStore      _prefStore           = TourbookPlugin.getDefault().getPreferenceStore();
 
    /**
@@ -152,10 +152,10 @@ public class SuuntoJsonProcessor {
       }
 
       // If the activity contains laps, we need to close the last lap.
-      if (_lapCounter != 0) {
+      if (_numLaps != 0) {
          final TimeData lastTimeData = activityData.get(activityData.size() - 1);
          lastTimeData.marker = 1;
-         lastTimeData.markerLabel = Integer.toString(++_lapCounter);
+         lastTimeData.markerLabel = Integer.toString(++_numLaps);
       }
    }
 
@@ -320,7 +320,7 @@ public class SuuntoJsonProcessor {
                (currentSampleData.contains(TAG_MANUAL) ||
                      currentSampleData.contains(TAG_DISTANCE))) {
             timeData.marker = 1;
-            timeData.markerLabel = Integer.toString(++_lapCounter);
+            timeData.markerLabel = Integer.toString(++_numLaps);
             if (!reusePreviousTimeEntry) {
                _sampleList.add(timeData);
             }
@@ -418,7 +418,7 @@ public class SuuntoJsonProcessor {
 
          final Set<TourMarker> tourMarkers = activityToReUse.getTourMarkers();
          for (final TourMarker tourMarker : tourMarkers) {
-            _lapCounter = Integer.valueOf(tourMarker.getLabel());
+            _numLaps = Integer.valueOf(tourMarker.getLabel());
          }
          activityToReUse.setTourMarkers(new HashSet<TourMarker>());
 
