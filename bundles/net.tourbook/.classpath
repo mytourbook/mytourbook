@@ -8,7 +8,11 @@
 			<accessrule kind="accessible" pattern="com/sun/net/**"/>
 		</accessrules>
 	</classpathentry>
-	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins">
+		<accessrules>
+			<accessrule kind="accessible" pattern="org/eclipse/core/internal/databinding/conversion/**"/>
+		</accessrules>
+	</classpathentry>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
