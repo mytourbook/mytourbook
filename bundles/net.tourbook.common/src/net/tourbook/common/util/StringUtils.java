@@ -28,7 +28,7 @@ public final class StringUtils {
     */
    public static boolean isNullOrEmpty(final String string) {
 
-      return string == null || string.isEmpty();
+      return string == null || string.trim().isEmpty();
    }
 
    /**

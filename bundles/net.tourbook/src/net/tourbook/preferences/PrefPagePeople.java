@@ -29,6 +29,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.HrZoneContext;
 import net.tourbook.data.TourData;
@@ -1803,7 +1804,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
     */
    private boolean isPersonValid() {
 
-      if (_txtFirstName.getText().trim().equals(UI.EMPTY_STRING)) {
+      if (StringUtils.isNullOrEmpty(_txtFirstName.getText())) {
 
          setErrorMessage(Messages.Pref_People_Error_first_name_is_required);
 
@@ -1816,7 +1817,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
          final String transferPath = _rawDataPathEditor.getStringValue().trim();
 
-         if (!transferPath.equals(UI.EMPTY_STRING) && Util.isDirectory(transferPath) == false) {
+         if (!StringUtils.isNullOrEmpty(transferPath) && Util.isDirectory(transferPath) == false) {
 
             setErrorMessage(Messages.Pref_People_Error_path_is_invalid);
 

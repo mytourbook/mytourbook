@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,6 +21,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.NIO;
+import net.tourbook.common.UI;
+import net.tourbook.common.util.StringUtils;
+import net.tourbook.common.util.Util;
+import net.tourbook.map25.Map25App;
+import net.tourbook.map25.Map25Provider;
+import net.tourbook.map25.Map25ProviderManager;
+import net.tourbook.map25.Map25View;
+import net.tourbook.map25.TileEncoding;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -63,17 +75,6 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.part.PageBook;
 import org.oscim.theme.VtmThemes;
-
-import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.NIO;
-import net.tourbook.common.UI;
-import net.tourbook.common.util.Util;
-import net.tourbook.map25.Map25App;
-import net.tourbook.map25.Map25Provider;
-import net.tourbook.map25.Map25ProviderManager;
-import net.tourbook.map25.Map25View;
-import net.tourbook.map25.TileEncoding;
 
 public class PrefPage_Map25Provider extends PreferencePage implements IWorkbenchPreferencePage {
 
@@ -1782,7 +1783,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
             final Path mapFilePath = NIO.getPath(mapFilePathname);
             final Path themeFilePath = NIO.getPath(themeFilePathname);
 
-            if (mapFilePathname.equals(UI.EMPTY_STRING)) {
+            if (StringUtils.isNullOrEmpty(mapFilePathname)) {
 
                setErrorMessage(Messages.Pref_Map25_Provider_Error_MapFilename_IsRequired);
                return false;
@@ -1792,7 +1793,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
                setErrorMessage(Messages.Pref_Map25_Provider_Error_MapFilename_IsNotValid);
                return false;
 
-            } else if (themeFilePathname.equals(UI.EMPTY_STRING)) {
+            } else if (StringUtils.isNullOrEmpty(themeFilePathname)) {
 
                setErrorMessage(Messages.Pref_Map25_Provider_Error_ThemeFilename_IsRequired);
                return false;
@@ -1807,15 +1808,15 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
 
             // validate online map
 
-            if (_txtProviderName.getText().trim().equals(UI.EMPTY_STRING)) {
+            if (StringUtils.isNullOrEmpty(_txtProviderName.getText().trim())) {
                setErrorMessage(Messages.Pref_Map25_Provider_Error_ProviderNameIsRequired);
                return false;
 
-            } else if (_txtOnline_Url.getText().trim().equals(UI.EMPTY_STRING)) {
+            } else if (StringUtils.isNullOrEmpty(_txtOnline_Url.getText().trim())) {
                setErrorMessage(Messages.Pref_Map25_Provider_Error_UrlIsRequired);
                return false;
 
-            } else if (_txtOnline_TilePath.getText().trim().equals(UI.EMPTY_STRING)) {
+            } else if (StringUtils.isNullOrEmpty(_txtOnline_TilePath.getText().trim())) {
                setErrorMessage(Messages.Pref_Map25_Provider_Error_TilePathIsRequired);
                return false;
             }
