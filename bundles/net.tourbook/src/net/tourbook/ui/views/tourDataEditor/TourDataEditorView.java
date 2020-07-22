@@ -5949,7 +5949,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     * Edit time slices values :
     * Altitude, Heartbeat, Temperature, Cadence
     */
-   void editTimeSlicesValues() {
+   public void editTimeSlicesValues() {
 
       if (isRowSelectionMode() == false) {
          return;
@@ -5966,116 +5966,124 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       if (dialogEditTimeSlicesValues.open() == Window.OK) {
 
-         final float newAltitudeValue = dialogEditTimeSlicesValues.getNewAltitudeValue();
-         final float newCadenceValue = dialogEditTimeSlicesValues.getNewCadenceValue();
-         final float newPulseValue = dialogEditTimeSlicesValues.getNewPulseValue();
-         final float newTemperatureValue = dialogEditTimeSlicesValues.getNewTemperatureValue();
+         BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
+            @Override
+            public void run() {
 
-         final boolean isAltitudeValueOffset = dialogEditTimeSlicesValues.getIsAltitudeValueOffset();
-         final boolean isCadenceValueOffset = dialogEditTimeSlicesValues.getIsCadenceValueOffset();
-         final boolean isPulseValueOffset = dialogEditTimeSlicesValues.getIsPulseValueOffset();
-         final boolean isTemperatureValueOffset = dialogEditTimeSlicesValues.getIsTemperatureValueOffset();
+               final float newAltitudeValue = dialogEditTimeSlicesValues.getNewAltitudeValue();
+               final float newCadenceValue = dialogEditTimeSlicesValues.getNewCadenceValue();
+               final float newPulseValue = dialogEditTimeSlicesValues.getNewPulseValue();
+               final float newTemperatureValue = dialogEditTimeSlicesValues.getNewTemperatureValue();
 
-         final int[] selectedRows = new int[selectedTimeSlices.length];
-         boolean tourDataModified = false;
-         for (int index = 0; index < selectedTimeSlices.length; ++index) {
+               final boolean isAltitudeValueOffset = dialogEditTimeSlicesValues.getIsAltitudeValueOffset();
+               final boolean isCadenceValueOffset = dialogEditTimeSlicesValues.getIsCadenceValueOffset();
+               final boolean isPulseValueOffset = dialogEditTimeSlicesValues.getIsPulseValueOffset();
+               final boolean isTemperatureValueOffset = dialogEditTimeSlicesValues.getIsTemperatureValueOffset();
 
-            final int currentTimeSliceIndex = ((TimeSlice) selectedTimeSlices[index]).serieIndex;
+               final int[] selectedRows = new int[selectedTimeSlices.length];
+               boolean tourDataModified = false;
+               for (int index = 0; index < selectedTimeSlices.length; ++index) {
 
-            selectedRows[index] = currentTimeSliceIndex;
+                  final int currentTimeSliceIndex = ((TimeSlice) selectedTimeSlices[index]).serieIndex;
 
-            if (newAltitudeValue != Float.MIN_VALUE && _serieAltitude != null) {
+                  selectedRows[index] = currentTimeSliceIndex;
 
-               if (isAltitudeValueOffset) {
-                  _serieAltitude[currentTimeSliceIndex] += newAltitudeValue;
-               } else {
-                  _serieAltitude[currentTimeSliceIndex] = newAltitudeValue;
-               }
+                  if (newAltitudeValue != Float.MIN_VALUE && _serieAltitude != null) {
 
-               tourDataModified = true;
-            }
+                     if (isAltitudeValueOffset) {
+                        _serieAltitude[currentTimeSliceIndex] += newAltitudeValue;
+                     } else {
+                        _serieAltitude[currentTimeSliceIndex] = newAltitudeValue;
+                     }
 
-            if (newPulseValue != Integer.MIN_VALUE && _seriePulse != null) {
-
-               if (isPulseValueOffset) {
-                  _seriePulse[currentTimeSliceIndex] += newPulseValue;
-               } else {
-                  _seriePulse[currentTimeSliceIndex] = newPulseValue;
-               }
-
-               tourDataModified = true;
-            }
-
-            if (newCadenceValue != Integer.MIN_VALUE && _serieCadence != null) {
-
-               if (isCadenceValueOffset) {
-                  _serieCadence[currentTimeSliceIndex] += newCadenceValue;
-               } else {
-                  _serieCadence[currentTimeSliceIndex] = newCadenceValue;
-               }
-
-               _tourData.setCadenceSerie(_serieCadence);
-               tourDataModified = true;
-            }
-
-            if (newTemperatureValue != Float.MIN_VALUE & _serieTemperature != null) {
-               if (isTemperatureValueOffset) {
-
-                  //If we are currently in imperial system, we can't just convert the offset as it will lead to errors.
-                  // For example : If the user has asked for an offset of 1°F, then it could offset the metric temperature to -17.22222 °C!!!
-
-                  if (UI.UNIT_VALUE_TEMPERATURE != 1) {
-
-                     final float currentTemperatureMetric = _serieTemperature[currentTimeSliceIndex];
-                     float currentTemperatureFahrenheit = (currentTemperatureMetric * UI.UNIT_FAHRENHEIT_MULTI) + UI.UNIT_FAHRENHEIT_ADD;
-                     currentTemperatureFahrenheit += newTemperatureValue;
-                     final float newTemperatureMetric = UI.convertTemperatureToMetric(currentTemperatureFahrenheit);
-                     _serieTemperature[currentTimeSliceIndex] = newTemperatureMetric;
-
-                  } else {
-                     _serieTemperature[currentTimeSliceIndex] += newTemperatureValue;
+                     tourDataModified = true;
                   }
 
-               } else {
-                  _serieTemperature[currentTimeSliceIndex] = newTemperatureValue;
+                  if (newPulseValue != Integer.MIN_VALUE && _seriePulse != null) {
+
+                     if (isPulseValueOffset) {
+                        _seriePulse[currentTimeSliceIndex] += newPulseValue;
+                     } else {
+                        _seriePulse[currentTimeSliceIndex] = newPulseValue;
+                     }
+
+                     tourDataModified = true;
+                  }
+
+                  if (newCadenceValue != Integer.MIN_VALUE && _serieCadence != null) {
+
+                     if (isCadenceValueOffset) {
+                        _serieCadence[currentTimeSliceIndex] += newCadenceValue;
+                     } else {
+                        _serieCadence[currentTimeSliceIndex] = newCadenceValue;
+                     }
+
+                     _tourData.setCadenceSerie(_serieCadence);
+                     tourDataModified = true;
+                  }
+
+                  if (newTemperatureValue != Float.MIN_VALUE & _serieTemperature != null) {
+                     if (isTemperatureValueOffset) {
+
+                        //If we are currently in imperial system, we can't just convert the offset as it will lead to errors.
+                        // For example : If the user has asked for an offset of 1°F, then it could offset the metric temperature to -17.22222 °C!!!
+
+                        if (UI.UNIT_VALUE_TEMPERATURE != 1) {
+
+                           final float currentTemperatureMetric = _serieTemperature[currentTimeSliceIndex];
+                           float currentTemperatureFahrenheit = (currentTemperatureMetric * UI.UNIT_FAHRENHEIT_MULTI) + UI.UNIT_FAHRENHEIT_ADD;
+                           currentTemperatureFahrenheit += newTemperatureValue;
+                           final float newTemperatureMetric = UI.convertTemperatureToMetric(currentTemperatureFahrenheit);
+                           _serieTemperature[currentTimeSliceIndex] = newTemperatureMetric;
+
+                        } else {
+                           _serieTemperature[currentTimeSliceIndex] += newTemperatureValue;
+                        }
+
+                     } else {
+                        _serieTemperature[currentTimeSliceIndex] = newTemperatureValue;
+                     }
+                     tourDataModified = true;
+                  }
                }
-               tourDataModified = true;
+
+               if (!tourDataModified) {
+                  return;
+               }
+
+               // force recompute values, e.g. gradient
+               _tourData.clearComputedSeries();
+
+               // recompute min/max values
+               getDataSeriesFromTourData();
+
+               // update UI
+               updateUI_Tab_1_Tour();
+               updateUI_ReferenceTourRanges();
+
+               _timeSlice_Viewer.getControl().setRedraw(false);
+               {
+                  _timeSlice_Viewer.refresh(true);
+               }
+               _timeSlice_Viewer.getControl().setRedraw(true);
+
+               setTourDirty();
+
+               // notify other viewers
+               fireModifyNotification();
+
+               /*
+                * Select back the previously selected indices
+                */
+               final int[] mappedTimeSlicesIndices = mapTimeSlicesIndicesWithRows(selectedRows);
+               final Table table = (Table) _timeSlice_Viewer.getControl();
+
+               table.setSelection(mappedTimeSlicesIndices);
+               table.showSelection();
+
             }
-         }
+         });
 
-         if (!tourDataModified) {
-            return;
-         }
-
-         // force recompute values, e.g. gradient
-         _tourData.clearComputedSeries();
-
-         // recompute min/max values
-         getDataSeriesFromTourData();
-
-         // update UI
-         updateUI_Tab_1_Tour();
-         updateUI_ReferenceTourRanges();
-
-         _timeSlice_Viewer.getControl().setRedraw(false);
-         {
-            _timeSlice_Viewer.refresh(true);
-         }
-         _timeSlice_Viewer.getControl().setRedraw(true);
-
-         setTourDirty();
-
-         // notify other viewers
-         fireModifyNotification();
-
-         /*
-          * Select back the previously selected indices
-          */
-         final int[] mappedTimeSlicesIndices = mapTimeSlicesIndicesWithRows(selectedRows);
-         final Table table = (Table) _timeSlice_Viewer.getControl();
-
-         table.setSelection(mappedTimeSlicesIndices);
-         table.showSelection();
       }
    }
 
