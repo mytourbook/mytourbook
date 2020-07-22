@@ -721,21 +721,6 @@ public class RawDataManager {
          }
          break;
 
-      case OnlyTrainingValues:
-
-         if (actionReimportTour_12_ConfirmDialog(
-               ITourbookPreferences.TOGGLE_STATE_REIMPORT_TRAINING_VALUES,
-               Messages.Import_Data_Dialog_ConfirmReimportTraining_Message)) {
-
-            TourLogManager.addLog(
-                  TourLogState.DEFAULT, //
-                  LOG_REIMPORT_ONLY_TRAINING,
-                  TourLogView.CSS_LOG_TITLE);
-
-            return true;
-         }
-         break;
-
       case OnlyTourTimerPauses:
 
          if (actionReimportTour_12_ConfirmDialog(
@@ -745,6 +730,21 @@ public class RawDataManager {
             TourLogManager.addLog(
                   TourLogState.DEFAULT, //
                   LOG_REIMPORT_ONLY_TOURTIMERPAUSES,
+                  TourLogView.CSS_LOG_TITLE);
+
+            return true;
+         }
+         break;
+
+      case OnlyTrainingValues:
+
+         if (actionReimportTour_12_ConfirmDialog(
+               ITourbookPreferences.TOGGLE_STATE_REIMPORT_TRAINING_VALUES,
+               Messages.Import_Data_Dialog_ConfirmReimportTraining_Message)) {
+
+            TourLogManager.addLog(
+                  TourLogState.DEFAULT, //
+                  LOG_REIMPORT_ONLY_TRAINING,
                   TourLogView.CSS_LOG_TITLE);
 
             return true;
