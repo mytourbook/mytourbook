@@ -236,6 +236,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    // Statistics view tooltip
    // display a pause sign on the gps track like in ST
 
+   //DONE FB TOFIX When updating to DB 43, the recording time goes to the paused time when it should go to the recordED time
+
    public static final String     ID                            = "net.tourbook.views.TourDataEditorView";                //$NON-NLS-1$
    //
    private static final String    GRAPH_LABEL_HEARTBEAT_UNIT    = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;

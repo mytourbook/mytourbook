@@ -4892,8 +4892,10 @@ public class TourDatabase {
          }
 
          // 42 -> 43
+         boolean isPostUpdate43 = false;
          if (currentDbVersion == 41) {
             currentDbVersion = newVersion = updateDbDesign_042_to_043(conn, splashManager);
+            isPostUpdate43 = true;
          }
 
          /*
@@ -4950,6 +4952,9 @@ public class TourDatabase {
          }
          if (isPostUpdate40) {
             updateDbDesign_039_to_040_PostUpdate(conn, splashManager);
+         }
+         if (isPostUpdate43) {
+            updateDbDesign_042_to_043_PostUpdate(conn, splashManager);
          }
 
       } catch (final SQLException e) {
@@ -7492,6 +7497,39 @@ public class TourDatabase {
       return newDbVersion;
    }
 
+   private int updateDbDesign_042_to_043(final Connection conn, final SplashManager splashManager) throws SQLException {
+
+      final int newDbVersion = 43;
+
+      logDb_UpdateStart(newDbVersion);
+      updateMonitor(splashManager, newDbVersion);
+
+      final Statement stmt = conn.createStatement();
+      {
+         // double check if db is already updated
+         if (isTableAvailable(conn, TABLE_TOUR_TIMER_PAUSE) == false) {
+
+            createTable_TourTimerPauses(stmt);
+         }
+
+         // check if db is updated to version 43
+         if (isColumnAvailable(conn, TABLE_TOUR_DATA, "tourRecordedTime") == false) { //$NON-NLS-1$
+
+// SET_FORMATTING_OFF
+
+            // Add new columns
+            SQL.AddCol_BigInt(stmt, TABLE_TOUR_DATA, "tourRecordedTime",          DEFAULT_0);                            //$NON-NLS-1$
+
+// SET_FORMATTING_ON
+         }
+      }
+      stmt.close();
+
+      logDb_UpdateEnd(newDbVersion);
+
+      return newDbVersion;
+   }
+
 //   private int updateDbDesign_034_to_035(final Connection conn, final IProgressMonitor monitor) throws SQLException {
 //
 //      final int newDbVersion = 35;
@@ -7600,38 +7638,28 @@ public class TourDatabase {
 //                  net.tourbook.common.UI.formatHhMmSs(timeDiff / 1000)));
 //   }
 
-   private int updateDbDesign_042_to_043(final Connection conn, final SplashManager splashManager) throws SQLException {
+   private void updateDbDesign_042_to_043_PostUpdate(final Connection conn, final SplashManager splashManager)
+      throws SQLException {
 
-      final int newDbVersion = 43;
+         final long startTime = System.currentTimeMillis();
 
-      logDb_UpdateStart(newDbVersion);
-      updateMonitor(splashManager, newDbVersion);
 
-      final Statement stmt = conn.createStatement();
-      {
-         // double check if db is already updated
-         if (isTableAvailable(conn, TABLE_TOUR_TIMER_PAUSE) == false) {
+         final PreparedStatement stmtUpdate = conn.prepareStatement( //
+               //
+               "UPDATE " + TABLE_TOUR_DATA //    //$NON-NLS-1$
+               //
+                     + " SET" //                     //$NON-NLS-1$
+                     //
+                     + " tourRecordedTime=tourRecordingTime"); //$NON-NLS-1$
 
-            createTable_TourTimerPauses(stmt);
-         }
+         stmtUpdate.executeUpdate();
 
-         // check if db is updated to version 43
-         if (isColumnAvailable(conn, TABLE_TOUR_DATA, "tourRecordedTime") == false) { //$NON-NLS-1$
+         final long timeDiff = System.currentTimeMillis() - startTime;
 
-// SET_FORMATTING_OFF
-
-            // Add new columns
-            SQL.AddCol_BigInt(stmt, TABLE_TOUR_DATA, "tourRecordedTime",          DEFAULT_0);                            //$NON-NLS-1$
-
-// SET_FORMATTING_ON
-         }
+         StatusUtil.logInfo(String.format(
+               "Database postupdate 39 -> 40 in %s mm:ss", //$NON-NLS-1$
+               net.tourbook.common.UI.formatHhMmSs(timeDiff / 1000)));
       }
-      stmt.close();
-
-      logDb_UpdateEnd(newDbVersion);
-
-      return newDbVersion;
-   }
 
    private void updateDbDesign_VersionNumber(final Connection conn, final int newVersion) throws SQLException {
 
