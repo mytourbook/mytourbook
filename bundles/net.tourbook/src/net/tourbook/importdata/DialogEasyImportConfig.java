@@ -4078,7 +4078,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
          try {
             //We use the retrieved TourbookFileSystem's implementation to select the folder to watch
-            selectedFolder = fileSystem.selectFileSystemFolder(_parent.getShell());
+            selectedFolder = fileSystem.selectFileSystemFolder(_parent.getShell(),
+                  filterOSPath.replace(fileSystem.getId(), UI.EMPTY_STRING));
             if (!StringUtils.isNullOrEmpty(selectedFolder)) {
                _comboIC_DeviceFolder.setText(selectedFolder);
             }
