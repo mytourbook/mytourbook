@@ -114,6 +114,7 @@ public class TourBook_ColumnFactory {
       defineColumn_Time_TimeZone();
       defineColumn_Time_MovingTime();
       defineColumn_Time_RecordingTime();
+      defineColumn_Time_RecordedTime();
       defineColumn_Time_PausedTime();
       defineColumn_Time_PausedTime_Relative();
       defineColumn_Time_WeekNo();
@@ -2479,6 +2480,39 @@ public class TourBook_ColumnFactory {
                   : (double) dbPausedTime / dbRecordingTime * 100;
 
             cell.setText(_nf1.format(relativePausedTime));
+
+            setCellColor(cell, element);
+         }
+      });
+   }
+
+   /**
+    * Column: Time - Recorded time (h)
+    */
+   private void defineColumn_Time_RecordedTime() {
+
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.TIME_RECORDED_TIME.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final long value = ((TVITourBookItem) element).colTourRecordedTime;
+
+            return colDef_NatTable.printLongValue(value);
+         }
+      });
+
+      final TreeColumnDefinition colDef_Tree = TreeColumnFactory.TIME_RECORDED_TIME.createColumn(_columnManager_Tree, _pc);
+
+      colDef_Tree.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            final long value = ((TVITourBookItem) element).colTourRecordedTime;
+
+            colDef_Tree.printLongValue(cell, value, element instanceof TVITourBookTour);
 
             setCellColor(cell, element);
          }

@@ -225,6 +225,8 @@ public abstract class TableColumnFactory {
    public static final String             TIME_PAUSED_TIME_ID                                = "TIME_PAUSED_TIME";                                //$NON-NLS-1$
    public static final TableColumnFactory TIME_PAUSED_TIME_RELATIVE;
    public static final String             TIME_PAUSED_TIME_RELATIVE_ID                       = "TIME_PAUSED_TIME_RELATIVE";                       //$NON-NLS-1$
+   public static final TableColumnFactory TIME_RECORDED_TIME;
+   public static final String             TIME_RECORDED_TIME_ID                              = "TIME_RECORDED_TIME_ID";                           //$NON-NLS-1$
    public static final TableColumnFactory TIME_RECORDING_TIME;
    public static final String             TIME_RECORDING_TIME_ID                             = "TIME_RECORDING_TIME";                             //$NON-NLS-1$
    public static final TableColumnFactory TIME_RECORDING_TIME_TOTAL;
@@ -3123,7 +3125,31 @@ public abstract class TableColumnFactory {
          }
       };
 
-      //TODO FB
+      TIME_RECORDED_TIME = new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, TIME_RECORDED_TIME_ID, SWT.TRAIL);
+
+            colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
+
+            colDef.setColumnLabel(Messages.ColumnFactory_recorded_time_label);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_recorded_time);
+            colDef.setColumnUnit(Messages.ColumnFactory_recorded_time_label);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_recorded_time_tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+            colDef.setValueFormats(
+                  ValueFormatSet.Time,
+                  ValueFormat.TIME_HH_MM,
+                  columnManager);
+
+            return colDef;
+         }
+      };
+
       TIME_RECORDING_TIME = new TableColumnFactory() {
 
          @Override

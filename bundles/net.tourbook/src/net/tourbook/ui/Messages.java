@@ -130,6 +130,9 @@ public class Messages extends NLS {
    public static String        ColumnFactory_pulse_difference;
    public static String        ColumnFactory_pulse_label;
    public static String        ColumnFactory_pulse_tooltip;
+   public static String        ColumnFactory_recorded_time;
+   public static String        ColumnFactory_recorded_time_label;
+   public static String        ColumnFactory_recorded_time_tooltip;
    public static String        ColumnFactory_recording_time;
    public static String        ColumnFactory_recording_time_label;
    public static String        ColumnFactory_recording_time_tooltip;

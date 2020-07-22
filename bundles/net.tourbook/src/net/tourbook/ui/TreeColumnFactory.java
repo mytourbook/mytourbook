@@ -99,6 +99,7 @@ public abstract class TreeColumnFactory {
    public static final TreeColumnFactory TIME_DRIVING_TIME_NO_CATEGORY;
    public static final TreeColumnFactory TIME_PAUSED_TIME;
    public static final TreeColumnFactory TIME_PAUSED_TIME_RELATIVE;
+   public static final TreeColumnFactory TIME_RECORDED_TIME;
    public static final TreeColumnFactory TIME_RECORDING_TIME;
    public static final TreeColumnFactory TIME_TIME_ZONE;
    public static final TreeColumnFactory TIME_TIME_ZONE_DIFFERENCE;
@@ -1686,7 +1687,31 @@ public abstract class TreeColumnFactory {
          }
       };
 
-      //TODO FB
+      TIME_RECORDED_TIME = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TIME_RECORDED_TIME", SWT.TRAIL); //$NON-NLS-1$
+
+            colDef.setColumnCategory(Messages.ColumnFactory_Category_Time);
+
+            colDef.setColumnLabel(Messages.ColumnFactory_recorded_time_label);
+            colDef.setColumnHeaderText(Messages.ColumnFactory_recorded_time);
+            colDef.setColumnUnit(Messages.ColumnFactory_recorded_time);
+            colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_recorded_time_tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
+            colDef.setValueFormats(//
+                  ValueFormatSet.Time,
+                  ValueFormat.TIME_HH,
+                  ValueFormat.TIME_HH_MM,
+                  columnManager);
+
+            return colDef;
+         }
+      };
+
       TIME_RECORDING_TIME = new TreeColumnFactory() {
          @Override
          public TreeColumnDefinition createColumn(final ColumnManager columnManager,
