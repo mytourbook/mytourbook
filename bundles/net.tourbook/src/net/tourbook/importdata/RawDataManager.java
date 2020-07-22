@@ -111,6 +111,7 @@ public class RawDataManager {
    private static final String      LOG_REIMPORT_ONLY_RUNNING_DYNAMICS  = Messages.Log_Reimport_Only_RunningDynamics;
    private static final String      LOG_REIMPORT_ONLY_SWIMMING          = Messages.Log_Reimport_Only_Swimming;
    private static final String      LOG_REIMPORT_ONLY_TEMPERATURE       = Messages.Log_Reimport_Only_Temperature;
+   private static final String      LOG_REIMPORT_ONLY_TOURTIMERPAUSES   = Messages.Log_Reimport_Only_TourTimerPauses;
    private static final String      LOG_REIMPORT_ONLY_TRAINING          = Messages.Log_Reimport_Only_Training;
    private static final String      LOG_REIMPORT_TOUR                   = Messages.Log_Reimport_Tour;
 
@@ -220,6 +221,8 @@ public class RawDataManager {
       OnlyTrainingValues, //
 
       OnlyTourMarker, //
+
+      OnlyTourTimerPauses, //
    }
 
    private RawDataManager() {}
@@ -733,6 +736,21 @@ public class RawDataManager {
          }
          break;
 
+      case OnlyTourTimerPauses:
+
+         if (actionReimportTour_12_ConfirmDialog(
+               ITourbookPreferences.TOGGLE_STATE_REIMPORT_TOUR_TIMERPAUSES,
+               Messages.Import_Data_Dialog_ConfirmReimportTourTimerPauses_Message)) {
+
+            TourLogManager.addLog(
+                  TourLogState.DEFAULT, //
+                  LOG_REIMPORT_ONLY_TOURTIMERPAUSES,
+                  TourLogView.CSS_LOG_TITLE);
+
+            return true;
+         }
+         break;
+
       case Tour:
 
          if (actionReimportTour_12_ConfirmDialog(
@@ -1069,6 +1087,7 @@ public class RawDataManager {
                || reimportId == ReImport.OnlyRunningDynamics
                || reimportId == ReImport.OnlySwimming
                || reimportId == ReImport.OnlyTemperatureValues
+               || reimportId == ReImport.OnlyTourTimerPauses
                || reimportId == ReImport.OnlyTrainingValues
 
          ) {
@@ -1250,6 +1269,14 @@ public class RawDataManager {
          oldTourData.setTraining_TrainingEffect_Aerob(reimportedTourData.getTraining_TrainingEffect_Aerob());
          oldTourData.setTraining_TrainingEffect_Anaerob(reimportedTourData.getTraining_TrainingEffect_Anaerob());
          oldTourData.setTraining_TrainingPerformance(reimportedTourData.getTraining_TrainingPerformance());
+      }
+
+      // PAUSES
+      if (reimportId == ReImport.AllTimeSlices || reimportId == ReImport.OnlyTourTimerPauses) {
+
+         // re-import pauses only
+
+         oldTourData.setTourTimerPauses(reimportedTourData.getTourTimerPauses());
       }
 
       // ALL

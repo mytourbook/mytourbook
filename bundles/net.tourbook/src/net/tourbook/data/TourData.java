@@ -8482,6 +8482,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return tourTags;
    }
 
+   public List<TourTimerPause> getTourTimerPauses() {
+      return tourTimerPauses;
+   }
+
    /**
     * @return Returns {@link #tourTitle} or an empty string when value is not set
     */
