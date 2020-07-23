@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -668,6 +668,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
       defineColumn_Time_WeekNo();
       defineColumn_Time_WeekYear();
       defineColumn_Time_RecordingTime();
+      defineColumn_Time_RecordedTime();
       defineColumn_Time_PausedTime();
       defineColumn_Time_BreakTime_Relative();
 
@@ -1242,7 +1243,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
    }
 
    /**
-    * column: relative paused time %
+    * column: relative break time %
     */
    private void defineColumn_Time_BreakTime_Relative() {
 
@@ -1261,7 +1262,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
             final Object element = cell.getElement();
             final TVICollatedTour item = (TVICollatedTour) element;
 
-            final long dbPausedTime = item.colPausedTime;
+            final long dbPausedTime = item.colBreakTime;
             final long dbRecordingTime = item.colRecordingTime;
 
             final float relativePausedTime = dbRecordingTime == 0 ? 0 : (float) dbPausedTime
@@ -1308,6 +1309,29 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
          @Override
          public void update(final ViewerCell cell) {
 
+            final Object element = cell.getElement();
+            final TVICollatedTour item = (TVICollatedTour) element;
+
+            final long value = item.colPausedTime;
+
+            colDef.printLongValue(cell, value, element instanceof TVICollatedTour_Tour);
+
+            setCellColor(cell, element);
+         }
+      });
+   }
+
+   /**
+    * column: recorded time (h)
+    */
+   private void defineColumn_Time_RecordedTime() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.TIME_RECORDED_TIME.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
             /*
              * display paused time relative to the recording time
              */
@@ -1315,7 +1339,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
             final Object element = cell.getElement();
             final TVICollatedTour item = (TVICollatedTour) element;
 
-            final long value = item.colPausedTime;
+            final long value = item.colRecordedTime;
 
             colDef.printLongValue(cell, value, element instanceof TVICollatedTour_Tour);
 

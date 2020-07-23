@@ -238,6 +238,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    //TODO Add those new Tourbookview columns in CSVExport.java
 
+   //TODO check that the sums of paused time work with my big database
+
    public static final String     ID                            = "net.tourbook.views.TourDataEditorView";                //$NON-NLS-1$
    //
    private static final String    GRAPH_LABEL_HEARTBEAT_UNIT    = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;

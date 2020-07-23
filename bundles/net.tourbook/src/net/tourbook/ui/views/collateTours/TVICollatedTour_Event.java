@@ -219,7 +219,8 @@ public class TVICollatedTour_Event extends TVICollatedTour {
                tourItem.colAvgSpeed = dbDrivingTime == 0 ? 0 : 3.6f * dbDistance / dbDrivingTime;
                tourItem.colAvgPace = dbDistance == 0 ? 0 : dbDrivingTime * 1000 / dbDistance;
 
-               tourItem.colPausedTime = tourItem.colRecordingTime - tourItem.colDrivingTime;
+               tourItem.colPausedTime = tourItem.colRecordingTime - tourItem.colRecordedTime;
+               tourItem.colBreakTime = tourItem.colRecordingTime - tourItem.colDrivingTime;
 
                // get first tag id
                if (dbTagId instanceof Long) {

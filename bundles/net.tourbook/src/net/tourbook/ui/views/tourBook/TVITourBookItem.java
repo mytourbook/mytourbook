@@ -269,7 +269,9 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             + "AVG( CASE WHEN cadenceZones_DelimiterValue = 0 THEN NULL ELSE cadenceZones_DelimiterValue END ), " + NL // 24  //$NON-NLS-1$
 
             + "MIN(CASE WHEN weather_Temperature_Min = 0 THEN NULL ELSE weather_Temperature_Min END), " + NL // 25            //$NON-NLS-1$
-            + "MAX(CASE WHEN weather_Temperature_Max = 0 THEN NULL ELSE weather_Temperature_Max END)  " + NL // 26            //$NON-NLS-1$
+            + "MAX(CASE WHEN weather_Temperature_Max = 0 THEN NULL ELSE weather_Temperature_Max END), " + NL // 26            //$NON-NLS-1$
+
+            + "SUM(CAST(TourRecordedTime AS BIGINT))     " + NL // 27   //$NON-NLS-1$
       ;
 
    }
@@ -680,6 +682,8 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
       colTemperature_Min               = result.getFloat(startIndex + 25);
       colTemperature_Max               = result.getFloat(startIndex + 26);
+
+      colTourRecordedTime  =  result.getLong(startIndex + 27);
 
 // SET_FORMATTING_ON
 
