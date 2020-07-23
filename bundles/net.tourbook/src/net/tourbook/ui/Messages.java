@@ -61,6 +61,12 @@ public class Messages extends NLS {
    public static String        ColumnFactory_BreakTime_Header;
    public static String        ColumnFactory_BreakTime_Label;
    public static String        ColumnFactory_BreakTime_Tooltip;
+   public static String        ColumnFactory_break_time_relative_label;
+   public static String        ColumnFactory_break_relative_time;
+   public static String        ColumnFactory_break_time_relative_tooltip;
+   public static String        ColumnFactory_break_time;
+   public static String        ColumnFactory_break_time_label;
+   public static String        ColumnFactory_break_time_tooltip;
    public static String        ColumnFactory_cadence;
    public static String        ColumnFactory_cadence_label;
    public static String        ColumnFactory_cadence_tooltip;
@@ -114,11 +120,8 @@ public class Messages extends NLS {
    public static String        ColumnFactory_max_speed_tooltip;
    public static String        ColumnFactory_pace_label;
    public static String        ColumnFactory_pace_tooltip;
-   public static String        ColumnFactory_paused_relative_time;
    public static String        ColumnFactory_paused_time;
    public static String        ColumnFactory_paused_time_label;
-   public static String        ColumnFactory_paused_time_relative_label;
-   public static String        ColumnFactory_paused_time_relative_tooltip;
    public static String        ColumnFactory_paused_time_tooltip;
    public static String        ColumnFactory_power;
    public static String        ColumnFactory_power_label;

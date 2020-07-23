@@ -669,7 +669,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
       defineColumn_Time_WeekYear();
       defineColumn_Time_RecordingTime();
       defineColumn_Time_PausedTime();
-      defineColumn_Time_PausedTime_Relative();
+      defineColumn_Time_BreakTime_Relative();
 
       defineColumn_Tour_Type();
       defineColumn_Tour_TypeText();
@@ -1242,6 +1242,40 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
    }
 
    /**
+    * column: relative paused time %
+    */
+   private void defineColumn_Time_BreakTime_Relative() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.TIME_BREAK_TIME_RELATIVE.createColumn(
+            _columnManager,
+            _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            /*
+             * display paused time relative to the recording time
+             */
+
+            final Object element = cell.getElement();
+            final TVICollatedTour item = (TVICollatedTour) element;
+
+            final long dbPausedTime = item.colPausedTime;
+            final long dbRecordingTime = item.colRecordingTime;
+
+            final float relativePausedTime = dbRecordingTime == 0 ? 0 : (float) dbPausedTime
+                  / dbRecordingTime
+                  * 100;
+
+            cell.setText(_nf1.format(relativePausedTime));
+
+            setCellColor(cell, element);
+         }
+      });
+   }
+
+   /**
     * column: driving time (h)
     */
    private void defineColumn_Time_DrivingTime() {
@@ -1284,40 +1318,6 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
             final long value = item.colPausedTime;
 
             colDef.printLongValue(cell, value, element instanceof TVICollatedTour_Tour);
-
-            setCellColor(cell, element);
-         }
-      });
-   }
-
-   /**
-    * column: relative paused time %
-    */
-   private void defineColumn_Time_PausedTime_Relative() {
-
-      final TreeColumnDefinition colDef = TreeColumnFactory.TIME_PAUSED_TIME_RELATIVE.createColumn(
-            _columnManager,
-            _pc);
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            /*
-             * display paused time relative to the recording time
-             */
-
-            final Object element = cell.getElement();
-            final TVICollatedTour item = (TVICollatedTour) element;
-
-            final long dbPausedTime = item.colPausedTime;
-            final long dbRecordingTime = item.colRecordingTime;
-
-            final float relativePausedTime = dbRecordingTime == 0 ? 0 : (float) dbPausedTime
-                  / dbRecordingTime
-                  * 100;
-
-            cell.setText(_nf1.format(relativePausedTime));
 
             setCellColor(cell, element);
          }
