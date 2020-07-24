@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,10 +15,24 @@
  *******************************************************************************/
 package net.tourbook.map25.ui;
 
+import de.byteholder.geoclipse.mapprovider.IMapProviderListener;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
+import net.tourbook.Messages;
+import net.tourbook.common.UI;
+import net.tourbook.common.action.ActionOpenPrefDialog;
+import net.tourbook.common.font.MTFont;
+import net.tourbook.common.tooltip.ToolbarSlideout;
+import net.tourbook.map25.Map25App;
+import net.tourbook.map25.Map25Provider;
+import net.tourbook.map25.Map25ProviderManager;
+import net.tourbook.map25.Map25View;
+import net.tourbook.preferences.MapsforgeThemeStyle;
+import net.tourbook.preferences.PrefPage_Map25Provider;
 
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -34,20 +48,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolBar;
 import org.oscim.theme.VtmThemes;
-
-import net.tourbook.Messages;
-import net.tourbook.common.UI;
-import net.tourbook.common.action.ActionOpenPrefDialog;
-import net.tourbook.common.font.MTFont;
-import net.tourbook.common.tooltip.ToolbarSlideout;
-import net.tourbook.map25.Map25App;
-import net.tourbook.map25.Map25Provider;
-import net.tourbook.map25.Map25ProviderManager;
-import net.tourbook.map25.Map25View;
-import net.tourbook.preferences.MapsforgeThemeStyle;
-import net.tourbook.preferences.PrefPage_Map25Provider;
-
-import de.byteholder.geoclipse.mapprovider.IMapProviderListener;
 
 /**
  * 2.5D map provider slideout
@@ -76,8 +76,6 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
    private Label     _lblMapProvider;
    private Label     _lblTheme;
    private Label     _lblThemeStyle;
-
-   private Label     _lblCopyright;
 
    /**
     * @param ownerControl
@@ -224,17 +222,6 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
       }
 
       fillMapProvider();
-   }
-
-   private void createUI_30_Info(final Composite parent) {
-
-      /*
-       * Label: Slideout Info with copyright Info
-       */
-      _lblCopyright = new Label(parent, SWT.NONE);
-      _lblCopyright.setText(Messages.Slideout_Map25Provider_Label_Copyright);
-
-      GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_lblCopyright);
    }
 
    private void fillMapProvider() {
@@ -480,8 +467,8 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
       }
 
       // a map provider is not selected -> this should not occure
-      int a = 0;
-      a++;
+//      int a = 0;
+//      a++;
    }
 
    private void updateMap(final Map25Provider mapProvider) {
