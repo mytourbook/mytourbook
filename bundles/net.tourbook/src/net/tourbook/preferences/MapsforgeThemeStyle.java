@@ -1,6 +1,6 @@
 /*******************************************************************************
- * Copyright (C) 2019 Wolfgang Schramm and Contributors
- * Copyright 2019, 2020 Thomas Theussing
+ * Copyright (C) 2019, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2019, 2020 Thomas Theussing
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,7 +14,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-
 package net.tourbook.preferences;
 
 import java.util.HashMap;
@@ -33,7 +32,7 @@ public class MapsforgeThemeStyle {
    private Map<String, String> name            = new HashMap<>();
 
    private String              xmlLayer;
-   private String              defaultlanguage = "en"; //$NON-NLS-1$
+   private String              defaultlanguage = "en";                          //$NON-NLS-1$
 
    public String getDefaultLaguage() {
       return defaultlanguage;
@@ -70,7 +69,7 @@ public class MapsforgeThemeStyle {
 
       if ("default".equals(language)) { //$NON-NLS-1$
          return name.get(defaultlanguage);
-      } else if(language.length() > 2) { //eg, when using "en_EN, then using only first 2 chars"
+      } else if (language.length() > 2) { //eg, when using "en_EN, then using only first 2 chars"
          if (name.containsKey(language.substring(0, 2))) {
             return name.get(language.substring(0, 2));
          } else { //is already short like "en"
@@ -82,7 +81,6 @@ public class MapsforgeThemeStyle {
          return name.get(defaultlanguage);
       }
    }
-
 
    /**
     * get the style name like

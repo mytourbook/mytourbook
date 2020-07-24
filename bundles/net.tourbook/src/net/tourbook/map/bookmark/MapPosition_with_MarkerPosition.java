@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  * Copyright 2012 Hannes Janetzek
  * Copyright (C) 2019 Thomas Theussing
  *
@@ -15,71 +15,40 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-
 package net.tourbook.map.bookmark;
 
 import org.oscim.core.MapPosition;
 import org.oscim.core.MercatorProjection;
 
-public class MapPosition_with_MarkerPosition extends org.oscim.core.MapPosition{
-   
+public class MapPosition_with_MarkerPosition extends org.oscim.core.MapPosition {
+
    /** Projected position x 0..1 */
    public double mapPositionMarkerX;
-   
-   public double getMapPositionMarkerX() {
-      return mapPositionMarkerX;
-   }
 
-   public void setMapPositionMarkerX(double mapPositionMarkerX) {
-      this.mapPositionMarkerX = mapPositionMarkerX;
-   }
-
-
-   
    /** Projected position x 0..1 */
-   public double mapPositionMarkerY;  
-   
-   public double getMapPositionMarkerY() {
-      return mapPositionMarkerY;
-   }  
-   
-   public void setMapPositionMarkerY(double mapPositionMarkerY) {
-      this.mapPositionMarkerY = mapPositionMarkerY;
-   }
+   public double mapPositionMarkerY;
 
-   
-   public double getMarkerLatitude() {
-      return MercatorProjection.toLatitude(mapPositionMarkerY);
-  }
-
-  public double getMarkerLongitude() {
-      return MercatorProjection.toLongitude(mapPositionMarkerX);
-  }
-   
-   
-   
-   
    public MapPosition_with_MarkerPosition() {
       super();
       this.mapPositionMarkerX = 0.5;
       this.mapPositionMarkerY = 0.5;
    }
 
-
-   public MapPosition_with_MarkerPosition(double latitude, double longitude, int scale) {
+   public MapPosition_with_MarkerPosition(final double latitude, final double longitude, final int scale) {
       super(latitude, longitude, scale);
    }
 
-   
    //TODO: this constuctor is not used yet. lat/long must be converted to mercador first, or?
-   public MapPosition_with_MarkerPosition(double latitude, double longitude, int scale, double markerLatitude,  double markerLongitude) {
+   public MapPosition_with_MarkerPosition(final double latitude, final double longitude, final int scale, final double markerLatitude, final double markerLongitude) {
       super(latitude, longitude, scale);
       //this.mapPositionMarkerY = markerLatitude;
       //this.mapPositionMarkerX = markerLongitude;
-   } 
-   
-   public MapPosition_with_MarkerPosition(MapPosition mapPosition) {
+   }
+
+   public MapPosition_with_MarkerPosition(final MapPosition mapPosition) {
+      
       super(mapPosition.getLatitude(), mapPosition.getLongitude(), mapPosition.scale);
+      
       this.bearing = mapPosition.bearing;
       this.roll = mapPosition.roll;
       this.zoomLevel = mapPosition.zoomLevel;
@@ -90,10 +59,33 @@ public class MapPosition_with_MarkerPosition extends org.oscim.core.MapPosition{
 
       this.mapPositionMarkerX = mapPosition.x;
       this.mapPositionMarkerY = mapPosition.y;
-      
-      
+
       System.out.println("constructor lat: " + mapPosition.getLatitude() + " lon: " + mapPosition.getLongitude()); //$NON-NLS-1$ //$NON-NLS-2$
       System.out.println("constructor y: " + mapPositionMarkerY + " x: " + mapPositionMarkerX); //$NON-NLS-1$ //$NON-NLS-2$
-   }  
-   
+   }
+
+   public double getMapPositionMarkerX() {
+      return mapPositionMarkerX;
+   }
+
+   public double getMapPositionMarkerY() {
+      return mapPositionMarkerY;
+   }
+
+   public double getMarkerLatitude() {
+      return MercatorProjection.toLatitude(mapPositionMarkerY);
+   }
+
+   public double getMarkerLongitude() {
+      return MercatorProjection.toLongitude(mapPositionMarkerX);
+   }
+
+   public void setMapPositionMarkerX(final double mapPositionMarkerX) {
+      this.mapPositionMarkerX = mapPositionMarkerX;
+   }
+
+   public void setMapPositionMarkerY(final double mapPositionMarkerY) {
+      this.mapPositionMarkerY = mapPositionMarkerY;
+   }
+
 }

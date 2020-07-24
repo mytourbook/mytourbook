@@ -1,6 +1,6 @@
 /*******************************************************************************
- * Copyright (C) 2019 Wolfgang Schramm and Contributors
- * Copyright 2019, 2020 Thomas Theussing
+ * Copyright (C) 2019, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2019, 2020 Thomas Theussing
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,7 +14,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-
 package net.tourbook.preferences;
 
 import java.io.FileInputStream;
@@ -41,6 +40,7 @@ import net.tourbook.common.UI;
  * @see http://www.vogella.com/tutorials/JavaXML/article.html
  */
 public class MapsforgeStyleParser {
+
    static final String ID              = "id";           //$NON-NLS-1$
    static final String XML_LAYER       = "layer";        //$NON-NLS-1$
    static final String STYLE_MENU      = "stylemenu";    //$NON-NLS-1$
@@ -62,6 +62,7 @@ public class MapsforgeStyleParser {
     * @param args
     */
    public static void main(final String args[]) {
+
       final MapsforgeStyleParser mapStyleParser = new MapsforgeStyleParser();
       //List<MapsforgeThemeStyle> styles = mapStyleParser.readXML("C:\\Users\\top\\BTSync\\oruxmaps\\mapstyles\\TMS\\Tiramisu_3_0_beta1.xml"); //$NON-NLS-1$
       final List<MapsforgeThemeStyle> styles = mapStyleParser.readXML("C:\\Users\\top\\BTSync\\oruxmaps\\mapstyles\\ELV4\\Elevate.xml"); //$NON-NLS-1$
