@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
 import java.nio.file.ClosedWatchServiceException;
+import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -47,6 +48,9 @@ import java.util.concurrent.locks.ReentrantLock;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
+import net.tourbook.common.FileSystemManager;
+import net.tourbook.common.NIO;
+import net.tourbook.common.TourbookFileSystem;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.formatter.FormatManager;
@@ -225,12 +229,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    //
    private static final String CSS_IMPORT_BACKGROUND                      = "div.import-background";                                          //$NON-NLS-1$
    private static final String CSS_IMPORT_TILE                            = "a.import-tile";                                                  //$NON-NLS-1$
-   //
-   static final int            COLUMN_DATE                                = 0;
-   static final int            COLUMN_TITLE                               = 1;
-   static final int            COLUMN_DATA_FORMAT                         = 2;
-   static final int            COLUMN_FILE_NAME                           = 3;
-   static final int            COLUMN_TIME_ZONE                           = 4;
    //
    private static final String STATE_IMPORTED_FILENAMES                   = "importedFilenames";                                              //$NON-NLS-1$
    private static final String STATE_SELECTED_TOUR_INDICES                = "SelectedTourIndices";                                            //$NON-NLS-1$
@@ -925,6 +923,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
        * Common preferences
        */
       _prefChangeListenerCommon = new IPropertyChangeListener() {
+
          @Override
          public void propertyChange(final PropertyChangeEvent event) {
 
@@ -1269,7 +1268,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       tooltip = UI.replaceHTML_NewLine(tooltip);
 
-      // shwo red image when off
+      // show red image when off
       final String imageUrl = isWatchingOn //
             ? _imageUrl_Device_TurnOn
             : _imageUrl_Device_TurnOff;
@@ -1517,7 +1516,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                ? Messages.Import_Data_HTML_WatchingOff
                : Messages.Import_Data_HTML_WatchingOn;
 
-         // shwo red image when off
+         // show red image when off
          final String imageUrl = isWatchingOff //
                ? _imageUrl_Device_TurnOff
                : _imageUrl_Device_TurnOn;
@@ -1636,13 +1635,15 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       sb.append("<table border=0 class='deviceList'><tbody>"); //$NON-NLS-1$
 
+      final EasyConfig easyConfig = getEasyConfig();
+
       for (final OSFile deviceFile : notImportedFiles) {
 
          final String fileMoveState = deviceFile.isBackupImportFile
                ? Messages.Import_Data_HTML_Title_Moved_State
                : UI.EMPTY_STRING;
 
-         final String filePathName = UI.replaceHTML_BackSlash(deviceFile.getPath().getParent().toString());
+         String filePathName = UI.replaceHTML_BackSlash(deviceFile.getPath().getParent().toString());
          final ZonedDateTime modifiedTime = TimeTools.getZonedDateTime(deviceFile.modifiedTime);
 
          sb.append(HTML_TR);
@@ -1653,11 +1654,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
          sb.append("<td class='column content'>"); //$NON-NLS-1$
          sb.append(deviceFile.getFileName());
-         sb.append(HTML_TD_END);
-
-// this is for debugging
-         sb.append("<td class='column content'>"); //$NON-NLS-1$
-         sb.append(filePathName);
          sb.append(HTML_TD_END);
 
          sb.append("<td class='column right'>"); //$NON-NLS-1$
@@ -1671,6 +1667,21 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          sb.append("<td class='right'>"); //$NON-NLS-1$
          sb.append(deviceFile.size);
          sb.append(HTML_TD_END);
+
+         // this is for debugging
+         if (easyConfig.stateToolTipDisplayAbsoluteFilePath) {
+
+            if (NIO.isTourBookFileSystem(filePathName)) {
+
+               final TourbookFileSystem tourbookFileSystem = FileSystemManager.getTourbookFileSystem(filePathName);
+
+               filePathName = filePathName.replace(tourbookFileSystem.getId(), tourbookFileSystem.getDisplayId());
+            }
+
+            sb.append("<td class='column content'>"); //$NON-NLS-1$
+            sb.append(filePathName);
+            sb.append(HTML_TD_END);
+         }
 
          sb.append(HTML_TR_END);
       }
@@ -2683,7 +2694,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    }
 
    /**
-    * Defines all columns for the table viewer in the column manager, the sequenze defines the
+    * Defines all columns for the table viewer in the column manager, the sequence defines the
     * default columns
     *
     * @param parent
@@ -3173,7 +3184,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
     */
    private void defineColumn_Tour_Marker() {
 
-      final ColumnDefinition colDef = TableColumnFactory.TOUR_MARKERS.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.TOUR_NUM_MARKERS.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
       colDef.setLabelProvider(new CellLabelProvider() {
@@ -3413,6 +3424,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       _prefStoreCommon.removePropertyChangeListener(_prefChangeListenerCommon);
 
       disposeConfigImages();
+
+      FileSystemManager.closeFileSystems();
 
       super.dispose();
    }
@@ -4130,10 +4143,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       try {
 
-         if (osFolder != null && osFolder.trim().length() > 0 && Files.exists(Paths.get(osFolder))) {
+         if (osFolder != null && osFolder.trim().length() > 0) {
+
+            final Path folderPath = NIO.getDeviceFolderPath(osFolder);
 
             // device folder exists
-            return true;
+            return folderPath != null && Files.exists(folderPath);
          }
 
       } catch (final Exception e) {}
@@ -4255,9 +4270,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          _isInUpdate = true;
          {
             _tourViewer.setSelection(selectionBackup, true);
-
-            final Table table = _tourViewer.getTable();
-            table.showSelection();
+            _tourViewer.getTable().showSelection();
          }
          _isInUpdate = false;
       }
@@ -4336,6 +4349,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    }
 
    private void recreateViewer() {
+
       _columnManager.saveState(_state);
       _columnManager.clearColumns();
       defineAllColumns();
@@ -4518,7 +4532,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    }
 
    /**
-    * This will also aktivate/deactivate the folder/store watcher.
+    * This will also activate/deactivate the folder/store watcher.
     *
     * @see net.tourbook.common.util.ITourViewer#reloadViewer()
     */
@@ -5179,7 +5193,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
          if (table.isDisposed()) {
 
-            // this occured when testing
+            // this occurred when testing
             return;
          }
 
@@ -5292,7 +5306,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
    /**
     * @param isStartWatching
-    *           When <code>true</code> a new watcher ist restarted, otherwise this thread is
+    *           When <code>true</code> a new watcher is restarted, otherwise this thread is
     *           canceled.
     */
    private void thread_WatchFolders(final boolean isStartWatching) {
@@ -5368,9 +5382,16 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       }
    }
 
+   /**
+    * Note : A suppress warning is added because the resource "tourbookFileSystem"
+    * is actually closed in this method {@link #dispose()}
+    *
+    * @return
+    */
    private Runnable thread_WatchFolders_Runnable() {
 
       return new Runnable() {
+         @SuppressWarnings("resource")
          @Override
          public void run() {
 
@@ -5378,9 +5399,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             WatchKey watchKey = null;
 
             try {
-
-               // keep watcher local because it could be set to null !!!
-               folderWatcher = _folderWatcher = FileSystems.getDefault().newWatchService();
 
                final EasyConfig easyConfig = getEasyConfig();
                final ImportConfig importConfig = easyConfig.getActiveImportConfig();
@@ -5391,11 +5409,21 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                boolean isDeviceFolderValid = false;
                final String deviceFolder = importConfig.getDeviceOSFolder();
 
+               final FileSystem tourbookFileSystem = NIO.isTourBookFileSystem(
+                     deviceFolder)
+                           ? FileSystemManager.getFileSystem(deviceFolder) : null;
+
+               // keep watcher local because it could be set to null !!!
+               folderWatcher = _folderWatcher =
+                     tourbookFileSystem != null
+                           ? tourbookFileSystem.newWatchService()
+                           : FileSystems.getDefault().newWatchService();
+
                if (deviceFolder != null) {
 
                   try {
 
-                     final Path deviceFolderPath = Paths.get(deviceFolder);
+                     final Path deviceFolderPath = NIO.getDeviceFolderPath(deviceFolder);
 
                      if (Files.exists(deviceFolderPath)) {
 
@@ -5471,9 +5499,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                }
                while (watchKey.reset());
 
-            } catch (final InterruptedException e) {
-               //
-            } catch (final ClosedWatchServiceException e) {
+            } catch (final InterruptedException | ClosedWatchServiceException e) {
                //
             } catch (final Exception e) {
                TourLogManager.logEx(e);
@@ -5631,6 +5657,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       easyConfig.backgroundOpacity = modifiedConfig.backgroundOpacity;
       easyConfig.isLiveUpdate = modifiedConfig.isLiveUpdate;
       easyConfig.numHorizontalTiles = modifiedConfig.numHorizontalTiles;
+      easyConfig.stateToolTipDisplayAbsoluteFilePath = modifiedConfig.stateToolTipDisplayAbsoluteFilePath;
       easyConfig.stateToolTipWidth = modifiedConfig.stateToolTipWidth;
       easyConfig.tileSize = modifiedConfig.tileSize;
 

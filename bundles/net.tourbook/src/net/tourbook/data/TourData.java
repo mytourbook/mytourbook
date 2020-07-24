@@ -336,7 +336,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    private short                 isDistanceFromSensor            = 0;                     // db-version 8
 
-   // ############################################# ALTITUDE #############################################
+   // ############################################# ELEVATION #############################################
 
    /**
     * aaaa (h) initial altitude (m)
@@ -483,6 +483,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    @XmlElement
    private float                 maxSpeed;                                             // db-version 4
+
+   /**
+    * maximum pace in metric system
+    */
+   @XmlElement
+   private float                 maxPace;
 
    // ############################################# AVERAGE VALUES #############################################
 
@@ -943,7 +949,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private double[]           distanceSerieDoubleImperial;
 
    /**
-    * Contains the absolute altitude in meter (metric system) or <code>null</code> when not
+    * Contains the absolute elevation in meter (metric system) or <code>null</code> when not
     * available.
     */
    @XmlElementWrapper(name = "AltitudeSeries")
@@ -952,25 +958,25 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    public float[]             altitudeSerie;
 
    /**
-    * smoothed altitude serie is used to display the tour chart when not <code>null</code>
+    * Smoothed elevation serie is used to display the tour chart when not <code>null</code>
     */
    @Transient
    private float[]            altitudeSerieSmoothed;
 
    /**
-    * contains the absolute altitude in feet (imperial system)
+    * Contains the absolute elevation in feet (imperial system)
     */
    @Transient
    private float[]               altitudeSerieImperial;
 
    /**
-    * smoothed altitude serie is used to display the tour chart when not <code>null</code>
+    * Smoothed elevation serie is used to display the tour chart when not <code>null</code>
     */
    @Transient
    private float[]               altitudeSerieImperialSmoothed;
 
    /**
-    * SRTM altitude values, when <code>null</code> srtm data have not yet been attached, when
+    * SRTM elevation values, when <code>null</code> srtm data have not yet been attached, when
     * <code>length()==0</code> data are invalid.
     */
    @Transient
@@ -1312,7 +1318,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    public float[]             dataSerieDiffTo2ndAlti;
 
    /**
-    * contains the altitude serie which is adjusted
+    * Contains the adjusted elevation serie in the current measurement system
     */
    @Transient
    public float[]             dataSerieAdjustedAlti;
@@ -1398,7 +1404,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    public long[]              timeSerieHistory;
 
    /**
-    * Time in double precicion that x-axis values are displayed at the correct position, this is
+    * Time in double precision that x-axis values are displayed at the correct position, this is
     * not the case when max chart pixels is 1'000'000'000 with floating point.
     */
    @Transient
@@ -1450,7 +1456,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    /**
     * List with all tour markers which is used only for multiple tours. This list is required
-    * because the tour markers cannnot be modified and a Set with all tourmarkers is not sorted as
+    * because the tour markers cannot be modified and a Set with all tourmarkers is not sorted as
     * it should.
     */
    @Transient
@@ -1721,7 +1727,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
             final float temp = temperatureSerie[serieIndex];
 
             if (temp == Float.MIN_VALUE) {
-               // remove invalid values which are set temporaritly
+               // remove invalid values which are set temporarily
                temperatureSerie[serieIndex] = 0;
             } else {
                sumTemperature += temp < 0 ? -temp : temp;
@@ -2426,6 +2432,41 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
+    * Compute elevation up/down for an elevation serie with the current Douglas Peucker tolerance.
+    *
+    * @param elevationSerie
+    * @return
+    */
+   public AltitudeUpDown computeAltitudeUpDown(final float[] elevationSerie) {
+
+      float prefDPTolerance;
+
+      if (_isImportedMTTour) {
+         // use imported value
+         prefDPTolerance = dpTolerance / 10;
+      } else {
+         prefDPTolerance = _prefStore.getFloat(ITourbookPreferences.COMPUTED_ALTITUDE_DP_TOLERANCE);
+      }
+
+      AltitudeUpDown altiUpDown;
+      if (elevationSerie != null) {
+
+         // DP needs distance
+
+         altiUpDown = computeAltitudeUpDown_20_Algorithm_DP(elevationSerie, prefDPTolerance, 0, elevationSerie.length - 1);
+
+         // keep this value to see in the UI (tour segmenter) the value and how it is computed
+         dpTolerance = (short) (prefDPTolerance * 10);
+
+      } else {
+
+         altiUpDown = computeAltitudeUpDown_30_Algorithm_9_08(null, prefDPTolerance);
+      }
+
+      return altiUpDown;
+   }
+
+   /**
     * Computes the elevation gain/loss values for a specific range.
     *
     * @param startIndex
@@ -2451,7 +2492,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
          // DP needs distance
 
-         altiUpDown = computeAltitudeUpDown_20_Algorithm_DP(prefDPTolerance, startIndex, endIndex);
+         altiUpDown = computeAltitudeUpDown_20_Algorithm_DP(altitudeSerie, prefDPTolerance, startIndex, endIndex);
 
          // keep this value to see in the UI (tour segmenter) the value and how it is computed
          dpTolerance = (short) (prefDPTolerance * 10);
@@ -2467,6 +2508,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * Compute altitude up/down with Douglas Peucker algorithm.
     *
+    * @param elevationSerie
     * @param dpTolerance
     *           The Douglas-Peucker tolerance value
     * @param startIndex
@@ -2475,12 +2517,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *           The end of the section for which to compute the elevation gain/loss
     * @return Returns <code>null</code> when altitude up/down cannot be computed
     */
-   private AltitudeUpDown computeAltitudeUpDown_20_Algorithm_DP(final float dpTolerance, final int startIndex, final int endIndex) {
+   private AltitudeUpDown computeAltitudeUpDown_20_Algorithm_DP(final float[] elevationSerie,
+                                                                final float dpTolerance,
+                                                                final int startIndex,
+                                                                final int endIndex) {
 
       // check if all necessary data are available
-      if (altitudeSerie == null || altitudeSerie.length < 2 ||
-            startIndex > altitudeSerie.length || endIndex >= altitudeSerie.length ||
-            startIndex >= endIndex) {
+      if (elevationSerie == null
+            || elevationSerie.length < 2
+            || startIndex > elevationSerie.length
+            || endIndex >= elevationSerie.length
+            || startIndex >= endIndex) {
+
          return null;
       }
 
@@ -2488,7 +2536,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       final DPPoint dpPoints[] = new DPPoint[endIndex - startIndex];
       int dpPointsIndex = 0;
       for (int serieIndex = startIndex; serieIndex < endIndex; serieIndex++) {
-         dpPoints[dpPointsIndex] = new DPPoint(distanceSerie[serieIndex], altitudeSerie[serieIndex], serieIndex);
+         dpPoints[dpPointsIndex] = new DPPoint(distanceSerie[serieIndex], elevationSerie[serieIndex], serieIndex);
          dpPointsIndex++;
       }
 
@@ -2502,7 +2550,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       float altitudeUpTotal = 0;
       float altitudeDownTotal = 0;
 
-      float prevAltitude = altitudeSerie[startIndex];
+      float prevAltitude = elevationSerie[startIndex];
 
       /*
        * Get altitude up/down from the tour altitude values which are found by DP
@@ -2510,7 +2558,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       for (int dbIndex = 1; dbIndex < simplifiedPoints.length; dbIndex++) {
 
          final DPPoint point = simplifiedPoints[dbIndex];
-         final float currentAltitude = altitudeSerie[startIndex + point.serieIndex];
+         final float currentAltitude = elevationSerie[startIndex + point.serieIndex];
          final float altiDiff = currentAltitude - prevAltitude;
 
          if (altiDiff > 0) {
@@ -2768,7 +2816,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
 
       /**
-       * Very special behaviour until the tour chart analyzer can show both values:
+       * Very special behavior until the tour chart analyzer can show both values:
        * <p>
        * Returns the up values, when 0 then the down values
        */
@@ -2859,7 +2907,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
             if (breakTimeSerie[serieIndex] == true) {
 
-               // break has occured in this time slice
+               // break has occurred in this time slice
 
                if (serieIndex < lastIndex) {
 
@@ -2960,7 +3008,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
             if (breakTimeSerie[serieIndex] == true) {
 
-               // break has occured in this time slice
+               // break has occurred in this time slice
 
                if (serieIndex < lastIndex) {
 
@@ -3513,6 +3561,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
 
       maxSpeed = 0.0f;
+      maxPace = Float.MAX_VALUE;
 
       for (int serieIndex = 1; serieIndex < serieLength; serieIndex++) {
 
@@ -3534,6 +3583,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
          paceSerieSeconds[serieIndex] = paceMetricSeconds;
          paceSerieSecondsImperial[serieIndex] = paceImperialSeconds;
+
+         maxPace = paceMetricSeconds == 0 ? maxPace : Math.min(maxPace, paceMetricSeconds);
 
          paceSerieMinute[serieIndex] = paceMetricSeconds / 60;
          paceSerieMinuteImperial[serieIndex] = paceImperialSeconds / 60;
@@ -3761,6 +3812,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
 
       maxSpeed = 0.0f;
+      maxPace = Float.MAX_VALUE;
+
       for (int serieIndex = 0; serieIndex < Vh.length; serieIndex++) {
 
          final double speedMetric = Vh[serieIndex] * 3.6;
@@ -3778,6 +3831,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
          paceSerieSeconds[serieIndex] = paceMetricSeconds;
          paceSerieSecondsImperial[serieIndex] = paceImperialSeconds;
+
+         maxPace = paceMetricSeconds == 0 ? maxPace : Math.min(maxPace, paceMetricSeconds);
 
          paceSerieMinute[serieIndex] = paceMetricSeconds / 60;
          paceSerieMinuteImperial[serieIndex] = paceImperialSeconds / 60;
@@ -4539,8 +4594,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       final int serieLength = timeSerie.length;
 
-      maxSpeed = 0;
-
       speedSerie = new float[serieLength];
       speedSerieImperial = new float[serieLength];
 
@@ -4569,6 +4622,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
 
       final int serieLengthLast = serieLength - 1;
+
+      maxSpeed = 0;
+      maxPace = Float.MAX_VALUE;
 
       for (int serieIndex = 0; serieIndex < serieLength; serieIndex++) {
 
@@ -4633,6 +4689,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          final float paceMetricSeconds = speedMetric < 1.0 ? 0 : (float) (3600.0 / speedMetric);
          final float paceImperialSeconds = speedMetric < 0.6 ? 0 : (float) (3600.0 / speedImperial);
 
+         maxPace = paceMetricSeconds == 0 ? maxPace : Math.min(maxPace, paceMetricSeconds);
+
          paceSerieSeconds[serieIndex] = paceMetricSeconds;
          paceSerieSecondsImperial[serieIndex] = paceImperialSeconds;
 
@@ -4642,7 +4700,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
-    * compute the speed when the time serie has unequal time intervalls, with Wolfgangs algorithm
+    * compute the speed when the time serie has unequal time intervals, with Wolfgang's algorithm
     */
    private void computeSpeedSerieInternalWithVariableInterval() {
 
@@ -4657,6 +4715,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       final int lastSerieIndex = serieLength - 1;
 
       maxSpeed = 0;
+      maxPace = Float.MAX_VALUE;
 
       speedSerie = new float[serieLength];
       speedSerieImperial = new float[serieLength];
@@ -5497,7 +5556,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
             if (swimSerieStartIndex >= swimSerieSize) {
 
-               // there are no further swim data, this can occure when the last tour(s) have no swim data
+               // there are no further swim data, this can occur when the last tour(s) have no swim data
                break;
             }
 
@@ -5682,7 +5741,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          long lastValidTime = 0;
          long lastValidAbsoluteTime = 0;
 
-         // convert data from the tour format into interger[] arrays
+         // convert data from the tour format into integer[] arrays
          for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
 
             final TimeData timeData = timeDataSerie[serieIndex];
@@ -5860,13 +5919,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       } else {
 
          /*
-          * relativ data is available, these data are NOT from GPS devices
+          * relative data is available, these data are NOT from GPS devices
           */
 
          int distanceAbsolute = 0;
          int altitudeAbsolute = 0;
 
-         // convert data from the tour format into an interger[]
+         // convert data from the tour format into an integer[]
          for (int serieIndex = 0; serieIndex < serieSize; serieIndex++) {
 
             final TimeData timeData = timeDataSerie[serieIndex];
@@ -6012,7 +6071,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       /*
        * Distance is measured with the gps device and not with a sensor. Remove all distance values
        * which are set but lat/lon is not available, this case can happen when a device is in a
-       * tunnel. Distance values will be interpolited later.
+       * tunnel. Distance values will be interpolated later.
        */
 
       final int size = timeSerie.length;
@@ -6028,7 +6087,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Because of the current algorithm, the first distance value can be <code>0</code> and the other
     * values can be {@link Float#MIN_VALUE}.
     * <p>
-    * When this occures, set all distance values to {@link Float#MIN_VALUE}, that distance values
+    * When this occurs, set all distance values to {@link Float#MIN_VALUE}, that distance values
     * are not recognized.
     */
    private void createTimeSeries_14_RemoveInvalidDistanceValues() {
@@ -6068,7 +6127,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       } else {
 
-         // this case needs more investigation if it occures
+         // this case needs more investigation if it occurs
       }
    }
 
@@ -6235,7 +6294,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
                if (pulseTime != 0) {
 
                   if (pulseTime == 65535) {
-                     // ignore, this value occured in daum data
+                     // ignore, this value occurred in daum data
                   } else {
 
                      pulseTimes.add(pulseTime);
@@ -6319,7 +6378,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       try {
          /*
           * this is the default implementation to create a tour id, but on the 5.5.2007 a
-          * NumberFormatException occured so the calculation for the tour id was adjusted
+          * NumberFormatException occurred so the calculation for the tour id was adjusted
           */
          tourIdKey = Short.toString(startYear)
                + Short.toString(startMonth)
@@ -6409,7 +6468,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       out.println("TOUR DATA"); //$NON-NLS-1$
       out.println("----------------------------------------------------"); //$NON-NLS-1$
 // out.println("Typ: " + getDeviceTourType()); //$NON-NLS-1$
-      out.println("Date:               " + startDay + "." + startMonth + "." + startYear); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      out.println("Date:               " + startDay + UI.SYMBOL_DOT + startMonth + UI.SYMBOL_DOT + startYear); //$NON-NLS-1$
       out.println("Time:               " + startHour + ":" + startMinute); //$NON-NLS-1$ //$NON-NLS-2$
       out.println("Total distance:     " + getStartDistance()); //$NON-NLS-1$
       // out.println("Distance:           " + getDistance());
@@ -7288,6 +7347,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    public float getMaxAltitude() {
       return maxAltitude;
+   }
+
+   public float getMaxPace() {
+      return maxPace;
    }
 
    /**
@@ -8195,10 +8258,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return tzId;
    }
 
+   /**
+    * @return Returns elevation loss in metric system (m)
+    */
    public int getTourAltDown() {
       return tourAltDown;
    }
 
+   /**
+    * @return Returns elevation gain in metric system (m)
+    */
    public int getTourAltUp() {
       return tourAltUp;
    }
@@ -9435,6 +9504,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       final float paceMetricSeconds = speedMetric < 1.0 ? 0 : (float) (3600.0 / speedMetric);
       final float paceImperialSeconds = speedMetric < 0.6 ? 0 : (float) (3600.0 / speedImperial);
 
+      maxPace = paceMetricSeconds == 0 ? maxPace : Math.min(maxPace, paceMetricSeconds);
+
       paceSerieSeconds[serieIndex] = paceMetricSeconds;
       paceSerieSecondsImperial[serieIndex] = paceImperialSeconds;
 
@@ -9734,8 +9805,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
-    * Set tour start yeay/month/day which are used in views, e.g. tourbook view, they are
-    * accessed with sql statements.
+    * Set tour start year/month/day which are used in views, e.g. tourbook view, they are
+    * accessed with SQL statements.
     *
     * @param tourStartTime
     */

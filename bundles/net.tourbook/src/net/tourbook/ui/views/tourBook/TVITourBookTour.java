@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2013  Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -23,84 +23,126 @@ import net.tourbook.database.TourDatabase;
 
 public class TVITourBookTour extends TVITourBookItem {
 
-	long					tourId;
-	long					tourTypeId;
+   public long             tourId;
 
-	long					colStartDistance;
-	short					colTimeInterval;
+   /**
+    * The default for tour type id is not 0 because 0 is a valid tour type id and would be used even
+    * when tour type id is not set.
+    */
+   long                    tourTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
 
-	HashSet<Long>			sqlTagIds;
-	HashSet<Long>			sqlMarkerIds;
+   long                    colDateTime_MS;
+   String                  colDateTime_Text;
 
-	/**
-	 * id's for the tags or <code>null</code> when tags are not available
-	 */
-	private ArrayList<Long>	_tagIds;
+   long                    colStartDistance;
+   short                   colTimeInterval;
 
-	/**
-	 * id's for the markers or <code>null</code> when markers are not available
-	 */
-	private ArrayList<Long>	_markerIds;
+   HashSet<Long>           sqlTagIds;
+   HashSet<Long>           sqlMarkerIds;
 
-	public TVITourBookTour(final TourBookView view, final TreeViewerItem parentItem) {
+   /**
+    * Id's for the tags or <code>null</code> when tags are not available
+    */
+   private ArrayList<Long> _tagIds;
 
-		super(view);
+   /**
+    * Id's for the markers or <code>null</code> when markers are not available
+    */
+   private ArrayList<Long> _markerIds;
 
-		setParentItem(parentItem);
-	}
+   /**
+    * @param view
+    * @param parentItem
+    */
+   public TVITourBookTour(final TourBookView view, final TreeViewerItem parentItem) {
 
-	@Override
-	protected void fetchChildren() {}
+      super(view);
 
-	public long getColumnStartDistance() {
-		return colStartDistance;
-	}
+      setParentItem(parentItem);
+   }
 
-	public short getColumnTimeInterval() {
-		return colTimeInterval;
-	}
+   @Override
+   public void clearChildren() {
 
-	public ArrayList<Long> getMarkerIds() {
-		if (sqlMarkerIds != null && _markerIds == null) {
-			_markerIds = new ArrayList<Long>(sqlMarkerIds);
-		}
-		return _markerIds;
-	}
+      // cleanup
+      sqlTagIds = null;
+      sqlMarkerIds = null;
 
-	public ArrayList<Long> getTagIds() {
-		if (sqlTagIds != null && _tagIds == null) {
-			_tagIds = new ArrayList<Long>(sqlTagIds);
-		}
-		return _tagIds;
-	}
+      _tagIds = null;
+      _markerIds = null;
 
-	@Override
-	public Long getTourId() {
-		return tourId;
-	}
+      super.clearChildren();
+   }
 
-	/**
-	 * @return Returns the tour type id of the tour or {@link TourDatabase#ENTITY_IS_NOT_SAVED} when
-	 *         the tour type is not set.
-	 */
-	public long getTourTypeId() {
-		return tourTypeId;
-	}
+   @Override
+   protected void fetchChildren() {}
 
-	/**
-	 * tour items do not have children
-	 */
-	@Override
-	public boolean hasChildren() {
-		return false;
-	}
+   public long getColumnStartDistance() {
+      return colStartDistance;
+   }
 
-	public void setMarkerIds(final HashSet<Long> markerIds) {
-		sqlMarkerIds = markerIds;
-	}
+   public short getColumnTimeInterval() {
+      return colTimeInterval;
+   }
 
-	public void setTagIds(final HashSet<Long> tagIds) {
-		sqlTagIds = tagIds;
-	}
+   public ArrayList<Long> getMarkerIds() {
+      if (sqlMarkerIds != null && _markerIds == null) {
+         _markerIds = new ArrayList<>(sqlMarkerIds);
+      }
+      return _markerIds;
+   }
+
+   public ArrayList<Long> getTagIds() {
+      if (sqlTagIds != null && _tagIds == null) {
+         _tagIds = new ArrayList<>(sqlTagIds);
+      }
+      return _tagIds;
+   }
+
+   @Override
+   public Long getTourId() {
+      return tourId;
+   }
+
+   /**
+    * @return Returns the tour type id of the tour or {@link TourDatabase#ENTITY_IS_NOT_SAVED} when
+    *         the tour type is not set.
+    */
+   public long getTourTypeId() {
+      return tourTypeId;
+   }
+
+   /**
+    * tour items do not have children
+    */
+   @Override
+   public boolean hasChildren() {
+      return false;
+   }
+
+   public void setMarkerIds(final HashSet<Long> markerIds) {
+      sqlMarkerIds = markerIds;
+   }
+
+   public void setTagIds(final HashSet<Long> tagIds) {
+      sqlTagIds = tagIds;
+   }
+
+   @Override
+   public String toString() {
+
+      return "TVITourBookTour" + NL //$NON-NLS-1$
+
+            + "[" + NL //$NON-NLS-1$
+
+            + "colDateTimeText=" + colDateTime_Text //$NON-NLS-1$
+            + NL
+            + "colTourDateTime=" + colTourDateTime + NL //$NON-NLS-1$
+            + "colTourTitle=" + colTourTitle //$NON-NLS-1$
+
+            + NL
+
+            + "]"; //$NON-NLS-1$
+   }
 
 }

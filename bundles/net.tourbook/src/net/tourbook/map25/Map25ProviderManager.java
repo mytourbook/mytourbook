@@ -101,7 +101,7 @@ public class Map25ProviderManager {
 
       mapProvider.isDefault = true;
       mapProvider.isEnabled = true;
-      mapProvider.name = Messages.Map25_Provider_Mapilion_Name; //$NON-NLS-1$
+      mapProvider.name = Messages.Map25_Provider_Mapilion_Name;
       mapProvider.online_url = "https://tiles.mapilion.com/data/v3"; //$NON-NLS-1$
       mapProvider.online_TilePath = "/{Z}/{X}/{Y}.pbf"; //$NON-NLS-1$
       mapProvider.tileEncoding = TileEncoding.MP;
@@ -370,7 +370,7 @@ public class Map25ProviderManager {
 
       } else {
 
-         /**
+         /*
           * Create default map providers
           */
          allMapProvider.add(_defaultMapProvider);
@@ -380,7 +380,7 @@ public class Map25ProviderManager {
          allMapProvider.add(createMapProvider_MyTileServer());
       }
 
-      /**
+      /*
        * Ensure that at least one map provider is enabled
        */
       boolean isOneEnabled = false;

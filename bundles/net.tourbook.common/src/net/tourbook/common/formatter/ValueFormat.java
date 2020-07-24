@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,21 +17,21 @@ package net.tourbook.common.formatter;
 
 public enum ValueFormat {
 
-	DEFAULT, //
-	DUMMY_VALUE, //
+   DEFAULT, //
+   DUMMY_VALUE, //
 
-	TEXT, //
+   TEXT, //
 
-	PACE_MM_SS, //
+   PACE_MM_SS, //
 
-	NUMBER_1_0, //
-	NUMBER_1_1, //
-	NUMBER_1_2, //
-	NUMBER_1_3, //
+   NUMBER_1_0, //
+   NUMBER_1_1, //
+   NUMBER_1_2, //
+   NUMBER_1_3, //
 
-	TIME_HH, //
-	TIME_HH_MM, //
-	TIME_HH_MM_SS, //
+   TIME_HH, //
+   TIME_HH_MM, //
+   TIME_HH_MM_SS, //
    TIME_SSS, //
 
 }

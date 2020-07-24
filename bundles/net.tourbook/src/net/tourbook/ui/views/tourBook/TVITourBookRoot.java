@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,29 +15,38 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourBook;
 
-import de.byteholder.geoclipse.map.UI;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.TreeViewerItem;
-import net.tourbook.common.util.Util;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.SQLFilter;
 
 public class TVITourBookRoot extends TVITourBookItem {
 
+
+   /**
+    * @param view
+    * @param viewLayout
+    */
    TVITourBookRoot(final TourBookView view) {
+
       super(view);
    }
 
    @Override
    protected void fetchChildren() {
+
+      getItemsHierarchical();
+   }
+
+   private void getItemsHierarchical() {
 
       /*
        * set the children for the root item, these are year items
@@ -60,22 +69,22 @@ public class TVITourBookRoot extends TVITourBookItem {
 
          fromTourData = NL
 
-               + "FROM (            " + NL //$NON-NLS-1$
+               + "FROM (" + NL //                              //$NON-NLS-1$
 
-               + " SELECT           " + NL //$NON-NLS-1$
+               + " SELECT " + NL //                            //$NON-NLS-1$
 
-               + "  StartYear,      " + NL //$NON-NLS-1$
+               + "  StartYear," + NL //$NON-NLS-1$
                + SQL_SUM_FIELDS + NL
 
                + "  FROM " + TourDatabase.TABLE_TOUR_DATA + NL//$NON-NLS-1$
 
                // get tag id's
                + "  LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" + NL //$NON-NLS-1$ //$NON-NLS-2$
-               + "  ON tourID = jTdataTtag.TourData_tourId   " + NL //$NON-NLS-1$
+               + "  ON tourID = jTdataTtag.TourData_tourId " + NL //$NON-NLS-1$
 
                + sqlWhereClause
 
-               + ") td              " + NL//$NON-NLS-1$
+               + ") td " + NL//$NON-NLS-1$
          ;
 
       } else {
@@ -110,11 +119,7 @@ public class TVITourBookRoot extends TVITourBookItem {
             + " ORDER BY StartYear     " + NL //$NON-NLS-1$
       ;
 
-      Connection conn = null;
-
-      try {
-
-         conn = TourDatabase.getInstance().getConnection();
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          final PreparedStatement statement = conn.prepareStatement(sql);
          sqlFilter.setParameters(statement, 1);
@@ -173,8 +178,6 @@ public class TVITourBookRoot extends TVITourBookItem {
 
       } catch (final SQLException e) {
          SQL.showException(e, sql);
-      } finally {
-         Util.closeSql(conn);
       }
    }
 

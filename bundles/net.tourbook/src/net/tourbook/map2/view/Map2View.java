@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -999,7 +999,7 @@ public class Map2View extends ViewPart implements
 
                      if (selection instanceof SelectionTourIds) {
 
-                        // clone tour id's otherwise the original couldl be removed
+                        // clone tour id's otherwise the original could be removed
                         final SelectionTourIds selectionTourIds = (SelectionTourIds) selection;
 
                         final ArrayList<Long> allTourIds = new ArrayList<>();
@@ -1156,9 +1156,13 @@ public class Map2View extends ViewPart implements
 
                _map.paint();
 
-            } else if (property.equals(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD)) {
+            } else if (property.equals(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD)
+                  || property.equals(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD_WARNING)) {
 
-               _map.setTourPaintMethodEnhanced(event.getNewValue().equals(PrefPageMap2Appearance.TOUR_PAINT_METHOD_COMPLEX));
+               final String tourPaintMethod = _prefStore.getString(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD);
+               final boolean isShowPaintingMethodWarning = _prefStore.getBoolean(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD_WARNING);
+
+               _map.setTourPaintMethodEnhanced(PrefPageMap2Appearance.TOUR_PAINT_METHOD_COMPLEX.equals(tourPaintMethod), isShowPaintingMethodWarning);
 
             } else if (property.equals(ITourbookPreferences.GRAPH_COLORS_HAS_CHANGED)
                   || property.equals(ITourbookPreferences.MAP2_OPTIONS_IS_MODIFIED)) {
@@ -1187,7 +1191,7 @@ public class Map2View extends ViewPart implements
 
             } else if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
 
-               // this can occure when tour geo filter color is modified
+               // this can occur when tour geo filter color is modified
 
                _map.paint();
             }
@@ -1608,7 +1612,8 @@ public class Map2View extends ViewPart implements
       _map.setMeasurementSystem(net.tourbook.ui.UI.UNIT_VALUE_DISTANCE, UI.UNIT_LABEL_DISTANCE);
 
       final String tourPaintMethod = _prefStore.getString(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD);
-      _map.setTourPaintMethodEnhanced(PrefPageMap2Appearance.TOUR_PAINT_METHOD_COMPLEX.equals(tourPaintMethod));
+      final boolean isShowPaintingMethodWarning = _prefStore.getBoolean(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD_WARNING);
+      _map.setTourPaintMethodEnhanced(PrefPageMap2Appearance.TOUR_PAINT_METHOD_COMPLEX.equals(tourPaintMethod), isShowPaintingMethodWarning);
 
       // setup tool tip's
       _map.setTourToolTip(_tourToolTip = new TourToolTip(_map));
@@ -2060,7 +2065,7 @@ public class Map2View extends ViewPart implements
 
       TourGeoFilter_Loader.stopLoading(_geoFilter_PreviousGeoLoaderItem);
 
-      // delay geo part loader, moving the mouse can occure very often
+      // delay geo part loader, moving the mouse can occur very often
       _parent.getDisplay().timerExec(50, new Runnable() {
 
          private int __runningId = runnableRunningId;
@@ -2309,7 +2314,7 @@ public class Map2View extends ViewPart implements
 
       final int serieSize = latitudeSerie.length;
 
-      // check bounds -> this problem occured several times
+      // check bounds -> this problem occurred several times
       if (valueIndex1 >= serieSize) {
          valueIndex1 = serieSize - 1;
       }
@@ -2505,7 +2510,7 @@ public class Map2View extends ViewPart implements
 
          } else {
 
-            // use old behaviour
+            // use old behavior
 
             final ChartDataModel chartDataModel = chartInfo.chartDataModel;
             if (chartDataModel != null) {
@@ -3066,7 +3071,7 @@ public class Map2View extends ViewPart implements
       _allTourData.add(tourData);
       _hash_AllTourData = _allTourData.hashCode();
 
-      // reset also ALL tour id's, otherwiese a reselected multiple tour is not displayed
+      // reset also ALL tour id's, otherwise a reselected multiple tour is not displayed
       // it took some time to debug this issue !!!
       _hash_AllTourIds = tourData.getTourId().hashCode();
 
@@ -3768,7 +3773,7 @@ public class Map2View extends ViewPart implements
 
       } else {
 
-         // multiple tourdata, I'm not sure if this still occures after merging multiple tours into one tourdata
+         // multiple tourdata, I'm not sure if this still occurs after merging multiple tours into one tourdata
       }
    }
 
@@ -4000,6 +4005,8 @@ public class Map2View extends ViewPart implements
          _allTourData.add(tourData);
          _hash_AllTourData = _allTourData.hashCode();
          _hash_AllTourIds = tourData.getTourId().hashCode();
+
+         _map.tourBreadcrumb().resetTours();
 
          paintTours_10_All();
       }

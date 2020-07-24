@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1327,10 +1327,12 @@ public class TourManager {
     * @return Returns a string of this format : "33 - 64"
     */
    public static String generateCadenceZones_TimePercentages(final int cadenceZoneSlowTime, final int cadenceZoneFastTime) {
+
       String cadenceZonesPercentages = UI.EMPTY_STRING;
 
       final int totalCadenceTime = cadenceZoneSlowTime + cadenceZoneFastTime;
       if (totalCadenceTime > 0) {
+
          final int cadenceZone_SlowPercentage = Math.round(cadenceZoneSlowTime * 100f / totalCadenceTime);
          final int cadenceZone_FastPercentage = Math.round(cadenceZoneFastTime * 100f / totalCadenceTime);
 
@@ -1425,7 +1427,7 @@ public class TourManager {
     */
    public static RGB getGraphColor(final String graphName, final String colorProfileName) {
 
-      final String prefGraphName = ICommonPreferences.GRAPH_COLORS + graphName + "."; //$NON-NLS-1$
+      final String prefGraphName = ICommonPreferences.GRAPH_COLORS + graphName + UI.SYMBOL_DOT;
 
       // get COLOR from common pref store
       final IPreferenceStore commonPrefStore = CommonActivator.getPrefStore();
@@ -1848,9 +1850,7 @@ public class TourManager {
              */
             new ProgressMonitorDialog(TourbookPlugin.getAppShell()).run(true, true, saveRunnable);
 
-         } catch (final InvocationTargetException e) {
-            StatusUtil.showStatus(e);
-         } catch (final InterruptedException e) {
+         } catch (final InvocationTargetException | InterruptedException e) {
             StatusUtil.showStatus(e);
          }
       }
@@ -2494,9 +2494,7 @@ public class TourManager {
 
             new ProgressMonitorDialog(TourbookPlugin.getAppShell()).run(true, false, saveRunnable);
 
-         } catch (final InvocationTargetException e) {
-            StatusUtil.showStatus(e);
-         } catch (final InterruptedException e) {
+         } catch (final InvocationTargetException | InterruptedException e) {
             StatusUtil.showStatus(e);
          }
       }
@@ -2640,7 +2638,7 @@ public class TourManager {
     */
    public static void setGraphColor(final ChartDataYSerie yData, final String graphName) {
 
-      final String prefGraphName = ICommonPreferences.GRAPH_COLORS + graphName + "."; //$NON-NLS-1$
+      final String prefGraphName = ICommonPreferences.GRAPH_COLORS + graphName + UI.SYMBOL_DOT;
 
       // get COLOR from common pref store
       final IPreferenceStore commonPrefStore = CommonActivator.getPrefStore();

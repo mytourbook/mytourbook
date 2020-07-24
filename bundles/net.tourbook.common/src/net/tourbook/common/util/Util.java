@@ -19,7 +19,6 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -91,6 +90,7 @@ public class Util {
    public static final String UNIQUE_ID_SUFFIX_SUUNTO2             = "92145"; //$NON-NLS-1$
    public static final String UNIQUE_ID_SUFFIX_SUUNTO3             = "73198"; //$NON-NLS-1$
    public static final String UNIQUE_ID_SUFFIX_SUUNTO9             = "93281"; //$NON-NLS-1$
+   public static final String UNIQUE_ID_SUFFIX_SUUNTOQUEST         = "41502"; //$NON-NLS-1$
 
    /*
     * Default xml tags
@@ -1052,6 +1052,46 @@ public class Util {
    /**
     * @param state
     * @param key
+    * @param allDefaultValues
+    * @return Returns a string value from {@link IDialogSettings}. When the key is not found, the
+    *         default value is returned.
+    */
+   public static <E extends Enum<E>> ArrayList<E> getStateEnumList(final IDialogSettings state,
+                                                                   final String key,
+                                                                   final ArrayList<E> allDefaultValues) {
+
+      if (state == null) {
+         return allDefaultValues;
+      }
+
+      final String[] allStateValues = state.getArray(key);
+      if (allStateValues == null || allStateValues.length == 0 || allDefaultValues == null || allDefaultValues.size() == 0) {
+         return allDefaultValues;
+      }
+
+      final ArrayList<E> allEnumValues = new ArrayList<>();
+
+      try {
+
+         final Class<E> declaringClass = allDefaultValues.get(0).getDeclaringClass();
+
+         for (final String stateValue : allStateValues) {
+            if (stateValue != null) {
+               allEnumValues.add(Enum.valueOf(declaringClass, stateValue));
+            }
+         }
+
+      } catch (final IllegalArgumentException ex) {
+
+         return allDefaultValues;
+      }
+
+      return allEnumValues;
+   }
+
+   /**
+    * @param state
+    * @param key
     * @param defaultValue
     * @return Returns a float value from {@link IDialogSettings}. When the key is not found, the
     *         default value is returned.
@@ -1233,6 +1273,24 @@ public class Util {
       }
 
       final String stateValue = state.get(key);
+
+      return stateValue == null ? defaultValue : stateValue;
+   }
+
+   /**
+    * @param state
+    * @param key
+    * @param defaultValue
+    * @return Returns a string value from {@link IDialogSettings}. When the key is not found, the
+    *         default value is returned.
+    */
+   public static String[] getStateStringArray(final IDialogSettings state, final String key, final String[] defaultValue) {
+
+      if (state == null) {
+         return defaultValue;
+      }
+
+      final String[] stateValue = state.getArray(key);
 
       return stateValue == null ? defaultValue : stateValue;
    }
@@ -1864,14 +1922,10 @@ public class Util {
 
       String content = UI.EMPTY_STRING;
 
-      try {
-
-         final FileInputStream stream = new FileInputStream(fileName);
+      try (FileInputStream stream = new FileInputStream(fileName)) {
 
          content = readContentFromStream(stream);
 
-      } catch (final FileNotFoundException e) {
-         StatusUtil.showStatus(e);
       } catch (final IOException e) {
          StatusUtil.showStatus(e);
       }
@@ -1891,9 +1945,7 @@ public class Util {
          final StringBuilder sb = new StringBuilder();
          String line;
 
-         try {
-
-            final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, UI.UTF_8));
+         try (final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, UI.UTF_8))) {
 
             while ((line = reader.readLine()) != null) {
                sb.append(line).append(UI.NEW_LINE);
@@ -2347,14 +2399,30 @@ public class Util {
    }
 
    public static <E extends Enum<E>> void setStateEnum(final IDialogSettings state,
+                                                       final String stateKey,
+                                                       final ArrayList<E> allValues) {
+
+      final ArrayList<String> allEnumNames = new ArrayList<>();
+
+      for (final Enum<E> enumValue : allValues) {
+
+         if (allEnumNames != null) {
+            allEnumNames.add(enumValue.name());
+         }
+      }
+
+      if (allEnumNames.size() > 0) {
+         state.put(stateKey, allEnumNames.toArray(new String[allEnumNames.size()]));
+      }
+   }
+
+   public static <E extends Enum<E>> void setStateEnum(final IDialogSettings state,
                                                        final String key,
                                                        final Enum<E> value) {
 
-      if (value == null) {
-         return;
+      if (value != null) {
+         state.put(key, value.name());
       }
-
-      state.put(key, value.name());
    }
 
    public static void setXmlDefaultHeader(final XMLMemento xmlHeader, final Bundle bundle) {

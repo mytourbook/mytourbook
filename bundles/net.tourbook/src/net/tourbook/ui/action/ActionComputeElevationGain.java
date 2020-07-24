@@ -62,7 +62,7 @@ public class ActionComputeElevationGain extends Action {
 
       final StringBuilder differenceResult = new StringBuilder();
       if (elevationDifference > 0) {
-         differenceResult.append("+");
+         differenceResult.append(net.tourbook.common.UI.SYMBOL_PLUS);
       }
 
       differenceResult.append(_nf0.format((elevationDifference) / UI.UNIT_VALUE_ALTITUDE));

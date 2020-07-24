@@ -96,7 +96,7 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
       _nfLatLon.setMaximumFractionDigits(4);
    }
 
-   /**
+   /*
     * UI controls
     */
    private Composite _parent;
@@ -294,18 +294,17 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 
    private void createUI_10_TableViewer(final Composite parent) {
 
-      /**
+      /*
        * create table
        */
-      final Table table = new Table(parent, SWT.FULL_SELECTION /** | SWT.MULTI /* | SWT.BORDER */
-      );
+      final Table table = new Table(parent, SWT.FULL_SELECTION /* | SWT.MULTI /* | SWT.BORDER */);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
 
       table.setHeaderVisible(true);
 //      table.setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
       table.setLinesVisible(false);
 
-      /**
+      /*
        * create table viewer
        */
       _bookmarkViewer = new TableViewer(table);
@@ -642,7 +641,7 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
          }
       });
    }
-
+   
    /**
     * Column: Positionmarker Longitude
     */
@@ -668,8 +667,8 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
             cell.setText(valueText);
          }
       });
-   }
-
+   }   
+   
    @Override
    public void dispose() {
 
@@ -704,7 +703,7 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 
       final IActionBars actionBars = getViewSite().getActionBars();
 
-      /**
+      /*
        * Fill view menu
        */
       final IMenuManager menuMgr = actionBars.getMenuManager();
@@ -712,7 +711,7 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
       menuMgr.add(new Separator());
       menuMgr.add(_actionModifyColumns);
 
-      /**
+      /*
        * Fill view toolbar
        */
 //      final IToolBarManager tbm = actionBars.getToolBarManager();

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -90,6 +90,7 @@ public class SaveTour_Handler extends AbstractHandler implements IElementUpdater
       return false;
    }
 
+   @SuppressWarnings("rawtypes")
    @Override
    public void updateElement(final UIElement uiElement, final Map parameters) {
 

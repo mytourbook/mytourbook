@@ -238,8 +238,8 @@
    <extension	point="org.eclipse.ui.preferencePages">
       <page
             category="net.tourbook.preferences.PrefPageImport"
-            class="net.tourbook.device.suunto.Suunto9ImportPreferences"
-            id="net.tourbook.device.suunto.suunto9ImportPreferences"
+            class="net.tourbook.device.suunto.PrefPageSuunto9"
+            id="net.tourbook.device.suunto.PrefPageSuunto9"
             name="Suunto Spartan/9">
       </page>
    </extension>
@@ -282,6 +282,14 @@
 			fileextension="gz"
 			id="net.tourbook.device.Suunto9"
 			name="Suunto Spartan/9">
+		</device>
+		
+		<!-- Suunto Quest -->
+		<device
+			class="net.tourbook.device.suunto.SuuntoQuestDeviceDataReader"
+			fileextension="xml"
+			id="net.tourbook.device.SuuntoQuest"
+			name="Suunto Quest">
 		</device>
 
 		<!-- TUR -->

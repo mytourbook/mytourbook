@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.SQL;
-import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -80,11 +79,8 @@ public class ActionComputeCadenceZonesTimes extends Action {
       TourLogManager.showLogView();
       TourLogManager.logTitle(NLS.bind(Messages.Log_ComputeCadenceZonesTimes_001_Start, selectedTours.size()));
 
-      Connection sqlConnection = null;
       boolean isTaskDone = false;
-      try {
-
-         sqlConnection = TourDatabase.getInstance().getConnection();
+      try (Connection sqlConnection = TourDatabase.getInstance().getConnection()) {
 
          isTaskDone = TourManager.computeCadenceZonesTimes(sqlConnection, selectedTours);
 
@@ -93,8 +89,6 @@ public class ActionComputeCadenceZonesTimes extends Action {
       } finally {
 
          TourLogManager.logTitle(String.format(Messages.Log_ComputeCadenceZonesTimes_002_End, (System.currentTimeMillis() - start) / 1000.0));
-
-         Util.closeSql(sqlConnection);
 
          if (isTaskDone) {
 

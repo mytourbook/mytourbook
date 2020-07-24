@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -106,9 +106,8 @@ public class TVICatalogYearItem extends TVICatalogItem {
       sb.append(" WHERE TourCompared.refTourId=? AND TourCompared.startYear=?"); //$NON-NLS-1$
       sb.append(" ORDER BY TourCompared.tourDate"); //$NON-NLS-1$
 
-      try {
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         final Connection conn = TourDatabase.getInstance().getConnection();
          final PreparedStatement statement = conn.prepareStatement(sb.toString());
          statement.setLong(1, refId);
          statement.setInt(2, year);
@@ -179,8 +178,6 @@ public class TVICatalogYearItem extends TVICatalogItem {
 
             lastTourId = tourId;
          }
-
-         conn.close();
 
       } catch (final SQLException e) {
          UI.showSQLException(e);

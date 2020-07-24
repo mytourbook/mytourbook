@@ -21,7 +21,6 @@ import com.skedgo.converter.TimezoneMapper;
 import java.beans.PropertyVetoException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.nio.file.Path;
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -102,7 +101,7 @@ public class TourDatabase {
    /**
     * Version for the database which is required that the tourbook application works successfully
     */
-   private static final int TOURBOOK_DB_VERSION = 40;
+   private static final int TOURBOOK_DB_VERSION = 41;
 
 //   private static final int TOURBOOK_DB_VERSION = 40; // 19.10
 //   private static final int TOURBOOK_DB_VERSION = 39; // 19.7
@@ -930,9 +929,7 @@ public class TourDatabase {
 
          new ProgressMonitorDialog(shell).run(true, true, runnable);
 
-      } catch (final InvocationTargetException e) {
-         e.printStackTrace();
-      } catch (final InterruptedException e) {
+      } catch (final InvocationTargetException | InterruptedException e) {
          e.printStackTrace();
       } finally {
 
@@ -1004,22 +1001,14 @@ public class TourDatabase {
          @Override
          public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
-            Connection conn = null;
-            try {
-
-               conn = TourDatabase.getInstance().getConnection();
+            try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
                run_AllTours(conn, monitor);
 
             } catch (final SQLException e) {
 
                net.tourbook.common.util.SQL.showException(e);
-
-            } finally {
-
-               Util.closeSql(conn);
             }
-
          }
 
          private void run_AllTours(final Connection conn, final IProgressMonitor monitor) throws SQLException {
@@ -1098,9 +1087,7 @@ public class TourDatabase {
 
          new ProgressMonitorDialog(shell).run(true, true, runnable);
 
-      } catch (final InvocationTargetException e) {
-         StatusUtil.log(e);
-      } catch (final InterruptedException e) {
+      } catch (final InvocationTargetException | InterruptedException e) {
          StatusUtil.log(e);
       } finally {
 
@@ -1191,14 +1178,11 @@ public class TourDatabase {
     */
    private static void deleteTour_WithSQL(final long tourId) {
 
-      Connection conn = null;
       PreparedStatement prepStmt = null;
 
       String sql = UI.EMPTY_STRING;
 
-      try {
-
-         conn = TourDatabase.getInstance().getConnection();
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
 // SET_FORMATTING_OFF
 
@@ -1231,8 +1215,6 @@ public class TourDatabase {
       } catch (final SQLException e) {
          System.out.println(sql);
          UI.showSQLException(e);
-      } finally {
-         Util.closeSql(conn);
       }
    }
 
@@ -2348,7 +2330,6 @@ public class TourDatabase {
 
 //      final long startTime = System.nanoTime();
 
-      Connection conn = null;
       PreparedStatement deleteStmt = null;
       PreparedStatement insertStmt = null;
 
@@ -2356,11 +2337,9 @@ public class TourDatabase {
 
       int[] tourGeoParts = null;
 
-      try {
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          final long tourId = tourData.getTourId();
-
-         conn = TourDatabase.getInstance().getConnection();
 
          /*
           * Delete old geo parts
@@ -2405,7 +2384,6 @@ public class TourDatabase {
       } finally {
          Util.closeSql(deleteStmt);
          Util.closeSql(insertStmt);
-         Util.closeSql(conn);
       }
 
 //      System.out.println(
@@ -3132,6 +3110,12 @@ public class TourDatabase {
             + " avgAltitudeChange                     INTEGER DEFAULT 0,                  \n" //$NON-NLS-1$
             //
             // version 40 end
+
+            // version 41 start  -  20.5
+            //
+            + " maxPace                               FLOAT DEFAULT 0,                  \n" //$NON-NLS-1$
+            //
+            // version 41 end
 
             //            // version 35 start  -  18.?
             //            //
@@ -3973,7 +3957,7 @@ public class TourDatabase {
       sql = "ALTER TABLE " + table + " DROP COLUMN " + fieldName; //$NON-NLS-1$ //$NON-NLS-2$
       exec(stmt, sql);
 
-      sql = "RENAME COLUMN " + table + "." + tempFieldName + " TO " + fieldName; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      sql = "RENAME COLUMN " + table + UI.SYMBOL_DOT + tempFieldName + " TO " + fieldName; //$NON-NLS-1$ //$NON-NLS-2$
       exec(stmt, sql);
    }
 
@@ -4110,8 +4094,6 @@ public class TourDatabase {
 
             try {
                _server = new NetworkServerControl(InetAddress.getByName("localhost"), 1527); //$NON-NLS-1$
-            } catch (final UnknownHostException e) {
-               StatusUtil.log(e);
             } catch (final Exception e) {
                StatusUtil.log(e);
             }
@@ -4251,11 +4233,7 @@ public class TourDatabase {
          return;
       }
 
-      Connection conn = null;
-
-      try {
-
-         conn = getConnection_Simple();
+      try (Connection conn = getConnection_Simple()) {
 
          /*
           * Check if the tourdata table exists
@@ -4277,11 +4255,7 @@ public class TourDatabase {
             splashManager.setMessage(Messages.Database_Monitor_CreateDatabase);
          }
 
-         Statement stmt = null;
-
-         try {
-
-            stmt = conn.createStatement();
+         try (Statement stmt = conn.createStatement()) {
 
             createTable_TourData(stmt);
 
@@ -4308,14 +4282,10 @@ public class TourDatabase {
 
          } catch (final SQLException e) {
             UI.showSQLException(e);
-         } finally {
-            Util.closeSql(stmt);
          }
 
       } catch (final SQLException e) {
          UI.showSQLException(e);
-      } finally {
-         Util.closeSql(conn);
       }
    }
 
@@ -4334,14 +4304,12 @@ public class TourDatabase {
          return false;
       }
 
-      Connection conn1 = null;
       Connection conn2 = null;
       Statement stmt1 = null;
       Statement stmt2 = null;
 
-      try {
+      try (Connection conn1 = getConnection_Simple()) {
 
-         conn1 = getConnection_Simple();
          {
             String sql = "SELECT * FROM " + TABLE_DB_VERSION; //$NON-NLS-1$
 
@@ -4405,7 +4373,6 @@ public class TourDatabase {
 
       } finally {
 
-         Util.closeSql(conn1);
          Util.closeSql(conn2);
          Util.closeSql(stmt1);
          Util.closeSql(stmt2);
@@ -4884,6 +4851,11 @@ public class TourDatabase {
             isPostUpdate40 = true;
          }
 
+         // 40 -> 41
+         if (currentDbVersion == 40) {
+            currentDbVersion = newVersion = updateDbDesign_040_to_041(conn, splashManager);
+         }
+
          /*
           * Update version number
           */
@@ -4894,7 +4866,7 @@ public class TourDatabase {
           * connections and entitymanager which is checking the version number.
           * <p>
           * Also the data structure must be updated otherwise the entity manager fails because the
-          * data structure in the programm code MUST be the same as in the database.
+          * data structure in the program code MUST be the same as in the database.
           */
          if (isPostUpdate5) {
             TourDatabase.computeAnyValues_ForAllTours(splashManager);
@@ -6252,7 +6224,7 @@ public class TourDatabase {
              */
 
             /*
-             * Drop tables which will never be used, they exist since many years but it is unknows
+             * Drop tables which will never be used, they exist since many years but it is unknown
              * why they has been created.
              */
             SQL.Cleanup_DropTable(stmt, TABLE_TOUR_CATEGORY);
@@ -7451,6 +7423,33 @@ public class TourDatabase {
       StatusUtil.logInfo(String.format(
             "Database postupdate 39 -> 40 in %s mm:ss", //$NON-NLS-1$
             net.tourbook.common.UI.formatHhMmSs(timeDiff / 1000)));
+   }
+
+   private int updateDbDesign_040_to_041(final Connection conn, final SplashManager splashManager) throws SQLException {
+
+      final int newDbVersion = 41;
+
+      logDb_UpdateStart(newDbVersion);
+      updateMonitor(splashManager, newDbVersion);
+
+      final Statement stmt = conn.createStatement();
+      {
+         // check if db is updated to version 41
+         if (isColumnAvailable(conn, TABLE_TOUR_DATA, "maxPace") == false) { //$NON-NLS-1$
+
+// SET_FORMATTING_OFF
+
+            // Add new columns
+            SQL.AddCol_Float(stmt, TABLE_TOUR_DATA, "maxPace",          DEFAULT_0);                            //$NON-NLS-1$
+
+// SET_FORMATTING_ON
+         }
+      }
+      stmt.close();
+
+      logDb_UpdateEnd(newDbVersion);
+
+      return newDbVersion;
    }
 
 //   private int updateDbDesign_034_to_035(final Connection conn, final IProgressMonitor monitor) throws SQLException {

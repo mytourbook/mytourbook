@@ -739,11 +739,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
       final ArrayList<String> tourPhotoImages = new ArrayList<>();
 
-      Connection conn = null;
-
-      try {
-
-         conn = TourDatabase.getInstance().getConnection();
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          final String sql = "SELECT imageFileName" // 						//$NON-NLS-1$
                + " FROM " + TourDatabase.TABLE_TOUR_PHOTO //			//$NON-NLS-1$
@@ -761,8 +757,6 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
       } catch (final SQLException e) {
          SQL.showException(e);
-      } finally {
-         Util.closeSql(conn);
       }
 
       return tourPhotoImages;
@@ -772,11 +766,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
       int numberOfTours = 0;
 
-      Connection conn = null;
-
-      try {
-
-         conn = TourDatabase.getInstance().getConnection();
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          final String sql = UI.EMPTY_STRING //
 
@@ -807,8 +797,6 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
       } catch (final SQLException e) {
          SQL.showException(e);
-      } finally {
-         Util.closeSql(conn);
       }
 
       return numberOfTours;
@@ -1221,11 +1209,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
       final ArrayList<ImagePathReplacement> replacedImages = new ArrayList<>();
 
-      Connection conn = null;
-
-      try {
-
-         conn = TourDatabase.getInstance().getConnection();
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          final String sql = "UPDATE " + TourDatabase.TABLE_TOUR_PHOTO //	//$NON-NLS-1$
 
@@ -1265,15 +1249,6 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
       } catch (final SQLException e) {
          net.tourbook.ui.UI.showSQLException(e);
-      } finally {
-
-         if (conn != null) {
-            try {
-               conn.close();
-            } catch (final SQLException e) {
-               net.tourbook.ui.UI.showSQLException(e);
-            }
-         }
       }
 
       return replacedImages;
@@ -1300,10 +1275,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
 //		final long start = System.nanoTime();
 
-      Connection conn = null;
-
-      try {
-         conn = TourDatabase.getInstance().getConnection();
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          final PreparedStatement sqlUpdate = conn.prepareStatement(//
                "UPDATE " + TourDatabase.TABLE_TOUR_PHOTO //	//$NON-NLS-1$
@@ -1351,15 +1323,6 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
       } catch (final SQLException e) {
          net.tourbook.ui.UI.showSQLException(e);
-      } finally {
-
-         if (conn != null) {
-            try {
-               conn.close();
-            } catch (final SQLException e) {
-               net.tourbook.ui.UI.showSQLException(e);
-            }
-         }
       }
 
 //		System.out.println(net.tourbook.common.UI.timeStampNano()
@@ -1428,6 +1391,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
     *  1 when geo coordinates are written into the image file
     *         </pre>
     */
+   @SuppressWarnings("unused")
    private int setExifGPSTag_IntoImageFile(final File originalJpegImageFile,
                                            final double latitude,
                                            final double longitude,
@@ -1582,6 +1546,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
     * @throws ImageReadException
     * @throws ImageWriteException
     */
+   @SuppressWarnings("unused")
    private void setExifGPSTag_IntoImageFile_WithExifRewriter(final File jpegImageFile,
                                                              final File destinationFile,
                                                              final double latitude,
@@ -1850,11 +1815,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
 //		final long start = System.nanoTime();
 
-      Connection conn = null;
-
-      try {
-
-         conn = TourDatabase.getInstance().getConnection();
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          final String sql = "SELECT " // 																//$NON-NLS-1$
                //
@@ -1916,15 +1877,6 @@ public class TourPhotoManager implements IPhotoServiceProvider {
 
       } catch (final SQLException e) {
          net.tourbook.ui.UI.showSQLException(e);
-      } finally {
-
-         if (conn != null) {
-            try {
-               conn.close();
-            } catch (final SQLException e) {
-               net.tourbook.ui.UI.showSQLException(e);
-            }
-         }
       }
 
 //		System.out.println(net.tourbook.common.UI.timeStampNano()

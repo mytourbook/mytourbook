@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -41,7 +41,7 @@ public class TVITagView_TagCategory extends TVITagViewItem {
       final ArrayList<TreeViewerItem> children = new ArrayList<>();
       setChildren(children);
 
-      try {
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          /*
           * get all tags for the current tag category
@@ -70,7 +70,6 @@ public class TVITagView_TagCategory extends TVITagViewItem {
          sb.append(" WHERE jTblCatCat.TourTagCategory_tagCategoryId1 = ?");// + tagCategoryId); //$NON-NLS-1$
          sb.append(" ORDER BY tblCat.name"); //$NON-NLS-1$
 
-         final Connection conn = TourDatabase.getInstance().getConnection();
          PreparedStatement statement = conn.prepareStatement(sb.toString());
          statement.setLong(1, tagCategoryId);
 
@@ -130,8 +129,6 @@ public class TVITagView_TagCategory extends TVITagViewItem {
 
             readTagTotals(tagItem);
          }
-
-         conn.close();
 
       } catch (final SQLException e) {
          net.tourbook.ui.UI.showSQLException(e);

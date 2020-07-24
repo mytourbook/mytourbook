@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,18 +18,7 @@ package net.tourbook.ui.views.tourBook;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Iterator;
-
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.dialogs.ProgressMonitorDialog;
-import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.jface.viewers.ColumnViewer;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.custom.BusyIndicator;
-import org.eclipse.swt.widgets.Display;
+import java.util.concurrent.CompletableFuture;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -46,10 +35,37 @@ import net.tourbook.tour.TourLogState;
 import net.tourbook.tour.TourLogView;
 import net.tourbook.tour.TourManager;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.viewers.ColumnViewer;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.widgets.Display;
+
 public class ActionDeleteTour extends Action {
 
    private TourBookView   _tourBookView;
+
    private TreeViewerItem _nextSelectedTreeItem;
+
+   private final class TourItem implements ITourItem {
+
+      private Long _tourId;
+
+      public TourItem(final Long tourId) {
+         _tourId = tourId;
+      }
+
+      @Override
+      public Long getTourId() {
+         return _tourId;
+      }
+   }
 
    public ActionDeleteTour(final TourBookView tourBookView) {
 
@@ -61,11 +77,72 @@ public class ActionDeleteTour extends Action {
       setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__delete_disabled));
    }
 
-   private void deleteTours(final IStructuredSelection selection,
+   private void deleteTours(final ArrayList<Long> selectedTourIDs,
+                            final IStructuredSelection treeSelection,
                             final SelectionDeletedTours selectionRemovedTours,
                             final IProgressMonitor monitor) {
 
       TourLogManager.addLog(TourLogState.DEFAULT, TourLogManager.LOG_TOUR_DELETE_TOURS, TourLogView.CSS_LOG_TITLE);
+
+      if (_tourBookView.isLayoutNatTable()) {
+
+         deleteTours_NatTable(selectedTourIDs, selectionRemovedTours, monitor);
+
+      } else {
+
+         deleteTours_Tree(treeSelection, selectionRemovedTours, monitor);
+      }
+   }
+
+   private void deleteTours_NatTable(final ArrayList<Long> selectedTourIDs,
+                                     final SelectionDeletedTours selectionRemovedTours,
+                                     final IProgressMonitor monitor) {
+
+      final int numSelectedTours = selectedTourIDs.size();
+      int tourCounter = 0;
+
+      final ArrayList<ITourItem> removedTours = selectionRemovedTours.removedTours;
+
+      if (monitor != null) {
+         monitor.beginTask(Messages.Tour_Book_Action_DeleteSelectedTours_Monitor, numSelectedTours);
+      }
+
+      // loop: selected tours
+      for (final Long tourId : selectedTourIDs) {
+
+         if (monitor != null) {
+
+            monitor.subTask(NLS.bind(
+                  Messages.Tour_Book_Action_DeleteSelectedTours_MonitorSubtask,
+                  ++tourCounter,
+                  numSelectedTours));
+
+            if (monitor.isCanceled()) {
+               break;
+            }
+         }
+
+         final TourData tourData = TourManager.getTour(tourId);
+         final String tour = tourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S);
+
+         if (TourDatabase.deleteTour(tourId)) {
+
+            // log deletion
+            TourLogManager.addSubLog(TourLogState.TOUR_DELETED, tour);
+
+            // keep removed tour id
+            removedTours.add(new TourItem(tourId));
+         }
+
+         if (monitor != null) {
+            monitor.worked(1);
+         }
+      }
+   }
+
+   private void deleteTours_Tree(final IStructuredSelection selection,
+                                 final SelectionDeletedTours selectionRemovedTours,
+                                 final IProgressMonitor monitor) {
 
       final int selectionSize = selection.size();
       int tourCounter = 0;
@@ -78,6 +155,7 @@ public class ActionDeleteTour extends Action {
       if (monitor != null) {
          monitor.beginTask(Messages.Tour_Book_Action_DeleteSelectedTours_Monitor, selectionSize);
       }
+
       // loop: selected tours
       for (final Iterator<?> iterator = selection.iterator(); iterator.hasNext();) {
 
@@ -161,7 +239,7 @@ public class ActionDeleteTour extends Action {
              * it's possible that the parent does not have any children, then also this parent must
              * be removed (to be done later)
              */
-//				_nextSelectedTreeItem = firstSelectedParent;
+//          _nextSelectedTreeItem = firstSelectedParent;
             // for (TreeViewerItem tourParent : tourParents) {
             //
             // }
@@ -184,27 +262,47 @@ public class ActionDeleteTour extends Action {
          return;
       }
 
-      final ColumnViewer treeViewer = _tourBookView.getViewer();
+      final ArrayList<Long> selectedTourIDs = new ArrayList<>(_tourBookView.getSelectedTourIDs());
+      final int numSelectedTours = selectedTourIDs.size();
+      final int[] firstDeletePosition = { 0 };
+      final IStructuredSelection[] treeSelection = new StructuredSelection[] { new StructuredSelection() };
+      ColumnViewer treeViewer = null;
 
-      // get selected tours
-      final IStructuredSelection selection = (IStructuredSelection) treeViewer.getSelection();
+      final boolean isLayoutNatTable = _tourBookView.isLayoutNatTable();
+      if (isLayoutNatTable) {
 
-      int selectedTours = 0;
-      for (final Iterator<?> iterator = selection.iterator(); iterator.hasNext();) {
-         final Object nextElement = iterator.next();
-         if (nextElement instanceof TVITourBookTour) {
-            selectedTours++;
-         }
+         final ArrayList<Long> firstTourId = new ArrayList<>();
+         firstTourId.add(selectedTourIDs.get(0));
+
+         final CompletableFuture<Void> rowIndexFuture = _tourBookView.getNatTable_DataLoader().getRowIndexFromTourId(firstTourId)
+
+               .thenAccept((allRowPositions) -> {
+
+                  // keep row positon for the first deleted tour
+                  final int firstRowPosition = allRowPositions[0];
+
+                  firstDeletePosition[0] = firstRowPosition;
+               });
+
+         // wait until row index is set
+         rowIndexFuture.join();
+
+      } else {
+
+         treeViewer = _tourBookView.getViewer();
+
+         // get selected tours
+         treeSelection[0] = (IStructuredSelection) treeViewer.getSelection();
       }
 
       /*
        * confirm a second time
        */
-      if (selectedTours > 0) {
+      if (numSelectedTours > 0) {
          if (MessageDialog.openConfirm(
                Display.getCurrent().getActiveShell(),
                Messages.Tour_Book_Action_delete_selected_tours_dlg_title_confirm,
-               NLS.bind(Messages.Tour_Book_Action_delete_selected_tours_dlg_message_confirm, selectedTours)) == false) {
+               NLS.bind(Messages.Tour_Book_Action_delete_selected_tours_dlg_message_confirm, numSelectedTours)) == false) {
             return;
          }
       }
@@ -212,16 +310,16 @@ public class ActionDeleteTour extends Action {
       // log deletions
       TourLogManager.showLogView();
 
-      final SelectionDeletedTours selectionRemovedTours = new SelectionDeletedTours();
+      final SelectionDeletedTours selectionForDeletedTours = new SelectionDeletedTours();
 
-      if (selectedTours < 2) {
+      if (numSelectedTours < 2) {
 
          final Runnable deleteRunnable = new Runnable() {
             @Override
             public void run() {
 
                // delete selected tours
-               deleteTours(selection, selectionRemovedTours, null);
+               deleteTours(selectedTourIDs, treeSelection[0], selectionForDeletedTours, null);
             }
          };
          BusyIndicator.showWhile(Display.getCurrent(), deleteRunnable);
@@ -233,7 +331,7 @@ public class ActionDeleteTour extends Action {
             public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
                // delete selected tours
-               deleteTours(selection, selectionRemovedTours, monitor);
+               deleteTours(selectedTourIDs, treeSelection[0], selectionForDeletedTours, monitor);
             }
          };
 
@@ -247,17 +345,26 @@ public class ActionDeleteTour extends Action {
       final PostSelectionProvider postSelectionProvider = _tourBookView.getPostSelectionProvider();
 
       // fire post selection
-      postSelectionProvider.setSelection(selectionRemovedTours);
+      postSelectionProvider.setSelection(selectionForDeletedTours);
 
       // set selection empty
-      selectionRemovedTours.removedTours.clear();
+      selectionForDeletedTours.removedTours.clear();
       postSelectionProvider.clearSelection();
 
       // ensure that the deleted item is removed
       _tourBookView.reloadViewer();
 
-      if (_nextSelectedTreeItem != null) {
-         treeViewer.setSelection(new StructuredSelection(_nextSelectedTreeItem), true);
+      // select next tour item
+      if (isLayoutNatTable) {
+
+         // select tour at the same position as the first deleted tour
+         _tourBookView.selectTours_NatTable(firstDeletePosition, true, true, false);
+
+      } else {
+
+         if (_nextSelectedTreeItem != null) {
+            treeViewer.setSelection(new StructuredSelection(_nextSelectedTreeItem), true);
+         }
       }
    }
 

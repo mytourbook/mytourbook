@@ -256,8 +256,6 @@ public class Messages extends NLS {
    public static String        ColumnFactory_NumberOfTours_Header;
    public static String        ColumnFactory_NumberOfTours_Label;
    public static String        ColumnFactory_NumberOfTours_Tooltip;
-   public static String        ColumnFactory_PaceDelta_Label;
-   public static String        ColumnFactory_PaceDelta_Tooltip;
    public static String        ColumnFactory_PhotoTimeAdjustment_Header;
    public static String        ColumnFactory_PhotoTimeAdjustment_Label;
    public static String        ColumnFactory_PhotoTimeAdjustment_Tooltip;
@@ -352,10 +350,10 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Surfing_NumberOfEvents_Header;
    public static String        ColumnFactory_Surfing_NumberOfEvents_Label;
 
-   public static String        ColumnFactory_Swim_Cadence_Label;
-   public static String        ColumnFactory_Swim_Cadence_Tooltip;
-   public static String        ColumnFactory_Swim_Strokes_Label;
-   public static String        ColumnFactory_Swim_Strokes_Tooltip;
+   public static String        ColumnFactory_Swim_StrokeRate_Label;
+   public static String        ColumnFactory_Swim_StrokeRate_Tooltip;
+   public static String        ColumnFactory_Swim_StrokesPerLength_Label;
+   public static String        ColumnFactory_Swim_StrokesPerLength_Tooltip;
    public static String        ColumnFactory_Swim_StrokeStyle_Label;
    public static String        ColumnFactory_Swim_StrokeStyle_Tooltip;
 
@@ -502,6 +500,7 @@ public class Messages extends NLS {
    public static String        Tour_Tooltip_Label_GearShifts;
    public static String        Tour_Tooltip_Label_Hour;
    public static String        Tour_Tooltip_Label_MaxAltitude;
+   public static String        Tour_Tooltip_Label_MaxPace;
    public static String        Tour_Tooltip_Label_MaxPulse;
    public static String        Tour_Tooltip_Label_MaxSpeed;
    public static String        Tour_Tooltip_Label_MovingTime;

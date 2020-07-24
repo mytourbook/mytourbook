@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -704,7 +704,7 @@ public class TourFilterManager {
             // skip all events which has not yet been executed
             if (__runnableCounter != _fireEventCounter[0]) {
 
-               // a new event occured
+               // a new event occurred
                return;
             }
 
@@ -912,7 +912,7 @@ public class TourFilterManager {
 
             value1 = (LocalDate
                   .of(dateTime1.getYear(), dateTime1.getMonthValue(), dateTime1.getDayOfMonth())
-                  .toEpochDay() + 1) * 86400_000;
+                  .toEpochDay()) * 86400_000;
 
             value2 = (LocalDate
                   .of(dateTime2.getYear(), dateTime2.getMonthValue(), dateTime2.getDayOfMonth())
@@ -1036,6 +1036,11 @@ public class TourFilterManager {
             sql = TOUR_DATA_TOUR_LOCATION_END;
             getSQL__FieldOperators_Text(sqlWhere, sqlParameters, fieldOperator, sql, text1, text2);
             break;
+
+         case TRAINING_INTENSITY_FACTOR:
+         case TRAINING_POWER_TO_WEIGHT_RATIO:
+         case TRAINING_STRESS_SCORE:
+            break;
          }
       }
 
@@ -1054,24 +1059,27 @@ public class TourFilterManager {
 
       switch (fieldOperator) {
       case LESS_THAN:
-         getSQL_LessThan(sqlWhere, sqlParameters, sqlField, value1);
+         getSQL_LessThan(sqlWhere, sqlParameters, sqlField, value1, OP_AND);
          break;
       case LESS_THAN_OR_EQUAL:
-         getSQL_LessThanOrEqual(sqlWhere, sqlParameters, sqlField, value1);
+         //To be less than or equal, we include the next day (i.e.: + 86400_000)
+         getSQL_LessThanOrEqual(sqlWhere, sqlParameters, sqlField, value1 + 86400_000);
          break;
 
       case GREATER_THAN:
-         getSQL_GreaterThan(sqlWhere, sqlParameters, sqlField, value1);
+         //To be greater than, we go to the next day (i.e.: + 86400_000)
+         getSQL_GreaterThan(sqlWhere, sqlParameters, sqlField, value1 + 86400_000, OP_AND);
          break;
       case GREATER_THAN_OR_EQUAL:
          getSQL_GreaterThanOrEqual(sqlWhere, sqlParameters, sqlField, value1);
          break;
 
       case EQUALS:
-         getSQL_Equals(sqlWhere, sqlParameters, sqlField, value1, true);
+         getSQL_GreaterThanOrEqual(sqlWhere, sqlParameters, sqlField, value1);
+         getSQL_LessThanOrEqual(sqlWhere, sqlParameters, sqlField, value1 + 86400_000);
          break;
       case NOT_EQUALS:
-         getSQL_Equals(sqlWhere, sqlParameters, sqlField, value1, false);
+         getSQL_Between(sqlWhere, sqlParameters, sqlField, value1, value1 + 86400_000, false);
          break;
 
       case BETWEEN:
@@ -1093,14 +1101,14 @@ public class TourFilterManager {
 
       switch (fieldOperator) {
       case LESS_THAN:
-         getSQL_LessThan(sqlWhere, sqlParameters, sqlField, value1);
+         getSQL_LessThan(sqlWhere, sqlParameters, sqlField, value1, OP_AND);
          break;
       case LESS_THAN_OR_EQUAL:
          getSQL_LessThanOrEqual(sqlWhere, sqlParameters, sqlField, value1);
          break;
 
       case GREATER_THAN:
-         getSQL_GreaterThan(sqlWhere, sqlParameters, sqlField, value1);
+         getSQL_GreaterThan(sqlWhere, sqlParameters, sqlField, value1, OP_AND);
          break;
       case GREATER_THAN_OR_EQUAL:
          getSQL_GreaterThanOrEqual(sqlWhere, sqlParameters, sqlField, value1);
@@ -1241,6 +1249,24 @@ public class TourFilterManager {
          sqlParameters.add(dateValue1);
          sqlParameters.add(dateValue2);
          break;
+
+      case STARTS_WITH:
+      case EXCLUDE_ALL:
+      case NOT_LIKE:
+      case NOT_EQUALS:
+      case LIKE:
+      case LESS_THAN_OR_EQUAL:
+      case LESS_THAN:
+      case IS_EMPTY:
+      case IS_NOT_EMPTY:
+      case IS_AVAILABLE:
+      case IS_NOT_AVAILABLE:
+      case INCLUDE_ANY:
+      case ENDS_WITH:
+      case EQUALS:
+      case GREATER_THAN:
+      case GREATER_THAN_OR_EQUAL:
+         break;
       }
    }
 
@@ -1338,12 +1364,21 @@ public class TourFilterManager {
       sqlParameters.add(value1);
    }
 
+   /**
+    * @param sqlWhere
+    * @param sqlParameters
+    * @param sqlField
+    * @param value1
+    * @param operand
+    *           The type of operand: either {@link #OP_AND} or {@link #OP_OR}
+    */
    private static void getSQL_GreaterThan(final StringBuilder sqlWhere,
                                           final ArrayList<Object> sqlParameters,
                                           final String sqlField,
-                                          final Object value1) {
+                                          final Object value1,
+                                          final String operand) {
 
-      sqlWhere.append(OP_AND + sqlField + OP_GREATER_THAN);
+      sqlWhere.append(operand + sqlField + OP_GREATER_THAN);
       sqlParameters.add(value1);
    }
 
@@ -1356,12 +1391,21 @@ public class TourFilterManager {
       sqlParameters.add(value1);
    }
 
+   /**
+    * @param sqlWhere
+    * @param sqlParameters
+    * @param sqlField
+    * @param value1
+    * @param operand
+    *           The type of operand: either {@link #OP_AND} or {@link #OP_OR}
+    */
    private static void getSQL_LessThan(final StringBuilder sqlWhere,
                                        final ArrayList<Object> sqlParameters,
                                        final String sqlField,
-                                       final Object value1) {
+                                       final Object value1,
+                                       final String operand) {
 
-      sqlWhere.append(OP_AND + sqlField + OP_LESS_THAN);
+      sqlWhere.append(operand + sqlField + OP_LESS_THAN);
       sqlParameters.add(value1);
    }
 
@@ -1504,6 +1548,11 @@ public class TourFilterManager {
          case NUMBER_FLOAT:
             readXml_Number_Float(xmlProperty, filterProperty, 1);
             break;
+
+         case TEXT:
+         case SEASON:
+         case CATEGORY:
+            break;
          }
 
          break;
@@ -1544,6 +1593,9 @@ public class TourFilterManager {
             readXml_Season(xmlProperty, filterProperty, 1);
             readXml_Season(xmlProperty, filterProperty, 2);
             break;
+
+         case CATEGORY:
+            break;
          }
 
          break;
@@ -1551,6 +1603,24 @@ public class TourFilterManager {
       case SEASON_UNTIL_TODAY_FROM_DATE:
       case SEASON_TODAY_UNTIL_DATE:
          readXml_Season(xmlProperty, filterProperty, 1);
+         break;
+
+      case STARTS_WITH:
+      case EXCLUDE_ALL:
+      case NOT_LIKE:
+      case LIKE:
+      case IS_EMPTY:
+      case IS_NOT_EMPTY:
+      case IS_AVAILABLE:
+      case IS_NOT_AVAILABLE:
+      case INCLUDE_ANY:
+      case ENDS_WITH:
+      case SEASON_UNTIL_TODAY_FROM_YEAR_START:
+      case SEASON_CURRENT_MONTH:
+      case SEASON_CURRENT_DAY:
+      case SEASON_MONTH:
+      case SEASON_TODAY_UNTIL_YEAR_END:
+         // no additional controls
          break;
       }
    }
@@ -1824,6 +1894,11 @@ public class TourFilterManager {
          case NUMBER_FLOAT:
             writeXml_Number_Float(xmlProperty, doubleValue1, 1);
             break;
+
+         case TEXT:
+         case SEASON:
+         case CATEGORY:
+            break;
          }
 
          break;
@@ -1857,6 +1932,10 @@ public class TourFilterManager {
             writeXml_Season(xmlProperty, monthDay1, 1);
             writeXml_Season(xmlProperty, monthDay2, 2);
             break;
+
+         case TEXT:
+         case CATEGORY:
+            break;
          }
 
          break;
@@ -1865,6 +1944,23 @@ public class TourFilterManager {
       case SEASON_TODAY_UNTIL_DATE:
       case SEASON_MONTH:
          writeXml_Season(xmlProperty, monthDay1, 1);
+         break;
+
+      case STARTS_WITH:
+      case EXCLUDE_ALL:
+      case NOT_LIKE:
+      case LIKE:
+      case IS_EMPTY:
+      case IS_NOT_EMPTY:
+      case IS_AVAILABLE:
+      case IS_NOT_AVAILABLE:
+      case INCLUDE_ANY:
+      case ENDS_WITH:
+      case SEASON_UNTIL_TODAY_FROM_YEAR_START:
+      case SEASON_CURRENT_MONTH:
+      case SEASON_CURRENT_DAY:
+      case SEASON_TODAY_UNTIL_YEAR_END:
+         // no additional controls
          break;
       }
    }

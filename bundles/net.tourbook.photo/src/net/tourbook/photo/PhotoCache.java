@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -39,8 +39,7 @@ public class PhotoCache {
 
    private static Cache<String, Photo>                       _cache;
 
-   private static final ListenerList<IPhotoEvictionListener> _evictionListeners = new ListenerList<>(
-         ListenerList.IDENTITY);
+   private static final ListenerList<IPhotoEvictionListener> _evictionListeners = new ListenerList<>(ListenerList.IDENTITY);
 
    static {
 

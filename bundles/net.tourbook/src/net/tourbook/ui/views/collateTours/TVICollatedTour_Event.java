@@ -117,11 +117,7 @@ public class TVICollatedTour_Event extends TVICollatedTour {
 
             + " ORDER BY TourStartTime"; //$NON-NLS-1$
 
-      Connection conn = null;
-
-      try {
-
-         conn = TourDatabase.getInstance().getConnection();
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
          final PreparedStatement statement = conn.prepareStatement(sqlString);
          statement.setLong(1, eventStart.toInstant().toEpochMilli());
@@ -251,8 +247,6 @@ public class TVICollatedTour_Event extends TVICollatedTour {
 
       } catch (final SQLException e) {
          SQL.showException(e);
-      } finally {
-         SQL.close(conn);
       }
    }
 

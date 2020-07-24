@@ -148,7 +148,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
    private static final String            STATE_IS_LAYER_LABEL_VISIBLE                     = "STATE_IS_LAYER_LABEL_VISIBLE";                           //$NON-NLS-1$
    private static final String            STATE_IS_LAYER_MARKER_VISIBLE                    = "STATE_IS_LAYER_MARKER_VISIBLE";                          //$NON-NLS-1$
    private static final String            STATE_IS_LAYER_PHOTO_VISIBLE                     = "STATE_IS_LAYER_PHOTO_VISIBLE";                           //$NON-NLS-1$
- //  private static final String            STATE_IS_LAYER_PHOTO_TITLE_VISIBLE
+   private static final String            STATE_IS_LAYER_PHOTO_TITLE_VISIBLE               = "STATE_IS_LAYER_PHOTO_TITLE_VISIBLE";                     //$NON-NLS-1$
    private static final String            STATE_IS_LAYER_SCALE_BAR_VISIBLE                 = "STATE_IS_LAYER_SCALE_BAR_VISIBLE";                       //$NON-NLS-1$
    private static final String            STATE_IS_LAYER_TILE_INFO_VISIBLE                 = "STATE_IS_LAYER_TILE_INFO_VISIBLE";                       //$NON-NLS-1$
    private static final String            STATE_IS_LAYER_TOUR_VISIBLE                      = "STATE_IS_LAYER_TOUR_VISIBLE";                            //$NON-NLS-1$
@@ -256,7 +256,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
    private Menu                            _swtContextMenu;
 
    //
-   /**
+   /*
     * UI controls
     */
    private Composite _swtContainer;
@@ -308,36 +308,30 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       }
    }
 
-/**   private class ActionShowPhoto_WithConfig extends ActionToolbarSlideout {
-
-      public ActionShowPhoto_WithConfig() {
-
-         super(
-               TourbookPlugin.getImageDescriptor(Map25View.IMAGE_ACTION_SHOW_PHOTO_IN_MAP),
-               TourbookPlugin.getImageDescriptor(Map25View.IMAGE_ACTION_SHOW_PHOTO_IN_MAP_DISABLED));
-
-         isToggleAction = true;
-         notSelectedTooltip = MAP_ACTION_SHOW_PHOTO_IN_MAP;
-      }
-
-      @Override
-      protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
-         return new SlideoutMap25_PhotoOptions(_parent, toolbar, Map25View.this);
-      }
-
-      @Override
-      protected void onBeforeOpenSlideout() {
-         closeOpenedDialogs(this);
-      }
-
-      @Override
-      protected void onSelect() {
-
-         super.onSelect();
-
-         //actionShowTour(getSelection());  //hmmm
-      }
-   }*/
+/*
+ * private class ActionShowPhoto_WithConfig extends ActionToolbarSlideout {
+ * public ActionShowPhoto_WithConfig() {
+ * super(
+ * TourbookPlugin.getImageDescriptor(Map25View.IMAGE_ACTION_SHOW_PHOTO_IN_MAP),
+ * TourbookPlugin.getImageDescriptor(Map25View.IMAGE_ACTION_SHOW_PHOTO_IN_MAP_DISABLED));
+ * isToggleAction = true;
+ * notSelectedTooltip = MAP_ACTION_SHOW_PHOTO_IN_MAP;
+ * }
+ * @Override
+ * protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+ * return new SlideoutMap25_PhotoOptions(_parent, toolbar, Map25View.this);
+ * }
+ * @Override
+ * protected void onBeforeOpenSlideout() {
+ * closeOpenedDialogs(this);
+ * }
+ * @Override
+ * protected void onSelect() {
+ * super.onSelect();
+ * //actionShowTour(getSelection()); //hmmm
+ * }
+ * }
+ */
 
    private class ActionShowTour_WithConfig extends ActionToolbarSlideout {
 
@@ -814,7 +808,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
             _isContextMenuVisible = false;
 
-            /**
+            /*
              * run async that the context state and tour info reset is done after the context menu
              * actions has done they tasks
              */
@@ -884,7 +878,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
             final int serieIndex = tourMarker.getSerieIndex();
 
-            /**
+            /*
              * check bounds because when a tour is split, it can happen that the marker serie index
              * is out of scope
              */
@@ -892,7 +886,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
                continue;
             }
 
-            /**
+            /*
              * draw tour marker
              */
 
@@ -946,7 +940,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
          @Override
          public void componentResized(final ComponentEvent e) {
 
-            /**
+            /*
              * Render map otherwise a black screen is displayed until the map is moved
              */
             final Map map = _mapApp.getMap();
@@ -1052,7 +1046,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
    private void fillActionBars() {
 
-      /**
+      /*
        * fill view toolbar
        */
       final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
@@ -1083,7 +1077,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       tbm.add(_actionMapOptions);
       tbm.add(_actionMapProvider);
 
-      /**
+      /*
        * fill view menu
        */
 //		final IMenuManager menuMgr = getViewSite().getActionBars().getMenuManager();
@@ -1163,7 +1157,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       final int selectionHash = selection.hashCode();
       if (_lastSelectionHash == selectionHash) {
 
-         /**
+         /*
           * Last selection has not changed, this can occure when the app lost the focus and got the
           * focus again.
           */
@@ -1403,7 +1397,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
             if (galleryPhotos != null) {
                allPhotos.addAll(galleryPhotos);
-               /**playing with photos next lines*/
+               /* playing with photos next lines */
                //Map25App.debugPrint("* Map25View: paintphotoselection else: size: " + allPhotos.size());
             }
          }
@@ -1421,7 +1415,9 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       //}else {
       //_mapApp.debugPrint("* Map25View: paintphotoselection same hash, skipping ");
       //}
-      _photo_pts = _mapApp._phototoolkit.createPhotoItemList(_allPhotos);
+
+      _photo_pts = _mapApp._phototoolkit.createPhotoItemList(_allPhotos, _mapApp.getIsPhotoShowTitle());
+
       //PhotoToolkit phototoolkit = new PhotoToolkit();
       //_photo_pts = phototoolkit.createPhotoItemList(allPhotos);
 
@@ -1436,7 +1432,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
       _allTourData.clear();
 
-      if (tourData.latitudeSerie != null && tourData.latitudeSerie.length > 0) {
+      if (tourData != null && tourData.latitudeSerie != null && tourData.latitudeSerie.length > 0) {
          _allTourData.add(tourData);
       }
 
@@ -1445,7 +1441,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
    private void paintTours(final ArrayList<Long> tourIdList) {
 
-      /**
+      /*
        * TESTING if a map redraw can be avoided, 15.6.2015
        */
       final int tourIdsHashCode = tourIdList.hashCode();
@@ -1479,7 +1475,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
          return;
       }
 
-      /**
+      /*
        * Tours
        */
       final TourLayer tourLayer = _mapApp.getLayer_Tour();
@@ -1537,7 +1533,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
       checkSliderIndices();
 
-      /**
+      /*
        * Chart slider + path
        */
       final Map25TrackConfig activeTourTrackConfig = Map25ConfigManager.getActiveTourTrackConfig();
@@ -1573,7 +1569,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       }
 
 
-      /**
+      /*
        * Markers
        */
       final MarkerLayer markerLayer = _mapApp.getLayer_TourMarker();
@@ -1582,13 +1578,13 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
          markerLayer.replaceMarkers(allMarkers);
       }
 
-      /**
+      /*
        * Photos
        */
       paintPhotos(_allPhotos);
       //_mapApp.debugPrint(" Map25View: ** paintTours_AndUpdateMap: creating photolayer OLD with size: " + _allPhotos.size());
 
-      final List<MarkerItem> photoItems = _mapApp._phototoolkit.createPhotoItemList(_allPhotos);
+      final List<MarkerItem> photoItems = _mapApp._phototoolkit.createPhotoItemList(_allPhotos, _mapApp.getIsPhotoShowTitle());
 
       _mapApp.setPhotoSelection(photoItems);
       //_mapApp.debugPrint(" Map25View: ** paintTours_AndUpdateMap: creating photoItems with size: " + photoItems.size());
@@ -1596,7 +1592,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       //photoLayer.setEnabled(true);
       Map25App.debugPrint(" Map25View: ** paintTours_AndUpdateMap: creating photolayer with size: " + _allPhotos.size()); //$NON-NLS-1$
 
-      /**
+      /*
        * Update map
        */
       final Map map25 = _mapApp.getMap();
@@ -1633,7 +1629,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
    void restoreState() {
 
-      /**
+      /*
        * Layer
        */
 
@@ -1671,6 +1667,8 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
 
       _mapApp.getLayer_Label().setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_LABEL_VISIBLE, true));
       _mapApp.getLayer_ScaleBar().setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_SCALE_BAR_VISIBLE, true));
+      _mapApp.setIsPhotoShowTitle(Util.getStateBoolean(_state, STATE_IS_LAYER_PHOTO_TITLE_VISIBLE, true));
+
       _mapApp.getLayer_TileInfo().setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_TILE_INFO_VISIBLE, false));
 
       // map is synced with
@@ -1700,6 +1698,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       _state.put(STATE_IS_LAYER_PHOTO_VISIBLE, _mapApp.getLayer_Photo().isEnabled());
 
       _state.put(STATE_IS_LAYER_SCALE_BAR_VISIBLE, _mapApp.getLayer_ScaleBar().isEnabled());
+      _state.put(STATE_IS_LAYER_PHOTO_TITLE_VISIBLE, _mapApp.getIsPhotoShowTitle());
 
       _state.put(STATE_IS_LAYER_BOOKMARK_VISIBLE, _mapApp.getLayer_MapBookmark().isEnabled());
 

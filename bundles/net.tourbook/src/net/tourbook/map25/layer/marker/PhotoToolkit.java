@@ -139,37 +139,39 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
       };
    }
 
-   public MarkerSymbol createPhotoBitmapFromPhoto(final Photo photo, final MarkerItem item) {
+   public MarkerSymbol createPhotoBitmapFromPhoto(final Photo photo, final MarkerItem item, final boolean showPhotoTitle) {
       Bitmap bitmapImage = getPhotoBitmap(photo);
       MarkerSymbol bitmapPhoto = null;
 
       if (bitmapImage == null) {
          bitmapImage = _bitmapPhoto;
       }
-      bitmapPhoto = createAdvanceSymbol(item, bitmapImage, true);
+      bitmapPhoto = createAdvanceSymbol(item, bitmapImage, true, showPhotoTitle);
 
       return bitmapPhoto;
    }
 
 
-   public List<MarkerItem> createPhotoItemList(final ArrayList<Photo> galleryPhotos){
-      Map25App.debugPrint(" Phototoolkit createPhotoItemList: entering "); //$NON-NLS-1$
+   public List<MarkerItem> createPhotoItemList(final ArrayList<Photo> galleryPhotos, final boolean showPhotoTitle){
+      debugPrint(" Phototoolkit createPhotoItemList: entering "); //$NON-NLS-1$
       final List<MarkerItem> pts = new ArrayList<>();
 
       if (galleryPhotos == null) {
-         Map25App.debugPrint(" Map25View: *** createPhotoItemList: galleriePhotos was null"); //$NON-NLS-1$
+         debugPrint(" Map25View: *** createPhotoItemList: galleriePhotos was null"); //$NON-NLS-1$
          return pts;
          }
 
       if (galleryPhotos.size() == 0) {
-         Map25App.debugPrint(" Map25View: *** createPhotoItemList: galleriePhotos.size() was 0"); //$NON-NLS-1$
+         debugPrint(" Map25View: *** createPhotoItemList: galleriePhotos.size() was 0"); //$NON-NLS-1$
          return  pts;
       }
 
-      /**if (!_isShowPhoto) {
-         Map25App.debugPrint(" Map25View: *** createPhotoItemList: photlayer is off");
-         return pts;
-      }*/
+      /*
+       * if (!_isShowPhoto) {
+       * debugPrint(" Map25View: *** createPhotoItemList: photlayer is off");
+       * return pts;
+       * }
+       */
 
       _allPhotos = galleryPhotos;
 
@@ -184,14 +186,19 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
          switch (stars) {
          case 1:
             starText = " *"; //$NON-NLS-1$
+            break;
          case 2:
             starText = " **"; //$NON-NLS-1$
+            break;
          case 3:
             starText = " ***"; //$NON-NLS-1$
+            break;
          case 4:
             starText = " ****"; //$NON-NLS-1$
+            break;
          case 5:
             starText = " *****"; //$NON-NLS-1$
+            break;
          }
          photoName = TimeTools.getZonedDateTime(photo.imageExifTime).format(TimeTools.Formatter_Time_S) + starText;
 
@@ -204,21 +211,21 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
                Math.abs(photo.getImageMetaData().longitude) > Double.MIN_VALUE
                )
          {
-//            Map25App.debugPrint("PhotoToolkit: *** createPhotoItemList: using exif geo");
+//            debugPrint("PhotoToolkit: *** createPhotoItemList: using exif geo");
             photoLat = photo.getImageMetaData().latitude;
             photoLon = photo.getImageMetaData().longitude;
          } else {
-            Map25App.debugPrint("PhotoToolkit: *** createPhotoItemList: using tour geo"); //$NON-NLS-1$
+            debugPrint("PhotoToolkit: *** createPhotoItemList: using tour geo"); //$NON-NLS-1$
             photoLat = photo.getTourLatitude();
             photoLon = photo.getTourLongitude();
          }
 
-         //Map25App.debugPrint("PhotoToolkit: *** createPhotoItemList Name: " + photo.getImageMetaData().objectName + " Description: " + photo.getImageMetaData().captionAbstract);
+         //debugPrint("PhotoToolkit: *** createPhotoItemList Name: " + photo.getImageMetaData().objectName + " Description: " + photo.getImageMetaData().captionAbstract);
 
          final MarkerItem item = new MarkerItem(photoKey, photoName, photoDescription,
                new GeoPoint(photoLat, photoLon)
                );
-         final MarkerSymbol markerSymbol = createPhotoBitmapFromPhoto(photo, item);
+         final MarkerSymbol markerSymbol = createPhotoBitmapFromPhoto(photo, item, showPhotoTitle);
 
          if (markerSymbol != null) {
             item.setMarker(markerSymbol);
@@ -327,14 +334,18 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
    public boolean onItemLongPress(final int index, final MarkerItem photoItem) {
       // TODO Auto-generated method stub
       //debugPrint(" ??????????? PhotoToolkit *** onItemLongPress(int index, MarkerItem photoItem): " + arg0 + " " + arg1);
-      debugPrint(" ??????????? PhotoToolkit *** onItemLongPress(int index, MarkerItem photoItem): " + _allPhotos.get(index).imageFilePathName + " " + photoItem.getTitle()); //$NON-NLS-1$ //$NON-NLS-2$
+      debugPrint(" ??????????? PhotoToolkit *** onItemLongPress(int index, MarkerItem photoItem): " + _allPhotos.get( //$NON-NLS-1$
+            index).imageFilePathName
+            + " " + photoItem.getTitle()); //$NON-NLS-1$
       return false;
    }
 
    @Override
    public boolean onItemSingleTapUp(final int index, final MarkerItem photoItem) {
       // TODO Auto-generated method stub
-      debugPrint(" ??????????? PhotoToolkit *** onItemSingleTapUp(int index, MarkerItem photoItem): " + _allPhotos.get(index).imageFilePathName + " " + photoItem.getTitle()); //$NON-NLS-1$ //$NON-NLS-2$
+      debugPrint(" ??????????? PhotoToolkit *** onItemSingleTapUp(int index, MarkerItem photoItem): " + _allPhotos //$NON-NLS-1$
+            .get(
+            index).imageFilePathName + " " + photoItem.getTitle()); //$NON-NLS-1$
       //showPhoto(_allPhotos.get(index));
       return false;
    }
@@ -372,7 +383,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
    }
 
    public void updatePhotos() {
-      //net.tourbook.map25.Map25App.debugPrint("???? PhotoToolkit: Update Photos");
+      //net.tourbook.map25.debugPrint("???? PhotoToolkit: Update Photos");
       _mapApp.updateUI_PhotoLayer();
    }
 

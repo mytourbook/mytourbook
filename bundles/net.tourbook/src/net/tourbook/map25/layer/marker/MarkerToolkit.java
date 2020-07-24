@@ -43,8 +43,10 @@ import net.tourbook.map25.Map25ConfigManager;
 
 public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<MarkerItem> {
    //ItemizedLayer<MarkerItem> mMarkerLayer;
-   protected int _fgColor = 0xFF000000; // 100 percent black. AARRGGBB
-   protected int _bgColor = 0x80FF69B4; // 50 percent pink. AARRGGBB
+   protected int _fgColor = 0xFF000000;   // 100 percent black. AARRGGBB
+   protected int _bgColor = 0x80FF69B4;   // 50 percent pink. AARRGGBB
+   //protected int _poiColor = 0xFF91c7ff;  // blue like toolbar
+   protected int  _poiColor               = 0xFFFFFF00;                                                               // yellow is better to see                                                             // 100percent yellow
    protected int _clusterSymbolSizeDP = net.tourbook.map25.layer.marker.MarkerRenderer.MAP_MARKER_CLUSTER_SIZE_DP;
    protected int _clusterForegroundColor = net.tourbook.map25.layer.marker.MarkerRenderer.CLUSTER_COLOR_TEXT;
    protected int _clusterBackgroundColor = net.tourbook.map25.layer.marker.MarkerRenderer.CLUSTER_COLOR_BACK;
@@ -87,7 +89,7 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
       if(shape == MarkerShape.CIRCLE) {
          _BitmapClusterSymbol = drawCircle(_clusterSymbol_Size);
       } else {
-         _BitmapClusterSymbol = drawStar(_clusterSymbol_Size);
+         _BitmapClusterSymbol = drawStar(_clusterSymbol_Size, _poiColor);
       }
 
       _symbol = new MarkerSymbol(_bitmapPoi, MarkerSymbol.HotspotPlace.CENTER, false);
@@ -109,14 +111,33 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
    }
 
    /**
-    * creates a transparent symbol with text and description.
-    * @param mItem  -> the MarkerItem to process, containing title and description
-    * if description starts with a '#' the first line of the description is drawn.
-    * @param poiBitmap  -> poi bitmap for the center
-    * @return MarkerSymbol with title, description and symbol
+    * creates a transparent symbol with text and description. for marker.
+    * short version of createAdvanceSymbol(final MarkerItem mItem, final Bitmap poiBitmap, false, false)
     *
+    * @param mItem
+    * @param poiBitmap
+    * @return
     */
-   public MarkerSymbol createAdvanceSymbol(final MarkerItem mItem, final Bitmap poiBitmap, final Boolean isPhoto) {
+   public MarkerSymbol createAdvanceSymbol(final MarkerItem mItem, final Bitmap poiBitmap) {
+      return createAdvanceSymbol(mItem, poiBitmap, false, false);
+   }
+
+   /**
+    * creates a transparent symbol with text and description. for photos and marker.
+    *
+    * @param mItem
+    *           -> the MarkerItem to process, containing title and description
+    *           if description starts with a '#' the first line of the description is drawn.
+    * @param poiBitmap
+    *           -> poi bitmap for the center
+    * @param isPhoto
+    *           -> called from PhotoToolkit yes/no
+    * @param showPhotoTitle
+    *           -> when isPhoto = true show photo title on/off. when isPhoto = false, this param is
+    *           ignored
+    * @return MarkerSymbol with title, description and symbol
+    */
+   public MarkerSymbol createAdvanceSymbol(final MarkerItem mItem, final Bitmap poiBitmap, final Boolean isPhoto, final boolean showPhotoTitle) {
       loadConfig();
       final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
       final boolean isBillboard = config.markerOrientation == Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD;
@@ -165,10 +186,10 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
       titleCanvas.setBitmap(titleBitmap);
 
       { // testing block
-      /**
-       * the following three lines displaying a transparent box.
-       * only for testing purposes, normally uncommented
-       */
+         /*
+          * the following three lines displaying a transparent box.
+          * only for testing purposes, normally uncommented
+          */
       //fillPainter.setColor(0x60ffffff);
       //markerCanvas.drawCircle(0, 0, size.x*2, fillPainter);
       //fillPainter.setColor(_bgColor);
@@ -197,7 +218,11 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
          markerCanvas.drawBitmap(subtitleBitmap, size.x/2-(lineLength / 2), size.y - lineLength);
       }
 
-      if (config.isShowTourMarker) {
+      if (isPhoto) {
+         if (showPhotoTitle) {
+            markerCanvas.drawBitmap(titleBitmap, size.x/2-(titleSize.x/2), 0);
+         }
+      } else {
          markerCanvas.drawBitmap(titleBitmap, size.x/2-(titleSize.x/2), 0);
       }
 
@@ -237,19 +262,19 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
    public List<MarkerItem> createMarkerItemList(final MarkerMode MarkerMode){
       loadConfig();
       createPoiBitmap(MarkerShape.STAR);
-      _BitmapClusterSymbol = drawStar(_clusterSymbol_Size);
+      _BitmapClusterSymbol = drawStar(_clusterSymbol_Size, _poiColor);
       final List<MarkerItem> pts = new ArrayList<>();
 
       for (final MapBookmark mapBookmark : net.tourbook.map.bookmark.MapBookmarkManager.getAllBookmarks()) {
-         //Map25App.debugPrint("*** Markertoolkit:  mapbookmark name: " + mapBookmark.name + " lat: " +  mapBookmark.get_mapPositionMarkerLatitude() + " lon: " + mapBookmark.get_mapPositionMarkerLongitude()); //$NON-NLS-1$
-         //Map25App.debugPrint("*** Markertoolkit: " + mapBookmark.toString());
+         //debugPrint("*** Markertoolkit:  mapbookmark name: " + mapBookmark.name + " lat: " +  mapBookmark.get_mapPositionMarkerLatitude() + " lon: " + mapBookmark.get_mapPositionMarkerLongitude()); //$NON-NLS-1$
+         //debugPrint("*** Markertoolkit: " + mapBookmark.toString());
          final MarkerItem item = new MarkerItem(mapBookmark.id,
                mapBookmark.name,
                UI.EMPTY_STRING,
                //new GeoPoint(mapBookmark.getLatitude(), mapBookmark.getLongitude())
                new GeoPoint(mapBookmark.get_mapPositionMarkerLatitude(), mapBookmark.get_mapPositionMarkerLongitude())
                );
-         item.setMarker(createAdvanceSymbol(item, _bitmapPoi, false));
+         item.setMarker(createAdvanceSymbol(item, _bitmapPoi));
          pts.add(item);
       }
 
@@ -269,7 +294,7 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
             final MarkerItem item = new MarkerItem(y + ", " + x, "Title " + demo_lat + "/" + demo_lon,"Description "  + x + "/" + y, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
                   new GeoPoint(demo_lat + y * STEP + random, demo_lon + x * STEP + random)
                   );
-            item.setMarker(createAdvanceSymbol(item, _bitmapPoi, false));
+            item.setMarker(createAdvanceSymbol(item, _bitmapPoi));
             pts.add(item);
          }
       }
@@ -284,7 +309,7 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
       if(shape == MarkerShape.CIRCLE) {
          _bitmapPoi = drawCircle(_symbolSizeInt);
       } else {
-         _bitmapPoi = drawStar(_symbolSizeInt);
+         _bitmapPoi = drawStar(_symbolSizeInt, _poiColor);
       }
      return _bitmapPoi;
 
@@ -307,15 +332,15 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
    }
 
 
-   public Bitmap drawStar(final int bitmapStarSize) {
+   public Bitmap drawStar(final int bitmapStarSize, final int starColor) {
       //_mapApp.debugPrint("*** Markertoolkit:  drawstar: "); //$NON-NLS-1$
       _bitmapStar = CanvasAdapter.newBitmap(bitmapStarSize, bitmapStarSize, 0);
       final org.oscim.backend.canvas.Canvas defaultMarkerCanvas = CanvasAdapter.newCanvas();
       defaultMarkerCanvas.setBitmap(_bitmapStar);
       final float half = bitmapStarSize/2;
-      _fillPainter.setColor(0xFFFFFF00); // 100percent yellow
+      _fillPainter.setColor(starColor);
       _fillPainter.setStrokeWidth(2);
-      /**
+      /*
        * link: https://stackoverflow.com/questions/16327588/how-to-make-star-shape-in-java
        */
       defaultMarkerCanvas.drawLine(half * 0.1f  , half * 0.65f, half * 1.9f  , half * 0.65f, _fillPainter);
@@ -360,7 +385,9 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
    public boolean onItemLongPress(final int index, final MarkerItem item) {
       // TODO Auto-generated method stub
 
-      debugPrint(" Markertoolkit: " + //$NON-NLS-1$
+      debugPrint(
+            " Markertoolkit: " //$NON-NLS-1$
+            +
             (UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //$NON-NLS-1$ //$NON-NLS-2$
             + ("\tonItemLongpress") //$NON-NLS-1$
             + ("\tMapbookmark") //$NON-NLS-1$
@@ -397,7 +424,9 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
    public boolean onItemSingleTapUp(final int index, final MarkerItem item) {
       // TODO Auto-generated method stub
 
-      debugPrint(" MarkerToolkit: " + //$NON-NLS-1$
+      debugPrint(
+            " MarkerToolkit: " //$NON-NLS-1$
+            +
             (UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //$NON-NLS-1$ //$NON-NLS-2$
             + ("\tonItemSingleTapUp") //$NON-NLS-1$
             + ("\tMapbookmark") //$NON-NLS-1$

@@ -29,7 +29,6 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
-import net.tourbook.common.util.Util;
 import net.tourbook.data.NormalizedGeoData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.SQLFilter;
@@ -93,10 +92,9 @@ public class GeoPartTourLoader {
          }
       }
 
-      Connection conn = null;
       String select = null;
 
-      try {
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
 // this is very slow
 //       final SQLFilter appFilter = new SQLFilter(SQLFilter.TAG_FILTER);
@@ -139,8 +137,6 @@ public class GeoPartTourLoader {
             select = selectGeoPart;
          }
 
-         conn = TourDatabase.getInstance().getConnection();
-
          /*
           * Fill parameters
           */
@@ -172,9 +168,6 @@ public class GeoPartTourLoader {
          StatusUtil.log(select);
          net.tourbook.ui.UI.showSQLException(e);
 
-      } finally {
-
-         Util.closeSql(conn);
       }
 
       final long timeDiff = System.currentTimeMillis() - start;

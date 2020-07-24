@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,13 +24,11 @@ import java.util.ArrayList;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.FileUtils;
 import net.tourbook.common.util.StatusUtil;
-import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 
 public abstract class TourbookDevice implements IRawDataReader {
 
-   private static final String   XML_COMMENT           = "<!--";                                           //$NON-NLS-1$
    protected static final String XML_START_ID          = "<?xml";                                          //$NON-NLS-1$
    protected static final String XML_HEADER            = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";    //$NON-NLS-1$
 
@@ -123,7 +121,7 @@ public abstract class TourbookDevice implements IRawDataReader {
     *           index in the byte stream, this will be incremented when the return value is true
     * @param newByte
     *           received byte
-    * @return Return <code>true</code> when the receice data are correct for this device
+    * @return Return <code>true</code> when the receive data are correct for this device
     */
    public abstract boolean checkStartSequence(int byteIndex, int newByte);
 
@@ -219,7 +217,7 @@ public abstract class TourbookDevice implements IRawDataReader {
    }
 
    /**
-    * @return Returns a list of files which are also imported additonal to the selected imported
+    * @return Returns a list of files which are also imported additional to the selected imported
     *         file or <code>null</code> otherwise.
     */
    public ArrayList<String> getAdditionalImportedFiles() {
@@ -266,11 +264,9 @@ public abstract class TourbookDevice implements IRawDataReader {
    protected boolean isValidXMLFile(final String importFilePath, final String deviceTag, final boolean isRemoveBOM) {
 
       final String deviceTagLower = deviceTag.toLowerCase();
-      BufferedReader fileReader = null;
 
-      try {
-
-         final FileInputStream inputStream = new FileInputStream(importFilePath);
+      try (FileInputStream inputStream = new FileInputStream(importFilePath);
+            BufferedReader fileReader = new BufferedReader(new InputStreamReader(inputStream, UI.UTF_8))) {
 
          if (isRemoveBOM) {
 
@@ -280,8 +276,6 @@ public abstract class TourbookDevice implements IRawDataReader {
                // just ignore it
             }
          }
-
-         fileReader = new BufferedReader(new InputStreamReader(inputStream, UI.UTF_8));
 
          String line = fileReader.readLine();
          if (line == null || line.toLowerCase().contains(XML_START_ID) == false) {
@@ -306,8 +300,6 @@ public abstract class TourbookDevice implements IRawDataReader {
 
       } catch (final Exception e1) {
          StatusUtil.log(e1);
-      } finally {
-         Util.closeReader(fileReader);
       }
 
       return true;
