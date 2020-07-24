@@ -1,14 +1,14 @@
 /*******************************************************************************
  * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
- * 
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -29,8 +29,6 @@ import net.tourbook.map25.layer.marker.algorithm.distance.ClusterItem;
 import net.tourbook.map25.layer.marker.algorithm.distance.DistanceClustering;
 import net.tourbook.map25.layer.marker.algorithm.distance.QuadItem;
 import net.tourbook.map25.layer.marker.algorithm.distance.StaticCluster;
-import net.tourbook.map25.layer.marker.MarkerToolkit;
-
 import org.oscim.backend.CanvasAdapter;
 import org.oscim.backend.canvas.Bitmap;
 import org.oscim.backend.canvas.Paint;
@@ -81,7 +79,7 @@ public class MarkerRenderer extends BucketRenderer {
 
 	private static final HashMap<Integer, Bitmap>	_clusterBitmaps				= new HashMap<>();
 
-	private static final TimSort<ProjectedItem>		ZSORT						= new TimSort<ProjectedItem>();
+	private static final TimSort<ProjectedItem>		ZSORT						= new TimSort<>();
 
 	final static Comparator<ProjectedItem>			zComparator;
 	static {
@@ -119,7 +117,7 @@ public class MarkerRenderer extends BucketRenderer {
 
 	private int _fgColor;
 	private int _bgColor;
-	
+
 	private final MarkerLayer				_markerLayer;
 	private final SymbolBucket				_symbolBucket;
 
@@ -173,8 +171,8 @@ public class MarkerRenderer extends BucketRenderer {
 
 	private ClusterAlgorithm				_clusterAlgorithm;
 
-	private DistanceClustering<ClusterItem>	_distanceAlgorithm		= new DistanceClustering<ClusterItem>();
-	
+	private DistanceClustering<ClusterItem>	_distanceAlgorithm		= new DistanceClustering<>();
+
 	private MarkerToolkit _markertoolkit;
 
 	/**
@@ -216,8 +214,8 @@ public class MarkerRenderer extends BucketRenderer {
 		_markerLayer = markerLayer;
 
 		_symbolBucket = new SymbolBucket();
-		
-		_markertoolkit = new MarkerToolkit(MarkerToolkit.MarkerShape.CIRCLE);
+
+		_markertoolkit = new MarkerToolkit(MarkerShape.CIRCLE);
 
 		configureRenderer();
 	}
@@ -238,11 +236,11 @@ public class MarkerRenderer extends BucketRenderer {
 
 		_fgColor = ColorUtil.getARGB(config.markerOutline_Color, (int) (config.markerOutline_Opacity / 100.0 * 0xff));
 		_bgColor = ColorUtil.getARGB(config.markerFill_Color,    (int) (config.markerFill_Opacity    / 100.0 * 0xff));
-		
+
 		/*System.out.println("***textOpacy: " + config.markerOutline_Opacity); //$NON-NLS-1$
 		System.out.println("***FillOpacy: " + config.markerFill_Opacity); //$NON-NLS-1$
 		System.out.println("***bgColor: " + _bgColor); //$NON-NLS-1$ */
-		
+
 		_clusterSymbolSizeDP = config.clusterSymbol_Size;
 		_clusterSymbolWeight = config.clusterSymbol_Weight;
 		_clusterOutlineSize = config.clusterOutline_Size;
@@ -546,7 +544,7 @@ public class MarkerRenderer extends BucketRenderer {
 
 			canvas.drawCircle(noClippingPos, noClippingPos, outlineRadius, outlinePainter);
 		}
-		
+
 		/*final Paint textPainter = CanvasAdapter.newPaint();
 		textPainter.setStyle(Paint.Style.STROKE);
 		textPainter.setColor(ColorUtil.getARGB(config.markerOutline_Color, markerOutline_Opacity));
@@ -818,16 +816,16 @@ public class MarkerRenderer extends BucketRenderer {
 			   if (markerSymbol == null) {
 			      markerSymbol = _defaultMarkerSymbol;
 			   }
-			   
-            String title = projItem.mapMarker.title;
-            String subtitle = projItem.mapMarker.description;
+
+            final String title = projItem.mapMarker.title;
+            final String subtitle = projItem.mapMarker.description;
             //System.out.println("***** subtitle: " +  subtitle + " and length: " + subtitle.length()); //$NON-NLS-1$  //$NON-NLS-2$
 
             //create dummy MarkerItem with dummy coordinates. only need it for create the label
-			   MarkerItem item = new MarkerItem(title, subtitle, new GeoPoint(5.0, 5.0));
-			   item.setMarker(_markertoolkit.createAdvanceSymbol(item, markerSymbol.getBitmap()));
-			   
-			   mapSymbol.set(projItem.mapX, projItem.mapY, item.getMarker().getBitmap(), markerSymbol.mBillboard); 
+			   final MarkerItem item = new MarkerItem(title, subtitle, new GeoPoint(5.0, 5.0));
+            item.setMarker(_markertoolkit.createAdvanceSymbol(item, markerSymbol.getBitmap()));
+
+			   mapSymbol.set(projItem.mapX, projItem.mapY, item.getMarker().getBitmap(), markerSymbol.mBillboard);
 			   mapSymbol.offset = markerSymbol.getHotspot();
 			   mapSymbol.billboard = markerSymbol.isBillboard();
 			}

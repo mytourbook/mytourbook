@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -66,528 +66,528 @@ import org.oscim.core.MapPosition;
  */
 public class SlideoutMapBookmarks extends ToolbarSlideout {
 
-	private IMapBookmarks		_mapBookmarks;
+   private IMapBookmarks      _mapBookmarks;
 
-	private TableViewer			_bookmarkViewer;
+   private TableViewer        _bookmarkViewer;
 
-	private SelectionAdapter	_defaultSelectionListener;
-	private MouseWheelListener	_defaultMouseWheelListener;
+   private SelectionAdapter   _defaultSelectionListener;
+   private MouseWheelListener _defaultMouseWheelListener;
 
-	private final NumberFormat	_nfLatLon	= NumberFormat.getNumberInstance();
-	{
-		_nfLatLon.setMinimumFractionDigits(2);
-		_nfLatLon.setMaximumFractionDigits(2);
-	}
+   private final NumberFormat _nfLatLon = NumberFormat.getNumberInstance();
+   {
+      _nfLatLon.setMinimumFractionDigits(2);
+      _nfLatLon.setMaximumFractionDigits(2);
+   }
 
-	private PixelConverter	_pc;
+   private PixelConverter _pc;
 
-	/*
-	 * UI controls
-	 */
-	private Composite		_parent;
+   /*
+    * UI controls
+    */
+   private Composite _parent;
 
-	private Button			_btnDelete;
-	private Button			_btnRename;
+   private Button    _btnDelete;
+   private Button    _btnRename;
 
-	private Spinner			_spinnerNumRecentBookmarks;
-	private Spinner			_spinnerNumBookmarkItems;
+   private Spinner   _spinnerNumRecentBookmarks;
+   private Spinner   _spinnerNumBookmarkItems;
 
-	private class BookmarkComparator extends ViewerComparator {
+   private class BookmarkComparator extends ViewerComparator {
 
-		@Override
-		public int compare(final Viewer viewer, final Object e1, final Object e2) {
+      @Override
+      public int compare(final Viewer viewer, final Object e1, final Object e2) {
 
-			if (e1 == null || e2 == null) {
-				return 0;
-			}
+         if (e1 == null || e2 == null) {
+            return 0;
+         }
 
-			final MapBookmark bookmark1 = (MapBookmark) e1;
-			final MapBookmark bookmark2 = (MapBookmark) e2;
+         final MapBookmark bookmark1 = (MapBookmark) e1;
+         final MapBookmark bookmark2 = (MapBookmark) e2;
 
-			return bookmark1.name.compareTo(bookmark2.name);
-		}
+         return bookmark1.name.compareTo(bookmark2.name);
+      }
 
-		@Override
-		public boolean isSorterProperty(final Object element, final String property) {
+      @Override
+      public boolean isSorterProperty(final Object element, final String property) {
 
-			// force resorting when a name is renamed
-			return true;
-		}
-	}
+         // force resorting when a name is renamed
+         return true;
+      }
+   }
 
-	private class BookmarkProvider implements IStructuredContentProvider {
+   private class BookmarkProvider implements IStructuredContentProvider {
 
-		@Override
-		public void dispose() {}
+      @Override
+      public void dispose() {}
 
-		@Override
-		public Object[] getElements(final Object inputElement) {
-			return MapBookmarkManager.getAllBookmarks().toArray();
-		}
+      @Override
+      public Object[] getElements(final Object inputElement) {
+         return MapBookmarkManager.getAllBookmarks().toArray();
+      }
 
-		@Override
-		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
-	}
+      @Override
+      public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
+   }
 
-	/**
-	 * @param ownerControl
-	 * @param toolBar
-	 * @param mapBookmarks
-	 * @param canAnimate
-	 *            When <code>true</code> then the UI widgets are displayed to configure the
-	 *            animation
-	 */
-	public SlideoutMapBookmarks(final Control ownerControl,
-								final ToolBar toolBar,
-								final IMapBookmarks mapBookmarks) {
+   /**
+    * @param ownerControl
+    * @param toolBar
+    * @param mapBookmarks
+    * @param canAnimate
+    *           When <code>true</code> then the UI widgets are displayed to configure the
+    *           animation
+    */
+   public SlideoutMapBookmarks(final Control ownerControl,
+                               final ToolBar toolBar,
+                               final IMapBookmarks mapBookmarks) {
 
-		super(ownerControl, toolBar);
+      super(ownerControl, toolBar);
 
-		_mapBookmarks = mapBookmarks;
-	}
+      _mapBookmarks = mapBookmarks;
+   }
 
-	private void createActions() {
+   private void createActions() {
 
-	}
+   }
 
-	@Override
-	protected Composite createToolTipContentArea(final Composite parent) {
+   @Override
+   protected Composite createToolTipContentArea(final Composite parent) {
 
-		_parent = parent;
+      _parent = parent;
 
-		initUI(parent);
+      initUI(parent);
 
-		createActions();
+      createActions();
 
-		final Composite ui = createUI(parent);
+      final Composite ui = createUI(parent);
 
-		restoreState();
+      restoreState();
 
-		// fill bookmark viewer
-		_bookmarkViewer.setInput(new Object());
+      // fill bookmark viewer
+      _bookmarkViewer.setInput(new Object());
 
-		enableActions();
+      enableActions();
 
-		return ui;
-	}
+      return ui;
+   }
 
-	private Composite createUI(final Composite parent) {
+   private Composite createUI(final Composite parent) {
 
-		final Composite shellContainer = new Composite(parent, SWT.NONE);
-		GridLayoutFactory.swtDefaults().applyTo(shellContainer);
-		{
-			final Composite container = new Composite(shellContainer, SWT.NONE);
-			GridDataFactory.fillDefaults().applyTo(container);
-			GridLayoutFactory.fillDefaults().applyTo(container);
+      final Composite shellContainer = new Composite(parent, SWT.NONE);
+      GridLayoutFactory.swtDefaults().applyTo(shellContainer);
+      {
+         final Composite container = new Composite(shellContainer, SWT.NONE);
+         GridDataFactory.fillDefaults().applyTo(container);
+         GridLayoutFactory.fillDefaults().applyTo(container);
 //			container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-			{
-				createUI_10_Title(container);
+         {
+            createUI_10_Title(container);
 
-				createUI_50_BookmarkViewer(container);
-				createUI_60_BookmarkActions(container);
+            createUI_50_BookmarkViewer(container);
+            createUI_60_BookmarkActions(container);
 
-				createUI_70_Options(container);
+            createUI_70_Options(container);
 
-			}
-		}
+         }
+      }
 
-		return shellContainer;
-	}
+      return shellContainer;
+   }
 
-	private void createUI_10_Title(final Composite parent) {
+   private void createUI_10_Title(final Composite parent) {
 
-		/*
-		 * Label: Slideout title
-		 */
-		final Label label = new Label(parent, SWT.NONE);
-		label.setText(Messages.Slideout_Map_Bookmark_Label_Title);
-		MTFont.setBannerFont(label);
+      /*
+       * Label: Slideout title
+       */
+      final Label label = new Label(parent, SWT.NONE);
+      label.setText(Messages.Slideout_Map_Bookmark_Label_Title);
+      MTFont.setBannerFont(label);
 //		GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(label);
-	}
+   }
 
-	private void createUI_50_BookmarkViewer(final Composite parent) {
+   private void createUI_50_BookmarkViewer(final Composite parent) {
 
-		final Composite layoutContainer = new Composite(parent, SWT.NONE);
-		GridDataFactory
-				.fillDefaults()
-				.hint(
-						_pc.convertWidthInCharsToPixels(50),
-						_pc.convertHeightInCharsToPixels((int) (MapBookmarkManager.numberOfBookmarkItems * 1.4)))
-				.applyTo(layoutContainer);
+      final Composite layoutContainer = new Composite(parent, SWT.NONE);
+      GridDataFactory
+            .fillDefaults()
+            .hint(
+                  _pc.convertWidthInCharsToPixels(50),
+                  _pc.convertHeightInCharsToPixels((int) (MapBookmarkManager.numberOfBookmarkItems * 1.4)))
+            .applyTo(layoutContainer);
 
-		final TableColumnLayout tableLayout = new TableColumnLayout();
-		layoutContainer.setLayout(tableLayout);
+      final TableColumnLayout tableLayout = new TableColumnLayout();
+      layoutContainer.setLayout(tableLayout);
 
-		/*
-		 * create table
-		 */
-		final Table table = new Table(layoutContainer, SWT.FULL_SELECTION);
+      /*
+       * create table
+       */
+      final Table table = new Table(layoutContainer, SWT.FULL_SELECTION);
 
-		table.setLayout(new TableLayout());
-		table.setHeaderVisible(true);
+      table.setLayout(new TableLayout());
+      table.setHeaderVisible(true);
 
-		_bookmarkViewer = new TableViewer(table);
+      _bookmarkViewer = new TableViewer(table);
 
-		/*
-		 * create columns
-		 */
-		TableViewerColumn tvc;
-		TableColumn tc;
+      /*
+       * create columns
+       */
+      TableViewerColumn tvc;
+      TableColumn tc;
 
-		{
-			// Column: Bookmark name
+      {
+         // Column: Bookmark name
 
-			tvc = new TableViewerColumn(_bookmarkViewer, SWT.LEAD);
-			tc = tvc.getColumn();
-			tc.setText(Messages.Map_Bookmark_Column_Name);
-			tvc.setLabelProvider(new CellLabelProvider() {
-				@Override
-				public void update(final ViewerCell cell) {
+         tvc = new TableViewerColumn(_bookmarkViewer, SWT.LEAD);
+         tc = tvc.getColumn();
+         tc.setText(Messages.Map_Bookmark_Column_Name);
+         tvc.setLabelProvider(new CellLabelProvider() {
+            @Override
+            public void update(final ViewerCell cell) {
 
-					final MapBookmark bookmark = (MapBookmark) cell.getElement();
+               final MapBookmark bookmark = (MapBookmark) cell.getElement();
 
-					cell.setText(bookmark.name);
-				}
-			});
-			tableLayout.setColumnData(tc, new ColumnWeightData(1, false));
-		}
-		{
-			// Column: Zoomlevel
+               cell.setText(bookmark.name);
+            }
+         });
+         tableLayout.setColumnData(tc, new ColumnWeightData(1, false));
+      }
+      {
+         // Column: Zoomlevel
 
-			tvc = new TableViewerColumn(_bookmarkViewer, SWT.TRAIL);
-			tc = tvc.getColumn();
-			tc.setText(Messages.Map_Bookmark_Column_ZoomLevel);
-			tc.setToolTipText(Messages.Map_Bookmark_Column_ZoomLevel_Tooltip);
-			tvc.setLabelProvider(new CellLabelProvider() {
-				@Override
-				public void update(final ViewerCell cell) {
+         tvc = new TableViewerColumn(_bookmarkViewer, SWT.TRAIL);
+         tc = tvc.getColumn();
+         tc.setText(Messages.Map_Bookmark_Column_ZoomLevel2);
+         tc.setToolTipText(Messages.Map_Bookmark_Column_ZoomLevel2_Tooltip);
+         tvc.setLabelProvider(new CellLabelProvider() {
+            @Override
+            public void update(final ViewerCell cell) {
 
-					final MapBookmark bookmark = (MapBookmark) cell.getElement();
-					final MapPosition mapPos = bookmark.getMapPosition();
+               final MapBookmark bookmark = (MapBookmark) cell.getElement();
+               final MapPosition mapPos = bookmark.getMapPosition();
 
-					cell.setText(Integer.toString(mapPos.zoomLevel));
-				}
-			});
-			tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(5), true));
-		}
-		{
-			// Column: Latitude
+               cell.setText(Integer.toString(mapPos.zoomLevel));
+            }
+         });
+         tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(5), true));
+      }
+      {
+         // Column: Latitude
 
-			tvc = new TableViewerColumn(_bookmarkViewer, SWT.TRAIL);
-			tc = tvc.getColumn();
-			tc.setText(Messages.Map_Bookmark_Column_Latitude);
-			tc.setToolTipText(Messages.Map_Bookmark_Column_Latitude_Tooltip);
-			tvc.setLabelProvider(new CellLabelProvider() {
-				@Override
-				public void update(final ViewerCell cell) {
+         tvc = new TableViewerColumn(_bookmarkViewer, SWT.TRAIL);
+         tc = tvc.getColumn();
+         tc.setText(Messages.Map_Bookmark_Column_Latitude);
+         tc.setToolTipText(Messages.Map_Bookmark_Column_Latitude_Tooltip);
+         tvc.setLabelProvider(new CellLabelProvider() {
+            @Override
+            public void update(final ViewerCell cell) {
 
-					final MapBookmark bookmark = (MapBookmark) cell.getElement();
-					final String valueText = _nfLatLon.format(bookmark.getLatitude());
+               final MapBookmark bookmark = (MapBookmark) cell.getElement();
+               final String valueText = _nfLatLon.format(bookmark.getLatitude());
 
-					cell.setText(valueText);
-				}
-			});
-			tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(9), true));
-		}
-		{
-			// Column: Longitude
+               cell.setText(valueText);
+            }
+         });
+         tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(9), true));
+      }
+      {
+         // Column: Longitude
 
-			tvc = new TableViewerColumn(_bookmarkViewer, SWT.TRAIL);
-			tc = tvc.getColumn();
-			tc.setText(Messages.Map_Bookmark_Column_Longitude);
-			tc.setToolTipText(Messages.Map_Bookmark_Column_Longitude_Tooltip);
-			tvc.setLabelProvider(new CellLabelProvider() {
-				@Override
-				public void update(final ViewerCell cell) {
+         tvc = new TableViewerColumn(_bookmarkViewer, SWT.TRAIL);
+         tc = tvc.getColumn();
+         tc.setText(Messages.Map_Bookmark_Column_Longitude);
+         tc.setToolTipText(Messages.Map_Bookmark_Column_Longitude_Tooltip);
+         tvc.setLabelProvider(new CellLabelProvider() {
+            @Override
+            public void update(final ViewerCell cell) {
 
-					final MapBookmark bookmark = (MapBookmark) cell.getElement();
-					final String valueText = _nfLatLon.format(bookmark.getLongitude());
+               final MapBookmark bookmark = (MapBookmark) cell.getElement();
+               final String valueText = _nfLatLon.format(bookmark.getLongitude());
 
-					cell.setText(valueText);
-				}
-			});
-			tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(9), true));
-		}
+               cell.setText(valueText);
+            }
+         });
+         tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(9), true));
+      }
 
-		/*
-		 * create table viewer
-		 */
-		_bookmarkViewer.setContentProvider(new BookmarkProvider());
-		_bookmarkViewer.setComparator(new BookmarkComparator());
+      /*
+       * create table viewer
+       */
+      _bookmarkViewer.setContentProvider(new BookmarkProvider());
+      _bookmarkViewer.setComparator(new BookmarkComparator());
 
-		_bookmarkViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+      _bookmarkViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 
-			@Override
-			public void selectionChanged(final SelectionChangedEvent event) {
-				onBookmark_Select();
-			}
-		});
+         @Override
+         public void selectionChanged(final SelectionChangedEvent event) {
+            onBookmark_Select();
+         }
+      });
 
-		_bookmarkViewer.addDoubleClickListener(new IDoubleClickListener() {
+      _bookmarkViewer.addDoubleClickListener(new IDoubleClickListener() {
 
-			@Override
-			public void doubleClick(final DoubleClickEvent event) {
-				onBookmark_Rename(true);
-			}
-		});
+         @Override
+         public void doubleClick(final DoubleClickEvent event) {
+            onBookmark_Rename(true);
+         }
+      });
 
-		_bookmarkViewer.getTable().addKeyListener(new KeyListener() {
+      _bookmarkViewer.getTable().addKeyListener(new KeyListener() {
 
-			@Override
-			public void keyPressed(final KeyEvent e) {
+         @Override
+         public void keyPressed(final KeyEvent e) {
 
-				switch (e.keyCode) {
+            switch (e.keyCode) {
 
-				case SWT.DEL:
-					onBookmark_Delete();
-					break;
+            case SWT.DEL:
+               onBookmark_Delete();
+               break;
 
-				case SWT.F2:
-					onBookmark_Rename(false);
-					break;
+            case SWT.F2:
+               onBookmark_Rename(false);
+               break;
 
-				default:
-					break;
-				}
-			}
+            default:
+               break;
+            }
+         }
 
-			@Override
-			public void keyReleased(final KeyEvent e) {}
-		});
-	}
+         @Override
+         public void keyReleased(final KeyEvent e) {}
+      });
+   }
 
-	private void createUI_60_BookmarkActions(final Composite parent) {
+   private void createUI_60_BookmarkActions(final Composite parent) {
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory
-				.fillDefaults()//
-				.grab(true, false)
-				.align(SWT.END, SWT.FILL)
-				.applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-		{
-			{
-				/*
-				 * Button: Rename
-				 */
-				_btnRename = new Button(container, SWT.PUSH);
-				_btnRename.setText(Messages.App_Action_Rename);
-				_btnRename.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(final SelectionEvent e) {
-						onBookmark_Rename(false);
-					}
-				});
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory
+            .fillDefaults()//
+            .grab(true, false)
+            .align(SWT.END, SWT.FILL)
+            .applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      {
+         {
+            /*
+             * Button: Rename
+             */
+            _btnRename = new Button(container, SWT.PUSH);
+            _btnRename.setText(Messages.App_Action_Rename);
+            _btnRename.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  onBookmark_Rename(false);
+               }
+            });
 
-				// set button default width
-				UI.setButtonLayoutData(_btnRename);
-			}
-			{
-				/*
-				 * Button: Delete
-				 */
-				_btnDelete = new Button(container, SWT.PUSH);
-				_btnDelete.setText(Messages.App_Action_Delete);
-				_btnDelete.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(final SelectionEvent e) {
-						onBookmark_Delete();
-					}
-				});
+            // set button default width
+            UI.setButtonLayoutData(_btnRename);
+         }
+         {
+            /*
+             * Button: Delete
+             */
+            _btnDelete = new Button(container, SWT.PUSH);
+            _btnDelete.setText(Messages.App_Action_Delete);
+            _btnDelete.addSelectionListener(new SelectionAdapter() {
+               @Override
+               public void widgetSelected(final SelectionEvent e) {
+                  onBookmark_Delete();
+               }
+            });
 
-				// set button default width
-				UI.setButtonLayoutData(_btnDelete);
-			}
-		}
-	}
+            // set button default width
+            UI.setButtonLayoutData(_btnDelete);
+         }
+      }
+   }
 
-	private void createUI_70_Options(final Composite parent) {
+   private void createUI_70_Options(final Composite parent) {
 
-		final Composite container = new Composite(parent, SWT.NONE);
-		GridDataFactory
-				.fillDefaults()//
-				.grab(true, false)
-				.indent(0, 10)
-				.applyTo(container);
-		GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory
+            .fillDefaults()//
+            .grab(true, false)
+            .indent(0, 10)
+            .applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
-		{
-			createUI_74_Options_NumItems(container);
-		}
-	}
+      {
+         createUI_74_Options_NumItems(container);
+      }
+   }
 
-	private void createUI_74_Options_NumItems(final Composite parent) {
+   private void createUI_74_Options_NumItems(final Composite parent) {
 
-		{
-			/*
-			 * Number of bookmark list entries
-			 */
+      {
+         /*
+          * Number of bookmark list entries
+          */
 
-			// Label
-			final Label label = new Label(parent, SWT.NONE);
-			label.setText(Messages.Slideout_Map_Bookmark_Label_NumBookmarkListItems);
-			label.setToolTipText(Messages.Slideout_Map_Bookmark_Label_NumBookmarkListItems_Tooltip);
+         // Label
+         final Label label = new Label(parent, SWT.NONE);
+         label.setText(Messages.Slideout_Map_Bookmark_Label_NumBookmarkListItems);
+         label.setToolTipText(Messages.Slideout_Map_Bookmark_Label_NumBookmarkListItems_Tooltip);
 
-			// Spinner
-			_spinnerNumBookmarkItems = new Spinner(parent, SWT.BORDER);
-			_spinnerNumBookmarkItems.setMinimum(MapBookmarkManager.NUM_BOOKMARK_ITEMS_MIN);
-			_spinnerNumBookmarkItems.setMaximum(MapBookmarkManager.NUM_BOOKMARK_ITEMS_MAX);
-			_spinnerNumBookmarkItems.setPageIncrement(5);
-			_spinnerNumBookmarkItems.addSelectionListener(_defaultSelectionListener);
-			_spinnerNumBookmarkItems.addMouseWheelListener(_defaultMouseWheelListener);
-		}
-		{
-			/*
-			 * Number of context menu items
-			 */
+         // Spinner
+         _spinnerNumBookmarkItems = new Spinner(parent, SWT.BORDER);
+         _spinnerNumBookmarkItems.setMinimum(MapBookmarkManager.NUM_BOOKMARK_ITEMS_MIN);
+         _spinnerNumBookmarkItems.setMaximum(MapBookmarkManager.NUM_BOOKMARK_ITEMS_MAX);
+         _spinnerNumBookmarkItems.setPageIncrement(5);
+         _spinnerNumBookmarkItems.addSelectionListener(_defaultSelectionListener);
+         _spinnerNumBookmarkItems.addMouseWheelListener(_defaultMouseWheelListener);
+      }
+      {
+         /*
+          * Number of context menu items
+          */
 
-			// Label
-			final Label label = new Label(parent, SWT.NONE);
-			label.setText(Messages.Slideout_Map_Bookmark_Label_NumContextMenuItems);
-			label.setToolTipText(Messages.Slideout_Map_Bookmark_Label_NumContextMenuItems_Tooltip);
+         // Label
+         final Label label = new Label(parent, SWT.NONE);
+         label.setText(Messages.Slideout_Map_Bookmark_Label_NumContextMenuItems);
+         label.setToolTipText(Messages.Slideout_Map_Bookmark_Label_NumContextMenuItems_Tooltip);
 
-			// Spinner
-			_spinnerNumRecentBookmarks = new Spinner(parent, SWT.BORDER);
-			_spinnerNumRecentBookmarks.setMinimum(MapBookmarkManager.NUM_RECENT_BOOKMARKS_MIN);
-			_spinnerNumRecentBookmarks.setMaximum(MapBookmarkManager.NUM_RECENT_BOOKMARKS_MAX);
-			_spinnerNumRecentBookmarks.setPageIncrement(5);
-			_spinnerNumRecentBookmarks.addSelectionListener(_defaultSelectionListener);
-			_spinnerNumRecentBookmarks.addMouseWheelListener(_defaultMouseWheelListener);
-		}
-	}
+         // Spinner
+         _spinnerNumRecentBookmarks = new Spinner(parent, SWT.BORDER);
+         _spinnerNumRecentBookmarks.setMinimum(MapBookmarkManager.NUM_RECENT_BOOKMARKS_MIN);
+         _spinnerNumRecentBookmarks.setMaximum(MapBookmarkManager.NUM_RECENT_BOOKMARKS_MAX);
+         _spinnerNumRecentBookmarks.setPageIncrement(5);
+         _spinnerNumRecentBookmarks.addSelectionListener(_defaultSelectionListener);
+         _spinnerNumRecentBookmarks.addMouseWheelListener(_defaultMouseWheelListener);
+      }
+   }
 
-	private void enableActions() {
+   private void enableActions() {
 
-		final MapBookmark selectedBookmark = getSelectedBookmark();
+      final MapBookmark selectedBookmark = getSelectedBookmark();
 
-		final boolean isBookmarkSelected = selectedBookmark != null;
+      final boolean isBookmarkSelected = selectedBookmark != null;
 
-		_btnDelete.setEnabled(isBookmarkSelected);
-		_btnRename.setEnabled(isBookmarkSelected);
-	}
+      _btnDelete.setEnabled(isBookmarkSelected);
+      _btnRename.setEnabled(isBookmarkSelected);
+   }
 
-	private MapBookmark getSelectedBookmark() {
+   private MapBookmark getSelectedBookmark() {
 
-		final IStructuredSelection selection = (IStructuredSelection) _bookmarkViewer.getSelection();
-		final MapBookmark selectedBookmark = (MapBookmark) selection.getFirstElement();
+      final IStructuredSelection selection = (IStructuredSelection) _bookmarkViewer.getSelection();
+      final MapBookmark selectedBookmark = (MapBookmark) selection.getFirstElement();
 
-		return selectedBookmark;
-	}
+      return selectedBookmark;
+   }
 
-	private void initUI(final Composite parent) {
+   private void initUI(final Composite parent) {
 
-		_pc = new PixelConverter(parent);
+      _pc = new PixelConverter(parent);
 
-		_defaultSelectionListener = new SelectionAdapter() {
-			@Override
-			public void widgetSelected(final SelectionEvent e) {
-				onChangeUI();
-			}
-		};
+      _defaultSelectionListener = new SelectionAdapter() {
+         @Override
+         public void widgetSelected(final SelectionEvent e) {
+            onChangeUI();
+         }
+      };
 
-		_defaultMouseWheelListener = new MouseWheelListener() {
-			@Override
-			public void mouseScrolled(final MouseEvent event) {
-				UI.adjustSpinnerValueOnMouseScroll(event);
-				onChangeUI();
-			}
-		};
+      _defaultMouseWheelListener = new MouseWheelListener() {
+         @Override
+         public void mouseScrolled(final MouseEvent event) {
+            UI.adjustSpinnerValueOnMouseScroll(event);
+            onChangeUI();
+         }
+      };
 
-	}
+   }
 
-	private void onBookmark_Delete() {
+   private void onBookmark_Delete() {
 
-		final MapBookmark selectedBookmark = getSelectedBookmark();
+      final MapBookmark selectedBookmark = getSelectedBookmark();
 
-		if (selectedBookmark == null) {
-			return;
-		}
+      if (selectedBookmark == null) {
+         return;
+      }
 
-		// update model
-		MapBookmarkManager.onDeleteBookmark(selectedBookmark);
+      // update model
+      MapBookmarkManager.onDeleteBookmark(selectedBookmark);
 
-		// update UI
-		_bookmarkViewer.refresh();
+      // update UI
+      _bookmarkViewer.refresh();
 
-		enableActions();
-	}
+      enableActions();
+   }
 
-	private void onBookmark_Rename(final boolean isOpenedWithMouse) {
+   private void onBookmark_Rename(final boolean isOpenedWithMouse) {
 
-		final MapBookmark selectedBookmark = getSelectedBookmark();
+      final MapBookmark selectedBookmark = getSelectedBookmark();
 
-		final BookmarkRenameDialog addDialog = new BookmarkRenameDialog(
+      final BookmarkRenameDialog addDialog = new BookmarkRenameDialog(
 
-				_parent.getShell(),
-				Messages.Map_Bookmark_Dialog_RenameBookmark_Title,
-				Messages.Map_Bookmark_Dialog_RenameBookmark_Message,
-				selectedBookmark.name,
-				isOpenedWithMouse,
-				new IInputValidator() {
+            _parent.getShell(),
+            Messages.Map_Bookmark_Dialog_RenameBookmark_Title,
+            Messages.Map_Bookmark_Dialog_RenameBookmark_Message,
+            selectedBookmark.name,
+            isOpenedWithMouse,
+            new IInputValidator() {
 
-					@Override
-					public String isValid(final String newText) {
+               @Override
+               public String isValid(final String newText) {
 
-						if (newText.trim().length() == 0) {
-							return Messages.Map_Bookmark_Dialog_ValidationRename;
-						}
+                  if (newText.trim().length() == 0) {
+                     return Messages.Map_Bookmark_Dialog_ValidationRename;
+                  }
 
-						return null;
-					}
-				});
+                  return null;
+               }
+            });
 
-		setIsAnotherDialogOpened(true);
-		{
-			addDialog.open();
-		}
-		setIsAnotherDialogOpened(false);
+      setIsAnotherDialogOpened(true);
+      {
+         addDialog.open();
+      }
+      setIsAnotherDialogOpened(false);
 
-		if (addDialog.getReturnCode() != Window.OK) {
-			return;
-		}
+      if (addDialog.getReturnCode() != Window.OK) {
+         return;
+      }
 
-		// update model
-		selectedBookmark.name = addDialog.getValue();
-		MapBookmarkManager.onUpdateBookmark(selectedBookmark);
+      // update model
+      selectedBookmark.name = addDialog.getValue();
+      MapBookmarkManager.onUpdateBookmark(selectedBookmark);
 
-		// update ui
-		_bookmarkViewer.refresh();
+      // update ui
+      _bookmarkViewer.refresh();
 
-		// reselect bookmark
-		_bookmarkViewer.setSelection(new StructuredSelection(selectedBookmark), true);
-	}
+      // reselect bookmark
+      _bookmarkViewer.setSelection(new StructuredSelection(selectedBookmark), true);
+   }
 
-	private void onBookmark_Select() {
+   private void onBookmark_Select() {
 
-		final MapBookmark selectedBookmark = getSelectedBookmark();
+      final MapBookmark selectedBookmark = getSelectedBookmark();
 
-		if (selectedBookmark == null) {
-			// this happened when deleting a bookmark
-			return;
-		}
+      if (selectedBookmark == null) {
+         // this happened when deleting a bookmark
+         return;
+      }
 
-		_mapBookmarks.moveToMapLocation(selectedBookmark);
+      _mapBookmarks.moveToMapLocation(selectedBookmark);
 
-		enableActions();
-	}
+      enableActions();
+   }
 
-	private void onChangeUI() {
+   private void onChangeUI() {
 
-		saveState();
+      saveState();
 
-		enableActions();
-	}
+      enableActions();
+   }
 
-	private void restoreState() {
+   private void restoreState() {
 
-		_spinnerNumBookmarkItems.setSelection(MapBookmarkManager.numberOfBookmarkItems);
-		_spinnerNumRecentBookmarks.setSelection(MapBookmarkManager.numberOfRecentBookmarks);
-	}
+      _spinnerNumBookmarkItems.setSelection(MapBookmarkManager.numberOfBookmarkItems);
+      _spinnerNumRecentBookmarks.setSelection(MapBookmarkManager.numberOfRecentBookmarks);
+   }
 
-	private void saveState() {
+   private void saveState() {
 
-		MapBookmarkManager.numberOfBookmarkItems = _spinnerNumBookmarkItems.getSelection();
-		MapBookmarkManager.numberOfRecentBookmarks = _spinnerNumRecentBookmarks.getSelection();
-	}
+      MapBookmarkManager.numberOfBookmarkItems = _spinnerNumBookmarkItems.getSelection();
+      MapBookmarkManager.numberOfRecentBookmarks = _spinnerNumRecentBookmarks.getSelection();
+   }
 
 }
