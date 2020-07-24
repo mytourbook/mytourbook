@@ -120,6 +120,8 @@ public abstract class TourbookFileSystem {
     * The chosen folder path needs to be saved in {@link #FILE_SYSTEM_FOLDER}
     *
     * @param shell
+    * @param workingDirectory
+    *           The folder to use as the working directory
     */
-   public abstract String selectFileSystemFolder(Shell shell);
+   public abstract String selectFileSystemFolder(Shell shell, String workingDirectory);
 }

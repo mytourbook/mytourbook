@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,6 +17,15 @@ package net.tourbook.application;
 
 import java.util.ArrayList;
 
+import net.tourbook.Messages;
+import net.tourbook.common.UI;
+import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.StringUtils;
+import net.tourbook.data.TourPerson;
+import net.tourbook.database.PersonManager;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.ui.CustomControlContribution;
+
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -31,14 +40,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-
-import net.tourbook.Messages;
-import net.tourbook.common.UI;
-import net.tourbook.common.util.StatusUtil;
-import net.tourbook.data.TourPerson;
-import net.tourbook.database.PersonManager;
-import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.ui.CustomControlContribution;
 
 public class PersonContributionItem extends CustomControlContribution {
 
@@ -170,7 +171,7 @@ public class PersonContributionItem extends CustomControlContribution {
 
 		for (final TourPerson person : _allPeople) {
 			String lastName = person.getLastName();
-			lastName = lastName.equals(UI.EMPTY_STRING) ? UI.EMPTY_STRING : UI.SPACE + lastName;
+         lastName = StringUtils.isNullOrEmpty(lastName) ? UI.EMPTY_STRING : UI.SPACE + lastName;
 			_cboPeople.add(person.getFirstName() + lastName);
 		}
 	}

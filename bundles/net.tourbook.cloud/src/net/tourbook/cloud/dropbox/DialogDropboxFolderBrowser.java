@@ -61,9 +61,10 @@ import org.eclipse.swt.widgets.Text;
 
 public class DialogDropboxFolderBrowser extends TitleAreaDialog {
 
-   private static final String   ROOT_FOLDER    = "/";                                             //$NON-NLS-1$
+   private static final String   ROOT_FOLDER    = "/";                                                   //$NON-NLS-1$
 
    private static String         _accessToken;
+   private static String         _workingDirectory;
 
    final IPreferenceStore        _prefStore     = CommonActivator.getPrefStore();
 
@@ -87,13 +88,14 @@ public class DialogDropboxFolderBrowser extends TitleAreaDialog {
     */
    private Label                 _labelErrorMessage;
 
-   public DialogDropboxFolderBrowser(final Shell parentShell, final String accessToken) {
+   public DialogDropboxFolderBrowser(final Shell parentShell, final String accessToken, final String workingDirectory) {
 
       super(parentShell);
 
       setShellStyle(getShellStyle() | SWT.RESIZE);
 
       _accessToken = accessToken;
+      _workingDirectory = workingDirectory;
 
       setDefaultImage(Activator.getImageDescriptor(Messages.Image__Dropbox_Logo).createImage());
    }
@@ -337,9 +339,14 @@ public class DialogDropboxFolderBrowser extends TitleAreaDialog {
       }
    }
 
-   private String selectFolder(final String folderAbsolutePath) {
+   private String selectFolder(String folderAbsolutePath) {
 
       try {
+
+         if (folderAbsolutePath.equals(ROOT_FOLDER)) {
+            folderAbsolutePath = UI.EMPTY_STRING;
+         }
+
          final ListFolderResult list = DropboxClient.getDefault(_accessToken).files().listFolder(folderAbsolutePath);
          _folderList = list.getEntries();
 
@@ -357,7 +364,7 @@ public class DialogDropboxFolderBrowser extends TitleAreaDialog {
 
    private String updateViewers() {
 
-      final String dropboxResult = selectFolder(UI.EMPTY_STRING);
+      final String dropboxResult = selectFolder(_workingDirectory);
 
       if (!StringUtils.isNullOrEmpty(dropboxResult)) {
          return dropboxResult;

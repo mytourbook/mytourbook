@@ -28,6 +28,7 @@ import java.util.stream.Stream;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
@@ -213,7 +214,7 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
 
    private float[] convertStringToFloatArray(final String values) {
 
-      if (values.equals(UI.EMPTY_STRING)) {
+      if (StringUtils.isNullOrEmpty(values)) {
          return null;
       }
 

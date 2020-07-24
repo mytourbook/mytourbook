@@ -10533,13 +10533,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    public String toString() {
       return "TourData [\n" //                                                      //$NON-NLS-1$
 
-            + ("start=" + startYear + "-" + startMonth + "-" + startDay + " ") //               //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-            + (startHour + ":" + startMinute + ":" + startSecond + "\n") //                     //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+            + ("start=" + startYear + UI.DASH + startMonth + UI.DASH + startDay + UI.SPACE) //               //$NON-NLS-1$
+            + (startHour + UI.SYMBOL_COLON + startMinute + UI.SYMBOL_COLON + startSecond + UI.NEW_LINE) //
 
-            + ("tourId=" + tourId + "\n") //                                          //$NON-NLS-1$ //$NON-NLS-2$
+            + ("tourId=" + tourId + UI.NEW_LINE) //                                          //$NON-NLS-1$
 
-            + ("object=" + super.toString() + "\n") //                                    //$NON-NLS-1$ //$NON-NLS-2$
-            + ("identityHashCode=" + System.identityHashCode(this) + "\n") //                  //$NON-NLS-1$ //$NON-NLS-2$
+            + ("object=" + super.toString() + UI.NEW_LINE) //                                    //$NON-NLS-1$
+            + ("identityHashCode=" + System.identityHashCode(this) + UI.NEW_LINE) //                  //$NON-NLS-1$
 
             //            + ("marker size:" + tourMarkers.size() + " " + tourMarkers+"\n") //$NON-NLS-1$
 

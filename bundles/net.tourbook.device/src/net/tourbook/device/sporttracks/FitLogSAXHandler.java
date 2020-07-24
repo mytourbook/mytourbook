@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -32,6 +32,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.util.MtMath;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TimeData;
@@ -940,7 +941,7 @@ public class FitLogSAXHandler extends DefaultHandler {
          _isInTimeZoneUtcOffset = false;
          _currentActivity.hasTimeZoneUtcOffset = false;
 
-         if (_characters.length() == 0 || _characters.toString().equals(UI.EMPTY_STRING)) {
+         if (StringUtils.isNullOrEmpty(_characters.toString())) {
             return;
          }
 
@@ -1130,10 +1131,10 @@ public class FitLogSAXHandler extends DefaultHandler {
             }
 
             final StringBuilder name = new StringBuilder();
-            if (!brand.equals(UI.EMPTY_STRING)) {
+            if (!StringUtils.isNullOrEmpty(brand)) {
                name.append(brand);
             }
-            if (!model.equals(UI.EMPTY_STRING)) {
+            if (!StringUtils.isNullOrEmpty(model)) {
                if (name.length() > 0) {
                   name.append(UI.DASH_WITH_SPACE + model);
                } else {
