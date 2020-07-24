@@ -922,9 +922,9 @@ public class Slideout_TourGeoFilter extends AdvancedSlideout implements ITourVie
 
       final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, COLUMN_ZOOM_LEVEL, SWT.TRAIL);
 
-      colDef.setColumnLabel(Messages.Map_Bookmark_Column_ZoomLevel_Tooltip);
-      colDef.setColumnHeaderText(Messages.Map_Bookmark_Column_ZoomLevel);
-      colDef.setColumnHeaderToolTipText(Messages.Map_Bookmark_Column_ZoomLevel_Tooltip);
+      colDef.setColumnLabel(Messages.Map_Bookmark_Column_ZoomLevel2_Tooltip);
+      colDef.setColumnHeaderText(Messages.Map_Bookmark_Column_ZoomLevel2);
+      colDef.setColumnHeaderToolTipText(Messages.Map_Bookmark_Column_ZoomLevel2_Tooltip);
 
       colDef.setIsDefaultColumn();
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(5));

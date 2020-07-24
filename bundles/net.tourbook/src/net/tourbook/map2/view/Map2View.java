@@ -2895,7 +2895,6 @@ public class Map2View extends ViewPart implements
     * @return Returns a list which contains all photos.
     */
    private ArrayList<Photo> paintPhotoSelection(final ISelection selection) {
-
       _isLinkPhotoDisplayed = false;
 
       final ArrayList<Photo> allPhotos = new ArrayList<>();
@@ -2919,13 +2918,13 @@ public class Map2View extends ViewPart implements
             final ArrayList<Photo> galleryPhotos = tourData.getGalleryPhotos();
 
             if (galleryPhotos != null) {
-               allPhotos.addAll(galleryPhotos);
+               allPhotos.addAll(galleryPhotos);  
             }
          }
       }
 
       paintPhotos(allPhotos);
-
+      
       return allPhotos;
    }
 
