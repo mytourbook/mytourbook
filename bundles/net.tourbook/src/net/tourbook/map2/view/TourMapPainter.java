@@ -1822,7 +1822,9 @@ public class TourMapPainter extends MapPainter {
          int devX;
          int devY;
 
-         final Image tourMarkerImage = drawTourMarkerImage(gcTile.getDevice(), tourMarker.getLabel(), markerBounds);
+         //TODO FB. NExt challenge: draw an SVG (TODO) to show a pause.
+         // Icing on the cake, when clicking,show the total amount of pause (just like ST)
+         final Image tourMarkerImage = drawTourMarkerImage(gcTile.getDevice(), "PAUSE", markerBounds);
          {
             devX = devMarkerPosX - markerBounds.width / 2;
             devY = devMarkerPosY - markerBounds.height;
