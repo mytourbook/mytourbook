@@ -28,8 +28,10 @@ dependencies {
    
    compile project(':vtm')
    compile project(':vtm-desktop')
+   compile project(':vtm-desktop-lwjgl')
    compile project(':vtm-gdx')
    compile project(':vtm-http')
+   compile project(':vtm-mvt')
    compile project(':vtm-themes')
    
    // !!! STRING MUST BE CREATED WITH " OTHERWISE IT IS NOT WORKING !!!

@@ -1,3 +1,19 @@
+/*******************************************************************************
+ * Copyright (C) 2019, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2019, 2020 Thomas Theussing
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation version 2 of the License.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
+ *******************************************************************************/
 package net.tourbook.preferences;
 
 import java.io.FileInputStream;
@@ -19,11 +35,12 @@ import net.tourbook.common.UI;
 
 /**
  * reading Mapsforge theme. after making instance call readXML
- * 
+ *
  * @author telemaxx
  * @see http://www.vogella.com/tutorials/JavaXML/article.html
  */
 public class MapsforgeStyleParser {
+
    static final String ID              = "id";           //$NON-NLS-1$
    static final String XML_LAYER       = "layer";        //$NON-NLS-1$
    static final String STYLE_MENU      = "stylemenu";    //$NON-NLS-1$
@@ -40,15 +57,43 @@ public class MapsforgeStyleParser {
    String              defaultstyle    = UI.EMPTY_STRING;
 
    /**
+    * just for test purposes
+    *
+    * @param args
+    */
+   public static void main(final String args[]) {
+
+      final MapsforgeStyleParser mapStyleParser = new MapsforgeStyleParser();
+      //List<MapsforgeThemeStyle> styles = mapStyleParser.readXML("C:\\Users\\top\\BTSync\\oruxmaps\\mapstyles\\TMS\\Tiramisu_3_0_beta1.xml"); //$NON-NLS-1$
+      final List<MapsforgeThemeStyle> styles = mapStyleParser.readXML("C:\\Users\\top\\BTSync\\oruxmaps\\mapstyles\\ELV4\\Elevate.xml"); //$NON-NLS-1$
+      System.out.println("Stylecount: " + styles.size()); //$NON-NLS-1$
+      System.out.println("Defaultlanguage: " + mapStyleParser.getDefaultLanguage()); //$NON-NLS-1$
+      System.out.println("Defaultstyle:    " + mapStyleParser.getDefaultStyle()); //$NON-NLS-1$
+      //System.out.println("Defaultstylename de:" + styles.);
+      for (final MapsforgeThemeStyle style : styles) {
+         System.out.println(style);
+         System.out.println("local Name: " + style.getName("de")); //$NON-NLS-1$ //$NON-NLS-2$
+      }
+   }
+
+   public String getDefaultLanguage() {
+      return defaultlanguage;
+   }
+
+   public String getDefaultStyle() {
+      return defaultstyle;
+   }
+
+   /**
     * reading mapsforgetheme and return a list with selectable layers
-    * 
+    *
     * @param xmlFile
     * @return
     */
    @SuppressWarnings({ "unchecked", "null" })
    public List<MapsforgeThemeStyle> readXML(final String xmlFile) {
 
-      final List<MapsforgeThemeStyle> items = new ArrayList<MapsforgeThemeStyle>();
+      final List<MapsforgeThemeStyle> items = new ArrayList<>();
       try (InputStream in = new FileInputStream(xmlFile)) {
          // First, create a new XMLInputFactory
          final XMLInputFactory inputFactory = XMLInputFactory.newInstance();
@@ -127,31 +172,4 @@ public class MapsforgeStyleParser {
       }
       return items;
    } //end ReadConfig
-
-   public String getDefaultLanguage() {
-      return defaultlanguage;
-   }
-
-   public String getDefaultStyle() {
-      return defaultstyle;
-   }
-
-   /**
-    * just for test purposes
-    * 
-    * @param args
-    */
-   public static void main(final String args[]) {
-      final MapsforgeStyleParser mapStyleParser = new MapsforgeStyleParser();
-      //List<MapsforgeThemeStyle> styles = mapStyleParser.readXML("C:\\Users\\top\\BTSync\\oruxmaps\\mapstyles\\TMS\\Tiramisu_3_0_beta1.xml"); //$NON-NLS-1$
-      final List<MapsforgeThemeStyle> styles = mapStyleParser.readXML("C:\\Users\\top\\BTSync\\oruxmaps\\mapstyles\\ELV4\\Elevate.xml"); //$NON-NLS-1$
-      System.out.println("Stylecount: " + styles.size()); //$NON-NLS-1$
-      System.out.println("Defaultlanguage: " + mapStyleParser.getDefaultLanguage()); //$NON-NLS-1$
-      System.out.println("Defaultstyle:    " + mapStyleParser.getDefaultStyle()); //$NON-NLS-1$
-      //System.out.println("Defaultstylename de:" + styles.);
-      for (final MapsforgeThemeStyle style : styles) {
-         System.out.println(style);
-         System.out.println("local Name: " + style.getName("de")); //$NON-NLS-1$ //$NON-NLS-2$
-      }
-   }
 }

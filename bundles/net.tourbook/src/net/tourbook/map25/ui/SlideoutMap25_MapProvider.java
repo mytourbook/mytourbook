@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,10 +15,24 @@
  *******************************************************************************/
 package net.tourbook.map25.ui;
 
+import de.byteholder.geoclipse.mapprovider.IMapProviderListener;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
+import net.tourbook.Messages;
+import net.tourbook.common.UI;
+import net.tourbook.common.action.ActionOpenPrefDialog;
+import net.tourbook.common.font.MTFont;
+import net.tourbook.common.tooltip.ToolbarSlideout;
+import net.tourbook.map25.Map25App;
+import net.tourbook.map25.Map25Provider;
+import net.tourbook.map25.Map25ProviderManager;
+import net.tourbook.map25.Map25View;
+import net.tourbook.preferences.MapsforgeThemeStyle;
+import net.tourbook.preferences.PrefPage_Map25Provider;
 
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -34,20 +48,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolBar;
 import org.oscim.theme.VtmThemes;
-
-import net.tourbook.Messages;
-import net.tourbook.common.UI;
-import net.tourbook.common.action.ActionOpenPrefDialog;
-import net.tourbook.common.font.MTFont;
-import net.tourbook.common.tooltip.ToolbarSlideout;
-import net.tourbook.map25.Map25App;
-import net.tourbook.map25.Map25Provider;
-import net.tourbook.map25.Map25ProviderManager;
-import net.tourbook.map25.Map25View;
-import net.tourbook.preferences.MapsforgeThemeStyle;
-import net.tourbook.preferences.PrefPage_Map25Provider;
-
-import de.byteholder.geoclipse.mapprovider.IMapProviderListener;
 
 /**
  * 2.5D map provider slideout
@@ -132,6 +132,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
             createUI_12_Actions(container);
          }
          createUI_20_Options(shellContainer);
+         //createUI_30_Info(shellContainer);
       }
 
       return shellContainer;
@@ -359,9 +360,9 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
 
       final int selectedIndex = _comboTheme.getSelectionIndex();
 
-      final boolean isThemeFromFile = mapProvider.isOfflineMap && selectedIndex == 0;
+      final boolean isThemeFromFile = mapProvider.is_mf_Map && selectedIndex == 0;
 
-      mapProvider.offline_IsThemeFromFile = isThemeFromFile;
+      mapProvider.mf_IsThemeFromFile = isThemeFromFile;
 
       if (isThemeFromFile) {
 
@@ -372,7 +373,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
          int themeIndex = selectedIndex;
 
          // adjust index for offline maps because the first item is not a theme
-         if (mapProvider.isOfflineMap) {
+         if (mapProvider.is_mf_Map) {
             themeIndex--;
          }
 
@@ -419,7 +420,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
       }
 
       // update model
-      mapProvider.offline_ThemeStyle = selectedThemeStyle;
+      mapProvider.mf_ThemeStyle = selectedThemeStyle;
 
       Map25ProviderManager.saveMapProvider();
 
@@ -466,8 +467,8 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
       }
 
       // a map provider is not selected -> this should not occure
-      int a = 0;
-      a++;
+//      int a = 0;
+//      a++;
    }
 
    private void updateMap(final Map25Provider mapProvider) {
@@ -479,7 +480,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
 
       String mpTooltip = UI.EMPTY_STRING;
 
-      if (mapProvider.isOfflineMap) {
+      if (mapProvider.is_mf_Map) {
 
          // offline
 
@@ -496,8 +497,8 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
          mpTooltip = String.format(Messages.Slideout_Map25Provider_Combo_MapProvider_Offline_Tooltip,
 
                mapProvider.tileEncoding,
-               mapProvider.offline_MapFilepath,
-               mapProvider.offline_ThemeFilepath,
+               mapProvider.mf_MapFilepath,
+               mapProvider.mf_ThemeFilepath,
                themeStyleText
 
          );
@@ -526,7 +527,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
        */
       _comboTheme.removeAll();
 
-      if (mapProvider != null && mapProvider.isOfflineMap) {
+      if (mapProvider != null && mapProvider.is_mf_Map) {
 
          // add an additional option to use the theme from the theme file
 
@@ -546,7 +547,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
          return;
       }
 
-      if (mapProvider.isOfflineMap && mapProvider.offline_IsThemeFromFile) {
+      if (mapProvider.is_mf_Map && mapProvider.mf_IsThemeFromFile) {
 
          // select: theme is from a file
          _comboTheme.select(0);
@@ -554,7 +555,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
       }
 
       int themeIndex = Map25ProviderManager.getThemeIndex(mapProvider.theme, mapProvider.tileEncoding);
-      if (mapProvider.isOfflineMap) {
+      if (mapProvider.is_mf_Map) {
 
          // adjust because of the offline additional item
 
@@ -573,7 +574,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
 
       _comboThemeStyle.removeAll();
 
-      if (mapProvider.isOfflineMap == false) {
+      if (mapProvider.is_mf_Map == false) {
 
          // online map has no theme styles
 
@@ -604,7 +605,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
          return;
       }
 
-      if (mapProvider.isOfflineMap && _comboTheme.getSelectionIndex() > 0) {
+      if (mapProvider.is_mf_Map && _comboTheme.getSelectionIndex() > 0) {
 
          /*
           * When it's an offline map and the themes are NOT from the a file then there are no theme
@@ -637,7 +638,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
 
          _comboThemeStyle.add(mfStyle.getLocaleName());
 
-         if (mfStyle.getXmlLayer().equals(mapProvider.offline_ThemeStyle)) {
+         if (mfStyle.getXmlLayer().equals(mapProvider.mf_ThemeStyle)) {
             styleSelectIndex = styleIndex + 1;
          }
       }
