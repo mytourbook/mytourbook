@@ -68,6 +68,9 @@ Improvements
   - Changed first run wizard so that user can select units before configuring first user https://github.com/wolfgang-ch/mytourbook/pull/204 
   - Changed user height unit to feet and inches instead of meters for users using imperial units https://github.com/wolfgang-ch/mytourbook/pull/204 
 
+* EasyImportManager updates for DropBox (rtdog)
+  - Added feature to allow interruption of filesystems in EasyImportManager which allows DropBox to perform better https://github.com/wolfgang-ch/mytourbook/pull/211
+  - Removed a few synchronization issues to prevent spurious errors
   
 UI Themes
 =========
