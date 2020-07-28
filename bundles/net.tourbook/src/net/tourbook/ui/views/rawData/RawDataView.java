@@ -195,7 +195,6 @@ import org.joda.time.PeriodType;
  */
 public class RawDataView extends ViewPart implements ITourProviderAll, ITourViewer3 {
 
-
    public static final String  ID                                         = "net.tourbook.views.rawData.RawDataView";                         //$NON-NLS-1$
 
    private static final String COLUMN_FACTORY_TIME_ZONE_DIFF_TOOLTIP      = net.tourbook.ui.Messages.ColumnFactory_TimeZoneDifference_Tooltip;
@@ -218,7 +217,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private static final String HTML_TD_SPACE                              = "<td ";                                                           //$NON-NLS-1$
    private static final String HTML_TD_END                                = "</td>";                                                          //$NON-NLS-1$
    private static final String HTML_TR                                    = "<tr>";                                                           //$NON-NLS-1$
-private static final String HTML_TR_END                                = "</tr>";                                                          //$NON-NLS-1$
+   private static final String HTML_TR_END                                = "</tr>";                                                          //$NON-NLS-1$
    //
    private static final String JS_FUNCTION_ON_SELECT_IMPORT_CONFIG        = "onSelectImportConfig";                                           //$NON-NLS-1$
    //
@@ -251,7 +250,6 @@ private static final String HTML_TR_END                                = "</tr>"
    public static final boolean STATE_IS_SET_BODY_WEIGHT_DEFAULT           = true;
    //
    private static final String HREF_TOKEN                                 = "#";                                                              //$NON-NLS-1$
-
    private static final String PAGE_ABOUT_BLANK                           = "about:blank";                                                    //$NON-NLS-1$
 
    /**
@@ -284,7 +282,6 @@ private static final String HTML_TR_END                                = "</tr>"
    private static String       HREF_ACTION_IMPORT_FROM_FILES;
    private static String       HREF_ACTION_OLD_UI;
    private static String       HREF_ACTION_SERIAL_PORT_CONFIGURED;
-
    private static String       HREF_ACTION_SERIAL_PORT_DIRECTLY;
    private static String       HREF_ACTION_SETUP_EASY_IMPORT;
 
@@ -300,8 +297,7 @@ private static final String HTML_TR_END                                = "</tr>"
    }
 
    private static boolean                 _isStopWatchingStoresThread;
-   public static volatile ReentrantLock THREAD_WATCHER_LOCK = new ReentrantLock();
-
+   public static volatile ReentrantLock   THREAD_WATCHER_LOCK             = new ReentrantLock();
    //
    private final IPreferenceStore         _prefStore                      = TourbookPlugin.getPrefStore();
    private final IPreferenceStore         _prefStoreCommon                = CommonActivator.getPrefStore();
@@ -2261,6 +2257,7 @@ private static final String HTML_TR_END                                = "</tr>"
           * Eclipse 3.8 with Linux has only a limited css3 support -> DISABLED
           */
          if (UI.IS_WIN) {
+
             webFile = WEB.getResourceFile(WEB_RESOURCE_TOUR_IMPORT_CSS3);
             css3 = Util.readContentFromFile(webFile.getAbsolutePath());
          }
@@ -5291,7 +5288,6 @@ private static final String HTML_TR_END                                = "</tr>"
 
       // activate store watching
       _isWatchingStores.set(true);
-
    }
 
    private void thread_FolderWatcher_Deactivate() {
