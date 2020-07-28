@@ -91,15 +91,38 @@ public class Map25ProviderManager {
       _mapProviderListeners.add(listener);
    }
 
+   
    /**
-    * opensciencemap.org
+    * mapilion.com/
     */
-   private static Map25Provider createMapProvider_Default() {
+   private static Map25Provider createMapProvider_Mapilion() {
 
       final Map25Provider mapProvider = new Map25Provider();
 
       mapProvider.isDefault = true;
       mapProvider.isEnabled = true;
+      mapProvider.name = Messages.Map25_Provider_Mapilion_Name;
+      mapProvider.online_url = "https://tiles.mapilion.com/data/v3"; //$NON-NLS-1$
+      mapProvider.online_TilePath = "/{Z}/{X}/{Y}.pbf"; //$NON-NLS-1$
+      mapProvider.tileEncoding = TileEncoding.MP;
+      mapProvider.theme = VtmThemes.OPENMAPTILES;
+      mapProvider.description = Messages.Map25_Provider_Mapilion_Description; //$NON-NLS-1$
+
+      _defaultMapProvider = mapProvider;
+
+      return mapProvider;
+   }
+   
+   
+   /**
+    * opensciencemap.org, server seems to be down since 2019-12
+    */
+   private static Map25Provider createMapProvider_Default() {
+
+      final Map25Provider mapProvider = new Map25Provider();
+
+      //mapProvider.isDefault = true;
+      mapProvider.isEnabled = false;
       mapProvider.name = Messages.Map25_Provider_OpenScienceMap_Name;
       mapProvider.online_url = "http://opensciencemap.org/tiles/vtm"; //$NON-NLS-1$
       mapProvider.online_TilePath = "/{Z}/{X}/{Y}.vtm"; //$NON-NLS-1$
@@ -107,7 +130,7 @@ public class Map25ProviderManager {
       mapProvider.theme = VtmThemes.DEFAULT;
       mapProvider.description = Messages.Map25_Provider_OpenScienceMap_Description;
 
-      _defaultMapProvider = mapProvider;
+      //_defaultMapProvider = mapProvider;
 
       return mapProvider;
    }
@@ -121,10 +144,10 @@ public class Map25ProviderManager {
 
       mapProvider.isEnabled = false;
       mapProvider.name = "0_OpenandromapV4Map_OpenandromapTheme_Switzerland"; //$NON-NLS-1$
-      mapProvider.offline_MapFilepath = "C:\\OfflineMaps\\mapfiles\\www.openandromaps.org\\Switzerland_ML.map"; //$NON-NLS-1$
-      mapProvider.offline_ThemeFilepath = "C:\\OfflineMaps\\mapstyles\\www.openandromaps.org\\Elements.xml"; //$NON-NLS-1$
+      mapProvider.mf_MapFilepath = "C:\\OfflineMaps\\mapfiles\\www.openandromaps.org\\Switzerland_ML.map"; //$NON-NLS-1$
+      mapProvider.mf_ThemeFilepath = "C:\\OfflineMaps\\mapstyles\\www.openandromaps.org\\Elements.xml"; //$NON-NLS-1$
       mapProvider.tileEncoding = TileEncoding.MF;
-      mapProvider.offline_ThemeStyle = "elv-mtb"; //$NON-NLS-1$
+      mapProvider.mf_ThemeStyle = "elv-mtb"; //$NON-NLS-1$
       mapProvider.description = Messages.Map25_Provider_OpenAndoMap_Description;
 
       return mapProvider;
@@ -194,6 +217,10 @@ public class Map25ProviderManager {
       switch (tileEncoding) {
       case MVT:
          return VtmThemes.MAPZEN;
+
+         // Mapilion   
+      case MP:
+         return VtmThemes.OPENMAPTILES;
 
       // Open Science Map
       case VTM:
@@ -303,26 +330,24 @@ public class Map25ProviderManager {
                   mapProvider.name           = Util.getXmlString(xml, ATTR_NAME, UI.EMPTY_STRING);
                   mapProvider.description    = Util.getXmlString(xml, ATTR_DESCRIPTION, UI.EMPTY_STRING);
 
-                  mapProvider.isOfflineMap   = Util.getXmlBoolean(xml, ATTR_IS_OFFLINE_MAP, false);
+                  mapProvider.is_mf_Map   = Util.getXmlBoolean(xml, ATTR_IS_OFFLINE_MAP, false);
 
-                  if (mapProvider.isOfflineMap) {
+                  if (mapProvider.is_mf_Map) {
 
-                     mapProvider.offline_IsThemeFromFile    = Util.getXmlBoolean(xml, ATTR_OFFLINE_IS_THEME_FROM_FILE, true);
-                     mapProvider.offline_MapFilepath        = Util.getXmlString(xml, ATTR_OFFLINE_MAP_FILEPATH, UI.EMPTY_STRING);
-                     mapProvider.offline_ThemeFilepath      = Util.getXmlString(xml, ATTR_OFFLINE_THEME_FILEPATH, UI.EMPTY_STRING);
-                     mapProvider.offline_ThemeStyle         = Util.getXmlString(xml, ATTR_OFFLINE_THEME_STYLE, UI.EMPTY_STRING);
+                     mapProvider.mf_IsThemeFromFile    = Util.getXmlBoolean(xml, ATTR_OFFLINE_IS_THEME_FROM_FILE, true);
+                     mapProvider.mf_MapFilepath        = Util.getXmlString(xml, ATTR_OFFLINE_MAP_FILEPATH, UI.EMPTY_STRING);
+                     mapProvider.mf_ThemeFilepath      = Util.getXmlString(xml, ATTR_OFFLINE_THEME_FILEPATH, UI.EMPTY_STRING);
+                     mapProvider.mf_ThemeStyle         = Util.getXmlString(xml, ATTR_OFFLINE_THEME_STYLE, UI.EMPTY_STRING);
 
                   } else {
 
                      mapProvider.online_ApiKey              = Util.getXmlString(xml, ATTR_ONLINE_API_KEY, UI.EMPTY_STRING);
-                     //mapProvider.online_TilePath            = Util.getXmlString(xml, ATTR_ONLINE_TILE_PATH, UI.EMPTY_STRING);
-                     //mapProvider.online_url                 = Util.getXmlString(xml, ATTR_ONLINE_URL, UI.EMPTY_STRING);                    
                      mapProvider.online_TilePath            = Util.getXmlString(xml, ATTR_ONLINE_TILE_PATH, "/{Z}/{X}/{Y}.vtm"); //$NON-NLS-1$
                      mapProvider.online_url                 = Util.getXmlString(xml, ATTR_ONLINE_URL, "http://opensciencemap.org/tiles/vtm"); //$NON-NLS-1$
                   }
 // SET_FORMATTING_ON
 
-                  final boolean isOfflineThemeFromFile = mapProvider.isOfflineMap && mapProvider.offline_IsThemeFromFile;
+                  final boolean isOfflineThemeFromFile = mapProvider.is_mf_Map && mapProvider.mf_IsThemeFromFile;
                   final TileEncoding tileEncoding = (TileEncoding) Util.getXmlEnum(xml, ATTR_TILE_ENCODING, TileEncoding.VTM);
 
                   mapProvider.tileEncoding = tileEncoding;
@@ -330,8 +355,8 @@ public class Map25ProviderManager {
                         ? null
                         : (VtmThemes) Util.getXmlEnum(xml, ATTR_THEME, getDefaultTheme(tileEncoding));
 
-    /*              System.out.println("################## Name, Url and online_TilePath: " + mapProvider.name + " " + mapProvider.online_url //$NON-NLS-1$//$NON-NLS-2$
-                        + mapProvider.online_TilePath);*/
+                  Map25App.debugPrint("################## Name, Url and online_TilePath: " + mapProvider.name + " " + mapProvider.online_url //$NON-NLS-1$//$NON-NLS-2$
+                        + mapProvider.online_TilePath);
 
                   allMapProvider.add(mapProvider);
                }
@@ -349,6 +374,7 @@ public class Map25ProviderManager {
           * Create default map providers
           */
          allMapProvider.add(_defaultMapProvider);
+         allMapProvider.add(createMapProvider_Mapilion());
          allMapProvider.add(createMapProvider_Mapzen());
          allMapProvider.add(createMapProvider_Mapsforge());
          allMapProvider.add(createMapProvider_MyTileServer());
@@ -448,7 +474,7 @@ public class Map25ProviderManager {
 
             final IMemento xml = xmlRoot.createChild(TAG_MAP_PROVIDER);
 
-            final boolean isOfflineMap = mapProvider.isOfflineMap;
+            final boolean isOfflineMap = mapProvider.is_mf_Map;
 
             xml.putString(ATTR_UUID, mapProvider.getId().toString());
 
@@ -462,10 +488,10 @@ public class Map25ProviderManager {
 
             if (isOfflineMap) {
 
-               xml.putBoolean(ATTR_OFFLINE_IS_THEME_FROM_FILE, mapProvider.offline_IsThemeFromFile);
-               xml.putString(ATTR_OFFLINE_MAP_FILEPATH, mapProvider.offline_MapFilepath);
-               xml.putString(ATTR_OFFLINE_THEME_FILEPATH, mapProvider.offline_ThemeFilepath);
-               xml.putString(ATTR_OFFLINE_THEME_STYLE, mapProvider.offline_ThemeStyle);
+               xml.putBoolean(ATTR_OFFLINE_IS_THEME_FROM_FILE, mapProvider.mf_IsThemeFromFile);
+               xml.putString(ATTR_OFFLINE_MAP_FILEPATH, mapProvider.mf_MapFilepath);
+               xml.putString(ATTR_OFFLINE_THEME_FILEPATH, mapProvider.mf_ThemeFilepath);
+               xml.putString(ATTR_OFFLINE_THEME_STYLE, mapProvider.mf_ThemeStyle);
 
             } else {
 

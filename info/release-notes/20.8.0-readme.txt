@@ -1,11 +1,4 @@
-20.?.0                                                 ?. Month 2020
-
-
-TODO's
-======  
-             
-  - csv export: export new column(s) in tourbook view
-
+20.8.0                                                 ?. August 2020
 
 New
 ===
@@ -19,7 +12,6 @@ New
 
 * Dropbox Integration (Frederic)
   - Ability to connect a Dropbox account to MyTourbook, and also choosing a specific a folder for this account. This Dropbox folder can be set up as a device to watch in the Easy Import Dashboard. In this case, added or deleted files will be automatically and immediately detected.
-  
 
 * Import Suunto Quest Files (Frederic)
 
@@ -71,7 +63,11 @@ Improvements
 * Tour Book view (Frederic)
   - Adding the ability to bulk edit the weather conditions
 
+* Better Imperial Unit Support (rtdog)
+  - Changed first run wizard so that user can select units before configuring first user https://github.com/wolfgang-ch/mytourbook/pull/204 
+  - Changed user height unit to feet and inches instead of meters for users using imperial units https://github.com/wolfgang-ch/mytourbook/pull/204 
 
+  
 UI Themes
 =========
 
@@ -81,7 +77,7 @@ UI Themes
    -cssTheme org.eclipse.e4.ui.css.theme.e4_default
    -cssTheme org.eclipse.e4.ui.css.theme.e4_dark
 
-  The "dark" theme can also be used, but MyTourbook is not yet prepared for it, however it looks not very bad. 
+  The "dark" theme can be used but MyTourbook is not yet prepared for it, however it looks not very bad. 
   The "classic" theme is a little bit different compared with the theme in MyTourbook before 20.8.
   
 
@@ -97,6 +93,9 @@ Changes
 * Tour Editor View - Swim slices (Frederic)
   - Renamed the column "Strokes" to "Stk/length" (Number of strokes per length)
   - Renamed the column "Cadence" to "Stk/min" (Number of strokes per minute)
+
+* Suunto 9 (Frederic)
+  Support for activities that are split into several physical files (i.e.: long activities)
 
 
 Fixes   
@@ -124,6 +123,8 @@ Fixes
 * Tour Filter (Frederic)
   - When filtering on start dates, the filters "Greater Than or Equal", "Less than", "Equals", "Not Equals" were not working
  
+ * TourData Editor Save (rtdog)
+  - Using the hotkey to save a modified tour on TourData Editor saved to DB but not on local screen.  Fixed. https://github.com/wolfgang-ch/mytourbook/pull/201
    
 Translation    
 ===========
@@ -137,6 +138,7 @@ Translation
 System   
 ======
 
-* Eclipse 2020-06
 * FIT SDK 21.32
+* Eclipse 2020-06
+* Java 9+ runtime support
 

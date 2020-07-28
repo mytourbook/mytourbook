@@ -1057,6 +1057,8 @@ public class Messages extends NLS {
    public static String        Image__save_tour_disabled;
    public static String        Image__show_distance_on_x_axis;
    public static String        Image__show_distance_on_x_axis_disabled;
+   public static String        Image__show_distance_on_x_axis_imperial;
+   public static String        Image__show_distance_on_x_axis_imperial_disabled;
    public static String        Image__show_time_on_x_axis;
    public static String        Image__spline_point;
    public static String        Image__synch_graph_byScale;
@@ -1376,18 +1378,22 @@ public class Messages extends NLS {
    public static String        Map_Bookmark_Action_Bookmark_Rename;
    public static String        Map_Bookmark_Button_Add;
    public static String        Map_Bookmark_Button_Rename;
-   public static String        Map_Bookmark_Column_Bearing;
-   public static String        Map_Bookmark_Column_Bearing_Tooltip;
+   public static String        Map_Bookmark_Column_Bearing2;                                     //2, because of refactoring
+   public static String        Map_Bookmark_Column_Bearing2_Tooltip;                             //2, because of refactoring
    public static String        Map_Bookmark_Column_Latitude;
    public static String        Map_Bookmark_Column_Latitude_Tooltip;
    public static String        Map_Bookmark_Column_Longitude;
    public static String        Map_Bookmark_Column_Longitude_Tooltip;
+   public static String        Map_Bookmark_Column_PositionMarkerLatitude;
+   public static String        Map_Bookmark_Column_PositionMarkerLatitude_Tooltip;
+   public static String        Map_Bookmark_Column_PositionMarkerLongitude;
+   public static String        Map_Bookmark_Column_PositionMarkerLongitude_Tooltip;
    public static String        Map_Bookmark_Column_Name;
    public static String        Map_Bookmark_Column_Scale;
-   public static String        Map_Bookmark_Column_Tilt;
-   public static String        Map_Bookmark_Column_Tilt_Tooltip;
-   public static String        Map_Bookmark_Column_ZoomLevel;
-   public static String        Map_Bookmark_Column_ZoomLevel_Tooltip;
+   public static String        Map_Bookmark_Column_Tilt2;                                        //2, because of refactoring
+   public static String        Map_Bookmark_Column_Tilt2_Tooltip;                                //2, because of refactoring
+   public static String        Map_Bookmark_Column_ZoomLevel2;                                   //2, because of refactoring
+   public static String        Map_Bookmark_Column_ZoomLevel2_Tooltip;                           //2, because of refactoring
    public static String        Map_Bookmark_Dialog_AddBookmark_Message;
    public static String        Map_Bookmark_Dialog_AddBookmark_Title;
    public static String        Map_Bookmark_Dialog_RenameBookmark_Message;
@@ -1401,6 +1407,8 @@ public class Messages extends NLS {
    public static String        Map25_Config_SymbolOrientation_Billboard;
    public static String        Map25_Config_SymbolOrientation_Ground;
 
+   public static String        Map25_Provider_Mapilion_Description;
+   public static String        Map25_Provider_Mapilion_Name;
    public static String        Map25_Provider_MapzenVectorTiles_Description;
    public static String        Map25_Provider_MapzenVectorTiles_Name;
    public static String        Map25_Provider_MyTileServer_Description;
@@ -1592,6 +1600,7 @@ public class Messages extends NLS {
    public static String        Pref_Map25_Action_EditMapProviderPreferences_Tooltip;
    public static String        Pref_Map25_Dialog_MapFilename_Title;
    public static String        Pref_Map25_Dialog_MapStyleFilename_Title;
+   public static String        Pref_Map25_Encoding_Mapilion;
    public static String        Pref_Map25_Encoding_Mapsforge_Offline;
    public static String        Pref_Map25_Encoding_Mapzen;
    public static String        Pref_Map25_Encoding_OpenScienceMap;
@@ -2064,8 +2073,10 @@ public class Messages extends NLS {
    public static String Slideout_Map25MapOptions_Checkbox_Layer_Cartography_Tooltip;
    public static String Slideout_Map25MapOptions_Checkbox_Layer_Hillshading;
    public static String Slideout_Map25MapOptions_Checkbox_Layer_LabelSymbol;
+   public static String Slideout_Map25MapOptions_Checkbox_Layer_Satellite;
    public static String Slideout_Map25MapOptions_Checkbox_Layer_ScaleBar;
    public static String Slideout_Map25MapOptions_Checkbox_Layer_TileInfo;
+   public static String Slideout_Map25MapOptions_Checkbox_Photo_Title;
    public static String Slideout_Map25MapOptions_Checkbox_UseDraggedKeyNavigation;
    public static String Slideout_Map25MapOptions_Checkbox_UseDraggedKeyNavigation_Tooltip;
    public static String Slideout_Map25MapOptions_Group_MapLayer;
@@ -2104,6 +2115,7 @@ public class Messages extends NLS {
    public static String Slideout_Map25Provider_Label_MapProvider;
    public static String Slideout_Map25Provider_Label_MapProvider_Title;
    public static String Slideout_Map25Provider_Label_ThemeStyle;
+   public static String Slideout_Map25Provider_Label_Copyright;
 
    public static String Slideout_Map2MapOptions_Action_SetTourPaintingModeBasic;
    public static String Slideout_Map2MapOptions_Dialog_EnhancePaintingWarning_Message;

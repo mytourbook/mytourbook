@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,6 +21,7 @@ import java.net.URL;
 
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
+import net.tourbook.common.util.StringUtils;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.FileLocator;
@@ -378,13 +379,13 @@ public class SplashManager {
 
    public void setSplashImagePath(final String splashPath) {
 
-      Assert.isLegal(splashPath != null && !splashPath.equals(UI.EMPTY_STRING));
+      Assert.isLegal(!StringUtils.isNullOrEmpty(splashPath));
       this.splashPath = splashPath;
    }
 
    public void setSplashPluginId(final String pluginId) {
 
-      Assert.isLegal(pluginId != null && !pluginId.equals(UI.EMPTY_STRING));
+      Assert.isLegal(!StringUtils.isNullOrEmpty(pluginId));
       this.pluginId = pluginId;
    }
 
