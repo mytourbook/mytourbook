@@ -22,6 +22,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.TreeViewerItem;
@@ -29,7 +30,6 @@ import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tour.ITourItem;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.UI;
 
 public abstract class TVITourBookItem extends TreeViewerItem implements ITourItem {
 
@@ -612,6 +612,10 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       tourItem.colAvgPace = dbDistance == 0 ? 0 : dbDrivingTime * 1000 / dbDistance;
 
       tourItem.colPausedTime = tourItem.colTourRecordingTime - tourItem.colTourDrivingTime;
+
+      if (UI.IS_SCRAMBLE_DATA) {
+         tourItem.scrambleData();
+      }
 
       return tourItem;
    }
