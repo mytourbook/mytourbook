@@ -23,11 +23,11 @@ Improvements
 * Tour Book View (Frederic)
   - Adding the ability to bulk edit the weather conditions
 
-* Calendar View
-  - Tour pulse/power average values are displayed in the tour (day) content cell
-
 * Statistics (Frederic)
   - The number of years to be displayed in the graph is now dynamically filled and updated based on the number of available years
+
+* Calendar View
+  - Tour pulse/power average values can be displayed in the tour (day) content cell
 
 * 2D Map
   - The enhanced painting warning can be hidden in the track options slideout
@@ -48,7 +48,7 @@ Improvements
 * Tour Marker View (Frederic)
   - Added the Average Speed column
 
-* Photo
+* Photo View
   - Show selected/hovered folder in the Photo view with more contrast which makes it better readable
   
 * Dialog Adjust Elevation
@@ -78,8 +78,8 @@ UI Themes
    -cssTheme org.eclipse.e4.ui.css.theme.e4_default
    -cssTheme org.eclipse.e4.ui.css.theme.e4_dark
 
-  The "dark" theme can be used but MyTourbook is not yet prepared for it, however it looks not very bad. 
-  The "classic" theme is a little bit different compared with the theme in MyTourbook before 20.8.
+  The "dark" theme can be used but MyTourbook is not yet prepared for it 
+  The "classic" theme is a little bit different compared with the theme in MyTourbook before 20.8
   
 
 Changes  
@@ -110,17 +110,18 @@ Fixes
   - When importing files, the tour type is set only if it is checked in the launcher configuration
 
 * 3D Map (Frederic)
-  - Removed the deprecated or unavailable layers (ID_USDA_NAIP & ID_USDA_NAIP_USGS & MS Virtual Earth Aerial). Added the layers USGS NAIP PLUS, USGS Topo Base Map and USGS Topo Base Map Large
+  - Removed the deprecated or unavailable layers (ID_USDA_NAIP & ID_USDA_NAIP_USGS & MS Virtual Earth Aerial). 
+    Added the layers USGS NAIP PLUS, USGS Topo Base Map and USGS Topo Base Map Large
   - We disable the actions when the data series are not available
   - Fixed an issue where the Atmosphere and Scale layers would not appear when using MyTourbook in French
-  - 3D Map colors : Fixed the pace ranges from seconds to minutes for better readability
+  - 3D Map colors: Fixed the pace ranges from seconds to minutes for better readability
 
 * Tour Editor
   - Show daytime with am/pm in time slices/swim slices when imperial measurement system is selected
   - Fixed daytime to be not >24h
 
 * Tour Editor Save (rtdog)
-  - Using the hotkey to save a modified tour on TourData Editor saved to DB but not on local screen.  Fixed. https://github.com/wolfgang-ch/mytourbook/pull/201
+  - Using the hotkey to save a modified tour on TourData Editor saved to DB but not on local screen.  https://github.com/wolfgang-ch/mytourbook/pull/201
 
 * Tour Filter (Frederic)
   - When filtering on start dates, the filters "Greater Than or Equal", "Less than", "Equals", "Not Equals" were not working
