@@ -493,7 +493,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
        * Tour import
        */
       store.setDefault(ITourbookPreferences.IMPORT_IS_NEW_UI, false);
-      store.setDefault(ITourbookPreferences.IMPORT_DEFAULT_CADENCE, "rpm");
 
       /*
        * Adjust temperature

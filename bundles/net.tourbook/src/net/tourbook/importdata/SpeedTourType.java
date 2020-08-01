@@ -23,16 +23,15 @@ public class SpeedTourType implements Comparable<Object>, Cloneable {
 	/**
 	 * Average speed for this tour type in km/h.
 	 */
-	public float	avgSpeed;
-   public String cadenceType = "SPM";                           // TODO RT: test strongarm
-	public long		tourTypeId	= TourDatabase.ENTITY_IS_NOT_SAVED;
+   public float  avgSpeed;
+   public long   tourTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
+   public String cadence;
 
 	public SpeedTourType() {}
 
-   // TODO RT: SpeedTourType
-   public SpeedTourType(final int value, final String cadenceType) {
+   public SpeedTourType(final int value, final String cadence) {
 		this.avgSpeed = value;
-      this.cadenceType = cadenceType;
+      this.cadence = cadence;
 	}
 
 	@Override
@@ -64,7 +63,7 @@ public class SpeedTourType implements Comparable<Object>, Cloneable {
       //
             + ("avgSpeed=" + avgSpeed + ", ") //$NON-NLS-1$ //$NON-NLS-2$
             + ("tourTypeId=" + tourTypeId + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("cadenceType=" + cadenceType + ", ") //$NON-NLS-1$ //$NON-NLS-2$
+            + ("cadence=" + cadence + ", ") //$NON-NLS-1$ //$NON-NLS-2$
             //
             + "]"; //$NON-NLS-1$
    }

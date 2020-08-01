@@ -429,6 +429,7 @@ private static final String HTML_TR_END                                = "</tr>"
    public static final boolean STATE_IS_IGNORE_INVALID_FILE_DEFAULT       = true;
    public static final String  STATE_IS_SET_BODY_WEIGHT                   = "isSetBodyWeight";                                                //$NON-NLS-1$
    public static final boolean STATE_IS_SET_BODY_WEIGHT_DEFAULT           = true;
+   public static final String  STATE_DEFAULT_CADENCE                      = "defaultCadence";                                                 //$NON-NLS-1$
    public static final String  STATE_DEFAULT_CADENCE_DEFAULT              = "rpm";                                                            //$NON-NLS-1$
 
    //
@@ -4614,6 +4615,9 @@ private static final String HTML_TR_END                                = "</tr>"
       // restore: set body weight status before the tours are imported
       final boolean isSetBodyWeight = Util.getStateBoolean(_state, STATE_IS_SET_BODY_WEIGHT, STATE_IS_SET_BODY_WEIGHT_DEFAULT);
       _rawDataMgr.setState_IsSetBodyWeight(isSetBodyWeight);
+
+      final String defaultCadence = Util.getStateString(_state, STATE_DEFAULT_CADENCE, STATE_DEFAULT_CADENCE_DEFAULT);
+      _rawDataMgr.setState_DefaultCadence(defaultCadence);
 
       // auto open import log view
       final boolean isAutoOpenLogView = Util.getStateBoolean(_state, //

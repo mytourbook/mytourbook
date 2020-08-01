@@ -1854,6 +1854,8 @@ public class Messages extends NLS {
    public static String PrefPage_Import_Checkbox_IgnoreInvalidFiles;
    public static String PrefPage_Import_Checkbox_IgnoreInvalidFiles_Tooltip;
    public static String PrefPage_Import_Checkbox_SetBodyWeight;
+   public static String PrefPage_Import_Default_Cadence;
+   public static String PrefPage_Import_Default_Cadence_Tooltip;
 
    public static String PrefPage_ViewActions_Group;
    public static String PrefPage_ViewActions_Label_DoubleClick;

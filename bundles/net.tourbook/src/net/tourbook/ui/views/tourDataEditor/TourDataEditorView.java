@@ -9187,7 +9187,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       sb.append(UI.TAB);
 
       // cadence
-      sb.append("rpm"); //$NON-NLS-1$  // TODO RT: Does this export handle spm vs. rpm?
+      sb.append("rpm"); //$NON-NLS-1$
       sb.append(UI.TAB);
 
       // speed

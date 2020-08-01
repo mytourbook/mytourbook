@@ -416,6 +416,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
    private final IDialogSettings        _state                            = TourbookPlugin.getState(ID);
    private final IDialogSettings        _stateIC                          = TourbookPlugin.getState(ID + "_IC"); //$NON-NLS-1$
    private final IDialogSettings        _stateIL                          = TourbookPlugin.getState(ID + "_IL"); //$NON-NLS-1$
+   private final IDialogSettings        _stateRDV                         = TourbookPlugin.getState(RawDataView.ID);
    //
    private IPropertyChangeListener      _prefChangeListener;
    //
@@ -536,6 +537,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
    private Combo             _comboIL_TourType;
    private Combo                    _comboIL_One_TourType_Cadence;
    private Combo                    _comboIC_DeviceFolder;
+   private Combo[]                  _comboTT_Cadence;
    //
    private Image             _imageFileSystem;
    //
@@ -558,8 +560,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
    private Label             _lblIL_TemperatureAdjustmentDuration;
    private Label             _lblIL_TemperatureAdjustmentDuration_Unit;
    private Label[]           _lblTT_Speed_SpeedUnit;
-   private Label[]           _lblTT_Speed_TourTypeIcon;
-   Label[]                          _lblTest_Cadence_Type;                    //TODO RT: test, delete me
+   private Label[]                  _lblTT_Speed_TourTypeIcon;
    //
    private Link[]            _linkTT_Speed_TourType;
    private Link              _linkTT_One_TourType;
@@ -2041,13 +2042,15 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
          });
 
          _lblIL_One_TourTypeCadenceLabel = new Label(container, SWT.NONE);
-         _lblIL_One_TourTypeCadenceLabel.setText("Cadence"); // TODO RT: Language support
+         _lblIL_One_TourTypeCadenceLabel.setText(Messages.Tour_Editor_Label_Cadence);
 
-         _comboIL_One_TourType_Cadence = new Combo(container, SWT.NONE);
+         _comboIL_One_TourType_Cadence = new Combo(container, SWT.READ_ONLY | SWT.DROP_DOWN);
 
-         _comboIL_One_TourType_Cadence.add("rpm");
-         _comboIL_One_TourType_Cadence.add("spm"); // TODO RT: are these language specific?
+         _comboIL_One_TourType_Cadence.add(Messages.Tour_Editor_Radio_Cadence_Rpm);
+         _comboIL_One_TourType_Cadence.add(Messages.Tour_Editor_Radio_Cadence_Spm);
 
+         final String cadence = Util.getStateString(_stateRDV, RawDataView.STATE_DEFAULT_CADENCE, RawDataView.STATE_DEFAULT_CADENCE_DEFAULT);
+         _comboIL_One_TourType_Cadence.setText(cadence);
       }
 
       return container;
@@ -2133,10 +2136,10 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
        */
       _actionTTSpeed_Delete = new ActionSpeedTourType_Delete[speedTTSize];
       _lblTT_Speed_TourTypeIcon = new Label[speedTTSize];
-      _lblTest_Cadence_Type = new Label[speedTTSize];
       _lblTT_Speed_SpeedUnit = new Label[speedTTSize];
       _linkTT_Speed_TourType = new Link[speedTTSize];
       _spinnerTT_Speed_AvgSpeed = new Spinner[speedTTSize];
+      _comboTT_Cadence = new Combo[speedTTSize];
 
       _speedTourType_Container.setRedraw(false);
       {
@@ -2180,6 +2183,19 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
             linkTourType.addSelectionListener(_speedTourTypeListener);
 
             /*
+             * Combo: Cadence
+             */
+            final Label lblCadence = new Label(_speedTourType_Container, SWT.NONE);
+            lblCadence.setText(Messages.Tour_Editor_Label_Cadence);
+
+            final Combo comboCadence = new Combo(_speedTourType_Container, SWT.READ_ONLY | SWT.DROP_DOWN);
+            comboCadence.add(Messages.Tour_Editor_Radio_Cadence_Rpm);
+            comboCadence.add(Messages.Tour_Editor_Radio_Cadence_Spm);
+
+            final String cadence = Util.getStateString(_stateRDV, RawDataView.STATE_DEFAULT_CADENCE, RawDataView.STATE_DEFAULT_CADENCE_DEFAULT);
+            comboCadence.setText(cadence); // default for new records
+
+            /*
              * Context menu: Tour type
              */
             final MenuManager menuMgr = new MenuManager();
@@ -2207,6 +2223,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
             _lblTT_Speed_SpeedUnit[speedTTIndex] = lblUnit;
             _linkTT_Speed_TourType[speedTTIndex] = linkTourType;
             _spinnerTT_Speed_AvgSpeed[speedTTIndex] = spinnerValue;
+            _comboTT_Cadence[speedTTIndex] = comboCadence;
          }
       }
       _speedTourType_Container.setRedraw(true);
@@ -2231,7 +2248,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       final Composite speedTTContainer = new Composite(_speedTourType_ScrolledContainer, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(speedTTContainer);
       GridLayoutFactory.fillDefaults()
-            .numColumns(5)
+            .numColumns(7)
             .applyTo(speedTTContainer);
 
       _speedTourType_ScrolledContainer.setContent(speedTTContainer);
@@ -3297,6 +3314,10 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
                   for (final Label label : _lblTT_Speed_SpeedUnit) {
                      label.setEnabled(isILSelected);
+                  }
+
+                  for (final Combo combo : _comboTT_Cadence) {
+                     combo.setEnabled(isILSelected);
                   }
 
                   for (final Label label : _lblTT_Speed_TourTypeIcon) {
@@ -4486,10 +4507,12 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
                final Spinner spinnerAvgSpeed = _spinnerTT_Speed_AvgSpeed[speedTTIndex];
                final Link linkTourType = _linkTT_Speed_TourType[speedTTIndex];
+               final Combo comboCadence = _comboTT_Cadence[speedTTIndex];
 
                final SpeedTourType speedTourType = new SpeedTourType();
 
                speedTourType.avgSpeed = spinnerAvgSpeed.getSelection() * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+               speedTourType.cadence = comboCadence.getText();
 
                final Object tourTypeId = linkTourType.getData(DATA_KEY_TOUR_TYPE_ID);
                if (tourTypeId instanceof Long) {
@@ -4677,7 +4700,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
                   final Spinner spinnerAvgSpeed = _spinnerTT_Speed_AvgSpeed[speedTTIndex];
                   final Link linkTourType = _linkTT_Speed_TourType[speedTTIndex];
                   final Label labelTourTypeIcon = _lblTT_Speed_TourTypeIcon[speedTTIndex];
-                  final Label labelTestCadenceType = _lblTest_Cadence_Type[speedTTIndex];
+                  final Combo comboCadence = _comboTT_Cadence[speedTTIndex];
 
                   // update UI
                   final double avgSpeed = (speedTT.avgSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE) + 0.0001;
@@ -4690,7 +4713,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
                      linkTourType.setData(DATA_KEY_TOUR_TYPE_ID, null);
                      linkTourType.setText(Messages.Dialog_ImportConfig_Link_TourType);
                      labelTourTypeIcon.setImage(null);
-
                   } else {
 
                      linkTourType.setData(DATA_KEY_TOUR_TYPE_ID, tourTypeId);
@@ -4701,11 +4723,15 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
                      labelTourTypeIcon.setImage(TourTypeImage.getTourTypeImage(tourTypeId));
                   }
 
+                  if (speedTT.cadence != null) {
+                     comboCadence.setText(speedTT.cadence);
+                  }
+
                   // keep references
                   labelTourTypeIcon.setData(DATA_KEY_SPEED_TOUR_TYPE_INDEX, speedTTIndex);
                   linkTourType.setData(DATA_KEY_SPEED_TOUR_TYPE_INDEX, speedTTIndex);
                   spinnerAvgSpeed.setData(DATA_KEY_SPEED_TOUR_TYPE_INDEX, speedTTIndex);
-                  labelTestCadenceType.setData(DATA_KEY_SPEED_TOUR_TYPE_INDEX, speedTTIndex);
+                  comboCadence.setData(DATA_KEY_SPEED_TOUR_TYPE_INDEX, speedTTIndex);
                   _actionTTSpeed_Delete[speedTTIndex].setData(DATA_KEY_SPEED_TOUR_TYPE_INDEX, speedTTIndex);
                }
             }
@@ -4751,6 +4777,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
          _lblTT_Speed_SpeedUnit = null;
          _linkTT_Speed_TourType = null;
          _spinnerTT_Speed_AvgSpeed = null;
+         _comboTT_Cadence = null;
       }
    }
 

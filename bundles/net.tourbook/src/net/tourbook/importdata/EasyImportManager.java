@@ -143,7 +143,7 @@ public class EasyImportManager {
       return _instance;
    }
 
-   private final IDialogSettings    _state                                             = TourbookPlugin.getState(ID);
+   private final IDialogSettings _state     = TourbookPlugin.getState(ID);
 
    private EasyConfig               _easyConfig;
 
@@ -523,6 +523,10 @@ public class EasyImportManager {
       return osFiles;
    }
 
+   private float getTourTypeCadenceMultiplier(final String cadence) {
+      return (cadence.equals(Messages.Tour_Editor_Radio_Cadence_Rpm)) ? 1.0f : 2.0f;
+   }
+
    /**
     * @param osFolder
     * @return Returns the device OS path or <code>null</code> when this folder is not valid.
@@ -823,6 +827,7 @@ public class EasyImportManager {
                      EasyConfig.TOUR_TYPE_AVG_SPEED_MIN,
                      EasyConfig.TOUR_TYPE_AVG_SPEED_MAX);
 
+               speedVertex.cadence = Util.getXmlString(xmlSpeed, ATTR_IL_TOUR_TYPE_CADENCE, RawDataView.STATE_DEFAULT_CADENCE_DEFAULT);
                speedVertices.add(speedVertex);
             }
          }
@@ -832,7 +837,7 @@ public class EasyImportManager {
          final Long xmlTourTypeId = Util.getXmlLong(xmlConfig, ATTR_TOUR_TYPE_ID, null);
 
          importLauncher.oneTourType = TourDatabase.getTourType(xmlTourTypeId);
-         importLauncher.oneTourTypeCadence = Util.getXmlString(xmlConfig, ATTR_IL_TOUR_TYPE_CADENCE, "rpm"); // TODO RT Set default
+         importLauncher.oneTourTypeCadence = Util.getXmlString(xmlConfig, ATTR_IL_TOUR_TYPE_CADENCE, Messages.Tour_Editor_Radio_Cadence_Rpm);
 
       } else {
 
@@ -1179,6 +1184,7 @@ public class EasyImportManager {
 
                   Util.setXmlLong(xmlSpeedVertex, ATTR_TOUR_TYPE_ID, speedVertex.tourTypeId);
                   xmlSpeedVertex.putFloat(ATTR_AVG_SPEED, speedVertex.avgSpeed);
+                  xmlSpeedVertex.putString(ATTR_IL_TOUR_TYPE_CADENCE, speedVertex.cadence);
                }
             }
 
@@ -1207,7 +1213,7 @@ public class EasyImportManager {
    private void setTourType(final TourData tourData, final ImportLauncher importLauncher) {
 
       String tourTypeName = UI.EMPTY_STRING;
-      String tourtypeCadence = UI.EMPTY_STRING;
+      String tourTypeCadence = UI.EMPTY_STRING;
 
       final Enum<TourTypeConfig> ttConfig = importLauncher.tourTypeConfig;
 
@@ -1233,6 +1239,7 @@ public class EasyImportManager {
             if (tourAvgSpeed <= speedTourType.avgSpeed) {
 
                tourTypeId = speedTourType.tourTypeId;
+               tourTypeCadence = speedTourType.cadence;
                break;
             }
          }
@@ -1243,6 +1250,7 @@ public class EasyImportManager {
             tourTypeName = tourType.getName();
 
             tourData.setTourType(tourType);
+            tourData.setCadenceMultiplier(getTourTypeCadenceMultiplier(tourTypeCadence));
          }
 
       } else if (TourTypeConfig.TOUR_TYPE_CONFIG_ONE_FOR_ALL.equals(ttConfig)) {
@@ -1250,15 +1258,14 @@ public class EasyImportManager {
          // set one tour type
 
          final TourType tourType = importLauncher.oneTourType;
-         final float tourTypeCadenceMultiplier = (importLauncher.oneTourTypeCadence.equals("rpm")) ? 1.0f : 2.0f; // TODO RT: Should this be enum?
 
          if (tourType != null) {
 
             tourTypeName = tourType.getName();
-            tourtypeCadence = importLauncher.oneTourTypeCadence;
+            tourTypeCadence = importLauncher.oneTourTypeCadence;
 
             tourData.setTourType(tourType);
-            tourData.setCadenceMultiplier(tourTypeCadenceMultiplier);
+            tourData.setCadenceMultiplier(getTourTypeCadenceMultiplier(tourTypeCadence));
          }
 
       } else {
@@ -1271,7 +1278,6 @@ public class EasyImportManager {
             String.format(//
                   LOG_EASY_IMPORT_003_TOUR_TYPE_ITEM,
                   tourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S),
-                  tourTypeName + " (" + tourtypeCadence + ")"));
+                  tourTypeName + " (" + tourTypeCadence + ")"));
    }
-
 }

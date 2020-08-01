@@ -197,7 +197,6 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
          }
 
          {
-            //   TODO RT: Build pref GUI
             /*
              * Tour type cadence default
              */
@@ -206,20 +205,19 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
 
             final Label lblDefaultCadence = new Label(cadenceContainer, SWT.FILL | SWT.LEFT);
 
-            lblDefaultCadence.setText("Default Cadence"); // TODO RT: Create Message
+            lblDefaultCadence.setText(Messages.PrefPage_Import_Default_Cadence);
 
             _comboDefaultCadence = new Combo(cadenceContainer, SWT.DROP_DOWN | SWT.READ_ONLY);
 
-            _comboDefaultCadence.add("rpm");
-            _comboDefaultCadence.add("spm");
+            _comboDefaultCadence.add(Messages.Tour_Editor_Radio_Cadence_Rpm);
+            _comboDefaultCadence.add(Messages.Tour_Editor_Radio_Cadence_Spm);
             _comboDefaultCadence.addSelectionListener(_defaultSelectionListener);
 
             /*
              * Label:
              */
             final Label lblDefaultCadenceInfo = new Label(parent, SWT.WRAP | SWT.READ_ONLY);
-            lblDefaultCadenceInfo.setText(
-                  "The default label, brown fox jumps over the lazy dog, brown fox jumps over the lazy dog, brown fox jumps over the lazy dog"); // TODO RT: Message
+            lblDefaultCadenceInfo.setText(Messages.PrefPage_Import_Default_Cadence_Tooltip);
             GridDataFactory.fillDefaults()//
                   .grab(true, false)
                   .indent(_checkboxIndent, 0)
@@ -312,8 +310,10 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
             RawDataView.STATE_IS_SET_BODY_WEIGHT_DEFAULT);
       _chkSetBodyWeight.setSelection(isSetBodyWeight);
 
-
-      _comboDefaultCadence.setText(_prefStore.getString(ITourbookPreferences.IMPORT_DEFAULT_CADENCE));
+      final String defaultCadence = Util.getStateString(_state,
+            RawDataView.STATE_DEFAULT_CADENCE,
+            RawDataView.STATE_DEFAULT_CADENCE_DEFAULT);
+      _comboDefaultCadence.setText(defaultCadence);
    }
 
    private void saveState() {
@@ -328,8 +328,7 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
       _state.put(RawDataView.STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW, isOpenImportLog);
       _state.put(RawDataView.STATE_IS_IGNORE_INVALID_FILE, isIgnoreInvalidFile);
       _state.put(RawDataView.STATE_IS_SET_BODY_WEIGHT, isSetBodyWeight);
-
-      _prefStore.setValue(ITourbookPreferences.IMPORT_DEFAULT_CADENCE, defaultCadence);
+      _state.put(RawDataView.STATE_DEFAULT_CADENCE, defaultCadence);
 
       _rawDataMgr.setState_CreateTourIdWithTime(isCreateTourIdWithTime);
       _rawDataMgr.setState_IsOpenImportLogView(isOpenImportLog);
