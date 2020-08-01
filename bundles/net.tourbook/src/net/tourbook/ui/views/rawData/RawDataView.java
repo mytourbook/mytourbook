@@ -428,8 +428,8 @@ private static final String HTML_TR_END                                = "</tr>"
    public static final String  STATE_IS_IGNORE_INVALID_FILE               = "isIgnoreInvalidFile";                                            //$NON-NLS-1$
    public static final boolean STATE_IS_IGNORE_INVALID_FILE_DEFAULT       = true;
    public static final String  STATE_IS_SET_BODY_WEIGHT                   = "isSetBodyWeight";                                                //$NON-NLS-1$
-
    public static final boolean STATE_IS_SET_BODY_WEIGHT_DEFAULT           = true;
+   public static final String  STATE_DEFAULT_CADENCE_DEFAULT              = "rpm";                                                            //$NON-NLS-1$
 
    //
    private static final String HREF_TOKEN                                 = "#";                                                              //$NON-NLS-1$
@@ -456,7 +456,9 @@ private static final String HTML_TR_END                                = "</tr>"
    private static final String DOM_ID_DEVICE_ON_OFF                       = "deviceOnOff";                                                    //$NON-NLS-1$
    private static final String DOM_ID_DEVICE_STATE                        = "deviceState";                                                    //$NON-NLS-1$
    private static final String DOM_ID_IMPORT_CONFIG                       = "importConfig";                                                   //$NON-NLS-1$
-   private static final String DOM_ID_IMPORT_TILES                        = "importTiles";                                                    //$NON-NLS-1$
+   private static final String DOM_ID_IMPORT_TILES               = "importTiles";               //$NON-NLS-1$
+
+
    //
    private static String       HREF_ACTION_DEVICE_IMPORT;
    private static String       HREF_ACTION_DEVICE_WATCHING_ON_OFF;
@@ -1869,10 +1871,11 @@ private static final String HTML_TR_END                                = "</tr>"
          if (oneTourType != null) {
 
             final String ttName = oneTourType.getName();
+            final String ttCadence = importLauncher.oneTourTypeCadence;
 
             // show this text only when the name is different
             if (!tileName.equals(ttName)) {
-               ttText.append(ttName);
+               ttText.append(ttName + " (" + ttCadence + ")");
             }
          }
       }

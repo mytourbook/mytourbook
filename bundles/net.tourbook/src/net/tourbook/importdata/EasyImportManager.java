@@ -115,6 +115,7 @@ public class EasyImportManager {
    private static final String      ATTR_IL_LAST_MARKER_DISTANCE                       = "lastMarkerDistance";                               //$NON-NLS-1$
    private static final String      ATTR_IL_TEMPERATURE_ADJUSTMENT_DURATION            = "temperatureAdjustmentDuration";                    //$NON-NLS-1$
    private static final String      ATTR_IL_TEMPERATURE_TOUR_AVG_TEMPERATURE           = "tourAverageTemperature";                           //$NON-NLS-1$
+   private static final String      ATTR_IL_TOUR_TYPE_CADENCE                          = "tourTypeCadence";                                  //$NON-NLS-1$
    //
    public static final String       LOG_EASY_IMPORT_000_IMPORT_START                   = Messages.Log_EasyImport_000_ImportStart;
    public static final String       LOG_EASY_IMPORT_001_BACKUP_TOUR_FILES              = Messages.Log_EasyImport_001_BackupTourFiles;
@@ -831,6 +832,7 @@ public class EasyImportManager {
          final Long xmlTourTypeId = Util.getXmlLong(xmlConfig, ATTR_TOUR_TYPE_ID, null);
 
          importLauncher.oneTourType = TourDatabase.getTourType(xmlTourTypeId);
+         importLauncher.oneTourTypeCadence = Util.getXmlString(xmlConfig, ATTR_IL_TOUR_TYPE_CADENCE, "rpm"); // TODO RT Set default
 
       } else {
 
@@ -1186,6 +1188,7 @@ public class EasyImportManager {
 
             if (oneTourType != null) {
                Util.setXmlLong(xmlConfig, ATTR_TOUR_TYPE_ID, oneTourType.getTypeId());
+               xmlConfig.putString(ATTR_IL_TOUR_TYPE_CADENCE, importLauncher.oneTourTypeCadence);
             }
 
          } else {
@@ -1204,6 +1207,7 @@ public class EasyImportManager {
    private void setTourType(final TourData tourData, final ImportLauncher importLauncher) {
 
       String tourTypeName = UI.EMPTY_STRING;
+      String tourtypeCadence = UI.EMPTY_STRING;
 
       final Enum<TourTypeConfig> ttConfig = importLauncher.tourTypeConfig;
 
@@ -1246,12 +1250,15 @@ public class EasyImportManager {
          // set one tour type
 
          final TourType tourType = importLauncher.oneTourType;
+         final float tourTypeCadenceMultiplier = (importLauncher.oneTourTypeCadence.equals("rpm")) ? 1.0f : 2.0f; // TODO RT: Should this be enum?
 
          if (tourType != null) {
 
             tourTypeName = tourType.getName();
+            tourtypeCadence = importLauncher.oneTourTypeCadence;
 
             tourData.setTourType(tourType);
+            tourData.setCadenceMultiplier(tourTypeCadenceMultiplier);
          }
 
       } else {
@@ -1264,7 +1271,7 @@ public class EasyImportManager {
             String.format(//
                   LOG_EASY_IMPORT_003_TOUR_TYPE_ITEM,
                   tourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S),
-                  tourTypeName));
+                  tourTypeName + " (" + tourtypeCadence + ")"));
    }
 
 }

@@ -25,11 +25,13 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -42,6 +44,7 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
 
    public static final String    ID          = "net.tourbook.preferences.PrefPageImport"; //$NON-NLS-1$
 
+   private final IPreferenceStore _prefStore  = TourbookPlugin.getPrefStore();
    private final IDialogSettings _state      = TourbookPlugin.getState(RawDataView.ID);
 
    private RawDataManager        _rawDataMgr = RawDataManager.getInstance();
@@ -62,6 +65,8 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
    private Label              _lblInvalidFilesInfo;
 
    private PreferenceLinkArea _linkBodyWeight;
+
+   private Combo              _comboDefaultCadence;
 
    @Override
    protected Control createContents(final Composite parent) {
@@ -190,6 +195,37 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
                   .hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
                   .applyTo(_linkBodyWeight.getControl());
          }
+
+         {
+            //   TODO RT: Build pref GUI
+            /*
+             * Tour type cadence default
+             */
+            final Composite cadenceContainer = new Composite(parent, SWT.NONE);
+            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(cadenceContainer);
+
+            final Label lblDefaultCadence = new Label(cadenceContainer, SWT.FILL | SWT.LEFT);
+
+            lblDefaultCadence.setText("Default Cadence"); // TODO RT: Create Message
+
+            _comboDefaultCadence = new Combo(cadenceContainer, SWT.DROP_DOWN | SWT.READ_ONLY);
+
+            _comboDefaultCadence.add("rpm");
+            _comboDefaultCadence.add("spm");
+            _comboDefaultCadence.addSelectionListener(_defaultSelectionListener);
+
+            /*
+             * Label:
+             */
+            final Label lblDefaultCadenceInfo = new Label(parent, SWT.WRAP | SWT.READ_ONLY);
+            lblDefaultCadenceInfo.setText(
+                  "The default label, brown fox jumps over the lazy dog, brown fox jumps over the lazy dog, brown fox jumps over the lazy dog"); // TODO RT: Message
+            GridDataFactory.fillDefaults()//
+                  .grab(true, false)
+                  .indent(_checkboxIndent, 0)
+                  .hint(_pc.convertWidthInCharsToPixels(40), SWT.DEFAULT)
+                  .applyTo(lblDefaultCadenceInfo);
+         }
       }
    }
 
@@ -230,6 +266,7 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
       _chkCreateTourIdWithTime.setSelection(RawDataView.STATE_IS_CREATE_TOUR_ID_WITH_TIME_DEFAULT);
       _chkIgnoreInvalidFile.setSelection(RawDataView.STATE_IS_IGNORE_INVALID_FILE_DEFAULT);
       _chkSetBodyWeight.setSelection(RawDataView.STATE_IS_SET_BODY_WEIGHT_DEFAULT);
+      _comboDefaultCadence.setText(RawDataView.STATE_DEFAULT_CADENCE_DEFAULT);
 
       enableControls();
 
@@ -274,6 +311,9 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
             RawDataView.STATE_IS_SET_BODY_WEIGHT,
             RawDataView.STATE_IS_SET_BODY_WEIGHT_DEFAULT);
       _chkSetBodyWeight.setSelection(isSetBodyWeight);
+
+
+      _comboDefaultCadence.setText(_prefStore.getString(ITourbookPreferences.IMPORT_DEFAULT_CADENCE));
    }
 
    private void saveState() {
@@ -282,15 +322,19 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
       final boolean isOpenImportLog = _chkAutoOpenImportLog.getSelection();
       final boolean isIgnoreInvalidFile = _chkIgnoreInvalidFile.getSelection();
       final boolean isSetBodyWeight = _chkSetBodyWeight.getSelection();
+      final String defaultCadence = _comboDefaultCadence.getText();
 
       _state.put(RawDataView.STATE_IS_CREATE_TOUR_ID_WITH_TIME, isCreateTourIdWithTime);
       _state.put(RawDataView.STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW, isOpenImportLog);
       _state.put(RawDataView.STATE_IS_IGNORE_INVALID_FILE, isIgnoreInvalidFile);
       _state.put(RawDataView.STATE_IS_SET_BODY_WEIGHT, isSetBodyWeight);
 
+      _prefStore.setValue(ITourbookPreferences.IMPORT_DEFAULT_CADENCE, defaultCadence);
+
       _rawDataMgr.setState_CreateTourIdWithTime(isCreateTourIdWithTime);
       _rawDataMgr.setState_IsOpenImportLogView(isOpenImportLog);
       _rawDataMgr.setState_IsIgnoreInvalidFile(isIgnoreInvalidFile);
       _rawDataMgr.setState_IsSetBodyWeight(isSetBodyWeight);
+      _rawDataMgr.setState_DefaultCadence(defaultCadence);
    }
 }

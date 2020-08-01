@@ -532,9 +532,10 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
    private Button            _btnIL_Remove;
    //
    private Combo             _comboIC_BackupFolder;
-   private Combo             _comboIC_DeviceFolder;
    private Combo             _comboIC_DeviceType;
    private Combo             _comboIL_TourType;
+   private Combo                    _comboIL_One_TourType_Cadence;
+   private Combo                    _comboIC_DeviceFolder;
    //
    private Image             _imageFileSystem;
    //
@@ -551,6 +552,9 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
    private Label             _lblIL_LastMarkerDistanceUnit;
    private Label             _lblIL_LastMarkerText;
    private Label             _lblIL_One_TourTypeIcon;
+
+   private Label                    _lblIL_One_TourTypeCadenceLabel;
+
    private Label             _lblIL_TemperatureAdjustmentDuration;
    private Label             _lblIL_TemperatureAdjustmentDuration_Unit;
    private Label[]           _lblTT_Speed_SpeedUnit;
@@ -2015,7 +2019,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
       {
          _lblIL_One_TourTypeIcon = new Label(container, SWT.NONE);
          GridDataFactory.fillDefaults()
@@ -2035,6 +2039,15 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
                net.tourbook.common.UI.openControlMenu(_linkTT_One_TourType);
             }
          });
+
+         _lblIL_One_TourTypeCadenceLabel = new Label(container, SWT.NONE);
+         _lblIL_One_TourTypeCadenceLabel.setText("Cadence"); // TODO RT: Language support
+
+         _comboIL_One_TourType_Cadence = new Combo(container, SWT.NONE);
+
+         _comboIL_One_TourType_Cadence.add("rpm");
+         _comboIL_One_TourType_Cadence.add("spm"); // TODO RT: are these language specific?
+
       }
 
       return container;
@@ -4535,6 +4548,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       }
 
       _selectedIL.setupItemImage();
+      _selectedIL.oneTourTypeCadence = _comboIL_One_TourType_Cadence.getText();
+
    }
 
    /**
@@ -4705,6 +4720,10 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
                final long tourTypeId = oneTourType.getTypeId();
                tourType = TourDatabase.getTourType(tourTypeId);
+            }
+
+            if (_selectedIL.oneTourTypeCadence != null) {
+               _comboIL_One_TourType_Cadence.setText(_selectedIL.oneTourTypeCadence);
             }
 
             updateUI_OneTourType(tourType);
