@@ -21,6 +21,7 @@ import java.util.List;
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.ColumnDefinition;
+import net.tourbook.common.util.ColumnManager;
 import net.tourbook.ui.views.tourBook.TourBookView;
 
 import org.eclipse.nebula.widgets.nattable.NatTable;
@@ -138,24 +139,46 @@ public class NatTable_Header_Tooltip extends NatTableContentTooltip {
 
             // hovered colum is not sorted
 
+            final ColumnManager columnMgr = _tourBookView.getNatTable_ColumnManager();
+            final boolean isShowSortingInHeader = columnMgr.isShowColumnAnnotation_Sorting();
+
             final String debugInfo = isShowDebugInfo ? natTableDebugInfo(event) : UI.EMPTY_STRING;
 
             String sortInfo;
+
             if (colDef.canSortColumn()) {
                sortInfo = Messages.Column_SortInfo_CanSort;
             } else {
                sortInfo = Messages.Column_SortInfo_CanNotSort;
             }
 
-            if (defaultToolTipText == null) {
+            if (isShowSortingInHeader) {
 
-               return sortInfo + debugInfo;
+               // the header is already showing the sorting info, do not show it again in the header tooltip
+
+               if (defaultToolTipText == null) {
+
+                  return sortInfo + debugInfo;
+
+               } else {
+
+                  return defaultToolTipText + debugInfo;
+               }
 
             } else {
 
-               return defaultToolTipText
-                     + UI.NEW_LINE2 + sortInfo
-                     + debugInfo;
+               // the header is not showing the sorting info
+
+               if (defaultToolTipText == null) {
+
+                  return sortInfo + debugInfo;
+
+               } else {
+
+                  return defaultToolTipText
+                        + UI.NEW_LINE2 + sortInfo
+                        + debugInfo;
+               }
             }
          }
       }
