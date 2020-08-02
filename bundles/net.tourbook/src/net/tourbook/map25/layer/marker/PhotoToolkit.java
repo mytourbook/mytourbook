@@ -28,6 +28,7 @@ import java.util.UUID;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.map25.Map25App;
 import net.tourbook.map25.Map25ConfigManager;
 import net.tourbook.photo.ILoadCallBack;
@@ -138,6 +139,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
    }
 
    public MarkerSymbol createPhotoBitmapFromPhoto(final Photo photo, final MarkerItem item, final boolean showPhotoTitle) {
+
       Bitmap bitmapImage = getPhotoBitmap(photo);
       MarkerSymbol bitmapPhoto = null;
 
@@ -150,7 +152,9 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
    }
 
    public List<MarkerItem> createPhotoItemList(final ArrayList<Photo> galleryPhotos, final boolean showPhotoTitle) {
+
       debugPrint(" Phototoolkit createPhotoItemList: entering "); //$NON-NLS-1$
+
       final List<MarkerItem> pts = new ArrayList<>();
 
       if (galleryPhotos == null) {
@@ -241,7 +245,8 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
     * @param photo
     * @return the bitmap
     */
-   public Bitmap getPhotoBitmap(final Photo photo) {
+   private Bitmap getPhotoBitmap(final Photo photo) {
+
       Bitmap photoBitmap = null;
 
       // using photo image size of 2D map, not working yet
@@ -254,20 +259,24 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
 
       if (scaledThumbImage != null) {
          try {
-            photoBitmap = CanvasAdapter.decodeBitmap(new ByteArrayInputStream(ImageUtils.formatImage(scaledThumbImage,
-                  org.eclipse.swt.SWT.IMAGE_BMP)));
+
+            final byte[] formattedImage = ImageUtils.formatImage(scaledThumbImage, org.eclipse.swt.SWT.IMAGE_BMP);
+
+            photoBitmap = CanvasAdapter.decodeBitmap(new ByteArrayInputStream(formattedImage));
+
          } catch (final IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            StatusUtil.log(e);
          }
       }
 
       return photoBitmap;
    }
 
-   public Image getPhotoImage(final Photo photo, final int thumbSize) {
+   private Image getPhotoImage(final Photo photo, final int thumbSize) {
+
       Image photoImage = null;
       Image scaledThumbImage = null;
+
       final ImageQuality requestedImageQuality = ImageQuality.THUMB;
 
       // check if image has an loading error
@@ -318,6 +327,8 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
                   thumbRotation);
 
          } else {
+
+            // wait until image is loaded
             scaledThumbImage = null;
          }
       }

@@ -229,6 +229,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    }
 
    public static void debugPrint(final String debugText) {
+
       if (debugMode == DebugMode.ON) {
          System.out.println(UI.timeStamp() + debugText);
          //System.out.println(UI.timeStamp() + " map25: " + debugText);//$NON-NLS-1$
@@ -1576,6 +1577,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       debugPrint(" map25: " + "# updateUI_PhotoLayer(): #photos: " + _selectedPhotosPts.size() + " enabled: " + "isShowPhotoLayer"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
       _layer_Photo.addItems(_selectedPhotosPts); //hopefully done in map25view "paintToursAndUpdate"
       _layer_Photo.setEnabled(isShowPhotoLayer);
+
       //_phototoolkit._isMarkerClusteredLast = config.isPhotoClustered;
       _phototoolkit._isMarkerClusteredLast = config.isMarkerClustered;// using settings from MapBookmarks must be changed later with own config
    }
