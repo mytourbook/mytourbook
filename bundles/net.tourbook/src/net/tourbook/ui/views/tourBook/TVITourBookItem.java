@@ -269,7 +269,9 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             + "AVG( CASE WHEN cadenceZones_DelimiterValue = 0 THEN NULL ELSE cadenceZones_DelimiterValue END ), " + NL // 24  //$NON-NLS-1$
 
             + "MIN(CASE WHEN weather_Temperature_Min = 0 THEN NULL ELSE weather_Temperature_Min END), " + NL // 25            //$NON-NLS-1$
-            + "MAX(CASE WHEN weather_Temperature_Max = 0 THEN NULL ELSE weather_Temperature_Max END)  " + NL // 26            //$NON-NLS-1$
+            + "MAX(CASE WHEN weather_Temperature_Max = 0 THEN NULL ELSE weather_Temperature_Max END), " + NL // 26            //$NON-NLS-1$
+
+            + "SUM(CAST(TourRecordedTime AS BIGINT))     " + NL // 27   //$NON-NLS-1$
       ;
 
    }
@@ -310,7 +312,8 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
    long         colTourRecordingTime;
    long         colTourRecordedTime;
    long         colTourDrivingTime;
-   long         colPausedTime;
+   long         colTourPausedTime;
+   long         colBreakTime;
    //
    long         colAltitudeUp;
    long         colAltitudeDown;
@@ -620,7 +623,8 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       tourItem.colAvgSpeed = dbDrivingTime == 0 ? 0 : 3.6f * dbDistance / dbDrivingTime;
       tourItem.colAvgPace = dbDistance == 0 ? 0 : dbDrivingTime * 1000 / dbDistance;
 
-      tourItem.colPausedTime = tourItem.colTourRecordingTime - tourItem.colTourDrivingTime;
+      tourItem.colTourPausedTime = tourItem.colTourRecordingTime - tourItem.colTourRecordedTime;
+      tourItem.colBreakTime = tourItem.colTourRecordingTime - tourItem.colTourDrivingTime;
 
       if (UI.IS_SCRAMBLE_DATA) {
          tourItem.scrambleData();
@@ -683,9 +687,12 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       colTemperature_Min               = result.getFloat(startIndex + 25);
       colTemperature_Max               = result.getFloat(startIndex + 26);
 
+      colTourRecordedTime  =  result.getLong(startIndex + 27);
+
 // SET_FORMATTING_ON
 
-      colPausedTime = colTourRecordingTime - colTourDrivingTime;
+      colTourPausedTime = colTourRecordingTime - colTourRecordedTime;
+      colBreakTime = colTourRecordingTime - colTourDrivingTime;
 
       colSlowVsFastCadence = TourManager.generateCadenceZones_TimePercentages(cadenceZone_SlowTime, cadenceZone_FastTime);
    }

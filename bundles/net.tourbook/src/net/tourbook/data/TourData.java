@@ -9874,6 +9874,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       this.tourTimerPauses = timerPauses;
 
+      //TODO FB Remove and expect the code to always set the recorded time when importing a file ?
       this.tourRecordedTime = tourRecordingTime - getTourPausedTime();
    }
 

@@ -236,7 +236,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    // Statistics view tooltip
    // display a pause sign on the gps track like in ST
 
-   //DONE FB TOFIX When updating to DB 43, the recording time goes to the paused time when it should go to the recordED time
+   //TODO Add those new Tourbookview columns in CSVExport.java
+
+   //TODO check that the sums of paused time work with my big database
 
    public static final String     ID                            = "net.tourbook.views.TourDataEditorView";                //$NON-NLS-1$
    //
@@ -5616,11 +5618,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    }
 
    /**
-    * Column: Paused time
+    * Column: Break time
     */
    private void defineColumn_TimeSlice_Time_BreakTime() {
 
-      final ColumnDefinition colDef = TableColumnFactory.TIME_BREAK_TIME.createColumn(_timeSlice_ColumnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.TIME_IS_BREAK_TIME.createColumn(_timeSlice_ColumnManager, _pc);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
