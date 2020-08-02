@@ -1794,10 +1794,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
        */
       final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
-      tbm.add(_actionSelectAllTours);
       tbm.add(_actionToggleViewLayout);
-
-      tbm.add(new Separator());
+      tbm.add(_actionSelectAllTours);
       tbm.add(_actionExpandSelection);
       tbm.add(_actionCollapseAll);
       tbm.add(_actionLinkWithOtherViews);
