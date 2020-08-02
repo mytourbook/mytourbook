@@ -150,6 +150,7 @@ public class EasyImportManager {
       return _instance;
    }
 
+
    /**
     * @param isForceRetrieveFiles
     *           When <code>true</code> files will be retrieved even when the stores have not
@@ -160,7 +161,7 @@ public class EasyImportManager {
     *         {@link ImportConfig#notImportedFiles} contains the files which are available in the
     *         device folder but not available in the tour database.
     */
-   public DeviceImportState checkImportedFiles(final boolean isForceRetrieveFiles) {
+   public DeviceImportState checkImportedFiles(final boolean isForceRetrieveFiles) throws InterruptedException {
 
       final DeviceImportState returnState = new DeviceImportState();
 
@@ -327,7 +328,7 @@ public class EasyImportManager {
 
    /**
     */
-   private void getImportFiles(final Iterable<FileStore> fileStores) {
+   private void getImportFiles(final Iterable<FileStore> fileStores) throws InterruptedException {
 
       final ArrayList<OSFile> movedFiles = new ArrayList<>();
       final ArrayList<OSFile> notImportedFiles = new ArrayList<>();
@@ -412,7 +413,21 @@ public class EasyImportManager {
       /*
        * Get files which are not yet imported
        */
+
+      // Wrap in lock because of DB exception risk
+      // Thread can be interrupted before getting the lock, but not while in
+      // critical section.  Watch for interrupt() or folderWatcher.close() !
+
+      RawDataView.THREAD_WATCHER_LOCK.lock();
+
+      if (Thread.currentThread().isInterrupted()) {
+         RawDataView.THREAD_WATCHER_LOCK.unlock();
+         Thread.currentThread().interrupt();
+         throw new InterruptedException();
+      }
+
       final HashSet<String> dbFileNames = getDbFileNames(availableFiles);
+      RawDataView.THREAD_WATCHER_LOCK.unlock();
 
       for (final OSFile deviceFile : availableFiles) {
          if (dbFileNames.contains(deviceFile.getFileName()) == false) {
@@ -437,7 +452,7 @@ public class EasyImportManager {
 
    private List<OSFile> getOSFiles(final String folder,
                                    final String globFilePattern,
-                                   final Iterable<FileStore> fileStores) {
+                                   final Iterable<FileStore> fileStores) throws InterruptedException {
 
       final List<OSFile> osFiles = new ArrayList<>();
 
@@ -452,9 +467,20 @@ public class EasyImportManager {
          globPattern = ImportConfig.DEVICE_FILES_DEFAULT;
       }
 
+      if (Thread.interrupted()) {
+         Thread.currentThread().interrupt();
+         throw new InterruptedException();
+      }
+
       try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(validPath, globPattern)) {
 
          for (final Path path : directoryStream) {
+
+            if (Thread.interrupted()) {
+               Thread.currentThread().interrupt();
+               throw new InterruptedException();
+            }
+
             try {
 
                final BasicFileAttributeView fileAttributesView = Files.getFileAttributeView(

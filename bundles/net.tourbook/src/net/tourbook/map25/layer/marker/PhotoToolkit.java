@@ -19,7 +19,6 @@
 
 package net.tourbook.map25.layer.marker;
 
-import java.awt.Point;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -43,12 +42,10 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.imgscalr.Scalr.Rotation;
 import org.oscim.backend.CanvasAdapter;
 import org.oscim.backend.canvas.Bitmap;
 import org.oscim.backend.canvas.Color;
@@ -275,14 +272,13 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
    private Image getPhotoImage(final Photo photo, final int thumbSize) {
 
       Image photoImage = null;
-      Image scaledThumbImage = null;
 
       final ImageQuality requestedImageQuality = ImageQuality.THUMB;
 
       // check if image has an loading error
       final PhotoLoadingState photoLoadingState = photo.getLoadingState(requestedImageQuality);
       if (photoLoadingState != PhotoLoadingState.IMAGE_IS_INVALID) {
-         //debugPrint("??? entering getPhotoImage"); //$NON-NLS-1$
+
          // image is not yet loaded
 
          // check if image is in the cache
@@ -297,43 +293,9 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
 
             PhotoLoadManager.putImageInLoadingQueueThumbMap(photo, requestedImageQuality, imageLoadCallback);
          }
-
-         if (photoImage != null) {
-
-            final Rectangle imageBounds = photoImage.getBounds();
-            final int originalImageWidth = imageBounds.width;
-            final int originalImageHeight = imageBounds.height;
-
-            final int imageWidth = originalImageWidth;
-            final int imageHeight = originalImageHeight;
-
-            //final int thumbSize = PhotoLoadManager.IMAGE_SIZE_THUMBNAIL;//    PhotoLoadManager.IMAGE_SIZE_LARGE_DEFAULT;
-            boolean isRotated = false;
-
-            final Point bestSize = ImageUtils.getBestSize(imageWidth, imageHeight, thumbSize, thumbSize);
-            final Rotation thumbRotation = null;
-            if (isRotated == false) {
-               isRotated = true;
-               //thumbRotation = getRotation();
-            }
-
-            scaledThumbImage = ImageUtils.resize(
-                  _display,
-                  photoImage,
-                  bestSize.x,
-                  bestSize.y,
-                  SWT.ON,
-                  SWT.LOW,
-                  thumbRotation);
-
-         } else {
-
-            // wait until image is loaded
-            scaledThumbImage = null;
-         }
       }
 
-      return scaledThumbImage;
+      return photoImage;
    }
 
    @Override
