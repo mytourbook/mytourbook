@@ -1015,6 +1015,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       final boolean isTourLayerVisible = tourLayer == null ? false : tourLayer.isEnabled();
 
       final boolean isTourAvailable = _allTourData.size() > 0;
+      final boolean isAllPhotoAvailable = _allPhotos.size() > 0;
 
       final boolean canShowTour = isTourAvailable && isTourLayerVisible;
 
@@ -1022,7 +1023,7 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       //_actionShowPhoto_WithOptions.setEnabled(isTourAvailable);
       _actionShowTour_WithOptions.setEnabled(isTourAvailable);
       _actionShowMarker_WithOptions.setEnabled(isTourAvailable);
-      //_actionShowPhotos.setEnabled(isTourAvailable);
+      _actionShowPhotos.setEnabled(isAllPhotoAvailable);
       _actionShowEntireTour.setEnabled(canShowTour);
       _actionSyncMap_WithTour.setEnabled(canShowTour);
       _actionSyncMap_WithChartSlider.setEnabled(canShowTour);
