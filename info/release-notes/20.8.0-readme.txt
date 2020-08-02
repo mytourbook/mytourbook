@@ -7,11 +7,12 @@ New
   - Displayed tours are not categorized by date
   - Tours can be sorted
     - By many columns except when a column is computed or have a SQL relation
-    - Using multiple columns (by pressing the Alt key)
+    - By using multiple columns (by pressing the Alt key)
   - Columns can be freezed for horizontal scrolling (freeze action is in the header context menu)
 
 * Dropbox Integration (Frederic)
-  - Ability to connect a Dropbox account to MyTourbook, and also choosing a specific a folder for this account. This Dropbox folder can be set up as a device to watch in the Easy Import Dashboard. In this case, added or deleted files will be automatically and immediately detected.
+  - Ability to connect a Dropbox account to MyTourbook, and also choosing a specific a folder for this account. 
+    This Dropbox folder can be set up as a device to watch in the Easy Import Dashboard. In this case, added or deleted files will be automatically and immediately detected.
 
 * Import Suunto Quest Files (Frederic)
 
@@ -19,11 +20,14 @@ New
 Improvements
 ============
 
-* Calendar view
-  - Tour pulse/power average values are displayed in the tour (day) content cell
+* Tour Book View (Frederic)
+  - Adding the ability to bulk edit the weather conditions
 
 * Statistics (Frederic)
   - The number of years to be displayed in the graph is now dynamically filled and updated based on the number of available years
+
+* Calendar View
+  - Tour pulse/power average values can be displayed in the tour (day) content cell
 
 * 2D Map
   - The enhanced painting warning can be hidden in the track options slideout
@@ -38,14 +42,17 @@ Improvements
   - new online provider mapilion. the old provider opensciencemap is dead.
   - switching between online/offline is working almost correct now, without restart app
 
-* Photo
+* Tour Chart (Frederic)
+  - Adding the ability to select all the time slices in between the left and right sliders.
+
+* Tour Marker View (Frederic)
+  - Added the Average Speed column
+
+* Photo View
   - Show selected/hovered folder in the Photo view with more contrast which makes it better readable
   
 * Dialog Adjust Elevation
   - Show elevation gain/loss values before and after the adjustment, supported adjustment type: "Approach elevation with SRTM data"  
-
-* Tour Marker View (Frederic)
-  - Added the Average Speed column
 
 * Tour tooltip (Frederic)
   - Added the maximum pace (^ Pace)
@@ -53,15 +60,9 @@ Improvements
 * Tree/Table Columns
   - A new column is now added at the current mouse position and not at the end (nobody complained it)
 
-* Tour Chart (Frederic)
-  - Adding the ability to select all the time slices in between the left and right sliders.
-
-* Keyboard shortcuts
+* Keyboard Shortcuts
   - Ctrl+W - Close current view or tour  
   - Ctrl+Shift+<Key> - Open all directory views with a key shortcut
-
-* Tour Book view (Frederic)
-  - Adding the ability to bulk edit the weather conditions
 
 * Better Imperial Unit Support (rtdog)
   - Changed first run wizard so that user can select units before configuring first user https://github.com/wolfgang-ch/mytourbook/pull/204 
@@ -77,18 +78,16 @@ UI Themes
    -cssTheme org.eclipse.e4.ui.css.theme.e4_default
    -cssTheme org.eclipse.e4.ui.css.theme.e4_dark
 
-  The "dark" theme can be used but MyTourbook is not yet prepared for it, however it looks not very bad. 
-  The "classic" theme is a little bit different compared with the theme in MyTourbook before 20.8.
+  The "dark" theme can be used but MyTourbook is not yet prepared for it 
+  The "classic" theme is a little bit different compared with the theme in MyTourbook before 20.8
   
 
 Changes  
 =======
 
-* CSV Export
-  The csv export is now exporting all Tour Book view columns, existing csv column headers may also be modified 
-
-* Tour Book view
-  Any existing column profiles must be recreated
+* Tour Book View
+  - Any existing column profiles must be recreated
+  - The csv export is now exporting all Tour Book view columns, existing csv column headers may also be modified 
 
 * Tour Editor View - Swim slices (Frederic)
   - Renamed the column "Strokes" to "Stk/length" (Number of strokes per length)
@@ -100,12 +99,6 @@ Changes
 
 Fixes   
 =====
-
-* 3D Map (Frederic)
-  - Removed the deprecated or unavailable layers (ID_USDA_NAIP & ID_USDA_NAIP_USGS & MS Virtual Earth Aerial). Added the layers USGS NAIP PLUS, USGS Topo Base Map and USGS Topo Base Map Large
-  - We disable the actions when the data series are not available
-  - Fixed an issue where the Atmosphere and Scale layers would not appear when using MyTourbook in French
-  - 3D Map colors : Fixed the pace ranges from seconds to minutes for better readability
   
 * TCX Import (Frederic)
   - Fixed an issue where the distance data and display were erroneous since the distance is reset at each new lap 
@@ -113,18 +106,26 @@ Fixes
 * GPX/TCX Export (Frederic)
   - Fixed and updated the GPX/TCX export templates as the file validation was failing against the schemas.
 
+* Easy Import (Frederic)
+  - When importing files, the tour type is set only if it is checked in the launcher configuration
+
+* 3D Map (Frederic)
+  - Removed the deprecated or unavailable layers (ID_USDA_NAIP & ID_USDA_NAIP_USGS & MS Virtual Earth Aerial). 
+    Added the layers USGS NAIP PLUS, USGS Topo Base Map and USGS Topo Base Map Large
+  - We disable the actions when the data series are not available
+  - Fixed an issue where the Atmosphere and Scale layers would not appear when using MyTourbook in French
+  - 3D Map colors: Fixed the pace ranges from seconds to minutes for better readability
+
 * Tour Editor
   - Show daytime with am/pm in time slices/swim slices when imperial measurement system is selected
   - Fixed daytime to be not >24h
 
-* Easy Import (Frederic)
-  - When importing files, the tour type is set only if it is checked in the launcher configuration
+* Tour Editor Save (rtdog)
+  - Using the hotkey to save a modified tour on TourData Editor saved to DB but not on local screen.  https://github.com/wolfgang-ch/mytourbook/pull/201
 
 * Tour Filter (Frederic)
   - When filtering on start dates, the filters "Greater Than or Equal", "Less than", "Equals", "Not Equals" were not working
  
- * TourData Editor Save (rtdog)
-  - Using the hotkey to save a modified tour on TourData Editor saved to DB but not on local screen.  Fixed. https://github.com/wolfgang-ch/mytourbook/pull/201
    
 Translation    
 ===========
@@ -141,4 +142,6 @@ System
 * FIT SDK 21.32
 * Eclipse 2020-06
 * Java 9+ runtime support
+  - Depending on the used Java VM and OS, the 2.5D map can crash the application, 3D map could not be displayed
+  - Java 8 is currently the least headache-causing platform
 
