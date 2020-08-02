@@ -1048,7 +1048,9 @@ public class Map25View extends ViewPart implements IMapBookmarks, ICloseOpenedDi
       //tbm.add(_actionShowPhoto_WithOptions);
       tbm.add(_actionShowPhotos);
 
-      tbm.add(new Separator());
+// hide separator when only 1 photo action is available -> too much separators
+//      tbm.add(new Separator());
+
       tbm.add(_actionMapBookmarks); //should be moved to position like in Map2View
 
       tbm.add(new Separator());
