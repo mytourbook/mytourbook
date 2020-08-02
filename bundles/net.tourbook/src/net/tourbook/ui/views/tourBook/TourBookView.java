@@ -1755,13 +1755,16 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _actionSetOtherPerson.setEnabled(isTourSelected);
       _actionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
 
-      _actionCollapseOthers.setEnabled(numSelectedItems == 1 && firstElementHasChildren);
-      _actionExpandSelection.setEnabled(
-            firstTreeElement == null
+      _actionCollapseAll.setEnabled(isTreeLayout);
+      _actionCollapseOthers.setEnabled(isTreeLayout &&
+            (numSelectedItems == 1 && firstElementHasChildren));
+
+      _actionExpandSelection.setEnabled(isTreeLayout &&
+            (firstTreeElement == null
                   ? false
                   : numSelectedItems == 1
                         ? firstElementHasChildren
-                        : true);
+                        : true));
 
       _actionSelectAllTours.setEnabled(isTreeLayout);
       _actionToggleViewLayout.setEnabled(true);
@@ -1791,10 +1794,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
        */
       final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
-      tbm.add(_actionSelectAllTours);
       tbm.add(_actionToggleViewLayout);
-
-      tbm.add(new Separator());
+      tbm.add(_actionSelectAllTours);
       tbm.add(_actionExpandSelection);
       tbm.add(_actionCollapseAll);
       tbm.add(_actionLinkWithOtherViews);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,14 +15,14 @@
  *******************************************************************************/
 package net.tourbook.map25;
 
+import de.byteholder.geoclipse.map.UI;
+
 import java.util.List;
 import java.util.UUID;
 
-import org.oscim.theme.VtmThemes;
-
 import net.tourbook.preferences.MapsforgeThemeStyle;
 
-import de.byteholder.geoclipse.map.UI;
+import org.oscim.theme.VtmThemes;
 
 public class Map25Provider implements Cloneable {
 
@@ -33,18 +33,19 @@ public class Map25Provider implements Cloneable {
    public boolean   isDefault;
 
    /**
-    *
+    * The field name is Thomas naming, have no idea what it means, this value is currently not set,
+    * except default is false.
     */
-   public boolean   isOfflineMap;
+   public boolean   is_mf_Map;
 
    public String    name        = UI.EMPTY_STRING;
    public String    description = UI.EMPTY_STRING;
 
    /**
-    * Requires that {@link #isOfflineMap} is <code>true</code> which is setting the theme filepath
-    * {@link #offline_ThemeFilepath}
+    * Requires that {@link #is_mf_Map} is <code>true</code> which is setting the theme filepath
+    * {@link #mf_ThemeFilepath}
     */
-   public boolean   offline_IsThemeFromFile;
+   public boolean   mf_IsThemeFromFile;
 
    public VtmThemes theme;
 
@@ -58,9 +59,9 @@ public class Map25Provider implements Cloneable {
    /*
     * Offline map provider
     */
-   public String       offline_MapFilepath   = UI.EMPTY_STRING;
-   public String       offline_ThemeFilepath = UI.EMPTY_STRING;
-   public String       offline_ThemeStyle    = UI.EMPTY_STRING;
+   public String       mf_MapFilepath   = UI.EMPTY_STRING;
+   public String       mf_ThemeFilepath = UI.EMPTY_STRING;
+   public String       mf_ThemeStyle    = UI.EMPTY_STRING;
 
    public TileEncoding tileEncoding          = TileEncoding.MVT;
 
@@ -159,13 +160,13 @@ public class Map25Provider implements Cloneable {
             || _cachedThemeFilepath == null
 
             // check if styles for the theme filepath are not yet loaded
-            || (_cachedThemeFilepath != null && _cachedThemeFilepath.equals(offline_ThemeFilepath) == false)) {
+            || (_cachedThemeFilepath != null && _cachedThemeFilepath.equals(mf_ThemeFilepath) == false)) {
 
          // styles needs to be loaded
-         mfStyles = Map25ProviderManager.loadMapsforgeThemeStyles(offline_ThemeFilepath);
+         mfStyles = Map25ProviderManager.loadMapsforgeThemeStyles(mf_ThemeFilepath);
 
          // mark styles to be loaded for this filepath
-         _cachedThemeFilepath = offline_ThemeFilepath;
+         _cachedThemeFilepath = mf_ThemeFilepath;
 
          // cache theme styles
          _cachedThemeStyles = mfStyles;
@@ -205,7 +206,7 @@ public class Map25Provider implements Cloneable {
 //            + "_id            = " + _id + "\n" //$NON-NLS-1$ //$NON-NLS-2$
             + "_uuid          = " + _uuid + "\n" //$NON-NLS-1$ //$NON-NLS-2$
 
-            + "isOfflineMap   = " + isOfflineMap + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "isOfflineMap   = " + is_mf_Map + "\n" //$NON-NLS-1$ //$NON-NLS-2$
             + "tileEncoding   = " + tileEncoding + "\n" //$NON-NLS-1$ //$NON-NLS-2$
             + "theme          = " + theme + "\n" //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -213,10 +214,10 @@ public class Map25Provider implements Cloneable {
             + "online_TilePath         = " + online_TilePath + "\n" //$NON-NLS-1$ //$NON-NLS-2$
             + "online_ApiKey           = " + online_ApiKey + "\n" //$NON-NLS-1$ //$NON-NLS-2$
 
-            + "offline_MapFilepath     = " + offline_MapFilepath + "\n" //$NON-NLS-1$ //$NON-NLS-2$
-            + "offline_ThemeFilepath   = " + offline_ThemeFilepath + "\n" //$NON-NLS-1$ //$NON-NLS-2$
-            + "offline_ThemeStyle      = " + offline_ThemeStyle + "\n" //$NON-NLS-1$ //$NON-NLS-2$
-            + "offline_IsThemeFromFile = " + offline_IsThemeFromFile + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "offline_MapFilepath     = " + mf_MapFilepath + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "offline_ThemeFilepath   = " + mf_ThemeFilepath + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "offline_ThemeStyle      = " + mf_ThemeStyle + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "offline_IsThemeFromFile = " + mf_IsThemeFromFile + "\n" //$NON-NLS-1$ //$NON-NLS-2$
 
       ;
    }
