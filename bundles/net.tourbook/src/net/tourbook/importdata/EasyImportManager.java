@@ -151,6 +151,7 @@ public class EasyImportManager {
       return _instance;
    }
 
+
    /**
     * @param isForceRetrieveFiles
     *           When <code>true</code> files will be retrieved even when the stores have not

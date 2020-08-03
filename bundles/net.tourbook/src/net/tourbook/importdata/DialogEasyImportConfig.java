@@ -270,11 +270,11 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
    private Button            _btnIL_Remove;
    //
    private Combo             _comboIC_BackupFolder;
+   private Combo             _comboIC_DeviceFolder;
    private Combo             _comboIC_DeviceType;
    private Combo             _comboIL_TourType;
-   private Combo                    _comboIL_One_TourType_Cadence;
-   private Combo                    _comboIC_DeviceFolder;
-   private Combo[]                  _comboTT_Cadence;
+   private Combo             _comboIL_One_TourType_Cadence;
+   private Combo[]           _comboTT_Cadence;
    //
    private Image             _imageFileSystem;
    //
@@ -291,21 +291,19 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
    private Label             _lblIL_LastMarkerDistanceUnit;
    private Label             _lblIL_LastMarkerText;
    private Label             _lblIL_One_TourTypeIcon;
-   private Label                    _lblIL_One_TourTypeCadenceLabel;
+   private Label             _lblIL_One_TourTypeCadenceLabel;
    private Label             _lblIL_TemperatureAdjustmentDuration;
    private Label             _lblIL_TemperatureAdjustmentDuration_Unit;
    private Label[]           _lblTT_Speed_SpeedUnit;
-   private Label[]                  _lblTT_Speed_TourTypeIcon;
+   private Label[]           _lblTT_Speed_TourTypeIcon;
    //
    private Link[]            _linkTT_Speed_TourType;
    private Link              _linkTT_One_TourType;
    private Link              _linkIC_LocalFolderPath;
    private Link              _linkIC_DeviceFolderPath;
    private Link              _linkIC_ILActions;
-
    //
    private Spinner           _spinnerDash_AnimationCrazinessFactor;
-
    private Spinner           _spinnerDash_AnimationDuration;
    private Spinner           _spinnerDash_BgOpacity;
    private Spinner           _spinnerDash_NumHTiles;
@@ -331,7 +329,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       /**
        * @param tourType
        */
-      public ActionIL_NewOneTourType(final TourType tourType) { 
+      public ActionIL_NewOneTourType(final TourType tourType) {
 
          super(tourType.getName(), AS_CHECK_BOX);
 
@@ -4714,6 +4712,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
                      linkTourType.setData(DATA_KEY_TOUR_TYPE_ID, null);
                      linkTourType.setText(Messages.Dialog_ImportConfig_Link_TourType);
                      labelTourTypeIcon.setImage(null);
+
                   } else {
 
                      linkTourType.setData(DATA_KEY_TOUR_TYPE_ID, tourTypeId);
@@ -4734,6 +4733,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
                   spinnerAvgSpeed.setData(DATA_KEY_SPEED_TOUR_TYPE_INDEX, speedTTIndex);
                   comboCadence.setData(DATA_KEY_SPEED_TOUR_TYPE_INDEX, speedTTIndex);
                   _actionTTSpeed_Delete[speedTTIndex].setData(DATA_KEY_SPEED_TOUR_TYPE_INDEX, speedTTIndex);
+
                }
             }
             _speedTourType_OuterContainer.setRedraw(true);
