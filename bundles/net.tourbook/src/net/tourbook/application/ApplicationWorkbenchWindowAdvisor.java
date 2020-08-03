@@ -29,6 +29,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.swimming.SwimStrokeManager;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourPerson;
 import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
@@ -188,7 +189,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
             label = currentPage.getLabel();
          }
 
-         if ((label != null) && !label.equals(UI.EMPTY_STRING)) {
+         if (!StringUtils.isNullOrEmpty(label)) {
             title = NLS.bind(shellTitle, label, title);
          }
       }

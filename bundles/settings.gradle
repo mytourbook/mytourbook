@@ -1,7 +1,7 @@
 rootProject.name = 'MyTourbook-Bundles'
 
 include ':mytourbook'
-project(':mytourbook'	).projectDir	= new File('..')
+project(':mytourbook'   ).projectDir   = new File('..')
 
 // rcp projects
 include ':net.tourbook.vtm'
@@ -13,13 +13,16 @@ include ':net.tourbook.ext.vtm.windows'
 // vtm projects
 include ':vtm'
 include ':vtm-desktop'
+include ':vtm-desktop-lwjgl'
 include ':vtm-gdx'
 include ':vtm-http'
+include ':vtm-mvt'
 include ':vtm-themes'
 
-project(':vtm'			).projectDir	= new File('../../vtm-parent/vtm')
-project(':vtm-desktop'	).projectDir	= new File('../../vtm-parent/vtm-desktop')
-project(':vtm-gdx'		).projectDir	= new File('../../vtm-parent/vtm-gdx')
-project(':vtm-http'		).projectDir	= new File('../../vtm-parent/vtm-http')
-project(':vtm-themes'	).projectDir	= new File('../../vtm-parent/vtm-themes')
-
+project(':vtm'                ).projectDir   = new File('../../vtm-parent/vtm')
+project(':vtm-desktop'        ).projectDir   = new File('../../vtm-parent/vtm-desktop')
+project(':vtm-desktop-lwjgl'  ).projectDir   = new File('../../vtm-parent/vtm-desktop-lwjgl')
+project(':vtm-gdx'            ).projectDir   = new File('../../vtm-parent/vtm-gdx')
+project(':vtm-http'           ).projectDir   = new File('../../vtm-parent/vtm-http')
+project(':vtm-mvt'            ).projectDir   = new File('../../vtm-parent/vtm-mvt')
+project(':vtm-themes'         ).projectDir   = new File('../../vtm-parent/vtm-themes')

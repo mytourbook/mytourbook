@@ -46,6 +46,7 @@ import net.tourbook.common.util.ITourViewer3;
 import net.tourbook.common.util.ITreeViewer;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.ToolTip;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.common.util.Util;
@@ -743,7 +744,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
                false,
                0,
 //             false);
-               true // with this fix, the sort column indicator is not writter over the column label
+               true // with this fix, the sort column indicator is not written over the column label
          );
 
          this.selectedSortHeaderCellPainter = new BackgroundPainter(new PaddingDecorator(interiorPainter,
@@ -923,7 +924,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
             if (partRef.getPart(false) == TourBookView.this) {
 
-               // ensure the tour tooltip is hidden, it occured that even closing this view did not close the tooltip
+               // ensure the tour tooltip is hidden, it occurred that even closing this view did not close the tooltip
                if (_tourInfoToolTip_NatTable != null) {
                   _tourInfoToolTip_NatTable.hideToolTip();
                }
@@ -1723,7 +1724,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       }
 
       final boolean useWeatherRetrieval = _prefStore.getBoolean(ITourbookPreferences.WEATHER_USE_WEATHER_RETRIEVAL) &&
-            !_prefStore.getString(ITourbookPreferences.WEATHER_API_KEY).equals(UI.EMPTY_STRING);
+            !StringUtils.isNullOrEmpty(_prefStore.getString(ITourbookPreferences.WEATHER_API_KEY));
 
       final boolean isTableLayout = _isLayoutNatTable;
       final boolean isTreeLayout = !isTableLayout;
@@ -1754,13 +1755,16 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       _actionSetOtherPerson.setEnabled(isTourSelected);
       _actionSetTourType.setEnabled(isTourSelected && tourTypes.size() > 0);
 
-      _actionCollapseOthers.setEnabled(numSelectedItems == 1 && firstElementHasChildren);
-      _actionExpandSelection.setEnabled(
-            firstTreeElement == null
+      _actionCollapseAll.setEnabled(isTreeLayout);
+      _actionCollapseOthers.setEnabled(isTreeLayout &&
+            (numSelectedItems == 1 && firstElementHasChildren));
+
+      _actionExpandSelection.setEnabled(isTreeLayout &&
+            (firstTreeElement == null
                   ? false
                   : numSelectedItems == 1
                         ? firstElementHasChildren
-                        : true);
+                        : true));
 
       _actionSelectAllTours.setEnabled(isTreeLayout);
       _actionToggleViewLayout.setEnabled(true);
@@ -1790,10 +1794,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
        */
       final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
-      tbm.add(_actionSelectAllTours);
       tbm.add(_actionToggleViewLayout);
-
-      tbm.add(new Separator());
+      tbm.add(_actionSelectAllTours);
       tbm.add(_actionExpandSelection);
       tbm.add(_actionCollapseAll);
       tbm.add(_actionLinkWithOtherViews);
@@ -2123,7 +2125,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          return;
       }
 
-      // positon context menu to the selected tour
+      // position context menu to the selected tour
 
       final RowSelectionModel<TVITourBookTour> rowSelectionModel = getNatTable_SelectionModel();
       final Set<Range> allSelectedRowPositions = rowSelectionModel.getSelectedRowPositions();
@@ -2208,7 +2210,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
          if (hoveredRow == -1) {
 
-            // nothing is hovered, this should not occure because when a tour is selected it's row is set to be also hovered
+            // nothing is hovered, this should not occur because when a tour is selected it's row is set to be also hovered
 
             return;
          }
@@ -2937,7 +2939,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       /*
        * This must be selected lately otherwise the selection state is set but is not visible
-       * (button is not pressed). Could not figure out why this occures after debugging this issue
+       * (button is not pressed). Could not figure out why this occurs after debugging this issue
        */
       _actionLinkWithOtherViews.setSelection(_state.getBoolean(STATE_IS_LINK_WITH_OTHER_VIEWS));
    }
@@ -3054,7 +3056,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          _selectedYearSub = tourStartTime.getMonthValue();
       }
 
-      // run async otherwise an internal NPE occures
+      // run async otherwise an internal NPE occurs
       _parent.getDisplay().asyncExec(new Runnable() {
          @Override
          public void run() {
@@ -3101,7 +3103,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
                       * </code>
                       */
 
-                     // this occures sometimes but it seems that it's an eclipse internal problem
+                     // this occurs sometimes but it seems that it's an eclipse internal problem
                      StatusUtil.log("This is a known issue when a treeviewer do a collapseAll()", e); //$NON-NLS-1$
                   }
                }

@@ -25,8 +25,6 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.TouchEvent;
-import org.eclipse.swt.events.TouchListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -54,7 +52,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
    private MouseWheelListener _defaultMouseWheelListener;
    private FocusListener      _keepOpenListener;
    private SelectionAdapter   _layerSelectionListener;
-   private Listener      _btn_refresh_Bookmark_listener;
+   private Listener           _btn_refresh_Bookmark_listener;
    private PixelConverter     _pc;
 
    private Map25View          _map25View;
@@ -67,12 +65,12 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
    private Button    _chkShowLayer_BaseMap;
    private Button    _chkShowLayer_Building;
    private Button    _chkShowLayer_Hillshading;
+   private Button    _chkShowLayer_Satellite;
    private Button    _chkShowLayer_Label;
    private Button    _chkShowLayer_Scale;
+   private Button    _chkShowPhoto_Title;
    private Button    _chkShowLayer_TileInfo;
-//   private Button    _chkShowLayer_Bookmark;
-//   private Button    _btn_refresh_Bookmark;
-//   private Button    _chkShowLayer_S3DB;
+
    private Button    _chkUseDraggedKeyboardNavigation;
 
    private Spinner   _spinnerHillshadingOpacity;
@@ -151,9 +149,9 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
       final Group group = new Group(parent, SWT.NONE);
       group.setText(Messages.Slideout_Map25MapOptions_Group_MapLayer);
       GridDataFactory
-            .fillDefaults()//
-            .grab(true, false)
-            .applyTo(group);
+      .fillDefaults()//
+      .grab(true, false)
+      .applyTo(group);
       GridLayoutFactory.swtDefaults().numColumns(1).applyTo(group);
       {
          {
@@ -172,39 +170,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
             _chkShowLayer_Building.setText(Messages.Slideout_Map25MapOptions_Checkbox_Layer_3DBuilding);
             _chkShowLayer_Building.addSelectionListener(_layerSelectionListener);
          }
-         
-         {
-            /*
-             * S3DB
-             */
-            //    _chkShowLayer_S3DB = new Button(group, SWT.CHECK);
-            //    _chkShowLayer_S3DB.setText("Advanced Builings");
-            //    _chkShowLayer_S3DB.addSelectionListener(_layerSelectionListener);
-         } 
-         
- 
-         {
-            /*
-             * Bookmark
-             */    
-/*            final Composite containerBookmark = new Composite(group, SWT.NONE);
-            GridDataFactory.fillDefaults().grab(true, false).applyTo(containerBookmark);
-            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerBookmark);
-            {
-               {
-                  _chkShowLayer_Bookmark = new Button(containerBookmark, SWT.CHECK);
-                  _chkShowLayer_Bookmark.setText("Bookmarks");
-                  _chkShowLayer_Bookmark.addSelectionListener(_layerSelectionListener);
-               }
-               {
-                  _btn_refresh_Bookmark = new Button(containerBookmark, SWT.PUSH);
-                  _btn_refresh_Bookmark.setText("Update");
-                  _btn_refresh_Bookmark.addListener(SWT.Selection, _btn_refresh_Bookmark_listener);
-               }
-            }*/
-         }
 
-         
          {
             /*
              * Hillshading
@@ -263,6 +229,25 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
             _chkShowLayer_BaseMap.setToolTipText(Messages.Slideout_Map25MapOptions_Checkbox_Layer_Cartography_Tooltip);
             _chkShowLayer_BaseMap.addSelectionListener(_layerSelectionListener);
          }
+
+         {
+            /*
+             * Satellite
+             */
+            _chkShowLayer_Satellite = new Button(group, SWT.CHECK);
+            _chkShowLayer_Satellite.setText(Messages.Slideout_Map25MapOptions_Checkbox_Layer_Satellite);
+            _chkShowLayer_Satellite.addSelectionListener(_layerSelectionListener);
+         }
+
+         {
+            /*
+             * Photo Title
+             */
+            _chkShowPhoto_Title = new Button(group, SWT.CHECK);
+            _chkShowPhoto_Title.setText(Messages.Slideout_Map25MapOptions_Checkbox_Photo_Title);
+            _chkShowPhoto_Title.addSelectionListener(_layerSelectionListener);
+         }
+
          {
             /*
              * Tile info
@@ -357,10 +342,10 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
             onModify_Layer();
          }
       };
-      
+
       _btn_refresh_Bookmark_listener = new Listener() {
          @Override
-         public void handleEvent(Event e) {
+         public void handleEvent(final Event e) {
             // TODO Auto-generated method stub
             if (e.type == SWT.Selection){
                final Map25App mapApp = _map25View.getMapApp();
@@ -369,7 +354,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
             }
          }
       };
-      
+
    }
 
    private void onChangeUI() {
@@ -401,17 +386,25 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
       final Map25App mapApp = _map25View.getMapApp();
 
       mapApp.getLayer_BaseMap().setEnabled(_chkShowLayer_BaseMap.getSelection());
-      mapApp.getLayer_Building().setEnabled(_chkShowLayer_Building.getSelection());
       mapApp.getLayer_HillShading().setEnabled(_chkShowLayer_Hillshading.getSelection());
+      // satellite maps
+      mapApp.getLayer_Satellite().setEnabled(_chkShowLayer_Satellite.getSelection());
+
       mapApp.getLayer_Label().setEnabled(_chkShowLayer_Label.getSelection());
-//      mapApp.getLayer_Bookmark().setEnabled(_chkShowLayer_Bookmark.getSelection());
-//      mapApp.getLayer_S3DB().setEnabled(_chkShowLayer_S3DB.getSelection());
       mapApp.getLayer_ScaleBar().setEnabled(_chkShowLayer_Scale.getSelection());
+
+      mapApp.setIsPhotoShowTitle(_chkShowPhoto_Title.getSelection());
+
       mapApp.getLayer_TileInfo().setEnabled(_chkShowLayer_TileInfo.getSelection());
+
+      // switching on/off both building layers
+      mapApp.getLayer_Building().setEnabled(_chkShowLayer_Building.getSelection());
+      mapApp.getLayer_S3DB().setEnabled(_chkShowLayer_Building.getSelection());
 
       enableActions();
 
       mapApp.getMap().updateMap(true);
+      mapApp.updateUI_PhotoLayer();
    }
 
    private void restoreState() {
@@ -419,14 +412,18 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
       final Map25App mapApp = _map25View.getMapApp();
 
       _chkShowLayer_BaseMap.setSelection(mapApp.getLayer_BaseMap().isEnabled());
-      _chkShowLayer_Building.setSelection(mapApp.getLayer_Building().isEnabled());
       _chkShowLayer_Hillshading.setSelection(mapApp.getLayer_HillShading().isEnabled());
-      _chkShowLayer_Label.setSelection(mapApp.getLayer_Label().isEnabled());
-//      _chkShowLayer_Bookmark.setSelection(mapApp.getLayer_Bookmark().isEnabled());
-//      _chkShowLayer_S3DB.setSelection(mapApp.getLayer_S3DB().isEnabled());
+      //satellite maps
+      _chkShowLayer_Satellite.setSelection(mapApp.getLayer_Satellite().isEnabled());
 
+      _chkShowLayer_Label.setSelection(mapApp.getLayer_Label().isEnabled());
       _chkShowLayer_Scale.setSelection(mapApp.getLayer_ScaleBar().isEnabled());
+
+      _chkShowPhoto_Title.setSelection(mapApp.getIsPhotoShowTitle());
+
       _chkShowLayer_TileInfo.setSelection(mapApp.getLayer_TileInfo().isEnabled());
+
+      _chkShowLayer_Building.setSelection(mapApp.getLayer_Building().isEnabled());
 
       _spinnerHillshadingOpacity.setSelection(mapApp.getLayer_HillShading_Opacity());
 

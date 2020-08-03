@@ -2927,8 +2927,8 @@ public class ColumnManager {
 
                if (allNewVisibleColumnIds.get(visibleIndex).equals(headerColumnId)) {
 
-                  // set position after the current column
-                  newColumnPosition = visibleIndex + 1;
+                  // set position at the current column
+                  newColumnPosition = visibleIndex;
                   break;
                }
             }

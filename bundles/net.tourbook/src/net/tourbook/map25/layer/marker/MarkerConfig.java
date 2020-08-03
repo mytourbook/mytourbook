@@ -31,10 +31,12 @@ public class MarkerConfig {
    public String name      = Map25ConfigManager.CONFIG_DEFAULT_ID_1;
 
    /*
-    * Marker
+    * Marker(Tourmarker, Mapbookmarks, Photo)
     */
    public boolean isShowTourMarker      = true;
    public boolean isShowMapBookmark     = true;
+   public boolean isShowPhoto           = true;
+   public boolean isShowPhotoTitle      = true;
 
    public int     markerOrientation     = Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD;
    public RGB     markerFill_Color      = Map25ConfigManager.DEFAULT_MARKER_FILL_COLOR;
@@ -48,6 +50,7 @@ public class MarkerConfig {
     * Cluster
     */
    public boolean                isMarkerClustered      = true;
+   public boolean                isPhotoClustered       = true;
 
    public Enum<ClusterAlgorithm> clusterAlgorithm       = ClusterAlgorithm.FirstMarker_Grid;
    public int                    clusterGrid_Size       = Map25ConfigManager.DEFAULT_CLUSTER_GRID_SIZE;
@@ -60,6 +63,7 @@ public class MarkerConfig {
    public int                    clusterSymbol_Size     = Map25ConfigManager.DEFAULT_CLUSTER_SYMBOL_SIZE;
    public int                    clusterSymbol_Weight   = Map25ConfigManager.DEFAULT_CLUSTER_SYMBOL_WEIGHT;
 
+   
    @Override
    public boolean equals(final Object obj) {
 

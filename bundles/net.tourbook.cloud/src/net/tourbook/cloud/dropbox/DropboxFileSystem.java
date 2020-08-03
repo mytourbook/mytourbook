@@ -201,7 +201,8 @@ public class DropboxFileSystem extends TourbookFileSystem {
     * account as a device to watch.
     */
    @Override
-   public String selectFileSystemFolder(final Shell shell) {
+   public String selectFileSystemFolder(final Shell shell, final String workingDirectory) {
+
       final DialogDropboxFolderBrowser dropboxFolderChooser[] = new DialogDropboxFolderBrowser[1];
       final int folderChooserResult[] = new int[1];
       BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
@@ -210,7 +211,8 @@ public class DropboxFileSystem extends TourbookFileSystem {
             final String accessToken = _prefStore.getString(IPreferences.DROPBOX_ACCESSTOKEN);
 
             dropboxFolderChooser[0] = new DialogDropboxFolderBrowser(Display.getCurrent().getActiveShell(),
-                  accessToken);
+                  accessToken,
+                  workingDirectory);
             folderChooserResult[0] = dropboxFolderChooser[0].open();
          }
       });

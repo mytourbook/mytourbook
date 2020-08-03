@@ -143,14 +143,6 @@ public class EasyImportManager {
       return _instance;
    }
 
-   private final IDialogSettings _state     = TourbookPlugin.getState(ID);
-
-   private EasyConfig               _easyConfig;
-
-   private String                   _fileStoresHash;
-
-   private ReentrantLock            STORE_LOCK                                         = new ReentrantLock();
-
 
    /**
     * @param isForceRetrieveFiles
