@@ -132,192 +132,6 @@ import org.joda.time.PeriodType;
  */
 public class DialogEasyImportConfig extends TitleAreaDialog {
 
-   private static final String          ID                                = "DialogEasyImportConfig";            //$NON-NLS-1$
-   //
-   private static final String          COLUMN_ADJUST_TEMPERATURE         = "{0} - {1} {2}";                     //$NON-NLS-1$
-   //
-   private static final String          STATE_BACKUP_DEVICE_HISTORY_ITEMS = "STATE_BACKUP_DEVICE_HISTORY_ITEMS"; //$NON-NLS-1$
-   private static final String          STATE_BACKUP_FOLDER_HISTORY_ITEMS = "STATE_BACKUP_FOLDER_HISTORY_ITEMS"; //$NON-NLS-1$
-   private static final String          STATE_DEVICE_DEVICE_HISTORY_ITEMS = "STATE_DEVICE_DEVICE_HISTORY_ITEMS"; //$NON-NLS-1$
-   private static final String          STATE_DEVICE_FOLDER_HISTORY_ITEMS = "STATE_DEVICE_FOLDER_HISTORY_ITEMS"; //$NON-NLS-1$
-   private static final String          STATE_SELECTED_IMPORT_LAUNCHER    = "STATE_SELECTED_IMPORT_LAUNCHER";    //$NON-NLS-1$
-   private static final String          STATE_SELECTED_TAB_FOLDER         = "STATE_SELECTED_TAB_FOLDER";         //$NON-NLS-1$
-   //
-   private static final String          DATA_KEY_TOUR_TYPE_ID             = "DATA_KEY_TOUR_TYPE_ID";             //$NON-NLS-1$
-   private static final String          DATA_KEY_SPEED_TOUR_TYPE_INDEX    = "DATA_KEY_SPEED_TOUR_TYPE_INDEX";    //$NON-NLS-1$
-   //
-   private static final int             CONTROL_DECORATION_WIDTH          = 6;
-   private static final String          CSS_PX                            = "px";                                //$NON-NLS-1$
-   //
-   private final IPreferenceStore       _prefStore                        = TourbookPlugin.getPrefStore();
-   private final IDialogSettings        _state                            = TourbookPlugin.getState(ID);
-   private final IDialogSettings        _stateIC                          = TourbookPlugin.getState(ID + "_IC"); //$NON-NLS-1$
-   private final IDialogSettings        _stateIL                          = TourbookPlugin.getState(ID + "_IL"); //$NON-NLS-1$
-   //
-   private IPropertyChangeListener      _prefChangeListener;
-   //
-   private SelectionAdapter             _defaultModify_Listener;
-   private MouseWheelListener           _defaultModify_MouseWheelListener;
-   private MouseWheelListener           _defaultMouseWheelListener;
-   private SelectionAdapter             _icSelectionListener;
-   private FocusListener                _ic_FolderFocusListener;
-   private KeyAdapter                   _ic_FolderKeyListener;
-   private ModifyListener               _ic_FolderModifyListener;
-   private ModifyListener               _icModifyListener;
-   private ModifyListener               _ilModifyListener;
-   private SelectionAdapter             _ilSelectionListener;
-   private SelectionAdapter             _liveUpdateListener;
-   private MouseWheelListener           _liveUpdateMouseWheelListener;
-   private SelectionAdapter             _speedTourTypeListener;
-   //
-   private ActionOpenPrefDialog         _actionOpenTourTypePrefs;
-   private Action                       _actionRestoreDefaults;
-   private ActionSpeedTourType_Add      _actionTTSpeed_Add;
-   private ActionSpeedTourType_Delete[] _actionTTSpeed_Delete;
-   private ActionSpeedTourType_Sort     _actionTTSpeed_Sort;
-   //
-   private PixelConverter               _pc;
-
-   /** Model for all configurations. */
-   private EasyConfig                   _dialogEasyConfig;
-
-   /** Model for the currently selected configuration. */
-   private ImportConfig                 _selectedIC;
-   private ImportLauncher               _selectedIL;
-   //
-   private RawDataView                  _rawDataView;
-   private TableViewer                  _icViewer;
-   private TableViewer                  _ilViewer;
-   private ICColumnViewer               _icColumnViewer                   = new ICColumnViewer();
-   private ILColumnViewer               _ilColumnViewer                   = new ILColumnViewer();
-   private ColumnManager                _icColumnManager;
-   private ColumnManager                _ilColumnManager;
-   //
-   private TableColumnDefinition        _colDefProfileImage;
-   private int                          _columnIndexConfigImage;
-   //
-   private HashMap<Long, Image>         _configImages                     = new HashMap<>();
-   private HashMap<Long, Integer>       _configImageHash                  = new HashMap<>();
-   //
-   private HistoryItems                 _deviceHistoryItems               = new HistoryItems();
-   private HistoryItems                 _backupHistoryItems               = new HistoryItems();
-   //
-   private long                         _dragStart;
-   private int                          _leftPadding;
-   private int                          _defaultPaneWidth;
-   private boolean                      _isInUIUpdate;
-
-   private int                          _initialTab;
-
-   private final NumberFormat           _nf1                              = NumberFormat.getNumberInstance();
-   {
-      _nf1.setMinimumFractionDigits(1);
-      _nf1.setMaximumFractionDigits(1);
-   }
-
-   private final PeriodType         _durationTemplate    = PeriodType
-         .yearMonthDayTime()
-         //      // hide these components
-         .withMillisRemoved();
-
-   private Color                    COLOR_RED;
-   private Color                    COLOR_FOREGROUND;
-
-   /**
-    * Contains the controls which are displayed in the first column, these controls are used to get
-    * the maximum width and set the first column within the different section to the same width
-    */
-   private final ArrayList<Control> _firstColumnControls = new ArrayList<>();
-
-   /*
-    * UI controls
-    */
-   private Composite         _parent;
-   private Composite         _speedTourType_OuterContainer;
-   private Composite         _speedTourType_Container;
-   private Composite         _icViewerContainer;
-   private Composite         _ilViewerContainer;
-   private ScrolledComposite _speedTourType_ScrolledContainer;
-   //
-   private PageBook          _pagebookTourType;
-   //
-   private Label             _pageTourType_NoTourType;
-   private Composite         _pageTourType_OneForAll;
-   private Composite         _pageTourType_BySpeed;
-   //
-   private Button            _chkDash_DisplayAbsoluteFilePath;
-   private Button            _chkDash_LiveUpdate;
-   private Button            _chkIC_CreateBackup;
-   private Button            _chkIC_DeleteDeviceFiles;
-   private Button            _chkIC_ImportFiles;
-   private Button            _chkIC_TurnOffWatching;
-   private Button            _chkIL_AdjustTemperature;
-   private Button            _chkIL_RetrieveWeatherData;
-   private Button            _chkIL_SaveTour;
-   private Button            _chkIL_ShowInDashboard;
-   private Button            _chkIL_SetLastMarker;
-   private Button            _chkIL_SetTourType;
-   //
-   private Button            _btnIC_Duplicate;
-   private Button            _btnIC_New;
-   private Button            _btnIC_Remove;
-   private Button            _btnIC_SelectBackupFolder;
-   private Button            _btnIC_SelectDeviceFolder;
-   private Button            _btnIL_Duplicate;
-   private Button            _btnIL_New;
-   private Button            _btnIL_NewOne;
-   private Button            _btnIL_Remove;
-   //
-   private Combo             _comboIC_BackupFolder;
-   private Combo             _comboIC_DeviceFolder;
-   private Combo             _comboIC_DeviceType;
-   private Combo             _comboIL_TourType;
-   //
-   private Image             _imageFileSystem;
-   //
-   private Label             _lblIC_FileSystemImage;
-   private Label             _lblIC_ConfigName;
-   private Label             _lblIC_BackupFolder;
-   private Label             _lblIC_DeleteFilesInfo;
-   private Label             _lblIC_DeviceFolder;
-   private Label             _lblIL_AvgTemperature;
-   private Label             _lblIL_AvgTemperature_Unit;
-   private Label             _lblIL_ConfigDescription;
-   private Label             _lblIL_ConfigName;
-   private Label             _lblIL_LastMarker;
-   private Label             _lblIL_LastMarkerDistanceUnit;
-   private Label             _lblIL_LastMarkerText;
-   private Label             _lblIL_One_TourTypeIcon;
-   private Label             _lblIL_TemperatureAdjustmentDuration;
-   private Label             _lblIL_TemperatureAdjustmentDuration_Unit;
-   private Label[]           _lblTT_Speed_SpeedUnit;
-   private Label[]           _lblTT_Speed_TourTypeIcon;
-   //
-   private Link[]            _linkTT_Speed_TourType;
-   private Link              _linkTT_One_TourType;
-   private Link              _linkIC_LocalFolderPath;
-   private Link              _linkIC_DeviceFolderPath;
-   private Link              _linkIC_ILActions;
-   //
-   private Spinner           _spinnerDash_AnimationCrazinessFactor;
-   private Spinner           _spinnerDash_AnimationDuration;
-   private Spinner           _spinnerDash_BgOpacity;
-   private Spinner           _spinnerDash_NumHTiles;
-   private Spinner           _spinnerDash_StateTooltipWidth;
-   private Spinner           _spinnerDash_TileSize;
-   private Spinner           _spinnerIL_AvgTemperature;
-   private Spinner           _spinnerIL_LastMarkerDistance;
-   private Spinner           _spinnerIL_TemperatureAdjustmentDuration;
-   private Spinner[]         _spinnerTT_Speed_AvgSpeed;
-   //
-   private TabFolder         _tabFolderEasy;
-   //
-   private Text              _txtIC_DeviceFiles;
-   private Text              _txtIC_ConfigName;
-   private Text              _txtIL_ConfigDescription;
-   private Text              _txtIL_ConfigName;
-   private Text              _txtIL_LastMarker;
-
    private class ActionIL_NewOneTourType extends Action {
 
       private TourType _tourType;
@@ -341,7 +155,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
          onIL_AddOne(_tourType);
       }
    }
-
    private class ActionIL_SetOneTourType extends Action {
 
       private TourType __tourType;
@@ -371,7 +184,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
          updateUI_OneTourType(__tourType);
       }
    }
-
    private class ActionSpeedTourType_Add extends Action {
 
       public ActionSpeedTourType_Add() {
@@ -387,7 +199,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
          onSpeed_IL_TT_Add();
       }
    }
-
    private class ActionSpeedTourType_Delete extends Action {
 
       private int _speedTTIndex;
@@ -412,7 +223,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
          _speedTTIndex = speedTTIndex;
       }
    }
-
    private class ActionSpeedTourType_SetInMenu extends Action {
 
       private int      _speedTTIndex;
@@ -446,7 +256,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
          onSpeed_IL_TT_SetTourType(_speedTTIndex, _tourType);
       }
    }
-
    private class ActionSpeedTourType_Sort extends Action {
 
       public ActionSpeedTourType_Sort() {
@@ -464,7 +273,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
          onSpeed_IL_TT_Sort();
       }
    }
-
    public class ICColumnViewer implements ITourViewer {
 
       @Override
@@ -508,7 +316,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       @Override
       public void updateColumnHeader(final ColumnDefinition colDef) {}
    }
-
    private class ICContentProvider implements IStructuredContentProvider {
 
       public ICContentProvider() {}
@@ -527,7 +334,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       @Override
       public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {}
    }
-
    public class ILColumnViewer implements ITourViewer {
 
       @Override
@@ -571,7 +377,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       @Override
       public void updateColumnHeader(final ColumnDefinition colDef) {}
    }
-
    private class ILContentProvider implements IStructuredContentProvider {
 
       public ILContentProvider() {}
@@ -590,6 +395,207 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       @Override
       public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {}
    }
+   private static final String          ID                                = "DialogEasyImportConfig";            //$NON-NLS-1$
+   //
+   private static final String          COLUMN_ADJUST_TEMPERATURE         = "{0} - {1} {2}";                     //$NON-NLS-1$
+   //
+   private static final String          STATE_BACKUP_DEVICE_HISTORY_ITEMS = "STATE_BACKUP_DEVICE_HISTORY_ITEMS"; //$NON-NLS-1$
+   private static final String          STATE_BACKUP_FOLDER_HISTORY_ITEMS = "STATE_BACKUP_FOLDER_HISTORY_ITEMS"; //$NON-NLS-1$
+   private static final String          STATE_DEVICE_DEVICE_HISTORY_ITEMS = "STATE_DEVICE_DEVICE_HISTORY_ITEMS"; //$NON-NLS-1$
+   private static final String          STATE_DEVICE_FOLDER_HISTORY_ITEMS = "STATE_DEVICE_FOLDER_HISTORY_ITEMS"; //$NON-NLS-1$
+   private static final String          STATE_SELECTED_IMPORT_LAUNCHER    = "STATE_SELECTED_IMPORT_LAUNCHER";    //$NON-NLS-1$
+   private static final String          STATE_SELECTED_TAB_FOLDER         = "STATE_SELECTED_TAB_FOLDER";         //$NON-NLS-1$
+   //
+   private static final String          DATA_KEY_TOUR_TYPE_ID             = "DATA_KEY_TOUR_TYPE_ID";             //$NON-NLS-1$
+   private static final String          DATA_KEY_SPEED_TOUR_TYPE_INDEX    = "DATA_KEY_SPEED_TOUR_TYPE_INDEX";    //$NON-NLS-1$
+   //
+   private static final int             CONTROL_DECORATION_WIDTH          = 6;
+   private static final String          CSS_PX                            = "px";                                //$NON-NLS-1$
+   //
+   private final IPreferenceStore       _prefStore                        = TourbookPlugin.getPrefStore();
+   private final IDialogSettings        _state                            = TourbookPlugin.getState(ID);
+   private final IDialogSettings        _stateIC                          = TourbookPlugin.getState(ID + "_IC"); //$NON-NLS-1$
+   private final IDialogSettings        _stateIL                          = TourbookPlugin.getState(ID + "_IL"); //$NON-NLS-1$
+   private final IDialogSettings        _stateRDV                         = TourbookPlugin.getState(RawDataView.ID);
+   //
+   private IPropertyChangeListener      _prefChangeListener;
+   //
+   private SelectionAdapter             _defaultModify_Listener;
+   private MouseWheelListener           _defaultModify_MouseWheelListener;
+   private MouseWheelListener           _defaultMouseWheelListener;
+   private SelectionAdapter             _icSelectionListener;
+   private FocusListener                _ic_FolderFocusListener;
+   private KeyAdapter                   _ic_FolderKeyListener;
+   private ModifyListener               _ic_FolderModifyListener;
+   private ModifyListener               _icModifyListener;
+   private ModifyListener               _ilModifyListener;
+
+   private SelectionAdapter             _ilSelectionListener;
+
+   private SelectionAdapter             _liveUpdateListener;
+   private MouseWheelListener           _liveUpdateMouseWheelListener;
+   private SelectionAdapter             _speedTourTypeListener;
+   //
+   private ActionOpenPrefDialog         _actionOpenTourTypePrefs;
+   private Action                       _actionRestoreDefaults;
+   private ActionSpeedTourType_Add      _actionTTSpeed_Add;
+   private ActionSpeedTourType_Delete[] _actionTTSpeed_Delete;
+   private ActionSpeedTourType_Sort     _actionTTSpeed_Sort;
+   //
+   private PixelConverter               _pc;
+   /** Model for all configurations. */
+   private EasyConfig                   _dialogEasyConfig;
+   /** Model for the currently selected configuration. */
+   private ImportConfig                 _selectedIC;
+   private ImportLauncher               _selectedIL;
+   //
+   private RawDataView                  _rawDataView;
+   private TableViewer                  _icViewer;
+   private TableViewer                  _ilViewer;
+   private ICColumnViewer               _icColumnViewer                   = new ICColumnViewer();
+   private ILColumnViewer               _ilColumnViewer                   = new ILColumnViewer();
+   private ColumnManager                _icColumnManager;
+   private ColumnManager                _ilColumnManager;
+
+   //
+   private TableColumnDefinition        _colDefProfileImage;
+
+   private int                          _columnIndexConfigImage;
+   //
+   private HashMap<Long, Image>         _configImages                     = new HashMap<>();
+
+   private HashMap<Long, Integer>       _configImageHash                  = new HashMap<>();
+
+   //
+   private HistoryItems                 _deviceHistoryItems               = new HistoryItems();
+   private HistoryItems                 _backupHistoryItems               = new HistoryItems();
+
+   //
+   private long                         _dragStart;
+
+   private int                          _leftPadding;
+   private int                          _defaultPaneWidth;
+   private boolean                      _isInUIUpdate;
+   private int                          _initialTab;
+   private final NumberFormat           _nf1                              = NumberFormat.getNumberInstance();
+   {
+      _nf1.setMinimumFractionDigits(1);
+      _nf1.setMaximumFractionDigits(1);
+   }
+   private final PeriodType         _durationTemplate    = PeriodType
+         .yearMonthDayTime()
+         //      // hide these components
+         .withMillisRemoved();
+   private Color                    COLOR_RED;
+   private Color                    COLOR_FOREGROUND;
+   /**
+    * Contains the controls which are displayed in the first column, these controls are used to get
+    * the maximum width and set the first column within the different section to the same width
+    */
+   private final ArrayList<Control> _firstColumnControls = new ArrayList<>();
+   /*
+    * UI controls
+    */
+   private Composite         _parent;
+   private Composite         _speedTourType_OuterContainer;
+   private Composite         _speedTourType_Container;
+   private Composite         _icViewerContainer;
+   private Composite         _ilViewerContainer;
+   private ScrolledComposite _speedTourType_ScrolledContainer;
+   //
+   private PageBook          _pagebookTourType;
+   //
+   private Label             _pageTourType_NoTourType;
+   private Composite         _pageTourType_OneForAll;
+   private Composite         _pageTourType_BySpeed;
+   //
+   private Button            _chkDash_DisplayAbsoluteFilePath;
+   private Button            _chkDash_LiveUpdate;
+   private Button            _chkIC_CreateBackup;
+   private Button            _chkIC_DeleteDeviceFiles;
+   private Button            _chkIC_ImportFiles;
+   private Button            _chkIC_TurnOffWatching;
+   private Button            _chkIL_AdjustTemperature;
+   private Button            _chkIL_RetrieveWeatherData;
+   private Button            _chkIL_SaveTour;
+   private Button            _chkIL_ShowInDashboard;
+   private Button            _chkIL_SetLastMarker;
+   private Button            _chkIL_SetTourType;
+   //
+   private Button            _btnIC_Duplicate;
+   private Button            _btnIC_New;
+   private Button            _btnIC_Remove;
+   private Button            _btnIC_SelectBackupFolder;
+   private Button            _btnIC_SelectDeviceFolder;
+   private Button            _btnIL_Duplicate;
+   private Button            _btnIL_New;
+   private Button            _btnIL_NewOne;
+   private Button            _btnIL_Remove;
+   //
+   private Combo             _comboIC_BackupFolder;
+   private Combo             _comboIC_DeviceType;
+   private Combo             _comboIL_TourType;
+   private Combo                    _comboIL_One_TourType_Cadence;
+   private Combo                    _comboIC_DeviceFolder;
+   private Combo[]                  _comboTT_Cadence;
+   //
+   private Image             _imageFileSystem;
+   //
+   private Label             _lblIC_FileSystemImage;
+   private Label             _lblIC_ConfigName;
+   private Label             _lblIC_BackupFolder;
+   private Label             _lblIC_DeleteFilesInfo;
+   private Label             _lblIC_DeviceFolder;
+   private Label             _lblIL_AvgTemperature;
+   private Label             _lblIL_AvgTemperature_Unit;
+   private Label             _lblIL_ConfigDescription;
+   private Label             _lblIL_ConfigName;
+   private Label             _lblIL_LastMarker;
+   private Label             _lblIL_LastMarkerDistanceUnit;
+   private Label             _lblIL_LastMarkerText;
+   private Label             _lblIL_One_TourTypeIcon;
+
+   private Label                    _lblIL_One_TourTypeCadenceLabel;
+
+   private Label             _lblIL_TemperatureAdjustmentDuration;
+   private Label             _lblIL_TemperatureAdjustmentDuration_Unit;
+   private Label[]           _lblTT_Speed_SpeedUnit;
+   private Label[]                  _lblTT_Speed_TourTypeIcon;
+   //
+   private Link[]            _linkTT_Speed_TourType;
+   private Link              _linkTT_One_TourType;
+   private Link              _linkIC_LocalFolderPath;
+   private Link              _linkIC_DeviceFolderPath;
+   private Link              _linkIC_ILActions;
+   //
+   private Spinner           _spinnerDash_AnimationCrazinessFactor;
+   private Spinner           _spinnerDash_AnimationDuration;
+   private Spinner           _spinnerDash_BgOpacity;
+   private Spinner           _spinnerDash_NumHTiles;
+   private Spinner           _spinnerDash_StateTooltipWidth;
+   private Spinner           _spinnerDash_TileSize;
+
+   private Spinner           _spinnerIL_AvgTemperature;
+
+   private Spinner           _spinnerIL_LastMarkerDistance;
+
+   private Spinner           _spinnerIL_TemperatureAdjustmentDuration;
+
+   private Spinner[]         _spinnerTT_Speed_AvgSpeed;
+
+   //
+   private TabFolder         _tabFolderEasy;
+
+   //
+   private Text              _txtIC_DeviceFiles;
+
+   private Text              _txtIC_ConfigName;
+
+   private Text              _txtIL_ConfigDescription;
+
+   private Text              _txtIL_ConfigName;
+
+   private Text              _txtIL_LastMarker;
 
    public DialogEasyImportConfig(final Shell parentShell,
                                  final EasyConfig easyConfig,
@@ -2014,7 +2020,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
       {
          _lblIL_One_TourTypeIcon = new Label(container, SWT.NONE);
          GridDataFactory.fillDefaults()
@@ -2034,6 +2040,17 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
                net.tourbook.common.UI.openControlMenu(_linkTT_One_TourType);
             }
          });
+
+         _lblIL_One_TourTypeCadenceLabel = new Label(container, SWT.NONE);
+         _lblIL_One_TourTypeCadenceLabel.setText(Messages.Tour_Editor_Label_Cadence);
+
+         _comboIL_One_TourType_Cadence = new Combo(container, SWT.READ_ONLY | SWT.DROP_DOWN);
+
+         _comboIL_One_TourType_Cadence.add(Messages.Tour_Editor_Radio_Cadence_Rpm);
+         _comboIL_One_TourType_Cadence.add(Messages.Tour_Editor_Radio_Cadence_Spm);
+
+         final String cadence = Util.getStateString(_stateRDV, RawDataView.STATE_DEFAULT_CADENCE, RawDataView.STATE_DEFAULT_CADENCE_DEFAULT);
+         _comboIL_One_TourType_Cadence.setText(cadence);
       }
 
       return container;
@@ -2122,6 +2139,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       _lblTT_Speed_SpeedUnit = new Label[speedTTSize];
       _linkTT_Speed_TourType = new Link[speedTTSize];
       _spinnerTT_Speed_AvgSpeed = new Spinner[speedTTSize];
+      _comboTT_Cadence = new Combo[speedTTSize];
 
       _speedTourType_Container.setRedraw(false);
       {
@@ -2165,6 +2183,19 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
             linkTourType.addSelectionListener(_speedTourTypeListener);
 
             /*
+             * Combo: Cadence
+             */
+            final Label lblCadence = new Label(_speedTourType_Container, SWT.NONE);
+            lblCadence.setText(Messages.Tour_Editor_Label_Cadence);
+
+            final Combo comboCadence = new Combo(_speedTourType_Container, SWT.READ_ONLY | SWT.DROP_DOWN);
+            comboCadence.add(Messages.Tour_Editor_Radio_Cadence_Rpm);
+            comboCadence.add(Messages.Tour_Editor_Radio_Cadence_Spm);
+
+            final String cadence = Util.getStateString(_stateRDV, RawDataView.STATE_DEFAULT_CADENCE, RawDataView.STATE_DEFAULT_CADENCE_DEFAULT);
+            comboCadence.setText(cadence); // default for new records
+
+            /*
              * Context menu: Tour type
              */
             final MenuManager menuMgr = new MenuManager();
@@ -2192,6 +2223,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
             _lblTT_Speed_SpeedUnit[speedTTIndex] = lblUnit;
             _linkTT_Speed_TourType[speedTTIndex] = linkTourType;
             _spinnerTT_Speed_AvgSpeed[speedTTIndex] = spinnerValue;
+            _comboTT_Cadence[speedTTIndex] = comboCadence;
          }
       }
       _speedTourType_Container.setRedraw(true);
@@ -2216,7 +2248,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       final Composite speedTTContainer = new Composite(_speedTourType_ScrolledContainer, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(speedTTContainer);
       GridLayoutFactory.fillDefaults()
-            .numColumns(5)
+            .numColumns(7)
             .applyTo(speedTTContainer);
 
       _speedTourType_ScrolledContainer.setContent(speedTTContainer);
@@ -3282,6 +3314,10 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
                   for (final Label label : _lblTT_Speed_SpeedUnit) {
                      label.setEnabled(isILSelected);
+                  }
+
+                  for (final Combo combo : _comboTT_Cadence) {
+                     combo.setEnabled(isILSelected);
                   }
 
                   for (final Label label : _lblTT_Speed_TourTypeIcon) {
@@ -4472,10 +4508,12 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
                final Spinner spinnerAvgSpeed = _spinnerTT_Speed_AvgSpeed[speedTTIndex];
                final Link linkTourType = _linkTT_Speed_TourType[speedTTIndex];
+               final Combo comboCadence = _comboTT_Cadence[speedTTIndex];
 
                final SpeedTourType speedTourType = new SpeedTourType();
 
                speedTourType.avgSpeed = spinnerAvgSpeed.getSelection() * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+               speedTourType.cadence = comboCadence.getText();
 
                final Object tourTypeId = linkTourType.getData(DATA_KEY_TOUR_TYPE_ID);
                if (tourTypeId instanceof Long) {
@@ -4534,6 +4572,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
       }
 
       _selectedIL.setupItemImage();
+      _selectedIL.oneTourTypeCadence = _comboIL_One_TourType_Cadence.getText();
+
    }
 
    /**
@@ -4661,6 +4701,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
                   final Spinner spinnerAvgSpeed = _spinnerTT_Speed_AvgSpeed[speedTTIndex];
                   final Link linkTourType = _linkTT_Speed_TourType[speedTTIndex];
                   final Label labelTourTypeIcon = _lblTT_Speed_TourTypeIcon[speedTTIndex];
+                  final Combo comboCadence = _comboTT_Cadence[speedTTIndex];
 
                   // update UI
                   final double avgSpeed = (speedTT.avgSpeed / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE) + 0.0001;
@@ -4673,7 +4714,6 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
                      linkTourType.setData(DATA_KEY_TOUR_TYPE_ID, null);
                      linkTourType.setText(Messages.Dialog_ImportConfig_Link_TourType);
                      labelTourTypeIcon.setImage(null);
-
                   } else {
 
                      linkTourType.setData(DATA_KEY_TOUR_TYPE_ID, tourTypeId);
@@ -4684,12 +4724,16 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
                      labelTourTypeIcon.setImage(TourTypeImage.getTourTypeImage(tourTypeId));
                   }
 
+                  if (speedTT.cadence != null) {
+                     comboCadence.setText(speedTT.cadence);
+                  }
+
                   // keep references
                   labelTourTypeIcon.setData(DATA_KEY_SPEED_TOUR_TYPE_INDEX, speedTTIndex);
                   linkTourType.setData(DATA_KEY_SPEED_TOUR_TYPE_INDEX, speedTTIndex);
                   spinnerAvgSpeed.setData(DATA_KEY_SPEED_TOUR_TYPE_INDEX, speedTTIndex);
+                  comboCadence.setData(DATA_KEY_SPEED_TOUR_TYPE_INDEX, speedTTIndex);
                   _actionTTSpeed_Delete[speedTTIndex].setData(DATA_KEY_SPEED_TOUR_TYPE_INDEX, speedTTIndex);
-
                }
             }
             _speedTourType_OuterContainer.setRedraw(true);
@@ -4703,6 +4747,10 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
                final long tourTypeId = oneTourType.getTypeId();
                tourType = TourDatabase.getTourType(tourTypeId);
+            }
+
+            if (_selectedIL.oneTourTypeCadence != null) {
+               _comboIL_One_TourType_Cadence.setText(_selectedIL.oneTourTypeCadence);
             }
 
             updateUI_OneTourType(tourType);
@@ -4730,6 +4778,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
          _lblTT_Speed_SpeedUnit = null;
          _linkTT_Speed_TourType = null;
          _spinnerTT_Speed_AvgSpeed = null;
+         _comboTT_Cadence = null;
       }
    }
 

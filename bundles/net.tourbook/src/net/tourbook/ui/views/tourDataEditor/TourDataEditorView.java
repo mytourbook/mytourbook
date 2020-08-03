@@ -222,440 +222,6 @@ import org.eclipse.ui.progress.UIJob;
  */
 public class TourDataEditorView extends ViewPart implements ISaveablePart, ISaveAndRestorePart, ITourProvider2 {
 
-   public static final String     ID                            = "net.tourbook.views.TourDataEditorView";                //$NON-NLS-1$
-   //
-   private static final String    GRAPH_LABEL_HEARTBEAT_UNIT    = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
-   private static final String    VALUE_UNIT_K_CALORIES         = net.tourbook.ui.Messages.Value_Unit_KCalories;
-   //
-   /**
-    * On Linux an async selection event is fired since e4
-    */
-   private static final String    FIX_LINUX_ASYNC_EVENT_1       = "FIX_LINUX_ASYNC_EVENT_1";                              //$NON-NLS-1$
-   private static final String    FIX_LINUX_ASYNC_EVENT_2       = "FIX_LINUX_ASYNC_EVENT_2";                              //$NON-NLS-1$
-   //
-   private static final int       COLUMN_SPACING                = 20;
-   //
-   private static final String    WIDGET_KEY                    = "widgetKey";                                            //$NON-NLS-1$
-   private static final String    WIDGET_KEY_TOURDISTANCE       = "tourDistance";                                         //$NON-NLS-1$
-   private static final String    WIDGET_KEY_ALTITUDE_UP        = "altitudeUp";                                           //$NON-NLS-1$
-   private static final String    WIDGET_KEY_ALTITUDE_DOWN      = "altitudeDown";                                         //$NON-NLS-1$
-   private static final String    WIDGET_KEY_PERSON             = "tourPerson";                                           //$NON-NLS-1$
-   //
-   private static final String    MESSAGE_KEY_ANOTHER_SELECTION = "anotherSelection";                                     //$NON-NLS-1$
-   //
-   /**
-    * shows the busy indicator to load the slice viewer when there are more items as this value
-    */
-   private static final int       BUSY_INDICATOR_ITEMS          = 5000;
-   //
-   private static final String    STATE_SELECTED_TAB            = "tourDataEditor.selectedTab";                           //$NON-NLS-1$
-   private static final String    STATE_ROW_EDIT_MODE           = "tourDataEditor.rowEditMode";                           //$NON-NLS-1$
-   private static final String    STATE_IS_EDIT_MODE            = "tourDataEditor.isEditMode";                            //$NON-NLS-1$
-   private static final String    STATE_CSV_EXPORT_PATH         = "tourDataEditor.csvExportPath";                         //$NON-NLS-1$
-   //
-   private static final String    STATE_SECTION_CHARACTERISTICS = "STATE_SECTION_CHARACTERISTICS";                        //$NON-NLS-1$
-   private static final String    STATE_SECTION_DATE_TIME       = "STATE_SECTION_DATE_TIME";                              //$NON-NLS-1$
-   private static final String    STATE_SECTION_PERSONAL        = "STATE_SECTION_PERSONAL";                               //$NON-NLS-1$
-   private static final String    STATE_SECTION_TITLE           = "STATE_SECTION_TITLE";                                  //$NON-NLS-1$
-   private static final String    STATE_SECTION_WEATHER         = "STATE_SECTION_WEATHER";                                //$NON-NLS-1$
-   //
-   static final String            STATE_LAT_LON_DIGITS          = "STATE_LAT_LON_DIGITS";                                 //$NON-NLS-1$
-   static final int               DEFAULT_LAT_LON_DIGITS        = 5;
-   private static final String    COLUMN_DATA_SEQUENCE          = "DATA_SEQUENCE";                                        //$NON-NLS-1$
-   private static final String    COLUMN_ALTITUDE               = "ALTITUDE_ALTITUDE";                                    //$NON-NLS-1$
-   private static final String    COLUMN_PULSE                  = "BODY_PULSE";                                           //$NON-NLS-1$
-   private static final String    COLUMN_CADENCE                = "POWERTRAIN_CADENCE";                                   //$NON-NLS-1$
-   private static final String    COLUMN_TEMPERATURE            = "WEATHER_TEMPERATURE";                                  //$NON-NLS-1$
-   private static final String    COLUMN_POWER                  = "POWER";                                                //$NON-NLS-1$
-   private static final String    COLUMN_PACE                   = "MOTION_PACE";                                          //$NON-NLS-1$
-   //
-   private final IPreferenceStore _prefStore                    = TourbookPlugin.getPrefStore();
-   private final IPreferenceStore _prefStoreCommon              = CommonActivator.getPrefStore();
-   private final IDialogSettings  _state                        = TourbookPlugin.getState(ID);
-   private final IDialogSettings  _stateTimeSlice               = TourbookPlugin.getState(ID + ".slice");                 //$NON-NLS-1$
-   private final IDialogSettings  _stateSwimSlice               = TourbookPlugin.getState(ID + ".swimSlice");             //$NON-NLS-1$
-   //
-   private final boolean          _isOSX                        = UI.IS_OSX;
-   private final boolean          _isLinux                      = UI.IS_LINUX;
-   //
-   /**
-    * Tour start daytime in seconds
-    */
-   private int                    _tourStartDayTime;
-   //
-   /*
-    * Data series which are displayed in the viewer, all are metric system
-    */
-   private int[]                   _serieTime;
-   private float[]                 _serieDistance;
-   private float[]                 _serieAltitude;
-   private float[]                 _serieTemperature;
-   private float[]                 _serieCadence;
-   private float[]                 _serieGradient;
-   private float[]                 _serieSpeed;
-   private float[]                 _seriePace;
-   private float[]                 _seriePower;
-   private float[]                 _seriePulse;
-   private double[]                _serieLatitude;
-   private double[]                _serieLongitude;
-   private float[][]               _serieGears;
-   private boolean[]               _serieBreakTime;
-   //
-   private short[]                 _swimSerie_StrokeRate;
-// private short[]                 _swimSerie_LengthType;
-   private short[]                 _swimSerie_StrokesPerlength;
-   private short[]                 _swimSerie_StrokeStyle;
-   private int[]                   _swimSerie_Time;
-   //
-   private ColumnDefinition        _timeSlice_ColDef_Altitude;
-   private ColumnDefinition        _timeSlice_ColDef_Cadence;
-   private ColumnDefinition        _timeSlice_ColDef_Pulse;
-   private ColumnDefinition        _timeSlice_ColDef_Temperature;
-   private ColumnDefinition        _timeSlice_ColDef_Latitude;
-   private ColumnDefinition        _timeSlice_ColDef_Longitude;
-   //
-   private ColumnDefinition        _swimSlice_ColDef_StrokeRate;
-   private ColumnDefinition        _swimSlice_ColDef_Strokes;
-   private ColumnDefinition        _swimSlice_ColDef_StrokeStyle;
-   //
-   private MessageManager          _messageManager;
-   private PostSelectionProvider   _postSelectionProvider;
-   private ISelectionListener      _postSelectionListener;
-   private IPartListener2          _partListener;
-   private IPropertyChangeListener _prefChangeListener;
-   private IPropertyChangeListener _prefChangeListenerCommon;
-   private ITourEventListener      _tourEventListener;
-   private ITourSaveListener       _tourSaveListener;
-   //
-   private final NumberFormat      _nf1        = NumberFormat.getNumberInstance();
-   private final NumberFormat      _nf1NoGroup = NumberFormat.getNumberInstance();
-   private final NumberFormat      _nf2        = NumberFormat.getNumberInstance();
-   private final NumberFormat      _nf3        = NumberFormat.getNumberInstance();
-   private final NumberFormat      _nf6        = NumberFormat.getNumberInstance();
-   private final NumberFormat      _nf3NoGroup = NumberFormat.getNumberInstance();
-   {
-      _nf1.setMinimumFractionDigits(1);
-      _nf1.setMaximumFractionDigits(1);
-      _nf2.setMinimumFractionDigits(2);
-      _nf2.setMaximumFractionDigits(2);
-      _nf3.setMinimumFractionDigits(3);
-      _nf3.setMaximumFractionDigits(3);
-      _nf6.setMinimumFractionDigits(6);
-      _nf6.setMaximumFractionDigits(6);
-
-      _nf1NoGroup.setMinimumFractionDigits(1);
-      _nf1NoGroup.setMaximumFractionDigits(1);
-      _nf1NoGroup.setGroupingUsed(false);
-
-      _nf3NoGroup.setMinimumFractionDigits(3);
-      _nf3NoGroup.setMaximumFractionDigits(3);
-      _nf3NoGroup.setGroupingUsed(false);
-   }
-   //
-   private long                               _timeSlice_ViewerTourId = -1;
-   private long                               _swimSlice_ViewerTourId = -1;
-   //
-   /**
-    * <code>true</code>: rows can be selected in the viewer<br>
-    * <code>false</code>: cell can be selected in the viewer
-    */
-   private boolean                            _isRowEditMode          = true;
-   private boolean                            _isEditMode;
-   private boolean                            _isTourDirty            = false;
-   private boolean                            _isTourWithSwimData;
-   //
-   /**
-    * is <code>true</code> when the tour is currently being saved to prevent a modify event or the
-    * onSelectionChanged event
-    */
-   private boolean                            _isSavingInProgress     = false;
-
-   /**
-    * when <code>true</code> data are loaded into fields
-    */
-   private boolean                            _isSetField             = false;
-
-   /**
-    * contains the tour id from the last selection event
-    */
-   private Long                               _selectionTourId;
-   private ModifyListener                     _modifyListener;
-   private ModifyListener                     _modifyListener_Temperature;
-   private MouseWheelListener                 _mouseWheelListener;
-   private MouseWheelListener                 _mouseWheelListener_Temperature;
-   private SelectionAdapter                   _selectionListener;
-   private SelectionAdapter                   _selectionListener_Temperature;
-   private SelectionListener                  _columnSortListener;
-   private SelectionAdapter                   _tourTimeListener;
-   private ModifyListener                     _verifyFloatValue;
-   private ModifyListener                     _verifyIntValue;
-   //
-   private PixelConverter                     _pc;
-
-   /**
-    * this width is used as a hint for the width of the description field, this value also
-    * influences the width of the columns in this editor
-    */
-   private final int                          _hintTextColumnWidth    = _isOSX ? 200 : 150;
-   private int                                _hintValueFieldWidth;
-   private int                                _hintDefaultSpinnerWidth;
-
-   /**
-    * is <code>true</code> when {@link #_tourChart} contains reference tours
-    */
-   private boolean                            _isReferenceTourAvailable;
-
-   /**
-    * range for the reference tours, is <code>null</code> when reference tours are not available<br>
-    * 1st index = ref tour<br>
-    * 2nd index: 0:start, 1:end
-    */
-   private int[][]                            _refTourRange;
-
-   private boolean                            _isPartVisible;
-
-   /**
-    * when <code>true</code> additional info is displayed in the title area
-    */
-   private boolean                            _isInfoInTitle;
-
-   /**
-    * Is <code>true</code> when a cell editor is active, otherwise <code>false</code>
-    */
-   private boolean                            _isCellEditorActive;
-
-   /**
-    * Current combobox cell editor or <code>null</code> when a cell editor is not active.
-    */
-   private CellEditor_ComboBox_Customized     _currentComboBox_CellEditor;
-
-   /**
-    * Current text cell editor or <code>null</code> when a cell editor is not active.
-    */
-   private CellEditor_Text_Customized         _currentTextEditor_CellEditor;
-
-   /**
-    * every requested UI update increased this counter
-    */
-   private int                                _uiUpdateCounter;
-
-   /**
-    * counter when the UI update runnable is run, this will optimize performance to not update the
-    * UI when the part is hidden
-    */
-   private int                                _uiRunnableCounter      = 0;
-   private int                                _uiUpdateTitleCounter   = 0;
-   private TourData                           _uiRunnableTourData;
-   private boolean                            _uiRunnableForce_TimeSliceReload;
-   private boolean                            _uiRunnableForce_SwimSliceReload;
-   private boolean                            _uiRunnableIsDirtyDisabled;
-   //
-   private SliceEditingSupport_Float          _timeSlice_AltitudeEditingSupport;
-   private SliceEditingSupport_Float          _timeSlice_PulseEditingSupport;
-   private SliceEditingSupport_Float          _timeSlice_TemperatureEditingSupport;
-   private SliceEditingSupport_Float          _timeSlice_CadenceEditingSupport;
-   private SliceEditingSupport_Double         _timeSlice_LatitudeEditingSupport;
-   private SliceEditingSupport_Double         _timeSlice_LongitudeEditingSupport;
-   //
-   private SliceEditingSupport_Short          _swimSlice_StrokeRateEditingSupport;
-   private SliceEditingSupport_Short          _swimSlice_StrokesEditingSupport;
-   private SliceEditor_ComboBox_StrokeStyle   _swimSlice_StrokeStyleEditingSupport;
-   //
-   private int                                _enableActionCounter    = 0;
-
-   /**
-    * contains all markers with the data serie index as key
-    */
-   private final HashMap<Integer, TourMarker> _markerMap              = new HashMap<>();
-
-   /**
-    * When <code>true</code> the tour is created with the tour editor
-    */
-   private boolean                            _isManualTour;
-   private boolean                            _isTitleModified;
-   private boolean                            _isAltitudeManuallyModified;
-   private boolean                            _isDistManuallyModified;
-   private boolean                            _isLocationStartModified;
-   private boolean                            _isLocationEndModified;
-   private boolean                            _isTimeZoneManuallyModified;
-   private boolean                            _isTemperatureManuallyModified;
-   private boolean                            _isWindSpeedManuallyModified;
-
-   /*
-    * Measurement unit values
-    */
-   private float                            _unitValueAltitude;
-   private float                            _unitValueDistance;
-   private int[]                            _unitValueWindSpeed;
-   //
-   private MenuManager                      _swimViewer_MenuManager;
-   private MenuManager                      _timeViewer_MenuManager;
-   private IContextMenuProvider             _swimViewer_ContextMenuProvider = new SwimSlice_ViewerContextMenuProvider();
-   private IContextMenuProvider             _timeViewer_ContextMenuProvider = new TimeSlice_ViewerContextMenuProvider();
-   //
-   private Action_RemoveSwimStyle           _action_RemoveSwimStyle;
-   private Action_SetSwimStyle_Header       _action_SetSwimStyle_Header;
-   private ActionComputeDistanceValues      _actionComputeDistanceValues;
-   private ActionCreateTourMarker           _actionCreateTourMarker;
-   private ActionCSVTimeSliceExport         _actionCsvTimeSliceExport;
-   private ActionDeleteDistanceValues       _actionDeleteDistanceValues;
-   private ActionDeleteTimeSlicesKeepTime   _actionDeleteTimeSlicesKeepTime;
-   private ActionDeleteTimeSlicesRemoveTime _actionDeleteTimeSlicesRemoveTime;
-   private ActionEditTimeSlicesValues       _actionEditTimeSlicesValues;
-   private ActionExport                     _actionExportTour;
-   private ActionExtractTour                _actionExtractTour;
-   private ActionModifyColumns              _actionModify_TimeSliceColumns;
-   private ActionModifyColumns              _actionModify_SwimSliceColumns;
-   private ActionOpenAdjustAltitudeDialog   _actionOpenAdjustAltitudeDialog;
-   private ActionOpenMarkerDialog           _actionOpenMarkerDialog;
-   private ActionSetStartDistanceTo0        _actionSetStartDistanceTo_0;
-   private ActionSplitTour                  _actionSplitTour;
-   private ActionToggleReadEditMode         _actionToggleReadEditMode;
-   private ActionToggleRowSelectMode        _actionToggleRowSelectMode;
-   private ActionViewSettings               _actionViewSettings;
-   //
-   private ArrayList<Action_SetSwimStyle>   _allSwimStyleActions;
-   //
-   private TagMenuManager                   _tagMenuMgr;
-
-   /**
-    * Number of digits for the lat/lon columns.
-    */
-   private int                              _latLonDigits;
-
-   private final NumberFormat               _nfLatLon                       = NumberFormat.getNumberInstance();
-
-   private TourData                         _tourData;
-
-   //
-   // ################################################## UI controls ##################################################
-   //
-
-   private Composite                _parent;
-   private PageBook                 _pageBook;
-   private Composite                _page_NoTourData;
-   private Form                     _page_EditorForm;
-
-   private PageBook                 _pageBook_Swim;
-   private Composite                _pageSwim_NoData;
-   private Composite                _pageSwim_Data;
-   //
-   private CTabFolder               _tabFolder;
-   private CTabItem                 _tab_10_Tour;
-   private CTabItem                 _tab_20_TimeSlices;
-   private CTabItem                 _tab_30_SwimSlices;
-   //
-   /**
-    * contains the controls which are displayed in the first column, these controls are used to get
-    * the maximum width and set the first column within the different section to the same width
-    */
-   private final ArrayList<Control> _firstColumnControls          = new ArrayList<>();
-   private final ArrayList<Control> _firstColumnContainerControls = new ArrayList<>();
-   private final ArrayList<Control> _secondColumnControls         = new ArrayList<>();
-   //
-   private TourChart                _tourChart;
-
-   private Composite                _tourContainer;
-   //
-   private ScrolledComposite        _tab1Container;
-   private Composite                _tab2_TimeSlice_Container;
-   //
-   private Composite                _swimSliceViewerContainer;
-   private Composite                _timeSliceViewerContainer;
-   //
-   private Section                  _sectionTitle;
-   private Section                  _sectionDateTime;
-   private Section                  _sectionPersonal;
-   private Section                  _sectionWeather;
-   private Section                  _sectionCharacteristics;
-   //
-   private Label                    _timeSlice_Label;
-   private TableViewer              _timeSlice_Viewer;
-   private AtomicInteger            _timeSlice_Viewer_RunningId   = new AtomicInteger();
-   private TimeSliceComparator      _timeSlice_Comparator         = new TimeSliceComparator();
-   private Object[]                 _timeSlice_ViewerItems;
-   private ColumnManager            _timeSlice_ColumnManager;
-   private TimeSlice_TourViewer     _timeSlice_TourViewer         = new TimeSlice_TourViewer();
-   //
-   private TableViewer              _swimSlice_Viewer;
-   private Object[]                 _swimSlice_ViewerItems;
-   private ColumnManager            _swimSlice_ColumnManager;
-   private SwimSlice_TourViewer     _swimSlice_TourViewer         = new SwimSlice_TourViewer();
-
-   private FormToolkit              _tk;
-
-   /*
-    * tab: tour
-    */
-   private Combo             _comboTitle;
-   //
-   private Button            _rdoCadence_Rpm;
-   private Button            _rdoCadence_Spm;
-   //
-   private CLabel            _lblCloudIcon;
-   private CLabel            _lblTourType;
-   //
-   private ControlDecoration _decoTimeZone;
-   //
-   private Combo             _comboLocation_Start;
-   private Combo             _comboLocation_End;
-   private Combo             _comboTimeZone;
-   private Combo             _comboWeather_Clouds;
-   private Combo             _comboWeather_WindDirectionText;
-   private Combo             _comboWeather_WindSpeedText;
-   //
-   private DateTime          _dtStartTime;
-   private DateTime          _dtTourDate;
-   //
-   private Label             _lblAltitudeUpUnit;
-   private Label             _lblAltitudeDownUnit;
-   private Label             _lblDistanceUnit;
-   private Label             _lblPerson_BodyWeightUnit;
-   private Label             _lblSpeedUnit;
-   private Label             _lblStartTime;
-   private Label             _lblTags;
-   private Label             _lblTimeZone;
-   private Label             _lblWeather_PrecipitationUnit;
-   private Label             _lblWeather_PressureUnit;
-   private Label             _lblWeather_TemperatureUnit_Avg;
-   private Label             _lblWeather_TemperatureUnit_Max;
-   private Label             _lblWeather_TemperatureUnit_Min;
-   private Label             _lblWeather_TemperatureUnit_WindChill;
-   //
-   private Link              _linkDefaultTimeZone;
-   private Link              _linkGeoTimeZone;
-   private Link              _linkRemoveTimeZone;
-   private Link              _linkTag;
-   private Link              _linkTourType;
-   private Link              _linkWeather;
-   //
-   private Spinner           _spinPerson_BodyWeight;
-   private Spinner           _spinPerson_Calories;
-   private Spinner           _spinPerson_FTP;
-   private Spinner           _spinPerson_RestPuls;
-   private Spinner           _spinWeather_Humidity;
-   private Spinner           _spinWeather_PrecipitationValue;
-   private Spinner           _spinWeather_PressureValue;
-   private Spinner           _spinWeather_Temperature_Average;
-   private Spinner           _spinWeather_Temperature_Min;
-   private Spinner           _spinWeather_Temperature_Max;
-   private Spinner           _spinWeather_Temperature_WindChill;
-   private Spinner           _spinWeather_Wind_DirectionValue;
-   private Spinner           _spinWeather_Wind_SpeedValue;
-   //
-   private Text              _txtAltitudeDown;
-   private Text              _txtAltitudeUp;
-   private Text              _txtDescription;
-   private Text              _txtDistance;
-   private Text              _txtWeather;
-   //
-   private TimeDuration      _timeDriving;
-   private TimeDuration      _timePaused;
-   private TimeDuration      _timeRecording;
-
-   private Menu              _swimViewer_ContextMenu;
-   private Menu              _timeViewer_ContextMenu;
-
    private class Action_RemoveSwimStyle extends Action {
 
       public Action_RemoveSwimStyle() {
@@ -671,7 +237,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          setSwimStyle(null);
       }
    }
-
    /**
     * Swim style menu header item without action
     */
@@ -683,7 +248,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          setEnabled(false);
       }
    }
-
    private class ActionViewSettings extends ActionToolbarSlideout {
 
       @Override
@@ -692,7 +256,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          return new SlideoutViewSettings(_pageBook, toolbar, _state, TourDataEditorView.this);
       }
    }
-
    private final class CellEditor_ComboBox_Customized extends ComboBoxCellEditor {
 
       public CellEditor_ComboBox_Customized(final Composite composite, final String[] allItemText) {
@@ -726,7 +289,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          super.focusLost();
       }
    }
-
    /**
     * It took me hours to find this location where the editor is activated/deactivated without using
     * TableViewerEditor which is activated in setCellEditingSupport but not in the row edit mode.
@@ -764,7 +326,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          super.focusLost();
       }
    }
-
    private final class SliceEditingSupport_Double extends EditingSupport {
 
       private final TextCellEditor __cellEditor;
@@ -833,7 +394,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          }
       }
    }
-
    private final class SliceEditingSupport_Float extends EditingSupport {
 
       private final TextCellEditor __cellEditor;
@@ -953,7 +513,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          }
       }
    }
-
    private final class SliceEditingSupport_Short extends EditingSupport {
 
       private final TextCellEditor __cellEditor;
@@ -1028,7 +587,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          }
       }
    }
-
    private final class SliceEditor_ComboBox_StrokeStyle extends EditingSupport {
 
       private final ComboBoxCellEditor __cellEditor;
@@ -1119,7 +677,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          }
       }
    }
-
    private class SliceViewerItems {
 
       Object[] __timeSlice_ViewerItems;
@@ -1137,7 +694,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          __swimSlice_ViewerItems = swimSlice_ViewerItems;
       }
    }
-
    private class SwimSlice_TourViewer implements ITourViewer2 {
 
       @Override
@@ -1284,7 +840,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       @Override
       public void updateColumnHeader(final ColumnDefinition colDef) {}
    }
-
    private class SwimSlice_ViewerContentProvider implements IStructuredContentProvider {
 
       public SwimSlice_ViewerContentProvider() {}
@@ -1300,7 +855,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       @Override
       public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {}
    }
-
    public class SwimSlice_ViewerContextMenuProvider implements IContextMenuProvider {
 
       @Override
@@ -1326,7 +880,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          return _swimViewer_ContextMenu;
       }
    }
-
    private class TimeDuration {
 
       private static final String timeFormat      = "%5d:%02d:%02d"; //$NON-NLS-1$
@@ -1493,7 +1046,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          _isSetField = isBackup;
       }
    }
-
    private class TimeSlice_TourViewer implements ITourViewer2 {
 
       @Override
@@ -1640,7 +1192,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       @Override
       public void updateColumnHeader(final ColumnDefinition colDef) {}
    }
-
    private class TimeSlice_ViewerContentProvider implements IStructuredContentProvider {
 
       public TimeSlice_ViewerContentProvider() {}
@@ -1656,7 +1207,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       @Override
       public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {}
    }
-
    public class TimeSlice_ViewerContextMenuProvider implements IContextMenuProvider {
 
       @Override
@@ -1682,7 +1232,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          return _timeViewer_ContextMenu;
       }
    }
-
    private class TimeSliceComparator extends ViewerComparator {
 
       private static final int ASCENDING       = 0;
@@ -1827,6 +1376,457 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          updateUI_SetSortDirection(__sortColumnId, __sortDirection);
       }
    }
+   public static final String     ID                            = "net.tourbook.views.TourDataEditorView";                //$NON-NLS-1$
+   //
+   private static final String    GRAPH_LABEL_HEARTBEAT_UNIT    = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
+   private static final String    VALUE_UNIT_K_CALORIES         = net.tourbook.ui.Messages.Value_Unit_KCalories;
+   //
+   /**
+    * On Linux an async selection event is fired since e4
+    */
+   private static final String    FIX_LINUX_ASYNC_EVENT_1       = "FIX_LINUX_ASYNC_EVENT_1";                              //$NON-NLS-1$
+   private static final String    FIX_LINUX_ASYNC_EVENT_2       = "FIX_LINUX_ASYNC_EVENT_2";                              //$NON-NLS-1$
+   //
+   private static final int       COLUMN_SPACING                = 20;
+   //
+   private static final String    WIDGET_KEY                    = "widgetKey";                                            //$NON-NLS-1$
+   private static final String    WIDGET_KEY_TOURDISTANCE       = "tourDistance";                                         //$NON-NLS-1$
+   private static final String    WIDGET_KEY_ALTITUDE_UP        = "altitudeUp";                                           //$NON-NLS-1$
+   private static final String    WIDGET_KEY_ALTITUDE_DOWN      = "altitudeDown";                                         //$NON-NLS-1$
+   private static final String    WIDGET_KEY_PERSON             = "tourPerson";                                           //$NON-NLS-1$
+   //
+   private static final String    MESSAGE_KEY_ANOTHER_SELECTION = "anotherSelection";                                     //$NON-NLS-1$
+   //
+   /**
+    * shows the busy indicator to load the slice viewer when there are more items as this value
+    */
+   private static final int       BUSY_INDICATOR_ITEMS          = 5000;
+   //
+   private static final String    STATE_SELECTED_TAB            = "tourDataEditor.selectedTab";                           //$NON-NLS-1$
+   private static final String    STATE_ROW_EDIT_MODE           = "tourDataEditor.rowEditMode";                           //$NON-NLS-1$
+   private static final String    STATE_IS_EDIT_MODE            = "tourDataEditor.isEditMode";                            //$NON-NLS-1$
+   private static final String    STATE_CSV_EXPORT_PATH         = "tourDataEditor.csvExportPath";                         //$NON-NLS-1$
+   //
+   private static final String    STATE_SECTION_CHARACTERISTICS = "STATE_SECTION_CHARACTERISTICS";                        //$NON-NLS-1$
+   private static final String    STATE_SECTION_DATE_TIME       = "STATE_SECTION_DATE_TIME";                              //$NON-NLS-1$
+   private static final String    STATE_SECTION_PERSONAL        = "STATE_SECTION_PERSONAL";                               //$NON-NLS-1$
+   private static final String    STATE_SECTION_TITLE           = "STATE_SECTION_TITLE";                                  //$NON-NLS-1$
+   private static final String    STATE_SECTION_WEATHER         = "STATE_SECTION_WEATHER";                                //$NON-NLS-1$
+   //
+   static final String            STATE_LAT_LON_DIGITS          = "STATE_LAT_LON_DIGITS";                                 //$NON-NLS-1$
+   static final int               DEFAULT_LAT_LON_DIGITS        = 5;
+   private static final String    COLUMN_DATA_SEQUENCE          = "DATA_SEQUENCE";                                        //$NON-NLS-1$
+   private static final String    COLUMN_ALTITUDE               = "ALTITUDE_ALTITUDE";                                    //$NON-NLS-1$
+   private static final String    COLUMN_PULSE                  = "BODY_PULSE";                                           //$NON-NLS-1$
+   private static final String    COLUMN_CADENCE                = "POWERTRAIN_CADENCE";                                   //$NON-NLS-1$
+   private static final String    COLUMN_TEMPERATURE            = "WEATHER_TEMPERATURE";                                  //$NON-NLS-1$
+   private static final String    COLUMN_POWER                  = "POWER";                                                //$NON-NLS-1$
+   private static final String    COLUMN_PACE                   = "MOTION_PACE";                                          //$NON-NLS-1$
+   //
+   private final IPreferenceStore _prefStore                    = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore _prefStoreCommon              = CommonActivator.getPrefStore();
+   private final IDialogSettings  _state                        = TourbookPlugin.getState(ID);
+   private final IDialogSettings  _stateTimeSlice               = TourbookPlugin.getState(ID + ".slice");                 //$NON-NLS-1$
+   private final IDialogSettings  _stateSwimSlice               = TourbookPlugin.getState(ID + ".swimSlice");             //$NON-NLS-1$
+//
+   private final boolean          _isOSX                        = UI.IS_OSX;
+   private final boolean          _isLinux                      = UI.IS_LINUX;
+   //
+   /**
+    * Tour start daytime in seconds
+    */
+   private int                    _tourStartDayTime;
+   //
+   /*
+    * Data series which are displayed in the viewer, all are metric system
+    */
+   private int[]                   _serieTime;
+   private float[]                 _serieDistance;
+   private float[]                 _serieAltitude;
+   private float[]                 _serieTemperature;
+   private float[]                 _serieCadence;
+   private float[]                 _serieGradient;
+   private float[]                 _serieSpeed;
+   private float[]                 _seriePace;
+   private float[]                 _seriePower;
+   private float[]                 _seriePulse;
+   private double[]                _serieLatitude;
+   private double[]                _serieLongitude;
+   private float[][]               _serieGears;
+   private boolean[]               _serieBreakTime;
+   //
+   private short[]                 _swimSerie_StrokeRate;
+   // private short[]                 _swimSerie_LengthType;
+   private short[]                 _swimSerie_StrokesPerlength;
+   private short[]                 _swimSerie_StrokeStyle;
+   private int[]                   _swimSerie_Time;
+   //
+   private ColumnDefinition        _timeSlice_ColDef_Altitude;
+   private ColumnDefinition        _timeSlice_ColDef_Cadence;
+   private ColumnDefinition        _timeSlice_ColDef_Pulse;
+   private ColumnDefinition        _timeSlice_ColDef_Temperature;
+   private ColumnDefinition        _timeSlice_ColDef_Latitude;
+   private ColumnDefinition        _timeSlice_ColDef_Longitude;
+   //
+   private ColumnDefinition        _swimSlice_ColDef_StrokeRate;
+   private ColumnDefinition        _swimSlice_ColDef_Strokes;
+   private ColumnDefinition        _swimSlice_ColDef_StrokeStyle;
+   //
+   private MessageManager          _messageManager;
+   private PostSelectionProvider   _postSelectionProvider;
+   private ISelectionListener      _postSelectionListener;
+   private IPartListener2          _partListener;
+
+   private IPropertyChangeListener _prefChangeListener;
+
+   private IPropertyChangeListener _prefChangeListenerCommon;
+   private ITourEventListener      _tourEventListener;
+   private ITourSaveListener       _tourSaveListener;
+   //
+   private final NumberFormat      _nf1        = NumberFormat.getNumberInstance();
+   private final NumberFormat      _nf1NoGroup = NumberFormat.getNumberInstance();
+   private final NumberFormat      _nf2        = NumberFormat.getNumberInstance();
+   private final NumberFormat      _nf3        = NumberFormat.getNumberInstance();
+   private final NumberFormat      _nf6        = NumberFormat.getNumberInstance();
+   private final NumberFormat      _nf3NoGroup = NumberFormat.getNumberInstance();
+   {
+      _nf1.setMinimumFractionDigits(1);
+      _nf1.setMaximumFractionDigits(1);
+      _nf2.setMinimumFractionDigits(2);
+      _nf2.setMaximumFractionDigits(2);
+      _nf3.setMinimumFractionDigits(3);
+      _nf3.setMaximumFractionDigits(3);
+      _nf6.setMinimumFractionDigits(6);
+      _nf6.setMaximumFractionDigits(6);
+
+      _nf1NoGroup.setMinimumFractionDigits(1);
+      _nf1NoGroup.setMaximumFractionDigits(1);
+      _nf1NoGroup.setGroupingUsed(false);
+
+      _nf3NoGroup.setMinimumFractionDigits(3);
+      _nf3NoGroup.setMaximumFractionDigits(3);
+      _nf3NoGroup.setGroupingUsed(false);
+   }
+   //
+   private long                               _timeSlice_ViewerTourId = -1;
+   private long                               _swimSlice_ViewerTourId = -1;
+
+   //
+   /**
+    * <code>true</code>: rows can be selected in the viewer<br>
+    * <code>false</code>: cell can be selected in the viewer
+    */
+   private boolean                            _isRowEditMode          = true;
+   private boolean                            _isEditMode;
+   private boolean                            _isTourDirty            = false;
+
+   private boolean                            _isTourWithSwimData;
+
+   //
+   /**
+    * is <code>true</code> when the tour is currently being saved to prevent a modify event or the
+    * onSelectionChanged event
+    */
+   private boolean                            _isSavingInProgress     = false;
+
+   /**
+    * when <code>true</code> data are loaded into fields
+    */
+   private boolean                            _isSetField             = false;
+
+   /**
+    * contains the tour id from the last selection event
+    */
+   private Long                               _selectionTourId;
+
+   private ModifyListener                     _modifyListener;
+
+   private ModifyListener                     _modifyListener_Temperature;
+
+   private MouseWheelListener                 _mouseWheelListener;
+
+   private MouseWheelListener                 _mouseWheelListener_Temperature;
+
+   private SelectionAdapter                   _selectionListener;
+   private SelectionAdapter                   _selectionListener_Temperature;
+   private SelectionListener                  _columnSortListener;
+   private SelectionAdapter                   _tourTimeListener;
+   private ModifyListener                     _verifyFloatValue;
+   private ModifyListener                     _verifyIntValue;
+   //
+   private PixelConverter                     _pc;
+   /**
+    * this width is used as a hint for the width of the description field, this value also
+    * influences the width of the columns in this editor
+    */
+   private final int                          _hintTextColumnWidth    = _isOSX ? 200 : 150;
+   private int                                _hintValueFieldWidth;
+   private int                                _hintDefaultSpinnerWidth;
+   /**
+    * is <code>true</code> when {@link #_tourChart} contains reference tours
+    */
+   private boolean                            _isReferenceTourAvailable;
+   /**
+    * range for the reference tours, is <code>null</code> when reference tours are not available<br>
+    * 1st index = ref tour<br>
+    * 2nd index: 0:start, 1:end
+    */
+   private int[][]                            _refTourRange;
+   private boolean                            _isPartVisible;
+   /**
+    * when <code>true</code> additional info is displayed in the title area
+    */
+   private boolean                            _isInfoInTitle;
+   /**
+    * Is <code>true</code> when a cell editor is active, otherwise <code>false</code>
+    */
+   private boolean                            _isCellEditorActive;
+   /**
+    * Current combobox cell editor or <code>null</code> when a cell editor is not active.
+    */
+   private CellEditor_ComboBox_Customized     _currentComboBox_CellEditor;
+
+   /**
+    * Current text cell editor or <code>null</code> when a cell editor is not active.
+    */
+   private CellEditor_Text_Customized         _currentTextEditor_CellEditor;
+
+   /**
+    * every requested UI update increased this counter
+    */
+   private int                                _uiUpdateCounter;
+   /**
+    * counter when the UI update runnable is run, this will optimize performance to not update the
+    * UI when the part is hidden
+    */
+   private int                                _uiRunnableCounter      = 0;
+   private int                                _uiUpdateTitleCounter   = 0;
+   private TourData                           _uiRunnableTourData;
+   private boolean                            _uiRunnableForce_TimeSliceReload;
+   private boolean                            _uiRunnableForce_SwimSliceReload;
+   private boolean                            _uiRunnableIsDirtyDisabled;
+   //
+   private SliceEditingSupport_Float          _timeSlice_AltitudeEditingSupport;
+   private SliceEditingSupport_Float          _timeSlice_PulseEditingSupport;
+
+   private SliceEditingSupport_Float          _timeSlice_TemperatureEditingSupport;
+   private SliceEditingSupport_Float          _timeSlice_CadenceEditingSupport;
+   private SliceEditingSupport_Double         _timeSlice_LatitudeEditingSupport;
+   private SliceEditingSupport_Double         _timeSlice_LongitudeEditingSupport;
+   //
+   private SliceEditingSupport_Short          _swimSlice_StrokeRateEditingSupport;
+   private SliceEditingSupport_Short          _swimSlice_StrokesEditingSupport;
+   private SliceEditor_ComboBox_StrokeStyle   _swimSlice_StrokeStyleEditingSupport;
+   //
+   private int                                _enableActionCounter    = 0;
+   /**
+    * contains all markers with the data serie index as key
+    */
+   private final HashMap<Integer, TourMarker> _markerMap              = new HashMap<>();
+   /**
+    * When <code>true</code> the tour is created with the tour editor
+    */
+   private boolean                            _isManualTour;
+   private boolean                            _isTitleModified;
+   private boolean                            _isAltitudeManuallyModified;
+   private boolean                            _isDistManuallyModified;
+   private boolean                            _isLocationStartModified;
+   private boolean                            _isLocationEndModified;
+   private boolean                            _isTimeZoneManuallyModified;
+   private boolean                            _isTemperatureManuallyModified;
+   private boolean                            _isWindSpeedManuallyModified;
+   /*
+    * Measurement unit values
+    */
+   private float                            _unitValueAltitude;
+   private float                            _unitValueDistance;
+   private int[]                            _unitValueWindSpeed;
+   //
+   private MenuManager                      _swimViewer_MenuManager;
+   private MenuManager                      _timeViewer_MenuManager;
+   private IContextMenuProvider             _swimViewer_ContextMenuProvider = new SwimSlice_ViewerContextMenuProvider();
+   private IContextMenuProvider             _timeViewer_ContextMenuProvider = new TimeSlice_ViewerContextMenuProvider();
+   //
+   private Action_RemoveSwimStyle           _action_RemoveSwimStyle;
+   private Action_SetSwimStyle_Header       _action_SetSwimStyle_Header;
+   private ActionComputeDistanceValues      _actionComputeDistanceValues;
+   private ActionCreateTourMarker           _actionCreateTourMarker;
+
+   private ActionCSVTimeSliceExport         _actionCsvTimeSliceExport;
+
+   private ActionDeleteDistanceValues       _actionDeleteDistanceValues;
+
+   private ActionDeleteTimeSlicesKeepTime   _actionDeleteTimeSlicesKeepTime;
+
+   //
+   // ################################################## UI controls ##################################################
+   //
+
+   private ActionDeleteTimeSlicesRemoveTime _actionDeleteTimeSlicesRemoveTime;
+   private ActionEditTimeSlicesValues       _actionEditTimeSlicesValues;
+   private ActionExport                     _actionExportTour;
+   private ActionExtractTour                _actionExtractTour;
+
+   private ActionModifyColumns              _actionModify_TimeSliceColumns;
+   private ActionModifyColumns              _actionModify_SwimSliceColumns;
+   private ActionOpenAdjustAltitudeDialog   _actionOpenAdjustAltitudeDialog;
+   private ActionOpenMarkerDialog           _actionOpenMarkerDialog;
+   private ActionSetStartDistanceTo0        _actionSetStartDistanceTo_0;
+   private ActionSplitTour                  _actionSplitTour;
+   private ActionToggleReadEditMode         _actionToggleReadEditMode;
+   private ActionToggleRowSelectMode        _actionToggleRowSelectMode;
+   private ActionViewSettings               _actionViewSettings;
+   //
+   private ArrayList<Action_SetSwimStyle>   _allSwimStyleActions;
+   //
+   private TagMenuManager                   _tagMenuMgr;
+
+   /**
+    * Number of digits for the lat/lon columns.
+    */
+   private int                              _latLonDigits;
+   private final NumberFormat               _nfLatLon                       = NumberFormat.getNumberInstance();
+   private TourData                         _tourData;
+   private Composite                _parent;
+   private PageBook                 _pageBook;
+   private Composite                _page_NoTourData;
+   private Form                     _page_EditorForm;
+   private PageBook                 _pageBook_Swim;
+   private Composite                _pageSwim_NoData;
+   private Composite                _pageSwim_Data;
+   //
+   private CTabFolder               _tabFolder;
+   private CTabItem                 _tab_10_Tour;
+   private CTabItem                 _tab_20_TimeSlices;
+   private CTabItem                 _tab_30_SwimSlices;
+   //
+   /**
+    * contains the controls which are displayed in the first column, these controls are used to get
+    * the maximum width and set the first column within the different section to the same width
+    */
+   private final ArrayList<Control> _firstColumnControls          = new ArrayList<>();
+   private final ArrayList<Control> _firstColumnContainerControls = new ArrayList<>();
+   private final ArrayList<Control> _secondColumnControls         = new ArrayList<>();
+   //
+   private TourChart                _tourChart;
+   private Composite                _tourContainer;
+   //
+   private ScrolledComposite        _tab1Container;
+   private Composite                _tab2_TimeSlice_Container;
+
+   //
+   private Composite                _swimSliceViewerContainer;
+
+   private Composite                _timeSliceViewerContainer;
+   //
+   private Section                  _sectionTitle;
+   private Section                  _sectionDateTime;
+   private Section                  _sectionPersonal;
+   private Section                  _sectionWeather;
+   private Section                  _sectionCharacteristics;
+   //
+   private Label                    _timeSlice_Label;
+   private TableViewer              _timeSlice_Viewer;
+   private AtomicInteger            _timeSlice_Viewer_RunningId   = new AtomicInteger();
+   private TimeSliceComparator      _timeSlice_Comparator         = new TimeSliceComparator();
+   private Object[]                 _timeSlice_ViewerItems;
+   private ColumnManager            _timeSlice_ColumnManager;
+   private TimeSlice_TourViewer     _timeSlice_TourViewer         = new TimeSlice_TourViewer();
+   //
+   private TableViewer              _swimSlice_Viewer;
+   private Object[]                 _swimSlice_ViewerItems;
+   private ColumnManager            _swimSlice_ColumnManager;
+   private SwimSlice_TourViewer     _swimSlice_TourViewer         = new SwimSlice_TourViewer();
+   private FormToolkit              _tk;
+   /*
+    * tab: tour
+    */
+   private Combo             _comboTitle;
+   //
+   private Button            _rdoCadence_Rpm;
+   private Button            _rdoCadence_Spm;
+   //
+   private CLabel            _lblCloudIcon;
+   private CLabel            _lblTourType;
+   //
+   private ControlDecoration _decoTimeZone;
+   //
+   private Combo             _comboLocation_Start;
+   private Combo             _comboLocation_End;
+   private Combo             _comboTimeZone;
+   private Combo             _comboWeather_Clouds;
+   private Combo             _comboWeather_WindDirectionText;
+   private Combo             _comboWeather_WindSpeedText;
+   //
+   private DateTime          _dtStartTime;
+   private DateTime          _dtTourDate;
+   //
+   private Label             _lblAltitudeUpUnit;
+   private Label             _lblAltitudeDownUnit;
+   private Label             _lblDistanceUnit;
+   private Label             _lblPerson_BodyWeightUnit;
+   private Label             _lblSpeedUnit;
+   private Label             _lblStartTime;
+   private Label             _lblTags;
+   private Label             _lblTimeZone;
+   private Label             _lblWeather_PrecipitationUnit;
+   private Label             _lblWeather_PressureUnit;
+   private Label             _lblWeather_TemperatureUnit_Avg;
+   private Label             _lblWeather_TemperatureUnit_Max;
+   private Label             _lblWeather_TemperatureUnit_Min;
+   private Label             _lblWeather_TemperatureUnit_WindChill;
+   //
+   private Link              _linkDefaultTimeZone;
+   private Link              _linkGeoTimeZone;
+   private Link              _linkRemoveTimeZone;
+   private Link              _linkTag;
+   private Link              _linkTourType;
+   private Link              _linkWeather;
+   //
+   private Spinner           _spinPerson_BodyWeight;
+   private Spinner           _spinPerson_Calories;
+   private Spinner           _spinPerson_FTP;
+
+   private Spinner           _spinPerson_RestPuls;
+   private Spinner           _spinWeather_Humidity;
+
+   private Spinner           _spinWeather_PrecipitationValue;
+
+   private Spinner           _spinWeather_PressureValue;
+
+   private Spinner           _spinWeather_Temperature_Average;
+
+   private Spinner           _spinWeather_Temperature_Min;
+
+   private Spinner           _spinWeather_Temperature_Max;
+
+   private Spinner           _spinWeather_Temperature_WindChill;
+
+   private Spinner           _spinWeather_Wind_DirectionValue;
+
+   private Spinner           _spinWeather_Wind_SpeedValue;
+
+   //
+   private Text              _txtAltitudeDown;
+
+   private Text              _txtAltitudeUp;
+
+   private Text              _txtDescription;
+
+   private Text              _txtDistance;
+
+   private Text              _txtWeather;
+
+   //
+   private TimeDuration      _timeDriving;
+
+   private TimeDuration      _timePaused;
+
+   private TimeDuration      _timeRecording;
+
+   private Menu              _swimViewer_ContextMenu;
+
+   private Menu              _timeViewer_ContextMenu;
 
    /**
     * Compute distance values from the geo positions

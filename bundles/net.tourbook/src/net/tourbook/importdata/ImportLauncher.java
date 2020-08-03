@@ -34,6 +34,7 @@ public class ImportLauncher implements Cloneable {
    public Enum<TourTypeConfig>     tourTypeConfig;
 
    public TourType                 oneTourType;
+   public String                   oneTourTypeCadence;
 
    public ArrayList<SpeedTourType> speedTourTypes                = new ArrayList<>();
 
