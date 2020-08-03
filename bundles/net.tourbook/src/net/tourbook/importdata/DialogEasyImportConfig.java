@@ -132,269 +132,6 @@ import org.joda.time.PeriodType;
  */
 public class DialogEasyImportConfig extends TitleAreaDialog {
 
-   private class ActionIL_NewOneTourType extends Action {
-
-      private TourType _tourType;
-
-      /**
-       * @param tourType
-       */
-      public ActionIL_NewOneTourType(final TourType tourType) {
-
-         super(tourType.getName(), AS_CHECK_BOX);
-
-         // show image when tour type can be selected, disabled images look ugly on win
-         final Image tourTypeImage = TourTypeImage.getTourTypeImage(tourType.getTypeId());
-         setImageDescriptor(ImageDescriptor.createFromImage(tourTypeImage));
-
-         _tourType = tourType;
-      }
-
-      @Override
-      public void run() {
-         onIL_AddOne(_tourType);
-      }
-   }
-   private class ActionIL_SetOneTourType extends Action {
-
-      private TourType __tourType;
-
-      /**
-       * @param tourType
-       */
-      public ActionIL_SetOneTourType(final TourType tourType, final boolean isChecked) {
-
-         super(tourType.getName(), AS_CHECK_BOX);
-
-         if (isChecked == false) {
-
-            // show image when tour type can be selected, disabled images look ugly on win
-            final Image tourTypeImage = TourTypeImage.getTourTypeImage(tourType.getTypeId());
-            setImageDescriptor(ImageDescriptor.createFromImage(tourTypeImage));
-         }
-
-         setChecked(isChecked);
-         setEnabled(isChecked == false);
-
-         __tourType = tourType;
-      }
-
-      @Override
-      public void run() {
-         updateUI_OneTourType(__tourType);
-      }
-   }
-   private class ActionSpeedTourType_Add extends Action {
-
-      public ActionSpeedTourType_Add() {
-
-         super(null, AS_PUSH_BUTTON);
-
-         setToolTipText(Messages.Dialog_ImportConfig_Action_AddSpeed_Tooltip);
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Add));
-      }
-
-      @Override
-      public void run() {
-         onSpeed_IL_TT_Add();
-      }
-   }
-   private class ActionSpeedTourType_Delete extends Action {
-
-      private int _speedTTIndex;
-
-      public ActionSpeedTourType_Delete() {
-
-         super(null, AS_PUSH_BUTTON);
-
-         setToolTipText(Messages.Dialog_ImportConfig_Action_RemoveSpeed_Tooltip);
-
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Trash));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Trash_Disabled));
-      }
-
-      @Override
-      public void run() {
-         onSpeed_IL_TT_Remove(_speedTTIndex);
-      }
-
-      public void setData(final String key, final int speedTTIndex) {
-
-         _speedTTIndex = speedTTIndex;
-      }
-   }
-   private class ActionSpeedTourType_SetInMenu extends Action {
-
-      private int      _speedTTIndex;
-      private TourType _tourType;
-
-      /**
-       * @param tourType
-       * @param speedTTIndex
-       */
-      public ActionSpeedTourType_SetInMenu(final TourType tourType, final boolean isChecked, final int speedTTIndex) {
-
-         super(tourType.getName(), AS_CHECK_BOX);
-
-         _speedTTIndex = speedTTIndex;
-
-         if (isChecked == false) {
-
-            // show image when tour type can be selected, disabled images look ugly on win
-            final Image tourTypeImage = TourTypeImage.getTourTypeImage(tourType.getTypeId());
-            setImageDescriptor(ImageDescriptor.createFromImage(tourTypeImage));
-         }
-
-         setChecked(isChecked);
-         setEnabled(isChecked == false);
-
-         _tourType = tourType;
-      }
-
-      @Override
-      public void run() {
-         onSpeed_IL_TT_SetTourType(_speedTTIndex, _tourType);
-      }
-   }
-   private class ActionSpeedTourType_Sort extends Action {
-
-      public ActionSpeedTourType_Sort() {
-
-         super(null, AS_PUSH_BUTTON);
-
-         setToolTipText(Messages.Dialog_ImportConfig_Action_SortBySpeed_Tooltip);
-
-         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Sort));
-         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Sort_Disabled));
-      }
-
-      @Override
-      public void run() {
-         onSpeed_IL_TT_Sort();
-      }
-   }
-   public class ICColumnViewer implements ITourViewer {
-
-      @Override
-      public ColumnManager getColumnManager() {
-         return _icColumnManager;
-      }
-
-      @Override
-      public ColumnViewer getViewer() {
-         return _icViewer;
-      }
-
-      @Override
-      public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
-
-         _icViewerContainer.setRedraw(false);
-         {
-            final ISelection selection = _icViewer.getSelection();
-
-            _icViewer.getTable().dispose();
-
-            createUI_212_IC_ViewerTable(_icViewerContainer);
-            _icViewerContainer.layout();
-
-            // update viewer
-            reloadViewer();
-
-            _icViewer.setSelection(selection);
-         }
-         _icViewerContainer.setRedraw(true);
-
-         return _icViewer;
-      }
-
-      @Override
-      public void reloadViewer() {
-
-         _icViewer.setInput(this);
-      }
-
-      @Override
-      public void updateColumnHeader(final ColumnDefinition colDef) {}
-   }
-   private class ICContentProvider implements IStructuredContentProvider {
-
-      public ICContentProvider() {}
-
-      @Override
-      public void dispose() {}
-
-      @Override
-      public Object[] getElements(final Object parent) {
-
-         final ArrayList<ImportConfig> configItems = _dialogEasyConfig.importConfigs;
-
-         return configItems.toArray(new ImportConfig[configItems.size()]);
-      }
-
-      @Override
-      public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {}
-   }
-   public class ILColumnViewer implements ITourViewer {
-
-      @Override
-      public ColumnManager getColumnManager() {
-         return _ilColumnManager;
-      }
-
-      @Override
-      public ColumnViewer getViewer() {
-         return _ilViewer;
-      }
-
-      @Override
-      public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
-
-         _ilViewerContainer.setRedraw(false);
-         {
-            final ISelection selection = _ilViewer.getSelection();
-
-            _ilViewer.getTable().dispose();
-
-            createUI_512_IL_ViewerTable(_ilViewerContainer);
-            _ilViewerContainer.layout();
-
-            // update viewer
-            reloadViewer();
-
-            _ilViewer.setSelection(selection);
-         }
-         _ilViewerContainer.setRedraw(true);
-
-         return _ilViewer;
-      }
-
-      @Override
-      public void reloadViewer() {
-
-         _ilViewer.setInput(this);
-      }
-
-      @Override
-      public void updateColumnHeader(final ColumnDefinition colDef) {}
-   }
-   private class ILContentProvider implements IStructuredContentProvider {
-
-      public ILContentProvider() {}
-
-      @Override
-      public void dispose() {}
-
-      @Override
-      public Object[] getElements(final Object parent) {
-
-         final ArrayList<ImportLauncher> configItems = _dialogEasyConfig.importLaunchers;
-
-         return configItems.toArray(new ImportLauncher[configItems.size()]);
-      }
-
-      @Override
-      public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {}
-   }
    private static final String          ID                                = "DialogEasyImportConfig";            //$NON-NLS-1$
    //
    private static final String          COLUMN_ADJUST_TEMPERATURE         = "{0} - {1} {2}";                     //$NON-NLS-1$
@@ -429,9 +166,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
    private ModifyListener               _ic_FolderModifyListener;
    private ModifyListener               _icModifyListener;
    private ModifyListener               _ilModifyListener;
-
    private SelectionAdapter             _ilSelectionListener;
-
    private SelectionAdapter             _liveUpdateListener;
    private MouseWheelListener           _liveUpdateMouseWheelListener;
    private SelectionAdapter             _speedTourTypeListener;
@@ -443,8 +178,10 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
    private ActionSpeedTourType_Sort     _actionTTSpeed_Sort;
    //
    private PixelConverter               _pc;
+
    /** Model for all configurations. */
    private EasyConfig                   _dialogEasyConfig;
+
    /** Model for the currently selected configuration. */
    private ImportConfig                 _selectedIC;
    private ImportLauncher               _selectedIL;
@@ -456,43 +193,43 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
    private ILColumnViewer               _ilColumnViewer                   = new ILColumnViewer();
    private ColumnManager                _icColumnManager;
    private ColumnManager                _ilColumnManager;
-
    //
    private TableColumnDefinition        _colDefProfileImage;
-
    private int                          _columnIndexConfigImage;
    //
    private HashMap<Long, Image>         _configImages                     = new HashMap<>();
-
    private HashMap<Long, Integer>       _configImageHash                  = new HashMap<>();
-
    //
    private HistoryItems                 _deviceHistoryItems               = new HistoryItems();
    private HistoryItems                 _backupHistoryItems               = new HistoryItems();
-
    //
    private long                         _dragStart;
-
    private int                          _leftPadding;
    private int                          _defaultPaneWidth;
    private boolean                      _isInUIUpdate;
+
    private int                          _initialTab;
+
    private final NumberFormat           _nf1                              = NumberFormat.getNumberInstance();
    {
       _nf1.setMinimumFractionDigits(1);
       _nf1.setMaximumFractionDigits(1);
    }
+
    private final PeriodType         _durationTemplate    = PeriodType
          .yearMonthDayTime()
          //      // hide these components
          .withMillisRemoved();
+
    private Color                    COLOR_RED;
    private Color                    COLOR_FOREGROUND;
+
    /**
     * Contains the controls which are displayed in the first column, these controls are used to get
     * the maximum width and set the first column within the different section to the same width
     */
    private final ArrayList<Control> _firstColumnControls = new ArrayList<>();
+
    /*
     * UI controls
     */
@@ -554,9 +291,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
    private Label             _lblIL_LastMarkerDistanceUnit;
    private Label             _lblIL_LastMarkerText;
    private Label             _lblIL_One_TourTypeIcon;
-
    private Label                    _lblIL_One_TourTypeCadenceLabel;
-
    private Label             _lblIL_TemperatureAdjustmentDuration;
    private Label             _lblIL_TemperatureAdjustmentDuration_Unit;
    private Label[]           _lblTT_Speed_SpeedUnit;
@@ -567,35 +302,300 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
    private Link              _linkIC_LocalFolderPath;
    private Link              _linkIC_DeviceFolderPath;
    private Link              _linkIC_ILActions;
+
    //
    private Spinner           _spinnerDash_AnimationCrazinessFactor;
+
    private Spinner           _spinnerDash_AnimationDuration;
    private Spinner           _spinnerDash_BgOpacity;
    private Spinner           _spinnerDash_NumHTiles;
    private Spinner           _spinnerDash_StateTooltipWidth;
    private Spinner           _spinnerDash_TileSize;
-
    private Spinner           _spinnerIL_AvgTemperature;
-
    private Spinner           _spinnerIL_LastMarkerDistance;
-
    private Spinner           _spinnerIL_TemperatureAdjustmentDuration;
-
    private Spinner[]         _spinnerTT_Speed_AvgSpeed;
-
    //
    private TabFolder         _tabFolderEasy;
-
    //
    private Text              _txtIC_DeviceFiles;
-
    private Text              _txtIC_ConfigName;
-
    private Text              _txtIL_ConfigDescription;
-
    private Text              _txtIL_ConfigName;
-
    private Text              _txtIL_LastMarker;
+
+   private class ActionIL_NewOneTourType extends Action {
+
+      private TourType _tourType;
+
+      /**
+       * @param tourType
+       */
+      public ActionIL_NewOneTourType(final TourType tourType) { 
+
+         super(tourType.getName(), AS_CHECK_BOX);
+
+         // show image when tour type can be selected, disabled images look ugly on win
+         final Image tourTypeImage = TourTypeImage.getTourTypeImage(tourType.getTypeId());
+         setImageDescriptor(ImageDescriptor.createFromImage(tourTypeImage));
+
+         _tourType = tourType;
+      }
+
+      @Override
+      public void run() {
+         onIL_AddOne(_tourType);
+      }
+   }
+
+   private class ActionIL_SetOneTourType extends Action {
+
+      private TourType __tourType;
+
+      /**
+       * @param tourType
+       */
+      public ActionIL_SetOneTourType(final TourType tourType, final boolean isChecked) {
+
+         super(tourType.getName(), AS_CHECK_BOX);
+
+         if (isChecked == false) {
+
+            // show image when tour type can be selected, disabled images look ugly on win
+            final Image tourTypeImage = TourTypeImage.getTourTypeImage(tourType.getTypeId());
+            setImageDescriptor(ImageDescriptor.createFromImage(tourTypeImage));
+         }
+
+         setChecked(isChecked);
+         setEnabled(isChecked == false);
+
+         __tourType = tourType;
+      }
+
+      @Override
+      public void run() {
+         updateUI_OneTourType(__tourType);
+      }
+   }
+
+   private class ActionSpeedTourType_Add extends Action {
+
+      public ActionSpeedTourType_Add() {
+
+         super(null, AS_PUSH_BUTTON);
+
+         setToolTipText(Messages.Dialog_ImportConfig_Action_AddSpeed_Tooltip);
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Add));
+      }
+
+      @Override
+      public void run() {
+         onSpeed_IL_TT_Add();
+      }
+   }
+
+   private class ActionSpeedTourType_Delete extends Action {
+
+      private int _speedTTIndex;
+
+      public ActionSpeedTourType_Delete() {
+
+         super(null, AS_PUSH_BUTTON);
+
+         setToolTipText(Messages.Dialog_ImportConfig_Action_RemoveSpeed_Tooltip);
+
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Trash));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Trash_Disabled));
+      }
+
+      @Override
+      public void run() {
+         onSpeed_IL_TT_Remove(_speedTTIndex);
+      }
+
+      public void setData(final String key, final int speedTTIndex) {
+
+         _speedTTIndex = speedTTIndex;
+      }
+   }
+
+   private class ActionSpeedTourType_SetInMenu extends Action {
+
+      private int      _speedTTIndex;
+      private TourType _tourType;
+
+      /**
+       * @param tourType
+       * @param speedTTIndex
+       */
+      public ActionSpeedTourType_SetInMenu(final TourType tourType, final boolean isChecked, final int speedTTIndex) {
+
+         super(tourType.getName(), AS_CHECK_BOX);
+
+         _speedTTIndex = speedTTIndex;
+
+         if (isChecked == false) {
+
+            // show image when tour type can be selected, disabled images look ugly on win
+            final Image tourTypeImage = TourTypeImage.getTourTypeImage(tourType.getTypeId());
+            setImageDescriptor(ImageDescriptor.createFromImage(tourTypeImage));
+         }
+
+         setChecked(isChecked);
+         setEnabled(isChecked == false);
+
+         _tourType = tourType;
+      }
+
+      @Override
+      public void run() {
+         onSpeed_IL_TT_SetTourType(_speedTTIndex, _tourType);
+      }
+   }
+
+   private class ActionSpeedTourType_Sort extends Action {
+
+      public ActionSpeedTourType_Sort() {
+
+         super(null, AS_PUSH_BUTTON);
+
+         setToolTipText(Messages.Dialog_ImportConfig_Action_SortBySpeed_Tooltip);
+
+         setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Sort));
+         setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__App_Sort_Disabled));
+      }
+
+      @Override
+      public void run() {
+         onSpeed_IL_TT_Sort();
+      }
+   }
+
+   public class ICColumnViewer implements ITourViewer {
+
+      @Override
+      public ColumnManager getColumnManager() {
+         return _icColumnManager;
+      }
+
+      @Override
+      public ColumnViewer getViewer() {
+         return _icViewer;
+      }
+
+      @Override
+      public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
+
+         _icViewerContainer.setRedraw(false);
+         {
+            final ISelection selection = _icViewer.getSelection();
+
+            _icViewer.getTable().dispose();
+
+            createUI_212_IC_ViewerTable(_icViewerContainer);
+            _icViewerContainer.layout();
+
+            // update viewer
+            reloadViewer();
+
+            _icViewer.setSelection(selection);
+         }
+         _icViewerContainer.setRedraw(true);
+
+         return _icViewer;
+      }
+
+      @Override
+      public void reloadViewer() {
+
+         _icViewer.setInput(this);
+      }
+
+      @Override
+      public void updateColumnHeader(final ColumnDefinition colDef) {}
+   }
+
+   private class ICContentProvider implements IStructuredContentProvider {
+
+      public ICContentProvider() {}
+
+      @Override
+      public void dispose() {}
+
+      @Override
+      public Object[] getElements(final Object parent) {
+
+         final ArrayList<ImportConfig> configItems = _dialogEasyConfig.importConfigs;
+
+         return configItems.toArray(new ImportConfig[configItems.size()]);
+      }
+
+      @Override
+      public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {}
+   }
+
+   public class ILColumnViewer implements ITourViewer {
+
+      @Override
+      public ColumnManager getColumnManager() {
+         return _ilColumnManager;
+      }
+
+      @Override
+      public ColumnViewer getViewer() {
+         return _ilViewer;
+      }
+
+      @Override
+      public ColumnViewer recreateViewer(final ColumnViewer columnViewer) {
+
+         _ilViewerContainer.setRedraw(false);
+         {
+            final ISelection selection = _ilViewer.getSelection();
+
+            _ilViewer.getTable().dispose();
+
+            createUI_512_IL_ViewerTable(_ilViewerContainer);
+            _ilViewerContainer.layout();
+
+            // update viewer
+            reloadViewer();
+
+            _ilViewer.setSelection(selection);
+         }
+         _ilViewerContainer.setRedraw(true);
+
+         return _ilViewer;
+      }
+
+      @Override
+      public void reloadViewer() {
+
+         _ilViewer.setInput(this);
+      }
+
+      @Override
+      public void updateColumnHeader(final ColumnDefinition colDef) {}
+   }
+
+   private class ILContentProvider implements IStructuredContentProvider {
+
+      public ILContentProvider() {}
+
+      @Override
+      public void dispose() {}
+
+      @Override
+      public Object[] getElements(final Object parent) {
+
+         final ArrayList<ImportLauncher> configItems = _dialogEasyConfig.importLaunchers;
+
+         return configItems.toArray(new ImportLauncher[configItems.size()]);
+      }
+
+      @Override
+      public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {}
+   }
 
    public DialogEasyImportConfig(final Shell parentShell,
                                  final EasyConfig easyConfig,
