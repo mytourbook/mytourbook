@@ -134,6 +134,14 @@ public class EasyImportManager {
 
    private static EasyImportManager _instance;
 
+   private final IDialogSettings    _state                                             = TourbookPlugin.getState(ID);
+
+   private EasyConfig               _easyConfig;
+
+   private String                   _fileStoresHash;
+
+   private ReentrantLock            STORE_LOCK                                         = new ReentrantLock();
+
    public static EasyImportManager getInstance() {
 
       if (_instance == null) {
@@ -142,7 +150,6 @@ public class EasyImportManager {
 
       return _instance;
    }
-
 
    /**
     * @param isForceRetrieveFiles
