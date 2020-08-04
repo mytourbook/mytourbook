@@ -272,6 +272,10 @@ public class RawDataManager {
       return _importState_IsIgnoreInvalidFile;
    }
 
+   public static boolean isSetBodyWeight() {
+      return _importState_IsSetBodyWeight;
+   }
+
    private static ArrayList<String> readInvalidFilesToIgnoreFile() {
       final ArrayList<String> invalidFilesList = new ArrayList<>();
 
@@ -1763,10 +1767,6 @@ public class RawDataManager {
       fileIn.delete();
 
       return newFile.getAbsolutePath();
-   }
-
-   public boolean isSetBodyWeight() {
-      return _importState_IsSetBodyWeight;
    }
 
    public void removeAllTours() {
