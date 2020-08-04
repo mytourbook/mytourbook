@@ -123,7 +123,7 @@ public class RawDataManager {
    private static boolean           _importState_IsAutoOpenImportLog    = RawDataView.STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW_DEFAULT;
    private static boolean           _importState_IsIgnoreInvalidFile    = RawDataView.STATE_IS_IGNORE_INVALID_FILE_DEFAULT;
    private static boolean           _importState_IsSetBodyWeight        = RawDataView.STATE_IS_SET_BODY_WEIGHT_DEFAULT;
-
+   private static String            _importState_DefaultCadence         = RawDataView.STATE_DEFAULT_CADENCE_DEFAULT;
    static {
 
       ALL_IMPORT_TOUR_TYPE_CONFIG = new ComboEnumEntry<?>[] {
@@ -133,7 +133,6 @@ public class RawDataManager {
 
       };
    }
-
    private static RawDataManager           _instance                           = null;
 
    private static ArrayList<String>        _invalidFilesList                   = new ArrayList<>();
@@ -168,24 +167,25 @@ public class RawDataManager {
     */
    private final HashSet<String>           _importedFileNamesChildren          = new HashSet<>();
    private boolean                         _isImported;
+
    private boolean                         _isImportCanceled;
+
    //
    private int                             _importState_ImportYear             = ADJUST_IMPORT_YEAR_IS_DISABLED;
-
    private boolean                         _importState_IsConvertWayPoints     = Util.getStateBoolean(_importState,
          RawDataView.STATE_IS_CONVERT_WAYPOINTS,
          RawDataView.STATE_IS_CONVERT_WAYPOINTS_DEFAULT);
+
    private boolean                         _importState_IsCreateTourIdWithTime = RawDataView.STATE_IS_CREATE_TOUR_ID_WITH_TIME_DEFAULT;
    private boolean                         _importState_IsChecksumValidation   = RawDataView.STATE_IS_CHECKSUM_VALIDATION_DEFAULT;
-
    private boolean                         _importState_IsMergeTracks          = RawDataView.STATE_IS_MERGE_TRACKS_DEFAULT;
 
    private List<TourbookDevice>            _devicesBySortPriority;
 
    private HashMap<String, TourbookDevice> _devicesByExtension;
+
    private final ArrayList<TourType>       _tempTourTypes                      = new ArrayList<>();
    private final ArrayList<TourTag>        _tempTourTags                       = new ArrayList<>();
-
    /**
     * Filepath from the previous re-imported tour
     */
@@ -223,6 +223,10 @@ public class RawDataManager {
    }
 
    private RawDataManager() {}
+
+   public static String DefaultCadence() {
+      return _importState_DefaultCadence;
+   }
 
    public static boolean doesInvalidFileExist(final String fileName) {
       final ArrayList<String> invalidFilesList = readInvalidFilesToIgnoreFile();
@@ -2026,6 +2030,10 @@ public class RawDataManager {
 
    public void setState_CreateTourIdWithTime(final boolean isActionChecked) {
       _importState_IsCreateTourIdWithTime = isActionChecked;
+   }
+
+   public void setState_DefaultCadence(final String defaultCadence) {
+      _importState_DefaultCadence = defaultCadence;
    }
 
    public void setState_IsIgnoreInvalidFile(final boolean isIgnoreInvalidFile) {
