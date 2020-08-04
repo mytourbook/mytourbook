@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -269,7 +269,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
                      /*
                       * This case happened that this event contains not the same tourdata as the
-                      * tourchart, it occured for multiple tours in tourdata.
+                      * tourchart, it occurred for multiple tours in tourdata.
                       */
 
                      onSelectionChanged(new SelectionTourData(eventTourData));
@@ -635,7 +635,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
 
                // paint regular tour
 
-               // force update when photo link selection occured
+               // force update when photo link selection occurred
                _isForceUpdate = _tourPhotoLink != null;
 
                if (tourIds.size() > 1) {
@@ -813,7 +813,7 @@ public class TourChartView extends ViewPart implements ITourChartViewer, IPhotoE
    private void saveState() {
 
       if (_tourChart == null) {
-         // this occured when testing
+         // this occurred when testing
          return;
       }
 

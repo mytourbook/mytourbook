@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -78,11 +78,11 @@ public class TourSegmenterTooltip extends AnimatedToolTipShell implements ITourP
 		_nf_3_3.setMaximumFractionDigits(3);
 	}
 	/**
-	 * contains the controls which are displayed in the first column, these controls are used to get
-	 * the maximum width and set the first column within the differenct section to the same width
-	 */
-	private final ArrayList<Control>	_firstColumnControls	= new ArrayList<Control>();
-	private final ArrayList<Control>	_secondColumnControls	= new ArrayList<Control>();
+    * contains the controls which are displayed in the first column, these controls are used to get
+    * the maximum width and set the first column within the different section to the same width
+    */
+	private final ArrayList<Control>	_firstColumnControls	= new ArrayList<>();
+	private final ArrayList<Control>	_secondColumnControls	= new ArrayList<>();
 
 	/*
 	 * UI resources
@@ -489,7 +489,7 @@ public class TourSegmenterTooltip extends AnimatedToolTipShell implements ITourP
 
 		final TourData tourData = TourManager.getInstance().getTourData(_hoveredTourId);
 
-		final ArrayList<TourData> tours = new ArrayList<TourData>();
+		final ArrayList<TourData> tours = new ArrayList<>();
 		tours.add(tourData);
 
 		return tours;
@@ -645,12 +645,12 @@ public class TourSegmenterTooltip extends AnimatedToolTipShell implements ITourP
 		if (hoveredSegment != null && isTooltipClosing()) {
 
 			/**
-			 * This case occures when the tooltip is opened but is currently closing and the mouse
-			 * is moved from the tooltip back to the hovered label.
-			 * <p>
-			 * This prevents that when the mouse is over the hovered label but not moved, that the
-			 * tooltip keeps opened.
-			 */
+          * This case occurs when the tooltip is opened but is currently closing and the mouse
+          * is moved from the tooltip back to the hovered label.
+          * <p>
+          * This prevents that when the mouse is over the hovered label but not moved, that the
+          * tooltip keeps opened.
+          */
 			isKeepOpened = true;
 		}
 

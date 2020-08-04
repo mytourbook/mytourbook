@@ -120,33 +120,33 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 //	private int							ROW_DEFAULT_HEIGHT;
 //	private int							ROW_MAX_HEIGHT;
 
-   private final IDialogSettings _state        = TourbookPlugin
-         .getState("DialogMarker");                               //$NON-NLS-1$
+   private final IDialogSettings  _state        = TourbookPlugin
+         .getState("DialogMarker");                                             //$NON-NLS-1$
 
-   private TourChart             _tourChart;
-   private TourData              _tourData;
+   private TourChart              _tourChart;
+   private TourData               _tourData;
 
    /**
     * marker which is currently selected
     */
-   private TourMarker            _selectedTourMarker;
+   private TourMarker             _selectedTourMarker;
 
    /**
     * backup for the selected tour marker
     */
-   private TourMarker            _backupMarker = new TourMarker();
+   private TourMarker             _backupMarker = new TourMarker();
 
-   private Set<TourMarker>       _originalTourMarkers;
-   private HashSet<TourMarker>   _dialogTourMarkers;
+   private Set<TourMarker>        _originalTourMarkers;
+   private HashSet<TourMarker>    _dialogTourMarkers;
 
    /**
     * initial tour marker
     */
-   private TourMarker            _initialTourMarker;
+   private TourMarker             _initialTourMarker;
 
-   private ModifyListener        _defaultModifyListener;
-   private MouseWheelListener    _defaultMouseWheelListener;
-   private SelectionAdapter      _defaultSelectionAdapter;
+   private ModifyListener         _defaultModifyListener;
+   private MouseWheelListener     _defaultMouseWheelListener;
+   private SelectionAdapter       _defaultSelectionAdapter;
 
 //	private SignMenuManager				_signMenuManager			= new SignMenuManager(this);
 
@@ -162,7 +162,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 
    /**
     * Contains the controls which are displayed in the first column, these controls are used to get
-    * the maximum width and set the first column within the differenct section to the same width.
+    * the maximum width and set the first column within the different section to the same width.
     */
    private final ArrayList<Control> _firstColumnControls = new ArrayList<>();
 
@@ -438,7 +438,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
    }
 
    /**
-    * remove selected markers from the view and update dependened structures
+    * remove selected markers from the view and update dependent structures
     */
    private void actionDeleteMarker() {
 

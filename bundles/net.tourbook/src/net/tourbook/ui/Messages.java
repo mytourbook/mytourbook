@@ -354,10 +354,10 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Surfing_NumberOfEvents_Header;
    public static String        ColumnFactory_Surfing_NumberOfEvents_Label;
 
-   public static String        ColumnFactory_Swim_Cadence_Label;
-   public static String        ColumnFactory_Swim_Cadence_Tooltip;
-   public static String        ColumnFactory_Swim_Strokes_Label;
-   public static String        ColumnFactory_Swim_Strokes_Tooltip;
+   public static String        ColumnFactory_Swim_StrokeRate_Label;
+   public static String        ColumnFactory_Swim_StrokeRate_Tooltip;
+   public static String        ColumnFactory_Swim_StrokesPerLength_Label;
+   public static String        ColumnFactory_Swim_StrokesPerLength_Tooltip;
    public static String        ColumnFactory_Swim_StrokeStyle_Label;
    public static String        ColumnFactory_Swim_StrokeStyle_Tooltip;
 

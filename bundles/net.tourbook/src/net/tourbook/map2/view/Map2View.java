@@ -2066,7 +2066,7 @@ public class Map2View extends ViewPart implements
 
       TourGeoFilter_Loader.stopLoading(_geoFilter_PreviousGeoLoaderItem);
 
-      // delay geo part loader, moving the mouse can occure very often
+      // delay geo part loader, moving the mouse can occur very often
       _parent.getDisplay().timerExec(50, new Runnable() {
 
          private int __runningId = runnableRunningId;
@@ -2315,7 +2315,7 @@ public class Map2View extends ViewPart implements
 
       final int serieSize = latitudeSerie.length;
 
-      // check bounds -> this problem occured several times
+      // check bounds -> this problem occurred several times
       if (valueIndex1 >= serieSize) {
          valueIndex1 = serieSize - 1;
       }
@@ -2511,7 +2511,7 @@ public class Map2View extends ViewPart implements
 
          } else {
 
-            // use old behaviour
+            // use old behavior
 
             final ChartDataModel chartDataModel = chartInfo.chartDataModel;
             if (chartDataModel != null) {
@@ -3073,7 +3073,7 @@ public class Map2View extends ViewPart implements
       _allTourData.add(tourData);
       _hash_AllTourData = _allTourData.hashCode();
 
-      // reset also ALL tour id's, otherwiese a reselected multiple tour is not displayed
+      // reset also ALL tour id's, otherwise a reselected multiple tour is not displayed
       // it took some time to debug this issue !!!
       _hash_AllTourIds = tourData.getTourId().hashCode();
 
@@ -3775,7 +3775,7 @@ public class Map2View extends ViewPart implements
 
       } else {
 
-         // multiple tourdata, I'm not sure if this still occures after merging multiple tours into one tourdata
+         // multiple tourdata, I'm not sure if this still occurs after merging multiple tours into one tourdata
       }
    }
 

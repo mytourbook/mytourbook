@@ -137,7 +137,6 @@ public class RawDataManager {
    private static RawDataManager           _instance                           = null;
 
    private static ArrayList<String>        _invalidFilesList                   = new ArrayList<>();
-   final static IPreferenceStore           _commonPrefStore                    = CommonActivator.getPrefStore();
    private final IPreferenceStore          _prefStore                          = TourbookPlugin.getPrefStore();
 
    private final IDialogSettings           _importState                        = TourbookPlugin.getState(RawDataView.ID);
@@ -268,6 +267,10 @@ public class RawDataManager {
 
    public static boolean isIgnoreInvalidFile() {
       return _importState_IsIgnoreInvalidFile;
+   }
+
+   public static boolean isSetBodyWeight() {
+      return _importState_IsSetBodyWeight;
    }
 
    private static ArrayList<String> readInvalidFilesToIgnoreFile() {
@@ -464,7 +467,7 @@ public class RawDataManager {
       TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR, null, null);
 
       // get selected tours
-      final IStructuredSelection selectedTours = ((IStructuredSelection) tourViewer.getViewer().getSelection());
+      final IStructuredSelection selectedTours = tourViewer.getViewer().getStructuredSelection();
 
       setImportId();
       setImportCanceled(false);
@@ -482,7 +485,7 @@ public class RawDataManager {
             monitor.beginTask(Messages.Import_Data_Dialog_Reimport_Task, importSize);
 
             // loop: all selected tours in the viewer
-            for (final Object element : selectedTours.toArray()) {
+            for (final Object selectedTourItem : selectedTours.toArray()) {
 
                if (monitor.isCanceled()) {
                   // stop re-importing but process re-imported tours
@@ -497,10 +500,10 @@ public class RawDataManager {
 
                TourData oldTourData = null;
 
-               if (element instanceof TVITourBookTour) {
-                  oldTourData = TourManager.getInstance().getTourData(((TVITourBookTour) element).getTourId());
-               } else if (element instanceof TourData) {
-                  oldTourData = (TourData) element;
+               if (selectedTourItem instanceof TVITourBookTour) {
+                  oldTourData = TourManager.getInstance().getTourData(((TVITourBookTour) selectedTourItem).getTourId());
+               } else if (selectedTourItem instanceof TourData) {
+                  oldTourData = (TourData) selectedTourItem;
                }
 
                if (oldTourData == null) {
@@ -544,12 +547,10 @@ public class RawDataManager {
                updateTourData_InImportView_FromDb(monitor);
 
                // reselect tours, run in UI thread
-               Display.getDefault().asyncExec(new Runnable() {
-                  @Override
-                  public void run() {
-                     tourViewer.reloadViewer();
-                     tourViewer.getViewer().setSelection(selectedTours, true);
-                  }
+               Display.getDefault().asyncExec(() -> {
+
+                  tourViewer.reloadViewer();
+                  tourViewer.getViewer().setSelection(selectedTours, true);
                });
             }
          }
@@ -1735,10 +1736,6 @@ public class RawDataManager {
       fileIn.delete();
 
       return newFile.getAbsolutePath();
-   }
-
-   public boolean isSetBodyWeight() {
-      return _importState_IsSetBodyWeight;
    }
 
    public void removeAllTours() {

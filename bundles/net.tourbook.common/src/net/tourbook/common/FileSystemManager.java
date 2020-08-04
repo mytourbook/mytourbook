@@ -44,7 +44,7 @@ public class FileSystemManager {
          return;
       }
 
-      _fileSystemsList.forEach(tfs -> tfs.close());
+      _fileSystemsList.forEach(TourbookFileSystem::close);
    }
 
    /**

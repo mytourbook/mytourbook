@@ -30,19 +30,19 @@ import org.eclipse.jface.viewers.TreeViewer;
 
 public class TVIPrefTagRoot extends TVIPrefTagItem {
 
-   private boolean _isTreeLayout;
+   private boolean _isTreeLayoutHierarchical;
 
    /**
     * @param tagViewer
-    * @param isTreeLayout
-    *           Is <code>true</code> when the tree is displayed hierarchical,, otherwise the tree
+    * @param isTreeLayoutHierarchical
+    *           Is <code>true</code> when the tree is displayed hierarchical, otherwise the tree
     *           items are displayed flat
     */
-   public TVIPrefTagRoot(final TreeViewer tagViewer, final boolean isTreeLayout) {
+   public TVIPrefTagRoot(final TreeViewer tagViewer, final boolean isTreeLayoutHierarchical) {
 
       super(tagViewer);
 
-      _isTreeLayout = isTreeLayout;
+      _isTreeLayoutHierarchical = isTreeLayoutHierarchical;
    }
 
    @Override
@@ -54,7 +54,7 @@ public class TVIPrefTagRoot extends TVIPrefTagItem {
          return;
       }
 
-      if (_isTreeLayout) {
+      if (_isTreeLayoutHierarchical) {
          getItemsHierarchical(em);
       } else {
          getItemsFlat(em);
@@ -71,6 +71,7 @@ public class TVIPrefTagRoot extends TVIPrefTagItem {
        */
       final Query query = em.createQuery(
             UI.EMPTY_STRING
+
                   + "SELECT" //$NON-NLS-1$
 
                   + " Tag" //$NON-NLS-1$

@@ -621,7 +621,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
    private void defineColumn_Altitude_AvgGradient() {
 
-      final ColumnDefinition colDef = TableColumnFactory.ALTITUDE_AVG_GRADIENT.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.ALTITUDE_GRADIENT_AVG.createColumn(_columnManager, _pc);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -643,7 +643,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
     */
    private void defineColumn_Altitude_ElevationGainDelta() {
 
-      final ColumnDefinition colDef = TableColumnFactory.MARKER_ALTITUDE_ELEVATIONGAINDELTA.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.MARKER_ALTITUDE_ELEVATION_GAIN_DELTA.createColumn(_columnManager, _pc);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -670,7 +670,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
     * Column: Elevation loss
     */
    private void defineColumn_Altitude_ElevationLossDelta() {
-      final ColumnDefinition colDef = TableColumnFactory.MARKER_ALTITUDE_ELEVATIONLOSSDELTA.createColumn(_columnManager, _pc);
+      final ColumnDefinition colDef = TableColumnFactory.MARKER_ALTITUDE_ELEVATION_LOSS_DELTA.createColumn(_columnManager, _pc);
 
       colDef.setLabelProvider(new CellLabelProvider() {
          @Override

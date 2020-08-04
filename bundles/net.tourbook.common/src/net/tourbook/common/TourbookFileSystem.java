@@ -20,6 +20,7 @@ import java.nio.file.FileStore;
 import java.nio.file.FileSystem;
 import java.nio.file.Path;
 
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Shell;
 
 /**
@@ -81,6 +82,15 @@ public abstract class TourbookFileSystem {
    }
 
    /**
+    * Provides the file system icon {@link ImageDescriptor} to be displayed in the Easy Import
+    * Configuration dialog for a better user experience
+    *
+    * @return
+    *         The {@link ImageDescriptor} of the file system icon.
+    */
+   public abstract ImageDescriptor getFileSystemImageDescriptor();
+
+   /**
     * Gets the {@link Path} of a given folder in the file system.
     *
     * @param folderName
@@ -110,6 +120,8 @@ public abstract class TourbookFileSystem {
     * The chosen folder path needs to be saved in {@link #FILE_SYSTEM_FOLDER}
     *
     * @param shell
+    * @param workingDirectory
+    *           The folder to use as the working directory
     */
-   public abstract String selectFileSystemFolder(Shell shell);
+   public abstract String selectFileSystemFolder(Shell shell, String workingDirectory);
 }

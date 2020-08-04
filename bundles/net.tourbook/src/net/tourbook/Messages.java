@@ -19,15 +19,13 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
-   private static final String BUNDLE_NAME = "net.tourbook.messages";                              //$NON-NLS-1$
+   private static final String BUNDLE_NAME = "net.tourbook.messages";                                 //$NON-NLS-1$
 
    public static String        Action_Cadence_Set;
    public static String        Action_Cadence_Set_Rpm;
    public static String        Action_Cadence_Set_Spm;
 
    public static String        Action_Compute_ElevationGain;
-
-   public static String        Action_FileSystem_Preferences;
 
    public static String        Action_Map_AddBookmark;
    public static String        Action_Map_RenameBookmark;
@@ -200,6 +198,7 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Checkbox_TourType_Tooltip;
 
    public static String        Dialog_ImportConfig_Combo_Device_LocalDevice;
+   public static String        Dialog_ImportConfig_Combo_Folder_Tooltip;
 
    public static String        Dialog_ImportConfig_Column_AdjustTemperature_Header;
    public static String        Dialog_ImportConfig_Column_AdjustTemperature_Label;
@@ -225,20 +224,27 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Column_TurnOFF_Header;
    public static String        Dialog_ImportConfig_Column_TurnOFF_Label;
    public static String        Dialog_ImportConfig_Column_TurnOFF_Tooltip;
-   public static String        Dialog_ImportConfig_Combo_Folder_Tooltip;
+
    public static String        Dialog_ImportConfig_Dialog_BackupFolder_Message;
    public static String        Dialog_ImportConfig_Dialog_BackupFolder_Title;
    public static String        Dialog_ImportConfig_Dialog_DeviceFolder_Message;
    public static String        Dialog_ImportConfig_Dialog_DeviceFolder_Title;
    public static String        Dialog_ImportConfig_Dialog_Message;
    public static String        Dialog_ImportConfig_Dialog_Title;
+
    public static String        Dialog_ImportConfig_Error_FolderIsInvalid;
+
+   public static String        Dialog_ImportConfig_Group_Dashboard;
    public static String        Dialog_ImportConfig_Group_ImportActions;
    public static String        Dialog_ImportConfig_Group_ImportLauncherConfig;
+   public static String        Dialog_ImportConfig_Group_StateTooltip;
+   public static String        Dialog_ImportConfig_Group_Tiles;
+
    public static String        Dialog_ImportConfig_Info_ConfigDragDrop;
    public static String        Dialog_ImportConfig_Info_ImportActions;
    public static String        Dialog_ImportConfig_Info_MovedDeviceFiles;
    public static String        Dialog_ImportConfig_Info_NoDeviceName;
+
    public static String        Dialog_ImportConfig_Label_AnimationCrazyFactor;
    public static String        Dialog_ImportConfig_Label_AnimationCrazyFactor_Tooltip;
    public static String        Dialog_ImportConfig_Label_AnimationDuration;
@@ -262,12 +268,19 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Label_LastMarkerDistance;
    public static String        Dialog_ImportConfig_Label_LastMarkerDistance_Tooltip;
    public static String        Dialog_ImportConfig_Label_LastMarkerText;
+   public static String        Dialog_ImportConfig_Label_StateTooltip_DisplayAbsoluteFilePath;
+   public static String        Dialog_ImportConfig_Label_StateTooltip_DisplayAbsoluteFilePath_Tooltip;
    public static String        Dialog_ImportConfig_Label_StateTooltipWidth;
+
+   public static String        Dialog_ImportConfig_Link_FileSystem_Preferences;
    public static String        Dialog_ImportConfig_Link_OtherActions;
    public static String        Dialog_ImportConfig_Link_TourType;
+
    public static String        Dialog_ImportConfig_Spinner_Speed_Tooltip;
+
    public static String        Dialog_ImportConfig_State_OFF;
    public static String        Dialog_ImportConfig_State_ON;
+
    public static String        Dialog_ImportConfig_Tab_Configuration;
    public static String        Dialog_ImportConfig_Tab_Dashboard;
    public static String        Dialog_ImportConfig_Tab_Launcher;
@@ -348,6 +361,8 @@ public class Messages extends NLS {
    public static String        Dialog_RetrieveWeather_Dialog_Title;
    public static String        Dialog_RetrieveWeather_Label_WeatherDataNotRetrieved;
    public static String        Dialog_RetrieveWeather_WeatherDataNotFound;
+
+   public static String        Dialog_SetWeatherDescription_Dialog_Title;
 
    public static String        dialog_is_tour_editor_modified_message;
    public static String        dialog_is_tour_editor_modified_title;
@@ -447,7 +462,6 @@ public class Messages extends NLS {
    public static String        app_dlg_confirmFileOverwrite_message;
    public static String        app_dlg_confirmFileOverwrite_title;
 
-   public static String        app_unit_minutes;
    public static String        app_unit_seconds;
 
    public static String        App__False;
@@ -530,6 +544,10 @@ public class Messages extends NLS {
 
    public static String        App_Link_RestoreDefaultValues;
 
+   public static String        App_SortDirection_Ascending;
+   public static String        App_SortDirection_Descending;
+   public static String        App_SortDirection_None;
+
    public static String        App_Splash_Copyright;
 
    public static String        App_SplashMessage_Finalize;
@@ -562,6 +580,9 @@ public class Messages extends NLS {
    public static String        Collate_Tours_Label_TooltipHeader_Single;
    public static String        Collate_Tours_Link_SelectTourType;
    public static String        Collate_Tours_Link_SelectTourType_Tooltip;
+
+   public static String        Column_SortInfo_CanNotSort;
+   public static String        Column_SortInfo_CanSort;
 
    public static String        Compare_Result_Action_check_selected_tours;
    public static String        Compare_Result_Action_remove_save_result;
@@ -945,6 +966,7 @@ public class Messages extends NLS {
    public static String        Image__database_other_person;
    public static String        Image__delete;
    public static String        Image__delete_disabled;
+   public static String        Image__easy_import_config_harddrive;
    public static String        Image__edit_adjust_altitude;
    public static String        Image__edit_adjust_altitude_disabled;
    public static String        Image__edit_row;
@@ -1059,6 +1081,8 @@ public class Messages extends NLS {
    public static String        Image__save_tour_disabled;
    public static String        Image__show_distance_on_x_axis;
    public static String        Image__show_distance_on_x_axis_disabled;
+   public static String        Image__show_distance_on_x_axis_imperial;
+   public static String        Image__show_distance_on_x_axis_imperial_disabled;
    public static String        Image__show_time_on_x_axis;
    public static String        Image__spline_point;
    public static String        Image__synch_graph_byScale;
@@ -1113,6 +1137,7 @@ public class Messages extends NLS {
    public static String        Image__Tour_Duplicate;
    public static String        Image__Tour_Duplicate_disabled;
    public static String        Image__TourBook_Month;
+   public static String        Image__TourBook_NatTable;
    public static String        Image__TourBook_SelectAll;
    public static String        Image__TourBook_Week;
    public static String        Image__TourFilter;
@@ -1383,18 +1408,22 @@ public class Messages extends NLS {
    public static String        Map_Bookmark_Action_Bookmark_Rename;
    public static String        Map_Bookmark_Button_Add;
    public static String        Map_Bookmark_Button_Rename;
-   public static String        Map_Bookmark_Column_Bearing;
-   public static String        Map_Bookmark_Column_Bearing_Tooltip;
+   public static String        Map_Bookmark_Column_Bearing2;                                     //2, because of refactoring
+   public static String        Map_Bookmark_Column_Bearing2_Tooltip;                             //2, because of refactoring
    public static String        Map_Bookmark_Column_Latitude;
    public static String        Map_Bookmark_Column_Latitude_Tooltip;
    public static String        Map_Bookmark_Column_Longitude;
    public static String        Map_Bookmark_Column_Longitude_Tooltip;
+   public static String        Map_Bookmark_Column_PositionMarkerLatitude;
+   public static String        Map_Bookmark_Column_PositionMarkerLatitude_Tooltip;
+   public static String        Map_Bookmark_Column_PositionMarkerLongitude;
+   public static String        Map_Bookmark_Column_PositionMarkerLongitude_Tooltip;
    public static String        Map_Bookmark_Column_Name;
    public static String        Map_Bookmark_Column_Scale;
-   public static String        Map_Bookmark_Column_Tilt;
-   public static String        Map_Bookmark_Column_Tilt_Tooltip;
-   public static String        Map_Bookmark_Column_ZoomLevel;
-   public static String        Map_Bookmark_Column_ZoomLevel_Tooltip;
+   public static String        Map_Bookmark_Column_Tilt2;                                        //2, because of refactoring
+   public static String        Map_Bookmark_Column_Tilt2_Tooltip;                                //2, because of refactoring
+   public static String        Map_Bookmark_Column_ZoomLevel2;                                   //2, because of refactoring
+   public static String        Map_Bookmark_Column_ZoomLevel2_Tooltip;                           //2, because of refactoring
    public static String        Map_Bookmark_Dialog_AddBookmark_Message;
    public static String        Map_Bookmark_Dialog_AddBookmark_Title;
    public static String        Map_Bookmark_Dialog_RenameBookmark_Message;
@@ -1408,6 +1437,8 @@ public class Messages extends NLS {
    public static String        Map25_Config_SymbolOrientation_Billboard;
    public static String        Map25_Config_SymbolOrientation_Ground;
 
+   public static String        Map25_Provider_Mapilion_Description;
+   public static String        Map25_Provider_Mapilion_Name;
    public static String        Map25_Provider_MapzenVectorTiles_Description;
    public static String        Map25_Provider_MapzenVectorTiles_Name;
    public static String        Map25_Provider_MyTileServer_Description;
@@ -1599,6 +1630,7 @@ public class Messages extends NLS {
    public static String        Pref_Map25_Action_EditMapProviderPreferences_Tooltip;
    public static String        Pref_Map25_Dialog_MapFilename_Title;
    public static String        Pref_Map25_Dialog_MapStyleFilename_Title;
+   public static String        Pref_Map25_Encoding_Mapilion;
    public static String        Pref_Map25_Encoding_Mapsforge_Offline;
    public static String        Pref_Map25_Encoding_Mapzen;
    public static String        Pref_Map25_Encoding_OpenScienceMap;
@@ -2087,8 +2119,10 @@ public class Messages extends NLS {
    public static String Slideout_Map25MapOptions_Checkbox_Layer_Cartography_Tooltip;
    public static String Slideout_Map25MapOptions_Checkbox_Layer_Hillshading;
    public static String Slideout_Map25MapOptions_Checkbox_Layer_LabelSymbol;
+   public static String Slideout_Map25MapOptions_Checkbox_Layer_Satellite;
    public static String Slideout_Map25MapOptions_Checkbox_Layer_ScaleBar;
    public static String Slideout_Map25MapOptions_Checkbox_Layer_TileInfo;
+   public static String Slideout_Map25MapOptions_Checkbox_Photo_Title;
    public static String Slideout_Map25MapOptions_Checkbox_UseDraggedKeyNavigation;
    public static String Slideout_Map25MapOptions_Checkbox_UseDraggedKeyNavigation_Tooltip;
    public static String Slideout_Map25MapOptions_Group_MapLayer;
@@ -2127,6 +2161,7 @@ public class Messages extends NLS {
    public static String Slideout_Map25Provider_Label_MapProvider;
    public static String Slideout_Map25Provider_Label_MapProvider_Title;
    public static String Slideout_Map25Provider_Label_ThemeStyle;
+   public static String Slideout_Map25Provider_Label_Copyright;
 
    public static String Slideout_Map2MapOptions_Action_SetTourPaintingModeBasic;
    public static String Slideout_Map2MapOptions_Dialog_EnhancePaintingWarning_Message;
@@ -2427,6 +2462,7 @@ public class Messages extends NLS {
    public static String Tour_Action_SetMinMaxTemperature_Message;
    public static String Tour_Action_SetMinMaxTemperature_Title;
    public static String Tour_Action_SetTimeZone;
+   public static String Tour_Action_SetWeatherConditions;
    public static String Tour_Action_ShowBreaktimeValues;
    public static String Tour_Action_ShowTourMarker;
    public static String Tour_Action_Swim_Strokes_Tooltip;
@@ -2436,6 +2472,8 @@ public class Messages extends NLS {
    public static String Tour_Action_TourPhotosWithoutTooltip_Tooltip;
    public static String Tour_Action_TourPhotosWithTooltip_Tooltip;
    public static String Tour_Action_ValuePointToolTip_IsVisible;
+   public static String Tour_Action_Select_Inbetween_Timeslices;
+   public static String Tour_Action_Select_Inbetween_Timeslices_Tooltip;
    public static String Tour_Action_Weather;
 
    public static String Tour_Blog_Action_EditMarker_Tooltip;
@@ -2453,13 +2491,15 @@ public class Messages extends NLS {
    public static String Tour_Book_Action_DeleteSelectedTours_Monitor;
    public static String Tour_Book_Action_DeleteSelectedTours_MonitorSubtask;
    public static String Tour_Book_Action_ExportViewCSV;
-   public static String Tour_Book_Action_ToggleMonthWeek_Tooltip;
+
+   public static String Tour_Book_Action_ToggleViewLayout_Tooltip;
    public static String Tour_Book_Combo_statistic_tooltip;
    public static String Tour_Book_Combo_year_tooltip;
    public static String Tour_Book_Label_chart_title;
    public static String Tour_Book_Label_Total;
    public static String Tour_Book_Monitor_CollateSubtask;
    public static String Tour_Book_Monitor_CollateTask;
+   public static String Tour_Book_SortColumnTooltip;
 
    public static String Tour_Data_LoadTourData_Monitor;
    public static String Tour_Data_LoadTourData_Monitor_SubTask;

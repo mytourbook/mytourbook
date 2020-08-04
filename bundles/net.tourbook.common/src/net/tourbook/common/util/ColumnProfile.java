@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,6 +19,8 @@ import java.util.ArrayList;
 
 import net.tourbook.common.UI;
 
+import org.eclipse.nebula.widgets.nattable.NatTable;
+
 public class ColumnProfile implements Cloneable {
 
    private static long                _idCreator;
@@ -32,12 +34,14 @@ public class ColumnProfile implements Cloneable {
    ArrayList<ColumnDefinition>        visibleColumnDefinitions = new ArrayList<>();
 
    /**
-    * Contains the column ids which are visible in the viewer.
+    * Contains the column id's (with the correct sort order) which are visible in the viewer.
     */
-   String[]                           visibleColumnIds;
+   private String[]                   _visibleColumnIds;
 
    /**
     * Contains a pair with column id/column width for visible columns.
+    * <p>
+    * <b>The sort order is differently!</b>
     */
    String[]                           visibleColumnIdsAndWidth;
 
@@ -47,6 +51,11 @@ public class ColumnProfile implements Cloneable {
     * @since 16.5
     */
    public ArrayList<ColumnProperties> columnProperties         = new ArrayList<>();
+
+   /**
+    * Column id which is frozen in a {@link NatTable} or <code>null</code> when nothing is frozen.
+    */
+   String                             frozenColumnId;
 
    private long                       _id;
 
@@ -97,8 +106,8 @@ public class ColumnProfile implements Cloneable {
     */
    public int getColumnIndex(final String columnId) {
 
-      for (int columnIndex = 0; columnIndex < visibleColumnIds.length; columnIndex++) {
-         final String visibleColumnId = visibleColumnIds[columnIndex];
+      for (int columnIndex = 0; columnIndex < getVisibleColumnIds().length; columnIndex++) {
+         final String visibleColumnId = getVisibleColumnIds()[columnIndex];
          if (visibleColumnId.equals(columnId)) {
             return columnIndex;
          }
@@ -107,8 +116,29 @@ public class ColumnProfile implements Cloneable {
       return -1;
    }
 
+   /**
+    * @return the frozenColumnId
+    */
+   public String getFrozenColumnId() {
+      return frozenColumnId;
+   }
+
    public long getID() {
       return _id;
+   }
+
+   /**
+    * @return Returns {@link #visibleColumnDefinitions}
+    */
+   public ArrayList<ColumnDefinition> getVisibleColumnDefinitions() {
+      return visibleColumnDefinitions;
+   }
+
+   /**
+    * @return the {@link #_visibleColumnIds}
+    */
+   public String[] getVisibleColumnIds() {
+      return _visibleColumnIds;
    }
 
    @Override
@@ -117,6 +147,14 @@ public class ColumnProfile implements Cloneable {
       int result = 1;
       result = prime * result + (int) (_id ^ (_id >>> 32));
       return result;
+   }
+
+   /**
+    * @param visibleColumnIds
+    *           the visibleColumnIds to set
+    */
+   public void setVisibleColumnIds(final String[] visibleColumnIds) {
+      _visibleColumnIds = visibleColumnIds;
    }
 
    @Override
