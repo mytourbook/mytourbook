@@ -222,6 +222,7 @@ import org.eclipse.ui.progress.UIJob;
  */
 public class TourDataEditorView extends ViewPart implements ISaveablePart, ISaveAndRestorePart, ITourProvider2 {
    //TODO FB : Trying to address this request : https://sourceforge.net/p/mytourbook/discussion/622811/thread/17da3fb19f/
+   // and this similar GitHub issue : https://github.com/wolfgang-ch/mytourbook/issues/217
    // Do the following formats :
    // DONE BUT TO CHECK WITH MULTIPLE FILES: FIT
    // DONE BUT TO CHECK WITH MULTIPLE FILES: Ambit2 xml
@@ -239,6 +240,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    //TODO Add those new Tourbookview columns in CSVExport.java
 
    //TODO check that the sums of paused time work with my big database
+
+   //TODO when creating a manual activity and changing the recorded time/paused time, it should affect the elapsed time
 
    public static final String     ID                            = "net.tourbook.views.TourDataEditorView";                //$NON-NLS-1$
    //
