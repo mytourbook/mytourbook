@@ -8913,7 +8913,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       final int elapsedTime = (int) _tourData.getTourRecordingTime();
       final int drivingTime = (int) _tourData.getTourDrivingTime();
       final int recordedTime = (int) _tourData.getTourRecordedTime();
-      final int pausedTime = _tourData.getTourPausedTime();
+      final int pausedTime = (int) _tourData.getTourPausedTime();
 
       _timeElapsed.setTime(elapsedTime);
       _timeRecorded.setTime(recordedTime);

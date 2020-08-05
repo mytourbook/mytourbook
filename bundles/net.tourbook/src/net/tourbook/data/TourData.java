@@ -8380,15 +8380,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return _sortedMarkers;
    }
 
-   public int getTourPausedTime() {
+   public long getTourPausedTime() {
       if (tourTimerPauses != null && tourTimerPauses.size() > 0) {
 
          final long pausedTime = tourTimerPauses.stream().mapToLong(TourTimerPause::getPauseDuration).sum();
 
-         return (int) (pausedTime / 1000);
+         return pausedTime / 1000;
       }
 
-      return (int) (tourRecordingTime - tourRecordedTime);
+      return tourRecordingTime - tourRecordedTime;
    }
 
    /**

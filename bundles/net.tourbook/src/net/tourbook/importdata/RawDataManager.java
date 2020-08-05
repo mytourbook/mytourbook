@@ -43,6 +43,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.ITourViewer3;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.widgets.ComboEnumEntry;
 import net.tourbook.data.TourData;
@@ -86,44 +87,45 @@ import org.eclipse.ui.WorkbenchException;
 
 public class RawDataManager {
 
-   private static final String      RAW_DATA_LAST_SELECTED_PATH         = "raw-data-view.last-selected-import-path";             //$NON-NLS-1$
-   private static final String      TEMP_IMPORTED_FILE                  = "received-device-data.txt";                            //$NON-NLS-1$
+   private static final String      RAW_DATA_LAST_SELECTED_PATH          = "raw-data-view.last-selected-import-path";             //$NON-NLS-1$
+   private static final String      TEMP_IMPORTED_FILE                   = "received-device-data.txt";                            //$NON-NLS-1$
 
-   private static final String      FILE_EXTENSION_FIT                  = ".fit";                                                //$NON-NLS-1$
+   private static final String      FILE_EXTENSION_FIT                   = ".fit";                                                //$NON-NLS-1$
 
-   public static final String       LOG_IMPORT_DELETE_TOUR_FILE         = Messages.Log_Import_DeleteTourFiles;
-   public static final String       LOG_IMPORT_DELETE_TOUR_FILE_END     = Messages.Log_Import_DeleteTourFiles_End;
-   private static final String      LOG_IMPORT_TOUR                     = Messages.Log_Import_Tour;
-   public static final String       LOG_IMPORT_TOUR_IMPORTED            = Messages.Log_Import_Tour_Imported;
-   private static final String      LOG_IMPORT_TOUR_END                 = Messages.Log_Import_Tour_End;
-   public static final String       LOG_IMPORT_TOURS_IMPORTED_FROM_FILE = Messages.Log_Import_Tours_Imported_From_File;
+   public static final String       LOG_IMPORT_DELETE_TOUR_FILE          = Messages.Log_Import_DeleteTourFiles;
+   public static final String       LOG_IMPORT_DELETE_TOUR_FILE_END      = Messages.Log_Import_DeleteTourFiles_End;
+   private static final String      LOG_IMPORT_TOUR                      = Messages.Log_Import_Tour;
+   public static final String       LOG_IMPORT_TOUR_IMPORTED             = Messages.Log_Import_Tour_Imported;
+   public static final String       LOG_IMPORT_TOUR_OLD_DATA_VS_NEW_DATA = Messages.Log_Import_Tour_Old_Data_Vs_New_Data;
+   private static final String      LOG_IMPORT_TOUR_END                  = Messages.Log_Import_Tour_End;
+   public static final String       LOG_IMPORT_TOURS_IMPORTED_FROM_FILE  = Messages.Log_Import_Tours_Imported_From_File;
 
-   public static final String       LOG_REIMPORT_PREVIOUS_FILES         = Messages.Log_Reimport_PreviousFiles;
-   public static final String       LOG_REIMPORT_END                    = Messages.Log_Reimport_PreviousFiles_End;
+   public static final String       LOG_REIMPORT_PREVIOUS_FILES          = Messages.Log_Reimport_PreviousFiles;
+   public static final String       LOG_REIMPORT_END                     = Messages.Log_Reimport_PreviousFiles_End;
 
-   private static final String      LOG_REIMPORT_ALL_TIME_SLICES        = Messages.Log_Reimport_AllTimeSlices;
-   private static final String      LOG_REIMPORT_ONLY_ALTITUDE          = Messages.Log_Reimport_Only_Altitude;
-   private static final String      LOG_REIMPORT_ONLY_CADENCE           = Messages.Log_Reimport_Only_Cadence;
-   private static final String      LOG_REIMPORT_ONLY_GEAR              = Messages.Log_Reimport_Only_Gear;
-   private static final String      LOG_REIMPORT_ONLY_MARKER            = Messages.Log_Reimport_Only_TourMarker;
-   private static final String      LOG_REIMPORT_ONLY_POWER_SPEED       = Messages.Log_Reimport_Only_PowerSpeed;
-   private static final String      LOG_REIMPORT_ONLY_POWER_PULSE       = Messages.Log_Reimport_Only_PowerPulse;
-   private static final String      LOG_REIMPORT_ONLY_RUNNING_DYNAMICS  = Messages.Log_Reimport_Only_RunningDynamics;
-   private static final String      LOG_REIMPORT_ONLY_SWIMMING          = Messages.Log_Reimport_Only_Swimming;
-   private static final String      LOG_REIMPORT_ONLY_TEMPERATURE       = Messages.Log_Reimport_Only_Temperature;
-   private static final String      LOG_REIMPORT_ONLY_TOURTIMERPAUSES   = Messages.Log_Reimport_Only_TourTimerPauses;
-   private static final String      LOG_REIMPORT_ONLY_TRAINING          = Messages.Log_Reimport_Only_Training;
-   private static final String      LOG_REIMPORT_TOUR                   = Messages.Log_Reimport_Tour;
+   private static final String      LOG_REIMPORT_ALL_TIME_SLICES         = Messages.Log_Reimport_AllTimeSlices;
+   private static final String      LOG_REIMPORT_ONLY_ALTITUDE           = Messages.Log_Reimport_Only_Altitude;
+   private static final String      LOG_REIMPORT_ONLY_CADENCE            = Messages.Log_Reimport_Only_Cadence;
+   private static final String      LOG_REIMPORT_ONLY_GEAR               = Messages.Log_Reimport_Only_Gear;
+   private static final String      LOG_REIMPORT_ONLY_MARKER             = Messages.Log_Reimport_Only_TourMarker;
+   private static final String      LOG_REIMPORT_ONLY_POWER_SPEED        = Messages.Log_Reimport_Only_PowerSpeed;
+   private static final String      LOG_REIMPORT_ONLY_POWER_PULSE        = Messages.Log_Reimport_Only_PowerPulse;
+   private static final String      LOG_REIMPORT_ONLY_RUNNING_DYNAMICS   = Messages.Log_Reimport_Only_RunningDynamics;
+   private static final String      LOG_REIMPORT_ONLY_SWIMMING           = Messages.Log_Reimport_Only_Swimming;
+   private static final String      LOG_REIMPORT_ONLY_TEMPERATURE        = Messages.Log_Reimport_Only_Temperature;
+   private static final String      LOG_REIMPORT_ONLY_TOURTIMERPAUSES    = Messages.Log_Reimport_Only_TourTimerPauses;
+   private static final String      LOG_REIMPORT_ONLY_TRAINING           = Messages.Log_Reimport_Only_Training;
+   private static final String      LOG_REIMPORT_TOUR                    = Messages.Log_Reimport_Tour;
 
-   private static final String      INVALIDFILES_TO_IGNORE              = "invalidfiles_to_ignore.txt";                          //$NON-NLS-1$
+   private static final String      INVALIDFILES_TO_IGNORE               = "invalidfiles_to_ignore.txt";                          //$NON-NLS-1$
 
-   public static final int          ADJUST_IMPORT_YEAR_IS_DISABLED      = -1;
+   public static final int          ADJUST_IMPORT_YEAR_IS_DISABLED       = -1;
 
    static final ComboEnumEntry<?>[] ALL_IMPORT_TOUR_TYPE_CONFIG;
 
-   private static boolean           _importState_IsAutoOpenImportLog    = RawDataView.STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW_DEFAULT;
-   private static boolean           _importState_IsIgnoreInvalidFile    = RawDataView.STATE_IS_IGNORE_INVALID_FILE_DEFAULT;
-   private static boolean           _importState_IsSetBodyWeight        = RawDataView.STATE_IS_SET_BODY_WEIGHT_DEFAULT;
+   private static boolean           _importState_IsAutoOpenImportLog     = RawDataView.STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW_DEFAULT;
+   private static boolean           _importState_IsIgnoreInvalidFile     = RawDataView.STATE_IS_IGNORE_INVALID_FILE_DEFAULT;
+   private static boolean           _importState_IsSetBodyWeight         = RawDataView.STATE_IS_SET_BODY_WEIGHT_DEFAULT;
 
    static {
 
@@ -951,6 +953,19 @@ public class RawDataManager {
                   NLS.bind(LOG_IMPORT_TOUR_IMPORTED,
                         newTourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S),
                         reimportFileNamePath));
+
+            //Print the old vs new data comparison
+            String differences = UI.EMPTY_STRING;
+            if (reimportId == ReImport.OnlyTourTimerPauses) {
+
+               differences = NLS.bind(LOG_IMPORT_TOUR_OLD_DATA_VS_NEW_DATA,
+                     UI.format_hhh_mm_ss(oldTourData.getTourPausedTime()),
+                     UI.format_hhh_mm_ss(newTourData.getTourPausedTime()));
+            }
+
+            if (!StringUtils.isNullOrEmpty(differences)) {
+               TourLogManager.addSubLog(TourLogState.INFO, differences);
+            }
 
             // set re-import file path as new location
             newTourData.setImportFilePath(reimportFileNamePath);
