@@ -9,7 +9,9 @@ TODO's
 New
 ===
 
-* 
+* Elapsed Time - Recorded Time - Paused Time (Frederic)
+ - Added the following tour times in the TourDataEditorView, Calendar view...
+ - The recorded/paused time are imported from the following formats
 
 
 Improvements
