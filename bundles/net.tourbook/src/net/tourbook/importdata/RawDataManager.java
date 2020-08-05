@@ -939,6 +939,12 @@ public class RawDataManager {
          /*
           * tour(s) could be re-imported from the file, check if it contains a valid tour
           */
+
+         long previousTourTimerPauses = 0;
+         if (reimportId == ReImport.OnlyTourTimerPauses) {
+            previousTourTimerPauses = oldTourData.getTourPausedTime();
+         }
+
          TourData newTourData = actionReimportTour_40(reimportId, reimportedFile, oldTourData);
 
          if (newTourData == null) {
@@ -959,7 +965,7 @@ public class RawDataManager {
             if (reimportId == ReImport.OnlyTourTimerPauses) {
 
                differences = NLS.bind(LOG_IMPORT_TOUR_OLD_DATA_VS_NEW_DATA,
-                     UI.format_hhh_mm_ss(oldTourData.getTourPausedTime()),
+                     UI.format_hhh_mm_ss(previousTourTimerPauses),
                      UI.format_hhh_mm_ss(newTourData.getTourPausedTime()));
             }
 
