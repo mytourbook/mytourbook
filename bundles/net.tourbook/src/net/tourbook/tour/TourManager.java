@@ -848,6 +848,8 @@ public class TourManager {
       int toStartIndex = 0;
       int toSwimStartIndex = 0;
       int tourElapsedTime = 0;
+      int tourRecordedTime = 0;
+      int tourPausedTime = 0;
       float tourDistance = 0;
       float tourAltUp = 0;
       float tourAltDown = 0;
@@ -1098,6 +1100,9 @@ public class TourManager {
           * this is because it starts with 0.
           */
          tourElapsedTime++;
+
+         tourRecordedTime += fromTourData.getTourRecordedTime();
+         tourPausedTime += fromTourData.getTourPausedTime();
       }
 
       /*

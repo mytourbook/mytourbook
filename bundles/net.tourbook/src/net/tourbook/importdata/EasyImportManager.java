@@ -150,7 +150,6 @@ public class EasyImportManager {
       return _instance;
    }
 
-
    /**
     * @param isForceRetrieveFiles
     *           When <code>true</code> files will be retrieved even when the stores have not
@@ -1212,12 +1211,12 @@ public class EasyImportManager {
          // set tour type by speed
 
          final float tourDistanceKm = tourData.getTourDistance();
-         final long drivingTime = tourData.getTourMovingTime();
+         final long movingTime = tourData.getTourMovingTime();
 
          double tourAvgSpeed = 0;
 
-         if (drivingTime != 0) {
-            tourAvgSpeed = tourDistanceKm / drivingTime * 3.6;
+         if (movingTime != 0) {
+            tourAvgSpeed = tourDistanceKm / movingTime * 3.6;
          }
 
          final ArrayList<SpeedTourType> speedTourTypes = importLauncher.speedTourTypes;
