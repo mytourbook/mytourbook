@@ -473,9 +473,6 @@ public class FitLogSAXHandler extends DefaultHandler {
          tourData.setAvgCadence(_currentActivity.avgCadence);
       }
 
-      //TODO FB ???
-
-//         tourData.setTourRecordedTime(_currentActivity.duration);
       if (_currentActivity.pauses.size() > 0) {
 
          final ArrayList<TourTimerPause> tourTimerPauses = new ArrayList<>();
@@ -484,10 +481,6 @@ public class FitLogSAXHandler extends DefaultHandler {
          }
 
          tourData.setTourTimerPauses(tourTimerPauses);
-         final long totalTourTimerPauses = tourData.getTotalTourTimerPauses();
-
-         tourData.setTourRecordedTime(_currentActivity.duration - totalTourTimerPauses);
-         tourData.setTourPausedTime(totalTourTimerPauses);
       }
 
       // No need to set the timezone Id if the activity has GPS coordinates (as it was already done
@@ -517,6 +510,11 @@ public class FitLogSAXHandler extends DefaultHandler {
          // create additional data
          if (isComputeDrivingTime) {
             tourData.computeTourDrivingTime();
+
+            final long totalTourTimerPauses = tourData.getTotalTourTimerPauses();
+
+            tourData.setTourRecordedTime(tourData.getTourElapsedTime() - totalTourTimerPauses);
+            tourData.setTourPausedTime(totalTourTimerPauses);
          }
 
          tourData.computeAltitudeUpDown();
