@@ -238,6 +238,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    //it would be very useful if not mandatory to have the ability to see in the slices where pauses are
 
    // Statistics view tooltip
+   // Statitics add recorded time dor - Jour, - Semaine etc...
    // display a pause sign on the gps track like in ST
 
    //TODO Add those new Tourbookview columns in CSVExport.java
