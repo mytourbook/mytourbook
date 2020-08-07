@@ -618,7 +618,10 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
             tourData.computeComputedValues();
             tourData.computeTourDrivingTime();
 
-            tourData.setTourPausedTime(tourData.getTourElapsedTime() - tourData.getTourRecordedTime());
+            final long tourRecordedTime = tourData.getTourRecordedTime();
+            if (tourRecordedTime > 0) {
+               tourData.setTourPausedTime(tourData.getTourElapsedTime() - tourRecordedTime);
+            }
 
             tourData.completeTourMarkerWithRelativeTime();
          }
