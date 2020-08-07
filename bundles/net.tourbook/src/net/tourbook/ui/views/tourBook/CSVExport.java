@@ -766,12 +766,12 @@ public class CSVExport {
 
       { // HEADER_TIME_PAUSED_TIME_RELATIVE
 
-         final long colPausedTime = tviItem.colBreakTime;
-         final long dbPausedTime = colPausedTime;
-         final long dbRecordingTime = tviItem.colTourElapsedTime;
-         final float relativePausedTime = dbRecordingTime == 0 //
+         final long colBreakTime = tviItem.colBreakTime;
+         final long dbPausedTime = colBreakTime;
+         final long dbElapsedTime = tviItem.colTourElapsedTime;
+         final float relativePausedTime = dbElapsedTime == 0 //
                ? 0
-               : (float) dbPausedTime / dbRecordingTime * 100;
+               : (float) dbPausedTime / dbElapsedTime * 100;
          if (relativePausedTime != 0) {
             sb.append(_nf1.format(relativePausedTime));
          }
@@ -789,18 +789,18 @@ public class CSVExport {
 
       { // HEADER_TIME_MOVING_TIME hhh:mm:ss
 
-         final long colDrivingTime = tviItem.colTourMovingTime;
-         if (colDrivingTime != 0) {
-            sb.append(net.tourbook.common.UI.format_hh_mm_ss(colDrivingTime));
+         final long colMovingTime = tviItem.colTourMovingTime;
+         if (colMovingTime != 0) {
+            sb.append(net.tourbook.common.UI.format_hh_mm_ss(colMovingTime));
          }
          sb.append(UI.TAB);
       }
 
       { // HEADER_TIME_PAUSED_TIME hhh:mm:ss
 
-         final long colPausedTime = tviItem.colBreakTime;
-         if (colPausedTime != 0) {
-            sb.append(net.tourbook.common.UI.format_hh_mm_ss(colPausedTime));
+         final long colBreakTime = tviItem.colBreakTime;
+         if (colBreakTime != 0) {
+            sb.append(net.tourbook.common.UI.format_hh_mm_ss(colBreakTime));
          }
          sb.append(UI.TAB);
       }
