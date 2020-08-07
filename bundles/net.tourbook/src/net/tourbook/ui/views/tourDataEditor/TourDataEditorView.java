@@ -227,7 +227,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    // DONE BUT TO CHECK WITH MULTIPLE FILES: FIT
    // DONE BUT TO CHECK WITH MULTIPLE FILES: Ambit2 xml
    // DONE BUT TO CHECK WITH MULTIPLE FILES: Ambit 2 sml
-   // TODO Numbers are wrong when I compare to movescount: Suunto 9
+   // DONE BUT TO CHECK WITH MULTIPLE FILES: Suunto 9
    // 08/06/2020 It seems that the computed elapsed time is wrong. Not sure why
    //example: 05-12-2020 : THe elapsed time should be 0:46:46 or 0:46:47
 
