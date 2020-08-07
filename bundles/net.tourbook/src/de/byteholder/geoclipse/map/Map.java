@@ -3939,7 +3939,7 @@ public class Map extends Canvas {
       final String tourTitle = tourData.getTourTitle();
       final boolean isTourTitle = tourTitle.length() > 0;
 
-      final long movingTime = tourData.getTourDrivingTime();
+      final long movingTime = tourData.getTourMovingTime();
       final String textMovingTime = String.format(VALUE_FORMAT_2,
             TOUR_TOOLTIP_LABEL_MOVING_TIME,
             FormatManager.formatMovingTime(movingTime));

@@ -228,6 +228,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    // DONE BUT TO CHECK WITH MULTIPLE FILES: Ambit2 xml
    // DONE BUT TO CHECK WITH MULTIPLE FILES: Ambit 2 sml
    // TODO Numbers are wrong when I compare to movescount: Suunto 9
+   // 08/06/2020 It seems that the computed elapsed time is wrong. Not sure why
+   //example: 05-12-2020 : THe elapsed time should be 0:46:46 or 0:46:47
+
    // DONE: Sporttracks fitlog
    //TODO: TCX (find a file with a pause. Does the TCX format even support pauses?)
 
@@ -6685,9 +6688,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          // tour is imported
 
          if ((_serieTime == null) || (_serieTime.length == 0)) {
-            _tourData.setTourRecordingTime(0);
+            _tourData.setTourElapsedTime(0);
          } else {
-            _tourData.setTourRecordingTime(_serieTime[_serieTime.length - 1]);
+            _tourData.setTourElapsedTime(_serieTime[_serieTime.length - 1]);
          }
          _tourData.computeTourDrivingTime();
 
@@ -8456,8 +8459,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          // manual tour
          if (_isManualTour) {
 
-            _tourData.setTourRecordingTime(_timeElapsed.getTime());
-            _tourData.setTourDrivingTime(_timeMoving.getTime());
+            _tourData.setTourElapsedTime(_timeElapsed.getTime());
+            _tourData.setTourMovingTime(_timeMoving.getTime());
          }
 
       } catch (final IllegalArgumentException e) {
@@ -8913,16 +8916,16 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _txtAltitudeDown.setText(Integer.toString((int) (altitudeDown / _unitValueAltitude)));
 
       // tour times
-      final int elapsedTime = (int) _tourData.getTourRecordingTime();
-      final int drivingTime = (int) _tourData.getTourDrivingTime();
+      final int elapsedTime = (int) _tourData.getTourElapsedTime();
+      final int movingTime = (int) _tourData.getTourMovingTime();
       final int recordedTime = (int) _tourData.getTourRecordedTime();
       final int pausedTime = (int) _tourData.getTourPausedTime();
 
       _timeElapsed.setTime(elapsedTime);
       _timeRecorded.setTime(recordedTime);
       _timePaused.setTime(pausedTime);
-      _timeMoving.setTime(drivingTime);
-      _timeBreak.setTime(elapsedTime - drivingTime);
+      _timeMoving.setTime(movingTime);
+      _timeBreak.setTime(elapsedTime - movingTime);
 
       /*
        * Time zone

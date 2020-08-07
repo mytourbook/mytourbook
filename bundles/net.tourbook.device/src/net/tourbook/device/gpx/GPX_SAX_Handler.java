@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -610,12 +610,12 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
       } else if (name.equals(TAG_MT_TOUR_DRIVING_TIME)) {
 
-         _tourData.setTourDrivingTime(getIntValue(charData));
+         _tourData.setTourMovingTime(getIntValue(charData));
          _isInMT_Tour = false;
 
       } else if (name.equals(TAG_MT_TOUR_RECORDING_TIME)) {
 
-         _tourData.setTourRecordingTime(getLongValue(charData));
+         _tourData.setTourElapsedTime(getLongValue(charData));
          _isInMT_Tour = false;
 
       } else if (name.equals(TAG_MT_TOUR_ALTITUDE_DOWN)) {

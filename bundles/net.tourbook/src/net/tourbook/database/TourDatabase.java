@@ -3125,6 +3125,7 @@ public class TourDatabase {
             //
             + " tourTimerPauses                               BLOB,                  \n" //$NON-NLS-1$
             + " tourRecordedTime                              BIGINT,                  \n" //$NON-NLS-1$
+            + " tourPausedTime                                BIGINT,                  \n" //$NON-NLS-1$
             //
             // version 42 end
 
@@ -7519,6 +7520,7 @@ public class TourDatabase {
 
             // Add new columns
             SQL.AddCol_BigInt(stmt, TABLE_TOUR_DATA, "tourRecordedTime",          DEFAULT_0);                            //$NON-NLS-1$
+            SQL.AddCol_BigInt(stmt, TABLE_TOUR_DATA, "tourPausedTime",          DEFAULT_0);                            //$NON-NLS-1$
 
 // SET_FORMATTING_ON
          }

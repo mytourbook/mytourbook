@@ -1301,11 +1301,11 @@ public class RawDataManager {
 
          // re-import pauses only
 
-         if (reimportedTourData.getTourRecordedTime() > 0) {
-            oldTourData.setTourRecordedTime(reimportedTourData.getTourRecordedTime());
-         }
+         oldTourData.setTourRecordedTime(reimportedTourData.getTourRecordedTime());
 
          oldTourData.setTourTimerPauses(reimportedTourData.getTourTimerPauses());
+         final long totalTourTimerPauses = reimportedTourData.getTotalTourTimerPauses();
+         oldTourData.setTourPausedTime(totalTourTimerPauses);
       }
 
       // ALL

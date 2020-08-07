@@ -293,7 +293,7 @@ public class SuuntoJsonProcessor {
             }
          }
 
-         //TODO display the pauses in the Map like in ST if it's possible ?
+         //TODO FB display the pauses in the Map like in ST if it's possible ?
          if (!reusePreviousTimeEntry) {
             timeData = new TimeData();
             timeData.absoluteTime = currentTime;
@@ -394,9 +394,14 @@ public class SuuntoJsonProcessor {
 
       tourData.createTimeSeries(_sampleList, true);
 
+      long pausedTime = 0;
       if (_timerPauses.size() > 0) {
          tourData.setTourTimerPauses(_timerPauses);
+         pausedTime = tourData.getTotalTourTimerPauses();
+         tourData.setTourPausedTime(pausedTime);
       }
+
+      tourData.setTourRecordedTime(tourData.getTourElapsedTime() - pausedTime);
 
       tourData.finalizeTour_SwimData(tourData, _allSwimData);
 

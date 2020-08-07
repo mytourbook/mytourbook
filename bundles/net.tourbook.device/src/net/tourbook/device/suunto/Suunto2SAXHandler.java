@@ -528,6 +528,7 @@ public class Suunto2SAXHandler extends DefaultHandler {
 
    private void finalizeTour_TimerPauses(final TourData tourData) {
       if (_tourTimerPauses.size() == 0) {
+         tourData.setTourRecordedTime(tourData.getTourElapsedTime());
          return;
       }
 
@@ -541,6 +542,10 @@ public class Suunto2SAXHandler extends DefaultHandler {
       }
 
       tourData.setTourTimerPauses(_finalTourtimerPauses);
+      final long totalTourTimerPauses = tourData.getTotalTourTimerPauses();
+
+      tourData.setTourRecordedTime(tourData.getTourElapsedTime() - totalTourTimerPauses);
+      tourData.setTourPausedTime(totalTourTimerPauses);
    }
 
    /**

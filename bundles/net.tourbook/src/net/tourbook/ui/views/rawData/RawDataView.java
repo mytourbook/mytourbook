@@ -2921,11 +2921,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             final TourData tourData = (TourData) cell.getElement();
 
             final float tourDistance = tourData.getTourDistance();
-            final long drivingTime = tourData.getTourDrivingTime();
+            final long movingTime = tourData.getTourMovingTime();
 
             final float pace = tourDistance == 0 ? //
             0
-                  : drivingTime * 1000 / tourDistance * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+                  : movingTime * 1000 / tourDistance * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 
             if (pace == 0) {
                cell.setText(UI.EMPTY_STRING);
@@ -2951,12 +2951,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
             final TourData tourData = ((TourData) cell.getElement());
             final float tourDistance = tourData.getTourDistance();
-            final long drivingTime = tourData.getTourDrivingTime();
+            final long movingTime = tourData.getTourMovingTime();
 
             double value = 0;
 
-            if (drivingTime != 0) {
-               value = tourDistance / drivingTime * 3.6 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+            if (movingTime != 0) {
+               value = tourDistance / movingTime * 3.6 / net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
             }
 
             colDef.printDetailValue(cell, value);
@@ -3038,7 +3038,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          @Override
          public void update(final ViewerCell cell) {
 
-            final long value = ((TourData) cell.getElement()).getTourDrivingTime();
+            final long value = ((TourData) cell.getElement()).getTourMovingTime();
 
             colDef.printDetailValue(cell, value);
          }
@@ -3057,7 +3057,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          @Override
          public void update(final ViewerCell cell) {
 
-            final long value = ((TourData) cell.getElement()).getTourRecordingTime();
+            final long value = ((TourData) cell.getElement()).getTourElapsedTime();
 
             colDef.printDetailValue(cell, value);
          }

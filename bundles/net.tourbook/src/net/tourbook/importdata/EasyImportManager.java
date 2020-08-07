@@ -1212,7 +1212,7 @@ public class EasyImportManager {
          // set tour type by speed
 
          final float tourDistanceKm = tourData.getTourDistance();
-         final long drivingTime = tourData.getTourDrivingTime();
+         final long drivingTime = tourData.getTourMovingTime();
 
          double tourAvgSpeed = 0;
 

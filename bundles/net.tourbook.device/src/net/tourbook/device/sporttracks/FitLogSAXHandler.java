@@ -419,8 +419,9 @@ public class FitLogSAXHandler extends DefaultHandler {
 
          tourData.setTourDistance(_currentActivity.distance);
 
-         tourData.setTourRecordingTime(_currentActivity.duration);
-         tourData.setTourDrivingTime(_currentActivity.duration);
+         tourData.setTourElapsedTime(_currentActivity.duration);
+         tourData.setTourRecordedTime(_currentActivity.duration);
+         tourData.setTourMovingTime(_currentActivity.duration);
          isComputeDrivingTime = false;
 
          tourData.setTourAltUp(_currentActivity.elevationUp);
@@ -483,6 +484,10 @@ public class FitLogSAXHandler extends DefaultHandler {
          }
 
          tourData.setTourTimerPauses(tourTimerPauses);
+         final long totalTourTimerPauses = tourData.getTotalTourTimerPauses();
+
+         tourData.setTourRecordedTime(_currentActivity.duration - totalTourTimerPauses);
+         tourData.setTourPausedTime(totalTourTimerPauses);
       }
 
       // No need to set the timezone Id if the activity has GPS coordinates (as it was already done

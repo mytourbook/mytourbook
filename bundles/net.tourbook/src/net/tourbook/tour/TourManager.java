@@ -847,7 +847,7 @@ public class TourManager {
 
       int toStartIndex = 0;
       int toSwimStartIndex = 0;
-      int tourRecordingTime = 0;
+      int tourElapsedTime = 0;
       float tourDistance = 0;
       float tourAltUp = 0;
       float tourAltDown = 0;
@@ -937,12 +937,12 @@ public class TourManager {
 
             // adjust relative time series
             for (int serieIndex = 0; serieIndex < fromSerieLength; serieIndex++) {
-               toTimeSerie[toStartIndex + serieIndex] = tourRecordingTime + fromTimeSerie[serieIndex];
+               toTimeSerie[toStartIndex + serieIndex] = tourElapsedTime + fromTimeSerie[serieIndex];
             }
             if (fromSwim_Time != null) {
                isSwim_Time = true;
                for (int swimSerieIndex = 0; swimSerieIndex < fromSwimSerieLength; swimSerieIndex++) {
-                  toSwim_Time[toSwimStartIndex + swimSerieIndex] = tourRecordingTime + fromSwim_Time[swimSerieIndex];
+                  toSwim_Time[toSwimStartIndex + swimSerieIndex] = tourElapsedTime + fromSwim_Time[swimSerieIndex];
                }
             }
 
@@ -1079,7 +1079,7 @@ public class TourManager {
 
          // summarize recording time
          final int fromTourEnd = fromTimeSerie[fromSerieLength - 1];
-         tourRecordingTime += fromTourEnd;
+         tourElapsedTime += fromTourEnd;
 
          // summarize altitude up/down
          tourAltUp += fromTourData.getTourAltUp();
@@ -1097,7 +1097,7 @@ public class TourManager {
           * Add 1 otherwise the next tour has the same start time as the previous tour end time,
           * this is because it starts with 0.
           */
-         tourRecordingTime++;
+         tourElapsedTime++;
       }
 
       /*
@@ -1174,7 +1174,7 @@ public class TourManager {
       final ZonedDateTime tourStartTime = TimeTools.getZonedDateTime(firstTour.getTourStartTimeMS());
 
       joinedTourData.setTourStartTime(tourStartTime);
-      joinedTourData.setTourRecordingTime(tourRecordingTime);
+      joinedTourData.setTourElapsedTime(tourElapsedTime);
       joinedTourData.setTourDistance(tourDistance);
 
       // computing these values is VERY cpu intensive because of the DP algorithm

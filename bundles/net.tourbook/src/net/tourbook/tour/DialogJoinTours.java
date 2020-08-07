@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -938,8 +938,10 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
       int joinedSerieIndex = 0;
       int joinedTourStartIndex = 0;
       int joinedTourStartDistance = 0;
-      int joinedRecordingTime = 0;
-      int joinedDrivingTime = 0;
+      int joinedElapsedTime = 0;
+      int joinedRecordedTime = 0;
+      int joinedPausedTime = 0;
+      int joinedMovingTime = 0;
       float joinedDistance = 0;
       int joinedCalories = 0;
       boolean isJoinedDistanceFromSensor = false;
@@ -1141,7 +1143,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
                   joinMarkerIndex = joinedSliceCounter - 1;
                }
 
-               // adjust marker position, position is relativ to the tour start
+               // adjust marker position, position is relative to the tour start
                clonedMarker.setSerieIndex(joinMarkerIndex);
 
                if (isJoinTime) {
@@ -1325,8 +1327,10 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
           */
          tourTourData.computeTourDrivingTime();
 
-         joinedRecordingTime += tourTourData.getTourRecordingTime();
-         joinedDrivingTime += tourTourData.getTourDrivingTime();
+         joinedElapsedTime += tourTourData.getTourElapsedTime();
+         joinedRecordedTime += tourTourData.getTourRecordedTime();
+         joinedPausedTime += tourTourData.getTourPausedTime();
+         joinedMovingTime += tourTourData.getTourMovingTime();
 
          joinedDistance += tourTourData.getTourDistance();
          joinedCalories += tourTourData.getCalories();
@@ -1369,8 +1373,10 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
       _joinedTourData.setWeatherWindDir(joinedWeatherWindDir);
       _joinedTourData.setWeatherWindSpeed(joinedWeatherWindSpeed);
 
-      _joinedTourData.setTourRecordingTime(joinedRecordingTime);
-      _joinedTourData.setTourDrivingTime(joinedDrivingTime);
+      _joinedTourData.setTourElapsedTime(joinedElapsedTime);
+      _joinedTourData.setTourRecordedTime(joinedRecordedTime);
+      _joinedTourData.setTourPausedTime(joinedPausedTime);
+      _joinedTourData.setTourMovingTime(joinedMovingTime);
       _joinedTourData.setTourDistance(joinedDistance);
 
       // !! tour type and tour tags are already set !!

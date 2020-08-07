@@ -45,7 +45,7 @@ import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.ChartLabel;
 
 public class HAC4LinuxDeviceReader extends TourbookDevice {
-   private Section m_section = Section.SECTION_NONE;;
+   private Section m_section = Section.SECTION_NONE;
 
    /*
     * (non-Javadoc) The file to be parsed includes several sections with different information in
@@ -370,13 +370,14 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
                   int tourDrivingTime = Short.parseShort(fields[1].substring(6, 8));
                   tourDrivingTime = tourDrivingTime + Short.parseShort(fields[1].substring(3, 5)) * 60;
                   tourDrivingTime = tourDrivingTime + Short.parseShort(fields[1].substring(0, 2)) * 3600;
-                  tourData.setTourDrivingTime(tourDrivingTime);
+                  tourData.setTourMovingTime(tourDrivingTime);
+                  tourData.setTourRecordedTime(tourDrivingTime);
                }
                if (fields[0].equals("RecTime")) {//"hh:mm:ss.00" //$NON-NLS-1$
                   int tourRecordingTime = Short.parseShort(fields[1].substring(6, 8));
                   tourRecordingTime = tourRecordingTime + Short.parseShort(fields[1].substring(3, 5)) * 60;
                   tourRecordingTime = tourRecordingTime + Short.parseShort(fields[1].substring(0, 2)) * 3600;
-                  tourData.setTourRecordingTime(tourRecordingTime);
+                  tourData.setTourElapsedTime(tourRecordingTime);
                }
                if (fields[0].equals("Distance")) { //$NON-NLS-1$
                   tourData.setTourDistance(Integer.parseInt(fields[1]));
@@ -616,6 +617,8 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
             // create additional data
             tourData.computeComputedValues();
             tourData.computeTourDrivingTime();
+
+            tourData.setTourPausedTime(tourData.getTourElapsedTime() - tourData.getTourRecordedTime());
 
             tourData.completeTourMarkerWithRelativeTime();
          }
