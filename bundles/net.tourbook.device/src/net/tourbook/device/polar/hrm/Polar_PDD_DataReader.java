@@ -129,10 +129,9 @@ public class Polar_PDD_DataReader extends TourbookDevice {
       }
 
       exerciseData.setTourDistance(_currentExercise.distance);
-      exerciseData.setTourMovingTime(_currentExercise.duration);
       exerciseData.setTourElapsedTime(_currentExercise.duration);
+      exerciseData.setTourMovingTime(_currentExercise.duration);
       exerciseData.setTourRecordedTime(_currentExercise.duration);
-      exerciseData.setTourPausedTime(exerciseData.getTourElapsedTime() - exerciseData.getTourRecordedTime());
 
       // set other fields
       exerciseData.setCalories(_currentExercise.calories);
@@ -373,7 +372,7 @@ public class Polar_PDD_DataReader extends TourbookDevice {
          // advance to next slice
          if (hrmTime >= gpxTime) {
 
-            // the case > should not occure but is used to move gpx slice forward
+            // the case > should not occur but is used to move gpx slice forward
 
             gpxSerieIndex++;
 

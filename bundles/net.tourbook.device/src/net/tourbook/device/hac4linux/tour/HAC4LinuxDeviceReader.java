@@ -235,7 +235,7 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
 
    /*
     * (non-Javadoc) Parses records containing the tour data slices all in one row For examples of a
-    * row and the meaning of each of the tab seperated fields see the comment on the top of the
+    * row and the meaning of each of the tab separated fields see the comment on the top of the
     * method
     */
    private TimeData parseRecord(final String line, final int delta, final int lastAlti, final int lastDistance) {
@@ -300,7 +300,7 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
          final StringBuffer tourDescription = new StringBuffer();
          final ArrayList<TimeData> timeDataList = new ArrayList<>();
 
-         // time in seconds between time slices 20 seconds as the deafault
+         // time in seconds between time slices 20 seconds as the default
          int deltaTime = 20;
          int lastAlti = 0;
          int lastDistance = 0;
@@ -527,7 +527,7 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
                // workaround for a bug within HAC4Linux writing
                // pulse information for that device even though
                // no pulse is recorded.
-               // the data written alsways form a sawtooth graph
+               // the data written always form a sawtooth graph
                // 0-256-0-256....
                if (tourData.getDeviceName().equals("CM414AM")) { //$NON-NLS-1$
                   timeData.pulse = 0;
@@ -561,7 +561,7 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
                timeRelative += Integer.parseInt(fields[2].substring(3, 5)) * 60;
                timeRelative += Integer.parseInt(fields[2].substring(0, 2)) * 3600;
 
-               // set time temporaritly the correct absolute time will be set later
+               // set time temporarily the correct absolute time will be set later
                tourMarker.setTime(timeRelative, Long.MIN_VALUE);
 
                allTourMarker.add(tourMarker);
@@ -645,17 +645,61 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
     * currently read.
     */
    private void switchSection(final String line) {
-      if (line.equals("[FILE]")) {m_section = Section.SECTION_FILE;return;} //$NON-NLS-1$
-      if (line.equals("[INFORMATION]")) {m_section = Section.SECTION_INFO;return;} //$NON-NLS-1$
-      if (line.equals("[NOTES]")) {m_section = Section.SECTION_NOTES;return;} //$NON-NLS-1$
-      if (line.equals("[FRIENDS]")) {m_section = Section.SECTION_FRIENDS;return;} //$NON-NLS-1$
-      if (line.equals("[PERSON]")) {m_section = Section.SECTION_PERSON;return;} //$NON-NLS-1$
-      if (line.equals("[STATISTICS]")) {m_section = Section.SECTION_STATISTICS;return;} //$NON-NLS-1$
-      if (line.equals("[SETTINGS]")) {m_section = Section.SECTION_SETTINGS;return;} //$NON-NLS-1$
-      if (line.equals("[POLAR-EXTENSION]")) {m_section = Section.SECTION_POLAREXTS;return;} //$NON-NLS-1$
-      if (line.equals("[COACH-PARAMETER]")) {m_section = Section.SECTION_COACH;return;} //$NON-NLS-1$
-      if (line.equals("[TOUR-DATA]")) {m_section = Section.SECTION_TOURDATA;return;} //$NON-NLS-1$
-      if (line.equals("[MARKING-DATA]")) {m_section = Section.SECTION_MARKS;return;} //$NON-NLS-1$
+      if (line.equals("[FILE]")) {
+//$NON-NLS-0$
+         m_section = Section.SECTION_FILE;
+         return;
+      }
+      if (line.equals("[INFORMATION]")) {
+//$NON-NLS-0$
+         m_section = Section.SECTION_INFO;
+         return;
+      }
+      if (line.equals("[NOTES]")) {
+//$NON-NLS-0$
+         m_section = Section.SECTION_NOTES;
+         return;
+      }
+      if (line.equals("[FRIENDS]")) {
+//$NON-NLS-0$
+         m_section = Section.SECTION_FRIENDS;
+         return;
+      }
+      if (line.equals("[PERSON]")) {
+//$NON-NLS-0$
+         m_section = Section.SECTION_PERSON;
+         return;
+      }
+      if (line.equals("[STATISTICS]")) {
+//$NON-NLS-0$
+         m_section = Section.SECTION_STATISTICS;
+         return;
+      }
+      if (line.equals("[SETTINGS]")) {
+//$NON-NLS-0$
+         m_section = Section.SECTION_SETTINGS;
+         return;
+      }
+      if (line.equals("[POLAR-EXTENSION]")) {
+//$NON-NLS-0$
+         m_section = Section.SECTION_POLAREXTS;
+         return;
+      }
+      if (line.equals("[COACH-PARAMETER]")) {
+//$NON-NLS-0$
+         m_section = Section.SECTION_COACH;
+         return;
+      }
+      if (line.equals("[TOUR-DATA]")) {
+//$NON-NLS-0$
+         m_section = Section.SECTION_TOURDATA;
+         return;
+      }
+      if (line.equals("[MARKING-DATA]")) {
+//$NON-NLS-0$
+         m_section = Section.SECTION_MARKS;
+         return;
+      }
 
       m_section = Section.SECTION_NONE;
    }
