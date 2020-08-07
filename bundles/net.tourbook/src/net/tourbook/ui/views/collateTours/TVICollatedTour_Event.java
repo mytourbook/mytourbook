@@ -168,8 +168,8 @@ public class TVICollatedTour_Event extends TVICollatedTour {
 
                final long dbTourStartTime = result.getLong(6);
                final long dbDistance = tourItem.colDistance = result.getLong(7);
-               tourItem.colRecordingTime = result.getLong(8);
-               final long dbDrivingTime = tourItem.colDrivingTime = result.getLong(9);
+               tourItem.colElapsedTime = result.getLong(8);
+               final long dbDrivingTime = tourItem.colMovingTime = result.getLong(9);
                tourItem.colAltitudeUp = result.getLong(10);
                tourItem.colAltitudeDown = result.getLong(11);
 
@@ -219,8 +219,8 @@ public class TVICollatedTour_Event extends TVICollatedTour {
                tourItem.colAvgSpeed = dbDrivingTime == 0 ? 0 : 3.6f * dbDistance / dbDrivingTime;
                tourItem.colAvgPace = dbDistance == 0 ? 0 : dbDrivingTime * 1000 / dbDistance;
 
-               tourItem.colPausedTime = tourItem.colRecordingTime - tourItem.colRecordedTime;
-               tourItem.colBreakTime = tourItem.colRecordingTime - tourItem.colDrivingTime;
+               tourItem.colPausedTime = tourItem.colElapsedTime - tourItem.colRecordedTime;
+               tourItem.colBreakTime = tourItem.colElapsedTime - tourItem.colMovingTime;
 
                // get first tag id
                if (dbTagId instanceof Long) {

@@ -664,7 +664,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
       defineColumn_1stColumn_CollateEvent();
       defineColumn_Time_WeekDay();
       defineColumn_Time_TourStartTime();
-      defineColumn_Time_DrivingTime();
+      defineColumn_Time_MovingTime();
       defineColumn_Time_WeekNo();
       defineColumn_Time_WeekYear();
       defineColumn_Time_RecordingTime();
@@ -1263,7 +1263,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
             final TVICollatedTour item = (TVICollatedTour) element;
 
             final long dbPausedTime = item.colBreakTime;
-            final long dbRecordingTime = item.colRecordingTime;
+            final long dbRecordingTime = item.colElapsedTime;
 
             final float relativePausedTime = dbRecordingTime == 0 ? 0 : (float) dbPausedTime
                   / dbRecordingTime
@@ -1277,9 +1277,9 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
    }
 
    /**
-    * column: driving time (h)
+    * column: moving time (h)
     */
-   private void defineColumn_Time_DrivingTime() {
+   private void defineColumn_Time_MovingTime() {
 
       final TreeColumnDefinition colDef = TreeColumnFactory.TIME_DRIVING_TIME.createColumn(_columnManager, _pc);
       colDef.setIsDefaultColumn();
@@ -1289,7 +1289,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            final long value = ((TVICollatedTour) element).colDrivingTime;
+            final long value = ((TVICollatedTour) element).colMovingTime;
 
             colDef.printLongValue(cell, value, element instanceof TVICollatedTour_Tour);
 
@@ -1360,7 +1360,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            final long value = ((TVICollatedTour) element).colRecordingTime;
+            final long value = ((TVICollatedTour) element).colElapsedTime;
 
             colDef.printLongValue(cell, value, element instanceof TVICollatedTour_Tour);
 

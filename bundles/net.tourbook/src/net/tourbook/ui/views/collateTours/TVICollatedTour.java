@@ -87,8 +87,8 @@ public abstract class TVICollatedTour extends TreeViewerItem implements ITourIte
 
    long                    colDistance;
    long                    colRecordedTime;
-   long                    colRecordingTime;
-   long                    colDrivingTime;
+   long                    colElapsedTime;
+   long                    colMovingTime;
 
    long                    colBreakTime;
    long                    colPausedTime;
@@ -131,8 +131,8 @@ public abstract class TVICollatedTour extends TreeViewerItem implements ITourIte
 
       colDistance = result.getLong(startIndex + 0);
 
-      colRecordingTime = result.getLong(startIndex + 1);
-      colDrivingTime = result.getLong(startIndex + 2);
+      colElapsedTime = result.getLong(startIndex + 1);
+      colMovingTime = result.getLong(startIndex + 2);
 
       colAltitudeUp = result.getLong(startIndex + 3);
       colAltitudeDown = result.getLong(startIndex + 4);
@@ -169,8 +169,8 @@ public abstract class TVICollatedTour extends TreeViewerItem implements ITourIte
 
       colRecordedTime = result.getLong(startIndex + 22);
 
-      colBreakTime = colRecordingTime - colDrivingTime;
-      colPausedTime = colRecordingTime - colRecordedTime;
+      colBreakTime = colElapsedTime - colMovingTime;
+      colPausedTime = colElapsedTime - colRecordedTime;
    }
 
    public ArrayList<Long> getTagIds() {
