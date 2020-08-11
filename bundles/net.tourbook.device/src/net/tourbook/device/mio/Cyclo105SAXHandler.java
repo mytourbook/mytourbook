@@ -51,50 +51,50 @@ public class Cyclo105SAXHandler extends DefaultHandler {
    private static final String TAG_TRACKNAME   = "TrackName";   //$NON-NLS-1$
 
    // TrackPoints tags
-   private static final String TAG_ALTITUDE     = "Altitude";     //$NON-NLS-1$
-   private static final String TAG_CADENCE      = "Cadence";      //$NON-NLS-1$
-   private static final String TAG_HEARTRATE    = "HeartRate";    //$NON-NLS-1$
-   private static final String TAG_INTERVALTIME = "IntervalTime"; //$NON-NLS-1$
-   private static final String TAG_LATITUDE     = "Latitude";     //$NON-NLS-1$
-   private static final String TAG_LONGITUDE    = "Longitude";    //$NON-NLS-1$
-   private static final String TAG_POWER        = "Power";        //$NON-NLS-1$
-   private static final String TAG_SPEED        = "Speed";        //$NON-NLS-1$
+   private static final String     TAG_ALTITUDE     = "Altitude";                 //$NON-NLS-1$
+   private static final String     TAG_CADENCE      = "Cadence";                  //$NON-NLS-1$
+   private static final String     TAG_HEARTRATE    = "HeartRate";                //$NON-NLS-1$
+   private static final String     TAG_INTERVALTIME = "IntervalTime";             //$NON-NLS-1$
+   private static final String     TAG_LATITUDE     = "Latitude";                 //$NON-NLS-1$
+   private static final String     TAG_LONGITUDE    = "Longitude";                //$NON-NLS-1$
+   private static final String     TAG_POWER        = "Power";                    //$NON-NLS-1$
+   private static final String     TAG_SPEED        = "Speed";                    //$NON-NLS-1$
 
    private HashMap<Long, TourData> _alreadyImportedTours;
    private HashMap<Long, TourData> _newlyImportedTours;
    private TourbookDevice          _device;
    private String                  _importFilePath;
 
-   private ArrayList<TimeData>   _sampleList     = new ArrayList<>();
-   private TimeData              _sampleData;
+   private ArrayList<TimeData>     _sampleList      = new ArrayList<>();
+   private TimeData                _sampleData;
 
-   private ArrayList<Integer>    _markerList     = new ArrayList<>();
+   private ArrayList<Integer>      _markerList      = new ArrayList<>();
 
-   private boolean               _isImported;
-   private StringBuilder         _characters     = new StringBuilder();
+   private boolean                 _isImported;
+   private StringBuilder           _characters      = new StringBuilder();
 
-   private boolean               _isInRootMagellan;
-   private boolean               _isInTrackPoints;
-   private boolean               _isInTrackMaster;
+   private boolean                 _isInRootMagellan;
+   private boolean                 _isInTrackPoints;
+   private boolean                 _isInTrackMaster;
 
-   private boolean               _isInAccruedTime;
-   private boolean               _isInAltitude;
-   private boolean               _isInCalories;
-   private boolean               _isInLatitude;
-   private boolean               _isInLongitude;
-   private boolean               _isInCadence;
-   private boolean               _isInHR;
-   private boolean               _isInIntervalTime;
-   private boolean               _isInPower;
-   private boolean               _isInSpeed;
-   private boolean               _isInTrackName;
-   private boolean               _isInStartTime;
+   private boolean                 _isInAccruedTime;
+   private boolean                 _isInAltitude;
+   private boolean                 _isInCalories;
+   private boolean                 _isInLatitude;
+   private boolean                 _isInLongitude;
+   private boolean                 _isInCadence;
+   private boolean                 _isInHR;
+   private boolean                 _isInIntervalTime;
+   private boolean                 _isInPower;
+   private boolean                 _isInSpeed;
+   private boolean                 _isInTrackName;
+   private boolean                 _isInStartTime;
 
-   private int                   _tourCalories;
-   private Period                _tourStartTime;
-   private DateTime              _tourStartDate;
+   private int                     _tourCalories;
+   private Period                  _tourStartTime;
+   private DateTime                _tourStartDate;
 
-   private final PeriodFormatter periodFormatter = new PeriodFormatterBuilder()
+   private final PeriodFormatter   periodFormatter  = new PeriodFormatterBuilder()
          .appendHours().appendSuffix(UI.SYMBOL_COLON)
          .appendMinutes().appendSuffix(UI.SYMBOL_COLON)
          .appendSeconds()
@@ -114,7 +114,7 @@ public class Cyclo105SAXHandler extends DefaultHandler {
    @Override
    public void characters(final char[] chars, final int startIndex, final int length) throws SAXException {
 
-      if (_isInTrackPoints//
+      if (_isInTrackPoints
             || _isInTrackName
             || _isInStartTime
             || _isInCalories
@@ -126,9 +126,7 @@ public class Cyclo105SAXHandler extends DefaultHandler {
             || _isInHR
             || _isInPower
             || _isInSpeed
-            || _isInIntervalTime
-      //
-      ) {
+            || _isInIntervalTime) {
          _characters.append(chars, startIndex, length);
       }
    }
@@ -264,7 +262,7 @@ public class Cyclo105SAXHandler extends DefaultHandler {
     * @param tourStartTime
     *           The tour start time that is used to compute the {@see TimeData#absoluteTime}
     */
-   private void finalizeSamples(final ZonedDateTime tourStartTime) {
+   private void finalizeSamples(final long tourStartTime) {
 
       int time = 0;
       int numberOfMarkers = 0;
@@ -273,9 +271,9 @@ public class Cyclo105SAXHandler extends DefaultHandler {
          final TimeData currentTimeData = element;
 
          time += currentTimeData.time;
-         currentTimeData.absoluteTime = (tourStartTime.toEpochSecond() + time) * 1000;
+         currentTimeData.absoluteTime = (tourStartTime + time) * 1000;
 
-         if (this._markerList.contains(time)) {
+         if (_markerList.contains(time)) {
             currentTimeData.marker = 1;
 
             ++numberOfMarkers;
@@ -308,7 +306,7 @@ public class Cyclo105SAXHandler extends DefaultHandler {
             TimeTools.getDefaultTimeZone());
       tourData.setTourStartTime(tourStartTime);
 
-      finalizeSamples(tourStartTime);
+      finalizeSamples(tourStartTime.toEpochSecond());
 
       tourData.setImportFilePath(_importFilePath);
       tourData.setCalories(_tourCalories * 1000);
