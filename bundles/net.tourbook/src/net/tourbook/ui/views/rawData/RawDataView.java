@@ -4291,7 +4291,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       final ImportConfig selectedConfig = easyConfig.importConfigs.get(selectedIndex);
 
       setWatcher_Off();
-
       easyConfig.setActiveImportConfig(selectedConfig);
       _isDeviceStateValid = false;
       updateUI_2_Dashboard();
@@ -5381,7 +5380,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                }
             }
          } catch (final InterruptedException e) {
-            TourLogManager.logEx(e);
+            // TourLogManager.logEx(e); // This is expected condition, don't need to log.
          } finally {
             _folderWatcher = null;
             _watchingFolderThread = null;
