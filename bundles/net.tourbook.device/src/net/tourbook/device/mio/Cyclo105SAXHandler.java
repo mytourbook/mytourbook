@@ -114,8 +114,7 @@ public class Cyclo105SAXHandler extends DefaultHandler {
    @Override
    public void characters(final char[] chars, final int startIndex, final int length) throws SAXException {
 
-      if (_isInTrackPoints
-            || _isInTrackName
+      if (_isInTrackName
             || _isInStartTime
             || _isInCalories
             || _isInAccruedTime
