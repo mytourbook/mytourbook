@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="feature.net.tourbook.ext.jpa"
-      label="Ejb3 Service"
+      label="JPA Service"
       version="3.4.0.2020-07-19"
       provider-name="MyTourbook"
       plugin="net.tourbook.branding">
