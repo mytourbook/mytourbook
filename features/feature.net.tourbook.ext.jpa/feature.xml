@@ -7,7 +7,8 @@
       plugin="net.tourbook.branding">
 
    <description>
-      This feature contains the EBJ3 service for MyTourbook, it contains a modified version than the original Hibernate jar&apos;s.
+      This feature contains the JPA service for MyTourbook, it contains
+a modified version than the original Hibernate jar&apos;s.
    </description>
 
    <copyright>
