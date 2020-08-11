@@ -3490,7 +3490,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       tourData.setTourPerson(person);
 
       // set weight from person
-      if (_rawDataMgr.isSetBodyWeight()) {
+      if (RawDataManager.isSetBodyWeight()) {
          tourData.setBodyWeight(person.getWeight());
       }
 
