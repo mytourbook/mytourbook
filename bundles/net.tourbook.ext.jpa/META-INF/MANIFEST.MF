@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Hibernate EJB3
+Bundle-Name: Hibernate JPA
 Bundle-SymbolicName: net.tourbook.ext.jpa;singleton:=true
 Bundle-Version: 3.4.0.2020-07-19
 Eclipse-BuddyPolicy: registered
