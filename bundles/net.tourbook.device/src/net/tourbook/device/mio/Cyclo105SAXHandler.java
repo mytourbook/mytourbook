@@ -60,12 +60,10 @@ public class Cyclo105SAXHandler extends DefaultHandler {
    private static final String TAG_POWER        = "Power";        //$NON-NLS-1$
    private static final String TAG_SPEED        = "Speed";        //$NON-NLS-1$
 
-   //
    private HashMap<Long, TourData> _alreadyImportedTours;
    private HashMap<Long, TourData> _newlyImportedTours;
    private TourbookDevice          _device;
    private String                  _importFilePath;
-   //
 
    private ArrayList<TimeData>   _sampleList     = new ArrayList<>();
    private TimeData              _sampleData;
