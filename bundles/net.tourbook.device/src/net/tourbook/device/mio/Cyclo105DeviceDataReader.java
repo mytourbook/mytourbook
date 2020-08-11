@@ -98,7 +98,6 @@ public class Cyclo105DeviceDataReader extends TourbookDevice {
          }
 
       } catch (final Exception e) {
-
          StatusUtil.log(e);
       }
 
@@ -115,12 +114,11 @@ public class Cyclo105DeviceDataReader extends TourbookDevice {
          return false;
       }
 
-      final Cyclo105SAXHandler saxHandler =
-            new Cyclo105SAXHandler(
-                  this,
-                  importFilePath,
-                  alreadyImportedTours,
-                  newlyImportedTours);
+      final Cyclo105SAXHandler saxHandler = new Cyclo105SAXHandler(
+            this,
+            importFilePath,
+            alreadyImportedTours,
+            newlyImportedTours);
 
       try (FileInputStream inputStream = new FileInputStream(importFilePath)) {
 
@@ -135,7 +133,6 @@ public class Cyclo105DeviceDataReader extends TourbookDevice {
          StatusUtil.log("Error parsing file: " + importFilePath, e); //$NON-NLS-1$
          return false;
       } finally {
-
          saxHandler.dispose();
       }
 
