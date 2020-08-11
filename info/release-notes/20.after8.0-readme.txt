@@ -11,6 +11,8 @@ New
 
 * 
 
+* Import Magellan/Mio Cyclo 105 *.act Files (Frederic)
+
 
 Improvements
 ============

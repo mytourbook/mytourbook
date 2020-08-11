@@ -298,6 +298,13 @@
 			fileextension="tur"
 			id="net.tourbook.device.TurDeviceReader"
 			name="TUR"/>
-		</extension>
+		
+		<!-- Mio Cyclo 105 -->
+      	<device
+            class="net.tourbook.device.mio.Cyclo105DeviceDataReader"
+            fileextension="act"
+            id="net.tourbook.device.MioCyclo105"
+            name="Mio Cyclo 105"/>
+   	</extension>
    
 </plugin>
