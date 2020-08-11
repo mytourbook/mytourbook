@@ -6,7 +6,7 @@
 
 	<persistence-unit name="tourdatabase" transaction-type="RESOURCE_LOCAL">
   
-		<provider>org.hibernate.ejb.HibernatePersistence</provider>
+		<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
      
 		<class>net.tourbook.data.TourBike</class>
 		<class>net.tourbook.data.TourCompared</class>
