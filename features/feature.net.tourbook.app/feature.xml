@@ -35,7 +35,7 @@
       <import plugin="net.tourbook.ext.rxtx_2.2"/>
       <import plugin="net.tourbook.ext.worldwind"/>
       <import plugin="net.tourbook.ext.apache"/>
-      <import plugin="net.tourbook.ext.ejb3"/>
+      <import plugin="net.tourbook.ext.jpa"/>
       <import plugin="net.tourbook.ext.geoclipse"/>
       <import plugin="org.eclipse.equinox.p2.artifact.repository"/>
       <import plugin="org.eclipse.equinox.p2.core"/>

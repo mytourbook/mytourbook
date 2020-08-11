@@ -7,7 +7,7 @@ Disallow: net.tourbook.device.garmin.fit/fit.jar
 Disallow: net.tourbook.device.garmin.fit/FIT SDK 1.0.zip
 Disallow: net.tourbook.device.garmin.fit/Profile.zip
 
-Disallow: net.tourbook.ext.ejb3_3.4.0/
+Disallow: net.tourbook.ext.jpa/
 Disallow: net.tourbook.ext.jars/
 Disallow: net.tourbook.ext.jars.printing/
 Disallow: net.tourbook.ext.velocity/

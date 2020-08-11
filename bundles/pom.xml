@@ -37,10 +37,10 @@
       <module>net.tourbook.web</module>
 
       <module>net.tourbook.ext.apache</module>
-      <module>net.tourbook.ext.ejb3_3.4.0</module>
       <module>net.tourbook.ext.geoclipse</module>
       <module>net.tourbook.ext.jars</module>
       <module>net.tourbook.ext.jars.printing</module>
+      <module>net.tourbook.ext.jpa</module>
       <module>net.tourbook.ext.rxtx.linux64_2.2</module>
       <module>net.tourbook.ext.rxtx.macosx_2.2</module>
       <module>net.tourbook.ext.rxtx.win64_2.2</module>

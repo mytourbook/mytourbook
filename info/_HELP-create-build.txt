@@ -307,7 +307,7 @@ All MT app + build files
 /feature.net.tourbook.ext.derby
 /feature.net.tourbook.ext.eclipse
 /feature.net.tourbook.ext.eclipse.nl
-/feature.net.tourbook.ext.ejb3
+/feature.net.tourbook.ext.jpa
 /feature.net.tourbook.ext.jars
 /feature.net.tourbook.ext.rxtx
 /feature.net.tourbook.ext.worldwind
@@ -327,7 +327,7 @@ All MT app + build files
 /net.tourbook.device.nmea
 /net.tourbook.device.nmea.nl
 /net.tourbook.export
-/net.tourbook.ext.ejb3_3.4.0
+/net.tourbook.ext.jpa
 /net.tourbook.ext.jars
 /net.tourbook.ext.jars.printing
 /net.tourbook.ext.rxtx_2.2
