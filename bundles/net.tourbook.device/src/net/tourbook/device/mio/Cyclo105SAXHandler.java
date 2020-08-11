@@ -260,7 +260,8 @@ public class Cyclo105SAXHandler extends DefaultHandler {
     * samples
     *
     * @param tourStartTime
-    *           The tour start time that is used to compute the {@see TimeData#absoluteTime}
+    *           The tour start time, in seconds, that is used to compute the
+    *           {@see TimeData#absoluteTime}
     */
    private void finalizeSamples(final long tourStartTime) {
 
