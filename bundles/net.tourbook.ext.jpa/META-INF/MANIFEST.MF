@@ -10,7 +10,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ClassPath: slf4j-api-1.7.25.jar,
  slf4j-log4j12-1.7.30,
  log4j-core-2.13.3.jar,
- lib/hibernate-core-5.4.20/lib/required/hibernate-core-5.4.20.Alpha5.jar,
+ lib/hibernate-core-5.4.20/lib/required/hibernate-core-5.4.20.Final.jar,
  lib/hibernate-core-5.4.20/lib/required/antlr-2.7.7.jar,
  lib/hibernate-core-5.4.20/lib/required/byte-buddy-1.10.10.jar,
  lib/hibernate-core-5.4.20/lib/required/classmate-1.5.1.jar,
