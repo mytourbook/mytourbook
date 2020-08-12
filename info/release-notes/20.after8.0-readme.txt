@@ -11,7 +11,7 @@ New
 
 * 
 
-* Import Magellan/Mio Cyclo 105 *.act Files (Frederic)
+* Import Magellan/Mio Cyclo 105 *.act Files (Frederic) https://github.com/wolfgang-ch/mytourbook/pull/219
 
 
 Improvements
