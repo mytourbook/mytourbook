@@ -38,12 +38,9 @@ import org.eclipse.swt.graphics.Rectangle;
  */
 public class PhotoImageCache {
 
-   private static IPreferenceStore                       _prefStore                 = Activator
-         .getDefault()
-         .getPreferenceStore();
+   private static IPreferenceStore _prefStore                 = Activator.getDefault().getPreferenceStore();
 
-   private static int                                    _maxThumbImageCacheSize    = _prefStore
-         .getInt(IPhotoPreferences.PHOTO_THUMBNAIL_IMAGE_CACHE_SIZE);
+   private static int              _maxThumbImageCacheSize    = _prefStore.getInt(IPhotoPreferences.PHOTO_THUMBNAIL_IMAGE_CACHE_SIZE);
 
    /**
     * This cache size should not be too large otherwise OS has no resources, loading images is
@@ -51,11 +48,14 @@ public class PhotoImageCache {
     * 5184x3456 on win7 for smaller image it could be larger for bigger images it should be
     * smaller.
     */
-   private static int                                    _maxOriginalImageCacheSize = _prefStore
-         .getInt(IPhotoPreferences.PHOTO_ORIGINAL_IMAGE_CACHE_SIZE);
+   private static int              _maxOriginalImageCacheSize = _prefStore.getInt(IPhotoPreferences.PHOTO_ORIGINAL_IMAGE_CACHE_SIZE);
+
+// SET_FORMATTING_OFF
 
    private static final Cache<String, ImageCacheWrapper> _imageCacheThumb;
    private static final Cache<String, ImageCacheWrapper> _imageCacheOriginal;
+
+// SET_FORMATTING_ON
 
    static {
 

@@ -297,6 +297,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    }
 
    private static boolean                 _isStopWatchingStoresThread;
+   public static volatile ReentrantLock   THREAD_WATCHER_LOCK             = new ReentrantLock();
    //
    private final IPreferenceStore         _prefStore                      = TourbookPlugin.getPrefStore();
    private final IPreferenceStore         _prefStoreCommon                = CommonActivator.getPrefStore();
@@ -3488,7 +3489,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       tourData.setTourPerson(person);
 
       // set weight from person
-      if (_rawDataMgr.isSetBodyWeight()) {
+      if (RawDataManager.isSetBodyWeight()) {
          tourData.setBodyWeight(person.getWeight());
       }
 
@@ -4288,9 +4289,12 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       final ImportConfig selectedConfig = easyConfig.importConfigs.get(selectedIndex);
 
-      easyConfig.setActiveImportConfig(selectedConfig);
+      setWatcher_Off();
 
+      easyConfig.setActiveImportConfig(selectedConfig);
       _isDeviceStateValid = false;
+      updateUI_2_Dashboard();
+      setWatcher_On();
       updateUI_2_Dashboard();
    }
 
@@ -5231,9 +5235,17 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
          // !!! Store watching must be canceled before the watch folder thread because it could launch a new watch folder thread !!!
          thread_WatchStores_Cancel();
-         thread_WatchFolders(false);
+         // thread_WatchFolders(false);
 
          updateUI_WatcherAnimation(DOM_CLASS_DEVICE_OFF_ANIMATED);
+
+         try {
+            if (_watchingStoresThread != null) {
+               _watchingStoresThread.join();
+            }
+         } catch (final InterruptedException e) {
+            TourLogManager.logEx(e);
+         }
       }
    }
 
@@ -5276,9 +5288,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       // activate store watching
       _isWatchingStores.set(true);
-
-      // activate folder watching
-      thread_WatchFolders(true);
    }
 
    private void thread_FolderWatcher_Deactivate() {
@@ -5293,7 +5302,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    /**
     * Retrieve files from the device folder and update the UI.
     */
-   private void thread_UpdateDeviceState() {
+   private void thread_UpdateDeviceState() throws InterruptedException {
 
       final EasyConfig importConfig = getEasyConfig();
 
@@ -5348,36 +5357,27 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       if (_watchingFolderThread != null) {
 
          try {
-
             if (_folderWatcher != null) {
 
                try {
+                  THREAD_WATCHER_LOCK.lock();
                   _folderWatcher.close();
                } catch (final IOException e) {
                   TourLogManager.logEx(e);
                } finally {
-                  _folderWatcher = null;
+                  _watchingFolderThread.interrupt(); // (rtdog) CancelWatchfolders
+                  THREAD_WATCHER_LOCK.unlock();
+
+                  //  This join could be interrupted and throw spurious exception
+                  //  It could also hang on a STORE_LOCK deadlock
+                  _watchingFolderThread.join(10000); // unlock then join
                }
             }
-
-         } catch (final Exception e) {
+         } catch (final InterruptedException e) {
             TourLogManager.logEx(e);
          } finally {
-
-            try {
-
-               // it occurred that the join never ended
-//               _watchingFolderThread.join();
-               _watchingFolderThread.join(10000);
-
-               // force interrupt
-               _watchingFolderThread.interrupt();
-
-            } catch (final InterruptedException e) {
-               TourLogManager.logEx(e);
-            } finally {
-               _watchingFolderThread = null;
-            }
+            _folderWatcher = null;
+            _watchingFolderThread = null;
          }
       }
    }
@@ -5465,15 +5465,15 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                   } catch (final Exception e) {}
                }
 
-               // do not update the device state when the import is running otherwise the import file list can be wrong
-               if (_isUpdateDeviceState) {
-                  thread_UpdateDeviceState();
-               }
-
                do {
 
                   // wait for the next event
                   watchKey = folderWatcher.take();
+
+                  if (Thread.currentThread().isInterrupted()) {
+                     Thread.currentThread().interrupt();
+                     throw new InterruptedException(); // Needed because DropboxFileWatcher take() doesn't throw interruptedException when interrupted
+                  }
 
                   /*
                    * Events MUST be polled otherwise this will stay in an endless loop.
@@ -5500,21 +5500,21 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                while (watchKey.reset());
 
             } catch (final InterruptedException | ClosedWatchServiceException e) {
-               //
+               // no-op
             } catch (final Exception e) {
                TourLogManager.logEx(e);
             } finally {
 
-               if (watchKey != null) {
-                  watchKey.cancel();
-               }
-
-               if (folderWatcher != null) {
-                  try {
-                     folderWatcher.close();
-                  } catch (final IOException e) {
-                     TourLogManager.logEx(e);
+               try {
+                  if (watchKey != null) {
+                     watchKey.cancel();
                   }
+
+                  if (folderWatcher != null) {
+                     folderWatcher.close();
+                  }
+               } catch (final Exception e) {
+                  TourLogManager.logEx(e);
                }
             }
          }
@@ -5525,7 +5525,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
     * Thread cannot be interrupted, it could cause SQL exceptions, so set flag and wait.
     */
    private void thread_WatchStores_Cancel() {
-
+      _isDeviceStateValid = false;
       _isStopWatchingStoresThread = true;
 
       // run with progress, duration can be 0...5 seconds
@@ -5539,16 +5539,14 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
                   monitor.beginTask(Messages.Import_Data_Task_CloseDeviceInfo, IProgressMonitor.UNKNOWN);
 
-                  final int waitingTime = 5000; // in ms
+                  final int waitingTime = 30000; // in ms
 
-                  _watchingStoresThread.join(waitingTime);
+                  THREAD_WATCHER_LOCK.lock();
+                  _watchingStoresThread.interrupt();
+                  THREAD_WATCHER_LOCK.unlock();
+                  _watchingStoresThread.join(waitingTime); // must unlock then join
 
                   if (_watchingStoresThread.isAlive()) {
-
-                     // thread is still alive
-
-                     _watchingStoresThread.interrupt();
-
                      StatusUtil.logInfo(NLS.bind(
                            Messages.Import_Data_Task_CloseDeviceInfo_CannotClose,
                            waitingTime / 1000));
@@ -5557,7 +5555,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                } catch (final InterruptedException e) {
                   TourLogManager.logEx(e);
                } finally {
-
                   _watchingStoresThread = null;
                }
             }
@@ -5572,16 +5569,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    }
 
    private void thread_WatchStores_Start() {
-
       _watchingStoresThread = new Thread("WatchingStores") { //$NON-NLS-1$
          @Override
          public void run() {
 
-            while (!isInterrupted()) {
+            while (true) {
 
                try {
-
-                  Thread.sleep(1000);
 
                   // check if this thread should be stopped
                   if (_isStopWatchingStoresThread) {
@@ -5602,15 +5596,10 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                         final DeviceImportState importState = EasyImportManager.getInstance().checkImportedFiles(isCheckFiles);
 
                         if (importState.areTheSameStores == false || isCheckFiles) {
-
-                           // stores have changed, update the folder watcher
-
                            thread_WatchFolders(true);
                         }
 
                         if (importState.areFilesRetrieved || isCheckFiles) {
-
-                           // import files have been retrieved, update the UI
 
                            updateUI_DeviceState();
                         }
@@ -5619,15 +5608,27 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                      }
                   }
 
+                  Thread.sleep(1000);
                } catch (final InterruptedException e) {
-                  interrupt();
+
+                  if (_isStopWatchingStoresThread) {
+                     _isStopWatchingStoresThread = false;
+                     break;
+                  }
+                  // interrupt();
                } catch (final Exception e) {
                   TourLogManager.logEx(e);
                }
-            }
-         }
-      };
 
+            }
+            _isStopWatchingStoresThread = false;
+
+            // StoreWatcher going down, need to take down DeviceFolderWatcher
+            thread_WatchFolders_Cancel();
+         }
+
+      };
+      _isDeviceStateValid = false;
       _watchingStoresThread.setDaemon(true);
       _watchingStoresThread.start();
    }
