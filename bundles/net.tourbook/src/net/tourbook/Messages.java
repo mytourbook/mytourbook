@@ -22,6 +22,7 @@ public class Messages extends NLS {
    private static final String BUNDLE_NAME = "net.tourbook.messages";                                 //$NON-NLS-1$
 
    public static String        Action_Cadence_Set;
+   public static String        Action_Cadence_Set_None;
    public static String        Action_Cadence_Set_Rpm;
    public static String        Action_Cadence_Set_Spm;
 
@@ -833,6 +834,11 @@ public class Messages extends NLS {
    public static String        Dlg_TourMarker_MsgBox_delete_markers_title;
    public static String        Dlg_TourMarker_MsgBox_WrongFormat_Message;
    public static String        Dlg_TourMarker_MsgBox_WrongFormat_Title;
+
+   public static String        Enum_Cadence_None;
+   public static String        Enum_Cadence_Rpm;
+   public static String        Enum_Cadence_Spm;
+   public static String        Enum_Cadence_Invalid;
 
    public static String        External_Link_MyTourbook;
    public static String        External_Link_MyTourbook_TourChartSmoothing;
