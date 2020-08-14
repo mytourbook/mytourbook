@@ -231,10 +231,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    // 08/06/2020 It seems that the computed elapsed time is wrong. Not sure why
    //example: 05-12-2020 : THe elapsed time should be 0:46:46 or 0:46:47
    //=> After investigation, it seems that the {@link TourData#createTimeSeries()} generates this number
+   // so the elapsed time is erroneous when imporitng from json.gz and gpx
    //If i import from a FIT (exported from Movescount), the recorded time is the same
 
    // DONE: Sporttracks fitlog
    //TODO: TCX (find a file with a pause. Does the TCX format even support pauses?)
+   //Looking at a TCX file from movescount, it seems that pauses are laps with 0 distance
 
    // Add entries in time slices for pauses ? or just add a column "paused" like "break" and select the checkbox if it is a pause ?
    //it would be very useful if not mandatory to have the ability to see in the slices where pauses are
