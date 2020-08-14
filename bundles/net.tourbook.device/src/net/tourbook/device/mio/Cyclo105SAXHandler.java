@@ -26,7 +26,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.ui.UI;
 
-import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 import org.joda.time.Period;
 import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
@@ -92,7 +92,7 @@ public class Cyclo105SAXHandler extends DefaultHandler {
 
    private int                     _tourCalories;
    private Period                  _tourStartTime;
-   private DateTime                _tourStartDate;
+   private LocalDate               _tourStartDate;
 
    private final PeriodFormatter   periodFormatter  = new PeriodFormatterBuilder()
          .appendHours().appendSuffix(UI.SYMBOL_COLON)
@@ -182,7 +182,7 @@ public class Cyclo105SAXHandler extends DefaultHandler {
          // ex: <TrackName>2016-7-30</TrackName>
          _isInTrackName = false;
 
-         _tourStartDate = DateTime.parse(_characters.toString());
+         _tourStartDate = LocalDate.parse(_characters.toString());
 
       } else if (name.equals(TAG_STARTTIME)) {
 
