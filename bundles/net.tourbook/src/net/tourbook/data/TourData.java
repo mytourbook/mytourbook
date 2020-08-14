@@ -6512,11 +6512,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       final PrintStream out = System.out;
 
       out.print(
-            (getTourElapsedTime() / 3600)
+            (tourRecordingTime / 3600)
                   + ":" //$NON-NLS-1$
-                  + ((getTourElapsedTime() % 3600) / 60)
+                  + ((tourRecordingTime % 3600) / 60)
                   + ":" //$NON-NLS-1$
-                  + ((getTourElapsedTime() % 3600) % 60)
+                  + ((tourRecordingTime % 3600) % 60)
                   + "  "); //$NON-NLS-1$
       out.print(getTourDistance());
    }
@@ -6529,11 +6529,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       out.println(
             "Tour time:      " //$NON-NLS-1$
-                  + (getTourElapsedTime() / 3600)
+                  + (tourRecordingTime / 3600)
                   + ":" //$NON-NLS-1$
-                  + ((getTourElapsedTime() % 3600) / 60)
+                  + ((tourRecordingTime % 3600) / 60)
                   + ":" //$NON-NLS-1$
-                  + (getTourElapsedTime() % 3600) % 60);
+                  + (tourRecordingTime % 3600) % 60);
 
       out.println(
             "Recorded time:      " //$NON-NLS-1$
@@ -8415,7 +8415,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return tourDrivingTime;
    }
 
-
    public long getTourPausedTime() {
       return tourPausedTime;
    }
@@ -8662,7 +8661,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       result = 37 * result + startHour;
       result = 37 * result + startMinute;
       result = 37 * result + (int) this.getTourDistance();
-      result = 37 * result + (int) this.getTourElapsedTime();
+      result = 37 * result + (int) tourRecordingTime;
 
       return result;
    }

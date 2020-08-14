@@ -247,6 +247,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    //TODO when creating a manual activity and changing the recorded time/paused time, it should affect the elapsed time
 
+   //TODO Remove the translations for time recording (elapsed) for all languages that are not english or french
+   //Yes, the translators will have to translate : elapsed, paused, recorded, ...
+
    public static final String     ID                            = "net.tourbook.views.TourDataEditorView";                //$NON-NLS-1$
    //
    private static final String    GRAPH_LABEL_HEARTBEAT_UNIT    = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
@@ -8461,6 +8464,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          if (_isManualTour) {
 
             _tourData.setTourElapsedTime(_timeElapsed.getTime());
+            _tourData.setTourRecordedTime(_timeRecorded.getTime());
+            _tourData.setTourPausedTime(_timePaused.getTime());
             _tourData.setTourMovingTime(_timeMoving.getTime());
          }
 
@@ -9042,7 +9047,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    }
 
    /**
-    * Validate tour recording/driving/paused time
+    * Validate tour elapsed/recorded/paused/moving/break time
     */
    private void updateUI_Time(final Widget widget) {
 
@@ -9068,48 +9073,79 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          return;
       }
 
-      /*
-       * TODO FB
-       * int recTime = _timeRecording.getTime();
-       * int pausedTime = _timePaused.getTime();
-       * int driveTime = _timeDriving.getTime();
-       * if (recTime < 0) {
-       * recTime = -recTime - 1;
-       * }
-       * if (pausedTime < 0) {
-       * pausedTime = 0;
-       * }
-       * if (widget == _timeRecording._spinHours
-       * || widget == _timeRecording._spinMinutes
-       * || widget == _timeRecording._spinSeconds) {
-       * // recording time is modified
-       * if (pausedTime > recTime) {
-       * pausedTime = recTime;
-       * }
-       * driveTime = recTime - pausedTime;
-       * } else if (widget == _timePaused._spinHours
-       * || widget == _timePaused._spinMinutes
-       * || widget == _timePaused._spinSeconds) {
-       * // paused time is modified
-       * if (pausedTime > recTime) {
-       * recTime = pausedTime;
-       * }
-       * driveTime = recTime - pausedTime;
-       * } else if (widget == _timeDriving._spinHours
-       * || widget == _timeDriving._spinMinutes
-       * || widget == _timeDriving._spinSeconds) {
-       * // driving time is modified
-       * if (driveTime > recTime) {
-       * recTime = driveTime;
-       * }
-       * pausedTime = recTime - driveTime;
-       * }
-       * _timeRecording.setTime(recTime / 3600, ((recTime % 3600) / 60), ((recTime % 3600) % 60));
-       * _timeDriving.setTime(driveTime / 3600, ((driveTime % 3600) / 60), ((driveTime % 3600) %
-       * 60));
-       * _timePaused.setTime(pausedTime / 3600, ((pausedTime % 3600) / 60), ((pausedTime % 3600) %
-       * 60));
-       */
+      int elapsedTime = _timeElapsed.getTime();
+      int recordedTime = _timeRecorded.getTime();
+      int pausedTime = _timePaused.getTime();
+      int breakTime = _timeBreak.getTime();
+      int movingTime = _timeMoving.getTime();
+
+      if (elapsedTime < 0) {
+         elapsedTime = -elapsedTime - 1;
+      }
+      if (breakTime < 0) {
+         breakTime = 0;
+      }
+
+      if (widget == _timeElapsed._spinHours
+            || widget == _timeElapsed._spinMinutes
+            || widget == _timeElapsed._spinSeconds) {
+         // elapsed time is modified
+
+         if (breakTime > elapsedTime) {
+            breakTime = elapsedTime;
+         }
+         if (pausedTime > elapsedTime) {
+            pausedTime = elapsedTime;
+         }
+
+         movingTime = elapsedTime - breakTime;
+         recordedTime = elapsedTime - pausedTime;
+
+      } else if (widget == _timeRecorded._spinHours
+            || widget == _timeRecorded._spinMinutes
+            || widget == _timeRecorded._spinSeconds) {
+         // recorded time is modified
+
+         if (recordedTime > elapsedTime) {
+            elapsedTime = recordedTime;
+         }
+         pausedTime = elapsedTime - recordedTime;
+
+      } else if (widget == _timePaused._spinHours
+            || widget == _timePaused._spinMinutes
+            || widget == _timePaused._spinSeconds) {
+         // paused time is modified
+
+         if (pausedTime > elapsedTime) {
+            elapsedTime = pausedTime;
+         }
+
+         recordedTime = elapsedTime - pausedTime;
+
+      } else if (widget == _timeBreak._spinHours
+            || widget == _timeBreak._spinMinutes
+            || widget == _timeBreak._spinSeconds) {
+         // break time is modified
+         if (breakTime > elapsedTime) {
+            elapsedTime = breakTime;
+         }
+         movingTime = elapsedTime - breakTime;
+      } else if (widget == _timeMoving._spinHours
+            || widget == _timeMoving._spinMinutes
+            || widget == _timeMoving._spinSeconds) {
+         // moving time is modified
+         if (movingTime > elapsedTime) {
+            elapsedTime = movingTime;
+         }
+         breakTime = elapsedTime - movingTime;
+      }
+
+      _timeElapsed.setTime(elapsedTime / 3600, ((elapsedTime % 3600) / 60), ((elapsedTime % 3600) % 60));
+      _timeRecorded.setTime(recordedTime / 3600, ((recordedTime % 3600) / 60), ((recordedTime % 3600) % 60));
+      _timePaused.setTime(pausedTime / 3600, ((pausedTime % 3600) / 60), ((pausedTime % 3600) % 60));
+      _timeMoving.setTime(movingTime / 3600, ((movingTime % 3600) / 60), ((movingTime % 3600) % 60));
+      _timeBreak.setTime(breakTime / 3600, ((breakTime % 3600) / 60), ((breakTime % 3600) % 60));
+
    }
 
    private void updateUI_TimeZone() {
