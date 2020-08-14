@@ -230,6 +230,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    // DONE BUT TO CHECK WITH MULTIPLE FILES: Suunto 9
    // 08/06/2020 It seems that the computed elapsed time is wrong. Not sure why
    //example: 05-12-2020 : THe elapsed time should be 0:46:46 or 0:46:47
+   //=> After investigation, it seems that the {@link TourData#createTimeSeries()} generates this number
+   //If i import from a FIT (exported from Movescount), the recorded time is the same
 
    // DONE: Sporttracks fitlog
    //TODO: TCX (find a file with a pause. Does the TCX format even support pauses?)
@@ -238,14 +240,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    //it would be very useful if not mandatory to have the ability to see in the slices where pauses are
 
    // Statistics view tooltip
-   // Statitics add recorded time dor - Jour, - Semaine etc...
+   // Statitics: For Time - Day/month/year, add a drop down menu for the user to choose
+   // between elapsed time, recorded time or moving time
    // display a pause sign on the gps track like in ST
 
    //TODO Add those new Tourbookview columns in CSVExport.java
 
    //TODO check that the sums of paused time work with my big database
-
-   //TODO when creating a manual activity and changing the recorded time/paused time, it should affect the elapsed time
 
    //TODO Remove the translations for time recording (elapsed) for all languages that are not english or french
    //Yes, the translators will have to translate : elapsed, paused, recorded, ...
@@ -9108,6 +9109,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
          if (recordedTime > elapsedTime) {
             elapsedTime = recordedTime;
+            movingTime = elapsedTime - breakTime;
          }
          pausedTime = elapsedTime - recordedTime;
 
@@ -9118,6 +9120,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
          if (pausedTime > elapsedTime) {
             elapsedTime = pausedTime;
+            movingTime = elapsedTime - breakTime;
          }
 
          recordedTime = elapsedTime - pausedTime;
@@ -9126,18 +9129,25 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             || widget == _timeBreak._spinMinutes
             || widget == _timeBreak._spinSeconds) {
          // break time is modified
+
          if (breakTime > elapsedTime) {
             elapsedTime = breakTime;
+            recordedTime = elapsedTime - pausedTime;
          }
+
          movingTime = elapsedTime - breakTime;
+
       } else if (widget == _timeMoving._spinHours
             || widget == _timeMoving._spinMinutes
             || widget == _timeMoving._spinSeconds) {
          // moving time is modified
+
          if (movingTime > elapsedTime) {
             elapsedTime = movingTime;
+            recordedTime = elapsedTime - pausedTime;
          }
          breakTime = elapsedTime - movingTime;
+
       }
 
       _timeElapsed.setTime(elapsedTime / 3600, ((elapsedTime % 3600) / 60), ((elapsedTime % 3600) % 60));
