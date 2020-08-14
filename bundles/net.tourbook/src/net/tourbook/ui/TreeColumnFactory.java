@@ -1919,7 +1919,7 @@ public abstract class TreeColumnFactory {
             colDef.setColumnCategory(Messages.ColumnFactory_Category_Tour);
 
             colDef.setColumnHeaderText(Messages.ColumnFactory_tour_numbers);
-            colDef.setColumnLabel(Messages.ColumnFactory_tour_numbers_lable);
+            colDef.setColumnLabel(Messages.ColumnFactory_tour_numbers_label);
             colDef.setColumnHeaderToolTipText(Messages.ColumnFactory_tour_numbers_tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
