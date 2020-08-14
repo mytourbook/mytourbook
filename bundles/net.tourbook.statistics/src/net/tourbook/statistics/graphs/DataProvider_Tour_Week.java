@@ -173,7 +173,10 @@ public class DataProvider_Tour_Week extends DataProvider {
             + " SUM(TourDrivingTime),     " + NL //      7 //$NON-NLS-1$
             + " SUM(1),                   " + NL //      8 //$NON-NLS-1$
 
-            + " TourType_TypeId           " + NL //      9 //$NON-NLS-1$
+            + " TourType_TypeId,          " + NL //      9 //$NON-NLS-1$
+
+            + " SUM(tourRecordedTime),    " + NL //      10 //$NON-NLS-1$
+            + " SUM(tourPausedTime)       " + NL //      11 //$NON-NLS-1$
 
             + fromTourData
 
@@ -188,8 +191,10 @@ public class DataProvider_Tour_Week extends DataProvider {
          final float[][] dbNumTours = new float[numTourTypes][numWeeks];
 
          final int[][] dbDurationTime = new int[numTourTypes][numWeeks];
-         final int[][] dbRecordingTime = new int[numTourTypes][numWeeks];
-         final int[][] dbDrivingTime = new int[numTourTypes][numWeeks];
+         final int[][] dbElapsedTime = new int[numTourTypes][numWeeks];
+         final int[][] dbRecordedTime = new int[numTourTypes][numWeeks];
+         final int[][] dbPausedTime = new int[numTourTypes][numWeeks];
+         final int[][] dbMovingTime = new int[numTourTypes][numWeeks];
          final int[][] dbBreakTime = new int[numTourTypes][numWeeks];
 
          final long[][] dbTypeIds = new long[numTourTypes][numWeeks];
@@ -217,7 +222,7 @@ public class DataProvider_Tour_Week extends DataProvider {
             if (weekIndex < 0) {
 
                /**
-                * This can occure when dbWeek == 0, tour is in the previous year and not displayed
+                * This can occur when dbWeek == 0, tour is in the previous year and not displayed
                 * in the week stats
                 */
 
@@ -227,14 +232,14 @@ public class DataProvider_Tour_Week extends DataProvider {
             if (weekIndex >= numWeeks) {
 
                /**
-                * This problem occured but is not yet fully fixed, it needs more investigation.
+                * This problem occurred but is not yet fully fixed, it needs more investigation.
                 * <p>
                 * Problem with this configuration</br>
                 * Statistic: Week summary</br>
                 * Tour type: Velo (3 bars)</br>
                 * Displayed years: 2013 + 2014
                 * <p>
-                * Problem occured when selecting year 2015
+                * Problem occurred when selecting year 2015
                 */
                continue;
             }
@@ -263,15 +268,19 @@ public class DataProvider_Tour_Week extends DataProvider {
             dbAltitude[colorIndex][weekIndex] = (int) (result.getInt(4) / UI.UNIT_VALUE_ALTITUDE);
             dbDurationTime[colorIndex][weekIndex] = result.getInt(5);
 
-            final int recordingTime = result.getInt(6);
-            final int drivingTime = result.getInt(7);
+            final int elapsedTime = result.getInt(6);
+            final int movingTime = result.getInt(7);
             final int numTours = result.getInt(8);
+            final int recordedTime = result.getInt(10);
+            final int pausedTime = result.getInt(11);
 
             dbNumTours[colorIndex][weekIndex] = numTours;
 
-            dbRecordingTime[colorIndex][weekIndex] = recordingTime;
-            dbDrivingTime[colorIndex][weekIndex] = drivingTime;
-            dbBreakTime[colorIndex][weekIndex] = recordingTime - drivingTime;
+            dbElapsedTime[colorIndex][weekIndex] = elapsedTime;
+            dbRecordedTime[colorIndex][weekIndex] = recordedTime;
+            dbPausedTime[colorIndex][weekIndex] = pausedTime;
+            dbMovingTime[colorIndex][weekIndex] = movingTime;
+            dbBreakTime[colorIndex][weekIndex] = elapsedTime - movingTime;
          }
 
          _tourWeekData.typeIds = dbTypeIds;
@@ -289,8 +298,10 @@ public class DataProvider_Tour_Week extends DataProvider {
          _tourWeekData.altitudeLow = new float[numTourTypes][numWeeks];
          _tourWeekData.altitudeHigh = dbAltitude;
 
-         _tourWeekData.recordingTime = dbRecordingTime;
-         _tourWeekData.drivingTime = dbDrivingTime;
+         _tourWeekData.elapsedTime = dbElapsedTime;
+         _tourWeekData.recordedTime = dbRecordedTime;
+         _tourWeekData.pausedTime = dbPausedTime;
+         _tourWeekData.movingTime = dbMovingTime;
          _tourWeekData.breakTime = dbBreakTime;
 
          _tourWeekData.numToursLow = new float[numTourTypes][numWeeks];

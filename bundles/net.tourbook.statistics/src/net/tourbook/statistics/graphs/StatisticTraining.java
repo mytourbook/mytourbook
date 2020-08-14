@@ -321,8 +321,10 @@ public abstract class StatisticTraining extends TourbookStatistic implements IBa
       toolTipFormat.append(Messages.tourtime_info_altitude + NL);
       toolTipFormat.append(Messages.tourtime_info_time + NL2);
 
-      toolTipFormat.append(Messages.tourtime_info_recording_time_tour + NL);
-      toolTipFormat.append(Messages.tourtime_info_driving_time_tour + NL);
+      toolTipFormat.append(Messages.tourtime_info_elapsed_time_tour + NL);
+      toolTipFormat.append(Messages.tourtime_info_recorded_time_tour + NL);
+      toolTipFormat.append(Messages.tourtime_info_paused_time_tour + NL);
+      toolTipFormat.append(Messages.tourtime_info_moving_time_tour + NL);
       toolTipFormat.append(Messages.tourtime_info_break_time_tour + NL2);
 
       toolTipFormat.append(Messages.tourtime_info_avg_speed + NL);

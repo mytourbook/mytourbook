@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -315,9 +315,13 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
       toolTipFormat.append(Messages.tourtime_info_time);
       toolTipFormat.append(UI.NEW_LINE);
       toolTipFormat.append(UI.NEW_LINE);
-      toolTipFormat.append(Messages.tourtime_info_recording_time_tour);
+      toolTipFormat.append(Messages.tourtime_info_elapsed_time_tour);
       toolTipFormat.append(UI.NEW_LINE);
-      toolTipFormat.append(Messages.tourtime_info_driving_time_tour);
+      toolTipFormat.append(Messages.tourtime_info_recorded_time_tour);
+      toolTipFormat.append(UI.NEW_LINE);
+      toolTipFormat.append(Messages.tourtime_info_paused_time_tour);
+      toolTipFormat.append(UI.NEW_LINE);
+      toolTipFormat.append(Messages.tourtime_info_moving_time_tour);
       toolTipFormat.append(UI.NEW_LINE);
       toolTipFormat.append(Messages.tourtime_info_break_time_tour);
       toolTipFormat.append(UI.NEW_LINE);
