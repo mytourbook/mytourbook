@@ -4526,18 +4526,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   setTourDirty();
                }
             });
-
-            final Composite radioContainer = new Composite(container, SWT.NONE);
-            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(radioContainer);
-            {
-               // ratio: rpm
-               //_rdoCadence_Rpm = _tk.createButton(radioContainer, Messages.Tour_Editor_Radio_Cadence_Rpm, SWT.RADIO);
-               //_rdoCadence_Rpm.addSelectionListener(_selectionListener);
-
-               // radio: spm
-               //_rdoCadence_Spm = _tk.createButton(radioContainer, Messages.Tour_Editor_Radio_Cadence_Spm, SWT.RADIO);
-               //_rdoCadence_Spm.addSelectionListener(_selectionListener);
-            }
          }
       }
    }

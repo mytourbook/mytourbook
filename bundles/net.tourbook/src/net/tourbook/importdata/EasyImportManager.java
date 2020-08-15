@@ -823,10 +823,7 @@ public class EasyImportManager {
                      EasyConfig.TOUR_TYPE_AVG_SPEED_DEFAULT,
                      EasyConfig.TOUR_TYPE_AVG_SPEED_MIN,
                      EasyConfig.TOUR_TYPE_AVG_SPEED_MAX);
-
-               speedVertex.cadence = Cadence.valueOf(Util.getXmlString(xmlSpeed,
-                     ATTR_IL_TOUR_TYPE_CADENCE,
-                     RawDataView.STATE_DEFAULT_CADENCE_DEFAULT.name()));
+               speedVertex.cadence = (Cadence) Util.getXmlEnum(xmlSpeed, ATTR_IL_TOUR_TYPE_CADENCE, RawDataView.STATE_DEFAULT_CADENCE_DEFAULT);
                speedVertices.add(speedVertex);
             }
          }
@@ -836,9 +833,9 @@ public class EasyImportManager {
          final Long xmlTourTypeId = Util.getXmlLong(xmlConfig, ATTR_TOUR_TYPE_ID, null);
 
          importLauncher.oneTourType = TourDatabase.getTourType(xmlTourTypeId);
-         importLauncher.oneTourTypeCadence = Cadence.getByValue(Util.getXmlInteger(xmlConfig,
+         importLauncher.oneTourTypeCadence = (Cadence) Util.getXmlEnum(xmlConfig,
                ATTR_IL_TOUR_TYPE_CADENCE,
-               RawDataView.STATE_DEFAULT_CADENCE_DEFAULT.getValue()));
+               RawDataView.STATE_DEFAULT_CADENCE_DEFAULT);
       } else {
 
          // this is the default, tour type is not set
@@ -1184,7 +1181,7 @@ public class EasyImportManager {
 
                   Util.setXmlLong(xmlSpeedVertex, ATTR_TOUR_TYPE_ID, speedVertex.tourTypeId);
                   xmlSpeedVertex.putFloat(ATTR_AVG_SPEED, speedVertex.avgSpeed);
-                  xmlSpeedVertex.putString(ATTR_IL_TOUR_TYPE_CADENCE, speedVertex.cadence.name());
+                  Util.setXmlEnum(xmlSpeedVertex, ATTR_IL_TOUR_TYPE_CADENCE, speedVertex.cadence);
                }
             }
 
@@ -1194,7 +1191,7 @@ public class EasyImportManager {
 
             if (oneTourType != null) {
                Util.setXmlLong(xmlConfig, ATTR_TOUR_TYPE_ID, oneTourType.getTypeId());
-               xmlConfig.putInteger(ATTR_IL_TOUR_TYPE_CADENCE, importLauncher.oneTourTypeCadence.getValue());
+               Util.setXmlEnum(xmlConfig, ATTR_IL_TOUR_TYPE_CADENCE, importLauncher.oneTourTypeCadence);
             }
 
          } else {
