@@ -19,6 +19,8 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.Util;
 import net.tourbook.importdata.RawDataManager;
+import net.tourbook.tour.Cadence;
+import net.tourbook.ui.ComboViewerCadence;
 import net.tourbook.ui.views.rawData.RawDataView;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -31,7 +33,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -65,8 +66,7 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
    private Label              _lblInvalidFilesInfo;
 
    private PreferenceLinkArea _linkBodyWeight;
-
-   private Combo              _comboDefaultCadence;
+   private ComboViewerCadence _comboDefaultCadence;
 
    @Override
    protected Control createContents(final Composite parent) {
@@ -207,11 +207,7 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
 
             lblDefaultCadence.setText(Messages.PrefPage_Import_Default_Cadence);
 
-            _comboDefaultCadence = new Combo(cadenceContainer, SWT.DROP_DOWN | SWT.READ_ONLY);
-
-            _comboDefaultCadence.add(Messages.Tour_Editor_Radio_Cadence_Rpm);
-            _comboDefaultCadence.add(Messages.Tour_Editor_Radio_Cadence_Spm);
-            _comboDefaultCadence.addSelectionListener(_defaultSelectionListener);
+            _comboDefaultCadence = new ComboViewerCadence(cadenceContainer, SWT.DROP_DOWN | SWT.READ_ONLY);
 
             /*
              * Label:
@@ -264,7 +260,7 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
       _chkCreateTourIdWithTime.setSelection(RawDataView.STATE_IS_CREATE_TOUR_ID_WITH_TIME_DEFAULT);
       _chkIgnoreInvalidFile.setSelection(RawDataView.STATE_IS_IGNORE_INVALID_FILE_DEFAULT);
       _chkSetBodyWeight.setSelection(RawDataView.STATE_IS_SET_BODY_WEIGHT_DEFAULT);
-      _comboDefaultCadence.setText(RawDataView.STATE_DEFAULT_CADENCE_DEFAULT);
+      _comboDefaultCadence.setSelection(RawDataView.STATE_DEFAULT_CADENCE_DEFAULT);
 
       enableControls();
 
@@ -310,10 +306,11 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
             RawDataView.STATE_IS_SET_BODY_WEIGHT_DEFAULT);
       _chkSetBodyWeight.setSelection(isSetBodyWeight);
 
-      final String defaultCadence = Util.getStateString(_state,
+      final Cadence defaultCadence = (Cadence) Util.getStateEnum(_state,
             RawDataView.STATE_DEFAULT_CADENCE,
             RawDataView.STATE_DEFAULT_CADENCE_DEFAULT);
-      _comboDefaultCadence.setText(defaultCadence);
+
+      _comboDefaultCadence.setSelection(defaultCadence);
    }
 
    private void saveState() {
@@ -322,13 +319,13 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
       final boolean isOpenImportLog = _chkAutoOpenImportLog.getSelection();
       final boolean isIgnoreInvalidFile = _chkIgnoreInvalidFile.getSelection();
       final boolean isSetBodyWeight = _chkSetBodyWeight.getSelection();
-      final String defaultCadence = _comboDefaultCadence.getText();
+      final Cadence defaultCadence = _comboDefaultCadence.getSelectedCadence();
 
       _state.put(RawDataView.STATE_IS_CREATE_TOUR_ID_WITH_TIME, isCreateTourIdWithTime);
       _state.put(RawDataView.STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW, isOpenImportLog);
       _state.put(RawDataView.STATE_IS_IGNORE_INVALID_FILE, isIgnoreInvalidFile);
       _state.put(RawDataView.STATE_IS_SET_BODY_WEIGHT, isSetBodyWeight);
-      _state.put(RawDataView.STATE_DEFAULT_CADENCE, defaultCadence);
+      Util.setStateEnum(_state, RawDataView.STATE_DEFAULT_CADENCE, defaultCadence);
 
       _rawDataMgr.setState_CreateTourIdWithTime(isCreateTourIdWithTime);
       _rawDataMgr.setState_IsOpenImportLogView(isOpenImportLog);

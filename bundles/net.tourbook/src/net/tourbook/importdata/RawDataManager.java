@@ -50,6 +50,7 @@ import net.tourbook.data.TourPerson;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.Cadence;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourLogState;
@@ -123,7 +124,7 @@ public class RawDataManager {
    private static boolean           _importState_IsAutoOpenImportLog    = RawDataView.STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW_DEFAULT;
    private static boolean           _importState_IsIgnoreInvalidFile    = RawDataView.STATE_IS_IGNORE_INVALID_FILE_DEFAULT;
    private static boolean           _importState_IsSetBodyWeight        = RawDataView.STATE_IS_SET_BODY_WEIGHT_DEFAULT;
-   private static String            _importState_DefaultCadence         = RawDataView.STATE_DEFAULT_CADENCE_DEFAULT;
+   private static Cadence           _importState_DefaultCadence         = RawDataView.STATE_DEFAULT_CADENCE_DEFAULT;
    static {
 
       ALL_IMPORT_TOUR_TYPE_CONFIG = new ComboEnumEntry<?>[] {
@@ -224,7 +225,7 @@ public class RawDataManager {
 
    private RawDataManager() {}
 
-   public static String DefaultCadence() {
+   public static Cadence DefaultCadence() {
       return _importState_DefaultCadence;
    }
 
@@ -271,6 +272,10 @@ public class RawDataManager {
 
    public static boolean isIgnoreInvalidFile() {
       return _importState_IsIgnoreInvalidFile;
+   }
+
+   public static boolean isSetBodyWeight() {
+      return _importState_IsSetBodyWeight;
    }
 
    private static ArrayList<String> readInvalidFilesToIgnoreFile() {
@@ -1738,10 +1743,6 @@ public class RawDataManager {
       return newFile.getAbsolutePath();
    }
 
-   public boolean isSetBodyWeight() {
-      return _importState_IsSetBodyWeight;
-   }
-
    public void removeAllTours() {
 
       _toursInImportView.clear();
@@ -2032,7 +2033,7 @@ public class RawDataManager {
       _importState_IsCreateTourIdWithTime = isActionChecked;
    }
 
-   public void setState_DefaultCadence(final String defaultCadence) {
+   public void setState_DefaultCadence(final Cadence defaultCadence) {
       _importState_DefaultCadence = defaultCadence;
    }
 
