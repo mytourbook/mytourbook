@@ -43,7 +43,7 @@ public class SubMenu_SetCadence extends Action implements IMenuCreator {
 
 	private ITourProvider	_tourProvider;
 
-   private class ActionSetNone extends Action { // TODO RT Assign
+   private class ActionSetNone extends Action {
 
       public ActionSetNone() {
          super(Messages.Action_Cadence_Set_None, AS_CHECK_BOX);

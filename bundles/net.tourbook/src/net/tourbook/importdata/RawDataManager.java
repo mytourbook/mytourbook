@@ -134,6 +134,7 @@ public class RawDataManager {
 
       };
    }
+
    private static RawDataManager           _instance                           = null;
 
    private static ArrayList<String>        _invalidFilesList                   = new ArrayList<>();
