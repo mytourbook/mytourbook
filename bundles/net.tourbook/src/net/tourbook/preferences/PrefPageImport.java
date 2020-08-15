@@ -306,9 +306,9 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
             RawDataView.STATE_IS_SET_BODY_WEIGHT_DEFAULT);
       _chkSetBodyWeight.setSelection(isSetBodyWeight);
 
-      final Cadence defaultCadence = Cadence.getByValue(Util.getStateInt(_state,
+      final Cadence defaultCadence = (Cadence) Util.getStateEnum(_state,
             RawDataView.STATE_DEFAULT_CADENCE,
-            RawDataView.STATE_DEFAULT_CADENCE_DEFAULT.getValue()));
+            RawDataView.STATE_DEFAULT_CADENCE_DEFAULT);
 
       _comboDefaultCadence.setSelection(defaultCadence);
    }
@@ -325,7 +325,7 @@ public class PrefPageImport extends PreferencePage implements IWorkbenchPreferen
       _state.put(RawDataView.STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW, isOpenImportLog);
       _state.put(RawDataView.STATE_IS_IGNORE_INVALID_FILE, isIgnoreInvalidFile);
       _state.put(RawDataView.STATE_IS_SET_BODY_WEIGHT, isSetBodyWeight);
-      _state.put(RawDataView.STATE_DEFAULT_CADENCE, defaultCadence.getValue());
+      Util.setStateEnum(_state, RawDataView.STATE_DEFAULT_CADENCE, defaultCadence);
 
       _rawDataMgr.setState_CreateTourIdWithTime(isCreateTourIdWithTime);
       _rawDataMgr.setState_IsOpenImportLogView(isOpenImportLog);

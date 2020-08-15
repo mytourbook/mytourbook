@@ -42,7 +42,7 @@ public class ComboViewerCadence extends ComboViewer {
             if (!(element instanceof Cadence)) {
                throw new IllegalStateException("Invalid object type found in ComboViewerCadence: " + element.getClass());
             }
-            return ((Cadence) element).getLabel();
+            return ((Cadence) element).getNlsLabel();
          }
       });
 

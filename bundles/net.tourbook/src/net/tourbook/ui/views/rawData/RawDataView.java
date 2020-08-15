@@ -4612,7 +4612,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       final boolean isSetBodyWeight = Util.getStateBoolean(_state, STATE_IS_SET_BODY_WEIGHT, STATE_IS_SET_BODY_WEIGHT_DEFAULT);
       _rawDataMgr.setState_IsSetBodyWeight(isSetBodyWeight);
 
-      final Cadence defaultCadence = Cadence.getByValue(Util.getStateInt(_state, STATE_DEFAULT_CADENCE, STATE_DEFAULT_CADENCE_DEFAULT.getValue()));
+      final Cadence defaultCadence = (Cadence) Util.getStateEnum(_state, STATE_DEFAULT_CADENCE, STATE_DEFAULT_CADENCE_DEFAULT);
       _rawDataMgr.setState_DefaultCadence(defaultCadence);
 
       // auto open import log view

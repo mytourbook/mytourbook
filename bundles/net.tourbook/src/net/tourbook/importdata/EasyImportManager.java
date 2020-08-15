@@ -824,9 +824,9 @@ public class EasyImportManager {
                      EasyConfig.TOUR_TYPE_AVG_SPEED_MIN,
                      EasyConfig.TOUR_TYPE_AVG_SPEED_MAX);
 
-               speedVertex.cadence = Cadence.getByValue(Util.getXmlInteger(xmlSpeed,
+               speedVertex.cadence = Cadence.valueOf(Util.getXmlString(xmlSpeed,
                      ATTR_IL_TOUR_TYPE_CADENCE,
-                     RawDataView.STATE_DEFAULT_CADENCE_DEFAULT.getValue()));
+                     RawDataView.STATE_DEFAULT_CADENCE_DEFAULT.name()));
                speedVertices.add(speedVertex);
             }
          }
@@ -1184,7 +1184,7 @@ public class EasyImportManager {
 
                   Util.setXmlLong(xmlSpeedVertex, ATTR_TOUR_TYPE_ID, speedVertex.tourTypeId);
                   xmlSpeedVertex.putFloat(ATTR_AVG_SPEED, speedVertex.avgSpeed);
-                  xmlSpeedVertex.putInteger(ATTR_IL_TOUR_TYPE_CADENCE, speedVertex.cadence.getValue());
+                  xmlSpeedVertex.putString(ATTR_IL_TOUR_TYPE_CADENCE, speedVertex.cadence.name());
                }
             }
 
@@ -1278,6 +1278,6 @@ public class EasyImportManager {
             String.format(//
                   LOG_EASY_IMPORT_003_TOUR_TYPE_ITEM,
                   tourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S),
-                  tourTypeName + " (" + tourTypeCadence.getLabel() + ")"));
+                  tourTypeName + " (" + tourTypeCadence.getNlsLabel() + ")"));
    }
 }

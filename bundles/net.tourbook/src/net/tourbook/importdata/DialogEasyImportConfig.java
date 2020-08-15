@@ -2046,9 +2046,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
 
          _comboIL_One_TourType_Cadence = new ComboViewerCadence(container, SWT.READ_ONLY | SWT.DROP_DOWN);
 
-         final Cadence cadence = Cadence.getByValue(Util.getStateInt(_stateRDV,
-               RawDataView.STATE_DEFAULT_CADENCE,
-               RawDataView.STATE_DEFAULT_CADENCE_DEFAULT.getValue()));
+         final Cadence cadence = (Cadence) Util.getStateEnum(_stateRDV, RawDataView.STATE_DEFAULT_CADENCE, RawDataView.STATE_DEFAULT_CADENCE_DEFAULT);
          _comboIL_One_TourType_Cadence.setSelection(cadence);
       }
 
@@ -2188,9 +2186,10 @@ public class DialogEasyImportConfig extends TitleAreaDialog {
             lblCadence.setText(Messages.Tour_Editor_Label_Cadence);
 
             final ComboViewerCadence comboCadence = new ComboViewerCadence(_speedTourType_Container);
-            final Cadence cadence = Cadence.getByValue(Util.getStateInt(_stateRDV,
+
+            final Cadence cadence = (Cadence) Util.getStateEnum(_stateRDV,
                   RawDataView.STATE_DEFAULT_CADENCE,
-                  RawDataView.STATE_DEFAULT_CADENCE_DEFAULT.getValue()));
+                  RawDataView.STATE_DEFAULT_CADENCE_DEFAULT);
             comboCadence.setSelection(cadence);
 
             /*

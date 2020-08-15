@@ -7,7 +7,7 @@ public enum Cadence {
    NONE(0), RPM(1), SPM(2), INVALID(255);
 
    protected int value;
-   private String label;
+   private String label; // This field offers NLS support
 
    private Cadence(final int value) {
       this.value = value;
@@ -40,12 +40,12 @@ public enum Cadence {
       return Cadence.INVALID;
    }
 
-   public String getLabel() {
-      return label;
-   }
-
    public float getMultiplier() {
       return value;
+   }
+
+   public String getNlsLabel() {
+      return label;
    }
 
    public int getValue() {
