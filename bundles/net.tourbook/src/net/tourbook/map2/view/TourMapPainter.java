@@ -522,7 +522,7 @@ public class TourMapPainter extends MapPainter {
 
          if (isDrawVertical) {
 
-            // vertial legend
+            // vertical legend
             g2.drawLine(contentX, devValue, contentWidth, devValue);
 
          } else {
@@ -715,7 +715,7 @@ public class TourMapPainter extends MapPainter {
 
          if (isDrawVertical) {
 
-            // vertial legend
+            // vertical legend
 
             gc.drawLine(contentX, devValue, contentWidth, devValue);
 
@@ -980,7 +980,7 @@ public class TourMapPainter extends MapPainter {
                if (tourData == prevTourData) {
 
                   /*
-                   * This can occure when a compared tour is compared with it's own reference tour
+                   * This can occur when a compared tour is compared with it's own reference tour
                    * -> paint 2nd time as normal tour
                    */
                   isGeoCompareRefTour = false;
@@ -1064,7 +1064,8 @@ public class TourMapPainter extends MapPainter {
          _colorCache.dispose();
       }
 
-      if (_tourPaintConfig.isShowTourMarker || _tourPaintConfig.isShowWayPoints) {
+      if (_tourPaintConfig.isShowTourMarker || _tourPaintConfig.isShowWayPoints ||
+            _tourPaintConfig.isShowTourPauses) {
 
          // draw marker above the tour
 
@@ -1096,7 +1097,7 @@ public class TourMapPainter extends MapPainter {
                      longitudeSerie);
             }
 
-            if (_tourPaintConfig.isShowTourPauses || true) {
+            if (_tourPaintConfig.isShowTourPauses) {
 
                isContentInTile = doPaint_Pauses(
                      gcTile,
@@ -1111,7 +1112,7 @@ public class TourMapPainter extends MapPainter {
 
             if (_tourPaintConfig.isShowWayPoints) {
 
-               // ckeck if way points are available
+               // check if way points are available
                final Set<TourWayPoint> wayPoints = tourData.getTourWayPoints();
                if (wayPoints.size() > 0) {
 
@@ -1261,7 +1262,7 @@ public class TourMapPainter extends MapPainter {
 
          final ArrayList<TourMarker> sortedMarkers = tourData.getTourMarkersSorted();
 
-         // ckeck if markers are available
+         // check if markers are available
          if (sortedMarkers.size() > 0) {
 
             // draw tour marker
@@ -1379,7 +1380,7 @@ public class TourMapPainter extends MapPainter {
 
          final List<TourTimerPause> tourTimerPauses = tourData.getTourTimerPauses();
 
-         // ckeck if pauses are available
+         // check if pauses are available
          if (tourTimerPauses.size() > 0) {
 
             // draw tour pauses durations
@@ -1394,15 +1395,10 @@ public class TourMapPainter extends MapPainter {
                for (int index = serieIndex; index < tourData.timeSerie.length; ++index) {
                   final long currentTime = tourData.timeSerie[index] * 1000 + tourData.getTourStartTimeMS();
                   if (currentTime == startTime ||
-                        currentTime > startTime ||
-                        index == 1688) {
+                        currentTime > startTime) {
                      serieIndex = index;
                      break;
                   }
-
-//                  if (index == tourData.timeSerie.length - 1) {
-//                     index = -1;
-//                  }
                }
 
                /*
@@ -2071,7 +2067,7 @@ public class TourMapPainter extends MapPainter {
     * @param tile
     * @param latitude
     * @param longitude
-    * @param tourMarker
+    * @param tourTimerPause
     * @param parts
     * @return Returns <code>true</code> when marker has been painted
     */
@@ -2199,7 +2195,7 @@ public class TourMapPainter extends MapPainter {
                parts);
 
          /*
-          * check if the way point paints into a neighbour tile
+          * check if the way point paints into a neighbor tile
           */
          if (parts > 1) {
 
