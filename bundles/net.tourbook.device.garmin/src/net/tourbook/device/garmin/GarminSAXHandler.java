@@ -628,7 +628,8 @@ public class GarminSAXHandler extends DefaultHandler {
 
          // create additional data
          tourData.computeAltitudeUpDown();
-         tourData.computeTourDrivingTime();
+         tourData.setTourRecordedTime(tourData.getTourElapsedTime());
+         tourData.computeTourMovingTime();
          tourData.computeComputedValues();
       }
 

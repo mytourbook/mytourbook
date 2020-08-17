@@ -190,7 +190,7 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
          /*
           * set time serie from the imported trackpoints
           */
-         final ArrayList<TimeData> timeDataList = new ArrayList<TimeData>();
+         final ArrayList<TimeData> timeDataList = new ArrayList<>();
          TimeData timeData;
 
          int time;
@@ -299,7 +299,8 @@ public class DaumErgoBikeDataReader extends TourbookDevice {
             newlyImportedTours.put(tourId, tourData);
 
             // create additional data
-            tourData.computeTourDrivingTime();
+            tourData.setTourRecordedTime(tourData.getTourElapsedTime());
+            tourData.computeTourMovingTime();
             tourData.computeComputedValues();
          }
 

@@ -1180,13 +1180,15 @@ public class TourManager {
 
       joinedTourData.setTourStartTime(tourStartTime);
       joinedTourData.setTourElapsedTime(tourElapsedTime);
+      joinedTourData.setTourRecordedTime(tourRecordedTime);
+      joinedTourData.setTourPausedTime(tourPausedTime);
       joinedTourData.setTourDistance(tourDistance);
 
-      // computing these values is VERY cpu intensive because of the DP algorithm
+      // computing these values is VERY CPU intensive because of the DP algorithm
       joinedTourData.setTourAltUp(tourAltUp);
       joinedTourData.setTourAltDown(tourAltDown);
 
-      joinedTourData.computeTourDrivingTime();
+      joinedTourData.computeTourMovingTime();
       joinedTourData.computeComputedValues();
 
       joinedTourData.multipleTour_IsCadenceRpm = isCadenceRpm;

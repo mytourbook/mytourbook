@@ -955,7 +955,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
             oldTourData.setBreakTimeSerie(null);
 
             // recompute break time
-            oldTourData.computeTourDrivingTime();
+            oldTourData.computeTourMovingTime();
 
             return true;
          }

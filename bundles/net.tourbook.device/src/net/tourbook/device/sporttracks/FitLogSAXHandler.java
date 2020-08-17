@@ -509,7 +509,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 
          // create additional data
          if (isComputeDrivingTime) {
-            tourData.computeTourDrivingTime();
+            tourData.computeTourMovingTime();
 
             final long totalTourTimerPauses = tourData.getTotalTourTimerPauses();
 

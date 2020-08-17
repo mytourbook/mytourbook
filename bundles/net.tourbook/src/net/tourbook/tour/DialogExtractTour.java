@@ -922,7 +922,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 
             final TourMarker extractedMarker = tourMarker.clone(_tourDataTarget);
 
-            // adjust marker position, position is relativ to the tour start
+            // adjust marker position, position is relative to the tour start
             extractedMarker.setSerieIndex(extractedMarkerIndex);
 
             if (isTourTime) {
@@ -951,7 +951,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
          }
 
          /*
-          * copy all way points, they can be independant of the tour
+          * copy all way points, they can be independent of the tour
           */
          for (final TourWayPoint sourceWayPoint : _tourDataSource.getTourWayPoints()) {
             extractedWayPoints.add(sourceWayPoint.clone(_tourDataTarget));
@@ -1049,7 +1049,9 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
       }
 
       _tourDataTarget.computeAltitudeUpDown();
-      _tourDataTarget.computeTourDrivingTime();
+      _tourDataTarget.setTourRecordedTime(_tourDataTarget.getTourElapsedTime());
+      //TODO FB set the pauses as well ??
+      _tourDataTarget.computeTourMovingTime();
       _tourDataTarget.computeComputedValues();
 
       // set person which is required to save a tour

@@ -1325,7 +1325,9 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
          /*
           * summarize other fields
           */
-         tourTourData.computeTourDrivingTime();
+         tourTourData.setTourRecordedTime(tourTourData.getTourElapsedTime());
+         //TODO FB merge the pauses
+         tourTourData.computeTourMovingTime();
 
          joinedElapsedTime += tourTourData.getTourElapsedTime();
          joinedRecordedTime += tourTourData.getTourRecordedTime();
@@ -1702,5 +1704,4 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
       // reflow layout that the tags are aligned correctly
       _dlgInnerContainer.layout(true);
    }
-
 }

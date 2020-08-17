@@ -298,7 +298,7 @@ public class Suunto3_STAXHandler {
 
          // create additional data
          tourData.computeAltitudeUpDown();
-         tourData.computeTourDrivingTime();
+         tourData.computeTourMovingTime();
          tourData.computeComputedValues();
       }
 

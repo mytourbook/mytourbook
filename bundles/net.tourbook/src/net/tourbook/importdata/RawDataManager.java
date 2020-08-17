@@ -1140,7 +1140,7 @@ public class RawDataManager {
             newTourData.clearComputedSeries();
 
             newTourData.computeAltitudeUpDown();
-            newTourData.computeTourDrivingTime();
+            newTourData.computeTourMovingTime();
             newTourData.computeComputedValues();
 
             // maintain list, that another call of this method do not find this tour again

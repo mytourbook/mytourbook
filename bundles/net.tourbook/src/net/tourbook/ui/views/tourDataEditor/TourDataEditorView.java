@@ -234,7 +234,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    // so the elapsed time is erroneous when imporitng from json.gz and gpx
    //If i import from a FIT (exported from Movescount), the recorded time is the same
 
-   // DONE: Sporttracks fitlog
+   // 1/2 DONE: Sporttracks fitlog (try with manual activity import)
    //TODO: TCX (find a file with a pause. Does the TCX format even support pauses?)
    //Looking at a TCX file from movescount, it seems that pauses are laps with 0 distance
 
@@ -6699,7 +6699,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          } else {
             _tourData.setTourElapsedTime(_serieTime[_serieTime.length - 1]);
          }
-         _tourData.computeTourDrivingTime();
+         _tourData.computeTourMovingTime();
 
          if ((_serieDistance == null) || (_serieDistance.length == 0)) {
             // disabled because distance can be edited when distance serie is not available
@@ -7877,7 +7877,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          updateModel_FromUI();
 
          _tourData.computeAltitudeUpDown();
-         _tourData.computeTourDrivingTime();
+         _tourData.computeTourMovingTime();
          _tourData.computeComputedValues();
 
          /*

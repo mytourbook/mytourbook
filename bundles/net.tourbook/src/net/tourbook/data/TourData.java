@@ -4922,10 +4922,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
-    * Computes the tour driving time in seconds, this is the tour recording time - tour break time.
+    * Computes the tour moving time in seconds, this is the tour elapsed time - tour break time.
     * This value is store in {@link #tourDrivingTime}.
     */
-   public void computeTourDrivingTime() {
+   public void computeTourMovingTime() {
 
       if (isManualTour()) {
          // manual tours do not have data series
@@ -6891,7 +6891,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
             computeBreakTimeFixed(minBreakTime / deviceTimeInterval);
          }
 
-         computeTourDrivingTime();
+         computeTourMovingTime();
       }
 
       return computeBreakTime(startIndex, endIndex);
