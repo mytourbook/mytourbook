@@ -175,8 +175,8 @@ public class DataProvider_Tour_Week extends DataProvider {
 
             + " TourType_TypeId,          " + NL //      9 //$NON-NLS-1$
 
-            + " SUM(tourRecordedTime),    " + NL //      10 //$NON-NLS-1$
-            + " SUM(tourPausedTime)       " + NL //      11 //$NON-NLS-1$
+            + " SUM(tourRecordedTime),    " + NL //     10 //$NON-NLS-1$
+            + " SUM(tourPausedTime)       " + NL //     11 //$NON-NLS-1$
 
             + fromTourData
 

@@ -157,10 +157,10 @@ public class DataProvider_Tour_Month extends DataProvider {
             + sqlDurationTime + "         " + NL //       5 //$NON-NLS-1$
             + " SUM(TourRecordingTime),	" + NL //       6 //$NON-NLS-1$
             + " SUM(TourDrivingTime),		" + NL //       7 //$NON-NLS-1$
-            + " SUM(1), 						" + NL //       8 //$NON-NLS-1$
-            + " TourType_TypeId, 			" + NL //       9 //$NON-NLS-1$
-            + " SUM(tourRecordedTime),	   " + NL //      10 //$NON-NLS-1$
-            + " SUM(tourPausedTime)     	" + NL //      11 //$NON-NLS-1$
+            + " SUM(1),                   " + NL //       8 //$NON-NLS-1$
+            + " TourType_TypeId,          " + NL //       9 //$NON-NLS-1$
+            + " SUM(tourRecordedTime),    " + NL //      10 //$NON-NLS-1$
+            + " SUM(tourPausedTime)       " + NL //      11 //$NON-NLS-1$
 
             + fromTourData
 

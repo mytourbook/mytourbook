@@ -1090,7 +1090,6 @@ public class GPX_SAX_Handler extends DefaultHandler {
          _newlyImportedTours.put(tourId, _tourData);
 
          _tourData.computeAltitudeUpDown();
-         _tourData.setTourRecordedTime(_tourData.getTourElapsedTime());
          _tourData.computeTourMovingTime();
          _tourData.computeComputedValues();
 

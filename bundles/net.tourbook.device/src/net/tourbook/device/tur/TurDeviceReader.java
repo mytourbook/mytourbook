@@ -133,7 +133,7 @@ public class TurDeviceReader extends TourbookDevice {
 
    @Override
    public int getTransferDataSize() {
-      // We dont't have a COM port device so this is not necessary
+      // We don't have a COM port device so this is not necessary
       return 0;
    }
 
