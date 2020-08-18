@@ -33,15 +33,13 @@ public class ActionShowTourPauses extends Action {
 
       setText(Messages.map_action_show_tour_pauses);
 
-      //TODO FB
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(net.tourbook.Messages.Image__edit_tour_marker));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(net.tourbook.Messages.Image__edit_tour_pauses));
       setDisabledImageDescriptor(TourbookPlugin
-            .getImageDescriptor(net.tourbook.Messages.Image__edit_tour_marker_disabled));
+            .getImageDescriptor(net.tourbook.Messages.Image__edit_tour_pauses_disabled));
    }
 
    @Override
    public void run() {
       _mapView.actionSetShowTourPausesInMap();
    }
-
 }

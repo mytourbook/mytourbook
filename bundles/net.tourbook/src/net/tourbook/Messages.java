@@ -955,6 +955,8 @@ public class Messages extends NLS {
    public static String        Image__edit_tour_marker_disabled;
    public static String        Image__edit_tour_marker_new;
    public static String        Image__edit_tour_marker_new_disabled;
+   public static String        Image__edit_tour_pauses;
+   public static String        Image__edit_tour_pauses_disabled;
    public static String        Image__expand_all;
    public static String        Image__Eye;
    public static String        Image__graph_altimeter;
