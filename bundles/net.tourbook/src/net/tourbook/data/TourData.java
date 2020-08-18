@@ -8298,6 +8298,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    public long getTotalTourTimerPauses() {
+
       if (tourTimerPauses == null || tourTimerPauses.size() == 0) {
          return 0;
       }

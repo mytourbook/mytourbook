@@ -41,9 +41,15 @@ public class TourTimerPause implements Serializable {
    @ManyToOne(optional = false)
    private TourData          tourData;
 
+   /**
+    * The start time of the pause (in milliseconds)
+    */
    @XmlElement
    private long              startTime;
 
+   /**
+    * The end time of the pause (in milliseconds)
+    */
    @XmlElement
    private long              endTime;
 
