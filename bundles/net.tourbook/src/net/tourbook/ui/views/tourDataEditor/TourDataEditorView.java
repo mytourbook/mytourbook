@@ -231,7 +231,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    // 08/06/2020 It seems that the computed elapsed time is wrong. Not sure why
    //example: 05-12-2020 : THe elapsed time should be 0:46:46 or 0:46:47
    //=> After investigation, it seems that the {@link TourData#createTimeSeries()} generates this number
-   // so the elapsed time is erroneous when imporitng from json.gz and gpx
+   // so the elapsed time is erroneous when importing from json.gz and gpx
    //If i import from a FIT (exported from Movescount), the recorded time is the same
 
    // 1/2 DONE: Sporttracks fitlog (try with manual activity import)
@@ -252,8 +252,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    //TODO Remove the translations for time recording (elapsed) for all languages that are not english or french
    //Yes, the translators will have to translate : elapsed, paused, recorded, ...
-
-   //2D map contextual menu : Add a buton "Show pause durations" below show tour markers
 
    public static final String     ID                            = "net.tourbook.views.TourDataEditorView";                //$NON-NLS-1$
    //

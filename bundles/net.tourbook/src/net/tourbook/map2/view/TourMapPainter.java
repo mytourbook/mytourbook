@@ -1067,7 +1067,7 @@ public class TourMapPainter extends MapPainter {
       if (_tourPaintConfig.isShowTourMarker || _tourPaintConfig.isShowWayPoints ||
             _tourPaintConfig.isShowTourPauses) {
 
-         // draw marker above the tour
+         // draw marker/pauses above the tour
 
          for (final TourData tourData : tourDataList) {
 
@@ -1315,10 +1315,19 @@ public class TourMapPainter extends MapPainter {
                                   final double[] latitudeSerie,
                                   final double[] longitudeSerie) {
 
+      final List<TourTimerPause> tourTimerPauses = tourData.getTourTimerPauses();
+
+      // check if pauses are available
+      if (tourTimerPauses.size() == 0) {
+         return isContentInTile;
+      }
+
       if (tourData.isMultipleTours()) {
 
+         //TODO FB support joining pauses when creating a multiple tour
          final int[] multipleStartTimeIndex = tourData.multipleTourStartIndex;
          final int[] multipleNumberOfMarkers = tourData.multipleNumberOfMarkers;
+//         final int[] multipleNumberOfPauses = tourData.multipleNumberOfPauses;
 
          int tourIndex = 0;
          int numberOfMultiMarkers = 0;
@@ -1351,11 +1360,6 @@ public class TourMapPainter extends MapPainter {
 
             final TourMarker tourMarker = allTourMarkers.get(markerIndex);
 
-            // skip marker when hidden or not set
-            if (tourMarker.isMarkerVisible() == false || tourMarker.getLabel().length() == 0) {
-               continue;
-            }
-
             final int markerSerieIndex = tourSerieIndex + tourMarker.getSerieIndex();
 
             tourMarker.setMultiTourSerieIndex(markerSerieIndex);
@@ -1378,11 +1382,6 @@ public class TourMapPainter extends MapPainter {
 
       } else {
 
-         final List<TourTimerPause> tourTimerPauses = tourData.getTourTimerPauses();
-
-         // check if pauses are available
-         if (tourTimerPauses.size() > 0) {
-
             // draw tour pauses durations
 
             int pauseCounter = 0;
@@ -1393,9 +1392,10 @@ public class TourMapPainter extends MapPainter {
                final long startTime = tourTimerPause.getStartTime();
 
                for (int index = serieIndex; index < tourData.timeSerie.length; ++index) {
+
                   final long currentTime = tourData.timeSerie[index] * 1000 + tourData.getTourStartTimeMS();
-                  if (currentTime == startTime ||
-                        currentTime > startTime) {
+
+                  if (currentTime == startTime || currentTime > startTime) {
                      serieIndex = index;
                      break;
                   }
@@ -1421,7 +1421,6 @@ public class TourMapPainter extends MapPainter {
 
                   pauseCounter++;
                }
-            }
 
             isContentInTile = isContentInTile || pauseCounter > 0;
          }
@@ -1961,8 +1960,6 @@ public class TourMapPainter extends MapPainter {
          int devX;
          int devY;
 
-         //TODO FB. NExt challenge: draw an SVG (TODO) to show a pause and instead of the string "PAUSE"
-         //=> display its duration "00:12:12".
          final Image tourMarkerImage = drawTourMarkerImage(gcTile.getDevice(), tourMarker.getLabel(), markerBounds);
          {
             devX = devMarkerPosX - markerBounds.width / 2;
@@ -2069,7 +2066,7 @@ public class TourMapPainter extends MapPainter {
     * @param longitude
     * @param tourTimerPause
     * @param parts
-    * @return Returns <code>true</code> when marker has been painted
+    * @return Returns <code>true</code> when pause duration has been painted
     */
    private boolean drawTourPauses(final GC gcTile,
                                   final Map map,
@@ -2099,7 +2096,8 @@ public class TourMapPainter extends MapPainter {
        * create and cache marker bounds
        */
 
-      final org.eclipse.swt.graphics.Point labelExtent = gcTile.textExtent("TOTO");
+      final String pauseDuration = UI.format_hh_mm_ss(tourTimerPause.getPauseDuration() / 1000);
+      final org.eclipse.swt.graphics.Point labelExtent = gcTile.textExtent(pauseDuration);
 
       final int bannerWidth = labelExtent.x + 2 * MARKER_MARGIN + 1;
       final int bannerHeight = labelExtent.y + 2 * MARKER_MARGIN;
@@ -2107,24 +2105,18 @@ public class TourMapPainter extends MapPainter {
       final int markerImageWidth = bannerWidth;
       final int markerImageHeight = bannerHeight + MARKER_POLE;
 
-      final Rectangle markerBounds = new Rectangle(bannerWidth, bannerHeight, markerImageWidth, markerImageHeight);
+      final Rectangle pauseBounds = new Rectangle(bannerWidth, bannerHeight, markerImageWidth, markerImageHeight);
 
-      final boolean isMarkerInTile = isBoundsInTile(markerBounds, devMarkerPosX, devMarkerPosY, tileSize);
-      if (isMarkerInTile) {
+      final boolean isPauseInTile = isBoundsInTile(pauseBounds, devMarkerPosX, devMarkerPosY, tileSize);
+      if (isPauseInTile) {
 
          int devX;
          int devY;
 
-         //TODO FB. NExt challenge: draw an SVG (TODO) to show a pause and instead of the string "PAUSE"
-         //=> display its duration "00:12:12".
-
-         long toto = tourTimerPause.getPauseDuration();
-         toto /= 1000;
-
-         final Image tourMarkerImage = drawTourMarkerImage(gcTile.getDevice(), UI.format_hh_mm_ss(toto), markerBounds);
+         final Image tourMarkerImage = drawTourMarkerImage(gcTile.getDevice(), pauseDuration, pauseBounds);
          {
-            devX = devMarkerPosX - markerBounds.width / 2;
-            devY = devMarkerPosY - markerBounds.height;
+            devX = devMarkerPosX - pauseBounds.width / 2;
+            devY = devMarkerPosY - pauseBounds.height;
 
             devX += devPartOffset;
             devY += devPartOffset;
@@ -2133,10 +2125,10 @@ public class TourMapPainter extends MapPainter {
          }
          tourMarkerImage.dispose();
 
-         tile.addMarkerBounds(devX, devY, markerBounds.x, markerBounds.y, zoomLevel, parts);
+         tile.addMarkerBounds(devX, devY, pauseBounds.x, pauseBounds.y, zoomLevel, parts);
       }
 
-      return isMarkerInTile;
+      return isPauseInTile;
    }
 
    /**
