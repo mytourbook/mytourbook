@@ -8298,14 +8298,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    public long getTotalTourTimerPauses() {
-      if (tourTimerPauses != null && tourTimerPauses.size() > 0) {
-
-         final long pausedTime = tourTimerPauses.stream().mapToLong(TourTimerPause::getPauseDuration).sum();
-
-         return pausedTime / 1000;
+      if (tourTimerPauses == null || tourTimerPauses.size() == 0) {
+         return 0;
       }
 
-      return tourRecordingTime - tourRecordedTime;
+      final long pausedTime = tourTimerPauses.stream().mapToLong(TourTimerPause::getPauseDuration).sum();
+
+      return pausedTime / 1000;
    }
 
    /**
