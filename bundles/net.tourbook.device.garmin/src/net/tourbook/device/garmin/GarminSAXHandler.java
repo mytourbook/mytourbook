@@ -522,8 +522,7 @@ public class GarminSAXHandler extends DefaultHandler {
                      if (currentPause.getStartTime() != _currentStartTime.getMillis()) {
                         _timerPauses.get(_timerPauses.size() - 1).setEndTime(_currentStartTime.getMillis());
                      }
-                  }
-                  else {
+                  } else {
                      final TourTimerPause timerPause = new TourTimerPause(null,
                            _currentStartTime.getMillis(), //"attribute StartTime" * 1000,
                            -1);
