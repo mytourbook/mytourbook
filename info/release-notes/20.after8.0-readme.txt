@@ -9,7 +9,7 @@ TODO's
 New
 ===
 
-* Elapsed Time - Recorded Time - Paused Time (Frederic)
+* Elapsed Time - Recorded Time - Paused Time (Frederic) https://github.com/wolfgang-ch/mytourbook/pull/2XX
  - Added the following tour times in the TourDataEditorView, Calendar view...
  - The recorded/paused time are imported from the following formats
 
