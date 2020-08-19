@@ -527,6 +527,7 @@ public class Suunto2SAXHandler extends DefaultHandler {
    }
 
    private void finalizeTour_TimerPauses(final TourData tourData) {
+
       if (_tourTimerPauses.size() == 0) {
          tourData.setTourRecordedTime(tourData.getTourElapsedTime());
          return;
