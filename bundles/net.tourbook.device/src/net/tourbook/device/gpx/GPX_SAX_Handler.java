@@ -181,8 +181,8 @@ public class GPX_SAX_Handler extends DefaultHandler {
    private static final String TAG_MT_TOUR_END_TIME            = "mt:tourEndTime";          //$NON-NLS-1$
    private static final String TAG_MT_TOUR_DRIVING_TIME        = "mt:tourDrivingTime";      //$NON-NLS-1$
    private static final String TAG_MT_TOUR_RECORDING_TIME      = "mt:tourRecordingTime";    //$NON-NLS-1$
-   private static final String TAG_MT_TOUR_RECORDED_TIME      = "mt:tourRecordedTime";    //$NON-NLS-1$
-   private static final String TAG_MT_TOUR_PAUSED_TIME      = "mt:tourPausedTime";    //$NON-NLS-1$
+   private static final String TAG_MT_TOUR_RECORDED_TIME       = "mt:tourRecordedTime";    //$NON-NLS-1$
+   private static final String TAG_MT_TOUR_PAUSED_TIME         = "mt:tourPausedTime";    //$NON-NLS-1$
 
    private static final String TAG_MT_TOUR_ALTITUDE_UP         = "mt:tourAltUp";            //$NON-NLS-1$
    private static final String TAG_MT_TOUR_ALTITUDE_DOWN       = "mt:tourAltDown";          //$NON-NLS-1$
@@ -442,7 +442,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
          /**
           * Set tourmarker/waypoints AFTER all tours are created that tourmarker/waypoints are set
-          * only ONCE, otherwise this exception occures:
+          * only ONCE, otherwise this exception occurs:
           * <p>
           * org.hibernate.PersistentObjectException: detached entity passed to persist:
           * net.tourbook.data.TourMarker
@@ -1399,7 +1399,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
       if (_tourData != null) {
 
          /**
-          * This can occure when MT tours are imported and tour metadata are read.
+          * This can occur when MT tours are imported and tour metadata are read.
           * <p>
           * When an MT tour is imported, there can be only 1 tour in a gpx file. The export of
           * multiple tours with MT data is disabled in the export dialog.
@@ -1509,7 +1509,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
          if (name.equals(TAG_GPX)) {
 
             /*
-             * get version of the xml file
+             * get version of the XML file
              */
             for (int attrIndex = 0; attrIndex < attributes.getLength(); attrIndex++) {
 
@@ -1719,7 +1719,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
       } else if (TAG_TRKPT.equals(name) || TAG_RTEPT.equals(name)) {
 
          /*
-          * new trackpoing
+          * new trackpoint
           */
          _isInTrkPt = true;
 
