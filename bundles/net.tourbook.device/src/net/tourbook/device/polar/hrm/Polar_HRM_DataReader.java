@@ -485,9 +485,6 @@ public class Polar_HRM_DataReader extends TourbookDevice {
       tourData.setDeviceFirmwareVersion(Integer.toString(_hrmVersion));
 
       tourData.createTimeSeries(timeSeries, true);
-      //TODO FB I am thinking i will need to do the same below for all the files calling createTimeSeries()
-      //since this function sets the elpased time of a tour ?
-      tourData.setTourRecordedTime(tourData.getTourElapsedTime());
 
       // after all data are added, the tour id can be created
       final String uniqueId = createUniqueId(tourData, Util.UNIQUE_ID_SUFFIX_POLAR_HRM);
@@ -500,6 +497,7 @@ public class Polar_HRM_DataReader extends TourbookDevice {
          newlyImportedTours.put(tourId, tourData);
 
          // create additional data
+         tourData.setTourRecordedTime(tourData.getTourElapsedTime());
          tourData.computeTourMovingTime();
          tourData.computeComputedValues();
          tourData.computeAltitudeUpDown();

@@ -313,16 +313,16 @@ public class Suunto3_STAXHandler {
          return;
       }
 
-      final List<TourTimerPause> _finalTourtimerPauses = new ArrayList<>();
+      final List<TourTimerPause> tourTimerPauses = new ArrayList<>();
 
       for (final TourTimerPause tourTimerPause : _tourTimerPauses) {
          if (tourTimerPause.getStartTime() > 0 && tourTimerPause.getEndTime() > 0) {
             tourTimerPause.setTourData(tourData);
-            _finalTourtimerPauses.add(tourTimerPause);
+            tourTimerPauses.add(tourTimerPause);
          }
       }
 
-      tourData.setTourTimerPauses(_finalTourtimerPauses);
+      tourData.setTourTimerPauses(tourTimerPauses);
       final long totalTourTimerPauses = tourData.getTotalTourTimerPauses();
 
       tourData.setTourRecordedTime(tourData.getTourElapsedTime() - totalTourTimerPauses);

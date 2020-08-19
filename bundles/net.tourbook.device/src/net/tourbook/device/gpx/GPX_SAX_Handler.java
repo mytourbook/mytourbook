@@ -1077,7 +1077,6 @@ public class GPX_SAX_Handler extends DefaultHandler {
       _tourData.setDeviceName(_device.visibleName);
 
       _tourData.createTimeSeries(_timeDataList, true);
-      _tourData.setTourRecordedTime(_tourData.getTourElapsedTime());
 
       // after all data are added, the tour id can be created
       final String uniqueId = _device.createUniqueId(_tourData, Util.UNIQUE_ID_SUFFIX_GPX);
@@ -1090,6 +1089,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
          _newlyImportedTours.put(tourId, _tourData);
 
          _tourData.computeAltitudeUpDown();
+         _tourData.setTourRecordedTime(_tourData.getTourElapsedTime());
          _tourData.computeTourMovingTime();
          _tourData.computeComputedValues();
 
