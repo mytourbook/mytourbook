@@ -221,15 +221,14 @@ import org.eclipse.ui.progress.UIJob;
  * This editor can edit (when all is implemented) all data for a tour
  */
 public class TourDataEditorView extends ViewPart implements ISaveablePart, ISaveAndRestorePart, ITourProvider2 {
-   //TODO FB : Trying to address this request : https://sourceforge.net/p/mytourbook/discussion/622811/thread/17da3fb19f/
-   // and this similar GitHub issue : https://github.com/wolfgang-ch/mytourbook/issues/217
+   //TODO FB
    // Do the following formats :
    // DONE BUT TO CHECK WITH MULTIPLE FILES: FIT
    // DONE BUT TO CHECK WITH MULTIPLE FILES: Ambit2 xml
    // DONE BUT TO CHECK WITH MULTIPLE FILES: Ambit 2 sml
    // DONE BUT TO CHECK WITH MULTIPLE FILES: Suunto 9
    // 08/06/2020 It seems that the computed elapsed time is wrong. Not sure why
-   //example: 05-12-2020 : THe elapsed time should be 0:46:46 or 0:46:47
+   //example: 05-12-2020 : The elapsed time should be 0:46:46 or 0:46:47
    //=> After investigation, it seems that the {@link TourData#createTimeSeries()} generates this number
    // so the elapsed time is erroneous when importing from json.gz and gpx
    //If i import from a FIT (exported from Movescount), the recorded time is the same
@@ -245,8 +244,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    // Statitics: For Time - Day/month/year, add a drop down menu for the user to choose
    // between elapsed time, recorded time or moving time
    // display a pause sign on the gps track like in ST
-
-   //TODO Add those new Tourbookview columns in CSVExport.java
 
    //TODO check that the sums of paused time work with my big database
 

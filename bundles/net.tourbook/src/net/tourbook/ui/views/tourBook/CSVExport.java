@@ -107,12 +107,14 @@ public class CSVExport {
    private static final String HEADER_SURFING_NUMBER_OF_EVENTS                        = "SURFING Number of surfing events";                 //$NON-NLS-1$
 
    private static final String HEADER_TIME_DAY                                        = "TIME Day";                                         //$NON-NLS-1$
+   private static final String HEADER_TIME_ELAPSED_TIME                               = "TIME Elapsed time (%s)";                           //$NON-NLS-1$
+   private static final String HEADER_TIME_ISO_DATE_TIME                              = "TIME ISO8601";                                     //$NON-NLS-1$
    private static final String HEADER_TIME_MONTH                                      = "TIME Month";                                       //$NON-NLS-1$
    private static final String HEADER_TIME_MOVING_TIME                                = "TIME Moving time (%s)";                            //$NON-NLS-1$
-   private static final String HEADER_TIME_ISO_DATE_TIME                              = "TIME ISO8601";                                     //$NON-NLS-1$
    private static final String HEADER_TIME_PAUSED_TIME                                = "TIME Paused time (%s)";                            //$NON-NLS-1$
-   private static final String HEADER_TIME_PAUSED_TIME_RELATIVE                       = "TIME Relative paused time (%)";                    //$NON-NLS-1$
-   private static final String HEADER_TIME_RECORDING_TIME                             = "TIME Recording time (%s)";                         //$NON-NLS-1$
+   private static final String HEADER_TIME_BREAK_TIME                                 = "TIME Break time (%s)";                             //$NON-NLS-1$
+   private static final String HEADER_TIME_BREAK_TIME_RELATIVE                        = "TIME Relative break time (%)";                     //$NON-NLS-1$
+   private static final String HEADER_TIME_RECORDED_TIME                              = "TIME Recorded time (%s)";                          //$NON-NLS-1$
    private static final String HEADER_TIME_TOUR_START_TIME                            = "TIME Tour start time";                             //$NON-NLS-1$
    private static final String HEADER_TIME_WEEK                                       = "TIME Week";                                        //$NON-NLS-1$
    private static final String HEADER_TIME_WEEK_YEAR                                  = "TIME Week year";                                   //$NON-NLS-1$
@@ -342,13 +344,17 @@ public class CSVExport {
       csvHeader(sb,                 HEADER_TIME_WEEKDAY);
       csvHeader(sb,                 HEADER_TIME_WEEK_YEAR);
 
-      csvHeader(sb, String.format(  HEADER_TIME_RECORDING_TIME,        Messages.App_Unit_Seconds_Small));
-      csvHeader(sb, String.format(  HEADER_TIME_MOVING_TIME,           Messages.App_Unit_Seconds_Small));
+      csvHeader(sb, String.format(  HEADER_TIME_ELAPSED_TIME,        Messages.App_Unit_Seconds_Small));
+      csvHeader(sb, String.format(  HEADER_TIME_RECORDED_TIME,           Messages.App_Unit_Seconds_Small));
       csvHeader(sb, String.format(  HEADER_TIME_PAUSED_TIME,           Messages.App_Unit_Seconds_Small));
-      csvHeader(sb,                 HEADER_TIME_PAUSED_TIME_RELATIVE);
-      csvHeader(sb, String.format(  HEADER_TIME_RECORDING_TIME,        CSV_EXPORT_DURATION_HHH_MM_SS));
-      csvHeader(sb, String.format(  HEADER_TIME_MOVING_TIME,           CSV_EXPORT_DURATION_HHH_MM_SS));
+      csvHeader(sb, String.format(  HEADER_TIME_MOVING_TIME,           Messages.App_Unit_Seconds_Small));
+      csvHeader(sb, String.format(  HEADER_TIME_BREAK_TIME,           Messages.App_Unit_Seconds_Small));
+      csvHeader(sb,                 HEADER_TIME_BREAK_TIME_RELATIVE);
+      csvHeader(sb, String.format(  HEADER_TIME_ELAPSED_TIME,        CSV_EXPORT_DURATION_HHH_MM_SS));
+      csvHeader(sb, String.format(  HEADER_TIME_RECORDED_TIME,           CSV_EXPORT_DURATION_HHH_MM_SS));
       csvHeader(sb, String.format(  HEADER_TIME_PAUSED_TIME,           CSV_EXPORT_DURATION_HHH_MM_SS));
+      csvHeader(sb, String.format(  HEADER_TIME_MOVING_TIME,           CSV_EXPORT_DURATION_HHH_MM_SS));
+      csvHeader(sb, String.format(  HEADER_TIME_BREAK_TIME,           CSV_EXPORT_DURATION_HHH_MM_SS));
 
 // SET_FORMATTING_ON
 
@@ -760,9 +766,11 @@ public class CSVExport {
 
       /////////////////////////////////////////////////////////////////////////////////////////////
 
-      csvField(sb, tviItem.colTourElapsedTime); // HEADER_TIME_RECORDING_TIME
+      csvField(sb, tviItem.colTourElapsedTime); // HEADER_TIME_ELAPSED_TIME
+      csvField(sb, tviItem.colTourRecordedTime); // HEADER_TIME_RECORDED_TIME
+      csvField(sb, tviItem.colTourPausedTime); // HEADER_TIME_PAUSED_TIME
       csvField(sb, tviItem.colTourMovingTime); // HEADER_TIME_MOVING_TIME
-      csvField(sb, tviItem.colBreakTime); // HEADER_TIME_PAUSED_TIME
+      csvField(sb, tviItem.colBreakTime); // HEADER_TIME_BREAK_TIME
 
       { // HEADER_TIME_PAUSED_TIME_RELATIVE
 
@@ -780,9 +788,27 @@ public class CSVExport {
 
       { // HEADER_TIME_RECORDING_TIME hhh:mm:ss
 
-         final long colRecordingTime = (tviItem).colTourElapsedTime;
-         if (colRecordingTime != 0) {
-            sb.append(net.tourbook.common.UI.format_hh_mm_ss(colRecordingTime));
+         final long colElapsedTime = (tviItem).colTourElapsedTime;
+         if (colElapsedTime != 0) {
+            sb.append(net.tourbook.common.UI.format_hh_mm_ss(colElapsedTime));
+         }
+         sb.append(UI.TAB);
+      }
+
+      { // HEADER_TIME_RECORDED_TIME hhh:mm:ss
+
+         final long colTourRecordedTime = (tviItem).colTourRecordedTime;
+         if (colTourRecordedTime != 0) {
+            sb.append(net.tourbook.common.UI.format_hh_mm_ss(colTourRecordedTime));
+         }
+         sb.append(UI.TAB);
+      }
+
+      { // HEADER_TIME_PAUSED_TIME hhh:mm:ss
+
+         final long colTourPausedTime = (tviItem).colTourPausedTime;
+         if (colTourPausedTime != 0) {
+            sb.append(net.tourbook.common.UI.format_hh_mm_ss(colTourPausedTime));
          }
          sb.append(UI.TAB);
       }
@@ -796,7 +822,7 @@ public class CSVExport {
          sb.append(UI.TAB);
       }
 
-      { // HEADER_TIME_PAUSED_TIME hhh:mm:ss
+      { // HEADER_TIME_BREAK_TIME hhh:mm:ss
 
          final long colBreakTime = tviItem.colBreakTime;
          if (colBreakTime != 0) {
