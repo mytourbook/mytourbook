@@ -684,7 +684,8 @@ public class ColumnDefinition implements Cloneable {
    }
 
    public void setColumnWidth(final int columnWidth) {
-      _columnWidth = columnWidth;
+
+      _columnWidth = Math.min(columnWidth, ColumnManager.COLUMN_WIDTH_MAXIMUM);
    }
 
    public void setControlListener(final ControlListener controlListener) {
