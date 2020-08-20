@@ -277,7 +277,7 @@ public class DataProvider_Tour_Day extends DataProvider {
             + (" LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag") //$NON-NLS-1$ //$NON-NLS-2$
             + (" ON tourID = jTdataTtag.TourData_tourId" + NL) //$NON-NLS-1$
 
-            + (" WHERE StartYear IN (" + getYearList(lastYear, numberOfYears) + ")" + NL) //$NON-NLS-1$ //$NON-NLS-2$
+            + (" WHERE StartYear IN (" + getYearList(lastYear, numberOfYears) + UI.SYMBOL_BRACKET_RIGHT + NL) //$NON-NLS-1$
             + sqlFilter.getWhereClause()
 
             + (" ORDER BY TourStartTime" + NL + NL); //$NON-NLS-1$

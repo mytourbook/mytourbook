@@ -395,7 +395,7 @@ public class RawDataManager {
       // add option for every file extension
       for (final TourbookDevice device : deviceList) {
          filterExtensions[deviceIndex] = "*." + device.fileExtension; //$NON-NLS-1$
-         filterNames[deviceIndex] = device.visibleName + (" (*." + device.fileExtension + ")"); //$NON-NLS-1$ //$NON-NLS-2$
+         filterNames[deviceIndex] = device.visibleName + (" (*." + device.fileExtension + UI.SYMBOL_BRACKET_RIGHT); //$NON-NLS-1$
          deviceIndex++;
       }
 

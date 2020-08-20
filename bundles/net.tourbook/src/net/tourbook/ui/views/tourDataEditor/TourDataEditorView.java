@@ -8682,7 +8682,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             sb.append(refTour.getStartValueIndex());
             sb.append(UI.DASH_WITH_SPACE);
             sb.append(refTour.getEndValueIndex());
-            sb.append(")"); //$NON-NLS-1$
+            sb.append(UI.SYMBOL_BRACKET_RIGHT);
 
             final int[] oneRange = _refTourRange[refCounter];
             oneRange[0] = refTour.getStartValueIndex();

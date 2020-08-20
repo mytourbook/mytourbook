@@ -119,7 +119,7 @@ public class DataProvider_Tour_Week extends DataProvider {
                + (" LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag") + NL //$NON-NLS-1$ //$NON-NLS-2$
                + (" ON tourID = jTdataTtag.TourData_tourId") + NL //$NON-NLS-1$
 
-               + (" WHERE StartWeekYear IN (" + getYearList(lastYear, numberOfYears) + ")") + NL //$NON-NLS-1$ //$NON-NLS-2$
+               + (" WHERE StartWeekYear IN (" + getYearList(lastYear, numberOfYears) + UI.SYMBOL_BRACKET_RIGHT) + NL //$NON-NLS-1$
                + sqlFilter.getWhereClause() + NL
 
                + ") td" //$NON-NLS-1$
@@ -133,7 +133,7 @@ public class DataProvider_Tour_Week extends DataProvider {
 
                + (" FROM " + TourDatabase.TABLE_TOUR_DATA) + NL //$NON-NLS-1$
 
-               + (" WHERE StartWeekYear IN (" + getYearList(lastYear, numberOfYears) + ")") + NL //$NON-NLS-1$ //$NON-NLS-2$
+               + (" WHERE StartWeekYear IN (" + getYearList(lastYear, numberOfYears) + UI.SYMBOL_BRACKET_RIGHT) + NL //$NON-NLS-1$
                + sqlFilter.getWhereClause()
 
          ;
@@ -217,7 +217,7 @@ public class DataProvider_Tour_Week extends DataProvider {
             if (weekIndex < 0) {
 
                /**
-                * This can occure when dbWeek == 0, tour is in the previous year and not displayed
+                * This can occur when dbWeek == 0, tour is in the previous year and not displayed
                 * in the week stats
                 */
 
@@ -227,14 +227,14 @@ public class DataProvider_Tour_Week extends DataProvider {
             if (weekIndex >= numWeeks) {
 
                /**
-                * This problem occured but is not yet fully fixed, it needs more investigation.
+                * This problem occurred but is not yet fully fixed, it needs more investigation.
                 * <p>
                 * Problem with this configuration</br>
                 * Statistic: Week summary</br>
                 * Tour type: Velo (3 bars)</br>
                 * Displayed years: 2013 + 2014
                 * <p>
-                * Problem occured when selecting year 2015
+                * Problem occurred when selecting year 2015
                 */
                continue;
             }
