@@ -123,7 +123,7 @@ public class ActionSaveTourInDatabase extends Action {
       if (deviceId != null) {
          for (final ExternalDevice device : getDeviceList()) {
             if (deviceId.equals(device.deviceId)) {
-               return " (" + device.visibleName + ")";//$NON-NLS-1$ //$NON-NLS-2$
+               return " (" + device.visibleName + UI.SYMBOL_BRACKET_RIGHT;//$NON-NLS-1$
             }
          }
       }

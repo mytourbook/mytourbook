@@ -62,7 +62,7 @@ public class DataProvider_Tour_Time extends DataProvider {
 
    /**
     * Retrieve chart data from the database
-    * 
+    *
     * @param person
     * @param tourTypeFilter
     * @param lastYear
@@ -76,7 +76,7 @@ public class DataProvider_Tour_Time extends DataProvider {
                                  final int numberOfYears,
                                  final boolean isForceUpdate) {
 
-      // dont reload data which are already here
+      // don't reload data which are already here
       if (_activePerson == person
             && _activeTourTypeFilter == tourTypeFilter
             && _lastYear == lastYear
@@ -131,7 +131,7 @@ public class DataProvider_Tour_Time extends DataProvider {
             + (" LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag") //$NON-NLS-1$ //$NON-NLS-2$
             + (" ON tourID = jTdataTtag.TourData_tourId") //$NON-NLS-1$
 
-            + (" WHERE StartYear IN (" + getYearList(lastYear, numberOfYears) + ")" + UI.NEW_LINE) //$NON-NLS-1$ //$NON-NLS-2$
+            + (" WHERE StartYear IN (" + getYearList(lastYear, numberOfYears) + UI.SYMBOL_BRACKET_RIGHT + UI.NEW_LINE) //$NON-NLS-1$
             + sqlFilter.getWhereClause()
 
             + (" ORDER BY TourStartTime"); //$NON-NLS-1$
@@ -156,13 +156,13 @@ public class DataProvider_Tour_Time extends DataProvider {
          final TIntArrayList allDistance = new TIntArrayList();
          final TIntArrayList allAltitudeUp = new TIntArrayList();
 
-         final ArrayList<String> allTourTitle = new ArrayList<String>();
-         final ArrayList<String> allTourDescription = new ArrayList<String>();
+         final ArrayList<String> allTourTitle = new ArrayList<>();
+         final ArrayList<String> allTourDescription = new ArrayList<>();
 
          final TLongArrayList allTypeIds = new TLongArrayList();
          final TIntArrayList allTypeColorIndex = new TIntArrayList();
 
-         final HashMap<Long, ArrayList<Long>> allTagIds = new HashMap<Long, ArrayList<Long>>();
+         final HashMap<Long, ArrayList<Long>> allTagIds = new HashMap<>();
 
          long lastTourId = -1;
          ArrayList<Long> tagIds = null;
@@ -237,7 +237,7 @@ public class DataProvider_Tour_Time extends DataProvider {
                allTourDescription.add(dbDescription == null ? UI.EMPTY_STRING : dbDescription);
 
                if (dbTagId instanceof Long) {
-                  tagIds = new ArrayList<Long>();
+                  tagIds = new ArrayList<>();
                   tagIds.add((Long) dbTagId);
 
                   allTagIds.put(dbTourId, tagIds);

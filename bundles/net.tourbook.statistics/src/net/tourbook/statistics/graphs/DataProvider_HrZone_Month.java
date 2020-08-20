@@ -100,7 +100,7 @@ public class DataProvider_HrZone_Month extends DataProvider {
                + (" LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag") + NL //$NON-NLS-1$ //$NON-NLS-2$
                + (" ON tourID = jTdataTtag.TourData_tourId") + NL //$NON-NLS-1$
 
-               + (" WHERE StartYear IN (" + getYearList(lastYear, numYears) + ")") + NL //$NON-NLS-1$ //$NON-NLS-2$
+               + (" WHERE StartYear IN (" + getYearList(lastYear, numYears) + UI.SYMBOL_BRACKET_RIGHT) + NL //$NON-NLS-1$
                + (" AND NumberOfHrZones > 0") + NL //$NON-NLS-1$
                + sqlFilter.getWhereClause() + NL
 
@@ -115,7 +115,7 @@ public class DataProvider_HrZone_Month extends DataProvider {
 
                + (" FROM " + TourDatabase.TABLE_TOUR_DATA) + NL //$NON-NLS-1$
 
-               + (" WHERE StartYear IN (" + getYearList(lastYear, numYears) + ")") + NL //$NON-NLS-1$ //$NON-NLS-2$
+               + (" WHERE StartYear IN (" + getYearList(lastYear, numYears) + UI.SYMBOL_BRACKET_RIGHT) + NL //$NON-NLS-1$
                + (" AND NumberOfHrZones > 0") + NL //$NON-NLS-1$
                + sqlFilter.getWhereClause() + NL
 

@@ -523,7 +523,7 @@ public class CalendarProfile implements Cloneable {
 
    private String dump_RGB(final RGB rgb) {
 
-      return "new RGB (" + rgb.red + ", " + rgb.green + ", " + rgb.blue + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+      return "new RGB (" + rgb.red + ", " + rgb.green + ", " + rgb.blue + UI.SYMBOL_BRACKET_RIGHT; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
    }
 
    @Override

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
@@ -12,83 +12,85 @@
  *******************************************************************************/
 package net.tourbook.common.util;
 
+import net.tourbook.common.UI;
+
 import org.eclipse.swt.graphics.Image;
 
 /**
- * Contains the context for a hovered area which displays a tool tip when the mouse hoveres the
+ * Contains the context for a hovered area which displays a tool tip when the mouse hovers the
  * hovered area.
  * <p>
  * Each property is set in this context or it can be <code>null</code> when documented.
  */
 public class HoveredAreaContext {
 
-	/**
-	 * Tour tool tip provider which provides a tool tip for the hovered area.
-	 */
-	public ITourToolTipProvider	tourToolTipProvider;
+   /**
+    * Tour tool tip provider which provides a tool tip for the hovered area.
+    */
+   public ITourToolTipProvider tourToolTipProvider;
 
-	/**
-	 * Image which is displayed when the mouse is hovered over the hovered area, when
-	 * <code>null</code> an hovered image is not available.
-	 */
-	public Image				hoveredImage;
+   /**
+    * Image which is displayed when the mouse is hovered over the hovered area, when
+    * <code>null</code> an hovered image is not available.
+    */
+   public Image                hoveredImage;
 
-	/**
-	 * Left corner of the hovereded area relativ to the client area
-	 */
-	public int					hoveredTopLeftX;
+   /**
+    * Left corner of the hovered area relative to the client area
+    */
+   public int                  hoveredTopLeftX;
 
-	/**
-	 * top corner of the hovereded area
-	 */
-	public int					hoveredTopLeftY;
+   /**
+    * top corner of the hovered area
+    */
+   public int                  hoveredTopLeftY;
 
-	/**
-	 * Hovered area width
-	 */
-	public int					hoveredWidth;
+   /**
+    * Hovered area width
+    */
+   public int                  hoveredWidth;
 
-	/**
-	 * Hovered area height
-	 */
-	public int					hoveredHeight;
+   /**
+    * Hovered area height
+    */
+   public int                  hoveredHeight;
 
-	/**
-	 * @param tourToolTipProvider
-	 * @param hoveredArea
-	 * @param devTopLeftX
-	 * @param devTopLeftY
-	 * @param devWidth
-	 * @param devHeight
-	 */
-	public HoveredAreaContext(	final ITourToolTipProvider tourToolTipProvider,
-								final IHoveredArea hoveredArea,
-								final int devTopLeftX,
-								final int devTopLeftY,
-								final int devWidth,
-								final int devHeight) {
+   /**
+    * @param tourToolTipProvider
+    * @param hoveredArea
+    * @param devTopLeftX
+    * @param devTopLeftY
+    * @param devWidth
+    * @param devHeight
+    */
+   public HoveredAreaContext(final ITourToolTipProvider tourToolTipProvider,
+                             final IHoveredArea hoveredArea,
+                             final int devTopLeftX,
+                             final int devTopLeftY,
+                             final int devWidth,
+                             final int devHeight) {
 
-		this.tourToolTipProvider = tourToolTipProvider;
+      this.tourToolTipProvider = tourToolTipProvider;
 
-		hoveredImage = hoveredArea.getHoveredImage();
+      hoveredImage = hoveredArea.getHoveredImage();
 
-		hoveredTopLeftX = devTopLeftX;
-		hoveredTopLeftY = devTopLeftY;
-		hoveredWidth = devWidth;
-		hoveredHeight = devHeight;
-	}
+      hoveredTopLeftX = devTopLeftX;
+      hoveredTopLeftY = devTopLeftY;
+      hoveredWidth = devWidth;
+      hoveredHeight = devHeight;
+   }
 
-	@Override
-	public String toString() {
-		return "HoveredAreaContext [" // //$NON-NLS-1$
+   @Override
+   public String toString() {
+      return "HoveredAreaContext [" // //$NON-NLS-1$
 //				+ ("tourToolTipProvider=" + tourToolTipProvider + ", ")
 //				+ ("hoveredImage=" + hoveredImage + ", ")
 //				+ ("hoveredTopLeftX=" + hoveredTopLeftX + ", ")
 //				+ ("hoveredTopLeftY=" + hoveredTopLeftY + ", ")
 //				+ ("hoveredWidth=" + hoveredWidth + ", ")
 //				+ ("hoveredHeight=" + hoveredHeight)
-				+ "]" //$NON-NLS-1$
-				+ (" " + this.hashCode()); //$NON-NLS-1$
-	}
+            + "]" //$NON-NLS-1$
+            + (UI.SPACE1 + this.hashCode());
+   }
 
 }

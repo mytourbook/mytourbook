@@ -119,7 +119,7 @@ public class DataProvider_Tour_Week extends DataProvider {
                + (" LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag") + NL //$NON-NLS-1$ //$NON-NLS-2$
                + (" ON tourID = jTdataTtag.TourData_tourId") + NL //$NON-NLS-1$
 
-               + (" WHERE StartWeekYear IN (" + getYearList(lastYear, numberOfYears) + ")") + NL //$NON-NLS-1$ //$NON-NLS-2$
+               + (" WHERE StartWeekYear IN (" + getYearList(lastYear, numberOfYears) + UI.SYMBOL_BRACKET_RIGHT) + NL //$NON-NLS-1$
                + sqlFilter.getWhereClause() + NL
 
                + ") td" //$NON-NLS-1$
@@ -133,7 +133,7 @@ public class DataProvider_Tour_Week extends DataProvider {
 
                + (" FROM " + TourDatabase.TABLE_TOUR_DATA) + NL //$NON-NLS-1$
 
-               + (" WHERE StartWeekYear IN (" + getYearList(lastYear, numberOfYears) + ")") + NL //$NON-NLS-1$ //$NON-NLS-2$
+               + (" WHERE StartWeekYear IN (" + getYearList(lastYear, numberOfYears) + UI.SYMBOL_BRACKET_RIGHT) + NL //$NON-NLS-1$
                + sqlFilter.getWhereClause()
 
          ;
