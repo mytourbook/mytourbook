@@ -218,7 +218,7 @@ public class GarminSAXHandler extends DefaultHandler {
       final int weekYear = Util.getYearForWeek(jdkCalendar);
 
       sbJdk.append(jdkFormatter.format(dtDate));
-      sbJdk.append(" " + weekYear + " | "); //$NON-NLS-1$ //$NON-NLS-2$
+      sbJdk.append(UI.SPACE1 + weekYear + " | "); //$NON-NLS-1$
    }
 
 // private static void weekCheck() {
@@ -300,8 +300,8 @@ public class GarminSAXHandler extends DefaultHandler {
             formatDT(zonedFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
             formatDT(zonedFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
             formatDT(zonedFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
-            sbJoda.append("    "); //$NON-NLS-1$
-            sbJdk.append("    "); //$NON-NLS-1$
+            sbJoda.append(UI.SPACE4);
+            sbJdk.append(UI.SPACE4);
             formatDT(zonedFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
             formatDT(zonedFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
             formatDT(zonedFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
@@ -501,15 +501,16 @@ public class GarminSAXHandler extends DefaultHandler {
 
          } else if (name.equals(TAG_DISTANCE_METERS)) {
 
-            //TODO fb close the lap ??
             _isInDistance = false;
 
             try {
                final int distance = Integer.parseInt(_characters.toString());
+
                if (distance == 0) {
                   final TourTimerPause timerPause = new TourTimerPause(null,
-                        _currentStartTime.getMillis(), //"attribute StartTime" * 1000,
-                        -1);
+                        _currentStartTime.getMillis(),
+                        Long.MIN_VALUE);
+
                   _timerPauses.add(timerPause);
                   _isPreviousLapAPause = true;
 
@@ -519,26 +520,16 @@ public class GarminSAXHandler extends DefaultHandler {
 
                      final TourTimerPause currentPause = _timerPauses.get(_timerPauses.size() - 1);
 
+                     //In a TCX file, the first lap is always created with a distance of 0 meters.
+                     //Hence, we don't consider that a pause.
                      if (currentPause.getStartTime() != _currentStartTime.getMillis()) {
                         _timerPauses.get(_timerPauses.size() - 1).setEndTime(_currentStartTime.getMillis());
                      }
-                  } else {
-                     final TourTimerPause timerPause = new TourTimerPause(null,
-                           _currentStartTime.getMillis(), //"attribute StartTime" * 1000,
-                           -1);
-                     _timerPauses.add(timerPause);
                   }
 
                   _isPreviousLapAPause = false;
-//_currentStartTime
-                  // when at the next one, if ifpreviouslapa pause,
-                  // then the timerpause end time = attribute start time if start time != end time
-
                }
-
-            } catch (final Exception e) {
-               System.out.println(e.getMessage());
-            }
+            } catch (final NumberFormatException e) {}
 
          } else if (_isInNotes && name.equals(TAG_NOTES)) {
 
@@ -678,7 +669,6 @@ public class GarminSAXHandler extends DefaultHandler {
 
          // create additional data
          tourData.computeAltitudeUpDown();
-         tourData.setTourRecordedTime(tourData.getTourElapsedTime());
          tourData.computeTourMovingTime();
          tourData.computeComputedValues();
       }
@@ -1110,6 +1100,7 @@ public class GarminSAXHandler extends DefaultHandler {
                   } else if (name.equals(TAG_DISTANCE_METERS)) {
 
                      _isInDistance = true;
+                     _characters.delete(0, _characters.length());
 
                   } else if (name.equals(TAG_CALORIES)) {
 

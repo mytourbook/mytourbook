@@ -234,7 +234,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    //If i import from a FIT (exported from Movescount), the recorded time is the same
 
    // 1/2 DONE: Sporttracks fitlog (try with manual activity import)
-   //TODO: TCX (find a file with a pause. Does the TCX format even support pauses?)
+   //DONE TCX (find a file with a pause. Does the TCX format even support pauses?)
    //Looking at a TCX file from movescount, it seems that pauses are laps with 0 distance
 
    // Add entries in time slices for pauses ? or just add a column "paused" like "break" and select the checkbox if it is a pause ?
