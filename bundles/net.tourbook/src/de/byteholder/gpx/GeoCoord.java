@@ -259,7 +259,7 @@ public class GeoCoord {
             .replace('\'', ':');
 
       //  : hinten    -> (nichts)
-      if (s.endsWith(":")) { //$NON-NLS-1$
+      if (s.endsWith(UI.SYMBOL_COLON)) {
          s = s.substring(0, s.length() - 1);
       }
 
@@ -506,11 +506,11 @@ public class GeoCoord {
 
       return UI.EMPTY_STRING
             + NumberForm.n2(degrees)
-            + ":" //$NON-NLS-1$
+            + UI.SYMBOL_COLON
             + NumberForm.n2(minutes)
-            + ":" //$NON-NLS-1$
+            + UI.SYMBOL_COLON
             + NumberForm.n2(seconds)
-            + " " //$NON-NLS-1$
+            + UI.SPACE1
             + direction;
    }
 
@@ -542,7 +542,7 @@ public class GeoCoord {
       }
       m -= degrees * faktg;
       m /= faktm;
-      return UI.EMPTY_STRING + NumberForm.n2(degrees) + ":" + NumberForm.n2f3(m) + " " + direction; //$NON-NLS-1$ //$NON-NLS-2$
+      return UI.EMPTY_STRING + NumberForm.n2(degrees) + UI.SYMBOL_COLON + NumberForm.n2f3(m) + UI.SPACE1 + direction;
    }
 
    public String toStringDouble() { // nur für GPS-Datenfiles
@@ -554,13 +554,13 @@ public class GeoCoord {
 
       return UI.EMPTY_STRING
             + NumberForm.n2(degrees)
-            + ":" //$NON-NLS-1$
+            + UI.SYMBOL_COLON
             + NumberForm.n2(minutes)
-            + ":" //$NON-NLS-1$
+            + UI.SYMBOL_COLON
             + NumberForm.n2(seconds)
-            + ":" //$NON-NLS-1$
+            + UI.SYMBOL_COLON
             + NumberForm.n2(tertias)
-            + " " //$NON-NLS-1$
+            + UI.SPACE1
             + direction;
    }
 

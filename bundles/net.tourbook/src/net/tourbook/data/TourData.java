@@ -6469,7 +6469,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       out.println("----------------------------------------------------"); //$NON-NLS-1$
 // out.println("Typ: " + getDeviceTourType()); //$NON-NLS-1$
       out.println("Date:               " + startDay + UI.SYMBOL_DOT + startMonth + UI.SYMBOL_DOT + startYear); //$NON-NLS-1$
-      out.println("Time:               " + startHour + ":" + startMinute); //$NON-NLS-1$ //$NON-NLS-2$
+      out.println("Time:               " + startHour + UI.SYMBOL_COLON + startMinute); //$NON-NLS-1$
       out.println("Total distance:     " + getStartDistance()); //$NON-NLS-1$
       // out.println("Distance:           " + getDistance());
       out.println("Altitude:           " + getStartAltitude()); //$NON-NLS-1$
@@ -6482,11 +6482,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       out.print(
             (getTourRecordingTime() / 3600)
-                  + ":" //$NON-NLS-1$
+                  + UI.SYMBOL_COLON
                   + ((getTourRecordingTime() % 3600) / 60)
-                  + ":" //$NON-NLS-1$
+                  + UI.SYMBOL_COLON
                   + ((getTourRecordingTime() % 3600) % 60)
-                  + "  "); //$NON-NLS-1$
+                  + UI.SPACE2);
       out.print(getTourDistance());
    }
 
@@ -6499,17 +6499,17 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       out.println(
             "Tour time:      " //$NON-NLS-1$
                   + (getTourRecordingTime() / 3600)
-                  + ":" //$NON-NLS-1$
+                  + UI.SYMBOL_COLON
                   + ((getTourRecordingTime() % 3600) / 60)
-                  + ":" //$NON-NLS-1$
+                  + UI.SYMBOL_COLON
                   + (getTourRecordingTime() % 3600) % 60);
 
       out.println(
             "Driving time:      " //$NON-NLS-1$
                   + (getTourDrivingTime() / 3600)
-                  + ":" //$NON-NLS-1$
+                  + UI.SYMBOL_COLON
                   + ((getTourDrivingTime() % 3600) / 60)
-                  + ":" //$NON-NLS-1$
+                  + UI.SYMBOL_COLON
                   + (getTourDrivingTime() % 3600) % 60);
 
       out.println("Altitude up (m):   " + getTourAltUp()); //$NON-NLS-1$
