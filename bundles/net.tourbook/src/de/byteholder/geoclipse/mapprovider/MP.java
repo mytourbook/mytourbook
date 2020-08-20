@@ -85,11 +85,11 @@ public abstract class MP extends CommonMapProvider implements Cloneable, Compara
     *
     * Technical Usage Requirements
     *
-    * - Valid HTTP User-Agent identifying application. Faking another app�s User-Agent WILL get you blocked.
+    * - Valid HTTP User-Agent identifying application. Faking another app's User-Agent WILL get you blocked.
     * - If known, a valid HTTP Referer.
-    * - DO NOT send no-cache headers. (�Cache-Control: no-cache�, �Pragma: no-cache� etc.)
+    * - DO NOT send no-cache headers. ("Cache-Control: no-cache", "Pragma: no-cache" etc.)
     * - Cache Tile downloads locally according to HTTP Expiry Header, alternatively a minimum of 7 days.
-    * - Maximum of 2 download threads. (Unmodified web browsers� download thread limits are acceptable.)
+    * - Maximum of 2 download threads. (Unmodified web browsers' download thread limits are acceptable.)
     *
     * </code>
     */
