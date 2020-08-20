@@ -386,7 +386,7 @@ public class WebContentServer {
          os = httpExchange.getResponseBody();
          os.write(response.getBytes());
 
-         StatusUtil.log(response + " " + file.getPath());//$NON-NLS-1$
+         StatusUtil.log(response + UI.SPACE1 + file.getPath());
 
       } catch (final Exception e) {
          StatusUtil.log(e);
@@ -407,7 +407,7 @@ public class WebContentServer {
          os = httpExchange.getResponseBody();
          os.write(response.getBytes());
 
-         StatusUtil.log(response + " " + file.getPath());//$NON-NLS-1$
+         StatusUtil.log(response + UI.SPACE1 + file.getPath());
 
       } catch (final Exception e) {
          StatusUtil.log(e);

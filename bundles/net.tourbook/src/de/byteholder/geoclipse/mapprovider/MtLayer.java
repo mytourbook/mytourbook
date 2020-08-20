@@ -113,7 +113,7 @@ public class MtLayer implements Comparable<MtLayer>, Cloneable {
       sb.append(_positionIndex);
       sb.append(" v:"); //$NON-NLS-1$
       sb.append(_isDisplayedInMap);
-      sb.append(" "); //$NON-NLS-1$
+      sb.append(net.tourbook.common.UI.SPACE1);
       sb.append(_mtGeoLayer.getName());
 
       return sb.toString();

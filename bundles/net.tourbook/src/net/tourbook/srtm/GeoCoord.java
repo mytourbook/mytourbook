@@ -234,7 +234,7 @@ public class GeoCoord {
       //    blank       -> (nichts)
       //    "           -> (nichts)
       //    [NEO]       -> (nichts)
-      s = s.replace(" ", UI.EMPTY_STRING) //$NON-NLS-1$
+      s = s.replace(UI.SPACE1, UI.EMPTY_STRING)
             .replace("\"", UI.EMPTY_STRING) //$NON-NLS-1$
             .replace("N", UI.EMPTY_STRING) //$NON-NLS-1$
             .replace("E", UI.EMPTY_STRING) //$NON-NLS-1$
@@ -530,7 +530,7 @@ public class GeoCoord {
          d = -d;
       }
 
-      return UI.EMPTY_STRING + NumberForm.f5(d) + " " + direction; //$NON-NLS-1$
+      return UI.EMPTY_STRING + NumberForm.f5(d) + UI.SPACE1 + direction;
 
    }
 
@@ -542,7 +542,7 @@ public class GeoCoord {
       }
       m -= degrees * faktg;
       m /= faktm;
-      return UI.EMPTY_STRING + NumberForm.n2(degrees) + UI.SYMBOL_COLON + NumberForm.n2f3(m) + " " + direction; //$NON-NLS-1$
+      return UI.EMPTY_STRING + NumberForm.n2(degrees) + UI.SYMBOL_COLON + NumberForm.n2f3(m) + UI.SPACE1 + direction;
    }
 
    public String toStringDouble() { // nur für GPS-Datenfiles
