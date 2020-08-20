@@ -1210,7 +1210,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
              * Get Tours
              */
             sb.append("<div class='get-tours-title title'>\n"); //$NON-NLS-1$
-            sb.append("   " + Messages.Import_Data_HTML_GetTours + "\n"); //$NON-NLS-1$ //$NON-NLS-2$
+            sb.append(UI.SPACE3 + Messages.Import_Data_HTML_GetTours + "\n"); //$NON-NLS-1$
             sb.append("</div>\n"); //$NON-NLS-1$
 
             createHTML_90_SimpleImport(sb);
