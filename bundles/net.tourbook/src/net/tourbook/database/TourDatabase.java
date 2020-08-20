@@ -1594,7 +1594,7 @@ public class TourDatabase {
                      final String sqlQuery = UI.EMPTY_STRING //
                            + "SELECT" //$NON-NLS-1$
                            + " DISTINCT" //$NON-NLS-1$
-                           + " " + fieldname
+                           + " " + fieldname //$NON-NLS-1$
                            + " FROM " + db //$NON-NLS-1$
                            + " ORDER BY " + fieldname; //$NON-NLS-1$
 
@@ -2866,7 +2866,7 @@ public class TourDatabase {
             + " tourEndPlace        VARCHAR(" + TourData.DB_LENGTH_TOUR_END_PLACE + "),      \n" //$NON-NLS-1$ //$NON-NLS-2$
             + " calories            INTEGER,                                                 \n" //$NON-NLS-1$
             + " bikerWeight         FLOAT,                                                   \n" //$NON-NLS-1$
-            + " " + KEY_BIKE + "    BIGINT,                                                  \n" //$NON-NLS-1$
+            + " " + KEY_BIKE + "    BIGINT,                                                  \n" //$NON-NLS-1$ //$NON-NLS-2$
 
             // from wolfgang
             + " devicePluginName    VARCHAR(" + TourData.DB_LENGTH_DEVICE_PLUGIN_NAME + "),  \n" //$NON-NLS-1$ //$NON-NLS-2$
@@ -2874,8 +2874,8 @@ public class TourDatabase {
 
             // version 4 end
 
-            + " " + KEY_TYPE + "    BIGINT,                                                  \n" //$NON-NLS-1$
-            + " " + KEY_PERSON + "  BIGINT,                                                  \n" //$NON-NLS-1$
+            + " " + KEY_TYPE + "    BIGINT,                                                  \n" //$NON-NLS-1$ //$NON-NLS-2$
+            + " " + KEY_PERSON + "  BIGINT,                                                  \n" //$NON-NLS-1$ //$NON-NLS-2$
 
             // version 6 start
             //
@@ -3948,7 +3948,7 @@ public class TourDatabase {
       String sql;
       final String tempFieldName = fieldName + "_temp";//$NON-NLS-1$
 
-      sql = "ALTER TABLE " + table + " ADD COLUMN " + tempFieldName + " " + newFieldType; //$NON-NLS-1$ //$NON-NLS-2$
+      sql = "ALTER TABLE " + table + " ADD COLUMN " + tempFieldName + " " + newFieldType; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
       exec(stmt, sql);
 
       sql = "UPDATE " + table + " SET " + tempFieldName + " = " + fieldName; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
