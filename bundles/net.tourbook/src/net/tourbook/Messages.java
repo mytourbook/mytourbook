@@ -869,7 +869,11 @@ public class Messages extends NLS {
 
    public static String        Graph_Label_Time_Paused;
 
-   public static String        Graph_Label_Time_Recording;
+   public static String        Graph_Label_Time_Elapsed;
+
+   public static String        Graph_Label_Time_Break;
+
+   public static String        Graph_Label_Time_Recorded;
 
    public static String        HR_Zone_01_060_Moderate;
    public static String        HR_Zone_01_060_Moderate_Shortcut;
@@ -1811,7 +1815,9 @@ public class Messages extends NLS {
    public static String Pref_Statistic_Radio_BarStacked;
    public static String Pref_Statistic_Radio_Duration_MovingTime;
    public static String Pref_Statistic_Radio_Duration_PausedTime;
-   public static String Pref_Statistic_Radio_Duration_RecordingTime;
+   public static String Pref_Statistic_Radio_Duration_RecordedTime;
+   public static String Pref_Statistic_Radio_Duration_ElapsedTime;
+   public static String Pref_Statistic_Radio_Duration_BreakTime;
 
    public static String Pref_Swimming_Label_Info;
 

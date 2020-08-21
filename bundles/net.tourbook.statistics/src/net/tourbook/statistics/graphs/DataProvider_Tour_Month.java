@@ -134,9 +134,19 @@ public class DataProvider_Tour_Month extends DataProvider {
          sqlDurationTime = " SUM(TourRecordingTime - TourDrivingTime),"; //$NON-NLS-1$
          break;
 
-      case RECORDING:
+      case ELAPSED:
 
          sqlDurationTime = " SUM(TourRecordingTime),"; //$NON-NLS-1$
+         break;
+
+      case PAUSED:
+
+         sqlDurationTime = " SUM(TourPausedTime),"; //$NON-NLS-1$
+         break;
+
+      case RECORDED:
+
+         sqlDurationTime = " SUM(TourRecordedTime),"; //$NON-NLS-1$
          break;
 
       case MOVING:
