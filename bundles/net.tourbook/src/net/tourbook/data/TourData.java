@@ -291,22 +291,22 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    // ############################################# TIME #############################################
 
+   //TODO FB Rename into elapsed in the DB
    /**
     * Total recording time in seconds
     *
     * @since Is long since db version 22, before it was int
     */
    @XmlElement
-   //TODO FB Rename into elapsed in the DB
    private long                  tourRecordingTime;
 
+   //TODO FB Rename into moving in to db
    /**
     * Total moving time in seconds
     *
     * @since Is long since db version 22, before it was int
     */
    @XmlElement
-   //TODO FB Rename into moving in to db
    private long                  tourDrivingTime;
 
    /**

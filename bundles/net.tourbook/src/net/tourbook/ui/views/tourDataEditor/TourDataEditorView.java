@@ -250,6 +250,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    //TODO Remove the translations for time recording (elapsed) for all languages that are not english or french
    //Yes, the translators will have to translate : elapsed, paused, recorded, ...
 
+   //Why and how did I bring such a regression in the gpx export ?
+   //  <mt:tourDrivingTime>$tourData.tourDrivingTime</mt:tourDrivingTime>
+//   <mt:tourRecordingTime>$tourData.tourRecordingTime</mt:tourRecordingTime>
+
    public static final String     ID                            = "net.tourbook.views.TourDataEditorView";                //$NON-NLS-1$
    //
    private static final String    GRAPH_LABEL_HEARTBEAT_UNIT    = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
