@@ -23,6 +23,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -48,19 +49,20 @@ import org.eclipse.swt.widgets.Display;
 
 public class NatTable_DataLoader {
 
-   private static final char                              NL                    = net.tourbook.common.UI.NEW_LINE;
+   private static final char   NL                    = net.tourbook.common.UI.NEW_LINE;
 
-   private static final String                            SQL_ASCENDING         = "ASC";                           //$NON-NLS-1$
-   private static final String                            SQL_DESCENDING        = "DESC";                          //$NON-NLS-1$
+   private static final String SQL_ASCENDING         = "ASC";                          //$NON-NLS-1$
+   private static final String SQL_DESCENDING        = "DESC";                         //$NON-NLS-1$
 
-   private static final String                            SQL_DEFAULT_FIELD     = "TourStartTime";                 //$NON-NLS-1$
+   private static final String SQL_DEFAULT_FIELD     = "TourStartTime";                //$NON-NLS-1$
 
    /**
     * Dummy field name for fields which currently cannot be sorted in the NatTable.
     */
-   public static final String                             FIELD_WITHOUT_SORTING = "FIELD_WITHOUT_SORTING";         //$NON-NLS-1$
+   public static final String  FIELD_WITHOUT_SORTING = "FIELD_WITHOUT_SORTING";        //$NON-NLS-1$
 
-   private static final int                               FETCH_SIZE            = 1000;
+//   private static final int                               FETCH_SIZE            = 1000;
+   private static final int                               FETCH_SIZE            = 50;
 
    private static final ExecutorService                   _loadingExecutor      = createExecuter_TourLoading();
    private static final ExecutorService                   _rowIndexExecutor     = createExecuter_TourId_RowIndex();
@@ -694,6 +696,142 @@ public class NatTable_DataLoader {
    }
 
    private boolean loadPagedTourItems(final LazyTourLoaderItem loaderItem) {
+
+//      final long start = System.nanoTime();
+
+      final SQLFilter sqlFilter = new SQLFilter(SQLFilter.TAG_FILTER);
+
+      final String sql = NL
+
+            + "SELECT " //                                                                         //$NON-NLS-1$
+            + "   " + TVITourBookItem.SQL_ALL_TOUR_FIELDS + "," + NL //                            //$NON-NLS-1$ //$NON-NLS-2$
+            + "   tblMarker.markerId, " //                                                         //$NON-NLS-1$
+            + "   jtblTdataTtag.TourTag_tagId" //                                                  //$NON-NLS-1$
+
+            + " FROM" + NL //                                                                      //$NON-NLS-1$
+            + "(" //                                                                               //$NON-NLS-1$
+
+            + "   SELECT" //                                                                       //$NON-NLS-1$
+
+            + "   " + TVITourBookItem.SQL_ALL_TOUR_FIELDS + NL //                                  //$NON-NLS-1$
+
+            + "   FROM " + TourDatabase.TABLE_TOUR_DATA + NL //                                    //$NON-NLS-1$
+
+            + "   WHERE 1=1" + NL //                                                               //$NON-NLS-1$
+            + "   " + sqlFilter.getWhereClause() + NL //                                           //$NON-NLS-1$
+
+            + "   " + createSqlOrderBy() //                                                        //$NON-NLS-1$
+
+            + "   OFFSET ? ROWS FETCH NEXT ? ROWS ONLY" + NL //                                    //$NON-NLS-1$
+
+            + ") SelectTourData" //                                                                //$NON-NLS-1$
+
+            // get marker id's
+            + " LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_MARKER + " tblMarker" //                //$NON-NLS-1$ //$NON-NLS-2$
+            + " ON SelectTourData.tourId = tblMarker.TourData_tourId" + NL //                       //$NON-NLS-1$
+
+            // get tag id's
+            + " LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jtblTdataTtag" ////$NON-NLS-1$ //$NON-NLS-2$
+            + " ON SelectTourData.tourId = jtblTdataTtag.TourData_tourId" //                       //$NON-NLS-1$
+      ;
+
+//      System.out.println((System.currentTimeMillis() + " sql:" + sql));
+//      // TODO remove SYSTEM.OUT.PRINTLN
+
+      try (Connection conn = TourDatabase.getInstance().getConnection()) {
+
+         int rowIndex = loaderItem.sqlOffset;
+
+         final PreparedStatement prepStmt = conn.prepareStatement(sql);
+
+         // set filter parameters
+         sqlFilter.setParameters(prepStmt, 1);
+
+         // set other parameters
+         int paramIndex = sqlFilter.getLastParameterIndex();
+
+         prepStmt.setInt(paramIndex++, rowIndex);
+         prepStmt.setInt(paramIndex++, FETCH_SIZE);
+
+         long prevTourId = -1;
+         HashSet<Long> tagIds = null;
+         HashSet<Long> markerIds = null;
+
+         final ResultSet result = prepStmt.executeQuery();
+         while (result.next()) {
+
+            final long result_TourId = result.getLong(1);
+
+            final Object result_MarkerId = result.getObject(85);
+            final Object result_TagId = result.getObject(86);
+
+            if (result_TourId == prevTourId) {
+
+               // these are additional result set's for the same tour
+
+               // get tags from outer join
+               if (result_TagId instanceof Long) {
+                  tagIds.add((Long) result_TagId);
+               }
+
+               // get markers from outer join
+               if (result_MarkerId instanceof Long) {
+                  markerIds.add((Long) result_MarkerId);
+               }
+
+            } else {
+
+               // first resultset for a new tour
+
+               final TVITourBookTour tourItem = new TVITourBookTour(null, null);
+
+               tourItem.tourId = result_TourId;
+
+               TVITourBookItem.getTourDataFields(result, tourItem);
+
+               // get first tag id
+               if (result_TagId instanceof Long) {
+
+                  tagIds = new HashSet<>();
+                  tagIds.add((Long) result_TagId);
+
+                  tourItem.setTagIds(tagIds);
+               }
+
+               // get first marker id
+               if (result_MarkerId instanceof Long) {
+
+                  markerIds = new HashSet<>();
+                  markerIds.add((Long) result_MarkerId);
+
+                  tourItem.setMarkerIds(markerIds);
+               }
+
+               // keep tour item
+               final int natTableRowIndex = rowIndex++;
+
+               _fetchedTourItems.put(natTableRowIndex, tourItem);
+               _fetchedTourIndex.put(tourItem.tourId, natTableRowIndex);
+            }
+
+            prevTourId = result_TourId;
+         }
+
+      } catch (final SQLException e) {
+
+         SQL.showException(e, sql);
+
+         return false;
+      }
+
+//      System.out.println((UI.timeStampNano() + " " + this.getClass().getName() + " \t")
+//            + (((float) (System.nanoTime() - start) / 1000000) + " ms"));
+//      // TODO remove SYSTEM.OUT.PRINTLN
+
+      return true;
+   }
+
+   private boolean loadPagedTourItems_original(final LazyTourLoaderItem loaderItem) {
 
 //      final long start = System.nanoTime();
 

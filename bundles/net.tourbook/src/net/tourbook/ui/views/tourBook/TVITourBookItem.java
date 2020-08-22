@@ -36,7 +36,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
    static ZonedDateTime       calendar8 = ZonedDateTime.now().with(TimeTools.calendarWeek.dayOfWeek(), 1);
 
    public static final String SQL_ALL_TOUR_FIELDS;
-   static final String        SQL_ALL_OTHER_FIELDS;
+   public static final String SQL_ALL_OTHER_FIELDS;
 
    static final String        SQL_SUM_COLUMNS;
    static final String        SQL_SUM_FIELDS;
@@ -55,7 +55,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             + "tourDrivingTime, " //                              7     //$NON-NLS-1$
             + "tourAltUp, " //                                    8     //$NON-NLS-1$
             + "tourAltDown, " //                                  9     //$NON-NLS-1$
-            + "startDistance, " //                                10     //$NON-NLS-1$
+            + "startDistance, " //                                10    //$NON-NLS-1$
             + "tourType_typeId, " //                              11    //$NON-NLS-1$
             + "tourTitle, " //                                    12    //$NON-NLS-1$
             + "deviceTimeInterval, " //                           13    //$NON-NLS-1$
@@ -64,7 +64,8 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             + "maxPulse, " //                                     16    //$NON-NLS-1$
             + "avgPulse, " //                                     17    //$NON-NLS-1$
             + "avgCadence, " //                                   18    //$NON-NLS-1$
-            + "(DOUBLE(avgTemperature) / temperatureScale), " //  19    //$NON-NLS-1$
+            + "avgTemperature, " //                               19    //$NON-NLS-1$
+x            + "(DOUBLE(avgTemperature) / temperatureScale), " //  19    //$NON-NLS-1$
 
             + "TourStartTime, " //                                20    //$NON-NLS-1$
             + "TimeZoneId, " //                                   21    //$NON-NLS-1$

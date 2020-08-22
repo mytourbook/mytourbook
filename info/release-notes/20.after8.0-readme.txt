@@ -3,7 +3,7 @@
 
 TODO's
 ======  
-             
+* SQL Bug: Tour tag filter with flat tourbook view             
 
 
 New
