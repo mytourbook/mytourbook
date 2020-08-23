@@ -232,6 +232,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    //=> After investigation, it seems that the {@link TourData#createTimeSeries()} generates this number
    // so the elapsed time is erroneous when importing from json.gz and gpx
    //If i import from a FIT (exported from Movescount), the recorded time is the same
+   //08/22/2020: Hunch => is it because maybe in some cases the last x seconds of data not having GPS data,
+   // we dont keep them and hence we are missing those seconds. If it's the case, then we should make an exception for
+   //the last bit of data right before the "stop" and save them
 
    // 1/2 DONE: Sporttracks fitlog (try with manual activity import)
    //DONE BUT TO CHECK WITH MULTIPLE FILES: TCX
@@ -247,6 +250,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    //Why and how did I bring such a regression in the gpx export ?
    //  <mt:tourDrivingTime>$tourData.tourDrivingTime</mt:tourDrivingTime>
 //   <mt:tourRecordingTime>$tourData.tourRecordingTime</mt:tourRecordingTime>
+
+   //TODO I think we should display the pauses in the graph chart just like for markers (add a button like markers as well)
 
    public static final String     ID                            = "net.tourbook.views.TourDataEditorView";                //$NON-NLS-1$
    //
