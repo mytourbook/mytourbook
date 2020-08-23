@@ -149,7 +149,7 @@ public class TourTagFilterManager {
          sqlParameters.add(tagId);
       }
 
-      final String sqlWhere = " AND jTdataTtag.TourTag_tagId IN (" + parameterTagIds.toString() + ") \n"; //$NON-NLS-1$ //$NON-NLS-2$
+      final String sqlWhere = " AND jTdataTtag.TourTag_tagId IN (" + parameterTagIds.toString() + ")" + UI.NEW_LINE; //$NON-NLS-1$ //$NON-NLS-2$
 
       return new SQLFilterData(sqlWhere, sqlParameters);
    }

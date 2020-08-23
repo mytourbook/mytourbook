@@ -184,8 +184,8 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             // -------- JOINT TABLES, they are added at the end --------------
             /////////////////////////////////////////////////////////////////////////
 
-            + "jTdataTtag.TourTag_tagId, "//                      last+1   //$NON-NLS-1$
-            + "Tmarker.markerId "//                               last+2   //$NON-NLS-1$
+            + "jTdataTtag.TourTag_tagId, " //                     SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER + 1   //$NON-NLS-1$
+            + "Tmarker.markerId " //                              SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER + 2   //$NON-NLS-1$
       ;
 
       SQL_SUM_FIELDS = NL
