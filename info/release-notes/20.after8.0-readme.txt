@@ -15,6 +15,9 @@ New
 Improvements
 ============
 
+* Flat Tour Book View
+  - Show markers and tags columns with the correct content (no dummy text)
+  
 * 
 
 Changes  
