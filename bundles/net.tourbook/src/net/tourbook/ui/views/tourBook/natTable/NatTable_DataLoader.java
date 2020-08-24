@@ -23,6 +23,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -699,22 +700,54 @@ public class NatTable_DataLoader {
 
       final SQLFilter sqlFilter = new SQLFilter(SQLFilter.TAG_FILTER);
 
+      /**
+       * Using this syntax from
+       * https://stackoverflow.com/questions/38770349/get-rows-on-first-table-not-on-left-joins-result-set#38770491
+       * <code>
+       * SELECT ST1.Col1, T2.Col1 FROM
+       * (
+       *     SELECT * FROM Table1
+       *     ORDER BY Col1
+       *     OFFSET @offset ROWS
+       *     FETCH NEXT @page ROWS ONLY
+       * ) ST1
+       * JOIN Table2 T2 ON ST1.Id=T2.FkToT1
+       * </code>
+       */
+
       final String sql = NL
 
-            + "SELECT " //                                                             //$NON-NLS-1$
+            + "SELECT " //                                                                         //$NON-NLS-1$
+            + "   " + TVITourBookItem.SQL_ALL_TOUR_FIELDS + "," + NL //                            //$NON-NLS-1$ //$NON-NLS-2$
+            + "   tblMarker.markerId, " //                                                         //$NON-NLS-1$
+            + "   jtblTdataTtag.TourTag_tagId" //                                                  //$NON-NLS-1$
 
-            + TVITourBookItem.SQL_ALL_TOUR_FIELDS + NL
+            + " FROM" + NL //                                                                      //$NON-NLS-1$
+            + "(" //                                                                               //$NON-NLS-1$
 
-            + " FROM " + TourDatabase.TABLE_TOUR_DATA + " TourData" + NL //            //$NON-NLS-1$ //$NON-NLS-2$
+            + "   SELECT" //                                                                       //$NON-NLS-1$
 
-            + " WHERE 1=1" + NL // //$NON-NLS-1$
-            + sqlFilter.getWhereClause() + NL
+            + "   " + TVITourBookItem.SQL_ALL_TOUR_FIELDS + NL //                                  //$NON-NLS-1$
 
-            + createSqlOrderBy()
+            + "   FROM " + TourDatabase.TABLE_TOUR_DATA + NL //                                    //$NON-NLS-1$
 
-            + " OFFSET ? ROWS FETCH NEXT ? ROWS ONLY" + NL //                          //$NON-NLS-1$
+            + "   WHERE 1=1" + NL //                                                               //$NON-NLS-1$
+            + "   " + sqlFilter.getWhereClause() + NL //                                           //$NON-NLS-1$
+
+            + "   " + createSqlOrderBy() //                                                        //$NON-NLS-1$
+
+            + "   OFFSET ? ROWS FETCH NEXT ? ROWS ONLY" + NL //                                    //$NON-NLS-1$
+
+            + ") TourData_Fetched" //                                                                //$NON-NLS-1$
+
+            // get marker id's
+            + " LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_MARKER + " tblMarker" //                //$NON-NLS-1$ //$NON-NLS-2$
+            + " ON TourData_Fetched.tourId = tblMarker.TourData_tourId" + NL //                       //$NON-NLS-1$
+
+            // get tag id's
+            + " LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jtblTdataTtag" ////$NON-NLS-1$ //$NON-NLS-2$
+            + " ON TourData_Fetched.tourId = jtblTdataTtag.TourData_tourId" //                       //$NON-NLS-1$
       ;
-
 //      System.out.println((System.currentTimeMillis() + " sql:" + sql));
 //      // TODO remove SYSTEM.OUT.PRINTLN
 
@@ -733,19 +766,68 @@ public class NatTable_DataLoader {
          prepStmt.setInt(paramIndex++, rowIndex);
          prepStmt.setInt(paramIndex++, FETCH_SIZE);
 
+         long prevTourId = -1;
+         HashSet<Long> tagIds = null;
+         HashSet<Long> markerIds = null;
+
          final ResultSet result = prepStmt.executeQuery();
          while (result.next()) {
 
-            final TVITourBookTour tourItem = new TVITourBookTour(null, null);
+            final long result_TourId = result.getLong(1);
 
-            tourItem.tourId = result.getLong(1);
+            final Object result_MarkerId = result.getObject(TVITourBookItem.SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER);
+            final Object result_TagId = result.getObject(TVITourBookItem.SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER + 1);
 
-            TVITourBookItem.getTourDataFields(result, tourItem);
+            if (result_TourId == prevTourId) {
 
-            final int natTableRowIndex = rowIndex++;
+               // these are additional result set's for the same tour
 
-            _fetchedTourItems.put(natTableRowIndex, tourItem);
-            _fetchedTourIndex.put(tourItem.tourId, natTableRowIndex);
+               // get tags from outer join
+               if (result_TagId instanceof Long) {
+                  tagIds.add((Long) result_TagId);
+               }
+
+               // get markers from outer join
+               if (result_MarkerId instanceof Long) {
+                  markerIds.add((Long) result_MarkerId);
+               }
+
+            } else {
+
+               // first resultset for a new tour
+
+               final TVITourBookTour tourItem = new TVITourBookTour(null, null);
+
+               tourItem.tourId = result_TourId;
+
+               TVITourBookItem.getTourDataFields(result, tourItem);
+
+               // get first tag id
+               if (result_TagId instanceof Long) {
+
+                  tagIds = new HashSet<>();
+                  tagIds.add((Long) result_TagId);
+
+                  tourItem.setTagIds(tagIds);
+               }
+
+               // get first marker id
+               if (result_MarkerId instanceof Long) {
+
+                  markerIds = new HashSet<>();
+                  markerIds.add((Long) result_MarkerId);
+
+                  tourItem.setMarkerIds(markerIds);
+               }
+
+               // keep tour item
+               final int natTableRowIndex = rowIndex++;
+
+               _fetchedTourItems.put(natTableRowIndex, tourItem);
+               _fetchedTourIndex.put(tourItem.tourId, natTableRowIndex);
+            }
+
+            prevTourId = result_TourId;
          }
 
       } catch (final SQLException e) {

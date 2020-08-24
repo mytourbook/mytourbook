@@ -3,7 +3,7 @@
 
 TODO's
 ======  
-             
+* SQL Bug: Tour tag filter with flat tourbook view             
 
 
 New
@@ -19,6 +19,9 @@ New
 Improvements
 ============
 
+* Flat Tour Book View
+  - Show markers and tags columns with the correct content (no dummy text)
+  
 * 
 
 Changes  

@@ -2945,7 +2945,13 @@ public class TourBook_ColumnFactory {
 
          @Override
          public String getValueText(final Object element) {
-            return "Tour markers are not yet supported, they are from a join table"; //$NON-NLS-1$
+
+            final ArrayList<Long> markerIds = ((TVITourBookTour) element).getMarkerIds();
+            if (markerIds == null) {
+               return UI.EMPTY_STRING;
+            } else {
+               return _nf0.format(markerIds.size());
+            }
          }
       });
 
@@ -3055,7 +3061,7 @@ public class TourBook_ColumnFactory {
 
          @Override
          public String getValueText(final Object element) {
-            return "Tour tags are not yet supported, they are from a join table"; //$NON-NLS-1$
+            return TourDatabase.getTagNames(((TVITourBookTour) element).getTagIds());
          }
 
          @Override
