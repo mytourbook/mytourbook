@@ -959,8 +959,6 @@ public class Messages extends NLS {
    public static String        Image__edit_tour_marker_disabled;
    public static String        Image__edit_tour_marker_new;
    public static String        Image__edit_tour_marker_new_disabled;
-   public static String        Image__edit_tour_pauses;
-   public static String        Image__edit_tour_pauses_disabled;
    public static String        Image__expand_all;
    public static String        Image__Eye;
    public static String        Image__graph_altimeter;
@@ -1131,6 +1129,8 @@ public class Messages extends NLS {
    public static String        Image__TourInfo_Disabled;
    public static String        Image__TourLog;
    public static String        Image__TourMarker;
+   public static String        Image__TourPauses;
+   public static String        Image__TourPauses_disabled;
    public static String        Image__TourSegments;
    public static String        Image__TourSegments_Disabled;
    public static String        Image__TourTagFilter;

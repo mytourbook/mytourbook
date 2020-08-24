@@ -80,6 +80,7 @@ import net.tourbook.ui.tourChart.action.ActionCanMoveSlidersWhenZoomed;
 import net.tourbook.ui.tourChart.action.ActionGraph;
 import net.tourbook.ui.tourChart.action.ActionGraphOverlapped;
 import net.tourbook.ui.tourChart.action.ActionTourChartMarker;
+import net.tourbook.ui.tourChart.action.ActionTourChartPauses;
 import net.tourbook.ui.tourChart.action.ActionTourPhotos;
 import net.tourbook.ui.tourChart.action.ActionXAxisDistance;
 import net.tourbook.ui.tourChart.action.ActionXAxisTime;
@@ -159,6 +160,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    public static final String    ACTION_ID_EDIT_CHART_PREFERENCES          = "ACTION_ID_EDIT_CHART_PREFERENCES";        //$NON-NLS-1$
    private static final String   ACTION_ID_IS_GRAPH_OVERLAPPED             = "ACTION_ID_IS_GRAPH_OVERLAPPED";           //$NON-NLS-1$
    public static final String    ACTION_ID_IS_SHOW_TOUR_PHOTOS             = "ACTION_ID_IS_SHOW_TOUR_PHOTOS";           //$NON-NLS-1$
+   public static final String    ACTION_ID_IS_SHOW_TOUR_PAUSES             = "ACTION_ID_IS_SHOW_TOUR_PAUSES";           //$NON-NLS-1$
    public static final String    ACTION_ID_X_AXIS_DISTANCE                 = "ACTION_ID_X_AXIS_DISTANCE";               //$NON-NLS-1$
    public static final String    ACTION_ID_X_AXIS_TIME                     = "ACTION_ID_X_AXIS_TIME";                   //$NON-NLS-1$
 
@@ -959,6 +961,30 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    }
 
    /**
+    * Show/Hide tour pauses
+    *
+    * @param isChecked
+    */
+   public void actionTourChartPauses(final boolean isChecked) {
+
+      // check if the button was pressed
+      if (isChecked && !_tcc.isShowTourPauses) {
+         return;
+      }
+
+      if (isChecked) {
+
+         // show distance on x axis
+
+         _tcc.isShowTimeOnXAxis = !_tcc.isShowTimeOnXAxis;
+         _tcc.isShowTimeOnXAxisBackup = _tcc.isShowTimeOnXAxis;
+
+         switchSlidersTo2ndXData();
+         updateTourChart(false);
+      }
+   }
+
+   /**
     * Set the X-axis to distance
     *
     * @param isChecked
@@ -1599,6 +1625,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       _allTourChartActions.put(ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED, new ActionCanMoveSlidersWhenZoomed(this));
       _allTourChartActions.put(ACTION_ID_IS_SHOW_TOUR_PHOTOS, new ActionTourPhotos(this));
       _allTourChartActions.put(ACTION_ID_IS_GRAPH_OVERLAPPED, new ActionGraphOverlapped(this));
+      _allTourChartActions.put(ACTION_ID_IS_SHOW_TOUR_PAUSES, new ActionTourChartPauses(this));
       _allTourChartActions.put(ACTION_ID_X_AXIS_DISTANCE, new ActionXAxisDistance(this));
       _allTourChartActions.put(ACTION_ID_X_AXIS_TIME, new ActionXAxisTime(this));
 
@@ -2826,6 +2853,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       tbm.add(new Separator());
       tbm.add(_allTourChartActions.get(ACTION_ID_IS_SHOW_TOUR_PHOTOS));
       tbm.add(_actionTourMarker);
+      tbm.add(_allTourChartActions.get(ACTION_ID_IS_SHOW_TOUR_PAUSES));
       tbm.add(_actionTourInfo);
 
       if (_tcc.canUseGeoCompareTool) {

@@ -13,33 +13,31 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.map2.action;
+package net.tourbook.ui.tourChart.action;
 
+import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.map2.Messages;
-import net.tourbook.map2.view.Map2View;
+import net.tourbook.ui.tourChart.TourChart;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionShowTourPauses extends Action {
 
-   private Map2View _mapView;
+public class ActionTourChartPauses extends Action {
 
-   public ActionShowTourPauses(final Map2View mapView) {
+   private TourChart _tourChart;
 
-      super(null, AS_CHECK_BOX);
+   public ActionTourChartPauses(final TourChart tourChart) {
 
-      _mapView = mapView;
+      super(Messages.Tour_Action_show_distance_on_x_axis, AS_RADIO_BUTTON);
 
-      setText(Messages.map_action_show_tour_pauses);
+      _tourChart = tourChart;
 
-      setImageDescriptor(TourbookPlugin.getImageDescriptor(net.tourbook.Messages.Image__TourPauses));
-      setDisabledImageDescriptor(TourbookPlugin
-            .getImageDescriptor(net.tourbook.Messages.Image__TourPauses_disabled));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TourPauses));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TourPauses_disabled));
    }
 
    @Override
    public void run() {
-      _mapView.actionSetShowTourPausesInMap();
+      _tourChart.actionTourChartPauses(isChecked());
    }
 }
