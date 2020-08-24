@@ -69,8 +69,7 @@ public class TVITourBookYearCategorized extends TVITourBookItem {
             + "SELECT " //                                                    //$NON-NLS-1$
 
             + SQL_ALL_TOUR_FIELDS + UI.COMMA_SPACE + NL
-            + SQL_ALL_OTHER_FIELDS
-            + NL
+            + SQL_ALL_OTHER_FIELDS + NL
 
             + " FROM " + TourDatabase.TABLE_TOUR_DATA + " TourData" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
 
