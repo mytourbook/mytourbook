@@ -912,6 +912,20 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       setActionChecked(ACTION_ID_IS_GRAPH_OVERLAPPED, isItemChecked);
    }
 
+   /**
+    * Show/Hide tour pauses
+    *
+    * @param isChecked
+    */
+   public void actionShowTourChartPauses(final boolean arePausesVisible) {
+
+      _prefStore.setValue(ITourbookPreferences.GRAPH_ARE_PAUSES_VISIBLE, arePausesVisible);
+
+      _tcc.isShowTourPauses = arePausesVisible;
+
+      updateUI_PausesLayer(arePausesVisible);
+   }
+
    public void actionShowTourInfo(final boolean isTourInfoVisible) {
 
       _prefStore.setValue(ITourbookPreferences.GRAPH_TOUR_INFO_IS_VISIBLE, isTourInfoVisible);
@@ -958,30 +972,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       updatePhotoAction();
 
       updateTourChart();
-   }
-
-   /**
-    * Show/Hide tour pauses
-    *
-    * @param isChecked
-    */
-   public void actionTourChartPauses(final boolean isChecked) {
-
-      // check if the button was pressed
-      if (isChecked && !_tcc.isShowTourPauses) {
-         return;
-      }
-
-      if (isChecked) {
-
-         // show distance on x axis
-
-         _tcc.isShowTimeOnXAxis = !_tcc.isShowTimeOnXAxis;
-         _tcc.isShowTimeOnXAxisBackup = _tcc.isShowTimeOnXAxis;
-
-         switchSlidersTo2ndXData();
-         updateTourChart(false);
-      }
    }
 
    /**
@@ -2230,6 +2220,114 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       return chartLabel;
    }
 
+   /**
+    * create the layer which displays the tour pauses
+    *
+    * @param isForcedPauses
+    *           When <code>true</code> the pauses must be drawn, otherwise
+    *           {@link TourChartConfiguration#isShowTourPauses} determines if the pauses are drawn
+    *           or not.
+    *           <p>
+    */
+   private void createLayer_Pauses(final boolean isForcedPauses) {
+
+      if (isForcedPauses == false && _tcc.isShowTourPauses == false) {
+
+         // pauses layer is not displayed
+
+         hidePausesLayer();
+
+         return;
+      }
+
+      // pauses layer is visible
+
+//      final ChartMarkerConfig cmc = new ChartMarkerConfig();
+//
+//      if (_layerMarker == null) {
+//
+//         // setup marker layer, a layer is created only once
+//
+//         _layerMarker = new ChartLayerMarker(this);
+//
+//         // set overlay painter
+//         addChartOverlay(_layerMarker);
+//
+//         addChartMouseListener(_mouseMarkerListener);
+//      }
+//
+//      _layerMarker.setChartMarkerConfig(cmc);
+//      _tourMarkerTooltip.setChartMarkerConfig(cmc);
+//
+//      // set data serie for the x-axis
+//      final double[] xAxisSerie = _tcc.isShowTimeOnXAxis
+//            ? _tourData.getTimeSerieDouble()
+//            : _tourData.getDistanceSerieDouble();
+//
+//      if (_tourData.isMultipleTours()) {
+//
+//         final int[] multipleStartTimeIndex = _tourData.multipleTourStartIndex;
+//         final int[] multipleNumberOfMarkers = _tourData.multipleNumberOfMarkers;
+//
+//         // fixing ArrayIndexOutOfBoundsException: 0
+//         if (multipleStartTimeIndex.length == 0) {
+//            return;
+//         }
+//
+//         int tourIndex = 0;
+//         int numberOfMultiMarkers = 0;
+//         int tourSerieIndex = 0;
+//
+//         // setup first multiple tour
+//         tourSerieIndex = multipleStartTimeIndex[tourIndex];
+//         numberOfMultiMarkers = multipleNumberOfMarkers[tourIndex];
+//
+//         final ArrayList<TourMarker> allTourMarkers = _tourData.multiTourMarkers;
+//
+//         for (int markerIndex = 0; markerIndex < allTourMarkers.size(); markerIndex++) {
+//
+//            while (markerIndex >= numberOfMultiMarkers) {
+//
+//               // setup next tour
+//
+//               tourIndex++;
+//
+//               if (tourIndex <= multipleStartTimeIndex.length - 1) {
+//
+//                  tourSerieIndex = multipleStartTimeIndex[tourIndex];
+//                  numberOfMultiMarkers += multipleNumberOfMarkers[tourIndex];
+//               }
+//            }
+//
+//            final TourMarker tourMarker = allTourMarkers.get(markerIndex);
+//            final int xAxisSerieIndex = tourSerieIndex + tourMarker.getSerieIndex();
+//
+//            tourMarker.setMultiTourSerieIndex(xAxisSerieIndex);
+//
+//            final ChartLabel chartLabel = createLayer_Marker_ChartLabel(//
+//                  tourMarker,
+//                  xAxisSerie,
+//                  xAxisSerieIndex,
+//                  tourMarker.getLabelPosition());
+//
+//            cmc.chartLabels.add(chartLabel);
+//         }
+//
+//      } else {
+//
+//         for (final TourMarker tourMarker : _tourData.getTourMarkers()) {
+//
+//            final ChartLabel chartLabel = createLayer_Marker_ChartLabel(
+//                  tourMarker,
+//                  xAxisSerie,
+//                  tourMarker.getSerieIndex(),
+//                  tourMarker.getLabelPosition());
+//
+//            cmc.chartLabels.add(chartLabel);
+//         }
+//      }
+   }
+
    private void createLayer_Photo() {
 
       while (true) {
@@ -3318,6 +3416,21 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       _selectedTourMarker = null;
 
       _tourMarkerTooltip.hideNow();
+   }
+
+   /**
+    * Hides the pauses layer.
+    */
+   private void hidePausesLayer() {
+
+//      if (_layerMarker != null) {
+//
+//         removeChartOverlay(_layerMarker);
+//
+//         _layerMarker = null;
+//      }
+//
+//      removeChartMouseListener(_mouseMarkerListener);
    }
 
    private void hidePhotoLayer() {
@@ -5558,6 +5671,26 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       setupGraphLayer();
 
       // update marker layer
+      updateCustomLayers();
+   }
+
+   /**
+    * Updates the pauses layer in the chart
+    *
+    * @param arePausesVisible
+    */
+   public void updateUI_PausesLayer(final boolean arePausesVisible) {
+
+      // create/hide pauses layer
+      if (arePausesVisible) {
+         createLayer_Pauses(true);
+      } else {
+         hidePausesLayer();
+      }
+
+      setupGraphLayer();
+
+      // update pauses layer
       updateCustomLayers();
    }
 
