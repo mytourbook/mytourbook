@@ -236,6 +236,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    // we dont keep them and hence we are missing those seconds. If it's the case, then we should make an exception for
    //the last bit of data right before the "stop" and save them
 
+   // Elevation gain is OK from fit and GPX but not JSON!
+
    // 1/2 DONE: Sporttracks fitlog (try with manual activity import)
    //DONE BUT TO CHECK WITH MULTIPLE FILES: TCX
 
