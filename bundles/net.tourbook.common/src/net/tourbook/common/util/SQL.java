@@ -151,6 +151,10 @@ public final class SQL {
 
    public static void showException(final SQLException exception, final String sqlStatement) {
 
+      // log without line number that it can be easily copy/pasted into a sql tool
+      System.out.println();
+      System.out.println(sqlStatement);
+
       final String sqlStatementWithNumber = addLineNumbers(sqlStatement);
 
       Display.getDefault().asyncExec(new Runnable() {
