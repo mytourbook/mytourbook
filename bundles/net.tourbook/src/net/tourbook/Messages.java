@@ -2432,7 +2432,6 @@ public class Messages extends NLS {
    public static String Tour_Action_SetTimeZone;
    public static String Tour_Action_SetWeatherConditions;
    public static String Tour_Action_ShowBreaktimeValues;
-   public static String Tour_Action_ShowTourMarker;
    public static String Tour_Action_Swim_Strokes_Tooltip;
    public static String Tour_Action_Swim_Swolf_Tooltip;
    public static String Tour_Action_TourInfo_Tooltip;
