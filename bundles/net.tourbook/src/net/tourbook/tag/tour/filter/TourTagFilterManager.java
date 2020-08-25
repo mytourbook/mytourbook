@@ -149,7 +149,7 @@ public class TourTagFilterManager {
          sqlParameters.add(tagId);
       }
 
-      final String sqlWhere = " AND jTdataTtag.TourTag_tagId IN (" + parameterTagIds.toString() + ") \n"; //$NON-NLS-1$ //$NON-NLS-2$
+      final String sqlWhere = " AND jTdataTtag.TourTag_tagId IN (" + parameterTagIds.toString() + ")" + UI.NEW_LINE; //$NON-NLS-1$ //$NON-NLS-2$
 
       return new SQLFilterData(sqlWhere, sqlParameters);
    }
@@ -157,6 +157,25 @@ public class TourTagFilterManager {
    private static File getXmlFile() {
 
       return _stateLocation.append(TOUR_FILTER_FILE_NAME).toFile();
+   }
+
+   /**
+    * @return Returns <code>true</code> when a tour tag filter is enabled
+    */
+   public static boolean isTourTagFilterEnabled() {
+
+      if (_selectedProfile == null) {
+         return false;
+      }
+
+      if (_isTourTagFilterEnabled == false || _selectedProfile.tagFilterIds.size() == 0) {
+
+         // tour tag filter is not enabled
+
+         return false;
+      }
+
+      return true;
    }
 
    /**
