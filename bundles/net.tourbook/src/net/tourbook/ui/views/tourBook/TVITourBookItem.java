@@ -35,6 +35,10 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
    static ZonedDateTime       calendar8 = ZonedDateTime.now().with(TimeTools.calendarWeek.dayOfWeek(), 1);
 
+   /**
+    * All tour fields in the tourbook view, the first field is <code>tourId</code> which can be
+    * prefixed with <code>DISTINCT</code>
+    */
    public static final String SQL_ALL_TOUR_FIELDS;
 
    public static final String SQL_ALL_OTHER_FIELDS;

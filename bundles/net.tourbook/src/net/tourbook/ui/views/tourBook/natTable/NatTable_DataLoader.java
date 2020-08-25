@@ -49,18 +49,19 @@ import org.eclipse.swt.widgets.Display;
 
 public class NatTable_DataLoader {
 
-   private static final char                              NL                    = net.tourbook.common.UI.NEW_LINE;
+   private static final char   NL                    = net.tourbook.common.UI.NEW_LINE;
 
-   private static final String                            SQL_ASCENDING         = "ASC";                           //$NON-NLS-1$
-   private static final String                            SQL_DESCENDING        = "DESC";                          //$NON-NLS-1$
+   private static final String SQL_ASCENDING         = "ASC";                          //$NON-NLS-1$
+   private static final String SQL_DESCENDING        = "DESC";                         //$NON-NLS-1$
 
-   private static final String                            SQL_DEFAULT_FIELD     = "TourStartTime";                 //$NON-NLS-1$
+   private static final String SQL_DEFAULT_FIELD     = "TourStartTime";                //$NON-NLS-1$
 
    /**
     * Dummy field name for fields which currently cannot be sorted in the NatTable.
     */
-   public static final String                             FIELD_WITHOUT_SORTING = "FIELD_WITHOUT_SORTING";         //$NON-NLS-1$
+   public static final String  FIELD_WITHOUT_SORTING = "FIELD_WITHOUT_SORTING";        //$NON-NLS-1$
 
+//   private static final int                               FETCH_SIZE            = 1000;
    private static final int                               FETCH_SIZE            = 1000;
 
    private static final ExecutorService                   _loadingExecutor      = createExecuter_TourLoading();
@@ -275,7 +276,7 @@ public class NatTable_DataLoader {
 
             + "SELECT" + NL //                                    //$NON-NLS-1$
             + "   DISTINCT TourId," + NL //                       //$NON-NLS-1$
-            + "   " + createSqlSorting_SortingFields()
+            + "   " + createSqlSorting_SortingFields() //$NON-NLS-1$
             + "   jTdataTtag.TourTag_tagId" + NL //               //$NON-NLS-1$
 
             + "FROM " + TourDatabase.TABLE_TOUR_DATA + NL //      //$NON-NLS-1$
@@ -314,9 +315,6 @@ public class NatTable_DataLoader {
          SQL.showException(e, sql);
       }
 
-      System.out.println((System.currentTimeMillis() + " allTourIds:" + allTourIds.size()));
-      // TODO remove SYSTEM.OUT.PRINTLN
-
       _allLoadedTourIds = allTourIds.toArray();
    }
 
@@ -337,11 +335,11 @@ public class NatTable_DataLoader {
             + "         jTdataTtag.TourTag_tagId" + NL //                                                   //$NON-NLS-1$
 
             + "      FROM " + TourDatabase.TABLE_TOUR_DATA + NL //                                          //$NON-NLS-1$
-            + "      LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" //       //$NON-NLS-1$
+            + "      LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" //       //$NON-NLS-1$ //$NON-NLS-2$
             + "      ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //                               //$NON-NLS-1$
 
             + "      WHERE 1=1" + NL //                                                                     //$NON-NLS-1$
-            + "      " + sqlFilter.getWhereClause()
+            + "      " + sqlFilter.getWhereClause() //$NON-NLS-1$
 
             // VERY IMPORTANT: "AS <name>" MUST be set, otherwise it DO NOT work
             + "   ) AS DerivedTable1 " + NL //                                                              //$NON-NLS-1$
@@ -369,9 +367,6 @@ public class NatTable_DataLoader {
          // get first value
          final int numTours = result.getInt(1);
 
-         System.out.println((System.currentTimeMillis() + " Num Tours: " + numTours));
-         // TODO remove SYSTEM.OUT.PRINTLN
-
          return numTours;
 
 //       TourDatabase.disableRuntimeStatistic(conn);
@@ -387,8 +382,7 @@ public class NatTable_DataLoader {
 
 //      final long start = System.nanoTime();
 
-      final SQLFilter sqlNoTagFilter = new SQLFilter();
-      final SQLFilter sqlFilter = new SQLFilter(SQLFilter.TAG_FILTER);
+      final SQLFilter sqlFilter_WithTags = new SQLFilter(SQLFilter.TAG_FILTER);
 
       /**
        * Using this syntax from
@@ -405,79 +399,53 @@ public class NatTable_DataLoader {
        * </code>
        */
 
-      final String sql = ""
+      final String sql = NL
 
-//            + " SELECT " //                                                                        //$NON-NLS-1$
-//            + "   " + TVITourBookItem.SQL_ALL_TOUR_FIELDS + "," + NL //                            //$NON-NLS-1$ //$NON-NLS-2$
-//            + "   Tmarker.markerId, " //                                                           //$NON-NLS-1$
-//            + "   jTdataTtag.TourTag_tagId" + NL //                                                //$NON-NLS-1$
-//
-//            + " FROM" + NL //                                                                      //$NON-NLS-1$
-//            + " (" //                                                                              //$NON-NLS-1$
-//
-//            + "   SELECT" //                                                                       //$NON-NLS-1$
-//
-//            + "   " + TVITourBookItem.SQL_ALL_TOUR_FIELDS + NL //                                  //$NON-NLS-1$
-//
-//            + "   FROM " + TourDatabase.TABLE_TOUR_DATA + NL //                                    //$NON-NLS-1$
-//
-//            + "   WHERE 1=1" + NL //                                                               //$NON-NLS-1$
-//            + "   " + sqlNoTagFilter.getWhereClause() //                                           //$NON-NLS-1$
-//
-//            + "   " + createSqlSorting_OrderBy() //                                                //$NON-NLS-1$
-//
-//            + "   OFFSET ? ROWS FETCH NEXT ? ROWS ONLY" + NL //                                    //$NON-NLS-1$
-//
-//            + " ) AS TourData" + NL //                                                             //$NON-NLS-1$
-//
-//            // get marker id's
-//            + " LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_MARKER + " Tmarker" //                 //$NON-NLS-1$ //$NON-NLS-2$
-//            + " ON TourData.tourId = Tmarker.TourData_tourId" + NL //                              //$NON-NLS-1$
-//
-//            // get tag id's
-//            + " LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" //   //$NON-NLS-1$ //$NON-NLS-2$
-//            + " ON TourData.tourId = jTdataTtag.TourData_tourId" + NL//                            //$NON-NLS-1$
-//
-//            + " WHERE 1=1" + NL //                                                                 //$NON-NLS-1$
-//            + sqlFilter.getWhereClause() //
+            // get all markers/tags for paged tours
+            + " SELECT" //                                                                            //$NON-NLS-1$
+            + "    " + TVITourBookItem.SQL_ALL_TOUR_FIELDS + "," + NL //                              //$NON-NLS-1$ //$NON-NLS-2$
+            + "    Tmarker.markerId," + NL //                                                         //$NON-NLS-1$
+            + "    jTdataTtag.TourTag_tagId" + NL //                                                  //$NON-NLS-1$
 
-//            + "-- get all markers/tags for paged tours" + NL //                                     //$NON-NLS-1$
-            + "SELECT " + NL //                                                                       //$NON-NLS-1$
-            + "    tourID, " + NL //                                                                  //$NON-NLS-1$
-            + "    startYear, startMonth, startDay, tourDistance, tourRecordingTime, tourDrivingTime, tourAltUp, tourAltDown, startDistance, tourType_typeId, tourTitle, deviceTimeInterval, maxSpeed, maxAltitude, maxPulse, avgPulse, avgCadence, avgTemperature, TourStartTime, TimeZoneId, startWeek, startWeekYear, weatherWindDir, weatherWindSpd, weatherClouds, restPulse, calories, tourPerson_personId, numberOfTimeSlices, numberOfPhotos, dpTolerance, frontShiftCount, rearShiftCount,power_Avg,power_Max, power_Normalized, power_FTP, power_TotalWork, power_TrainingStressScore, power_IntensityFactor, power_PedalLeftRightBalance, power_AvgLeftTorqueEffectiveness, power_AvgRightTorqueEffectiveness, power_AvgLeftPedalSmoothness, power_AvgRightPedalSmoothness, bikerWeight, tourImportFileName, tourImportFilePath, devicePluginName, deviceFirmwareVersion, cadenceMultiplier, runDyn_StanceTime_Min, runDyn_StanceTime_Max, runDyn_StanceTime_Avg, runDyn_StanceTimeBalance_Min, runDyn_StanceTimeBalance_Max, runDyn_StanceTimeBalance_Avg, runDyn_StepLength_Min, runDyn_StepLength_Max, runDyn_StepLength_Avg, runDyn_VerticalOscillation_Min, runDyn_VerticalOscillation_Max, runDyn_VerticalOscillation_Avg, runDyn_VerticalRatio_Min, runDyn_VerticalRatio_Max, runDyn_VerticalRatio_Avg, surfing_NumberOfEvents, surfing_MinSpeed_StartStop, surfing_MinSpeed_Surfing, surfing_MinTimeDuration, surfing_IsMinDistance, surfing_MinDistance,training_TrainingEffect_Aerob, training_TrainingEffect_Anaerob, training_TrainingPerformance, cadenceZone_SlowTime, cadenceZone_FastTime, cadenceZones_DelimiterValue, weather_Temperature_Min, weather_Temperature_Max, temperatureScale, tourStartPlace, tourEndPlace, avgAltitudeChange," //$NON-NLS-1$
-            + NL
-            + "    Tmarker.markerId,    " + NL //                                                     //$NON-NLS-1$
-            + "    jTdataTtag.TourTag_tagId" + NL //                                                 //$NON-NLS-1$
             + " FROM" + NL //                                                                         //$NON-NLS-1$
             + " (" + NL //                                                                            //$NON-NLS-1$
-//            + "    -- fetch paged tours" + NL //                                                    //$NON-NLS-1$
+
+            // fetch paged tours
             + "    SELECT " + NL //                                                                   //$NON-NLS-1$
-            + "       DISTINCT tourID, " + NL //                                                      //$NON-NLS-1$
-            + "       startYear, startMonth, startDay, tourDistance, tourRecordingTime, tourDrivingTime, tourAltUp, tourAltDown, startDistance, tourType_typeId, tourTitle, deviceTimeInterval, maxSpeed, maxAltitude, maxPulse, avgPulse, avgCadence, avgTemperature, TourStartTime, TimeZoneId, startWeek, startWeekYear, weatherWindDir, weatherWindSpd, weatherClouds, restPulse, calories, tourPerson_personId, numberOfTimeSlices, numberOfPhotos, dpTolerance, frontShiftCount, rearShiftCount,power_Avg,power_Max, power_Normalized, power_FTP, power_TotalWork, power_TrainingStressScore, power_IntensityFactor, power_PedalLeftRightBalance, power_AvgLeftTorqueEffectiveness, power_AvgRightTorqueEffectiveness, power_AvgLeftPedalSmoothness, power_AvgRightPedalSmoothness, bikerWeight, tourImportFileName, tourImportFilePath, devicePluginName, deviceFirmwareVersion, cadenceMultiplier, runDyn_StanceTime_Min, runDyn_StanceTime_Max, runDyn_StanceTime_Avg, runDyn_StanceTimeBalance_Min, runDyn_StanceTimeBalance_Max, runDyn_StanceTimeBalance_Avg, runDyn_StepLength_Min, runDyn_StepLength_Max, runDyn_StepLength_Avg, runDyn_VerticalOscillation_Min, runDyn_VerticalOscillation_Max, runDyn_VerticalOscillation_Avg, runDyn_VerticalRatio_Min, runDyn_VerticalRatio_Max, runDyn_VerticalRatio_Avg, surfing_NumberOfEvents, surfing_MinSpeed_StartStop, surfing_MinSpeed_Surfing, surfing_MinTimeDuration, surfing_IsMinDistance, surfing_MinDistance,training_TrainingEffect_Aerob, training_TrainingEffect_Anaerob, training_TrainingPerformance, cadenceZone_SlowTime, cadenceZone_FastTime, cadenceZones_DelimiterValue, weather_Temperature_Min, weather_Temperature_Max, temperatureScale, tourStartPlace, tourEndPlace, avgAltitudeChange" //$NON-NLS-1$
-            + NL
+            + "       DISTINCT " + TVITourBookItem.SQL_ALL_TOUR_FIELDS + NL //                        //$NON-NLS-1$
+
             + "    FROM" + NL //                                                                      //$NON-NLS-1$
             + "    (" + NL //                                                                         //$NON-NLS-1$
-//            + "       -- get filtered tours" + NL //                                                //$NON-NLS-1$
-            + "       SELECT " + NL //                                                                //$NON-NLS-1$
-            + "          tourID, " + NL //                                                            //$NON-NLS-1$
-            + "          startYear, startMonth, startDay, tourDistance, tourRecordingTime, tourDrivingTime, tourAltUp, tourAltDown, startDistance, tourType_typeId, tourTitle, deviceTimeInterval, maxSpeed, maxAltitude, maxPulse, avgPulse, avgCadence, avgTemperature, TourStartTime, TimeZoneId, startWeek, startWeekYear, weatherWindDir, weatherWindSpd, weatherClouds, restPulse, calories, tourPerson_personId, numberOfTimeSlices, numberOfPhotos, dpTolerance, frontShiftCount, rearShiftCount,power_Avg,power_Max, power_Normalized, power_FTP, power_TotalWork, power_TrainingStressScore, power_IntensityFactor, power_PedalLeftRightBalance, power_AvgLeftTorqueEffectiveness, power_AvgRightTorqueEffectiveness, power_AvgLeftPedalSmoothness, power_AvgRightPedalSmoothness, bikerWeight, tourImportFileName, tourImportFilePath, devicePluginName, deviceFirmwareVersion, cadenceMultiplier, runDyn_StanceTime_Min, runDyn_StanceTime_Max, runDyn_StanceTime_Avg, runDyn_StanceTimeBalance_Min, runDyn_StanceTimeBalance_Max, runDyn_StanceTimeBalance_Avg, runDyn_StepLength_Min, runDyn_StepLength_Max, runDyn_StepLength_Avg, runDyn_VerticalOscillation_Min, runDyn_VerticalOscillation_Max, runDyn_VerticalOscillation_Avg, runDyn_VerticalRatio_Min, runDyn_VerticalRatio_Max, runDyn_VerticalRatio_Avg, surfing_NumberOfEvents, surfing_MinSpeed_StartStop, surfing_MinSpeed_Surfing, surfing_MinTimeDuration, surfing_IsMinDistance, surfing_MinDistance,training_TrainingEffect_Aerob, training_TrainingEffect_Anaerob, training_TrainingPerformance, cadenceZone_SlowTime, cadenceZone_FastTime, cadenceZones_DelimiterValue, weather_Temperature_Min, weather_Temperature_Max, temperatureScale, tourStartPlace, tourEndPlace, avgAltitudeChange," //$NON-NLS-1$
-            + NL
-            + "          jTdataTtag.TourTag_tagId" + NL //                                            //$NON-NLS-1$
-            + "       FROM TOURDATA" + NL //                                                          //$NON-NLS-1$
-            + "       LEFT OUTER JOIN TOURDATA_TOURTAG jTdataTtag ON TourData.tourId = jTdataTtag.TourData_tourId" + NL // //$NON-NLS-1$
-            + "       WHERE 1=1" + NL //                                                               //$NON-NLS-1$
-            + "          AND TOURDATA.tourPerson_personId = 0" + NL //                                 //$NON-NLS-1$
-            + "          AND jTdataTtag.TourTag_tagId IN ( 641)" + NL //                               //$NON-NLS-1$
-            + "       ORDER BY TourStartTime ASC" + NL //                                              //$NON-NLS-1$
-            + "    ) AS TourData " + NL //                                                             //$NON-NLS-1$
-            + "    OFFSET 0 ROWS FETCH NEXT 10 ROWS ONLY" + NL //                                      //$NON-NLS-1$
-            + " ) AS TourData  " + NL //                                                               //$NON-NLS-1$
-            + " LEFT OUTER JOIN TOURMARKER Tmarker ON TourData.tourId = Tmarker.TourData_tourId" + NL //                   //$NON-NLS-1$
-            + " LEFT OUTER JOIN TOURDATA_TOURTAG jTdataTtag ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //       //$NON-NLS-1$
 
+            // get filtered tours
+            + "       SELECT " + NL //                                                                //$NON-NLS-1$
+            + "          " + TVITourBookItem.SQL_ALL_TOUR_FIELDS + "," + NL //                        //$NON-NLS-1$ //$NON-NLS-2$
+            + "          jTdataTtag.TourTag_tagId" + NL //                                            //$NON-NLS-1$
+
+            + "       FROM TOURDATA" + NL //                                                          //$NON-NLS-1$
+            + "       LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" ////$NON-NLS-1$ //$NON-NLS-2$
+            + "       ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //                        //$NON-NLS-1$
+
+            + "       WHERE 1=1" + NL //                                                              //$NON-NLS-1$
+            + "       " + sqlFilter_WithTags.getWhereClause() //                                      //$NON-NLS-1$
+            + "       " + createSqlSorting_OrderBy() //                                               //$NON-NLS-1$
+            + "    ) AS TourData " + NL //                                                            //$NON-NLS-1$
+
+            + "    OFFSET ? ROWS FETCH NEXT ? ROWS ONLY" + NL //                                      //$NON-NLS-1$
+
+            + " ) AS TourData  " + NL //                                                              //$NON-NLS-1$
+
+            + " LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_MARKER + " Tmarker" //                    //$NON-NLS-1$ //$NON-NLS-2$
+            + " ON TourData.tourId = Tmarker.TourData_tourId" + NL //                                 //$NON-NLS-1$
+
+            + " LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" //      //$NON-NLS-1$ //$NON-NLS-2$
+            + " ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //                              //$NON-NLS-1$
+
+            + " " + createSqlSorting_OrderBy() //                                                     //$NON-NLS-1$
       ;
-      System.out.println((System.currentTimeMillis() + " sql:" + sql));
-      // TODO remove SYSTEM.OUT.PRINTLN
+
+//      System.out.println((System.currentTimeMillis() + " sql:" + sql));
+//      // TODO remove SYSTEM.OUT.PRINTLN
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
@@ -485,19 +453,16 @@ public class NatTable_DataLoader {
 
          final PreparedStatement prepStmt = conn.prepareStatement(sql);
 
-//         int paramIndex = 1;
-//
-//         // set filter parameters
-//         sqlNoTagFilter.setParameters(prepStmt, paramIndex);
-//
-//         // set other parameters
-//         paramIndex = sqlNoTagFilter.getLastParameterIndex();
-//
-//         prepStmt.setInt(paramIndex++, rowIndex);
-//         prepStmt.setInt(paramIndex++, FETCH_SIZE);
-//
-//         // set filter parameters
-//         sqlFilter.setParameters(prepStmt, paramIndex);
+         int paramIndex = 1;
+
+         // set filter parameters
+         sqlFilter_WithTags.setParameters(prepStmt, paramIndex);
+
+         // set other parameters
+         paramIndex = sqlFilter_WithTags.getLastParameterIndex();
+
+         prepStmt.setInt(paramIndex++, rowIndex);
+         prepStmt.setInt(paramIndex++, FETCH_SIZE);
 
          long prevTourId = -1;
          HashSet<Long> tagIds = null;

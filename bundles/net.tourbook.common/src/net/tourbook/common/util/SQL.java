@@ -165,7 +165,7 @@ public final class SQL {
                   + sqlStatementWithNumber + UI.NEW_LINE2
                   + Util.getSQLExceptionText(exception);
 
-            MessageDialog.openError(Display.getDefault().getActiveShell(), //
+            SQLMessageDialog.openError(Display.getDefault().getActiveShell(),
                   "SQL Error", //$NON-NLS-1$
                   message);
 

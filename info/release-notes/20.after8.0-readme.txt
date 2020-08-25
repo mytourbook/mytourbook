@@ -3,7 +3,6 @@
 
 TODO's
 ======  
-* SQL Bug: Tour tag filter with flat tourbook view             
 
 
 New
@@ -29,6 +28,9 @@ Changes
 Fixes   
 =====
 
+* Flat Tour Book View
+  - Tour tag filter caused SQL exception https://github.com/wolfgang-ch/mytourbook/issues/220
+             
 * 
  
    

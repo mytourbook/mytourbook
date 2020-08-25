@@ -160,6 +160,25 @@ public class TourTagFilterManager {
    }
 
    /**
+    * @return Returns <code>true</code> when a tour tag filter is enabled
+    */
+   public static boolean isTourTagFilterEnabled() {
+
+      if (_selectedProfile == null) {
+         return false;
+      }
+
+      if (_isTourTagFilterEnabled == false || _selectedProfile.tagFilterIds.size() == 0) {
+
+         // tour tag filter is not enabled
+
+         return false;
+      }
+
+      return true;
+   }
+
+   /**
     * Read filter profile XML file.
     *
     * @return
