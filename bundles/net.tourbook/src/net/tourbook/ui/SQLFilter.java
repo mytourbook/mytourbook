@@ -103,7 +103,7 @@ public class SQLFilter {
        */
       if (appFilter.contains(SQLAppFilter.Photo) && TourbookPlugin.getActivePhotoFilter()) {
 
-         sb.append(" AND TourData.numberOfPhotos > 0\n"); //$NON-NLS-1$
+         sb.append(" AND TourData.NumberOfPhotos > 0\n"); //$NON-NLS-1$
       }
 
       /*
