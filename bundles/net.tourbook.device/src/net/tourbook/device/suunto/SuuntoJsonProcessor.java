@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.device.suunto;
 
+import de.byteholder.geoclipse.map.UI;
+
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -48,8 +50,8 @@ import org.json.JSONObject;
 public class SuuntoJsonProcessor {
 
    public static final String  DeviceName      = "Suunto Spartan/9"; //$NON-NLS-1$
-   public static final String  TAG_SAMPLES     = "Samples";          //$NON-NLS-1$
    public static final String  TAG_SAMPLE      = "Sample";           //$NON-NLS-1$
+   public static final String  TAG_SAMPLES     = "Samples";          //$NON-NLS-1$
    public static final String  TAG_EVENTS      = "Events";           //$NON-NLS-1$
    public static final String  TAG_TIMEISO8601 = "TimeISO8601";      //$NON-NLS-1$
    public static final String  TAG_ATTRIBUTES  = "Attributes";       //$NON-NLS-1$
@@ -62,8 +64,9 @@ public class SuuntoJsonProcessor {
    public static final String  TAG_GPSALTITUDE = "GPSAltitude";      //$NON-NLS-1$
    public static final String  TAG_LATITUDE    = "Latitude";         //$NON-NLS-1$
    public static final String  TAG_LONGITUDE   = "Longitude";        //$NON-NLS-1$
-   private static final String TAG_TYPE        = "Start";            //$NON-NLS-1$
-   private static final String TAG_START       = "Type";             //$NON-NLS-1$
+   private static final String TAG_START       = "Start";            //$NON-NLS-1$
+   private static final String TAG_STOP        = "Stop";             //$NON-NLS-1$
+   private static final String TAG_TYPE        = "Type";             //$NON-NLS-1$
    private static final String TAG_PAUSE       = "Pause";            //$NON-NLS-1$
    private static final String TAG_HR          = "HR";               //$NON-NLS-1$
    private static final String TAG_RR          = "R-R";              //$NON-NLS-1$
@@ -83,8 +86,10 @@ public class SuuntoJsonProcessor {
    private static final String       TotalLengths         = "TotalLengths";                                  //$NON-NLS-1$
    private static final String       Stroke               = "Stroke";                                        //$NON-NLS-1$
    private static final String       Turn                 = "Turn";                                          //$NON-NLS-1$
-   private static final String       Type                 = "Type";                                          //$NON-NLS-1$
    private static int                previousTotalLengths = 0;
+
+   private static final String       EndOfTour            = "EndOfTour";                                     //$NON-NLS-1$
+   private static final String       StartOfTour          = "StartOfTour";                                   //$NON-NLS-1$
 
    private ArrayList<TimeData>       _sampleList;
    private ArrayList<TourTimerPause> _timerPauses;
@@ -138,12 +143,18 @@ public class SuuntoJsonProcessor {
       final Iterator<TimeData> sampleListIterator = activityData.iterator();
       long previousAbsoluteTime = 0;
       while (sampleListIterator.hasNext()) {
+
          final TimeData currentTimeData = sampleListIterator.next();
 
          // Removing the entries that don't have GPS data
          // In the case where the activity is an indoor tour,
          // we remove the entries that don't have altitude data.
+         // Except for the first and last entries that are the start and end
+         // time when the user has started and stopped the activity.
          if (currentTimeData.marker == 0 &&
+               (StringUtils.isNullOrEmpty(currentTimeData.markerLabel) ||
+                     (!currentTimeData.markerLabel.equals(EndOfTour) &&
+                           !currentTimeData.markerLabel.equals(StartOfTour))) &&
                (!isIndoorTour && currentTimeData.longitude == Double.MIN_VALUE && currentTimeData.latitude == Double.MIN_VALUE) ||
                (isIndoorTour && currentTimeData.absoluteAltitude == Float.MIN_VALUE) ||
                currentTimeData.absoluteTime == previousAbsoluteTime) {
@@ -153,9 +164,54 @@ public class SuuntoJsonProcessor {
          }
       }
 
+      final TimeData firstTimeData = activityData.get(0);
+      firstTimeData.markerLabel = UI.EMPTY_STRING;
+
+      if (firstTimeData.longitude == Double.MIN_VALUE &&
+            firstTimeData.latitude == Double.MIN_VALUE &&
+            firstTimeData.absoluteAltitude == Float.MIN_VALUE) {
+
+         //We copy the lat/lon/altitude from the first time data so that this very first
+         //time data is taken into account.
+         //NOTE: Movescount does the same in their FIT file.
+
+         for (int index = 0; index > activityData.size(); ++index) {
+            final TimeData currentTimeData = activityData.get(index);
+            if (currentTimeData.latitude != Double.MIN_VALUE) {
+               firstTimeData.latitude = currentTimeData.latitude;
+               firstTimeData.longitude = currentTimeData.longitude;
+               firstTimeData.absoluteAltitude = currentTimeData.absoluteAltitude;
+
+               break;
+            }
+         }
+      }
+
+      final TimeData lastTimeData = activityData.get(activityData.size() - 1);
+      lastTimeData.markerLabel = UI.EMPTY_STRING;
+
+      if (lastTimeData.longitude == Double.MIN_VALUE &&
+            lastTimeData.latitude == Double.MIN_VALUE &&
+            lastTimeData.absoluteAltitude == Float.MIN_VALUE) {
+
+         //We copy the lat/lon/altitude from the last time data so that this very last
+         //time data is taken into account.
+         //NOTE: Movescount does the same in their FIT file.
+
+         for (int index = activityData.size() - 1; index > -1; --index) {
+            final TimeData currentTimeData = activityData.get(index);
+            if (currentTimeData.latitude != Double.MIN_VALUE) {
+               lastTimeData.latitude = currentTimeData.latitude;
+               lastTimeData.longitude = currentTimeData.longitude;
+               lastTimeData.absoluteAltitude = currentTimeData.absoluteAltitude;
+
+               break;
+            }
+         }
+      }
+
       // If the activity contains laps, we need to close the last lap.
-      if (_numLaps != 0) {
-         final TimeData lastTimeData = activityData.get(activityData.size() - 1);
+      if (_numLaps > 0) {
          lastTimeData.marker = 1;
          lastTimeData.markerLabel = Integer.toString(++_numLaps);
       }
@@ -257,14 +313,14 @@ public class SuuntoJsonProcessor {
          reusePreviousTimeEntry = false;
          TimeData timeData = null;
 
-         ZonedDateTime currentZonedDateTime = ZonedDateTime.parse(sampleTime);
-         currentZonedDateTime = currentZonedDateTime.truncatedTo(ChronoUnit.SECONDS);
+         final ZonedDateTime currentZonedDateTime = ZonedDateTime.parse(sampleTime);
+         ZonedDateTime adjustedCurrentZonedDateTime = currentZonedDateTime.truncatedTo(ChronoUnit.SECONDS);
          // Rounding to the nearest second.
          if (Character.getNumericValue(sampleTime.charAt(20)) >= 5) {
-            currentZonedDateTime = currentZonedDateTime.plusSeconds(1);
+            adjustedCurrentZonedDateTime = adjustedCurrentZonedDateTime.plusSeconds(1);
          }
 
-         final long currentTime = currentZonedDateTime.toInstant().toEpochMilli();
+         final long currentTime = adjustedCurrentZonedDateTime.toInstant().toEpochMilli();
 
          if (currentSampleData.toString().contains(TAG_RR)) {
             BuildRRDataList(_allRRData, currentSampleSml);
@@ -299,20 +355,16 @@ public class SuuntoJsonProcessor {
          }
 
          if (currentSampleData.contains(TAG_PAUSE)) {
-            if (!isPaused) {
-               if (currentSampleData.contains(Boolean.TRUE.toString())) {
-                  isPaused = true;
-                  pauseStartTime = currentZonedDateTime;
-               }
-            } else {
-               if (currentSampleData.contains(Boolean.FALSE.toString())) {
-                  isPaused = false;
+            if (!isPaused && currentSampleData.contains(Boolean.TRUE.toString())) {
+               isPaused = true;
+               pauseStartTime = currentZonedDateTime;
+            } else if (currentSampleData.contains(Boolean.FALSE.toString())) {
+               isPaused = false;
 
-                  final TourTimerPause timerPause = new TourTimerPause(tourData,
-                        pauseStartTime.toEpochSecond() * 1000,
-                        currentZonedDateTime.toEpochSecond() * 1000);
-                  _timerPauses.add(timerPause);
-               }
+               final TourTimerPause timerPause = new TourTimerPause(tourData,
+                     pauseStartTime.toEpochSecond() * 1000,
+                     currentZonedDateTime.toEpochSecond() * 1000);
+               _timerPauses.add(timerPause);
             }
          }
 
@@ -320,13 +372,30 @@ public class SuuntoJsonProcessor {
          //the pause date because in the JSON file, the samples are
          //not necessarily in chronological order and we could have
          //the potential to miss data.
-         if (isPaused && currentZonedDateTime.isAfter(pauseStartTime)) {
-            continue;
+         if (isPaused) {
+
+            //We need to create a time slice for when the user stops the activity.
+            if (currentSampleData.contains(TAG_LAP) &&
+                  currentSampleData.contains(TAG_TYPE) &&
+                  currentSampleData.contains(TAG_STOP)) {
+
+               //We use the time stamp when the user stopped the activity "TAG_PAUSE",
+               //NOT when the user saved the activity (TAG_STOP)
+               timeData.absoluteTime = pauseStartTime.toEpochSecond() * 1000;
+               timeData.markerLabel = EndOfTour;
+
+               _sampleList.add(timeData);
+            }
+
+            if (currentZonedDateTime.isAfter(pauseStartTime)) {
+               continue;
+            }
          }
 
          if (currentSampleData.contains(TAG_LAP) &&
                (currentSampleData.contains(TAG_MANUAL) ||
                      currentSampleData.contains(TAG_DISTANCE))) {
+
             timeData.marker = 1;
             timeData.markerLabel = Integer.toString(++_numLaps);
             if (!reusePreviousTimeEntry) {
@@ -430,6 +499,12 @@ public class SuuntoJsonProcessor {
 
          final ZonedDateTime startTime = ZonedDateTime.parse(firstSample.get(TAG_TIMEISO8601).toString());
          tourData.setTourStartTime(startTime);
+
+         //We use the time stamp when the user started the activity "TAG_START",
+         final TimeData startTimeData = new TimeData();
+         startTimeData.absoluteTime = startTime.toEpochSecond() * 1000;
+         startTimeData.markerLabel = StartOfTour;
+         _sampleList.add(startTimeData);
 
       } else if (activityToReUse != null) {
 
@@ -619,7 +694,7 @@ public class SuuntoJsonProcessor {
 
       final String swimmingType = TryRetrieveStringElementValue(
             swimmingSample,
-            Type);
+            TAG_TYPE);
 
       switch (swimmingType) {
       case Stroke:
