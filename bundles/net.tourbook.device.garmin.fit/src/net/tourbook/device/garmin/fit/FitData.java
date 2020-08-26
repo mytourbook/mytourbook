@@ -470,6 +470,8 @@ public class FitData {
 
    private void finalizeTour_TimerPauses(final TourData tourData) {
       if (_tourTimerPauses.size() == 0) {
+
+         _tourData.setTourRecordedTime(_tourData.getTourElapsedTime() - _tourData.getTourPausedTime());
          return;
       }
 
