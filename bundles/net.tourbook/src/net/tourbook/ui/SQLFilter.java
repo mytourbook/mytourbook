@@ -146,16 +146,19 @@ public class SQLFilter {
        */
       _isTagFilterActive = false;
 
-      if (appFilter.contains(SQLAppFilter.Tag)) {
+      if (TourTagFilterManager.isTourTagFilterEnabled() && TourTagFilterManager.getSelectedProfile().isOrOperator) {
 
-         final SQLFilterData tourTagSqlData = TourTagFilterManager.getSQL();
+         if (appFilter.contains(SQLAppFilter.Tag)) {
 
-         if (tourTagSqlData != null) {
+            final SQLFilterData tourTagSqlData = TourTagFilterManager.getSQL();
 
-            _isTagFilterActive = true;
+            if (tourTagSqlData != null) {
 
-            sb.append(tourTagSqlData.getWhereString());
-            _parameters.addAll(tourTagSqlData.getParameters());
+               _isTagFilterActive = true;
+
+               sb.append(tourTagSqlData.getWhereString());
+               _parameters.addAll(tourTagSqlData.getParameters());
+            }
          }
       }
 

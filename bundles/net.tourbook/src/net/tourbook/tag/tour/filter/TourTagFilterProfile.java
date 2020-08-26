@@ -32,7 +32,15 @@ public class TourTagFilterProfile implements Cloneable {
     */
    String              name         = Messages.Tour_Filter_Default_ProfileName;
 
+   /**
+    * Contains all tag id's for this profile
+    */
    public TLongHashSet tagFilterIds = new TLongHashSet();
+
+   /**
+    * When <code>true</code> (default) then the tags are OR'ed otherwise they are AND'ed
+    */
+   public boolean      isOrOperator = TourTagFilterManager.ATTR_IS_OR_OPERATOR_DEFAULT;
 
    public TourTagFilterProfile() {
 

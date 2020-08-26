@@ -40,38 +40,40 @@ import org.osgi.framework.Version;
 
 public class TourTagFilterManager {
 
-   private static final String                    TOUR_FILTER_FILE_NAME    = "tour-tag-filter.xml";                  //$NON-NLS-1$
-   private static final int                       TOUR_FILTER_VERSION      = 1;
+   private static final String                    TOUR_FILTER_FILE_NAME       = "tour-tag-filter.xml";                  //$NON-NLS-1$
+   private static final int                       TOUR_FILTER_VERSION         = 1;
 
-   private static final String                    TAG_PROFILE              = "Profile";                              //$NON-NLS-1$
-   private static final String                    TAG_ROOT                 = "TourTagFilterProfiles";                //$NON-NLS-1$
+   private static final String                    TAG_PROFILE                 = "Profile";                              //$NON-NLS-1$
+   private static final String                    TAG_ROOT                    = "TourTagFilterProfiles";                //$NON-NLS-1$
 
-   private static final String                    ATTR_TOUR_FILTER_VERSION = "tourTagFilterVersion";                 //$NON-NLS-1$
-   private static final String                    ATTR_IS_SELECTED         = "isSelected";                           //$NON-NLS-1$
-   private static final String                    ATTR_NAME                = "name";                                 //$NON-NLS-1$
-   private static final String                    ATTR_TAG_ID              = "tagIds";                               //$NON-NLS-1$
+   private static final String                    ATTR_TOUR_FILTER_VERSION    = "tourTagFilterVersion";                 //$NON-NLS-1$
+   private static final String                    ATTR_IS_OR_OPERATOR         = "isOrOperator";                         //$NON-NLS-1$
+   static final boolean                           ATTR_IS_OR_OPERATOR_DEFAULT = true;
+   private static final String                    ATTR_IS_SELECTED            = "isSelected";                           //$NON-NLS-1$
+   private static final String                    ATTR_NAME                   = "name";                                 //$NON-NLS-1$
+   private static final String                    ATTR_TAG_ID                 = "tagIds";                               //$NON-NLS-1$
 
-   private static final String                    PARAMETER_FIRST          = " ?";                                   //$NON-NLS-1$
-   private static final String                    PARAMETER_FOLLOWING      = ", ?";                                  //$NON-NLS-1$
+   private static final String                    PARAMETER_FIRST             = " ?";                                   //$NON-NLS-1$
+   private static final String                    PARAMETER_FOLLOWING         = ", ?";                                  //$NON-NLS-1$
 
-   private static final Bundle                    _bundle                  = TourbookPlugin.getDefault().getBundle();
+   private static final Bundle                    _bundle                     = TourbookPlugin.getDefault().getBundle();
 
-   private static final IPath                     _stateLocation           = Platform.getStateLocation(_bundle);
-   private static final IPreferenceStore          _prefStore               = TourbookPlugin.getPrefStore();
+   private static final IPath                     _stateLocation              = Platform.getStateLocation(_bundle);
+   private static final IPreferenceStore          _prefStore                  = TourbookPlugin.getPrefStore();
 
    private static boolean                         _isTourTagFilterEnabled;
 
    /**
     * Contains all available profiles.
     */
-   private static ArrayList<TourTagFilterProfile> _filterProfiles          = new ArrayList<>();
+   private static ArrayList<TourTagFilterProfile> _filterProfiles             = new ArrayList<>();
 
    /**
     * Contains the selected profile or <code>null</code> when a profile is not selected.
     */
    private static TourTagFilterProfile            _selectedProfile;
 
-   private static int[]                           _fireEventCounter        = new int[1];
+   private static int[]                           _fireEventCounter           = new int[1];
 
    private static ActionTourTagFilter             _actionTourTagFilter;
 
@@ -133,23 +135,42 @@ public class TourTagFilterManager {
       }
 
       final ArrayList<Object> sqlParameters = new ArrayList<>();
+      String sqlWhere;
 
-      boolean isFirst = true;
-      final StringBuilder parameterTagIds = new StringBuilder();
+      if (_selectedProfile.isOrOperator) {
 
-      for (final long tagId : tagIds) {
+         // combine tags with OR
 
-         if (isFirst) {
-            isFirst = false;
-            parameterTagIds.append(PARAMETER_FIRST);
-         } else {
-            parameterTagIds.append(PARAMETER_FOLLOWING);
+         boolean isFirst = true;
+         final StringBuilder parameterTagIds = new StringBuilder();
+
+         for (final long tagId : tagIds) {
+
+            if (isFirst) {
+               isFirst = false;
+               parameterTagIds.append(PARAMETER_FIRST);
+            } else {
+               parameterTagIds.append(PARAMETER_FOLLOWING);
+            }
+
+            sqlParameters.add(tagId);
          }
 
-         sqlParameters.add(tagId);
-      }
+         sqlWhere = " AND jTdataTtag.TourTag_tagId IN (" + parameterTagIds.toString() + ")" + UI.NEW_LINE; //$NON-NLS-1$ //$NON-NLS-2$
 
-      final String sqlWhere = " AND jTdataTtag.TourTag_tagId IN (" + parameterTagIds.toString() + ")" + UI.NEW_LINE; //$NON-NLS-1$ //$NON-NLS-2$
+      } else {
+
+         /*
+          * Combine tags with AND, this cannot simply be done by using AND operatore, it is done in
+          * the data loader with an inner join -> complicated
+          */
+         for (final long tagId : tagIds) {
+
+            sqlParameters.add(tagId);
+         }
+
+         sqlWhere = UI.EMPTY_STRING;
+      }
 
       return new SQLFilterData(sqlWhere, sqlParameters);
    }
@@ -200,6 +221,7 @@ public class TourTagFilterManager {
                   final TourTagFilterProfile tagFilterProfile = new TourTagFilterProfile();
 
                   tagFilterProfile.name = Util.getXmlString(xmlProfile, ATTR_NAME, UI.EMPTY_STRING);
+                  tagFilterProfile.isOrOperator = Util.getXmlBoolean(xmlProfile, ATTR_IS_OR_OPERATOR, true);
 
                   _filterProfiles.add(tagFilterProfile);
 
@@ -278,6 +300,7 @@ public class TourTagFilterManager {
             final IMemento xmlProfile = xmlRoot.createChild(TAG_PROFILE);
 
             xmlProfile.putString(ATTR_NAME, tagFilterProfile.name);
+            xmlProfile.putBoolean(ATTR_IS_OR_OPERATOR, tagFilterProfile.isOrOperator);
 
             // set flag for active profile
             if (tagFilterProfile == _selectedProfile) {
