@@ -46,9 +46,11 @@ import net.tourbook.common.color.MapUnits;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.util.ImageConverter;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourReference;
+import net.tourbook.data.TourTimerPause;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.map2.Messages;
 import net.tourbook.map3.layer.TourLegendLabel;
@@ -520,7 +522,7 @@ public class TourMapPainter extends MapPainter {
 
          if (isDrawVertical) {
 
-            // vertial legend
+            // vertical legend
             g2.drawLine(contentX, devValue, contentWidth, devValue);
 
          } else {
@@ -713,7 +715,7 @@ public class TourMapPainter extends MapPainter {
 
          if (isDrawVertical) {
 
-            // vertial legend
+            // vertical legend
 
             gc.drawLine(contentX, devValue, contentWidth, devValue);
 
@@ -978,7 +980,7 @@ public class TourMapPainter extends MapPainter {
                if (tourData == prevTourData) {
 
                   /*
-                   * This can occure when a compared tour is compared with it's own reference tour
+                   * This can occur when a compared tour is compared with it's own reference tour
                    * -> paint 2nd time as normal tour
                    */
                   isGeoCompareRefTour = false;
@@ -1062,9 +1064,10 @@ public class TourMapPainter extends MapPainter {
          _colorCache.dispose();
       }
 
-      if (_tourPaintConfig.isShowTourMarker || _tourPaintConfig.isShowWayPoints) {
+      if (_tourPaintConfig.isShowTourMarker || _tourPaintConfig.isShowWayPoints ||
+            _tourPaintConfig.isShowTourPauses) {
 
-         // draw marker above the tour
+         // draw marker/pauses above the tour
 
          for (final TourData tourData : tourDataList) {
 
@@ -1094,9 +1097,22 @@ public class TourMapPainter extends MapPainter {
                      longitudeSerie);
             }
 
+            if (_tourPaintConfig.isShowTourPauses) {
+
+               isContentInTile = doPaint_Pauses(
+                     gcTile,
+                     map,
+                     tile,
+                     parts,
+                     isContentInTile,
+                     tourData,
+                     latitudeSerie,
+                     longitudeSerie);
+            }
+
             if (_tourPaintConfig.isShowWayPoints) {
 
-               // ckeck if way points are available
+               // check if way points are available
                final Set<TourWayPoint> wayPoints = tourData.getTourWayPoints();
                if (wayPoints.size() > 0) {
 
@@ -1218,7 +1234,7 @@ public class TourMapPainter extends MapPainter {
             final TourMarker tourMarker = allTourMarkers.get(markerIndex);
 
             // skip marker when hidden or not set
-            if (tourMarker.isMarkerVisible() == false || tourMarker.getLabel().length() == 0) {
+            if (tourMarker.isMarkerVisible() == false || StringUtils.isNullOrEmpty(tourMarker.getLabel())) {
                continue;
             }
 
@@ -1246,7 +1262,7 @@ public class TourMapPainter extends MapPainter {
 
          final ArrayList<TourMarker> sortedMarkers = tourData.getTourMarkersSorted();
 
-         // ckeck if markers are available
+         // check if markers are available
          if (sortedMarkers.size() > 0) {
 
             // draw tour marker
@@ -1256,7 +1272,7 @@ public class TourMapPainter extends MapPainter {
             for (final TourMarker tourMarker : sortedMarkers) {
 
                // skip marker when hidden or not set
-               if (tourMarker.isMarkerVisible() == false || tourMarker.getLabel().length() == 0) {
+               if (tourMarker.isMarkerVisible() == false || StringUtils.isNullOrEmpty(tourMarker.getLabel())) {
                   continue;
                }
 
@@ -1285,6 +1301,128 @@ public class TourMapPainter extends MapPainter {
             }
 
             isContentInTile = isContentInTile || markerCounter > 0;
+         }
+      }
+      return isContentInTile;
+   }
+
+   private boolean doPaint_Pauses(final GC gcTile,
+                                  final Map map,
+                                  final Tile tile,
+                                  final int parts,
+                                  boolean isContentInTile,
+                                  final TourData tourData,
+                                  final double[] latitudeSerie,
+                                  final double[] longitudeSerie) {
+
+      final List<TourTimerPause> tourTimerPauses = tourData.getTourTimerPauses();
+
+      // check if pauses are available
+      if (tourTimerPauses.size() == 0) {
+         return isContentInTile;
+      }
+
+      if (tourData.isMultipleTours()) {
+
+         //TODO FB support joining pauses when creating a multiple tour
+         final int[] multipleStartTimeIndex = tourData.multipleTourStartIndex;
+         final int[] multipleNumberOfMarkers = tourData.multipleNumberOfMarkers;
+//         final int[] multipleNumberOfPauses = tourData.multipleNumberOfPauses;
+
+         int tourIndex = 0;
+         int numberOfMultiMarkers = 0;
+         int tourSerieIndex = 0;
+
+         // setup first multiple tour
+         tourSerieIndex = multipleStartTimeIndex[tourIndex];
+         numberOfMultiMarkers = multipleNumberOfMarkers[tourIndex];
+
+         final ArrayList<TourMarker> allTourMarkers = tourData.multiTourMarkers;
+
+         // draw tour marker
+
+         final int markerCounter = 0;
+
+         for (int markerIndex = 0; markerIndex < allTourMarkers.size(); markerIndex++) {
+
+            while (markerIndex >= numberOfMultiMarkers) {
+
+               // setup next tour
+
+               tourIndex++;
+
+               if (tourIndex <= multipleStartTimeIndex.length - 1) {
+
+                  tourSerieIndex = multipleStartTimeIndex[tourIndex];
+                  numberOfMultiMarkers += multipleNumberOfMarkers[tourIndex];
+               }
+            }
+
+            final TourMarker tourMarker = allTourMarkers.get(markerIndex);
+
+            final int markerSerieIndex = tourSerieIndex + tourMarker.getSerieIndex();
+
+            tourMarker.setMultiTourSerieIndex(markerSerieIndex);
+
+            // draw tour marker
+//            if (drawTourPauses(
+//                  gcTile,
+//                  map,
+//                  tile,
+//                  latitudeSerie[markerSerieIndex],
+//                  longitudeSerie[markerSerieIndex],
+//                  tourMarker,
+//                  parts)) {
+//
+//               markerCounter++;
+//            }
+         }
+
+         isContentInTile = isContentInTile || markerCounter > 0;
+
+      } else {
+
+            // draw tour pauses durations
+
+            int pauseCounter = 0;
+            int serieIndex = 0;
+
+            for (final TourTimerPause tourTimerPause : tourTimerPauses) {
+
+               final long startTime = tourTimerPause.getStartTime();
+
+               for (int index = serieIndex; index < tourData.timeSerie.length; ++index) {
+
+                  final long currentTime = tourData.timeSerie[index] * 1000 + tourData.getTourStartTimeMS();
+
+                  if (currentTime == startTime || currentTime > startTime) {
+                     serieIndex = index;
+                     break;
+                  }
+               }
+
+               /*
+                * check bounds because when a tour is split, it can happen that the marker serie
+                * index is out of scope
+                */
+               if (serieIndex >= latitudeSerie.length) {
+                  continue;
+               }
+
+               // draw tour marker
+               if (drawTourPauses(
+                     gcTile,
+                     map,
+                     tile,
+                     latitudeSerie[serieIndex],
+                     longitudeSerie[serieIndex],
+                     tourTimerPause,
+                     parts)) {
+
+                  pauseCounter++;
+               }
+
+            isContentInTile = isContentInTile || pauseCounter > 0;
          }
       }
       return isContentInTile;
@@ -1924,6 +2062,79 @@ public class TourMapPainter extends MapPainter {
     * @param gcTile
     * @param map
     * @param tile
+    * @param latitude
+    * @param longitude
+    * @param tourTimerPause
+    * @param parts
+    * @return Returns <code>true</code> when pause duration has been painted
+    */
+   private boolean drawTourPauses(final GC gcTile,
+                                  final Map map,
+                                  final Tile tile,
+                                  final double latitude,
+                                  final double longitude,
+                                  final TourTimerPause tourTimerPause,
+                                  final int parts) {
+
+      final MP mp = map.getMapProvider();
+      final int zoomLevel = map.getZoom();
+      final int tileSize = mp.getTileSize();
+      final int devPartOffset = ((parts - 1) / 2) * tileSize;
+
+      // get world viewport for the current tile
+      final int worldTileX = tile.getX() * tileSize;
+      final int worldTileY = tile.getY() * tileSize;
+
+      // convert lat/long into world pixels
+      final Point worldMarkerPos = mp.geoToPixel(new GeoPosition(latitude, longitude), zoomLevel);
+
+      // convert world position into device position
+      final int devMarkerPosX = worldMarkerPos.x - worldTileX;
+      final int devMarkerPosY = worldMarkerPos.y - worldTileY;
+
+      /*
+       * create and cache marker bounds
+       */
+
+      final String pauseDuration = UI.format_hh_mm_ss(tourTimerPause.getPauseDuration() / 1000);
+      final org.eclipse.swt.graphics.Point labelExtent = gcTile.textExtent(pauseDuration);
+
+      final int bannerWidth = labelExtent.x + 2 * MARKER_MARGIN + 1;
+      final int bannerHeight = labelExtent.y + 2 * MARKER_MARGIN;
+
+      final int markerImageWidth = bannerWidth;
+      final int markerImageHeight = bannerHeight + MARKER_POLE;
+
+      final Rectangle pauseBounds = new Rectangle(bannerWidth, bannerHeight, markerImageWidth, markerImageHeight);
+
+      final boolean isPauseInTile = isBoundsInTile(pauseBounds, devMarkerPosX, devMarkerPosY, tileSize);
+      if (isPauseInTile) {
+
+         int devX;
+         int devY;
+
+         final Image tourMarkerImage = drawTourMarkerImage(gcTile.getDevice(), pauseDuration, pauseBounds);
+         {
+            devX = devMarkerPosX - pauseBounds.width / 2;
+            devY = devMarkerPosY - pauseBounds.height;
+
+            devX += devPartOffset;
+            devY += devPartOffset;
+
+            gcTile.drawImage(tourMarkerImage, devX, devY);
+         }
+         tourMarkerImage.dispose();
+
+         tile.addMarkerBounds(devX, devY, pauseBounds.x, pauseBounds.y, zoomLevel, parts);
+      }
+
+      return isPauseInTile;
+   }
+
+   /**
+    * @param gcTile
+    * @param map
+    * @param tile
     * @param twp
     * @param twpWorldPixel
     * @param parts
@@ -1976,7 +2187,7 @@ public class TourMapPainter extends MapPainter {
                parts);
 
          /*
-          * check if the way point paints into a neighbour tile
+          * check if the way point paints into a neighbor tile
           */
          if (parts > 1) {
 

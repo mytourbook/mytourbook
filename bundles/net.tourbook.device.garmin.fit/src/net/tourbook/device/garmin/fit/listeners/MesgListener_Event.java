@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,12 +15,15 @@
  *******************************************************************************/
 package net.tourbook.device.garmin.fit.listeners;
 
+import com.garmin.fit.Event;
 import com.garmin.fit.EventMesg;
 import com.garmin.fit.EventMesgListener;
+import com.garmin.fit.EventType;
 
 import java.util.List;
 
 import net.tourbook.data.GearData;
+import net.tourbook.data.TourTimerPause;
 import net.tourbook.device.garmin.fit.FitData;
 
 /**
@@ -28,17 +31,49 @@ import net.tourbook.device.garmin.fit.FitData;
  */
 public class MesgListener_Event extends AbstractMesgListener implements EventMesgListener {
 
-   List<GearData> _gearData;
+   List<GearData>       _gearData;
+   List<TourTimerPause> _timerPauses;
 
    public MesgListener_Event(final FitData fitData) {
 
       super(fitData);
 
       _gearData = fitData.getGearData();
+      _timerPauses = fitData.getTourTimerPauses();
    }
 
+   @SuppressWarnings("incomplete-switch")
    @Override
    public void onMesg(final EventMesg mesg) {
+
+      final Event event = mesg.getEvent();
+      final EventType eventType = mesg.getEventType();
+      if (event != null && event == Event.TIMER && eventType != null) {
+
+         switch (eventType) {
+         case STOP:
+         case STOP_ALL:
+            //TODO FB remove
+            System.out.print("STOP:");
+            System.out.println(mesg.getTimestamp());
+            //Get total_timer_time field Units: s Comment: Exclude pauses
+
+            final TourTimerPause tourTimerPause = new TourTimerPause();
+            tourTimerPause.setStartTime(mesg.getTimestamp().getTimestamp() * 1000);
+            _timerPauses.add(tourTimerPause);
+            break;
+
+         case START:
+            //TODO FB remove
+            System.out.print("START: ");
+            System.out.println(mesg.getTimestamp());
+            if (_timerPauses.size() > 0) {
+               _timerPauses.get(_timerPauses.size() - 1).setEndTime(mesg.getTimestamp().getTimestamp() * 1000);
+            }
+            break;
+
+         }
+      }
 
       final Long gearChangeData = mesg.getGearChangeData();
 

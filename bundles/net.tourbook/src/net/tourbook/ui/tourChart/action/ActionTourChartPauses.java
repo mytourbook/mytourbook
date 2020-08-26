@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2020 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,34 +13,31 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.ui.views.calendar;
+package net.tourbook.ui.tourChart.action;
 
-public enum FormatterID {
+import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.ui.tourChart.TourChart;
 
-   EMPTY, //
+import org.eclipse.jface.action.Action;
 
-   TOUR_TITLE, //
-   TOUR_DESCRIPTION, //
 
-   DISTANCE, //
-   ELEVATION, //
-   ELEVATION_CHANGE, //
+public class ActionTourChartPauses extends Action {
 
-   CADENCE_ZONES_TIMES, //
+   private TourChart _tourChart;
 
-   SPEED, //
-   PACE, //
+   public ActionTourChartPauses(final TourChart tourChart) {
 
-   POWER_AVG, //
-   PULSE_AVG, //
+      super(Messages.Tour_Action_Show_Tour_Pauses, AS_RADIO_BUTTON);
 
-   ENERGY_KCAL, //
-   ENERGY_MJ, //
+      _tourChart = tourChart;
 
-   TIME_ELAPSED, //
-   TIME_RECORDED, //
-   TIME_PAUSED, //
-   TIME_MOVING, //
-   TIME_BREAK, //
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TourPauses));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Messages.Image__TourPauses_disabled));
+   }
 
+   @Override
+   public void run() {
+      _tourChart.actionShowTourChartPauses(isChecked());
+   }
 }

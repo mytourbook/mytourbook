@@ -18,5 +18,6 @@ Import-Package: net.tourbook.common,
  net.tourbook.common.util,
  net.tourbook.data,
  net.tourbook.importdata,
- net.tourbook.ui
+ net.tourbook.ui,
+ org.joda.time
 Automatic-Module-Name: net.tourbook.device.garmin

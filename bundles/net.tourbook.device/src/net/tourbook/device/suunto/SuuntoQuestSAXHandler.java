@@ -578,7 +578,8 @@ public class SuuntoQuestSAXHandler extends DefaultHandler {
          _newlyImportedTours.put(tourId, tourData);
 
          // create additional data
-         tourData.computeTourDrivingTime();
+         tourData.setTourRecordedTime(tourData.getTourElapsedTime());
+         tourData.computeTourMovingTime();
          tourData.computeComputedValues();
       }
 

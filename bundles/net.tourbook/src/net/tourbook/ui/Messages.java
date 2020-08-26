@@ -61,6 +61,12 @@ public class Messages extends NLS {
    public static String        ColumnFactory_BreakTime_Header;
    public static String        ColumnFactory_BreakTime_Label;
    public static String        ColumnFactory_BreakTime_Tooltip;
+   public static String        ColumnFactory_break_time_relative_label;
+   public static String        ColumnFactory_break_relative_time;
+   public static String        ColumnFactory_break_time_relative_tooltip;
+   public static String        ColumnFactory_break_time;
+   public static String        ColumnFactory_break_time_label;
+   public static String        ColumnFactory_break_time_tooltip;
    public static String        ColumnFactory_cadence;
    public static String        ColumnFactory_cadence_label;
    public static String        ColumnFactory_cadence_tooltip;
@@ -114,11 +120,8 @@ public class Messages extends NLS {
    public static String        ColumnFactory_max_speed_tooltip;
    public static String        ColumnFactory_pace_label;
    public static String        ColumnFactory_pace_tooltip;
-   public static String        ColumnFactory_paused_relative_time;
    public static String        ColumnFactory_paused_time;
    public static String        ColumnFactory_paused_time_label;
-   public static String        ColumnFactory_paused_time_relative_label;
-   public static String        ColumnFactory_paused_time_relative_tooltip;
    public static String        ColumnFactory_paused_time_tooltip;
    public static String        ColumnFactory_power;
    public static String        ColumnFactory_power_label;
@@ -130,6 +133,9 @@ public class Messages extends NLS {
    public static String        ColumnFactory_pulse_difference;
    public static String        ColumnFactory_pulse_label;
    public static String        ColumnFactory_pulse_tooltip;
+   public static String        ColumnFactory_recorded_time;
+   public static String        ColumnFactory_recorded_time_label;
+   public static String        ColumnFactory_recorded_time_tooltip;
    public static String        ColumnFactory_recording_time;
    public static String        ColumnFactory_recording_time_label;
    public static String        ColumnFactory_recording_time_tooltip;
@@ -505,7 +511,9 @@ public class Messages extends NLS {
    public static String        Tour_Tooltip_Label_MaxSpeed;
    public static String        Tour_Tooltip_Label_MovingTime;
    public static String        Tour_Tooltip_Label_NoTour;
-   public static String        Tour_Tooltip_Label_RecordingTime;
+   public static String        Tour_Tooltip_Label_ElapsedTime;
+   public static String        Tour_Tooltip_Label_PausedTime;
+   public static String        Tour_Tooltip_Label_RecordedTime;
    public static String        Tour_Tooltip_Label_RestPulse;
    public static String        Tour_Tooltip_Label_RunDyn_StanceTime_Avg;
    public static String        Tour_Tooltip_Label_RunDyn_StanceTime_Max;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2019, 2020 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -139,9 +139,9 @@ public class HistoricalWeatherRetriever {
 
       if (_isLogWeatherData) {
 
-         final long recordingTime = tour.getTourRecordingTime();
+         final long elapsedTime = tour.getTourElapsedTime();
          final ZonedDateTime zdtTourStart = tour.getTourStartTime();
-         final ZonedDateTime zdtTourEnd = zdtTourStart.plusSeconds(recordingTime);
+         final ZonedDateTime zdtTourEnd = zdtTourStart.plusSeconds(elapsedTime);
          final String tourTitle = tour.getTourTitle();
 
          System.out.println();

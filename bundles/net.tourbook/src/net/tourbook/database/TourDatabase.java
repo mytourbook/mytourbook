@@ -67,6 +67,7 @@ import net.tourbook.data.TourPhoto;
 import net.tourbook.data.TourReference;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
+import net.tourbook.data.TourTimerPause;
 import net.tourbook.data.TourType;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -101,8 +102,9 @@ public class TourDatabase {
    /**
     * Version for the database which is required that the tourbook application works successfully
     */
-   private static final int TOURBOOK_DB_VERSION = 41;
+   private static final int TOURBOOK_DB_VERSION = 42;
 
+//   private static final int TOURBOOK_DB_VERSION = 41; // 20.8
 //   private static final int TOURBOOK_DB_VERSION = 40; // 19.10
 //   private static final int TOURBOOK_DB_VERSION = 39; // 19.7
 //   private static final int TOURBOOK_DB_VERSION = 38; // 19.6
@@ -164,6 +166,7 @@ public class TourDatabase {
    public static final String  TABLE_TOUR_REFERENCE                       = "TOURREFERENCE";                                         //$NON-NLS-1$
    public static final String  TABLE_TOUR_TAG                             = "TOURTAG";                                               //$NON-NLS-1$
    public static final String  TABLE_TOUR_TAG_CATEGORY                    = "TOURTAGCATEGORY";                                       //$NON-NLS-1$
+   public static final String  TABLE_TOUR_TIMER_PAUSE                     = "TOURTIMERPAUSE";                                        //$NON-NLS-1$
    public static final String  TABLE_TOUR_TYPE                            = "TOURTYPE";                                              //$NON-NLS-1$
    public static final String  TABLE_TOUR_WAYPOINT                        = "TOURWAYPOINT";                                          //$NON-NLS-1$
    public static final String  TABLE_TOUR_GEO_PARTS                       = "TourGeoParts";                                          //$NON-NLS-1$
@@ -199,6 +202,7 @@ public class TourDatabase {
    public static final String                             ENTITY_ID_REF                   = "RefID";                                                //$NON-NLS-1$
    public static final String                             ENTITY_ID_TAG                   = "TagID";                                                //$NON-NLS-1$
    public static final String                             ENTITY_ID_TAG_CATEGORY          = "TagCategoryID";                                        //$NON-NLS-1$
+   public static final String                             ENTITY_ID_TIMERPAUSE            = "timerPauseId";                                         //$NON-NLS-1$
    public static final String                             ENTITY_ID_TOUR                  = "TourID";                                               //$NON-NLS-1$
    public static final String                             ENTITY_ID_TYPE                  = "TypeID";                                               //$NON-NLS-1$
    public static final String                             ENTITY_ID_WAY_POINT             = "WayPointID";                                           //$NON-NLS-1$
@@ -3111,11 +3115,19 @@ public class TourDatabase {
             //
             // version 40 end
 
-            // version 41 start  -  20.5
+            // version 41 start  -  20.8
             //
             + " maxPace                               FLOAT DEFAULT 0,                  \n" //$NON-NLS-1$
             //
             // version 41 end
+
+            // version 42 start  -  20.X
+            //
+            + " tourTimerPauses                               BLOB,                  \n" //$NON-NLS-1$
+            + " tourRecordedTime                              BIGINT,                  \n" //$NON-NLS-1$
+            + " tourPausedTime                                BIGINT,                  \n" //$NON-NLS-1$
+            //
+            // version 42 end
 
             //            // version 35 start  -  18.?
             //            //
@@ -3543,6 +3555,29 @@ public class TourDatabase {
                   + "   FOREIGN KEY (" + KEY_TAG_CATEGORY + "2)                                       \n"//$NON-NLS-1$ //$NON-NLS-2$
                   + "   REFERENCES " + TABLE_TOUR_TAG_CATEGORY + " (" + ENTITY_ID_TAG_CATEGORY + ")   \n"//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
       );
+   }
+
+   /**
+    * Create table {@link #TABLE_TOUR_TIMER_PAUSE} for {@link TourTimerPause}.
+    *
+    * @param stmt
+    * @throws SQLException
+    */
+   private void createTable_TourTimerPauses(final Statement stmt) throws SQLException {
+
+      /*
+       * CREATE TABLE TourTimerPause
+       */
+      exec(stmt, "CREATE TABLE " + TABLE_TOUR_TIMER_PAUSE + "   (                           \n" //$NON-NLS-1$ //$NON-NLS-2$
+      //
+            + SQL.CreateField_EntityId(ENTITY_ID_TIMERPAUSE, true)
+            //
+            + "   " + KEY_TOUR + "         BIGINT,                                          \n" //$NON-NLS-1$ //$NON-NLS-2$
+            //
+            + "   startTime      BIGINT   NOT NULL,                                        \n" //$NON-NLS-1$
+            + "   endTime        BIGINT   NOT NULL                                        \n" //$NON-NLS-1$
+
+            + ")"); //$NON-NLS-1$
    }
 
    /**
@@ -4280,6 +4315,8 @@ public class TourDatabase {
 //            createTable_TourSign(stmt);
 //            createTable_TourSignCategory(stmt);
 
+            createTable_TourTimerPauses(stmt);
+
          } catch (final SQLException e) {
             UI.showSQLException(e);
          }
@@ -4856,6 +4893,13 @@ public class TourDatabase {
             currentDbVersion = newVersion = updateDbDesign_040_to_041(conn, splashManager);
          }
 
+         // 41 -> 42
+         boolean isPostUpdate42 = false;
+         if (currentDbVersion == 41) {
+            currentDbVersion = newVersion = updateDbDesign_041_to_042(conn, splashManager);
+            isPostUpdate42 = true;
+         }
+
          /*
           * Update version number
           */
@@ -4910,6 +4954,9 @@ public class TourDatabase {
          }
          if (isPostUpdate40) {
             updateDbDesign_039_to_040_PostUpdate(conn, splashManager);
+         }
+         if (isPostUpdate42) {
+            updateDbDesign_041_to_042_PostUpdate(conn, splashManager);
          }
 
       } catch (final SQLException e) {
@@ -7452,6 +7499,39 @@ public class TourDatabase {
       return newDbVersion;
    }
 
+   private int updateDbDesign_041_to_042(final Connection conn, final SplashManager splashManager) throws SQLException {
+      final int newDbVersion = 42;
+
+      logDb_UpdateStart(newDbVersion);
+      updateMonitor(splashManager, newDbVersion);
+
+      final Statement stmt = conn.createStatement();
+      {
+         // double check if db is already updated
+         if (isTableAvailable(conn, TABLE_TOUR_TIMER_PAUSE) == false) {
+
+            createTable_TourTimerPauses(stmt);
+         }
+
+         // check if db is updated to version 42
+         if (isColumnAvailable(conn, TABLE_TOUR_DATA, "tourRecordedTime") == false) { //$NON-NLS-1$
+
+// SET_FORMATTING_OFF
+
+            // Add new columns
+            SQL.AddCol_BigInt(stmt, TABLE_TOUR_DATA, "tourRecordedTime",          DEFAULT_0);                            //$NON-NLS-1$
+            SQL.AddCol_BigInt(stmt, TABLE_TOUR_DATA, "tourPausedTime",          DEFAULT_0);                            //$NON-NLS-1$
+
+// SET_FORMATTING_ON
+         }
+      }
+      stmt.close();
+
+      logDb_UpdateEnd(newDbVersion);
+
+      return newDbVersion;
+   }
+
 //   private int updateDbDesign_034_to_035(final Connection conn, final IProgressMonitor monitor) throws SQLException {
 //
 //      final int newDbVersion = 35;
@@ -7559,6 +7639,28 @@ public class TourDatabase {
 //                  "Database postupdate 34->35 in %s mm:ss", //$NON-NLS-1$
 //                  net.tourbook.common.UI.formatHhMmSs(timeDiff / 1000)));
 //   }
+
+   private void updateDbDesign_041_to_042_PostUpdate(final Connection conn, final SplashManager splashManager)
+         throws SQLException {
+
+      final long startTime = System.currentTimeMillis();
+
+      final PreparedStatement stmtUpdate = conn.prepareStatement( //
+            //
+            "UPDATE " + TABLE_TOUR_DATA //    //$NON-NLS-1$
+            //
+                  + " SET" //                     //$NON-NLS-1$
+                  //
+                  + " tourRecordedTime=tourRecordingTime"); //$NON-NLS-1$
+
+      stmtUpdate.executeUpdate();
+
+      final long timeDiff = System.currentTimeMillis() - startTime;
+
+      StatusUtil.logInfo(String.format(
+            "Database postupdate 39 -> 40 in %s mm:ss", //$NON-NLS-1$
+            net.tourbook.common.UI.formatHhMmSs(timeDiff / 1000)));
+   }
 
    private void updateDbDesign_VersionNumber(final Connection conn, final int newVersion) throws SQLException {
 

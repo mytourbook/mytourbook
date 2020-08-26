@@ -132,9 +132,19 @@ public class DataProvider_Tour_Year extends DataProvider {
          sqlDurationTime = " SUM(TourRecordingTime - TourDrivingTime),"; //$NON-NLS-1$
          break;
 
-      case RECORDING:
+      case ELAPSED:
 
          sqlDurationTime = " SUM(TourRecordingTime),"; //$NON-NLS-1$
+         break;
+
+      case PAUSED:
+
+         sqlDurationTime = " SUM(TourPausedTime),"; //$NON-NLS-1$
+         break;
+
+      case RECORDED:
+
+         sqlDurationTime = " SUM(TourRecordedTime),"; //$NON-NLS-1$
          break;
 
       case MOVING:
@@ -156,7 +166,9 @@ public class DataProvider_Tour_Year extends DataProvider {
             + " SUM(TourRecordingTime),   " + NL //      5 //$NON-NLS-1$
             + " SUM(TourDrivingTime),     " + NL //      6 //$NON-NLS-1$
             + " SUM(1),                   " + NL //      7 //$NON-NLS-1$
-            + " TourType_TypeId           " + NL //      8 //$NON-NLS-1$
+            + " TourType_TypeId,          " + NL //      8 //$NON-NLS-1$
+            + " SUM(tourRecordedTime),    " + NL //      9 //$NON-NLS-1$
+            + " SUM(tourPausedTime)       " + NL //     10 //$NON-NLS-1$
 
             + fromTourData
 
@@ -181,8 +193,10 @@ public class DataProvider_Tour_Year extends DataProvider {
          final float[][] dbNumTours = new float[numTourTypes][numYears];
 
          final int[][] dbDurationTime = new int[numTourTypes][numYears];
-         final int[][] dbRecordingTime = new int[numTourTypes][numYears];
-         final int[][] dbDrivingTime = new int[numTourTypes][numYears];
+         final int[][] dbElapsedTime = new int[numTourTypes][numYears];
+         final int[][] dbRecordedTime = new int[numTourTypes][numYears];
+         final int[][] dbPausedTime = new int[numTourTypes][numYears];
+         final int[][] dbMovingTime = new int[numTourTypes][numYears];
          final int[][] dbBreakTime = new int[numTourTypes][numYears];
 
          final long[][] dbTypeIds = new long[numTourTypes][numYears];
@@ -200,10 +214,12 @@ public class DataProvider_Tour_Year extends DataProvider {
             final int dbValue_Altitude = (int) (result.getInt(3) / UI.UNIT_VALUE_ALTITUDE);
             final int dbValue_Distance = (int) ((result.getInt(2) + 500) / 1000 / UI.UNIT_VALUE_DISTANCE);
             final int dbValue_Duration = result.getInt(4);
-            final int dbValue_RecordingTime = result.getInt(5);
-            final int dbValue_DrivingTime = result.getInt(6);
+            final int dbValue_ElapsedTime = result.getInt(5);
+            final int dbValue_MovingTime = result.getInt(6);
             final int dbValue_NumTours = result.getInt(7);
             final Long dbValue_TourTypeIdObject = (Long) result.getObject(8);
+            final int dbValue_RecordedTime = result.getInt(9);
+            final int dbValue_PausedTime = result.getInt(10);
 
             final int yearIndex = numYears - (lastYear - dbValue_ResultYear + 1);
 
@@ -241,12 +257,14 @@ public class DataProvider_Tour_Year extends DataProvider {
             dbDurationTime[colorIndex][yearIndex] = dbValue_Duration;
             dbNumTours[colorIndex][yearIndex] = dbValue_NumTours;
 
-            dbRecordingTime[colorIndex][yearIndex] = dbValue_RecordingTime;
-            dbDrivingTime[colorIndex][yearIndex] = dbValue_DrivingTime;
-            dbBreakTime[colorIndex][yearIndex] = dbValue_RecordingTime - dbValue_DrivingTime;
+            dbElapsedTime[colorIndex][yearIndex] = dbValue_ElapsedTime;
+            dbRecordedTime[colorIndex][yearIndex] = dbValue_RecordedTime;
+            dbPausedTime[colorIndex][yearIndex] = dbValue_PausedTime;
+            dbMovingTime[colorIndex][yearIndex] = dbValue_MovingTime;
+            dbBreakTime[colorIndex][yearIndex] = dbValue_ElapsedTime - dbValue_MovingTime;
 
             usedTourTypeIds[colorIndex] = typeId;
-            tourTypeSum[colorIndex] += dbValue_Distance + dbValue_Altitude + dbValue_RecordingTime;
+            tourTypeSum[colorIndex] += dbValue_Distance + dbValue_Altitude + dbValue_ElapsedTime;
          }
 
          final int[] years = new int[_numberOfYears];
@@ -266,8 +284,10 @@ public class DataProvider_Tour_Year extends DataProvider {
          final ArrayList<Object> durationWithData = new ArrayList<>();
          final ArrayList<Object> numToursWithData = new ArrayList<>();
 
-         final ArrayList<Object> recordingTimeWithData = new ArrayList<>();
-         final ArrayList<Object> drivingTimeWithData = new ArrayList<>();
+         final ArrayList<Object> elapsedTimeWithData = new ArrayList<>();
+         final ArrayList<Object> recordedTimeWithData = new ArrayList<>();
+         final ArrayList<Object> pausedTimeWithData = new ArrayList<>();
+         final ArrayList<Object> movingTimeWithData = new ArrayList<>();
          final ArrayList<Object> breakTimeWithData = new ArrayList<>();
 
          for (int tourTypeIndex = 0; tourTypeIndex < tourTypeSum.length; tourTypeIndex++) {
@@ -283,8 +303,10 @@ public class DataProvider_Tour_Year extends DataProvider {
                durationWithData.add(dbDurationTime[tourTypeIndex]);
                numToursWithData.add(dbNumTours[tourTypeIndex]);
 
-               recordingTimeWithData.add(dbRecordingTime[tourTypeIndex]);
-               drivingTimeWithData.add(dbDrivingTime[tourTypeIndex]);
+               elapsedTimeWithData.add(dbElapsedTime[tourTypeIndex]);
+               recordedTimeWithData.add(dbRecordedTime[tourTypeIndex]);
+               pausedTimeWithData.add(dbPausedTime[tourTypeIndex]);
+               movingTimeWithData.add(dbMovingTime[tourTypeIndex]);
                breakTimeWithData.add(dbBreakTime[tourTypeIndex]);
             }
          }
@@ -310,8 +332,10 @@ public class DataProvider_Tour_Year extends DataProvider {
             _tourDataYear.setDurationTimeLow(new int[1][numYears]);
             _tourDataYear.setDurationTimeHigh(new int[1][numYears]);
 
-            _tourDataYear.recordingTime = new int[1][numYears];
-            _tourDataYear.drivingTime = new int[1][numYears];
+            _tourDataYear.elapsedTime = new int[1][numYears];
+            _tourDataYear.recordedTime = new int[1][numYears];
+            _tourDataYear.pausedTime = new int[1][numYears];
+            _tourDataYear.movingTime = new int[1][numYears];
             _tourDataYear.breakTime = new int[1][numYears];
 
             _tourDataYear.numToursLow = new float[1][numYears];
@@ -324,8 +348,10 @@ public class DataProvider_Tour_Year extends DataProvider {
             final float[][] usedAltitude = new float[numUsedTourTypes][];
             final float[][] usedDistance = new float[numUsedTourTypes][];
             final int[][] usedDuration = new int[numUsedTourTypes][];
-            final int[][] usedRecordingTime = new int[numUsedTourTypes][];
-            final int[][] usedDrivingTime = new int[numUsedTourTypes][];
+            final int[][] usedElapsedTime = new int[numUsedTourTypes][];
+            final int[][] usedRecordedTime = new int[numUsedTourTypes][];
+            final int[][] usedPausedTime = new int[numUsedTourTypes][];
+            final int[][] usedMovingTime = new int[numUsedTourTypes][];
             final int[][] usedBreakTime = new int[numUsedTourTypes][];
             final float[][] usedNumTours = new float[numUsedTourTypes][];
 
@@ -337,8 +363,10 @@ public class DataProvider_Tour_Year extends DataProvider {
                usedDistance[index] = (float[]) distanceWithData.get(index);
 
                usedDuration[index] = (int[]) durationWithData.get(index);
-               usedRecordingTime[index] = (int[]) recordingTimeWithData.get(index);
-               usedDrivingTime[index] = (int[]) drivingTimeWithData.get(index);
+               usedElapsedTime[index] = (int[]) elapsedTimeWithData.get(index);
+               usedRecordedTime[index] = (int[]) recordedTimeWithData.get(index);
+               usedPausedTime[index] = (int[]) pausedTimeWithData.get(index);
+               usedMovingTime[index] = (int[]) movingTimeWithData.get(index);
                usedBreakTime[index] = (int[]) breakTimeWithData.get(index);
 
                usedNumTours[index] = (float[]) numToursWithData.get(index);
@@ -356,8 +384,10 @@ public class DataProvider_Tour_Year extends DataProvider {
             _tourDataYear.setDurationTimeLow(new int[numUsedTourTypes][numYears]);
             _tourDataYear.setDurationTimeHigh(usedDuration);
 
-            _tourDataYear.recordingTime = usedRecordingTime;
-            _tourDataYear.drivingTime = usedDrivingTime;
+            _tourDataYear.elapsedTime = usedElapsedTime;
+            _tourDataYear.recordedTime = usedRecordedTime;
+            _tourDataYear.pausedTime = usedPausedTime;
+            _tourDataYear.movingTime = usedMovingTime;
             _tourDataYear.breakTime = usedBreakTime;
 
             _tourDataYear.numToursLow = new float[numUsedTourTypes][numYears];

@@ -178,7 +178,12 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             + "tourEndPlace, " //                                 84    //$NON-NLS-1$
 
             // -------- AVERAGE ALTITUDE CHANGE -----------
-            + "avgAltitudeChange " //                             85    //$NON-NLS-1$
+            + "avgAltitudeChange, " //                             85    //$NON-NLS-1$
+
+            // -------- TOUR DATA -----------
+
+            + "tourRecordedTime " //                             86    //$NON-NLS-1$
+
       ;
 
       SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER = 86;
@@ -270,7 +275,9 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             + "AVG( CASE WHEN cadenceZones_DelimiterValue = 0 THEN NULL ELSE cadenceZones_DelimiterValue END ), " + NL // 24  //$NON-NLS-1$
 
             + "MIN(CASE WHEN weather_Temperature_Min = 0 THEN NULL ELSE weather_Temperature_Min END), " + NL // 25            //$NON-NLS-1$
-            + "MAX(CASE WHEN weather_Temperature_Max = 0 THEN NULL ELSE weather_Temperature_Max END)  " + NL // 26            //$NON-NLS-1$
+            + "MAX(CASE WHEN weather_Temperature_Max = 0 THEN NULL ELSE weather_Temperature_Max END), " + NL // 26            //$NON-NLS-1$
+
+            + "SUM(CAST(TourRecordedTime AS BIGINT))     " + NL // 27   //$NON-NLS-1$
       ;
 
    }
@@ -308,9 +315,11 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
    float        colBodyWeight;
    int          colRestPulse;
    //
-   long         colTourRecordingTime;
-   long         colTourDrivingTime;
-   long         colPausedTime;
+   long         colTourElapsedTime;
+   long         colTourRecordedTime;
+   long         colTourMovingTime;
+   long         colTourPausedTime;
+   long         colBreakTime;
    //
    long         colAltitudeUp;
    long         colAltitudeDown;
@@ -440,8 +449,8 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       tourItem.tourDay                 = dbDay;
 
       tourItem.colTourDistance         = result.getLong(5);
-      tourItem.colTourRecordingTime    = result.getLong(6);
-      tourItem.colTourDrivingTime      = result.getLong(7);
+      tourItem.colTourElapsedTime    = result.getLong(6);
+      tourItem.colTourMovingTime      = result.getLong(7);
       tourItem.colAltitudeUp           = result.getLong(8);
       tourItem.colAltitudeDown         = result.getLong(9);
 
@@ -570,6 +579,10 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
       tourItem.colAltitude_AvgChange                  = result.getLong(85);
 
+      // -------- TOUR DATA -----------
+
+      tourItem.colTourRecordedTime    = result.getLong(86);
+
 // SET_FORMATTING_ON
 
       // -----------------------------------------------
@@ -615,11 +628,12 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
       // compute average speed/pace, prevent divide by 0
       final long dbDistance = tourItem.colTourDistance;
-      final long dbDrivingTime = tourItem.colTourDrivingTime;
+      final long dbDrivingTime = tourItem.colTourMovingTime;
       tourItem.colAvgSpeed = dbDrivingTime == 0 ? 0 : 3.6f * dbDistance / dbDrivingTime;
       tourItem.colAvgPace = dbDistance == 0 ? 0 : dbDrivingTime * 1000 / dbDistance;
 
-      tourItem.colPausedTime = tourItem.colTourRecordingTime - tourItem.colTourDrivingTime;
+      tourItem.colTourPausedTime = tourItem.colTourElapsedTime - tourItem.colTourRecordedTime;
+      tourItem.colBreakTime = tourItem.colTourElapsedTime - tourItem.colTourMovingTime;
 
       if (UI.IS_SCRAMBLE_DATA) {
          tourItem.scrambleData();
@@ -634,8 +648,8 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
       colTourDistance                  = result.getLong(startIndex + 0);
 
-      colTourRecordingTime             = result.getLong(startIndex + 1);
-      colTourDrivingTime               = result.getLong(startIndex + 2);
+      colTourElapsedTime             = result.getLong(startIndex + 1);
+      colTourMovingTime               = result.getLong(startIndex + 2);
 
       colAltitudeUp                    = result.getLong(startIndex + 3);
       colAltitudeDown                  = result.getLong(startIndex + 4);
@@ -650,8 +664,8 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       colMaxSpeed                      = result.getFloat(startIndex + 6);
 
       // compute average speed/pace, prevent divide by 0
-      colAvgSpeed                      = colTourDrivingTime == 0 ? 0 : 3.6f * colTourDistance / colTourDrivingTime;
-      colAvgPace                       = colTourDistance == 0 ? 0 : colTourDrivingTime * 1000f / colTourDistance;
+      colAvgSpeed                      = colTourMovingTime == 0 ? 0 : 3.6f * colTourDistance / colTourMovingTime;
+      colAvgPace                       = colTourDistance == 0 ? 0 : colTourMovingTime * 1000f / colTourDistance;
 
       colMaxAltitude                   = result.getLong(startIndex + 7);
       colMaxPulse                      = result.getLong(startIndex + 8);
@@ -682,9 +696,12 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       colTemperature_Min               = result.getFloat(startIndex + 25);
       colTemperature_Max               = result.getFloat(startIndex + 26);
 
+      colTourRecordedTime  =  result.getLong(startIndex + 27);
+
 // SET_FORMATTING_ON
 
-      colPausedTime = colTourRecordingTime - colTourDrivingTime;
+      colTourPausedTime = colTourElapsedTime - colTourRecordedTime;
+      colBreakTime = colTourElapsedTime - colTourMovingTime;
 
       colSlowVsFastCadence = TourManager.generateCadenceZones_TimePercentages(cadenceZone_SlowTime, cadenceZone_FastTime);
    }

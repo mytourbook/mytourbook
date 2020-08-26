@@ -24,6 +24,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -33,12 +34,14 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourTimerPause;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.TourbookDevice;
 import net.tourbook.tour.TourLogManager;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
+import org.joda.time.DateTime;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -108,66 +111,69 @@ public class GarminSAXHandler extends DefaultHandler {
       TIME_FORMAT_RFC822.setTimeZone(TimeZone.getTimeZone("UTC")); //$NON-NLS-1$
    }
 
-   private boolean                 _importState_IsIgnoreSpeedValues;
+   private boolean                   _importState_IsIgnoreSpeedValues;
 
-   private boolean                 _isInActivity;
-   private boolean                 _isInCourse;
-   private boolean                 _isInLap;
+   private boolean                   _isInActivity;
+   private boolean                   _isInCourse;
+   private boolean                   _isInLap;
 
-   private boolean                 _isInAltitude;
-   private boolean                 _isInCalories;
-   private boolean                 _isInCadence;
-   private boolean                 _isInDistance;
-   private boolean                 _isInHeartRate;
-   private boolean                 _isInHeartRateValue;
-   private boolean                 _isInLatitude;
-   private boolean                 _isInLongitude;
-   private boolean                 _isInName;
-   private boolean                 _isInNotes;
-   private boolean                 _isInNs2Speed;
-   private boolean                 _isInNs2Watts;
-   private boolean                 _isInNs3Speed;
-   private boolean                 _isInNs3Watts;
-   private boolean                 _isInRunCadence;
-   private boolean                 _isInSensorState;
-   private boolean                 _isInTime;
-   private boolean                 _isInTrackpoint;
+   private boolean                   _isInAltitude;
+   private boolean                   _isInCalories;
+   private boolean                   _isInCadence;
+   private boolean                   _isInDistance;
+   private boolean                   _isInHeartRate;
+   private boolean                   _isInHeartRateValue;
+   private boolean                   _isInLatitude;
+   private boolean                   _isInLongitude;
+   private boolean                   _isInName;
+   private boolean                   _isInNotes;
+   private boolean                   _isInNs2Speed;
+   private boolean                   _isInNs2Watts;
+   private boolean                   _isInNs3Speed;
+   private boolean                   _isInNs3Watts;
+   private boolean                   _isInRunCadence;
+   private boolean                   _isInSensorState;
+   private boolean                   _isInTime;
+   private boolean                   _isInTrackpoint;
 
-   private boolean                 _isInCreator;
-   private boolean                 _isInCreatorName;
-   private boolean                 _isInCreatorVersionMajor;
-   private boolean                 _isInCreatorVersionMinor;
+   private boolean                   _isInCreator;
+   private boolean                   _isInCreatorName;
+   private boolean                   _isInCreatorVersionMajor;
+   private boolean                   _isInCreatorVersionMinor;
 
-   private HashMap<Long, TourData> _alreadyImportedTours;
-   private HashMap<Long, TourData> _newlyImportedTours;
-   private TourbookDevice          _device;
-   private String                  _importFilePath;
-   private boolean                 _isImported;
+   private HashMap<Long, TourData>   _alreadyImportedTours;
+   private HashMap<Long, TourData>   _newlyImportedTours;
+   private TourbookDevice            _device;
+   private String                    _importFilePath;
+   private boolean                   _isImported;
 
-   private ArrayList<TimeData>     _allTimeData = new ArrayList<>();
+   private ArrayList<TourTimerPause> _timerPauses = new ArrayList<>();
+   private boolean                   _isPreviousLapAPause;
+   private ArrayList<TimeData>       _allTimeData = new ArrayList<>();
 
-   private TimeData                _timeData;
+   private TimeData                  _timeData;
 
-   private int                     _dataVersion = -1;
-   private int                     _lapCounter;
-   private int                     _trackPointCounter;
+   private int                       _dataVersion = -1;
+   private int                       _lapCounter;
+   private int                       _trackPointCounter;
 
-   private boolean                 _isSetLapMarker;
-   private boolean                 _isSetLapStartTime;
-   private ArrayList<Long>         _allLapStart = new ArrayList<>();
+   private boolean                   _isSetLapMarker;
+   private boolean                   _isSetLapStartTime;
+   private ArrayList<Long>           _allLapStart = new ArrayList<>();
 
-   private long                    _currentTime;
-   private String                  _activitySport;
-   private int                     _tourCalories;
-   private int                     _lapCalories;
-   private boolean                 _isDistanceFromSensor;
-   private boolean                 _isFromStrideSensor;
+   private DateTime                  _currentStartTime;
+   private long                      _currentTime;
+   private String                    _activitySport;
+   private int                       _tourCalories;
+   private int                       _lapCalories;
+   private boolean                   _isDistanceFromSensor;
+   private boolean                   _isFromStrideSensor;
 
-   private StringBuilder           _characters  = new StringBuilder();
+   private StringBuilder             _characters  = new StringBuilder();
 
-   private Sport                   _sport;
-   private String                  _tourNotes;
-   private String                  _tourTitle;
+   private Sport                     _sport;
+   private String                    _tourNotes;
+   private String                    _tourTitle;
 
    private class Sport {
 
@@ -212,7 +218,7 @@ public class GarminSAXHandler extends DefaultHandler {
       final int weekYear = Util.getYearForWeek(jdkCalendar);
 
       sbJdk.append(jdkFormatter.format(dtDate));
-      sbJdk.append(" " + weekYear + " | "); //$NON-NLS-1$ //$NON-NLS-2$
+      sbJdk.append(UI.SPACE1 + weekYear + " | "); //$NON-NLS-1$
    }
 
 // private static void weekCheck() {
@@ -294,8 +300,8 @@ public class GarminSAXHandler extends DefaultHandler {
             formatDT(zonedFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
             formatDT(zonedFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
             formatDT(zonedFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
-            sbJoda.append("    "); //$NON-NLS-1$
-            sbJdk.append("    "); //$NON-NLS-1$
+            sbJoda.append(UI.SPACE4);
+            sbJdk.append(UI.SPACE4);
             formatDT(zonedFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
             formatDT(zonedFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
             formatDT(zonedFormatter, jdkFormatter, sbJdk, sbJoda, dt.plusDays(days++), calendar);
@@ -319,7 +325,7 @@ public class GarminSAXHandler extends DefaultHandler {
    /**
     * Check if date time starts with the date 2007-04-01, this can happen when the tcx file is
     * partly corrupt. When tour starts with the date 2007-04-01, move forward in the list until
-    * another date occures and use this as the start date.
+    * another date occurs and use this as the start date.
     */
    private void adjustTourStart() {
 
@@ -466,6 +472,7 @@ public class GarminSAXHandler extends DefaultHandler {
 
       _allLapStart.clear();
       _allTimeData.clear();
+      _timerPauses.clear();
    }
 
    @Override
@@ -492,6 +499,38 @@ public class GarminSAXHandler extends DefaultHandler {
 
             finalize_Trackpoint();
 
+         } else if (name.equals(TAG_DISTANCE_METERS)) {
+
+            _isInDistance = false;
+
+            try {
+               final int distance = Integer.parseInt(_characters.toString());
+
+               if (distance == 0) {
+                  final TourTimerPause timerPause = new TourTimerPause(null,
+                        _currentStartTime.getMillis(),
+                        Long.MIN_VALUE);
+
+                  _timerPauses.add(timerPause);
+                  _isPreviousLapAPause = true;
+
+               } else if (_isPreviousLapAPause) {
+
+                  if (_timerPauses.size() > 0) {
+
+                     final TourTimerPause currentPause = _timerPauses.get(_timerPauses.size() - 1);
+
+                     //In a TCX file, the first lap is always created with a distance of 0 meters.
+                     //Hence, we don't consider that a pause.
+                     if (currentPause.getStartTime() != _currentStartTime.getMillis()) {
+                        _timerPauses.get(_timerPauses.size() - 1).setEndTime(_currentStartTime.getMillis());
+                     }
+                  }
+
+                  _isPreviousLapAPause = false;
+               }
+            } catch (final NumberFormatException e) {}
+
          } else if (_isInNotes && name.equals(TAG_NOTES)) {
 
             _isInNotes = false;
@@ -509,7 +548,7 @@ public class GarminSAXHandler extends DefaultHandler {
             if (_trackPointCounter > 0) {
                /*
                 * summarize calories when at least one trackpoint is available. This will fix a bug
-                * because an invalid tcx file can contain old laps with calories but without
+                * because an invalid TCX file can contain old laps with calories but without
                 * trackpoints
                 */
                _tourCalories += _lapCalories;
@@ -530,7 +569,7 @@ public class GarminSAXHandler extends DefaultHandler {
 
             _isInName = false;
 
-            // "Name" tag occures multiple times
+            // "Name" tag occurs multiple times
             if (!_isInCreator) {
 
                _tourTitle = _characters.toString();
@@ -616,6 +655,8 @@ public class GarminSAXHandler extends DefaultHandler {
 
       tourData.createTimeSeries(_allTimeData, true);
 
+      finalizeTour_TimerPauses(tourData);
+
       // after all data are added, the tour id can be created
       final String uniqueId = _device.createUniqueId(tourData, Util.UNIQUE_ID_SUFFIX_GARMIN_TCX);
       final Long tourId = tourData.createTourId(uniqueId);
@@ -628,7 +669,7 @@ public class GarminSAXHandler extends DefaultHandler {
 
          // create additional data
          tourData.computeAltitudeUpDown();
-         tourData.computeTourDrivingTime();
+         tourData.computeTourMovingTime();
          tourData.computeComputedValues();
       }
 
@@ -662,6 +703,29 @@ public class GarminSAXHandler extends DefaultHandler {
          _isSetLapStartTime = false;
          _allLapStart.add(_currentTime);
       }
+   }
+
+   private void finalizeTour_TimerPauses(final TourData tourData) {
+
+      if (_timerPauses.size() == 0) {
+         tourData.setTourRecordedTime(tourData.getTourElapsedTime());
+         return;
+      }
+
+      final List<TourTimerPause> tourTimerPauses = new ArrayList<>();
+
+      for (final TourTimerPause tourTimerPause : _timerPauses) {
+         if (tourTimerPause.getStartTime() > 0 && tourTimerPause.getEndTime() > 0) {
+            tourTimerPause.setTourData(tourData);
+            tourTimerPauses.add(tourTimerPause);
+         }
+      }
+
+      tourData.setTourTimerPauses(tourTimerPauses);
+      final long totalTourTimerPauses = tourData.getTotalTourTimerPauses();
+
+      tourData.setTourRecordedTime(tourData.getTourElapsedTime() - totalTourTimerPauses);
+      tourData.setTourPausedTime(totalTourTimerPauses);
    }
 
    private void getData_Creator_10_Start(final String name) {
@@ -899,7 +963,7 @@ public class GarminSAXHandler extends DefaultHandler {
       }
    }
 
-   private void initialize_NewLap() {
+   private void initialize_NewLap(final String startTimeValue) {
 
       _isInLap = true;
 
@@ -911,6 +975,8 @@ public class GarminSAXHandler extends DefaultHandler {
          _isSetLapMarker = true;
       }
       _isSetLapStartTime = true;
+
+      _currentStartTime = DateTime.parse(startTimeValue);
    }
 
    private void initialize_NewTour() {
@@ -996,7 +1062,7 @@ public class GarminSAXHandler extends DefaultHandler {
 
                } else if (name.equals(TAG_LAP)) {
 
-                  initialize_NewLap();
+                  initialize_NewLap(attributes.getValue(0));
                }
 
             } else if (name.equals(TAG_COURSE) || name.equals(TAG_HISTORY)) {
@@ -1031,6 +1097,11 @@ public class GarminSAXHandler extends DefaultHandler {
                      // create new time item
                      _timeData = new TimeData();
 
+                  } else if (name.equals(TAG_DISTANCE_METERS)) {
+
+                     _isInDistance = true;
+                     _characters.delete(0, _characters.length());
+
                   } else if (name.equals(TAG_CALORIES)) {
 
                      _isInCalories = true;
@@ -1039,7 +1110,7 @@ public class GarminSAXHandler extends DefaultHandler {
 
                } else if (name.equals(TAG_LAP)) {
 
-                  initialize_NewLap();
+                  initialize_NewLap(attributes.getValue(0));
                }
 
             } else if (_isInCourse) {
@@ -1106,7 +1177,7 @@ public class GarminSAXHandler extends DefaultHandler {
       } else if (name.equals(TAG_DATABASE)) {
 
          /*
-          * get version of the xml file
+          * get version of the XML file
           */
          for (int attrIndex = 0; attrIndex < attributes.getLength(); attrIndex++) {
 
