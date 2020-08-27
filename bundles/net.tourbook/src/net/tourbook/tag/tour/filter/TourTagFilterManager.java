@@ -24,10 +24,10 @@ import net.tourbook.application.ActionTourTagFilter;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.util.SQLData;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tour.filter.SQLFilterData;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
@@ -39,6 +39,8 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 
 public class TourTagFilterManager {
+
+   private static final char                      NL                          = UI.NEW_LINE;
 
    private static final String                    TOUR_FILTER_FILE_NAME       = "tour-tag-filter.xml";                  //$NON-NLS-1$
    private static final int                       TOUR_FILTER_VERSION         = 1;
@@ -116,10 +118,36 @@ public class TourTagFilterManager {
    }
 
    /**
-    * @return Returns SQL where part for the tag filter or <code>null</code> when tag filter is
+    * @return Returns a SQL part for the tag filter when the tags are AND'ed.
+    */
+   public static SQLData getSQL_JoinPartForAndOperator() {
+
+      final long[] tagIds = _selectedProfile.tagFilterIds.toArray();
+      final ArrayList<Object> sqlParameters = new ArrayList<>();
+
+      final StringBuilder tagIdsAsParameters = new StringBuilder();
+
+      for (int tagIndex = 0; tagIndex < tagIds.length; tagIndex++) {
+         final long tagId = tagIds[tagIndex];
+         if (tagIndex == 0) {
+            tagIdsAsParameters.append(PARAMETER_FIRST);
+         } else {
+            tagIdsAsParameters.append(PARAMETER_FOLLOWING);
+         }
+
+         sqlParameters.add(tagId);
+      }
+
+      final String sql = " TOURTAG_TAGID IN (" + tagIdsAsParameters.toString() + ")" + NL; //$NON-NLS-1$ //$NON-NLS-2$
+
+      return new SQLData(sql, sqlParameters);
+   }
+
+   /**
+    * @return Returns the SQL where part for the tag filter or <code>null</code> when tag filter is
     *         disabled.
     */
-   public static SQLFilterData getSQL() {
+   public static SQLData getSQL_WherePart() {
 
       if (_selectedProfile == null) {
          return null;
@@ -135,44 +163,37 @@ public class TourTagFilterManager {
       }
 
       final ArrayList<Object> sqlParameters = new ArrayList<>();
-      String sqlWhere;
+      String sqlWhere = UI.EMPTY_STRING;
 
       if (_selectedProfile.isOrOperator) {
 
          // combine tags with OR
 
-         boolean isFirst = true;
          final StringBuilder parameterTagIds = new StringBuilder();
 
-         for (final long tagId : tagIds) {
-
-            if (isFirst) {
-               isFirst = false;
+         for (int tagIndex = 0; tagIndex < tagIds.length; tagIndex++) {
+            if (tagIndex == 0) {
                parameterTagIds.append(PARAMETER_FIRST);
             } else {
                parameterTagIds.append(PARAMETER_FOLLOWING);
             }
 
-            sqlParameters.add(tagId);
+            sqlParameters.add(tagIds[tagIndex]);
          }
 
-         sqlWhere = " AND jTdataTtag.TourTag_tagId IN (" + parameterTagIds.toString() + ")" + UI.NEW_LINE; //$NON-NLS-1$ //$NON-NLS-2$
+         sqlWhere = " AND jTdataTtag.TourTag_tagId IN (" + parameterTagIds.toString() + ")" + NL; //$NON-NLS-1$ //$NON-NLS-2$
 
       } else {
 
-         /*
-          * Combine tags with AND, this cannot simply be done by using AND operatore, it is done in
-          * the data loader with an inner join -> complicated
+         /**
+          * Combine tags with AND
+          * <p>
+          * This cannot simply be done by using an AND operator, it is done in the data loader with
+          * an inner join -> complicated
           */
-         for (final long tagId : tagIds) {
-
-            sqlParameters.add(tagId);
-         }
-
-         sqlWhere = UI.EMPTY_STRING;
       }
 
-      return new SQLFilterData(sqlWhere, sqlParameters);
+      return new SQLData(sqlWhere, sqlParameters);
    }
 
    private static File getXmlFile() {

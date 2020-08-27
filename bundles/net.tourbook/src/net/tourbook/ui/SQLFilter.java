@@ -22,9 +22,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.util.SQLData;
 import net.tourbook.data.TourPerson;
 import net.tourbook.tag.tour.filter.TourTagFilterManager;
-import net.tourbook.tour.filter.SQLFilterData;
 import net.tourbook.tour.filter.TourFilterManager;
 import net.tourbook.tour.filter.geo.TourGeoFilter_Manager;
 
@@ -121,10 +121,10 @@ public class SQLFilter {
       /*
        * App Filter: Tour data
        */
-      final SQLFilterData tourSqlData = TourFilterManager.getSQL();
+      final SQLData tourSqlData = TourFilterManager.getSQL();
       if (tourSqlData != null) {
 
-         sb.append(tourSqlData.getWhereString());
+         sb.append(tourSqlData.getSqlString());
          _parameters.addAll(tourSqlData.getParameters());
       }
 
@@ -133,10 +133,10 @@ public class SQLFilter {
        */
       if (appFilter.contains(SQLAppFilter.GeoLocation)) {
 
-         final SQLFilterData tourSqlGeoData = TourGeoFilter_Manager.getSQL();
+         final SQLData tourSqlGeoData = TourGeoFilter_Manager.getSQL();
          if (tourSqlGeoData != null) {
 
-            sb.append(tourSqlGeoData.getWhereString());
+            sb.append(tourSqlGeoData.getSqlString());
             _parameters.addAll(tourSqlGeoData.getParameters());
          }
       }
@@ -150,13 +150,13 @@ public class SQLFilter {
 
          if (appFilter.contains(SQLAppFilter.Tag)) {
 
-            final SQLFilterData tourTagSqlData = TourTagFilterManager.getSQL();
+            final SQLData tourTagSqlData = TourTagFilterManager.getSQL_WherePart();
 
             if (tourTagSqlData != null) {
 
                _isTagFilterActive = true;
 
-               sb.append(tourTagSqlData.getWhereString());
+               sb.append(tourTagSqlData.getSqlString());
                _parameters.addAll(tourTagSqlData.getParameters());
             }
          }
