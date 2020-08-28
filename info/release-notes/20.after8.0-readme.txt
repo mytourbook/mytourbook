@@ -3,7 +3,7 @@
 
 TODO's
 ======  
-
+* Number of tours in Tourbook view is wrong when a tour contains multiple tags
 
 New
 ===
