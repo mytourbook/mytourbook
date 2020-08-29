@@ -69,25 +69,46 @@ public class TVITourBookRoot extends TVITourBookItem {
 
          sqlFromTourData = UI.EMPTY_STRING
 
-               + "FROM (" + NL //                                       //$NON-NLS-1$
+               + "FROM (" + NL //                                                //$NON-NLS-1$
 
-               + "   SELECT" + NL //                                    //$NON-NLS-1$
+               + "   SELECT" + NL //                                             //$NON-NLS-1$
 
                // this is necessary otherwise tours can occure multiple times when a tour contains multiple tags !!!
-               + "      DISTINCT TourId," + NL //                       //$NON-NLS-1$
+               + "      DISTINCT TourId," + NL //                                //$NON-NLS-1$
 
-               + "      StartYear," + NL //                             //$NON-NLS-1$
+               + "      StartYear," + NL //                                      //$NON-NLS-1$
                + "      " + SQL_SUM_FIELDS
 
-               + "   FROM " + TourDatabase.TABLE_TOUR_DATA + NL //      //$NON-NLS-1$
+//               + "   FROM " + TourDatabase.TABLE_TOUR_DATA + NL //               //$NON-NLS-1$
+//
+//               // get tag id's
+//               + "   LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" + NL //$NON-NLS-1$ //$NON-NLS-2$
+//               + "   ON tourID = jTdataTtag.TourData_tourId " + NL //            //$NON-NLS-1$
 
-               // get tag id's
-               + "   LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" + NL //$NON-NLS-1$ //$NON-NLS-2$
-               + "   ON tourID = jTdataTtag.TourData_tourId " + NL //   //$NON-NLS-1$
+               + "   FROM TOURDATA" + NL //                                      //$NON-NLS-1$
+               + "   INNER JOIN " + NL //                                        //$NON-NLS-1$
+               + "   (" + NL //                                                  //$NON-NLS-1$
+               + "      SELECT *" + NL //                                        //$NON-NLS-1$
+               + "      FROM TOURDATA_TOURTAG" + NL //                           //$NON-NLS-1$
+               + "      INNER JOIN " + NL //                                     //$NON-NLS-1$
+               + "      (  " + NL //                                             //$NON-NLS-1$
+               + "         SELECT " + NL //                                      //$NON-NLS-1$
+               + "            TOURDATA_TOURID AS Count_TourId, " + NL //         //$NON-NLS-1$
+               + "            COUNT(*) AS NumTagIds" + NL //                     //$NON-NLS-1$
+               + "         FROM TOURDATA_TOURTAG " + NL //                       //$NON-NLS-1$
+               + "         WHERE TOURTAG_TAGID IN (9, 22)" + NL //               //$NON-NLS-1$
+               + "         GROUP BY TOURDATA_TOURID" + NL //                     //$NON-NLS-1$
+               + "         HAVING COUNT(TOURDATA_TOURID) = 2" + NL //            //$NON-NLS-1$
+               + "      ) " + NL //                                              //$NON-NLS-1$
+               + "      AS jTdataTtag " + NL //                                  //$NON-NLS-1$
+               + "      ON TOURDATA_TOURTAG.TOURDATA_TOURID = jTdataTtag.Count_TourId" + NL //                             //$NON-NLS-1$
+               + "   ) " + NL //                                                 //$NON-NLS-1$
+               + "   AS jTdataTtag      " + NL //                                //$NON-NLS-1$
+               + "   ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //    //$NON-NLS-1$
 
                + "   " + sqlWhereClause
 
-               + ") NecessaryNameOtherwiseItDoNotWork" + NL //          //$NON-NLS-1$
+               + ") NecessaryNameOtherwiseItDoNotWork" + NL //                   //$NON-NLS-1$
          ;
 
       } else {
@@ -114,7 +135,7 @@ public class TVITourBookRoot extends TVITourBookItem {
             "SELECT" + NL //                                //$NON-NLS-1$
 
             + "   StartYear," + NL //                       //$NON-NLS-1$
-            + SQL_SUM_COLUMNS
+            + "   " + SQL_SUM_COLUMNS
 
             + sqlFromTourData
             + sqlGroupBy
