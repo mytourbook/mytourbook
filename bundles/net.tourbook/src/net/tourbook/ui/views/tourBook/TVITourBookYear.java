@@ -56,77 +56,80 @@ public class TVITourBookYear extends TVITourBookItem {
       final ArrayList<TreeViewerItem> children = new ArrayList<>();
       setChildren(children);
 
-      String sumYearField = UI.EMPTY_STRING;
-      String sumYearFieldSub = UI.EMPTY_STRING;
+      String sqlSumYearField = UI.EMPTY_STRING;
+      String sqlSumYearFieldSub = UI.EMPTY_STRING;
 
       if (isWeekDisplayed) {
 
          // show weeks
 
-         sumYearField = "StartWeekYear"; //$NON-NLS-1$
-         sumYearFieldSub = "StartWeek"; //$NON-NLS-1$
+         sqlSumYearField = "StartWeekYear"; //$NON-NLS-1$
+         sqlSumYearFieldSub = "StartWeek"; //$NON-NLS-1$
 
       } else {
 
          // show months
 
-         sumYearField = "StartYear"; //$NON-NLS-1$
-         sumYearFieldSub = "StartMonth"; //$NON-NLS-1$
+         sqlSumYearField = "StartYear"; //$NON-NLS-1$
+         sqlSumYearFieldSub = "StartMonth"; //$NON-NLS-1$
       }
 
       final SQLFilter sqlFilter = new SQLFilter(SQLFilter.TAG_FILTER);
-      String fromTourData;
+      String sqlFromTourData;
 
       if (sqlFilter.isTagFilterActive()) {
 
          // with tag filter
 
-         fromTourData = NL
+         sqlFromTourData = NL
 
-               + "FROM (                  " + NL //$NON-NLS-1$
+               + "FROM (" + NL //                                          //$NON-NLS-1$
 
-               + " SELECT                 " + NL //$NON-NLS-1$
+               + "   SELECT" + NL //                                       //$NON-NLS-1$
 
-               + sumYearField + ",        " + NL //$NON-NLS-1$
-               + sumYearFieldSub + ",     " + NL //$NON-NLS-1$
-               + SQL_SUM_FIELDS + NL
+               // this is necessary otherwise tours can occure multiple times when a tour contains multiple tags !!!
+               + "      DISTINCT TourId," + NL //                       //$NON-NLS-1$
 
-               + "  FROM " + TourDatabase.TABLE_TOUR_DATA + NL//$NON-NLS-1$
+               + "      " + sqlSumYearField + "," + NL //                  //$NON-NLS-1$
+               + "      " + sqlSumYearFieldSub + "," + NL //               //$NON-NLS-1$
+               + "      " + SQL_SUM_FIELDS + NL
+
+               + "   FROM " + TourDatabase.TABLE_TOUR_DATA + NL //         //$NON-NLS-1$
 
                // get tag id's
-               + "  LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" + NL //$NON-NLS-1$ //$NON-NLS-2$
-               + "  ON tourID = jTdataTtag.TourData_tourId" + NL //$NON-NLS-1$
+               + "   LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" + NL //$NON-NLS-1$ //$NON-NLS-2$
+               + "   ON tourID = jTdataTtag.TourData_tourId" + NL //       //$NON-NLS-1$
 
-               + "  WHERE " + sumYearField + "=?" + NL //$NON-NLS-1$ //$NON-NLS-2$
-               + sqlFilter.getWhereClause()
+               + "   WHERE " + sqlSumYearField + "=?" + NL //              //$NON-NLS-1$ //$NON-NLS-2$
+               + "      " + sqlFilter.getWhereClause()
 
-               + ") td                    " + NL//$NON-NLS-1$
+               + ") NecessaryNameOtherwiseItDoNotWork" + NL //             //$NON-NLS-1$
          ;
 
       } else {
 
          // without tag filter
 
-         fromTourData = NL
+         sqlFromTourData = NL
 
-               + " FROM " + TourDatabase.TABLE_TOUR_DATA + NL //$NON-NLS-1$
+               + " FROM " + TourDatabase.TABLE_TOUR_DATA + NL //           //$NON-NLS-1$
 
-               + " WHERE " + sumYearField + "=?" + NL //$NON-NLS-1$ //$NON-NLS-2$
+               + " WHERE " + sqlSumYearField + "=?" + NL //                //$NON-NLS-1$ //$NON-NLS-2$
                + sqlFilter.getWhereClause() + NL;
       }
 
       final String sql = NL +
 
-            "SELECT                       " + NL //$NON-NLS-1$
+            "SELECT" + NL //                                                        //$NON-NLS-1$
 
-            + sumYearField + ",         " + NL //$NON-NLS-1$
-            + sumYearFieldSub + ",      " + NL //$NON-NLS-1$
+            + sqlSumYearField + "," + NL //                                         //$NON-NLS-1$
+            + sqlSumYearFieldSub + "," + NL //                                      //$NON-NLS-1$
             + SQL_SUM_COLUMNS
 
-            + fromTourData
+            + sqlFromTourData
 
-            + " GROUP BY " + sumYearField + "," + sumYearFieldSub + NL //      //$NON-NLS-1$ //$NON-NLS-2$
-            + " ORDER BY " + sumYearFieldSub + NL //                  //$NON-NLS-1$
+            + "GROUP BY " + sqlSumYearField + "," + sqlSumYearFieldSub + NL //      //$NON-NLS-1$ //$NON-NLS-2$
+            + "ORDER BY " + sqlSumYearFieldSub + NL //                              //$NON-NLS-1$
       ;
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {

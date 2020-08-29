@@ -28,9 +28,10 @@ Changes
 Fixes   
 =====
 
-* Flat Tour Book View
-  - Tour tag filter caused SQL exception https://github.com/wolfgang-ch/mytourbook/issues/220
-             
+* Tour Book View
+  - Tour tag filter caused SQL exception in flat layout view https://github.com/wolfgang-ch/mytourbook/issues/220
+  - All summarized values are wrong when a tour contains multiple tags and the tour tag filter is activated https://github.com/wolfgang-ch/mytourbook/issues/223
+
 * 
  
    
