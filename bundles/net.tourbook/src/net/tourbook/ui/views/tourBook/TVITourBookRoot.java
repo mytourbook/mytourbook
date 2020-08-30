@@ -24,8 +24,10 @@ import java.util.ArrayList;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.SQL;
+import net.tourbook.common.util.SQLData;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.tag.tour.filter.TourTagFilterManager;
 import net.tourbook.ui.SQLFilter;
 
 public class TVITourBookRoot extends TVITourBookItem {
@@ -47,113 +49,128 @@ public class TVITourBookRoot extends TVITourBookItem {
 
    private void getItemsHierarchical() {
 
-      /*
-       * set the children for the root item, these are year items
-       */
-      final ArrayList<TreeViewerItem> children = new ArrayList<>();
-      setChildren(children);
-
-      final SQLFilter sqlFilter = new SQLFilter(SQLFilter.TAG_FILTER);
-      String sqlFromTourData;
-
-      final String sqlFilterWhereClause = sqlFilter.getWhereClause().trim();
-      final boolean isSqlWhereClause = sqlFilterWhereClause.length() > 0;
-
-      final String sqlWhereClause = isSqlWhereClause
-            ? "WHERE 1=1 " + NL + sqlFilterWhereClause + NL //$NON-NLS-1$
-            : UI.EMPTY_STRING;
-
-      if (sqlFilter.isTagFilterActive()) {
-
-         // with tag filter
-
-         sqlFromTourData = UI.EMPTY_STRING
-
-               + "FROM (" + NL //                                                //$NON-NLS-1$
-
-               + "   SELECT" + NL //                                             //$NON-NLS-1$
-
-               // this is necessary otherwise tours can occure multiple times when a tour contains multiple tags !!!
-               + "      DISTINCT TourId," + NL //                                //$NON-NLS-1$
-
-               + "      StartYear," + NL //                                      //$NON-NLS-1$
-               + "      " + SQL_SUM_FIELDS
-
-//               + "   FROM " + TourDatabase.TABLE_TOUR_DATA + NL //               //$NON-NLS-1$
-//
-//               // get tag id's
-//               + "   LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" + NL //$NON-NLS-1$ //$NON-NLS-2$
-//               + "   ON tourID = jTdataTtag.TourData_tourId " + NL //            //$NON-NLS-1$
-
-               + "   FROM TOURDATA" + NL //                                      //$NON-NLS-1$
-               + "   INNER JOIN " + NL //                                        //$NON-NLS-1$
-               + "   (" + NL //                                                  //$NON-NLS-1$
-               + "      SELECT *" + NL //                                        //$NON-NLS-1$
-               + "      FROM TOURDATA_TOURTAG" + NL //                           //$NON-NLS-1$
-               + "      INNER JOIN " + NL //                                     //$NON-NLS-1$
-               + "      (  " + NL //                                             //$NON-NLS-1$
-               + "         SELECT " + NL //                                      //$NON-NLS-1$
-               + "            TOURDATA_TOURID AS Count_TourId, " + NL //         //$NON-NLS-1$
-               + "            COUNT(*) AS NumTagIds" + NL //                     //$NON-NLS-1$
-               + "         FROM TOURDATA_TOURTAG " + NL //                       //$NON-NLS-1$
-               + "         WHERE TOURTAG_TAGID IN (9, 22)" + NL //               //$NON-NLS-1$
-               + "         GROUP BY TOURDATA_TOURID" + NL //                     //$NON-NLS-1$
-               + "         HAVING COUNT(TOURDATA_TOURID) = 2" + NL //            //$NON-NLS-1$
-               + "      ) " + NL //                                              //$NON-NLS-1$
-               + "      AS jTdataTtag " + NL //                                  //$NON-NLS-1$
-               + "      ON TOURDATA_TOURTAG.TOURDATA_TOURID = jTdataTtag.Count_TourId" + NL //                             //$NON-NLS-1$
-               + "   ) " + NL //                                                 //$NON-NLS-1$
-               + "   AS jTdataTtag      " + NL //                                //$NON-NLS-1$
-               + "   ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //    //$NON-NLS-1$
-
-               + "   " + sqlWhereClause
-
-               + ") NecessaryNameOtherwiseItDoNotWork" + NL //                   //$NON-NLS-1$
-         ;
-
-      } else {
-
-         // without tag filter
-
-         sqlFromTourData = UI.EMPTY_STRING
-
-               + " FROM " + TourDatabase.TABLE_TOUR_DATA + NL //$NON-NLS-1$
-
-               + sqlWhereClause;
-      }
-
-      final boolean isShowSummaryRow = tourBookView.isShowSummaryRow();
-
-      final String sqlGroupBy = isShowSummaryRow
-
-            // show a summary row
-            ? "GROUP BY ROLLUP(StartYear)" + NL //          //$NON-NLS-1$
-            : "GROUP BY StartYear" + NL; //                 //$NON-NLS-1$
-
-      final String sql = NL +
-
-            "SELECT" + NL //                                //$NON-NLS-1$
-
-            + "   StartYear," + NL //                       //$NON-NLS-1$
-            + "   " + SQL_SUM_COLUMNS
-
-            + sqlFromTourData
-            + sqlGroupBy
-
-            + "ORDER BY StartYear" + NL //                  //$NON-NLS-1$
-      ;
+      String sql = null;
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
-         final PreparedStatement statement = conn.prepareStatement(sql);
-         sqlFilter.setParameters(statement, 1);
+         /*
+          * set the children for the root item, these are year items
+          */
+         final ArrayList<TreeViewerItem> children = new ArrayList<>();
+         setChildren(children);
+
+         final SQLFilter sqlAppFilter = new SQLFilter(SQLFilter.TAG_FILTER);
+         String sqlFromTourData;
+
+         final String sqlFilterWhereClause = sqlAppFilter.getWhereClause().trim();
+         final boolean isSqlWhereClause = sqlFilterWhereClause.length() > 0;
+
+         final String sqlWhereClause = isSqlWhereClause
+               ? "WHERE 1=1 " + NL + sqlFilterWhereClause + NL //$NON-NLS-1$
+               : UI.EMPTY_STRING;
+
+         boolean isCombineTagsWithOr = false;
+         SQLData sqlCombineTagsWithAnd = null;
+
+         if (TourTagFilterManager.isTourTagFilterEnabled()) {
+
+            // with tag filter
+
+            isCombineTagsWithOr = TourTagFilterManager.isCombineTagsWithOr();
+
+            String sqlTagJoinTable;
+
+            if (isCombineTagsWithOr) {
+
+               sqlTagJoinTable = "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG;
+
+            } else {
+
+               sqlCombineTagsWithAnd = TourTagFilterManager.createSql_CombineTagsWithAnd();
+               sqlTagJoinTable = sqlCombineTagsWithAnd.getSqlString();
+            }
+
+            sqlFromTourData = UI.EMPTY_STRING
+
+                  + "FROM (" + NL //                                                   //$NON-NLS-1$
+
+                  + "   SELECT" + NL //                                                //$NON-NLS-1$
+
+                  // this is necessary otherwise tours can occure multiple times when a tour contains multiple tags !!!
+                  + "      DISTINCT TourId," + NL //                                   //$NON-NLS-1$
+
+                  + "      StartYear," + NL //                                         //$NON-NLS-1$
+                  + "      " + SQL_SUM_FIELDS
+
+                  + "       FROM TOURDATA" + NL //                                     //$NON-NLS-1$
+
+                  + "       " + sqlTagJoinTable
+
+                  + "       AS jTdataTtag" //                                          //$NON-NLS-1$
+                  + "       ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //   //$NON-NLS-1$
+
+                  + "   " + sqlWhereClause
+
+                  + ") NecessaryNameOtherwiseItDoNotWork" + NL //                      //$NON-NLS-1$
+            ;
+
+         } else {
+
+            // without tag filter
+
+            sqlFromTourData = UI.EMPTY_STRING
+
+                  + " FROM " + TourDatabase.TABLE_TOUR_DATA + NL //$NON-NLS-1$
+
+                  + sqlWhereClause;
+         }
+
+         final boolean isShowSummaryRow = tourBookView.isShowSummaryRow();
+
+         final String sqlGroupBy = isShowSummaryRow
+
+               // show a summary row
+               ? "GROUP BY ROLLUP(StartYear)" + NL //          //$NON-NLS-1$
+               : "GROUP BY StartYear" + NL; //                 //$NON-NLS-1$
+
+         sql = NL +
+
+               "SELECT" + NL //                                //$NON-NLS-1$
+
+               + "   StartYear," + NL //                       //$NON-NLS-1$
+               + "   " + SQL_SUM_COLUMNS
+
+               + sqlFromTourData
+               + sqlGroupBy
+
+               + "ORDER BY StartYear" + NL //                  //$NON-NLS-1$
+         ;
+
+         final PreparedStatement prepStmt = conn.prepareStatement(sql);
+
+         int paramIndex = 1;
+
+         if (isCombineTagsWithOr) {
+
+            // combine tags with OR
+
+         } else {
+
+            // combine tags with AND
+
+            // set join parameters
+            sqlCombineTagsWithAnd.setParameters(prepStmt, paramIndex);
+            paramIndex = sqlCombineTagsWithAnd.getLastParameterIndex();
+         }
+
+         sqlAppFilter.setParameters(prepStmt, paramIndex);
 
          TVITourBookYear yearItem = null;
 
          int yearIndex = 0;
          int summaryIndex = 0;
 
-         final ResultSet result = statement.executeQuery();
+         final ResultSet result = prepStmt.executeQuery();
          while (result.next()) {
 
             final int dbYear = result.getInt(1);

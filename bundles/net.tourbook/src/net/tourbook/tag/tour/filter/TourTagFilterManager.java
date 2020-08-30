@@ -79,6 +79,63 @@ public class TourTagFilterManager {
 
    private static ActionTourTagFilter             _actionTourTagFilter;
 
+   public static SQLData createSql_CombineTagsWithAnd() {
+
+      final SQLData sqlJoinPartForAndOperator = createSQL_JoinPartForAndOperator();
+
+      final String sql = NL
+
+            + " INNER JOIN" + NL //                                                                      //$NON-NLS-1$
+            + " (" + NL //                                                                               //$NON-NLS-1$
+            + "    SELECT *" + NL //                                                                     //$NON-NLS-1$
+            + "    FROM TOURDATA_TOURTAG" + NL //                                                        //$NON-NLS-1$
+            + "    INNER JOIN" + NL //                                                                   //$NON-NLS-1$
+            + "    (" + NL //                                                                            //$NON-NLS-1$
+            + "       SELECT TOURDATA_TOURID AS Count_TourId, COUNT(*) AS NumTagIds" + NL //             //$NON-NLS-1$
+            + "       FROM TOURDATA_TOURTAG" + NL //                                                     //$NON-NLS-1$
+            + "       WHERE " + sqlJoinPartForAndOperator.getSqlString() + NL //                         //$NON-NLS-1$
+            + "       GROUP BY TOURDATA_TOURID" + NL //                                                  //$NON-NLS-1$
+            + "       HAVING COUNT(TOURDATA_TOURID) = ?" + NL //                                         //$NON-NLS-1$
+            + "    )" + NL //                                                                            //$NON-NLS-1$
+            + "    AS jTdataTtag " + NL //                                                               //$NON-NLS-1$
+            + "    ON TOURDATA_TOURTAG.TOURDATA_TOURID = jTdataTtag.Count_TourId" + NL //                //$NON-NLS-1$
+            + " ) " + NL //                                                                              //$NON-NLS-1$
+      ;
+
+      final ArrayList<Object> sqlParameters = sqlJoinPartForAndOperator.getParameters();
+
+      // add number of tags that only tours with ALL tags are available in the join table
+      sqlParameters.add(sqlParameters.size());
+
+      return new SQLData(sql, sqlParameters);
+   }
+
+   /**
+    * @return Returns a SQL part for the tag filter when the tags are AND'ed.
+    */
+   private static SQLData createSQL_JoinPartForAndOperator() {
+
+      final long[] tagIds = _selectedProfile.tagFilterIds.toArray();
+      final ArrayList<Object> sqlParameters = new ArrayList<>();
+
+      final StringBuilder tagIdsAsParameters = new StringBuilder();
+
+      for (int tagIndex = 0; tagIndex < tagIds.length; tagIndex++) {
+         final long tagId = tagIds[tagIndex];
+         if (tagIndex == 0) {
+            tagIdsAsParameters.append(PARAMETER_FIRST);
+         } else {
+            tagIdsAsParameters.append(PARAMETER_FOLLOWING);
+         }
+
+         sqlParameters.add(tagId);
+      }
+
+      final String sql = " TOURTAG_TAGID IN (" + tagIdsAsParameters.toString() + ")" + NL; //$NON-NLS-1$ //$NON-NLS-2$
+
+      return new SQLData(sql, sqlParameters);
+   }
+
    /**
     * Fire event that the tour filter has changed.
     */
@@ -115,32 +172,6 @@ public class TourTagFilterManager {
     */
    public static TourTagFilterProfile getSelectedProfile() {
       return _selectedProfile;
-   }
-
-   /**
-    * @return Returns a SQL part for the tag filter when the tags are AND'ed.
-    */
-   public static SQLData getSQL_JoinPartForAndOperator() {
-
-      final long[] tagIds = _selectedProfile.tagFilterIds.toArray();
-      final ArrayList<Object> sqlParameters = new ArrayList<>();
-
-      final StringBuilder tagIdsAsParameters = new StringBuilder();
-
-      for (int tagIndex = 0; tagIndex < tagIds.length; tagIndex++) {
-         final long tagId = tagIds[tagIndex];
-         if (tagIndex == 0) {
-            tagIdsAsParameters.append(PARAMETER_FIRST);
-         } else {
-            tagIdsAsParameters.append(PARAMETER_FOLLOWING);
-         }
-
-         sqlParameters.add(tagId);
-      }
-
-      final String sql = " TOURTAG_TAGID IN (" + tagIdsAsParameters.toString() + ")" + NL; //$NON-NLS-1$ //$NON-NLS-2$
-
-      return new SQLData(sql, sqlParameters);
    }
 
    /**
@@ -199,6 +230,21 @@ public class TourTagFilterManager {
    private static File getXmlFile() {
 
       return _stateLocation.append(TOUR_FILTER_FILE_NAME).toFile();
+   }
+
+   /**
+    * @return Returns <code>true</code> when the tags are OR'ed otherwise they are AND'ed
+    */
+   public static boolean isCombineTagsWithOr() {
+
+      boolean isCombineTagsWithOr = true;
+      final boolean isTourTagFilterEnabled = isTourTagFilterEnabled();
+
+      if (isTourTagFilterEnabled && getSelectedProfile().isOrOperator == false) {
+         isCombineTagsWithOr = false;
+      }
+
+      return isCombineTagsWithOr;
    }
 
    /**

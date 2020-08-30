@@ -266,37 +266,6 @@ public class NatTable_DataLoader {
       return sb.toString();
    }
 
-   private SQLData createSql_Tags_CombineTagsWithAnd() {
-
-      final SQLData sqlJoinPartForAndOperator = TourTagFilterManager.getSQL_JoinPartForAndOperator();
-
-      final String sql = NL
-
-            + " INNER JOIN" + NL //                                                                      //$NON-NLS-1$
-            + " (" + NL //                                                                               //$NON-NLS-1$
-            + "    SELECT *" + NL //                                                                     //$NON-NLS-1$
-            + "    FROM TOURDATA_TOURTAG" + NL //                                                        //$NON-NLS-1$
-            + "    INNER JOIN" + NL //                                                                   //$NON-NLS-1$
-            + "    (" + NL //                                                                            //$NON-NLS-1$
-            + "       SELECT TOURDATA_TOURID AS Count_TourId, COUNT(*) AS NumTagIds" + NL //             //$NON-NLS-1$
-            + "       FROM TOURDATA_TOURTAG" + NL //                                                     //$NON-NLS-1$
-            + "       WHERE " + sqlJoinPartForAndOperator.getSqlString() + NL //                         //$NON-NLS-1$
-            + "       GROUP BY TOURDATA_TOURID" + NL //                                                  //$NON-NLS-1$
-            + "       HAVING COUNT(TOURDATA_TOURID) = ?" + NL //                                         //$NON-NLS-1$
-            + "    )" + NL //                                                                            //$NON-NLS-1$
-            + "    AS jTdataTtag " + NL //                                                               //$NON-NLS-1$
-            + "    ON TOURDATA_TOURTAG.TOURDATA_TOURID = jTdataTtag.Count_TourId" + NL //                //$NON-NLS-1$
-            + " ) " + NL //                                                                              //$NON-NLS-1$
-      ;
-
-      final ArrayList<Object> sqlParameters = sqlJoinPartForAndOperator.getParameters();
-
-      // add number of tags that only tours with ALL tags are available in the join table
-      sqlParameters.add(sqlParameters.size());
-
-      return new SQLData(sql, sqlParameters);
-   }
-
    /**
     * Loads all tour id's for the current sort and tour filter
     *
@@ -311,7 +280,7 @@ public class NatTable_DataLoader {
 
          PreparedStatement prepStmt;
 
-         if (isCombineTagsWithOr()) {
+         if (TourTagFilterManager.isCombineTagsWithOr()) {
 
             // tags are combined with OR
 
@@ -343,7 +312,7 @@ public class NatTable_DataLoader {
             // tags are combined with AND
 
             final SQLFilter sqlFilter = new SQLFilter();
-            final SQLData sqlCombineTagsWithAnd = createSql_Tags_CombineTagsWithAnd();
+            final SQLData sqlCombineTagsWithAnd = TourTagFilterManager.createSql_CombineTagsWithAnd();
 
             sql = NL
 
@@ -402,7 +371,7 @@ public class NatTable_DataLoader {
 
          PreparedStatement prepStmt;
 
-         if (isCombineTagsWithOr()) {
+         if (TourTagFilterManager.isCombineTagsWithOr()) {
 
             final SQLFilter sqlFilter = new SQLFilter(SQLFilter.TAG_FILTER);
 
@@ -437,7 +406,7 @@ public class NatTable_DataLoader {
          } else {
 
             final SQLFilter sqlFilter = new SQLFilter();
-            final SQLData sqlCombineTagsWithAnd = createSql_Tags_CombineTagsWithAnd();
+            final SQLData sqlCombineTagsWithAnd = TourTagFilterManager.createSql_CombineTagsWithAnd();
 
             sql = NL
 
@@ -518,7 +487,7 @@ public class NatTable_DataLoader {
 
          PreparedStatement prepStmt;
 
-         final boolean isCombineTagsWithOr = isCombineTagsWithOr();
+         final boolean isCombineTagsWithOr = TourTagFilterManager.isCombineTagsWithOr();
 
          String sqlTagJoinTable;
          SQLData sqlCombineTagsWithAnd = null;
@@ -529,7 +498,7 @@ public class NatTable_DataLoader {
 
          } else {
 
-            sqlCombineTagsWithAnd = createSql_Tags_CombineTagsWithAnd();
+            sqlCombineTagsWithAnd = TourTagFilterManager.createSql_CombineTagsWithAnd();
             sqlTagJoinTable = sqlCombineTagsWithAnd.getSqlString();
          }
 
@@ -1051,21 +1020,6 @@ public class NatTable_DataLoader {
 
          return _allLoadedTourIds[rowIndex];
       }
-   }
-
-   /**
-    * @return Returns <code>true</code> when the tags are OR'ed otherwise they are AND'ed
-    */
-   private boolean isCombineTagsWithOr() {
-
-      boolean isCombineTagsWithOr = true;
-      final boolean isTourTagFilterEnabled = TourTagFilterManager.isTourTagFilterEnabled();
-
-      if (isTourTagFilterEnabled && TourTagFilterManager.getSelectedProfile().isOrOperator == false) {
-         isCombineTagsWithOr = false;
-      }
-
-      return isCombineTagsWithOr;
    }
 
    /**
