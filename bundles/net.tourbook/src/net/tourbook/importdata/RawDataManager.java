@@ -43,6 +43,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.ITourViewer3;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.widgets.ComboEnumEntry;
 import net.tourbook.data.TourData;
@@ -86,43 +87,45 @@ import org.eclipse.ui.WorkbenchException;
 
 public class RawDataManager {
 
-   private static final String      RAW_DATA_LAST_SELECTED_PATH         = "raw-data-view.last-selected-import-path";             //$NON-NLS-1$
-   private static final String      TEMP_IMPORTED_FILE                  = "received-device-data.txt";                            //$NON-NLS-1$
+   private static final String      RAW_DATA_LAST_SELECTED_PATH          = "raw-data-view.last-selected-import-path";             //$NON-NLS-1$
+   private static final String      TEMP_IMPORTED_FILE                   = "received-device-data.txt";                            //$NON-NLS-1$
 
-   private static final String      FILE_EXTENSION_FIT                  = ".fit";                                                //$NON-NLS-1$
+   private static final String      FILE_EXTENSION_FIT                   = ".fit";                                                //$NON-NLS-1$
 
-   public static final String       LOG_IMPORT_DELETE_TOUR_FILE         = Messages.Log_Import_DeleteTourFiles;
-   public static final String       LOG_IMPORT_DELETE_TOUR_FILE_END     = Messages.Log_Import_DeleteTourFiles_End;
-   private static final String      LOG_IMPORT_TOUR                     = Messages.Log_Import_Tour;
-   public static final String       LOG_IMPORT_TOUR_IMPORTED            = Messages.Log_Import_Tour_Imported;
-   private static final String      LOG_IMPORT_TOUR_END                 = Messages.Log_Import_Tour_End;
-   public static final String       LOG_IMPORT_TOURS_IMPORTED_FROM_FILE = Messages.Log_Import_Tours_Imported_From_File;
+   public static final String       LOG_IMPORT_DELETE_TOUR_FILE          = Messages.Log_Import_DeleteTourFiles;
+   public static final String       LOG_IMPORT_DELETE_TOUR_FILE_END      = Messages.Log_Import_DeleteTourFiles_End;
+   private static final String      LOG_IMPORT_TOUR                      = Messages.Log_Import_Tour;
+   public static final String       LOG_IMPORT_TOUR_IMPORTED             = Messages.Log_Import_Tour_Imported;
+   public static final String       LOG_IMPORT_TOUR_OLD_DATA_VS_NEW_DATA = Messages.Log_Import_Tour_Old_Data_Vs_New_Data;
+   private static final String      LOG_IMPORT_TOUR_END                  = Messages.Log_Import_Tour_End;
+   public static final String       LOG_IMPORT_TOURS_IMPORTED_FROM_FILE  = Messages.Log_Import_Tours_Imported_From_File;
 
-   public static final String       LOG_REIMPORT_PREVIOUS_FILES         = Messages.Log_Reimport_PreviousFiles;
-   public static final String       LOG_REIMPORT_END                    = Messages.Log_Reimport_PreviousFiles_End;
+   public static final String       LOG_REIMPORT_PREVIOUS_FILES          = Messages.Log_Reimport_PreviousFiles;
+   public static final String       LOG_REIMPORT_END                     = Messages.Log_Reimport_PreviousFiles_End;
 
-   private static final String      LOG_REIMPORT_ALL_TIME_SLICES        = Messages.Log_Reimport_AllTimeSlices;
-   private static final String      LOG_REIMPORT_ONLY_ALTITUDE          = Messages.Log_Reimport_Only_Altitude;
-   private static final String      LOG_REIMPORT_ONLY_CADENCE           = Messages.Log_Reimport_Only_Cadence;
-   private static final String      LOG_REIMPORT_ONLY_GEAR              = Messages.Log_Reimport_Only_Gear;
-   private static final String      LOG_REIMPORT_ONLY_MARKER            = Messages.Log_Reimport_Only_TourMarker;
-   private static final String      LOG_REIMPORT_ONLY_POWER_SPEED       = Messages.Log_Reimport_Only_PowerSpeed;
-   private static final String      LOG_REIMPORT_ONLY_POWER_PULSE       = Messages.Log_Reimport_Only_PowerPulse;
-   private static final String      LOG_REIMPORT_ONLY_RUNNING_DYNAMICS  = Messages.Log_Reimport_Only_RunningDynamics;
-   private static final String      LOG_REIMPORT_ONLY_SWIMMING          = Messages.Log_Reimport_Only_Swimming;
-   private static final String      LOG_REIMPORT_ONLY_TEMPERATURE       = Messages.Log_Reimport_Only_Temperature;
-   private static final String      LOG_REIMPORT_ONLY_TRAINING          = Messages.Log_Reimport_Only_Training;
-   private static final String      LOG_REIMPORT_TOUR                   = Messages.Log_Reimport_Tour;
+   private static final String      LOG_REIMPORT_ALL_TIME_SLICES         = Messages.Log_Reimport_AllTimeSlices;
+   private static final String      LOG_REIMPORT_ONLY_ALTITUDE           = Messages.Log_Reimport_Only_Altitude;
+   private static final String      LOG_REIMPORT_ONLY_CADENCE            = Messages.Log_Reimport_Only_Cadence;
+   private static final String      LOG_REIMPORT_ONLY_GEAR               = Messages.Log_Reimport_Only_Gear;
+   private static final String      LOG_REIMPORT_ONLY_MARKER             = Messages.Log_Reimport_Only_TourMarker;
+   private static final String      LOG_REIMPORT_ONLY_POWER_SPEED        = Messages.Log_Reimport_Only_PowerSpeed;
+   private static final String      LOG_REIMPORT_ONLY_POWER_PULSE        = Messages.Log_Reimport_Only_PowerPulse;
+   private static final String      LOG_REIMPORT_ONLY_RUNNING_DYNAMICS   = Messages.Log_Reimport_Only_RunningDynamics;
+   private static final String      LOG_REIMPORT_ONLY_SWIMMING           = Messages.Log_Reimport_Only_Swimming;
+   private static final String      LOG_REIMPORT_ONLY_TEMPERATURE        = Messages.Log_Reimport_Only_Temperature;
+   private static final String      LOG_REIMPORT_ONLY_TOURTIMERPAUSES    = Messages.Log_Reimport_Only_TourTimerPauses;
+   private static final String      LOG_REIMPORT_ONLY_TRAINING           = Messages.Log_Reimport_Only_Training;
+   private static final String      LOG_REIMPORT_TOUR                    = Messages.Log_Reimport_Tour;
 
-   private static final String      INVALIDFILES_TO_IGNORE              = "invalidfiles_to_ignore.txt";                          //$NON-NLS-1$
+   private static final String      INVALIDFILES_TO_IGNORE               = "invalidfiles_to_ignore.txt";                          //$NON-NLS-1$
 
-   public static final int          ADJUST_IMPORT_YEAR_IS_DISABLED      = -1;
+   public static final int          ADJUST_IMPORT_YEAR_IS_DISABLED       = -1;
 
    static final ComboEnumEntry<?>[] ALL_IMPORT_TOUR_TYPE_CONFIG;
 
-   private static boolean           _importState_IsAutoOpenImportLog    = RawDataView.STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW_DEFAULT;
-   private static boolean           _importState_IsIgnoreInvalidFile    = RawDataView.STATE_IS_IGNORE_INVALID_FILE_DEFAULT;
-   private static boolean           _importState_IsSetBodyWeight        = RawDataView.STATE_IS_SET_BODY_WEIGHT_DEFAULT;
+   private static boolean           _importState_IsAutoOpenImportLog     = RawDataView.STATE_IS_AUTO_OPEN_IMPORT_LOG_VIEW_DEFAULT;
+   private static boolean           _importState_IsIgnoreInvalidFile     = RawDataView.STATE_IS_IGNORE_INVALID_FILE_DEFAULT;
+   private static boolean           _importState_IsSetBodyWeight         = RawDataView.STATE_IS_SET_BODY_WEIGHT_DEFAULT;
 
    static {
 
@@ -220,6 +223,8 @@ public class RawDataManager {
       OnlyTrainingValues, //
 
       OnlyTourMarker, //
+
+      OnlyTourTimerPauses, //
    }
 
    private RawDataManager() {}
@@ -267,6 +272,10 @@ public class RawDataManager {
 
    public static boolean isIgnoreInvalidFile() {
       return _importState_IsIgnoreInvalidFile;
+   }
+
+   public static boolean isSetBodyWeight() {
+      return _importState_IsSetBodyWeight;
    }
 
    private static ArrayList<String> readInvalidFilesToIgnoreFile() {
@@ -391,7 +400,7 @@ public class RawDataManager {
       // add option for every file extension
       for (final TourbookDevice device : deviceList) {
          filterExtensions[deviceIndex] = "*." + device.fileExtension; //$NON-NLS-1$
-         filterNames[deviceIndex] = device.visibleName + (" (*." + device.fileExtension + ")"); //$NON-NLS-1$ //$NON-NLS-2$
+         filterNames[deviceIndex] = device.visibleName + (" (*." + device.fileExtension + UI.SYMBOL_BRACKET_RIGHT); //$NON-NLS-1$
          deviceIndex++;
       }
 
@@ -718,6 +727,21 @@ public class RawDataManager {
          }
          break;
 
+      case OnlyTourTimerPauses:
+
+         if (actionReimportTour_12_ConfirmDialog(
+               ITourbookPreferences.TOGGLE_STATE_REIMPORT_TOUR_TIMERPAUSES,
+               Messages.Import_Data_Dialog_ConfirmReimportTourTimerPauses_Message)) {
+
+            TourLogManager.addLog(
+                  TourLogState.DEFAULT, //
+                  LOG_REIMPORT_ONLY_TOURTIMERPAUSES,
+                  TourLogView.CSS_LOG_TITLE);
+
+            return true;
+         }
+         break;
+
       case OnlyTrainingValues:
 
          if (actionReimportTour_12_ConfirmDialog(
@@ -915,6 +939,12 @@ public class RawDataManager {
          /*
           * tour(s) could be re-imported from the file, check if it contains a valid tour
           */
+
+         long previousTourTimerPauses = 0;
+         if (reimportId == ReImport.OnlyTourTimerPauses) {
+            previousTourTimerPauses = oldTourData.getTourPausedTime();
+         }
+
          TourData newTourData = actionReimportTour_40(reimportId, reimportedFile, oldTourData);
 
          if (newTourData == null) {
@@ -929,6 +959,19 @@ public class RawDataManager {
                   NLS.bind(LOG_IMPORT_TOUR_IMPORTED,
                         newTourData.getTourStartTime().format(TimeTools.Formatter_DateTime_S),
                         reimportFileNamePath));
+
+            //Print the old vs new data comparison
+            String differences = UI.EMPTY_STRING;
+            if (reimportId == ReImport.OnlyTourTimerPauses) {
+
+               differences = NLS.bind(LOG_IMPORT_TOUR_OLD_DATA_VS_NEW_DATA,
+                     UI.format_hhh_mm_ss(previousTourTimerPauses),
+                     UI.format_hhh_mm_ss(newTourData.getTourPausedTime()));
+            }
+
+            if (!StringUtils.isNullOrEmpty(differences)) {
+               TourLogManager.addSubLog(TourLogState.INFO, differences);
+            }
 
             // set re-import file path as new location
             newTourData.setImportFilePath(reimportFileNamePath);
@@ -1069,6 +1112,7 @@ public class RawDataManager {
                || reimportId == ReImport.OnlyRunningDynamics
                || reimportId == ReImport.OnlySwimming
                || reimportId == ReImport.OnlyTemperatureValues
+               || reimportId == ReImport.OnlyTourTimerPauses
                || reimportId == ReImport.OnlyTrainingValues
 
          ) {
@@ -1096,7 +1140,7 @@ public class RawDataManager {
             newTourData.clearComputedSeries();
 
             newTourData.computeAltitudeUpDown();
-            newTourData.computeTourDrivingTime();
+            newTourData.computeTourMovingTime();
             newTourData.computeComputedValues();
 
             // maintain list, that another call of this method do not find this tour again
@@ -1250,6 +1294,18 @@ public class RawDataManager {
          oldTourData.setTraining_TrainingEffect_Aerob(reimportedTourData.getTraining_TrainingEffect_Aerob());
          oldTourData.setTraining_TrainingEffect_Anaerob(reimportedTourData.getTraining_TrainingEffect_Anaerob());
          oldTourData.setTraining_TrainingPerformance(reimportedTourData.getTraining_TrainingPerformance());
+      }
+
+      // PAUSES
+      if (reimportId == ReImport.AllTimeSlices || reimportId == ReImport.OnlyTourTimerPauses) {
+
+         // re-import pauses only
+
+         oldTourData.setTourRecordedTime(reimportedTourData.getTourRecordedTime());
+
+         oldTourData.setTourTimerPauses(reimportedTourData.getTourTimerPauses());
+         final long totalTourTimerPauses = reimportedTourData.getTotalTourTimerPauses();
+         oldTourData.setTourPausedTime(totalTourTimerPauses);
       }
 
       // ALL
@@ -1732,10 +1788,6 @@ public class RawDataManager {
       fileIn.delete();
 
       return newFile.getAbsolutePath();
-   }
-
-   public boolean isSetBodyWeight() {
-      return _importState_IsSetBodyWeight;
    }
 
    public void removeAllTours() {

@@ -284,9 +284,11 @@ public class CalendarProfileManager {
    private static final DataFormatter _tourFormatter_Power_Avg;
    private static final DataFormatter _tourFormatter_Pulse_Avg;
    private static final DataFormatter _tourFormatter_Speed;
-   private static final DataFormatter _tourFormatter_Time_Moving;
+   private static final DataFormatter _tourFormatter_Time_Elapsed;
+   private static final DataFormatter _tourFormatter_Time_Recorded;
    private static final DataFormatter _tourFormatter_Time_Paused;
-   private static final DataFormatter _tourFormatter_Time_Recording;
+   private static final DataFormatter _tourFormatter_Time_Moving;
+   private static final DataFormatter _tourFormatter_Time_Break;
    private static final DataFormatter _tourFormatter_TourDescription;
    private static final DataFormatter _tourFormatter_TourTitle;
 
@@ -298,9 +300,11 @@ public class CalendarProfileManager {
    private static final DataFormatter _weekFormatter_Energy_MJ;
    private static final DataFormatter _weekFormatter_Pace;
    private static final DataFormatter _weekFormatter_Speed;
-   private static final DataFormatter _weekFormatter_Time_Moving;
+   private static final DataFormatter _weekFormatter_Time_Elapsed;
+   private static final DataFormatter _weekFormatter_Time_Recorded;
    private static final DataFormatter _weekFormatter_Time_Paused;
-   private static final DataFormatter _weekFormatter_Time_Recording;
+   private static final DataFormatter _weekFormatter_Time_Moving;
+   private static final DataFormatter _weekFormatter_Time_Break;
 
    static final DataFormatter[]       allTourContentFormatter;
    static final DataFormatter[]       allWeekFormatter;
@@ -339,9 +343,11 @@ public class CalendarProfileManager {
       _tourFormatter_Energy_kcal       = createFormatter_Energy_kcal();
       _tourFormatter_Energy_MJ         = createFormatter_Energy_MJ();
 
-      _tourFormatter_Time_Moving       = createFormatter_Time_Moving();
+      _tourFormatter_Time_Elapsed      = createFormatter_Time_Elapsed();
+      _tourFormatter_Time_Recorded     = createFormatter_Time_Recorded();
       _tourFormatter_Time_Paused       = createFormatter_Time_Paused();
-      _tourFormatter_Time_Recording    = createFormatter_Time_Recording();
+      _tourFormatter_Time_Moving       = createFormatter_Time_Moving();
+      _tourFormatter_Time_Break        = createFormatter_Time_Break();
 
       allTourContentFormatter = new DataFormatter[] {
 
@@ -363,9 +369,11 @@ public class CalendarProfileManager {
             _tourFormatter_Energy_kcal,
             _tourFormatter_Energy_MJ,
 
-            _tourFormatter_Time_Recording,
-            _tourFormatter_Time_Moving,
+            _tourFormatter_Time_Elapsed,
+            _tourFormatter_Time_Recorded,
             _tourFormatter_Time_Paused,
+            _tourFormatter_Time_Moving,
+            _tourFormatter_Time_Break,
       };
 
       // Week
@@ -380,9 +388,11 @@ public class CalendarProfileManager {
       _weekFormatter_Energy_kcal                   = createFormatter_Energy_kcal();
       _weekFormatter_Energy_MJ                     = createFormatter_Energy_MJ();
 
-      _weekFormatter_Time_Moving                   = createFormatter_Time_Moving();
+      _weekFormatter_Time_Elapsed                  = createFormatter_Time_Elapsed();
+      _weekFormatter_Time_Recorded                 = createFormatter_Time_Recorded();
       _weekFormatter_Time_Paused                   = createFormatter_Time_Paused();
-      _weekFormatter_Time_Recording                = createFormatter_Time_Recording();
+      _weekFormatter_Time_Moving                   = createFormatter_Time_Moving();
+      _weekFormatter_Time_Break                    = createFormatter_Time_Break();
 
       allWeekFormatter = new DataFormatter[] {
 
@@ -399,9 +409,11 @@ public class CalendarProfileManager {
             _weekFormatter_Energy_kcal,
             _weekFormatter_Energy_MJ,
 
-            _weekFormatter_Time_Recording,
-            _weekFormatter_Time_Moving,
+            _weekFormatter_Time_Elapsed,
+            _weekFormatter_Time_Recorded,
             _weekFormatter_Time_Paused,
+            _weekFormatter_Time_Moving,
+            _weekFormatter_Time_Break
       };
 
       DEFAULT_TOUR_FORMATTER_DATA = new FormatterData[] {
@@ -411,7 +423,7 @@ public class CalendarProfileManager {
          new FormatterData(true,      FormatterID.DISTANCE,             _tourFormatter_Distance.getDefaultFormat()),
          new FormatterData(true,      FormatterID.ELEVATION,            _tourFormatter_Elevation.getDefaultFormat()),
          new FormatterData(true,      FormatterID.ELEVATION_CHANGE,     _tourFormatter_Elevation_Change.getDefaultFormat()),
-         new FormatterData(true,      FormatterID.TIME_MOVING,          _tourFormatter_Time_Moving.getDefaultFormat()),
+         new FormatterData(true,      FormatterID.TIME_MOVING,          _weekFormatter_Time_Recorded.getDefaultFormat()),
          new FormatterData(false,     FormatterID.EMPTY,                ValueFormat.DUMMY_VALUE),
          new FormatterData(false,     FormatterID.EMPTY,                ValueFormat.DUMMY_VALUE),
          new FormatterData(false,     FormatterID.EMPTY,                ValueFormat.DUMMY_VALUE),
@@ -427,7 +439,7 @@ public class CalendarProfileManager {
          new FormatterData(true,      FormatterID.SPEED,                _weekFormatter_Speed.getDefaultFormat()),
          new FormatterData(true,      FormatterID.PACE,                 _weekFormatter_Pace.getDefaultFormat()),
          new FormatterData(true,      FormatterID.CADENCE_ZONES_TIMES,  _weekFormatter_CadenceZones_TimePercentages.getDefaultFormat()),
-         new FormatterData(true,      FormatterID.TIME_MOVING,          _weekFormatter_Time_Moving.getDefaultFormat()),
+         new FormatterData(true,      FormatterID.TIME_MOVING,          _weekFormatter_Time_Recorded.getDefaultFormat()),
          new FormatterData(false,     FormatterID.EMPTY,                ValueFormat.DUMMY_VALUE),
       };
 
@@ -1183,11 +1195,11 @@ public class CalendarProfileManager {
          @Override
          String format(final CalendarTourData data, final ValueFormat valueFormat, final boolean isShowValueUnit) {
 
-            if (data.drivingTime > 0 && data.distance > 0) {
+            if (data.movingTime > 0 && data.distance > 0) {
 
                final float pace = data.distance == 0
                      ? 0
-                     : 1000 * data.drivingTime / data.distance * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
+                     : 1000 * data.movingTime / data.distance * net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
 
                final String valueText = UI.format_mm_ss((long) pace);
 
@@ -1336,11 +1348,11 @@ public class CalendarProfileManager {
          @Override
          String format(final CalendarTourData data, final ValueFormat valueFormat, final boolean isShowValueUnit) {
 
-            if (data.distance > 0 && data.drivingTime > 0) {
+            if (data.distance > 0 && data.movingTime > 0) {
 
                float speed = data.distance == 0
                      ? 0
-                     : data.distance / (data.drivingTime / 3.6f);
+                     : data.distance / (data.movingTime / 3.6f);
 
                //convert to the current measurement system
                speed /= net.tourbook.ui.UI.UNIT_VALUE_DISTANCE;
@@ -1384,6 +1396,119 @@ public class CalendarProfileManager {
    }
 
    /**
+    * Break time
+    *
+    * @return
+    */
+   private static DataFormatter createFormatter_Time_Break() {
+
+      final DataFormatter dataFormatter = new DataFormatter(
+            FormatterID.TIME_BREAK,
+            Messages.Calendar_Profile_Value_BreakTime,
+            GraphColorManager.PREF_GRAPH_TIME) {
+
+         @Override
+         String format(final CalendarTourData data, final ValueFormat valueFormat, final boolean isShowValueUnit) {
+
+            if (data.elapsedTime > 0) {
+
+               final String valueText = valueFormatter.printLong(data.elapsedTime - data.movingTime);
+
+               return isShowValueUnit
+                     ? valueText + UI.SPACE + UI.UNIT_LABEL_TIME + UI.SPACE
+                     : valueText + UI.SPACE;
+
+            } else {
+               return UI.EMPTY_STRING;
+            }
+         }
+
+         @Override
+         public ValueFormat getDefaultFormat() {
+            return ValueFormat.TIME_HH_MM;
+         }
+
+         @Override
+         public ValueFormat[] getValueFormats() {
+
+            return new ValueFormat[] {
+                  ValueFormat.TIME_HH,
+                  ValueFormat.TIME_HH_MM,
+                  ValueFormat.TIME_HH_MM_SS };
+         }
+
+         @Override
+         void setValueFormat(final ValueFormat valueFormat) {
+
+            valueFormatId = valueFormat;
+            valueFormatter = getFormatter_Time(valueFormat.name());
+         }
+      };
+
+      // setup default formatter
+      dataFormatter.setValueFormat(dataFormatter.getDefaultFormat());
+
+      return dataFormatter;
+   }
+
+   /**
+    * Elapsed time
+    *
+    * @return
+    */
+   private static DataFormatter createFormatter_Time_Elapsed() {
+
+      final DataFormatter dataFormatter = new DataFormatter(
+            FormatterID.TIME_ELAPSED,
+            Messages.Calendar_Profile_Value_ElapsedTime,
+            GraphColorManager.PREF_GRAPH_TIME) {
+
+         @Override
+         String format(final CalendarTourData data, final ValueFormat valueFormat, final boolean isShowValueUnit) {
+
+            if (data.elapsedTime > 0) {
+
+               final String valueText = valueFormatter.printLong(data.elapsedTime);
+
+               return isShowValueUnit
+                     ? valueText + UI.SPACE + UI.UNIT_LABEL_TIME + UI.SPACE
+                     : valueText + UI.SPACE;
+
+            } else {
+
+               return UI.EMPTY_STRING;
+            }
+         }
+
+         @Override
+         public ValueFormat getDefaultFormat() {
+            return ValueFormat.TIME_HH_MM;
+         }
+
+         @Override
+         public ValueFormat[] getValueFormats() {
+
+            return new ValueFormat[] {
+                  ValueFormat.TIME_HH,
+                  ValueFormat.TIME_HH_MM,
+                  ValueFormat.TIME_HH_MM_SS };
+         }
+
+         @Override
+         void setValueFormat(final ValueFormat valueFormat) {
+
+            valueFormatId = valueFormat;
+            valueFormatter = getFormatter_Time(valueFormat.name());
+         }
+      };
+
+      // setup default formatter
+      dataFormatter.setValueFormat(dataFormatter.getDefaultFormat());
+
+      return dataFormatter;
+   }
+
+   /**
     * Moving time
     *
     * @return
@@ -1398,9 +1523,9 @@ public class CalendarProfileManager {
          @Override
          String format(final CalendarTourData data, final ValueFormat valueFormat, final boolean isShowValueUnit) {
 
-            if (data.drivingTime > 0) {
+            if (data.movingTime > 0) {
 
-               final String valueText = valueFormatter.printLong(data.drivingTime);
+               final String valueText = valueFormatter.printLong(data.movingTime);
 
                return isShowValueUnit
                      ? valueText + UI.SPACE + UI.UNIT_LABEL_TIME + UI.SPACE
@@ -1454,9 +1579,9 @@ public class CalendarProfileManager {
          @Override
          String format(final CalendarTourData data, final ValueFormat valueFormat, final boolean isShowValueUnit) {
 
-            if (data.recordingTime > 0) {
+            if (data.elapsedTime > 0) {
 
-               final String valueText = valueFormatter.printLong(data.recordingTime - data.drivingTime);
+               final String valueText = valueFormatter.printLong(data.elapsedTime - data.recordedTime);
 
                return isShowValueUnit
                      ? valueText + UI.SPACE + UI.UNIT_LABEL_TIME + UI.SPACE
@@ -1496,23 +1621,23 @@ public class CalendarProfileManager {
    }
 
    /**
-    * Recording time
+    * Recorded time
     *
     * @return
     */
-   private static DataFormatter createFormatter_Time_Recording() {
+   private static DataFormatter createFormatter_Time_Recorded() {
 
       final DataFormatter dataFormatter = new DataFormatter(
-            FormatterID.TIME_RECORDING,
-            Messages.Calendar_Profile_Value_RecordingTime,
+            FormatterID.TIME_RECORDED,
+            Messages.Calendar_Profile_Value_RecordedTime,
             GraphColorManager.PREF_GRAPH_TIME) {
 
          @Override
          String format(final CalendarTourData data, final ValueFormat valueFormat, final boolean isShowValueUnit) {
 
-            if (data.recordingTime > 0) {
+            if (data.recordedTime > 0) {
 
-               final String valueText = valueFormatter.printLong(data.recordingTime);
+               final String valueText = valueFormatter.printLong(data.recordedTime);
 
                return isShowValueUnit
                      ? valueText + UI.SPACE + UI.UNIT_LABEL_TIME + UI.SPACE
@@ -3540,16 +3665,24 @@ public class CalendarProfileManager {
             _tourFormatter_Speed.setValueFormat(valueFormat);
             break;
 
-         case TIME_MOVING:
-            _tourFormatter_Time_Moving.setValueFormat(valueFormat);
+         case TIME_ELAPSED:
+            _tourFormatter_Time_Elapsed.setValueFormat(valueFormat);
+            break;
+
+         case TIME_RECORDED:
+            _tourFormatter_Time_Recorded.setValueFormat(valueFormat);
             break;
 
          case TIME_PAUSED:
             _tourFormatter_Time_Paused.setValueFormat(valueFormat);
             break;
 
-         case TIME_RECORDING:
-            _tourFormatter_Time_Recording.setValueFormat(valueFormat);
+         case TIME_MOVING:
+            _tourFormatter_Time_Moving.setValueFormat(valueFormat);
+            break;
+
+         case TIME_BREAK:
+            _tourFormatter_Time_Break.setValueFormat(valueFormat);
             break;
 
          default:
@@ -3598,16 +3731,24 @@ public class CalendarProfileManager {
             _weekFormatter_Speed.setValueFormat(valueFormat);
             break;
 
-         case TIME_MOVING:
-            _weekFormatter_Time_Moving.setValueFormat(valueFormat);
+         case TIME_ELAPSED:
+            _weekFormatter_Time_Elapsed.setValueFormat(valueFormat);
+            break;
+
+         case TIME_RECORDED:
+            _weekFormatter_Time_Recorded.setValueFormat(valueFormat);
             break;
 
          case TIME_PAUSED:
             _weekFormatter_Time_Paused.setValueFormat(valueFormat);
             break;
 
-         case TIME_RECORDING:
-            _weekFormatter_Time_Recording.setValueFormat(valueFormat);
+         case TIME_MOVING:
+            _weekFormatter_Time_Moving.setValueFormat(valueFormat);
+            break;
+
+         case TIME_BREAK:
+            _weekFormatter_Time_Break.setValueFormat(valueFormat);
             break;
 
          default:

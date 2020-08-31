@@ -152,7 +152,8 @@ public class ImageUtils {
       return new Point(newWidth, newHeight);
    }
 
-   public static Point getBestSize(final Point original, final Point max) {
+   @SuppressWarnings("unused")
+   private static Point getBestSize(final Point original, final Point max) {
       return getBestSize(original.x, original.y, max.x, max.y);
    }
 
@@ -165,17 +166,6 @@ public class ImageUtils {
       return !(img.getWidth() == width && img.getHeight() == height);
    }
 
-//	public Image resize(int w, int h, Image img) {
-//		Image newImage = new Image(Display.getDefault(), w, h);
-//		GC gc = new GC(newImage);
-//		gc.setAntialias(SWT.ON);
-//		gc.setInterpolation(SWT.HIGH);
-//		gc.drawImage(img, 0, 0, img.getBounds().width, img.getBounds().height, 0, 0, w, h);
-//		gc.dispose();
-//		img.dispose();
-//		return newImage;
-//	}
-
    /**
     * Returns a new scaled image. new Image must be disposed after use.
     *
@@ -184,7 +174,7 @@ public class ImageUtils {
     * @param height
     * @return
     */
-   public static Image resize(final Display display, final Image image, final int width, final int height) {
+   private static Image resize(final Display display, final Image image, final int width, final int height) {
       return resize(display, image, width, height, SWT.ON, SWT.HIGH, null);
    }
 
@@ -299,11 +289,12 @@ public class ImageUtils {
       return scaledImage;
    }
 
-   public static ImageData resize(final Display display,
-                                  final ImageData imageData,
-                                  final int width,
-                                  final int height,
-                                  final boolean antiAliasing) {
+   @SuppressWarnings("unused")
+   private static ImageData resize(final Display display,
+                                   final ImageData imageData,
+                                   final int width,
+                                   final int height,
+                                   final boolean antiAliasing) {
 
       if (imageData == null) {
          return null;
@@ -324,6 +315,7 @@ public class ImageUtils {
          fullImage.dispose();
          return result;
       }
+
       return imageData.scaledTo(width, height);
    }
 
@@ -336,7 +328,8 @@ public class ImageUtils {
     * @param maxHeight
     * @return
     */
-   public static Image resizeBestSize(final Display display, final Image img, final int maxWidth, final int maxHeight) {
+   @SuppressWarnings("unused")
+   private static Image resizeBestSize(final Display display, final Image img, final int maxWidth, final int maxHeight) {
 
       if (img == null) {
          return null;
@@ -349,6 +342,22 @@ public class ImageUtils {
 
       // Resize image
       return ImageUtils.resize(display, img, newSize.x, newSize.y);
+   }
+
+   @SuppressWarnings("unused")
+   private Image resize(final int w, final int h, final Image img) {
+
+      final Image newImage = new Image(Display.getDefault(), w, h);
+      final GC gc = new GC(newImage);
+      {
+         gc.setAntialias(SWT.ON);
+         gc.setInterpolation(SWT.HIGH);
+         gc.drawImage(img, 0, 0, img.getBounds().width, img.getBounds().height, 0, 0, w, h);
+      }
+      gc.dispose();
+      img.dispose();
+
+      return newImage;
    }
 
 }

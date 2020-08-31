@@ -522,6 +522,8 @@ public class UI {
    /**
     * When <code>true</code> then data in the UI are scrambled. This is used to create anynonymous
     * screenshots.
+    * <p>
+    * Commandline parameter: <code>-DscrambleData</code>
     */
    public static boolean IS_SCRAMBLE_DATA = System.getProperty("scrambleData") != null; //$NON-NLS-1$
 

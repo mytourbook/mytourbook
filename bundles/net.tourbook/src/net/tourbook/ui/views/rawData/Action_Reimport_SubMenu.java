@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -37,6 +37,7 @@ public class Action_Reimport_SubMenu extends Action implements IMenuCreator {
    private ActionReimport_EntireTour                _actionReimport_EntireTour;
    private ActionReimport_OnlyTimeSlices            _actionReimport_OnlyTimeSlices;
    private ActionReimport_OnlyTourMarker            _actionReimport_OnlyTourMarker;
+   private ActionReimport_OnlyTourTimerPauses       _actionReimport_OnlyTourTimerPauses;
 
    private ActionReimport_OnlyAltitudeValues        _actionReimport_OnlyAltitudeValues;
    private ActionReimport_OnlyCadenceValues         _actionReimport_OnlyCadenceValues;
@@ -189,6 +190,18 @@ public class Action_Reimport_SubMenu extends Action implements IMenuCreator {
       }
    }
 
+   private class ActionReimport_OnlyTourTimerPauses extends Action {
+
+      public ActionReimport_OnlyTourTimerPauses() {
+         setText(Messages.Import_Data_Action_Reimport_OnlyTourTimerPauses);
+      }
+
+      @Override
+      public void run() {
+         RawDataManager.getInstance().actionReimportTour(RawDataManager.ReImport.OnlyTourTimerPauses, _tourViewer);
+      }
+   }
+
    private class ActionReimport_OnlyTrainingValues extends Action {
 
       public ActionReimport_OnlyTrainingValues() {
@@ -212,6 +225,7 @@ public class Action_Reimport_SubMenu extends Action implements IMenuCreator {
       _actionReimport_EntireTour = new ActionReimport_EntireTour();
       _actionReimport_OnlyTimeSlices = new ActionReimport_OnlyTimeSlices();
       _actionReimport_OnlyTourMarker = new ActionReimport_OnlyTourMarker();
+      _actionReimport_OnlyTourTimerPauses = new ActionReimport_OnlyTourTimerPauses();
 
       _actionReimport_OnlyAltitudeValues = new ActionReimport_OnlyAltitudeValues();
       _actionReimport_OnlyCadenceValues = new ActionReimport_OnlyCadenceValues();
@@ -245,6 +259,7 @@ public class Action_Reimport_SubMenu extends Action implements IMenuCreator {
 
       new ActionContributionItem(_actionReimport_OnlyTemperatureValues).fill(menu, -1);
       new ActionContributionItem(_actionReimport_OnlyTourMarker).fill(menu, -1);
+      new ActionContributionItem(_actionReimport_OnlyTourTimerPauses).fill(menu, -1);
       new ActionContributionItem(_actionReimport_OnlyTrainingValues).fill(menu, -1);
 
       new ActionContributionItem(_actionReimport_OnlyTimeSlices).fill(menu, -1);

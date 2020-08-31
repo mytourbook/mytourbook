@@ -20,7 +20,6 @@ import de.byteholder.geoclipse.mapprovider.IMapProviderListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
@@ -42,10 +41,10 @@ import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.ToolBar;
 import org.oscim.theme.VtmThemes;
 
@@ -69,9 +68,9 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
     */
    private Composite _parent;
 
-   private Combo     _comboMapProvider;
-   private Combo     _comboTheme;
-   private Combo     _comboThemeStyle;
+   private List      _listMapProvider;
+   private List      _listTheme;
+   private List      _listThemeStyle;
 
    private Label     _lblMapProvider;
    private Label     _lblTheme;
@@ -152,8 +151,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
    private void createUI_12_Actions(final Composite parent) {
 
       final ToolBar toolbar = new ToolBar(parent, SWT.FLAT);
-      GridDataFactory
-            .fillDefaults()//
+      GridDataFactory.fillDefaults()
             .grab(true, false)
             .align(SWT.END, SWT.BEGINNING)
             .applyTo(toolbar);
@@ -177,10 +175,11 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
              */
             _lblMapProvider = new Label(container, SWT.NONE);
             _lblMapProvider.setText(Messages.Slideout_Map25Provider_Label_MapProvider);
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(_lblMapProvider);
 
-            _comboMapProvider = new Combo(container, SWT.READ_ONLY);
-            _comboMapProvider.addFocusListener(_keepOpenListener);
-            _comboMapProvider.addSelectionListener(new SelectionAdapter() {
+            _listMapProvider = new List(container, SWT.SINGLE);
+            _listMapProvider.addFocusListener(_keepOpenListener);
+            _listMapProvider.addSelectionListener(new SelectionAdapter() {
                @Override
                public void widgetSelected(final SelectionEvent e) {
                   onSelect_MapProvider();
@@ -193,10 +192,11 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
              */
             _lblTheme = new Label(container, SWT.NONE);
             _lblTheme.setText(Messages.Slideout_Map25Provider_Label_DefaultTheme);
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(_lblTheme);
 
-            _comboTheme = new Combo(container, SWT.READ_ONLY | SWT.DROP_DOWN);
-            _comboTheme.addFocusListener(_keepOpenListener);
-            _comboTheme.addSelectionListener(new SelectionAdapter() {
+            _listTheme = new List(container, SWT.SINGLE);
+            _listTheme.addFocusListener(_keepOpenListener);
+            _listTheme.addSelectionListener(new SelectionAdapter() {
                @Override
                public void widgetSelected(final SelectionEvent e) {
                   onSelect_Theme();
@@ -209,10 +209,11 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
              */
             _lblThemeStyle = new Label(container, SWT.NONE);
             _lblThemeStyle.setText(Messages.Slideout_Map25Provider_Label_ThemeStyle);
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(_lblThemeStyle);
 
-            _comboThemeStyle = new Combo(container, SWT.READ_ONLY);
-            _comboThemeStyle.addFocusListener(_keepOpenListener);
-            _comboThemeStyle.addSelectionListener(new SelectionAdapter() {
+            _listThemeStyle = new List(container, SWT.SINGLE);
+            _listThemeStyle.addFocusListener(_keepOpenListener);
+            _listThemeStyle.addSelectionListener(new SelectionAdapter() {
                @Override
                public void widgetSelected(final SelectionEvent e) {
                   onSelect_ThemeStyle();
@@ -248,10 +249,10 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
 
       _allEnabledMapProvider = allEnabledMapProviders;
 
-      _comboMapProvider.removeAll();
+      _listMapProvider.removeAll();
 
       for (final Map25Provider map25Provider : allEnabledMapProviders) {
-         _comboMapProvider.add(map25Provider.name);
+         _listMapProvider.add(map25Provider.name);
       }
 
       /*
@@ -263,7 +264,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
 
    private Map25Provider getSelectedMapProvider() {
 
-      final int selectedIndex = _comboMapProvider.getSelectionIndex();
+      final int selectedIndex = _listMapProvider.getSelectionIndex();
 
       if (selectedIndex < 0) {
 
@@ -309,7 +310,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
    @Override
    public void mapProviderListChanged() {
 
-      if (_comboMapProvider == null) {
+      if (_listMapProvider == null) {
 
          // this can occure when dialog is closed and the event is still fired
 
@@ -358,7 +359,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
 
       final Map25Provider mapProvider = getSelectedMapProvider();
 
-      final int selectedIndex = _comboTheme.getSelectionIndex();
+      final int selectedIndex = _listTheme.getSelectionIndex();
 
       final boolean isThemeFromFile = mapProvider.is_mf_Map && selectedIndex == 0;
 
@@ -401,9 +402,9 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
 
       final Map25Provider mapProvider = getSelectedMapProvider();
 
-      final List<MapsforgeThemeStyle> mfStyles = mapProvider.getThemeStyles(false);
+      final java.util.List<MapsforgeThemeStyle> mfStyles = mapProvider.getThemeStyles(false);
 
-      int selectedStyleIndex = _comboThemeStyle.getSelectionIndex();
+      int selectedStyleIndex = _listThemeStyle.getSelectionIndex();
       String selectedThemeStyle;
 
       if (selectedStyleIndex == 0) {
@@ -458,7 +459,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
 
             _isInUpdateUI = true;
             {
-               _comboMapProvider.select(providerIndex);
+               _listMapProvider.select(providerIndex);
             }
             _isInUpdateUI = false;
 
@@ -484,7 +485,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
 
          // offline
 
-         final List<MapsforgeThemeStyle> themeStyles = mapProvider.getThemeStyles(false);
+         final java.util.List<MapsforgeThemeStyle> themeStyles = mapProvider.getThemeStyles(false);
 
          final CharSequence[] allThemeStyles = new CharSequence[themeStyles.size()];
          for (int styleIndex = 0; styleIndex < themeStyles.size(); styleIndex++) {
@@ -525,32 +526,32 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
       /*
        * Fill theme combo
        */
-      _comboTheme.removeAll();
+      _listTheme.removeAll();
 
       if (mapProvider != null && mapProvider.is_mf_Map) {
 
          // add an additional option to use the theme from the theme file
 
-         _comboTheme.add(Messages.Pref_Map25_Provider_Theme_FromThemeFile);
+         _listTheme.add(Messages.Pref_Map25_Provider_Theme_FromThemeFile);
       }
 
       // fill combobox with all themes
       for (final VtmThemes vtmTheme : VtmThemes.values()) {
-         _comboTheme.add(vtmTheme.toString());
+         _listTheme.add(vtmTheme.toString());
       }
 
       /*
        * Select theme
        */
       if (mapProvider == null) {
-         _comboTheme.select(0);
+         _listTheme.select(0);
          return;
       }
 
       if (mapProvider.is_mf_Map && mapProvider.mf_IsThemeFromFile) {
 
          // select: theme is from a file
-         _comboTheme.select(0);
+         _listTheme.select(0);
          return;
       }
 
@@ -561,64 +562,61 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
 
          themeIndex++;
       }
-      _comboTheme.select(themeIndex);
+      _listTheme.select(themeIndex);
    }
 
    /**
     * This must be called <b>AFTER</b> {@link #updateUI_Theme(Map25Provider)} because it depends on
-    * the {@link #_comboTheme}
+    * the {@link #_listTheme}
     *
     * @param mapProvider
     */
    private void updateUI_Theme_Style(final Map25Provider mapProvider) {
 
-      _comboThemeStyle.removeAll();
+      _listThemeStyle.removeAll();
 
       if (mapProvider.is_mf_Map == false) {
 
          // online map has no theme styles
 
-         _comboThemeStyle.add(Messages.Pref_Map25_Provider_ThemeStyle_Info_NotSupported);
-         _comboThemeStyle.select(0);
+         _listThemeStyle.add(Messages.Pref_Map25_Provider_ThemeStyle_Info_NotSupported);
 
          _lblThemeStyle.setEnabled(false);
-         _comboThemeStyle.setEnabled(false);
+         _listThemeStyle.setEnabled(false);
 
-         _comboThemeStyle.getParent().layout(true, true);
+         _listThemeStyle.getParent().layout(true, true);
 
          return;
       }
 
-      final List<MapsforgeThemeStyle> mfStyles = mapProvider.getThemeStyles(false);
+      final java.util.List<MapsforgeThemeStyle> mfStyles = mapProvider.getThemeStyles(false);
       if (mfStyles == null) {
 
          // invalid style file
 
-         _comboThemeStyle.add(Messages.Pref_Map25_Provider_ThemeStyle_Info_InvalidThemeFilename);
-         _comboThemeStyle.select(0);
+         _listThemeStyle.add(Messages.Pref_Map25_Provider_ThemeStyle_Info_InvalidThemeFilename);
 
          _lblThemeStyle.setEnabled(false);
-         _comboThemeStyle.setEnabled(false);
+         _listThemeStyle.setEnabled(false);
 
-         _comboThemeStyle.getParent().layout(true, true);
+         _listThemeStyle.getParent().layout(true, true);
 
          return;
       }
 
-      if (mapProvider.is_mf_Map && _comboTheme.getSelectionIndex() > 0) {
+      if (mapProvider.is_mf_Map && _listTheme.getSelectionIndex() > 0) {
 
          /*
           * When it's an offline map and the themes are NOT from the a file then there are no theme
           * styles
           */
 
-         _comboThemeStyle.add(Messages.Pref_Map25_Provider_ThemeStyle_Info_NoStyles);
-         _comboThemeStyle.select(0);
+         _listThemeStyle.add(Messages.Pref_Map25_Provider_ThemeStyle_Info_NoStyles);
 
          _lblThemeStyle.setEnabled(false);
-         _comboThemeStyle.setEnabled(false);
+         _listThemeStyle.setEnabled(false);
 
-         _comboThemeStyle.getParent().layout(true, true);
+         _listThemeStyle.getParent().layout(true, true);
 
          return;
       }
@@ -628,7 +626,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
        */
 
       // first item is "All Styles"
-      _comboThemeStyle.add(Messages.Pref_Map25_Provider_ThemeStyle_Info_All);
+      _listThemeStyle.add(Messages.Pref_Map25_Provider_ThemeStyle_Info_All);
 
       int styleSelectIndex = 0;
 
@@ -636,7 +634,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
 
          final MapsforgeThemeStyle mfStyle = mfStyles.get(styleIndex);
 
-         _comboThemeStyle.add(mfStyle.getLocaleName());
+         _listThemeStyle.add(mfStyle.getLocaleName());
 
          if (mfStyle.getXmlLayer().equals(mapProvider.mf_ThemeStyle)) {
             styleSelectIndex = styleIndex + 1;
@@ -644,14 +642,14 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
       }
 
       _lblThemeStyle.setEnabled(true);
-      _comboThemeStyle.setEnabled(true);
+      _listThemeStyle.setEnabled(true);
 
-      _comboThemeStyle.getParent().layout(true, true);
+      _listThemeStyle.getParent().layout(true, true);
 
       // select map provider style
       _isInUpdateUI = true;
       {
-         _comboThemeStyle.select(styleSelectIndex);
+         _listThemeStyle.select(styleSelectIndex);
       }
       _isInUpdateUI = false;
    }

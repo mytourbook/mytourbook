@@ -43,8 +43,9 @@ public class CalendarTourData {
    int             cadenceZone_SlowTime;
    int             cadenceZone_FastTime;
 
-   int             recordingTime;
-   int             drivingTime;
+   int             elapsedTime;
+   int             recordedTime;
+   int             movingTime;
 
    int             calories;
    float           power_Avg;

@@ -161,15 +161,15 @@ public abstract class TourbookDevice implements IRawDataReader {
           * export and import found a wrong tour when exporting was done with camouflage speed ->
           * this resulted in a NEW tour
           */
-         final int tourRecordingTime = (int) tourData.getTourRecordingTime();
+         final int tourElapsedTime = (int) tourData.getTourElapsedTime();
 
          if (distanceSerie == null) {
-            uniqueKey = Integer.toString(tourRecordingTime);
+            uniqueKey = Integer.toString(tourElapsedTime);
          } else {
 
             final long tourDistance = (long) distanceSerie[(distanceSerie.length - 1)];
 
-            uniqueKey = Long.toString(tourDistance + tourRecordingTime);
+            uniqueKey = Long.toString(tourDistance + tourElapsedTime);
          }
 
       } else {
@@ -202,7 +202,7 @@ public abstract class TourbookDevice implements IRawDataReader {
 
       if (isCreateTourIdWithRecordingTime) {
 
-         uniqueKey = Long.toString(tourDistance + tourData.getTourRecordingTime());
+         uniqueKey = Long.toString(tourDistance + tourData.getTourElapsedTime());
 
       } else {
 

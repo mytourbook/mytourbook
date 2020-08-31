@@ -39,6 +39,7 @@ import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourTag;
+import net.tourbook.data.TourTimerPause;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.device.InvalidDeviceSAXException;
@@ -418,8 +419,9 @@ public class FitLogSAXHandler extends DefaultHandler {
 
          tourData.setTourDistance(_currentActivity.distance);
 
-         tourData.setTourRecordingTime(_currentActivity.duration);
-         tourData.setTourDrivingTime(_currentActivity.duration);
+         tourData.setTourElapsedTime(_currentActivity.duration);
+         tourData.setTourRecordedTime(_currentActivity.duration);
+         tourData.setTourMovingTime(_currentActivity.duration);
          isComputeDrivingTime = false;
 
          tourData.setTourAltUp(_currentActivity.elevationUp);
@@ -471,6 +473,16 @@ public class FitLogSAXHandler extends DefaultHandler {
          tourData.setAvgCadence(_currentActivity.avgCadence);
       }
 
+      if (_currentActivity.pauses.size() > 0) {
+
+         final ArrayList<TourTimerPause> tourTimerPauses = new ArrayList<>();
+         for (final Pause element : _currentActivity.pauses) {
+            tourTimerPauses.add(new TourTimerPause(tourData, element.startTime, element.endTime));
+         }
+
+         tourData.setTourTimerPauses(tourTimerPauses);
+      }
+
       // No need to set the timezone Id if the activity has GPS coordinates (as it was already done
       // when the time series were created) or if the activity has not time zone UTC offset or no start time.
       if ((tourData.latitudeSerie == null || tourData.latitudeSerie.length == 0) &&
@@ -497,9 +509,12 @@ public class FitLogSAXHandler extends DefaultHandler {
 
          // create additional data
          if (isComputeDrivingTime) {
-            tourData.computeTourDrivingTime();
+            tourData.computeTourMovingTime();
          }
 
+         final long totalTourTimerPauses = tourData.getTotalTourTimerPauses();
+         tourData.setTourPausedTime(totalTourTimerPauses);
+         tourData.setTourRecordedTime(tourData.getTourElapsedTime() - totalTourTimerPauses);
          tourData.computeAltitudeUpDown();
          tourData.computeComputedValues();
 
@@ -951,8 +966,10 @@ public class FitLogSAXHandler extends DefaultHandler {
          _currentActivity.timeZoneUtcOffset = timeZoneUtcOffset / 3600;
 
          //We update the tour start time with the retrieved UTC offset
-         final ZonedDateTime tourStartTimeWithUTCOffset = _currentActivity.tourStartTime.toInstant().atOffset(ZoneOffset.ofHours(
-               _currentActivity.timeZoneUtcOffset)).toZonedDateTime();
+         final ZonedDateTime tourStartTimeWithUTCOffset = _currentActivity.tourStartTime.toInstant()
+               .atOffset(ZoneOffset.ofHours(
+                     _currentActivity.timeZoneUtcOffset))
+               .toZonedDateTime();
          _currentActivity.tourStartTime = tourStartTimeWithUTCOffset;
 
       } else if (_isInHasStartTime) {

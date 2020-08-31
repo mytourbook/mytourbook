@@ -33,6 +33,7 @@ import net.tourbook.data.SwimData;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
+import net.tourbook.data.TourTimerPause;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -49,49 +50,50 @@ import org.eclipse.swt.widgets.Display;
  */
 public class FitData {
 
-   private static final Integer    DEFAULT_MESSAGE_INDEX = Integer.valueOf(0);
+   private static final Integer       DEFAULT_MESSAGE_INDEX = Integer.valueOf(0);
 
-   private IPreferenceStore        _prefStore            = Activator.getDefault().getPreferenceStore();
+   private IPreferenceStore           _prefStore            = Activator.getDefault().getPreferenceStore();
 
-   private boolean                 _isIgnoreLastMarker;
-   private boolean                 _isSetLastMarker;
-   private boolean                 _isFitImportTourType;
-   private String                  _fitImportTourTypeMode;
-   private int                     _lastMarkerTimeSlices;
+   private boolean                    _isIgnoreLastMarker;
+   private boolean                    _isSetLastMarker;
+   private boolean                    _isFitImportTourType;
+   private String                     _fitImportTourTypeMode;
+   private int                        _lastMarkerTimeSlices;
 
-   public boolean                  isComputeAveragePower;
+   public boolean                     isComputeAveragePower;
 
-   private FitDataReader           _fitDataReader;
-   private String                  _importFilePathName;
+   private FitDataReader              _fitDataReader;
+   private String                     _importFilePathName;
 
-   private HashMap<Long, TourData> _alreadyImportedTours;
-   private HashMap<Long, TourData> _newlyImportedTours;
+   private HashMap<Long, TourData>    _alreadyImportedTours;
+   private HashMap<Long, TourData>    _newlyImportedTours;
 
-   private TourData                _tourData             = new TourData();
+   private TourData                   _tourData             = new TourData();
 
-   private String                  _deviceId;
-   private String                  _manufacturer;
-   private String                  _garminProduct;
-   private String                  _softwareVersion;
+   private String                     _deviceId;
+   private String                     _manufacturer;
+   private String                     _garminProduct;
+   private String                     _softwareVersion;
 
-   private String                  _sessionIndex;
-   private ZonedDateTime           _sessionStartTime;
+   private String                     _sessionIndex;
+   private ZonedDateTime              _sessionStartTime;
 
-   private String                  _sportName            = UI.EMPTY_STRING;
-   private String                  _profileName          = UI.EMPTY_STRING;
+   private String                     _sportName            = UI.EMPTY_STRING;
+   private String                     _profileName          = UI.EMPTY_STRING;
 
-   private final List<TimeData>    _allTimeData          = new ArrayList<>();
+   private final List<TimeData>       _allTimeData          = new ArrayList<>();
 
-   private final List<GearData>    _allGearData          = new ArrayList<>();
-   private final List<SwimData>    _allSwimData          = new ArrayList<>();
-   private final List<TourMarker>  _allTourMarker        = new ArrayList<>();
+   private final List<GearData>       _allGearData          = new ArrayList<>();
+   private final List<SwimData>       _allSwimData          = new ArrayList<>();
+   private final List<TourMarker>     _allTourMarker        = new ArrayList<>();
+   private final List<TourTimerPause> _tourTimerPauses      = new ArrayList<>();
 
-   private TimeData                _current_TimeData;
-   private TimeData                _previous_TimeData;
+   private TimeData                   _current_TimeData;
+   private TimeData                   _previous_TimeData;
 
-   private TourMarker              _current_TourMarker;
+   private TourMarker                 _current_TourMarker;
 
-   private long                    _timeDiffMS;
+   private long                       _timeDiffMS;
 
    public FitData(final FitDataReader fitDataReader,
                   final String importFilePath,
@@ -271,6 +273,8 @@ public class FitData {
          _tourData.finalizeTour_SwimData(_tourData, _allSwimData);
 
          finalizeTour_Type(_tourData);
+
+         finalizeTour_TimerPauses(_tourData);
       }
    }
 
@@ -464,6 +468,25 @@ public class FitData {
       tourData.setTourMarkers(tourTourMarkers);
    }
 
+   private void finalizeTour_TimerPauses(final TourData tourData) {
+      if (_tourTimerPauses.size() == 0) {
+
+         _tourData.setTourRecordedTime(_tourData.getTourElapsedTime() - _tourData.getTourPausedTime());
+         return;
+      }
+
+      final List<TourTimerPause> _finalTourtimerPauses = new ArrayList<>();
+
+      for (final TourTimerPause tourTimerPause : _tourTimerPauses) {
+         if (tourTimerPause.getStartTime() > 0 && tourTimerPause.getEndTime() > 0) {
+            tourTimerPause.setTourData(tourData);
+            _finalTourtimerPauses.add(tourTimerPause);
+         }
+      }
+
+      tourData.setTourTimerPauses(_finalTourtimerPauses);
+   }
+
    private void finalizeTour_Type(final TourData tourData) {
 
       // If enabled, set Tour Type using FIT file data
@@ -557,6 +580,10 @@ public class FitData {
 
    public TourData getTourData() {
       return _tourData;
+   }
+
+   public List<TourTimerPause> getTourTimerPauses() {
+      return _tourTimerPauses;
    }
 
    public String getTourTitle() {

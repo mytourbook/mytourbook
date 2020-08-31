@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,14 +15,14 @@
  *******************************************************************************/
 package net.tourbook.map25;
 
+import de.byteholder.geoclipse.map.UI;
+
 import java.util.List;
 import java.util.UUID;
 
-import org.oscim.theme.VtmThemes;
-
 import net.tourbook.preferences.MapsforgeThemeStyle;
 
-import de.byteholder.geoclipse.map.UI;
+import org.oscim.theme.VtmThemes;
 
 public class Map25Provider implements Cloneable {
 
@@ -33,7 +33,8 @@ public class Map25Provider implements Cloneable {
    public boolean   isDefault;
 
    /**
-    *
+    * The field name is Thomas naming, have no idea what it means, this value is currently not set,
+    * except default is false.
     */
    public boolean   is_mf_Map;
 

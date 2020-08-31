@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -212,7 +212,7 @@ public class TourInfoView extends ViewPart {
 
          final int modifiers = field.getModifiers();
 
-         // skip contstants
+         // skip constants
          final boolean isConstant = Modifier.isStatic(modifiers) && Modifier.isFinal(modifiers);
          if (isConstant) {
             continue;
@@ -646,7 +646,7 @@ public class TourInfoView extends ViewPart {
 
    private void onResize() {
 
-      // horizontal scroll bar ishidden, only the vertical scrollbar can be displayed
+      // horizontal scroll bar is hidden, only the vertical scrollbar can be displayed
       int infoContainerWidth = _uiContainer.getBounds().width;
       final ScrollBar vertBar = _uiContainer.getVerticalBar();
 
@@ -948,7 +948,7 @@ public class TourInfoView extends ViewPart {
          sb.append(refTour.getStartValueIndex());
          sb.append(UI.DASH_WITH_SPACE);
          sb.append(refTour.getEndValueIndex());
-         sb.append(")"); //$NON-NLS-1$
+         sb.append(UI.SYMBOL_BRACKET_RIGHT);
 
          refCounter++;
       }

@@ -222,7 +222,7 @@ public class TourGeoFilter_Manager {
             }
          }
 
-         sqlWhere = "GeoPart IN (" + sqlGeoPartParameters + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+         sqlWhere = "GeoPart IN (" + sqlGeoPartParameters + UI.SYMBOL_BRACKET_RIGHT; //$NON-NLS-1$
 
       } else {
 
@@ -292,7 +292,7 @@ public class TourGeoFilter_Manager {
             // skip all events which has not yet been executed
             if (__runnableCounter != _fireEventCounter[0]) {
 
-               // a new event occured
+               // a new event occurred
                return;
             }
 
@@ -369,7 +369,7 @@ public class TourGeoFilter_Manager {
 
       if (sqlSelect_WithAllTourIds_FromGeoParts == null) {
 
-         // this can occure when there are no geo parts, this would cause a sql exception
+         // this can occur when there are no geo parts, this would cause a sql exception
 
          return null;
       }

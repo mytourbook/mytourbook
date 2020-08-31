@@ -3,18 +3,24 @@
 
 TODO's
 ======  
-             
 
 
 New
 ===
 
-* 
+* Elapsed Time - Recorded Time - Paused Time (Frederic) https://github.com/wolfgang-ch/mytourbook/pull/222
+ - The recorded/paused time are imported from the following formats Garmin FIT, Suunto (Ambit 2 xml, Ambit 2 sml, Suunto Spartan/9 .json.gz), SportTracks Fitlog, Garmin TCX
+ - Added the ability to re-import, for existing tours, only the timer pauses (and hence also the recorded time).
+ - The new tour times (Recorded & Paused Times) are available for displau in the TourDataEditorView, TourBookView, Calendar view & Statistics View
+ - 2D Map: Added the ability to display/hide the location and duration of the tour pauses
 
 
 Improvements
 ============
 
+* Flat Tour Book View
+  - Show markers and tags columns with the correct content (no dummy text)
+  
 * 
 
 Changes  
@@ -26,6 +32,9 @@ Changes
 Fixes   
 =====
 
+* Flat Tour Book View
+  - Tour tag filter caused SQL exception https://github.com/wolfgang-ch/mytourbook/issues/220
+             
 * 
  
    
