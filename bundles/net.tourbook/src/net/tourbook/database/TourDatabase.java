@@ -202,7 +202,7 @@ public class TourDatabase {
    public static final String                             ENTITY_ID_REF                   = "RefID";                                                //$NON-NLS-1$
    public static final String                             ENTITY_ID_TAG                   = "TagID";                                                //$NON-NLS-1$
    public static final String                             ENTITY_ID_TAG_CATEGORY          = "TagCategoryID";                                        //$NON-NLS-1$
-   public static final String                             ENTITY_ID_TIMERPAUSE            = "timerPauseId";                                         //$NON-NLS-1$
+   public static final String                             ENTITY_ID_TIMERPAUSE            = "TimerPauseId";                                         //$NON-NLS-1$
    public static final String                             ENTITY_ID_TOUR                  = "TourID";                                               //$NON-NLS-1$
    public static final String                             ENTITY_ID_TYPE                  = "TypeID";                                               //$NON-NLS-1$
    public static final String                             ENTITY_ID_WAY_POINT             = "WayPointID";                                           //$NON-NLS-1$
