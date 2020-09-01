@@ -38,6 +38,9 @@ public class TVITourBookYearCategorized extends TVITourBookItem {
       setParentItem(parentItem);
    }
 
+   /**
+    * Fetch all tour data within a month/week category.
+    */
    @Override
    protected void fetchChildren() {
 
@@ -66,26 +69,26 @@ public class TVITourBookYearCategorized extends TVITourBookItem {
 
       final String sqlString = NL
 
-            + "SELECT " //                                                    //$NON-NLS-1$
+            + "SELECT" + NL //                                                      //$NON-NLS-1$
 
             + SQL_ALL_TOUR_FIELDS + UI.COMMA_SPACE + NL
             + SQL_ALL_OTHER_FIELDS + NL
 
-            + " FROM " + TourDatabase.TABLE_TOUR_DATA + " TourData" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
+            + "FROM " + TourDatabase.TABLE_TOUR_DATA + " TourData" + NL //          //$NON-NLS-1$ //$NON-NLS-2$
 
             // get tag id's
-            + " LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" //$NON-NLS-1$ //$NON-NLS-2$
-            + " ON TourData.tourId = jTdataTtag.TourData_tourId" //           //$NON-NLS-1$
+            + "LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" //$NON-NLS-1$ //$NON-NLS-2$
+            + " ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //            //$NON-NLS-1$
 
             // get marker id's
-            + " LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_MARKER + " Tmarker" //$NON-NLS-1$ //$NON-NLS-2$
-            + " ON TourData.tourId = Tmarker.TourData_tourId" + NL //         //$NON-NLS-1$
+            + "LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_MARKER + " Tmarker" //   //$NON-NLS-1$ //$NON-NLS-2$
+            + " ON TourData.tourId = Tmarker.TourData_tourId" + NL //               //$NON-NLS-1$
 
-            + " WHERE " + sumYear + " = ?" + NL //                            //$NON-NLS-1$ //$NON-NLS-2$
-            + " AND " + sumYearSub + " = ?" + NL //                           //$NON-NLS-1$ //$NON-NLS-2$
-            + sqlFilter.getWhereClause()
+            + "WHERE " + sumYear + " = ?" + NL //                                   //$NON-NLS-1$ //$NON-NLS-2$
+            + "   AND " + sumYearSub + " = ?" + NL //                               //$NON-NLS-1$ //$NON-NLS-2$
+            + "   " + sqlFilter.getWhereClause()
 
-            + " ORDER BY TourStartTime\n"; //$NON-NLS-1$
+            + "ORDER BY TourStartTime" + NL; //                                     //$NON-NLS-1$
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
