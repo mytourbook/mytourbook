@@ -1086,7 +1086,7 @@ public class TourMapPainter extends MapPainter {
 
             if (_tourPaintConfig.isShowTourMarker) {
 
-               isContentInTile = doPaint_Marker(
+               isContentInTile = isContentInTile || doPaint_Marker(
                      gcTile,
                      map,
                      tile,
@@ -1099,7 +1099,7 @@ public class TourMapPainter extends MapPainter {
 
             if (_tourPaintConfig.isShowTourPauses) {
 
-               isContentInTile = doPaint_Pauses(
+               isContentInTile = isContentInTile || doPaint_Pauses(
                      gcTile,
                      map,
                      tile,
