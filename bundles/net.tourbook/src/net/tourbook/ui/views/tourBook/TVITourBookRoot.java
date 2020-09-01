@@ -83,9 +83,78 @@ public class TVITourBookRoot extends TVITourBookItem {
 
             if (isCombineTagsWithOr) {
 
+               /**
+                * <code>
+                *
+                * SELECT
+                *    StartYear,
+                *    SUM( CAST(TourDistance AS BIGINT)),
+                *    ...
+                * 	MAX(CASE WHEN weather_Temperature_Max = 0 THEN NULL ELSE weather_Temperature_Max END)
+                * FROM (
+                *    SELECT
+                *       DISTINCT TourId,
+                *       StartYear,
+                *       ...
+                * 		weather_Temperature_Max
+                * 	FROM TOURDATA
+                * 	LEFT JOIN TOURDATA_TOURTAG AS jTdataTtag ON TourData.tourId = jTdataTtag.TourData_tourId
+                *    WHERE 1=1
+                * 		AND TourData.tourPerson_personId = 0
+                * 		AND TourData.tourType_typeId IN ( 0, 1, 34)
+                * 		AND jTdataTtag.TourTag_tagId IN ( 22, 9)
+                * ) NecessaryNameOtherwiseItDoNotWork
+                * GROUP BY ROLLUP(StartYear)
+                * ORDER BY StartYear
+                *
+                * </code>
+                */
+
                sqlTagJoinTable = "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG;
 
             } else {
+
+               /**
+                * <code>
+                *
+                * SELECT
+                *    StartYear,
+                *    SUM( CAST(TourDistance AS BIGINT)),
+                * 	...
+                * 	MAX(CASE WHEN weather_Temperature_Max = 0 THEN NULL ELSE weather_Temperature_Max END)
+                * FROM (
+                *    SELECT
+                *       DISTINCT TourId,
+                *       StartYear,
+                *       TourDistance,
+                * 		...
+                * 		weather_Temperature_Max
+                * 	FROM TOURDATA
+                * 	INNER JOIN
+                * 	(
+                * 	 SELECT *
+                * 	 FROM TOURDATA_TOURTAG
+                * 	 INNER JOIN
+                * 	 (
+                * 		 SELECT TOURDATA_TOURID AS Count_TourId, COUNT(*) AS NumTagIds
+                * 		 FROM TOURDATA_TOURTAG
+                * 		 WHERE  TOURTAG_TAGID IN ( 22, 9)
+                * 		 GROUP BY TOURDATA_TOURID
+                * 		 HAVING COUNT(TOURDATA_TOURID) = 2
+                * 	 )
+                * 	 AS jTdataTtag
+                * 	 ON TOURDATA_TOURTAG.TOURDATA_TOURID = jTdataTtag.Count_TourId
+                * 	)
+                *    AS jTdataTtag ON TourData.tourId = jTdataTtag.TourData_tourId
+                *    WHERE 1=1
+                * 		AND TourData.tourPerson_personId = 0
+                * 		AND TourData.tourType_typeId IN ( 0, 1, 34)
+                * ) NecessaryNameOtherwiseItDoNotWork
+                * GROUP BY ROLLUP(StartYear)
+                * ORDER BY StartYear
+                *
+                * </code>
+                */
 
                sqlCombineTagsWithAnd = TourTagFilterManager.createSql_CombineTagsWithAnd();
                sqlTagJoinTable = sqlCombineTagsWithAnd.getSqlString();
@@ -118,6 +187,24 @@ public class TVITourBookRoot extends TVITourBookItem {
          } else {
 
             // without tag filter
+
+            /**
+             * <code>
+             *
+             *  SELECT
+             *     StartYear,
+             *     SUM( CAST(TourDistance AS BIGINT)),
+             *     ...
+             *     MAX(CASE WHEN weather_Temperature_Max = 0 THEN NULL ELSE weather_Temperature_Max END)
+             *  FROM TOURDATA
+             *  WHERE 1=1
+             *     AND TourData.tourPerson_personId = 0
+             *     AND TourData.tourType_typeId IN ( 0, 1, 34)
+             *  GROUP BY ROLLUP(StartYear)
+             *  ORDER BY StartYear
+             *
+             * </code>
+             */
 
             sqlFromTourData = UI.EMPTY_STRING
 

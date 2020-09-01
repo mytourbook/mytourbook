@@ -175,8 +175,8 @@ public class TourTagFilterManager {
    }
 
    /**
-    * @return Returns the SQL where part for the tag filter or <code>null</code> when tag filter is
-    *         disabled.
+    * @return Returns the SQL <code>WHERE</code> part for the tag filter when a tag filter is
+    *         enabled and tag's are OR'ed, otherwise <code>null</code>.
     */
    public static SQLData getSQL_WherePart() {
 
@@ -193,36 +193,36 @@ public class TourTagFilterManager {
          return null;
       }
 
-      final ArrayList<Object> sqlParameters = new ArrayList<>();
-      String sqlWhere = UI.EMPTY_STRING;
-
-      if (_selectedProfile.isOrOperator) {
-
-         // combine tags with OR
-
-         final StringBuilder parameterTagIds = new StringBuilder();
-
-         for (int tagIndex = 0; tagIndex < tagIds.length; tagIndex++) {
-            if (tagIndex == 0) {
-               parameterTagIds.append(PARAMETER_FIRST);
-            } else {
-               parameterTagIds.append(PARAMETER_FOLLOWING);
-            }
-
-            sqlParameters.add(tagIds[tagIndex]);
-         }
-
-         sqlWhere = " AND jTdataTtag.TourTag_tagId IN (" + parameterTagIds.toString() + ")" + NL; //$NON-NLS-1$ //$NON-NLS-2$
-
-      } else {
+      if (_selectedProfile.isOrOperator == false) {
 
          /**
           * Combine tags with AND
           * <p>
-          * This cannot simply be done by using an AND operator, it is done in the data loader with
-          * an inner join -> complicated
+          * This cannot simply be done by using an AND operator between tag's, it is done with an
+          * inner join -> complicated
           */
+
+         return null;
       }
+
+      /*
+       * Combine tags with OR
+       */
+
+      final ArrayList<Object> sqlParameters = new ArrayList<>();
+      final StringBuilder parameterTagIds = new StringBuilder();
+
+      for (int tagIndex = 0; tagIndex < tagIds.length; tagIndex++) {
+         if (tagIndex == 0) {
+            parameterTagIds.append(PARAMETER_FIRST);
+         } else {
+            parameterTagIds.append(PARAMETER_FOLLOWING);
+         }
+
+         sqlParameters.add(tagIds[tagIndex]);
+      }
+
+      final String sqlWhere = " AND jTdataTtag.TourTag_tagId IN (" + parameterTagIds.toString() + ")" + NL; //$NON-NLS-1$ //$NON-NLS-2$
 
       return new SQLData(sqlWhere, sqlParameters);
    }
@@ -233,7 +233,8 @@ public class TourTagFilterManager {
    }
 
    /**
-    * @return Returns <code>true</code> when the tags are OR'ed otherwise they are AND'ed
+    * @return Returns <code>true</code> when the filter tags are OR'ed or the tour tag filter is not
+    *         enabled, otherwise tags's are AND'ed
     */
    public static boolean isCombineTagsWithOr() {
 

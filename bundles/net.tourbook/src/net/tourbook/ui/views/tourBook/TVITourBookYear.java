@@ -159,7 +159,7 @@ public class TVITourBookYear extends TVITourBookItem {
                + "ORDER BY " + sqlSumYearFieldSub + NL //                              //$NON-NLS-1$
          ;
 
-         final ZonedDateTime tourWeek = calendar8.with(//
+         final ZonedDateTime tourWeek = calendar8.with(
                TimeTools.calendarWeek.dayOfWeek(),
                TimeTools.calendarWeek.getFirstDayOfWeek().getValue());
 
@@ -210,7 +210,7 @@ public class TVITourBookYear extends TVITourBookItem {
                final TemporalField weekBasedYear = TimeTools.calendarWeek.weekBasedYear();
                final TemporalField weekOfYear = TimeTools.calendarWeek.weekOfYear();
 
-               categoryDate = tourWeekLocal//
+               categoryDate = tourWeekLocal
                      .with(weekBasedYear, dbYear)
                      .with(weekOfYear, dbYearSub);
 
@@ -223,7 +223,7 @@ public class TVITourBookYear extends TVITourBookItem {
 
                // month
 
-               categoryDate = tourWeekLocal//
+               categoryDate = tourWeekLocal
                      .withYear(dbYear)
                      .withMonth(dbYearSub);
 

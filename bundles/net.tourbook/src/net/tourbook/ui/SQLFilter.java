@@ -176,6 +176,10 @@ public class SQLFilter {
    /**
     * @return Returns the WHERE clause to filter tours by the app filter, e.g. person, tour types,
     *         ...
+    *         <p>
+    *         This WHERE clause contains the tag filter sql statements only, when a tag filter is
+    *         enabled and the tag's are combined with OR.
+    *         ...
     */
    public String getWhereClause() {
       return _sqlWhereClause;

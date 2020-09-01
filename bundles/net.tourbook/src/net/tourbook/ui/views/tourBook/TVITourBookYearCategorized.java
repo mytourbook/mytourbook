@@ -74,9 +74,13 @@ public class TVITourBookYearCategorized extends TVITourBookItem {
 
       if (isCombineTagsWithOr) {
 
+         // combine tags with OR
+
          sqlTagJoinTable = "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG;
 
       } else {
+
+         // combine tags with AND
 
          sqlCombineTagsWithAnd = TourTagFilterManager.createSql_CombineTagsWithAnd();
          sqlTagJoinTable = sqlCombineTagsWithAnd.getSqlString();
@@ -91,20 +95,20 @@ public class TVITourBookYearCategorized extends TVITourBookItem {
             + SQL_ALL_TOUR_FIELDS + UI.COMMA_SPACE + NL
             + SQL_ALL_OTHER_FIELDS + NL
 
-            + "FROM " + TourDatabase.TABLE_TOUR_DATA + NL //         //$NON-NLS-1$
+            + "FROM " + TourDatabase.TABLE_TOUR_DATA + NL //                        //$NON-NLS-1$
 
             // get/filter tag's
             + "   " + sqlTagJoinTable
 
             + "   AS jTdataTtag" + NL //$NON-NLS-1$
-            + "   ON tourID = jTdataTtag.TourData_tourId" + NL //       //$NON-NLS-1$
+            + "   ON tourID = jTdataTtag.TourData_tourId" + NL //                   //$NON-NLS-1$
 
             // get marker id's
             + "LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_MARKER + " Tmarker" //   //$NON-NLS-1$ //$NON-NLS-2$
             + " ON TourData.tourId = Tmarker.TourData_tourId" + NL //               //$NON-NLS-1$
 
-            + "WHERE " + sumYear + " = ?" + NL //                                   //$NON-NLS-1$ //$NON-NLS-2$
-            + "   AND " + sumYearSub + " = ?" + NL //                               //$NON-NLS-1$ //$NON-NLS-2$
+            + "WHERE " + sumYear + "=?" + NL //                                     //$NON-NLS-1$ //$NON-NLS-2$
+            + "   AND " + sumYearSub + "=?" + NL //                                 //$NON-NLS-1$ //$NON-NLS-2$
             + "   " + sqlAppFilter.getWhereClause()
 
             + "ORDER BY TourStartTime" + NL; //                                     //$NON-NLS-1$
