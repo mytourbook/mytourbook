@@ -84,17 +84,11 @@ public class TVITourBookYear extends TVITourBookItem {
          final SQLFilter sqlAppFilter = new SQLFilter(SQLFilter.TAG_FILTER);
          String sqlFromTourData;
 
-         final String sqlFilterWhereClause = sqlAppFilter.getWhereClause().trim();
-         final boolean isSqlWhereClause = sqlFilterWhereClause.length() > 0;
-
-         final String sqlWhereClause = isSqlWhereClause
-               ? "WHERE 1=1 " + NL + sqlFilterWhereClause + NL //$NON-NLS-1$
-               : UI.EMPTY_STRING;
-
+         final boolean isTourTagFilterEnabled = TourTagFilterManager.isTourTagFilterEnabled();
          boolean isCombineTagsWithOr = false;
          SQLData sqlCombineTagsWithAnd = null;
 
-         if (TourTagFilterManager.isTourTagFilterEnabled()) {
+         if (isTourTagFilterEnabled) {
 
             // with tag filter
 
@@ -114,29 +108,29 @@ public class TVITourBookYear extends TVITourBookItem {
 
             sqlFromTourData = NL
 
-                  + "FROM (" + NL //                                          //$NON-NLS-1$
+                  + "FROM (" + NL //                                                   //$NON-NLS-1$
 
-                  + "   SELECT" + NL //                                       //$NON-NLS-1$
+                  + "   SELECT" + NL //                                                //$NON-NLS-1$
 
                   // this is necessary otherwise tours can occure multiple times when a tour contains multiple tags !!!
-                  + "      DISTINCT TourId," + NL //                       //$NON-NLS-1$
+                  + "      DISTINCT TourId," + NL //                                   //$NON-NLS-1$
 
-                  + "      " + sqlSumYearField + "," + NL //                  //$NON-NLS-1$
-                  + "      " + sqlSumYearFieldSub + "," + NL //               //$NON-NLS-1$
+                  + "      " + sqlSumYearField + "," + NL //                           //$NON-NLS-1$
+                  + "      " + sqlSumYearFieldSub + "," + NL //                        //$NON-NLS-1$
                   + "      " + SQL_SUM_FIELDS + NL
 
-                  + "   FROM " + TourDatabase.TABLE_TOUR_DATA + NL //         //$NON-NLS-1$
+                  + "   FROM " + TourDatabase.TABLE_TOUR_DATA + NL //                  //$NON-NLS-1$
 
                   // get tag id's
                   + "       " + sqlTagJoinTable
 
                   + "   AS jTdataTtag" + NL //$NON-NLS-1$
-                  + "   ON tourID = jTdataTtag.TourData_tourId" + NL //       //$NON-NLS-1$
+                  + "   ON tourID = jTdataTtag.TourData_tourId" + NL //                //$NON-NLS-1$
 
-                  + "   WHERE " + sqlSumYearField + "=?" + NL //              //$NON-NLS-1$ //$NON-NLS-2$
+                  + "   WHERE " + sqlSumYearField + "=?" + NL //                       //$NON-NLS-1$ //$NON-NLS-2$
                   + "      " + sqlAppFilter.getWhereClause()
 
-                  + ") NecessaryNameOtherwiseItDoNotWork" + NL //             //$NON-NLS-1$
+                  + ") NecessaryNameOtherwiseItDoNotWork" + NL //                      //$NON-NLS-1$
             ;
 
          } else {
@@ -145,10 +139,10 @@ public class TVITourBookYear extends TVITourBookItem {
 
             sqlFromTourData = NL
 
-                  + " FROM " + TourDatabase.TABLE_TOUR_DATA + NL //           //$NON-NLS-1$
+                  + "FROM " + TourDatabase.TABLE_TOUR_DATA + NL //                     //$NON-NLS-1$
 
-                  + " WHERE " + sqlSumYearField + "=?" + NL //                //$NON-NLS-1$ //$NON-NLS-2$
-                  + sqlAppFilter.getWhereClause() + NL;
+                  + "WHERE " + sqlSumYearField + "=?" + NL //                          //$NON-NLS-1$ //$NON-NLS-2$
+                  + "   " + sqlAppFilter.getWhereClause() + NL;
          }
 
          sql = NL +
@@ -173,9 +167,9 @@ public class TVITourBookYear extends TVITourBookItem {
 
          int paramIndex = 1;
 
-         if (isCombineTagsWithOr) {
+         if (isTourTagFilterEnabled == false || isCombineTagsWithOr) {
 
-            // combine tags with OR
+            // no need to add tag parameters
 
          } else {
 

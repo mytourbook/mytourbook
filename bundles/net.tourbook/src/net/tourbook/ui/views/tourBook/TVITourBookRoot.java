@@ -69,10 +69,11 @@ public class TVITourBookRoot extends TVITourBookItem {
                ? "WHERE 1=1 " + NL + sqlFilterWhereClause + NL //$NON-NLS-1$
                : UI.EMPTY_STRING;
 
+         final boolean isTourTagFilterEnabled = TourTagFilterManager.isTourTagFilterEnabled();
          boolean isCombineTagsWithOr = false;
          SQLData sqlCombineTagsWithAnd = null;
 
-         if (TourTagFilterManager.isTourTagFilterEnabled()) {
+         if (isTourTagFilterEnabled) {
 
             // with tag filter
 
@@ -150,9 +151,9 @@ public class TVITourBookRoot extends TVITourBookItem {
 
          int paramIndex = 1;
 
-         if (isCombineTagsWithOr) {
+         if (isTourTagFilterEnabled == false || isCombineTagsWithOr) {
 
-            // combine tags with OR
+            // no need to add tag parameters
 
          } else {
 

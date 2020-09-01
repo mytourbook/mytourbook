@@ -248,7 +248,8 @@ public class TourTagFilterManager {
    }
 
    /**
-    * @return Returns <code>true</code> when a tour tag filter is enabled
+    * @return Returns <code>true</code> when a tour tag filter is enabled in the current tour tag
+    *         filter profile.
     */
    public static boolean isTourTagFilterEnabled() {
 
