@@ -70,18 +70,18 @@ public class TVITourBookRoot extends TVITourBookItem {
                : UI.EMPTY_STRING;
 
          final boolean isTourTagFilterEnabled = TourTagFilterManager.isTourTagFilterEnabled();
-         boolean isCombineTagsWithOr = false;
+         boolean isNoTagFilter_Or_CombineTagsWithOr = false;
          SQLData sqlCombineTagsWithAnd = null;
 
          if (isTourTagFilterEnabled) {
 
             // with tag filter
 
-            isCombineTagsWithOr = TourTagFilterManager.isCombineTagsWithOr();
+            isNoTagFilter_Or_CombineTagsWithOr = TourTagFilterManager.isNoTagsFilter_Or_CombineTagsWithOr();
 
             String sqlTagJoinTable;
 
-            if (isCombineTagsWithOr) {
+            if (isNoTagFilter_Or_CombineTagsWithOr) {
 
                /**
                 * <code>
@@ -238,9 +238,9 @@ public class TVITourBookRoot extends TVITourBookItem {
 
          int paramIndex = 1;
 
-         if (isTourTagFilterEnabled == false || isCombineTagsWithOr) {
+         if (isTourTagFilterEnabled == false || isNoTagFilter_Or_CombineTagsWithOr) {
 
-            // no need to add tag parameters
+            // nothing more to do
 
          } else {
 

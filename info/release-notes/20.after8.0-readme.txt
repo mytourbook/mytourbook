@@ -3,7 +3,7 @@
 
 TODO's
 ======  
-* All total numbers in tourbook view are wrong when a tour contains multiple tags, nobody discovered this yet. 
+* Do not autodelete "Selected Tags" in tour tag filter when they are not checked 
 
 New
 ===

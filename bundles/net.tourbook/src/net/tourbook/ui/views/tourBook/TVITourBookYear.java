@@ -85,18 +85,18 @@ public class TVITourBookYear extends TVITourBookItem {
          String sqlFromTourData;
 
          final boolean isTourTagFilterEnabled = TourTagFilterManager.isTourTagFilterEnabled();
-         boolean isCombineTagsWithOr = false;
+         boolean isNoTagFilter_Or_CombineTagsWithOr = false;
          SQLData sqlCombineTagsWithAnd = null;
 
          if (isTourTagFilterEnabled) {
 
             // with tag filter
 
-            isCombineTagsWithOr = TourTagFilterManager.isCombineTagsWithOr();
+            isNoTagFilter_Or_CombineTagsWithOr = TourTagFilterManager.isNoTagsFilter_Or_CombineTagsWithOr();
 
             String sqlTagJoinTable;
 
-            if (isCombineTagsWithOr) {
+            if (isNoTagFilter_Or_CombineTagsWithOr) {
 
                sqlTagJoinTable = "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG;
 
@@ -167,9 +167,9 @@ public class TVITourBookYear extends TVITourBookItem {
 
          int paramIndex = 1;
 
-         if (isTourTagFilterEnabled == false || isCombineTagsWithOr) {
+         if (isTourTagFilterEnabled == false || isNoTagFilter_Or_CombineTagsWithOr) {
 
-            // no need to add tag parameters
+            // nothing more to do
 
          } else {
 

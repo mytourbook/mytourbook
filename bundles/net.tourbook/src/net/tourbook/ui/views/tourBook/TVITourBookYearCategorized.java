@@ -67,12 +67,12 @@ public class TVITourBookYearCategorized extends TVITourBookItem {
          sumYearSub = "startMonth"; //$NON-NLS-1$
       }
 
-      final boolean isCombineTagsWithOr = TourTagFilterManager.isCombineTagsWithOr();
+      final boolean isNoTagFilter_Or_CombineTagsWithOr = TourTagFilterManager.isNoTagsFilter_Or_CombineTagsWithOr();
       SQLData sqlCombineTagsWithAnd = null;
 
       String sqlTagJoinTable;
 
-      if (isCombineTagsWithOr) {
+      if (isNoTagFilter_Or_CombineTagsWithOr) {
 
          // combine tags with OR
 
@@ -122,9 +122,9 @@ public class TVITourBookYearCategorized extends TVITourBookItem {
          int paramIndex = 1;
 
          // set sql tag parameters
-         if (isCombineTagsWithOr) {
+         if (isNoTagFilter_Or_CombineTagsWithOr) {
 
-            // combine tags with OR
+            // nothing more to do
 
          } else {
 

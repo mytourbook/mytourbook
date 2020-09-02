@@ -236,16 +236,16 @@ public class TourTagFilterManager {
     * @return Returns <code>true</code> when the filter tags are OR'ed or the tour tag filter is not
     *         enabled, otherwise tags's are AND'ed
     */
-   public static boolean isCombineTagsWithOr() {
+   public static boolean isNoTagsFilter_Or_CombineTagsWithOr() {
 
-      boolean isCombineTagsWithOr = true;
+      boolean isNoTagFilter_Or_CombineTagsWithOr = true;
       final boolean isTourTagFilterEnabled = isTourTagFilterEnabled();
 
       if (isTourTagFilterEnabled && getSelectedProfile().isOrOperator == false) {
-         isCombineTagsWithOr = false;
+         isNoTagFilter_Or_CombineTagsWithOr = false;
       }
 
-      return isCombineTagsWithOr;
+      return isNoTagFilter_Or_CombineTagsWithOr;
    }
 
    /**

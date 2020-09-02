@@ -280,7 +280,7 @@ public class NatTable_DataLoader {
 
          PreparedStatement prepStmt;
 
-         if (TourTagFilterManager.isCombineTagsWithOr()) {
+         if (TourTagFilterManager.isNoTagsFilter_Or_CombineTagsWithOr()) {
 
             // tags are combined with OR
 
@@ -322,7 +322,7 @@ public class NatTable_DataLoader {
                   + " FROM" + NL //                                                                      //$NON-NLS-1$
                   + " ( SELECT" + NL //                                                                  //$NON-NLS-1$
                   + "      TourId," + NL //                                                              //$NON-NLS-1$
-                  + "      jTdataTtag.TourTag_tagId," + NL //                                             //$NON-NLS-1$
+                  + "      jTdataTtag.TourTag_tagId," + NL //                                            //$NON-NLS-1$
                   + "      " + createSql_Sorting_Fields() + NL
                   + "   FROM " + TourDatabase.TABLE_TOUR_DATA + NL //                                    //$NON-NLS-1$
                   + "   " + sqlCombineTagsWithAnd.getSqlString()
@@ -371,7 +371,7 @@ public class NatTable_DataLoader {
 
          PreparedStatement prepStmt;
 
-         if (TourTagFilterManager.isCombineTagsWithOr()) {
+         if (TourTagFilterManager.isNoTagsFilter_Or_CombineTagsWithOr()) {
 
             final SQLFilter sqlFilter = new SQLFilter(SQLFilter.TAG_FILTER);
 
@@ -487,12 +487,12 @@ public class NatTable_DataLoader {
 
          PreparedStatement prepStmt;
 
-         final boolean isCombineTagsWithOr = TourTagFilterManager.isCombineTagsWithOr();
+         final boolean isNoTagFilter_Or_CombineTagsWithOr = TourTagFilterManager.isNoTagsFilter_Or_CombineTagsWithOr();
 
          String sqlTagJoinTable;
          SQLData sqlCombineTagsWithAnd = null;
 
-         if (isCombineTagsWithOr) {
+         if (isNoTagFilter_Or_CombineTagsWithOr) {
 
             sqlTagJoinTable = "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG;
 
@@ -533,7 +533,7 @@ public class NatTable_DataLoader {
                + "       ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //                        //$NON-NLS-1$
 
                + "       WHERE 1=1" + NL //                                                              //$NON-NLS-1$
-               + "       " + sqlAppFilter.getWhereClause() //                                      //$NON-NLS-1$
+               + "       " + sqlAppFilter.getWhereClause() //                                            //$NON-NLS-1$
                + "       " + createSql_Sorting_OrderBy() + NL //                                         //$NON-NLS-1$
                + "    ) AS TourData " + NL //                                                            //$NON-NLS-1$
 
@@ -547,16 +547,16 @@ public class NatTable_DataLoader {
                + " LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" //            //$NON-NLS-1$ //$NON-NLS-2$
                + " ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //                              //$NON-NLS-1$
 
-               + " " + createSql_Sorting_OrderBy() //                                                     //$NON-NLS-1$
+               + " " + createSql_Sorting_OrderBy() //                                                    //$NON-NLS-1$
          ;
 
          prepStmt = conn.prepareStatement(sql);
 
          int paramIndex = 1;
 
-         if (isCombineTagsWithOr) {
+         if (isNoTagFilter_Or_CombineTagsWithOr) {
 
-            // combine tags with OR
+            // nothing more to do
 
          } else {
 
