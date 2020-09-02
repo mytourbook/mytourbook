@@ -19,7 +19,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import net.tourbook.common.util.SQLData;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.tag.tour.filter.TourTagFilterManager;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.UI;
 
@@ -38,6 +40,9 @@ public class TVITourBookYearCategorized extends TVITourBookItem {
       setParentItem(parentItem);
    }
 
+   /**
+    * Fetch all tour data within a month/week category.
+    */
    @Override
    protected void fetchChildren() {
 
@@ -62,42 +67,80 @@ public class TVITourBookYearCategorized extends TVITourBookItem {
          sumYearSub = "startMonth"; //$NON-NLS-1$
       }
 
-      final SQLFilter sqlFilter = new SQLFilter(SQLFilter.TAG_FILTER);
+      final boolean isNoTagFilter_Or_CombineTagsWithOr = TourTagFilterManager.isNoTagsFilter_Or_CombineTagsWithOr();
+      SQLData sqlCombineTagsWithAnd = null;
 
-      final String sqlString = NL
+      String sqlTagJoinTable;
 
-            + "SELECT " //                                                    //$NON-NLS-1$
+      if (isNoTagFilter_Or_CombineTagsWithOr) {
+
+         // combine tags with OR
+
+         sqlTagJoinTable = "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG;
+
+      } else {
+
+         // combine tags with AND
+
+         sqlCombineTagsWithAnd = TourTagFilterManager.createSql_CombineTagsWithAnd();
+         sqlTagJoinTable = sqlCombineTagsWithAnd.getSqlString();
+      }
+
+      final SQLFilter sqlAppFilter = new SQLFilter(SQLFilter.TAG_FILTER);
+
+      final String sql = NL
+
+            + "SELECT" + NL //                                                      //$NON-NLS-1$
 
             + SQL_ALL_TOUR_FIELDS + UI.COMMA_SPACE + NL
-            + SQL_ALL_OTHER_FIELDS
-            + NL
+            + SQL_ALL_OTHER_FIELDS + NL
 
-            + " FROM " + TourDatabase.TABLE_TOUR_DATA + " TourData" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
+            + "FROM " + TourDatabase.TABLE_TOUR_DATA + NL //                        //$NON-NLS-1$
 
-            // get tag id's
-            + " LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" //$NON-NLS-1$ //$NON-NLS-2$
-            + " ON TourData.tourId = jTdataTtag.TourData_tourId" //           //$NON-NLS-1$
+            // get/filter tag's
+            + "   " + sqlTagJoinTable
+
+            + "   AS jTdataTtag" + NL //$NON-NLS-1$
+            + "   ON tourID = jTdataTtag.TourData_tourId" + NL //                   //$NON-NLS-1$
 
             // get marker id's
-            + " LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_MARKER + " Tmarker" //$NON-NLS-1$ //$NON-NLS-2$
-            + " ON TourData.tourId = Tmarker.TourData_tourId" + NL //         //$NON-NLS-1$
+            + "LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_MARKER + " Tmarker" //   //$NON-NLS-1$ //$NON-NLS-2$
+            + " ON TourData.tourId = Tmarker.TourData_tourId" + NL //               //$NON-NLS-1$
 
-            + " WHERE " + sumYear + " = ?" + NL //                            //$NON-NLS-1$ //$NON-NLS-2$
-            + " AND " + sumYearSub + " = ?" + NL //                           //$NON-NLS-1$ //$NON-NLS-2$
-            + sqlFilter.getWhereClause()
+            + "WHERE  " + sumYear + "=?" + NL //                                    //$NON-NLS-1$ //$NON-NLS-2$
+            + "   AND " + sumYearSub + "=?" + NL //                                 //$NON-NLS-1$ //$NON-NLS-2$
+            + "   " + sqlAppFilter.getWhereClause()
 
-            + " ORDER BY TourStartTime\n"; //$NON-NLS-1$
+            + "ORDER BY TourStartTime" + NL; //                                     //$NON-NLS-1$
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 
 //         TourDatabase.enableRuntimeStatistics(conn);
 
-         final PreparedStatement statement = conn.prepareStatement(sqlString);
-         statement.setInt(1, tourYear);
-         statement.setInt(2, tourYearSub);
-         sqlFilter.setParameters(statement, 3);
+         final PreparedStatement prepStmt = conn.prepareStatement(sql);
 
-         fetchTourItems(statement);
+         int paramIndex = 1;
+
+         // set sql tag parameters
+         if (isNoTagFilter_Or_CombineTagsWithOr) {
+
+            // nothing more to do
+
+         } else {
+
+            // combine tags with AND
+
+            // set join parameters
+            sqlCombineTagsWithAnd.setParameters(prepStmt, paramIndex);
+            paramIndex = sqlCombineTagsWithAnd.getLastParameterIndex();
+         }
+
+         // set sql other parameters
+         prepStmt.setInt(paramIndex++, tourYear);
+         prepStmt.setInt(paramIndex++, tourYearSub);
+         sqlAppFilter.setParameters(prepStmt, paramIndex++);
+
+         fetchTourItems(prepStmt);
 
 //       TourDatabase.disableRuntimeStatistic(conn);
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -130,7 +130,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
 
    {}
 
-   private final ArrayList<TourTagFilterProfile> _profiles      = TourTagFilterManager.getProfiles();
+   private final ArrayList<TourTagFilterProfile> _profiles                                = TourTagFilterManager.getProfiles();
 
    private TableViewer                           _profileViewer;
    private TourTagFilterProfile                  _selectedProfile;
@@ -139,46 +139,40 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
    private TVIPrefTagRoot                        _tagViewerRootItem;
 
    private CheckboxTableViewer                   _tagCloudViewer;
-   private ArrayList<TagCloud>                   _tagCloudItems = new ArrayList<>();
+   private ArrayList<TagCloud>                   _tagCloudItems                           = new ArrayList<>();
 
    private ToolItem                              _tourTagFilterItem;
 
    private ModifyListener                        _defaultModifyListener;
+   private SelectionAdapter                      _defaultSelectionListener;
    private ITourEventListener                    _tourEventListener;
-   {
-      _defaultModifyListener = new ModifyListener() {
-         @Override
-         public void modifyText(final ModifyEvent e) {
-            onProfile_Modify();
-         }
-      };
-   }
 
-   private boolean                           _tagViewerItem_IsChecked;
-   private boolean                           _tagViewerItem_IsKeyPressed;
-   private Object                            _tagViewerItem_Data;
+   private boolean                               _tagViewerItem_IsChecked;
+   private boolean                               _tagViewerItem_IsKeyPressed;
+   private Object                                _tagViewerItem_Data;
 
-   private boolean                           _tagCloudViewerItem_IsChecked;
-   private boolean                           _tagCloudViewerItem_IsKeyPressed;
-   private Object                            _tagCloudViewerItem_Data;
+   private boolean                               _tagCloudViewerItem_IsChecked;
+   private boolean                               _tagCloudViewerItem_IsKeyPressed;
+   private Object                                _tagCloudViewerItem_Data;
 
-   private long                              _expandRunnableCounter;
-   private boolean                           _isExpandingSelection;
-   private boolean                           _isBehaviourSingleExpandedOthersCollapse = true;
-   private boolean                           _isBehaviourAutoExpandCollapse           = true;
-   private boolean                           _isInCollapseAll;
-   private boolean                           _isHierarchicalLayout;
-   private boolean                           _isLiveUpdate;
+   private long                                  _expandRunnableCounter;
+   private boolean                               _isBehaviourSingleExpandedOthersCollapse = true;
+   private boolean                               _isBehaviourAutoExpandCollapse           = true;
+   private boolean                               _isExpandingSelection;
+   private boolean                               _isHierarchicalLayout;
+   private boolean                               _isInCollapseAll;
+   private boolean                               _isInUpdateUI;
+   private boolean                               _isLiveUpdate;
 
-   private PixelConverter                    _pc;
+   private PixelConverter                        _pc;
 
-   private ActionCollapseAllWithoutSelection _actionCollapseAll;
-   private ActionExpandAll                   _actionExpandAll;
-   private ActionOpenPrefDialog              _actionOpenPrefTags;
-   private ActionTag_LayoutFlat              _actionTag_LayoutFlat;
-   private ActionTag_LayoutHierarchical      _actionTag_LayoutHierarchical;
-   private ActionTagCloud_CheckAllTags       _actionTagCloud_CheckAll;
-   private ActionTagCloud_UncheckAllTags     _actionTagCloud_UncheckAll;
+   private ActionCollapseAllWithoutSelection     _actionCollapseAll;
+   private ActionExpandAll                       _actionExpandAll;
+   private ActionOpenPrefDialog                  _actionOpenPrefTags;
+   private ActionTag_LayoutFlat                  _actionTag_LayoutFlat;
+   private ActionTag_LayoutHierarchical          _actionTag_LayoutHierarchical;
+   private ActionTagCloud_CheckAllTags           _actionTagCloud_CheckAll;
+   private ActionTagCloud_UncheckAllTags         _actionTagCloud_UncheckAll;
 
    /*
     * UI controls
@@ -188,10 +182,13 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
    private Button  _btnDeleteProfile;
    private Button  _btnNewProfile;
    private Button  _chkLiveUpdate;
+   private Button  _rdoTagOperator_OR;
+   private Button  _rdoTagOperator_AND;
 
    private Label   _lblAllTags;
    private Label   _lblProfileName;
    private Label   _lblSelectTags;
+   private Label   _lblTagOperator;
 
    private Image   _imgTag;
    private Image   _imgTagRoot;
@@ -533,8 +530,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
       GridLayoutFactory.fillDefaults().applyTo(shellContainer);
       {
          final Composite sashContainer = new Composite(shellContainer, SWT.NONE);
-         GridDataFactory
-               .fillDefaults()//
+         GridDataFactory.fillDefaults()
                .grab(true, true)
                .applyTo(sashContainer);
          GridLayoutFactory.swtDefaults().applyTo(sashContainer);
@@ -548,7 +544,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
             // right part
             final Composite containerTags = createUI_300_Tags(sashContainer);
 
-            new SashLeftFixedForm(//
+            new SashLeftFixedForm(
                   sashContainer,
                   containerProfiles,
                   sash,
@@ -697,12 +693,10 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
    private Composite createUI_300_Tags(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory
-            .fillDefaults()//
+      GridDataFactory.fillDefaults()
             .grab(true, true)
             .applyTo(container);
-      GridLayoutFactory
-            .fillDefaults()//
+      GridLayoutFactory.fillDefaults()
             .numColumns(1)
             .extendedMargins(3, 0, 0, 0)
             .applyTo(container);
@@ -725,8 +719,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
    private void createUI_310_ProfileName(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory
-            .fillDefaults()//
+      GridDataFactory.fillDefaults()
             .grab(true, false)
             .applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
@@ -735,8 +728,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
             // Label: Profile name
             _lblProfileName = new Label(container, SWT.NONE);
             _lblProfileName.setText(Messages.Slideout_TourFilter_Label_ProfileName);
-            GridDataFactory
-                  .fillDefaults()//
+            GridDataFactory.fillDefaults()
                   .align(SWT.FILL, SWT.CENTER)
                   .applyTo(_lblProfileName);
          }
@@ -744,8 +736,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
             // Text: Profile name
             _txtProfileName = new Text(container, SWT.BORDER);
             _txtProfileName.addModifyListener(_defaultModifyListener);
-            GridDataFactory
-                  .fillDefaults()//
+            GridDataFactory.fillDefaults()
                   .grab(true, false)
                   .hint(_pc.convertWidthInCharsToPixels(30), SWT.DEFAULT)
                   .applyTo(_txtProfileName);
@@ -772,7 +763,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
          // right part
          final Composite containerTagViewer = createUI_340_AllTags(container);
 
-         new SashLeftFixedForm(//
+         new SashLeftFixedForm(
                container,
                containerTagList,
                sash,
@@ -787,8 +778,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
-      GridLayoutFactory
-            .fillDefaults()
+      GridLayoutFactory.fillDefaults()
             .numColumns(1)
             .spacing(0, 2)
             .applyTo(container);
@@ -796,6 +786,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
       {
          createUI_332_TagCloud_Header(container);
          createUI_334_TagCloud_Viewer(container);
+         createUI_336_TagCloud_Options(container);
       }
 
       return container;
@@ -813,8 +804,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
 
             _lblSelectTags = new Label(container, SWT.NONE);
             _lblSelectTags.setText(Messages.Slideout_TourTagFilter_Label_SelectedTags);
-            GridDataFactory
-                  .fillDefaults()//
+            GridDataFactory.fillDefaults()
                   .align(SWT.FILL, SWT.CENTER)
                   .grab(true, false)
                   .applyTo(_lblSelectTags);
@@ -909,6 +899,44 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
             onTagCloud_Select(event);
          }
       });
+   }
+
+   private void createUI_336_TagCloud_Options(final Composite parent) {
+
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      {
+         {
+            // Label: Tag operator
+            _lblTagOperator = new Label(container, SWT.NONE);
+            _lblTagOperator.setText(Messages.Slideout_TourTagFilter_Label_TagOperator);
+         }
+
+         final Composite containerOperator = new Composite(container, SWT.NONE);
+         GridDataFactory.fillDefaults().grab(true, false).applyTo(containerOperator);
+         GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerOperator);
+         {
+            {
+               /*
+                * Radio: OR
+                */
+               _rdoTagOperator_OR = new Button(containerOperator, SWT.RADIO);
+               _rdoTagOperator_OR.setText(Messages.Slideout_TourFilter_Radio_TagOperator_OR);
+               _rdoTagOperator_OR.setToolTipText(Messages.Slideout_TourFilter_Radio_TagOperator_OR_Tooltip);
+               _rdoTagOperator_OR.addSelectionListener(_defaultSelectionListener);
+            }
+            {
+               /*
+                * Radio: AND
+                */
+               _rdoTagOperator_AND = new Button(containerOperator, SWT.RADIO);
+               _rdoTagOperator_AND.setText(Messages.Slideout_TourFilter_Radio_TagOperator_AND);
+               _rdoTagOperator_AND.setToolTipText(Messages.Slideout_TourFilter_Radio_TagOperator_AND_Tooltip);
+               _rdoTagOperator_AND.addSelectionListener(_defaultSelectionListener);
+            }
+         }
+      }
    }
 
    private Composite createUI_340_AllTags(final Composite parent) {
@@ -1211,8 +1239,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
                }
             });
 
-            GridDataFactory
-                  .fillDefaults()//
+            GridDataFactory.fillDefaults()
                   .grab(true, false)
                   .align(SWT.END, SWT.CENTER)
                   .applyTo(_chkLiveUpdate);
@@ -1253,6 +1280,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
       final boolean isProfileSelected = _selectedProfile != null;
       final boolean canCheckTags = numTagCloudItems > 0 && numCheckedTagCloudItems < numTagCloudItems;
       final boolean canUncheckTags = numTagCloudItems > 0 && numCheckedTagCloudItems > 0;
+      final boolean canSetTagOperator = isProfileSelected && numCheckedTagCloudItems > 1;
 
       _btnApply.setEnabled(isProfileSelected && _isLiveUpdate == false);
       _btnCopyProfile.setEnabled(isProfileSelected);
@@ -1271,6 +1299,10 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
       _lblAllTags.setEnabled(isProfileSelected);
       _lblProfileName.setEnabled(isProfileSelected);
       _lblSelectTags.setEnabled(isProfileSelected);
+      _lblTagOperator.setEnabled(canSetTagOperator);
+
+      _rdoTagOperator_AND.setEnabled(canSetTagOperator);
+      _rdoTagOperator_OR.setEnabled(canSetTagOperator);
 
       _tagCloudViewer.getTable().setEnabled(isProfileSelected);
       _tagViewer.getTree().setEnabled(isProfileSelected);
@@ -1438,6 +1470,22 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
             onDisposeSlideout();
          }
       });
+
+      _defaultModifyListener = new ModifyListener() {
+         @Override
+         public void modifyText(final ModifyEvent e) {
+            onProfile_Modify();
+         }
+      };
+
+      _defaultSelectionListener = new SelectionAdapter() {
+
+         @Override
+         public void widgetSelected(final SelectionEvent e) {
+            onProfile_Modify();
+            fireModifyEvent();
+         }
+      };
    }
 
    /**
@@ -1594,13 +1642,16 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
 
    private void onProfile_Modify() {
 
+      if (_isInUpdateUI) {
+         return;
+      }
+
       if (_selectedProfile == null) {
          return;
       }
 
-      final String profileName = _txtProfileName.getText();
-
-      _selectedProfile.name = profileName;
+      _selectedProfile.name = _txtProfileName.getText();
+      _selectedProfile.isOrOperator = _rdoTagOperator_OR.getSelection();
 
       _profileViewer.refresh();
    }
@@ -1627,32 +1678,45 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
 
       _selectedProfile = selectedProfile;
 
-      // update model
+      /*
+       * Update model
+       */
       TourTagFilterManager.setSelectedProfile(_selectedProfile);
 
-      // update UI
-      if (_selectedProfile == null) {
+      /*
+       * Update UI
+       */
+      _isInUpdateUI = true;
+      {
+         if (_selectedProfile == null) {
 
-         // no profile
+            // no profile
 
-         _txtProfileName.setText(UI.EMPTY_STRING);
+            _txtProfileName.setText(UI.EMPTY_STRING);
 
-      } else {
+         } else {
 
-         // a profile is selected
+            // a profile is selected
 
-         _txtProfileName.setText(_selectedProfile.name);
+            final boolean isOrOperator = _selectedProfile.isOrOperator;
 
-         if (_selectedProfile.name.startsWith(Messages.Tour_Filter_Default_ProfileName)) {
+            _txtProfileName.setText(_selectedProfile.name);
 
-            // a default profile is selected, make is easy to rename it
+            _rdoTagOperator_OR.setSelection(isOrOperator);
+            _rdoTagOperator_AND.setSelection(!isOrOperator);
 
-            _txtProfileName.selectAll();
-            _txtProfileName.setFocus();
+            if (_selectedProfile.name.startsWith(Messages.Tour_Filter_Default_ProfileName)) {
+
+               // a default profile is selected, make is easy to rename it
+
+               _txtProfileName.selectAll();
+               _txtProfileName.setFocus();
+            }
+
+            update_FromProfile();
          }
-
-         update_FromProfile();
       }
+      _isInUpdateUI = false;
 
       fireModifyEvent();
    }
@@ -2112,12 +2176,16 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
 
    private void updateTags_TagProfile(final TourTagFilterProfile profile, final long[] tagIds) {
 
-      // update model
+      /*
+       * Update model
+       */
       final TLongHashSet profileTagFilterIds = profile.tagFilterIds;
       profileTagFilterIds.clear();
       profileTagFilterIds.addAll(tagIds);
 
-      // update UI
+      /*
+       * Update UI
+       */
       _profileViewer.update(profile, null);
    }
 

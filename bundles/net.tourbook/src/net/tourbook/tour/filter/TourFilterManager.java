@@ -30,6 +30,7 @@ import net.tourbook.application.ActionTourDataFilter;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.util.SQLData;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -841,7 +842,7 @@ public class TourFilterManager {
     * @return Returns sql data for the selected tour filter profile or <code>null</code> when not
     *         available.
     */
-   public static SQLFilterData getSQL() {
+   public static SQLData getSQL() {
 
       if (_isTourFilterEnabled == false || _selectedProfile == null) {
 
@@ -1044,7 +1045,7 @@ public class TourFilterManager {
          }
       }
 
-      final SQLFilterData tourFilterSQLData = new SQLFilterData(sqlWhere.toString(), sqlParameters);
+      final SQLData tourFilterSQLData = new SQLData(sqlWhere.toString(), sqlParameters);
 
       return tourFilterSQLData;
    }
