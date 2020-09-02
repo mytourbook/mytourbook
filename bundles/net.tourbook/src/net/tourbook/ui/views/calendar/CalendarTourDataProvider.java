@@ -274,7 +274,7 @@ public class CalendarTourDataProvider {
 
             firstTourStartTime = result.getLong(1);
 
-            // this occures when there are 0 tours
+            // this occurs when there are 0 tours
             if (firstTourStartTime != 0) {
 
                _firstTourDateTime = TimeTools.toLocalDateTime(firstTourStartTime);
@@ -820,7 +820,7 @@ public class CalendarTourDataProvider {
 
                   + "   SELECT" + NL //                                                //$NON-NLS-1$
 
-                  // this is necessary otherwise tours can occure multiple times when a tour contains multiple tags !!!
+                  // this is necessary otherwise tours can occur multiple times when a tour contains multiple tags !!!
                   + "      DISTINCT TourId," + NL //                                   //$NON-NLS-1$
 
                   + "      TourDistance," + NL //                                      //$NON-NLS-1$
