@@ -41,7 +41,6 @@ import net.tourbook.tour.TourLogManager;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
-import org.joda.time.DateTime;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -161,7 +160,7 @@ public class GarminSAXHandler extends DefaultHandler {
    private boolean                   _isSetLapStartTime;
    private ArrayList<Long>           _allLapStart = new ArrayList<>();
 
-   private DateTime                  _currentStartTime;
+   private long                      _currentStartTime;
    private long                      _currentTime;
    private String                    _activitySport;
    private int                       _tourCalories;
@@ -508,7 +507,7 @@ public class GarminSAXHandler extends DefaultHandler {
 
                if (distance == 0) {
                   final TourTimerPause timerPause = new TourTimerPause(null,
-                        _currentStartTime.getMillis(),
+                        _currentStartTime,
                         Long.MIN_VALUE);
 
                   _timerPauses.add(timerPause);
@@ -522,8 +521,8 @@ public class GarminSAXHandler extends DefaultHandler {
 
                      //In a TCX file, the first lap is always created with a distance of 0 meters.
                      //Hence, we don't consider that a pause.
-                     if (currentPause.getStartTime() != _currentStartTime.getMillis()) {
-                        _timerPauses.get(_timerPauses.size() - 1).setEndTime(_currentStartTime.getMillis());
+                     if (currentPause.getStartTime() != _currentStartTime) {
+                        _timerPauses.get(_timerPauses.size() - 1).setEndTime(_currentStartTime);
                      }
                   }
 
@@ -976,7 +975,11 @@ public class GarminSAXHandler extends DefaultHandler {
       }
       _isSetLapStartTime = true;
 
-      _currentStartTime = DateTime.parse(startTimeValue);
+      try {
+         _currentStartTime = TIME_FORMAT.parse(startTimeValue).getTime();
+      } catch (final ParseException e) {
+         TourLogManager.logError(e.getMessage() + " in " + _importFilePath); //$NON-NLS-1$
+      }
    }
 
    private void initialize_NewTour() {
