@@ -107,7 +107,7 @@ public class TVITourBookYearCategorized extends TVITourBookItem {
             + "LEFT OUTER JOIN " + TourDatabase.TABLE_TOUR_MARKER + " Tmarker" //   //$NON-NLS-1$ //$NON-NLS-2$
             + " ON TourData.tourId = Tmarker.TourData_tourId" + NL //               //$NON-NLS-1$
 
-            + "WHERE " + sumYear + "=?" + NL //                                     //$NON-NLS-1$ //$NON-NLS-2$
+            + "WHERE  " + sumYear + "=?" + NL //                                    //$NON-NLS-1$ //$NON-NLS-2$
             + "   AND " + sumYearSub + "=?" + NL //                                 //$NON-NLS-1$ //$NON-NLS-2$
             + "   " + sqlAppFilter.getWhereClause()
 

@@ -172,12 +172,12 @@ public class TVITourBookRoot extends TVITourBookItem {
                   + "      StartYear," + NL //                                         //$NON-NLS-1$
                   + "      " + SQL_SUM_FIELDS
 
-                  + "       FROM TOURDATA" + NL //                                     //$NON-NLS-1$
+                  + "   FROM TOURDATA" + NL //                                         //$NON-NLS-1$
 
-                  + "       " + sqlTagJoinTable
+                  + "   " + sqlTagJoinTable
 
-                  + "       AS jTdataTtag" //                                          //$NON-NLS-1$
-                  + "       ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //   //$NON-NLS-1$
+                  + "   AS jTdataTtag" //                                              //$NON-NLS-1$
+                  + "   ON TourData.tourId = jTdataTtag.TourData_tourId" + NL //       //$NON-NLS-1$
 
                   + "   " + sqlWhereClause
 
