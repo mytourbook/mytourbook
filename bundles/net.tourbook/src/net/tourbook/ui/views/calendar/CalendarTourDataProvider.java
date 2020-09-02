@@ -873,8 +873,8 @@ public class CalendarTourDataProvider {
                + " SUM(calories)," + NL //                                          7  //$NON-NLS-1$
 
                + " SUM(cadenceZone_SlowTime)," + NL //                              8  //$NON-NLS-1$
-               + " SUM(cadenceZone_FastTime)," + NL //                               9  //$NON-NLS-1$
-               + " SUM(TourRecordedTime)            " + NL //   10  //$NON-NLS-1$
+               + " SUM(cadenceZone_FastTime)," + NL //                              9  //$NON-NLS-1$
+               + " SUM(TourRecordedTime)" + NL //                                  10  //$NON-NLS-1$
 
                + sqlFromTourData;
 
