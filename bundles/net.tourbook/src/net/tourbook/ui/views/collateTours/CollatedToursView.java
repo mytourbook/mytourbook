@@ -667,7 +667,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
       defineColumn_Time_MovingTime();
       defineColumn_Time_WeekNo();
       defineColumn_Time_WeekYear();
-      defineColumn_Time_RecordingTime();
+      defineColumn_Time_ElapsedTime();
       defineColumn_Time_RecordedTime();
       defineColumn_Time_PausedTime();
       defineColumn_Time_BreakTime_Relative();
@@ -1277,11 +1277,32 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
    }
 
    /**
+    * column: elapsed time (h)
+    */
+   private void defineColumn_Time_ElapsedTime() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.TIME_ELAPSED_TIME.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            final long value = ((TVICollatedTour) element).colElapsedTime;
+
+            colDef.printLongValue(cell, value, element instanceof TVICollatedTour_Tour);
+
+            setCellColor(cell, element);
+         }
+      });
+   }
+
+   /**
     * column: moving time (h)
     */
    private void defineColumn_Time_MovingTime() {
 
-      final TreeColumnDefinition colDef = TreeColumnFactory.TIME_DRIVING_TIME.createColumn(_columnManager, _pc);
+      final TreeColumnDefinition colDef = TreeColumnFactory.TIME_MOVING_TIME.createColumn(_columnManager, _pc);
       colDef.setIsDefaultColumn();
 
       colDef.setLabelProvider(new CellLabelProvider() {
@@ -1340,27 +1361,6 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
             final TVICollatedTour item = (TVICollatedTour) element;
 
             final long value = item.colRecordedTime;
-
-            colDef.printLongValue(cell, value, element instanceof TVICollatedTour_Tour);
-
-            setCellColor(cell, element);
-         }
-      });
-   }
-
-   /**
-    * column: recording time (h)
-    */
-   private void defineColumn_Time_RecordingTime() {
-
-      final TreeColumnDefinition colDef = TreeColumnFactory.TIME_RECORDING_TIME.createColumn(_columnManager, _pc);
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final Object element = cell.getElement();
-            final long value = ((TVICollatedTour) element).colElapsedTime;
 
             colDef.printLongValue(cell, value, element instanceof TVICollatedTour_Tour);
 

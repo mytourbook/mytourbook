@@ -313,7 +313,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       _allSortableColumns.add(TableColumnFactory.MOTION_DISTANCE_ID);
       _allSortableColumns.add(TableColumnFactory.MOTION_AVG_PACE_ID);
       _allSortableColumns.add(TableColumnFactory.POWERTRAIN_AVG_CADENCE_ID);
-      _allSortableColumns.add(TableColumnFactory.TIME_RECORDING_TIME_ID);
+      _allSortableColumns.add(TableColumnFactory.TIME_ELAPSED_TIME_ID);
    }
 
    private static final SurfingFilter[] _allSurfingSegmentFilter = new SurfingFilter[] {
@@ -565,7 +565,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             rc = segment1.cadence - segment2.cadence;
             break;
 
-         case TableColumnFactory.TIME_RECORDING_TIME_ID:
+         case TableColumnFactory.TIME_ELAPSED_TIME_ID:
             rc = segment1.time_Elapsed - segment2.time_Elapsed;
             break;
 
@@ -3089,9 +3089,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
    private void defineAllColumns() {
 
-      defineColumn_Time_RecordingTimeTotal();
-      defineColumn_Time_Recording();
-      defineColumn_Time_Driving();
+      defineColumn_Time_ElapsedTimeTotal();
+      defineColumn_Time_Elapsed();
+      defineColumn_Time_Moving();
       defineColumn_Time_Paused();
       defineColumn_Time_TimeOfDay();
 
@@ -3766,69 +3766,13 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    }
 
    /**
-    * column: driving time
+    * column: elapsed time
     */
-   private void defineColumn_Time_Driving() {
+   private void defineColumn_Time_Elapsed() {
 
       final ColumnDefinition colDef;
 
-      colDef = TableColumnFactory.TIME_DRIVING_TIME.createColumn(_columnManager, _pc);
-
-      colDef.setIsDefaultColumn();
-      colDef.setColumnSelectionListener(_columnSortListener);
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final TourSegment segment = (TourSegment) cell.getElement();
-            final int value = segment.time_Moving;
-
-            colDef.printDetailValue(cell, value);
-
-            if (segment.isTotal) {
-               setStyle_ColumnTotal(cell);
-            }
-         }
-      });
-   }
-
-   /**
-    * column: break time
-    */
-   private void defineColumn_Time_Paused() {
-
-      final ColumnDefinition colDef;
-
-      colDef = TableColumnFactory.TIME_PAUSED_TIME.createColumn(_columnManager, _pc);
-
-      colDef.setIsDefaultColumn();
-      colDef.setColumnSelectionListener(_columnSortListener);
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final TourSegment segment = (TourSegment) cell.getElement();
-            final int value = segment.time_Break;
-
-            colDef.printDetailValue(cell, value);
-
-            if (segment.isTotal) {
-               setStyle_ColumnTotal(cell);
-            }
-         }
-      });
-   }
-
-   /**
-    * column: recording time
-    */
-   private void defineColumn_Time_Recording() {
-
-      final ColumnDefinition colDef;
-
-      colDef = TableColumnFactory.TIME_RECORDING_TIME.createColumn(_columnManager, _pc);
+      colDef = TableColumnFactory.TIME_ELAPSED_TIME.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
       colDef.setColumnSelectionListener(_columnSortListener);
@@ -3852,13 +3796,13 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    }
 
    /**
-    * column: TOTAL recording time
+    * column: TOTAL elapsed time
     */
-   private void defineColumn_Time_RecordingTimeTotal() {
+   private void defineColumn_Time_ElapsedTimeTotal() {
 
       final ColumnDefinition colDef;
 
-      colDef = TableColumnFactory.TIME_RECORDING_TIME_TOTAL.createColumn(_columnManager, _pc);
+      colDef = TableColumnFactory.TIME_ELAPSED_TIME_TOTAL.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
       colDef.setColumnSelectionListener(_columnSortListener);
@@ -3874,6 +3818,62 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             } else {
                final int value = segment.time_Total;
                colDef.printDetailValue(cell, value);
+            }
+         }
+      });
+   }
+
+   /**
+    * column: moving time
+    */
+   private void defineColumn_Time_Moving() {
+
+      final ColumnDefinition colDef;
+
+      colDef = TableColumnFactory.TIME_MOVING_TIME.createColumn(_columnManager, _pc);
+
+      colDef.setIsDefaultColumn();
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final TourSegment segment = (TourSegment) cell.getElement();
+            final int value = segment.time_Moving;
+
+            colDef.printDetailValue(cell, value);
+
+            if (segment.isTotal) {
+               setStyle_ColumnTotal(cell);
+            }
+         }
+      });
+   }
+
+   /**
+    * column: paused time
+    */
+   private void defineColumn_Time_Paused() {
+
+      final ColumnDefinition colDef;
+
+      colDef = TableColumnFactory.TIME_PAUSED_TIME.createColumn(_columnManager, _pc);
+
+      colDef.setIsDefaultColumn();
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final TourSegment segment = (TourSegment) cell.getElement();
+            final int value = segment.time_Break;
+
+            colDef.printDetailValue(cell, value);
+
+            if (segment.isTotal) {
+               setStyle_ColumnTotal(cell);
             }
          }
       });

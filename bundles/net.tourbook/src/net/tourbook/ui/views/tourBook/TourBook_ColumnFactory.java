@@ -112,7 +112,7 @@ public class TourBook_ColumnFactory {
       defineColumn_Time_TourStartTime();
       defineColumn_Time_TimeZoneDifference();
       defineColumn_Time_TimeZone();
-      defineColumn_Time_RecordingTime();
+      defineColumn_Time_ElapsedTime();
       defineColumn_Time_RecordedTime();
       defineColumn_Time_PausedTime();
       defineColumn_Time_MovingTime();
@@ -2454,11 +2454,44 @@ public class TourBook_ColumnFactory {
    }
 
    /**
+    * Column: Time - Elapsed time (h)
+    */
+   private void defineColumn_Time_ElapsedTime() {
+
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.TIME_ELAPSED_TIME.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final long value = ((TVITourBookItem) element).colTourElapsedTime;
+
+            return colDef_NatTable.printLongValue(value);
+         }
+      });
+
+      final TreeColumnDefinition colDef_Tree = TreeColumnFactory.TIME_ELAPSED_TIME.createColumn(_columnManager_Tree, _pc);
+
+      colDef_Tree.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            final long value = ((TVITourBookItem) element).colTourElapsedTime;
+
+            colDef_Tree.printLongValue(cell, value, element instanceof TVITourBookTour);
+
+            setCellColor(cell, element);
+         }
+      });
+   }
+
+   /**
     * Column: Time - Moving time (h)
     */
    private void defineColumn_Time_MovingTime() {
 
-      final TableColumnDefinition colDef_NatTable = TableColumnFactory.TIME_DRIVING_TIME.createColumn(_columnManager_NatTable, _pc);
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.TIME_MOVING_TIME.createColumn(_columnManager_NatTable, _pc);
       colDef_NatTable.setIsDefaultColumn();
       colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
 
@@ -2471,7 +2504,7 @@ public class TourBook_ColumnFactory {
          }
       });
 
-      final TreeColumnDefinition colDef_Tree = TreeColumnFactory.TIME_DRIVING_TIME.createColumn(_columnManager_Tree, _pc);
+      final TreeColumnDefinition colDef_Tree = TreeColumnFactory.TIME_MOVING_TIME.createColumn(_columnManager_Tree, _pc);
       colDef_Tree.setIsDefaultColumn();
       colDef_Tree.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -2547,39 +2580,6 @@ public class TourBook_ColumnFactory {
 
             final Object element = cell.getElement();
             final long value = ((TVITourBookItem) element).colTourRecordedTime;
-
-            colDef_Tree.printLongValue(cell, value, element instanceof TVITourBookTour);
-
-            setCellColor(cell, element);
-         }
-      });
-   }
-
-   /**
-    * Column: Time - Elapsed time (h)
-    */
-   private void defineColumn_Time_RecordingTime() {
-
-      final TableColumnDefinition colDef_NatTable = TableColumnFactory.TIME_RECORDING_TIME.createColumn(_columnManager_NatTable, _pc);
-      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
-
-         @Override
-         public String getValueText(final Object element) {
-
-            final long value = ((TVITourBookItem) element).colTourElapsedTime;
-
-            return colDef_NatTable.printLongValue(value);
-         }
-      });
-
-      final TreeColumnDefinition colDef_Tree = TreeColumnFactory.TIME_RECORDING_TIME.createColumn(_columnManager_Tree, _pc);
-
-      colDef_Tree.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final Object element = cell.getElement();
-            final long value = ((TVITourBookItem) element).colTourElapsedTime;
 
             colDef_Tree.printLongValue(cell, value, element instanceof TVITourBookTour);
 

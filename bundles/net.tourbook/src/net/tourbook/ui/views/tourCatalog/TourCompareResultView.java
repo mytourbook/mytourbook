@@ -640,7 +640,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
       defineColumn_Motion_VerticalSpeed();
       defineColumn_Motion_Distance();
 
-      defineColumn_Time_DrivingTime();
+      defineColumn_Time_MovingTime();
 
       defineColumn_Data_TimeInterval();
 
@@ -929,11 +929,11 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
    }
 
    /**
-    * column: driving time (h)
+    * column: moving time (h)
     */
-   private void defineColumn_Time_DrivingTime() {
+   private void defineColumn_Time_MovingTime() {
 
-      final TreeColumnDefinition colDef = TreeColumnFactory.TIME_DRIVING_TIME_NO_CATEGORY.createColumn(_columnManager, _pc);
+      final TreeColumnDefinition colDef = TreeColumnFactory.TIME_MOVING_TIME_NO_CATEGORY.createColumn(_columnManager, _pc);
 
       colDef.setIsDefaultColumn();
 
@@ -1240,7 +1240,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
                   }
                }
             } else {
-               // this is a child which can be the parent for other childs
+               // this is a child which can be the parent for other children
                getComparedTours(comparedTours, treeItem, CompareIds);
             }
          }
