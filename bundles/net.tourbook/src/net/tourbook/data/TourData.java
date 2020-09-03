@@ -8345,7 +8345,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
-    * @return Returns total elapsed time in seconds
+    * @return Returns the total elapsed time in seconds
     */
    public long getTourElapsedTime() {
       return tourRecordingTime;
@@ -8404,12 +8404,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
-    * @return Returns moving time in seconds.
+    * @return Returns the total moving time in seconds.
     */
    public long getTourMovingTime() {
       return tourDrivingTime;
    }
 
+   /**
+    * @return Returns the total paused time in seconds.
+    */
    public long getTourPausedTime() {
       return tourPausedTime;
    }
@@ -8429,6 +8432,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return tourPhotos;
    }
 
+   /**
+    * @return Returns the total recorded time in seconds.
+    */
    public long getTourRecordedTime() {
       return tourRecordedTime;
    }
