@@ -53,20 +53,12 @@ public class MesgListener_Event extends AbstractMesgListener implements EventMes
          switch (eventType) {
          case STOP:
          case STOP_ALL:
-            //TODO FB remove
-            System.out.print("STOP:");
-            System.out.println(mesg.getTimestamp());
-            //Get total_timer_time field Units: s Comment: Exclude pauses
-
             final TourTimerPause tourTimerPause = new TourTimerPause();
             tourTimerPause.setStartTime(mesg.getTimestamp().getTimestamp() * 1000);
             _timerPauses.add(tourTimerPause);
             break;
 
          case START:
-            //TODO FB remove
-            System.out.print("START: ");
-            System.out.println(mesg.getTimestamp());
             if (_timerPauses.size() > 0) {
                _timerPauses.get(_timerPauses.size() - 1).setEndTime(mesg.getTimestamp().getTimestamp() * 1000);
             }

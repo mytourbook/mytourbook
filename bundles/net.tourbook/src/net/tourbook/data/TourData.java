@@ -9716,7 +9716,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @param tourMovingTime
     */
    public void setTourMovingTime(final int tourMovingTime) {
-      this.tourDrivingTime = tourMovingTime;
+      tourDrivingTime = tourMovingTime;
    }
 
    /**

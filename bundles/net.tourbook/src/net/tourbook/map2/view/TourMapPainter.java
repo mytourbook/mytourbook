@@ -1124,6 +1124,19 @@ public class TourMapPainter extends MapPainter {
                isContentInTile = isContentInTile || staticPauseCounter > 0;
             }
 
+            if (_tourPaintConfig.isShowTourPauses) {
+
+               isContentInTile = doPaint_Pauses(
+                     gcTile,
+                     map,
+                     tile,
+                     parts,
+                     isContentInTile,
+                     tourData,
+                     latitudeSerie,
+                     longitudeSerie);
+            }
+
             if (_tourPaintConfig.isShowWayPoints) {
 
                // check if way points are available
@@ -1396,45 +1409,45 @@ public class TourMapPainter extends MapPainter {
 
       } else {
 
-         // draw tour pauses durations
+            // draw tour pauses durations
 
-         int pauseCounter = 0;
-         int serieIndex = 0;
+            int pauseCounter = 0;
+            int serieIndex = 0;
 
-         for (final TourTimerPause tourTimerPause : tourTimerPauses) {
+            for (final TourTimerPause tourTimerPause : tourTimerPauses) {
 
-            final long startTime = tourTimerPause.getStartTime();
+               final long startTime = tourTimerPause.getStartTime();
 
-            for (int index = serieIndex; index < tourData.timeSerie.length; ++index) {
+               for (int index = serieIndex; index < tourData.timeSerie.length; ++index) {
 
-               final long currentTime = tourData.timeSerie[index] * 1000 + tourData.getTourStartTimeMS();
+                  final long currentTime = tourData.timeSerie[index] * 1000 + tourData.getTourStartTimeMS();
 
-               if (currentTime == startTime || currentTime > startTime) {
-                  serieIndex = index;
-                  break;
+                  if (currentTime == startTime || currentTime > startTime) {
+                     serieIndex = index;
+                     break;
+                  }
                }
-            }
 
-            /*
-             * check bounds because when a tour is split, it can happen that the marker serie
-             * index is out of scope
-             */
-            if (serieIndex >= latitudeSerie.length) {
-               continue;
-            }
+               /*
+                * check bounds because when a tour is split, it can happen that the marker serie
+                * index is out of scope
+                */
+               if (serieIndex >= latitudeSerie.length) {
+                  continue;
+               }
 
-            // draw tour marker
-            if (drawTourPauses(
-                  gcTile,
-                  map,
-                  tile,
-                  latitudeSerie[serieIndex],
-                  longitudeSerie[serieIndex],
-                  tourTimerPause,
-                  parts)) {
+               // draw tour marker
+               if (drawTourPauses(
+                     gcTile,
+                     map,
+                     tile,
+                     latitudeSerie[serieIndex],
+                     longitudeSerie[serieIndex],
+                     tourTimerPause,
+                     parts)) {
 
-               pauseCounter++;
-            }
+                  pauseCounter++;
+               }
 
             isContentInTile = isContentInTile || pauseCounter > 0;
          }
