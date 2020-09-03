@@ -316,21 +316,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private String                timeZoneId;
 
    /**
-    * An array of {@link TourTimerPause}
-    * A timer pause is a device event triggered by the user.
-    * TODO FB rename to ?
-    * tourDevicePauses
-    * tourUserPauses
-    * .....
-    */
-   //TODO FB Can't i map it just with the tourid ???
-   @OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
-   @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-   @XmlElementWrapper(name = "TourTimerPauses")
-   @XmlElement(name = "TourTimerPause")
-   private List<TourTimerPause>             tourTimerPauses                         = new ArrayList<>();
-
-   /**
     * Total paused time in seconds
     *
     * This number could come from a direct value or from {@link tourTimerPauses}
@@ -896,6 +881,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    @OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
    @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
    private final Set<TourReference>    tourReferences                     = new HashSet<>();
+
+   /**
+    * An array of {@link TourTimerPause}
+    * A timer pause is a device event triggered by the user.
+    */
+   @OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
+   @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
+   @XmlElementWrapper(name = "TourTimerPauses")
+   @XmlElement(name = "TourTimerPause")
+   private List<TourTimerPause>             tourTimerPauses                         = new ArrayList<>();
 
    /**
     * Tags
