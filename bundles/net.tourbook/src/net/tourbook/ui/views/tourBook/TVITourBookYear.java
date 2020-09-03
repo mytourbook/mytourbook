@@ -28,10 +28,10 @@ import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.SQL;
-import net.tourbook.common.util.SQLData;
 import net.tourbook.common.util.TreeViewerItem;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.tag.tour.filter.TourTagFilterManager;
+import net.tourbook.tag.tour.filter.TourTagFilterSqlJoinBuilder;
 import net.tourbook.ui.SQLFilter;
 
 public class TVITourBookYear extends TVITourBookItem {
@@ -84,27 +84,11 @@ public class TVITourBookYear extends TVITourBookItem {
          final SQLFilter sqlAppFilter = new SQLFilter(SQLFilter.TAG_FILTER);
          String sqlFromTourData;
 
-         final boolean isTourTagFilterEnabled = TourTagFilterManager.isTourTagFilterEnabled();
-         boolean isNoTagFilter_Or_CombineTagsWithOr = false;
-         SQLData sqlCombineTagsWithAnd = null;
+         final TourTagFilterSqlJoinBuilder tagFilterSqlJoinBuilder = new TourTagFilterSqlJoinBuilder();
 
-         if (isTourTagFilterEnabled) {
+         if (TourTagFilterManager.isTourTagFilterEnabled()) {
 
             // with tag filter
-
-            isNoTagFilter_Or_CombineTagsWithOr = TourTagFilterManager.isNoTagsFilter_Or_CombineTagsWithOr();
-
-            String sqlTagJoinTable;
-
-            if (isNoTagFilter_Or_CombineTagsWithOr) {
-
-               sqlTagJoinTable = "LEFT JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG;
-
-            } else {
-
-               sqlCombineTagsWithAnd = TourTagFilterManager.createSql_CombineTagsWithAnd();
-               sqlTagJoinTable = sqlCombineTagsWithAnd.getSqlString();
-            }
 
             sqlFromTourData = NL
 
@@ -122,7 +106,7 @@ public class TVITourBookYear extends TVITourBookItem {
                   + "   FROM " + TourDatabase.TABLE_TOUR_DATA + NL //                  //$NON-NLS-1$
 
                   // get tag id's
-                  + "       " + sqlTagJoinTable
+                  + "       " + tagFilterSqlJoinBuilder.getSqlTagJoinTable()
 
                   + "   AS jTdataTtag" + NL //$NON-NLS-1$
                   + "   ON tourID = jTdataTtag.TourData_tourId" + NL //                //$NON-NLS-1$
@@ -167,18 +151,7 @@ public class TVITourBookYear extends TVITourBookItem {
 
          int paramIndex = 1;
 
-         if (isTourTagFilterEnabled == false || isNoTagFilter_Or_CombineTagsWithOr) {
-
-            // nothing more to do
-
-         } else {
-
-            // combine tags with AND
-
-            // set join parameters
-            sqlCombineTagsWithAnd.setParameters(prepStmt, paramIndex);
-            paramIndex = sqlCombineTagsWithAnd.getLastParameterIndex();
-         }
+         paramIndex = tagFilterSqlJoinBuilder.setParameters(prepStmt, paramIndex);
 
          // set sql parameters
          prepStmt.setInt(paramIndex++, tourYear);
