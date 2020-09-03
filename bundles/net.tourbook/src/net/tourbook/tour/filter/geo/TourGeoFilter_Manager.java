@@ -222,7 +222,7 @@ public class TourGeoFilter_Manager {
             }
          }
 
-         sqlWhere = "GeoPart IN (" + sqlGeoPartParameters + UI.SYMBOL_BRACKET_RIGHT; //$NON-NLS-1$
+         sqlWhere = "GeoPart IN (" + sqlGeoPartParameters + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 
       } else {
 

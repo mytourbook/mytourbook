@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.map25.layer.marker;
 
-import net.tourbook.common.UI;
-
 /**
  * The internal representation of a marker, this can be a normal map marker or a cluster.
  * <p>
@@ -31,7 +29,7 @@ class ProjectedItem {
 
    /**
     * Map X position,
-    *
+    * 
     * <pre>
     * map center     0
     * bottom-right   +x +y
@@ -42,7 +40,7 @@ class ProjectedItem {
 
    /**
     * Map Y position
-    *
+    * 
     * <pre>
     * map center     0
     * bottom-right   +x +y
@@ -93,6 +91,6 @@ class ProjectedItem {
 
    @Override
    public String toString() {
-      return "\n" + mapX + UI.SYMBOL_COLON + mapY + " / " + dy + UI.SPACE1 + isVisible; //$NON-NLS-1$ //$NON-NLS-2$
+      return "\n" + mapX + ":" + mapY + " / " + dy + " " + isVisible; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
    }
 }

@@ -41,6 +41,9 @@ import org.eclipse.swt.widgets.Shell;
 
 public class DialogMP extends TitleAreaDialog {
 
+   private static final String            SPACE1                  = net.tourbook.common.UI.SPACE1;
+   private static final String            SPACE2                  = net.tourbook.common.UI.SPACE2;
+
    private static final String            TIME_SPACER             = "       ";                    //$NON-NLS-1$
 
    private static final String            DEFAULT_MONO_FONT       = "Courier";                    //$NON-NLS-1$
@@ -142,11 +145,11 @@ public class DialogMP extends TitleAreaDialog {
 
          sb.setLength(0);
          sb.append(TimeTools.getZonedDateTime(logEntry.time).format(_timeFormatter));
-         sb.append(net.tourbook.common.UI.SPACE2);
+         sb.append(SPACE2);
          sb.append(logEntry.counter);
-         sb.append(net.tourbook.common.UI.SPACE2);
+         sb.append(SPACE2);
          sb.append(logEntry.threadName);
-         sb.append(net.tourbook.common.UI.SPACE2);
+         sb.append(SPACE2);
          sb.append(logEntry.tileEventId);
 
          final Tile tile = logEntry.tile;
@@ -156,7 +159,7 @@ public class DialogMP extends TitleAreaDialog {
             final long start = tile.getTimeStartLoading();
             final long end = tile.getTimeEndLoading();
 
-            sb.append(net.tourbook.common.UI.SPACE2);
+            sb.append(SPACE2);
 
             // column: time how long it takes until loading starts
             String time = TIME_SPACER;
@@ -166,7 +169,7 @@ public class DialogMP extends TitleAreaDialog {
             int length = time.length();
             sb.append(time.substring(length - 7, length));
 
-            sb.append(net.tourbook.common.UI.SPACE1);
+            sb.append(SPACE1);
 
             // column: time how long the tile image is being loaded
             time = TIME_SPACER;
@@ -177,15 +180,15 @@ public class DialogMP extends TitleAreaDialog {
             sb.append(time.substring(length - 7, length));
 
             // column: tile key
-            sb.append(net.tourbook.common.UI.SPACE2);
+            sb.append(SPACE2);
             sb.append(tile.toString());
 
             if (tile.getOfflinePath() != null) {
-               sb.append(net.tourbook.common.UI.SPACE2);
+               sb.append(SPACE2);
                sb.append(tile.getOfflinePath());
             }
             if (tile.getUrl() != null) {
-               sb.append(net.tourbook.common.UI.SPACE2);
+               sb.append(SPACE2);
                sb.append(tile.getUrl());
             }
          }

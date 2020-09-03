@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,7 +15,6 @@
  *******************************************************************************/
 package net.tourbook.common.color;
 
-import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 
 public class ColorValue implements Cloneable {
@@ -53,7 +52,7 @@ public class ColorValue implements Cloneable {
 
    @Override
    public String toString() {
-      return "ColorValue(" + value + ", " + red + ", " + green + ", " + blue + UI.SYMBOL_BRACKET_RIGHT; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+      return "ColorValue(" + value + ", " + red + ", " + green + ", " + blue + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
    }
 
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2015 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,7 +21,6 @@ package net.tourbook.chart;
 import java.util.ArrayList;
 
 import net.tourbook.common.RectangleLong;
-import net.tourbook.common.UI;
 
 /**
  * The slider is moved on the x-axis and displays the current position in the slider label.
@@ -72,7 +71,7 @@ public class ChartXSlider {
 
    /**
     * Constructor
-    *
+    * 
     * @param devVirtualSliderLinePos
     */
    ChartXSlider(final ChartComponentGraph graph, final int xxDevSliderPosition, final int sliderType) {
@@ -136,7 +135,7 @@ public class ChartXSlider {
 
    /**
     * When the width of the graph changed, the slider bar position must be adjusted.
-    *
+    * 
     * @param devGraphHeight
     * @param isFireEvent
     */
@@ -193,7 +192,7 @@ public class ChartXSlider {
    /**
     * Sets a new position for the sliderLine and also updates the slider/line rectangles and value.
     * A Slider move event is fired
-    *
+    * 
     * @param xxDevLinePos
     */
    void moveToXXDevPosition(double xxDevLinePos,
@@ -267,7 +266,7 @@ public class ChartXSlider {
 
    /**
     * Set position of the slider within value array.
-    *
+    * 
     * @param valueIndex
     */
    void setValueIndex(final int valueIndex) {
@@ -278,10 +277,10 @@ public class ChartXSlider {
    @Override
    public String toString() {
       return "ChartXSlider [" //$NON-NLS-1$
-            + ("_positionRatio=" + _positionRatio + UI.SPACE1) //$NON-NLS-1$
-            + ("_valueIndex=" + _valueIndex + UI.SPACE1) //$NON-NLS-1$
-            + ("_xxDevSliderLinePos=" + _xxDevSliderLinePos + UI.SPACE1) //$NON-NLS-1$
-            + ("sliderType=" + sliderType + UI.SPACE1) //$NON-NLS-1$
+            + ("_positionRatio=" + _positionRatio + " ") //$NON-NLS-1$ //$NON-NLS-2$
+            + ("_valueIndex=" + _valueIndex + " ") //$NON-NLS-1$ //$NON-NLS-2$
+            + ("_xxDevSliderLinePos=" + _xxDevSliderLinePos + " ") //$NON-NLS-1$ //$NON-NLS-2$
+            + ("sliderType=" + sliderType + " ") //$NON-NLS-1$ //$NON-NLS-2$
             + "]"; //$NON-NLS-1$
    }
 

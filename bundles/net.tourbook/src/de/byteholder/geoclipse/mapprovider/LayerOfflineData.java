@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,8 +14,6 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package de.byteholder.geoclipse.mapprovider;
-
-import net.tourbook.common.UI;
 
 public class LayerOfflineData implements Cloneable {
 
@@ -38,7 +36,7 @@ public class LayerOfflineData implements Cloneable {
 
    @Override
    public String toString() {
-      return "p:" + position + " v:" + isDisplayedInMap + UI.SPACE1 + title + UI.SYMBOL_BRACKET_LEFT + name + UI.SYMBOL_BRACKET_RIGHT; //$NON-NLS-1$ //$NON-NLS-2$
+      return "p:" + position + " v:" + isDisplayedInMap + " " + title + "(" + name + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
    }
 
 }

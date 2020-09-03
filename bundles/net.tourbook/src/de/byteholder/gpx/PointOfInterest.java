@@ -2,8 +2,6 @@ package de.byteholder.gpx;
 
 import java.util.List;
 
-import net.tourbook.common.UI;
-
 import org.eclipse.jface.viewers.ISelection;
 
 /**
@@ -104,7 +102,7 @@ public class PointOfInterest extends Waypoint implements ISelection {
    public String toString() {
 
       final StringBuilder buf = new StringBuilder();
-      buf.append(this.getName()).append(" (").append(this.getCategory()).append(UI.SYMBOL_BRACKET_RIGHT); //$NON-NLS-1$
+      buf.append(this.getName()).append(" (").append(this.getCategory()).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
 
       if ((nearestPlaces != null) && (nearestPlaces.size() > 0)) {
          buf.append(" near ").append(nearestPlaces.get(0).toString()); //$NON-NLS-1$

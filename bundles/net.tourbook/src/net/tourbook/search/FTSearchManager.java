@@ -603,7 +603,7 @@ public class FTSearchManager {
                //
                + "SELECT" //$NON-NLS-1$
                //
-               + (net.tourbook.common.UI.SPACE1 + TourDatabase.ENTITY_ID_WAY_POINT + ",") //		1 //$NON-NLS-1$
+               + (" " + TourDatabase.ENTITY_ID_WAY_POINT + ",") //		1 //$NON-NLS-1$ //$NON-NLS-2$
                + (TourDatabase.KEY_TOUR + ",") //						2 //$NON-NLS-1$
                + " name," //											3 //$NON-NLS-1$
                + " description," //									4 //$NON-NLS-1$
