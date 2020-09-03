@@ -1192,6 +1192,9 @@ public class DialogExportTour extends TitleAreaDialog {
                break;
             }
 
+            // merge distance is also used as total distance for not merged tours
+            _mergedDistance = 0;
+
             // create file path name
             final String tourFileName = net.tourbook.ui.UI.format_yyyymmdd_hhmmss(tourData);
 

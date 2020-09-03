@@ -177,7 +177,7 @@ public class SQLFilter {
     * @return Returns the WHERE clause to filter tours by the app filter, e.g. person, tour types,
     *         ...
     *         <p>
-    *         This WHERE clause contains the tag filter sql statements only, when a tag filter is
+    *         This WHERE clause contains the tag filter sql statements ONLY, when a tag filter is
     *         enabled and the tag's are combined with OR.
     *         ...
     */
@@ -201,9 +201,10 @@ public class SQLFilter {
     * @param statement
     * @param startIndex
     *           Sets the parameter start index, the first parameter is 1
+    * @return Returns the last parameter index +1 which was used for setting parameters
     * @throws SQLException
     */
-   public void setParameters(final PreparedStatement statement, final int startIndex) throws SQLException {
+   public int setParameters(final PreparedStatement statement, final int startIndex) throws SQLException {
 
       int parameterIndex = startIndex;
 
@@ -241,6 +242,8 @@ public class SQLFilter {
       }
 
       _lastParameterIndex = parameterIndex;
+
+      return parameterIndex;
    }
 
    @Override
