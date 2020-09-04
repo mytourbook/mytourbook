@@ -182,7 +182,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
    private static final String TAG_MT_TOUR_DRIVING_TIME        = "mt:tourDrivingTime";      //$NON-NLS-1$
    private static final String TAG_MT_TOUR_ELAPSED_TIME      = "mt:tourDeviceTime_Elapsed";    //$NON-NLS-1$
    private static final String TAG_MT_TOUR_RECORDED_TIME       = "mt:tourDeviceTime_Recorded";    //$NON-NLS-1$
-   private static final String TAG_MT_TOUR_PAUSED_TIME         = "mt:tourPausedTime";    //$NON-NLS-1$
+   private static final String TAG_MT_TOUR_PAUSED_TIME         = "mt:tourDeviceTime_Paused";    //$NON-NLS-1$
 
    private static final String TAG_MT_TOUR_ALTITUDE_UP         = "mt:tourAltUp";            //$NON-NLS-1$
    private static final String TAG_MT_TOUR_ALTITUDE_DOWN       = "mt:tourAltDown";          //$NON-NLS-1$
@@ -627,7 +627,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
       } else if (name.equals(TAG_MT_TOUR_PAUSED_TIME)) {
 
-         _tourData.setTourPausedTime(getLongValue(charData));
+         _tourData.setTourDeviceTime_Paused(getLongValue(charData));
          _isInMT_Tour = false;
 
       } else if (name.equals(TAG_MT_TOUR_ALTITUDE_DOWN)) {

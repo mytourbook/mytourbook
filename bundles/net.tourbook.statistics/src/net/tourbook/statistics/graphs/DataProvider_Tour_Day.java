@@ -280,7 +280,7 @@ public class DataProvider_Tour_Day extends DataProvider {
             + " jTdataTtag.TourTag_tagId,"            + NL //  16    //$NON-NLS-1$
 
             + " TourDeviceTime_Recorded,"                    + NL //  17    //$NON-NLS-1$
-            + " TourPausedTime"                       + NL //  18    //$NON-NLS-1$
+            + " TourDeviceTime_Paused"                       + NL //  18    //$NON-NLS-1$
 
             + NL
 
@@ -314,7 +314,7 @@ public class DataProvider_Tour_Day extends DataProvider {
          final TIntArrayList dbAllTourElapsedTime = new TIntArrayList();
          final TIntArrayList dbAllTourMovingTime = new TIntArrayList();
          final TIntArrayList dbAllTourDeviceTime_Recorded = new TIntArrayList();
-         final TIntArrayList dbAllTourPausedTime = new TIntArrayList();
+         final TIntArrayList dbAllTourDeviceTime_Paused = new TIntArrayList();
 
          final TFloatArrayList dbAllDistance = new TFloatArrayList();
          final TFloatArrayList dbAllAvgSpeed = new TFloatArrayList();
@@ -421,7 +421,7 @@ public class DataProvider_Tour_Day extends DataProvider {
                dbAllTourElapsedTime.add(dbElapsedTime);
                dbAllTourMovingTime.add(dbMovingTime);
                dbAllTourDeviceTime_Recorded.add(dbRecordedTime);
-               dbAllTourPausedTime.add(dbPausedTime);
+               dbAllTourDeviceTime_Paused.add(dbPausedTime);
 
                dbAllTourDuration.add(durationTimeValue);
 
@@ -641,7 +641,7 @@ public class DataProvider_Tour_Day extends DataProvider {
          _tourDayData.allElapsedTime = dbAllTourElapsedTime.toArray();
          _tourDayData.allMovingTime = dbAllTourMovingTime.toArray();
          _tourDayData.allDeviceTime_Recorded = dbAllTourDeviceTime_Recorded.toArray();
-         _tourDayData.allPausedTime = dbAllTourPausedTime.toArray();
+         _tourDayData.allPausedTime = dbAllTourDeviceTime_Paused.toArray();
 
          _tourDayData.tourTitle = dbAllTourTitle;
          _tourDayData.tourDescription = dbAllTourDescription;

@@ -139,7 +139,7 @@ public class DataProvider_Tour_Year extends DataProvider {
 
       case PAUSED:
 
-         sqlDurationTime = " SUM(TourPausedTime),"; //$NON-NLS-1$
+         sqlDurationTime = " SUM(TourDeviceTime_Paused),"; //$NON-NLS-1$
          break;
 
       case RECORDED:
@@ -168,7 +168,7 @@ public class DataProvider_Tour_Year extends DataProvider {
             + " SUM(1),                   " + NL //      7 //$NON-NLS-1$
             + " TourType_TypeId,          " + NL //      8 //$NON-NLS-1$
             + " SUM(TourDeviceTime_Recorded),    " + NL //      9 //$NON-NLS-1$
-            + " SUM(tourPausedTime)       " + NL //     10 //$NON-NLS-1$
+            + " SUM(TourDeviceTime_Paused)       " + NL //     10 //$NON-NLS-1$
 
             + fromTourData
 

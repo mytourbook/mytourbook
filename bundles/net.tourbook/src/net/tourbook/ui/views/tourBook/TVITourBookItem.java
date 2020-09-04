@@ -318,7 +318,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
    long         colTourElapsedTime;
    long         colTourDeviceTime_Recorded;
    long         colTourMovingTime;
-   long         colTourPausedTime;
+   long         colTourDeviceTime_Paused;
    long         colBreakTime;
    //
    long         colAltitudeUp;
@@ -632,7 +632,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       tourItem.colAvgSpeed = dbDrivingTime == 0 ? 0 : 3.6f * dbDistance / dbDrivingTime;
       tourItem.colAvgPace = dbDistance == 0 ? 0 : dbDrivingTime * 1000 / dbDistance;
 
-      tourItem.colTourPausedTime = tourItem.colTourElapsedTime - tourItem.colTourDeviceTime_Recorded;
+      tourItem.colTourDeviceTime_Paused = tourItem.colTourElapsedTime - tourItem.colTourDeviceTime_Recorded;
       tourItem.colBreakTime = tourItem.colTourElapsedTime - tourItem.colTourMovingTime;
 
       if (UI.IS_SCRAMBLE_DATA) {
@@ -700,7 +700,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
 // SET_FORMATTING_ON
 
-      colTourPausedTime = colTourElapsedTime - colTourDeviceTime_Recorded;
+      colTourDeviceTime_Paused = colTourElapsedTime - colTourDeviceTime_Recorded;
       colBreakTime = colTourElapsedTime - colTourMovingTime;
 
       colSlowVsFastCadence = TourManager.generateCadenceZones_TimePercentages(cadenceZone_SlowTime, cadenceZone_FastTime);

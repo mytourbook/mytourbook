@@ -768,7 +768,7 @@ public class CSVExport {
 
       csvField(sb, tviItem.colTourElapsedTime); // HEADER_TIME_ELAPSED_TIME
       csvField(sb, tviItem.colTourDeviceTime_Recorded); // HEADER_TIME_RECORDED_TIME
-      csvField(sb, tviItem.colTourPausedTime); // HEADER_TIME_PAUSED_TIME
+      csvField(sb, tviItem.colTourDeviceTime_Paused); // HEADER_TIME_PAUSED_TIME
       csvField(sb, tviItem.colTourMovingTime); // HEADER_TIME_MOVING_TIME
       csvField(sb, tviItem.colBreakTime); // HEADER_TIME_BREAK_TIME
 
@@ -806,9 +806,9 @@ public class CSVExport {
 
       { // HEADER_TIME_PAUSED_TIME hhh:mm:ss
 
-         final long colTourPausedTime = (tviItem).colTourPausedTime;
-         if (colTourPausedTime != 0) {
-            sb.append(net.tourbook.common.UI.format_hh_mm_ss(colTourPausedTime));
+         final long colTourDeviceTime_Paused = (tviItem).colTourDeviceTime_Paused;
+         if (colTourDeviceTime_Paused != 0) {
+            sb.append(net.tourbook.common.UI.format_hh_mm_ss(colTourDeviceTime_Paused));
          }
          sb.append(UI.TAB);
       }

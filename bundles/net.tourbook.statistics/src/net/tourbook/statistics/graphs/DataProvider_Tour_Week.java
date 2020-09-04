@@ -154,7 +154,7 @@ public class DataProvider_Tour_Week extends DataProvider {
 
       case PAUSED:
 
-         sqlDurationTime = " SUM(TourPausedTime),"; //$NON-NLS-1$
+         sqlDurationTime = " SUM(TourDeviceTime_Paused),"; //$NON-NLS-1$
          break;
 
       case RECORDED:
@@ -186,7 +186,7 @@ public class DataProvider_Tour_Week extends DataProvider {
             + " TourType_TypeId,          " + NL //      9 //$NON-NLS-1$
 
             + " SUM(TourDeviceTime_Recorded),    " + NL //     10 //$NON-NLS-1$
-            + " SUM(tourPausedTime)       " + NL //     11 //$NON-NLS-1$
+            + " SUM(TourDeviceTime_Paused)       " + NL //     11 //$NON-NLS-1$
 
             + fromTourData
 

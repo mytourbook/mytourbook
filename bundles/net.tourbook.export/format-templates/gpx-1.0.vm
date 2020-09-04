@@ -33,7 +33,7 @@
          <mt:tourDrivingTime>$tourData.tourDrivingTime</mt:tourDrivingTime>
          <mt:tourDeviceTime_Elapsed>$tourData.tourDeviceTime_Elapsed</mt:tourDeviceTime_Elapsed>
          <mt:tourDeviceTime_Recorded>$tourData.tourDeviceTime_Recorded</mt:tourDeviceTime_Recorded>
-         <mt:tourPausedTime>$tourData.tourPausedTime</mt:tourPausedTime>
+         <mt:tourDeviceTime_Paused>$tourData.tourDeviceTime_Paused</mt:tourDeviceTime_Paused>
 ## distance
          <mt:tourAltDown>$tourData.tourAltDown</mt:tourAltDown>
          <mt:tourAltUp>$tourData.tourAltUp</mt:tourAltUp>

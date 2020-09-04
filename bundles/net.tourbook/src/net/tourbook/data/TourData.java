@@ -320,7 +320,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * This number could come from a direct value or from {@link tourTimerPauses}
     */
    @XmlElement
-   private long                  tourPausedTime;
+   private long                  tourDeviceTime_Paused;
 
 
    /**
@@ -8344,6 +8344,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
+    * @return Returns the total paused time in seconds.
+    */
+   public long getTourDeviceTime_Paused() {
+      return tourDeviceTime_Paused;
+   }
+
+   /**
     * @return Returns the total recorded time in seconds.
     */
    public long getTourDeviceTime_Recorded() {
@@ -8414,13 +8421,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    public long getTourMovingTime() {
       return tourDrivingTime;
-   }
-
-   /**
-    * @return Returns the total paused time in seconds.
-    */
-   public long getTourPausedTime() {
-      return tourPausedTime;
    }
 
    /**
@@ -9682,6 +9682,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       setTourEndTimeMS();
    }
 
+   /**
+    * Set total paused time in seconds
+    *
+    * @param tourDeviceTime_Paused
+    */
+   public void setTourDeviceTime_Paused(final long tourDeviceTime_Paused) {
+
+      this.tourDeviceTime_Paused = tourDeviceTime_Paused;
+   }
+
    public void setTourDeviceTime_Recorded(final long tourDeviceTime_Recorded) {
       this.tourDeviceTime_Recorded = tourDeviceTime_Recorded;
    }
@@ -9721,16 +9731,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    public void setTourMovingTime(final int tourMovingTime) {
       tourDrivingTime = tourMovingTime;
-   }
-
-   /**
-    * Set total paused time in seconds
-    *
-    * @param tourPausedTime
-    */
-   public void setTourPausedTime(final long tourPausedTime) {
-
-      this.tourPausedTime = tourPausedTime;
    }
 
    /**

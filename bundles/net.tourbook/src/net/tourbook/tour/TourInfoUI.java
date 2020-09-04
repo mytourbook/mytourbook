@@ -1347,7 +1347,7 @@ public class TourInfoUI {
        */
       final long elapsedTime = _tourData.getTourDeviceTime_Elapsed();
       final long recordedTime = _tourData.getTourDeviceTime_Recorded();
-      final long pausedTime = _tourData.getTourPausedTime();
+      final long pausedTime = _tourData.getTourDeviceTime_Paused();
       final long movingTime = _tourData.getTourMovingTime();
       final long breakTime = elapsedTime - movingTime;
 

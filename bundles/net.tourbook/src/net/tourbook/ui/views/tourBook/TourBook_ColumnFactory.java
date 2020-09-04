@@ -2531,7 +2531,7 @@ public class TourBook_ColumnFactory {
          @Override
          public String getValueText(final Object element) {
 
-            final long value = ((TVITourBookItem) element).colTourPausedTime;
+            final long value = ((TVITourBookItem) element).colTourDeviceTime_Paused;
 
             return colDef_NatTable.printLongValue(value);
          }
@@ -2546,7 +2546,7 @@ public class TourBook_ColumnFactory {
             final Object element = cell.getElement();
             final TVITourBookItem item = (TVITourBookItem) element;
 
-            final long value = item.colTourPausedTime;
+            final long value = item.colTourDeviceTime_Paused;
 
             colDef_Tree.printLongValue(cell, value, element instanceof TVITourBookTour);
 

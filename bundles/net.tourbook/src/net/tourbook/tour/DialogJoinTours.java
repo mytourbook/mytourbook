@@ -1331,7 +1331,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
          joinedElapsedTime += tourData.getTourDeviceTime_Elapsed();
          joinedRecordedTime += tourData.getTourDeviceTime_Recorded();
-         joinedPausedTime += tourData.getTourPausedTime();
+         joinedPausedTime += tourData.getTourDeviceTime_Paused();
          joinedMovingTime += tourData.getTourMovingTime();
 
          joinedDistance += tourData.getTourDistance();
@@ -1377,7 +1377,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
       _joinedTourData.setTourDeviceTime_Elapsed(joinedElapsedTime);
       _joinedTourData.setTourDeviceTime_Recorded(joinedRecordedTime);
-      _joinedTourData.setTourPausedTime(joinedPausedTime);
+      _joinedTourData.setTourDeviceTime_Paused(joinedPausedTime);
       _joinedTourData.setTourMovingTime(joinedMovingTime);
       _joinedTourData.setTourDistance(joinedDistance);
 

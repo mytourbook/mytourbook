@@ -466,7 +466,7 @@ public class SuuntoJsonProcessor {
       if (_timerPauses.size() > 0) {
          tourData.setTourTimerPauses(_timerPauses);
          pausedTime = tourData.getTotalTourTimerPauses();
-         tourData.setTourPausedTime(pausedTime);
+         tourData.setTourDeviceTime_Paused(pausedTime);
       }
 
       tourData.setTourDeviceTime_Recorded(tourData.getTourDeviceTime_Elapsed() - pausedTime);

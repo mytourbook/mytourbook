@@ -513,7 +513,7 @@ public class FitLogSAXHandler extends DefaultHandler {
          }
 
          final long totalTourTimerPauses = tourData.getTotalTourTimerPauses();
-         tourData.setTourPausedTime(totalTourTimerPauses);
+         tourData.setTourDeviceTime_Paused(totalTourTimerPauses);
          tourData.setTourDeviceTime_Recorded(tourData.getTourDeviceTime_Elapsed() - totalTourTimerPauses);
          tourData.computeAltitudeUpDown();
          tourData.computeComputedValues();

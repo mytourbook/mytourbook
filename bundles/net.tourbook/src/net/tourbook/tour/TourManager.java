@@ -849,7 +849,7 @@ public class TourManager {
       int toSwimStartIndex = 0;
       int tourElapsedTime = 0;
       int tourDeviceTime_Recorded = 0;
-      int tourPausedTime = 0;
+      int tourDeviceTime_Paused = 0;
       float tourDistance = 0;
       float tourAltUp = 0;
       float tourAltDown = 0;
@@ -1102,7 +1102,7 @@ public class TourManager {
          tourElapsedTime++;
 
          tourDeviceTime_Recorded += fromTourData.getTourDeviceTime_Recorded();
-         tourPausedTime += fromTourData.getTourPausedTime();
+         tourDeviceTime_Paused += fromTourData.getTourDeviceTime_Paused();
       }
 
       /*
@@ -1181,7 +1181,7 @@ public class TourManager {
       joinedTourData.setTourStartTime(tourStartTime);
       joinedTourData.setTourDeviceTime_Elapsed(tourElapsedTime);
       joinedTourData.setTourDeviceTime_Recorded(tourDeviceTime_Recorded);
-      joinedTourData.setTourPausedTime(tourPausedTime);
+      joinedTourData.setTourDeviceTime_Paused(tourDeviceTime_Paused);
       joinedTourData.setTourDistance(tourDistance);
 
       // computing these values is VERY CPU intensive because of the DP algorithm
