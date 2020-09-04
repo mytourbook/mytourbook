@@ -93,7 +93,7 @@ public class DataProvider_Tour_Year extends DataProvider {
                + "  TourDistance,            " + NL //$NON-NLS-1$
                + "  TourAltUp,               " + NL //$NON-NLS-1$
                + "  TourDeviceTime_Elapsed,  " + NL //$NON-NLS-1$
-               + "  TourDrivingTime,         " + NL //$NON-NLS-1$
+               + "  TourComputedTime_Moving, " + NL //$NON-NLS-1$
 
                + "  TourType_TypeId,          " + NL //$NON-NLS-1$
                + "  jTdataTtag.TourTag_tagId   " + NL //$NON-NLS-1$
@@ -129,7 +129,7 @@ public class DataProvider_Tour_Year extends DataProvider {
       switch (durationTime) {
       case BREAK:
 
-         sqlDurationTime = " SUM(TourDeviceTime_Elapsed - TourDrivingTime),"; //$NON-NLS-1$
+         sqlDurationTime = " SUM(TourDeviceTime_Elapsed - TourComputedTime_Moving),"; //$NON-NLS-1$
          break;
 
       case ELAPSED:
@@ -150,7 +150,7 @@ public class DataProvider_Tour_Year extends DataProvider {
       case MOVING:
       default:
          // this is also the old implementation for the duration values
-         sqlDurationTime = " SUM(CASE WHEN TourDrivingTime > 0 THEN TourDrivingTime ELSE TourDeviceTime_Elapsed END),"; //$NON-NLS-1$
+         sqlDurationTime = " SUM(CASE WHEN TourComputedTime_Moving > 0 THEN TourComputedTime_Moving ELSE TourDeviceTime_Elapsed END),"; //$NON-NLS-1$
          break;
       }
 
@@ -164,7 +164,7 @@ public class DataProvider_Tour_Year extends DataProvider {
             + " SUM(TourAltUp),           " + NL //      3 //$NON-NLS-1$
             + sqlDurationTime + "         " + NL //      4 //$NON-NLS-1$
             + " SUM(TourDeviceTime_Elapsed), " + NL //      5 //$NON-NLS-1$
-            + " SUM(TourDrivingTime),     " + NL //      6 //$NON-NLS-1$
+            + " SUM(TourComputedTime_Moving)," + NL //      6 //$NON-NLS-1$
             + " SUM(1),                   " + NL //      7 //$NON-NLS-1$
             + " TourType_TypeId,          " + NL //      8 //$NON-NLS-1$
             + " SUM(TourDeviceTime_Recorded),    " + NL //      9 //$NON-NLS-1$

@@ -58,7 +58,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             + "startDay, " //                                     4     //$NON-NLS-1$
             + "tourDistance, " //                                 5     //$NON-NLS-1$
             + "tourDeviceTime_Elapsed, " //                       6     //$NON-NLS-1$
-            + "tourDrivingTime, " //                              7     //$NON-NLS-1$
+            + "tourComputedTime_Moving, " //                      7     //$NON-NLS-1$
             + "tourAltUp, " //                                    8     //$NON-NLS-1$
             + "tourAltDown, " //                                  9     //$NON-NLS-1$
             + "startDistance, " //                                10    //$NON-NLS-1$
@@ -201,7 +201,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
             + "TourDistance,                " + NL //$NON-NLS-1$
             + "TourDeviceTime_Elapsed,      " + NL //$NON-NLS-1$
-            + "TourDrivingTime,             " + NL //$NON-NLS-1$
+            + "TourComputedTime_Moving,     " + NL //$NON-NLS-1$
             + "TourAltUp,                   " + NL //$NON-NLS-1$
             + "TourAltDown,                 " + NL //$NON-NLS-1$
 
@@ -243,7 +243,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
             + "SUM( CAST(TourDistance AS BIGINT)),          " + NL // 0    //$NON-NLS-1$
             + "SUM( CAST(TourDeviceTime_Elapsed AS BIGINT))," + NL // 1    //$NON-NLS-1$
-            + "SUM( CAST(TourDrivingTime AS BIGINT)),       " + NL // 2    //$NON-NLS-1$
+            + "SUM( CAST(TourComputedTime_Moving AS BIGINT)), " + NL // 2    //$NON-NLS-1$
             + "SUM( CAST(TourAltUp AS BIGINT)),             " + NL // 3    //$NON-NLS-1$
             + "SUM( CAST(TourAltDown AS BIGINT)),           " + NL // 4    //$NON-NLS-1$
             + "SUM(1),                                      " + NL // 5    //$NON-NLS-1$
@@ -628,9 +628,9 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
       // compute average speed/pace, prevent divide by 0
       final long dbDistance = tourItem.colTourDistance;
-      final long dbDrivingTime = tourItem.colTourMovingTime;
-      tourItem.colAvgSpeed = dbDrivingTime == 0 ? 0 : 3.6f * dbDistance / dbDrivingTime;
-      tourItem.colAvgPace = dbDistance == 0 ? 0 : dbDrivingTime * 1000 / dbDistance;
+      final long dbMovingTime = tourItem.colTourMovingTime;
+      tourItem.colAvgSpeed = dbMovingTime == 0 ? 0 : 3.6f * dbDistance / dbMovingTime;
+      tourItem.colAvgPace = dbDistance == 0 ? 0 : dbMovingTime * 1000 / dbDistance;
 
       tourItem.colTourDeviceTime_Paused = tourItem.colTourElapsedTime - tourItem.colTourDeviceTime_Recorded;
       tourItem.colBreakTime = tourItem.colTourElapsedTime - tourItem.colTourMovingTime;

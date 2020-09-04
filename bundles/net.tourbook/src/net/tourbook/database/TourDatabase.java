@@ -3002,8 +3002,8 @@ public class TourDatabase {
             + " TourStartTime          BIGINT DEFAULT 0,                                    \n" //$NON-NLS-1$
             + " TourEndTime            BIGINT DEFAULT 0,                                    \n" //$NON-NLS-1$
 
-            + " TourDeviceTime_Elapsed BIGINT DEFAULT 0,                                    \n" //$NON-NLS-1$
-            + " TourDrivingTime        BIGINT DEFAULT 0,                                    \n" //$NON-NLS-1$
+            + " TourDeviceTime_Elapsed  BIGINT DEFAULT 0,                                    \n" //$NON-NLS-1$
+            + " TourComputedTime_Moving BIGINT DEFAULT 0,                                    \n" //$NON-NLS-1$
             //
             // version 22 end ---------
 
@@ -7540,7 +7540,8 @@ public class TourDatabase {
             SQL.AddCol_BigInt(stmt, TABLE_TOUR_DATA, "tourDeviceTime_Recorded", DEFAULT_0);                            //$NON-NLS-1$
             SQL.AddCol_BigInt(stmt, TABLE_TOUR_DATA, "tourDeviceTime_Paused",   DEFAULT_0);                            //$NON-NLS-1$
 
-            SQL.RenameCol(stmt, TABLE_TOUR_DATA, "tourRecordingTime", "tourDeviceTime_Elapsed");
+            SQL.RenameCol(stmt, TABLE_TOUR_DATA, "tourRecordingTime", "TourDeviceTime_Elapsed");
+            SQL.RenameCol(stmt, TABLE_TOUR_DATA, "tourDrivingTime", "TourComputedTime_Moving");
 
 // SET_FORMATTING_ON
          }

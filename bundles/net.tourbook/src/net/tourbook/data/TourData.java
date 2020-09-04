@@ -299,14 +299,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    @XmlElement
    private long                  tourDeviceTime_Elapsed;
 
-   //TODO FB Rename into moving in to db
    /**
     * Total moving time in seconds
     *
     * @since Is long since db version 22, before it was int
     */
    @XmlElement
-   private long                  tourDrivingTime;
+   private long                  tourComputedTime_Moving;
 
    /**
     * Time zone ID or <code>null</code> when the time zone ID is not available.
@@ -4917,7 +4916,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    /**
     * Computes the tour moving time in seconds, this is the tour elapsed time - tour break time.
-    * This value is store in {@link #tourDrivingTime}.
+    * This value is store in {@link #tourComputedTime_Moving}.
     */
    public void computeTourMovingTime() {
 
@@ -4932,10 +4931,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
 
       if ((timeSerie == null) || (timeSerie.length == 0)) {
-         tourDrivingTime = 0;
+         tourComputedTime_Moving = 0;
       } else {
-         final int tourDrivingTimeRaw = timeSerie[timeSerie.length - 1] - getBreakTime();
-         tourDrivingTime = Math.max(0, tourDrivingTimeRaw);
+         final int tourMovingTimeRaw = timeSerie[timeSerie.length - 1] - getBreakTime();
+         tourComputedTime_Moving = Math.max(0, tourMovingTimeRaw);
       }
    }
 
@@ -5228,7 +5227,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       final float tourPace = tourDistance == 0 //
             ? 0
-            : tourDrivingTime * 1000 / (tourDistance * UI.UNIT_VALUE_DISTANCE);
+            : tourComputedTime_Moving * 1000 / (tourDistance * UI.UNIT_VALUE_DISTANCE);
 
       segmentSerie_Time_Recording = new int[segmentSerieLength];
       segmentSerie_Time_Driving = new int[segmentSerieLength];
@@ -6539,11 +6538,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       out.println(
             "Moving time:      " //$NON-NLS-1$
-                  + (getTourMovingTime() / 3600)
+                  + (getTourComputedTime_Moving() / 3600)
                   + UI.SYMBOL_COLON
-                  + ((getTourMovingTime() % 3600) / 60)
+                  + ((getTourComputedTime_Moving() % 3600) / 60)
                   + UI.SYMBOL_COLON
-                  + (getTourMovingTime() % 3600) % 60);
+                  + (getTourComputedTime_Moving() % 3600) % 60);
 
       out.println("Altitude up (m):   " + getTourAltUp()); //$NON-NLS-1$
       out.println("Altitude down (m):   " + getTourAltDown()); //$NON-NLS-1$
@@ -8321,6 +8320,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
+    * @return Returns the total moving time in seconds.
+    */
+   public long getTourComputedTime_Moving() {
+      return tourComputedTime_Moving;
+   }
+
+   /**
     * !!! THIS VALUE IS NOT CACHED BECAUSE WHEN THE DEFAULT TIME ZONE IS CHANGING THEN THIS VALUE IS
     * WRONG !!!
     */
@@ -8414,13 +8420,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       });
 
       return _sortedMarkers;
-   }
-
-   /**
-    * @return Returns the total moving time in seconds.
-    */
-   public long getTourMovingTime() {
-      return tourDrivingTime;
    }
 
    /**
@@ -9663,6 +9662,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
+    * Set total moving time in seconds.
+    *
+    * @param tourComputedTime_Moving
+    */
+   public void setTourComputedTime_Moving(final int tourComputedTime_Moving) {
+      this.tourComputedTime_Moving = tourComputedTime_Moving;
+   }
+
+   /**
     * @param tourDescription
     *           the tourDescription to set
     */
@@ -9722,15 +9730,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       this.tourMarkers = tourMarkers;
 
       resetSortedMarkers();
-   }
-
-   /**
-    * Set total moving time in seconds.
-    *
-    * @param tourMovingTime
-    */
-   public void setTourMovingTime(final int tourMovingTime) {
-      tourDrivingTime = tourMovingTime;
    }
 
    /**

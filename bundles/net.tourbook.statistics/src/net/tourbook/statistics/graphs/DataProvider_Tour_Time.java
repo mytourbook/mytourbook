@@ -113,7 +113,7 @@ public class DataProvider_Tour_Time extends DataProvider {
             + "TourStartTime," //			5 //$NON-NLS-1$
             + "TimeZoneId, "//				6 //$NON-NLS-1$
             + "TourDeviceTime_Elapsed," //7 //$NON-NLS-1$
-            + "TourDrivingTime,"//			8 //$NON-NLS-1$
+            + "TourComputedTime_Moving,"//8 //$NON-NLS-1$
 
             + "TourDistance," //			9 //$NON-NLS-1$
             + "TourAltUp," //				10 //$NON-NLS-1$
@@ -154,7 +154,7 @@ public class DataProvider_Tour_Time extends DataProvider {
 
          final TIntArrayList allTourDeviceTime_Elapsed = new TIntArrayList();
          final TIntArrayList allTourDeviceTime_Recorded = new TIntArrayList();
-         final TIntArrayList allTourDrivingTime = new TIntArrayList();
+         final TIntArrayList allTourMovingTime = new TIntArrayList();
 
          final TIntArrayList allDistance = new TIntArrayList();
          final TIntArrayList allAltitudeUp = new TIntArrayList();
@@ -202,7 +202,7 @@ public class DataProvider_Tour_Time extends DataProvider {
                final String dbTimeZoneId = result.getString(6);
                final int dbElapsedTime = result.getInt(7);
                final int dbRecordedTime = result.getInt(15);
-               final int dbDrivingTime = result.getInt(8);
+               final int dbMovingTime = result.getInt(8);
 
                final float dbDistance = result.getFloat(9);
                final int dbAltitudeUp = result.getInt(10);
@@ -232,7 +232,7 @@ public class DataProvider_Tour_Time extends DataProvider {
                allTourEndTime.add((startDayTime + dbElapsedTime));
                allTourDeviceTime_Elapsed.add(dbElapsedTime);
                allTourDeviceTime_Recorded.add(dbRecordedTime);
-               allTourDrivingTime.add(dbDrivingTime);
+               allTourMovingTime.add(dbMovingTime);
 
                allDistance.add((int) (dbDistance / UI.UNIT_VALUE_DISTANCE));
                allAltitudeUp.add((int) (dbAltitudeUp / UI.UNIT_VALUE_ALTITUDE));
@@ -311,7 +311,7 @@ public class DataProvider_Tour_Time extends DataProvider {
 
          _tourDataTime.tourDeviceTime_ElapsedValues = allTourDeviceTime_Elapsed.toArray();
          _tourDataTime.tourDeviceTime_RecordedValues = allTourDeviceTime_Recorded.toArray();
-         _tourDataTime.tourDrivingTimeValues = allTourDrivingTime.toArray();
+         _tourDataTime.tourMovingTimeValues = allTourMovingTime.toArray();
 
          _tourDataTime.tourTitle = allTourTitle;
          _tourDataTime.tourDescription = allTourDescription;

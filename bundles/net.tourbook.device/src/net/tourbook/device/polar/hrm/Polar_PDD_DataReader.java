@@ -129,7 +129,7 @@ public class Polar_PDD_DataReader extends TourbookDevice {
       }
 
       exerciseData.setTourDistance(_currentExercise.distance);
-      exerciseData.setTourMovingTime(_currentExercise.duration);
+      exerciseData.setTourComputedTime_Moving(_currentExercise.duration);
       exerciseData.setTourDeviceTime_Recorded(_currentExercise.duration);
 
       // set other fields

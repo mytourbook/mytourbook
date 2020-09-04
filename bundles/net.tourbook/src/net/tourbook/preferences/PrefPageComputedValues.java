@@ -948,7 +948,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
             final int tourElapsedTime = (int) oldTourData.getTourDeviceTime_Elapsed();
 
             // get old break time
-            final int tourMovingTime = (int) oldTourData.getTourMovingTime();
+            final int tourMovingTime = (int) oldTourData.getTourComputedTime_Moving();
             oldBreakTime[0] += tourElapsedTime - tourMovingTime;
 
             // force the break time to be recomputed with the current values which are already store in the pref store
@@ -981,7 +981,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
                final int tourElapsedTime = (int) savedTourData.getTourDeviceTime_Elapsed();
 
                // get old break time
-               final int tourMovingTime = (int) savedTourData.getTourMovingTime();
+               final int tourMovingTime = (int) savedTourData.getTourComputedTime_Moving();
                newBreakTime[0] += tourElapsedTime - tourMovingTime;
 
                subTaskText = NLS.bind(

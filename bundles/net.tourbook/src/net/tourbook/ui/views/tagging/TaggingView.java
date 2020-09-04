@@ -1266,7 +1266,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
                return;
             }
 
-            final long value = ((TVITagViewItem) element).colDrivingTime;
+            final long value = ((TVITagViewItem) element).colMovingTime;
 
             colDef.printLongValue(cell, value, element instanceof TVITagView_Tour);
 

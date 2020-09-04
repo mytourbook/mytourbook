@@ -49,7 +49,7 @@ public class TourData_Time {
 
    int[]                          tourDeviceTime_ElapsedValues;
    int[]                          tourDeviceTime_RecordedValues;
-   int[]                          tourDrivingTimeValues;
+   int[]                          tourMovingTimeValues;
 
    ArrayList<String>              tourTitle;
    ArrayList<String>              tourDescription;

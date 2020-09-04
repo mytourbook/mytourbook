@@ -52,7 +52,7 @@ public class TVICompareResultComparedTour extends TVICompareResultItem {
    int                normalizedStartIndex = -1;
    int                normalizedEndIndex   = -1;
 
-   int                compareDrivingTime;
+   int                compareMovingTime;
    int                compareElapsedTime;
 
    float              compareDistance;

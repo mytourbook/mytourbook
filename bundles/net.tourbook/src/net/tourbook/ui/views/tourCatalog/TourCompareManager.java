@@ -394,12 +394,12 @@ public class TourCompareManager {
 
       final float compareDistance = compareTourDataDistance[compareEndIndex] - compareTourDataDistance[compareStartIndex];
       final int elapsedTime = compareTourDataTime[compareEndIndex] - compareTourDataTime[compareStartIndex];
-      final int drivingTime = Math.max(0, elapsedTime - compareTourData.getBreakTime(compareStartIndex, compareEndIndex));
+      final int movingTime = Math.max(0, elapsedTime - compareTourData.getBreakTime(compareStartIndex, compareEndIndex));
 
-      compareResultItem.compareDrivingTime = drivingTime;
+      compareResultItem.compareMovingTime = movingTime;
       compareResultItem.compareElapsedTime = elapsedTime;
       compareResultItem.compareDistance = compareDistance;
-      compareResultItem.compareSpeed = compareDistance / drivingTime * 3.6f;
+      compareResultItem.compareSpeed = compareDistance / movingTime * 3.6f;
       compareResultItem.avgAltimeter = getAvgAltimeter(compareTourData, compareStartIndex, compareEndIndex);
 
       compareResultItem.timeInterval = compareTourData.getDeviceTimeInterval();

@@ -69,7 +69,7 @@ public class TVICollatedTour_Event extends TVICollatedTour {
             + "TourStartTime, " //									6	//$NON-NLS-1$
             + "tourDistance, " //									7	//$NON-NLS-1$
             + "TourDeviceTime_Elapsed, " //						8	//$NON-NLS-1$
-            + "tourDrivingTime, " //								9	//$NON-NLS-1$
+            + "TourComputedTime_Moving, " //								9	//$NON-NLS-1$
             + "tourAltUp, " //										10	//$NON-NLS-1$
             + "tourAltDown, " //									11	//$NON-NLS-1$
             + "startDistance, " //									12	//$NON-NLS-1$
@@ -169,7 +169,7 @@ public class TVICollatedTour_Event extends TVICollatedTour {
                final long dbTourStartTime = result.getLong(6);
                final long dbDistance = tourItem.colDistance = result.getLong(7);
                tourItem.colElapsedTime = result.getLong(8);
-               final long dbDrivingTime = tourItem.colMovingTime = result.getLong(9);
+               final long dbMovingTime = tourItem.colMovingTime = result.getLong(9);
                tourItem.colAltitudeUp = result.getLong(10);
                tourItem.colAltitudeDown = result.getLong(11);
 
@@ -216,8 +216,8 @@ public class TVICollatedTour_Event extends TVICollatedTour {
                      : (Long) tourTypeId);
 
                // compute average speed/pace, prevent divide by 0
-               tourItem.colAvgSpeed = dbDrivingTime == 0 ? 0 : 3.6f * dbDistance / dbDrivingTime;
-               tourItem.colAvgPace = dbDistance == 0 ? 0 : dbDrivingTime * 1000 / dbDistance;
+               tourItem.colAvgSpeed = dbMovingTime == 0 ? 0 : 3.6f * dbDistance / dbMovingTime;
+               tourItem.colAvgPace = dbDistance == 0 ? 0 : dbMovingTime * 1000 / dbDistance;
 
                tourItem.colPausedTime = tourItem.colElapsedTime - tourItem.colRecordedTime;
                tourItem.colBreakTime = tourItem.colElapsedTime - tourItem.colMovingTime;

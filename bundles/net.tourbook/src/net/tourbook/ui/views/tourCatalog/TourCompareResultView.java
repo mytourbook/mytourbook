@@ -944,7 +944,7 @@ public class TourCompareResultView extends ViewPart implements ITourViewer, ITou
             final Object element = cell.getElement();
             if (element instanceof TVICompareResultComparedTour) {
 
-               final long value = ((TVICompareResultComparedTour) element).compareDrivingTime;
+               final long value = ((TVICompareResultComparedTour) element).compareMovingTime;
 
                colDef.printLongValue(cell, value, true);
 

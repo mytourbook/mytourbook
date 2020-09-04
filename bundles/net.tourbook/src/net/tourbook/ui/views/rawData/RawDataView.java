@@ -2921,7 +2921,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             final TourData tourData = (TourData) cell.getElement();
 
             final float tourDistance = tourData.getTourDistance();
-            final long movingTime = tourData.getTourMovingTime();
+            final long movingTime = tourData.getTourComputedTime_Moving();
 
             final float pace = tourDistance == 0 ? //
             0
@@ -2951,7 +2951,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
             final TourData tourData = ((TourData) cell.getElement());
             final float tourDistance = tourData.getTourDistance();
-            final long movingTime = tourData.getTourMovingTime();
+            final long movingTime = tourData.getTourComputedTime_Moving();
 
             double value = 0;
 
@@ -3057,7 +3057,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          @Override
          public void update(final ViewerCell cell) {
 
-            final long value = ((TourData) cell.getElement()).getTourMovingTime();
+            final long value = ((TourData) cell.getElement()).getTourComputedTime_Moving();
 
             colDef.printDetailValue(cell, value);
          }

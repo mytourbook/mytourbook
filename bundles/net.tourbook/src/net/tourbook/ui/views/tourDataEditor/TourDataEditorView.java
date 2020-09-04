@@ -236,8 +236,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    // we dont keep them and hence we are missing those seconds. If it's the case, then we should make an exception for
    //the last bit of data right before the "stop" and save them
 
-   // Elevation gain is OK from fit and GPX but not JSON!
-
    // 1/2 DONE: Sporttracks fitlog (try with manual activity import)
    //DONE BUT TO CHECK WITH MULTIPLE FILES: TCX
 
@@ -254,6 +252,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 //   <mt:tourRecordingTime>$tourData.tourRecordingTime</mt:tourRecordingTime>
 
    //TODO I think we should display the pauses in the graph chart just like for markers (add a button like markers as well)
+
+   // TODO Rename the last strings that contain "recording", "driving"
 
    public static final String     ID                            = "net.tourbook.views.TourDataEditorView";                //$NON-NLS-1$
    //
@@ -8471,7 +8471,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _tourData.setTourDeviceTime_Elapsed(_timeElapsed.getTime());
             _tourData.setTourDeviceTime_Recorded(_timeRecorded.getTime());
             _tourData.setTourDeviceTime_Paused(_timePaused.getTime());
-            _tourData.setTourMovingTime(_timeMoving.getTime());
+            _tourData.setTourComputedTime_Moving(_timeMoving.getTime());
          }
 
       } catch (final IllegalArgumentException e) {
@@ -8928,7 +8928,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       // tour times
       final int elapsedTime = (int) _tourData.getTourDeviceTime_Elapsed();
-      final int movingTime = (int) _tourData.getTourMovingTime();
+      final int movingTime = (int) _tourData.getTourComputedTime_Moving();
       final int recordedTime = (int) _tourData.getTourDeviceTime_Recorded();
       final int pausedTime = (int) _tourData.getTourDeviceTime_Paused();
 

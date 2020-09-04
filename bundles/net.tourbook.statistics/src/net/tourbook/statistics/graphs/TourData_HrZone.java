@@ -52,7 +52,7 @@ class TourData_HrZone {
    ArrayList<int[]>               hrZones;
 
    ArrayList<Integer>             tourDeviceTime_Elapsed;
-   ArrayList<Integer>             tourDrivingTime;
+   ArrayList<Integer>             tourComputedTime_Moving;
 
    ArrayList<String>              tourTitle;
    ArrayList<String>              tourDescription;

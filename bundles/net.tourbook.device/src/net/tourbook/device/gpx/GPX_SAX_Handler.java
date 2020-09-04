@@ -179,8 +179,8 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
    private static final String TAG_MT_TOUR_START_TIME          = "mt:tourStartTime";        //$NON-NLS-1$
    private static final String TAG_MT_TOUR_END_TIME            = "mt:tourEndTime";          //$NON-NLS-1$
-   private static final String TAG_MT_TOUR_DRIVING_TIME        = "mt:tourDrivingTime";      //$NON-NLS-1$
-   private static final String TAG_MT_TOUR_ELAPSED_TIME      = "mt:tourDeviceTime_Elapsed";    //$NON-NLS-1$
+   private static final String TAG_MT_TOUR_MOVING_TIME         = "mt:tourComputedTime_Moving";      //$NON-NLS-1$
+   private static final String TAG_MT_TOUR_ELAPSED_TIME        = "mt:tourDeviceTime_Elapsed";    //$NON-NLS-1$
    private static final String TAG_MT_TOUR_RECORDED_TIME       = "mt:tourDeviceTime_Recorded";    //$NON-NLS-1$
    private static final String TAG_MT_TOUR_PAUSED_TIME         = "mt:tourDeviceTime_Paused";    //$NON-NLS-1$
 
@@ -612,7 +612,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
       } else if (name.equals(TAG_MT_TOUR_DRIVING_TIME)) {
 
-         _tourData.setTourMovingTime(getIntValue(charData));
+         _tourData.setTourComputedTime_Moving(getIntValue(charData));
          _isInMT_Tour = false;
 
       } else if (name.equals(TAG_MT_TOUR_ELAPSED_TIME)) {

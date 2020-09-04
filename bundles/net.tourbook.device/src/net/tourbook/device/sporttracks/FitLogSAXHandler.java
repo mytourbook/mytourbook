@@ -343,7 +343,7 @@ public class FitLogSAXHandler extends DefaultHandler {
 
    private void finalizeTour() {
 
-      boolean isComputeDrivingTime = true;
+      boolean isComputeMovingTime = true;
 
       // create data object for each tour
       final TourData tourData = new TourData();
@@ -421,8 +421,8 @@ public class FitLogSAXHandler extends DefaultHandler {
 
          tourData.setTourDeviceTime_Elapsed(_currentActivity.duration);
          tourData.setTourDeviceTime_Recorded(_currentActivity.duration);
-         tourData.setTourMovingTime(_currentActivity.duration);
-         isComputeDrivingTime = false;
+         tourData.setTourComputedTime_Moving(_currentActivity.duration);
+         isComputeMovingTime = false;
 
          tourData.setTourAltUp(_currentActivity.elevationUp);
          tourData.setTourAltDown(_currentActivity.elevationDown);
@@ -508,7 +508,7 @@ public class FitLogSAXHandler extends DefaultHandler {
          _newlyImportedTours.put(tourId, tourData);
 
          // create additional data
-         if (isComputeDrivingTime) {
+         if (isComputeMovingTime) {
             tourData.computeTourMovingTime();
          }
 

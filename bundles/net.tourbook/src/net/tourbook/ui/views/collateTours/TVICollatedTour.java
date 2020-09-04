@@ -38,31 +38,30 @@ public abstract class TVICollatedTour extends TreeViewerItem implements ITourIte
             //
             + "SUM(TOURDISTANCE)," // 								0	//$NON-NLS-1$
             + "SUM(tourDeviceTime_Elapsed)," //					1	//$NON-NLS-1$
-            + "SUM(TOURDRIVINGTIME)," //							2	//$NON-NLS-1$
+            + "SUM(TourComputedTime_Moving)," //				2	//$NON-NLS-1$
             + "SUM(TOURALTUP)," //									3	//$NON-NLS-1$
             + "SUM(TOURALTDOWN)," //								4	//$NON-NLS-1$
             + "SUM(1)," //											5	//$NON-NLS-1$
             //
             + "MAX(MAXSPEED)," //									6	//$NON-NLS-1$
             + "SUM(TOURDISTANCE)," //								7	//$NON-NLS-1$
-            + "SUM(TOURDRIVINGTIME)," //							8	//$NON-NLS-1$
-            + "MAX(MAXALTITUDE)," //								9	//$NON-NLS-1$
-            + "MAX(MAXPULSE)," //									10	//$NON-NLS-1$
+            + "MAX(MAXALTITUDE)," //								8	//$NON-NLS-1$
+            + "MAX(MAXPULSE)," //									9	//$NON-NLS-1$
             //
-            + "AVG( CASE WHEN AVGPULSE = 0			THEN NULL ELSE AVGPULSE END)," //			11	//$NON-NLS-1$
-            + "AVG( CASE WHEN AVGCADENCE = 0		THEN NULL ELSE AVGCADENCE END )," //		12	//$NON-NLS-1$
-            + "AVG( CASE WHEN AvgTemperature = 0	THEN NULL ELSE DOUBLE(AvgTemperature) / TemperatureScale END )," //	13	//$NON-NLS-1$
-            + "AVG( CASE WHEN WEATHERWINDDIR = 0	THEN NULL ELSE WEATHERWINDDIR END )," //	14	//$NON-NLS-1$
-            + "AVG( CASE WHEN WEATHERWINDSPD = 0	THEN NULL ELSE WEATHERWINDSPD END )," //	15	//$NON-NLS-1$
-            + "AVG( CASE WHEN RESTPULSE = 0			THEN NULL ELSE RESTPULSE END )," //			16	//$NON-NLS-1$
+            + "AVG( CASE WHEN AVGPULSE = 0			THEN NULL ELSE AVGPULSE END)," //			10	//$NON-NLS-1$
+            + "AVG( CASE WHEN AVGCADENCE = 0		THEN NULL ELSE AVGCADENCE END )," //		11	//$NON-NLS-1$
+            + "AVG( CASE WHEN AvgTemperature = 0	THEN NULL ELSE DOUBLE(AvgTemperature) / TemperatureScale END )," //	12	//$NON-NLS-1$
+            + "AVG( CASE WHEN WEATHERWINDDIR = 0	THEN NULL ELSE WEATHERWINDDIR END )," //	13	//$NON-NLS-1$
+            + "AVG( CASE WHEN WEATHERWINDSPD = 0	THEN NULL ELSE WEATHERWINDSPD END )," //	14	//$NON-NLS-1$
+            + "AVG( CASE WHEN RESTPULSE = 0			THEN NULL ELSE RESTPULSE END )," //			15	//$NON-NLS-1$
             //
-            + "SUM(CALORIES)," //									17	//$NON-NLS-1$
-            + "SUM(numberOfTimeSlices)," //							18	//$NON-NLS-1$
-            + "SUM(numberOfPhotos)," //								19	//$NON-NLS-1$
+            + "SUM(CALORIES)," //									16	//$NON-NLS-1$
+            + "SUM(numberOfTimeSlices)," //							17	//$NON-NLS-1$
+            + "SUM(numberOfPhotos)," //								18	//$NON-NLS-1$
             //
-            + "SUM(frontShiftCount)," //							20	//$NON-NLS-1$
-            + "SUM(rearShiftCount)," //								21	//$NON-NLS-1$
-            + "SUM(TourDeviceTime_Recorded)"; //							22//$NON-NLS-1$
+            + "SUM(frontShiftCount)," //							19	//$NON-NLS-1$
+            + "SUM(rearShiftCount)," //								20	//$NON-NLS-1$
+            + "SUM(TourDeviceTime_Recorded)"; //							21//$NON-NLS-1$
    }
 
    CollatedToursView       collateToursView;
@@ -143,31 +142,30 @@ public abstract class TVICollatedTour extends TreeViewerItem implements ITourIte
 
       // compute average speed/pace, prevent divide by 0
       final long dbDistance = result.getLong(startIndex + 7);
-      final long dbDrivingTime = result.getLong(startIndex + 8);
 
-      colAvgSpeed = dbDrivingTime == 0 ? 0 : 3.6f * dbDistance / dbDrivingTime;
-      colAvgPace = dbDistance == 0 ? 0 : dbDrivingTime * 1000f / dbDistance;
+      colAvgSpeed = colMovingTime == 0 ? 0 : 3.6f * dbDistance / colMovingTime;
+      colAvgPace = dbDistance == 0 ? 0 : colMovingTime * 1000f / dbDistance;
 
-      colMaxAltitude = result.getLong(startIndex + 9);
-      colMaxPulse = result.getLong(startIndex + 10);
+      colMaxAltitude = result.getLong(startIndex + 8);
+      colMaxPulse = result.getLong(startIndex + 9);
 
-      colAvgPulse = result.getFloat(startIndex + 11);
-      colAvgCadence = result.getFloat(startIndex + 12);
-      colAvgTemperature = result.getFloat(startIndex + 13);
+      colAvgPulse = result.getFloat(startIndex + 10);
+      colAvgCadence = result.getFloat(startIndex + 11);
+      colAvgTemperature = result.getFloat(startIndex + 12);
 
-      colWindDir = result.getInt(startIndex + 14);
-      colWindSpd = result.getInt(startIndex + 15);
-      colRestPulse = result.getInt(startIndex + 16);
+      colWindDir = result.getInt(startIndex + 13);
+      colWindSpd = result.getInt(startIndex + 14);
+      colRestPulse = result.getInt(startIndex + 15);
 
-      colCalories = result.getLong(startIndex + 17);
+      colCalories = result.getLong(startIndex + 16);
 
-      colNumberOfTimeSlices = result.getInt(startIndex + 18);
-      colNumberOfPhotos = result.getInt(startIndex + 19);
+      colNumberOfTimeSlices = result.getInt(startIndex + 17);
+      colNumberOfPhotos = result.getInt(startIndex + 18);
 
-      colFrontShiftCount = result.getInt(startIndex + 20);
-      colRearShiftCount = result.getInt(startIndex + 21);
+      colFrontShiftCount = result.getInt(startIndex + 19);
+      colRearShiftCount = result.getInt(startIndex + 20);
 
-      colRecordedTime = result.getLong(startIndex + 22);
+      colRecordedTime = result.getLong(startIndex + 21);
 
       colBreakTime = colElapsedTime - colMovingTime;
       colPausedTime = colElapsedTime - colRecordedTime;

@@ -839,7 +839,7 @@ public class NatTable_DataLoader {
        * TIME
        */
       case TableColumnFactory.TIME_BREAK_TIME_RELATIVE_ID:           return FIELD_WITHOUT_SORTING;
-      case TableColumnFactory.TIME_MOVING_TIME_ID:                  return "tourDrivingTime";                 //$NON-NLS-1$
+      case TableColumnFactory.TIME_MOVING_TIME_ID:                  return "tourComputedTime_Moving";                 //$NON-NLS-1$
       case TableColumnFactory.TIME_BREAK_TIME_ID:                    return FIELD_WITHOUT_SORTING;
       case TableColumnFactory.TIME_RECORDED_TIME_ID:                 return "tourDeviceTime_Recorded";                 //$NON-NLS-1$
       case TableColumnFactory.TIME_PAUSED_TIME_ID:                   return FIELD_WITHOUT_SORTING;

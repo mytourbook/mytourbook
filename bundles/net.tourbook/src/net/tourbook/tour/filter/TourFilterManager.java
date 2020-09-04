@@ -96,7 +96,7 @@ public class TourFilterManager {
    private static final String TOUR_DATA_TOUR_LOCATION_START     = "TourData.tourStartPlace";                                       //$NON-NLS-1$
    private static final String TOUR_DATA_TOUR_LOCATION_END       = "TourData.tourEndPlace";                                         //$NON-NLS-1$
    private static final String TOUR_DATA_TOUR_DISTANCE           = "TourData.tourDistance";                                         //$NON-NLS-1$
-   private static final String TOUR_DATA_TOUR_MOVING_TIME        = "TourData.tourDrivingTime";                                      //$NON-NLS-1$
+   private static final String TOUR_DATA_TOUR_MOVING_TIME        = "TourData.tourComputedTime_Moving";                              //$NON-NLS-1$
    private static final String TOUR_DATA_TOUR_ELAPSED_TIME       = "TourData.tourDeviceTime_Elapsed";                               //$NON-NLS-1$
    private static final String TOUR_DATA_TOUR_START_TIME         = "TourData.tourStartTime";                                        //$NON-NLS-1$
    private static final String TOUR_DATA_TOUR_TITLE              = "TourData.tourTitle";                                            //$NON-NLS-1$
@@ -937,7 +937,7 @@ public class TourFilterManager {
             break;
 
          case TIME_BREAK_TIME:
-            sql = "(TourData.tourDeviceTime_Elapsed - TourData.tourDrivingTime)"; //$NON-NLS-1$
+            sql = "(TourData.tourDeviceTime_Elapsed - TourData.tourComputedTime_Moving)"; //$NON-NLS-1$
             getSQL__FieldOperators_Number(sqlWhere, sqlParameters, fieldOperator, sql, int1, int2);
             break;
 

@@ -459,7 +459,7 @@ public class CalendarTourDataProvider {
                + "   TourDistance," + NL //                       7  //$NON-NLS-1$
                + "   TourAltUp," + NL //                          8  //$NON-NLS-1$
                + "   TourDeviceTime_Elapsed," + NL //             9  //$NON-NLS-1$
-               + "   TourDrivingTime," + NL //                    10 //$NON-NLS-1$
+               + "   TourComputedTime_Moving," + NL //                    10 //$NON-NLS-1$
                + "   TourTitle," + NL //                          11 //$NON-NLS-1$
                + "   TourType_typeId," + NL //                    12 //$NON-NLS-1$
                + "   TourDescription," + NL //                    13 //$NON-NLS-1$
@@ -776,7 +776,7 @@ public class CalendarTourDataProvider {
 
                   + "      TourDistance," + NL //                                      //$NON-NLS-1$
                   + "      TourDeviceTime_Elapsed," + NL //                            //$NON-NLS-1$
-                  + "      TourDrivingTime," + NL //                                   //$NON-NLS-1$
+                  + "      TourComputedTime_Moving," + NL //                                   //$NON-NLS-1$
                   + "      TourAltUp," + NL //                                         //$NON-NLS-1$
                   + "      TourAltDown," + NL //                                       //$NON-NLS-1$
                   + "      calories," + NL //                                          //$NON-NLS-1$
@@ -816,7 +816,7 @@ public class CalendarTourDataProvider {
                + " SUM(TourDistance)," + NL //                                      2  //$NON-NLS-1$
 
                + " SUM(TourDeviceTime_Elapsed)," + NL //                            3  //$NON-NLS-1$
-               + " SUM(TourDrivingTime)," + NL //                                   4  //$NON-NLS-1$
+               + " SUM(TourComputedTime_Moving)," + NL //                                   4  //$NON-NLS-1$
 
                + " SUM(TourAltUp)," + NL //                                         5  //$NON-NLS-1$
                + " SUM(TourAltDown)," + NL //                                       6  //$NON-NLS-1$

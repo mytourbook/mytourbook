@@ -37,7 +37,7 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 
             + "SUM(tourDistance)," //              0   //$NON-NLS-1$
             + "SUM(TourDeviceTime_Elapsed)," //    1   //$NON-NLS-1$
-            + "SUM(tourDrivingTime)," //           2   //$NON-NLS-1$
+            + "SUM(tourComputedTime_Moving)," //   2   //$NON-NLS-1$
             + "SUM(tourAltUp)," //                 3   //$NON-NLS-1$
             + "SUM(tourAltDown)," //               4   //$NON-NLS-1$
 
@@ -57,7 +57,7 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 
             + "tourDistance," //             0   //$NON-NLS-1$
             + "TourDeviceTime_Elapsed," //   1   //$NON-NLS-1$
-            + "tourDrivingTime," //          2   //$NON-NLS-1$
+            + "tourComputedTime_Moving," //  2   //$NON-NLS-1$
             + "tourAltUp," //                3   //$NON-NLS-1$
             + "tourAltDown," //              4   //$NON-NLS-1$
 
@@ -79,7 +79,7 @@ public abstract class TVITagViewItem extends TreeViewerItem {
    long   colDistance;
 
    long   colElapsedTime;
-   long   colDrivingTime;
+   long   colMovingTime;
    long   colPausedTime;
 
    long   colAltitudeUp;
@@ -154,8 +154,8 @@ public abstract class TVITagViewItem extends TreeViewerItem {
       colDistance = result.getLong(startIndex + 0);
 
       colElapsedTime = result.getLong(startIndex + 1);
-      colDrivingTime = result.getLong(startIndex + 2);
-      colPausedTime = colElapsedTime - colDrivingTime;
+      colMovingTime = result.getLong(startIndex + 2);
+      colPausedTime = colElapsedTime - colMovingTime;
 
       colAltitudeUp = result.getLong(startIndex + 3);
       colAltitudeDown = result.getLong(startIndex + 4);
@@ -169,16 +169,16 @@ public abstract class TVITagViewItem extends TreeViewerItem {
       colAvgTemperature = result.getFloat(startIndex + 10);
 
       // prevent divide by 0
-      // 3.6 * SUM(TOURDISTANCE) / SUM(TOURDRIVINGTIME)
-      colAvgSpeed = (colDrivingTime == 0 ? 0 : 3.6f * colDistance / colDrivingTime);
-      colAvgPace = colDistance == 0 ? 0 : colDrivingTime * 1000f / colDistance;
+      // 3.6 * SUM(TOURDISTANCE) / SUM(tourComputedTime_Moving)
+      colAvgSpeed = (colMovingTime == 0 ? 0 : 3.6f * colDistance / colMovingTime);
+      colAvgPace = colDistance == 0 ? 0 : colMovingTime * 1000f / colDistance;
 
       if (UI.IS_SCRAMBLE_DATA) {
 
          colDistance = UI.scrambleNumbers(colDistance);
 
          colElapsedTime = UI.scrambleNumbers(colElapsedTime);
-         colDrivingTime = UI.scrambleNumbers(colDrivingTime);
+         colMovingTime = UI.scrambleNumbers(colMovingTime);
          colPausedTime = UI.scrambleNumbers(colPausedTime);
 
          colAltitudeUp = UI.scrambleNumbers(colAltitudeUp);
@@ -193,8 +193,8 @@ public abstract class TVITagViewItem extends TreeViewerItem {
          colAvgTemperature = UI.scrambleNumbers(colAvgTemperature);
 
          // prevent divide by 0
-         colAvgSpeed = (colDrivingTime == 0 ? 0 : 3.6f * colDistance / colDrivingTime);
-         colAvgPace = colDistance == 0 ? 0 : colDrivingTime * 1000f / colDistance;
+         colAvgSpeed = (colMovingTime == 0 ? 0 : 3.6f * colDistance / colMovingTime);
+         colAvgPace = colDistance == 0 ? 0 : colMovingTime * 1000f / colDistance;
       }
    }
 
