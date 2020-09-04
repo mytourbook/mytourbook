@@ -181,7 +181,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
    private static final String TAG_MT_TOUR_END_TIME            = "mt:tourEndTime";          //$NON-NLS-1$
    private static final String TAG_MT_TOUR_DRIVING_TIME        = "mt:tourDrivingTime";      //$NON-NLS-1$
    private static final String TAG_MT_TOUR_RECORDING_TIME      = "mt:tourRecordingTime";    //$NON-NLS-1$
-   private static final String TAG_MT_TOUR_RECORDED_TIME       = "mt:tourRecordedTime";    //$NON-NLS-1$
+   private static final String TAG_MT_TOUR_RECORDED_TIME       = "mt:tourDeviceTime_Recorded";    //$NON-NLS-1$
    private static final String TAG_MT_TOUR_PAUSED_TIME         = "mt:tourPausedTime";    //$NON-NLS-1$
 
    private static final String TAG_MT_TOUR_ALTITUDE_UP         = "mt:tourAltUp";            //$NON-NLS-1$
@@ -622,7 +622,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
       } else if (name.equals(TAG_MT_TOUR_RECORDED_TIME)) {
 
-         _tourData.setTourRecordedTime(getLongValue(charData));
+         _tourData.setTourDeviceTime_Recorded(getLongValue(charData));
          _isInMT_Tour = false;
 
       } else if (name.equals(TAG_MT_TOUR_PAUSED_TIME)) {
@@ -1101,7 +1101,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
          _newlyImportedTours.put(tourId, _tourData);
 
          _tourData.computeAltitudeUpDown();
-         _tourData.setTourRecordedTime(_tourData.getTourElapsedTime());
+         _tourData.setTourDeviceTime_Recorded(_tourData.getTourElapsedTime());
          _tourData.computeTourMovingTime();
          _tourData.computeComputedValues();
 

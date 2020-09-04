@@ -62,7 +62,7 @@ public abstract class TVICollatedTour extends TreeViewerItem implements ITourIte
             //
             + "SUM(frontShiftCount)," //							20	//$NON-NLS-1$
             + "SUM(rearShiftCount)," //								21	//$NON-NLS-1$
-            + "SUM(TOURRECORDEDTIME)"; //							22//$NON-NLS-1$
+            + "SUM(TourDeviceTime_Recorded)"; //							22//$NON-NLS-1$
    }
 
    CollatedToursView       collateToursView;

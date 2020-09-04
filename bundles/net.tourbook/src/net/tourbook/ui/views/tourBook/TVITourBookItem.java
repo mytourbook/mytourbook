@@ -182,7 +182,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
             // -------- TOUR DATA -----------
 
-            + "tourRecordedTime " //                             86    //$NON-NLS-1$
+            + "tourDeviceTime_Recorded " //                             86    //$NON-NLS-1$
 
       ;
 
@@ -277,7 +277,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             + "MIN(CASE WHEN weather_Temperature_Min = 0 THEN NULL ELSE weather_Temperature_Min END), " + NL // 25            //$NON-NLS-1$
             + "MAX(CASE WHEN weather_Temperature_Max = 0 THEN NULL ELSE weather_Temperature_Max END), " + NL // 26            //$NON-NLS-1$
 
-            + "SUM(CAST(TourRecordedTime AS BIGINT))     " + NL // 27   //$NON-NLS-1$
+            + "SUM(CAST(tourDeviceTime_Recorded AS BIGINT))     " + NL // 27   //$NON-NLS-1$
       ;
 
    }
@@ -316,7 +316,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
    int          colRestPulse;
    //
    long         colTourElapsedTime;
-   long         colTourRecordedTime;
+   long         colTourDeviceTime_Recorded;
    long         colTourMovingTime;
    long         colTourPausedTime;
    long         colBreakTime;
@@ -581,7 +581,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
       // -------- TOUR DATA -----------
 
-      tourItem.colTourRecordedTime    = result.getLong(86);
+      tourItem.colTourDeviceTime_Recorded    = result.getLong(86);
 
 // SET_FORMATTING_ON
 
@@ -632,7 +632,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       tourItem.colAvgSpeed = dbDrivingTime == 0 ? 0 : 3.6f * dbDistance / dbDrivingTime;
       tourItem.colAvgPace = dbDistance == 0 ? 0 : dbDrivingTime * 1000 / dbDistance;
 
-      tourItem.colTourPausedTime = tourItem.colTourElapsedTime - tourItem.colTourRecordedTime;
+      tourItem.colTourPausedTime = tourItem.colTourElapsedTime - tourItem.colTourDeviceTime_Recorded;
       tourItem.colBreakTime = tourItem.colTourElapsedTime - tourItem.colTourMovingTime;
 
       if (UI.IS_SCRAMBLE_DATA) {
@@ -696,11 +696,11 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       colTemperature_Min               = result.getFloat(startIndex + 25);
       colTemperature_Max               = result.getFloat(startIndex + 26);
 
-      colTourRecordedTime  =  result.getLong(startIndex + 27);
+      colTourDeviceTime_Recorded  =  result.getLong(startIndex + 27);
 
 // SET_FORMATTING_ON
 
-      colTourPausedTime = colTourElapsedTime - colTourRecordedTime;
+      colTourPausedTime = colTourElapsedTime - colTourDeviceTime_Recorded;
       colBreakTime = colTourElapsedTime - colTourMovingTime;
 
       colSlowVsFastCadence = TourManager.generateCadenceZones_TimePercentages(cadenceZone_SlowTime, cadenceZone_FastTime);

@@ -3124,7 +3124,7 @@ public class TourDatabase {
             // version 42 start  -  20.X
             //
             + " tourTimerPauses                               BLOB,                  \n" //$NON-NLS-1$
-            + " tourRecordedTime                              BIGINT,                  \n" //$NON-NLS-1$
+            + " tourDeviceTime_Recorded                       BIGINT,                  \n" //$NON-NLS-1$
             + " tourPausedTime                                BIGINT,                  \n" //$NON-NLS-1$
             //
             // version 42 end
@@ -7514,12 +7514,12 @@ public class TourDatabase {
          }
 
          // check if db is updated to version 42
-         if (isColumnAvailable(conn, TABLE_TOUR_DATA, "tourRecordedTime") == false) { //$NON-NLS-1$
+         if (isColumnAvailable(conn, TABLE_TOUR_DATA, "tourDeviceTime_Recorded") == false) { //$NON-NLS-1$
 
 // SET_FORMATTING_OFF
 
             // Add new columns
-            SQL.AddCol_BigInt(stmt, TABLE_TOUR_DATA, "tourRecordedTime",          DEFAULT_0);                            //$NON-NLS-1$
+            SQL.AddCol_BigInt(stmt, TABLE_TOUR_DATA, "tourDeviceTime_Recorded",          DEFAULT_0);                            //$NON-NLS-1$
             SQL.AddCol_BigInt(stmt, TABLE_TOUR_DATA, "tourPausedTime",          DEFAULT_0);                            //$NON-NLS-1$
 
 // SET_FORMATTING_ON
@@ -7651,7 +7651,7 @@ public class TourDatabase {
             //
                   + " SET" //                     //$NON-NLS-1$
                   //
-                  + " tourRecordedTime=tourRecordingTime"); //$NON-NLS-1$
+                  + " tourDeviceTime_Recorded=tourRecordingTime"); //$NON-NLS-1$
 
       stmtUpdate.executeUpdate();
 

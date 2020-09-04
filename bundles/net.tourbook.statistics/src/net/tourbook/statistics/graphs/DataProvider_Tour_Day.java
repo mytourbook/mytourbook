@@ -279,7 +279,7 @@ public class DataProvider_Tour_Day extends DataProvider {
             + " TourType_typeId,"                     + NL //  15    //$NON-NLS-1$
             + " jTdataTtag.TourTag_tagId,"            + NL //  16    //$NON-NLS-1$
 
-            + " TourRecordedTime,"                    + NL //  17    //$NON-NLS-1$
+            + " TourDeviceTime_Recorded,"                    + NL //  17    //$NON-NLS-1$
             + " TourPausedTime"                       + NL //  18    //$NON-NLS-1$
 
             + NL
@@ -313,7 +313,7 @@ public class DataProvider_Tour_Day extends DataProvider {
          final TIntArrayList dbAllTourDuration = new TIntArrayList();
          final TIntArrayList dbAllTourElapsedTime = new TIntArrayList();
          final TIntArrayList dbAllTourMovingTime = new TIntArrayList();
-         final TIntArrayList dbAllTourRecordedTime = new TIntArrayList();
+         final TIntArrayList dbAllTourDeviceTime_Recorded = new TIntArrayList();
          final TIntArrayList dbAllTourPausedTime = new TIntArrayList();
 
          final TFloatArrayList dbAllDistance = new TFloatArrayList();
@@ -420,7 +420,7 @@ public class DataProvider_Tour_Day extends DataProvider {
                dbAllTourEndTime.add((startDayTime + dbElapsedTime));
                dbAllTourElapsedTime.add(dbElapsedTime);
                dbAllTourMovingTime.add(dbMovingTime);
-               dbAllTourRecordedTime.add(dbRecordedTime);
+               dbAllTourDeviceTime_Recorded.add(dbRecordedTime);
                dbAllTourPausedTime.add(dbPausedTime);
 
                dbAllTourDuration.add(durationTimeValue);
@@ -640,7 +640,7 @@ public class DataProvider_Tour_Day extends DataProvider {
 
          _tourDayData.allElapsedTime = dbAllTourElapsedTime.toArray();
          _tourDayData.allMovingTime = dbAllTourMovingTime.toArray();
-         _tourDayData.allRecordedTime = dbAllTourRecordedTime.toArray();
+         _tourDayData.allDeviceTime_Recorded = dbAllTourDeviceTime_Recorded.toArray();
          _tourDayData.allPausedTime = dbAllTourPausedTime.toArray();
 
          _tourDayData.tourTitle = dbAllTourTitle;

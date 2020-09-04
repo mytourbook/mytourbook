@@ -848,7 +848,7 @@ public class TourManager {
       int toStartIndex = 0;
       int toSwimStartIndex = 0;
       int tourElapsedTime = 0;
-      int tourRecordedTime = 0;
+      int tourDeviceTime_Recorded = 0;
       int tourPausedTime = 0;
       float tourDistance = 0;
       float tourAltUp = 0;
@@ -1101,7 +1101,7 @@ public class TourManager {
           */
          tourElapsedTime++;
 
-         tourRecordedTime += fromTourData.getTourRecordedTime();
+         tourDeviceTime_Recorded += fromTourData.getTourDeviceTime_Recorded();
          tourPausedTime += fromTourData.getTourPausedTime();
       }
 
@@ -1180,7 +1180,7 @@ public class TourManager {
 
       joinedTourData.setTourStartTime(tourStartTime);
       joinedTourData.setTourElapsedTime(tourElapsedTime);
-      joinedTourData.setTourRecordedTime(tourRecordedTime);
+      joinedTourData.setTourDeviceTime_Recorded(tourDeviceTime_Recorded);
       joinedTourData.setTourPausedTime(tourPausedTime);
       joinedTourData.setTourDistance(tourDistance);
 

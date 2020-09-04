@@ -371,7 +371,7 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
                   tourDrivingTime = tourDrivingTime + Short.parseShort(fields[1].substring(3, 5)) * 60;
                   tourDrivingTime = tourDrivingTime + Short.parseShort(fields[1].substring(0, 2)) * 3600;
                   tourData.setTourMovingTime(tourDrivingTime);
-                  tourData.setTourRecordedTime(tourDrivingTime);
+                  tourData.setTourDeviceTime_Recorded(tourDrivingTime);
                }
                if (fields[0].equals("RecTime")) {//"hh:mm:ss.00" //$NON-NLS-1$
                   int tourRecordingTime = Short.parseShort(fields[1].substring(6, 8));
@@ -616,7 +616,7 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
 
             // create additional data
             tourData.computeComputedValues();
-            tourData.setTourRecordedTime(tourData.getTourElapsedTime());
+            tourData.setTourDeviceTime_Recorded(tourData.getTourElapsedTime());
             tourData.computeTourMovingTime();
 
             tourData.completeTourMarkerWithRelativeTime();

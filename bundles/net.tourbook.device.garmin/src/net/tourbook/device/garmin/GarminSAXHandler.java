@@ -707,7 +707,7 @@ public class GarminSAXHandler extends DefaultHandler {
    private void finalizeTour_TimerPauses(final TourData tourData) {
 
       if (_timerPauses.size() == 0) {
-         tourData.setTourRecordedTime(tourData.getTourElapsedTime());
+         tourData.setTourDeviceTime_Recorded(tourData.getTourElapsedTime());
          return;
       }
 
@@ -723,7 +723,7 @@ public class GarminSAXHandler extends DefaultHandler {
       tourData.setTourTimerPauses(tourTimerPauses);
       final long totalTourTimerPauses = tourData.getTotalTourTimerPauses();
 
-      tourData.setTourRecordedTime(tourData.getTourElapsedTime() - totalTourTimerPauses);
+      tourData.setTourDeviceTime_Recorded(tourData.getTourElapsedTime() - totalTourTimerPauses);
       tourData.setTourPausedTime(totalTourTimerPauses);
    }
 

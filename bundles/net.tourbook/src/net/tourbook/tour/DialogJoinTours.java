@@ -1325,12 +1325,12 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
          /*
           * summarize other fields
           */
-         tourTourData.setTourRecordedTime(tourTourData.getTourElapsedTime());
+         tourTourData.setTourDeviceTime_Recorded(tourTourData.getTourElapsedTime());
          //TODO FB merge the pauses
          tourTourData.computeTourMovingTime();
 
          joinedElapsedTime += tourTourData.getTourElapsedTime();
-         joinedRecordedTime += tourTourData.getTourRecordedTime();
+         joinedRecordedTime += tourTourData.getTourDeviceTime_Recorded();
          joinedPausedTime += tourTourData.getTourPausedTime();
          joinedMovingTime += tourTourData.getTourMovingTime();
 
@@ -1376,7 +1376,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
       _joinedTourData.setWeatherWindSpeed(joinedWeatherWindSpeed);
 
       _joinedTourData.setTourElapsedTime(joinedElapsedTime);
-      _joinedTourData.setTourRecordedTime(joinedRecordedTime);
+      _joinedTourData.setTourDeviceTime_Recorded(joinedRecordedTime);
       _joinedTourData.setTourPausedTime(joinedPausedTime);
       _joinedTourData.setTourMovingTime(joinedMovingTime);
       _joinedTourData.setTourDistance(joinedDistance);

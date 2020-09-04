@@ -328,7 +328,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Total recorded time in seconds
     */
    @XmlElement
-   private long                  tourRecordedTime;
+   private long                  tourDeviceTime_Recorded;
 
    // ############################################# DISTANCE #############################################
 
@@ -6532,11 +6532,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       out.println(
             "Recorded time:      " //$NON-NLS-1$
-                  + (getTourRecordedTime() / 3600)
+                  + (getTourDeviceTime_Recorded() / 3600)
                   + UI.SYMBOL_COLON
-                  + ((getTourRecordedTime() % 3600) / 60)
+                  + ((getTourDeviceTime_Recorded() % 3600) / 60)
                   + UI.SYMBOL_COLON
-                  + (getTourRecordedTime() % 3600) % 60);
+                  + (getTourDeviceTime_Recorded() % 3600) % 60);
 
       out.println(
             "Moving time:      " //$NON-NLS-1$
@@ -8338,6 +8338,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
+    * @return Returns the total recorded time in seconds.
+    */
+   public long getTourDeviceTime_Recorded() {
+      return tourDeviceTime_Recorded;
+   }
+
+   /**
     * @return the tour distance in metric measurement system
     */
    public float getTourDistance() {
@@ -8430,13 +8437,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    public Set<TourPhoto> getTourPhotos() {
       return tourPhotos;
-   }
-
-   /**
-    * @return Returns the total recorded time in seconds.
-    */
-   public long getTourRecordedTime() {
-      return tourRecordedTime;
    }
 
    public Collection<TourReference> getTourReferences() {
@@ -9671,6 +9671,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       this.tourDescription = tourDescription;
    }
 
+   public void setTourDeviceTime_Recorded(final long tourDeviceTime_Recorded) {
+      this.tourDeviceTime_Recorded = tourDeviceTime_Recorded;
+   }
+
    public void setTourDistance(final float tourDistance) {
       this.tourDistance = tourDistance;
    }
@@ -9798,10 +9802,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       numberOfPhotos = tourPhotos.size();
 
       computePhotoTimeAdjustment();
-   }
-
-   public void setTourRecordedTime(final long tourRecordedTime) {
-      this.tourRecordedTime = tourRecordedTime;
    }
 
    /**

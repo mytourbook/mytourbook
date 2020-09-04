@@ -247,6 +247,7 @@ public class StatisticTour_Time extends TourbookStatistic implements IBarSelecti
       final int[] startValue = _tourTimeData.tourTimeStartValues;
       final int[] endValue = _tourTimeData.tourTimeEndValues;
 
+      //TODO FB
       final int recordingTime = _tourTimeData.tourRecordingTimeValues[valueIndex];
       final int drivingTime = _tourTimeData.tourDrivingTimeValues[valueIndex];
       final int breakTime = recordingTime - drivingTime;

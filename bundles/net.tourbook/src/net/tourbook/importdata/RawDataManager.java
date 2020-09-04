@@ -1301,7 +1301,7 @@ public class RawDataManager {
 
          // re-import pauses only
 
-         oldTourData.setTourRecordedTime(reimportedTourData.getTourRecordedTime());
+         oldTourData.setTourDeviceTime_Recorded(reimportedTourData.getTourDeviceTime_Recorded());
 
          oldTourData.setTourTimerPauses(reimportedTourData.getTourTimerPauses());
          final long totalTourTimerPauses = reimportedTourData.getTotalTourTimerPauses();

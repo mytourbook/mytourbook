@@ -8469,7 +8469,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          if (_isManualTour) {
 
             _tourData.setTourElapsedTime(_timeElapsed.getTime());
-            _tourData.setTourRecordedTime(_timeRecorded.getTime());
+            _tourData.setTourDeviceTime_Recorded(_timeRecorded.getTime());
             _tourData.setTourPausedTime(_timePaused.getTime());
             _tourData.setTourMovingTime(_timeMoving.getTime());
          }
@@ -8929,7 +8929,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       // tour times
       final int elapsedTime = (int) _tourData.getTourElapsedTime();
       final int movingTime = (int) _tourData.getTourMovingTime();
-      final int recordedTime = (int) _tourData.getTourRecordedTime();
+      final int recordedTime = (int) _tourData.getTourDeviceTime_Recorded();
       final int pausedTime = (int) _tourData.getTourPausedTime();
 
       _timeElapsed.setTime(elapsedTime);

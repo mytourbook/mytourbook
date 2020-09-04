@@ -423,7 +423,7 @@ public class CalendarTourDataProvider {
          ArrayList<Integer> dbElevationGain = null;
          ArrayList<Integer> dbElevationLoss = null;
          ArrayList<Integer> dbTourElapsedTime = null;
-         ArrayList<Integer> dbTourRecordedTime = null;
+         ArrayList<Integer> dbTourDeviceTime_Recorded = null;
          ArrayList<Integer> dbTourMovingTime = null;
 
          ArrayList<Integer> dbCalories = null;
@@ -472,7 +472,7 @@ public class CalendarTourDataProvider {
                + "   TourAltDown," + NL //                        18 //$NON-NLS-1$
                + "   AvgPulse," + NL //                           19 //$NON-NLS-1$
                + "   Power_Avg," + NL //                          20 //$NON-NLS-1$
-               + "   TourRecordedTime" + NL //                    21 //$NON-NLS-1$
+               + "   TourDeviceTime_Recorded" + NL //                    21 //$NON-NLS-1$
 
                + NL
 
@@ -538,7 +538,7 @@ public class CalendarTourDataProvider {
                   dbElevationGain = new ArrayList<>();
                   dbElevationLoss = new ArrayList<>();
                   dbTourElapsedTime = new ArrayList<>();
-                  dbTourRecordedTime = new ArrayList<>();
+                  dbTourDeviceTime_Recorded = new ArrayList<>();
                   dbTourMovingTime = new ArrayList<>();
 
                   dbCalories = new ArrayList<>();
@@ -590,7 +590,7 @@ public class CalendarTourDataProvider {
                   dbElevationGain.add(result.getInt(8));
 
                   dbTourElapsedTime.add(elapsedTime);
-                  dbTourRecordedTime.add(recordedTime);
+                  dbTourDeviceTime_Recorded.add(recordedTime);
                   dbTourMovingTime.add(result.getInt(10));
 
                   dbTourTitle.add(result.getString(11));
@@ -676,7 +676,7 @@ public class CalendarTourDataProvider {
                data.elevationLoss = dbElevationGain.get(tourIndex);
 
                data.elapsedTime = dbTourElapsedTime.get(tourIndex);
-               data.recordedTime = dbTourRecordedTime.get(tourIndex);
+               data.recordedTime = dbTourDeviceTime_Recorded.get(tourIndex);
                data.movingTime = dbTourMovingTime.get(tourIndex);
 
                data.calories = dbCalories.get(tourIndex);
@@ -825,7 +825,7 @@ public class CalendarTourDataProvider {
 
                + " SUM(cadenceZone_SlowTime)," + NL //                              8  //$NON-NLS-1$
                + " SUM(cadenceZone_FastTime)," + NL //                              9  //$NON-NLS-1$
-               + " SUM(TourRecordedTime)" + NL //                                  10  //$NON-NLS-1$
+               + " SUM(TourDeviceTime_Recorded)" + NL //                                  10  //$NON-NLS-1$
 
                + sqlFromTourData;
 

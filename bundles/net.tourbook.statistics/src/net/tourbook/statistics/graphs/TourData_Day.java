@@ -58,7 +58,7 @@ public class TourData_Day {
 
    int[]                          allElapsedTime;
    int[]                          allMovingTime;
-   int[]                          allRecordedTime;
+   int[]                          allDeviceTime_Recorded;
    int[]                          allPausedTime;
 
    int[]                          allStartTime;
